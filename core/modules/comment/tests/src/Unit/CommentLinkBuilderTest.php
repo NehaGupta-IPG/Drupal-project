@@ -171,7 +171,7 @@ class CommentLinkBuilderTest extends UnitTestCase {
       'is_anonymous' => [FALSE, TRUE],
       'comment_count' => [0, 1],
       'has_access_comments' => [0, 1],
-      'has_post_comments'   => [0, 1],
+      'has_post_comments' => [0, 1],
       'form_location' => FormLocation::cases(),
       'comments' => CommentingStatus::cases(),
       'view_mode' => [
@@ -181,7 +181,7 @@ class CommentLinkBuilderTest extends UnitTestCase {
     $permutations = static::generatePermutations($combinations);
     foreach ($permutations as $combination) {
       $case = [
-        [TRUE, $combination['comments'], $combination['form_location'], $combination['comment_count']],
+        [TRUE, $combination['comments'], $combination['form_location'], $combination['comment_count'], $combination['has_access_comments'], $combination['has_post_comments']],
         ['view_mode' => $combination['view_mode']],
         $combination['has_access_comments'],
         $combination['has_post_comments'],
@@ -249,7 +249,7 @@ class CommentLinkBuilderTest extends UnitTestCase {
    * @return \Drupal\node\NodeInterface|\PHPUnit\Framework\MockObject\Stub
    *   Stub node for testing.
    */
-  protected function getMockNode($has_field, $comment_status, $form_location, $comment_count) {
+  protected function getMockNode($has_field, $comment_status, $form_location, $comment_count, $has_access_comments = FALSE, $has_post_comments = FALSE) {
     $node = $this->createStub(NodeInterface::class);
     $node
       ->method('hasField')
@@ -258,11 +258,33 @@ class CommentLinkBuilderTest extends UnitTestCase {
     if (empty($this->timestamp)) {
       $this->timestamp = time();
     }
-    $field_item = (object) [
-      'status' => $comment_status->value,
-      'comment_count' => $comment_count,
-      'last_comment_timestamp' => $this->timestamp,
-    ];
+    $field_item = $this->getMockBuilder('\Drupal\Core\Field\FieldItemListInterface')
+      ->disableOriginalConstructor()
+      ->getMock();
+    $field_item
+      ->method('__get')
+      ->willReturnMap([
+        ['status', $comment_status->value],
+        ['comment_count', $comment_count],
+        ['last_comment_timestamp', $this->timestamp],
+      ]);
+    $field_item
+      ->method('access')
+      ->willReturnCallback(function ($operation, $account) use ($has_access_comments, $has_post_comments) {
+        switch ($operation) {
+          case 'view only':
+            return $account->hasPermission('access comments');
+
+          case 'view':
+            return $account->hasPermission('access comments') || $account->hasPermission('post comments');
+
+          case 'create':
+            return $account->hasPermission('post comments');
+
+          default:
+            return FALSE;
+        }
+      });
     $node
       ->method('get')
       ->willReturn($field_item);
