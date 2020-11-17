@@ -291,10 +291,6 @@ class CommentController extends ControllerBase {
 
     $create_operation = 'create';
     if ($pid) {
-      $parent_comment = $this->entityTypeManager()->getStorage('comment')->load($pid);
-      if (!$parent_comment) {
-        return AccessResult::forbidden('Cannot reply to a non-existing comment');
-      }
       // Distinguish between a reply and a first-tier comment creation.
       // @see \Drupal\comment\CommentFieldItemList::access()
       $create_operation = "reply to {$pid}";
@@ -305,33 +301,27 @@ class CommentController extends ControllerBase {
 
     // Check if the user is able to create comments.
     $access = $field->access($create_operation, NULL, TRUE);
-    if (!$access->isAllowed()) {
-      // Exit if the user is not allowed to create new comments.
+    if ($access->isForbidden()) {
       return $access;
     }
 
     $status = CommentingStatus::tryFrom((int) $field->status);
-    $access = AccessResult::allowedIf(
+    $access = $access
       // Commenting is open on this entity.
-      $status === CommentingStatus::Open
+      ->andIf(AccessResult::allowedIf($status === CommentingStatus::Open))
       // And the user has access to the host entity.
-      && $entity->access('view')
-    )->addCacheableDependency($entity);
-    if (!$access->isAllowed()) {
-      // Exit if comments are closed or the user cannot view the host entity.
-      return $access;
-    }
+      ->andIf($entity->access('view', NULL, TRUE));
 
     // Comment replies require some additional checks.
     if ($pid) {
-      return AccessResult::allowedIf(
+      $parent_comment = $this->entityTypeManager()->getStorage('comment')->load($pid);
+      $access = $access
         // The parent comment is published.
-        $parent_comment->isPublished()
+        ->andIf(AccessResult::allowedIf($parent_comment->isPublished()))
         // And the parent comment host belongs to the entity.
-        && $parent_comment->getCommentedEntityId() === $entity->id()
+        ->andIf(AccessResult::allowedIf($parent_comment->getCommentedEntityId() === $entity->id()))
         // And the user is allowed to view the parent comment.
-        && $parent_comment->access('view')
-      )->addCacheableDependency($parent_comment);
+        ->andIf($parent_comment->access('view', NULL, TRUE));
     }
 
     return $access;
