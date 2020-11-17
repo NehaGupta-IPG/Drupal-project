@@ -7,6 +7,7 @@ namespace Drupal\Tests\comment\Kernel;
 use Drupal\comment\Controller\CommentController;
 use Drupal\comment\Plugin\Field\FieldType\CommentItemInterface;
 use Drupal\comment\Tests\CommentTestTrait;
+use Drupal\Core\Cache\Cache;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\node\Entity\NodeType;
 use Drupal\Tests\comment\Traits\CommentCreationTrait;
@@ -90,7 +91,12 @@ class CommentControllerTest extends KernelTestBase {
     $node->save();
 
     // Check that it's forbidden to comment on a non-accessible entity.
-    $this->assertTrue($this->controller->replyFormAccess($node, 'comment')->isNeutral());
+    /** @var \Drupal\Core\Access\AccessResult $access_result */
+    $access_result = $this->controller->replyFormAccess($node, 'comment');
+    $this->assertTrue($access_result->isNeutral());
+    $this->assertSame($node->getCacheTags(), $access_result->getCacheTags());
+    // @see \Drupal\comment\CommentAccessControlHandler::checkCreateAccess()
+    $this->assertSame(['user.permissions'], $access_result->getCacheContexts());
 
     // Publish the node.
     $node->setPublished()->save();
@@ -99,13 +105,17 @@ class CommentControllerTest extends KernelTestBase {
 
     // Check that only users granted with proper permissions are able comment on
     // an accessible entity.
-    $this->assertEquals($expectation, $this->controller->replyFormAccess($node, 'comment')->isAllowed());
+    $access_result = $this->controller->replyFormAccess($node, 'comment');
+    $this->assertEquals($expectation, $access_result->isAllowed());
+    $this->assertSame($node->getCacheTags(), $access_result->getCacheTags());
 
     // Close commenting on this node.
     $node->get('comment')->status = CommentItemInterface::CLOSED;
 
     // Check that is not possible to comment when comments are closed.
-    $this->assertTrue($this->controller->replyFormAccess($node, 'comment')->isNeutral());
+    $access_result = $this->controller->replyFormAccess($node, 'comment');
+    $this->assertTrue($access_result->isNeutral());
+    $this->assertSame($node->getCacheTags(), $access_result->getCacheTags());
 
     // Reopen commenting on this node.
     $node->get('comment')->status = CommentItemInterface::OPEN;
@@ -123,20 +133,28 @@ class CommentControllerTest extends KernelTestBase {
     ]);
 
     // Check that users granted with proper permissions can reply to a comment.
-    $this->assertEquals($expectation, $this->controller->replyFormAccess($node, 'comment', $comment->id())->isAllowed());
+    $access_result = $this->controller->replyFormAccess($node, 'comment', $comment->id());
+    $this->assertEquals($expectation, $access_result->isAllowed());
+    // Now the parent comment cache metadata should have been merged.
+    $expected_cache_tags = Cache::mergeTags($node->getCacheTags(), $comment->getCacheTags());
+    $this->assertSame($expected_cache_tags, $access_result->getCacheTags());
 
     // Unpublish the comment.
     $comment->setUnpublished()->save();
 
     // Check that users cannot reply to an unpublished comment.
-    $this->assertTrue($this->controller->replyFormAccess($node, 'comment', $comment->id())->isNeutral());
+    $access_result = $this->controller->replyFormAccess($node, 'comment', $comment->id());
+    $this->assertTrue($access_result->isNeutral());
+    $this->assertSame($expected_cache_tags, $access_result->getCacheTags());
 
-    // Publish the parent comment but move it to a different node to a different node.
+    // Publish the parent comment but move it to a different node.
     $other_node = $this->createNode(['type' => 'page']);
     $comment->setPublished()->set('entity_id', $other_node->id())->save();
 
     // Check that users cannot reply to a comment from other entity.
-    $this->assertTrue($this->controller->replyFormAccess($node, 'comment', $comment->id())->isNeutral());
+    $access_result = $this->controller->replyFormAccess($node, 'comment', $comment->id());
+    $this->assertTrue($access_result->isNeutral());
+    $this->assertSame($expected_cache_tags, $access_result->getCacheTags());
   }
 
   /**
