@@ -95,6 +95,8 @@ function hook_comment_links_alter(array &$links, CommentInterface $entity, array
  * is attached to the nodes search result and we need to check if the user is
  * able to view the comments.
  *
+ * @see comment_node_search_result()
+ *
  * @section edit 'edit'
  * This is a standard entity operation that allows access to the comment field
  * widget in the commented entity form.
