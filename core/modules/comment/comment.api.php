@@ -86,7 +86,7 @@ function hook_comment_links_alter(array &$links, CommentInterface $entity, array
  *
  * @see \Drupal\comment\Controller\CommentController::replyFormAccess()
  *
- * @section view_only 'view only'
+ * @section view_comments_only 'view comments only'
  * Unlike 'view', this operation limit its scope only to view the field list
  * of comments. Such an operation will be allowed only if the user can access at
  * least one comment from the thread. This is typically used to assemble the

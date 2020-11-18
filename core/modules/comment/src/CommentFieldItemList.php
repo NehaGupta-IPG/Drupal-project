@@ -58,14 +58,14 @@ class CommentFieldItemList extends FieldItemList {
       // decision to show only comments, only comment form or both will be made
       // by CommentDefaultFormatter::viewElements() later. Uses recursive calls
       // on same method invoking lower operations.
-      $result = $this->access('view only', $account, TRUE);
+      $result = $this->access('view comments only', $account, TRUE);
       if (!$result->isAllowed()) {
         $result = $result->orIf($this->access('create', $account, TRUE));
       }
 
       return $return_as_object ? $result : $result->isAllowed();
     }
-    if ($operation === 'view only') {
+    if ($operation === 'view comments only') {
       // In contrast to 'view', this operation is used as the lowest operation
       // by various methods to check only a single permission on last comment.
       return $this->lastPublishedCommentAccess($account, $return_as_object);

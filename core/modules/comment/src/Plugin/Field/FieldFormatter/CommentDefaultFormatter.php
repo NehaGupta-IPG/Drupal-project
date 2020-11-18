@@ -141,7 +141,7 @@ class CommentDefaultFormatter extends FormatterBase {
       // $entity->get($field_name)->comment_count, but unpublished comments
       // should display if the user is an administrator.
       $elements['#cache']['contexts'][] = 'user.permissions';
-      if ($items->access('view only', $this->currentUser) || $this->currentUser->hasPermission('administer comments')) {
+      if ($items->access('view comments only', $this->currentUser) || $this->currentUser->hasPermission('administer comments')) {
         $output['comments'] = [];
 
         if ($items->comment_count || $this->currentUser->hasPermission('administer comments')) {

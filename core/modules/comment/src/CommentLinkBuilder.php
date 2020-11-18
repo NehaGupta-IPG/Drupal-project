@@ -82,7 +82,7 @@ class CommentLinkBuilder implements CommentLinkBuilderInterface {
           // Teaser view: display the number of comments that have been posted,
           // or a link to add new comments if the user has permission, the
           // entity is open to new comments, and there currently are none.
-          if ($field->comment_count > 0 && $field->access('view only', $this->currentUser)) {
+          if ($field->comment_count > 0 && $field->access('view comments only', $this->currentUser)) {
             $links['comment-comments'] = [
               'title' => $this->formatPlural($field->comment_count, '1 comment', '@count comments'),
               'attributes' => ['title' => $this->t('Jump to the first comment.')],
@@ -128,7 +128,7 @@ class CommentLinkBuilder implements CommentLinkBuilderInterface {
               // Show the "post comment" link if the form is on another page, or
               // if there are existing comments that the link will skip past.
               $separate_form_location = $comment_form_location === FormLocation::SeparatePage;
-              $existing_comments = $field->comment_count > 0 && $field->access('view only', $this->currentUser);
+              $existing_comments = $field->comment_count > 0 && $field->access('view comments only', $this->currentUser);
               if ($separate_form_location || $existing_comments) {
                 $links['comment-add'] = [
                   'title' => $this->t('Add new comment'),
