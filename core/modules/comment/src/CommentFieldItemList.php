@@ -68,6 +68,8 @@ class CommentFieldItemList extends FieldItemList {
     if ($operation === 'view comments only') {
       // In contrast to 'view', this operation is used as the lowest operation
       // by various methods to check only a single permission on last comment.
+      // If a user is able to view the last published comments, they are able
+      // to view the whole list of comments.
       return $this->lastPublishedCommentAccess($account, $return_as_object);
     }
 
