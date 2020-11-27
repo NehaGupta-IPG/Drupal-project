@@ -495,6 +495,7 @@ class FileSystem implements FileSystemInterface {
     }
     // Write the data to a temporary file.
     $temp_name = $this->tempnam('temporary://', 'file');
+    $this->prepareDirectory($temp_name, self::CREATE_DIRECTORY);
     if (file_put_contents($temp_name, $data) === FALSE) {
       throw new FileWriteException("Temporary file '$temp_name' could not be created.");
     }
