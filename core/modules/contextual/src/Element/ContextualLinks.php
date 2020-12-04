@@ -64,6 +64,9 @@ class ContextualLinks extends RenderElementBase {
 
     $contextual_links_manager = static::contextualLinkManager();
 
+    $literal_links = $element['#contextual_links']['contextual']['route_parameters'] ?? [];
+    unset($element['#contextual_links']['contextual']);
+
     foreach ($element['#contextual_links'] as $group => $args) {
       $args += [
         'route_parameters' => [],
@@ -77,6 +80,13 @@ class ContextualLinks extends RenderElementBase {
     // Transform contextual links into parameters suitable for links.html.twig.
     $links = [];
     $use_ajax = FALSE;
+    foreach ($literal_links as $class => $freeform_link) {
+      $class = Html::getClass($class);
+      $links[$class] = [
+        'title' => $freeform_link['title'],
+        'url' => Url::fromUserInput($freeform_link['path'], $freeform_link['options']),
+      ];
+    }
     foreach ($items as $class => $item) {
       // Check whether any of the contextual links have the use-ajax class.
       $use_ajax = $use_ajax || in_array('use-ajax', $item['localized_options']['class'] ?? [], TRUE);
