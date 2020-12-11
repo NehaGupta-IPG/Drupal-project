@@ -220,7 +220,7 @@ class FormErrorHandler implements FormErrorHandlerInterface {
 
     // Add aria-describedby attribute to the form element.
     if (($elements['#errors']) !== NULL) {
-      $elements['#attributes']['aria-describedby'] = $elements['#id'] . '--error-message';
+      $elements['#attributes']['aria-errormessage'] = $elements['#id'] . '--error-message';
     }
   }
 
