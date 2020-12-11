@@ -5,6 +5,7 @@ namespace Drupal\Core\Form;
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Messenger\MessengerTrait;
 use Drupal\Core\Render\Element;
+use Drupal\Core\Render\RendererInterface;
 
 /**
  * Handles form errors.
@@ -12,6 +13,34 @@ use Drupal\Core\Render\Element;
 class FormErrorHandler implements FormErrorHandlerInterface {
 
   use MessengerTrait;
+
+  /**
+   * The renderer service.
+   *
+   * @var \Drupal\Core\Render\RendererInterface
+   */
+  protected $renderer;
+
+  /**
+   * Constructs a FormErrorHandler instance.
+   *
+   * @param \Drupal\Core\Render\RendererInterface $renderer
+   *   The renderer service.
+   */
+  public function __construct(RendererInterface $renderer) {
+    $this->renderer = $renderer;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function create(ContainerInterface $container) {
+    // Instantiates this form class.
+    return new static(
+      // Load the service required to construct this class.
+      $container->get('renderer')
+    );
+  }
 
   /**
    * {@inheritdoc}
@@ -39,10 +68,34 @@ class FormErrorHandler implements FormErrorHandlerInterface {
    */
   protected function displayErrorMessages(array $form, FormStateInterface $form_state) {
     $errors = $form_state->getErrors();
-
-    // Loop through all form errors and set an error message.
-    foreach ($errors as $error) {
-      $this->messenger()->addMessage($error, 'error');
+    $items = [
+      '#theme' => 'item_list',
+      '#items' => [],
+      '#list_type' => 'ul',
+    ];
+    // Loop through all form errors and set an id.
+    foreach ($errors as $name => $error) {
+      $form_element = FormElementHelper::getElementByName($name, $form);
+      $has_id = !empty($form_element['#id']);
+      if ($has_id) {
+        $items['#wrapper_attributes'] = [
+          'id' => $form_element['#id'] . '--error-message',
+        ];
+      }
+      $message = [
+        'message' => [
+          '#markup' => $error,
+        ],
+        'items' => $items,
+      ];
+      if ($has_id) {
+        // Render the error messages as HTML.
+        $message = $this->renderer->renderPlain($message);
+        $this->messenger()->addMessage($message, 'error');
+      }
+      else {
+        $this->messenger()->addMessage($error, 'error');
+      }
     }
   }
 
@@ -164,6 +217,11 @@ class FormErrorHandler implements FormErrorHandlerInterface {
 
     // Store the errors for this element on the element directly.
     $elements['#errors'] = $form_state->getError($elements);
+
+    // Add aria-describedby attribute to the form element.
+    if (($elements['#errors']) !== NULL) {
+      $elements['#attributes']['aria-describedby'] = $elements['#id'] . '--status-message';
+    }
   }
 
 }

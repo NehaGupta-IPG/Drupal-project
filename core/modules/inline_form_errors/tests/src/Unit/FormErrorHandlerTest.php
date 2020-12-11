@@ -196,8 +196,11 @@ class FormErrorHandlerTest extends UnitTestCase {
         FALSE
       );
 
-    $this->renderer->expects($this->never())
-      ->method('renderInIsolation');
+    $this->renderer->expects($this->any())
+      ->method('renderInIsolation')
+      ->will($this->returnCallback(function ($message) {
+        return $message['message']['#markup'];
+      }));
 
     $this->testForm['#disable_inline_form_errors'] = TRUE;
 
