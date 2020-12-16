@@ -109,8 +109,7 @@ class ContextualLinks extends FieldPluginBase {
   public function render(ResultRow $values) {
     $links = [];
     foreach ($this->options['fields'] as $field) {
-      // @fixme Find out how to force the rendering here.
-      $rendered_field = $this->view->style_plugin->getField($values->index, $field);
+      $rendered_field = $this->view->field[$field]->last_render;
       if (empty($rendered_field)) {
         continue;
       }
