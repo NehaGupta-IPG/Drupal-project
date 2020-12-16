@@ -54,6 +54,7 @@ class ContextualLinks extends FieldPluginBase {
       '#description' => $this->t('Fields to be included as contextual links.'),
       '#options' => $field_options,
       '#default_value' => $this->options['fields'],
+      '#element_validate' => [[static::class, 'validateOptions']],
     ];
     $form['destination'] = [
       '#type' => 'select',
@@ -65,6 +66,19 @@ class ContextualLinks extends FieldPluginBase {
       ],
       '#default_value' => $this->options['destination'],
     ];
+  }
+
+  /**
+   * Form API #element_validate for options.
+   *
+   * @todo Make this reusable (or replace with reusable method).
+   * @see \Drupal\Core\Render\Element\Checkboxes::getCheckedCheckboxes
+   */
+  public static function validateOptions(&$element, FormStateInterface $form_state, &$complete_form) {
+    $value = array_filter($element['#value'], function ($value) {
+      return $value !== 0;
+    });
+    $form_state->setValueForElement($element, $value);
   }
 
   /**
@@ -95,6 +109,7 @@ class ContextualLinks extends FieldPluginBase {
   public function render(ResultRow $values) {
     $links = [];
     foreach ($this->options['fields'] as $field) {
+      // @fixme Find out how to force the rendering here.
       $rendered_field = $this->view->style_plugin->getField($values->index, $field);
       if (empty($rendered_field)) {
         continue;
@@ -123,6 +138,9 @@ class ContextualLinks extends FieldPluginBase {
     }
 
     // Renders a contextual links placeholder.
+    // Links must be a nested array of strings, so that _contextual_links_to_id
+    // can serialize them.
+    // @see \Drupal\contextual\Element\ContextualLinks::preRenderLinks
     if (!empty($links)) {
       $contextual_links = [
         'contextual' => [
