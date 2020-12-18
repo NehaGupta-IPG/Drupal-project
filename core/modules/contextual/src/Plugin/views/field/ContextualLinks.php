@@ -113,12 +113,13 @@ class ContextualLinks extends FieldPluginBase {
         $tokens = $this->getRenderTokens([]);
         $path = strip_tags(Html::decodeEntities(strtr($path, $tokens)));
 
-        $links[$field] = [
+        $link_key = "{$this->view->id()}__{$this->view->current_display}__$field";
+        $links[$link_key] = [
           'path' => $path,
           'title' => $title,
         ];
         if (!empty($this->options['destination'])) {
-          $links[$field]['options']['query'] = $this->getDestinationArray();
+          $links[$link_key]['options']['query'] = $this->getDestinationArray();
         }
       }
     }
