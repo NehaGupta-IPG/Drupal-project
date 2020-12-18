@@ -96,7 +96,7 @@ class ContextualLinks extends TokenizeAreaPluginBase {
     }
     $xpath = new \DOMXPath($dom);
     $domLinks = $xpath->query('//a[@href]');
-    $i=0;
+    $i = 0;
     foreach ($domLinks as $domLink) {
       assert($domLink instanceof \DOMNode);
       $title = $domLink->textContent;
