@@ -36,7 +36,6 @@ class ContextualLinks extends FieldPluginBase {
     $options = parent::defineOptions();
 
     $options['fields'] = ['default' => []];
-    $options['destination'] = ['default' => 1];
 
     return $options;
   }
@@ -55,16 +54,6 @@ class ContextualLinks extends FieldPluginBase {
       '#options' => $field_options,
       '#default_value' => $this->options['fields'],
       '#element_validate' => [[static::class, 'validateOptions']],
-    ];
-    $form['destination'] = [
-      '#type' => 'select',
-      '#title' => $this->t('Include destination'),
-      '#description' => $this->t('Include a "destination" parameter in the link to return the user to the original view upon completing the contextual action.'),
-      '#options' => [
-        '0' => $this->t('No'),
-        '1' => $this->t('Yes'),
-      ],
-      '#default_value' => $this->options['destination'],
     ];
   }
 
