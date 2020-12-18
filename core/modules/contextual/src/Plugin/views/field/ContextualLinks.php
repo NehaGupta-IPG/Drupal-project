@@ -2,9 +2,7 @@
 
 namespace Drupal\contextual\Plugin\views\field;
 
-use Drupal\Component\Serialization\Json;
 use Drupal\Component\Utility\Html;
-use Drupal\Component\Utility\UrlHelper;
 use Drupal\contextual\ContextualLinksSerializer;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Routing\RedirectDestinationTrait;
