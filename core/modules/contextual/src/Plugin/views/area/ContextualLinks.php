@@ -89,7 +89,7 @@ class ContextualLinks extends TokenizeAreaPluginBase {
   protected function extractLinks(MarkupInterface $markup) {
     $links = [];
     $dom = new \DOMDocument();
-    // phpcs:ignore
+    // cSpell:disable-next-line
     $domOptions = LIBXML_HTML_NODEFDTD | LIBXML_NOERROR | LIBXML_NOWARNING | LIBXML_NONET | LIBXML_NOENT;
     $domLoaded = $dom->loadHTML((string) $markup, $domOptions);
     if (!$domLoaded) {
