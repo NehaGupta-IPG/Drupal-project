@@ -78,7 +78,10 @@ class QueueWorker extends Plugin {
    * The 'queue.database' service used by the default.
    *
    * @var string (optional)
+   *
+   * todo: provide the default value 'queue.database' before
+   *   drupal:10.0.0 release.
    */
-  public $queue_service = 'queue.database';
+  public $queue_service;
 
 }
