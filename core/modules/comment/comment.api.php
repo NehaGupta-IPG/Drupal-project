@@ -53,8 +53,8 @@ function hook_comment_links_alter(array &$links, CommentInterface $entity, array
  * The comment field access method supports the main entity field access
  * operations, such as 'view' and 'edit', but allows also some more complex
  * comment specific operations. The complexity derives from the fact that the
- * comment field is mixing the actions of viewing and posting when is placed as
- * an entity display component.
+ * comment field is mixing the actions of viewing and posting when it is placed
+ * as an entity display component.
  *
  * @see \Drupal\comment\CommentFieldItemList::access()
  *
@@ -63,7 +63,7 @@ function hook_comment_links_alter(array &$links, CommentInterface $entity, array
  * @section view 'view'
  * Used to check the access when the field is placed on an entity view display.
  * Even if it's a standard entity field access operation, this is a composite
- * operation as involves in the same time viewing the list of existing comments
+ * operation as involves at the same time viewing the list of existing comments
  * and accessing the post comment form beneath. This is a standard core
  * operation as is used typically when the field is a visible component of a
  * commented entity view display.
