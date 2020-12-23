@@ -362,7 +362,7 @@ class CommentHooks {
           // At least one comment field is open.
           $open = TRUE;
         }
-        if ($node->get($field_name)->access('view comments only')) {
+        if ($node->get($field_name)->access('view comment list')) {
           $comments += $node->get($field_name)->comment_count;
         }
       }

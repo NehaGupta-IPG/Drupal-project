@@ -272,7 +272,7 @@ class CommentLinkBuilderTest extends UnitTestCase {
       ->method('access')
       ->willReturnCallback(function ($operation, $account) use ($has_access_comments, $has_post_comments) {
         switch ($operation) {
-          case 'view comments only':
+          case 'view comment list':
             return $account->hasPermission('access comments');
 
           case 'view':
