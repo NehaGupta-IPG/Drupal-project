@@ -65,7 +65,7 @@ class QueueFactory {
    */
   public function get($name, $reliable = FALSE) {
     if (!isset($this->queues[$name])) {
-      $service_name = $this->getServiceName($name);
+      $service_name = $this->getServiceName($name, $reliable);
       /*
        * todo: remove $service_name detection legacy logic before
        *   drupal:10.0.0 release.
@@ -108,13 +108,17 @@ class QueueFactory {
    *
    * @return string|null
    *   Service name. The 'queue.database' is used by the default.
+   * @param bool $reliable
+   *   (optional) TRUE if the ordering of items and guaranteeing every item executes at
+   *   least once is important, FALSE if scalability is the main concern. Defaults
+   *   to FALSE.
    *
    * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
    */
-  protected function getServiceName(string $queue_id): ?string {
-    $definition = $this->queueWorkerManager->getDefinition($queue_id);
+  protected function getServiceName(string $queue_id, bool $reliable = FALSE): ?string {
+    $definition = $this->queueWorkerManager->getDefinition($queue_id, FALSE);
     $service_name = NULL;
-    if (isset($definition['queue_reliable_service'])) {
+    if ($reliable && isset($definition['queue_reliable_service'])) {
       $service_name = $definition['queue_reliable_service'];
     }
     elseif (isset($definition['queue_service'])) {
