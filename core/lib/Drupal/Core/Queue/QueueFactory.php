@@ -105,13 +105,13 @@ class QueueFactory {
    *
    * @param string $queue_id
    *   Queue Worker ID. The ID of the queue.
-   *
-   * @return string|null
-   *   Service name. The 'queue.database' is used by the default.
    * @param bool $reliable
    *   (optional) TRUE if the ordering of items and guaranteeing every item executes at
    *   least once is important, FALSE if scalability is the main concern. Defaults
    *   to FALSE.
+   *
+   * @return string|null
+   *   Service name. The 'queue.database' is used by the default.
    *
    * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
    */
