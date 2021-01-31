@@ -41,35 +41,52 @@
    *   contextual links as rendered by the server.
    */
   function adjustIfNestedAndOverlapping($contextual) {
+    function dimensions($el) {
+      // Retrieve dimensions of contextual link.
+      const $trigger = $el.find('.trigger');
+      // Elements with the .visually-hidden class have no dimensions, so this
+      // class must be temporarily removed to calculate the dimensions.
+      $trigger.removeClass('visually-hidden');
+      const dims = { width: $el.width(), height: $el.height() };
+      $trigger.addClass('visually-hidden');
+      return dims;
+    }
+
+    function overlapsTooMuch($el1, $el2, width, height) {
+      return (
+        Math.abs($el1.offset().left - $el2.offset().left) < width &&
+        Math.abs($el1.offset().top - $el2.offset().top) < height
+      );
+    }
+
+    // Find all contextual link divs in the outermost contextual region.
     const $contextuals = $contextual
-      // @todo confirm that .closest() is not sufficient
       .parents('.contextual-region')
       .eq(-1)
       .find('.contextual');
 
     // Early-return when there's no nesting.
-    if ($contextuals.length <= 1) {
+    if ($contextuals.length < 2) {
       return;
     }
 
-    // If the two contextual links overlap, then we move the second one.
-    const firstTop = $contextuals.eq(0).offset().top;
-    const secondTop = $contextuals.eq(1).offset().top;
-    if (firstTop === secondTop) {
-      const $nestedContextual = $contextuals.eq(1);
+    // We can safely assume that all contextual links have same dimension.
+    const { width, height } = dimensions($contextuals.eq(0));
 
-      // Retrieve height of nested contextual link.
-      let height = 0;
-      const $trigger = $nestedContextual.find('.trigger');
-      // Elements with the .visually-hidden class have no dimensions, so this
-      // class must be temporarily removed to the calculate the height.
-      $trigger.removeClass('visually-hidden');
-      height = $nestedContextual.height();
-      $trigger.addClass('visually-hidden');
+    // Iterate over pairs (if any) of nested contextual links.
+    for (let i1 = 0; i1 < $contextuals.length; i1++) {
+      for (let i2 = i1 + 1; i2 < $contextuals.length; i2++) {
+        const $contextual1 = $contextuals.eq(i1);
+        const $contextual2 = $contextuals.eq(i2);
 
-      // Adjust nested contextual link's position.
-      $nestedContextual[0].style.top =
-        $nestedContextual.position().top + height;
+        if (overlapsTooMuch($contextual1, $contextual2, width / 2, height / 2)) {
+          // Adjust contextual2's position to be to the left of contextual1.
+          const c2right = parseFloat($contextual2.css('right'));
+          const offset = $contextual2.offset().left - $contextual1.offset().left;
+          // If c2 is on the right of c1, right offset must be higher, so it's +offset.
+          $contextual2.css({ right: c2right + offset + width });
+        }
+      }
     }
   }
 
