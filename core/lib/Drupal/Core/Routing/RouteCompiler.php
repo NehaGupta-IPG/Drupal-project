@@ -45,8 +45,8 @@ class RouteCompiler extends SymfonyRouteCompiler implements RouteCompilerInterfa
     $num_parts = count(explode('/', trim($route->getPath(), '/')));
 
     $unlimited_requirements = array_filter($route->getRequirements(), function ($it, $key) use ($stripped_path) {
-      if($it !== '.*' && $it !== '.+') {
-        return false;
+      if ($it !== '.*' && $it !== '.+') {
+        return FALSE;
       }
 
       $needle = "{{$key}}";
