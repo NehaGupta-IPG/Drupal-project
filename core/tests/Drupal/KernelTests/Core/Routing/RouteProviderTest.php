@@ -777,28 +777,28 @@ class RouteProviderTest extends KernelTestBase {
   }
 
   /**
-    * Tests the possibility to pass a forward slash as part of the parameters.
-    *
-    * @dataProvider providerTestParameterInfiniteParts
-    */
-   public function testParameterInfiniteParts(string $route_path, string $parameter, string $route_requirement, string $request_path, int $expected_routes) {
-     $connection = Database::getConnection();
-     $provider = new RouteProvider($connection, $this->state, $this->currentPath, $this->cache, $this->pathProcessor, $this->cacheTagsInvalidator, 'test_routes');
+   * Tests the possibility to pass a forward slash as part of the parameters.
+   *
+   * @dataProvider providerTestParameterInfiniteParts
+   */
+  public function testParameterInfiniteParts(string $route_path, string $parameter, string $route_requirement, string $request_path, int $expected_routes) {
+    $connection = Database::getConnection();
+    $provider = new RouteProvider($connection, $this->state, $this->currentPath, $this->cache, $this->pathProcessor, $this->cacheTagsInvalidator, 'test_routes');
 
-     $this->fixtures->createTables($connection);
-     $dumper = new MatcherDumper($connection, $this->state, 'test_routes');
-     $collection = new RouteCollection();
-     $route = new Route($route_path);
-     $route->setRequirement($parameter, $route_requirement);
-     $collection->add('unlimited_parts', $route);
-     $dumper->addRoutes($collection);
-     $dumper->dump();
-     $request = Request::create($request_path, 'GET');
-     $provider->getRouteCollectionForRequest($request);
-     $cache = $this->cache->get("route:[language]=en:{$request_path}:");
-     $this->assertNotEmpty($cache);
-     $route_collection = $cache->data['routes'];
-     $this->assertEquals($route_collection->count(), $expected_routes);
+    $this->fixtures->createTables($connection);
+    $dumper = new MatcherDumper($connection, $this->state, 'test_routes');
+    $collection = new RouteCollection();
+    $route = new Route($route_path);
+    $route->setRequirement($parameter, $route_requirement);
+    $collection->add('unlimited_parts', $route);
+    $dumper->addRoutes($collection);
+    $dumper->dump();
+    $request = Request::create($request_path, 'GET');
+    $provider->getRouteCollectionForRequest($request);
+    $cache = $this->cache->get("route:[language]=en:{$request_path}:");
+    $this->assertNotEmpty($cache);
+    $route_collection = $cache->data['routes'];
+    $this->assertEquals($route_collection->count(), $expected_routes);
   }
 
   /**
