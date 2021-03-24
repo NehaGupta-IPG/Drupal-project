@@ -122,7 +122,6 @@ class OEmbedForm extends AddFormBase {
       '#button_type' => 'primary',
       '#validate' => ['::validateUrl'],
       '#submit' => ['::addButtonSubmit'],
-      // @todo Move validation in https://www.drupal.org/node/2988215
       '#ajax' => [
         'callback' => '::updateFormCallback',
         'wrapper' => 'media-library-wrapper',

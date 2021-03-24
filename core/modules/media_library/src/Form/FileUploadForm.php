@@ -162,7 +162,6 @@ class FileUploadForm extends AddFormBase {
     $form['container']['upload'] = [
       '#type' => 'managed_file',
       '#title' => $this->formatPlural($slots, 'Add file', 'Add files'),
-      // @todo Move validation in https://www.drupal.org/node/2988215
       '#process' => array_merge(['::validateUploadElement'], $process, ['::processUploadElement']),
       '#upload_validators' => $item->getUploadValidators(),
       // Set multiple to true only if available slots is not exactly one
