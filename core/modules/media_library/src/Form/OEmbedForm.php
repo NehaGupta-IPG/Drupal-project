@@ -6,7 +6,6 @@ use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Form\FormBuilderInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Url;
-use Drupal\media\OEmbed\ResourceException;
 use Drupal\media\OEmbed\ResourceFetcherInterface;
 use Drupal\media\OEmbed\UrlResolverInterface;
 use Drupal\media\Plugin\media\Source\OEmbedInterface;
@@ -151,15 +150,13 @@ class OEmbedForm extends AddFormBase {
    *   The current form state.
    */
   public function validateUrl(array &$form, FormStateInterface $form_state) {
-    $url = $form_state->getValue('url');
-    if ($url) {
-      try {
-        $resource_url = $this->urlResolver->getResourceUrl($url);
-        $this->resourceFetcher->fetchResource($resource_url);
-      }
-      catch (ResourceException $e) {
-        $form_state->setErrorByName('url', $e->getMessage());
-      }
+    $source_values = [$form_state->getValue('url')];
+    try {
+      $validation = $this->validateMediaSourceValues($source_values, $form_state);
+      $this->setAddedMediaItems($validation, $form_state);
+    }
+    catch (\Exception $e) {
+      $form_state->setErrorByName('url', $e->getMessage());
     }
   }
 
