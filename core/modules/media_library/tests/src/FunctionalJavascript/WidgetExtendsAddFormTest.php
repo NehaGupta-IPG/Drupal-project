@@ -61,4 +61,5 @@ class WidgetExtendsAddFormTest extends MediaLibraryTestBase {
     $assert_session->fieldValueEquals('media_library_select_form[0]', $added_media->id());
     $assert_session->checkboxChecked('media_library_select_form[0]');
   }
+
 }
