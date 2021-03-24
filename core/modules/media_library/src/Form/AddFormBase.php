@@ -678,7 +678,7 @@ abstract class AddFormBase extends FormBase implements BaseFormIdInterface, Trus
     $form_display->extractFormValues($media, $form['media'][$delta]['fields'], $form_state);
     $form_display->validateFormValues($media, $form['media'][$delta]['fields'], $form_state);
   }
-  
+
   /**
    * Validates source values by attempting to create media entities.
    *
