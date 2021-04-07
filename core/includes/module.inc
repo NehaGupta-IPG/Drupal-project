@@ -61,7 +61,7 @@ function module_config_sort($data) {
   // compound of "[sign-as-integer][padded-integer-weight][name]"; e.g., given
   // two modules and weights (spaces added for clarity):
   // - Block with weight -5: 0 0000000000000000005 block
-  // - Node  with weight  0: 1 0000000000000000000 node
+  // - Node  with weight  0: 1 0000000000000000000 node.
   $sort = [];
   foreach ($data as $name => $weight) {
     // Prefix negative weights with 0, positive weights with 1.

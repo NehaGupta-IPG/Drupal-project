@@ -454,7 +454,7 @@ class EntityQueryTest extends EntityKernelTestBase {
     // entity id marked with *:
 
     // 8  NULL pl *
-    // 12 NULL pl *
+    // 12 NULL pl *.
 
     // 4  NULL tr *
     // 12 NULL tr

@@ -81,7 +81,7 @@ class TaxonomyIndexTidUiTest extends UITestBase {
     // - term 1.1
     // term 2.0
     // - term 2.1
-    // - term 2.2
+    // - term 2.2.
     for ($i = 0; $i < 3; $i++) {
       for ($j = 0; $j <= $i; $j++) {
         $this->terms[$i][$j] = $term = Term::create([

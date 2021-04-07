@@ -162,7 +162,7 @@ class DefaultExceptionHtmlSubscriber extends HttpExceptionSubscriberBase {
       // Add to query (GET) or request (POST) parameters:
       // - 'destination' (to ensure e.g. the login form in a 403 response
       //   redirects to the original URL)
-      // - '_exception_statuscode'
+      // - '_exception_statuscode'.
       $parameters = $sub_request->isMethod('GET') ? $sub_request->query : $sub_request->request;
       $parameters->add($this->redirectDestination->getAsArray() + ['_exception_statuscode' => $status_code]);
 

@@ -375,7 +375,7 @@ class ExtensionDiscovery {
     // 1 1 core/profiles/testing/modules/compatible_test/compatible_test.module
     // 2   sites/all/modules/common/common.module
     // 3   modules/devel/devel.module
-    // 4   sites/default/modules/custom/custom.module
+    // 4   sites/default/modules/custom/custom.module.
     array_multisort($origins, SORT_ASC, $profiles, SORT_ASC, $all_files);
 
     return $all_files;

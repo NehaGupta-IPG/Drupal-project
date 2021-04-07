@@ -79,7 +79,7 @@ class MenuTreeStorageTest extends KernelTestBase {
     // <tools>
     // - test1
     // -- test2
-    // --- test3
+    // --- test3.
     $this->addMenuLink('test1', '');
     $this->assertMenuLink('test1', ['has_children' => 0, 'depth' => 1]);
 
@@ -104,7 +104,7 @@ class MenuTreeStorageTest extends KernelTestBase {
     // --- test3
     // - test4
     // -- test5
-    // --- test6
+    // --- test6.
 
     $this->addMenuLink('test1', '');
     $this->addMenuLink('test2', 'test1');
@@ -127,7 +127,7 @@ class MenuTreeStorageTest extends KernelTestBase {
     // -- test5
     // --- test2
     // ---- test3
-    // --- test6
+    // --- test6.
 
     $this->assertMenuLink('test1', ['has_children' => 0, 'depth' => 1]);
     $this->assertMenuLink('test2', ['has_children' => 1, 'depth' => 3], ['test5', 'test4'], ['test3']);
@@ -145,7 +145,7 @@ class MenuTreeStorageTest extends KernelTestBase {
     // -- test4
     // --- test5
     // ---- test2
-    // ---- test6
+    // ---- test6.
 
     $this->assertMenuLink('test1', ['has_children' => 1, 'depth' => 1], [], ['test4', 'test5', 'test2', 'test3', 'test6']);
     $this->assertMenuLink('test2', ['has_children' => 0, 'depth' => 4], ['test5', 'test4', 'test1']);
@@ -162,7 +162,7 @@ class MenuTreeStorageTest extends KernelTestBase {
     // -- test3
     // -- test5
     // --- test2
-    // --- test6
+    // --- test6.
     $this->assertMenuLink('test1', ['has_children' => 1, 'depth' => 1], [], ['test5', 'test2', 'test3', 'test6']);
     $this->assertMenuLink('test2', ['has_children' => 0, 'depth' => 3], ['test5', 'test1']);
     $this->assertMenuLink('test3', ['has_children' => 0, 'depth' => 2], ['test1']);
@@ -201,7 +201,7 @@ class MenuTreeStorageTest extends KernelTestBase {
     // ------ test6
     // ------- test7
     // -------- test8
-    // --------- test9
+    // --------- test9.
     $this->addMenuLink('footerA', '', '<front>', [], 'footer');
     $visible_children = [];
     for ($i = 3; $i <= $this->treeStorage->maxDepth(); $i++) {
@@ -304,7 +304,7 @@ class MenuTreeStorageTest extends KernelTestBase {
     // - child1
     // -- child2
     // --- child3
-    // ---- child4
+    // ---- child4.
     $this->addMenuLink('root');
     $this->addMenuLink('child1', 'root');
     $this->addMenuLink('child2', 'child1');
@@ -326,7 +326,7 @@ class MenuTreeStorageTest extends KernelTestBase {
     // - child1
     // -- child2
     // --- child3
-    // ---- child4
+    // ---- child4.
     $this->addMenuLink('root');
     $this->addMenuLink('child1', 'root');
     $this->addMenuLink('child2', 'child1');
