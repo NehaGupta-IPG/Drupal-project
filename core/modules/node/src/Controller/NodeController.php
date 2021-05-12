@@ -181,6 +181,7 @@ class NodeController extends ControllerBase implements ContainerInjectionInterfa
 
     $rows = [];
     $all_revisions = [];
+    $displayed_revisions = [];
     $default_revision = $node->getRevisionId();
     $current_revision_displayed = FALSE;
 
@@ -191,6 +192,7 @@ class NodeController extends ControllerBase implements ContainerInjectionInterfa
       // displayed.
       $all_revisions[$vid] = $revision;
       if ($revision->hasTranslation($langcode) && $revision->getTranslation($langcode)->isRevisionTranslationAffected()) {
+        $displayed_revisions[$vid] = $revision;
         $username = [
           '#theme' => 'username',
           '#account' => $revision->getRevisionUser(),
@@ -286,7 +288,11 @@ class NodeController extends ControllerBase implements ContainerInjectionInterfa
 
     $build['pager'] = ['#type' => 'pager'];
 
-    $this->moduleHandler->alter(['entity_revision_overview', 'entity_node_revision_overview'], $build, $node, $all_revisions);
+    $context = [
+      'all_revisions' => $all_revisions,
+      'displayed_revisions' => $displayed_revisions,
+    ];
+    $this->moduleHandler->alter(['entity_revision_overview', 'entity_node_revision_overview'], $build, $node, $context);
 
     return $build;
   }
