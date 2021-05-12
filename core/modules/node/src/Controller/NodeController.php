@@ -157,6 +157,8 @@ class NodeController extends ControllerBase implements ContainerInjectionInterfa
     $header = [$this->t('Revision'), $this->t('Operations')];
 
     $rows = [];
+    $all_revisions = [];
+    $default_revision = $node->getRevisionId();
     $current_revision_displayed = FALSE;
 
     foreach ($this->getRevisionIds($node, $node_storage) as $vid) {
@@ -164,6 +166,7 @@ class NodeController extends ControllerBase implements ContainerInjectionInterfa
       $revision = $node_storage->loadRevision($vid);
       // Only show revisions that are affected by the language that is being
       // displayed.
+      $all_revisions[$vid] = $revision;
       if ($revision->hasTranslation($langcode) && $revision->getTranslation($langcode)->isRevisionTranslationAffected()) {
         $username = [
           '#theme' => 'username',
@@ -259,6 +262,12 @@ class NodeController extends ControllerBase implements ContainerInjectionInterfa
     ];
 
     $build['pager'] = ['#type' => 'pager'];
+
+    $context = [
+      'node' => $node,
+      'revisions' => $all_revisions,
+    ];
+    $this->alter('node_revision_overview', $build, $context);
 
     return $build;
   }
