@@ -2,6 +2,8 @@
 
 namespace Drupal\link\Plugin\Field\FieldWidget;
 
+use Drupal\Component\Utility\NestedArray;
+use Drupal\Component\Utility\SortArray;
 use Drupal\Core\Field\Attribute\FieldWidget;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Url;
@@ -191,6 +193,7 @@ class LinkWidget extends WidgetBase {
   public function formElement(FieldItemListInterface $items, $delta, array $element, array &$form, FormStateInterface $form_state) {
     /** @var \Drupal\link\LinkItemInterface $item */
     $item = $items[$delta];
+    $default_values = $item->getFieldDefinition()->getDefaultValueLiteral() ?: [];
 
     $display_uri = NULL;
     if (!$item->isEmpty()) {
@@ -278,11 +281,12 @@ class LinkWidget extends WidgetBase {
       ];
     }
 
+    $title_default_value = $default_values[$delta]['title'] ?? NULL;
     $element['title'] = [
       '#type' => 'textfield',
       '#title' => $this->t('Link text'),
       '#placeholder' => $this->getSetting('placeholder_title'),
-      '#default_value' => $items[$delta]->title ?? NULL,
+      '#default_value' => $items[$delta]->title ?? $title_default_value,
       '#maxlength' => 255,
       '#access' => $title_visibility_setting != LinkTitleVisibility::Disabled,
       '#required' => $title_visibility_setting === LinkTitleVisibility::Required && $element['#required'],
@@ -488,6 +492,78 @@ class LinkWidget extends WidgetBase {
 
     $property_path_array = explode('.', $violation->getPropertyPath());
     return ($element === FALSE) ? FALSE : $element[$property_path_array[1]];
+  }
+
+  /**
+   * {@inheritdoc}
+   *
+   * Override extractFormValues() so that it does not call filterEmptyItems()
+   * when in the default value form. This makes it possible to save a default
+   * value for "Link text" without requiring a default value for "URL".
+   */
+  public function extractFormValues(FieldItemListInterface $items, array $form, FormStateInterface $form_state): void {
+    if (!$this->isDefaultValueWidget($form_state)) {
+      parent::extractFormValues($items, $form, $form_state);
+    }
+    else {
+      $field_name = $this->fieldDefinition->getName();
+
+      // Extract the values from $form_state->getValues().
+      $path = array_merge($form['#parents'], [$field_name]);
+      $key_exists = NULL;
+      $values = NestedArray::getValue($form_state->getValues(), $path, $key_exists);
+
+      if ($key_exists) {
+        // Account for drag-and-drop reordering if needed.
+        if (!$this->handlesMultipleValues()) {
+          // Remove the 'value' of the 'add more' button.
+          unset($values['add_more']);
+
+          // The original delta, before drag-and-drop reordering, is needed to
+          // route errors to the correct form element.
+          foreach ($values as $delta => &$value) {
+            $value['_original_delta'] = $delta;
+
+            // We need to omit the call to filterEmptyItems() on $items in the
+            // parent because a Link text with no URL is considered empty, and
+            // removed from the list. Instead we unset completely empty items.
+            if ($value['uri'] == NULL && $value['title'] == NULL) {
+              unset($values[$delta]);
+            }
+          }
+
+          usort($values, function ($a, $b) {
+            return SortArray::sortByKeyInt($a, $b, '_weight');
+          });
+        }
+
+        // Let the widget massage the submitted values.
+        $values = $this->massageFormValues($values, $form, $form_state);
+        // Assign the values and remove the empty ones.
+        $items->setValue($values);
+
+        // Put delta mapping in $form_state, so that flagErrors() can use it.
+        $field_state = static::getWidgetState($form['#parents'], $field_name, $form_state);
+        foreach ($items as $delta => $item) {
+          $field_state['original_deltas'][$delta] = $item->_original_delta ?? $delta;
+          unset($item->_original_delta, $item->_weight);
+        }
+        static::setWidgetState($form['#parents'], $field_name, $form_state, $field_state);
+      }
+    }
+  }
+
+  /**
+   * Checks if a given route name is one of Drupal's special no-link routes.
+   *
+   * @param string $route
+   *   The route name.
+   *
+   * @return bool
+   *   TRUE if the route is a no-link route, FALSE otherwise.
+   */
+  protected static function isNoLinkRoute(string $route): bool {
+    return in_array($route, ['<nolink>', '<none>', '<button>'], TRUE);
   }
 
 }
