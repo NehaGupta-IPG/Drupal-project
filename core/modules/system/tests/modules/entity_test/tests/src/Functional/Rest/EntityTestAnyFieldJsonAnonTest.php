@@ -27,4 +27,5 @@ class EntityTestAnyFieldJsonAnonTest extends EntityTestAnyFieldResourceTestBase 
    * {@inheritdoc}
    */
   protected $defaultTheme = 'stark';
+
 }

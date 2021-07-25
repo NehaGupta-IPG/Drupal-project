@@ -102,7 +102,10 @@ abstract class EntityTestAnyFieldResourceTestBase extends EntityResourceTestBase
         ],
       ],
       'created' => [
-        (new \DateTime())->setTimestamp((int) $this->entity->get('created')->value)->setTimezone(new \DateTimeZone("UTC"))->format(\DateTime::RFC3339),
+        [
+          'value' => (new \DateTime())->setTimestamp((int) $this->entity->get('created')->value)->setTimezone(new \DateTimeZone('UTC'))->format(\DateTime::RFC3339),
+          'format' => \DateTime::RFC3339,
+        ],
       ],
       'user_id' => [
         [

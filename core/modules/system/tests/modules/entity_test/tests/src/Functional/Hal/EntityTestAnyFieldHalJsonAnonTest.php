@@ -49,7 +49,7 @@ class EntityTestAnyFieldHalJsonAnonTest extends EntityTestAnyFieldResourceTestBa
     return $normalization + [
       '_links' => [
         'self' => [
-          'href' => '',
+          'href' => $this->baseUrl . '/entity/entity_test_any_field/1?_format=hal_json',
         ],
         'type' => [
           'href' => $this->baseUrl . '/rest/type/entity_test_any_field/entity_test_any_field',
