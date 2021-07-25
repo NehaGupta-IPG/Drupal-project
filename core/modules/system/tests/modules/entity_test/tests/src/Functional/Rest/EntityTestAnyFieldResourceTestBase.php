@@ -5,15 +5,12 @@ namespace Drupal\Tests\entity_test\Functional\Rest;
 use Drupal\entity_test\Entity\EntityTestAnyField;
 use Drupal\entity_test\TraversableObject;
 use Drupal\Tests\rest\Functional\EntityResource\EntityResourceTestBase;
-use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Drupal\user\Entity\User;
 
 /**
  * Base class for AnyItem's resource test.
  */
 abstract class EntityTestAnyFieldResourceTestBase extends EntityResourceTestBase {
-
-  use ExpectDeprecationTrait;
 
   /**
    * {@inheritdoc}
