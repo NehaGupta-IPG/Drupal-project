@@ -15,7 +15,7 @@ class AnyNormalizerTest extends KernelTestBase {
   /**
    * {@inheritdoc}
    */
-  public static $modules = ['system', 'serialization', 'entity_test', 'user'];
+  protected static $modules = ['system', 'serialization', 'entity_test', 'user'];
 
   /**
    * The serializer type.
@@ -83,7 +83,7 @@ class AnyNormalizerTest extends KernelTestBase {
    * Tests normalizing 'any' typed data with non-normalizable object stored.
    */
   public function testNormalizeNonNormalizableObject() {
-    $this->setExpectedException(\UnexpectedValueException::class);
+    $this->expectException(\UnexpectedValueException::class);
     $object = $this->buildDataNonNormalizableObject();
     $this->serializer->normalize($object);
   }
