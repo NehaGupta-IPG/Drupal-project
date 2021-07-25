@@ -4,7 +4,6 @@ namespace Drupal\Tests\entity_test\Functional\Rest;
 
 use Drupal\entity_test\Entity\EntityTestAnyField;
 use Drupal\entity_test\TraversableObject;
-use Drupal\Tests\rest\Functional\BcTimestampNormalizerUnixTestTrait;
 use Drupal\Tests\rest\Functional\EntityResource\EntityResourceTestBase;
 use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Drupal\user\Entity\User;
@@ -14,13 +13,12 @@ use Drupal\user\Entity\User;
  */
 abstract class EntityTestAnyFieldResourceTestBase extends EntityResourceTestBase {
 
-  use BcTimestampNormalizerUnixTestTrait;
   use ExpectDeprecationTrait;
 
   /**
    * {@inheritdoc}
    */
-  public static $modules = ['entity_test'];
+  protected static $modules = ['entity_test'];
 
   /**
    * {@inheritdoc}
@@ -49,7 +47,7 @@ abstract class EntityTestAnyFieldResourceTestBase extends EntityResourceTestBase
   /**
    * {@inheritdoc}
    */
-  public function setUp() {
+  public function setUp(): void {
     $this->traversableObject = new TraversableObject(
       [
         'property1' => 'value1',
@@ -107,7 +105,7 @@ abstract class EntityTestAnyFieldResourceTestBase extends EntityResourceTestBase
         ],
       ],
       'created' => [
-        $this->formatExpectedTimestampItemValues((int) $this->entity->get('created')->value),
+        (new \DateTime())->setTimestamp((int) $this->entity->get('created')->value)->setTimezone(new \DateTimeZone("UTC"))->format(\DateTime::RFC3339),
       ],
       'user_id' => [
         [

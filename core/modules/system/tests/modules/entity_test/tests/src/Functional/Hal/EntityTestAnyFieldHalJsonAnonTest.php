@@ -20,7 +20,7 @@ class EntityTestAnyFieldHalJsonAnonTest extends EntityTestAnyFieldResourceTestBa
   /**
    * {@inheritdoc}
    */
-  public static $modules = ['hal'];
+  protected static $modules = ['hal'];
 
   /**
    * {@inheritdoc}
@@ -31,6 +31,11 @@ class EntityTestAnyFieldHalJsonAnonTest extends EntityTestAnyFieldResourceTestBa
    * {@inheritdoc}
    */
   protected static $mimeType = 'application/hal+json';
+
+  /**
+   * {@inheritdoc}
+   */
+  protected $defaultTheme = 'stark';
 
   /**
    * {@inheritdoc}
