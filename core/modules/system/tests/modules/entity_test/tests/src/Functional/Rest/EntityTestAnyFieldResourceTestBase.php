@@ -6,7 +6,7 @@ use Drupal\entity_test\Entity\EntityTestAnyField;
 use Drupal\entity_test\TraversableObject;
 use Drupal\Tests\rest\Functional\BcTimestampNormalizerUnixTestTrait;
 use Drupal\Tests\rest\Functional\EntityResource\EntityResourceTestBase;
-use Drupal\Tests\Traits\ExpectDeprecationTrait;
+use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Drupal\user\Entity\User;
 
 /**
