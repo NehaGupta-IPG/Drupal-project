@@ -1456,7 +1456,7 @@ abstract class EntityResourceTestBase extends ResourceTestBase {
           // as strings in PHP memory.
           $expected_stored_data = static::castToString($expected_stored_data);
         }
-        $this->assertEntityArraySubset($expected_stored_data, static::castToString($this->serializer->normalize($modified_entity->get($field_name)->getValue())));
+        $this->assertEntityArraySubset($expected_stored_data, $this->serializer->normalize($modified_entity->get($field_name)->getValue()));
       }
     }
   }
