@@ -46,55 +46,58 @@ class EntityTestAnyFieldHalJsonAnonTest extends EntityTestAnyFieldResourceTestBa
     $normalization = $this->applyHalFieldNormalization($default_normalization);
 
     $author = User::load(0);
-    return $normalization + [
-      '_links' => [
-        'self' => [
-          'href' => $this->baseUrl . '/entity/entity_test_any_field/1?_format=hal_json',
-        ],
-        'type' => [
-          'href' => $this->baseUrl . '/rest/type/entity_test_any_field/entity_test_any_field',
-        ],
-        $this->baseUrl . '/rest/relation/entity_test_any_field/entity_test_any_field/user_id' => [
-          [
-            'href' => $this->baseUrl . '/user/0?_format=hal_json',
-            'lang' => 'en',
+
+    return $normalization +
+      [
+        '_links' => [
+          'self' => [
+            'href' => $this->baseUrl . '/entity/entity_test_any_field/1?_format=hal_json',
+          ],
+          'type' => [
+            'href' => $this->baseUrl . '/rest/type/entity_test_any_field/entity_test_any_field',
+          ],
+          $this->baseUrl . '/rest/relation/entity_test_any_field/entity_test_any_field/user_id' => [
+            [
+              'href' => $this->baseUrl . '/user/0?_format=hal_json',
+              'lang' => 'en',
+            ],
           ],
         ],
-      ],
-      '_embedded' => [
-        $this->baseUrl . '/rest/relation/entity_test_any_field/entity_test_any_field/user_id' => [
-          [
-            '_links' => [
-              'self' => [
-                'href' => $this->baseUrl . '/user/0?_format=hal_json',
+        '_embedded' => [
+          $this->baseUrl . '/rest/relation/entity_test_any_field/entity_test_any_field/user_id' => [
+            [
+              '_links' => [
+                'self' => [
+                  'href' => $this->baseUrl . '/user/0?_format=hal_json',
+                ],
+                'type' => [
+                  'href' => $this->baseUrl . '/rest/type/user/user',
+                ],
               ],
-              'type' => [
-                'href' => $this->baseUrl . '/rest/type/user/user',
+              'uuid' => [
+                [
+                  'value' => $author->uuid(),
+                ],
               ],
+              'lang' => 'en',
             ],
-            'uuid' => [
-              [
-                'value' => $author->uuid(),
-              ],
-            ],
-            'lang' => 'en',
           ],
         ],
-      ],
-    ];
+      ];
   }
 
   /**
    * {@inheritdoc}
    */
   protected function getNormalizedPostEntity() {
-    return parent::getNormalizedPostEntity() + [
-      '_links' => [
-        'type' => [
-          'href' => $this->baseUrl . '/rest/type/entity_test_any_field/entity_test_any_field',
+    return parent::getNormalizedPostEntity() +
+      [
+        '_links' => [
+          'type' => [
+            'href' => $this->baseUrl . '/rest/type/entity_test_any_field/entity_test_any_field',
+          ],
         ],
-      ],
-    ];
+      ];
   }
 
   /**

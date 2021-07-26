@@ -3,6 +3,8 @@
 namespace Drupal\Tests\serialization\Kernel;
 
 use Drupal\Core\TypedData\DataDefinition;
+use Drupal\Core\TypedData\TypedDataInterface;
+use Drupal\Core\TypedData\TypedDataManagerInterface;
 use Drupal\entity_test\Entity\EntityTest;
 use Drupal\KernelTests\KernelTestBase;
 
@@ -15,10 +17,15 @@ class AnyNormalizerTest extends KernelTestBase {
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['system', 'serialization', 'entity_test', 'user'];
+  protected static $modules = [
+    'system',
+    'serialization',
+    'entity_test',
+    'user',
+  ];
 
   /**
-   * The serializer type.
+   * The serializer service.
    *
    * @var \Symfony\Component\Serializer\Serializer
    */
@@ -45,7 +52,7 @@ class AnyNormalizerTest extends KernelTestBase {
   /**
    * Tests normalizing 'any' typed data with basic string stored.
    */
-  public function testNormalizeBase() {
+  public function testNormalizeBase(): void {
     $typed_data = $this->buildDataBasicString();
     $this->assertSame('test', $this->serializer->normalize($typed_data, 'json'));
   }
@@ -53,7 +60,7 @@ class AnyNormalizerTest extends KernelTestBase {
   /**
    * Tests normalizing 'any' typed data with traversable object stored.
    */
-  public function testNormalizeTraversableObject() {
+  public function testNormalizeTraversableObject(): void {
     $typed_data = $this->buildDataTraversableObject();
     $this->assertSame([
       'property1' => 'value1',
@@ -64,7 +71,7 @@ class AnyNormalizerTest extends KernelTestBase {
   /**
    * Tests normalizing 'any' typed data with typed data stored.
    */
-  public function testNormalizeTypedData() {
+  public function testNormalizeTypedData(): void {
     $typed_data = $this->buildDataTypedData();
     $this->assertSame('test', $this->serializer->normalize($typed_data));
   }
@@ -72,7 +79,7 @@ class AnyNormalizerTest extends KernelTestBase {
   /**
    * Tests normalizing 'any' typed data with entity stored.
    */
-  public function testNormalizeEntity() {
+  public function testNormalizeEntity(): void {
     $entity = EntityTest::create(['name' => $this->randomString()]);
     $entity->save();
     $normalized = $this->serializer->normalize($entity);
@@ -82,7 +89,7 @@ class AnyNormalizerTest extends KernelTestBase {
   /**
    * Tests normalizing 'any' typed data with non-normalizable object stored.
    */
-  public function testNormalizeNonNormalizableObject() {
+  public function testNormalizeNonNormalizableObject(): void {
     $this->expectException(\UnexpectedValueException::class);
     $object = $this->buildDataNonNormalizableObject();
     $this->serializer->normalize($object);
@@ -91,7 +98,7 @@ class AnyNormalizerTest extends KernelTestBase {
   /**
    * Tests normalizing 'any' typed data on more complex situation.
    */
-  public function testNormalizeComplex() {
+  public function testNormalizeComplex(): void {
     $typed_data = $this->buildDataComplex();
     $this->assertSame([
       'key1' => 'test1',
@@ -106,60 +113,57 @@ class AnyNormalizerTest extends KernelTestBase {
   /**
    * Builds example 'any' typed data with basic string stored.
    */
-  protected function buildDataBasicString() {
-    $typed_data = $this->typedDataManager->create(
+  protected function buildDataBasicString(): TypedDataInterface {
+    return $this->typedDataManager->create(
       DataDefinition::create('any'),
       'test',
       'test name'
     );
-    return $typed_data;
   }
 
   /**
    * Builds example 'any' typed data with traversable object stored.
    */
-  protected function buildDataTraversableObject() {
-    $typed_data = $this->typedDataManager->create(
+  protected function buildDataTraversableObject(): TypedDataInterface {
+    return $this->typedDataManager->create(
       DataDefinition::create('any'),
       new TraversableObject(),
       'test name'
     );
-    return $typed_data;
   }
 
   /**
    * Builds example 'any' typed data with typed data stored.
    */
-  protected function buildDataTypedData() {
+  protected function buildDataTypedData(): TypedDataInterface {
     $typed_data_string = $this->typedDataManager->create(
       DataDefinition::create('string'),
       'test',
       'typed data string'
     );
-    $typed_data_any = $this->typedDataManager->create(
+
+    return $this->typedDataManager->create(
       DataDefinition::create('any'),
       $typed_data_string,
       'typed data any'
     );
-    return $typed_data_any;
   }
 
   /**
    * Builds example 'any' typed data with non-normalizable object stored.
    */
-  protected function buildDataNonNormalizableObject() {
-    $typed_data = $this->typedDataManager->create(
+  protected function buildDataNonNormalizableObject(): TypedDataInterface {
+    return $this->typedDataManager->create(
       DataDefinition::create('any'),
       new NonNormalizableObject(),
       'test name'
     );
-    return $typed_data;
   }
 
   /**
    * Builds example 'any' typed data with more complex data stored.
    */
-  protected function buildDataComplex() {
+  protected function buildDataComplex(): TypedDataInterface {
     $typed_data_string = $this->typedDataManager->create(
       DataDefinition::create('string'),
       'test2',
@@ -171,12 +175,12 @@ class AnyNormalizerTest extends KernelTestBase {
       'key2' => $typed_data_string,
       'key3' => $traversableObject,
     ];
-    $typed_data_any = $this->typedDataManager->create(
+
+    return $this->typedDataManager->create(
       DataDefinition::create('any'),
       $value,
       'typed data any'
     );
-    return $typed_data_any;
   }
 
 }
@@ -186,9 +190,19 @@ class AnyNormalizerTest extends KernelTestBase {
  */
 class NonNormalizableObject {
 
-  public $property1 = "value1";
+  /**
+   * The first property.
+   *
+   * @var string
+   */
+  public string $property1 = "value1";
 
-  public $property2 = "value2";
+  /**
+   * The second property.
+   *
+   * @var string
+   */
+  public string $property2 = "value2";
 
 }
 

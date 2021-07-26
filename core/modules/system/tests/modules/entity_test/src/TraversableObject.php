@@ -7,8 +7,19 @@ namespace Drupal\entity_test;
  */
 class TraversableObject implements \IteratorAggregate {
 
+
+  /**
+   * The first property.
+   *
+   * @var mixed
+   */
   protected $property1;
 
+  /**
+   * The second property.
+   *
+   * @var mixed
+   */
   protected $property2;
 
   /**
@@ -22,7 +33,7 @@ class TraversableObject implements \IteratorAggregate {
   /**
    * Convert to array.
    */
-  public function toArray() {
+  public function toArray(): array {
     return [
       'property1' => $this->property1,
       'property2' => $this->property2,

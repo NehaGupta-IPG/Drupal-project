@@ -72,6 +72,7 @@ abstract class EntityTestAnyFieldResourceTestBase extends EntityResourceTestBase
     ]);
     $entity->setOwnerId(0);
     $entity->save();
+
     return $entity;
   }
 
@@ -80,6 +81,7 @@ abstract class EntityTestAnyFieldResourceTestBase extends EntityResourceTestBase
    */
   protected function getExpectedNormalizedEntity() {
     $author = User::load(0);
+
     return [
       'uuid' => [
         [
@@ -103,7 +105,9 @@ abstract class EntityTestAnyFieldResourceTestBase extends EntityResourceTestBase
       ],
       'created' => [
         [
-          'value' => (new \DateTime())->setTimestamp((int) $this->entity->get('created')->value)->setTimezone(new \DateTimeZone('UTC'))->format(\DateTime::RFC3339),
+          'value' => (new \DateTime())->setTimestamp((int) $this->entity->get('created')->value)
+            ->setTimezone(new \DateTimeZone('UTC'))
+            ->format(\DateTime::RFC3339),
           'format' => \DateTime::RFC3339,
         ],
       ],

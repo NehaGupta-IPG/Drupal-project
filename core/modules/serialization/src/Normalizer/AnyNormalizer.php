@@ -30,6 +30,7 @@ class AnyNormalizer extends NormalizerBase {
     if (isset($value) && (is_object($value) || is_array($value))) {
       $value = $this->serializer->normalize($value, $format, $context);
     }
+
     return $value;
   }
 
