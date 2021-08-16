@@ -6,6 +6,7 @@ use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Messenger\MessengerTrait;
 use Drupal\Core\Render\Element;
 use Drupal\Core\Render\RendererInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Handles form errors.
@@ -35,9 +36,7 @@ class FormErrorHandler implements FormErrorHandlerInterface {
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container) {
-    // Instantiates this form class.
     return new static(
-      // Load the service required to construct this class.
       $container->get('renderer')
     );
   }
@@ -73,7 +72,7 @@ class FormErrorHandler implements FormErrorHandlerInterface {
       '#items' => [],
       '#list_type' => 'ul',
     ];
-    // Loop through all form errors and set an id.
+    // Loop through all form errors and sets an ID & error messages.
     foreach ($errors as $name => $error) {
       $form_element = FormElementHelper::getElementByName($name, $form);
       $has_id = !empty($form_element['#id']);
@@ -220,8 +219,7 @@ class FormErrorHandler implements FormErrorHandlerInterface {
 
     // Add aria-describedby attribute to the form element.
     if (($elements['#errors']) !== NULL) {
-      $elements['#attributes']['aria-errormessage'] = $elements['#id'] . '--error-message';
-      $elements['#attributes']['aria-invalid'] = TRUE;
+      $elements['#attributes']['aria-describedby'] = $elements['#id'] . '--status-message';
     }
   }
 
