@@ -24,6 +24,7 @@ use Symfony\Component\HttpFoundation\Request;
  * - \Drupal\Core\Url::fromRouteMatch()
  * - \Drupal\Core\Url::fromUri()
  * - \Drupal\Core\Url::fromUserInput()
+ * - \Drupal\Core\Url::fromToken()
  *
  * @see \Drupal\Core\Entity\EntityBase::toUrl()
  */
@@ -80,6 +81,13 @@ class Url implements TrustedCallbackInterface {
    * @var bool
    */
   protected $external = FALSE;
+
+  /**
+   * Indicates whether this object contains a valid url token.
+   *
+   * @var bool
+   */
+  protected $token = FALSE;
 
   /**
    * Indicates whether this URL is for a URI without a Drupal route.
@@ -264,7 +272,14 @@ class Url implements TrustedCallbackInterface {
    *   - 'https': Whether this URL should point to a secure location. If not
    *     defined, the current scheme is used, so the user stays on HTTP or HTTPS
    *     respectively. TRUE enforces HTTPS and FALSE enforces HTTP.
-   *
+   *   - 'context': Additional context for tokens in an array keyed with
+   *     entity type ids and the entity id.  This is only used for validation
+   *     purposes.
+   *     For example:
+   *     [
+   *       'node' => 12,
+   *       'user' => 1
+   *     ]
    * @return static
    *   A new Url object with properties depending on the URI scheme. Call the
    *   access() method on this to do access checking.
@@ -320,6 +335,9 @@ class Url implements TrustedCallbackInterface {
     }
     elseif ($uri_parts['scheme'] === 'route') {
       $url = static::fromRouteUri($uri_parts, $uri_options, $uri);
+    }
+    elseif ($uri_parts['scheme'] === 'token') {
+      $url = static::fromToken($uri, $options);
     }
     else {
       $url = new static($uri, [], $options);
@@ -461,6 +479,45 @@ class Url implements TrustedCallbackInterface {
     }
 
     return new static($route_name, $route_parameters, $options);
+  }
+
+  /**
+   * Creates a new Url from token.
+   *
+   * @param string $uri
+   *   The original passed in URI.
+   * @param array $options
+   *   An array of options, see \Drupal\Core\Url::fromUri() for details.
+   *
+   * @return \Drupal\Core\Url
+   *   A new Url object for a 'token:' URI.
+   */
+  protected static function fromToken($uri, array $options) {
+    $token_string = ltrim($uri, 'token:');
+    $token_service = \Drupal::token();
+    $token_context = [];
+    if (isset($options['context']) && !is_null($options['context'])) {
+      foreach($options['context'] as $entity_type_id => $id) {
+        $entity = \Drupal::entityTypeManager()->getStorage($entity_type_id)->load($id);
+        $options['context'][$entity_type_id] = $entity;
+      }
+      $token_context = $options['context'];
+    }
+
+    if (!empty($token_string) && $tokens = $token_service->scan($token_string)) {
+      $token_replacement = $token_service->replace($token_string, $token_context, ['clear' => TRUE]);
+    }
+    if (!empty($token_replacement)) {
+      if (UrlHelper::isExternal($token_replacement)) {
+        return static::fromUri($token_replacement, $options);
+      }
+      else {
+        return static::fromUri('internal:' . $token_replacement, $options);
+      }
+    }
+    else {
+      return NULL;
+    }
   }
 
   /**

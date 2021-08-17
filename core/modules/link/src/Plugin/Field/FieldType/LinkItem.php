@@ -160,6 +160,13 @@ class LinkItem extends FieldItemBase implements LinkItemInterface {
   /**
    * {@inheritdoc}
    */
+  public function isToken() {
+    return $this->getUrl()->isToken();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public static function mainPropertyName() {
     return 'uri';
   }

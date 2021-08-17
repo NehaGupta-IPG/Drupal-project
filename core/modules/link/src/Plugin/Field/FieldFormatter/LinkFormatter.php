@@ -173,6 +173,9 @@ class LinkFormatter extends FormatterBase {
   public function viewElements(FieldItemListInterface $items, $langcode) {
     $element = [];
     $entity = $items->getEntity();
+    $token_context = [
+      $entity->getEntityTypeId() => $entity
+    ];
     $settings = $this->getSettings();
 
     foreach ($items as $delta => $item) {
@@ -185,7 +188,7 @@ class LinkFormatter extends FormatterBase {
         // Unsanitized token replacement here because the entire link title
         // gets auto-escaped during link generation in
         // \Drupal\Core\Utility\LinkGenerator::generate().
-        $link_title = \Drupal::token()->replace($item->title, [$entity->getEntityTypeId() => $entity], ['clear' => TRUE]);
+        $link_title = \Drupal::token()->replace($item->title, $token_context, ['clear' => TRUE]);
       }
 
       // Trim the link text to the desired length.
@@ -261,6 +264,7 @@ class LinkFormatter extends FormatterBase {
       $options['attributes'] = AttributeXss::sanitizeAttributes($options['attributes']);
     }
 
+    $options['attributes']['target'] = 'custom_uri';
     $url->setOptions($options);
     return $url;
   }
