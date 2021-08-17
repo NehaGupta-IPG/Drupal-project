@@ -210,7 +210,7 @@ class LinkWidget extends WidgetBase {
         $display_uri = $item->uri;
       }
     }
-    $entity = $item->getEntity();
+
     $element['uri'] = [
       '#type' => 'url',
       '#title' => $this->t('URL'),
