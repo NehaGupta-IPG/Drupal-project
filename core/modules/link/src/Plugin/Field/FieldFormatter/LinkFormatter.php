@@ -264,7 +264,6 @@ class LinkFormatter extends FormatterBase {
       $options['attributes'] = AttributeXss::sanitizeAttributes($options['attributes']);
     }
 
-    $options['attributes']['target'] = 'custom_uri';
     $url->setOptions($options);
     return $url;
   }
