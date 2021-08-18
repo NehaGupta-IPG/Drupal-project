@@ -36,7 +36,7 @@ interface LinkItemInterface extends FieldItemInterface {
    * Determines if a link is a token.
    *
    * @return bool
-   *   TRUE if the link is external, FALSE otherwise.
+   *   TRUE if the link contains a token, FALSE otherwise.
    */
   public function isToken();
 

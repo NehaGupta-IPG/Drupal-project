@@ -174,7 +174,7 @@ class LinkFormatter extends FormatterBase {
     $element = [];
     $entity = $items->getEntity();
     $token_context = [
-      $entity->getEntityTypeId() => $entity
+      $entity->getEntityTypeId() => $entity,
     ];
     $settings = $this->getSettings();
 

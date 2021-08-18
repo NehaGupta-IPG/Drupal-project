@@ -280,6 +280,7 @@ class Url implements TrustedCallbackInterface {
    *       'node' => 12,
    *       'user' => 1
    *     ]
+   *
    * @return static
    *   A new Url object with properties depending on the URI scheme. Call the
    *   access() method on this to do access checking.
@@ -497,7 +498,7 @@ class Url implements TrustedCallbackInterface {
     $token_service = \Drupal::token();
     $token_context = [];
     if (isset($options['context']) && !is_null($options['context'])) {
-      foreach($options['context'] as $entity_type_id => $id) {
+      foreach ($options['context'] as $entity_type_id => $id) {
         $entity = \Drupal::entityTypeManager()->getStorage($entity_type_id)->load($id);
         $options['context'][$entity_type_id] = $entity;
       }

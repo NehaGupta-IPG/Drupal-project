@@ -438,7 +438,7 @@ class LinkWidget extends WidgetBase {
    * {@inheritdoc}
    */
   public function massageFormValues(array $values, array $form, FormStateInterface $form_state) {
-    $entity = $form_state->getformObject()->getEntity();
+    $entity = $form_state->getFormObject()->getEntity();
     foreach ($values as &$value) {
       $value['uri'] = static::getUserEnteredStringAsUri($value['uri']);
 
