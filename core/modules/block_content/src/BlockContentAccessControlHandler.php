@@ -88,7 +88,7 @@ class BlockContentAccessControlHandler extends EntityAccessControlHandler implem
       $dependency = $entity->getAccessDependency();
       if (empty($dependency)) {
         // If an access dependency has not been set let modules set one.
-        $event = new BlockContentGetDependencyEvent($entity);
+        $event = new BlockContentGetDependencyEvent($entity, $operation);
         $this->eventDispatcher->dispatch($event, BlockContentEvents::BLOCK_CONTENT_GET_DEPENDENCY);
         $dependency = $event->getAccessDependency();
         if (empty($dependency)) {

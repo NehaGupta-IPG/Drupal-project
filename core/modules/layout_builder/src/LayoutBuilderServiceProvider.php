@@ -31,10 +31,11 @@ class LayoutBuilderServiceProvider implements ServiceProviderInterface {
     if (isset($modules['block_content'])) {
       $definition = new Definition(SetInlineBlockDependency::class);
       $definition->setArguments([
-        new Reference('entity_type.manager'),
+        new Reference('entity.repository'),
         new Reference('database'),
         new Reference('inline_block.usage'),
         new Reference('plugin.manager.layout_builder.section_storage'),
+        new Reference('current_route_match'),
       ]);
       $definition->addTag('event_subscriber');
       $definition->setPublic(TRUE);
