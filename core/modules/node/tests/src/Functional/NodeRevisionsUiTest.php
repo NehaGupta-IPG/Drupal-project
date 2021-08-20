@@ -172,6 +172,7 @@ class NodeRevisionsUiTest extends NodeTestBase {
     $node_id = $node->id();
 
     $this->drupalGet('node/' . $node_id . '/revisions');
+    $this->assertSession()->responseHeaderNotEquals('x-drupal-dynamic-cache', 'UNCACHEABLE');
 
     // Verify that the latest affected revision having been a default revision
     // is displayed as the current one.
