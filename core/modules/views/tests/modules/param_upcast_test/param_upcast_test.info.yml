@@ -1,0 +1,7 @@
+name: 'Param upcasting test'
+type: module
+description: 'Support module for named param upcasting testing.'
+package: Testing
+version: VERSION
+dependencies:
+  - drupal:views

@@ -1,0 +1,21 @@
+<?php
+
+/**
+ * @file
+ * Contains param_upcast_test.module
+ */
+
+use Drupal\user\UserInterface;
+use Drupal\views\ViewExecutable;
+
+/**
+ * Implements hook_views_post_execute().
+ */
+function param_upcast_test_views_post_execute(ViewExecutable $view) {
+  if ($view->id() === 'param_upcast') {
+    $account = \Drupal::routeMatch()->getParameter('user');
+    if ($account instanceof UserInterface) {
+      \Drupal::state()->set('param_upcast_test.upcasted', TRUE);
+    }
+  }
+}

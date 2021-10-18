@@ -134,6 +134,8 @@ abstract class PathPluginBase extends DisplayPluginBase implements DisplayRouter
     $total_arguments = count($argument_ids);
 
     $argument_map = [];
+    $parameters = [];
+    $argument_stack = $this->getHandlers('argument');
 
     $bits = [];
     if (is_string($path)) {
@@ -155,6 +157,13 @@ abstract class PathPluginBase extends DisplayPluginBase implements DisplayRouter
           $arg_id = 'arg_' . $arg_counter++;
           $argument_map[$arg_id] = $parameter_name;
           $bits[$pos] = '{' . $parameter_name . '}';
+          /** @var \Drupal\views\Plugin\views\argument\ArgumentPluginBase $argument */
+          if (($argument = array_shift($argument_stack)) && $context_definition = $argument->getContextDefinition()) {
+            $type = $context_definition->getDataType();
+            if (strpos($type, 'entity:') === 0) {
+              $parameters[$parameter_name]['type'] = $type;
+            }
+          }
         }
       }
     }
@@ -195,6 +204,11 @@ abstract class PathPluginBase extends DisplayPluginBase implements DisplayRouter
     $route->setOption('_view_display_plugin_id', $this->getPluginId());
     $route->setOption('_view_display_plugin_class', static::class);
     $route->setOption('_view_display_show_admin_links', $this->getOption('show_admin_links'));
+
+    // Set type for named parameters.
+    if ($parameters) {
+      $route->setOption('parameters', $parameters);
+    }
 
     // Store whether the view will return a response.
     $route->setOption('returns_response', !empty($this->getPluginDefinition()['returns_response']));

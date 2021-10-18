@@ -1,0 +1,47 @@
+dependencies:
+  module:
+    - entity_test
+id: param_upcast
+module: views
+base_table: entity_test
+base_field: id
+display:
+  default:
+    display_plugin: default
+    id: default
+    display_title: Master
+    position: 0
+    display_options:
+      fields:
+        name:
+          table: entity_test
+          field: name
+          id: name
+          entity_type: null
+          entity_field: name
+          plugin_id: field
+          type: string
+      arguments:
+        user_id:
+          id: user_id
+          table: entity_test
+          field: user_id
+          default_action: 'not found'
+          specify_validation: true
+          validate:
+            type: 'entity:user'
+            fail: 'not found'
+          validate_options:
+            operation: view
+            multiple: 0
+            access: false
+            restrict_roles: false
+            roles: {  }
+          entity_type: entity_test
+          entity_field: user_id
+          plugin_id: numeric
+  page_1:
+    display_plugin: page
+    id: page_1
+    display_options:
+      path: user/%user/content
