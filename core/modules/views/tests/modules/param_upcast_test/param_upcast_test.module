@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains param_upcast_test.module
+ * Contains param_upcast_test.module.
  */
 
 use Drupal\user\UserInterface;
