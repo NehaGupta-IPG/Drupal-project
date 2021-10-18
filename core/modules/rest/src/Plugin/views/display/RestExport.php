@@ -13,7 +13,6 @@ use Drupal\Core\State\StateInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\views\Attribute\ViewsDisplay;
 use Drupal\views\Plugin\views\display\ResponseDisplayPluginInterface;
-use Drupal\views\Plugin\ViewsPluginManager;
 use Drupal\views\Render\ViewsRenderPipelineMarkup;
 use Drupal\views\ViewExecutable;
 use Drupal\views\Plugin\views\display\PathPluginBase;
