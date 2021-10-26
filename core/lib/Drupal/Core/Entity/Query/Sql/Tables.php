@@ -403,7 +403,8 @@ class Tables implements TablesInterface {
    */
   protected function ensureFieldTable($index_prefix, &$field, $type, $langcode, $base_table, $entity_id_field, $field_id_field, $delta) {
     $field_name = $field->getName();
-    if (!isset($this->fieldTables[$index_prefix . $field_name])) {
+    $tableKey = $index_prefix . $field_name . $type . $langcode . $delta;
+    if (!isset($this->fieldTables[$tableKey])) {
       $entity_type_id = $this->sqlQuery->getMetaData('entity_type');
       /** @var \Drupal\Core\Entity\Sql\DefaultTableMapping $table_mapping */
       $table_mapping = $this->entityTypeManager->getStorage($entity_type_id)->getTableMapping();
@@ -411,9 +412,9 @@ class Tables implements TablesInterface {
       if ($field->getCardinality() != 1) {
         $this->sqlQuery->addMetaData('simple_query', FALSE);
       }
-      $this->fieldTables[$index_prefix . $field_name] = $this->addJoin($type, $table, "[%alias].[$field_id_field] = [$base_table].[$entity_id_field]", $langcode, $delta);
+      $this->fieldTables[$tableKey] = $this->addJoin($type, $table, "[%alias].[$field_id_field] = [$base_table].[$entity_id_field]", $langcode, $delta);
     }
-    return $this->fieldTables[$index_prefix . $field_name];
+    return $this->fieldTables[$tableKey];
   }
 
   /**
