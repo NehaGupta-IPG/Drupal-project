@@ -322,8 +322,8 @@ class ImageItem extends FileItem {
   /**
    * {@inheritdoc}
    */
-  public function preSave() {
-    parent::preSave();
+  public function onChange($property_name, $notify = TRUE) {
+    parent::onChange($property_name, $notify);
 
     $width = $this->get('width')->getValue();
     $height = $this->get('height')->getValue();
@@ -342,6 +342,7 @@ class ImageItem extends FileItem {
       $this->getLogger('image')->warning("Missing file with ID %id.", ['%id' => $this->target_id]);
     }
   }
+
 
   /**
    * {@inheritdoc}
