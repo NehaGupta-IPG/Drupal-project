@@ -9,7 +9,7 @@ use Drupal\Core\Ajax\AjaxHelperTrait;
 use Drupal\Core\Database\Connection;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityRepositoryInterface;
-use Drupal\Core\Routing\CurrentRouteMatch;
+use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\layout_builder\Access\LayoutPreviewAccessAllowed;
 use Drupal\layout_builder\InlineBlockUsageInterface;
 use Drupal\layout_builder\LayoutEntityHelperTrait;
@@ -64,7 +64,7 @@ class SetInlineBlockDependency implements EventSubscriberInterface {
   /**
    * The current route match service.
    *
-   * @var \Drupal\Core\Routing\CurrentRouteMatch
+   * @var \Drupal\Core\Routing\RouteMatchInterface
    */
   protected $currentRouteMatch;
 
@@ -79,8 +79,10 @@ class SetInlineBlockDependency implements EventSubscriberInterface {
    *   The inline block usage service.
    * @param \Drupal\layout_builder\SectionStorage\SectionStorageManagerInterface $section_storage_manager
    *   The section storage manager.
+   * @param \Drupal\Core\Routing\RouteMatchInterface $current_route_match
+   *   The current route match service.
    */
-  public function __construct(EntityRepositoryInterface $entity_repository, Connection $database, InlineBlockUsageInterface $usage, SectionStorageManagerInterface $section_storage_manager, CurrentRouteMatch $current_route_match) {
+  public function __construct(EntityRepositoryInterface $entity_repository, Connection $database, InlineBlockUsageInterface $usage, SectionStorageManagerInterface $section_storage_manager, RouteMatchInterface $current_route_match) {
     $this->entityRepository = $entity_repository;
     $this->database = $database;
     $this->usage = $usage;
