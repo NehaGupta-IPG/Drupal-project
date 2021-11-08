@@ -363,7 +363,7 @@ class LocaleSource {
     $variables = [
       '%project' => $project->name,
       '%version' => $project->version,
-      '%core' => $project->core,
+      '%core' => 'all',
       '%language' => $project->langcode,
     ];
     return strtr($template, $variables);
