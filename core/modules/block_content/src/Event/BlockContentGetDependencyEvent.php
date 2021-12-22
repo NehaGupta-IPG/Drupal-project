@@ -28,7 +28,7 @@ class BlockContentGetDependencyEvent extends Event {
   protected $accessDependency;
 
   /**
-   * The access operation to load the block content dependency for.
+   * The access operation for which to load the block content dependency.
    *
    * @var string
    */
@@ -40,9 +40,9 @@ class BlockContentGetDependencyEvent extends Event {
    * @param \Drupal\block_content\BlockContentInterface $blockContent
    *   The block content entity.
    * @param string $operation
-   *   The access operation to load the block content dependency for.
+   *   The access operation for which to load the block content dependency.
    */
-  public function __construct(BlockContentInterface $blockContent, $operation) {
+  public function __construct(BlockContentInterface $blockContent, string $operation) {
     $this->blockContent = $blockContent;
     $this->operation = $operation;
   }
