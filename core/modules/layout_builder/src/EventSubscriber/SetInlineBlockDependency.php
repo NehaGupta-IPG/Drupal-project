@@ -149,7 +149,7 @@ class SetInlineBlockDependency implements EventSubscriberInterface {
    * @see \Drupal\block_content\BlockContentAccessControlHandler::checkAccess()
    * @see \Drupal\layout_builder\EventSubscriber\BlockComponentRenderArray::onBuildRender()
    */
-  protected function getInlineBlockDependency(BlockContentInterface $block_content, $operation) {
+  protected function getInlineBlockDependency(BlockContentInterface $block_content, string $operation) {
     $active_operations = ['update', 'delete'];
     $current_route = $this->currentRouteMatch->getRouteObject();
     if ('view' == $operation && ($current_route && $current_route->getOption('_layout_builder'))) {
