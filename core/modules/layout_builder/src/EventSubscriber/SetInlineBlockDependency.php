@@ -106,17 +106,6 @@ class SetInlineBlockDependency implements EventSubscriberInterface {
    *   The event.
    */
   public function onGetDependency(BlockContentGetDependencyEvent $event) {
-    // Ajax form submission will trigger here, it's ajax route, such as UpdateBlockForm.
-    // If the action from ajax, the section component should in preview mode,
-    // the view operation should LayoutPreviewAccessAllowed.
-    // @see \Drupal\layout_builder\Form\ConfigureBlockFormBase::successfulAjaxSubmit().
-    // @see \Drupal\layout_builder\EventSubscriber\BlockComponentRenderArray::onBuildRender().
-    if ($this->isAjax() && $event->getOperation() === 'view' && ($section_storage = $this->currentRouteMatch->getParameter('section_storage'))) {
-      // Determines if a block content revision is used in section storage.
-      if (in_array($event->getBlockContentEntity()->getRevisionId(), $this->getInlineBlockRevisionIdsInSections($section_storage->getSections()))) {
-        $event->setAccessDependency(new LayoutPreviewAccessAllowed());
-      }
-    }
     if ($dependency = $this->getInlineBlockDependency($event->getBlockContentEntity(), $event->getOperation())) {
       $event->setAccessDependency($dependency);
     }
@@ -172,9 +161,9 @@ class SetInlineBlockDependency implements EventSubscriberInterface {
     }
     if ($this->isLayoutCompatibleEntity($layout_entity)) {
       if ($this->isBlockRevisionUsedInEntity($layout_entity, $block_content)) {
-        return $layout_entity;
+        // Allow components to be viewed when rendered via AJAX (preview mode).
+        return 'view' === $operation && $this->isAjax() ? new LayoutPreviewAccessAllowed() : $layout_entity;
       }
-
     }
     return NULL;
   }
