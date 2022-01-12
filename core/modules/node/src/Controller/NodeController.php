@@ -68,18 +68,6 @@ class NodeController extends ControllerBase implements ContainerInjectionInterfa
   }
 
   /**
-   * {@inheritdoc}
-   */
-  public static function create(ContainerInterface $container) {
-    return new static(
-      $container->get('date.formatter'),
-      $container->get('renderer'),
-      $container->get('entity.repository'),
-      $container->get('module_handler')
-    );
-  }
-
-  /**
    * Displays add content links for available content types.
    *
    * Redirects to node/add/[type] if only one content type is available.
@@ -182,7 +170,6 @@ class NodeController extends ControllerBase implements ContainerInjectionInterfa
     $rows = [];
     $all_revisions = [];
     $displayed_revisions = [];
-    $default_revision = $node->getRevisionId();
     $current_revision_displayed = FALSE;
 
     foreach ($this->getRevisionIds($node, $node_storage) as $vid) {
@@ -192,7 +179,7 @@ class NodeController extends ControllerBase implements ContainerInjectionInterfa
       // displayed.
       $all_revisions[$vid] = $revision;
       if ($revision->hasTranslation($langcode) && $revision->getTranslation($langcode)->isRevisionTranslationAffected()) {
-        $displayed_revisions[$vid] = $revision;
+        $displayed_revisions[$vid] = $revision->getTranslation($langcode);
         $username = [
           '#theme' => 'username',
           '#account' => $revision->getRevisionUser(),
