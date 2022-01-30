@@ -245,6 +245,10 @@ class CommentLinkBuilderTest extends UnitTestCase {
    *   One of the FormLocation enum cases.
    * @param int $comment_count
    *   Number of comments against the field.
+   * @param bool $has_access_comments
+   *   TRUE if the user has 'access comments' permission.
+   * @param bool $has_post_comments
+   *   TRUE if the use has 'post comments' permission.
    *
    * @return \Drupal\node\NodeInterface|\PHPUnit\Framework\MockObject\Stub
    *   Stub node for testing.
