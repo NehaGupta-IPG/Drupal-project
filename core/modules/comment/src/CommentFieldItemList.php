@@ -4,6 +4,7 @@ namespace Drupal\comment;
 
 use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Cache\CacheableMetadata;
+use Drupal\Core\Cache\RefinableCacheableDependencyInterface;
 use Drupal\Core\Field\FieldItemList;
 use Drupal\Core\Session\AccountInterface;
 
@@ -128,7 +129,9 @@ class CommentFieldItemList extends FieldItemList {
     if ($last_published_comment_id) {
       if ($comment = \Drupal::entityTypeManager()->getStorage('comment')->load($last_published_comment_id)) {
         // Allow if access on comment is allowed.
-        return $comment->access('view', $account, $return_as_object);
+        return $comment
+          ->access('view', $account, $return_as_object)
+          ->addCacheableDependency($comment);
       }
     }
     // If there are no comments, make no opinion.
