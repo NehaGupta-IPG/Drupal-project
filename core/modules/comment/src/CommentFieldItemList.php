@@ -53,7 +53,7 @@ class CommentFieldItemList extends FieldItemList {
     }
     if ($operation === 'view') {
       // This operation is only used by EntityViewDisplay::buildMultiple(). In
-      // this case check both: 'view comment list'' or 'create' access, since
+      // this case check both: 'view comment list' or 'create' access, since
       // this field is considered a composition of listed comments and comment
       // form. The decision to show only comments, only comment form or both
       // will be made by CommentDefaultFormatter::viewElements() later. Uses
