@@ -321,7 +321,7 @@ class CommentController extends ControllerBase {
         // And the parent comment host belongs to the entity.
         ->andIf(AccessResult::allowedIf($parent_comment->getCommentedEntityId() === $entity->id()))
         // And the user is allowed to view the parent comment.
-        ->andIf($parent_comment->access('view', NULL, TRUE));
+        ->andIf(AccessResult::allowedIf(!$parent_comment->access('view', NULL, TRUE)->isForbidden()));
     }
 
     return $access;
