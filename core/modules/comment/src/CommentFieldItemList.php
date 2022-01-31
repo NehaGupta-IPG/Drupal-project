@@ -128,9 +128,11 @@ class CommentFieldItemList extends FieldItemList {
     if ($last_published_comment_id) {
       if ($comment = \Drupal::entityTypeManager()->getStorage('comment')->load($last_published_comment_id)) {
         // Allow if access on comment is allowed.
-        return $comment
-          ->access('view', $account, $return_as_object)
-          ->addCacheableDependency($comment);
+        $access = $comment->access('view', $account, $return_as_object);
+        if ($return_as_object) {
+          $access->addCacheableDependency($comment);
+        }
+        return $access;
       }
     }
     // If there are no comments, make no opinion.
