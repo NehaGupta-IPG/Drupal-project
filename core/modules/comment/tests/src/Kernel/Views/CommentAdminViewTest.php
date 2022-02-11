@@ -37,11 +37,13 @@ class CommentAdminViewTest extends ViewsKernelTestBase {
    * {@inheritdoc}
    */
   protected static $modules = [
-    'user',
     'comment',
     'entity_test',
+    'field',
     'language',
     'locale',
+    'text',
+    'user',
   ];
 
   /**
@@ -54,7 +56,7 @@ class CommentAdminViewTest extends ViewsKernelTestBase {
     $this->installEntitySchema('comment');
     $this->installEntitySchema('entity_test');
     // Create the anonymous role.
-    $this->installConfig(['user']);
+    $this->installConfig(['comment', 'user']);
 
     // Create user 1 so that the user created later in the test has a different
     // user ID.

@@ -921,3 +921,9 @@ views_field_bulk_form:
       sequence:
         type: string
         label: 'Action'
+    actions_order:
+      type: sequence
+      label: 'Actions order'
+      sequence:
+        type: string
+        label: 'Action'

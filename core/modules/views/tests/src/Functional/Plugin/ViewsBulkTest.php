@@ -71,7 +71,8 @@ class ViewsBulkTest extends ViewTestBase {
 
     // Now click 'Apply to selected items' and assert the first node is selected
     // on the confirm form.
-    $this->submitForm(['node_bulk_form[0]' => TRUE], 'Apply to selected items');
+    $edit = ['node_bulk_form[0]' => TRUE, 'action' => 'node_delete_action'];
+    $this->submitForm($edit, 'Apply to selected items');
     $this->assertSession()->pageTextContains($node_1->getTitle());
     $this->assertSession()->pageTextNotContains($node_2->getTitle());
 
@@ -92,7 +93,8 @@ class ViewsBulkTest extends ViewTestBase {
 
     // Now click 'Apply to selected items' and assert the second node is
     // selected on the confirm form.
-    $this->submitForm(['node_bulk_form[1]' => TRUE], 'Apply to selected items');
+    $edit = ['node_bulk_form[1]' => TRUE, 'action' => 'node_delete_action'];
+    $this->submitForm($edit, 'Apply to selected items');
     $this->assertSession()->pageTextContains($node_1->getTitle());
     $this->assertSession()->pageTextNotContains($node_3->getTitle());
   }

@@ -1,0 +1,12 @@
+tr.draggable td {
+  width: 100%;
+}
+tr.draggable td:first-child {
+  display: flex;
+  align-items: center;
+  width: 2.5rem;
+}
+/* Ensure a space between checkbox and the 'Changed' asterisk */
+tr.draggable td:first-child input[type=checkbox] {
+  margin-right: 3px;
+}

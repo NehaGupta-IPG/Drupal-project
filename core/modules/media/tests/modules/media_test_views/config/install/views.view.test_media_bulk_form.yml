@@ -41,6 +41,11 @@ display:
           action_title: 'With selection'
           include_exclude: exclude
           selected_actions: {  }
+          actions_order:
+            - media_publish_action
+            - media_save_action
+            - media_unpublish_action
+            - media_delete_action
         name:
           id: name
           table: media_field_data
