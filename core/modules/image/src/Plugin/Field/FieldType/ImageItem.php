@@ -353,6 +353,24 @@ class ImageItem extends FileItem {
   /**
    * {@inheritdoc}
    */
+  public function getValue() {
+    $values = parent::getValue();
+
+    // If the image is invalid and no width/height was calculated,
+    // include NULL values to prevent undefined index notices.
+    if ($this->width === NULL) {
+      $values['width'] = NULL;
+    }
+    if ($this->height === NULL) {
+      $values['height'] = NULL;
+    }
+
+    return $values;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public static function generateSampleValue(FieldDefinitionInterface $field_definition) {
     $random = new Random();
     $settings = $field_definition->getSettings();
