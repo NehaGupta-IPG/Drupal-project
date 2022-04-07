@@ -73,13 +73,13 @@ class MediaOverviewTest extends MediaLibraryTestBase {
     $actual_actions = $this->xpath('//select[@id="edit-action"]//option');
     $expected_actions = [
       'media_publish_action',
-      'media_save_action',
       'media_unpublish_action',
+      'media_save_action',
       'media_delete_action',
     ];
-    $this->assertSame($expected_actions, array_map(function (NodeElement $action): string {
+    $this->assertSame($expected_actions, array_values(array_filter(array_map(function (NodeElement $action): string {
       return $action->getValue();
-    }, $actual_actions));
+    }, $actual_actions))));
 
     // There should be links to both the grid and table displays.
     $assert_session->linkExists('Grid');

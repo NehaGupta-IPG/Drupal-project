@@ -83,8 +83,8 @@ display:
           selected_actions: {  }
           actions_order:
             - media_publish_action
-            - media_save_action
             - media_unpublish_action
+            - media_save_action
             - media_delete_action
         rendered_entity:
           id: rendered_entity

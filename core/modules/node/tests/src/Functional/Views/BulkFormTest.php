@@ -107,18 +107,18 @@ class BulkFormTest extends NodeTestBase {
     // Tests that actions are sorted according to the view configured order.
     $actual_actions = $this->xpath('//select[@id="edit-action"]//option');
     $expected_actions = [
+      'node_publish_action',
+      'node_unpublish_action',
+      'node_promote_action',
+      'node_unpromote_action',
       'node_make_sticky_action',
       'node_make_unsticky_action',
-      'node_promote_action',
-      'node_publish_action',
       'node_save_action',
-      'node_unpromote_action',
-      'node_unpublish_action',
       'node_delete_action',
     ];
-    $this->assertSame($expected_actions, array_map(function (NodeElement $action): string {
+    $this->assertSame($expected_actions, array_values(array_filter(array_map(function (NodeElement $action): string {
       return $action->getValue();
-    }, $actual_actions));
+    }, $actual_actions))));
 
     // Unpublish a node using the bulk form.
     $node = reset($this->nodes);
