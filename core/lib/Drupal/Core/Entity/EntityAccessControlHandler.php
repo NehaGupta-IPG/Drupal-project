@@ -101,6 +101,16 @@ class EntityAccessControlHandler extends EntityHandlerBase implements EntityAcce
       $this->moduleHandler()->invokeAll($entity->getEntityTypeId() . '_access', [$entity, $operation, $account])
     );
 
+    // You cannot delete an unsaved entity.
+    $set_cache = TRUE;
+    if ($operation === 'delete' && $entity && $entity->isNew()) {
+      $result = AccessResult::forbidden();
+      // We cannot cache this, as the entity has no ID and hence no tags to
+      // invalidate.
+      $set_cache = FALSE;
+      $access[] = $result;
+    }
+
     $return = $this->processAccessHookResults($access);
 
     // Also execute the default access check except when the access result is
@@ -108,7 +118,9 @@ class EntityAccessControlHandler extends EntityHandlerBase implements EntityAcce
     if (!$return->isForbidden()) {
       $return = $return->orIf($this->checkAccess($entity, $operation, $account));
     }
-    $result = $this->setCache($return, $cid, $operation, $langcode, $account);
+    if ($set_cache) {
+      $result = $this->setCache($return, $entity->uuid(), $operation, $langcode, $account);
+    }
     return $return_as_object ? $result : $result->isAllowed();
   }
 

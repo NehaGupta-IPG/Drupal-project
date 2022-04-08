@@ -91,6 +91,13 @@ class NodeAccessControlHandler extends EntityAccessControlHandler implements Nod
   public function access(EntityInterface $entity, $operation, ?AccountInterface $account = NULL, $return_as_object = FALSE) {
     $account = $this->prepareUser($account);
 
+    // You cannot delete an unsaved entity.
+    if ($operation === 'delete' && $entity && $entity->isNew()) {
+      $result = AccessResult::forbidden();
+      $result->addCacheableDependency($entity);
+      return $return_as_object ? $result : $result->isAllowed();
+    }
+
     // Only bypass if not a revision operation, to retain compatibility.
     if ($account->hasPermission('bypass node access') && !isset(static::REVISION_OPERATION_MAP[$operation])) {
       $result = AccessResult::allowed()->cachePerPermissions();

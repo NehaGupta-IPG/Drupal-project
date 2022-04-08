@@ -108,11 +108,17 @@ class AccessTest extends KernelTestBase {
     $file4 = File::create([
       'filename' => 'druplicon.txt',
       'filemime' => 'text/plain',
+      'uri' => 'public://druplicon.txt',
     ]);
     $this->assertFalse($file4->access('delete', $user_own));
     $this->assertFalse($file4->access('update', $user_own));
-    $this->assertTrue($file4->access('delete', $user_any));
+    // You cannot delete an unsaved file.
+    $this->assertFalse($file4->access('delete', $user_any));
     $this->assertFalse($file4->access('update', $user_any));
+    // Save file and check delete access again.
+    $file4->save();
+    $this->assertTrue($file4->access('delete', $user_any));
+    $this->assertFalse($file4->access('delete', $user_own));
   }
 
   /**
