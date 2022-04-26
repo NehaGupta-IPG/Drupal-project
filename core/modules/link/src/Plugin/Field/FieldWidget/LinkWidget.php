@@ -229,7 +229,7 @@ class LinkWidget extends WidgetBase {
       // @todo The user should be able to select an entity type. Will be fixed
       //   in https://www.drupal.org/node/2423093.
       $element['uri']['#target_type'] = 'node';
-      // Disable autocompletion when the first character is '/', '#' or '?'.
+      // Disable autocompletion when the first character is '[', '/', '#' or '?'.
       $element['uri']['#attributes']['data-autocomplete-first-character-denylist'] = '[/#?';
 
       // The link widget is doing its own processing in
