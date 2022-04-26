@@ -173,6 +173,7 @@ class LinkFormatter extends FormatterBase {
   public function viewElements(FieldItemListInterface $items, $langcode) {
     $element = [];
     $entity = $items->getEntity();
+    // Add token_context for the field's parent entity.
     $token_context = [
       $entity->getEntityTypeId() => $entity,
     ];
