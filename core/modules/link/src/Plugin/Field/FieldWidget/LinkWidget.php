@@ -122,7 +122,7 @@ class LinkWidget extends WidgetBase {
     elseif (in_array($string, ['<nolink>', '<none>', '<button>'], TRUE)) {
       $uri = 'route:' . $string;
     }
-    // Detects if this string is a replaceable token, and sets the token:prefix if it is.
+    // Detects if this string is a replaceable token, and sets the 'token:' prefix if it is.
     elseif (\Drupal::token()->scan($string)) {
       if (strpos($string, "token:") === FALSE) {
         $uri = 'token:' . $string;
