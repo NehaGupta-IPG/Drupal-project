@@ -401,8 +401,8 @@ class EntityTypeInfo implements ContainerInjectionInterface {
 
     $moderation_info = \Drupal::getContainer()->get('content_moderation.moderation_information');
     if ($moderation_info->hasPendingRevision($entity) && $entity->hasLinkTemplate('latest-version')) {
-      $entity_type_id = $entity->getEntityTypeId();
-      $form_state->setRedirect("entity.$entity_type_id.latest_version", [$entity_type_id => $entity->id()]);
+      $url = $entity->toUrl('latest-version');
+      $form_state->setRedirectUrl($url);
     }
   }
 
