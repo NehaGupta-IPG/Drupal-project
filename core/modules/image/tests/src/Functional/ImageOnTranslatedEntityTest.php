@@ -284,7 +284,7 @@ class ImageOnTranslatedEntityTest extends ImageFieldTestBase {
     // Translate the node into French.
     $this->drupalGet('node/' . $default_language_node->id() . '/translations/add/en/fr');
 
-    // Translate propertiers of file.
+    // Translate properties of file.
     $edit = [];
     $edit['title[0][value]'] = 'Scarlett Johansson';
     $name = 'files[' . $this->fieldName . '_0]';
