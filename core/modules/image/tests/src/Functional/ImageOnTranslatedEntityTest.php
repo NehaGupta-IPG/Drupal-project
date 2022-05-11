@@ -256,7 +256,7 @@ class ImageOnTranslatedEntityTest extends ImageFieldTestBase {
       'settings[node][basicpage][translatable]' => 1,
       "settings[node][basicpage][fields][$this->fieldName]" => 1,
       "settings[node][basicpage][columns][$this->fieldName][file]" => FALSE,
-      // Enable alt and title
+      // Enable alt and title.
       "settings[node][basicpage][columns][$this->fieldName][alt]" => 1,
       "settings[node][basicpage][columns][$this->fieldName][title]" => 1,
     ];
@@ -314,7 +314,7 @@ class ImageOnTranslatedEntityTest extends ImageFieldTestBase {
   }
 
   /**
-   * Tests synced file fields on translated nodes with content moderation
+   * Tests synced file fields on translated nodes with content moderation.
    */
   public function testSyncedImagesWithTranslatablePropertiesAndContentModeration() {
     // Enable translation for "Basic page" nodes.
