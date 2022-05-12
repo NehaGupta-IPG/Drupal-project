@@ -310,7 +310,7 @@ class ImageOnTranslatedEntityTest extends ImageFieldTestBase {
 
     // Ensure the file status of the second file is permanent.
     $file = File::load($second_fid);
-    $this->assertTrue($file->isPermanent()
+    $this->assertTrue($file->isPermanent());
   }
 
   /**
