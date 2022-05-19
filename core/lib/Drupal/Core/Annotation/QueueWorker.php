@@ -68,19 +68,14 @@ class QueueWorker extends Plugin {
   /**
    * The service name which handle the defined reliable queue.
    *
-   * @var string (optional)
+   * @var string
    */
   public $queue_reliable_service;
 
   /**
    * The service name which handle the defined queue.
    *
-   * The 'queue.database' service used by the default.
-   *
-   * @var string (optional)
-   *
-   * todo: provide the default value 'queue.database' before
-   *   drupal:10.0.0 release.
+   * @var string
    */
   public $queue_service;
 
