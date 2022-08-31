@@ -111,6 +111,16 @@ class ElementsLabelsTest extends BrowserTestBase {
   }
 
   /**
+   * Tests deprecated ability to set form element id as array.
+   *
+   * @group legacy
+   */
+  public function testFormIdAsArrayDeprecation() {
+    $this->drupalGet('form_test/form-labels/true');
+    $this->expectDeprecation('Providing IDs as an array is deprecated in drupal:9.5.0 and is removed in drupal:10.0.0. Only use string values for ID. See https://www.drupal.org/node/3307047');
+  }
+
+  /**
    * Tests XSS-protection of element labels.
    */
   protected function testTitleEscaping(): void {

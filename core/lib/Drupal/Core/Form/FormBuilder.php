@@ -1043,7 +1043,7 @@ class FormBuilder implements FormBuilderInterface, FormValidatorInterface, FormS
     }
 
     if (!empty($element['#attributes']['id']) && is_array($element['#attributes']['id'])) {
-      @trigger_error('Providing IDs as an array is deprecated in drupal:9.5.0 and is removed in drupal:10.0.0. Only use string values for ID.', E_USER_DEPRECATED);
+      @trigger_error('Providing IDs as an array is deprecated in drupal:9.5.0 and is removed in drupal:10.0.0. Only use string values for ID. See https://www.drupal.org/node/3307047', E_USER_DEPRECATED);
       $element['#attributes']['id'] = reset($element['#attributes']['id']);
     }
 

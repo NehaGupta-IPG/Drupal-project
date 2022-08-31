@@ -58,7 +58,7 @@ class FormTestLabelForm extends FormBase {
   /**
    * {@inheritdoc}
    */
-  public function buildForm(array $form, FormStateInterface $form_state) {
+  public function buildForm(array $form, FormStateInterface $form_state, $test_id_as_array = NULL) {
     $form['form_checkboxes_test'] = [
       '#type' => 'checkboxes',
       '#title' => $this->t('Checkboxes test'),
@@ -189,6 +189,17 @@ class FormTestLabelForm extends FormBase {
         'id' => 'was_set_within_attributes',
       ],
     ];
+
+    if ($test_id_as_array) {
+      $form['id_as_array'] = [
+        '#type' => 'textfield',
+        '#title' => 'ID is set within #attributes as an array',
+        '#attributes' => [
+          'id' => ['i_probably_should_not_be_in_an_array'],
+        ],
+      ];
+    }
+
     return $form;
   }
 
