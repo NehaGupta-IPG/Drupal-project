@@ -2,7 +2,7 @@
 
 namespace Drupal\views\Plugin\EntityReferenceSelection;
 
-use Drupal\Component\Utility\Tags;
+use Drupal\Component\Utility\Html;
 use Drupal\Component\Utility\Xss;
 use Drupal\Core\Entity\Attribute\EntityReferenceSelection;
 use Drupal\Core\Entity\EntityReferenceSelection\SelectionPluginBase;
@@ -14,12 +14,12 @@ use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Render\Element;
 use Drupal\Core\Render\RendererInterface;
 use Drupal\Core\Session\AccountInterface;
+use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Url;
 use Drupal\views\Render\ViewsRenderPipelineMarkup;
 use Drupal\views\Views;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Drupal\Core\StringTranslation\StringTranslationTrait;
 
 /**
  * Plugin implementation of the 'selection' entity_reference.
@@ -357,7 +357,6 @@ class ViewsSelection extends SelectionPluginBase implements ContainerFactoryPlug
     $display_name = $element['#selection_settings']['view']['display_name'];
     $arguments = $element['#selection_settings']['view']['arguments'] ?? NULL;
     $view_name = $element['#selection_settings']['view']['view_name'];
-    $widget_has_tags = $element['#tags'];
 
     // Check that the view is valid and the display still exists.
     $view = Views::getView($view_name);
@@ -389,12 +388,10 @@ class ViewsSelection extends SelectionPluginBase implements ContainerFactoryPlug
       $label = Html::decodeEntities(
         strip_tags($this->renderer->renderPlain($result)));
 
-      if ($widget_has_tags) {
-        // Labels containing commas or quotes must be wrapped in quotes.
-        $label = Tags::encode($label);
-      }
-
-      $entity_labels[] = $label;
+      $entity_labels[] = [
+        'id' => $entity_id,
+        'label' => $label,
+      ];
     }
 
     return $entity_labels;
