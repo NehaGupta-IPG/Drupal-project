@@ -386,7 +386,8 @@ class ViewsSelection extends SelectionPluginBase implements ContainerFactoryPlug
     $entity_labels = [];
 
     foreach ($results as $entity_id => $result) {
-      $label = html_entity_decode(strip_tags($this->renderer->renderPlain($result))) . ' (' . $entity_id . ')';
+      $label = Html::decodeEntities(
+        strip_tags($this->renderer->renderPlain($result)));
 
       if ($widget_has_tags) {
         // Labels containing commas or quotes must be wrapped in quotes.
