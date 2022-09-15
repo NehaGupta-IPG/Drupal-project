@@ -6,6 +6,7 @@ use Drupal\Component\Utility\Crypt;
 use Drupal\Component\Utility\Tags;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityReferenceSelection\SelectionInterface;
+use Drupal\Core\Entity\EntityReferenceSelection\SelectionWithAutocompleteLabelsInterface;
 use Drupal\Core\Entity\EntityReferenceSelection\SelectionWithAutocreateInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Render\Attribute\FormElement;
@@ -115,7 +116,7 @@ class EntityAutocomplete extends Textfield {
 
         // Extract the labels from the passed-in entity objects, taking access
         // checks into account.
-        return static::getEntityLabels($element['#default_value']);
+        return static::getEntityLabels($element['#default_value'], $element);
       }
     }
 
@@ -371,30 +372,48 @@ class EntityAutocomplete extends Textfield {
    *
    * @param \Drupal\Core\Entity\EntityInterface[] $entities
    *   An array of entity objects.
+   * @param array|null $element
+   *   The form element.
    *
    * @return string
    *   A string of entity labels separated by commas.
    */
-  public static function getEntityLabels(array $entities) {
+  public static function getEntityLabels(array $entities, array $element = NULL) {
     /** @var \Drupal\Core\Entity\EntityRepositoryInterface $entity_repository */
     $entity_repository = \Drupal::service('entity.repository');
 
     $entity_labels = [];
-    foreach ($entities as $entity) {
-      // Set the entity in the correct language for display.
-      $entity = $entity_repository->getTranslationFromContext($entity);
-
-      // Use the special view label, since some entities allow the label to be
-      // viewed, even if the entity is not allowed to be viewed.
-      $label = ($entity->access('view label')) ? $entity->label() : t('- Restricted access -');
-
-      // Take into account "autocreated" entities.
-      if (!$entity->isNew()) {
-        $label .= ' (' . $entity->id() . ')';
+    // Check to see if the Selection handler can supply entity labels.
+    if ($element) {
+      $options = $element['#selection_settings'] + [
+          'target_type' => $element['#target_type'],
+          'handler' => $element['#selection_handler'],
+        ];
+      /** @var /Drupal\Core\Entity\EntityReferenceSelection\SelectionInterface $handler */
+      $handler = \Drupal::service('plugin.manager.entity_reference_selection')
+        ->getInstance($options);
+      if ($handler instanceof SelectionWithAutocompleteLabelsInterface) {
+        $entity_labels = $handler->getAutocompleteLabels($entities, $element);
       }
+    }
 
-      // Labels containing commas or quotes must be wrapped in quotes.
-      $entity_labels[] = Tags::encode($label);
+    if (empty($entity_labels)) {
+      foreach ($entities as $entity) {
+        // Set the entity in the correct language for display.
+        $entity = $entity_repository->getTranslationFromContext($entity);
+
+        // Use the special view label, since some entities allow the label to be
+        // viewed, even if the entity is not allowed to be viewed.
+        $label = ($entity->access('view label')) ? $entity->label() : t('- Restricted access -');
+
+        // Take into account "autocreated" entities.
+        if (!$entity->isNew()) {
+          $label .= ' (' . $entity->id() . ')';
+        }
+
+        // Labels containing commas or quotes must be wrapped in quotes.
+        $entity_labels[] = Tags::encode($label);
+      }
     }
 
     return implode(', ', $entity_labels);

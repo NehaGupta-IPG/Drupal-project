@@ -2,9 +2,11 @@
 
 namespace Drupal\views\Plugin\EntityReferenceSelection;
 
+use Drupal\Component\Utility\Tags;
 use Drupal\Component\Utility\Xss;
 use Drupal\Core\Entity\Attribute\EntityReferenceSelection;
 use Drupal\Core\Entity\EntityReferenceSelection\SelectionPluginBase;
+use Drupal\Core\Entity\EntityReferenceSelection\SelectionWithAutocompleteLabelsInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Form\FormStateInterface;
@@ -28,7 +30,7 @@ use Drupal\Core\StringTranslation\StringTranslationTrait;
   group: "views",
   weight: 0
 )]
-class ViewsSelection extends SelectionPluginBase implements ContainerFactoryPluginInterface {
+class ViewsSelection extends SelectionPluginBase implements ContainerFactoryPluginInterface, SelectionWithAutocompleteLabelsInterface {
   use StringTranslationTrait;
 
   /**
@@ -345,6 +347,56 @@ class ViewsSelection extends SelectionPluginBase implements ContainerFactoryPlug
       'arguments' => $arguments,
     ];
     $form_state->setValueForElement($element, $value);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getAutocompleteLabels(array $entities, array $element): array {
+    // Use the rendered view row to display the referenced entity.
+    $display_name = $element['#selection_settings']['view']['display_name'];
+    $arguments = $element['#selection_settings']['view']['arguments'] ?? NULL;
+    $view_name = $element['#selection_settings']['view']['view_name'];
+    $widget_has_tags = $element['#tags'];
+
+    // Check that the view is valid and the display still exists.
+    $view = Views::getView($view_name);
+
+    if (!$view) {
+      $this->messenger()->addWarning(t('The reference view %view_name cannot be found.', ['%view_name' => $view_name]));
+      return FALSE;
+    }
+    if (!$view->access($display_name)) {
+      $this->messenger()->addWarning(t('You do no have access to the reference view %view_name.', ['%view_name' => $view_name]));
+      return FALSE;
+    }
+    $view->setDisplay($display_name);
+
+    $entity_ids = [];
+    foreach ($entities as $entity) {
+      $entity_ids[] = $entity->id();
+    }
+
+    $view->displayHandlers->get($display_name)->setOption('entity_reference_options', [
+      'limit' => 0,
+      'ids' => $entity_ids,
+    ]);
+
+    $results = $view->executeDisplay($display_name, $arguments);
+    $entity_labels = [];
+
+    foreach ($results as $entity_id => $result) {
+      $label = html_entity_decode(strip_tags($this->renderer->renderPlain($result))) . ' (' . $entity_id . ')';
+
+      if ($widget_has_tags) {
+        // Labels containing commas or quotes must be wrapped in quotes.
+        $label = Tags::encode($label);
+      }
+
+      $entity_labels[] = $label;
+    }
+
+    return $entity_labels;
   }
 
 }
