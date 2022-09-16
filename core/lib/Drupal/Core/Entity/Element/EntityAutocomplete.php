@@ -381,10 +381,10 @@ class EntityAutocomplete extends Textfield {
   public static function getEntityLabels(array $entities, array $element = NULL) {
     /** @var \Drupal\Core\Entity\EntityRepositoryInterface $entity_repository */
     $entity_repository = \Drupal::service('entity.repository');
+    $labels_data = NULL;
 
-    $labels_data = [];
     // Check to see if the Selection handler can supply entity labels.
-    if ($element) {
+    if ($element != NULL) {
       $options = $element['#selection_settings'] + [
           'target_type' => $element['#target_type'],
           'handler' => $element['#selection_handler'],
@@ -395,30 +395,32 @@ class EntityAutocomplete extends Textfield {
       if ($handler instanceof SelectionWithAutocompleteLabelsInterface) {
         $labels_data = $handler->getAutocompleteLabels($entities, $element);
       }
-      else {
-        // Fallback to legacy/default behavior for handlers that don't expose
-        // the new interface for getting automcomplete labels.
-        foreach ($entities as $entity) {
-          // Set the entity in the correct language for display.
-          $entity = $entity_repository->getTranslationFromContext($entity);
+    }
 
-          // Use the special view label, since some entities allow the label to be
-          // viewed, even if the entity is not allowed to be viewed.
-          $label = ($entity->access('view label')) ? $entity->label() : t('- Restricted access -');
+    if ($labels_data === NULL) {
+      $labels_data = [];
+      // Fallback to legacy/default behavior for handlers that don't expose
+      // the new interface for getting autocomplete labels.
+      foreach ($entities as $entity) {
+        // Set the entity in the correct language for display.
+        $entity = $entity_repository->getTranslationFromContext($entity);
 
-          // Take into account "autocreated" entities.
-          if ($entity->isNew()) {
-            $id = NULL;
-          }
-          else {
-            $id = $entity->id();
-          }
+        // Use the special view label, since some entities allow the label to be
+        // viewed, even if the entity is not allowed to be viewed.
+        $label = ($entity->access('view label')) ? $entity->label() : t('- Restricted access -');
 
-          $labels_data[] = [
-            'id' => $id,
-            'label' => $label,
-          ];
+        // Take into account "autocreated" entities.
+        if ($entity->isNew()) {
+          $id = NULL;
         }
+        else {
+          $id = $entity->id();
+        }
+
+        $labels_data[] = [
+          'id' => $id,
+          'label' => $label,
+        ];
       }
     }
 
