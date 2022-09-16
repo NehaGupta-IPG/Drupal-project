@@ -427,7 +427,7 @@ class EntityAutocomplete extends Textfield {
       $id = $label_data['id'];
       $label = $label_data['label'];
 
-      if (empty(!$id)) {
+      if ($id !== NULL) {
         $label .= ' (' . $id . ')';
       }
 
