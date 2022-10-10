@@ -119,7 +119,7 @@ class SystemMenuOffCanvasForm extends PluginFormBase implements ContainerInjecti
     unset($form['entity_form']['label'], $form['entity_form']['id'], $form['entity_form']['description'], $form['entity_form']['actions']);
     // Since the overview form is further nested than expected, update the
     // #parents. See \Drupal\menu_ui\MenuForm::form().
-    $form_state->set('menu_overview_form_parents', ['settings', 'entity_form', 'links']);
+    $form_state->set('menu_overview_form_parents', ['entity_form', 'links']);
 
     return $form;
   }

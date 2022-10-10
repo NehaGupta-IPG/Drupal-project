@@ -33,6 +33,15 @@ class TestSettingsValidationBlock extends BlockBase {
       $form_state->setErrorByName('digits', $this->t('Only digits are allowed'));
     }
   }
+  
+  /**
+   * {@inheritdoc}
+   */
+  public function blockSubmit($form, FormStateInterface $form_state) {
+    if (isset($form['digits'])) {
+      \Drupal::messenger()->addMessage('This is the right $form.');
+    }
+  }
 
   /**
    * {@inheritdoc}

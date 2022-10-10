@@ -333,7 +333,7 @@ class BlockForm extends EntityForm {
     $sub_form_state = SubformState::createForSubform($form['settings'], $form, $form_state);
     // Call the plugin submit handler.
     $block = $entity->getPlugin();
-    $this->getPluginForm($block)->submitConfigurationForm($form, $sub_form_state);
+    $this->getPluginForm($block)->submitConfigurationForm($form['settings'], $sub_form_state);
     // If this block is context-aware, set the context mapping.
     if ($block instanceof ContextAwarePluginInterface && $block->getContextDefinitions()) {
       $context_mapping = $sub_form_state->getValue('context_mapping', []);
