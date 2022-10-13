@@ -191,6 +191,11 @@ abstract class PathPluginBase extends DisplayPluginBase implements DisplayRouter
 
     $route = new Route($route_path, $defaults);
 
+    // Set type for named parameters.
+    if ($parameters) {
+      $route->setOption('parameters', $parameters);
+    }
+
     // Add access check parameters to the route.
     $access_plugin = $this->getPlugin('access');
     if (!isset($access_plugin)) {
@@ -204,11 +209,6 @@ abstract class PathPluginBase extends DisplayPluginBase implements DisplayRouter
     $route->setOption('_view_display_plugin_id', $this->getPluginId());
     $route->setOption('_view_display_plugin_class', static::class);
     $route->setOption('_view_display_show_admin_links', $this->getOption('show_admin_links'));
-
-    // Set type for named parameters.
-    if ($parameters) {
-      $route->setOption('parameters', $parameters);
-    }
 
     // Store whether the view will return a response.
     $route->setOption('returns_response', !empty($this->getPluginDefinition()['returns_response']));
