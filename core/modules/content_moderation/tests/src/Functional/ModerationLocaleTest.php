@@ -238,7 +238,10 @@ class ModerationLocaleTest extends ModerationStateTestBase {
     $this->clickLink('Add');
     $this->submitNodeForm('Test 1.3 FR', 'draft');
     $fr_node = $this->loadTranslation($node, 'fr');
-    $this->assertLatestVersionPage($fr_node);
+    // Draft translations does not have latest version because never
+    // were published.
+    $this->assertEquals($fr_node->toUrl()->setAbsolute()->toString(), $this->getSession()->getCurrentUrl());
+    $this->assertModerationForm($fr_node, FALSE);
     $this->assertModerationForm($node);
 
     // Add an Italian translation draft (revision 4).
@@ -246,16 +249,19 @@ class ModerationLocaleTest extends ModerationStateTestBase {
     $this->clickLink('Add');
     $this->submitNodeForm('Test 1.4 IT', 'draft');
     $it_node = $this->loadTranslation($node, 'it');
-    $this->assertLatestVersionPage($it_node);
+    // Draft translations does not have latest version because never
+    // were published.
+    $this->assertEquals($it_node->toUrl()->setAbsolute()->toString(), $this->getSession()->getCurrentUrl());
+    $this->assertModerationForm($it_node, FALSE);
     $this->assertModerationForm($node);
-    $this->assertModerationForm($fr_node);
+    $this->assertModerationForm($fr_node, FALSE);
 
     // Publish the English draft (revision 5).
     $this->drupalGet($edit_path);
     $this->submitNodeForm('Test 1.5 EN', 'published', TRUE);
     $this->assertNotLatestVersionPage($node);
-    $this->assertModerationForm($fr_node);
-    $this->assertModerationForm($it_node);
+    $this->assertModerationForm($fr_node, FALSE);
+    $this->assertModerationForm($it_node, FALSE);
 
     // Publish the Italian draft (revision 6).
     $this->drupalGet($translate_path);
@@ -263,7 +269,7 @@ class ModerationLocaleTest extends ModerationStateTestBase {
     $this->submitNodeForm('Test 1.6 IT', 'published');
     $this->assertNotLatestVersionPage($it_node);
     $this->assertNoModerationForm($node);
-    $this->assertModerationForm($fr_node);
+    $this->assertModerationForm($fr_node, FALSE);
 
     // Publish the French draft (revision 7).
     $this->drupalGet($translate_path);
@@ -402,7 +408,10 @@ class ModerationLocaleTest extends ModerationStateTestBase {
     $this->clickLink('Add');
     $this->submitNodeForm('Test 3.3 FR', 'draft');
     $fr_node3 = $this->loadTranslation($node3, 'fr');
-    $this->assertLatestVersionPage($fr_node3);
+    // Draft translations does not have latest version because never
+    // were published.
+    $this->assertEquals($fr_node3->toUrl()->setAbsolute()->toString(), $this->getSession()->getCurrentUrl());
+    $this->assertModerationForm($fr_node3, FALSE);
     $this->assertModerationForm($node3);
 
     // Publish the French draft (revision 4).
@@ -435,7 +444,10 @@ class ModerationLocaleTest extends ModerationStateTestBase {
     $this->drupalGet($url);
     $this->assertSession()->pageTextContains('Test 1.2 IT');
     $this->submitNodeForm('Test 1.3 EN', 'draft');
-    $this->assertLatestVersionPage($node);
+    // Draft translations does not have latest version because never
+    // were published.
+    $this->assertEquals($node->toUrl()->setAbsolute()->toString(), $this->getSession()->getCurrentUrl());
+    $this->assertModerationForm($node);
 
     // Create a French draft (without saving) and verify that the Italian draft
     // values are used as source values.
