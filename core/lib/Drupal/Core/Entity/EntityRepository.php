@@ -114,7 +114,7 @@ class EntityRepository implements EntityRepositoryInterface {
         // the first and second place in the candidates array.
         $candidates = [
           $langcode => $candidates[$langcode],
-          $default_langcode => $candidates[$default_langcode]
+          $default_langcode => $candidates[$default_langcode],
         ] + $candidates;
 
         // Return the most fitting entity translation.
