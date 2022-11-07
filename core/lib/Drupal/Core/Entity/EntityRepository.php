@@ -107,16 +107,21 @@ class EntityRepository implements EntityRepositoryInterface {
         $candidates = $this->languageManager->getFallbackCandidates($context);
 
         // Ensure the default language has the proper language code.
-        $default_language_id = $entity->getUntranslated()->language()->getId();
-        $candidates[$default_language_id] = LanguageInterface::LANGCODE_DEFAULT;
+        $default_langcode = $entity->getUntranslated()->language()->getId();
+        $candidates[$default_langcode] = LanguageInterface::LANGCODE_DEFAULT;
 
-        if ($entity->hasTranslation($default_language_id)) {
-          return $entity->getTranslation($default_language_id);
-        }
+        // Move the current language and the default fallback language onto
+        // the first and second place in the candidates array.
+        $candidates = [
+          $langcode => $candidates[$langcode],
+          $default_langcode => $candidates[$default_langcode]
+        ] + $candidates;
+
         // Return the most fitting entity translation.
         foreach ($candidates as $candidate) {
           if ($entity->hasTranslation($candidate)) {
-            return $entity->getTranslation($candidate);
+            $translation = $entity->getTranslation($candidate);
+            break;
           }
         }
       }
