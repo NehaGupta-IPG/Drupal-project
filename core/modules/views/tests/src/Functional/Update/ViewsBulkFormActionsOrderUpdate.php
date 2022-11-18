@@ -22,9 +22,7 @@ class ViewsBulkFormActionsOrderUpdate extends UpdatePathTestBase {
   }
 
   /**
-   * Tests views_post_update_bulk_form_action_order().
-   *
-   * @see views_post_update_bulk_form_action_order()
+   * @covers  \views_post_update_bulk_form_action_order
    */
   public function testBulkFormActionsOrderPostUpdate(): void {
     $config_factory = \Drupal::configFactory();
