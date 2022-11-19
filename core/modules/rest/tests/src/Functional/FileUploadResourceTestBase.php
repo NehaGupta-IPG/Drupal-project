@@ -93,6 +93,13 @@ abstract class FileUploadResourceTestBase extends ResourceTestBase {
   protected $fileStorage;
 
   /**
+   * The type of field in which to store the uploaded file.
+   *
+   * @var string
+   */
+  protected $fieldType = 'file';
+
+  /**
    * {@inheritdoc}
    */
   protected function setUp(): void {
@@ -105,7 +112,7 @@ abstract class FileUploadResourceTestBase extends ResourceTestBase {
     $this->fieldStorage = FieldStorageConfig::create([
       'entity_type' => 'entity_test',
       'field_name' => 'field_rest_file_test',
-      'type' => 'file',
+      'type' => $this->fieldType,
       'settings' => [
         'uri_scheme' => 'public',
       ],
