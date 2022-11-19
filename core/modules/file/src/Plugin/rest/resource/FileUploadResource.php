@@ -239,6 +239,71 @@ class FileUploadResource extends ResourceBase {
   }
 
   /**
+<<<<<<< HEAD
+=======
+   * Prepares the filename to strip out any malicious extensions.
+   *
+   * @param string $filename
+   *   The file name.
+   * @param array $validators
+   *   The array of upload validators.
+   *
+   * @return string
+   *   The prepared/munged filename.
+   */
+  protected function prepareFilename($filename, array &$validators) {
+    // The actual extension validation occurs in
+    // \Drupal\file\Plugin\rest\resource\FileUploadResource::validate().
+    $extensions = $validators['FileExtension']['extensions'] ?? '';
+    $event = new FileUploadSanitizeNameEvent($filename, $extensions);
+    $this->eventDispatcher->dispatch($event);
+    return $event->getFilename();
+  }
+
+  /**
+   * Determines the URI for a file field.
+   *
+   * @param array $settings
+   *   The array of field settings.
+   *
+   * @return string
+   *   An un-sanitized file directory URI with tokens replaced. The result of
+   *   the token replacement is then converted to plain text and returned.
+   */
+  protected function getUploadLocation(array $settings) {
+    $destination = trim($settings['file_directory'], '/');
+
+    // Replace tokens. As the tokens might contain HTML we convert it to plain
+    // text.
+    $destination = PlainTextOutput::renderFromHtml($this->token->replace($destination, []));
+    return $settings['uri_scheme'] . '://' . $destination;
+  }
+
+  /**
+   * Retrieves the upload validators for a field definition.
+   *
+   * @param \Drupal\Core\Field\FieldDefinitionInterface $field_definition
+   *   The field definition for which to get validators.
+   *
+   * @return array
+   *   An array suitable for passing to file_save_upload() or the file field
+   *   element's '#upload_validators' property.
+   */
+  protected function getUploadValidators(FieldDefinitionInterface $field_definition) {
+    $item_definition = $field_definition->getItemDefinition();
+    $class = $item_definition->getClass();
+    /** @var \Drupal\file\Plugin\Field\FieldType\FileItem $item */
+    $item = new $class($item_definition);
+
+    $validators = $item->getUploadValidators();
+    // Add in our check of the file name length.
+    $validators['file_validate_name_length'] = [];
+
+    return $validators;
+  }
+
+  /**
+>>>>>>> cae3eec4bfe (Clean slate)
    * {@inheritdoc}
    */
   protected function getBaseRoute($canonical_path, $method) {
