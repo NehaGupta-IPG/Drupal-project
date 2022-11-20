@@ -121,7 +121,6 @@ class TokenReplaceTest extends KernelTestBase {
     $tests['[term:tid]'] = $term1->id();
     $tests['[term:uuid]'] = $term1->uuid();
     $tests['[term:name]'] = $term1->getName();
-    $tests['[term:description]'] = $term1->description->processed;
     $tests['[term:url]'] = $term1->toUrl('canonical', ['absolute' => TRUE])->toString();
     $tests['[term:node-count]'] = 0;
     $tests['[term:parent:name]'] = '[term:parent:name]';
@@ -137,7 +136,6 @@ class TokenReplaceTest extends KernelTestBase {
     $metadata_tests['[term:tid]'] = $base_bubbleable_metadata;
     $metadata_tests['[term:uuid]'] = $base_bubbleable_metadata;
     $metadata_tests['[term:name]'] = $base_bubbleable_metadata;
-    $metadata_tests['[term:description]'] = $base_bubbleable_metadata;
     $metadata_tests['[term:url]'] = $base_bubbleable_metadata;
     $metadata_tests['[term:node-count]'] = $base_bubbleable_metadata;
     $metadata_tests['[term:parent:name]'] = $base_bubbleable_metadata;
@@ -159,7 +157,6 @@ class TokenReplaceTest extends KernelTestBase {
     $tests['[term:tid]'] = $term2->id();
     $tests['[term:uuid]'] = $term2->uuid();
     $tests['[term:name]'] = $term2->getName();
-    $tests['[term:description]'] = $term2->description->processed;
     $tests['[term:url]'] = $term2->toUrl('canonical', ['absolute' => TRUE])->toString();
     $tests['[term:node-count]'] = 1;
     $tests['[term:parent:name]'] = $term1->getName();

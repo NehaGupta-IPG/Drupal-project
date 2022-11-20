@@ -284,7 +284,6 @@ class TermTest extends TaxonomyTestBase {
     \Drupal::service('module_installer')->install(['views']);
     $edit = [
       'name[0][value]' => $this->randomMachineName(12),
-      'description[0][value]' => $this->randomMachineName(100),
     ];
     // Explicitly set the parents field to 'root', to ensure that
     // TermForm::save() handles the invalid term ID correctly.
@@ -310,7 +309,6 @@ class TermTest extends TaxonomyTestBase {
 
     // Verify that the randomly generated term is present.
     $this->assertSession()->pageTextContains($edit['name[0][value]']);
-    $this->assertSession()->pageTextContains($edit['description[0][value]']);
 
     // Test the "Add child" link on the overview page.
     $this->drupalGet('admin/structure/taxonomy/manage/' . $this->vocabulary->id() . '/overview');
@@ -330,7 +328,6 @@ class TermTest extends TaxonomyTestBase {
     // Edit the term.
     $edit = [
       'name[0][value]' => $this->randomMachineName(14),
-      'description[0][value]' => $this->randomMachineName(102),
     ];
     $this->drupalGet('taxonomy/term/' . $term->id() . '/edit');
     $this->submitForm($edit, 'Save');
@@ -357,21 +354,6 @@ class TermTest extends TaxonomyTestBase {
     // View the term and check that it is correct.
     $this->drupalGet('taxonomy/term/' . $term->id());
     $this->assertSession()->pageTextContains($edit['name[0][value]']);
-    $this->assertSession()->pageTextContains($edit['description[0][value]']);
-
-    // Did this page request display a 'term-listing-heading'?
-    $this->assertSession()->elementExists('xpath', '//div[@class="views-element-container"]/div/header/div/div/p');
-    // Check that it does NOT show a description when description is blank.
-    $term->setDescription(NULL);
-    $term->save();
-    $this->drupalGet('taxonomy/term/' . $term->id());
-    $this->assertSession()->elementNotExists('xpath', '//div[@class="views-element-container"]/div/header/div/div/p');
-
-    // Check that the description value is processed.
-    $value = $this->randomMachineName();
-    $term->setDescription($value);
-    $term->save();
-    $this->assertSame("<p>{$value}</p>\n", (string) $term->description->processed);
 
     // Check that the term feed page is working.
     $this->drupalGet('taxonomy/term/' . $term->id() . '/feed');
@@ -390,7 +372,6 @@ class TermTest extends TaxonomyTestBase {
     $this->drupalGet('admin/structure/taxonomy/manage/' . $this->vocabulary->id() . '/add');
     $edit = [
       'name[0][value]' => $this->randomMachineName(12),
-      'description[0][value]' => $this->randomMachineName(100),
     ];
 
     // Create the term to edit.
@@ -423,7 +404,6 @@ class TermTest extends TaxonomyTestBase {
     // Create a Term.
     $edit = [
       'name[0][value]' => $this->randomMachineName(12),
-      'description[0][value]' => $this->randomMachineName(100),
     ];
     // Create the term to edit.
     $this->drupalGet('admin/structure/taxonomy/manage/' . $this->vocabulary->id() . '/add');
@@ -519,8 +499,7 @@ class TermTest extends TaxonomyTestBase {
     // Add a new term with multiple parents.
     $edit = [
       'name[0][value]' => $this->randomMachineName(12),
-      'description[0][value]' => $this->randomMachineName(100),
-      'parent[]' => [0, 1],
+      'parent[]' => [0, $parent->id()],
     ];
     // Save the new term.
     $this->drupalGet('admin/structure/taxonomy/manage/' . $this->vocabulary->id() . '/add');
@@ -676,7 +655,6 @@ class TermTest extends TaxonomyTestBase {
   public function testTermBreadcrumbs(): void {
     $edit = [
       'name[0][value]' => $this->randomMachineName(14),
-      'description[0][value]' => $this->randomMachineName(100),
       'parent[]' => [0],
     ];
 

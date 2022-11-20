@@ -109,7 +109,6 @@ class TaxonomyFieldFilterTest extends ViewTestBase {
     ]);
     foreach (['es', 'fr'] as $langcode) {
       $translation = $taxonomy->addTranslation($langcode, ['name' => $this->termNames[$langcode]]);
-      $translation->description->value = $this->termNames[$langcode];
       $translation->field_foo->value = $this->termNames[$langcode];
     }
     $taxonomy->save();
@@ -127,10 +126,6 @@ class TaxonomyFieldFilterTest extends ViewTestBase {
     // Should show just the Spanish translation, once.
     $this->assertPageCounts('test-name-filter', ['es' => 1, 'fr' => 0, 'en' => 0], 'Comida name filter');
 
-    // Test the description filter page, which filters for description contains
-    // 'Comida'. Should show just the Spanish translation, once.
-    $this->assertPageCounts('test-desc-filter', ['es' => 1, 'fr' => 0, 'en' => 0], 'Comida description filter');
-
     // Test the field filter page, which filters for field_foo contains
     // 'Comida'. Should show just the Spanish translation, once.
     $this->assertPageCounts('test-field-filter', ['es' => 1, 'fr' => 0, 'en' => 0], 'Comida field filter');
@@ -138,10 +133,6 @@ class TaxonomyFieldFilterTest extends ViewTestBase {
     // Test the name Paris filter page, which filters for name contains
     // 'Paris'. Should show each translation once.
     $this->assertPageCounts('test-name-paris', ['es' => 1, 'fr' => 1, 'en' => 1], 'Paris name filter');
-
-    // Test the description Paris page, which filters for description contains
-    // 'Paris'. Should show each translation, once.
-    $this->assertPageCounts('test-desc-paris', ['es' => 1, 'fr' => 1, 'en' => 1], 'Paris description filter');
 
     // Test the field Paris filter page, which filters for field_foo contains
     // 'Paris'. Should show each translation once.
@@ -171,8 +162,7 @@ class TaxonomyFieldFilterTest extends ViewTestBase {
     // page, and they are the same. So the title/body string should appear on
     // the page twice as many times as the input count.
     foreach ($counts as $langcode => $count) {
-      $this->assertEquals(2 * $count, substr_count($text, $this->termNames[$langcode]), 'Translation ' . $langcode . ' has count ' . $count . ' with ' . $message);
-    }
+      $this->assertEquals(substr_count($text, $this->term_names[$langcode]), $count, 'Translation ' . $langcode . ' has count ' . $count . ' with ' . $message);    }
   }
 
   /**
@@ -191,14 +181,12 @@ class TaxonomyFieldFilterTest extends ViewTestBase {
 
     $properties += [
       'name' => $this->randomMachineName(),
-      'description' => $this->randomMachineName(),
       'langcode' => LanguageInterface::LANGCODE_NOT_SPECIFIED,
       'field_foo' => $this->randomMachineName(),
     ];
 
     $term = Term::create([
       'name' => $properties['name'],
-      'description' => $properties['description'],
       'format' => $format->id(),
       'vid' => $this->vocabulary->id(),
       'langcode' => $properties['langcode'],
