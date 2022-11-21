@@ -124,11 +124,19 @@ class TaxonomyFieldFilterTest extends ViewTestBase {
   public function testFilters(): void {
     // Test the name filter page, which filters for name contains 'Comida'.
     // Should show just the Spanish translation, once.
-    $this->assertPageCounts('test-name-filter', ['es' => 1, 'fr' => 0, 'en' => 0], 'Comida name filter');
+    $this->assertPageCounts('test-name-filter', [
+      'es' => 1,
+      'fr' => 0,
+      'en' => 0,
+    ], 'Comida name filter');
 
     // Test the field filter page, which filters for field_foo contains
     // 'Comida'. Should show just the Spanish translation, once.
-    $this->assertPageCounts('test-field-filter', ['es' => 1, 'fr' => 0, 'en' => 0], 'Comida field filter');
+    $this->assertPageCounts('test-field-filter', [
+      'es' => 1,
+      'fr' => 0,
+      'en' => 0,
+    ], 'Comida field filter');
 
     // Test the name Paris filter page, which filters for name contains
     // 'Paris'. Should show each translation once.
@@ -136,7 +144,11 @@ class TaxonomyFieldFilterTest extends ViewTestBase {
 
     // Test the field Paris filter page, which filters for field_foo contains
     // 'Paris'. Should show each translation once.
-    $this->assertPageCounts('test-field-paris', ['es' => 1, 'fr' => 1, 'en' => 1], 'Paris field filter');
+    $this->assertPageCounts('test-field-paris', [
+      'es' => 1,
+      'fr' => 1,
+      'en' => 1,
+    ], 'Paris field filter');
 
   }
 
@@ -162,7 +174,8 @@ class TaxonomyFieldFilterTest extends ViewTestBase {
     // page, and they are the same. So the title/body string should appear on
     // the page twice as many times as the input count.
     foreach ($counts as $langcode => $count) {
-      $this->assertEquals(substr_count($text, $this->term_names[$langcode]), $count, 'Translation ' . $langcode . ' has count ' . $count . ' with ' . $message);    }
+      $this->assertEquals(substr_count($text, $this->termNames[$langcode]), $count, 'Translation ' . $langcode . ' has count ' . $count . ' with ' . $message);
+    }
   }
 
   /**
