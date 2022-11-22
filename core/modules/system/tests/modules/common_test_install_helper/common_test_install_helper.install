@@ -1,0 +1,14 @@
+<?php
+
+/**
+ * @file
+ * Helper module for the ExceptionTest test.
+ */
+
+/**
+ * Implements hook_install().
+ */
+function common_test_install_helper_install() {
+  // Throw an exception here to simulate a fault.
+  throw new Exception('Bad code!');
+}

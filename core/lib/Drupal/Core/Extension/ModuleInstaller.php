@@ -244,8 +244,7 @@ class ModuleInstaller implements ModuleInstallerInterface {
         // fastCGI which executes ::destruct() after the module installation
         // page was sent already.
         \Drupal::service('router.builder')->rebuild();
-      }
-      else {
+      } else {
         // Rebuild the router immediately if it is marked as needing a rebuild.
         // @todo Work this through a bit more. This fixes
         //   \Drupal\Tests\standard\Functional\StandardTest::testStandard()
@@ -297,8 +296,7 @@ class ModuleInstaller implements ModuleInstallerInterface {
     foreach ($current_modules as $name => $weight) {
       if (isset($current_module_filenames[$name])) {
         $module_filenames[$name] = $current_module_filenames[$name];
-      }
-      else {
+      } else {
         $module_path = \Drupal::service('extension.list.module')
           ->getPath($name);
         $pathname = "$module_path/$name.info.yml";
@@ -373,12 +371,10 @@ class ModuleInstaller implements ModuleInstallerInterface {
         if ($entity_type->getProvider() == $module) {
           if ($is_fieldable_entity_type) {
             $update_manager->installFieldableEntityType($entity_type, $entity_field_manager->getFieldStorageDefinitions($entity_type->id()));
-          }
-          else {
+          } else {
             $update_manager->installEntityType($entity_type);
           }
-        }
-        elseif ($is_fieldable_entity_type && !in_array($entity_type->getProvider(), $entity_type_providers_to_install, TRUE)) {
+        } elseif ($is_fieldable_entity_type && !in_array($entity_type->getProvider(), $entity_type_providers_to_install, TRUE)) {
           // The module being installed may be adding new fields to existing
           // entity types. Field definitions for any entity type defined by
           // modules being installed are handled in the if branch.
@@ -389,8 +385,7 @@ class ModuleInstaller implements ModuleInstallerInterface {
               // will be created later in that case.
               try {
                 $update_manager->installFieldStorageDefinition($storage_definition->getName(), $entity_type->id(), $module, $storage_definition);
-              }
-              catch (EntityStorageException $e) {
+              } catch (EntityStorageException $e) {
                 Error::logException($this->logger, $e, 'An error occurred while notifying the creation of the @name field storage definition: "@message" in %function (line %line of %file).', ['@name' => $storage_definition->getName()]);
               }
             }
@@ -588,8 +583,7 @@ class ModuleInstaller implements ModuleInstallerInterface {
       foreach ($entity_type_manager->getDefinitions() as $entity_type) {
         if ($entity_type->getProvider() == $module) {
           $update_manager->uninstallEntityType($entity_type);
-        }
-        elseif ($entity_type->entityClassImplements(FieldableEntityInterface::CLASS)) {
+        } elseif ($entity_type->entityClassImplements(FieldableEntityInterface::CLASS)) {
           // The module being uninstalled might have added new fields to
           // existing entity types. This will add them to the deleted fields
           // repository so their data will be purged on cron.
@@ -728,8 +722,7 @@ class ModuleInstaller implements ModuleInstallerInterface {
       // ModuleHandler instance upon first retrieval.
       $this->kernel->updateModules($module_filenames, $module_filenames);
       $container = $this->kernel->getContainer();
-    }
-    else {
+    } else {
       $container = $this->kernel->resetContainer();
     }
 
@@ -826,7 +819,6 @@ class ModuleInstaller implements ModuleInstallerInterface {
    */
   protected function invoke(string $module, string $hook, array $args = []): mixed {
     $function = $module . '_' . $hook;
-    return function_exists($function) ? $function(... $args) : NULL;
+    return function_exists($function) ? $function(...$args) : NULL;
   }
-
 }
