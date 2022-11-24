@@ -257,10 +257,14 @@ class FieldBlockTest extends EntityKernelTestBase {
     $this->entityFieldManager->getFieldDefinitions('entity_test', 'entity_test')->willReturn(['the_field_name' => $field_definition]);
 
     if ($log_message) {
-      $this->logger->warning($log_message, $log_arguments)->shouldBeCalled();
+      /** @var void|\Prophecy\Prophecy\MethodProphecy $warning */
+      $warning = $this->logger->warning($log_message, $log_arguments);
+      $warning->shouldBeCalled();
     }
     else {
-      $this->logger->warning(Argument::cetera())->shouldNotBeCalled();
+      /** @var void|\Prophecy\Prophecy\MethodProphecy $warning */
+      $warning = $this->logger->warning(Argument::cetera());
+      $warning->shouldNotBeCalled();
     }
 
     $block = $this->getTestBlock($entity);

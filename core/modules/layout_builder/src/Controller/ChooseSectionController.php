@@ -67,6 +67,7 @@ class ChooseSectionController implements ContainerInjectionInterface {
     $items = [];
     $definitions = $this->layoutManager->getFilteredDefinitions('layout_builder', $this->getPopulatedContexts($section_storage), ['section_storage' => $section_storage]);
     foreach ($definitions as $plugin_id => $definition) {
+      /** @var \Drupal\Component\Plugin\Definition\PluginDefinitionInterface $definition */
       $layout = $this->layoutManager->createInstance($plugin_id);
       $item = [
         '#type' => 'link',

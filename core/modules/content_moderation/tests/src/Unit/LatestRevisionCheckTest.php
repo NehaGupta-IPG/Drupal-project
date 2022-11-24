@@ -59,7 +59,7 @@ class LatestRevisionCheckTest extends UnitTestCase {
    */
   public function testLatestAccessPermissions($entity_class, $entity_type, $has_pending_revision, array $account_permissions, $is_owner, $result_class) {
 
-    /** @var \Drupal\Core\Session\AccountInterface|\Prophecy\Prophecy\MethodProphecy $account */
+    /** @var \Drupal\Core\Session\AccountInterface|\Prophecy\Prophecy\ObjectProphecy $account */
     $account = $this->prophesize(AccountInterface::class);
     $possible_permissions = [
       'view latest version',
@@ -71,7 +71,9 @@ class LatestRevisionCheckTest extends UnitTestCase {
       $has_permission = $account->hasPermission($permission);
       $has_permission->willReturn(in_array($permission, $account_permissions));
     }
-    $account->id()->willReturn(42);
+    /** @var int|\Prophecy\Prophecy\MethodProphecy $account_id */
+    $account_id = $account->id();
+    $account_id->willReturn(42);
 
     /** @var \Drupal\Core\Entity\EntityInterface|\Prophecy\Prophecy\ObjectProphecy $entity */
     $entity = $this->prophesize($entity_class);
@@ -88,13 +90,16 @@ class LatestRevisionCheckTest extends UnitTestCase {
       $entity->getOwnerId()->willReturn($is_owner ? 42 : 3);
     }
 
-    /** @var \Drupal\content_moderation\ModerationInformation $mod_info */
     $mod_info = $this->prophesize(ModerationInformation::class);
-    $mod_info->hasPendingRevision($entity->reveal())->willReturn($has_pending_revision);
+    /** @var bool|\Prophecy\Prophecy\MethodProphecy $has_pending_revisions */
+    $has_pending_revisions = $mod_info->hasPendingRevision($entity->reveal());
+    $has_pending_revisions->willReturn($has_pending_revision);
 
     $route = $this->prophesize(Route::class);
 
-    $route->getOption('_content_moderation_entity_type')->willReturn($entity_type);
+    /** @var mixed|\Prophecy\Prophecy\MethodProphecy $route_option */
+    $route_option = $route->getOption('_content_moderation_entity_type');
+    $route_option->willReturn($entity_type);
 
     $route_match = $this->prophesize(RouteMatch::class);
     $route_match->getParameter($entity_type)->willReturn($entity->reveal());

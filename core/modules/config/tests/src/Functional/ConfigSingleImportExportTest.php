@@ -82,6 +82,7 @@ EOD;
     $this->submitForm($edit, 'Import');
     $this->assertSession()->pageTextContains('Are you sure you want to create a new first test configuration?');
     $this->submitForm([], 'Confirm');
+    /** @var \Drupal\Core\Entity\EntityInterface $entity */
     $entity = $storage->load('first');
     $this->assertSame('First', $entity->label());
     $this->assertSame('first', $entity->id());

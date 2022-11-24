@@ -186,6 +186,7 @@ class ConfigurableLanguage extends ConfigEntityBase implements ConfigurableLangu
     parent::postDelete($storage, $entities);
     $language_manager = \Drupal::languageManager();
     $language_manager->reset();
+    /** @var \Drupal\Core\Entity\EntityInterface $entity */
     $entity = reset($entities);
     if ($language_manager instanceof ConfigurableLanguageManagerInterface && !$entity->isUninstalling() && !$entity->isSyncing()) {
       $language_manager->updateLockedLanguageWeights();
