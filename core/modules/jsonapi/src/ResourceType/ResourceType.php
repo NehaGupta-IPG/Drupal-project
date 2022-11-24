@@ -84,7 +84,7 @@ class ResourceType {
   /**
    * The list of fields on the underlying entity type + bundle.
    *
-   * @var string[]
+   * @var \Drupal\jsonapi\ResourceType\ResourceTypeField[]
    */
   protected $fields;
 

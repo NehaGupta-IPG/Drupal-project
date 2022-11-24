@@ -446,6 +446,7 @@ class JsonApiDocumentTopLevelNormalizerTest extends JsonapiKernelTestBase {
    * @covers ::normalize
    */
   public function testNormalizeException() {
+    /** @var \Drupal\jsonapi\Normalizer\Value\CacheableNormalization $normalized */
     $normalized = $this
       ->container
       ->get('jsonapi.serializer')
@@ -453,11 +454,13 @@ class JsonApiDocumentTopLevelNormalizerTest extends JsonapiKernelTestBase {
         new JsonApiDocumentTopLevel(new ErrorCollection([new BadRequestHttpException('Lorem')]), new NullIncludedData(), new LinkCollection([])),
         'api_json',
         []
-      )->getNormalization();
-    $this->assertNotEmpty($normalized['errors']);
-    $this->assertArrayNotHasKey('data', $normalized);
-    $this->assertEquals(400, $normalized['errors'][0]['status']);
-    $this->assertEquals('Lorem', $normalized['errors'][0]['detail']);
+      );
+    /** @var array $normalized_array */
+    $normalized_array = $normalized->getNormalization();
+    $this->assertNotEmpty($normalized_array['errors']);
+    $this->assertArrayNotHasKey('data', $normalized_array);
+    $this->assertEquals(400, $normalized_array['errors'][0]['status']);
+    $this->assertEquals('Lorem', $normalized_array['errors'][0]['detail']);
     $this->assertEquals([
       'info' => [
         'href' => 'http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.1',

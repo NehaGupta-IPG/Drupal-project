@@ -239,6 +239,7 @@ class FieldConfig extends FieldConfigBase implements FieldConfigInterface {
 
     // If this is part of a configuration synchronization then the following
     // configuration updates are not necessary.
+    /** @var \Drupal\Core\Entity\SynchronizableInterface $entity */
     $entity = reset($fields);
     if ($entity->isSyncing()) {
       return;

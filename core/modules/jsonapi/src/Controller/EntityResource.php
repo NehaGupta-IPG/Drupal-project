@@ -270,6 +270,7 @@ class EntityResource {
       throw new ConflictHttpException('Conflict: Entity already exists.');
     }
 
+    /** @var \Drupal\Core\Entity\EntityInterface $parsed_entity */
     $parsed_entity->save();
 
     // Build response object.

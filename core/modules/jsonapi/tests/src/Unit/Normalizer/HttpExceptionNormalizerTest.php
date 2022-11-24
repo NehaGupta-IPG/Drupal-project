@@ -31,9 +31,11 @@ class HttpExceptionNormalizerTest extends UnitTestCase {
     $current_user = $this->prophesize(AccountInterface::class);
     $current_user->hasPermission('access site reports')->willReturn(TRUE);
     $normalizer = new HttpExceptionNormalizer($current_user->reveal());
+    /** @var \Drupal\jsonapi\Normalizer\Value\CacheableNormalization $normalized */
     $normalized = $normalizer->normalize($exception, 'api_json');
-    $normalized = $normalized->getNormalization();
-    $error = $normalized[0];
+    /** @var array $normalized_array */
+    $normalized_array = $normalized->getNormalization();
+    $error = $normalized_array[0];
     $this->assertNotEmpty($error['meta']);
     $this->assertNotEmpty($error['source']);
     $this->assertSame('13', $error['code']);
@@ -46,9 +48,11 @@ class HttpExceptionNormalizerTest extends UnitTestCase {
     $current_user = $this->prophesize(AccountInterface::class);
     $current_user->hasPermission('access site reports')->willReturn(FALSE);
     $normalizer = new HttpExceptionNormalizer($current_user->reveal());
+    /** @var \Drupal\jsonapi\Normalizer\Value\CacheableNormalization $normalized */
     $normalized = $normalizer->normalize($exception, 'api_json');
-    $normalized = $normalized->getNormalization();
-    $error = $normalized[0];
+    /** @var array $normalized_array */
+    $normalized_array = $normalized->getNormalization();
+    $error = $normalized_array[0];
     $this->assertArrayNotHasKey('meta', $error);
     $this->assertArrayNotHasKey('source', $error);
   }

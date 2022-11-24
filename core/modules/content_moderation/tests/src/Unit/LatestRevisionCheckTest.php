@@ -59,7 +59,7 @@ class LatestRevisionCheckTest extends UnitTestCase {
    */
   public function testLatestAccessPermissions($entity_class, $entity_type, $has_pending_revision, array $account_permissions, $is_owner, $result_class) {
 
-    /** @var \Drupal\Core\Session\AccountInterface $account */
+    /** @var \Drupal\Core\Session\AccountInterface|\Prophecy\Prophecy\MethodProphecy $account */
     $account = $this->prophesize(AccountInterface::class);
     $possible_permissions = [
       'view latest version',
@@ -67,15 +67,23 @@ class LatestRevisionCheckTest extends UnitTestCase {
       'view own unpublished content',
     ];
     foreach ($possible_permissions as $permission) {
-      $account->hasPermission($permission)->willReturn(in_array($permission, $account_permissions));
+      /** @var bool|\Prophecy\Prophecy\MethodProphecy $has_permission */
+      $has_permission = $account->hasPermission($permission);
+      $has_permission->willReturn(in_array($permission, $account_permissions));
     }
     $account->id()->willReturn(42);
 
-    /** @var \Drupal\Core\Entity\EntityInterface $entity */
+    /** @var \Drupal\Core\Entity\EntityInterface|\Prophecy\Prophecy\ObjectProphecy $entity */
     $entity = $this->prophesize($entity_class);
-    $entity->getCacheContexts()->willReturn([]);
-    $entity->getCacheTags()->willReturn([]);
-    $entity->getCacheMaxAge()->willReturn(0);
+    /** @var string[]|\Prophecy\Prophecy\MethodProphecy $cache_contexts */
+    $cache_contexts = $entity->getCacheContexts();
+    $cache_contexts->willReturn([]);
+    /** @var string[]|\Prophecy\Prophecy\MethodProphecy $cache_tags */
+    $cache_tags = $entity->getCacheTags();
+    $cache_tags->willReturn([]);
+    /** @var int|\Prophecy\Prophecy\MethodProphecy $cache_max_age */
+    $cache_max_age = $entity->getCacheMaxAge();
+    $cache_max_age->willReturn(0);
     if (is_subclass_of($entity_class, EntityOwnerInterface::class)) {
       $entity->getOwnerId()->willReturn($is_owner ? 42 : 3);
     }

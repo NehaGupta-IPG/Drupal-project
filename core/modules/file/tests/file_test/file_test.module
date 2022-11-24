@@ -225,6 +225,7 @@ function file_test_file_url_alter(&$uri) {
       }
       // Public created files.
       else {
+        /** @var \Drupal\Core\StreamWrapper\StreamWrapperInterface $wrapper */
         $wrapper = $stream_wrapper_manager->getViaScheme($scheme);
         $path = $wrapper->getDirectoryPath() . '/' . $stream_wrapper_manager::getTarget($uri);
       }
@@ -255,6 +256,7 @@ function file_test_file_url_alter(&$uri) {
       }
       // Public created files.
       else {
+        /** @var \Drupal\Core\StreamWrapper\StreamWrapperInterface $wrapper */
         $wrapper = $stream_wrapper_manager->getViaScheme($scheme);
         $path = $wrapper->getDirectoryPath() . '/' . $stream_wrapper_manager::getTarget($uri);
       }
@@ -278,6 +280,7 @@ function file_test_file_url_alter(&$uri) {
       }
       // Public created files.
       else {
+        /** @var \Drupal\Core\StreamWrapper\StreamWrapperInterface $wrapper */
         $wrapper = $stream_wrapper_manager->getViaScheme($scheme);
         $path = $wrapper->getDirectoryPath() . '/' . $stream_wrapper_manager::getTarget($uri);
       }

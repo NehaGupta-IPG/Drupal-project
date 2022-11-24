@@ -91,7 +91,9 @@ class BlockConfigEntityUnitTest extends UnitTestCase {
    * @covers ::calculateDependencies
    */
   public function testCalculateDependencies() {
-    $this->themeHandler->themeExists('stark')->willReturn(TRUE);
+    /** @var \Prophecy\Prophecy\MethodProphecy $theme_exists */
+    $theme_exists = $this->themeHandler->themeExists('stark');
+    $theme_exists->willReturn(TRUE);
     $values = ['theme' => 'stark'];
     // Mock the entity under test so that we can mock getPluginCollections().
     $entity = $this->getMockBuilder('\Drupal\block\Entity\Block')
@@ -100,7 +102,9 @@ class BlockConfigEntityUnitTest extends UnitTestCase {
       ->getMock();
     // Create a configurable plugin that would add a dependency.
     $instance_id = $this->randomMachineName();
-    $this->moduleHandler->moduleExists('test')->willReturn(TRUE);
+    /** @var \Prophecy\Prophecy\MethodProphecy $module_exists */
+    $module_exists = $this->moduleHandler->moduleExists('test');
+    $module_exists->willReturn(TRUE);
     $instance = new TestConfigurablePlugin([], $instance_id, ['provider' => 'test']);
 
     // Create a plugin collection to contain the instance.

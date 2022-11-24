@@ -21,7 +21,7 @@ class BlockVisibilityTest extends MigrateProcessTestCase {
   /**
    * The module handler.
    *
-   * @var \Drupal\Core\Extension\ModuleHandlerInterface
+   * @var \Drupal\Core\Extension\ModuleHandlerInterface|\Prophecy\Prophecy\ObjectProphecy
    */
   protected $moduleHandler;
 
@@ -30,7 +30,9 @@ class BlockVisibilityTest extends MigrateProcessTestCase {
    */
   protected function setUp(): void {
     parent::setUp();
-    $this->moduleHandler = $this->prophesize(ModuleHandlerInterface::class);
+    /** @var \Prophecy\Prophecy\ObjectProphecy $module_handler */
+    $module_handler = $this->prophesize(ModuleHandlerInterface::class);
+    $this->moduleHandler = $module_handler;
     $migrate_lookup = $this->prophesize(MigrateLookupInterface::class);
     $this->plugin = new BlockVisibility([], 'block_visibility_pages', [], $this->moduleHandler->reveal(), $migrate_lookup->reveal());
   }
@@ -67,7 +69,9 @@ class BlockVisibilityTest extends MigrateProcessTestCase {
    * @covers ::transform
    */
   public function testTransformPhpEnabled() {
-    $this->moduleHandler->moduleExists('php')->willReturn(TRUE);
+    /** @var \Prophecy\Prophecy\MethodProphecy $module_exists */
+    $module_exists = $this->moduleHandler->moduleExists('php');
+    $module_exists->willReturn(TRUE);
     $visibility = $this->plugin->transform([2, '<?php', []], $this->migrateExecutable, $this->row, 'destination_property');
     $this->assertSame('php', $visibility['php']['id']);
     $this->assertFalse($visibility['php']['negate']);
@@ -78,7 +82,9 @@ class BlockVisibilityTest extends MigrateProcessTestCase {
    * @covers ::transform
    */
   public function testTransformPhpDisabled() {
-    $this->moduleHandler->moduleExists('php')->willReturn(FALSE);
+    /** @var \Prophecy\Prophecy\MethodProphecy $module_exists */
+    $module_exists = $this->moduleHandler->moduleExists('php');
+    $module_exists->willReturn(FALSE);
     $transformed_value = $this->plugin->transform([2, '<?php', []], $this->migrateExecutable, $this->row, 'destination_property');
     $this->assertEmpty($transformed_value);
   }
@@ -87,7 +93,9 @@ class BlockVisibilityTest extends MigrateProcessTestCase {
    * @covers ::transform
    */
   public function testTransformException() {
-    $this->moduleHandler->moduleExists('php')->willReturn(FALSE);
+    /** @var \Prophecy\Prophecy\MethodProphecy $module_exists */
+    $module_exists = $this->moduleHandler->moduleExists('php');
+    $module_exists->willReturn(FALSE);
     $migrate_lookup = $this->prophesize(MigrateLookupInterface::class);
     $this->row = $this->getMockBuilder('Drupal\migrate\Row')
       ->disableOriginalConstructor()

@@ -3,6 +3,7 @@
 namespace Drupal\Tests\field\Unit\Plugin\migrate\process;
 
 use Drupal\Component\Plugin\Exception\PluginNotFoundException;
+use Drupal\field\Plugin\migrate\process\FieldType;
 use Drupal\field\Plugin\migrate\process\ProcessField;
 use Drupal\migrate\MigrateException;
 use Drupal\migrate\MigrateExecutable;
@@ -92,7 +93,9 @@ class ProcessFieldTest extends MigrateTestCase {
 
     if ($plugin_not_found) {
       $exception = new PluginNotFoundException('foo');
-      $this->fieldManager->getPluginIdFromFieldType()->willThrow($exception);
+      /** @var string|\Prophecy\Prophecy\MethodProphecy $plugin_id */
+      $plugin_id = $this->fieldManager->getPluginIdFromFieldType('');
+      $plugin_id->willThrow($exception);
     }
 
     $transformed_value = $plugin->transform($value, $this->migrateExecutable->reveal(), $this->row->reveal(), 'foo');

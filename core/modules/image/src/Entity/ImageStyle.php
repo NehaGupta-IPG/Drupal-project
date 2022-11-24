@@ -182,6 +182,7 @@ class ImageStyle extends ConfigEntityBase implements ImageStyleInterface, Entity
       // The scheme of derivative image files only needs to be computed for
       // source files not stored in the default scheme.
       if ($source_scheme != $default_scheme) {
+        /** @var \Drupal\Core\StreamWrapper\StreamWrapperInterface $class */
         $class = $this->getStreamWrapperManager()->getClass($source_scheme);
         $is_writable = NULL;
         if ($class) {
@@ -246,7 +247,9 @@ class ImageStyle extends ConfigEntityBase implements ImageStyleInterface, Entity
     // to the actual file path, this avoids bootstrapping PHP once the files are
     // built.
     if ($clean_urls === FALSE && $stream_wrapper_manager::getScheme($uri) == 'public' && !file_exists($uri)) {
-      $directory_path = $stream_wrapper_manager->getViaUri($uri)->getDirectoryPath();
+      /** @var \Drupal\Core\StreamWrapper\LocalStream $local_stream */
+      $local_stream = $stream_wrapper_manager->getViaUri($uri);
+      $directory_path = $local_stream->getDirectoryPath();
       return Url::fromUri('base:' . $directory_path . '/' . $stream_wrapper_manager::getTarget($uri), ['absolute' => TRUE, 'query' => $token_query])->toString();
     }
 

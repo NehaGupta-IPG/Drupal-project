@@ -82,9 +82,10 @@ class ResourceObjectNormalizerCacherTest extends KernelTestBase {
     $resource_type = $this->resourceTypeRepository->get($user->getEntityTypeId(), $user->bundle());
     $resource_object = ResourceObject::createFromEntity($resource_type, $user);
     $cache_tag_to_invalidate = 'link_normalization';
+    /** @var \Drupal\jsonapi\Normalizer\Value\CacheableNormalization $normalized_links */
     $normalized_links = $this->serializer
-      ->normalize($resource_object->getLinks(), 'api_json')
-      ->withCacheableDependency((new CacheableMetadata())->addCacheTags([$cache_tag_to_invalidate]));
+      ->normalize($resource_object->getLinks(), 'api_json');
+    $normalized_links = $normalized_links->withCacheableDependency((new CacheableMetadata())->addCacheTags([$cache_tag_to_invalidate]));
     assert($normalized_links instanceof CacheableNormalization);
     $normalization_parts = [
       ResourceObjectNormalizationCacher::RESOURCE_CACHE_SUBSET_BASE => [

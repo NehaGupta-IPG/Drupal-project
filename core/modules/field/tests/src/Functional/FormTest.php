@@ -614,11 +614,13 @@ class FormTest extends FieldTestBase {
 
     // Update the field to remove the default value, and switch to the default
     // widget.
-    $this->field->setDefaultValue([]);
-    $this->field->save();
+    /** @var \Drupal\Core\Field\FieldConfigBase $field */
+    $field = $this->field;
+    $field->setDefaultValue([]);
+    $field->save();
     \Drupal::service('entity_display.repository')
-      ->getFormDisplay($entity_type, $this->field->getTargetBundle())
-      ->setComponent($this->field->getName(), [
+      ->getFormDisplay($entity_type, $field->getTargetBundle())
+      ->setComponent($field->getName(), [
         'type' => 'test_field_widget',
       ])
       ->save();
@@ -638,8 +640,8 @@ class FormTest extends FieldTestBase {
 
     // Set the field back to hidden.
     \Drupal::service('entity_display.repository')
-      ->getFormDisplay($entity_type, $this->field->getTargetBundle())
-      ->removeComponent($this->field->getName())
+      ->getFormDisplay($entity_type, $field->getTargetBundle())
+      ->removeComponent($field->getName())
       ->save();
 
     // Create a new revision.

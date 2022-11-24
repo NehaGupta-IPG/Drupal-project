@@ -321,6 +321,7 @@ class ContactPersonalTest extends BrowserTestBase {
     }
     $this->drupalGet('admin/people/create');
     $this->submitForm($edit, 'Create new account');
+    /** @var \Drupal\user\Entity\User $user */
     $user = user_load_by_name($name);
     $this->drupalLogout();
 

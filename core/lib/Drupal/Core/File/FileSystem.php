@@ -276,6 +276,7 @@ class FileSystem implements FileSystemInterface {
     $scheme = StreamWrapperManager::getScheme($directory);
 
     if ($this->streamWrapperManager->isValidScheme($scheme)) {
+      /** @var \Drupal\Core\StreamWrapper\LocalStream $wrapper */
       $wrapper = $this->streamWrapperManager->getViaScheme($scheme);
 
       if ($filename = tempnam($wrapper->getDirectoryPath(), $prefix)) {

@@ -445,6 +445,7 @@ class DbLogTest extends BrowserTestBase {
     $this->submitForm($edit, 'Create new account');
     $this->assertSession()->statusCodeEquals(200);
     // Retrieve the user object.
+    /** @var \Drupal\user\Entity\User $user */
     $user = user_load_by_name($name);
     $this->assertNotNull($user, new FormattableMarkup('User @name was loaded', ['@name' => $name]));
     // pass_raw property is needed by drupalLogin.

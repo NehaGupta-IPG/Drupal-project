@@ -281,6 +281,7 @@ class ConfigEntityStorage extends EntityStorageBase implements ConfigEntityStora
     // that configuration schema has casted some of the values.
     if (!$entity->hasTrustedData()) {
       $data = $this->mapFromStorageRecords([$config->get()]);
+      /** @var \Drupal\Core\Config\Entity\ConfigEntityTypeInterface $updated_entity */
       $updated_entity = current($data);
 
       foreach (array_keys($config->get()) as $property) {
@@ -422,6 +423,7 @@ class ConfigEntityStorage extends EntityStorageBase implements ConfigEntityStora
       $values[$this->uuidKey] = $this->uuidService->generate();
     }
     $data = $this->mapFromStorageRecords([$values]);
+    /** @var EntityInterface $entity */
     $entity = current($data);
     $entity->original = clone $entity;
     $entity->setSyncing($is_syncing);
@@ -442,6 +444,7 @@ class ConfigEntityStorage extends EntityStorageBase implements ConfigEntityStora
     $entity->original = clone $entity;
 
     $data = $this->mapFromStorageRecords([$values]);
+    /** @var \Drupal\Core\Config\Entity\ConfigEntityTypeInterface $updated_entity */
     $updated_entity = current($data);
 
     /** @var \Drupal\Core\Config\Entity\ConfigEntityTypeInterface $entity_type */

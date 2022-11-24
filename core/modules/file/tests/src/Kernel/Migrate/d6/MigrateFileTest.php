@@ -115,6 +115,7 @@ class MigrateFileTest extends MigrateDrupal6TestBase implements MigrateDumpAlter
 
     // File 2, when migrated for the second time, is treated as a different file
     // (due to having a different uri this time) and is given fid 6.
+    /** @var \Drupal\file\Entity\File $file */
     $file = File::load(6);
     $this->assertSame('public://core/tests/fixtures/files/image-2.jpg', $file->getFileUri());
 

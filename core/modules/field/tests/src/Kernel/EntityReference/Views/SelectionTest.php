@@ -37,7 +37,7 @@ class SelectionTest extends KernelTestBase {
   /**
    * Nodes for testing.
    *
-   * @var string[][]
+   * @var \Drupal\node\NodeInterface[]
    */
   protected $nodes = [];
 

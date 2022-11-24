@@ -383,10 +383,12 @@ abstract class ResourceTestBase extends BrowserTestBase {
     $self_link = new Link(new CacheableMetadata(), $url, 'self');
     $resource_type = $this->container->get('jsonapi.resource_type.repository')->getByTypeName(static::$resourceTypeName);
     $doc = new JsonApiDocumentTopLevel(new ResourceObjectData([ResourceObject::createFromEntity($resource_type, $entity)], 1), new NullIncludedData(), new LinkCollection(['self' => $self_link]));
-    return $this->serializer->normalize($doc, 'api_json', [
+    /** @var \Drupal\jsonapi\Normalizer\Value\CacheableNormalization $normalized_object */
+    $normalized_object = $this->serializer->normalize($doc, 'api_json', [
       'resource_type' => $resource_type,
       'account' => $this->account,
-    ])->getNormalization();
+    ]);
+    return $normalized_object->getNormalization();
   }
 
   /**

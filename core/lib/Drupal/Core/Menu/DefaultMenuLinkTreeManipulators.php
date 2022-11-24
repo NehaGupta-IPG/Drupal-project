@@ -207,6 +207,7 @@ class DefaultMenuLinkTreeManipulators {
         $access_result = AccessResult::allowed();
       }
       else {
+        /** @var \Drupal\Core\Access\AccessResultInterface $access_result */
         $access_result = $this->accessManager->checkNamedRoute($url->getRouteName(), $url->getRouteParameters(), $this->account, TRUE);
       }
     }

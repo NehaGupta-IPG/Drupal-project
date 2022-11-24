@@ -121,6 +121,7 @@ class BlockAccessControlHandler extends EntityAccessControlHandler implements En
             $contexts = $this->contextRepository->getRuntimeContexts(array_values($block_plugin->getContextMapping()));
             $this->contextHandler->applyContextMapping($block_plugin, $contexts);
           }
+          /** @var \Drupal\Core\Access\AccessResultInterface $access */
           $access = $block_plugin->access($account, TRUE);
         }
         catch (MissingValueContextException $e) {
