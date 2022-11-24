@@ -44,9 +44,9 @@ class PathProcessorImageStyles implements InboundPathProcessorInterface {
    * {@inheritdoc}
    */
   public function processInbound($path, Request $request) {
-    /** @var \Drupal\Core\StreamWrapper\LocalStream $local_stream */
-    $local_stream = $this->streamWrapperManager->getViaScheme('public');
-    $directory_path = $local_stream->getDirectoryPath();
+    /** @var \Drupal\Core\StreamWrapper\StreamWrapperInterface $stream_wrapper */
+    $stream_wrapper = $this->streamWrapperManager->getViaScheme('public');
+    $directory_path = $stream_wrapper->getDirectoryPath();
     if (strpos($path, '/' . $directory_path . '/styles/') === 0) {
       $path_prefix = '/' . $directory_path . '/styles/';
     }

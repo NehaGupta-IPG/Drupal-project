@@ -52,9 +52,9 @@ class DownloadTest extends FileManagedTestBase {
     $url = $this->fileUrlGenerator->generateAbsoluteString($file->getFileUri());
     // URLs can't contain characters outside the ASCII set so $filename has to be
     // encoded.
-    /** @var \Drupal\Core\StreamWrapper\LocalStream $local_stream */
-    $local_stream = \Drupal::service('stream_wrapper_manager')->getViaScheme('public');
-    $filename = $GLOBALS['base_url'] . '/' . $local_stream->getDirectoryPath() . '/' . rawurlencode($file->getFilename());
+    /** @var \Drupal\Core\StreamWrapper\StreamWrapperInterface $stream_wrapper */
+    $stream_wrapper = \Drupal::service('stream_wrapper_manager')->getViaScheme('public');
+    $filename = $GLOBALS['base_url'] . '/' . $stream_wrapper->getDirectoryPath() . '/' . rawurlencode($file->getFilename());
     $this->assertEquals($filename, $url, 'Correctly generated a URL for a created file.');
     $http_client = $this->getHttpClient();
     $response = $http_client->head($url);
@@ -168,9 +168,9 @@ class DownloadTest extends FileManagedTestBase {
       'clean' => '',
       'unclean' => 'index.php/',
     ];
-    /** @var \Drupal\Core\StreamWrapper\LocalStream $local_stream */
-    $local_stream = \Drupal::service('stream_wrapper_manager')->getViaScheme('public');
-    $public_directory_path = $local_stream->getDirectoryPath();
+    /** @var \Drupal\Core\StreamWrapper\StreamWrapperInterface $stream_wrapper */
+    $stream_wrapper = \Drupal::service('stream_wrapper_manager')->getViaScheme('public');
+    $public_directory_path = $stream_wrapper->getDirectoryPath();
     foreach ($clean_url_settings as $clean_url_setting => $script_path) {
       $clean_urls = $clean_url_setting == 'clean';
       $request = $this->prepareRequestForGenerator($clean_urls);

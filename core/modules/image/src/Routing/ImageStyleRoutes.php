@@ -50,10 +50,9 @@ class ImageStyleRoutes implements ContainerInjectionInterface {
     // disabled image derivatives will always be served through the menu system.
     // If clean URLs are enabled and the image derivative already exists, PHP
     // will be bypassed.
-    /** @var \Drupal\Core\StreamWrapper\LocalStream $local_stream */
-    $local_stream = $this->streamWrapperManager->getViaScheme('public');
-    $directory_path = $local_stream->getDirectoryPath();
-
+    /** @var \Drupal\Core\StreamWrapper\StreamWrapperInterface $stream_wrapper */
+    $stream_wrapper = $this->streamWrapperManager->getViaScheme('public');
+    $directory_path = $stream_wrapper->getDirectoryPath();
     $routes['image.style_public'] = new Route(
       '/' . $directory_path . '/styles/{image_style}/{scheme}',
       [
