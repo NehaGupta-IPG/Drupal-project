@@ -225,9 +225,9 @@ function file_test_file_url_alter(&$uri) {
       }
       // Public created files.
       else {
-        /** @var \Drupal\Core\StreamWrapper\StreamWrapperInterface $wrapper */
-        $wrapper = $stream_wrapper_manager->getViaScheme($scheme);
-        $path = $wrapper->getDirectoryPath() . '/' . $stream_wrapper_manager::getTarget($uri);
+        /** @var \Drupal\Core\StreamWrapper\StreamWrapperInterface $stream_wrapper */
+        $stream_wrapper = $stream_wrapper_manager->getViaScheme($scheme);
+        $path = $stream_wrapper->getDirectoryPath() . '/' . $stream_wrapper_manager::getTarget($uri);
       }
 
       // Clean up Windows paths.
@@ -256,9 +256,9 @@ function file_test_file_url_alter(&$uri) {
       }
       // Public created files.
       else {
-        /** @var \Drupal\Core\StreamWrapper\StreamWrapperInterface $wrapper */
-        $wrapper = $stream_wrapper_manager->getViaScheme($scheme);
-        $path = $wrapper->getDirectoryPath() . '/' . $stream_wrapper_manager::getTarget($uri);
+        /** @var \Drupal\Core\StreamWrapper\StreamWrapperInterface $stream_wrapper */
+        $stream_wrapper = $stream_wrapper_manager->getViaScheme($scheme);
+        $path = $stream_wrapper->getDirectoryPath() . '/' . $stream_wrapper_manager::getTarget($uri);
       }
 
       // Clean up Windows paths.
@@ -280,9 +280,9 @@ function file_test_file_url_alter(&$uri) {
       }
       // Public created files.
       else {
-        /** @var \Drupal\Core\StreamWrapper\StreamWrapperInterface $wrapper */
-        $wrapper = $stream_wrapper_manager->getViaScheme($scheme);
-        $path = $wrapper->getDirectoryPath() . '/' . $stream_wrapper_manager::getTarget($uri);
+        /** @var \Drupal\Core\StreamWrapper\StreamWrapperInterface $stream_wrapper */
+        $stream_wrapper = $stream_wrapper_manager->getViaScheme($scheme);
+        $path = $stream_wrapper->getDirectoryPath() . '/' . $stream_wrapper_manager::getTarget($uri);
       }
 
       // Clean up Windows paths.
