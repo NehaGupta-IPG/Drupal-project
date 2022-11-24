@@ -30,9 +30,7 @@ class BlockVisibilityTest extends MigrateProcessTestCase {
    */
   protected function setUp(): void {
     parent::setUp();
-    /** @var \Prophecy\Prophecy\ObjectProphecy $module_handler */
-    $module_handler = $this->prophesize(ModuleHandlerInterface::class);
-    $this->moduleHandler = $module_handler;
+    $this->moduleHandler = $this->prophesize(ModuleHandlerInterface::class);;
     $migrate_lookup = $this->prophesize(MigrateLookupInterface::class);
     $this->plugin = new BlockVisibility([], 'block_visibility_pages', [], $this->moduleHandler->reveal(), $migrate_lookup->reveal());
   }
