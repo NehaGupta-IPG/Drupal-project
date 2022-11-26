@@ -189,6 +189,7 @@ class ModerationStateFieldItemListTest extends KernelTestBase {
     $this->assertEquals(0, $unmoderated_node->moderation_state->count());
 
     $unmoderated_node->moderation_state = NULL;
+    // @phpstan-ignore-next-line
     $this->assertEquals(0, $unmoderated_node->moderation_state->count());
     $this->assertCount(0, $unmoderated_node->validate());
   }

@@ -173,7 +173,9 @@ class OverridesSectionStorageTest extends UnitTestCase {
     $no_layout_builder_form->entityClassImplements(FieldableEntityInterface::class)->willReturn(TRUE);
     $no_layout_builder_form->hasHandlerClass('form', 'layout_builder')->willReturn(FALSE);
     $entity_types['no_layout_builder_form'] = $no_layout_builder_form->reveal();
-    $this->entityFieldManager->getFieldStorageDefinitions('no_layout_builder_form')->shouldNotBeCalled();
+    /** @var \Prophecy\Prophecy\MethodProphecy $get_field_storage_definitions */
+    $get_field_storage_definitions = $this->entityFieldManager->getFieldStorageDefinitions('no_layout_builder_form');
+    $get_field_storage_definitions->shouldNotBeCalled();
 
     $no_view_builder = $this->prophesize(EntityTypeInterface::class);
     $no_view_builder->entityClassImplements(FieldableEntityInterface::class)->willReturn(TRUE);
@@ -187,7 +189,9 @@ class OverridesSectionStorageTest extends UnitTestCase {
     $no_canonical_link->hasLinkTemplate('canonical')->willReturn(FALSE);
     $no_canonical_link->hasHandlerClass('form', 'layout_builder')->willReturn(TRUE);
     $entity_types['no_canonical_link'] = $no_canonical_link->reveal();
-    $this->entityFieldManager->getFieldStorageDefinitions('no_canonical_link')->shouldNotBeCalled();
+    /** @var \Prophecy\Prophecy\MethodProphecy $get_field_storage_definitions */
+    $get_field_storage_definitions = $this->entityFieldManager->getFieldStorageDefinitions('no_canonical_link');
+    $get_field_storage_definitions->shouldNotBeCalled();
 
     $canonical_link_no_route = $this->prophesize(EntityTypeInterface::class);
     $canonical_link_no_route->entityClassImplements(FieldableEntityInterface::class)->willReturn(TRUE);
@@ -196,7 +200,9 @@ class OverridesSectionStorageTest extends UnitTestCase {
     $canonical_link_no_route->getLinkTemplate('canonical')->willReturn('/entity/{entity}');
     $canonical_link_no_route->hasHandlerClass('form', 'layout_builder')->willReturn(TRUE);
     $entity_types['canonical_link_no_route'] = $canonical_link_no_route->reveal();
-    $this->entityFieldManager->getFieldStorageDefinitions('canonical_link_no_route')->shouldNotBeCalled();
+    /** @var \Prophecy\Prophecy\MethodProphecy $get_field_storage_definitions */
+    $get_field_storage_definitions = $this->entityFieldManager->getFieldStorageDefinitions('canonical_link_no_route');
+    $get_field_storage_definitions->shouldNotBeCalled();
 
     $from_canonical = $this->prophesize(EntityTypeInterface::class);
     $from_canonical->entityClassImplements(FieldableEntityInterface::class)->willReturn(TRUE);
@@ -217,7 +223,9 @@ class OverridesSectionStorageTest extends UnitTestCase {
     $entity_types['with_string_id'] = $with_string_id->reveal();
     $string_id = $this->prophesize(FieldStorageDefinitionInterface::class);
     $string_id->getType()->willReturn('string');
-    $this->entityFieldManager->getFieldStorageDefinitions('with_string_id')->willReturn(['id' => $string_id->reveal()]);
+    /** @var \Prophecy\Prophecy\MethodProphecy $get_field_storage_definitions */
+    $get_field_storage_definitions = $this->entityFieldManager->getFieldStorageDefinitions('with_string_id');
+    $get_field_storage_definitions->willReturn(['id' => $string_id->reveal()]);
 
     $with_integer_id = $this->prophesize(EntityTypeInterface::class);
     $with_integer_id->entityClassImplements(FieldableEntityInterface::class)->willReturn(TRUE);
@@ -230,9 +238,12 @@ class OverridesSectionStorageTest extends UnitTestCase {
     $entity_types['with_integer_id'] = $with_integer_id->reveal();
     $integer_id = $this->prophesize(FieldStorageDefinitionInterface::class);
     $integer_id->getType()->willReturn('integer');
-    $this->entityFieldManager->getFieldStorageDefinitions('with_integer_id')->willReturn(['id' => $integer_id->reveal()]);
-
-    $this->entityTypeManager->getDefinitions()->willReturn($entity_types);
+    /** @var \Prophecy\Prophecy\MethodProphecy $get_field_storage_definitions */
+    $get_field_storage_definitions = $this->entityFieldManager->getFieldStorageDefinitions('with_integer_id');
+    $get_field_storage_definitions->willReturn(['id' => $string_id->reveal()]);
+    /** @var \Prophecy\Prophecy\MethodProphecy $get_definitions */
+    $get_definitions = $this->entityTypeManager->getDefinitions();
+    $get_definitions->willReturn($entity_types);
 
     $expected = [
       'entity.from_canonical.canonical' => new Route(

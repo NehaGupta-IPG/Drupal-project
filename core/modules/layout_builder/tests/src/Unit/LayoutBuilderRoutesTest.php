@@ -72,7 +72,9 @@ class LayoutBuilderRoutesTest extends UnitTestCase {
     $this->sectionStorageManager->loadEmpty('second')->willReturn($section_storage_second->reveal());
     $definitions['first'] = new SectionStorageDefinition();
     $definitions['second'] = new SectionStorageDefinition();
-    $this->sectionStorageManager->getDefinitions()->willReturn($definitions);
+    /** @var \Prophecy\Prophecy\MethodProphecy $section_definitions */
+    $section_definitions = $this->sectionStorageManager->getDefinitions();
+    $section_definitions->willReturn($definitions);
 
     $collection = new RouteCollection();
     $event = new RouteBuildEvent($collection);

@@ -59,7 +59,7 @@ class LatestRevisionCheckTest extends UnitTestCase {
    */
   public function testLatestAccessPermissions($entity_class, $entity_type, $has_pending_revision, array $account_permissions, $is_owner, $result_class) {
 
-    /** @var \Drupal\Core\Session\AccountInterface|\Prophecy\Prophecy\ObjectProphecy $account */
+    /** @var \Prophecy\Prophecy\ObjectProphecy $account */
     $account = $this->prophesize(AccountInterface::class);
     $possible_permissions = [
       'view latest version',
@@ -67,39 +67,39 @@ class LatestRevisionCheckTest extends UnitTestCase {
       'view own unpublished content',
     ];
     foreach ($possible_permissions as $permission) {
-      /** @var bool|\Prophecy\Prophecy\MethodProphecy $has_permission */
+      /** @var \Prophecy\Prophecy\MethodProphecy $has_permission */
       $has_permission = $account->hasPermission($permission);
       $has_permission->willReturn(in_array($permission, $account_permissions));
     }
-    /** @var int|\Prophecy\Prophecy\MethodProphecy $account_id */
+    /** @var \Prophecy\Prophecy\MethodProphecy $account_id */
     $account_id = $account->id();
     $account_id->willReturn(42);
 
-    /** @var \Drupal\Core\Entity\EntityInterface|\Prophecy\Prophecy\ObjectProphecy $entity */
+    /** @var \Prophecy\Prophecy\ObjectProphecy $entity */
     $entity = $this->prophesize($entity_class);
-    /** @var string[]|\Prophecy\Prophecy\MethodProphecy $cache_contexts */
-    $cache_contexts = $entity->getCacheContexts();
-    $cache_contexts->willReturn([]);
-    /** @var string[]|\Prophecy\Prophecy\MethodProphecy $cache_tags */
-    $cache_tags = $entity->getCacheTags();
-    $cache_tags->willReturn([]);
-    /** @var int|\Prophecy\Prophecy\MethodProphecy $cache_max_age */
-    $cache_max_age = $entity->getCacheMaxAge();
-    $cache_max_age->willReturn(0);
+    /** @var \Prophecy\Prophecy\MethodProphecy $get_cache_contexts */
+    $get_cache_contexts = $entity->getCacheContexts();
+    $get_cache_contexts->willReturn([]);
+    /** @var \Prophecy\Prophecy\MethodProphecy $get_cache_tags */
+    $get_cache_tags = $entity->getCacheTags();
+    $get_cache_tags->willReturn([]);
+    /** @var \Prophecy\Prophecy\MethodProphecy $get_cache_max_age */
+    $get_cache_max_age = $entity->getCacheMaxAge();
+    $get_cache_max_age->willReturn(0);
     if (is_subclass_of($entity_class, EntityOwnerInterface::class)) {
       $entity->getOwnerId()->willReturn($is_owner ? 42 : 3);
     }
 
     $mod_info = $this->prophesize(ModerationInformation::class);
-    /** @var bool|\Prophecy\Prophecy\MethodProphecy $has_pending_revisions */
+    /** @var \Prophecy\Prophecy\MethodProphecy $has_pending_revisions */
     $has_pending_revisions = $mod_info->hasPendingRevision($entity->reveal());
     $has_pending_revisions->willReturn($has_pending_revision);
 
     $route = $this->prophesize(Route::class);
 
-    /** @var mixed|\Prophecy\Prophecy\MethodProphecy $route_option */
-    $route_option = $route->getOption('_content_moderation_entity_type');
-    $route_option->willReturn($entity_type);
+    /** @var \Prophecy\Prophecy\MethodProphecy $get_option */
+    $get_option = $route->getOption('_content_moderation_entity_type');
+    $get_option->willReturn($entity_type);
 
     $route_match = $this->prophesize(RouteMatch::class);
     $route_match->getParameter($entity_type)->willReturn($entity->reveal());

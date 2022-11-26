@@ -273,7 +273,9 @@ class DefaultsSectionStorageTest extends UnitTestCase {
     $with_bundle_parameter->hasViewBuilderClass()->willReturn(TRUE);
     $with_bundle_parameter->get('field_ui_base_route')->willReturn('with_bundle');
     $entity_types['with_bundle_parameter'] = $with_bundle_parameter->reveal();
-    $this->entityTypeManager->getDefinitions()->willReturn($entity_types);
+    /** @var \Prophecy\Prophecy\MethodProphecy $definitions */
+    $definitions = $this->entityTypeManager->getDefinitions();
+    $definitions->willReturn($entity_types);
 
     $expected = [
       'known' => new Route('/admin/entity/whatever', [], [], ['_admin_route' => TRUE]),

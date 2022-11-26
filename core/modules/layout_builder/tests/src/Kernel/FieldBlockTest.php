@@ -253,16 +253,20 @@ class FieldBlockTest extends EntityKernelTestBase {
     $field->view(Argument::type('array'))->will($promise);
 
     $field_definition = $this->prophesize(FieldDefinitionInterface::class);
-    $field_definition->getLabel()->willReturn('The Field Label');
-    $this->entityFieldManager->getFieldDefinitions('entity_test', 'entity_test')->willReturn(['the_field_name' => $field_definition]);
+    /** @var \Prophecy\Prophecy\MethodProphecy $get_label */
+    $get_label = $field_definition->getLabel();
+    $get_label->willReturn('The Field Label');
+    /** @var \Drupal\Core\Field\FieldDefinitionInterface|\Prophecy\Prophecy\MethodProphecy $get_field_definitions */
+    $get_field_definitions = $this->entityFieldManager->getFieldDefinitions('entity_test', 'entity_test');
+    $get_field_definitions->willReturn(['the_field_name' => $field_definition]);
 
     if ($log_message) {
-      /** @var void|\Prophecy\Prophecy\MethodProphecy $warning */
+      /** @var \Prophecy\Prophecy\MethodProphecy $warning */
       $warning = $this->logger->warning($log_message, $log_arguments);
       $warning->shouldBeCalled();
     }
     else {
-      /** @var void|\Prophecy\Prophecy\MethodProphecy $warning */
+      /** @var \Prophecy\Prophecy\MethodProphecy $warning */
       $warning = $this->logger->warning(Argument::cetera());
       $warning->shouldNotBeCalled();
     }

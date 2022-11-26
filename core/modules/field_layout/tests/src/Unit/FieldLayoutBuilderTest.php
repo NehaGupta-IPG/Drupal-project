@@ -82,16 +82,16 @@ class FieldLayoutBuilderTest extends UnitTestCase {
     $non_configurable_field_definition->isDisplayConfigurable('view')->willReturn(FALSE);
     $definitions['non_configurable_field'] = $non_configurable_field_definition->reveal();
     $definitions['non_configurable_field_with_extra_field'] = $non_configurable_field_definition->reveal();
-    /** @var \Drupal\Core\Field\FieldDefinitionInterface[]|\Prophecy\Prophecy\MethodProphecy $field_definitions */
-    $field_definitions = $this->entityFieldManager->getFieldDefinitions('the_entity_type_id', 'the_entity_type_bundle');
-    $field_definitions->willReturn($definitions);
+    /** @var \Prophecy\Prophecy\MethodProphecy $get_field_definitions */
+    $get_field_definitions = $this->entityFieldManager->getFieldDefinitions('the_entity_type_id', 'the_entity_type_bundle');
+    $get_field_definitions->willReturn($definitions);
     $extra_fields = [];
     $extra_fields['non_configurable_field_with_extra_field'] = [
       'label' => 'This non-configurable field is also defined in hook_entity_extra_field_info()',
     ];
-    /** @var array|\Prophecy\Prophecy\MethodProphecy $entity_field_manager_extra_fields */
-    $entity_field_manager_extra_fields = $this->entityFieldManager->getExtraFields('the_entity_type_id', 'the_entity_type_bundle');
-    $entity_field_manager_extra_fields->willReturn($extra_fields);
+    /** @var \Prophecy\Prophecy\MethodProphecy $get_extra_fields */
+    $get_extra_fields = $this->entityFieldManager->getExtraFields('the_entity_type_id', 'the_entity_type_bundle');
+    $get_extra_fields->willReturn($extra_fields);
 
     $build = [
       'test1' => [
@@ -172,16 +172,16 @@ class FieldLayoutBuilderTest extends UnitTestCase {
   public function testBuildForm() {
     $definitions = [];
     $non_configurable_field_definition = $this->prophesize(FieldDefinitionInterface::class);
-    /** @var bool|\Prophecy\Prophecy\MethodProphecy $is_display_configurable */
+    /** @var \Prophecy\Prophecy\MethodProphecy $is_display_configurable */
     $is_display_configurable = $non_configurable_field_definition->isDisplayConfigurable('form');
     $is_display_configurable->willReturn(FALSE);
     $definitions['non_configurable_field'] = $non_configurable_field_definition->reveal();
-    /** @var \Drupal\Core\Field\FieldDefinitionInterface[]|\Prophecy\Prophecy\MethodProphecy $field_definitions */
-    $field_definitions = $this->entityFieldManager->getFieldDefinitions('the_entity_type_id', 'the_entity_type_bundle');
-    $field_definitions->willReturn($definitions);
-    /** @var array|\Prophecy\Prophecy\MethodProphecy $entity_field_manager_extra_fields */
-    $entity_field_manager_extra_fields = $this->entityFieldManager->getExtraFields('the_entity_type_id', 'the_entity_type_bundle');
-    $entity_field_manager_extra_fields->willReturn([]);
+    /** @var \Prophecy\Prophecy\MethodProphecy $get_field_definitions */
+    $get_field_definitions = $this->entityFieldManager->getFieldDefinitions('the_entity_type_id', 'the_entity_type_bundle');
+    $get_field_definitions->willReturn($definitions);
+    /** @var \Prophecy\Prophecy\MethodProphecy $get_extra_fields */
+    $get_extra_fields = $this->entityFieldManager->getExtraFields('the_entity_type_id', 'the_entity_type_bundle');
+    $get_extra_fields->willReturn([]);
 
     $build = [
       'test1' => [
@@ -278,16 +278,16 @@ class FieldLayoutBuilderTest extends UnitTestCase {
   public function testBuildFormEmpty() {
     $definitions = [];
     $non_configurable_field_definition = $this->prophesize(FieldDefinitionInterface::class);
-    /** @var bool|\Prophecy\Prophecy\MethodProphecy $is_display_configurable */
+    /** @var \Prophecy\Prophecy\MethodProphecy $is_display_configurable */
     $is_display_configurable = $non_configurable_field_definition->isDisplayConfigurable('form');
     $is_display_configurable->willReturn(FALSE);
     $definitions['non_configurable_field'] = $non_configurable_field_definition->reveal();
-    /** @var \Drupal\Core\Field\FieldDefinitionInterface[]|\Prophecy\Prophecy\MethodProphecy $field_definitions */
-    $field_definitions = $this->entityFieldManager->getFieldDefinitions('the_entity_type_id', 'the_entity_type_bundle');
-    $field_definitions->willReturn($definitions);
-    /** @var array|\Prophecy\Prophecy\MethodProphecy $entity_field_manager_extra_fields */
-    $entity_field_manager_extra_fields = $this->entityFieldManager->getExtraFields('the_entity_type_id', 'the_entity_type_bundle');
-    $entity_field_manager_extra_fields->willReturn([]);
+    /** @var \Prophecy\Prophecy\MethodProphecy $get_field_definitions */
+    $get_field_definitions = $this->entityFieldManager->getFieldDefinitions('the_entity_type_id', 'the_entity_type_bundle');
+    $get_field_definitions->willReturn($definitions);
+    /** @var \Prophecy\Prophecy\MethodProphecy $get_extra_fields */
+    $get_extra_fields = $this->entityFieldManager->getExtraFields('the_entity_type_id', 'the_entity_type_bundle');
+    $get_extra_fields->willReturn([]);
 
     $build = [
       'non_configurable_field' => [
@@ -323,9 +323,9 @@ class FieldLayoutBuilderTest extends UnitTestCase {
    * @covers ::buildForm
    */
   public function testBuildFormNoLayout() {
-    /** @var \Drupal\Core\Field\FieldDefinitionInterface[]|\Prophecy\Prophecy\MethodProphecy $field_definitions */
-    $field_definitions = $this->entityFieldManager->getFieldDefinitions(Argument::any(), Argument::any());
-    $field_definitions->shouldNotBeCalled();
+    /** @var \Prophecy\Prophecy\MethodProphecy $get_field_definitions */
+    $get_field_definitions = $this->entityFieldManager->getFieldDefinitions(Argument::any(), Argument::any());
+    $get_field_definitions->shouldNotBeCalled();
 
     $build = [
       'test1' => [
