@@ -256,7 +256,7 @@ class FieldBlockTest extends EntityKernelTestBase {
     /** @var \Prophecy\Prophecy\MethodProphecy $get_label */
     $get_label = $field_definition->getLabel();
     $get_label->willReturn('The Field Label');
-    /** @var \Drupal\Core\Field\FieldDefinitionInterface|\Prophecy\Prophecy\MethodProphecy $get_field_definitions */
+    /** @var \Prophecy\Prophecy\MethodProphecy $get_field_definitions */
     $get_field_definitions = $this->entityFieldManager->getFieldDefinitions('entity_test', 'entity_test');
     $get_field_definitions->willReturn(['the_field_name' => $field_definition]);
 

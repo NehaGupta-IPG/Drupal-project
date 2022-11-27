@@ -59,7 +59,7 @@ class LatestRevisionCheckTest extends UnitTestCase {
    */
   public function testLatestAccessPermissions($entity_class, $entity_type, $has_pending_revision, array $account_permissions, $is_owner, $result_class) {
 
-    /** @var \Drupal\Core\Session\AccountInterface|\Prophecy\Prophecy\ObjectProphecy $account */
+    /** @var \Drupal\Core\Session\AccountInterface */
     $account = $this->prophesize(AccountInterface::class);
     $possible_permissions = [
       'view latest version',
@@ -75,7 +75,6 @@ class LatestRevisionCheckTest extends UnitTestCase {
     $account_id = $account->id();
     $account_id->willReturn(42);
 
-    /** @var \Drupal\node\Entity\Node|\Drupal\block_content\Entity\BlockContent|\Prophecy\Prophecy\ObjectProphecy $entity */
     $entity = $this->prophesize($entity_class);
     /** @var \Prophecy\Prophecy\MethodProphecy $get_cache_contexts */
     $get_cache_contexts = $entity->getCacheContexts();
