@@ -82,7 +82,7 @@ EOD;
     $this->submitForm($edit, 'Import');
     $this->assertSession()->pageTextContains('Are you sure you want to create a new first test configuration?');
     $this->submitForm([], 'Confirm');
-    /** @var \Drupal\Core\Entity\EntityInterface $entity */
+    /** @var \Drupal\Core\Config\Entity\ConfigEntityInterface $entity */
     $entity = $storage->load('first');
     $this->assertSame('First', $entity->label());
     $this->assertSame('first', $entity->id());
@@ -126,6 +126,7 @@ EOD;
     $this->submitForm($edit, 'Import');
     $this->assertSession()->pageTextContains('Are you sure you want to create a new second test configuration?');
     $this->submitForm([], 'Confirm');
+    /** @var \Drupal\Core\Config\Entity\ConfigEntityInterface $entity */
     $entity = $storage->load('second');
     $this->assertSession()->pageTextContains('The configuration was imported successfully.');
     $this->assertSame('Second', $entity->label());

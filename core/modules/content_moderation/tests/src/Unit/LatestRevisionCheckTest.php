@@ -59,7 +59,7 @@ class LatestRevisionCheckTest extends UnitTestCase {
    */
   public function testLatestAccessPermissions($entity_class, $entity_type, $has_pending_revision, array $account_permissions, $is_owner, $result_class) {
 
-    /** @var \Prophecy\Prophecy\ObjectProphecy $account */
+    /** @var \Drupal\Core\Session\AccountInterface|\Prophecy\Prophecy\ObjectProphecy $account */
     $account = $this->prophesize(AccountInterface::class);
     $possible_permissions = [
       'view latest version',
@@ -75,7 +75,7 @@ class LatestRevisionCheckTest extends UnitTestCase {
     $account_id = $account->id();
     $account_id->willReturn(42);
 
-    /** @var \Prophecy\Prophecy\ObjectProphecy $entity */
+    /** @var \Drupal\node\Entity\Node|\Drupal\block_content\Entity\BlockContent|\Prophecy\Prophecy\ObjectProphecy $entity */
     $entity = $this->prophesize($entity_class);
     /** @var \Prophecy\Prophecy\MethodProphecy $get_cache_contexts */
     $get_cache_contexts = $entity->getCacheContexts();
@@ -87,7 +87,9 @@ class LatestRevisionCheckTest extends UnitTestCase {
     $get_cache_max_age = $entity->getCacheMaxAge();
     $get_cache_max_age->willReturn(0);
     if (is_subclass_of($entity_class, EntityOwnerInterface::class)) {
-      $entity->getOwnerId()->willReturn($is_owner ? 42 : 3);
+      /** @var \Prophecy\Prophecy\MethodProphecy $get_owner_id */
+      $get_owner_id = $entity->getOwnerId();
+      $get_owner_id->willReturn($is_owner ? 42 : 3);
     }
 
     $mod_info = $this->prophesize(ModerationInformation::class);

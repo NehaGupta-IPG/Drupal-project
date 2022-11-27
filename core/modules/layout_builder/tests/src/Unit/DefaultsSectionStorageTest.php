@@ -79,7 +79,9 @@ class DefaultsSectionStorageTest extends UnitTestCase {
     $container->set('entity_type.manager', $this->entityTypeManager->reveal());
     \Drupal::setContainer($container);
 
-    $this->plugin->getPluginDefinition()
+    /** @var \Drupal\layout_builder\SectionStorage\SectionStorageDefinition $get_plugin_definition */
+    $get_plugin_definition = $this->plugin->getPluginDefinition();
+    $get_plugin_definition
       ->addContextDefinition('display', EntityContextDefinition::fromEntityTypeId('entity_view_display'))
       ->addContextDefinition('view_mode', new ContextDefinition('string'));
 

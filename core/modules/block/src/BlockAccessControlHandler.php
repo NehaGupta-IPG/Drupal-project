@@ -121,18 +121,20 @@ class BlockAccessControlHandler extends EntityAccessControlHandler implements En
             $contexts = $this->contextRepository->getRuntimeContexts(array_values($block_plugin->getContextMapping()));
             $this->contextHandler->applyContextMapping($block_plugin, $contexts);
           }
-          /** @var \Drupal\Core\Access\AccessResultInterface $access */
+          /** @var \Drupal\Core\Access\AccessResult $access */
           $access = $block_plugin->access($account, TRUE);
         }
         catch (MissingValueContextException $e) {
           // The contexts exist but have no value. Deny access without
           // disabling caching.
+          /** @var \Drupal\Core\Access\AccessResult $access */
           $access = AccessResult::forbidden();
         }
         catch (ContextException $e) {
           // If any context is missing then we might be missing cacheable
           // metadata, and don't know based on what conditions the block is
           // accessible or not. Make sure the result cannot be cached.
+          /** @var \Drupal\Core\Access\AccessResult */
           $access = AccessResult::forbidden()->setCacheMaxAge(0);
         }
       }

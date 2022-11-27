@@ -39,7 +39,9 @@ class AssertMailTraitTest extends KernelTestBase {
     $this->assertCount(0, $captured_emails, 'The captured emails queue is empty.');
 
     // Send the email.
-    $mail_service->getInstance(['module' => 'simpletest', 'key' => 'drupal_mail_test'])->mail($message);
+    /** @var \Drupal\Core\Mail\MailInterface $mail_service_instance */
+    $mail_service_instance = $mail_service->getInstance(['module' => 'simpletest', 'key' => 'drupal_mail_test']);
+    $mail_service_instance->mail($message);
 
     // Ensure that there is one email in the captured emails array.
     $captured_emails = $this->getMails();
@@ -66,7 +68,9 @@ class AssertMailTraitTest extends KernelTestBase {
         'to' => $this->randomMachineName(32) . '@example.com',
         'body' => $this->randomString(512),
       ];
-      $mail_service->getInstance(['module' => 'drupal_mail_test', 'key' => $index])->mail($message);
+      /** @var \Drupal\Core\Mail\MailInterface $mail_service_instance */
+      $mail_service_instance = $mail_service->getInstance(['module' => 'drupal_mail_test', 'key' => $index]);
+      $mail_service_instance->mail($message);
     }
 
     // There should now be 6 emails captured.
@@ -89,7 +93,9 @@ class AssertMailTraitTest extends KernelTestBase {
     // Send the last email again, so we can confirm that
     // \Drupal\Core\Test\AssertMailTrait::getMails() filters correctly returns
     // all emails with a given property/value.
-    $mail_service->getInstance(['module' => 'drupal_mail_test', 'key' => $index])->mail($message);
+    /** @var \Drupal\Core\Mail\MailInterface $mail_service_instance */
+    $mail_service_instance = $mail_service->getInstance(['module' => 'drupal_mail_test', 'key' => $index]);
+    $mail_service_instance->mail($message);
     $captured_emails = $this->getMails(['id' => 'drupal_mail_test_4']);
     $this->assertCount(2, $captured_emails, 'All emails with the same id are returned when filtering by id.');
   }

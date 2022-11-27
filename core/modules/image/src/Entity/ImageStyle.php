@@ -247,7 +247,7 @@ class ImageStyle extends ConfigEntityBase implements ImageStyleInterface, Entity
     // to the actual file path, this avoids bootstrapping PHP once the files are
     // built.
     if ($clean_urls === FALSE && $stream_wrapper_manager::getScheme($uri) == 'public' && !file_exists($uri)) {
-      /** @var \Drupal\Core\StreamWrapper\StreamWrapperInterface $stream_wrapper */
+      /** @var \Drupal\Core\StreamWrapper\LocalStream $stream_wrapper */
       $stream_wrapper = $stream_wrapper_manager->getViaUri($uri);
       $directory_path = $stream_wrapper->getDirectoryPath();
       return Url::fromUri('base:' . $directory_path . '/' . $stream_wrapper_manager::getTarget($uri), ['absolute' => TRUE, 'query' => $token_query])->toString();

@@ -48,10 +48,10 @@ class FieldImportCreateTest extends FieldKernelTestBase {
     // A field storage with two fields.
     $field_storage_2 = FieldStorageConfig::load($field_storage_id_2);
     $this->assertNotEmpty($field_storage_2, 'The second field was created.');
-    /** @var \Drupal\Core\Entity\EntityInterface $field2a */
+    /** @var \Drupal\Core\Field\FieldConfigBase $field2a */
     $field2a = FieldConfig::load($field_id_2a);
     $this->assertEquals('entity_test', $field2a->getTargetBundle(), 'The second field was created on bundle entity_test.');
-    /** @var \Drupal\Core\Entity\EntityInterface $field2b */
+    /** @var \Drupal\Core\Field\FieldConfigBase $field2b */
     $field2b = FieldConfig::load($field_id_2b);
     $this->assertEquals('test_bundle', $field2b->getTargetBundle(), 'The second field was created on bundle test_bundle.');
 

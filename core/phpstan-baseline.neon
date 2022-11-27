@@ -226,11 +226,6 @@ parameters:
 			path: lib/Drupal/Core/Action/ActionManager.php
 
 		-
-			message: "#^Method Drupal\\\\Core\\\\Archiver\\\\ArchiverManager\\:\\:getInstance\\(\\) should return object\\|false but return statement is missing\\.$#"
-			count: 1
-			path: lib/Drupal/Core/Archiver/ArchiverManager.php
-
-		-
 			message: "#^Variable \\$group_keys might not be defined\\.$#"
 			count: 2
 			path: lib/Drupal/Core/Asset/CssCollectionGrouper.php
