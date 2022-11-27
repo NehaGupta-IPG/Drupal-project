@@ -38,6 +38,7 @@ class EntityAutocompleteMatcher implements EntityAutocompleteMatcherInterface {
       'target_type' => $target_type,
       'handler' => $selection_handler,
     ];
+    /** @var \Drupal\Core\Entity\EntityReferenceSelection\SelectionInterface $handler */
     $handler = $this->selectionManager->getInstance($options);
 
     if (isset($string)) {

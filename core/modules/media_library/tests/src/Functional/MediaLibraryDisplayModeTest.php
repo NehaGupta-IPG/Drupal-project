@@ -184,8 +184,13 @@ class MediaLibraryDisplayModeTest extends BrowserTestBase {
     $this->assertViewDisplay($type_id, 'medium');
 
     // Delete a form and view display.
-    EntityFormDisplay::load('media.type_one.media_library')->delete();
-    EntityViewDisplay::load('media.type_one.media_library')->delete();
+    /** @var \Drupal\Core\Entity\Entity\EntityFormDisplay $loaded_entity_form_display */
+    $loaded_entity_form_display = EntityFormDisplay::load('media.type_one.media_library');
+    $loaded_entity_form_display->delete();
+    /** @var \Drupal\Core\Entity\Entity\EntityViewDisplay $loaded_entity_view_display */
+    $loaded_entity_view_display = EntityViewDisplay::load('media.type_one.media_library');
+    $loaded_entity_view_display->delete();
+
     // Make sure the form and view display are not created when saving existing
     // media types.
     $this->drupalGet('admin/structure/media/manage/type_one');

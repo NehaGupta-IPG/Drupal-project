@@ -79,7 +79,9 @@ class ListPlugin extends CKEditor5PluginDefault implements CKEditor5PluginConfig
    * {@inheritdoc}
    */
   public function getElementsSubset(): array {
-    $subset = $this->getPluginDefinition()->getElements();
+    /** @var  \Drupal\ckeditor5\Plugin\CKEditor5PluginDefinition $plugin_definition */
+    $plugin_definition = $this->getPluginDefinition();
+    $subset = $plugin_definition->getElements();
     $subset = array_diff($subset, ['<ol reversed start>']);
     $reversed_enabled = $this->getConfiguration()['reversed'];
     $start_index_enabled = $this->getConfiguration()['startIndex'];

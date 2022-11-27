@@ -55,7 +55,9 @@ class Alignment extends CKEditor5PluginDefault implements CKEditor5PluginConfigu
       '#description' => $this->t('These are the alignment types that will appear in the alignment dropdown.'),
     ];
 
-    foreach ($this->getPluginDefinition()->getCKEditor5Config()['alignment']['options'] as $alignment_option) {
+    /** @var  \Drupal\ckeditor5\Plugin\CKEditor5PluginDefinition $get_plugin_definition */
+    $get_plugin_definition = $this->getPluginDefinition();
+    foreach ($get_plugin_definition->getCKEditor5Config()['alignment']['options'] as $alignment_option) {
       $name = $alignment_option['name'];
       $form['enabled_alignments'][$name] = [
         '#type' => 'checkbox',
@@ -110,6 +112,7 @@ class Alignment extends CKEditor5PluginDefault implements CKEditor5PluginConfigu
    */
   public function getElementsSubset(): array {
     $enabled_alignments = $this->configuration['enabled_alignments'];
+    /** @var  \Drupal\ckeditor5\Plugin\CKEditor5PluginDefinition $plugin_definition */
     $plugin_definition = $this->getPluginDefinition();
     $all_elements = $plugin_definition->getElements();
     $subset = HTMLRestrictions::fromString(implode($all_elements));

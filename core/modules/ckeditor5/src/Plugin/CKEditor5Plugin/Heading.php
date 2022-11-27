@@ -98,7 +98,9 @@ class Heading extends CKEditor5PluginDefault implements CKEditor5PluginConfigura
       '#description' => $this->t('These are the headings that will appear in the headings dropdown. If a heading is not chosen here, it does not necessarily mean the corresponding tag is disallowed in the text format.'),
     ];
 
-    foreach ($this->getPluginDefinition()->getCKEditor5Config()['heading']['options'] as $heading_option) {
+    /** @var  \Drupal\ckeditor5\Plugin\CKEditor5PluginDefinition $plugin_definition */
+    $plugin_definition = $this->getPluginDefinition();
+    foreach ($plugin_definition->getCKEditor5Config()['heading']['options'] as $heading_option) {
       $model = $heading_option['model'];
 
       if (in_array($model, self::ALWAYS_ENABLED_HEADINGS, TRUE)) {
@@ -201,6 +203,7 @@ class Heading extends CKEditor5PluginDefault implements CKEditor5PluginConfigura
    *   List of tags provided by the enabled headings.
    */
   private function enabledHeadingsToTags(array $enabled_headings): array {
+    /** @var  \Drupal\ckeditor5\Plugin\CKEditor5PluginDefinition $plugin_definition */
     $plugin_definition = $this->getPluginDefinition();
     $elements = $plugin_definition->getElements();
     $heading_keyed_by_model = [];

@@ -298,6 +298,7 @@ class EntityReferenceItem extends FieldItemBase implements OptionsProviderInterf
       'field' => $entity_type->getKey('id'),
       'direction' => 'DESC',
     ];
+    /** @var \Drupal\Core\Entity\EntityReferenceSelection\SelectionInterface $selection_handler */
     $selection_handler = $manager->getInstance($options);
 
     // Select a random number of references between the last 50 referenceable

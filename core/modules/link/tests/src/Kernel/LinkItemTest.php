@@ -161,11 +161,13 @@ class LinkItemTest extends FieldKernelTestBase {
     // Check that setting options to NULL does not trigger an error when
     // calling getUrl();
     $entity->field_test->options = NULL;
+    // @phpstan-ignore-next-line
     $this->assertInstanceOf(Url::class, $entity->field_test[0]->getUrl());
 
     // Check that setting LinkItem value NULL doesn't generate any error or
     // warning.
     $entity->field_test[0] = NULL;
+    // @phpstan-ignore-next-line
     $this->assertNull($entity->field_test[0]->getValue());
 
     // Test the generateSampleValue() method for generic, external, and internal

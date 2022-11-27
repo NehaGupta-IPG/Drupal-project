@@ -16,9 +16,11 @@ class MenuLinkPluginTest extends UnitTestCase {
    * @covers ::getUuid
    */
   public function testGetInstanceReflection() {
-    /** @var \Drupal\menu_link_content\Plugin\Menu\MenuLinkContent $menu_link_content_plugin */
+    /** @var \Prophecy\Prophecy\ObjectProphecy $menu_link_content_plugin */
     $menu_link_content_plugin = $this->prophesize(MenuLinkContent::class);
-    $menu_link_content_plugin->getDerivativeId()->willReturn('test_id');
+    /** @var \Prophecy\Prophecy\MethodProphecy $get_derivative_id */
+    $get_derivative_id = $menu_link_content_plugin->getDerivativeId();
+    $get_derivative_id->willReturn('test_id');
     $menu_link_content_plugin = $menu_link_content_plugin->reveal();
 
     $class = new \ReflectionClass(MenuLinkContent::class);

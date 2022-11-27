@@ -193,7 +193,9 @@ class Media extends CKEditor5PluginDefault implements ContainerFactoryPluginInte
    * {@inheritdoc}
    */
   public function getElementsSubset(): array {
-    $subset = $this->getPluginDefinition()->getElements();
+    /** @var  \Drupal\ckeditor5\Plugin\CKEditor5PluginDefinition $plugin_definition */
+    $plugin_definition = $this->getPluginDefinition();
+    $subset = $plugin_definition->getElements();
     $view_mode_override_enabled = $this->getConfiguration()['allow_view_mode_override'];
     if (!$view_mode_override_enabled) {
       $subset = array_diff($subset, ['<drupal-media data-view-mode>']);

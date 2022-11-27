@@ -231,11 +231,13 @@ END;
     $this->responses->append($response);
 
     // The corrupt provider should cause a warning to be logged.
-    $this->logger->log(
+    /** @var \Prophecy\Prophecy\MethodProphecy $logged_warning */
+    $logged_warning = $this->logger->log(
       RfcLogLevel::WARNING,
       "Provider Uncle Rico's football videos does not define a valid external URL.",
       Argument::type('array')
-    )->shouldBeCalled();
+    );
+    $logged_warning->shouldBeCalled();
 
     $youtube = $this->repository->get('YouTube');
     // The corrupt provider should not be stored.

@@ -125,7 +125,9 @@ class SectionStorageManagerTest extends UnitTestCase {
    * @covers ::findDefinitions
    */
   public function testFindDefinitions() {
-    $this->discovery->getDefinitions()->willReturn([
+    /** @var \Prophecy\Prophecy\MethodProphecy $get_definitions */
+    $get_definitions = $this->discovery->getDefinitions();
+    $get_definitions->willReturn([
       'plugin1' => (new SectionStorageDefinition())->setClass(SectionStorageInterface::class),
       'plugin2' => (new SectionStorageDefinition(['weight' => -5]))->setClass(SectionStorageInterface::class),
       'plugin3' => (new SectionStorageDefinition(['weight' => -5]))->setClass(SectionStorageInterface::class),
@@ -160,7 +162,9 @@ class SectionStorageManagerTest extends UnitTestCase {
       'missing_contexts' => (new SectionStorageDefinition())->setClass(SectionStorageInterface::class),
       'provider_access' => (new SectionStorageDefinition())->setClass(SectionStorageInterface::class),
     ];
-    $this->discovery->getDefinitions()->willReturn($definitions);
+    /** @var \Prophecy\Prophecy\MethodProphecy $get_definitions */
+    $get_definitions = $this->discovery->getDefinitions();
+    $get_definitions->willReturn($definitions);
 
     $provider_access = $this->prophesize(SectionStorageInterface::class);
     $provider_access->isApplicable($cacheability)->willReturn($plugin_is_applicable);
@@ -171,7 +175,9 @@ class SectionStorageManagerTest extends UnitTestCase {
     $missing_contexts = $this->prophesize(SectionStorageInterface::class);
 
     // Do not do any filtering based on context.
-    $this->contextHandler->filterPluginDefinitionsByContexts($contexts, $definitions)->willReturnArgument(1);
+    /** @var \Prophecy\Prophecy\MethodProphecy $filter_plugin_defintions_by_contexts */
+    $filter_plugin_defintions_by_contexts = $this->contextHandler->filterPluginDefinitionsByContexts($contexts, $definitions);
+    $filter_plugin_defintions_by_contexts->willReturnArgument(1);
     $this->contextHandler->applyContextMapping($no_access, $contexts)->shouldBeCalled();
     $this->contextHandler->applyContextMapping($provider_access, $contexts)->shouldBeCalled();
     $this->contextHandler->applyContextMapping($missing_contexts, $contexts)->willThrow(new ContextException());
@@ -214,7 +220,9 @@ class SectionStorageManagerTest extends UnitTestCase {
       'first' => (new SectionStorageDefinition())->setClass(SectionStorageInterface::class),
       'second' => (new SectionStorageDefinition())->setClass(SectionStorageInterface::class),
     ];
-    $this->discovery->getDefinitions()->willReturn($definitions);
+    /** @var \Prophecy\Prophecy\MethodProphecy $get_definitions */
+    $get_definitions = $this->discovery->getDefinitions();
+    $get_definitions->willReturn($definitions);
 
     // Create a plugin that has cacheability info itself as a cacheable object
     // and from within ::isApplicable() but is not applicable.
@@ -240,7 +248,9 @@ class SectionStorageManagerTest extends UnitTestCase {
     $this->factory->createInstance('second', [])->willReturn($second_plugin->reveal());
 
     // Do not do any filtering based on context.
-    $this->contextHandler->filterPluginDefinitionsByContexts($contexts, $definitions)->willReturnArgument(1);
+    /** @var \Prophecy\Prophecy\MethodProphecy $filter_plugin_defintions_by_contexts */
+    $filter_plugin_defintions_by_contexts = $this->contextHandler->filterPluginDefinitionsByContexts($contexts, $definitions);
+    $filter_plugin_defintions_by_contexts->willReturnArgument(1);
     $this->contextHandler->applyContextMapping($first_plugin, $contexts)->shouldBeCalled();
     $this->contextHandler->applyContextMapping($second_plugin, $contexts)->shouldBeCalled();
 

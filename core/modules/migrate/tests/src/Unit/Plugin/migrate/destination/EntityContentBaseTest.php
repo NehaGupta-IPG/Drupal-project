@@ -80,10 +80,15 @@ class EntityContentBaseTest extends EntityTestBase {
    */
   public function testUntranslatable() {
     // An entity type without a language.
-    $this->entityType->getKey('langcode')->willReturn('');
-    $this->entityType->getKey('id')->willReturn('id');
-    $this->entityFieldManager->getBaseFieldDefinitions('foo')
-      ->willReturn(['id' => BaseFieldDefinitionTest::create('integer')]);
+    /** @var \Prophecy\Prophecy\MethodProphecy $get_langcode_key */
+    $get_langcode_key = $this->entityType->getKey('langcode');
+    $get_langcode_key->willReturn('');
+    /** @var \Prophecy\Prophecy\MethodProphecy $get_id_key */
+    $get_id_key = $this->entityType->getKey('id');
+    $get_id_key->willReturn('id');
+    /** @var \Prophecy\Prophecy\MethodProphecy $get_base_field_definitions */
+    $get_base_field_definitions = $this->entityFieldManager->getBaseFieldDefinitions('foo');
+    $get_base_field_definitions->willReturn(['id' => BaseFieldDefinitionTest::create('integer')]);
 
     $destination = new EntityTestDestination(
       ['translations' => TRUE],

@@ -467,8 +467,10 @@ class CKEditor5PluginManager extends DefaultPluginManager implements CKEditor5Pl
    *   Whether the plugin is disabled due to unmet conditions.
    */
   protected function isPluginDisabled(CKEditor5PluginInterface $plugin, EditorInterface $editor): bool {
-    assert($plugin->getPluginDefinition()->hasConditions());
-    foreach ($plugin->getPluginDefinition()->getConditions() as $condition_type => $required_value) {
+    /** @var  \Drupal\ckeditor5\Plugin\CKEditor5PluginDefinition $plugin_definition */
+    $plugin_definition = $plugin->getPluginDefinition();
+    assert($plugin_definition->hasConditions());
+    foreach ($plugin_definition->getConditions() as $condition_type => $required_value) {
       switch ($condition_type) {
         case 'toolbarItem':
           if (!in_array($required_value, $editor->getSettings()['toolbar']['items'])) {

@@ -39,12 +39,15 @@ class EntityRevisionTest extends EntityTestBase {
    * Tests that revision destination fails for unrevisionable entities.
    */
   public function testUnrevisionable() {
-    $this->entityType->getKey('id')->willReturn('id');
-    $this->entityType->getKey('revision')->willReturn('');
-    $this->entityFieldManager->getBaseFieldDefinitions('foo')
-      ->willReturn([
-        'id' => BaseFieldDefinitionTest::create('integer'),
-      ]);
+    /** @var \Prophecy\Prophecy\MethodProphecy $get_id_key */
+    $get_id_key = $this->entityType->getKey('id');
+    $get_id_key->willReturn('id');
+    /** @var \Prophecy\Prophecy\MethodProphecy $get_revision_key */
+    $get_revision_key = $this->entityType->getKey('revision');
+    $get_revision_key->willReturn('');
+    /** @var \Prophecy\Prophecy\MethodProphecy $get_base_field_definitions */
+    $get_base_field_definitions = $this->entityFieldManager->getBaseFieldDefinitions('foo');
+    $get_base_field_definitions->willReturn(['id' => BaseFieldDefinitionTest::create('integer')]);
 
     $destination = new EntityRevisionTestDestination(
       [],
@@ -66,14 +69,21 @@ class EntityRevisionTest extends EntityTestBase {
    * Tests that translation destination fails for untranslatable entities.
    */
   public function testUntranslatable() {
-    $this->entityType->getKey('id')->willReturn('id');
-    $this->entityType->getKey('revision')->willReturn('vid');
-    $this->entityType->getKey('langcode')->willReturn('');
-    $this->entityFieldManager->getBaseFieldDefinitions('foo')
-      ->willReturn([
-        'id' => BaseFieldDefinitionTest::create('integer'),
-        'vid' => BaseFieldDefinitionTest::create('integer'),
-      ]);
+    /** @var \Prophecy\Prophecy\MethodProphecy $get_id_key */
+    $get_id_key = $this->entityType->getKey('id');
+    $get_id_key->willReturn('id');
+    /** @var \Prophecy\Prophecy\MethodProphecy $get_revision_key */
+    $get_revision_key = $this->entityType->getKey('revision');
+    $get_revision_key->willReturn('vid');
+    /** @var \Prophecy\Prophecy\MethodProphecy $get_langcode_key */
+    $get_langcode_key = $this->entityType->getKey('langcode');
+    $get_langcode_key->willReturn('');
+    /** @var \Prophecy\Prophecy\MethodProphecy $get_base_field_definitions */
+    $get_base_field_definitions = $this->entityFieldManager->getBaseFieldDefinitions('foo');
+    $get_base_field_definitions->willReturn([
+      'id' => BaseFieldDefinitionTest::create('integer'),
+      'vid' => BaseFieldDefinitionTest::create('integer'),
+    ]);
 
     $destination = new EntityRevisionTestDestination(
       ['translations' => TRUE],
