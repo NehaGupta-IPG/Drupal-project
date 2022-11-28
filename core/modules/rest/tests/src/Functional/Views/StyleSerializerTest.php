@@ -714,6 +714,8 @@ class StyleSerializerTest extends ViewTestBase {
     ];
     // Add two body items.
     $node->body = [$body, $body];
+    /** @var \Drupal\Core\Field\FieldItemListInterface $node_body */
+    $node_body = $node->body;
     $node->save();
 
     $view = Views::getView('test_serializer_node_display_field');
@@ -721,10 +723,10 @@ class StyleSerializerTest extends ViewTestBase {
     $this->executeView($view);
 
     $result = Json::decode($this->drupalGet('test/serialize/node-field', ['query' => ['_format' => 'json']]));
-    $this->assertSame($node->body->count(), count($result[2]['body']), 'Expected count of values');
+    $this->assertSame($node_body->count(), count($result[2]['body']), 'Expected count of values');
     $this->assertEquals($result[2]['body'], array_map(function ($item) {
       return $item['value'];
-    }, $node->body->getValue()), 'Expected raw body values found.');
+    }, $node_body->getValue()), 'Expected raw body values found.');
   }
 
   /**
