@@ -42,12 +42,14 @@ class ConnectionTest extends UnitTestCase {
    * @return \Drupal\mysql\Driver\Database\mysql\Connection
    */
   private function createConnection(): Connection {
-    $this->pdoStatement
+    /** @var \Prophecy\Prophecy\ObjectProphecy $pdo_statement */
+    $pdo_statement = $this->pdoStatement;
+    $pdo_statement
       ->setFetchMode(Argument::any())
       ->shouldBeCalled()
       ->willReturn(TRUE);
 
-    $this->pdoStatement
+    $pdo_statement
       ->execute(Argument::any())
       ->shouldBeCalled()
       ->willReturn(TRUE);
@@ -76,7 +78,9 @@ class ConnectionTest extends UnitTestCase {
    * @dataProvider providerVersionAndIsMariaDb
    */
   public function testVersionAndIsMariaDb(bool $expected_is_mariadb, string $server_version, string $expected_version): void {
-    $this->pdoStatement
+    /** @var \Prophecy\Prophecy\ObjectProphecy $pdo_statement */
+    $pdo_statement = $this->pdoStatement;
+    $pdo_statement
       ->fetchColumn(Argument::any())
       ->shouldBeCalled()
       ->willReturn($server_version);

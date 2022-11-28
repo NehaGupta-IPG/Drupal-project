@@ -89,8 +89,9 @@ class InstallTasksTest extends UnitTestCase {
    * @dataProvider providerNameAndMinimumVersion
    */
   public function testNameAndMinimumVersion(bool $is_mariadb, string $expected_name, string $expected_minimum_version): void {
-    $this->connection
-      ->isMariaDb()
+    /** @var \Prophecy\Prophecy\MethodProphecy $is_maria_db */
+    $is_maria_db = $this->connection->isMariaDb();
+    $is_maria_db
       ->shouldBeCalledTimes(2)
       ->willReturn($is_mariadb);
     $tasks = $this->createTasks();

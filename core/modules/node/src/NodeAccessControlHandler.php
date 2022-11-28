@@ -98,7 +98,9 @@ class NodeAccessControlHandler extends EntityAccessControlHandler implements Nod
       $result = AccessResult::forbidden("The 'access content' permission is required.")->cachePerPermissions();
       return $return_as_object ? $result : $result->isAllowed();
     }
-    $result = parent::access($entity, $operation, $account, TRUE)->cachePerPermissions();
+    /** @var null|\Drupal\Core\Access\AccessResult $access */
+    $access = parent::access($entity, $operation, $account, TRUE);
+    $result = $access->cachePerPermissions();
 
     return $return_as_object ? $result : $result->isAllowed();
   }
@@ -118,7 +120,9 @@ class NodeAccessControlHandler extends EntityAccessControlHandler implements Nod
       return $return_as_object ? $result : $result->isAllowed();
     }
 
-    $result = parent::createAccess($entity_bundle, $account, $context, TRUE)->cachePerPermissions();
+    /** @var null|\Drupal\Core\Access\AccessResult $create_access */
+    $create_access = parent::createAccess($entity_bundle, $account, $context, TRUE);
+    $result = $create_access->cachePerPermissions();
     return $return_as_object ? $result : $result->isAllowed();
   }
 
