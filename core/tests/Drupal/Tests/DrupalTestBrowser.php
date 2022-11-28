@@ -41,6 +41,7 @@ class DrupalTestBrowser extends AbstractBrowser {
       return $this;
     }
 
+    /** @var \GuzzleHttp\Psr7\Uri $base_uri */
     $path = $base_uri->getPath();
     if ($path !== '' && $path !== '/') {
       throw new \InvalidArgumentException('Setting a path in the Guzzle "base_uri" config option is not supported by DrupalTestBrowser.');

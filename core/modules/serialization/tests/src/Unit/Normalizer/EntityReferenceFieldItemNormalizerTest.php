@@ -150,7 +150,9 @@ class EntityReferenceFieldItemNormalizerTest extends UnitTestCase {
       ->willReturn($entity_reference)
       ->shouldBeCalled();
 
-    $this->fieldItem->getProperties(TRUE)
+    /** @var \Prophecy\Prophecy\MethodProphecy $get_properties */
+    $get_properties = $this->fieldItem->getProperties(TRUE);
+    $get_properties
       ->willReturn(['target_id' => $this->getTypedDataProperty(FALSE)])
       ->shouldBeCalled();
 
@@ -202,11 +204,15 @@ class EntityReferenceFieldItemNormalizerTest extends UnitTestCase {
     $this->fieldItem->getFieldDefinition()
       ->willReturn($field_definition->reveal());
 
-    $this->fieldItem->get('entity')
+    /** @var \Prophecy\Prophecy\MethodProphecy $get_entity */
+    $get_entity = $this->fieldItem->get('entity');
+    $get_entity
       ->willReturn($entity_reference)
       ->shouldBeCalled();
 
-    $this->fieldItem->getProperties(TRUE)
+    /** @var \Prophecy\Prophecy\MethodProphecy $get_properties */
+    $get_properties = $this->fieldItem->getProperties(TRUE);
+    $get_properties
       ->willReturn(['target_id' => $this->getTypedDataProperty(FALSE)])
       ->shouldBeCalled();
 
@@ -241,14 +247,20 @@ class EntityReferenceFieldItemNormalizerTest extends UnitTestCase {
     $field_definition->getSetting('target_type')
       ->willReturn('taxonomy_term');
 
-    $this->fieldItem->getFieldDefinition()
+    /** @var \Prophecy\Prophecy\MethodProphecy $get_field_definition */
+    $get_field_definition = $this->fieldItem->getFieldDefinition();
+    $get_field_definition
       ->willReturn($field_definition->reveal());
 
-    $this->fieldItem->get('entity')
+    /** @var \Prophecy\Prophecy\MethodProphecy $get_entity */
+    $get_entity = $this->fieldItem->get('entity');
+    $get_entity
       ->willReturn($entity_reference)
       ->shouldBeCalled();
 
-    $this->fieldItem->getProperties(TRUE)
+    /** @var \Prophecy\Prophecy\MethodProphecy $get_properties */
+    $get_properties = $this->fieldItem->getProperties(TRUE);
+    $get_properties
       ->willReturn(['target_id' => $this->getTypedDataProperty(FALSE)])
       ->shouldBeCalled();
 
@@ -276,11 +288,15 @@ class EntityReferenceFieldItemNormalizerTest extends UnitTestCase {
     $this->fieldItem->getFieldDefinition()
       ->willReturn($field_definition->reveal());
 
-    $this->fieldItem->get('entity')
+    /** @var \Prophecy\Prophecy\MethodProphecy $get_entity */
+    $get_entity = $this->fieldItem->get('entity');
+    $get_entity
       ->willReturn($entity_reference->reveal())
       ->shouldBeCalled();
 
-    $this->fieldItem->getProperties(TRUE)
+    /** @var \Prophecy\Prophecy\MethodProphecy $get_properties */
+    $get_properties = $this->fieldItem->getProperties(TRUE);
+    $get_properties
       ->willReturn(['target_id' => $this->getTypedDataProperty(FALSE)])
       ->shouldBeCalled();
 
@@ -311,7 +327,9 @@ class EntityReferenceFieldItemNormalizerTest extends UnitTestCase {
       ->willReturn($entity)
       ->shouldBeCalled();
 
-    $this->fieldItem->getProperties()->willReturn([
+    /** @var \Prophecy\Prophecy\MethodProphecy $get_properties */
+    $get_properties = $this->fieldItem->getProperties();
+    $get_properties->willReturn([
       'target_id' => $this->prophesize(IntegerInterface::class),
     ]);
     $this->fieldItem->setValue(['target_id' => 'test'])->shouldBeCalled();
@@ -337,7 +355,9 @@ class EntityReferenceFieldItemNormalizerTest extends UnitTestCase {
       ->willReturn($entity)
       ->shouldBeCalled();
 
-    $this->fieldItem->getProperties()->willReturn([
+    /** @var \Prophecy\Prophecy\MethodProphecy $get_properties */
+    $get_properties = $this->fieldItem->getProperties();
+    $get_properties->willReturn([
       'target_id' => $this->prophesize(IntegerInterface::class),
     ]);
     $this->fieldItem->setValue(['target_id' => 'test'])->shouldBeCalled();
@@ -358,8 +378,9 @@ class EntityReferenceFieldItemNormalizerTest extends UnitTestCase {
       'target_uuid' => '080e3add-f9d5-41ac-9821-eea55b7b42fb',
     ];
 
-    $this->fieldDefinition
-      ->getName()
+    /** @var \Prophecy\Prophecy\MethodProphecy $get_name */
+    $get_name = $this->fieldDefinition->getName();
+    $get_name
       ->willReturn('field_reference')
       ->shouldBeCalled();
 
@@ -378,12 +399,14 @@ class EntityReferenceFieldItemNormalizerTest extends UnitTestCase {
       'target_type' => 'test_type',
       'target_uuid' => 'unique-but-none-non-existent',
     ];
-    $this->entityRepository
-      ->loadEntityByUuid($data['target_type'], $data['target_uuid'])
+    /** @var \Prophecy\Prophecy\MethodProphecy $load_entity_by_id */
+    $load_entity_by_id = $this->entityRepository->loadEntityByUuid($data['target_type'], $data['target_uuid']);
+    $load_entity_by_id
       ->willReturn(NULL)
       ->shouldBeCalled();
-    $this->fieldItem
-      ->getName()
+    /** @var \Prophecy\Prophecy\MethodProphecy $get_name */
+    $get_name = $this->fieldItem->getName();
+    $get_name
       ->willReturn('field_reference')
       ->shouldBeCalled();
 
@@ -402,8 +425,9 @@ class EntityReferenceFieldItemNormalizerTest extends UnitTestCase {
       'target_type' => 'test_type',
       'target_uuid' => '',
     ];
-    $this->fieldItem
-      ->getName()
+    /** @var \Prophecy\Prophecy\MethodProphecy $get_name */
+    $get_name = $this->fieldItem->getName();
+    $get_name
       ->willReturn('field_reference')
       ->shouldBeCalled();
 
@@ -442,12 +466,14 @@ class EntityReferenceFieldItemNormalizerTest extends UnitTestCase {
     }
 
     // Avoid a static method call by returning dummy serialized property data.
-    $this->fieldDefinition
-      ->getFieldStorageDefinition()
+    /** @var \Prophecy\Prophecy\MethodProphecy $get_field_storage_definition */
+    $get_field_storage_definition = $this->fieldDefinition->getFieldStorageDefinition();
+    $get_field_storage_definition
       ->willReturn()
       ->shouldBeCalled();
-    $this->fieldDefinition
-      ->getName()
+    /** @var \Prophecy\Prophecy\MethodProphecy $get_name */
+    $get_name = $this->fieldDefinition->getName();
+    $get_name
       ->willReturn('field_reference')
       ->shouldBeCalled();
     $entity = $this->prophesize(EntityInterface::class);
@@ -455,8 +481,9 @@ class EntityReferenceFieldItemNormalizerTest extends UnitTestCase {
     $entity->getEntityType()
       ->willReturn($entity_type->reveal())
       ->shouldBeCalled();
-    $this->fieldItem
-      ->getPluginDefinition()
+    /** @var \Prophecy\Prophecy\MethodProphecy $get_plugin_definition */
+    $get_plugin_definition = $this->fieldItem->getPluginDefinition();
+    $get_plugin_definition
       ->willReturn([
         'serialized_property_names' => [
           'foo' => 'bar',
@@ -493,7 +520,9 @@ class EntityReferenceFieldItemNormalizerTest extends UnitTestCase {
       ->willReturn($entity)
       ->shouldBeCalled();
 
-    $this->fieldItem->getProperties()->willReturn([
+    /** @var \Prophecy\Prophecy\MethodProphecy $get_properties */
+    $get_properties = $this->fieldItem->getProperties();
+    $get_properties->willReturn([
       'target_id' => $this->prophesize(IntegerInterface::class),
       'extra_property' => $this->prophesize(StringInterface::class),
     ]);

@@ -177,6 +177,7 @@ class Search extends FilterPluginBase {
       // Add the conditions set up by the search query to the views query.
       $search_condition->condition("$search_index.type", $this->searchType);
       $search_dataset = $this->query->addTable('node_search_dataset');
+      /** @var \Drupal\search\ViewsSearchQuery $conditions */
       $conditions = $this->searchQuery->conditions();
       $condition_conditions =& $conditions->conditions();
       foreach ($condition_conditions as $key => &$condition) {

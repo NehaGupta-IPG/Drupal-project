@@ -85,7 +85,9 @@ class AjaxBasePageNegotiatorTest extends UnitTestCase {
     $this->requestStack->push($request);
     $route_match = RouteMatch::createFromRequest($request);
 
-    $this->tokenGenerator->validate($theme_token, $theme)->willReturn(TRUE);
+    /** @var \Prophecy\Prophecy\MethodProphecy $validate */
+    $validate =  $this->tokenGenerator->validate($theme_token, $theme);
+    $validate->willReturn(TRUE);
 
     $result = $this->negotiator->determineActiveTheme($route_match);
     $this->assertSame($theme, $result);
@@ -103,7 +105,9 @@ class AjaxBasePageNegotiatorTest extends UnitTestCase {
     $this->requestStack->push($request);
     $route_match = RouteMatch::createFromRequest($request);
 
-    $this->tokenGenerator->validate($theme_token, $theme)->willReturn(FALSE);
+    /** @var \Prophecy\Prophecy\MethodProphecy $validate */
+    $validate = $this->tokenGenerator->validate($theme_token, $theme)
+    $validate->willReturn(FALSE);
 
     $result = $this->negotiator->determineActiveTheme($route_match);
     $this->assertSame(NULL, $result);
@@ -123,7 +127,9 @@ class AjaxBasePageNegotiatorTest extends UnitTestCase {
     $this->requestStack->push($request);
     $route_match = RouteMatch::createFromRequest($request);
 
-    $this->tokenGenerator->validate(Argument::cetera())->shouldNotBeCalled();
+    /** @var \Prophecy\Prophecy\MethodProphecy $validate */
+    $validate = $this->tokenGenerator->validate(Argument::cetera());
+    $validate->shouldNotBeCalled();
 
     $result = $this->negotiator->determineActiveTheme($route_match);
     $this->assertSame($theme, $result);

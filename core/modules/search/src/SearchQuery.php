@@ -321,7 +321,9 @@ class SearchQuery extends SelectExtender {
           $queryor->condition('d.data', "% $or %", 'LIKE');
         }
         if (count($queryor)) {
-          $this->conditions->condition($queryor);
+          /** @var \Drupal\search\ViewsSearchQuery $conditions */
+          $conditions = $this->conditions;
+          $conditions->condition($queryor);
           // A group of OR keywords only needs to match once.
           $this->matches += ($has_new_scores > 0);
         }
@@ -330,7 +332,9 @@ class SearchQuery extends SelectExtender {
       else {
         $has_and = TRUE;
         [$num_new_scores, $num_valid_words] = $this->parseWord($key);
-        $this->conditions->condition('d.data', "% $key %", 'LIKE');
+        /** @var \Drupal\search\ViewsSearchQuery $conditions */
+        $conditions = $this->conditions;
+        $conditions->condition('d.data', "% $key %", 'LIKE');
         if (!$num_valid_words) {
           $this->simple = FALSE;
         }
@@ -344,7 +348,9 @@ class SearchQuery extends SelectExtender {
 
     // Negative matches.
     foreach ($this->keys['negative'] as $key) {
-      $this->conditions->condition('d.data', "% $key %", 'NOT LIKE');
+      /** @var \Drupal\search\ViewsSearchQuery $conditions */
+      $conditions = $this->conditions;
+      $conditions->condition('d.data', "% $key %", 'NOT LIKE');
       $this->simple = FALSE;
     }
   }
