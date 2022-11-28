@@ -248,9 +248,9 @@ class SectionStorageManagerTest extends UnitTestCase {
     $this->factory->createInstance('second', [])->willReturn($second_plugin->reveal());
 
     // Do not do any filtering based on context.
-    /** @var \Prophecy\Prophecy\MethodProphecy $filter_plugin_defintions_by_contexts */
-    $filter_plugin_defintions_by_contexts = $this->contextHandler->filterPluginDefinitionsByContexts($contexts, $definitions);
-    $filter_plugin_defintions_by_contexts->willReturnArgument(1);
+    /** @var \Prophecy\Prophecy\MethodProphecy $filter_plugin_definitions_by_contexts */
+    $filter_plugin_definitions_by_contexts = $this->contextHandler->filterPluginDefinitionsByContexts($contexts, $definitions);
+    $filter_plugin_definitions_by_contexts->willReturnArgument(1);
     $this->contextHandler->applyContextMapping($first_plugin, $contexts)->shouldBeCalled();
     $this->contextHandler->applyContextMapping($second_plugin, $contexts)->shouldBeCalled();
 
