@@ -85,7 +85,9 @@ class FormStateDecoratorBaseTest extends UnitTestCase {
    * @dataProvider providerSingleBooleanArgument
    */
   public function testGetAlwaysProcess($always_process) {
-    $this->decoratedFormState->getAlwaysProcess()
+    /** @var \Prophecy\Prophecy\MethodProphecy $get_always_process */
+    $get_always_process = $this->decoratedFormState->getAlwaysProcess();
+    $get_always_process
       ->willReturn($always_process)
       ->shouldBeCalled();
 
@@ -114,7 +116,9 @@ class FormStateDecoratorBaseTest extends UnitTestCase {
       'FOO' => 'BAR',
     ];
 
-    $this->decoratedFormState->getButtons()
+    /** @var \Prophecy\Prophecy\MethodProphecy $get_buttons */
+    $get_buttons = $this->decoratedFormState->getButtons();
+    $get_buttons
       ->willReturn($buttons)
       ->shouldBeCalled();
 
@@ -139,7 +143,9 @@ class FormStateDecoratorBaseTest extends UnitTestCase {
    * @dataProvider providerSingleBooleanArgument
    */
   public function testIsCached($cache) {
-    $this->decoratedFormState->isCached()
+    /** @var \Prophecy\Prophecy\MethodProphecy $is_cached */
+    $is_cached = $this->decoratedFormState->isCached();
+    $is_cached
       ->willReturn($cache)
       ->shouldBeCalled();
     $this->assertSame($cache, $this->formStateDecoratorBase->isCached());
@@ -187,7 +193,9 @@ class FormStateDecoratorBaseTest extends UnitTestCase {
    *   return value.
    */
   public function testIsExecuted($executed) {
-    $this->decoratedFormState->isExecuted()
+    /** @var \Prophecy\Prophecy\MethodProphecy $is_executed */
+    $is_executed = $this->decoratedFormState->isExecuted();
+    $is_executed
       ->willReturn($executed)
       ->shouldBeCalled();
 
@@ -246,7 +254,9 @@ class FormStateDecoratorBaseTest extends UnitTestCase {
    * @dataProvider providerSingleBooleanArgument
    */
   public function testHasFileElement($has_file_element) {
-    $this->decoratedFormState->hasFileElement()
+    /** @var \Prophecy\Prophecy\MethodProphecy $file_element */
+    $file_element = $this->decoratedFormState->hasFileElement();
+    $file_element
       ->willReturn($has_file_element)
       ->shouldBeCalled();
 
@@ -271,7 +281,9 @@ class FormStateDecoratorBaseTest extends UnitTestCase {
    * @dataProvider providerLimitValidationErrors
    */
   public function testGetLimitValidationErrors($limit_validation_errors) {
-    $this->decoratedFormState->getLimitValidationErrors()
+    /** @var \Prophecy\Prophecy\MethodProphecy $get_limited_validation_errors */
+    $get_limited_validation_errors = $this->decoratedFormState->getLimitValidationErrors();
+    $get_limited_validation_errors
       ->willReturn($limit_validation_errors)
       ->shouldBeCalled();
 
@@ -310,7 +322,9 @@ class FormStateDecoratorBaseTest extends UnitTestCase {
    * @dataProvider providerIsMethodType
    */
   public function testIsMethodType($expected_return_value, $method_type) {
-    $this->decoratedFormState->isMethodType($method_type)
+    /** @var \Prophecy\Prophecy\MethodProphecy $is_method_type */
+    $is_method_type = $this->decoratedFormState->isMethodType($method_type);
+    $is_method_type
       ->willReturn($expected_return_value)
       ->shouldBeCalled();
 
@@ -369,7 +383,9 @@ class FormStateDecoratorBaseTest extends UnitTestCase {
    * @dataProvider providerSingleBooleanArgument
    */
   public function testIsValidationEnforced($must_validate) {
-    $this->decoratedFormState->isValidationEnforced()
+    /** @var \Prophecy\Prophecy\MethodProphecy $is_validation_enforced */
+    $is_validation_enforced = $this->decoratedFormState->isValidationEnforced();
+    $is_validation_enforced
       ->willReturn($must_validate)
       ->shouldBeCalled();
 
@@ -394,7 +410,9 @@ class FormStateDecoratorBaseTest extends UnitTestCase {
    * @dataProvider providerSingleBooleanArgument
    */
   public function testIsRedirectDisabled($no_redirect) {
-    $this->decoratedFormState->isRedirectDisabled()
+    /** @var \Prophecy\Prophecy\MethodProphecy $is_redirect_disabled */
+    $is_redirect_disabled = $this->decoratedFormState->isRedirectDisabled();
+    $is_redirect_disabled
       ->willReturn($no_redirect)
       ->shouldBeCalled();
 
@@ -419,7 +437,9 @@ class FormStateDecoratorBaseTest extends UnitTestCase {
    * @dataProvider providerSingleBooleanArgument
    */
   public function testIsProcessingInput($process_input) {
-    $this->decoratedFormState->isProcessingInput()
+    /** @var \Prophecy\Prophecy\MethodProphecy $is_processing_input */
+    $is_processing_input = $this->decoratedFormState->isProcessingInput();
+    $is_processing_input
       ->willReturn($process_input)
       ->shouldBeCalled();
 
@@ -444,7 +464,9 @@ class FormStateDecoratorBaseTest extends UnitTestCase {
    * @dataProvider providerSingleBooleanArgument
    */
   public function testIsProgrammed($programmed) {
-    $this->decoratedFormState->isProgrammed()
+    /** @var \Prophecy\Prophecy\MethodProphecy $is_programmed */
+    $is_programmed = $this->decoratedFormState->isProgrammed();
+    $is_programmed
       ->willReturn($programmed)
       ->shouldBeCalled();
 
@@ -469,7 +491,9 @@ class FormStateDecoratorBaseTest extends UnitTestCase {
    * @dataProvider providerSingleBooleanArgument
    */
   public function testIsBypassingProgrammedAccessChecks($programmed_bypass_access_check) {
-    $this->decoratedFormState->isBypassingProgrammedAccessChecks()
+    /** @var \Prophecy\Prophecy\MethodProphecy $is_bypassing_programmed_access_checks */
+    $is_bypassing_programmed_access_checks = $this->decoratedFormState->isBypassingProgrammedAccessChecks();
+    $is_bypassing_programmed_access_checks
       ->willReturn($programmed_bypass_access_check)
       ->shouldBeCalled();
 
@@ -498,7 +522,9 @@ class FormStateDecoratorBaseTest extends UnitTestCase {
       'FOO' => 'BAR',
     ];
 
-    $this->decoratedFormState->getRebuildInfo()
+    /** @var \Prophecy\Prophecy\MethodProphecy $get_rebuild_info */
+    $get_rebuild_info =  $this->decoratedFormState->getRebuildInfo();
+    $get_rebuild_info
       ->willReturn($rebuild_info)
       ->shouldBeCalled();
 
@@ -573,7 +599,9 @@ class FormStateDecoratorBaseTest extends UnitTestCase {
       'FOO' => 'BAR',
     ];
 
-    $this->decoratedFormState->getSubmitHandlers()
+    /** @var \Prophecy\Prophecy\MethodProphecy $get_submit_handlers */
+    $get_submit_handlers = $this->decoratedFormState->getSubmitHandlers();
+    $get_submit_handlers
       ->willReturn($submit_handlers)
       ->shouldBeCalled();
 
@@ -601,7 +629,9 @@ class FormStateDecoratorBaseTest extends UnitTestCase {
    *   value.
    */
   public function testIsSubmitted($submitted) {
-    $this->decoratedFormState->isSubmitted()
+    /** @var \Prophecy\Prophecy\MethodProphecy $is_submitted */
+    $is_submitted = $this->decoratedFormState->isSubmitted();
+    $is_submitted
       ->willReturn($submitted);
 
     $this->assertSame($submitted, $this->formStateDecoratorBase->isSubmitted());
@@ -629,7 +659,9 @@ class FormStateDecoratorBaseTest extends UnitTestCase {
       'FOO' => 'BAR',
     ];
 
-    $this->decoratedFormState->getTemporary()
+    /** @var \Prophecy\Prophecy\MethodProphecy $get_temporary */
+    $get_temporary = $this->decoratedFormState->getTemporary();
+    $get_temporary
       ->willReturn($temporary)
       ->shouldBeCalled();
 
@@ -793,7 +825,9 @@ class FormStateDecoratorBaseTest extends UnitTestCase {
       'FOO' => 'BAR',
     ];
 
-    $this->decoratedFormState->getValidateHandlers()
+    /** @var \Prophecy\Prophecy\MethodProphecy $get_validate_handlers */
+    $get_validate_handlers = $this->decoratedFormState->getValidateHandlers();
+    $get_validate_handlers
       ->willReturn($validate_handlers)
       ->shouldBeCalled();
 
@@ -828,7 +862,9 @@ class FormStateDecoratorBaseTest extends UnitTestCase {
    *   value.
    */
   public function testIsValidationComplete($complete) {
-    $this->decoratedFormState->isValidationComplete()
+    /** @var \Prophecy\Prophecy\MethodProphecy $is_validation_complete */
+    $is_validation_complete = $this->decoratedFormState->isValidationComplete();
+    $is_validation_complete
       ->willReturn($complete)
       ->shouldBeCalled();
 
@@ -854,7 +890,9 @@ class FormStateDecoratorBaseTest extends UnitTestCase {
    *   $name argument.
    */
   public function testLoadInclude($expected, $module, $type, $name) {
-    $this->decoratedFormState->loadInclude($module, $type, $name)
+    /** @var \Prophecy\Prophecy\MethodProphecy $load_include */
+    $load_include = $this->decoratedFormState->loadInclude($module, $type, $name);
+    $load_include
       ->willReturn($expected)
       ->shouldBeCalled();
 
@@ -884,7 +922,9 @@ class FormStateDecoratorBaseTest extends UnitTestCase {
       'foo' => 'bar',
     ];
 
-    $this->decoratedFormState->getCacheableArray()
+    /** @var \Prophecy\Prophecy\MethodProphecy $get_cacheable_array */
+    $get_cacheable_array = $this->decoratedFormState->getCacheableArray();
+    $get_cacheable_array
       ->willReturn($cacheable_array)
       ->shouldBeCalled();
 
@@ -1044,7 +1084,9 @@ class FormStateDecoratorBaseTest extends UnitTestCase {
       'FOO' => 'BAR',
     ];
 
-    $this->decoratedFormState->getBuildInfo()
+    /** @var \Prophecy\Prophecy\MethodProphecy $get_build_info */
+    $get_build_info = $this->decoratedFormState->getBuildInfo();
+    $get_build_info
       ->willReturn($build_info)
       ->shouldBeCalled();
 
@@ -1185,7 +1227,9 @@ class FormStateDecoratorBaseTest extends UnitTestCase {
     $key = ['foo', 'bar'];
     $has = TRUE;
 
-    $this->decoratedFormState->hasValue($key)
+    /** @var \Prophecy\Prophecy\MethodProphecy $has_value */
+    $has_value = $this->decoratedFormState->hasValue($key);
+    $has_value
       ->willReturn($has)
       ->shouldBeCalled();
 
@@ -1199,7 +1243,9 @@ class FormStateDecoratorBaseTest extends UnitTestCase {
     $key = ['foo', 'bar'];
     $is_empty = TRUE;
 
-    $this->decoratedFormState->isValueEmpty($key)
+    /** @var \Prophecy\Prophecy\MethodProphecy $is_value_empty */
+    $is_value_empty = $this->decoratedFormState->isValueEmpty($key);
+    $is_value_empty
       ->willReturn($is_empty)
       ->shouldBeCalled();
 
@@ -1352,7 +1398,9 @@ class FormStateDecoratorBaseTest extends UnitTestCase {
     ];
     $message = 'bar';
 
-    $this->decoratedFormState->getError($element)
+    /** @var \Prophecy\Prophecy\MethodProphecy $get_errors */
+    $get_errors = $this->decoratedFormState->getError($element);
+    $get_errors
       ->willReturn($message)
       ->shouldBeCalled();
 
@@ -1366,7 +1414,9 @@ class FormStateDecoratorBaseTest extends UnitTestCase {
     $errors = [
       'foo' => 'bar',
     ];
-    $this->decoratedFormState->getErrors()
+    /** @var \Prophecy\Prophecy\MethodProphecy $get_errors */
+    $get_errors = $this->decoratedFormState->getErrors();
+    $get_errors
       ->willReturn($errors)
       ->shouldBeCalled();
 
@@ -1395,7 +1445,9 @@ class FormStateDecoratorBaseTest extends UnitTestCase {
    * @dataProvider providerSingleBooleanArgument
    */
   public function testIsRebuilding($rebuild) {
-    $this->decoratedFormState->isRebuilding()
+    /** @var \Prophecy\Prophecy\MethodProphecy $is_rebuilding */
+    $is_rebuilding = $this->decoratedFormState->isRebuilding();
+    $is_rebuilding
       ->willReturn($rebuild)
       ->shouldBeCalled();
 
@@ -1420,7 +1472,9 @@ class FormStateDecoratorBaseTest extends UnitTestCase {
    * @dataProvider providerSingleBooleanArgument
    */
   public function testHasInvalidToken($expected) {
-    $this->decoratedFormState->hasInvalidToken()
+    /** @var \Prophecy\Prophecy\MethodProphecy $has_invalid_token */
+    $has_invalid_token = $this->decoratedFormState->hasInvalidToken();
+    $has_invalid_token
       ->willReturn($expected)
       ->shouldBeCalled();
 
@@ -1433,7 +1487,9 @@ class FormStateDecoratorBaseTest extends UnitTestCase {
    * @dataProvider providerPrepareCallback
    */
   public function testPrepareCallback($unprepared_callback, callable $prepared_callback) {
-    $this->decoratedFormState->prepareCallback(Argument::is($unprepared_callback))
+    /** @var \Prophecy\Prophecy\MethodProphecy $prepare_callback */
+    $prepare_callback = $this->decoratedFormState->prepareCallback(Argument::is($unprepared_callback));
+    $prepare_callback
       ->willReturn($prepared_callback)
       ->shouldBeCalled();
 
@@ -1506,7 +1562,9 @@ class FormStateDecoratorBaseTest extends UnitTestCase {
   public function testGetCleanValueKeys() {
     $keys = ['BAR'];
 
-    $this->decoratedFormState->getCleanValueKeys()
+    /** @var \Prophecy\Prophecy\MethodProphecy $get_clean_value_keys */
+    $get_clean_value_keys = $this->decoratedFormState->getCleanValueKeys();
+    $get_clean_value_keys
       ->willReturn($keys)
       ->shouldBeCalled();
 

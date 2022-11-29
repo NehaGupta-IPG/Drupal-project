@@ -105,7 +105,9 @@ class FieldDefinitionListenerTest extends UnitTestCase {
           throw new PluginNotFoundException($entity_type_id);
         }
       });
-    $this->entityTypeManager->getDefinitions()->willReturn($definitions);
+    /** @var \Prophecy\Prophecy\MethodProphecy $get_definitons */
+    $get_definitons = $this->entityTypeManager->getDefinitions();
+    $get_definitons->willReturn($definitions);
   }
 
   /**

@@ -106,8 +106,9 @@ class DefaultHtmlRouteProviderTest extends UnitTestCase {
       $this->entityTypeManager->getDefinition('the_bundle_entity_type_id')->willReturn($bundle_entity_type);
 
       if ($field_storage_definition) {
-        $this->entityFieldManager->getFieldStorageDefinitions('the_bundle_entity_type_id')
-          ->willReturn(['id' => $field_storage_definition]);
+        /** @var \Prophecy\Prophecy\MethodProphecy $get_field_storage_definitions */
+        $get_field_storage_definitions = $this->entityFieldManager->getFieldStorageDefinitions('the_bundle_entity_type_id');
+        $get_field_storage_definitions->willReturn(['id' => $field_storage_definition]);
       }
     }
 
@@ -203,8 +204,9 @@ class DefaultHtmlRouteProviderTest extends UnitTestCase {
    */
   public function testGetCanonicalRoute(Route $expected = NULL, EntityTypeInterface $entity_type, FieldStorageDefinitionInterface $field_storage_definition = NULL) {
     if ($field_storage_definition) {
-      $this->entityFieldManager->getFieldStorageDefinitions($entity_type->id())
-        ->willReturn([$entity_type->getKey('id') => $field_storage_definition]);
+      /** @var \Prophecy\Prophecy\MethodProphecy $get_field_storage_definitions */
+      $get_field_storage_definitions = $this->entityFieldManager->getFieldStorageDefinitions($entity_type->id());
+      $get_field_storage_definitions->willReturn([$entity_type->getKey('id') => $field_storage_definition]);
     }
 
     $route = $this->routeProvider->getCanonicalRoute($entity_type);
@@ -315,7 +317,9 @@ class DefaultHtmlRouteProviderTest extends UnitTestCase {
 
     $field_storage_definition = $this->prophesize(FieldStorageDefinitionInterface::class);
     $field_storage_definition->getType()->willReturn('integer');
-    $this->entityFieldManager->getFieldStorageDefinitions('the_entity_type_id')->willReturn(['id' => $field_storage_definition]);
+    /** @var \Prophecy\Prophecy\MethodProphecy $get_field_storage_definitions */
+    $get_field_storage_definitions = $this->entityFieldManager->getFieldStorageDefinitions('the_entity_type_id');
+    $get_field_storage_definitions->willReturn(['id' => $field_storage_definition]);
 
     $type = $this->routeProvider->getEntityTypeIdKeyType($entity_type->reveal());
     $this->assertSame('integer', $type);
@@ -327,7 +331,9 @@ class DefaultHtmlRouteProviderTest extends UnitTestCase {
   public function testGetEntityTypeIdKeyTypeNotFieldable() {
     $entity_type = $this->prophesize(EntityTypeInterface::class);
     $entity_type->entityClassImplements(FieldableEntityInterface::class)->willReturn(FALSE);
-    $this->entityFieldManager->getFieldStorageDefinitions(Argument::any())->shouldNotBeCalled();
+    /** @var \Prophecy\Prophecy\MethodProphecy $get_field_storage_definitions */
+    $get_field_storage_definitions = $this->entityFieldManager->getFieldStorageDefinitions(Argument::any());
+    $get_field_storage_definitions->shouldNotBeCalled();
 
     $type = $this->routeProvider->getEntityTypeIdKeyType($entity_type->reveal());
     $this->assertNull($type);
