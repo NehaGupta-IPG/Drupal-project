@@ -115,15 +115,21 @@ class EntityContextDefinitionIsSatisfiedTest extends UnitTestCase {
     $content_entity_type = new EntityType(['id' => 'test_content']);
     $this->entityTypeManager->getDefinition('test_config')->willReturn($config_entity_type);
     $this->entityTypeManager->getDefinition('test_content')->willReturn($content_entity_type);
-    $this->entityTypeManager->getDefinitions()->willReturn([
+    /** @var \Prophecy\Prophecy\MethodProphecy $get_definitions */
+    $get_definitions = $this->entityTypeManager->getDefinitions();
+    $get_definitions->willReturn([
       'test_config' => $config_entity_type,
       'test_content' => $content_entity_type,
     ]);
 
-    $this->entityTypeBundleInfo->getBundleInfo('test_config')->willReturn([
+    /** @var \Prophecy\Prophecy\MethodProphecy $get_bundle_info_test_config */
+    $get_bundle_info_test_config = $this->entityTypeBundleInfo->getBundleInfo('test_config');
+    $get_bundle_info_test_config->willReturn([
       'test_config' => ['label' => 'test_config'],
     ]);
-    $this->entityTypeBundleInfo->getBundleInfo('test_content')->willReturn([
+    /** @var \Prophecy\Prophecy\MethodProphecy $get_bundle_info_test_content */
+    $get_bundle_info_test_content =  $this->entityTypeBundleInfo->getBundleInfo('test_content');
+    $get_bundle_info_test_content->willReturn([
       'test_content' => ['label' => 'test_content'],
     ]);
 
@@ -220,11 +226,15 @@ class EntityContextDefinitionIsSatisfiedTest extends UnitTestCase {
     $this->entityTypeManager->getStorage('test_content')->willReturn($content_entity_storage->reveal());
 
     $this->entityTypeManager->getDefinition('test_content')->willReturn($entity_type);
-    $this->entityTypeManager->getDefinitions()->willReturn([
+    /** @var \Prophecy\Prophecy\MethodProphecy $get_definitions */
+    $get_definitions = $this->entityTypeManager->getDefinitions();
+    $get_definitions->willReturn([
       'test_content' => $entity_type,
     ]);
 
-    $this->entityTypeBundleInfo->getBundleInfo('test_content')->willReturn([
+    /** @var \Prophecy\Prophecy\MethodProphecy $get_bundle_info */
+    $get_bundle_info = $this->entityTypeBundleInfo->getBundleInfo('test_content');
+    $get_bundle_info->willReturn([
       'first_bundle' => ['label' => 'First bundle'],
       'second_bundle' => ['label' => 'Second bundle'],
       'third_bundle' => ['label' => 'Third bundle'],
@@ -288,13 +298,17 @@ class EntityContextDefinitionIsSatisfiedTest extends UnitTestCase {
    */
   public function testIsSatisfiedByPassBundledEntity($expected, $requirement_constraint) {
     $entity_type = new EntityType(['id' => 'test_content']);
-    $this->entityTypeManager->getDefinitions()->willReturn([
+    /** @var \Prophecy\Prophecy\MethodProphecy $get_definitions */
+    $get_definitions =  $this->entityTypeManager->getDefinitions();
+    $get_definitions->willReturn([
       'test_content' => $entity_type,
     ]);
     $this->entityTypeManager->getDefinition('test_content')->willReturn($entity_type);
     $this->entityTypeManager->getStorage('test_content')->shouldNotBeCalled();
 
-    $this->entityTypeBundleInfo->getBundleInfo('test_content')->willReturn([
+    /** @var \Prophecy\Prophecy\MethodProphecy $get_bundle_info */
+    $get_bundle_info = $this->entityTypeBundleInfo->getBundleInfo('test_content');
+    $get_bundle_info->willReturn([
       'first_bundle' => ['label' => 'First bundle'],
       'second_bundle' => ['label' => 'Second bundle'],
       'third_bundle' => ['label' => 'Third bundle'],

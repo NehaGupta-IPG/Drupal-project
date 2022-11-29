@@ -167,7 +167,9 @@ class DefaultMenuLinkTreeManipulatorsTest extends UnitTestCase {
     // performed. 9 routes, but 1 is external, 2 already have their 'access'
     // property set, and 1 is a child if an inaccessible menu link, so only 5
     // calls will be made.
-    $this->cacheContextManager->assertValidTokens(['user.permissions'])->shouldBeCalled()->willReturn(TRUE);
+    /** @var \Prophecy\Prophecy\MethodProphecy $assert_valid_tokens_user_permissions */
+    $assert_valid_tokens_user_permissions = $this->cacheContextManager->assertValidTokens(['user.permissions']);
+    $assert_valid_tokens_user_permissions->shouldBeCalled()->willReturn(TRUE);
     $this->accessManager->expects($this->exactly(5))
       ->method('checkNamedRoute')
       ->willReturnMap([
@@ -192,7 +194,9 @@ class DefaultMenuLinkTreeManipulatorsTest extends UnitTestCase {
 
     $this->mockTree();
     $this->originalTree[5]->subtree[7]->access = AccessResult::neutral();
-    $this->cacheContextManager->assertValidTokens(['user'])->shouldBeCalled()->willReturn(TRUE);
+    /** @var \Prophecy\Prophecy\MethodProphecy $assert_valid_tokens_user */
+    $assert_valid_tokens_user = $this->cacheContextManager->assertValidTokens(['user']);
+    $assert_valid_tokens_user->shouldBeCalled()->willReturn(TRUE);
     $this->originalTree[8]->access = AccessResult::allowed()->cachePerUser();
 
     // Since \Drupal\Core\Menu\DefaultMenuLinkTreeManipulators::checkAccess()
@@ -256,7 +260,9 @@ class DefaultMenuLinkTreeManipulatorsTest extends UnitTestCase {
       ->willReturn(TRUE);
 
     $this->mockTree();
-    $this->cacheContextManager->assertValidTokens(['user.permissions'])->shouldBeCalled()->willReturn(TRUE);
+    /** @var \Prophecy\Prophecy\MethodProphecy $assert_valid_tokens_user_permissions */
+    $assert_valid_tokens_user_permissions = $this->cacheContextManager->assertValidTokens(['user.permissions']);
+    $assert_valid_tokens_user_permissions->shouldBeCalled()->willReturn(TRUE);
     $this->defaultMenuTreeManipulators->checkAccess($this->originalTree);
 
     $expected_access_result = AccessResult::allowed()->cachePerPermissions();
@@ -331,8 +337,12 @@ class DefaultMenuLinkTreeManipulatorsTest extends UnitTestCase {
       ->with('node')
       ->willReturn($storage);
 
-    $this->cacheContextManager->assertValidTokens(['user.permissions'])->shouldBeCalled()->willReturn(TRUE);
-    $this->cacheContextManager->assertValidTokens(['user.permissions', 'user.node_grants:view'])->shouldBeCalled()->willReturn(TRUE);
+    /** @var \Prophecy\Prophecy\MethodProphecy $assert_valid_tokens_user_permissions */
+    $assert_valid_tokens_user_permissions = $this->cacheContextManager->assertValidTokens(['user.permissions']);
+    $assert_valid_tokens_user_permissions->shouldBeCalled()->willReturn(TRUE);
+    /** @var \Prophecy\Prophecy\MethodProphecy $assert_valid_tokens_user_permission_user_node_grants_views */
+    $assert_valid_tokens_user_permission_user_node_grants_views = $this->cacheContextManager->assertValidTokens(['user.permissions', 'user.node_grants:view']);
+    $assert_valid_tokens_user_permission_user_node_grants_views->shouldBeCalled()->willReturn(TRUE);
     $node_access_result = AccessResult::allowed()->cachePerPermissions()->addCacheContexts(['user.node_grants:view']);
 
     $tree = $this->defaultMenuTreeManipulators->checkNodeAccess($tree);

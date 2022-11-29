@@ -397,6 +397,7 @@ class LayoutDeriver extends DeriverBase {
    * {@inheritdoc}
    */
   public function getDerivativeDefinitions($base_plugin_definition) {
+    /** @var \Drupal\Core\Layout\LayoutDefinition $base_plugin_definition */
     if ($base_plugin_definition->get('array_based')) {
       $this->derivatives['array_based'] = [];
     }
