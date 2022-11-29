@@ -125,7 +125,9 @@ class EntityTypeManagerTest extends UnitTestCase {
           throw new PluginNotFoundException($entity_type_id);
         }
       });
-    $this->discovery->getDefinitions()->willReturn($definitions);
+    /** @var \Prophecy\Prophecy\MethodProphecy $get_definitions */
+    $get_definitions = $this->discovery->getDefinitions();
+    $get_definitions->willReturn($definitions);
 
   }
 

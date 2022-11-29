@@ -139,7 +139,9 @@ class EntityTypeBundleInfoTest extends UnitTestCase {
           throw new PluginNotFoundException($entity_type_id);
         }
       });
-    $this->entityTypeManager->getDefinitions()->willReturn($definitions);
+    /** @var \Prophecy\Prophecy\MethodProphecy $get_definition */
+    $get_definition = $this->entityTypeManager->getDefinitions();
+    $get_definition->willReturn($definitions);
 
   }
 
@@ -166,7 +168,9 @@ class EntityTypeBundleInfoTest extends UnitTestCase {
    * @dataProvider providerTestGetBundleInfo
    */
   public function testGetBundleInfo($entity_type_id, $expected) {
-    $this->moduleHandler->invokeAll('entity_bundle_info')->willReturn([]);
+    /** @var \Prophecy\Prophecy\MethodProphecy $invoke_all */
+    $invoke_all = $this->moduleHandler->invokeAll('entity_bundle_info')
+    $invoke_all->willReturn([]);
     $this->moduleHandler->alter('entity_bundle_info', Argument::type('array'))->willReturn(NULL);
 
     $apple = $this->prophesize(EntityTypeInterface::class);
@@ -216,7 +220,9 @@ class EntityTypeBundleInfoTest extends UnitTestCase {
    * @covers ::getAllBundleInfo
    */
   public function testGetAllBundleInfo() {
-    $this->moduleHandler->invokeAll('entity_bundle_info')->willReturn([]);
+    /** @var \Prophecy\Prophecy\MethodProphecy $invoke_all */
+    $invoke_all = $this->moduleHandler->invokeAll('entity_bundle_info');
+    $invoke_all->willReturn([]);
     $this->moduleHandler->alter('entity_bundle_info', Argument::type('array'))->willReturn(NULL);
 
     $apple = $this->prophesize(EntityTypeInterface::class);
@@ -232,7 +238,9 @@ class EntityTypeBundleInfoTest extends UnitTestCase {
       'banana' => $banana,
     ]);
 
-    $this->cacheBackend->get('entity_bundle_info:en')->willReturn(FALSE);
+    /** @var \Prophecy\Prophecy\MethodProphecy $get */
+    $get = $this->cacheBackend->get('entity_bundle_info:en');
+    $get->willReturn(FALSE);
     $this->cacheBackend->set('entity_bundle_info:en', Argument::any(), Cache::PERMANENT, ['entity_types', 'entity_bundles'])
       ->will(function () {
         $this->get('entity_bundle_info:en')
@@ -276,7 +284,9 @@ class EntityTypeBundleInfoTest extends UnitTestCase {
     // Ensure that EntityTypeBundleInfo::getAllBundleInfo() does not add
     // additional bundles if hook_entity_bundle_info() defines some and the
     // entity_type does not define a bundle entity type.
-    $this->moduleHandler->invokeAll('entity_bundle_info')->willReturn([
+    /** @var \Prophecy\Prophecy\MethodProphecy $invoke_all */
+    $invoke_all = $this->moduleHandler->invokeAll('entity_bundle_info')
+    $invoke_all->willReturn([
       'banana' => [
         'fig' => [
           'label' => 'Fig banana',

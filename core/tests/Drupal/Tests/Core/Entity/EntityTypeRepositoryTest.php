@@ -58,7 +58,9 @@ class EntityTypeRepositoryTest extends UnitTestCase {
       $entity_type->getLinkTemplates()->willReturn([]);
 
       // Give the entity type a legitimate class to return.
-      $entity_type->getClass()->willReturn($class);
+      /** @var \Prophecy\Prophecy\MethodProphecy $get_class */
+      $get_class = $entity_type->getClass();
+      $get_class->willReturn($class);
 
       $definitions[$key] = $entity_type->reveal();
     }
@@ -77,7 +79,9 @@ class EntityTypeRepositoryTest extends UnitTestCase {
           throw new PluginNotFoundException($entity_type_id);
         }
       });
-    $this->entityTypeManager->getDefinitions()->willReturn($definitions);
+    /** @var \Prophecy\Prophecy\MethodProphecy $get_definitions */
+    $get_definitions = $this->entityTypeManager->getDefinitions();
+    $get_definitions->willReturn($definitions);
   }
 
   /**

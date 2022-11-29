@@ -69,7 +69,9 @@ class EntityRepositoryTest extends UnitTestCase {
     $this->languageManager->getCurrentLanguage(LanguageInterface::TYPE_CONTENT)
       ->willReturn($language)
       ->shouldBeCalledTimes(1);
-    $this->languageManager->getFallbackCandidates(Argument::type('array'))
+    /** @var \Prophecy\Prophecy\MethodProphecy $get_fallback_candidates */
+    $get_fallback_candidates = $this->languageManager->getFallbackCandidates(Argument::type('array'));
+    $get_fallback_candidates
       ->will(function ($args) {
         $context = $args[0];
         $candidates = [];

@@ -266,9 +266,15 @@ class EntityUrlTest extends UnitTestCase {
   public function testToUrlLinkTemplateAddForm($has_bundle_key, $bundle_entity_type, $bundle_key, $expected_route_parameters) {
     $values = ['id' => $this->entityId, 'langcode' => $this->langcode];
     $entity = $this->getEntity(UrlTestEntity::class, $values);
-    $this->entityType->hasKey('bundle')->willReturn($has_bundle_key);
-    $this->entityType->getBundleEntityType()->willReturn($bundle_entity_type);
-    $this->entityType->getKey('bundle')->willReturn($bundle_key);
+    /** @var \Prophecy\Prophecy\MethodProphecy $bundle_key */
+    $bundle_key = $this->entityType->hasKey('bundle');
+    $bundle_key->willReturn($has_bundle_key);
+    /** @var \Prophecy\Prophecy\MethodProphecy $get_bundle_entity_type */
+    $get_bundle_entity_type = $this->entityType->getBundleEntityType();
+    $get_bundle_entity_type->willReturn($bundle_entity_type);
+    /** @var \Prophecy\Prophecy\MethodProphecy $get_key */
+    $get_key = $this->entityType->getKey('bundle');
+    $get_key->willReturn($bundle_key);
     $link_template = 'add-form';
     $this->registerLinkTemplate($link_template);
 
@@ -313,7 +319,9 @@ class EntityUrlTest extends UnitTestCase {
     $entity = $this->getEntity(UrlTestEntity::class, ['id' => $this->entityId]);
 
     $this->registerBundleInfo($bundle_info);
-    $this->entityType->getUriCallback()->willReturn($uri_callback);
+    /** @var \Prophecy\Prophecy\MethodProphecy $get_uri_callback */
+    $get_uri_callback = $this->entityType->getUriCallback();
+    $get_uri_callback->willReturn($uri_callback);
 
     $link_template = 'canonical';
     $this->expectException(UndefinedLinkTemplateException::class);
@@ -354,7 +362,9 @@ class EntityUrlTest extends UnitTestCase {
     $entity = $this->getEntity(UrlTestEntity::class, ['id' => $this->entityId, 'langcode' => $this->langcode]);
 
     $this->registerBundleInfo($bundle_info);
-    $this->entityType->getUriCallback()->willReturn($uri_callback);
+    /** @var \Prophecy\Prophecy\MethodProphecy $get_uri_callback */
+    $get_uri_callback = $this->entityType->getUriCallback();
+    $get_uri_callback->willReturn($uri_callback);
 
     /** @var \Drupal\Core\Url $url */
     $url = $entity->toUrl('canonical');
@@ -488,7 +498,9 @@ class EntityUrlTest extends UnitTestCase {
       // generator but perform assertions on the URL object directly.
       $link_template => "/test-entity/{test_entity}/$link_template",
     ];
-    $this->entityType->getLinkTemplates()->willReturn($link_templates);
+    /** @var \Prophecy\Prophecy\MethodProphecy $get_link_templates */
+    $get_link_templates = $this->entityType->getLinkTemplates();
+    $get_link_templates->willReturn($link_templates);
   }
 
   /**
@@ -498,9 +510,9 @@ class EntityUrlTest extends UnitTestCase {
    *   The bundle information to register.
    */
   protected function registerBundleInfo($bundle_info) {
-    $this->entityTypeBundleInfo
-      ->getBundleInfo($this->entityTypeId)
-      ->willReturn([$this->entityTypeId => $bundle_info]);
+    /** @var \Prophecy\Prophecy\MethodProphecy $get_bundle_info */
+    $get_bundle_info = $this->entityTypeBundleInfo->getBundleInfo($this->entityTypeId);
+    $get_bundle_info->willReturn([$this->entityTypeId => $bundle_info]);
   }
 
 }
