@@ -174,19 +174,21 @@ class AttributeTest extends UnitTestCase {
 
     // Add one class on empty attribute.
     $attribute->addClass('banana');
-    $this->assertEquals(['banana'], $attribute['class']->value());
+    /** @var AttributeArray $attribute_class */
+    $attribute_class = $attribute['class'];
+    $this->assertEquals(['banana'], $attribute_class->value());
 
     // Add one class.
     $attribute->addClass('aa');
-    $this->assertEquals(['banana', 'aa'], $attribute['class']->value());
+    $this->assertEquals(['banana', 'aa'], $attribute_class->value());
 
     // Add multiple classes.
     $attribute->addClass('xx', 'yy');
-    $this->assertEquals(['banana', 'aa', 'xx', 'yy'], $attribute['class']->value());
+    $this->assertEquals(['banana', 'aa', 'xx', 'yy'], $attribute_class->value());
 
     // Add an array of classes.
     $attribute->addClass(['red', 'green', 'blue']);
-    $this->assertEquals(['banana', 'aa', 'xx', 'yy', 'red', 'green', 'blue'], $attribute['class']->value());
+    $this->assertEquals(['banana', 'aa', 'xx', 'yy', 'red', 'green', 'blue'], $attribute_class->value());
 
     // Add an array of duplicate classes.
     $attribute->addClass(['red', 'green', 'blue'], ['aa', 'aa', 'banana'], 'yy');
