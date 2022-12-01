@@ -221,7 +221,9 @@ class EntityFieldManagerTest extends UnitTestCase {
           return $definitions[$args[0]];
         }
       });
-    $this->entityTypeManager->getDefinitions()->willReturn($definitions);
+    /** @var \Prophecy\Prophecy\MethodProphecy $get_definitions */
+    $get_definitions = $this->entityTypeManager->getDefinitions();
+    $get_definitions->willReturn($definitions);
 
   }
 
@@ -319,7 +321,9 @@ class EntityFieldManagerTest extends UnitTestCase {
     ];
 
     $this->moduleHandler->invokeAllWith('entity_base_field_info', Argument::any());
-    $this->moduleHandler->invokeAllWith('entity_field_storage_info', Argument::any())
+    /** @var \Prophecy\Prophecy\MethodProphecy $invoke_all_with */
+    $invoke_all_with = $this->moduleHandler->invokeAllWith('entity_field_storage_info', Argument::any());
+    $invoke_all_with
       ->will(function ($arguments) use ($definitions) {
         [$hook, $callback] = $arguments;
         $callback(
@@ -356,7 +360,9 @@ class EntityFieldManagerTest extends UnitTestCase {
     $entity_class = EntityTypeManagerTestEntity::class;
     $entity_class::$baseFieldDefinitions += ['langcode' => $field_definition];
 
-    $this->entityType->isTranslatable()->willReturn(TRUE);
+    /** @var \Prophecy\Prophecy\MethodProphecy $is_translatable */
+    $is_translatable = $this->entityType->isTranslatable();
+    $is_translatable->willReturn(TRUE);
 
     $definitions = $this->entityFieldManager->getBaseFieldDefinitions('test_entity_type');
 
@@ -399,8 +405,12 @@ class EntityFieldManagerTest extends UnitTestCase {
       $entity_class::$baseFieldDefinitions += ['langcode' => $field_definition->reveal()];
     }
 
-    $this->entityType->isTranslatable()->willReturn(TRUE);
-    $this->entityType->getLabel()->willReturn('Test');
+    /** @var \Prophecy\Prophecy\MethodProphecy $is_translatable */
+    $is_translatable = $this->entityType->isTranslatable();
+    $is_translatable->willReturn(TRUE);
+    /** @var \Prophecy\Prophecy\MethodProphecy $get_label */
+    $get_label = $this->entityType->getLabel();
+    $get_label->willReturn('Test');
 
     $this->expectException(\LogicException::class);
     $this->expectExceptionMessage('The Test entity type cannot be translatable as it does not define a translatable "langcode" field.');
@@ -431,7 +441,9 @@ class EntityFieldManagerTest extends UnitTestCase {
 
     $expected = ['id' => $field_definition];
 
-    $this->cacheBackend->get('entity_base_field_definitions:test_entity_type:en')
+    /** @var \Prophecy\Prophecy\MethodProphecy $get */
+    $get = $this->cacheBackend->get('entity_base_field_definitions:test_entity_type:en');
+    $get
       ->willReturn(FALSE)
       ->shouldBeCalled();
     $this->cacheBackend->set('entity_base_field_definitions:test_entity_type:en', Argument::any(), Cache::PERMANENT, ['entity_types', 'entity_field_info'])
@@ -458,10 +470,14 @@ class EntityFieldManagerTest extends UnitTestCase {
 
     $expected = ['id' => $field_definition];
 
-    $this->cacheBackend->get('entity_base_field_definitions:test_entity_type:en')
+    /** @var \Prophecy\Prophecy\MethodProphecy $get_entity_base_field_definitions */
+    $get_entity_base_field_definitions = $this->cacheBackend->get('entity_base_field_definitions:test_entity_type:en');
+    $get_entity_base_field_definitions
       ->willReturn((object) ['data' => $expected])
       ->shouldBeCalledTimes(2);
-    $this->cacheBackend->get('entity_bundle_field_definitions:test_entity_type:test_bundle:en')
+    /** @var \Prophecy\Prophecy\MethodProphecy $get_entity_bundle_field_definitions */
+    $get_entity_bundle_field_definitions = $this->cacheBackend->get('entity_bundle_field_definitions:test_entity_type:test_bundle:en');
+    $get_entity_bundle_field_definitions
       ->willReturn(FALSE)
       ->shouldBeCalledTimes(1);
     $this->cacheBackend->set('entity_bundle_field_definitions:test_entity_type:test_bundle:en', Argument::any(), Cache::PERMANENT, ['entity_types', 'entity_field_info'])
@@ -490,7 +506,9 @@ class EntityFieldManagerTest extends UnitTestCase {
 
     $definitions = ['field_storage' => $field_storage_definition->reveal()];
 
-    $this->moduleHandler->invokeAllWith('entity_field_storage_info', Argument::any())
+    /** @var \Prophecy\Prophecy\MethodProphecy $invoke_all_with */
+    $invoke_all_with = $this->moduleHandler->invokeAllWith('entity_field_storage_info', Argument::any());
+    $invoke_all_with
       ->will(function ($arguments) use ($definitions) {
         [$hook, $callback] = $arguments;
         $callback(
@@ -507,10 +525,14 @@ class EntityFieldManagerTest extends UnitTestCase {
       'field_storage' => $field_storage_definition->reveal(),
     ];
 
-    $this->cacheBackend->get('entity_base_field_definitions:test_entity_type:en')
+    /** @var \Prophecy\Prophecy\MethodProphecy $get_entity_base_field_definitions */
+    $get_entity_base_field_definitions = $this->cacheBackend->get('entity_base_field_definitions:test_entity_type:en');
+    $get_entity_base_field_definitions
       ->willReturn((object) ['data' => ['id' => $expected['id']]])
       ->shouldBeCalledTimes(2);
-    $this->cacheBackend->get('entity_field_storage_definitions:test_entity_type:en')->willReturn(FALSE);
+    /** @var \Prophecy\Prophecy\MethodProphecy $get_entity_field_storage_definitions */
+    $get_entity_field_storage_definitions = $this->cacheBackend->get('entity_field_storage_definitions:test_entity_type:en');
+    $get_entity_field_storage_definitions->willReturn(FALSE);
 
     $this->cacheBackend->set('entity_field_storage_definitions:test_entity_type:en', Argument::any(), Cache::PERMANENT, ['entity_types', 'entity_field_info'])
       ->will(function () use ($expected) {
@@ -534,8 +556,12 @@ class EntityFieldManagerTest extends UnitTestCase {
   public function testGetBaseFieldDefinitionsInvalidDefinition() {
     $this->setUpEntityWithFieldDefinition(FALSE, 'langcode', ['langcode' => 'langcode']);
 
-    $this->entityType->isTranslatable()->willReturn(TRUE);
-    $this->entityType->getLabel()->willReturn('the_label');
+    /** @var \Prophecy\Prophecy\MethodProphecy $is_translatable */
+    $is_translatable = $this->entityType->isTranslatable();
+    $is_translatable->willReturn(TRUE);
+    /** @var \Prophecy\Prophecy\MethodProphecy $get_label */
+    $get_label = $this->entityType->getLabel();
+    $get_label->willReturn('the_label');
 
     $this->expectException(\LogicException::class);
     $this->entityFieldManager->getBaseFieldDefinitions('test_entity_type');
@@ -565,7 +591,9 @@ class EntityFieldManagerTest extends UnitTestCase {
     $field_definition->setTargetBundle(NULL)->shouldBeCalled();
     $field_definition->setTargetBundle('test_bundle')->shouldBeCalled();
 
-    $this->moduleHandler->invokeAllWith(Argument::type('string'), Argument::any())
+    /** @var \Prophecy\Prophecy\MethodProphecy $invoke_all_with */
+    $invoke_all_with = $this->moduleHandler->invokeAllWith(Argument::type('string'), Argument::any());
+    $invoke_all_with
       ->will(function ($arguments) use ($field_definition, $module) {
         [$hook, $callback] = $arguments;
         $callback(
@@ -693,9 +721,13 @@ class EntityFieldManagerTest extends UnitTestCase {
       ->willReturn($language)
       ->shouldBeCalledTimes(1);
 
-    $this->cacheBackend->get($cache_id)->shouldBeCalled();
+    /** @var \Prophecy\Prophecy\MethodProphecy $get */
+    $get = $this->cacheBackend->get($cache_id);
+    $get->shouldBeCalled();
 
-    $this->moduleHandler->invokeAll('entity_extra_field_info')->willReturn($hook_bundle_extra_fields);
+    /** @var \Prophecy\Prophecy\MethodProphecy $invoke_all */
+    $invoke_all = $this->moduleHandler->invokeAll('entity_extra_field_info');
+    $invoke_all->willReturn($hook_bundle_extra_fields);
     $this->moduleHandler->alter('entity_extra_field_info', $hook_bundle_extra_fields)->shouldBeCalled();
 
     $this->cacheBackend->set($cache_id, $processed_hook_bundle_extra_fields[$entity_type_id][$bundle], Cache::PERMANENT, ['entity_field_info'])->shouldBeCalled();
@@ -707,7 +739,9 @@ class EntityFieldManagerTest extends UnitTestCase {
    * @covers ::getFieldMap
    */
   public function testGetFieldMap() {
-    $this->entityTypeBundleInfo->getBundleInfo('test_entity_type')->willReturn([])->shouldBeCalled();
+    /** @var \Prophecy\Prophecy\MethodProphecy $get_bundle_info */
+    $get_bundle_info = $this->entityTypeBundleInfo->getBundleInfo('test_entity_type');
+    $get_bundle_info->willReturn([])->shouldBeCalled();
 
     // Set up a content entity type.
     $entity_type = $this->prophesize(ContentEntityTypeInterface::class);
@@ -758,7 +792,9 @@ class EntityFieldManagerTest extends UnitTestCase {
 
     // Set up the entity type bundle info to return two bundles for the
     // fieldable entity type.
-    $this->entityTypeBundleInfo->getBundleInfo('test_entity_type')->willReturn([
+    /** @var \Prophecy\Prophecy\MethodProphecy $get_bundle_info */
+    $get_bundle_info = $this->entityTypeBundleInfo->getBundleInfo('test_entity_type');
+    $get_bundle_info->willReturn([
       'first_bundle' => 'first_bundle',
       'second_bundle' => 'second_bundle',
     ])->shouldBeCalled();
@@ -796,7 +832,9 @@ class EntityFieldManagerTest extends UnitTestCase {
       ],
     ];
     $this->setUpEntityTypeDefinitions();
-    $this->cacheBackend->get('entity_field_map')->willReturn((object) ['data' => $expected]);
+    /** @var \Prophecy\Prophecy\MethodProphecy $get */
+    $get = $this->cacheBackend->get('entity_field_map');
+    $get->willReturn((object) ['data' => $expected]);
 
     // Call the field map twice to make sure the static cache works.
     $this->assertEquals($expected, $this->entityFieldManager->getFieldMap());
@@ -813,11 +851,15 @@ class EntityFieldManagerTest extends UnitTestCase {
 
     // Set up the entity type bundle info to return two bundles for the
     // fieldable entity type.
-    $this->entityTypeBundleInfo->getBundleInfo('test_entity_type')->willReturn([
+    /** @var \Prophecy\Prophecy\MethodProphecy $get_bundle_info */
+    $get_bundle_info = $this->entityTypeBundleInfo->getBundleInfo('test_entity_type');
+    $get_bundle_info->willReturn([
       'first_bundle' => 'first_bundle',
       'second_bundle' => 'second_bundle',
     ])->shouldBeCalled();
-    $this->moduleHandler->invokeAllWith('entity_base_field_info', Argument::any())->shouldBeCalled();
+    /** @var \Prophecy\Prophecy\MethodProphecy $invoke_all_with */
+    $invoke_all_with = $this->moduleHandler->invokeAllWith('entity_base_field_info', Argument::any());
+    $invoke_all_with->shouldBeCalled();
 
     // Define an ID field definition as a base field.
     $id_definition = $this->prophesize(FieldDefinitionInterface::class);
