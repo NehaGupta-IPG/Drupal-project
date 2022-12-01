@@ -116,6 +116,7 @@ class TitleResolverTest extends UnitTestCase {
     $request->attributes->set('_raw_variables', $raw_variables);
 
     $route = new Route('/test-route', ['_title' => 'static title %test @test']);
+    /** @var \Drupal\Core\StringTranslation\TranslatableMarkup $translatable_markup */
     $translatable_markup = $this->titleResolver->getTitle($request, $route);
     $this->assertSame('', $translatable_markup->getArguments()['@test']);
     $this->assertSame('', $translatable_markup->getArguments()['%test']);
