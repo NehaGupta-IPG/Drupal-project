@@ -290,4 +290,34 @@ class NestedArrayTest extends TestCase {
     return $data;
   }
 
+  /**
+   * @covers ::arrayWalkNested
+   */
+  public function testArrayWalkNested() {
+    $array = [
+      'one' => 1,
+      'nest' => [
+        'two' => 2,
+        'three' => 3,
+        'nest' => [
+          'four' => 4,
+        ],
+      ],
+      'five' => 5,
+    ];
+
+    $output = [];
+    NestedArray::arrayWalkNested($array, function ($value, $parents) use (&$output) {
+      $output[] = $value . ' - ' . implode(':', $parents);
+    });
+
+    $this->assertEquals([
+      '1 - one',
+      '2 - nest:two',
+      '3 - nest:three',
+      '4 - nest:nest:four',
+      '5 - five',
+    ], $output);
+  }
+
 }
