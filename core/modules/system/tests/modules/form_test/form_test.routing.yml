@@ -318,6 +318,14 @@ form_test.radios_checked:
   requirements:
     _access: 'TRUE'
 
+form_test.radios_required:
+  path: '/form-test/radios-required'
+  defaults:
+    _form: '\Drupal\form_test\Form\FormTestRadiosRequiredForm'
+    _title: 'Radios require'
+  requirements:
+    _access: 'TRUE'
+
 form_test.email:
   path: '/form-test/email'
   defaults:
