@@ -70,7 +70,9 @@ abstract class LinksetControllerTestBase extends BrowserTestBase {
   protected function doRequest(string $method, Url $url, $expected_status = 200, ?UserInterface $account = NULL): Response {
     $request_options = [];
     if (!is_null($account)) {
-      $credentials = $account->name->value . ':' . $account->passRaw;
+      /** @var string $account_pass_raw */
+      $account_pass_raw = $account->passRaw;
+      $credentials = $account->getAccountName() . ':' . $account_pass_raw;
       $request_options[RequestOptions::HEADERS] = [
         'Authorization' => 'Basic ' . base64_encode($credentials),
       ];

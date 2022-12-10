@@ -336,8 +336,8 @@ CORE_INCOMPATIBILITY;
     $version = preg_replace('/-dev$/', '', \Drupal::VERSION);
     [$major, $minor] = explode('.', $version, 2);
 
-    $next_minor = $minor + 1;
-    $next_major = $major + 1;
+    $next_minor = (int) $minor + 1;
+    $next_major = (int) $major + 1;
     return [
       'next_minor' => [
         'next_minor',

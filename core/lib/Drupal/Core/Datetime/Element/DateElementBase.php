@@ -42,7 +42,7 @@ abstract class DateElementBase extends FormElementBase {
     $year_pattern = '@^[0-9]{1,4}@';
     if (!preg_match($year_pattern, $min_year, $matches)) {
       if (preg_match($plus_pattern, $min_year, $matches)) {
-        $min_year = $this_year + $matches[0];
+        $min_year = $this_year . $matches[0];
       }
       else {
         $min_year = $this_year;
@@ -50,7 +50,7 @@ abstract class DateElementBase extends FormElementBase {
     }
     if (!preg_match($year_pattern, $max_year, $matches)) {
       if (preg_match($plus_pattern, $max_year, $matches)) {
-        $max_year = $this_year + $matches[0];
+        $max_year = $this_year . $matches[0];
       }
       else {
         $max_year = $this_year;

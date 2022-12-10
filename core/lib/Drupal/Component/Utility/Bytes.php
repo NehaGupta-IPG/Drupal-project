@@ -79,7 +79,7 @@ class Bytes {
     if ($unit) {
       // Find the position of the unit in the ordered string which is the power
       // of magnitude to multiply a kilobyte by.
-      return round($size * pow(self::KILOBYTE, stripos('bkmgtpezy', $unit[0])));
+      return round((float) $size * pow(self::KILOBYTE, stripos('bkmgtpezy', $unit[0])));
     }
     else {
       // Ensure size is a proper number type.
