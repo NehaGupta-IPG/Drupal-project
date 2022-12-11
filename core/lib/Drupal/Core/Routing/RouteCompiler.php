@@ -12,9 +12,19 @@ use Symfony\Component\Routing\RouteCompiler as SymfonyRouteCompiler;
 class RouteCompiler extends SymfonyRouteCompiler implements RouteCompilerInterface {
 
   /**
-   * Flag the path as having unlimited parts.
+   * Value for a route's $num_parts indicating an unlimited number of parts.
+   *
+   * This is a positive integer rather than a special value (such as -1) so that
+   * the query in \Drupal\Core\Routing\RouteProvider does not need to use an OR
+   * condition when matching parts. Having an OR in the condition would degrade
+   * performance.
+   *
+   * Any number of parts in a request will effectively match a route defined as
+   * having this number of parts, because the {routing} table's 'path' field is
+   * stored as a varchar(255). It's therefore impossible to have a route with
+   * this many actual parts.
    */
-  const UNLIMITED_PARTS = -1;
+  private const NUM_PARTS_UNLIMITED = 256;
 
   /**
    * Compiles the current route instance.
@@ -55,7 +65,7 @@ class RouteCompiler extends SymfonyRouteCompiler implements RouteCompilerInterfa
     }, ARRAY_FILTER_USE_BOTH);
 
     if (count($unlimited_requirements) > 0) {
-      $num_parts = static::UNLIMITED_PARTS;
+      $num_parts = static::NUM_PARTS_UNLIMITED;
     }
 
     return new CompiledRoute(
