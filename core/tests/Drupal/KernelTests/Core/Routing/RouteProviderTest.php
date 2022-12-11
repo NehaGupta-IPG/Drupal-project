@@ -814,10 +814,10 @@ class RouteProviderTest extends KernelTestBase {
       ['/some/param/{with_unlimited_parts}', 'with_unlimited_parts', '.+', '/some/param/hello/world', 1],
       ['/some/param/{no_infinite_cardinality}', 'no_infinite_cardinality', '\d+', '/some/param/hello/world', 0],
       ['/some/{param}/{no_infinite_cardinality}', 'no_infinite_cardinality', '\d+', '/some/param/hello/world', 0],
-      // Only the latest parameter can be entitled in containing forward slash.
-      ['/some/{param}/{with_unlimited_parts}', 'param', '.*', '/some/param/hello/world', 0],
+      ['/some/{param}/{with_unlimited_parts}', 'param', '.*', '/some/param/hello/world', 1],
       // Not supported.
       ['/some/{param}', 'param', '[dor/]+', '/some/dor/dro', 0],
+      // Not in path.
       ['/some/{param}', 'random_var', '.+', '/some/dor/dro', 0],
     ];
   }

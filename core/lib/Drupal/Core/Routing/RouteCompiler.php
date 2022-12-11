@@ -52,16 +52,17 @@ class RouteCompiler extends SymfonyRouteCompiler implements RouteCompilerInterfa
     $pattern_outline = static::getPatternOutline($stripped_path);
     // We count the number of parts including any optional trailing parts. This
     // allows the RouteProvider to filter candidate routes more efficiently.
-    $num_parts = count(explode('/', trim($route->getPath(), '/')));
+    $parts = explode('/', trim($route->getPath(), '/'));
+    $num_parts = count($parts);
 
-    $unlimited_requirements = array_filter($route->getRequirements(), function ($it, $key) use ($stripped_path) {
+    $unlimited_requirements = array_filter($route->getRequirements(), function ($it, $key) use ($parts) {
       if ($it !== '.*' && $it !== '.+') {
         return FALSE;
       }
 
+      // Only consider requirements matching parameters in the path.
       $needle = "{{$key}}";
-      // Only the last parameter can be set to include '/' and only if the path ends with this parameter.
-      return substr_compare($stripped_path, $needle, -strlen($needle)) === 0;
+      return in_array($needle, $parts, TRUE);
     }, ARRAY_FILTER_USE_BOTH);
 
     if (count($unlimited_requirements) > 0) {
