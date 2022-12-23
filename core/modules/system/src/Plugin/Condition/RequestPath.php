@@ -163,6 +163,11 @@ class RequestPath extends ConditionPluginBase implements ContainerFactoryPluginI
     $request = $this->requestStack->getCurrentRequest();
     // Compare the lowercase path alias (if any) and internal path.
     $path = $this->currentPath->getPath($request);
+    // Remove multiple slashes as they can only be there by mistake.
+    $count = -1;
+    while ($count !== 0) {
+      $path = str_replace('//', '/', $path, $count);
+    }
     // Do not trim a trailing slash if that is the complete path.
     $path = $path === '/' ? $path : rtrim($path, '/');
     $path_alias = mb_strtolower($this->aliasManager->getAliasByPath($path));
