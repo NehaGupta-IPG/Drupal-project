@@ -835,3 +835,12 @@ function template_preprocess_views_mini_pager(&$variables): void {
   @trigger_error(__FUNCTION__ . '() is deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. Initial template_preprocess functions are registered directly in hook_theme(). See https://www.drupal.org/node/3504125', E_USER_DEPRECATED);
   \Drupal::service(ViewsThemeHooks::class)->preprocessViewsMiniPager($variables);
 }
+
+/**
+ * Implements hook_ENTITY_TYPE_presave().
+ */
+function views_view_presave(ViewEntityInterface $view) {
+  /** @var \Drupal\views\ViewsConfigUpdater $config_updater */
+  $config_updater = \Drupal::classResolver(ViewsConfigUpdater::class);
+  $config_updater->updateAll($view);
+}
