@@ -255,7 +255,7 @@ class NumericFilter extends FilterPluginBase implements FilterOperatorsInterface
           $source => ['value' => $operator],
         ];
       }
-      if ($exposed && !isset($user_input[$identifier]['value'])) {
+      if ($exposed && !isset($user_input[$identifier]) && !isset($user_input[$identifier]['value'])) {
         $user_input[$identifier]['value'] = $this->value['value'];
         $form_state->setUserInput($user_input);
       }
