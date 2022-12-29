@@ -1314,7 +1314,7 @@ class FormBuilder implements FormBuilderInterface, FormValidatorInterface, FormS
         if (!$input_exists && !$form_state->isRebuilding() && !$form_state->isProgrammed()) {
           // Add the necessary parent keys to FormState::$input and sets the
           // element's input value to NULL.
-          NestedArray::setValue($form_state->getUserInput(), $element['#parents'], NULL);
+          NestedArray::setValue($form_state->getUserInput(), $element['#parents'], NULL, TRUE);
           $input_exists = TRUE;
         }
         // If we have input for the current element, assign it to the #value
