@@ -324,10 +324,10 @@ class NumericFilter extends FilterPluginBase implements FilterOperatorsInterface
         $form['value']['min'] += $states;
         $form['value']['max'] += $states;
       }
-      if ($exposed && !isset($user_input[$identifier]['min'])) {
+      if ($exposed && !isset($user_input[$identifier]) && !isset($user_input[$identifier]['min'])) {
         $user_input[$identifier]['min'] = $this->value['min'];
       }
-      if ($exposed && !isset($user_input[$identifier]['max'])) {
+      if ($exposed && !isset($user_input[$identifier]) && !isset($user_input[$identifier]['max'])) {
         $user_input[$identifier]['max'] = $this->value['max'];
       }
 
