@@ -67,16 +67,12 @@ class QueueWorker extends Plugin {
 
   /**
    * The service name which handle the defined reliable queue.
-   *
-   * @var string
    */
-  public $queue_reliable_service;
+  public string $queue_reliable_service;
 
   /**
    * The service name which handle the defined queue.
-   *
-   * @var string
    */
-  public $queue_service;
+  public string $queue_service;
 
 }

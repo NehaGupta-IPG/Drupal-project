@@ -26,28 +26,26 @@ class QueueFactory {
   protected $settings;
 
   /**
-   * The Queue Worker Manager service.
-   *
-   * @var \Drupal\Core\Queue\QueueWorkerManagerInterface
-   */
-  protected $queueManager;
-
-  /**
    * Constructs QueueFactory object.
    *
    * @param \Drupal\Core\Site\Settings $settings
    *   The site settings.
    * @param \Psr\Container\ContainerInterface $container
    *   A service locator that contains the queue services.
+   * @param \Drupal\Core\Queue\QueueWorkerManagerInterface|null $queueManager
+   *   The Queue Worker Manager service.
    */
   public function __construct(
     Settings $settings,
     #[AutowireLocator('queue_factory')]
     protected ContainerInterface $container,
-    QueueWorkerManagerInterface $queue_manager,
+    protected ?QueueWorkerManagerInterface $queueManager = NULL,
   ) {
     $this->settings = $settings;
-    $this->queueManager = $queue_manager;
+    if ($this->queueManager === NULL) {
+      @trigger_error('Calling ' . __METHOD__ . ' without the $queueManager argument is deprecated in drupal:10.1.0 and it will be required in drupal:11.0.0. See https://www.drupal.org/node/2821989', E_USER_DEPRECATED);
+      $this->queueManager = \Drupal::service('plugin.manager.queue_worker');
+    }
   }
 
   /**
@@ -90,15 +88,12 @@ class QueueFactory {
   protected function getServiceName(string $queue_id, bool $reliable = FALSE): string {
     $definition = $this->queueManager->getDefinition($queue_id, FALSE);
     $service_name = NULL;
-    /*
-     * todo: remove $service_name detection legacy logic before
-     *   drupal:11.0.0 release.
-     */
+    /* @todo: remove $service_name detection legacy logic before drupal:11.0.0. */
     // If it is a reliable queue, check the specific settings first.
     if ($reliable) {
       $service_name = $this->settings::get('queue_reliable_service_' . $queue_id);
       if ($service_name) {
-        @trigger_error("The \"queue_reliable_service_{$queue_id}\" key is deprecated in drupal:10.0.0 and has no effect in drupal:11.0.0. Use hook_queue_info_alter() and `\$queue['{$queue_id}']['queue_reliable_service'] = '{$service_name}';` alter instead.", \E_USER_DEPRECATED);
+        @trigger_error("The \"queue_reliable_service_{$queue_id}\" key is deprecated in drupal:10.1.0 and has no effect in drupal:11.0.0. Use hook_queue_info_alter() and `\$queue['{$queue_id}']['queue_reliable_service'] = '{$service_name}';` alter instead.", \E_USER_DEPRECATED);
       }
     }
     // If no reliable queue was defined, check the service and global
@@ -106,7 +101,7 @@ class QueueFactory {
     if (empty($service_name)) {
       $service_name = $this->settings::get('queue_service_' . $queue_id);
       if ($service_name) {
-        @trigger_error("The \"queue_service_{$queue_id}\" key is deprecated in drupal:10.0.0 and has no effect in drupal:11.0.0. Use hook_queue_info_alter() and `\$queue['{$queue_id}']['queue_service'] = '{$service_name}';` alter instead.", \E_USER_DEPRECATED);
+        @trigger_error("The \"queue_service_{$queue_id}\" key is deprecated in drupal:10.1.0 and has no effect in drupal:11.0.0. Use hook_queue_info_alter() and `\$queue['{$queue_id}']['queue_service'] = '{$service_name}';` alter instead.", \E_USER_DEPRECATED);
       }
     }
 
