@@ -123,11 +123,11 @@ class NodeAccessTest extends NodeAccessTestBase {
       'type' => 'page',
       'uid' => $web_user7->id(),
       'body' => [
-         [
+        [
           'value' => $this->randomMachineName(32),
           'format' => filter_default_format(),
-          ],
         ],
+      ],
       'title' => $this->randomMachineName(8),
     ]);
 
