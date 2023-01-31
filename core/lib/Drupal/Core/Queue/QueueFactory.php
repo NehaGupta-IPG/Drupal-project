@@ -43,7 +43,7 @@ class QueueFactory {
   ) {
     $this->settings = $settings;
     if ($this->queueManager === NULL) {
-      @trigger_error('Calling ' . __METHOD__ . ' without the $queueManager argument is deprecated in drupal:10.1.0 and it will be required in drupal:11.0.0. See https://www.drupal.org/node/2821989', E_USER_DEPRECATED);
+      @trigger_error('Calling ' . __METHOD__ . ' without the $queueManager argument is deprecated in drupal:10.1.0 and it will be required in drupal:11.0.0. See https://www.drupal.org/node/3338022', E_USER_DEPRECATED);
       $this->queueManager = \Drupal::service('plugin.manager.queue_worker');
     }
   }
@@ -93,7 +93,7 @@ class QueueFactory {
     if ($reliable) {
       $service_name = $this->settings::get('queue_reliable_service_' . $queue_id);
       if ($service_name) {
-        @trigger_error("The \"queue_reliable_service_{$queue_id}\" key is deprecated in drupal:10.1.0 and has no effect in drupal:11.0.0. Use hook_queue_info_alter() and `\$queue['{$queue_id}']['queue_reliable_service'] = '{$service_name}';` alter instead.", \E_USER_DEPRECATED);
+        @trigger_error("The \"queue_reliable_service_{$queue_id}\" key is deprecated in drupal:10.1.0 and has no effect in drupal:11.0.0. Use hook_queue_info_alter() and `\$queue['{$queue_id}']['queue_reliable_service'] = '{$service_name}';` alter instead. See https://www.drupal.org/node/3338022", \E_USER_DEPRECATED);
       }
     }
     // If no reliable queue was defined, check the service and global
@@ -101,7 +101,7 @@ class QueueFactory {
     if (empty($service_name)) {
       $service_name = $this->settings::get('queue_service_' . $queue_id);
       if ($service_name) {
-        @trigger_error("The \"queue_service_{$queue_id}\" key is deprecated in drupal:10.1.0 and has no effect in drupal:11.0.0. Use hook_queue_info_alter() and `\$queue['{$queue_id}']['queue_service'] = '{$service_name}';` alter instead.", \E_USER_DEPRECATED);
+        @trigger_error("The \"queue_service_{$queue_id}\" key is deprecated in drupal:10.1.0 and has no effect in drupal:11.0.0. Use hook_queue_info_alter() and `\$queue['{$queue_id}']['queue_service'] = '{$service_name}';` alter instead. See https://www.drupal.org/node/3338022", \E_USER_DEPRECATED);
       }
     }
 
