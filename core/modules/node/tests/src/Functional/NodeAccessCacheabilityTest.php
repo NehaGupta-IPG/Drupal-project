@@ -63,6 +63,14 @@ class NodeAccessCacheabilityTest extends NodeTestBase {
     $this->assertNoCacheContext('user.node_grants:view');
     $this->drupalLogout();
 
+    // Log in as a user different from the one whose access is being checked.
+    // Since the current user is not the target of the access check, the
+    // 'user.node_grants:view' cache context should not be present.
+    $this->drupalLogin($this->drupalCreateUser());
+    $this->drupalGet(new Url('node_access_test_auto_bubbling', ['uid' => $this->drupalCreateUser()->id()]));
+    $this->assertNoCacheContext('user.node_grants:view');
+    $this->drupalLogout();
+
     // Uninstall the module with the only hook_node_grants() implementation.
     $this->container->get('module_installer')->uninstall(['node_access_test']);
     $this->rebuildContainer();

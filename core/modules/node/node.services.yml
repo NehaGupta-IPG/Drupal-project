@@ -18,7 +18,7 @@ services:
     class: Drupal\node\Routing\RouteSubscriber
   node.grant_storage:
     class: Drupal\node\NodeGrantDatabaseStorage
-    arguments: ['@database', '@module_handler', '@language_manager']
+    arguments: ['@database', '@module_handler', '@language_manager', '@current_user']
     tags:
       - { name: backend_overridable }
   Drupal\node\NodeGrantDatabaseStorageInterface: '@node.grant_storage'
