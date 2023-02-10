@@ -310,8 +310,10 @@ class LinkFieldTest extends BrowserTestBase {
       ->setComponent($field_name, [
         'type' => 'link_default',
         'settings' => [
-          'placeholder_url' => 'http://example.com',
-          'placeholder_title' => 'Enter the text for this link',
+          'placeholder_url' => $placeholderUrl = 'http://example.com',
+          'placeholder_title' => $placeholderTitle = 'Enter the text for this link',
+          'title_url' => $titleUrl = 'URL custom title',
+          'title_title' => $titleTitle = 'Link custom text',
         ],
       ])
       ->save();
@@ -333,14 +335,16 @@ class LinkFieldTest extends BrowserTestBase {
       // Assert label is shown.
       $this->assertSession()->pageTextContains('Read more about this entity');
       $this->assertSession()->fieldValueEquals("{$field_name}[0][uri]", '');
-      $this->assertSession()->responseContains('placeholder="http://example.com"');
+      $this->assertSession()->responseContains("placeholder=\"$placeholderUrl\"");
 
       if ($title_setting === LinkTitleVisibility::Disabled) {
         $this->assertSession()->fieldNotExists("{$field_name}[0][title]");
-        $this->assertSession()->responseNotContains('placeholder="Enter the text for this link"');
+        $this->assertSession()->responseNotContains("placeholder=\"$placeholderTitle\"");
       }
       else {
-        $this->assertSession()->responseContains('placeholder="Enter the text for this link"');
+        $this->assertSession()->responseContains("placeholder=\"$placeholderTitle\"");
+        $this->assertSession()->elementContains('xpath', '//div[contains(@class,"field--type-link")][2]//div[1]/label', $titleUrl);
+        $this->assertSession()->elementContains('xpath', '//div[contains(@class,"field--type-link")][2]//div[2]/label', $titleTitle);
 
         $this->assertSession()->fieldValueEquals("{$field_name}[0][title]", '');
         if ($title_setting === LinkTitleVisibility::Optional) {
@@ -349,7 +353,7 @@ class LinkFieldTest extends BrowserTestBase {
             "{$field_name}[0][title]" => 'Example',
           ];
           $this->submitForm($edit, 'Save');
-          $this->assertSession()->statusMessageContains('The URL field is required when the Link text field is specified.', 'error');
+          $this->assertSession()->statusMessageContains("The $titleUrl field is required when the $titleTitle field is specified.", 'error');
         }
         if ($title_setting === LinkTitleVisibility::Required) {
           // Verify that the link text is required, if the URL is non-empty.
@@ -357,14 +361,14 @@ class LinkFieldTest extends BrowserTestBase {
             "{$field_name}[0][uri]" => 'http://www.example.com',
           ];
           $this->submitForm($edit, 'Save');
-          $this->assertSession()->statusMessageContains('Link text field is required if there is URL input.', 'error');
+          $this->assertSession()->statusMessageContains("$titleTitle field is required if there is $titleUrl input.", 'error');
 
           // Verify that the link text is not required, if the URL is empty.
           $edit = [
             "{$field_name}[0][uri]" => '',
           ];
           $this->submitForm($edit, 'Save');
-          $this->assertSession()->statusMessageNotContains('Link text field is required.');
+          $this->assertSession()->statusMessageNotContains("$titleTitle field is required.");
 
           // Verify that a URL and link text meets requirements.
           $this->drupalGet('entity_test/add');

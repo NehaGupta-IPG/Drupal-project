@@ -32,6 +32,8 @@ class LinkWidget extends WidgetBase {
     return [
       'placeholder_url' => '',
       'placeholder_title' => '',
+      'title_url' => 'URL',
+      'title_title' => 'Link text',
     ] + parent::defaultSettings();
   }
 
@@ -209,7 +211,7 @@ class LinkWidget extends WidgetBase {
     }
     $element['uri'] = [
       '#type' => 'url',
-      '#title' => $this->t('URL'),
+      '#title' => $this->t($this->getSetting('title_url')),
       '#placeholder' => $this->getSetting('placeholder_url'),
       '#default_value' => $display_uri,
       '#element_validate' => [[static::class, 'validateUriElement']],
@@ -278,7 +280,7 @@ class LinkWidget extends WidgetBase {
 
     $element['title'] = [
       '#type' => 'textfield',
-      '#title' => $this->t('Link text'),
+      '#title' => $this->getSetting('title_title'),
       '#placeholder' => $this->getSetting('placeholder_title'),
       '#default_value' => $items[$delta]->title ?? NULL,
       '#maxlength' => 255,
@@ -391,11 +393,23 @@ class LinkWidget extends WidgetBase {
   public function settingsForm(array $form, FormStateInterface $form_state) {
     $elements = parent::settingsForm($form, $form_state);
 
+    $elements['title_url'] = [
+      '#type' => 'textfield',
+      '#title' => $this->t('Title for URL field'),
+      '#default_value' => $this->getSetting('title_url'),
+      '#description' => $this->t('Title to show for URL field.'),
+    ];
     $elements['placeholder_url'] = [
       '#type' => 'textfield',
       '#title' => $this->t('Placeholder for URL'),
       '#default_value' => $this->getSetting('placeholder_url'),
       '#description' => $this->t('Text that will be shown inside the field until a value is entered. This hint is usually a sample value or a brief description of the expected format.'),
+    ];
+    $elements['title_title'] = [
+      '#type' => 'textfield',
+      '#title' => $this->t('Title for link text field'),
+      '#default_value' => $this->getSetting('title_title'),
+      '#description' => $this->t('Title to show for link text.'),
     ];
     $elements['placeholder_title'] = [
       '#type' => 'textfield',
@@ -418,18 +432,24 @@ class LinkWidget extends WidgetBase {
   public function settingsSummary() {
     $summary = [];
 
+    $title_title = $this->getSetting('title_title');
     $placeholder_title = $this->getSetting('placeholder_title');
+    $title_url = $this->getSetting('title_url');
     $placeholder_url = $this->getSetting('placeholder_url');
-    if (empty($placeholder_title) && empty($placeholder_url)) {
-      $summary[] = $this->t('No placeholders');
+
+    $defaultSettings = $this->defaultSettings();
+
+    if ($title_title != $defaultSettings['title_title']) {
+      $summary[] = $this->t('Custom title for field "link text": @title_title', ['@title_title' => $title_title]);
     }
-    else {
-      if (!empty($placeholder_title)) {
-        $summary[] = $this->t('Title placeholder: @placeholder_title', ['@placeholder_title' => $placeholder_title]);
-      }
-      if (!empty($placeholder_url)) {
-        $summary[] = $this->t('URL placeholder: @placeholder_url', ['@placeholder_url' => $placeholder_url]);
-      }
+    if (!empty($placeholder_title)) {
+      $summary[] = $this->t('Title placeholder: @placeholder_title', ['@placeholder_title' => $placeholder_title]);
+    }
+    if ($title_url != $defaultSettings['title_url']) {
+      $summary[] = $this->t('Custom title for field "URL": @title_url', ['@title_url' => $title_url]);
+    }
+    if (!empty($placeholder_url)) {
+      $summary[] = $this->t('URL placeholder: @placeholder_url', ['@placeholder_url' => $placeholder_url]);
     }
 
     return $summary;
