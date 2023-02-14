@@ -90,6 +90,13 @@ class FileSystemForm extends ConfigFormBase {
    * {@inheritdoc}
    */
   public function buildForm(array $form, FormStateInterface $form_state) {
+    $form['drupal_root'] = [
+      '#type' => 'item',
+      '#title' => $this->t('Drupal root directory'),
+      '#markup' => DRUPAL_ROOT,
+      '#description' => $this->t('The top level directory of the Drupal installation. Relative paths shown below are relative to this location.'),
+    ];
+
     $form['file_public_path'] = [
       '#type' => 'item',
       '#title' => $this->t('Public file system path'),
