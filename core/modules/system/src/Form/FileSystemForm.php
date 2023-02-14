@@ -66,6 +66,10 @@ class FileSystemForm extends ConfigFormBase {
     $this->dateFormatter = $date_formatter;
     $this->streamWrapperManager = $stream_wrapper_manager;
     $this->fileSystem = $file_system;
+    if ($this->root === NULL) {
+      @trigger_error('Calling ' . __METHOD__ . ' without the $root argument is deprecated in drupal:10.1.0 and it will be required in drupal:11.0.0. See https://www.drupal.org/node/3341696', E_USER_DEPRECATED);
+      $this->root = \Drupal::root();
+    }
   }
 
   /**
