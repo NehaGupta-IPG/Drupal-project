@@ -383,7 +383,7 @@ class NestedArray {
    *   where $value is the current array value, and $parents is an array of
    *   parent keys of the value, starting with the outermost key.
    */
-  public static function arrayWalkNested(array $array, callable $callback) {
+  public static function arrayWalkNested(array &$array, callable $callback) {
     $parents = [];
     self::arrayWalkNestedRecursive($array, $callback, $parents);
   }
