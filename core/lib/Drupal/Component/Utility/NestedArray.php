@@ -403,9 +403,10 @@ class NestedArray {
       $current_parents[] = $key;
       if (is_array($value)) {
         self::arrayWalkNestedRecursive($value, $callback, $current_parents);
-        continue;
       }
-      $callback($value, $current_parents);
+      else {
+        $callback($value, $current_parents);
+      }
     }
   }
 
