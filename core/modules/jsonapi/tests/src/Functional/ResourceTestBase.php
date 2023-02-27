@@ -14,7 +14,6 @@ use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Cache\CacheableResponseInterface;
 use Drupal\Core\Cache\CacheRedirect;
 use Drupal\Core\Config\Entity\ConfigEntityInterface;
-use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Entity\ContentEntityNullStorage;
 use Drupal\Core\Entity\ContentEntityTypeInterface;
 use Drupal\Core\Entity\EntityInterface;
@@ -3446,7 +3445,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
   protected function getRelationshipFieldNames(?EntityInterface $entity = NULL) {
     $entity = $entity ?: $this->entity;
     // Only content entity types can have relationships.
-    $fields = $entity instanceof ContentEntityInterface
+    $fields = $entity instanceof FieldableEntityInterface
       ? iterator_to_array($entity)
       : [];
     return array_reduce($fields, function ($field_names, $field) {
