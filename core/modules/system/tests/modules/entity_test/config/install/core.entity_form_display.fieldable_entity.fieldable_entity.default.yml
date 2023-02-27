@@ -1,0 +1,18 @@
+status: true
+dependencies:
+  module:
+    - entity_test
+id: fieldable_entity.fieldable_entity.default
+targetEntityType: fieldable_entity
+bundle: fieldable_entity
+mode: default
+content:
+  title:
+    type: string_textfield
+    weight: 10
+    region: content
+    settings:
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+hidden: {  }

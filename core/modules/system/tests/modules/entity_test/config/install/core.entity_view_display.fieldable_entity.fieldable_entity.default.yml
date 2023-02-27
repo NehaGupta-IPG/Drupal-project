@@ -1,0 +1,13 @@
+status: true
+dependencies:
+  module:
+    - entity_test
+third_party_settings:
+  entity_test:
+    foo: bar
+id: fieldable_entity.fieldable_entity.default
+targetEntityType: fieldable_entity
+bundle: fieldable_entity
+mode: default
+content: {  }
+hidden: {  }
