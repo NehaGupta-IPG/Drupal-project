@@ -2,9 +2,16 @@
 
 namespace Drupal\jsonapi\Normalizer;
 
-use Drupal\Core\Entity\ContentEntityInterface;
-use Drupal\jsonapi\ResourceType\ResourceType;
-use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
+@trigger_error(__NAMESPACE__ . '\ContentEntityDenormalizer is deprecated in drupal:10.4.0 and will be removed before drupal:11.0.0. Instead, use \Drupal\jsonapi\Normalizer\FieldableEntityDenormalizer. See https://www.drupal.org/node/3343351', E_USER_DEPRECATED);
+
+use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
+use Drupal\Core\Entity\EntityFieldManagerInterface;
+use Drupal\Core\Entity\EntityTypeManagerInterface;
+use Drupal\Core\Field\FieldTypePluginManagerInterface;
+use Drupal\serialization\Normalizer\CacheableNormalizerInterface;
+use Symfony\Component\Serializer\Normalizer\CacheableSupportsMethodInterface;
+use Symfony\Component\Serializer\SerializerAwareInterface;
+use Symfony\Component\Serializer\SerializerInterface;
 
 /**
  * Converts a JSON:API array structure into a Drupal entity object.
@@ -15,81 +22,72 @@ use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
  * @see https://www.drupal.org/project/drupal/issues/3032787
  * @see jsonapi.api.php
  */
-final class ContentEntityDenormalizer extends EntityDenormalizerBase {
+final class ContentEntityDenormalizer implements SerializerAwareInterface, CacheableNormalizerInterface, CacheableSupportsMethodInterface, DenormalizerInterface {
 
   /**
-   * Prepares the input data to create the entity.
+   * The replacement service.
    *
-   * @param array $data
-   *   The input data to modify.
-   * @param \Drupal\jsonapi\ResourceType\ResourceType $resource_type
-   *   Contains the info about the resource type.
-   * @param string $format
-   *   Format the given data was extracted from.
-   * @param array $context
-   *   Options available to the denormalizer.
-   *
-   * @return array
-   *   The modified input data.
+   * @var \Drupal\jsonapi\Normalizer\FieldableEntityDenormalizer
    */
-  protected function prepareInput(array $data, ResourceType $resource_type, $format, array $context) {
-    $data_internal = [];
+  private FieldableEntityDenormalizer $replacement;
 
-    $field_map = $this->fieldManager->getFieldMap()[$resource_type->getEntityTypeId()];
+  /**
+   * Constructs an ContentEntityDenormalizer object.
+   *
+   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   *   The entity type manager.
+   * @param \Drupal\Core\Entity\EntityFieldManagerInterface $field_manager
+   *   The entity field manager.
+   * @param \Drupal\Core\Field\FieldTypePluginManagerInterface $plugin_manager
+   *   The plugin manager for fields.
+   */
+  public function __construct(EntityTypeManagerInterface $entity_type_manager, EntityFieldManagerInterface $field_manager, FieldTypePluginManagerInterface $plugin_manager) {
+    @trigger_error(__METHOD__ . '() is deprecated in drupal:10.4.0 and is removed from drupal:11.0.0. Use \Drupal\jsonapi\JsonApiResource\ResourceObject::extractFieldableEntityFields() method instead. See https://www.drupal.org/node/3343351', E_USER_DEPRECATED);
+    $this->replacement = new FieldableEntityDenormalizer($entity_type_manager, $field_manager, $plugin_manager);
+  }
 
-    $entity_type_id = $resource_type->getEntityTypeId();
-    $entity_type_definition = $this->entityTypeManager->getDefinition($entity_type_id);
-    $bundle_key = $entity_type_definition->getKey('bundle');
-    $uuid_key = $entity_type_definition->getKey('uuid');
+  /**
+   * {@inheritdoc}
+   */
+  public function denormalize($data, $type, $format = NULL, array $context = []): mixed {
+    return $this->replacement->denormalize($data, $type, $format, $context);
+  }
 
-    // User resource objects contain a read-only attribute that is not a real
-    // field on the user entity type.
-    // @see \Drupal\jsonapi\JsonApiResource\ResourceObject::extractContentEntityFields()
-    // @todo Eliminate this special casing in https://www.drupal.org/project/drupal/issues/3079254.
-    if ($entity_type_id === 'user') {
-      $data = array_diff_key($data, array_flip([$resource_type->getPublicName('display_name')]));
-    }
+  /**
+   * {@inheritdoc}
+   */
+  public function supportsDenormalization($data, string $type, ?string $format = NULL, array $context = []): bool {
+    return $this->replacement->supportsDenormalization($data, $type, $format);
+  }
 
-    // Translate the public fields into the entity fields.
-    foreach ($data as $public_field_name => $field_value) {
-      $internal_name = $resource_type->getInternalName($public_field_name);
+  /**
+   * {@inheritdoc}
+   */
+  public function normalize($object, $format = NULL, array $context = []): array|string|int|float|bool|\ArrayObject|NULL {
+    return $this->replacement->normalize($object, $format, $context);
+  }
 
-      // Skip any disabled field, except the always required bundle key and
-      // required-in-case-of-PATCHing uuid key.
-      // @see \Drupal\jsonapi\ResourceType\ResourceTypeRepository::getFieldMapping()
-      if ($resource_type->hasField($internal_name) && !$resource_type->isFieldEnabled($internal_name) && $bundle_key !== $internal_name && $uuid_key !== $internal_name) {
-        continue;
-      }
+  /**
+   * {@inheritdoc}
+   */
+  public function supportsNormalization($data, ?string $format = NULL, array $context = []): bool {
+    @trigger_error(__METHOD__ . '() is deprecated in drupal:10.4.0 and is removed from drupal:11.0.0. Use getSupportedTypes() instead. See https://www.drupal.org/node/3359695', E_USER_DEPRECATED);
 
-      if (!isset($field_map[$internal_name]) || !in_array($resource_type->getBundle(), $field_map[$internal_name]['bundles'], TRUE)) {
-        throw new UnprocessableEntityHttpException(sprintf(
-          'The attribute %s does not exist on the %s resource type.',
-          $internal_name,
-          $resource_type->getTypeName()
-        ));
-      }
+    return $this->replacement->supportsNormalization($data, $format);
+  }
 
-      $field_type = $field_map[$internal_name]['type'];
-      $field_class = $this->pluginManager->getDefinition($field_type)['list_class'];
-
-      $field_denormalization_context = array_merge($context, [
-        'field_type' => $field_type,
-        'field_name' => $internal_name,
-        'field_definition' => $this->fieldManager->getFieldDefinitions($resource_type->getEntityTypeId(), $resource_type->getBundle())[$internal_name],
-      ]);
-      $data_internal[$internal_name] = $this->serializer->denormalize($field_value, $field_class, $format, $field_denormalization_context);
-    }
-
-    return $data_internal;
+  /**
+   * {@inheritdoc}
+   */
+  public function setSerializer(SerializerInterface $serializer): void {
+    $this->replacement->setSerializer($serializer);
   }
 
   /**
    * {@inheritdoc}
    */
   public function getSupportedTypes(?string $format): array {
-    return [
-      ContentEntityInterface::class => TRUE,
-    ];
+    return $this->replacement->getSupportedTypes($format);
   }
 
 }

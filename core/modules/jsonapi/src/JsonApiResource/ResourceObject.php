@@ -312,8 +312,7 @@ class ResourceObject implements CacheableDependencyInterface, ResourceIdentifier
    * @see https://www.drupal.org/node/3343351
    */
   protected static function extractContentEntityFields(ResourceType $resource_type, ContentEntityInterface $entity) {
-    @trigger_error(__METHOD__ . '() is deprecated in drupal:10.1.0 and is removed from drupal:11.0.0. Use \Drupal\jsonapi\JsonApiResource\ResourceObject::extractFieldableEntityFields() method instead. See https://www.drupal.org/node/3343351', E_USER_DEPRECATED);
-    @trigger_error('\Drupal\jsonapi\JsonApiResource\ResourceObject::extractContentEntityFields() has been deprecated in favor of \Drupal\jsonapi\JsonApiResource\ResourceObject::extractFieldableEntityFields(). Use that instead.');
+    @trigger_error(__METHOD__ . '() is deprecated in drupal:10.4.0 and is removed from drupal:11.0.0. Use \Drupal\jsonapi\JsonApiResource\ResourceObject::extractFieldableEntityFields() method instead. See https://www.drupal.org/node/3343351', E_USER_DEPRECATED);
     return static::extractFieldableEntityFields($resource_type, $entity);
   }
 
