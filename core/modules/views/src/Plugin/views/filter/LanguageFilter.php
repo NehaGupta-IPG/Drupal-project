@@ -2,6 +2,7 @@
 
 namespace Drupal\views\Plugin\views\filter;
 
+use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
@@ -48,9 +49,11 @@ class LanguageFilter extends InOperator implements ContainerFactoryPluginInterfa
   public function getValueOptions() {
     if (!isset($this->valueOptions)) {
       $this->valueTitle = $this->t('Language');
+      // Only configurable languages are displayed when filter is exposed.
+      $languages_to_list = $this->options['exposed'] ? LanguageInterface::STATE_CONFIGURABLE : LanguageInterface::STATE_ALL | LanguageInterface::STATE_SITE_DEFAULT | PluginBase::INCLUDE_NEGOTIATED;
       // Pass the current values so options that are already selected do not get
       // lost when there are changes in the language configuration.
-      $this->valueOptions = $this->listLanguages(LanguageInterface::STATE_ALL | LanguageInterface::STATE_SITE_DEFAULT | PluginBase::INCLUDE_NEGOTIATED, array_keys($this->value));
+      $this->valueOptions = $this->listLanguages($languages_to_list, array_keys($this->value));
     }
     return $this->valueOptions;
   }
