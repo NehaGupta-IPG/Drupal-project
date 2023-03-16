@@ -220,7 +220,7 @@ class CommentAdminViewTest extends ViewsKernelTestBase {
     $executable->destroy();
 
     // Test the language filter.
-    $executable->setExposedInput(['langcode' => '***LANGUAGE_site_default***']);
+    $executable->setExposedInput(['langcode' => 'en']);
     $build = $executable->preview($display_id);
     $this->setRawContent($renderer->renderRoot($build));
 
