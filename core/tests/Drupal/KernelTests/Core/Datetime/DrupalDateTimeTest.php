@@ -109,9 +109,11 @@ class DrupalDateTimeTest extends KernelTestBase {
   }
 
   /**
-   * @param $timestamp
+   * Test DateTime object creation.
    *
-   * @return void
+   * @param mixed $timestamp
+   *   Timestamp value.
+   *
    * @dataProvider timestampProvider()
    */
   public function testTimestampArgumentTypes($timestamp) {
@@ -135,4 +137,5 @@ class DrupalDateTimeTest extends KernelTestBase {
       [87654321.1],
     ];
   }
+
 }
