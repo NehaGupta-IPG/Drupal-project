@@ -396,6 +396,11 @@ class EntityViewsData implements EntityHandlerInterface, EntityViewsDataInterfac
           $views_field['field']['id'] = 'field';
           $views_field['entity field'] = $field_definition->getName();
 
+          // Special handling for field type.
+          if ($field_definition->getType() == 'uri') {
+            $views_field['field']['default_formatter'] = 'string';
+          }
+
           $data[$table_mapping->getBaseTable()][$field_definition->getName()] = $views_field;
         }
       }
