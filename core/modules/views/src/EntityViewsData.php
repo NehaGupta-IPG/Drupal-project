@@ -379,6 +379,25 @@ class EntityViewsData implements EntityHandlerInterface, EntityViewsDataInterfac
             ],
           ];
         }
+
+        // Declare computed base fields.
+        // @todo Also declare computed bundle fields, but these can't yet be
+        // output: see https://www.drupal.org/project/drupal/issues/2981047.
+        if ($field_definition->isComputed() && !$field_definition->isInternal()) {
+          $views_field = [];
+          $views_field['title'] = $field_definition->getLabel();
+
+          if ($description = $field_definition->getDescription()) {
+            $views_field['help'] = $description;
+          }
+
+          // Computed fields have no database storage, so can't participate in
+          // a query, so there is no sort, argument, or filter.
+          $views_field['field']['id'] = 'field';
+          $views_field['entity field'] = $field_definition->getName();
+
+          $data[$table_mapping->getBaseTable()][$field_definition->getName()] = $views_field;
+        }
       }
     }
     if (($uid_key = $entity_keys['uid'] ?? '')) {
