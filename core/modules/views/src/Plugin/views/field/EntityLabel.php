@@ -106,7 +106,7 @@ class EntityLabel extends FieldPluginBase {
       }
     }
 
-    return $this->sanitizeValue($entity->label());
+    return $entity->label();
   }
 
   /**
