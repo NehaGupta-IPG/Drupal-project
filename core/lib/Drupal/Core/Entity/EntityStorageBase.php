@@ -632,7 +632,7 @@ abstract class EntityStorageBase extends EntityHandlerBase implements EntityStor
     }
 
     // Load the original entity, if any.
-    if ($id_exists && !$entity->getOriginal()) {
+    if ($id_exists) {
       $entity->setOriginal($this->loadUnchanged($id));
     }
 
