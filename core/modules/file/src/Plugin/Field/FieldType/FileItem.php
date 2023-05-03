@@ -34,7 +34,7 @@ use Drupal\file\Validation\FileValidatorSettingsTrait;
   default_widget: "file_generic",
   default_formatter: "file_default",
   list_class: FileFieldItemList::class,
-  constraints: ["ReferenceAccess" => [], "FileValidation" => []],
+  constraints: ["ReferenceAccess" => [], "FileValidation" => [], "FileDescriptionRequired" => []],
   column_groups: [
     'target_id' => [
       'label' => new TranslatableMarkup('File'),
@@ -51,8 +51,6 @@ use Drupal\file\Validation\FileValidatorSettingsTrait;
   ],
 )]
 class FileItem extends EntityReferenceItem {
-
-  use FileValidatorSettingsTrait;
 
   /**
    * {@inheritdoc}
@@ -158,7 +156,7 @@ class FileItem extends EntityReferenceItem {
       '#description' => $this->t('This setting only has an effect if the display option is enabled.'),
       '#states' => [
         'visible' => [
-          ':input[name="field_storage[subform][settings][display_field]"]' => ['checked' => TRUE],
+          ':input[name="settings[display_field]"]' => ['checked' => TRUE],
         ],
       ],
     ];
@@ -211,9 +209,7 @@ class FileItem extends EntityReferenceItem {
       '#type' => 'textfield',
       '#title' => $this->t('Maximum upload size'),
       '#default_value' => $settings['max_filesize'],
-      '#description' => $this->t('Enter a value like "512" (bytes), "80 KB" (kilobytes) or "50 MB" (megabytes) in order to restrict the allowed file size. If left empty the file sizes could be limited only by PHP\'s maximum post and file upload sizes (current limit <strong>%limit</strong>).', [
-        '%limit' => ByteSizeMarkup::create(Environment::getUploadMaxSize()),
-      ]),
+      '#description' => $this->t('Enter a value like "512" (bytes), "80 KB" (kilobytes) or "50 MB" (megabytes) in order to restrict the allowed file size. If left empty the file sizes could be limited only by PHP\'s maximum post and file upload sizes (current limit <strong>%limit</strong>).', ['%limit' => format_size(Environment::getUploadMaxSize())]),
       '#size' => 10,
       '#element_validate' => [[static::class, 'validateMaxFilesize']],
       '#weight' => 5,
@@ -254,8 +250,7 @@ class FileItem extends EntityReferenceItem {
    *
    * This doubles as a convenience clean-up function and a validation routine.
    * Commas are allowed by the end-user, but ultimately the value will be stored
-   * as a space-separated list for compatibility with the 'FileExtension'
-   * constraint.
+   * as a space-separated list for compatibility with file_validate_extensions().
    */
   public static function validateExtensions($element, FormStateInterface $form_state) {
     if (!empty($element['#value'])) {
@@ -350,7 +345,24 @@ class FileItem extends EntityReferenceItem {
    *   element's '#upload_validators' property.
    */
   public function getUploadValidators() {
-    return $this->getFileUploadValidators($this->getSettings());
+    $validators = [];
+    $settings = $this->getSettings();
+
+    // Cap the upload size according to the PHP limit.
+    $max_filesize = Bytes::toNumber(Environment::getUploadMaxSize());
+    if (!empty($settings['max_filesize'])) {
+      $max_filesize = min($max_filesize, Bytes::toNumber($settings['max_filesize']));
+    }
+
+    // There is always a file size limit due to the PHP server limit.
+    $validators['file_validate_size'] = [$max_filesize];
+
+    // Add the extension check if necessary.
+    if (!empty($settings['file_extensions'])) {
+      $validators['file_validate_extensions'] = [$settings['file_extensions']];
+    }
+
+    return $validators;
   }
 
   /**
@@ -379,7 +391,7 @@ class FileItem extends EntityReferenceItem {
     $data = $random->paragraphs(3);
     /** @var \Drupal\file\FileRepositoryInterface $file_repository */
     $file_repository = \Drupal::service('file.repository');
-    $file = $file_repository->writeData($data, $destination, FileExists::Error);
+    $file = $file_repository->writeData($data, $destination, FileSystemInterface::EXISTS_ERROR);
     $values = [
       'target_id' => $file->id(),
       'display' => (int) $settings['display_default'],

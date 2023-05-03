@@ -176,7 +176,7 @@ class FileFieldDisplayTest extends FileFieldTestBase {
     $field_edit = [
       'settings[description_field]' => TRUE,
     ];
-    $this->fieldUIAddNewField('/admin/structure/types/manage/' . $type_name, $field_name, $this->randomString(), $field_type, [], $field_edit);
+    $this->fieldUIAddNewField('/admin/structure/types/manage/' . $type_name, $field_name, $label = $this->randomString(), $field_type, [], $field_edit);
     // Add a node of our new type and upload a file to it.
     $file = current($this->drupalGetTestFiles('text'));
     $title = $this->randomString();
@@ -189,6 +189,16 @@ class FileFieldDisplayTest extends FileFieldTestBase {
     $node = $this->drupalGetNodeByTitle($title);
     $this->drupalGet('node/' . $node->id() . '/edit');
     $this->assertSession()->pageTextContains('The description may be used as the label of the link to the file.');
+
+    // Set the description field as required.
+    $edit = ['settings[description_field_required]' => TRUE];
+    $this->drupalGet("admin/structure/types/manage/{$type_name}/fields/node.{$type_name}.field_{$field_name}");
+    $this->submitForm($edit, 'Save settings');
+    // When resubmitting the form a message should be shown indicating that the
+    // description is now required.
+    $this->drupalGet($node->toUrl('edit-form'));
+    $this->submitForm([], 'Save');
+    $this->assertSession()->pageTextContains("The $label field description is required.");
   }
 
   /**
