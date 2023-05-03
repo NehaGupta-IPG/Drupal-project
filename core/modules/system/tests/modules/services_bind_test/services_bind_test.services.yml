@@ -1,0 +1,39 @@
+parameters:
+  services_bind_test.test_parameter: 'test parameter value'
+services:
+  _defaults:
+    bind:
+      Drupal\services_bind_test\TestInjection: '@services_bind_test.test_injection'
+      Drupal\services_bind_test\TestInjection $testInjectionOther: '@services_bind_test.test_injection.other'
+      string $testContainerParameter: '%services_bind_test.test_parameter%'
+      string $testString: 'test string value'
+      $testValue: 123
+
+  services_bind_test.test_injection:
+    class: Drupal\services_bind_test\TestInjection
+    arguments: [ 'default' ]
+  services_bind_test.test_injection.other:
+    class: Drupal\services_bind_test\TestInjection
+    arguments: [ 'other' ]
+  services_bind_test.test_injection.override:
+    class: Drupal\services_bind_test\TestInjection
+    arguments: [ 'override' ]
+
+  services_bind_test.test_service.bind:
+    class: Drupal\services_bind_test\TestService
+  services_bind_test.test_service.override_arg_0:
+    class: Drupal\services_bind_test\TestService
+    arguments:
+      - '@services_bind_test.test_injection.override'
+  services_bind_test.test_service.override_arg_named:
+    class: Drupal\services_bind_test\TestService
+    arguments:
+      $testInjection: '@services_bind_test.test_injection.override'
+      $testInjectionOther: '@services_bind_test.test_injection.override'
+      $testContainerParameter: 'overridden parameter'
+      $testString: 'overridden string value'
+      $testValue: 456
+  services_bind_test.test_service.override_arg_typed:
+    class: Drupal\services_bind_test\TestService
+    arguments:
+      Drupal\services_bind_test\TestInjection: '@services_bind_test.test_injection.override'
