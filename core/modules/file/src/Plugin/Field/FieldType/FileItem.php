@@ -10,14 +10,11 @@ use Drupal\Core\Field\Attribute\FieldType;
 use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\Core\Field\Plugin\Field\FieldType\EntityReferenceItem;
-use Drupal\Core\File\FileExists;
 use Drupal\Core\File\FileSystemInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\StreamWrapper\StreamWrapperInterface;
-use Drupal\Core\StringTranslation\ByteSizeMarkup;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\TypedData\DataDefinition;
-use Drupal\file\Validation\FileValidatorSettingsTrait;
 
 /**
  * Plugin implementation of the 'file' field type.
@@ -72,7 +69,8 @@ class FileItem extends EntityReferenceItem {
       'file_extensions' => 'txt',
       'file_directory' => '[date:custom:Y]-[date:custom:m]',
       'max_filesize' => '',
-      'description_field' => 0,
+      'description_field' => FALSE,
+      'description_field_required' => FALSE,
     ] + parent::defaultFieldSettings();
   }
 
@@ -221,6 +219,18 @@ class FileItem extends EntityReferenceItem {
       '#default_value' => $settings['description_field'] ?? '',
       '#description' => $this->t('The description field allows users to enter a description about the uploaded file.'),
       '#weight' => 11,
+    ];
+
+    $element['description_field_required'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('Require the <em>Description</em> field'),
+      '#default_value' => $settings['description_field_required'] ?? FALSE,
+      '#weight' => 12,
+      '#states' => [
+        'visible' => [
+          ':input[name="settings[description_field]"]' => ['checked' => TRUE],
+        ],
+      ],
     ];
 
     return $element;
