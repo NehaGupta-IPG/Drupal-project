@@ -151,10 +151,26 @@ class TermTest extends TaxonomyTestBase {
       // Set terms 1-20 to be children of first term created.
       if ($x <= 12) {
         $edit['parent'] = $term1->id();
+        // Specific weight and name for sorting tests.
+        if ($x === 4) {
+          $edit['weight'] = 100;
+          $edit['name'] = $x . '-term-name';
+        }
+        if ($x === 2) {
+          $edit['weight'] = $x - 1;
+          $edit['name'] = '000';
+        }
       }
       $term = $this->createTerm($this->vocabulary, $edit);
       $terms_array[$x] = Term::load($term->id());
     }
+
+    // Test sorting for specific weight and name.
+    $children = $taxonomy_storage->loadChildren($term1->id());
+    $first_children = current($children);
+    $last_children = end($children);
+    $this->assertEquals('000', $first_children->getName());
+    $this->assertEquals('4-term-name', $last_children->getName());
 
     // Get Page 1. Parent term and terms 1-13 are displayed.
     $this->drupalGet('admin/structure/taxonomy/manage/' . $this->vocabulary->id() . '/overview');
