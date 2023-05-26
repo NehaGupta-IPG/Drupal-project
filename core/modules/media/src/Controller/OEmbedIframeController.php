@@ -222,11 +222,11 @@ class OEmbedIframeController implements ContainerInjectionInterface {
       do {
         $message = $e->getMessage();
         $context = [];
-        if ($e->getUrl()) {
+        if (method_exists($e, 'getUrl') && $e->getUrl()) {
           $message .= ' URL: {url}.';
           $context['url'] = $e->getUrl();
         }
-        if ($e->getData()) {
+        if (method_exists($e, 'getData') && $e->getData()) {
           $message .= ' Data:<br><pre>{data}</pre>';
           $context['data'] = var_export($e->getData(), TRUE);
         }
