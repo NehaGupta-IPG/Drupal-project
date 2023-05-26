@@ -135,7 +135,7 @@ class WidgetOEmbedTest extends MediaLibraryTestBase {
     // assertWaitOnAjaxRequest() required for input "id" attributes to
     // consistently match their label's "for" attribute.
     $assert_session->assertWaitOnAjaxRequest();
-    $this->waitForText('Could not retrieve the oEmbed resource.');
+    $this->waitForText('Could not retrieve the oEmbed resource:');
 
     // Select a media item to check if the selection is persisted when adding
     // new items.
@@ -323,7 +323,7 @@ class WidgetOEmbedTest extends MediaLibraryTestBase {
     // assertWaitOnAjaxRequest() required for input "id" attributes to
     // consistently match their label's "for" attribute.
     $assert_session->assertWaitOnAjaxRequest();
-    $this->waitForText('Could not retrieve the oEmbed resource.');
+    $this->waitForText('Could not retrieve the oEmbed resource:');
 
     // Select a media item to check if the selection is persisted when adding
     // new items.
