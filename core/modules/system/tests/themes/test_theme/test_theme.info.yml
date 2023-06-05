@@ -14,6 +14,7 @@ description: 'Theme for testing the theme system'
 version: VERSION
 base theme: starterkit_theme
 logo: images/logo2.svg
+favicon: images/favicon2.svg
 libraries:
   - test_theme/global-styling
 libraries-override:
