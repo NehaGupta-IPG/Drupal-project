@@ -120,4 +120,35 @@ class ThemeSettingsTest extends KernelTestBase {
     $this->assertEquals($expected, \Drupal::service(ThemeSettingsProvider::class)->getSetting('logo.url', 'test_theme'));
   }
 
+  /**
+   * Tests default favicon configuration can be overridden.
+   */
+  public function testFaviconConfig() {
+    // Install stark theme.
+    $this->container->get('theme_installer')->install(['stark']);
+
+    // Get stark theme object.
+    $theme = $this->container->get('theme_handler')->getTheme('stark');
+    $starkConfig = $this->config('stark.settings');
+
+    // Test when the theme has a favicon.ico file.
+    $expected = '/' . $theme->getPath() . '/favicon.ico';
+    $this->assertEquals($expected, theme_get_setting('favicon.url', 'stark'));
+
+    // Test a custom favicon file.
+    $values = [
+      'default_favicon' => FALSE,
+      'favicon_path' => $theme->getPath() . '/custom_favicon.svg',
+    ];
+    theme_settings_convert_to_config($values, $starkConfig)->save();
+    drupal_static_reset('theme_get_setting');
+    $expected = '/' . $theme->getPath() . '/custom_favicon.svg';
+    $this->assertEquals($expected, theme_get_setting('favicon.url', 'stark'));
+
+    // Test when the theme does not have a favicon configured.
+    $this->container->get('theme_installer')->install(['stark']);
+    $expected = '/core/misc/favicon.ico';
+    $this->assertEquals($expected, theme_get_setting('favicon.url', 'stark'));
+  }
+
 }

@@ -27,6 +27,13 @@ class ActiveTheme {
   protected $logo;
 
   /**
+   * The path to the favicon.
+   *
+   * @var string
+   */
+  protected $favicon;
+
+  /**
    * The path to the theme.
    *
    * @var string
@@ -46,7 +53,6 @@ class ActiveTheme {
    * @var string
    */
   protected $owner;
-
 
   /**
    * An array of base theme extension objects keyed by name.
@@ -102,6 +108,7 @@ class ActiveTheme {
       'engine' => 'twig',
       'owner' => 'twig',
       'logo' => '',
+      'favicon' => '',
       'libraries' => [],
       'extension' => 'html.twig',
       'base_theme_extensions' => [],
@@ -112,6 +119,7 @@ class ActiveTheme {
 
     $this->name = $values['name'];
     $this->logo = $values['logo'];
+    $this->favicon = $values['favicon'];
     $this->path = $values['path'];
     $this->engine = $values['engine'];
     $this->owner = $values['owner'];
@@ -208,6 +216,16 @@ class ActiveTheme {
    */
   public function getLogo() {
     return $this->logo;
+  }
+
+  /**
+   * Returns the favicon provided by the theme.
+   *
+   * @return string
+   *   The favicon path.
+   */
+  public function getFavicon() {
+    return $this->favicon;
   }
 
   /**
