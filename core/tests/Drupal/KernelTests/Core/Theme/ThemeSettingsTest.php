@@ -126,14 +126,17 @@ class ThemeSettingsTest extends KernelTestBase {
   public function testFaviconConfig() {
     /** @var \Drupal\Core\Extension\ThemeInstallerInterface $theme_installer */
     $theme_installer = $this->container->get('theme_installer');
-    $theme_installer->install(['stark']);
+    $theme_installer->install(['olivero']);
     /** @var \Drupal\Core\Extension\ThemeHandler $theme_handler */
     $theme_handler = $this->container->get('theme_handler');
-    $theme = $theme_handler->getTheme('stark');
+    $theme = $theme_handler->getTheme('olivero');
 
     // Tests default behavior.
     $expected = '/' . $theme->getPath() . '/favicon.ico';
     $this->assertEquals($expected, theme_get_setting('favicon.url', 'olivero'));
+
+    $theme_installer->install(['stark']);
+    $theme = $theme_handler->getTheme('stark');
 
     $config = $this->config('stark.settings');
 
