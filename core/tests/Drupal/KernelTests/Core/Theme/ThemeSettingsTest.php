@@ -133,7 +133,7 @@ class ThemeSettingsTest extends KernelTestBase {
 
     // Tests default behavior.
     $expected = '/' . $theme->getPath() . '/favicon.ico';
-    $this->assertEquals($expected, theme_get_setting('favicon.url', 'stark'));
+    $this->assertEquals($expected, theme_get_setting('favicon.url', 'olivero'));
 
     $config = $this->config('stark.settings');
 
