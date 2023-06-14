@@ -8,7 +8,7 @@ use Drupal\Core\Database\Query\PagerSelectExtender;
 /**
  * Defines a class to store localized strings in the database.
  */
-class StringDatabaseStorage implements StringStorageInterface {
+class StringDatabaseStorage implements StringStorageInterface, StringContextInterface {
 
   /**
    * The database connection.
@@ -107,6 +107,19 @@ class StringDatabaseStorage implements StringStorageInterface {
    */
   public function countTranslations() {
     return $this->dbExecute("SELECT t.language, COUNT(*) AS translated FROM {locales_source} s INNER JOIN {locales_target} t ON s.lid = t.lid GROUP BY t.language")->fetchAllKeyed();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getContexts(): array {
+    return $this->connection->select('locales_source', 's')
+      ->fields('s', ['context'])
+      ->condition('context', '', '<>')
+      ->distinct()
+      ->orderBy('context')
+      ->execute()
+      ->fetchCol();
   }
 
   /**
@@ -426,6 +439,14 @@ class StringDatabaseStorage implements StringStorageInterface {
       else {
         $query->condition($field_alias, (array) $value, 'IN');
       }
+    }
+
+    // Add context filter.
+    if (isset($options['filters']['context'])) {
+      $context_filter = $this->connection->condition('AND');
+      $query->condition($context_filter);
+      $context_filter->condition($this->dbFieldTable('context') . '.context', $this->connection->escapeLike($options['filters']['context']), 'LIKE');
+      unset($options['filters']['context']);
     }
 
     // Process other options, string filter, query limit, etc.
