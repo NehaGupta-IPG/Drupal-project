@@ -474,13 +474,6 @@ class WidgetOEmbedTest extends MediaLibraryTestBase {
     // Check if the correct error message appears:
     $assert_session->pageTextContains('Could not retrieve the oEmbed resource: Client error: `GET http://web/media_test_oembed/resource?url=' . $youtube404Resource . '` resulted in a `404 Not Found` response: Not Found');
 
-    $page->fillField('Add Type Five via URL', $youtube404Resource);
-    $page->pressButton('Add');
-    // Wait for the button ajax to do its thing:
-    $assert_session->assertWaitOnAjaxRequest();
-    // Check if the correct error message appears:
-    $assert_session->pageTextContains('Could not retrieve the oEmbed resource: Client error: `GET http://web/media_test_oembed/resource?url=' . $youtube404Resource . '` resulted in a `404 Not Found` response: Not Found');
-
     // Get the latest logged watchdog entry and get its id, it should be our
     // oembed error event (Taken from dblog/tests/src/Functional/DbLogTest.php,
     // testLogEventPage()):
