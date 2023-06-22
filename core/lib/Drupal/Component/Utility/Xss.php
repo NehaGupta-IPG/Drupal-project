@@ -66,9 +66,11 @@ class Xss {
     'menu',
     'meter',
     'nav',
+    'noscript',
     'ol',
     'output',
     'p',
+    'picture',
     'pre',
     'progress',
     'q',
@@ -79,6 +81,7 @@ class Xss {
     'samp',
     'section',
     'small',
+    'source',
     'span',
     'strong',
     'sub',
@@ -96,9 +99,9 @@ class Xss {
     'u',
     'ul',
     'var',
+    'video',
     'wbr',
   ];
-
   /**
    * The default list of HTML tags allowed by filter().
    *
