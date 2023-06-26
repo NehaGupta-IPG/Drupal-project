@@ -145,17 +145,22 @@ class TermTest extends TaxonomyTestBase {
     // individual terms.
     for ($x = 1; $x <= 40; $x++) {
       $edit = [];
-      // Set terms in order so we know which terms will be on which pages.
+      // Set terms in order, so we know which terms will be on which pages.
       $edit['weight'] = $x;
 
       // Set terms 1-20 to be children of first term created.
       if ($x <= 12) {
         $edit['parent'] = $term1->id();
-        // Specific weight and name for sorting tests.
+        // Specific weight and name for children sorting tests.
+        // Make the 4th term the last one sorted,
+        // setting the biggest weight.
         if ($x === 4) {
           $edit['weight'] = 100;
           $edit['name'] = $x . '-term-name';
         }
+        // Make the second term first one sorted.
+        // setting the same weight of the first term and
+        // specific name to be sorted out first - '000'.
         if ($x === 2) {
           $edit['weight'] = $x - 1;
           $edit['name'] = '000';
