@@ -9,6 +9,14 @@
   fill-opacity: 1 !important;
 }
 
+/**
+ * Adjust default z-index of "balloon" popups (such as the hyperlink dialog)
+ * to ensure it appears over jQuery UI modals.
+ */
+.ck-body-wrapper {
+  --ck-z-modal: calc(var(--jui-dialog-z-index) + 999);
+}
+
 .ck-editor__main > :is(.ck-editor__editable, .ck-source-editing-area) {
   /* Set the min-height equal to configuration value for the number of rows.
    * The `--ck-min-height` value is set on the parent `.ck-editor` element by
