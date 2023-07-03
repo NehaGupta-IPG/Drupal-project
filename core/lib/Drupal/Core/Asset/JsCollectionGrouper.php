@@ -33,6 +33,21 @@ class JsCollectionGrouper implements AssetCollectionGrouperInterface {
           // Help ensure maximum reuse of aggregate files by only grouping
           // together items that share the same 'group' value.
           $group_keys = $item['preprocess'] ? [$item['type'], $item['group']] : FALSE;
+
+          // Enables aggregation for 'async' or 'defer' attributes.
+          //
+          // @see: https://www.drupal.org/project/drupal/issues/1587536
+          if ($group_keys && !empty($item['attributes'])) {
+            foreach (array_keys($item['attributes']) as $attribute_key) {
+              if (in_array($attribute_key, ['async', 'defer'])) {
+                $group_keys[] = $attribute_key;
+              }
+              else {
+                $group_keys = FALSE;
+              }
+            }
+          }
+
           break;
 
         case 'external':

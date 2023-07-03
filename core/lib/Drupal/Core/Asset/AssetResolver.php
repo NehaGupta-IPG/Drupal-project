@@ -347,8 +347,15 @@ class AssetResolver implements AssetResolverInterface {
           $options['scope'] = in_array($library, $header_js_libraries) ? 'header' : 'footer';
 
           // Preprocess can only be set if caching is enabled and no
-          // attributes are set.
-          $options['preprocess'] = $options['cache'] && empty($options['attributes']) ? $options['preprocess'] : FALSE;
+          // attributes other than 'async' or 'defer' are set.
+          //
+          // @see: https://www.drupal.org/project/drupal/issues/1587536
+          $options['preprocess'] = $options['cache'] && (
+            empty($options['attributes']) ||
+            count(\array_diff_key(
+              $options['attributes'], ['async' => TRUE, 'defer' => TRUE])
+            ) === 0
+          ) ? $options['preprocess'] : FALSE;
 
           // Always add a tiny value to the weight, to conserve the insertion
           // order.
