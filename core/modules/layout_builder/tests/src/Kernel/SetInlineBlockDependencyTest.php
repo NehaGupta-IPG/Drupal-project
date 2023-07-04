@@ -119,7 +119,7 @@ class SetInlineBlockDependencyTest extends KernelTestBase {
       'use editorial transition create_new_draft',
       'use editorial transition publish',
     ]);
-    $this->assertTrue($block->access('view', $account));
+    $this->assertFalse($block->access('view', $account));
     $this->assertTrue($block->access('update', $account));
     $this->assertTrue($block->access('delete', $account));
   }
