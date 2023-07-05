@@ -569,6 +569,12 @@ class XssTest extends TestCase {
         'Time with datetime attribute',
         ['time'],
       ],
+      [
+        '<div a_b="underscore">',
+        '<div a_b="underscore">',
+        'Attribute names with underscore.',
+        ['div'],
+      ],
     ];
   }
 
