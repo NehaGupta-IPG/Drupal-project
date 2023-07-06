@@ -30,12 +30,20 @@ class CurrentThemeConditionTest extends KernelTestBase {
     /** @var \Drupal\Core\Condition\ConditionInterface $condition */
     $condition = $manager->createInstance('current_theme');
     $condition->setConfiguration(['theme' => 'test_theme']);
+    /** @var \Drupal\Core\Condition\ConditionInterface $condition_any */
+    $condition_any = $manager->createInstance('current_theme');
+    $condition_any->setConfiguration(['theme' => '']);
     /** @var \Drupal\Core\Condition\ConditionInterface $condition_negated */
     $condition_negated = $manager->createInstance('current_theme');
     $condition_negated->setConfiguration(['theme' => 'test_theme', 'negate' => TRUE]);
+    /** @var \Drupal\Core\Condition\ConditionInterface $condition_any_negated */
+    $condition_any_negated = $manager->createInstance('current_theme');
+    $condition_any_negated->setConfiguration(['theme' => '', 'negate' => TRUE]);
 
-    $this->assertEquals('The current theme is test_theme', $condition->summary());
-    $this->assertEquals('The current theme is not test_theme', $condition_negated->summary());
+    $this->assertEquals(new FormattableMarkup('The current theme is @theme.', ['@theme' => 'test_theme']), $condition->summary());
+    $this->assertEquals(new FormattableMarkup('The current theme is one of the enabled themes.', ['@theme' => '']), $condition_any->summary());
+    $this->assertEquals(new FormattableMarkup('The current theme is not @theme.', ['@theme' => 'test_theme']), $condition_negated->summary());
+    $this->assertEquals(new FormattableMarkup('The current theme is not one of the enabled themes.', ['@theme' => '']), $condition_any_negated->summary());
 
     // The expected theme has not been set up yet.
     $this->assertFalse($condition->execute());

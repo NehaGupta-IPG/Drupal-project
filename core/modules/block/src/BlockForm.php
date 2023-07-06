@@ -232,10 +232,7 @@ class BlockForm extends EntityForm {
     $visibility = $this->entity->getVisibility();
     $definitions = $this->manager->getFilteredDefinitions('block_ui', $form_state->getTemporaryValue('gathered_contexts'), ['block' => $this->entity]);
     foreach ($definitions as $condition_id => $definition) {
-      // Don't display the current theme condition.
-      if ($condition_id == 'current_theme') {
-        continue;
-      }
+
       // Don't display the language condition until we have multiple languages.
       if ($condition_id == 'language' && !$this->language->isMultilingual()) {
         continue;

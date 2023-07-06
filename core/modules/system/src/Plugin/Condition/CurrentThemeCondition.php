@@ -71,6 +71,7 @@ class CurrentThemeCondition extends ConditionPluginBase implements ContainerFact
       '#options' => array_map(function ($theme_info) {
         return $theme_info->info['name'];
       }, $this->themeHandler->listInfo()),
+      '#empty_option' => $this->t('- Any -'),
     ];
     return parent::buildConfigurationForm($form, $form_state);
   }
@@ -98,11 +99,18 @@ class CurrentThemeCondition extends ConditionPluginBase implements ContainerFact
    * {@inheritdoc}
    */
   public function summary() {
-    if ($this->isNegated()) {
-      return $this->t('The current theme is not @theme', ['@theme' => $this->configuration['theme']]);
+    $theme = $this->configuration['theme'];
+
+    if ($theme) {
+      $summary = $this->isNegated() ?
+        $this->t('The current theme is not @theme.', ['@theme' => $theme]) : $this->t('The current theme is @theme.', ['@theme' => $theme]);
+    }
+    else {
+      $summary = $this->isNegated() ?
+        $this->t('The current theme is not one of the enabled themes.') : $this->t('The current theme is one of the enabled themes.');
     }
 
-    return $this->t('The current theme is @theme', ['@theme' => $this->configuration['theme']]);
+    return $summary;
   }
 
   /**
