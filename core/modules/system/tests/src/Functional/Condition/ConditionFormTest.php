@@ -52,7 +52,7 @@ class ConditionFormTest extends BrowserTestBase {
     $this->assertSession()->pageTextContains('Bundle: article');
     $this->assertSession()->pageTextContains('Executed successfully.');
 
-    $this->assertSession()->pageTextContains('The current theme is stark');
+    $this->assertSession()->pageTextContains('The current theme is one of the enabled themes.');
     /** @var \Drupal\Core\Extension\ThemeInstallerInterface $theme_installer */
     $theme_installer = $this->container->get('theme_installer');
     $theme_installer->install(['olivero']);
