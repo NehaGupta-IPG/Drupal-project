@@ -40,7 +40,7 @@ export default defineConfig(defaultConfig, {
     'no-jquery/no-map': 'error',
     'no-jquery/no-merge': 'error',
     'no-jquery/no-param': 'error',
-    'no-jquery/no-parent': 'off',
+    'no-jquery/no-parent': 'error',
     'no-jquery/no-parents': 'off',
     'no-jquery/no-parse-html': 'error',
     'no-jquery/no-prop': 'off',

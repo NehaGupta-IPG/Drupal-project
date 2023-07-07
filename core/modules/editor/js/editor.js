@@ -169,7 +169,7 @@
         // as per http://stackoverflow.com/a/5438771.
         closeOnEscape: false,
         create() {
-          $(this).parent().find('.ui-dialog-titlebar-close').remove();
+          $(this.parentElement).find('.ui-dialog-titlebar-close').remove();
         },
         beforeClose: false,
         close(event) {

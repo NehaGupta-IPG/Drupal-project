@@ -59,16 +59,19 @@
           .toggleClass('active')
           .closest('.js-media-library-widget')
           .find('.js-media-library-item-weight')
-          .parent()
-          .toggle();
+          .each(function () {
+            $(this.parentElement).toggle();
+          });
       });
       mediaLibraryToggle.forEach((item) => {
         item.textContent = strings.show;
       });
 
-      $(once('media-library-toggle', '.js-media-library-item-weight', context))
-        .parent()
-        .hide();
+      $(
+        once('media-library-toggle', '.js-media-library-item-weight', context),
+      ).each(function () {
+        $(this.parentElement).hide();
+      });
     },
   };
 

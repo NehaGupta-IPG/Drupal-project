@@ -44,7 +44,7 @@
          *   The label of the block.
          */
         function toggleBlockEntry(index, label) {
-          const $row = $(label).parent().parent();
+          const $row = $(label.parentElement.parentElement);
           const textMatch = label.textContent.toLowerCase().includes(query);
           $row.toggle(textMatch);
         }
@@ -61,7 +61,7 @@
           );
         } else {
           $filterRows.each(function (index) {
-            $(this).parent().parent().show();
+            $(this.parentElement.parentElement).show();
           });
         }
       }
