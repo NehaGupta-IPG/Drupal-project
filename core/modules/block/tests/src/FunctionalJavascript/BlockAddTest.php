@@ -40,12 +40,6 @@ class BlockAddTest extends WebDriverTestBase {
 
     $this->drupalGet('admin/structure/block/add/system_powered_by_block');
     $assert_session = $this->assertSession();
-
-    // Click on Pages condition because, current theme
-    // have the same "Theme" label.
-    $assert_session->linkExists('Pages');
-    $this->clickLink('Pages');
-
     // Pick a theme with a region that does not exist in another theme.
     $assert_session->selectExists('Theme')->selectOption('claro');
     $assert_session->assertWaitOnAjaxRequest();
