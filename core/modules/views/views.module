@@ -514,3 +514,47 @@ function views_entity_field_label($entity_type, $field_name) {
   @trigger_error("views_entity_field_label() is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Use \Drupal::service('entity_field.manager')->getFieldLabels(). See https://www.drupal.org/node/3489411", E_USER_DEPRECATED);
   return \Drupal::service('entity_field.manager')->getFieldLabels($entity_type, $field_name);
 }
+
+/**
+ * Implements hook_ENTITY_TYPE_update().
+ */
+function views_view_update(EntityInterface $entity) {
+  // Clear the views block config cache.
+  $views_block_config_store = \Drupal::keyValue('views_block_overrides');
+  if ($views_block_config_store->has($entity->id())) {
+    $views_block_config_store->delete($entity->id());
+  }
+}
+
+/**
+ * Implements hook_ENTITY_TYPE_update().
+ */
+function views_view_delete(EntityInterface $entity) {
+  views_view_update($entity);
+}
+
+/**
+ * Implements hook_ENTITY_TYPE_update().
+ */
+function views_block_update(EntityInterface $entity) {
+  // Clear the views block config cache.
+  $plugin_id = $entity->getPluginId();
+  if (str_starts_with($plugin_id, 'views_block:')) {
+    // Extract view id from plugin id.
+    $view_id = explode('-', substr($plugin_id, 12))[0] ?? NULL;
+    if (!empty($view_id)) {
+      // Clear the views block config cache.
+      $views_block_config_store = \Drupal::keyValue('views_block_overrides');
+      if ($views_block_config_store->has($view_id)) {
+        $views_block_config_store->delete($view_id);
+      }
+    }
+  }
+}
+
+/**
+ * Implements hook_ENTITY_TYPE_delete().
+ */
+function views_block_delete(EntityInterface $entity) {
+  views_block_update($entity);
+}
