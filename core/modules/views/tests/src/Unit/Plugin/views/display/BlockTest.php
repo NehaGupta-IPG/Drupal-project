@@ -64,7 +64,7 @@ class BlockTest extends UnitTestCase {
 
     $key_value = $this->getMockBuilder('Drupal\Core\KeyValueStore\DatabaseStorage')
       ->disableOriginalConstructor()
-      ->onlyMethods(['has', 'set'])
+      ->onlyMethods(['has', 'set', 'getMultiple'])
       ->getMock();
     $key_value->expects($this->any())
       ->method('has')
@@ -72,6 +72,10 @@ class BlockTest extends UnitTestCase {
     $key_value->expects($this->any())
       ->method('set')
       ->will($this->returnValue(NULL));
+    $key_value->expects($this->any())
+      ->method('getMultiple')
+      ->will($this->returnValue(NULL));
+
     $key_value_factory = $this->getMockBuilder('Drupal\Core\KeyValueStore\KeyValueDatabaseFactory')
       ->disableOriginalConstructor()
       ->onlyMethods(['get'])
