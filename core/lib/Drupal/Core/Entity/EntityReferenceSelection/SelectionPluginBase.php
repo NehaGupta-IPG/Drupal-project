@@ -51,4 +51,58 @@ abstract class SelectionPluginBase extends ConfigurablePluginBase implements Sel
    */
   public function entityQueryAlter(SelectInterface $query) {}
 
+  /**
+   * Build the form elements for selection plugins with autocreate support.
+   *
+   * @param array $form
+   *   An associative array containing the initial structure of the plugin form.
+   * @param array $bundles
+   *   An array of bundles to store new items in.
+   *
+   * @return array
+   *   The form structure.
+   */
+  protected function buildAutocreateConfigurationForm(array $form, array $bundles) {
+    $form['auto_create'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t("Create referenced entities if they don't already exist"),
+      '#default_value' => $this->configuration['auto_create'],
+      '#weight' => -2,
+    ];
+    $form['auto_create_bundle'] = [
+      '#type' => 'select',
+      '#title' => $this->t('Store new items in'),
+      '#options' => $this->getBundleOptions($bundles),
+      '#default_value' => $this->configuration['auto_create_bundle'],
+      '#access' => count($bundles) > 1,
+      '#states' => [
+        'visible' => [
+          ':input[name="settings[handler_settings][auto_create]"]' => ['checked' => TRUE],
+        ],
+      ],
+      '#weight' => -1,
+    ];
+    return $form;
+  }
+
+  /**
+   * Transforms bundles in the correct structure for a select element.
+   *
+   * @param array $bundles
+   *   An array of bundles in the structure of
+   *   Drupal\Core\Entity\EntityTypeBundleInfoInterface::getBundleInfo().
+   *
+   * @return array
+   *   An array of bundle labels keyed be the bundle name.
+   */
+  protected function getBundleOptions(array $bundles) {
+    $bundle_options = [];
+    foreach ($bundles as $bundle_name => $bundle_info) {
+      $bundle_options[$bundle_name] = $bundle_info['label'];
+    }
+    natsort($bundle_options);
+
+    return $bundle_options;
+  }
+
 }

@@ -167,6 +167,11 @@ class EntityReferenceAutocompleteWidget extends WidgetBase {
   protected function getAutocreateBundle() {
     $bundle = NULL;
     if ($this->getSelectionHandlerSetting('auto_create')) {
+      // If a bundle is explicitly defined, use it.
+      if ($bundle = $this->getSelectionHandlerSetting('auto_create_bundle')) {
+        return $bundle;
+      }
+
       $target_bundles = $this->getSelectionHandlerSetting('target_bundles');
       // If there's no target bundle at all, use the target_type. It's the
       // default for bundleless entity types.
@@ -177,9 +182,7 @@ class EntityReferenceAutocompleteWidget extends WidgetBase {
       elseif (count($target_bundles) == 1) {
         $bundle = reset($target_bundles);
       }
-      // If there's more than one target bundle, use the autocreate bundle
-      // stored in selection handler settings.
-      elseif (!$bundle = $this->getSelectionHandlerSetting('auto_create_bundle')) {
+      else {
         // If no bundle has been set as auto create target means that there is
         // an inconsistency in entity reference field settings.
         trigger_error(sprintf(

@@ -9,6 +9,7 @@ use Drupal\Component\Utility\Crypt;
 use Drupal\Component\Utility\Html;
 use Drupal\Core\Site\Settings;
 use Drupal\entity_test\EntityTestHelper;
+use Drupal\entity_test\Entity\EntityTest;
 use Drupal\Tests\BrowserTestBase;
 use Drupal\Tests\field\Traits\EntityReferenceFieldCreationTrait;
 use Drupal\views\Views;
@@ -32,6 +33,7 @@ class SelectionTest extends BrowserTestBase {
     'views',
     'entity_reference_test',
     'entity_test',
+    'views_entity_test',
   ];
 
   /**
@@ -76,20 +78,20 @@ class SelectionTest extends BrowserTestBase {
     EntityTestHelper::createBundle('test_bundle');
 
     // Create an entity reference field.
-    $handler_settings = [
+    $this->handlerSettings = [
       'view' => [
         'view_name' => 'test_entity_reference',
         'display_name' => 'entity_reference_1',
       ],
     ];
-    $this->handlerSettings = $handler_settings;
-    $this->createEntityReferenceField('entity_test', 'test_bundle', 'test_field', $this->randomString(), 'node', 'views', $handler_settings);
   }
 
   /**
    * Tests that the Views selection handles the views output properly.
    */
   public function testAutocompleteOutput(): void {
+    $this->createEntityReferenceField('entity_test', 'test_bundle', 'test_field', $this->randomString(), 'node', 'views', $this->handlerSettings);
+
     // Reset any internal static caching.
     \Drupal::service('entity_type.manager')->getStorage('node')->resetCache();
 
@@ -128,6 +130,59 @@ class SelectionTest extends BrowserTestBase {
       ],
     ];
     $this->assertEquals($expected, $result, 'The autocomplete result of the Views entity reference selection handler contains the proper output.');
+  }
+
+  /**
+   * Tests autocreation in a views selection plugin.
+   */
+  public function testAutocompleteAutocreation() {
+    $type3 = $this->drupalCreateContentType()->id();
+
+    $account = $this->drupalCreateUser([
+      'access content',
+      'administer entity_test content',
+      "administer nodes",
+    ]);
+    $this->drupalLogin($account);
+
+    $this->handlerSettings['auto_create'] = TRUE;
+    $this->handlerSettings['auto_create_bundle'] = $type3;
+    $this->createEntityReferenceField('entity_test', 'entity_test', 'test_field', $this->randomString(), 'node', 'views_with_autocreate', $this->handlerSettings);
+
+    /** @var \Drupal\Core\Entity\EntityDisplayRepositoryInterface $entity_display_repository */
+    $entity_display_repository = \Drupal::service('entity_display.repository');
+    $entity_display_repository->getFormDisplay('entity_test', 'entity_test', 'default')
+      ->setComponent('test_field', [
+        'type' => 'entity_reference_autocomplete',
+      ])
+      ->save();
+
+    $this->drupalGet('/entity_test/add');
+
+    $this->assertSession()->elementExists('xpath', '//input[@id="edit-test-field-0-target-id" and contains(@class, "form-autocomplete")]');
+
+    $new_title = $this->randomMachineName();
+
+    // Assert referenced node does not exist.
+    $this->assertEmpty($this->drupalGetNodeByTitle($new_title), 'Referenced node does not exist yet.');
+
+    $edit = [
+      'name[0][value]' => $this->randomMachineName(),
+      'test_field[0][target_id]' => $new_title,
+    ];
+    $this->drupalPostForm("/entity_test/add", $edit, 'Save');
+
+    // Assert referenced node was created.
+    $referenced_node = $this->drupalGetNodeByTitle($new_title);
+    $this->assertNotEmpty($referenced_node, 'Referenced node was created.');
+    $this->assertSame($type3, $referenced_node->getType());
+
+    // Assert the referenced node is associated with referencing node.
+    $result = \Drupal::entityQuery('entity_test')->execute();
+
+    $referencing_nid = key($result);
+    $referencing_node = EntityTest::load($referencing_nid);
+    $this->assertEquals($referenced_node->id(), $referencing_node->test_field->target_id, 'Newly created node is referenced from the referencing node.');
   }
 
 }

@@ -20,3 +20,19 @@ entity_reference_selection.views:
           sequence:
             type: string
             label: 'Argument'
+
+entity_reference_selection.views_with_autocreate:
+  type: entity_reference_selection.views
+  label: 'Views selection handler settings'
+  mapping:
+    auto_create:
+      type: boolean
+      label: 'Create referenced entities if they don''t already exist'
+    auto_create_bundle:
+      type: string
+      label: 'Bundle assigned to the auto-created entities.'
+
+# Schema for all entity reference 'views_with_autocreate:*' selection handlers that are not
+# providing a specific schema.
+entity_reference_selection.views_with_autocreate:*:
+  type: entity_reference_selection.views_with_autocreate

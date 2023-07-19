@@ -156,20 +156,11 @@ class DefaultSelection extends SelectionPluginBase implements ContainerFactoryPl
     $selected_bundles = [];
 
     if ($entity_type->hasKey('bundle')) {
-      $bundle_options = [];
-      foreach ($bundles as $bundle_name => $bundle_info) {
-        $bundle_options[$bundle_name] = $bundle_info['label'];
-      }
-      natsort($bundle_options);
-      $selected_bundles = array_intersect_key(
-        $bundle_options,
-        array_filter((array) $configuration['target_bundles'])
-      );
 
       $form['target_bundles'] = [
         '#type' => 'checkboxes',
         '#title' => $entity_type->getBundleLabel(),
-        '#options' => $bundle_options,
+        '#options' => $this->getBundleOptions($bundles),
         '#default_value' => (array) $configuration['target_bundles'],
         '#required' => TRUE,
         '#size' => 6,
@@ -201,6 +192,7 @@ class DefaultSelection extends SelectionPluginBase implements ContainerFactoryPl
     }
     $form['target_bundles']['#element_validate'][] = [static::class, 'validateTargetBundles'];
 
+    $selected_bundles = array_intersect_key($this->getBundleOptions($bundles), array_filter((array) $configuration['target_bundles']));
     if ($entity_type->entityClassImplements(FieldableEntityInterface::class)) {
       $options = $entity_type->hasKey('bundle') ? $selected_bundles : $bundles;
       $fields = [];
@@ -282,29 +274,8 @@ class DefaultSelection extends SelectionPluginBase implements ContainerFactoryPl
       }
 
     }
-
-    $form['auto_create'] = [
-      '#type' => 'checkbox',
-      '#title' => $this->t("Create referenced entities if they don't already exist"),
-      '#default_value' => $configuration['auto_create'],
-      '#weight' => -2,
-    ];
-
-    if ($entity_type->hasKey('bundle')) {
-      $form['auto_create_bundle'] = [
-        '#type' => 'select',
-        '#title' => $this->t('Store new items in'),
-        '#options' => $selected_bundles,
-        '#default_value' => $configuration['auto_create_bundle'],
-        '#access' => count($selected_bundles) > 1,
-        '#states' => [
-          'visible' => [
-            ':input[name="settings[handler_settings][auto_create]"]' => ['checked' => TRUE],
-          ],
-        ],
-        '#weight' => -1,
-      ];
-    }
+    $bundles = array_intersect_key($bundles, array_filter((array) $configuration['target_bundles']));
+    $form = $this->buildAutocreateConfigurationForm($form, $bundles);
 
     return $form;
   }
