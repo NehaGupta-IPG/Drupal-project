@@ -115,9 +115,18 @@ class Block extends DisplayPluginBase {
 
     $this->entityTypeManager = $entity_type_manager;
     $this->blockManager = $block_manager;
-    $this->keyValue = $key_value ?: \Drupal::service('keyvalue');
-    $this->contextRepository = $context_repository ?: \Drupal::service('context.repository');
-    $this->contextHandler = $context_handler ?: \Drupal::service('context.handler');
+    if (!isset($key_value)) {
+      @trigger_error('Calling ' . __METHOD__ . '() without the $key_value argument is deprecated in drupal:10.2.0 and will be required in drupal:11.0.0', E_USER_DEPRECATED);
+      $this->keyValue = \Drupal::service('keyvalue');
+    }
+    if (!isset($context_repository)) {
+      @trigger_error('Calling ' . __METHOD__ . '() without the $context_repository argument is deprecated in drupal:10.2.0 and will be required in drupal:11.0.0', E_USER_DEPRECATED);
+      $this->contextRepository = \Drupal::service('context.repository');
+    }
+    if (!isset($context_handler)) {
+      @trigger_error('Calling ' . __METHOD__ . '() without the $context_handler argument is deprecated in drupal:10.2.0 and will be required in drupal:11.0.0', E_USER_DEPRECATED);
+      $this->contextHandler = \Drupal::service('context.handler');
+    }
   }
 
   /**
