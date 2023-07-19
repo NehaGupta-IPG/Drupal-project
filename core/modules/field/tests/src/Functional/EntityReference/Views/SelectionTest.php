@@ -170,7 +170,8 @@ class SelectionTest extends BrowserTestBase {
       'name[0][value]' => $this->randomMachineName(),
       'test_field[0][target_id]' => $new_title,
     ];
-    $this->drupalPostForm("/entity_test/add", $edit, 'Save');
+    $this->drupalGet('/entity_test/add');
+    $this->submitForm($edit, 'Save');
 
     // Assert referenced node was created.
     $referenced_node = $this->drupalGetNodeByTitle($new_title);
