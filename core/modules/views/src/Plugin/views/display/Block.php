@@ -117,16 +117,19 @@ class Block extends DisplayPluginBase {
     $this->blockManager = $block_manager;
     if (!isset($key_value)) {
       @trigger_error('Calling ' . __METHOD__ . '() without the $key_value argument is deprecated in drupal:10.2.0 and will be required in drupal:11.0.0', E_USER_DEPRECATED);
-      $this->keyValue = \Drupal::service('keyvalue');
+      $key_value = \Drupal::service('keyvalue');
     }
+    $this->keyValue = $key_value;
     if (!isset($context_repository)) {
       @trigger_error('Calling ' . __METHOD__ . '() without the $context_repository argument is deprecated in drupal:10.2.0 and will be required in drupal:11.0.0', E_USER_DEPRECATED);
-      $this->contextRepository = \Drupal::service('context.repository');
+      $context_repository = \Drupal::service('context.repository');
     }
+    $this->contextRepository = $context_repository;
     if (!isset($context_handler)) {
       @trigger_error('Calling ' . __METHOD__ . '() without the $context_handler argument is deprecated in drupal:10.2.0 and will be required in drupal:11.0.0', E_USER_DEPRECATED);
-      $this->contextHandler = \Drupal::service('context.handler');
+      $context_handler = \Drupal::service('context.handler');
     }
+    $this->contextHandler = $context_handler;
   }
 
   /**
