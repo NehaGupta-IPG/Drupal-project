@@ -179,7 +179,9 @@ class SelectionTest extends BrowserTestBase {
     $this->assertSame($type3, $referenced_node->getType());
 
     // Assert the referenced node is associated with referencing node.
-    $result = \Drupal::entityQuery('entity_test')->execute();
+    $result = \Drupal::entityQuery('entity_test')
+      ->accessCheck(TRUE)
+      ->execute();
 
     $referencing_nid = key($result);
     $referencing_node = EntityTest::load($referencing_nid);
