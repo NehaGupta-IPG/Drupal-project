@@ -36,8 +36,11 @@ use Drupal\Core\Queue\QueueFactoryInterface;
 use Drupal\Core\Site\Settings;
 use Psr\Log\LoggerAwareInterface;
 use Symfony\Component\Console\DependencyInjection\AddConsoleCommandPass;
+use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\DependencyInjection\Compiler\RemoveBuildParametersPass;
+use Symfony\Component\DependencyInjection\Exception\LogicException;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\EventDispatcher\DependencyInjection\RegisterListenersPass;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
@@ -127,6 +130,21 @@ class CoreServiceProvider implements ServiceProviderInterface, ServiceModifierIn
 
     $container->registerForAutoconfiguration(EventSubscriberInterface::class)
       ->addTag('event_subscriber');
+
+    $container->registerAttributeForAutoconfiguration(AsEventListener::class, static function (
+      ChildDefinition $definition,
+      AsEventListener $attribute,
+      \ReflectionClass|\ReflectionMethod $reflector,
+    ) {
+      $tagAttributes = get_object_vars($attribute);
+      if ($reflector instanceof \ReflectionMethod) {
+        if (isset($tagAttributes['method'])) {
+          throw new LogicException(sprintf('AsEventListener attribute cannot declare a method on "%s::%s()".', $reflector->class, $reflector->name));
+        }
+        $tagAttributes['method'] = $reflector->getName();
+      }
+      $definition->addTag('kernel.event_listener', $tagAttributes);
+    });
 
     $container->registerForAutoconfiguration(LoggerAwareInterface::class)
       ->addTag('logger_aware');
