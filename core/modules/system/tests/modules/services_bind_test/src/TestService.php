@@ -10,21 +10,11 @@ namespace Drupal\services_bind_test;
 class TestService {
 
   public function __construct(
-    private readonly TestInjection $testInjection,
-    private readonly TestInjection $testInjectionOther,
-    private readonly string $testContainerParameter,
-    private readonly string $testString,
-    private readonly int $testValue,
+    public readonly TestInjection $testInjection,
+    public readonly TestInjection $testInjectionOther,
+    public readonly string $testContainerParameter,
+    public readonly string $testString,
+    public readonly int $testValue,
   ) {}
-
-  public function export(): array {
-    return [
-      $this->testInjection->id,
-      $this->testInjectionOther->id,
-      $this->testContainerParameter,
-      $this->testString,
-      $this->testValue,
-    ];
-  }
 
 }

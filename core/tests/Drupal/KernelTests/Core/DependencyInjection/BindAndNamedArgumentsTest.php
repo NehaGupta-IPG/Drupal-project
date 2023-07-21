@@ -3,7 +3,6 @@
 namespace Drupal\KernelTests\Core\DependencyInjection;
 
 use Drupal\KernelTests\KernelTestBase;
-use Drupal\services_bind_test\TestService;
 
 /**
  * Tests autoconfiguration of services.
@@ -30,8 +29,16 @@ class BindAndNamedArgumentsTest extends KernelTestBase {
       catch (\Throwable $e) {
         throw new \Exception("Failed to get service '$name'.", 0, $e);
       }
-      $this->assertInstanceOf(TestService::class, $service);
-      $actual[$name] = $service->export();
+      $actual[$name] = array_map(
+        static function ($value) {
+          if (is_object($value)) {
+            $vars = get_object_vars($value);
+            return reset($vars);
+          }
+          return $value;
+        },
+        array_values(get_object_vars($service)),
+      );
     }
     $expected = [
       'services_bind_test.test_service.bind' => [
