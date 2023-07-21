@@ -434,15 +434,24 @@ class YamlFileLoader
             $definition->setAutowired($service['autowire']);
         }
 
-        if (isset($defaults['bind'])) {
-            // This is a simplified copy of the respective section in symfony.
-            // In symfony. the 'bind' key can be in '_defaults' or on a specific
-            // service definition.
-            // In Drupal, for now, the 'bind' key is only supported in
-            // '_defaults'.
+        if (isset($defaults['bind']) || isset($service['bind'])) {
             // Deep clone, to avoid multiple process of the same instance in the passes
             $bindings = $definition->getBindings();
-            $bindings += unserialize(serialize($defaults['bind']));
+            $bindings += isset($defaults['bind']) ? unserialize(serialize($defaults['bind'])) : [];
+
+            if (isset($service['bind'])) {
+                if (!\is_array($service['bind'])) {
+                    throw new InvalidArgumentException(sprintf('Parameter "bind" must be an array for service "%s" in "%s". Check your YAML syntax.', $id, $file));
+                }
+
+                $bindings = array_merge($bindings, $this->resolveServices($service['bind']));
+                $bindingType = BoundArgument::SERVICE_BINDING;
+                foreach ($bindings as $argument => $value) {
+                    if (!$value instanceof BoundArgument) {
+                        $bindings[$argument] = new BoundArgument($value, true, $bindingType, $file);
+                    }
+                }
+            }
 
             $definition->setBindings($bindings);
         }

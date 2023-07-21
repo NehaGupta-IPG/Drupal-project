@@ -37,3 +37,17 @@ services:
     class: Drupal\services_bind_test\TestService
     arguments:
       Drupal\services_bind_test\TestInjection: '@services_bind_test.test_injection.override'
+  services_bind_test.test_service.service_bind:
+    class: Drupal\services_bind_test\TestService
+    bind:
+      Drupal\services_bind_test\TestInjection: '@services_bind_test.test_injection.override'
+      Drupal\services_bind_test\TestInjection $testInjectionOther: '@services_bind_test.test_injection.override'
+      string $testContainerParameter: 'service-bound value replacing the parameter'
+      string $testString: 'service-bound string value'
+      $testValue: 999
+  services_bind_test.test_service.service_bind_and_args:
+    class: Drupal\services_bind_test\TestService
+    bind:
+      Drupal\services_bind_test\TestInjection: '@services_bind_test.test_injection.override'
+    arguments:
+      $testString: 'overridden string value'

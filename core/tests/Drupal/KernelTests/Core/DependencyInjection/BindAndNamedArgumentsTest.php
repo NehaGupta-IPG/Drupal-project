@@ -62,6 +62,20 @@ class BindAndNamedArgumentsTest extends KernelTestBase {
         'test string value',
         123,
       ],
+      'services_bind_test.test_service.service_bind' => [
+        'override',
+        'override',
+        'service-bound value replacing the parameter',
+        'service-bound string value',
+        999,
+      ],
+      'services_bind_test.test_service.service_bind_and_args' => [
+        'override',
+        'other',
+        'test parameter value',
+        'overridden string value',
+        123,
+      ],
     ];
     $this->assertSame($expected, $actual);
   }
