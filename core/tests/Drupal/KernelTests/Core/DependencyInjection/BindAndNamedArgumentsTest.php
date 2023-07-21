@@ -83,6 +83,16 @@ class BindAndNamedArgumentsTest extends KernelTestBase {
         'overridden string value',
         123,
       ],
+      'services_bind_test.test_service.autowire' => [
+        'autowire',
+        'autowire 1',
+        'autowire attr',
+      ],
+      'services_bind_test.test_service.autowire_and_bind' => [
+        'autowire',
+        'override autowire',
+        'override autowire',
+      ],
     ];
     $this->assertSame($expected, $actual);
   }

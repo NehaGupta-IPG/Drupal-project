@@ -18,6 +18,18 @@ services:
   services_bind_test.test_injection.override:
     class: Drupal\services_bind_test\TestInjection
     arguments: [ 'override' ]
+  Drupal\services_bind_test\TestInjectionAutowire $testInjectionAutowire:
+    class: Drupal\services_bind_test\TestInjectionAutowire
+    arguments: [ 'autowire' ]
+  Drupal\services_bind_test\TestInjectionAutowire $testInjectionAutowire1:
+    class: Drupal\services_bind_test\TestInjectionAutowire
+    arguments: [ 'autowire 1' ]
+  services_bind_test.test_injection_autowire.override:
+    class: Drupal\services_bind_test\TestInjectionAutowire
+    arguments: [ 'override autowire' ]
+  services_bind_test.test_injection_autowire.attr:
+    class: Drupal\services_bind_test\TestInjectionAutowire
+    arguments: [ 'autowire attr' ]
 
   services_bind_test.test_service.bind:
     class: Drupal\services_bind_test\TestService
@@ -51,3 +63,12 @@ services:
       Drupal\services_bind_test\TestInjection: '@services_bind_test.test_injection.override'
     arguments:
       $testString: 'overridden string value'
+  services_bind_test.test_service.autowire:
+    class: Drupal\services_bind_test\TestServiceWithAutowire
+    autowire: true
+  services_bind_test.test_service.autowire_and_bind:
+    class: Drupal\services_bind_test\TestServiceWithAutowire
+    autowire: true
+    bind:
+      $testInjectionAutowire1: '@services_bind_test.test_injection_autowire.override'
+      $testInjectionAutowireAttr: '@services_bind_test.test_injection_autowire.override'
