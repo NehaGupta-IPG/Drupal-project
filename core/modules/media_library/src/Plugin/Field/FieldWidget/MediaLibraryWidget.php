@@ -22,6 +22,7 @@ use Drupal\Core\Security\TrustedCallbackInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Url;
+use Drupal\Core\Utility\LinkGeneratorInterface;
 use Drupal\field_ui\FieldUI;
 use Drupal\media\Entity\Media;
 use Drupal\media_library\MediaLibraryState;
@@ -66,6 +67,11 @@ class MediaLibraryWidget extends WidgetBase implements TrustedCallbackInterface 
   protected $moduleHandler;
 
   /**
+   * The link generator.
+   */
+  protected LinkGeneratorInterface $linkGenerator;
+
+  /**
    * Constructs a MediaLibraryWidget widget.
    *
    * @param string $plugin_id
@@ -84,12 +90,19 @@ class MediaLibraryWidget extends WidgetBase implements TrustedCallbackInterface 
    *   The current active user.
    * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
    *   The module handler.
+   * @param \Drupal\Core\Utility\LinkGeneratorInterface $link_generator
+   *   The link generator service.
    */
-  public function __construct($plugin_id, $plugin_definition, FieldDefinitionInterface $field_definition, array $settings, array $third_party_settings, EntityTypeManagerInterface $entity_type_manager, AccountInterface $current_user, ModuleHandlerInterface $module_handler) {
+  public function __construct($plugin_id, $plugin_definition, FieldDefinitionInterface $field_definition, array $settings, array $third_party_settings, EntityTypeManagerInterface $entity_type_manager, AccountInterface $current_user, ModuleHandlerInterface $module_handler, LinkGeneratorInterface $link_generator = NULL) {
     parent::__construct($plugin_id, $plugin_definition, $field_definition, $settings, $third_party_settings);
     $this->entityTypeManager = $entity_type_manager;
     $this->currentUser = $current_user;
     $this->moduleHandler = $module_handler;
+    if ($link_generator === NULL) {
+      @trigger_error('Calling ' . __METHOD__ . ' without the $link_generator argument is deprecated in drupal:10.1.0 and it will be required in drupal:11.0.0. See https://www.drupal.org/node/3337223', E_USER_DEPRECATED);
+      $link_generator = \Drupal::service('link_generator');
+    }
+    $this->linkGenerator = $link_generator;
   }
 
   /**
@@ -104,7 +117,8 @@ class MediaLibraryWidget extends WidgetBase implements TrustedCallbackInterface 
       $configuration['third_party_settings'],
       $container->get('entity_type.manager'),
       $container->get('current_user'),
-      $container->get('module_handler')
+      $container->get('module_handler'),
+      $container->get('link_generator')
     );
   }
 
@@ -361,19 +375,15 @@ class MediaLibraryWidget extends WidgetBase implements TrustedCallbackInterface 
       ];
     }
     else {
-      // @todo Use a <button> link here.
       $multiple_items = count($referenced_entities) > 1;
-      $element['#field_prefix']['weight_toggle'] = [
-        '#type' => 'html_tag',
-        '#tag' => 'button',
-        '#value' => $this->t('Show media item weights'),
-        '#access' => $multiple_items,
-        '#attributes' => [
-          'class' => [
-            'link',
-            'js-media-library-widget-toggle-weight',
-          ],
+      $options['attributes'] = [
+        'class' => [
+          'link',
+          'js-media-library-widget-toggle-weight',
         ],
+      ];
+      $element['#field_prefix']['weight_toggle'] = [
+        '#markup' => $this->linkGenerator->generate($this->t('Show media item weights'), new Url('<button>', [], $options)),
       ];
     }
 
