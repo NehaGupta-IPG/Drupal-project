@@ -17,6 +17,7 @@ use Drupal\Core\Lock\LockBackendInterface;
 use Drupal\Core\Test\FunctionalTestSetupTrait;
 use Drupal\Core\Test\TestSetupTrait;
 use Drupal\Core\Utility\Error;
+use Drupal\Core\Shutdown\ShutdownHandler;
 use Drupal\Tests\block\Traits\BlockCreationTrait;
 use Drupal\Tests\node\Traits\ContentTypeCreationTrait;
 use Drupal\Tests\node\Traits\NodeCreationTrait;
@@ -167,9 +168,9 @@ abstract class BrowserTestBase extends TestCase {
   /**
    * The original array of shutdown function callbacks.
    *
-   * @var array
+   * @var \Drupal\Core\Shutdown\CallbackStack
    */
-  protected $originalShutdownCallbacks = [];
+  protected $originalShutdownCallbacks;
 
   /**
    * Registers the dumper CLI handler when the DebugDump extension is enabled.
@@ -443,10 +444,7 @@ abstract class BrowserTestBase extends TestCase {
     $this->loggedInUser = FALSE;
 
     // Restore original shutdown callbacks.
-    if (function_exists('drupal_register_shutdown_function')) {
-      $callbacks = &drupal_register_shutdown_function();
-      $callbacks = $this->originalShutdownCallbacks;
-    }
+    ShutdownHandler::getInstance()->reset($this->originalShutdownCallbacks);
   }
 
   /**

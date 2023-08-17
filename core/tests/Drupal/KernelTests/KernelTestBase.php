@@ -19,6 +19,7 @@ use Drupal\Core\Language\Language;
 use Drupal\Core\Routing\RouteObjectInterface;
 use Drupal\Core\Site\Settings;
 use Drupal\Core\Test\EventSubscriber\FieldStorageCreateCheckSubscriber;
+use Drupal\Core\Shutdown\ShutdownHandler;
 use Drupal\Core\Test\TestDatabase;
 use Drupal\Tests\BrowserHtmlDebugTrait;
 use Drupal\Tests\ConfigTestTrait;
@@ -644,7 +645,7 @@ abstract class KernelTestBase extends TestCase implements ServiceProviderInterfa
   protected function assertPostConditions(): void {
     // Execute registered Drupal shutdown functions prior to tearing down.
     // @see _drupal_shutdown_function()
-    $callbacks = &drupal_register_shutdown_function();
+    $callbacks = ShutdownHandler::getInstance()->reset();
     while ($callback = array_shift($callbacks)) {
       call_user_func_array($callback['callback'], $callback['arguments']);
     }

@@ -222,4 +222,28 @@ class Error {
     return get_error_handler();
   }
 
+  /**
+   * Displays and logs any errors that may happen during shutdown.
+   *
+   * @param string $message
+   *   A message to display an error.
+   * @param \Exception|\Throwable $exception
+   *   The exception object that was thrown.
+   * @internal
+   */
+  public static function shutdownExceptionHandler(string $message, \Exception|\Throwable $exception): void {
+    // If using PHP-FPM then fastcgi_finish_request() will have been fired
+    // preventing further output to the browser.
+    if (!function_exists('fastcgi_finish_request')) {
+      // If we are displaying errors, then do so with no possibility of a
+      // further uncaught exception being thrown.
+      require_once __DIR__ . '/errors.inc';
+      if (error_displayable()) {
+        print '<h1>' . $message . '</h1>';
+        print '<p>' . static::renderExceptionSafe($exception) . '</p><hr />';
+      }
+    }
+    error_log($exception);
+  }
+
 }
