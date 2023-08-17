@@ -229,6 +229,7 @@ class Error {
    *   A message to display an error.
    * @param \Exception|\Throwable $exception
    *   The exception object that was thrown.
+   *
    * @internal
    */
   public static function shutdownExceptionHandler(string $message, \Exception|\Throwable $exception): void {

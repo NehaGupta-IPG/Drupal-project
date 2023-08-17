@@ -7,4 +7,4 @@ namespace Drupal\Core\Shutdown;
  *
  * @see \Drupal\Core\Shutdown\ShutdownHandler
  */
-class CallbackStack extends \ArrayIterator { }
+class CallbackStack extends \ArrayIterator {}

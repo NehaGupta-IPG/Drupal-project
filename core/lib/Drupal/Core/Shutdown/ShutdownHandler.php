@@ -80,7 +80,7 @@ class ShutdownHandler {
    *
    * @param callable $callback
    *   The shutdown function to register.
-   * @param ...$args
+   * @param array $args
    *   Additional arguments to pass to the shutdown function.
    */
   final public function set(callable $callback, ...$args): void {
@@ -120,7 +120,7 @@ class ShutdownHandler {
         $this->callbackStack->next();
       }
     }
-      // Catch \Throwable, which covers both Error and Exception throwables.
+    // Catch \Throwable, which covers both Error and Exception throwables.
     catch (\Throwable $error) {
       Error::shutdownExceptionHandler('Uncaught exception thrown in shutdown function.', $error);
     }

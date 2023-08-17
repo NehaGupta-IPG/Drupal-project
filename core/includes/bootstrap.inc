@@ -520,7 +520,7 @@ function _drupal_shutdown_function(): void {
 function _drupal_shutdown_function_handle_exception($exception): void {
   @trigger_error(__FUNCTION__ .
     '() is deprecated in drupal:10.2.0 and is removed from drupal:11.0.0. ' .
-    'Use \Drupal\Core\Utility\Error::shutdownExceptionHandler() instead. '.
+    'Use \Drupal\Core\Utility\Error::shutdownExceptionHandler() instead. ' .
     'As internal API, ' . __FUNCTION__ .
     '() may also be removed in a minor release. See ' .
     'https://www.drupal.org/node/3053808',
