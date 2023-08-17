@@ -6,8 +6,9 @@ use PHPUnit\Framework\TestCase;
 
 /**
  * Test legacy drupal_register_shutdown_function() function.
- * @
- * @legacy
+ *
+ * @group Utility
+ * @group legacy
  */
 class LegacyShutdownTest extends TestCase {
 
