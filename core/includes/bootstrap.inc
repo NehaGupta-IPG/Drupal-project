@@ -478,7 +478,7 @@ function &drupal_register_shutdown_function($callback = NULL, ...$args) {
   $handler = ShutdownHandler::getInstance();
   if (isset($callback)) {
     // Save callback and arguments
-    $handler->set($callback, $args);
+    $handler->set($callback, ...$args);
   }
   $callbacks = $handler->get();
   return $callbacks;
