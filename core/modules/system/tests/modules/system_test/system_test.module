@@ -27,7 +27,7 @@ function _system_test_second_shutdown_function($arg1, $arg2): void {
 
   // Throw an exception with an HTML tag. Since this is called in a shutdown
   // function, it will not bubble up to the default exception handler but will
-  // be caught in _drupal_shutdown_function() and be displayed through
+  // be caught in ShutdownHandler::shutdown() and be displayed through
   // \Drupal\Core\Utility\Error::renderExceptionSafe() if possible.
   throw new Exception('Drupal is <blink>awesome</blink>.');
 }

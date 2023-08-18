@@ -344,7 +344,7 @@ class SystemTestController extends ControllerBase implements TrustedCallbackInte
     // If using PHP-FPM then fastcgi_finish_request() will have been fired
     // preventing further output to the browser which means that the escaping of
     // the exception message can not be tested.
-    // @see _drupal_shutdown_function()
+    // @see \Drupal\Core\Shutdown\ShutdownHandler::shutdown()
     // @see \Drupal\system\Tests\System\ShutdownFunctionsTest
     if (function_exists('fastcgi_finish_request') || ob_get_status()) {
       return ['#markup' => 'The response will flush before shutdown functions are called.'];

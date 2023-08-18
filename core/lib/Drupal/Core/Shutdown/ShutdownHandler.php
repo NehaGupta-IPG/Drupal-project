@@ -135,7 +135,7 @@ class ShutdownHandler {
    * @return \Drupal\Core\Shutdown\CallbackStack
    *   Callback stack before reset.
    */
-  final public function reset(?CallbackStack $callbackStack): CallbackStack {
+  final public function reset(?CallbackStack $callbackStack = NULL): CallbackStack {
     $callbacks = $this->callbackStack;
     $this->callbackStack = $callbackStack ?? new CallbackStack();
     return $callbacks;

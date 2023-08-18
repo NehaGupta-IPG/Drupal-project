@@ -644,11 +644,8 @@ abstract class KernelTestBase extends TestCase implements ServiceProviderInterfa
    */
   protected function assertPostConditions(): void {
     // Execute registered Drupal shutdown functions prior to tearing down.
-    // @see _drupal_shutdown_function()
-    $callbacks = ShutdownHandler::getInstance()->reset();
-    while ($callback = array_shift($callbacks)) {
-      call_user_func_array($callback['callback'], $callback['arguments']);
-    }
+    // @see \Drupal\Core\Shutdown\ShutdownHandler::shutdown()
+    ShutdownHandler::getInstance()->shutdown();
 
     // Shut down the kernel (if bootKernel() was called).
     // @see \Drupal\KernelTests\Core\DrupalKernel\DrupalKernelTest
