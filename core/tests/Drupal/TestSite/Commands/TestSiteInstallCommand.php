@@ -6,6 +6,7 @@ namespace Drupal\TestSite\Commands;
 
 use Drupal\Core\Config\ConfigImporter;
 use Drupal\Core\Database\Database;
+use Drupal\Core\Shutdown\CallbackStack;
 use Drupal\Core\Test\FunctionalTestSetupTrait;
 use Drupal\Core\Test\TestDatabase;
 use Drupal\Core\Test\TestSetupTrait;
@@ -49,7 +50,7 @@ class TestSiteInstallCommand extends Command {
   /**
    * The original array of shutdown function callbacks.
    */
-  protected array $originalShutdownCallbacks = [];
+  protected ?CallbackStack $originalShutdownCallbacks;
 
 
   /**
