@@ -2,7 +2,7 @@
 
 namespace Drupal\Tests\Core\Utility;
 
-use PHPUnit\Framework\TestCase;
+use Drupal\Tests\UnitTestCase;
 
 /**
  * Test legacy drupal_register_shutdown_function() function.
@@ -12,7 +12,7 @@ use PHPUnit\Framework\TestCase;
  * @group Utility
  * @group legacy
  */
-class LegacyShutdownTest extends TestCase {
+class LegacyShutdownTest extends UnitTestCase {
 
   /**
    * Test legacy drupal_register_shutdown_function() function.
