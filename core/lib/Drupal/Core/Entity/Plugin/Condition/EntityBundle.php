@@ -4,6 +4,7 @@ namespace Drupal\Core\Entity\Plugin\Condition;
 
 use Drupal\Core\Condition\Attribute\Condition;
 use Drupal\Core\Condition\ConditionPluginBase;
+use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Entity\EntityTypeBundleInfoInterface;
 use Drupal\Core\Entity\Plugin\Condition\Deriver\EntityBundle as EntityBundleDeriver;
 use Drupal\Core\Form\FormStateInterface;
@@ -90,7 +91,7 @@ class EntityBundle extends ConditionPluginBase implements ContainerFactoryPlugin
     }
     /** @var \Drupal\Core\Entity\ContentEntityInterface $entity */
     $entity = $this->getContextValue($this->getDerivativeId());
-    return !empty($this->configuration['bundles'][$entity->bundle()]);
+    return $entity instanceof ContentEntityInterface && !empty($this->configuration['bundles'][$entity->bundle()]);
   }
 
   /**

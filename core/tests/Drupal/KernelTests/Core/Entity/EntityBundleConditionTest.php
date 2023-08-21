@@ -81,6 +81,11 @@ class EntityBundleConditionTest extends EntityKernelTestBase {
       'test' => 'test',
     ]);
     $this->assertEquals('Test entity bundle is page, article or test', $condition->summary());
+
+    // Check the no context condition.
+    $condition_no_context = $this->container->get('plugin.manager.condition')->createInstance('entity_bundle:entity_test_with_bundle')
+      ->setConfig('bundles', ['article' => 'article']);
+    $this->assertFalse($condition_no_context->execute(), 'No context set fail.');
   }
 
 }

@@ -48,8 +48,10 @@ class EntityBundle extends DeriverBase implements ContainerDeriverInterface {
         $this->derivatives[$entity_type_id] = $base_plugin_definition;
         $this->derivatives[$entity_type_id]['label'] = $entity_type->getBundleLabel();
         $this->derivatives[$entity_type_id]['provider'] = $entity_type->getProvider();
+        $context_definition = EntityContextDefinition::fromEntityType($entity_type);
+        $context_definition->setRequired(FALSE);
         $this->derivatives[$entity_type_id]['context_definitions'] = [
-          $entity_type_id => EntityContextDefinition::fromEntityType($entity_type),
+          $entity_type_id => $context_definition,
         ];
       }
     }
