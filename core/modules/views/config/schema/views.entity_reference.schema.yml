@@ -21,7 +21,7 @@ entity_reference_selection.views:
             type: string
             label: 'Argument'
 
-entity_reference_selection.views_with_auto_create:
+entity_reference_selection.views_auto_create:
   type: entity_reference_selection.views
   label: 'Views selection handler settings'
   mapping:
@@ -32,7 +32,7 @@ entity_reference_selection.views_with_auto_create:
       type: string
       label: 'Bundle assigned to the auto-created entities.'
 
-# Schema for all entity reference 'views_with_auto_create:*' selection handlers that are not
+# Schema for all entity reference 'views_auto_create:*' selection handlers that are not
 # providing a specific schema.
-entity_reference_selection.views_with_auto_create:*:
-  type: entity_reference_selection.views_with_auto_create
+entity_reference_selection.views_auto_create:*:
+  type: entity_reference_selection.views_auto_create
