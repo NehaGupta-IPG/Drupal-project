@@ -147,7 +147,7 @@ class SelectionTest extends BrowserTestBase {
 
     $this->handlerSettings['auto_create'] = TRUE;
     $this->handlerSettings['auto_create_bundle'] = $type3;
-    $this->createEntityReferenceField('entity_test', 'entity_test', 'test_field', $this->randomString(), 'node', 'views_with_autocreate', $this->handlerSettings);
+    $this->createEntityReferenceField('entity_test', 'entity_test', 'test_field', $this->randomString(), 'node', 'views_with_auto_create', $this->handlerSettings);
 
     /** @var \Drupal\Core\Entity\EntityDisplayRepositoryInterface $entity_display_repository */
     $entity_display_repository = \Drupal::service('entity_display.repository');

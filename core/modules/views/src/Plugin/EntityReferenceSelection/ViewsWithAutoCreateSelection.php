@@ -8,9 +8,9 @@ use Drupal\user\EntityOwnerInterface;
  * Plugin implementation of the 'selection' entity_reference with auto create.
  *
  * @EntityReferenceSelection(
- *   id = "views_with_autocreate",
+ *   id = "views_with_auto_create",
  *   label = @Translation("Views: Filter by an entity reference view and allow auto create"),
- *   group = "views_with_autocreate",
+ *   group = "views_with_auto_create",
  *   weight = 1
  * )
  */
