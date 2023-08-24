@@ -1,9 +1,8 @@
 <?php
 
-namespace Drupal\views_entity_test\Plugin\EntityReferenceSelection;
+namespace Drupal\views\Plugin\EntityReferenceSelection;
 
 use Drupal\user\EntityOwnerInterface;
-use Drupal\views\Plugin\EntityReferenceSelection\ViewsAutocreateSelectionBase;
 
 /**
  * Plugin implementation of the 'selection' entity_reference with autocreation.
@@ -15,7 +14,7 @@ use Drupal\views\Plugin\EntityReferenceSelection\ViewsAutocreateSelectionBase;
  *   weight = 1
  * )
  */
-class TestViewsWithAutoCreationSelection extends ViewsAutocreateSelectionBase {
+class ViewsWithAutoCreateSelection extends ViewsAutoCreateSelectionBase {
 
   /**
    * {@inheritdoc}

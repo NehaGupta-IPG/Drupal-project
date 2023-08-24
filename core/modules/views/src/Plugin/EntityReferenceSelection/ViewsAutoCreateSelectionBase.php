@@ -10,7 +10,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 /**
  * Base class for views selection plugins with basic autocreate functionality.
  */
-abstract class ViewsAutocreateSelectionBase extends ViewsSelection implements SelectionWithAutocreateInterface {
+abstract class ViewsAutoCreateSelectionBase extends ViewsSelection implements SelectionWithAutocreateInterface {
 
   /**
    * The entity type bundle info service.
