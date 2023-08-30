@@ -10,7 +10,7 @@
               .then(response => {
                 if (response.status === 404) {
                   messages.error(Drupal.t(
-                    'Your server is not configured properly to access @name assets. Please review Drupal server requirements.',
+                    'Your server is not configured properly to access @name assets. Review Drupal server requirements.',
                     { '@name': urlInfo['name'] },
                   ));
                 } else {
