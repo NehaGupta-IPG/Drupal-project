@@ -274,6 +274,10 @@ field.widget.settings.email_default:
 field.widget.settings.datetime_timestamp:
   type: mapping
   label: 'Datetime timestamp display format settings'
+  mapping:
+    use_current_time:
+      type: boolean
+      label: 'Use current time on empty'
 
 field.widget.settings.boolean_checkbox:
   type: mapping

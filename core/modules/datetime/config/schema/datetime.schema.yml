@@ -79,11 +79,3 @@ field.widget.settings.datetime_datelist:
 field.widget.settings.datetime_default:
   type: mapping
   label: 'Datetime default display format settings'
-
-field.widget.settings.datetime_timestamp:
-  type: mapping
-  label: 'Datetime select list display format settings'
-  mapping:
-    use_current_time:
-      type: boolean
-      label: 'Time increments'
