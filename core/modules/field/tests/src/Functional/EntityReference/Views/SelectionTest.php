@@ -33,7 +33,6 @@ class SelectionTest extends BrowserTestBase {
     'views',
     'entity_reference_test',
     'entity_test',
-    'views_entity_test',
   ];
 
   /**
