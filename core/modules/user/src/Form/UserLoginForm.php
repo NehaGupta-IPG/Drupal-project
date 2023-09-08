@@ -122,6 +122,7 @@ class UserLoginForm extends FormBase implements WorkspaceSafeFormInterface {
         'autofocus' => 'autofocus',
         'autocomplete' => 'username',
       ],
+      '#error_field_only' => TRUE,
     ];
 
     $form['pass'] = [

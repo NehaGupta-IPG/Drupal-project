@@ -106,6 +106,10 @@ class FormErrorHandler extends CoreFormErrorHandler {
     }
 
     if (!empty($error_links)) {
+      // Do not show form-level messages for elements that suppress it.
+      if (!empty($form_element['#error_field_only'])) {
+        return;
+      }
       $render_array = [
         [
           '#markup' => $this->formatPlural(count($error_links), '1 error has been found: ', '@count errors have been found: '),
