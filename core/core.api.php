@@ -2019,13 +2019,19 @@
  * at the moment, Drupal only uses them for the plugin system.)
  *
  * To annotate a class as a plugin, add code similar to the following to the
- * end of the documentation block immediately preceding the class declaration:
+ * end of the documentation block immediately preceding the class declaration.
+ * Below is an example of an annotation using various data types:
+ * Note: Any classes must be preceded with the initial "\" (i.e. \Drupal\Core\...)
  * @code
  * * @ContentEntityType(
  * *   id = "comment",
  * *   label = @Translation("Comment"),
- * *   ...
- * *   base_table = "comment"
+ * *   description = @Translation("This field manages configuration and 
+ * *   presentation of comments on an entity."),
+ * *   login_required = FALSE,
+ * *   list_class = "\Drupal\comment\CommentFieldItemList",
+ * *   base_table = "comment",
+ * *   cardinality = 1
  * * )
  * @endcode
  *
