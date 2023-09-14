@@ -111,7 +111,7 @@ class SearchBlockForm extends FormBase implements WorkspaceSafeFormInterface {
       '#id' => $id_prefix . 'keys',
       '#attributes' => [
         'id' => $id_prefix . 'keys',
-        'title' => $this->t('Enter the terms you wish to search for.')
+        'title' => $this->t('Enter the terms you wish to search for.'),
       ],
     ];
 
