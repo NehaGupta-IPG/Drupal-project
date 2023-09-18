@@ -1209,10 +1209,10 @@ class FormBuilder implements FormBuilderInterface, FormValidatorInterface, FormS
     // JavaScript on document ready.
     if (!empty($element['#disabled'])) {
       if (!empty($element['#allow_focus'])) {
-        $element['#attributes']['readonly'] = 'readonly';
+        $element['#attributes']['readonly'] = TRUE;
       }
       else {
-        $element['#attributes']['disabled'] = 'disabled';
+        $element['#attributes']['disabled'] = TRUE;
       }
     }
 
