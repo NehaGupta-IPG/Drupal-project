@@ -31,7 +31,3 @@ props:
         - ol
       # Provide a default value
       default: ul
-slots:
-  text:
-    type: string
-    description: Text
