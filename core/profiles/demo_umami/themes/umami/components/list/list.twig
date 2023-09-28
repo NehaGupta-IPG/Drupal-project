@@ -1,0 +1,9 @@
+<div {{ attributes.addClass('umami-list') }}>
+  <{{ html_tag|default('ul') }}>
+    {% for item in items %}
+      <li{{ item.attributes.addClass('umami-list__item') }}>
+        {{ item.content }}
+      </li>
+    {% endfor %}
+  </{{ html_tag|default('ul') }}>
+</div>
