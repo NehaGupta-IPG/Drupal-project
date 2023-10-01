@@ -62,10 +62,13 @@ JS;
 
     // Besides verifying there is no JavaScript syntax error, also verify the
     // HTML structure.
+    // This structure includes an aria-live div between the BigPipe script and
+    // closing body tag.
     // The BigPipe stop signal is present just before the closing </body> and
     // </html> tags.
+    $aria_live_div = '<div id="drupal-live-announce" class="visually-hidden" aria-live="polite" aria-busy="false"></div>';
     $this->assertSession()
-      ->responseContains(BigPipe::STOP_SIGNAL . "\n\n\n</body></html>");
+      ->responseContains(BigPipe::STOP_SIGNAL . "\n\n\n$aria_live_div</body></html>");
     $js_code_until_closing_body_tag = substr(BigPipeRegressionTestController::MARKER_2678662, 0, strpos(BigPipeRegressionTestController::MARKER_2678662, '</body>'));
     // The BigPipe start signal does NOT start at the closing </body> tag string
     // in an inline script.

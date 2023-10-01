@@ -922,6 +922,46 @@
       typeof this[progressIndicatorMethod] === 'function'
     ) {
       this[progressIndicatorMethod].call(this);
+
+      // To avoid very fast AJAX operations from being announced, wait for the
+      // duration of the announceDelay property (1 second by default) before
+      // announcing progress to screenreaders.
+      const delay = this.progress.announceDelay || 1000;
+      setTimeout(() => {
+        // Note that the disabling of $(this.element) is a pre-existing
+        // implementation used to prevent interaction while the request is in
+        // progress. It is being leveraged here as a way to confirm the AJAX
+        // operation completed as nothing else is available in scope to do so.
+        const shouldAnnounce = this.progress.hasOwnProperty('announce')
+          ? this.progress.announce
+          : true;
+        if ($(this.element).prop('disabled') && shouldAnnounce) {
+          let count = 1;
+          const toForceRepeat = '\u00A0';
+          let message = Drupal.t('Busy');
+          if (typeof this.progress.message === 'string') {
+            message = this.progress.message;
+          } else if (typeof this.progress.announceMessage === 'string') {
+            message = this.progress.announceMessage;
+          }
+
+          Drupal.announce(message, 'assertive');
+          // The progress message will be re-announced at a set interval until
+          // the AJAX operation is completed. Defaults to twice the value of the
+          // initial delay.
+          const rep = setInterval(() => {
+            if ($(this.element).prop('disabled')) {
+              Drupal.announce(
+                message + toForceRepeat.repeat(count % 2),
+                'assertive',
+              );
+              count += 1;
+            } else {
+              clearInterval(rep);
+            }
+          }, delay * 2);
+        }
+      }, delay);
     }
   };
 
@@ -1005,6 +1045,7 @@
    * Sets the throbber progress indicator.
    */
   Drupal.Ajax.prototype.setProgressIndicatorThrobber = function () {
+    console.log('here');
     this.progress.element = $(
       Drupal.theme('ajaxProgressThrobber', this.progress.message),
     );
