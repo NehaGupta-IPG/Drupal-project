@@ -2,6 +2,7 @@
 
 namespace Drupal\layout_builder\Plugin\Block;
 
+use Drupal\Component\Plugin\PluginBase;
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Access\RefinableDependentAccessInterface;
@@ -215,7 +216,10 @@ class InlineBlock extends BlockBase implements ContainerFactoryPluginInterface, 
   protected function getEntity() {
     if (!isset($this->blockContent)) {
       if (!empty($this->configuration['block_serialized'])) {
-        $this->blockContent = unserialize($this->configuration['block_serialized']);
+        $base_class = $this->entityTypeManager->getDefinition('block_content')->getClass();
+        [, $bundle] = explode(PluginBase::DERIVATIVE_SEPARATOR, $this->getPluginId());
+        $bundle_class = $this->entityTypeManager->getStorage('block_content')->getEntityClass($bundle);
+        $this->blockContent = unserialize($this->configuration['block_serialized'], ['allowed_classes' => [$base_class, $bundle_class]]);
       }
       elseif (!empty($this->configuration['block_revision_id'])) {
         $entity = $this->entityTypeManager->getStorage('block_content')->loadRevision($this->configuration['block_revision_id']);
