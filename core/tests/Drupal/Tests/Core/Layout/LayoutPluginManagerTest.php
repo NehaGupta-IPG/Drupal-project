@@ -394,6 +394,7 @@ module_a_provided_layout:
   theme_hook: onecol
   path: layouts
   library: module_a/onecol
+  weight: 10
   regions:
     top:
       label: Top region

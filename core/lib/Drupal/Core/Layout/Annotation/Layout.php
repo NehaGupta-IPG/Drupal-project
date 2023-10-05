@@ -156,6 +156,13 @@ class Layout extends Plugin {
   public $default_region;
 
   /**
+   * An optional weight.
+   *
+   * @var int
+   */
+  public $weight = 0;
+
+  /**
    * The layout plugin class.
    *
    * This default value is used for plugins defined in layouts.yml that do not

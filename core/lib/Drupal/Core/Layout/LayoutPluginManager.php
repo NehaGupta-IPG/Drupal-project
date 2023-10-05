@@ -199,9 +199,12 @@ class LayoutPluginManager extends DefaultPluginManager implements LayoutPluginMa
    *   An array of plugin definitions, sorted by category and label.
    */
   public function getSortedDefinitions(?array $definitions = NULL, $label_key = 'label') {
-    // Sort the plugins first by category, then by label.
+    // Sort the plugins first by weight, then by category and last by label.
     $definitions = $definitions ?? $this->getDefinitions();
     uasort($definitions, function (LayoutDefinition $a, LayoutDefinition $b) {
+      if ($a->getWeight() !== $b->getWeight()) {
+        return $a->getWeight() > $b->getWeight() ? 1 : -1;
+      }
       if ($a->getCategory() != $b->getCategory()) {
         return strnatcasecmp($a->getCategory(), $b->getCategory());
       }
