@@ -128,7 +128,6 @@ class LayoutDefinition extends PluginDefinition implements PluginDefinitionInter
    */
   protected $weight = 0;
 
-
   /**
    * Any additional properties and values.
    *
