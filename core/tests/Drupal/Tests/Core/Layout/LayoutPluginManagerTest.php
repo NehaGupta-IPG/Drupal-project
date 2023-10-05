@@ -436,6 +436,7 @@ use Drupal\Core\StringTranslation\TranslatableMarkup;
   label: new TranslatableMarkup('Layout plugin'),
   category: new TranslatableMarkup('Columns: 1'),
   description: new TranslatableMarkup('Test layout'),
+  weight: 8,
   path: "core/lib/Drupal/Core",
   template: "templates/plugin-provided-layout",
   regions: [
