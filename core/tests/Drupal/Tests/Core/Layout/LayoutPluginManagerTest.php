@@ -344,13 +344,13 @@ EOS;
    */
   public function testGetGroupedDefinitions(): void {
     $category_expected = [
-      'Columns: 1' => [
-        'module_a_provided_layout',
-        'plugin_provided_layout',
-      ],
       'Columns: 2' => [
         'theme_a_provided_layout',
         'plugin_provided_by_annotation_layout',
+      ],
+      'Columns: 1' => [
+        'module_a_provided_layout',
+        'plugin_provided_layout',
       ],
     ];
 
