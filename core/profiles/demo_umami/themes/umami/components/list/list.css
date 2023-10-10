@@ -15,25 +15,17 @@
   position: relative;
   min-height: 1.5em;
   margin: 0;
-  padding: 0 0 0.6em 2.5em; /* LTR */
+  padding-block: 0 0.6em;
+  padding-inline: 2.5em 0;
   counter-increment: step-counter;
   border-bottom: none;
-}
-
-[dir=rtl] .umami-list--ordered li {
-  padding: 0 2.5em 0.6em 0;
 }
 
 .umami-list--ordered li::before {
   position: absolute;
   top: 0;
-  left: 0; /* LTR */
+  inset-inline-start: 0;
   content: counter(step-counter);
   color: #cc2a00;
   font-size: 1.5rem;
-}
-
-[dir=rtl] .umami-list--ordered li::before {
-  right: 0;
-  left: auto;
 }

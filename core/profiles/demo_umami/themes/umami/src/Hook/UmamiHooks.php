@@ -51,7 +51,7 @@ class UmamiHooks {
 
       if ($element['#field_name'] == 'field_recipe_instruction') {
         // This field not SDC component but component styles still may reused.
-        $variables['#attached']['library'][] = 'sdc/umami--list';
+        $variables['#attached']['library'][] = 'core/components.umami--list';
         $variables['attributes']['class'][] = 'umami-list';
         $variables['attributes']['class'][] = 'umami-list--ordered';
       }

@@ -1,5 +1,4 @@
-# This is so your IDE knows about the syntax for fixes and autocomplete.
-$schema: https://git.drupalcode.org/project/drupal/-/raw/10.1.x/core/modules/sdc/src/metadata.schema.json
+$schema: https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json
 
 # The human readable name.
 name: List
@@ -15,10 +14,6 @@ props:
   type: object
 
   properties:
-    attributes:
-      type: Drupal\Core\Template\Attribute
-      title: Attributes
-      description: Wrapper attributes.
     items:
       type: array
       title: List items
@@ -29,5 +24,9 @@ props:
       enum:
         - ul
         - ol
+      meta:enum:
+        ul: Unordered list
+        ol: Ordered list
+      x-translation-context: Umami list HTML tag options
       # Provide a default value
       default: ul
