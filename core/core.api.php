@@ -2026,7 +2026,7 @@
  * * @ContentEntityType(
  * *   id = "comment",
  * *   label = @Translation("Comment"),
- * *   description = @Translation("This field manages configuration and 
+ * *   description = @Translation("This field manages configuration and
  * *   presentation of comments on an entity."),
  * *   login_required = FALSE,
  * *   list_class = "\Drupal\comment\CommentFieldItemList",
