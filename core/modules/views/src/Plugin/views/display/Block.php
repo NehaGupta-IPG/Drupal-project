@@ -116,17 +116,17 @@ class Block extends DisplayPluginBase {
     $this->entityTypeManager = $entity_type_manager;
     $this->blockManager = $block_manager;
     if (!isset($key_value)) {
-      @trigger_error('Calling ' . __METHOD__ . '() without the $key_value argument is deprecated in drupal:10.2.0 and will be required in drupal:11.0.0', E_USER_DEPRECATED);
+      @trigger_error('Calling ' . __METHOD__ . '() without the $key_value argument is deprecated in drupal:10.2.0 and will be required in drupal:11.0.0. See https://www.drupal.org/node/3395016', E_USER_DEPRECATED);
       $key_value = \Drupal::service('keyvalue');
     }
     $this->keyValue = $key_value;
     if (!isset($context_repository)) {
-      @trigger_error('Calling ' . __METHOD__ . '() without the $context_repository argument is deprecated in drupal:10.2.0 and will be required in drupal:11.0.0', E_USER_DEPRECATED);
+      @trigger_error('Calling ' . __METHOD__ . '() without the $context_repository argument is deprecated in drupal:10.2.0 and will be required in drupal:11.0.0. See https://www.drupal.org/node/3395016', E_USER_DEPRECATED);
       $context_repository = \Drupal::service('context.repository');
     }
     $this->contextRepository = $context_repository;
     if (!isset($context_handler)) {
-      @trigger_error('Calling ' . __METHOD__ . '() without the $context_handler argument is deprecated in drupal:10.2.0 and will be required in drupal:11.0.0', E_USER_DEPRECATED);
+      @trigger_error('Calling ' . __METHOD__ . '() without the $context_handler argument is deprecated in drupal:10.2.0 and will be required in drupal:11.0.0 See https://www.drupal.org/node/3395016', E_USER_DEPRECATED);
       $context_handler = \Drupal::service('context.handler');
     }
     $this->contextHandler = $context_handler;
@@ -421,22 +421,23 @@ class Block extends DisplayPluginBase {
   /**
    * Allows to change the display settings right before executing the block.
    *
+   * When this block is rebuilt as part of an AJAX call, the AJAX handler does
+   * not have block instance settings and context information available.
+   * Because of that, the first time this block is rendered the block instance
+   * overrides are put in the key/value store. The first time the block is
+   * rendered is normally during a non-AJax request but it could be an Ajax
+   * request. This is possible only when all following calls pass along the
+   * 'block_config_key' query param and it  matches the key generated here.
+   *
+   * @see \Drupal\views\Plugin\views\display\Block::preview().
+   * @see \Drupal\views\Plugin\views\display\Block::getConfigurationFromHashedKey().
+   *
    * @param \Drupal\views\Plugin\Block\ViewsBlock $block
    *   The block plugin for views displays.
    */
   public function preBlockBuild(ViewsBlock $block) {
     $config = $block->getConfiguration();
 
-    // If this block is being rebuilt as part of an AJAX call, the AJAX handler
-    // does not have block instance settings and context information available.
-    // Because of that, the first time this block is rendered (normally during
-    // a non-AJAX request, but it could be AJAX as well), we store the block
-    // instance overrides in the key/value store, to be retrieved when
-    // subsequent AJAX calls happen. This will be possible as long as all
-    // following calls pass along the 'block_config_key' query param and it
-    // matches the key we are generating here for this view+display combination.
-    // See \Drupal\views\Plugin\views\display\Block::preview().
-    // See \Drupal\views\Plugin\views\display\Block::getConfigurationFromHashedKey().
     $request = $this->view->getRequest();
     if (!empty($request->query)) {
       $key = $request->query->get('block_config_key');
