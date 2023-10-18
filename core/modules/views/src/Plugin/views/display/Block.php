@@ -126,7 +126,7 @@ class Block extends DisplayPluginBase {
     }
     $this->contextRepository = $context_repository;
     if (!isset($context_handler)) {
-      @trigger_error('Calling ' . __METHOD__ . '() without the $context_handler argument is deprecated in drupal:10.2.0 and will be required in drupal:11.0.0 See https://www.drupal.org/node/3395016', E_USER_DEPRECATED);
+      @trigger_error('Calling ' . __METHOD__ . '() without the $context_handler argument is deprecated in drupal:10.2.0 and will be required in drupal:11.0.0. See https://www.drupal.org/node/3395016', E_USER_DEPRECATED);
       $context_handler = \Drupal::service('context.handler');
     }
     $this->contextHandler = $context_handler;
@@ -429,8 +429,8 @@ class Block extends DisplayPluginBase {
    * request. This is possible only when all following calls pass along the
    * 'block_config_key' query param and it  matches the key generated here.
    *
-   * @see \Drupal\views\Plugin\views\display\Block::preview().
-   * @see \Drupal\views\Plugin\views\display\Block::getConfigurationFromHashedKey().
+   * @see \Drupal\views\Plugin\views\display\Block::preview()
+   * @see \Drupal\views\Plugin\views\display\Block::getConfigurationFromHashedKey()
    *
    * @param \Drupal\views\Plugin\Block\ViewsBlock $block
    *   The block plugin for views displays.
