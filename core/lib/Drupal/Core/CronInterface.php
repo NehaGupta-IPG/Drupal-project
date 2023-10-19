@@ -25,6 +25,6 @@ interface CronInterface {
    * @return bool
    *   TRUE upon successful cron execution, FALSE otherwise.
    */
-  public function run(): bool;
+  public function run();
 
 }
