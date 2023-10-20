@@ -9,6 +9,7 @@ use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\jsonapi\Controller\EntityResource as JsonApiEntityResource;
+use Drupal\jsonapi\JsonApiResource\Data;
 use Drupal\jsonapi\JsonApiResource\IncludedData;
 use Drupal\jsonapi\JsonApiResource\Link;
 use Drupal\jsonapi\JsonApiResource\LinkCollection;
@@ -55,6 +56,7 @@ final class EntityResource extends JsonApiEntityResource {
   const PARAM_LANGCODE = 'langCode';
   const HEADER_CONTENT_LANGUAGE = 'Content-Language';
   const ATTR_TRANSLATION_RESOURCE = 'jsonapi_translation_resource';
+  const ATTR_TRANSLATION_LANGUAGE = 'jsonapi_translation_language';
 
   /**
    * The language manager.
@@ -123,7 +125,7 @@ final class EntityResource extends JsonApiEntityResource {
       $response->headers->set('Content-Location', $url->getGeneratedUrl());
 
       // @todo Neither internal nor dynamic page cache support the "Accept-Language"
-      //    header currently. Remove this once they do.
+      //   header currently. Remove this once they do.
       \Drupal::service('page_cache_kill_switch')->trigger();
     }
 
@@ -156,8 +158,9 @@ final class EntityResource extends JsonApiEntityResource {
         $langcode_key = $this->entityTypeManager
           ->getDefinition($resource_type->getEntityTypeId())
           ->getKey('langcode');
+        $field_name = $resource_type->getPublicName($langcode_key);
 
-        if (!isset($body['data']['attributes'][$langcode_key])) {
+        if (!isset($body['data']['attributes'][$field_name])) {
           $parsed_entity = $this->getEntityFromRequest($resource_type, $request);
           assert($parsed_entity instanceof ContentEntityInterface);
           $parsed_entity->set($langcode_key, $resource_language);
@@ -419,23 +422,26 @@ final class EntityResource extends JsonApiEntityResource {
    *   specified.
    */
   protected function getResourceLanguage(Request $request): ?LanguageInterface {
-    $language = $this->getRequestAttribute($request, 'jsonapi_translation_language', function (Request $request) {
+    $language = $this->getRequestAttribute($request, static::ATTR_TRANSLATION_LANGUAGE, function (Request $request) {
       $param_langcode = $request->query->get(static::PARAM_LANGCODE);
-      $header_langcode = $request->headers->get(static::HEADER_CONTENT_LANGUAGE);
+      $content_language_header = $request->headers->get(static::HEADER_CONTENT_LANGUAGE);
 
-      if (!$param_langcode && !$header_langcode) {
+      if (!$param_langcode && !$content_language_header) {
         return NULL;
       }
 
       if ($request->headers->get('Accept-Language')) {
         throw new BadRequestHttpException('Specifying both a request language and the "Accept-Language" header is not supported.');
       }
-      if ($param_langcode && $header_langcode && $param_langcode !== $header_langcode) {
+      if ($content_language_header && $request->isMethodCacheable()) {
+        throw new BadRequestHttpException('Specifying the "Content-Language" header is not supported in cacheable requests.');
+      }
+      if ($param_langcode && $content_language_header && $param_langcode !== $content_language_header) {
         $message = 'Translation resource language mismatch: "%s" ("%s" query string parameter) vs "%s" ("%s" header).';
-        throw new UnprocessableEntityHttpException(sprintf($message, $param_langcode, static::PARAM_LANGCODE, $header_langcode, static::HEADER_CONTENT_LANGUAGE));
+        throw new UnprocessableEntityHttpException(sprintf($message, $param_langcode, static::PARAM_LANGCODE, $content_language_header, static::HEADER_CONTENT_LANGUAGE));
       }
 
-      $langcode = $param_langcode ?: $header_langcode;
+      $langcode = $param_langcode ?: $content_language_header;
       $languages = $this->languageManager->getLanguages();
       $language = $languages[$langcode] ?? NULL;
 
@@ -443,7 +449,7 @@ final class EntityResource extends JsonApiEntityResource {
         return $language;
       }
 
-      throw new UnprocessableEntityHttpException(sprintf('Invalid language "%s" specified', $langcode));
+      throw new UnprocessableEntityHttpException(sprintf('The specified language ("%s") is invalid or has not been configured.', $langcode));
     });
     assert(!isset($language) || $language instanceof LanguageInterface);
     return $language;
@@ -536,7 +542,11 @@ final class EntityResource extends JsonApiEntityResource {
   /**
    * {@inheritdoc}
    */
-  protected function buildWrappedResponse(TopLevelDataInterface $primary_data, Request $request, IncludedData $includes, $response_code = 200, array $headers = [], LinkCollection $links = NULL, array $meta = []) {
+  protected function buildWrappedResponse(TopLevelDataInterface $data, Request $request, IncludedData $includes, $response_code = 200, array $headers = [], LinkCollection $links = NULL, array $meta = []) {
+    if ($data instanceof Data && $data->getCardinality() !== 1) {
+      return parent::buildWrappedResponse($data, $request, $includes, $response_code, $headers, $links, $meta);
+    }
+
     $translation = $request->attributes->get(static::ATTR_TRANSLATION_RESOURCE);
     if ($translation instanceof ContentEntityInterface) {
       $translation_langcodes = array_keys($translation->getTranslationLanguages());
@@ -549,31 +559,31 @@ final class EntityResource extends JsonApiEntityResource {
       unset($query[static::PARAM_LANGCODE]);
       $url = static::getRequestLink($request, $query);
 
-      foreach ($primary_data->getData() as $data) {
-        if ($data instanceof ResourceObject) {
-          $resource_links = $data->getLinks()->filter(function ($key) {
+      foreach ($data->getData() as $resource_data) {
+        if ($resource_data instanceof ResourceObject) {
+          $resource_links = $resource_data->getLinks()->filter(function ($key) {
             return $key !== 'self';
           });
           $self_link = new Link(new CacheableMetadata(), $url, 'self', $attributes);
           $resource_links = $resource_links->withLink('self', $self_link);
           $resource_objects[] = new ResourceObject(
-            $data,
-            $data->getResourceType(),
-            $data->getId(),
-            $data->getVersionIdentifier(),
-            $data->getFields(),
+            $resource_data,
+            $resource_data->getResourceType(),
+            $resource_data->getId(),
+            $resource_data->getVersionIdentifier(),
+            $resource_data->getFields(),
             $resource_links,
-            $data->getLanguage()
+            $resource_data->getLanguage()
           );
         }
       }
 
       if ($resource_objects) {
-        $primary_data = new ResourceObjectData($resource_objects, count($resource_objects));
+        $data = new ResourceObjectData($resource_objects, count($resource_objects));
       }
     }
 
-    return parent::buildWrappedResponse($primary_data, $request, $includes, $response_code, $headers, $links, $meta);
+    return parent::buildWrappedResponse($data, $request, $includes, $response_code, $headers, $links, $meta);
   }
 
 }
