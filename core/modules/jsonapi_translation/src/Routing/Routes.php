@@ -26,7 +26,7 @@ use Symfony\Component\Routing\RouteCollection;
  * @see \Drupal\jsonapi_translation\Controller\EntityResource
  * @see \Drupal\jsonapi_translation\JsonapiTranslationServiceProvider
  */
-class Routes extends JsonApiRoutes {
+final class Routes extends JsonApiRoutes {
 
   /**
    * {@inheritdoc}

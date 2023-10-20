@@ -18,7 +18,7 @@ use Symfony\Component\HttpKernel\KernelEvents;
  * @see https://www.drupal.org/project/drupal/issues/3032787
  * @see \Drupal\Core\EventSubscriber\FinishResponseSubscriber
  */
-class ResponseSubscriber implements EventSubscriberInterface {
+final class ResponseSubscriber implements EventSubscriberInterface {
 
   /**
    * Sets the response language.

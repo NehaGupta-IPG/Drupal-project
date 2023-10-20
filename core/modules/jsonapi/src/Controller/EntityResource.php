@@ -134,7 +134,7 @@ class EntityResource {
    *   Thrown when the entity does not pass validation.
    */
   public function createIndividual(ResourceType $resource_type, Request $request) {
-    $parsed_entity = $this->getParsedEntity($resource_type, $request);
+    $parsed_entity = $this->getEntityFromRequest($resource_type, $request);
 
     if ($parsed_entity instanceof FieldableEntityInterface) {
       // Only check 'edit' permissions for fields that were actually submitted
@@ -213,7 +213,7 @@ class EntityResource {
       throw new BadRequestHttpException('Updating a resource object that has a working copy is not yet supported. See https://www.drupal.org/project/drupal/issues/2795279.');
     }
 
-    $parsed_entity = $this->getParsedEntity($resource_type, $request);
+    $parsed_entity = $this->getEntityFromRequest($resource_type, $request);
 
     $body = $this->getRequestBody($request);
     $data = $body['data'];
@@ -760,12 +760,12 @@ class EntityResource {
    * @return \Drupal\Core\Entity\EntityInterface
    *   A non-stored entity object.
    */
-  protected function getParsedEntity(ResourceType $resource_type, Request $request): EntityInterface {
-    $parsed_entity = $this->getRequestAttribute($request, 'jsonapi_parsed_entity', function (Request $request) use ($resource_type) {
+  protected function getEntityFromRequest(ResourceType $resource_type, Request $request): EntityInterface {
+    $entity = $this->getRequestAttribute($request, 'jsonapi_parsed_entity', function (Request $request) use ($resource_type) {
       return $this->deserialize($resource_type, $request, JsonApiDocumentTopLevel::class);
     });
-    assert($parsed_entity instanceof EntityInterface);
-    return $parsed_entity;
+    assert($entity instanceof EntityInterface);
+    return $entity;
   }
 
   /**
@@ -817,13 +817,10 @@ class EntityResource {
    *   The attribute value.
    */
   protected function getRequestAttribute(Request $request, string $key, callable $value_callback) {
-    $value = $request->attributes->get($key);
-    if ($value) {
-      return $value;
+    if (!$request->attributes->has($key)) {
+      $request->attributes->set($key, $value_callback($request));
     }
-    $value = $value_callback($request);
-    $request->attributes->set($key, $value);
-    return $value;
+    return $request->attributes->get($key);
   }
 
   /**

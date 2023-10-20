@@ -1,8 +1,7 @@
 name: JSON:API Translation
 type: module
-description: Allows to translate content entities via the web API provided by JSON:API.
+description: Allows the translation of content entities via JSON:API endpoints.
 package: Core (Experimental)
 dependencies:
-# TODO Should we add this?
-#  - drupal:content_translation
+  - drupal:content_translation
   - drupal:jsonapi

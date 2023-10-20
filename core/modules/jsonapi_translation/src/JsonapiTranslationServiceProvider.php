@@ -17,7 +17,7 @@ use Symfony\Component\DependencyInjection\Reference;
  *
  * @see https://www.drupal.org/project/drupal/issues/3032787
  */
-class JsonapiTranslationServiceProvider extends ServiceProviderBase {
+final class JsonapiTranslationServiceProvider extends ServiceProviderBase {
 
   /**
    * {@inheritdoc}
@@ -29,7 +29,7 @@ class JsonapiTranslationServiceProvider extends ServiceProviderBase {
     $definition->setClass(EntityAccessChecker::class);
     $definition = $container->getDefinition('jsonapi.entity_resource');
     $definition->setClass(EntityResource::class);
-    $definition->addArgument(new Reference('language_manager'));
+    $definition->addMethodCall('setLanguageManager', [new Reference('language_manager')]);
   }
 
 }

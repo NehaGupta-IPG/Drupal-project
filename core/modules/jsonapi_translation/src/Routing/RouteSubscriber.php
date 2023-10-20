@@ -15,7 +15,7 @@ use Symfony\Component\Routing\RouteCollection;
  *
  * @see https://www.drupal.org/project/drupal/issues/3032787
  */
-class RouteSubscriber extends RouteSubscriberBase {
+final class RouteSubscriber extends RouteSubscriberBase {
 
   /**
    * The JSON:API resource type repository.

@@ -2,22 +2,13 @@
 
 namespace Drupal\jsonapi_translation\Controller;
 
-use Drupal\Component\Datetime\TimeInterface;
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Entity\ContentEntityInterface;
-use Drupal\Core\Entity\EntityFieldManagerInterface;
 use Drupal\Core\Entity\EntityInterface;
-use Drupal\Core\Entity\EntityRepositoryInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
-use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\Language\LanguageManagerInterface;
-use Drupal\Core\Render\RendererInterface;
-use Drupal\Core\Session\AccountInterface;
-use Drupal\jsonapi\Access\EntityAccessChecker;
-use Drupal\jsonapi\Context\FieldResolver;
 use Drupal\jsonapi\Controller\EntityResource as JsonApiEntityResource;
-use Drupal\jsonapi\IncludeResolver;
 use Drupal\jsonapi\JsonApiResource\IncludedData;
 use Drupal\jsonapi\JsonApiResource\Link;
 use Drupal\jsonapi\JsonApiResource\LinkCollection;
@@ -26,14 +17,12 @@ use Drupal\jsonapi\JsonApiResource\ResourceObjectData;
 use Drupal\jsonapi\JsonApiResource\TopLevelDataInterface;
 use Drupal\jsonapi\ResourceResponse;
 use Drupal\jsonapi\ResourceType\ResourceType;
-use Drupal\jsonapi\ResourceType\ResourceTypeRepositoryInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
-use Symfony\Component\Serializer\SerializerInterface;
 
 /**
  * Process all entity requests taking translatability into account.
@@ -61,9 +50,9 @@ use Symfony\Component\Serializer\SerializerInterface;
  *
  * @see https://www.drupal.org/project/drupal/issues/3032787
  */
-class EntityResource extends JsonApiEntityResource {
+final class EntityResource extends JsonApiEntityResource {
 
-  const PARAM_LANGCODE = 'lang_code';
+  const PARAM_LANGCODE = 'langCode';
   const HEADER_CONTENT_LANGUAGE = 'Content-Language';
   const ATTR_TRANSLATION_RESOURCE = 'jsonapi_translation_resource';
 
@@ -75,47 +64,9 @@ class EntityResource extends JsonApiEntityResource {
   protected $languageManager;
 
   /**
-   * EntityResource constructor.
-   *
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
-   *   The entity type manager.
-   * @param \Drupal\Core\Entity\EntityFieldManagerInterface $field_manager
-   *   The entity type field manager.
-   * @param \Drupal\jsonapi\ResourceType\ResourceTypeRepositoryInterface $resource_type_repository
-   *   The JSON:API resource type repository.
-   * @param \Drupal\Core\Render\RendererInterface $renderer
-   *   The renderer.
-   * @param \Drupal\Core\Entity\EntityRepositoryInterface $entity_repository
-   *   The entity repository.
-   * @param \Drupal\jsonapi\IncludeResolver $include_resolver
-   *   The include resolver.
-   * @param \Drupal\jsonapi\Access\EntityAccessChecker $entity_access_checker
-   *   The JSON:API entity access checker.
-   * @param \Drupal\jsonapi\Context\FieldResolver $field_resolver
-   *   The JSON:API field resolver.
-   * @param \Symfony\Component\Serializer\SerializerInterface|\Symfony\Component\Serializer\Normalizer\DenormalizerInterface $serializer
-   *   The JSON:API serializer.
-   * @param \Drupal\Component\Datetime\TimeInterface $time
-   *   The time service.
-   * @param \Drupal\Core\Session\AccountInterface $user
-   *   The current user account.
-   * @param \Drupal\Core\Language\LanguageManagerInterface $language_manager
-   *   The language manager.
+   * Injects the language manager.
    */
-  public function __construct(
-    EntityTypeManagerInterface $entity_type_manager,
-    EntityFieldManagerInterface $field_manager,
-    ResourceTypeRepositoryInterface $resource_type_repository,
-    RendererInterface $renderer, EntityRepositoryInterface $entity_repository,
-    IncludeResolver $include_resolver,
-    EntityAccessChecker $entity_access_checker,
-    FieldResolver $field_resolver,
-    SerializerInterface $serializer,
-    TimeInterface $time,
-    AccountInterface $user,
-    LanguageManagerInterface $language_manager
-  ) {
-    parent::__construct($entity_type_manager, $field_manager, $resource_type_repository, $renderer, $entity_repository, $include_resolver, $entity_access_checker, $field_resolver, $serializer, $time, $user);
+  public function setLanguageManager(LanguageManagerInterface $language_manager) {
     $this->languageManager = $language_manager;
   }
 
@@ -137,7 +88,7 @@ class EntityResource extends JsonApiEntityResource {
         return parent::getIndividual($entity, $request);
       }
       else {
-        throw new UnprocessableEntityHttpException('The specified resource does not support translation.');
+        throw new BadRequestHttpException('The request specified a preferred language, but the requested resource type does not support translations.');
       }
     }
 
@@ -207,7 +158,7 @@ class EntityResource extends JsonApiEntityResource {
           ->getKey('langcode');
 
         if (!isset($body['data']['attributes'][$langcode_key])) {
-          $parsed_entity = $this->getParsedEntity($resource_type, $request);
+          $parsed_entity = $this->getEntityFromRequest($resource_type, $request);
           assert($parsed_entity instanceof ContentEntityInterface);
           $parsed_entity->set($langcode_key, $resource_language);
         }
@@ -400,7 +351,7 @@ class EntityResource extends JsonApiEntityResource {
       throw new UnprocessableEntityHttpException('The specified resource is not language aware.');
     }
     $resource_langcode = $resource_language->getId();
-    $parsed_entity = $this->getParsedEntity($resource_type, $request);
+    $parsed_entity = $this->getEntityFromRequest($resource_type, $request);
     $parsed_langcode = $parsed_entity->language()->getId();
     if ($resource_langcode !== $parsed_langcode) {
       $message = 'Translation resource language mismatch: "%s" (request metadata) vs "%s" (request payload).';

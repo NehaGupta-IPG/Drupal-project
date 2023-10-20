@@ -13,7 +13,7 @@ use Drupal\jsonapi\Access\EntityAccessChecker as JsonApiEntityAccessChecker;
  *
  * @see https://www.drupal.org/project/drupal/issues/3032787
  */
-class EntityAccessChecker extends JsonApiEntityAccessChecker {
+final class EntityAccessChecker extends JsonApiEntityAccessChecker {
 
   /**
    * {@inheritdoc}

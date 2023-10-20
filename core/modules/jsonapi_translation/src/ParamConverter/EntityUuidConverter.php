@@ -12,7 +12,7 @@ use Drupal\jsonapi\ParamConverter\EntityUuidConverter as JsonApiEntityUuidConver
  *
  * @todo Remove when https://www.drupal.org/node/2353611 lands.
  */
-class EntityUuidConverter extends JsonApiEntityUuidConverter {
+final class EntityUuidConverter extends JsonApiEntityUuidConverter {
 
   /**
    * {@inheritdoc}
