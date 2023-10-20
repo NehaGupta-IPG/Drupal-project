@@ -85,7 +85,7 @@ class EntityAccessChecker {
   public function getAccessCheckedResourceObject(EntityInterface $entity, ?AccountInterface $account = NULL) {
     $account = $account ?: $this->currentUser;
     $resource_type = $this->resourceTypeRepository->get($entity->getEntityTypeId(), $entity->bundle());
-    $entity = $this->entityRepository->getTranslationFromContext($entity, NULL, ['operation' => 'entity_upcast']);
+    $entity = $this->getEntityTranslation($entity);
     $access = $this->checkEntityAccess($entity, 'view', $account);
     $entity->addCacheableDependency($access);
     if (!$access->isAllowed()) {
@@ -102,6 +102,19 @@ class EntityAccessChecker {
       return new EntityAccessDeniedHttpException($entity, $access, '/data', 'The current user is not allowed to GET the selected resource.');
     }
     return ResourceObject::createFromEntity($resource_type, $entity);
+  }
+
+  /**
+   * Returns the appropriate translation to operate on.
+   *
+   * @param \Drupal\Core\Entity\EntityInterface $entity
+   *   An entity object.
+   *
+   * @return \Drupal\Core\Entity\EntityInterface
+   *   An entity translation object.
+   */
+  protected function getEntityTranslation(EntityInterface $entity): EntityInterface {
+    return $this->entityRepository->getTranslationFromContext($entity, NULL, ['operation' => 'entity_upcast']);
   }
 
   /**

@@ -1,0 +1,27 @@
+services:
+  jsonapi_translation.route_subscriber:
+    class: Drupal\jsonapi_translation\Routing\RouteSubscriber
+    arguments: ['@jsonapi.resource_type.repository']
+    tags:
+      - { name: event_subscriber }
+  jsonapi_translation.response_subscriber:
+    class: Drupal\jsonapi_translation\EventSubscriber\ResponseSubscriber
+    tags:
+      - { name: event_subscriber }
+
+  # Controller.
+  jsonapi_translation.entity_resource:
+    class: Drupal\jsonapi_translation\Controller\EntityResource
+    arguments:
+      - '@entity_type.manager'
+      - '@entity_field.manager'
+      - '@jsonapi.resource_type.repository'
+      - '@renderer'
+      - '@entity.repository'
+      - '@jsonapi.include_resolver'
+      - '@jsonapi.entity_access_checker'
+      - '@jsonapi.field_resolver'
+      - '@jsonapi.serializer'
+      - '@datetime.time'
+      - '@current_user'
+      - '@language_manager'
