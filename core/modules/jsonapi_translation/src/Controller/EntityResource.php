@@ -90,7 +90,7 @@ final class EntityResource extends JsonApiEntityResource {
         return parent::getIndividual($entity, $request);
       }
       else {
-        throw new BadRequestHttpException('The request specified a preferred language, but the requested resource type does not support translations.');
+        throw new BadRequestHttpException('The request specified a preferred language, but the requested resource type does not support translation.');
       }
     }
 
@@ -351,7 +351,7 @@ final class EntityResource extends JsonApiEntityResource {
       return;
     }
     if (!$this->isResourceLanguageAware($resource_type)) {
-      throw new UnprocessableEntityHttpException('The specified resource is not language aware.');
+      throw new UnprocessableEntityHttpException('The request specified a preferred language, but the requested resource type does not support translation.');
     }
     $resource_langcode = $resource_language->getId();
     $parsed_entity = $this->getEntityFromRequest($resource_type, $request);
@@ -430,11 +430,11 @@ final class EntityResource extends JsonApiEntityResource {
         return NULL;
       }
 
-      if ($request->headers->get('Accept-Language')) {
-        throw new BadRequestHttpException('Specifying both a request language and the "Accept-Language" header is not supported.');
-      }
       if ($content_language_header && $request->isMethodCacheable()) {
         throw new BadRequestHttpException('Specifying the "Content-Language" header is not supported in cacheable requests.');
+      }
+      if ($request->headers->get('Accept-Language')) {
+        throw new BadRequestHttpException('Specifying both a request language and the "Accept-Language" header is not supported.');
       }
       if ($param_langcode && $content_language_header && $param_langcode !== $content_language_header) {
         $message = 'Translation resource language mismatch: "%s" ("%s" query string parameter) vs "%s" ("%s" header).';
@@ -469,10 +469,11 @@ final class EntityResource extends JsonApiEntityResource {
    */
   protected function getPreferredResourceTranslation(ContentEntityInterface $entity, Request $request): ContentEntityInterface {
     $default_langcode = $entity->getUntranslated()->language()->getId();
-    $translation_langcodes = array_merge([$default_langcode], array_keys($entity->getTranslationLanguages(FALSE)));
-    $langcodes = array_combine($translation_langcodes, $translation_langcodes);
+    $translation_langcodes = array_keys($entity->getTranslationLanguages(FALSE));
+    $langcodes = array_merge([$default_langcode], $translation_langcodes);
     $langcode = $request->getPreferredLanguage($langcodes);
-    return $langcode ? $entity->getTranslation($langcode) : $entity->getUntranslated();
+    return $langcode && $entity->hasTranslation($langcode) ?
+      $entity->getTranslation($langcode) : $entity->getUntranslated();
   }
 
   /**
@@ -570,7 +571,7 @@ final class EntityResource extends JsonApiEntityResource {
             $resource_data,
             $resource_data->getResourceType(),
             $resource_data->getId(),
-            $resource_data->getVersionIdentifier(),
+            $resource_data->getResourceType()->isVersionable() ? $resource_data->getVersionIdentifier() : NULL,
             $resource_data->getFields(),
             $resource_links,
             $resource_data->getLanguage()

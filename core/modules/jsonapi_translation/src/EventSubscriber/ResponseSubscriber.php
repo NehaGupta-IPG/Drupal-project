@@ -38,11 +38,10 @@ final class ResponseSubscriber implements EventSubscriberInterface {
       $response->headers->set(EntityResource::HEADER_CONTENT_LANGUAGE, $langcode);
     }
 
-    // If the resource translation was negotiated via the "Accept-Language"
-    // header, we also need to set the "Vary" header accordingly, otherwise HTTP
-    // caching would not handle independent translations correctly.
-    $key = 'Accept-Language';
-    if ($response instanceof CacheableResponseInterface && $request->headers->has($key)) {
+    // We need to set the "Vary" header accordingly, otherwise HTTP caching
+    // would not handle independent translations correctly.
+    if ($response instanceof CacheableResponseInterface) {
+      $key = 'Accept-Language';
       $vary = $response->headers->get('Vary');
       $vary .= $vary ? ',' . $key : $key;
       $response->headers->set('Vary', $vary);

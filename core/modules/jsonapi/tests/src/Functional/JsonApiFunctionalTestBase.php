@@ -264,8 +264,10 @@ abstract class JsonApiFunctionalTestBase extends BrowserTestBase {
    * @param bool $referencing_twice
    *   (optional) Set to TRUE if you want articles to reference the same tag
    *   twice.
+   * @param string|null $langcode
+   *   (optional) The node language.
    */
-  protected function createDefaultContent($num_articles, $num_tags, $article_has_image, $article_has_link, $is_multilingual, $referencing_twice = FALSE) {
+  protected function createDefaultContent($num_articles, $num_tags, $article_has_image, $article_has_link, $is_multilingual, $referencing_twice = FALSE, $langcode = NULL) {
     $random = $this->getRandomGenerator();
     for ($created_tags = 0; $created_tags < $num_tags; $created_tags++) {
       $term = Term::create([
@@ -287,6 +289,10 @@ abstract class JsonApiFunctionalTestBase extends BrowserTestBase {
         'promote' => TRUE,
       ];
 
+      if ($langcode) {
+        $values['langcode'] = $langcode;
+      }
+
       if ($referencing_twice) {
         $values['field_tags'] = [
           ['target_id' => 1],
@@ -295,10 +301,10 @@ abstract class JsonApiFunctionalTestBase extends BrowserTestBase {
       }
       else {
         // Get N random tags.
-        $selected_tags = mt_rand(1, $num_tags);
+        $selected_tags = $num_tags > 1 ? mt_rand(1, $num_tags) : 1;
         $tags = [];
         while (count($tags) < $selected_tags) {
-          $tags[] = mt_rand(1, $num_tags);
+          $tags[] = $num_tags > 1 ? mt_rand(1, $num_tags) : 1;
           $tags = array_unique($tags);
         }
         $values['field_tags'] = array_map(function ($tag): array {
