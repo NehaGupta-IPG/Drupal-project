@@ -35,13 +35,13 @@ use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
  * language:
  * - GET requests may specify the preferred resource language via the
  *   "Accept-Language" header, when accessing entities via the canonical URL.
- *   Alternatively it is possible to use a "lang_code" query string parameter to
+ *   Alternatively it is possible to use a "langCode" query string parameter to
  *   specify the desired resource language. In the former case a missing
- *   translation will trigger a fallback to the default translation, in the
+ *   translation will trigger a fallback to an existing translation, in the
  *   latter a "404 Not found" will be returned.
  * - POST, PATCH, DELETE requests may use the two following ways to specify a
  *   resource language:
- *   - The "lang_code" query string parameter described above.
+ *   - The "langCode" query string parameter described above.
  *   - The "Content-Language" request header.
  *   These are functionally identical and a missing translation will always
  *   result in a "404 Not found" response.
@@ -97,7 +97,7 @@ final class EntityResource extends JsonApiEntityResource {
     $entity = $this->getDefaultTranslation($entity);
 
     // If a resource language is explicitly provided, a resource translation was
-    // univocally specified. Otherwise we rely on the "Accept-Language" header
+    // unambiguously specified. Otherwise we rely on the "Accept-Language" header
     // for the fallback logic.
     if ($resource_language) {
       $translation = $this->getResourceTranslation($entity, $request);
@@ -124,8 +124,8 @@ final class EntityResource extends JsonApiEntityResource {
       $response->addCacheableDependency($url);
       $response->headers->set('Content-Location', $url->getGeneratedUrl());
 
-      // @todo Neither internal nor dynamic page cache support the "Accept-Language"
-      //   header currently. Remove this once they do.
+      // @todo Internal page cache does not support the "Accept-Language" header
+      //   currently. Remove this once it does. See TODO.
       \Drupal::service('page_cache_kill_switch')->trigger();
     }
 
