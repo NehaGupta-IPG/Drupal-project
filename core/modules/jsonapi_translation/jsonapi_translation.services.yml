@@ -17,3 +17,4 @@ services:
       -
         method: 'setLanguageManager'
         arguments: ['@language_manager']
+  Drupal\jsonapi_translation\Controller\EntityResource: '@jsonapi_translation.entity_resource'

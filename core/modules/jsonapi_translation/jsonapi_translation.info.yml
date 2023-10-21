@@ -2,6 +2,7 @@ name: JSON:API Translation
 type: module
 description: Allows the translation of content entities via JSON:API endpoints.
 package: Core (Experimental)
+version: VERSION
 dependencies:
   - drupal:content_translation
   - drupal:jsonapi
