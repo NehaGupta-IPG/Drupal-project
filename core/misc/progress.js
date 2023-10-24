@@ -18,6 +18,7 @@
     return (
       `<div id="${escapedId}" class="progress" aria-live="polite">` +
       '<div class="progress__label">&nbsp;</div>' +
+      `<progress class="progressbar" value="0" max="100"></progress>` +
       '<div class="progress__track"><div class="progress__bar"></div></div>' +
       '<div class="progress__percentage"></div>' +
       '<div class="progress__description">&nbsp;</div>' +
@@ -75,6 +76,8 @@
        */
       setProgress(percentage, message, label) {
         if (percentage >= 0 && percentage <= 100) {
+          const bar = $(this.element).find('progress');
+          bar.val(percentage);
           $(this.element)
             .find('div.progress__bar')
             .each(function () {

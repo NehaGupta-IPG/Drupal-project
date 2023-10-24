@@ -21,6 +21,39 @@
   --progress-bar-default-size-radius: var(--space-m);
 }
 
+.progressbar {
+  display: block;
+  margin-block-start: 0;
+  border: var(--progress-bar-border-size) var(--progress-track-border-color) solid;
+  border-radius: var(--progress-bar-default-size-radius);
+  background-color: var(--progress-track-bg-color);
+  inline-size: 100%;
+  block-size: 1rem;
+  box-sizing: border-box;
+}
+
+.progressbar::-webkit-progress-bar {
+  background-color: transparent;
+}
+
+.progressbar::-moz-progress-bar {
+  block-size: var(--progress-bar-default-size);
+  -moz-transition: var(--progress-bar-transition);
+  transition: var(--progress-bar-transition);
+  border: var(--progress-bar-border-size) var(--progress-bar-border-color) solid;
+  border-radius: var(--progress-bar-default-size-radius);
+  background-color: var(--progress-bar-bg-color);
+}
+
+.progressbar::-webkit-progress-value {
+  block-size: var(--progress-bar-default-size);
+  -webkit-transition: var(--progress-bar-transition);
+  transition: var(--progress-bar-transition);
+  border: var(--progress-bar-border-size) var(--progress-bar-border-color) solid;
+  border-radius: var(--progress-bar-default-size-radius);
+  background-color: var(--progress-bar-bg-color);
+}
+
 .progress::after {
   display: table;
   clear: both;
