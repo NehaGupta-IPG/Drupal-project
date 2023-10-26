@@ -178,7 +178,7 @@ class LinkFormatter extends FormatterBase {
     foreach ($items as $delta => $item) {
       // By default use the full URL as the link text.
       $url = $this->buildUrl($item);
-      $link_title = $url->toString();
+      $link_title = rawurldecode($url->toString());
 
       // If the title field value is available, use it for the link text.
       if (empty($settings['url_only']) && !empty($item->title)) {

@@ -159,7 +159,7 @@ class UnroutedUrlAssembler implements UnroutedUrlAssemblerInterface {
 
     $prefix = empty($uri) ? rtrim($options['prefix'], '/') : $options['prefix'];
 
-    $uri = str_replace('%2F', '/', rawurlencode($prefix . $uri));
+    $uri = str_replace('%2F', '/', rawurlencode(rawurldecode($prefix . $uri)));
     $query = $options['query'] ? ('?' . UrlHelper::buildQuery($options['query'])) : '';
     $url = $base . $options['script'] . $uri . $query . $options['fragment'];
     return $collect_bubbleable_metadata ? $generated_url->setGeneratedUrl($url) : $url;

@@ -45,7 +45,7 @@ class LinkSeparateFormatter extends LinkFormatter {
     foreach ($items as $delta => $item) {
       // By default use the full URL as the link text.
       $url = $this->buildUrl($item);
-      $link_title = $url->toString();
+      $link_title = rawurldecode($url->toString());
 
       // If the link text field value is available, use it for the text.
       if (empty($settings['url_only']) && !empty($item->title)) {
@@ -62,7 +62,7 @@ class LinkSeparateFormatter extends LinkFormatter {
       if (empty($item->title)) {
         $link_title = NULL;
       }
-      $url_title = $url->toString();
+      $url_title = rawurldecode($url->toString());
       if (!empty($settings['trim_length'])) {
         $link_title = $link_title !== NULL ? Unicode::truncate($link_title, $settings['trim_length'], FALSE, TRUE) : NULL;
         $url_title = Unicode::truncate($url_title, $settings['trim_length'], FALSE, TRUE);
