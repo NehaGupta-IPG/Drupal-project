@@ -101,6 +101,7 @@ class NodeForm extends ContentEntityForm {
     // Attempt to load from preview when the uuid is present unless we are
     // rebuilding the form.
     $request_uuid = \Drupal::request()->query->get('uuid');
+    $form['#cache']['contexts'] = ['url.query_args:uuid'];
     if (!$form_state->isRebuilding() && $request_uuid && $preview = $store->get($request_uuid)) {
       /** @var \Drupal\Core\Form\FormStateInterface $preview */
 
