@@ -5,6 +5,7 @@ namespace Drupal\layout_builder\EventSubscriber;
 use Drupal\block_content\BlockContentEvents;
 use Drupal\block_content\BlockContentInterface;
 use Drupal\block_content\Event\BlockContentGetDependencyEvent;
+use Drupal\Core\Access\AccessibleInterface;
 use Drupal\Core\Ajax\AjaxHelperTrait;
 use Drupal\Core\Database\Connection;
 use Drupal\Core\Entity\EntityInterface;
@@ -45,49 +46,49 @@ class SetInlineBlockDependency implements EventSubscriberInterface {
    *
    * @var \Drupal\Core\Entity\EntityRepositoryInterface
    */
-  protected $entityRepository;
-
-  /**
-   * The database connection.
-   *
-   * @var \Drupal\Core\Database\Connection
-   */
-  protected $database;
-
-  /**
-   * The inline block usage service.
-   *
-   * @var \Drupal\layout_builder\InlineBlockUsageInterface
-   */
-  protected $usage;
+  protected EntityRepositoryInterface $entityRepository;
 
   /**
    * The current route match service.
    *
    * @var \Drupal\Core\Routing\RouteMatchInterface
    */
-  protected $currentRouteMatch;
+  protected RouteMatchInterface $currentRouteMatch;
 
   /**
-   * Constructs SetInlineBlockDependency object.
+   * Constructs a new SetInlineBlockDependency object.
    *
-   * @param \Drupal\Core\Entity\EntityRepositoryInterface $entity_repository
-   *   The entity type manager.
+   * @param \Drupal\Core\Entity\EntityRepositoryInterface $entityRepository
+   *   The entity repository
    * @param \Drupal\Core\Database\Connection $database
    *   The database connection.
    * @param \Drupal\layout_builder\InlineBlockUsageInterface $usage
    *   The inline block usage service.
-   * @param \Drupal\layout_builder\SectionStorage\SectionStorageManagerInterface $section_storage_manager
+   * @param \Drupal\layout_builder\SectionStorage\SectionStorageManagerInterface $sectionStorageManager
    *   The section storage manager.
-   * @param \Drupal\Core\Routing\RouteMatchInterface $current_route_match
+   * @param \Drupal\Core\Routing\RouteMatchInterface|null $currentRouteMatch
    *   The current route match service.
    */
-  public function __construct(EntityRepositoryInterface $entity_repository, Connection $database, InlineBlockUsageInterface $usage, SectionStorageManagerInterface $section_storage_manager, RouteMatchInterface $current_route_match) {
-    $this->entityRepository = $entity_repository;
-    $this->database = $database;
-    $this->usage = $usage;
-    $this->sectionStorageManager = $section_storage_manager;
-    $this->currentRouteMatch = $current_route_match;
+  public function __construct(
+    mixed $entityRepository,
+    protected readonly Connection $database,
+    protected readonly InlineBlockUsageInterface $usage,
+    SectionStorageManagerInterface $sectionStorageManager,
+    ?RouteMatchInterface $currentRouteMatch,
+  ) {
+    if (!$entityRepository instanceof EntityRepositoryInterface) {
+      // @todo Replace link with a link to the change record.
+      @trigger_error('Calling ' . __METHOD__ . ' without passing the entity repository as the first argument is deprecated in drupal:11.0.0 and will be required in drupal:12.0.0. See https://www.drupal.org/node/3047022', E_USER_DEPRECATED);
+      $entityRepository = \Drupal::service('entity.repository');
+    }
+    $this->entityRepository = $entityRepository;
+    $this->sectionStorageManager = $sectionStorageManager;
+    if (empty($currentRouteMatch)) {
+      // @todo Replace link with a link to the change record.
+      @trigger_error('Calling ' . __METHOD__ . ' without the $currentRouteMatch argument is deprecated in drupal:11.0.0 and will be required in drupal:12.0.0. See https://www.drupal.org/node/3047022', E_USER_DEPRECATED);
+      $currentRouteMatch = \Drupal::service('current_route_match');
+    }
+    $this->currentRouteMatch = $currentRouteMatch;
   }
 
   /**
@@ -132,16 +133,16 @@ class SetInlineBlockDependency implements EventSubscriberInterface {
    * @param string $operation
    *   The access operation to load the inline block dependency for.
    *
-   * @return \Drupal\Core\Entity\EntityInterface|null
-   *   Returns the layout dependency.
+   * @return \Drupal\Core\Access\AccessibleInterface|null
+   *   Returns the access dependency.
    *
    * @see \Drupal\block_content\BlockContentAccessControlHandler::checkAccess()
    * @see \Drupal\layout_builder\EventSubscriber\BlockComponentRenderArray::onBuildRender()
    */
-  protected function getInlineBlockDependency(BlockContentInterface $block_content, string $operation) {
+  protected function getInlineBlockDependency(BlockContentInterface $block_content, string $operation): ?AccessibleInterface {
     $active_operations = ['update', 'delete'];
     $current_route = $this->currentRouteMatch->getRouteObject();
-    if ('view' == $operation && ($current_route && $current_route->getOption('_layout_builder'))) {
+    if ('view' === $operation && ($current_route && $current_route->getOption('_layout_builder'))) {
       $active_operations[] = 'view';
     }
     $layout_entity_info = $this->usage->getUsage($block_content->id());
