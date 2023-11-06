@@ -430,6 +430,9 @@ class EntityField extends FieldPluginBase implements CacheableDependencyInterfac
     $options['settings'] = [
       'default' => $this->definition['default_formatter_settings'] ?? [],
     ];
+    $options['third_party_settings'] = [
+      'default' => [],
+    ];
     $options['group_column'] = [
       'default' => $default_column,
     ];
@@ -532,6 +535,43 @@ class EntityField extends FieldPluginBase implements CacheableDependencyInterfac
     $format = $form_state->getUserInput()['options']['type'] ?? $this->options['type'];
     if ($formatter = $this->getFormatterInstance($format)) {
       $settings_form = $formatter->settingsForm($form, $form_state);
+      $settings_form['third_party_settings'] = [
+        '#type' => 'details',
+        '#title' => $this->t('Third party settings'),
+        '#open' => TRUE,
+        '#access' => FALSE,
+        '#weight' => 6,
+      ];
+      // Invoke field_formatter_third_party_settings_form().
+      \Drupal::moduleHandler()->invokeAllWith(
+        'field_formatter_third_party_settings_form',
+        function (callable $hook, string $module) use (&$settings_form, &$formatter, &$field, &$form, &$form_state) {
+          $settings_form['third_party_settings'][$module] = $hook(
+            $formatter,
+            $field,
+            'views',
+            $form,
+            $form_state
+          );
+        }
+      );
+      if (!empty($settings_form['third_party_settings'])) {
+        // If there are third party settings fields to use. Allow the user to
+        // opt in/out of it.
+        $settings_form['use_third_party_settings'] = [
+          '#title' => $this->t('Use third party settings'),
+          '#type' => 'checkbox',
+          '#default_value' => !empty($this->options['third_party_settings']),
+          '#description' => $this->t("Enable use of the field formatter's third party settings."),
+          '#weight' => 5,
+        ];
+        unset($settings_form['third_party_settings']['#access']);
+        $settings_form['third_party_settings']['#states'] = [
+          'visible' => [
+            ':input[name="options[settings][use_third_party_settings]"]' => ['checked' => TRUE],
+          ],
+        ];
+      }
       // Convert field UI selector states to work in the Views field form.
       FormHelper::rewriteStatesSelector($settings_form, "fields[{$field->getName()}][settings_edit_form]", 'options');
     }
@@ -545,12 +585,45 @@ class EntityField extends FieldPluginBase implements CacheableDependencyInterfac
     // When we change the formatter type we don't want to keep any of the
     // previous configured formatter settings, as there might be schema
     // conflict.
-    unset($options['settings']);
+    unset($options['settings'], $options['third_party_settings']);
     $options = $form_state_options + $options;
     if (!isset($options['settings'])) {
       $options['settings'] = [];
     }
+
+    if (empty($options['settings']['use_third_party_settings'])) {
+      // Don't make use of third party settings.
+      $options['third_party_settings'] = [];
+    }
+    else {
+      $options['third_party_settings'] = $options['settings']['third_party_settings'] ?? [];
+      foreach ($options['third_party_settings'] as $module => $third_party_setting) {
+        if (empty($third_party_setting)) {
+          unset($options['third_party_settings'][$module]);
+        }
+      }
+    }
+    if (empty($options['third_party_settings'])) {
+      // Remove empty third party settings from being persisted.
+      unset($options['third_party_settings']);
+    }
+    unset($options['settings']['use_third_party_settings'], $options['settings']['third_party_settings']);
+
     return $options;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function unpackOptions(&$storage, $options, $definition = NULL, $all = TRUE, $check = TRUE) {
+    parent::unpackOptions($storage, $options, $definition, $all, $check);
+    if (!isset($definition)) {
+      $definition = $this->defineOptions();
+    }
+    // Remove the third party settings if it has no value.
+    if (!$all && isset($definition['third_party_settings']) && empty($storage['third_party_settings'])) {
+      unset($storage['third_party_settings']);
+    }
   }
 
   /**
@@ -1034,12 +1107,14 @@ class EntityField extends FieldPluginBase implements CacheableDependencyInterfac
       $format = $this->options['type'];
     }
     $settings = $this->options['settings'] + $this->formatterPluginManager->getDefaultSettings($format);
+    $third_party_settings = $this->options['third_party_settings'] ?? [];
 
     $options = [
       'field_definition' => $this->getFieldDefinition(),
       'configuration' => [
         'type' => $format,
         'settings' => $settings,
+        'third_party_settings' => $third_party_settings,
         'label' => '',
         'weight' => 0,
       ],
