@@ -178,6 +178,10 @@ field.widget.settings.file_generic:
       type: string
       label: 'Progress indicator'
 
+action.configuration.file_delete_action:
+  type: action_configuration_default
+  label: 'Delete file configuration'
+
 field_formatter_settings_base_file:
   type: mapping
   mapping:
