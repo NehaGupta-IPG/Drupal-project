@@ -1,0 +1,35 @@
+langcode: en
+status: true
+dependencies:
+  module:
+    - node
+    - options
+id: node.field_integer_list_3
+field_name: field_integer_list_3
+entity_type: node
+type: list_integer
+settings:
+  allowed_values:
+    -
+      value: 0
+      label: 'Zero value'
+    -
+      value: -1
+      label: 'Minus one'
+    -
+      value: 1
+      label: One
+    -
+      value: 2
+      label: Two
+    -
+      value: -2
+      label: 'Minus two'
+  allowed_values_function: ''
+module: options
+locked: false
+cardinality: 1
+translatable: true
+indexes: {  }
+persist_with_no_fields: false
+custom_storage: false
