@@ -137,7 +137,8 @@ interface LanguageNegotiatorInterface {
    *   definitions are returned.
    *
    * @return array[]
-   *   An array of language negotiation method definitions keyed by method id.
+   *   An array of language negotiation method definitions keyed by method id,
+   *   it is not sorted by weight.
    */
   public function getNegotiationMethods($type = NULL);
 
