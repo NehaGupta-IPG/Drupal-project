@@ -150,16 +150,41 @@ class ImageItemTest extends FieldKernelTestBase {
     $this->assertEquals($image->getHeight(), $entity->image_test->height);
     $this->assertEquals($new_alt, $entity->image_test->alt);
 
-    // Check that the image item can be set to the referenced file directly.
+    // Check that the image item can be set to the referenced file directly,
+    // both as a value, as well as an array with entity or target id and that
+    // the exisiting width and height is not lost.
     $entity->image_test = $this->image;
     $this->assertEquals($this->image->id(), $entity->image_test->target_id);
+    $this->assertEquals($image->getWidth(), $entity->image_test->width);
+    $this->assertEquals($image->getHeight(), $entity->image_test->height);
+
+    $entity->image_test = ['entity' => $this->image];
+    $this->assertEquals($this->image->id(), $entity->image_test->target_id);
+    $this->assertEquals($image->getWidth(), $entity->image_test->width);
+    $this->assertEquals($image->getHeight(), $entity->image_test->height);
+
+    $entity->image_test = ['target_id' => $this->image->id()];
+    $this->assertEquals($this->image->id(), $entity->image_test->target_id);
+    $this->assertEquals($image->getWidth(), $entity->image_test->width);
+    $this->assertEquals($image->getHeight(), $entity->image_test->height);
 
     // Delete the image and try to save the entity again.
     $this->image->delete();
     $entity = EntityTest::create(['name' => $this->randomMachineName()]);
     $entity->save();
 
-    // Test image item properties.
+    // Set a different image as array, width and height does get reset.
+    $new_image = File::create([
+      'uri' => 'public://example.jpg',
+    ]);
+    $new_image->save();
+    $entity->image_test = ['target_id' => $new_image->id()];
+    $this->assertEquals($new_image->id(), $entity->image_test->target_id);
+    $this->assertNull($entity->image_test->width);
+    $this->assertNull($entity->image_test->height);
+
+
+      // Test image item properties.
     $expected = ['target_id', 'entity', 'alt', 'title', 'width', 'height'];
     $properties = $entity->getFieldDefinition('image_test')->getFieldStorageDefinition()->getPropertyDefinitions();
     $this->assertEquals($expected, array_keys($properties));

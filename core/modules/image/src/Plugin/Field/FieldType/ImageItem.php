@@ -16,6 +16,7 @@ use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\TypedData\DataDefinition;
 use Drupal\file\Entity\File;
 use Drupal\file\Plugin\Field\FieldType\FileFieldItemList;
+use Drupal\file\FileInterface;
 use Drupal\file\Plugin\Field\FieldType\FileItem;
 
 /**
@@ -348,6 +349,23 @@ class ImageItem extends FileItem {
     if (!($this->entity && $this->entity instanceof EntityInterface)) {
       $this->getLogger('image')->warning("Missing file with ID %id.", ['%id' => $this->target_id]);
     }
+  }
+
+  public function setValue($values, $notify = TRUE) {
+    // Avoid losing the width and height values when the same reference is
+    // set again and there already is a width and height.
+    if (is_array($values) && !isset($values['width']) && !isset($values['height']) && $this->target_id && $this->width && $this->height) {
+      if (isset($values['entity']) && $values['entity'] instanceof FileInterface && $values['entity']->id() == $this->target_id) {
+        $values['width'] = $this->width;
+        $values['height'] = $this->height;
+      }
+      if (isset($values['target_id']) && $values['target_id'] == $this->target_id) {
+        $values['width'] = $this->width;
+        $values['height'] = $this->height;
+      }
+    }
+
+    parent::setValue($values, $notify);
   }
 
   /**
