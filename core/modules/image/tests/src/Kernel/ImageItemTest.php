@@ -152,7 +152,7 @@ class ImageItemTest extends FieldKernelTestBase {
 
     // Check that the image item can be set to the referenced file directly,
     // both as a value, as well as an array with entity or target id and that
-    // the exisiting width and height is not lost.
+    // the existing width and height is not lost.
     $entity->image_test = $this->image;
     $this->assertEquals($this->image->id(), $entity->image_test->target_id);
     $this->assertEquals($image->getWidth(), $entity->image_test->width);
