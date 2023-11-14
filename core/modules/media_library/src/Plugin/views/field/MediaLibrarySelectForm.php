@@ -137,6 +137,16 @@ class MediaLibrarySelectForm extends FieldPluginBase implements WorkspaceSafeFor
     $form['actions']['submit']['#value'] = $this->t('Insert selected');
     $form['actions']['submit']['#button_type'] = 'primary';
     $form['actions']['submit']['#field_id'] = $selection_field_id;
+
+    $form['actions']['cancel'] = [
+      '#type' => 'button',
+      '#value' => $this->t('Cancel'),
+      '#attributes' => [
+        // This is a special class to which JavaScript assigns dialog closing
+        // behavior.
+        'class' => ['dialog-cancel'],
+      ],
+    ];
   }
 
   /**
