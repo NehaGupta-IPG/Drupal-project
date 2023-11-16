@@ -152,6 +152,18 @@ class DisplayFeedTest extends ViewTestBase {
     $this->drupalGet('test-feed-display-fields.xml');
     $this->assertEquals($node_title, $this->getSession()->getDriver()->getText('//item/title'));
     $this->assertEquals($node_link, $this->getSession()->getDriver()->getText('//item/link'));
+
+    // Link and GUID as an absolute URL.
+    // Change the display to use the view_node_absolute field, which uses the
+    // field settings to return an absolute URL.
+    $view = Views::getView('test_display_feed');
+    $display = &$view->storage->getDisplay('feed_2');
+    $display['display_options']['row']['options']['link_field'] = 'view_node_absolute';
+    $display['display_options']['row']['options']['guid_field_options']['guid_field'] = 'view_node_absolute';
+    $view->save();
+    $this->drupalGet('test-feed-display-fields.xml');
+    $this->assertEquals($node_link, $this->getSession()->getDriver()->getText('//item/link'));
+    $this->assertEquals($node_link, $this->getSession()->getDriver()->getText('//item/guid'));
   }
 
   /**
