@@ -19,6 +19,29 @@ use Symfony\Component\Validator\ConstraintViolationInterface;
 )]
 class TextfieldWidget extends StringTextfieldWidget {
 
+  use HideTextFormatHelpTrait;
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function defaultSettings() {
+    return static::hideOptionsDefaultSettings() + parent::defaultSettings();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function settingsForm(array $form, FormStateInterface $form_state) {
+    return array_merge(parent::settingsForm($form, $form_state), $this->hideOptionsSettingsForm($form, $form_state));
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function settingsSummary() {
+    return array_merge(parent::settingsSummary(), $this->hideOptionsSettingsSummary());
+  }
+
   /**
    * {@inheritdoc}
    */
@@ -34,6 +57,8 @@ class TextfieldWidget extends StringTextfieldWidget {
     if ($allowed_formats && !$this->isDefaultValueWidget($form_state)) {
       $element['#allowed_formats'] = $allowed_formats;
     }
+
+    $element += $this->hideOptionsFormElement();
 
     return $element;
   }
