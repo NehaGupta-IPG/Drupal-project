@@ -53,7 +53,7 @@ class TextFieldTest extends StringFieldTest {
     $this->adminUser = $this->drupalCreateUser([
       'administer filters',
       'administer entity_test fields',
-      'administer entity_test form display'
+      'administer entity_test form display',
     ]);
   }
 

@@ -7,8 +7,7 @@ namespace Drupal\text\Plugin\Field\FieldWidget;
 use Drupal\Core\Form\FormStateInterface;
 
 /**
- * Wrapper to define the common logic to allow to hide text format help in text
- * based widgets.
+ * Wrapper to allow to hide text format help in text based widgets.
  */
 trait HideTextFormatHelpTrait {
 
