@@ -53,6 +53,7 @@ class TextFieldTest extends StringFieldTest {
     $this->adminUser = $this->drupalCreateUser([
       'administer filters',
       'administer entity_test fields',
+      'administer entity_test form display'
     ]);
   }
 
@@ -308,6 +309,15 @@ class TextFieldTest extends StringFieldTest {
   }
 
   /**
+   * Test widgets for fields with selected allowed formats.
+   */
+  public function testTextfieldWidgetsHideHelp() {
+    $this->_testTextfieldWidgetsHideHelp('text', 'text_textfield');
+    $this->_testTextfieldWidgetsHideHelp('text_long', 'text_textarea');
+    $this->_testTextfieldWidgetsHideHelp('text_with_summary', 'text_textarea_with_summary');
+  }
+
+  /**
    * Helper function for testTextfieldWidgetsFormatted().
    */
   public function _testTextfieldWidgetsFormatted($field_type, $widget_type): void {
@@ -405,6 +415,99 @@ class TextFieldTest extends StringFieldTest {
     $content = $display->build($entity);
     $rendered_entity = \Drupal::service('renderer')->renderRoot($content);
     $this->assertStringContainsString($value, (string) $rendered_entity);
+  }
+
+  /**
+   * Helper function for testTextfieldWidgetsHideHelp().
+   */
+  public function _testTextfieldWidgetsHideHelp($field_type, $widget_type) {
+    // Create a field.
+    $field_name = $this->randomMachineName();
+    $field_storage = FieldStorageConfig::create([
+      'field_name' => $field_name,
+      'entity_type' => 'entity_test',
+      'type' => $field_type,
+    ]);
+    $field_storage->save();
+    FieldConfig::create([
+      'field_storage' => $field_storage,
+      'bundle' => 'entity_test',
+      'label' => $this->randomMachineName() . '_label',
+    ])->save();
+    /** @var \Drupal\Core\Entity\EntityDisplayRepositoryInterface $display_repository */
+    $display_repository = \Drupal::service('entity_display.repository');
+    $display_repository->getFormDisplay('entity_test', 'entity_test')
+      ->setComponent($field_name, [
+        'type' => $widget_type,
+      ])
+      ->save();
+    $display_repository->getViewDisplay('entity_test', 'entity_test', 'full')
+      ->setComponent($field_name)
+      ->save();
+
+    $this->drupalLogin($this->adminUser);
+    // Go to the form display page to assert that checkboxes are present.
+    $fieldEditUrl = 'entity_test/structure/entity_test/form-display';
+    $this->drupalGet($fieldEditUrl);
+    $this->submitForm([], $field_name . '_settings_edit');
+    $this->assertSession()->pageTextContains('Hide the help link About text formats.');
+    $this->getSession()->getPage()->hasUnCheckedField('fields[' . $field_name . '][settings_edit_form][settings][hide_help]');
+    $this->assertSession()->pageTextContains('Hide text format guidelines.');
+    $this->getSession()->getPage()->hasUnCheckedField('fields[' . $field_name . '][settings_edit_form][settings][hide_guidelines]');
+
+    // Confirm that both help link and guidelines are visible.
+    $this->drupalLogin($this->webUser);
+    $this->drupalGet('entity_test/add');
+    $this->assertSession()->elementExists('css', '[data-drupal-selector="edit-' . $field_name . '-0-format-help"]');
+    $this->assertSession()->elementExists('css', '[data-drupal-selector="edit-' . $field_name . '-0-format-guidelines"]');
+
+    // Hide the help link.
+    $this->drupalLogin($this->adminUser);
+    $this->drupalGet($fieldEditUrl);
+    $this->submitForm([], $field_name . '_settings_edit');
+    $edit = [
+      'fields[' . $field_name . '][settings_edit_form][settings][hide_help]' => TRUE,
+      'fields[' . $field_name . '][settings_edit_form][settings][hide_guidelines]' => FALSE,
+    ];
+    $this->submitForm($edit, 'edit-submit');
+
+    // Confirm that only guidelines are visible.
+    $this->drupalLogin($this->webUser);
+    $this->drupalGet('entity_test/add');
+    $this->assertSession()->elementNotExists('css', '[data-drupal-selector="edit-' . $field_name . '-0-format-help"]');
+    $this->assertSession()->elementExists('css', '[data-drupal-selector="edit-' . $field_name . '-0-format-guidelines"]');
+
+    // Hide the guidelines text.
+    $this->drupalLogin($this->adminUser);
+    $this->drupalGet($fieldEditUrl);
+    $this->submitForm([], $field_name . '_settings_edit');
+    $edit = [
+      'fields[' . $field_name . '][settings_edit_form][settings][hide_help]' => FALSE,
+      'fields[' . $field_name . '][settings_edit_form][settings][hide_guidelines]' => TRUE,
+    ];
+    $this->submitForm($edit, 'edit-submit');
+
+    // Confirm that only guidelines are visible.
+    $this->drupalLogin($this->webUser);
+    $this->drupalGet('entity_test/add');
+    $this->assertSession()->elementExists('css', '[data-drupal-selector="edit-' . $field_name . '-0-format-help"]');
+    $this->assertSession()->elementNotExists('css', '[data-drupal-selector="edit-' . $field_name . '-0-format-guidelines"]');
+
+    // Hide both.
+    $this->drupalLogin($this->adminUser);
+    $this->drupalGet($fieldEditUrl);
+    $this->submitForm([], $field_name . '_settings_edit');
+    $edit = [
+      'fields[' . $field_name . '][settings_edit_form][settings][hide_help]' => TRUE,
+      'fields[' . $field_name . '][settings_edit_form][settings][hide_guidelines]' => TRUE,
+    ];
+    $this->submitForm($edit, 'edit-submit');
+
+    // Confirm that only guidelines are visible.
+    $this->drupalLogin($this->webUser);
+    $this->drupalGet('entity_test/add');
+    $this->assertSession()->elementNotExists('css', '[data-drupal-selector="edit-' . $field_name . '-0-format-help"]');
+    $this->assertSession()->elementNotExists('css', '[data-drupal-selector="edit-' . $field_name . '-0-format-guidelines"]');
   }
 
 }
