@@ -131,10 +131,10 @@ field.widget.settings.text_textarea:
       type: text
       label: 'Placeholder'
     hide_help:
-      type: string
+      type: boolean
       label: 'Hide help'
     hide_guidelines:
-      type: string
+      type: boolean
       label: 'Hide guidelines'
 
 
@@ -155,10 +155,10 @@ field.widget.settings.text_textarea_with_summary:
       type: boolean
       label: 'Always show summary'
     hide_help:
-      type: string
+      type: boolean
       label: 'Hide help'
     hide_guidelines:
-      type: string
+      type: boolean
       label: 'Hide guidelines'
 
 field.widget.settings.text_textfield:
@@ -172,8 +172,8 @@ field.widget.settings.text_textfield:
       type: label
       label: 'Placeholder'
     hide_help:
-      type: string
+      type: boolean
       label: 'Hide help'
     hide_guidelines:
-      type: string
+      type: boolean
       label: 'Hide guidelines'
