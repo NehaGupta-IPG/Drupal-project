@@ -129,8 +129,8 @@ class LanguageNegotiator implements LanguageNegotiatorInterface {
     $language = NULL;
 
     if ($this->currentUser) {
-      // Execute the language negotiation methods in the order they were set up
-      // and return the first valid language found.
+      // Execute the language negotiation methods in order they were
+      // configured and return the first valid language found.
       foreach ($this->getEnabledNegotiators($type) as $method_id => $info) {
         if (!isset($this->negotiatedLanguages[$method_id])) {
           try {
@@ -171,10 +171,13 @@ class LanguageNegotiator implements LanguageNegotiatorInterface {
    *   The language type.
    *
    * @return array
-   *   An array of enabled detection methods for the provided language type.
+   *   An array of enabled detection methods for the provided language type,
+   *   ordered by defined weight
    */
   protected function getEnabledNegotiators($type) {
-    return $this->configFactory->get('language.types')->get('negotiation.' . $type . '.enabled') ?: [];
+    $types = $this->configFactory->get('language.types')->get('negotiation.' . $type . '.enabled') ?: [];
+    asort($types, SORT_NUMERIC);
+    return $types;
   }
 
   /**
@@ -208,7 +211,8 @@ class LanguageNegotiator implements LanguageNegotiatorInterface {
     $definitions = $this->negotiatorManager->getDefinitions();
     if (isset($type)) {
       $enabled_methods = $this->getEnabledNegotiators($type);
-      $definitions = array_intersect_key($definitions, $enabled_methods);
+      // Reduce the definitions to the enabled ones und sort them by the weight of the enabled methods.
+      $definitions = array_merge($enabled_methods, array_intersect_key($definitions, $enabled_methods));
     }
     return $definitions;
   }
