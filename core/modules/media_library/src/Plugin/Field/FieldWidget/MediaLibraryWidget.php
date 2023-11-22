@@ -497,6 +497,7 @@ class MediaLibraryWidget extends WidgetBase implements TrustedCallbackInterface 
           '#weight' => 1,
           '#access' => $media_item->access('update'),
           '#attributes' => [
+            'aria-label' => $media_item->access('view label') ? $this->t('Edit @label', ['@label' => $media_item->label()]) : $this->t('Edit media'),
             'class' => ['edit-media', 'use-ajax'],
             'href' => $media_item->toUrl('edit-form', ['query' => $state->all()])->toString(),
             'data-dialog-type' => 'modal',
