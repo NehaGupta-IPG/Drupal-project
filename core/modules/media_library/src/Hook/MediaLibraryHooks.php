@@ -252,7 +252,7 @@ class MediaLibraryHooks {
 
       // Extract and parse the 'media_library_opener_id' from the request URI.
       $queryString = parse_url($mediaLibraryOpenerId, PHP_URL_QUERY);
-      parse_str($queryString, $queryParams);
+      parse_str($queryString ?? '', $queryParams);
       $mediaLibraryOpenerId = $queryParams['media_library_opener_id'] ?? NULL;
 
       if (($wrapper_format === 'drupal_modal' || $wrapper_format === 'drupal_ajax') && $mediaLibraryOpenerId === 'media_library.opener.field_widget') {
