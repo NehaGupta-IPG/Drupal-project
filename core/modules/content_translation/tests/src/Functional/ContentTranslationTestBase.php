@@ -120,6 +120,7 @@ abstract class ContentTranslationTestBase extends BrowserTestBase {
       'create content translations',
       'update content translations',
       'delete content translations',
+      'translate any entity',
     ]);
   }
 
