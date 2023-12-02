@@ -83,6 +83,78 @@ class BlockTest extends BlockTestBase {
   }
 
   /**
+   * Tests the negate condition for block's role visibility settings.
+   */
+  public function testBlockRoleVisibilityNegateCondition() {
+    $block_name = 'system_powered_by_block';
+    // Create a random title for the block.
+    $title = $this->randomMachineName(8);
+    // Enable a standard block.
+    $default_theme = $this->config('system.theme')->get('default');
+    // Test negate conditions for block's role access.
+    $this->drupalLogin($this->adminUser);
+    $block_id = strtolower($this->randomMachineName(8));
+    $edit = [
+      'id' => $block_id,
+      'region' => 'sidebar_first',
+      'settings[label]' => $title,
+      'settings[label_display]' => TRUE,
+      'visibility[user_role][roles][' . RoleInterface::AUTHENTICATED_ID . ']' => TRUE,
+      'visibility[user_role][negate]' => TRUE,
+    ];
+    $this->drupalGet('admin/structure/block/add/' . $block_name . '/' . $default_theme);
+
+    $this->submitForm($edit, 'Save block');
+    $this->assertSession()->pageTextContains('The block configuration has been saved.');
+    $this->drupalGet('');
+    $this->assertSession()->pageTextNotContains('Powered by Drupal');
+    $this->drupalLogout();
+
+    $this->drupalGet('');
+    $this->assertSession()->pageTextContains('Powered by Drupal');
+
+    // Enabled for "Editor" role and negate condition is TRUE.
+    // So block should not be displayed for editor users.
+    $this->drupalLogin($this->adminUser);
+    $this->drupalCreateRole(['access content'], 'editor', 'Editor');
+    $edit = [
+      'visibility[user_role][roles][editor]' => TRUE,
+      'visibility[user_role][roles][' . RoleInterface::AUTHENTICATED_ID . ']' => FALSE,
+      'visibility[user_role][negate]' => TRUE,
+    ];
+    $this->drupalGet('admin/structure/block/manage/' . $block_id);
+    $this->submitForm($edit, 'Save block');
+    $this->drupalLogout();
+
+    $this->drupalLogin($this->drupalCreateUser([], $this->randomMachineName(), FALSE, ['roles' => ['editor']]));
+    $this->drupalGet('');
+    $this->drupalGet('admin/structure/block/manage/' . $block_id);
+    $this->assertSession()->pageTextNotContains('Powered by Drupal');
+
+    // Block shouldn't be displayed to anonymous users.
+    $this->drupalLogout();
+    $this->drupalGet('');
+    $this->assertSession()->pageTextContains('Powered by Drupal');
+
+    $this->drupalLogin($this->drupalCreateUser());
+    $this->drupalGet('');
+    $this->assertSession()->pageTextContains('Powered by Drupal');
+
+    $this->drupalLogin($this->adminUser);
+    $edit = [
+      'visibility[user_role][roles][editor]' => TRUE,
+      'visibility[user_role][negate]' => FALSE,
+    ];
+    $this->drupalGet('admin/structure/block/manage/' . $block_id);
+    $this->submitForm($edit, 'Save block');
+    $this->drupalLogout();
+
+    $this->drupalLogin($this->drupalCreateUser([], $this->randomMachineName(), FALSE, ['roles' => ['editor']]));
+    $this->drupalGet('');
+    $this->assertSession()->pageTextContains('Powered by Drupal');
+  }
+
+  /**
    * Tests that visibility can be properly toggled.
    */
   public function testBlockToggleVisibility(): void {

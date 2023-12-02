@@ -266,6 +266,15 @@ class BlockForm extends EntityForm {
 
     if (isset($form['user_role'])) {
       $form['user_role']['#title'] = $this->t('Roles');
+      $form['user_role']['negate']['#title'] = $this->t('Roles');
+      $form['user_role']['negate']['#type'] = 'radios';
+      $form['user_role']['negate']['#weight'] = -1;
+      $form['user_role']['negate']['#default_value'] = (int) $form['request_path']['negate']['#default_value'];
+      $form['user_role']['negate']['#options'] = [
+        $this->t('Show for the selected roles'),
+        $this->t('Hide for the selected roles'),
+      ];
+      $form['user_role']['roles']['#title_display'] = 'invisible';
       unset($form['user_role']['roles']['#description']);
     }
     if (isset($form['request_path'])) {
