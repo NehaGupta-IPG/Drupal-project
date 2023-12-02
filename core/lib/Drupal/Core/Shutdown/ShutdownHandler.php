@@ -6,6 +6,9 @@ use Drupal\Core\Utility\Error;
 
 /**
  * Drupal shutdown handler utility class.
+ *
+ * Wrapper for register_shutdown_function() that catches thrown exceptions to
+ * avoid "Exception thrown without a stack frame in Unknown".
  */
 class ShutdownHandler {
 
@@ -62,9 +65,6 @@ class ShutdownHandler {
   /**
    * Getter for functions registered for execution on shutdown.
    *
-   * Wrapper for register_shutdown_function() that catches thrown exceptions to
-   * avoid "Exception thrown without a stack frame in Unknown".
-   *
    * @return \Drupal\Core\Shutdown\CallbackStack
    *   Array of shutdown functions to be executed.
    */
@@ -74,9 +74,6 @@ class ShutdownHandler {
 
   /**
    * Registers a function for execution on shutdown.
-   *
-   * Wrapper for register_shutdown_function() that catches thrown exceptions to
-   * avoid "Exception thrown without a stack frame in Unknown".
    *
    * @param callable $callback
    *   The shutdown function to register.
