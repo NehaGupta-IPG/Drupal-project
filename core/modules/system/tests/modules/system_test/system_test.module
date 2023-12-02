@@ -15,7 +15,7 @@ use Drupal\Core\Shutdown\ShutdownHandler;
 function _system_test_first_shutdown_function($arg1, $arg2): void {
   // Set something to ensure that this function got called.
   \Drupal::state()->set('_system_test_first_shutdown_function', [$arg1, $arg2]);
-  ShutdownHandler::getInstance()->set('_system_test_second_shutdown_function', $arg1, $arg2);
+  ShutdownHandler::getInstance()->add('_system_test_second_shutdown_function', $arg1, $arg2);
 }
 
 /**

@@ -40,7 +40,7 @@ class ShutdownFunctionTest extends KernelTestBase {
     $this->assertEmpty($instance->get());
     // Register a shutdown function that, when called, will register another
     // shutdown function.
-    $instance->set([$this, 'shutdownOne']);
+    $instance->add([$this, 'shutdownOne']);
     $this->assertCount(1, $instance->get());
 
     // Simulate the Drupal shutdown.
@@ -56,7 +56,7 @@ class ShutdownFunctionTest extends KernelTestBase {
    * Tests shutdown functions by registering another shutdown function.
    */
   public function shutdownOne(): void {
-    ShutdownHandler::getInstance()->set([$this, 'shutdownTwo']);
+    ShutdownHandler::getInstance()->add([$this, 'shutdownTwo']);
     $this->shutDownOneCalled = TRUE;
   }
 

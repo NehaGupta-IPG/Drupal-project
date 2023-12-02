@@ -64,7 +64,7 @@ function _batch_page(Request $request) {
   // updated.
   // @see _batch_shutdown()
   // @see \Symfony\Component\HttpFoundation\Response::send()
-  ShutdownHandler::getInstance()->set('_batch_shutdown');
+  ShutdownHandler::getInstance()->add('_batch_shutdown');
   _batch_needs_update(TRUE);
 
   $build = [];
@@ -567,7 +567,7 @@ function _batch_finished() {
  * Shutdown function: Stores the current batch data for the next request.
  *
  * @see _batch_page()
- * @see \Drupal\Core\Shutdown\ShutdownHandler::set()
+ * @see \Drupal\Core\Shutdown\ShutdownHandler::add()
  */
 function _batch_shutdown(): void {
   if (($batch = batch_get()) && _batch_needs_update()) {

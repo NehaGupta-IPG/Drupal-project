@@ -340,7 +340,7 @@ class SystemTestController extends ControllerBase implements TrustedCallbackInte
    * A simple page callback which adds a register shutdown function.
    */
   public function shutdownFunctions($arg1, $arg2) {
-    ShutdownHandler::getInstance()->set('_system_test_first_shutdown_function', $arg1, $arg2);
+    ShutdownHandler::getInstance()->add('_system_test_first_shutdown_function', $arg1, $arg2);
     // If using PHP-FPM then fastcgi_finish_request() will have been fired
     // preventing further output to the browser which means that the escaping of
     // the exception message can not be tested.

@@ -36,7 +36,7 @@ class DatabaseLockBackend extends LockBackendAbstract {
   public function __construct(Connection $database) {
     // __destruct() is causing problems with garbage collections, register a
     // shutdown function instead.
-    ShutdownHandler::getInstance()->set([$this, 'releaseAll']);
+    ShutdownHandler::getInstance()->add([$this, 'releaseAll']);
     $this->database = $database;
   }
 

@@ -454,12 +454,12 @@ function drupal_static_reset($name = NULL): void {
  * @param mixed ...$args
  *   Additional arguments to pass to the shutdown function.
  *
- * @return array
+ * @return iterable
  *   Array of shutdown functions to be executed.
  *
  * @deprecated in drupal:10.2.0 and is removed from drupal:11.0.0. Use
  *    \Drupal\Core\Shutdown\ShutdownHandler::get() or
- *    \Drupal\Core\Shutdown\ShutdownHandler::set() or
+ *    \Drupal\Core\Shutdown\ShutdownHandler::add() or
  *    \Drupal\Core\Shutdown\ShutdownHandler::reset() instead.
  *
  * @see https://www.drupal.org/node/3053808
@@ -470,7 +470,7 @@ function &drupal_register_shutdown_function($callback = NULL, ...$args) {
   @trigger_error(__FUNCTION__ .
     '() is deprecated in drupal:10.2.0 and is removed from drupal:11.0.0. ' .
     'Use \Drupal\Core\Shutdown\ShutdownHandler::get() or ' .
-    '\Drupal\Core\Shutdown\ShutdownHandler::set() or ' .
+    '\Drupal\Core\Shutdown\ShutdownHandler::add() or ' .
     '\Drupal\Core\Shutdown\ShutdownHandler::reset() instead. See ' .
     'https://www.drupal.org/node/3053808',
     E_USER_DEPRECATED
@@ -478,7 +478,7 @@ function &drupal_register_shutdown_function($callback = NULL, ...$args) {
   $handler = ShutdownHandler::getInstance();
   if (isset($callback)) {
     // Save callback and arguments
-    $handler->set($callback, ...$args);
+    $handler->add($callback, ...$args);
   }
   $callbacks = $handler->get();
   return $callbacks;

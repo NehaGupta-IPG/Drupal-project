@@ -275,7 +275,7 @@ class SessionTestController extends ControllerBase {
       'primary key' => ['sid'],
     ]);
 
-    ShutdownHandler::getInstance()->set(function () {
+    ShutdownHandler::getInstance()->add(function () {
       $schema = \Drupal::database()->schema();
       $schema->dropTable('sessions');
       $schema->renameTable('sessions_tmp', 'sessions');

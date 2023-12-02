@@ -80,7 +80,7 @@ class ShutdownHandler {
    * @param array $args
    *   Additional arguments to pass to the shutdown function.
    */
-  final public function set(callable $callback, ...$args): void {
+  final public function add(callable $callback, ...$args): void {
     $this->register();
     $this->callbackStack[] = ['callback' => $callback, 'arguments' => $args];
   }
