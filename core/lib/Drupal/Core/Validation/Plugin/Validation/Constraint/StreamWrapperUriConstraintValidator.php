@@ -16,7 +16,7 @@ class StreamWrapperUriConstraintValidator extends ConstraintValidator implements
   /**
    * Creates a StreamWrapperUriConstraintValidator object.
    *
-   * @param \Drupal\Core\StreamWrapper\StreamWrapperManagerInterface $stream_wrapper_manager
+   * @param \Drupal\Core\StreamWrapper\StreamWrapperManagerInterface $streamWrapperManager
    *   The stream wrapper manager.
    */
   public function __construct(protected StreamWrapperManagerInterface $streamWrapperManager) {
@@ -35,12 +35,13 @@ class StreamWrapperUriConstraintValidator extends ConstraintValidator implements
    * {@inheritdoc}
    */
   public function validate(mixed $value, Constraint $constraint) {
-    if ($this->streamWrapperManager->isValidUri($directory)) {
+    if ($this->streamWrapperManager->isValidUri($value)) {
       return;
     }
-    $violation = $this->context
+    $this->context
       ->buildViolation($constraint->message)
-      ->setParameter('%value', $value);
+      ->setParameter('%value', $value)
+      ->addViolation();
   }
 
 }
