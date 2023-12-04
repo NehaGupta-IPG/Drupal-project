@@ -3,6 +3,7 @@
 namespace Drupal\block_content\Plugin\Block;
 
 use Drupal\block_content\BlockContentUuidLookup;
+use Drupal\block_content\MissingBlockContentEntitySubscriber;
 use Drupal\block_content\Plugin\Derivative\BlockContent;
 use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Block\Attribute\Block;
@@ -12,9 +13,11 @@ use Drupal\Core\Entity\EntityDisplayRepositoryInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
-use Drupal\Core\Routing\UrlGeneratorInterface;
+use Drupal\Core\Routing\RedirectDestinationInterface;
 use Drupal\Core\Session\AccountInterface;
+use Drupal\Core\State\StateInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\Core\Url;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -57,11 +60,18 @@ class BlockContentBlock extends BlockBase implements ContainerFactoryPluginInter
   protected $blockContent;
 
   /**
-   * The URL generator.
+   * State service.
    *
-   * @var \Drupal\Core\Routing\UrlGeneratorInterface
+   * @var \Drupal\Core\State\StateInterface
    */
-  protected $urlGenerator;
+  protected $state;
+
+  /**
+   * Redirect destination.
+   *
+   * @var \Drupal\Core\Routing\RedirectDestinationInterface
+   */
+  protected $redirectDestination;
 
   /**
    * The block content UUID lookup service.
@@ -78,6 +88,13 @@ class BlockContentBlock extends BlockBase implements ContainerFactoryPluginInter
   protected $entityDisplayRepository;
 
   /**
+   * Missing block content entities repository.
+   *
+   * @var \Drupal\block_content\MissingBlockContentEntitySubscriber
+   */
+  protected $missingBlockContentEntitySubscriber;
+
+  /**
    * Constructs a new BlockContentBlock.
    *
    * @param array $configuration
@@ -92,22 +109,28 @@ class BlockContentBlock extends BlockBase implements ContainerFactoryPluginInter
    *   The entity type manager service.
    * @param \Drupal\Core\Session\AccountInterface $account
    *   The account for which view access should be checked.
-   * @param \Drupal\Core\Routing\UrlGeneratorInterface $url_generator
-   *   The URL generator.
+   * @param \Drupal\Core\State\StateInterface $state
+   *   State service.
+   * @param \Drupal\Core\Routing\RedirectDestinationInterface $redirectDestination
+   *   Redirect destination.
    * @param \Drupal\block_content\BlockContentUuidLookup $uuid_lookup
-   *   The block content UUID lookup service.
+   *   UUID lookup.
    * @param \Drupal\Core\Entity\EntityDisplayRepositoryInterface $entity_display_repository
-   *   The entity display repository.
+   *   Display repository.
+   * @param \Drupal\block_content\MissingBlockContentEntitySubscriber $missingBlockContentEntitySubscriber
+   *   Missing block content entities subscriber.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, BlockManagerInterface $block_manager, EntityTypeManagerInterface $entity_type_manager, AccountInterface $account, UrlGeneratorInterface $url_generator, BlockContentUuidLookup $uuid_lookup, EntityDisplayRepositoryInterface $entity_display_repository) {
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, BlockManagerInterface $block_manager, EntityTypeManagerInterface $entity_type_manager, AccountInterface $account, StateInterface $state, RedirectDestinationInterface $redirectDestination, BlockContentUuidLookup $uuid_lookup, EntityDisplayRepositoryInterface $entity_display_repository, MissingBlockContentEntitySubscriber $missingBlockContentEntitySubscriber) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
 
     $this->blockManager = $block_manager;
     $this->entityTypeManager = $entity_type_manager;
     $this->account = $account;
-    $this->urlGenerator = $url_generator;
+    $this->state = $state;
+    $this->redirectDestination = $redirectDestination;
     $this->uuidLookup = $uuid_lookup;
     $this->entityDisplayRepository = $entity_display_repository;
+    $this->missingBlockContentEntitySubscriber = $missingBlockContentEntitySubscriber;
   }
 
   /**
@@ -173,6 +196,13 @@ class BlockContentBlock extends BlockBase implements ContainerFactoryPluginInter
     if ($this->getEntity()) {
       return $this->getEntity()->access('view', $account, TRUE);
     }
+    // Missing items that were found during config import.
+    // @see \Drupal\block_content\MissingBlockContentEntitySubscriber::onMissingContent
+    // @see \Drupal\block_content\Plugin\Derivative\BlockContent::getDerivativeDefinitions
+    if ($this->missingBlockContentEntitySubscriber->isMissing($this->getDerivativeId())) {
+      return AccessResult::allowedIfHasPermission($account, 'administer blocks')
+        ->addCacheTags(['block_content_list']);
+    }
     return AccessResult::forbidden();
   }
 
@@ -183,15 +213,27 @@ class BlockContentBlock extends BlockBase implements ContainerFactoryPluginInter
     if ($block = $this->getEntity()) {
       return $this->entityTypeManager->getViewBuilder($block->getEntityTypeId())->view($block, $this->configuration['view_mode']);
     }
-    else {
+    // Missing items that were found during config import.
+    // @see \Drupal\block_content\MissingBlockContentEntitySubscriber::onMissingContent
+    // @see \Drupal\block_content\Plugin\Derivative\BlockContent::getDerivativeDefinitions
+    if ($missing = $this->missingBlockContentEntitySubscriber->isMissing($this->getDerivativeId())) {
       return [
-        '#markup' => $this->t('Block with uuid %uuid does not exist. <a href=":url">Add content block</a>.', [
-          '%uuid' => $this->getDerivativeId(),
-          ':url' => $this->urlGenerator->generate('block_content.add_page'),
+        '#markup' => $this->t('The content of the (%bundle) block is missing. <a href=":url">Add missing content</a>.', [
+          '%bundle' => $this->entityTypeManager->getStorage('block_content_type')->load($missing['bundle'])->label(),
+          ':url' => Url::fromRoute('block_content.add_missing', [
+            'uuid' => $missing['uuid'],
+            'block_content_type' => $missing['bundle'],
+          ], ['query' => $this->redirectDestination->getAsArray()])->toString(),
         ]),
         '#access' => $this->account->hasPermission('administer blocks'),
       ];
     }
+    // Fallback to the broken behaviour that occurs when a block plugin is
+    // missing.
+    // @see \Drupal\Core\Block\Plugin\Block\Broken::brokenMessage
+    return [
+      '#markup' => $this->t('This block is broken or missing. You may be missing content or you might need to enable the original module.'),
+    ];
   }
 
   /**
