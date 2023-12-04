@@ -1,0 +1,46 @@
+<?php
+
+namespace Drupal\Core\Validation\Plugin\Validation\Constraint;
+
+use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
+use Drupal\Core\StreamWrapper\StreamWrapperManagerInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\Validator\Constraint;
+use Symfony\Component\Validator\ConstraintValidator;
+
+/**
+ * Validates a string follows a stream wrapper pattern.
+ */
+class StreamWrapperUriConstraintValidator extends ConstraintValidator implements ContainerInjectionInterface {
+
+  /**
+   * Creates a StreamWrapperUriConstraintValidator object.
+   *
+   * @param \Drupal\Core\StreamWrapper\StreamWrapperManagerInterface $stream_wrapper_manager
+   *   The stream wrapper manager.
+   */
+  public function __construct(protected StreamWrapperManagerInterface $streamWrapperManager) {
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function create(ContainerInterface $container) {
+    return new static(
+      $container->get('stream_wrapper_manager')
+    );
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function validate(mixed $value, Constraint $constraint) {
+    if ($this->streamWrapperManager->isValidUri($directory)) {
+      return;
+    }
+    $violation = $this->context
+      ->buildViolation($constraint->message)
+      ->setParameter('%value', $value);
+  }
+
+}
