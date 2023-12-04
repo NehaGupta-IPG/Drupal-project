@@ -6,7 +6,7 @@ use Drupal\block_content\Entity\BlockContent;
 use Drupal\Core\Url;
 
 /**
- * Test behaviour of block_content blocks when the content entity doesn't exist.
+ * Test behavior of block_content blocks when the content entity doesn't exist.
  *
  * @group block_content
  */

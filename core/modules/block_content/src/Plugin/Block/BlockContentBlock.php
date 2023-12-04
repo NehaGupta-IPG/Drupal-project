@@ -228,7 +228,7 @@ class BlockContentBlock extends BlockBase implements ContainerFactoryPluginInter
         '#access' => $this->account->hasPermission('administer blocks'),
       ];
     }
-    // Fallback to the broken behaviour that occurs when a block plugin is
+    // Fallback to the broken behavior that occurs when a block plugin is
     // missing.
     // @see \Drupal\Core\Block\Plugin\Block\Broken::brokenMessage
     return [

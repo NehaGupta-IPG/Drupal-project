@@ -70,7 +70,7 @@ class BlockContentController extends ControllerBase {
    * @param \Drupal\Core\Entity\EntityRepositoryInterface $entityRepository
    *   The entity repository.
    */
-  public function __construct(EntityStorageInterface $block_content_storage, EntityStorageInterface $block_content_type_storage, ThemeHandlerInterface $theme_handler,  EntityRepositoryInterface $entityRepository) {
+  public function __construct(EntityStorageInterface $block_content_storage, EntityStorageInterface $block_content_type_storage, ThemeHandlerInterface $theme_handler, EntityRepositoryInterface $entityRepository) {
     $this->blockContentStorage = $block_content_storage;
     $this->blockContentTypeStorage = $block_content_type_storage;
     $this->themeHandler = $theme_handler;
