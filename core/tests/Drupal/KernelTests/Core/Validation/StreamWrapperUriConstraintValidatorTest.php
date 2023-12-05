@@ -17,14 +17,14 @@ class StreamWrapperUriConstraintValidatorTest extends KernelTestBase {
    *
    * @var \Drupal\Core\TypedData\TypedDataManager
    */
-  protected $typedData;
+  private $typedData;
 
   /**
    * The data definition object to use.
    *
    * @var \Drupal\Core\TypedData\DataDefinition
    */
-  protected $definition;
+  private $definition;
 
   /**
    * {@inheritdoc}
