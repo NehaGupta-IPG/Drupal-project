@@ -21,6 +21,6 @@ interface StateRevertValidationInterface {
    * @return \Drupal\workflows\StateInterface[]
    *   The states that can be reverted to.
    */
-  public function getValidRevertStates(ContentEntityInterface $revision, AccountInterface $user);
+  public function getValidRevertStates(ContentEntityInterface $revision, AccountInterface $user): array;
 
 }

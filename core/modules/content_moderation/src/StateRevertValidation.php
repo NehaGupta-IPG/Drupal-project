@@ -20,7 +20,7 @@ class StateRevertValidation implements StateRevertValidationInterface {
   /**
    * {@inheritdoc}
    */
-  public function getValidRevertStates(ContentEntityInterface $revision, AccountInterface $user) {
+  public function getValidRevertStates(ContentEntityInterface $revision, AccountInterface $user): array {
     $workflow = $this->moderationInfo->getWorkflowForEntity($revision);
     return array_filter($workflow->getTypePlugin()->getStates(), function (StateInterface $state) use ($workflow, $user) {
       return $user->hasPermission('revert ' . $workflow->id() . ' revisions to ' . $state->id());
