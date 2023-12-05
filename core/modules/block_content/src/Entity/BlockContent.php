@@ -191,20 +191,6 @@ class BlockContent extends EditorialContentEntityBase implements BlockContentInt
   /**
    * {@inheritdoc}
    */
-  public function preSaveRevision(EntityStorageInterface $storage, \stdClass $record) {
-    parent::preSaveRevision($storage, $record);
-
-    if (!$this->isNewRevision() && $this->getOriginal() && empty($record->revision_log_message)) {
-      // If we are updating an existing block_content without adding a new
-      // revision and the user did not supply a revision log, keep the existing
-      // one.
-      $record->revision_log = $this->getOriginal()->getRevisionLogMessage();
-    }
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public static function baseFieldDefinitions(EntityTypeInterface $entity_type) {
     /** @var \Drupal\Core\Field\BaseFieldDefinition[] $fields */
     $fields = parent::baseFieldDefinitions($entity_type);

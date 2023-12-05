@@ -11,6 +11,7 @@ use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\TypedData\TranslationStatusInterface;
 use Drupal\Core\TypedData\TypedDataInterface;
+use Drupal\user\EntityOwnerInterface;
 
 /**
  * Implements Entity Field API specific enhancements to the Entity class.
@@ -474,6 +475,12 @@ abstract class ContentEntityBase extends EntityBase implements \IteratorAggregat
     }
     else {
       $this->validated = FALSE;
+    }
+
+    // If no revision author has been set explicitly, make the entity owner the
+    // revision author.
+    if ($this instanceof EntityOwnerInterface && $this instanceof RevisionLogInterface && !$this->getRevisionUser()) {
+      $this->setRevisionUserId($this->getOwnerId());
     }
 
     parent::preSave($storage);

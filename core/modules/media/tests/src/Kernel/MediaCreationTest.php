@@ -80,6 +80,7 @@ class MediaCreationTest extends MediaKernelTestBase {
     $this->assertSame('Unnamed', $media->getName(), 'The media item was not created with the correct name.');
     $source_field_name = $media->bundle->entity->getSource()->getSourceFieldDefinition($media->bundle->entity)->getName();
     $this->assertSame('Nation of sheep, ruled by wolves, owned by pigs.', $media->get($source_field_name)->value, 'Source returns incorrect source field value.');
+    $this->assertSame($media->getOwnerId(), $media->getRevisionUserId(), 'The media item was not created with the correct revision author.');
   }
 
 }
