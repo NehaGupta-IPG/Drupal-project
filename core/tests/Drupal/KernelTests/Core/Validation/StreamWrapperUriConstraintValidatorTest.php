@@ -44,7 +44,7 @@ class StreamWrapperUriConstraintValidatorTest extends KernelTestBase {
   public function testValidate(mixed $value, bool $is_valid): void {
     $typed_data = $this->typedData->create($this->definition, $value);
     $violations = $typed_data->validate();
-    $this->assertEquals($is_valid ? 0 : 1, $violations->count(), 'Validation failed for incorrect value.');
+    $this->assertCount($is_valid ? 0 : 1, $violations, 'Validation failed for incorrect value.');
     if (!$is_valid) {
       $expected = sprintf('"%s" is not a valid stream wrapper URI.', $value);
       $actual = $violations->get(0)->getMessage();
