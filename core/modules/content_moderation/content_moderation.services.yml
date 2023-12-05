@@ -12,6 +12,7 @@ services:
   content_moderation.state_revert_validation:
     class: Drupal\content_moderation\StateRevertValidation
     arguments: ['@content_moderation.moderation_information']
+  Drupal\content_moderation\StateRevertValidationInterface: '@content_moderation.state_revert_validation'
   content_moderation.moderation_information:
     class: Drupal\content_moderation\ModerationInformation
   Drupal\content_moderation\ModerationInformationInterface: '@content_moderation.moderation_information'
