@@ -12,20 +12,9 @@ use Drupal\workflows\StateInterface;
 class StateRevertValidation implements StateRevertValidationInterface {
 
   /**
-   * The moderation information service.
-   *
-   * @var \Drupal\content_moderation\ModerationInformationInterface
-   */
-  protected $moderationInfo;
-
-  /**
    * Constructs a new StateRevertValidation.
-   *
-   * @param \Drupal\content_moderation\ModerationInformationInterface $moderation_info
-   *   The moderation information service.
    */
-  public function __construct(ModerationInformationInterface $moderation_info) {
-    $this->moderationInfo = $moderation_info;
+  public function __construct(protected ModerationInformationInterface $moderationInfo) {
   }
 
   /**
