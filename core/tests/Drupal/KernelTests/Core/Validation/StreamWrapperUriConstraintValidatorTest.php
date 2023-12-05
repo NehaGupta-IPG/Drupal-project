@@ -2,6 +2,7 @@
 
 namespace Drupal\KernelTests\Core\Validation;
 
+use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\TypedData\DataDefinition;
 use Drupal\Core\TypedData\TypedDataManagerInterface;
 use Drupal\KernelTests\KernelTestBase;
@@ -11,6 +12,8 @@ use Drupal\KernelTests\KernelTestBase;
  * @group validation
  */
 class StreamWrapperUriConstraintValidatorTest extends KernelTestBase {
+
+  use StringTranslationTrait;
 
   /**
    * The typed data manager to use.
@@ -46,9 +49,8 @@ class StreamWrapperUriConstraintValidatorTest extends KernelTestBase {
     $violations = $typed_data->validate();
     $this->assertCount($is_valid ? 0 : 1, $violations, 'Validation failed for incorrect value.');
     if (!$is_valid) {
-      $expected = sprintf('"%s" is not a valid stream wrapper URI.', $value);
-      $actual = $violations->get(0)->getMessage();
-      $this->assertEquals($expected, $actual, 'Validation violation message was generated correctly for incorrect value.');
+      $expected = (string) $this->t('"%value" is not a valid stream wrapper URI.', ['%value' => $value]);
+      $this->assertSame($expected, (string) $violations->get(0)->getMessage(), 'Validation violation message was generated correctly for incorrect value.');
     }
   }
 
