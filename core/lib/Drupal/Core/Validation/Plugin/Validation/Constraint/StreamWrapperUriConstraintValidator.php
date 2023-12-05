@@ -27,7 +27,7 @@ class StreamWrapperUriConstraintValidator extends ConstraintValidator implements
    */
   public static function create(ContainerInterface $container) {
     return new static(
-      $container->get('stream_wrapper_manager')
+      $container->get(StreamWrapperManagerInterface::class);
     );
   }
 
