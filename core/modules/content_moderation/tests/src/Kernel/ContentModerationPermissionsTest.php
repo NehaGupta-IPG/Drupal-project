@@ -41,7 +41,11 @@ class ContentModerationPermissionsTest extends KernelTestBase {
   #[DataProvider('permissionsTestCases')]
   public function testPermissions($workflow, $permissions): void {
     Workflow::create($workflow)->save();
-    $this->assertEquals($permissions, (new Permissions())->transitionPermissions());
+    $this->assertEquals($permissions, array_map(function (array $transitionPermission): array {
+      $transitionPermission['title'] = (string) $transitionPermission['title'];
+      $transitionPermission['description'] = (string) $transitionPermission['description'];
+      return $transitionPermission;
+    }, (new Permissions())->transitionPermissions()));
   }
 
   /**
@@ -50,7 +54,7 @@ class ContentModerationPermissionsTest extends KernelTestBase {
    * @return array
    *   Content moderation permissions based test cases.
    */
-  public static function permissionsTestCases() {
+  public static function permissionsTestCases(): array {
     return [
       'Simple Content Moderation Workflow' => [
         [
@@ -110,8 +114,8 @@ class ContentModerationPermissionsTest extends KernelTestBase {
         ],
         [
           'use simple_workflow transition publish' => [
-            'title' => 'Simple Workflow workflow: Use Publish transition.',
-            'description' => 'Move content from Draft, Published states to Published state.',
+            'title' => '<em class="placeholder">Simple Workflow</em> workflow: Use <em class="placeholder">Publish</em> transition.',
+            'description' => 'Move content from <em class="placeholder">Draft, Published</em> states to <em class="placeholder">Published</em> state.',
             'dependencies' => [
               'config' => [
                 'workflows.workflow.simple_workflow',
@@ -119,8 +123,8 @@ class ContentModerationPermissionsTest extends KernelTestBase {
             ],
           ],
           'use simple_workflow transition create_new_draft' => [
-            'title' => 'Simple Workflow workflow: Use Create New Draft transition.',
-            'description' => 'Move content from Draft, Published states to Draft state.',
+            'title' => '<em class="placeholder">Simple Workflow</em> workflow: Use <em class="placeholder">Create New Draft</em> transition.',
+            'description' => 'Move content from <em class="placeholder">Draft, Published</em> states to <em class="placeholder">Draft</em> state.',
             'dependencies' => [
               'config' => [
                 'workflows.workflow.simple_workflow',
@@ -128,13 +132,25 @@ class ContentModerationPermissionsTest extends KernelTestBase {
             ],
           ],
           'use simple_workflow transition archive' => [
-            'title' => 'Simple Workflow workflow: Use Archive transition.',
-            'description' => 'Move content from Published state to Archived state.',
+            'title' => '<em class="placeholder">Simple Workflow</em> workflow: Use <em class="placeholder">Archive</em> transition.',
+            'description' => 'Move content from <em class="placeholder">Published</em> state to <em class="placeholder">Archived</em> state.',
             'dependencies' => [
               'config' => [
                 'workflows.workflow.simple_workflow',
               ],
             ],
+          ],
+          'revert simple_workflow revisions to draft' => [
+            'title' => '<em class="placeholder">Simple Workflow</em> workflow: Revert revisions to <em class="placeholder">Draft</em> state',
+            'description' => 'For supported entity types assigned to the <em class="placeholder">Simple Workflow</em> workflow, allows users to revert <em>any</em> content revision to the <em class="placeholder">Draft</em> state. Reverting revisions will not consider any existing transition based permissions.',
+          ],
+          'revert simple_workflow revisions to published' => [
+            'title' => '<em class="placeholder">Simple Workflow</em> workflow: Revert revisions to <em class="placeholder">Published</em> state',
+            'description' => 'For supported entity types assigned to the <em class="placeholder">Simple Workflow</em> workflow, allows users to revert <em>any</em> content revision to the <em class="placeholder">Published</em> state. Reverting revisions will not consider any existing transition based permissions.',
+          ],
+          'revert simple_workflow revisions to archived' => [
+            'title' => '<em class="placeholder">Simple Workflow</em> workflow: Revert revisions to <em class="placeholder">Archived</em> state',
+            'description' => 'For supported entity types assigned to the <em class="placeholder">Simple Workflow</em> workflow, allows users to revert <em>any</em> content revision to the <em class="placeholder">Archived</em> state. Reverting revisions will not consider any existing transition based permissions.',
           ],
         ],
       ],

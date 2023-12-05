@@ -8,6 +8,8 @@ use Drupal\Core\Routing\RoutingEvents;
 use Drupal\workflows\Entity\Workflow;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
+use Drupal\content_moderation\Form\RevisionRevertForm;
+use Drupal\Core\Routing\RouteBuildEvent;
 
 /**
  * Subscriber for moderated revisionable entity forms.
@@ -51,6 +53,22 @@ class ContentModerationRouteSubscriber extends RouteSubscriberBase {
   protected function alterRoutes(RouteCollection $collection) {
     foreach ($collection as $route) {
       $this->setLatestRevisionFlag($route);
+    }
+  }
+
+  /**
+   * Change revision revert form to use content moderation's version.
+   *
+   * @param \Drupal\Core\Routing\RouteBuildEvent $event
+   *   The routing alter event.
+   */
+  public function onRoutingRouteAlterRevisionForm(RouteBuildEvent $event) {
+    // @todo Make this applicable to all revisionable entities.
+    // @see https://www.drupal.org/project/drupal/issues/2350939
+    foreach ($event->getRouteCollection() as $name => $route) {
+      if ($name === 'node.revision_revert_confirm') {
+        $route->setDefault('_form', RevisionRevertForm::class);
+      }
     }
   }
 
@@ -106,7 +124,7 @@ class ContentModerationRouteSubscriber extends RouteSubscriberBase {
     $events = parent::getSubscribedEvents();
     // This needs to run after that EntityResolverManager has set the route
     // entity type.
-    $events[RoutingEvents::ALTER] = ['onAlterRoutes', -200];
+    $events[RoutingEvents::ALTER] = [['onRoutingRouteAlterRevisionForm', -150], ['onAlterRoutes', -200]];
     return $events;
   }
 
