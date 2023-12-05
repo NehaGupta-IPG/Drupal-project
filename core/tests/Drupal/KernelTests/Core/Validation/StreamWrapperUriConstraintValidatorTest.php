@@ -52,7 +52,7 @@ class StreamWrapperUriConstraintValidatorTest extends KernelTestBase {
     }
   }
 
-  public function provideTestValidate() {
+  public function provideTestValidate(): array {
     $data = [];
     $data[] = [FALSE, FALSE];
     $data[] = ['', FALSE];
