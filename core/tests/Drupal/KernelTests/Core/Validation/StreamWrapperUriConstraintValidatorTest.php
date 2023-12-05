@@ -20,7 +20,7 @@ class StreamWrapperUriConstraintValidatorTest extends KernelTestBase {
   protected $typedData;
 
   /**
-   * The data definiton object to use.
+   * The data definition object to use.
    *
    * @var \Drupal\Core\TypedData\DataDefinition
    */
@@ -62,7 +62,7 @@ class StreamWrapperUriConstraintValidatorTest extends KernelTestBase {
     $data[] = ['../relative/path', FALSE];
     $data[] = ['/absolute/path', FALSE];
     $data[] = ['https://www.example.com', FALSE];
-    $data[] = ['invalidschema://path', FALSE];
+    $data[] = ['invalid-schema://path', FALSE];
     $data[] = ['public://media-icons/generic', TRUE];
     return $data;
   }
