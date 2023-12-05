@@ -14,6 +14,9 @@ use Symfony\Component\Validator\Constraint;
  */
 class StreamWrapperUriConstraint extends Constraint {
 
-  public $message = 'Invalid stream wrapper URI "%value".';
+  /**
+   * {@inheritdoc}
+   */
+  public $message = '"%value" is not a valid stream wrapper URI.';
 
 }
