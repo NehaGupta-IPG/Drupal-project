@@ -168,6 +168,10 @@ class FieldBlock extends BlockBase implements ContextAwarePluginInterface, Conta
       if ($view) {
         $build = [$view];
       }
+      $field_label = $this->getConfiguration()['field_label'];
+      if (isset($build['#title']) && !empty($field_label)) {
+        $build['#title'] = $field_label;
+      }
     }
     // @todo Remove in https://www.drupal.org/project/drupal/issues/2367555.
     catch (EnforcedResponseException $e) {
@@ -225,6 +229,7 @@ class FieldBlock extends BlockBase implements ContextAwarePluginInterface, Conta
   public function defaultConfiguration() {
     return [
       'label_display' => FALSE,
+      'field_label' => '',
       'formatter' => [
         'label' => 'above',
         'type' => $this->pluginDefinition['default_formatter'],
@@ -239,6 +244,13 @@ class FieldBlock extends BlockBase implements ContextAwarePluginInterface, Conta
    */
   public function blockForm($form, FormStateInterface $form_state) {
     $config = $this->getConfiguration();
+
+    $form['field_label'] = [
+      '#type' => 'textfield',
+      '#title' => $this->t('Override field title'),
+      '#default_value' => $config['field_label'],
+      '#description' => $this->t('Provide custom title here to override default field title.'),
+    ];
 
     $form['formatter'] = [
       '#tree' => TRUE,
@@ -338,6 +350,7 @@ class FieldBlock extends BlockBase implements ContextAwarePluginInterface, Conta
    * {@inheritdoc}
    */
   public function blockSubmit($form, FormStateInterface $form_state) {
+    $this->configuration['field_label'] = $form_state->getValue('field_label');
     $this->configuration['formatter'] = $form_state->getValue('formatter');
   }
 
