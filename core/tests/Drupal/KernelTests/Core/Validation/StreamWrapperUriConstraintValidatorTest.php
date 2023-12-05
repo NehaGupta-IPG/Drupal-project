@@ -41,7 +41,7 @@ class StreamWrapperUriConstraintValidatorTest extends KernelTestBase {
    *
    * @dataProvider provideTestValidate
    */
-  public function testValidate($value, $is_valid) {
+  public function testValidate(mixed $value, bool $is_valid): void {
     $typed_data = $this->typedData->create($this->definition, $value);
     $violations = $typed_data->validate();
     $this->assertEquals($is_valid ? 0 : 1, $violations->count(), 'Validation failed for incorrect value.');
