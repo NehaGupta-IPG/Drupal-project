@@ -119,7 +119,7 @@ class ShutdownHandler {
     }
     // Catch \Throwable, which covers both Error and Exception throwables.
     catch (\Throwable $error) {
-      Error::shutdownExceptionHandler('Uncaught exception thrown in shutdown function.', $error);
+      Error::shutdownExceptionHandler($error);
     }
   }
 

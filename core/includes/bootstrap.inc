@@ -506,8 +506,5 @@ function _drupal_shutdown_function(): void {
  */
 function _drupal_shutdown_function_handle_exception($exception): void {
   @trigger_error(__FUNCTION__ . '() is deprecated in drupal:10.3.0 and is removed from drupal:11.0.0. Use \Drupal\Core\Utility\Error::shutdownExceptionHandler() instead. As internal API, ' . __FUNCTION__ . '() may also be removed in a minor release. See https://www.drupal.org/node/3053808', E_USER_DEPRECATED);
-  Error::shutdownExceptionHandler(
-    'Uncaught exception thrown in shutdown function.',
-    $exception
-  );
+  Error::shutdownExceptionHandler($exception);
 }

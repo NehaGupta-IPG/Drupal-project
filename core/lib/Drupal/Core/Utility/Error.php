@@ -225,14 +225,14 @@ class Error {
   /**
    * Displays and logs any errors that may happen during shutdown.
    *
+   * @param \Exception|\Throwable $exception
+   *    The exception object that was thrown.
    * @param string $message
    *   A message to display an error.
-   * @param \Exception|\Throwable $exception
-   *   The exception object that was thrown.
    *
    * @internal
    */
-  public static function shutdownExceptionHandler(string $message, \Exception|\Throwable $exception): void {
+  public static function shutdownExceptionHandler(\Exception|\Throwable $exception, string $message = 'Uncaught exception thrown in shutdown function.'): void {
     // If using PHP-FPM then fastcgi_finish_request() will have been fired
     // preventing further output to the browser.
     if (!function_exists('fastcgi_finish_request')) {
