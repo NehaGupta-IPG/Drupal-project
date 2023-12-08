@@ -2,6 +2,7 @@
 
 namespace Drupal\KernelTests\Core\Validation;
 
+use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\TypedData\DataDefinition;
 use Drupal\Core\TypedData\TypedDataManagerInterface;
 use Drupal\KernelTests\KernelTestBase;
@@ -30,11 +31,25 @@ class StreamWrapperUriConstraintValidatorTest extends KernelTestBase {
   /**
    * {@inheritdoc}
    */
+  protected static $modules = ['file_test'];
+
+  /**
+   * {@inheritdoc}
+   */
   protected function setUp(): void {
     parent::setUp();
     $this->typedData = $this->container->get(TypedDataManagerInterface::class);
     $this->definition = DataDefinition::create('string')
       ->addConstraint('StreamWrapperUri');
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function register(ContainerBuilder $container) {
+    parent::register($container);
+    $container->register('stream_wrapper.private', 'Drupal\Core\StreamWrapper\PrivateStream')
+      ->addTag('stream_wrapper', ['scheme' => 'private']);
   }
 
   /**
@@ -59,18 +74,31 @@ class StreamWrapperUriConstraintValidatorTest extends KernelTestBase {
     }
   }
 
+  /**
+   * Data provider for testValidate().
+   */
   public function provideTestValidate(): array {
     $data = [];
+    // Not a string.
     $data[] = [FALSE, FALSE, TRUE];
     $data[] = [10, FALSE, TRUE];
     $data[] = ['', FALSE];
+    // String, but invalid schema.
     $data[] = ['invalid-string', FALSE];
     $data[] = ['invalid-schema:', FALSE];
     $data[] = ['../relative/path', FALSE];
     $data[] = ['/absolute/path', FALSE];
     $data[] = ['https://www.example.com', FALSE];
     $data[] = ['invalid-schema://path', FALSE];
+    // Valid schema.
+    $data[] = ['assets://media-icons/generic', TRUE];
+    $data[] = ['dummy-external-readonly://media-icons/generic', TRUE];
+    $data[] = ['dummy-readonly://media-icons/generic', TRUE];
+    $data[] = ['dummy-remote://media-icons/generic', TRUE];
+    $data[] = ['dummy://media-icons/generic', TRUE];
+    $data[] = ['private://media-icons/generic', TRUE];
     $data[] = ['public://media-icons/generic', TRUE];
+    $data[] = ['temporary://media-icons/generic', TRUE];
     return $data;
   }
 
