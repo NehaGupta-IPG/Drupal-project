@@ -226,7 +226,7 @@ class Error {
    * Displays and logs any errors that may happen during shutdown.
    *
    * @param \Exception|\Throwable $exception
-   *    The exception object that was thrown.
+   *   The exception object that was thrown.
    * @param string $message
    *   A message to display an error.
    *
