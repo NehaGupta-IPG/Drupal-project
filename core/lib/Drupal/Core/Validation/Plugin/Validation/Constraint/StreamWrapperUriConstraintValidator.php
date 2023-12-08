@@ -7,6 +7,7 @@ use Drupal\Core\StreamWrapper\StreamWrapperManagerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
+use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 
 /**
  * Validates a string follows a stream wrapper pattern.
@@ -35,6 +36,9 @@ class StreamWrapperUriConstraintValidator extends ConstraintValidator implements
    * {@inheritdoc}
    */
   public function validate(mixed $value, Constraint $constraint) {
+    if (!is_string($value)) {
+      throw new UnexpectedTypeException($value, 'string');
+    }
     if ($this->streamWrapperManager->isValidUri($value)) {
       return;
     }

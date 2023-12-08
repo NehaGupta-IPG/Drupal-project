@@ -5,6 +5,7 @@ namespace Drupal\KernelTests\Core\Validation;
 use Drupal\Core\TypedData\DataDefinition;
 use Drupal\Core\TypedData\TypedDataManagerInterface;
 use Drupal\KernelTests\KernelTestBase;
+use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 
 /**
  * @coversDefaultClass \Drupal\Core\Validation\Plugin\Validation\Constraint\StreamWrapperUriConstraintValidator
@@ -41,8 +42,11 @@ class StreamWrapperUriConstraintValidatorTest extends KernelTestBase {
    *
    * @dataProvider provideTestValidate
    */
-  public function testValidate(mixed $value, bool $is_valid): void {
+  public function testValidate(mixed $value, bool $is_valid, bool $throws_exception = FALSE): void {
     $typed_data = $this->typedData->create($this->definition, $value);
+    if ($throws_exception) {
+      $this->expectException(UnexpectedTypeException::class);
+    }
     $violations = $typed_data->validate();
     $this->assertCount($is_valid ? 0 : 1, $violations, 'Validation failed for incorrect value.');
     if (!$is_valid) {
@@ -57,9 +61,9 @@ class StreamWrapperUriConstraintValidatorTest extends KernelTestBase {
 
   public function provideTestValidate(): array {
     $data = [];
-    $data[] = [FALSE, FALSE];
+    $data[] = [FALSE, FALSE, TRUE];
+    $data[] = [10, FALSE, TRUE];
     $data[] = ['', FALSE];
-    $data[] = [10, FALSE];
     $data[] = ['invalid-string', FALSE];
     $data[] = ['invalid-schema:', FALSE];
     $data[] = ['../relative/path', FALSE];
