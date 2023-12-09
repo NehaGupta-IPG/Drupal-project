@@ -10,7 +10,7 @@ namespace Drupal\Core\ProxyClass\Routing {
     /**
      * Provides a proxy class for \Drupal\Core\Routing\RouteBuilder.
      *
-     * @see \Drupal\Component\ProxyBuilder
+     * @see \Drupal\Component\ProxyBuilder\ProxyBuilder
      */
     class RouteBuilder implements \Drupal\Core\Routing\RouteBuilderInterface, \Drupal\Core\DestructableInterface
     {

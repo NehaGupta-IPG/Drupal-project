@@ -10,7 +10,7 @@ namespace Drupal\Core\ProxyClass\Batch {
     /**
      * Provides a proxy class for \Drupal\Core\Batch\BatchStorage.
      *
-     * @see \Drupal\Component\ProxyBuilder
+     * @see \Drupal\Component\ProxyBuilder\ProxyBuilder
      */
     class BatchStorage implements \Drupal\Core\Batch\BatchStorageInterface
     {

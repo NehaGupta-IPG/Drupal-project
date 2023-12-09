@@ -10,7 +10,7 @@ namespace Drupal\Core\ProxyClass\Menu {
     /**
      * Provides a proxy class for \Drupal\Core\Menu\MenuActiveTrail.
      *
-     * @see \Drupal\Component\ProxyBuilder
+     * @see \Drupal\Component\ProxyBuilder\ProxyBuilder
      */
     class MenuActiveTrail implements \Drupal\Core\Cache\CacheCollectorInterface, \Drupal\Core\DestructableInterface, \Drupal\Core\Menu\MenuActiveTrailInterface
     {

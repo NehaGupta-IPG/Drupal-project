@@ -10,7 +10,7 @@ namespace Drupal\Core\ProxyClass\PageCache {
     /**
      * Provides a proxy class for \Drupal\Core\PageCache\ChainResponsePolicy.
      *
-     * @see \Drupal\Component\ProxyBuilder
+     * @see \Drupal\Component\ProxyBuilder\ProxyBuilder
      */
     class ChainResponsePolicy implements \Drupal\Core\PageCache\ChainResponsePolicyInterface
     {

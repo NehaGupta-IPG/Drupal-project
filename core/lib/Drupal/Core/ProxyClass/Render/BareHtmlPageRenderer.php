@@ -10,7 +10,7 @@ namespace Drupal\Core\ProxyClass\Render {
     /**
      * Provides a proxy class for \Drupal\Core\Render\BareHtmlPageRenderer.
      *
-     * @see \Drupal\Component\ProxyBuilder
+     * @see \Drupal\Component\ProxyBuilder\ProxyBuilder
      */
     class BareHtmlPageRenderer implements \Drupal\Core\Render\BareHtmlPageRendererInterface
     {
