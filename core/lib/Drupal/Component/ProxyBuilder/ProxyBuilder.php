@@ -67,7 +67,7 @@ namespace {{ namespace }}{
     /**
      * Provides a proxy class for \{{ class_name }}.
      *
-     * @see \Drupal\Component\ProxyBuilder
+     * @see \Drupal\Component\ProxyBuilder\ProxyBuilder
      */
 
 EOS;
