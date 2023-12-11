@@ -121,7 +121,7 @@ class Media extends CKEditor5PluginDefault implements ContainerFactoryPluginInte
             'title' => $all_view_modes[$view_mode],
             'attributeName' => 'data-view-mode',
             'attributeValue' => $view_mode,
-            'modelElements' => ['drupalMedia'],
+            'modelElements' => ['drupalMedia', 'drupalMediaInline'],
             'modelAttributes' => [
               'drupalMediaType' => array_keys($media_bundles),
             ],
@@ -133,7 +133,7 @@ class Media extends CKEditor5PluginDefault implements ContainerFactoryPluginInte
             'title' => $all_view_modes[$view_mode],
             'attributeName' => 'data-view-mode',
             'attributeValue' => $view_mode,
-            'modelElements' => ['drupalMedia'],
+            'modelElements' => ['drupalMedia', 'drupalMediaInline'],
             'modelAttributes' => [
               'drupalMediaType' => $specific_bundles,
             ],
@@ -196,7 +196,7 @@ class Media extends CKEditor5PluginDefault implements ContainerFactoryPluginInte
     $subset = $this->getPluginDefinition()->getElements();
     $view_mode_override_enabled = $this->getConfiguration()['allow_view_mode_override'];
     if (!$view_mode_override_enabled) {
-      $subset = array_diff($subset, ['<drupal-media data-view-mode>']);
+      $subset = array_diff($subset, ['<drupal-media data-view-mode>', '<drupal-media-inline data-view-mode>']);
     }
     return $subset;
   }

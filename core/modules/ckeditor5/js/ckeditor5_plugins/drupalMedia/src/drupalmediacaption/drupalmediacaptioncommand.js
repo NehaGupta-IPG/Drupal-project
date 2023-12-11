@@ -51,7 +51,7 @@ export default class ToggleDrupalMediaCaptionCommand extends Command {
     if (!selectedElement) {
       // Command should be enabled if `<drupalMedia>` element is part of the
       // selection.
-      this.isEnabled = !!getClosestSelectedDrupalMediaElement(selection);
+      this.isEnabled = !!getClosestSelectedDrupalMediaElement(selection, false);
       // Check if the selection descends from a `<drupalMedia>` element that
       // also includes a `<caption>`.
       this.value = !!getMediaCaptionFromModelSelection(selection);
@@ -60,7 +60,7 @@ export default class ToggleDrupalMediaCaptionCommand extends Command {
     }
 
     // If single element is selected, check if it's a `<drupalMedia>` element.
-    this.isEnabled = isDrupalMedia(selectedElement);
+    this.isEnabled = isDrupalMedia(selectedElement, false);
 
     if (!this.isEnabled) {
       this.value = false;

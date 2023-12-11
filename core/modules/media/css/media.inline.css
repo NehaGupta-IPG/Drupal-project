@@ -1,0 +1,18 @@
+/**
+ * @file
+ * Default styling for media that is embedded inline inside text, lists, etc.
+ */
+
+.media-embedded-inline {
+  display: inline-block;
+}
+
+.drupal-media-inline .media-embedded-inline {
+  width: 100%;
+}
+
+.media-embedded-inline video,
+.media-embedded-inline img,
+.media-embedded-inline audio {
+  display: inline-block;
+}

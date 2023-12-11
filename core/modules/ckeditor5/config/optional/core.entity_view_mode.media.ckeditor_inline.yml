@@ -1,0 +1,10 @@
+langcode: en
+status: true
+dependencies:
+  module:
+    - media
+id: media.ckeditor_inline
+label: 'Ckeditor Inline'
+description: 'View mode used for media embedded inline'
+targetEntityType: media
+cache: true

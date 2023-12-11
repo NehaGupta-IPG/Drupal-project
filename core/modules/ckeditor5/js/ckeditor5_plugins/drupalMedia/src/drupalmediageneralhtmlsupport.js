@@ -5,18 +5,22 @@ import { setViewAttributes } from '@ckeditor/ckeditor5-html-support/src/utils';
 
 /**
  * View-to-model conversion helper for Drupal Media.
- * Used for preserving allowed attributes on the Drupal Media model.
+ * Used for preserving allowed attributes on the Drupal Media models.
  *
+ * @param {string} model
+ *   The model name (DrupalMedia or DrupalMediaInline).
+ * @param {string} view
+ *   The view name (drupal-media or drupal-media-inline).
  * @param {module:html-support/datafilter~DataFilter} dataFilter
  *   The General HTML support data filter.
  *
  * @return {function}
  *   Function that adds an event listener to upcastDispatcher.
  */
-function viewToModelDrupalMediaAttributeConverter(dataFilter) {
+function viewToModelDrupalMediaAttributeConverter(dataFilter, model, view) {
   return (dispatcher) => {
     dispatcher.on(
-      'element:drupal-media',
+      `element:${view}`,
       (evt, data, conversionApi) => {
         function preserveElementAttributes(viewElement, attributeName) {
           const viewAttributes = dataFilter.processViewAttributes(
@@ -96,18 +100,21 @@ function modelToDataAttributeConverter(evt, data, conversionApi) {
 /**
  * Model to editing view attribute converter.
  *
+ * @param {string} model
+ *   The model name (DrupalMedia or DrupalMediaInline).
+ *
  * @return {function}
  *   A function that adds an event listener to downcastDispatcher.
  */
-function modelToEditingViewAttributeConverter() {
+function modelToEditingViewAttributeConverter(model) {
   return (dispatcher) => {
     dispatcher.on(
-      'attribute:linkHref:drupalMedia',
+      `attribute:linkHref:${model}`,
       (evt, data, conversionApi) => {
         if (
           !conversionApi.consumable.consume(
             data.item,
-            'attribute:htmlLinkAttributes:drupalMedia',
+            `attribute:htmlLinkAttributes:${model}`,
           )
         ) {
           return;
@@ -134,18 +141,21 @@ function modelToEditingViewAttributeConverter() {
 /**
  * Model to data view attribute converter.
  *
+ * @param {string} model
+ *   The model name (DrupalMedia or DrupalMediaInline).
+ *
  * @return {function}
  *   Function that adds an event listener to downcastDispatcher.
  */
-function modelToDataViewAttributeConverter() {
+function modelToDataViewAttributeConverter(model) {
   return (dispatcher) => {
     dispatcher.on(
-      'attribute:linkHref:drupalMedia',
+      `attribute:linkHref:${model}`,
       (evt, data, conversionApi) => {
         if (
           !conversionApi.consumable.consume(
             data.item,
-            'attribute:htmlLinkAttributes:drupalMedia',
+            `attribute:htmlLinkAttributes:${model}`,
           )
         ) {
           return;
@@ -163,7 +173,7 @@ function modelToDataViewAttributeConverter() {
     );
 
     dispatcher.on(
-      'attribute:htmlAttributes:drupalMedia',
+      `attribute:htmlAttributes:${model}`,
       modelToDataAttributeConverter,
       { priority: 'low' },
     );
@@ -204,32 +214,45 @@ export default class DrupalMediaGeneralHtmlSupport extends Plugin {
     const dataFilter = this.editor.plugins.get('DataFilter');
     const dataSchema = this.editor.plugins.get('DataSchema');
 
-    // This needs to be initialized in ::constructor() to ensure this runs
-    // before the General HTML Support has been initialized.
-    // @see module:html-support/generalhtmlsupport~GeneralHtmlSupport
-    dataSchema.registerBlockElement({
-      model: 'drupalMedia',
-      view: 'drupal-media',
-    });
+    const viewToModelMap = {
+      'drupal-media': 'drupalMedia',
+      'drupal-media-inline': 'drupalMediaInline',
+    };
 
-    dataFilter.on('register:drupal-media', (evt, definition) => {
-      if (definition.model !== 'drupalMedia') {
-        return;
-      }
+    Object.keys(viewToModelMap).forEach((view) => {
+      const model = viewToModelMap[view];
 
-      schema.extend('drupalMedia', {
-        allowAttributes: ['htmlLinkAttributes', 'htmlAttributes'],
+      // This needs to be initialized in ::constructor() to ensure this runs
+      // before the General HTML Support has been initialized.
+      // @see module:html-support/generalhtmlsupport~GeneralHtmlSupport
+      dataSchema.registerBlockElement({
+        model,
+        view,
       });
 
-      conversion
-        .for('upcast')
-        .add(viewToModelDrupalMediaAttributeConverter(dataFilter));
-      conversion
-        .for('editingDowncast')
-        .add(modelToEditingViewAttributeConverter());
-      conversion.for('dataDowncast').add(modelToDataViewAttributeConverter());
+      dataFilter.on(`register:${view}`, (evt, definition) => {
+        if (definition.model !== model) {
+          return;
+        }
 
-      evt.stop();
+        schema.extend(model, {
+          allowAttributes: ['htmlLinkAttributes', 'htmlAttributes'],
+        });
+
+        conversion
+          .for('upcast')
+          .add(
+            viewToModelDrupalMediaAttributeConverter(dataFilter, model, view),
+          );
+        conversion
+          .for('editingDowncast')
+          .add(modelToEditingViewAttributeConverter(model));
+        conversion
+          .for('dataDowncast')
+          .add(modelToDataViewAttributeConverter(model));
+
+        evt.stop();
+      });
     });
   }
 

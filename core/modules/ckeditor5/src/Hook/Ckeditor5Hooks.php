@@ -96,7 +96,22 @@ class Ckeditor5Hooks {
    */
   #[Hook('theme')]
   public function theme() : array {
-    return ['ckeditor5_settings_toolbar' => ['render element' => 'form']];
+    return [
+      // The theme hook is used for rendering the CKEditor 5 toolbar settings in
+      // the Drupal admin UI. The toolbar settings UI is internal, and utilizing
+      // it outside of core usages is not supported because the UI can change at
+      // any point.
+      // @internal
+      'ckeditor5_settings_toolbar' => [
+        'render element' => 'form',
+      ],
+      'field__ckeditor_inline' => [
+        'base hook' => 'field',
+      ],
+      'media__ckeditor_inline_embed' => [
+        'base hook' => 'media',
+      ],
+    ];
   }
 
   /**

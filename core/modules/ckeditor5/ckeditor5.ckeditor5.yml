@@ -742,6 +742,9 @@ media_media:
       - <drupal-media>
       - <drupal-media data-entity-type data-entity-uuid alt>
       - <drupal-media data-view-mode>
+      - <drupal-media-inline>
+      - <drupal-media-inline data-entity-type data-entity-uuid alt>
+      - <drupal-media-inline data-view-mode>
     conditions:
       filter: media_embed
 
@@ -756,6 +759,7 @@ ckeditor5_drupalMediaCaption:
     label: Media caption
     elements:
       - <drupal-media data-caption>
+      - <drupal-media-inline data-caption>
     conditions:
       filter: filter_caption
       plugins:
@@ -805,6 +809,7 @@ media_mediaAlign:
     library: ckeditor5/internal.drupal.ckeditor5.mediaAlign
     elements:
       - <drupal-media data-align>
+      - <drupal-media-inline data-align>
     conditions:
       filter: filter_align
       plugins: [media_media]

@@ -378,8 +378,8 @@ class CKEditor5AllowedTagsTest extends CKEditor5TestBase {
     $page->checkField('filters[media_embed][settings][allowed_view_modes][view_mode_1]');
     $page->checkField('filters[media_embed][settings][allowed_view_modes][view_mode_2]');
 
-    $allowed_with_media = $this->allowedElements . ' <drupal-media data-entity-type data-entity-uuid alt data-view-mode>';
-    $allowed_with_media_without_view_mode = $this->allowedElements . ' <drupal-media data-entity-type data-entity-uuid alt>';
+    $allowed_with_media = $this->allowedElements . ' <drupal-media data-entity-type data-entity-uuid alt data-view-mode> <drupal-media-inline data-entity-type data-entity-uuid alt data-view-mode>';
+    $allowed_with_media_without_view_mode = $this->allowedElements . ' <drupal-media data-entity-type data-entity-uuid alt> <drupal-media-inline data-entity-type data-entity-uuid alt>';
     $page->clickLink('Media');
     $this->assertTrue($page->hasUncheckedField('editor[settings][plugins][media_media][allow_view_mode_override]'));
     $this->assertHtmlEsqueFieldValueEquals('filters[filter_html][settings][allowed_html]', $allowed_with_media_without_view_mode);
@@ -403,7 +403,7 @@ class CKEditor5AllowedTagsTest extends CKEditor5TestBase {
     // filter_align is enabled.
     $page->checkField('filters[filter_align][status]');
     $assert_session->assertExpectedAjaxRequest(1);
-    $this->assertEquals($this->allowedElements . ' <drupal-media data-entity-type data-entity-uuid alt data-view-mode data-align>', $allowed_html_field->getValue());
+    $this->assertEquals($this->allowedElements . ' <drupal-media data-entity-type data-entity-uuid alt data-view-mode data-align> <drupal-media-inline data-entity-type data-entity-uuid alt data-view-mode data-align>', $allowed_html_field->getValue());
 
     // Disable media embed.
     $this->assertTrue($page->hasCheckedField('filters[media_embed][status]'));

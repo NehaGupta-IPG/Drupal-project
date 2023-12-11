@@ -212,6 +212,13 @@ export default class DrupalMediaEditing extends Plugin {
       inheritAllFrom: '$blockObject',
       allowAttributes: Object.keys(this.attrs),
     });
+
+    schema.register('drupalMediaInline', {
+      inheritAllFrom: '$inlineObject',
+      allowIn: ['$block', '$container', '$text'],
+      allowAttributes: Object.keys(this.attrs),
+    });
+
     // Register `<drupal-media>` as a block element in the DOM converter. This
     // ensures that the DOM converter knows to handle the `<drupal-media>` as a
     // block element.
@@ -229,213 +236,228 @@ export default class DrupalMediaEditing extends Plugin {
       'DrupalMediaMetadataRepository',
     );
 
-    conversion
-      .for('upcast')
-      .elementToElement({
+    const viewToModelMap = {
+      'drupal-media': 'drupalMedia',
+      'drupal-media-inline': 'drupalMediaInline',
+    };
+
+    Object.keys(viewToModelMap).forEach((view) => {
+      const model = viewToModelMap[view];
+
+      conversion
+        .for('upcast')
+        .elementToElement({
+          view: {
+            name: view,
+          },
+          model,
+        })
+        .add((dispatcher) => {
+          dispatcher.on(
+            `element:${view}`,
+            (evt, data) => {
+              const [modelElement] = data.modelRange.getItems();
+              metadataRepository
+                .getMetadata(modelElement)
+                .then((metadata) => {
+                  if (!modelElement) {
+                    return;
+                  }
+                  // On upcast, get `drupalMediaIsImage` attribute value from media metadata
+                  // repository.
+                  this.upcastDrupalMediaIsImage(modelElement);
+                  // Enqueue a model change after getting modelElement.
+                  this.editor.model.enqueueChange(
+                    { isUndoable: false },
+                    (writer) => {
+                      writer.setAttribute(
+                        'drupalMediaType',
+                        metadata.type,
+                        modelElement,
+                      );
+                    },
+                  );
+                })
+                .catch((e) => {
+                  // There isn't any UI indication for errors because this should be
+                  // always called after the Drupal Media has been upcast, which would
+                  // already display an error in the UI.
+                  console.warn(e.toString());
+                });
+            },
+            // This converter needs to have the lowest priority to ensure that the
+            // model element and its attributes have already been converted. It is only used
+            // to gather metadata to make the UI tailored to the specific media entity that
+            // is being dealt with.
+            { priority: 'lowest' },
+          );
+        });
+
+      conversion.for('dataDowncast').elementToElement({
+        model,
         view: {
-          name: 'drupal-media',
+          name: view,
         },
-        model: 'drupalMedia',
-      })
-      .add((dispatcher) => {
-        dispatcher.on(
-          'element:drupal-media',
-          (evt, data) => {
-            const [modelElement] = data.modelRange.getItems();
-            metadataRepository
-              .getMetadata(modelElement)
-              .then((metadata) => {
-                if (!modelElement) {
-                  return;
-                }
-                // On upcast, get `drupalMediaIsImage` attribute value from media metadata
-                // repository.
-                this.upcastDrupalMediaIsImage(modelElement);
-                // Enqueue a model change after getting modelElement.
-                this.editor.model.enqueueChange(
-                  { isUndoable: false },
-                  (writer) => {
-                    writer.setAttribute(
-                      'drupalMediaType',
-                      metadata.type,
-                      modelElement,
-                    );
+      });
+      conversion
+        .for('editingDowncast')
+        .elementToElement({
+          model,
+          view: (modelElement, { writer }) => {
+            const container = writer.createContainerElement('figure', {
+              class:
+                view === 'drupal-media-inline' ? `drupal-media ${view}` : view,
+            });
+            if (!this.previewUrl) {
+              // If preview URL isn't available, insert empty preview element
+              // which indicates that preview couldn't be loaded.
+              const mediaPreview = writer.createRawElement('div', {
+                'data-drupal-media-preview': 'unavailable',
+              });
+              writer.insert(
+                writer.createPositionAt(container, 0),
+                mediaPreview,
+              );
+            }
+            writer.setCustomProperty(model, true, container);
+
+            return toWidget(container, writer, {
+              label: Drupal.t('Media widget'),
+            });
+          },
+        })
+        .add((dispatcher) => {
+          const converter = (event, data, conversionApi) => {
+            const viewWriter = conversionApi.writer;
+            const modelElement = data.item;
+            const container = conversionApi.mapper.toViewElement(data.item);
+
+            // Search for preview container recursively from its children because
+            // the preview container could be wrapped with an element such as
+            // `<a>`.
+            let media = getPreviewContainer(container.getChildren());
+
+            // Use pre-existing media preview container if one exists. If the
+            // preview element doesn't exist, create a new element.
+            if (media) {
+              // Stop processing if media preview is unavailable or a preview is
+              // already loading.
+              if (media.getAttribute('data-drupal-media-preview') !== 'ready') {
+                return;
+              }
+
+              // Preview was ready meaning that a new preview can be loaded.
+              // "Change the attribute to loading to prepare for the loading of
+              // the updated preview. Preview is kept intact so that it remains
+              // interactable in the UI until the new preview has been rendered.
+              viewWriter.setAttribute(
+                'data-drupal-media-preview',
+                'loading',
+                media,
+              );
+            } else {
+              media = viewWriter.createRawElement('div', {
+                'data-drupal-media-preview': 'loading',
+              });
+              viewWriter.insert(
+                viewWriter.createPositionAt(container, 0),
+                media,
+              );
+            }
+
+            this._fetchPreview(modelElement).then(({ label, preview }) => {
+              if (!media) {
+                // Nothing to do if associated preview wrapped no longer exist.
+                return;
+              }
+              // CKEditor 5 doesn't support async view conversion. Therefore, once
+              // the promise is fulfilled, the editing view needs to be modified
+              // manually.
+              this.editor.editing.view.change((writer) => {
+                const mediaPreview = writer.createRawElement(
+                  'div',
+                  { 'data-drupal-media-preview': 'ready', 'aria-label': label },
+                  (domElement) => {
+                    domElement.innerHTML = preview;
                   },
                 );
-              })
-              .catch((e) => {
-                // There isn't any UI indication for errors because this should be
-                // always called after the Drupal Media has been upcast, which would
-                // already display an error in the UI.
-                console.warn(e.toString());
+                // Insert the new preview before the previous preview element to
+                // ensure that the location remains same even if it is wrapped
+                // with another element.
+                writer.insert(writer.createPositionBefore(media), mediaPreview);
+                writer.remove(media);
               });
+            });
+          };
+
+          // List all attributes that should trigger re-rendering of the
+          // preview.
+          this.converterAttributes.forEach((attribute) => {
+            dispatcher.on(`attribute:${attribute}:${model}`, converter);
+          });
+
+          return dispatcher;
+        });
+
+      conversion.for('editingDowncast').add((dispatcher) => {
+        dispatcher.on(
+          `attribute:drupalElementStyleAlign:${model}`,
+          (evt, data, conversionApi) => {
+            const alignMapping = {
+              // This is a map of CSS classes representing Drupal element styles for alignments.
+              left: 'drupal-media-style-align-left',
+              right: 'drupal-media-style-align-right',
+              center: 'drupal-media-style-align-center',
+            };
+            const viewElement = conversionApi.mapper.toViewElement(data.item);
+            const viewWriter = conversionApi.writer;
+
+            // If the prior value is alignment related, it should be removed
+            // whether or not the module property is consumed.
+            if (alignMapping[data.attributeOldValue]) {
+              viewWriter.removeClass(
+                alignMapping[data.attributeOldValue],
+                viewElement,
+              );
+            }
+
+            // If the new value is not alignment related, do not proceed.
+            if (!alignMapping[data.attributeNewValue]) {
+              return;
+            }
+
+            // The model property is already consumed, do not proceed.
+            if (!conversionApi.consumable.consume(data.item, evt.name)) {
+              return;
+            }
+
+            // Add the alignment class in the view that corresponds to the value
+            // of the model's drupalElementStyle property.
+            viewWriter.addClass(
+              alignMapping[data.attributeNewValue],
+              viewElement,
+            );
           },
-          // This converter needs to have the lowest priority to ensure that the
-          // model element and its attributes have already been converted. It is only used
-          // to gather metadata to make the UI tailored to the specific media entity that
-          // is being dealt with.
-          { priority: 'lowest' },
         );
       });
 
-    conversion.for('dataDowncast').elementToElement({
-      model: 'drupalMedia',
-      view: {
-        name: 'drupal-media',
-      },
-    });
-    conversion
-      .for('editingDowncast')
-      .elementToElement({
-        model: 'drupalMedia',
-        view: (modelElement, { writer }) => {
-          const container = writer.createContainerElement('figure', {
-            class: 'drupal-media',
-          });
-          if (!this.previewUrl) {
-            // If preview URL isn't available, insert empty preview element
-            // which indicates that preview couldn't be loaded.
-            const mediaPreview = writer.createRawElement('div', {
-              'data-drupal-media-preview': 'unavailable',
-            });
-            writer.insert(writer.createPositionAt(container, 0), mediaPreview);
-          }
-          writer.setCustomProperty('drupalMedia', true, container);
-
-          return toWidget(container, writer, {
-            label: Drupal.t('Media widget'),
-          });
-        },
-      })
-      .add((dispatcher) => {
-        const converter = (event, data, conversionApi) => {
-          const viewWriter = conversionApi.writer;
-          const modelElement = data.item;
-          const container = conversionApi.mapper.toViewElement(data.item);
-
-          // Search for preview container recursively from its children because
-          // the preview container could be wrapped with an element such as
-          // `<a>`.
-          let media = getPreviewContainer(container.getChildren());
-
-          // Use pre-existing media preview container if one exists. If the
-          // preview element doesn't exist, create a new element.
-          if (media) {
-            // Stop processing if media preview is unavailable or a preview is
-            // already loading.
-            if (media.getAttribute('data-drupal-media-preview') !== 'ready') {
-              return;
-            }
-
-            // Preview was ready meaning that a new preview can be loaded.
-            // "Change the attribute to loading to prepare for the loading of
-            // the updated preview. Preview is kept intact so that it can still
-            // be interacted with via the UI until the new preview has been
-            // rendered.
-            viewWriter.setAttribute(
-              'data-drupal-media-preview',
-              'loading',
-              media,
-            );
-          } else {
-            media = viewWriter.createRawElement('div', {
-              'data-drupal-media-preview': 'loading',
-            });
-            viewWriter.insert(viewWriter.createPositionAt(container, 0), media);
-          }
-
-          this._fetchPreview(modelElement).then(({ label, preview }) => {
-            if (!media) {
-              // Nothing to do if associated preview wrapped no longer exist.
-              return;
-            }
-            // CKEditor 5 doesn't support async view conversion. Therefore, once
-            // the promise is fulfilled, the editing view needs to be modified
-            // manually.
-            this.editor.editing.view.change((writer) => {
-              const mediaPreview = writer.createRawElement(
-                'div',
-                { 'data-drupal-media-preview': 'ready', 'aria-label': label },
-                (domElement) => {
-                  domElement.innerHTML = preview;
-                },
-              );
-              // Insert the new preview before the previous preview element to
-              // ensure that the location remains same even if it is wrapped
-              // with another element.
-              writer.insert(writer.createPositionBefore(media), mediaPreview);
-              writer.remove(media);
-            });
-          });
+      // Set attributeToAttribute conversion for all supported attributes.
+      Object.keys(this.attrs).forEach((modelKey) => {
+        const attributeMapping = {
+          model: {
+            key: modelKey,
+            name: model,
+          },
+          view: {
+            name: view,
+            key: this.attrs[modelKey],
+          },
         };
-
-        // List all attributes that should trigger re-rendering of the
-        // preview.
-        this.converterAttributes.forEach((attribute) => {
-          dispatcher.on(`attribute:${attribute}:drupalMedia`, converter);
-        });
-
-        return dispatcher;
+        // Attributes should be rendered only in dataDowncast to avoid having
+        // unfiltered data-attributes on the Drupal Media widget.
+        conversion.for('dataDowncast').attributeToAttribute(attributeMapping);
+        conversion.for('upcast').attributeToAttribute(attributeMapping);
       });
-
-    conversion.for('editingDowncast').add((dispatcher) => {
-      dispatcher.on(
-        'attribute:drupalElementStyleAlign:drupalMedia',
-        (evt, data, conversionApi) => {
-          const alignMapping = {
-            // This is a map of CSS classes representing Drupal element styles for alignments.
-            left: 'drupal-media-style-align-left',
-            right: 'drupal-media-style-align-right',
-            center: 'drupal-media-style-align-center',
-          };
-          const viewElement = conversionApi.mapper.toViewElement(data.item);
-          const viewWriter = conversionApi.writer;
-
-          // If the prior value is alignment related, it should be removed
-          // whether or not the module property is consumed.
-          if (alignMapping[data.attributeOldValue]) {
-            viewWriter.removeClass(
-              alignMapping[data.attributeOldValue],
-              viewElement,
-            );
-          }
-
-          // If the new value is not alignment related, do not proceed.
-          if (!alignMapping[data.attributeNewValue]) {
-            return;
-          }
-
-          // The model property is already consumed, do not proceed.
-          if (!conversionApi.consumable.consume(data.item, evt.name)) {
-            return;
-          }
-
-          // Add the alignment class in the view that corresponds to the value
-          // of the model's drupalElementStyle property.
-          viewWriter.addClass(
-            alignMapping[data.attributeNewValue],
-            viewElement,
-          );
-        },
-      );
-    });
-
-    // Set attributeToAttribute conversion for all supported attributes.
-    Object.keys(this.attrs).forEach((modelKey) => {
-      const attributeMapping = {
-        model: {
-          key: modelKey,
-          name: 'drupalMedia',
-        },
-        view: {
-          name: 'drupal-media',
-          key: this.attrs[modelKey],
-        },
-      };
-      // Attributes should be rendered only in dataDowncast to avoid having
-      // unfiltered data-attributes on the Drupal Media widget.
-      conversion.for('dataDowncast').attributeToAttribute(attributeMapping);
-      conversion.for('upcast').attributeToAttribute(attributeMapping);
     });
   }
 

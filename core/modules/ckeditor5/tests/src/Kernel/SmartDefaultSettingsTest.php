@@ -242,7 +242,7 @@ class SmartDefaultSettingsTest extends KernelTestBase {
     $basic_html_format_with_media_embed['format'] = 'basic_html_with_media_embed';
     // Add media_embed filter, update filter_html filter settings.
     $basic_html_format_with_media_embed['filters']['media_embed'] = ['status' => TRUE];
-    $new_value = $current_value . ' <drupal-media data-entity-type data-entity-uuid data-align data-caption alt>';
+    $new_value = $current_value . ' <drupal-media data-entity-type data-entity-uuid data-align data-caption alt> <drupal-media-inline data-entity-type data-entity-uuid data-align data-caption alt>';
     NestedArray::setValue($basic_html_format_with_media_embed, $allowed_html_parents, $new_value);
     FilterFormat::create($basic_html_format_with_media_embed)->save();
     $basic_html_editor_with_media_embed = Editor::create(
@@ -262,6 +262,7 @@ class SmartDefaultSettingsTest extends KernelTestBase {
     $basic_html_format_with_media_embed_view_mode_invalid['format'] = 'basic_html_with_media_embed_view_mode_enabled_no_view_modes_configured';
     $current_value_media_embed = NestedArray::getValue($basic_html_format_with_media_embed, $allowed_html_parents);
     $new_value = str_replace('<drupal-media data-entity-type data-entity-uuid data-align data-caption alt>', '<drupal-media data-entity-type data-entity-uuid data-align data-caption alt data-view-mode>', $current_value_media_embed);
+    $new_value = str_replace('<drupal-media-inline data-entity-type data-entity-uuid data-align data-caption alt>', '<drupal-media-inline data-entity-type data-entity-uuid data-align data-caption alt data-view-mode>', $new_value);
     NestedArray::setValue($basic_html_format_with_media_embed_view_mode_invalid, $allowed_html_parents, $new_value);
     FilterFormat::create($basic_html_format_with_media_embed_view_mode_invalid)->save();
     $basic_html_editor_with_media_embed_view_mode_enabled_no_view_modes_configured = Editor::create(
@@ -1148,7 +1149,7 @@ class SmartDefaultSettingsTest extends KernelTestBase {
           'ckeditor5_sourceEditing' => [
             'allowed_tags' => array_merge(
               $basic_html_test_case['expected_ckeditor5_settings']['plugins']['ckeditor5_sourceEditing']['allowed_tags'],
-              ['<drupal-media data-view-mode>'],
+              ['<drupal-media data-view-mode>', '<drupal-media-inline data-view-mode>'],
             ),
           ],
           'media_media' => ['allow_view_mode_override' => FALSE],
@@ -1168,13 +1169,13 @@ class SmartDefaultSettingsTest extends KernelTestBase {
           ],
           [
             'As part of migrating to CKEditor 5, it was found that the %text_format text format\'s HTML filters includes plugins that support the following tags, but not some of their attributes. To ensure these attributes remain supported, the following were added to the Source Editing plugin\'s <em>Manually editable HTML tags</em>: @missing_attributes. The text format must be saved to make these changes active.',
-            'a:2:{s:12:"%text_format";s:74:"(with Media Embed support, view mode enabled but no view modes configured)";s:19:"@missing_attributes";s:120:"<a hreflang> <blockquote cite> <ul type> <ol type> <h2 id> <h3 id> <h4 id> <h5 id> <h6 id> <drupal-media data-view-mode>";}',
+            'a:2:{s:12:"%text_format";s:74:"(with Media Embed support, view mode enabled but no view modes configured)";s:19:"@missing_attributes";s:120:"<a hreflang> <blockquote cite> <ul type> <ol type> <h2 id> <h3 id> <h4 id> <h5 id> <h6 id> <drupal-media data-view-mode> <drupal-media-inline data-view-mode>";}',
           ],
         ],
       ],
       'expected_messages' => array_merge_recursive($basic_html_test_case['expected_messages'], [
         'status' => [
-          'To maintain the capabilities of this text format, <a target="_blank" href="/admin/help/ckeditor5#migration-settings">the CKEditor 5 migration</a> did the following: Enabled these plugins: (<em class="placeholder">Link, Block quote, Code, List, Image, Image Upload, Image align, Image caption</em>). Added these tags/attributes to the Source Editing Plugin\'s <a target="_blank" href="/admin/help/ckeditor5#source-editing">Manually editable HTML tags</a> setting: &lt;cite&gt; &lt;dl&gt; &lt;dt&gt; &lt;dd&gt; &lt;span&gt; &lt;a hreflang&gt; &lt;blockquote cite&gt; &lt;ul type&gt; &lt;ol type&gt; &lt;h2 id&gt; &lt;h3 id&gt; &lt;h4 id&gt; &lt;h5 id&gt; &lt;h6 id&gt; &lt;drupal-media data-view-mode&gt;. Additional details are available in your logs.',
+          'To maintain the capabilities of this text format, <a target="_blank" href="/admin/help/ckeditor5#migration-settings">the CKEditor 5 migration</a> did the following: Enabled these plugins: (<em class="placeholder">Link, Block quote, Code, List, Image, Image Upload, Image align, Image caption</em>). Added these tags/attributes to the Source Editing Plugin\'s <a target="_blank" href="/admin/help/ckeditor5#source-editing">Manually editable HTML tags</a> setting: &lt;cite&gt; &lt;dl&gt; &lt;dt&gt; &lt;dd&gt; &lt;span&gt; &lt;a hreflang&gt; &lt;blockquote cite&gt; &lt;ul type&gt; &lt;ol type&gt; &lt;h2 id&gt; &lt;h3 id&gt; &lt;h4 id&gt; &lt;h5 id&gt; &lt;h6 id&gt; &lt;drupal-media data-view-mode&gt; &lt;drupal-media-inline data-view-mode&gt;. Additional details are available in your logs.',
         ],
         'warning' => [
           'Updating to CKEditor 5 added support for some previously unsupported tags/attributes. A plugin introduced support for the following:   This attribute: <em class="placeholder"> reversed (for &lt;ol&gt;)</em>; Additional details are available in your logs.',
@@ -1183,6 +1184,7 @@ class SmartDefaultSettingsTest extends KernelTestBase {
       'expected_post_filter_drop_fundamental_compatibility_violations' => [],
       'expected_post_update_text_editor_violations' => [
         'settings.plugins.ckeditor5_sourceEditing.allowed_tags.14' => 'The following attribute(s) can optionally be supported by enabled plugins and should not be added to the Source Editing "Manually editable HTML tags" field: <em class="placeholder">Media (&lt;drupal-media data-view-mode&gt;)</em>.',
+        'settings.plugins.ckeditor5_sourceEditing.allowed_tags.15' => 'The following attribute(s) can optionally be supported by enabled plugins and should not be added to the Source Editing "Manually editable HTML tags" field: <em class="placeholder">Media (&lt;drupal-media-inline data-view-mode&gt;)</em>.',
       ],
     ];
 
@@ -1200,7 +1202,7 @@ class SmartDefaultSettingsTest extends KernelTestBase {
           'ckeditor5_sourceEditing' => [
             'allowed_tags' => array_merge(
               $basic_html_test_case['expected_ckeditor5_settings']['plugins']['ckeditor5_sourceEditing']['allowed_tags'],
-              ['<drupal-media data-view-mode>'],
+              ['<drupal-media data-view-mode>', '<drupal-media-inline data-view-mode>'],
             ),
           ],
           'media_media' => ['allow_view_mode_override' => FALSE],
@@ -1220,13 +1222,13 @@ class SmartDefaultSettingsTest extends KernelTestBase {
           ],
           [
             'As part of migrating to CKEditor 5, it was found that the %text_format text format\'s HTML filters includes plugins that support the following tags, but not some of their attributes. To ensure these attributes remain supported, the following were added to the Source Editing plugin\'s <em>Manually editable HTML tags</em>: @missing_attributes. The text format must be saved to make these changes active.',
-            'a:2:{s:12:"%text_format";s:76:"(with Media Embed support, view mode enabled and two view modes configured )";s:19:"@missing_attributes";s:120:"<a hreflang> <blockquote cite> <ul type> <ol type> <h2 id> <h3 id> <h4 id> <h5 id> <h6 id> <drupal-media data-view-mode>";}',
+            'a:2:{s:12:"%text_format";s:76:"(with Media Embed support, view mode enabled and two view modes configured )";s:19:"@missing_attributes";s:120:"<a hreflang> <blockquote cite> <ul type> <ol type> <h2 id> <h3 id> <h4 id> <h5 id> <h6 id> <drupal-media data-view-mode> <drupal-media-inline data-view-mode>";}',
           ],
         ],
       ],
       'expected_messages' => array_merge_recursive($basic_html_test_case['expected_messages'], [
         'status' => [
-          'To maintain the capabilities of this text format, <a target="_blank" href="/admin/help/ckeditor5#migration-settings">the CKEditor 5 migration</a> did the following: Enabled these plugins: (<em class="placeholder">Link, Block quote, Code, List, Image, Image Upload, Image align, Image caption</em>). Added these tags/attributes to the Source Editing Plugin\'s <a target="_blank" href="/admin/help/ckeditor5#source-editing">Manually editable HTML tags</a> setting: &lt;cite&gt; &lt;dl&gt; &lt;dt&gt; &lt;dd&gt; &lt;span&gt; &lt;a hreflang&gt; &lt;blockquote cite&gt; &lt;ul type&gt; &lt;ol type&gt; &lt;h2 id&gt; &lt;h3 id&gt; &lt;h4 id&gt; &lt;h5 id&gt; &lt;h6 id&gt; &lt;drupal-media data-view-mode&gt;. Additional details are available in your logs.',
+          'To maintain the capabilities of this text format, <a target="_blank" href="/admin/help/ckeditor5#migration-settings">the CKEditor 5 migration</a> did the following: Enabled these plugins: (<em class="placeholder">Link, Block quote, Code, List, Image, Image Upload, Image align, Image caption</em>). Added these tags/attributes to the Source Editing Plugin\'s <a target="_blank" href="/admin/help/ckeditor5#source-editing">Manually editable HTML tags</a> setting: &lt;cite&gt; &lt;dl&gt; &lt;dt&gt; &lt;dd&gt; &lt;span&gt; &lt;a hreflang&gt; &lt;blockquote cite&gt; &lt;ul type&gt; &lt;ol type&gt; &lt;h2 id&gt; &lt;h3 id&gt; &lt;h4 id&gt; &lt;h5 id&gt; &lt;h6 id&gt; &lt;drupal-media data-view-mode&gt; &lt;drupal-media-inline data-view-mode&gt;. Additional details are available in your logs.',
         ],
         'warning' => [
           'Updating to CKEditor 5 added support for some previously unsupported tags/attributes. A plugin introduced support for the following:   This attribute: <em class="placeholder"> reversed (for &lt;ol&gt;)</em>; Additional details are available in your logs.',
@@ -1235,6 +1237,7 @@ class SmartDefaultSettingsTest extends KernelTestBase {
       'expected_post_filter_drop_fundamental_compatibility_violations' => [],
       'expected_post_update_text_editor_violations' => [
         'settings.plugins.ckeditor5_sourceEditing.allowed_tags.14' => 'The following attribute(s) can optionally be supported by enabled plugins and should not be added to the Source Editing "Manually editable HTML tags" field: <em class="placeholder">Media (&lt;drupal-media data-view-mode&gt;)</em>.',
+        'settings.plugins.ckeditor5_sourceEditing.allowed_tags.15' => 'The following attribute(s) can optionally be supported by enabled plugins and should not be added to the Source Editing "Manually editable HTML tags" field: <em class="placeholder">Media (&lt;drupal-media-inline data-view-mode&gt;)</em>.',
       ],
     ];
 

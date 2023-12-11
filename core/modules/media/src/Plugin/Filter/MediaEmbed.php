@@ -21,8 +21,10 @@ use Drupal\filter\FilterProcessResult;
 use Drupal\filter\Plugin\FilterBase;
 use Drupal\filter\Plugin\FilterInterface;
 use Drupal\image\Plugin\Field\FieldType\ImageItem;
+use Drupal\media\Event\MediaBuildEmbedEvent;
 use Drupal\media\MediaInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 /**
  * Provides a filter to embed media items using a custom tag.
@@ -118,8 +120,10 @@ class MediaEmbed extends FilterBase implements ContainerFactoryPluginInterface, 
    *   The renderer.
    * @param \Drupal\Core\Logger\LoggerChannelFactoryInterface $logger_factory
    *   The logger factory.
+   * @param \Symfony\Contracts\EventDispatcher\EventDispatcherInterface $eventDispatcher
+   *   The event dispatcher.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, EntityRepositoryInterface $entity_repository, EntityTypeManagerInterface $entity_type_manager, EntityDisplayRepositoryInterface $entity_display_repository, EntityTypeBundleInfoInterface $bundle_info, RendererInterface $renderer, LoggerChannelFactoryInterface $logger_factory) {
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, EntityRepositoryInterface $entity_repository, EntityTypeManagerInterface $entity_type_manager, EntityDisplayRepositoryInterface $entity_display_repository, EntityTypeBundleInfoInterface $bundle_info, RendererInterface $renderer, LoggerChannelFactoryInterface $logger_factory, protected EventDispatcherInterface $eventDispatcher) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
     $this->entityRepository = $entity_repository;
     $this->entityTypeManager = $entity_type_manager;
@@ -142,7 +146,8 @@ class MediaEmbed extends FilterBase implements ContainerFactoryPluginInterface, 
       $container->get('entity_display.repository'),
       $container->get('entity_type.bundle.info'),
       $container->get('renderer'),
-      $container->get('logger.factory')
+      $container->get('logger.factory'),
+      $container->get('event_dispatcher'),
     );
   }
 
@@ -255,6 +260,7 @@ class MediaEmbed extends FilterBase implements ContainerFactoryPluginInterface, 
     //   instead of only when #access allows this media to be viewed and hence
     //   only when media is actually rendered.
     $build[':media_embed']['#attached']['library'][] = 'media/filter.caption';
+    $build[':media_embed']['#attached']['library'][] = 'media/media.inline';
 
     return $build;
   }
@@ -278,17 +284,25 @@ class MediaEmbed extends FilterBase implements ContainerFactoryPluginInterface, 
   public function process($text, $langcode) {
     $result = new FilterProcessResult($text);
 
-    if (stristr($text, '<drupal-media') === FALSE) {
+    if (stristr($text, '<drupal-media') === FALSE && stristr($text, '<drupal-media-inline') === FALSE) {
       return $result;
     }
 
     $dom = Html::load($text);
     $xpath = new \DOMXPath($dom);
+    $matched_attributes = '@data-entity-type="media" and normalize-space(@data-entity-uuid)!=""';
 
-    foreach ($xpath->query('//drupal-media[@data-entity-type="media" and normalize-space(@data-entity-uuid)!=""]') as $node) {
+    foreach ($xpath->query('//drupal-media[' . $matched_attributes . ']|//drupal-media-inline[' . $matched_attributes . ']') as $node) {
       /** @var \DOMElement $node */
       $uuid = $node->getAttribute('data-entity-uuid');
       $view_mode_id = $node->getAttribute('data-view-mode') ?: $this->settings['default_view_mode'];
+
+      // Inline media needs a dedicated view mode in order to ensure rendering
+      // of valid (flow content) HTML when rendering inside flow content like
+      // <p> tags for example.
+      if ($node->tagName == 'drupal-media-inline') {
+        $view_mode_id = 'ckeditor_inline';
+      }
 
       // Delete the consumed attributes.
       $node->removeAttribute('data-entity-type');
@@ -314,9 +328,14 @@ class MediaEmbed extends FilterBase implements ContainerFactoryPluginInterface, 
         }
       }
 
-      $build = $media && ($view_mode || $view_mode_id === EntityDisplayRepositoryInterface::DEFAULT_DISPLAY_MODE)
-        ? $this->renderMedia($media, $view_mode_id, $langcode)
-        : $this->renderMissingMediaIndicator();
+      if ($media && ($view_mode || $view_mode_id === EntityDisplayRepositoryInterface::DEFAULT_DISPLAY_MODE)) {
+        $build = $this->renderMedia($media, $view_mode_id, $langcode);
+        $event = $this->eventDispatcher->dispatch(new MediaBuildEmbedEvent($view_mode_id, $media, $build, $node));
+        $build = $event->getBuild();
+      }
+      else {
+        $build = $this->renderMissingMediaIndicator();
+      }
 
       if (empty($build['#attributes']['class'])) {
         $build['#attributes']['class'] = [];
@@ -337,6 +356,10 @@ class MediaEmbed extends FilterBase implements ContainerFactoryPluginInterface, 
         else {
           $build['#attributes'][$attribute->nodeName] = $attribute->nodeValue;
         }
+      }
+
+      if ($node->tagName == 'drupal-media-inline') {
+        $build['#attributes']['class'][] = 'media-embedded-inline';
       }
 
       $this->renderIntoDomNode($build, $node, $result);

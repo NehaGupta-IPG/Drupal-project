@@ -101,7 +101,7 @@ abstract class MediaTestBase extends WebDriverTestBase {
         'filter_html' => [
           'status' => TRUE,
           'settings' => [
-            'allowed_html' => '<p> <br> <strong> <em> <a href> <drupal-media data-entity-type data-entity-uuid data-align data-view-mode data-caption alt>',
+            'allowed_html' => '<p> <br> <strong> <em> <a href> <drupal-media data-entity-type data-entity-uuid data-align data-view-mode data-caption alt> <drupal-media-inline data-entity-type data-entity-uuid data-align data-view-mode data-caption alt>',
           ],
         ],
         'filter_align' => ['status' => TRUE],

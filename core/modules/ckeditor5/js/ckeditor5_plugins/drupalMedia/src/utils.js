@@ -7,12 +7,25 @@ import { isWidget } from 'ckeditor5/src/widget';
  *
  * @param {module:engine/model/element~Element} modelElement
  *   The model element to be checked.
+ * @param {boolean} includeInline
+ *   Optional. Whether to consider <drupal-media-inline> elements as
+ *   media. Defaults to true.
  * @return {boolean}
  *   A boolean indicating if the element is a drupalMedia element.
  *
  * @private
  */
-export function isDrupalMedia(modelElement) {
+export function isDrupalMedia(modelElement, includeInline) {
+  if (typeof includeInline === 'undefined') {
+    includeInline = true;
+  }
+  if (includeInline) {
+    return (
+      !!modelElement &&
+      (modelElement.is('element', 'drupalMedia') ||
+        modelElement.is('element', 'drupalMediaInline'))
+    );
+  }
   return !!modelElement && modelElement.is('element', 'drupalMedia');
 }
 
@@ -21,12 +34,25 @@ export function isDrupalMedia(modelElement) {
  *
  * @param {module:engine/view/element~Element} viewElement
  *   The view element.
+ * @param {boolean} includeInline
+ *  Optional. Whether to consider <drupal-media-inline> elements as
+ *   media. Defaults to true.
  * @return {boolean}
  *   A boolean indicating if the element is a <drupal-media> element.
  *
  * @private
  */
-export function isDrupalMediaWidget(viewElement) {
+export function isDrupalMediaWidget(viewElement, includeInline) {
+  if (typeof includeInline === 'undefined') {
+    includeInline = true;
+  }
+  if (includeInline) {
+    return (
+      isWidget(viewElement) &&
+      (!!viewElement.getCustomProperty('drupalMedia') ||
+        !!viewElement.getCustomProperty('drupalMediaInline'))
+    );
+  }
   return (
     isWidget(viewElement) && !!viewElement.getCustomProperty('drupalMedia')
   );
@@ -37,6 +63,9 @@ export function isDrupalMediaWidget(viewElement) {
  *
  * @param {module:engine/model/selection~Selection|module:engine/model/documentselection~DocumentSelection} selection
  *   The current selection.
+ * @param {boolean} includeInline
+ *  Optional. Whether to consider <drupal-media-inline> elements as
+ *   media. Defaults to true.
  * @return {module:engine/model/element~Element|null}
  *   The `drupalMedia` element which could be either the current selected an
  *   ancestor of the selection. Returns null if the selection has no Drupal
@@ -44,12 +73,17 @@ export function isDrupalMediaWidget(viewElement) {
  *
  * @private
  */
-export function getClosestSelectedDrupalMediaElement(selection) {
+export function getClosestSelectedDrupalMediaElement(selection, includeInline) {
+  if (typeof includeInline === 'undefined') {
+    includeInline = true;
+  }
   const selectedElement = selection.getSelectedElement();
 
-  return isDrupalMedia(selectedElement)
+  return isDrupalMedia(selectedElement, includeInline)
     ? selectedElement
-    : selection.getFirstPosition().findAncestor('drupalMedia');
+    : selection
+        .getFirstPosition()
+        .findAncestor(includeInline ? /drupalMedia(Inline)?/ : /drupalMedia/);
 }
 
 /**
@@ -57,14 +91,20 @@ export function getClosestSelectedDrupalMediaElement(selection) {
  *
  * @param {module:engine/model/selection~Selection} selection
  *   The current selection.
+ * @param {boolean} includeInline
+ *  Optional. Whether to consider <drupal-media-inline> elements as
+ *   media. Defaults to true.
  * @return {module:engine/view/element~Element|null}
  *   The currently selected Drupal Media widget or null.
  *
  * @private
  */
-export function getClosestSelectedDrupalMediaWidget(selection) {
+export function getClosestSelectedDrupalMediaWidget(selection, includeInline) {
+  if (typeof includeInline === 'undefined') {
+    includeInline = true;
+  }
   const viewElement = selection.getSelectedElement();
-  if (viewElement && isDrupalMediaWidget(viewElement)) {
+  if (viewElement && isDrupalMediaWidget(viewElement, includeInline)) {
     return viewElement;
   }
 
@@ -76,7 +116,7 @@ export function getClosestSelectedDrupalMediaWidget(selection) {
   let parent = selection.getFirstPosition().parent;
 
   while (parent) {
-    if (parent.is('element') && isDrupalMediaWidget(parent)) {
+    if (parent.is('element') && isDrupalMediaWidget(parent, includeInline)) {
       return parent;
     }
 

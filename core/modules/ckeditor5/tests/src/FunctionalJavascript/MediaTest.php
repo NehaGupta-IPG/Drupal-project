@@ -111,7 +111,7 @@ class MediaTest extends MediaTestBase {
     $filter_format->setFilterConfig('filter_html', [
       'status' => TRUE,
       'settings' => [
-        'allowed_html' => '<p> <br> <strong> <em> <a href> <drupal-media data-entity-type data-entity-uuid data-align data-caption alt data-view-mode> <ol> <ul> <li>',
+        'allowed_html' => '<p> <br> <strong> <em> <a href> <drupal-media data-entity-type data-entity-uuid data-align data-caption alt data-view-mode> <drupal-media-inline data-entity-type data-entity-uuid data-align data-caption alt data-view-mode> <ol> <ul> <li>',
       ],
     ]);
     $filter_format->save();
@@ -166,7 +166,7 @@ class MediaTest extends MediaTestBase {
     $filter_format->setFilterConfig('filter_html', [
       'status' => TRUE,
       'settings' => [
-        'allowed_html' => '<p> <br> <strong> <em> <a href> <drupal-media data-entity-type data-entity-uuid data-align data-caption alt data-foo data-view-mode> <div data-bar>',
+        'allowed_html' => '<p> <br> <strong> <em> <a href> <drupal-media data-entity-type data-entity-uuid data-align data-caption alt data-foo data-view-mode> <drupal-media-inline data-entity-type data-entity-uuid data-align data-caption alt data-view-mode> <div data-bar>',
       ],
     ]);
     $filter_format->save();
@@ -705,7 +705,7 @@ class MediaTest extends MediaTestBase {
     $filter_format->setFilterConfig('filter_html', [
       'status' => TRUE,
       'settings' => [
-        'allowed_html' => '<p> <br> <h1 class> <div class> <section class> <drupal-media data-entity-type data-entity-uuid data-align data-caption data-view-mode alt class="layercake-side">',
+        'allowed_html' => '<p> <br> <h1 class> <div class> <section class> <drupal-media data-entity-type data-entity-uuid data-align data-caption data-view-mode alt class="layercake-side"> <drupal-media-inline data-entity-type data-entity-uuid data-align data-caption data-view-mode alt>',
       ],
     ]);
     $filter_format->save();
@@ -1020,6 +1020,56 @@ class MediaTest extends MediaTestBase {
     $this->assertNotEmpty($this->getBalloonButton('View Mode 1'));
     $this->assertNotEmpty($this->getBalloonButton('View Mode 2 has Numeric ID'));
     $this->assertNotEmpty($this->getBalloonButton('View Mode 4'));
+  }
+
+  /**
+   * Tests inline embedding.
+   */
+  public function testInlineMedia() {
+    // Reconfigure the text format to suit our needs.
+    /** @var \Drupal\filter\FilterFormatInterface $format */
+    $format = FilterFormat::load($this->host->body->format);
+    $filter_html = $format->get('filters')['filter_html'];
+    $filter_html['settings']['allowed_html'] = $filter_html['settings']['allowed_html'] . '<ul> <li>';
+    $format->setFilterConfig('filter_html', $filter_html);
+    $format->save();
+
+    // Setup the test content containing inline and normal media in the editor.
+    $assert_session = $this->assertSession();
+    $original_value = $this->host->body->value;
+    $inline_value = \str_replace('drupal-media', 'drupal-media-inline', $original_value);
+    // @todo Captions on inline media are not supported yet.
+    $inline_value = \str_replace('data-caption="baz"', '', $inline_value);
+    $this->host->body->value = <<<END
+        <div>
+            $original_value
+            <p>This is a paragraph $inline_value with an inline media</p>
+            <ul>
+                <li>This is a list item $inline_value containing an inline media</li>
+            </ul>
+        </div>
+END;
+    $this->host->save();
+    $this->drupalGet($this->host->toUrl('edit-form'));
+
+    // Wait until media previews are fetched.
+    $this->assertNotEmpty($assert_session->waitForElementVisible('css', '.ck-widget.drupal-media-inline'));
+    $this->assertNotEmpty($assert_session->waitForElementVisible('css', '.ck-widget.drupal-media'));
+
+    // Confirm that the inline media is contained as phrasing content inside
+    // flow content.
+    $assert_session->elementExists('css', 'p > .drupal-media-inline');
+    $assert_session->elementExists('css', 'ul > li > .drupal-media-inline');
+    // Also ensure that a media not embedded inside flow content is still
+    // rendered not using the inline templates.
+    $assert_session->elementExists('css', 'div > .drupal-media');
+
+    // Verify the rendered inline media is rendered with markup that is using
+    // the dedicated inline media and field templates.
+    $this->drupalGet($this->host->toUrl('canonical'));
+    $assert_session->elementExists('css', 'p > span.media-embedded-inline span img[src*="image-test.png"]');
+    $assert_session->elementExists('css', 'ul > li > span.media-embedded-inline span img[src*="image-test.png"]');
+    $assert_session->elementExists('css', 'div > figure.caption-drupal-media article.media img[src*="image-test.png"]');
   }
 
   /**
