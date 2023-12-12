@@ -20,7 +20,7 @@ function user_removed_post_updates(): array {
 /**
  * Update config for change mail notifications.
  */
-function user_post_update_mail_change() {
+function user_post_update_mail_change(): void {
   $config_factory = \Drupal::service('config.factory');
 
   $config_factory->getEditable('user.settings')
