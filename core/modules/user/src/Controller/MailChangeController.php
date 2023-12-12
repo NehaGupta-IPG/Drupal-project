@@ -55,15 +55,19 @@ class MailChangeController extends ControllerBase {
         ':logout' => Url::fromRoute('user.logout')->toString(),
       ];
       $messenger->addError($this->t('You are currently logged in as %user, and are attempting to confirm an email address change for another account. <a href=":logout">Log out</a> and try using the link again.', $arguments));
+      return $this->redirect('<front>');
     }
+
     // The link has expired.
-    elseif ($request_time - $timestamp > $timeout) {
+    if ($request_time - $timestamp > $timeout) {
       $messenger->addError($this->t('You have tried to use an email address change link that has expired. Visit your account and change your email again.'));
+      return $this->redirect('<front>');
     }
+
     // The link is valid.
-    elseif ($timestamp <= $request_time && $timestamp >= $user->getLastLoginTime() && hash_equals($hash, user_pass_rehash($user, $timestamp, $new_mail))) {
-      // Save the new email but refresh also the last login time so that this
-      // mail change link gets expired.
+    if ($timestamp <= $request_time && $timestamp >= $user->getLastLoginTime() && hash_equals($hash, user_pass_rehash($user, $timestamp, $new_mail))) {
+      // Save the new email but also refresh the last login time so that this
+      // mail change link is expired.
       $user->setEmail($new_mail)->setLastLoginTime($request_time)->save();
       /** @var \Drupal\user\UserStorageInterface $user_storage */
       $user_storage = $this->entityTypeManager()->getStorage('user');
@@ -74,12 +78,11 @@ class MailChangeController extends ControllerBase {
       }
       $arguments = ['%mail' => $new_mail];
       $messenger->addStatus($this->t('Your email address has been changed to %mail.', $arguments));
+      return $this->redirect('<front>');
     }
     // Timestamp from the link is abnormal (in the future) or user registered a
     // new login in the meantime or the hash is not valid.
-    else {
-      $messenger->addError($this->t('You have tried to use an email address change link that has either been used or is no longer valid. Visit your account and change your email again.'));
-    }
+    $messenger->addError($this->t('You have tried to use an email address change link that has either been used or is no longer valid. Visit your account and change your email again.'));
 
     return $this->redirect('<front>');
   }
