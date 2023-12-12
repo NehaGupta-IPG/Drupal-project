@@ -3,7 +3,6 @@
 namespace Drupal\Core\Validation\Plugin\Validation\Constraint;
 
 use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
-use Drupal\Core\StreamWrapper\StreamWrapperInterface;
 use Drupal\Core\StreamWrapper\StreamWrapperManagerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Validator\Constraint;
@@ -43,16 +42,22 @@ class StreamWrapperUriConstraintValidator extends ConstraintValidator implements
     if (!$constraint instanceof StreamWrapperUriConstraint) {
       throw new UnexpectedValueException($constraint, StreamWrapperUriConstraint::class);
     }
-    if ($this->streamWrapperManager->isValidUri($value)) {
-      $read_write_stream_wrappers = $this->streamWrapperManager->getNames(StreamWrapperInterface::READ | StreamWrapperInterface::WRITE);
-      $uri_scheme = $this->streamWrapperManager->getScheme($value);
-      if (in_array($uri_scheme, array_keys($read_write_stream_wrappers))) {
-        return;
-      }
+    if (!$this->streamWrapperManager->isValidUri($value)) {
+      $this->context
+        ->buildViolation($constraint->message)
+        ->setParameter('%value', $value)
+        ->addViolation();
+      // Do not continue with an invalid URI.
+      return;
+    }
+    $read_write_stream_wrappers = $this->streamWrapperManager->getNames($constraint->filter);
+    $uri_scheme = $this->streamWrapperManager->getScheme($value);
+    if (in_array($uri_scheme, array_keys($read_write_stream_wrappers))) {
+      return;
     }
     $this->context
-      ->buildViolation($constraint->message)
-      ->setParameter('%value', $value)
+      ->buildViolation($constraint->invalidSchemeMessage)
+      ->setParameter('%scheme', $uri_scheme)
       ->addViolation();
   }
 
