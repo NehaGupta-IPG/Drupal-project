@@ -27,7 +27,7 @@ function user_post_update_mail_change(): void {
     ->set('notify.mail_change_notification', FALSE)
     ->set('notify.mail_change_verification', FALSE)
     ->set('mail_change_timeout', 86400)
-    ->save();
+    ->save(TRUE);
 
   $mail_change_notification = [
     'body' => "[user:display-name],\n\nA request to change your email address has been made at [site:name]. In order to complete the change you will need to follow the instructions sent to your new email address within 24 hours.\n\nIf you did not intend to make this change, contact [site:mail].\n\n--  [site:name] team",
@@ -41,5 +41,5 @@ function user_post_update_mail_change(): void {
   $config_factory->getEditable('user.mail')
     ->set('mail_change_notification', $mail_change_notification)
     ->set('mail_change_verification', $mail_change_verification)
-    ->save();
+    ->save(TRUE);
 }
