@@ -294,7 +294,7 @@ class AccountSettingsForm extends ConfigFormBase {
     $form['mail_change']['mail_change_notification']['enabled'] = [
       '#type' => 'checkbox',
       '#title' => $this->t('Notify user when email changes'),
-      '#default_value' => $config->get('notify.mail_change_notification'),
+      '#config_target' => 'user.settings:notify.mail_change_notification',
     ];
     $states = [
       'invisible' => [
@@ -325,7 +325,7 @@ class AccountSettingsForm extends ConfigFormBase {
     $form['mail_change']['mail_change_verification']['enabled'] = [
       '#type' => 'checkbox',
       '#title' => $this->t('Require email verification when a user changes their email address'),
-      '#default_value' => $config->get('notify.mail_change_verification'),
+      '#config_target' => 'user.settings:notify.mail_change_verification',
     ];
     $states = [
       'invisible' => [
