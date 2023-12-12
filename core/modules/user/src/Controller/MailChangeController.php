@@ -97,7 +97,7 @@ class MailChangeController extends ControllerBase {
    *   An access result
    */
   public function access(UserInterface $user): AccessResultInterface {
-    return AccessResult::allowedIf($user->isActive());
+    return AccessResult::allowedIf($user->isActive())->addCacheableDependency($user);
   }
 
   /**
