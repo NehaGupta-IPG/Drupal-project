@@ -90,10 +90,11 @@ class StreamWrapperUriConstraintValidatorTest extends KernelTestBase {
     $data[] = ['/absolute/path', FALSE];
     $data[] = ['https://www.example.com', FALSE];
     $data[] = ['invalid-schema://path', FALSE];
+    // Valid schema, but not writable.
+    $data[] = ['dummy-external-readonly://media-icons/generic', FALSE];
+    $data[] = ['dummy-readonly://media-icons/generic', FALSE];
     // Valid schema.
     $data[] = ['assets://media-icons/generic', TRUE];
-    $data[] = ['dummy-external-readonly://media-icons/generic', TRUE];
-    $data[] = ['dummy-readonly://media-icons/generic', TRUE];
     $data[] = ['dummy-remote://media-icons/generic', TRUE];
     $data[] = ['dummy://media-icons/generic', TRUE];
     $data[] = ['private://media-icons/generic', TRUE];

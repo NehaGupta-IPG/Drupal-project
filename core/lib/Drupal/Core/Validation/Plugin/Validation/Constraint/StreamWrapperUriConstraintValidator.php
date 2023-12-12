@@ -3,6 +3,7 @@
 namespace Drupal\Core\Validation\Plugin\Validation\Constraint;
 
 use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
+use Drupal\Core\StreamWrapper\StreamWrapperInterface;
 use Drupal\Core\StreamWrapper\StreamWrapperManagerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Validator\Constraint;
@@ -40,7 +41,11 @@ class StreamWrapperUriConstraintValidator extends ConstraintValidator implements
       throw new UnexpectedTypeException($value, 'string');
     }
     if ($this->streamWrapperManager->isValidUri($value)) {
-      return;
+      $read_write_stream_wrappers = $this->streamWrapperManager->getNames(StreamWrapperInterface::READ | StreamWrapperInterface::WRITE);
+      $uri_scheme = $this->streamWrapperManager->getScheme($value);
+      if (in_array($uri_scheme, array_keys($read_write_stream_wrappers))) {
+        return;
+      }
     }
     $this->context
       ->buildViolation($constraint->message)
