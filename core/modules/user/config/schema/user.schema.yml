@@ -116,6 +116,7 @@ user.mail:
     status_canceled:
       type: mail
       label: 'Account cancelled'
+
 user.flood:
   type: config_object
   label: 'User flood settings'
