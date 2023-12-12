@@ -19,6 +19,12 @@ user.settings:
         cancel_confirm:
           type: boolean
           label: 'Account cancellation confirmation'
+        mail_change_notification:
+          type: boolean
+          label: 'Notify user when email changes'
+        mail_change_verification:
+          type: boolean
+          label: 'Require email verification when a user changes their email address'
         password_reset:
           type: boolean
           label: 'Notify user when password reset'
@@ -57,6 +63,9 @@ user.settings:
       label: 'When cancelling a user account'
       constraints:
         UserCancelMethod: []
+    mail_change_timeout:
+      type: integer
+      label: 'Mail change timeout'
     password_reset_timeout:
       type: integer
       label: 'Password reset timeout'
@@ -77,6 +86,12 @@ user.mail:
     cancel_confirm:
       type: mail
       label: 'Account cancellation confirmation'
+    mail_change_notification:
+      type: mail
+      label: 'Change mail notification'
+    mail_change_verification:
+      type: mail
+      label: 'Change mail verification'
     password_reset:
       type: mail
       label: 'Password recovery'
@@ -101,7 +116,6 @@ user.mail:
     status_canceled:
       type: mail
       label: 'Account cancelled'
-
 user.flood:
   type: config_object
   label: 'User flood settings'
