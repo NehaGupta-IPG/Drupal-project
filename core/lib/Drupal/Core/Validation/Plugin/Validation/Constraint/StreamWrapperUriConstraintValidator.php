@@ -40,6 +40,9 @@ class StreamWrapperUriConstraintValidator extends ConstraintValidator implements
     if (!is_string($value)) {
       throw new UnexpectedTypeException($value, 'string');
     }
+    if (!$constraint instanceof StreamWrapperUriConstraint) {
+      throw new UnexpectedValueException($constraint, StreamWrapperUriConstraint::class);
+    }
     if ($this->streamWrapperManager->isValidUri($value)) {
       $read_write_stream_wrappers = $this->streamWrapperManager->getNames(StreamWrapperInterface::READ | StreamWrapperInterface::WRITE);
       $uri_scheme = $this->streamWrapperManager->getScheme($value);
