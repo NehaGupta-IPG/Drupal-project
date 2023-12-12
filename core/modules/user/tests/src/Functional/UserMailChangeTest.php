@@ -50,7 +50,7 @@ class UserMailChangeTest extends BrowserTestBase {
   /**
    * Tests email change functionality.
    */
-  public function testMailChange() {
+  public function testMailChange(): void {
     $this->drupalLogin($this->account);
 
     // Ensure a time between the user last login and the time the account edit
@@ -108,7 +108,7 @@ class UserMailChangeTest extends BrowserTestBase {
   /**
    * Tests email change functionality when changing password at the same time (which changes the password hash used for token generation)
    */
-  public function testMailChangeWithPasswordChange() {
+  public function testMailChangeWithPasswordChange(): void {
     $this->drupalLogin($this->account);
 
     // Ensure a time between the user last login and the time the account edit
@@ -173,7 +173,7 @@ class UserMailChangeTest extends BrowserTestBase {
    * administrator. The other way around, changing an non-empty email to an
    * empty one, is not allowed.
    */
-  public function testMailChangeForUserWithEmptyEmail() {
+  public function testMailChangeForUserWithEmptyEmail(): void {
     // Simulate a user without an email address.
     $this->account->setEmail(NULL)->save();
 
@@ -225,7 +225,7 @@ class UserMailChangeTest extends BrowserTestBase {
   /**
    * Tests change of email for blocked users.
    */
-  public function testBlockedUser() {
+  public function testBlockedUser(): void {
     $timestamp = $this->time->getRequestTime() - 1;
     $account_cloned = clone $this->account;
     $account_cloned->block()->save();
@@ -236,7 +236,7 @@ class UserMailChangeTest extends BrowserTestBase {
   /**
    * Tests change of email for expired timestamp.
    */
-  public function testExpiredTimestamp() {
+  public function testExpiredTimestamp(): void {
     $timestamp = $this->time->getRequestTime() - (24 * 60 * 60 + 1);
     $this->drupalGet(MailChangeController::getUrl($this->account, [], $timestamp)->getInternalPath());
     $this->assertSession()->responseContains('You have tried to use an email address change link that has expired. Visit your account and change your email again.');
@@ -245,7 +245,7 @@ class UserMailChangeTest extends BrowserTestBase {
   /**
    * Tests change of email when other user is logged in.
    */
-  public function testOtherUserLoggedIn() {
+  public function testOtherUserLoggedIn(): void {
     $timestamp = $this->time->getRequestTime() - 1;
     // Create other account and login with it.
     $current_account = $this->drupalCreateUser();
@@ -267,7 +267,7 @@ class UserMailChangeTest extends BrowserTestBase {
   /**
    * Tests change of email for timestamp in the future.
    */
-  public function testFutureTimestamp() {
+  public function testFutureTimestamp(): void {
     $timestamp = $this->time->getRequestTime() + 60 * 60;
     $this->drupalGet(MailChangeController::getUrl($this->account, [], $timestamp)->getInternalPath());
     $this->assertSession()->responseContains('You have tried to use an email address change link that has either been used or is no longer valid. Visit your account and change your email again.');
@@ -276,7 +276,7 @@ class UserMailChangeTest extends BrowserTestBase {
   /**
    * Tests change of email with the wrong hash.
    */
-  public function testWrongHash() {
+  public function testWrongHash(): void {
     $timestamp = $this->time->getRequestTime() - 1;
     // Generate the hash for other user.
     $other_account = $this->drupalCreateUser();
@@ -288,7 +288,7 @@ class UserMailChangeTest extends BrowserTestBase {
   /**
    * Test that the link must contain the requested email address.
    */
-  public function testWrongEmail() {
+  public function testWrongEmail(): void {
     $timestamp = $this->time->getRequestTime() - 1;
     // Can't use MailChangeController here as its ::getUrl method uses the
     // stored email address.
@@ -313,7 +313,7 @@ class UserMailChangeTest extends BrowserTestBase {
    * @return string
    *   An URL.
    */
-  protected function extractUrlFromMail($mail_id) {
+  protected function extractUrlFromMail($mail_id): string {
     // Assume the most recent email.
     $email = $this->getMails(['id' => $mail_id]);
     $email = end($email);
@@ -327,7 +327,7 @@ class UserMailChangeTest extends BrowserTestBase {
    * @return string
    *   A random email address.
    */
-  protected function getRandomEmailAddress() {
+  protected function getRandomEmailAddress(): string {
     return mb_strtolower($this->randomMachineName()) . '@example.com';
   }
 

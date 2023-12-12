@@ -4,10 +4,10 @@ namespace Drupal\user\Controller;
 
 use Drupal\Component\Datetime\TimeInterface;
 use Drupal\Core\Access\AccessResult;
+use Drupal\Core\Access\AccessResultInterface;
 use Drupal\Core\Controller\ControllerBase;
 use Drupal\Core\Url;
 use Drupal\user\UserInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 
 /**
@@ -16,28 +16,12 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 class MailChangeController extends ControllerBase {
 
   /**
-   * The date-time service.
+   * Builds a new MailChangeController.
    *
-   * @var \Drupal\Component\Datetime\TimeInterface
-   */
-  protected $dateTime;
-
-  /**
-   * Builds a new controller.
-   *
-   * @param \Drupal\Component\Datetime\TimeInterface $date_time
+   * @param \Drupal\Component\Datetime\TimeInterface $dateTime
    *   The date-time service.
    */
-  public function __construct(TimeInterface $date_time) {
-    $this->dateTime = $date_time;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public static function create(ContainerInterface $container) {
-    return new static($container->get('datetime.time'));
-  }
+  public function __construct(protected TimeInterface $dateTime) {}
 
   /**
    * Returns the user mail change page.
@@ -109,7 +93,7 @@ class MailChangeController extends ControllerBase {
    * @return \Drupal\Core\Access\AccessResultInterface
    *   An access result
    */
-  public function access(UserInterface $user) {
+  public function access(UserInterface $user): AccessResultInterface {
     return AccessResult::allowedIf($user->isActive());
   }
 
@@ -132,7 +116,7 @@ class MailChangeController extends ControllerBase {
    * @return \Drupal\Core\Url
    *   A unique url that provides a one-time email change confirmation.
    */
-  public static function getUrl(UserInterface $account, array $options = [], $timestamp = NULL, $hash = NULL) {
+  public static function getUrl(UserInterface $account, array $options = [], $timestamp = NULL, $hash = NULL): Url {
     $timestamp = $timestamp ?: \Drupal::time()->getRequestTime();
     $langcode = $options['langcode'] ?? $account->getPreferredLangcode();
     $hash = empty($hash) ? user_pass_rehash($account, $timestamp) : $hash;
