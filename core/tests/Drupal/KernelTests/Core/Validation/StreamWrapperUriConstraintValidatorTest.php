@@ -99,7 +99,7 @@ class StreamWrapperUriConstraintValidatorTest extends KernelTestBase {
     $data[] = ['/absolute/path', 'uri'];
     $data[] = ['https://www.example.com', 'uri'];
     $data[] = ['invalid-schema://path', 'uri'];
-    // Valid schema, with defailt constraint options.
+    // Valid schema, with default constraint options.
     $data[] = ['assets://media-icons/generic'];
     $data[] = ['dummy-external-readonly://media-icons/generic'];
     $data[] = ['dummy-readonly://media-icons/generic'];
