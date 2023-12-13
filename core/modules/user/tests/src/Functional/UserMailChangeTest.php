@@ -49,8 +49,10 @@ class UserMailChangeTest extends BrowserTestBase {
 
   /**
    * Tests email change functionality.
+   *
+   * @dataProvider providerTestMailChange
    */
-  public function testMailChange(): void {
+  public function testMailChange($with_password): void {
     $this->drupalLogin($this->account);
 
     // Ensure a time between the user last login and the time the account edit
@@ -69,6 +71,15 @@ class UserMailChangeTest extends BrowserTestBase {
       'mail' => $new_mail,
       'current_pass' => $this->account->pass_raw,
     ];
+    if ($with_password) {
+      $new_password = \Drupal::service('password_generator')
+        ->generate();
+      $edit += [
+        'pass[pass1]' => $new_password,
+        'pass[pass2]' => $new_password,
+      ];
+    }
+
     $this->drupalGet($this->account->toUrl('edit-form'));
     $this->submitForm($edit, 'Save');
 
@@ -107,64 +118,17 @@ class UserMailChangeTest extends BrowserTestBase {
   }
 
   /**
-   * Tests email change functionality when changing password at the same time (which changes the password hash used for token generation)
+   * Provides data for testMailChange.
    */
-  public function testMailChangeWithPasswordChange(): void {
-    $this->drupalLogin($this->account);
-
-    // Ensure a time between the user last login and the time the account edit
-    // is posted. A human cannot login, edit the account and post the changes
-    // within the same second. But tests occasionally are running all steps in
-    // the same timestamp, so that the mail change URL timestamp equals the user
-    // last login timestamp. Later, in this test, when the user tries to reuse
-    // the expired link, the test is still within the timestamp when the user
-    // has logged in and a time difference cannot be experienced a because the
-    // user last login time has seconds as granularity.
-    sleep(1);
-
-    // Change the user email address and password at the same time.
-    $new_mail = $this->getRandomEmailAddress();
-    $new_password = $password = \Drupal::service('password_generator')->generate();
-    $edit = [
-      'mail' => $new_mail,
-      'current_pass' => $this->account->pass_raw,
-      'pass[pass1]' => $new_password,
-      'pass[pass2]' => $new_password,
+  public function providerTestMailChange(): array {
+    return [
+      'no_password change' => [
+        FALSE,
+      ],
+      'with password change' => [
+        TRUE,
+      ],
     ];
-    $this->drupalGet($this->account->toUrl('edit-form'));
-    $this->submitForm($edit, 'Save');
-
-    // Check that the validation status message was displayed.
-    $this->assertSession()->pageTextContains('You must confirm your email address. Further instructions have been sent to your new email address.');
-
-    $user_mail = $this->config('user.mail');
-
-    /** @var \Drupal\Core\Utility\Token $token_service */
-    $token_service = $this->container->get('token');
-
-    // Check that a notification email was sent.
-    $this->assertMail('to', $this->account->getEmail());
-    $subject = $token_service->replace($user_mail->get('mail_change_notification.subject'), ['user' => $this->account]);
-    $this->assertMail('subject', $subject);
-
-    // Check that a verification email was sent.
-    $this->assertMailString('to', $new_mail, 2);
-    $subject = $token_service->replace($user_mail->get('mail_change_verification.subject'), ['user' => $this->account]);
-    $this->assertMailString('subject', $subject, 2);
-
-    $sent_mail_change_url = $this->extractUrlFromMail('user_mail_change_verification');
-
-    // Check that the email was updated.
-    $this->drupalGet($sent_mail_change_url);
-    $this->assertSession()->responseContains(new FormattableMarkup('Your email address has been changed to %mail.', ['%mail' => $new_mail]));
-
-    // Check that the change email URL is not cached and expires after first use.
-    $this->drupalGet($sent_mail_change_url);
-    $this->assertNull($this->getSession()->getResponseHeader('X-Drupal-Cache'));
-    $this->assertSession()->responseContains('You have tried to use an email address change link that has either been used or is no longer valid. Visit your account and change your email again.');
-
-    // Check that the user email changed.
-    $this->assertSame(User::load($this->account->id())->getEmail(), $new_mail);
   }
 
   /**
