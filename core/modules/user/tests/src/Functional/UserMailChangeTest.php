@@ -96,13 +96,14 @@ class UserMailChangeTest extends BrowserTestBase {
     $this->drupalGet($sent_mail_change_url);
     $this->assertSession()->responseContains(new FormattableMarkup('Your email address has been changed to %mail.', ['%mail' => $new_mail]));
 
-    // Check that the change email URL is not cached and expires after first use.
+    // Check that the change email URL is not cached and expires after first
+    // use.
     $this->drupalGet($sent_mail_change_url);
-    self::assertNull($this->getSession()->getResponseHeader('X-Drupal-Cache'));
+    $this->assertNull($this->getSession()->getResponseHeader('X-Drupal-Cache'));
     $this->assertSession()->responseContains('You have tried to use an email address change link that has either been used or is no longer valid. Visit your account and change your email again.');
 
     // Check that the user mail has been changed.
-    self::assertSame(User::load($this->account->id())->getEmail(), $new_mail);
+    $this->assertSame(User::load($this->account->id())->getEmail(), $new_mail);
   }
 
   /**
@@ -159,11 +160,11 @@ class UserMailChangeTest extends BrowserTestBase {
 
     // Check that the change email URL is not cached and expires after first use.
     $this->drupalGet($sent_mail_change_url);
-    self::assertNull($this->getSession()->getResponseHeader('X-Drupal-Cache'));
+    $this->assertNull($this->getSession()->getResponseHeader('X-Drupal-Cache'));
     $this->assertSession()->responseContains('You have tried to use an email address change link that has either been used or is no longer valid. Visit your account and change your email again.');
 
     // Check that the user email changed.
-    self::assertSame(User::load($this->account->id())->getEmail(), $new_mail);
+    $this->assertSame(User::load($this->account->id())->getEmail(), $new_mail);
   }
 
   /**
@@ -189,8 +190,8 @@ class UserMailChangeTest extends BrowserTestBase {
     $this->assertSession()->pageTextContains('You must confirm your email address. Further instructions have been sent to your new email address.');
 
     // Check that only the verification email was sent.
-    self::assertCount(1, $this->getMails());
-    self::assertNotEmpty($this->getMails(['id' => 'user_mail_change_verification']));
+    $this->assertCount(1, $this->getMails());
+    $this->assertNotEmpty($this->getMails(['id' => 'user_mail_change_verification']));
   }
 
   /**
@@ -216,10 +217,10 @@ class UserMailChangeTest extends BrowserTestBase {
     $this->assertSession()->pageTextNotContains('You must confirm your email address. Further instructions have been sent to your new email address.');
 
     // Check that no email was sent to the old or to the new address.
-    self::assertEmpty($this->getMails());
+    $this->assertEmpty($this->getMails());
 
     // Check that the user's email was changed.
-    self::assertSame($new_mail, User::load($this->account->id())->getEmail());
+    $this->assertSame($new_mail, User::load($this->account->id())->getEmail());
   }
 
   /**
