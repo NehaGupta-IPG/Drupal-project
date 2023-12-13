@@ -459,27 +459,26 @@ abstract class AccountForm extends ContentEntityForm implements TrustedCallbackI
    */
   public function notify(array &$form, FormStateInterface $form_state) {
     $new_mail = $form_state->get('mail_change_verification');
-    if ($new_mail !== NULL) {
-      // Send a verification to the new email address.
-      /** @var \Drupal\user\UserInterface $account */
-      $account = $this->getEntity();
-      /** @var \Drupal\user\UserInterface $account_cloned */
-      $account_cloned = clone $account;
-      $account_cloned->setEmail($new_mail);
-      if (_user_mail_notify('mail_change_verification', $account_cloned) !== NULL) {
-        // Send notification email to the old email address, if it's set.
-        if ($account->getEmail()) {
-          _user_mail_notify('mail_change_notification', $account);
-        }
-        $this->messenger()
-          ->addWarning($this->t('You must confirm your email address. Further instructions have been sent to your new email address.'));
-      }
-      else {
-        // Make the change immediately if no verification email is configured.
-        $account->setEmail($new_mail);
-        $account->save();
-      }
+    if ($new_mail === NULL) {
+      return;
     }
+    // Send a verification to the new email address.
+    /** @var \Drupal\user\UserInterface $account */
+    $account = $this->getEntity();
+    $account_cloned = clone $account;
+    $account_cloned->setEmail($new_mail);
+    if (_user_mail_notify('mail_change_verification', $account_cloned) == NULL) {
+      // Make the change immediately if no verification email is configured.
+      $account->setEmail($new_mail);
+      $account->save();
+      return;
+    }
+    // Send notification email to the old email address, if it's set.
+    if ($account->getEmail()) {
+      _user_mail_notify('mail_change_notification', $account);
+    }
+    $this->messenger()
+      ->addWarning($this->t('You must confirm your email address. Further instructions have been sent to your new email address.'));
   }
 
   /**
