@@ -26,7 +26,7 @@ class UserMailChangeTest extends BrowserTestBase {
   protected $account;
 
   /**
-   * The date/time service.
+   * The time service.
    *
    * @var \Drupal\Component\Datetime\TimeInterface
    */

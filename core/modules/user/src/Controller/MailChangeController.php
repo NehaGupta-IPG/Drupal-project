@@ -18,10 +18,10 @@ class MailChangeController extends ControllerBase {
   /**
    * Builds a new MailChangeController.
    *
-   * @param \Drupal\Component\Datetime\TimeInterface $dateTime
-   *   The date-time service.
+   * @param \Drupal\Component\Datetime\TimeInterface $time
+   *   The time service.
    */
-  public function __construct(protected TimeInterface $dateTime) {}
+  public function __construct(protected TimeInterface $time) {}
 
   /**
    * Returns the user mail change page.
@@ -45,7 +45,7 @@ class MailChangeController extends ControllerBase {
     $timeout = $this->config('user.settings')->get('mail_change_timeout');
     /** @var \Drupal\Core\Session\AccountProxyInterface $current_user */
     $current_user = $this->currentUser();
-    $request_time = $this->dateTime->getRequestTime();
+    $request_time = $this->time->getRequestTime();
     $messenger = $this->messenger();
 
     // Other user is authenticated.
