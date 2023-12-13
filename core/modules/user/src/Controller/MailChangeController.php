@@ -26,7 +26,7 @@ class MailChangeController extends ControllerBase {
   /**
    * Returns the user mail change page.
    *
-   * In order to never disclose a mail change link via a referrer header this
+   * In order to never disclose an email change link via a referrer header this
    * controller must always return a redirect response.
    *
    * @param \Drupal\user\UserInterface $user
@@ -67,7 +67,7 @@ class MailChangeController extends ControllerBase {
     // The link is valid.
     if ($timestamp <= $request_time && $timestamp >= $user->getLastLoginTime() && hash_equals($hash, user_pass_rehash($user, $timestamp, $new_mail))) {
       // Save the new email but also refresh the last login time so that this
-      // mail change link is expired.
+      // email change link is expired.
       $user->setEmail($new_mail)->setLastLoginTime($request_time)->save();
       /** @var \Drupal\user\UserStorageInterface $user_storage */
       $user_storage = $this->entityTypeManager()->getStorage('user');
@@ -80,18 +80,18 @@ class MailChangeController extends ControllerBase {
       $messenger->addStatus($this->t('Your email address has been changed to %mail.', $arguments));
       return $this->redirect('<front>');
     }
-    // Timestamp from the link is abnormal (in the future) or user registered a
-    // new login in the meantime or the hash is not valid.
+    // Timestamp from the link is in the future or the user registered a new
+    // login in the meantime or the hash is not valid.
     $messenger->addError($this->t('You have tried to use an email address change link that has either been used or is no longer valid. Visit your account and change your email again.'));
 
     return $this->redirect('<front>');
   }
 
   /**
-   * Checks access to change email url.
+   * Checks access to change email URL.
    *
    * @param \Drupal\user\UserInterface $user
-   *   The user account requesting email change.
+   *   The user account requesting an email change.
    *
    * @return \Drupal\Core\Access\AccessResultInterface
    *   An access result
@@ -101,7 +101,7 @@ class MailChangeController extends ControllerBase {
   }
 
   /**
-   * Generates a unique URL for a one time mail change confirmation.
+   * Generates a unique URL for a one time email change confirmation.
    *
    * @param \Drupal\user\UserInterface $account
    *   An object containing the user account.
@@ -117,7 +117,7 @@ class MailChangeController extends ControllerBase {
    *   account data and timestamp.
    *
    * @return \Drupal\Core\Url
-   *   A unique url that provides a one-time email change confirmation.
+   *   A unique URL that provides a one-time email change confirmation.
    */
   public static function getUrl(UserInterface $account, array $options = [], $timestamp = NULL, $hash = NULL): Url {
     $timestamp = $timestamp ?: \Drupal::time()->getRequestTime();

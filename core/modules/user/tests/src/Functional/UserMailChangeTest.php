@@ -72,7 +72,7 @@ class UserMailChangeTest extends BrowserTestBase {
     $this->drupalGet($this->account->toUrl('edit-form'));
     $this->submitForm($edit, 'Save');
 
-    // Check that the validation status message has been displayed.
+    // Check that the validation status message was displayed.
     $this->assertSession()->pageTextContains('You must confirm your email address. Further instructions have been sent to your new email address.');
 
     $user_mail = $this->config('user.mail');
@@ -80,23 +80,23 @@ class UserMailChangeTest extends BrowserTestBase {
     /** @var \Drupal\Core\Utility\Token $token_service */
     $token_service = $this->container->get('token');
 
-    // Check that a notification mail has been sent.
+    // Check that a notification email was sent.
     $this->assertMail('to', $this->account->getEmail());
     $subject = $token_service->replace($user_mail->get('mail_change_notification.subject'), ['user' => $this->account]);
     $this->assertMail('subject', $subject);
 
-    // Check that a verification mail has been sent.
+    // Check that a verification email was sent.
     $this->assertMailString('to', $new_mail, 2);
     $subject = $token_service->replace($user_mail->get('mail_change_verification.subject'), ['user' => $this->account]);
     $this->assertMailString('subject', $subject, 2);
 
     $sent_mail_change_url = $this->extractUrlFromMail('user_mail_change_verification');
 
-    // Check that the email has been successfully updated.
+    // Check that the email was updated.
     $this->drupalGet($sent_mail_change_url);
     $this->assertSession()->responseContains(new FormattableMarkup('Your email address has been changed to %mail.', ['%mail' => $new_mail]));
 
-    // Check that the change mail URL is not cached and expires after first use.
+    // Check that the change email URL is not cached and expires after first use.
     $this->drupalGet($sent_mail_change_url);
     self::assertNull($this->getSession()->getResponseHeader('X-Drupal-Cache'));
     $this->assertSession()->responseContains('You have tried to use an email address change link that has either been used or is no longer valid. Visit your account and change your email again.');
@@ -133,7 +133,7 @@ class UserMailChangeTest extends BrowserTestBase {
     $this->drupalGet($this->account->toUrl('edit-form'));
     $this->submitForm($edit, 'Save');
 
-    // Check that the validation status message has been displayed.
+    // Check that the validation status message was displayed.
     $this->assertSession()->pageTextContains('You must confirm your email address. Further instructions have been sent to your new email address.');
 
     $user_mail = $this->config('user.mail');
@@ -141,37 +141,37 @@ class UserMailChangeTest extends BrowserTestBase {
     /** @var \Drupal\Core\Utility\Token $token_service */
     $token_service = $this->container->get('token');
 
-    // Check that a notification mail has been sent.
+    // Check that a notification email was sent.
     $this->assertMail('to', $this->account->getEmail());
     $subject = $token_service->replace($user_mail->get('mail_change_notification.subject'), ['user' => $this->account]);
     $this->assertMail('subject', $subject);
 
-    // Check that a verification mail has been sent.
+    // Check that a verification email was sent.
     $this->assertMailString('to', $new_mail, 2);
     $subject = $token_service->replace($user_mail->get('mail_change_verification.subject'), ['user' => $this->account]);
     $this->assertMailString('subject', $subject, 2);
 
     $sent_mail_change_url = $this->extractUrlFromMail('user_mail_change_verification');
 
-    // Check that the email has been successfully updated.
+    // Check that the email was updated.
     $this->drupalGet($sent_mail_change_url);
     $this->assertSession()->responseContains(new FormattableMarkup('Your email address has been changed to %mail.', ['%mail' => $new_mail]));
 
-    // Check that the change mail URL is not cached and expires after first use.
+    // Check that the change email URL is not cached and expires after first use.
     $this->drupalGet($sent_mail_change_url);
     self::assertNull($this->getSession()->getResponseHeader('X-Drupal-Cache'));
     $this->assertSession()->responseContains('You have tried to use an email address change link that has either been used or is no longer valid. Visit your account and change your email again.');
 
-    // Check that the user mail has been changed.
+    // Check that the user email changed.
     self::assertSame(User::load($this->account->id())->getEmail(), $new_mail);
   }
 
   /**
    * Tests email change functionality for a user without am email address.
    *
-   * Drupal allows accounts without email when the account is created by an
-   * administrator. The other way around, changing an non-empty email to an
-   * empty one, is not allowed.
+   * Drupal allows accounts without an email when the account is created by an
+   * administrator. Note that, changing an non-empty email to an empty one, is
+   * not allowed.
    */
   public function testMailChangeForUserWithEmptyEmail(): void {
     // Simulate a user without an email address.
@@ -185,10 +185,10 @@ class UserMailChangeTest extends BrowserTestBase {
     $this->drupalGet($this->account->toUrl('edit-form'));
     $this->submitForm($edit, 'Save');
 
-    // Check that the validation status message has been displayed.
+    // Check that the validation status message was displayed.
     $this->assertSession()->pageTextContains('You must confirm your email address. Further instructions have been sent to your new email address.');
 
-    // Check that only the verification message was sent.
+    // Check that only the verification email was sent.
     self::assertCount(1, $this->getMails());
     self::assertNotEmpty($this->getMails(['id' => 'user_mail_change_verification']));
   }
@@ -197,7 +197,7 @@ class UserMailChangeTest extends BrowserTestBase {
    * Tests email change functionality when email change verification is off.
    */
   public function testMailChangeNoVerification() {
-    // Disable mail change verification.
+    // Disable email change verification.
     $this->config('user.settings')
       ->set('notify.mail_change_verification', FALSE)
       ->save();
@@ -212,13 +212,13 @@ class UserMailChangeTest extends BrowserTestBase {
     $this->drupalGet($this->account->toUrl('edit-form'));
     $this->submitForm($edit, 'Save');
 
-    // Check that the validation status message has not been displayed.
+    // Check that the validation status message was not displayed.
     $this->assertSession()->pageTextNotContains('You must confirm your email address. Further instructions have been sent to your new email address.');
 
     // Check that no email was sent to the old or to the new address.
     self::assertEmpty($this->getMails());
 
-    // Check that the user's email was changed instantly.
+    // Check that the user's email was changed.
     self::assertSame($new_mail, User::load($this->account->id())->getEmail());
   }
 
@@ -243,7 +243,7 @@ class UserMailChangeTest extends BrowserTestBase {
   }
 
   /**
-   * Tests change of email when other user is logged in.
+   * Tests change of email when another user is logged in.
    */
   public function testOtherUserLoggedIn(): void {
     $timestamp = $this->time->getRequestTime() - 1;
@@ -311,7 +311,7 @@ class UserMailChangeTest extends BrowserTestBase {
    *   Unique mail ID.
    *
    * @return string
-   *   An URL.
+   *   A URL.
    */
   protected function extractUrlFromMail($mail_id): string {
     // Assume the most recent email.

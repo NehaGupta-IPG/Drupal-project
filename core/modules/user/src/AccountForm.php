@@ -444,7 +444,7 @@ abstract class AccountForm extends ContentEntityForm implements TrustedCallbackI
   }
 
   /**
-   * Sends notifications after the account is updated.
+   * Sends notifications after the user account is updated.
    *
    * This callback is called after ::submitForm and ::save complete, so that the
    * user entity is guaranteed to be fully updated with any new password hashes.
@@ -494,7 +494,8 @@ abstract class AccountForm extends ContentEntityForm implements TrustedCallbackI
     $own_account = $this->currentUser()->id() === $account->id();
     $skip_verification = !$own_account || $this->currentUser()->hasPermission('administer users');
     if (!$account->isNew() && ($old_mail !== $new_mail) && !$skip_verification) {
-      // After ::save, which ensures password hashes are updated, send verification emails in ::notify
+      // After ::save, which ensures password hashes are updated, send
+      // verification emails in ::notify
       $form_state->set('mail_change_verification', $new_mail);
       $form_state->setValue('mail', $old_mail);
     }
