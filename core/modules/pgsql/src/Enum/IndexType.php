@@ -7,7 +7,7 @@ namespace Drupal\pgsql\Enum;
 /**
  * Enum of supported index types.
  */
-enum IndexTypes: string {
+enum IndexType: string {
 
   case GIN = 'GIN';
 
