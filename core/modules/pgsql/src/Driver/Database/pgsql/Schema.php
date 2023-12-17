@@ -6,7 +6,7 @@ use Drupal\Core\Database\Configuration\IndexSpecification;
 use Drupal\Core\Database\SchemaObjectExistsException;
 use Drupal\Core\Database\SchemaObjectDoesNotExistException;
 use Drupal\Core\Database\Schema as DatabaseSchema;
-use Drupal\pgsql\Enum\IndexTypes;
+use Drupal\pgsql\Enum\IndexType;
 
 // cSpell:ignore adbin adnum adrelid adsrc attisdropped attname attnum attrdef
 // cSpell:ignore attrelid atttypid atttypmod bigserial conkey conname conrelid
@@ -1042,7 +1042,7 @@ EOD;
   protected function _createIndexSql(string $table, string $name, iterable $fields): string {
     $query = 'CREATE INDEX ' . $this->ensureIdentifiersLength($table, $name, 'idx') . ' ON {' . $table . '} ';
     $operator = '';
-    if ($fields instanceof IndexSpecification && ($config = $fields->getDriverConfig('pgsql')) && !empty($config['type']) && $config['type'] instanceof IndexTypes) {
+    if ($fields instanceof IndexSpecification && ($config = $fields->getDriverConfig('pgsql')) && !empty($config['type']) && $config['type'] instanceof IndexType) {
       // Both GIN and GiST indexes may cover only one column.
       if (count($fields) > 1) {
         throw new \RuntimeException('Postgres indexes of %s type may only cover a single column. See https://www.postgresql.org/docs/current/textsearch-indexes.html', $config['type']->value);
@@ -1054,7 +1054,7 @@ EOD;
       $query .= 'USING ' . $config['type']->value . ' ';
       // While the operator is technically applied to a specific column, we
       // include it in the index config as it is impractical to introduce a
-      // second layer of object value objects into the schema definition array.
+      // second layer of value objects into the schema definition array.
       $operator = $config['operator'] ?? '';
     }
     $query .= sprintf(

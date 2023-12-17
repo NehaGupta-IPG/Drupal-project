@@ -11,7 +11,7 @@ use Drupal\Core\Database\Database;
 use Drupal\Core\Database\IntegrityConstraintViolationException;
 use Drupal\Core\Database\Schema;
 use Drupal\Core\Database\SchemaException;
-use Drupal\pgsql\Enum\IndexTypes;
+use Drupal\pgsql\Enum\IndexType;
 use Drupal\Tests\Core\Database\SchemaIntrospectionTestTrait;
 use PHPUnit\Framework\Attributes\DataProvider;
 
@@ -1433,7 +1433,7 @@ abstract class DriverSpecificSchemaTestBase extends DriverSpecificKernelTestBase
           ['text'],
           [
             'pgsql' => [
-              'type' => IndexTypes::GIST,
+              'type' => IndexType::GIST,
               'operator' => 'gist_trgm_ops',
             ],
           ]
