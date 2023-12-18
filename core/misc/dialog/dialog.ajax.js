@@ -94,7 +94,7 @@
     prepareDialogButtons($dialog) {
       const buttons = [];
       const buttonSelectors =
-        '.form-actions input[type=submit], .form-actions a.button, .form-actions a.action-link';
+        '.form-actions input[type=submit], .form-actions button, .form-actions a.button, .form-actions a.action-link';
       const buttonElements = $dialog[0].querySelectorAll(buttonSelectors);
 
       buttonElements.forEach((button) => {
