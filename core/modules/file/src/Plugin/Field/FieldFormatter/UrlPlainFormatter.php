@@ -68,7 +68,6 @@ class UrlPlainFormatter extends FileFormatterBase {
         ],
       ];
 
-      // Add url.site cache context if url is absolute URL.
       if ($this->getSetting('absolute_url')) {
         $elements[$delta]['#cache']['contexts'] = ['url.site'];
       }

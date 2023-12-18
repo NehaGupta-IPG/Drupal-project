@@ -221,9 +221,10 @@ class ImageFieldDisplayTest extends ImageFieldTestBase {
     $this->assertEquals($expected_url, $node->{$field_name}->view($display_options)[0]['#markup']);
 
     // Test the image URL formatter with an image style.
+    $file_url_generator = \Drupal::service('file_url_generator');
     $this->config('image.settings')->set('suppress_itok_output', TRUE)->save();
     $display_options['settings']['image_style'] = 'thumbnail';
-    $expected_url = \Drupal::service('file_url_generator')->transformRelative(ImageStyle::load('thumbnail')->buildUrl($image_uri));
+    $expected_url = $file_url_generator->transformRelative(ImageStyle::load('thumbnail')->buildUrl($image_uri));
     $this->assertEquals($expected_url, $node->{$field_name}->view($display_options)[0]['#markup']);
 
     // Test the settings summary.
@@ -234,37 +235,22 @@ class ImageFieldDisplayTest extends ImageFieldTestBase {
         'absolute_url' => TRUE,
       ],
     ];
-    $file_url_generator = \Drupal::service('file_url_generator');
     $display = \Drupal::service('entity_display.repository')->getViewDisplay('node', $node->getType(), 'default');
     $display->setComponent($field_name, $display_options)->save();
     $this->drupalGet("admin/structure/types/manage/" . $node->getType() . "/display");
     $this->assertSession()->responseContains('Image style: Thumbnail (100×100)');
 
-    // Test the absolute_url option with the image style setting.
-    // Build the uri with thumbnail image style.
+    // Tests the 'absolute_url' setting with the image style setting.
     $image_style_uri = $file_url_generator->transformRelative($image_style->buildUri($image_uri));
     $expected_url = $file_url_generator->generateAbsoluteString($image_style_uri);
     $this->assertEquals($expected_url, $node->{$field_name}->view($display_options)[0]['#markup']);
-    if ($scheme === 'public') {
-      $this->assertContains('url.site', $node->{$field_name}->view($display_options)[0]['#cache']['contexts']);
-    }
-    if ($scheme === 'private') {
-      $this->assertEquals($expected_url, $node->{$field_name}->view($display_options)[0]['#markup']);
-      $this->assertContains('url.site', $node->{$field_name}->view($display_options)[0]['#cache']['contexts']);
-      $this->drupalLogout();
-    }
+    $this->assertContains('url.site', $node->{$field_name}->view($display_options)[0]['#cache']['contexts']);
 
+    // Tests the 'absolute_url' setting with the original image.
     $display_options['settings']['image_style'] = '';
     $expected_url = $file_url_generator->generateAbsoluteString($image_uri);
     $this->assertEquals($expected_url, $node->{$field_name}->view($display_options)[0]['#markup']);
-    if ($scheme === 'public') {
-      $this->assertContains('url.site', $node->{$field_name}->view($display_options)[0]['#cache']['contexts']);
-    }
-    if ($scheme === 'private') {
-      $this->assertEquals($expected_url, $node->{$field_name}->view($display_options)[0]['#markup']);
-      $this->assertContains('url.site', $node->{$field_name}->view($display_options)[0]['#cache']['contexts']);
-      $this->drupalLogout();
-    }
+    $this->assertContains('url.site', $node->{$field_name}->view($display_options)[0]['#cache']['contexts']);
 
     // Disable absolute_url option again to validate cache contexts.
     $display_options = [
@@ -276,12 +262,7 @@ class ImageFieldDisplayTest extends ImageFieldTestBase {
     ];
     $display = \Drupal::service('entity_display.repository')->getViewDisplay('node', $node->getType());
     $display->setComponent($field_name, $display_options)->save();
-    if ($scheme === 'public') {
-      $this->assertNotContains('url.site', $node->{$field_name}->view($display_options)[0]['#cache']['contexts']);
-    }
-    elseif ($scheme === 'private') {
-      $this->assertNotContains('url.site', $node->{$field_name}->view($display_options)[0]['#cache']['contexts']);
-    }
+    $this->assertNotContains('url.site', $node->{$field_name}->view($display_options)[0]['#cache']['contexts']);
   }
 
   /**

@@ -202,7 +202,6 @@ class ImageUrlFormatter extends ImageFormatterBase {
       $elements[$delta] = ['#markup' => $url];
       $cacheability->applyTo($elements[$delta]);
 
-      // Add url.site cache context if url is absolute URL.
       if ($this->getSetting('absolute_url')) {
         array_push($elements[$delta]['#cache']['contexts'], 'url.site');
       }

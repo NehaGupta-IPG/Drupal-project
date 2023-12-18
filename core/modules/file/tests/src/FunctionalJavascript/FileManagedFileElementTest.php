@@ -113,7 +113,7 @@ class FileManagedFileElementTest extends WebDriverTestBase {
   }
 
   /**
-   * Test "Absolute url" settings on field display mode settings form.
+   * Tests the 'absolute_url' setting on the field display setting form.
    */
   public function testAbsoluteFileUrlFormatterConfiguration() {
     $field_name = strtolower($this->randomMachineName());
