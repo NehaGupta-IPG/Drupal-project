@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Drupal\Core\Database\Configuration;
+namespace Drupal\Core\Database\Schema;
 
 /**
  * Class for Schema API index specifications containing driver config.
  */
-final class IndexSpecification extends \ArrayObject {
+final class Index extends \ArrayObject {
 
   /**
    * Constructor.

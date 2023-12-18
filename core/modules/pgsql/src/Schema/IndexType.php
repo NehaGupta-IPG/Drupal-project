@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Drupal\pgsql\Enum;
+namespace Drupal\pgsql\Schema;
 
 /**
  * Enum of supported index types.
