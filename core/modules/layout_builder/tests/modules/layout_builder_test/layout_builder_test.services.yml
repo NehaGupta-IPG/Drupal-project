@@ -3,3 +3,8 @@ services:
     class: Drupal\layout_builder_test\ContextProvider\IHaveRuntimeContexts
     tags:
       - { name: 'context_provider' }
+  layout_builder_test.subscriber:
+    class: Drupal\layout_builder_test\EventSubscriber\LayoutBuilderTestSubscriber
+    arguments: ['@state']
+    tags:
+      - { name: event_subscriber }

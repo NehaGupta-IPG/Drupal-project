@@ -142,7 +142,7 @@ class ConfigureSectionForm extends FormBase implements WorkspaceDynamicSafeFormI
     // context slot on creation.
     $this->layout = $section->getLayout();
 
-    $form_state->setTemporaryValue('gathered_contexts', $this->getPopulatedContexts($this->sectionStorage));
+    $form_state->setTemporaryValue('gathered_contexts', $this->getPopulatedContexts($this->sectionStorage, $delta));
     $form['#tree'] = TRUE;
     $form['layout_settings'] = [];
     $subform_state = SubformState::createForSubform($form['layout_settings'], $form, $form_state);

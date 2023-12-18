@@ -123,7 +123,7 @@ class MoveBlockForm extends FormBase implements WorkspaceDynamicSafeFormInterfac
     $form['#attributes']['data-layout-builder-target-highlight-id'] = $this->blockUpdateHighlightId($uuid);
 
     $sections = $section_storage->getSections();
-    $contexts = $this->getPopulatedContexts($section_storage);
+    $contexts = $this->getPopulatedContexts($section_storage, $delta);
     $region_options = [];
     foreach ($sections as $section_delta => $section) {
       $layout = $section->getLayout($contexts);

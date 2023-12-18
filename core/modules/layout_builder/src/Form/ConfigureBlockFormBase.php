@@ -166,7 +166,7 @@ abstract class ConfigureBlockFormBase extends FormBase implements BaseFormIdInte
     $this->uuid = $component->getUuid();
     $this->block = $component->getPlugin();
 
-    $form_state->setTemporaryValue('gathered_contexts', $this->getPopulatedContexts($section_storage));
+    $form_state->setTemporaryValue('gathered_contexts', $this->getPopulatedContexts($section_storage, $delta));
 
     $form['#tree'] = TRUE;
     $form['settings'] = [];

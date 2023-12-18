@@ -293,12 +293,13 @@ class LayoutBuilder extends RenderElementBase implements ContainerFactoryPluginI
     $storage_type = $section_storage->getStorageType();
     $storage_id = $section_storage->getStorageId();
     $section = $section_storage->getSection($delta);
+    $contexts = $this->getPopulatedContexts($section_storage, $delta);
 
-    $layout = $section->getLayout($this->getPopulatedContexts($section_storage));
+    $layout = $section->getLayout($contexts);
     $layout_settings = $section->getLayoutSettings();
     $section_label = !empty($layout_settings['label']) ? $layout_settings['label'] : $this->t('Section @section', ['@section' => $delta + 1]);
 
-    $build = $section->toRenderArray($this->getPopulatedContexts($section_storage), TRUE);
+    $build = $section->toRenderArray($contexts, TRUE);
     $layout_definition = $layout->getPluginDefinition();
 
     $region_labels = $layout_definition->getRegionLabels();
