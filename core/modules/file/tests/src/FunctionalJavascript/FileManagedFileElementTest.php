@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\Tests\file\FunctionalJavascript;
 
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
+use Drupal\Tests\file\Functional\FileFieldCreationTrait;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -14,6 +15,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 #[Group('file')]
 #[RunTestsInSeparateProcesses]
 class FileManagedFileElementTest extends WebDriverTestBase {
+  use FileFieldCreationTrait;
 
   /**
    * {@inheritdoc}
@@ -108,6 +110,49 @@ class FileManagedFileElementTest extends WebDriverTestBase {
         }
       }
     }
+  }
+
+  /**
+   * Test "Absolute url" settings on field display mode settings form.
+   */
+  public function testAbsoluteFileUrlFormatterConfiguration() {
+    $field_name = strtolower($this->randomMachineName());
+    $type_name = 'article';
+    $field_storage_settings = [
+      'display_field' => '1',
+      'display_default' => '1',
+      'cardinality' => '1',
+    ];
+    $field_settings = [
+      'description_field' => '1',
+    ];
+    $widget_settings = [];
+    $this->createFileField($field_name, 'node', $type_name, $field_storage_settings, $field_settings, $widget_settings);
+
+    $edit = [
+      "fields[$field_name][type]" => 'file_url_plain',
+    ];
+    $this->drupalGet("admin/structure/types/manage/$type_name/display");
+    $page = $this->getSession()->getPage();
+    $page->fillField("fields[$field_name][type]", 'file_url_plain');
+    $this->assertSession()->waitForElement('css', '.tabledrag-changed-warning');
+    $this->submitForm($edit, 'Save');
+    $this->assertSession()->responseContains('Your settings have been saved.');
+
+    $this->drupalGet("admin/structure/types/manage/$type_name/display");
+    $page = $this->getSession()->getPage();
+    $page->pressButton("{$field_name}_settings_edit");
+    $this->assertSession()->waitForElement('css', '.ajax-new-content');
+    $edit = [
+      "fields[$field_name][settings_edit_form][settings][absolute_url]" => TRUE,
+    ];
+    foreach ($edit as $name => $value) {
+      $page->fillField($name, $value);
+    }
+    $page->pressButton("{$field_name}_plugin_settings_update");
+    $this->assertSession()->waitForElement('css', '.field-plugin-summary-cell > .ajax-new-content');
+    $this->submitForm([], 'Save');
+    $this->assertSession()->pageTextContains('Rendered as absolute url');
   }
 
   /**

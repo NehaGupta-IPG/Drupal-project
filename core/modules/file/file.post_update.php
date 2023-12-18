@@ -5,6 +5,7 @@
  * Post update functions for File.
  */
 
+use Drupal\Core\Entity\Entity\EntityViewDisplay;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 
 /**
@@ -30,4 +31,31 @@ function file_removed_post_updates(): array {
 function file_post_update_add_playsinline(array &$sandbox = []): ?TranslatableMarkup {
   // No-op.
   return NULL;
+}
+
+/**
+ * Set the default value for "absolute_url" field formatter setting.
+ */
+function file_post_update_set_default_absolute_url(array &$sandbox = NULL): void {
+  $displays = EntityViewDisplay::loadMultiple();
+  foreach ($displays as $display) {
+    /** @var \Drupal\Core\Entity\Entity\EntityViewDisplay $display */
+    $fields_settings = $display->get('content');
+    $changed = FALSE;
+    foreach ($fields_settings as $field_name => $settings) {
+      if (!empty($settings['type'])) {
+        switch ($settings['type']) {
+          case 'file_url_plain':
+          case 'image_url':
+            $fields_settings[$field_name]['settings']['absolute_url'] = FALSE;
+            $changed = TRUE;
+            break;
+
+        }
+      }
+    }
+    if ($changed === TRUE) {
+      $display->set('content', $fields_settings)->save();
+    }
+  }
 }
