@@ -5,13 +5,13 @@ declare(strict_types=1);
 namespace Drupal\KernelTests\Core\Database;
 
 use Drupal\Component\Render\FormattableMarkup;
-use Drupal\Core\Database\Configuration\IndexSpecification;
+use Drupal\Core\Database\Schema\Index;
 use Drupal\Core\Database\Connection;
 use Drupal\Core\Database\Database;
 use Drupal\Core\Database\IntegrityConstraintViolationException;
 use Drupal\Core\Database\Schema;
 use Drupal\Core\Database\SchemaException;
-use Drupal\pgsql\Enum\IndexType;
+use Drupal\pgsql\Schema\IndexType;
 use Drupal\Tests\Core\Database\SchemaIntrospectionTestTrait;
 use PHPUnit\Framework\Attributes\DataProvider;
 
@@ -1429,7 +1429,7 @@ abstract class DriverSpecificSchemaTestBase extends DriverSpecificKernelTestBase
         ],
       ],
       'indexes' => [
-        'text_column_index' => new IndexSpecification(
+        'text_column_index' => new Index(
           ['text'],
           [
             'pgsql' => [
