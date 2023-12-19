@@ -295,7 +295,7 @@
     /**
      * Find the wrapper of the displayed text.
      */
-    this.$selected_div = this.$form.find('.views-selected-options').parent();
+    this.$selected_div = this.$form.find('.views-selected-options').parentElement;
     this.$selected_div.hide();
 
     /**
@@ -389,7 +389,7 @@
       $displayButtons
         .appendTo($addDisplayDropdown.find('.action-list'))
         .wrap('<li>')
-        .parent()
+        .parentElement
         .eq(0)
         .addClass('first')
         .end()
@@ -436,7 +436,7 @@
    *   where to put it.
    */
   Drupal.behaviors.viewsUiRenderAddViewButton.toggleMenu = function ($trigger) {
-    $trigger.parent().toggleClass('open');
+    $trigger.parentElement.toggleClass('open');
     $trigger.next().slideToggle('fast');
   };
 
@@ -622,9 +622,9 @@
         '.views-display-setting a',
       );
       if ($contextualFilters.length) {
-        $('#preview-args').parent().show();
+        $('#preview-args').parentElement.show();
       } else {
-        $('#preview-args').parent().hide();
+        $('#preview-args').parentElement.hide();
       }
 
       // Executes an initial preview.
@@ -761,7 +761,7 @@
             // button for adding a new filter group.
             $(
               `<ul class="action-links"><li><a id="views-add-group-link" href="#">${this.addGroupButton[0].value}</a></li></ul>`,
-            ).prependTo(this.table.parent()),
+            ).prependTo(this.table.parentElement),
           ),
         )
           .find('#views-add-group-link')
@@ -1182,13 +1182,13 @@
 
       function changeDefaultWidget(event) {
         if ($(event.target).prop('checked')) {
-          $context.find('input.default-radios').parent().hide();
-          $context.find('td.any-default-radios-row').parent().hide();
-          $context.find('input.default-checkboxes').parent().show();
+          $context.find('input.default-radios').parentElement.hide();
+          $context.find('td.any-default-radios-row').parentElement.hide();
+          $context.find('input.default-checkboxes').parentElement.show();
         } else {
-          $context.find('input.default-checkboxes').parent().hide();
-          $context.find('td.any-default-radios-row').parent().show();
-          $context.find('input.default-radios').parent().show();
+          $context.find('input.default-checkboxes').parentElement.hide();
+          $context.find('td.any-default-radios-row').parentElement.show();
+          $context.find('input.default-radios').parentElement.show();
         }
       }
 

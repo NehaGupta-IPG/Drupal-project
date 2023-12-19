@@ -20,8 +20,7 @@
         const values = [];
         $(context)
           .find('input[name^="options"]:checked')
-          // eslint-disable-next-line jquery/no-parent
-          .parent()
+          .parentElement
           .each(function () {
             values.push(
               Drupal.checkPlain($(this).find('label')[0].textContent),
