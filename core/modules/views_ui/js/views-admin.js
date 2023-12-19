@@ -295,7 +295,9 @@
     /**
      * Find the wrapper of the displayed text.
      */
-    this.$selected_div = this.$form.find('.views-selected-options').parentElement;
+    this.$selected_div = this.$form.find(
+      '.views-selected-options',
+    ).parentElement;
     this.$selected_div.hide();
 
     /**
@@ -389,8 +391,7 @@
       $displayButtons
         .appendTo($addDisplayDropdown.find('.action-list'))
         .wrap('<li>')
-        .parentElement
-        .eq(0)
+        .parentElement.eq(0)
         .addClass('first')
         .end()
         .eq(-1)

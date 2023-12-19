@@ -20,8 +20,7 @@
         const values = [];
         $(context)
           .find('input[name^="options"]:checked')
-          .parentElement
-          .each(function () {
+          .parentElement.each(function () {
             values.push(
               Drupal.checkPlain($(this).find('label')[0].textContent),
             );
