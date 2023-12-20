@@ -255,7 +255,7 @@ class FileFieldDisplayTest extends FileFieldTestBase {
   /**
    * Test "Absolute url" settings for "file_url_plain" formatter.
    */
-  public function testAbsoluteFileUrlFormatterValue() {
+  public function testAbsoluteFileUrlFormatterValue(): void {
     $node_storage = $this->container->get('entity_type.manager')->getStorage('node');
     $field_name = strtolower($this->randomMachineName());
     $type_name = 'article';
