@@ -2,7 +2,7 @@
 
 namespace Drupal\Component\Utility;
 
-// cspell:ignore ckers kses harnhammar
+// cspell:ignore ckers kses harnhammar rdfa
 
 /**
  * Provides helper to filter for cross-site scripting.
@@ -107,6 +107,46 @@ class Xss {
    * @see \Drupal\Component\Utility\Xss::filter()
    */
   protected static $htmlTags = ['a', 'em', 'strong', 'cite', 'blockquote', 'code', 'ul', 'ol', 'li', 'dl', 'dt', 'dd'];
+
+  /**
+   * The default list of safe attributes not sanitized by filter().
+   *
+   * @var array
+   *
+   * @see \Drupal\Component\Utility\Xss::filter()
+   */
+  protected static $safeAttributes = [
+    'title',
+    'alt',
+    'class',
+    'value',
+    'name',
+    'property',
+    'typeof',
+    'rel',
+    'rev',
+    'datetime',
+    'mailto',
+    'media',
+    'sizes',
+  ];
+
+  /**
+   * The default list of Unsafe attributes that must be sanitized by filter().
+   *
+   * @var array
+   *
+   * @see \Drupal\Component\Utility\Xss::filter()
+   */
+  protected static $unSafeAttributes = [
+    'action',
+    'cite',
+    'formaction',
+    'href',
+    'object',
+    'src',
+    'target',
+  ];
 
   /**
    * Filters HTML to prevent cross-site-scripting (XSS) vulnerabilities.
@@ -284,6 +324,7 @@ class Xss {
     $attribute_name = '';
     $skip = FALSE;
     $skip_protocol_filtering = FALSE;
+    $enforce_protocol_filtering = FALSE;
 
     while (strlen($attributes) != 0) {
       // Was the last operation successful?
@@ -308,18 +349,16 @@ class Xss {
             // starting with "javascript:"). However, for some non-URI
             // attributes performing this filtering causes valid and safe data
             // to be mangled. We prevent this by skipping protocol filtering on
-            // such attributes.
+            // such attributes. Adding check to skip angular attributes (ng).
             // @see \Drupal\Component\Utility\UrlHelper::filterBadProtocol()
             // @see https://www.w3.org/TR/html4/index/attributes.html
-            $skip_protocol_filtering = str_starts_with($attribute_name, 'data-') || in_array($attribute_name, [
-              'title',
-              'alt',
-              'rel',
-              'property',
-              'class',
-              'datetime',
-            ]);
+            $skip_protocol_filtering = str_starts_with($attribute_name, 'data-') ||
+              str_starts_with($attribute_name, 'ng-') ||
+              in_array($attribute_name, static::$safeAttributes);
 
+            // There are also certain attributes that we want to make sure we
+            // filter no matter what.
+            $enforce_protocol_filtering = in_array($attribute_name, static::$unSafeAttributes);
             $working = $mode = 1;
             $attributes = preg_replace('/^[-a-zA-Z][-a-zA-Z0-9]*/', '', $attributes);
           }
@@ -351,7 +390,12 @@ class Xss {
           $working = 1;
           // Attribute value, a URL after href= for instance.
           if (preg_match('/^"([^"]*)"(\s+|$)/', $attributes, $match)) {
-            $value = $skip_protocol_filtering ? $match[1] : UrlHelper::filterBadProtocol($match[1]);
+            if ($enforce_protocol_filtering || !$skip_protocol_filtering) {
+              $value = static::filterProtocol($attribute_name, $match[1]);
+            }
+            else {
+              $value = $match[1];
+            }
 
             if (!$skip) {
               $attributes_array[] = "$attribute_name=\"$value\"";
@@ -361,7 +405,12 @@ class Xss {
           }
 
           if (preg_match("/^'([^']*)'(\s+|$)/", $attributes, $match)) {
-            $value = $skip_protocol_filtering ? $match[1] : UrlHelper::filterBadProtocol($match[1]);
+            if ($enforce_protocol_filtering || !$skip_protocol_filtering) {
+              $value = static::filterProtocol($attribute_name, $match[1]);
+            }
+            else {
+              $value = $match[1];
+            }
 
             if (!$skip) {
               $attributes_array[] = "$attribute_name='$value'";
@@ -371,7 +420,12 @@ class Xss {
           }
 
           if (preg_match("%^([^\s\"']+)(\s+|$)%", $attributes, $match)) {
-            $value = $skip_protocol_filtering ? $match[1] : UrlHelper::filterBadProtocol($match[1]);
+            if ($enforce_protocol_filtering || !$skip_protocol_filtering) {
+              $value = static::filterProtocol($attribute_name, $match[1]);
+            }
+            else {
+              $value = $match[1];
+            }
 
             if (!$skip) {
               $attributes_array[] = "$attribute_name=\"$value\"";
@@ -418,6 +472,33 @@ class Xss {
    */
   protected static function needsRemoval(array $html_tags, $elem) {
     return !isset($html_tags[strtolower($elem)]);
+  }
+
+  /**
+   * Strips bad protocols from attribute values.
+   *
+   * @param string $name
+   *   The attribute name.
+   * @param string $value
+   *   The attribute value.
+   *
+   * @return string
+   *   The attribute value, stripped of any bad protocols.
+   */
+  protected static function filterProtocol(string $name, string $value): string {
+    // If the attribute is a safe attribute check that it doesn't contain a
+    // protocol. If it does call UrlHelper::stripDangerousProtocols().
+    if (in_array($name, static::$safeAttributes)) {
+      return preg_match('/
+        ^[a-zA-Z0-9]+ # check for any text
+        \: # separated by a colon
+        [a-zA-Z0-9]+$ # followed by any text
+        /',
+        $value) ? UrlHelper::stripDangerousProtocols($value) : $value;
+    }
+    else {
+      return UrlHelper::filterBadProtocol($value);
+    }
   }
 
   /**

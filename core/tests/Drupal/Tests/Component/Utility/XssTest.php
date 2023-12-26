@@ -8,10 +8,11 @@ use Drupal\Component\Utility\Html;
 use Drupal\Component\Utility\UrlHelper;
 use Drupal\Component\Utility\Xss;
 use PHPUnit\Framework\TestCase;
+use Prophecy\PhpUnit\ProphecyTrait;
 
 // cspell:ignore ascript barbaz ckers cript CVEs dynsrc fooÿñ msgbox ncript
 // cspell:ignore nfocus nmedi nosuchscheme nosuchtag onmediaerror scrscriptipt
-// cspell:ignore tascript vbscript
+// cspell:ignore tascript vbscript rdfa
 
 /**
  * XSS Filtering tests.
@@ -27,6 +28,8 @@ use PHPUnit\Framework\TestCase;
  * @runTestsInSeparateProcesses
  */
 class XssTest extends TestCase {
+
+  use ProphecyTrait;
 
   /**
    * {@inheritdoc}
@@ -516,6 +519,36 @@ class XssTest extends TestCase {
         ['a'],
       ],
       [
+        '<a href="mailto:me@example.com">Drupal</a>',
+        '<a href="mailto:me@example.com">Drupal</a>',
+        'Link tag with rev attribute',
+        ['a'],
+      ],
+      [
+        '<a href="https://www.drupal.org/" rev="section">Drupal</a>',
+        '<a href="https://www.drupal.org/" rev="section">Drupal</a>',
+        'Link tag with mailto href',
+        ['a'],
+      ],
+      [
+        '<a media="print and (resolution:300dpi)">Drupal</a>',
+        '<a media="print and (resolution:300dpi)">Drupal</a>',
+        'Link tag with media attribute',
+        ['a'],
+      ],
+      [
+        '<a sizes="16x16">Drupal</a>',
+        '<a sizes="16x16">Drupal</a>',
+        'Link tag with sizes attribute',
+        ['a'],
+      ],
+      [
+        '<time datetime="2017-02-14">',
+        '<time datetime="2017-02-14">',
+        'Time with datetime attribute',
+        ['time'],
+      ],
+      [
         '<span property="dc:subject">Drupal 8: The best release ever.</span>',
         '<span property="dc:subject">Drupal 8: The best release ever.</span>',
         'Span tag with property attribute',
@@ -568,6 +601,68 @@ class XssTest extends TestCase {
         '<time datetime="1978-11-19T05:00:00Z">#DBD</time>',
         'Time with datetime attribute',
         ['time'],
+      ],
+      [
+        '<section class="actions-menu-inner" ng-style="{ \'max-height\': maxPanelHeight }" pretty-scrollbar scroll-axis="y" scroll-theme="light"></section>',
+        '<section class="actions-menu-inner" ng-style="{ \'max-height\': maxPanelHeight }" pretty-scrollbar scroll-axis="y" scroll-theme="light"></section>',
+        'Section tag with ng- attribute',
+        ['section'],
+      ],
+      [
+        '<source srcset="image.jpg 1x" media="all and (min-width: 560px) and (max-width: 850px)" type="image/jpeg" />',
+        '<source srcset="image.jpg 1x" media="all and (min-width: 560px) and (max-width: 850px)" type="image/jpeg" />',
+        'Source with media containing breakpoints',
+        ['source'],
+      ],
+      // Test RDFa attributes.
+      [
+        '<img src="http://example.com/foo.jpg" typeof="foaf:Image">',
+        '<img src="http://example.com/foo.jpg" typeof="foaf:Image">',
+        'Image tag with RDFa with namespaced attribute',
+        ['img'],
+      ],
+      [
+        '<img src="http://example.com/foo.jpg" typeof="foaf:bad////value">',
+        '<img src="http://example.com/foo.jpg" typeof="foaf:bad////value">',
+        'Image tag with RDFa with bad with namespaced attribute',
+        ['img'],
+      ],
+      [
+        '<img src="http://example.com/foo.jpg" foo="bar:baz">',
+        '<img src="http://example.com/foo.jpg" foo="baz">',
+        'Image tag with non-RDFa attribute',
+        ['img'],
+      ],
+      [
+        '<h2 property="title">The Title</h2>',
+        '<h2 property="title">The Title</h2>',
+        'H2 tag with RDFa attribute without namespace',
+        ['h2'],
+      ],
+      [
+        '<h2 property="http://purl.org/dc/terms/title">The Title</h2>',
+        '<h2 property="http://purl.org/dc/terms/title">The Title</h2>',
+        'H2 tag with RDFa attribute with URL',
+        ['h2'],
+      ],
+      [
+        '<h2 property="javascript:alert(0);">The Title</h2>',
+        '<h2 property="javascript:alert(0);">The Title</h2>',
+        'H2 tag with RDFa attribute with XSS',
+        ['h2'],
+      ],
+      // Test attributes with colons that should not be filtered out.
+      [
+        '<img src="http://example.com/foo.jpg" title="Example: title" alt="Example: alt">',
+        '<img src="http://example.com/foo.jpg" title="Example: title" alt="Example: alt">',
+        'img tag alt and title attributes with colons in text',
+        ['img'],
+      ],
+      [
+        '<img src="http://example.com/foo.jpg" data-caption="Example: data-caption.">',
+        '<img src="http://example.com/foo.jpg" data-caption="Example: data-caption.">',
+        'img tag with colon in data-caption attribute',
+        ['img'],
       ],
     ];
   }
