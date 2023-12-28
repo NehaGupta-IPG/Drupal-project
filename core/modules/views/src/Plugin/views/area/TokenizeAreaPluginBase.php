@@ -46,12 +46,19 @@ abstract class TokenizeAreaPluginBase extends AreaPluginBase {
       '#default_value' => $this->options['tokenize'],
     ];
 
-    // Get a list of the available fields and arguments for token replacement.
+    // Get a list of the available fields, exposed filters, and arguments for
+    // token replacement.
     $options = [];
     $optgroup_arguments = (string) $this->t('Arguments');
     $optgroup_fields = (string) $this->t('Fields');
+    $optgroup_filters = (string) $this->t('Exposed filters');
     foreach ($this->view->display_handler->getHandlers('field') as $field => $handler) {
       $options[$optgroup_fields]["{{ $field }}"] = $handler->adminLabel();
+    }
+    foreach ($this->view->display_handler->getHandlers('filter') as $filter => $handler) {
+      if ($handler->options['exposed']) {
+        $options[$optgroup_filters]["{{ filters.$filter }}"] = $handler->adminLabel();
+      }
     }
 
     foreach ($this->view->display_handler->getHandlers('argument') as $arg => $handler) {
