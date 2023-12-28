@@ -25,6 +25,15 @@ AddEncoding gzip svgz
 # Add correct encoding for webp.
 AddType image/webp .webp
 
+# Some PHP settings that cannot be changed at runtime can be set below if PHP
+# is running as an Apache module. See
+# https://www.php.net/manual/en/configuration.changes.php for instructions. See
+# sites/default/default.settings.php and
+# Drupal\Core\DrupalKernel::bootEnvironment() for settings that can be changed
+# at runtime.
+<IfModule mod_php.c>
+</IfModule>
+
 # Requires mod_expires to be enabled.
 <IfModule mod_expires.c>
   # Enable expirations.
