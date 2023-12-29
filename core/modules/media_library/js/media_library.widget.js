@@ -67,10 +67,12 @@
         item.textContent = strings.show;
       });
 
-      $(
-        once('media-library-toggle', '.js-media-library-item-weight', context),
-      ).each(function () {
-        $(this.parentElement).hide();
+      once(
+        'media-library-toggle',
+        '.js-media-library-item-weight',
+        context,
+      ).forEach(({ parentElement }) => {
+        $(parentElement).hide();
       });
     },
   };
