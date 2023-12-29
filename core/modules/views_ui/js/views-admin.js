@@ -346,13 +346,10 @@
    */
   Drupal.viewsUi.AddItemForm.prototype.refreshCheckedItems = function () {
     // Perhaps we should precache the text div, too.
-    const viewsSelectedOptions = this.$selected_div.querySelector(
-      '.views-selected-options',
-    );
-
-    viewsSelectedOptions.innerHTML = this.checkedItems.join(', ');
-    const event = new Event('dialogContentResize');
-    viewsSelectedOptions.dispatchEvent(event);
+    $(this.$selected_div)
+      .find('.views-selected-options')
+      .html(this.checkedItems.join(', '))
+      .trigger('dialogContentResize');
   };
 
   /**
