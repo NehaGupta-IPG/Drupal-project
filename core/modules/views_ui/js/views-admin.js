@@ -295,11 +295,10 @@
     /**
      * Find the wrapper of the displayed text.
      */
-    this.$selected_div = this.$form.find(
-      '.views-selected-options',
-    )[0].parentElement;
-    this.$selected_div.style.display = 'none';
-
+    this.$selected_div = $(
+      this.$form.find('.views-selected-options')[0].parentElement,
+    );
+    this.$selected_div.hide();
     /**
      *
      * @type {Array}
@@ -318,7 +317,7 @@
     const label = $target.closest('td').next().html().trim();
     // Add/remove the checked item to the list.
     if (event.target.checked) {
-      this.$selected_div.style.display = 'block';
+      this.$selected_div.show();
       this.checkedItems.push(label);
     } else {
       const position = $.inArray(label, this.checkedItems);
@@ -333,7 +332,7 @@
       }
       // Hide it again if none item is selected.
       if (this.checkedItems.length === 0) {
-        this.$selected_div.style.display = 'none';
+        this.$selected_div.hide();
       }
     }
     this.refreshCheckedItems();
@@ -344,7 +343,7 @@
    */
   Drupal.viewsUi.AddItemForm.prototype.refreshCheckedItems = function () {
     // Perhaps we should precache the text div, too.
-    $(this.$selected_div)
+    this.$selected_div
       .find('.views-selected-options')
       .html(this.checkedItems.join(', '))
       .trigger('dialogContentResize');
@@ -617,9 +616,9 @@
         '.views-display-setting a',
       );
       if ($contextualFilters.length) {
-        $('#preview-args')[0].parentElement.style.display = '';
+        $($('#preview-args')[0].parentElement).show();
       } else {
-        $('#preview-args')[0].parentElement.style.display = 'none';
+        $($('#preview-args')[0].parentElement).hide();
       }
 
       // Executes an initial preview.
@@ -1177,23 +1176,21 @@
 
       function changeDefaultWidget(event) {
         if ($(event.target).prop('checked')) {
-          $context.find('input.default-radios')[0].parentElement.style.display =
-            'none';
-          $context.find(
-            'td.any-default-radios-row',
-          )[0].parentElement.style.display = 'none';
-          $context.find(
-            'input.default-checkboxes',
-          )[0].parentElement.style.display = '';
+          $(context.querySelector('input.default-radios').parentElement).hide();
+          $(
+            context.querySelector('td.any-default-radios-row').parentElement,
+          ).hide();
+          $(
+            context.querySelector('input.default-checkboxes').parentElement,
+          ).show();
         } else {
-          $context.find('input.default-radios')[0].parentElement.style.display =
-            '';
-          $context.find(
-            'td.any-default-radios-row',
-          )[0].parentElement.style.display = '';
-          $context.find(
-            'input.default-checkboxes',
-          )[0].parentElement.style.display = 'none';
+          $(
+            context.querySelector('input.default-checkboxes').parentElement,
+          ).hide();
+          $(
+            context.querySelector('td.any-default-radios-row').parentElement,
+          ).show();
+          $(context.querySelector('input.default-radios').parentElement).show();
         }
       }
 

@@ -18,14 +18,14 @@
       // Provide the vertical tab summaries.
       $context.find('#edit-workflow').drupalSetSummary((context) => {
         const values = [];
-        const optionsCheckboxesLabels = context.querySelectorAll(
-          '*:has(> input[name^="options"]:checked) label',
-        );
-
-        optionsCheckboxesLabels.forEach(function (label) {
-          const labelTextContent = label.textContent.trim();
-          values.push(Drupal.checkPlain(labelTextContent));
-        });
+        $(context)
+          .find('input[name^="options"]:checked')
+          .parent()
+          .each(function () {
+            values.push(
+              Drupal.checkPlain($(this).find('label')[0].textContent),
+            );
+          });
         if ($(context).find('#edit-options-status:checked').length === 0) {
           values.unshift(Drupal.t('Not published'));
         }
