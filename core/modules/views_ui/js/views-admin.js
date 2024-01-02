@@ -319,6 +319,7 @@
     // Add/remove the checked item to the list.
     if (event.target.checked) {
       this.$selected_div.show();
+      this.$selected_div[0].style.display = 'block';
       this.checkedItems.push(label);
     } else {
       const position = $.inArray(label, this.checkedItems);
