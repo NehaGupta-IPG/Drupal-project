@@ -27,9 +27,12 @@
  * @see https://www.drupal.org/node/2492225
  *
  * It is strongly recommended that you set zend.assertions=1 in the PHP.ini file
- * (It cannot be changed from .htaccess or runtime) on development machines and
- * to 0 or -1 in production.
+ * on development machines and to 0 or -1 in production. When zend.assertions is
+ * set, it cannot be changed to or from -1.
+ *
+ * @see https://www.php.net/manual/en/ini.core.php#ini.zend.assertions
  */
+ini_set('zend.assertions', 1);
 
 /**
  * Enable local development services.
