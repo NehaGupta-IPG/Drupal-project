@@ -6,6 +6,7 @@ use Drupal\Component\Datetime\TimeInterface;
 use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Access\AccessResultInterface;
 use Drupal\Core\Controller\ControllerBase;
+use Drupal\Core\Flood\FloodInterface;
 use Drupal\Core\Url;
 use Drupal\user\UserInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -18,10 +19,12 @@ class MailChangeController extends ControllerBase {
   /**
    * Builds a new MailChangeController.
    *
+   * @param \Drupal\Core\Flood\FloodInterface $flood
+   *   The flood service.
    * @param \Drupal\Component\Datetime\TimeInterface $time
    *   The time service.
    */
-  public function __construct(protected TimeInterface $time) {}
+  public function __construct(protected FloodInterface $flood, protected TimeInterface $time) {}
 
   /**
    * Returns the user mail change page.
@@ -42,11 +45,18 @@ class MailChangeController extends ControllerBase {
    *   An HTTP response doing a redirect.
    */
   public function page(UserInterface $user, string $new_mail, int $timestamp, string $hash) : RedirectResponse {
+    $messenger = $this->messenger();
+    $flood_config = $this->configFactory->get('user.flood');
+    if (!$this->flood->isAllowed('user.email_change_ip', $flood_config->get('ip_limit'), $flood_config->get('ip_window'))) {
+      $messenger->addError($this->t('Too many email change requests from your IP address. It is temporarily blocked. Try again later or contact the site administrator.'));
+      return $this->redirect('<front>');
+    }
+    $this->flood->register('user.email_change_ip', $flood_config->get('ip_window'));
+
     $timeout = $this->config('user.settings')->get('mail_change_timeout');
     /** @var \Drupal\Core\Session\AccountProxyInterface $current_user */
     $current_user = $this->currentUser();
     $request_time = $this->time->getRequestTime();
-    $messenger = $this->messenger();
 
     // Other user is authenticated.
     if ($current_user->isAuthenticated() && $current_user->id() !== $user->id()) {
@@ -64,6 +74,15 @@ class MailChangeController extends ControllerBase {
       return $this->redirect('<front>');
     }
 
+    // Register flood events based on the uid only, so they apply for any
+    // IP address. This allows them to be cleared on successful reset (from
+    // any IP).
+    $identifier = $user->id();
+    if (!$this->flood->isAllowed('user.email_change_user', $flood_config->get('user_limit'), $flood_config->get('user_window'), $identifier)) {
+      return $this->redirect('<front>');
+    }
+    $this->flood->register('user.email_change_user', $flood_config->get('user_window'), $identifier);
+
     // The link is valid.
     if ($timestamp <= $request_time && $timestamp >= $user->getLastLoginTime() && hash_equals($hash, user_pass_rehash($user, $timestamp, $new_mail))) {
       // Save the new email but also refresh the last login time so that this
@@ -78,6 +97,7 @@ class MailChangeController extends ControllerBase {
       }
       $arguments = ['%mail' => $new_mail];
       $messenger->addStatus($this->t('Your email address has been changed to %mail.', $arguments));
+      $this->flood->clear('user.email_change_user', $user->id());
       return $this->redirect('<front>');
     }
     // Timestamp from the link is in the future or the user registered a new
