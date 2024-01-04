@@ -18,7 +18,7 @@ class LegacyShutdownTest extends UnitTestCase {
   /**
    * Test legacy drupal_register_shutdown_function() function.
    */
-  public function testDrupalRegisterShutdownFunction() {
+  public function testDrupalRegisterShutdownFunction(): void {
     $a = static function (int $b = 0): int {
       static $a;
       return $a += $b;

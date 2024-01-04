@@ -17,6 +17,7 @@ use Drupal\Core\Lock\LockBackendInterface;
 use Drupal\Core\Test\FunctionalTestSetupTrait;
 use Drupal\Core\Test\TestSetupTrait;
 use Drupal\Core\Utility\Error;
+use Drupal\Core\Shutdown\CallbackStack;
 use Drupal\Core\Shutdown\ShutdownHandler;
 use Drupal\Tests\block\Traits\BlockCreationTrait;
 use Drupal\Tests\node\Traits\ContentTypeCreationTrait;
@@ -170,7 +171,7 @@ abstract class BrowserTestBase extends TestCase {
    *
    * @var \Drupal\Core\Shutdown\CallbackStack
    */
-  protected $originalShutdownCallbacks;
+  protected CallbackStack $originalShutdownCallbacks;
 
   /**
    * Registers the dumper CLI handler when the DebugDump extension is enabled.
