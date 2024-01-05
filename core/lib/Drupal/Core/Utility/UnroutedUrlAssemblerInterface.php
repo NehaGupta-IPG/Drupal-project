@@ -40,6 +40,8 @@ interface UnroutedUrlAssemblerInterface {
    *   - 'https': Whether this URL should point to a secure location. If not
    *     defined, the current scheme is used, so the user stays on HTTP or HTTPS
    *     respectively. TRUE enforces HTTPS and FALSE enforces HTTP.
+   *   - 'allowed_protocols': An explicit list of protocols to be allowed
+   *     in addition to those traditionally allowed. Defaults to an empty array.
    * @param bool $collect_bubbleable_metadata
    *   (optional) Defaults to FALSE. When TRUE, both the generated URL and its
    *   associated bubbleable metadata are returned.

@@ -47,6 +47,12 @@ field.field_settings.link:
     link_type:
       type: integer
       label: 'Allowed link type'
+    allowed_protocols:
+      type: sequence
+      label: 'Allowed protocols'
+      sequence:
+        type: string
+        label: 'Custom protocol'
 
 field.value.link:
   type: mapping
