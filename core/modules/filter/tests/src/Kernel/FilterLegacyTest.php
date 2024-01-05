@@ -30,9 +30,10 @@ class FilterLegacyTest extends KernelTestBase {
   /**
    * Tests update of roles during installation of default formats.
    *
-   * @expectedDeprecation Specifying roles in text formats is deprecated in drupal:9.1.0 and will not be supported starting in drupal:10.0.0. See https://www.drupal.org/node/3168851
+   * @group legacy
    */
   public function testInstallRoles() {
+    $this->expectDeprecation('Specifying roles in text formats is deprecated in drupal:9.1.0 and will not be supported starting in drupal:10.0.0. See https://www.drupal.org/node/3168851');
     // Install filter_test_legacy module, which ships with the
     // filter_test_legacy text format, which declares roles in configuration.
     $this->installConfig(['user', 'filter_test_legacy']);
@@ -52,9 +53,10 @@ class FilterLegacyTest extends KernelTestBase {
   /**
    * Tests that changes to FilterFormat::$roles do not have an effect.
    *
-   * @expectedDeprecation The 'roles' property of text formats is deprecated in drupal:9.1.0 and is removed from drupal:10.0.0. See https://www.drupal.org/node/3168851.
+   * @group legacy
    */
   public function testUpdateRoles() {
+    $this->expectDeprecation('The \'roles\' property of text formats is deprecated in drupal:9.1.0 and is removed from drupal:10.0.0. See https://www.drupal.org/node/3168851.');
     // Install filter_test module, which ships with the filter_test format.
     $this->installConfig(['user', 'filter_test']);
     $format = FilterFormat::load('filter_test');
