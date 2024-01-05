@@ -181,13 +181,28 @@ export default class DrupalMediaEditing extends Plugin {
    * @private
    */
   async _fetchPreview(modelElement) {
-    const query = {
-      text: this._renderElement(modelElement),
+    const queryParams = {
+      text: btoa(this._renderElement(modelElement)),
       uuid: modelElement.getAttribute('drupalMediaEntityUuid'),
     };
 
+    // Consider query parameters that might already exist, for example ones that
+    // are added by path processors.
+    const previewUrlParts = this.previewUrl.split('?');
+    if (previewUrlParts.length > 1) {
+      const existingQuery = new URLSearchParams(previewUrlParts[1]);
+      existingQuery.forEach(( value, key) => {
+        queryParams[key] = value;
+      });
+    }
+
+    let query = new URLSearchParams();
+    Object.keys(queryParams).forEach((key) => {
+      query.append(key, queryParams[key]);
+    });
+
     const response = await fetch(
-      `${this.previewUrl}?${new URLSearchParams(query)}`,
+      `${previewUrlParts[0]}?${query}`,
       {
         headers: {
           'X-Drupal-MediaPreview-CSRF-Token':
