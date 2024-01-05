@@ -111,9 +111,11 @@ class SearchCommentTest extends BrowserTestBase {
       'filters' => [
         'filter_html_escape' => ['status' => 1],
       ],
-      'roles' => [RoleInterface::AUTHENTICATED_ID],
     ]);
     $basic_html_format->save();
+    user_role_grant_permissions(RoleInterface::AUTHENTICATED_ID, [
+      'use text format basic_html',
+    ]);
 
     $comment_body = 'Test comment body';
 

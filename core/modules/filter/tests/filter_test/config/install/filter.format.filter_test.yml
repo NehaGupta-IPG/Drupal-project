@@ -1,11 +1,8 @@
+format: filter_test
 langcode: en
 status: true
 name: 'Test format'
-format: filter_test
 weight: 2
-roles:
-  - anonymous
-  - authenticated
 filters:
   filter_autop:
     id: filter_autop

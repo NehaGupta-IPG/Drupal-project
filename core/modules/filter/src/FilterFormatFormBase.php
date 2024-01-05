@@ -4,6 +4,7 @@ namespace Drupal\filter;
 
 use Drupal\Component\Utility\Html;
 use Drupal\Core\Entity\EntityForm;
+use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\filter\Plugin\Filter\FilterNull;
 use Drupal\user\Entity\Role;
@@ -188,6 +189,24 @@ abstract class FilterFormatFormBase extends EntityForm {
   /**
    * {@inheritdoc}
    */
+  protected function copyFormValuesToEntity(EntityInterface $entity, array $form, FormStateInterface $form_state) {
+    // Avoid setting the roles as a property of the text format.
+    $roles = $form_state->getValue('roles');
+    $form_state->unsetValue('roles');
+    parent::copyFormValuesToEntity($entity, $form, $form_state);
+
+    foreach ($form_state->getValue('filters') as $instance_id => $config) {
+      $entity->setFilterConfig($instance_id, $config);
+    }
+
+    // Restore roles form value to allow saving user permissions later.
+    // @see ::save()
+    $form_state->setValue('roles', $roles);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function validateForm(array &$form, FormStateInterface $form_state) {
     parent::validateForm($form, $form_state);
 
@@ -213,31 +232,17 @@ abstract class FilterFormatFormBase extends EntityForm {
   /**
    * {@inheritdoc}
    */
-  public function submitForm(array &$form, FormStateInterface $form_state) {
-    parent::submitForm($form, $form_state);
-
-    // Add the submitted form values to the text format, and save it.
-    $format = $this->entity;
-    foreach ($form_state->getValues() as $key => $value) {
-      if ($key != 'filters') {
-        $format->set($key, $value);
-      }
-      else {
-        foreach ($value as $instance_id => $config) {
-          $format->setFilterConfig($instance_id, $config);
-        }
-      }
-    }
-    $format->save();
+  public function save(array $form, FormStateInterface $form_state) {
+    $status = parent::save($form, $form_state);
 
     // Save user permissions.
-    if ($permission = $format->getPermissionName()) {
+    if ($permission = $this->getEntity()->getPermissionName()) {
       foreach ($form_state->getValue('roles') as $rid => $enabled) {
         user_role_change_permissions($rid, [$permission => $enabled]);
       }
     }
 
-    return $this->entity;
+    return $status;
   }
 
   /**

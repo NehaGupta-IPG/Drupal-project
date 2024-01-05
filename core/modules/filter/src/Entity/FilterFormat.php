@@ -109,6 +109,10 @@ class FilterFormat extends ConfigEntityBase implements FilterFormatInterface, En
    * This property only has an effect when a new text format is created and the
    * list is not empty. By default, no user role is allowed to use a new format.
    *
+   * @deprecated in drupal:9.1.0 and is removed from drupal:10.0.0. Remove the
+   *   'roles' key from the text format configuration.
+   * @see https://www.drupal.org/node/3168851
+   *
    * @var array
    */
   protected $roles;
@@ -182,17 +186,6 @@ class FilterFormat extends ConfigEntityBase implements FilterFormatInterface, En
   /**
    * {@inheritdoc}
    */
-  public function toArray() {
-    $properties = parent::toArray();
-    // The 'roles' property is only used during install and should never
-    // actually be saved.
-    unset($properties['roles']);
-    return $properties;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public function disable() {
     if ($this->isFallbackFormat()) {
       throw new \LogicException("The fallback text format '{$this->id()}' cannot be disabled.");
@@ -248,6 +241,7 @@ class FilterFormat extends ConfigEntityBase implements FilterFormatInterface, En
       // \Drupal\filter\FilterPermissions::permissions() and lastly
       // filter_formats(), so its cache must be reset upfront.
       if (($roles = $this->get('roles')) && $permission = $this->getPermissionName()) {
+        @trigger_error('Specifying roles in text formats is deprecated in drupal:9.1.0 and will not be supported starting in drupal:10.0.0. See https://www.drupal.org/node/3168851', E_USER_DEPRECATED);
         foreach (Role::loadMultiple() as $rid => $role) {
           $enabled = in_array($rid, $roles, TRUE);
           user_role_change_permissions($rid, [$permission => $enabled]);
