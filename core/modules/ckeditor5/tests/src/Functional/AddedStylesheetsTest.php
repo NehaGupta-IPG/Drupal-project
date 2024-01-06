@@ -99,7 +99,7 @@ class AddedStylesheetsTest extends BrowserTestBase {
    * Test the ckeditor5-stylesheets theme config.
    */
   public function testCkeditorStylesheets(): void {
-    $this->expectDeprecation('Specifying roles in text formats is deprecated in drupal:9.1.0 and will not be supported starting in drupal:10.0.0. See https://www.drupal.org/node/3168851');
+    $this->expectDeprecation('Specifying roles in text formats is deprecated in drupal:10.3.0 and will not be supported starting in drupal:11.0.0. See https://www.drupal.org/node/3168851');
     $assert_session = $this->assertSession();
 
     /** @var \Drupal\Core\Extension\ThemeInstallerInterface $theme_installer */
