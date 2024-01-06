@@ -446,7 +446,7 @@ class CKEditor5AllowedTagsTest extends CKEditor5TestBase {
 
     // Change the node's text format to Full HTML.
     $this->drupalGet('node/1/edit');
-    $filter_tips = $page->find('css', '[data-drupal-format-id="basic_html"]');
+    $filter_tips = $page->find('css', '[data-drupal-format-id="plain_text"]');
     $this->assertTrue($filter_tips->isVisible());
     $page->selectFieldOption('body[0][format]', 'full_html');
     $this->assertNotEmpty($assert_session->waitForText('Change text format?'));
