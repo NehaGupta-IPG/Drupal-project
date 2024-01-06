@@ -37,6 +37,7 @@ class CKEditor5DialogTest extends CKEditor5TestBase {
    * Tests if CKEditor 5 tooltips can be interacted with in dialogs.
    */
   public function testCKEditor5FocusInTooltipsInDialog(): void {
+    $this->expectDeprecation('Specifying roles in text formats is deprecated in drupal:10.3.0 and will not be supported starting in drupal:11.0.0. See https://www.drupal.org/node/3168851');
     FilterFormat::create([
       'format' => 'test_format',
       'name' => 'CKEditor 5 with link',

@@ -99,6 +99,7 @@ class CKEditor5FragmentLinkTest extends WebDriverTestBase {
    * Tests if the fragment link to a textarea works with CKEditor 5 enabled.
    */
   public function testFragmentLink(): void {
+    $this->expectDeprecation('Specifying roles in text formats is deprecated in drupal:10.3.0 and will not be supported starting in drupal:11.0.0. See https://www.drupal.org/node/3168851');
     $session = $this->getSession();
     $web_assert = $this->assertSession();
     $ckeditor_class = '.ck-editor';
