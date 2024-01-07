@@ -381,6 +381,12 @@ class ContentTranslationController extends ControllerBase {
     /** @var \Drupal\Core\Entity\ContentEntityInterface $entity */
     $entity = $route_match->getParameter($entity_type_id);
 
+    // If the entity already has the target translation, redirect to the
+    // translation overview page.
+    if ($entity->hasTranslation($target->getId())) {
+      return $this->redirect("entity.$entity_type_id.content_translation_overview", [$entity_type_id => $entity->id()]);
+    }
+
     // In case of a pending revision, make sure we load the latest
     // translation-affecting revision for the source language, otherwise the
     // initial form values may not be up-to-date.
