@@ -84,6 +84,9 @@ class ViewsConfigUpdater {
       if ($this->processRssViewModeUpdate($view)) {
         $changed = TRUE;
       }
+      if ($this->processEmptyGroupColumn($handler, $handler_type, $key, $display_id, $view)) {
+        $changed = TRUE;
+      }
       return $changed;
     });
   }
@@ -467,6 +470,107 @@ class ViewsConfigUpdater {
 
     if ($changed) {
       $view->set('display', $displays);
+    }
+
+    return $changed;
+  }
+
+  /**
+   * Processes displays and adds pagination_heading_level if necessary.
+   *
+   * @param $compound_handler
+   *   A compound display handler.
+   * @param string $handler_type
+   *   The handler type.
+   *
+   * @return bool
+   *   Whether the handler was updated.
+   */
+  public function processDefaultPagerHeadingUpdate(array &$compound_handler, string $handler_type): bool {
+    $allow_pager_type_update = [
+      'mini',
+      'full',
+    ];
+
+    if ($handler_type === 'pager' && in_array($compound_handler['type'], $allow_pager_type_update) && !isset($compound_handler['options']['pagination_heading_level'])) {
+      $compound_handler['options']['pagination_heading_level'] = 'h4';
+      return TRUE;
+    }
+    return FALSE;
+  }
+
+  /**
+   * Checks if there are any fields that have an empty group_column.
+   *
+   * @param \Drupal\views\ViewEntityInterface $view
+   *   The View to update.
+   *
+   * @return bool
+   *   Whether the view was updated.
+   */
+  public function needsFixForEmptyGroupColumn(ViewEntityInterface $view) {
+    return $this->processDisplayHandlers($view, TRUE, function (&$handler, $handler_type, $key, $display_id) use ($view) {
+      return $this->processEmptyGroupColumn($handler, $handler_type, $key, $display_id, $view);
+    });
+  }
+
+  /**
+   * Fixes empty group columns.
+   *
+   * Some fields could be saved without a group column, this assures that every
+   * field has a default group column.
+   *
+   * @param array $handler
+   *   A display handler.
+   * @param string $handler_type
+   *   The handler type.
+   * @param string $key
+   *   The handler key.
+   * @param string $display_id
+   *   The handler display ID.
+   * @param \Drupal\views\ViewEntityInterface $view
+   *   The view being updated.
+   */
+  public function processEmptyGroupColumn(&$handler, string $handler_type, $key, $display_id, ViewEntityInterface $view): bool {
+    if ($handler_type !== 'field') {
+      return FALSE;
+    }
+    $changed = FALSE;
+    if (!empty($handler['plugin_id']) && $handler['plugin_id'] === 'field' && isset($handler['group_column']) && empty($handler['group_column'])) {
+      // Attempt to load the field storage definition of the field.
+      $executable = $view->getExecutable();
+      $executable->setDisplay($display_id);
+      /** @var \Drupal\views\Plugin\views\field\FieldHandlerInterface $field_handler */
+      $field_handler = $executable->getDisplay()->getHandler('field', $handler['id']);
+      if ($entity_type_id = $field_handler->getEntityType()) {
+        $field_storage_definitions = $this->entityFieldManager->getFieldStorageDefinitions($entity_type_id);
+
+        $field_storage = NULL;
+        if (isset($handler['field']) && isset($field_storage_definitions[$handler['field']])) {
+          $field_storage = $field_storage_definitions[$handler['field']];
+        }
+        elseif (isset($handler['entity_field']) && isset($field_storage_definitions[$handler['entity_field']])) {
+          $field_storage = $field_storage_definitions[$handler['entity_field']];
+        }
+        if ($field_storage !== NULL) {
+          // Use the field's main property as default column. If the field
+          // item does not define a main property, use the first column as
+          // default column.
+          $default_column = $field_storage->getMainPropertyName();
+          if (empty($default_column)) {
+            $column_names = array_keys($field_storage->getColumns());
+            $default_column = $column_names[0];
+          }
+          $handler['group_column'] = $default_column;
+          $changed = TRUE;
+        }
+      }
+    }
+
+    $deprecations_triggered = &$this->triggeredDeprecations['2815881'][$view->id()];
+    if ($this->deprecationsEnabled && $changed && !$deprecations_triggered) {
+      $deprecations_triggered = TRUE;
+      @trigger_error(sprintf('The field "%s" has its "group_column" set to an empty value for the "%s" view. This is deprecated in drupal:9.4.0 and is disallowed in drupal:10.0.0. Module-provided Views configuration should be updated to accommodate the changes described at https://www.drupal.org/node/3255641.', $handler['field'], $view->id()), E_USER_DEPRECATED);
     }
 
     return $changed;

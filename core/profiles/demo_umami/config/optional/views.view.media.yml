@@ -134,7 +134,7 @@ display:
             image_link: ''
             image_loading:
               attribute: lazy
-          group_column: ''
+          group_column: target_id
           group_columns: {  }
           group_rows: true
           delta_limit: 0

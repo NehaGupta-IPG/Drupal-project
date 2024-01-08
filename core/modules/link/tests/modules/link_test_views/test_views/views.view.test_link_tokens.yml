@@ -133,7 +133,7 @@ display:
             url_plain: false
             rel: '0'
             target: '0'
-          group_column: ''
+          group_column: uri
           group_columns: {  }
           group_rows: true
           delta_limit: 0
