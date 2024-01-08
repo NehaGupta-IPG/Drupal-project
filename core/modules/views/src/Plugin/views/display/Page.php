@@ -11,6 +11,8 @@ use Drupal\Core\State\StateInterface;
 use Drupal\Core\Routing\RouteProviderInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\views\Attribute\ViewsDisplay;
+use Drupal\views\Plugin\ViewsPluginManager;
+use Drupal\views\ViewsData;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Routing\Route;
 
@@ -76,9 +78,25 @@ class Page extends PathPluginBase {
    *   The menu storage.
    * @param \Drupal\Core\Menu\MenuParentFormSelectorInterface $parent_form_selector
    *   The parent form selector service.
+   * @param \Drupal\views\ViewsData $views_data
+   *   The views data.
+   * @param \Drupal\views\Plugin\ViewsPluginManager $access_plugin_manager
+   *   The plugin manager for views access plugins.
+   * @param \Drupal\views\Plugin\ViewsPluginManager $cache_plugin_manager
+   *   The plugin manager for views cache plugins.
+   * @param \Drupal\views\Plugin\ViewsPluginManager $display_extender_plugin_manager
+   *   The plugin manager for views display extender plugins.
+   * @param \Drupal\views\Plugin\ViewsPluginManager $exposed_form_plugin_manager
+   *   The plugin manager for views exposed form plugins.
+   * @param \Drupal\views\Plugin\ViewsPluginManager $pager_plugin_manager
+   *   The plugin manager for views pager plugins.
+   * @param \Drupal\views\Plugin\ViewsPluginManager $row_plugin_manager
+   *   The plugin manager for views row plugins.
+   * @param \Drupal\views\Plugin\ViewsPluginManager $style_plugin_manager
+   *   The plugin manager for views style plugins.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, RouteProviderInterface $route_provider, StateInterface $state, EntityStorageInterface $menu_storage, MenuParentFormSelectorInterface $parent_form_selector) {
-    parent::__construct($configuration, $plugin_id, $plugin_definition, $route_provider, $state);
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, RouteProviderInterface $route_provider, StateInterface $state, EntityStorageInterface $menu_storage, MenuParentFormSelectorInterface $parent_form_selector, ViewsData $views_data, ViewsPluginManager $access_plugin_manager, ViewsPluginManager $cache_plugin_manager, ViewsPluginManager $display_extender_plugin_manager, ViewsPluginManager $exposed_form_plugin_manager, ViewsPluginManager $pager_plugin_manager, ViewsPluginManager $row_plugin_manager, ViewsPluginManager $style_plugin_manager) {
+    parent::__construct($configuration, $plugin_id, $plugin_definition, $route_provider, $state, $views_data, $access_plugin_manager, $cache_plugin_manager, $display_extender_plugin_manager, $exposed_form_plugin_manager, $pager_plugin_manager, $row_plugin_manager, $style_plugin_manager);
     $this->menuStorage = $menu_storage;
     $this->parentFormSelector = $parent_form_selector;
   }
@@ -94,7 +112,15 @@ class Page extends PathPluginBase {
       $container->get('router.route_provider'),
       $container->get('state'),
       $container->get('entity_type.manager')->getStorage('menu'),
-      $container->get('menu.parent_form_selector')
+      $container->get('menu.parent_form_selector'),
+      $container->get('views.views_data'),
+      $container->get('plugin.manager.views.access'),
+      $container->get('plugin.manager.views.cache'),
+      $container->get('plugin.manager.views.display_extender'),
+      $container->get('plugin.manager.views.exposed_form'),
+      $container->get('plugin.manager.views.pager'),
+      $container->get('plugin.manager.views.row'),
+      $container->get('plugin.manager.views.style'),
     );
   }
 

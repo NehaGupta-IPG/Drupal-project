@@ -13,9 +13,11 @@ use Drupal\Core\State\StateInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\views\Attribute\ViewsDisplay;
 use Drupal\views\Plugin\views\display\ResponseDisplayPluginInterface;
+use Drupal\views\Plugin\ViewsPluginManager;
 use Drupal\views\Render\ViewsRenderPipelineMarkup;
 use Drupal\views\ViewExecutable;
 use Drupal\views\Plugin\views\display\PathPluginBase;
+use Drupal\views\ViewsData;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
@@ -121,9 +123,25 @@ class RestExport extends PathPluginBase implements ResponseDisplayPluginInterfac
    *   The authentication providers, keyed by ID.
    * @param string[] $serializer_format_providers
    *   The serialization format providers, keyed by format.
+   * @param \Drupal\views\ViewsData $views_data
+   *   The views data.
+   * @param \Drupal\views\Plugin\ViewsPluginManager $access_plugin_manager
+   *   The plugin manager for views access plugins.
+   * @param \Drupal\views\Plugin\ViewsPluginManager $cache_plugin_manager
+   *   The plugin manager for views cache plugins.
+   * @param \Drupal\views\Plugin\ViewsPluginManager $display_extender_plugin_manager
+   *   The plugin manager for views display extender plugins.
+   * @param \Drupal\views\Plugin\ViewsPluginManager $exposed_form_plugin_manager
+   *   The plugin manager for views exposed form plugins.
+   * @param \Drupal\views\Plugin\ViewsPluginManager $pager_plugin_manager
+   *   The plugin manager for views pager plugins.
+   * @param \Drupal\views\Plugin\ViewsPluginManager $row_plugin_manager
+   *   The plugin manager for views row plugins.
+   * @param \Drupal\views\Plugin\ViewsPluginManager $style_plugin_manager
+   *   The plugin manager for views style plugins.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, RouteProviderInterface $route_provider, StateInterface $state, RendererInterface $renderer, array $authentication_providers, array $serializer_format_providers) {
-    parent::__construct($configuration, $plugin_id, $plugin_definition, $route_provider, $state);
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, RouteProviderInterface $route_provider, StateInterface $state, RendererInterface $renderer, array $authentication_providers, array $serializer_format_providers, ViewsData $views_data, ViewsPluginManager $access_plugin_manager, ViewsPluginManager $cache_plugin_manager, ViewsPluginManager $display_extender_plugin_manager, ViewsPluginManager $exposed_form_plugin_manager, ViewsPluginManager $pager_plugin_manager, ViewsPluginManager $row_plugin_manager, ViewsPluginManager $style_plugin_manager) {
+    parent::__construct($configuration, $plugin_id, $plugin_definition, $route_provider, $state, $views_data, $access_plugin_manager, $cache_plugin_manager, $display_extender_plugin_manager, $exposed_form_plugin_manager, $pager_plugin_manager, $row_plugin_manager, $style_plugin_manager);
 
     $this->renderer = $renderer;
     // $authentication_providers as defined in
@@ -147,7 +165,15 @@ class RestExport extends PathPluginBase implements ResponseDisplayPluginInterfac
       $container->get('state'),
       $container->get('renderer'),
       $container->getParameter('authentication_providers'),
-      $container->getParameter('serializer.format_providers')
+      $container->getParameter('serializer.format_providers'),
+      $container->get('views.views_data'),
+      $container->get('plugin.manager.views.access'),
+      $container->get('plugin.manager.views.cache'),
+      $container->get('plugin.manager.views.display_extender'),
+      $container->get('plugin.manager.views.exposed_form'),
+      $container->get('plugin.manager.views.pager'),
+      $container->get('plugin.manager.views.row'),
+      $container->get('plugin.manager.views.style'),
     );
   }
 
