@@ -126,7 +126,7 @@ class ModulesUninstallForm extends FormBase {
       '#title_display' => 'invisible',
       '#size' => 30,
       '#placeholder' => $this->t('Filter by name or description'),
-      '#description' => $this->t('Enter a part of the module name or description'),
+      '#description' => $this->t('Enter a part of the module name, description or machine name'),
       '#attributes' => [
         'class' => ['table-filter-text'],
         'data-table' => '#system-modules-uninstall',
@@ -205,6 +205,7 @@ class ModulesUninstallForm extends FormBase {
       }
     }
 
+    $form['#attached']['library'][] = 'core/drupal.tableresponsive';
     $form['#attached']['library'][] = 'system/drupal.system.modules';
     $form['actions'] = ['#type' => 'actions'];
     $form['actions']['submit'] = [
