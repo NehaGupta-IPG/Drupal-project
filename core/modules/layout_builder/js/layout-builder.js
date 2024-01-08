@@ -4,7 +4,7 @@
  */
 
 (($, Drupal, Sortable) => {
-  const { ajax, behaviors, debounce, announce, formatPlural } = Drupal;
+  const { ajax, behaviors, debounce, announce, formatPlural, Ajax } = Drupal;
 
   /*
    * Boolean that tracks if block listing is currently being filtered. Declared
@@ -133,18 +133,29 @@
       const deltaFrom = $from
         ? $from.closest('[data-layout-delta]').data('layout-delta')
         : deltaTo;
-      ajax({
-        url: [
-          $item.closest('[data-layout-update-url]').data('layout-update-url'),
-          deltaFrom,
-          deltaTo,
-          itemRegion.data('region'),
-          $item.data('layout-block-uuid'),
-          $item.prev('[data-layout-block-uuid]').data('layout-block-uuid'),
-        ]
-          .filter((element) => element !== undefined)
-          .join('/'),
-      }).execute();
+      fetch('/session/token')
+        .then((r) => r.text())
+        .then((token) => {
+          ajax({
+            beforeSerialize(elementSettings, options) {
+              Ajax.prototype.beforeSerialize(elementSettings, options);
+              options.headers = options.headers || {};
+              options.headers['X-CSRF-Token'] = token;
+            },
+            url: [
+              $item
+                .closest('[data-layout-update-url]')
+                .data('layout-update-url'),
+              deltaFrom,
+              deltaTo,
+              itemRegion.data('region'),
+              $item.data('layout-block-uuid'),
+              $item.prev('[data-layout-block-uuid]').data('layout-block-uuid'),
+            ]
+              .filter((element) => element !== undefined)
+              .join('/'),
+          }).execute();
+        });
     }
   };
 
