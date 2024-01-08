@@ -35,7 +35,7 @@ class UninstallTest extends BrowserTestBase {
    * @param string $theme
    *   The admin theme to set.
    */
-  protected function setAdminTheme($theme) {
+  protected function setAdminTheme($theme) : void {
     \Drupal::service('theme_installer')->install([$theme]);
     \Drupal::configFactory()->getEditable('system.theme')
       ->set('admin', $theme)
@@ -64,7 +64,7 @@ class UninstallTest extends BrowserTestBase {
    * @return array
    *   List of admin themes to test with.
    */
-  public function dataUninstallPage() {
+  public function dataUninstallPage() : array {
     $data = [['default'], ['claro']];
     return $data;
   }
@@ -74,7 +74,7 @@ class UninstallTest extends BrowserTestBase {
    *
    * @dataProvider dataUninstallPage
    */
-  public function testUninstallPage($theme) {
+  public function testUninstallPage($theme) : void {
     if ($theme !== 'default') {
       $this->setAdminTheme($theme);
     }

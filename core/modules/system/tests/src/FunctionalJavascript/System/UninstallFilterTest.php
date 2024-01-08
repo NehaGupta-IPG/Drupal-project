@@ -28,7 +28,7 @@ class UninstallFilterTest extends WebDriverTestBase {
   /**
    * Tests the modules uninstall filter.
    */
-  public function testFilter() {
+  public function testFilter() : void {
     $account = $this->drupalCreateUser(['administer modules']);
     $this->drupalLogin($account);
 
