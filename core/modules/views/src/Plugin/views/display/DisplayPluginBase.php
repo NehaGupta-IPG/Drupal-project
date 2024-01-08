@@ -18,15 +18,76 @@ use Drupal\Core\Link;
 use Drupal\Core\Url;
 use Drupal\views\Form\ViewsForm;
 use Drupal\views\Plugin\views\area\AreaPluginBase;
+use Drupal\views\Plugin\ViewsPluginManager;
 use Drupal\views\ViewExecutable;
 use Drupal\views\Plugin\views\PluginBase;
 use Drupal\views\Views;
+use Drupal\views\ViewsData;
+use Symfony\Component\DependencyInjection\Container;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Base class for views display plugins.
  */
 abstract class DisplayPluginBase extends PluginBase implements DisplayPluginInterface, DependentPluginInterface {
   use PluginDependencyTrait;
+
+  /**
+   * The views data.
+   *
+   * @var \Drupal\views\ViewsData
+   */
+  protected ViewsData $viewsData;
+
+  /**
+   * The plugin manager for views access plugins.
+   *
+   * @var \Drupal\views\Plugin\ViewsPluginManager
+   */
+  protected ViewsPluginManager $accessPluginManager;
+
+
+  /**
+   * The plugin manager for views cache plugins.
+   *
+   * * @var \Drupal\views\Plugin\ViewsPluginManager
+   */
+  protected ViewsPluginManager $cachePluginManager;
+
+  /**
+   * The plugin manager for views display extender plugins.
+   *
+   * @var \Drupal\views\Plugin\ViewsPluginManager
+   */
+  protected ViewsPluginManager $displayExtenderPluginManager;
+
+  /**
+   * The plugin manager for views exposed form plugins.
+   *
+   * @var \Drupal\views\Plugin\ViewsPluginManager
+   */
+  protected ViewsPluginManager $exposedFormPluginManager;
+
+  /**
+   * The plugin manager for views pager plugins.
+   *
+   * @var \Drupal\views\Plugin\ViewsPluginManager
+   */
+  protected ViewsPluginManager $pagerPluginManager;
+
+  /**
+   * The plugin manager for views row plugins.
+   *
+   * @var \Drupal\views\Plugin\ViewsPluginManager
+   */
+  protected ViewsPluginManager $rowPluginManager;
+
+  /**
+   * The plugin manager for views style plugins.
+   *
+   * @var \Drupal\views\Plugin\ViewsPluginManager
+   */
+  protected ViewsPluginManager $stylePluginManager;
 
   /**
    * The top object of a view.
@@ -141,18 +202,72 @@ abstract class DisplayPluginBase extends PluginBase implements DisplayPluginInte
    * an empty array of configuration to the parent. This prevents our
    * configuration from being duplicated.
    *
-   * @todo Replace DisplayPluginBase::$display with
-   *   DisplayPluginBase::$configuration to standardize with other plugins.
-   *
    * @param array $configuration
    *   A configuration array containing information about the plugin instance.
    * @param string $plugin_id
    *   The plugin ID for the plugin instance.
    * @param mixed $plugin_definition
    *   The plugin implementation definition.
+   * @param \Drupal\views\ViewsData $views_data
+   *   The views data.
+   * @param \Drupal\views\Plugin\ViewsPluginManager $access_plugin_manager
+   *   The plugin manager for views access plugins.
+   * @param \Drupal\views\Plugin\ViewsPluginManager $cache_plugin_manager
+   *   The plugin manager for views cache plugins.
+   * @param \Drupal\views\Plugin\ViewsPluginManager $display_extender_plugin_manager
+   *   The plugin manager for views display extender plugins.
+   * @param \Drupal\views\Plugin\ViewsPluginManager $exposed_form_plugin_manager
+   *   The plugin manager for views exposed form plugins.
+   * @param \Drupal\views\Plugin\ViewsPluginManager $pager_plugin_manager
+   *   The plugin manager for views pager plugins.
+   * @param \Drupal\views\Plugin\ViewsPluginManager $row_plugin_manager
+   *   The plugin manager for views row plugins.
+   * @param \Drupal\views\Plugin\ViewsPluginManager $style_plugin_manager
+   *   The plugin manager for views style plugins.
+   *
+   * @todo Replace DisplayPluginBase::$display with
+   *   DisplayPluginBase::$configuration to standardize with other plugins.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition) {
+  public function __construct(array $configuration,
+  $plugin_id,
+  $plugin_definition,
+  ViewsData $views_data,
+      ViewsPluginManager $access_plugin_manager,
+  ViewsPluginManager $cache_plugin_manager,
+      ViewsPluginManager $display_extender_plugin_manager,
+  ViewsPluginManager $exposed_form_plugin_manager,
+      ViewsPluginManager $pager_plugin_manager,
+  ViewsPluginManager $row_plugin_manager,
+  ViewsPluginManager $style_plugin_manager) {
     parent::__construct([], $plugin_id, $plugin_definition);
+
+    $this->viewsData = $views_data;
+    $this->accessPluginManager = $access_plugin_manager;
+    $this->cachePluginManager = $cache_plugin_manager;
+    $this->displayExtenderPluginManager = $display_extender_plugin_manager;
+    $this->exposedFormPluginManager = $exposed_form_plugin_manager;
+    $this->pagerPluginManager = $pager_plugin_manager;
+    $this->rowPluginManager = $row_plugin_manager;
+    $this->stylePluginManager = $style_plugin_manager;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function create(ContainerInterface $container, array $configuration, $plugin_id, mixed $plugin_definition) {
+    return new static(
+      $configuration,
+      $plugin_id,
+      $plugin_definition,
+      $container->get('views.views_data'),
+      $container->get('plugin.manager.views.access'),
+      $container->get('plugin.manager.views.cache'),
+      $container->get('plugin.manager.views.display_extender'),
+      $container->get('plugin.manager.views.exposed_form'),
+      $container->get('plugin.manager.views.pager'),
+      $container->get('plugin.manager.views.row'),
+      $container->get('plugin.manager.views.style'),
+    );
   }
 
   /**
@@ -165,12 +280,11 @@ abstract class DisplayPluginBase extends PluginBase implements DisplayPluginInte
     $display['display_options'] += ['display_extenders' => []];
     $this->extenders = [];
     if ($extenders = Views::getEnabledDisplayExtenders()) {
-      $manager = Views::pluginManager('display_extender');
       $display_extender_options = $display['display_options']['display_extenders'];
       foreach ($extenders as $extender) {
         /** @var \Drupal\views\Plugin\views\display_extender\DisplayExtenderPluginBase $plugin */
-        if ($plugin = $manager->createInstance($extender)) {
-          $extender_options = $display_extender_options[$plugin->getPluginId()] ?? [];
+        if ($plugin = $this->displayExtenderPluginManager->createInstance($extender)) {
+          $extender_options = isset($display_extender_options[$plugin->getPluginId()]) ?? [];
           $plugin->init($this->view, $this, $extender_options);
           $this->extenders[$extender] = $plugin;
         }
@@ -797,7 +911,7 @@ abstract class DisplayPluginBase extends PluginBase implements DisplayPluginInte
 
     // Query plugins allow specifying a specific query class per base table.
     if ($type == 'query') {
-      $views_data = Views::viewsData()->get($this->view->storage->get('base_table'));
+      $views_data = $this->viewsData->get($this->view->storage->get('base_table'));
       $name = $views_data['table']['base']['query_id'] ?? 'views_query';
     }
     else {
@@ -806,7 +920,8 @@ abstract class DisplayPluginBase extends PluginBase implements DisplayPluginInte
 
     // Plugin instances are stored on the display for re-use.
     if (!isset($this->plugins[$type][$name])) {
-      $plugin = Views::pluginManager($type)->createInstance($name);
+      $plugin_manager = lcfirst(Container::camelize($type)) . 'PluginManager';
+      $plugin = $this->{$plugin_manager}->createInstance($name);
 
       // Initialize the plugin.
       $plugin->init($this->view, $this, $options['options']);
@@ -1193,7 +1308,7 @@ abstract class DisplayPluginBase extends PluginBase implements DisplayPluginInte
     $pager_plugin = $this->getPlugin('pager');
     if (!$pager_plugin) {
       // Default to the no pager plugin.
-      $pager_plugin = Views::pluginManager('pager')->createInstance('none');
+      $pager_plugin = $this->pagerPluginManager->createInstance('none');
     }
 
     $pager_str = $pager_plugin->summaryTitle();
@@ -1254,7 +1369,7 @@ abstract class DisplayPluginBase extends PluginBase implements DisplayPluginInte
     $access_plugin = $this->getPlugin('access');
     if (!$access_plugin) {
       // Default to the no access control plugin.
-      $access_plugin = Views::pluginManager('access')->createInstance('none');
+      $access_plugin = $this->accessPluginManager->createInstance('none');
     }
 
     $access_str = $access_plugin->summaryTitle();
@@ -1274,7 +1389,7 @@ abstract class DisplayPluginBase extends PluginBase implements DisplayPluginInte
     $cache_plugin = $this->getPlugin('cache');
     if (!$cache_plugin) {
       // Default to the no cache control plugin.
-      $cache_plugin = Views::pluginManager('cache')->createInstance('none');
+      $cache_plugin = $this->cachePluginManager->createInstance('none');
     }
 
     $cache_str = $cache_plugin->summaryTitle();
@@ -1331,7 +1446,7 @@ abstract class DisplayPluginBase extends PluginBase implements DisplayPluginInte
     $exposed_form_plugin = $this->getPlugin('exposed_form');
     if (!$exposed_form_plugin) {
       // Default to the no cache control plugin.
-      $exposed_form_plugin = Views::pluginManager('exposed_form')->createInstance('basic');
+      $exposed_form_plugin = $this->exposedFormPluginManager->createInstance('basic');
     }
 
     $exposed_form_str = $exposed_form_plugin->summaryTitle();
@@ -1989,8 +2104,9 @@ abstract class DisplayPluginBase extends PluginBase implements DisplayPluginInte
         $plugin_options = $this->getOption($plugin_type);
         $type = $form_state->getValue([$plugin_type, 'type']);
         if ($plugin_options['type'] != $type) {
+          $plugin_manager = lcfirst(Container::camelize($plugin_type)) . 'PluginManager';
           /** @var \Drupal\views\Plugin\views\ViewsPluginInterface $plugin */
-          $plugin = Views::pluginManager($plugin_type)->createInstance($type);
+          $plugin = $this->{$plugin_manager}->createInstance($type);
           if ($plugin) {
             $plugin->init($this->view, $this, $plugin_options['options']);
             $plugin_options = [
@@ -2790,6 +2906,39 @@ abstract class DisplayPluginBase extends PluginBase implements DisplayPluginInte
       return $entity_type->isTranslatable();
     }
     return FALSE;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function __serialize() {
+    $display = clone $this;
+    // Don't serialize all the injected service.
+    unset(
+      $display->viewsData,
+      $display->accessPluginManager,
+      $display->cachePluginManager,
+      $display->displayExtenderPluginManager,
+      $display->exposedFormPluginManager,
+      $display->pagerPluginManager,
+    );
+    return serialize(get_object_vars($display));
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function __unserialize($serialized) {
+    $data = unserialize($serialized);
+    foreach ($data as $key => $value) {
+      $this->{$key} = $value;
+    }
+    $this->viewsData = \Drupal::service('views.views_data');
+    $this->accessPluginManager = \Drupal::service('plugin.manager.views.access');
+    $this->cachePluginManager = \Drupal::service('plugin.manager.views.cache');
+    $this->displayExtenderPluginManager = \Drupal::service('plugin.manager.views.display_extender');
+    $this->exposedFormPluginManager = \Drupal::service('plugin.manager.views.exposed_form');
+    $this->pagerPluginManager = \Drupal::service('plugin.manager.views.pager');
   }
 
 }
