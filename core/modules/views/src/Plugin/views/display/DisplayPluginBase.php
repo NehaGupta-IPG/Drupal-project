@@ -232,11 +232,11 @@ abstract class DisplayPluginBase extends PluginBase implements DisplayPluginInte
   $plugin_id,
   $plugin_definition,
   ViewsData $views_data,
-      ViewsPluginManager $access_plugin_manager,
+  ViewsPluginManager $access_plugin_manager,
   ViewsPluginManager $cache_plugin_manager,
-      ViewsPluginManager $display_extender_plugin_manager,
+  ViewsPluginManager $display_extender_plugin_manager,
   ViewsPluginManager $exposed_form_plugin_manager,
-      ViewsPluginManager $pager_plugin_manager,
+  ViewsPluginManager $pager_plugin_manager,
   ViewsPluginManager $row_plugin_manager,
   ViewsPluginManager $style_plugin_manager) {
     parent::__construct([], $plugin_id, $plugin_definition);
