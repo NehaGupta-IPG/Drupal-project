@@ -46,7 +46,7 @@ class MailChangeController extends ControllerBase {
    */
   public function page(UserInterface $user, string $new_mail, int $timestamp, string $hash) : RedirectResponse {
     $messenger = $this->messenger();
-    $flood_config = $this->configFactory->get('user.flood');
+    $flood_config = $this->config('user.flood');
     if (!$this->flood->isAllowed('user.email_change_ip', $flood_config->get('ip_limit'), $flood_config->get('ip_window'))) {
       $messenger->addError($this->t('Too many email change requests from your IP address. It is temporarily blocked. Try again later or contact the site administrator.'));
       return $this->redirect('<front>');
