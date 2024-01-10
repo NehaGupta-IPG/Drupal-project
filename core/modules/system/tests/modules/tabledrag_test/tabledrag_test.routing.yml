@@ -13,3 +13,11 @@ tabledrag_test.nested_tabledrag_test_form:
     _title: 'Nested draggable table test'
   requirements:
     _access: 'TRUE'
+
+tabledrag_test.subgroup_test_form:
+  path: '/tabledrag_subgroup_test'
+  defaults:
+    _form: '\Drupal\tabledrag_test\Form\TableDragSubgroupTestForm'
+    _title: 'Draggable table test'
+  requirements:
+    _access: 'TRUE'

@@ -1,0 +1,16 @@
+/**
+ * Ensure all rows are equal height to avoid overlap and discontinuities in drop
+ * zones and make the drop location more predictable.
+ */
+#tabledrag-test-table tr {
+  height: 4rem;
+}
+
+/**
+ * When dragging a row up to be a child of another, the drag should finish below
+ * the target row.
+ */
+[data-drop-target-child-up] {
+  position: relative;
+  top: 4rem;
+}

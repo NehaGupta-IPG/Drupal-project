@@ -2,5 +2,8 @@ tabledrag:
   version: VERSION
   js:
     js/tabledrag_test.js: {}
+  css:
+    theme:
+      css/tabledrag_test.css: {}
   dependencies:
     - core/drupal.tabledrag
