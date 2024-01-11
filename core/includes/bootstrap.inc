@@ -6,7 +6,6 @@
  */
 
 use Drupal\Component\Utility\Crypt;
-use Drupal\Core\Logger\RfcLogLevel;
 use Drupal\Core\Shutdown\ShutdownHandler;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Test\TestDatabase;

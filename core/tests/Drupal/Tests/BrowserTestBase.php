@@ -169,9 +169,9 @@ abstract class BrowserTestBase extends TestCase {
   /**
    * The original array of shutdown function callbacks.
    *
-   * @var \Drupal\Core\Shutdown\CallbackStack
+   * @var \Drupal\Core\Shutdown\CallbackStack|null
    */
-  protected CallbackStack $originalShutdownCallbacks;
+  protected ?CallbackStack $originalShutdownCallbacks = NULL;
 
   /**
    * Registers the dumper CLI handler when the DebugDump extension is enabled.
@@ -325,7 +325,6 @@ abstract class BrowserTestBase extends TestCase {
       throw new \Exception('Functional/FunctionalJavascript test classes must specify the #[RunTestsInSeparateProcesses] attribute');
     }
 
-    $this->originalShutdownCallbacks = new CallbackStack();
     parent::setUp();
 
     $this->setUpAppRoot();
