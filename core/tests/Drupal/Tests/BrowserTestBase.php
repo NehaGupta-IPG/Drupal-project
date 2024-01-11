@@ -325,6 +325,7 @@ abstract class BrowserTestBase extends TestCase {
       throw new \Exception('Functional/FunctionalJavascript test classes must specify the #[RunTestsInSeparateProcesses] attribute');
     }
 
+    $this->originalShutdownCallbacks = new CallbackStack();
     parent::setUp();
 
     $this->setUpAppRoot();
