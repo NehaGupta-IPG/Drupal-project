@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\views_ui\Functional;
 
+use Drupal\Core\Database\Database;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -204,6 +205,74 @@ SQL;
       ->save();
     $this->submitForm([], 'Update preview');
     $this->assertCount(0, $this->xpath('//div[@id="views-live-preview"]//b[text()=:text]', [':text' => 'Test preview title']));
+  }
+
+  /**
+   * Tests the live preview limit.
+   */
+  public function testPreviewLimit() {
+    $live_preview_limit = \Drupal::ConfigFactory()->get('views.settings')->get('ui.show.live_preview_limit') ?: 50;
+
+    // Add additional records to the test data table.
+    $count = $live_preview_limit + 1;
+    $data_set = $this->dataSet();
+    $query = Database::getConnection()->insert('views_test_data')->fields(array_keys($data_set[0]));
+    for ($i = 1; $i <= $count; $i++) {
+      $record = [
+        'name' => $this->randomString(12),
+        'age' => 50,
+        'job' => $this->randomString(32),
+        'created' => gmmktime(0, 0, 0, 1, 1, 2000),
+        'status' => 1,
+      ];
+      $query->values($record);
+    }
+    $query->execute();
+
+    // Test display all items.
+    $this->drupalGet('admin/structure/views/nojs/display/test_preview/default/pager');
+    $this->submitForm($edit = ['pager[type]' => 'none'], 'Apply');
+    $this->drupalGet('admin/structure/views/view/test_preview/edit');
+    $this->submitForm($edit = [], t('Save'));
+    $this->submitForm($edit = [], t('Update preview'));
+
+    // Verify that not all items are shown.
+    $elements = $this->xpath('//div[@class = "view-content"]/div[contains(@class, views-row)]');
+    $this->assertEquals($live_preview_limit, count($elements));
+    $message = "Limit of results is not set. The live preview has a limit of $live_preview_limit items per page.";
+    $this->assertSession()->pageTextContains($message);
+
+    // Test full pager when the views limit is less than the maximum preview
+    // limit.
+    $limit = 20;
+    $this->drupalGet('admin/structure/views/nojs/display/test_preview/default/pager');
+    $this->submitForm($edit = ['pager[type]' => 'full'], 'Apply');
+    $this->drupalGet('admin/structure/views/nojs/display/test_preview/default/pager_options');
+    $this->submitForm($edit = ['pager_options[items_per_page]' => $limit], 'Apply');
+    $this->drupalGet('admin/structure/views/view/test_preview/edit');
+    $this->submitForm($edit = [], t('Save'));
+    $this->submitForm($edit = [], t('Update preview'));
+
+    // Verify that not all items are shown.
+    $elements = $this->xpath('//div[@class = "view-content"]/div[contains(@class, views-row)]');
+    $this->assertEquals($limit, count($elements));
+    $message = "The live preview has a limit of $live_preview_limit items per page.";
+    $this->assertSession()->pageTextNotContains($message);
+
+    // Test full pager when the views limit is greater than the maximum preview
+    // limit.
+    $limit = $live_preview_limit + 1;
+    $this->drupalGet('admin/structure/views/nojs/display/test_preview/default/pager_options');
+    $this->submitForm($edit = ['pager_options[items_per_page]' => $limit], 'Apply');
+    $this->drupalGet('admin/structure/views/view/test_preview/edit');
+    $this->submitForm($edit = [], t('Save'));
+    $this->submitForm($edit = [], t('Update preview'));
+
+    // Verify that not all items are shown.
+    $elements = $this->xpath('//div[@class = "view-content"]/div[contains(@class, views-row)]');
+    $this->assertEquals($live_preview_limit, count($elements));
+    $message = "Limit of results is set to $limit. The live preview has a limit of $live_preview_limit items per page.";
+    $this->assertSession()->pageTextContains($message);
   }
 
 }

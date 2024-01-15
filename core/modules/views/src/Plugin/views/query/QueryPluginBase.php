@@ -165,6 +165,23 @@ abstract class QueryPluginBase extends PluginBase implements CacheableDependency
    * Returns the limit of the query.
    */
   public function getLimit() {
+    // Prevent of crash on live preview with large sets.
+    if (!empty($this->view->live_preview)) {
+      $live_preview_limit = \Drupal::ConfigFactory()->get('views.settings')->get('ui.show.live_preview_limit') ?: 50;
+      if (empty($this->limit) || $this->limit > $live_preview_limit) {
+        $options = [
+          '%limit' => !empty($this->limit) ? $this->limit : '',
+          '%live_preview_limit' => $live_preview_limit,
+        ];
+        $message = $this->t('Limit of results is not set. The live preview has a limit of %live_preview_limit items per page.', $options);
+        if ($this->limit > $live_preview_limit) {
+          $message = $this->t('Limit of results is set to %limit. The live preview has a limit of %live_preview_limit items per page.', $options);
+        }
+        $this->messenger->addWarning($message);
+        return $live_preview_limit;
+      }
+    }
+
     return $this->limit;
   }
 

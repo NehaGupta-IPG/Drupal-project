@@ -1565,10 +1565,10 @@ class Sql extends QueryPluginBase {
         // Let the pager modify the query to add limits.
         $view->pager->preExecute($query);
 
-        if (!empty($this->limit) || !empty($this->offset)) {
+        if (!empty($this->getLimit()) || !empty($this->offset)) {
           // We can't have an offset without a limit, so provide a very large
           // limit instead.
-          $limit = intval(!empty($this->limit) ? $this->limit : 999999);
+          $limit = intval(!empty($this->getLimit()) ? $this->getLimit() : 999999);
           $offset = intval(!empty($this->offset) ? $this->offset : 0);
           $query->range($offset, $limit);
         }
