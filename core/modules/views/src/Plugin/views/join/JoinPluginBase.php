@@ -313,15 +313,11 @@ class JoinPluginBase extends PluginBase implements JoinPluginInterface {
     }
 
     $right_field = $table['alias'] . '.' . $this->field;
-
-    if (\Drupal::database()->databaseType() == 'pgsql') {
-      if (strrpos($this->leftField, 'id') !== FALSE && strrpos($this->field, 'id') !== FALSE) {
-        $left_field .= '::bigint';
-        $right_field .= '::bigint';
-      }
+    if (\Drupal::database()->databaseType() === 'pgsql' && str_contains($this->leftField, 'id') && str_contains($this->field, 'id')) {
+      $left_field .= '::text';
+      $right_field .= '::text';
     }
-
-    $condition = "$left_field " . $this->configuration['operator'] . " $right_field";
+    $condition = $left_field . ' ' . $this->configuration['operator'] . ' ' . $right_field;
     $arguments = [];
 
     // Tack on the extra.
