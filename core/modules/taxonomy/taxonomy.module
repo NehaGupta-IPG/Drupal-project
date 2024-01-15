@@ -6,8 +6,65 @@
 
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\Sql\SqlContentEntityStorage;
+use Drupal\Core\Form\FormStateInterface;
 use Drupal\taxonomy\Entity\Term;
+use Drupal\taxonomy\Entity\TermInterface;
 use Drupal\taxonomy\Hook\TaxonomyThemeHooks;
+
+/**
+ * Implements hook_form_BASE_FORM_ID_alter().
+ */
+function taxonomy_form_taxonomy_term_form_alter(&$form, FormStateInterface $form_state, $form_id) {
+  $config = \Drupal::service('config.factory');
+  $entity_type_manager = \Drupal::service('entity_type.manager');
+  /** @var \Drupal\taxonomy\TermStorageInterface $taxonomy_storage */
+  $taxonomy_storage = $entity_type_manager->getStorage('taxonomy_term');
+
+  if (isset($form['parent'])) {
+    $vocabulary_id = $form['vid']['#value'];
+    $term_id = $form['tid']['#value'];
+    $term = '';
+    $parent = '';
+
+    if (isset($term_id) && !empty($term_id)) {
+      $term = $taxonomy_storage->load($term_id);
+      $parent = array_keys($taxonomy_storage->loadParents($term_id));
+    }
+
+    // \Drupal\taxonomy\TermStorageInterface::loadTree() and
+    // \Drupal\taxonomy\TermStorageInterface::loadParents() may contain large
+    // numbers of items so we check for taxonomy.settings:override_selector
+    // before loading the full vocabulary. Contrib modules can then intercept
+    // before hook_form_alter to provide scalable alternatives.
+    if (!$config->get('taxonomy.settings')->get('override_selector')) {
+      $exclude = [];
+      if ($term instanceof TermInterface) {
+        $parent = array_keys($taxonomy_storage->loadParents($term->id()));
+        $children = $taxonomy_storage->loadTree($vocabulary_id, $term->id());
+
+        // A term can't be the child of itself, nor of its children.
+        foreach ($children as $child) {
+          $exclude[] = $child->tid;
+        }
+        $exclude[] = $term->id();
+      }
+
+      $tree = $taxonomy_storage->loadTree($vocabulary_id);
+      $options = ['<' . t('root') . '>'];
+      if (empty($parent)) {
+        $parent = [0];
+      }
+
+      foreach ($tree as $item) {
+        if (!in_array($item->tid, $exclude)) {
+          $options[$item->tid] = str_repeat('-', $item->depth) . $item->name;
+        }
+      }
+
+      $form['parent']['widget']['#options'] = $options;
+    }
+  }
+}
 
 /**
  * Prepares variables for taxonomy term templates.
