@@ -77,7 +77,12 @@ class FieldOrLanguageJoinTest extends RelationshipJoinTestBase {
     $this->assertSame($join_info['join type'], 'LEFT');
     $this->assertSame($join_info['table'], $configuration['table']);
     $this->assertSame($join_info['alias'], 'users_field_data');
-    $this->assertSame($join_info['condition'], 'views_test_data.uid = users_field_data.uid');
+    if (\Drupal::database()->databaseType() === 'pgsql') {
+      $this->assertSame($join_info['condition'], 'views_test_data.uid::text = users_field_data.uid::text');
+    }
+    else {
+      $this->assertSame($join_info['condition'], 'views_test_data.uid = users_field_data.uid');
+    }
 
     // Set a different alias and make sure table info is as expected.
     $join_info = $this->buildJoin($view, $configuration, 'users1');

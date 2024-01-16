@@ -111,7 +111,12 @@ class JoinTest extends RelationshipJoinTestBase {
     $this->assertEquals('LEFT', $join_info['join type'], 'Make sure the default join type is LEFT');
     $this->assertEquals($configuration['table'], $join_info['table']);
     $this->assertEquals('users_field_data', $join_info['alias']);
-    $this->assertEquals('views_test_data.uid = users_field_data.uid', $join_info['condition']);
+    if (\Drupal::database()->databaseType() === 'pgsql') {
+      $this->assertEquals('views_test_data.uid::text = users_field_data.uid::text', $join_info['condition']);
+    }
+    else {
+      $this->assertEquals('views_test_data.uid = users_field_data.uid', $join_info['condition']);
+    }
 
     // Set a different alias and make sure table info is as expected.
     $join = $this->manager->createInstance('standard', $configuration);
