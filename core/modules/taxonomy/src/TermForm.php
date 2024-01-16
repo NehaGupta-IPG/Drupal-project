@@ -69,7 +69,6 @@ class TermForm extends ContentEntityForm {
     $form_state->setRedirectUrl($vocabulary->toUrl('overview-form'));
   }
 
-
   /**
    * {@inheritdoc}
    */
@@ -81,7 +80,6 @@ class TermForm extends ContentEntityForm {
       $form_state->setErrorByName('weight', $this->t('Weight value must be numeric.'));
     }
   }
-
 
   /**
    * {@inheritdoc}
