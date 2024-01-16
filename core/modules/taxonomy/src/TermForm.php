@@ -69,6 +69,20 @@ class TermForm extends ContentEntityForm {
     $form_state->setRedirectUrl($vocabulary->toUrl('overview-form'));
   }
 
+
+  /**
+   * {@inheritdoc}
+   */
+  public function validateForm(array &$form, FormStateInterface $form_state) {
+    parent::validateForm($form, $form_state);
+
+    // Ensure numeric values.
+    if ($form_state->hasValue('weight') && !is_numeric($form_state->getValue('weight'))) {
+      $form_state->setErrorByName('weight', $this->t('Weight value must be numeric.'));
+    }
+  }
+
+
   /**
    * {@inheritdoc}
    */
