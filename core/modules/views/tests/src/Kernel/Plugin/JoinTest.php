@@ -221,7 +221,12 @@ class JoinTest extends RelationshipJoinTestBase {
 
     $tables = $query->getTables();
     $join_info = $tables['users5'];
-    $this->assertStringContainsString("views_test_data.uid = users5.uid", $join_info['condition'], 'Make sure the join condition appears in the query.');
+    if (\Drupal::database()->databaseType() === 'pgsql') {
+      $this->assertStringContainsString("views_test_data.uid::text = users5.uid::text", $join_info['condition'], 'Make sure the join condition appears in the query.');
+    }
+    else {
+      $this->assertStringContainsString("views_test_data.uid = users5.uid", $join_info['condition'], 'Make sure the join condition appears in the query.');
+    }
     $this->assertStringContainsString("users5.langcode = :views_join_condition_4", $join_info['condition'], 'Make sure the first extra join condition appears in the query.');
     $this->assertStringContainsString("views_test_data.status = :views_join_condition_5", $join_info['condition'], 'Make sure the second extra join condition appears in the query.');
     $this->assertStringContainsString("users5.name = views_test_data.name", $join_info['condition'], 'Make sure the third extra join condition appears in the query.');
