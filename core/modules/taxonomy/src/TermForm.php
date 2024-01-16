@@ -77,7 +77,7 @@ class TermForm extends ContentEntityForm {
     parent::validateForm($form, $form_state);
 
     // Ensure numeric values.
-    if ($form_state->hasValue('weight') && !is_numeric($form_state->getValue('weight'))) {
+    if ($form_state->hasValue('weight') && !is_numeric($form_state->getValue('weight')[0]['value'])) {
       $form_state->setErrorByName('weight', $this->t('Weight value must be numeric.'));
     }
   }
