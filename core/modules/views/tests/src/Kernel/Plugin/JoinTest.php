@@ -189,7 +189,12 @@ class JoinTest extends RelationshipJoinTestBase {
 
     $tables = $query->getTables();
     $join_info = $tables['users4'];
-    $this->assertStringContainsString("views_test_data.uid = users4.uid", $join_info['condition'], 'Make sure the join condition appears in the query.');
+    if (\Drupal::database()->databaseType() === 'pgsql') {
+      $this->assertStringContainsString("views_test_data.uid::text = users4.uid::text", $join_info['condition'], 'Make sure the join condition appears in the query.');
+    }
+    else {
+      $this->assertStringContainsString("views_test_data.uid = users4.uid", $join_info['condition'], 'Make sure the join condition appears in the query.');
+    }
     $this->assertStringContainsString("users4.name = :views_join_condition_2", $join_info['condition'], 'Make sure the first extra join condition appears in the query.');
     $this->assertStringContainsString("users4.name IN ( :views_join_condition_3[] )", $join_info['condition'], 'The IN condition for the join is properly formed.');
     $this->assertEquals([$random_name_2, $random_name_3, $random_name_4], $join_info['arguments'][':views_join_condition_3[]'], 'Make sure the IN arguments are still part of an array.');
