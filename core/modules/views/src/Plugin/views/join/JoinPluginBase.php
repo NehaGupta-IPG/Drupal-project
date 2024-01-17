@@ -313,7 +313,7 @@ class JoinPluginBase extends PluginBase implements JoinPluginInterface {
     }
 
     $right_field = $table['alias'] . '.' . $this->field;
-    if (\Drupal::database()->databaseType() === 'pgsql' && $this->leftField && str_contains($this->leftField, 'id') && $this->field && str_contains($this->field, 'id')) {
+    if (\Drupal::database()->databaseType() === 'pgsql' && $this->leftField && $this->field && str_contains($this->leftField, 'id') && str_contains($this->field, 'id')) {
       $left_field .= '::text';
       $right_field .= '::text';
     }
