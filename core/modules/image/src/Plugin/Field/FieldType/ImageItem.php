@@ -532,19 +532,19 @@ class ImageItem extends FileItem {
   /**
    * {@inheritdoc}
    */
-  public function getUploadValidators() {
+  public function getUploadValidators(): array {
     $upload_validators = parent::getUploadValidators();
     // Always validate that the uploaded file is an image.
-    $upload_validators['file_validate_is_image'] = [];
+    $upload_validators['FileIsImage'] = [];
 
     // If the image's resolution is constrained by the field settings, validate
     // that too.
     $min_resolution = $this->getSetting('min_resolution') ?: 0;
     $max_resolution = $this->getSetting('max_resolution') ?: 0;
     if ($min_resolution || $max_resolution) {
-      $upload_validators['file_validate_image_resolution'] = [
-        $max_resolution,
-        $min_resolution,
+      $upload_validators['FileImageDimensions'] = [
+        'maxDimensions' => $max_resolution,
+        'minDimensions' => $min_resolution,
       ];
     }
 
@@ -556,7 +556,7 @@ class ImageItem extends FileItem {
       // supported by the current image toolkit. Otherwise, validate against all
       // toolkit supported extensions.
       $extensions = !empty($extensions) ? array_intersect(explode(' ', $extensions), $supported_extensions) : $supported_extensions;
-      $upload_validators['file_validate_extensions'][0] = implode(' ', $extensions);
+      $upload_validators['FileExtension']['extensions'] = implode(' ', $extensions);
     }
     return $upload_validators;
   }

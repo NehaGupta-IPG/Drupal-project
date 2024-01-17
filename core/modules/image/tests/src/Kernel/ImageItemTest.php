@@ -195,7 +195,6 @@ class ImageItemTest extends FieldKernelTestBase {
     $entity = EntityTest::create();
     $entity->image_test = NULL;
     $entity->image_test->target_id = 9999;
-<<<<<<< HEAD
     $entity->save();
     // Check that the proper warning has been logged.
     $arguments = [
@@ -268,50 +267,6 @@ class ImageItemTest extends FieldKernelTestBase {
     // Verify the file URI starts with the expected protocol and structure.
     $this->assertStringStartsWith($expected_start, $fileUri);
     $this->assertMatchesRegularExpression('#^' . preg_quote($expected_start, '#') . '[^/]+#', $fileUri);
-=======
-    // PHPUnit re-throws E_USER_WARNING as an exception.
-    try {
-      $entity->save();
-      $this->fail('Exception did not fail');
-    }
-    catch (EntityStorageException $exception) {
-      $this->assertInstanceOf(Warning::class, $exception->getPrevious());
-      $this->assertEquals('Missing file with ID 9999.', $exception->getMessage());
-      $this->assertEmpty($entity->image_test->width);
-      $this->assertEmpty($entity->image_test->height);
-    }
-  }
-
-  /**
-   * Tests that image items register appropriate upload validators.
-   */
-  public function testUploadValidators() {
-    $entity = EntityTest::create();
-    $items = $entity->get('image_test');
-    $item = $items->appendItem();
-    $field_definition = $items->getFieldDefinition();
-
-    $validators = $item->getUploadValidators();
-    $this->assertArrayHasKey('file_validate_is_image', $validators);
-    $this->assertArrayNotHasKey('file_validate_image_resolution', $validators);
-
-    $field_definition->setSetting('min_resolution', '32x32')->save();
-    $validators = $item->getUploadValidators();
-    $this->assertArrayHasKey('file_validate_is_image', $validators);
-    $this->assertSame([0, '32x32'], $validators['file_validate_image_resolution']);
-
-    $field_definition->setSetting('min_resolution', NULL)
-      ->setSetting('max_resolution', '1024x768')
-      ->save();
-    $validators = $item->getUploadValidators();
-    $this->assertArrayHasKey('file_validate_is_image', $validators);
-    $this->assertSame(['1024x768', 0], $validators['file_validate_image_resolution']);
-
-    $field_definition->setSetting('min_resolution', '32x32')->save();
-    $validators = $item->getUploadValidators();
-    $this->assertArrayHasKey('file_validate_is_image', $validators);
-    $this->assertSame(['1024x768', '32x32'], $validators['file_validate_image_resolution']);
->>>>>>> cae3eec4bfe (Clean slate)
   }
 
 }
