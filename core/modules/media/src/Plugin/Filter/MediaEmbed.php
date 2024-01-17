@@ -182,6 +182,13 @@ class MediaEmbed extends FilterBase implements ContainerFactoryPluginInterface, 
       '#element_validate' => [[static::class, 'validateOptions']],
     ];
 
+    $form['disable_filtering'] = [
+      '#title' => $this->t("Allow disabled view modes to be selected in the editor"),
+      '#description' => $this->t("By default, users can only choose view modes that are enabled for the media bundle they chose. This is useful if you rely on view modes fallback mechanism."),
+      '#type' => 'checkbox',
+      '#default_value' => $this->settings['disable_filtering'],
+    ];
+
     return $form;
   }
 

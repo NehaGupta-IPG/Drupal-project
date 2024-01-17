@@ -100,7 +100,12 @@ class Media extends CKEditor5PluginDefault implements ContainerFactoryPluginInte
 
     // Configure view modes.
     foreach (array_keys($media_bundles) as $bundle) {
-      $allowed_view_modes_by_bundle = $this->entityDisplayRepository->getViewModeOptionsByBundle('media', $bundle);
+      if (!empty($media_embed_filter->settings['disable_filtering'])) {
+        $allowed_view_modes_by_bundle = $all_view_modes;
+      }
+      else {
+        $allowed_view_modes_by_bundle = $this->entityDisplayRepository->getViewModeOptionsByBundle('media', $bundle);
+      }
 
       foreach (array_keys($allowed_view_modes_by_bundle) as $view_mode) {
         // Get the bundles that have this view mode enabled.
