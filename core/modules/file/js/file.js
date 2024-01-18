@@ -93,9 +93,7 @@
   Drupal.behaviors.fileButtons = {
     attach(context) {
       const $context = $(context);
-      $context
-        .find('.js-form-submit')
-        .on('click', Drupal.file.disableFields);
+      $context.find('.js-form-submit').on('click', Drupal.file.disableFields);
       $context
         .find('.js-form-managed-file .js-form-submit')
         .on('click', Drupal.file.progressBar);
