@@ -53,4 +53,18 @@ class AjaxFormImageButtonTest extends WebDriverTestBase {
     $this->assertNotEmpty($assertSession->waitForElementVisible('css', '#ajax-1-more-div'), 'Page updated after image button pressed');
   }
 
+  /**
+   * Tests image buttons cannot be operated with right click.
+   */
+  public function testAjaxImageButtonRightClick() {
+    // Get a Field UI manage-display page.
+    $this->drupalGet('ajax_forms_image_button_form');
+    $assertSession = $this->assertSession();
+    $session = $this->getSession();
+
+    $button = $session->getPage()->findButton('Edit');
+    $button->rightClick();
+    $this->assertEmpty($assertSession->waitForElementVisible('css', '#ajax-1-more-div'));
+  }
+
 }

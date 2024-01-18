@@ -805,7 +805,7 @@
        *   The event triggered.
        */
       clickAddGroupButton(event) {
-        this.addGroupButton.trigger('mousedown');
+        this.addGroupButton.trigger('click');
         event.preventDefault();
       },
 
@@ -817,7 +817,7 @@
        *   form button that should be clicked.
        */
       clickRemoveGroupButton(event) {
-        this.table.find(`#${event.data.buttonId}`).trigger('mousedown');
+        this.table.find(`#${event.data.buttonId}`).trigger('click');
         event.preventDefault();
       },
 

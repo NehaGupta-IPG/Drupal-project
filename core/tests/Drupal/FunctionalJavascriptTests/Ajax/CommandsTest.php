@@ -41,8 +41,12 @@ class CommandsTest extends WebDriverTestBase {
     $this->assertSession()->elementExists('css', 'link[href="my/file.css"]');
     $this->assertSession()->elementExists('css', 'link[href="https://example.com/css?family=Open+Sans"]');
 
-    // Tests the 'after' command.
-    $page->pressButton("AJAX 'After': Click to put something after the div");
+    // Tests the 'after' command as well as testing that ajax submission does
+    // not occur on right click.
+    $button = $page->findButton("AJAX 'After': Click to put something after the div");
+    $button->rightClick();
+    $this->assertFalse($this->assertSession()->waitForText('This will be placed after'));
+    $button->click();
     $this->assertWaitPageContains('<div id="after_div">Something can be inserted after this</div>This will be placed after');
 
     // Tests the 'alert' command.
@@ -140,7 +144,7 @@ Drupal.behaviors.testSettingsCommand = {
 JS;
     $session->executeScript($test_settings_command);
     // @todo Replace after https://www.drupal.org/project/drupal/issues/2616184
-    $session->executeScript('window.jQuery("#edit-settings-command-example").mousedown();');
+    $session->executeScript('window.jQuery("#edit-settings-command-example").click();');
     $this->assertWaitPageContains('<div class="test-settings-command">42</div>');
   }
 
