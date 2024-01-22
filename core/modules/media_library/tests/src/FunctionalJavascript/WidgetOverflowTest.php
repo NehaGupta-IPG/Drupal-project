@@ -80,7 +80,7 @@ class WidgetOverflowTest extends MediaLibraryTestBase {
         ->uploadFileAndGetRemoteFilePath($path);
     }
     $page = $this->getSession()->getPage();
-    $page->fillField('Add files', implode("\n", $remote_paths));
+    $page->fillField('Image', implode("\n", $remote_paths));
     $this->assertMediaAdded();
     $assert_session = $this->assertSession();
     foreach ($filenames as $i => $filename) {
