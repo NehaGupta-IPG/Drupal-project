@@ -209,7 +209,7 @@ class WidgetUploadTest extends MediaLibraryTestBase {
     $this->openMediaLibraryForField('field_twin_media');
     $this->switchToMediaType('Four');
     // We set the multiple to FALSE if only one file can be uploaded.
-    $this->assertFalse($assert_session->fieldExists('Add file')->hasAttribute('multiple'));
+    $this->assertFalse($assert_session->fieldExists('Image')->hasAttribute('multiple'));
     $assert_session->pageTextContains('One file only.');
     $choose_files = $assert_session->elementExists('css', '.form-managed-file');
     $choose_files->hasButton('Choose file');
@@ -218,7 +218,7 @@ class WidgetUploadTest extends MediaLibraryTestBase {
     // Assert media type four should only allow jpg files by trying a png file
     // first.
     $png_uri_4 = $file_system->copy($png_image->uri, 'public://');
-    $this->addMediaFileToField('Add file', $file_system->realpath($png_uri_4));
+    $this->addMediaFileToField('Image', $file_system->realpath($png_uri_4));
     $this->waitForText('Only files with the following extensions are allowed');
     // Assert that jpg files are accepted by type four.
     $jpg_uri_2 = $file_system->copy($jpg_image->uri, 'public://');
@@ -560,7 +560,7 @@ class WidgetUploadTest extends MediaLibraryTestBase {
     $this->switchToMediaType('Four');
 
     // We set the multiple to FALSE if only one file can be uploaded.
-    $this->assertFalse($assert_session->fieldExists('Add file')->hasAttribute('multiple'));
+    $this->assertFalse($assert_session->fieldExists('Image')->hasAttribute('multiple'));
     $assert_session->pageTextContains('One file only.');
     $choose_files = $assert_session->elementExists('css', '.form-managed-file');
     $choose_files->hasButton('Choose file');
@@ -569,7 +569,7 @@ class WidgetUploadTest extends MediaLibraryTestBase {
     // Assert media type four should only allow jpg files by trying a png file
     // first.
     $png_uri_4 = $file_system->copy($png_image->uri, 'public://');
-    $this->addMediaFileToField('Add file', $file_system->realpath($png_uri_4));
+    $this->addMediaFileToField('Image', $file_system->realpath($png_uri_4));
     $this->waitForText('Only files with the following extensions are allowed');
     // Assert that jpg files are accepted by type four.
     $jpg_uri_2 = $file_system->copy($jpg_image->uri, 'public://');
