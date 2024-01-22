@@ -8,10 +8,12 @@ use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Config\ConfigImporterException;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityMalformedException;
+use Drupal\Core\Entity\UnsupportedEntityOperationException;
 use Drupal\Core\Entity\EntityStorageBase;
 use Drupal\Core\Config\Config;
 use Drupal\Core\Config\Entity\Exception\ConfigEntityIdLengthException;
 use Drupal\Core\Entity\EntityTypeInterface;
+use Drupal\Core\Installer\InstallerKernel;
 use Drupal\Component\Uuid\UuidInterface;
 use Drupal\Core\Language\LanguageManagerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -160,9 +162,21 @@ class ConfigEntityStorage extends EntityStorageBase implements ConfigEntityStora
     /** @var \Drupal\Core\Config\Config[] $configs */
     $configs = [];
     $records = [];
+
+    // Never load config with overrides when running updates.
+    if (defined('MAINTENANCE_MODE') && (MAINTENANCE_MODE == 'update' || InstallerKernel::installationAttempted())) {
+      $this->overrideFree = TRUE;
+    }
     foreach ($this->configFactory->loadMultiple($names) as $config) {
       $id = $config->get($this->idKey);
-      $records[$id] = $this->overrideFree ? $config->getOriginal(NULL, FALSE) : $config->get();
+      if ($this->overrideFree) {
+        $records[$id] = $config->getOriginal(NULL, FALSE);
+      }
+      else {
+        $records[$id] = $config->get();
+        $records[$id]['_core']['has_overrides'] = $config->hasOverrides();
+
+      }
       $configs[$id] = $config;
     }
     $entities = $this->mapFromStorageRecords($records);
@@ -170,6 +184,7 @@ class ConfigEntityStorage extends EntityStorageBase implements ConfigEntityStora
     // Config entities wrap config objects, and therefore they need to inherit
     // the cacheability metadata of config objects (to ensure e.g. additional
     // cacheability metadata added by config overrides is not lost).
+    /** @var \Drupal\Core\Config\Entity\ConfigEntityInterface $entity */
     foreach ($entities as $id => $entity) {
       // But rather than simply inheriting all cacheability metadata of config
       // objects, we need to make sure the self-referring cache tag that is
@@ -220,12 +235,19 @@ class ConfigEntityStorage extends EntityStorageBase implements ConfigEntityStora
    *
    * @throws \Drupal\Core\Entity\EntityMalformedException
    *   When attempting to save a configuration entity that has no ID.
+   * @throws \Drupal\Core\Entity\UnsupportedEntityOperationException
+   *   When attempting to save a config entity with config overrides.
    */
   public function save(EntityInterface $entity) {
     // Configuration entity IDs are strings, and '0' is a valid ID.
     $id = $entity->id();
     if ($id === NULL || $id === '') {
       throw new EntityMalformedException('The entity does not have an ID.');
+    }
+
+    /** @var \Drupal\Core\Config\Entity\ConfigEntityInterface $entity */
+    if ($entity->hasOverrides()) {
+      throw new UnsupportedEntityOperationException('A config entity with config overrides must not be saved. Use \Drupal\Core\Config\Entity\ConfigEntityStorageInterface::loadOverrideFree() to load a non-overridden config entity.');
     }
 
     // Check the configuration entity ID length.
@@ -357,7 +379,7 @@ class ConfigEntityStorage extends EntityStorageBase implements ConfigEntityStora
    */
   public function importUpdate($name, Config $new_config, Config $old_config) {
     $id = static::getIDFromConfigName($name, $this->entityType->getConfigPrefix());
-    $entity = $this->load($id);
+    $entity = $this->loadOverrideFree($id);
     if (!$entity) {
       throw new ConfigImporterException("Attempt to update non-existing entity '$id'.");
     }

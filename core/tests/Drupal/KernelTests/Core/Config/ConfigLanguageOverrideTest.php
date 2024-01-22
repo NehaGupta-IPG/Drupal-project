@@ -4,10 +4,14 @@ declare(strict_types=1);
 
 namespace Drupal\KernelTests\Core\Config;
 
+use Drupal\Core\Entity\UnsupportedEntityOperationException;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\language\Entity\ConfigurableLanguage;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
+
+// cspell:ignore Übersetzter
+// cspell:ignore Titel
 
 /**
  * Confirm that language overrides work.
@@ -31,6 +35,9 @@ class ConfigLanguageOverrideTest extends KernelTestBase {
   protected function setUp(): void {
     parent::setUp();
     $this->installConfig(['config_test']);
+
+    ConfigurableLanguage::createFromLangcode('fr')->save();
+    ConfigurableLanguage::createFromLangcode('de')->save();
   }
 
   /**
@@ -47,9 +54,6 @@ class ConfigLanguageOverrideTest extends KernelTestBase {
     // Ensure that the raw data is not translated.
     $raw = $config->getRawData();
     $this->assertSame('bar', $raw['foo']);
-
-    ConfigurableLanguage::createFromLangcode('fr')->save();
-    ConfigurableLanguage::createFromLangcode('de')->save();
 
     \Drupal::languageManager()->setConfigOverrideLanguage(\Drupal::languageManager()->getLanguage('fr'));
     $config = \Drupal::config('config_test.system');
@@ -124,6 +128,46 @@ class ConfigLanguageOverrideTest extends KernelTestBase {
     $override = \Drupal::languageManager()->getLanguageConfigOverride('de', 'config_test.bar');
     $this->assertTrue($override->isNew());
     $this->assertNull($override->get('value'));
+  }
+
+  /**
+   * Tests language overrides of config entities.
+   */
+  public function testConfigEntityLanguageOverrides(): void {
+    /** @var \Drupal\language\ConfigurableLanguageManagerInterface $language_manager */
+    $language_manager = \Drupal::languageManager();
+    $storage = \Drupal::entityTypeManager()->getStorage('config_test');
+
+    // Create a config entity and a language override.
+    $config_entity = $storage->create([
+      'id' => 'override_test',
+      'label' => 'Original language',
+    ]);
+    $config_entity->save();
+
+    $language_manager->setConfigOverrideLanguage($language_manager->getLanguage('de'));
+
+    // Load the entity while having an active config override, this should work.
+    $config_entity = $storage->load('override_test');
+    $config_entity->set('label', 'Changed label');
+    $config_entity->save();
+
+    $config_entity = $storage->load('override_test');
+    $this->assertEquals('Changed label', $config_entity->label());
+
+    $language_manager
+      ->getLanguageConfigOverride('de', 'config_test.dynamic.override_test')
+      ->set('label', 'Übersetzter Titel')
+      ->save();
+    \Drupal::configFactory()->reset();
+
+    $config_entity = $storage->load('override_test');
+    $this->assertEquals('Übersetzter Titel', $config_entity->label());
+
+    $config_entity->set('label', 'Changed again');
+    $this->expectException(UnsupportedEntityOperationException::class);
+    $this->expectExceptionMessage('A config entity with config overrides must not be saved. Use \Drupal\Core\Config\Entity\ConfigEntityStorageInterface::loadOverrideFree() to load a non-overridden config entity.');
+    $config_entity->save();
   }
 
 }

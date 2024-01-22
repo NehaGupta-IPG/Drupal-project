@@ -165,6 +165,11 @@ class DbUpdateController extends ControllerBase {
       $request->getSession()->set('update_ignore_warnings', TRUE);
     }
 
+    // Disable config entity overrides.
+    if (!defined('MAINTENANCE_MODE')) {
+      define('MAINTENANCE_MODE', 'update');
+    }
+
     $regions = [];
     $requirements = update_check_requirements();
     $severity = RequirementSeverity::maxSeverityFromRequirements($requirements);

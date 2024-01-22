@@ -180,4 +180,12 @@ interface ConfigEntityInterface extends EntityInterface, ThirdPartySettingsInter
    */
   public function hasTrustedData();
 
+  /**
+   * Returns whether the config entity has overridden configuration.
+   *
+   * @return bool
+   *   TRUE if the entity has overridden configuration.
+   */
+  public function hasOverrides(): bool;
+
 }

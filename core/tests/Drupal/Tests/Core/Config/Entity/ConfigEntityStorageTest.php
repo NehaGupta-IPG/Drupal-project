@@ -20,6 +20,7 @@ use Drupal\Core\Config\ImmutableConfig;
 use Drupal\Core\Config\TypedConfigManagerInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityMalformedException;
+use Drupal\Core\Entity\UnsupportedEntityOperationException;
 use Drupal\Core\Entity\EntityStorageException;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Entity\Query\QueryFactoryInterface;
@@ -28,6 +29,8 @@ use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Language\Language;
 use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\PreserveGlobalState;
+use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 use PHPUnit\Framework\MockObject\MockObject;
 use Prophecy\Argument;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -548,6 +551,7 @@ class ConfigEntityStorageTest extends UnitTestCase {
     $config_object->get('id')->willReturn('foo');
     $config_object->isNew()->willReturn(FALSE);
     $config_object->getName()->willReturn('foo');
+    $config_object->hasOverrides()->willReturn(FALSE);
     $config_object->getCacheContexts()->willReturn([]);
     $config_object->getCacheTags()->willReturn(['config:foo']);
     $config_object->getCacheMaxAge()->willReturn(Cache::PERMANENT);
@@ -573,6 +577,20 @@ class ConfigEntityStorageTest extends UnitTestCase {
   }
 
   /**
+   * @legaqcy-covers ::save
+   */
+  public function testSaveWithOverrides(): void {
+    $entity = $this->getMockEntity(['id' => 'foo'], ['hasOverrides']);
+    $entity->expects($this->once())
+      ->method('hasOverrides')
+      ->willReturn(TRUE);
+
+    $this->expectException(UnsupportedEntityOperationException::class);
+    $this->expectExceptionMessage('A config entity with config overrides must not be saved. Use \Drupal\Core\Config\Entity\ConfigEntityStorageInterface::loadOverrideFree() to load a non-overridden config entity.');
+    $this->entityStorage->save($entity);
+  }
+
+  /**
    * Tests load.
    *
    * @legacy-covers ::load
@@ -584,6 +602,7 @@ class ConfigEntityStorageTest extends UnitTestCase {
     $config_object = $this->prophesize(ImmutableConfig::class);
     $config_object->get()->willReturn(['id' => 'foo']);
     $config_object->get('id')->willReturn('foo');
+    $config_object->hasOverrides()->willReturn(FALSE);
     $config_object->getCacheContexts()->willReturn([]);
     $config_object->getCacheTags()->willReturn(['config:foo']);
     $config_object->getCacheMaxAge()->willReturn(Cache::PERMANENT);
@@ -595,6 +614,7 @@ class ConfigEntityStorageTest extends UnitTestCase {
     $entity = $this->entityStorage->load('foo');
     $this->assertInstanceOf(EntityInterface::class, $entity);
     $this->assertSame('foo', $entity->id());
+    $this->assertFalse($entity->hasOverrides());
 
     $this->expectException(\AssertionError::class);
     $this->expectExceptionMessage(sprintf('Cannot load the "%s" entity with NULL ID.', $this->entityTypeId));
@@ -617,10 +637,12 @@ class ConfigEntityStorageTest extends UnitTestCase {
     $foo_config_object->getCacheTags()->willReturn(['config:foo']);
     $foo_config_object->getCacheMaxAge()->willReturn(Cache::PERMANENT);
     $foo_config_object->getName()->willReturn('foo');
+    $foo_config_object->hasOverrides()->willReturn(FALSE);
 
     $bar_config_object = $this->prophesize(ImmutableConfig::class);
     $bar_config_object->get()->willReturn(['id' => 'bar']);
     $bar_config_object->get('id')->willReturn('bar');
+    $bar_config_object->hasOverrides()->willReturn(FALSE);
     $bar_config_object->getCacheContexts()->willReturn([]);
     $bar_config_object->getCacheTags()->willReturn(['config:bar']);
     $bar_config_object->getCacheMaxAge()->willReturn(Cache::PERMANENT);
@@ -653,6 +675,7 @@ class ConfigEntityStorageTest extends UnitTestCase {
     $config_object = $this->prophesize(ImmutableConfig::class);
     $config_object->get()->willReturn(['id' => 'foo']);
     $config_object->get('id')->willReturn('foo');
+    $config_object->hasOverrides()->willReturn(FALSE);
     $config_object->getCacheContexts()->willReturn([]);
     $config_object->getCacheTags()->willReturn(['config:foo']);
     $config_object->getCacheMaxAge()->willReturn(Cache::PERMANENT);
@@ -666,6 +689,89 @@ class ConfigEntityStorageTest extends UnitTestCase {
     foreach ($entities as $id => $entity) {
       $this->assertSame($id, $entity->id());
     }
+  }
+
+  /**
+   * @legacy-covers ::load
+   * @legacy-covers ::postLoad
+   * @legacy-covers ::mapFromStorageRecords
+   * @legacy-covers ::doLoadMultiple
+   */
+  public function testLoadWithOverrides(): void {
+    $config_object = $this->prophesize(ImmutableConfig::class);
+    $config_object->get()->willReturn(['id' => 'foo']);
+    $config_object->get('id')->willReturn('foo');
+    $config_object->hasOverrides()->willReturn(TRUE);
+    $config_object->getCacheContexts()->willReturn([]);
+    $config_object->getCacheTags()->willReturn(['config:foo']);
+    $config_object->getCacheMaxAge()->willReturn(Cache::PERMANENT);
+    $config_object->getName()->willReturn('foo');
+
+    $this->configFactory->loadMultiple(['the_provider.the_config_prefix.foo'])
+      ->willReturn([$config_object->reveal()]);
+
+    $entity = $this->entityStorage->load('foo');
+    $this->assertInstanceOf(EntityInterface::class, $entity);
+    $this->assertSame('foo', $entity->id());
+    $this->assertTrue($entity->hasOverrides());
+    $this->assertEquals([], $entity->get('_core'));
+  }
+
+  /**
+   * @legacy-covers ::load
+   * @legacy-covers ::postLoad
+   * @legacy-covers ::mapFromStorageRecords
+   * @legacy-covers ::doLoadMultiple
+   */
+  #[PreserveGlobalState(FALSE)]
+  #[RunInSeparateProcess]
+  public function testLoadWithOverridesMaintenanceMode() {
+
+    define('MAINTENANCE_MODE', 'update');
+
+    $config_object = $this->prophesize(ImmutableConfig::class);
+    $config_object->getOriginal(NULL, FALSE)->willReturn(['id' => 'foo', 'value' => 'original_value']);
+    $config_object->get()->willReturn(['id' => 'foo', 'value' => 'some_value']);
+    $config_object->get('id')->willReturn('foo');
+    $config_object->hasOverrides()->willReturn(FALSE);
+    $config_object->getCacheContexts()->willReturn([]);
+    $config_object->getCacheTags()->willReturn(['config:foo']);
+    $config_object->getCacheMaxAge()->willReturn(Cache::PERMANENT);
+    $config_object->getName()->willReturn('foo');
+
+    $this->configFactory->loadMultiple(['the_provider.the_config_prefix.foo'])
+      ->willReturn([$config_object->reveal()]);
+
+    $entity = $this->entityStorage->load('foo');
+    $this->assertInstanceOf(EntityInterface::class, $entity);
+    $this->assertSame('foo', $entity->id());
+    $this->assertSame('original_value', $entity->get('value'));
+    $this->assertFalse($entity->hasOverrides());
+  }
+
+  /**
+   * @legacy-covers ::load
+   * @legacy-covers ::postLoad
+   * @legacy-covers ::mapFromStorageRecords
+   * @legacy-covers ::doLoadMultiple
+   */
+  public function testLoadOverrideFree() {
+    $config_object = $this->prophesize(ImmutableConfig::class);
+    $config_object->getOriginal(NULL, FALSE)->willReturn(['id' => 'foo']);
+    $config_object->get('id')->willReturn('foo');
+    $config_object->hasOverrides()->willReturn(TRUE);
+    $config_object->getCacheContexts()->willReturn([]);
+    $config_object->getCacheTags()->willReturn(['config:foo']);
+    $config_object->getCacheMaxAge()->willReturn(Cache::PERMANENT);
+    $config_object->getName()->willReturn('foo');
+
+    $this->configFactory->loadMultiple(['the_provider.the_config_prefix.foo'])
+      ->willReturn([$config_object->reveal()]);
+
+    $entity = $this->entityStorage->loadOverrideFree('foo');
+    $this->assertInstanceOf(EntityInterface::class, $entity);
+    $this->assertSame('foo', $entity->id());
+    $this->assertFalse($entity->hasOverrides());
   }
 
   /**
