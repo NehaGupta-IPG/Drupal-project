@@ -837,6 +837,36 @@ abstract class AddFormBase extends FormBase implements BaseFormIdInterface, Trus
   }
 
   /**
+   * Returns the label of the source field for a media type.
+   *
+   * @param \Drupal\media\MediaTypeInterface $media_type
+   *   The media type to get the source field name for.
+   *
+   * @return string
+   *   The label of the media type's source field.
+   */
+  protected function getSourceFieldLabel(MediaTypeInterface $media_type) {
+    return $media_type->getSource()
+      ->getSourceFieldDefinition($media_type)
+      ->getLabel();
+  }
+
+  /**
+   * Returns the description of the source field for a media type.
+   *
+   * @param \Drupal\media\MediaTypeInterface $media_type
+   *   The media type to get the source field name for.
+   *
+   * @return string
+   *   The description of the media type's source field.
+   */
+  protected function getSourceFieldDescription(MediaTypeInterface $media_type) {
+    return $media_type->getSource()
+      ->getSourceFieldDefinition($media_type)
+      ->getDescription();
+  }
+
+  /**
    * Get all pre-selected media items from the form state.
    *
    * @param \Drupal\Core\Form\FormStateInterface $form_state

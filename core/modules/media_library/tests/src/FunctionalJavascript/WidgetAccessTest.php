@@ -113,7 +113,7 @@ class WidgetAccessTest extends MediaLibraryTestBase {
     ]);
     $this->drupalGet('media-library', $url_options);
     $assert_session->elementExists('css', '.js-media-library-view');
-    $assert_session->fieldExists('Add files');
+    $assert_session->fieldExists('Image');
 
     // Assert the media library can not be accessed if the required state
     // parameters are changed without changing the hash.
