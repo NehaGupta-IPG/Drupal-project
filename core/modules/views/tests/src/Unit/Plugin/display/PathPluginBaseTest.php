@@ -56,11 +56,11 @@ class PathPluginBaseTest extends UnitTestCase {
   protected $viewsData;
 
   /**
-   * The display plugin manager.
+   * The plugin manager for views plugins.
    *
-   * @var \Drupal\Component\Plugin\PluginManagerInterface;
+   * @var \Drupal\views\Plugin\ViewsPluginManager;
    */
-  protected $displayPluginManager;
+  protected $viewPluginManager;
 
   /**
    * {@inheritdoc}
@@ -74,26 +74,7 @@ class PathPluginBaseTest extends UnitTestCase {
       ->disableOriginalConstructor()
       ->getMock();
 
-    $this->displayPluginManager = $this->getMockBuilder('\Drupal\views\Plugin\ViewsPluginManager')
-      ->disableOriginalConstructor()
-      ->getMock();
-
-    $this->displayPluginManager1 = $this->getMockBuilder('\Drupal\views\Plugin\ViewsPluginManager')
-      ->disableOriginalConstructor()
-      ->getMock();
-    $this->displayPluginManager2 = $this->getMockBuilder('\Drupal\views\Plugin\ViewsPluginManager')
-      ->disableOriginalConstructor()
-      ->getMock();
-    $this->displayPluginManager3 = $this->getMockBuilder('\Drupal\views\Plugin\ViewsPluginManager')
-      ->disableOriginalConstructor()
-      ->getMock();
-    $this->displayPluginManager4 = $this->getMockBuilder('\Drupal\views\Plugin\ViewsPluginManager')
-      ->disableOriginalConstructor()
-      ->getMock();
-    $this->displayPluginManager5 = $this->getMockBuilder('\Drupal\views\Plugin\ViewsPluginManager')
-      ->disableOriginalConstructor()
-      ->getMock();
-    $this->displayPluginManager6 = $this->getMockBuilder('\Drupal\views\Plugin\ViewsPluginManager')
+    $this->viewPluginManager = $this->getMockBuilder('\Drupal\views\Plugin\ViewsPluginManager')
       ->disableOriginalConstructor()
       ->getMock();
 
@@ -107,13 +88,13 @@ class PathPluginBaseTest extends UnitTestCase {
         $this->routeProvider,
         $this->state,
         $this->viewsData,
-        $this->accessPluginManager,
-        $this->displayPluginManager,
-        $this->displayPluginManager,
-        $this->displayPluginManager,
-        $this->displayPluginManager,
-        $this->displayPluginManager,
-        $this->displayPluginManager,
+        $this->viewPluginManager,
+        $this->viewPluginManager,
+        $this->viewPluginManager,
+        $this->viewPluginManager,
+        $this->viewPluginManager,
+        $this->viewPluginManager,
+        $this->viewPluginManager,
       ])
       ->onlyMethods([])
       ->getMock();
@@ -158,8 +139,6 @@ class PathPluginBaseTest extends UnitTestCase {
       ->method('get')
       ->willReturn([]);
     $container->set('cache.data', $cache);
-
-    $container->set('plugin.manager.views.access', $this->accessPluginManager);
 
     $cache_plugin_manager = $this->getMockBuilder('\Drupal\views\Plugin\ViewsPluginManager')
       ->disableOriginalConstructor()
@@ -249,13 +228,13 @@ class PathPluginBaseTest extends UnitTestCase {
         $this->routeProvider,
         $this->state,
         $this->viewsData,
-        $this->displayPluginManager,
-        $this->displayPluginManager,
-        $this->displayPluginManager,
-        $this->displayPluginManager,
-        $this->displayPluginManager,
-        $this->displayPluginManager,
-        $this->displayPluginManager,
+        $this->viewPluginManager,
+        $this->viewPluginManager,
+        $this->viewPluginManager,
+        $this->viewPluginManager,
+        $this->viewPluginManager,
+        $this->viewPluginManager,
+        $this->viewPluginManager,
       ])
       ->onlyMethods([])
       ->getMock();
