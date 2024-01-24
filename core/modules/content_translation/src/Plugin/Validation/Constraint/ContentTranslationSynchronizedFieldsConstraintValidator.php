@@ -2,6 +2,7 @@
 
 namespace Drupal\content_translation\Plugin\Validation\Constraint;
 
+use Drupal\content_moderation\ModerationInformationInterface;
 use Drupal\content_translation\ContentTranslationManagerInterface;
 use Drupal\content_translation\FieldTranslationSynchronizerInterface;
 use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
@@ -56,6 +57,13 @@ class ContentTranslationSynchronizedFieldsConstraintValidator extends Constraint
   protected $synchronizer;
 
   /**
+   * The moderation information service.
+   *
+   * @var \Drupal\content_moderation\ModerationInformationInterface
+   */
+  protected $moderationInformation;
+
+  /**
    * ContentTranslationSynchronizedFieldsConstraintValidator constructor.
    *
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
@@ -64,11 +72,14 @@ class ContentTranslationSynchronizedFieldsConstraintValidator extends Constraint
    *   The content translation manager.
    * @param \Drupal\content_translation\FieldTranslationSynchronizerInterface $synchronizer
    *   The field translation synchronizer.
+   * @param \Drupal\content_moderation\ModerationInformationInterface $moderation_information
+   *   The moderation information service.
    */
-  public function __construct(EntityTypeManagerInterface $entity_type_manager, ContentTranslationManagerInterface $content_translation_manager, FieldTranslationSynchronizerInterface $synchronizer) {
+  public function __construct(EntityTypeManagerInterface $entity_type_manager, ContentTranslationManagerInterface $content_translation_manager, FieldTranslationSynchronizerInterface $synchronizer, ModerationInformationInterface $moderation_information) {
     $this->entityTypeManager = $entity_type_manager;
     $this->contentTranslationManager = $content_translation_manager;
     $this->synchronizer = $synchronizer;
+    $this->moderationInformation = $moderation_information;
   }
 
   /**
@@ -78,7 +89,8 @@ class ContentTranslationSynchronizedFieldsConstraintValidator extends Constraint
     return new static(
       $container->get('entity_type.manager'),
       $container->get('content_translation.manager'),
-      $container->get('content_translation.synchronizer')
+      $container->get('content_translation.synchronizer'),
+      $container->get('content_moderation.moderation_information')
     );
   }
 
@@ -111,10 +123,8 @@ class ContentTranslationSynchronizedFieldsConstraintValidator extends Constraint
     $original_translation = $this->getOriginalTranslation($entity, $original);
     if ($this->hasSynchronizedPropertyChanges($entity, $original_translation, $synchronized_properties)) {
       if ($entity->isDefaultTranslationAffectedOnly()) {
-        /** @var \Drupal\content_moderation\ModerationInformation $moderation_information */
-        $moderation_information = \Drupal::service('content_moderation.moderation_information');
         foreach ($entity->getTranslationLanguages(FALSE) as $langcode => $language) {
-          if ($entity->getTranslation($langcode)->hasTranslationChanges() && !$moderation_information->isModeratedEntity($entity->getTranslation($langcode))) {
+          if ($entity->getTranslation($langcode)->hasTranslationChanges() && !$this->moderationInformation->isModeratedEntity($entity->getTranslation($langcode))) {
             $this->context->addViolation($constraint->defaultTranslationMessage);
             break;
           }
