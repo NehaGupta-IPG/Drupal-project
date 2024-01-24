@@ -114,9 +114,7 @@ class ContentTranslationSynchronizedFieldsConstraintValidator extends Constraint
         /** @var \Drupal\content_moderation\ModerationInformation $moderation_information */
         $moderation_information = \Drupal::service('content_moderation.moderation_information');
         foreach ($entity->getTranslationLanguages(FALSE) as $langcode => $language) {
-          if ($entity->getTranslation($langcode)->hasTranslationChanges()
-		        && !$moderation_information->isModeratedEntity($entity->getTranslation($langcode))
-		      ) {
+          if ($entity->getTranslation($langcode)->hasTranslationChanges() && !$moderation_information->isModeratedEntity($entity->getTranslation($langcode))) {
             $this->context->addViolation($constraint->defaultTranslationMessage);
             break;
           }
