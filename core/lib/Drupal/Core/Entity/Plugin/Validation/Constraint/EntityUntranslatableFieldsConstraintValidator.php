@@ -2,7 +2,6 @@
 
 namespace Drupal\Core\Entity\Plugin\Validation\Constraint;
 
-use Drupal\content_moderation\ModerationInformationInterface;
 use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
 use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Entity\EntityChangesDetectionTrait;
@@ -26,13 +25,6 @@ class EntityUntranslatableFieldsConstraintValidator extends ConstraintValidator 
   protected $entityTypeManager;
 
   /**
-   * The moderation information service.
-   *
-   * @var \Drupal\content_moderation\ModerationInformationInterface
-   */
-  protected $moderationInformation;
-
-  /**
    * Constructs an EntityUntranslatableFieldsConstraintValidator object.
    *
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
@@ -40,9 +32,8 @@ class EntityUntranslatableFieldsConstraintValidator extends ConstraintValidator 
    * @param \Drupal\content_moderation\ModerationInformationInterface $moderation_information
    *   The moderation information service.
    */
-  public function __construct(EntityTypeManagerInterface $entity_type_manager, ModerationInformationInterface $moderation_information) {
+  public function __construct(EntityTypeManagerInterface $entity_type_manager) {
     $this->entityTypeManager = $entity_type_manager;
-    $this->moderationInformation = $moderation_information;
   }
 
   /**
@@ -50,8 +41,7 @@ class EntityUntranslatableFieldsConstraintValidator extends ConstraintValidator 
    */
   public static function create(ContainerInterface $container) {
     return new static(
-      $container->get('entity_type.manager'),
-      $container->get('content_moderation.moderation_information')
+      $container->get('entity_type.manager')
     );
   }
 
@@ -83,8 +73,11 @@ class EntityUntranslatableFieldsConstraintValidator extends ConstraintValidator 
     // in default revisions.
     if ($this->hasUntranslatableFieldsChanges($entity)) {
       if ($entity->isDefaultTranslationAffectedOnly()) {
+        $moderationInformation = \Drupal::hasService('content_moderation.moderation_information') ?
+          \Drupal::service('content_moderation.moderation_information') :
+          NULL;
         foreach ($entity->getTranslationLanguages(FALSE) as $langcode => $language) {
-          if ($entity->getTranslation($langcode)->hasTranslationChanges() && !$this->moderationInformation->isModeratedEntity($entity->getTranslation($langcode))) {
+          if ($entity->getTranslation($langcode)->hasTranslationChanges() && ($moderationInformation === NULL || !$moderationInformation->isModeratedEntity($entity->getTranslation($langcode)))) {
             $this->context->addViolation($constraint->defaultTranslationMessage);
             break;
           }
