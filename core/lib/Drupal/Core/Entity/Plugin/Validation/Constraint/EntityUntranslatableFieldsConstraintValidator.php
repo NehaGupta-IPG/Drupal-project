@@ -29,8 +29,6 @@ class EntityUntranslatableFieldsConstraintValidator extends ConstraintValidator 
    *
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager.
-   * @param \Drupal\content_moderation\ModerationInformationInterface $moderation_information
-   *   The moderation information service.
    */
   public function __construct(EntityTypeManagerInterface $entity_type_manager) {
     $this->entityTypeManager = $entity_type_manager;
