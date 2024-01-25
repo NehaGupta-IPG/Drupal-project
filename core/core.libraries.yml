@@ -606,6 +606,16 @@ drupal.fieldgroup:
     component:
       misc/components/fieldgroup.module.css: {}
 
+drupal.filter:
+  version: VERSION
+  js:
+    misc/drupal-filter.js: {}
+  dependencies:
+    - core/drupal
+    - core/drupal.announce
+    - core/drupal.debounce
+    - core/once
+
 drupal.form:
   version: VERSION
   js:

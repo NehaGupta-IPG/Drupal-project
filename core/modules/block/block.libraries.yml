@@ -17,8 +17,7 @@ drupal.block.admin:
   dependencies:
     - core/jquery
     - core/drupal
-    - core/drupal.announce
-    - core/drupal.debounce
+    - core/drupal.filter
     - core/drupal.dialog.ajax
     - core/drupal.tabledrag
     - core/drupal.vertical-tabs

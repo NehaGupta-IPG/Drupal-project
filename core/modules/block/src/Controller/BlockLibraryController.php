@@ -147,8 +147,11 @@ class BlockLibraryController extends ControllerBase {
       '#size' => 30,
       '#placeholder' => $this->t('Filter by block name'),
       '#attributes' => [
-        'class' => ['block-filter-text'],
-        'data-element' => '.block-add-table',
+        'class' => ['table-filter-text'],
+        'data-table' => '.block-add-table',
+        'data-items' => 'tbody tr',
+        'data-singular' => 'block',
+        'data-plural' => 'blocks',
         'title' => $this->t('Enter a part of the block name to filter by.'),
       ],
     ];

@@ -163,6 +163,10 @@ class ModulesListForm extends FormBase {
       '#attributes' => [
         'class' => ['table-filter-text'],
         'data-table' => '#system-modules',
+        'data-items' => '.package-listing table tbody tr',
+        'data-targets' => '.table-filter-text-source, .module-name, .module-description',
+        'data-singular' => 'module',
+        'data-plural' => 'modules',
         'autocomplete' => 'off',
       ],
     ];
@@ -210,7 +214,10 @@ class ModulesListForm extends FormBase {
         '#title' => Markup::create(Xss::filterAdmin($this->t($package))),
         '#open' => TRUE,
         '#theme' => 'system_modules_details',
-        '#attributes' => ['class' => ['package-listing']],
+        '#attributes' => [
+          'class' => ['package-listing'],
+          'data-filter-label' => 'package-' . $package,
+        ],
         // Ensure that the "Core" package comes first.
         '#weight' => $package == 'Core' ? -10 : NULL,
       ];
@@ -255,6 +262,8 @@ class ModulesListForm extends FormBase {
     $row['#required'] = [];
     $row['#requires'] = [];
     $row['#required_by'] = [];
+
+    $row['#attributes'] = ['data-filter-labelledby' => 'package-' . $module->info['package']];
 
     $lifecycle = $module->info[ExtensionLifecycle::LIFECYCLE_IDENTIFIER];
     $row['name']['#markup'] = $module->info['name'];

@@ -132,8 +132,12 @@ class ChooseBlockController implements ContainerInjectionInterface {
       '#size' => 30,
       '#placeholder' => $this->t('Filter by block name'),
       '#attributes' => [
-        'class' => ['js-layout-builder-filter'],
+        'class' => ['table-filter-text'],
         'title' => $this->t('Enter a part of the block name to filter by.'),
+        'data-table' => '.js-layout-builder-categories',
+        'data-items' => '.js-layout-builder-block-link',
+        'data-singular' => 'block',
+        'data-plural' => 'blocks',
       ],
     ];
 
@@ -151,9 +155,10 @@ class ChooseBlockController implements ContainerInjectionInterface {
     foreach ($grouped_definitions as $category => $blocks) {
       $block_categories[$category]['#type'] = 'details';
       $block_categories[$category]['#attributes']['class'][] = 'js-layout-builder-category';
+      $block_categories[$category]['#attributes']['data-filter-label']= 'block-' . $category;
       $block_categories[$category]['#open'] = TRUE;
       $block_categories[$category]['#title'] = $category;
-      $block_categories[$category]['links'] = $this->getBlockLinks($section_storage, $delta, $region, $blocks);
+      $block_categories[$category]['links'] = $this->getBlockLinks($section_storage, $delta, $region, $blocks, $category);
     }
     $build['block_categories'] = $block_categories;
     return $build;
@@ -221,11 +226,12 @@ class ChooseBlockController implements ContainerInjectionInterface {
    * @return array
    *   The block links render array.
    */
-  protected function getBlockLinks(SectionStorageInterface $section_storage, int $delta, $region, array $blocks) {
+  protected function getBlockLinks(SectionStorageInterface $section_storage, int $delta, $region, array $blocks, string $category) {
     $links = [];
     foreach ($blocks as $block_id => $block) {
       $attributes = $this->getAjaxAttributes();
       $attributes['class'][] = 'js-layout-builder-block-link';
+      $attributes['data-filter-labelledby'] = 'block-' . $category;
       $link = [
         'title' => $block['admin_label'],
         'url' => Url::fromRoute('layout_builder.add_block',
