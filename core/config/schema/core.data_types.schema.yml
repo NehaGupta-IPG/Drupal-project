@@ -275,7 +275,7 @@ theme_settings:
           constraints:
             Regex:
               pattern: '/^image\/[a-z_\-\+]+$/'
-              message: "The %value machine name is not valid."
+              message: "%value is not a valid image MIME type."
         path:
           type: string
           label: 'Path'
