@@ -76,11 +76,6 @@ class ComposerProjectTemplatesTest extends ComposerBuildTestBase {
         'composer/Template/RecommendedProject',
         '/web',
       ],
-      'legacy-project' => [
-        'drupal/legacy-project',
-        'composer/Template/LegacyProject',
-        '',
-      ],
     ];
   }
 
@@ -326,17 +321,6 @@ class ComposerProjectTemplatesTest extends ComposerBuildTestBase {
         "dist": {
           "type": "path",
           "url": "composer/Template/RecommendedProject"
-        },
-        "type": "project",
-        "version": "$version"
-      }
-    },
-    "drupal/legacy-project": {
-      "$version": {
-        "name": "drupal/legacy-project",
-        "dist": {
-          "type": "path",
-          "url": "composer/Template/LegacyProject"
         },
         "type": "project",
         "version": "$version"
