@@ -293,9 +293,9 @@ theme_settings:
         use_default:
           type: boolean
           label: 'Use the default shortcut icon supplied by the theme'
-            # If this is `true`, then `mimetype` and `path` are indeed optional keys. But if this is `false`, then they
-            # MUST be specified.
-            # @todo Figure out how to conditionally require other keys … without changing the config schema structure
+          # If this is `true`, then `mimetype` and `path` are indeed optional keys. But if this is `false`, then they
+          # MUST be specified.
+          # @todo Figure out how to conditionally require other keys … without changing the config schema structure
           constraints: {}
     features:
       # @todo Figure out how to make each of these keys required if and only if:
