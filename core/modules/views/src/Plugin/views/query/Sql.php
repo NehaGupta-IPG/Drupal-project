@@ -276,6 +276,7 @@ class Sql extends QueryPluginBase {
   public function setCountField($table, $field, $alias = NULL) {
     if (empty($alias)) {
       $alias = $table . '_' . $field;
+      $alias = $this->sanitizeAlias($alias);
     }
     $this->count_field = [
       'table' => $table,
@@ -409,6 +410,7 @@ class Sql extends QueryPluginBase {
     while (!empty($this->relationships[$alias])) {
       $alias = $alias_base . '_' . $count++;
     }
+    $alias = $this->sanitizeAlias($alias);
 
     // Make sure this join is adjusted for our relationship.
     if ($link_point && isset($this->relationships[$link_point])) {
@@ -529,6 +531,7 @@ class Sql extends QueryPluginBase {
       else {
         $alias = $relationship . '_' . $table;
       }
+      $alias = $this->sanitizeAlias($alias);
     }
 
     // Check this again to make sure we don't blow up existing aliases for
@@ -538,10 +541,12 @@ class Sql extends QueryPluginBase {
     }
 
     $alias = $this->markTable($table, $relationship, $alias);
+    $alias = $this->sanitizeAlias($alias);
 
     // If no alias is specified, give it the default.
-    if (!isset($alias)) {
+    if (empty($alias)) {
       $alias = $this->tables[$relationship][$table]['alias'] . $this->tables[$relationship][$table]['count'];
+      $alias = $this->sanitizeAlias($alias);
     }
 
     // If this is a relationship based table, add a marker with
@@ -572,6 +577,38 @@ class Sql extends QueryPluginBase {
   }
 
   /**
+   * Produce a safe alias value.
+   *
+   * We limit the length of the original alias (to a default maximum of 60
+   * characters), incorporating a hash of the original value for uniqueness
+   * if that value was too long to use verbatim.
+   *
+   * This prevents subsequent truncation from creating duplicate aliases
+   * in cases where two or more aliases are identical up to the point of
+   * truncation.  This happens particularly easily with relationships,
+   * where alias names may be built from several concatenated identifiers.
+   *
+   * @param $alias
+   *   The alias to sanitize.
+   * @param $maxlength
+   *   The maximum permitted length for the alias.  Defaults to 60 chars.
+   *
+   * @return string
+   *   The sanitized alias.
+   */
+  public static function sanitizeAlias($alias, $maxlength = 60) {
+    if (!is_string($alias)) {
+      return $alias;
+    }
+    if (strlen($alias) > $maxlength) {
+      $checksum = 'c' . crc32($alias);
+      $pos = strlen($checksum) + strlen($alias) - $maxlength;
+      $alias = $checksum . substr($alias, $pos);
+    }
+    return strtolower(substr($alias, 0, $maxlength));
+  }
+
+  /**
    * Marks a relationship based table as included.
    */
   protected function markTable($table, $relationship, $alias) {
@@ -585,6 +622,7 @@ class Sql extends QueryPluginBase {
           $alias = $relationship . '__';
         }
         $alias .= $table;
+        $alias = $this->sanitizeAlias($alias);
       }
       $this->tables[$relationship][$table] = [
         'count' => 1,
@@ -831,6 +869,10 @@ class Sql extends QueryPluginBase {
       if (!empty($this->tableQueue[$alias])) {
         return $this->tableQueue[$alias];
       }
+      $alias = $this->sanitizeAlias($alias);
+      if (!empty($this->tableQueue[$alias])) {
+        return $this->tableQueue[$alias];
+      }
     }
   }
 
@@ -881,10 +923,7 @@ class Sql extends QueryPluginBase {
 
     // PostgreSQL truncates aliases to 63 characters:
     // https://www.drupal.org/node/571548.
-
-    // We limit the length of the original alias up to 60 characters
-    // to get a unique alias later if its have duplicates.
-    $alias = strtolower(substr($alias, 0, 60));
+    $alias = $this->sanitizeAlias($alias);
 
     // Create a field info array.
     $field_info = [
@@ -899,7 +938,8 @@ class Sql extends QueryPluginBase {
     $base = $alias;
     $counter = 0;
     while (!empty($this->fields[$alias]) && $this->fields[$alias] != $field_info) {
-      $field_info['alias'] = $alias = $base . '_' . ++$counter;
+      $alias = $this->sanitizeAlias($base . '_' . ++$counter);
+      $field_info['alias'] = $alias;
     }
 
     if (empty($this->fields[$alias])) {

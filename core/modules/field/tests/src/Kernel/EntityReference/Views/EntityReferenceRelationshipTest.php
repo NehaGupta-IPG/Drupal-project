@@ -10,6 +10,7 @@ use Drupal\entity_test\Entity\EntityTestMulChanged;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\Tests\field\Traits\EntityReferenceFieldCreationTrait;
 use Drupal\Tests\views\Kernel\ViewsKernelTestBase;
+use Drupal\views\Plugin\views\query\Sql;
 use Drupal\views\Tests\ViewTestData;
 use Drupal\views\Views;
 use PHPUnit\Framework\Attributes\Group;
@@ -141,7 +142,8 @@ class EntityReferenceRelationshipTest extends ViewsKernelTestBase {
       $this->assertEquals($this->entities[$index]->id(), $row->_entity->id());
 
       // Test the forward relationship.
-      $this->assertEquals(1, $row->entity_test_mul_property_data_entity_test__field_test_data_i);
+      $alias = Sql::sanitizeAlias('entity_test_mul_property_data_entity_test__field_test_data_id');
+      $this->assertEquals(1, $row->{$alias});
 
       // Test that the correct relationship entity is on the row.
       $this->assertEquals(1, $row->_relationship_entities['field_test_data']->id());
