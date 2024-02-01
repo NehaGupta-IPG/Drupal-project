@@ -6,6 +6,7 @@ use Drupal\Component\Render\FormattableMarkup;
 use Drupal\Core\Test\AssertMailTrait;
 use Drupal\Core\Url;
 use Drupal\Tests\BrowserTestBase;
+use Drupal\Tests\UiHelperTrait;
 use Drupal\user\Controller\MailChangeController;
 use Drupal\user\Entity\User;
 
@@ -17,6 +18,7 @@ use Drupal\user\Entity\User;
 class UserMailChangeTest extends BrowserTestBase {
 
   use AssertMailTrait;
+  use UiHelperTrait;
 
   /**
    * The user object to test password resetting for.
@@ -227,6 +229,8 @@ class UserMailChangeTest extends BrowserTestBase {
     $this->drupalLogout();
     $this->drupalGet($path);
     $this->assertSession()->responseContains(new FormattableMarkup('Your email address has been changed to %mail.', ['%mail' => $new_mail]));
+    // Confirm the user was not logged in.
+    $this->assertFalse($this->drupalUserIsLoggedIn($this->account));
   }
 
   /**
