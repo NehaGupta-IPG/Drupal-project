@@ -120,19 +120,21 @@ function user_login_finalize(UserInterface $account): void {
  *   (optional) A keyed array of settings. Supported options are:
  *   - langcode: A language code to be used when generating locale-sensitive
  *    URLs. If langcode is NULL the users preferred language is used.
+ *   - new_mail: The new user email when in the process of changing the
+ *     account email address.
  *
  * @return string
  *   A unique URL that provides a one-time log in for the user, from which
  *   they can change their password.
  */
-function user_pass_reset_url($account, $options = []) {
+function user_pass_reset_url($account, $options = [], $new_mail = NULL) {
   $timestamp = \Drupal::time()->getCurrentTime();
   $langcode = $options['langcode'] ?? $account->getPreferredLangcode();
   return Url::fromRoute('user.reset',
     [
       'uid' => $account->id(),
       'timestamp' => $timestamp,
-      'hash' => user_pass_rehash($account, $timestamp),
+      'hash' => user_pass_rehash($account, $timestamp, $new_mail),
     ],
     [
       'absolute' => TRUE,
@@ -410,7 +412,8 @@ function user_cancel_methods(): array {
  */
 function user_mail_tokens(&$replacements, $data, $options): void {
   if (isset($data['user'])) {
-    $replacements['[user:one-time-login-url]'] = user_pass_reset_url($data['user'], $options);
+    $new_mail = $options['new_mail'] ?? NULL;
+    $replacements['[user:one-time-login-url]'] = user_pass_reset_url($data['user'], $options, $new_mail);
     if ($data['user']->getEmail()) {
       $replacements['[user:mail-change-url]'] = MailChangeController::getUrl($data['user'], $options)->toString();
     }
@@ -526,6 +529,9 @@ function user_role_revoke_permissions($rid, array $permissions = []): void {
  * @param \Drupal\Core\Session\AccountInterface $account
  *   The user object of the account being notified. Must contain at
  *   least the fields 'uid', 'name', and 'mail'.
+ * @param string|null $new_mail
+ *   The new user email when in the process of changing the account email
+ *   address.
  *
  * @return array|null
  *   An array containing various information about the message, as they are
@@ -535,10 +541,11 @@ function user_role_revoke_permissions($rid, array $permissions = []): void {
  * @see user_mail_tokens()
  * @see \Drupal\Core\Mail\MailManagerInterface::mail()
  */
-function _user_mail_notify($op, AccountInterface $account) {
+function _user_mail_notify($op, AccountInterface $account, string $new_mail = NULL) {
 
   if (\Drupal::config('user.settings')->get('notify.' . $op)) {
     $params['account'] = $account;
+    $params['new_mail'] = $new_mail;
     // Get the custom site notification email to use as the from email address
     // if it has been set.
     $site_mail = \Drupal::config('system.site')->get('mail_notification');

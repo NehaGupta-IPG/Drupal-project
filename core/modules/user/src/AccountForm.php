@@ -465,9 +465,7 @@ abstract class AccountForm extends ContentEntityForm implements TrustedCallbackI
     // Send a verification to the new email address.
     /** @var \Drupal\user\UserInterface $account */
     $account = $this->getEntity();
-    $account_cloned = clone $account;
-    $account_cloned->setEmail($new_mail);
-    if (_user_mail_notify('mail_change_verification', $account_cloned) == NULL) {
+    if (_user_mail_notify('mail_change_verification', $account, $new_mail) == NULL) {
       // Make the change immediately if no verification email is configured.
       $account->setEmail($new_mail);
       $account->save();
@@ -475,7 +473,7 @@ abstract class AccountForm extends ContentEntityForm implements TrustedCallbackI
     }
     // Send notification email to the old email address, if it's set.
     if ($account->getEmail()) {
-      _user_mail_notify('mail_change_notification', $account);
+      _user_mail_notify('mail_change_notification', $account, NULL);
     }
     $this->messenger()
       ->addWarning($this->t('You must confirm your email address. Further instructions have been sent to your new email address.'));

@@ -129,6 +129,8 @@ class MailChangeController extends ControllerBase {
    *   (optional) A keyed array of settings. Supported options are:
    *   - langcode: A language code to be used when generating locale-sensitive
    *     URLs. If not specified, the user's preferred language is used.
+   *   - new_mail: The new user email when in the process of changing the
+   *     account email address.
    * @param int $timestamp
    *   (optional) The timestamp when hash is created. Defaults to the current
    *   request time.
@@ -142,15 +144,17 @@ class MailChangeController extends ControllerBase {
   public static function getUrl(UserInterface $account, array $options = [], $timestamp = NULL, $hash = NULL): Url {
     $timestamp = $timestamp ?: \Drupal::time()->getRequestTime();
     $langcode = $options['langcode'] ?? $account->getPreferredLangcode();
-    $hash = empty($hash) ? user_pass_rehash($account, $timestamp) : $hash;
+    $new_mail = $options['new_mail'] ?? NULL;
+    $hash = empty($hash) ? user_pass_rehash($account, $timestamp, $new_mail) : $hash;
     $url_options = [
       'absolute' => TRUE,
       'language' => \Drupal::service('language_manager')->getLanguage($langcode),
     ];
+
     return Url::fromRoute('user.mail_change', [
       'user' => $account->id(),
       'timestamp' => $timestamp,
-      'new_mail' => $account->getEmail(),
+      'new_mail' => $options['new_mail'] ?? $account->getEmail(),
       'hash' => $hash,
     ], $url_options);
   }

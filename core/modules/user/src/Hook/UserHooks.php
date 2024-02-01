@@ -232,9 +232,13 @@ class UserHooks {
     $original_language = $language_manager->getConfigOverrideLanguage();
     $language_manager->setConfigOverrideLanguage($language);
     $mail_config = \Drupal::config('user.mail');
-    $token_options = ['langcode' => $langcode, 'callback' => 'user_mail_tokens', 'clear' => TRUE];
+    $token_options = ['langcode' => $langcode, 'callback' => 'user_mail_tokens', 'clear' => TRUE, 'new_mail' => $params['new_mail']];
     $message['subject'] .= PlainTextOutput::renderFromHtml($token_service->replace($mail_config->get($key . '.subject'), $variables, $token_options));
     $message['body'][] = $token_service->replacePlain($mail_config->get($key . '.body'), $variables, $token_options);
+    // Send to the new email if this is
+    if ($key === "mail_change_verification") {
+      $message['to'] = $params['new_mail'] ?? $message['to'];
+    }
     $language_manager->setConfigOverrideLanguage($original_language);
   }
 

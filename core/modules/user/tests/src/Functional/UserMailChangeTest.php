@@ -192,9 +192,8 @@ class UserMailChangeTest extends BrowserTestBase {
    */
   public function testBlockedUser(): void {
     $timestamp = $this->time->getRequestTime() - 1;
-    $account_cloned = clone $this->account;
-    $account_cloned->block()->save();
-    $this->drupalGet(MailChangeController::getUrl($account_cloned, [], $timestamp)->getInternalPath());
+    $this->account->block()->save();
+    $this->drupalGet(MailChangeController::getUrl($this->account, [], $timestamp)->getInternalPath());
     $this->assertSession()->statusCodeEquals(403);
   }
 
@@ -219,7 +218,8 @@ class UserMailChangeTest extends BrowserTestBase {
     // logged in.
     $new_mail = $this->getRandomEmailAddress();
     $this->account->setEmail($new_mail);
-    $path = MailChangeController::getUrl($this->account, [], $timestamp)->getInternalPath();
+    $options['new_mail'] = $new_mail;
+    $path = MailChangeController::getUrl($this->account, $options, $timestamp)->getInternalPath();
     $this->drupalGet($path);
     $this->assertSession()->responseContains(new FormattableMarkup('You are currently logged in as %user, and are attempting to confirm an email address change for another account. <a href=":logout">Log out</a> and try using the link again.', ['%user' => $current_account->getAccountName(), ':logout' => Url::fromRoute('user.logout')->toString()]));
 
