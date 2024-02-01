@@ -87,10 +87,6 @@ class MailChangeController extends ControllerBase {
       // Save the new email and also refresh the last login time so that this
       // email change link is expired.
       $user->setEmail($new_mail)->setLastLoginTime($request_time)->save();
-      // Reflect the changes in the session if the user is logged in.
-      if ($current_user->isAuthenticated() && $current_user->id() === $user->id()) {
-        $current_user->setAccount($user);
-      }
       $arguments = ['%mail' => $new_mail];
       $messenger->addStatus($this->t('Your email address has been changed to %mail.', $arguments));
       $this->flood->clear('user.email_change_user', $user->id());
