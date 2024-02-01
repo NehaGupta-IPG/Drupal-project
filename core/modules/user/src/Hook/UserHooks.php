@@ -236,7 +236,7 @@ class UserHooks {
     $token_options = ['langcode' => $langcode, 'callback' => 'user_mail_tokens', 'clear' => TRUE, 'new_mail' => $new_mail];
     $message['subject'] .= PlainTextOutput::renderFromHtml($token_service->replace($mail_config->get($key . '.subject'), $variables, $token_options));
     $message['body'][] = $token_service->replacePlain($mail_config->get($key . '.body'), $variables, $token_options);
-    // Send to the new email if this is
+    // Send to the new email when this is a mail change verification.
     if ($key === "mail_change_verification") {
       $message['to'] = $params['new_mail'] ?? $message['to'];
     }

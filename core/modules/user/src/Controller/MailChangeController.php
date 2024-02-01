@@ -29,20 +29,20 @@ class MailChangeController extends ControllerBase {
   /**
    * Returns the user mail change page.
    *
-   * In order to never disclose an email change link via a referrer header this
-   * controller must always return a redirect response.
+   * This controller must return a redirect response. This is to prevent
+   * disclosure of an email change link via a referrer header.
    *
    * @param \Drupal\user\UserInterface $user
-   *   The user account requesting email change.
+   *   The user account requesting an email change.
    * @param string $new_mail
-   *   The user's new email address.
+   *   The new email address.
    * @param int $timestamp
    *   The timestamp when the hash was created.
    * @param string $hash
    *   Unique hash.
    *
    * @return \Symfony\Component\HttpFoundation\RedirectResponse
-   *   An HTTP response doing a redirect.
+   *   An HTTP redirect response.
    */
   public function page(UserInterface $user, string $new_mail, int $timestamp, string $hash) : RedirectResponse {
     $messenger = $this->messenger();
@@ -74,9 +74,8 @@ class MailChangeController extends ControllerBase {
       return $this->redirect('<front>');
     }
 
-    // Register flood events based on the uid only, so they apply for any
-    // IP address. This allows them to be cleared on successful reset (from
-    // any IP).
+    // Register flood events based on the UID only, so they apply for any IP
+    // address. This allows them to be cleared on successful reset from any IP.
     $identifier = $user->id();
     if (!$this->flood->isAllowed('user.email_change_user', $flood_config->get('user_limit'), $flood_config->get('user_window'), $identifier)) {
       return $this->redirect('<front>');
@@ -85,7 +84,7 @@ class MailChangeController extends ControllerBase {
 
     // The link is valid.
     if ($timestamp <= $request_time && $timestamp >= $user->getLastLoginTime() && hash_equals($hash, user_pass_rehash($user, $timestamp, $new_mail))) {
-      // Save the new email but also refresh the last login time so that this
+      // Save the new email and also refresh the last login time so that this
       // email change link is expired.
       $user->setEmail($new_mail)->setLastLoginTime($request_time)->save();
       // Reflect the changes in the session if the user is logged in.
@@ -97,21 +96,23 @@ class MailChangeController extends ControllerBase {
       $this->flood->clear('user.email_change_user', $user->id());
       return $this->redirect('<front>');
     }
-    // Timestamp from the link is in the future or the user registered a new
-    // login in the meantime or the hash is not valid.
+
+    // The link is not valid. The timestamp from the link may be in the future
+    // or the user registered a new login in the meantime or the hash is not
+    // valid.
     $messenger->addError($this->t('You have tried to use an email address change link that has either been used or is no longer valid. Visit your account and change your email again.'));
 
     return $this->redirect('<front>');
   }
 
   /**
-   * Checks access to change email URL.
+   * Checks access to the change email URL.
    *
    * @param \Drupal\user\UserInterface $user
    *   The user account requesting an email change.
    *
    * @return \Drupal\Core\Access\AccessResultInterface
-   *   An access result
+   *   An access result.
    */
   public function access(UserInterface $user): AccessResultInterface {
     return AccessResult::allowedIf($user->isActive())->addCacheableDependency($user);
@@ -129,11 +130,11 @@ class MailChangeController extends ControllerBase {
    *   - new_mail: The new user email when in the process of changing the
    *     account email address.
    * @param int $timestamp
-   *   (optional) The timestamp when hash is created. Defaults to the current
-   *   request time.
+   *   (optional) The timestamp to use for creating the hash. Defaults to the
+   *   current request time.
    * @param string $hash
    *   (optional) Unique hash. If not defined, the hash is computed based on the
-   *   account data and timestamp.
+   *   account data, the options array and the timestamp.
    *
    * @return \Drupal\Core\Url
    *   A unique URL that provides a one-time email change confirmation.
