@@ -35,15 +35,6 @@ class FormErrorHandler implements FormErrorHandlerInterface {
   /**
    * {@inheritdoc}
    */
-  public static function create(ContainerInterface $container) {
-    return new static(
-      $container->get('renderer')
-    );
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public function handleFormErrors(array &$form, FormStateInterface $form_state) {
     // After validation check if there are errors.
     if ($form_state->getErrors()) {
