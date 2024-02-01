@@ -88,9 +88,6 @@ class MailChangeController extends ControllerBase {
       // Save the new email but also refresh the last login time so that this
       // email change link is expired.
       $user->setEmail($new_mail)->setLastLoginTime($request_time)->save();
-      /** @var \Drupal\user\UserStorageInterface $user_storage */
-      $user_storage = $this->entityTypeManager()->getStorage('user');
-      $user_storage->updateLastLoginTimestamp($user);
       // Reflect the changes in the session if the user is logged in.
       if ($current_user->isAuthenticated() && $current_user->id() === $user->id()) {
         $current_user->setAccount($user);
