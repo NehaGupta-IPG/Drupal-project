@@ -15,7 +15,7 @@ class ImageFieldItemList extends FileFieldItemList {
    * {@inheritdoc}
    */
   public function hasAffectingChanges(FieldItemListInterface $original_items, $langcode) {
-    if ($this->equals($original_items)) {
+    if (!$this->equals($original_items)) {
       return TRUE;
     }
 
