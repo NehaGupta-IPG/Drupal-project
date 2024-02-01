@@ -415,7 +415,7 @@ function user_mail_tokens(&$replacements, $data, $options): void {
     $new_mail = $options['new_mail'] ?? NULL;
     $replacements['[user:one-time-login-url]'] = user_pass_reset_url($data['user'], $options, $new_mail);
     if ($data['user']->getEmail()) {
-      $replacements['[user:mail-change-url]'] = MailChangeController::getUrl($data['user'], $options)->toString();
+      $replacements['[user:mail-change-url]'] = MailChangeController::getUrl($data['user'], $options)->toString(TRUE)->getGeneratedUrl();
     }
     $replacements['[user:cancel-url]'] = user_cancel_url($data['user'], $options);
   }
