@@ -68,7 +68,7 @@ class UserMailChangeTest extends BrowserTestBase {
     sleep(1);
 
     // Change the user email address.
-    $new_mail = $this->getRandomEmailAddress();
+    $new_mail = 'foo@example.com';
     $edit = [
       'mail' => $new_mail,
       'current_pass' => $this->account->pass_raw,
@@ -146,7 +146,7 @@ class UserMailChangeTest extends BrowserTestBase {
 
     $this->drupalLogin($this->account);
     $edit = [
-      'mail' => $this->getRandomEmailAddress(),
+      'mail' => 'foo@example.com',
       'current_pass' => $this->account->pass_raw,
     ];
     $this->drupalGet($this->account->toUrl('edit-form'));
@@ -171,7 +171,7 @@ class UserMailChangeTest extends BrowserTestBase {
     $this->drupalLogin($this->account);
 
     // Change the user email address.
-    $new_mail = $this->getRandomEmailAddress();
+    $new_mail = 'foo@example.com';
     $edit = [
       'mail' => $new_mail,
       'current_pass' => $this->account->pass_raw,
@@ -219,7 +219,7 @@ class UserMailChangeTest extends BrowserTestBase {
     $this->drupalLogin($current_account);
     // Try to change the email for the first account when the other account is
     // logged in.
-    $new_mail = $this->getRandomEmailAddress();
+    $new_mail = 'foo@example.com';
     $this->account->setEmail($new_mail);
     $options['new_mail'] = $new_mail;
     $path = MailChangeController::getUrl($this->account, $options, $timestamp)->getInternalPath();
@@ -268,7 +268,7 @@ class UserMailChangeTest extends BrowserTestBase {
     $url = Url::fromRoute('user.mail_change', [
       'user' => $this->account->id(),
       'timestamp' => $timestamp,
-      'new_mail' => $this->getRandomEmailAddress(),
+      'new_mail' => 'foo@example.com',
       'hash' => user_pass_rehash($this->account, $timestamp),
     ], $url_options);
     $this->drupalGet($url);
@@ -290,16 +290,6 @@ class UserMailChangeTest extends BrowserTestBase {
     $email = end($email);
     preg_match('#.+user\/mail\-change\/.+#', $email['body'], $urls);
     return $urls[0];
-  }
-
-  /**
-   * Generates a random email address.
-   *
-   * @return string
-   *   A random email address.
-   */
-  protected function getRandomEmailAddress(): string {
-    return mb_strtolower($this->randomMachineName()) . '@example.com';
   }
 
 }
