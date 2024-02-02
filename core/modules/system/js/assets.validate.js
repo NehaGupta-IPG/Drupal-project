@@ -3,7 +3,7 @@
     attach: (context, settings) => {
       const getAssetsValidationMessenger = () => {
         return new Drupal.Message(
-          context.querySelector('[data-assets-validate-messages]')
+          context.querySelector('[data-assets-validate-messages]'),
         );
       };
       const validate = (e) => {
@@ -20,15 +20,21 @@
                 getAssetsValidationMessenger().add(
                   Drupal.t(
                     'Your server is not configured properly to access @name assets. Review Drupal server requirements.',
-                    { '@name': el.name }
+                    {
+                      '@name': el.name,
+                    },
                   ),
-                  {type: 'error'}
+                  {
+                    type: 'error',
+                  },
                 );
               } else {
                 getAssetsValidationMessenger().add(
                   Drupal.t(
                     'Your server is configured properly to access @name assets.',
-                    { '@name': el.name }
+                    {
+                      '@name': el.name,
+                    },
                   ),
                 );
               }
@@ -37,21 +43,25 @@
               getAssetsValidationMessenger().add(
                 Drupal.t(
                   'Unable to check server requirements for @name assets.',
-                  { '@name': el.name }
+                  {
+                    '@name': el.name,
+                  },
                 ),
-                {type: 'warning'}
+                {
+                  type: 'warning',
+                },
               );
             });
         } catch (err) {
           getAssetsValidationMessenger().add(
-            Drupal.t(
-              'Unable to check server requirements for @name assets.',
-              { '@name': el.name }
-            ),
-            {type: 'warning'}
+            Drupal.t('Unable to check server requirements for @name assets.', {
+              '@name': el.name,
+            }),
+            {
+              type: 'warning',
+            },
           );
         }
-
       };
       once('performance-assets-validate', document.body).forEach(() => {
         context
@@ -60,6 +70,6 @@
             chb.addEventListener('change', validate);
           });
       });
-    }
+    },
   };
 })(Drupal, once);
