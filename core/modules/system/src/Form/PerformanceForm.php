@@ -151,7 +151,7 @@ class PerformanceForm extends ConfigFormBase {
       '#disabled' => $disabled,
       '#attached' => ['library' => ['system/assets.validate']],
       '#attributes' => [
-        "data-performance-assets-validate-path" => Url::fromRoute(
+        'data-performance-assets-validate-path' => Url::fromRoute(
           'system.css_asset',
           ['file_name' => '_validate.css']
         )->toString(),
@@ -164,7 +164,7 @@ class PerformanceForm extends ConfigFormBase {
       '#disabled' => $disabled,
       '#attached' => ['library' => ['system/assets.validate']],
       '#attributes' => [
-        "data-performance-assets-validate-path" => Url::fromRoute(
+        'data-performance-assets-validate-path' => Url::fromRoute(
           'system.js_asset',
           ['file_name' => '_validate.js']
         )->toString(),
