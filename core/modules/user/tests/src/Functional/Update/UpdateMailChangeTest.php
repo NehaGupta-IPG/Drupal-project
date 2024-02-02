@@ -9,7 +9,6 @@ use Symfony\Component\Yaml\Yaml;
  * Tests update of user mail change configurations.
  *
  * @group user
- * @group legacy
  */
 class UpdateMailChangeTest extends UpdatePathTestBase {
 
