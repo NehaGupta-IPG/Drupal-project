@@ -203,7 +203,8 @@ class UserMailChangeTest extends BrowserTestBase {
    * Tests change of email for expired timestamp.
    */
   public function testExpiredTimestamp(): void {
-    $timestamp = $this->time->getRequestTime() - (24 * 60 * 60 + 1);
+    // Set the expired timestamp to the previous day minus one second.
+    $timestamp = $this->time->getRequestTime() - (86401);
     $this->drupalGet(MailChangeController::getUrl($this->account, [], $timestamp)->getInternalPath());
     $this->assertSession()->responseContains('You have tried to use an email address change link that has expired. Visit your account and change your email again.');
   }
@@ -237,7 +238,8 @@ class UserMailChangeTest extends BrowserTestBase {
    * Tests change of email for timestamp in the future.
    */
   public function testFutureTimestamp(): void {
-    $timestamp = $this->time->getRequestTime() + 60 * 60;
+    // Set the timestamp to 1 hour in the future.
+    $timestamp = $this->time->getRequestTime() + 3600;
     $this->drupalGet(MailChangeController::getUrl($this->account, [], $timestamp)->getInternalPath());
     $this->assertSession()->responseContains('You have tried to use an email address change link that has either been used or is no longer valid. Visit your account and change your email again.');
   }
