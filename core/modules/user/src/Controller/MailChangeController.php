@@ -44,7 +44,7 @@ class MailChangeController extends ControllerBase {
    * @return \Symfony\Component\HttpFoundation\RedirectResponse
    *   An HTTP redirect response.
    */
-  public function page(UserInterface $user, string $new_mail, int $timestamp, string $hash) : RedirectResponse {
+  public function page(UserInterface $user, string $new_mail, int $timestamp, string $hash): RedirectResponse {
     $messenger = $this->messenger();
     $flood_config = $this->config('user.flood');
     if (!$this->flood->isAllowed('user.email_change_ip', $flood_config->get('ip_limit'), $flood_config->get('ip_window'))) {

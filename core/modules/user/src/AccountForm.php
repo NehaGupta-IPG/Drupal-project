@@ -455,7 +455,7 @@ abstract class AccountForm extends ContentEntityForm implements TrustedCallbackI
    * @param \Drupal\Core\Form\FormStateInterface $form_state
    *   The current state of the form.
    */
-  public function notify(array &$form, FormStateInterface $form_state) {
+  public function notify(array &$form, FormStateInterface $form_state): void {
     $new_mail = $form_state->get('mail_change_verification');
     if ($new_mail === NULL) {
       return;

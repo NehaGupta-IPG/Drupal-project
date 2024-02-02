@@ -163,7 +163,7 @@ class UserMailChangeTest extends BrowserTestBase {
   /**
    * Tests email change functionality when email change verification is off.
    */
-  public function testMailChangeNoVerification() {
+  public function testMailChangeNoVerification(): void {
     // Disable email change verification.
     $this->config('user.settings')
       ->set('notify.mail_change_verification', FALSE)
