@@ -142,6 +142,7 @@ class PerformanceForm extends ConfigFormBase {
       '#open' => TRUE,
       '#description' => $this->t('External resources can be optimized automatically, which can reduce both the size and number of requests made to your website.') . $disabled_message,
     ];
+
     $form['bandwidth_optimization']['preprocess_css'] = [
       '#prefix' => '<div data-assets-validate-messages></div>',
       '#type' => 'checkbox',
