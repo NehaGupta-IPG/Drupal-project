@@ -1,57 +1,65 @@
-((Drupal, drupalSettings) => {
+((Drupal, once) => {
   Drupal.behaviors.systemPerformanceAssetsValidate = {
     attach: (context, settings) => {
-      const validate = () => {
-        const messages = new Drupal.Message(
-          context.querySelector('[data-assets-validate-messages]'),
+      const getAssetsValidationMessenger = () => {
+        return new Drupal.Message(
+          context.querySelector('[data-assets-validate-messages]')
         );
-        drupalSettings.systemPerformanceAssetsChecklist.forEach((urlInfo) => {
-          messages.clear();
-          try {
-            fetch(urlInfo.url)
-              .then((response) => {
-                if (response.status === 404) {
-                  messages.error(
-                    Drupal.t(
-                      'Your server is not configured properly to access @name assets. Review Drupal server requirements.',
-                      { '@name': urlInfo.name },
-                    ),
-                  );
-                } else {
-                  messages.add(
-                    Drupal.t(
-                      'Your server is configured properly to access @name assets.',
-                      { '@name': urlInfo.name },
-                    ),
-                  );
-                }
-              })
-              .catch((error) => {
-                messages.warning(
+      };
+      const validate = (e) => {
+        const el = e.currentTarget;
+        if (!el.checked) {
+          return;
+        }
+        const validateUrl = el.dataset.performanceAssetsValidatePath;
+        getAssetsValidationMessenger().clear();
+        try {
+          fetch(validateUrl)
+            .then((response) => {
+              if (response.status === 404) {
+                getAssetsValidationMessenger().add(
                   Drupal.t(
-                    'Unable to check server requirements for @name assets.',
-                    { '@name': urlInfo.name },
+                    'Your server is not configured properly to access @name assets. Review Drupal server requirements.',
+                    { '@name': el.name }
+                  ),
+                  {type: 'error'}
+                );
+              } else {
+                getAssetsValidationMessenger().add(
+                  Drupal.t(
+                    'Your server is configured properly to access @name assets.',
+                    { '@name': el.name }
                   ),
                 );
-              });
-          } catch (err) {
-            messages.warning(
-              Drupal.t(
-                'Unable to check server requirements for @name assets.',
-                { '@name': urlInfo.name },
-              ),
-            );
-          }
-        });
+              }
+            })
+            .catch((error) => {
+              getAssetsValidationMessenger().add(
+                Drupal.t(
+                  'Unable to check server requirements for @name assets.',
+                  { '@name': el.name }
+                ),
+                {type: 'warning'}
+              );
+            });
+        } catch (err) {
+          getAssetsValidationMessenger().add(
+            Drupal.t(
+              'Unable to check server requirements for @name assets.',
+              { '@name': el.name }
+            ),
+            {type: 'warning'}
+          );
+        }
+
       };
-      context
-        .querySelectorAll('[data-assets-validate-button="init"]')
-        .forEach((btn) => {
-          btn.setAttribute('data-assets-validate-button', '');
-          btn.setAttribute('type', 'button');
-          btn.addEventListener('keyup', validate);
-          btn.addEventListener('click', validate);
-        });
-    },
+      once('performance-assets-validate', document.body).forEach(() => {
+        context
+          .querySelectorAll('[data-performance-assets-validate-path]')
+          .forEach((chb) => {
+            chb.addEventListener('change', validate);
+          });
+      });
+    }
   };
-})(Drupal, drupalSettings);
+})(Drupal, once);

@@ -79,3 +79,4 @@ assets.validate:
   dependencies:
     - core/drupalSettings
     - core/drupal.message
+    - core/once

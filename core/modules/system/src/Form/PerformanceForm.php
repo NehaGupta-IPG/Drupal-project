@@ -142,44 +142,32 @@ class PerformanceForm extends ConfigFormBase {
       '#open' => TRUE,
       '#description' => $this->t('External resources can be optimized automatically, which can reduce both the size and number of requests made to your website.') . $disabled_message,
     ];
-
-    $form['bandwidth_optimization']['validate'] = [
-      '#type' => 'button',
-      '#value' => $this->t('Validate'),
-      '#description' => 'text',
-      '#attached' => [
-        'library' => ['system/assets.validate'],
-        'drupalSettings' => [
-          "systemPerformanceAssetsChecklist" => [
-            [
-              'url' => Url::fromRoute('system.css_asset', ['file_name' => '_validate.css'])->toString(),
-              'name' => 'css',
-            ],
-            [
-              'url' => Url::fromRoute('system.js_asset', ['file_name' => '_validate.js'])->toString(),
-              'name' => 'js',
-            ],
-          ],
-        ],
-      ],
-      '#attributes' => [
-        'data-assets-validate-button' => 'init',
-        'type' => 'button',
-      ],
-      '#prefix' => '<div data-assets-validate-messages></div>',
-      '#disabled' => $disabled || $config->get('css.preprocess') || $config->get('js.preprocess'),
-    ];
     $form['bandwidth_optimization']['preprocess_css'] = [
+      '#prefix' => '<div data-assets-validate-messages></div>',
       '#type' => 'checkbox',
       '#title' => $this->t('Aggregate CSS files'),
       '#config_target' => 'system.performance:css.preprocess',
       '#disabled' => $disabled,
+      '#attached' => ['library' => ['system/assets.validate']],
+      '#attributes' => [
+        "data-performance-assets-validate-path" => Url::fromRoute(
+          'system.css_asset',
+          ['file_name' => '_validate.css']
+        )->toString(),
+      ],
     ];
     $form['bandwidth_optimization']['preprocess_js'] = [
       '#type' => 'checkbox',
       '#title' => $this->t('Aggregate JavaScript files'),
       '#config_target' => 'system.performance:js.preprocess',
       '#disabled' => $disabled,
+      '#attached' => ['library' => ['system/assets.validate']],
+      '#attributes' => [
+        "data-performance-assets-validate-path" => Url::fromRoute(
+          'system.js_asset',
+          ['file_name' => '_validate.js']
+        )->toString(),
+      ],
     ];
 
     return parent::buildForm($form, $form_state);
