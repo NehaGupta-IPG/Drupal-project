@@ -53,7 +53,7 @@ class MediaTest extends MediaKernelTestBase {
    * @group legacy
    */
   public function testGetRequestTime() {
-    $this->expectDeprecation('Drupal\media\Entity\Media::getRequestTime is deprecated in drupal:10.2.0 and is removed from drupal:11.0.0. No replacement provided. See https://www.drupal.org/node/3349765');
+    $this->expectDeprecation('Drupal\media\Entity\Media::getRequestTime is deprecated in drupal:10.3.0 and is removed from drupal:11.0.0. No replacement provided. See https://www.drupal.org/node/3349765');
     Media::getRequestTime();
   }
 
