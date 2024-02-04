@@ -94,9 +94,15 @@ class PathAliasListBuilder extends EntityListBuilder {
   protected function getEntityIds() {
     $query = $this->getStorage()->getQuery()->accessCheck(TRUE);
 
-    $search = $this->currentRequest->query->get('search');
-    if ($search) {
-      $query->condition('alias', $search, 'CONTAINS');
+    if ($alias = $this->currentRequest->query->get('alias')) {
+      $query->condition('alias', $alias, 'CONTAINS');
+    }
+    if ($path = $this->currentRequest->query->get('path')) {
+      $query->condition('path', $path, 'CONTAINS');
+    }
+    $langcode = $this->currentRequest->query->get('langcode');
+    if ($langcode && $langcode !== 'und') {
+      $query->condition('langcode', $langcode);
     }
 
     // Only add the pager if a limit is specified.
@@ -115,8 +121,8 @@ class PathAliasListBuilder extends EntityListBuilder {
    * {@inheritdoc}
    */
   public function render() {
-    $keys = $this->currentRequest->query->get('search');
-    $build['path_admin_filter_form'] = $this->formBuilder->getForm(PathFilterForm::class, $keys);
+    $query = $this->currentRequest->query->all();
+    $build['path_admin_filter_form'] = $this->formBuilder->getForm(PathFilterForm::class, $query);
     $build += parent::render();
 
     $build['table']['#empty'] = $this->t('No path aliases available. <a href=":link">Add URL alias</a>.', [':link' => Url::fromRoute('entity.path_alias.add_form')->toString()]);
