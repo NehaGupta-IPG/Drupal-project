@@ -8,6 +8,7 @@ use Drupal\media\Entity\Media;
 use Drupal\media\Entity\MediaType;
 use Drupal\media\MediaInterface;
 use Drupal\media\MediaTypeInterface;
+use Drupal\Tests\user\Traits\UserCreationTrait;
 use Drupal\user\Entity\Role;
 use Drupal\user\Entity\User;
 use PHPUnit\Framework\Attributes\Group;
@@ -19,6 +20,8 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 #[Group('media')]
 #[RunTestsInSeparateProcesses]
 class MediaCreationTest extends MediaKernelTestBase {
+
+  use UserCreationTrait;
 
   /**
    * Tests creating a media type programmatically.
@@ -81,6 +84,14 @@ class MediaCreationTest extends MediaKernelTestBase {
     $source_field_name = $media->bundle->entity->getSource()->getSourceFieldDefinition($media->bundle->entity)->getName();
     $this->assertSame('Nation of sheep, ruled by wolves, owned by pigs.', $media->get($source_field_name)->value, 'Source returns incorrect source field value.');
     $this->assertSame($media->getOwnerId(), $media->getRevisionUserId(), 'The media item was not created with the correct revision author.');
+
+    // Editing the media entity when logged in as a different user should update
+    // the revision user.
+    $new_user = $this->setUpCurrentUser();
+    $media->setNewRevision(TRUE);
+    $media->setName('a new revision')
+      ->save();
+    $this->assertSame($new_user->id(), $media->getRevisionUserId());
   }
 
 }
