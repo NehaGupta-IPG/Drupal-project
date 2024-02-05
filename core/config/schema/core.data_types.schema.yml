@@ -264,39 +264,7 @@ theme_settings:
   type: config_object
   mapping:
     favicon:
-      type: mapping
-      label: 'Shortcut icon settings'
-      mapping:
-        mimetype:
-          type: string
-          label: 'MIME type'
-          requiredKey: false
-          nullable: true
-          constraints:
-            Regex:
-              pattern: '/^image\/[a-z_\-\+]+$/'
-              message: "%value is not a valid image MIME type."
-        path:
-          type: string
-          label: 'Path'
-          requiredKey: false
-          nullable: true
-          # @todo use \Symfony\Component\Validator\Constraints\ImageValidator?
-        url:
-          # TRICKY: this is only part of config due to theme_get_setting() storing the URL computed from `path` in
-          # config; it's not actually configurable. Hence there's no need for actual validation: if `path` is set, then
-          # this will be (re)computed in theme_get_setting().
-          type: uri
-          label: 'URL'
-          requiredKey: false
-          nullable: true
-        use_default:
-          type: boolean
-          label: 'Use the default shortcut icon supplied by the theme'
-          # If this is `true`, then `mimetype` and `path` are indeed optional keys. But if this is `false`, then they
-          # MUST be specified.
-          # @todo Figure out how to conditionally require other keys … without changing the config schema structure
-          constraints: {}
+      type: theme_settings_favicon.[use_default]
     features:
       # @todo Figure out how to make each of these keys required if and only if:
       # 1. the theme supports them, by declaring support for a subset of _system_default_theme_features() in *.info.yml
@@ -327,27 +295,7 @@ theme_settings:
           type: boolean
           label: 'Site slogan'
     logo:
-      type: mapping
-      label: 'Logo settings'
-      mapping:
-        path:
-          type: string
-          label: 'Logo path'
-          requiredKey: false
-          nullable: true
-        url:
-          # TRICKY: this is only part of config due to theme_get_setting() storing the URL computed from `path` in
-          # config; it's not actually configurable. Hence there's no need for actual validation: if `path` is set, then
-          # this will be (re)computed in theme_get_setting().
-          type: uri
-          nullable: true
-          label: 'URL'
-        use_default:
-          type: boolean
-          label: 'Use default'
-          # If this is `true`, then `path` is indeed an optional key. But if this is `false`, then it MUST be specified.
-          # @todo Figure out how to conditionally require other keys … without changing the config schema structure
-          constraints: {}
+      type: theme_settings_logo.[use_default]
     third_party_settings:
       # Third party settings are always optional: they're an optional extension
       # point.
@@ -356,6 +304,69 @@ theme_settings:
       label: 'Third party settings'
       sequence:
         type: theme_settings.third_party.[%key]
+
+theme_settings_favicon.*:
+  type: mapping
+  label: 'Shortcut icon settings'
+  mapping:
+    use_default:
+      type: boolean
+      label: 'Use the default shortcut icon supplied by the theme'
+      constraints: { }
+
+theme_settings_favicon.1:
+  type: 'theme_settings_favicon.*'
+  label: 'Shortcut icon settings'
+  mapping:
+    mimetype:
+      type: string
+      label: 'MIME type'
+      requiredKey: false
+      nullable: true
+      constraints:
+        Regex:
+          pattern: '/^image\/[a-z_\-\+]+$/'
+          message: "%value is not a valid image MIME type."
+    path:
+      type: string
+      label: 'Path'
+      requiredKey: false
+      nullable: true
+      # @todo use \Symfony\Component\Validator\Constraints\ImageValidator?
+    url:
+      # TRICKY: this is only part of config due to theme_get_setting() storing the URL computed from `path` in
+      # config; it's not actually configurable. Hence there's no need for actual validation: if `path` is set, then
+      # this will be (re)computed in theme_get_setting().
+      type: uri
+      label: 'URL'
+      requiredKey: false
+      nullable: true
+
+theme_settings_logo.*:
+  type: mapping
+  label: 'Logo settings'
+  mapping:
+    use_default:
+      type: boolean
+      label: 'Use default'
+      constraints: { }
+
+theme_settings_logo.1:
+  type: 'theme_settings_logo.*'
+  label: 'Logo settings'
+  mapping:
+    path:
+      type: string
+      label: 'Logo path'
+      requiredKey: false
+      nullable: true
+    url:
+      # TRICKY: this is only part of config due to theme_get_setting() storing the URL computed from `path` in
+      # config; it's not actually configurable. Hence there's no need for actual validation: if `path` is set, then
+      # this will be (re)computed in theme_get_setting().
+      type: uri
+      nullable: true
+      label: 'URL'
 
 # Array of routes with route_name and route_params keys.
 route:
