@@ -437,7 +437,7 @@ class DisplayTest extends ViewTestBase {
 
     // Remove the empty area, but mark the header area to still appear.
     $view->removeHandler('default', 'empty', 'area');
-    $item = $view->getHandler('default', 'header', 'area');
+    $item = $view->getHandlerConfiguration('default', 'header', 'area');
     $item['empty'] = TRUE;
     $view->setHandler('default', 'header', 'area', $item);
     $this->executeView($view);
@@ -446,7 +446,7 @@ class DisplayTest extends ViewTestBase {
     $view->destroy();
 
     // Hide the header on empty results.
-    $item = $view->getHandler('default', 'header', 'area');
+    $item = $view->getHandlerConfiguration('default', 'header', 'area');
     $item['empty'] = FALSE;
     $view->setHandler('default', 'header', 'area', $item);
     $this->executeView($view);

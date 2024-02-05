@@ -2326,7 +2326,7 @@ class ViewExecutable {
    *   Either the handler instance's configuration, or NULL if the handler is
    *   not used on the display.
    */
-  public function getHandler($display_id, $type, $id) {
+  public function getHandlerConfiguration($display_id, $type, $id) {
     // Get info about the types so we can get the right data.
     $types = static::getHandlerTypes();
     // Initialize the display.
@@ -2414,7 +2414,7 @@ class ViewExecutable {
    * @see set_item()
    */
   public function setHandlerOption($display_id, $type, $id, $option, $value) {
-    $item = $this->getHandler($display_id, $type, $id);
+    $item = $this->getHandlerConfiguration($display_id, $type, $id);
     $item[$option] = $value;
     $this->setHandler($display_id, $type, $id, $item);
   }

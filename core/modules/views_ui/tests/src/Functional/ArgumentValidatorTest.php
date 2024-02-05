@@ -35,7 +35,7 @@ class ArgumentValidatorTest extends UITestBase {
     // display and assert that this works.
     $this->saveArgumentHandlerWithValidationOptions(TRUE);
     $view = Views::getView('test_argument');
-    $handler = $view->getHandler('default', 'argument', 'id');
+    $handler = $view->getHandlerConfiguration('default', 'argument', 'id');
     $this->assertTrue($handler['specify_validation'], 'Validation for this argument has been turned on.');
     $this->assertEquals('entity:node', $handler['validate']['type'], 'Validation for the argument is based on the node.');
 
@@ -43,7 +43,7 @@ class ArgumentValidatorTest extends UITestBase {
     // validation type to be reset back to 'none'.
     $this->saveArgumentHandlerWithValidationOptions(FALSE);
     $view = Views::getView('test_argument');
-    $handler = $view->getHandler('default', 'argument', 'id');
+    $handler = $view->getHandlerConfiguration('default', 'argument', 'id');
     $this->assertFalse($handler['specify_validation'], 'Validation for this argument has been turned off.');
     $this->assertEquals('none', $handler['validate']['type'], 'Validation for the argument has been reverted to Basic Validation.');
   }
