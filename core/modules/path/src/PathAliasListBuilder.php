@@ -7,6 +7,7 @@ use Drupal\Core\Entity\EntityListBuilder;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Form\FormBuilderInterface;
+use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\path_alias\AliasManagerInterface;
 use Drupal\Core\Url;
@@ -101,7 +102,7 @@ class PathAliasListBuilder extends EntityListBuilder {
       $query->condition('path', $path, 'CONTAINS');
     }
     $langcode = $this->currentRequest->query->get('langcode');
-    if ($langcode && $langcode !== 'und') {
+    if ($langcode && $langcode !== LanguageInterface::LANGCODE_NOT_SPECIFIED) {
       $query->condition('langcode', $langcode);
     }
 
