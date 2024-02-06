@@ -71,4 +71,3 @@ function media_post_update_install_update_metadata_action() {
       ->save();
   }
 }
-
