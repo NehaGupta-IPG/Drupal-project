@@ -22,6 +22,7 @@ use Drupal\Core\Url;
 use Drupal\Core\Utility\Token;
 use Drupal\media\Attribute\OEmbedMediaSource;
 use Drupal\media\IFrameUrlHelper;
+use Drupal\media\MediaSourceBase;
 use Drupal\media\MediaInterface;
 use Drupal\media\MediaSourceBase;
 use Drupal\media\MediaTypeInterface;
@@ -260,7 +261,7 @@ class OEmbed extends MediaSourceBase implements OEmbedInterface {
         return parent::getMetadata($media, 'default_name');
 
       case 'thumbnail_uri':
-        return $this->getLocalThumbnailUri($resource, $media) ?: parent::getMetadata($media, 'thumbnail_uri');
+        return $this->getLocalThumbnailUri($resource, $media, $media->isMetadataUpdateEnforced()) ?: parent::getMetadata($media, 'thumbnail_uri');
 
       case 'type':
         return $resource->getType();
@@ -400,6 +401,8 @@ class OEmbed extends MediaSourceBase implements OEmbedInterface {
    *   The oEmbed resource.
    * @param \Drupal\media\MediaInterface $media
    *   The media entity that contains the resource.
+   * @param bool $forceUpdate
+   *   TRUE if the thumbnail should be updated even if it already exists.
    *
    * @return string|null
    *   The local thumbnail URI, or NULL if it could not be downloaded, or if the
@@ -410,7 +413,7 @@ class OEmbed extends MediaSourceBase implements OEmbedInterface {
    * toggle-able. See https://www.drupal.org/project/drupal/issues/2962751 for
    * more information.
    */
-  protected function getLocalThumbnailUri(Resource $resource, MediaInterface $media) {
+  protected function getLocalThumbnailUri(Resource $resource, MediaInterface $media, $forceUpdate = FALSE) {
     $token_data = ['date' => $media->getCreatedTime()];
 
     // If there is no remote thumbnail, there's nothing for us to fetch here.
@@ -446,9 +449,12 @@ class OEmbed extends MediaSourceBase implements OEmbedInterface {
     // regardless of its extension, return its URI.
     $remote_thumbnail_url = $remote_thumbnail_url->toString();
     $hash = Crypt::hashBase64($remote_thumbnail_url);
-    $files = $this->fileSystem->scanDirectory($directory, "/^$hash\..*/");
-    if (count($files) > 0) {
-      return reset($files)->uri;
+
+    if ($forceUpdate === FALSE) {
+      $files = $this->fileSystem->scanDirectory($directory, "/^$hash\..*/");
+      if (count($files) > 0) {
+        return reset($files)->uri;
+      }
     }
 
     // The local thumbnail doesn't exist yet, so we need to download it.

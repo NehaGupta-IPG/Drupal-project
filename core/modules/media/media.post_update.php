@@ -5,6 +5,11 @@
  * Post update functions for Media.
  */
 
+use Drupal\Core\Config\Entity\ConfigEntityUpdater;
+use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
+use Drupal\media\MediaConfigUpdater;
+use Drupal\system\Entity\Action;
+
 /**
  * Implements hook_removed_post_updates().
  */
@@ -27,3 +32,43 @@ function media_removed_post_updates(): array {
 function media_post_update_media_author_views_filter_update(): void {
   // Empty update function to clear the Views data cache.
 }
+
+/**
+ * Add the oEmbed loading attribute setting to field formatter instances.
+ */
+function media_post_update_oembed_loading_attribute(array &$sandbox = NULL): void {
+  $media_config_updater = \Drupal::classResolver(MediaConfigUpdater::class);
+  assert($media_config_updater instanceof MediaConfigUpdater);
+  $media_config_updater->setDeprecationsEnabled(TRUE);
+  \Drupal::classResolver(ConfigEntityUpdater::class)->update($sandbox, 'entity_view_display', function (EntityViewDisplayInterface $view_display) use ($media_config_updater): bool {
+    return $media_config_updater->processOembedEagerLoadField($view_display);
+  });
+}
+
+/**
+ * Updates media.settings:iframe_domain config if it's still at the default.
+ */
+function media_post_update_set_blank_iframe_domain_to_null() {
+  $media_settings = \Drupal::configFactory()->getEditable('media.settings');
+  if ($media_settings->get('iframe_domain') === '') {
+    $media_settings
+      ->set('iframe_domain', NULL)
+      ->save(TRUE);
+  }
+}
+
+/**
+ * Install the 'Update metadata' action.
+ */
+function media_post_update_install_update_metadata_action() {
+  if (!Action::load('media_update_metadata')) {
+    Action::create([
+      'id' => 'media_update_metadata',
+      'label' => 'Update metadata',
+      'type' => 'media',
+      'plugin' => 'media_update_metadata',
+    ])
+      ->save();
+  }
+}
+

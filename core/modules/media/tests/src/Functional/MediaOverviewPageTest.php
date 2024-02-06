@@ -157,6 +157,9 @@ class MediaOverviewPageTest extends MediaFunctionalTestBase {
     $assert_session->linkByHrefExists('/media/' . $media1->id() . '/edit');
     $assert_session->elementExists('css', 'td.views-field-operations li a:contains("Delete")', $row1);
     $assert_session->linkByHrefExists('/media/' . $media1->id() . '/delete');
+    $update_metadata_link1 = $assert_session->elementExists('css', 'td.views-field-operations li a:contains("Update metadata")', $row1);
+    $this->assertSame('Update metadata', $update_metadata_link1->getText());
+    $assert_session->linkByHrefExists('/media/' . $media1->id() . '/update-metadata');
 
     // Make sure the role save below properly invalidates cache tags.
     $this->refreshVariables();

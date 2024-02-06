@@ -1,3 +1,11 @@
+media.update_metadata:
+  path: '/media/{media}/update-metadata'
+  defaults:
+    _controller: '\Drupal\media\Controller\UpdateMetadataController::updateMetadata'
+  requirements:
+    _entity_access: 'media.update'
+    _csrf_token: 'TRUE'
+
 media.oembed_iframe:
   path: '/media/oembed'
   defaults:

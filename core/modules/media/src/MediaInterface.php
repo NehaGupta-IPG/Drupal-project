@@ -64,4 +64,19 @@ interface MediaInterface extends ContentEntityInterface, EntityChangedInterface,
    */
   public function getSource();
 
+  /**
+   * Force metadata update in prepareSave().
+   *
+   * @return $this
+   */
+  public function enforceMetadataUpdate();
+
+  /**
+   * Check whether the metadata update is enforced or not.
+   *
+   * @return bool
+   *   TRUE if the metadata update is enforced, FALSE if it's not.
+   */
+  public function isMetadataUpdateEnforced();
+
 }
