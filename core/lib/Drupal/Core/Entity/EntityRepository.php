@@ -112,10 +112,10 @@ class EntityRepository implements EntityRepositoryInterface {
 
         // Move the current language and the default fallback language onto
         // the first and second place in the candidates array.
-        $candidates = [
-          $langcode => $candidates[$langcode],
-          $default_langcode => $candidates[$default_langcode],
-        ] + $candidates;
+        $candidates = [$default_langcode => $candidates[$default_langcode]] + $candidates;
+        if (isset($candidates[$langcode])) {
+          $candidates = [$langcode => $candidates[$langcode]] + $candidates;
+        }
 
         // Return the most fitting entity translation.
         foreach ($candidates as $candidate) {
