@@ -38,7 +38,7 @@ display:
           order: ASC
           relationship: none
           table: node_field_data
-          plugin_id: numeric
+          plugin_id: standard
       pager:
         type: full
       query:
