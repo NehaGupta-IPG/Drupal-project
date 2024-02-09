@@ -34,7 +34,7 @@ display:
           id: name
           relationship: none
           table: views_test_data
-          plugin_id: string
+          plugin_id: standard
       pager:
         type: full
         options:
