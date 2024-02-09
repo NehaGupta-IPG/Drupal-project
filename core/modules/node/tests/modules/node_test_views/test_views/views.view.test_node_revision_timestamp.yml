@@ -34,7 +34,7 @@ display:
           table: node_revision
           field: revision_timestamp
           order: DESC
-          plugin_id: field
+          plugin_id: standard
           entity_type: node
           entity_field: revision_timestamp
     display_plugin: default
