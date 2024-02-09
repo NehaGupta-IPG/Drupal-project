@@ -57,7 +57,7 @@ display:
           table: block_content_field_revision
           field: revision_id
           order: ASC
-          plugin_id: field
+          plugin_id: standard
           entity_type: block_content
           entity_field: revision_id
     display_plugin: default
