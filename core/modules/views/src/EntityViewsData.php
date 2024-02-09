@@ -116,6 +116,35 @@ class EntityViewsData implements EntityHandlerInterface, EntityViewsDataInterfac
   }
 
   /**
+   * Gets the field storage definitions.
+   *
+   * @return \Drupal\Core\Field\FieldStorageDefinitionInterface[]
+   *   The array of field storage definitions, keyed by field name.
+   *
+   * @deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. No
+   * replacement is provided.
+   *
+   * @see https://www.drupal.org/node/3240278
+   */
+  protected function getFieldStorageDefinitions() {
+    @trigger_error(__METHOD__ . '() is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. No replacement is provided. See https://www.drupal.org/node/3240278', E_USER_DEPRECATED);
+    if (!isset($this->fieldStorageDefinitions)) {
+      $this->fieldStorageDefinitions = $this->entityFieldManager->getFieldStorageDefinitions($this->entityType->id());
+    }
+
+    if ($this->entityType->hasKey('bundle')) {
+      $bundle_field_definitions = [];
+      foreach ($this->entityTypeBundleInfo->getBundleInfo($this->entityType->id()) as $bundle_id => $bundle_info) {
+        $bundle_field_definitions += $this->entityFieldManager->getFieldDefinitions($this->entityType->id(), $bundle_id);
+      }
+
+      $this->fieldStorageDefinitions += $bundle_field_definitions;
+    }
+
+    return $this->fieldStorageDefinitions;
+  }
+
+  /**
    * {@inheritdoc}
    */
   public function getViewsData() {
@@ -598,6 +627,14 @@ class EntityViewsData implements EntityHandlerInterface, EntityViewsDataInterfac
     $process_method = 'processViewsDataFor' . Container::camelize($field_type);
     if (method_exists($this, $process_method)) {
       $this->{$process_method}($table, $field_definition, $views_field, $column_name);
+    }
+
+    $target_bundle = $field_definition->getTargetBundle();
+    if (!empty($target_bundle)) {
+      $views_field['field']['bundle'] = $field_definition->getTargetBundle();
+      $views_field['filter']['bundle'] = $field_definition->getTargetBundle();
+      $views_field['sort']['bundle'] = $field_definition->getTargetBundle();
+      $views_field['argument']['bundle'] = $field_definition->getTargetBundle();
     }
 
     return $views_field;
