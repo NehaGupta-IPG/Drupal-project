@@ -42,7 +42,7 @@ display:
           table: users_field_data
           field: uid
           order: ASC
-          plugin_id: user
+          plugin_id: standard
           entity_type: user
           entity_field: uid
       filters:
