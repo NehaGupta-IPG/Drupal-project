@@ -28,7 +28,7 @@ display:
           id: name
           label: ''
           table: views_test_data
-          plugin_id: string
+          plugin_id: standard
       filters:
         type:
           field: name
