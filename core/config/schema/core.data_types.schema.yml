@@ -312,7 +312,6 @@ theme_settings_favicon.*:
     use_default:
       type: boolean
       label: 'Use the default shortcut icon supplied by the theme'
-      constraints: { }
 
 theme_settings_favicon.0:
   type: 'theme_settings_favicon.*'
@@ -321,7 +320,6 @@ theme_settings_favicon.0:
     mimetype:
       type: string
       label: 'MIME type'
-      requiredKey: false
       nullable: true
       constraints:
         Regex:
