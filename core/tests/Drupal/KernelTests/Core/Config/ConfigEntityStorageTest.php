@@ -53,6 +53,28 @@ class ConfigEntityStorageTest extends KernelTestBase {
   }
 
   /**
+   * Test that the compilation of a query condition works as expected.
+   */
+  public function testSavingEmptyUuid() {
+    $entity_type = 'config_test';
+    $id = 'XFiles_S06E11_Two_Fathers';
+    // Load the original configuration entity.
+    $storage = $this->container->get('entity_type.manager')
+      ->getStorage($entity_type);
+    $entity = $storage->create(['id' => $id]);
+    $entity->save();
+    $entity->set('uuid', NULL);
+    try {
+      $entity->save();
+    }
+    catch (ConfigDuplicateUUIDException $e) {
+      // We totally expect that to happen when we remove the uuid like that.
+    }
+    // Make sure we assert something as well then.
+    self::assertEquals($id, $entity->id());
+  }
+
+  /**
    * Tests the hasData() method for config entity storage.
    *
    * @legacy-covers \Drupal\Core\Config\Entity\ConfigEntityStorage::hasData
