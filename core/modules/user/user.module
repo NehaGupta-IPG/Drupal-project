@@ -189,7 +189,7 @@ function user_cancel_url(UserInterface $account, $options = []) {
  *   A UNIX timestamp, typically \Drupal::time()->getRequestTime().
  * @param string $mail
  *   (optional) If passed, this value will be used to compute the hash instead
- *   of that stored into $account.
+ *   of that stored for the $account.
  *
  * @return string
  *   A string that is safe for use in URLs and SQL statements.
