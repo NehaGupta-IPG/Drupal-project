@@ -94,9 +94,11 @@ class Page extends PathPluginBase {
    *   The plugin manager for views row plugins.
    * @param \Drupal\views\Plugin\ViewsPluginManager $style_plugin_manager
    *   The plugin manager for views style plugins.
+   * @param \Drupal\views\Plugin\ViewsPluginManager $query_plugin_manager
+   *   The plugin manager for views query plugins.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, RouteProviderInterface $route_provider, StateInterface $state, EntityStorageInterface $menu_storage, MenuParentFormSelectorInterface $parent_form_selector, ViewsData $views_data, ViewsPluginManager $access_plugin_manager, ViewsPluginManager $cache_plugin_manager, ViewsPluginManager $display_extender_plugin_manager, ViewsPluginManager $exposed_form_plugin_manager, ViewsPluginManager $pager_plugin_manager, ViewsPluginManager $row_plugin_manager, ViewsPluginManager $style_plugin_manager) {
-    parent::__construct($configuration, $plugin_id, $plugin_definition, $route_provider, $state, $views_data, $access_plugin_manager, $cache_plugin_manager, $display_extender_plugin_manager, $exposed_form_plugin_manager, $pager_plugin_manager, $row_plugin_manager, $style_plugin_manager);
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, RouteProviderInterface $route_provider, StateInterface $state, EntityStorageInterface $menu_storage, MenuParentFormSelectorInterface $parent_form_selector, ViewsData $views_data, ViewsPluginManager $access_plugin_manager, ViewsPluginManager $cache_plugin_manager, ViewsPluginManager $display_extender_plugin_manager, ViewsPluginManager $exposed_form_plugin_manager, ViewsPluginManager $pager_plugin_manager, ViewsPluginManager $row_plugin_manager, ViewsPluginManager $style_plugin_manager, ViewsPluginManager $query_plugin_manager) {
+    parent::__construct($configuration, $plugin_id, $plugin_definition, $route_provider, $state, $views_data, $access_plugin_manager, $cache_plugin_manager, $display_extender_plugin_manager, $exposed_form_plugin_manager, $pager_plugin_manager, $row_plugin_manager, $style_plugin_manager, $query_plugin_manager);
     $this->menuStorage = $menu_storage;
     $this->parentFormSelector = $parent_form_selector;
   }
@@ -121,6 +123,7 @@ class Page extends PathPluginBase {
       $container->get('plugin.manager.views.pager'),
       $container->get('plugin.manager.views.row'),
       $container->get('plugin.manager.views.style'),
+      $container->get('plugin.manager.views.query'),
     );
   }
 

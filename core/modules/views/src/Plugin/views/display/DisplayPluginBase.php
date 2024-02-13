@@ -90,6 +90,13 @@ abstract class DisplayPluginBase extends PluginBase implements DisplayPluginInte
   protected ViewsPluginManager $stylePluginManager;
 
   /**
+   * The plugin manager for views query plugins.
+   *
+   * @var \Drupal\views\Plugin\ViewsPluginManager
+   */
+  protected ViewsPluginManager $queryPluginManager;
+
+  /**
    * The top object of a view.
    *
    * @var \Drupal\views\ViewExecutable
@@ -224,6 +231,8 @@ abstract class DisplayPluginBase extends PluginBase implements DisplayPluginInte
    *   The plugin manager for views row plugins.
    * @param \Drupal\views\Plugin\ViewsPluginManager $style_plugin_manager
    *   The plugin manager for views style plugins.
+   * @param \Drupal\views\Plugin\ViewsPluginManager $query_plugin_manager
+   *   The plugin manager for views query plugins.
    *
    * @todo Replace DisplayPluginBase::$display with
    *   DisplayPluginBase::$configuration to standardize with other plugins.
@@ -238,7 +247,9 @@ abstract class DisplayPluginBase extends PluginBase implements DisplayPluginInte
   ViewsPluginManager $exposed_form_plugin_manager,
   ViewsPluginManager $pager_plugin_manager,
   ViewsPluginManager $row_plugin_manager,
-  ViewsPluginManager $style_plugin_manager) {
+  ViewsPluginManager $style_plugin_manager,
+  ViewsPluginManager $query_plugin_manager,
+  ) {
     parent::__construct([], $plugin_id, $plugin_definition);
 
     $this->viewsData = $views_data;
@@ -249,6 +260,7 @@ abstract class DisplayPluginBase extends PluginBase implements DisplayPluginInte
     $this->pagerPluginManager = $pager_plugin_manager;
     $this->rowPluginManager = $row_plugin_manager;
     $this->stylePluginManager = $style_plugin_manager;
+    $this->queryPluginManager = $query_plugin_manager;
   }
 
   /**
@@ -267,6 +279,7 @@ abstract class DisplayPluginBase extends PluginBase implements DisplayPluginInte
       $container->get('plugin.manager.views.pager'),
       $container->get('plugin.manager.views.row'),
       $container->get('plugin.manager.views.style'),
+      $container->get('plugin.manager.views.query'),
     );
   }
 
