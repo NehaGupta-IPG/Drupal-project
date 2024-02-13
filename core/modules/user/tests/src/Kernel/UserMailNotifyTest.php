@@ -33,6 +33,14 @@ class UserMailNotifyTest extends EntityKernelTestBase {
   }
 
   /**
+   * {@inheritdoc}
+   */
+  public function setUp(): void {
+    parent::setUp();
+    $this->installSchema('user', ['users_data']);
+  }
+
+  /**
    * Data provider for user mail testing.
    *
    * @return array
