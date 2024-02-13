@@ -486,7 +486,7 @@ abstract class AccountForm extends ContentEntityForm implements TrustedCallbackI
     $new_mail = $form_state->getValue('mail');
     $old_mail = $account->getEmail();
 
-    $own_account = $this->currentUser()->id() === $account->id();
+    $own_account = (int) $this->currentUser()->id() === (int) $account->id();
     $skip_verification = !$own_account || $this->currentUser()->hasPermission('administer users');
     // Determine if this is a request to change the user email.
     if (!$account->isNew() && ($old_mail !== $new_mail) && !$skip_verification) {

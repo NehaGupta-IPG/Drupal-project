@@ -58,8 +58,8 @@ class MailChangeController extends ControllerBase {
     $current_user = $this->currentUser();
     $request_time = $this->time->getRequestTime();
 
-    // Other user is authenticated.
-    if ($current_user->isAuthenticated() && $current_user->id() !== $user->id()) {
+    // Another user is authenticated.
+    if ($current_user->isAuthenticated() && ((int) $current_user->id() !== (int) $user->id())) {
       $arguments = [
         '%user' => $current_user->getAccountName(),
         ':logout' => Url::fromRoute('user.logout')->toString(),
