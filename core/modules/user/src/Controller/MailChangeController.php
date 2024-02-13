@@ -6,8 +6,8 @@ use Drupal\Component\Datetime\TimeInterface;
 use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Access\AccessResultInterface;
 use Drupal\Core\Controller\ControllerBase;
-use Drupal\Core\Flood\FloodInterface;
 use Drupal\Core\Url;
+use Drupal\user\UserFloodControlInterface;
 use Drupal\user\UserInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 
@@ -16,15 +16,7 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
  */
 class MailChangeController extends ControllerBase {
 
-  /**
-   * Builds a new MailChangeController.
-   *
-   * @param \Drupal\Core\Flood\FloodInterface $flood
-   *   The flood service.
-   * @param \Drupal\Component\Datetime\TimeInterface $time
-   *   The time service.
-   */
-  public function __construct(protected FloodInterface $flood, protected TimeInterface $time) {}
+  public function __construct(protected UserFloodControlInterface $flood, protected TimeInterface $time) {}
 
   /**
    * Returns the user mail change page.
