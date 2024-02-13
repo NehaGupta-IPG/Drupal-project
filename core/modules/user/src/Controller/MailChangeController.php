@@ -3,9 +3,11 @@
 namespace Drupal\user\Controller;
 
 use Drupal\Component\Datetime\TimeInterface;
+use Drupal\Component\Utility\Crypt;
 use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Access\AccessResultInterface;
 use Drupal\Core\Controller\ControllerBase;
+use Drupal\Core\Site\Settings;
 use Drupal\Core\Url;
 use Drupal\user\UserFloodControlInterface;
 use Drupal\user\UserInterface;
@@ -26,8 +28,8 @@ class MailChangeController extends ControllerBase {
    *
    * @param \Drupal\user\UserInterface $user
    *   The user account requesting an email change.
-   * @param string $new_mail
-   *   The new email address.
+   * @param string $new_mail_hash
+   *   Hash of the new email address.
    * @param int $timestamp
    *   The timestamp when the hash was created.
    * @param string $hash
@@ -36,7 +38,7 @@ class MailChangeController extends ControllerBase {
    * @return \Symfony\Component\HttpFoundation\RedirectResponse
    *   An HTTP redirect response.
    */
-  public function page(UserInterface $user, string $new_mail, int $timestamp, string $hash): RedirectResponse {
+  public function page(UserInterface $user, string $new_mail_hash, int $timestamp, string $hash): RedirectResponse {
     $messenger = $this->messenger();
     $flood_config = $this->config('user.flood');
     if (!$this->flood->isAllowed('user.email_change_ip', $flood_config->get('ip_limit'), $flood_config->get('ip_window'))) {
@@ -75,6 +77,7 @@ class MailChangeController extends ControllerBase {
     $this->flood->register('user.email_change_user', $flood_config->get('user_window'), $identifier);
 
     // The link is valid.
+    $new_mail = \Drupal::service('user.data')->get('user', $user->id(), 'email_change:' . $new_mail_hash);
     if ($timestamp <= $request_time && $timestamp >= $user->getLastLoginTime() && hash_equals($hash, user_pass_rehash($user, $timestamp, $new_mail))) {
       // Save the new email and also refresh the last login time so that this
       // email change link is expired.
@@ -130,17 +133,21 @@ class MailChangeController extends ControllerBase {
   public static function getUrl(UserInterface $account, array $options = [], $timestamp = NULL, $hash = NULL): Url {
     $timestamp = $timestamp ?: \Drupal::time()->getRequestTime();
     $langcode = $options['langcode'] ?? $account->getPreferredLangcode();
-    $new_mail = $options['new_mail'] ?? NULL;
+    $new_mail = $options['new_mail'] ?? '';
     $hash = empty($hash) ? user_pass_rehash($account, $timestamp, $new_mail) : $hash;
     $url_options = [
       'absolute' => TRUE,
       'language' => \Drupal::service('language_manager')->getLanguage($langcode),
     ];
 
+    // Create a hash of the the new mail address and save in user.data.
+    $new_mail_hash = Crypt::hmacBase64($new_mail, \Drupal::service('private_key')->get() . Settings::getHashSalt());
+    \Drupal::service('user.data')->set('user', $account->id(), 'email_change:' . $new_mail_hash, $new_mail);
+
     return Url::fromRoute('user.mail_change', [
       'user' => $account->id(),
       'timestamp' => $timestamp,
-      'new_mail' => $options['new_mail'] ?? $account->getEmail(),
+      'new_mail_hash' => $new_mail_hash,
       'hash' => $hash,
     ], $url_options);
   }

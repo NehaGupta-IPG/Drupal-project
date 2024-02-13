@@ -3,6 +3,8 @@
 namespace Drupal\Tests\user\Functional;
 
 use Drupal\Component\Render\FormattableMarkup;
+use Drupal\Component\Utility\Crypt;
+use Drupal\Core\Site\Settings;
 use Drupal\Core\Test\AssertMailTrait;
 use Drupal\Core\Url;
 use Drupal\Tests\BrowserTestBase;
@@ -99,6 +101,7 @@ class UserMailChangeTest extends BrowserTestBase {
     $this->assertMail('subject', $subject);
 
     // Check that a verification email was sent.
+
     $this->assertMailString('to', $new_mail, 2);
     $subject = $token_service->replace($user_mail->get('mail_change_verification.subject'), ['user' => $this->account]);
     $this->assertMailString('subject', $subject, 2);
@@ -265,10 +268,15 @@ class UserMailChangeTest extends BrowserTestBase {
     // stored email address.
     $langcode = $this->account->getPreferredLangcode();
     $url_options = ['absolute' => TRUE, 'language' => \Drupal::service('language_manager')->getLanguage($langcode)];
+
+    $new_mail = 'foo@example.com';
+    $new_mail_hash = Crypt::hmacBase64($new_mail, \Drupal::service('private_key')->get() . Settings::getHashSalt());
+    \Drupal::service('user.data')->set('user', $this->account->id(), 'email_change:' . $new_mail_hash, $new_mail);
+
     $url = Url::fromRoute('user.mail_change', [
       'user' => $this->account->id(),
       'timestamp' => $timestamp,
-      'new_mail' => 'foo@example.com',
+      'new_mail_hash' => $new_mail_hash,
       'hash' => user_pass_rehash($this->account, $timestamp),
     ], $url_options);
     $this->drupalGet($url);

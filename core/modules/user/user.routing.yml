@@ -270,7 +270,7 @@ user.well-known.change_password:
     _user_is_logged_in: 'TRUE'
 
 user.mail_change:
-  path: '/user/mail-change/{user}/{new_mail}/{timestamp}/{hash}'
+  path: '/user/mail-change/{user}/{new_mail_hash}/{timestamp}/{hash}'
   defaults:
     _controller: '\Drupal\user\Controller\MailChangeController::page'
     _title: 'Change email address'
