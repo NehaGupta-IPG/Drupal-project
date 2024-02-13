@@ -85,6 +85,8 @@ class EntityReference extends DisplayPluginBase {
    *   The plugin manager for views row plugins.
    * @param \Drupal\views\Plugin\ViewsPluginManager $style_plugin_manager
    *   The plugin manager for views style plugins.
+   * @param \Drupal\views\Plugin\ViewsPluginManager $query_plugin_manager
+   *   The plugin manager for views query plugins.
    */
   public function __construct(array $configuration,
   $plugin_id,
@@ -97,8 +99,9 @@ class EntityReference extends DisplayPluginBase {
   ViewsPluginManager $exposed_form_plugin_manager,
   ViewsPluginManager $pager_plugin_manager,
   ViewsPluginManager $row_plugin_manager,
-  ViewsPluginManager $style_plugin_manager) {
-    parent::__construct($configuration, $plugin_id, $plugin_definition, $views_data, $access_plugin_manager, $cache_plugin_manager, $display_extender_plugin_manager, $exposed_form_plugin_manager, $pager_plugin_manager, $row_plugin_manager, $style_plugin_manager);
+  ViewsPluginManager $style_plugin_manager,
+  ViewsPluginManager $query_plugin_manager) {
+    parent::__construct($configuration, $plugin_id, $plugin_definition, $views_data, $access_plugin_manager, $cache_plugin_manager, $display_extender_plugin_manager, $exposed_form_plugin_manager, $pager_plugin_manager, $row_plugin_manager, $style_plugin_manager, $query_plugin_manager);
     $this->connection = $connection;
   }
 
@@ -119,6 +122,7 @@ class EntityReference extends DisplayPluginBase {
       $container->get('plugin.manager.views.pager'),
       $container->get('plugin.manager.views.row'),
       $container->get('plugin.manager.views.style'),
+      $container->get('plugin.manager.views.query'),
     );
   }
 
