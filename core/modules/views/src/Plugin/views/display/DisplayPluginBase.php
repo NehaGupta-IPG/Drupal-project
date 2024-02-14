@@ -10,6 +10,7 @@ use Drupal\Component\Utility\UrlHelper;
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Cache\CacheableDependencyInterface;
+use Drupal\Core\DependencyInjection\DependencySerializationTrait;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\Plugin\PluginDependencyTrait;
@@ -31,6 +32,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  */
 abstract class DisplayPluginBase extends PluginBase implements DisplayPluginInterface, DependentPluginInterface {
   use PluginDependencyTrait;
+  use DependencySerializationTrait;
 
   /**
    * The views data.
@@ -2919,39 +2921,6 @@ abstract class DisplayPluginBase extends PluginBase implements DisplayPluginInte
       return $entity_type->isTranslatable();
     }
     return FALSE;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function __serialize() {
-    $display = clone $this;
-    // Don't serialize all the injected service.
-    unset(
-      $display->viewsData,
-      $display->accessPluginManager,
-      $display->cachePluginManager,
-      $display->displayExtenderPluginManager,
-      $display->exposedFormPluginManager,
-      $display->pagerPluginManager,
-    );
-    return serialize(get_object_vars($display));
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function __unserialize($serialized) {
-    $data = unserialize($serialized);
-    foreach ($data as $key => $value) {
-      $this->{$key} = $value;
-    }
-    $this->viewsData = \Drupal::service('views.views_data');
-    $this->accessPluginManager = \Drupal::service('plugin.manager.views.access');
-    $this->cachePluginManager = \Drupal::service('plugin.manager.views.cache');
-    $this->displayExtenderPluginManager = \Drupal::service('plugin.manager.views.display_extender');
-    $this->exposedFormPluginManager = \Drupal::service('plugin.manager.views.exposed_form');
-    $this->pagerPluginManager = \Drupal::service('plugin.manager.views.pager');
   }
 
 }
