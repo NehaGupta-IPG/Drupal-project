@@ -116,6 +116,11 @@ class CollectRoutesTest extends UnitTestCase {
       ->getMock();
     $container->set('plugin.manager.views.row', $row_plugin_manager);
 
+    $query_plugin_manager = $this->getMockBuilder('\Drupal\views\Plugin\ViewsPluginManager')
+      ->disableOriginalConstructor()
+      ->getMock();
+    $container->set('plugin.manager.views.query', $query_plugin_manager);
+
     \Drupal::setContainer($container);
 
     $this->restExport = RestExport::create($container, [], "test_routes", []);
