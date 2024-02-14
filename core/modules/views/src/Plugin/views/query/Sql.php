@@ -590,13 +590,14 @@ class Sql extends QueryPluginBase {
    *
    * @param $alias
    *   The alias to sanitize.
-   * @param $maxlength
-   *   The maximum permitted length for the alias.  Defaults to 60 chars.
+   * @param int $maxlength
+   *   The maximum number of characters permitted in an alias. Defaults to 60.
    *
-   * @return string
-   *   The sanitized alias.
+   * @return mixed
+   *   The sanitized alias string (if a string argument was supplied;
+   *   non-strings are returned unmodified).
    */
-  public static function sanitizeAlias($alias, $maxlength = 60) {
+  public static function sanitizeAlias($alias, int $maxlength = 60) {
     if (!is_string($alias)) {
       return $alias;
     }
