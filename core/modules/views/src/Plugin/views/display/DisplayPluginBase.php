@@ -37,66 +37,66 @@ abstract class DisplayPluginBase extends PluginBase implements DisplayPluginInte
   /**
    * The views data.
    *
-   * @var \Drupal\views\ViewsData
+   * @var \Drupal\views\ViewsData|null
    */
-  protected ViewsData $viewsData;
+  protected ?ViewsData $viewsData;
 
   /**
    * The plugin manager for views access plugins.
    *
-   * @var \Drupal\views\Plugin\ViewsPluginManager
+   * @var \Drupal\views\Plugin\ViewsPluginManager|null
    */
-  protected ViewsPluginManager $accessPluginManager;
+  protected ?ViewsPluginManager $accessPluginManager;
 
 
   /**
    * The plugin manager for views cache plugins.
    *
-   * * @var \Drupal\views\Plugin\ViewsPluginManager
+   * * @var \Drupal\views\Plugin\ViewsPluginManager|null
    */
-  protected ViewsPluginManager $cachePluginManager;
+  protected ?ViewsPluginManager $cachePluginManager;
 
   /**
    * The plugin manager for views display extender plugins.
    *
-   * @var \Drupal\views\Plugin\ViewsPluginManager
+   * @var \Drupal\views\Plugin\ViewsPluginManager|null
    */
-  protected ViewsPluginManager $displayExtenderPluginManager;
+  protected ?ViewsPluginManager $displayExtenderPluginManager;
 
   /**
    * The plugin manager for views exposed form plugins.
    *
-   * @var \Drupal\views\Plugin\ViewsPluginManager
+   * @var \Drupal\views\Plugin\ViewsPluginManager|null
    */
-  protected ViewsPluginManager $exposedFormPluginManager;
+  protected ?ViewsPluginManager $exposedFormPluginManager;
 
   /**
    * The plugin manager for views pager plugins.
    *
-   * @var \Drupal\views\Plugin\ViewsPluginManager
+   * @var \Drupal\views\Plugin\ViewsPluginManager|null
    */
-  protected ViewsPluginManager $pagerPluginManager;
+  protected ?ViewsPluginManager $pagerPluginManager;
 
   /**
    * The plugin manager for views row plugins.
    *
-   * @var \Drupal\views\Plugin\ViewsPluginManager
+   * @var \Drupal\views\Plugin\ViewsPluginManager|null
    */
-  protected ViewsPluginManager $rowPluginManager;
+  protected ?ViewsPluginManager $rowPluginManager;
 
   /**
    * The plugin manager for views style plugins.
    *
-   * @var \Drupal\views\Plugin\ViewsPluginManager
+   * @var \Drupal\views\Plugin\ViewsPluginManager|null
    */
-  protected ViewsPluginManager $stylePluginManager;
+  protected ?ViewsPluginManager $stylePluginManager;
 
   /**
    * The plugin manager for views query plugins.
    *
-   * @var \Drupal\views\Plugin\ViewsPluginManager
+   * @var \Drupal\views\Plugin\ViewsPluginManager|null
    */
-  protected ViewsPluginManager $queryPluginManager;
+  protected ?ViewsPluginManager $queryPluginManager;
 
   /**
    * The top object of a view.
@@ -217,23 +217,23 @@ abstract class DisplayPluginBase extends PluginBase implements DisplayPluginInte
    *   The plugin ID for the plugin instance.
    * @param mixed $plugin_definition
    *   The plugin implementation definition.
-   * @param \Drupal\views\ViewsData $views_data
+   * @param \Drupal\views\ViewsData|null $views_data
    *   The views data.
-   * @param \Drupal\views\Plugin\ViewsPluginManager $access_plugin_manager
+   * @param \Drupal\views\Plugin\ViewsPluginManager|null $access_plugin_manager
    *   The plugin manager for views access plugins.
-   * @param \Drupal\views\Plugin\ViewsPluginManager $cache_plugin_manager
+   * @param \Drupal\views\Plugin\ViewsPluginManager|null $cache_plugin_manager
    *   The plugin manager for views cache plugins.
-   * @param \Drupal\views\Plugin\ViewsPluginManager $display_extender_plugin_manager
+   * @param \Drupal\views\Plugin\ViewsPluginManager|null $display_extender_plugin_manager
    *   The plugin manager for views display extender plugins.
-   * @param \Drupal\views\Plugin\ViewsPluginManager $exposed_form_plugin_manager
+   * @param \Drupal\views\Plugin\ViewsPluginManager|null $exposed_form_plugin_manager
    *   The plugin manager for views exposed form plugins.
-   * @param \Drupal\views\Plugin\ViewsPluginManager $pager_plugin_manager
+   * @param \Drupal\views\Plugin\ViewsPluginManager|null $pager_plugin_manager
    *   The plugin manager for views pager plugins.
-   * @param \Drupal\views\Plugin\ViewsPluginManager $row_plugin_manager
+   * @param \Drupal\views\Plugin\ViewsPluginManager|null $row_plugin_manager
    *   The plugin manager for views row plugins.
-   * @param \Drupal\views\Plugin\ViewsPluginManager $style_plugin_manager
+   * @param \Drupal\views\Plugin\ViewsPluginManager|null $style_plugin_manager
    *   The plugin manager for views style plugins.
-   * @param \Drupal\views\Plugin\ViewsPluginManager $query_plugin_manager
+   * @param \Drupal\views\Plugin\ViewsPluginManager|null $query_plugin_manager
    *   The plugin manager for views query plugins.
    *
    * @todo Replace DisplayPluginBase::$display with
@@ -242,26 +242,65 @@ abstract class DisplayPluginBase extends PluginBase implements DisplayPluginInte
   public function __construct(array $configuration,
   $plugin_id,
   $plugin_definition,
-  ViewsData $views_data,
-  ViewsPluginManager $access_plugin_manager,
-  ViewsPluginManager $cache_plugin_manager,
-  ViewsPluginManager $display_extender_plugin_manager,
-  ViewsPluginManager $exposed_form_plugin_manager,
-  ViewsPluginManager $pager_plugin_manager,
-  ViewsPluginManager $row_plugin_manager,
-  ViewsPluginManager $style_plugin_manager,
-  ViewsPluginManager $query_plugin_manager,
+  ViewsData $views_data = NULL,
+  ViewsPluginManager $access_plugin_manager = NULL,
+  ViewsPluginManager $cache_plugin_manager = NULL,
+  ViewsPluginManager $display_extender_plugin_manager = NULL,
+  ViewsPluginManager $exposed_form_plugin_manager = NULL,
+  ViewsPluginManager $pager_plugin_manager = NULL,
+  ViewsPluginManager $row_plugin_manager = NULL,
+  ViewsPluginManager $style_plugin_manager = NULL,
+  ViewsPluginManager $query_plugin_manager = NULL,
   ) {
     parent::__construct([], $plugin_id, $plugin_definition);
 
     $this->viewsData = $views_data;
+    if ($access_plugin_manager === NULL) {
+      @trigger_error('Calling ' . __METHOD__ . ' without the $access_plugin_manager argument is deprecated in drupal:10.3.0 and it will be required in drupal:11.0.0. See https://www.drupal.org/node/2015121', E_USER_DEPRECATED);
+      $access_plugin_manager = \Drupal::service('plugin.manager.views.access');
+    }
     $this->accessPluginManager = $access_plugin_manager;
+
+    if ($cache_plugin_manager === NULL) {
+      @trigger_error('Calling ' . __METHOD__ . ' without the $cache_plugin_manager argument is deprecated in drupal:10.3.0 and it will be required in drupal:11.0.0. See https://www.drupal.org/node/2015121', E_USER_DEPRECATED);
+      $cache_plugin_manager = \Drupal::service('plugin.manager.views.cache');
+    }
     $this->cachePluginManager = $cache_plugin_manager;
+
+    if ($display_extender_plugin_manager === NULL) {
+      @trigger_error('Calling ' . __METHOD__ . ' without the $display_extender_plugin_manager argument is deprecated in drupal:10.3.0 and it will be required in drupal:11.0.0. See https://www.drupal.org/node/2015121', E_USER_DEPRECATED);
+      $display_extender_plugin_manager = \Drupal::service('plugin.manager.views.display_extender');
+    }
     $this->displayExtenderPluginManager = $display_extender_plugin_manager;
+
+    if ($exposed_form_plugin_manager === NULL) {
+      @trigger_error('Calling ' . __METHOD__ . ' without the $exposed_form_plugin_manager argument is deprecated in drupal:10.3.0 and it will be required in drupal:11.0.0. See https://www.drupal.org/node/2015121', E_USER_DEPRECATED);
+      $exposed_form_plugin_manager = \Drupal::service('plugin.manager.views.exposed_form');
+    }
     $this->exposedFormPluginManager = $exposed_form_plugin_manager;
+
+    if ($pager_plugin_manager === NULL) {
+      @trigger_error('Calling ' . __METHOD__ . ' without the $pager_plugin_manager argument is deprecated in drupal:10.3.0 and it will be required in drupal:11.0.0. See https://www.drupal.org/node/2015121', E_USER_DEPRECATED);
+      $pager_plugin_manager = \Drupal::service('plugin.manager.views.pager');
+    }
     $this->pagerPluginManager = $pager_plugin_manager;
+
+    if ($row_plugin_manager === NULL) {
+      @trigger_error('Calling ' . __METHOD__ . ' without the $row_plugin_manager argument is deprecated in drupal:10.3.0 and it will be required in drupal:11.0.0. See https://www.drupal.org/node/2015121', E_USER_DEPRECATED);
+      $row_plugin_manager = \Drupal::service('plugin.manager.views.row');
+    }
     $this->rowPluginManager = $row_plugin_manager;
+
+    if ($style_plugin_manager === NULL) {
+      @trigger_error('Calling ' . __METHOD__ . ' without the $style_plugin_manager argument is deprecated in drupal:10.3.0 and it will be required in drupal:11.0.0. See https://www.drupal.org/node/2015121', E_USER_DEPRECATED);
+      $style_plugin_manager = \Drupal::service('plugin.manager.views.style');
+    }
     $this->stylePluginManager = $style_plugin_manager;
+
+    if ($query_plugin_manager === NULL) {
+      @trigger_error('Calling ' . __METHOD__ . ' without the $query_plugin_manager argument is deprecated in drupal:10.3.0 and it will be required in drupal:11.0.0. See https://www.drupal.org/node/2015121', E_USER_DEPRECATED);
+      $query_plugin_manager = \Drupal::service('plugin.manager.views.query');
+    }
     $this->queryPluginManager = $query_plugin_manager;
   }
 
