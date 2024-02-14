@@ -91,7 +91,7 @@ class ConfigImportSubscriber extends ConfigImportValidateEventSubscriberBase {
   }
 
   /**
-   * Validates module installations and uninstallations.
+   * Verifies the process of installing and removing modules.
    *
    * @param \Drupal\Core\Config\ConfigImporter $config_importer
    *   The configuration importer.
@@ -182,7 +182,7 @@ class ConfigImportSubscriber extends ConfigImportValidateEventSubscriberBase {
   }
 
   /**
-   * Validates theme installations and uninstallations.
+   * Confirms the installation and removal processes of themes.
    *
    * @param \Drupal\Core\Config\ConfigImporter $config_importer
    *   The configuration importer.

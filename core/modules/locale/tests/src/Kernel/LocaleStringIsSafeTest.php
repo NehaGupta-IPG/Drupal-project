@@ -35,8 +35,8 @@ class LocaleStringIsSafeTest extends KernelTestBase {
     $result = locale_string_is_safe($string);
     $this->assertTrue($result);
 
-    // Check an untranslatable string which includes unsafe HTML (according to
-    // the locale_string_is_safe() function definition).
+    // Verify a non-translatable string that contains potentially unsafe HTML,
+    // based on the definition provided by the locale_string_is_safe() function.
     $string = 'Hello <img src="world.png" alt="world" />!';
     $result = locale_string_is_safe($string);
     $this->assertFalse($result);

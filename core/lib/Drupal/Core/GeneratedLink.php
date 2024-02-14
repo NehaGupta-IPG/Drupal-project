@@ -6,11 +6,11 @@ use Drupal\Component\Render\MarkupInterface;
 use Drupal\Core\Render\BubbleableMetadata;
 
 /**
- * Used to return generated links, along with associated cacheability metadata.
+ * Used to return generated links and their related cacheability data.
  *
- * Note: not to be confused with \Drupal\Core\Link, which is for passing around
- *   links that are not generated (typically link text + route name + route
- *   parameters).
+ * Note: Don't confuse this with \Drupal\Core\Link. That's used for dealing
+ *  with links that are not yet generated (typically, these can be a combination of
+ *  link text, route name, and route parameters).
  */
 class GeneratedLink extends BubbleableMetadata implements MarkupInterface, \Countable {
 

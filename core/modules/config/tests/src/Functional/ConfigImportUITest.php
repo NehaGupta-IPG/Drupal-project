@@ -117,7 +117,7 @@ class ConfigImportUITest extends BrowserTestBase {
     // file in sync will already contain them.
     \Drupal::service('module_installer')->uninstall(['text', 'options']);
 
-    // Set the state system to record installations and uninstallations.
+    // Configure the state system to log the events of installing and removing modules.
     \Drupal::state()->set('ConfigImportUITest.core.extension.modules_installed', []);
     \Drupal::state()->set('ConfigImportUITest.core.extension.modules_uninstalled', []);
 
@@ -195,7 +195,7 @@ class ConfigImportUITest extends BrowserTestBase {
     ];
     $sync->write('system.theme', $system_theme);
 
-    // Set the state system to record installations and uninstallations.
+    // Configure the state system to log the events of theme installations and removals.
     \Drupal::state()->set('ConfigImportUITest.core.extension.modules_installed', []);
     \Drupal::state()->set('ConfigImportUITest.core.extension.modules_uninstalled', []);
 
