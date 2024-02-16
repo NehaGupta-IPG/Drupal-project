@@ -596,6 +596,7 @@ class EntityViewsData implements EntityHandlerInterface, EntityViewsDataInterfac
             $views_field['sort']['id'] = 'standard';
             break;
 
+          case 'blob':
           case 'char':
           case 'string':
           case 'varchar':
