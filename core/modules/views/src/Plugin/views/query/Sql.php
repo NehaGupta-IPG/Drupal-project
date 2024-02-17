@@ -579,7 +579,7 @@ class Sql extends QueryPluginBase {
   /**
    * Produce a safe alias value.
    *
-   * We limit the length of the original alias (to a default maximum of 60
+   * We limit the length of an alias string (to a default maximum of 60
    * characters), incorporating a hash of the original value for uniqueness
    * if that value was too long to use verbatim.
    *
@@ -588,7 +588,7 @@ class Sql extends QueryPluginBase {
    * truncation.  This happens particularly easily with relationships,
    * where alias names may be built from several concatenated identifiers.
    *
-   * @param $alias
+   * @param mixed $alias
    *   The alias to sanitize.
    * @param int $maxlength
    *   The maximum number of characters permitted in an alias. Defaults to 60.
@@ -597,7 +597,7 @@ class Sql extends QueryPluginBase {
    *   The sanitized alias string (if a string argument was supplied;
    *   non-strings are returned unmodified).
    */
-  public static function sanitizeAlias($alias, int $maxlength = 60) {
+  public static function sanitizeAlias(mixed $alias, int $maxlength = 60): mixed {
     if (!is_string($alias)) {
       return $alias;
     }
