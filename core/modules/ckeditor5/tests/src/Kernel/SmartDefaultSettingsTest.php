@@ -418,7 +418,6 @@ class SmartDefaultSettingsTest extends KernelTestBase {
    */
   #[DataProvider('provider')]
   public function test(string $format_id, array $filters_to_drop, array $expected_ckeditor5_settings, string $expected_superset, array $expected_fundamental_compatibility_violations, array $expected_db_logs, array $expected_messages, ?array $expected_post_filter_drop_fundamental_compatibility_violations = NULL, ?array $expected_post_update_text_editor_violations = NULL): void {
-    $this->expectDeprecation('Specifying roles in text formats is deprecated in drupal:10.3.0 and will not be supported starting in drupal:11.0.0. See https://www.drupal.org/node/3168851');
     $text_format = FilterFormat::load($format_id);
     $text_editor = Editor::load($format_id);
 
