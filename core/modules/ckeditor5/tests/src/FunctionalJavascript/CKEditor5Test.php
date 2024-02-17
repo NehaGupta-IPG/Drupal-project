@@ -13,7 +13,6 @@ use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\node\Entity\Node;
 use Drupal\Tests\ckeditor5\Traits\CKEditor5TestTrait;
 use Drupal\Tests\TestFileCreationTrait;
-use Drupal\user\RoleInterface;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Symfony\Component\Validator\ConstraintViolationInterface;
@@ -556,11 +555,9 @@ JS;
    * Tests list plugin.
    */
   public function testListPlugin(): void {
-    $this->expectDeprecation('Specifying roles in text formats is deprecated in drupal:10.3.0 and will not be supported starting in drupal:11.0.0. See https://www.drupal.org/node/3168851');
     FilterFormat::create([
       'format' => 'test_format',
       'name' => 'CKEditor 5 with list',
-      'roles' => [RoleInterface::AUTHENTICATED_ID],
     ])->save();
     Editor::create([
       'format' => 'test_format',
@@ -743,7 +740,6 @@ JS;
     FilterFormat::create([
       'format' => 'ckeditor5',
       'name' => 'CKEditor 5 HTML',
-      'roles' => [RoleInterface::AUTHENTICATED_ID],
     ])->save();
     Editor::create([
       'format' => 'ckeditor5',

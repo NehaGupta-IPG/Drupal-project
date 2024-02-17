@@ -57,7 +57,6 @@ class AddedStylesheetsTest extends BrowserTestBase {
       'format' => 'llama',
       'name' => 'Llama',
       'filters' => [],
-      'roles' => [RoleInterface::AUTHENTICATED_ID],
     ]);
     $filtered_html_format->save();
     $this->editor = Editor::create([
