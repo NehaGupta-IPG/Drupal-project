@@ -22,6 +22,7 @@ class ImageUploadAccessTest extends ImageUploadTest {
    * Test access to the CKEditor 5 image upload controller.
    */
   public function testCkeditor5ImageUploadRoute(): void {
+    $this->expectDeprecation('Specifying roles in text formats is deprecated in drupal:10.3.0 and will not be supported starting in drupal:11.0.0. See https://www.drupal.org/node/3168851');
     $this->createBasicFormat();
     $url = $this->getUploadUrl();
     $test_image = file_get_contents(current($this->getTestFiles('image'))->uri);
