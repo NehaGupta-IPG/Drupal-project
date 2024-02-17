@@ -17,6 +17,7 @@ use Drupal\Tests\BrowserTestBase;
 use Drupal\Tests\ckeditor5\Traits\SynchronizeCsrfTokenSeedTrait;
 use Drupal\Tests\media\Traits\MediaTypeCreationTrait;
 use Drupal\Tests\TestFileCreationTrait;
+use Drupal\user\RoleInterface;
 use Drupal\user\Entity\User;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -136,6 +137,7 @@ class MediaEntityMetadataApiTest extends BrowserTestBase {
           ],
         ],
       ],
+      'roles' => [RoleInterface::AUTHENTICATED_ID],
     ]);
     $filtered_html_format->save();
     $this->editor = Editor::create([
@@ -218,6 +220,7 @@ class MediaEntityMetadataApiTest extends BrowserTestBase {
    * Tests the media entity metadata API.
    */
   public function testApi(): void {
+    $this->expectDeprecation('Specifying roles in text formats is deprecated in drupal:10.3.0 and will not be supported starting in drupal:11.0.0. See https://www.drupal.org/node/3168851');
     $path = '/ckeditor5/filtered_html/media-entity-metadata';
     $token = $this->container->get('csrf_token')->get(ltrim($path, '/'));
     $uuid = $this->mediaImage->uuid();
@@ -284,6 +287,7 @@ class MediaEntityMetadataApiTest extends BrowserTestBase {
    * Tests the media entity metadata API with translations.
    */
   public function testApiTranslation(): void {
+    $this->expectDeprecation('Specifying roles in text formats is deprecated in drupal:10.3.0 and will not be supported starting in drupal:11.0.0. See https://www.drupal.org/node/3168851');
     $this->container->get('module_installer')->install(['language', 'content_translation']);
     $this->resetAll();
     ConfigurableLanguage::createFromLangcode('fi')->save();
