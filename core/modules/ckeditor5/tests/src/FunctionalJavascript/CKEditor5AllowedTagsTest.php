@@ -7,6 +7,8 @@ namespace Drupal\Tests\ckeditor5\FunctionalJavascript;
 use Drupal\Core\Entity\Entity\EntityViewMode;
 use Drupal\editor\Entity\Editor;
 use Drupal\filter\Entity\FilterFormat;
+use Drupal\user\Entity\Role;
+use Drupal\user\RoleInterface;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Symfony\Component\Yaml\Yaml;
@@ -426,6 +428,11 @@ class CKEditor5AllowedTagsTest extends CKEditor5TestBase {
     FilterFormat::create(
       Yaml::parseFile('core/profiles/standard/config/install/filter.format.basic_html.yml')
     )->save();
+    // @see core/profiles/standard/config/install/user.role.authenticated.yml
+    $this->grantPermissions(
+      Role::load(RoleInterface::AUTHENTICATED_ID),
+      ['use text format basic_html']
+    );
 
     $page = $this->getSession()->getPage();
     $assert_session = $this->assertSession();
@@ -446,7 +453,7 @@ class CKEditor5AllowedTagsTest extends CKEditor5TestBase {
 
     // Change the node's text format to Full HTML.
     $this->drupalGet('node/1/edit');
-    $filter_tips = $page->find('css', '[data-drupal-format-id="plain_text"]');
+    $filter_tips = $page->find('css', '[data-drupal-format-id="basic_html"]');
     $this->assertTrue($filter_tips->isVisible());
     $page->selectFieldOption('body[0][format]', 'full_html');
     $this->assertNotEmpty($assert_session->waitForText('Change text format?'));
@@ -475,7 +482,7 @@ class CKEditor5AllowedTagsTest extends CKEditor5TestBase {
     $this->drupalGet('node/1/edit');
     $page->pressButton('Save');
 
-    $assert_session->responseContains('<foo bar="baz">⬅️✌️➡️</foo><p><a href="https://example.com" foo="bar" hreflang="en"><abbr title="National Aeronautics and Space Administration">NASA</abbr> is an acronym.</a></p>');
+    $assert_session->responseContains('<p><a foo="bar" hreflang="en" href="https://example.com"><abbr title="National Aeronautics and Space Administration">NASA</abbr> is an acronym.</a></p>');
 
     // Configure Basic HTML text format to use CKE5 and enable the link plugin.
     $this->drupalGet('admin/config/content/formats/manage/basic_html');
