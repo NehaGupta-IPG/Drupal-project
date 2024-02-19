@@ -185,6 +185,9 @@ system.logging:
             - 'some'
             - 'all'
             - 'verbose'
+    deprecations:
+      type: string
+      label: 'Deprecations to display (all, contrib & custom, custom only)'
 
 system.performance:
   type: config_object

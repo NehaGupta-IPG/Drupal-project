@@ -55,7 +55,23 @@ function drupal_error_levels(): array {
  *   The line number the error was raised at.
  */
 function _drupal_error_handler_real($error_level, $message, $filename, $line): void {
-  if ($error_level & error_reporting()) {
+  $deprecation_setting = _drupal_get_deprecation_logging_setting();
+  if (($error_level & error_reporting()) || ($error_level === E_USER_DEPRECATED && $deprecation_setting !== 'none')) {
+
+    // Filter out deprecations depending on the deprecation setting value.
+    if ($error_level === E_USER_DEPRECATED && $deprecation_setting !== 'all') {
+      $is_contrib = strpos($filename, '/modules/contrib/') !== FALSE;
+      if ($deprecation_setting === 'contrib' && !$is_contrib) {
+        return;
+      }
+      $is_core = strpos($filename, '/core/') !== FALSE;
+
+      if ($deprecation_setting === 'custom' && ($is_contrib || $is_core)) {
+        return;
+      }
+    }
+
+>>>>>>> 12a411934db (Added new config schema; enabled filtered deprecations reporting.)
     $types = drupal_error_levels();
     [$severity_msg, $severity_level] = $types[$error_level];
     $backtrace = debug_backtrace();
@@ -337,6 +353,34 @@ function _drupal_get_error_level() {
   // possibly in an edge-case error situation while trying to serve a regular
   // request on a public site, so use the non-verbose default value.
   return $error_level ?: ERROR_REPORTING_DISPLAY_ALL;
+}
+
+/**
+ * Returns the current deprecation logging setting.
+ *
+ * This function should only be used to get the current error level prior to the
+ * kernel being booted or before Drupal is installed. In all other situations
+ * the following code is preferred:
+ * @code
+ * \Drupal::config('system.logging')->get('deprecations');
+ * @endcode
+ *
+ * @return bool
+ *   The current deprecation logging setting.
+ */
+function _drupal_get_deprecation_logging_setting() {
+  if (InstallerKernel::installationAttempted()) {
+    return 'all';
+  }
+  $deprecations = 'all';
+  try {
+    $deprecations = \Drupal::config('system.logging')->get('deprecations');
+  }
+  catch (\Exception $e) {
+    $deprecations = $GLOBALS['config']['system.logging']['deprecations'] ?? 'all';
+  }
+
+  return $deprecations;
 }
 
 /**
