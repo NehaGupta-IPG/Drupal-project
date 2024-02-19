@@ -11,7 +11,6 @@ use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\filter\Entity\FilterFormat;
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
 use Drupal\node\Entity\NodeType;
-use Drupal\user\RoleInterface;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -46,7 +45,6 @@ class FormErrorHandlerCKEditor5Test extends WebDriverTestBase {
     FilterFormat::create([
       'format' => 'ckeditor5',
       'name' => 'CKEditor 5 with image upload',
-      'roles' => [RoleInterface::AUTHENTICATED_ID],
     ])->save();
     Editor::create([
       'format' => 'ckeditor5',
@@ -82,6 +80,7 @@ class FormErrorHandlerCKEditor5Test extends WebDriverTestBase {
     $account = $this->drupalCreateUser([
       'administer nodes',
       'create page content',
+      'use text format ckeditor5',
     ]);
     $this->drupalLogin($account);
   }
@@ -90,7 +89,6 @@ class FormErrorHandlerCKEditor5Test extends WebDriverTestBase {
    * Tests if the fragment link to a textarea works with CKEditor 5 enabled.
    */
   public function testFragmentLink(): void {
-    $this->expectDeprecation('Specifying roles in text formats is deprecated in drupal:10.3.0 and will not be supported starting in drupal:11.0.0. See https://www.drupal.org/node/3168851');
     $session = $this->getSession();
     $web_assert = $this->assertSession();
     $ckeditor_class = '.ck-editor';
