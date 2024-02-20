@@ -19,7 +19,6 @@ abstract class ConfigEntityResourceTestBase extends ResourceTestBase {
   const SKIP_METHODS = [
     'testRelated',
     'testRelationships',
-    'testPostIndividual',
     'testPatchIndividual',
     'testDeleteIndividual',
     'testRevisions',
