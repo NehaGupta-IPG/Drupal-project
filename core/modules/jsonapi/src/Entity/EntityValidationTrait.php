@@ -2,6 +2,7 @@
 
 namespace Drupal\jsonapi\Entity;
 
+use Drupal\Core\Config\Entity\ConfigEntityInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\FieldableEntityInterface;
 use Drupal\jsonapi\Exception\UnprocessableHttpEntityException;
@@ -33,15 +34,24 @@ trait EntityValidationTrait {
    * @see \Drupal\rest\Plugin\rest\resource\EntityResourceValidationTrait::validate()
    */
   protected static function validate(EntityInterface $entity, ?array $field_names = NULL) {
-    if (!$entity instanceof FieldableEntityInterface) {
+    if (!$entity instanceof FieldableEntityInterface && !$entity instanceof ConfigEntityInterface) {
       return;
+    }
+
+    // Any config entity received here is guaranteed to be fully validatable.
+    // @see \Drupal\jsonapi\ResourceType\ResourceTypeRepository::isMutableResourceType()
+    if ($entity instanceof ConfigEntityInterface) {
+      $entity = $entity->getTypedData();
     }
 
     $violations = $entity->validate();
 
     // Remove violations of inaccessible fields as they cannot stem from our
-    // changes.
-    $violations->filterByFieldAccess();
+    // changes. Field-level access control only exists for fieldable entities,
+    // not for config entities.
+    if ($entity instanceof FieldableEntityInterface) {
+      $violations->filterByFieldAccess();
+    }
 
     // Filter violations based on the given fields.
     if ($field_names !== NULL) {
