@@ -38,6 +38,31 @@ class LoggingForm extends ConfigFormBase {
       '#description' => $this->t('It is recommended that sites running on production environments do not display any errors.'),
     ];
 
+    $form['deprecation_level'] = [
+      '#type' => 'radios',
+      '#title' => $this->t('Deprecations to log'),
+      '#config_target' => 'system.logging:deprecation_level',
+      '#options' => [
+        'none' => $this->t('None'),
+        'custom' => $this->t('Custom code only'),
+        'contrib' => $this->t('Custom and contributed code'),
+        'all' => $this->t('All (core and vendor included)'),
+      ],
+      '#description' => $this->t('It is recommended that sites running on production environments do not log any deprecations.'),
+    ];
+
+    $form['ignored_deprecations'] = [
+      '#type' => 'textarea',
+      '#title' => $this->t('Ignored deprecations'),
+      '#config_target' => 'system.logging:ignored_deprecations',
+      '#description' => $this->t('List of ignored deprecations, one per line'),
+      '#states' => [
+        'visible' => [
+          ':input[name="deprecation_level"]' => ['!value' => 'none'],
+        ],
+      ],
+    ];
+
     return parent::buildForm($form, $form_state);
   }
 

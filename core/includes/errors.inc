@@ -55,23 +55,35 @@ function drupal_error_levels(): array {
  *   The line number the error was raised at.
  */
 function _drupal_error_handler_real($error_level, $message, $filename, $line): void {
-  $deprecation_setting = _drupal_get_deprecation_logging_setting();
-  if (($error_level & error_reporting()) || ($error_level === E_USER_DEPRECATED && $deprecation_setting !== 'none')) {
+  $deprecation_level = _drupal_get_deprecation_setting('deprecation_level', 'all');
+  if (($error_level & error_reporting()) || ($error_level === E_USER_DEPRECATED && $deprecation_level !== 'none')) {
 
-    // Filter out deprecations depending on the deprecation setting value.
-    if ($error_level === E_USER_DEPRECATED && $deprecation_setting !== 'all') {
-      $is_contrib = strpos($filename, '/modules/contrib/') !== FALSE;
-      if ($deprecation_setting === 'contrib' && !$is_contrib) {
+    // Filter out deprecations depending on the deprecation settings value.
+    // In case of invalid delrecation level setting all deprecations will be
+    // displayed.
+    if ($error_level === E_USER_DEPRECATED) {
+      if ($deprecation_level !== 'all') {
+        $is_contrib = strpos($filename, '/modules/contrib/') !== FALSE;
+        if ($deprecation_level === 'contrib' && !$is_contrib) {
+          return;
+        }
+        $is_core = strpos($filename, '/core/') !== FALSE;
+        $is_vendor = strpos($filename, '/vendor/') !== FALSE;
+        if ($deprecation_level === 'custom' && ($is_contrib || $is_core || $is_vendor)) {
+          return;
+        }
+      }
+
+      $ignored_deprecations = explode(PHP_EOL, _drupal_get_deprecation_setting('ignored_deprecations', ''));
+      if (in_array($message, $ignored_deprecations)) {
         return;
       }
-      $is_core = strpos($filename, '/core/') !== FALSE;
-
-      if ($deprecation_setting === 'custom' && ($is_contrib || $is_core)) {
-        return;
-      }
+      $channel = 'deprecation';
+    }
+    else {
+      $channel = 'php';
     }
 
->>>>>>> 12a411934db (Added new config schema; enabled filtered deprecations reporting.)
     $types = drupal_error_levels();
     [$severity_msg, $severity_level] = $types[$error_level];
     $backtrace = debug_backtrace();
@@ -95,7 +107,7 @@ function _drupal_error_handler_real($error_level, $message, $filename, $line): v
       'backtrace' => $backtrace,
       '@backtrace_string' => (new \Exception())->getTraceAsString(),
       'exception' => NULL,
-    ], $recoverable || $to_string);
+    ], $recoverable || $to_string, $channel);
   }
   // If the site is a test site then fail for user deprecations so they can be
   // caught by the deprecation error handler.
@@ -160,8 +172,10 @@ function error_displayable($error = NULL) {
  *   - An exception is thrown and not caught by something else.
  *   - A recoverable fatal error, which is a fatal error.
  *   Non-recoverable fatal errors cannot be logged by Drupal.
+ * @param string $channel
+ *   The logger channel to use.
  */
-function _drupal_log_error($error, $fatal = FALSE): void {
+function _drupal_log_error($error, $fatal = FALSE, $channel = 'php') : void {
   $is_installer = InstallerKernel::installationAttempted() && \Drupal::hasContainer();
 
   // Backtrace, exception and 'severity_level' are not valid replacement values
@@ -187,7 +201,7 @@ function _drupal_log_error($error, $fatal = FALSE): void {
       // Provide the PHP backtrace and exception to logger implementations. Add
       // 'severity_level' to the context to maintain BC and allow logging
       // implementations to use it.
-      \Drupal::logger('php')->log($severity, '%type: @message in %function (line %line of %file) @backtrace_string.', $error + ['backtrace' => $backtrace, 'exception' => $exception, 'severity_level' => $severity]);
+      \Drupal::logger($channel)->log($severity, '%type: @message in %function (line %line of %file) @backtrace_string.', $error + ['backtrace' => $backtrace, 'exception' => $exception, 'severity_level' => $severity]);
     }
     catch (\Throwable) {
       // We can't log, for example because the database connection is not
@@ -356,31 +370,27 @@ function _drupal_get_error_level() {
 }
 
 /**
- * Returns the current deprecation logging setting.
+ * Helper function to get error reporting setting.
  *
- * This function should only be used to get the current error level prior to the
- * kernel being booted or before Drupal is installed. In all other situations
- * the following code is preferred:
- * @code
- * \Drupal::config('system.logging')->get('deprecations');
- * @endcode
- *
- * @return bool
- *   The current deprecation logging setting.
+ * @param string $setting
+ *   The setting to get.
+ * @param string $default
+ *   The default value.
  */
-function _drupal_get_deprecation_logging_setting() {
+function _drupal_get_deprecation_setting(string $setting, string $default) {
   if (InstallerKernel::installationAttempted()) {
-    return 'all';
-  }
-  $deprecations = 'all';
-  try {
-    $deprecations = \Drupal::config('system.logging')->get('deprecations');
-  }
-  catch (\Exception $e) {
-    $deprecations = $GLOBALS['config']['system.logging']['deprecations'] ?? 'all';
+    return $default;
   }
 
-  return $deprecations;
+  $value = $default;
+  try {
+    $value = \Drupal::config('system.logging')->get($setting);
+  }
+  catch (\Exception $e) {
+    $value = $GLOBALS['config']['system.logging'][$setting] ?? $default;
+  }
+
+  return $value;
 }
 
 /**

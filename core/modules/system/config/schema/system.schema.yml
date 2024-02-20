@@ -188,6 +188,12 @@ system.logging:
     deprecations:
       type: string
       label: 'Deprecations to display (all, contrib & custom, custom only)'
+    deprecation_level:
+      type: string
+      label: 'Deprecations to display (all, contrib & custom, custom only)'
+    ignored_deprecations:
+      type: string
+      label: 'List of ignored deprecations'
 
 system.performance:
   type: config_object
