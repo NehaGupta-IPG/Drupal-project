@@ -30,7 +30,7 @@ class FilterLegacyTest extends KernelTestBase {
    *
    * @group legacy
    */
-  public function testInstallRoles() {
+  public function testInstallRoles(): void {
     $this->expectDeprecation('Specifying roles in text formats is deprecated in drupal:10.3.0 and will not be supported starting in drupal:11.0.0. See https://www.drupal.org/node/3168851');
     // Install filter_test_legacy module, which ships with the
     // filter_test_legacy text format, which declares roles in configuration.
