@@ -2108,8 +2108,31 @@ abstract class ResourceTestBase extends BrowserTestBase {
       // field.
       $response = $this->request('POST', $url, $request_options);
       $label_field = $this->entity->getEntityType()->getKey('label');
-      $label_field_capitalized = $this->entity->getFieldDefinition($label_field)->getLabel();
-      $this->assertResourceErrorResponse(422, "$label_field: $label_field_capitalized: this field cannot hold more than 1 values.", NULL, $response, '/data/attributes/' . $label_field);
+      if ($this->entity instanceof FieldableEntityInterface) {
+        $label_field_capitalized = $this->entity->getFieldDefinition($label_field)->getLabel();
+        $this->assertResourceErrorResponse(422, "$label_field: $label_field_capitalized: this field cannot hold more than 1 values.", NULL, $response, '/data/attributes/' . $label_field);
+      }
+      else {
+        // @todo Config schema assumes at least high-level type compliance, which is violated here. Harden it to provide equivalently helpful error responses.
+        $this->assertResourceResponse(500, [
+          'jsonapi' => static::$jsonApiMember,
+          'errors' => [
+            0 => [
+              'title' => 'Internal Server Error',
+              'status' => '500',
+              'detail' => 'Expected argument of type "string", "array" given',
+              'links' => [
+                'via' => [
+                  'href' => Url::fromUri('base:/jsonapi/menu/menu')->setAbsolute()->toString(TRUE)->getGeneratedUrl(),
+                ],
+                'info' => [
+                  'href' => HttpExceptionNormalizer::getInfoUrl(500),
+                ],
+              ],
+            ],
+          ],
+        ], $response);
+      }
     }
 
     $request_options[RequestOptions::BODY] = $parseable_invalid_request_body_2;
