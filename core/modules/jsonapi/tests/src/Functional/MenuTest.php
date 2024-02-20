@@ -110,8 +110,15 @@ class MenuTest extends ConfigEntityResourceTestBase {
    * {@inheritdoc}
    */
   protected function getPostDocument(): array {
-    // @todo Update in https://www.drupal.org/node/2300677.
-    return [];
+    return [
+      'data' => [
+        'type' => 'menu--menu',
+        'attributes' => [
+          'drupal_internal__id' => 'special',
+          'label' => 'My special menu',
+        ],
+      ],
+    ];
   }
 
 }
