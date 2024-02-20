@@ -230,19 +230,6 @@ abstract class ResourceTestBase extends BrowserTestBase {
   protected function setUp(): void {
     parent::setUp();
 
-    // Create an entity.
-    $entity_type_manager = $this->container->get('entity_type.manager');
-    $this->entityStorage = $entity_type_manager->getStorage(static::$entityTypeId);
-    $this->uuidKey = $entity_type_manager->getDefinition(static::$entityTypeId)
-      ->getKey('uuid');
-    $this->entity = $this->createEntity();
-
-    // Abort ASAP to prevent unnecessary use of resources.
-    if ($this->entity instanceof ConfigEntityInterface && $this instanceof ConfigEntityResourceTestBase && !$this->isFullyValidatable()) {
-      $this->markTestSkipped("Not yet supported for config entities.");
-      return;
-    }
-
     $this->serializer = $this->container->get('jsonapi.serializer');
 
     $this->config('system.logging')->set('error_level', ERROR_REPORTING_HIDE)->save();
@@ -255,7 +242,18 @@ abstract class ResourceTestBase extends BrowserTestBase {
     $this->account = $this->createUser();
     $this->container->get('current_user')->setAccount($this->account);
 
-    $this->entity = $this->setUpFields($this->entity, $this->account);
+    // Create an entity.
+    $entity_type_manager = $this->container->get('entity_type.manager');
+    $this->entityStorage = $entity_type_manager->getStorage(static::$entityTypeId);
+    $this->uuidKey = $entity_type_manager->getDefinition(static::$entityTypeId)
+      ->getKey('uuid');
+    $this->entity = $this->setUpFields($this->createEntity(), $this->account);
+
+    // Abort ASAP to prevent unnecessary use of resources.
+    if ($this->entity instanceof ConfigEntityInterface && $this instanceof ConfigEntityResourceTestBase && !$this->isFullyValidatable()) {
+      $this->markTestSkipped("Not yet supported for config entities.");
+      return;
+    }
     // Refresh entity storage as new fields have been created.
     $this->entityStorage = $entity_type_manager->getStorage(static::$entityTypeId);
 
