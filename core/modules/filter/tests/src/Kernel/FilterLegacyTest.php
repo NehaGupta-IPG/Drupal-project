@@ -15,9 +15,7 @@ use Drupal\user\RoleInterface;
 class FilterLegacyTest extends KernelTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = [
     'filter',
