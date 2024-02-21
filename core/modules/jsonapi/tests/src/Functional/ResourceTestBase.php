@@ -126,9 +126,11 @@ abstract class ResourceTestBase extends BrowserTestBase {
   protected static $uniqueFieldNames = [];
 
   /**
-   * The entity ID for the first created entity in testPost().
+   * The entity ID for the first created content entity in testPost().
    *
    * The default value of 2 should work for most content entities.
+   *
+   * For config entities, this will always need to be overridden.
    *
    * @var string|int
    *
@@ -2144,11 +2146,14 @@ abstract class ResourceTestBase extends BrowserTestBase {
       $this->assertResourceErrorResponse(422, "IDs should be properly generated and formatted UUIDs as described in RFC 4122.", $url, $response);
     }
 
-    $request_options[RequestOptions::BODY] = $parseable_invalid_request_body_3;
+    // Only fieldable entity types can have field-level access control.
+    if ($this->entity instanceof FieldableEntityInterface) {
+      $request_options[RequestOptions::BODY] = $parseable_invalid_request_body_3;
 
-    // DX: 403 when entity contains field without 'edit' access.
-    $response = $this->request('POST', $url, $request_options);
-    $this->assertResourceErrorResponse(403, "The current user is not allowed to POST the selected field (field_rest_test).", $url, $response, '/data/attributes/field_rest_test');
+      // DX: 403 when entity contains field without 'edit' access.
+      $response = $this->request('POST', $url, $request_options);
+      $this->assertResourceErrorResponse(403, "The current user is not allowed to POST the selected field (field_rest_test).", $url, $response, '/data/attributes/field_rest_test');
+    }
 
     $request_options[RequestOptions::BODY] = $parseable_invalid_request_body_4;
 
@@ -2213,6 +2218,13 @@ abstract class ResourceTestBase extends BrowserTestBase {
     }
     else {
       $this->assertFalse($response->hasHeader('Location'));
+    }
+
+    // Recreating the config entity using the same document will result in the
+    // same ID, because config entities do not have incrementing integer IDs. So
+    // there is no point in testing the same thing again.
+    if ($this->entity instanceof ConfigEntityInterface) {
+      return;
     }
 
     // 201 for well-formed request that creates another entity.

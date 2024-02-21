@@ -109,6 +109,11 @@ class MenuTest extends ConfigEntityResourceTestBase {
   /**
    * {@inheritdoc}
    */
+  protected static $firstCreatedEntityId = 'special';
+
+  /**
+   * {@inheritdoc}
+   */
   protected function getPostDocument(): array {
     return [
       'data' => [
