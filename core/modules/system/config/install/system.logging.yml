@@ -1,3 +1,4 @@
 error_level: hide
-deprecation_level: none
+log_deprecations: false
+deprecations_ignored_file_patterns: ''
 ignored_deprecations: ''

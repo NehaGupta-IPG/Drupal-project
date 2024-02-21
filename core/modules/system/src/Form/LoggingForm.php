@@ -38,27 +38,33 @@ class LoggingForm extends ConfigFormBase {
       '#description' => $this->t('It is recommended that sites running on production environments do not display any errors.'),
     ];
 
-    $form['deprecation_level'] = [
-      '#type' => 'radios',
-      '#title' => $this->t('Deprecations to log'),
-      '#config_target' => 'system.logging:deprecation_level',
-      '#options' => [
-        'none' => $this->t('None'),
-        'custom' => $this->t('Custom code only'),
-        'contrib' => $this->t('Custom and contributed code'),
-        'all' => $this->t('All (core and vendor included)'),
-      ],
+    $form['log_deprecations'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('Should deprecations be logged?'),
+      '#config_target' => 'system.logging:log_deprecations',
       '#description' => $this->t('It is recommended that sites running on production environments do not log any deprecations.'),
     ];
 
+    $form['deprecations_ignored_file_patterns'] = [
+      '#type' => 'textarea',
+      '#title' => $this->t('Ignored deprecation source file patterns'),
+      '#config_target' => 'system.logging:deprecations_ignored_file_patterns',
+      '#description' => $this->t('List of source file patterns from which deprecations should be ignored. Regex allowed.'),
+      '#states' => [
+        'visible' => [
+          ':input[name="log_deprecations"]' => ['checked' => TRUE],
+        ],
+      ],
+      '#rows' => 3,
+    ];
     $form['ignored_deprecations'] = [
       '#type' => 'textarea',
       '#title' => $this->t('Ignored deprecations'),
       '#config_target' => 'system.logging:ignored_deprecations',
-      '#description' => $this->t('List of ignored deprecations, one per line'),
+      '#description' => $this->t('List of ignored deprecation messages, one per line'),
       '#states' => [
         'visible' => [
-          ':input[name="deprecation_level"]' => ['!value' => 'none'],
+          ':input[name="log_deprecations"]' => ['checked' => TRUE],
         ],
       ],
     ];

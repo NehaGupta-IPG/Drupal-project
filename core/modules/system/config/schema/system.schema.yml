@@ -189,8 +189,12 @@ system.logging:
       type: string
       label: 'Deprecations to display (all, contrib & custom, custom only)'
     deprecation_level:
+    log_deprecations:
+      type: boolean
+      label: 'Should deprecations be logged'
+    deprecations_ignored_file_patterns:
       type: string
-      label: 'Deprecations to display (all, contrib & custom, custom only)'
+      label: 'List of ignored deprecation source file patterns'
     ignored_deprecations:
       type: string
       label: 'List of ignored deprecations'

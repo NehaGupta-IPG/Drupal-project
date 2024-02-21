@@ -56,21 +56,16 @@ function drupal_error_levels(): array {
  */
 function _drupal_error_handler_real($error_level, $message, $filename, $line): void {
   $deprecation_level = _drupal_get_deprecation_setting('deprecation_level', 'all');
-  if (($error_level & error_reporting()) || ($error_level === E_USER_DEPRECATED && $deprecation_level !== 'none')) {
+  if (($error_level & error_reporting()) || ($error_level === E_USER_DEPRECATED && _drupal_get_deprecation_setting('log_deprecations', FALSE))) {
 
-    // Filter out deprecations depending on the deprecation settings value.
-    // In case of invalid delrecation level setting all deprecations will be
-    // displayed.
+    // Filter out deprecations depending on the deprecation settings.
     if ($error_level === E_USER_DEPRECATED) {
-      if ($deprecation_level !== 'all') {
-        $is_contrib = strpos($filename, '/modules/contrib/') !== FALSE;
-        if ($deprecation_level === 'contrib' && !$is_contrib) {
-          return;
-        }
-        $is_core = strpos($filename, '/core/') !== FALSE;
-        $is_vendor = strpos($filename, '/vendor/') !== FALSE;
-        if ($deprecation_level === 'custom' && ($is_contrib || $is_core || $is_vendor)) {
-          return;
+      $ignored_file_patterns = _drupal_get_deprecation_setting('deprecations_ignored_file_patterns', '');
+      if ($ignored_file_patterns !== '') {
+        foreach (explode(PHP_EOL, $ignored_file_patterns) as $pattern) {
+          if (preg_match($pattern, $filename) === 1) {
+            return;
+          }
         }
       }
 
@@ -374,14 +369,13 @@ function _drupal_get_error_level() {
  *
  * @param string $setting
  *   The setting to get.
- * @param string $default
+ * @param mixed $default
  *   The default value.
+ *
+ * @return mixed
+ *   The configuration value.
  */
-function _drupal_get_deprecation_setting(string $setting, string $default) {
-  if (InstallerKernel::installationAttempted()) {
-    return $default;
-  }
-
+function _drupal_get_deprecation_setting(string $setting, $default) {
   $value = $default;
   try {
     $value = \Drupal::config('system.logging')->get($setting);

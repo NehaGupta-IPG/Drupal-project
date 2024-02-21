@@ -1805,7 +1805,8 @@ function system_update_11201(): void {
  */
 function system_update_10202(&$sandbox) {
   $config = \Drupal::configFactory()->getEditable('system.logging');
-  $config->set('deprecation_level', 'none');
+  $config->set('log_deprecations', FALSE);
+  $config->set('deprecations_ignored_file_patterns', '*/vendor/*' . PHP_EOL . '*/core/*');
   $config->set('ignored_deprecations', '');
   $config->save();
 }
