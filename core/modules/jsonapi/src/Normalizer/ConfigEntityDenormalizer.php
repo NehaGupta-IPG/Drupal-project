@@ -4,6 +4,7 @@ namespace Drupal\jsonapi\Normalizer;
 
 use Drupal\Core\Config\Entity\ConfigEntityInterface;
 use Drupal\jsonapi\ResourceType\ResourceType;
+use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
 
 /**
  * Converts the Drupal config entity object to a JSON:API array structure.
@@ -22,7 +23,15 @@ final class ConfigEntityDenormalizer extends EntityDenormalizerBase {
   protected function prepareInput(array $data, ResourceType $resource_type, $format, array $context) {
     $prepared = [];
     foreach ($data as $key => $value) {
-      $prepared[$resource_type->getInternalName($key)] = $value;
+      $internal_name = $resource_type->getInternalName($key);
+      if (!$resource_type->hasField($internal_name)) {
+        throw new UnprocessableEntityHttpException(sprintf(
+          'The attribute %s does not exist on the %s resource type.',
+          $internal_name,
+          $resource_type->getTypeName()
+        ));
+      }
+      $prepared[$internal_name] = $value;
     }
     return $prepared;
   }
