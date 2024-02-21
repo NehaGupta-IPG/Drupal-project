@@ -109,16 +109,31 @@ class NodeTypeTest extends ConfigEntityResourceTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function getPostDocument(): array {
-    // @todo Update in https://www.drupal.org/node/2300677.
-    return [];
+  protected static $firstCreatedEntityId = 'special';
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function getPostDocument():array {
+    return [
+      'data' => [
+        'type' => 'date_format--date_format',
+        'attributes' => [
+          'drupal_internal__type' => 'special',
+          'name' => 'My special date format',
+        ],
+      ],
+    ];
   }
 
   /**
    * {@inheritdoc}
    */
   protected function getExpectedUnauthorizedAccessMessage($method): string {
-    return "The 'access content' permission is required.";
+    return match($method) {
+      'GET' => "The 'access content' permission is required.",
+      'POST' => "The 'administer content types' permission is required.",
+    };
   }
 
 }
