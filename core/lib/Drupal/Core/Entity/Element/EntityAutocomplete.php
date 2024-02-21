@@ -401,12 +401,7 @@ class EntityAutocomplete extends Textfield {
         $label = ($entity->access('view label')) ? $entity->label() : new TranslatableMarkup('- Restricted access -');
 
         // Take into account "autocreated" entities.
-        if ($entity->isNew()) {
-          $id = NULL;
-        }
-        else {
-          $id = $entity->id();
-        }
+        $id = $entity->isNew() ? NULL : $entity->id();
 
         $labels_data[] = [
           'id' => $id,
