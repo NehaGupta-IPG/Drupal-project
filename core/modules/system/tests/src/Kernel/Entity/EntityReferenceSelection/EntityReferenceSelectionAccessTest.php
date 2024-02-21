@@ -209,7 +209,6 @@ class EntityReferenceSelectionAccessTest extends KernelTestBase {
         'arguments' => [
           ['Node unpublished', 'CONTAINS'],
         ],
-        'result' => [],
       ],
     ];
     $this->assertReferenceable($selection_options, $referenceable_tests, 'Node handler');
