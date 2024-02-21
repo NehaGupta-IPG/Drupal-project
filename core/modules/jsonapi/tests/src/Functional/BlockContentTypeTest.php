@@ -106,9 +106,21 @@ class BlockContentTypeTest extends ConfigEntityResourceTestBase {
   /**
    * {@inheritdoc}
    */
+  protected static $firstCreatedEntityId = 'special';
+
+  /**
+   * {@inheritdoc}
+   */
   protected function getPostDocument(): array {
-    // @todo Update in https://www.drupal.org/node/2300677.
-    return [];
+    return [
+      'data' => [
+        'type' => 'block_content_type--block_content_type',
+        'attributes' => [
+          'drupal_internal__id' => 'special',
+          'label' => 'My special block content type',
+        ],
+      ],
+    ];
   }
 
 }

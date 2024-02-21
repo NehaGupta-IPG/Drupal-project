@@ -2125,7 +2125,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
               'detail' => 'Expected argument of type "string", "array" given',
               'links' => [
                 'via' => [
-                  'href' => Url::fromUri('base:/jsonapi/menu/menu')->setAbsolute()->toString(TRUE)->getGeneratedUrl(),
+                  'href' => Url::fromRoute(sprintf('jsonapi.%s.collection', static::$resourceTypeName))->setAbsolute()->toString(TRUE)->getGeneratedUrl(),
                 ],
                 'info' => [
                   'href' => HttpExceptionNormalizer::getInfoUrl(500),
