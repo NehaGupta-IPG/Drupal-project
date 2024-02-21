@@ -362,11 +362,15 @@ class ViewsSelection extends SelectionPluginBase implements ContainerFactoryPlug
     $view = Views::getView($view_name);
 
     if (!$view) {
-      $this->messenger()->addWarning(t('The reference view %view_name cannot be found.', ['%view_name' => $view_name]));
+      $this->messenger()->addWarning(
+        $this->t('The reference view %view_name cannot be found.', ['%view_name' => $view_name])
+      );
       return [];
     }
     if (!$view->access($display_name)) {
-      $this->messenger()->addWarning(t('You do no have access to the reference view %view_name.', ['%view_name' => $view_name]));
+      $this->messenger()->addWarning(
+        $this->t('You do no have access to the reference view %view_name.', ['%view_name' => $view_name])
+      );
       return [];
     }
     $view->setDisplay($display_name);

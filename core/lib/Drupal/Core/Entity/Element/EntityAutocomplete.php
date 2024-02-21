@@ -13,6 +13,7 @@ use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Render\Attribute\FormElement;
 use Drupal\Core\Render\Element\Textfield;
 use Drupal\Core\Site\Settings;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 
 /**
  * Provides an entity autocomplete form element.
@@ -397,7 +398,7 @@ class EntityAutocomplete extends Textfield {
 
         // Use the special view label, since some entities allow the label to be
         // viewed, even if the entity is not allowed to be viewed.
-        $label = ($entity->access('view label')) ? $entity->label() : t('- Restricted access -');
+        $label = ($entity->access('view label')) ? $entity->label() : new TranslatableMarkup('- Restricted access -');
 
         // Take into account "autocreated" entities.
         if ($entity->isNew()) {
