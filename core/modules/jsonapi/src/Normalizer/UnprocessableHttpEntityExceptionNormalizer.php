@@ -3,6 +3,10 @@
 namespace Drupal\jsonapi\Normalizer;
 
 use Drupal\Component\Render\PlainTextOutput;
+use Drupal\Core\Config\Entity\ConfigEntityInterface;
+use Drupal\Core\Entity\FieldableEntityInterface;
+use Drupal\Core\Field\FieldStorageDefinitionInterface;
+use Drupal\Core\TypedData\PrimitiveInterface;
 use Drupal\jsonapi\Exception\UnprocessableHttpEntityException;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
@@ -46,10 +50,13 @@ class UnprocessableHttpEntityExceptionNormalizer extends HttpExceptionNormalizer
     $entity = $violations->getEntity();
     foreach ($violations->getFieldNames() as $field_name) {
       $field_violations = $violations->getByField($field_name);
-      $cardinality = $entity->get($field_name)
-        ->getFieldDefinition()
-        ->getFieldStorageDefinition()
-        ->getCardinality();
+      $cardinality = match(TRUE) {
+        $entity instanceof FieldableEntityInterface => $entity->get($field_name)
+          ->getFieldDefinition()
+          ->getFieldStorageDefinition()
+          ->getCardinality(),
+        $entity instanceof ConfigEntityInterface => $entity->getTypedData()->get($field_name) instanceof PrimitiveInterface ? 1 : FieldStorageDefinitionInterface::CARDINALITY_UNLIMITED,
+      };
 
       foreach ($field_violations as $violation) {
         /** @var \Symfony\Component\Validator\ConstraintViolation $violation */
