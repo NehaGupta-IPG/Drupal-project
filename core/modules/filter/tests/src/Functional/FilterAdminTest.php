@@ -252,7 +252,6 @@ class FilterAdminTest extends BrowserTestBase {
     $edit = [];
     $edit['format'] = $this->randomMachineName();
     $edit['name'] = $this->randomMachineName();
-    $edit['roles[' . RoleInterface::AUTHENTICATED_ID . ']'] = 1;
     $edit['filters[' . $second_filter . '][status]'] = TRUE;
     $edit['filters[' . $first_filter . '][status]'] = TRUE;
     $this->drupalGet('admin/config/content/formats/add');
@@ -260,11 +259,16 @@ class FilterAdminTest extends BrowserTestBase {
     $this->assertSession()->addressEquals('admin/config/content/formats');
     $this->assertSession()->statusMessageContains("Added text format {$edit['name']}.", 'status');
 
+    // @see core/profiles/standard/config/install/user.role.authenticated.yml
+    $this->grantPermissions(
+      Role::load(RoleInterface::AUTHENTICATED_ID),
+      ["use text format {$edit['format']}"]
+    );
+
     filter_formats_reset();
     $format = FilterFormat::load($edit['format']);
     $this->assertNotNull($format, 'Format found in database.');
     $this->drupalGet('admin/config/content/formats/manage/' . $format->id());
-    $this->assertSession()->checkboxChecked('roles[' . RoleInterface::AUTHENTICATED_ID . ']');
     $this->assertSession()->checkboxChecked('filters[' . $second_filter . '][status]');
     $this->assertSession()->checkboxChecked('filters[' . $first_filter . '][status]');
     /** @var \Drupal\user\Entity\Role $role */
@@ -282,12 +286,16 @@ class FilterAdminTest extends BrowserTestBase {
     // Allow authenticated users on full HTML.
     $format = FilterFormat::load($full);
     $edit = [];
-    $edit['roles[' . RoleInterface::ANONYMOUS_ID . ']'] = 0;
-    $edit['roles[' . RoleInterface::AUTHENTICATED_ID . ']'] = 1;
     $this->drupalGet('admin/config/content/formats/manage/' . $full);
     $this->submitForm($edit, 'Save configuration');
     $this->assertSession()->addressEquals('admin/config/content/formats/manage/' . $full);
     $this->assertSession()->statusMessageContains("The text format {$format->label()} has been updated.", 'status');
+
+    // @see core/profiles/standard/config/install/user.role.authenticated.yml
+    $this->grantPermissions(
+      Role::load(RoleInterface::AUTHENTICATED_ID),
+      ["use text format $full"]
+    );
 
     // Switch user.
     $this->drupalLogin($this->webUser);
@@ -349,13 +357,11 @@ class FilterAdminTest extends BrowserTestBase {
 
     // Full HTML.
     $edit = [];
-    $edit['roles[' . RoleInterface::AUTHENTICATED_ID . ']'] = FALSE;
     $this->drupalGet('admin/config/content/formats/manage/' . $full);
     $this->submitForm($edit, 'Save configuration');
     $this->assertSession()->addressEquals('admin/config/content/formats/manage/' . $full);
     $this->assertSession()->statusMessageContains("The text format {$format->label()} has been updated.", 'status');
     $this->drupalGet('admin/config/content/formats/manage/' . $full);
-    $this->assertSession()->fieldValueEquals('roles[' . RoleInterface::AUTHENTICATED_ID . ']', $edit['roles[' . RoleInterface::AUTHENTICATED_ID . ']']);
 
     // Filter order.
     $edit = [];
