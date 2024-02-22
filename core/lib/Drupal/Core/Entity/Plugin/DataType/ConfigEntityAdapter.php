@@ -3,6 +3,7 @@
 namespace Drupal\Core\Entity\Plugin\DataType;
 
 use Drupal\Core\Config\TypedConfigManagerInterface;
+use Drupal\Core\Entity\EntityConstraintViolationList;
 use Drupal\Core\TypedData\Exception\MissingDataException;
 use Drupal\Core\TypedData\TypedDataManagerInterface;
 
@@ -144,6 +145,16 @@ class ConfigEntityAdapter extends EntityAdapter {
    */
   protected function getConfigTypedData() {
     return $this->getTypedConfigManager()->createFromNameAndData($this->entity->getConfigDependencyName(), $this->entity->toArray());
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function validate() {
+    return new EntityConstraintViolationList(
+      $this->getEntity(),
+      iterator_to_array(parent::validate())
+    );
   }
 
 }
