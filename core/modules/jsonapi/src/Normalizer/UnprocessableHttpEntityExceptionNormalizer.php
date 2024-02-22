@@ -34,7 +34,6 @@ class UnprocessableHttpEntityExceptionNormalizer extends HttpExceptionNormalizer
     /** @var \Drupal\jsonapi\Exception\UnprocessableHttpEntityException $exception */
     $errors = parent::buildErrorObjects($exception);
     $error = $errors[0];
-    unset($error['links']);
 
     $errors = [];
     $violations = $exception->getViolations();
