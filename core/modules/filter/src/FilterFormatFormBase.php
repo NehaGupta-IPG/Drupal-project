@@ -20,7 +20,6 @@ abstract class FilterFormatFormBase extends EntityForm {
    */
   public function form(array $form, FormStateInterface $form_state) {
     $format = $this->entity;
-    $is_fallback = ($format->id() == $this->config('filter.settings')->get('fallback_format'));
 
     $form['#tree'] = TRUE;
     $form['#attached']['library'][] = 'filter/drupal.filter.admin';
@@ -44,22 +43,6 @@ abstract class FilterFormatFormBase extends EntityForm {
       '#disabled' => !$format->isNew(),
       '#weight' => -20,
     ];
-
-    // Add user role access selection.
-    $form['roles'] = [
-      '#type' => 'checkboxes',
-      '#title' => $this->t('Roles'),
-      '#options' => array_map(fn(RoleInterface $role) => Html::escape($role->label()), Role::loadMultiple()),
-      '#disabled' => $is_fallback,
-      '#weight' => -10,
-    ];
-    if ($is_fallback) {
-      $form['roles']['#description'] = $this->t('All roles for this text format must be enabled and cannot be changed.');
-    }
-    if (!$format->isNew()) {
-      // If editing an existing text format, pre-select its current permissions.
-      $form['roles']['#default_value'] = array_keys(filter_get_roles_by_format($format));
-    }
 
     // Create filter plugin instances for all available filters, including both
     // enabled/configured ones as well as new and not yet configured ones.
@@ -190,18 +173,12 @@ abstract class FilterFormatFormBase extends EntityForm {
    * {@inheritdoc}
    */
   protected function copyFormValuesToEntity(EntityInterface $entity, array $form, FormStateInterface $form_state) {
-    // Avoid setting the roles as a property of the text format.
-    $roles = $form_state->getValue('roles');
-    $form_state->unsetValue('roles');
+
     parent::copyFormValuesToEntity($entity, $form, $form_state);
 
     foreach ($form_state->getValue('filters') as $instance_id => $config) {
       $entity->setFilterConfig($instance_id, $config);
     }
-
-    // Restore roles form value to allow saving user permissions later.
-    // @see ::save()
-    $form_state->setValue('roles', $roles);
   }
 
   /**
@@ -227,22 +204,6 @@ abstract class FilterFormatFormBase extends EntityForm {
     if ($format_exists) {
       $form_state->setErrorByName('name', $this->t('Text format names must be unique. A format named %name already exists.', ['%name' => $format_name]));
     }
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function save(array $form, FormStateInterface $form_state) {
-    $status = parent::save($form, $form_state);
-
-    // Save user permissions.
-    if ($permission = $this->getEntity()->getPermissionName()) {
-      foreach ($form_state->getValue('roles') as $rid => $enabled) {
-        user_role_change_permissions($rid, [$permission => $enabled]);
-      }
-    }
-
-    return $status;
   }
 
   /**
