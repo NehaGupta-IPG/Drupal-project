@@ -2,6 +2,7 @@
 
 namespace Drupal\Core\Entity;
 
+use Drupal\Core\Config\Entity\ConfigEntityInterface;
 use Drupal\Core\Entity\Plugin\Validation\Constraint\CompositeConstraintBase;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
@@ -19,7 +20,7 @@ class EntityConstraintViolationList extends ConstraintViolationList implements E
   /**
    * The entity that has been validated.
    *
-   * @var \Drupal\Core\Entity\FieldableEntityInterface
+   * @var \Drupal\Core\Entity\FieldableEntityInterface|\Drupal\Core\Config\Entity\ConfigEntityInterface
    */
   protected $entity;
 
@@ -42,12 +43,12 @@ class EntityConstraintViolationList extends ConstraintViolationList implements E
   /**
    * {@inheritdoc}
    *
-   * @param \Drupal\Core\Entity\FieldableEntityInterface $entity
+   * @param \Drupal\Core\Entity\FieldableEntityInterface|\Drupal\Core\Config\Entity\ConfigEntityInterface $entity
    *   The entity that has been validated.
    * @param iterable $violations
    *   The set of violations.
    */
-  public function __construct(FieldableEntityInterface $entity, iterable $violations = []) {
+  public function __construct(FieldableEntityInterface|ConfigEntityInterface $entity, iterable $violations = []) {
     parent::__construct($violations);
     $this->entity = $entity;
   }
@@ -65,7 +66,10 @@ class EntityConstraintViolationList extends ConstraintViolationList implements E
         if ($path = $violation->getPropertyPath()) {
           // An example of $path might be 'title.0.value'.
           [$field_name] = explode('.', $path, 2);
-          if ($this->entity->hasField($field_name)) {
+          if ($this->entity instanceof FieldableEntityInterface && $this->entity->hasField($field_name)) {
+            $this->violationOffsetsByField[$field_name][$offset] = $offset;
+          }
+          elseif ($this->entity instanceof ConfigEntityInterface && in_array($field_name, $this->entity->getEntityType()->getPropertiesToExport(), TRUE)) {
             $this->violationOffsetsByField[$field_name][$offset] = $offset;
           }
           // If the first part of the violation property path is not a valid
