@@ -314,7 +314,11 @@ class ResourceTypeRepository implements ResourceTypeRepositoryInterface {
       return TRUE;
     }
 
-    // @todo this is inaccurate — it won't work for e.g. `field.field.*.*.*`.
+    // @todo this is inaccurate — it won't work for e.g. `field.field.*.*.*`. We
+    //   need the inverse of \Drupal\Core\Config\ConfigManager::getEntityTypeIdByName()
+    //   To build that, we would need to expand the `@ConfigEntityType`
+    //   annotation with a "id_parts" key-value pair, which defaults to 1, and
+    //   FieldConfig, FieldStorageConfig, EntityViewMode etc. would specify.
     $config_schema_type_name = $entity_type->getConfigPrefix() . '.*';
     $config_schema_type_definition = \Drupal::service('config.typed')->getDefinition($config_schema_type_name);
 
