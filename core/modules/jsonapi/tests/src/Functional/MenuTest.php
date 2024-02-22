@@ -126,4 +126,11 @@ class MenuTest extends ConfigEntityResourceTestBase {
     ];
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  protected static $patchProtectedFieldNames = [
+    // @todo expand this, but first fix ::getModifiedEntityForPatchTesting()
+  ];
+
 }
