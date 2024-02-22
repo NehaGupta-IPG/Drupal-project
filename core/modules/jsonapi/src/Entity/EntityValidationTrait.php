@@ -51,13 +51,13 @@ trait EntityValidationTrait {
     // not for config entities.
     if ($entity instanceof FieldableEntityInterface) {
       $violations->filterByFieldAccess();
-    }
 
-    // Filter violations based on the given fields.
-    if ($field_names !== NULL) {
-      $violations->filterByFields(
-        array_diff(array_keys($entity->getFieldDefinitions()), $field_names)
-      );
+      // Filter violations based on the given fields.
+      if ($field_names !== NULL) {
+        $violations->filterByFields(
+          array_diff(array_keys($entity->getFieldDefinitions()), $field_names)
+        );
+      }
     }
 
     if (count($violations) > 0) {
