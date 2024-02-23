@@ -132,8 +132,15 @@ class NodeTypeTest extends ConfigEntityResourceTestBase {
   protected function getExpectedUnauthorizedAccessMessage($method): string {
     return match($method) {
       'GET' => "The 'access content' permission is required.",
-      'POST' => "The 'administer content types' permission is required.",
+      'POST', 'PATCH' => "The 'administer content types' permission is required.",
     };
   }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected static $patchProtectedFieldNames = [
+    // @todo expand this, but first fix ::getModifiedEntityForPatchTesting()
+  ];
 
 }
