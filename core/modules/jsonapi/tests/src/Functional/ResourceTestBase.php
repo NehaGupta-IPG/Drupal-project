@@ -2424,7 +2424,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
       $this->entity instanceof ContentEntityInterface
         ? "The current user is not allowed to PATCH the selected field ($id_field_name). The entity ID cannot be changed."
         : "Entity is not valid: The '$id_field_name' property cannot be changed.",
-      $url,
+      $this->entity instanceof ContentEntityInterface ? $url : NULL,
       $response,
       $this->entity instanceof ContentEntityInterface
         ? "/data/attributes/$id_field_name"
