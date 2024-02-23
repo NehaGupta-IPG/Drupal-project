@@ -285,9 +285,19 @@ JS;
 
     // Confirm there are no longer any warnings.
     $assert_session->waitForElementRemoved('css', '[data-drupal-messages] [role="alert"]');
+    $machine_name = $page->findField('edit-format')->getValue();
+
     $page->pressButton('Save configuration');
     $this->assertNotEmpty($assert_session->waitForText('Added text format ckeditor5'));
     $assert_session->responseContains('Added text format <em class="placeholder">ckeditor5</em>.');
+
+    if ($this->checkPermissions(["use text format $machine_name"])) {
+      // @see core/profiles/standard/config/install/user.role.authenticated.yml
+      $this->grantPermissions(
+        Role::load(RoleInterface::AUTHENTICATED_ID),
+        ["use text format $machine_name"]
+      );
+    }
   }
 
   /**

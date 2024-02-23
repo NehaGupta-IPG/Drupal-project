@@ -445,11 +445,15 @@ class CKEditor5AllowedTagsTest extends CKEditor5TestBase {
 
     // Configure Full HTML text format to use CKEditor 5.
     $this->drupalGet('admin/config/content/formats/manage/full_html');
-    $page->checkField('roles[authenticated]');
     $page->selectFieldOption('editor[editor]', 'ckeditor5');
     $assert_session->assertWaitOnAjaxRequest();
     $page->pressButton('Save configuration');
     $this->assertTrue($assert_session->waitForText('The text format Full HTML has been updated.'));
+
+    $this->grantPermissions(
+      Role::load(RoleInterface::AUTHENTICATED_ID),
+      ['use text format full_html']
+    );
 
     // Change the node's text format to Full HTML.
     $this->drupalGet('node/1/edit');
@@ -486,7 +490,6 @@ class CKEditor5AllowedTagsTest extends CKEditor5TestBase {
 
     // Configure Basic HTML text format to use CKE5 and enable the link plugin.
     $this->drupalGet('admin/config/content/formats/manage/basic_html');
-    $page->checkField('roles[authenticated]');
     $page->selectFieldOption('editor[editor]', 'ckeditor5');
     $assert_session->assertWaitOnAjaxRequest();
     $this->assertNotEmpty($assert_session->waitForElement('css', '.ckeditor5-toolbar-available .ckeditor5-toolbar-item-underline'));
