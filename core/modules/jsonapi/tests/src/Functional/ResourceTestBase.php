@@ -28,6 +28,12 @@ use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\Core\Field\Plugin\Field\FieldType\BooleanItem;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\TypedData\DataReferenceTargetDefinition;
+use Drupal\Core\TypedData\Plugin\DataType\BooleanData;
+use Drupal\Core\TypedData\Plugin\DataType\DecimalData;
+use Drupal\Core\TypedData\Plugin\DataType\FloatData;
+use Drupal\Core\TypedData\Plugin\DataType\IntegerData;
+use Drupal\Core\TypedData\Plugin\DataType\StringData;
+use Drupal\Core\TypedData\Plugin\DataType\Timestamp;
 use Drupal\Core\TypedData\TypedDataInternalPropertiesHelper;
 use Drupal\Core\Url;
 use Drupal\field\Entity\FieldConfig;
@@ -110,6 +116,13 @@ abstract class ResourceTestBase extends BrowserTestBase {
 
   /**
    * The fields that are protected against modification during PATCH requests.
+   *
+   * For config entities, this can be determined automatically: those config
+   * entity properties that are listed for the ImmutableProperties constraint.
+   * This always includes the property that is used as the `id` entity key.
+   *
+   * @see \Drupal\Core\Entity\Plugin\Validation\Constraint\ImmutablePropertiesConstraint
+   * @see \Drupal\Core\Config\Entity\ConfigEntityType::getConstraints()
    *
    * @var string[]
    */
@@ -251,10 +264,17 @@ abstract class ResourceTestBase extends BrowserTestBase {
       ->getKey('uuid');
     $this->entity = $this->setUpFields($this->createEntity(), $this->account);
 
-    // Abort ASAP to prevent unnecessary use of resources.
-    if ($this->entity instanceof ConfigEntityInterface && $this instanceof ConfigEntityResourceTestBase && !$this->isFullyValidatable()) {
-      $this->markTestSkipped("Not yet supported for config entities.");
-      return;
+    // Config entities need different treatment.
+    if ($this->entity instanceof ConfigEntityInterface) {
+      if (static::$patchProtectedFieldNames !== NULL) {
+        throw new \LogicException('$patchProtectedFieldNames must not be set for config entity JSON:API resource type tests: it is inferred automatically from its immutable properties.');
+      }
+      static::$patchProtectedFieldNames = array_flip($this->entity->getEntityType()->getConstraints()['ImmutableProperties']);
+      // Abort ASAP to prevent unnecessary use of resources.
+      if ($this instanceof ConfigEntityResourceTestBase && !$this->isFullyValidatable()) {
+        $this->markTestSkipped("Not yet supported for config entities.");
+        return;
+      }
     }
     // Refresh entity storage as new fields have been created.
     $this->entityStorage = $entity_type_manager->getStorage(static::$entityTypeId);
@@ -2412,10 +2432,11 @@ abstract class ResourceTestBase extends BrowserTestBase {
     }
 
     // DX:
-    // - 403 when entity trying to update a content entity's ID field.
-    // - 422 when entity trying to update a config entity's ID field.
+    // - 403 when trying to update a content entity's ID field.
+    // - 422 when trying to update a config entity's ID field.
     // The reason for the difference: config entities do not have field-level
-    // access control.
+    // access control. Hence an entity-level validation error is triggered
+    // instead of a field-level access control error.
     $request_options[RequestOptions::BODY] = Json::encode($this->makeNormalizationInvalid($this->getPatchDocument(), 'id'));
     $response = $this->request('PATCH', $url, $request_options);
     $id_field_name = $this->entity->getEntityType()->getKey('id');
@@ -2451,6 +2472,12 @@ abstract class ResourceTestBase extends BrowserTestBase {
     }
 
     // DX: 403 when sending PATCH request with updated read-only fields.
+    // DX:
+    // - 403 when trying to update a content entity's read-only field
+    // - 422 when trying to update a config entity's immutable field
+    // The reason for the difference: config entities do not have field-level
+    // access control. Hence an entity-level validation error is triggered
+    // instead of a field-level access control error.
     [$modified_entity, $original_values] = static::getModifiedEntityForPatchTesting($this->entity);
     // Send PATCH request by serializing the modified entity, assert the error
     // response, change the modified entity field that caused the error response
@@ -2458,8 +2485,19 @@ abstract class ResourceTestBase extends BrowserTestBase {
     foreach (static::$patchProtectedFieldNames as $patch_protected_field_name => $reason) {
       $request_options[RequestOptions::BODY] = Json::encode($this->normalize($modified_entity, $url));
       $response = $this->request('PATCH', $url, $request_options);
-      $this->assertResourceErrorResponse(403, "The current user is not allowed to PATCH the selected field (" . $patch_protected_field_name . ")." . ($reason !== NULL ? ' ' . $reason : ''), $url->setAbsolute(), $response, '/data/attributes/' . $patch_protected_field_name);
-      $modified_entity->get($patch_protected_field_name)->setValue($original_values[$patch_protected_field_name]);
+      $this->assertResourceErrorResponse(
+        $this->entity instanceof ContentEntityInterface ? 403 : 422,
+        $this->entity instanceof ContentEntityInterface
+          ? "The current user is not allowed to PATCH the selected field (" . $patch_protected_field_name . ")." . ($reason !== NULL ? ' ' . $reason : '')
+          : "Entity is not valid: The '$id_field_name' property cannot be changed.",
+        $this->entity instanceof ContentEntityInterface ? $url : NULL,
+        $response,
+        $this->entity instanceof ContentEntityInterface
+          ? '/data/attributes/' . $patch_protected_field_name
+          // @see \Drupal\Core\Entity\Plugin\Validation\Constraint\ImmutablePropertiesConstraintValidator
+          : '/data'
+      );
+      $modified_entity->set($patch_protected_field_name, $original_values[$patch_protected_field_name]);
     }
 
     $request_options[RequestOptions::BODY] = $parseable_invalid_request_body_4;
@@ -2774,7 +2812,23 @@ abstract class ResourceTestBase extends BrowserTestBase {
     $original_values = [];
     foreach (array_keys(static::$patchProtectedFieldNames) as $field_name) {
       $field = $modified_entity->get($field_name);
-      // @todo Use config schema to determine an alternative value?
+
+      // Config entities get modified entities based on config schema.
+      if ($entity instanceof ConfigEntityInterface) {
+        $original_values[$field_name] = $modified_entity->get($field_name);
+        $modified_entity->set(
+          $field_name,
+          match ($entity->getTypedData()->get($field_name)->getDataDefinition()->getClass()) {
+            BooleanData::class => !$original_values[$field_name],
+            IntegerData::class, FloatData::class, DecimalData::class, Timestamp::class => $original_values[$field_name] + 1,
+            StringData::class => str_rot13($original_values[$field_name]),
+          }
+        );
+        continue;
+      }
+
+      // Content entities get modified entities using ::generateSampleItems(),
+      // with a few exceptions.
       $original_values[$field_name] = $field->getValue();
       switch ($field->getItemDefinition()->getClass()) {
         case BooleanItem::class:
