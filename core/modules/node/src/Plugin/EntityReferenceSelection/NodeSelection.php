@@ -45,7 +45,8 @@ class NodeSelection extends DefaultSelection {
     if ($this->currentUser->hasPermission('view own unpublished content') && !$this->currentUser->hasPermission('view any unpublished content')) {
       $or = $query->orConditionGroup()
         ->condition('status', NodeInterface::PUBLISHED)
-        ->condition('uid', $this->currentUser->id());
+        ->condition('uid', $this->currentUser->id())
+        ->condition('uid', 0);
       $query->condition($or);
     }
 
