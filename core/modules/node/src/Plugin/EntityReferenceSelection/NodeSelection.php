@@ -55,29 +55,28 @@ class NodeSelection extends DefaultSelection {
   /**
    * {@inheritdoc}
    */
+  public function createNewEntity($entity_type_id, $bundle, $label, $uid) {
+    $node = parent::createNewEntity($entity_type_id, $bundle, $label, $uid);
+
+    // In order to create a referenceable node, it needs to published.
+    /** @var \Drupal\node\NodeInterface $node */
+    $node->setPublished();
+
+    return $node;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function validateReferenceableNewEntities(array $entities) {
     $entities = parent::validateReferenceableNewEntities($entities);
-    $configuration = $this->getConfiguration();
-    if (!$configuration['include_unpublished_entities']) {
-      // Mirror the conditions checked in buildEntityQuery().
-      if (!$this->currentUser->hasPermission('bypass node access') &&
-        !$this->moduleHandler->hasImplementations('node_grants')) {
-        $entities = array_filter($entities, function ($node) {
-          /** @var \Drupal\node\NodeInterface $node */
-          return $node->isPublished();
-        });
-      }
-    }
-
-    // Permission to "view own unpublished content" allows
-    // the user to reference any published content or own unpublished content.
-    if ($this->currentUser->hasPermission('view own unpublished content') && !$this->currentUser->hasPermission('view any unpublished content')) {
+    // Mirror the conditions checked in buildEntityQuery().
+    if (!$this->currentUser->hasPermission('bypass node access') && !$this->moduleHandler->hasImplementations('node_grants')) {
       $entities = array_filter($entities, function ($node) {
         /** @var \Drupal\node\NodeInterface $node */
-        return ($node->getOwnerId() === $this->currentUser->id() || $node->isPublished());
+        return $node->isPublished();
       });
     }
-
     return $entities;
   }
 
