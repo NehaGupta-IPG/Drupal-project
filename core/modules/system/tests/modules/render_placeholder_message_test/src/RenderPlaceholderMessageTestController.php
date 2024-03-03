@@ -8,6 +8,7 @@ use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
 use Drupal\Core\Render\RendererInterface;
 use Drupal\Core\Security\TrustedCallbackInterface;
 use Drupal\Core\Render\RenderContext;
+use Revolt\EventLoop;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -137,14 +138,17 @@ class RenderPlaceholderMessageTestController implements TrustedCallbackInterface
     // suspend the Fiber, this will cause BigPipe::renderPlaceholders() to loop
     // around all of the fibers before resuming this one, then finally rendering
     // the messages when there are no other placeholders left.
-    if (\Fiber::getCurrent() !== NULL) {
-      \Fiber::suspend();
-    }
-    // Set message.
-    \Drupal::messenger()->addStatus($message);
+    $suspension = EventLoop::getSuspension();
+    EventLoop::defer(static function () use ($suspension, $message) {
+      // Set message.
+      \Drupal::messenger()->addStatus($message);
 
-    // Print which message is expected.
-    return ['#markup' => '<p class="logged-message">Message: ' . $message . '</p>'];
+      // Print which message is expected.
+      $suspension->resume(['#markup' => '<p class="logged-message">Message: ' . $message . '</p>']);
+    });
+
+    // Wait for the message.
+    return $suspension->suspend();
   }
 
   /**

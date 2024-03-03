@@ -17,6 +17,7 @@ use Drupal\Core\Security\DoTrustedCallbackTrait;
 use Drupal\Core\Theme\ThemeManagerInterface;
 use Drupal\Core\Utility\CallableResolver;
 use Symfony\Component\HttpFoundation\RequestStack;
+use function Drupal\Core\Async\stream;
 
 /**
  * Turns a render array into an HTML string.
@@ -747,47 +748,27 @@ class Renderer implements RendererInterface {
 
     // First render all placeholders except 'status messages' placeholders.
     $message_placeholders = [];
-    $fibers = [];
+    $placeholder_operations = [];
     foreach ($elements['#attached']['placeholders'] as $placeholder => $placeholder_element) {
       if (isset($placeholder_element['#lazy_builder']) && $placeholder_element['#lazy_builder'][0] === 'Drupal\Core\Render\Element\StatusMessages::renderMessages') {
         $message_placeholders[] = $placeholder;
       }
       else {
         // Get the render array for the given placeholder.
-        $fibers[$placeholder] = new \Fiber(function () use ($placeholder_element) {
-          return [$this->doRenderPlaceholder($placeholder_element), $placeholder_element];
-        });
+        $placeholder_operations[$placeholder] = fn () => [
+          $this->doRenderPlaceholder($placeholder_element),
+          $placeholder_element,
+        ];
       }
     }
-    $iterations = 0;
-    while (count($fibers) > 0) {
-      foreach ($fibers as $placeholder => $fiber) {
-        if (!$fiber->isStarted()) {
-          $fiber->start();
-        }
-        elseif ($fiber->isSuspended()) {
-          $fiber->resume();
-        }
-        // If the Fiber hasn't terminated by this point, move onto the next
-        // placeholder, we'll resume this fiber again when we get back here.
-        if (!$fiber->isTerminated()) {
-          // If we've gone through the placeholders once already, and they're
-          // still not finished, then start to allow code higher up the stack to
-          // get on with something else.
-          if ($iterations) {
-            $fiber = \Fiber::getCurrent();
-            if ($fiber !== NULL) {
-              $fiber->suspend();
-            }
-          }
-          continue;
-        }
-        [$markup, $placeholder_element] = $fiber->getReturn();
-
-        $elements = $this->doReplacePlaceholder($placeholder, $markup, $elements, $placeholder_element);
-        unset($fibers[$placeholder]);
+    // Process the rendered placeholders as they become available.
+    foreach (stream($placeholder_operations) as $placeholder => $result) {
+      if ($result->isError()) {
+        throw $result->getValue();
       }
-      $iterations++;
+      [$markup, $placeholder_element] = $result->getValue();
+
+      $elements = $this->doReplacePlaceholder($placeholder, $markup, $elements, $placeholder_element);
     }
 
     // Then render 'status messages' placeholders.

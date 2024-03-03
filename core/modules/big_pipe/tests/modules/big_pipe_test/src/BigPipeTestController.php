@@ -9,6 +9,7 @@ use Drupal\big_pipe_test\EventSubscriber\BigPipeTestSubscriber;
 use Drupal\Core\Form\EnforcedResponseException;
 use Drupal\Core\Security\TrustedCallbackInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Revolt\EventLoop;
 
 /**
  * Returns responses for Big Pipe routes.
@@ -150,23 +151,24 @@ class BigPipeTestController implements TrustedCallbackInterface {
   /**
    * Render API callback: Suspends its own execution then returns markup.
    *
-   * This function is assigned as a #lazy_builder callback.
+   * This function is assigned as a #lazy_builder callback and defers its own
+   * execution then returns markup.
    *
    * @return array
    *   A render array with a pig-themed message wrapped in a <span>,
    *   and caching disabled to ensure dynamic rendering.
    */
   public static function piggy(): array {
-    // Immediately call Fiber::suspend(), so that other placeholders are
-    // executed next. When this is resumed, it will immediately return the
+    // Defer the generation of our markup, so that other placeholders are
+    // executed next. When this is executed, it will immediately return the
     // render array.
-    if (\Fiber::getCurrent() !== NULL) {
-      \Fiber::suspend();
-    }
-    return [
+    $suspension = EventLoop::getSuspension();
+    EventLoop::defer(fn () => $suspension->resume([
       '#markup' => '<span>This 🐷 little 🐽 piggy 🐖 stayed 🐽 at 🐷 home.</span>',
       '#cache' => ['max-age' => 0],
-    ];
+    ]));
+
+    return $suspension->suspend();
   }
 
   /**
