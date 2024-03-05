@@ -3,6 +3,8 @@
 file.settings:
   type: config_object
   label: 'File settings'
+  constraints:
+    FullyValidatable: ~
   mapping:
     description:
       type: mapping
@@ -11,9 +13,21 @@ file.settings:
         type:
           type: string
           label: 'Type'
+          constraints:
+            # @todo Are there any other types of form elements we should allow here?
+            # @see \Drupal\file\Plugin\Field\FieldWidget\FileWidget::process()
+            Choice:
+              - textfield
+              - textarea
         length:
           type: integer
           label: 'Length'
+          constraints:
+            Range:
+              # This is directly used as the maximum length of the input field, so it
+              # should be at least 1.
+              # @see \Drupal\file\Plugin\Field\FieldWidget\FileWidget::process()
+              min: 1
     icon:
       type: mapping
       label: 'Icon'
@@ -21,6 +35,8 @@ file.settings:
         directory:
           type: path
           label: 'Directory'
+          constraints:
+            NotBlank: []
     make_unused_managed_files_temporary:
       type: boolean
       label: 'Controls if unused files should be marked temporary'
