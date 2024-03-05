@@ -33,6 +33,8 @@ class DeleteTest extends FileManagedUnitTestBase {
    * Tries deleting a file that is in use.
    */
   public function testInUse(): void {
+    $this->installConfig('file');
+
     // This test expects unused managed files to be marked as a temporary file
     // and then deleted up by file_cron().
     $this->config('file.settings')
