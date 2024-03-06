@@ -295,7 +295,7 @@
     } else {
       url = window.location;
     }
-    const hash = url.hash.substring(1);
+    const hash = Drupal.cleanId(url.hash.substring(1));
     if (hash) {
       const $target = $(`#${hash}`);
       $('body').trigger('formFragmentLinkClickOrHashChange', [$target]);

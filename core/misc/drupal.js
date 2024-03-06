@@ -622,6 +622,14 @@ window.Drupal = { behaviors: {}, locale: {} };
    * @return {string}
    *   The formatted text (html).
    */
+  Drupal.cleanId = function (input) {
+    if (typeof input !== 'string') return input;
+    return input
+      .replace(/[\s_[]/g, '-')
+      .toLowerCase()
+      .replace(/[^A-Za-z0-9\-_]/g, '')
+      .replace(/-+/g, '-');
+  };
   Drupal.theme.placeholder = function (str) {
     return `<em class="placeholder">${Drupal.checkPlain(str)}</em>`;
   };
