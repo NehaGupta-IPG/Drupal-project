@@ -86,7 +86,7 @@ final class Result {
    * @phpstan-assert-if-true OkT $this->getValue()
    * @phpstan-assert-if-false ErrorT $this->getValue()
    */
-  public function isOk() {
+  public function isOk() : bool {
     return $this->isOk;
   }
 
@@ -99,7 +99,7 @@ final class Result {
    * @phpstan-assert-if-true ErrorT $this->getValue()
    * @phpstan-assert-if-false OkT $this->getValue()
    */
-  public function isError() {
+  public function isError() : bool {
     return !$this->isOk;
   }
 
