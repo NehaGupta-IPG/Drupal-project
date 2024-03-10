@@ -76,8 +76,7 @@
        */
       setProgress(percentage, message, label) {
         if (percentage >= 0 && percentage <= 100) {
-          const bar = $(this.element).find('progress');
-          bar.val(percentage);
+          $(this.element).find('progress').prop('value', percentage);
           $(this.element)
             .find('div.progress__bar')
             .each(function () {
