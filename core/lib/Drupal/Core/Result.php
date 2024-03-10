@@ -5,20 +5,49 @@ declare(strict_types=1);
 namespace Drupal\Core;
 
 /**
- * A result type that can either be OkT or ErrorT.
+ * A result type that can be used to indicate success or failure.
  *
- * A result type is a monadic type holding a returned value or an error code.
- * They provide an elegant way of handling errors, without resorting to
- * exception handling; when a function that may fail returns a result type,
- * the programmer is forced to consider success or failure paths, before
- * getting access to the expected result; this eliminates the possibility of
- * an erroneous programmer assumption.
+ * This can be used in case an operation can succeed or fail but throwing an
+ * exception not appropriate. For example in a list of tasks where individual
+ * tasks fail without stopping the processing of other tasks in the list. In
+ * such a case throwing an exception would cause PHP to abort the entire list of
+ * tasks.
  *
- * A monad is a structure that combines program fragments (functions) and wraps
- * their return values in a type with additional computation.
+ * The value contained in the result can depend on whether the result is in the
+ * Ok or Error state. PHPStan generic annotations can be used to indicate the
+ * type of the value contained in the result in the Ok and Error cases.
+ *
+ * For example to write a function that processes user input for a number field
+ * and returns a result which contains an integer on success but holds an
+ * error message on failure you could do the following:
+ * ```
+ * /**
+ *  * @param string $maybeInteger
+ *  *   User input that might be a valid integer.
+ *  *
+ *  * @return \Drupal\Core\Result<int, string>
+ *  *   A Result that contains the integer value of the user input on success or
+ *  *   an error message for the user in case of error.
+ *  * /
+ * function convert_to_integer(string $maybeInteger) : Result {
+ *   // Check that we're dealing with a numeric type (either integer or float).
+ *   if (is_numeric($maybeInteger)) {
+ *     // Check that we're not dealing with a float by checking integer
+ *     // conversion doesn't truncate anything.
+ *     if (((float) (int) $maybeInteger) === ((float) $maybeInteger)) {
+ *       return Result::error("The input only supports whole numbers.");
+ *     }
+ *     // Return the successful integer input.
+ *     return Result::ok((int) $maybeInteger);
+ *   }
+ *   return Result::error("You must input a whole number");
+ * }
+ * ```
  *
  * @template OkT
+ *   The type of the value contained in the result in case of success.
  * @template ErrorT
+ *   The type of the value contained in the result in case of error.
  */
 final class Result {
 
@@ -26,7 +55,7 @@ final class Result {
    * Create a new result.
    *
    * @param bool $isOk
-   *   TRUE if the result is OkT or FALSE otherwise.
+   *   TRUE if the result is success or FALSE otherwise.
    * @param OkT|ErrorT $value
    *   The value for the result.
    *
@@ -38,7 +67,7 @@ final class Result {
   ) {}
 
   /**
-   * Create a result that resolved to OkT.
+   * Create a result that indicated success.
    *
    * @template T
    *
@@ -46,7 +75,7 @@ final class Result {
    *   The value for the successful result.
    *
    * @return self<T, never>
-   *   A result in the OkT state.
+   *   A result in the success state.
    */
   public static function ok($value) : self {
     // The indirect assignment and @-var annotation are needed until
@@ -58,7 +87,7 @@ final class Result {
   }
 
   /**
-   * Create a result that resolved to ErrorT.
+   * Create a result that indicates an error.
    *
    * @template T
    *
@@ -66,7 +95,7 @@ final class Result {
    *   The value for the error result.
    *
    * @return self<never, T>
-   *   A result in the ErrorT state.
+   *   A result in the error state.
    */
   public static function error($value) : self {
     // The indirect assignment and @-var annotation are needed until
@@ -78,10 +107,10 @@ final class Result {
   }
 
   /**
-   * Check whether the result is OkT.
+   * Check whether the result is successful.
    *
    * @return bool
-   *   Whether the result is OkT.
+   *   Whether the result is successful.
    *
    * @phpstan-assert-if-true OkT $this->getValue()
    * @phpstan-assert-if-false ErrorT $this->getValue()
@@ -91,10 +120,10 @@ final class Result {
   }
 
   /**
-   * Check whether the result is ErrorT.
+   * Check whether the result is an error.
    *
    * @return bool
-   *   Whether the result is ErrorT.
+   *   Whether the result is an error.
    *
    * @phpstan-assert-if-true ErrorT $this->getValue()
    * @phpstan-assert-if-false OkT $this->getValue()
@@ -107,8 +136,8 @@ final class Result {
    * Get the value from the result.
    *
    * @return OkT|ErrorT
-   *   The value for the result, the type depends on whether the result is OkT
-   *   or ErrorT.
+   *   The value contained in the result. Will be of generic type OkT in case
+   *   the result is a success and type ErrorT in case the result is an error.
    */
   public function getValue() {
     return $this->value;
