@@ -865,6 +865,7 @@ class FormTest extends BrowserTestBase {
       'select' => 'select',
       'weight' => 'select',
       'datetime' => 'datetime',
+      'button' => 'button',
     ];
 
     foreach ($form as $name => $item) {
