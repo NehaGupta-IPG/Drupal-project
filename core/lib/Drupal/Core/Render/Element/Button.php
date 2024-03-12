@@ -57,7 +57,7 @@ class Button extends FormElementBase {
       '#pre_render' => [
         [static::class, 'preRenderButton'],
       ],
-      '#theme_wrappers' => ['button__submit'],
+      '#theme' => 'button__submit',
     ];
   }
 
@@ -106,14 +106,6 @@ class Button extends FormElementBase {
     if (!empty($element['#attributes']['disabled'])) {
       $element['#attributes']['class'][] = 'is-disabled';
     }
-
-    // if (!isset($element['#theme_wrappers'])) {
-    //   $element['#theme_wrappers'] = [];
-    //   // Determine whether to use input.html.twig or button.html.twig as template
-    //   // only if a template is not already defined in the #theme_wrapper.
-    //   $tag = !empty($element['#uses_button_tag']) ? 'button' : 'input';
-    //   array_unshift($element['#theme_wrappers'], $tag . '__submit');
-    // }
 
     return $element;
   }
