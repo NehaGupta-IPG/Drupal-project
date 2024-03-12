@@ -57,7 +57,7 @@ class Button extends FormElementBase {
       '#pre_render' => [
         [static::class, 'preRenderButton'],
       ],
-      '#theme' => 'button__submit',
+      '#theme_wrappers' => ['button__submit'],
     ];
   }
 
