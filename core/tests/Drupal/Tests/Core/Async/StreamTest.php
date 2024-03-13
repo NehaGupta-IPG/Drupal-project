@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Drupal\Tests\Core\Async;
 
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\CoversFunction;
 use Revolt\EventLoop;
 use function Drupal\Core\Async\stream;
 
@@ -12,12 +14,12 @@ use function Drupal\Core\Async\stream;
  * Test the async stream function.
  *
  * @group Async
- * @covers \Drupal\Core\Async\stream
  */
+#[CoversFunction("\Drupal\Core\Async\stream")]
 class StreamTest extends UnitTestCase {
 
   /**
-   * Test that it doesn't complain if operations aren't actually async.
+   * Tests that stream() doesn't complain if operations aren't actually async.
    */
   public function testHandlesSynchronousOperations() : void {
     $output = [];
@@ -36,7 +38,7 @@ class StreamTest extends UnitTestCase {
   }
 
   /**
-   * Test that it properly deals with deferred operations.
+   * Tests that stream() properly deals with deferred operations.
    *
    * Results should arrive in order as guaranteed by the EventLoop.
    */
@@ -57,7 +59,7 @@ class StreamTest extends UnitTestCase {
   }
 
   /**
-   * Test that it handles delayed operations.
+   * Tests that stream() handles delayed operations.
    *
    * Results should arrive in order of completion as guaranteed by the
    * EventLoop.
@@ -79,7 +81,7 @@ class StreamTest extends UnitTestCase {
   }
 
   /**
-   * Test that operations work if an operation suspends again.
+   * Tests that operations work if an operation suspends again.
    */
   public function testNestedOperation() : void {
     $operations = [
@@ -104,15 +106,15 @@ class StreamTest extends UnitTestCase {
   }
 
   /**
-   * Create a deferred operation.
-   *
-   * @template T
+   * Creates a deferred operation.
    *
    * @param T $returnValue
    *   The return value.
    *
    * @return T
    *   The return value after suspension.
+   *
+   * @template T
    */
   protected function executeDeferredOperation(mixed $returnValue) : mixed {
     $suspension = EventLoop::getSuspension();
@@ -121,9 +123,7 @@ class StreamTest extends UnitTestCase {
   }
 
   /**
-   * Create a delay operation.
-   *
-   * @template T
+   * Creates a delayed operation.
    *
    * @param float $delay
    *   The delay in seconds.
@@ -132,6 +132,8 @@ class StreamTest extends UnitTestCase {
    *
    * @return T
    *   The return value after the delay.
+   *
+   * @template T
    */
   protected function executeDelayedOperation(float $delay, mixed $returnValue) : mixed {
     $suspension = EventLoop::getSuspension();
