@@ -7,17 +7,15 @@ namespace Drupal\Core;
 /**
  * A result type that can be used to indicate success or failure.
  *
- * This can be used in case an operation can succeed or fail but throwing an
- * exception not appropriate. For example in a list of tasks where individual
- * tasks fail without stopping the processing of other tasks in the list. In
- * such a case throwing an exception would cause PHP to abort the entire list of
- * tasks.
+ * This can be used to indicate whether the operation was a success or failure,
+ * as well as providing the successful result or error message, in a single
+ * value object.
  *
- * The value contained in the result can depend on whether the result is in the
+ * The value contained in the result depends on whether the result is in the
  * Ok or Error state. PHPStan generic annotations can be used to indicate the
  * type of the value contained in the result in the Ok and Error cases.
  *
- * For example to write a function that processes user input for a number field
+ * For example, to write a function that processes user input for a number field
  * and returns a result which contains an integer on success but holds an
  * error message on failure you could do the following:
  * ```
@@ -42,6 +40,12 @@ namespace Drupal\Core;
  *   }
  *   return Result::error("You must input a whole number");
  * }
+ *
+ * // Validate a set of user input and get a list of successes and failures.
+ * $results = array_map(
+ *   fn ($maybeInteger) => convert_to_integer($maybeInteger),
+ *   ["1", "not-an-int", "3.5", "6", "42"]
+ * );
  * ```
  *
  * @template OkT
