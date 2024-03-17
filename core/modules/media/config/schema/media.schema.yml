@@ -145,5 +145,3 @@ filter_settings.media_embed:
 action.configuration.media_update_metadata:
   type: action_configuration_default
   label: 'Update metadata'
-  constraints:
-    FullyValidatable: ~
