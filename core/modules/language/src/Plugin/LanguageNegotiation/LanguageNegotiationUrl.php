@@ -107,11 +107,23 @@ class LanguageNegotiationUrl extends LanguageNegotiationMethodBase implements In
       $parts = explode('/', trim($path, '/'));
       $prefix = array_shift($parts);
 
-      // Search prefix within added languages.
+      // We set the path language for the request, that can be used by other
+      // inbound processors later (like the AliasPathProcessor). We first find
+      // the language with an empty path prefix and default to that langcode.
+      foreach ($this->languageManager->getLanguages() as $language) {
+        if (isset($config['prefixes'][$language->getId()]) && $config['prefixes'][$language->getId()] === '') {
+          $request->attributes->set('path_langcode', $language->getId());
+          break;
+        }
+      }
+
+      // Search for the path prefix within added languages.
       foreach ($this->languageManager->getLanguages() as $language) {
         if (isset($config['prefixes'][$language->getId()]) && $config['prefixes'][$language->getId()] == $prefix) {
           // Rebuild $path with the language removed.
           $path = '/' . implode('/', $parts);
+          // Update the request with the language.
+          $request->attributes->set('path_langcode', $language->getId());
           break;
         }
       }

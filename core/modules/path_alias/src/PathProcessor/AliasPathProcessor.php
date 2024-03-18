@@ -34,7 +34,12 @@ class AliasPathProcessor implements InboundPathProcessorInterface, OutboundPathP
    * {@inheritdoc}
    */
   public function processInbound($path, Request $request) {
-    $path = $this->aliasManager->getPathByAlias($path);
+    // The LanguageNegotiationUrl inbound path processor removes the language
+    // prefix and sets it as an attribute on the request. As there might exist
+    // the same url aliases for different languages we need to use it while
+    // querying the path alias.
+    $path_langcode = $request->attributes->get('path_langcode');
+    $path = $this->aliasManager->getPathByAlias($path, $path_langcode);
     return $path;
   }
 
