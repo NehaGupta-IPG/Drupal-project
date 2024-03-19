@@ -31,6 +31,12 @@ entity_reference_selection.views_auto_create:
     auto_create_bundle:
       type: string
       label: 'Bundle assigned to the auto-created entities.'
+      nullable: true
+      constraints:
+        NotBlank: []
+        AutoCreateEntityBundleExists:
+          entityTypeId: '%parent.%parent.%parent.entity_type'
+          fieldName: '%parent.%parent.%parent.field_name'
 
 # Schema for all entity reference 'views_auto_create:*' selection handlers that are not
 # providing a specific schema.
