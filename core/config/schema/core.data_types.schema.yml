@@ -313,7 +313,7 @@ theme_settings_favicon.*:
       type: boolean
       label: 'Use the default shortcut icon supplied by the theme'
 
-theme_settings_favicon.0:
+theme_settings_favicon.1:
   type: 'theme_settings_favicon.*'
   label: 'Shortcut icon settings'
   mapping:
@@ -349,7 +349,7 @@ theme_settings_logo.*:
       label: 'Use default'
       constraints: { }
 
-theme_settings_logo.0:
+theme_settings_logo.1:
   type: 'theme_settings_logo.*'
   label: 'Logo settings'
   mapping:
