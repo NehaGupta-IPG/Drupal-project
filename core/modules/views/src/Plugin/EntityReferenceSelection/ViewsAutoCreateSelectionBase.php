@@ -8,7 +8,6 @@ use Drupal\Core\Entity\EntityReferenceSelection\SelectionWithAutocreateInterface
 use Drupal\Core\Entity\EntityTypeBundleInfoInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use function parent;
 
 /**
  * Base class for views selection plugins with basic autocreate functionality.
@@ -30,8 +29,6 @@ abstract class ViewsAutoCreateSelectionBase extends ViewsSelection implements Se
     $instance->entityTypeBundleInfo = $container->get('entity_type.bundle.info');
     return $instance;
   }
-
-
 
   /**
    * {@inheritdoc}

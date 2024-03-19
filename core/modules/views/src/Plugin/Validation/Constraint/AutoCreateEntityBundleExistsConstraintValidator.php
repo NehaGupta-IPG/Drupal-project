@@ -17,7 +17,6 @@ use function array_key_exists;
 use function assert;
 use function is_string;
 
-
 /**
  * Validates that the bundle exists of an entity reference field with auto creation option enabled.
  */

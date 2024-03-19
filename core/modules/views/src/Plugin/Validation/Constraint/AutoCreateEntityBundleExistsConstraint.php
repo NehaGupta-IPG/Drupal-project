@@ -24,16 +24,21 @@ class AutoCreateEntityBundleExistsConstraint extends SymfonyConstraint {
   public string $message = "The '@bundle' bundle does not exist on the '@entity_type_id' entity type.";
 
   /**
-   * The entity type ID which should have the given bundle.
+   * The host entity type ID.
    *
    * This can contain variable values (e.g., `%parent`) that will be replaced.
    *
    * @see \Drupal\Core\Config\Schema\TypeResolver::replaceVariable()
-   *
-   * @var string
    */
   public string $entityTypeId;
 
+  /**
+   * The field name which has auto creation enabled.
+   *
+   * This can contain variable values (e.g., `%parent`) that will be replaced.
+   *
+   * @see \Drupal\Core\Config\Schema\TypeResolver::replaceVariable()
+   */
   public string $fieldName;
 
   /**
@@ -49,4 +54,5 @@ class AutoCreateEntityBundleExistsConstraint extends SymfonyConstraint {
   public function getRequiredOptions(): array {
     return ['entityTypeId', 'fieldName'];
   }
+
 }
