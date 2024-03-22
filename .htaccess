@@ -32,7 +32,10 @@ AddType image/webp .webp
 # Drupal\Core\DrupalKernel::bootEnvironment() for settings that can be changed
 # at runtime.
 <IfModule mod_php.c>
-  php_value zend.assertions 0
+  # Assertion checks should be disabled unless developing locally. A value of 1
+  # means assertion checking is enabled. Uncomment the following line to
+  # disable assertion checking if you are unable to disable it globally.
+  # php_value zend.assertions 0
 </IfModule>
 
 # Requires mod_expires to be enabled.
