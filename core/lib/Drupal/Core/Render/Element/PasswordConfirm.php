@@ -13,6 +13,8 @@ use Drupal\Core\Render\Attribute\FormElement;
  *
  * Properties:
  * - #size: The size of the input element in characters.
+ * - #pass2_attributes: An array of attributes to apply to the
+ *   confirm_password field.
  *
  * Usage example:
  * @code
@@ -20,6 +22,8 @@ use Drupal\Core\Render\Attribute\FormElement;
  *   '#type' => 'password_confirm',
  *   '#title' => $this->t('Password'),
  *   '#size' => 25,
+ *   '#attributes' => ['class' => ['password-field']],
+ *   '#pass2_attributes' => ['class' => ['password-confirm']],
  * ];
  * @endcode
  *
