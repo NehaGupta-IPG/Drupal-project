@@ -67,28 +67,38 @@ class PasswordConfirm extends FormElementBase {
    * Expand a password_confirm field into two text boxes.
    */
   public static function processPasswordConfirm(&$element, FormStateInterface $form_state, &$complete_form) {
+    $pass1_attributes = [
+      'class' => ['password-field', 'js-password-field'],
+      'autocomplete' => ['new-password'],
+    ];
     $element['pass1'] = [
       '#type' => 'password',
       '#title' => t('Password'),
       '#value' => empty($element['#value']) ? NULL : $element['#value']['pass1'],
       '#required' => $element['#required'],
-      '#attributes' => [
-        'class' => ['password-field', 'js-password-field'],
-        'autocomplete' => ['new-password'],
-      ],
+      '#attributes' => is_array($element['#attributes']) ?
+      array_merge_recursive($element['#attributes'], $pass1_attributes) :
+      $pass1_attributes,
       '#error_no_message' => TRUE,
+    ];
+
+    $pass2_attributes = [
+      'class' => ['password-confirm', 'js-password-confirm'],
+      'autocomplete' => ['new-password'],
     ];
     $element['pass2'] = [
       '#type' => 'password',
       '#title' => t('Confirm password'),
       '#value' => empty($element['#value']) ? NULL : $element['#value']['pass2'],
       '#required' => $element['#required'],
-      '#attributes' => [
-        'class' => ['password-confirm', 'js-password-confirm'],
-        'autocomplete' => ['new-password'],
-      ],
+      '#attributes' => $pass2_attributes,
       '#error_no_message' => TRUE,
     ];
+    if (isset($element['#pass2_attributes'])) {
+      $element['pass2']['#attributes'] = is_array($element['#pass2_attributes']) ?
+        array_merge_recursive($element['#pass2_attributes'], $pass2_attributes) :
+        $pass2_attributes;
+    }
     $element['#element_validate'] = [[static::class, 'validatePasswordConfirm']];
     $element['#tree'] = TRUE;
 
