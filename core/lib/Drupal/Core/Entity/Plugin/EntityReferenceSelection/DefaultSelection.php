@@ -6,6 +6,7 @@ use Drupal\Component\Utility\Html;
 use Drupal\Core\Database\Query\AlterableInterface;
 use Drupal\Core\Entity\Attribute\EntityReferenceSelection;
 use Drupal\Core\Entity\EntityFieldManagerInterface;
+use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityReferenceSelection\SelectionPluginBase;
 use Drupal\Core\Entity\EntityReferenceSelection\SelectionWithAutocreateInterface;
 use Drupal\Core\Entity\EntityRepositoryInterface;
@@ -158,6 +159,7 @@ class DefaultSelection extends SelectionPluginBase implements ContainerFactoryPl
       ],
       'auto_create' => FALSE,
       'auto_create_bundle' => NULL,
+      'allow_self_reference' => TRUE,
     ] + parent::defaultConfiguration();
   }
 
@@ -323,6 +325,12 @@ class DefaultSelection extends SelectionPluginBase implements ContainerFactoryPl
         '#weight' => -1,
       ];
     }
+
+    $form['allow_self_reference'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('Allow an entity to reference itself'),
+      '#default_value' => $configuration['allow_self_reference'],
+    ];
 
     return $form;
   }
@@ -493,6 +501,18 @@ class DefaultSelection extends SelectionPluginBase implements ContainerFactoryPl
 
     if (isset($match) && $label_key = $entity_type->getKey('label')) {
       $query->condition($label_key, $match, $match_operator);
+    }
+
+    // Disallow references to the referencing entity.
+    $entity = $this->configuration['entity'] ? $this->configuration['entity'] : NULL;
+    if (($entity instanceof EntityInterface) && !is_null($entity->id())) {
+      $allow_self_reference = !empty($configuration['allow_self_reference']);
+      if (!$allow_self_reference) {
+        // Referencing entity must be the same entity type as the query.
+        if ($entity->getEntityTypeId() == $entity_type->id()) {
+          $query->condition($entity_type->getKey('id'), $entity->id(), '<>');
+        }
+      }
     }
 
     // Add entity-access tag.

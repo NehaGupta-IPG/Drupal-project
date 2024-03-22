@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Drupal\Tests\system\Kernel\Entity;
 
 use Drupal\Component\Utility\Html;
+use Drupal\entity_test\Entity\EntityTest;
+use Drupal\entity_test\Entity\EntityTestNoLabel;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\node\Entity\NodeType;
@@ -61,12 +63,9 @@ class EntityReferenceSelectionReferenceableTest extends KernelTestBase {
   protected function setUp(): void {
     parent::setUp();
 
+    $this->installEntitySchema('entity_test');
     $this->installEntitySchema('entity_test_no_label');
     $this->installEntitySchema('node');
-
-    /** @var \Drupal\Core\Entity\EntityStorageInterface $storage */
-    $storage = $this->container->get('entity_type.manager')
-      ->getStorage('entity_test_no_label');
 
     // Create a new node-type.
     NodeType::create([
@@ -83,15 +82,97 @@ class EntityReferenceSelectionReferenceableTest extends KernelTestBase {
 
     // Generate a bundle name to be used with 'entity_test_no_label'.
     $this->bundle = $this->randomMachineName();
+  }
 
-    // Create 6 entities to be referenced by the field.
-    foreach (static::$labels as $name) {
-      $storage->create([
-        'id' => $this->randomMachineName(),
-        'name' => $name,
-        'type' => $this->bundle,
-      ])->save();
+  /**
+   * Tests the 'allow_self_reference' selection handler setting.
+   *
+   * @param $allow_self_reference
+   *   Value for 'allow_self_reference' selection handler setting.
+   * @param $entity_is_reference
+   *   Assert whether the referencing entity is reference.
+   *
+   * @dataProvider providerAllowSelfReference
+   */
+  public function testAllowSelfReference($allow_self_reference, $entity_is_reference) {
+    $field_name = 'field_test';
+    $this->createEntityReferenceField('entity_test', 'entity_test', $field_name, 'Test entity reference', 'entity_test');
+    $field_config = FieldConfig::loadByName('entity_test', 'entity_test', $field_name);
+    $handler_settings = $field_config->getSetting('handler_settings');
+    $handler_settings['allow_self_reference'] = $allow_self_reference;
+    $field_config
+      ->setSetting('handler_settings', $handler_settings)
+      ->save();
+
+    $entity = EntityTest::create(['name' => $this->randomMachineName()]);
+    $entity->save();
+    $other = EntityTest::create(['name' => $this->randomMachineName()]);
+    $other->save();
+
+    $handler = $this->container
+      ->get('plugin.manager.entity_reference_selection')
+      ->getSelectionHandler($field_config, $entity);
+
+    $referenceable = $handler->getReferenceableEntities()['entity_test'];
+    if ($entity_is_reference) {
+      $this->assertArrayHasKey($entity->id(), $referenceable, 'Can reference entity.');
     }
+    else {
+      $this->assertArrayNotHasKey($entity->id(), $referenceable, 'Can not reference entity.');
+    }
+    // Other entity is always reference.
+    $this->assertArrayHasKey($other->id(), $referenceable, 'Can reference other entity.');
+  }
+
+  /**
+   * Data provider for testAllowSelfReference().
+   */
+  public function providerAllowSelfReference() {
+    return [
+      'when setting is true, referencing entity is reference' => [
+        TRUE,
+        TRUE,
+      ],
+      'when setting is false, referencing entity is not reference' => [
+        FALSE,
+        FALSE,
+      ],
+    ];
+  }
+
+  /**
+   * Tests entities can be referenced despite having the same ID as referencer.
+   *
+   * Ensures that the 'allow_self_reference' selection handler setting does not
+   * attempt to exclude entities that are different entity types.
+   */
+  public function testPreventSelfReferenceDifferentEntityType() {
+    $field_name = 'field_test';
+    $this->createEntityReferenceField('entity_test', 'entity_test', $field_name, 'Test entity reference', 'entity_test_no_label');
+    $field_config = FieldConfig::loadByName('entity_test', 'entity_test', $field_name);
+    $handler_settings = $field_config->getSetting('handler_settings');
+    $handler_settings['allow_self_reference'] = FALSE;
+    $field_config
+      ->setSetting('handler_settings', $handler_settings)
+      ->save();
+
+    $entity = EntityTest::create(['name' => $this->randomMachineName()]);
+    $entity->save();
+    $other = EntityTestNoLabel::create(['name' => $this->randomMachineName()]);
+    $other->save();
+
+    // The entity type doesn't matter, so long as it is a different type to the
+    // other entity.
+    $this->assertNotEquals($entity->getEntityTypeId(), $other->getEntityTypeId());
+    // This test requires ID's to be the same.
+    $this->assertEquals($entity->id(), $other->id());
+
+    $handler = $this->container
+      ->get('plugin.manager.entity_reference_selection')
+      ->getSelectionHandler($field_config, $entity);
+
+    $referenceable = $handler->getReferenceableEntities()['entity_test_no_label'];
+    $this->assertArrayHasKey($entity->id(), $referenceable, 'Can reference entity even though the IDs are the same.');
   }
 
   /**
@@ -114,6 +195,19 @@ class EntityReferenceSelectionReferenceableTest extends KernelTestBase {
    */
   #[DataProvider('providerTestCases')]
   public function testReferenceablesWithNoLabelKey($match, $match_operator, $limit, $count_limited, array $items, $count_all): void {
+    /** @var \Drupal\Core\Entity\EntityStorageInterface $storage */
+    $storage = $this->container->get('entity_type.manager')
+      ->getStorage('entity_test_no_label');
+
+    // Create 6 entities to be referenced by the field.
+    foreach (static::$labels as $name) {
+      $storage->create([
+        'id' => mb_strtolower($this->randomMachineName()),
+        'name' => $name,
+        'type' => $this->bundle,
+      ])->save();
+    }
+
     // Test ::getReferenceableEntities().
     $referenceables = $this->selectionHandler->getReferenceableEntities($match, $match_operator, $limit);
 
