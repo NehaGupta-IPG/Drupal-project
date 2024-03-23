@@ -64,7 +64,7 @@ class MediaSelection extends DefaultSelection {
     if (!$this->currentUser->hasPermission('administer media')) {
       $uid = $this->currentUser->id();
       $unpublished_permission = $this->currentUser->hasPermission('view own unpublished media');
-      $entities = array_filter($entities, function ($media) {
+      $entities = array_filter($entities, function ($media) use ($unpublished_permission, $uid) {
         $unpublished_access = ($unpublished_permission && ($media->getOwnerId() == $uid));
         /** @var \Drupal\media\MediaInterface $media */
         return ($unpublished_access || $media->isPublished());
