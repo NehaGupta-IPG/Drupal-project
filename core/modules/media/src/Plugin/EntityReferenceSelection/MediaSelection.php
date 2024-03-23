@@ -27,7 +27,17 @@ class MediaSelection extends DefaultSelection {
     // Ensure that users with insufficient permission cannot see unpublished
     // entities.
     if (!$this->currentUser->hasPermission('administer media')) {
-      $query->condition('status', 1);
+      // Permission to "view own unpublished media" allows
+      // the user to reference any published media or own unpublished media.
+      if ($this->currentUser->hasPermission('view own unpublished media')) {
+        $or = $query->orConditionGroup()
+          ->condition('status', 1)
+          ->condition('uid', $this->currentUser->id());
+        $query->condition($or);
+      }
+      else {
+        $query->condition('status', 1);
+      }
     }
     return $query;
   }
@@ -52,9 +62,12 @@ class MediaSelection extends DefaultSelection {
     $entities = parent::validateReferenceableNewEntities($entities);
     // Mirror the conditions checked in buildEntityQuery().
     if (!$this->currentUser->hasPermission('administer media')) {
+      $uid = $this->currentUser->id();
+      $unpublished_permission = $this->currentUser->hasPermission('view own unpublished media');
       $entities = array_filter($entities, function ($media) {
+        $unpublished_access = ($unpublished_permission && ($media->getOwnerId() == $uid));
         /** @var \Drupal\media\MediaInterface $media */
-        return $media->isPublished();
+        return ($unpublished_access || $media->isPublished());
       });
     }
     return $entities;
