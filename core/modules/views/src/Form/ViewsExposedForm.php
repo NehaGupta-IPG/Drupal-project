@@ -37,13 +37,6 @@ class ViewsExposedForm extends FormBase implements WorkspaceSafeFormInterface {
   protected $currentPathStack;
 
   /**
-   * The current route match.
-   *
-   * @var \Drupal\Core\Routing\RouteMatchInterface
-   */
-  protected $routeMatch;
-
-  /**
    * Constructs a new ViewsExposedForm.
    *
    * @param \Drupal\views\ExposedFormCache $exposed_form_cache
@@ -56,7 +49,6 @@ class ViewsExposedForm extends FormBase implements WorkspaceSafeFormInterface {
   public function __construct(ExposedFormCache $exposed_form_cache, CurrentPathStack $current_path_stack, protected RouteMatchInterface $routeMatch) {
     $this->exposedFormCache = $exposed_form_cache;
     $this->currentPathStack = $current_path_stack;
-    $this->routeMatch = $route_match;
   }
 
   /**
