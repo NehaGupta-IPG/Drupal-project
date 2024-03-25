@@ -614,7 +614,7 @@ class Views {
    * @return array
    *   Array of args.
    */
-  public static function buildArgs(RouteMatchInterface $route_match) {
+  public static function buildArgs(RouteMatchInterface $route_match): array {
     $args = [];
     $route = $route_match->getRouteObject();
     $map = $route->hasOption('_view_argument_map') ? $route->getOption('_view_argument_map') : [];
