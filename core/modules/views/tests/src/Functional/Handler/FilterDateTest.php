@@ -26,7 +26,11 @@ class FilterDateTest extends ViewTestBase {
    *
    * @var array
    */
-  public static $testViews = ['test_filter_date_between'];
+  public static $testViews = [
+    'test_filter_date_between',
+    'test_filter_date_between_exposed',
+    'test_filter_date_exposed_operators',
+  ];
 
   /**
    * {@inheritdoc}
@@ -105,6 +109,8 @@ class FilterDateTest extends ViewTestBase {
     $this->_testUiValidation();
     $this->_testFilterDateUI();
     $this->_testFilterDatetimeUI();
+    $this->_testExposedFilterTimestampUI();
+    $this->_testExposedFilterExposedOperator();
   }
 
   /**
@@ -300,7 +306,8 @@ class FilterDateTest extends ViewTestBase {
     $this->assertCount(1, $results);
     $this->assertEquals($this->nodes[3]->id(), $results[0]->getText());
     $this->submitForm([
-      'created' => $this->dateFormatter->format(250000, 'custom', 'Y-m-d H:i:s'),
+      'created[date]' => $this->dateFormatter->format(250000, 'custom', 'Y-m-d'),
+      'created[time]' => $this->dateFormatter->format(250000, 'custom', 'H:i:s'),
     ], 'Apply');
     $results = $this->cssSelect('.view-content .field-content');
     $this->assertCount(2, $results);
@@ -361,7 +368,203 @@ class FilterDateTest extends ViewTestBase {
     $this->submitForm([], 'Save');
 
     $this->drupalGet('exposed-date-filter');
-    $this->assertSession()->fieldExists('created');
+    $this->assertSession()->fieldExists('created[date]');
+    $this->assertSession()->fieldExists('created[time]');
+  }
+
+  /**
+   * Make sure the exposed timestamp filters work.
+   */
+  protected function _testExposedFilterTimestampUI() {
+    $this->drupalLogin($this->drupalCreateUser(['access content']));
+
+    // Test the exposed "=" filter.
+    $this->drupalGet('test-filter-date-exposed');
+
+    // Verify that exposed input elements exists in the output with the proper
+    // types.
+    $date_field = $this->assertSession()->fieldExists('edit-created-date');
+    $this->assertEquals('date', $date_field->getAttribute('type'));
+    $this->assertEquals('', $date_field->getValue());
+
+    $time_field = $this->assertSession()->fieldExists('edit-created-time');
+    $this->assertEquals('time', $time_field->getAttribute('type'));
+    $this->assertEquals('', $time_field->getValue());
+
+    // Verify the node list.
+    $this->assertSession()->pageTextContains($this->nodes[0]->getTitle());
+    $this->assertSession()->pageTextContains($this->nodes[1]->getTitle());
+    $this->assertSession()->pageTextContains($this->nodes[2]->getTitle());
+    $this->assertSession()->pageTextContains($this->nodes[3]->getTitle());
+
+    // Apply the filter.
+    $timezone = $this->config('system.date')->get('timezone.default');
+    $created = $this->nodes[1]->getCreatedTime();
+    $date = $this->dateFormatter->format($created, 'custom', 'Y-m-d', $timezone);
+    $time = $this->dateFormatter->format($created, 'custom', 'H:i:s', $timezone);
+
+    $edit = [
+      'created[date]' => $date,
+      'created[time]' => $time,
+    ];
+
+    $this->drupalGet('test-filter-date-exposed', ['query' => $edit]);
+
+    // Verify the exposed inputs have the values being filtered on.
+    $date_field = $this->assertSession()->fieldExists('edit-created-date');
+    $this->assertEquals($date, $date_field->getValue());
+    $time_field = $this->assertSession()->fieldExists('edit-created-time');
+    $this->assertEquals($time, $time_field->getValue());
+
+    // Verify the node list.
+    $this->assertSession()->pageTextNotContains($this->nodes[0]->getTitle());
+    $this->assertSession()->pageTextContains($this->nodes[1]->getTitle());
+    $this->assertSession()->pageTextNotContains($this->nodes[2]->getTitle());
+    $this->assertSession()->pageTextNotContains($this->nodes[3]->getTitle());
+
+    // Test the exposed "between" filter.
+    $this->drupalGet('test-filter-date-between-exposed');
+
+    // Verify that exposed input elements exists in the output with the proper
+    // types.
+    $date_field = $this->assertSession()->fieldExists('edit-created-min-date');
+    $this->assertEquals('date', $date_field->getAttribute('type'));
+    $this->assertEquals('', $date_field->getValue());
+
+    $time_field = $this->assertSession()->fieldExists('edit-created-min-time');
+    $this->assertEquals('time', $time_field->getAttribute('type'));
+    $this->assertEquals('', $time_field->getValue());
+    $date_field = $this->assertSession()->fieldExists('edit-created-max-date');
+    $this->assertEquals('date', $date_field->getAttribute('type'));
+    $this->assertEquals('', $date_field->getValue());
+
+    $time_field = $this->assertSession()->fieldExists('edit-created-max-time');
+    $this->assertEquals('time', $time_field->getAttribute('type'));
+    $this->assertEquals('', $time_field->getValue());
+
+    // Verify the node list.
+    $this->assertSession()->pageTextContains($this->nodes[0]->getTitle());
+    $this->assertSession()->pageTextContains($this->nodes[1]->getTitle());
+    $this->assertSession()->pageTextContains($this->nodes[2]->getTitle());
+    $this->assertSession()->pageTextContains($this->nodes[3]->getTitle());
+
+    // Apply the filter.
+    $timezone = $this->config('system.date')->get('timezone.default');
+    $created = $this->nodes[1]->getCreatedTime();
+    $min_date = $this->dateFormatter->format($created - 3600, 'custom', 'Y-m-d', $timezone);
+    $min_time = $this->dateFormatter->format($created - 3600, 'custom', 'H:i:s', $timezone);
+    $max_date = $this->dateFormatter->format($created + 3600, 'custom', 'Y-m-d', $timezone);
+    $max_time = $this->dateFormatter->format($created + 3600, 'custom', 'H:i:s', $timezone);
+
+    $edit = [
+      'created[min][date]' => $min_date,
+      'created[min][time]' => $min_time,
+      'created[max][date]' => $max_date,
+      'created[max][time]' => $max_time,
+    ];
+
+    $this->drupalGet('test-filter-date-between-exposed', ['query' => $edit]);
+
+    // Verify the exposed inputs have the values being filtered on.
+    $date_field = $this->assertSession()->fieldExists('edit-created-min-date');
+    $this->assertEquals($min_date, $date_field->getValue());
+    $time_field = $this->assertSession()->fieldExists('edit-created-min-time');
+    $this->assertEquals($min_time, $time_field->getValue());
+    $date_field = $this->assertSession()->fieldExists('edit-created-max-date');
+    $this->assertEquals($max_date, $date_field->getValue());
+    $time_field = $this->assertSession()->fieldExists('edit-created-max-time');
+    $this->assertEquals($max_time, $time_field->getValue());
+
+    // Verify the node list.
+    $this->assertSession()->pageTextNotContains($this->nodes[0]->getTitle());
+    $this->assertSession()->pageTextContains($this->nodes[1]->getTitle());
+    $this->assertSession()->pageTextNotContains($this->nodes[2]->getTitle());
+    $this->assertSession()->pageTextNotContains($this->nodes[3]->getTitle());
+  }
+
+  /**
+   * Make sure the date time widgets work properly with exposed operator.
+   */
+  protected function _testExposedFilterExposedOperator() {
+    $this->drupalLogin($this->drupalCreateUser(['access content']));
+
+    // Test the exposed "=" filter.
+    $this->drupalGet('test-filter-date-exposed-operators');
+
+    // Verify that exposed input elements exists in the output with the proper
+    // types.
+    $date_field = $this->assertSession()->fieldExists('edit-created-value-date');
+    $this->assertEquals('date', $date_field->getAttribute('type'));
+    $this->assertEquals('', $date_field->getValue());
+    $time_field = $this->assertSession()->fieldExists('edit-created-value-time');
+    $this->assertEquals('time', $time_field->getAttribute('type'));
+    $this->assertEquals('', $time_field->getValue());
+
+    // Verify the node list.
+    $this->assertSession()->pageTextContains($this->nodes[0]->getTitle());
+    $this->assertSession()->pageTextContains($this->nodes[1]->getTitle());
+    $this->assertSession()->pageTextContains($this->nodes[2]->getTitle());
+    $this->assertSession()->pageTextContains($this->nodes[3]->getTitle());
+
+    // Apply the filter.
+    $timezone = $this->config('system.date')->get('timezone.default');
+    $created = $this->nodes[1]->getCreatedTime();
+    $date = $this->dateFormatter->format($created, 'custom', 'Y-m-d', $timezone);
+    $time = $this->dateFormatter->format($created, 'custom', 'H:i:s', $timezone);
+
+    // When operator is exposed, when the operator is not 'between' or
+    // 'not-between', the date goes inside the value key in the array
+    // corresponding to the identifier.
+    $edit = [
+      'created[value][date]' => $date,
+      'created[value][time]' => $time,
+      'created_op' => '=',
+    ];
+
+    $this->drupalGet('test-filter-date-exposed-operators', ['query' => $edit]);
+
+    // Verify the exposed inputs have the values being filtered on.
+    $date_field = $this->assertSession()->fieldExists('edit-created-value-date');
+    $this->assertEquals($date, $date_field->getValue());
+    $time_field = $this->assertSession()->fieldExists('edit-created-value-time');
+    $this->assertEquals($time, $time_field->getValue());
+
+    // Verify the node list.
+    $this->assertSession()->pageTextNotContains($this->nodes[0]->getTitle());
+    $this->assertSession()->pageTextContains($this->nodes[1]->getTitle());
+    $this->assertSession()->pageTextNotContains($this->nodes[2]->getTitle());
+    $this->assertSession()->pageTextNotContains($this->nodes[3]->getTitle());
+
+    $min_date = $this->dateFormatter->format($created - 3600, 'custom', 'Y-m-d', $timezone);
+    $min_time = $this->dateFormatter->format($created - 3600, 'custom', 'H:i:s', $timezone);
+    $max_date = $this->dateFormatter->format($created + 3600, 'custom', 'Y-m-d', $timezone);
+    $max_time = $this->dateFormatter->format($created + 3600, 'custom', 'H:i:s', $timezone);
+
+    $edit = [
+      'created_op' => 'between',
+      'created[min][date]' => $min_date,
+      'created[min][time]' => $min_time,
+      'created[max][date]' => $max_date,
+      'created[max][time]' => $max_time,
+    ];
+
+    $this->drupalGet('test-filter-date-exposed-operators', ['query' => $edit]);
+
+    // Verify the exposed inputs have the values being filtered on.
+    $date_field = $this->assertSession()->fieldExists('edit-created-min-date');
+    $this->assertEquals($min_date, $date_field->getValue());
+    $time_field = $this->assertSession()->fieldExists('edit-created-min-time');
+    $this->assertEquals($min_time, $time_field->getValue());
+    $date_field = $this->assertSession()->fieldExists('edit-created-max-date');
+    $this->assertEquals($max_date, $date_field->getValue());
+    $time_field = $this->assertSession()->fieldExists('edit-created-max-time');
+    $this->assertEquals($max_time, $time_field->getValue());
+
+    // Verify the node list.
+    $this->assertSession()->pageTextNotContains($this->nodes[0]->getTitle());
+    $this->assertSession()->pageTextContains($this->nodes[1]->getTitle());
+    $this->assertSession()->pageTextNotContains($this->nodes[2]->getTitle());
+    $this->assertSession()->pageTextNotContains($this->nodes[3]->getTitle());
   }
 
   /**
