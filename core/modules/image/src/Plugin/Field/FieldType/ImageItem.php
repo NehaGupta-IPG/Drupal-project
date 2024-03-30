@@ -156,6 +156,7 @@ class ImageItem extends FileItem {
   public static function propertyDefinitions(FieldStorageDefinitionInterface $field_definition) {
     $properties = parent::propertyDefinitions($field_definition);
 
+    unset($properties['display']);
     unset($properties['description']);
 
     $properties['alt'] = DataDefinition::create('string')
@@ -434,7 +435,7 @@ class ImageItem extends FileItem {
       'title' => $random->sentences(4),
       'width' => $width,
       'height' => $height,
-      'display' => isset($settings['display_default']) ? (int) $settings['display_default'] : 1,
+      'display' => (int) $settings['display_default'],
     ];
     return $values;
   }
