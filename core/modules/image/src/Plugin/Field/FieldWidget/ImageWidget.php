@@ -130,6 +130,11 @@ class ImageWidget extends FileWidget {
       }
     }
     else {
+      // The field settings include defaults for the field type. However, this
+      // widget is a base class for other widgets (e.g., ImageWidget) that may
+      // act on field types without these expected settings.
+      $field_settings = $this->getFieldSettings() + ['display_field' => NULL];
+      $elements['#display_field'] = (bool) $field_settings['display_field'];
       $elements['#file_upload_description'] = $file_upload_help;
     }
 
@@ -143,6 +148,14 @@ class ImageWidget extends FileWidget {
     $element = parent::formElement($items, $delta, $element, $form, $form_state);
 
     $field_settings = $this->getFieldSettings();
+
+    // The field settings include defaults for the field type. However, this
+    // widget is a base class for other widgets (e.g., ImageWidget) that may act
+    // on field types without these expected settings.
+    $field_settings += [
+      'display_default' => NULL,
+      'display_field' => NULL,
+    ];
 
     // Add image validation.
     $element['#upload_validators']['FileIsImage'] = [];
@@ -173,6 +186,8 @@ class ImageWidget extends FileWidget {
     $element['#title_field_required'] = $field_settings['title_field_required'];
     $element['#alt_field'] = $field_settings['alt_field'];
     $element['#alt_field_required'] = $field_settings['alt_field_required'];
+    $element['#display_field'] = (bool) $field_settings['display_field'];
+    $element['#display_default'] = $field_settings['display_default'];
 
     // Default image.
     $default_image = $field_settings['default_image'];
