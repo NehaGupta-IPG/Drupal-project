@@ -49,13 +49,6 @@ class SetInlineBlockDependency implements EventSubscriberInterface {
   protected EntityRepositoryInterface $entityRepository;
 
   /**
-   * The current route match service.
-   *
-   * @var \Drupal\Core\Routing\RouteMatchInterface
-   */
-  protected RouteMatchInterface $currentRouteMatch;
-
-  /**
    * Constructs a new SetInlineBlockDependency object.
    *
    * @param \Drupal\Core\Entity\EntityRepositoryInterface $entityRepository
@@ -73,8 +66,8 @@ class SetInlineBlockDependency implements EventSubscriberInterface {
     mixed $entityRepository,
     protected readonly Connection $database,
     protected readonly InlineBlockUsageInterface $usage,
-    SectionStorageManagerInterface $sectionStorageManager,
-    ?RouteMatchInterface $currentRouteMatch,
+    protected readonly SectionStorageManagerInterface $sectionStorageManager,
+    protected readonly ?RouteMatchInterface $currentRouteMatch,
   ) {
     if (!$entityRepository instanceof EntityRepositoryInterface) {
       // @todo Replace link with a link to the change record.
@@ -82,13 +75,11 @@ class SetInlineBlockDependency implements EventSubscriberInterface {
       $entityRepository = \Drupal::service('entity.repository');
     }
     $this->entityRepository = $entityRepository;
-    $this->sectionStorageManager = $sectionStorageManager;
     if (empty($currentRouteMatch)) {
       // @todo Replace link with a link to the change record.
       @trigger_error('Calling ' . __METHOD__ . ' without the $currentRouteMatch argument is deprecated in drupal:11.0.0 and will be required in drupal:12.0.0. See https://www.drupal.org/node/3047022', E_USER_DEPRECATED);
       $currentRouteMatch = \Drupal::service('current_route_match');
     }
-    $this->currentRouteMatch = $currentRouteMatch;
   }
 
   /**
