@@ -17,6 +17,7 @@ use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Form\WorkspaceSafeFormInterface;
 use Drupal\Core\Render\Element;
 use Drupal\Core\Security\TrustedCallbackInterface;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Url;
 use Drupal\media\MediaInterface;
 use Drupal\media\MediaTypeInterface;
@@ -842,10 +843,10 @@ abstract class AddFormBase extends FormBase implements BaseFormIdInterface, Trus
    * @param \Drupal\media\MediaTypeInterface $media_type
    *   The media type to get the source field name for.
    *
-   * @return string
+   * @return string|\Drupal\Core\StringTranslation\TranslatableMarkup|null
    *   The label of the media type's source field.
    */
-  protected function getSourceFieldLabel(MediaTypeInterface $media_type) {
+  protected function getSourceFieldLabel(MediaTypeInterface $media_type): string|TranslatableMarkup|null {
     return $media_type->getSource()
       ->getSourceFieldDefinition($media_type)
       ->getLabel();
@@ -857,10 +858,10 @@ abstract class AddFormBase extends FormBase implements BaseFormIdInterface, Trus
    * @param \Drupal\media\MediaTypeInterface $media_type
    *   The media type to get the source field name for.
    *
-   * @return string
+   * @return string|\Drupal\Core\StringTranslation\TranslatableMarkup|null
    *   The description of the media type's source field.
    */
-  protected function getSourceFieldDescription(MediaTypeInterface $media_type) {
+  protected function getSourceFieldDescription(MediaTypeInterface $media_type): string|TranslatableMarkup|null {
     return $media_type->getSource()
       ->getSourceFieldDefinition($media_type)
       ->getDescription();
