@@ -61,3 +61,10 @@ function views_removed_post_updates(): array {
 function views_post_update_counter_field_not_sortable(): void {
   // Empty update to trigger a cache rebuild so updated Views data is applied.
 }
+
+/**
+ * Clear caches to allow empty field texts to be translatable.
+ */
+function views_post_update_make_empty_field_text_translatable(): void {
+  // Empty post-update hook.
+}
