@@ -24,7 +24,7 @@ class GridResponsive extends StylePluginBase {
    * {@inheritdoc}
    */
   protected $usesRowPlugin = TRUE;
- 
+
   /**
    * Should grouping fields use a wrapping element tag.
    *
