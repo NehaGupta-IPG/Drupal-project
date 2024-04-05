@@ -9,8 +9,8 @@
  *   - attributes: The row's HTML attributes.
  *   - content: The row's content.
  * - view: The view object.
- * - default_row_class: A flag indicating whether default classes should be
- *   used on rows.
+ * - default_row_class: A flag indicating whether default classes should be used on rows.
+ * - grouping_label_element: The HTML heading element used to wrap the group label.
  *
  * @see template_preprocess_views_view_unformatted()
  *
@@ -18,7 +18,11 @@
  */
 #}
 {% if title %}
-  <h3>{{ title }}</h3>
+  {% if grouping_label_element is empty %}
+    {{ title }}
+  {% else %}
+    <{{ grouping_label_element }}>{{ title }}</{{ grouping_label_element }}>
+  {% endif %}
 {% endif %}
 {% for row in rows %}
   {%
