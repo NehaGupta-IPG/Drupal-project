@@ -44,7 +44,6 @@ class VocabularyTest extends ConfigEntityResourceTestBase {
    */
   protected $entity;
 
-
   /**
    * {@inheritdoc}
    */

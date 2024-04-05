@@ -46,6 +46,11 @@ class EditorTest extends ConfigEntityResourceTestBase {
   /**
    * {@inheritdoc}
    */
+  protected static $firstCreatedEntityId = 'special';
+
+  /**
+   * {@inheritdoc}
+   */
   protected $defaultTheme = 'stark';
 
   /**
@@ -163,8 +168,63 @@ class EditorTest extends ConfigEntityResourceTestBase {
    * {@inheritdoc}
    */
   protected function getPostDocument(): array {
-    // @todo Update in https://www.drupal.org/node/2300677.
-    return [];
+    if (!FilterFormat::load('special')) {
+      FilterFormat::create([
+        'name' => 'My special format',
+        'format' => 'special',
+        'langcode' => 'en',
+        'filters' => [],
+      ])->save();
+    }
+
+    return [
+      'data' => [
+        'type' => 'editor--editor',
+        'attributes' => [
+          'dependencies' => [
+            'config' => [
+              'filter.format.special',
+            ],
+          ],
+          'drupal_internal__format' => 'special',
+          'editor' => 'ckeditor5',
+          'settings' => [
+            'toolbar' => [
+              'items' => ['bold', 'italic'],
+            ],
+          ],
+          'image_upload' => [
+            'status' => FALSE,
+          ],
+        ],
+      ],
+    ];
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function getPatchDocument() {
+    return [
+      'data' => [
+        'type' => 'editor--editor',
+        'id' => $this->entity->uuid(),
+        'attributes' => [
+          'drupal_internal__format' => 'llama',
+          // This specifies a different image upload directory.
+          'image_upload' => [
+            'status' => TRUE,
+            'scheme' => 'public',
+            'directory' => 'inline-images-changed',
+            'max_size' => NULL,
+            'max_dimensions' => [
+              'width' => NULL,
+              'height' => NULL,
+            ],
+          ],
+        ],
+      ],
+    ];
   }
 
   /**
@@ -222,6 +282,22 @@ class EditorTest extends ConfigEntityResourceTestBase {
     // editor access also depends on access to the configured filter format.
     \Drupal::entityTypeManager()->getAccessControlHandler('filter_format')->resetCache();
     return parent::entityAccess($entity, $operation, $account);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function testPatchIndividual() {
+    // Ensure ::getModifiedEntityForPatchTesting() can pick an alternative value
+    // for the 'format' property.
+    FilterFormat::create([
+      // TRICKY: `llama` is transformed to `yynzn` by str_rot13() in the test.
+      // @see ::getModifiedEntityForPatchTesting()
+      'format' => 'yynzn',
+      'name' => $this->randomString(),
+    ])->save();
+
+    return parent::testPatchIndividual();
   }
 
 }
