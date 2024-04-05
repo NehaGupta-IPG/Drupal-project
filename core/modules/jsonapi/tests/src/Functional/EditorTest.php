@@ -5,12 +5,14 @@ declare(strict_types=1);
 namespace Drupal\Tests\jsonapi\Functional;
 
 use Drupal\ckeditor5\Plugin\CKEditor5Plugin\Heading;
+use Drupal\Component\Serialization\Json;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Url;
 use Drupal\editor\Entity\Editor;
 use Drupal\filter\Entity\FilterFormat;
 use Drupal\jsonapi\JsonApiSpec;
+use GuzzleHttp\RequestOptions;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -300,6 +302,48 @@ class EditorTest extends ConfigEntityResourceTestBase {
     // cSpell:enable
 
     return parent::testPatchIndividual();
+  }
+
+  /**
+   * Cannot use `unicorn` because `editor.settings.unicorn` is not validatable.
+   */
+  public function testEditorPluginWithNonFullyValidatableSettings() {
+    $this->container->get('module_installer')->install(['editor_test']);
+
+    $this->setUpAuthorization('POST');
+    $this->config('jsonapi.settings')->set('read_only', FALSE)->save(TRUE);
+
+    $doc = $this->getPostDocument();
+    // @see \Drupal\editor_test\Plugin\Editor\UnicornEditor
+    $doc['data']['attributes']['editor'] = 'unicorn';
+    // @see `type: editor.settings.unicorn` in core/modules/editor/tests/modules/editor_test/config/schema/editor_test.schema.yml
+    $doc['data']['attributes']['settings'] = [
+      'ponies_too' => FALSE,
+    ];
+
+    // Create editor POST request.
+    $url = Url::fromRoute(sprintf('jsonapi.%s.collection.post', static::$resourceTypeName));
+    $request_options = $this->getAuthenticationRequestOptions();
+    $request_options[RequestOptions::HEADERS]['Accept'] = 'application/vnd.api+json';
+    $request_options[RequestOptions::HEADERS]['Content-Type'] = 'application/vnd.api+json';
+    $request_options[RequestOptions::BODY] = Json::encode($doc);
+
+    // POST request: 422 when adding relationships to non-existing resources.
+    $response = $this->request('POST', $url, $request_options);
+    $expected_document = [
+      'errors' => [
+        0 => [
+          'title' => 'Unprocessable Content',
+          'status' => '422',
+          'detail' => "settings: The value at property path settings cannot be validated. Please contact the developer of the \"unicorn\" editor plugin to make this validatable.",
+          'source' => [
+            'pointer' => '/data/attributes/settings',
+          ],
+        ],
+      ],
+      'jsonapi' => static::$jsonApiMember,
+    ];
+    $this->assertResourceResponse(422, $expected_document, $response);
   }
 
 }
