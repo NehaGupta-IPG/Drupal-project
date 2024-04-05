@@ -94,8 +94,8 @@ class StyleTest extends ViewsKernelTestBase {
     // Setup grouping by the job and the age field.
     $view->initStyle();
     $view->style_plugin->options['grouping'] = [
-      ['field' => 'job'],
-      ['field' => 'age'],
+      ['field' => 'job', 'grouping_label_element' => 'h3'],
+      ['field' => 'age', 'grouping_label_element' => 'h3'],
     ];
 
     // Reduce the amount of items to make the test a bit easier.
@@ -141,9 +141,11 @@ class StyleTest extends ViewsKernelTestBase {
     $expected['Job: Singer'] = [];
     $expected['Job: Singer']['group'] = 'Job: Singer';
     $expected['Job: Singer']['level'] = 0;
+    $expected['Job: Singer']['grouping_label_element'] = 'h3';
     $expected['Job: Singer']['rows']['Age: 25'] = [];
     $expected['Job: Singer']['rows']['Age: 25']['group'] = 'Age: 25';
     $expected['Job: Singer']['rows']['Age: 25']['level'] = 1;
+    $expected['Job: Singer']['rows']['Age: 25']['grouping_label_element'] = 'h3';
     $expected['Job: Singer']['rows']['Age: 25']['rows'][0] = new ResultRow(['index' => 0]);
     $expected['Job: Singer']['rows']['Age: 25']['rows'][0]->views_test_data_name = 'John';
     $expected['Job: Singer']['rows']['Age: 25']['rows'][0]->views_test_data_job = 'Singer';
@@ -152,6 +154,7 @@ class StyleTest extends ViewsKernelTestBase {
     $expected['Job: Singer']['rows']['Age: 27'] = [];
     $expected['Job: Singer']['rows']['Age: 27']['group'] = 'Age: 27';
     $expected['Job: Singer']['rows']['Age: 27']['level'] = 1;
+    $expected['Job: Singer']['rows']['Age: 27']['grouping_label_element'] = 'h3';
     $expected['Job: Singer']['rows']['Age: 27']['rows'][1] = new ResultRow(['index' => 1]);
     $expected['Job: Singer']['rows']['Age: 27']['rows'][1]->views_test_data_name = 'George';
     $expected['Job: Singer']['rows']['Age: 27']['rows'][1]->views_test_data_job = 'Singer';
@@ -160,9 +163,11 @@ class StyleTest extends ViewsKernelTestBase {
     $expected['Job: Drummer'] = [];
     $expected['Job: Drummer']['group'] = 'Job: Drummer';
     $expected['Job: Drummer']['level'] = 0;
+    $expected['Job: Drummer']['grouping_label_element'] = 'h3';
     $expected['Job: Drummer']['rows']['Age: 28'] = [];
     $expected['Job: Drummer']['rows']['Age: 28']['group'] = 'Age: 28';
     $expected['Job: Drummer']['rows']['Age: 28']['level'] = 1;
+    $expected['Job: Drummer']['rows']['Age: 28']['grouping_label_element'] = 'h3';
     $expected['Job: Drummer']['rows']['Age: 28']['rows'][2] = new ResultRow(['index' => 2]);
     $expected['Job: Drummer']['rows']['Age: 28']['rows'][2]->views_test_data_name = 'Ringo';
     $expected['Job: Drummer']['rows']['Age: 28']['rows'][2]->views_test_data_job = 'Drummer';
@@ -184,8 +189,8 @@ class StyleTest extends ViewsKernelTestBase {
       $expected['Job: Drummer']['rows']['Age: 28']['rows'][2]->views_test_data_job = 'Drummer' . $rand3;
       $expected['Job: Drummer']['group'] = 'Job: Drummer';
 
-      $view->style_plugin->options['grouping'][0] = ['field' => 'job', 'rendered' => TRUE, 'rendered_strip' => TRUE];
-      $view->style_plugin->options['grouping'][1] = ['field' => 'age', 'rendered' => TRUE, 'rendered_strip' => TRUE];
+      $view->style_plugin->options['grouping'][0] = ['field' => 'job', 'rendered' => TRUE, 'rendered_strip' => TRUE, 'grouping_label_element' => 'h3'];
+      $view->style_plugin->options['grouping'][1] = ['field' => 'age', 'rendered' => TRUE, 'rendered_strip' => TRUE, 'grouping_label_element' => 'h3'];
     }
 
     // The newer api passes the value of the grouping as well.
@@ -230,8 +235,9 @@ class StyleTest extends ViewsKernelTestBase {
       $view->result[0]->views_test_data_job .= $rand1;
       $view->result[1]->views_test_data_job .= $rand2;
       $view->result[2]->views_test_data_job .= $rand3;
-      $view->style_plugin->options['grouping'][0] = ['field' => 'job', 'rendered' => TRUE, 'rendered_strip' => TRUE];
-      $view->style_plugin->options['grouping'][1] = ['field' => 'age', 'rendered' => TRUE, 'rendered_strip' => TRUE];
+      $view->style_plugin->options['grouping'][0] = ['field' => 'job', 'rendered' => TRUE, 'rendered_strip' => TRUE, 'grouping_label_element' => 'h3'];
+      $view->style_plugin->options['grouping'][1] = ['field' => 'age', 'rendered' => TRUE, 'rendered_strip' => TRUE, 'grouping_label_element' => 'h3'];
+
     }
 
     $sets_new_rendered = $view->style_plugin->renderGrouping($view->result, $view->style_plugin->options['grouping'], TRUE);
@@ -263,8 +269,8 @@ class StyleTest extends ViewsKernelTestBase {
       $view->result[0]->views_test_data_job .= $rand1;
       $view->result[1]->views_test_data_job .= $rand2;
       $view->result[2]->views_test_data_job .= $rand3;
-      $view->style_plugin->options['grouping'][0] = ['field' => 'job', 'rendered' => TRUE, 'rendered_strip' => TRUE];
-      $view->style_plugin->options['grouping'][1] = ['field' => 'age', 'rendered' => TRUE, 'rendered_strip' => TRUE];
+      $view->style_plugin->options['grouping'][0] = ['field' => 'job', 'rendered' => TRUE, 'rendered_strip' => TRUE, 'grouping_label_element' => 'h3'];
+      $view->style_plugin->options['grouping'][1] = ['field' => 'age', 'rendered' => TRUE, 'rendered_strip' => TRUE, 'grouping_label_element' => 'h3'];
     }
 
     $sets_new_rendered = $view->style_plugin->renderGrouping($view->result, $view->style_plugin->options['grouping'], TRUE);
