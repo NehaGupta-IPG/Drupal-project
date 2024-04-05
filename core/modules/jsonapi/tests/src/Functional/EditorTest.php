@@ -290,12 +290,14 @@ class EditorTest extends ConfigEntityResourceTestBase {
   public function testPatchIndividual() {
     // Ensure ::getModifiedEntityForPatchTesting() can pick an alternative value
     // for the 'format' property.
+    // cSpell:disable
     FilterFormat::create([
       // TRICKY: `llama` is transformed to `yynzn` by str_rot13() in the test.
       // @see ::getModifiedEntityForPatchTesting()
       'format' => 'yynzn',
       'name' => $this->randomString(),
     ])->save();
+    // cSpell:enable
 
     return parent::testPatchIndividual();
   }
