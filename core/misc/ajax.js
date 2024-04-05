@@ -619,19 +619,27 @@
       ajax.options.data.dialogOptions = elementSettings.dialog;
     }
 
-    // Ensure that we have a valid URL by adding ? when no query parameter is
-    // yet available, otherwise append using &.
-    if (!ajax.options.url.includes('?')) {
-      ajax.options.url += '?';
-    } else {
-      ajax.options.url += '&';
-    }
     // If this element has a dialog type use if for the wrapper if not use 'ajax'.
     let wrapper = `drupal_${elementSettings.dialogType || 'ajax'}`;
     if (elementSettings.dialogRenderer) {
       wrapper += `.${elementSettings.dialogRenderer}`;
     }
-    ajax.options.url += `${Drupal.ajax.WRAPPER_FORMAT}=${wrapper}`;
+
+    let queryParams;
+    let originalPath = '';
+
+    // Ensure that we have a valid URL by adding ? when no query parameter is
+    // yet available, otherwise append using &.
+    if (!ajax.options.url.includes('?')) {
+      queryParams = new URLSearchParams();
+      originalPath = ajax.options.url;
+    } else {
+      const [path, currentQueryParams] = ajax.options.url.split('?');
+      queryParams = new URLSearchParams(currentQueryParams);
+      originalPath = path;
+    }
+    queryParams.set(Drupal.ajax.WRAPPER_FORMAT, wrapper);
+    ajax.options.url = `${originalPath}?${queryParams.toString()}`;
 
     // Bind the ajaxSubmit function to the element event.
     $(ajax.element).on(elementSettings.event, function (event) {
