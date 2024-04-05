@@ -102,7 +102,7 @@ trait EntityValidationTrait {
             $wrapped_entity,
             [
               // @todo the "editor plugin" part here should still be computed dynamically, by introspecting the schema. Or better yet: determine the provider of the `editor.settings.unicorn` schema type, which is the editor_test module, and provide that in the message.
-              new ConstraintViolation("The value at property path $key cannot be validated. Contact the developer of the \"$reason\" editor plugin to make this validatable.", NULL, [], '', $key, NULL)
+              new ConstraintViolation("The value at property path $key cannot be validated. Contact the developer of the \"$reason\" editor plugin to make this validatable.", NULL, [], '', $key, NULL),
             ],
           ));
           throw $exception;
