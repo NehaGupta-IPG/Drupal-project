@@ -320,16 +320,13 @@ class ImageItem extends FileItem {
   }
 
   /**
-   * {@inheritdoc}
+   * Ensure that the width and height are set on the image item.
    */
-  public function onChange($property_name, $notify = TRUE) {
-    parent::onChange($property_name, $notify);
-
+  protected function ensureImageDimensions(): void {
     $width = $this->get('width')->getValue();
     $height = $this->get('height')->getValue();
 
-    // Determine the dimensions if necessary.
-    if ($this->entity && $this->entity instanceof EntityInterface) {
+    if ($this->entity instanceof FileInterface) {
       if ($width === NULL || $height === NULL) {
         $image = \Drupal::service('image.factory')->get($this->entity->getFileUri());
         if ($image->isValid()) {
@@ -343,13 +340,34 @@ class ImageItem extends FileItem {
   /**
    * {@inheritdoc}
    */
+  public function onChange($property_name, $notify = TRUE): void {
+    parent::onChange($property_name, $notify);
+
+    // Ensure that the width and height are set when changing any property
+    // other than the width and height.
+    if ($property_name !== 'width' && $property_name !== 'height') {
+      $this->ensureImageDimensions();
+    }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function preSave() {
     parent::preSave();
-    if (!($this->entity && $this->entity instanceof EntityInterface)) {
+
+    // Determine the dimensions if necessary.
+    if ($this->entity instanceof EntityInterface) {
+      $this->ensureImageDimensions();
+    }
+    else {
       $this->getLogger('image')->warning("Missing file with ID %id.", ['%id' => $this->target_id]);
     }
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function setValue($values, $notify = TRUE) {
     // Avoid losing the width and height values when the same reference is
     // set again and there already is a width and height.
