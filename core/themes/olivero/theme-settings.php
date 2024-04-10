@@ -117,4 +117,10 @@ function olivero_form_system_theme_settings_alter(&$form, FormStateInterface $fo
       ],
     ];
   }
+
+  $form['olivero_settings']['olivero_utilities']['comment_form_after_comments'] = [
+    '#type' => 'checkbox',
+    '#title' => t('Move comment form after comments'),
+    '#default_value' => theme_get_setting('comment_form_after_comments'),
+  ];
 }
