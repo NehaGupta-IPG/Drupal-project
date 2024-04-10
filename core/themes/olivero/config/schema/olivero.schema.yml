@@ -39,5 +39,5 @@ olivero.settings:
       type: color_hex
       label: 'Base Primary Color'
     comment_form_after_comments:
-      type: integer
+      type: boolean
       label: 'Comment form after comments'
