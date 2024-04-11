@@ -13,3 +13,12 @@ function olivero_removed_post_updates(): array {
     'olivero_post_update_add_olivero_primary_color' => '11.0.0',
   ];
 }
+
+/**
+ * Sets the `comment_form_after_comments` value of Olivero's theme settings.
+ */
+function olivero_post_update_add_comment_form_after_comments() {
+  \Drupal::configFactory()->getEditable('olivero.settings')
+    ->set('comment_form_after_comments', FALSE)
+    ->save();
+}
