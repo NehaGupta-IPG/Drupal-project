@@ -42,7 +42,7 @@
     {{ title_suffix }}
   {% endif %}
 
-  {% if comment_form_after_comments %}
+  {% if comment_form_position %}
     {{ comments }}
   {% endif %}
 
@@ -61,7 +61,7 @@
     </div>
   {% endif %}
 
-  {% if not comment_form_after_comments %}
+  {% if not comment_form_position %}
     {{ comments }}
   {% endif %}
 
