@@ -20,5 +20,5 @@ function olivero_removed_post_updates(): array {
 function olivero_post_update_add_comment_form_after_comments() {
   \Drupal::configFactory()->getEditable('olivero.settings')
     ->set('comment_form_after_comments', FALSE)
-    ->save();
+    ->save(TRUE);
 }
