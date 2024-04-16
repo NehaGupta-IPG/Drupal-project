@@ -3,7 +3,7 @@
 <title>Semver Test</title>
 <short_name>semver_test</short_name>
 <dc:creator>Drupal</dc:creator>
-<supported_branches>8.0.,8.1.</supported_branches>
+<supported_branches>8.x-7.,8.0.,8.1.</supported_branches>
 <project_status>published</project_status>
 <link>http://example.com/project/semver_test</link>
   <terms>
@@ -168,5 +168,83 @@
      <term><name>Release type</name><value>Bug fixes</value></term>
    </terms>
  </release>
+<release>
+    <name>Semver Test 8.x-7.1</name>
+    <version>8.x-7.1</version>
+    <tag>SEMVER_TEST-8-x-7-1</tag>
+    <status>published</status>
+    <release_link>http://example.com/semver_test-8-x-7-1-release</release_link>
+    <download_link>http://example.com/semver_test-8-x-7-1.tar.gz</download_link>
+    <date>1250424521</date>
+    <terms>
+      <term><name>Release type</name><value>New features</value></term>
+      <term><name>Release type</name><value>Bug fixes</value></term>
+    </terms>
+  </release>
+  <release>
+    <name>Semver Test 8.x-7.1-beta1</name>
+    <version>8.x-7.1-beta1</version>
+    <tag>SEMVER_TEST-8-x-7-1-beta1</tag>
+    <status>published</status>
+    <release_link>http://example.com/semver_test-8-x-7-1-beta1-release</release_link>
+    <download_link>http://example.com/semver_test-8-x-7-1-beta1.tar.gz</download_link>
+    <date>1250424521</date>
+    <terms>
+      <term><name>Release type</name><value>New features</value></term>
+      <term><name>Release type</name><value>Bug fixes</value></term>
+    </terms>
+  </release>
+  <release>
+    <name>Semver Test 8.x-7.1-alpha1</name>
+    <version>8.x-7.1-alpha1</version>
+    <tag>SEMVER_TEST-8-x-7-1-alpha1</tag>
+    <status>published</status>
+    <release_link>http://example.com/semver_test-8-x-7-1-alpha1-release</release_link>
+    <download_link>http://example.com/semver_test-8-x-7-1-alpha1.tar.gz</download_link>
+    <date>1250424521</date>
+    <terms>
+      <term><name>Release type</name><value>New features</value></term>
+      <term><name>Release type</name><value>Bug fixes</value></term>
+    </terms>
+  </release>
+  <release>
+    <name>Semver Test 8.x-7.0</name>
+    <version>8.x-7.0</version>
+    <tag>SEMVER_TEST-8-x-7-0</tag>
+    <status>published</status>
+    <release_link>http://example.com/semver_test-8-x-7-0-release</release_link>
+    <download_link>http://example.com/semver_test-8-x-7-0.tar.gz</download_link>
+    <date>1250424521</date>
+    <terms>
+      <term><name>Release type</name><value>New features</value></term>
+      <term><name>Release type</name><value>Bug fixes</value></term>
+    </terms>
+  </release>
+  <release>
+    <name>Semver Test 8.x-7.0-beta1</name>
+    <version>8.x-7.0-beta1</version>
+    <tag>SEMVER_TEST-8-x-7-0-beta1</tag>
+    <status>published</status>
+    <release_link>http://example.com/semver_test-8-x-7-0-beta1-release</release_link>
+    <download_link>http://example.com/semver_test-8-x-7-0-beta1.tar.gz</download_link>
+    <date>1250424521</date>
+    <terms>
+      <term><name>Release type</name><value>New features</value></term>
+      <term><name>Release type</name><value>Bug fixes</value></term>
+    </terms>
+  </release>
+  <release>
+    <name>Semver Test 8.x-7.0-alpha1</name>
+    <version>8.x-7.0-alpha1</version>
+    <tag>SEMVER_TEST-8-x-7-0-alpha1</tag>
+    <status>published</status>
+    <release_link>http://example.com/semver_test-8-x-7-0-alpha1-release</release_link>
+    <download_link>http://example.com/semver_test-8-x-7-0-alpha1.tar.gz</download_link>
+    <date>1250424521</date>
+    <terms>
+      <term><name>Release type</name><value>New features</value></term>
+      <term><name>Release type</name><value>Bug fixes</value></term>
+    </terms>
+  </release>
 </releases>
 </project>
