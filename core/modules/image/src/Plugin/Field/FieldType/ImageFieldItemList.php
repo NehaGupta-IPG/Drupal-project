@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\image\Plugin\Field\FieldType;
 
 use Drupal\Core\Field\FieldItemListInterface;
@@ -14,7 +16,7 @@ class ImageFieldItemList extends FileFieldItemList {
   /**
    * {@inheritdoc}
    */
-  public function hasAffectingChanges(FieldItemListInterface $original_items, $langcode) {
+  public function hasAffectingChanges(FieldItemListInterface $original_items, $langcode): bool {
     if (!$this->equals($original_items)) {
       return TRUE;
     }

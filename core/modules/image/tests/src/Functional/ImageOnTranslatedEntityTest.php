@@ -249,7 +249,7 @@ class ImageOnTranslatedEntityTest extends ImageFieldTestBase {
   /**
    * Tests synced file fields on translated nodes.
    */
-  public function testSyncedImagesWithTranslatableProperties() {
+  public function testSyncedImagesWithTranslatableProperties(): void {
     // Enable translation for "Basic page" nodes.
     $edit = [
       'entity_types[node]' => 1,
@@ -302,8 +302,6 @@ class ImageOnTranslatedEntityTest extends ImageFieldTestBase {
 
     \Drupal::entityTypeManager()->getStorage('file')->resetCache();
 
-    /** @var \Drupal\file\FileInterface $file */
-
     // Ensure the file status of the first file permanent.
     $file = File::load($first_fid);
     $this->assertTrue($file->isPermanent());
@@ -316,7 +314,7 @@ class ImageOnTranslatedEntityTest extends ImageFieldTestBase {
   /**
    * Tests synced file fields on translated nodes with content moderation.
    */
-  public function testSyncedImagesWithTranslatablePropertiesAndContentModeration() {
+  public function testSyncedImagesWithTranslatablePropertiesAndContentModeration(): void {
     // Enable translation for "Basic page" nodes.
     $edit = [
       'entity_types[node]' => 1,

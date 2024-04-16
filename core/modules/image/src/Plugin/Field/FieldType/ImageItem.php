@@ -368,7 +368,7 @@ class ImageItem extends FileItem {
   /**
    * {@inheritdoc}
    */
-  public function setValue($values, $notify = TRUE) {
+  public function setValue($values, $notify = TRUE): void {
     // Avoid losing the width and height values when the same reference is
     // set again and there already is a width and height.
     if (is_array($values) && !isset($values['width']) && !isset($values['height']) && $this->target_id && $this->width && $this->height) {
