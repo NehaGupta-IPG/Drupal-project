@@ -263,7 +263,7 @@ class ImageOnTranslatedEntityTest extends ImageFieldTestBase {
     $this->drupalGet('admin/config/regional/content-language');
     $this->submitForm($edit, 'Save configuration');
 
-    // Verify that the image field on the "Basic basic" node type is
+    // Verify that the image field on the "Basic page" node type is
     // translatable.
     $definitions = \Drupal::service('entity_field.manager')->getFieldDefinitions('node', 'basic_page');
     $this->assertTrue($definitions[$this->fieldName]->isTranslatable(), 'Node image field is translatable.');
