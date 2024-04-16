@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-This XML file is the exact same as the file drupal.1.xml except
+This XML file is the exact same as the file drupal.1.0.xml except
 'supported_branches' in this file does not contain the '8.0.' branch. Therefore,
 all the releases that start with '8.0.' are in an unsupported branch.
 -->
