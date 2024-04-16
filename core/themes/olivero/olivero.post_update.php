@@ -19,6 +19,6 @@ function olivero_removed_post_updates(): array {
  */
 function olivero_post_update_add_comment_form_position() {
   \Drupal::configFactory()->getEditable('olivero.settings')
-    ->set('comment_form_position', 0)
+    ->set('comment_form_position', 'before')
     ->save(TRUE);
 }

@@ -42,7 +42,7 @@
     {{ title_suffix }}
   {% endif %}
 
-  {% if comment_form_position %}
+  {% if comment_form_position == 'after' %}
     {{ comments }}
   {% endif %}
 
@@ -61,7 +61,7 @@
     </div>
   {% endif %}
 
-  {% if not comment_form_position %}
+  {% if comment_form_position == 'before' %}
     {{ comments }}
   {% endif %}
 
