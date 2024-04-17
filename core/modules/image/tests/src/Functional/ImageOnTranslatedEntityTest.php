@@ -366,14 +366,16 @@ class ImageOnTranslatedEntityTest extends ImageFieldTestBase {
     $this->assertSession()->responseContains('alt="Scarlett Johansson image"');
     $this->assertSession()->responseContains('title="Scarlett Johansson image title"');
 
+    // Login as the root user.
+    $this->drupalLogin($this->rootUser);
+
     // Install content moderation and enable moderation on Basic Page node type.
     $this->container->get('module_installer')->install(['content_moderation']);
-    $this->rebuildContainer();
 
     $workflow = $this->createEditorialWorkflow();
     $workflow->getTypePlugin()->addEntityTypeAndBundle('node', 'basic_page');
     $workflow->save();
-    $this->drupalLogin($this->rootUser);
+    $this->rebuildContainer();
 
     // Edit the node in French with workflow enabled.
     $this->drupalGet('fr/node/' . $default_language_node->id() . '/edit');
