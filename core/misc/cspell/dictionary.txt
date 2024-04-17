@@ -394,6 +394,9 @@ smtps
 squaresmall
 squiz
 ssess
+sslmode
+sslkey
+sslrootcert
 starterkit
 statuscode
 stddev
