@@ -373,7 +373,7 @@ class QueryGroupByTest extends ViewsKernelTestBase {
     $this->installEntitySchema('file');
     $this->installSchema('file', 'file_usage');
     /** @var \Drupal\image\ImageStyleInterface $style */
-    $style = ImageStyle::create(['name' => 'foo']);
+    $style = ImageStyle::create(['name' => 'foo', 'label' => 'bar']);
     $style->save();
 
     // Create a new image field 'bar' to be used in 'entity_test_fields' view.
