@@ -38,6 +38,6 @@ class DefaultStyle extends StylePluginBase {
    *
    * @var bool
    */
-  protected $usesGroupingLabelElement = TRUE;
+  protected bool $usesGroupingLabelElement = TRUE;
 
 }
