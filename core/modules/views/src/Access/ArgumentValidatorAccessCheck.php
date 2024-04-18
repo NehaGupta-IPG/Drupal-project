@@ -35,7 +35,7 @@ class ArgumentValidatorAccessCheck implements AccessInterface {
    * Constructs an ArgumentValidatorAccessCheck instance.
    *
    * @param \Drupal\views\Entity\ViewsPluginManager $views_plugin_manager
-   *   The views plugin manager
+   *   The views plugin manager.
    * @param \Drupal\Core\Routing\RouteMatchInterface $current_route_match
    *   Route match for the current route.
    */

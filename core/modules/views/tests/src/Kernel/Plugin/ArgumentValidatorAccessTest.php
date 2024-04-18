@@ -40,8 +40,7 @@ class ArgumentValidatorAccessTest extends ViewsKernelTestBase {
   }
 
   /**
-   * Tests that access to a view's route is correctly affected by argument
-   * validation.
+   * Tests that argument validation impacts access to a view's route.
    */
   public function testArgumentValidateAccess() {
     // Create a page node.
@@ -65,8 +64,8 @@ class ArgumentValidatorAccessTest extends ViewsKernelTestBase {
       'access content',
     ]);
 
-    // test_argument_validator_node.page_1 has argument validation on node.
-    // content type must be article.
+    // test_argument_validator_node.page_1 has argument validation on node that
+    // the content type must be article.
     $this->assertFalse($access_manager->checkNamedRoute($route_name, ['node' => $node_page->id()], $test_user));
     $this->assertTrue($access_manager->checkNamedRoute($route_name, ['node' => $node_article->id()], $test_user));
   }
