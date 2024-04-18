@@ -19,7 +19,7 @@ class ArgumentValidatorAccessTest extends ViewsKernelTestBase {
   /**
    * {@inheritdoc}
    */
-  public static $modules = ['node', 'user', 'filter'];
+  protected static $modules = ['node', 'user', 'filter'];
 
   /**
    * Views used by this test.
@@ -31,7 +31,7 @@ class ArgumentValidatorAccessTest extends ViewsKernelTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function setUp($import_test_views = TRUE) {
+  protected function setUp($import_test_views = TRUE): void {
     parent::setUp($import_test_views);
 
     $this->installEntitySchema('node');
@@ -42,7 +42,7 @@ class ArgumentValidatorAccessTest extends ViewsKernelTestBase {
   /**
    * Tests that argument validation impacts access to a view's route.
    */
-  public function testArgumentValidateAccess() {
+  public function testArgumentValidateAccess(): void {
     // Create a page node.
     $node_page = $this->createNode([
       'type' => 'page',
