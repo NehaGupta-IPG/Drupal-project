@@ -122,7 +122,6 @@ abstract class PathPluginBase extends DisplayPluginBase implements DisplayRouter
       '_view_display_show_admin_links' => $this->getOption('show_admin_links'),
     ];
 
-    // @todo How do we apply argument validation?
     $path = $this->getOption('path');
 
     // @todo Figure out validation/argument loading.
@@ -190,7 +189,41 @@ abstract class PathPluginBase extends DisplayPluginBase implements DisplayRouter
     }
     $access_plugin->alterRouteDefinition($route);
 
-    // Set the argument map, in order to support named parameters.
+    $arguments = $this->getOption('arguments');
+    // Some views return null arguments rather than []
+    if ($arguments === NULL) {
+      $arguments = [];
+    }
+
+    $validate_arguments = [];
+    $idx = -1;
+
+    // Collect arguments which have validation and have a fail behavior of
+    // "page not found" or "access denied".
+    foreach ($arguments as $argument) {
+      if (!empty($argument['specify_validation']) && !empty($argument['validate'])
+        && in_array($argument['validate']['fail'], ['not found', 'access denied']) ) {
+        $validate_arguments[] = [
+          'plugin_id' => $argument['validate']['type'],
+          'plugin_options' => $argument['validate_options'],
+          'parameter_name' => $argument_map['arg_' . ++$idx],
+          'view_id' => $view_id,
+          'display_id' => $display_id,
+        ];
+      }
+    }
+
+    if (!empty($validate_arguments)) {
+      // Add route requirement to enforce access based on argument validation.
+      // This is primarily used to avoid displaying broken menu links that will
+      // fail validation.
+      $route->setRequirement(
+        '_argument_validator_access',
+        serialize(['arguments' => $validate_arguments])
+      );
+    }
+
+  // Set the argument map, in order to support named parameters.
     $route->setOption('_view_argument_map', $argument_map);
     $route->setOption('_view_display_plugin_id', $this->getPluginId());
     $route->setOption('_view_display_plugin_class', static::class);
