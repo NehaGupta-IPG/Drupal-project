@@ -63,7 +63,7 @@ abstract class StylePluginBase extends PluginBase {
    *
    * @var bool
    */
-  protected $usesGroupingLabelElement = FALSE;
+  protected bool $usesGroupingLabelElement = FALSE;
 
   /**
    * Does the style plugin support custom css class for the rows.
