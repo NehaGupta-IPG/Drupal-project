@@ -30,7 +30,7 @@ class HtmlList extends StylePluginBase {
    *
    * @var bool
    */
-  protected $usesGroupingLabelElement = TRUE;
+  protected bool $usesGroupingLabelElement = TRUE;
 
   /**
    * Does the style plugin support custom css class for the rows.
