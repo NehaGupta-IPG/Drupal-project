@@ -46,8 +46,7 @@ class DateTimeComputed extends TypedData {
     $item = $this->getParent();
     $value = $item->{($this->definition->getSetting('date source'))};
 
-    // A date cannot be created from a NULL value.
-    if ($value === NULL) {
+    if (!is_string($value) && $value !== '') {
       return NULL;
     }
 
