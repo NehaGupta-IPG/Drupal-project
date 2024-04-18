@@ -300,7 +300,10 @@ abstract class StylePluginBase extends PluginBase {
   }
 
   /**
-   * Retrieve labels from views configuration.
+   * Retrieve of labels from views configuration.
+   * 
+   * @return array
+   * Array of field rewrite elements to list as grouping label options.
    */
   public function getLabelElements() {
     static $labelElements = NULL;
