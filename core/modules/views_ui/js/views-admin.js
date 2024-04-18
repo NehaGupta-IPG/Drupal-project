@@ -616,10 +616,11 @@
       const $contextualFilters = $contextualFiltersBucket.find(
         '.views-display-setting a',
       );
+      const previewArgs = document.getElementById('preview-args');
       if ($contextualFilters.length) {
-        $($('#preview-args')[0].parentElement).show();
+        $(previewArgs.parentElement).show();
       } else {
-        $($('#preview-args')[0].parentElement).hide();
+        $(previewArgs.parentElement).hide();
       }
 
       // Executes an initial preview.
@@ -1176,22 +1177,17 @@
       const $context = $(context);
 
       function changeDefaultWidget(event) {
+        const defRadios = context.querySelector('input.default-radios');
+        const radiosRow = context.querySelector('td.any-default-radios-row');
+        const defCheckboxes = context.querySelector('input.default-checkboxes');
         if ($(event.target).prop('checked')) {
-          $(context.querySelector('input.default-radios').parentElement).hide();
-          $(
-            context.querySelector('td.any-default-radios-row').parentElement,
-          ).hide();
-          $(
-            context.querySelector('input.default-checkboxes').parentElement,
-          ).show();
+          $(defRadios.parentElement).hide();
+          $(radiosRow.parentElement).hide();
+          $(defCheckboxes.parentElement).show();
         } else {
-          $(
-            context.querySelector('input.default-checkboxes').parentElement,
-          ).hide();
-          $(
-            context.querySelector('td.any-default-radios-row').parentElement,
-          ).show();
-          $(context.querySelector('input.default-radios').parentElement).show();
+          $(defCheckboxes.parentElement).hide();
+          $(radiosRow.parentElement).show();
+          $(defRadios.parentElement).show();
         }
       }
 
