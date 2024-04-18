@@ -20,24 +20,24 @@ class ArgumentValidatorAccessCheck implements AccessInterface {
   /**
    * The views plugin manager.
    *
-   * @var ViewsPluginManager
+   * @var \Drupal\views\Entity\ViewsPluginManager
    */
   protected $viewsPluginManager;
 
   /**
    * Route match for the current route.
    *
-   * @var RouteMatchInterface
+   * @var \Drupal\Core\Routing\RouteMatchInterface
    */
   protected $currentRouteMatch;
 
   /**
    * Constructs an ArgumentValidatorAccessCheck instance.
    *
-   * @param ViewsPluginManager $views_plugin_manager
-   *  The views plugin manager
-   * @param RouteMatchInterface $current_route_match
-   *  Route match for the current route.
+   * @param \Drupal\views\Entity\ViewsPluginManager $views_plugin_manager
+   *   The views plugin manager
+   * @param \Drupal\Core\Routing\RouteMatchInterface $current_route_match
+   *   Route match for the current route.
    */
   public function __construct(ViewsPluginManager $views_plugin_manager, RouteMatchInterface $current_route_match) {
     $this->viewsPluginManager = $views_plugin_manager;

@@ -202,7 +202,7 @@ abstract class PathPluginBase extends DisplayPluginBase implements DisplayRouter
     // "page not found" or "access denied".
     foreach ($arguments as $argument) {
       if (!empty($argument['specify_validation']) && !empty($argument['validate'])
-        && in_array($argument['validate']['fail'], ['not found', 'access denied']) ) {
+        && in_array($argument['validate']['fail'], ['not found', 'access denied'])) {
         $validate_arguments[] = [
           'plugin_id' => $argument['validate']['type'],
           'plugin_options' => $argument['validate_options'],
@@ -223,7 +223,7 @@ abstract class PathPluginBase extends DisplayPluginBase implements DisplayRouter
       );
     }
 
-  // Set the argument map, in order to support named parameters.
+    // Set the argument map, in order to support named parameters.
     $route->setOption('_view_argument_map', $argument_map);
     $route->setOption('_view_display_plugin_id', $this->getPluginId());
     $route->setOption('_view_display_plugin_class', static::class);
