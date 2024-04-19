@@ -1,14 +1,21 @@
 {
-  "extends": [
-    "./.eslintrc.json",
-    "./.eslintrc.jquery.json"
-  ],
+  "extends": ["./.eslintrc.json", "./.eslintrc.jquery.json"],
   "rules": {
     "no-shadow": "off",
     "no-new": "off",
     "no-continue": "off",
     "new-cap": "off",
-    "max-len": "off",
+    "max-len": [
+      "error",
+      80,
+      {
+        "ignoreUrls": true,
+        "ignoreComments": false,
+        "ignoreRegExpLiterals": true,
+        "ignoreStrings": true,
+        "ignoreTemplateLiterals": true
+      }
+    ],
     "default-case": "off",
     "default-param-last": "off",
     "prefer-destructuring": "off",
