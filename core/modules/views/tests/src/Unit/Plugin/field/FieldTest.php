@@ -583,7 +583,7 @@ class FieldTest extends UnitTestCase {
 
     $handler->query(TRUE);
 
-    $this->assertObjectNotHasProperty('group_fields', $handler);
+    $this->assertEmpty($handler->group_fields);
     $this->assertNull($handler->tableAlias);
   }
 
@@ -709,8 +709,7 @@ class FieldTest extends UnitTestCase {
     $this->executable->query = $query;
 
     $handler->query(TRUE);
-
-    $this->assertObjectNotHasProperty('group_fields', $handler);
+    $this->assertEmpty($handler->group_fields);
     $this->assertNull($handler->tableAlias);
   }
 
