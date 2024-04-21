@@ -459,7 +459,6 @@ class NumericFilter extends FilterPluginBase implements FilterOperatorsInterface
         'value' => $value,
       ];
     }
-
     $rc = parent::acceptExposedInput($input);
 
     if (empty($this->options['expose']['required'])) {
@@ -468,7 +467,7 @@ class NumericFilter extends FilterPluginBase implements FilterOperatorsInterface
       if (!empty($info[$this->operator]['values'])) {
         switch ($info[$this->operator]['values']) {
           case 1:
-            if (!isset($value['value']) || $value['value'] === '') {
+            if (isset($value['value']) && $value['value'] === '') {
               return FALSE;
             }
             break;
