@@ -269,7 +269,7 @@ class FilterDateTest extends ViewTestBase {
   /**
    * Tests exposed form date field group filter with multiple selects.
    */
-  public function testExposedGroupedMultipleSelecteFilters(): void{
+  public function testExposedGroupedMultipleSelectFilters(): void {
     $filter_identifier = $this->fieldName . '_value';
     $this->drupalGet('admin/structure/views/nojs/handler/test_filter_datetime/default/filter/' . $filter_identifier);
     $this->submitForm([], 'Expose filter');
@@ -297,9 +297,8 @@ class FilterDateTest extends ViewTestBase {
     $this->drupalGet($path);
 
     $this->submitForm([
-      $filter_identifier.'[1]' => 1,
+      $filter_identifier . '[1]' => 1,
     ], 'Apply');
-
 
     $this->assertIds([4]);
 
