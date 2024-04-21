@@ -468,12 +468,15 @@ class NumericFilter extends FilterPluginBase implements FilterOperatorsInterface
       if (!empty($info[$this->operator]['values'])) {
         switch ($info[$this->operator]['values']) {
           case 1:
-            if ($value['value'] === '') {
+            if (!isset($value['value']) || $value['value'] === '') {
               return FALSE;
             }
             break;
 
           case 2:
+            if (!isset($value['min']) || !isset($value['max'])) {
+              return FALSE;
+            }
             if ($value['min'] === '' && $value['max'] === '') {
               return FALSE;
             }
