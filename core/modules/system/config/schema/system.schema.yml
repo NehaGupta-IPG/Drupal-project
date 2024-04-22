@@ -240,13 +240,24 @@ system.performance:
 system.theme:
   type: config_object
   label: 'Theme settings'
+  constraints:
+    FullyValidatable: ~
   mapping:
     admin:
       type: string
       label: 'Administration theme'
+      nullable: true
+      constraints:
+        ExtensionName: []
+        ExtensionExists: theme
+      # @see \Drupal\user\Theme\AdminNegotiator::determineActiveTheme()
+      requiredKey: false
     default:
       type: string
       label: 'Default theme'
+      constraints:
+        ExtensionName: []
+        ExtensionExists: theme
 
 system.menu.*:
   type: config_entity
