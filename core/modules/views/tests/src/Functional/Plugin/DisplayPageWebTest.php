@@ -169,7 +169,7 @@ class DisplayPageWebTest extends ViewTestBase {
     $this->container->get('config.factory')
       ->getEditable('system.theme')
       ->set('admin', 'claro')
-      ->set('default', 'stable')
+      ->set('default', 'stable9')
       ->save();
     $theme_handler->refreshInfo();
     // Check that the page has been served with the default theme.

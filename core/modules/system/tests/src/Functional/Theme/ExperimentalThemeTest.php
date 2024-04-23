@@ -81,7 +81,7 @@ class ExperimentalThemeTest extends BrowserTestBase {
     $this->assertSession()->responseContains(sprintf('Experimental test %s                (default theme, administration theme, experimental theme)', \Drupal::VERSION));
 
     // Uninstall the theme.
-    $this->config('system.theme')->set('default', 'test_theme')->save();
+    $this->config('system.theme')->set('default', $this->defaultTheme)->save();
     \Drupal::service('theme_handler')->refreshInfo();
     \Drupal::service('theme_installer')->uninstall(['experimental_theme_test']);
 

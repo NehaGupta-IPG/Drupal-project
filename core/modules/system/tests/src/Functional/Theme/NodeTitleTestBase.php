@@ -52,6 +52,7 @@ abstract class NodeTitleTestBase extends NodeTestBase {
    */
   public function testNodeWithTitle0(): void {
     $theme = $this->getTheme();
+    $this->container->get('theme_installer')->install([$theme]);
     if ($theme !== $this->defaultTheme) {
       $system_theme_config = $this->container->get('config.factory')
         ->getEditable('system.theme');
