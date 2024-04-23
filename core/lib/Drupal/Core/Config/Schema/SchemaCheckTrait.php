@@ -59,6 +59,28 @@ trait SchemaCheckTrait {
         "The 'contact.form.feedback' config does not exist.",
       ],
     ],
+    'system.theme' => [
+      // TRICKY: chicken vs egg: `system` module must be installed before the
+      // `stark` theme can be installed! Stark is the default theme unless an
+      // install profile specifies a different default theme.
+      'default' => [
+        // @see core/modules/system/config/install/system.theme.yml
+        "Theme 'stark' is not installed.",
+        // @see core/profiles/standard/config/install/system.theme.yml
+        "Theme 'olivero' is not installed.",
+        // @see core/profiles/demo_umami/config/install/system.theme.yml
+        "Theme 'umami' is not installed.",
+        // @see \Drupal\Tests\system\Functional\Theme\MaintenanceThemeUpdateRegistryTest::prepareEnvironment()
+        "Theme 'test_theme_updates' is not installed.",
+        // @see \Drupal\Tests\config\Functional\ConfigImportInstallProfileTest::testInstallProfileValidation()
+        "Theme 'test_theme_theme' is not installed.",
+      ],
+      'admin' => [
+        // @see core/profiles/standard/config/install/system.theme.yml
+        // @see core/profiles/demo_umami/config/install/system.theme.yml
+        "Theme 'claro' is not installed.",
+      ],
+    ],
     'editor.editor.*' => [
       // @todo Fix stream wrappers not being available early enough in
       //   https://www.drupal.org/project/drupal/issues/3416735
