@@ -1088,7 +1088,7 @@ class FormBuilder implements FormBuilderInterface, FormValidatorInterface, FormS
     if (isset($element['#type']) && !in_array($element['#type'], $types_to_skip) && !empty($element['#input']) && empty($element['#attributes']['aria-labelledby'])) {
       $title_key = in_array($element['#type'], ['button', 'submit']) ? '#value' : '#title';
       if (!isset($element[$title_key])) {
-        @trigger_error(sprintf('Form elements must have a #title attribute as of Drupal 9.0.0. Form element "%s" of #type "%s" from form "%s" is missing a #title attribute.', implode('][', $element['#array_parents']), $element['#type'], $form_id), E_USER_DEPRECATED);
+        @trigger_error(sprintf('Form elements must have a #title attribute as of Drupal 11.0.0. Form element "%s" of #type "%s" from form "%s" is missing a #title attribute.', implode('][', $element['#array_parents']), $element['#type'], $form_id), E_USER_DEPRECATED);
       }
     }
 

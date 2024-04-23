@@ -120,7 +120,7 @@ class ElementsLabelsTest extends KernelTestBase {
    * Tests XSS-protection of element labels.
    *
    * @group legacy
-   * @expectedDeprecation Form elements must have a #title attribute as of Drupal 9.0.0. Form element "form_textfield_test_title_no_show" of #type "textfield" from form "form_label_test_form" is missing a #title attribute.
+   * @expectedDeprecation Form elements must have a #title attribute as of Drupal 11.0.0. Form element "form_textfield_test_title_no_show" of #type "textfield" from form "form_label_test_form" is missing a #title attribute.
    */
   protected function testTitleEscaping(): void {
     $this->drupalGet('form_test/form-labels');
