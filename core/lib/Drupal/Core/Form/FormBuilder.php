@@ -1088,7 +1088,7 @@ class FormBuilder implements FormBuilderInterface, FormValidatorInterface, FormS
     if (isset($element['#type']) && !in_array($element['#type'], $types_to_skip) && !empty($element['#input']) && empty($element['#attributes']['aria-labelledby'])) {
       $title_key = in_array($element['#type'], ['button', 'submit']) ? '#value' : '#title';
       if (!isset($element[$title_key])) {
-        @trigger_error(sprintf('Form elements not having title attributes is deprecated in drupal:10.3.0 This is only for form elements that require a title for accessibility. This will be removed in drupal:11.0.0. Form element "%s" of #type "%s" from form "%s" is missing a #title attribute. See https://www.drupal.org/project/drupal/issues/933004', implode('][', $element['#array_parents']), $element['#type'], $form_id), E_USER_DEPRECATED);
+        @trigger_error(sprintf('Form elements that need titles for accessibility not having title attributes is deprecated in drupal:10.3.0 and is removed in drupal:11.0.0. Form element "%s" of #type "%s" from form "%s" is missing a #title attribute. See https://www.drupal.org/project/drupal/issues/933004', implode('][', $element['#array_parents']), $element['#type'], $form_id), E_USER_DEPRECATED);
       }
     }
 
