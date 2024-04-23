@@ -46,6 +46,7 @@ class OptionsSelectWidget extends OptionsWidgetBase {
 
     $element += [
       '#type' => 'select',
+      '#title' => '@todo',
       '#options' => $options,
       '#default_value' => $selected,
       '#multiple' => $multiple,

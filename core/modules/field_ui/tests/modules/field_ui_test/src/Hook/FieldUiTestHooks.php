@@ -54,6 +54,8 @@ class FieldUiTestHooks {
       ],
       'weight' => [
         '#type' => 'textfield',
+        '#title' => 'Weight',
+        '#title_display' => 'invisible',
         '#default_value' => 0,
         '#size' => 3,
         '#attributes' => [
@@ -65,6 +67,8 @@ class FieldUiTestHooks {
       'parent_wrapper' => [
         'parent' => [
           '#type' => 'select',
+          '#title' => 'Parent',
+          '#title_display' => 'invisible',
           '#options' => [
             'indent' => 'Indent',
           ],

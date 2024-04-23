@@ -164,7 +164,8 @@ class ContentLanguageSettingsForm extends FormBase {
       foreach ($bundles[$entity_type_id] as $bundle => $bundle_info) {
         $form['settings'][$entity_type_id][$bundle]['settings'] = [
           '#type' => 'item',
-          '#label' => $bundle_info['label'],
+          '#title' => $bundle_info['label'],
+          '#title_display' => 'invisible',
           'language' => [
             '#type' => 'language_configuration',
             '#entity_information' => [

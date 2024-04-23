@@ -70,6 +70,7 @@ class FormBuilderTest extends FormTestBase {
     ];
     $form['options'] = [
       '#type' => 'radios',
+      '#title' => 'Options',
       '#options' => [
         'foo' => 'foo',
         'bar' => 'bar',

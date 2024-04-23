@@ -1075,6 +1075,22 @@ class FormBuilder implements FormBuilderInterface, FormValidatorInterface, FormS
       }
       $element['#processed'] = TRUE;
     }
+    $types_to_skip = [
+      'field_ui_table',
+      'table',
+      'tableselect',
+      'hidden',
+      'token',
+      'value',
+      'item',
+      'datelist',
+    ];
+    if (isset($element['#type']) && !in_array($element['#type'], $types_to_skip) && !empty($element['#input']) && empty($element['#attributes']['aria-labelledby'])) {
+      $title_key = in_array($element['#type'], ['button', 'submit']) ? '#value' : '#title';
+      if (!isset($element[$title_key])) {
+        @trigger_error(sprintf('Form elements must have a #title attribute as of Drupal 9.0.0. Form element "%s" of #type "%s" from form "%s" is missing a #title attribute.', implode('][', $element['#array_parents']), $element['#type'], $form_id), E_USER_DEPRECATED);
+      }
+    }
 
     // We start off assuming all form elements are in the correct order.
     $element['#sorted'] = TRUE;

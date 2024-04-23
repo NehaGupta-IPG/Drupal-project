@@ -27,6 +27,7 @@ class FormTestFileForm extends FormBase {
   public function buildForm(array $form, FormStateInterface $form_state) {
     $form['file'] = [
       '#type' => 'file',
+      '#title' => $this->t('Test file'),
       '#multiple' => TRUE,
       '#attributes' => [
         'class' => ['some-class'],

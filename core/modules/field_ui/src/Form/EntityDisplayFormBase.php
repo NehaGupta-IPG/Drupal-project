@@ -432,9 +432,13 @@ abstract class EntityDisplayFormBase extends EntityForm {
         if (!empty($settings_form) || !empty($third_party_settings_form)) {
           $field_row['settings_edit'] = $base_button + [
             '#type' => 'image_button',
+            '#title' => $this->t('Edit'),
             '#name' => $field_name . '_settings_edit',
             '#src' => 'core/misc/icons/787878/cog.svg',
-            '#attributes' => ['class' => ['field-plugin-settings-edit'], 'alt' => $this->t('Edit')],
+            // The title will be copied to the 'alt' tag in
+            // \Drupal\Core\Render\Element\ImageButton::preRenderButton(), so
+            // there's no need to do it here.
+            '#attributes' => ['class' => ['field-plugin-settings-edit']],
             '#op' => 'edit',
             // Do not check errors for the 'Edit' button, but make sure we get
             // the value of the 'plugin type' select.

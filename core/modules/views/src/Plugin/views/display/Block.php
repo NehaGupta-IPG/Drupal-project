@@ -195,6 +195,8 @@ class Block extends DisplayPluginBase implements PostSaveViewInterface {
         $form['#title'] .= $this->t('Block category');
         $form['block_category'] = [
           '#type' => 'textfield',
+          '#title' => $this->t('Block category'),
+          '#title_display' => 'invisible',
           '#autocomplete_route_name' => 'block.category_autocomplete',
           '#description' => $this->t('The category this block will appear under on the <a href=":href">blocks placement page</a>.', [':href' => Url::fromRoute('block.admin_display')->toString()]),
           '#default_value' => $this->getOption('block_category'),
@@ -232,6 +234,8 @@ class Block extends DisplayPluginBase implements PostSaveViewInterface {
         $allow = array_keys(array_filter($this->getOption('allow')));
         $form['allow'] = [
           '#type' => 'checkboxes',
+          '#title' => $this->t('Allow settings in the block configuration'),
+          '#title_display' => 'invisible',
           '#default_value' => $allow,
           '#options' => $options,
         ];

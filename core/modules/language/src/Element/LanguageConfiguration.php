@@ -36,7 +36,7 @@ class LanguageConfiguration extends FormElementBase {
     $options = $element['#options'] ?? [];
     // Avoid validation failure since we are moving the '#options' key in the
     // nested 'language' select element.
-    unset($element['#options']);
+    unset($element['#options'], $element['#type']);
     /** @var \Drupal\language\Entity\ContentLanguageSettings $default_config */
     $default_config = $element['#default_value'];
     $element['langcode'] = [

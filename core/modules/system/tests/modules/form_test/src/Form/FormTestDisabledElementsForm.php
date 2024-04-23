@@ -239,6 +239,7 @@ class FormTestDisabledElementsForm extends FormBase {
     // Buttons.
     $form['image_button'] = [
       '#type' => 'image_button',
+      '#title' => 'Image button',
       '#value' => 'Image button',
       '#src' => '',
       '#disabled' => TRUE,

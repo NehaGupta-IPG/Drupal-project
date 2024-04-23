@@ -106,6 +106,7 @@ class DatetimeElementFormTest extends KernelTestBase implements FormInterface, T
     // Element without specifying the default value.
     $form['simple_datetime_element'] = [
       '#type' => 'datetime',
+      '#title' => 'datelist test, no default',
       '#date_date_format' => 'Y-m-d',
       '#date_time_format' => 'H:i:s',
       '#date_date_element' => 'HTML Date',
