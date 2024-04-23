@@ -1222,61 +1222,6 @@
   };
 
   /**
-   * Provide a wrapper for new content via Ajax.
-   *
-   * Wrap the inserted markup when inserting multiple root elements with an
-   * ajax effect.
-   *
-   * @param {jQuery} $newContent
-   *   Response elements after parsing.
-   * @param {Drupal.Ajax} ajax
-   *   {@link Drupal.Ajax} object created by {@link Drupal.ajax}.
-   * @param {object} response
-   *   The response from the Ajax request.
-   *
-   * @deprecated in drupal:8.6.0 and is removed from drupal:12.0.0.
-   *   Use data with desired wrapper.
-   *
-   * @see https://www.drupal.org/node/2940704
-   *
-   * @todo Add deprecation warning after it is possible. For more information
-   *   see: https://www.drupal.org/project/drupal/issues/2973400
-   */
-  Drupal.theme.ajaxWrapperNewContent = ($newContent, ajax, response) =>
-    (response.effect || ajax.effect) !== 'none' &&
-    $newContent.filter(
-      (i) =>
-        !(
-          // We can not consider HTML comments or whitespace text as separate
-          // roots, since they do not cause visual regression with effect.
-          (
-            $newContent[i].nodeName === '#comment' ||
-            ($newContent[i].nodeName === '#text' &&
-              /^(\s|\n|\r)*$/.test($newContent[i].textContent))
-          )
-        ),
-    ).length > 1
-      ? Drupal.theme('ajaxWrapperMultipleRootElements', $newContent)
-      : $newContent;
-
-  /**
-   * Provide a wrapper for multiple root elements via Ajax.
-   *
-   * @param {jQuery} $elements
-   *   Response elements after parsing.
-   *
-   * @deprecated in drupal:8.6.0 and is removed from drupal:12.0.0.
-   *   Use data with desired wrapper.
-   *
-   * @see https://www.drupal.org/node/2940704
-   *
-   * @todo Add deprecation warning after it is possible. For more information
-   *   see: https://www.drupal.org/project/drupal/issues/2973400
-   */
-  Drupal.theme.ajaxWrapperMultipleRootElements = ($elements) =>
-    $('<div></div>').append($elements);
-
-  /**
    * @typedef {object} Drupal.AjaxCommands~commandDefinition
    *
    * @prop {string} command
@@ -1349,18 +1294,7 @@
         return template.content.childNodes;
       };
 
-      let $newContent = $(parseHTML(response.data));
-
-      // For backward compatibility, in some cases a wrapper will be added. This
-      // behavior will be removed before Drupal 9.0.0. If different behavior is
-      // needed, the theme functions can be overridden.
-      // @see https://www.drupal.org/node/2940704
-      $newContent = Drupal.theme(
-        'ajaxWrapperNewContent',
-        $newContent,
-        ajax,
-        response,
-      );
+      const $newContent = $($.parseHTML(response.data, document, true));
 
       // If removing content from the wrapper, detach behaviors first.
       switch (method) {
