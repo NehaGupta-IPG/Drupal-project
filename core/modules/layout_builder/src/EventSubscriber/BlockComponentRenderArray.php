@@ -14,7 +14,9 @@ use Drupal\layout_builder\Access\LayoutPreviewAccessAllowed;
 use Drupal\layout_builder\Event\SectionComponentBuildRenderArrayEvent;
 use Drupal\layout_builder\Plugin\Block\InlineBlock;
 use Drupal\layout_builder\LayoutBuilderEvents;
+use Drupal\layout_builder\LayoutEntityHelperTrait;
 use Drupal\views\Plugin\Block\ViewsBlock;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
@@ -25,6 +27,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  */
 class BlockComponentRenderArray implements EventSubscriberInterface {
 
+  use LayoutEntityHelperTrait;
   use StringTranslationTrait;
 
   /**
@@ -35,13 +38,44 @@ class BlockComponentRenderArray implements EventSubscriberInterface {
   protected $currentUser;
 
   /**
+   * An array of counters used for Views block recursive rendering protection.
+   *
+   * The counter records every time a specific entity has been rendered by a
+   * Views block within the same layout.
+   *
+   * @var array
+   */
+  protected static $viewsRecursiveRenderDepth = [];
+
+  /**
+   * The logger instance.
+   *
+   * @var \Psr\Log\LoggerInterface
+   */
+  protected $logger;
+
+  /**
+   * The number of times the same entity can be rendered by Views blocks.
+   *
+   * @var int
+   */
+  const VIEWS_RECURSIVE_RENDER_LIMIT = 2;
+
+  /**
    * Creates a BlockComponentRenderArray object.
    *
    * @param \Drupal\Core\Session\AccountInterface $current_user
    *   The current user.
+   * @param \Psr\Log\LoggerInterface $logger
+   *   The logger service.
    */
-  public function __construct(AccountInterface $current_user) {
+  public function __construct(AccountInterface $current_user, LoggerInterface $logger = NULL) {
     $this->currentUser = $current_user;
+    if (!$logger) {
+      @trigger_error('Calling ' . __METHOD__ . '() without the $logger argument is deprecated in drupal:10.3.0 and it will be required in drupal:11.0.0. See See https://www.drupal.org/node/3356924', E_USER_DEPRECATED);
+      $logger = \Drupal::service('logger.channel.layout_builder');
+    }
+    $this->logger = $logger;
   }
 
   /**
@@ -59,6 +93,7 @@ class BlockComponentRenderArray implements EventSubscriberInterface {
    *   The section component render event.
    */
   public function onBuildRender(SectionComponentBuildRenderArrayEvent $event) {
+    $bypass_build = FALSE;
     $block = $event->getPlugin();
     if (!$block instanceof BlockPluginInterface) {
       return;
@@ -172,7 +207,52 @@ class BlockComponentRenderArray implements EventSubscriberInterface {
         }
       }
 
-      $event->setBuild($build);
+      if ($block instanceof ViewsBlock) {
+        $this->checkForViewsBlockRecursion($block, $bypass_build);
+      }
+
+      if (!$bypass_build) {
+        $event->setBuild($build);
+      }
+
+    }
+  }
+
+  /**
+   * Sets $bypass_build to true when Views blocks exceed recursion limits.
+   *
+   * @param \Drupal\views\Plugin\Derivative\ViewsBlock $block
+   *   The Views block.
+   * @param bool $bypass_build
+   *   Determines if block component should be built.
+   */
+  protected function checkForViewsBlockRecursion(ViewsBlock $block, &$bypass_build) {
+    $view = $block->getViewExecutable();
+    $view_id = $view->id();
+    $view_current_display = $view->current_display;
+    $current_display = $view->getDisplay($view->current_display);
+    $row_plugin = $current_display->getPlugin('row');
+    list($is_displaying,) = explode(':', $row_plugin->getPluginId(), 2);
+    if ($is_displaying === 'entity') {
+      foreach ($view->result as $row) {
+        if (isset($row->_entity)) {
+          $type = $row->_entity->getEntityTypeId();
+          $bundle = $row->_entity->bundle();
+          $id = $row->_entity->id();
+          $row_recursion_id = "$type:$bundle:$id";
+          if (isset(static::$viewsRecursiveRenderDepth[$row_recursion_id])) {
+            static::$viewsRecursiveRenderDepth[$row_recursion_id]++;
+          }
+          else {
+            static::$viewsRecursiveRenderDepth[$row_recursion_id] = 1;
+          }
+          if (static::$viewsRecursiveRenderDepth[$row_recursion_id] > static::VIEWS_RECURSIVE_RENDER_LIMIT) {
+            $error = "Did not render View: $view_id with display $view_current_display to prevent recursion";
+            $this->logger->error($error);
+            $bypass_build = TRUE;
+          }
+        }
+      }
     }
   }
 

@@ -10,6 +10,7 @@ use Drupal\Core\Config\Action\Attribute\ActionMethod;
 use Drupal\Core\Entity\Entity\EntityViewDisplay as BaseEntityViewDisplay;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Entity\FieldableEntityInterface;
+use Drupal\Core\Entity\RevisionableInterface;
 use Drupal\Core\Plugin\Context\Context;
 use Drupal\Core\Plugin\Context\ContextDefinition;
 use Drupal\Core\Plugin\Context\EntityContext;
@@ -32,6 +33,25 @@ class LayoutBuilderEntityViewDisplay extends BaseEntityViewDisplay implements La
   use LayoutEntityHelperTrait;
   use SectionListTrait;
   use StringTranslationTrait;
+
+  /**
+   * The number of times this formatter allows rendering the same entity.
+   *
+   * @var int
+   */
+  const RECURSIVE_RENDER_LIMIT = 1;
+
+  /**
+   * An array of counters for the recursive rendering protection.
+   *
+   * Each counter takes into account all the relevant information about the
+   * field and the referenced entity that is being rendered.
+   *
+   * @var array
+   *
+   * @see \Drupal\Core\Field\Plugin\Field\FieldFormatter\EntityReferenceEntityFormatter::viewElements()
+   */
+  public static $recursiveRenderDepth = [];
 
   /**
    * The entity field manager.
@@ -334,6 +354,10 @@ class LayoutBuilderEntityViewDisplay extends BaseEntityViewDisplay implements La
     $build = [];
     if ($storage) {
       foreach ($storage->getSections() as $delta => $section) {
+        if ($this->isRecursiveRenderLimit($entity, $delta)) {
+          $build[$delta] = [];
+          continue;
+        }
         $build[$delta] = $section->toRenderArray($contexts);
       }
     }
@@ -477,6 +501,49 @@ class LayoutBuilderEntityViewDisplay extends BaseEntityViewDisplay implements La
 
     // Return the first section.
     return $this->getSection(0);
+  }
+
+  /**
+   * Tests if this section has been rendered beyond the recursive limit.
+   *
+   * @param \Drupal\Core\Entity\FieldableEntityInterface $entity
+   *   The entity being rendered.
+   * @param int $section_delta
+   *   The section delta.
+   *
+   * @return bool
+   *   TRUE if the recursive limit has been reached, otherwise FALSE.
+   */
+  protected function isRecursiveRenderLimit(FieldableEntityInterface $entity, $section_delta) {
+    $render_id_values = [
+      '%entity_type' => $entity->getEntityTypeId(),
+      '%entity_id' => $entity->id(),
+      '%view_mode' => $this->getMode(),
+      '%section_delta' => $section_delta,
+    ];
+    if ($entity instanceof RevisionableInterface) {
+      $render_id_values['%revision_id'] = $entity->getRevisionId();
+    }
+    $recursive_render_id = implode(':', $render_id_values);
+
+    if (isset(static::$recursiveRenderDepth[$recursive_render_id])) {
+      static::$recursiveRenderDepth[$recursive_render_id]++;
+    }
+    else {
+      static::$recursiveRenderDepth[$recursive_render_id] = 1;
+    }
+
+    // Protect ourselves from recursive rendering.
+    if (static::$recursiveRenderDepth[$recursive_render_id] > static::RECURSIVE_RENDER_LIMIT) {
+      $error = 'Recursive rendering detected when rendering layout:';
+      foreach ($render_id_values as $key => $render_id_value) {
+        $error .= str_replace('%', '', $key) . ": $key, ";
+      }
+      $error = $this->t('Aborting rendering @error', ['@error' => $error]);
+      $this->getLogger()->error($error, $render_id_values);
+      return TRUE;
+    }
+    return FALSE;
   }
 
   /**

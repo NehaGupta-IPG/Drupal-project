@@ -8,6 +8,7 @@ use Drupal\Core\Entity\Entity\EntityViewDisplay;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
+use Drupal\layout_builder\Entity\LayoutBuilderEntityViewDisplay;
 use Drupal\KernelTests\Core\Entity\EntityKernelTestBase;
 
 /**
@@ -25,16 +26,16 @@ abstract class LayoutBuilderCompatibilityTestBase extends EntityKernelTestBase {
   /**
    * The entity view display.
    *
-   * @var \Drupal\layout_builder\Entity\LayoutEntityDisplayInterface
+   * @var \Drupal\layout_builder\Entity\LayoutBuilderEntityViewDisplay
    */
-  protected $display;
+  public $display;
 
   /**
    * The entity being rendered.
    *
    * @var \Drupal\Core\Entity\FieldableEntityInterface
    */
-  protected $entity;
+  public $entity;
 
   /**
    * {@inheritdoc}
@@ -117,6 +118,11 @@ abstract class LayoutBuilderCompatibilityTestBase extends EntityKernelTestBase {
   protected function assertFieldAttributes(EntityInterface $entity, array $attributes) {
     $view_builder = $this->container->get('entity_type.manager')->getViewBuilder($entity->getEntityTypeId());
     $build = $view_builder->view($entity);
+
+    if ($this->display instanceof LayoutBuilderEntityViewDisplay) {
+      $this->display::$recursiveRenderDepth = [];
+    }
+
     $this->render($build);
 
     $actual = array_map(function (\SimpleXMLElement $element) {
