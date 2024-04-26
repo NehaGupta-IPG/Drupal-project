@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\KernelTests\Core\Database;
 
-use Drupal\Component\Render\FormattableMarkup;
 use Drupal\Core\Database\Schema\Index;
 use Drupal\Core\Database\Connection;
 use Drupal\Core\Database\Database;
