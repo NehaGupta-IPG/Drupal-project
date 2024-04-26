@@ -13,7 +13,7 @@ use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 // cSpell:ignore attname attnum attrelid objid refobjid refobjsubid regclass
-// cspell:ignore relkind relname
+// cspell:ignore relkind relname tsvector
 
 /**
  * Tests schema API for the PostgreSQL driver.
