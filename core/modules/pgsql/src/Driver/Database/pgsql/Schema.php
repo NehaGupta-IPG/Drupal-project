@@ -886,7 +886,7 @@ EOD;
 
     // Get the schema and tablename for the table without identifier quotes.
     $full_name = str_replace('"', '', $this->connection->prefixTables('{' . $table . '}'));
-    $result = $this->connection->query("SELECT i.relname AS index_name, a.attname AS column_name FROM pg_class t, pg_class i, pg_index ix, pg_attribute a WHERE t.oid = ix.indrelid AND i.oid = ix.indexrelid AND a.attrelid = t.oid AND a.attnum = ANY(ix.indkey) AND t.relkind = 'r' AND t.relname = :table_name ORDER BY index_name ASC, column_name ASC", [
+    $result = $this->connection->query("SELECT i.relname AS index_name, a.attname AS column_name, pg_get_indexdef(i.oid) AS indexdef FROM pg_class t, pg_class i, pg_index ix, pg_attribute a WHERE t.oid = ix.indrelid AND i.oid = ix.indexrelid AND a.attrelid = t.oid AND a.attnum = ANY(ix.indkey) AND t.relkind = 'r' AND t.relname = :table_name ORDER BY index_name ASC, column_name ASC", [
       ':table_name' => $full_name,
     ])->fetchAll();
     foreach ($result as $row) {
@@ -898,6 +898,7 @@ EOD;
       }
       elseif (str_ends_with($row->index_name, '_idx')) {
         $index_schema['indexes'][$row->index_name][] = $row->column_name;
+        $index_schema['index_definitions'][$row->index_name] = $row->indexdef;
       }
     }
 

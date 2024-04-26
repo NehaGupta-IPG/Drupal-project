@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\pgsql\Kernel\pgsql;
 
+use Drupal\Core\Database\Schema\Index;
 use Drupal\KernelTests\Core\Database\DriverSpecificSchemaTestBase;
 use Drupal\pgsql\Driver\Database\pgsql\Schema;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -420,6 +421,97 @@ class SchemaTest extends DriverSpecificSchemaTestBase {
     ];
     $this->schema->createTable($table_name, $table_spec);
     $this->assertTrue($this->schema->tableExists($table_name));
+  }
+
+  /**
+   * Test creation of a GIST index.
+   *
+   * The base method tests a GIST index specification by way of verifying the
+   * object-based index specification. Run that test, but also verify it does
+   * what it says on the tin.
+   */
+  #[\Override]
+  public function testObjectIndexSyntax(): void {
+    parent::testObjectIndexSyntax();
+    $introspect_index_schema = new \ReflectionMethod(get_class($this->schema), 'introspectIndexSchema');
+    $index_schema = $introspect_index_schema->invoke($this->schema, 'index_with_object');
+    $this->assertCount(1, $index_schema['index_definitions']);
+    $this->assertStringContainsString('USING gist', current($index_schema['index_definitions']));
+    $this->schema->dropIndex('index_with_object', 'text_column_index');
+    $index_schema = $introspect_index_schema->invoke($this->schema, 'index_with_object');
+    $this->assertEmpty($index_schema['indexes']);
+    // Test adding an index via ::addIndex().
+    $this->schema->addIndex(
+      'index_with_object',
+      'text_column_index_2',
+      new Index(
+      ['text'],
+      [
+        'pgsql' => [
+          'type' => IndexType::GIST,
+          'operator' => 'gist_trgm_ops',
+        ],
+      ]
+    ),
+      [
+        'fields' => [
+          'id' => [
+            'type' => 'serial',
+            'not null' => TRUE,
+            'description' => 'Primary Key: Unique ID.',
+          ],
+          'text' => [
+            'type' => 'text',
+            'description' => 'A text field',
+          ],
+        ],
+        'primary key' => ['id'],
+      ]
+    );
+    $index_schema = $introspect_index_schema->invoke($this->schema, 'index_with_object');
+    $this->assertCount(1, $index_schema['index_definitions']);
+    $this->assertStringContainsString('USING gist', current($index_schema['index_definitions']));
+  }
+
+  /**
+   * Test CRUD of GIN indexes.
+   */
+  public function testGinIndexCrud(): void {
+    $specification = [
+      'fields' => [
+        'id' => [
+          'type' => 'serial',
+          'not null' => TRUE,
+          'description' => 'Primary Key: Unique ID.',
+        ],
+        'json' => [
+          'type' => 'json',
+          'description' => 'A JSON field',
+        ],
+      ],
+      'indexes' => [
+        'json_column_index' => new Index(
+          ['json'],
+          [
+            'pgsql' => [
+              'type' => IndexType::GIN,
+            ],
+          ]
+        ),
+      ],
+      'primary key' => ['id'],
+    ];
+    // $table_name = 'index_with_object';
+    $this->markTestSkipped('GIN indexes only support tsvector, array and jsonb columns. This test may be enabled after https://www.drupal.org/project/drupal/issues/3343634 lands and JSON data storage is supported.');
+    // $this->schema->createTable($table_name, $specification);
+    // $this->assertIndexOnColumns($table_name, ['json']);
+    // $introspect_index_schema = new \ReflectionMethod(get_class($this->schema), 'introspectIndexSchema');
+    // $index_schema = $introspect_index_schema->invoke($this->schema, 'index_with_object');
+    // $this->assertCount(1, $index_schema['index_definitions']);
+    // $this->assertStringContainsString('USING gin', current($index_schema['index_definitions']));
+    // $this->schema->dropIndex('index_with_object', 'text_column_index');
+    // $index_schema = $introspect_index_schema->invoke($this->schema, 'index_with_object');
+    // $this->assertEmpty($index_schema['indexes']);
   }
 
 }
