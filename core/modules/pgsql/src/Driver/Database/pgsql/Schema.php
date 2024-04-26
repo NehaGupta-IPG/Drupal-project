@@ -12,7 +12,7 @@ use Drupal\pgsql\Schema\IndexType;
 // cSpell:ignore attrelid atttypid atttypmod bigserial conkey conname conrelid
 // cSpell:ignore contype fillfactor indexname indexrelid indisprimary indkey
 // cSpell:ignore indrelid nextval nspname regclass relkind relname relnamespace
-// cSpell:ignore schemaname setval
+// cSpell:ignore schemaname setval tsvector
 
 /**
  * @addtogroup schemaapi
