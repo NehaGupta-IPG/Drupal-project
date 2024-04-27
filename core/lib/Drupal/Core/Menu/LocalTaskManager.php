@@ -21,7 +21,6 @@ use Drupal\Core\Url;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Controller\ArgumentResolverInterface;
-use function trigger_error;
 
 /**
  * Provides the default local task manager using YML as primary definition.
