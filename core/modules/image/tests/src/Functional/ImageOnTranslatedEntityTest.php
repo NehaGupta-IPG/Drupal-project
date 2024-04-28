@@ -288,17 +288,18 @@ class ImageOnTranslatedEntityTest extends ImageFieldTestBase {
     // Translate the node into French.
     $this->drupalGet('node/' . $default_language_node->id() . '/translations/add/en/fr');
 
-    // Translate properties of file.
+    // Translate the properties of the file.
     $edit = [];
     $edit['title[0][value]'] = 'Scarlett Johansson';
     $edit = [$this->fieldName . '[0][alt]' => 'Scarlett Johansson image', $this->fieldName . '[0][title]' => 'Scarlett Johansson image title'];
     $this->submitForm($edit, 'Save (this translation)');
-    // This inspects the HTML after the post of the translation, the image
-    // should be displayed on the original node.
+    // This inspects the HTML after the translation is posted. The image should
+    // be displayed on the original node.
     $this->drupalGet('node/' . $default_language_node->id());
     $this->assertSession()->responseContains('alt="Lost in translation image"');
     $this->assertSession()->responseContains('title="Lost in translation image title"');
     $second_fid = $this->getLastFileId();
+
     // View the translated node.
     $this->drupalGet('fr/node/' . $default_language_node->id());
     $this->assertSession()->responseContains('alt="Scarlett Johansson image"');
@@ -306,7 +307,7 @@ class ImageOnTranslatedEntityTest extends ImageFieldTestBase {
 
     \Drupal::entityTypeManager()->getStorage('file')->resetCache();
 
-    // Ensure the file status of the first file permanent.
+    // Ensure the file status of the first file is permanent.
     $file = File::load($first_fid);
     $this->assertTrue($file->isPermanent());
 
@@ -351,22 +352,24 @@ class ImageOnTranslatedEntityTest extends ImageFieldTestBase {
 
     // Translate the node into French.
     $this->drupalGet('node/' . $default_language_node->id() . '/translations/add/en/fr');
-    // Translate properties of file.
+    // Translate the properties of the file.
     $edit = [];
     $edit['title[0][value]'] = 'Scarlett Johansson';
     $edit = [$this->fieldName . '[0][alt]' => 'Scarlett Johansson image', $this->fieldName . '[0][title]' => 'Scarlett Johansson image title'];
     $this->submitForm($edit, 'Save (this translation)');
-    // This inspects the HTML after the post of the translation, the image
-    // should be displayed on the original node.
+
+    // This inspects the HTML after the translation is posted. The image should
+    // be displayed on the original node.
     $this->drupalGet('node/' . $default_language_node->id());
     $this->assertSession()->responseContains('alt="Lost in translation image"');
     $this->assertSession()->responseContains('title="Lost in translation image title"');
+
     // View the translated node.
     $this->drupalGet('fr/node/' . $default_language_node->id());
     $this->assertSession()->responseContains('alt="Scarlett Johansson image"');
     $this->assertSession()->responseContains('title="Scarlett Johansson image title"');
 
-    // Install content moderation and enable moderation on Basic Page node type.
+    // Install Content Moderation and enable moderation on Basic Page node type.
     $this->container->get('module_installer')->install(['content_moderation']);
     $this->rebuildContainer();
     $workflow = $this->createEditorialWorkflow();
@@ -374,19 +377,19 @@ class ImageOnTranslatedEntityTest extends ImageFieldTestBase {
     $workflow->save();
 
     // Create an admin user to test image translations on a moderated node.
-    // The goal here is not to test specific access controls for moderation, so
-    // a user with an Administrator role was used.
+    // (Access control is not under test.)
     $cm_admin_user = $this->drupalCreateUser([], NULL, TRUE);
     $this->drupalLogin($cm_admin_user);
 
     // Edit the node in French with workflow enabled.
     $this->drupalGet('fr/node/' . $default_language_node->id() . '/edit');
 
-    // Translate properties of file with moderation.
+    // Translate the properties of a file with moderation.
     $edit = [];
     $edit['title[0][value]'] = 'Moderate Scarlett Johansson';
     $edit = [$this->fieldName . '[0][alt]' => 'Moderate Scarlett Johansson image', $this->fieldName . '[0][title]' => 'Moderate Scarlett Johansson image title'];
     $this->submitForm($edit, 'Save (this translation)');
+
     // View the translated node.
     $this->drupalGet('fr/node/' . $default_language_node->id());
     $this->assertSession()->responseContains('alt="Moderate Scarlett Johansson image"');
