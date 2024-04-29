@@ -40,7 +40,6 @@ abstract class MenuLinkContentResourceTestBase extends EntityResourceTestBase {
    * {@inheritdoc}
    */
   protected function setUpAuthorization($method) {
-    $this->grantPermissionsToTestedRole(['access user profiles']);
     switch ($method) {
       case 'GET':
       case 'POST':
