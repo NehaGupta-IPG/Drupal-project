@@ -181,8 +181,15 @@ export default class DrupalMediaEditing extends Plugin {
    * @private
    */
   async _fetchPreview(modelElement) {
+    // Convert the rendered model into a base64 encoded string. We can't just
+    // use only btoa() here as it's not UTF-8 safe.
+    const utf8Encoded = btoa(encodeURIComponent(this._renderElement(modelElement)).replace(/%([0-9A-F]{2})/g,
+      function toSolidBytes(match, p1) {
+         return String.fromCharCode('0x' + p1);
+      }
+    ));
+
     const queryParams = {
-      text: btoa(this._renderElement(modelElement)),
       uuid: modelElement.getAttribute('drupalMediaEntityUuid'),
     };
 
@@ -205,6 +212,7 @@ export default class DrupalMediaEditing extends Plugin {
       `${previewUrlParts[0]}?${query}`,
       {
         headers: {
+          'X-Encoded-Media-Embed': utf8Encoded,
           'X-Drupal-MediaPreview-CSRF-Token':
             this.editor.config.get('drupalMedia').previewCsrfToken,
         },
