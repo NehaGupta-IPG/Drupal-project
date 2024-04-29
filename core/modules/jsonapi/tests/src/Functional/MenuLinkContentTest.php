@@ -66,10 +66,7 @@ class MenuLinkContentTest extends ResourceTestBase {
    * {@inheritdoc}
    */
   protected function setUpAuthorization($method): void {
-    $this->grantPermissionsToTestedRole([
-      'access user profiles',
-      'administer menu',
-    ]);
+    $this->grantPermissionsToTestedRole(['administer menu']);
   }
 
   /**
@@ -80,7 +77,7 @@ class MenuLinkContentTest extends ResourceTestBase {
       'id' => 'llama',
       'title' => 'Llama Gabilondo',
       'description' => 'Llama Gabilondo',
-      'link' => 'entity:user/1',
+      'link' => 'https://nl.wikipedia.org/wiki/Llama',
       'weight' => 0,
       'menu_name' => 'main',
     ]);
@@ -247,15 +244,6 @@ class MenuLinkContentTest extends ResourceTestBase {
     $request_options[RequestOptions::BODY] = $response_body;
     $response = $this->request('PATCH', $url, $request_options);
     $this->assertResourceResponse(200, Json::decode($response_body), $response);
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function testRelationships() {
-    // @see \Drupal\Tests\jsonapi\Functional\ResourceTestBase::doTestRelationshipMutation()
-    $this->grantPermissionsToTestedRole(['access user profiles']);
-    parent::testRelationships();
   }
 
 }
