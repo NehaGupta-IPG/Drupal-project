@@ -63,6 +63,7 @@ trait SchemaCheckTrait {
       // TRICKY: chicken vs egg: `system` module must be installed before the
       // `stark` theme can be installed! Stark is the default theme unless an
       // install profile specifies a different default theme.
+      // @todo Remove this in https://www.drupal.org/project/drupal/issues/3444106
       'default' => [
         // @see core/modules/system/config/install/system.theme.yml
         "Theme 'stark' is not installed.",
