@@ -14,7 +14,7 @@ use Drupal\menu_link_content\Entity\MenuLinkContent;
  *
  * @group jsonapi
  */
-class MenuLinkContentTestInternal extends MenuLinkContentTest {
+class MenuLinkContentInternalTest extends MenuLinkContentTest {
 
   /**
    * {@inheritdoc}
@@ -44,10 +44,11 @@ class MenuLinkContentTestInternal extends MenuLinkContentTest {
    * {@inheritdoc}
    */
   protected function getExpectedDocument() {
-    $self_url = Url::fromUri('base:/jsonapi/menu_link_content/menu_link_content/' . $this->entity->uuid())->setAbsolute()->toString(TRUE)->getGeneratedUrl();
+    $base_url = Url::fromUri('base:/jsonapi/menu_link_content/menu_link_content/' . $this->entity->uuid())->setAbsolute();
+    $self_url = clone $base_url;
     $version_identifier = 'id:' . $this->entity->getRevisionId();
+    $self_url = $self_url->setOption('query', ['resourceVersion' => $version_identifier]);
     $version_query_string = '?resourceVersion=' . urlencode($version_identifier);
-
     return [
       'jsonapi' => [
         'meta' => [
@@ -58,13 +59,13 @@ class MenuLinkContentTestInternal extends MenuLinkContentTest {
         'version' => '1.0',
       ],
       'links' => [
-        'self' => ['href' => $self_url],
+        'self' => ['href' => $base_url->toString()],
       ],
       'data' => [
         'id' => $this->entity->uuid(),
         'type' => 'menu_link_content--menu_link_content',
         'links' => [
-          'self' => ['href' => $self_url],
+          'self' => ['href' => $self_url->toString()],
         ],
         'attributes' => [
           'bundle' => 'menu_link_content',
@@ -87,7 +88,7 @@ class MenuLinkContentTestInternal extends MenuLinkContentTest {
           'weight' => 0,
           'drupal_internal__id' => 1,
           'drupal_internal__revision_id' => 1,
-          'revision_created' => (new \DateTime())->setTimestamp($this->entity->getRevisionCreationTime())->setTimezone(new \DateTimeZone('UTC'))->format(\DateTime::RFC3339),
+          'revision_created' => (new \DateTime())->setTimestamp((int) $this->entity->getRevisionCreationTime())->setTimezone(new \DateTimeZone('UTC'))->format(\DateTime::RFC3339),
           'revision_log_message' => NULL,
           // @todo Attempt to remove this in https://www.drupal.org/project/drupal/issues/2933518.
           'revision_translation_affected' => TRUE,
@@ -97,10 +98,10 @@ class MenuLinkContentTestInternal extends MenuLinkContentTest {
             'data' => NULL,
             'links' => [
               'related' => [
-                'href' => $self_url . '/revision_user' . $version_query_string,
+                'href' => $base_url->toString() . '/revision_user' . $version_query_string,
               ],
               'self' => [
-                'href' => $self_url . '/relationships/revision_user' . $version_query_string,
+                'href' => $base_url->toString() . '/relationships/revision_user' . $version_query_string,
               ],
             ],
           ],
