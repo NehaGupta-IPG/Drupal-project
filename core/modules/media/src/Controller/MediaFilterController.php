@@ -97,7 +97,7 @@ class MediaFilterController implements ContainerInjectionInterface {
   public function preview(Request $request, FilterFormatInterface $filter_format) {
     self::checkCsrf($request, \Drupal::currentUser());
 
-    $text = base64_decode($request->query->get('text'));
+    $text = base64_decode($request->headers->get('X-Encoded-Media-Embed'));
     $uuid = $request->query->get('uuid');
     if ($text == '' || $uuid == '') {
       throw new NotFoundHttpException();
