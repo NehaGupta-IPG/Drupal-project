@@ -116,8 +116,8 @@ class MenuLinkContentTest extends ResourceTestBase {
         'attributes' => [
           'bundle' => 'menu_link_content',
           'link' => [
-            'uri' => 'entity:user/1',
-            'resolvable_uri' => $this->entity->get('link')->first()->get('resolvable_uri')->getValue(),
+            'uri' => 'https://nl.wikipedia.org/wiki/Llama',
+            'resolvable_uri' => 'https://nl.wikipedia.org/wiki/Llama',
             'title' => NULL,
             'options' => [],
           ],
