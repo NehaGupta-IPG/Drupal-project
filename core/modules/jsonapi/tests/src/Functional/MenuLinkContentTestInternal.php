@@ -1,12 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\jsonapi\Functional;
 
-use Drupal\Component\Serialization\Json;
-use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Url;
 use Drupal\menu_link_content\Entity\MenuLinkContent;
-use GuzzleHttp\RequestOptions;
 
 /**
  * JSON:API integration test for the "MenuLinkContent" content entity type.
@@ -21,7 +20,7 @@ class MenuLinkContentTestInternal extends MenuLinkContentTest {
    * {@inheritdoc}
    */
   protected function setUpAuthorization($method) {
-    $this->grantPermissionsToTestedRole(['administer menu']);
+    $this->grantPermissionsToTestedRole(['administer menu', 'access user profiles']);
   }
 
   /**
