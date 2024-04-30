@@ -2528,7 +2528,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
     $response = $this->request('PATCH', $url, $request_options);
     $this->assertResourceResponse(200, FALSE, $response);
     $updated_entity = $this->entityLoadUnchanged($this->entity->id());
-    if ($this->entity instanceof ContentEntityInterface) {
+    if ($this->entity instanceof RevisionableInterface) {
       $this->assertSame(static::$newRevisionsShouldBeAutomatic, $prior_revision_id < (int) $updated_entity->getRevisionId());
       $prior_revision_id = (int) $updated_entity->getRevisionId();
     }
@@ -2549,7 +2549,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
     // Assert that the entity was indeed updated, and that the response body
     // contains the serialized updated entity.
     $updated_entity = $this->entityLoadUnchanged($this->entity->id());
-    if ($this->entity instanceof ContentEntityInterface) {
+    if ($this->entity instanceof RevisionableInterface) {
       $this->assertSame(static::$newRevisionsShouldBeAutomatic, $prior_revision_id < (int) $updated_entity->getRevisionId());
       if ($this->entity instanceof RevisionLogInterface) {
         if (static::$newRevisionsShouldBeAutomatic) {
