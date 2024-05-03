@@ -3,9 +3,11 @@
 core.entity_view_mode.*.*:
   type: config_entity
   label: 'Entity view mode settings'
+  constraints:
+    FullyValidatable: ~
   mapping:
     id:
-      type: string
+      type: machine_name
       label: 'ID'
     label:
       type: required_label
@@ -13,9 +15,15 @@ core.entity_view_mode.*.*:
     description:
       type: text
       label: 'Description'
+      nullable: true
+      constraints:
+        NotBlank:
+          allowNull: true
     targetEntityType:
       type: string
       label: 'Target entity type'
+      constraints:
+        NotBlank: []
     cache:
       type: boolean
       label: 'Cached'
