@@ -12,7 +12,7 @@ use Drupal\FunctionalTests\Update\UpdatePathTestBase;
  * Tests the upgrade path for entity reference selection handler plugin setting.
  *
  * @group field
- * @see field_post_update_add_entity_reference_selection_plugin_option()
+ * @covers \field_post_update_add_entity_reference_selection_plugin_option
  */
 class IncludeUnpublishedEntitiesOptionUpdateTest extends UpdatePathTestBase {
 
@@ -21,7 +21,7 @@ class IncludeUnpublishedEntitiesOptionUpdateTest extends UpdatePathTestBase {
    */
   protected function setDatabaseDumpFiles(): void {
     $this->databaseDumpFiles = [
-      __DIR__ . '/../../../../../system/tests/fixtures/update/drupal-9.4.0.filled.standard.php.gz',
+      __DIR__ . '/../../../../../system/tests/fixtures/update/drupal-10.3.0.filled.standard.php.gz',
     ];
   }
 
