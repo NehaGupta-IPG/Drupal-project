@@ -14,25 +14,25 @@ use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Routing\RouteProviderInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\KernelTests\KernelTestBase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Controller\ArgumentResolverInterface;
 
 /**
  * Tests deprecations in LocalTaskManager.
- *
- * @group Menu
- * @group legacy
- * @coversDefaultClass \Drupal\Core\Menu\LocalTaskManager
  */
+#[CoversClass(LocalTaskManager::class)]
+#[Group('Menu')]
+#[RunTestsInSeparateProcesses]
+#[IgnoreDeprecations]
 class LegacyLocalTaskManagerTest extends KernelTestBase {
 
   /**
    * Tests the constructor deprecations.
-   *
-   * @covers ::__construct
-   *
-   * @group legacy
    */
   public function testConstructorDeprecation(): void {
     $request_stack = new RequestStack();
@@ -41,7 +41,7 @@ class LegacyLocalTaskManagerTest extends KernelTestBase {
     $language_manager
       ->method('getCurrentLanguage')
       ->willReturn(new Language(['id' => 'en']));
-    $this->expectDeprecation('Calling Drupal\Core\Menu\LocalTaskManager::__construct() without the $logger argument is deprecated in drupal:10.3.0 and it will be required in drupal:11.0.0. See https://www.drupal.org/node/3443775');
+    $this->expectUserDeprecationMessage('Calling Drupal\Core\Menu\LocalTaskManager::__construct() without the $logger argument is deprecated in drupal:11.4.0 and it will be required in drupal:12.0.0. See https://www.drupal.org/node/3443775');
     $manager = new LocalTaskManager(
       $this->createMock(ArgumentResolverInterface::class),
       $request_stack,
