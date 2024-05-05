@@ -42,7 +42,7 @@ class TermTranslationFieldViewTest extends TaxonomyTestBase {
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['language', 'content_translation', 'taxonomy'];
+  protected static $modules = ['language', 'content_translation', 'node'];
 
   /**
    * {@inheritdoc}
