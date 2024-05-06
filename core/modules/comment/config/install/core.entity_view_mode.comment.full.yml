@@ -5,6 +5,6 @@ dependencies:
     - comment
 id: comment.full
 label: 'Full comment'
-description: ''
+description: null
 targetEntityType: comment
 cache: true
