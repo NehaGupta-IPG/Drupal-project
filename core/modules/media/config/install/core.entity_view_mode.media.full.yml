@@ -5,6 +5,6 @@ dependencies:
     - media
 id: media.full
 label: 'Full content'
-description: ''
+description: null
 targetEntityType: media
 cache: true
