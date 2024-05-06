@@ -9,6 +9,10 @@ core.entity_view_mode.*.*:
     id:
       type: machine_name
       label: 'ID'
+      constraints:
+        Regex:
+          pattern: '/^[a-z0-9_.]+$/'
+          message: "The %value machine name is not valid."
     label:
       type: required_label
       label: 'The human-readable name of the view mode'
