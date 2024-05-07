@@ -52,4 +52,17 @@ class EntityViewModeValidationTest extends ConfigEntityValidationTestBase {
     parent::testImmutableProperties($valid_values);
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public static function providerInvalidMachineNameCharacters(): array {
+    return [
+      'INVALID: contains a space' => ['prefix.space separated', FALSE],
+      'INVALID: dash separated' => ['prefix.dash-separated', FALSE],
+      'INVALID: uppercase letters' => ['Uppercase.Letters', FALSE],
+      'VALID: underscore separated' => ['prefix.underscore_separated', TRUE],
+      'VALID: contains numbers' => ['prefix1.part2', TRUE],
+    ];
+  }
+
 }
