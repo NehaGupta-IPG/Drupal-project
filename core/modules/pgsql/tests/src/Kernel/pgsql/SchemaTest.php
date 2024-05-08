@@ -572,9 +572,9 @@ class SchemaTest extends DriverSpecificSchemaTestBase {
   }
 
   /**
-   * Test restriction on multicolumn support for GIN and GIST index types.
+   * Test restriction on multi-column support for GIN and GIST index types.
    */
-  public function testNoMulticolumnIndexesForGinGist(): void {
+  public function testNoMultiColumnIndexesForGinGist(): void {
     $specification = [
       'fields' => [
         'id' => [
