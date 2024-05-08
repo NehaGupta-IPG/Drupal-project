@@ -62,6 +62,9 @@ services:
   system.file_event.subscriber:
     class: Drupal\system\EventSubscriber\SecurityFileUploadEventSubscriber
     arguments: ['@config.factory']
+  system.update_admin_theme:
+    class: Drupal\system\EventSubscriber\UpdateEmptyAdminTheme
+    arguments: ['@config.factory', '@request_stack']
   logger.channel.system:
     parent: logger.channel_base
     arguments: ['system']

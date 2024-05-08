@@ -9,6 +9,7 @@ use Drupal\FunctionalTests\Update\UpdatePathTestBase;
 /**
  * @group system
  * @group Update
+ * @group legacy
  * @covers system_post_update_set_theme_admin_to_null
  */
 class ThemeAdminUpdateTest extends UpdatePathTestBase {
@@ -26,8 +27,9 @@ class ThemeAdminUpdateTest extends UpdatePathTestBase {
    * Tests the upgrade path for updating empty admin to NULL.
    */
   public function testLangcodesAddedToSimpleConfig(): void {
+    $this->expectDeprecation("Empty system.theme admin key isn't allowed.");
     $this->config('system.theme')->set('admin', '')->save();
-    $this->assertSame('', $this->config('system.theme')->get('admin'));
+    // Run Updates and no errors should occur.
     $this->runUpdates();
     $this->assertNull($this->config('system.theme')->get('admin'));
   }
