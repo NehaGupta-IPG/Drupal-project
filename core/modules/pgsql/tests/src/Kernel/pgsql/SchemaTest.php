@@ -112,6 +112,10 @@ class SchemaTest extends DriverSpecificSchemaTestBase {
         'test_field_4' => ['test_field_4'],
         'test_field_4_test_field_5' => ['test_field_4', 'test_field_5'],
       ],
+      'index_definitions' => [
+        'test_field_4' => 'CREATE INDEX ...',
+        'test_field_4_test_field_5' => 'CREATE INDEX ...',
+      ],
     ];
 
     $table_name = strtolower($this->getRandomGenerator()->name());
@@ -137,8 +141,22 @@ class SchemaTest extends DriverSpecificSchemaTestBase {
       $new_index_name = $ensure_identifier_length->invoke($this->schema, $table_name, $original_index_name, 'idx');
       $table_specification['indexes'][$new_index_name] = $columns;
     }
+    foreach ($table_specification['index_definitions'] as $original_index_name => $columns) {
+      unset($table_specification['index_definitions'][$original_index_name]);
+      $new_index_name = $ensure_identifier_length->invoke($this->schema, $table_name, $original_index_name, 'idx');
+      $table_specification['index_definitions'][$new_index_name] = $columns;
+    }
 
-    $this->assertEquals($table_specification, $index_schema);
+    $this->assertEquals(
+      array_filter($table_specification, fn ($key) => $key !== 'index_definitions', ARRAY_FILTER_USE_KEY),
+      array_filter($index_schema, fn ($key) => $key !== 'index_definitions', ARRAY_FILTER_USE_KEY)
+    );
+    foreach ($table_specification['index_definitions'] as $k => $v) {
+      $this->assertArrayHasKey($k, $index_schema['index_definitions']);
+      // We are not testing PgSQL's internals, rather that we are successfully
+      // retrieving an index creation statement.
+      $this->assertStringStartsWith('CREATE INDEX ', $v);
+    }
   }
 
   /**
