@@ -27,7 +27,7 @@ class ThemeAdminUpdateTest extends UpdatePathTestBase {
    * Tests the upgrade path for updating empty admin to NULL.
    */
   public function testLangcodesAddedToSimpleConfig(): void {
-    $this->expectDeprecation("Empty system.theme admin key isn't allowed.");
+    $this->expectDeprecation("Setting empty system.theme admin key is deprecated in drupal:11.0.0-alpha1 and would not be allowed in drupal:11.0.0-alpha2.");
     $this->config('system.theme')->set('admin', '')->save();
     // Run Updates and no errors should occur.
     $this->runUpdates();
