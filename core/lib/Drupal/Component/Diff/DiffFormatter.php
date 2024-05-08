@@ -5,7 +5,7 @@ namespace Drupal\Component\Diff;
 use Drupal\Component\Diff\Engine\DiffOpCopy;
 
 /**
- * A class to format Diffs
+ * A class to format Diffs.
  *
  * This class formats the diff in classic diff format.
  * It is intended that this class be customized via inheritance,
@@ -18,7 +18,7 @@ class DiffFormatter {
   /**
    * Should a block header be shown?
    */
-  public $show_header = TRUE;
+  public $showHeader = TRUE;
 
   /**
    * Number of leading context "lines" to preserve.
@@ -26,7 +26,7 @@ class DiffFormatter {
    * This should be left at zero for this class, but subclasses
    * may want to set this to other values.
    */
-  public $leading_context_lines = 0;
+  public $leadingContextLines = 0;
 
   /**
    * Number of trailing context "lines" to preserve.
@@ -34,14 +34,14 @@ class DiffFormatter {
    * This should be left at zero for this class, but subclasses
    * may want to set this to other values.
    */
-  public $trailing_context_lines = 0;
+  public $trailingContextLines = 0;
 
   /**
    * The line stats.
    *
    * @var array
    */
-  protected $line_stats = [
+  protected $lineStats = [
     'counter' => ['x' => 0, 'y' => 0],
     'offset' => ['x' => 0, 'y' => 0],
   ];
@@ -60,15 +60,15 @@ class DiffFormatter {
     $block = FALSE;
     $context = [];
 
-    $nlead = $this->leading_context_lines;
-    $ntrail = $this->trailing_context_lines;
+    $nlead = $this->leadingContextLines;
+    $ntrail = $this->trailingContextLines;
 
     $this->_start_diff();
 
     foreach ($diff->getEdits() as $edit) {
       if ($edit->type == 'copy') {
         if (is_array($block)) {
-          if (sizeof($edit->orig) <= $nlead + $ntrail) {
+          if (count($edit->orig) <= $nlead + $ntrail) {
             $block[] = $edit;
           }
           else {
@@ -84,9 +84,9 @@ class DiffFormatter {
       }
       else {
         if (!is_array($block)) {
-          $context = array_slice($context, sizeof($context) - $nlead);
-          $x0 = $xi - sizeof($context);
-          $y0 = $yi - sizeof($context);
+          $context = array_slice($context, count($context) - $nlead);
+          $x0 = $xi - count($context);
+          $y0 = $yi - count($context);
           $block = [];
           if ($context) {
             $block[] = new DiffOpCopy($context);
@@ -96,10 +96,10 @@ class DiffFormatter {
       }
 
       if ($edit->orig) {
-        $xi += sizeof($edit->orig);
+        $xi += count($edit->orig);
       }
       if ($edit->closing) {
-        $yi += sizeof($edit->closing);
+        $yi += count($edit->closing);
       }
     }
 
@@ -109,10 +109,10 @@ class DiffFormatter {
     $end = $this->_end_diff();
 
     if (!empty($xi)) {
-      $this->line_stats['counter']['x'] += $xi;
+      $this->lineStats['counter']['x'] += $xi;
     }
     if (!empty($yi)) {
-      $this->line_stats['counter']['y'] += $yi;
+      $this->lineStats['counter']['y'] += $yi;
     }
 
     return $end;
@@ -162,7 +162,7 @@ class DiffFormatter {
   }
 
   protected function _start_block($header) {
-    if ($this->show_header) {
+    if ($this->showHeader) {
       echo $header . "\n";
     }
   }

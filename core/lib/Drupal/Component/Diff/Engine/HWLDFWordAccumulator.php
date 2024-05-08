@@ -3,7 +3,7 @@
 namespace Drupal\Component\Diff\Engine;
 
 /**
- * Additions by Axel Boldt follow, partly taken from diff.php, phpwiki-1.3.3
+ * Additions by Axel Boldt follow, partly taken from diff.php, phpwiki-1.3.3.
  */
 
 /**
