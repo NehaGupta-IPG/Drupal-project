@@ -112,10 +112,6 @@ class SchemaTest extends DriverSpecificSchemaTestBase {
         'test_field_4' => ['test_field_4'],
         'test_field_4_test_field_5' => ['test_field_4', 'test_field_5'],
       ],
-      'index_definitions' => [
-        'test_field_4' => 'CREATE INDEX ...',
-        'test_field_4_test_field_5' => 'CREATE INDEX ...',
-      ],
     ];
 
     $table_name = strtolower($this->getRandomGenerator()->name());
@@ -141,6 +137,12 @@ class SchemaTest extends DriverSpecificSchemaTestBase {
       $new_index_name = $ensure_identifier_length->invoke($this->schema, $table_name, $original_index_name, 'idx');
       $table_specification['indexes'][$new_index_name] = $columns;
     }
+    // This is returned from introspection but is not part of the table
+    // specification used to create the table.
+    $table_specification['index_definitions'] = [
+      'test_field_4' => 'CREATE INDEX ...',
+      'test_field_4_test_field_5' => 'CREATE INDEX ...',
+    ];
     foreach ($table_specification['index_definitions'] as $original_index_name => $columns) {
       unset($table_specification['index_definitions'][$original_index_name]);
       $new_index_name = $ensure_identifier_length->invoke($this->schema, $table_name, $original_index_name, 'idx');
