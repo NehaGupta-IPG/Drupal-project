@@ -9,9 +9,11 @@ core.entity_view_mode.*.*:
     id:
       type: machine_name
       label: 'ID'
+      # Content Entity Type View Mode IDs utilize a #machine_name form type with the following regex pattern.
+      # @see \Drupal\field_ui\Form\EntityDisplayModeFormBase::form()
       constraints:
         Regex:
-          pattern: '/^[a-z0-9_]+\.[a-z0-9_]+$/'
+          pattern: '/^[a-z0-9_.]+/'
           message: "The %value machine name is not valid."
     label:
       type: required_label
@@ -27,7 +29,9 @@ core.entity_view_mode.*.*:
       type: string
       label: 'Target entity type'
       constraints:
-        NotBlank: []
+        PluginExists:
+          manager: entity_type.manager
+          interface: Drupal\Core\Entity\ContentEntityInterface
     cache:
       type: boolean
       label: 'Cached'
