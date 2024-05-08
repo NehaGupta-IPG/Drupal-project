@@ -445,56 +445,62 @@ class SchemaTest extends DriverSpecificSchemaTestBase {
 
   public static function ginGistIndexDefinitionProvider(): array {
     return [
-      'gin' => ['gin', [
-        'fields' => [
-          'id' => [
-            'type' => 'serial',
-            'not null' => TRUE,
-            'description' => 'Primary Key: Unique ID.',
+      'gin' => [
+        'gin',
+        [
+          'fields' => [
+            'id' => [
+              'type' => 'serial',
+              'not null' => TRUE,
+              'description' => 'Primary Key: Unique ID.',
+            ],
+            'text' => [
+              'type' => 'text',
+              'description' => 'A text field',
+            ],
           ],
-          'text' => [
-            'type' => 'text',
-            'description' => 'A text field',
+          'indexes' => [
+            'text_column_index' => new Index(
+              ['text'],
+              [
+                'pgsql' => [
+                  'type' => IndexType::Gin,
+                  'operator' => 'gin_trgm_ops',
+                ],
+              ]
+            ),
           ],
+          'primary key' => ['id'],
         ],
-        'indexes' => [
-          'text_column_index' => new Index(
-            ['text'],
-            [
-              'pgsql' => [
-                'type' => IndexType::Gin,
-                'operator' => 'gin_trgm_ops',
-              ],
-            ]
-          ),
-        ],
-        'primary key' => ['id'],
-      ]],
-      'gist' => ['gist', [
-        'fields' => [
-          'id' => [
-            'type' => 'serial',
-            'not null' => TRUE,
-            'description' => 'Primary Key: Unique ID.',
+      ],
+      'gist' => [
+        'gist',
+        [
+          'fields' => [
+            'id' => [
+              'type' => 'serial',
+              'not null' => TRUE,
+              'description' => 'Primary Key: Unique ID.',
+            ],
+            'text' => [
+              'type' => 'text',
+              'description' => 'A text field',
+            ],
           ],
-          'text' => [
-            'type' => 'text',
-            'description' => 'A text field',
+          'indexes' => [
+            'text_column_index' => new Index(
+              ['text'],
+              [
+                'pgsql' => [
+                  'type' => IndexType::Gist,
+                  'operator' => 'gist_trgm_ops',
+                ],
+              ]
+            ),
           ],
+          'primary key' => ['id'],
         ],
-        'indexes' => [
-          'text_column_index' => new Index(
-            ['text'],
-            [
-              'pgsql' => [
-                'type' => IndexType::Gist,
-                'operator' => 'gist_trgm_ops',
-              ],
-            ]
-          ),
-        ],
-        'primary key' => ['id'],
-      ]]
+      ],
     ];
   }
 
@@ -598,4 +604,5 @@ class SchemaTest extends DriverSpecificSchemaTestBase {
     $this->expectExceptionMessageMatches('/^Postgres indexes of GIST type in Drupal are currently limited to single columns..*/');
     $this->schema->createTable('exceptional', $specification);
   }
+
 }
