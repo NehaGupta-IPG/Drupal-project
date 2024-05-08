@@ -1044,9 +1044,9 @@ EOD;
     $query = 'CREATE INDEX ' . $this->ensureIdentifiersLength($table, $name, 'idx') . ' ON {' . $table . '} ';
     $operator = '';
     if ($fields instanceof Index && ($config = $fields->getDriverConfig('pgsql')) && !empty($config['type']) && $config['type'] instanceof IndexType) {
-      // Both GIN and GiST indexes may cover only one column.
+      // Both GIN and GIST indexes may cover only one column.
       if (count($fields) > 1) {
-        throw new \RuntimeException('Postgres indexes of %s type may only cover a single column. See https://www.postgresql.org/docs/current/textsearch-indexes.html', $config['type']->value);
+        throw new \RuntimeException(sprintf('Postgres indexes of %s type in Drupal are currently limited to single columns. Multi-column indexes are generally discouraged, anyway. Consider a single-column index. See https://www.postgresql.org/docs/current/indexes-multicolumn.html', $config['type']->value));
       }
       // Index must be on a full column.
       if (is_array($fields->getIterator()->current())) {
@@ -1056,6 +1056,8 @@ EOD;
       // While the operator is technically applied to a specific column, we
       // include it in the index config as it is impractical to introduce a
       // second layer of value objects into the schema definition array.
+      // In addition, it would significantly complicate multi-column index
+      // creation, which the PGSQL docs discourage anyway.
       $operator = $config['operator'] ?? '';
     }
     $query .= sprintf(

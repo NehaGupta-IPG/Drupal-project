@@ -6,6 +6,8 @@ namespace Drupal\pgsql\Schema;
 
 /**
  * Enum of supported index types.
+ *
+ * @see https://www.postgresql.org/docs/current/textsearch-indexes.html
  */
 enum IndexType: string {
 

@@ -465,14 +465,14 @@ class SchemaTest extends DriverSpecificSchemaTestBase {
       'index_with_object',
       'text_column_index_2',
       new Index(
-      ['text'],
-      [
-        'pgsql' => [
-          'type' => IndexType::GIST,
-          'operator' => 'gist_trgm_ops',
-        ],
-      ]
-    ),
+        ['text'],
+        [
+          'pgsql' => [
+            'type' => IndexType::GIST,
+            'operator' => 'gist_trgm_ops',
+          ],
+        ]
+      ),
       [
         'fields' => [
           'id' => [
@@ -534,4 +534,71 @@ class SchemaTest extends DriverSpecificSchemaTestBase {
     // $this->assertEmpty($index_schema['indexes']);
   }
 
+  /**
+   * Test restriction on substring indexes when using GIN and GIST.
+   */
+  public function testNoGinGistSubstringIndexes(): void {
+    $specification = [
+      'fields' => [
+        'id' => [
+          'type' => 'serial',
+          'not null' => TRUE,
+          'description' => 'Primary Key: Unique ID.',
+        ],
+        'text' => [
+          'type' => 'text',
+          'description' => 'A text field',
+        ],
+      ],
+      'indexes' => [
+        'text_column_index' => new Index(
+          [['text', 10]],
+          [
+            'pgsql' => [
+              'type' => IndexType::GIST,
+              'operator' => 'gist_trgm_ops',
+            ],
+          ]
+        ),
+      ],
+      'primary key' => ['id'],
+    ];
+    $this->expectException(\RuntimeException::class);
+    $this->expectExceptionMessage('Postgres GIST indexes are incompatible with substring column definition.');
+    $this->schema->createTable('exceptional', $specification);
+  }
+
+  /**
+   * Test restriction on multicolumn support for GIN and GIST index types.
+   */
+  public function testNoMulticolumnIndexesForGinGist(): void {
+    $specification = [
+      'fields' => [
+        'id' => [
+          'type' => 'serial',
+          'not null' => TRUE,
+          'description' => 'Primary Key: Unique ID.',
+        ],
+        'text' => [
+          'type' => 'text',
+          'description' => 'A text field',
+        ],
+      ],
+      'indexes' => [
+        'text_column_index' => new Index(
+          ['id', 'text'],
+          [
+            'pgsql' => [
+              'type' => IndexType::GIST,
+              'operator' => 'gist_trgm_ops',
+            ],
+          ]
+        ),
+      ],
+      'primary key' => ['id'],
+    ];
+    $this->expectException(\RuntimeException::class);
+    $this->expectExceptionMessageMatches('/^Postgres indexes of GIST type in Drupal are currently limited to single columns..*/');
+    $this->schema->createTable('exceptional', $specification);
+  }
 }
