@@ -11,8 +11,8 @@ namespace Drupal\pgsql\Schema;
  */
 enum IndexType: string {
 
-  case GIN = 'GIN';
+  case Gin = 'GIN';
 
-  case GIST = 'GIST';
+  case Gist = 'GIST';
 
 }
