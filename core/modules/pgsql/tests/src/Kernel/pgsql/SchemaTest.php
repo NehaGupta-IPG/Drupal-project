@@ -443,37 +443,9 @@ class SchemaTest extends DriverSpecificSchemaTestBase {
     $this->assertTrue($this->schema->tableExists($table_name));
   }
 
-  /**
-   * Test creation of a GIST index.
-   *
-   * The base method tests a GIST index specification by way of verifying the
-   * object-based index specification. Run that test, but also verify it does
-   * what it says on the tin.
-   */
-  #[\Override]
-  public function testObjectIndexSyntax(): void {
-    parent::testObjectIndexSyntax();
-    $introspect_index_schema = new \ReflectionMethod(get_class($this->schema), 'introspectIndexSchema');
-    $index_schema = $introspect_index_schema->invoke($this->schema, 'index_with_object');
-    $this->assertCount(1, $index_schema['index_definitions']);
-    $this->assertStringContainsString('USING gist', current($index_schema['index_definitions']));
-    $this->schema->dropIndex('index_with_object', 'text_column_index');
-    $index_schema = $introspect_index_schema->invoke($this->schema, 'index_with_object');
-    $this->assertEmpty($index_schema['indexes']);
-    // Test adding an index via ::addIndex().
-    $this->schema->addIndex(
-      'index_with_object',
-      'text_column_index_2',
-      new Index(
-        ['text'],
-        [
-          'pgsql' => [
-            'type' => IndexType::GIST,
-            'operator' => 'gist_trgm_ops',
-          ],
-        ]
-      ),
-      [
+  public static function ginGistIndexDefinitionProvider(): array {
+    return [
+      'gin' => ['gin', [
         'fields' => [
           'id' => [
             'type' => 'serial',
@@ -485,53 +457,78 @@ class SchemaTest extends DriverSpecificSchemaTestBase {
             'description' => 'A text field',
           ],
         ],
+        'indexes' => [
+          'text_column_index' => new Index(
+            ['text'],
+            [
+              'pgsql' => [
+                'type' => IndexType::Gin,
+                'operator' => 'gin_trgm_ops',
+              ],
+            ]
+          ),
+        ],
         'primary key' => ['id'],
-      ]
-    );
-    $index_schema = $introspect_index_schema->invoke($this->schema, 'index_with_object');
-    $this->assertCount(1, $index_schema['index_definitions']);
-    $this->assertStringContainsString('USING gist', current($index_schema['index_definitions']));
+      ]],
+      'gist' => ['gist', [
+        'fields' => [
+          'id' => [
+            'type' => 'serial',
+            'not null' => TRUE,
+            'description' => 'Primary Key: Unique ID.',
+          ],
+          'text' => [
+            'type' => 'text',
+            'description' => 'A text field',
+          ],
+        ],
+        'indexes' => [
+          'text_column_index' => new Index(
+            ['text'],
+            [
+              'pgsql' => [
+                'type' => IndexType::Gist,
+                'operator' => 'gist_trgm_ops',
+              ],
+            ]
+          ),
+        ],
+        'primary key' => ['id'],
+      ]]
+    ];
   }
 
   /**
-   * Test CRUD of GIN indexes.
+   * Test CRUD of GIN and GIST indexes.
+   *
+   * @dataProvider ginGistIndexDefinitionProvider
    */
-  public function testGinIndexCrud(): void {
-    $specification = [
-      'fields' => [
-        'id' => [
-          'type' => 'serial',
-          'not null' => TRUE,
-          'description' => 'Primary Key: Unique ID.',
-        ],
-        'json' => [
-          'type' => 'json',
-          'description' => 'A JSON field',
-        ],
-      ],
-      'indexes' => [
-        'json_column_index' => new Index(
-          ['json'],
-          [
-            'pgsql' => [
-              'type' => IndexType::GIN,
-            ],
-          ]
-        ),
-      ],
-      'primary key' => ['id'],
-    ];
-    // $table_name = 'index_with_object';
-    $this->markTestSkipped('GIN indexes only support tsvector, array and jsonb columns. This test may be enabled after https://www.drupal.org/project/drupal/issues/3343634 lands and JSON data storage is supported.');
-    // $this->schema->createTable($table_name, $specification);
-    // $this->assertIndexOnColumns($table_name, ['json']);
-    // $introspect_index_schema = new \ReflectionMethod(get_class($this->schema), 'introspectIndexSchema');
-    // $index_schema = $introspect_index_schema->invoke($this->schema, 'index_with_object');
-    // $this->assertCount(1, $index_schema['index_definitions']);
-    // $this->assertStringContainsString('USING gin', current($index_schema['index_definitions']));
-    // $this->schema->dropIndex('index_with_object', 'text_column_index');
-    // $index_schema = $introspect_index_schema->invoke($this->schema, 'index_with_object');
-    // $this->assertEmpty($index_schema['indexes']);
+  public function testGinGistIndexCrud(string $index_type, array $specification): void {
+    $table_name = 'index_with_object';
+    $this->schema->createTable($table_name, $specification);
+    $this->assertIndexOnColumns($table_name, ['text']);
+    $introspect_index_schema = new \ReflectionMethod(get_class($this->schema), 'introspectIndexSchema');
+    $index_schema = $introspect_index_schema->invoke($this->schema, 'index_with_object');
+    $this->assertCount(1, $index_schema['index_definitions']);
+    $this->assertStringContainsString('USING ' . $index_type, current($index_schema['index_definitions']));
+    $this->schema->dropIndex('index_with_object', 'text_column_index');
+    $index_schema = $introspect_index_schema->invoke($this->schema, 'index_with_object');
+    $this->assertEmpty($index_schema['indexes']);
+    // Test adding an index via ::addIndex().
+    $this->schema->addIndex(
+      'index_with_object',
+      'text_column_index_2',
+      new Index(
+        ['text'],
+        [
+          'pgsql' => $specification['indexes']['text_column_index']->getDriverConfig('pgsql'),
+        ]
+      ),
+      array_filter($specification, fn($k) => $k !== 'indexes', ARRAY_FILTER_USE_KEY),
+    );
+    $index_schema = $introspect_index_schema->invoke($this->schema, 'index_with_object');
+    $this->assertCount(1, $index_schema['index_definitions']);
+    $this->assertStringContainsString('USING ' . $index_type, current($index_schema['index_definitions']));
   }
 
   /**
@@ -555,7 +552,7 @@ class SchemaTest extends DriverSpecificSchemaTestBase {
           [['text', 10]],
           [
             'pgsql' => [
-              'type' => IndexType::GIST,
+              'type' => IndexType::Gist,
               'operator' => 'gist_trgm_ops',
             ],
           ]
@@ -589,7 +586,7 @@ class SchemaTest extends DriverSpecificSchemaTestBase {
           ['id', 'text'],
           [
             'pgsql' => [
-              'type' => IndexType::GIST,
+              'type' => IndexType::Gist,
               'operator' => 'gist_trgm_ops',
             ],
           ]

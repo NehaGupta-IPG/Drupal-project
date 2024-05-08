@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Drupal\Core\Database\Schema;
 
 /**
- * Class for Schema API index specifications containing driver config.
+ * Class for Schema API index specifications containing db-specific config.
  */
 final class Index extends \ArrayObject {
 
@@ -15,7 +15,9 @@ final class Index extends \ArrayObject {
    * @param array $fields
    *   Array of field specifications for the index.
    * @param array $config
-   *   Array of db-driver specific config, keyed by driver module name.
+   *   Array of db-specific config, keyed by base driver module name.
+   *   (The base driver being e.g. pgsql, even if the site is running a
+   *   contributed driver that extends the base driver's functionality.)
    *   Acceptable keys/values for the configuration are determined by the
    *   module(s) configured.
    */
@@ -24,10 +26,10 @@ final class Index extends \ArrayObject {
   }
 
   /**
-   * Getter for driver configuration.
+   * Getter for db-specific configuration.
    *
    * @param string $driver
-   *   Driver module name.
+   *   Base driver module name.
    *
    * @return array
    *   Configuration; if not set, will return an empty array.
