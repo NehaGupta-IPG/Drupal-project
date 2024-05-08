@@ -65,4 +65,17 @@ class EntityViewModeValidationTest extends ConfigEntityValidationTestBase {
     ];
   }
 
+  /**
+   * Tests that the entity ID's length is validated if it is a machine name.
+   *
+   * @param string $prefix
+   *   Prefix for machine name.
+   */
+  public function testMachineNameLength(string $prefix = ''): void {
+    // Machine name(id) of entity view mode is of type
+    // 'entity_type.view_mode_type'.
+    $string = 'test.';
+    parent::testMachineNameLength($string);
+  }
+
 }
