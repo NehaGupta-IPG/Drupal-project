@@ -376,7 +376,7 @@ class ManyToOneHelper {
       $field = $this->handler->realField;
       $clause = $operator == 'or' ? $this->handler->query->getConnection()->condition('OR') : $this->handler->query->getConnection()->condition('AND');
       foreach ($this->handler->tableAliases as $value => $alias) {
-        $clause->condition("$alias.$field", $value);
+        $clause->condition((!empty($alias) ? $alias . '.' : '') . "$field", $value);
       }
 
       // Implode on either AND or OR.
