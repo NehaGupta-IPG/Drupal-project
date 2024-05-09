@@ -527,7 +527,7 @@ class SchemaTest extends DriverSpecificSchemaTestBase {
       new Index(
         ['text'],
         [
-          'pgsql' => $specification['indexes']['text_column_index']->getDriverConfig('pgsql'),
+          'pgsql' => $specification['indexes']['text_column_index']->getDatabaseConfig('pgsql'),
         ]
       ),
       array_filter($specification, fn($k) => $k !== 'indexes', ARRAY_FILTER_USE_KEY),
