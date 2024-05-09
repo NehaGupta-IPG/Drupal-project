@@ -150,19 +150,22 @@ class ImageItemTest extends FieldKernelTestBase {
     $this->assertEquals($image->getHeight(), $entity->image_test->height);
     $this->assertEquals($new_alt, $entity->image_test->alt);
 
-    // Check that the image item can be set to the referenced file directly,
-    // both as a value, as well as an array with entity or target id and that
-    // the existing width and height is not lost.
+    // Check that the image width and height are not lost when setting the
+    // image item to a referenced file directly.
     $entity->image_test = $this->image;
     $this->assertEquals($this->image->id(), $entity->image_test->target_id);
     $this->assertEquals($image->getWidth(), $entity->image_test->width);
     $this->assertEquals($image->getHeight(), $entity->image_test->height);
 
+    // Check that the image width and height are not lost when setting the
+    // image item to an array with the 'entity' key.
     $entity->image_test = ['entity' => $this->image];
     $this->assertEquals($this->image->id(), $entity->image_test->target_id);
     $this->assertEquals($image->getWidth(), $entity->image_test->width);
     $this->assertEquals($image->getHeight(), $entity->image_test->height);
 
+    // Check that the image width and height are not lost when setting the
+    // image item to an array with the 'target_id' key.
     $entity->image_test = ['target_id' => $this->image->id()];
     $this->assertEquals($this->image->id(), $entity->image_test->target_id);
     $this->assertEquals($image->getWidth(), $entity->image_test->width);
@@ -173,7 +176,8 @@ class ImageItemTest extends FieldKernelTestBase {
     $entity = EntityTest::create(['name' => $this->randomMachineName()]);
     $entity->save();
 
-    // Set a different image as array, width and height does get reset.
+    // Check that the image width and height are not lost when setting a
+    // different image as an array with the 'target_id'.
     $new_image = File::create([
       'uri' => 'public://example.jpg',
     ]);
