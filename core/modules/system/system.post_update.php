@@ -6,6 +6,7 @@
  */
 
 use Drupal\Core\Config\Entity\ConfigEntityUpdater;
+use Drupal\Core\Entity\Entity\EntityViewMode;
 use Drupal\Core\Entity\EntityFormModeInterface;
 use Drupal\views\ViewEntityInterface;
 use Drupal\views\ViewsConfigUpdater;
@@ -147,4 +148,20 @@ function system_post_update_delete_rss_config(array &$sandbox): void {
   if (!isset($sandbox['#finished']) || $sandbox['#finished'] >= 1) {
     \Drupal::configFactory()->getEditable('system.rss')->delete();
   }
+}
+
+/**
+ * Updates all entity_view_mode configuration entities to set description from empty string to null
+ */
+function system_post_update_convert_empty_string_entity_view_modes_to_null(array &$sandbox): void {
+  \Drupal::classResolver(ConfigEntityUpdater::class)
+    ->update($sandbox, 'entity_view_mode', function (EntityViewMode $view_mode): bool {
+      // Entity view mode's `description` field must be stored as NULL at the
+      // config level if they are empty.
+      if (trim($view_mode->getDescription()) === '') {
+        $view_mode->set('description', NULL);
+      }
+      return TRUE;
+    });
+
 }
