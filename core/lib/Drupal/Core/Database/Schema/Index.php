@@ -15,11 +15,10 @@ final class Index extends \ArrayObject {
    * @param array $fields
    *   Array of field specifications for the index.
    * @param array $config
-   *   Array of db-specific config, keyed by base driver module name.
-   *   (The base driver being e.g. pgsql, even if the site is running a
-   *   contributed driver that extends the base driver's functionality.)
-   *   Acceptable keys/values for the configuration are determined by the
-   *   module(s) configured.
+   *   Array of db-specific config, keyed by database type. Acceptable
+   *   keys/values for the configuration are determined by the database driver.
+   *
+   * @see \Drupal\Core\Database\Connection::databaseType()
    */
   public function __construct(array $fields, protected array $config) {
     parent::__construct($fields);
@@ -28,14 +27,14 @@ final class Index extends \ArrayObject {
   /**
    * Getter for db-specific configuration.
    *
-   * @param string $driver
-   *   Base driver module name.
+   * @param string $database_type
+   *   Database type.
    *
    * @return array
    *   Configuration; if not set, will return an empty array.
    */
-  public function getDriverConfig(string $driver): array {
-    return $this->config[$driver] ?? [];
+  public function getDatabaseConfig(string $database_type): array {
+    return $this->config[$database_type] ?? [];
   }
 
 }
