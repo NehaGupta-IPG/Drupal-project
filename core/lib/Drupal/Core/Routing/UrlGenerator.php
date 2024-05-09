@@ -370,6 +370,10 @@ class UrlGenerator implements UrlGeneratorInterface {
 
     $base_url = $this->context->getBaseUrl();
 
+    if ($base_url === '/index.php') {
+      $base_url = '';
+    }
+
     $absolute = !empty($options['absolute']);
     if (!$absolute || !$host = $this->context->getHost()) {
       $url = $base_url . $path . $query . $fragment;
