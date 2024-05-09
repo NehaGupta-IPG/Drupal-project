@@ -8,7 +8,6 @@ use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Form\WorkspaceSafeFormInterface;
 use Drupal\Core\Path\CurrentPathStack;
 use Drupal\Core\Render\Element\Checkboxes;
-use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Url;
 use Drupal\views\ExposedFormCache;
 use Drupal\views\Views;
@@ -37,26 +36,16 @@ class ViewsExposedForm extends FormBase implements WorkspaceSafeFormInterface {
   protected $currentPathStack;
 
   /**
-   * The current route match.
-   *
-   * @var \Drupal\Core\Routing\RouteMatchInterface
-   */
-  protected $routeMatch;
-
-  /**
    * Constructs a new ViewsExposedForm.
    *
    * @param \Drupal\views\ExposedFormCache $exposed_form_cache
    *   The exposed form cache.
    * @param \Drupal\Core\Path\CurrentPathStack $current_path_stack
    *   The current path stack.
-   * @param \Drupal\Core\Routing\RouteMatchInterface $routeMatch
-   *   The current route match.
    */
-  public function __construct(ExposedFormCache $exposed_form_cache, CurrentPathStack $current_path_stack, RouteMatchInterface $routeMatch) {
+  public function __construct(ExposedFormCache $exposed_form_cache, CurrentPathStack $current_path_stack) {
     $this->exposedFormCache = $exposed_form_cache;
     $this->currentPathStack = $current_path_stack;
-    $this->routeMatch = $routeMatch;
   }
 
   /**
@@ -66,7 +55,6 @@ class ViewsExposedForm extends FormBase implements WorkspaceSafeFormInterface {
     return new static(
       $container->get('views.exposed_form_cache'),
       $container->get('path.current'),
-      $container->get('current_route_match')
     );
   }
 
@@ -90,8 +78,8 @@ class ViewsExposedForm extends FormBase implements WorkspaceSafeFormInterface {
     // Existing arguments need to be passed as this exposed form might
     // be used in a block. Without this contextual views arguments
     // will be lost.
-    if ($this->routeMatch->getRouteObject() && $this->routeMatch->getRouteName() !== 'views.ajax' && empty($view->args)) {
-      $args = Views::buildArgs($this->routeMatch);
+    if ($this->getRouteMatch()->getRouteObject() && $this->getRouteMatch()->getRouteName() !== 'views.ajax' && empty($view->args)) {
+      $args = Views::buildArgs($this->getRouteMatch());
       $view->setArguments($args);
     }
 
