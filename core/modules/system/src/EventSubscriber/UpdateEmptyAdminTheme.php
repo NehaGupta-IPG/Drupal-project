@@ -51,9 +51,9 @@ class UpdateEmptyAdminTheme implements EventSubscriberInterface {
     if ($saved_config->getName() === 'system.theme') {
       if ($saved_config->get('admin') === '') {
         $saved_config->set('admin', NULL)->save(TRUE);
-      }
-      if (!str_contains($this->requestStack->getMainRequest()->getBaseUrl(), 'update.php')) {
-        @trigger_error("Setting empty 'system.theme admin' key is deprecated in drupal:11.0.0-alpha1 and would not be allowed in drupal:11.0.0-alpha2. See https://www.drupal.org/node/3441503", E_USER_DEPRECATED);
+        if (!str_contains($this->requestStack->getMainRequest()->getBaseUrl(), 'update.php')) {
+          @trigger_error("Setting empty 'system.theme admin' key is deprecated in drupal:11.0.0-alpha1 and will not be allowed in drupal:11.0.0-alpha2. See https://www.drupal.org/node/3441503", E_USER_DEPRECATED);
+        }
       }
     }
   }

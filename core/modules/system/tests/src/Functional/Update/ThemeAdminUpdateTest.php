@@ -10,7 +10,7 @@ use Drupal\FunctionalTests\Update\UpdatePathTestBase;
  * @group system
  * @group Update
  * @group legacy
- * @covers system_post_update_set_theme_admin_to_null
+ * @covers \Drupal\system\EventSubscriber\UpdateEmptyAdminTheme
  */
 class ThemeAdminUpdateTest extends UpdatePathTestBase {
 
@@ -27,7 +27,7 @@ class ThemeAdminUpdateTest extends UpdatePathTestBase {
    * Tests the upgrade path for updating empty admin to NULL.
    */
   public function testLangcodesAddedToSimpleConfig(): void {
-    $this->expectDeprecation("Setting empty 'system.theme admin' key is deprecated in drupal:11.0.0-alpha1 and would not be allowed in drupal:11.0.0-alpha2. See https://www.drupal.org/node/3441503");
+    $this->expectDeprecation("Setting empty 'system.theme admin' key is deprecated in drupal:11.0.0-alpha1 and will not be allowed in drupal:11.0.0-alpha2. See https://www.drupal.org/node/3441503");
     $this->config('system.theme')->set('admin', '')->save();
     // Run Updates and no errors should occur.
     $this->runUpdates();
