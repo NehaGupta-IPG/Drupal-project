@@ -1043,7 +1043,7 @@ EOD;
   protected function _createIndexSql(string $table, string $name, iterable $fields): string {
     $query = 'CREATE INDEX ' . $this->ensureIdentifiersLength($table, $name, 'idx') . ' ON {' . $table . '} ';
     $operator = '';
-    if ($fields instanceof Index && ($config = $fields->getDriverConfig('pgsql')) && !empty($config['type']) && $config['type'] instanceof IndexType) {
+    if ($fields instanceof Index && ($config = $fields->getDatabaseConfig('pgsql')) && !empty($config['type']) && $config['type'] instanceof IndexType) {
       // Both GIN and GIST indexes may cover only one column.
       if (count($fields) > 1) {
         throw new \RuntimeException(sprintf('Postgres indexes of %s type in Drupal are currently limited to single columns. Multi-column indexes are generally discouraged, anyway. Consider a single-column index. See https://www.postgresql.org/docs/current/indexes-multicolumn.html', $config['type']->value));
