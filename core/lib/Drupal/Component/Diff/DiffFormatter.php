@@ -18,7 +18,7 @@ class DiffFormatter {
   /**
    * Should a block header be shown?
    */
-  public $showHeader = TRUE;
+  public bool $showHeader = TRUE;
 
   /**
    * Number of leading context "lines" to preserve.
@@ -26,7 +26,7 @@ class DiffFormatter {
    * This should be left at zero for this class, but subclasses
    * may want to set this to other values.
    */
-  public $leadingContextLines = 0;
+  public int $leadingContextLines = 0;
 
   /**
    * Number of trailing context "lines" to preserve.
@@ -34,14 +34,14 @@ class DiffFormatter {
    * This should be left at zero for this class, but subclasses
    * may want to set this to other values.
    */
-  public $trailingContextLines = 0;
+  public int $trailingContextLines = 0;
 
   /**
    * The line stats.
    *
    * @var array
    */
-  protected $lineStats = [
+  protected array $lineStats = [
     'counter' => ['x' => 0, 'y' => 0],
     'offset' => ['x' => 0, 'y' => 0],
   ];
