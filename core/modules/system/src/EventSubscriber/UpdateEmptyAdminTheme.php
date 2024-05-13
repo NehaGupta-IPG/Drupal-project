@@ -12,33 +12,9 @@ use Symfony\Component\HttpFoundation\RequestStack;
  * Updates system.theme:admin config if it's still at the default.
  */
 class UpdateEmptyAdminTheme implements EventSubscriberInterface {
-
-  /**
-   * The config.
-   *
-   * @var \Drupal\Core\Config\ConfigFactoryInterface
-   */
-  protected ConfigFactoryInterface $configFactory;
-
-  /**
-   * The request stack object.
-   *
-   * @var \Symfony\Component\HttpFoundation\RequestStack
-   */
-  protected RequestStack $requestStack;
-
-  /**
-   * Constructs a UpdateEmptyAdminTheme object.
-   *
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
-   *   The config factory.
-   * @param \Symfony\Component\HttpFoundation\RequestStack $request_stack
-   *   The request stack service.
-   */
-  public function __construct(ConfigFactoryInterface $config_factory, RequestStack $request_stack) {
-    $this->configFactory = $config_factory;
-    $this->requestStack = $request_stack;
-  }
+public function __construct(
+    protected readonly RequestStack $requestStack,
+  ) {}
 
   /**
    * Updates system.theme:admin config if it's still at the default.
@@ -46,16 +22,14 @@ class UpdateEmptyAdminTheme implements EventSubscriberInterface {
    * @param \Drupal\Core\Config\ConfigCrudEvent $event
    *   The Event to process.
    */
-  public function onSave(ConfigCrudEvent $event) {
+  public function onSave(ConfigCrudEvent $event): void {
     $saved_config = $event->getConfig();
-    if ($saved_config->getName() === 'system.theme') {
-      if ($saved_config->get('admin') === '') {
+     if ($saved_config->getName() === 'system.theme' && $saved_config->get('admin') === '') {
         $saved_config->set('admin', NULL)->save(TRUE);
         if (!str_contains($this->requestStack->getMainRequest()->getBaseUrl(), 'update.php')) {
           @trigger_error("Setting empty 'system.theme admin' key is deprecated in drupal:11.0.0-alpha1 and will not be allowed in drupal:11.0.0-alpha2. See https://www.drupal.org/node/3441503", E_USER_DEPRECATED);
         }
-      }
-    }
+     }
   }
 
   /**
