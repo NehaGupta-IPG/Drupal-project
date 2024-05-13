@@ -23,6 +23,9 @@ field.value.daterange:
     default_end_date:
       type: string
       label: 'Default end date value'
+    default_all_day:
+      type: string
+      label: 'Default all-day value'
 
 field.formatter.settings.daterange_default:
   type: field.formatter.settings.datetime_default

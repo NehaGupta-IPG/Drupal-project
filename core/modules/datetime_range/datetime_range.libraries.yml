@@ -1,0 +1,6 @@
+datetime_range:
+  js:
+    js/datetime_range.js: {}
+  dependencies:
+   - core/drupal
+   - core/jquery

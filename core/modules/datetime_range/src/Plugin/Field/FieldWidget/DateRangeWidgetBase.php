@@ -30,6 +30,18 @@ class DateRangeWidgetBase extends DateTimeWidgetBase {
       '#title' => $this->t('End date'),
     ] + $element['value'];
 
+     
+    $element['all_day'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('All day'),
+      '#description' => $this->t('Check this option for all day events.'),
+      '#access' => (bool) $this->fieldDefinition->getSetting('allow_all_day'),
+      '#attributes' => ['class' => ['check_group']],
+      '#attached' => [
+        'library' => ['datetime_range/datetime_range'],
+      ],
+    ];
+
     if ($items[$delta]->start_date) {
       /** @var \Drupal\Core\Datetime\DrupalDateTime $start_date */
       $start_date = $items[$delta]->start_date;
@@ -40,6 +52,16 @@ class DateRangeWidgetBase extends DateTimeWidgetBase {
       /** @var \Drupal\Core\Datetime\DrupalDateTime $end_date */
       $end_date = $items[$delta]->end_date;
       $element['end_value']['#default_value'] = $this->createDefaultValue($end_date, $element['end_value']['#date_timezone']);
+    }
+
+    if ($items[$delta]->all_day) {
+        $element['all_day']['#default_value'] = $items[$delta]->all_day;
+    }
+    else {
+      $default_values = $this->fieldDefinition->getDefaultValueLiteral();
+      if (!empty($default_values[0]['default_all_day'])) {
+        $element['all_day']['#default_value'] = $default_values[0]['default_all_day'];
+      }
     }
 
     return $element;
@@ -69,32 +91,54 @@ class DateRangeWidgetBase extends DateTimeWidgetBase {
         /** @var \Drupal\Core\Datetime\DrupalDateTime $start_date */
         $start_date = $item['value'];
 
-        if ($datetime_type === DateRangeItem::DATETIME_TYPE_ALLDAY) {
-          // All day fields start at midnight on the starting date, but are
-          // stored like datetime fields, so we need to adjust the time.
-          // This function is called twice, so to prevent a double conversion
-          // we need to explicitly set the timezone.
-          $start_date->setTimeZone($user_timezone)->setTime(0, 0, 0);
+        if ($datetime_type === DateRangeItem::DATETIME_TYPE_DATE && isset($item['all_day'])) {
+          unset($item['all_day']);
         }
 
-        // Adjust the date for storage.
-        $item['value'] = $start_date->setTimezone($storage_timezone)->format($storage_format);
+        if (empty($item['all_day'])) {
+          if ($datetime_type === DateRangeItem::DATETIME_TYPE_ALLDAY) {
+            // All day fields start at midnight on the starting date, but are
+            // stored like datetime fields, so we need to adjust the time.
+            // This function is called twice, so to prevent a double conversion
+            // we need to explicitly set the timezone.
+            $start_date->setTimeZone($user_timezone)->setTime(0, 0, 0);
+          }
+
+          // Adjust the date for storage.
+          $item['value'] = $start_date->setTimezone($storage_timezone)->format($storage_format);
+        }
+        else {
+          // For all day events, we store hour only because of storage format
+          // (it requires hour to be present). But date should be stored as
+          // it was chosen by the user.
+          $start_date->setTimeZone($user_timezone)->setTime(0, 0, 0);
+          $item['value'] = $start_date->setTimezone($user_timezone)->format($storage_format);
+        }
       }
 
       if (!empty($item['end_value']) && $item['end_value'] instanceof DrupalDateTime) {
         /** @var \Drupal\Core\Datetime\DrupalDateTime $end_date */
         $end_date = $item['end_value'];
 
-        if ($datetime_type === DateRangeItem::DATETIME_TYPE_ALLDAY) {
-          // All day fields start at midnight on the starting date, but are
-          // stored like datetime fields, so we need to adjust the time.
-          // This function is called twice, so to prevent a double conversion
-          // we need to explicitly set the timezone.
-          $end_date->setTimeZone($user_timezone)->setTime(23, 59, 59);
-        }
+        if (empty($item['all_day'])) {
+          if ($datetime_type === DateRangeItem::DATETIME_TYPE_ALLDAY) {
+            // All day fields start at midnight on the starting date, but are
+            // stored like datetime fields, so we need to adjust the time.
+            // This function is called twice, so to prevent a double conversion
+            // we need to explicitly set the timezone.
+            $end_date->setTimeZone($user_timezone)->setTime(23, 59, 59);
+          }
 
-        // Adjust the date for storage.
-        $item['end_value'] = $end_date->setTimezone($storage_timezone)->format($storage_format);
+          // Adjust the date for storage.
+          $item['end_value'] = $end_date->setTimezone($storage_timezone)->format($storage_format);
+        }
+        else {
+          // For all day events, we store hour only because of storage format
+          // (it requires hour to be present). But date should be stored as
+          // it was chosen by the user.
+          $end_date->setTimeZone($user_timezone)->setTime(0, 0, 0);
+          $item['end_value'] = $end_date->setTimezone($user_timezone)->format($storage_format);
+        }
       }
     }
 

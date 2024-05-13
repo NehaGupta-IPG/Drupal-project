@@ -61,6 +61,9 @@ class DateRangeItem extends DateTimeItem {
       ->setClass(DateTimeComputed::class)
       ->setSetting('date source', 'end_value');
 
+    $properties['all_day'] = DataDefinition::create('integer')
+      ->setLabel(t('All day'));
+
     return $properties;
   }
 
@@ -77,6 +80,13 @@ class DateRangeItem extends DateTimeItem {
     ] + $schema['columns']['value'];
 
     $schema['indexes']['end_value'] = ['end_value'];
+    $schema['columns']['all_day'] = [
+      'description' => 'Flag indicating all day dates.',
+      'type' => 'int',
+      'size' => 'tiny',
+      'unsigned' => TRUE,
+      'not null' => FALSE,
+    ];
 
     return $schema;
   }
@@ -90,6 +100,35 @@ class DateRangeItem extends DateTimeItem {
     $element['datetime_type']['#options'][static::DATETIME_TYPE_ALLDAY] = $this->t('All Day');
 
     return $element;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function defaultFieldSettings() {
+    return [
+      'allow_all_day' => 0,
+    ] + parent::defaultFieldSettings();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function fieldSettingsForm(array $form, FormStateInterface $form_state) {
+    $elements = parent::fieldSettingsForm($form, $form_state);
+
+    $date_type = $this->getFieldDefinition()->getFieldStorageDefinition()->getSetting('datetime_type');
+    if ($date_type === DateRangeItem::DATETIME_TYPE_DATETIME) {
+      $elements['allow_all_day'] = [
+        '#type' => 'checkbox',
+        '#title' => $this->t('Enable all day option'),
+        '#description' => $this->t('Check this box if the user should be able to skip time and set all day dates.'),
+        '#default_value' => $this->getSetting('allow_all_day'),
+        '#attributes' => ['class' => ['check_group']],
+      ];
+    }
+
+    return $elements;
   }
 
   /**
@@ -110,6 +149,9 @@ class DateRangeItem extends DateTimeItem {
       $values['value'] = gmdate(DateTimeItemInterface::DATE_STORAGE_FORMAT, $start);
       $values['end_value'] = gmdate(DateTimeItemInterface::DATE_STORAGE_FORMAT, $end);
     }
+
+    $values['allow_all_day'] = 0;
+
     return $values;
   }
 
