@@ -413,11 +413,13 @@ drupal.dialog.ajax:
 drupal.displace:
   version: VERSION
   js:
+    misc/displace-deprecation.js: {}
     misc/displace.js: {}
   dependencies:
     - core/jquery
     - core/drupal
     - core/drupal.debounce
+    - core/once
 
 drupal.dropbutton:
   version: VERSION

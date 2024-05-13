@@ -132,16 +132,30 @@
       $(window)
         .on('resize.dialogResize scroll.dialogResize', eventData, autoResize)
         .trigger('resize.dialogResize');
-      $(document).on(
-        'drupalViewportOffsetChange.dialogResize',
-        eventData,
-        autoResize,
+
+      const viewportResizeListener = () => {
+        autoResize({ data: eventData });
+      };
+
+      document.addEventListener(
+        'drupalViewportOffsetChange',
+        viewportResizeListener,
       );
+
+      document.addEventListener('dialogDisableViewportResizeListener', () => {
+        document.removeEventListener(
+          'drupalViewportOffsetChange',
+          viewportResizeListener,
+        );
+      });
     }
   });
 
   window.addEventListener('dialog:beforeclose', () => {
     $(window).off('.dialogResize');
     $(document).off('.dialogResize');
+    document.dispatchEvent(
+      new CustomEvent('dialogDisableViewportResizeListener'),
+    );
   });
 })(jQuery, Drupal, drupalSettings, Drupal.debounce, Drupal.displace);

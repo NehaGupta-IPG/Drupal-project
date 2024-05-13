@@ -6,6 +6,13 @@
  * toolbar that can potentially displace the positioning of other elements.
  */
 
+class DrupalViewportOffsetChangeEvent extends Event {
+  constructor(offsets) {
+    super('drupalViewportOffsetChange');
+    this.offsets = offsets;
+  }
+}
+
 /**
  * @typedef {object} Drupal~displaceOffset
  *
@@ -214,7 +221,7 @@
     });
 
     if (broadcast) {
-      $(document).trigger('drupalViewportOffsetChange', offsets);
+      document.dispatchEvent(new DrupalViewportOffsetChangeEvent(offsets));
     }
     return offsets;
   }
