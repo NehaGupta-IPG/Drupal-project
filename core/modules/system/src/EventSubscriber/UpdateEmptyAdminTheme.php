@@ -4,17 +4,23 @@ namespace Drupal\system\EventSubscriber;
 
 use Drupal\Core\Config\ConfigCrudEvent;
 use Drupal\Core\Config\ConfigEvents;
-use Drupal\Core\Config\ConfigFactoryInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
- * Updates system.theme:admin config if it's still at the default.
+ * Updates system.theme:admin config if it's still at the default empty string.
  */
 class UpdateEmptyAdminTheme implements EventSubscriberInterface {
-public function __construct(
-    protected readonly RequestStack $requestStack,
-  ) {}
+
+  /**
+   * Constructs a new ConfigSubscriber object.
+   *
+   * @param \Symfony\Component\HttpFoundation\RequestStack $requestStack
+   *   The request stack service.
+   */
+  public function __construct(protected readonly RequestStack $requestStack) {
+
+  }
 
   /**
    * Updates system.theme:admin config if it's still at the default.
@@ -24,12 +30,12 @@ public function __construct(
    */
   public function onSave(ConfigCrudEvent $event): void {
     $saved_config = $event->getConfig();
-     if ($saved_config->getName() === 'system.theme' && $saved_config->get('admin') === '') {
-        $saved_config->set('admin', NULL)->save(TRUE);
-        if (!str_contains($this->requestStack->getMainRequest()->getBaseUrl(), 'update.php')) {
-          @trigger_error("Setting empty 'system.theme admin' key is deprecated in drupal:11.0.0-alpha1 and will not be allowed in drupal:11.0.0-alpha2. See https://www.drupal.org/node/3441503", E_USER_DEPRECATED);
-        }
-     }
+    if ($saved_config->getName() === 'system.theme' && $saved_config->get('admin') === '') {
+      $saved_config->set('admin', NULL)->save(TRUE);
+      if (!str_contains($this->requestStack->getMainRequest()->getBaseUrl(), 'update.php')) {
+        @trigger_error("Setting empty 'system.theme admin' key is deprecated in drupal:11.0.0-alpha1 and will not be allowed in drupal:11.0.0-alpha2. See https://www.drupal.org/node/3441503", E_USER_DEPRECATED);
+      }
+    }
   }
 
   /**
