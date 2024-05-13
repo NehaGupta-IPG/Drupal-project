@@ -396,4 +396,11 @@ class Block extends DisplayPluginBase {
     }
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function getLinkDisplay() {
+    return $this->getOption('link_display') ?: NULL;
+  }
+
 }

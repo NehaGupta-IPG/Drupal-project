@@ -36,4 +36,11 @@ class Embed extends DisplayPluginBase {
     return $build;
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function getLinkDisplay() {
+    return $this->getOption('link_display') ?: NULL;
+  }
+
 }
