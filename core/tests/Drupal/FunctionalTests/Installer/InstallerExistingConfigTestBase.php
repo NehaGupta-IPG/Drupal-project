@@ -158,7 +158,8 @@ abstract class InstallerExistingConfigTestBase extends InstallerTestBase {
       'create' => [],
       // The system.mail is changed configuration because the test system
       // changes it to ensure that mails are not sent.
-      'update' => ['system.mail'],
+      // Empty admin theme is updated to null under system theme config.
+      'update' => ['system.mail', 'system.theme'],
       'delete' => [],
       'rename' => [],
     ];
