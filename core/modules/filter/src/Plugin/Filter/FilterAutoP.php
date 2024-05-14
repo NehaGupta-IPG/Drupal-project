@@ -100,9 +100,15 @@ class FilterAutoP extends FilterBase {
         $chunk = preg_replace('!<p>\s*(</?' . $block . '[^>]*>)!', "$1", $chunk);
         $chunk = preg_replace('!(</?' . $block . '[^>]*>)\s*</p>!', "$1", $chunk);
         // Make line breaks.
-        $chunk = preg_replace('|(?<!<br>)\s*\n|', "<br>\n", $chunk);
-        $chunk = preg_replace('!(</?' . $block . '[^>]*>)\s*<br>!', "$1", $chunk);
-        $chunk = preg_replace('!<br>(\s*</?(?:p|li|div|dl|dd|dt|th|pre|td|ul|ol)>)!', '$1', $chunk);
+        $chunk = preg_replace_callback('|(<br[^>]*>)?\s*\n|', function ($matches) {
+          if (isset($matches[1])) {
+            return $matches[1] . "\n";
+          }
+
+          return "<br>\n";
+        }, $chunk);
+        $chunk = preg_replace('!(</?' . $block . '[^>]*>)\s*<br[^>]*>!', "$1", $chunk);
+        $chunk = preg_replace('!<br[^>]*>(\s*</?(?:p|li|div|dl|dd|dt|th|pre|td|ul|ol)>)!', '$1', $chunk);
         $chunk = preg_replace('/&([^#])(?![A-Za-z0-9]{1,8};)/', '&amp;$1', $chunk);
       }
       $output .= $chunk;
