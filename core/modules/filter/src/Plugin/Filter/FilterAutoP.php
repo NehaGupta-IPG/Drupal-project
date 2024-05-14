@@ -101,10 +101,11 @@ class FilterAutoP extends FilterBase {
         $chunk = preg_replace('!(</?' . $block . '[^>]*>)\s*</p>!', "$1", $chunk);
         // Make line breaks.
         $chunk = preg_replace_callback('|(<br[^>]*>)?\s*\n|', function ($matches) {
+          // Preserve existing break tags with attributes.
           if (isset($matches[1])) {
             return $matches[1] . "\n";
           }
-
+          // Otherwise create new break tag.
           return "<br>\n";
         }, $chunk);
         $chunk = preg_replace('!(</?' . $block . '[^>]*>)\s*<br[^>]*>!', "$1", $chunk);
