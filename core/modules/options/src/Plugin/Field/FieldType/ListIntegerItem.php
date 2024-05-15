@@ -31,6 +31,7 @@ class ListIntegerItem extends ListItemBase {
    * {@inheritdoc}
    */
   public static function propertyDefinitions(FieldStorageDefinitionInterface $field_definition) {
+    $properties = parent::propertyDefinitions($field_definition);
     $properties['value'] = DataDefinition::create('integer')
       ->setLabel(new TranslatableMarkup('Integer value'))
       ->setRequired(TRUE);

@@ -32,6 +32,7 @@ class ListFloatItem extends ListItemBase {
    * {@inheritdoc}
    */
   public static function propertyDefinitions(FieldStorageDefinitionInterface $field_definition) {
+    $properties = parent::propertyDefinitions($field_definition);
     $properties['value'] = DataDefinition::create('float')
       ->setLabel(new TranslatableMarkup('Float value'))
       ->setRequired(TRUE);
