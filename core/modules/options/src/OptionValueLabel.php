@@ -37,7 +37,6 @@ class OptionValueLabel extends TypedData {
     return $this->valueLabel;
   }
 
-
   /**
    * {@inheritdoc}
    */
