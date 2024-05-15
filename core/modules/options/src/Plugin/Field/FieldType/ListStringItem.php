@@ -33,13 +33,12 @@ class ListStringItem extends ListItemBase {
    * {@inheritdoc}
    */
   public static function propertyDefinitions(FieldStorageDefinitionInterface $field_definition) {
-    $properties = parent::propertyDefinitions($field_definition);
     $properties['value'] = DataDefinition::create('string')
       ->setLabel(new TranslatableMarkup('Text value'))
       ->addConstraint('Length', ['max' => 255])
       ->setRequired(TRUE);
 
-    return $properties;
+    return $properties + parent::propertyDefinitions($field_definition);
   }
 
   /**
