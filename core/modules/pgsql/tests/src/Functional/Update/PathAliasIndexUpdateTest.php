@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\pgsql\Functional\Update;
 
 use Drupal\Core\Database\Database;
