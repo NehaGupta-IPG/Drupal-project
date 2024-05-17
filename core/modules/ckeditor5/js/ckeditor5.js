@@ -699,11 +699,14 @@
   });
 
   // Respond to dialogs that are closed, removing the current save handler.
-  window.addEventListener('dialog:afterclose', (e, dialog, element, dialogSettings) => {
-    const options = dialogSettings.options || {};
-    const selector = options.selector || '#drupal-modal';
-    if (Drupal.ckeditor5.saveCallback.has(selector)) {
-      Drupal.ckeditor5.saveCallback.delete(selector);
-    }
-  });
+  window.addEventListener(
+    'dialog:afterclose',
+    (e, dialog, element, dialogSettings) => {
+      const options = dialogSettings.options || {};
+      const selector = options.selector || '#drupal-modal';
+      if (Drupal.ckeditor5.saveCallback.has(selector)) {
+        Drupal.ckeditor5.saveCallback.delete(selector);
+      }
+    },
+  );
 })(Drupal, Drupal.debounce, CKEditor5, jQuery, once);
