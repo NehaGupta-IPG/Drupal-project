@@ -120,6 +120,7 @@ class MediaLibraryUiBuilder {
     }
     else {
       return [
+        '#modal_selector' => '#modal-media-library',
         '#theme' => 'media_library_wrapper',
         '#attributes' => [
           'id' => 'media-library-wrapper',

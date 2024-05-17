@@ -19,6 +19,8 @@
    *   The server response from the ajax request.
    * @param {Array} response.values
    *   The values that were saved.
+   * @param {Array} response.selector
+   *   Selector for the dialog.
    * @param {number} [status]
    *   The status code from the ajax request.
    *
@@ -29,6 +31,9 @@
     response,
     status,
   ) {
-    $(window).trigger('editor:dialogsave', [response.values]);
+    $(window).trigger('editor:dialogsave', [
+      response.values,
+      response.selector,
+    ]);
   };
 })(jQuery, Drupal);

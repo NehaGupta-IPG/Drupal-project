@@ -96,7 +96,8 @@ class DrupalDialogEvent extends Event {
     }
 
     function closeDialog(value) {
-      domElement.dispatchEvent(new DrupalDialogEvent('beforeclose', dialog));
+      const settings = $element.dialog('instance');
+      domElement.dispatchEvent(new DrupalDialogEvent('beforeclose', dialog, settings));
 
       // Unlocks the body when the dialog closes.
       bodyScrollLock.clearBodyLocks();
@@ -105,7 +106,7 @@ class DrupalDialogEvent extends Event {
       dialog.returnValue = value;
       dialog.open = false;
 
-      domElement.dispatchEvent(new DrupalDialogEvent('afterclose', dialog));
+      domElement.dispatchEvent(new DrupalDialogEvent('afterclose', dialog, settings));
     }
 
     dialog.show = () => {

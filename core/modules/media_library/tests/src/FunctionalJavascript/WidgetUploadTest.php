@@ -763,4 +763,78 @@ class WidgetUploadTest extends MediaLibraryTestBase {
     $assert_session->fieldValueEquals('Alternative text', $filenames[0], $media_item_one);
   }
 
+  /**
+   * Tests if the widget is working correctly when opened from a modal.
+   */
+  public function testWidgetInModalContext() {
+    $page = $this->getSession()->getPage();
+
+    foreach ($this->getTestFiles('image') as $image) {
+      $extension = pathinfo($image->filename, PATHINFO_EXTENSION);
+      if ($extension === 'png') {
+        $png_image = $image;
+      }
+      elseif ($extension === 'jpg') {
+        $jpg_image = $image;
+      }
+    }
+
+    if (!isset($png_image) || !isset($jpg_image)) {
+      $this->fail('Expected test files not present.');
+    }
+
+    // Create a user that can create media for all media types.
+    $user = $this->drupalCreateUser([
+      'access administration pages',
+      'access content',
+      'create basic_page content',
+      'create media',
+      'view media',
+    ]);
+    $this->drupalLogin($user);
+    $this->drupalGet('/media-library-test-modal');
+    $assert_session = $this->assertSession();
+    $this->click('.modal-basic_page');
+    $assert_session->waitForElement('css', '.ui-dialog-content');
+
+    $file_storage = $this->container->get('entity_type.manager')->getStorage('file');
+    /** @var \Drupal\Core\File\FileSystemInterface $file_system */
+    $file_system = $this->container->get('file_system');
+
+    // Add to the twin media field.
+    // Add to the twin media field.
+    $this->openMediaLibraryForField('field_twin_media');
+
+    // Assert the upload form is now visible for default tab type_three.
+    $assert_session->elementExists('css', '.js-media-library-add-form');
+    $assert_session->fieldExists('Add files');
+
+    // Assert we can upload a file to the default tab type_three.
+    $assert_session->elementNotExists('css', '.js-media-library-add-form[data-input]');
+    $this->addMediaFileToField('Add files', $this->container->get('file_system')->realpath($png_image->uri));
+    $this->assertMediaAdded();
+    $assert_session->elementExists('css', '.js-media-library-add-form[data-input]');
+    // We do not have pre-selected items, so the container should not be added
+    // to the form.
+    $assert_session->pageTextNotContains('Additional selected media');
+    // Files are temporary until the form is saved.
+    $files = $file_storage->loadMultiple();
+    $file = array_pop($files);
+    $this->assertSame('public://type-three-dir', $file_system->dirname($file->getFileUri()));
+    $this->assertTrue($file->isTemporary());
+    // Assert the revision_log_message field is not shown.
+    $upload_form = $assert_session->elementExists('css', '.js-media-library-add-form');
+    $assert_session->fieldNotExists('Revision log message', $upload_form);
+    // Assert the name field contains the filename and the alt text is required.
+    $assert_session->fieldValueEquals('Name', $png_image->filename);
+    $page->fillField('Alternative text', $this->randomString());
+    $buttons = $this->assertElementExistsAfterWait('css', '.media-library-widget-modal .ui-dialog-buttonpane');
+
+    $buttons->pressButton('Save');
+    $this->waitForText('Insert selected');
+    $buttons->pressButton('Insert selected');
+    $assert_session->waitForElementVisible('css', '#field_twin_media-media-library-wrapper .js-media-library-selection .js-media-library-item');
+
+  }
+
 }
