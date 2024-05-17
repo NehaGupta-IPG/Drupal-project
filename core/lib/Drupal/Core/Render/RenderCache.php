@@ -46,7 +46,15 @@ class RenderCache implements RenderCacheInterface {
       if (!$this->isCacheableForCurrentHttpMethod($cache->tags)) {
         return FALSE;
       }
-      return $cache->data;
+      $elements = $cache->data;
+      assert(is_array($elements));
+      if ($cache->expire >= 0) {
+        $max_age = max($this->requestStack->getCurrentRequest()->server->get('REQUEST_TIME') - $cache->expire, 0);
+        CacheableMetadata::createFromRenderArray($elements)
+          ->mergeCacheMaxAge($max_age)
+          ->applyTo($elements);
+      }
+      return $elements;
     }
     return FALSE;
   }
@@ -75,6 +83,12 @@ class RenderCache implements RenderCacheInterface {
     foreach ($bin_map as $bin => $items) {
       foreach ($this->cacheFactory->get($bin)->getMultiple($items) as $item_key => $cache) {
         if ($this->isCacheableForCurrentHttpMethod($cache->tags)) {
+          if ($cache->expire >= 0) {
+            $max_age = max($cache->expire - $this->requestStack->getCurrentRequest()->server->get('REQUEST_TIME'), 0);
+            CacheableMetadata::createFromRenderArray($cache->data)
+              ->mergeCacheMaxAge($max_age)
+              ->applyTo($cache->data);
+          }
           $results[$item_key] = $cache->data;
         }
       }
