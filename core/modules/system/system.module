@@ -559,11 +559,8 @@ function template_preprocess_system_security_advisories_fetch_error_message(arra
 
 /**
  * Implements hook_ENTITY_TYPE_presave() for entity_view_mode entities.
- * @todo Get correct issue link to reference the change from '' to NULL.
  */
 function system_entity_view_mode_presave(EntityInterface $entity) {
-  // View modes `description` field must be stored as NULL at the config level if they are empty.
-  // @see ...
   if (trim($entity->getDescription()) === '') {
     $entity->set('description', NULL);
   }
