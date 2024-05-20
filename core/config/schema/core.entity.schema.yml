@@ -9,11 +9,12 @@ core.entity_view_mode.*.*:
     id:
       type: machine_name
       label: 'ID'
-      # View mode IDs can only contain lowercase letters, numbers, and underscores.
+      # View mode IDs can only contain lowercase letters, numbers, and underscores
+      # prefixed by entity type name this view mode is used for and a dot.
       # @see \Drupal\field_ui\Form\EntityDisplayModeFormBase::form()
       constraints:
         Regex:
-          pattern: '/^[a-z0-9_.]+/'
+          pattern: '/^[a-z0-9_]+\.[a-z0-9_]+$/'
           message: "The %value machine name is not valid."
     label:
       type: required_label

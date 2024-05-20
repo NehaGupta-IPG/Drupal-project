@@ -21,7 +21,7 @@ class EntityViewModeValidationTest extends ConfigEntityValidationTestBase {
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['user'];
+  protected static $modules = ['user', 'entity_test'];
 
   /**
    * {@inheritdoc}
@@ -49,6 +49,7 @@ class EntityViewModeValidationTest extends ConfigEntityValidationTestBase {
    */
   public function testImmutableProperties(array $valid_values = []): void {
     $valid_values['id'] = 'user.test_changed';
+    $valid_values['targetEntityType'] = 'entity_test';
     parent::testImmutableProperties($valid_values);
   }
 
