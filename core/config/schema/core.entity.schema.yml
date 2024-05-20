@@ -9,7 +9,7 @@ core.entity_view_mode.*.*:
     id:
       type: machine_name
       label: 'ID'
-      # Content Entity Type View Mode IDs utilize a #machine_name form type with the following regex pattern.
+      # View mode IDs can only contain lowercase letters, numbers, and underscores.
       # @see \Drupal\field_ui\Form\EntityDisplayModeFormBase::form()
       constraints:
         Regex:
