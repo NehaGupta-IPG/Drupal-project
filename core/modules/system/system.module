@@ -558,7 +558,11 @@ function template_preprocess_system_security_advisories_fetch_error_message(arra
 }
 
 /**
- * Implements hook_ENTITY_TYPE_presave() for entity_view_mode entities.
+ * Implements hook_entity_view_mode_presave().
+ *
+ * Transforms empty description into null.
+ *
+ * @see system_post_update_convert_empty_string_entity_view_modes_to_null()
  */
 function system_entity_view_mode_presave(EntityInterface $entity) {
   if (trim($entity->getDescription()) === '') {

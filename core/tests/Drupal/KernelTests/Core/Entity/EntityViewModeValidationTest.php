@@ -79,4 +79,21 @@ class EntityViewModeValidationTest extends ConfigEntityValidationTestBase {
     parent::testMachineNameLength($string);
   }
 
+  /**
+   * Tests that description can be NULL, but not empty strings.
+   */
+  public function testDescriptionCannotBeEmpty(): void {
+    $this->entity->set('description', NULL);
+    // The entity's getters should cast NULL values to empty strings.
+    $this->assertSame('', $this->entity->getDescription());
+    // But NULL values should be valid at the config level.
+    $this->assertValidationErrors([]);
+
+    // But they cannot be empty strings, because that doesn't make sense.
+    $this->entity->set('description', '');
+    $this->assertValidationErrors([
+      'description' => 'This value should not be blank.',
+    ]);
+  }
+
 }
