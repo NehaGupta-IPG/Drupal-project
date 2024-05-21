@@ -32,13 +32,20 @@ class LanguageBrowserDetectionAcceptLanguageTest extends BrowserTestBase {
   protected $defaultTheme = 'stark';
 
   /**
+   * The admin user.
+   *
+   * @var \Drupal\user\UserInterface
+   */
+  protected $adminUser;
+
+  /**
    * {@inheritdoc}
    */
   protected function setUp(): void {
     parent::setUp();
     // User to manage languages.
-    $admin = $this->drupalCreateUser([], NULL, TRUE);
-    $this->drupalLogin($admin);
+    $this->adminUser = $this->drupalCreateUser([], NULL, TRUE);
+    $this->drupalLogin($this->adminUser);
 
     // Create FR.
     ConfigurableLanguage::createFromLangcode('fr')->save();
@@ -167,4 +174,5 @@ class LanguageBrowserDetectionAcceptLanguageTest extends BrowserTestBase {
     $this->assertSession()->responseHeaderEquals('Content-Language', 'fr');
     $this->assertSession()->responseHeaderEquals('X-Drupal-Cache', 'HIT');
   }
+
 }
