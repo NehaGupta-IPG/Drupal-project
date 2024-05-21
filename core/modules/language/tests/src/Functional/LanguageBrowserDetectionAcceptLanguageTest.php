@@ -127,4 +127,44 @@ class LanguageBrowserDetectionAcceptLanguageTest extends BrowserTestBase {
     $this->assertSession()->responseHeaderEquals('X-Drupal-Cache', 'HIT');
   }
 
+  /**
+   * Tests language headers when leaving the default language prefix empty.
+   *
+   * Mainly the correct "Content-Language" header is validated as well as the
+   * state of the "X-Drupal-Cache" header.
+   */
+  public function testEmptyLanguagePrefixForDefaultLanguage() {
+    $this->drupalLogin($this->adminUser);
+    // Leave default "en" prefix empty:
+    $this->drupalGet('/admin/config/regional/language/detection/url');
+    $this->submitForm([
+      'prefix[en]' => '',
+      'prefix[fr]' => 'fr',
+    ], 'Save configuration');
+    $this->drupalLogout();
+
+    // Check correct headers.
+    $this->drupalGet('/system-test/echo/language test', [], ['Accept-Language' => 'en']);
+    $this->assertSession()->responseHeaderEquals('Content-Language', 'en');
+    $this->assertSession()->responseHeaderEquals('X-Drupal-Cache', 'MISS');
+
+    $this->drupalGet('/fr/system-test/echo/language test', [], ['Accept-Language' => 'en']);
+    $this->assertSession()->responseHeaderEquals('Content-Language', 'fr');
+    $this->assertSession()->responseHeaderEquals('X-Drupal-Cache', 'MISS');
+
+    // Check with french browser.
+    $this->drupalGet('/system-test/echo/language test', [], ['Accept-Language' => 'fr-FR,fr']);
+    $this->assertSession()->responseHeaderEquals('Content-Language', 'en');
+    $this->assertSession()->responseHeaderEquals('X-Drupal-Cache', 'HIT');
+
+    // Check with UK browser.
+    $this->drupalGet('/system-test/echo/language test', [], ['Accept-Language' => 'en-UK,en']);
+    $this->assertSession()->responseHeaderEquals('Content-Language', 'en');
+    $this->assertSession()->responseHeaderEquals('X-Drupal-Cache', 'HIT');
+
+    // Check if french URL is still cached:
+    $this->drupalGet('/fr/system-test/echo/language test', [], ['Accept-Language' => 'en']);
+    $this->assertSession()->responseHeaderEquals('Content-Language', 'fr');
+    $this->assertSession()->responseHeaderEquals('X-Drupal-Cache', 'HIT');
+  }
 }
