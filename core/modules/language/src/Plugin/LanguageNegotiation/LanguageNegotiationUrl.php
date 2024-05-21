@@ -73,14 +73,9 @@ class LanguageNegotiationUrl extends LanguageNegotiationMethodBase implements In
             $langcode = $negotiated_language->getId();
           }
 
-          if (
-            $negotiated_language === FALSE
-            &&
-            $no_prefix_langcode = array_search('', $config['prefixes']) !== FALSE
-            ) {
+          if ($negotiated_language === FALSE && (($no_prefix_langcode = array_search('', $config['prefixes'])) !== FALSE)) {
             $langcode = $no_prefix_langcode;
           }
-          break;
 
         case LanguageNegotiationUrl::CONFIG_DOMAIN:
           // Get only the host, not the port.
