@@ -27,7 +27,7 @@ class EntityViewModeUpdatePathTest extends UpdatePathTestBase {
   /**
    * Tests update path for the entity view mode description value from '' to NULL.
    */
-  public function testRunUpdates() {
+  public function testRunUpdates(): void {
     $view_mode_type = EntityViewMode::load('node.full');
     $this->assertInstanceOf(EntityViewMode::class, $view_mode_type);
     $this->assertSame("\n", $view_mode_type->get('description'));

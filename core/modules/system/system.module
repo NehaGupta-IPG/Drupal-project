@@ -564,7 +564,7 @@ function template_preprocess_system_security_advisories_fetch_error_message(arra
  *
  * @see system_post_update_convert_empty_string_entity_view_modes_to_null()
  */
-function system_entity_view_mode_presave(EntityInterface $entity) {
+function system_entity_view_mode_presave(EntityInterface $entity): void {
   if (trim($entity->getDescription()) === '') {
     $entity->set('description', NULL);
   }
