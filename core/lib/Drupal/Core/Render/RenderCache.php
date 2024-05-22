@@ -46,7 +46,18 @@ class RenderCache implements RenderCacheInterface {
       if (!$this->isCacheableForCurrentHttpMethod($cache->tags)) {
         return FALSE;
       }
-      return $cache->data;
+      $elements = $cache->data;
+      assert(is_array($elements));
+      // Recalculate max-age using the current request time.
+      // Not updating the max-age might result in stacked caches based upon this
+      // cache entry to use an outdated and incorrect expire timestamp.
+      if ($cache->expire >= 0) {
+        $max_age = max($cache->expire - $this->requestStack->getCurrentRequest()->server->get('REQUEST_TIME'), 0);
+        CacheableMetadata::createFromRenderArray($elements)
+          ->mergeCacheMaxAge($max_age)
+          ->applyTo($elements);
+      }
+      return $elements;
     }
     return FALSE;
   }

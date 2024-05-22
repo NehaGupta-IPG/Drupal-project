@@ -142,7 +142,15 @@ class DynamicPageCacheSubscriber implements EventSubscriberInterface {
     $cached = $this->cache->get(['response'], (new CacheableMetadata())->setCacheContexts($this->cacheContexts));
     if ($cached) {
       $response = $cached->data;
+      assert($response instanceof CacheableResponseInterface);
       $response->headers->set(self::HEADER, 'HIT');
+      // Recalculate max-age using the current request time.
+      // Not updating the max-age might result in stacked caches based upon this
+      // cache entry to use an outdated and incorrect expire timestamp.
+      if ($cached->expire >= 0) {
+        $max_age = max($cached->expire - $request->server->get('REQUEST_TIME'), 0);
+        $response->getCacheableMetadata()->mergeCacheMaxAge($max_age);
+      }
       $event->setResponse($response);
     }
   }
