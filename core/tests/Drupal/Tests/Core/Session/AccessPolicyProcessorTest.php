@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\Core\Session;
 
+use Drupal\Component\Datetime\Time;
+use Drupal\Component\Datetime\TimeInterface;
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Cache\Context\CacheContextsManager;
@@ -24,6 +26,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use Prophecy\Argument;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\HttpFoundation\Request;
 
 /**
  * Tests the AccessPolicyProcessor service.
@@ -375,6 +378,7 @@ class AccessPolicyProcessorTest extends UnitTestCase {
     ?CacheBackendInterface $cache_static = NULL,
     ?AccountProxyInterface $current_user = NULL,
     ?AccountSwitcherInterface $account_switcher = NULL,
+    ?TimeInterface $time = NULL,
   ): AccessPolicyProcessor {
     // Prophecy does not accept a willReturn call on a mocked method if said
     // method has a return type of void. However, without willReturn() or any
@@ -410,12 +414,25 @@ class AccessPolicyProcessorTest extends UnitTestCase {
       $account_switcher = $this->prophesize(AccountSwitcherInterface::class)->reveal();
     }
 
+    if (!isset($time)) {
+      $request = Request::createFromGlobals();
+      $request->server->set('REQUEST_TIME', time());
+
+      $request_stack = $this->getMockBuilder('Symfony\Component\HttpFoundation\RequestStack')->getMock();
+      $request_stack
+        ->expects($this->any())
+        ->method('getCurrentRequest')
+        ->willReturn($request);
+      $time = new Time($request_stack);
+    }
+
     return new AccessPolicyProcessor(
       $variation_cache,
       $variation_cache_static,
       $cache_static,
       $current_user,
-      $account_switcher
+      $account_switcher,
+      $time,
     );
   }
 
