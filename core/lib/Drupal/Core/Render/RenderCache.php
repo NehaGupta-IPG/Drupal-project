@@ -49,7 +49,7 @@ class RenderCache implements RenderCacheInterface {
       $elements = $cache->data;
       assert(is_array($elements));
       if ($cache->expire >= 0) {
-        $max_age = max($this->requestStack->getCurrentRequest()->server->get('REQUEST_TIME') - $cache->expire, 0);
+        $max_age = max($cache->expire - $this->requestStack->getCurrentRequest()->server->get('REQUEST_TIME'), 0);
         CacheableMetadata::createFromRenderArray($elements)
           ->mergeCacheMaxAge($max_age)
           ->applyTo($elements);

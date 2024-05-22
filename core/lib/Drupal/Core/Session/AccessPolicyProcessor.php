@@ -141,7 +141,7 @@ class AccessPolicyProcessor implements AccessPolicyProcessorInterface {
         // warm static cache.
         $calculated_permissions = new CalculatedPermissions($calculated_permissions);
         if ($cache->expire >= 0) {
-          $max_age = max($this->time->getRequestTime() - $cache->expire, 0);
+          $max_age = max($cache->expire - $this->time->getRequestTime(), 0);
           $calculated_permissions = (new RefinableCalculatedPermissions())
             ->merge($calculated_permissions)
             ->mergeCacheMaxAge($max_age);
