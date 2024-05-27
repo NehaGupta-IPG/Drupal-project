@@ -71,6 +71,7 @@ class EntityDisplayModeTest extends BrowserTestBase {
     $edit = [
       'id' => $this->randomMachineName() . '.' . $this->randomMachineName(),
       'label' => $this->randomString(),
+      'description' => $this->randomString(),
     ];
     $this->submitForm($edit, 'Save');
     $this->assertSession()->pageTextContains('The machine-readable name must contain only lowercase letters, numbers, and underscores.');
