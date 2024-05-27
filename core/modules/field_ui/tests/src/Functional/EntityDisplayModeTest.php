@@ -198,6 +198,7 @@ class EntityDisplayModeTest extends BrowserTestBase {
     // Set new values and enable test plugins.
     $edit = [
       'label' => 'Breezier',
+      'description' => 'Breezier',
     ];
     $this->drupalGet('admin/structure/display-modes/view/manage/node.teaser');
     $this->submitForm($edit, 'Save');

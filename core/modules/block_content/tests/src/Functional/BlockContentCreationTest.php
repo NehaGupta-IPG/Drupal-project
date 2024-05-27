@@ -94,6 +94,7 @@ class BlockContentCreationTest extends BlockContentTestBase {
     $edit = [
       'id' => 'test_view_mode',
       'label' => 'Test View Mode',
+      'description' => 'Test View Mode',
     ];
     $this->submitForm($edit, 'Save');
     $this->assertSession()->pageTextContains('Saved the ' . $edit['label'] . ' view mode.');
