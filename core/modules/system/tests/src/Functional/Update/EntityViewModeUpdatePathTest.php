@@ -10,7 +10,7 @@ use Drupal\FunctionalTests\Update\UpdatePathTestBase;
 /**
  * Tests update path for the entity view mode description value from '' to NULL.
  *
- * @group contact
+ * @group system
  */
 class EntityViewModeUpdatePathTest extends UpdatePathTestBase {
 
@@ -28,16 +28,17 @@ class EntityViewModeUpdatePathTest extends UpdatePathTestBase {
    * Tests update path for the entity view mode description value from '' to NULL.
    */
   public function testRunUpdates(): void {
-    $view_mode_type = EntityViewMode::load('node.full');
-    $this->assertInstanceOf(EntityViewMode::class, $view_mode_type);
-    $this->assertSame("\n", $view_mode_type->get('description'));
+    $view_mode = EntityViewMode::load('node.full');
+    $this->assertInstanceOf(EntityViewMode::class, $view_mode);
+    $this->assertSame("\n", $view_mode->get('description'));
+    $this->assertSame("\n", $view_mode->getDescription());
     $this->runUpdates();
 
-    $view_mode_type = EntityViewMode::load('node.full');
-    $this->assertInstanceOf(EntityViewMode::class, $view_mode_type);
+    $view_mode = EntityViewMode::load('node.full');
+    $this->assertInstanceOf(EntityViewMode::class, $view_mode);
 
-    $this->assertNull($view_mode_type->get('description'));
-    $this->assertSame('', $view_mode_type->getDescription());
+    $this->assertNull($view_mode->get('description'));
+    $this->assertSame('', $view_mode->getDescription());
   }
 
 }

@@ -6,7 +6,7 @@
  */
 
 use Drupal\Core\Config\Entity\ConfigEntityUpdater;
-use Drupal\Core\Entity\Entity\EntityViewMode;
+use Drupal\Core\Entity\EntityViewModeInterface;
 use Drupal\Core\Entity\EntityFormModeInterface;
 use Drupal\views\ViewEntityInterface;
 use Drupal\views\ViewsConfigUpdater;
@@ -155,7 +155,7 @@ function system_post_update_delete_rss_config(array &$sandbox): void {
  */
 function system_post_update_convert_empty_string_entity_view_modes_to_null(array &$sandbox): void {
   \Drupal::classResolver(ConfigEntityUpdater::class)
-    ->update($sandbox, 'entity_view_mode', function (EntityViewMode $view_mode): bool {
+    ->update($sandbox, 'entity_view_mode', function (EntityViewModeInterface $view_mode): bool {
       // An empty description must be stored as NULL.
       if (trim($view_mode->get('description')) === '') {
         $view_mode->set('description', NULL);

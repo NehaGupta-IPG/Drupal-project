@@ -7,7 +7,7 @@ core.entity_view_mode.*.*:
     FullyValidatable: ~
   mapping:
     id:
-      type: machine_name
+      type: string
       label: 'ID'
       # View mode IDs can only contain lowercase letters, numbers, and underscores
       # prefixed by entity type name this view mode is used for and a dot.
@@ -15,7 +15,7 @@ core.entity_view_mode.*.*:
       constraints:
         Regex:
           pattern: '/^[a-z0-9_]+\.[a-z0-9_]+$/'
-          message: "The %value machine name is not valid."
+          message: "The %value ID is not valid."
     label:
       type: required_label
       label: 'The human-readable name of the view mode'
