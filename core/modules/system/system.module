@@ -562,7 +562,7 @@ function template_preprocess_system_security_advisories_fetch_error_message(arra
  *
  * Transforms empty description into null.
  *
- * @deprecated in drupal:10.4.0 and is removed from drupal:12.0.0, use NULL
+ * @deprecated in drupal:10.4.0 and is removed from drupal:12.0.0. Use NULL
  *  instead.
  *
  * @see https://www.drupal.org/node/3445150
