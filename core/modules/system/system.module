@@ -565,11 +565,12 @@ function template_preprocess_system_security_advisories_fetch_error_message(arra
  * @deprecated in drupal:10.4.0 and is removed from drupal:12.0.0, use NULL
  *  instead.
  *
+ * @see https://www.drupal.org/node/3445150
  * @see system_post_update_convert_empty_string_entity_view_modes_to_null()
  */
 function system_entity_view_mode_presave(EntityInterface $entity): void {
   if ($entity->get('description') === '') {
-    @trigger_error("Setting empty 'description' is deprecated in drupal:10.4.0 and is removed from drupal:12.0.0. See https://www.drupal.org/project/drupal/issues/3445150", E_USER_DEPRECATED);
+    @trigger_error("Setting empty 'description' is deprecated in drupal:10.4.0 and is removed from drupal:12.0.0. See https://www.drupal.org/node/3445150", E_USER_DEPRECATED);
     $entity->set('description', NULL);
   }
 }
