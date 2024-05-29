@@ -159,8 +159,9 @@ function system_post_update_convert_empty_string_entity_view_modes_to_null(array
       // An empty description must be stored as NULL.
       if (trim($view_mode->getDescription()) === '') {
         $view_mode->set('description', NULL);
+        return TRUE;
       }
-      return TRUE;
+      return FALSE;
     });
 
 }
