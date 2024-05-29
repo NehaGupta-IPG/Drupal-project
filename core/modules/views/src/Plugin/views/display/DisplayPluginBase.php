@@ -310,6 +310,16 @@ abstract class DisplayPluginBase extends PluginBase implements DisplayPluginInte
   /**
    * {@inheritdoc}
    */
+  public function getAjaxOptions() {
+    if ($this->usesAJAX()) {
+      return $this->getOption('use_ajax_options');
+    }
+    return FALSE;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function usesMore() {
     return $this->usesMore;
   }
@@ -1466,6 +1476,34 @@ abstract class DisplayPluginBase extends PluginBase implements DisplayPluginInte
           '#title' => $this->t('Use AJAX'),
           '#default_value' => $this->getOption('use_ajax') ? 1 : 0,
         ];
+
+        $options = [
+          'use_ajax_paging' => $this->t('Apply to paging.'),
+          'use_ajax_sorting' => $this->t('Apply to sorting.'),
+          'use_ajax_exposed_filters' => $this->t('Apply to exposed filters.'),
+        ];
+
+        if (empty($this->options['use_ajax_options'])) {
+          $this->options['use_ajax_options'] = [];
+        }
+
+        $form['use_ajax_options'] = [
+          '#type' => 'checkboxes',
+          '#title' => $this->t('AJAX options'),
+          '#options' => $options,
+          '#default_value' => $this->options['use_ajax_options'],
+          '#description' => $this->t('Select the options on which to apply ajax'),
+          '#states' => [
+            'disabled' => [
+              ':input[name="use_ajax"]' => ['checked' => FALSE],
+            ],
+          ],
+        ];
+
+        if (empty($this->options['use_ajax_options'])) {
+          $form['use_ajax_options']['#states']['checked'] = [':input[name="use_ajax"]' => ['checked' => TRUE]];
+        }
+
         break;
 
       case 'hide_attachment_summary':
@@ -1981,6 +2019,10 @@ abstract class DisplayPluginBase extends PluginBase implements DisplayPluginInte
         break;
 
       case 'use_ajax':
+        $this->setOption($section, (bool) $form_state->getValue($section));
+        $this->setOption('use_ajax_options', array_filter($form_state->getValue('use_ajax_options')));
+        break;
+
       case 'hide_attachment_summary':
       case 'show_admin_links':
       case 'exposed_block':
@@ -2353,6 +2395,10 @@ abstract class DisplayPluginBase extends PluginBase implements DisplayPluginInte
    */
   public function preExecute() {
     $this->view->setAjaxEnabled($this->ajaxEnabled());
+    if ($this->ajaxEnabled()) {
+      $this->view->setAjaxOptions($this->getAjaxOptions());
+    }
+
     if ($this->isMoreEnabled() && !$this->useMoreAlways()) {
       $this->view->get_total_rows = TRUE;
     }

@@ -78,6 +78,7 @@ class ViewsHooks {
                     // To fit multiple views on a page, the programmer may have
                     // overridden the display's pager_element.
             'pager_element' => isset($view->pager) ? $view->pager->getPagerId() : 0,
+            'ajaxOptions' => $view->getAjaxOptions(),
           ],
         ],
       ];
