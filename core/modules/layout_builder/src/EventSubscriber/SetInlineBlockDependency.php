@@ -145,8 +145,12 @@ class SetInlineBlockDependency implements EventSubscriberInterface {
         $section_storage = $this->currentRouteMatch->getParameter('section_storage');
         if ($section_storage) {
           $layout_entity = $section_storage->getContextValue('entity');
-          if ($this->isLayoutCompatibleEntity($layout_entity)) {
+          if ($layout_entity && $this->isLayoutCompatibleEntity($layout_entity)) {
             return $layout_entity;
+          }
+          else if ($layout = $section_storage->getContextValue('layout')) {
+            // We're editing a block in a layout template.
+            return $layout;
           }
         }
       }
