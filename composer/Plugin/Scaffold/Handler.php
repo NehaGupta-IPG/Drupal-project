@@ -175,7 +175,7 @@ class Handler {
 
     // Generate the locations class file.
     $drupal_locations_manager = new ManageDrupalLocations($this->io, $web_root);
-    $drupal_locations_manager->manageLocationsClass();
+    $scaffold_results[] = $drupal_locations_manager->manageLocationsClass();
 
     // Add the managed scaffold files to .gitignore if applicable.
     $gitIgnoreManager = new ManageGitIgnore($this->io, getcwd());

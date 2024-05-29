@@ -3,6 +3,7 @@
 namespace Drupal\Composer\Plugin\Scaffold;
 
 use Composer\IO\IOInterface;
+use Drupal\Composer\Plugin\Scaffold\Operations\ScaffoldResult;
 
 /**
  * Generates the DrupalLocation file which defines the Drupal app root constant.
@@ -56,8 +57,11 @@ class ManageDrupalLocations {
 
   /**
    * Writes the location class.
+   *
+   * @return \Drupal\Composer\Plugin\Scaffold\Operations\ScaffoldResult
+   *   The result of the locations class file generation.
    */
-  public function manageLocationsClass() {
+  public function manageLocationsClass(): ScaffoldResult {
     $this->io->write("Drupal app root defined as {$this->webRoot}.");
 
     // Composer changes the current directory to the project root, even if it
@@ -86,6 +90,10 @@ class ManageDrupalLocations {
     else {
       $this->io->writeError("There was a problem writing the Drupal locations class to $file_location.");
     }
+
+    $scaffold_file_path = new ScaffoldFilePath('locations', 'drupal/core', '[project-root]/DrupalLocation.php', $file_location);
+
+    return new ScaffoldResult($scaffold_file_path, TRUE);
   }
 
   /**
