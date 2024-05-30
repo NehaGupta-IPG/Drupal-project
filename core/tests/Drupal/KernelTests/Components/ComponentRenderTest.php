@@ -120,6 +120,11 @@ class ComponentRenderTest extends ComponentKernelTestBase {
           '#tag' => 'p',
           '#value' => 'This is the contents of the banner body.',
         ],
+        'nested_slot' => [
+          '#type' => 'html_tag',
+          '#tag' => 'p',
+          '#value' => $this->t('This is another slot.'),
+        ],
       ],
     ];
     $metadata = new BubbleableMetadata();
@@ -289,13 +294,17 @@ class ComponentRenderTest extends ComponentKernelTestBase {
    * Ensure that the slots allow a render array or a scalar when using the render element.
    */
   public function checkSlots(): void {
-    $slots = [
-      'This is the contents of the banner body.',
+    $slot_pairs = [
       [
-        '#plain_text' => 'This is the contents of the banner body.',
+        'This is the contents of the banner body.',
+        'This is the contents of the nested slot.',
+      ],
+      [
+        ['#plain_text' => 'This is the contents of the banner body.'],
+        ['#plain_text' => 'This is the contents of the nested slot.'],
       ],
     ];
-    foreach ($slots as $slot) {
+    foreach ($slot_pairs as $slot_pair) {
       $build = [
         '#type' => 'component',
         '#component' => 'sdc_test:my-banner',
@@ -306,11 +315,13 @@ class ComponentRenderTest extends ComponentKernelTestBase {
           'ctaTarget' => '',
         ],
         '#slots' => [
-          'banner_body' => $slot,
+          'banner_body' => $slot_pair[0],
+          'nested_slot' => $slot_pair[1],
         ],
       ];
       $crawler = $this->renderComponentRenderArray($build);
       $this->assertNotEmpty($crawler->filter('#sdc-wrapper [data-component-id="sdc_test:my-banner"] .component--my-banner--body:contains("This is the contents of the banner body.")'));
+      $this->assertNotEmpty($crawler->filter('#sdc-wrapper [data-component-id="sdc_test:my-banner"] .component--my-banner--nested-slot .just-a-slot:contains("This is the contents of the nested slot.")'));
     }
   }
 
