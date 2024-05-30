@@ -116,7 +116,9 @@ class ComponentNodeVisitor implements NodeVisitorInterface {
    *   The component, if any.
    */
   protected function getComponent(Node $node): ?Component {
-    $component_id = $node->getTemplateName();
+    $component_id = $node->hasNode('parent')
+      ? $node->getNode('parent')->getAttribute('value')
+      : $node->getTemplateName();
     if (!preg_match('/^[a-z]([a-zA-Z0-9_-]*[a-zA-Z0-9])*:[a-z]([a-zA-Z0-9_-]*[a-zA-Z0-9])*$/', $component_id)) {
       return NULL;
     }
