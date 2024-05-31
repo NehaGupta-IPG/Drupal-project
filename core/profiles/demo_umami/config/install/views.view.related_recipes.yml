@@ -153,7 +153,8 @@ display:
           relationship: none
           group_type: group
           admin_label: ''
-          plugin_id: numeric
+          plugin_id: entity_target_id
+          target_entity_type_id: taxonomy_term
           default_action: default
           exception:
             value: all
