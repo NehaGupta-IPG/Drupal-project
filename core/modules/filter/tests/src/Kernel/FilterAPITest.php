@@ -429,20 +429,20 @@ class FilterAPITest extends EntityKernelTestBase {
     ]);
     $crazy_format->save();
     // Use config to directly load the configuration and check that only enabled
-    // or customized plugins are saved to configuration.
+    // or customized plugins are saved to configuration. And that they're
+    // ordered by weight.
     $filters = $this->config('filter.format.crazy')->get('filters');
     $this->assertEquals(['filter_html', 'filter_html_escape'], array_keys($filters));
 
-    // Disable a plugin to ensure that disabled plugins with custom settings are
-    // stored in configuration.
-    $crazy_format->setFilterConfig('filter_html_escape', ['status' => FALSE]);
+    // Set the settings as per default to ensure that disabled plugins in this
+    // state are not stored in configuration.
+    $crazy_format->setFilterConfig('filter_html_escape', ['weight' => -10, 'status' => FALSE]);
     $crazy_format->save();
     $filters = $this->config('filter.format.crazy')->get('filters');
-    $this->assertEquals(['filter_html', 'filter_html_escape'], array_keys($filters));
+    $this->assertEquals(['filter_html'], array_keys($filters));
 
-    // Set the settings as per default to ensure that disable plugins in this
-    // state are not stored in configuration.
-    $crazy_format->setFilterConfig('filter_html_escape', ['weight' => -10]);
+    // Ensure that disabled plugins with non-standard default settings are no longer stored in configuration.
+    $crazy_format->setFilterConfig('filter_html_escape', ['weight' => 20, 'status' => FALSE]);
     $crazy_format->save();
     $filters = $this->config('filter.format.crazy')->get('filters');
     $this->assertEquals(['filter_html'], array_keys($filters));
@@ -495,16 +495,16 @@ class FilterAPITest extends EntityKernelTestBase {
     // Use the get method to match the assert after the module has been
     // uninstalled.
     $filters = $filter_format->get('filters');
-    $this->assertTrue(isset($filters['filter_test_restrict_tags_and_attributes']), 'The filter plugin filter_test_restrict_tags_and_attributes is configured by the filtered_html filter format.');
+    $this->assertFalse(isset($filters['filter_test_restrict_tags_and_attributes']), 'The filter plugin filter_test_restrict_tags_and_attributes is removed from the filtered_html filter format.');
 
     drupal_static_reset('filter_formats');
     \Drupal::entityTypeManager()->getStorage('filter_format')->resetCache();
     $module_data = \Drupal::service('extension.list.module')->getList();
     $this->assertFalse(isset($module_data['filter_test']->info['required']), 'The filter_test module is required.');
 
-    // Verify that a dependency exists on the module that provides the filter
-    // plugin since it has configuration for the disabled plugin.
-    $this->assertEquals(['module' => ['filter_test']], $filter_format->getDependencies());
+    // Verify that a dependency on the module that provides the disabled filter
+    // plugin does not exist.
+    $this->assertEquals([], $filter_format->getDependencies());
 
     // Uninstall the module.
     \Drupal::service('module_installer')->uninstall(['filter_test']);

@@ -361,6 +361,8 @@ class FilterAdminTest extends BrowserTestBase {
     $edit = [];
     $edit['filters[' . $second_filter . '][weight]'] = 2;
     $edit['filters[' . $first_filter . '][weight]'] = 1;
+    $edit['filters[' . $second_filter . '][status]'] = TRUE;
+    $edit['filters[' . $first_filter . '][status]'] = TRUE;
     $this->drupalGet('admin/config/content/formats/manage/' . $basic);
     $this->submitForm($edit, 'Save configuration');
     $this->assertSession()->addressEquals('admin/config/content/formats/manage/' . $basic);

@@ -12,12 +12,3 @@ filters:
     status: true
     weight: 0
     settings: {  }
-  filter_html:
-    id: filter_html
-    provider: filter
-    status: false
-    weight: -10
-    settings:
-      allowed_html: '<img src alt data-entity-type data-entity-uuid>'
-      filter_html_help: true
-      filter_html_nofollow: false
