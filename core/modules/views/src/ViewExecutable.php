@@ -733,7 +733,7 @@ class ViewExecutable {
   }
 
   public function getAjaxOptions(): array {
-    return $this->ajaxOptions;
+    return $this->ajaxOptions ?? [];
   }
 
   /**
