@@ -88,7 +88,7 @@ class AttributesTest extends UnitTestCase {
   /**
    * Tests the count method of the Attribute class.
    */
-  public function testAttributeCount() {
+  public function testAttributeCount(): void {
     $attributes = new Attribute([
       'id' => 'test-id',
       'class' => ['first', 'second'],
