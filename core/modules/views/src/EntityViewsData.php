@@ -381,8 +381,8 @@ class EntityViewsData implements EntityHandlerInterface, EntityViewsDataInterfac
         }
 
         // Declare computed base fields.
-        // @todo Also declare computed bundle fields, but these can't yet be
-        // output: see https://www.drupal.org/project/drupal/issues/2981047.
+        // @todo Also declare computed bundle fields. See
+        // https://www.drupal.org/project/drupal/issues/3404369.
         if ($field_definition->isComputed() && !$field_definition->isInternal()) {
           $views_field = [];
           $views_field['title'] = $field_definition->getLabel();

@@ -194,7 +194,7 @@ class EntityViewsDataTest extends KernelTestBase {
    */
   public function testComputedFields() {
     // Only base computed fields are registered automatically.
-    // @see https://www.drupal.org/project/drupal/issues/2981047 for bundle
+    // @see https://www.drupal.org/project/drupal/issues/3404369 for bundle
     // fields.
     $base_field_definitions = $this->commonBaseFields;
 
