@@ -2,6 +2,8 @@
 
 namespace Drupal\Core\Template;
 
+use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Layout\LayoutDefinition;
 use Drupal\Core\Site\Settings;
 use Drupal\Core\Template\Attribute\TwigAllowed;
 use Twig\Extra\Html\Cva;
@@ -25,7 +27,7 @@ class TwigSandboxPolicy implements SecurityPolicyInterface {
    * @var array
    */
   // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName
-  protected $allowed_methods;
+  protected $allowed_methods = [];
 
   /**
    * Allowed method prefixes.
@@ -62,8 +64,24 @@ class TwigSandboxPolicy implements SecurityPolicyInterface {
     $this->allowed_classes = array_flip($allowed_classes);
 
     $allowed_methods = static::getMethodsAllowedOnAllObjects();
-    // Flip the array so we can check using isset().
-    $this->allowed_methods = array_flip($allowed_methods);
+
+    // Align the array, so we can check using isset() during checks.
+    foreach ($allowed_methods as $method) {
+      if (!str_contains($method, '::')) {
+        @trigger_error('Not specifying a fully-qualified method name to twig_sandbox_allowed_methods is deprecated in drupal:11.0.0 and will throw an error in drupal:12.0.0. See https://www.drupal.org/node/3263019', E_USER_DEPRECATED);
+        $method = '::' . $method;
+      }
+      [$class, $name] = explode('::', $method);
+      if (isset($this->allowed_methods[$name])) {
+        $this->allowed_methods[$name][] = $class;
+      }
+      elseif ($class) {
+        $this->allowed_methods[$name] = [$class];
+      }
+      else {
+        $this->allowed_methods[$name] = [];
+      }
+    }
 
     $this->allowed_prefixes = Settings::get('twig_sandbox_allowed_prefixes', [
       'get',
@@ -94,14 +112,21 @@ class TwigSandboxPolicy implements SecurityPolicyInterface {
 
     // Return quickly for an exact match of the method name.
     if (isset($this->allowed_methods[$method])) {
-      return;
-    }
-
-    // If the method name starts with an allowed prefix, allow it. Note:
-    // strpos() is between 3x and 7x faster than preg_match() in this case.
-    foreach ($this->allowed_prefixes as $prefix) {
-      if (str_starts_with($method, $prefix)) {
+      $allowed_classes = $this->allowed_methods[$method];
+      if (empty($allowed_classes)) {
         return;
+      }
+      foreach ($this->allowed_methods[$method] as $class) {
+        if ($obj instanceof $class) {
+          return;
+        }
+      }
+    }
+    else {
+      foreach ($this->allowed_prefixes as $prefix) {
+        if (str_starts_with($method, $prefix)) {
+          return;
+        }
       }
     }
 
@@ -123,12 +148,13 @@ class TwigSandboxPolicy implements SecurityPolicyInterface {
   public static function getMethodsAllowedOnAllObjects(): array {
     return Settings::get('twig_sandbox_allowed_methods', [
       // Only allow idempotent methods.
-      'id',
-      'label',
-      'bundle',
-      'get',
-      '__toString',
-      'toString',
+      EntityInterface::class . '::id',
+      EntityInterface::class . '::label',
+      EntityInterface::class . '::bundle',
+      LayoutDefinition::class . '::id',
+      '::get',
+      '::__toString',
+      '::toString',
     ]);
   }
 
