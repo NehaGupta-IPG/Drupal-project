@@ -42,7 +42,8 @@ function field_update_10001() {
     if ($precisionValue !== $newPrecisionValue || $scaleValue !== $newScaleValue) {
       $decimalFieldStorageEntity->setSetting('precision', $newPrecisionValue);
       $decimalFieldStorageEntity->setSetting('scale', $newScaleValue);
-      $decimalFieldStorageEntity->save();
+      // Update the field storage definition:
+      \Drupal::service('entity.definition_update_manager')->updateFieldStorageDefinition($decimalFieldStorageEntity);
     }
 
   }
