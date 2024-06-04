@@ -55,7 +55,7 @@ class NumberTest extends TestCase {
   /**
    * Provides data to self::testNormalize().
    */
-  public function providerNormalize() {
+  public static function providerNormalize() {
     return [
       ['', ''],
       [0, 0],
@@ -87,7 +87,7 @@ class NumberTest extends TestCase {
   /**
    * Provides data to self::testCountSignificantDecimals().
    */
-  public function provideCountSignificantDecimals() {
+  public static function provideCountSignificantDecimals() {
     return [
       [0, 0],
       [0, '0'],
