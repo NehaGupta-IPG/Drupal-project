@@ -42,9 +42,12 @@ function field_update_10001() {
     // Set the new scale value:
     $newScaleValue = $scaleValue > $castedInitialPrecisionValue ? $castedInitialPrecisionValue : $scaleValue;
 
-    // Set the new precision and scale values and save the entity:
-    $decimalFieldStorageEntity->setSetting('precision', $newPrecisionValue);
-    $decimalFieldStorageEntity->setSetting('scale', $newScaleValue);
-    $decimalFieldStorageEntity->save();
+    // Set the new precision and scale values if they changed:
+    if ($precisionValue != $newPrecisionValue || $scaleValue != $newScaleValue) {
+      $decimalFieldStorageEntity->setSetting('precision', $newPrecisionValue);
+      $decimalFieldStorageEntity->setSetting('scale', $newScaleValue);
+      $decimalFieldStorageEntity->save();
+    }
+
   }
 }
