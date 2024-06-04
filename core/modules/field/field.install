@@ -11,3 +11,40 @@
 function field_update_last_removed(): int {
   return 8500;
 }
+
+/**
+ * Update existing DecimalItem fields to match the new maximum value.
+ */
+function field_update_8001() {
+
+  // Load all decimal field storage entities:
+  $decimalFieldStorageEntities = \Drupal::entityTypeManager()->getStorage('field_storage_config')->loadByProperties([
+    'type' => 'decimal',
+  ]);
+
+  foreach ($decimalFieldStorageEntities as $decimalFieldStorageEntity) {
+    /** @var \Drupal\field\Entity\FieldStorageConfig $decimalFieldStorageEntity*/
+
+    $castedInitialPrecisionValue = (int) $decimalFieldStorageEntity->getSetting('precision');
+
+    // Adjust the precision value, if it is higher, than the allowed
+    // initial precision configuration option value:
+    $precisionValue = $decimalFieldStorageEntity->getSetting('precision');
+    $newPrecisionMaxValue = $castedInitialPrecisionValue <= 10 ? 10 : $castedInitialPrecisionValue;
+
+    // Set the new precision value:
+    $newPrecisionValue = $precisionValue > $newPrecisionMaxValue ? $newPrecisionMaxValue : $precisionValue;
+
+    // Adjust the scale value, if it is higher, than the allowed
+    // initial precision configuration option value:
+    $scaleValue = $decimalFieldStorageEntity->getSetting('scale');
+
+    // Set the new scale value:
+    $newScaleValue = $scaleValue > $castedInitialPrecisionValue ? $castedInitialPrecisionValue : $scaleValue;
+
+    // Set the new precision and scale values and save the entity:
+    $decimalFieldStorageEntity->setSetting('precision', $newPrecisionValue);
+    $decimalFieldStorageEntity->setSetting('scale', $newScaleValue);
+    $decimalFieldStorageEntity->save();
+  }
+}
