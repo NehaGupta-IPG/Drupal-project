@@ -25,25 +25,21 @@ function field_update_10001() {
   foreach ($decimalFieldStorageEntities as $decimalFieldStorageEntity) {
     /** @var \Drupal\field\Entity\FieldStorageConfig $decimalFieldStorageEntity*/
 
-    $castedInitialPrecisionValue = (int) $decimalFieldStorageEntity->getSetting('precision');
+    $precision = (int) ini_get('precision');
+    $precisionMax = max($precision, 10);
 
     // Adjust the precision value, if it is higher, than the allowed
     // initial precision configuration option value:
-    $precisionValue = $decimalFieldStorageEntity->getSetting('precision');
-    $newPrecisionMaxValue = $castedInitialPrecisionValue <= 10 ? 10 : $castedInitialPrecisionValue;
-
-    // Set the new precision value:
-    $newPrecisionValue = $precisionValue > $newPrecisionMaxValue ? $newPrecisionMaxValue : $precisionValue;
+    $precisionValue = (int) $decimalFieldStorageEntity->getSetting('precision');
+    $newPrecisionValue = $precisionValue > $precisionMax ? $precisionMax : $precisionValue;
 
     // Adjust the scale value, if it is higher, than the allowed
     // initial precision configuration option value:
-    $scaleValue = $decimalFieldStorageEntity->getSetting('scale');
-
-    // Set the new scale value:
-    $newScaleValue = $scaleValue > $castedInitialPrecisionValue ? $castedInitialPrecisionValue : $scaleValue;
+    $scaleValue = (int) $decimalFieldStorageEntity->getSetting('scale');
+    $newScaleValue = $scaleValue > $precisionMax ? $precisionMax : $scaleValue;
 
     // Set the new precision and scale values if they changed:
-    if ($precisionValue != $newPrecisionValue || $scaleValue != $newScaleValue) {
+    if ($precisionValue !== $newPrecisionValue || $scaleValue !== $newScaleValue) {
       $decimalFieldStorageEntity->setSetting('precision', $newPrecisionValue);
       $decimalFieldStorageEntity->setSetting('scale', $newScaleValue);
       $decimalFieldStorageEntity->save();
