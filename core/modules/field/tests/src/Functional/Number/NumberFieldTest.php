@@ -50,11 +50,13 @@ class NumberFieldTest extends BrowserTestBase {
   public function testNumberDecimalField(): void {
     // Create a field with settings to validate.
     $field_name = $this->randomMachineName();
+    // Having precision = 10 and scale = 4 means 6 numbers before the decimal
+    // point and 4 after.
     FieldStorageConfig::create([
       'field_name' => $field_name,
       'entity_type' => 'entity_test',
       'type' => 'decimal',
-      'settings' => ['precision' => 8, 'scale' => 4],
+      'settings' => ['precision' => 10, 'scale' => 4],
     ])->save();
     FieldConfig::create([
       'field_name' => $field_name,
@@ -84,16 +86,29 @@ class NumberFieldTest extends BrowserTestBase {
     $this->assertSession()->fieldValueEquals("{$field_name}[0][value]", '');
     $this->assertSession()->responseContains('placeholder="0.00"');
 
-    // Submit a signed decimal value within the allowed precision and scale.
-    $value = '-1234.5678';
-    $edit = [
-      "{$field_name}[0][value]" => $value,
+    // Submit decimal values within the allowed precision and scale.
+    $valid_entries = [
+      '-1234.5678',
+      '19999.0000',
+      '99999.0000',
+      '909888.96',
+      '909888.99',
+      '988999.0096',
+      '988999.0099',
     ];
-    $this->submitForm($edit, 'Save');
-    preg_match('|entity_test/manage/(\d+)|', $this->getUrl(), $match);
-    $id = $match[1];
-    $this->assertSession()->pageTextContains('entity_test ' . $id . ' has been created.');
-    $this->assertSession()->responseContains($value);
+
+    foreach ($valid_entries as $valid_entry) {
+      $this->drupalGet('entity_test/add');
+      $edit = [
+        "{$field_name}[0][value]" => $valid_entry,
+      ];
+      $this->submitForm($edit, 'Save');
+      preg_match('|entity_test/manage/(\d+)|', $this->getUrl(), $match);
+      $id = $match[1];
+      $this->assertSession()->pageTextContains('entity_test ' . $id . ' has been created.');
+      $this->assertSession()->responseContains($valid_entry);
+      $this->assertSession()->responseNotContains("{$field_name} is not a valid number.");
+    }
 
     // Try to create entries with more than one decimal separator; assert fail.
     $wrong_entries = [
