@@ -15,7 +15,7 @@ function field_update_last_removed(): int {
 /**
  * Update existing DecimalItem fields to match the new maximum value.
  */
-function field_update_8001() {
+function field_update_10001() {
 
   // Load all decimal field storage entities:
   $decimalFieldStorageEntities = \Drupal::entityTypeManager()->getStorage('field_storage_config')->loadByProperties([
