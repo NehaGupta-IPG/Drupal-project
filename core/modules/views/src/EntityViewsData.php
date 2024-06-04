@@ -379,32 +379,32 @@ class EntityViewsData implements EntityHandlerInterface, EntityViewsDataInterfac
             ],
           ];
         }
+      }
 
-        // Declare computed base fields.
-        // @todo Also declare computed bundle fields. See
-        // https://www.drupal.org/project/drupal/issues/3404369.
-        if ($field_definition->isComputed() && !$field_definition->isInternal()) {
-          $views_field = [];
-          $views_field['title'] = $field_definition->getLabel();
+      // Declare computed base fields.
+      // @todo Also declare computed bundle fields. See
+      // https://www.drupal.org/project/drupal/issues/3404369.
+      if ($field_definition->isComputed() && !$field_definition->isInternal()) {
+        $views_field = [];
+        $views_field['title'] = $field_definition->getLabel();
 
-          if ($description = $field_definition->getDescription()) {
-            $views_field['help'] = $description;
-          }
-
-          // Computed fields have no database storage, so can't participate in
-          // a query, so there is no sort, argument, or filter.
-          $views_field['field']['id'] = 'field';
-          $views_field['entity field'] = $field_definition->getName();
-
-          // Special handling for field type.
-          // @todo Remove this hardcoding in
-          // https://www.drupal.org/project/drupal/issues/2337515
-          if ($field_definition->getType() == 'uri') {
-            $views_field['field']['default_formatter'] = 'string';
-          }
-
-          $data[$table_mapping->getBaseTable()][$field_definition->getName()] = $views_field;
+        if ($description = $field_definition->getDescription()) {
+          $views_field['help'] = $description;
         }
+
+        // Computed fields have no database storage, so can't participate in
+        // a query, so there is no sort, argument, or filter.
+        $views_field['field']['id'] = 'field';
+        $views_field['entity field'] = $field_definition->getName();
+
+        // Special handling for field type.
+        // @todo Remove this hardcoding in
+        // https://www.drupal.org/project/drupal/issues/2337515
+        if ($field_definition->getType() == 'uri') {
+          $views_field['field']['default_formatter'] = 'string';
+        }
+
+        $data[$table_mapping->getBaseTable()][$field_definition->getName()] = $views_field;
       }
     }
     if (($uid_key = $entity_keys['uid'] ?? '')) {
