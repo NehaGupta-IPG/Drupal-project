@@ -157,7 +157,7 @@ function system_post_update_convert_empty_string_entity_view_modes_to_null(array
   \Drupal::classResolver(ConfigEntityUpdater::class)
     ->update($sandbox, 'entity_view_mode', function (EntityViewModeInterface $view_mode): bool {
       // An empty description must be stored as NULL.
-      if (trim($view_mode->getDescription()) === '') {
+      if ($view_mode->get('description') !== NULL && trim($view_mode->get('description')) === '') {
         $view_mode->set('description', NULL);
         return TRUE;
       }
