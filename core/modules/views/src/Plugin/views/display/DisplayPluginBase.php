@@ -315,7 +315,7 @@ abstract class DisplayPluginBase extends PluginBase implements DisplayPluginInte
       $options = $this->defineOptions();
       return $this->getOption('use_ajax_options') ?? $options['defaults']['default']['ajax_options'];
     }
-    return FALSE;
+    return [];
   }
 
   /**
@@ -1484,21 +1484,17 @@ abstract class DisplayPluginBase extends PluginBase implements DisplayPluginInte
         ];
 
         $options = [
-          'use_ajax_paging' => $this->t('Apply to paging.'),
-          'use_ajax_sorting' => $this->t('Apply to sorting.'),
-          'use_ajax_exposed_filters' => $this->t('Apply to exposed filters.'),
+          'use_ajax_paging' => $this->t('On pager'),
+          'use_ajax_sorting' => $this->t('On sort criteria'),
+          'use_ajax_exposed_filters' => $this->t('On exposed filters'),
         ];
-
-        if (empty($this->options['use_ajax_options'])) {
-          $this->options['use_ajax_options'] = [];
-        }
 
         $form['use_ajax_options'] = [
           '#type' => 'checkboxes',
-          '#title' => $this->t('AJAX options'),
+          '#title' => $this->t('Use AJAX'),
           '#options' => $options,
           '#default_value' => $this->options['use_ajax_options'],
-          '#description' => $this->t('Select the options on which to apply ajax'),
+          '#description' => $this->t('Choose the options to apply AJAX. If none are selected, AJAX will apply to all options by default.'),
           '#states' => [
             'disabled' => [
               ':input[name="use_ajax"]' => ['checked' => FALSE],
