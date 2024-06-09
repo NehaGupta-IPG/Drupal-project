@@ -399,7 +399,7 @@ class EntityViewsData implements EntityHandlerInterface, EntityViewsDataInterfac
 
         // Special handling for field type.
         // @todo Remove this hardcoding in
-        // https://www.drupal.org/project/drupal/issues/2337515
+        // https://www.drupal.org/project/drupal/issues/2337515.
         if ($field_definition->getType() == 'uri') {
           $views_field['field']['default_formatter'] = 'string';
         }
