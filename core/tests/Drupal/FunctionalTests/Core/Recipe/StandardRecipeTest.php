@@ -33,7 +33,7 @@ class StandardRecipeTest extends StandardTest {
     // Set theme to stark and uninstall the other themes.
     $theme_installer = \Drupal::service('theme_installer');
     $theme_installer->install(['stark']);
-    $this->config('system.theme')->set('admin', '')->set('default', 'stark')->save();
+    $this->config('system.theme')->set('admin', null)->set('default', 'stark')->save();
     $theme_installer->uninstall(['claro', 'olivero']);
 
     // Determine which modules to uninstall.
