@@ -67,7 +67,7 @@ class FieldUITest extends UITestBase {
 
     // Ensure that dialog titles are not escaped.
     $edit_group_by_url = 'admin/structure/views/nojs/handler/test_view/default/field/name';
-    $this->assertSession()->linkByHrefNotExists($edit_group_by_url, 0, 'No aggregation link found.');
+    $this->assertSession()->linkByHrefNotExists($edit_group_by_url, 'No aggregation link found.');
 
     // Enable aggregation on the view.
     $edit = [
