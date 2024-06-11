@@ -137,7 +137,7 @@ class WebAssert extends MinkWebAssert {
    *
    * @param string $button
    *   One of id|name|label|value for the button.
-   * @param \Behat\Mink\Element\TraversableElement $container
+   * @param \Behat\Mink\Element\TraversableElement|null $container
    *   (optional) The document to check against. Defaults to the current page.
    *
    * @return \Behat\Mink\Element\NodeElement
@@ -167,7 +167,7 @@ class WebAssert extends MinkWebAssert {
    *
    * @param string $button
    *   One of id|name|label|value for the button.
-   * @param \Behat\Mink\Element\TraversableElement $container
+   * @param \Behat\Mink\Element\TraversableElement|null $container
    *   (optional) The document to check against. Defaults to the current page.
    *
    * @throws \Behat\Mink\Exception\ExpectationException
@@ -185,7 +185,7 @@ class WebAssert extends MinkWebAssert {
    *
    * @param string $select
    *   One of id|name|label|value for the select field.
-   * @param \Behat\Mink\Element\TraversableElement $container
+   * @param \Behat\Mink\Element\TraversableElement|null $container
    *   (optional) The document to check against. Defaults to the current page.
    *
    * @return \Behat\Mink\Element\NodeElement
@@ -215,7 +215,7 @@ class WebAssert extends MinkWebAssert {
    *   One of id|name|label|value for the select field.
    * @param string $option
    *   The option value.
-   * @param \Behat\Mink\Element\TraversableElement $container
+   * @param \Behat\Mink\Element\TraversableElement|null $container
    *   (optional) The document to check against. Defaults to the current page.
    *
    * @return \Behat\Mink\Element\NodeElement
@@ -251,7 +251,7 @@ class WebAssert extends MinkWebAssert {
    *   One of id|name|label|value for the select field.
    * @param string $option
    *   The option value that should not exist.
-   * @param \Behat\Mink\Element\TraversableElement $container
+   * @param \Behat\Mink\Element\TraversableElement|null $container
    *   (optional) The document to check against. Defaults to the current page.
    *
    * @throws \Behat\Mink\Exception\ElementNotFoundException
@@ -304,13 +304,16 @@ class WebAssert extends MinkWebAssert {
    *   (optional) A message to display with the assertion. Do not translate
    *   messages: use strtr() to embed variables in the message text, not
    *   t(). If left blank, a default message will be displayed.
+   * @param \Behat\Mink\Element\TraversableElement|null $container
+   *   (optional) The document to check against. Defaults to the current page.
    *
    * @throws \Behat\Mink\Exception\ExpectationException
    *   Thrown when element doesn't exist, or the link label is a different one.
    */
-  public function linkExists($label, $index = 0, $message = '') {
+  public function linkExists($label, $index = 0, $message = '', ?TraversableElement $container = NULL) {
+    $container = $container ?: $this->session->getPage();
     $message = ($message ?: strtr('Link with label %label not found.', ['%label' => $label]));
-    $links = $this->session->getPage()->findAll('named', ['link', $label]);
+    $links = $container->findAll('named', ['link', $label]);
     $this->assert(!empty($links[$index]), $message);
   }
 
@@ -327,13 +330,16 @@ class WebAssert extends MinkWebAssert {
    *   (optional) A message to display with the assertion. Do not translate
    *   messages: use strtr() to embed variables in the message text, not
    *   t(). If left blank, a default message will be displayed.
+   * @param \Behat\Mink\Element\TraversableElement|null $container
+   *   (optional) The document to check against. Defaults to the current page.
    *
    * @throws \Behat\Mink\Exception\ExpectationException
    *   Thrown when element doesn't exist, or the link label is a different one.
    */
-  public function linkExistsExact($label, $index = 0, $message = '') {
+  public function linkExistsExact($label, $index = 0, $message = '', ?TraversableElement $container = NULL) {
+    $container = $container ?: $this->session->getPage();
     $message = ($message ?: strtr('Link with label %label not found.', ['%label' => $label]));
-    $links = $this->session->getPage()->findAll('named_exact', ['link', $label]);
+    $links = $container->findAll('named_exact', ['link', $label]);
     $this->assert(!empty($links[$index]), $message);
   }
 
@@ -348,13 +354,16 @@ class WebAssert extends MinkWebAssert {
    *   (optional) A message to display with the assertion. Do not translate
    *   messages: use strtr() to embed variables in the message text, not
    *   t(). If left blank, a default message will be displayed.
+   * @param \Behat\Mink\Element\TraversableElement|null $container
+   *   (optional) The document to check against. Defaults to the current page.
    *
    * @throws \Behat\Mink\Exception\ExpectationException
    *   Thrown when element doesn't exist, or the link label is a different one.
    */
-  public function linkNotExists($label, $message = '') {
+  public function linkNotExists($label, $message = '', ?TraversableElement $container = NULL) {
+    $container = $container ?: $this->session->getPage();
     $message = ($message ?: strtr('Link with label %label found.', ['%label' => $label]));
-    $links = $this->session->getPage()->findAll('named', ['link', $label]);
+    $links = $container->findAll('named', ['link', $label]);
     $this->assert(empty($links), $message);
   }
 
@@ -369,13 +378,16 @@ class WebAssert extends MinkWebAssert {
    *   (optional) A message to display with the assertion. Do not translate
    *   messages: use strtr() to embed variables in the message text, not
    *   t(). If left blank, a default message will be displayed.
+   * @param \Behat\Mink\Element\TraversableElement|null $container
+   *   (optional) The document to check against. Defaults to the current page.
    *
    * @throws \Behat\Mink\Exception\ExpectationException
    *   Thrown when element doesn't exist, or the link label is a different one.
    */
-  public function linkNotExistsExact($label, $message = '') {
+  public function linkNotExistsExact($label, $message = '', ?TraversableElement $container = NULL) {
+    $container = $container ?: $this->session->getPage();
     $message = ($message ?: strtr('Link with label %label found.', ['%label' => $label]));
-    $links = $this->session->getPage()->findAll('named_exact', ['link', $label]);
+    $links = $container->findAll('named_exact', ['link', $label]);
     $this->assert(empty($links), $message);
   }
 
@@ -392,14 +404,17 @@ class WebAssert extends MinkWebAssert {
    *   message text, or use sprintf() if necessary. Avoid the use of
    *   \Drupal\Component\Render\FormattableMarkup unless you cast the object to
    *   a string. If left blank, a default message will be displayed.
+   * @param \Behat\Mink\Element\TraversableElement|null $container
+   *    (optional) The document to check against. Defaults to the current page.
    *
    * @throws \Behat\Mink\Exception\ExpectationException
    *   Thrown when element doesn't exist, or the link label is a different one.
    */
-  public function linkByHrefExists($href, $index = 0, $message = '') {
+  public function linkByHrefExists($href, $index = 0, $message = '', ?TraversableElement $container = NULL) {
+    $container = $container ?: $this->session->getPage();
     $xpath = $this->buildXPathQuery('//a[contains(@href, :href)]', [':href' => $href]);
     $message = ($message ?: strtr('No link containing href %href found.', ['%href' => $href]));
-    $links = $this->session->getPage()->findAll('xpath', $xpath);
+    $links = $container->findAll('xpath', $xpath);
     $this->assert(!empty($links[$index]), $message);
   }
 
@@ -416,14 +431,17 @@ class WebAssert extends MinkWebAssert {
    *   message text, or use sprintf() if necessary. Avoid the use of
    *   \Drupal\Component\Render\FormattableMarkup unless you cast the object to
    *   a string. If left blank, a default message will be displayed.
+   * @param \Behat\Mink\Element\TraversableElement|null $container
+   *   (optional) The document to check against. Defaults to the current page.
    *
    * @throws \Behat\Mink\Exception\ExpectationException
    *   Thrown when element doesn't exist, or the link label is a different one.
    */
-  public function linkByHrefExistsExact(string $href, int $index = 0, string $message = ''): void {
+  public function linkByHrefExistsExact(string $href, int $index = 0, string $message = '', ?TraversableElement $container = NULL): void {
+    $container = $container ?: $this->session->getPage();
     $xpath = $this->buildXPathQuery('//a[@href=:href]', [':href' => $href]);
     $message = ($message ?: strtr('No link with href %href found.', ['%href' => $href]));
-    $links = $this->session->getPage()->findAll('xpath', $xpath);
+    $links = $container->findAll('xpath', $xpath);
     $this->assert(!empty($links[$index]), $message);
   }
 
@@ -438,14 +456,17 @@ class WebAssert extends MinkWebAssert {
    *   message text, or use sprintf() if necessary. Avoid the use of
    *   \Drupal\Component\Render\FormattableMarkup unless you cast the object to
    *   a string. If left blank, a default message will be displayed.
+   * @param \Behat\Mink\Element\TraversableElement|null $container
+   *   (optional) The document to check against. Defaults to the current page.
    *
    * @throws \Behat\Mink\Exception\ExpectationException
    *   Thrown when element doesn't exist, or the link label is a different one.
    */
-  public function linkByHrefNotExists($href, $message = '') {
+  public function linkByHrefNotExists($href, $message = '', ?TraversableElement $container = NULL) {
+    $container = $container ?: $this->session->getPage();
     $xpath = $this->buildXPathQuery('//a[contains(@href, :href)]', [':href' => $href]);
     $message = ($message ?: strtr('Link containing href %href found.', ['%href' => $href]));
-    $links = $this->session->getPage()->findAll('xpath', $xpath);
+    $links = $container->findAll('xpath', $xpath);
     $this->assert(empty($links), $message);
   }
 
@@ -460,14 +481,17 @@ class WebAssert extends MinkWebAssert {
    *   message text, or use sprintf() if necessary. Avoid the use of
    *   \Drupal\Component\Render\FormattableMarkup unless you cast the object to
    *   a string. If left blank, a default message will be displayed.
+   * @param \Behat\Mink\Element\TraversableElement|null $container
+   *   (optional) The document to check against. Defaults to the current page.
    *
    * @throws \Behat\Mink\Exception\ExpectationException
    *   Thrown when element doesn't exist, or the link label is a different one.
    */
-  public function linkByHrefNotExistsExact(string $href, string $message = ''): void {
+  public function linkByHrefNotExistsExact(string $href, string $message = '', ?TraversableElement $container = NULL): void {
+    $container = $container ?: $this->session->getPage();
     $xpath = $this->buildXPathQuery('//a[@href=:href]', [':href' => $href]);
     $message = ($message ?: strtr('Link with href %href found.', ['%href' => $href]));
-    $links = $this->session->getPage()->findAll('xpath', $xpath);
+    $links = $container->findAll('xpath', $xpath);
     $this->assert(empty($links), $message);
   }
 
