@@ -22,6 +22,21 @@
         Drupal.views.instances[i] = new Drupal.views.ajaxView(ajaxViews[i]);
       });
     }
+
+    $('input[name="use_ajax"]', context).each(function () {
+      $(this).on('change', function () {
+        if (!$(this).is(':checked')) {
+          $('input[name="use_ajax_options[use_ajax_paging]"]', context).prop('checked', false);
+          $('input[name="use_ajax_options[use_ajax_sorting]"]', context).prop('checked', false);
+          $('input[name="use_ajax_options[use_ajax_exposed_filters]"]', context).prop('checked', false);
+        } else {
+          $('input[name="use_ajax_options[use_ajax_paging]"]', context).prop('checked', true);
+          $('input[name="use_ajax_options[use_ajax_sorting]"]', context).prop('checked', true);
+          $('input[name="use_ajax_options[use_ajax_exposed_filters]"]', context).prop('checked', true);
+        }
+      });
+    });
+
   };
   Drupal.behaviors.ViewsAjaxView.detach = (context, settings, trigger) => {
     if (trigger === 'unload') {
