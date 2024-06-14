@@ -15,7 +15,7 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
- * Provides a form removing module content entities data before uninstallation.
+ * Provides a form removing module content entities data before uninstalling.
  *
  * @internal
  */

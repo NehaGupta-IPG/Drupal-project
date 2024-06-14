@@ -134,7 +134,8 @@ class SelectionTest extends KernelTestBase {
   /**
    * Tests the anchor tag stripping.
    *
-   * Results based on the above data without stripping will produce an output like this:
+   * Results based on the above data without stripping will produce an output
+   * like so:
    *   ...<a href="/node/1" hreflang="en">Test first node</a>...
    *   ...<a href="/node/2" hreflang="en">Test second node</a>...
    *   ...<a href="/node/3" hreflang="en">Test third node</a>...

@@ -8,7 +8,7 @@ use Drupal\KernelTests\KernelTestBase;
 use Drupal\module_test\PluginManagerCacheClearer;
 
 /**
- * Tests the uninstallation of modules.
+ * Tests uninstalling modules.
  *
  * @group Module
  */

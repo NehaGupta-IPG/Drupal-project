@@ -35,8 +35,8 @@ class ViewUIObjectTest extends UnitTestCase {
       // EntityInterface::isNew() is missing from the list of methods, because
       // it calls id(), which breaks the ->expect($this->once()) call. Call it
       // later. EntityInterface::isSyncing() is only called during syncing
-      // process. EntityInterface::isUninstalling() is only called during
-      // uninstallation process. EntityInterface::getConfigDependencyName() and
+      // process. EntityInterface::isUninstalling() is only called during the uninstall.
+      // EntityInterface::getConfigDependencyName() and
       // ConfigEntityInterface::calculateDependencies() are only used for
       // dependency management.
       if (!in_array(

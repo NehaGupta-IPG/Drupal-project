@@ -137,8 +137,8 @@ function hook_module_implements_alter(&$implementations, $hook) {
  * by reading the .info.yml file with \Drupal\Core\Extension\InfoParser.
  *
  * Using implementations of this hook to make modules required by setting the
- * $info['required'] key is discouraged. Doing so will slow down the module
- * installation and uninstallation process. Instead, use
+ * $info['required'] key is discouraged. Doing so will slow down the install and
+ * uninstall process for the module. Instead, use
  * \Drupal\Core\Extension\ModuleUninstallValidatorInterface.
  *
  * @param array $info

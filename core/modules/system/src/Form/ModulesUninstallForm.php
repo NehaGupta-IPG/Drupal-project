@@ -142,8 +142,8 @@ class ModulesUninstallForm extends FormBase {
       return $form;
     }
 
-    // Deprecated and obsolete modules should appear at the top of the
-    // uninstallation list.
+    // Deprecated and obsolete modules should appear at the top of the uninstall
+    // list.
     $unstable_lifecycle = array_flip([
       ExtensionLifecycle::DEPRECATED,
       ExtensionLifecycle::OBSOLETE,

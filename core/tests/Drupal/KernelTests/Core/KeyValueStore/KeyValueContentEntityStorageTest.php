@@ -166,7 +166,7 @@ class KeyValueContentEntityStorageTest extends KernelTestBase {
   }
 
   /**
-   * Tests uninstallation of a module that does not use the SQL entity storage.
+   * Tests uninstalling a module that does not use the SQL entity storage.
    */
   public function testUninstall(): void {
     $uninstall_validator_reasons = \Drupal::service('content_uninstall_validator')->validate('keyvalue_test');

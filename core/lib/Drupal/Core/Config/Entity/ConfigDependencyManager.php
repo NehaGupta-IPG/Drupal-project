@@ -8,10 +8,10 @@ use Drupal\Component\Graph\Graph;
  * Provides a class to discover configuration entity dependencies.
  *
  * Configuration entities can depend on modules, themes and other configuration
- * entities. The dependency system is used during configuration installation,
- * uninstallation, and synchronization to ensure that configuration entities are
- * handled in the correct order. For example, node types are created before
- * their fields, and both are created before the view display configuration.
+ * entities. The dependency system is used during the install, uninstall, and
+ * syncing of configuration to ensure that configuration entities are handled in
+ * the correct order. For example, node types are created before their fields,
+ * and both are created before the view display configuration.
  *
  * The configuration dependency value is structured like this:
  * @code

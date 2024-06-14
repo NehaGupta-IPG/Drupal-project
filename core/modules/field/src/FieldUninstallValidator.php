@@ -10,7 +10,7 @@ use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\StringTranslation\TranslationInterface;
 
 /**
- * Prevents uninstallation of modules providing active field storage.
+ * Prevents the uninstall of modules providing active field storage.
  */
 class FieldUninstallValidator implements ConfigImportModuleUninstallValidatorInterface {
 

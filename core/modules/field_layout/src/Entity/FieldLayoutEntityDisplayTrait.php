@@ -144,7 +144,8 @@ trait FieldLayoutEntityDisplayTrait {
   public function calculateDependencies() {
     parent::calculateDependencies();
 
-    // This can be called during uninstallation, so check for a valid ID first.
+    // This can be called during the uninstall process, so check for a valid ID
+    // first.
     if ($this->getLayoutId()) {
       $this->calculatePluginDependencies($this->getLayout());
     }

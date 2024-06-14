@@ -113,7 +113,7 @@ interface ConfigEntityInterface extends EntityInterface, ThirdPartySettingsInter
    *
    * This method allows configuration entities to remove dependencies instead
    * of being deleted themselves. Configuration entities can use this method to
-   * avoid being unnecessarily deleted during an extension uninstallation.
+   * avoid being unnecessarily deleted during the uninstall of an extension.
    * For example, entity displays remove references to widgets and formatters if
    * the plugin that supplies them depends on a module that is being
    * uninstalled.

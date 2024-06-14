@@ -3,7 +3,7 @@
 namespace Drupal\Core\Extension;
 
 /**
- * Manages theme installation/uninstallation.
+ * Manages theme install and uninstall.
  */
 interface ThemeInstallerInterface {
 

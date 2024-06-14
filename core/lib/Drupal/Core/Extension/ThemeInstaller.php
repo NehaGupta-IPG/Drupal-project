@@ -15,7 +15,7 @@ use Drupal\Core\Theme\Registry;
 use Psr\Log\LoggerInterface;
 
 /**
- * Manages theme installation/uninstallation.
+ * Manages theme install and uninstall.
  */
 class ThemeInstaller implements ThemeInstallerInterface {
 

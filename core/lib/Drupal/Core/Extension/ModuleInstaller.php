@@ -25,7 +25,7 @@ use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
  * installs the schema, updates the Drupal kernel and more.
  *
  * We don't inject dependencies yet, as we would need to reload them after
- * each installation or uninstallation of a module.
+ * each install or uninstall of a module.
  * https://www.drupal.org/project/drupal/issues/2350111 for example tries to
  * solve this dilemma.
  */
@@ -564,7 +564,7 @@ class ModuleInstaller implements ModuleInstallerInterface {
         }
       }
 
-      // Allow modules to react prior to the uninstallation of a module.
+      // Allow modules to react prior to the uninstall of a module.
       $this->moduleHandler->invokeAll('module_preuninstall', [$module, $sync_status]);
 
       // Uninstall the module.
@@ -654,8 +654,8 @@ class ModuleInstaller implements ModuleInstallerInterface {
     }
     // Rebuild routes after installing module. This is done here on top of
     // \Drupal\Core\Routing\RouteBuilder::destruct to not run into errors on
-    // fastCGI which executes ::destruct() after the Module uninstallation page
-    // was sent already.
+    // fastCGI which executes ::destruct() after the Module uninstall page was
+    // sent already.
     \Drupal::service('router.builder')->rebuild();
 
     // Let other modules react.

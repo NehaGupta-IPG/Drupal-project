@@ -89,11 +89,12 @@ class ConfigImportAllTest extends ModuleTestBase {
 
     $this->resetAll();
 
-    // Delete all entities provided by modules that prevent uninstallation. For
-    // example, if any content entity exists its provider cannot be uninstalled.
-    // So deleting all taxonomy terms allows the Taxonomy to be uninstalled.
-    // Additionally, every field is deleted so modules can be uninstalled. For
-    // example, if a comment field exists then Comment cannot be uninstalled.
+    // Delete all entities provided by modules that prevent the uninstall of the
+    // module. For example, if any content entity exists its provider cannot be
+    // uninstalled. So deleting all taxonomy terms allows the Taxonomy to be
+    // uninstalled. Additionally, every field is deleted so modules can be
+    // uninstalled. For example, if a comment field exists then Comment cannot
+    // be uninstalled.
     $entity_type_manager = \Drupal::entityTypeManager();
     foreach ($entity_type_manager->getDefinitions() as $entity_type) {
       if (($entity_type instanceof ContentEntityTypeInterface || in_array($entity_type->id(), ['field_storage_config', 'filter_format'], TRUE))

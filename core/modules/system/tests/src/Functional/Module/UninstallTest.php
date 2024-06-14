@@ -13,7 +13,7 @@ use Drupal\user\Entity\Role;
 use Drupal\user\RoleInterface;
 
 /**
- * Tests the uninstallation of modules.
+ * Tests uninstalling modules.
  *
  * @group Module
  */
@@ -167,7 +167,7 @@ class UninstallTest extends BrowserTestBase {
     // Make sure our unique cache entry is gone.
     $cached = \Drupal::cache()->get('uninstall_test');
     $this->assertFalse($cached, 'Cache entry not found');
-    // Make sure we get an error message when we try to confirm uninstallation
+    // Make sure we get an error message when we try to confirm the uninstall
     // of an empty list of modules.
     $this->drupalGet('admin/modules/uninstall/confirm');
     $this->assertSession()->pageTextContains('The selected modules could not be uninstalled, either due to a website problem or due to the uninstall confirmation form timing out.');

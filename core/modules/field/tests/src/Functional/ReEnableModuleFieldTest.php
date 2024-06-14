@@ -108,8 +108,8 @@ class ReEnableModuleFieldTest extends BrowserTestBase {
     $this->assertSession()->pageTextContains("The Telephone number field type is used in the following field: node.field_telephone");
 
     // Add another telephone field to a different entity type in order to test
-    // the message for the case when multiple fields are blocking the
-    // uninstallation of a module.
+    // the message for the case when multiple fields are blocking the uninstall
+    // of a module.
     $field_storage2 = FieldStorageConfig::create([
       'field_name' => 'field_telephone_2',
       'entity_type' => 'user',
