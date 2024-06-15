@@ -375,6 +375,9 @@ system.image.gd:
     webp_quality:
       type: integer
       label: 'WEBP quality'
+    webp_lossless:
+      type: boolean
+      label: 'Toggle WEBP lossless'
 
 system.mail:
   type: config_object
