@@ -8,7 +8,7 @@ use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 
 /**
- * Unpublishes an entity.
+ * Provides an action set an entity to unpublished.
  */
 #[Action(
   id: 'entity:unpublish_action',

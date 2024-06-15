@@ -346,7 +346,7 @@ class FileFieldWidgetTest extends FileFieldTestBase {
     $this->drupalGet($comment_file->createFileUrl());
     $this->assertSession()->statusCodeEquals(403);
 
-    // Unpublishes node.
+    // Change the node to unpublished.
     $this->drupalLogin($this->adminUser);
     $edit = ['status[value]' => FALSE];
     $this->drupalGet('node/' . $node->id() . '/edit');
