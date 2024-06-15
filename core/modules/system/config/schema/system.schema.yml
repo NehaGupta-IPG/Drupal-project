@@ -372,6 +372,9 @@ system.image.gd:
         Range:
           min: 0
           max: 100
+    webp_quality:
+      type: integer
+      label: 'WEBP quality'
 
 system.mail:
   type: config_object
