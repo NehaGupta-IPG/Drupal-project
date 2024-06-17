@@ -126,7 +126,7 @@ class AccessPolicyProcessor implements AccessPolicyProcessorInterface {
     try {
       // Retrieve the permissions from the static cache if available.
       if ($static_cache = $this->variationStatic->get($cache_keys, $initial_cacheability)) {
-        // TODO?
+        // @todo How to handle this?
         return $static_cache->data;
       }
 
