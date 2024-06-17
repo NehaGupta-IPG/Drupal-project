@@ -16,9 +16,9 @@ function block_content_update_last_removed(): int {
 }
 
 /**
- * Install owner field.
+ * Install the owner field for Block Content entities.
  */
-function block_content_update_10301(): TranslatableMarkup {
+function block_content_update_10301(): void {
   $entityDefinitionUpdateManager = \Drupal::entityDefinitionUpdateManager();
   $entityType = $entityDefinitionUpdateManager->getEntityType('block_content');
 
@@ -28,5 +28,4 @@ function block_content_update_10301(): TranslatableMarkup {
     ->setTranslatable($entityType->isTranslatable());
   $entityDefinitionUpdateManager
     ->installFieldStorageDefinition('uid', 'block_content', 'block_content', $storage_definition);
-  return \t('Installed uid field for BlockContent entities.');
 }
