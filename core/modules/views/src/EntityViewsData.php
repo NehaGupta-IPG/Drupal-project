@@ -393,13 +393,13 @@ class EntityViewsData implements EntityHandlerInterface, EntityViewsDataInterfac
         }
 
         // Computed fields have no database storage, so can't participate in
-        // a query, so there is no sort, argument, or filter.
+        // a query. Therefore, there is no sort, argument, or filter.
         $views_field['field']['id'] = 'field';
         $views_field['entity field'] = $field_definition->getName();
 
         // Special handling for field type.
         // @todo Remove this hardcoding in
-        // https://www.drupal.org/project/drupal/issues/2337515.
+        //   https://www.drupal.org/project/drupal/issues/2337515.
         if ($field_definition->getType() == 'uri') {
           $views_field['field']['default_formatter'] = 'string';
         }

@@ -216,7 +216,7 @@ class EntityViewsDataTest extends KernelTestBase {
     $this->assertArrayNotHasKey('sort', $data['entity_test']['computed_string']);
     $this->assertArrayNotHasKey('argument', $data['entity_test']['computed_string']);
 
-    // Check special handling for uri fields.
+    // Check special handling for URI fields.
     $this->assertEquals('string', $data['entity_test']['computed_uri']['field']['default_formatter']);
   }
 
