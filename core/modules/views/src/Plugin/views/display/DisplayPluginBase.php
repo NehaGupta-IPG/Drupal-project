@@ -313,7 +313,7 @@ abstract class DisplayPluginBase extends PluginBase implements DisplayPluginInte
   public function getAjaxOptions() {
     if ($this->usesAJAX()) {
       $options = $this->defineOptions();
-      return $this->getOption('use_ajax_options') ?? $options['defaults']['default']['ajax_options'];
+      return $this->getOption('use_ajax_options') ?? $options['ajax_options'];
     }
     return [];
   }
@@ -523,6 +523,11 @@ abstract class DisplayPluginBase extends PluginBase implements DisplayPluginInte
       ],
       'use_ajax' => [
         'default' => FALSE,
+      ],
+      'ajax_options' => [
+        'use_ajax_paging' => 'use_ajax_paging',
+        'use_ajax_sorting' => 'use_ajax_sorting',
+        'use_ajax_exposed_filters' => 'use_ajax_exposed_filters',
       ],
       'hide_attachment_summary' => [
         'default' => FALSE,
