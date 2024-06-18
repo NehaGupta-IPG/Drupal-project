@@ -38,6 +38,7 @@ class EntityViewModeUpdatePathTest extends UpdatePathTestBase {
     $this->assertInstanceOf(EntityViewMode::class, $view_mode);
 
     $this->assertNull($view_mode->get('description'));
+    // Assert backward compatibility of EntityViewMode::getDescription().
     $this->assertSame('', $view_mode->getDescription());
   }
 
