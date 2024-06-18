@@ -15,7 +15,7 @@ core.entity_view_mode.*.*:
       constraints:
         Regex:
           pattern: '/^[a-z0-9_]+\.[a-z0-9_]+$/'
-          message: "The %value ID is not valid."
+          message: "The ID %value is not valid."
     label:
       type: required_label
       label: 'The human-readable name of the view mode'
