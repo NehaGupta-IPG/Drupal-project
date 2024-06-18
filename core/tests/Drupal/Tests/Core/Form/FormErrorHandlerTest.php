@@ -87,9 +87,9 @@ class FormErrorHandlerTest extends UnitTestCase {
 
     $this->renderer->expects($this->any())
       ->method('renderPlain')
-      ->will($this->returnCallback(function ($message) {
+      ->willReturnCallback(function ($message) {
         return $message['message']['#markup'];
-      }));
+      });
 
     $form = [
       '#parents' => [],

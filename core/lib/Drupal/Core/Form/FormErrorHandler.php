@@ -72,7 +72,7 @@ class FormErrorHandler implements FormErrorHandlerInterface {
             '#markup' => $error,
           ],
         ];
-        $message = $this->renderer->renderPlain($message);
+        $message = $this->renderer->renderInIsolation($message);
         $this->messenger()->addMessage($message, 'error');
       }
       else {
