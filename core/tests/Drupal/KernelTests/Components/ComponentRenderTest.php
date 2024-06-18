@@ -36,6 +36,7 @@ class ComponentRenderTest extends ComponentKernelTestBase {
     $this->checkIncludeDefaultContent();
     $this->checkIncludeDataMapping();
     $this->checkEmbedWithNested();
+    $this->checkExtendsWithNested();
     $this->checkPropValidation();
     $this->checkArrayObjectTypeCast();
     $this->checkNonExistingComponent();
@@ -133,6 +134,31 @@ class ComponentRenderTest extends ComponentKernelTestBase {
     $this->assertContains('core/components.sdc_test--my-cta', $libraries);
     $this->assertContains('core/components.sdc_test--my-banner', $libraries);
     $this->assertContains('core/components.sdc_test--just-a-slot', $libraries);
+  }
+
+  /**
+   * Render a card with slots that include a CTA component.
+   */
+  protected function checkExtendsWithNested(): void {
+    $build = [
+      '#type' => 'component',
+      '#component' => 'sdc_test:extends',
+      '#props' => [],
+      '#slots' => [
+        'nested_slot' => [
+          '#type' => 'html_tag',
+          '#tag' => 'p',
+          '#value' => $this->t('This is another slot.'),
+        ],
+      ],
+    ];
+    $metadata = new BubbleableMetadata();
+    $crawler = $this->renderComponentRenderArray($build, $metadata);
+    $this->assertNotEmpty($crawler->filter('.just-a-slot'), $crawler->outerHtml());
+    $this->assertStringContainsString(
+      'data-component-id="sdc_test:my-banner"',
+      $crawler->filter('.just-a-slot')->html(),
+    );
   }
 
   /**
