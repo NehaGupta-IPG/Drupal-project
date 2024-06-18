@@ -529,7 +529,7 @@ abstract class DisplayPluginBase extends PluginBase implements DisplayPluginInte
           'use_ajax_paging' => 'use_ajax_paging',
           'use_ajax_sorting' => 'use_ajax_sorting',
           'use_ajax_exposed_filters' => 'use_ajax_exposed_filters',
-        ]
+        ],
       ],
       'hide_attachment_summary' => [
         'default' => FALSE,
