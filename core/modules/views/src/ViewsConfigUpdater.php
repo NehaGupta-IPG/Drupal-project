@@ -84,6 +84,9 @@ class ViewsConfigUpdater {
       if ($this->processRssViewModeUpdate($view)) {
         $changed = TRUE;
       }
+      if ($this->addGroupingLabelElement($handler, $handler_type, $view)) {
+        $changed = TRUE;
+      }
       return $changed;
     });
   }
@@ -467,6 +470,35 @@ class ViewsConfigUpdater {
 
     if ($changed) {
       $view->set('display', $displays);
+    }
+
+    return $changed;
+  }
+
+  /**
+   * Add Grouping Label to views without one.
+   *
+   * @param array $handler
+   *   A display handler.
+   * @param string $handler_type
+   *   The handler type.
+   * @param \Drupal\views\ViewEntityInterface $view
+   *   The View being updated.
+   *
+   * @return bool
+   *   Whether the handler was updated.
+   */
+  public function addGroupingLabelElement(array &$handler, string $handler_type, ViewEntityInterface $view): bool {
+    $changed = FALSE;
+
+    // Add grouping label element to existing views.
+    if (($handler_type === 'style')
+      && isset($handler['plugin_id'], $handler['type'])
+      && $handler['plugin_id'] === 'style'
+      && $handler['type'] === 'Grid' || 'HtmlList' || 'GridResponsive' || 'DefaultStyle'
+      && !isset($handler['style']['grouping_label_element'])) {
+      $handler['style']= ['grouping_label_element' => NULL];
+      $changed = TRUE;
     }
 
     return $changed;
