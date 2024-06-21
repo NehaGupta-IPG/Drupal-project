@@ -69,7 +69,7 @@ class BlockComponentRenderArray implements EventSubscriberInterface {
    * @param \Psr\Log\LoggerInterface $logger
    *   The logger service.
    */
-  public function __construct(AccountInterface $current_user, LoggerInterface $logger = NULL) {
+  public function __construct(AccountInterface $current_user, ?LoggerInterface $logger = NULL) {
     $this->currentUser = $current_user;
     if (!$logger) {
       @trigger_error('Calling ' . __METHOD__ . '() without the $logger argument is deprecated in drupal:10.3.0 and it will be required in drupal:11.0.0. See See https://www.drupal.org/node/3356924', E_USER_DEPRECATED);
