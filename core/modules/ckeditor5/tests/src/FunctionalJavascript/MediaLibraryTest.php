@@ -324,4 +324,19 @@ class MediaLibraryTest extends WebDriverTestBase {
     $this->assertEquals('""', $drupal_media->getAttribute('alt'));
   }
 
+  /**
+   * Test submit without select items, should return error.
+   */
+  public function testEmptyWidgetOverflow(): void {
+    $assert_session = $this->assertSession();
+    $this->drupalGet('/node/add/blog');
+    $this->waitForEditor();
+    $this->pressEditorButton('Insert Media');
+    $this->assertNotEmpty($assert_session->waitForElementVisible('css', '#drupal-modal #media-library-content'));
+    $assert_session->elementExists('css', '.ui-dialog-buttonpane')->pressButton('Insert selected');
+    $element = $assert_session->waitForElement('css', ".messages--error:contains('No items selected.')", 10000);
+    $this->assertNotEmpty($element);
+  }
+
+
 }
