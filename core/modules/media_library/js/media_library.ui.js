@@ -307,18 +307,18 @@
         const selectItemsText =
           remaining < 0
             ? Drupal.formatPlural(
-              currentSelection.length,
-              '1 item selected',
-              '@count items selected',
-            )
+                currentSelection.length,
+                '1 item selected',
+                '@count items selected',
+              )
             : Drupal.formatPlural(
-              remaining,
-              '@selected of @count item selected',
-              '@selected of @count items selected',
-              {
-                '@selected': currentSelection.length,
-              },
-            );
+                remaining,
+                '@selected of @count item selected',
+                '@selected of @count items selected',
+                {
+                  '@selected': currentSelection.length,
+                },
+              );
         // The selected count div could have been created outside of the
         // context, so we unfortunately can't use context here.
         $('.js-media-library-selected-count').html(selectItemsText);
