@@ -153,6 +153,32 @@ class MediaLibrarySelectForm extends FieldPluginBase implements WorkspaceSafeFor
    *   A command to send the selection to the current field widget.
    */
   public static function updateWidget(array &$form, FormStateInterface $form_state, Request $request) {
+    if ($form_state->getErrors()) {
+      // If there are errors, we need to replace the form messages container with the error messages.
+      $messages = \Drupal::messenger()->all();
+
+      // Build the error message output.
+      $translate = \Drupal::translation();
+      $output = [
+        '#theme' => 'status_messages',
+        '#message_list' => $messages,
+        '#status_headings' => [
+          'status' => $translate->translate('Status message'),
+          'error' => $translate->translate('Error message'),
+          'warning' => $translate->translate('Warning message'),
+        ],
+      ];
+
+      // Replace the content of the messages container with the new messages
+      $response = new AjaxResponse();
+      $response->addCommand(new ReplaceCommand('#media-library-messages', $output));
+
+      // Clear the messages to prevent duplication.
+      \Drupal::messenger()->deleteAll();
+
+      return $response;
+    }
+
     $field_id = $form_state->getTriggeringElement()['#field_id'];
     $selected_ids = $form_state->getValue($field_id);
     $selected_ids = $selected_ids ? array_filter(explode(',', $selected_ids)) : [];
@@ -183,8 +209,9 @@ class MediaLibrarySelectForm extends FieldPluginBase implements WorkspaceSafeFor
    * {@inheritdoc}
    */
   public function viewsFormValidate(array &$form, FormStateInterface $form_state) {
-    $selected = array_filter($form_state->getValue($this->options['id']));
-    if (empty($selected)) {
+    $selected = array_filter($form_state->getValue($this->options['id'], []));
+    $current_selection = $form_state->getValue('media_library_select_form_selection');
+    if (empty($selected) && empty($current_selection)) {
       $form_state->setErrorByName('', $this->t('No items selected.'));
     }
   }
