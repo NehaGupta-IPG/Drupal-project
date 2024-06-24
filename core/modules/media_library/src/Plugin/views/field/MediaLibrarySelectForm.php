@@ -155,25 +155,13 @@ class MediaLibrarySelectForm extends FieldPluginBase implements WorkspaceSafeFor
    */
   public static function updateWidget(array &$form, FormStateInterface $form_state, Request $request) {
     if ($form_state->getErrors()) {
-      // If there are errors, we need to replace the form messages container with the error messages.
-      $messages = \Drupal::messenger()->all();
-
-      // Build the error message output.
-      $translate = \Drupal::translation();
-      $output = [
-        '#theme' => 'status_messages',
-        '#message_list' => $messages,
-        '#status_headings' => [
-          'status' => $translate->translate('Status message'),
-          'error' => $translate->translate('Error message'),
-          'warning' => $translate->translate('Warning message'),
-        ],
-      ];
-
-      // Replace the content of the messages container with the new messages
+      $all_messages = \Drupal::messenger()->all();
       $response = new AjaxResponse();
-      $response->addCommand(new ReplaceCommand('#media-library-messages', $output));
-
+      foreach ($all_messages as $type => $messages) {
+        foreach ($messages as $message) {
+          $response->addCommand(new MessageCommand($message, '#media-library-messages', ['type' => $type]));
+        }
+      }
       // Clear the messages to prevent duplication.
       \Drupal::messenger()->deleteAll();
 
