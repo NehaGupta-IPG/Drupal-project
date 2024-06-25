@@ -174,7 +174,7 @@ field.formatter.settings.file_url_plain:
   mapping:
     absolute_url:
       type: boolean
-      label: 'Render as absolute URL'
+      label: 'Absolute URL'
 
 field.widget.settings.file_generic:
   type: mapping

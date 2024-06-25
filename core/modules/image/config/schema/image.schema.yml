@@ -180,7 +180,7 @@ field.formatter.settings.image_url:
       label: 'Image style'
     absolute_url:
       type: boolean
-      label: 'Render as absolute URL'
+      label: 'Absolute URL'
 
 field.widget.settings.image_image:
   type: mapping

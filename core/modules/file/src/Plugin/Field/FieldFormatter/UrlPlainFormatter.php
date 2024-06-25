@@ -36,8 +36,8 @@ class UrlPlainFormatter extends FileFormatterBase {
     $form = parent::settingsForm($form, $form_state);
     $form['absolute_url'] = [
       '#type' => 'checkbox',
-      '#title' => $this->t('Render as absolute url'),
-      '#description' => $this->t('If checked, links will be rendered as absolute urls.'),
+      '#title' => $this->t('Absolute URL'),
+      '#description' => $this->t('If checked, links will be rendered as absolute URLs.'),
       '#default_value' => $this->getSetting('absolute_url'),
     ];
 
@@ -48,7 +48,7 @@ class UrlPlainFormatter extends FileFormatterBase {
    * {@inheritdoc}
    */
   public function settingsSummary(): array {
-    $summary[] = $this->getSetting('absolute_url') ? $this->t('Rendered as absolute url') : $this->t('Rendered as relative url');
+    $summary[] = $this->getSetting('absolute_url') ? $this->t('Rendered as absolute URL') : $this->t('Rendered as relative URL');
 
     return $summary;
   }
