@@ -36,7 +36,7 @@ function media_post_update_media_author_views_filter_update(): void {
 /**
  * Add the oEmbed loading attribute setting to field formatter instances.
  */
-function media_post_update_oembed_loading_attribute(array &$sandbox = NULL): void {
+function media_post_update_oembed_loading_attribute(?array &$sandbox = NULL): void {
   $media_config_updater = \Drupal::classResolver(MediaConfigUpdater::class);
   assert($media_config_updater instanceof MediaConfigUpdater);
   $media_config_updater->setDeprecationsEnabled(TRUE);
