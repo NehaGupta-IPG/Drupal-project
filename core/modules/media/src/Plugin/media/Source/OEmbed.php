@@ -22,7 +22,6 @@ use Drupal\Core\Url;
 use Drupal\Core\Utility\Token;
 use Drupal\media\Attribute\OEmbedMediaSource;
 use Drupal\media\IFrameUrlHelper;
-use Drupal\media\MediaSourceBase;
 use Drupal\media\MediaInterface;
 use Drupal\media\MediaSourceBase;
 use Drupal\media\MediaTypeInterface;
