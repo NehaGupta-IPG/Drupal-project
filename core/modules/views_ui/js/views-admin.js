@@ -295,7 +295,11 @@
     /**
      * Find the wrapper of the displayed text.
      */
-    this.$selected_div = this.$form.find('.views-selected-options').parentElement;
+
+    this.$selected_div = this.$form.find(
+      '.views-selected-options',
+    ).parentElement;
+    this.$selected_div.hide();
 
     this.$selected_div.hide();
     /**
