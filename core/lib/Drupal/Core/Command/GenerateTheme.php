@@ -40,6 +40,8 @@ class GenerateTheme extends Command {
   /**
    * GenerateTheme constructor.
    *
+   * @param object $class_loader
+   *   The class loader.
    * @param string|null $name
    *   The name of the command; passing null means it must be set in
    *   configure().
