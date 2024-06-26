@@ -21,6 +21,7 @@
         // eslint-disable-next-line jquery/no-parent
         $(context)
           .find('input[name^="options"]:checked')
+          // eslint-disable-next-line jquery/no-parent
           .parent()
           .each(function () {
             values.push(
