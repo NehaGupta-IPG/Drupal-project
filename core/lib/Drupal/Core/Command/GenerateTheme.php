@@ -46,13 +46,13 @@ class GenerateTheme extends Command {
    *   The name of the command; passing null means it must be set in
    *   configure().
    * @param string|null $root
-   *   The path for the Drupal root.
+   *   The path for the Drupal root. Only used in testing.
    */
   public function __construct($class_loader, ?string $name = NULL, ?string $root = NULL) {
     parent::__construct($name);
 
     $kernel = new DrupalKernel('prod', $class_loader, FALSE);
-    $this->root = $kernel->getAppRoot();
+    $this->root = $root ?? $kernel->getAppRoot();
   }
 
   /**
