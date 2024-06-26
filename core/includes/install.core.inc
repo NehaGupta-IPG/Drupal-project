@@ -541,7 +541,13 @@ function install_begin_request($class_loader, &$install_state): void {
     $task = install_verify_completed_task();
   }
 
-  if (!empty($task) && empty($install_state['config_install_path'])) {
+  // This check only matters for the interactive install to prevent
+  // earlier steps when the site is already installed.
+  if (
+    !empty($task)
+    && empty($install_state['config_install_path'])
+    && $install_state['interactive']
+  ) {
 
     // If the current step happens before the configure step, ensure
     // that configuration has not already been set up. Otherwise a completed
@@ -554,7 +560,8 @@ function install_begin_request($class_loader, &$install_state): void {
       $current_key !== FALSE
       && $install_configure_form_key !== FALSE
       && $current_key < $install_configure_form_key
-      && \Drupal::config('system.site')->get('name') != 'Drupal'
+      && class_exists('\Drupal\user\Entity\User')
+      && User::load(1)
     ) {
       throw new AlreadyInstalledException(\Drupal::service('string_translation'));
     }
