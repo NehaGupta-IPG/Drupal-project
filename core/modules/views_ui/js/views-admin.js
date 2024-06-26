@@ -297,8 +297,8 @@
      */
     this.$selected_div = this.$form.find(
       '.views-selected-options',
-    ).parentElement;
-    this.$selected_div.hide();
+    )[0].parentElement;
+    this.$selected_div.style.display = 'none';
 
     /**
      *
@@ -318,8 +318,7 @@
     const label = $target.closest('td').next().html().trim();
     // Add/remove the checked item to the list.
     if (event.target.checked) {
-      this.$selected_div.show();
-      this.$selected_div[0].style.display = 'block';
+      this.$selected_div.style.display = 'block';
       this.checkedItems.push(label);
     } else {
       const position = $.inArray(label, this.checkedItems);
@@ -334,7 +333,7 @@
       }
       // Hide it again if none item is selected.
       if (this.checkedItems.length === 0) {
-        this.$selected_div.hide();
+        this.$selected_div.style.display = 'none';
       }
     }
     this.refreshCheckedItems();
@@ -345,15 +344,13 @@
    */
   Drupal.viewsUi.AddItemForm.prototype.refreshCheckedItems = function () {
     // Perhaps we should precache the text div, too.
-    this.$selected_div
-      .find('.views-selected-options')
-      .html(this.checkedItems.join(', '));
+    const viewsSelectedOptions = this.$selected_div.querySelector(
+      '.views-selected-options',
+    );
 
-    this.$selected_div
-      ?.get(0)
-      ?.dispatchEvent(
-        new CustomEvent('dialogContentResize', { bubbles: true }),
-      );
+    viewsSelectedOptions.innerHTML = this.checkedItems.join(', ');
+    const event = new Event('dialogContentResize');
+    viewsSelectedOptions.dispatchEvent(event);
   };
 
   /**
@@ -437,7 +434,7 @@
    *   where to put it.
    */
   Drupal.behaviors.viewsUiRenderAddViewButton.toggleMenu = function ($trigger) {
-    $trigger.parentElement.toggleClass('open');
+    $trigger[0].parentElement.classList.toggle('open');
     $trigger.next().slideToggle('fast');
   };
 
@@ -623,9 +620,9 @@
         '.views-display-setting a',
       );
       if ($contextualFilters.length) {
-        $('#preview-args').parentElement.show();
+        $('#preview-args')[0].parentElement.style.display = '';
       } else {
-        $('#preview-args').parentElement.hide();
+        $('#preview-args')[0].parentElement.style.display = 'none';
       }
 
       // Executes an initial preview.
@@ -762,7 +759,7 @@
             // button for adding a new filter group.
             $(
               `<ul class="action-links"><li><a id="views-add-group-link" href="#">${this.addGroupButton[0].value}</a></li></ul>`,
-            ).prependTo(this.table.parentElement),
+            ).prependTo(this.table[0].parentElement),
           ),
         )
           .find('#views-add-group-link')
@@ -1183,13 +1180,23 @@
 
       function changeDefaultWidget(event) {
         if ($(event.target).prop('checked')) {
-          $context.find('input.default-radios').parentElement.hide();
-          $context.find('td.any-default-radios-row').parentElement.hide();
-          $context.find('input.default-checkboxes').parentElement.show();
+          $context.find('input.default-radios')[0].parentElement.style.display =
+            'none';
+          $context.find(
+            'td.any-default-radios-row',
+          )[0].parentElement.style.display = 'none';
+          $context.find(
+            'input.default-checkboxes',
+          )[0].parentElement.style.display = '';
         } else {
-          $context.find('input.default-checkboxes').parentElement.hide();
-          $context.find('td.any-default-radios-row').parentElement.show();
-          $context.find('input.default-radios').parentElement.show();
+          $context.find('input.default-radios')[0].parentElement.style.display =
+            '';
+          $context.find(
+            'td.any-default-radios-row',
+          )[0].parentElement.style.display = '';
+          $context.find(
+            'input.default-checkboxes',
+          )[0].parentElement.style.display = 'none';
         }
       }
 
