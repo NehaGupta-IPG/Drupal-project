@@ -758,7 +758,6 @@
             // button for adding a new filter group.
             $(
               `<ul class="action-links"><li><a id="views-add-group-link" href="#">${this.addGroupButton[0].value}</a></li></ul>`,
-
             ).prependTo(this.table[0].parentElement),
           ),
         )
