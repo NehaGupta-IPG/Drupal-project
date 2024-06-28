@@ -118,7 +118,7 @@ class ImageFieldManager {
         $this->cache
           ->set($cid, $defaults, CacheBackendInterface::CACHE_PERMANENT, [
             'image_default_images',
-            'entity_field_info'
+            'entity_field_info',
           ]);
         $this->cachedDefaults = $defaults;
       }
