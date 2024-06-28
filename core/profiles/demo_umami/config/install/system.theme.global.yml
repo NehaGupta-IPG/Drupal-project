@@ -9,6 +9,4 @@ features:
   favicon: true
   node_user_picture: true
 logo:
-  path: ''
-  url: ~
   use_default: true
