@@ -86,7 +86,7 @@ class ImageFieldManager {
         // configuration IDs for quick lookup.
         $defaults = [];
         $fields = $this->entityTypeManager
-          ->getStorage('entity_field.manager')
+          ->getStorage('field_config')
           ->loadMultiple();
 
         foreach ($fields as $field) {
