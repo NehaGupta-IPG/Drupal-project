@@ -74,7 +74,7 @@ class ImageFieldManager {
    *   ]
    * @code
    */
-  public function getDefaultImageFields() : array {
+  public function getDefaultImageFields(): array {
     $cid = 'image:default_images';
     if (!isset($this->cachedDefaults)) {
       $cache = $this->cache->get($cid);
