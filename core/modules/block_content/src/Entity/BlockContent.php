@@ -142,6 +142,35 @@ class BlockContent extends EditorialContentEntityBase implements BlockContentInt
   /**
    * {@inheritdoc}
    */
+  public function preSave(EntityStorageInterface $storage) {
+    parent::preSave($storage);
+    // Set the owner of this block if it's empty. This is for database no-SQL
+    // databases such as MongoDB that could not run
+    // block_content_post_update_set_owner(). This only needs to happen for
+    // existing blocks.
+    if (!$this->isNew() && $this->getOwnerId() === NULL) {
+      /** @var \Drupal\Core\Entity\RevisionableStorageInterface $storage */
+      $storage = \Drupal::entityTypeManager()->getStorage($this->getEntityTypeId());
+      $query = $storage->getQuery()
+        ->exists('revision_user')
+        ->accessCheck(FALSE)
+        ->allRevisions()
+        ->sort('revision_id', 'ASC')
+        ->range(0, 1);
+      $ids = $query->execute();
+      $revision = $storage->loadRevision(key($ids));
+      if ($revision instanceof BlockContentInterface) {
+        $uid = $revision->getRevisionUserId();
+        if ($uid !== NULL) {
+          $this->setOwnerId($uid);
+        }
+      }
+    }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function postSave(EntityStorageInterface $storage, $update = TRUE) {
     parent::postSave($storage, $update);
     if ($this->isReusable() || $this->getOriginal()?->isReusable()) {
