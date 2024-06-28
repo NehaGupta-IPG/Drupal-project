@@ -27,6 +27,11 @@ class MediaLibraryStateTest extends KernelTestBase {
   use MediaTypeCreationTrait;
 
   /**
+   * @var \Drupal\media\MediaTypeInterface|string
+   */
+  protected $form_mode = MediaLibraryState::DEFAULT_FORM_MODE;
+
+  /**
    * {@inheritdoc}
    */
   protected static $modules = [
@@ -74,14 +79,17 @@ class MediaLibraryStateTest extends KernelTestBase {
     $selected_media_type_id = 'image';
     $remaining_slots = 2;
 
-    $state = MediaLibraryState::create($opener_id, $allowed_media_type_ids, $selected_media_type_id, $remaining_slots);
+    // @todo where should this be pulled from? The field widget specifies.
+    $form_mode = MediaLibraryState::DEFAULT_FORM_MODE;
+
+    $state = MediaLibraryState::create($opener_id, $allowed_media_type_ids, $selected_media_type_id, $remaining_slots, [], $form_mode);
     $this->assertSame($opener_id, $state->getOpenerId());
     $this->assertSame($allowed_media_type_ids, $state->getAllowedTypeIds());
     $this->assertSame($selected_media_type_id, $state->getSelectedTypeId());
     $this->assertSame($remaining_slots, $state->getAvailableSlots());
     $this->assertTrue($state->hasSlotsAvailable());
 
-    $state = MediaLibraryState::create($opener_id, $allowed_media_type_ids, $selected_media_type_id, 0);
+    $state = MediaLibraryState::create($opener_id, $allowed_media_type_ids, $selected_media_type_id, 0, [], $form_mode);
     $this->assertFalse($state->hasSlotsAvailable());
   }
 
@@ -106,7 +114,10 @@ class MediaLibraryStateTest extends KernelTestBase {
       $this->expectException(\InvalidArgumentException::class);
       $this->expectExceptionMessageIs($exception_message);
     }
-    $state = MediaLibraryState::create($opener_id, $allowed_media_type_ids, $selected_type_id, $remaining_slots);
+    // @todo where should this be pulled from? The field widget specifies.
+    $form_mode = MediaLibraryState::DEFAULT_FORM_MODE;
+
+    $state = MediaLibraryState::create($opener_id, $allowed_media_type_ids, $selected_type_id, $remaining_slots, [], $form_mode);
     $this->assertInstanceOf(MediaLibraryState::class, $state);
 
     // Ensure that the state object carries cache metadata.
@@ -278,9 +289,12 @@ class MediaLibraryStateTest extends KernelTestBase {
    */
   #[DataProvider('providerFromRequest')]
   public function testFromRequest(array $query_overrides, $exception_expected): void {
+    // @todo where should this be pulled from? The field widget specifies.
+    $form_mode = MediaLibraryState::DEFAULT_FORM_MODE;
+
     // Override the query parameters and verify an exception is thrown when
     // required state parameters are changed.
-    $query = MediaLibraryState::create('test', ['file', 'image'], 'image', 2)->all();
+    $query = MediaLibraryState::create('test', ['file', 'image'], 'image', 2, [], $form_mode)->all();
     $query = array_merge($query, $query_overrides);
     if ($exception_expected) {
       $this->expectException(BadRequestHttpException::class);
@@ -323,6 +337,7 @@ class MediaLibraryStateTest extends KernelTestBase {
         'media_library_opener_id' => 'test',
         'media_library_allowed_types' => ['file', 'image'],
         'media_library_selected_type' => 'image',
+        'media_library_form_mode' => MediaLibraryState::DEFAULT_FORM_MODE,
         'media_library_remaining' => 2,
       ],
       FALSE,
@@ -370,7 +385,7 @@ class MediaLibraryStateTest extends KernelTestBase {
   public function testOpenerParameters(): void {
     $state = MediaLibraryState::create('test', ['file'], 'file', -1, [
       'foo' => 'baz',
-    ]);
+    ], $form_mode);
     $this->assertSame(['foo' => 'baz'], $state->getOpenerParameters());
   }
 
@@ -378,8 +393,8 @@ class MediaLibraryStateTest extends KernelTestBase {
    * Tests that hash is unaffected by allowed media type order.
    */
   public function testHashUnaffectedByMediaTypeOrder(): void {
-    $state1 = MediaLibraryState::create('test', ['file', 'image'], 'image', 2);
-    $state2 = MediaLibraryState::create('test', ['image', 'file'], 'image', 2);
+    $state1 = MediaLibraryState::create('test', ['file', 'image'], 'image', 2, $form_mode);
+    $state2 = MediaLibraryState::create('test', ['image', 'file'], 'image', 2, $form_mode);
     $this->assertSame($state1->getHash(), $state2->getHash());
   }
 
@@ -390,11 +405,11 @@ class MediaLibraryStateTest extends KernelTestBase {
     $state1 = MediaLibraryState::create('test', ['file'], 'file', -1, [
       'foo' => 'baz',
       'baz' => 'foo',
-    ]);
+    ], $form_mode);
     $state2 = MediaLibraryState::create('test', ['file'], 'file', -1, [
       'baz' => 'foo',
       'foo' => 'baz',
-    ]);
+    ], $form_mode);
     $this->assertSame($state1->getHash(), $state2->getHash());
   }
 

@@ -63,6 +63,9 @@ class WidgetAccessTest extends MediaLibraryTestBase {
     $role->revokePermission('view media');
     $role->save();
 
+    // @todo where should this be pulled from? The field widget specifies.
+    $form_mode = MediaLibraryState::DEFAULT_FORM_MODE;
+
     // Create a working state.
     $allowed_types = ['type_one', 'type_two', 'type_three', 'type_four'];
     // The opener parameters are not relevant to the test, but the opener
@@ -71,7 +74,7 @@ class WidgetAccessTest extends MediaLibraryTestBase {
       'entity_type_id' => 'node',
       'bundle' => 'basic_page',
       'field_name' => 'field_unlimited_media',
-    ]);
+    ], $form_mode);
     $url_options = ['query' => $state->all()];
 
     // Verify that unprivileged users can't access the widget view.

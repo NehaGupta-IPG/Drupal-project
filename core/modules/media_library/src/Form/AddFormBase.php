@@ -2,6 +2,7 @@
 
 namespace Drupal\media_library\Form;
 
+use Drupal\Component\Utility\Html;
 use Drupal\Core\Ajax\AjaxResponse;
 use Drupal\Core\Ajax\CloseDialogCommand;
 use Drupal\Core\Ajax\FocusFirstCommand;
@@ -21,6 +22,7 @@ use Drupal\Core\Url;
 use Drupal\media\MediaInterface;
 use Drupal\media\MediaTypeInterface;
 use Drupal\media_library\Ajax\UpdateSelectionCommand;
+use Drupal\media_library\MediaLibraryState;
 use Drupal\media_library\MediaLibraryUiBuilder;
 use Drupal\media_library\OpenerResolverInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -137,12 +139,18 @@ abstract class AddFormBase extends FormBase implements BaseFormIdInterface, Trus
     $form['#prefix'] = '<div id="media-library-add-form-wrapper">';
     $form['#suffix'] = '</div>';
 
+    // The media library state includes the widget settings of the form.
+    $media_state = $this->getMediaLibraryState($form_state);
+
+    // Form mode to render the secondary edit phase after uploading any bundle.
+    $add_form_mode = $media_state->getFormModeId();
+
     // The media library is loaded via AJAX, which means that the form action
     // URL defaults to the current URL. However, to add media, we always need to
     // submit the form to the media library URL, not whatever the current URL
     // may be.
     $form['#action'] = Url::fromRoute('media_library.ui', [], [
-      'query' => $this->getMediaLibraryState($form_state)->all(),
+      'query' => $media_state->all(),
     ])->toString();
 
     // The form is posted via AJAX. When there are messages set during the
@@ -154,6 +162,7 @@ abstract class AddFormBase extends FormBase implements BaseFormIdInterface, Trus
 
     $form['#attributes']['class'] = [
       'js-media-library-add-form',
+      Html::getClass('media_library_form_mode--' . $add_form_mode),
     ];
 
     $added_media = $this->getAddedMediaItems($form_state);
@@ -193,7 +202,7 @@ abstract class AddFormBase extends FormBase implements BaseFormIdInterface, Trus
         ],
       ];
       foreach ($added_media as $delta => $media) {
-        $form['media'][$delta] = $this->buildEntityFormElement($media, $form, $form_state, $delta);
+        $form['media'][$delta] = $this->buildEntityFormElement($media, $form, $form_state, $delta, $add_form_mode);
       }
 
       $form['selection'] = $this->buildCurrentSelectionArea($form, $form_state);
@@ -247,11 +256,14 @@ abstract class AddFormBase extends FormBase implements BaseFormIdInterface, Trus
    *   The current form state.
    * @param int $delta
    *   The delta of the media item.
+   * @param string $add_form_mode
+   *   The machine name of the form mode valid for all media types enabled
+   *   on a specific field (defined in widget).
    *
    * @return array
    *   The element containing the required fields sub-form.
    */
-  protected function buildEntityFormElement(MediaInterface $media, array $form, FormStateInterface $form_state, $delta) {
+  protected function buildEntityFormElement(MediaInterface $media, array $form, FormStateInterface $form_state, int $delta, string $add_form_mode = MediaLibraryState::DEFAULT_FORM_MODE) {
     // We need to make sure each button has a unique name attribute. The default
     // name for button elements is 'op'. If the name is not unique, the
     // triggering element is not set correctly and the wrong media item is
@@ -315,7 +327,8 @@ abstract class AddFormBase extends FormBase implements BaseFormIdInterface, Trus
       ];
     }
 
-    $form_display = EntityFormDisplay::collectRenderDisplay($media, 'media_library');
+    $form_display = EntityFormDisplay::collectRenderDisplay($media, $add_form_mode);
+
     // When the name is not added to the form as an editable field, output
     // the name as a fixed element to confirm the right file was uploaded.
     if (!$form_display->getComponent('name')) {

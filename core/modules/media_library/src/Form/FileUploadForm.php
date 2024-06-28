@@ -258,10 +258,16 @@ class FileUploadForm extends AddFormBase {
   }
 
   /**
+   * Build the sub form for media entities, but modify base to slim it down.
+   *
+   * @see hideExtraSourceFieldComponents()
+   *
    * {@inheritdoc}
    */
-  protected function buildEntityFormElement(MediaInterface $media, array $form, FormStateInterface $form_state, $delta) {
-    $element = parent::buildEntityFormElement($media, $form, $form_state, $delta);
+  protected function buildEntityFormElement(MediaInterface $media, array $form, FormStateInterface $form_state, int $delta, string $add_form_mode = 'media_library'): array {
+    $element = parent::buildEntityFormElement($media, $form, $form_state, $delta, $add_form_mode);
+
+    // @todo $media->bundle is not part of MediaInterface.
     $source_field = $this->getSourceFieldName($media->bundle->entity);
     if (isset($element['fields'][$source_field])) {
       $element['fields'][$source_field]['widget'][0]['#process'][] = [static::class, 'hideExtraSourceFieldComponents'];
@@ -271,6 +277,9 @@ class FileUploadForm extends AddFormBase {
 
   /**
    * Processes an image or file source field element.
+   *
+   * Removes the remove_button, preview, title, description and filename
+   * elements from the form.
    *
    * @param array $element
    *   The entity form source field element.
@@ -359,6 +368,7 @@ class FileUploadForm extends AddFormBase {
    * {@inheritdoc}
    */
   protected function prepareMediaEntityForSave(MediaInterface $media) {
+    // @todo $media->bundle is not part of MediaInterface.
     /** @var \Drupal\file\FileInterface $file */
     $file = $media->get($this->getSourceFieldName($media->bundle->entity))->entity;
     $file->setPermanent();
@@ -382,6 +392,7 @@ class FileUploadForm extends AddFormBase {
     /** @var \Drupal\media\MediaInterface $removed_media */
     $removed_media = $form_state->get(['media', $delta]);
 
+    // @todo $media->bundle is not part of MediaInterface.
     $file = $removed_media->get($this->getSourceFieldName($removed_media->bundle->entity))->entity;
     if ($file instanceof FileInterface && empty($this->fileUsage->listUsage($file))) {
       $file->delete();

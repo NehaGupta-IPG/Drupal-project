@@ -27,6 +27,8 @@ use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
  * - media_library_selected_type: The media library contains tabs to navigate
  *   between the different media types. The selected type contains the ID of the
  *   media type whose tab that should be opened.
+ * - media_library_form_mode: form mode machine name valid for all media types
+ *   enabled on this specific field (or 'default' will be used).
  * - media_library_remaining: When the opener wants to limit the amount of media
  *   items that can be selected, it can pass the number of remaining slots. When
  *   the number of remaining slots is a negative number, an unlimited amount of
@@ -41,14 +43,25 @@ use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
  */
 class MediaLibraryState extends ParameterBag implements CacheableDependencyInterface {
 
+  public const DEFAULT_FORM_MODE = 'media_library';
+
   /**
    * {@inheritdoc}
    */
   public function __construct(array $parameters = []) {
-    $this->validateRequiredParameters($parameters['media_library_opener_id'], $parameters['media_library_allowed_types'], $parameters['media_library_selected_type'], $parameters['media_library_remaining']);
     $parameters += [
+      'media_library_form_mode' => self::DEFAULT_FORM_MODE,
       'media_library_opener_parameters' => [],
     ];
+
+    $this->validateRequiredParameters(
+      $parameters['media_library_opener_id'],
+      $parameters['media_library_allowed_types'],
+      $parameters['media_library_selected_type'],
+      $parameters['media_library_remaining'],
+      $parameters['media_library_form_mode'],
+    );
+
     parent::__construct($parameters);
     $this->set('hash', $this->getHash());
   }
@@ -67,17 +80,24 @@ class MediaLibraryState extends ParameterBag implements CacheableDependencyInter
    *   library.
    * @param array $opener_parameters
    *   (optional) Any additional opener-specific parameter values.
+   * @param string|null $form_mode
+   *   (optional) The form_mode machine name for the add media form.
    *
    * @return static
    *   A state object.
    */
-  public static function create($opener_id, array $allowed_media_type_ids, $selected_type_id, $remaining_slots, array $opener_parameters = []) {
+  public static function create($opener_id, array $allowed_media_type_ids, $selected_type_id, $remaining_slots, array $opener_parameters = [], ?string $form_mode = self::DEFAULT_FORM_MODE) {
+    // When form_mode is passed explicitly as null, defaulting doesn't happen:
+    if (is_null($form_mode)) {
+      $form_mode = self::DEFAULT_FORM_MODE;
+    }
     $state = new static([
       'media_library_opener_id' => $opener_id,
       'media_library_allowed_types' => $allowed_media_type_ids,
       'media_library_selected_type' => $selected_type_id,
       'media_library_remaining' => $remaining_slots,
       'media_library_opener_parameters' => $opener_parameters,
+      'media_library_form_mode' => $form_mode,
     ]);
     return $state;
   }
@@ -104,7 +124,8 @@ class MediaLibraryState extends ParameterBag implements CacheableDependencyInter
       $query->all('media_library_allowed_types'),
       $query->get('media_library_selected_type'),
       $query->get('media_library_remaining'),
-      $query->all('media_library_opener_parameters')
+      $query->all('media_library_opener_parameters'),
+      $query->get('media_library_form_mode')
     );
 
     // The request parameters need to contain a valid hash to prevent a
@@ -135,12 +156,18 @@ class MediaLibraryState extends ParameterBag implements CacheableDependencyInter
    * @param int $remaining_slots
    *   The number of remaining items the user is allowed to select or add in the
    *   library.
+   * @param string|null $form_mode
+   *   The form_mode machine name for the add media form.
    *
    * @throws \InvalidArgumentException
    *   If one of the passed arguments is missing or does not pass the
    *   validation.
    */
-  protected function validateRequiredParameters($opener_id, array $allowed_media_type_ids, $selected_type_id, $remaining_slots) {
+  protected function validateRequiredParameters($opener_id, array $allowed_media_type_ids, $selected_type_id, $remaining_slots, ?string $form_mode = self::DEFAULT_FORM_MODE) {
+    // When form_mode is passed explicitly as null, defaulting doesn't happen:
+    if (is_null($form_mode)) {
+      $form_mode = self::DEFAULT_FORM_MODE;
+    }
     // The opener ID must be a non-empty string.
     if (!is_string($opener_id) || empty(trim($opener_id))) {
       throw new \InvalidArgumentException('The opener ID parameter is required and must be a string.');
@@ -159,6 +186,10 @@ class MediaLibraryState extends ParameterBag implements CacheableDependencyInter
     // The selected type ID must be a non-empty string.
     if (!is_string($selected_type_id) || empty(trim($selected_type_id))) {
       throw new \InvalidArgumentException('The selected type parameter is required and must be a string.');
+    }
+    // The form mode must be a non-empty valid machine name string.
+    if (trim($form_mode) === '' || preg_match('@[^a-z0-9_]@', $form_mode)) {
+      throw new \InvalidArgumentException('The form mode parameter is required and must be a valid string.');
     }
     // The selected type ID must be present in the list of allowed types.
     if (!in_array($selected_type_id, $allowed_media_type_ids, TRUE)) {
@@ -192,6 +223,7 @@ class MediaLibraryState extends ParameterBag implements CacheableDependencyInter
       $this->getSelectedTypeId(),
       $this->getAvailableSlots(),
       serialize($opener_parameters),
+      $this->getFormModeId(),
     ]);
 
     return Crypt::hmacBase64($hash, \Drupal::service('private_key')->get() . Settings::getHashSalt());
@@ -238,6 +270,21 @@ class MediaLibraryState extends ParameterBag implements CacheableDependencyInter
    */
   public function getSelectedTypeId() {
     return $this->get('media_library_selected_type');
+  }
+
+  /**
+   * Returns the form mode for the media's add/edit media form.
+   *
+   * This is the (sub)form displayed after the media is added (e.g. after
+   * upload, for the FileUploadForm), that is embedded within the media_library
+   * selection form. The same form_mode is used for every media bundle the
+   * field accepts.
+   *
+   * @return string
+   *   The form mode machine id.
+   */
+  public function getFormModeId() {
+    return $this->get('media_library_form_mode');
   }
 
   /**
