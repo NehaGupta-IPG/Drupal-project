@@ -5,6 +5,7 @@
  * Post update functions for Content Block.
  */
 
+use Drupal\Core\Database\Database;
 use Drupal\Core\Site\Settings;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 
@@ -26,6 +27,9 @@ function block_content_removed_post_updates(): array {
  * Set a default author for block content entities.
  */
 function block_content_post_update_set_owner(&$sandbox = NULL): TranslatableMarkup {
+  if (Database::getConnectionInfo()['default']['driver'] === 'mysql') {
+    return new TranslatableMarkup("We can't run this update on MongoDB, Block content authors will be set when updating the entity.");
+  }
   $blockContentStorage = \Drupal::entityTypeManager()
     ->getStorage('block_content');
 
