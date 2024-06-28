@@ -60,17 +60,15 @@ function _drupal_error_handler_real($error_level, $message, $filename, $line): v
 
     // Filter out deprecations depending on the deprecation settings.
     if ($error_level === E_USER_DEPRECATED) {
-      $ignored_file_patterns = _drupal_get_deprecation_setting('deprecations_ignored_file_patterns', '');
-      if ($ignored_file_patterns !== '') {
-        foreach (explode(PHP_EOL, $ignored_file_patterns) as $pattern) {
-          if (preg_match($pattern, $filename) === 1) {
-            return;
-          }
+      $ignored_file_patterns = _drupal_get_deprecation_setting('deprecations_ignored_file_patterns', []);
+      foreach ($ignored_file_patterns as $pattern) {
+        if (preg_match($pattern, $filename) === 1) {
+          return;
         }
       }
 
-      $ignored_deprecations = explode(PHP_EOL, _drupal_get_deprecation_setting('ignored_deprecations', ''));
-      if (in_array($message, $ignored_deprecations)) {
+      $ignored_deprecations = _drupal_get_deprecation_setting('ignored_deprecations', []);
+      if (in_array($message, $ignored_deprecations, TRUE)) {
         return;
       }
       $channel = 'deprecation';

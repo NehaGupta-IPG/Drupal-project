@@ -1803,10 +1803,10 @@ function system_update_11201(): void {
 /**
  * Set default values for new deprecation logging variables.
  */
-function system_update_10202(&$sandbox) {
+function system_update_10301(&$sandbox): void {
   $config = \Drupal::configFactory()->getEditable('system.logging');
   $config->set('log_deprecations', FALSE);
-  $config->set('deprecations_ignored_file_patterns', '*/vendor/*' . PHP_EOL . '*/core/*');
-  $config->set('ignored_deprecations', '');
+  $config->set('deprecations_ignored_file_patterns', ['*/vendor/*', '*/core/*']);
+  $config->set('ignored_deprecations', []);
   $config->save();
 }
