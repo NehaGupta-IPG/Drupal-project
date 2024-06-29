@@ -24,7 +24,7 @@ class ImageFieldManager implements ImageFieldManagerInterface {
   /**
    * Initialized field cache for default images.
    *
-   * @var array<string, \Drupal\Core\Field\FieldDefinitionInterface[]>|null
+   * @var array<string, \Drupal\Core\Field\FieldDefinitionInterface[]>
    */
   private array $cachedDefaults;
 
@@ -111,13 +111,13 @@ class ImageFieldManager implements ImageFieldManagerInterface {
     if (!$image->isValid()) {
       return AccessResult::forbidden();
     }
-    $account ??= $this->currentUser;
     // If the image being requested for download is being used as the default
     // image for any fields, then grant access if the user has 'view' access to
     // at least one of those fields.
     $uri = $image->getSource();
     $default_images = $this->getDefaultImageFields();
     $access = AccessResult::neutral()->addCacheTags(['image_default_images', 'entity_field_info']);
+    $account ??= $this->currentUser;
     if (isset($default_images[$uri])) {
       foreach ($default_images[$uri] as $field_definition) {
         $access_control_handler = $this->entityTypeManager->getAccessControlHandler($field_definition->getTargetEntityTypeId());
