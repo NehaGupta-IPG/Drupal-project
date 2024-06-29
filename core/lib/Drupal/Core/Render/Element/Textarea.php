@@ -14,6 +14,7 @@ use Drupal\Core\Render\Attribute\FormElement;
  * - #resizable: Controls whether the text area is resizable.  Allowed values
  *   are "none", "vertical", "horizontal", or "both" (defaults to "vertical").
  * - #maxlength: The maximum amount of characters to accept as input.
+ * - #normalize_newlines: Convert all newlines (\r\n|\r|\n) to \n.
  *
  * Usage example:
  * @code
@@ -38,6 +39,7 @@ class Textarea extends FormElementBase {
       '#cols' => 60,
       '#rows' => 5,
       '#resizable' => 'vertical',
+      '#normalize_newlines' => TRUE,
       '#process' => [
         [static::class, 'processAjaxForm'],
         [static::class, 'processGroup'],
@@ -66,7 +68,13 @@ class Textarea extends FormElementBase {
     if ($input !== FALSE && $input !== NULL) {
       // This should be a string, but allow other scalars since they might be
       // valid input in programmatic form submissions.
-      return is_scalar($input) ? (string) $input : '';
+      $value = is_scalar($input) ? (string) $input : '';
+      if (!empty($element['#normalize_newlines'])) {
+        // Convert all Windows and Mac newlines to a single newline,
+        // so filters only need to deal with one possibility.
+        $value = str_replace(["\r\n", "\r"], "\n", $value);
+      }
+      return $value;
     }
     return NULL;
   }
