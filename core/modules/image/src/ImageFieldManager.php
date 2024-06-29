@@ -2,44 +2,34 @@
 
 namespace Drupal\image;
 
+use Drupal\Core\Access\AccessResult;
+use Drupal\Core\Access\AccessResultInterface;
 use Drupal\Core\Cache\CacheBackendInterface;
+use Drupal\Core\Entity\EntityFieldManagerInterface;
 use Drupal\Core\Entity\EntityRepositoryInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
-use Drupal\file\FileInterface;
+use Drupal\Core\Image\ImageInterface;
+use Drupal\Core\Session\AccountInterface;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 /**
  * Provides a service for managing image fields.
+ *
+ * @todo perhaps rename to ImageDefaultAccess and make getDefaultImageFields() protected?
+ *   That is, this will be a service only for checking access to images that are used by default,
+ *   because managing fields is definitely not what this service does.
  */
-class ImageFieldManager {
+class ImageFieldManager implements ImageFieldManagerInterface {
 
   /**
-   * The cache backend.
+   * Initialized field cache for default images.
    *
-   * @var \Drupal\Core\Cache\CacheBackendInterface
+   * @var array<string, \Drupal\Core\Field\FieldDefinitionInterface[]>|null
    */
-  protected CacheBackendInterface $cache;
+  private array $cachedDefaults;
 
   /**
-   * The entity type manager.
-   *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
-   */
-  protected EntityTypeManagerInterface $entityTypeManager;
-
-  /**
-   * The entity repository.
-   *
-   * @var \Drupal\Core\Entity\EntityRepositoryInterface
-   */
-  protected EntityRepositoryInterface $entityRepository;
-
-  /**
-   * The initialized array.
-   */
-  private ?array $cachedDefaults;
-
-  /**
-   * Construct a new image field manager.
+   * Constructs a new ImageFieldManager.
    *
    * @param \Drupal\Core\Cache\CacheBackendInterface $cache
    *   The cache backend.
@@ -47,83 +37,102 @@ class ImageFieldManager {
    *   The entity type manager.
    * @param \Drupal\Core\Entity\EntityRepositoryInterface $entityRepository
    *   The entity repository.
+   * @param \Drupal\Core\Entity\EntityFieldManagerInterface $entityFieldManager
+   *   The entity field manager.
+   * @param \Drupal\Core\Session\AccountInterface $currentUser
+   *   The current user.
    */
-  public function __construct(CacheBackendInterface $cache, EntityTypeManagerInterface $entityTypeManager, EntityRepositoryInterface $entityRepository) {
-    $this->cache = $cache;
-    $this->entityTypeManager = $entityTypeManager;
-    $this->entityRepository = $entityRepository;
-    $this->cachedDefaults = NULL;
-  }
+  public function __construct(
+    #[Autowire(service: 'cache.default')]
+    protected readonly CacheBackendInterface $cache,
+    protected readonly EntityTypeManagerInterface $entityTypeManager,
+    protected readonly EntityRepositoryInterface $entityRepository,
+    protected readonly EntityFieldManagerInterface $entityFieldManager,
+    protected readonly AccountInterface $currentUser,
+  ) {}
 
   /**
-   * Map default values for image fields, and those fields' configuration IDs.
-   *
-   * This is used in image_file_download() to determine whether to grant access to
-   * an image stored in the private file storage.
-   *
-   * @return array
-   *   An associative array, where the keys are image file URIs, and the values
-   *   are arrays of field configuration IDs which use that image file as their
-   *   default image. For example,
-   *
-   * @code [
-   *     'private://default_images/astronaut.jpg' => [
-   *       'node.article.field_image',
-   *       'user.user.field_portrait',
-   *     ],
-   *   ]
-   * @code
+   * {@inheritdoc}
    */
   public function getDefaultImageFields(): array {
-    $cid = 'image:default_images';
     if (!isset($this->cachedDefaults)) {
-      $cache = $this->cache->get($cid);
-      if ($cache) {
+      $cid = 'image:default_images';
+      if ($cache = $this->cache->get($cid)) {
         $this->cachedDefaults = $cache->data;
       }
       else {
         // Save a map of all default image UUIDs and their corresponding field
-        // configuration IDs for quick lookup.
+        // definitions for quick lookup.
         $defaults = [];
-        $fields = $this->entityTypeManager
-          ->getStorage('field_config')
-          ->loadMultiple();
-
-        foreach ($fields as $field) {
-          if ($field->getType() === 'image') {
-            // Check if there is a default image in the field config.
-            $field_uuid = $field->getSetting('default_image')['uuid'];
-            if ($field_uuid) {
-              $file = $this->entityRepository->loadEntityByUuid('file', $field_uuid);
-              if ($file instanceof FileInterface) {
-                // A default image could be used by multiple field configs.
-                $defaults[$file->getFileUri()][] = $field->get('id');
-              }
+        $field_map = $this->entityFieldManager->getFieldMapByFieldType('image');
+        foreach ($field_map as $entity_type_id => $fields) {
+          $field_storages = $this->entityFieldManager->getFieldStorageDefinitions($entity_type_id);
+          foreach ($fields as $field_name => $field_info) {
+            // First, check if the default image is set on the field storage.
+            $uri_from_storage = NULL;
+            $file_uuid = $field_storages[$field_name]->getSetting('default_image')['uuid'];
+            if ($file_uuid && $file = $this->entityRepository->loadEntityByUuid('file', $file_uuid)) {
+              /** @var \Drupal\file\FileInterface $file */
+              $uri_from_storage = $file->getFileUri();
             }
 
-            // Field storage config can also have a default image.
-            $storage_uuid = $field->getFieldStorageDefinition()->getSetting('default_image')['uuid'];
-            if ($storage_uuid) {
-              $file = $this->entityRepository->loadEntityByUuid('file', $storage_uuid);
-              if ($file instanceof FileInterface) {
-                // Use the field config id since that is what we'll be using to
-                // check access in image_file_download().
-                $defaults[$file->getFileUri()][] = $field->get('id');
+            foreach ($field_info['bundles'] as $bundle) {
+              $field_definition = $this->entityFieldManager->getFieldDefinitions($entity_type_id, $bundle)[$field_name];
+              $default_uri = $uri_from_storage;
+              $file_uuid = $field_definition->getSetting('default_image')['uuid'];
+              // If the default image is overridden in the field definition, use
+              // that instead of the one set on the field storage.
+              if ($file_uuid && $file = $this->entityRepository->loadEntityByUuid('file', $file_uuid)) {
+                /** @var \Drupal\file\FileInterface $file */
+                $default_uri = $file->getFileUri();
+              }
+              // Finally, if a default image URI was found, add it to the list.
+              if ($default_uri) {
+                $defaults[$default_uri][] = $field_definition;
               }
             }
           }
         }
-
         // Cache the default image list.
-        $this->cache
-          ->set($cid, $defaults, CacheBackendInterface::CACHE_PERMANENT, [
-            'image_default_images',
-            'entity_field_info',
-          ]);
         $this->cachedDefaults = $defaults;
+        $this->cache->set($cid, $defaults, CacheBackendInterface::CACHE_PERMANENT, [
+          'image_default_images',
+          'entity_field_info',
+        ]);
       }
     }
     return $this->cachedDefaults;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function checkAccessToDefaultImage(ImageInterface $image, ?AccountInterface $account = NULL): AccessResultInterface {
+    if (!$image->isValid()) {
+      return AccessResult::forbidden();
+    }
+    $account ??= $this->currentUser;
+    // If the image being requested for download is being used as the default
+    // image for any fields, then grant access if the user has 'view' access to
+    // at least one of those fields.
+    $uri = $image->getSource();
+    $default_images = $this->getDefaultImageFields();
+    $access = AccessResult::neutral()->addCacheTags(['image_default_images', 'entity_field_info']);
+    if (isset($default_images[$uri])) {
+      foreach ($default_images[$uri] as $field_definition) {
+        $access_control_handler = $this->entityTypeManager->getAccessControlHandler($field_definition->getTargetEntityTypeId());
+        $field_access = $access_control_handler->fieldAccess('view', $field_definition, $account, NULL, TRUE);
+        // As long as the user has view access to at least one of the fields,
+        // that uses this image as a default, we can exit this foreach loop,
+        // and grant access.
+        if ($field_access->isAllowed()) {
+          return AccessResult::allowed()
+            ->addCacheableDependency($access)
+            ->addCacheableDependency($field_access);
+        }
+      }
+    }
+    return $access;
   }
 
 }
