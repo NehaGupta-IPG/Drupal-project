@@ -4,6 +4,7 @@ namespace Drupal\image;
 
 use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Access\AccessResultInterface;
+use Drupal\Core\Cache\Cache;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Entity\EntityFieldManagerInterface;
 use Drupal\Core\Entity\EntityRepositoryInterface;
@@ -26,7 +27,7 @@ class ImageFieldManager implements ImageFieldManagerInterface {
    *
    * @var array<string, \Drupal\Core\Field\FieldDefinitionInterface[]>
    */
-  private array $cachedDefaults;
+  protected array $cachedDefaults;
 
   /**
    * Constructs a new ImageFieldManager.
@@ -65,6 +66,10 @@ class ImageFieldManager implements ImageFieldManagerInterface {
         // definitions for quick lookup.
         $defaults = [];
         $field_map = $this->entityFieldManager->getFieldMapByFieldType('image');
+        $cache_tags = [
+          'image_default_images',
+          'entity_field_info',
+        ];
         foreach ($field_map as $entity_type_id => $fields) {
           $field_storages = $this->entityFieldManager->getFieldStorageDefinitions($entity_type_id);
           foreach ($fields as $field_name => $field_info) {
@@ -74,6 +79,7 @@ class ImageFieldManager implements ImageFieldManagerInterface {
             if ($file_uuid && $file = $this->entityRepository->loadEntityByUuid('file', $file_uuid)) {
               /** @var \Drupal\file\FileInterface $file */
               $uri_from_storage = $file->getFileUri();
+              $cache_tags = Cache::mergeTags($cache_tags, $file->getCacheTags());
             }
 
             foreach ($field_info['bundles'] as $bundle) {
@@ -85,6 +91,7 @@ class ImageFieldManager implements ImageFieldManagerInterface {
               if ($file_uuid && $file = $this->entityRepository->loadEntityByUuid('file', $file_uuid)) {
                 /** @var \Drupal\file\FileInterface $file */
                 $default_uri = $file->getFileUri();
+                $cache_tags = Cache::mergeTags($cache_tags, $file->getCacheTags());
               }
               // Finally, if a default image URI was found, add it to the list.
               if ($default_uri) {
@@ -95,10 +102,7 @@ class ImageFieldManager implements ImageFieldManagerInterface {
         }
         // Cache the default image list.
         $this->cachedDefaults = $defaults;
-        $this->cache->set($cid, $defaults, CacheBackendInterface::CACHE_PERMANENT, [
-          'image_default_images',
-          'entity_field_info',
-        ]);
+        $this->cache->set($cid, $defaults, CacheBackendInterface::CACHE_PERMANENT, $cache_tags);
       }
     }
     return $this->cachedDefaults;
