@@ -5,9 +5,16 @@ namespace Drupal\Core\Extension;
 use Composer\Semver\Semver;
 use Drupal\Component\Serialization\Exception\InvalidDataTypeException;
 use Drupal\Core\Serialization\Yaml;
+use Drupal\Core\Site\Settings;
 
 /**
  * Parses dynamic .info.yml files that might change during the page request.
+ *
+ * To allow extensions to be installed regardless of core compatibility, add
+ * @code
+ * $settings['extension_discovery_ignore_core_version_requirement'] = TRUE;
+ * @endcode
+ * to your settings.php.
  */
 class InfoParserDynamic implements InfoParserInterface {
 
@@ -82,6 +89,19 @@ class InfoParserDynamic implements InfoParserInterface {
       else {
         // Non-core extensions must specify core compatibility.
         throw new InfoParserException("The 'core_version_requirement' key must be present in " . $filename);
+      }
+    }
+
+    // If configured to do so, be lenient and allow contrib and custom
+    // extensions to be enabled regardless of core version compatibility. This
+    // is needed because the core_version_requirement for these extensionswill
+    // typically not include the latest development version of core.
+    if (Settings::get('extension_discovery_ignore_core_version_requirement', FALSE)) {
+      // We skip extensions in the 'Testing' package, because there fixture
+      // modules which are specifically for tests to check for an extension
+      // being incompatible.
+      if (!str_starts_with($filename, 'core/') && !str_starts_with($filename, $this->root . '/core/') && (!isset($parsed_info['package']) || $parsed_info['package'] !== 'Testing')) {
+        $parsed_info['core_version_requirement'] .= ' || ' . \Drupal::VERSION;
       }
     }
 
