@@ -429,7 +429,6 @@ class FileWidget extends WidgetBase {
         '#maxlength' => $config->get('description.length'),
         '#description' => new TranslatableMarkup('The description may be used as the label of the link to the file.'),
         '#required' => !empty($element['#description_field_required']),
-        // do i need this? '#element_validate' => $element['#description_field_required'] == 1 ? [[static::class, 'validateRequiredFields']] : [],
       ];
     }
 

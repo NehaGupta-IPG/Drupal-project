@@ -173,6 +173,16 @@ class FileFieldDisplayTest extends FileFieldTestBase {
     ];
     $this->drupalGet('admin/structure/types/add');
     $this->submitForm($edit, 'Save and manage fields');
+    $field_label = $this->randomString();
+    $this->drupalGet('/admin/structure/types/manage/' . $type_name . '/fields/add-field');
+    $this->submitForm(['new_storage_type' => 'file_upload'], 'Continue');
+    $edit = [
+      'label' => $field_label,
+      'group_field_options_wrapper' => $field_type,
+    ];
+    $this->submitForm($edit, 'Continue');
+    // Ensure the description field is selected on the field instance settings
+    // form. That's what this test is all about.
     $field_edit = [
       'settings[description_field]' => TRUE,
     ];
@@ -198,7 +208,7 @@ class FileFieldDisplayTest extends FileFieldTestBase {
     // description is now required.
     $this->drupalGet($node->toUrl('edit-form'));
     $this->submitForm([], 'Save');
-    $this->assertSession()->pageTextContains("The $label field description is required.");
+    $this->assertSession()->pageTextContains("The {$field_label} field description is required.");
   }
 
   /**
