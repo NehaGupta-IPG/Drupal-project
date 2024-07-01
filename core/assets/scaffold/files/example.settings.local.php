@@ -105,6 +105,19 @@ $config['system.performance']['js']['preprocess'] = FALSE;
 # $settings['extension_discovery_scan_tests'] = TRUE;
 
 /**
+ * Allow modules and themes to be installed regardless of core compatibility.
+ *
+ * Drupal uses the core_version_requirement key in an extension's .info.yml file
+ * to determine whether it can be installed. When a development version of
+ * Drupal is installed, this will prevent installation of most contrib
+ * extensions, because their .info.yml will typically only specify up to the
+ * lastest stable version of Drupal. It can be useful to ignore this to allow
+ * contrib modules to be used when developing Drupal core, or to develop contrib
+ * modules on the development version of Drupal core.
+ */
+# $settings['extension_discovery_ignore_core_version_requirement'] = TRUE;
+
+/**
  * Enable access to rebuild.php.
  *
  * This setting can be enabled to allow Drupal's php and database cached
