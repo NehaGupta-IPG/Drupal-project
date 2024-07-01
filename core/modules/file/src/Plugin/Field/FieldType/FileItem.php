@@ -14,8 +14,10 @@ use Drupal\Core\File\FileExists;
 use Drupal\Core\File\FileSystemInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\StreamWrapper\StreamWrapperInterface;
+use Drupal\Core\StringTranslation\ByteSizeMarkup;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\TypedData\DataDefinition;
+use Drupal\file\Validation\FileValidatorSettingsTrait;
 
 /**
  * Plugin implementation of the 'file' field type.
@@ -50,6 +52,8 @@ use Drupal\Core\TypedData\DataDefinition;
 )]
 class FileItem extends EntityReferenceItem {
 
+  use FileValidatorSettingsTrait;
+
   /**
    * {@inheritdoc}
    */
@@ -70,8 +74,7 @@ class FileItem extends EntityReferenceItem {
       'file_extensions' => 'txt',
       'file_directory' => '[date:custom:Y]-[date:custom:m]',
       'max_filesize' => '',
-      'description_field' => FALSE,
-      'description_field_required' => FALSE,
+      'description_field' => 0,
     ] + parent::defaultFieldSettings();
   }
 
@@ -155,7 +158,7 @@ class FileItem extends EntityReferenceItem {
       '#description' => $this->t('This setting only has an effect if the display option is enabled.'),
       '#states' => [
         'visible' => [
-          ':input[name="settings[display_field]"]' => ['checked' => TRUE],
+          ':input[name="field_storage[subform][settings][display_field]"]' => ['checked' => TRUE],
         ],
       ],
     ];
@@ -208,7 +211,9 @@ class FileItem extends EntityReferenceItem {
       '#type' => 'textfield',
       '#title' => $this->t('Maximum upload size'),
       '#default_value' => $settings['max_filesize'],
-      '#description' => $this->t('Enter a value like "512" (bytes), "80 KB" (kilobytes) or "50 MB" (megabytes) in order to restrict the allowed file size. If left empty the file sizes could be limited only by PHP\'s maximum post and file upload sizes (current limit <strong>%limit</strong>).', ['%limit' => format_size(Environment::getUploadMaxSize())]),
+      '#description' => $this->t('Enter a value like "512" (bytes), "80 KB" (kilobytes) or "50 MB" (megabytes) in order to restrict the allowed file size. If left empty the file sizes could be limited only by PHP\'s maximum post and file upload sizes (current limit <strong>%limit</strong>).', [
+        '%limit' => ByteSizeMarkup::create(Environment::getUploadMaxSize()),
+      ]),
       '#size' => 10,
       '#element_validate' => [[static::class, 'validateMaxFilesize']],
       '#weight' => 5,
@@ -226,7 +231,7 @@ class FileItem extends EntityReferenceItem {
       '#type' => 'checkbox',
       '#title' => $this->t('Require the <em>Description</em> field'),
       '#default_value' => $settings['description_field_required'] ?? FALSE,
-      '#weight' => 12,
+      '#weight' => 20,
       '#states' => [
         'visible' => [
           ':input[name="settings[description_field]"]' => ['checked' => TRUE],
@@ -356,24 +361,7 @@ class FileItem extends EntityReferenceItem {
    *   element's '#upload_validators' property.
    */
   public function getUploadValidators() {
-    $validators = [];
-    $settings = $this->getSettings();
-
-    // Cap the upload size according to the PHP limit.
-    $max_filesize = Bytes::toNumber(Environment::getUploadMaxSize());
-    if (!empty($settings['max_filesize'])) {
-      $max_filesize = min($max_filesize, Bytes::toNumber($settings['max_filesize']));
-    }
-
-    // There is always a file size limit due to the PHP server limit.
-    $validators['file_validate_size'] = [$max_filesize];
-
-    // Add the extension check if necessary.
-    if (!empty($settings['file_extensions'])) {
-      $validators['file_validate_extensions'] = [$settings['file_extensions']];
-    }
-
-    return $validators;
+    return $this->getFileUploadValidators($this->getSettings());
   }
 
   /**
