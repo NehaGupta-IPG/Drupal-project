@@ -299,7 +299,7 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
    * @param string $app_root
    *   (deprecated) (optional) The path to the application root as a string.
    *   Specifying the Drupal app root $app_root to createFromRequest() is
-   *   deprecated in drupal:10.2.0 and is removed from drupal:11.0.0. Omit the
+   *   deprecated in drupal:11.1.0 and is removed from drupal:12.0.0. Omit the
    *   parameter.
    *
    * @return static
@@ -309,7 +309,7 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
    */
   public static function createFromRequest(Request $request, $class_loader, $environment, $allow_dumping = TRUE, $app_root = NULL) {
     if ($app_root) {
-      @trigger_error('Specifying the Drupal app root $app_root is deprecated in drupal:10.2.0 and is removed from drupal:11.0.0. Omit the parameter. See https://www.drupal.org/node/3267862', E_USER_DEPRECATED);
+      @trigger_error('Specifying the Drupal app root $app_root is deprecated in drupal:11.1.0 and is removed from drupal:12.0.0. Omit the parameter. See https://www.drupal.org/node/3267862', E_USER_DEPRECATED);
     }
 
     $kernel = new static($environment, $class_loader, $allow_dumping, $app_root);
@@ -332,7 +332,7 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
    * @param string $app_root
    *   (deprecated) (optional) The path to the application root as a string.
    *   Specifying the Drupal app root $app_root to __construct is deprecated in
-   *   drupal:9.4.0 and is removed from drupal:11.0.0. Omit the parameter.
+   *   drupal:11.1.0 and is removed from drupal:12.0.0. Omit the parameter.
    */
   public function __construct($environment, $class_loader, $allow_dumping = TRUE, $app_root = NULL) {
     $this->environment = $environment;
@@ -340,7 +340,7 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
     $this->allowDumping = $allow_dumping;
 
     if ($app_root) {
-      @trigger_error('Specifying the Drupal app root $app_root is deprecated in drupal:10.2.0 and is removed from drupal:11.0.0. Omit the parameter. See https://www.drupal.org/node/3267862', E_USER_DEPRECATED);
+      @trigger_error('Specifying the Drupal app root $app_root is deprecated in drupal:11.1.0 and is removed from drupal:12.0.0. Omit the parameter. See https://www.drupal.org/node/3267862', E_USER_DEPRECATED);
     }
 
     if ($app_root === NULL) {
@@ -352,13 +352,13 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
   /**
    * Returns the application root directory.
    *
-   * @deprecated in drupal:10.2.0 and is removed from drupal:11.0.0. Use
+   * @deprecated in drupal:11.1.0 and is removed from drupal:12.0.0. Use
    *   getApplicationRoot() instead.
    *
    * @see https://www.drupal.org/node/3267862
    */
   protected static function guessApplicationRoot() {
-    @trigger_error('The guessApplicationRoot() method is deprecated in drupal:10.2.0 and is removed from drupal:11.0.0. Use getApplicationRoot() instead. See https://www.drupal.org/node/326786', E_USER_DEPRECATED);
+    @trigger_error('The guessApplicationRoot() method is deprecated in drupal:11.1.0 and is removed from drupal:12.0.0. Use getApplicationRoot() instead. See https://www.drupal.org/node/3267862', E_USER_DEPRECATED);
 
     return static::getApplicationRoot();
   }
@@ -1145,11 +1145,11 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
    *   (deprecated) (optional) The path to the application root as a string. If
    *   not supplied, the application root will be computed. Specifying the
    *   Drupal app root $app_root to bootEnvironment() is deprecated in
-   *   drupal:9.4.0 and is removed from drupal:11.0.0. Omit the parameter.
+   *   drupal:11.1.0 and is removed from drupal:12.0.0. Omit the parameter.
    */
   public static function bootEnvironment($app_root = NULL) {
     if ($app_root) {
-      @trigger_error('Specifying the Drupal app root $app_root is deprecated in drupal:10.2.0 and is removed from drupal:11.0.0. Omit the parameter. See https://www.drupal.org/node/3267862', E_USER_DEPRECATED);
+      @trigger_error('Specifying the Drupal app root $app_root is deprecated in drupal:11.1.0 and is removed from drupal:12.0.0. Omit the parameter. See https://www.drupal.org/node/3267862', E_USER_DEPRECATED);
     }
 
     if (static::$isEnvironmentInitialized) {
