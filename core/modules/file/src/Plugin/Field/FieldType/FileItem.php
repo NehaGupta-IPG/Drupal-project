@@ -10,6 +10,7 @@ use Drupal\Core\Field\Attribute\FieldType;
 use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\Core\Field\Plugin\Field\FieldType\EntityReferenceItem;
+use Drupal\Core\File\FileExists;
 use Drupal\Core\File\FileSystemInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\StreamWrapper\StreamWrapperInterface;
@@ -401,7 +402,7 @@ class FileItem extends EntityReferenceItem {
     $data = $random->paragraphs(3);
     /** @var \Drupal\file\FileRepositoryInterface $file_repository */
     $file_repository = \Drupal::service('file.repository');
-    $file = $file_repository->writeData($data, $destination, FileSystemInterface::EXISTS_ERROR);
+    $file = $file_repository->writeData($data, $destination, FileExists::Error);
     $values = [
       'target_id' => $file->id(),
       'display' => (int) $settings['display_default'],
