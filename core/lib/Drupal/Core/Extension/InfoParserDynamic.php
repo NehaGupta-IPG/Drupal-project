@@ -94,7 +94,7 @@ class InfoParserDynamic implements InfoParserInterface {
 
     // If configured to do so, be lenient and allow contrib and custom
     // extensions to be enabled regardless of core version compatibility. This
-    // is needed because the core_version_requirement for these extensionswill
+    // is needed because the core_version_requirement for these extensions will
     // typically not include the latest development version of core.
     if (Settings::get('extension_discovery_ignore_core_version_requirement', FALSE)) {
       // We skip extensions in the 'Testing' package, because there fixture
