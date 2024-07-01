@@ -4,6 +4,7 @@ namespace Drupal\Core\Menu\Plugin\Block;
 
 use Drupal\Core\Block\Attribute\Block;
 use Drupal\Core\Block\BlockBase;
+use Drupal\Core\Block\BlockPluginInterface;
 use Drupal\Core\Cache\CacheableDependencyInterface;
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Form\FormStateInterface;
@@ -62,6 +63,7 @@ class LocalTasksBlock extends BlockBase implements ContainerFactoryPluginInterfa
   public function defaultConfiguration() {
     return [
       'label_display' => '0',
+      'label_display_type' => BlockPluginInterface::BLOCK_LABEL_HIDDEN,
       'primary' => TRUE,
       'secondary' => TRUE,
     ];

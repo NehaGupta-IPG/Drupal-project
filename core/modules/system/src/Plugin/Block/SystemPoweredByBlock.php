@@ -3,6 +3,7 @@
 namespace Drupal\system\Plugin\Block;
 
 use Drupal\Core\Block\BlockBase;
+use Drupal\Core\Block\BlockPluginInterface;
 use Drupal\Core\Block\Attribute\Block;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 
@@ -19,7 +20,10 @@ class SystemPoweredByBlock extends BlockBase {
    * {@inheritdoc}
    */
   public function defaultConfiguration() {
-    return ['label_display' => '0'];
+    return [
+      'label_display' => '0',
+      'label_display_type' => BlockPluginInterface::BLOCK_LABEL_HIDDEN,
+    ];
   }
 
   /**

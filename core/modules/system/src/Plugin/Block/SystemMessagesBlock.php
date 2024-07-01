@@ -4,6 +4,7 @@ namespace Drupal\system\Plugin\Block;
 
 use Drupal\Core\Block\Attribute\Block;
 use Drupal\Core\Block\BlockBase;
+use Drupal\Core\Block\BlockPluginInterface;
 use Drupal\Core\Block\MessagesBlockPluginInterface;
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
@@ -25,6 +26,7 @@ class SystemMessagesBlock extends BlockBase implements MessagesBlockPluginInterf
   public function defaultConfiguration() {
     return [
       'label_display' => '0',
+      'label_display_type' => BlockPluginInterface::BLOCK_LABEL_HIDDEN,
     ];
   }
 

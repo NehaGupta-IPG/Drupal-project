@@ -29,6 +29,19 @@ interface BlockPluginInterface extends ConfigurableInterface, DependentPluginInt
   const BLOCK_LABEL_VISIBLE = 'visible';
 
   /**
+   * Indicates the block label (title) should be hidden from end users.
+   *
+   * @todo This value should be changed to "hidden" for consistency.
+   *   See https://www.drupal.org/node/2863313.
+   */
+  const BLOCK_LABEL_HIDDEN = '0';
+
+  /**
+   * Indicates the block label (title) should be visually hidden.
+   */
+  const BLOCK_LABEL_VISUALLY_HIDDEN = 'visually_hidden';
+
+  /**
    * Returns the user-facing block label.
    *
    * @todo Provide other specific label-related methods in

@@ -7,6 +7,7 @@ use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Block\Attribute\Block;
 use Drupal\Core\Block\BlockBase;
+use Drupal\Core\Block\BlockPluginInterface;
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Entity\EntityDisplayBase;
 use Drupal\Core\Entity\EntityFieldManagerInterface;
@@ -223,6 +224,7 @@ class FieldBlock extends BlockBase implements ContextAwarePluginInterface, Conta
   public function defaultConfiguration() {
     return [
       'label_display' => '0',
+      'label_display_type' => BlockPluginInterface::BLOCK_LABEL_HIDDEN,
       'formatter' => [
         'label' => 'above',
         'type' => $this->pluginDefinition['default_formatter'],
