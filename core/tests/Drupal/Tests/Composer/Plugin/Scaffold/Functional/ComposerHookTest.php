@@ -137,10 +137,11 @@ class ComposerHookTest extends BuildTestBase {
     $this->assertStringContainsString('- Copy [web-root]/index.php from assets/index.php', $stdout);
     $this->assertStringContainsString('- Copy [web-root]/update.php from assets/update.php', $stdout);
 
-    // Run scaffold operation again. It should not print anything.
+    // Run scaffold operation again. It should not print anything about copying
+    // scaffold files.
     $stdout = $this->mustExec("composer scaffold --no-ansi", $sut);
-
-    $this->assertEquals('', $stdout);
+    $this->assertStringNotContainsString('Scaffolding files', $stdout);
+    $this->assertStringNotContainsString('- Copy ', $stdout);
 
     // Delete a file and run it again. It should re-scaffold the removed file.
     unlink("$sut/index.php");

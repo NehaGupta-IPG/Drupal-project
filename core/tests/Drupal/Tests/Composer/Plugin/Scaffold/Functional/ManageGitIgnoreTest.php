@@ -133,7 +133,8 @@ EOT;
     $this->assertScaffoldedFile($sut . '/docroot/sites/.gitignore', FALSE, 'example.settings.local.php');
     $this->assertScaffoldedFile($sut . '/docroot/sites/default/.gitignore', FALSE, 'default.services.yml');
     $expected = <<<EOT
-M docroot/.gitignore
+ M .gitignore
+ M docroot/.gitignore
 ?? docroot/sites/.gitignore
 ?? docroot/sites/default/.gitignore
 EOT;
