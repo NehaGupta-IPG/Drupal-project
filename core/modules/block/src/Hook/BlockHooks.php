@@ -104,7 +104,7 @@ class BlockHooks {
     $variables['in_preview'] = $variables['elements']['#in_preview'] ?? FALSE;
     $is_label_visible = ($variables['configuration']['label_display'] ?? BlockPluginInterface::BLOCK_LABEL_HIDDEN) == BlockPluginInterface::BLOCK_LABEL_VISIBLE;
     $is_label_visually_hidden = !$is_label_visible && ($variables['configuration']['label_display_type'] ?? BlockPluginInterface::BLOCK_LABEL_HIDDEN) == BlockPluginInterface::BLOCK_LABEL_VISUALLY_HIDDEN;
-    $variables['label'] = ($is_label_visible || $is_label_visually_hidden) ? $variables['configuration']['label'] : '';
+    $variables['label'] = isset($variables['configuration']['label']) ? $variables['configuration']['label'] : '';
     $variables['content'] = $variables['elements']['content'];
     // A block's label is configuration: it is static. Allow dynamic labels to
     // be set in the render array.
