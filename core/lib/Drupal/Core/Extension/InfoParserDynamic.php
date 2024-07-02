@@ -92,27 +92,31 @@ class InfoParserDynamic implements InfoParserInterface {
       }
     }
 
+    // Determine if the extension is compatible with the current version of
+    // Drupal core.
+    try {
+      $is_core_compatible = Semver::satisfies(\Drupal::VERSION, $parsed_info['core_version_requirement']);
+    }
+    catch (\UnexpectedValueException) {
+      throw new InfoParserException("The 'core_version_requirement' constraint ({$parsed_info['core_version_requirement']}) is not a valid value in $filename");
+    }
+
     // If configured to do so, be lenient and allow contrib and custom
     // extensions to be enabled regardless of core version compatibility. This
     // is needed because the core_version_requirement for these extensions will
     // typically not include the latest development version of core.
+    $ignore_core_version = FALSE;
     if (Settings::get('extension_discovery_ignore_core_version_requirement', FALSE)) {
       // We skip extensions in the 'Testing' package, because there fixture
       // modules which are specifically for tests to check for an extension
       // being incompatible.
       if (!str_starts_with($filename, 'core/') && !str_starts_with($filename, $this->root . '/core/') && (!isset($parsed_info['package']) || $parsed_info['package'] !== 'Testing')) {
-        $parsed_info['core_version_requirement'] .= ' || ' . \Drupal::VERSION;
+        $ignore_core_version = TRUE;
       }
     }
 
-    // Determine if the extension is compatible with the current version of
-    // Drupal core.
-    try {
-      $parsed_info['core_incompatible'] = !Semver::satisfies(\Drupal::VERSION, $parsed_info['core_version_requirement']);
-    }
-    catch (\UnexpectedValueException) {
-      throw new InfoParserException("The 'core_version_requirement' constraint ({$parsed_info['core_version_requirement']}) is not a valid value in $filename");
-    }
+    $parsed_info['core_incompatible'] = !($is_core_compatible || $ignore_core_version);
+
     if (isset($parsed_info['version'])) {
       if ($parsed_info['version'] === 'VERSION') {
         $parsed_info['version'] = \Drupal::VERSION;
