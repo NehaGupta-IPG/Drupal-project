@@ -94,9 +94,10 @@ class UserAccessControlHandler extends EntityAccessControlHandler {
     // Fields that are not implicitly allowed to administrative users.
     $explicit_check_fields = [
       'pass',
+      'roles',
     ];
 
-    // Administrative users are allowed to edit and view all fields.
+    // Administrative users can edit all fields except password and roles.
     if (!in_array($field_definition->getName(), $explicit_check_fields) && $account->hasPermission('administer users')) {
       return AccessResult::allowed()->cachePerPermissions();
     }
@@ -145,6 +146,8 @@ class UserAccessControlHandler extends EntityAccessControlHandler {
         return ($operation == 'view') ? AccessResult::allowed() : AccessResult::neutral();
 
       case 'roles':
+        return AccessResult::allowedIfHasPermission($account, 'administer permissions');
+
       case 'status':
       case 'access':
       case 'login':

@@ -102,4 +102,11 @@ abstract class ChangeUserRoleBase extends ConfigurableActionBase implements Cont
     return $return_as_object ? $access : $access->isAllowed();
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function userAccess($operation, AccountInterface $account) {
+    return $account->hasPermission('administer permissions');
+  }
+
 }

@@ -58,7 +58,6 @@ class BulkFormTest extends UserTestBase {
     $this->submitForm($edit, 'Apply to selected items');
     $this->assertSession()->pageTextContains('No users selected.');
 
-    // Assign a role to a user.
     $account = $user_storage->load($this->users[0]->id());
     $roles = Role::loadMultiple();
     unset($roles[RoleInterface::ANONYMOUS_ID]);
@@ -116,12 +115,10 @@ class BulkFormTest extends UserTestBase {
     $this->assertTrue($anonymous_account->isBlocked(), 'Ensure the anonymous user got blocked.');
 
     // Test the list of available actions with a value that contains a dot.
-    $this->drupalLogin($this->drupalCreateUser([
-      'administer permissions',
-      'administer views',
-      'administer users',
-    ]));
-    $action_id = 'user_add_role_action.' . $role;
+    $this->drupalLogin($this->drupalCreateUser(['administer permissions', 'administer views', 'administer users']));
+    $role_id = strtolower($this->randomMachineName());
+    Role::create(['id' => $role_id])->save();
+    $action_id = 'user_add_role_action.' . $role_id;
     $edit = [
       'options[include_exclude]' => 'exclude',
       "options[selected_actions][$action_id]" => $action_id,
@@ -137,6 +134,71 @@ class BulkFormTest extends UserTestBase {
     $this->submitForm([], 'Save');
     $this->drupalGet('test-user-bulk-form');
     $this->assertSession()->optionExists('edit-action', $action_id);
+  }
+
+  /**
+   * Tests role assignment/de-assignment actions in user bulk forms.
+   */
+  public function testBulkFormRoles() {
+    $this->drupalLogin($this->drupalCreateUser(['administer users']));
+
+    /** @var \Drupal\user\UserStorageInterface $user_storage */
+    $user_storage = $this->container->get('entity_type.manager')->getStorage('user');
+
+    Role::create([
+      'id' => $role_id = strtolower($this->randomMachineName()),
+      'label' => $role_label = $this->randomMachineName(),
+    ])->save();
+
+    $user = $this->drupalCreateUser();
+    $uid = $user->id();
+
+    // Check that the create use does't have any custom roles.
+    $this->assertEmpty($user->getRoles(TRUE));
+
+    $this->drupalGet('test-user-bulk-form');
+    // Check that the user cannot access the user_add_role_action.* actions.
+    $this->assertSession()->optionNotExists('Action', "Add the $role_label role to the selected user(s)");
+    // Check that the user cannot access the user_remove_role_action.* actions.
+    $this->assertSession()->optionNotExists('Action', "Remove the $role_label role from the selected user(s)");
+
+    // Login with a user who can modify roles.
+    $this->drupalLogin($this->drupalCreateUser([
+      'administer users',
+      'administer permissions',
+    ]));
+
+    $this->drupalGet('test-user-bulk-form');
+    // Check that the user can access the user_add_role_action.* actions.
+    $this->assertSession()->optionExists('Action', "Add the $role_label role to the selected user(s)");
+    // Check that the user can access the user_remove_role_action.* actions.
+    $this->assertSession()->optionExists('Action', "Remove the $role_label role from the selected user(s)");
+
+    // Assign role to user.
+    $edit = [
+      'user_bulk_form[3]' => TRUE,
+      'action' => "user_add_role_action.$role_id",
+    ];
+    $this->drupalPostForm(NULL, $edit, t('Apply to selected items'));
+    $this->assertSession()->pageTextContains("Add the $role_label role to the selected user(s) was applied to 1 item.");
+
+    // Check that the role has been added to the user.
+    $user_storage->resetCache([$uid]);
+    $user = User::load($uid);
+    $this->assertSame([$role_id], $user->getRoles(TRUE));
+
+    // Remove role from user.
+    $edit = [
+      'user_bulk_form[3]' => TRUE,
+      'action' => "user_remove_role_action.$role_id",
+    ];
+    $this->submitForm($edit, t('Apply to selected items'));
+    $this->assertSession()->pageTextContains("Remove the $role_label role from the selected user(s) was applied to 1 item.");
+
+    // Check that the role has been removed from the user.
+    $user_storage->resetCache([$uid]);
+    $user = User::load($uid);
+    $this->assertEmpty($user->getRoles(TRUE));
   }
 
   /**

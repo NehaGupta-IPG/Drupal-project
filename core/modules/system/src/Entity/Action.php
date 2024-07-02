@@ -31,6 +31,9 @@ use Drupal\Core\Action\ActionPluginCollection;
     'singular' => '@count action',
     'plural' => '@count actions',
   ],
+  handlers: [
+    'access' => 'Drupal\system\ActionAccessControlHandler',
+  ],
   config_export: [
     'id',
     'label',

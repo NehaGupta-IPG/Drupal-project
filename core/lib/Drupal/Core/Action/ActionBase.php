@@ -3,6 +3,7 @@
 namespace Drupal\Core\Action;
 
 use Drupal\Core\Plugin\PluginBase;
+use Drupal\Core\Session\AccountInterface;
 
 /**
  * Provides a base implementation for an Action plugin.
@@ -21,6 +22,13 @@ abstract class ActionBase extends PluginBase implements ActionInterface {
     foreach ($entities as $entity) {
       $this->execute($entity);
     }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function userAccess($operation, AccountInterface $account) {
+    return TRUE;
   }
 
 }

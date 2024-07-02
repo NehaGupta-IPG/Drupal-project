@@ -58,4 +58,25 @@ interface ActionInterface extends ExecutableInterface, PluginInspectionInterface
    */
   public function access($object, ?AccountInterface $account = NULL, $return_as_object = FALSE);
 
+  /**
+   * Checks if a user account is allowed to access this action.
+   *
+   * This is a more generic access check than ::access(). Unlike ::access(),
+   * this method is used to determine if a user account is allowed to access the
+   * action, before being executed. The method could be useful, for example, on
+   * views with bulk operation form, where the list of actions should be limited
+   * to the actions that the current user is allowed to access. And this check
+   * should be performed before any per-object access check is done. The action
+   * config entity access handler is delegating the decision to this method.
+   *
+   * @param string $operation
+   *   The action operation.
+   * @param \Drupal\Core\Session\AccountInterface $account
+   *   The user account to be checked.
+   *
+   * @return bool
+   *   If the given user account is allowed to access this action.
+   */
+  public function userAccess($operation, AccountInterface $account);
+
 }

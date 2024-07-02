@@ -213,7 +213,7 @@ abstract class AccountForm extends ContentEntityForm implements TrustedCallbackI
       '#title' => $this->t('Roles'),
       '#default_value' => (!$register ? $account->getRoles() : []),
       '#options' => $roles,
-      '#access' => $roles && $user->hasPermission('administer permissions'),
+      '#access' => $account->roles->access('edit'),
     ];
 
     // Special handling for the inevitable "Authenticated user" role.
