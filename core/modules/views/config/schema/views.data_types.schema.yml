@@ -927,3 +927,7 @@ views_field_bulk_form:
       sequence:
         type: string
         label: 'Action'
+        constraints:
+          PluginExists:
+            manager: plugin.manager.action
+            interface: Drupal\Core\Action\ActionInterface
