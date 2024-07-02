@@ -928,6 +928,6 @@ views_field_bulk_form:
         type: string
         label: 'Action'
         constraints:
-          PluginExists:
-            manager: plugin.manager.action
-            interface: Drupal\Core\Action\ActionInterface
+          ConfigExists:
+            prefix: system.action.
+            interface: Drupal\system\ActionConfigEntityInterface
