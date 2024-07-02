@@ -9,17 +9,13 @@ use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
  * Updates system.theme:admin config if it's still at the default empty string.
+ *
+ * @internal
+ *   Tagged services are internal.
  */
 class UpdateEmptyAdminTheme implements EventSubscriberInterface {
 
-  /**
-   * Constructs a new ConfigSubscriber object.
-   *
-   * @param \Symfony\Component\HttpFoundation\RequestStack $requestStack
-   *   The request stack service.
-   */
-  public function __construct(protected readonly RequestStack $requestStack) {
-
+  public function __construct(private readonly RequestStack $requestStack) {
   }
 
   /**

@@ -54,9 +54,7 @@ abstract class NodeTitleTestBase extends NodeTestBase {
     $theme = $this->getTheme();
     if ($theme !== $this->defaultTheme) {
       \Drupal::service('theme_installer')->install([$theme]);
-      $system_theme_config = $this->container->get('config.factory')
-        ->getEditable('system.theme');
-      $system_theme_config
+      $this->config('system.theme')
         ->set('default', $theme)
         ->save();
     }
