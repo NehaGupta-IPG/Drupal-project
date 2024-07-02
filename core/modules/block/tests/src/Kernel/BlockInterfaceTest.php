@@ -86,8 +86,8 @@ class BlockInterfaceTest extends KernelTestBase {
       ],
       'label_display_type' => [
         '#type' => 'select',
-        '#title' => 'Hide method',
-        '#description' => 'Method of hiding the block title.',
+        '#title' => 'Visibility Mode',
+        '#description' => 'How the block title is displayed or hidden.',
         '#options' => [
           BlockPluginInterface::BLOCK_LABEL_HIDDEN => 'Hidden',
           BlockPluginInterface::BLOCK_LABEL_VISUALLY_HIDDEN => 'Visually Hidden',

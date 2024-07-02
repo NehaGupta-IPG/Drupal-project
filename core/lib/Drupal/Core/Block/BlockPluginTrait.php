@@ -187,8 +187,8 @@ trait BlockPluginTrait {
 
     $form['label_display_type'] = [
       '#type' => 'select',
-      '#title' => $this->t('Hide method'),
-      '#description' => $this->t('Method of hiding the block title.'),
+      '#title' => $this->t('Visibility Mode'),
+      '#description' => $this->t('How the block title is displayed or hidden.'),
       '#options' => $this->getLabelDisplayOptions(),
       '#default_value' => $this->configuration['label_display_type'],
       '#states' => [
