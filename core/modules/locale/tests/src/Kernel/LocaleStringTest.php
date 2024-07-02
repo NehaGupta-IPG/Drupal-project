@@ -140,7 +140,7 @@ class LocaleStringTest extends KernelTestBase {
     $source2 = $this->buildSourceString(['source' => $prefix . $this->randomMachineName(100)])->save();
     $source3 = $this->buildSourceString()->save();
 
-    /** @var StringInterface[] $sorted_strings */
+    /** @var \Drupal\locale\StringInterface[] $sorted_strings */
     $sorted_strings = [$source1, $source2, $source3];
     usort(
       $sorted_strings,
