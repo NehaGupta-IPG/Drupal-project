@@ -116,9 +116,17 @@ class BulkFormTest extends NodeTestBase {
       'node_save_action',
       'node_delete_action',
     ];
-    $this->assertSame($expected_actions, array_values(array_filter(array_map(function (NodeElement $action): string {
-      return $action->getValue();
-    }, $actual_actions))));
+    $this->assertSame(
+      $expected_actions,
+      array_values(
+        array_filter(
+          array_map(
+            fn(NodeElement $action): string => $action->getValue(),
+            $actual_actions,
+          ),
+        ),
+      ),
+    );
 
     // Unpublish a node using the bulk form.
     $node = reset($this->nodes);
