@@ -140,9 +140,20 @@ class LocaleStringTest extends KernelTestBase {
     $source2 = $this->buildSourceString(['source' => $prefix . $this->randomMachineName(100)])->save();
     $source3 = $this->buildSourceString()->save();
 
+    /** @var StringInterface[] $sorted_strings */
+    $sorted_strings = [$source1, $source2, $source3];
+    usort(
+      $sorted_strings,
+      static fn(StringInterface $source_a, StringInterface $source_b)
+        => strcmp($source_a->source, $source_b->source) ?: strcmp($source_a->context, $source_b->context),
+    );
+
     // Load all source strings.
     $strings = $this->storage->getStrings([]);
     $this->assertCount(3, $strings);
+    foreach (array_values($strings) as $index => $string) {
+      $this->assertEquals($sorted_strings[$index]->lid, $string->lid);
+    }
     // Load all source strings matching a given string.
     $filter_options['filters'] = ['source' => $prefix];
     $strings = $this->storage->getStrings([], $filter_options);
