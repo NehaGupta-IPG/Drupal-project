@@ -54,18 +54,25 @@ class UserAccessControlHandlerTest extends UnitTestCase {
   protected $owner;
 
   /**
+   * The mock user account with admin permissions.
+   *
+   * @var \Drupal\user\UserInterface
+   */
+  protected $admin;
+
+  /**
    * A user with 'administer users' permission.
    *
    * @var \Drupal\Core\Session\AccountInterface|\PHPUnit_Framework_MockObject_MockObject
    */
-  protected $account_with_admin_users_perm;
+  protected $accountWithAdminUsersPerm;
 
   /**
    * A user with 'administer permissions' permission.
    *
    * @var \Drupal\Core\Session\AccountInterface|\PHPUnit_Framework_MockObject_MockObject
    */
-  protected $account_with_admin_perms_perm;
+  protected $accountWithAdminPermsPerm;
 
   /**
    * The mocked test field items.
@@ -120,8 +127,8 @@ class UserAccessControlHandlerTest extends UnitTestCase {
         ['administer permissions', FALSE],
       ]);
 
-    $this->account_with_admin_perms_perm = $this->createMock(AccountInterface::class);
-    $this->account_with_admin_perms_perm
+    $this->accountWithAdminPermsPerm = $this->createMock(AccountInterface::class);
+    $this->accountWithAdminPermsPerm
       ->expects($this->any())
       ->method('hasPermission')
       ->willreturnValueMap([
@@ -404,8 +411,7 @@ class UserAccessControlHandlerTest extends UnitTestCase {
   /**
    * Provides test data for testRolesAccess().
    */
-  public function rolesAccessProvider()
-  {
+  public function rolesAccessProvider() {
     $role_access = [
       [
         'viewer' => 'viewer',
