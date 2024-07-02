@@ -393,8 +393,8 @@
         actionList.appendChild(li);
         li.appendChild(button);
       });
-      actionList.firstChild.classList.add('first');
-      actionList.lastChild.classList.add('last');
+      actionList.firstElementChild.classList.add('first');
+      actionList.lastElementChild.classList.add('last');
 
       $displayButtons.each(function () {
         const $this = $(this);
