@@ -74,7 +74,8 @@ class FileItem extends EntityReferenceItem {
       'file_extensions' => 'txt',
       'file_directory' => '[date:custom:Y]-[date:custom:m]',
       'max_filesize' => '',
-      'description_field' => 0,
+      'description_field' => FALSE,
+      'description_field_required' => FALSE,
     ] + parent::defaultFieldSettings();
   }
 

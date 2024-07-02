@@ -208,7 +208,7 @@ class FileFieldDisplayTest extends FileFieldTestBase {
     // description is now required.
     $this->drupalGet($node->toUrl('edit-form'));
     $this->submitForm([], 'Save');
-    $this->assertSession()->pageTextContains("The {$field_label} field description is required.");
+    $this->assertSession()->pageTextContains("The $label field description is required.");
   }
 
   /**
