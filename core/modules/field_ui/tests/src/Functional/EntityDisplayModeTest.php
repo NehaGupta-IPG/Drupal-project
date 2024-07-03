@@ -71,7 +71,6 @@ class EntityDisplayModeTest extends BrowserTestBase {
     $edit = [
       'id' => $this->randomMachineName() . '.' . $this->randomMachineName(),
       'label' => $this->randomString(),
-      'description' => $this->randomString(),
     ];
     $this->submitForm($edit, 'Save');
     $this->assertSession()->pageTextContains('The machine-readable name must contain only lowercase letters, numbers, and underscores.');
@@ -199,7 +198,6 @@ class EntityDisplayModeTest extends BrowserTestBase {
     // Set new values and enable test plugins.
     $edit = [
       'label' => 'Breezier',
-      'description' => 'Breezier',
     ];
     $this->drupalGet('admin/structure/display-modes/view/manage/node.teaser');
     $this->submitForm($edit, 'Save');
