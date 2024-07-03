@@ -257,7 +257,6 @@ class ManageDisplayTest extends BrowserTestBase {
 
     $edit = [
       'label' => 'Breezier',
-      'description' => 'Breezier',
     ];
     $this->drupalGet('admin/structure/display-modes/view/manage/node.teaser');
     $this->submitForm($edit, 'Save');

@@ -75,7 +75,6 @@ class LayoutDisplayTest extends BrowserTestBase {
     $this->drupalGet('admin/structure/display-modes/view/add/node');
     $page->fillField('label', 'New');
     $page->fillField('id', 'new');
-    $page->fillField('description', 'New description');
     $page->pressButton('Save');
 
     // Enable the new view mode.
