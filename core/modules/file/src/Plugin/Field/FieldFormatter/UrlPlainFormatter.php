@@ -25,7 +25,7 @@ class UrlPlainFormatter extends FileFormatterBase {
    */
   public static function defaultSettings(): array {
     $settings = parent::defaultSettings();
-    $settings['absolute_url'] = FALSE;
+    $settings['show_link_as'] = 'relative';
     return $settings;
   }
 
@@ -34,11 +34,35 @@ class UrlPlainFormatter extends FileFormatterBase {
    */
   public function settingsForm(array $form, FormStateInterface $form_state): array {
     $form = parent::settingsForm($form, $form_state);
-    $form['absolute_url'] = [
-      '#type' => 'checkbox',
-      '#title' => $this->t('Absolute URL'),
+    $form['show_link_as'] = [
+      '#type' => 'radios',
+      '#title' => $this->t('Show link as'),
+      '#default_value' => $this->getSetting('show_link_as'),
       '#description' => $this->t('If checked, links will be rendered as absolute URLs.'),
-      '#default_value' => $this->getSetting('absolute_url'),
+      '#options' => [
+        'absolute' => $this->t('Absolute'),
+        'relative' => $this->t('Relative'),
+      ],
+    ];
+    $form['absolute_url_suggestion'] = [
+      '#type' => 'html_tag',
+      '#tag' => 'p',
+      '#value' => $this->t('<strong>Example</strong>: https://www.example.com/sites/default/files/image.png'),
+      '#states' => [
+        'visible' => [
+          ':input[name="fields[' . $this->fieldDefinition->getName() . '][settings_edit_form][settings][show_link_as]"]' => ['value' => 'absolute'],
+        ],
+      ]
+    ];
+    $form['relative_url_suggestion'] = [
+      '#type' => 'html_tag',
+      '#tag' => 'p',
+      '#value' => $this->t('<strong>Example</strong>: /sites/default/files/image.png'),
+      '#states' => [
+        'visible' => [
+          ':input[name="fields[' . $this->fieldDefinition->getName() . '][settings_edit_form][settings][show_link_as]"]' => ['value' => 'relative'],
+        ],
+      ],
     ];
 
     return $form;
@@ -48,7 +72,7 @@ class UrlPlainFormatter extends FileFormatterBase {
    * {@inheritdoc}
    */
   public function settingsSummary(): array {
-    $summary[] = $this->getSetting('absolute_url') ? $this->t('Rendered as absolute URL') : $this->t('Rendered as relative URL');
+    $summary[] = $this->getSetting('absolute_url') ? $this->t('Absolute URL') : $this->t('Relative URL');
 
     return $summary;
   }
@@ -62,13 +86,13 @@ class UrlPlainFormatter extends FileFormatterBase {
     foreach ($this->getEntitiesToView($items, $langcode) as $delta => $file) {
       assert($file instanceof FileInterface);
       $elements[$delta] = [
-        '#markup' => $file->createFileUrl(!$this->getSetting('absolute_url')),
+        '#markup' => $file->createFileUrl($this->getSetting('show_link_as') === 'relative'),
         '#cache' => [
           'tags' => $file->getCacheTags(),
         ],
       ];
 
-      if ($this->getSetting('absolute_url')) {
+      if ($this->getSetting('show_link_as') === 'absolute') {
         $elements[$delta]['#cache']['contexts'] = ['url.site'];
       }
     }

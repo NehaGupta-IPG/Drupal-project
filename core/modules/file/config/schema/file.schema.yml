@@ -172,9 +172,9 @@ field.formatter.settings.file_url_plain:
   type: mapping
   label: 'URL to file format settings'
   mapping:
-    absolute_url:
-      type: boolean
-      label: 'Absolute URL'
+    show_link_as:
+      type: string
+      label: 'Show link as'
 
 field.widget.settings.file_generic:
   type: mapping
