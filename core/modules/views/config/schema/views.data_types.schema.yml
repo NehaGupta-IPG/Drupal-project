@@ -921,6 +921,10 @@ views_field_bulk_form:
       sequence:
         type: string
         label: 'Action'
+        constraints:
+          ConfigExists:
+            prefix: system.action.
+            interface: Drupal\system\ActionConfigEntityInterface
     actions_order:
       type: sequence
       label: 'Actions order'
