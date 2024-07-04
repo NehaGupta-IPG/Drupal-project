@@ -37,7 +37,7 @@ function file_post_update_add_playsinline(array &$sandbox = []): ?TranslatableMa
 /**
  * Set the default value for "absolute_url" field formatter setting.
  */
-function file_post_update_set_default_absolute_url(array &$sandbox = NULL): void {
+function file_post_update_set_default_absolute_url(): void {
   $displays = EntityViewDisplay::loadMultiple();
   foreach ($displays as $display) {
     /** @var \Drupal\Core\Entity\Entity\EntityViewDisplay $display */
