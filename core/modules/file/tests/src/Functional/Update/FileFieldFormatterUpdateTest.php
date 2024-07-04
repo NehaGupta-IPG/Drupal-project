@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\Tests\file\Functional\Update;
 
 use Drupal\Core\Entity\Entity\EntityViewDisplay;
+use Drupal\file\Plugin\Field\FieldFormatter\FileFormatterBase;
 use Drupal\FunctionalTests\Update\UpdatePathTestBase;
 
 /**
@@ -39,7 +40,7 @@ class FileFieldFormatterUpdateTest extends UpdatePathTestBase {
           switch ($settings['type']) {
             case 'file_url_plain':
             case 'image_url':
-              $this->assertArrayNotHasKey('absolute_url', $settings['settings']);
+              $this->assertArrayNotHasKey('show_link_as', $settings['settings']);
               break;
 
           }
@@ -57,8 +58,8 @@ class FileFieldFormatterUpdateTest extends UpdatePathTestBase {
           switch ($settings['type']) {
             case 'file_url_plain':
             case 'image_url':
-              $this->assertArrayHasKey('absolute_url', $settings['settings']);
-              $this->assertFalse($settings['settings']['absolute_url']);
+              $this->assertArrayHasKey('show_link_as', $settings['settings']);
+              $this->assertEquals($settings['settings']['show_link_as'], FileFormatterBase::RELATIVE_URL);
               break;
           }
         }

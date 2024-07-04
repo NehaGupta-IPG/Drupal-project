@@ -13,6 +13,7 @@ use Drupal\Core\Link;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Url;
+use Drupal\file\Plugin\Field\FieldFormatter\FileFormatterBase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -44,9 +45,9 @@ class ImageUrlFormatter extends ImageFormatterBase {
   /**
    * The file URL generator.
    *
-   * @var \Drupal\Core\File\FileUrlGeneratorInterface
+   * @var \Drupal\Core\File\FileUrlGeneratorInterface|null
    */
-  protected FileUrlGeneratorInterface $fileUrlGenerator;
+  protected ?FileUrlGeneratorInterface $fileUrlGenerator;
 
   /**
    * Constructs an ImageFormatter object.
@@ -72,7 +73,7 @@ class ImageUrlFormatter extends ImageFormatterBase {
    * @param \Drupal\Core\File\FileUrlGeneratorInterface|null $file_url_generator
    *   The file URL generator.
    */
-  public function __construct($plugin_id, $plugin_definition, FieldDefinitionInterface $field_definition, array $settings, $label, $view_mode, array $third_party_settings, EntityTypeManagerInterface $entity_type_manager, AccountInterface $current_user, FileUrlGeneratorInterface $file_url_generator = NULL) {
+  public function __construct($plugin_id, $plugin_definition, FieldDefinitionInterface $field_definition, array $settings, $label, $view_mode, array $third_party_settings, EntityTypeManagerInterface $entity_type_manager, AccountInterface $current_user, ?FileUrlGeneratorInterface $file_url_generator = NULL) {
     parent::__construct($plugin_id, $plugin_definition, $field_definition, $settings, $label, $view_mode, $third_party_settings);
     $this->imageStyleStorage = $entity_type_manager->getStorage('image_style');
     $this->currentUser = $current_user;
@@ -106,7 +107,7 @@ class ImageUrlFormatter extends ImageFormatterBase {
    */
   public static function defaultSettings() {
     return [
-      'absolute_url' => FALSE,
+      'show_link_as' => FileFormatterBase::RELATIVE_URL,
       'image_style' => '',
     ];
   }
@@ -117,11 +118,35 @@ class ImageUrlFormatter extends ImageFormatterBase {
   public function settingsForm(array $form, FormStateInterface $form_state) {
     $element = parent::settingsForm($form, $form_state);
 
-    $element['absolute_url'] = [
-      '#type' => 'checkbox',
-      '#title' => $this->t('Absolute URL'),
+    $element['show_link_as'] = [
+      '#type' => 'radios',
+      '#title' => $this->t('Show link as'),
+      '#default_value' => $this->getSetting('show_link_as'),
       '#description' => $this->t('If checked, links will be rendered as absolute URLs.'),
-      '#default_value' => $this->getSetting('absolute_url'),
+      '#options' => [
+        FileFormatterBase::ABSOLUTE_URL => $this->t('Absolute'),
+        FileFormatterBase::RELATIVE_URL => $this->t('Relative'),
+      ],
+    ];
+    $element['absolute_url_suggestion'] = [
+      '#type' => 'item',
+      '#title' => '',
+      '#description' => $this->t('<strong>Example</strong>: https://www.example.com/sites/default/files/image.png'),
+      '#states' => [
+        'visible' => [
+          ':input[name="fields[' . $this->fieldDefinition->getName() . '][settings_edit_form][settings][show_link_as]"]' => ['value' => 'absolute'],
+        ],
+      ],
+    ];
+    $element['relative_url_suggestion'] = [
+      '#type' => 'item',
+      '#title' => '',
+      '#description' => $this->t('<strong>Example</strong>: /sites/default/files/image.png'),
+      '#states' => [
+        'visible' => [
+          ':input[name="fields[' . $this->fieldDefinition->getName() . '][settings_edit_form][settings][show_link_as]"]' => ['value' => 'relative'],
+        ],
+      ],
     ];
 
     unset($element['image_link'], $element['image_loading']);
@@ -164,7 +189,7 @@ class ImageUrlFormatter extends ImageFormatterBase {
       $summary[] = $this->t('Original image');
     }
 
-    $summary[] = $this->getSetting('absolute_url') ? $this->t('Rendered as absolute URL') : $this->t('Rendered as relative URL');
+    $summary[] = ($this->getSetting('show_link_as') === FileFormatterBase::ABSOLUTE_URL) ? $this->t('Absolute URL') : $this->t('Relative URL');
 
     return array_merge($summary, parent::settingsSummary());
   }
@@ -192,7 +217,7 @@ class ImageUrlFormatter extends ImageFormatterBase {
       $url = $this->fileUrlGenerator->generateAbsoluteString($image_uri);
 
       // Generate absolute url for the image.
-      if (!$this->getSetting('absolute_url')) {
+      if ($this->getSetting('show_link_as') === FileFormatterBase::RELATIVE_URL) {
         $url = $this->fileUrlGenerator->generateString($url);
       }
 

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\file\FunctionalJavascript;
 
+use Drupal\file\Plugin\Field\FieldFormatter\FileFormatterBase;
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
 use Drupal\Tests\file\Functional\FileFieldCreationTrait;
 use PHPUnit\Framework\Attributes\Group;
@@ -146,7 +147,7 @@ class FileManagedFileElementTest extends WebDriverTestBase {
     $page->pressButton("{$field_name}_settings_edit");
     $this->assertSession()->waitForElement('css', '.ajax-new-content');
     $edit = [
-      "fields[$field_name][settings_edit_form][settings][absolute_url]" => TRUE,
+      "fields[$field_name][settings_edit_form][settings][show_link_as]" => FileFormatterBase::ABSOLUTE_URL,
     ];
     foreach ($edit as $name => $value) {
       $page->fillField($name, $value);
@@ -154,7 +155,7 @@ class FileManagedFileElementTest extends WebDriverTestBase {
     $page->pressButton("{$field_name}_plugin_settings_update");
     $this->assertSession()->waitForElement('css', '.field-plugin-summary-cell > .ajax-new-content');
     $this->submitForm([], 'Save');
-    $this->assertSession()->pageTextContains('Rendered as absolute url');
+    $this->assertSession()->pageTextContains('Absolute URL');
   }
 
   /**
