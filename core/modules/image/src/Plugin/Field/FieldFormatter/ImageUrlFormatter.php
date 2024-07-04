@@ -124,8 +124,8 @@ class ImageUrlFormatter extends ImageFormatterBase {
       '#default_value' => $this->getSetting('show_link_as'),
       '#description' => $this->t('If checked, links will be rendered as absolute URLs.'),
       '#options' => [
-        FileFormatterBase::ABSOLUTE_URL => $this->t('Absolute'),
-        FileFormatterBase::RELATIVE_URL => $this->t('Relative'),
+        FileFormatterBase::ABSOLUTE_URL => $this->t('Absolute URL'),
+        FileFormatterBase::RELATIVE_URL => $this->t('Relative URL'),
       ],
     ];
     $element['absolute_url_suggestion'] = [
