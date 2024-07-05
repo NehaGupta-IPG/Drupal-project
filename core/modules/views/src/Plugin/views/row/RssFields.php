@@ -182,7 +182,7 @@ class RssFields extends RowPluginBase {
           $item_guid = $this->getAbsoluteUrl($item_guid);
         }
         else {
-          $item_guid = Url::fromUri($item_guid);
+          $item_guid = Url::fromUri($item_guid)->setAbsolute()->toString();
         }
       }
     }
