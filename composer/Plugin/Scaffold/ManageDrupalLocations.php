@@ -6,16 +6,16 @@ use Composer\IO\IOInterface;
 use Drupal\Composer\Plugin\Scaffold\Operations\ScaffoldResult;
 
 /**
- * Generates the DrupalLocation file which defines the Drupal app root constant.
+ * Generates the DrupalLocation file which defines Drupal location constants.
  *
- * Drupal and the app root may be installed in various locations, and at runtime
- * it is not easy to determine these. Part of the difficulty is that Composer
- * can symlink packages in, and PHP's file location constants such as __DIR__
- * resolve symlinks.
+ * Drupal and the application root may be installed in various locations, and at
+ * runtime it is not easy to determine these. Part of the difficulty is that
+ * Composer can symlink packages in, and PHP's file location constants such as
+ * __DIR__ resolve symlinks.
  *
  * The authority on the location of packages is Composer, since it puts them in
- * their locations, and the authority on the location of the app root is this
- * scaffolding plugin, since it reads it from the composer.json file.
+ * their locations, and the authority on the location of the application root is
+ * this scaffolding plugin, since it reads it from the composer.json file.
  *
  * Reading the locations from composer.json is possible at runtime, but is
  * undesirable for performance. Therefore, during the Composer install process
@@ -62,7 +62,7 @@ class ManageDrupalLocations {
    *   The result of the locations class file generation.
    */
   public function manageLocationsClass(): ScaffoldResult {
-    $this->io->write("Drupal app root defined as {$this->webRoot}.");
+    $this->io->write("Drupal application root defined as {$this->webRoot}.");
 
     // Composer changes the current directory to the project root, even if it
     // run in a subdirectory.
@@ -102,7 +102,8 @@ class ManageDrupalLocations {
    * @param string $absolute_project_root
    *   The absolute path to the Composer project root, without a trailing slash.
    * @param string $absolute_app_root
-   *   The absolute path to the Drupal app root, without a trailing slash.
+   *   The absolute path to the Drupal application root, without a trailing
+   *   slash.
    *
    * @return string
    *   The absolute path of the directory to write to.
