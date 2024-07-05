@@ -1149,7 +1149,7 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
    */
   public static function bootEnvironment($app_root = NULL) {
     if ($app_root) {
-      @trigger_error('Specifying the Drupal app root $app_root is deprecated in drupal:11.1.0 and is removed from drupal:12.0.0. Omit the parameter. See https://www.drupal.org/node/3267862', E_USER_DEPRECATED);
+      @trigger_error('Calling ' . __METHOD__ . '() with the $app_root argument is deprecated in drupal:11.1.0 and is removed from drupal:12.0.0. See https://www.drupal.org/node/3267862', E_USER_DEPRECATED);
     }
 
     if (static::$isEnvironmentInitialized) {
