@@ -41,7 +41,7 @@ use Drupal\Composer\Plugin\Scaffold\Operations\ScaffoldResult;
 class ManageDrupalLocations {
 
   /**
-   * ManageGitIgnore constructor.
+   * ManageDrupalLocations constructor.
    *
    * @param \Composer\IO\IOInterface $io
    *   The Composer IO interface.
