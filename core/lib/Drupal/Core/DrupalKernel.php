@@ -298,9 +298,9 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
    *   from disk. Defaults to TRUE.
    * @param string $app_root
    *   (deprecated) (optional) The path to the application root as a string.
-   *   Specifying the Drupal app root $app_root to createFromRequest() is
-   *   deprecated in drupal:11.1.0 and is removed from drupal:12.0.0. Omit the
-   *   parameter.
+   *   Specifying the Drupal application root $app_root to createFromRequest()
+   *   is deprecated in drupal:11.1.0 and is removed from drupal:12.0.0. Omit
+   *   the parameter.
    *
    * @return static
    *
