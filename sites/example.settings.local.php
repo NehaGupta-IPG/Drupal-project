@@ -111,7 +111,7 @@ $config['system.performance']['js']['preprocess'] = FALSE;
  * to determine whether it can be installed. When a development version of
  * Drupal is installed, this will prevent installation of most contrib
  * extensions, because their .info.yml will typically only specify up to the
- * lastest stable version of Drupal. It can be useful to ignore this to allow
+ * latest stable version of Drupal. It can be useful to ignore this to allow
  * contrib modules to be used when developing Drupal core, or to develop contrib
  * modules on the development version of Drupal core.
  */
