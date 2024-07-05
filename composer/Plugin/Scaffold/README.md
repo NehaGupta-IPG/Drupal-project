@@ -234,8 +234,8 @@ to update it.
 ### DrupalLocation file
 
 The DrupalLocation file is a PHP class file which this plugin writes
-automatically. The class holds the location of the Drupal app root (that is, the
-location of Drupal's index.php file).
+automatically. The class holds the location of the Drupal application root (that
+is, the location of Drupal's index.php file).
 
 This file is written to the root of the Composer project, and must be specified
 in the root composer.json:
