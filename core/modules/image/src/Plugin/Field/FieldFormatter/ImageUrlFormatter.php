@@ -230,7 +230,7 @@ class ImageUrlFormatter extends ImageFormatterBase {
       $elements[$delta] = ['#markup' => $url];
       $cacheability->applyTo($elements[$delta]);
 
-      if ($this->getSetting('absolute_url')) {
+      if ($this->getSetting('show_link_as') === FileFormatterBase::ABSOLUTE_URL) {
         array_push($elements[$delta]['#cache']['contexts'], 'url.site');
       }
     }

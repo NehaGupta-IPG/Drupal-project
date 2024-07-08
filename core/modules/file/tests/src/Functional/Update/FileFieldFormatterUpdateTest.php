@@ -22,7 +22,7 @@ class FileFieldFormatterUpdateTest extends UpdatePathTestBase {
    */
   protected function setDatabaseDumpFiles(): void {
     $this->databaseDumpFiles = [
-      __DIR__ . '/../../../../../system/tests/fixtures/update/drupal-9.4.0.bare.standard.php.gz',
+      __DIR__ . '/../../../../../system/tests/fixtures/update/drupal-10.3.0.filled.standard.php.gz',
       __DIR__ . '/../../../fixtures/update/test-file-field-formatter-update.php',
     ];
   }
