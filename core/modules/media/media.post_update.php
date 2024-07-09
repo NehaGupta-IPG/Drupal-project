@@ -31,18 +31,6 @@ function media_post_update_media_author_views_filter_update(): void {
 }
 
 /**
- * Updates media.settings:iframe_domain config if it's still at the default.
- */
-function media_post_update_set_blank_iframe_domain_to_null() {
-  $media_settings = \Drupal::configFactory()->getEditable('media.settings');
-  if ($media_settings->get('iframe_domain') === '') {
-    $media_settings
-      ->set('iframe_domain', NULL)
-      ->save(TRUE);
-  }
-}
-
-/**
  * Install the 'Update metadata' action.
  */
 function media_post_update_install_update_metadata_action() {
