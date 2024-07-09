@@ -87,6 +87,8 @@ base_file_field_field_settings:
 field.field_settings.file:
   type: base_file_field_field_settings
   label: 'File settings'
+  constraints:
+    FullyValidatable: ~
   mapping:
     description_field:
       type: boolean
