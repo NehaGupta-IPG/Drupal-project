@@ -356,7 +356,7 @@ CORE_INCOMPATIBILITY;
       ],
     ]);
     $info_values = $this->infoParser->parse(vfsStream::url("modules/fixtures/$filename"));
-    $this->assertSame(FALSE, $info_values['core_incompatible']);
+    $this->assertFalse($info_values['core_incompatible']);
   }
 
   /**
