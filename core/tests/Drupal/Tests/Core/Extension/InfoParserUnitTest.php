@@ -7,6 +7,7 @@ namespace Drupal\Tests\Core\Extension;
 use Drupal\Core\Extension\ExtensionLifecycle;
 use Drupal\Core\Extension\InfoParser;
 use Drupal\Core\Extension\InfoParserException;
+use Drupal\Core\Site\Settings;
 use Drupal\Tests\UnitTestCase;
 use org\bovigo\vfs\vfsStream;
 // cspell:ignore skynet
@@ -326,6 +327,36 @@ CORE_INCOMPATIBILITY;
       $info_values = $this->infoParser->parse(vfsStream::url("modules/fixtures/$filename"));
       $this->assertSame($expected, $info_values['core_incompatible'], "core_incompatible correct in file: $filename");
     }
+  }
+
+  /**
+   * Tests core incompatibility can be ignored with a setting.
+   *
+   * @covers ::parse
+   */
+  public function testCoreIncompatibilityIgnoreSetting() {
+    $settings['extension_discovery_ignore_core_version_requirement'] = TRUE;
+    new Settings($settings);
+
+    // Use ^9 which is too old.
+    $core_incompatibility = <<<CORE_INCOMPATIBILITY
+      core_version_requirement: ^9
+      name: common_test
+      type: module
+      description: 'testing info file parsing'
+      simple_string: 'A simple string'
+      version: "VERSION"
+      CORE_INCOMPATIBILITY;
+
+    vfsStream::setup('modules');
+    $filename = "core_incompatible-ignore.info.txt";
+    vfsStream::create([
+      'fixtures' => [
+        $filename => $core_incompatibility,
+      ],
+    ]);
+    $info_values = $this->infoParser->parse(vfsStream::url("modules/fixtures/$filename"));
+    $this->assertSame(FALSE, $info_values['core_incompatible']);
   }
 
   /**
