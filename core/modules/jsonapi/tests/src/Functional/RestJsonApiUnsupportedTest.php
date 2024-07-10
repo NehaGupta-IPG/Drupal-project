@@ -86,7 +86,7 @@ class RestJsonApiUnsupportedTest extends ResourceTestBase {
   /**
    * Deploying a REST resource using api_json format results in 400 responses.
    *
-   * @see \Drupal\jsonapi\EventSubscriber\JsonApiRequestValidator::validateQueryParams()
+   * @see \Drupal\jsonapi\EventSubscriber\JsonApiQueryParamValidator::validateQueryParams()
    */
   public function testApiJsonNotSupportedInRest(): void {
     $this->assertSame(['json', 'xml'], $this->container->getParameter('serializer.formats'));

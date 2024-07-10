@@ -210,7 +210,7 @@ services:
 
   # Event subscribers.
   jsonapi.custom_query_parameter_names_validator.subscriber:
-    class: Drupal\jsonapi\EventSubscriber\JsonApiRequestValidator
+    class: Drupal\jsonapi\EventSubscriber\JsonApiQueryParamValidator
   jsonapi.resource_response.subscriber:
     class: Drupal\jsonapi\EventSubscriber\ResourceResponseSubscriber
     arguments: ['@jsonapi.serializer']
