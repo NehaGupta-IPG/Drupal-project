@@ -257,6 +257,9 @@ function install_state_defaults(): array {
     // Tokens in the pattern will be replaced by appropriate values for the
     // required translation file.
     'server_pattern' => \Drupal::TRANSLATION_DEFAULT_SERVER_PATTERN,
+    // The translation directory. This corresponds to the 'translation.path'
+    // setting of the 'locale.settings' configuration.
+    'translation_directory' => NULL,
     // Installation tasks can set this to TRUE to force the page request to
     // end (even if there is no themeable output), in the case of an interactive
     // installation. This is needed only rarely; for example, it would be used
@@ -451,16 +454,22 @@ function install_begin_request($class_loader, &$install_state): void {
   // If Drupal is being installed behind a proxy, configure the request.
   ReverseProxyMiddleware::setSettingsOnRequest($request, Settings::getInstance());
 
-  // Register the file translation service.
+  // Set-up translation-related install state.
   if (isset($GLOBALS['config']['locale.settings']['translation']['path'])) {
-    $directory = $GLOBALS['config']['locale.settings']['translation']['path'];
+    $install_state['translation_directory'] = $GLOBALS['config']['locale.settings']['translation']['path'];
   }
   else {
-    $directory = $site_path . '/files/translations';
+    $install_state['translation_directory'] = $site_path . '/files/translations';
   }
+
+  // Register the file translation service.
   /** @var \Drupal\Core\File\FileSystemInterface $file_system */
   $file_system = $container->get('file_system');
-  $container->set('string_translator.file_translation', new FileTranslation($directory, $file_system, $install_state['parameters']['profile'] ?? NULL));
+  $container->set('string_translator.file_translation', new FileTranslation(
+    $install_state['translation_directory'],
+    $file_system,
+    $install_state['parameters']['profile'] ?? NULL,
+  ));
   $container->get('string_translation')
     ->addTranslator($container->get('string_translator.file_translation'));
 
@@ -1404,7 +1413,7 @@ function install_select_language(&$install_state) {
 function install_download_translation(&$install_state) {
   // Check whether all conditions are met to download. Download the translation
   // for core if possible.
-  $requirements = install_check_translations($install_state['parameters']['langcode'], $install_state['server_pattern']);
+  $requirements = install_check_translations($install_state['parameters']['langcode'], $install_state);
   // Render requirements if any warnings or errors returned.
   if ($output = install_display_requirements($install_state, $requirements)) {
     return $output;
@@ -1416,7 +1425,7 @@ function install_download_translation(&$install_state) {
   // If we're using a custom profile and we know its version, try to download
   // that translation too. If we can't, proceed without it.
   if (isset($profile, $profile_path, $profile_version) && !str_starts_with($profile_path, 'core/')) {
-    install_check_translations($install_state['parameters']['langcode'], $install_state['server_pattern'], $profile, $profile_version);
+    install_check_translations($install_state['parameters']['langcode'], $install_state, $profile, $profile_version);
   }
 
   // At least one download was successful, reload the page in the new language.
@@ -1911,8 +1920,8 @@ function _install_module_batch(array $modules, array $module_names, array $insta
  *
  * @param string $langcode
  *   Language code to check for download.
- * @param string $server_pattern
- *   Server access pattern (to replace language code, version number, etc. in).
+ * @param array $install_state
+ *   An array of information about the current installation state.
  * @param string $project
  *   (optional) The name of the project for which to download translations.
  *   Defaults to `drupal` (i.e., core).
@@ -1924,24 +1933,29 @@ function _install_module_batch(array $modules, array $module_names, array $insta
  *   Requirements compliance array. If the translation cannot be downloaded this
  *   will contain a requirements error with detailed information.
  */
-function install_check_translations($langcode, $server_pattern, string $project = 'drupal', string $version = \Drupal::VERSION): array {
+function install_check_translations($langcode, $install_state, string $project = 'drupal', string $version = \Drupal::VERSION): array {
+  if (is_string($install_state)) {
+    @trigger_error('Passing the server pattern string as the second argument to install_check_translations() is deprecated in drupal:12.1.0 and is removed from drupal:13.0.0. Pass the installation state array instead. See https://www.drupal.org/node/3182651', E_USER_DEPRECATED);
+    $site_path = \Drupal::getContainer()->getParameter('site.path');
+    $install_state = [
+      'server_pattern' => $install_state,
+      'translation_directory' => $site_path . '/files/translations',
+    ];
+  }
+
   $requirements = [];
 
   $readable = FALSE;
   $writable = FALSE;
-  // @todo Make this configurable.
-  $site_path = \Drupal::getContainer()->getParameter('site.path');
-  $files_directory = $site_path . '/files';
-  $translations_directory = $site_path . '/files/translations';
   $translations_directory_exists = FALSE;
   $online = FALSE;
 
-  // First attempt to create or make writable the files directory.
+  // Attempt to create or make writable the translations directory. This will
+  // recursively attempt to create the directory, if possible, so by default it
+  // will also attempt to create the files directory if it does not exist yet.
   /** @var \Drupal\Core\File\FileSystemInterface $file_system */
   $file_system = \Drupal::service('file_system');
-  $file_system->prepareDirectory($files_directory, FileSystemInterface::CREATE_DIRECTORY | FileSystemInterface::MODIFY_PERMISSIONS);
-
-  // Then, attempt to create or make writable the translations directory.
+  $translations_directory = $install_state['translation_directory'];
   $file_system->prepareDirectory($translations_directory, FileSystemInterface::CREATE_DIRECTORY | FileSystemInterface::MODIFY_PERMISSIONS);
 
   // Get values so the requirements errors can be specific.
@@ -1958,7 +1972,7 @@ function install_check_translations($langcode, $server_pattern, string $project 
     '%core' => 'all',
     '%language' => $langcode,
   ];
-  $translation_url = strtr($server_pattern, $variables);
+  $translation_url = strtr($install_state['server_pattern'], $variables);
 
   $elements = parse_url($translation_url);
   $server_url = $elements['scheme'] . '://' . $elements['host'];
