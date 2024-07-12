@@ -497,7 +497,7 @@ class ViewsConfigUpdater {
       && $handler['plugin_id'] === 'style'
       && $handler['type'] === 'Grid' || 'HtmlList' || 'GridResponsive' || 'DefaultStyle'
       && !isset($handler['style']['grouping_label_element'])) {
-      $handler['style']= ['grouping_label_element' => NULL];
+      $handler['style'] = ['grouping_label_element' => NULL];
       $changed = TRUE;
     }
 
