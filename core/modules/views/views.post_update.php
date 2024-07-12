@@ -138,6 +138,6 @@ function views_post_update_views_add_grouping_label_element(?array &$sandbox = N
   $view_config_updater = \Drupal::classResolver(ViewsConfigUpdater::class);
   $view_config_updater->setDeprecationsEnabled(FALSE);
   \Drupal::classResolver(ConfigEntityUpdater::class)->update($sandbox, 'view', function (ViewEntityInterface $view) use ($view_config_updater): bool {
-    return $view_config_updater->addGroupingLabelElement($view);
+    return $view_config_updater->updateGroupingLabelElement($view);
   });
 }
