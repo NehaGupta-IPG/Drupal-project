@@ -146,9 +146,7 @@
                     matches += 1;
                   }
                 });
-                if (matches > 0) {
-                  makeAnnounce(matches);
-                }
+                makeAnnounce(matches);
                 checkLabels();
               } else {
                 filterItems.forEach((item) => {

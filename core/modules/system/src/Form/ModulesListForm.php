@@ -162,7 +162,7 @@ class ModulesListForm extends FormBase {
       '#description' => $this->t('Enter a part of the module name or description'),
       '#attributes' => [
         'class' => ['table-filter-text'],
-        'data-table' => '#system-modules',
+        'data-table' => '[data-drupal-selector="system-modules"]',
         'data-items' => '.package-listing table tbody tr',
         'data-targets' => '.table-filter-text-source, .module-name, .module-description',
         'data-singular' => $this->t('1 module is available in the modified list.'),

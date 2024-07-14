@@ -127,7 +127,12 @@ class ModulesUninstallForm extends FormBase {
       '#description' => $this->t('Enter a part of the module name or description'),
       '#attributes' => [
         'class' => ['table-filter-text'],
-        'data-table' => '#system-modules-uninstall',
+        'data-table' => '[data-drupal-selector="system-modules-uninstall"]',
+        'data-items' => 'tbody tr',
+        'data-targets' => '.table-filter-text-source, .module-name, .module-description',
+        'data-singular' => $this->t('1 module is available in the modified list.'),
+        'data-plural' => $this->t('@count modules are available in the modified list.'),
+        'data-full' => $this->t('All available modules are listed.'),
         'autocomplete' => 'off',
       ],
     ];
