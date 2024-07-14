@@ -165,8 +165,9 @@ class ModulesListForm extends FormBase {
         'data-table' => '#system-modules',
         'data-items' => '.package-listing table tbody tr',
         'data-targets' => '.table-filter-text-source, .module-name, .module-description',
-        'data-singular' => 'module',
-        'data-plural' => 'modules',
+        'data-singular' => $this->t('1 module is available in the modified list.'),
+        'data-plural' => $this->t('@count modules are available in the modified list.'),
+        'data-full' => $this->t('All available modules are listed.'),
         'autocomplete' => 'off',
       ],
     ];

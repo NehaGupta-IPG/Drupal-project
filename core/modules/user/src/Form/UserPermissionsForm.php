@@ -142,8 +142,9 @@ class UserPermissionsForm extends FormBase {
         'autocomplete' => 'off',
         'data-items' => 'tbody tr[data-filter-labelledby]',
         'data-targets' => '.table-filter-text-source',
-        'data-singular' => 'permission',
-        'data-plural' => 'permissions',
+        'data-singular' => $this->t('1 permission is available in the modified list.'),
+        'data-plural' => $this->t('@count permissions are available in the modified list.'),
+        'data-full' => $this->t('All available permissions are listed.'),
       ],
     ];
 

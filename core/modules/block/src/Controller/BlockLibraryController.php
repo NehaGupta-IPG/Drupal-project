@@ -150,8 +150,9 @@ class BlockLibraryController extends ControllerBase {
         'class' => ['table-filter-text'],
         'data-table' => '.block-add-table',
         'data-items' => 'tbody tr',
-        'data-singular' => 'block',
-        'data-plural' => 'blocks',
+        'data-singular' => $this->t('1 block is available in the modified list.'),
+        'data-plural' => $this->t('@count blocks are available in the modified list.'),
+        'data-full' => $this->t('All available blocks are listed.'),
         'title' => $this->t('Enter a part of the block name to filter by.'),
       ],
     ];

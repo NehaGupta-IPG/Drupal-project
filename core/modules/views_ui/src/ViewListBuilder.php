@@ -222,8 +222,9 @@ class ViewListBuilder extends ConfigEntityListBuilder {
         'title' => $this->t('Enter a part of the view name, machine name, description, or display path to filter by.'),
         'data-items' => 'tbody tr',
         'data-targets' => '[data-drupal-selector="views-table-filter-text-source"]',
-        'data-singular' => 'view',
-        'data-plural' => 'views',
+        'data-singular' => $this->t('1 view is available in the modified list.'),
+        'data-plural' => $this->t('@count views are available in the modified list.'),
+        'data-full' => $this->t('All available views are listed.'),
       ],
     ];
 

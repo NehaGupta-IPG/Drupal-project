@@ -34,7 +34,7 @@
       found = searchMethod(item, query);
     }
     return found;
-  };
+  }
 
   /**
    * Filters the table by a text input search string.
@@ -64,26 +64,22 @@
    */
   Drupal.behaviors.drupalFilterByText = {
     attach(context, settings) {
-
       once('drupal-filter-text', '.table-filter-text', context).forEach(
         (input) => {
-          const { table, items, targets, singular, plural } = input.dataset;
+          const { table, items, targets, singular, plural, full } =
+            input.dataset;
 
-          const ALL_PHRASE = `All available ${plural || 'items'} are listed.`;
-
-          const SINGULAR_PHRASE = `1 ${
-            singular || 'item'
-          } is available in the modified list.`;
-          const PLURAL_PHRASE = `@count ${
-            plural || 'items'
-          } are available in the modified list.`;
+          const ALL_PHRASE = `All available items are listed.`;
+          const SINGULAR_PHRASE = '1 item is available in the modified list.';
+          const PLURAL_PHRASE =
+            '@count items are available in the modified list.';
 
           const makeAnnounce = (matches) => {
             Drupal.announce(
               Drupal.formatPlural(
-                matches.length - 1,
-                SINGULAR_PHRASE,
-                PLURAL_PHRASE,
+                matches,
+                singular || SINGULAR_PHRASE,
+                plural || PLURAL_PHRASE,
               ),
             );
           };
@@ -150,14 +146,15 @@
                     matches += 1;
                   }
                 });
-
-                makeAnnounce(matches);
+                if (matches > 0) {
+                  makeAnnounce(matches);
+                }
                 checkLabels();
               } else {
-                Drupal.announce(ALL_PHRASE);
                 filterItems.forEach((item) => {
                   showElement(item);
                 });
+                Drupal.announce(full || ALL_PHRASE);
                 checkLabels(true);
               }
             };
@@ -165,7 +162,7 @@
             tableElement.addEventListener(FILTER_EVENT, (e) =>
               filterTableList(e.detail.event),
             );
-          }
+          };
 
           tables.forEach((tableElement) => initTable(tableElement));
 

@@ -136,8 +136,9 @@ class ChooseBlockController implements ContainerInjectionInterface {
         'title' => $this->t('Enter a part of the block name to filter by.'),
         'data-table' => '.js-layout-builder-categories',
         'data-items' => '.js-layout-builder-block-link',
-        'data-singular' => 'block',
-        'data-plural' => 'blocks',
+        'data-singular' => $this->t('1 block is available in the modified list.'),
+        'data-plural' => $this->t('@count blocks are available in the modified list.'),
+        'data-full' => $this->t('All available blocks are listed.'),
       ],
     ];
 
