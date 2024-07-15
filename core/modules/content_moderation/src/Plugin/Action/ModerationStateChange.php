@@ -3,7 +3,9 @@
 namespace Drupal\content_moderation\Plugin\Action;
 
 use Drupal\content_moderation\ModerationInformationInterface;
+use Drupal\content_moderation\Plugin\Derivative\ModerationStateChangeDeriver;
 use Drupal\Core\Access\AccessResult;
+use Drupal\Core\Action\Attribute\Action;
 use Drupal\Core\Action\ConfigurableActionBase;
 use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Entity\DependencyTrait;
@@ -12,18 +14,18 @@ use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Session\AccountInterface;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\workflows\Entity\Workflow;
 use Drupal\content_moderation\StateTransitionValidationInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Changes moderation_state of an entity.
- *
- * @Action(
- *   id = "moderation_state_change",
- *   deriver = "\Drupal\content_moderation\Plugin\Derivative\ModerationStateChangeDeriver"
- * )
  */
+#[Action(
+  id: 'moderation_state_change',
+  deriver: ModerationStateChangeDeriver::class
+)]
 class ModerationStateChange extends ConfigurableActionBase implements ContainerFactoryPluginInterface {
 
   use DependencyTrait;
