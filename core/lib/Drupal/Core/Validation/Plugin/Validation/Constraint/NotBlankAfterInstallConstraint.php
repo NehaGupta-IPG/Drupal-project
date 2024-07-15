@@ -12,7 +12,7 @@ use Symfony\Component\Validator\Constraints\NotBlank;
  * Extends the Symfony constraint to allow blank during install.
  */
 #[Constraint(
-  id: 'NotBlankAfterInstallConstraint',
+  id: 'NotBlankAfterInstall',
   label: new TranslatableMarkup('Not blank after install', [], ['context' => 'Validation']),
   type: FALSE
 )]
