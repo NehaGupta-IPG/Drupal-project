@@ -6,7 +6,9 @@
  */
 
 use Drupal\Core\Config\Entity\ConfigEntityUpdater;
+use Drupal\Core\Datetime\TimeZoneFormHelper;
 use Drupal\Core\Entity\EntityFormModeInterface;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 
 /**
  * Implements hook_removed_post_updates().
@@ -122,4 +124,21 @@ function system_post_update_convert_empty_description_entity_form_modes_to_null(
       return FALSE;
     });
 
+}
+
+/**
+ * Updates system.date timezone default to a value.
+ */
+function system_post_update_fix_null_timezone_settings(): ?TranslatableMarkup {
+  $system_date_settings = \Drupal::configFactory()->getEditable('system.date');
+  if ($system_date_settings->get('timezone.default') === NULL) {
+    $default_timezone = @date_default_timezone_get();
+    if (empty($default_timezone)) {
+      $options = TimeZoneFormHelper::getOptionsList();
+      $default_timezone = reset($options);
+    }
+    $system_date_settings->set('timezone.default', $default_timezone)->save();
+    return t('Default timezone set to %default', $default_timezone);
+  }
+  return NULL;
 }
