@@ -257,7 +257,9 @@ system.theme:
       label: 'Default theme'
       constraints:
         ExtensionName: []
-        ExtensionExists: theme
+        ExtensionExists:
+          type: theme
+          mustBeInstalled: false
 
 system.menu.*:
   type: config_entity

@@ -5,7 +5,10 @@ declare(strict_types = 1);
 namespace Drupal\Core\Extension\Plugin\Validation\Constraint;
 
 use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
+use Drupal\Core\Extension\ModuleExtensionList;
 use Drupal\Core\Extension\ModuleHandlerInterface;
+use Drupal\Core\Extension\ProfileExtensionList;
+use Drupal\Core\Extension\ThemeExtensionList;
 use Drupal\Core\Extension\ThemeHandlerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Validator\Constraint;
@@ -37,8 +40,20 @@ class ExtensionExistsConstraintValidator extends ConstraintValidator implements 
    *   The module handler service.
    * @param \Drupal\Core\Extension\ThemeHandlerInterface $theme_handler
    *   The theme handler service.
+   * @param \Drupal\Core\Extension\ModuleExtensionList $moduleExtensionList
+   *   The module extension list.
+   * @param \Drupal\Core\Extension\ThemeExtensionList $themeExtensionList
+   *   The theme extension list.
+   * @param \Drupal\Core\Extension\ProfileExtensionList $profileExtensionList
+   *   The profile extension list.
    */
-  public function __construct(ModuleHandlerInterface $module_handler, ThemeHandlerInterface $theme_handler) {
+  public function __construct(
+    ModuleHandlerInterface $module_handler,
+    ThemeHandlerInterface $theme_handler,
+    protected readonly ModuleExtensionList $moduleExtensionList,
+    protected readonly ThemeExtensionList $themeExtensionList,
+    protected readonly ProfileExtensionList $profileExtensionList,
+  ) {
     $this->moduleHandler = $module_handler;
     $this->themeHandler = $theme_handler;
   }
@@ -49,7 +64,10 @@ class ExtensionExistsConstraintValidator extends ConstraintValidator implements 
   public static function create(ContainerInterface $container) {
     return new static(
       $container->get('module_handler'),
-      $container->get('theme_handler')
+      $container->get('theme_handler'),
+      $container->get('extension.list.module'),
+      $container->get('extension.list.theme'),
+      $container->get(ProfileExtensionList::class)
     );
   }
 
@@ -58,6 +76,7 @@ class ExtensionExistsConstraintValidator extends ConstraintValidator implements 
    */
   public function validate(mixed $extension_name, Constraint $constraint): void {
     $variables = ['@name' => $extension_name];
+    $must_be_installed = $constraint->mustBeInstalled;
 
     switch ($constraint->type) {
       case 'module':
@@ -71,8 +90,15 @@ class ExtensionExistsConstraintValidator extends ConstraintValidator implements 
         if ($extension_name === 'core') {
           return;
         }
-        if (!$this->moduleHandler->moduleExists($extension_name)) {
-          $this->context->addViolation($constraint->moduleMessage, $variables);
+        if ($must_be_installed) {
+          if (!$this->moduleHandler->moduleExists($extension_name)) {
+            $this->context->addViolation($constraint->moduleNotInstalledMessage, $variables);
+          }
+        }
+        else {
+          if (!$this->moduleExtensionList->exists($extension_name)) {
+            $this->context->addViolation($constraint->moduleNotExistsMessage, $variables);
+          }
         }
         break;
 
@@ -81,7 +107,24 @@ class ExtensionExistsConstraintValidator extends ConstraintValidator implements 
         if ($extension_name === NULL) {
           return;
         }
-        if (!$this->themeHandler->themeExists($extension_name)) {
+        if ($must_be_installed) {
+          if (!$this->themeHandler->themeExists($extension_name)) {
+            $this->context->addViolation($constraint->themeNotInstalledMessage, $variables);
+          }
+        }
+        else {
+          if (!$this->themeExtensionList->exists($extension_name)) {
+            $this->context->addViolation($constraint->themeNotExistsMessage, $variables);
+          }
+        }
+        break;
+
+      case 'profile':
+        // This constraint may be used to validate nullable (optional) values.
+        if ($extension_name === NULL) {
+          return;
+        }
+        if (!$this->profileExtensionList->exists($extension_name)) {
           $this->context->addViolation($constraint->themeMessage, $variables);
         }
         break;
