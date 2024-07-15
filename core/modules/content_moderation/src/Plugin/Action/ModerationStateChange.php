@@ -226,7 +226,7 @@ class ModerationStateChange extends ConfigurableActionBase implements ContainerF
   /**
    * {@inheritdoc}
    */
-  public function execute(ContentEntityInterface $entity = NULL) {
+  public function execute(?ContentEntityInterface $entity = NULL) {
     /** @var \Drupal\node\Entity\Node $revision */
     $revision = $this->loadLatestRevision($entity);
     // Create a new revision if the states don't match.
@@ -271,7 +271,7 @@ class ModerationStateChange extends ConfigurableActionBase implements ContainerF
   /**
    * {@inheritdoc}
    */
-  public function access($object, AccountInterface $account = NULL, $return_as_object = FALSE) {
+  public function access($object, ?AccountInterface $account = NULL, $return_as_object = FALSE) {
     if (!$object || !$object instanceof ContentEntityInterface) {
       $result = AccessResult::forbidden('Not a valid entity.');
       return $return_as_object ? $result : $result->isAllowed();
