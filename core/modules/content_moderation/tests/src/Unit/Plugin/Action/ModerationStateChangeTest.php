@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\content_moderation\Unit\Plugin\Action;
 
 use Drupal\content_moderation\ModerationInformationInterface;
@@ -449,7 +451,7 @@ class ModerationStateChangeTest extends UnitTestCase {
    *
    * @dataProvider accessModerationStateChangeDataProvider
    */
-  public function testAccessModerationStateChange(ModerationInformationInterface $moderation_info, $node, $result, AccountInterface $account = NULL, StateTransitionValidationInterface $validator = NULL) {
+  public function testAccessModerationStateChange(ModerationInformationInterface $moderation_info, $node, $result, ?AccountInterface $account = NULL, ?StateTransitionValidationInterface $validator = NULL) {
     $config = ['workflow' => 'foo', 'state' => 'bar'];
     $plugin = $this->getModerationStateChangeMock($config, $moderation_info, $node, $validator);
     $this->assertEquals($result, $plugin->access($node, $account));
@@ -523,7 +525,7 @@ class ModerationStateChangeTest extends UnitTestCase {
   /**
    * Mocks Moderation state change action.
    */
-  protected function getModerationStateChangeMock($config, $moderation_info, $node, StateTransitionValidationInterface $validator = NULL) {
+  protected function getModerationStateChangeMock($config, $moderation_info, $node, ?StateTransitionValidationInterface $validator = NULL) {
     $usedValidator = $this->validator;
     if ($validator != NULL) {
       $usedValidator = $validator;
