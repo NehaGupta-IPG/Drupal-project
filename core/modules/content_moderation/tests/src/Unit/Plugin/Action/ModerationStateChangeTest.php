@@ -165,7 +165,7 @@ class ModerationStateChangeTest extends UnitTestCase {
     $moderation_info->expects($this->once())
       ->method('getWorkflowForEntity')
       ->with($node)
-      ->will($this->returnValue(NULL));
+      ->willReturn(NULL);
 
     $data['no-workflow'] = [$moderation_info, $node, FALSE];
 
@@ -182,7 +182,7 @@ class ModerationStateChangeTest extends UnitTestCase {
     $moderation_info->expects($this->once())
       ->method('getWorkflowForEntity')
       ->with($node)
-      ->will($this->returnValue($workflow));
+      ->willReturn($workflow);
 
     $data['different-workflow'] = [$moderation_info, $node, FALSE];
 
@@ -199,7 +199,7 @@ class ModerationStateChangeTest extends UnitTestCase {
     $moderation_info->expects($this->once())
       ->method('getWorkflowForEntity')
       ->with($node)
-      ->will($this->returnValue($workflow));
+      ->willReturn($workflow);
 
     $node->moderation_state = (object) ['value' => 'foobar'];
 
@@ -235,7 +235,7 @@ class ModerationStateChangeTest extends UnitTestCase {
     $moderation_info->expects($this->once())
       ->method('getWorkflowForEntity')
       ->with($node)
-      ->will($this->returnValue($workflow));
+      ->willReturn($workflow);
 
     $node->moderation_state = (object) ['value' => 'foobar'];
 
@@ -277,7 +277,7 @@ class ModerationStateChangeTest extends UnitTestCase {
     $moderation_info->expects($this->once())
       ->method('getWorkflowForEntity')
       ->with($node)
-      ->will($this->returnValue($workflow));
+      ->willReturn($workflow);
 
     $node->moderation_state = (object) ['value' => 'foobar'];
 
@@ -336,7 +336,7 @@ class ModerationStateChangeTest extends UnitTestCase {
     $moderation_info->expects($this->once())
       ->method('getWorkflowForEntity')
       ->with($node)
-      ->will($this->returnValue($workflow));
+      ->willReturn($workflow);
 
     $node->moderation_state = (object) ['value' => 'foobar'];
 
@@ -390,7 +390,7 @@ class ModerationStateChangeTest extends UnitTestCase {
     $moderation_info->expects($this->once())
       ->method('getWorkflowForEntity')
       ->with($node)
-      ->will($this->returnValue($workflow));
+      ->willReturn($workflow);
 
     $node->moderation_state = (object) ['value' => 'foobar'];
 
@@ -464,8 +464,8 @@ class ModerationStateChangeTest extends UnitTestCase {
     $this->node = $this->getMockBuilder(NodeInterface::class)
       ->disableOriginalConstructor()
       ->getMock();
-    $entity_type_id = $this->returnValue('node');
-    $entity_id = $this->returnValue(1);
+    $entity_type_id = 'node';
+    $entity_id = 1;
     $this->node->expects($this->any())
       ->method('getEntityTypeId')
       ->willReturn($entity_type_id);
@@ -477,7 +477,7 @@ class ModerationStateChangeTest extends UnitTestCase {
     $this->language = $this->createMock(LanguageInterface::class);
     $this->language->expects($this->any())
       ->method('getId')
-      ->willReturn($this->returnValue('und'));
+      ->willReturn('und');
 
     $this->node->expects($this->any())
       ->method('language')
