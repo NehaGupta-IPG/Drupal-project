@@ -3,18 +3,15 @@
 namespace Drupal\Core\Validation\Plugin\Validation\Constraint;
 
 use Drupal\Core\Installer\InstallerKernel;
-use Drupal\Core\TypedData\Validation\TypedDataAwareValidatorTrait;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Constraints\NotBlankValidator;
 
 /**
  * NotBlankAfterInstallConstraintValidator constraint validator.
  *
- * Overrides the symfony validator to check whether Drupal is installing.
+ * Extends the symfony validator to check whether Drupal is installing.
  */
 class NotBlankAfterInstallConstraintValidator extends NotBlankValidator {
-
-  use TypedDataAwareValidatorTrait;
 
   /**
    * {@inheritdoc}
