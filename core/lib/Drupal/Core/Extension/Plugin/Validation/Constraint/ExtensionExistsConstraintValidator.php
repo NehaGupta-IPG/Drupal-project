@@ -119,16 +119,6 @@ class ExtensionExistsConstraintValidator extends ConstraintValidator implements 
         }
         break;
 
-      case 'profile':
-        // This constraint may be used to validate nullable (optional) values.
-        if ($extension_name === NULL) {
-          return;
-        }
-        if (!$this->profileExtensionList->exists($extension_name)) {
-          $this->context->addViolation($constraint->themeMessage, $variables);
-        }
-        break;
-
       default:
         throw new \InvalidArgumentException("Unknown extension type: '$constraint->type'");
     }
