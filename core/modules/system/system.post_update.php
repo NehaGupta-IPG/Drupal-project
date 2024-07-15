@@ -82,3 +82,11 @@ function system_post_update_migrate_compress_setting(): void {
 function system_post_update_remove_non_admin_routes_state(): void {
   \Drupal::state()->delete('routing.non_admin_routes');
 }
+
+/**
+ * Removes the country.default value from system.date config.
+ */
+function system_post_update_remove_country_default_value(): void {
+  $system_date_settings = \Drupal::configFactory()->getEditable('system.date');
+  $system_date_settings->clear('country.default')->save();
+}
