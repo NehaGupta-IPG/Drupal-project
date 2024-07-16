@@ -196,7 +196,7 @@ class PathProcessorTest extends UnitTestCase {
     $test_path = '/%20';
     $request = Request::create($test_path);
     $processed = $processor_manager->processInbound($test_path, $request);
-    $this->assertEquals('/user/1', $processed);
+    $this->assertEquals('/user/login', $processed);
   }
 
 }
