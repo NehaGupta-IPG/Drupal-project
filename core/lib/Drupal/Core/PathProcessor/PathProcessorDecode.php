@@ -23,7 +23,7 @@ class PathProcessorDecode implements InboundPathProcessorInterface {
    * {@inheritdoc}
    */
   public function processInbound($path, Request $request) {
-    // Ensure that any urldecoded whitespace is trimmed from the URL.
+    // Ensure that any URL decoded whitespace is trimmed from the URL.
     return trim(urldecode($path));
   }
 
