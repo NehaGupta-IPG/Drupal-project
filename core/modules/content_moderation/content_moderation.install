@@ -11,3 +11,16 @@
 function content_moderation_update_last_removed(): int {
   return 8700;
 }
+
+/**
+ * Ensure moderation state change actions are available for all workflows.
+ */
+function content_moderation_update_110001() {
+  $workflows = \Drupal::entityTypeManager()->getStorage('workflow')->loadMultiple();
+  foreach ($workflows as $workflow) {
+    if ($workflow->getTypePlugin()->getPluginId() !== 'content_moderation') {
+      continue;
+    }
+    content_moderation_save_workflow_actions($workflow);
+  }
+}
