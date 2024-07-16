@@ -43,7 +43,7 @@ class ActionConfigSchemaTest extends KernelTestBase {
 
     $node_type = NodeType::create([
       'type' => 'page',
-      'label' => 'Page',
+      'name' => 'Page',
     ]);
     $node_type->save();
     $workflow = $this->createEditorialWorkflow();
