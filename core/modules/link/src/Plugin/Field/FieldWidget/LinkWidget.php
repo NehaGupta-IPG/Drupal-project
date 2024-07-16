@@ -239,6 +239,8 @@ class LinkWidget extends WidgetBase {
       '#maxlength' => 2048,
       '#required' => $element['#required'],
       '#link_type' => $this->getFieldSetting('link_type'),
+      '#for_column' => 'uri',
+      '#for_column_group' => 'uri',
     ];
 
     // If the field is configured to support internal links, it cannot use the
@@ -307,6 +309,8 @@ class LinkWidget extends WidgetBase {
       '#maxlength' => 255,
       '#access' => $title_visibility_setting != LinkTitleVisibility::Disabled,
       '#required' => $title_visibility_setting === LinkTitleVisibility::Required && $element['#required'],
+      '#for_column' => 'title',
+      '#for_column_group' => 'title',
     ];
     // Post-process the title field to make it conditionally required if URL is
     // non-empty. Omit the validation on the field edit form, since the field

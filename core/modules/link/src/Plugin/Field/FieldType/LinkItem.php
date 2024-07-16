@@ -24,6 +24,16 @@ use Drupal\link\LinkTitleVisibility;
   description: new TranslatableMarkup("A URL or internal path, with optional link text"),
   default_widget: "link_default",
   default_formatter: "link",
+  column_groups: [
+    "uri" => [
+      "label" => new TranslatableMarkup("Uri"),
+      "require_all_groups_for_translation" => TRUE
+    ],
+    "title" => [
+      "label" => new TranslatableMarkup("Title"),
+      "translatable" => TRUE
+    ],
+  ],
   constraints: [
     "LinkType" => [],
     "LinkAccess" => [],
