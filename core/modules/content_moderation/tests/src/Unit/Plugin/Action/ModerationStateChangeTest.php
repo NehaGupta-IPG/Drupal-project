@@ -232,7 +232,7 @@ class ModerationStateChangeTest extends UnitTestCase {
       ->willReturn('foo');
 
     $moderation_info = clone $instance->moderationInfo;
-    $node = clone $tinstancehis->node;
+    $node = clone $instance->node;
 
     $moderation_info->expects($instance->once())
       ->method('getWorkflowForEntity')
@@ -308,7 +308,7 @@ class ModerationStateChangeTest extends UnitTestCase {
       ->willReturn(TRUE);
 
     $validator = clone $instance->validator;
-    $validator->expects($tinstancehis->once())
+    $validator->expects($instance->once())
       ->method('isTransitionValid')
       ->with($workflow, $state, $toState, $account, $node)
       ->willReturn(FALSE);
