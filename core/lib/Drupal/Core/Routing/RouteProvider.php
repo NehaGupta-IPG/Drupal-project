@@ -180,7 +180,8 @@ class RouteProvider implements CacheableRouteProviderInterface, PreloadableRoute
     else {
       // Just trim on the right side.
       $path = $request->getPathInfo();
-      $path = $path === '/' ? $path : rtrim($request->getPathInfo(), '/');
+      // Decode the URL so that paths are normalized.
+      $path = $path === '/' ? $path : rtrim(trim(urldecode($request->getPathInfo())), '/');
       $path = $this->pathProcessor->processInbound($path, $request);
       $this->currentPath->setPath($path, $request);
       // Incoming path processors may also set query parameters.
@@ -480,7 +481,7 @@ class RouteProvider implements CacheableRouteProviderInterface, PreloadableRoute
       $key_parts[] = '[' . $provider . ']=' . $key_part;
     }
 
-    return 'route:' . implode(':', $key_parts) . ':' . $request->getPathInfo();
+    return 'route:' . implode(':', $key_parts) . ':' . trim(urldecode($request->getPathInfo()));
   }
 
   /**
