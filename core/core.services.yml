@@ -1476,10 +1476,6 @@ services:
       - { name: service_collector, tag: path_processor_outbound, call: addOutbound }
   Drupal\Core\PathProcessor\InboundPathProcessorInterface: '@path_processor_manager'
   Drupal\Core\PathProcessor\OutboundPathProcessorInterface: '@path_processor_manager'
-  path_processor_decode:
-    class: Drupal\Core\PathProcessor\PathProcessorDecode
-    tags:
-      - { name: path_processor_inbound, priority: 1000 }
   path_processor_front:
     class: Drupal\Core\PathProcessor\PathProcessorFront
     tags:
