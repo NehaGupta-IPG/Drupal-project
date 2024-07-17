@@ -37,7 +37,7 @@ class FormUrlFragmentTest extends WebDriverTestBase {
   /**
    * Tests that a form's complex url fragment does not give errors.
    */
-  public function testPreserveFormActionAfterAJAX() {
+  public function testFormComplexUrlFragment() {
     $this->drupalGet('/form-test/url');
     $this->clickLink('This is an anchor link with a broken fragment');
     $this->failOnJavaScriptErrors();
