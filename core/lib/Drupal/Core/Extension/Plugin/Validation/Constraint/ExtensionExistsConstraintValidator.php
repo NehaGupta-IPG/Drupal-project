@@ -6,7 +6,6 @@ namespace Drupal\Core\Extension\Plugin\Validation\Constraint;
 
 use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
 use Drupal\Core\Extension\ModuleExtensionList;
-use Drupal\Core\Extension\ProfileExtensionList;
 use Drupal\Core\Extension\ThemeExtensionList;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Validator\Constraint;
@@ -20,7 +19,6 @@ class ExtensionExistsConstraintValidator extends ConstraintValidator implements 
   public function __construct(
     protected readonly ModuleExtensionList $moduleExtensionList,
     protected readonly ThemeExtensionList $themeExtensionList,
-    protected readonly ProfileExtensionList $profileExtensionList,
   ) {
   }
 
