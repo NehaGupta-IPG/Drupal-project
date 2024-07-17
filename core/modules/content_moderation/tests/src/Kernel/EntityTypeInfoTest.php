@@ -65,6 +65,8 @@ class EntityTypeInfoTest extends KernelTestBase {
     $this->entityTypeManager = $this->container->get('entity_type.manager');
     $this->entityFieldManager = $this->container->get('entity_field.manager');
 
+    $this->installEntitySchema('action');
+
     $this->installConfig(['content_moderation']);
   }
 
