@@ -81,6 +81,8 @@ class ViewsListingTest extends WebDriverTestBase {
     // Filter on a string that also appears in the description.
     $search_input->setValue('content');
 
+    sleep(1);
+
     $enabled_rows = $page->findAll('css', 'tr.views-ui-list-enabled');
     $enabled_rows = $this->filterVisibleElements($enabled_rows);
     $disabled_rows = $page->findAll('css', 'tr.views-ui-list-disabled');
@@ -93,6 +95,8 @@ class ViewsListingTest extends WebDriverTestBase {
     $search_input->setValue('');
     // Add a backspace to trigger the keyUp event.
     $search_input->keyUp(8);
+
+    sleep(1);
 
     $enabled_rows = $page->findAll('css', 'tr.views-ui-list-enabled');
     $enabled_rows = $this->filterVisibleElements($enabled_rows);
@@ -113,6 +117,8 @@ class ViewsListingTest extends WebDriverTestBase {
     $disable_button->click();
 
     $session->assertWaitOnAjaxRequest();
+
+    sleep(1);
 
     $enabled_rows = $page->findAll('css', 'tr.views-ui-list-enabled');
     $enabled_rows = $this->filterVisibleElements($enabled_rows);

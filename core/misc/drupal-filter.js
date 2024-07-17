@@ -19,21 +19,16 @@
   }
 
   function searchMethod(target, query) {
-    return target?.textContent.toLowerCase().includes(query);
+    return target?.textContent.toLowerCase().includes(query) || false;
   }
 
   function foundInItem(query, item) {
-    let found = false;
     if (item.searchTargets) {
-      item.searchTargets.forEach((target) => {
-        if (searchMethod(target, query)) {
-          found = true;
-        }
-      });
-    } else {
-      found = searchMethod(item, query);
+      return Array.from(item.searchTargets).some((target) =>
+        searchMethod(target, query),
+      );
     }
-    return found;
+    return searchMethod(item, query);
   }
 
   /**
@@ -69,7 +64,7 @@
           const { table, items, targets, singular, plural, full } =
             input.dataset;
 
-          const ALL_PHRASE = `All available items are listed.`;
+          const ALL_PHRASE = Drupal.t('All available items are listed.');
           const SINGULAR_PHRASE = '1 item is available in the modified list.';
           const PLURAL_PHRASE =
             '@count items are available in the modified list.';
@@ -113,15 +108,12 @@
                   )
                 ) {
                   if (label.nodeName === 'DETAILS') {
-                    if (!reset && !label.hasAttribute('open')) {
-                      label.setAttribute('open', true);
-                      label.setAttribute('opened-by-filter', true);
-                    } else if (
-                      reset &&
-                      label.hasAttribute('opened-by-filter')
-                    ) {
-                      label.removeAttribute('open');
-                      label.removeAttribute('opened-by-filter');
+                    if (!reset && !label.open) {
+                      label.open = true;
+                      label.dataset.openedByFilter = true;
+                    } else if (reset && label.dataset.openedByFilter) {
+                      label.open = false;
+                      delete label.dataset.openedByFilter;
                     }
                   }
                   showElement(label);
@@ -149,9 +141,7 @@
                 makeAnnounce(matches);
                 checkLabels();
               } else {
-                filterItems.forEach((item) => {
-                  showElement(item);
-                });
+                filterItems.forEach(showElement);
                 Drupal.announce(full || ALL_PHRASE);
                 checkLabels(true);
               }
@@ -162,7 +152,7 @@
             );
           };
 
-          tables.forEach((tableElement) => initTable(tableElement));
+          tables.forEach(initTable);
 
           input.addEventListener(
             'input',
