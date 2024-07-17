@@ -156,6 +156,28 @@ function menu_ui_get_menu_link_defaults(NodeInterface $node) {
 }
 
 /**
+ * Form submission handler for menu items on a moderated node.
+ *
+ * @see menu_ui_form_content_moderation_entity_moderation_form_alter()
+ */
+function menu_ui_form_content_moderation_entity_moderation_form_submit(&$form, FormStateInterface $form_state) {
+  /** @var \Drupal\node\NodeInterface $node */
+  $node = $form_state->get('entity');
+  /** @var \Drupal\node\NodeStorageInterface $nodeStorage */
+  $nodeStorage = \Drupal::entityTypeManager()->getStorage('node');
+  // \Drupal\content_moderation\Form\EntityModerationForm::submitForm has
+  // created a new revision - where $node is the node prior to moderation.
+  $vid = $nodeStorage->getLatestRevisionId($node->id());
+  /** @var \Drupal\node\NodeInterface $revision */
+  $revision = $nodeStorage->loadRevision($vid);
+
+  if ($revision->isDefaultRevision()) {
+    $values = menu_ui_get_menu_link_defaults($node);
+    _menu_ui_node_save($revision, $values);
+  }
+}
+
+/**
  * Entity form builder to add the menu information to the node.
  */
 function menu_ui_node_builder($entity_type, NodeInterface $entity, &$form, FormStateInterface $form_state): void {
