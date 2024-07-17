@@ -69,6 +69,7 @@ class EntityTypeInfoTest extends KernelTestBase {
     $this->installEntitySchema('action');
     $this->installEntitySchema('entity_test');
     $this->installEntitySchema('entity_test_with_bundle');
+    $this->installEntitySchema('workflow');
     $this->installEntitySchema('user');
 
     $this->installConfig(['content_moderation']);
@@ -155,8 +156,7 @@ class EntityTypeInfoTest extends KernelTestBase {
    */
   protected function enableModeration($entity_type_id, $bundle): void {
     $workflow = $this->createEditorialWorkflow();
-    $workflow->getTypePlugin()->addEntityTypeAndBundle($entity_type_id, $bundle);
-    $workflow->save();
+    $this->addEntityTypeAndBundleToWorkflow($workflow, $entity_type_id, $bundle);
   }
 
 }
