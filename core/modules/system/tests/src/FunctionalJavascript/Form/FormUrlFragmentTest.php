@@ -4,10 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\system\FunctionalJavascript\Form;
 
-use Drupal\Core\Field\FieldStorageDefinitionInterface;
-use Drupal\Core\Url;
-use Drupal\field\Entity\FieldConfig;
-use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
 
 /**
