@@ -6,7 +6,6 @@ namespace Drupal\Tests\Core\PathProcessor;
 
 use Drupal\Core\Language\Language;
 use Drupal\Core\Language\LanguageInterface;
-use Drupal\Core\PathProcessor\PathProcessorDecode;
 use Drupal\Core\PathProcessor\PathProcessorFront;
 use Drupal\Core\PathProcessor\PathProcessorManager;
 use Drupal\language\HttpKernel\PathProcessorLanguage;
@@ -135,7 +134,6 @@ class PathProcessorTest extends UnitTestCase {
 
     // Create the processors.
     $alias_processor = new AliasPathProcessor($alias_manager);
-    $decode_processor = new PathProcessorDecode();
     $front_processor = new PathProcessorFront($config_factory_stub);
     $language_processor = new PathProcessorLanguage($config_factory_stub, $this->languageManager, $negotiator, $current_user, $config_subscriber);
 
@@ -144,7 +142,6 @@ class PathProcessorTest extends UnitTestCase {
     // meaning aliases will not be found.
     $priorities = [
       1000 => $alias_processor,
-      500 => $decode_processor,
       300 => $front_processor,
       200 => $language_processor,
     ];
@@ -171,7 +168,6 @@ class PathProcessorTest extends UnitTestCase {
     // the correct order.
     $processor_manager = new PathProcessorManager();
     $priorities = [
-      1000 => $decode_processor,
       500 => $language_processor,
       300 => $front_processor,
       200 => $alias_processor,
