@@ -243,8 +243,8 @@
    */
   Drupal.views.ajaxView.prototype.attachPagerAjax = function () {
     this.$view
-        .find('.js-pager__items a')
-        .each(this.attachPagerLinkAjax.bind(this));
+      .find('.js-pager__items a')
+      .each(this.attachPagerLinkAjax.bind(this));
   };
 
   /**
@@ -252,8 +252,8 @@
    */
   Drupal.views.ajaxView.prototype.attachSortingAndLinksAjax = function () {
     this.$view
-        .find('th.views-field a, .attachment .views-summary a')
-        .each(this.attachPagerLinkAjax.bind(this));
+      .find('th.views-field a, .attachment .views-summary a')
+      .each(this.attachPagerLinkAjax.bind(this));
   };
 
   /**
