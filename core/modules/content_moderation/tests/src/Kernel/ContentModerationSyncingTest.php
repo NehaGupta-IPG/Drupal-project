@@ -27,6 +27,7 @@ class ContentModerationSyncingTest extends KernelTestBase {
     'workflows',
     'content_moderation',
     'entity_test',
+    'system',
   ];
 
   /**
