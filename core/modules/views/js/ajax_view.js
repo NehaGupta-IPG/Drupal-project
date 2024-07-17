@@ -180,6 +180,17 @@
       ).forEach(this.attachPagerAjax.bind(this));
     }
 
+    // Add the ajax to sort and links.
+    if (drupalSettings.views.ajaxOptions.hasOwnProperty('use_ajax_sorting')) {
+      once(
+        'ajax-sorting',
+        this.$view
+          // Don't attach to nested views. Doing so would attach multiple behaviors
+          // to a given element.
+          .filter(this.filterNestedViews.bind(this)),
+      ).forEach(this.attachSortingAndLinksAjax.bind(this));
+    }
+
     // Add a trigger to update this view specifically. In order to trigger a
     // refresh use the following code.
     //
