@@ -1476,6 +1476,9 @@ services:
       - { name: service_collector, tag: path_processor_outbound, call: addOutbound }
   Drupal\Core\PathProcessor\InboundPathProcessorInterface: '@path_processor_manager'
   Drupal\Core\PathProcessor\OutboundPathProcessorInterface: '@path_processor_manager'
+  path_processor_decode:
+    class: Drupal\Core\PathProcessor\PathProcessorDecode
+    deprecated: The "%service_id%" service is deprecated. There is no replacement. See https://www.drupal.org/node/3461941
   path_processor_front:
     class: Drupal\Core\PathProcessor\PathProcessorFront
     tags:
