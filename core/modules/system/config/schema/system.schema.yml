@@ -259,6 +259,7 @@ system.theme:
         ExtensionName: []
         ExtensionExists:
           type: theme
+          # The default theme doesn't have to be installed, but it should exist in the file system.
           mustBeInstalled: false
 
 system.menu.*:
