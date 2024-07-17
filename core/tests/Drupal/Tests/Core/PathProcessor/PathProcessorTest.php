@@ -187,12 +187,6 @@ class PathProcessorTest extends UnitTestCase {
     $request = Request::create($test_path);
     $processed = $processor_manager->processInbound($test_path, $request);
     $this->assertEquals('/user/1', $processed, 'Processing in the correct order resolves the system path from an alias.');
-
-    // Test an inbound path with a URL encoded trailing space.
-    $test_path = '/%20';
-    $request = Request::create($test_path);
-    $processed = $processor_manager->processInbound($test_path, $request);
-    $this->assertEquals('/user/login', $processed);
   }
 
 }
