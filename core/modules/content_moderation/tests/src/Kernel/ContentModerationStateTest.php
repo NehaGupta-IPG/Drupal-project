@@ -93,6 +93,7 @@ class ContentModerationStateTest extends KernelTestBase {
     $this->installSchema('node', 'node_access');
     $this->installEntitySchema('node');
     $this->installEntitySchema('user');
+    $this->installEntitySchema('entity_test');
     $this->installEntitySchema($this->revEntityTypeId);
     $this->installEntitySchema('entity_test_no_bundle');
     $this->installEntitySchema('entity_test_mulrevpub');

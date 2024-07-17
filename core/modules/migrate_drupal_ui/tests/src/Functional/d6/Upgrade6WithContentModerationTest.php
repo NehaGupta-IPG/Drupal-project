@@ -76,6 +76,7 @@ class Upgrade6WithContentModerationTest extends Upgrade6Test {
   protected function getEntityCountsIncremental() {
     $entity_counts_incremental = parent::getEntityCountsIncremental();
     $entity_counts_incremental['content_moderation_state'] = $entity_counts_incremental['content_moderation_state'] + 1;
+    $entity_counts_incremental['actions'] = $entity_counts_incremental['actions'] + 3;
     return $entity_counts_incremental;
   }
 
