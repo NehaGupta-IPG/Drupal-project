@@ -31,6 +31,7 @@ class ContentModerationResaveTest extends KernelTestBase {
     'entity_test',
     'user',
     'workflows',
+    'system',
   ];
 
   /**
