@@ -58,22 +58,19 @@
         $target
           .toggleClass('active')
           .closest('.js-media-library-widget')
-          .find('.js-media-library-item-weight')
-          .each(function () {
-            $(this.parentElement).toggle();
-          });
+          .find(':has(>.js-media-library-item-weight)')
+          .toggle();
       });
       mediaLibraryToggle.forEach((item) => {
         item.textContent = strings.show;
       });
 
       once(
+      $(once(
         'media-library-toggle',
-        '.js-media-library-item-weight',
+        ':has(>.js-media-library-item-weight)',
         context,
-      ).forEach(({ parentElement }) => {
-        $(parentElement).hide();
-      });
+      )).hide();
     },
   };
 

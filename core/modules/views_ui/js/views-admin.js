@@ -296,9 +296,7 @@
      * Find the wrapper of the displayed text.
      */
 
-    this.$selected_div = $(
-      this.$form.find('.views-selected-options')[0].parentElement,
-    );
+    this.$selected_div = this.$form.find(':has(>.views-selected-options)');
     this.$selected_div.hide();
     /**
      *
@@ -1183,17 +1181,17 @@
       const $context = $(context);
 
       function changeDefaultWidget(event) {
-        const defRadios = context.querySelector('input.default-radios');
-        const radiosRow = context.querySelector('td.any-default-radios-row');
-        const defCheckboxes = context.querySelector('input.default-checkboxes');
+        const $defRadios = $context.find(':has(>input.default-radios)');
+        const $radiosRow = $context.find(':has(>td.any-default-radios-row)');
+        const $defCheckboxes = $context.find(':has(>input.default-checkboxes)');
         if ($(event.target).prop('checked')) {
-          $(defRadios.parentElement).hide();
-          $(radiosRow.parentElement).hide();
-          $(defCheckboxes.parentElement).show();
+          $defRadios.hide();
+          $radiosRow.hide();
+          $defCheckboxes.show();
         } else {
-          $(defCheckboxes.parentElement).hide();
-          $(radiosRow.parentElement).show();
-          $(defRadios.parentElement).show();
+          $defCheckboxes.hide();
+          $radiosRow.show();
+          $defRadios.show();
         }
       }
 
