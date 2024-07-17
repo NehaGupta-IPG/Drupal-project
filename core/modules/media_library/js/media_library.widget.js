@@ -66,11 +66,10 @@
       });
 
       once(
-      $(once(
         'media-library-toggle',
         ':has(>.js-media-library-item-weight)',
         context,
-      )).hide();
+      ).hide();
     },
   };
 
