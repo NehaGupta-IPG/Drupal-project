@@ -92,16 +92,17 @@ class ExtensionExistsConstraintValidatorTest extends KernelTestBase {
     // this option to false here which means that the extension should
     // be present in the file system but need not be installed.
     $definition = DataDefinition::create('string')
-      ->setConstraints(['ExtensionExists' => [
-          'type'=> 'module',
+      ->setConstraints([
+        'ExtensionExists' => [
+          'type' => 'module',
           'mustBeInstalled' => FALSE,
-        ]
+        ],
       ]);
 
     /** @var \Drupal\Core\TypedData\TypedDataManagerInterface $typed_data */
     $typed_data = $this->container->get('typed_data_manager');
 
-    //A module which is not present in the filesystem will trigger an error.
+    // A module which is not present in the filesystem will trigger an error.
     $data = $typed_data->create($definition, 'module_not_in_filesystem');
     $violations = $data->validate();
     $this->assertCount(1, $violations);
@@ -111,13 +112,14 @@ class ExtensionExistsConstraintValidatorTest extends KernelTestBase {
     $violations = $data->validate();
     $this->assertCount(0, $violations);
 
-    $definition->setConstraints(['ExtensionExists' => [
-        'type'=> 'theme',
+    $definition->setConstraints([
+      'ExtensionExists' => [
+        'type' => 'theme',
         'mustBeInstalled' => FALSE,
-        ]
+      ],
     ]);
 
-    //A theme which is not present in the filesystem will trigger an error.
+    // A theme which is not present in the filesystem will trigger an error.
     $data = $typed_data->create($definition, 'theme_not_in_filesystem');
     $violations = $data->validate();
     $this->assertCount(1, $violations);
@@ -126,6 +128,6 @@ class ExtensionExistsConstraintValidatorTest extends KernelTestBase {
     $data = $typed_data->create($definition, 'stark');
     $violations = $data->validate();
     $this->assertCount(0, $violations);
-    }
+  }
 
 }
