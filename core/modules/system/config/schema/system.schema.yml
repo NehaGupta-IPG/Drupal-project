@@ -259,7 +259,9 @@ system.theme:
         ExtensionName: []
         ExtensionExists:
           type: theme
-          # The default theme doesn't have to be installed, but it should exist in the file system.
+          # This configuration is validated while installing the theme, so it doesn't
+          # have to be installed, but it should exist in the file system.
+          # @see \Drupal\Core\Extension\ThemeInstaller::install()
           mustBeInstalled: false
 
 system.menu.*:
