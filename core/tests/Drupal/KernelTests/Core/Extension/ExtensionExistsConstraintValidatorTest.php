@@ -84,48 +84,48 @@ class ExtensionExistsConstraintValidatorTest extends KernelTestBase {
     $data->validate();
   }
 
-    /**
-     * Tests the ExtensionExistsConstraint having 'mustBeInstalled' option set to FALSE.
-     */
-    public function testValidationWithMustBeInstalledOption(): void {
-        // Set the constraint with 'mustBeInstalled' option. We are setting
-        // this option to false here which means that the extension should
-        // be present in the file system but need not be installed.
-        $definition = DataDefinition::create('string')
-            ->setConstraints(['ExtensionExists' => [
-                'type'=> 'module',
-                'mustBeInstalled' => FALSE,
-                ]
-            ]);
-
-        /** @var \Drupal\Core\TypedData\TypedDataManagerInterface $typed_data */
-        $typed_data = $this->container->get('typed_data_manager');
-
-        //A module which is not present in the filesystem will trigger an error.
-        $data = $typed_data->create($definition, 'module_not_in_filesystem');
-        $violations = $data->validate();
-        $this->assertCount(1, $violations);
-        $this->assertSame("Module 'module_not_in_filesystem' was not found.", (string) $violations->get(0)->getMessage());
-
-        $data->setValue('user');
-        $violations = $data->validate();
-        $this->assertCount(0, $violations);
-
-        $definition->setConstraints(['ExtensionExists' => [
-            'type'=> 'theme',
-            'mustBeInstalled' => FALSE,
+  /**
+   * Tests the ExtensionExistsConstraint having 'mustBeInstalled' option set to FALSE.
+   */
+  public function testValidationWithMustBeInstalledOption(): void {
+    // Set the constraint with 'mustBeInstalled' option. We are setting
+    // this option to false here which means that the extension should
+    // be present in the file system but need not be installed.
+    $definition = DataDefinition::create('string')
+      ->setConstraints(['ExtensionExists' => [
+          'type'=> 'module',
+          'mustBeInstalled' => FALSE,
         ]
-        ]);
+      ]);
 
-        //A theme which is not present in the filesystem will trigger an error.
-        $data = $typed_data->create($definition, 'theme_not_in_filesystem');
-        $violations = $data->validate();
-        $this->assertCount(1, $violations);
-        $this->assertSame("Theme 'theme_not_in_filesystem' was not found.", (string) $violations->get(0)->getMessage());
+    /** @var \Drupal\Core\TypedData\TypedDataManagerInterface $typed_data */
+    $typed_data = $this->container->get('typed_data_manager');
 
-        $data = $typed_data->create($definition, 'stark');
-        $violations = $data->validate();
-        $this->assertCount(0, $violations);
+    //A module which is not present in the filesystem will trigger an error.
+    $data = $typed_data->create($definition, 'module_not_in_filesystem');
+    $violations = $data->validate();
+    $this->assertCount(1, $violations);
+    $this->assertSame("Module 'module_not_in_filesystem' was not found.", (string) $violations->get(0)->getMessage());
+
+    $data->setValue('user');
+    $violations = $data->validate();
+    $this->assertCount(0, $violations);
+
+    $definition->setConstraints(['ExtensionExists' => [
+        'type'=> 'theme',
+        'mustBeInstalled' => FALSE,
+        ]
+    ]);
+
+    //A theme which is not present in the filesystem will trigger an error.
+    $data = $typed_data->create($definition, 'theme_not_in_filesystem');
+    $violations = $data->validate();
+    $this->assertCount(1, $violations);
+    $this->assertSame("Theme 'theme_not_in_filesystem' was not found.", (string) $violations->get(0)->getMessage());
+
+    $data = $typed_data->create($definition, 'stark');
+    $violations = $data->validate();
+    $this->assertCount(0, $violations);
     }
 
 }
