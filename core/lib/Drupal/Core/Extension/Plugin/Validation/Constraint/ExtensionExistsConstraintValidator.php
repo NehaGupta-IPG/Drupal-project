@@ -56,7 +56,7 @@ class ExtensionExistsConstraintValidator extends ConstraintValidator implements 
           }
         }
         elseif (!$this->moduleExtensionList->exists($extension_name)) {
-            $this->context->addViolation($constraint->moduleNotFoundMessage, $variables);
+          $this->context->addViolation($constraint->moduleNotFoundMessage, $variables);
         }
         break;
 
@@ -71,7 +71,7 @@ class ExtensionExistsConstraintValidator extends ConstraintValidator implements 
           }
         }
         elseif (!$this->themeExtensionList->exists($extension_name)) {
-            $this->context->addViolation($constraint->themeNotFoundMessage, $variables);
+          $this->context->addViolation($constraint->themeNotFoundMessage, $variables);
         }
         break;
 
