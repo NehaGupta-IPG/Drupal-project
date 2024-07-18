@@ -361,9 +361,6 @@ abstract class PluginBase extends ComponentPluginBase implements ContainerFactor
       // No need to run filterAdmin on an empty string.
       return '';
     }
-    if (empty($tokens)) {
-      return Xss::filterAdmin($text);
-    }
 
     $twig_tokens = [];
     foreach ($tokens as $token => $replacement) {
@@ -402,31 +399,26 @@ abstract class PluginBase extends ComponentPluginBase implements ContainerFactor
       }
     }
 
-    if ($twig_tokens) {
-      // Use the unfiltered text for the Twig template, then filter the output.
-      // Otherwise, Xss::filterAdmin could remove valid Twig syntax before the
-      // template is parsed.
+    // Use the unfiltered text for the Twig template, then filter the output.
+    // Otherwise, Xss::filterAdmin could remove valid Twig syntax before the
+    // template is parsed.
 
-      $build = [
-        '#type' => 'inline_template',
-        '#template' => $text,
-        '#context' => $twig_tokens,
-        '#post_render' => [
-          function ($children, $elements) {
-            return Xss::filterAdmin($children);
-          },
-        ],
-      ];
+    $build = [
+      '#type' => 'inline_template',
+      '#template' => $text,
+      '#context' => $twig_tokens,
+      '#post_render' => [
+      function ($children, $elements) {
+          return Xss::filterAdmin($children);
+        },
+      ],
+    ];
 
-      // Currently you cannot attach assets to tokens with
-      // Renderer::renderInIsolation(). This may be unnecessarily limiting.
-      // Consider using Renderer::executeInRenderContext() instead.
-      // @todo https://www.drupal.org/node/2566621
-      return (string) $this->getRenderer()->renderInIsolation($build);
-    }
-    else {
-      return Xss::filterAdmin($text);
-    }
+    // Currently you cannot attach assets to tokens with
+    // Renderer::renderInIsolation(). This may be unnecessarily limiting. Consider
+    // using Renderer::executeInRenderContext() instead.
+    // @todo https://www.drupal.org/node/2566621
+    return (string) $this->getRenderer()->renderInIsolation($build);
   }
 
   /**
