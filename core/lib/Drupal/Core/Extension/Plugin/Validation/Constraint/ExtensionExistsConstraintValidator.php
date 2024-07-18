@@ -55,10 +55,8 @@ class ExtensionExistsConstraintValidator extends ConstraintValidator implements 
             $this->context->addViolation($constraint->moduleNotInstalledMessage, $variables);
           }
         }
-        else {
-          if (!$this->moduleExtensionList->exists($extension_name)) {
-            $this->context->addViolation($constraint->moduleNotExistsMessage, $variables);
-          }
+        elseif (!$this->moduleExtensionList->exists($extension_name)) {
+            $this->context->addViolation($constraint->moduleNotFoundMessage, $variables);
         }
         break;
 
@@ -72,10 +70,8 @@ class ExtensionExistsConstraintValidator extends ConstraintValidator implements 
             $this->context->addViolation($constraint->themeNotInstalledMessage, $variables);
           }
         }
-        else {
-          if (!$this->themeExtensionList->exists($extension_name)) {
-            $this->context->addViolation($constraint->themeNotExistsMessage, $variables);
-          }
+        elseif (!$this->themeExtensionList->exists($extension_name)) {
+            $this->context->addViolation($constraint->themeNotFoundMessage, $variables);
         }
         break;
 
