@@ -129,7 +129,7 @@ final class EntityResource extends JsonApiEntityResource {
       $response->headers->set('Content-Location', $url->getGeneratedUrl());
 
       // @todo Internal page cache does not support the "Accept-Language" header
-      //   currently. Remove this once it does. See TODO.
+      //   currently. Remove this once it does. See https://www.drupal.org/project/drupal/issues/2430335.
       \Drupal::service('page_cache_kill_switch')->trigger();
     }
 
