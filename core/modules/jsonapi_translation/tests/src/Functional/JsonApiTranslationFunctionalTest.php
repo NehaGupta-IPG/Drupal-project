@@ -78,7 +78,7 @@ class JsonApiTranslationFunctionalTest extends JsonApiFunctionalTestBase {
       ->setThirdPartySetting('content_translation', 'enabled', TRUE)
       ->save();
 
-    for (['field_test' => TRUE, 'field_test_ut' => FALSE] as $field_name => $is_translatable) {
+    foreach (['field_test' => TRUE, 'field_test_ut' => FALSE] as $field_name => $is_translatable) {
       FieldStorageConfig::create([
         'field_name' => $field_name,
         'type' => 'string',
