@@ -127,7 +127,7 @@ final class Routes extends JsonApiRoutes {
     $translation_creation_route->setRequirement('_csrf_request_header_token', 'TRUE');
     $routes->add(static::getRouteName($resource_type, 'individual.translation.post'), $translation_creation_route);
 
-    $routes->addOptions(['parameters' => ['entity' => ['type' => 'entity:' . $entity_type_id]]]);
+    $routes->addOptions(['parameters' => ['entity' => ['type' => 'entity:' . $resource_type->getEntityTypeId()]]]);
 
     foreach ($routes as $route) {
       static::addRouteParameter($route, static::RESOURCE_TYPE_KEY, ['type' => ResourceTypeConverter::PARAM_TYPE_ID]);
