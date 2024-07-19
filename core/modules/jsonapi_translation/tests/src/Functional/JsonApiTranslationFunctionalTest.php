@@ -363,7 +363,7 @@ class JsonApiTranslationFunctionalTest extends JsonApiFunctionalTestBase {
    * @return array
    *   The parsed JSON response.
    */
-  protected function doTestNewNodeRequest(string $langcode, ?int $expected_status = Response::HTTP_CREATED, array $options = [], string $expected_langcode = NULL): array {
+  protected function doTestNewNodeRequest(string $langcode, ?int $expected_status = Response::HTTP_CREATED, array $options = [], ?string $expected_langcode = NULL): array {
     $body = [
       'data' => [
         'type' => 'node--article',
@@ -402,7 +402,7 @@ class JsonApiTranslationFunctionalTest extends JsonApiFunctionalTestBase {
    * @return array
    *   The parsed JSON response.
    */
-  protected function doTestPostRequest(Url $url, array $body, ?int $expected_status = Response::HTTP_CREATED, array $options = [], string $expected_langcode = NULL): array {
+  protected function doTestPostRequest(Url $url, array $body, ?int $expected_status = Response::HTTP_CREATED, array $options = [], ?string $expected_langcode = NULL): array {
     $headers = $options;
     if (isset($options['headers'])) {
       $headers = $options['headers'];
