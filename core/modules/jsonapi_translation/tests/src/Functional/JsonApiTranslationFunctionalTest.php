@@ -416,13 +416,15 @@ class JsonApiTranslationFunctionalTest extends JsonApiFunctionalTestBase {
       'options' => $options !== $headers ? $options : [],
     ]);
 
-    $output = Json::decode($response->getBody()->__toString());
-
     $this->assertEquals($expected_status, $response->getStatusCode());
+    $output = $this->getDocumentFromResponse($response, $expected_status === Response::HTTP_CREATED);
 
     if ($expected_status === Response::HTTP_CREATED) {
+
       $this->assertArrayHasKey('langcode', $output['data']['attributes']);
       $this->assertSame($expected_langcode, $output['data']['attributes']['langcode'] ?? '');
+    }  else {
+
     }
 
     return $output;
@@ -552,12 +554,13 @@ class JsonApiTranslationFunctionalTest extends JsonApiFunctionalTestBase {
       'auth' => [$this->user->getAccountName(), $this->user->pass_raw],
       'headers' => ['Content-Type' => 'application/vnd.api+json'] + $headers,
     ] + $options);
-    $output = Json::decode($response->getBody()->__toString());
 
     $status_code = $response->getStatusCode();
     $this->assertEquals($expected_status, $status_code);
 
+    $output = $this->getDocumentFromResponse($response, $status_code === Response::HTTP_OK);
     if ($status_code === Response::HTTP_OK) {
+
       $this->assertEquals($attributes['title'], $output['data']['attributes']['title']);
       if ($expected_langcode) {
         $this->assertSame($expected_langcode, $output['data']['attributes']['langcode']);
