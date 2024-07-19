@@ -44,7 +44,7 @@ final class ResponseSubscriber implements EventSubscriberInterface {
     // would not handle independent translations correctly.
     if ($response instanceof CacheableResponseInterface) {
       $key = 'Accept-Language';
-      $vary = $response->headers->get('Vary');
+      $vary = $response->headers->get('Vary') ?? '';
       $vary .= $vary ? ',' . $key : $key;
       $response->headers->set('Vary', $vary);
     }
