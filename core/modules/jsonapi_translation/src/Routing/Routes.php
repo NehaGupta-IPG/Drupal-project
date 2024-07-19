@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\jsonapi_translation\Routing;
 
-use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Routing\RouteObjectInterface;
 use Drupal\jsonapi\ParamConverter\ResourceTypeConverter;

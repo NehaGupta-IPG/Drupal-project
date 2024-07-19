@@ -363,7 +363,7 @@ class JsonApiTranslationFunctionalTest extends JsonApiFunctionalTestBase {
    * @return array
    *   The parsed JSON response.
    */
-  protected function doTestNewNodeRequest(string $langcode, int $expected_status = Response::HTTP_CREATED, array $options = [], string $expected_langcode = NULL): array {
+  protected function doTestNewNodeRequest(string $langcode, ?int $expected_status = Response::HTTP_CREATED, array $options = [], string $expected_langcode = NULL): array {
     $body = [
       'data' => [
         'type' => 'node--article',
@@ -402,7 +402,7 @@ class JsonApiTranslationFunctionalTest extends JsonApiFunctionalTestBase {
    * @return array
    *   The parsed JSON response.
    */
-  protected function doTestPostRequest(Url $url, array $body, int $expected_status = Response::HTTP_CREATED, array $options = [], string $expected_langcode = NULL): array {
+  protected function doTestPostRequest(Url $url, array $body, ?int $expected_status = Response::HTTP_CREATED, array $options = [], string $expected_langcode = NULL): array {
     $headers = $options;
     if (isset($options['headers'])) {
       $headers = $options['headers'];
@@ -507,7 +507,7 @@ class JsonApiTranslationFunctionalTest extends JsonApiFunctionalTestBase {
    * @return array
    *   The parsed JSON response.
    */
-  protected function doTestPatchRequest(NodeInterface &$node, string $expected_langcode = NULL, array $options = [], int $expected_status = Response::HTTP_OK): array {
+  protected function doTestPatchRequest(NodeInterface &$node, ?string $expected_langcode = NULL, array $options = [], int $expected_status = Response::HTTP_OK): array {
     $uuid = $node->uuid();
 
     $default_attributes = [
@@ -629,7 +629,7 @@ class JsonApiTranslationFunctionalTest extends JsonApiFunctionalTestBase {
    * @return array
    *   The parsed JSON response.
    */
-  protected function doTestDeleteRequest(NodeInterface &$node, string $expected_langcode = NULL, array $options = [], int $expected_status = Response::HTTP_NO_CONTENT): array {
+  protected function doTestDeleteRequest(NodeInterface &$node, ?string $expected_langcode = NULL, array $options = [], int $expected_status = Response::HTTP_NO_CONTENT): array {
     $uuid = $node->uuid();
 
     $headers = $options;

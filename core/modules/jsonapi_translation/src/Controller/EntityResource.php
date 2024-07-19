@@ -533,7 +533,7 @@ final class EntityResource extends JsonApiEntityResource {
   /**
    * {@inheritdoc}
    */
-  protected function buildWrappedResponse(TopLevelDataInterface $data, Request $request, IncludedData $includes, $response_code = 200, array $headers = [], LinkCollection $links = NULL, array $meta = []) {
+  protected function buildWrappedResponse(TopLevelDataInterface $data, Request $request, IncludedData $includes, $response_code = 200, array $headers = [], ?LinkCollection $links = NULL, array $meta = []) {
     if ($data instanceof Data && $data->getCardinality() !== 1) {
       return parent::buildWrappedResponse($data, $request, $includes, $response_code, $headers, $links, $meta);
     }
