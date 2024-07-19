@@ -84,10 +84,12 @@ final class EntityResource extends JsonApiEntityResource {
    *   translation.
    */
   public function getIndividual(EntityInterface $entity, Request $request) {
+    $resource_type = $this->resourceTypeRepository->get($entity->getEntityTypeId(), $entity->bundle());
+
     // If the entity type is not translatable or no resource language was
     // specified, we can safely fall back to the original behavior.
     $resource_language = $this->getResourceLanguage($request);
-    if (!$this->isEntityTypeTranslatable($entity->getEntityType())) {
+    if (!$resource_type->isTranslatable()) {
       if (!$resource_language) {
         return parent::getIndividual($entity, $request);
       }
@@ -216,7 +218,7 @@ final class EntityResource extends JsonApiEntityResource {
 
     // Check translatability.
     $this->checkResourceLanguage($resource_type, $request);
-    $this->checkEntityTranslatability($entity);
+    $this->checkEntityTranslatability($resource_type);
     $this->checkFieldTranslatability($resource_type, $request, $entity);
 
     // Creating a new translation just means PATCH-ing an existing entity, after
@@ -367,11 +369,10 @@ final class EntityResource extends JsonApiEntityResource {
   /**
    * Checks whether an entity is translatable.
    *
-   * @param \Drupal\Core\Entity\ContentEntityInterface $entity
-   *   A content entity.
+   * @param \Drupal\jsonapi\ResourceType\ResourceType $resourceType
    */
-  protected function checkEntityTranslatability(ContentEntityInterface $entity): void {
-    if (!$entity->isTranslatable()) {
+  protected function checkEntityTranslatability(ResourceType $resourceType): void {
+    if (!$resourceType->isTranslatable()) {
       throw new UnprocessableEntityHttpException('Translation is not enabled for the specified resource.');
     }
   }
@@ -522,24 +523,11 @@ final class EntityResource extends JsonApiEntityResource {
    *   TRUE if the resource type is translatable, FALSE otherwise.
    */
   protected function isResourceTypeTranslatable(ResourceType $resource_type): bool {
-    if (!$this->isResourceLanguageAware($resource_type)) {
-      return FALSE;
+    if ($resource_type->isTranslatable()) {
+      return TRUE;
     }
-    $entity_type = $this->entityTypeManager->getDefinition($resource_type->getEntityTypeId());
-    return $this->isEntityTypeTranslatable($entity_type);
-  }
 
-  /**
-   * Checks whether the specified entity type supports translation.
-   *
-   * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
-   *   An entity type definition.
-   *
-   * @return bool
-   *   TRUE if the resource type is translatable, FALSE otherwise.
-   */
-  protected function isEntityTypeTranslatable(EntityTypeInterface $entity_type): bool {
-    return $entity_type->entityClassImplements(ContentEntityInterface::class) && $entity_type->isTranslatable();
+    return $this->isResourceLanguageAware($resource_type);
   }
 
   /**

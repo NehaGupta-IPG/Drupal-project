@@ -75,6 +75,13 @@ class ResourceType {
   protected $isMutable;
 
   /**
+   * Whether this resource type is translatable.
+   *
+   * @var bool
+   */
+  private bool $isTranslatable;
+
+  /**
    * Whether this resource type's resources are versionable.
    *
    * @var bool
@@ -327,6 +334,16 @@ class ResourceType {
   }
 
   /**
+   * Whether this resource type is translatable.
+   *
+   * @return bool
+   *   TRUE if the resource type is translatable. FALSE otherwise.
+   */
+  public function isTranslatable(): bool {
+    return $this->isTranslatable;
+  }
+
+  /**
    * Instantiates a ResourceType object.
    *
    * @param string $entity_type_id
@@ -347,14 +364,17 @@ class ResourceType {
    *   (optional) The resource type fields, keyed by internal field name.
    * @param null|string $type_name
    *   The resource type name.
+   * @param bool $is_translatable
+   *   (optional) Whether the resource type is translatable.
    */
-  public function __construct($entity_type_id, $bundle, $deserialization_target_class, $internal = FALSE, $is_locatable = TRUE, $is_mutable = TRUE, $is_versionable = FALSE, array $fields = [], $type_name = NULL) {
+  public function __construct($entity_type_id, $bundle, $deserialization_target_class, $internal = FALSE, $is_locatable = TRUE, $is_mutable = TRUE, $is_versionable = FALSE, array $fields = [], $type_name = NULL, bool $is_translatable = FALSE) {
     $this->entityTypeId = $entity_type_id;
     $this->bundle = $bundle;
     $this->deserializationTargetClass = $deserialization_target_class;
     $this->internal = $internal;
     $this->isLocatable = $is_locatable;
     $this->isMutable = $is_mutable;
+    $this->isTranslatable = $is_translatable;
     $this->isVersionable = $is_versionable;
     $this->fields = $fields;
 

@@ -26,7 +26,8 @@ class CountableResourceTypeRepository extends ResourceTypeRepository {
       $resource_type->isMutable(),
       $resource_type->isVersionable(),
       $resource_type->getFields(),
-      $resource_type->getTypeName()
+      $resource_type->getTypeName(),
+      $resource_type->isTranslatable(),
     );
   }
 

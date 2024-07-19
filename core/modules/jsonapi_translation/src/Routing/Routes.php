@@ -111,14 +111,7 @@ final class Routes extends JsonApiRoutes {
   protected function getIndividualTranslationRoutesForResourceType(ResourceType $resource_type, string $path_prefix): RouteCollection {
     $routes = new RouteCollection();
 
-    if ($resource_type->isInternal() || !$resource_type->isLocatable() || !$resource_type->isMutable()) {
-      return $routes;
-    }
-
-    // We only support content entity translation at the moment.
-    $entity_type_id = $resource_type->getEntityTypeId();
-    $entity_type = $this->entityTypeManager->getDefinition($entity_type_id);
-    if (!$entity_type->isTranslatable() && $entity_type->entityClassImplements(ContentEntityInterface::class)) {
+    if ($resource_type->isInternal() || !$resource_type->isLocatable() || !$resource_type->isMutable() || !$resource_type->isTranslatable()) {
       return $routes;
     }
 
