@@ -420,11 +420,8 @@ class JsonApiTranslationFunctionalTest extends JsonApiFunctionalTestBase {
     $output = $this->getDocumentFromResponse($response, $expected_status === Response::HTTP_CREATED);
 
     if ($expected_status === Response::HTTP_CREATED) {
-
       $this->assertArrayHasKey('langcode', $output['data']['attributes']);
       $this->assertSame($expected_langcode, $output['data']['attributes']['langcode'] ?? '');
-    }  else {
-
     }
 
     return $output;
@@ -560,7 +557,6 @@ class JsonApiTranslationFunctionalTest extends JsonApiFunctionalTestBase {
 
     $output = $this->getDocumentFromResponse($response, $status_code === Response::HTTP_OK);
     if ($status_code === Response::HTTP_OK) {
-
       $this->assertEquals($attributes['title'], $output['data']['attributes']['title']);
       if ($expected_langcode) {
         $this->assertSame($expected_langcode, $output['data']['attributes']['langcode']);
