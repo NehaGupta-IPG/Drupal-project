@@ -76,10 +76,7 @@ class JsonApiTranslationFunctionalTest extends JsonApiFunctionalTestBase {
       ->setThirdPartySetting('content_translation', 'enabled', TRUE)
       ->save();
 
-    for ($i = 0; $i < 2; ++$i) {
-      $is_translatable = !$i;
-      $field_name = 'field_test' . ($is_translatable ? '' : '_ut');
-
+    for (['field_test' => TRUE, 'field_test_ut' => FALSE] as $field_name => $is_translatable) {
       FieldStorageConfig::create([
         'field_name' => $field_name,
         'type' => 'string',
@@ -94,11 +91,11 @@ class JsonApiTranslationFunctionalTest extends JsonApiFunctionalTestBase {
         'translatable' => $is_translatable,
       ])
         ->save();
-
-      $this->config('jsonapi.settings')
-        ->set('read_only', FALSE)
-        ->save(TRUE);
     }
+
+    $this->config('jsonapi.settings')
+      ->set('read_only', FALSE)
+      ->save(TRUE);
   }
 
   /**
