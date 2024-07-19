@@ -1,6 +1,6 @@
 name: JSON:API Translation
 type: module
-description: Allows the translation of content entities via JSON:API endpoints.
+description: Adds multilingual and translations support to the JSON:API module.
 package: Core (Experimental)
 version: VERSION
 dependencies:
