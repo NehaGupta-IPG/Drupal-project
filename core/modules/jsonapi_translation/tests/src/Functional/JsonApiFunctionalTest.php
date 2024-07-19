@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\jsonapi_translation\Functional;
 
 use Drupal\language\Entity\ContentLanguageSettings;

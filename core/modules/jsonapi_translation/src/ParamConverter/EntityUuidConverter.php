@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\jsonapi_translation\ParamConverter;
 
 use Drupal\jsonapi\ParamConverter\EntityUuidConverter as JsonApiEntityUuidConverter;

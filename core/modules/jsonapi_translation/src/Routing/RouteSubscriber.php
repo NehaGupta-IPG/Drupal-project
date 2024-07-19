@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\jsonapi_translation\Routing;
 
 use Drupal\Core\Routing\RouteObjectInterface;
