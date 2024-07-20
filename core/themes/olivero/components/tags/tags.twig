@@ -1,0 +1,25 @@
+{%
+  set classes = [
+    'tags',
+    'tags--label--' ~ label_display,
+  ]
+%}
+
+{%
+  set title_classes = [
+    'tags__label',
+    'tags__label--' ~ label_display,
+    label_display == 'visually_hidden' ? 'visually-hidden',
+  ]
+%}
+
+<div{{ attributes.addClass(classes) }}>
+  {% if label_display != 'hidden' %}
+    <h3{{ title_attributes.addClass(title_classes) }}>{{ label }}</h3>
+  {% endif %}
+  <ul class="tags__items">
+    {% for item in items %}
+      <li{{ item.attributes.addClass('tags__item') }}>{{ item.content }}</li>
+    {% endfor %}
+  </ul>
+</div>

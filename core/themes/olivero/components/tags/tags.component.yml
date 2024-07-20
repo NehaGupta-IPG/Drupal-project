@@ -1,0 +1,41 @@
+# This is so your IDE knows about the syntax for fixes and autocomplete.
+$schema: https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json
+
+# The human readable name.
+name: Tags
+
+# Status can be: "experimental", "stable", "deprecated", "obsolete".
+status: stable
+
+# Schema for the props. We support www.json-schema.org. Learn more about the
+# syntax there.
+props:
+  type: object
+  properties:
+    label:
+      title: Label
+      type: string
+    title_attributes:
+      type: Drupal\Core\Template\Attribute
+      title: Title Attributes
+    label_display:
+      type: string
+      title: Label Display
+      enum:
+        - above
+        - inline
+        - hidden
+        - visually_hidden
+      default: above
+    items:
+      title: Tags Items
+      type: array
+      item:
+        type: object
+        properties:
+          content:
+            title: Tags Item
+            type: object
+          attributes:
+            title: Item Attributes
+            type: Drupal\Core\Template\Attribute

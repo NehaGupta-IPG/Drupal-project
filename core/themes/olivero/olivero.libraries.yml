@@ -294,12 +294,6 @@ tabledrag:
     component:
       css/components/tabledrag.css: {}
 
-tags:
-  version: VERSION
-  css:
-    theme:
-      css/components/tags.css: {}
-
 olivero.table:
   version: VERSION
   css:
