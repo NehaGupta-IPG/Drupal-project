@@ -13,7 +13,7 @@ class DrupalDialogEvent extends Event {
   }
 }
 
-(function ($, Drupal, drupalSettings, bodyScrollLock) {
+(function ($, Drupal, drupalSettings) {
   /**
    * Default dialog options.
    *
@@ -84,12 +84,6 @@ class DrupalDialogEvent extends Event {
       $element.dialog(event.settings);
       dialog.open = true;
 
-      // Locks the body scroll only when it opens in modal.
-      if (event.settings.modal) {
-        // Locks the body when the dialog opens.
-        bodyScrollLock.lock(domElement);
-      }
-
       domElement.dispatchEvent(
         new DrupalDialogEvent('aftercreate', dialog, event.settings),
       );
@@ -97,9 +91,6 @@ class DrupalDialogEvent extends Event {
 
     function closeDialog(value) {
       domElement.dispatchEvent(new DrupalDialogEvent('beforeclose', dialog));
-
-      // Unlocks the body when the dialog closes.
-      bodyScrollLock.clearBodyLocks();
 
       $element.dialog('close');
       dialog.returnValue = value;
@@ -118,4 +109,4 @@ class DrupalDialogEvent extends Event {
 
     return dialog;
   };
-})(jQuery, Drupal, drupalSettings, bodyScrollLock);
+})(jQuery, Drupal, drupalSettings);

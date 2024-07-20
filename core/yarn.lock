@@ -3045,7 +3045,6 @@ __metadata:
     terser: "npm:^5.44.1"
     terser-webpack-plugin: "npm:^5.3.14"
     transliteration: "npm:^2.3.5"
-    tua-body-scroll-lock: "npm:^1.6.0"
     underscore: "npm:^1.13.8"
     webpack: "npm:^5.102.1"
     webpack-cli: "npm:^6.0.1"
@@ -10551,13 +10550,6 @@ __metadata:
     minimist: "npm:^1.2.6"
     strip-bom: "npm:^3.0.0"
   checksum: 10c0/5b4f301a2b7a3766a986baf8fc0e177eb80bdba6e396792ff92dc23b5bca8bb279fc96517dcaaef63a3b49bebc6c4c833653ec58155780bc906bdbcf7dda0ef5
-  languageName: node
-  linkType: hard
-
-"tua-body-scroll-lock@npm:^1.6.0":
-  version: 1.6.0
-  resolution: "tua-body-scroll-lock@npm:1.6.0"
-  checksum: 10c0/b8241012323f7abee540b3368dad051215de29cbfeb8941e28aac4330e19915f94d32efc68ca63e61eb37a141ba4587ae45dc8a35eaf07a587dd591c13929031
   languageName: node
   linkType: hard
 

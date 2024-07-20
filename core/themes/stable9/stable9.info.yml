@@ -65,6 +65,11 @@ libraries-override:
       component:
         misc/components/autocomplete-loading.module.css: css/core/components/autocomplete-loading.module.css
 
+  core/drupal.dialog:
+    css:
+      base:
+        misc/dialog/dialog-body-scroll-lock.css: css/core/dialog/dialog-body-scroll-lock.css
+
   core/drupal.dropbutton:
     css:
       component:

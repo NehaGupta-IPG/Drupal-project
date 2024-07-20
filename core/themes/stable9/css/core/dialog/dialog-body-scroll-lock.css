@@ -1,0 +1,16 @@
+/*
+ * When page has .ui-widget overlay then scroll lock.
+ * More info:
+ *
+ * https://api.jqueryui.com/dialog/#theming
+ *
+ * "Additionally, when the modal option is set, an element
+ * with a ui-widget-overlay class name is appended to the <body>."
+ *
+ * And this is one case for dialog modal:
+ * https://github.com/search?q=repo%3Ajquery%2Fjquery-ui%20ui-widget-overlay&type=code
+ */
+
+html:has(.ui-widget-overlay) {
+  overflow: hidden;
+}

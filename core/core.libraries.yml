@@ -377,10 +377,11 @@ drupal.dialog:
     assets/vendor/jquery.ui/ui/widgets/controlgroup-min.js: { weight: -11.7, minified: true }
     assets/vendor/jquery.ui/ui/form-reset-mixin-min.js: { weight: -11.7, minified: true }
     assets/vendor/jquery.ui/ui/widgets/mouse-min.js: { weight: -11.7, minified: true }
-    assets/vendor/tua-body-scroll-lock/tua-bsl.umd.min.js: { weight: -1,  minified: true }
   # All CSS assets previously came from core/jquery.ui, a deprecated library.
   # @todo replace with solution found in https://drupal.org/node/2158943
   css:
+    base:
+      misc/dialog/dialog-body-scroll-lock.css: {}
     component:
       assets/vendor/jquery.ui/themes/base/dialog.css: { weight: -11.4 }
       assets/vendor/jquery.ui/themes/base/button.css: { weight: -11.5 }
