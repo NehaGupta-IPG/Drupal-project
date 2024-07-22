@@ -138,7 +138,7 @@ class JsonApiTranslationFunctionalTest extends JsonApiFunctionalTestBase {
     // Verify that erroneous conditions are detected correctly.
     // @todo We need a new node to avoid caching issues. Remove this once a
     //   cache context taking the "Accept-Language" header into account is
-    //   available. See TODO.
+    //   available. See https://www.drupal.org/project/drupal/issues/2430335.
     $node = $this->createTranslatableNode('en');
     $output = $this->doTestQueryStringRequest($node, 'en', Response::HTTP_BAD_REQUEST, $headers);
     $this->assertSame('Specifying both a request language and the "Accept-Language" header is not supported.', $output['errors'][0]['detail']);
