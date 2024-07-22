@@ -22,15 +22,14 @@ class UpdateEmptyAdminTheme implements EventSubscriberInterface {
    * Updates system.theme:admin config if it's still at the default.
    *
    * @param \Drupal\Core\Config\ConfigCrudEvent $event
-   *   The Event to process.
+   *   The event to process.
    */
   public function onSave(ConfigCrudEvent $event): void {
     $saved_config = $event->getConfig();
     if ($saved_config->getName() === 'system.theme' && $saved_config->get('admin') === '') {
       $saved_config->set('admin', NULL)->save(TRUE);
       if (!str_contains($this->requestStack->getMainRequest()->getBaseUrl(), 'update.php')) {
-        @trigger_error("Setting empty 'system.theme admin' key is deprecated in drupal:11.0.0-alpha1 and will not be allowed in drupal:11.0.0-alpha2. See https://www.drupal.org/node/3441503", E_USER_DEPRECATED);
-      }
+        @trigger_error("Setting the admin theme to an empty string is deprecated in drupal:11.0.0 and will not be allowed in drupal:12.0.0. See https://www.drupal.org/node/3441503", E_USER_DEPRECATED);      }
     }
   }
 

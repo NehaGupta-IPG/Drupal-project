@@ -87,7 +87,7 @@ class ExtensionExistsConstraintValidatorTest extends KernelTestBase {
   /**
    * Tests the ExtensionExistsConstraint having 'mustBeInstalled' option set to FALSE.
    */
-  public function testValidationWithMustBeInstalledOption(): void {
+  public function testExtensionDoesNotNeedToBeInstalled(): void {
     // Set the constraint with 'mustBeInstalled' option. We are setting
     // this option to false here which means that the extension should
     // be present in the file system but need not be installed.
