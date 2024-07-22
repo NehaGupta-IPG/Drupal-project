@@ -217,7 +217,7 @@ final class EntityResource extends JsonApiEntityResource {
 
     // Check translatability.
     $this->checkResourceLanguage($resource_type, $request);
-    $this->checkResourceTypeTranslatability($resource_type);
+    $this->checkEntityTranslatability($entity);
     $this->checkFieldTranslatability($resource_type, $request, $entity);
 
     // Creating a new translation just means PATCH-ing an existing entity, after
@@ -253,7 +253,7 @@ final class EntityResource extends JsonApiEntityResource {
       if ($translation) {
         $this->checkResourceLanguage($resource_type, $request);
         if (!$translation->isDefaultTranslation()) {
-          $this->checkResourceTypeTranslatability($resource_type);
+          $this->checkEntityTranslatability($entity);
           $this->checkFieldTranslatability($resource_type, $request, $translation);
         }
       }
@@ -295,7 +295,7 @@ final class EntityResource extends JsonApiEntityResource {
         if ($translation->isDefaultTranslation()) {
           throw new BadRequestHttpException('Deleting the default translation is not supported.');
         }
-        $this->checkResourceTypeTranslatability($resource_type);
+        $this->checkEntityTranslatability($entity);
       }
       else {
         $resource_language = $this->getResourceLanguage($request);
@@ -366,13 +366,13 @@ final class EntityResource extends JsonApiEntityResource {
   }
 
   /**
-   * Checks whether a resource type is translatable.
+   * Checks whether an entity is translatable.
    *
-   * @param \Drupal\jsonapi\ResourceType\ResourceType $resourceType
-   *   The JSON:API resource type for the request to be checked.
+   * @param \Drupal\Core\Entity\ContentEntityInterface $entity
+   *   A content entity.
    */
-  protected function checkResourceTypeTranslatability(ResourceType $resourceType): void {
-    if (!$resourceType->isTranslatable()) {
+  protected function checkEntityTranslatability(ContentEntityInterface $entity): void {
+    if (!$entity->isTranslatable()) {
       throw new UnprocessableEntityHttpException('Translation is not enabled for the specified resource.');
     }
   }
