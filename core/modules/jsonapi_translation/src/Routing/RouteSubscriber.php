@@ -24,7 +24,7 @@ final class RouteSubscriber extends RouteSubscriberBase {
    *
    * @var \Drupal\jsonapi\ResourceType\ResourceTypeRepositoryInterface
    */
-  protected $resourceTypeRepository;
+  protected ResourceTypeRepositoryInterface $resourceTypeRepository;
 
   /**
    * RouteSubscriber constructor.
