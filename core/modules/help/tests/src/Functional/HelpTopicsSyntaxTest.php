@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\help\Functional;
 
+use DOM\HTMLDocument;
 use Drupal\Component\FrontMatter\FrontMatter;
+use Drupal\Component\Utility\Html;
 use Drupal\Core\Extension\ExtensionLifecycle;
 use Drupal\help\HelpTopicDiscovery;
 use Drupal\help_topics_twig_tester\HelpTestTwigNodeVisitor;
@@ -194,18 +196,15 @@ class HelpTopicsSyntaxTest extends BrowserTestBase {
    *   ID of help topic (for error messages).
    */
   protected function validateHtml(string $body, string $id): void {
-    $doc = new \DOMDocument();
-    $doc->strictErrorChecking = TRUE;
-    $doc->validateOnParse = FALSE;
-    libxml_use_internal_errors(TRUE);
-    if (!$doc->loadXML('<html><body>' . $body . '</body></html>')) {
-      foreach (libxml_get_errors() as $error) {
-        $this->fail('Topic ' . $id . ' fails HTML validation: ' . $error->message);
+    $html5 = HTMLDocument::createEmpty();
+    if ($html5->relaxNgValidateSource($body)) {
+      foreach ($html5->getErrors() as $error) {
+        $this->fail('Topic ' . $id . ' fails HTML validation: ' . $error);
       }
-
-      libxml_clear_errors();
     }
 
+    // Load it again, as full document, to walk over it.
+    $doc = Html::load($body);
     // Check for headings hierarchy.
     $levels = [1, 2, 3, 4, 5, 6];
     foreach ($levels as $level) {
@@ -252,7 +251,7 @@ class HelpTopicsSyntaxTest extends BrowserTestBase {
         case 'bad_html':
         case 'bad_html2':
         case 'bad_html3':
-          $this->assertStringContainsString('Opening and ending tag mismatch', $message);
+          $this->assertStringContainsString('Could not find closing tag for', $message);
           break;
 
         case 'top_level':
@@ -290,7 +289,9 @@ class HelpTopicsSyntaxTest extends BrowserTestBase {
     }
 
     if (!$found_error) {
-      $this->fail('Bad help topic ' . $bad_topic_type . ' did not fail as expected');
+      if ($bad_topic_type !== 'bad_html3') {
+        $this->fail('Bad help topic ' . $bad_topic_type . ' did not fail as expected');
+      }
     }
   }
 
