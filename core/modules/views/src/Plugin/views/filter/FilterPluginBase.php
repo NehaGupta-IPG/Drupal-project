@@ -1024,6 +1024,24 @@ abstract class FilterPluginBase extends HandlerBase implements CacheableDependen
           $form_state->setUserInput($user_input);
         }
       }
+      elseif (!empty($this->options['group_info']['remember'])) {
+        $user_input = $form_state->getUserInput();
+        if (
+          !empty($user_input)
+          && isset($user_input[$value])
+          && isset($user_input[$value . '_group'])
+        ) {
+          $user_input[$value] = $user_input[$value . '_group'];
+          $form_state->setUserInput($user_input);
+        }
+        elseif (
+          isset($user_input[$value])
+          && is_array($user_input[$value])
+        ) {
+          $user_input[$value] = $this->group_info;
+          $form_state->setUserInput($user_input);
+        }
+      }
 
       $this->options['expose']['label'] = '';
     }
@@ -1520,10 +1538,17 @@ abstract class FilterPluginBase extends HandlerBase implements CacheableDependen
         // Value can be optional, For example for 'empty' and 'not empty'
         // filters.
         if (isset($selected_group_options['value']) && $selected_group_options['value'] !== '') {
-          $input[$this->options['group_info']['identifier']] = $selected_group_options['value'];
+          $input[$this->options['expose']['identifier']] = $selected_group_options['value'];
+          $this->group_info = $selected_group;
+        }
+        elseif (isset($selected_group_options['string']) && $selected_group_options['string'] !== '') {
+          $input[$this->options['expose']['identifier']] = $selected_group_options['string'];
+          $this->group_info = $selected_group;
+        }
+        else {
+          $this->group_info = $input[$this->options['group_info']['identifier']];
         }
 
-        $this->group_info = $input[$this->options['group_info']['identifier']];
         return TRUE;
       }
       else {
@@ -1588,6 +1613,7 @@ abstract class FilterPluginBase extends HandlerBase implements CacheableDependen
         $views_session[$this->view->storage->id()][$display_id] = [];
       }
       $views_session[$this->view->storage->id()][$display_id][$this->options['group_info']['identifier']] = $input[$this->options['group_info']['identifier']];
+      $views_session[$this->view->storage->id()][$display_id][$this->options['group_info']['identifier'] . '_group'] = $this->group_info;
     }
     if (!empty($views_session)) {
       $session->set('views', $views_session);
