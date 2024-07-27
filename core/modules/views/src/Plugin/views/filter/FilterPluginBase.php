@@ -1538,6 +1538,7 @@ abstract class FilterPluginBase extends HandlerBase implements CacheableDependen
         // Value can be optional, For example for 'empty' and 'not empty'
         // filters.
         if (isset($selected_group_options['value']) && $selected_group_options['value'] !== '') {
+          $input[$this->options['group_info']['identifier']] = $selected_group_options['value'];
           $input[$this->options['expose']['identifier']] = $selected_group_options['value'];
           $this->group_info = $selected_group;
         }
