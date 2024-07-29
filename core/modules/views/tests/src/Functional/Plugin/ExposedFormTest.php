@@ -29,7 +29,7 @@ class ExposedFormTest extends ViewTestBase {
    *
    * @var array
    */
-  public static $testViews = ['test_exposed_form_buttons', 'test_exposed_block', 'test_exposed_form_sort_items_per_page', 'test_exposed_form_pager', 'test_remember_selected'];
+  public static $testViews = ['test_exposed_form_buttons', 'test_exposed_block', 'test_exposed_form_sort_items_per_page', 'test_exposed_form_pager', 'test_remember_selected', 'test_remember_group_filter'];
 
   /**
    * {@inheritdoc}
@@ -567,6 +567,20 @@ class ExposedFormTest extends ViewTestBase {
     // Reload the page and ensure the filter is selected.
     $this->drupalGet('test_remember_selected');
     $this->assertTrue($this->assertSession()->optionExists('type', 'page')->isSelected());
+  }
+
+  /**
+   * Tests the "Remember the last selection" functionality for group filter.
+   */
+  public function testRememberGroupFilter(): void {
+    $this->drupalGet('test_remember_group_filter');
+    $this->getSession()->getPage()->fillField('status', '2');
+    $this->getSession()->getPage()->pressButton('Apply');
+
+    // Reload the page and ensure the filter is selected.
+    $this->drupalGet('test_remember_group_filter');
+    $this->assertSession()->pageTextNotContains('element is not allowed');
+    $this->assertTrue($this->assertSession()->optionExists('status', '2')->isSelected());
   }
 
 }
