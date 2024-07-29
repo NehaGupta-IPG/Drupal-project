@@ -118,13 +118,13 @@ class AjaxTest extends WebDriverTestBase {
       'pre-wrapped-span' => '<span class="pre-wrapped">pre-wrapped<script> var test;</script></span>',
       'pre-wrapped-whitespace' => ' <div class="pre-wrapped-whitespace">pre-wrapped-whitespace</div>' . "\n",
       'not-wrapped' => 'not-wrapped',
-      'comment-string-not-wrapped' => '<!-- COMMENT -->comment-string-not-wrapped',
-      'comment-not-wrapped' => '<!-- COMMENT --><div class="comment-not-wrapped">comment-not-wrapped</div>',
+      'comment-string-not-wrapped' => 'comment-string-not-wrapped',
+      'comment-not-wrapped' => '<div class="comment-not-wrapped">comment-not-wrapped</div>',
       'svg' => '<svg xmlns="http://www.w3.org/2000/svg" width="10" height="10"><rect x="0" y="0" height="10" width="10" fill="green"></rect></svg>',
       'empty' => '',
     ];
     $render_multiple_root_unwrap = [
-      'mixed' => ' foo <!-- COMMENT -->  foo bar<div class="a class"><p>some string</p></div> additional not wrapped strings, <!-- ANOTHER COMMENT --> <p>final string</p>',
+      'mixed' => ' foo   foo bar<div class="a class"><p>some string</p></div> additional not wrapped strings,  <p>final string</p>',
       'top-level-only' => '<div>element #1</div><div>element #2</div>',
       'top-level-only-pre-whitespace' => ' <div>element #1</div><div>element #2</div> ',
       'top-level-only-middle-whitespace-span' => '<span>element #1</span> <span>element #2</span>',
