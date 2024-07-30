@@ -3,13 +3,19 @@
 namespace Drupal\views\Plugin\views\row;
 
 use Drupal\Core\Entity\EntityDisplayRepositoryInterface;
+use Drupal\Core\Entity\EntityRepositoryInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Language\LanguageManagerInterface;
+use Drupal\views\Entity\Render\EntityTranslationRenderTrait;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Base class for Views RSS row plugins.
  */
 abstract class RssPluginBase extends RowPluginBase {
+
+  use EntityTranslationRenderTrait;
 
   /**
    * A fake view mode to only display titles.
@@ -31,6 +37,20 @@ abstract class RssPluginBase extends RowPluginBase {
   protected $entityDisplayRepository;
 
   /**
+   * The language manager.
+   *
+   * @var \Drupal\Core\Language\LanguageManagerInterface
+   */
+  protected $languageManager;
+
+  /**
+   * The entity repository.
+   *
+   * @var \Drupal\Core\Entity\EntityRepositoryInterface
+   */
+  protected $entityRepository;
+
+  /**
    * Constructs a RssPluginBase  object.
    *
    * @param array $configuration
@@ -43,12 +63,26 @@ abstract class RssPluginBase extends RowPluginBase {
    *   The entity type manager.
    * @param \Drupal\Core\Entity\EntityDisplayRepositoryInterface $entity_display_repository
    *   The entity display repository.
+   * @param \Drupal\Core\Language\LanguageManagerInterface $language_manager
+   *   The language manager.
+   * @param \Drupal\Core\Entity\EntityRepositoryInterface $entity_repository
+   *   The entity repository.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, EntityTypeManagerInterface $entity_type_manager, EntityDisplayRepositoryInterface $entity_display_repository) {
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, EntityTypeManagerInterface $entity_type_manager, EntityDisplayRepositoryInterface $entity_display_repository, LanguageManagerInterface $language_manager = NULL, EntityRepositoryInterface $entity_repository = NULL) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
 
     $this->entityTypeManager = $entity_type_manager;
     $this->entityDisplayRepository = $entity_display_repository;
+    if ($language_manager === NULL) {
+      @trigger_error('The language_manager service must be passed to RssPluginBase::__construct(), it is required before Drupal 10.0.0.', E_USER_DEPRECATED);
+      $language_manager = \Drupal::service('language_manager');
+    }
+    $this->languageManager = $language_manager;
+    if ($entity_repository === NULL) {
+      @trigger_error('The entity.repository service must be passed to RssPluginBase::__construct(), it is required before Drupal 10.0.0.', E_USER_DEPRECATED);
+      $entity_repository = \Drupal::service('entity.repository');
+    }
+    $this->entityRepository = $entity_repository;
   }
 
   /**
@@ -117,6 +151,49 @@ abstract class RssPluginBase extends RowPluginBase {
     }
 
     return $dependencies;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function query() {
+    parent::query();
+    $this->getEntityTranslationRenderer()->query($this->view->getQuery());
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getEntityTypeId() {
+    return $this->entityTypeId;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function getEntityTypeManager() {
+    return $this->entityTypeManager;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function getEntityRepository() {
+    return $this->entityRepository;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function getLanguageManager() {
+    return $this->languageManager;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function getView() {
+    return $this->view;
   }
 
 }

@@ -135,6 +135,37 @@ class DisplayFeedTranslationTest extends ViewTestBase {
   }
 
   /**
+   * Tests that rendered node content is in current language.
+   */
+  public function testFeedTranslation() {
+    $node = $this->drupalCreateNode([
+      'type' => 'page',
+      'title' => 'Something in English',
+      'langcode' => 'en',
+    ]);
+
+    $es_translation = $node->addTranslation('es');
+    $es_translation->set('title', 'Algo en Español');
+    $es_translation->set('body', [['value' => 'Algo en Español']]);
+    $es_translation->save();
+
+    // Visit the page in english and assert title in English language.
+    $this->drupalGet('rss.xml');
+    $items = $this->getSession()->getDriver()->find('//channel/item');
+    foreach ($items as $item) {
+      $title_element = $item->findAll('xpath', 'title');
+      $this->assertEquals('Something in English', $title_element[0]->getText());
+    }
+
+    // Visit the page in spanish and assert title in Spanish language.
+    $this->drupalGet('es/rss.xml');
+    foreach ($items as $item) {
+      $title_element = $item->findAll('xpath', 'title');
+      $this->assertEquals('Algo en Español', $title_element[0]->getText());
+    }
+  }
+
+  /**
    * Checks the feed results for the given style of node links.
    *
    * @param string $link_style
