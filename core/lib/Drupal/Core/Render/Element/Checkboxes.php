@@ -108,43 +108,43 @@ class Checkboxes extends FormElementBase {
       }
     }
 
-    if (!empty($element['#check_all']) && $element['#check_all']) {
-      $element['all_wrapper'] = [
-        '#type' => 'container',
-        '#attributes' => ['class' => ['check-all']],
-        '#weight' => 0,
-      ];
-      $element['all_wrapper']['check_all'] = [
-        '#type' => 'html_tag',
-        '#tag' => 'button',
-        '#value' => t('Check all'),
-        '#default_value' => FALSE,
-        '#attributes' => [
-          'class' => [
-            'check-all-btn',
-            'button--small',
-          ],
-          'data-check-all' => TRUE,
-          'type' => 'button',
+    $element['all_wrapper'] = [
+      '#type' => 'container',
+      '#attributes' => ['class' => ['check-all']],
+      '#weight' => 0,
+    ];
+    $element['all_wrapper']['check_all'] = [
+      '#type' => 'html_tag',
+      '#tag' => 'button',
+      '#value' => t('Check all'),
+      '#default_value' => FALSE,
+      '#attributes' => [
+        'class' => [
+          'check-all-btn',
+          'button',
+          'button--small'
         ],
-      ];
-      $element['all_wrapper']['uncheck_all'] = [
-        '#type' => 'html_tag',
-        '#tag' => 'button',
-        '#value' => t('Uncheck all'),
-        '#default_value' => FALSE,
-        '#attributes' => [
-          'class' => [
-            'check-all-btn',
-            'button--small',
-          ],
-          'data-check-all' => FALSE,
-          'type' => 'button',
+        'data-check-all' => TRUE,
+        'type' => 'button',
+      ],
+    ];
+    $element['all_wrapper']['uncheck_all'] = [
+      '#type' => 'html_tag',
+      '#tag' => 'button',
+      '#value' => t('Uncheck all'),
+      '#default_value' => FALSE,
+      '#attributes' => [
+        'class' => [
+          'check-all-btn',
+          'button',
+          'button--small'
         ],
-      ];
+        'data-check-all' => FALSE,
+        'type' => 'button',
+      ],
+    ];
 
-      $element['#attached']['library'][] = 'core/drupal.check-all';
-    }
+    $element['#attached']['library'][] = 'core/drupal.check-all';
 
     return $element;
   }
