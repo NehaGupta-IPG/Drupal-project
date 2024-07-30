@@ -99,7 +99,7 @@ class NodeRevisionsAllTest extends NodeTestBase {
     $node->title = $this->randomMachineName();
     $node->body = [
       'value' => $this->randomMachineName(32),
-      'format' => filter_default_format(),
+      'format' => \filter_default_format(),
     ];
     $node->setNewRevision();
     // Ensure the revision author is a different user.
@@ -207,7 +207,7 @@ class NodeRevisionsAllTest extends NodeTestBase {
     $this->assertSession()->responseContains('page=1');
 
     // Check that the last revision is displayed on the first page.
-    $this->assertSession()->pageTextContains(end($logs));
+    $this->assertSession()->pageTextContains(\end($logs));
 
     // Go to the second page and check that one of the initial three revisions
     // is displayed.

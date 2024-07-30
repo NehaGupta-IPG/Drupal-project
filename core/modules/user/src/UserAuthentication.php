@@ -41,13 +41,13 @@ class UserAuthentication implements UserAuthInterface, UserAuthenticationInterfa
    * {@inheritdoc}
    */
   public function authenticate($username, #[\SensitiveParameter] $password) {
-    @trigger_error(__METHOD__ . ' is deprecated in drupal:10.3.0 and will be removed from drupal:12.0.0. Implement \Drupal\user\UserAuthenticationInterface instead. See https://www.drupal.org/node/3411040');
+    @\trigger_error(__METHOD__ . ' is deprecated in drupal:10.3.0 and will be removed from drupal:12.0.0. Implement \Drupal\user\UserAuthenticationInterface instead. See https://www.drupal.org/node/3411040');
     $uid = FALSE;
 
-    if (!empty($username) && strlen($password) > 0) {
+    if (!empty($username) && \strlen($password) > 0) {
       $account_search = $this->entityTypeManager->getStorage('user')->loadByProperties(['name' => $username]);
 
-      if ($account = reset($account_search)) {
+      if ($account = \reset($account_search)) {
         if ($this->authenticateAccount($account, $password)) {
           $uid = $account->id();
         }
@@ -63,7 +63,7 @@ class UserAuthentication implements UserAuthInterface, UserAuthenticationInterfa
     if (!empty($identifier)) {
       $account_search = $this->entityTypeManager->getStorage('user')->loadByProperties(['name' => $identifier]);
 
-      if ($account = reset($account_search)) {
+      if ($account = \reset($account_search)) {
         return $account;
       }
     }

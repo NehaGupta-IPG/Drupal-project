@@ -213,7 +213,7 @@ class ExtensionDiscovery {
     // Test extensions can also be included for debugging purposes by setting a
     // variable in settings.php.
     if (!isset($include_tests)) {
-      $include_tests = Settings::get('extension_discovery_scan_tests') || drupal_valid_test_ua();
+      $include_tests = Settings::get('extension_discovery_scan_tests') || \drupal_valid_test_ua();
     }
 
     $files = [];
@@ -232,7 +232,7 @@ class ExtensionDiscovery {
     // installation profiles.
     $files = $this->filterByProfileDirectories($files);
     // Sort the discovered extensions by their originating directories.
-    $origin_weights = array_flip($search_dirs);
+    $origin_weights = \array_flip($search_dirs);
     $files = $this->sort($files, $origin_weights);
 
     // Process and return the list of extensions keyed by extension name.
@@ -308,14 +308,14 @@ class ExtensionDiscovery {
       return $all_files;
     }
 
-    $all_files = array_filter($all_files, function ($file) {
-      if (!str_starts_with($file->subpath, 'profiles')) {
+    $all_files = \array_filter($all_files, function ($file) {
+      if (!\str_starts_with($file->subpath, 'profiles')) {
         // This extension doesn't belong to a profile, ignore it.
         return TRUE;
       }
 
       foreach ($this->profileDirectories as $profile_path) {
-        if (str_starts_with($file->getPath(), $profile_path)) {
+        if (\str_starts_with($file->getPath(), $profile_path)) {
           // Parent profile found.
           return TRUE;
         }
@@ -344,7 +344,7 @@ class ExtensionDiscovery {
     foreach ($all_files as $key => $file) {
       // If the extension does not belong to a profile, just apply the weight
       // of the originating directory.
-      if (!str_starts_with($file->subpath, 'profiles')) {
+      if (!\str_starts_with($file->subpath, 'profiles')) {
         $origins[$key] = $weights[$file->origin];
         $profiles[$key] = NULL;
       }
@@ -358,7 +358,7 @@ class ExtensionDiscovery {
       else {
         // Apply the weight of the originating profile directory.
         foreach ($this->profileDirectories as $weight => $profile_path) {
-          if (str_starts_with($file->getPath(), $profile_path)) {
+          if (\str_starts_with($file->getPath(), $profile_path)) {
             $origins[$key] = static::ORIGIN_PROFILE;
             $profiles[$key] = $weight;
             continue 2;
@@ -376,7 +376,7 @@ class ExtensionDiscovery {
     // 2   sites/all/modules/common/common.module
     // 3   modules/devel/devel.module
     // 4   sites/default/modules/custom/custom.module
-    array_multisort($origins, SORT_ASC, $profiles, SORT_ASC, $all_files);
+    \array_multisort($origins, SORT_ASC, $profiles, SORT_ASC, $all_files);
 
     return $all_files;
   }
@@ -430,7 +430,7 @@ class ExtensionDiscovery {
     $dir_prefix = ($dir == '' ? '' : "$dir/");
     $absolute_dir = ($dir == '' ? $this->root : $this->root . "/$dir");
 
-    if (!is_dir($absolute_dir)) {
+    if (!\is_dir($absolute_dir)) {
       return $files;
     }
     // Use Unix paths regardless of platform, skip dot directories, follow
@@ -467,7 +467,7 @@ class ExtensionDiscovery {
     foreach ($iterator as $key => $fileinfo) {
       // All extension names in Drupal have to be valid PHP function names due
       // to the module hook architecture.
-      if (!preg_match(static::PHP_FUNCTION_PATTERN, $fileinfo->getBasename('.info.yml'))) {
+      if (!\preg_match(static::PHP_FUNCTION_PATTERN, $fileinfo->getBasename('.info.yml'))) {
         continue;
       }
 
@@ -476,7 +476,7 @@ class ExtensionDiscovery {
       if ($this->infoParser === NULL) {
         $file = $fileinfo->openFile('r');
         while (!$type && !$file->eof()) {
-          preg_match('@^type:\s*(\'|")?(\w+)\1?\s*(?:\#.*)?$@', $file->fgets(), $matches);
+          \preg_match('@^type:\s*(\'|")?(\w+)\1?\s*(?:\#.*)?$@', $file->fgets(), $matches);
           if (isset($matches[2])) {
             $type = $matches[2];
           }

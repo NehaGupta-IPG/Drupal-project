@@ -71,7 +71,7 @@ class NestedFormTest extends FieldTestBase {
       'bundle' => 'entity_test',
       'label' => $this->randomMachineName() . '_label',
       'description' => '[site:name]_description',
-      'weight' => mt_rand(0, 127),
+      'weight' => \mt_rand(0, 127),
       'settings' => [
         'test_field_setting' => $this->randomMachineName(),
       ],

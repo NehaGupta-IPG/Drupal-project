@@ -108,7 +108,7 @@ class OffsetPage {
    *   An OffsetPage object with defaults.
    */
   public static function createFromQueryParameter($parameter) {
-    if (!is_array($parameter)) {
+    if (!\is_array($parameter)) {
       $cacheability = (new CacheableMetadata())->addCacheContexts(['url.query_args:page']);
       throw new CacheableBadRequestHttpException($cacheability, 'The page parameter needs to be an array.');
     }

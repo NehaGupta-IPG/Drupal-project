@@ -72,7 +72,7 @@ class Extension extends DrupalSqlBase {
    * {@inheritdoc}
    */
   public function prepareRow(Row $row) {
-    $row->setSourceProperty('info', unserialize($row->getSourceProperty('info')));
+    $row->setSourceProperty('info', \unserialize($row->getSourceProperty('info')));
     return parent::prepareRow($row);
   }
 

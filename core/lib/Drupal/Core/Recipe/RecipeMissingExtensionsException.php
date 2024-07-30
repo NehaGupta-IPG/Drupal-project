@@ -27,11 +27,11 @@ final class RecipeMissingExtensionsException extends \RuntimeException {
    *   [optional] The previous throwable used for the exception chaining.
    */
   public function __construct(public readonly array $extensions, string $message = "", int $code = 0, ?\Throwable $previous = NULL) {
-    assert(Inspector::assertAllStrings($extensions), 'Extension names must be strings.');
+    \assert(Inspector::assertAllStrings($extensions), 'Extension names must be strings.');
     if (!$message) {
       $sorted = $this->extensions;
-      sort($sorted);
-      $message = sprintf("The following extensions are missing and are required for this recipe: %s", implode(", ", $sorted));
+      \sort($sorted);
+      $message = \sprintf("The following extensions are missing and are required for this recipe: %s", \implode(", ", $sorted));
     }
     parent::__construct($message, $code, $previous);
   }

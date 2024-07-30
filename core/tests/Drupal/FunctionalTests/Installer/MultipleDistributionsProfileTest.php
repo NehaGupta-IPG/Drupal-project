@@ -47,8 +47,8 @@ class MultipleDistributionsProfileTest extends InstallerTestBase {
       ];
       // File API functions are not available yet.
       $path = $this->root . DIRECTORY_SEPARATOR . $this->siteDirectory . '/profiles/' . $name;
-      mkdir($path, 0777, TRUE);
-      file_put_contents("$path/$name.info.yml", Yaml::encode($info));
+      \mkdir($path, 0777, TRUE);
+      \file_put_contents("$path/$name.info.yml", Yaml::encode($info));
     }
     // Install the first distribution.
     $this->profile = 'distribution_one';

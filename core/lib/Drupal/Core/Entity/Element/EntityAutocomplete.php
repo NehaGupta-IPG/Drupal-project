@@ -99,17 +99,17 @@ class EntityAutocomplete extends Textfield {
   public static function valueCallback(&$element, $input, FormStateInterface $form_state) {
     // Process the #default_value property.
     if ($input === FALSE && isset($element['#default_value']) && $element['#process_default_value']) {
-      if (is_array($element['#default_value']) && $element['#tags'] !== TRUE) {
+      if (\is_array($element['#default_value']) && $element['#tags'] !== TRUE) {
         throw new \InvalidArgumentException('The #default_value property is an array but the form element does not allow multiple values.');
       }
-      elseif (!empty($element['#default_value']) && !is_array($element['#default_value'])) {
+      elseif (!empty($element['#default_value']) && !\is_array($element['#default_value'])) {
         // Convert the default value into an array for easier processing in
         // static::getEntityLabels().
         $element['#default_value'] = [$element['#default_value']];
       }
 
       if ($element['#default_value']) {
-        if (!(reset($element['#default_value']) instanceof EntityInterface)) {
+        if (!(\reset($element['#default_value']) instanceof EntityInterface)) {
           throw new \InvalidArgumentException('The #default_value property has to be an entity object or an array of entity objects.');
         }
 
@@ -121,8 +121,8 @@ class EntityAutocomplete extends Textfield {
 
     // Potentially the #value is set directly, so it contains the 'target_id'
     // array structure instead of a string.
-    if ($input !== FALSE && is_array($input)) {
-      $entity_ids = array_map(function (array $item) {
+    if ($input !== FALSE && \is_array($input)) {
+      $entity_ids = \array_map(function (array $item) {
         return $item['target_id'];
       }, $input);
 
@@ -178,7 +178,7 @@ class EntityAutocomplete extends Textfield {
       $element['#autocomplete_query_parameters']['entity_id'] = $selection_settings['entity']->id();
       unset($selection_settings['entity']);
     }
-    $data = serialize($selection_settings) . $element['#target_type'] . $element['#selection_handler'];
+    $data = \serialize($selection_settings) . $element['#target_type'] . $element['#selection_handler'];
     $selection_settings_key = Crypt::hmacBase64($data, Settings::getHashSalt());
 
     $key_value_storage = \Drupal::keyValue('entity_autocomplete');
@@ -203,7 +203,7 @@ class EntityAutocomplete extends Textfield {
     $value = NULL;
 
     // Check the value for emptiness, but allow the use of (string) "0".
-    if (!empty($element['#value']) || (is_string($element['#value']) && strlen($element['#value']))) {
+    if (!empty($element['#value']) || (\is_string($element['#value']) && \strlen($element['#value']))) {
       $options = $element['#selection_settings'] + [
         'target_type' => $element['#target_type'],
         'handler' => $element['#selection_handler'],
@@ -214,7 +214,7 @@ class EntityAutocomplete extends Textfield {
 
       // GET forms might pass the validated data around on the next request, in
       // which case it will already be in the expected format.
-      if (is_array($element['#value'])) {
+      if (\is_array($element['#value'])) {
         $value = $element['#value'];
       }
       else {
@@ -247,7 +247,7 @@ class EntityAutocomplete extends Textfield {
       // Check that the referenced entities are valid, if needed.
       if ($element['#validate_reference'] && !empty($value)) {
         // Validate existing entities.
-        $ids = array_reduce($value, function ($return, $item) {
+        $ids = \array_reduce($value, function ($return, $item) {
           if (isset($item['target_id'])) {
             $return[] = $item['target_id'];
           }
@@ -256,7 +256,7 @@ class EntityAutocomplete extends Textfield {
 
         if ($ids) {
           $valid_ids = $handler->validateReferenceableEntities($ids);
-          if ($invalid_ids = array_diff($ids, $valid_ids)) {
+          if ($invalid_ids = \array_diff($ids, $valid_ids)) {
             foreach ($invalid_ids as $invalid_id) {
               $form_state->setError($element, t('The referenced entity (%type: %id) does not exist.', [
                 '%type' => $element['#target_type'],
@@ -267,7 +267,7 @@ class EntityAutocomplete extends Textfield {
         }
 
         // Validate newly created entities.
-        $new_entities = array_reduce($value, function ($return, $item) {
+        $new_entities = \array_reduce($value, function ($return, $item) {
           if (isset($item['entity'])) {
             $return[] = $item['entity'];
           }
@@ -277,7 +277,7 @@ class EntityAutocomplete extends Textfield {
         if ($new_entities) {
           if ($autocreate) {
             $valid_new_entities = $handler->validateReferenceableNewEntities($new_entities);
-            $invalid_new_entities = array_diff_key($new_entities, $valid_new_entities);
+            $invalid_new_entities = \array_diff_key($new_entities, $valid_new_entities);
           }
           else {
             // If the selection handler does not support referencing newly
@@ -298,7 +298,7 @@ class EntityAutocomplete extends Textfield {
       // Use only the last value if the form element does not support multiple
       // matches (tags).
       if (!$element['#tags'] && !empty($value)) {
-        $last_value = $value[count($value) - 1];
+        $last_value = $value[\count($value) - 1];
         $value = $last_value['target_id'] ?? $last_value;
       }
     }
@@ -329,7 +329,7 @@ class EntityAutocomplete extends Textfield {
    */
   protected static function matchEntityByTitle(SelectionInterface $handler, $input, array &$element, FormStateInterface $form_state, $strict) {
     $entities_by_bundle = $handler->getReferenceableEntities($input, '=', 6);
-    $entities = array_reduce($entities_by_bundle, function ($flattened, $bundle_entities) {
+    $entities = \array_reduce($entities_by_bundle, function ($flattened, $bundle_entities) {
       return $flattened + $bundle_entities;
     }, []);
     $params = [
@@ -340,26 +340,26 @@ class EntityAutocomplete extends Textfield {
     if (empty($entities)) {
       if ($strict) {
         // Error if there are no entities available for a required field.
-        $form_state->setError($element, t('There are no @entity_type_plural matching "%value".', $params));
+        $form_state->setError($element, \t('There are no @entity_type_plural matching "%value".', $params));
       }
     }
-    elseif (count($entities) > 5) {
-      $params['@id'] = key($entities);
+    elseif (\count($entities) > 5) {
+      $params['@id'] = \key($entities);
       // Error if there are more than 5 matching entities.
-      $form_state->setError($element, t('Many @entity_type_plural are called %value. Specify the one you want by appending the id in parentheses, like "@value (@id)".', $params));
+      $form_state->setError($element, \t('Many @entity_type_plural are called %value. Specify the one you want by appending the id in parentheses, like "@value (@id)".', $params));
     }
-    elseif (count($entities) > 1) {
+    elseif (\count($entities) > 1) {
       // More helpful error if there are only a few matching entities.
       $multiples = [];
       foreach ($entities as $id => $name) {
         $multiples[] = $name . ' (' . $id . ')';
       }
       $params['@id'] = $id;
-      $form_state->setError($element, t('Multiple @entity_type_plural match this reference; "%multiple". Specify the one you want by appending the id in parentheses, like "@value (@id)".', ['%multiple' => strip_tags(implode('", "', $multiples))] + $params));
+      $form_state->setError($element, \t('Multiple @entity_type_plural match this reference; "%multiple". Specify the one you want by appending the id in parentheses, like "@value (@id)".', ['%multiple' => \strip_tags(\implode('", "', $multiples))] + $params));
     }
     else {
       // Take the one and only matching entity.
-      return key($entities);
+      return \key($entities);
     }
   }
 
@@ -386,7 +386,7 @@ class EntityAutocomplete extends Textfield {
 
       // Use the special view label, since some entities allow the label to be
       // viewed, even if the entity is not allowed to be viewed.
-      $label = ($entity->access('view label')) ? $entity->label() : t('- Restricted access -');
+      $label = ($entity->access('view label')) ? $entity->label() : \t('- Restricted access -');
 
       // Take into account "autocreated" entities.
       if (!$entity->isNew()) {
@@ -397,7 +397,7 @@ class EntityAutocomplete extends Textfield {
       $entity_labels[] = Tags::encode($label);
     }
 
-    return implode(', ', $entity_labels);
+    return \implode(', ', $entity_labels);
   }
 
   /**
@@ -415,7 +415,7 @@ class EntityAutocomplete extends Textfield {
     // Take "label (entity id)', match the ID from inside the parentheses.
     // @todo Add support for entities containing parentheses in their ID.
     // @see https://www.drupal.org/node/2520416
-    if (preg_match("/.+\s\(([^\)]+)\)/", $input, $matches)) {
+    if (\preg_match("/.+\s\(([^\)]+)\)/", $input, $matches)) {
       $match = $matches[1];
     }
 

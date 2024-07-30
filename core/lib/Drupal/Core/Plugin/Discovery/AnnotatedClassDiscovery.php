@@ -61,7 +61,7 @@ class AnnotatedClassDiscovery extends ComponentAnnotatedClassDiscovery {
         $subdir = '/' . $subdir;
       }
       $this->directorySuffix = $subdir;
-      $this->namespaceSuffix = str_replace('/', '\\', $subdir);
+      $this->namespaceSuffix = \str_replace('/', '\\', $subdir);
     }
     $this->rootNamespacesIterator = $root_namespaces;
     $plugin_namespaces = [];
@@ -103,10 +103,10 @@ class AnnotatedClassDiscovery extends ComponentAnnotatedClassDiscovery {
    *   The matching provider name, or NULL otherwise.
    */
   protected function getProviderFromNamespace($namespace) {
-    preg_match('|^Drupal\\\\(?<provider>[\w]+)\\\\|', $namespace, $matches);
+    \preg_match('|^Drupal\\\\(?<provider>[\w]+)\\\\|', $namespace, $matches);
 
     if (isset($matches['provider'])) {
-      return mb_strtolower($matches['provider']);
+      return \mb_strtolower($matches['provider']);
     }
 
     return NULL;

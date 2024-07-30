@@ -97,7 +97,7 @@ class CommentTranslationUITest extends ContentTranslationUITestBase {
    * {@inheritdoc}
    */
   protected function getTranslatorPermissions(): array {
-    return array_merge(parent::getTranslatorPermissions(), ['post comments', 'administer comments', 'access comments']);
+    return \array_merge(parent::getTranslatorPermissions(), ['post comments', 'administer comments', 'access comments']);
   }
 
   /**
@@ -178,7 +178,7 @@ class CommentTranslationUITest extends ContentTranslationUITestBase {
       $user = $this->drupalCreateUser();
       $values[$langcode] = [
         'uid' => $user->id(),
-        'created' => \Drupal::time()->getRequestTime() - mt_rand(0, 1000),
+        'created' => \Drupal::time()->getRequestTime() - \mt_rand(0, 1000),
       ];
       /** @var \Drupal\Core\Datetime\DateFormatterInterface $date_formatter */
       $date_formatter = $this->container->get('date.formatter');

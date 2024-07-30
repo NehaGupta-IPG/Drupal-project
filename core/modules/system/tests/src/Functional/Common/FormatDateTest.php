@@ -51,7 +51,7 @@ class FormatDateTest extends BrowserTestBase {
     /** @var \Drupal\Core\Datetime\DateFormatterInterface $date_formatter */
     $date_formatter = $this->container->get('date.formatter');
 
-    $timestamp = strtotime('2007-03-10T00:00:00+00:00');
+    $timestamp = \strtotime('2007-03-10T00:00:00+00:00');
     $this->assertSame($date_formatter->format($timestamp, 'example_style', '', 'America/Los_Angeles'), '9 Mar 07');
     $this->assertSame($date_formatter->format($timestamp, 'example_style_uppercase', '', 'America/Los_Angeles'), '9 Mar 2007');
     $this->assertSame($date_formatter->format($timestamp, 'undefined_style'), $date_formatter->format($timestamp, 'fallback'), 'Test DateFormatterInterface::format() defaulting to `fallback` when $type not found.');

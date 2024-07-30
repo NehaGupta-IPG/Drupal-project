@@ -294,7 +294,7 @@ class CommentForm extends ContentEntityForm {
       // Admin can leave the author ID blank to revert to anonymous.
       $author_id = $author_id ?: 0;
     }
-    if (!is_null($author_id)) {
+    if (!\is_null($author_id)) {
       if ($author_id === 0 && $form['author']['name']['#access']) {
         // Use the author name value when the form has access to the element and
         // the author ID is anonymous.
@@ -312,18 +312,18 @@ class CommentForm extends ContentEntityForm {
 
     // Validate the comment's subject. If not specified, extract from comment
     // body.
-    if (trim($comment->getSubject()) == '') {
+    if (\trim($comment->getSubject()) == '') {
       if ($comment->hasField('comment_body') && !$comment->comment_body->isEmpty()) {
         // The body may be in any format, so:
         // 1) Filter it into HTML
         // 2) Strip out all HTML tags
         // 3) Convert entities back to plain-text.
         $comment_text = $comment->comment_body->processed;
-        $comment->setSubject(Unicode::truncate(trim(Html::decodeEntities(strip_tags($comment_text))), 29, TRUE, TRUE));
+        $comment->setSubject(Unicode::truncate(\trim(Html::decodeEntities(\strip_tags($comment_text))), 29, TRUE, TRUE));
       }
       // Edge cases where the comment body is populated only by HTML tags will
       // require a default subject.
-      if (trim($comment->getSubject()) == '') {
+      if (\trim($comment->getSubject()) == '') {
         $comment->setSubject($this->t('(No subject)'));
       }
     }
@@ -334,7 +334,7 @@ class CommentForm extends ContentEntityForm {
    * {@inheritdoc}
    */
   protected function getEditedFieldNames(FormStateInterface $form_state) {
-    return array_merge(['created', 'name'], parent::getEditedFieldNames($form_state));
+    return \array_merge(['created', 'name'], parent::getEditedFieldNames($form_state));
   }
 
   /**
@@ -360,7 +360,7 @@ class CommentForm extends ContentEntityForm {
    *   The current state of the form.
    */
   public function preview(array &$form, FormStateInterface $form_state) {
-    $comment_preview = comment_preview($this->entity, $form_state);
+    $comment_preview = \comment_preview($this->entity, $form_state);
     $comment_preview['#title'] = $this->t('Preview comment');
     $form_state->set('comment_preview', $comment_preview);
     $form_state->setRebuild();

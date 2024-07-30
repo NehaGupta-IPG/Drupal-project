@@ -107,11 +107,11 @@ class MenuLinkTree implements MenuLinkTreeInterface {
       // Prepare the arguments for the menu tree manipulator callable; the first
       // argument is always the menu link tree.
       if (isset($manipulator['args'])) {
-        array_unshift($manipulator['args'], $tree);
-        $tree = call_user_func_array($callable, $manipulator['args']);
+        \array_unshift($manipulator['args'], $tree);
+        $tree = \call_user_func_array($callable, $manipulator['args']);
       }
       else {
-        $tree = call_user_func($callable, $tree);
+        $tree = \call_user_func($callable, $tree);
       }
     }
     return $tree;
@@ -140,12 +140,12 @@ class MenuLinkTree implements MenuLinkTreeInterface {
       // links.
       $build['#sorted'] = TRUE;
       // Get the menu name from the last link.
-      $item = end($items);
+      $item = \end($items);
       $link = $item['original_link'];
       $menu_name = $link->getMenuName();
       // Add the theme wrapper for outer markup.
       // Allow menu-specific theme overrides.
-      $build['#theme'] = 'menu__' . strtr($menu_name, '-', '_');
+      $build['#theme'] = 'menu__' . \strtr($menu_name, '-', '_');
       $build['#menu_name'] = $menu_name;
       $build['#items'] = $items;
       // Set cache tag.

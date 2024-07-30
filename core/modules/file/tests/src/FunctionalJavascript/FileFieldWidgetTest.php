@@ -75,7 +75,7 @@ class FileFieldWidgetTest extends WebDriverTestBase {
     $page = $this->getSession()->getPage();
     $assert_session = $this->assertSession();
 
-    $test_file = current($this->getTestFiles('text'));
+    $test_file = \current($this->getTestFiles('text'));
     $test_file_path = \Drupal::service('file_system')
       ->realpath($test_file->uri);
 
@@ -148,7 +148,7 @@ class FileFieldWidgetTest extends WebDriverTestBase {
     $page = $this->getSession()->getPage();
     $assert_session = $this->assertSession();
 
-    $test_file = current($this->getTestFiles('text'));
+    $test_file = \current($this->getTestFiles('text'));
     $test_file_path = \Drupal::service('file_system')
       ->realpath($test_file->uri);
 
@@ -169,7 +169,7 @@ class FileFieldWidgetTest extends WebDriverTestBase {
     $page->hasContent($test_file->name);
 
     // Create a new node and try to upload a file with an invalid extension.
-    $test_image = current($this->getTestFiles('image'));
+    $test_image = \current($this->getTestFiles('image'));
     $test_image_path = \Drupal::service('file_system')
       ->realpath($test_image->uri);
 
@@ -198,7 +198,7 @@ class FileFieldWidgetTest extends WebDriverTestBase {
     $web_driver = $this->getSession()->getDriver();
     $file_system = \Drupal::service('file_system');
 
-    $files = array_slice($this->getTestFiles('text'), 0, 3);
+    $files = \array_slice($this->getTestFiles('text'), 0, 3);
     $real_paths = [];
     foreach ($files as $file) {
       $real_paths[] = $file_system->realpath($file->uri);
@@ -211,7 +211,7 @@ class FileFieldWidgetTest extends WebDriverTestBase {
     // Tests that uploading multiple remote files works with remote path.
     $this->drupalGet("node/add/$type_name");
     $multiple_field = $this->getSession()->getPage()->findField('files[test_file_field_1_0][]');
-    $multiple_field->setValue(implode("\n", $remote_paths));
+    $multiple_field->setValue(\implode("\n", $remote_paths));
     $this->assertSession()->assertWaitOnAjaxRequest();
     $this->assertSession()->pageTextContains("Field {$field_name} can only hold {$cardinality} values but there were 3 uploaded. The following files have been omitted as a result: text-2.txt.");
   }
@@ -224,11 +224,11 @@ class FileFieldWidgetTest extends WebDriverTestBase {
    */
   public function getTestFile($type_name, $size = NULL) {
     // Get a file to upload.
-    $file = current($this->getTestFiles($type_name, $size));
+    $file = \current($this->getTestFiles($type_name, $size));
 
     // Add a filesize property to files as would be read by
     // \Drupal\file\Entity\File::load().
-    $file->filesize = filesize($file->uri);
+    $file->filesize = \filesize($file->uri);
 
     return File::create((array) $file);
   }

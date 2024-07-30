@@ -94,16 +94,16 @@ class PhpUnitTestRunner implements ContainerInjectionInterface {
     // reflection. We can determine the vendor directory based on that filename.
     $autoloader = require $this->appRoot . '/autoload.php';
     $reflector = new \ReflectionClass($autoloader);
-    $vendor_dir = dirname($reflector->getFileName(), 2);
+    $vendor_dir = \dirname($reflector->getFileName(), 2);
 
     // The file in Composer's bin dir is a *nix link, which does not work when
     // extracted from a tarball and generally not on Windows.
     $command = $vendor_dir . '/phpunit/phpunit/phpunit';
-    if (str_starts_with(PHP_OS, 'WIN')) {
+    if (\str_starts_with(PHP_OS, 'WIN')) {
       // On Windows it is necessary to run the script using the PHP executable.
       $php_executable_finder = new PhpExecutableFinder();
       $php = $php_executable_finder->find();
-      $command = $php . ' -f ' . escapeshellarg($command) . ' --';
+      $command = $php . ' -f ' . \escapeshellarg($command) . ' --';
     }
     return $command;
   }

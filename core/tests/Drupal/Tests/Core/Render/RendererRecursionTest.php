@@ -93,7 +93,7 @@ class RendererRecursionTest extends RendererTestBase {
 
     $this->assertEquals('<p>This is a rendered placeholder!</p><p>Rendered!</p>', $output, 'Rendered output as expected, with the placeholder replaced.');
     $this->assertContains('test:complex_child', $page['#cache']['tags'], 'Cache tag bubbling performed.');
-    $this->assertContains('dynamic_animal', array_keys($page['#attached']['drupalSettings']), 'Asset bubbling performed.');
+    $this->assertContains('dynamic_animal', \array_keys($page['#attached']['drupalSettings']), 'Asset bubbling performed.');
   }
 
   /**

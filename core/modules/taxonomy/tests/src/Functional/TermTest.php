@@ -243,7 +243,7 @@ class TermTest extends TaxonomyTestBase {
       $term_objects[$key] = \Drupal::entityTypeManager()->getStorage('taxonomy_term')->loadByProperties([
         'name' => $term,
       ]);
-      $term_objects[$key] = reset($term_objects[$key]);
+      $term_objects[$key] = \reset($term_objects[$key]);
     }
 
     // Get the node.
@@ -299,7 +299,7 @@ class TermTest extends TaxonomyTestBase {
     $terms = \Drupal::entityTypeManager()->getStorage('taxonomy_term')->loadByProperties([
       'name' => $edit['name[0][value]'],
     ]);
-    $term = reset($terms);
+    $term = \reset($terms);
     $this->assertNotNull($term, 'Term found in database.');
 
     // Submitting a term takes us to the add page; we need the List page.
@@ -322,7 +322,7 @@ class TermTest extends TaxonomyTestBase {
     $terms = \Drupal::entityTypeManager()->getStorage('taxonomy_term')->loadByProperties([
       'name' => 'Child term',
     ]);
-    $child = reset($terms);
+    $child = \reset($terms);
     $this->assertNotNull($child, 'Child term found in database.');
     $this->assertEquals($term->id(), $child->get('parent')->getValue()[0]['target_id']);
 
@@ -430,7 +430,7 @@ class TermTest extends TaxonomyTestBase {
     $terms = \Drupal::entityTypeManager()->getStorage('taxonomy_term')->loadByProperties([
       'name' => $edit['name[0][value]'],
     ]);
-    $term = reset($terms);
+    $term = \reset($terms);
     $this->assertNotNull($term, 'Term found in database.');
 
     // The term appears on the vocab list page.
@@ -617,7 +617,7 @@ class TermTest extends TaxonomyTestBase {
     \Drupal::entityTypeManager()->getStorage('taxonomy_term')->resetCache();
     /** @var \Drupal\taxonomy\TermInterface[] $terms */
     $terms = \Drupal::entityTypeManager()->getStorage('taxonomy_term')->loadByProperties(['name' => $name]);
-    return reset($terms);
+    return \reset($terms);
   }
 
   /**
@@ -634,7 +634,7 @@ class TermTest extends TaxonomyTestBase {
     foreach ($term->get('parent') as $item) {
       $parent_tids[] = (int) $item->target_id;
     }
-    sort($parent_tids);
+    \sort($parent_tids);
 
     return $parent_tids;
   }
@@ -686,7 +686,7 @@ class TermTest extends TaxonomyTestBase {
     $terms = \Drupal::entityTypeManager()->getStorage('taxonomy_term')->loadByProperties([
       'name' => $edit['name[0][value]'],
     ]);
-    $term = reset($terms);
+    $term = \reset($terms);
     $this->assertNotNull($term, 'Term found in database.');
 
     // Check the breadcrumb on the term edit page.

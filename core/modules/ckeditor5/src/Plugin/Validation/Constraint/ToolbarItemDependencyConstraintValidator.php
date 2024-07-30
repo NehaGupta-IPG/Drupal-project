@@ -30,7 +30,7 @@ class ToolbarItemDependencyConstraintValidator extends ConstraintValidator imple
     }
 
     $toolbar_items = $this->context->getRoot()->get('settings.toolbar.items')->toArray();
-    if (!in_array($constraint->toolbarItem, $toolbar_items, TRUE)) {
+    if (!\in_array($constraint->toolbarItem, $toolbar_items, TRUE)) {
       $this->context->buildViolation($constraint->message)
         ->setParameter('%toolbar_item', $constraint->toolbarItem)
         ->addViolation();

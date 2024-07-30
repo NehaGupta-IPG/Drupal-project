@@ -101,11 +101,11 @@ class DemoUmamiProfileTest extends BrowserTestBase {
         continue;
       }
 
-      $this->assertSame([], array_map(
+      $this->assertSame([], \array_map(
         function (ConstraintViolation $v) {
           return (string) $v->getMessage();
         },
-        iterator_to_array(CKEditor5::validatePair(
+        \iterator_to_array(CKEditor5::validatePair(
           $editor,
           $editor->getFilterFormat()
         ))
@@ -178,7 +178,7 @@ class DemoUmamiProfileTest extends BrowserTestBase {
     $nodes = $this->container->get('entity_type.manager')
       ->getStorage('node')
       ->loadByProperties(['title' => 'Deep mediterranean quiche']);
-    $node = reset($nodes);
+    $node = \reset($nodes);
     $this->drupalGet($node->toUrl('edit-form'));
     $assert_session->statusCodeEquals(200);
 
@@ -297,7 +297,7 @@ class DemoUmamiProfileTest extends BrowserTestBase {
       ->getStorage('node')
       ->loadByProperties(['title' => 'Deep mediterranean quiche']);
     /** @var \Drupal\node\Entity\Node $recipe_node */
-    $recipe_node = reset($nodes);
+    $recipe_node = \reset($nodes);
 
     // Check when editing a node, the warning is visible.
     $this->drupalGet($recipe_node->toUrl('edit-form'));

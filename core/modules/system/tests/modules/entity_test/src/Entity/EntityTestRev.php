@@ -77,8 +77,8 @@ class EntityTestRev extends EntityTest {
     $fields['user_id']->setRevisionable(TRUE);
 
     $fields['non_rev_field'] = BaseFieldDefinition::create('string')
-      ->setLabel(t('Non Revisionable Field'))
-      ->setDescription(t('A non-revisionable test field.'))
+      ->setLabel(\t('Non Revisionable Field'))
+      ->setDescription(\t('A non-revisionable test field.'))
       ->setRevisionable(FALSE)
       ->setTranslatable(TRUE)
       ->setCardinality(1)

@@ -151,7 +151,7 @@ abstract class FileMediaFormatterBase extends FileFormatterBase implements FileM
    */
   protected function prepareAttributes(array $additional_attributes = []) {
     $attributes = new Attribute();
-    foreach (array_merge(['controls', 'autoplay', 'loop'], $additional_attributes) as $attribute) {
+    foreach (\array_merge(['controls', 'autoplay', 'loop'], $additional_attributes) as $attribute) {
       if ($this->getSetting($attribute)) {
         $attributes->setAttribute($attribute, $attribute);
       }
@@ -169,7 +169,7 @@ abstract class FileMediaFormatterBase extends FileFormatterBase implements FileM
    *   TRUE if the MIME type applies, FALSE otherwise.
    */
   protected static function mimeTypeApplies($mime_type) {
-    [$type] = explode('/', $mime_type, 2);
+    [$type] = \explode('/', $mime_type, 2);
     return $type === static::getMediaType();
   }
 

@@ -99,10 +99,10 @@ class SortArray {
    *   The comparison result for uasort().
    */
   public static function sortByKeyString($a, $b, $key) {
-    $a_title = (is_array($a) && isset($a[$key])) ? $a[$key] : '';
-    $b_title = (is_array($b) && isset($b[$key])) ? $b[$key] : '';
+    $a_title = (\is_array($a) && isset($a[$key])) ? $a[$key] : '';
+    $b_title = (\is_array($b) && isset($b[$key])) ? $b[$key] : '';
 
-    return strnatcasecmp($a_title, $b_title);
+    return \strnatcasecmp($a_title, $b_title);
   }
 
   /**
@@ -119,8 +119,8 @@ class SortArray {
    *   The comparison result for uasort().
    */
   public static function sortByKeyInt($a, $b, $key) {
-    $a_weight = (is_array($a) && isset($a[$key])) ? $a[$key] : 0;
-    $b_weight = (is_array($b) && isset($b[$key])) ? $b[$key] : 0;
+    $a_weight = (\is_array($a) && isset($a[$key])) ? $a[$key] : 0;
+    $b_weight = (\is_array($b) && isset($b[$key])) ? $b[$key] : 0;
 
     return $a_weight <=> $b_weight;
   }

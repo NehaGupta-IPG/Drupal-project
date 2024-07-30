@@ -35,7 +35,7 @@ class ModuleHandlerTest extends KernelTestBase {
     if ($database_module !== 'core') {
       $module_list[] = $database_module;
     }
-    sort($module_list);
+    \sort($module_list);
     $this->assertModuleList($module_list, 'Initial');
 
     // Try to install a new module.
@@ -58,7 +58,7 @@ class ModuleHandlerTest extends KernelTestBase {
       'menu' => 'core/modules/menu/menu.module',
     ];
     $this->moduleHandler()->setModuleList($fixed_list);
-    $new_module_list = array_combine(array_keys($fixed_list), array_keys($fixed_list));
+    $new_module_list = \array_combine(\array_keys($fixed_list), \array_keys($fixed_list));
     $this->assertModuleList($new_module_list, 'When using a fixed list');
   }
 
@@ -73,8 +73,8 @@ class ModuleHandlerTest extends KernelTestBase {
    * @internal
    */
   protected function assertModuleList(array $expected_values, string $condition): void {
-    $expected_values = array_values(array_unique($expected_values));
-    $enabled_modules = array_keys($this->container->get('module_handler')->getModuleList());
+    $expected_values = \array_values(\array_unique($expected_values));
+    $enabled_modules = \array_keys($this->container->get('module_handler')->getModuleList());
     $this->assertEquals($expected_values, $enabled_modules, "$condition: extension handler returns correct results");
   }
 
@@ -342,7 +342,7 @@ class ModuleHandlerTest extends KernelTestBase {
     // Verify that the stream wrapper is available even without calling
     // \Drupal::service('stream_wrapper_manager')->getWrappers() again.
     // If the stream wrapper is not available file_exists() will raise a notice.
-    file_exists('dummy://');
+    \file_exists('dummy://');
     $stream_wrappers = \Drupal::service('stream_wrapper_manager')->getWrappers();
     $this->assertTrue(isset($stream_wrappers['dummy']));
     $this->assertTrue(isset($stream_wrappers['dummy1']));

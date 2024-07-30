@@ -17,7 +17,7 @@ class HeadersCacheContext extends RequestStackCacheContextBase implements Calcul
    * {@inheritdoc}
    */
   public static function getLabel() {
-    return t('HTTP headers');
+    return \t('HTTP headers');
   }
 
   /**
@@ -27,15 +27,15 @@ class HeadersCacheContext extends RequestStackCacheContextBase implements Calcul
     if ($header === NULL) {
       $headers = $this->requestStack->getCurrentRequest()->headers->all();
       // Order headers by name to have less cache variations.
-      ksort($headers);
+      \ksort($headers);
       $result = '';
       foreach ($headers as $name => $value) {
         if ($result) {
           $result .= '&';
         }
         // Sort values to minimize cache variations.
-        sort($value);
-        $result .= $name . '=' . implode(',', $value);
+        \sort($value);
+        $result .= $name . '=' . \implode(',', $value);
       }
       return $result;
     }

@@ -30,9 +30,9 @@ class Upsert extends QueryUpsert {
     foreach ($this->insertValues as $insert_values) {
       foreach ($this->insertFields as $idx => $field) {
         if (isset($table_information->blob_fields[$field]) && $insert_values[$idx] !== NULL) {
-          $blobs[$blob_count] = fopen('php://memory', 'a');
-          fwrite($blobs[$blob_count], $insert_values[$idx]);
-          rewind($blobs[$blob_count]);
+          $blobs[$blob_count] = \fopen('php://memory', 'a');
+          \fwrite($blobs[$blob_count], $insert_values[$idx]);
+          \rewind($blobs[$blob_count]);
 
           $stmt->getClientStatement()->bindParam(':db_insert_placeholder_' . $max_placeholder++, $blobs[$blob_count], \PDO::PARAM_LOB);
 
@@ -46,7 +46,7 @@ class Upsert extends QueryUpsert {
       // Check if values for a serial field has been passed.
       if (!empty($table_information->serial_fields)) {
         foreach ($table_information->serial_fields as $index => $serial_field) {
-          $serial_key = array_search($serial_field, $this->insertFields);
+          $serial_key = \array_search($serial_field, $this->insertFields);
           if ($serial_key !== FALSE) {
             $serial_value = $insert_values[$serial_key];
 
@@ -98,15 +98,15 @@ class Upsert extends QueryUpsert {
     $comments = $this->connection->makeComment($this->comments);
 
     // Default fields are always placed first for consistency.
-    $insert_fields = array_merge($this->defaultFields, $this->insertFields);
-    $insert_fields = array_map(function ($field) {
+    $insert_fields = \array_merge($this->defaultFields, $this->insertFields);
+    $insert_fields = \array_map(function ($field) {
       return $this->connection->escapeField($field);
     }, $insert_fields);
 
-    $query = $comments . 'INSERT INTO {' . $this->table . '} (' . implode(', ', $insert_fields) . ') VALUES ';
+    $query = $comments . 'INSERT INTO {' . $this->table . '} (' . \implode(', ', $insert_fields) . ') VALUES ';
 
     $values = $this->getInsertPlaceholderFragment($this->insertValues, $this->defaultFields);
-    $query .= implode(', ', $values);
+    $query .= \implode(', ', $values);
 
     // Updating the unique / primary key is not necessary.
     unset($insert_fields[$this->key]);
@@ -118,7 +118,7 @@ class Upsert extends QueryUpsert {
       $update[] = "$field = EXCLUDED.$field";
     }
 
-    $query .= ' ON CONFLICT (' . $this->connection->escapeField($this->key) . ') DO UPDATE SET ' . implode(', ', $update);
+    $query .= ' ON CONFLICT (' . $this->connection->escapeField($this->key) . ') DO UPDATE SET ' . \implode(', ', $update);
 
     return $query;
   }

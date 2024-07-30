@@ -68,7 +68,7 @@ class IncludeResolver {
    *   Thrown if a storage handler couldn't be loaded.
    */
   public function resolve($data, $include_parameter) {
-    assert($data instanceof ResourceObject || $data instanceof ResourceObjectData);
+    \assert($data instanceof ResourceObject || $data instanceof ResourceObjectData);
     $data = $data instanceof ResourceObjectData ? $data : new ResourceObjectData([$data], 1);
     $include_tree = static::toIncludeTree($data, $include_parameter);
     return IncludedData::deduplicate($this->resolveIncludeTree($include_tree, $data));
@@ -99,13 +99,13 @@ class IncludeResolver {
    *   Thrown if a storage handler couldn't be loaded.
    */
   protected function resolveIncludeTree(array $include_tree, Data $data, ?Data $includes = NULL) {
-    $includes = is_null($includes) ? new IncludedData([]) : $includes;
+    $includes = \is_null($includes) ? new IncludedData([]) : $includes;
     foreach ($include_tree as $field_name => $children) {
       $references = [];
       foreach ($data as $resource_object) {
         // Some objects in the collection may be LabelOnlyResourceObjects or
         // EntityAccessDeniedHttpException objects.
-        assert($resource_object instanceof ResourceIdentifierInterface);
+        \assert($resource_object instanceof ResourceIdentifierInterface);
         $public_field_name = $resource_object->getResourceType()->getPublicName($field_name);
 
         if ($resource_object instanceof LabelOnlyResourceObject) {
@@ -153,11 +153,11 @@ class IncludeResolver {
       }
       foreach ($references as $target_type => $ids) {
         $entity_storage = $this->entityTypeManager->getStorage($target_type);
-        $targeted_entities = $entity_storage->loadMultiple(array_unique($ids));
-        $access_checked_entities = array_map(function (EntityInterface $entity) {
+        $targeted_entities = $entity_storage->loadMultiple(\array_unique($ids));
+        $access_checked_entities = \array_map(function (EntityInterface $entity) {
           return $this->entityAccessChecker->getAccessCheckedResourceObject($entity);
         }, $targeted_entities);
-        $targeted_collection = new IncludedData(array_filter($access_checked_entities, function (ResourceIdentifierInterface $resource_object) {
+        $targeted_collection = new IncludedData(\array_filter($access_checked_entities, function (ResourceIdentifierInterface $resource_object) {
           return !$resource_object->getResourceType()->isInternal();
         }));
         $includes = static::resolveIncludeTree($children, $targeted_collection, IncludedData::merge($includes, $targeted_collection));
@@ -180,10 +180,10 @@ class IncludeResolver {
    */
   protected static function toIncludeTree(ResourceObjectData $data, $include_parameter) {
     // $include_parameter: 'one.two.three, one.two.four'.
-    $include_paths = array_map('trim', explode(',', $include_parameter));
+    $include_paths = \array_map('trim', \explode(',', $include_parameter));
     // $exploded_paths: [['one', 'two', 'three'], ['one', 'two', 'four']].
-    $exploded_paths = array_map(function ($include_path) {
-      return array_map('trim', explode('.', $include_path));
+    $exploded_paths = \array_map(function ($include_path) {
+      return \array_map('trim', \explode('.', $include_path));
     }, $include_paths);
     $resolved_paths_per_resource_type = [];
     /** @var \Drupal\jsonapi\JsonApiResource\ResourceIdentifierInterface $resource_object */
@@ -195,7 +195,7 @@ class IncludeResolver {
       }
       $resolved_paths_per_resource_type[$resource_type_name] = static::resolveInternalIncludePaths($resource_type, $exploded_paths);
     }
-    $resolved_paths = array_reduce($resolved_paths_per_resource_type, 'array_merge', []);
+    $resolved_paths = \array_reduce($resolved_paths_per_resource_type, 'array_merge', []);
     return static::buildTree($resolved_paths);
   }
 
@@ -214,13 +214,13 @@ class IncludeResolver {
    * @see self::buildTree
    */
   protected static function resolveInternalIncludePaths(ResourceType $base_resource_type, array $paths) {
-    $internal_paths = array_map(function ($exploded_path) use ($base_resource_type) {
+    $internal_paths = \array_map(function ($exploded_path) use ($base_resource_type) {
       if (empty($exploded_path)) {
         return [];
       }
       return FieldResolver::resolveInternalIncludePath($base_resource_type, $exploded_path);
     }, $paths);
-    $flattened_paths = array_reduce($internal_paths, 'array_merge', []);
+    $flattened_paths = \array_reduce($internal_paths, 'array_merge', []);
     return $flattened_paths;
   }
 
@@ -253,13 +253,13 @@ class IncludeResolver {
   protected static function buildTree(array $paths) {
     $merged = [];
     foreach ($paths as $parts) {
-      if (!$field_name = array_shift($parts)) {
+      if (!$field_name = \array_shift($parts)) {
         continue;
       }
       $previous = $merged[$field_name] ?? [];
-      $merged[$field_name] = array_merge($previous, [$parts]);
+      $merged[$field_name] = \array_merge($previous, [$parts]);
     }
-    return !empty($merged) ? array_map([static::class, __FUNCTION__], $merged) : $merged;
+    return !empty($merged) ? \array_map([static::class, __FUNCTION__], $merged) : $merged;
   }
 
 }

@@ -32,7 +32,7 @@ class ShutdownFunctionsTest extends BrowserTestBase {
     // This test intentionally throws an exception in a PHP shutdown function.
     // Prevent it from being interpreted as an actual test failure.
     // Not using File API; a potential error must trigger a PHP warning.
-    unlink(\Drupal::root() . '/' . $this->siteDirectory . '/error.log');
+    \unlink(\Drupal::root() . '/' . $this->siteDirectory . '/error.log');
     parent::tearDown();
   }
 
@@ -47,10 +47,10 @@ class ShutdownFunctionsTest extends BrowserTestBase {
     // If using PHP-FPM or output buffering, the response will be flushed to
     // the client before shutdown functions have fired.
     // @see \Drupal\system_test\Controller\SystemTestController::shutdownFunctions()
-    $response_will_flush = strpos($this->getSession()->getPage()->getContent(), 'The response will flush before shutdown functions are called.');
+    $response_will_flush = \strpos($this->getSession()->getPage()->getContent(), 'The response will flush before shutdown functions are called.');
     if ($response_will_flush) {
       // We need to wait to ensure that the shutdown functions have fired.
-      sleep(1);
+      \sleep(1);
     }
     $this->assertEquals([$arg1, $arg2], \Drupal::state()->get('_system_test_first_shutdown_function'));
     $this->assertEquals([$arg1, $arg2], \Drupal::state()->get('_system_test_second_shutdown_function'));

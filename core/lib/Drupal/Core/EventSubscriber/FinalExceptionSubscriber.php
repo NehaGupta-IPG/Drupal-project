@@ -118,7 +118,7 @@ class FinalExceptionSubscriber implements EventSubscriberInterface {
         // While the second trace is the error source and also contained in the
         // message, the message doesn't contain argument values, so we output it
         // once more in the backtrace.
-        array_shift($backtrace);
+        \array_shift($backtrace);
 
         // Generate a backtrace containing only scalar argument values.
         $error['@backtrace'] = Error::formatBacktrace($backtrace);
@@ -153,7 +153,7 @@ class FinalExceptionSubscriber implements EventSubscriberInterface {
    */
   public function on4xx(ExceptionEvent $event) {
     $exception = $event->getThrowable();
-    if ($exception && $exception instanceof HttpExceptionInterface && str_starts_with((string) $exception->getStatusCode(), '4')) {
+    if ($exception && $exception instanceof HttpExceptionInterface && \str_starts_with((string) $exception->getStatusCode(), '4')) {
       $message = PlainTextOutput::renderFromHtml($exception->getMessage());
       // If the exception is cacheable, generate a cacheable response.
       if ($exception instanceof CacheableDependencyInterface) {
@@ -202,7 +202,7 @@ class FinalExceptionSubscriber implements EventSubscriberInterface {
    * @see \error_displayable
    */
   protected function isErrorDisplayable($error) {
-    return error_displayable($error);
+    return \error_displayable($error);
   }
 
   /**
@@ -220,9 +220,9 @@ class FinalExceptionSubscriber implements EventSubscriberInterface {
   protected function simplifyFileInError($error) {
     // Attempt to reduce verbosity by removing DRUPAL_ROOT from the file path
     // in the message. This does not happen for (false) security.
-    $root_length = strlen(DRUPAL_ROOT);
-    if (substr($error['%file'], 0, $root_length) == DRUPAL_ROOT) {
-      $error['%file'] = substr($error['%file'], $root_length + 1);
+    $root_length = \strlen(DRUPAL_ROOT);
+    if (\substr($error['%file'], 0, $root_length) == DRUPAL_ROOT) {
+      $error['%file'] = \substr($error['%file'], $root_length + 1);
     }
     return $error;
   }

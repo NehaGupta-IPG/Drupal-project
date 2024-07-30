@@ -87,9 +87,9 @@ class LinkUri extends ProcessPluginBase implements ContainerFactoryPluginInterfa
    */
   public function transform($value, MigrateExecutableInterface $migrate_executable, Row $row, $destination_property) {
 
-    $path = ltrim($value, '/');
+    $path = \ltrim($value, '/');
 
-    if (parse_url($path, PHP_URL_SCHEME) === NULL) {
+    if (\parse_url($path, PHP_URL_SCHEME) === NULL) {
       if ($path == '<front>') {
         $path = '';
       }
@@ -107,7 +107,7 @@ class LinkUri extends ProcessPluginBase implements ContainerFactoryPluginInterfa
       $url = Url::fromUri($path);
       if ($url->isRouted()) {
         $route_name = $url->getRouteName();
-        foreach (array_keys($this->entityTypeManager->getDefinitions()) as $entity_type_id) {
+        foreach (\array_keys($this->entityTypeManager->getDefinitions()) as $entity_type_id) {
           if ($route_name == "entity.$entity_type_id.canonical" && isset($url->getRouteParameters()[$entity_type_id])) {
             return "entity:$entity_type_id/" . $url->getRouteParameters()[$entity_type_id];
           }
@@ -121,7 +121,7 @@ class LinkUri extends ProcessPluginBase implements ContainerFactoryPluginInterfa
           return $url->getUri();
         }
         else {
-          throw new MigrateException(sprintf('The path "%s" failed validation.', $path));
+          throw new MigrateException(\sprintf('The path "%s" failed validation.', $path));
         }
       }
     }

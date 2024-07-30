@@ -44,7 +44,7 @@ class TextItemBaseTest extends KernelTestBase {
     // max_length of the field.
     $field_definition->setSetting('max_length', $max_length);
     $sample_value = TextItemBase::generateSampleValue($field_definition);
-    $this->assertEquals($max_length, strlen($sample_value['value']));
+    $this->assertEquals($max_length, \strlen($sample_value['value']));
   }
 
   /**

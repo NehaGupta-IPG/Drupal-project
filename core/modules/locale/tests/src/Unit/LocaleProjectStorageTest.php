@@ -51,38 +51,38 @@ class LocaleProjectStorageTest extends UnitTestCase {
 
     // Add project 'b'.
     $this->projectStorage->set('b', ['name' => 'b']);
-    $this->assertSame(['b'], array_keys($this->projectStorage->getAll()));
+    $this->assertSame(['b'], \array_keys($this->projectStorage->getAll()));
 
     // Add project 'c' and confirm alphabetical order.
     $this->projectStorage->set('c', ['name' => 'c']);
-    $this->assertSame(['b', 'c'], array_keys($this->projectStorage->getAll()));
+    $this->assertSame(['b', 'c'], \array_keys($this->projectStorage->getAll()));
 
     // Add project 'a' and confirm 'a' is first.
     $this->projectStorage->set('a', ['name' => 'a']);
-    $this->assertSame(['a', 'b', 'c'], array_keys($this->projectStorage->getAll()));
+    $this->assertSame(['a', 'b', 'c'], \array_keys($this->projectStorage->getAll()));
 
     // Add project 'd' with a negative weight and confirm 'd' is first.
     $this->projectStorage->set('d', ['name' => 'd', 'weight' => -1]);
-    $this->assertSame(['d', 'a', 'b', 'c'], array_keys($this->projectStorage->getAll()));
+    $this->assertSame(['d', 'a', 'b', 'c'], \array_keys($this->projectStorage->getAll()));
 
     // Add project 'aa' with a positive weight and confirm 'aa' is last.
     $this->projectStorage->set('aa', ['name' => 'aa', 'weight' => 1]);
-    $this->assertSame(['d', 'a', 'b', 'c', 'aa'], array_keys($this->projectStorage->getAll()));
+    $this->assertSame(['d', 'a', 'b', 'c', 'aa'], \array_keys($this->projectStorage->getAll()));
 
     // Delete project 'a'.
     $this->projectStorage->delete('a');
-    $this->assertSame(['d', 'b', 'c', 'aa'], array_keys($this->projectStorage->getAll()));
+    $this->assertSame(['d', 'b', 'c', 'aa'], \array_keys($this->projectStorage->getAll()));
 
     // Add project 'e' with a lower negative weight than 'd' and confirm 'e' is
     // first.
     $this->projectStorage->set('e', ['name' => 'e', 'weight' => -5]);
-    $this->assertSame(['e', 'd', 'b', 'c', 'aa'], array_keys($this->projectStorage->getAll()));
+    $this->assertSame(['e', 'd', 'b', 'c', 'aa'], \array_keys($this->projectStorage->getAll()));
 
     // Pretend there is a container rebuild by generating a new
     // LocaleProjectStorage object with the same data.
     $this->projectStorage = new LocaleProjectStorage($this->keyValueMemoryFactory);
     $this->projectStorage->set('z', ['name' => 'z']);
-    $this->assertSame(['e', 'd', 'b', 'c', 'z', 'aa'], array_keys($this->projectStorage->getAll()));
+    $this->assertSame(['e', 'd', 'b', 'c', 'z', 'aa'], \array_keys($this->projectStorage->getAll()));
 
     // Now delete all projects.
     $this->projectStorage->deleteAll();
@@ -91,7 +91,7 @@ class LocaleProjectStorageTest extends UnitTestCase {
     // Add project 'z' before project 'a' and confirm 'a' is first.
     $this->projectStorage->set('z', ['name' => 'z']);
     $this->projectStorage->set('a', ['name' => 'a']);
-    $this->assertSame(['a', 'z'], array_keys($this->projectStorage->getAll()));
+    $this->assertSame(['a', 'z'], \array_keys($this->projectStorage->getAll()));
   }
 
   /**

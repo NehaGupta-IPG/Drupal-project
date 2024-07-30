@@ -41,7 +41,7 @@ class WorkspaceMerger implements WorkspaceMergerInterface {
       foreach ($this->getDifferringRevisionIdsOnSource() as $entity_type_id => $revision_difference) {
         $entity_type = $this->entityTypeManager->getDefinition($entity_type_id);
         $revisions_on_source = $this->entityTypeManager->getStorage($entity_type_id)
-          ->loadMultipleRevisions(array_keys($revision_difference));
+          ->loadMultipleRevisions(\array_keys($revision_difference));
 
         // Clear the tracked entities of the source workspace.
         $this->workspaceTracker->deleteTrackedEntities($this->sourceWorkspace->id(), $entity_type_id, $revision_difference, array_keys($revision_difference));
@@ -117,7 +117,7 @@ class WorkspaceMerger implements WorkspaceMergerInterface {
       if (!isset($tracked_entities_on_source[$entity_type_id])) {
         $target_revision_difference[$entity_type_id] = $tracked_revisions;
       }
-      elseif ($revision_difference = array_diff_key($tracked_revisions, $tracked_entities_on_source[$entity_type_id])) {
+      elseif ($revision_difference = \array_diff_key($tracked_revisions, $tracked_entities_on_source[$entity_type_id])) {
         $target_revision_difference[$entity_type_id] = $revision_difference;
       }
     }
@@ -141,7 +141,7 @@ class WorkspaceMerger implements WorkspaceMergerInterface {
       if (!isset($tracked_entities_on_target[$entity_type_id])) {
         $source_revision_difference[$entity_type_id] = $tracked_revisions;
       }
-      elseif ($revision_difference = array_diff_key($tracked_revisions, $tracked_entities_on_target[$entity_type_id])) {
+      elseif ($revision_difference = \array_diff_key($tracked_revisions, $tracked_entities_on_target[$entity_type_id])) {
         $source_revision_difference[$entity_type_id] = $revision_difference;
       }
     }
@@ -154,7 +154,7 @@ class WorkspaceMerger implements WorkspaceMergerInterface {
    */
   public function getNumberOfChangesOnTarget() {
     $total_changes = $this->getDifferringRevisionIdsOnTarget();
-    return count($total_changes, COUNT_RECURSIVE) - count($total_changes);
+    return \count($total_changes, COUNT_RECURSIVE) - \count($total_changes);
   }
 
   /**
@@ -162,7 +162,7 @@ class WorkspaceMerger implements WorkspaceMergerInterface {
    */
   public function getNumberOfChangesOnSource() {
     $total_changes = $this->getDifferringRevisionIdsOnSource();
-    return count($total_changes, COUNT_RECURSIVE) - count($total_changes);
+    return \count($total_changes, COUNT_RECURSIVE) - \count($total_changes);
   }
 
 }

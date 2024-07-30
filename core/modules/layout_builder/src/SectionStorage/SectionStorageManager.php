@@ -59,11 +59,11 @@ class SectionStorageManager extends DefaultPluginManager implements SectionStora
 
     // Sort the definitions by their weight while preserving the original order
     // for those with matching weights.
-    $weights = array_map(function (SectionStorageDefinition $definition) {
+    $weights = \array_map(function (SectionStorageDefinition $definition) {
       return $definition->getWeight();
     }, $definitions);
-    $ids = array_keys($definitions);
-    array_multisort($weights, $ids, $definitions);
+    $ids = \array_keys($definitions);
+    \array_multisort($weights, $ids, $definitions);
     return $definitions;
   }
 
@@ -85,7 +85,7 @@ class SectionStorageManager extends DefaultPluginManager implements SectionStora
    * {@inheritdoc}
    */
   public function findByContext(array $contexts, RefinableCacheableDependencyInterface $cacheability) {
-    $storage_types = array_keys($this->contextHandler->filterPluginDefinitionsByContexts($contexts, $this->getDefinitions()));
+    $storage_types = \array_keys($this->contextHandler->filterPluginDefinitionsByContexts($contexts, $this->getDefinitions()));
 
     // Add the manager as a cacheable dependency in order to vary by changes to
     // the plugin definitions.

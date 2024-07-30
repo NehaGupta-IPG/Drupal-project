@@ -33,7 +33,7 @@ class ProviderException extends \Exception {
    */
   public function __construct($message, ?Provider $provider = NULL, ?\Throwable $previous = NULL) {
     $this->provider = $provider;
-    $message = str_replace('@name', $provider ? $provider->getName() : '<unknown>', $message);
+    $message = \str_replace('@name', $provider ? $provider->getName() : '<unknown>', $message);
     parent::__construct($message, 0, $previous);
   }
 

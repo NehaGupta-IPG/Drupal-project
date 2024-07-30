@@ -79,7 +79,7 @@ class WorkspaceViewBuilder extends EntityViewBuilder {
       $changes_count = [];
       $all_tracked_entities = $this->workspaceTracker->getTrackedEntities($entity->id());
       foreach ($all_tracked_entities as $entity_type_id => $tracked_entity_ids) {
-        $changes_count[$entity_type_id] = $this->entityTypeManager->getDefinition($entity_type_id)->getCountLabel(count($tracked_entity_ids));
+        $changes_count[$entity_type_id] = $this->entityTypeManager->getDefinition($entity_type_id)->getCountLabel(\count($tracked_entity_ids));
       }
 
       $build[$build_id]['changes']['overview'] = [
@@ -103,7 +103,7 @@ class WorkspaceViewBuilder extends EntityViewBuilder {
           $list_builder = $this->entityTypeManager->createHandlerInstance(EntityListBuilder::class, $entity_type);
         }
 
-        $revisions = $this->entityTypeManager->getStorage($entity_type_id)->loadMultipleRevisions(array_keys($tracked_entities));
+        $revisions = $this->entityTypeManager->getStorage($entity_type_id)->loadMultipleRevisions(\array_keys($tracked_entities));
 
         // Load all users at once.
         $user_ids = [];
@@ -113,7 +113,7 @@ class WorkspaceViewBuilder extends EntityViewBuilder {
           }
         }
 
-        if ($user_ids = array_filter($user_ids)) {
+        if ($user_ids = \array_filter($user_ids)) {
           $revision_owners = $this->entityTypeManager->getStorage('user')->loadMultiple($user_ids);
         }
 
@@ -129,7 +129,7 @@ class WorkspaceViewBuilder extends EntityViewBuilder {
             $title = ['#markup' => $revision->label()];
           }
 
-          if (count($bundle_info[$entity_type_id]) > 1) {
+          if (\count($bundle_info[$entity_type_id]) > 1) {
             $type = [
               '#markup' => $this->t('@entity_type_label: @entity_bundle_label', [
                 '@entity_type_label' => $entity_type->getLabel(),
@@ -170,7 +170,7 @@ class WorkspaceViewBuilder extends EntityViewBuilder {
       }
 
       if ($changes_count) {
-        $build[$build_id]['changes']['overview']['#markup'] = implode(', ', $changes_count);
+        $build[$build_id]['changes']['overview']['#markup'] = \implode(', ', $changes_count);
       }
 
       $build[$build_id]['pager'] = [

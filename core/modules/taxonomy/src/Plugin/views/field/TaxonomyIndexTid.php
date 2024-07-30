@@ -141,7 +141,7 @@ class TaxonomyIndexTid extends PrerenderList {
     }
 
     if ($nids) {
-      $vids = array_filter($this->options['vids']);
+      $vids = \array_filter($this->options['vids']);
       if (empty($this->options['limit'])) {
         $vids = [];
       }

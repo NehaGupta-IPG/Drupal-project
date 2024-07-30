@@ -212,7 +212,7 @@ class TwigExtension extends AbstractExtension {
    * @see \Drupal\Core\Routing\UrlGeneratorInterface::generateFromRoute()
    */
   public function getPath($name, $parameters = [], $options = []) {
-    assert($this->urlGenerator instanceof UrlGeneratorInterface, "The URL generator hasn't been set up. Any configuration YAML file with a service directive dealing with the Twig configuration can cause this, most likely found in a recently installed or changed module.");
+    \assert($this->urlGenerator instanceof UrlGeneratorInterface, "The URL generator hasn't been set up. Any configuration YAML file with a service directive dealing with the Twig configuration can cause this, most likely found in a recently installed or changed module.");
 
     $options['absolute'] = FALSE;
     return $this->urlGenerator->generateFromRoute($name, $parameters, $options);
@@ -235,7 +235,7 @@ class TwigExtension extends AbstractExtension {
    * @todo Add an option for scheme-relative URLs.
    */
   public function getUrl($name, $parameters = [], $options = []) {
-    assert($this->urlGenerator instanceof UrlGeneratorInterface, "The URL generator hasn't been set up. Any configuration YAML file with a service directive dealing with the Twig configuration can cause this, most likely found in a recently installed or changed module.");
+    \assert($this->urlGenerator instanceof UrlGeneratorInterface, "The URL generator hasn't been set up. Any configuration YAML file with a service directive dealing with the Twig configuration can cause this, most likely found in a recently installed or changed module.");
 
     // Generate URL.
     $options['absolute'] = TRUE;
@@ -261,8 +261,8 @@ class TwigExtension extends AbstractExtension {
    *   A render array representing a link to the given URL.
    */
   public function getLink($text, $url, $attributes = []) {
-    assert(is_string($url) || $url instanceof Url, '$url must be a string or object of type \Drupal\Core\Url');
-    assert(is_array($attributes) || $attributes instanceof Attribute, '$attributes, if set, must be an array or object of type \Drupal\Core\Template\Attribute');
+    \assert(\is_string($url) || $url instanceof Url, '$url must be a string or object of type \Drupal\Core\Url');
+    \assert(\is_array($attributes) || $attributes instanceof Attribute, '$attributes, if set, must be an array or object of type \Drupal\Core\Template\Attribute');
 
     if (!$url instanceof Url) {
       $url = Url::fromUri($url);
@@ -300,7 +300,7 @@ class TwigExtension extends AbstractExtension {
    *   The file URL.
    */
   public function getFileUrl(?string $uri): string {
-    if (is_null($uri)) {
+    if (\is_null($uri)) {
       return '';
     }
     return $this->fileUrlGenerator->generateString($uri);
@@ -357,7 +357,7 @@ class TwigExtension extends AbstractExtension {
     // Support named arguments.
     $parameter_node = $args_node->hasNode('parameters') ? $args_node->getNode('parameters') : ($args_node->hasNode(1) ? $args_node->getNode(1) : NULL);
 
-    if (!isset($parameter_node) || $parameter_node instanceof ArrayExpression && count($parameter_node) <= 2 &&
+    if (!isset($parameter_node) || $parameter_node instanceof ArrayExpression && \count($parameter_node) <= 2 &&
         (!$parameter_node->hasNode(1) || $parameter_node->getNode(1) instanceof ConstantExpression)) {
       return ['html'];
     }
@@ -377,7 +377,7 @@ class TwigExtension extends AbstractExtension {
    *   An asset library.
    */
   public function attachLibrary($library) {
-    assert(is_string($library), 'Argument must be a string.');
+    \assert(\is_string($library), 'Argument must be a string.');
 
     // Use Renderer::render() on a temporary render array to get additional
     // bubbleable metadata on the render stack.
@@ -453,24 +453,24 @@ class TwigExtension extends AbstractExtension {
 
     $return = NULL;
 
-    if (is_scalar($arg)) {
+    if (\is_scalar($arg)) {
       $return = (string) $arg;
     }
-    elseif (is_object($arg)) {
+    elseif (\is_object($arg)) {
       if ($arg instanceof RenderableInterface) {
         $arg = $arg->toRenderable();
       }
-      elseif (method_exists($arg, '__toString')) {
+      elseif (\method_exists($arg, '__toString')) {
         $return = (string) $arg;
       }
       // You can't throw exceptions in the magic PHP __toString() methods, see
       // http://php.net/manual/language.oop5.magic.php#object.tostring so
       // we also support a toString method.
-      elseif (method_exists($arg, 'toString')) {
+      elseif (\method_exists($arg, 'toString')) {
         $return = $arg->toString();
       }
       else {
-        throw new \Exception('Object of type ' . get_class($arg) . ' cannot be printed.');
+        throw new \Exception('Object of type ' . \get_class($arg) . ' cannot be printed.');
       }
     }
 
@@ -494,7 +494,7 @@ class TwigExtension extends AbstractExtension {
     // special simple cases already handled.
 
     // Early return if this element was pre-rendered (no need to re-render).
-    if (isset($arg['#printed']) && $arg['#printed'] == TRUE && isset($arg['#markup']) && strlen($arg['#markup']) > 0) {
+    if (isset($arg['#printed']) && $arg['#printed'] == TRUE && isset($arg['#markup']) && \strlen($arg['#markup']) > 0) {
       return $arg['#markup'];
     }
     $arg['#printed'] = FALSE;
@@ -570,11 +570,11 @@ class TwigExtension extends AbstractExtension {
     }
 
     // Optimize for scalars as it is likely they come from the escape filter.
-    if (is_scalar($arg)) {
+    if (\is_scalar($arg)) {
       return $arg;
     }
 
-    if (is_object($arg)) {
+    if (\is_object($arg)) {
       $this->bubbleArgMetadata($arg);
       if ($arg instanceof RenderableInterface) {
         $arg = $arg->toRenderable();
@@ -588,17 +588,17 @@ class TwigExtension extends AbstractExtension {
       // You can't throw exceptions in the magic PHP __toString() methods, see
       // http://php.net/manual/language.oop5.magic.php#object.tostring so
       // we also support a toString method.
-      elseif (method_exists($arg, 'toString')) {
+      elseif (\method_exists($arg, 'toString')) {
         return $arg->toString();
       }
       else {
-        throw new \Exception('Object of type ' . get_class($arg) . ' cannot be printed.');
+        throw new \Exception('Object of type ' . \get_class($arg) . ' cannot be printed.');
       }
     }
 
     // This is a render array, with special simple cases already handled.
     // Early return if this element was pre-rendered (no need to re-render).
-    if (isset($arg['#printed']) && $arg['#printed'] == TRUE && isset($arg['#markup']) && strlen($arg['#markup']) > 0) {
+    if (isset($arg['#printed']) && $arg['#printed'] == TRUE && isset($arg['#markup']) && \strlen($arg['#markup']) > 0) {
       return $arg['#markup'];
     }
     $arg['#printed'] = FALSE;
@@ -622,10 +622,10 @@ class TwigExtension extends AbstractExtension {
    */
   public function safeJoin(Environment $env, $value, $glue = '') {
     if ($value instanceof \Traversable) {
-      $value = iterator_to_array($value, FALSE);
+      $value = \iterator_to_array($value, FALSE);
     }
 
-    return implode($glue, array_map(function ($item) use ($env) {
+    return \implode($glue, \array_map(function ($item) use ($env) {
       // If $item is not marked safe then it will be escaped.
       return $this->escapeFilter($env, $item, 'html', NULL, TRUE);
     }, (array) $value));
@@ -698,7 +698,7 @@ class TwigExtension extends AbstractExtension {
     if (empty($element['#theme'])) {
       // Throw assertion for render arrays that contain more than just metadata
       // (e.g., don't assert on empty field content).
-      assert(array_diff_key($element ?? [], [
+      \assert(\array_diff_key($element ?? [], [
         '#cache' => TRUE,
         '#weight' => TRUE,
         '#attached' => TRUE,
@@ -708,10 +708,10 @@ class TwigExtension extends AbstractExtension {
 
     // Replace dashes with underscores to support suggestions that match the
     // target template name rather than the underlying theme hook.
-    $suggestion = str_replace('-', '_', $suggestion);
+    $suggestion = \str_replace('-', '_', $suggestion);
 
     // Transform the theme hook to a format that supports multiple suggestions.
-    if (!is_iterable($element['#theme'])) {
+    if (!\is_iterable($element['#theme'])) {
       $element['#theme'] = [$element['#theme']];
     }
 
@@ -720,9 +720,9 @@ class TwigExtension extends AbstractExtension {
     // would cause the original hooks to be unavailable as fallbacks.
     //
     // Start with the lowest priority theme hook.
-    foreach (array_reverse($element['#theme']) as $theme_hook) {
+    foreach (\array_reverse($element['#theme']) as $theme_hook) {
       // Add new suggestions to the front (highest priority).
-      array_unshift($element['#theme'], $theme_hook . '__' . $suggestion);
+      \array_unshift($element['#theme'], $theme_hook . '__' . $suggestion);
     }
 
     // Reset the "#printed" flag to make sure the content gets rendered with the
@@ -756,7 +756,7 @@ class TwigExtension extends AbstractExtension {
 
     foreach ($used_variables as $name) {
       if (isset($context['deprecations'][$name]) && \array_key_exists($name, $context)) {
-        @trigger_error($context['deprecations'][$name], E_USER_DEPRECATED);
+        @\trigger_error($context['deprecations'][$name], E_USER_DEPRECATED);
       }
     }
   }

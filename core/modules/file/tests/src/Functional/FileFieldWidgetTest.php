@@ -204,7 +204,7 @@ class FileFieldWidgetTest extends FileFieldTestBase {
 
     // Save the node and ensure it does not have any files.
     $this->submitForm(['title[0][value]' => $this->randomMachineName()], 'Save');
-    preg_match('/node\/([0-9])/', $this->getUrl(), $matches);
+    \preg_match('/node\/([0-9])/', $this->getUrl(), $matches);
     $nid = $matches[1];
     $node = $node_storage->loadUnchanged($nid);
     $this->assertEmpty($node->{$field_name}->target_id, 'Node was successfully saved without any files.');
@@ -250,7 +250,7 @@ class FileFieldWidgetTest extends FileFieldTestBase {
   public function testPrivateFileSetting(): void {
     $node_storage = $this->container->get('entity_type.manager')->getStorage('node');
     // Grant the admin user required permissions.
-    user_role_grant_permissions($this->adminUser->roles[0]->target_id, ['administer node fields']);
+    \user_role_grant_permissions($this->adminUser->roles[0]->target_id, ['administer node fields']);
 
     $type_name = 'article';
     $field_name = $this->randomMachineName();
@@ -292,12 +292,12 @@ class FileFieldWidgetTest extends FileFieldTestBase {
 
     // Grant the admin user required comment permissions.
     $roles = $this->adminUser->getRoles();
-    user_role_grant_permissions($roles[1], ['administer comment fields', 'administer comments']);
+    \user_role_grant_permissions($roles[1], ['administer comment fields', 'administer comments']);
 
     // Revoke access comments permission from anon user, grant post to
     // authenticated.
-    user_role_revoke_permissions(RoleInterface::ANONYMOUS_ID, ['access comments']);
-    user_role_grant_permissions(RoleInterface::AUTHENTICATED_ID, ['post comments', 'skip comment approval']);
+    \user_role_revoke_permissions(RoleInterface::ANONYMOUS_ID, ['access comments']);
+    \user_role_grant_permissions(RoleInterface::AUTHENTICATED_ID, ['post comments', 'skip comment approval']);
 
     // Create a new field.
     $this->addDefaultCommentField('node', 'article');
@@ -328,7 +328,7 @@ class FileFieldWidgetTest extends FileFieldTestBase {
     $this->submitForm($edit, 'Save');
 
     // Get the comment ID.
-    preg_match('/comment-([0-9]+)/', $this->getUrl(), $matches);
+    \preg_match('/comment-([0-9]+)/', $this->getUrl(), $matches);
     $cid = $matches[1];
 
     // Log in as normal user.
@@ -394,7 +394,7 @@ class FileFieldWidgetTest extends FileFieldTestBase {
    */
   public function testWidgetElement(): void {
     $field_name = $this->randomMachineName();
-    $html_name = str_replace('_', '-', $field_name);
+    $html_name = \str_replace('_', '-', $field_name);
     $this->createFileField($field_name, 'node', 'article', ['cardinality' => FieldStorageConfig::CARDINALITY_UNLIMITED]);
     $file = $this->getTestFile('text');
     $xpath = "//details[@data-drupal-selector='edit-$html_name']/table";
@@ -458,7 +458,7 @@ class FileFieldWidgetTest extends FileFieldTestBase {
     $attacker_user = User::getAnonymousUser();
 
     // Set up permissions for anonymous attacker user.
-    user_role_change_permissions(RoleInterface::ANONYMOUS_ID, [
+    \user_role_change_permissions(RoleInterface::ANONYMOUS_ID, [
       'access content' => TRUE,
       'create article content' => TRUE,
       'edit any article content' => TRUE,
@@ -476,7 +476,7 @@ class FileFieldWidgetTest extends FileFieldTestBase {
    */
   public function testMaximumUploadFileSizeValidation(): void {
     // Grant the admin user required permissions.
-    user_role_grant_permissions($this->adminUser->roles[0]->target_id, ['administer node fields']);
+    \user_role_grant_permissions($this->adminUser->roles[0]->target_id, ['administer node fields']);
 
     $type_name = 'article';
     $field_name = $this->randomMachineName();
@@ -503,7 +503,7 @@ class FileFieldWidgetTest extends FileFieldTestBase {
    */
   public function testFileExtensionsSetting(): void {
     // Grant the admin user required permissions.
-    user_role_grant_permissions($this->adminUser->roles[0]->target_id, ['administer node fields']);
+    \user_role_grant_permissions($this->adminUser->roles[0]->target_id, ['administer node fields']);
 
     $type_name = 'article';
     $field_name = $this->randomMachineName();

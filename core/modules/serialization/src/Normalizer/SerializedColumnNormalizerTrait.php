@@ -28,12 +28,12 @@ trait SerializedColumnNormalizerTrait {
     // storage definition. To determine that, the entity type and bundle
     // must be known, which is contextual information that the Symfony
     // serializer does not pass to ::supportsDenormalization().
-    if (!is_array($data)) {
+    if (!\is_array($data)) {
       $data = [$field_item->getDataDefinition()->getMainPropertyName() => $data];
     }
     if ($this->dataHasStringForSerializeColumn($field_item, $data)) {
       $field_name = $field_item->getParent() ? $field_item->getParent()->getName() : $field_item->getName();
-      throw new \LogicException(sprintf('The generic FieldItemNormalizer cannot denormalize string values for "%s" properties of the "%s" field (field item class: %s).', implode('", "', $this->getSerializedPropertyNames($field_item)), $field_name, $class));
+      throw new \LogicException(\sprintf('The generic FieldItemNormalizer cannot denormalize string values for "%s" properties of the "%s" field (field item class: %s).', \implode('", "', $this->getSerializedPropertyNames($field_item)), $field_name, $class));
     }
   }
 
@@ -50,7 +50,7 @@ trait SerializedColumnNormalizerTrait {
    */
   protected function dataHasStringForSerializeColumn(FieldItemInterface $field_item, array $data) {
     foreach ($this->getSerializedPropertyNames($field_item) as $property_name) {
-      if (isset($data[$property_name]) && is_string($data[$property_name])) {
+      if (isset($data[$property_name]) && \is_string($data[$property_name])) {
         return TRUE;
       }
     }
@@ -78,10 +78,10 @@ trait SerializedColumnNormalizerTrait {
     if (!isset($field_storage_schema['columns'])) {
       return [];
     }
-    $serialized_columns = array_filter($field_storage_schema['columns'], function ($column_schema) {
+    $serialized_columns = \array_filter($field_storage_schema['columns'], function ($column_schema) {
       return isset($column_schema['serialize']) && $column_schema['serialize'] === TRUE;
     });
-    return array_keys($serialized_columns);
+    return \array_keys($serialized_columns);
   }
 
   /**
@@ -103,10 +103,10 @@ trait SerializedColumnNormalizerTrait {
       $definition = $field_item->getPluginDefinition();
       $serialized_fields = $field_item->getEntity()->getEntityType()->get('serialized_field_property_names');
       $field_name = $field_item->getFieldDefinition()->getName();
-      if (is_array($serialized_fields) && isset($serialized_fields[$field_name]) && is_array($serialized_fields[$field_name])) {
+      if (\is_array($serialized_fields) && isset($serialized_fields[$field_name]) && \is_array($serialized_fields[$field_name])) {
         return $serialized_fields[$field_name];
       }
-      if (isset($definition['serialized_property_names']) && is_array($definition['serialized_property_names'])) {
+      if (isset($definition['serialized_property_names']) && \is_array($definition['serialized_property_names'])) {
         return $definition['serialized_property_names'];
       }
     }

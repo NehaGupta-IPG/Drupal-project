@@ -27,13 +27,13 @@ class LanguageDomains extends ArrayBuild {
         if (empty($old_value['domain'])) {
           // The default language domain might be empty.
           // If it is, use the current domain.
-          $value[$old_key]['domain'] = parse_url($base_url, PHP_URL_HOST);
+          $value[$old_key]['domain'] = \parse_url($base_url, PHP_URL_HOST);
         }
         else {
           // Ensure we have a protocol when checking for the hostname.
-          $domain = 'http://' . str_replace(['http://', 'https://'], '', $old_value['domain']);
+          $domain = 'http://' . \str_replace(['http://', 'https://'], '', $old_value['domain']);
           // Only keep the host part of the domain.
-          $value[$old_key]['domain'] = parse_url($domain, PHP_URL_HOST);
+          $value[$old_key]['domain'] = \parse_url($domain, PHP_URL_HOST);
         }
       }
     }

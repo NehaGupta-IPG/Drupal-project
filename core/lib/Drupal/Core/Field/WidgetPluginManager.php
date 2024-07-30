@@ -96,7 +96,7 @@ class WidgetPluginManager extends DefaultPluginManager {
     // - the field type is not allowed for the widget
     // - the widget is not applicable to the field definition.
     $definition = $this->getDefinition($configuration['type'], FALSE);
-    if (!isset($definition['class']) || !in_array($field_type, $definition['field_types']) || !$definition['class']::isApplicable($field_definition)) {
+    if (!isset($definition['class']) || !\in_array($field_type, $definition['field_types']) || !$definition['class']::isApplicable($field_definition)) {
       // Grab the default widget for the field type.
       $field_type_definition = $this->fieldTypeManager->getDefinition($field_type);
       if (empty($field_type_definition['default_widget'])) {
@@ -119,7 +119,7 @@ class WidgetPluginManager extends DefaultPluginManager {
     $plugin_class = DefaultFactory::getPluginClass($plugin_id, $plugin_definition);
 
     // If the plugin provides a factory method, pass the container to it.
-    if (is_subclass_of($plugin_class, 'Drupal\Core\Plugin\ContainerFactoryPluginInterface')) {
+    if (\is_subclass_of($plugin_class, 'Drupal\Core\Plugin\ContainerFactoryPluginInterface')) {
       return $plugin_class::create(\Drupal::getContainer(), $configuration, $plugin_id, $plugin_definition);
     }
 
@@ -150,7 +150,7 @@ class WidgetPluginManager extends DefaultPluginManager {
     }
     // Filter out unknown settings, and fill in defaults for missing settings.
     $default_settings = $this->getDefaultSettings($configuration['type']);
-    $configuration['settings'] = array_intersect_key($configuration['settings'], $default_settings) + $default_settings;
+    $configuration['settings'] = \array_intersect_key($configuration['settings'], $default_settings) + $default_settings;
 
     return $configuration;
   }
@@ -171,7 +171,7 @@ class WidgetPluginManager extends DefaultPluginManager {
       $options = [];
       $field_types = $this->fieldTypeManager->getDefinitions();
       $widget_types = $this->getDefinitions();
-      uasort($widget_types, ['Drupal\Component\Utility\SortArray', 'sortByWeightElement']);
+      \uasort($widget_types, ['Drupal\Component\Utility\SortArray', 'sortByWeightElement']);
       foreach ($widget_types as $name => $widget_type) {
         foreach ($widget_type['field_types'] as $widget_field_type) {
           // Check that the field type exists.

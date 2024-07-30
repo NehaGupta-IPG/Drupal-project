@@ -59,17 +59,17 @@ class ModuleFilterTest extends WebDriverTestBase {
     $session->wait(1000, 'jQuery("#module-node:visible").length == 0');
     $visible_rows = $this->filterVisibleElements($module_rows);
     // Test Drupal.announce() message when multiple matches are expected.
-    $expected_message = count($visible_rows) . ' modules are available in the modified list.';
+    $expected_message = \count($visible_rows) . ' modules are available in the modified list.';
     $assertSession->elementTextContains('css', '#drupal-live-announce', $expected_message);
-    self::assertGreaterThan(count($visible_rows), count($module_rows));
-    self::assertGreaterThan(1, count($visible_rows));
+    self::assertGreaterThan(\count($visible_rows), \count($module_rows));
+    self::assertGreaterThan(1, \count($visible_rows));
 
     // Test Drupal.announce() message when one match is expected.
     // Using a very specific module name, we expect only one row.
     $filter->setValue('System dependency test');
     $session->wait(1000, 'jQuery("#module-node:visible").length == 0');
     $visible_rows = $this->filterVisibleElements($module_rows);
-    self::assertEquals(1, count($visible_rows));
+    self::assertEquals(1, \count($visible_rows));
     $expected_message = '1 module is available in the modified list.';
     $assertSession->elementTextContains('css', '#drupal-live-announce', $expected_message);
 
@@ -79,13 +79,13 @@ class ModuleFilterTest extends WebDriverTestBase {
     $filter->setValue('comment_base_field_test');
     $session->wait(1000, 'jQuery("#module-node:visible").length == 0');
     $visible_rows = $this->filterVisibleElements($module_rows);
-    self::assertEquals(1, count($visible_rows));
+    self::assertEquals(1, \count($visible_rows));
 
     // Test Drupal.announce() message when no matches are expected.
     $filter->setValue('Pan-Galactic Gargle Blaster');
     $session->wait(1000, 'jQuery("#module-node:visible").length == 0');
     $visible_rows = $this->filterVisibleElements($module_rows);
-    self::assertEquals(0, count($visible_rows));
+    self::assertEquals(0, \count($visible_rows));
 
     $expected_message = '0 modules are available in the modified list.';
     $assertSession->elementTextContains('css', '#drupal-live-announce', $expected_message);
@@ -101,7 +101,7 @@ class ModuleFilterTest extends WebDriverTestBase {
    *   An array of node elements.
    */
   protected function filterVisibleElements(array $elements): array {
-    $elements = array_filter($elements, function ($element) {
+    $elements = \array_filter($elements, function ($element) {
       return $element->isVisible();
     });
     return $elements;

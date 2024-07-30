@@ -40,23 +40,23 @@ class DateRangeItem extends DateTimeItem {
    */
   public static function propertyDefinitions(FieldStorageDefinitionInterface $field_definition) {
     $properties['value'] = DataDefinition::create('datetime_iso8601')
-      ->setLabel(t('Start date value'))
+      ->setLabel(\t('Start date value'))
       ->setRequired(TRUE);
 
     $properties['start_date'] = DataDefinition::create('any')
-      ->setLabel(t('Computed start date'))
-      ->setDescription(t('The computed start DateTime object.'))
+      ->setLabel(\t('Computed start date'))
+      ->setDescription(\t('The computed start DateTime object.'))
       ->setComputed(TRUE)
       ->setClass(DateTimeComputed::class)
       ->setSetting('date source', 'value');
 
     $properties['end_value'] = DataDefinition::create('datetime_iso8601')
-      ->setLabel(t('End date value'))
+      ->setLabel(\t('End date value'))
       ->setRequired(TRUE);
 
     $properties['end_date'] = DataDefinition::create('any')
-      ->setLabel(t('Computed end date'))
-      ->setDescription(t('The computed end DateTime object.'))
+      ->setLabel(\t('Computed end date'))
+      ->setDescription(\t('The computed end DateTime object.'))
       ->setComputed(TRUE)
       ->setClass(DateTimeComputed::class)
       ->setSetting('date source', 'end_value');
@@ -100,15 +100,15 @@ class DateRangeItem extends DateTimeItem {
 
     // Just pick a date in the past year. No guidance is provided by this Field
     // type.
-    $start = \Drupal::time()->getRequestTime() - mt_rand(0, 86400 * 365) - 86400;
+    $start = \Drupal::time()->getRequestTime() - \mt_rand(0, 86400 * 365) - 86400;
     $end = $start + 86400;
     if ($type == static::DATETIME_TYPE_DATETIME) {
-      $values['value'] = gmdate(DateTimeItemInterface::DATETIME_STORAGE_FORMAT, $start);
-      $values['end_value'] = gmdate(DateTimeItemInterface::DATETIME_STORAGE_FORMAT, $end);
+      $values['value'] = \gmdate(DateTimeItemInterface::DATETIME_STORAGE_FORMAT, $start);
+      $values['end_value'] = \gmdate(DateTimeItemInterface::DATETIME_STORAGE_FORMAT, $end);
     }
     else {
-      $values['value'] = gmdate(DateTimeItemInterface::DATE_STORAGE_FORMAT, $start);
-      $values['end_value'] = gmdate(DateTimeItemInterface::DATE_STORAGE_FORMAT, $end);
+      $values['value'] = \gmdate(DateTimeItemInterface::DATE_STORAGE_FORMAT, $start);
+      $values['end_value'] = \gmdate(DateTimeItemInterface::DATE_STORAGE_FORMAT, $end);
     }
     return $values;
   }

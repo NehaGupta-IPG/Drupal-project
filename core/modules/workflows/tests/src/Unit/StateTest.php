@@ -119,7 +119,7 @@ class StateTest extends UnitTestCase {
       new State($workflow_type, 'draft', 'Draft'),
       new State($workflow_type, 'published', 'Published'),
     ];
-    $this->assertEquals(['Draft', 'Published'], array_map([State::class, 'labelCallback'], $states));
+    $this->assertEquals(['Draft', 'Published'], \array_map([State::class, 'labelCallback'], $states));
   }
 
 }

@@ -33,14 +33,14 @@ class RouteCacheContext implements CacheContextInterface {
    * {@inheritdoc}
    */
   public static function getLabel() {
-    return t('Route');
+    return \t('Route');
   }
 
   /**
    * {@inheritdoc}
    */
   public function getContext() {
-    return $this->routeMatch->getRouteName() . hash('sha256', serialize($this->routeMatch->getRawParameters()->all()));
+    return $this->routeMatch->getRouteName() . \hash('sha256', \serialize($this->routeMatch->getRawParameters()->all()));
   }
 
   /**

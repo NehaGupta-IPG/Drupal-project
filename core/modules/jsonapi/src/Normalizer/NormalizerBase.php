@@ -34,10 +34,10 @@ abstract class NormalizerBase extends SerializationNormalizerBase {
    *   The rasterized value.
    */
   protected static function rasterizeValueRecursive($value) {
-    if (!$value || is_scalar($value)) {
+    if (!$value || \is_scalar($value)) {
       return $value;
     }
-    if (is_array($value)) {
+    if (\is_array($value)) {
       $output = [];
       foreach ($value as $key => $item) {
         $output[$key] = static::rasterizeValueRecursive($item);
@@ -49,7 +49,7 @@ abstract class NormalizerBase extends SerializationNormalizerBase {
       return $value->getNormalization();
     }
     // If the object can be turned into a string it's better than nothing.
-    if (method_exists($value, '__toString')) {
+    if (\method_exists($value, '__toString')) {
       return $value->__toString();
     }
 

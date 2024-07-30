@@ -87,11 +87,11 @@ class TemporaryQueryGuard {
    *   Collects cacheability for the query.
    */
   public static function applyAccessControls(Filter $filter, QueryInterface $query, CacheableMetadata $cacheability) {
-    assert(static::$fieldManager !== NULL);
-    assert(static::$moduleHandler !== NULL);
+    \assert(static::$fieldManager !== NULL);
+    \assert(static::$moduleHandler !== NULL);
     $filtered_fields = static::collectFilteredFields($filter->root());
-    $field_specifiers = array_map(function ($field) {
-      return explode('.', $field);
+    $field_specifiers = \array_map(function ($field) {
+      return \explode('.', $field);
     }, $filtered_fields);
     static::secureQuery($query, $query->getEntityTypeId(), static::buildTree($field_specifiers), $cacheability);
   }
@@ -130,8 +130,8 @@ class TemporaryQueryGuard {
     foreach ($tree as $specifier => $children) {
       // The field path reconstructs the entity condition fields.
       // E.g. `uid.0` would become `uid.0.name` if $specifier === 'name'.
-      $child_prefix = (is_null($field_prefix)) ? $specifier : "$field_prefix.$specifier";
-      if (is_null($field_storage_definition)) {
+      $child_prefix = (\is_null($field_prefix)) ? $specifier : "$field_prefix.$specifier";
+      if (\is_null($field_storage_definition)) {
         // When the field storage definition is NULL, this specifier is the
         // first specifier in an entity query field path or the previous
         // specifier was a data reference that has been traversed. In both
@@ -141,7 +141,7 @@ class TemporaryQueryGuard {
         // When $field_prefix is NULL, this must be the first specifier in the
         // entity query field path and a condition for the query's base entity
         // type must be applied.
-        if (is_null($field_prefix)) {
+        if (\is_null($field_prefix)) {
           static::applyAccessConditions($query, $entity_type_id, NULL, $cacheability);
         }
       }
@@ -150,8 +150,8 @@ class TemporaryQueryGuard {
         // type specifier, like so: `entity:node`. This extracts the `entity`
         // portion. JSON:API will have already validated that the property
         // exists.
-        $split_specifier = explode(':', $specifier, 2);
-        [$property_name, $target_entity_type_id] = array_merge($split_specifier, count($split_specifier) === 2 ? [] : [NULL]);
+        $split_specifier = \explode(':', $specifier, 2);
+        [$property_name, $target_entity_type_id] = \array_merge($split_specifier, \count($split_specifier) === 2 ? [] : [NULL]);
         // The specifier is either a field property or a delta. If it is a data
         // reference or a delta, then it needs to be traversed to the next
         // specifier. However, if the specific is a simple field property, i.e.
@@ -169,8 +169,8 @@ class TemporaryQueryGuard {
           // Keep descending the tree.
           static::secureQuery($query, $target_entity_type_id, $children, $cacheability, $child_prefix);
         }
-        elseif (is_null($property_definition)) {
-          assert(is_numeric($property_name), 'The specifier is not a property name, it must be a delta.');
+        elseif (\is_null($property_definition)) {
+          \assert(\is_numeric($property_name), 'The specifier is not a property name, it must be a delta.');
           // Keep descending the tree.
           static::secureQuery($query, $entity_type_id, $children, $cacheability, $child_prefix, $field_storage_definition);
         }
@@ -198,7 +198,7 @@ class TemporaryQueryGuard {
   protected static function applyAccessConditions(QueryInterface $query, $entity_type_id, $field_prefix, CacheableMetadata $cacheability) {
     $access_condition = static::getAccessCondition($entity_type_id, $cacheability);
     if ($access_condition) {
-      $prefixed_condition = !is_null($field_prefix)
+      $prefixed_condition = !\is_null($field_prefix)
         ? static::addConditionFieldPrefix($access_condition, $field_prefix)
         : $access_condition;
       $filter = new Filter($prefixed_condition);
@@ -407,7 +407,7 @@ class TemporaryQueryGuard {
 
     // If more than one condition was added above, then access was granted to
     // more than one subset, so combine them with an OR.
-    if (count($conditions) > 1) {
+    if (\count($conditions) > 1) {
       return new EntityConditionGroup('OR', $conditions);
     }
 
@@ -494,7 +494,7 @@ class TemporaryQueryGuard {
     // live on entities of different entity types.
     $comment_entity_type_id = $comment_entity_type->id();
     $field_map = static::$fieldManager->getFieldMapByFieldType('entity_reference');
-    assert(isset($field_map[$comment_entity_type_id]['entity_id']['bundles']), 'Every comment has an `entity_id` field.');
+    \assert(isset($field_map[$comment_entity_type_id]['entity_id']['bundles']), 'Every comment has an `entity_id` field.');
     $bundle_ids_by_target_entity_type_id = [];
     foreach ($field_map[$comment_entity_type_id]['entity_id']['bundles'] as $bundle_id) {
       $field_definitions = static::$fieldManager->getFieldDefinitions($comment_entity_type_id, $bundle_id);
@@ -524,7 +524,7 @@ class TemporaryQueryGuard {
       }
       else {
         $target_condition = static::getAccessCondition($target_entity_type_id, $cacheability);
-        $bundle_specific_access_conditions[$target_entity_type_id] = !is_null($target_condition)
+        $bundle_specific_access_conditions[$target_entity_type_id] = !\is_null($target_condition)
           ? new EntityConditionGroup('AND', [
             $bundle_condition,
             static::addConditionFieldPrefix($target_condition, $condition_field_prefix),
@@ -536,7 +536,7 @@ class TemporaryQueryGuard {
     // This condition ensures that the user is only permitted to see the
     // comments for which the user is also able to view the entity on which each
     // comment lives.
-    $commented_entity_condition = new EntityConditionGroup('OR', array_values($bundle_specific_access_conditions));
+    $commented_entity_condition = new EntityConditionGroup('OR', \array_values($bundle_specific_access_conditions));
     return $commented_entity_condition;
   }
 
@@ -579,7 +579,7 @@ class TemporaryQueryGuard {
         $fields[] = $member->field();
       }
     }
-    return array_unique($fields);
+    return \array_unique($fields);
   }
 
   /**
@@ -592,12 +592,12 @@ class TemporaryQueryGuard {
     foreach ($paths as $parts) {
       // This complex expression is needed to handle the string, "0", which
       // would be evaluated as FALSE.
-      if (!is_null(($field_name = array_shift($parts)))) {
+      if (!\is_null(($field_name = \array_shift($parts)))) {
         $previous = $merged[$field_name] ?? [];
-        $merged[$field_name] = array_merge($previous, [$parts]);
+        $merged[$field_name] = \array_merge($previous, [$parts]);
       }
     }
-    return !empty($merged) ? array_map([static::class, __FUNCTION__], $merged) : $merged;
+    return !empty($merged) ? \array_map([static::class, __FUNCTION__], $merged) : $merged;
   }
 
 }

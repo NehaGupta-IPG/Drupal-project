@@ -47,7 +47,7 @@ class ValidPathConstraintValidator extends ConstraintValidator implements Contai
       return;
     }
 
-    $path = trim($value, '/');
+    $path = \trim($value, '/');
     if (!$this->pathValidator->isValid($path)) {
       $this->context->addViolation($constraint->message, [
         '%link_path' => $value,

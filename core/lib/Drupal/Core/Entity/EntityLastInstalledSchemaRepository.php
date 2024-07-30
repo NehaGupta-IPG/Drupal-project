@@ -68,19 +68,19 @@ class EntityLastInstalledSchemaRepository implements EntityLastInstalledSchemaRe
     $all_definitions = $this->keyValueFactory->get('entity.definitions.installed')->getAll();
 
     // Filter out field storage definitions.
-    $filtered_keys = array_filter(array_keys($all_definitions), function ($key) {
-        return str_ends_with($key, '.entity_type');
+    $filtered_keys = \array_filter(\array_keys($all_definitions), function ($key) {
+        return \str_ends_with($key, '.entity_type');
     });
-    $entity_type_definitions = array_intersect_key($all_definitions, array_flip($filtered_keys));
+    $entity_type_definitions = \array_intersect_key($all_definitions, \array_flip($filtered_keys));
 
     // Ensure that the returned array is keyed by the entity type ID.
-    $keys = array_keys($entity_type_definitions);
-    $keys = array_map(function ($key) {
-      $parts = explode('.', $key);
+    $keys = \array_keys($entity_type_definitions);
+    $keys = \array_map(function ($key) {
+      $parts = \explode('.', $key);
       return $parts[0];
     }, $keys);
 
-    $this->entityTypeDefinitions = array_combine($keys, $entity_type_definitions);
+    $this->entityTypeDefinitions = \array_combine($keys, $entity_type_definitions);
     $this->cacheBackend->set('entity_type_definitions.installed', $this->entityTypeDefinitions, Cache::PERMANENT);
     return $this->entityTypeDefinitions;
   }

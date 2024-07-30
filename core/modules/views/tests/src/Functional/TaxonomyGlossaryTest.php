@@ -64,7 +64,7 @@ class TaxonomyGlossaryTest extends ViewTestBase {
   public function testTaxonomyGlossaryView(): void {
     $initials = [];
     foreach ($this->taxonomyTerms as $term) {
-      $char = mb_strtolower(substr($term->label(), 0, 1));
+      $char = \mb_strtolower(\substr($term->label(), 0, 1));
       $initials += [$char => 0];
       $initials[$char]++;
     }
@@ -82,16 +82,16 @@ class TaxonomyGlossaryTest extends ViewTestBase {
       $link = $assert_session->elementExists('xpath', $xpath);
 
       // Assert that the expected number of results is indicated in the link.
-      preg_match("/{$char} \(([0-9]+)\)/", $link->getParent()->getText(), $matches);
+      \preg_match("/{$char} \(([0-9]+)\)/", $link->getParent()->getText(), $matches);
       $this->assertEquals($count, $matches[1]);
     }
 
     // Check that no other glossary links but the expected ones have been
     // rendered.
-    $assert_session->elementsCount('xpath', '/ancestor::ul//a', count($initials), $link);
+    $assert_session->elementsCount('xpath', '/ancestor::ul//a', \count($initials), $link);
 
     // Go the taxonomy glossary page for the first term.
-    $this->drupalGet('test_taxonomy_glossary/' . substr($this->taxonomyTerms[0]->getName(), 0, 1));
+    $this->drupalGet('test_taxonomy_glossary/' . \substr($this->taxonomyTerms[0]->getName(), 0, 1));
     $assert_session->pageTextContains($this->taxonomyTerms[0]->getName());
   }
 

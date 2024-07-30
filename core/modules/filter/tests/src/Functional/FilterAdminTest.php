@@ -119,8 +119,8 @@ class FilterAdminTest extends BrowserTestBase {
       'create page content',
       'edit own page content',
     ]);
-    user_role_grant_permissions('authenticated', [$basic_html_format->getPermissionName()]);
-    user_role_grant_permissions('anonymous', [$restricted_html_format->getPermissionName()]);
+    \user_role_grant_permissions('authenticated', [$basic_html_format->getPermissionName()]);
+    \user_role_grant_permissions('anonymous', [$restricted_html_format->getPermissionName()]);
     $this->drupalLogin($this->adminUser);
     $this->drupalPlaceBlock('local_actions_block');
   }
@@ -207,7 +207,7 @@ class FilterAdminTest extends BrowserTestBase {
     $plain = 'plain_text';
 
     // Check that the fallback format exists and cannot be disabled.
-    $this->assertSame($plain, filter_fallback_format(), 'The fallback format is set to plain text.');
+    $this->assertSame($plain, \filter_fallback_format(), 'The fallback format is set to plain text.');
     $this->drupalGet('admin/config/content/formats');
     $this->assertSession()->responseNotContains('admin/config/content/formats/manage/' . $plain . '/disable');
     $this->drupalGet('admin/config/content/formats/manage/' . $plain . '/disable');
@@ -261,7 +261,7 @@ class FilterAdminTest extends BrowserTestBase {
     $this->assertSession()->addressEquals('admin/config/content/formats');
     $this->assertSession()->statusMessageContains("Added text format {$edit['name']}.", 'status');
 
-    filter_formats_reset();
+    \filter_formats_reset();
     $format = FilterFormat::load($edit['format']);
     $this->assertNotNull($format, 'Format found in database.');
     $this->drupalGet('admin/config/content/formats/manage/' . $format->id());
@@ -456,7 +456,7 @@ class FilterAdminTest extends BrowserTestBase {
     $this->drupalLogin($this->adminUser);
     $this->drupalGet('admin/reports/dblog');
     // The correct message has been logged.
-    $this->assertSession()->pageTextContains(sprintf('Disabled text format: %s.', $format_id));
+    $this->assertSession()->pageTextContains(\sprintf('Disabled text format: %s.', $format_id));
 
     // Programmatically change the text format to something random so we trigger
     // the missing text format message.
@@ -471,7 +471,7 @@ class FilterAdminTest extends BrowserTestBase {
     // Visit the dblog report page.
     $this->drupalGet('admin/reports/dblog');
     // The missing text format message has been logged.
-    $this->assertSession()->pageTextContains(sprintf('Missing text format: %s.', $format_id));
+    $this->assertSession()->pageTextContains(\sprintf('Missing text format: %s.', $format_id));
   }
 
   /**

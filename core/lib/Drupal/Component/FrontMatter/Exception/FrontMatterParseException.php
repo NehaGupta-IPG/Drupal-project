@@ -36,7 +36,7 @@ class FrontMatterParseException extends InvalidDataTypeException {
     // methods for accessing this kind of information reliably.
     $message = 'An error occurred when attempting to parse front matter data';
     if ($exception) {
-      preg_match('/line:?\s?(\d+)/i', $exception->getMessage(), $matches);
+      \preg_match('/line:?\s?(\d+)/i', $exception->getMessage(), $matches);
       if (!empty($matches[1])) {
         $message .= ' on line %d';
         // Add any matching line count to the existing source line so it
@@ -44,7 +44,7 @@ class FrontMatterParseException extends InvalidDataTypeException {
         $this->sourceLine += (int) $matches[1];
       }
     }
-    parent::__construct(sprintf($message, $this->sourceLine), 0, $exception);
+    parent::__construct(\sprintf($message, $this->sourceLine), 0, $exception);
   }
 
   /**

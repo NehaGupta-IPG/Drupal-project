@@ -243,7 +243,7 @@ abstract class ConfigEntityBase extends EntityBase implements ConfigEntityInterf
     if ($a_weight == $b_weight) {
       $a_label = $a->label() ?? '';
       $b_label = $b->label() ?? '';
-      return strnatcasecmp($a_label, $b_label);
+      return \strnatcasecmp($a_label, $b_label);
     }
     return $a_weight <=> $b_weight;
   }
@@ -259,7 +259,7 @@ abstract class ConfigEntityBase extends EntityBase implements ConfigEntityInterf
     $id_key = $entity_type->getKey('id');
     $property_names = $entity_type->getPropertiesToExport($this->id());
     if (empty($property_names)) {
-      throw new SchemaIncompleteException(sprintf("Entity type '%s' is missing 'config_export' definition in its annotation", $entity_type->getClass()));
+      throw new SchemaIncompleteException(\sprintf("Entity type '%s' is missing 'config_export' definition in its annotation", $entity_type->getClass()));
     }
     foreach ($property_names as $property_name => $export_name) {
       // Special handling for IDs so that computed compound IDs work.
@@ -311,7 +311,7 @@ abstract class ConfigEntityBase extends EntityBase implements ConfigEntityInterf
     $matching_entities = $storage->getQuery()
       ->condition('uuid', $this->uuid())
       ->execute();
-    $matched_entity = reset($matching_entities);
+    $matched_entity = \reset($matching_entities);
     if (!empty($matched_entity) && ($matched_entity != $this->id()) && $matched_entity != $this->getOriginalId()) {
       throw new ConfigDuplicateUUIDException("Attempt to save a configuration entity '{$this->id()}' with UUID '{$this->uuid()}' when this UUID is already used for '$matched_entity'");
     }
@@ -336,8 +336,8 @@ abstract class ConfigEntityBase extends EntityBase implements ConfigEntityInterf
         $mapping = ['config' => 0, 'content' => 1, 'module' => 2, 'theme' => 3, 'enforced' => 4];
         $dependency_sort = function ($dependencies) use ($mapping) {
           // Only sort the keys that exist.
-          $mapping_to_replace = array_intersect_key($mapping, $dependencies);
-          return array_replace($mapping_to_replace, $dependencies);
+          $mapping_to_replace = \array_intersect_key($mapping, $dependencies);
+          return \array_replace($mapping_to_replace, $dependencies);
         };
         $this->dependencies = $dependency_sort($this->dependencies);
         if (isset($this->dependencies['enforced'])) {
@@ -356,13 +356,13 @@ abstract class ConfigEntityBase extends EntityBase implements ConfigEntityInterf
       // Get the plugin collections first, so that the properties are
       // initialized in $vars and can be found later.
       $plugin_collections = $this->getPluginCollections();
-      $vars = get_object_vars($this);
+      $vars = \get_object_vars($this);
       foreach ($plugin_collections as $plugin_config_key => $plugin_collection) {
         // Save any changes to the plugin configuration to the entity.
         $this->set($plugin_config_key, $plugin_collection->getConfiguration());
         // If the plugin collections are stored as properties on the entity,
         // mark them to be unset.
-        $keys_to_unset += array_filter($vars, function ($value) use ($plugin_collection) {
+        $keys_to_unset += \array_filter($vars, function ($value) use ($plugin_collection) {
           return $plugin_collection === $value;
         });
       }
@@ -371,7 +371,7 @@ abstract class ConfigEntityBase extends EntityBase implements ConfigEntityInterf
     $vars = parent::__sleep();
 
     if (!empty($keys_to_unset)) {
-      $vars = array_diff($vars, array_keys($keys_to_unset));
+      $vars = \array_diff($vars, \array_keys($keys_to_unset));
     }
     return $vars;
   }
@@ -382,7 +382,7 @@ abstract class ConfigEntityBase extends EntityBase implements ConfigEntityInterf
   public function calculateDependencies() {
     // All dependencies should be recalculated on every save apart from enforced
     // dependencies. This ensures stale dependencies are never saved.
-    $this->dependencies = array_intersect_key($this->dependencies ?? [], ['enforced' => '']);
+    $this->dependencies = \array_intersect_key($this->dependencies ?? [], ['enforced' => '']);
     if ($this instanceof EntityWithPluginCollectionInterface) {
       // Configuration entities need to depend on the providers of any plugins
       // that they store the configuration for.
@@ -478,9 +478,9 @@ abstract class ConfigEntityBase extends EntityBase implements ConfigEntityInterf
   public function onDependencyRemoval(array $dependencies) {
     $changed = FALSE;
     if (!empty($this->third_party_settings)) {
-      $old_count = count($this->third_party_settings);
-      $this->third_party_settings = array_diff_key($this->third_party_settings, array_flip($dependencies['module']));
-      $changed = $old_count != count($this->third_party_settings);
+      $old_count = \count($this->third_party_settings);
+      $this->third_party_settings = \array_diff_key($this->third_party_settings, \array_flip($dependencies['module']));
+      $changed = $old_count != \count($this->third_party_settings);
     }
     if ($this instanceof EntityWithPluginCollectionInterface) {
       // Allow associated plugins to recalculate their dependencies and update
@@ -569,7 +569,7 @@ abstract class ConfigEntityBase extends EntityBase implements ConfigEntityInterf
    * {@inheritdoc}
    */
   public function getThirdPartyProviders() {
-    return array_keys($this->third_party_settings);
+    return \array_keys($this->third_party_settings);
   }
 
   /**

@@ -24,7 +24,7 @@ class FilterHtmlImageSecure extends FilterBase {
    * {@inheritdoc}
    */
   public function process($text, $langcode) {
-    return new FilterProcessResult(_filter_html_image_secure_process($text));
+    return new FilterProcessResult(\_filter_html_image_secure_process($text));
   }
 
   /**

@@ -71,13 +71,13 @@ class Endpoint {
     $this->provider = $provider;
     $this->schemes = $schemes;
 
-    $this->formats = $formats = array_map('mb_strtolower', $formats);
+    $this->formats = $formats = \array_map('mb_strtolower', $formats);
     // Assert that only the supported formats are present.
-    assert(array_diff($formats, ['json', 'xml']) == []);
+    \assert(\array_diff($formats, ['json', 'xml']) == []);
 
     // Use the first provided format to build the endpoint URL. If no formats
     // are provided, default to JSON.
-    $this->url = str_replace('{format}', reset($this->formats) ?: 'json', $url);
+    $this->url = \str_replace('{format}', \reset($this->formats) ?: 'json', $url);
 
     if (!UrlHelper::isValid($this->url, TRUE) || !UrlHelper::isExternal($this->url)) {
       throw new \InvalidArgumentException('oEmbed endpoint must have a valid external URL');
@@ -151,8 +151,8 @@ class Endpoint {
   public function matchUrl($url) {
     foreach ($this->getSchemes() as $scheme) {
       // Convert scheme into a valid regular expression.
-      $regexp = str_replace(['.', '*', '?'], ['\.', '.*', '\?'], $scheme);
-      if (preg_match("|^$regexp$|", $url)) {
+      $regexp = \str_replace(['.', '*', '?'], ['\.', '.*', '\?'], $scheme);
+      if (\preg_match("|^$regexp$|", $url)) {
         return TRUE;
       }
     }

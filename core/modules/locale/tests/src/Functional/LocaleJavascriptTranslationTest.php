@@ -45,7 +45,7 @@ class LocaleJavascriptTranslationTest extends BrowserTestBase {
 
     foreach ($files as $filename) {
       // Parse the file to look for source strings.
-      _locale_parse_js_file($filename);
+      \_locale_parse_js_file($filename);
 
       // Get all of the source strings that were found.
       $strings = $this->container
@@ -171,7 +171,7 @@ class LocaleJavascriptTranslationTest extends BrowserTestBase {
     $this->assertSession()->responseContains('core/misc/drupal.js');
     $this->assertSession()->responseContains($js_filename);
     // Assert translations JS is included before drupal.js.
-    $this->assertLessThan(strpos($content, 'core/misc/drupal.js'), strpos($content, $js_filename));
+    $this->assertLessThan(\strpos($content, 'core/misc/drupal.js'), \strpos($content, $js_filename));
   }
 
 }

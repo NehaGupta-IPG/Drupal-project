@@ -122,7 +122,7 @@ class SystemManager {
   public function listRequirements() {
     // Load .install files.
     include_once DRUPAL_ROOT . '/core/includes/install.inc';
-    drupal_load_updates();
+    \drupal_load_updates();
 
     // Check run-time requirements and status information.
     $requirements = $this->moduleHandler->invokeAll('requirements', ['runtime']);
@@ -133,7 +133,7 @@ class SystemManager {
     uasort($requirements, function ($a, $b) {
       if (!isset($a['weight'])) {
         if (!isset($b['weight'])) {
-          return strcasecmp($a['title'], $b['title']);
+          return \strcasecmp($a['title'], $b['title']);
         }
         return -$b['weight'];
       }
@@ -231,7 +231,7 @@ class SystemManager {
       $content[$key]['description'] = $link->getDescription();
       $content[$key]['url'] = $link->getUrlObject();
     }
-    ksort($content);
+    \ksort($content);
     return $content;
   }
 

@@ -108,7 +108,7 @@ class SelectionTest extends BrowserTestBase {
     $target_type = 'node';
     $selection_handler = 'views';
     $selection_settings = $this->handlerSettings;
-    $selection_settings_key = Crypt::hmacBase64(serialize($selection_settings) . $target_type . $selection_handler, Settings::getHashSalt());
+    $selection_settings_key = Crypt::hmacBase64(\serialize($selection_settings) . $target_type . $selection_handler, Settings::getHashSalt());
     \Drupal::keyValue('entity_autocomplete')->set($selection_settings_key, $selection_settings);
 
     $result = Json::decode($this->drupalGet('entity_reference_autocomplete/' . $target_type . '/' . $selection_handler . '/' . $selection_settings_key, ['query' => ['q' => 't']]));

@@ -60,7 +60,7 @@ class LocaleExportTest extends BrowserTestBase {
     // First import some known translations.
     // This will also automatically add the 'fr' language.
     $name = $file_system->tempnam('temporary://', "po_") . '.po';
-    file_put_contents($name, $this->getPoFile());
+    \file_put_contents($name, $this->getPoFile());
     $this->drupalGet('admin/config/regional/translate/import');
     $this->submitForm([
       'langcode' => 'fr',
@@ -79,7 +79,7 @@ class LocaleExportTest extends BrowserTestBase {
 
     // Import some more French translations which will be marked as customized.
     $name = $file_system->tempnam('temporary://', "po2_") . '.po';
-    file_put_contents($name, $this->getCustomPoFile());
+    \file_put_contents($name, $this->getCustomPoFile());
     $this->drupalGet('admin/config/regional/translate/import');
     $this->submitForm([
       'langcode' => 'fr',

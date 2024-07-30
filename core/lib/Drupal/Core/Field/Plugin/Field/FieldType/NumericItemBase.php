@@ -121,7 +121,7 @@ abstract class NumericItemBase extends FieldItemBase {
    *   Decimal number truncated.
    */
   protected static function truncateDecimal($decimal, $num) {
-    return floor($decimal * pow(10, $num)) / pow(10, $num);
+    return \floor($decimal * \pow(10, $num)) / \pow(10, $num);
   }
 
   /**
@@ -138,8 +138,8 @@ abstract class NumericItemBase extends FieldItemBase {
     $settingsValue = $form_state->getValue('settings');
 
     // Ensure that the minimum and maximum are numeric.
-    $minValue = is_numeric($settingsValue['min']) ? (float) $settingsValue['min'] : NULL;
-    $maxValue = is_numeric($settingsValue['max']) ? (float) $settingsValue['max'] : NULL;
+    $minValue = \is_numeric($settingsValue['min']) ? (float) $settingsValue['min'] : NULL;
+    $maxValue = \is_numeric($settingsValue['max']) ? (float) $settingsValue['max'] : NULL;
 
     // Only proceed with validation if both values are numeric.
     if ($minValue === NULL || $maxValue === NULL) {
@@ -147,7 +147,7 @@ abstract class NumericItemBase extends FieldItemBase {
     }
 
     if ($minValue > $maxValue) {
-      $form_state->setError($element, t('The minimum value must be less than or equal to %max.', ['%max' => $maxValue]));
+      $form_state->setError($element, \t('The minimum value must be less than or equal to %max.', ['%max' => $maxValue]));
       return;
     }
   }

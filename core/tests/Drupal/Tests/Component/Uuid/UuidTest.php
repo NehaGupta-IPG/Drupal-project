@@ -24,7 +24,7 @@ class UuidTest extends TestCase {
    */
   #[DataProvider('providerUuidInstances')]
   public function testGenerateUuid(UuidInterface $instance): void {
-    $this->assertTrue(Uuid::isValid($instance->generate()), sprintf('UUID generation for %s works.', get_class($instance)));
+    $this->assertTrue(Uuid::isValid($instance->generate()), \sprintf('UUID generation for %s works.', \get_class($instance)));
   }
 
   /**
@@ -32,7 +32,7 @@ class UuidTest extends TestCase {
    */
   #[DataProvider('providerUuidInstances')]
   public function testUuidIsUnique(UuidInterface $instance): void {
-    $this->assertNotEquals($instance->generate(), $instance->generate(), sprintf('Same UUID was not generated twice with %s.', get_class($instance)));
+    $this->assertNotEquals($instance->generate(), $instance->generate(), \sprintf('Same UUID was not generated twice with %s.', \get_class($instance)));
   }
 
   /**
@@ -47,12 +47,12 @@ class UuidTest extends TestCase {
     $instances[][] = new Php();
 
     // If valid PECL extensions exists add to list.
-    if (function_exists('uuid_create') && !function_exists('uuid_make')) {
+    if (\function_exists('uuid_create') && !\function_exists('uuid_make')) {
       $instances[][] = new Pecl();
     }
 
     // If we are on Windows add the com implementation as well.
-    if (function_exists('com_create_guid')) {
+    if (\function_exists('com_create_guid')) {
       $instances[][] = new Com();
     }
 

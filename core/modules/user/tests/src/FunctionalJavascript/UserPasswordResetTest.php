@@ -63,7 +63,7 @@ class UserPasswordResetTest extends WebDriverTestBase {
 
     // Set the last login time that is used to generate the one-time link so
     // that it is definitely over a second ago.
-    $account->login = \Drupal::time()->getRequestTime() - mt_rand(10, 100000);
+    $account->login = \Drupal::time()->getRequestTime() - \mt_rand(10, 100000);
     Database::getConnection()->update('users_field_data')
       ->fields(['login' => $account->getLastLoginTime()])
       ->condition('uid', $account->id())
@@ -99,7 +99,7 @@ class UserPasswordResetTest extends WebDriverTestBase {
     $this->submitForm([], 'Log in');
 
     // Generate file.
-    $image_file = current($this->drupalGetTestFiles('image'));
+    $image_file = \current($this->drupalGetTestFiles('image'));
     $image_path = \Drupal::service('file_system')->realpath($image_file->uri);
 
     // Upload file.
@@ -123,9 +123,9 @@ class UserPasswordResetTest extends WebDriverTestBase {
   public function getResetURL() {
     // Assume the most recent email.
     $_emails = $this->drupalGetMails();
-    $email = end($_emails);
+    $email = \end($_emails);
     $urls = [];
-    preg_match('#.+user/reset/.+#', $email['body'], $urls);
+    \preg_match('#.+user/reset/.+#', $email['body'], $urls);
 
     return $urls[0];
   }

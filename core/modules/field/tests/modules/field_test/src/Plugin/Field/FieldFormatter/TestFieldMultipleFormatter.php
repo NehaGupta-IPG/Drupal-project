@@ -72,7 +72,7 @@ class TestFieldMultipleFormatter extends FormatterBase {
       foreach ($items as $delta => $item) {
         $array[] = $delta . ':' . $item->value;
       }
-      $elements[0] = ['#markup' => $this->getSetting('test_formatter_setting_multiple') . '|' . implode('|', $array)];
+      $elements[0] = ['#markup' => $this->getSetting('test_formatter_setting_multiple') . '|' . \implode('|', $array)];
     }
 
     return $elements;

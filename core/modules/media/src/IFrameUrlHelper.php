@@ -73,8 +73,8 @@ class IFrameUrlHelper {
     if (!$url) {
       return FALSE;
     }
-    $url_host = parse_url($url, PHP_URL_HOST);
-    $system_host = parse_url($this->requestContext->getCompleteBaseUrl(), PHP_URL_HOST);
+    $url_host = \parse_url($url, PHP_URL_HOST);
+    $system_host = \parse_url($this->requestContext->getCompleteBaseUrl(), PHP_URL_HOST);
 
     // The URL is secure if its domain is not the same as the domain of the base
     // URL of the current request.

@@ -72,7 +72,7 @@ class Role extends AccessPluginBase implements CacheableDependencyInterface {
    * {@inheritdoc}
    */
   public function access(AccountInterface $account) {
-    return !empty(array_intersect(array_filter($this->options['role']), $account->getRoles()));
+    return !empty(\array_intersect(\array_filter($this->options['role']), $account->getRoles()));
   }
 
   /**
@@ -80,7 +80,7 @@ class Role extends AccessPluginBase implements CacheableDependencyInterface {
    */
   public function alterRouteDefinition(Route $route) {
     if ($this->options['role']) {
-      $route->setRequirement('_role', (string) implode('+', $this->options['role']));
+      $route->setRequirement('_role', (string) \implode('+', $this->options['role']));
     }
   }
 
@@ -88,7 +88,7 @@ class Role extends AccessPluginBase implements CacheableDependencyInterface {
    * {@inheritdoc}
    */
   public function summaryTitle() {
-    $count = count($this->options['role']);
+    $count = \count($this->options['role']);
     if ($count < 1) {
       return $this->t('No role(s) selected');
     }
@@ -96,7 +96,7 @@ class Role extends AccessPluginBase implements CacheableDependencyInterface {
       return $this->t('Multiple roles');
     }
     else {
-      $rid = reset($this->options['role']);
+      $rid = \reset($this->options['role']);
       return $this->roleStorage->load($rid)->label();
     }
   }
@@ -120,7 +120,7 @@ class Role extends AccessPluginBase implements CacheableDependencyInterface {
       '#type' => 'checkboxes',
       '#title' => $this->t('Role'),
       '#default_value' => $this->options['role'],
-      '#options' => array_map(fn(RoleInterface $role) => Html::escape($role->label()), $this->roleStorage->loadMultiple()),
+      '#options' => \array_map(fn(RoleInterface $role) => Html::escape($role->label()), $this->roleStorage->loadMultiple()),
       '#description' => $this->t('Only the checked roles will be able to access this display.'),
     ];
   }
@@ -130,7 +130,7 @@ class Role extends AccessPluginBase implements CacheableDependencyInterface {
    */
   public function validateOptionsForm(&$form, FormStateInterface $form_state) {
     $role = $form_state->getValue(['access_options', 'role']);
-    $role = array_filter($role);
+    $role = \array_filter($role);
 
     if (!$role) {
       $form_state->setError($form['role'], $this->t('You must select at least one role if type is "by role"'));
@@ -145,7 +145,7 @@ class Role extends AccessPluginBase implements CacheableDependencyInterface {
   public function calculateDependencies() {
     $dependencies = parent::calculateDependencies();
 
-    foreach (array_keys($this->options['role']) as $rid) {
+    foreach (\array_keys($this->options['role']) as $rid) {
       if ($role = $this->roleStorage->load($rid)) {
         $dependencies[$role->getConfigDependencyKey()][] = $role->getConfigDependencyName();
       }

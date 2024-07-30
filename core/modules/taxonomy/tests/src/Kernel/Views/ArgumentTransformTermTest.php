@@ -40,7 +40,7 @@ class ArgumentTransformTermTest extends TaxonomyTestBase {
     $view->initHandlers();
 
     /** @var string $hyphenated_term */
-    $hyphenated_term = str_replace(' ', '-', $term->label());
+    $hyphenated_term = \str_replace(' ', '-', $term->label());
     $this->assertTrue($view->argument['tid']->setArgument($hyphenated_term));
     // Assert hyphens are converted back to spaces.
     $this->assertEquals($term->label(), $view->argument['tid']->argument);

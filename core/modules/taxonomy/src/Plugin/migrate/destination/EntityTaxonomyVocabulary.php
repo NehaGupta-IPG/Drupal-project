@@ -22,7 +22,7 @@ class EntityTaxonomyVocabulary extends EntityConfigBase {
     $vocabulary = parent::getEntity($row, $old_destination_id_values);
 
     // Config schema does not allow description to be empty.
-    if (trim($vocabulary->getDescription()) === '') {
+    if (\trim($vocabulary->getDescription()) === '') {
       $vocabulary->set('description', NULL);
     }
     return $vocabulary;

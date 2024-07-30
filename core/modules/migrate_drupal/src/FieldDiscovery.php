@@ -122,7 +122,7 @@ class FieldDiscovery implements FieldDiscoveryInterface {
   public function addEntityFieldProcesses(MigrationInterface $migration, $entity_type_id) {
     $core = $this->getCoreVersion($migration);
     $fields = $this->getAllFields($core);
-    if (!empty($fields[$entity_type_id])  && is_array($fields[$entity_type_id])) {
+    if (!empty($fields[$entity_type_id])  && \is_array($fields[$entity_type_id])) {
       foreach ($fields[$entity_type_id] as $bundle => $fields) {
         $this->addBundleFieldProcesses($migration, $entity_type_id, $bundle);
       }
@@ -145,7 +145,7 @@ class FieldDiscovery implements FieldDiscoveryInterface {
       if ($plugin) {
         $method = $plugin_definition['field_plugin_method'] ?? 'defineValueProcessPipeline';
 
-        call_user_func_array([
+        \call_user_func_array([
           $plugin,
           $method,
         ], [
@@ -332,10 +332,10 @@ class FieldDiscovery implements FieldDiscoveryInterface {
    */
   protected function getCoreVersion(MigrationInterface $migration) {
     $tags = $migration->getMigrationTags();
-    if (in_array('Drupal 7', $tags, TRUE)) {
+    if (\in_array('Drupal 7', $tags, TRUE)) {
       return FieldDiscoveryInterface::DRUPAL_7;
     }
-    elseif (in_array('Drupal 6', $tags, TRUE)) {
+    elseif (\in_array('Drupal 6', $tags, TRUE)) {
       return FieldDiscoveryInterface::DRUPAL_6;
     }
     throw new \InvalidArgumentException("Drupal Core version not found for this migration");

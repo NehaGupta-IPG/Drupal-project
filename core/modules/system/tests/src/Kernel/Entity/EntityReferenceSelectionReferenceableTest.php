@@ -130,7 +130,7 @@ class EntityReferenceSelectionReferenceableTest extends KernelTestBase {
       // SelectionInterface::getReferenceableEntities() always return escaped
       // entity labels.
       // @see \Drupal\Core\Entity\EntityReferenceSelection\SelectionInterface::getReferenceableEntities()
-      $item = is_string($item) ? Html::escape($item) : $item;
+      $item = \is_string($item) ? Html::escape($item) : $item;
       $this->assertContainsEquals($item, $referenceables[$this->bundle]);
     }
 

@@ -35,7 +35,7 @@ class ErrorCollection implements \IteratorAggregate {
    *   The errors.
    */
   public function __construct(array $errors) {
-    assert(Inspector::assertAll(function ($error) {
+    \assert(Inspector::assertAll(function ($error) {
       return $error instanceof HttpExceptionInterface;
     }, $errors));
     $this->errors = $errors;

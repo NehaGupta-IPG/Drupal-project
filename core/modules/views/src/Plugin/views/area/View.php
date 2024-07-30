@@ -102,7 +102,7 @@ class View extends AreaPluginBase {
    */
   public function render($empty = FALSE) {
     if (!empty($this->options['view_to_insert'])) {
-      [$view_name, $display_id] = explode(':', $this->options['view_to_insert']);
+      [$view_name, $display_id] = \explode(':', $this->options['view_to_insert']);
 
       $view = $this->viewStorage->load($view_name)->getExecutable();
 

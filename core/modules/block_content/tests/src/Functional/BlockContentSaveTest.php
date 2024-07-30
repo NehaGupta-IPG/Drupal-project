@@ -43,7 +43,7 @@ class BlockContentSaveTest extends BlockContentTestBase {
       ->accessCheck(FALSE)
       ->aggregate('id', 'max')
       ->execute()[0]['id_max'];
-    $test_id = $max_id + mt_rand(1000, 1000000);
+    $test_id = $max_id + \mt_rand(1000, 1000000);
     $info = $this->randomMachineName(8);
     $block_array = [
       'info' => $info,

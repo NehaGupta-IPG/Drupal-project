@@ -88,7 +88,7 @@ class EntityReference extends StylePluginBase {
         $results[$values->{$id_field_alias}] = $this->view->rowPlugin->render($values);
         // Sanitize HTML, remove line breaks and extra whitespace.
         $results[$values->{$id_field_alias}]['#post_render'][] = function ($html, array $elements) {
-          return Xss::filterAdmin(preg_replace('/\s\s+/', ' ', str_replace("\n", '', $html)));
+          return Xss::filterAdmin(\preg_replace('/\s\s+/', ' ', \str_replace("\n", '', $html)));
         };
       }
     }

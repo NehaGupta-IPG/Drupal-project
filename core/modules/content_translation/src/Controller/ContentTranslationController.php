@@ -153,7 +153,7 @@ class ContentTranslationController extends ControllerBase {
       }
 
       // Show source-language column if there are non-original source langcodes.
-      $additional_source_langcodes = array_filter(array_keys($translations), function ($langcode) use ($entity, $original, $manager) {
+      $additional_source_langcodes = \array_filter(\array_keys($translations), function ($langcode) use ($entity, $original, $manager) {
         $source = $manager->getTranslationMetadata($entity->getTranslation($langcode))->getSource();
         return $source != $original && $source != LanguageInterface::LANGCODE_NOT_SPECIFIED;
       });
@@ -198,7 +198,7 @@ class ContentTranslationController extends ControllerBase {
         ];
 
         $links = &$operations['data']['#links'];
-        if (array_key_exists($langcode, $translations)) {
+        if (\array_key_exists($langcode, $translations)) {
           // Existing translation in the translation set: display status.
           $translation = $entity->getTranslation($langcode);
           $metadata = $manager->getTranslationMetadata($translation);

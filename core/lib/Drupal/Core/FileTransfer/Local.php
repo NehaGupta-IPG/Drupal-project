@@ -64,7 +64,7 @@ class Local extends FileTransfer implements ChmodInterface {
    * {@inheritdoc}
    */
   protected function createDirectoryJailed($directory) {
-    if (!is_dir($directory) && @!mkdir($directory, 0777, TRUE)) {
+    if (!\is_dir($directory) && @!\mkdir($directory, 0777, TRUE)) {
       throw new FileTransferException('Cannot create directory %directory.', 0, ['%directory' => $directory]);
     }
   }
@@ -73,7 +73,7 @@ class Local extends FileTransfer implements ChmodInterface {
    * {@inheritdoc}
    */
   protected function removeDirectoryJailed($directory) {
-    if (!is_dir($directory)) {
+    if (!\is_dir($directory)) {
       // Programmer error assertion, not something we expect users to see.
       throw new FileTransferException('removeDirectoryJailed() called with a path (%directory) that is not a directory.', 0, ['%directory' => $directory]);
     }
@@ -109,28 +109,28 @@ class Local extends FileTransfer implements ChmodInterface {
    * {@inheritdoc}
    */
   public function isDirectory($path) {
-    return is_dir($path);
+    return \is_dir($path);
   }
 
   /**
    * {@inheritdoc}
    */
   public function isFile($path) {
-    return is_file($path);
+    return \is_file($path);
   }
 
   /**
    * {@inheritdoc}
    */
   public function chmodJailed($path, $mode, $recursive) {
-    if ($recursive && is_dir($path)) {
+    if ($recursive && \is_dir($path)) {
       foreach (new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($path, \RecursiveDirectoryIterator::SKIP_DOTS), \RecursiveIteratorIterator::SELF_FIRST) as $filename => $file) {
-        if (@!chmod($filename, $mode)) {
+        if (@!\chmod($filename, $mode)) {
           throw new FileTransferException('Cannot chmod %path.', 0, ['%path' => $filename]);
         }
       }
     }
-    elseif (@!chmod($path, $mode)) {
+    elseif (@!\chmod($path, $mode)) {
       throw new FileTransferException('Cannot chmod %path.', 0, ['%path' => $path]);
     }
   }

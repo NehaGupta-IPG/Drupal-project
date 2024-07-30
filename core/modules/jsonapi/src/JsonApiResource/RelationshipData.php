@@ -26,7 +26,7 @@ class RelationshipData extends Data {
    * @see \Drupal\jsonapi\JsonApiResource\Data::__construct
    */
   public function __construct(array $data, $cardinality = -1) {
-    assert(Inspector::assertAllObjects($data, ResourceIdentifier::class));
+    \assert(Inspector::assertAllObjects($data, ResourceIdentifier::class));
     parent::__construct($data, $cardinality);
   }
 

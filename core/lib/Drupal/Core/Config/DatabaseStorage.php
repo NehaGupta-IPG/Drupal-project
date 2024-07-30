@@ -261,7 +261,7 @@ class DatabaseStorage implements StorageInterface {
    * {@inheritdoc}
    */
   public function encode($data) {
-    return serialize($data);
+    return \serialize($data);
   }
 
   /**

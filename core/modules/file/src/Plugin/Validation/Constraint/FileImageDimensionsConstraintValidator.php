@@ -60,7 +60,7 @@ class FileImageDimensionsConstraintValidator extends BaseFileConstraintValidator
     $maxDimensions = $constraint->maxDimensions;
     if ($maxDimensions) {
       // Check that it is smaller than the given dimensions.
-      [$width, $height] = explode('x', $maxDimensions);
+      [$width, $height] = \explode('x', $maxDimensions);
       if ($image->getWidth() > $width || $image->getHeight() > $height) {
         // Try to resize the image to fit the dimensions.
         if ($image->scale($width, $height)) {
@@ -101,7 +101,7 @@ class FileImageDimensionsConstraintValidator extends BaseFileConstraintValidator
     $minDimensions = $constraint->minDimensions;
     if ($minDimensions) {
       // Check that it is larger than the given dimensions.
-      [$width, $height] = explode('x', $minDimensions);
+      [$width, $height] = \explode('x', $minDimensions);
       if ($image->getWidth() < $width || $image->getHeight() < $height) {
         if ($scaling) {
           $this->context->addViolation($constraint->messageResizedImageTooSmall,

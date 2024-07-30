@@ -270,8 +270,8 @@ class DataDefinition implements DataDefinitionInterface, \ArrayAccess {
     // `NotBlank`'s `allowNull: true` option mitigates that.)
     // @see ::isRequired()
     // @see \Drupal\Core\TypedData\TypedDataManager::getDefaultConstraints()
-    if (array_key_exists('NotBlank', $constraints) && $this->isRequired()) {
-      assert(array_key_exists('NotNull', $constraints));
+    if (\array_key_exists('NotBlank', $constraints) && $this->isRequired()) {
+      \assert(\array_key_exists('NotNull', $constraints));
       $constraints['NotBlank']['allowNull'] = TRUE;
     }
     return $constraints;
@@ -318,7 +318,7 @@ class DataDefinition implements DataDefinitionInterface, \ArrayAccess {
   public function offsetExists($offset): bool {
     // PHP's array access does not work correctly with isset(), so we have to
     // bake isset() in here. See https://bugs.php.net/bug.php?id=41727.
-    return array_key_exists($offset, $this->definition) && isset($this->definition[$offset]);
+    return \array_key_exists($offset, $this->definition) && isset($this->definition[$offset]);
   }
 
   /**
@@ -372,9 +372,9 @@ class DataDefinition implements DataDefinitionInterface, \ArrayAccess {
    */
   public function __sleep(): array {
     // Never serialize the typed data manager.
-    $vars = get_object_vars($this);
+    $vars = \get_object_vars($this);
     unset($vars['typedDataManager']);
-    return array_keys($vars);
+    return \array_keys($vars);
   }
 
   /**

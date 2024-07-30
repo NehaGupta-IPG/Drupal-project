@@ -17,7 +17,7 @@ class DeprecatedController {
    */
   public function deprecatedMethod() {
     return [
-      '#markup' => deprecation_test_function(),
+      '#markup' => \deprecation_test_function(),
     ];
   }
 

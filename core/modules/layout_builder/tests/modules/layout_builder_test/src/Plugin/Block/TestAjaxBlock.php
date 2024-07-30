@@ -32,7 +32,7 @@ class TestAjaxBlock extends BlockBase {
       '#prefix' => '<div id="test-ajax-wrapper">',
       '#suffix' => '</div>',
       '#title' => $this->t('Time in this ajax test is @time', [
-        '@time' => time(),
+        '@time' => \time(),
       ]),
       '#ajax' => [
         'wrapper' => 'test-ajax-wrapper',

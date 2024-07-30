@@ -53,38 +53,38 @@ final class ExtensionVersion {
    */
   public static function createFromVersionString(string $version_string): ExtensionVersion {
     $original_version = $version_string;
-    if (str_starts_with($version_string, static::CORE_PREFIX) && $version_string !== '8.x-dev') {
-      $version_string = preg_replace('/8\.x-/', '', $version_string, 1);
+    if (\str_starts_with($version_string, static::CORE_PREFIX) && $version_string !== '8.x-dev') {
+      $version_string = \preg_replace('/8\.x-/', '', $version_string, 1);
     }
     else {
       // Ensure the version string has no unsupported core prefixes.
-      $dot_x_position = strpos($version_string, '.x-');
+      $dot_x_position = \strpos($version_string, '.x-');
       if ($dot_x_position === 1 || $dot_x_position === 2) {
-        $after_core_prefix = explode('.x-', $version_string)[1];
+        $after_core_prefix = \explode('.x-', $version_string)[1];
         if ($after_core_prefix !== 'dev') {
           throw new \UnexpectedValueException("Unexpected version core prefix in $version_string. The only core prefix expected in \Drupal\Core\Extension\ExtensionVersion is: 8.x-");
         }
       }
     }
-    $version_parts = explode('.', $version_string);
+    $version_parts = \explode('.', $version_string);
     $major_version = $version_parts[0];
-    $version_parts_count = count($version_parts);
+    $version_parts_count = \count($version_parts);
     if ($version_parts_count === 2) {
       $minor_version = NULL;
     }
     elseif ($version_parts_count === 3) {
       $minor_version = $version_parts[1];
     }
-    $last_part_split = explode('-', $version_parts[count($version_parts) - 1]);
-    $version_extra = count($last_part_split) === 1 ? NULL : $last_part_split[1];
+    $last_part_split = \explode('-', $version_parts[\count($version_parts) - 1]);
+    $version_extra = \count($last_part_split) === 1 ? NULL : $last_part_split[1];
     if ($version_parts_count > 3
        || $version_parts_count < 2
-       || !is_numeric($major_version)
-       || ($version_parts_count === 3 && !is_numeric($version_parts[1]))
+       || !\is_numeric($major_version)
+       || ($version_parts_count === 3 && !\is_numeric($version_parts[1]))
        // The only case where a non-numeric version part other the extra part is
        // allowed is in development versions like 8.x-1.x-dev, 1.2.x-dev or
        // 1.x-dev.
-       || (!is_numeric($last_part_split[0]) && $last_part_split !== 'x' && $version_extra !== 'dev')) {
+       || (!\is_numeric($last_part_split[0]) && $last_part_split !== 'x' && $version_extra !== 'dev')) {
       throw new \UnexpectedValueException("Unexpected version number in: $original_version");
     }
     return new static($major_version, $minor_version, $version_extra);
@@ -119,7 +119,7 @@ final class ExtensionVersion {
    *   The ExtensionVersion instance.
    */
   public static function createFromSupportBranch(string $branch): ExtensionVersion {
-    if (!str_ends_with($branch, '.')) {
+    if (!\str_ends_with($branch, '.')) {
       throw new \UnexpectedValueException("Invalid support branch: $branch");
     }
     return static::createFromVersionString($branch . '0');

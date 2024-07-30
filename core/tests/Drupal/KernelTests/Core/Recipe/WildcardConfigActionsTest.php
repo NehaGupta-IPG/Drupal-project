@@ -119,9 +119,9 @@ YAML;
       ->getQuery()
       ->condition('label', 'Changed by config action')
       ->execute();
-    sort($expected_changed_entities);
-    sort($changed);
-    $this->assertSame($expected_changed_entities, array_values($changed));
+    \sort($expected_changed_entities);
+    \sort($changed);
+    $this->assertSame($expected_changed_entities, \array_values($changed));
   }
 
   /**

@@ -48,7 +48,7 @@ class UserEditTest extends BrowserTestBase {
     // Ensure the formatted name is displayed when expected.
     $this->drupalGet('user/' . $user1->id());
     $this->assertSession()->responseContains($user1->getDisplayName());
-    $this->assertSession()->titleEquals(strip_tags($user1->getDisplayName()) . ' | Drupal');
+    $this->assertSession()->titleEquals(\strip_tags($user1->getDisplayName()) . ' | Drupal');
 
     // Check that filling out a single password field does not validate.
     $edit = [];

@@ -99,15 +99,15 @@ class ErrorHandlerTest extends BrowserTestBase {
    */
   public function testCustomErrorHandler(): void {
     $settings_filename = $this->siteDirectory . '/settings.php';
-    chmod($settings_filename, 0777);
-    $settings_php = file_get_contents($settings_filename);
+    \chmod($settings_filename, 0777);
+    $settings_php = \file_get_contents($settings_filename);
     $settings_php .= "\n";
     $settings_php .= "set_error_handler(function() {\n";
     $settings_php .= "  header('HTTP/1.1 418 I\'m a teapot');\n";
     $settings_php .= "  print('Oh oh, flying teapots from a custom error handler');\n";
     $settings_php .= "  exit();\n";
     $settings_php .= "});\n";
-    file_put_contents($settings_filename, $settings_php);
+    \file_put_contents($settings_filename, $settings_php);
 
     // For most types of errors, PHP throws an \Error object that Drupal
     // catches, so the error handler is not invoked. To test the error handler,

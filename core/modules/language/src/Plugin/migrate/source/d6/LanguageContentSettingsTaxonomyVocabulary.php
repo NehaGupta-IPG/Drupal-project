@@ -60,7 +60,7 @@ class LanguageContentSettingsTaxonomyVocabulary extends DrupalSqlBase {
     $i18ntaxonomy_vocabulary = $this->variableGet('i18ntaxonomy_vocabulary', []);
     $vid = $row->getSourceProperty('vid');
     $state = 0;
-    if (array_key_exists($vid, $i18ntaxonomy_vocabulary)) {
+    if (\array_key_exists($vid, $i18ntaxonomy_vocabulary)) {
       $state = $i18ntaxonomy_vocabulary[$vid];
     }
     $row->setSourceProperty('state', $state);

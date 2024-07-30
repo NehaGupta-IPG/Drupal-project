@@ -77,14 +77,14 @@ class LanguageLocaleListTest extends BrowserTestBase {
     // Get language list displayed in select list.
     $this->drupalGet('fr/admin/config/regional/language/add');
     $options = $this->assertSession()->selectExists('edit-predefined-langcode')->findAll('css', 'option');
-    $options = array_map(function ($item) {
+    $options = \array_map(function ($item) {
       return $item->getText();
     }, $options);
     // Remove the 'Custom language...' option form the end.
-    array_pop($options);
+    \array_pop($options);
     // Order language list.
     $options_ordered = $options;
-    natcasesort($options_ordered);
+    \natcasesort($options_ordered);
 
     // Check the language list displayed is ordered.
     $this->assertSame($options, $options_ordered, 'Language list is ordered.');

@@ -55,7 +55,7 @@ class HtmlResponseBigPipeSubscriber implements EventSubscriberInterface {
     if (isset($attachments['html_response_attachment_placeholders']['scripts_bottom'])) {
       $scripts_bottom_placeholder = $attachments['html_response_attachment_placeholders']['scripts_bottom'];
       $content = $response->getContent();
-      $content = str_replace($scripts_bottom_placeholder, '<drupal-big-pipe-scripts-bottom-marker>' . $scripts_bottom_placeholder . '<drupal-big-pipe-scripts-bottom-marker>', $content);
+      $content = \str_replace($scripts_bottom_placeholder, '<drupal-big-pipe-scripts-bottom-marker>' . $scripts_bottom_placeholder . '<drupal-big-pipe-scripts-bottom-marker>', $content);
       $response->setContent($content);
     }
   }
@@ -80,7 +80,7 @@ class HtmlResponseBigPipeSubscriber implements EventSubscriberInterface {
     // @see \Drupal\big_pipe\Render\BigPipe::sendPreBody()
     if (empty($attachments['big_pipe_nojs_placeholders'])) {
       $content = $response->getContent();
-      $content = str_replace('<drupal-big-pipe-scripts-bottom-marker>', '', $content);
+      $content = \str_replace('<drupal-big-pipe-scripts-bottom-marker>', '', $content);
       $response->setContent($content);
     }
 

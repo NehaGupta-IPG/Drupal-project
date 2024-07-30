@@ -137,7 +137,7 @@ class EntityRevision extends EntityContentBase {
    */
   protected function getEntity(Row $row, array $old_destination_id_values) {
     $revision_id = $old_destination_id_values ?
-      reset($old_destination_id_values) :
+      \reset($old_destination_id_values) :
       $row->getDestinationProperty($this->getKey('revision'));
     $entity = NULL;
     if (!empty($revision_id)) {
@@ -189,14 +189,14 @@ class EntityRevision extends EntityContentBase {
 
     $revision_key = $this->getKey('revision');
     if (!$revision_key) {
-      throw new MigrateException(sprintf('The "%s" entity type does not support revisions.', $this->storage->getEntityTypeId()));
+      throw new MigrateException(\sprintf('The "%s" entity type does not support revisions.', $this->storage->getEntityTypeId()));
     }
     $ids[$revision_key] = $this->getDefinitionFromEntity($revision_key);
 
     if ($this->isTranslationDestination()) {
       $langcode_key = $this->getKey('langcode');
       if (!$langcode_key) {
-        throw new MigrateException(sprintf('The "%s" entity type does not support translations.', $this->storage->getEntityTypeId()));
+        throw new MigrateException(\sprintf('The "%s" entity type does not support translations.', $this->storage->getEntityTypeId()));
       }
       $ids[$langcode_key] = $this->getDefinitionFromEntity($langcode_key);
     }
@@ -216,7 +216,7 @@ class EntityRevision extends EntityContentBase {
       ->execute();
     // The array keys are the revision IDs.
     // The array contains only one entry, so we can use key().
-    return (int) key($values);
+    return (int) \key($values);
   }
 
 }

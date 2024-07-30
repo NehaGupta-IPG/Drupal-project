@@ -76,7 +76,7 @@ class UpdateContribTest extends UpdateTestBase {
     $this->assertSession()->linkNotExists('AAA Update test');
     $this->assertSession()->linkByHrefNotExists('http://example.com/project/aaa_update_test');
 
-    $available = update_get_available();
+    $available = \update_get_available();
     $this->assertFalse(isset($available['aaa_update_test']['fetch_status']), 'Results are cached even if no releases are available.');
   }
 
@@ -204,7 +204,7 @@ class UpdateContribTest extends UpdateTestBase {
     $ccc_project_link = '<div class="project-update__title"><a href="http://example.com/project/ccc_update_test">CCC Update test</a>';
     // Verify that the 'BBB Update test' project is listed before the
     // 'CCC Update test' project.
-    $this->assertLessThan(strpos($this->getSession()->getPage()->getContent(), $ccc_project_link), strpos($this->getSession()->getPage()->getContent(), $bbb_project_link));
+    $this->assertLessThan(\strpos($this->getSession()->getPage()->getContent(), $ccc_project_link), \strpos($this->getSession()->getPage()->getContent(), $bbb_project_link));
   }
 
   /**
@@ -264,7 +264,7 @@ class UpdateContribTest extends UpdateTestBase {
         $full_version = "8.x-$version$extra_version";
         $this->refreshUpdateStatus([
           'drupal' => '8.0.0',
-          'aaa_update_test' => str_replace('.', '_', $version) . $extra_version,
+          'aaa_update_test' => \str_replace('.', '_', $version) . $extra_version,
         ]);
         $this->standardTests();
         $assert_session->pageTextNotContains('Security update required!');
@@ -345,7 +345,7 @@ class UpdateContribTest extends UpdateTestBase {
     // Make sure all the update_test_* themes are uninstalled.
     $extension_config = $this->config('core.extension');
     foreach ($extension_config->get('theme') as $theme => $weight) {
-      if (str_starts_with($theme, 'update_test_')) {
+      if (\str_starts_with($theme, 'update_test_')) {
         $extension_config->clear("theme.$theme");
       }
     }

@@ -47,7 +47,7 @@ trait BasicAuthResourceTestTrait {
       ->addCacheTags(['config:user.role.anonymous']);
     // Only add the 'user.roles:anonymous' cache context if its parent cache
     // context is not already present.
-    if (!in_array('user.roles', $expected_cacheability->getCacheContexts(), TRUE)) {
+    if (!\in_array('user.roles', $expected_cacheability->getCacheContexts(), TRUE)) {
       $expected_cacheability->addCacheContexts(['user.roles:anonymous']);
     }
     $this->assertResourceErrorResponse(401, 'No authentication credentials provided.', $response, $expected_cacheability->getCacheTags(), $expected_cacheability->getCacheContexts(), $expected_page_cache_header_value, FALSE);

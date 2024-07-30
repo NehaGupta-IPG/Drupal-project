@@ -171,7 +171,7 @@ class ProcessingTest extends BrowserTestBase {
     $batch_test_helper = new BatchTestHelper();
     // Batches 1, 2 and 3 are triggered in sequence by different submit
     // handlers. Each submit handler modify the submitted 'value'.
-    $value = rand(0, 255);
+    $value = \rand(0, 255);
     $edit = ['value' => $value];
     $this->drupalGet('batch-test/chained');
     $this->submitForm($edit, 'Submit');
@@ -192,7 +192,7 @@ class ProcessingTest extends BrowserTestBase {
     $batch_test_helper = new BatchTestHelper();
     // Batches 1, 2 and 3 are triggered in sequence by different submit
     // handlers. Each submit handler modify the submitted 'value'.
-    $value = rand(0, 255);
+    $value = \rand(0, 255);
     $this->drupalGet('batch-test/programmatic/' . $value);
     // Check that result messages are present and in the correct order.
     $this->assertBatchMessages($this->_resultMessages('chained'));
@@ -209,7 +209,7 @@ class ProcessingTest extends BrowserTestBase {
     $batch_test_helper = new BatchTestHelper();
     // Displaying the page triggers a batch that programmatically submits a
     // form.
-    $value = rand(0, 255);
+    $value = \rand(0, 255);
     $this->drupalGet('batch-test/nested-programmatic/' . $value);
     $this->assertEquals(['mock form submitted with value = ' . $value], $batch_test_helper->stack(), '\\Drupal::formBuilder()->submitForm() ran successfully within a batch operation.');
   }
@@ -237,7 +237,7 @@ class ProcessingTest extends BrowserTestBase {
    * @internal
    */
   public function assertBatchMessages(array $texts): void {
-    $pattern = '|' . implode('.*', $texts) . '|s';
+    $pattern = '|' . \implode('.*', $texts) . '|s';
     $this->assertSession()->responseMatches($pattern);
   }
 

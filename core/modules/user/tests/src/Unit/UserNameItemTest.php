@@ -33,8 +33,8 @@ class UserNameItemTest extends UnitTestCase {
 
     for ($i = 0; $i < 1000; $i++) {
       $sample_value = UserNameItem::generateSampleValue($definition->reveal());
-      $this->assertLessThanOrEqual($max_length, mb_strlen($sample_value['value']));
-      $this->assertEquals(trim($sample_value['value'], ' '), $sample_value['value']);
+      $this->assertLessThanOrEqual($max_length, \mb_strlen($sample_value['value']));
+      $this->assertEquals(\trim($sample_value['value'], ' '), $sample_value['value']);
     }
   }
 

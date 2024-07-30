@@ -41,7 +41,7 @@ class CastedIntFieldJoin extends JoinPluginBase {
 
     $right_field = "{$table['alias']}.$this->field";
 
-    assert(!isset($this->configuration['cast']) || in_array($this->configuration['cast'], ['right', 'left']));
+    \assert(!isset($this->configuration['cast']) || \in_array($this->configuration['cast'], ['right', 'left']));
     if (isset($this->configuration['cast']) && $this->configuration['cast'] === 'left') {
       $left_field = \Drupal::service('views.cast_sql')->getFieldAsInt($left_field);
     }

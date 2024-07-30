@@ -94,7 +94,7 @@ class ModeratedNodeListBuilder extends NodeListBuilder {
 
     $result = $query->execute();
 
-    return $result ? array_column($result, 'content_entity_revision_id') : [];
+    return $result ? \array_column($result, 'content_entity_revision_id') : [];
   }
 
   /**

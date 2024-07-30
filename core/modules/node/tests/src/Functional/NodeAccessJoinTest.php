@@ -146,7 +146,7 @@ class NodeAccessJoinTest extends NodeTestBase {
       ])
       ->save();
 
-    node_access_rebuild();
+    \node_access_rebuild();
     \Drupal::state()->set('node_access_test.private', TRUE);
   }
 
@@ -191,12 +191,12 @@ class NodeAccessJoinTest extends NodeTestBase {
     // 'author_private' articles are created by authorUser with private=1.
     // 'no_reference' is used for references when there is no related article.
     $access_type = ['public', 'private', 'author_public', 'author_private'];
-    $reference_access_type = array_merge(['no_reference'], $access_type);
+    $reference_access_type = \array_merge(['no_reference'], $access_type);
 
     foreach ($reference_access_type as $reference2) {
       foreach ($access_type as $article) {
-        $is_author = (str_starts_with($article, 'author'));
-        $is_private = (str_ends_with($article, 'private'));
+        $is_author = (\str_starts_with($article, 'author'));
+        $is_private = (\str_ends_with($article, 'private'));
         $edit = [
           'type' => 'article',
           'uid' => $is_author ? $this->authorUser->id() : $this->otherUser->id(),
@@ -261,16 +261,16 @@ class NodeAccessJoinTest extends NodeTestBase {
           }
         }
         // Public users only see 'public' and 'author_public' articles.
-        if (str_ends_with($reference, 'public')) {
+        if (\str_ends_with($reference, 'public')) {
           $count_s_public++;
-          if (str_ends_with($reference2, 'public')) {
+          if (\str_ends_with($reference2, 'public')) {
             $count_s2_public++;
           }
         }
         // authorUser sees 'public','author_public', 'author_private' articles.
-        if (str_ends_with($reference, 'public') || str_starts_with($reference, 'author')) {
+        if (\str_ends_with($reference, 'public') || \str_starts_with($reference, 'author')) {
           $count_s_author++;
-          if (str_ends_with($reference2, 'public') || str_starts_with($reference2, 'author')) {
+          if (\str_ends_with($reference2, 'public') || \str_starts_with($reference2, 'author')) {
             $count_s2_author++;
           }
         }
@@ -281,7 +281,7 @@ class NodeAccessJoinTest extends NodeTestBase {
         // hidden from view, instead of hiding just one cell of the table).
         // Count of pages where all related articles are accessible by
         // public users.
-        if (!str_ends_with($reference, 'private') && !str_ends_with($reference2, 'private')) {
+        if (!\str_ends_with($reference, 'private') && !\str_ends_with($reference2, 'private')) {
           $total_public++;
         }
         // Count of pages where all related articles are accessible by
@@ -294,16 +294,16 @@ class NodeAccessJoinTest extends NodeTestBase {
 
     // Generate a view listing all the pages, and check the view's content for
     // users with three different access levels.
-    ViewTestData::createTestViews(get_class($this), ['node_test_views']);
+    ViewTestData::createTestViews(\get_class($this), ['node_test_views']);
 
     // Check the author of the 'author' articles.
     $this->drupalLogin($this->authorUser);
     $this->drupalGet('test-node-access-join');
-    $chk_total = count($this->xpath("//td[@headers='view-title-table-column']"));
+    $chk_total = \count($this->xpath("//td[@headers='view-title-table-column']"));
     $this->assertEquals($chk_total, $total, 'Author should see ' . $total . ' rows. Actual: ' . $chk_total);
-    $chk_total = count($this->xpath("//td[@headers='view-title-1-table-column']/a"));
+    $chk_total = \count($this->xpath("//td[@headers='view-title-1-table-column']/a"));
     $this->assertEquals($chk_total, $count_s_author, 'Author should see ' . $count_s_author . ' primary references. Actual: ' . $chk_total);
-    $chk_total = count($this->xpath("//td[@headers='view-title-2-table-column']/a"));
+    $chk_total = \count($this->xpath("//td[@headers='view-title-2-table-column']/a"));
     $this->assertEquals($chk_total, $count_s2_author, 'Author should see ' . $count_s2_author . ' secondary references. Actual: ' . $chk_total);
 
     $session = $this->assertSession();
@@ -320,11 +320,11 @@ class NodeAccessJoinTest extends NodeTestBase {
     $this->regularUser = $this->drupalCreateUser(['access content']);
     $this->drupalLogin($this->regularUser);
     $this->drupalGet('test-node-access-join');
-    $chk_total = count($this->xpath("//td[@headers='view-title-table-column']"));
+    $chk_total = \count($this->xpath("//td[@headers='view-title-table-column']"));
     $this->assertEquals($chk_total, $total, 'Public user should see ' . $total . ' rows. Actual: ' . $chk_total);
-    $chk_total = count($this->xpath("//td[@headers='view-title-1-table-column']/a"));
+    $chk_total = \count($this->xpath("//td[@headers='view-title-1-table-column']/a"));
     $this->assertEquals($chk_total, $count_s_public, 'Public user should see ' . $count_s_public . ' primary references. Actual: ' . $chk_total);
-    $chk_total = count($this->xpath("//td[@headers='view-title-2-table-column']/a"));
+    $chk_total = \count($this->xpath("//td[@headers='view-title-2-table-column']/a"));
     $this->assertEquals($chk_total, $count_s2_public, 'Public user should see ' . $count_s2_public . ' secondary references. Actual: ' . $chk_total);
     $session->pageTextContains('Page - no_reference');
     $session->pageTextContains('Page - public - no_reference');
@@ -342,11 +342,11 @@ class NodeAccessJoinTest extends NodeTestBase {
     ]);
     $this->drupalLogin($this->accessUser);
     $this->drupalGet('test-node-access-join');
-    $chk_total = count($this->xpath("//td[@headers='view-title-table-column']"));
+    $chk_total = \count($this->xpath("//td[@headers='view-title-table-column']"));
     $this->assertEquals($chk_total, $total, 'Full-access user should see ' . $total . ' rows. Actual: ' . $chk_total);
-    $chk_total = count($this->xpath("//td[@headers='view-title-1-table-column']/a"));
+    $chk_total = \count($this->xpath("//td[@headers='view-title-1-table-column']/a"));
     $this->assertEquals($chk_total, $count_s_total, 'Full-access user should see ' . $count_s_total . ' primary references. Actual: ' . $chk_total);
-    $chk_total = count($this->xpath("//td[@headers='view-title-2-table-column']/a"));
+    $chk_total = \count($this->xpath("//td[@headers='view-title-2-table-column']/a"));
     $this->assertEquals($chk_total, $count_s2_total, 'Full-access user should see ' . $count_s2_total . ' secondary references. Actual: ' . $chk_total);
     $session->pageTextContains('Page - no_reference');
     $session->pageTextContains('Page - public - no_reference');

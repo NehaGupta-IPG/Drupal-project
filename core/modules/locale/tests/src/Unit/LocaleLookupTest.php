@@ -359,11 +359,11 @@ class LocaleLookupTest extends UnitTestCase {
     $translations = [
       'by' => [
         'word1' => '@count[2] word-by',
-        'word2' => implode(PoItem::DELIMITER, ['word-by', '@count[2] word-by']),
+        'word2' => \implode(PoItem::DELIMITER, ['word-by', '@count[2] word-by']),
       ],
       'ru' => [
         'word3' => '@count[2] word-ru',
-        'word4' => implode(PoItem::DELIMITER, ['word-ru', '@count[2] word-ru']),
+        'word4' => \implode(PoItem::DELIMITER, ['word-ru', '@count[2] word-ru']),
       ],
     ];
     return [

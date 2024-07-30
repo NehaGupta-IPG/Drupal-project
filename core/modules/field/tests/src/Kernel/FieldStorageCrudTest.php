@@ -379,7 +379,7 @@ class FieldStorageCrudTest extends FieldKernelTestBase {
 
     // Save an entity with data for the field.
     $entity = EntityTest::create();
-    $values[0]['value'] = mt_rand(1, 127);
+    $values[0]['value'] = \mt_rand(1, 127);
     $entity->{$field_storage->getName()}->value = $values[0]['value'];
     $entity = $this->entitySaveReload($entity);
 

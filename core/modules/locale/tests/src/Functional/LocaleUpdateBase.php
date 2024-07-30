@@ -143,12 +143,12 @@ EOF;
       'timestamp' => $timestamp,
     ]);
     $file->setPermanent();
-    file_put_contents($file->getFileUri(), $po_header . $text);
-    touch(\Drupal::service('file_system')->realpath($file->getFileUri()), $timestamp);
+    \file_put_contents($file->getFileUri(), $po_header . $text);
+    \touch(\Drupal::service('file_system')->realpath($file->getFileUri()), $timestamp);
     $file->save();
 
-    $this->assertTrue(file_exists($fileUri));
-    $this->assertEquals($timestamp, filemtime($fileUri));
+    $this->assertTrue(\file_exists($fileUri));
+    $this->assertEquals($timestamp, \filemtime($fileUri));
   }
 
   /**
@@ -287,7 +287,7 @@ EOF;
     ];
     $connection = Database::getConnection();
     foreach ($data as $file) {
-      $file = array_merge($default, $file);
+      $file = \array_merge($default, $file);
       $connection->insert('locale_file')->fields($file)->execute();
     }
   }

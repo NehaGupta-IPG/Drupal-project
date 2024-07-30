@@ -168,7 +168,7 @@ class FormTestLabelForm extends FormBase {
         '#title' => "$type <script>alert('XSS')</script> is XSS filtered!",
       ];
       // Add keys that are required for some elements to be processed correctly.
-      if (in_array($type, ['checkboxes', 'radios'], TRUE)) {
+      if (\in_array($type, ['checkboxes', 'radios'], TRUE)) {
         $form['form_' . $type . '_title_no_xss']['#options'] = [];
       }
       if ($type === 'datetime') {

@@ -71,7 +71,7 @@ class ArchiverManager extends DefaultPluginManager {
         // This method isn't quite as clean but gets the job done.
         // Also note that the file may not yet exist, so we cannot rely
         // on fileinfo() or other disk-level utilities.
-        if (strrpos($filepath, '.' . $extension) === strlen($filepath) - strlen('.' . $extension)) {
+        if (\strrpos($filepath, '.' . $extension) === \strlen($filepath) - \strlen('.' . $extension)) {
           return $this->createInstance($plugin_id, $options);
         }
       }
@@ -89,14 +89,14 @@ class ArchiverManager extends DefaultPluginManager {
     $valid_extensions = [];
     foreach ($this->getDefinitions() as $archive) {
       foreach ($archive['extensions'] as $extension) {
-        foreach (explode('.', $extension) as $part) {
-          if (!in_array($part, $valid_extensions)) {
+        foreach (\explode('.', $extension) as $part) {
+          if (!\in_array($part, $valid_extensions)) {
             $valid_extensions[] = $part;
           }
         }
       }
     }
-    return implode(' ', $valid_extensions);
+    return \implode(' ', $valid_extensions);
   }
 
 }

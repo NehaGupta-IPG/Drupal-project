@@ -67,7 +67,7 @@ class Rearrange extends ViewsFormBase {
     if ($display->defaultableSections($types[$type]['plural'])) {
       $section = $types[$type]['plural'];
       $form_state->set('section', $section);
-      views_ui_standard_display_dropdown($form, $form_state, $section);
+      \views_ui_standard_display_dropdown($form, $form_state, $section);
     }
 
     $count = 0;
@@ -165,7 +165,7 @@ class Rearrange extends ViewsFormBase {
     foreach ($form_state->getValue('fields') as $field => $info) {
       // Add each value that is a field with a weight to our list, but only if
       // it has had its 'removed' checkbox checked.
-      if (is_array($info) && isset($info['weight']) && empty($info['removed'])) {
+      if (\is_array($info) && isset($info['weight']) && empty($info['removed'])) {
         $order[$field] = $info['weight'];
       }
     }
@@ -174,7 +174,7 @@ class Rearrange extends ViewsFormBase {
     asort($order);
 
     // Create a new list of fields in the new order.
-    foreach (array_keys($order) as $field) {
+    foreach (\array_keys($order) as $field) {
       $new_fields[$field] = $old_fields[$field];
     }
     $display->setOption($types[$type]['plural'], $new_fields);

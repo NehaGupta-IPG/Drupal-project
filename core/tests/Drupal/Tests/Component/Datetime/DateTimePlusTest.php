@@ -32,10 +32,10 @@ class DateTimePlusTest extends TestCase {
     $date = new DateTimePlus($input, $timezone);
     $value = $date->format('c');
 
-    if (is_array($input)) {
-      $input = var_export($input, TRUE);
+    if (\is_array($input)) {
+      $input = \var_export($input, TRUE);
     }
-    $this->assertEquals($expected, $value, sprintf("Test new DateTimePlus(%s, %s): should be %s, found %s.", $input, $timezone, $expected, $value));
+    $this->assertEquals($expected, $value, \sprintf("Test new DateTimePlus(%s, %s): should be %s, found %s.", $input, $timezone, $expected, $value));
   }
 
   /**
@@ -53,10 +53,10 @@ class DateTimePlusTest extends TestCase {
     $date = DateTimePlus::createFromArray($input, $timezone);
     $value = $date->format('c');
 
-    if (is_array($input)) {
-      $input = var_export($input, TRUE);
+    if (\is_array($input)) {
+      $input = \var_export($input, TRUE);
     }
-    $this->assertEquals($expected, $value, sprintf("Test new DateTimePlus(%s, %s): should be %s, found %s.", $input, $timezone, $expected, $value));
+    $this->assertEquals($expected, $value, \sprintf("Test new DateTimePlus(%s, %s): should be %s, found %s.", $input, $timezone, $expected, $value));
   }
 
   /**
@@ -197,30 +197,30 @@ class DateTimePlusTest extends TestCase {
   public function assertDateTimestamp(DateTimePlus $date, string|int $input, array $initial, array $transform): void {
     // Check format.
     $value = $date->format($initial['format']);
-    $this->assertEquals($initial['expected_date'], $value, sprintf("Test new DateTimePlus(%s, %s): should be %s, found %s.", $input, $initial['timezone'], $initial['expected_date'], $value));
+    $this->assertEquals($initial['expected_date'], $value, \sprintf("Test new DateTimePlus(%s, %s): should be %s, found %s.", $input, $initial['timezone'], $initial['expected_date'], $value));
 
     // Check timezone name.
     $value = $date->getTimeZone()->getName();
-    $this->assertEquals($initial['expected_timezone'], $value, sprintf("The current timezone is %s: should be %s.", $value, $initial['expected_timezone']));
+    $this->assertEquals($initial['expected_timezone'], $value, \sprintf("The current timezone is %s: should be %s.", $value, $initial['expected_timezone']));
 
     // Check offset.
     $value = $date->getOffset();
-    $this->assertEquals($initial['expected_offset'], $value, sprintf("The current offset is %s: should be %s.", $value, $initial['expected_offset']));
+    $this->assertEquals($initial['expected_offset'], $value, \sprintf("The current offset is %s: should be %s.", $value, $initial['expected_offset']));
 
     // Transform the date to another timezone.
     $date->setTimezone(new \DateTimeZone($transform['timezone']));
 
     // Check transformed format.
     $value = $date->format($transform['format']);
-    $this->assertEquals($transform['expected_date'], $value, sprintf("Test \$date->setTimezone(new \\DateTimeZone(%s)): should be %s, found %s.", $transform['timezone'], $transform['expected_date'], $value));
+    $this->assertEquals($transform['expected_date'], $value, \sprintf("Test \$date->setTimezone(new \\DateTimeZone(%s)): should be %s, found %s.", $transform['timezone'], $transform['expected_date'], $value));
 
     // Check transformed timezone.
     $value = $date->getTimeZone()->getName();
-    $this->assertEquals($transform['expected_timezone'], $value, sprintf("The current timezone should be %s, found %s.", $transform['expected_timezone'], $value));
+    $this->assertEquals($transform['expected_timezone'], $value, \sprintf("The current timezone should be %s, found %s.", $transform['expected_timezone'], $value));
 
     // Check transformed offset.
     $value = $date->getOffset();
-    $this->assertEquals($transform['expected_offset'], $value, sprintf("The current offset should be %s, found %s.", $transform['expected_offset'], $value));
+    $this->assertEquals($transform['expected_offset'], $value, \sprintf("The current offset should be %s, found %s.", $transform['expected_offset'], $value));
   }
 
   /**
@@ -241,7 +241,7 @@ class DateTimePlusTest extends TestCase {
   public function testDateFormat($input, $timezone, $format, $format_date, $expected): void {
     $date = DateTimePlus::createFromFormat($format, $input, $timezone);
     $value = $date->format($format_date);
-    $this->assertEquals($expected, $value, sprintf("Test new DateTimePlus(%s, %s, %s): should be %s, found %s.", $input, $timezone, $format, $expected, $value));
+    $this->assertEquals($expected, $value, \sprintf("Test new DateTimePlus(%s, %s, %s): should be %s, found %s.", $input, $timezone, $format, $expected, $value));
   }
 
   /**
@@ -502,7 +502,7 @@ class DateTimePlusTest extends TestCase {
     $date_string = '2007-01-31 21:00:00';
 
     // Detect the system timezone.
-    $system_timezone = date_default_timezone_get();
+    $system_timezone = \date_default_timezone_get();
 
     return [
       // Create a date object with an unspecified timezone, which should

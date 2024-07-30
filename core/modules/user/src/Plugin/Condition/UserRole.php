@@ -34,7 +34,7 @@ class UserRole extends ConditionPluginBase {
       '#type' => 'checkboxes',
       '#title' => $this->t('When the user has the following roles'),
       '#default_value' => $this->configuration['roles'],
-      '#options' => array_map(fn(RoleInterface $role) => Html::escape($role->label()), Role::loadMultiple()),
+      '#options' => \array_map(fn(RoleInterface $role) => Html::escape($role->label()), Role::loadMultiple()),
       '#description' => $this->t('If you select no roles, the condition will evaluate to TRUE for all users.'),
     ];
     return parent::buildConfigurationForm($form, $form_state);
@@ -53,7 +53,7 @@ class UserRole extends ConditionPluginBase {
    * {@inheritdoc}
    */
   public function submitConfigurationForm(array &$form, FormStateInterface $form_state) {
-    $this->configuration['roles'] = array_filter($form_state->getValue('roles'));
+    $this->configuration['roles'] = \array_filter($form_state->getValue('roles'));
     parent::submitConfigurationForm($form, $form_state);
   }
 
@@ -62,13 +62,13 @@ class UserRole extends ConditionPluginBase {
    */
   public function summary() {
     // Use the role labels. They will be sanitized below.
-    $roles = array_map(fn(RoleInterface $role) => $role->label(), Role::loadMultiple());
-    $roles = array_intersect_key($roles, $this->configuration['roles']);
-    if (count($roles) > 1) {
-      $roles = implode(', ', $roles);
+    $roles = \array_map(fn(RoleInterface $role) => $role->label(), Role::loadMultiple());
+    $roles = \array_intersect_key($roles, $this->configuration['roles']);
+    if (\count($roles) > 1) {
+      $roles = \implode(', ', $roles);
     }
     else {
-      $roles = reset($roles);
+      $roles = \reset($roles);
     }
     if (!empty($this->configuration['negate'])) {
       return $this->t('The user is not a member of @roles', ['@roles' => $roles]);
@@ -86,7 +86,7 @@ class UserRole extends ConditionPluginBase {
       return TRUE;
     }
     $user = $this->getContextValue('user');
-    return (bool) array_intersect($this->configuration['roles'], $user->getRoles());
+    return (bool) \array_intersect($this->configuration['roles'], $user->getRoles());
   }
 
   /**

@@ -126,11 +126,11 @@ trait StandardTestTrait {
         continue;
       }
 
-      $this->assertSame([], array_map(
+      $this->assertSame([], \array_map(
         function (ConstraintViolation $v) {
           return (string) $v->getMessage();
         },
-        iterator_to_array(CKEditor5::validatePair(
+        \iterator_to_array(CKEditor5::validatePair(
           $editor,
           $editor->getFilterFormat()
         ))
@@ -269,12 +269,12 @@ trait StandardTestTrait {
       $source_field_label = $media_type->getSource()->getSourceFieldDefinition($media_type)->getLabel();
       $test_source_field = $assert_session->elementExists('xpath', "//*[contains(text(), '$source_field_label')]", $form)->getOuterHtml();
       $vertical_tabs = $assert_session->elementExists('css', '.js-form-type-vertical-tabs', $form)->getOuterHtml();
-      $this->assertGreaterThan(strpos($form_html, $test_source_field), strpos($form_html, $vertical_tabs));
+      $this->assertGreaterThan(\strpos($form_html, $test_source_field), \strpos($form_html, $vertical_tabs));
       // The "Published" checkbox should be the last element.
       $date_field = $assert_session->fieldExists('Date', $form)->getOuterHtml();
       $published_checkbox = $assert_session->fieldExists('Published', $form)->getOuterHtml();
-      $this->assertGreaterThan(strpos($form_html, $date_field), strpos($form_html, $published_checkbox));
-      if (is_a($media_type->getSource(), Image::class, TRUE)) {
+      $this->assertGreaterThan(\strpos($form_html, $date_field), \strpos($form_html, $published_checkbox));
+      if (\is_a($media_type->getSource(), Image::class, TRUE)) {
         // Assert the default entity view display is configured with an image
         // style.
         $this->drupalGet('/admin/structure/media/manage/' . $media_type->id() . '/display');

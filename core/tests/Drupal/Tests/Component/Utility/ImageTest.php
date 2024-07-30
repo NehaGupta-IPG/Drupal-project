@@ -26,10 +26,10 @@ class ImageTest extends TestCase {
     $return_value = Image::scaleDimensions($input['dimensions'], $input['width'], $input['height'], $input['upscale']);
 
     // Check the width.
-    $this->assertEquals($output['dimensions']['width'], $input['dimensions']['width'], sprintf('Computed width (%s) does not equal expected width (%s)', $output['dimensions']['width'], $input['dimensions']['width']));
+    $this->assertEquals($output['dimensions']['width'], $input['dimensions']['width'], \sprintf('Computed width (%s) does not equal expected width (%s)', $output['dimensions']['width'], $input['dimensions']['width']));
 
     // Check the height.
-    $this->assertEquals($output['dimensions']['height'], $input['dimensions']['height'], sprintf('Computed height (%s) does not equal expected height (%s)', $output['dimensions']['height'], $input['dimensions']['height']));
+    $this->assertEquals($output['dimensions']['height'], $input['dimensions']['height'], \sprintf('Computed height (%s) does not equal expected height (%s)', $output['dimensions']['height'], $input['dimensions']['height']));
 
     // Check the return value.
     $this->assertEquals($output['return_value'], $return_value, 'Incorrect return value.');

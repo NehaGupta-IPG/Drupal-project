@@ -85,7 +85,7 @@ class UserRegistrationRestTest extends ResourceTestBase {
     $user = $this->registerUser('Palmer.Eldritch');
     $this->assertFalse($user->isBlocked());
     $this->assertNotEmpty($user->getPassword());
-    $email_count = count($this->drupalGetMails());
+    $email_count = \count($this->drupalGetMails());
 
     $this->assertEquals(1, $email_count);
 
@@ -210,7 +210,7 @@ class UserRegistrationRestTest extends ResourceTestBase {
     // Verify that an anonymous user can register.
     $response = $this->registerRequest($name, $include_password, $include_email);
     $this->assertResourceResponse(200, FALSE, $response);
-    $user = user_load_by_name($name);
+    $user = \user_load_by_name($name);
     $this->assertNotEmpty($user, 'User was create as expected');
     return $user;
   }

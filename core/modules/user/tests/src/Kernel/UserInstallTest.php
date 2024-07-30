@@ -27,7 +27,7 @@ class UserInstallTest extends KernelTestBase {
     parent::setUp();
     $this->container->get('module_handler')->loadInclude('user', 'install');
     $this->installEntitySchema('user');
-    user_install();
+    \user_install();
   }
 
   /**

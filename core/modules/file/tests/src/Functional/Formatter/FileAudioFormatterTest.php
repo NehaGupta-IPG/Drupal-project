@@ -35,7 +35,7 @@ class FileAudioFormatterTest extends FileMediaFormatterTestBase {
     // Create a file field that accepts .mp3 and an unknown file extension.
     $field_config = $this->createMediaField('file_audio', 'unknown-extension, mp3', $formatter_settings);
 
-    file_put_contents('public://file.mp3', str_repeat('t', 10));
+    \file_put_contents('public://file.mp3', \str_repeat('t', 10));
     $file1 = File::create([
       'uri' => 'public://file.mp3',
       'filename' => 'file.mp3',

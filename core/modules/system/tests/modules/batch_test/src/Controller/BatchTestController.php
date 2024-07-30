@@ -135,8 +135,8 @@ class BatchTestController {
     $batch = [
       'operations' => [[BatchInjectionCallbacks::class . ':themeCallback', []]],
     ];
-    batch_set($batch);
-    return batch_process('batch-test/redirect');
+    \batch_set($batch);
+    return \batch_process('batch-test/redirect');
   }
 
   /**
@@ -153,8 +153,8 @@ class BatchTestController {
       'title' => 'Batch Test',
       'operations' => [[BatchInjectionCallbacks::class . ':titleCallback', []]],
     ];
-    batch_set($batch);
-    return batch_process('batch-test/redirect');
+    \batch_set($batch);
+    return \batch_process('batch-test/redirect');
   }
 
 }

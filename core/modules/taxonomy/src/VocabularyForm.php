@@ -50,7 +50,7 @@ class VocabularyForm extends BundleEntityFormBase {
     $entity = parent::buildEntity($form, $form_state);
 
     // The description cannot be an empty string.
-    if (trim($form_state->getValue('description')) === '') {
+    if (\trim($form_state->getValue('description')) === '') {
       $entity->set('description', NULL);
     }
 
@@ -142,7 +142,7 @@ class VocabularyForm extends BundleEntityFormBase {
     $vocabulary->setNewRevision($form_state->getValue(['revision']));
 
     // Prevent leading and trailing spaces in vocabulary names.
-    $vocabulary->set('name', trim($vocabulary->label()));
+    $vocabulary->set('name', \trim($vocabulary->label()));
 
     $status = $vocabulary->save();
     $edit_link = $this->entity->toLink($this->t('Edit'), 'edit-form')->toString();

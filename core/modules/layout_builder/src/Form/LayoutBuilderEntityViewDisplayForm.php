@@ -47,7 +47,7 @@ class LayoutBuilderEntityViewDisplayForm extends EntityViewDisplayEditForm {
     $form = parent::form($form, $form_state);
 
     // Remove the Layout Builder field from the list.
-    $form['#fields'] = array_diff($form['#fields'], [OverridesSectionStorage::FIELD_NAME]);
+    $form['#fields'] = \array_diff($form['#fields'], [OverridesSectionStorage::FIELD_NAME]);
     unset($form['fields'][OverridesSectionStorage::FIELD_NAME]);
 
     $is_enabled = $this->entity->isLayoutBuilderEnabled();

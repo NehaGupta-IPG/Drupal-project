@@ -81,7 +81,7 @@ class ResponsiveImageStyleForm extends EntityForm {
       '#disabled' => (bool) $responsive_image_style->id() && $this->operation != 'duplicate',
     ];
 
-    $image_styles = image_style_options(TRUE);
+    $image_styles = \image_style_options(TRUE);
     $image_styles[ResponsiveImageStyleInterface::ORIGINAL_IMAGE] = $this->t('- None (original image) -');
     $image_styles[ResponsiveImageStyleInterface::EMPTY_IMAGE] = $this->t('- empty image -');
 
@@ -117,7 +117,7 @@ class ResponsiveImageStyleForm extends EntityForm {
     // while the largest weight is expected to have the largest breakpoint
     // width. For responsive images, we need largest breakpoint widths first, so
     // we need to reverse the order of these breakpoints.
-    $breakpoints = array_reverse($this->breakpointManager->getBreakpointsByGroup($responsive_image_style->getBreakpointGroup()));
+    $breakpoints = \array_reverse($this->breakpointManager->getBreakpointsByGroup($responsive_image_style->getBreakpointGroup()));
 
     foreach ($breakpoints as $breakpoint_id => $breakpoint) {
       foreach ($breakpoint->getMultipliers() as $multiplier) {
@@ -148,7 +148,7 @@ class ResponsiveImageStyleForm extends EntityForm {
           '#type' => 'select',
           '#title' => $this->t('Image style'),
           '#options' => $image_styles,
-          '#default_value' => isset($image_style_mapping['image_mapping']) && is_string($image_style_mapping['image_mapping']) ? $image_style_mapping['image_mapping'] : '',
+          '#default_value' => isset($image_style_mapping['image_mapping']) && \is_string($image_style_mapping['image_mapping']) ? $image_style_mapping['image_mapping'] : '',
           '#description' => $this->t('Select an image style for this breakpoint.'),
           '#states' => [
             'visible' => [
@@ -173,7 +173,7 @@ class ResponsiveImageStyleForm extends EntityForm {
         $form['keyed_styles'][$breakpoint_id][$multiplier]['sizes_image_styles'] = [
           '#title' => $this->t('Image styles'),
           '#type' => 'checkboxes',
-          '#options' => array_diff_key($image_styles, ['' => '']),
+          '#options' => \array_diff_key($image_styles, ['' => '']),
           '#description' => $this->t('Select image styles with widths that range from the smallest amount of space this image will take up in the layout to the largest, bearing in mind that high resolution screens will need images 1.5x to 2x larger.'),
           '#default_value' => $image_style_mapping['image_mapping']['sizes_image_styles'] ?? [],
           '#states' => [
@@ -235,7 +235,7 @@ class ResponsiveImageStyleForm extends EntityForm {
             if (empty($image_style_mapping['sizes'])) {
               $form_state->setError($form['keyed_styles'][$breakpoint_id][$multiplier]['sizes'], 'Provide a value for the sizes attribute.');
             }
-            if (empty(array_keys(array_filter($image_style_mapping['sizes_image_styles'])))) {
+            if (empty(\array_keys(\array_filter($image_style_mapping['sizes_image_styles'])))) {
               $form_state->setError($form['keyed_styles'][$breakpoint_id][$multiplier]['sizes_image_styles'], 'Select at least one image style.');
             }
           }
@@ -260,7 +260,7 @@ class ResponsiveImageStyleForm extends EntityForm {
               'image_mapping_type' => 'sizes',
               'image_mapping' => [
                 'sizes' => $image_style_mapping['sizes'],
-                'sizes_image_styles' => array_keys(array_filter($image_style_mapping['sizes_image_styles'])),
+                'sizes_image_styles' => \array_keys(\array_filter($image_style_mapping['sizes_image_styles'])),
               ],
             ];
             $responsive_image_style->addImageStyleMapping($breakpoint_id, $multiplier, $mapping);

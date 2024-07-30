@@ -122,7 +122,7 @@ class UserMultipleCancelConfirm extends ConfirmFormBase {
       $names[$uid] = $account->label();
       // Prevent user 1 from being canceled.
       if ($uid <= 1) {
-        $root = intval($uid) === 1 ? $account : $root;
+        $root = \intval($uid) === 1 ? $account : $root;
         continue;
       }
       $form['accounts'][$uid] = [
@@ -138,7 +138,7 @@ class UserMultipleCancelConfirm extends ConfirmFormBase {
 
     // Output a notice that user 1 cannot be canceled.
     if (isset($root)) {
-      $redirect = (count($accounts) == 1);
+      $redirect = (\count($accounts) == 1);
       $message = $this->t('The user account %name cannot be canceled.', ['%name' => $root->label()]);
       $this->messenger()->addMessage($message, $redirect ? MessengerInterface::TYPE_ERROR : MessengerInterface::TYPE_WARNING);
       // If only user 1 was selected, redirect to the overview.
@@ -159,7 +159,7 @@ class UserMultipleCancelConfirm extends ConfirmFormBase {
       '#access' => $selectCancel,
     ];
 
-    $form['user_cancel_method'] += user_cancel_methods();
+    $form['user_cancel_method'] += \user_cancel_methods();
 
     if (!$selectCancel) {
       // Display an item to inform the user of the setting.
@@ -222,7 +222,7 @@ class UserMultipleCancelConfirm extends ConfirmFormBase {
           $admin_form->submitForm($admin_form_mock, $admin_form_state);
         }
         else {
-          user_cancel($form_state->getValues(), $uid, $form_state->getValue('user_cancel_method'));
+          \user_cancel($form_state->getValues(), $uid, $form_state->getValue('user_cancel_method'));
         }
       }
     }

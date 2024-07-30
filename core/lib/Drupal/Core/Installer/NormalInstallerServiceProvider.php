@@ -73,7 +73,7 @@ class NormalInstallerServiceProvider implements ServiceProviderInterface {
     }
 
     $pass_config = $container->getCompilerPassConfig();
-    $pass_config->setRemovingPasses(array_filter($pass_config->getRemovingPasses(), function ($pass) {
+    $pass_config->setRemovingPasses(\array_filter($pass_config->getRemovingPasses(), function ($pass) {
       // Remove InlineServiceDefinitionsPass, RemoveUnusedDefinitionsPass,
       // AnalyzeServiceReferencesPass and ReplaceAliasByActualDefinitionPass as
       // these are not necessary during installation.
@@ -83,7 +83,7 @@ class NormalInstallerServiceProvider implements ServiceProviderInterface {
                $pass instanceof AnalyzeServiceReferencesPass ||
                $pass instanceof ReplaceAliasByActualDefinitionPass);
     }));
-    $pass_config->setAfterRemovingPasses(array_filter($pass_config->getAfterRemovingPasses(), function ($pass) {
+    $pass_config->setAfterRemovingPasses(\array_filter($pass_config->getAfterRemovingPasses(), function ($pass) {
       // Remove ResolveHotPathPass as Drupal's container dumper does not support
       // it.
       // @see \Symfony\Component\DependencyInjection\Compiler\PassConfig

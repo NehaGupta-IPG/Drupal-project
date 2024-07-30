@@ -44,7 +44,7 @@ class EditorController extends ControllerBase {
         ->load($original_format_id);
     }
 
-    return new JsonResponse(editor_filter_xss($value, $filter_format, $original_format));
+    return new JsonResponse(\editor_filter_xss($value, $filter_format, $original_format));
   }
 
 }

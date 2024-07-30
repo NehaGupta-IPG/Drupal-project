@@ -148,7 +148,7 @@ abstract class MediaTestBase extends WebDriverTestBase {
       function (ConstraintViolationInterface $v) {
         return (string) $v->getMessage();
       },
-      iterator_to_array(CKEditor5::validatePair(
+      \iterator_to_array(CKEditor5::validatePair(
         Editor::load('test_format'),
         FilterFormat::load('test_format')
       ))

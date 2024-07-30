@@ -72,7 +72,7 @@ class EntityApiTest extends EntityKernelTestBase {
     $storage = $this->container->get('entity_type.manager')
       ->getStorage($entity_type);
 
-    $entities = array_values($storage->loadByProperties(['name' => 'test']));
+    $entities = \array_values($storage->loadByProperties(['name' => 'test']));
     $this->assertEquals('test', $entities[0]->name->value, "$entity_type: Created and loaded entity");
     $this->assertEquals('test', $entities[1]->name->value, "$entity_type: Created and loaded entity");
 
@@ -81,13 +81,13 @@ class EntityApiTest extends EntityKernelTestBase {
     $this->assertEquals($entity->id(), $loaded_entity->id(), "$entity_type: Loaded a single entity by id.");
 
     // Test deleting an entity.
-    $entities = array_values($storage->loadByProperties(['name' => 'test2']));
+    $entities = \array_values($storage->loadByProperties(['name' => 'test2']));
     $entities[0]->delete();
-    $entities = array_values($storage->loadByProperties(['name' => 'test2']));
+    $entities = \array_values($storage->loadByProperties(['name' => 'test2']));
     $this->assertEquals([], $entities, "$entity_type: Entity deleted.");
 
     // Test updating an entity.
-    $entities = array_values($storage->loadByProperties(['name' => 'test']));
+    $entities = \array_values($storage->loadByProperties(['name' => 'test']));
     $entities[0]->name->value = 'test3';
     $entities[0]->save();
     $entity = $storage->load($entities[0]->id());
@@ -334,16 +334,16 @@ class EntityApiTest extends EntityKernelTestBase {
     // We load the entities in an initial and reverse order, with both static
     // cache in place and reset, to ensure we always get the same result.
     $entities = $storage->loadMultiple($ids);
-    $this->assertEquals($ids, array_keys($entities));
+    $this->assertEquals($ids, \array_keys($entities));
     // Reverse the order and load again.
-    $ids = array_reverse($ids);
+    $ids = \array_reverse($ids);
     $entities = $storage->loadMultiple($ids);
-    $this->assertEquals($ids, array_keys($entities));
+    $this->assertEquals($ids, \array_keys($entities));
     // Reverse the order again, reset the cache and load again.
     $storage->resetCache();
-    $ids = array_reverse($ids);
+    $ids = \array_reverse($ids);
     $entities = $storage->loadMultiple($ids);
-    $this->assertEquals($ids, array_keys($entities));
+    $this->assertEquals($ids, \array_keys($entities));
 
     // Entity revision load.
     $storage = $this->container->get('entity_type.manager')->getStorage('entity_test_rev');
@@ -358,18 +358,18 @@ class EntityApiTest extends EntityKernelTestBase {
     $ids[] = $revision->getRevisionId();
 
     $entities = $storage->loadMultipleRevisions($ids);
-    $this->assertEquals($ids, array_keys($entities));
+    $this->assertEquals($ids, \array_keys($entities));
 
     // Reverse the order and load again.
-    $ids = array_reverse($ids);
+    $ids = \array_reverse($ids);
     $entities = $storage->loadMultipleRevisions($ids);
-    $this->assertEquals($ids, array_keys($entities));
+    $this->assertEquals($ids, \array_keys($entities));
 
     // Reverse the order again, reset the cache and load again.
-    $ids = array_reverse($ids);
+    $ids = \array_reverse($ids);
     $storage->resetCache();
     $entities = $storage->loadMultipleRevisions($ids);
-    $this->assertEquals($ids, array_keys($entities));
+    $this->assertEquals($ids, \array_keys($entities));
   }
 
   /**

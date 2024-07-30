@@ -159,9 +159,9 @@ class SvgIconBuilder implements IconBuilderInterface {
   protected function calculateSvgValues(array $rows, $width, $height, $stroke_width, $padding) {
     $region_rects = [];
 
-    $row_height = $this->getLength(count($rows), $height, $stroke_width, $padding);
+    $row_height = $this->getLength(\count($rows), $height, $stroke_width, $padding);
     foreach ($rows as $row => $cols) {
-      $column_width = $this->getLength(count($cols), $width, $stroke_width, $padding);
+      $column_width = $this->getLength(\count($cols), $width, $stroke_width, $padding);
       $vertical_offset = $this->getOffset($row, $row_height, $stroke_width, $padding);
       foreach ($cols as $col => $region) {
         $horizontal_offset = $this->getOffset($col, $column_width, $stroke_width, $padding);

@@ -85,7 +85,7 @@ class EntityConditionTest extends UnitTestCase {
   #[DataProvider('validationProvider')]
   public function testValidation($input, $exception): void {
     if ($exception) {
-      $this->expectException(get_class($exception));
+      $this->expectException(\get_class($exception));
       $this->expectExceptionMessage($exception->getMessage());
     }
     EntityCondition::createFromQueryParameter($input);

@@ -33,14 +33,14 @@ class LinkItemUrlValidationTest extends FieldKernelTestBase {
       [$value, $expected_violations] = $data;
       $link_item->setValue($value);
       $violations = $link_item->validate();
-      $expected_count = count($expected_violations);
-      $this->assertCount($expected_count, $violations, sprintf('Violation message count error for %s', $value));
+      $expected_count = \count($expected_violations);
+      $this->assertCount($expected_count, $violations, \sprintf('Violation message count error for %s', $value));
       if ($expected_count) {
         $i = 0;
         foreach ($expected_violations as $error_msg) {
           // If the expected message contains a '%' add the current link value.
-          if (strpos($error_msg, '%')) {
-            $error_msg = sprintf($error_msg, $value);
+          if (\strpos($error_msg, '%')) {
+            $error_msg = \sprintf($error_msg, $value);
           }
           $this->assertEquals($error_msg, $violations[$i++]->getMessage());
         }

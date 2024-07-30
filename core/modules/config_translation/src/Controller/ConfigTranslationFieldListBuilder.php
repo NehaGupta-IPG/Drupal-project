@@ -109,7 +109,7 @@ class ConfigTranslationFieldListBuilder extends ConfigTranslationEntityListBuild
   public function getFilterLabels() {
     $info = parent::getFilterLabels();
     $bundle = $this->baseEntityInfo->getBundleLabel() ?: $this->t('Bundle');
-    $bundle = mb_strtolower($bundle);
+    $bundle = \mb_strtolower($bundle);
 
     $info['placeholder'] = $this->t('Enter field or @bundle', ['@bundle' => $bundle]);
     $info['description'] = $this->t('Enter a part of the field or @bundle to filter by.', ['@bundle' => $bundle]);
@@ -161,7 +161,7 @@ class ConfigTranslationFieldListBuilder extends ConfigTranslationEntityListBuild
     }
 
     // There is more than one bundle defined.
-    if (count($this->baseEntityBundles) > 1) {
+    if (\count($this->baseEntityBundles) > 1) {
       return TRUE;
     }
 

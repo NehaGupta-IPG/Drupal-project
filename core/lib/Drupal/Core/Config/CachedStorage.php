@@ -83,7 +83,7 @@ class CachedStorage implements StorageInterface, StorageCacheInterface {
     $data_to_return = [];
 
     $cache_keys_map = $this->getCacheKeys($names);
-    $cache_keys = array_values($cache_keys_map);
+    $cache_keys = \array_values($cache_keys_map);
     $cached_list = $this->cache->getMultiple($cache_keys);
 
     if (!empty($cache_keys)) {
@@ -91,7 +91,7 @@ class CachedStorage implements StorageInterface, StorageCacheInterface {
       // $cache_keys contains just the $cache_key values that weren't found in
       // the cache.
       // @see \Drupal\Core\Cache\CacheBackendInterface::getMultiple()
-      $names_to_get = array_keys(array_intersect($cache_keys_map, $cache_keys));
+      $names_to_get = \array_keys(\array_intersect($cache_keys_map, $cache_keys));
       $list = $this->storage->readMultiple($names_to_get);
       // Cache configuration objects that were loaded from the storage, cache
       // missing configuration objects as an explicit FALSE.
@@ -106,7 +106,7 @@ class CachedStorage implements StorageInterface, StorageCacheInterface {
     }
 
     // Add the configuration objects from the cache to the list.
-    $cache_keys_inverse_map = array_flip($cache_keys_map);
+    $cache_keys_inverse_map = \array_flip($cache_keys_map);
     foreach ($cached_list as $cache_key => $cache) {
       $name = $cache_keys_inverse_map[$cache_key];
       $data_to_return[$name] = $cache->data;
@@ -114,7 +114,7 @@ class CachedStorage implements StorageInterface, StorageCacheInterface {
 
     // Ensure that only existing configuration objects are returned, filter out
     // cached information about missing objects.
-    return array_filter($data_to_return);
+    return \array_filter($data_to_return);
   }
 
   /**
@@ -278,11 +278,11 @@ class CachedStorage implements StorageInterface, StorageCacheInterface {
    */
   protected function getCacheKeys(array $names) {
     $prefix = $this->getCollectionPrefix();
-    $cache_keys = array_map(function ($name) use ($prefix) {
+    $cache_keys = \array_map(function ($name) use ($prefix) {
       return $prefix . $name;
     }, $names);
 
-    return array_combine($names, $cache_keys);
+    return \array_combine($names, $cache_keys);
   }
 
   /**

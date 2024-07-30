@@ -78,7 +78,7 @@ class AddedStylesheetsTest extends BrowserTestBase {
       function (ConstraintViolationInterface $v) {
         return (string) $v->getMessage();
       },
-      iterator_to_array(CKEditor5::validatePair($this->editor, $filtered_html_format))
+      \iterator_to_array(CKEditor5::validatePair($this->editor, $filtered_html_format))
     ));
     // Create node type.
     $this->drupalCreateContentType([

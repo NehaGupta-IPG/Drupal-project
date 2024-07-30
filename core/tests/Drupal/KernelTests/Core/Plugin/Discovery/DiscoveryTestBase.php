@@ -76,8 +76,8 @@ abstract class DiscoveryTestBase extends KernelTestBase {
         $item = (string) $item;
       }
     };
-    array_walk_recursive($definition, $func);
-    array_walk_recursive($expected_definition, $func);
+    \array_walk_recursive($definition, $func);
+    \array_walk_recursive($expected_definition, $func);
     $this->assertSame($expected_definition, $definition);
   }
 

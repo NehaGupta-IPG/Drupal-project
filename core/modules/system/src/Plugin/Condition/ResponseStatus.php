@@ -82,7 +82,7 @@ class ResponseStatus extends ConditionPluginBase implements ContainerFactoryPlug
    * {@inheritdoc}
    */
   public function submitConfigurationForm(array &$form, FormStateInterface $form_state): void {
-    $this->configuration['status_codes'] = array_keys(array_filter($form_state->getValue('status_codes')));
+    $this->configuration['status_codes'] = \array_keys(\array_filter($form_state->getValue('status_codes')));
     parent::submitConfigurationForm($form, $form_state);
   }
 
@@ -93,8 +93,8 @@ class ResponseStatus extends ConditionPluginBase implements ContainerFactoryPlug
     $allowed_codes = $this->configuration['status_codes'];
     $status_codes = [Response::HTTP_OK, Response::HTTP_FORBIDDEN, Response::HTTP_NOT_FOUND];
     $result = empty($allowed_codes) ? $status_codes : $allowed_codes;
-    $count = count($result);
-    $codes = implode(', ', $result);
+    $count = \count($result);
+    $codes = \implode(', ', $result);
     if (!empty($this->configuration['negate'])) {
       return $this->formatPlural($count, 'Request response code is not: @codes', 'Request response code is not one of the following: @codes', ['@codes' => $codes]);
     }
@@ -111,9 +111,9 @@ class ResponseStatus extends ConditionPluginBase implements ContainerFactoryPlug
     }
     $exception = $this->requestStack->getCurrentRequest()->attributes->get('exception');
     if ($exception) {
-      return ($exception instanceof HttpExceptionInterface && in_array($exception->getStatusCode(), $allowed_codes, TRUE));
+      return ($exception instanceof HttpExceptionInterface && \in_array($exception->getStatusCode(), $allowed_codes, TRUE));
     }
-    return in_array(Response::HTTP_OK, $allowed_codes, TRUE);
+    return \in_array(Response::HTTP_OK, $allowed_codes, TRUE);
   }
 
   /**

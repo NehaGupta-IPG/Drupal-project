@@ -113,7 +113,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
       $user_role->revokePermission($permission);
     }
     $user_role->save();
-    assert([] === $user_role->getPermissions(), 'The anonymous user role has no permissions at all.');
+    \assert([] === $user_role->getPermissions(), 'The anonymous user role has no permissions at all.');
 
     if (static::$auth !== FALSE) {
       // Ensure the authenticated user role has no permissions at all.
@@ -122,7 +122,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
         $user_role->revokePermission($permission);
       }
       $user_role->save();
-      assert([] === $user_role->getPermissions(), 'The authenticated user role has no permissions at all.');
+      \assert([] === $user_role->getPermissions(), 'The authenticated user role has no permissions at all.');
 
       // Create an account.
       $this->account = $this->createUser();
@@ -195,8 +195,8 @@ abstract class ResourceTestBase extends BrowserTestBase {
    *   The error string.
    */
   protected function getExpectedUnauthorizedAccessMessage($method) {
-    $resource_plugin_id = str_replace('.', ':', static::$resourceConfigId);
-    $permission = 'restful ' . strtolower($method) . ' ' . $resource_plugin_id;
+    $resource_plugin_id = \str_replace('.', ':', static::$resourceConfigId);
+    $permission = 'restful ' . \strtolower($method) . ' ' . $resource_plugin_id;
     return "The '$permission' permission is required.";
   }
 
@@ -375,15 +375,15 @@ abstract class ResourceTestBase extends BrowserTestBase {
 
     // Expected cache tags: X-Drupal-Cache-Tags header.
     $this->assertSame($expected_cache_tags !== FALSE, $response->hasHeader('X-Drupal-Cache-Tags'));
-    if (is_array($expected_cache_tags)) {
-      $this->assertEqualsCanonicalizing($expected_cache_tags, explode(' ', $response->getHeader('X-Drupal-Cache-Tags')[0]));
+    if (\is_array($expected_cache_tags)) {
+      $this->assertEqualsCanonicalizing($expected_cache_tags, \explode(' ', $response->getHeader('X-Drupal-Cache-Tags')[0]));
     }
 
     // Expected cache contexts: X-Drupal-Cache-Contexts header.
     $this->assertSame($expected_cache_contexts !== FALSE, $response->hasHeader('X-Drupal-Cache-Contexts'));
-    if (is_array($expected_cache_contexts)) {
+    if (\is_array($expected_cache_contexts)) {
       $optimized_expected_cache_contexts = \Drupal::service('cache_contexts_manager')->optimizeTokens($expected_cache_contexts);
-      $this->assertEqualsCanonicalizing($optimized_expected_cache_contexts, explode(' ', $response->getHeader('X-Drupal-Cache-Contexts')[0]));
+      $this->assertEqualsCanonicalizing($optimized_expected_cache_contexts, \explode(' ', $response->getHeader('X-Drupal-Cache-Contexts')[0]));
     }
 
     // Expected Page Cache header value: X-Drupal-Cache header.

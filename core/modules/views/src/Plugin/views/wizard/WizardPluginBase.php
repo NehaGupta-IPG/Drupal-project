@@ -185,7 +185,7 @@ abstract class WizardPluginBase extends PluginBase implements WizardInterface {
     $filters = [];
 
     // Add a default filter on the publishing status field, if available.
-    if ($this->entityType && is_subclass_of($this->entityType->getClass(), EntityPublishedInterface::class)) {
+    if ($this->entityType && \is_subclass_of($this->entityType->getClass(), EntityPublishedInterface::class)) {
       $field_name = $this->entityType->getKey('published');
       $this->filters = [
         $field_name => [
@@ -299,7 +299,7 @@ abstract class WizardPluginBase extends PluginBase implements WizardInterface {
     $style_form['style_plugin']['#default_value'] = static::getSelected($form_state, ['page', 'style', 'style_plugin'], 'default', $style_form['style_plugin']);
     // Changing this dropdown updates $form['displays']['page']['options'] via
     // AJAX.
-    views_ui_add_ajax_trigger($style_form, 'style_plugin', ['displays', 'page', 'options']);
+    \views_ui_add_ajax_trigger($style_form, 'style_plugin', ['displays', 'page', 'options']);
 
     $this->buildFormStyle($form, $form_state, 'page');
     $form['displays']['page']['options']['items_per_page'] = [
@@ -365,8 +365,8 @@ abstract class WizardPluginBase extends PluginBase implements WizardInterface {
         '#title' => $this->t('Feed row style'),
         '#type' => 'select',
         '#options' => $feed_row_options,
-        '#default_value' => key($feed_row_options),
-        '#access' => (count($feed_row_options) > 1),
+        '#default_value' => \key($feed_row_options),
+        '#access' => (\count($feed_row_options) > 1),
         '#states' => [
           'visible' => [
             ':input[name="page[feed]"]' => ['checked' => TRUE],
@@ -433,7 +433,7 @@ abstract class WizardPluginBase extends PluginBase implements WizardInterface {
       ], 'default', $style_form['style_plugin']);
       // Changing this dropdown updates $form['displays']['block']['options']
       // via AJAX.
-      views_ui_add_ajax_trigger($style_form, 'style_plugin', ['displays', 'block', 'options']);
+      \views_ui_add_ajax_trigger($style_form, 'style_plugin', ['displays', 'block', 'options']);
 
       $this->buildFormStyle($form, $form_state, 'block');
       $form['displays']['block']['options']['items_per_page'] = [
@@ -595,15 +595,15 @@ abstract class WizardPluginBase extends PluginBase implements WizardInterface {
         '#type' => 'select',
         '#title' => $this->t('output as'),
         '#options' => $options,
-        '#access' => count($options) > 1,
+        '#access' => \count($options) > 1,
       ];
       // For the block display, the default value should be "titles (linked)",
       // if it's available (since that's the most common use case).
       $block_with_linked_titles_available = ($type == 'block' && isset($options['titles_linked']));
-      $default_value = $block_with_linked_titles_available ? 'titles_linked' : key($options);
+      $default_value = $block_with_linked_titles_available ? 'titles_linked' : \key($options);
       $style_form['row_plugin']['#default_value'] = static::getSelected($form_state, [$type, 'style', 'row_plugin'], $default_value, $style_form['row_plugin']);
       // Changing this dropdown updates the individual row options via AJAX.
-      views_ui_add_ajax_trigger($style_form, 'row_plugin', ['displays', $type, 'options', 'style', 'row_options']);
+      \views_ui_add_ajax_trigger($style_form, 'row_plugin', ['displays', $type, 'options', 'style', 'row_options']);
 
       // This is the region that can be updated by AJAX. The base class doesn't
       // add anything here, but child classes can.
@@ -656,7 +656,7 @@ abstract class WizardPluginBase extends PluginBase implements WizardInterface {
       // Changing this dropdown updates the entire content of $form['displays']
       // via AJAX, since each bundle might have entirely different fields
       // attached to it, etc.
-      views_ui_add_ajax_trigger($form['displays']['show'], 'type', ['displays']);
+      \views_ui_add_ajax_trigger($form['displays']['show'], 'type', ['displays']);
     }
   }
 
@@ -916,7 +916,7 @@ abstract class WizardPluginBase extends PluginBase implements WizardInterface {
     }
 
     // Add any filters specified by the user when filling out the wizard.
-    $filters = array_merge($filters, $this->defaultDisplayFiltersUser($form, $form_state));
+    $filters = \array_merge($filters, $this->defaultDisplayFiltersUser($form, $form_state));
 
     return $filters;
   }
@@ -949,8 +949,8 @@ abstract class WizardPluginBase extends PluginBase implements WizardInterface {
       }
       else {
         foreach ($fields as $field_name => $value) {
-          if ($pos = strpos($field_name, '.' . $bundle_key)) {
-            $table = substr($field_name, 0, $pos);
+          if ($pos = \strpos($field_name, '.' . $bundle_key)) {
+            $table = \substr($field_name, 0, $pos);
             break;
           }
         }
@@ -965,7 +965,7 @@ abstract class WizardPluginBase extends PluginBase implements WizardInterface {
         $handler = $table_data[$bundle_key]['filter']['id'];
         $handler_definition = Views::pluginManager('filter')
           ->getDefinition($handler);
-        if ($handler == 'in_operator' || is_subclass_of($handler_definition['class'], 'Drupal\\views\\Plugin\\views\\filter\\InOperator')) {
+        if ($handler == 'in_operator' || \is_subclass_of($handler_definition['class'], 'Drupal\\views\\Plugin\\views\\filter\\InOperator')) {
           $value = [$type => $type];
         }
         // Otherwise, use just a single value.
@@ -1012,7 +1012,7 @@ abstract class WizardPluginBase extends PluginBase implements WizardInterface {
     }
 
     // Add any sorts specified by the user when filling out the wizard.
-    $sorts = array_merge($sorts, $this->defaultDisplaySortsUser($form, $form_state));
+    $sorts = \array_merge($sorts, $this->defaultDisplaySortsUser($form, $form_state));
 
     return $sorts;
   }
@@ -1035,10 +1035,10 @@ abstract class WizardPluginBase extends PluginBase implements WizardInterface {
     // Don't add a sort if there is no form value or the user set the sort to
     // 'none'.
     if (($sort_type = $form_state->getValue(['show', 'sort'])) && $sort_type != 'none') {
-      [$column, $sort] = explode(':', $sort_type);
+      [$column, $sort] = \explode(':', $sort_type);
       // Column either be a column-name or the table-column-name.
-      $column = explode('-', $column);
-      if (count($column) > 1) {
+      $column = \explode('-', $column);
+      if (\count($column) > 1) {
         $table = $column[0];
         $column = $column[1];
       }
@@ -1109,7 +1109,7 @@ abstract class WizardPluginBase extends PluginBase implements WizardInterface {
     if (!empty($page['link'])) {
       $display_options['menu']['type'] = 'normal';
       $display_options['menu']['title'] = $page['link_properties']['title'];
-      [$display_options['menu']['menu_name'], $display_options['menu']['parent']] = explode(':', $page['link_properties']['parent'], 2);
+      [$display_options['menu']['menu_name'], $display_options['menu']['parent']] = \explode(':', $page['link_properties']['parent'], 2);
     }
     return $display_options;
   }
@@ -1266,7 +1266,7 @@ abstract class WizardPluginBase extends PluginBase implements WizardInterface {
   protected function retrieveValidatedView(array $form, FormStateInterface $form_state, $unset = TRUE) {
     // @todo Figure out why all this hashing is done. Wouldn't it be easier to
     //   store a single entry and that's it?
-    $key = hash('sha256', serialize($form_state->getValues()));
+    $key = \hash('sha256', \serialize($form_state->getValues()));
     $view = ($this->validated_views[$key] ?? NULL);
     if ($unset) {
       unset($this->validated_views[$key]);
@@ -1285,7 +1285,7 @@ abstract class WizardPluginBase extends PluginBase implements WizardInterface {
    *   The validated view object.
    */
   protected function setValidatedView(array $form, FormStateInterface $form_state, ViewUI $view) {
-    $key = hash('sha256', serialize($form_state->getValues()));
+    $key = \hash('sha256', \serialize($form_state->getValues()));
     $this->validated_views[$key] = $view;
   }
 

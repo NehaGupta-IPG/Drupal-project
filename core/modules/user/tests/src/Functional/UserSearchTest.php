@@ -59,14 +59,14 @@ class UserSearchTest extends BrowserTestBase {
     $this->assertSession()->linkExists($keys, 0, 'Search by username worked for non-admin user');
 
     // Verify that searching by sub-string works too.
-    $subkey = substr($keys, 1, 5);
+    $subkey = \substr($keys, 1, 5);
     $edit = ['keys' => $subkey];
     $this->drupalGet('search/user');
     $this->submitForm($edit, 'Search');
     $this->assertSession()->linkExists($keys, 0, 'Search by username substring worked for non-admin user');
 
     // Verify that wildcard search works.
-    $subkey = substr($keys, 0, 2) . '*' . substr($keys, 4, 2);
+    $subkey = \substr($keys, 0, 2) . '*' . \substr($keys, 4, 2);
     $edit = ['keys' => $subkey];
     $this->drupalGet('search/user');
     $this->submitForm($edit, 'Search');
@@ -88,7 +88,7 @@ class UserSearchTest extends BrowserTestBase {
     $this->assertSession()->pageTextContains($user2->getAccountName());
 
     // Verify that a substring works too for email.
-    $subkey = substr($keys, 1, 5);
+    $subkey = \substr($keys, 1, 5);
     $edit = ['keys' => $subkey];
     $this->drupalGet('search/user');
     $this->submitForm($edit, 'Search');

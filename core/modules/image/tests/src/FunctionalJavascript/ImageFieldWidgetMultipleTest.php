@@ -50,7 +50,7 @@ class ImageFieldWidgetMultipleTest extends WebDriverTestBase {
     $this->assertSession()->fieldExists('title[0][value]')->setValue('Test');
 
     $images = $this->getTestFiles('image');
-    $images = array_slice($images, 0, 5);
+    $images = \array_slice($images, 0, 5);
 
     $paths = [];
     foreach ($images as $image) {
@@ -63,7 +63,7 @@ class ImageFieldWidgetMultipleTest extends WebDriverTestBase {
     }
 
     $multiple_field = $this->assertSession()->elementExists('xpath', '//input[@multiple]');
-    $multiple_field->setValue(implode("\n", $remote_paths));
+    $multiple_field->setValue(\implode("\n", $remote_paths));
     $this->assertSession()->waitForElementVisible('css', '[data-drupal-selector="edit-images-4-preview"]');
     $this->getSession()->getPage()->findButton('Save')->click();
 

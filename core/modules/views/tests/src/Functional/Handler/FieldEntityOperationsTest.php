@@ -96,7 +96,7 @@ class FieldEntityOperationsTest extends ViewTestBase {
           // Hungarian edit form, others to the English one (which has no path
           // prefix here).
           $base_path = \Drupal::request()->getBasePath();
-          $parts = explode('/', str_replace($base_path, '', $operation['url']->toString()));
+          $parts = \explode('/', \str_replace($base_path, '', $operation['url']->toString()));
           $expected_prefix = ($language->getId() != 'en' ? $language->getId() : 'node');
           $this->assertEquals($expected_prefix, $parts[1], 'Entity operation links to the correct language for the entity.');
         }

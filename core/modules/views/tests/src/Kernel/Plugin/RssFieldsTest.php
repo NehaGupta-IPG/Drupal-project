@@ -59,11 +59,11 @@ class RssFieldsTest extends ViewsKernelTestBase {
     $node = $this->createNode([
       'type' => 'article',
       'title' => 'Article title',
-      'created' => strtotime($date),
+      'created' => \strtotime($date),
       'body' => [
         0 => [
           'value' => 'A paragraph',
-          'format' => filter_default_format(),
+          'format' => \filter_default_format(),
         ],
       ],
     ]);

@@ -312,11 +312,11 @@ class EntityFormDisplay extends EntityDisplayBase implements EntityFormDisplayIn
       /** @var \Symfony\Component\Validator\ConstraintViolationInterface $violation */
       // Create a new violation object with just a different property path.
       $violation_path = $violation->getPropertyPath();
-      $path_parts = explode('.', $violation_path);
+      $path_parts = \explode('.', $violation_path);
       if ($path_parts[0] === $field_name) {
         unset($path_parts[0]);
       }
-      $new_path = implode('.', $path_parts);
+      $new_path = \implode('.', $path_parts);
 
       $constraint = NULL;
       $cause = NULL;

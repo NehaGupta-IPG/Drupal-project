@@ -55,7 +55,7 @@ class ManagedFileTest extends FileManagedUnitTestBase implements FormInterface {
     $form_state->setValues($values);
     $this->container->get('form_builder')->submitForm($this, $form_state);
     // Should submit without any errors.
-    $this->assertEquals(0, count($form_state->getErrors()));
+    $this->assertEquals(0, \count($form_state->getErrors()));
   }
 
 }

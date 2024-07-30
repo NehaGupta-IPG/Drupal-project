@@ -105,7 +105,7 @@ final class ResourceVersionRouteEnhancer implements EnhancerInterface {
     // requested version, without regard for whether a version query parameter
     // was provided or not.
     if (isset($defaults['entity'])) {
-      assert($defaults['entity'] instanceof EntityInterface);
+      \assert($defaults['entity'] instanceof EntityInterface);
       $defaults['entity']->addCacheContexts([static::CACHE_CONTEXT]);
     }
 
@@ -117,14 +117,14 @@ final class ResourceVersionRouteEnhancer implements EnhancerInterface {
     // Provide a helpful error when a version is specified with an unsafe
     // method.
     if (!$request->isMethodCacheable()) {
-      throw new BadRequestHttpException(sprintf('%s requests with a `%s` query parameter are not supported.', $request->getMethod(), static::RESOURCE_VERSION_QUERY_PARAMETER));
+      throw new BadRequestHttpException(\sprintf('%s requests with a `%s` query parameter are not supported.', $request->getMethod(), static::RESOURCE_VERSION_QUERY_PARAMETER));
     }
 
     $resource_version_identifier = $request->query->get(static::RESOURCE_VERSION_QUERY_PARAMETER);
 
     if (!static::isValidVersionIdentifier($resource_version_identifier)) {
       $cacheability = (new CacheableMetadata())->addCacheContexts([static::CACHE_CONTEXT]);
-      $message = sprintf('A resource version identifier was provided in an invalid format: `%s`', $resource_version_identifier);
+      $message = \sprintf('A resource version identifier was provided in an invalid format: `%s`', $resource_version_identifier);
       throw new CacheableBadRequestHttpException($cacheability, $message);
     }
 
@@ -146,9 +146,9 @@ final class ResourceVersionRouteEnhancer implements EnhancerInterface {
       }
       // 'latest-version' and 'working-copy' are the only acceptable version
       // identifiers for a collection resource.
-      if (!in_array($resource_version_identifier, [$latest_version_identifier, $working_copy_identifier])) {
+      if (!\in_array($resource_version_identifier, [$latest_version_identifier, $working_copy_identifier])) {
         $cacheability = (new CacheableMetadata())->addCacheContexts(['url.path', static::CACHE_CONTEXT]);
-        $message = sprintf('Collection resources only support the following resource version identifiers: %s', implode(', ', [
+        $message = \sprintf('Collection resources only support the following resource version identifiers: %s', \implode(', ', [
           $latest_version_identifier,
           $working_copy_identifier,
         ]));
@@ -180,7 +180,7 @@ final class ResourceVersionRouteEnhancer implements EnhancerInterface {
    *   TRUE if the received resource version value is valid, FALSE otherwise.
    */
   protected static function isValidVersionIdentifier($resource_version) {
-    return preg_match(static::VERSION_IDENTIFIER_VALIDATOR, $resource_version) === 1;
+    return \preg_match(static::VERSION_IDENTIFIER_VALIDATOR, $resource_version) === 1;
   }
 
 }

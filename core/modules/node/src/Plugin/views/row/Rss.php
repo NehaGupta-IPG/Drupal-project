@@ -83,7 +83,7 @@ class Rss extends RssPluginBase {
     global $base_url;
 
     $nid = $row->{$this->field_alias};
-    if (!is_numeric($nid)) {
+    if (!\is_numeric($nid)) {
       return;
     }
 
@@ -100,7 +100,7 @@ class Rss extends RssPluginBase {
     $node->rss_elements = [
       [
         'key' => 'pubDate',
-        'value' => gmdate('r', $node->getCreatedTime()),
+        'value' => \gmdate('r', $node->getCreatedTime()),
       ],
       [
         'key' => 'dc:creator',
@@ -125,7 +125,7 @@ class Rss extends RssPluginBase {
     unset($build['#theme']);
 
     if (!empty($node->rss_namespaces)) {
-      $this->view->style_plugin->namespaces = array_merge($this->view->style_plugin->namespaces, $node->rss_namespaces);
+      $this->view->style_plugin->namespaces = \array_merge($this->view->style_plugin->namespaces, $node->rss_namespaces);
     }
 
     $item = new \stdClass();

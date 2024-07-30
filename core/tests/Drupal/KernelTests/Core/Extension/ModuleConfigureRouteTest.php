@@ -115,7 +115,7 @@ class ModuleConfigureRouteTest extends KernelTestBase {
    */
   protected function assertModuleConfigureRoutesExist(string $module_name, array $module_info): void {
     $route = $this->routeProvider->getRouteByName($module_info['configure']);
-    $this->assertNotEmpty($route, sprintf('The configure route for the "%s" module was found.', $module_name));
+    $this->assertNotEmpty($route, \sprintf('The configure route for the "%s" module was found.', $module_name));
   }
 
 }

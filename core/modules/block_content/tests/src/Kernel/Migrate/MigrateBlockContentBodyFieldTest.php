@@ -46,7 +46,7 @@ class MigrateBlockContentBodyFieldTest extends MigrateDrupal7TestBase {
     $storage = FieldStorageConfig::load('block_content.body');
     $this->assertInstanceOf(FieldStorageConfigInterface::class, $storage);
     $this->assertSame('block_content', $storage->getTargetEntityTypeId());
-    $this->assertSame(['basic'], array_values($storage->getBundles()));
+    $this->assertSame(['basic'], \array_values($storage->getBundles()));
     $this->assertSame('body', $storage->getName());
 
     /** @var \Drupal\field\FieldConfigInterface $field */

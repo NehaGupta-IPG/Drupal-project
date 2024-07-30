@@ -132,7 +132,7 @@ class MigrateUserTest extends MigrateDrupal7TestBase {
     $this->assertSame($init, $user->getInitialEmail());
     $this->assertSame($roles, $user->getRoles());
     $this->assertSame($has_picture, !$user->user_picture->isEmpty());
-    if (!is_null($field_integer)) {
+    if (!\is_null($field_integer)) {
       $this->assertTrue($user->hasField('field_integer'));
       $this->assertEquals($field_integer[0], $user->field_integer->value);
     }
@@ -164,7 +164,7 @@ class MigrateUserTest extends MigrateDrupal7TestBase {
       $id_map = $this->getMigration('d7_user_role')->getIdMap();
       foreach ($rids as $rid) {
         $role = $id_map->lookupDestinationIds([$rid])[0];
-        $roles[] = reset($role);
+        $roles[] = \reset($role);
       }
 
       $entity_translation = Database::getConnection('default', 'migrate')

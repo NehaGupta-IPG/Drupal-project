@@ -28,7 +28,7 @@ abstract class LanguageNegotiationTestBase extends UnitTestCase {
    */
   protected function createLanguageNegotiationPlugin(array $configuration = [], $plugin_definition = NULL) {
     $class = $this->getPluginClass();
-    $this->assertTrue(in_array(ContainerFactoryPluginInterface::class, class_implements($class)));
+    $this->assertTrue(\in_array(ContainerFactoryPluginInterface::class, \class_implements($class)));
     return $class::create(\Drupal::getContainer(), $configuration, $class::METHOD_ID, $plugin_definition);
   }
 

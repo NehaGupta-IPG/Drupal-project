@@ -152,7 +152,7 @@ class Tid extends ArgumentDefaultPluginBase implements CacheableDependencyInterf
    */
   public function submitOptionsForm(&$form, FormStateInterface $form_state, &$options = []) {
     // Filter unselected items so we don't unnecessarily store giant arrays.
-    $options['vids'] = array_filter($options['vids']);
+    $options['vids'] = \array_filter($options['vids']);
   }
 
   /**
@@ -187,11 +187,11 @@ class Tid extends ArgumentDefaultPluginBase implements CacheableDependencyInterf
               $tids[] = $tid;
             }
           }
-          return implode($this->options['anyall'], $tids);
+          return \implode($this->options['anyall'], $tids);
         }
         // Return all tids.
         else {
-          return implode($this->options['anyall'], array_keys($taxonomy));
+          return \implode($this->options['anyall'], \array_keys($taxonomy));
         }
       }
     }
@@ -230,7 +230,7 @@ class Tid extends ArgumentDefaultPluginBase implements CacheableDependencyInterf
   public function calculateDependencies() {
     $dependencies = parent::calculateDependencies();
 
-    foreach ($this->vocabularyStorage->loadMultiple(array_keys($this->options['vids'])) as $vocabulary) {
+    foreach ($this->vocabularyStorage->loadMultiple(\array_keys($this->options['vids'])) as $vocabulary) {
       $dependencies[$vocabulary->getConfigDependencyKey()][] = $vocabulary->getConfigDependencyName();
     }
     return $dependencies;

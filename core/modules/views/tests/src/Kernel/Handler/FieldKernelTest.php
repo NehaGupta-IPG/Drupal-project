@@ -297,17 +297,17 @@ class FieldKernelTest extends ViewsKernelTestBase {
       $output = (string) $renderer->executeInRenderContext(new RenderContext(), function () use ($name_field_0, $row) {
         return $name_field_0->advancedRender($row);
       });
-      $this->assertEquals($expected_output_0, $output, sprintf('Test token replacement: "%s" gave "%s"', $name_field_0->options['alter']['text'], $output));
+      $this->assertEquals($expected_output_0, $output, \sprintf('Test token replacement: "%s" gave "%s"', $name_field_0->options['alter']['text'], $output));
 
       $output = (string) $renderer->executeInRenderContext(new RenderContext(), function () use ($name_field_1, $row) {
         return $name_field_1->advancedRender($row);
       });
-      $this->assertEquals($expected_output_1, $output, sprintf('Test token replacement: "%s" gave "%s"', $name_field_1->options['alter']['text'], $output));
+      $this->assertEquals($expected_output_1, $output, \sprintf('Test token replacement: "%s" gave "%s"', $name_field_1->options['alter']['text'], $output));
 
       $output = (string) $renderer->executeInRenderContext(new RenderContext(), function () use ($name_field_2, $row) {
         return $name_field_2->advancedRender($row);
       });
-      $this->assertEquals($expected_output_2, $output, sprintf('Test token replacement: "%s" gave %s"', $name_field_2->options['alter']['text'], $output));
+      $this->assertEquals($expected_output_2, $output, \sprintf('Test token replacement: "%s" gave %s"', $name_field_2->options['alter']['text'], $output));
     }
 
     $job_field = $view->field['job'];
@@ -319,7 +319,7 @@ class FieldKernelTest extends ViewsKernelTestBase {
     $output = (string) $renderer->executeInRenderContext(new RenderContext(), function () use ($job_field, $row) {
       return $job_field->advancedRender($row);
     });
-    $this->assertSubString($output, $random_text, sprintf('Make sure the self token (%s => %s) appears in the output (%s)',
+    $this->assertSubString($output, $random_text, \sprintf('Make sure the self token (%s => %s) appears in the output (%s)',
       $job_field->options['alter']['text'],
       $random_text,
       $output,
@@ -333,7 +333,7 @@ class FieldKernelTest extends ViewsKernelTestBase {
     $output = (string) $renderer->executeInRenderContext(new RenderContext(), function () use ($job_field, $row) {
       return $job_field->advancedRender($row);
     });
-    $this->assertEquals($old_token, $output, sprintf('Make sure the old token style (%s => %s) is not changed in the output (%s)', $job_field->options['alter']['text'], $random_text, $output));
+    $this->assertEquals($old_token, $output, \sprintf('Make sure the old token style (%s => %s) is not changed in the output (%s)', $job_field->options['alter']['text'], $random_text, $output));
 
     // Verify HTML tags are allowed in rewrite templates while token
     // replacements are escaped.
@@ -414,7 +414,7 @@ class FieldKernelTest extends ViewsKernelTestBase {
     $view->initDisplay();
     $this->executeView($view);
 
-    $column_map_reversed = array_flip($this->columnMap);
+    $column_map_reversed = \array_flip($this->columnMap);
     $view->row_index = 0;
     $random_name = $this->randomMachineName();
     $random_value = $this->randomMachineName();
@@ -696,7 +696,7 @@ class FieldKernelTest extends ViewsKernelTestBase {
     $view->initDisplay();
     $this->executeView($view);
 
-    $column_map_reversed = array_flip($this->columnMap);
+    $column_map_reversed = \array_flip($this->columnMap);
     $view->row_index = 0;
 
     $empty_text = $view->field['name']->options['empty'] = $this->randomMachineName();

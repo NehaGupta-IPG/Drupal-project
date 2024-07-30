@@ -142,7 +142,7 @@ class VersionNegotiatorTest extends JsonapiKernelTestBase {
    */
   public function testInvalidRevisionId(): void {
     $this->expectException(CacheableNotFoundHttpException::class);
-    $this->expectExceptionMessage(sprintf('The requested version, identified by `id:%s`, could not be found.', $this->node2->getRevisionId()));
+    $this->expectExceptionMessage(\sprintf('The requested version, identified by `id:%s`, could not be found.', $this->node2->getRevisionId()));
     $this->versionNegotiator->getRevision($this->node, 'id:' . $this->node2->getRevisionId());
   }
 

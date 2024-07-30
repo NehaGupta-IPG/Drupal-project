@@ -283,7 +283,7 @@ class HTMLRestrictionsTest extends UnitTestCase {
       [],
     ];
     yield 'empty array' => [
-      implode(' ', []),
+      \implode(' ', []),
       [],
     ];
     yield 'whitespace string' => [
@@ -297,11 +297,11 @@ class HTMLRestrictionsTest extends UnitTestCase {
       [],
     ];
     yield 'nonsense array #1' => [
-      implode(' ', ['foo', 'bar']),
+      \implode(' ', ['foo', 'bar']),
       [],
     ];
     yield 'nonsense array #2' => [
-      implode(' ', ['foo' => TRUE, 'bar' => FALSE]),
+      \implode(' ', ['foo' => TRUE, 'bar' => FALSE]),
       [],
     ];
 
@@ -939,7 +939,7 @@ class HTMLRestrictionsTest extends UnitTestCase {
       elseif ($$parameter === 'b') {
         $$parameter = $b;
       }
-      assert($$parameter instanceof HTMLRestrictions);
+      \assert($$parameter instanceof HTMLRestrictions);
     }
     $this->assertEquals($expected_diff, $a->diff($b));
     $this->assertEquals($expected_intersection, $a->intersect($b));

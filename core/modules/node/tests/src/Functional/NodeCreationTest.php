@@ -213,8 +213,8 @@ class NodeCreationTest extends NodeTestBase {
     $edit = [
       'title[0][value]' => $this->randomMachineName(8),
       'body[0][value]' => $this->randomMachineName(16),
-      'created[0][value][date]' => date('Y-m-d', $date),
-      'created[0][value][time]' => date('H:i:s', $date),
+      'created[0][value][date]' => \date('Y-m-d', $date),
+      'created[0][value][time]' => \date('H:i:s', $date),
     ];
     $this->drupalGet('node/add/page');
     $this->submitForm($edit, 'Save');
@@ -226,8 +226,8 @@ class NodeCreationTest extends NodeTestBase {
     $edit = [
       'title[0][value]' => $this->randomMachineName(8),
       'body[0][value]' => $this->randomMachineName(16),
-      'created[0][value][date]' => date('Y-m-d', $date),
-      'created[0][value][time]' => date('H:i:s', $date),
+      'created[0][value][date]' => \date('Y-m-d', $date),
+      'created[0][value][time]' => \date('H:i:s', $date),
     ];
     $this->drupalGet('node/add/page');
     $this->submitForm($edit, 'Save');
@@ -342,7 +342,7 @@ class NodeCreationTest extends NodeTestBase {
       ->fields('w', ['wid', 'variables'])
       ->execute();
     foreach ($query as $row) {
-      $variables = (array) unserialize($row->variables);
+      $variables = (array) \unserialize($row->variables);
       if (isset($variables['@message']) && $variables['@message'] === 'Test exception for rollback.') {
         $matches[] = $row->wid;
       }

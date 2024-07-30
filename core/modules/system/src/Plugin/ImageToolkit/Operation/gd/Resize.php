@@ -36,8 +36,8 @@ class Resize extends GDImageToolkitOperationBase {
    */
   protected function validateArguments(array $arguments) {
     // Assure integers for all arguments.
-    $arguments['width'] = (int) round($arguments['width']);
-    $arguments['height'] = (int) round($arguments['height']);
+    $arguments['width'] = (int) \round($arguments['width']);
+    $arguments['height'] = (int) \round($arguments['height']);
 
     // Fail when width or height are 0 or negative.
     if ($arguments['width'] <= 0) {
@@ -60,12 +60,12 @@ class Resize extends GDImageToolkitOperationBase {
     $data = [
       'width' => $arguments['width'],
       'height' => $arguments['height'],
-      'extension' => image_type_to_extension($this->getToolkit()->getType(), FALSE),
+      'extension' => \image_type_to_extension($this->getToolkit()->getType(), FALSE),
       'transparent_color' => $this->getToolkit()->getTransparentColor(),
       'is_temp' => TRUE,
     ];
     if ($this->getToolkit()->apply('create_new', $data)) {
-      if (imagecopyresampled($this->getToolkit()->getImage(), $original_image, 0, 0, 0, 0, $arguments['width'], $arguments['height'], imagesx($original_image), imagesy($original_image))) {
+      if (\imagecopyresampled($this->getToolkit()->getImage(), $original_image, 0, 0, 0, 0, $arguments['width'], $arguments['height'], \imagesx($original_image), \imagesy($original_image))) {
         return TRUE;
       }
       // In case of failure, restore the original image.

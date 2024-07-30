@@ -128,7 +128,7 @@ abstract class TransactionManagerBase implements TransactionManagerInterface {
    * When destructing, $stack must have been already emptied.
    */
   public function __destruct() {
-    assert($this->stack === [], "Transaction \$stack was not empty. Active stack: " . $this->dumpStackItemsAsString());
+    \assert($this->stack === [], "Transaction \$stack was not empty. Active stack: " . $this->dumpStackItemsAsString());
   }
 
   /**
@@ -142,7 +142,7 @@ abstract class TransactionManagerBase implements TransactionManagerInterface {
    * @internal
    */
   public function stackDepth(): int {
-    return count($this->stack());
+    return \count($this->stack());
   }
 
   /**
@@ -167,7 +167,7 @@ abstract class TransactionManagerBase implements TransactionManagerInterface {
    *   changes the order of object destruction when the develop mode is enabled.
    */
   public function commitAll(): void {
-    foreach (array_reverse($this->stack()) as $id => $item) {
+    foreach (\array_reverse($this->stack()) as $id => $item) {
       $this->unpile($item->name, $id);
     }
   }
@@ -238,7 +238,7 @@ abstract class TransactionManagerBase implements TransactionManagerInterface {
     foreach ($this->stack() as $id => $item) {
       $temp[] = $id . '\\' . $item->name;
     }
-    return implode(' > ', $temp);
+    return \implode(' > ', $temp);
   }
 
   /**
@@ -268,7 +268,7 @@ abstract class TransactionManagerBase implements TransactionManagerInterface {
     }
 
     // Define a unique ID for the transaction.
-    $id = uniqid('', TRUE);
+    $id = \uniqid('', TRUE);
 
     // Do the client-level processing.
     if ($this->stackDepth() === 0) {
@@ -381,7 +381,7 @@ abstract class TransactionManagerBase implements TransactionManagerInterface {
     // committing a root transaction while savepoints are active, all
     // subsequent savepoints will be released as well. The stack must be
     // diminished accordingly.
-    while (($i = array_key_last($this->stack())) != $id) {
+    while (($i = \array_key_last($this->stack())) != $id) {
       $this->voidStackItem((string) $i);
     }
 
@@ -414,7 +414,7 @@ abstract class TransactionManagerBase implements TransactionManagerInterface {
     }
 
     // Rolled back item should match the last one in stack.
-    if ($id != array_key_last($this->stack()) || $name !== $this->stack()[$id]->name) {
+    if ($id != \array_key_last($this->stack()) || $name !== $this->stack()[$id]->name) {
       throw new TransactionOutOfOrderException("Error attempting rollback of {$id}\\{$name}. Active stack: " . $this->dumpStackItemsAsString());
     }
 
@@ -534,7 +534,7 @@ abstract class TransactionManagerBase implements TransactionManagerInterface {
       $callbacks = $this->postTransactionCallbacks;
       $this->postTransactionCallbacks = [];
       foreach ($callbacks as $callback) {
-        call_user_func($callback, $this->getConnectionTransactionState() === ClientConnectionTransactionState::Committed || $this->getConnectionTransactionState() === ClientConnectionTransactionState::Voided);
+        \call_user_func($callback, $this->getConnectionTransactionState() === ClientConnectionTransactionState::Committed || $this->getConnectionTransactionState() === ClientConnectionTransactionState::Voided);
       }
     }
   }
@@ -618,7 +618,7 @@ abstract class TransactionManagerBase implements TransactionManagerInterface {
    * {@inheritdoc}
    */
   public function voidClientTransaction(): void {
-    while ($i = array_key_last($this->stack())) {
+    while ($i = \array_key_last($this->stack())) {
       $this->voidStackItem((string) $i);
     }
     $this->setConnectionTransactionState(ClientConnectionTransactionState::Voided);

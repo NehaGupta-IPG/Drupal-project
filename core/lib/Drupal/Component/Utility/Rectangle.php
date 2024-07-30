@@ -84,7 +84,7 @@ class Rectangle {
     // PHP 5.5 GD bug: https://bugs.php.net/bug.php?id=65148: To prevent buggy
     // behavior on negative multiples of 30 degrees we convert any negative
     // angle to a positive one between 0 and 360 degrees.
-    $angle -= floor($angle / 360) * 360;
+    $angle -= \floor($angle / 360) * 360;
 
     // For some rotations that are multiple of 30 degrees, we need to correct
     // an imprecision between GD that uses C floats internally, and PHP that
@@ -102,14 +102,14 @@ class Rectangle {
     }
 
     // Do the trigonometry, applying imprecision fixes where needed.
-    $rad = deg2rad($angle);
-    $cos = cos($rad);
-    $sin = sin($rad);
+    $rad = \deg2rad($angle);
+    $cos = \cos($rad);
+    $sin = \sin($rad);
     $a = $this->width * $cos;
     $b = $this->height * $sin + $correction;
     $c = $this->width * $sin;
     $d = $this->height * $cos + $correction;
-    if ((int) $angle == $angle && in_array($angle, [60, 150, 300])) {
+    if ((int) $angle == $angle && \in_array($angle, [60, 150, 300])) {
       $a = $this->fixImprecision($a, $imprecision);
       $b = $this->fixImprecision($b, $imprecision);
       $c = $this->fixImprecision($c, $imprecision);
@@ -117,8 +117,8 @@ class Rectangle {
     }
 
     // This is how GD on PHP5.5 calculates the new dimensions.
-    $this->boundingWidth = abs((int) $a) + abs((int) $b);
-    $this->boundingHeight = abs((int) $c) + abs((int) $d);
+    $this->boundingWidth = \abs((int) $a) + \abs((int) $b);
+    $this->boundingHeight = \abs((int) $c) + \abs((int) $d);
 
     return $this;
   }
@@ -139,7 +139,7 @@ class Rectangle {
    *   input is lower than the absolute imprecision.
    */
   protected function fixImprecision($input, $imprecision) {
-    if ($this->delta($input) < abs($imprecision)) {
+    if ($this->delta($input) < \abs($imprecision)) {
       return $input + $imprecision;
     }
     return $input;
@@ -155,7 +155,7 @@ class Rectangle {
    *   The fractional part of the input number, unsigned.
    */
   protected function fraction($input) {
-    return abs((int) $input - $input);
+    return \abs((int) $input - $input);
   }
 
   /**

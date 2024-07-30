@@ -65,7 +65,7 @@ trait UpdatePathTestTrait {
     if ($this->checkFailedUpdates) {
       $failure = $this->cssSelect('.failure');
       if ($failure) {
-        $this->fail('The update failed with the following message: "' . reset($failure)->getText() . '"');
+        $this->fail('The update failed with the following message: "' . \reset($failure)->getText() . '"');
       }
 
       // Ensure that there are no pending updates.
@@ -73,7 +73,7 @@ trait UpdatePathTestTrait {
         switch ($update_type) {
           case 'update':
             drupal_load_updates();
-            $all_updates = update_get_update_list();
+            $all_updates = \update_get_update_list();
             break;
 
           case 'post_update':
@@ -82,7 +82,7 @@ trait UpdatePathTestTrait {
         }
         foreach ($all_updates as $module => $updates) {
           if (!empty($updates['pending'])) {
-            foreach (array_keys($updates['pending']) as $update_name) {
+            foreach (\array_keys($updates['pending']) as $update_name) {
               $this->fail("The $update_name() update function from the $module module did not run.");
             }
           }
@@ -103,7 +103,7 @@ trait UpdatePathTestTrait {
       $module_handler_list = $module_handler->getModuleList();
       // Modules that are in the module handler but not configuration have been
       // uninstalled.
-      foreach (array_keys(array_diff_key($module_handler_list, $config_module_list)) as $module) {
+      foreach (\array_keys(\array_diff_key($module_handler_list, $config_module_list)) as $module) {
         $modules_uninstalled = TRUE;
         unset($module_handler_list[$module]);
       }
@@ -137,7 +137,7 @@ trait UpdatePathTestTrait {
       /** @var \Drupal\Core\Config\TypedConfigManagerInterface $typed_config */
       $typed_config = $this->container->get('config.typed');
       foreach ($names as $name) {
-        if (in_array($name, $exclude, TRUE)) {
+        if (\in_array($name, $exclude, TRUE)) {
           // Skip checking schema if the config is listed in the
           // $configSchemaCheckerExclusions property.
           continue;

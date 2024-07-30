@@ -37,8 +37,8 @@ class ComposerTest extends UnitTestCase {
    * file exactly matches \Drupal::MINIMUM_PHP.
    */
   public function testEnsurePhpConfiguredVersion(): void {
-    $composer_json = json_decode(file_get_contents($this->root . '/composer.json'), TRUE);
-    $composer_core_json = json_decode(file_get_contents($this->root . '/core/composer.json'), TRUE);
+    $composer_json = \json_decode(\file_get_contents($this->root . '/composer.json'), TRUE);
+    $composer_core_json = \json_decode(\file_get_contents($this->root . '/core/composer.json'), TRUE);
     $this->assertEquals(\Drupal::MINIMUM_PHP, $composer_json['config']['platform']['php'], 'The \Drupal::MINIMUM_PHP constant should always be exactly the same as the config.platform.php in the root composer.json.');
     $this->assertEquals($composer_core_json['require']['php'], '>=' . $composer_json['config']['platform']['php'], 'The config.platform.php configured version in the root composer.json file should always be exactly the same as the minimum php version configured in core/composer.json.');
   }

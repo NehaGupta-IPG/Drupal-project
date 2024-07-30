@@ -167,7 +167,7 @@ class EntityTestMapFieldTest extends ResourceTestBase {
   protected function getSparseFieldSets(): array {
     // EntityTestMapField's owner field name is `user_id`, not `uid`, which
     // breaks nested sparse fieldset tests.
-    return array_diff_key(parent::getSparseFieldSets(), array_flip([
+    return \array_diff_key(parent::getSparseFieldSets(), \array_flip([
       'nested_empty_fieldset',
       'nested_fieldset_with_owner_fieldset',
     ]));

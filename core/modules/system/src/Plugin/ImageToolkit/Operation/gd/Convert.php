@@ -32,7 +32,7 @@ class Convert extends GDImageToolkitOperationBase {
    * {@inheritdoc}
    */
   protected function validateArguments(array $arguments) {
-    if (!in_array($arguments['extension'], $this->getToolkit()->getSupportedExtensions())) {
+    if (!\in_array($arguments['extension'], $this->getToolkit()->getSupportedExtensions())) {
       throw new \InvalidArgumentException("Invalid extension ({$arguments['extension']}) specified for the image 'convert' operation");
     }
     return $arguments;
@@ -57,7 +57,7 @@ class Convert extends GDImageToolkitOperationBase {
       'is_temp' => TRUE,
     ];
     if ($this->getToolkit()->apply('create_new', $data)) {
-      if (imagecopyresampled($this->getToolkit()->getImage(), $original_image, 0, 0, 0, 0, $width, $height, $width, $height)) {
+      if (\imagecopyresampled($this->getToolkit()->getImage(), $original_image, 0, 0, 0, 0, $width, $height, $width, $height)) {
         return TRUE;
       }
       // In case of error, reset image and type to as it was.

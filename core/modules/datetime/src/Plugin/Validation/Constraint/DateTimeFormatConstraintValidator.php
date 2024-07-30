@@ -20,7 +20,7 @@ class DateTimeFormatConstraintValidator extends ConstraintValidator {
     /** @var \Drupal\datetime\Plugin\Field\FieldType\DateTimeItem $item */
     if (isset($item)) {
       $value = $item->getValue()['value'];
-      if (!is_string($value)) {
+      if (!\is_string($value)) {
         $this->context->addViolation($constraint->badType);
       }
       else {

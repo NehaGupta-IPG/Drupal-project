@@ -25,7 +25,7 @@ final class RecipeConfigInstaller extends ConfigInstaller {
     $storage = $recipe_config->getConfigStorage();
 
     // Build the list of new configuration to create.
-    $list = array_diff($storage->listAll(), $this->getActiveStorages()->listAll());
+    $list = \array_diff($storage->listAll(), $this->getActiveStorages()->listAll());
 
     // If there is nothing to do.
     if (empty($list)) {
@@ -37,7 +37,7 @@ final class RecipeConfigInstaller extends ConfigInstaller {
     // Sort $config_to_create in the order of the least dependent first.
     $dependency_manager = new ConfigDependencyManager();
     $dependency_manager->setData($config_to_create);
-    $config_to_create = array_merge(array_flip($dependency_manager->sortAll()), $config_to_create);
+    $config_to_create = \array_merge(\array_flip($dependency_manager->sortAll()), $config_to_create);
 
     // Create the optional configuration if there is any left after filtering.
     if (!empty($config_to_create)) {
@@ -56,7 +56,7 @@ final class RecipeConfigInstaller extends ConfigInstaller {
       return;
     }
 
-    foreach (array_keys($config_to_create) as $name) {
+    foreach (\array_keys($config_to_create) as $name) {
       // All config objects are mappings.
       /** @var \Drupal\Core\Config\Schema\Mapping $typed_config */
       $typed_config = $this->typedConfig->createFromNameAndData($name, $this->configFactory->get($name)->getRawData());
@@ -66,7 +66,7 @@ final class RecipeConfigInstaller extends ConfigInstaller {
         if ($constraint instanceof FullyValidatableConstraint) {
           /** @var \Symfony\Component\Validator\ConstraintViolationList $violations */
           $violations = $typed_config->validate();
-          if (count($violations) > 0) {
+          if (\count($violations) > 0) {
             throw new InvalidConfigException($violations, $typed_config);
           }
           break;

@@ -42,7 +42,7 @@ class TestForm extends FormBase {
    * {@inheritdoc}
    */
   public function validateForm(array &$form, FormStateInterface $form_state) {
-    if (!str_contains($form_state->getValue('email'), '.com')) {
+    if (!\str_contains($form_state->getValue('email'), '.com')) {
       $form_state->setErrorByName('email', $this->t('This is not a .com email address.'));
     }
   }

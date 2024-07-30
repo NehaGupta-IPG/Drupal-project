@@ -132,7 +132,7 @@ class StyleSerializerEntityTest extends ViewTestBase {
       $expected[] = $expected_row;
     }
 
-    $this->assertSame(json_encode($expected), $actual_json, 'The expected JSON output was found.');
+    $this->assertSame(\json_encode($expected), $actual_json, 'The expected JSON output was found.');
 
     // Test that the rendered output and the preview output are the same.
     $view->destroy();
@@ -187,7 +187,7 @@ class StyleSerializerEntityTest extends ViewTestBase {
     $view->save();
     $expected = $serializer->serialize($entities, 'xml');
     $actual_xml = $this->drupalGet('test/serialize/entity', ['query' => ['_format' => 'xml']]);
-    $this->assertSame(trim($expected), $actual_xml);
+    $this->assertSame(\trim($expected), $actual_xml);
     $this->assertCacheContexts(['languages:language_interface', 'theme', 'entity_test_view_grants', 'request_format']);
 
     // Allow multiple formats.
@@ -208,7 +208,7 @@ class StyleSerializerEntityTest extends ViewTestBase {
     $this->assertSame($expected, $actual_json, 'The expected JSON output was found.');
     $expected = $serializer->serialize($entities, 'xml');
     $actual_xml = $this->drupalGet('test/serialize/entity', ['query' => ['_format' => 'xml']]);
-    $this->assertSame(trim($expected), $actual_xml);
+    $this->assertSame(\trim($expected), $actual_xml);
   }
 
   /**
@@ -318,7 +318,7 @@ class StyleSerializerEntityTest extends ViewTestBase {
     // Add the new entity cache tag and remove the first one, because we just
     // show 10 items in total.
     $cache_tags[] = 'entity_test:11';
-    unset($cache_tags[array_search('entity_test:1', $cache_tags)]);
+    unset($cache_tags[\array_search('entity_test:1', $cache_tags)]);
 
     $this->assertCacheContexts($cache_contexts);
     $this->assertCacheTags($cache_tags);

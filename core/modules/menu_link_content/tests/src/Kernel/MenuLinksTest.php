@@ -319,7 +319,7 @@ class MenuLinksTest extends KernelTestBase {
     \Drupal::service('plugin.manager.menu.link')->rebuild();
     $menu_links = $this->menuLinkManager->loadLinksByRoute('menu_test.menu_test');
     $this->assertCount(1, $menu_links);
-    $menu_link = reset($menu_links);
+    $menu_link = \reset($menu_links);
     $this->assertEquals('menu_test', $menu_link->getPluginId());
 
     // Uninstall the module and ensure the menu link got removed.
@@ -389,15 +389,15 @@ class MenuLinksTest extends KernelTestBase {
 
     // Check that saving a pending revision does not affect the menu tree.
     $menu_tree = \Drupal::menuTree()->load('menu-test', new MenuTreeParameters());
-    $parent_link = reset($menu_tree);
+    $parent_link = \reset($menu_tree);
     $this->assertEquals($default_root_1_title, $parent_link->link->getTitle());
     $this->assertEquals('/#root_1', $parent_link->link->getUrlObject()->toString());
 
-    $child1_link = reset($parent_link->subtree);
+    $child1_link = \reset($parent_link->subtree);
     $this->assertEquals($default_child1_title, $child1_link->link->getTitle());
     $this->assertEquals('/#child1', $child1_link->link->getUrlObject()->toString());
 
-    $child2_link = reset($child1_link->subtree);
+    $child2_link = \reset($child1_link->subtree);
     $this->assertEquals($default_child2_title, $child2_link->link->getTitle());
     $this->assertEquals('/#child2', $child2_link->link->getUrlObject()->toString());
 
@@ -457,7 +457,7 @@ class MenuLinksTest extends KernelTestBase {
     $menu_tree = \Drupal::menuTree()->load('menu-test', new MenuTreeParameters());
     $this->assertCount(1, $menu_tree);
     /** @var \Drupal\Core\Menu\MenuLinkTreeElement $tree_element */
-    $tree_element = reset($menu_tree);
+    $tree_element = \reset($menu_tree);
     $this->assertInstanceOf(MenuLinkContentPlugin::class, $tree_element->link);
     $this->assertInstanceOf(MenuLinkContent::class, $tree_element->link->getEntity());
     $this->assertEquals($title, $tree_element->link->getEntity()->getTitle());

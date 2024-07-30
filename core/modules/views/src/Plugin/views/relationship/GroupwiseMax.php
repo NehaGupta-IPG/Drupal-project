@@ -204,7 +204,7 @@ class GroupwiseMax extends RelationshipPluginBase {
       // select field. See https://www.drupal.org/node/844910.
       // We work around this further down.
       $sort = $options['subquery_sort'];
-      [$sort_table, $sort_field] = explode('.', $sort);
+      [$sort_table, $sort_field] = \explode('.', $sort);
       $sort_options = ['order' => $options['subquery_order']];
       $temp_view->addHandler('default', 'sort', $sort_table, $sort_field, $sort_options);
     }
@@ -223,7 +223,7 @@ class GroupwiseMax extends RelationshipPluginBase {
     $relationship_id = NULL;
     // Add the used relationship for the subjoin, if defined.
     if (isset($this->definition['relationship'])) {
-      [$relationship_table, $relationship_field] = explode(':', $this->definition['relationship']);
+      [$relationship_table, $relationship_field] = \explode(':', $this->definition['relationship']);
       $relationship_id = $temp_view->addHandler('default', 'relationship', $relationship_table, $relationship_field);
     }
     $temp_item_options = ['relationship' => $relationship_id];
@@ -244,7 +244,7 @@ class GroupwiseMax extends RelationshipPluginBase {
     // Workaround until https://www.drupal.org/node/844910 is fixed:
     // Remove all fields from the SELECT except the base id.
     $fields = &$subquery->getFields();
-    foreach (array_keys($fields) as $field_name) {
+    foreach (\array_keys($fields) as $field_name) {
       // The base id for this subquery is stored in our definition.
       if ($field_name != $this->definition['field']) {
         unset($fields[$field_name]);
@@ -254,7 +254,7 @@ class GroupwiseMax extends RelationshipPluginBase {
     // Make every alias in the subquery safe within the outer query by
     // appending a namespace to it, '_inner' by default.
     $tables = &$subquery->getTables();
-    foreach (array_keys($tables) as $table_name) {
+    foreach (\array_keys($tables) as $table_name) {
       $tables[$table_name]['alias'] .= $this->subquery_namespace;
       // Namespace the join on every table.
       if (isset($tables[$table_name]['condition'])) {
@@ -262,7 +262,7 @@ class GroupwiseMax extends RelationshipPluginBase {
       }
     }
     // Namespace fields.
-    foreach (array_keys($fields) as $field_name) {
+    foreach (\array_keys($fields) as $field_name) {
       $fields[$field_name]['table'] .= $this->subquery_namespace;
       $fields[$field_name]['alias'] .= $this->subquery_namespace;
     }
@@ -277,7 +277,7 @@ class GroupwiseMax extends RelationshipPluginBase {
     foreach ($orders as $order_key => $order) {
       // But if we're using a whole view, we don't know what we have!
       if ($options['subquery_view']) {
-        [$sort_table, $sort_field] = explode('.', $order_key);
+        [$sort_table, $sort_field] = \explode('.', $order_key);
       }
       $orders[$sort_table . $this->subquery_namespace . '.' . $sort_field] = $order;
       unset($orders[$order_key]);
@@ -294,8 +294,8 @@ class GroupwiseMax extends RelationshipPluginBase {
     // We have to work directly with the SQL, because putting a name of a field
     // into a SelectQuery that it does not recognize (because it's outer) just
     // makes it treat it as a string.
-    $outer_placeholder = ':' . str_replace('.', '_', $this->definition['outer field']);
-    $subquery_sql = str_replace($outer_placeholder, $this->definition['outer field'], $subquery_sql);
+    $outer_placeholder = ':' . \str_replace('.', '_', $this->definition['outer field']);
+    $subquery_sql = \str_replace($outer_placeholder, $this->definition['outer field'], $subquery_sql);
 
     return $subquery_sql;
   }
@@ -310,11 +310,11 @@ class GroupwiseMax extends RelationshipPluginBase {
   protected function alterSubqueryCondition(AlterableInterface $query, &$conditions) {
     foreach ($conditions as $condition_id => &$condition) {
       // Skip the #conjunction element.
-      if (is_numeric($condition_id)) {
-        if (is_string($condition['field'])) {
+      if (\is_numeric($condition_id)) {
+        if (\is_string($condition['field'])) {
           $condition['field'] = $this->conditionNamespace($condition['field']);
         }
-        elseif (is_object($condition['field'])) {
+        elseif (\is_object($condition['field'])) {
           $sub_conditions = &$condition['field']->conditions();
           $this->alterSubqueryCondition($query, $sub_conditions);
         }
@@ -330,14 +330,14 @@ class GroupwiseMax extends RelationshipPluginBase {
    * need to quote each single part to prevent from query exceptions.
    */
   protected function conditionNamespace($string) {
-    $parts = explode(' = ', $string);
+    $parts = \explode(' = ', $string);
     foreach ($parts as &$part) {
-      if (str_contains($part, '.')) {
-        $part = '"' . str_replace('.', $this->subquery_namespace . '".', $part);
+      if (\str_contains($part, '.')) {
+        $part = '"' . \str_replace('.', $this->subquery_namespace . '".', $part);
       }
     }
 
-    return implode(' = ', $parts);
+    return \implode(' = ', $parts);
   }
 
   /**

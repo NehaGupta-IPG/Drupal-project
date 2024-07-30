@@ -187,7 +187,7 @@ class ViewsModerationStateSortTest extends ViewsKernelTestBase {
     $view->removeHandler('default', 'sort', 'moderation_state');
     $request = new Request([
       'order' => 'moderation_state',
-      'sort' => strtolower($order),
+      'sort' => \strtolower($order),
     ]);
     $view->setRequest($request);
     $view->execute();

@@ -27,7 +27,7 @@ class ContextCacheKeys extends CacheableMetadata {
     // Sorting keys warrants that different combination of the same keys
     // generates the same cache cid.
     // @see \Drupal\Core\Render\RenderCache::createCacheID()
-    sort($keys);
+    \sort($keys);
     $this->keys = $keys;
   }
 

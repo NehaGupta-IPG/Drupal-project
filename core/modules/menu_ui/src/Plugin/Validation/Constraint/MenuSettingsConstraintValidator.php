@@ -15,7 +15,7 @@ class MenuSettingsConstraintValidator extends ConstraintValidator {
    */
   public function validate($entity, Constraint $constraint): void {
     if (isset($entity) && !$entity->isNew() && !$entity->isDefaultRevision()) {
-      $defaults = menu_ui_get_menu_link_defaults($entity);
+      $defaults = \menu_ui_get_menu_link_defaults($entity);
 
       // If the menu UI entity builder is not present and the menu property has
       // not been set, do not attempt to validate the menu settings since they
@@ -24,8 +24,8 @@ class MenuSettingsConstraintValidator extends ConstraintValidator {
         return;
       }
 
-      if (trim($values['title']) && !empty($values['menu_parent'])) {
-        [$menu_name, $parent] = explode(':', $values['menu_parent'], 2);
+      if (\trim($values['title']) && !empty($values['menu_parent'])) {
+        [$menu_name, $parent] = \explode(':', $values['menu_parent'], 2);
         $values['menu_name'] = $menu_name;
         $values['parent'] = $parent;
       }

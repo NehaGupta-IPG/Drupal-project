@@ -33,7 +33,7 @@ class BinaryFileResponseTest extends KernelTestBase {
     $response = \Drupal::service('http_kernel')->handle($request);
     $response->prepare($request);
 
-    $this->assertSame($content_type, current(explode(';', $response->headers->get('Content-Type'))));
+    $this->assertSame($content_type, \current(\explode(';', $response->headers->get('Content-Type'))));
   }
 
   /**

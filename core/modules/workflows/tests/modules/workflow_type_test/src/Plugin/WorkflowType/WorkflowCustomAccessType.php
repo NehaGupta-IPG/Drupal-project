@@ -63,7 +63,7 @@ class WorkflowCustomAccessType extends WorkflowTypeBase {
    */
   public static function workflowAccess(WorkflowInterface $entity, $operation, AccountInterface $account) {
     $forbidden_operations = \Drupal::state()->get('workflow_type_test_forbidden_operations', []);
-    return in_array($operation, $forbidden_operations, TRUE)
+    return \in_array($operation, $forbidden_operations, TRUE)
       ? AccessResult::forbidden()
       : AccessResult::neutral();
   }

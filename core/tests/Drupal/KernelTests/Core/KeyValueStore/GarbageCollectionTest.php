@@ -29,7 +29,7 @@ class GarbageCollectionTest extends KernelTestBase {
 
     // Insert some items and confirm that they're set.
     for ($i = 0; $i <= 3; $i++) {
-      $store->setWithExpire('key_' . $i, $this->randomObject(), rand(500, 100000));
+      $store->setWithExpire('key_' . $i, $this->randomObject(), \rand(500, 100000));
     }
     $this->assertCount(4, $store->getAll(), 'Four items were written to the storage.');
 

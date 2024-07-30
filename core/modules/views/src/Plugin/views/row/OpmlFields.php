@@ -49,14 +49,14 @@ class OpmlFields extends RowPluginBase {
 
     $initial_labels = ['' => $this->t('- None -')];
     $view_fields_labels = $this->displayHandler->getFieldLabels();
-    $view_fields_labels = array_merge($initial_labels, $view_fields_labels);
+    $view_fields_labels = \array_merge($initial_labels, $view_fields_labels);
 
     $types = [
       'rss' => $this->t('RSS'),
       'link' => $this->t('Link'),
       'include' => $this->t('Include'),
     ];
-    $types = array_merge($initial_labels, $types);
+    $types = \array_merge($initial_labels, $types);
     $form['type_field'] = [
       '#type' => 'select',
       '#title' => $this->t('Type attribute'),
@@ -158,7 +158,7 @@ class OpmlFields extends RowPluginBase {
           $errors[] = $this->t('Row style plugin requires specifying which views field to use for XML URL attribute.');
         }
       }
-      elseif (in_array($this->options['type_field'], ['link', 'include'])) {
+      elseif (\in_array($this->options['type_field'], ['link', 'include'])) {
         if (empty($this->options['url_field'])) {
           $errors[] = $this->t('Row style plugin requires specifying which views field to use for URL attribute.');
         }
@@ -189,7 +189,7 @@ class OpmlFields extends RowPluginBase {
       }
     }
     // Remove empty attributes.
-    $item = array_filter($item);
+    $item = \array_filter($item);
 
     $build = [
       '#theme' => $this->themeFunctions(),
@@ -213,7 +213,7 @@ class OpmlFields extends RowPluginBase {
    *   The rendered field value.
    */
   public function getField($index, $field_id) {
-    if (empty($this->view->style_plugin) || !is_object($this->view->style_plugin) || empty($field_id)) {
+    if (empty($this->view->style_plugin) || !\is_object($this->view->style_plugin) || empty($field_id)) {
       return '';
     }
     return (string) $this->view->style_plugin->getField($index, $field_id);

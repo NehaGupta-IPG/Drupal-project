@@ -11,14 +11,14 @@ class PhpSerialize implements ObjectAwareSerializationInterface {
    * {@inheritdoc}
    */
   public static function encode($data) {
-    return serialize($data);
+    return \serialize($data);
   }
 
   /**
    * {@inheritdoc}
    */
   public static function decode($raw) {
-    return unserialize($raw);
+    return \unserialize($raw);
   }
 
   /**

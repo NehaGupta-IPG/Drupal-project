@@ -83,10 +83,10 @@ class LocaleDefaultConfigStorage {
     elseif ($this->optionalInstallStorage->exists($name)) {
       return $this->optionalInstallStorage->read($name);
     }
-    elseif (str_starts_with($name, 'language.entity.')) {
+    elseif (\str_starts_with($name, 'language.entity.')) {
       // Simulate default languages as if they were shipped as default
       // configuration.
-      $langcode = str_replace('language.entity.', '', $name);
+      $langcode = \str_replace('language.entity.', '', $name);
       $predefined_languages = $this->languageManager->getStandardLanguageList();
       if (isset($predefined_languages[$langcode])) {
         $data = $this->configStorage->read($name);
@@ -104,8 +104,8 @@ class LocaleDefaultConfigStorage {
    */
   public function listAll() {
     $languages = $this->predefinedConfiguredLanguages();
-    return array_unique(
-      array_merge(
+    return \array_unique(
+      \array_merge(
         $this->requiredInstallStorage->listAll(),
         $this->optionalInstallStorage->listAll(),
         $languages
@@ -127,15 +127,15 @@ class LocaleDefaultConfigStorage {
    *   predefined names as well.
    */
   public function getComponentNames($type, array $list) {
-    $names = array_unique(
-      array_merge(
-        array_keys($this->requiredInstallStorage->getComponentNames($list)),
-        array_keys($this->optionalInstallStorage->getComponentNames($list))
+    $names = \array_unique(
+      \array_merge(
+        \array_keys($this->requiredInstallStorage->getComponentNames($list)),
+        \array_keys($this->optionalInstallStorage->getComponentNames($list))
       )
     );
-    if ($type == 'module' && in_array('language', $list)) {
+    if ($type == 'module' && \in_array('language', $list)) {
       $languages = $this->predefinedConfiguredLanguages();
-      $names = array_unique(array_merge($names, $languages));
+      $names = \array_unique(\array_merge($names, $languages));
     }
     return $names;
   }
@@ -150,12 +150,12 @@ class LocaleDefaultConfigStorage {
     $names = $this->configStorage->listAll('language.entity.');
     $predefined_languages = $this->languageManager->getStandardLanguageList();
     foreach ($names as $id => $name) {
-      $langcode = str_replace('language.entity.', '', $name);
+      $langcode = \str_replace('language.entity.', '', $name);
       if (!isset($predefined_languages[$langcode])) {
         unset($names[$id]);
       }
     }
-    return array_values($names);
+    return \array_values($names);
   }
 
 }

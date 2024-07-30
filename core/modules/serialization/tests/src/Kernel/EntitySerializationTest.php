@@ -176,10 +176,10 @@ class EntitySerializationTest extends NormalizerTestBase {
 
     $normalized = $this->serializer->normalize($this->entity);
 
-    foreach (array_keys($expected) as $fieldName) {
+    foreach (\array_keys($expected) as $fieldName) {
       $this->assertSame($expected[$fieldName], $normalized[$fieldName], "Normalization produces expected array for $fieldName.");
     }
-    $this->assertEquals([], array_diff_key($normalized, $expected), 'No unexpected data is added to the normalized array.');
+    $this->assertEquals([], \array_diff_key($normalized, $expected), 'No unexpected data is added to the normalized array.');
   }
 
   /**
@@ -246,12 +246,12 @@ class EntitySerializationTest extends NormalizerTestBase {
       'field_test_text' => '<field_test_text><value>' . $this->values['field_test_text']['value'] . '</value><format>' . $this->values['field_test_text']['format'] . '</format><processed><![CDATA[<p>' . $this->values['field_test_text']['value'] . '</p>]]></processed></field_test_text>',
     ];
     // Sort it in the same order as normalized.
-    $expected = array_merge($normalized, $expected);
+    $expected = \array_merge($normalized, $expected);
     // Add header and footer.
-    array_unshift($expected, '<?xml version="1.0"?>' . PHP_EOL . '<response>');
+    \array_unshift($expected, '<?xml version="1.0"?>' . PHP_EOL . '<response>');
     $expected[] = '</response>' . PHP_EOL;
     // Reduced the array to a string.
-    $expected = implode('', $expected);
+    $expected = \implode('', $expected);
     // Test 'xml'. The output should match that of Symfony's XmlEncoder.
     $actual = $this->serializer->serialize($this->entity, 'xml');
     $this->assertSame($expected, $actual);
@@ -294,7 +294,7 @@ class EntitySerializationTest extends NormalizerTestBase {
    * Tests normalizing/denormalizing custom serialized columns.
    */
   public function testDenormalizeCustomSerializedItem(): void {
-    $entity = EntitySerializedField::create(['serialized_text' => serialize(['Hello world!'])]);
+    $entity = EntitySerializedField::create(['serialized_text' => \serialize(['Hello world!'])]);
     $normalized = $this->serializer->normalize($entity);
     $this->assertEquals(['Hello world!'], $normalized['serialized_text'][0]['value']);
     $this->expectException(\LogicException::class);
@@ -313,7 +313,7 @@ class EntitySerializationTest extends NormalizerTestBase {
    * Tests normalizing/denormalizing invalid custom serialized fields.
    */
   public function testDenormalizeInvalidCustomSerializedField(): void {
-    $entity = EntitySerializedField::create(['serialized_long' => serialize(['Hello world!'])]);
+    $entity = EntitySerializedField::create(['serialized_long' => \serialize(['Hello world!'])]);
     $normalized = $this->serializer->normalize($entity);
     $this->assertEquals(['Hello world!'], $normalized['serialized_long'][0]['value']);
     $this->expectException(\LogicException::class);
@@ -332,26 +332,26 @@ class EntitySerializationTest extends NormalizerTestBase {
    * Tests normalizing/denormalizing empty custom serialized fields.
    */
   public function testDenormalizeEmptyCustomSerializedField(): void {
-    $entity = EntitySerializedField::create(['serialized_long' => serialize([])]);
+    $entity = EntitySerializedField::create(['serialized_long' => \serialize([])]);
     $normalized = $this->serializer->normalize($entity);
     $this->assertEquals([], $normalized['serialized_long'][0]['value']);
 
     $entity = $this->serializer->denormalize($normalized, EntitySerializedField::class);
 
-    $this->assertEquals(serialize([]), $entity->get('serialized_long')->value);
+    $this->assertEquals(\serialize([]), $entity->get('serialized_long')->value);
   }
 
   /**
    * Tests normalizing/denormalizing valid custom serialized fields.
    */
   public function testDenormalizeValidCustomSerializedField(): void {
-    $entity = EntitySerializedField::create(['serialized_long' => serialize(['key' => 'value'])]);
+    $entity = EntitySerializedField::create(['serialized_long' => \serialize(['key' => 'value'])]);
     $normalized = $this->serializer->normalize($entity);
     $this->assertEquals(['key' => 'value'], $normalized['serialized_long'][0]['value']);
 
     $entity = $this->serializer->denormalize($normalized, EntitySerializedField::class);
 
-    $this->assertEquals(serialize(['key' => 'value']), $entity->get('serialized_long')->value);
+    $this->assertEquals(\serialize(['key' => 'value']), $entity->get('serialized_long')->value);
   }
 
   /**

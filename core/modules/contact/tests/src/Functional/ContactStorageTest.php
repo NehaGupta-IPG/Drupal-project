@@ -53,13 +53,13 @@ class ContactStorageTest extends ContactSitewideTest {
     $this->drupalLogin($admin_user);
     // Create first valid contact form.
     $mail = 'simpletest@example.com';
-    $this->addContactForm($id = $this->randomMachineName(16), $label = $this->randomMachineName(16), implode(',', [$mail]), '', TRUE, 'Your message has been sent.', [
+    $this->addContactForm($id = $this->randomMachineName(16), $label = $this->randomMachineName(16), \implode(',', [$mail]), '', TRUE, 'Your message has been sent.', [
       'send_a_pony' => 1,
     ]);
     $this->assertSession()->pageTextContains('Contact form ' . $label . ' has been added.');
 
     // Ensure that anonymous can submit site-wide contact form.
-    user_role_grant_permissions(RoleInterface::ANONYMOUS_ID, ['access site-wide contact form']);
+    \user_role_grant_permissions(RoleInterface::ANONYMOUS_ID, ['access site-wide contact form']);
     $this->drupalLogout();
     $this->drupalGet('contact');
     $this->assertSession()->pageTextContains('Your email address');
@@ -69,7 +69,7 @@ class ContactStorageTest extends ContactSitewideTest {
 
     $messages = Message::loadMultiple();
     /** @var \Drupal\contact\Entity\Message $message */
-    $message = reset($messages);
+    $message = \reset($messages);
     $this->assertEquals($id, $message->getContactForm()->id());
     $this->assertTrue($message->getContactForm()->getThirdPartySetting('contact_storage_test', 'send_a_pony', FALSE));
     $this->assertEquals($name, $message->getSenderName());

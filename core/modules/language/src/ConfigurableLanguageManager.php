@@ -148,7 +148,7 @@ class ConfigurableLanguageManager extends LanguageManager implements Configurabl
    * {@inheritdoc}
    */
   public function isMultilingual() {
-    return count($this->getLanguages(LanguageInterface::STATE_CONFIGURABLE)) > 1;
+    return \count($this->getLanguages(LanguageInterface::STATE_CONFIGURABLE)) > 1;
   }
 
   /**
@@ -223,8 +223,8 @@ class ConfigurableLanguageManager extends LanguageManager implements Configurabl
         if (!isset($this->initializing[$type])) {
           $this->initializing[$type] = TRUE;
           $negotiation = $this->negotiator->initializeType($type);
-          $this->negotiatedLanguages[$type] = reset($negotiation);
-          $this->negotiatedMethods[$type] = key($negotiation);
+          $this->negotiatedLanguages[$type] = \reset($negotiation);
+          $this->negotiatedMethods[$type] = \key($negotiation);
           unset($this->initializing[$type]);
         }
         // If the current interface language needs to be retrieved during
@@ -361,12 +361,12 @@ class ConfigurableLanguageManager extends LanguageManager implements Configurabl
   public function updateLockedLanguageWeights() {
     // Get the weight of the last configurable language.
     $configurable_languages = $this->getLanguages(LanguageInterface::STATE_CONFIGURABLE);
-    $max_weight = end($configurable_languages)->getWeight();
+    $max_weight = \end($configurable_languages)->getWeight();
 
     $locked_languages = $this->getLanguages(LanguageInterface::STATE_LOCKED);
     // Update locked language weights to maintain the existing order, if
     // necessary.
-    if (reset($locked_languages)->getWeight() <= $max_weight) {
+    if (\reset($locked_languages)->getWeight() <= $max_weight) {
       foreach ($locked_languages as $language) {
         // Update system languages weight.
         $max_weight++;
@@ -389,9 +389,9 @@ class ConfigurableLanguageManager extends LanguageManager implements Configurabl
         // LanguageInterface::LANGCODE_NOT_SPECIFIED at the end. Interface
         // translation fallback should only be based on explicit configuration
         // gathered via the alter hooks below.
-        $candidates = array_keys($this->getLanguages());
+        $candidates = \array_keys($this->getLanguages());
         $candidates[] = LanguageInterface::LANGCODE_NOT_SPECIFIED;
-        $candidates = array_combine($candidates, $candidates);
+        $candidates = \array_combine($candidates, $candidates);
 
         // The first candidate should always be the desired language if
         // specified.
@@ -422,7 +422,7 @@ class ConfigurableLanguageManager extends LanguageManager implements Configurabl
   public function getLanguageSwitchLinks($type, Url $url) {
     if ($this->negotiator) {
       foreach ($this->negotiator->getNegotiationMethods($type) as $method_id => $method) {
-        if (is_subclass_of($method['class'], LanguageSwitcherInterface::class)) {
+        if (\is_subclass_of($method['class'], LanguageSwitcherInterface::class)) {
           $original_languages = $this->negotiatedLanguages;
           $result = $this->negotiator->getNegotiationMethodInstance($method_id)->getLanguageSwitchLinks($this->requestStack->getCurrentRequest(), $type, $url);
 
@@ -430,7 +430,7 @@ class ConfigurableLanguageManager extends LanguageManager implements Configurabl
             // Allow modules to provide translations for specific links.
             $this->moduleHandler->alter('language_switch_links', $result, $type, $url);
 
-            $result = array_filter($result, function (array $link): bool {
+            $result = \array_filter($result, function (array $link): bool {
               $url = $link['url'] ?? NULL;
               $language = $link['language'] ?? NULL;
               if ($language instanceof LanguageInterface) {
@@ -504,7 +504,7 @@ class ConfigurableLanguageManager extends LanguageManager implements Configurabl
       // phpcs:ignore Drupal.Semantics.FunctionT.NotLiteralString
       $predefined[$key] = new TranslatableMarkup($value[0]);
     }
-    natcasesort($predefined);
+    \natcasesort($predefined);
     return $predefined;
   }
 

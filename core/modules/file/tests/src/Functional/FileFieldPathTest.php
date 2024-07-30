@@ -91,11 +91,11 @@ class FileFieldPathTest extends FileFieldTestBase {
   public function assertPathMatch(string $expected_path, string $actual_path, string $message): void {
     // Strip off the extension of the expected path to allow for _0, _1, etc.
     // suffixes when the file hits a duplicate name.
-    $pos = strrpos($expected_path, '.');
-    $base_path = substr($expected_path, 0, $pos);
-    $extension = substr($expected_path, $pos + 1);
+    $pos = \strrpos($expected_path, '.');
+    $base_path = \substr($expected_path, 0, $pos);
+    $extension = \substr($expected_path, $pos + 1);
 
-    $result = (bool) preg_match('/' . preg_quote($base_path, '/') . '(_[0-9]+)?\.' . preg_quote($extension, '/') . '/', $actual_path);
+    $result = (bool) \preg_match('/' . \preg_quote($base_path, '/') . '(_[0-9]+)?\.' . \preg_quote($extension, '/') . '/', $actual_path);
     $this->assertTrue($result, $message);
   }
 

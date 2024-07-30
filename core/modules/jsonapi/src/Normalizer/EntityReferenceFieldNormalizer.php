@@ -28,18 +28,18 @@ class EntityReferenceFieldNormalizer extends FieldNormalizer {
    * {@inheritdoc}
    */
   public function normalize($field, $format = NULL, array $context = []): array|string|int|float|bool|\ArrayObject|NULL {
-    assert($field instanceof EntityReferenceFieldItemListInterface);
+    \assert($field instanceof EntityReferenceFieldItemListInterface);
     // Build the relationship object based on the Entity Reference and normalize
     // that object instead.
-    $resource_identifiers = array_filter(ResourceIdentifier::toResourceIdentifiers($field->filterEmptyItems()), function (ResourceIdentifierInterface $resource_identifier) {
+    $resource_identifiers = \array_filter(ResourceIdentifier::toResourceIdentifiers($field->filterEmptyItems()), function (ResourceIdentifierInterface $resource_identifier) {
       return !$resource_identifier->getResourceType()->isInternal();
     });
     $normalized_items = CacheableNormalization::aggregate($this->serializer->normalize($resource_identifiers, $format, $context));
-    assert($context['resource_object'] instanceof ResourceObject);
+    \assert($context['resource_object'] instanceof ResourceObject);
     $resource_relationship = $context['resource_object']->getResourceType()->getFieldByInternalName($field->getName());
-    assert($resource_relationship instanceof ResourceTypeRelationship);
+    \assert($resource_relationship instanceof ResourceTypeRelationship);
     $link_cacheability = new CacheableMetadata();
-    $links = array_map(function (Url $link) use ($link_cacheability) {
+    $links = \array_map(function (Url $link) use ($link_cacheability) {
       $href = $link->setAbsolute()->toString(TRUE);
       $link_cacheability->addCacheableDependency($href);
       return ['href' => $href->getGeneratedUrl()];
@@ -49,7 +49,7 @@ class EntityReferenceFieldNormalizer extends FieldNormalizer {
       // Empty 'to-one' relationships must be NULL.
       // Empty 'to-many' relationships must be an empty array.
       // @link http://jsonapi.org/format/#document-resource-object-linkage
-      'data' => $resource_relationship->hasOne() ? array_shift($data_normalization) : $data_normalization,
+      'data' => $resource_relationship->hasOne() ? \array_shift($data_normalization) : $data_normalization,
     ];
     if (!empty($links)) {
       $normalization['links'] = $links;

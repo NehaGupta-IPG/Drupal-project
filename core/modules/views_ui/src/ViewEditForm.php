@@ -467,15 +467,15 @@ class ViewEditForm extends ViewFormBase {
         elseif ($view->status() && $view->getExecutable()->displayHandlers->get($display['id'])->hasPath()) {
           $path = $view->getExecutable()->displayHandlers->get($display['id'])->getPath();
 
-          if ($path && (!str_contains($path, '%'))) {
+          if ($path && (!\str_contains($path, '%'))) {
             // Wrap this in a try/catch as trying to generate links to some
             // routes may throw an exception, for example if they do not
             // respond to HTML, such as RESTExports.
             try {
-              if (!parse_url($path, PHP_URL_SCHEME)) {
+              if (!\parse_url($path, PHP_URL_SCHEME)) {
                 // @todo Views should expect and store a leading /. See:
                 //   https://www.drupal.org/node/2423913
-                $url = Url::fromUserInput('/' . ltrim($path, '/'));
+                $url = Url::fromUserInput('/' . \ltrim($path, '/'));
               }
               else {
                 $url = Url::fromUri("base:$path");
@@ -612,7 +612,7 @@ class ViewEditForm extends ViewFormBase {
       else {
         $column = 'third';
       }
-      if (isset($bucket['build']) && is_array($bucket['build'])) {
+      if (isset($bucket['build']) && \is_array($bucket['build'])) {
         $build['columns'][$column][$id] = $bucket['build'];
         $build['columns'][$column][$id]['#theme_wrappers'][] = 'views_ui_display_tab_bucket';
         $build['columns'][$column][$id]['#title'] = !empty($bucket['title']) ? $bucket['title'] : '';
@@ -916,7 +916,7 @@ class ViewEditForm extends ViewFormBase {
     $view = $this->entity;
     // Create the new display.
     $parents = $form_state->getTriggeringElement()['#parents'];
-    $display_type = array_pop($parents);
+    $display_type = \array_pop($parents);
     $display = $view->getExecutable()->newDisplay($display_type);
     $display_id = $display->display['id'];
     // A new display got added so the asterisks symbol should appear on the new
@@ -941,7 +941,7 @@ class ViewEditForm extends ViewFormBase {
 
     // Create the new display.
     $parents = $form_state->getTriggeringElement()['#parents'];
-    $display_type = array_pop($parents);
+    $display_type = \array_pop($parents);
 
     $new_display_id = $view->duplicateDisplayAsType($display_id, $display_type);
 
@@ -972,7 +972,7 @@ class ViewEditForm extends ViewFormBase {
     $option_build['#link'] = $view->getExecutable()->displayHandlers->get($display['id'])->optionLink($option['value'], $id, '', empty($option['desc']) ? '' : $option['desc']);
 
     $option_build['#links'] = [];
-    if (!empty($option['links']) && is_array($option['links'])) {
+    if (!empty($option['links']) && \is_array($option['links'])) {
       foreach ($option['links'] as $link_id => $link_value) {
         $option_build['#settings_links'][] = $view->getExecutable()->displayHandlers->get($display['id'])->optionLink($option['setting'], $link_id, 'views-button-configure', $link_value);
       }
@@ -1058,7 +1058,7 @@ class ViewEditForm extends ViewFormBase {
 
     // Create an array of actions to pass to links template.
     $actions = [];
-    $count_handlers = count($executable->display_handler->getHandlers($type));
+    $count_handlers = \count($executable->display_handler->getHandlers($type));
 
     // Create the add text variable for the add action.
     $add_text = $this->t('Add <span class="visually-hidden">@type</span>', ['@type' => $types[$type]['ltitle']]);
@@ -1114,7 +1114,7 @@ class ViewEditForm extends ViewFormBase {
       // If there is only one group but it is using the "OR" filter, we still
       // treat it as a group for display purposes, since we want to display the
       // "OR" label next to items within the group.
-      if (!empty($group_info['groups']) && (count($group_info['groups']) > 1 || current($group_info['groups']) == 'OR')) {
+      if (!empty($group_info['groups']) && (\count($group_info['groups']) > 1 || \current($group_info['groups']) == 'OR')) {
         $grouping = TRUE;
         $groups = [0 => []];
       }
@@ -1209,8 +1209,8 @@ class ViewEditForm extends ViewFormBase {
           ];
         }
         // Display an operator between each pair of filters within the group.
-        $keys = array_keys($contents);
-        $last = end($keys);
+        $keys = \array_keys($contents);
+        $last = \end($keys);
         foreach ($contents as $key => $pid) {
           if ($key != $last) {
             $operator = $group_info['groups'][$gid] == 'OR' ? $this->t('OR') : $this->t('AND');

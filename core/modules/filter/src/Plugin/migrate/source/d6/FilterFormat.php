@@ -46,7 +46,7 @@ class FilterFormat extends DrupalSqlBase {
   public function prepareRow(Row $row) {
     $filters = [];
     $roles = $row->getSourceProperty('roles');
-    $row->setSourceProperty('roles', array_values(array_filter(explode(',', $roles))));
+    $row->setSourceProperty('roles', \array_values(\array_filter(\explode(',', $roles))));
     $format = $row->getSourceProperty('format');
     // Find filters for this row.
     $results = $this->select('filters', 'f')

@@ -131,7 +131,7 @@ class EmailAction extends ConfigurableActionBase implements ContainerFactoryPlug
     // the recipient's preferred language. Otherwise, use the system default
     // language.
     $recipient_accounts = $this->storage->loadByProperties(['mail' => $recipient]);
-    $recipient_account = reset($recipient_accounts);
+    $recipient_account = \reset($recipient_accounts);
     if ($recipient_account) {
       $langcode = $recipient_account->getPreferredLangcode();
     }

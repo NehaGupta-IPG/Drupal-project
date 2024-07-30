@@ -54,7 +54,7 @@ class AttributeDiscoveryWithAnnotations extends AttributeClassDiscovery {
    * {@inheritdoc}
    */
   protected function getFileCacheSuffix(string $default_suffix):string {
-    return $default_suffix . ':' . Crypt::hashBase64(serialize($this->additionalNamespaces)) . ':' . str_replace('\\', '_', $this->pluginDefinitionAnnotationName);
+    return $default_suffix . ':' . Crypt::hashBase64(\serialize($this->additionalNamespaces)) . ':' . \str_replace('\\', '_', $this->pluginDefinitionAnnotationName);
   }
 
   /**
@@ -141,7 +141,7 @@ class AttributeDiscoveryWithAnnotations extends AttributeClassDiscovery {
       $this->annotationReader = new SimpleAnnotationReader();
 
       // Add the namespaces from the main plugin annotation, like @EntityType.
-      $namespace = substr($this->pluginDefinitionAnnotationName, 0, strrpos($this->pluginDefinitionAnnotationName, '\\'));
+      $namespace = \substr($this->pluginDefinitionAnnotationName, 0, \strrpos($this->pluginDefinitionAnnotationName, '\\'));
       $this->annotationReader->addNamespace($namespace);
 
       // Register additional namespaces to be scanned for annotations.

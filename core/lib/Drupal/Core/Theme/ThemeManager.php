@@ -140,7 +140,7 @@ class ThemeManager implements ThemeManagerInterface {
 
     // If an array of hook candidates were passed, use the first one that has an
     // implementation.
-    if (is_array($hook)) {
+    if (\is_array($hook)) {
       foreach ($hook as $candidate) {
         if ($theme_registry->has($candidate)) {
           break;
@@ -158,8 +158,8 @@ class ThemeManager implements ThemeManagerInterface {
     if (!$theme_registry->has($hook)) {
       // Iteratively strip everything after the last '__' delimiter, until an
       // implementation is found.
-      while ($pos = strrpos($hook, '__')) {
-        $hook = substr($hook, 0, $pos);
+      while ($pos = \strrpos($hook, '__')) {
+        $hook = \substr($hook, 0, $pos);
         if ($theme_registry->has($hook)) {
           break;
         }
@@ -182,7 +182,7 @@ class ThemeManager implements ThemeManagerInterface {
     $info = $theme_registry->get($hook);
     $invoke_map = $theme_registry->getPreprocessInvokes();
     if (isset($info['deprecated'])) {
-      @trigger_error($info['deprecated'], E_USER_DEPRECATED);
+      @\trigger_error($info['deprecated'], E_USER_DEPRECATED);
     }
 
     // If a renderable array is passed as $variables, then set $variables to
@@ -191,7 +191,7 @@ class ThemeManager implements ThemeManagerInterface {
       $element = $variables;
       $variables = [];
       if (isset($info['variables'])) {
-        foreach (array_keys($info['variables']) as $name) {
+        foreach (\array_keys($info['variables']) as $name) {
           if (\array_key_exists("#$name", $element)) {
             $variables[$name] = $element["#$name"];
           }
@@ -229,7 +229,7 @@ class ThemeManager implements ThemeManagerInterface {
     // '#theme' => 'node', but a module can add 'node__article' as a suggestion
     // via hook_theme_suggestions_HOOK_alter(), enabling a theme to have
     // an alternate template file for article nodes.
-    foreach (array_reverse($suggestions) as $suggestion) {
+    foreach (\array_reverse($suggestions) as $suggestion) {
       if ($theme_registry->has($suggestion)) {
         $info = $theme_registry->get($suggestion);
         if (isset($deprecated_suggestions[$suggestion])) {
@@ -536,7 +536,7 @@ class ThemeManager implements ThemeManagerInterface {
     // specific variants of it, as in the case of ['form', 'form_FORM_ID'].
     if (is_array($type)) {
       $extra_types = $type;
-      $type = array_shift($extra_types);
+      $type = \array_shift($extra_types);
       // Allow if statements in this function to use the faster isset() rather
       // than !empty() both when $type is passed as a string, or as an array
       // with one item.

@@ -114,7 +114,7 @@ class TokenReplaceKernelTest extends TokenReplaceKernelTestBase {
     $tests['[site:slogan]'] = $safe_slogan;
     $tests['[site:mail]'] = $config->get('mail');
     $tests['[site:url]'] = Url::fromRoute('<front>', [], $url_options)->toString();
-    $tests['[site:url-brief]'] = preg_replace(['!^https?://!', '!/$!'], '', Url::fromRoute('<front>', [], $url_options)->toString());
+    $tests['[site:url-brief]'] = \preg_replace(['!^https?://!', '!/$!'], '', Url::fromRoute('<front>', [], $url_options)->toString());
     $tests['[site:base-url]'] = 'http://localhost';
     $tests['[site:login-url]'] = Url::fromRoute('user.page', [], $url_options)->toString();
 
@@ -131,7 +131,7 @@ class TokenReplaceKernelTest extends TokenReplaceKernelTestBase {
     $metadata_tests['[site:login-url]'] = $bubbleable_metadata;
 
     // Test to make sure that we generated something for each token.
-    $this->assertNotContains(0, array_map('strlen', $tests), 'No empty tokens generated.');
+    $this->assertNotContains(0, \array_map('strlen', $tests), 'No empty tokens generated.');
 
     foreach ($tests as $input => $expected) {
       $bubbleable_metadata = new BubbleableMetadata();
@@ -179,7 +179,7 @@ class TokenReplaceKernelTest extends TokenReplaceKernelTestBase {
     $tests['[date:raw]'] = Xss::filter($date);
 
     // Test to make sure that we generated something for each token.
-    $this->assertNotContains(0, array_map('strlen', $tests), 'No empty tokens generated.');
+    $this->assertNotContains(0, \array_map('strlen', $tests), 'No empty tokens generated.');
 
     foreach ($tests as $input => $expected) {
       $output = $this->tokenService->replace($input, ['date' => $date], ['langcode' => $this->interfaceLanguage->getId()]);

@@ -66,7 +66,7 @@ class DependencyTest extends UnitTestCase {
     $constraint = $reflected_constraint->getValue($dependency);
     $this->assertInstanceOf(Constraint::class, $constraint);
 
-    $dependency = unserialize(serialize($dependency));
+    $dependency = \unserialize(\serialize($dependency));
     $reflected_constraint = (new \ReflectionObject($dependency))->getProperty('constraint');
     $constraint = $reflected_constraint->getValue($dependency);
     $this->assertNull($constraint);

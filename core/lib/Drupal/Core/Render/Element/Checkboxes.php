@@ -58,9 +58,9 @@ class Checkboxes extends FormElementBase {
    * Processes a checkboxes form element.
    */
   public static function processCheckboxes(&$element, FormStateInterface $form_state, &$complete_form) {
-    $value = is_array($element['#value']) ? $element['#value'] : [];
+    $value = \is_array($element['#value']) ? $element['#value'] : [];
     $element['#tree'] = TRUE;
-    if (count($element['#options']) > 0) {
+    if (\count($element['#options']) > 0) {
       if (!isset($element['#default_value']) || $element['#default_value'] == 0) {
         $element['#default_value'] = [];
       }
@@ -81,7 +81,7 @@ class Checkboxes extends FormElementBase {
         // Only enabled checkboxes receive their values from the form
         // submission, the disabled checkboxes use their default value.
         $default_value = NULL;
-        if (isset($value[$key]) || (!empty($element[$key]['#disabled']) && in_array($key, $element['#default_value'], TRUE))) {
+        if (isset($value[$key]) || (!empty($element[$key]['#disabled']) && \in_array($key, $element['#default_value'], TRUE))) {
           $default_value = $key;
         }
 
@@ -114,7 +114,7 @@ class Checkboxes extends FormElementBase {
       }
       return $value;
     }
-    elseif (is_array($input)) {
+    elseif (\is_array($input)) {
       // Programmatic form submissions use NULL to indicate that a checkbox
       // should be unchecked. We therefore remove all NULL elements from the
       // array before constructing the return value, to simulate the behavior
@@ -138,7 +138,7 @@ class Checkboxes extends FormElementBase {
         }
       }
 
-      return array_combine($input, $input);
+      return \array_combine($input, $input);
     }
     else {
       return [];
@@ -162,10 +162,10 @@ class Checkboxes extends FormElementBase {
     //
     // @see \Drupal\Core\Render\Element\Checkboxes::valueCallback()
     // @see https://www.w3.org/TR/html401/interact/forms.html#checkbox
-    $checked = array_filter($input, function ($value) {
+    $checked = \array_filter($input, function ($value) {
       return $value !== 0;
     });
-    return array_keys($checked);
+    return \array_keys($checked);
   }
 
   /**

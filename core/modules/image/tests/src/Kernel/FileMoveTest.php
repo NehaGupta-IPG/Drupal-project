@@ -64,11 +64,11 @@ class FileMoveTest extends KernelTestBase {
    */
   public function testNormal(): void {
     // Pick a file for testing.
-    $file = File::create((array) current($this->drupalGetTestFiles('image')));
+    $file = File::create((array) \current($this->drupalGetTestFiles('image')));
 
     // Create derivative image.
     $styles = ImageStyle::loadMultiple();
-    $style = reset($styles);
+    $style = \reset($styles);
     $original_uri = $file->getFileUri();
     $derivative_uri = $style->buildUri($original_uri);
     $style->createDerivative($original_uri, $derivative_uri);

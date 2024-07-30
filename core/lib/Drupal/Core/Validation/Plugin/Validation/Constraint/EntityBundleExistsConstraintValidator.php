@@ -38,15 +38,15 @@ class EntityBundleExistsConstraintValidator extends ConstraintValidator implemen
    * {@inheritdoc}
    */
   public function validate($value, Constraint $constraint): void {
-    assert($constraint instanceof EntityBundleExistsConstraint);
+    \assert($constraint instanceof EntityBundleExistsConstraint);
 
-    if (!is_string($value)) {
+    if (!\is_string($value)) {
       throw new UnexpectedTypeException($value, 'string');
     }
     // Resolve any dynamic tokens, like %parent, in the entity type ID.
     $entity_type_id = TypeResolver::resolveDynamicTypeName("[$constraint->entityTypeId]", $this->context->getObject());
 
-    if (!array_key_exists($value, $this->bundleInfo->getBundleInfo($entity_type_id))) {
+    if (!\array_key_exists($value, $this->bundleInfo->getBundleInfo($entity_type_id))) {
       $this->context->addViolation($constraint->message, [
         '@bundle' => $value,
         '@entity_type_id' => $entity_type_id,

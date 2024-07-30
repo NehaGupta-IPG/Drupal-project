@@ -52,7 +52,7 @@ final class PlaceBlock implements ConfigActionPluginInterface, ContainerFactoryP
    * {@inheritdoc}
    */
   public function apply(string $configName, mixed $value): void {
-    assert(is_array($value));
+    \assert(\is_array($value));
 
     $theme = $this->configFactory->get('system.theme')->get($this->whichTheme);
     $value['theme'] = $theme;
@@ -68,7 +68,7 @@ final class PlaceBlock implements ConfigActionPluginInterface, ContainerFactoryP
 
     // Allow the recipe author to position the block in the region without
     // needing to know exact weights.
-    if (array_key_exists('position', $value)) {
+    if (\array_key_exists('position', $value)) {
       $blocks = $this->blockStorage->loadByProperties([
         'theme' => $theme,
         'region' => $value['region'],

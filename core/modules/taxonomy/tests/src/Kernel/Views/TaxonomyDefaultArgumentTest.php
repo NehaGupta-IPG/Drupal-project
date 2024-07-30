@@ -61,7 +61,7 @@ class TaxonomyDefaultArgumentTest extends TaxonomyTestBase {
   public function testNodePath(): void {
     $view = $this->initViewWithRequest($this->nodes[0]->toUrl()->toString());
 
-    $expected = implode(',', [$this->term1->id(), $this->term2->id()]);
+    $expected = \implode(',', [$this->term1->id(), $this->term2->id()]);
     $this->assertEquals($expected, $view->argument['tid']->getDefaultArgument());
     $this->assertEquals($this->nodes[0]->getCacheTags(), $view->argument['tid']->getPlugin('argument_default')->getCacheTags());
     $view->destroy();
@@ -87,7 +87,7 @@ class TaxonomyDefaultArgumentTest extends TaxonomyTestBase {
 
     $view = $this->initViewWithRequest($this->nodes[0]->toUrl()->toString());
 
-    $expected = implode(',', [$this->term1->id(), $this->term2->id()]);
+    $expected = \implode(',', [$this->term1->id(), $this->term2->id()]);
     $this->assertEquals($expected, $view->argument['tid']->getDefaultArgument());
     $this->assertEquals($this->nodes[0]->getCacheTags(), $view->argument['tid']->getPlugin('argument_default')->getCacheTags());
   }

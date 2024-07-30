@@ -30,7 +30,7 @@ trait TaxonomyTestTrait {
       'description' => $this->randomMachineName(),
       'vid' => $this->randomMachineName(),
       'langcode' => LanguageInterface::LANGCODE_NOT_SPECIFIED,
-      'weight' => mt_rand(0, 10),
+      'weight' => \mt_rand(0, 10),
     ];
 
     $vocabulary = Vocabulary::create($values);
@@ -55,7 +55,7 @@ trait TaxonomyTestTrait {
       'description' => [
         'value' => $this->randomMachineName(),
         // Use the fallback text format.
-        'format' => filter_fallback_format(),
+        'format' => \filter_fallback_format(),
       ],
       'vid' => $vocabulary->id(),
       'langcode' => LanguageInterface::LANGCODE_NOT_SPECIFIED,

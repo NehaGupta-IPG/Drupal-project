@@ -215,7 +215,7 @@ class NodeType extends ConfigEntityBundleBase implements NodeTypeInterface {
     parent::postDelete($storage, $entities);
 
     // Clear the node type cache to reflect the removal.
-    $storage->resetCache(array_keys($entities));
+    $storage->resetCache(\array_keys($entities));
   }
 
   /**

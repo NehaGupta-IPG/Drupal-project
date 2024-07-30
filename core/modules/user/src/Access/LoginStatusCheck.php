@@ -24,7 +24,7 @@ class LoginStatusCheck implements AccessInterface {
    *   The access result.
    */
   public function access(AccountInterface $account, Route $route) {
-    $required_status = filter_var($route->getRequirement('_user_is_logged_in'), FILTER_VALIDATE_BOOLEAN);
+    $required_status = \filter_var($route->getRequirement('_user_is_logged_in'), FILTER_VALIDATE_BOOLEAN);
     $actual_status = $account->isAuthenticated();
     $access_result = AccessResult::allowedIf($required_status === $actual_status)->addCacheContexts(['user.roles:authenticated']);
     if (!$access_result->isAllowed()) {

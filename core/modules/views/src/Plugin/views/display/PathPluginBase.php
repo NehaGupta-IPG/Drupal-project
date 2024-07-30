@@ -69,11 +69,11 @@ abstract class PathPluginBase extends DisplayPluginBase implements DisplayRouter
    * {@inheritdoc}
    */
   public function getPath() {
-    $bits = explode('/', $this->getOption('path'));
+    $bits = \explode('/', $this->getOption('path'));
     if ($this->isDefaultTabPath()) {
-      array_pop($bits);
+      \array_pop($bits);
     }
-    return implode('/', $bits);
+    return \implode('/', $bits);
   }
 
   /**
@@ -130,14 +130,14 @@ abstract class PathPluginBase extends DisplayPluginBase implements DisplayRouter
     // page arguments so the argument actually comes through.
     $arg_counter = 0;
 
-    $argument_ids = array_keys((array) $this->getOption('arguments'));
-    $total_arguments = count($argument_ids);
+    $argument_ids = \array_keys((array) $this->getOption('arguments'));
+    $total_arguments = \count($argument_ids);
 
     $argument_map = [];
 
     $bits = [];
-    if (is_string($path)) {
-      $bits = explode('/', $path);
+    if (\is_string($path)) {
+      $bits = \explode('/', $path);
       // Replace arguments in the views UI (defined via %) with parameters in
       // routes (defined via {}). As a name for the parameter use arg_$key, so
       // it can be pulled in the views controller from the request.
@@ -149,9 +149,9 @@ abstract class PathPluginBase extends DisplayPluginBase implements DisplayRouter
           $bits[$pos] = '{' . $arg_id . '}';
           $argument_map[$arg_id] = $arg_id;
         }
-        elseif (str_starts_with($bit, '%')) {
+        elseif (\str_starts_with($bit, '%')) {
           // Use the name defined in the path.
-          $parameter_name = substr($bit, 1);
+          $parameter_name = \substr($bit, 1);
           $arg_id = 'arg_' . $arg_counter++;
           $argument_map[$arg_id] = $parameter_name;
           $bits[$pos] = '{' . $parameter_name . '}';
@@ -172,13 +172,13 @@ abstract class PathPluginBase extends DisplayPluginBase implements DisplayRouter
 
     // If this is to be a default tab, create the route for the parent path.
     if ($this->isDefaultTabPath()) {
-      $bit = array_pop($bits);
+      $bit = \array_pop($bits);
       if (empty($bits)) {
         $bits[] = $bit;
       }
     }
 
-    $route_path = '/' . implode('/', $bits);
+    $route_path = '/' . \implode('/', $bits);
 
     $route = new Route($route_path, $defaults);
 
@@ -262,7 +262,7 @@ abstract class PathPluginBase extends DisplayPluginBase implements DisplayRouter
     return !$route->hasDefault('view_id')
     && ('/' . $view_path == $route_path)
     // Also ensure that we don't override for example REST routes.
-    && (!$route->getMethods() || in_array('GET', $route->getMethods()));
+    && (!$route->getMethods() || \in_array('GET', $route->getMethods()));
   }
 
   /**
@@ -292,7 +292,7 @@ abstract class PathPluginBase extends DisplayPluginBase implements DisplayRouter
         // We assume that the numeric ids of the parameters match the one from
         // the view argument handlers.
         foreach ($parameters as $position => $parameter_name) {
-          $path = str_replace('{arg_' . $position . '}', '{' . $parameter_name . '}', $path);
+          $path = \str_replace('{arg_' . $position . '}', '{' . $parameter_name . '}', $path);
           $argument_map['arg_' . $position] = $parameter_name;
         }
         // Copy the original options from the route, so for example we ensure
@@ -324,19 +324,19 @@ abstract class PathPluginBase extends DisplayPluginBase implements DisplayRouter
     // Replace % with the link to our standard views argument loader
     // views_arg_load -- which lives in views.module.
 
-    $bits = explode('/', $this->getOption('path'));
+    $bits = \explode('/', $this->getOption('path'));
 
     // Replace % with %views_arg for menu autoloading and add to the
     // page arguments so the argument actually comes through.
-    if (in_array('%', $bits, TRUE)) {
+    if (\in_array('%', $bits, TRUE)) {
       // If a view requires any arguments we cannot create a static menu link.
       return [];
     }
-    $path = implode('/', $bits);
+    $path = \implode('/', $bits);
     $view_id = $this->view->storage->id();
     $display_id = $this->display['id'];
     $view_id_display = "{$view_id}.{$display_id}";
-    $menu_link_id = 'views.' . str_replace('/', '.', $view_id_display);
+    $menu_link_id = 'views.' . \str_replace('/', '.', $view_id_display);
 
     if ($path) {
       $menu = $this->getOption('menu');
@@ -357,7 +357,7 @@ abstract class PathPluginBase extends DisplayPluginBase implements DisplayRouter
         $links[$menu_link_id]['expanded'] = $menu['expanded'];
 
         if (isset($menu['weight'])) {
-          $links[$menu_link_id]['weight'] = intval($menu['weight']);
+          $links[$menu_link_id]['weight'] = \intval($menu['weight']);
         }
 
         // Insert item into the proper menu.
@@ -404,7 +404,7 @@ abstract class PathPluginBase extends DisplayPluginBase implements DisplayRouter
       ],
     ];
 
-    $path = strip_tags($this->getOption('path'));
+    $path = \strip_tags($this->getOption('path'));
 
     if (empty($path)) {
       $path = $this->t('No path is set');
@@ -456,7 +456,7 @@ abstract class PathPluginBase extends DisplayPluginBase implements DisplayRouter
       }
 
       // Automatically remove '/' and trailing whitespace from path.
-      $form_state->setValue('path', trim($form_state->getValue('path'), '/ '));
+      $form_state->setValue('path', \trim($form_state->getValue('path'), '/ '));
     }
   }
 
@@ -482,7 +482,7 @@ abstract class PathPluginBase extends DisplayPluginBase implements DisplayRouter
    */
   protected function validatePath($path) {
     $errors = [];
-    if (str_starts_with($path, '%')) {
+    if (\str_starts_with($path, '%')) {
       $errors[] = $this->t('"%" may not be used for the first segment of a path.');
     }
 
@@ -495,16 +495,16 @@ abstract class PathPluginBase extends DisplayPluginBase implements DisplayRouter
       $errors[] = $this->t('No query allowed.');
     }
 
-    if (!parse_url('internal:/' . $path)) {
+    if (!\parse_url('internal:/' . $path)) {
       $errors[] = $this->t('Invalid path. Valid characters are alphanumerics as well as "-", ".", "_" and "~".');
     }
 
-    $path_sections = explode('/', $path);
+    $path_sections = \explode('/', $path);
     // Symfony routing does not allow to use numeric placeholders.
     // @see \Symfony\Component\Routing\RouteCompiler
-    $numeric_placeholders = array_filter($path_sections, function ($section) {
-      return (preg_match('/^%(.*)/', $section, $matches)
-        && is_numeric($matches[1]));
+    $numeric_placeholders = \array_filter($path_sections, function ($section) {
+      return (\preg_match('/^%(.*)/', $section, $matches)
+        && \is_numeric($matches[1]));
     });
     if (!empty($numeric_placeholders)) {
       $errors[] = $this->t("Numeric placeholders may not be used. Use plain placeholders (%).");

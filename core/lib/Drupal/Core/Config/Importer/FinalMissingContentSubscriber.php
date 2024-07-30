@@ -22,7 +22,7 @@ class FinalMissingContentSubscriber implements EventSubscriberInterface {
    *   The missing content event.
    */
   public function onMissingContent(MissingContentEvent $event) {
-    foreach (array_keys($event->getMissingContent()) as $uuid) {
+    foreach (\array_keys($event->getMissingContent()) as $uuid) {
       $event->resolveMissingContent($uuid);
     }
   }

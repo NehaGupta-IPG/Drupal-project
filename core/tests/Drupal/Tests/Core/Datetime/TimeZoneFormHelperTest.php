@@ -43,10 +43,10 @@ class TimeZoneFormHelperTest extends UnitTestCase {
 
     // Test that the ungrouped and grouped results have the same number of
     // items.
-    $ungrouped_count = count(TimeZoneFormHelper::getOptionsList());
+    $ungrouped_count = \count(TimeZoneFormHelper::getOptionsList());
     $grouped_result = TimeZoneFormHelper::getOptionsListByRegion();
     $grouped_count = 0;
-    array_walk_recursive($grouped_result, function () use (&$grouped_count) {
+    \array_walk_recursive($grouped_result, function () use (&$grouped_count) {
       $grouped_count++;
     });
     $this->assertEquals($ungrouped_count, $grouped_count);

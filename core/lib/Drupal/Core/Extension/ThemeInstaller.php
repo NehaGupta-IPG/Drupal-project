@@ -60,15 +60,15 @@ class ThemeInstaller implements ThemeInstallerInterface {
     $installed_modules = $extension_config->get('module') ?: [];
 
     if ($install_dependencies) {
-      $theme_list = array_combine($theme_list, $theme_list);
+      $theme_list = \array_combine($theme_list, $theme_list);
 
-      if ($missing = array_diff_key($theme_list, $theme_data)) {
+      if ($missing = \array_diff_key($theme_list, $theme_data)) {
         // One or more of the given themes doesn't exist.
-        throw new UnknownExtensionException('Unknown themes: ' . implode(', ', $missing) . '.');
+        throw new UnknownExtensionException('Unknown themes: ' . \implode(', ', $missing) . '.');
       }
 
       // Only process themes that are not installed currently.
-      if (!$theme_list = array_diff_key($theme_list, $installed_themes)) {
+      if (!$theme_list = \array_diff_key($theme_list, $installed_themes)) {
         // Nothing to do. All themes already installed.
         return TRUE;
       }
@@ -82,32 +82,32 @@ class ThemeInstaller implements ThemeInstallerInterface {
         // dependencies keyed by the module extension machine name. Therefore,
         // we can find the theme dependencies by finding array keys for
         // 'requires' that are not in $module_dependencies.
-        $theme_dependencies = array_diff_key($theme_data[$theme]->requires, $module_dependencies);
+        $theme_dependencies = \array_diff_key($theme_data[$theme]->requires, $module_dependencies);
         // We can find the unmet module dependencies by finding the module
         // machine names keys that are not in $installed_modules keys.
-        $unmet_module_dependencies = array_diff_key($module_dependencies, $installed_modules);
+        $unmet_module_dependencies = \array_diff_key($module_dependencies, $installed_modules);
 
         if ($theme_data[$theme]->info[ExtensionLifecycle::LIFECYCLE_IDENTIFIER] === ExtensionLifecycle::DEPRECATED) {
           // phpcs:ignore Drupal.Semantics.FunctionTriggerError
-          @trigger_error("The theme '$theme' is deprecated. See " . $theme_data[$theme]->info['lifecycle_link'], E_USER_DEPRECATED);
+          @\trigger_error("The theme '$theme' is deprecated. See " . $theme_data[$theme]->info['lifecycle_link'], E_USER_DEPRECATED);
         }
 
         // Prevent themes with unmet module dependencies from being installed.
         if (!empty($unmet_module_dependencies)) {
-          $unmet_module_dependencies_list = implode(', ', array_keys($unmet_module_dependencies));
+          $unmet_module_dependencies_list = \implode(', ', \array_keys($unmet_module_dependencies));
           throw new MissingDependencyException("Unable to install theme: '$theme' due to unmet module dependencies: '$unmet_module_dependencies_list'.");
         }
 
         foreach ($module_dependencies as $dependency => $dependency_object) {
           if ($incompatible = $this->checkDependencyMessage($module_list, $dependency, $dependency_object)) {
-            $sanitized_message = Html::decodeEntities(strip_tags($incompatible));
+            $sanitized_message = Html::decodeEntities(\strip_tags($incompatible));
             throw new MissingDependencyException("Unable to install theme: $sanitized_message");
           }
         }
 
         // Add dependencies to the list of themes to install. The new themes
         // will be processed as the parent foreach loop continues.
-        foreach (array_keys($theme_dependencies) as $dependency) {
+        foreach (\array_keys($theme_dependencies) as $dependency) {
           if (!isset($theme_data[$dependency])) {
             // The dependency does not exist.
             return FALSE;
@@ -121,13 +121,13 @@ class ThemeInstaller implements ThemeInstallerInterface {
       }
 
       // Set the actual theme weights.
-      $theme_list = array_map(function ($theme) use ($theme_data) {
+      $theme_list = \array_map(function ($theme) use ($theme_data) {
         return $theme_data[$theme]->sort;
       }, $theme_list);
 
       // Sort the theme list by their weights (reverse).
-      arsort($theme_list);
-      $theme_list = array_keys($theme_list);
+      \arsort($theme_list);
+      $theme_list = \array_keys($theme_list);
     }
 
     $themes_installed = [];
@@ -139,7 +139,7 @@ class ThemeInstaller implements ThemeInstallerInterface {
       }
 
       // Throw an exception if the theme name is too long.
-      if (strlen($key) > DRUPAL_EXTENSION_NAME_MAX_LENGTH) {
+      if (\strlen($key) > DRUPAL_EXTENSION_NAME_MAX_LENGTH) {
         throw new ExtensionNameLengthException("Theme name $key is over the maximum allowed length of " . DRUPAL_EXTENSION_NAME_MAX_LENGTH . ' characters.');
       }
 
@@ -210,7 +210,7 @@ class ThemeInstaller implements ThemeInstallerInterface {
       // they are not uninstalled at the same time.
       if (isset($list[$key]) && !empty($list[$key]->sub_themes)) {
         foreach ($list[$key]->sub_themes as $sub_key => $sub_label) {
-          if (isset($list[$sub_key]) && !in_array($sub_key, $theme_list, TRUE)) {
+          if (isset($list[$sub_key]) && !\in_array($sub_key, $theme_list, TRUE)) {
             throw new \InvalidArgumentException("The base theme $key cannot be uninstalled, because theme $sub_key depends on it.");
           }
         }

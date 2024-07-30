@@ -109,13 +109,13 @@ JS);
         $this->assertSession()->assertWaitOnAjaxRequest(500);
       }
       catch (\RuntimeException $e) {
-        throw new \LogicException(sprintf('This call to %s claims there no AJAX request was triggered, but this is wrong: %s.', __METHOD__, $e->getMessage()));
+        throw new \LogicException(\sprintf('This call to %s claims there no AJAX request was triggered, but this is wrong: %s.', __METHOD__, $e->getMessage()));
       }
       catch (\LogicException $e) {
         // This is the intent: ::assertWaitOnAjaxRequest() should detect an
         // "incorrect" call, because this assertion is asserting *no* AJAX
         // requests have been triggered.
-        assert(str_contains($e->getMessage(), 'Unnecessary'));
+        \assert(\str_contains($e->getMessage(), 'Unnecessary'));
 
         $result = $this->getSession()->evaluateScript(<<<JS
         (function() {

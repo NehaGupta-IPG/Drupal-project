@@ -87,7 +87,7 @@ class ThemeSettingsTest extends KernelTestBase {
       'default_logo' => FALSE,
       'logo_path' => 'public://logo_with_scheme.png',
     ];
-    theme_settings_convert_to_config($values, $config)->save();
+    \theme_settings_convert_to_config($values, $config)->save();
 
     // Tests logo path with scheme.
     /** @var \Drupal\Core\File\FileUrlGeneratorInterface $file_url_generator */
@@ -99,7 +99,7 @@ class ThemeSettingsTest extends KernelTestBase {
       'default_logo' => FALSE,
       'logo_path' => $theme->getPath() . '/logo_relative_path.gif',
     ];
-    theme_settings_convert_to_config($values, $config)->save();
+    \theme_settings_convert_to_config($values, $config)->save();
 
     \Drupal::service('cache.memory')->invalidateTags(['config:stark.settings']);
 

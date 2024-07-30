@@ -134,8 +134,8 @@ class MigrateNodeTest extends MigrateNodeTestBase {
     // SQLite does not support scales for float data types so we need to convert
     // the value manually.
     if ($this->container->get('database')->driver() == 'sqlite') {
-      $value_1 = sprintf('%01.2f', $value_1);
-      $value_2 = sprintf('%01.2f', $value_2);
+      $value_1 = \sprintf('%01.2f', $value_1);
+      $value_2 = \sprintf('%01.2f', $value_2);
     }
     $this->assertSame('33.00', $value_1);
     $this->assertSame('44.00', $value_2);

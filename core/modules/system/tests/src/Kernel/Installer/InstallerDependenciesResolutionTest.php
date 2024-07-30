@@ -35,11 +35,11 @@ class InstallerDependenciesResolutionTest extends KernelTestBase {
     $profile_list->setPathname('testing_missing_dependencies', 'core/profiles/tests/testing_missing_dependencies/testing_missing_dependencies.info.yml');
 
     // Requires install.inc to be able to use drupal_verify_profile.
-    require_once dirname(__FILE__, 7) . '/includes/install.inc';
+    require_once \dirname(__FILE__, 7) . '/includes/install.inc';
 
-    $info = drupal_verify_profile([
+    $info = \drupal_verify_profile([
       'parameters' => ['profile' => 'testing_missing_dependencies'],
-      'profile_info' => install_profile_info('testing_missing_dependencies'),
+      'profile_info' => \install_profile_info('testing_missing_dependencies'),
     ]);
 
     $message = $info['required_modules']['description']->render();

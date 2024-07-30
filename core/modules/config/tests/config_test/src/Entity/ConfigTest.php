@@ -158,8 +158,8 @@ class ConfigTest extends ConfigEntityBase implements ConfigTestInterface {
     // are passed.
     $called = \Drupal::state()->get('config_test.on_dependency_removal_called', []);
     $called[$this->id()] = $dependencies;
-    $called[$this->id()]['config'] = array_keys($called[$this->id()]['config']);
-    $called[$this->id()]['content'] = array_keys($called[$this->id()]['content']);
+    $called[$this->id()]['config'] = \array_keys($called[$this->id()]['config']);
+    $called[$this->id()]['content'] = \array_keys($called[$this->id()]['content']);
     \Drupal::state()->set('config_test.on_dependency_removal_called', $called);
 
     $changed = parent::onDependencyRemoval($dependencies);
@@ -168,8 +168,8 @@ class ConfigTest extends ConfigEntityBase implements ConfigTestInterface {
     }
     $fix_deps = \Drupal::state()->get('config_test.fix_dependencies', []);
     foreach ($dependencies['config'] as $entity) {
-      if (in_array($entity->getConfigDependencyName(), $fix_deps)) {
-        $key = array_search($entity->getConfigDependencyName(), $this->dependencies['enforced']['config']);
+      if (\in_array($entity->getConfigDependencyName(), $fix_deps)) {
+        $key = \array_search($entity->getConfigDependencyName(), $this->dependencies['enforced']['config']);
         if ($key !== FALSE) {
           $changed = TRUE;
           unset($this->dependencies['enforced']['config'][$key]);
@@ -177,7 +177,7 @@ class ConfigTest extends ConfigEntityBase implements ConfigTestInterface {
       }
     }
     // If any of the dependencies removed still exists, return FALSE.
-    if (array_intersect_key(array_flip($this->dependencies['enforced']['config']), $dependencies['config'])) {
+    if (\array_intersect_key(\array_flip($this->dependencies['enforced']['config']), $dependencies['config'])) {
       return FALSE;
     }
     return $changed;

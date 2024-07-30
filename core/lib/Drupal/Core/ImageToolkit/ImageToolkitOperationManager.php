@@ -84,7 +84,7 @@ class ImageToolkitOperationManager extends DefaultPluginManager implements Image
     $toolkit_id = $toolkit->getPluginId();
     $definitions = $this->getDefinitions();
 
-    $definitions = array_filter($definitions,
+    $definitions = \array_filter($definitions,
       function ($definition) use ($toolkit_id, $operation) {
         return $definition['toolkit'] == $toolkit_id && $definition['operation'] == $operation;
       }
@@ -109,7 +109,7 @@ class ImageToolkitOperationManager extends DefaultPluginManager implements Image
       // Pickup the first plugin found.
       // @todo In https://www.drupal.org/node/2110591 we'll return here the UI
       //   selected plugin or the first found if missed.
-      $definition = reset($definitions);
+      $definition = \reset($definitions);
       return $definition['id'];
     }
   }

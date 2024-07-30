@@ -53,7 +53,7 @@ class PageEditTest extends BlockContentTestBase {
       ->accessCheck(FALSE)
       ->condition('info', $edit['info[0][value]'])
       ->execute();
-    $block = BlockContent::load(reset($blocks));
+    $block = BlockContent::load(\reset($blocks));
     $this->assertNotEmpty($block, 'Content block found in database.');
 
     // Load the edit page.

@@ -107,7 +107,7 @@ class ClassLoaderTest extends BrowserTestBase {
    * Tests that .module files can use class constants in main section.
    */
   public function testAutoloadFromModuleFile(): void {
-    $this->assertFalse(defined('MODULE_AUTOLOAD_TEST_CONSTANT'));
+    $this->assertFalse(\defined('MODULE_AUTOLOAD_TEST_CONSTANT'));
     // Create use with required permissions.
     $this->drupalLogin($this->drupalCreateUser(['administer modules']));
 

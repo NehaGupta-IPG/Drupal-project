@@ -73,8 +73,8 @@ class DateTimeTest extends BrowserTestBase {
     $date1 = '2007-01-31 21:00:00 -1000';
     $date2 = '2007-07-31 21:00:00 -1000';
     $this->drupalCreateContentType(['type' => 'article']);
-    $node1 = $this->drupalCreateNode(['created' => strtotime($date1), 'type' => 'article']);
-    $node2 = $this->drupalCreateNode(['created' => strtotime($date2), 'type' => 'article']);
+    $node1 = $this->drupalCreateNode(['created' => \strtotime($date1), 'type' => 'article']);
+    $node2 = $this->drupalCreateNode(['created' => \strtotime($date2), 'type' => 'article']);
 
     // Confirm date format and time zone.
     $this->drupalGet('node/' . $node1->id());
@@ -106,7 +106,7 @@ class DateTimeTest extends BrowserTestBase {
     // Add custom date format.
     $this->clickLink('Add format');
     $date_format_id = $this->randomMachineName(8);
-    $name = ucwords($date_format_id);
+    $name = \ucwords($date_format_id);
     $date_format = 'd.m.Y - H:i';
     $edit = [
       'id' => $date_format_id,
@@ -158,7 +158,7 @@ class DateTimeTest extends BrowserTestBase {
 
     // Add a new date format with an existing format.
     $date_format_id = $this->randomMachineName(8);
-    $name = ucwords($date_format_id);
+    $name = \ucwords($date_format_id);
     $date_format = 'Y';
     $edit = [
       'id' => $date_format_id,
@@ -188,7 +188,7 @@ class DateTimeTest extends BrowserTestBase {
 
     // Add a new date format with HTML in it.
     $date_format_id = $this->randomMachineName(8);
-    $name = ucwords($date_format_id);
+    $name = \ucwords($date_format_id);
     $date_format = '& \<\e\m\>Y\<\/\e\m\>';
     $edit = [
       'id' => $date_format_id,
@@ -202,7 +202,7 @@ class DateTimeTest extends BrowserTestBase {
     $this->assertSession()->pageTextContains('Custom date format added.');
     // Check that the custom date format appears in the date format list.
     $this->assertSession()->pageTextContains($name);
-    $this->assertSession()->assertEscaped('<em>' . date("Y") . '</em>');
+    $this->assertSession()->assertEscaped('<em>' . \date("Y") . '</em>');
   }
 
   /**

@@ -23,11 +23,11 @@ class EnterProfileNode extends Node {
 
   public function compile(Compiler $compiler): void {
     $compiler
-      ->write(sprintf('$%s = $this->extensions[', $this->getAttribute('var_name')))
+      ->write(\sprintf('$%s = $this->extensions[', $this->getAttribute('var_name')))
       /* cspell:disable-next-line */
       ->repr($this->getAttribute('extension_name'))
       ->raw("];\n")
-      ->write(sprintf('$%s->enter();', $this->getAttribute('var_name')))
+      ->write(\sprintf('$%s->enter();', $this->getAttribute('var_name')))
       ->raw("\n\n");
   }
 

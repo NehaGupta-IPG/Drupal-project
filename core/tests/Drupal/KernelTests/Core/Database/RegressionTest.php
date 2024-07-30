@@ -24,7 +24,7 @@ class RegressionTest extends DatabaseTestBase {
    */
   public function testRegression_310447(): void {
     // That's a 255 character UTF-8 string.
-    $job = str_repeat("é", 255);
+    $job = \str_repeat("é", 255);
     $this->connection
       ->insert('test')
       ->fields([

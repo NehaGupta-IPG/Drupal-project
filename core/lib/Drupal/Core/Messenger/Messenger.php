@@ -56,7 +56,7 @@ class Messenger implements MessengerInterface {
 
     // Do not use strict type checking so that equivalent string and
     // MarkupInterface objects are detected.
-    if ($repeat || !in_array($message, $this->flashBag->peek($type))) {
+    if ($repeat || !\in_array($message, $this->flashBag->peek($type))) {
       $this->flashBag->add($type, $message);
     }
 

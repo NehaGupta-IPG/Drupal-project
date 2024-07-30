@@ -144,7 +144,7 @@ class LazyContextRepositoryTest extends UnitTestCase {
    */
   protected function setupContextAndProvider($service_id, array $unqualified_context_ids, array $expected_unqualified_context_ids = []): array {
     $contexts = [];
-    for ($i = 0; $i < count($unqualified_context_ids); $i++) {
+    for ($i = 0; $i < \count($unqualified_context_ids); $i++) {
       $contexts[] = new Context(new ContextDefinition('example'));
     }
 
@@ -152,9 +152,9 @@ class LazyContextRepositoryTest extends UnitTestCase {
 
     $context_provider = $this->prophesize('\Drupal\Core\Plugin\Context\ContextProviderInterface');
     $context_provider->getRuntimeContexts($expected_unqualified_context_ids)
-      ->willReturn(array_combine($unqualified_context_ids, $contexts));
+      ->willReturn(\array_combine($unqualified_context_ids, $contexts));
     $context_provider->getAvailableContexts()
-      ->willReturn(array_combine($unqualified_context_ids, $contexts));
+      ->willReturn(\array_combine($unqualified_context_ids, $contexts));
     $context_provider = $context_provider->reveal();
     $this->container->set($service_id, $context_provider);
 

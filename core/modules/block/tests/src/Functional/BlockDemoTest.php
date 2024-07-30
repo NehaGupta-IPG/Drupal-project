@@ -52,7 +52,7 @@ class BlockDemoTest extends BrowserTestBase {
     ];
 
     // All available themes minute minus the default theme.
-    $themes = array_diff($available_themes, [$default_theme]);
+    $themes = \array_diff($available_themes, [$default_theme]);
 
     foreach ($themes as $theme) {
       // Install theme.

@@ -97,7 +97,7 @@ class ConfigImportUITest extends BrowserTestBase {
     $core_extension['theme']['olivero'] = 0;
     $sync->write('core.extension', $core_extension);
     // Olivero ships with configuration.
-    $sync->write('olivero.settings', Yaml::decode(file_get_contents('core/themes/olivero/config/install/olivero.settings.yml')));
+    $sync->write('olivero.settings', Yaml::decode(\file_get_contents('core/themes/olivero/config/install/olivero.settings.yml')));
 
     // Use the install storage so that we can read configuration from modules
     // and themes that are not installed.

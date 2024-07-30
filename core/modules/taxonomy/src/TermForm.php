@@ -58,8 +58,8 @@ class TermForm extends ContentEntityForm {
       }
 
       foreach ($tree as $item) {
-        if (!in_array($item->tid, $exclude)) {
-          $options[$item->tid] = str_repeat('-', $item->depth) . $item->name;
+        if (!\in_array($item->tid, $exclude)) {
+          $options[$item->tid] = \str_repeat('-', $item->depth) . $item->name;
         }
       }
     }
@@ -69,8 +69,8 @@ class TermForm extends ContentEntityForm {
     }
 
     if ($this->getRequest()->query->has('parent')) {
-      $parent = array_values(array_intersect(
-        array_keys($options),
+      $parent = \array_values(\array_intersect(
+        \array_keys($options),
         (array) $this->getRequest()->query->all()['parent'],
       ));
     }
@@ -114,7 +114,7 @@ class TermForm extends ContentEntityForm {
         '#type' => 'submit',
         '#value' => $this->t('Save and go to list'),
         '#weight' => 20,
-        '#submit' => array_merge($element['submit']['#submit'], ['::overview']),
+        '#submit' => \array_merge($element['submit']['#submit'], ['::overview']),
         '#access' => $this->currentUser()->hasPermission('access taxonomy overview'),
       ];
     }
@@ -143,7 +143,7 @@ class TermForm extends ContentEntityForm {
     parent::validateForm($form, $form_state);
 
     // Ensure numeric values.
-    if ($form_state->hasValue('weight') && !is_numeric($form_state->getValue('weight'))) {
+    if ($form_state->hasValue('weight') && !\is_numeric($form_state->getValue('weight'))) {
       $form_state->setErrorByName('weight', $this->t('Weight value must be numeric.'));
     }
   }
@@ -155,10 +155,10 @@ class TermForm extends ContentEntityForm {
     $term = parent::buildEntity($form, $form_state);
 
     // Prevent leading and trailing spaces in term names.
-    $term->setName(trim($term->getName()));
+    $term->setName(\trim($term->getName()));
 
     // Assign parents with proper delta values starting from 0.
-    $term->parent = array_values($form_state->getValue('parent'));
+    $term->parent = \array_values($form_state->getValue('parent'));
 
     return $term;
   }
@@ -167,7 +167,7 @@ class TermForm extends ContentEntityForm {
    * {@inheritdoc}
    */
   protected function getEditedFieldNames(FormStateInterface $form_state) {
-    return array_merge(['parent', 'weight'], parent::getEditedFieldNames($form_state));
+    return \array_merge(['parent', 'weight'], parent::getEditedFieldNames($form_state));
   }
 
   /**
@@ -217,7 +217,7 @@ class TermForm extends ContentEntityForm {
         break;
     }
 
-    $current_parent_count = count($form_state->getValue('parent'));
+    $current_parent_count = \count($form_state->getValue('parent'));
     // Root doesn't count if it's the only parent.
     if ($current_parent_count == 1 && $form_state->hasValue(['parent', 0])) {
       $form_state->setValue('parent', []);

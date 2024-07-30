@@ -49,7 +49,7 @@ final class LinearHistory implements CheckpointListInterface {
     private readonly TimeInterface $time,
   ) {
     $this->checkpoints = $this->state->get(self::CHECKPOINT_KEY, []);
-    $this->activeCheckpoint = end($this->checkpoints) ?: NULL;
+    $this->activeCheckpoint = \end($this->checkpoints) ?: NULL;
   }
 
   /**
@@ -64,7 +64,7 @@ final class LinearHistory implements CheckpointListInterface {
    */
   public function get(string $id): Checkpoint {
     if (!isset($this->checkpoints[$id])) {
-      throw new UnknownCheckpointException(sprintf('The checkpoint "%s" does not exist', $id));
+      throw new UnknownCheckpointException(\sprintf('The checkpoint "%s" does not exist', $id));
     }
     return $this->checkpoints[$id];
   }
@@ -74,7 +74,7 @@ final class LinearHistory implements CheckpointListInterface {
    */
   public function getParents(string $id): \Traversable {
     if (!isset($this->checkpoints[$id])) {
-      throw new UnknownCheckpointException(sprintf('The checkpoint "%s" does not exist', $id));
+      throw new UnknownCheckpointException(\sprintf('The checkpoint "%s" does not exist', $id));
     }
     $checkpoint = $this->checkpoints[$id];
     while ($checkpoint->parent !== NULL) {
@@ -94,7 +94,7 @@ final class LinearHistory implements CheckpointListInterface {
    * {@inheritdoc}
    */
   public function count(): int {
-    return count($this->checkpoints);
+    return \count($this->checkpoints);
   }
 
   /**
@@ -102,7 +102,7 @@ final class LinearHistory implements CheckpointListInterface {
    */
   public function add(string $id, string|\Stringable $label): Checkpoint {
     if (isset($this->checkpoints[$id])) {
-      throw new CheckpointExistsException(sprintf('Cannot create a checkpoint with the ID "%s" as it already exists', $id));
+      throw new CheckpointExistsException(\sprintf('Cannot create a checkpoint with the ID "%s" as it already exists', $id));
     }
     $checkpoint = new Checkpoint($id, $label, $this->time->getCurrentTime(), $this->activeCheckpoint?->id);
     $this->checkpoints[$checkpoint->id] = $checkpoint;
@@ -117,7 +117,7 @@ final class LinearHistory implements CheckpointListInterface {
    */
   public function delete(string $id): static {
     if (!isset($this->checkpoints[$id])) {
-      throw new UnknownCheckpointException(sprintf('Cannot delete a checkpoint with the ID "%s" as it does not exist', $id));
+      throw new UnknownCheckpointException(\sprintf('Cannot delete a checkpoint with the ID "%s" as it does not exist', $id));
     }
 
     foreach ($this->checkpoints as $key => $checkpoint) {

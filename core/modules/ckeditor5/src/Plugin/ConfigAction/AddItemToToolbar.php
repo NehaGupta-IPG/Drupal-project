@@ -47,10 +47,10 @@ final class AddItemToToolbar implements ConfigActionPluginInterface, ContainerFa
    */
   public function apply(string $configName, mixed $value): void {
     $editor = $this->configManager->loadConfigEntityByName($configName);
-    assert($editor instanceof EditorInterface);
+    \assert($editor instanceof EditorInterface);
 
     if ($editor->getEditor() !== 'ckeditor5') {
-      throw new ConfigActionException(sprintf('The %s config action only works with editors that use CKEditor 5.', $this->pluginId));
+      throw new ConfigActionException(\sprintf('The %s config action only works with editors that use CKEditor 5.', $this->pluginId));
     }
 
     if (is_string($value)) {
@@ -97,9 +97,9 @@ final class AddItemToToolbar implements ConfigActionPluginInterface, ContainerFa
     // at the editor level, if necessary.
     /** @var \Drupal\ckeditor5\Plugin\CKEditor5PluginDefinition $definition */
     foreach ($this->pluginManager->getDefinitions() as $id => $definition) {
-      if (array_key_exists($item_name, $definition->getToolbarItems())) {
+      if (\array_key_exists($item_name, $definition->getToolbarItems())) {
         // If plugin settings already exist, don't change them.
-        if (array_key_exists($id, $editor_settings['plugins'])) {
+        if (\array_key_exists($id, $editor_settings['plugins'])) {
           break;
         }
         elseif ($definition->isConfigurable()) {

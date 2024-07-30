@@ -393,7 +393,7 @@ abstract class ExtensionList {
    *   name.
    */
   public function getAllInstalledInfo() {
-    return array_intersect_key($this->getAllAvailableInfo(), array_flip($this->getInstalledExtensionNames()));
+    return \array_intersect_key($this->getAllAvailableInfo(), \array_flip($this->getInstalledExtensionNames()));
   }
 
   /**
@@ -403,7 +403,7 @@ abstract class ExtensionList {
    *   An array of arrays of .info.yml entries keyed by the machine name.
    */
   protected function recalculateInfo() {
-    return array_map(function (Extension $extension) {
+    return \array_map(function (Extension $extension) {
       return $extension->info;
     }, $this->getList());
   }
@@ -438,9 +438,9 @@ abstract class ExtensionList {
    */
   protected function recalculatePathNames() {
     $extensions = $this->getList();
-    ksort($extensions);
+    \ksort($extensions);
 
-    return array_map(function (Extension $extension) {
+    return \array_map(function (Extension $extension) {
       return $extension->getPathname();
     }, $extensions);
   }
@@ -538,7 +538,7 @@ abstract class ExtensionList {
    *   If there is no extension with the supplied name.
    */
   public function getPath($extension_name) {
-    return dirname($this->getPathname($extension_name));
+    return \dirname($this->getPathname($extension_name));
   }
 
   /**
@@ -582,7 +582,7 @@ abstract class ExtensionList {
    */
   public function checkIncompatibility($name) {
     $extension = $this->get($name);
-    return $extension->info['core_incompatible'] || (isset($extension->info['php']) && version_compare(phpversion(), $extension->info['php']) < 0);
+    return $extension->info['core_incompatible'] || (isset($extension->info['php']) && \version_compare(\phpversion(), $extension->info['php']) < 0);
   }
 
   /**
@@ -598,7 +598,7 @@ abstract class ExtensionList {
    *   and 0 if they are equal.
    */
   public static function sortByName(Extension $a, Extension $b): int {
-    return strcasecmp($a->info['name'], $b->info['name']);
+    return \strcasecmp($a->info['name'], $b->info['name']);
   }
 
 }

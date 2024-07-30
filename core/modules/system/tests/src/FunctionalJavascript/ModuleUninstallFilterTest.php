@@ -57,13 +57,13 @@ class ModuleUninstallFilterTest extends WebDriverTestBase {
     $filter->setValue('dynamic');
     $session->wait(1000, 'jQuery("#edit-uninstall-page-cache:visible").length == 0');
     $visible_rows = $this->filterVisibleElements($module_rows);
-    $this->assertNotEquals(count($module_rows), count($visible_rows));
+    $this->assertNotEquals(\count($module_rows), \count($visible_rows));
 
     // Test Drupal.announce() message when multiple matches are expected.
     $filter->setValue('cache');
     $session->wait(1000, 'jQuery("#drupal-live-announce").html().indexOf("modules are available") > -1');
     $visible_rows = $this->filterVisibleElements($module_rows);
-    $expected_message = count($visible_rows) . ' modules are available in the modified list.';
+    $expected_message = \count($visible_rows) . ' modules are available in the modified list.';
     $assertSession->elementTextContains('css', '#drupal-live-announce', $expected_message);
 
     // Test Drupal.announce() message when only one match is expected.
@@ -71,7 +71,7 @@ class ModuleUninstallFilterTest extends WebDriverTestBase {
     $filter->setValue('dynamic page cache');
     $session->wait(1000, 'jQuery("#drupal-live-announce").html().indexOf("module is available") > -1');
     $visible_rows = $this->filterVisibleElements($module_rows);
-    $this->assertEquals(1, count($visible_rows));
+    $this->assertEquals(1, \count($visible_rows));
     $expected_message = '1 module is available in the modified list.';
     $assertSession->elementTextContains('css', '#drupal-live-announce', $expected_message);
 
@@ -79,7 +79,7 @@ class ModuleUninstallFilterTest extends WebDriverTestBase {
     $filter->setValue('Pan-Galactic Gargle Blaster');
     $session->wait(1000, 'jQuery("#drupal-live-announce").html().indexOf("0 modules are available") > -1');
     $visible_rows = $this->filterVisibleElements($module_rows);
-    $this->assertEquals(0, count($visible_rows));
+    $this->assertEquals(0, \count($visible_rows));
     $expected_message = '0 modules are available in the modified list.';
     $assertSession->elementTextContains('css', '#drupal-live-announce', $expected_message);
   }
@@ -94,7 +94,7 @@ class ModuleUninstallFilterTest extends WebDriverTestBase {
    *   An array of node elements that are visible.
    */
   protected function filterVisibleElements($elements) {
-    $elements = array_filter($elements, function ($element) {
+    $elements = \array_filter($elements, function ($element) {
       return $element->isVisible();
     });
     return $elements;

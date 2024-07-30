@@ -179,7 +179,7 @@ class Resource implements CacheableDependencyInterface {
     $this->authorName = $author_name;
     $this->authorUrl = $author_url;
 
-    if (isset($cache_age) && is_numeric($cache_age)) {
+    if (isset($cache_age) && \is_numeric($cache_age)) {
       // If the cache age is too big, it can overflow the 'expire' column of
       // database cache backends, causing SQL exceptions. To prevent that,
       // arbitrarily limit the cache age to 5 years. That should be enough.

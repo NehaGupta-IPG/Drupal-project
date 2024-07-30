@@ -493,9 +493,9 @@ class FilterKernelTest extends KernelTestBase {
     $this->assertFilteredString($filter, $tests);
 
     // Very long string hitting PCRE limits.
-    $limit = max((int) ini_get('pcre.backtrack_limit'), (int) ini_get('pcre.recursion_limit'));
+    $limit = \max((int) \ini_get('pcre.backtrack_limit'), (int) \ini_get('pcre.recursion_limit'));
     $source = $this->randomMachineName($limit);
-    $result = _filter_autop($source);
+    $result = \_filter_autop($source);
     $this->assertEquals($result, '<p>' . $source . "</p>\n", 'Line break filter can process very long strings.');
   }
 
@@ -527,7 +527,7 @@ class FilterKernelTest extends KernelTestBase {
 <div>Test two</div>
 
 <!-- END CUSTOM TEMPLATE OUTPUT from 'container.html.twig' -->", $render);
-    $result = _filter_autop($render);
+    $result = \_filter_autop($render);
 
     // After auto-p is applied, the theme debug should no longer have
     // line breaks but the true line breaks should still.
@@ -714,8 +714,8 @@ class FilterKernelTest extends KernelTestBase {
     // - characters/encoding, surrounding markup, security
 
     // Create an email that is too long.
-    $long_email = str_repeat('a', 254) . '@example.com';
-    $too_long_email = str_repeat('b', 255) . '@example.com';
+    $long_email = \str_repeat('a', 254) . '@example.com';
+    $too_long_email = \str_repeat('b', 255) . '@example.com';
     $email_with_plus_sign = 'one+two@example.com';
 
     // Filter selection/pattern matching.
@@ -995,17 +995,17 @@ class FilterKernelTest extends KernelTestBase {
       $result = $filter->process($source, $filter)->getProcessedText();
       foreach ($tasks as $value => $is_expected) {
         if ($is_expected) {
-          $this->assertStringContainsString($value, $result, sprintf('%s: %s found. Filtered result: %s.',
-            var_export($source, TRUE),
-            var_export($value, TRUE),
-            var_export($result, TRUE),
+          $this->assertStringContainsString($value, $result, \sprintf('%s: %s found. Filtered result: %s.',
+            \var_export($source, TRUE),
+            \var_export($value, TRUE),
+            \var_export($result, TRUE),
           ));
         }
         else {
-          $this->assertStringNotContainsString($value, $result, sprintf('%s: %s not found. Filtered result: %s.',
-            var_export($source, TRUE),
-            var_export($value, TRUE),
-            var_export($result, TRUE),
+          $this->assertStringNotContainsString($value, $result, \sprintf('%s: %s not found. Filtered result: %s.',
+            \var_export($source, TRUE),
+            \var_export($value, TRUE),
+            \var_export($result, TRUE),
           ));
         }
       }
@@ -1040,28 +1040,28 @@ class FilterKernelTest extends KernelTestBase {
     ]);
     $path = __DIR__ . '/../..';
 
-    $input = file_get_contents($path . '/filter.url-input.txt');
-    $expected = file_get_contents($path . '/filter.url-output.txt');
-    $result = _filter_url($input, $filter);
+    $input = \file_get_contents($path . '/filter.url-input.txt');
+    $expected = \file_get_contents($path . '/filter.url-output.txt');
+    $result = \_filter_url($input, $filter);
     $this->assertSame($expected, $result, 'Complex HTML document was correctly processed.');
 
-    $pcre_backtrack_limit = ini_get('pcre.backtrack_limit');
+    $pcre_backtrack_limit = \ini_get('pcre.backtrack_limit');
     // Setting this limit to the smallest possible value should cause PCRE
     // errors and break the various preg_* functions used by _filter_url().
-    ini_set('pcre.backtrack_limit', 1);
+    \ini_set('pcre.backtrack_limit', 1);
 
     // If PCRE errors occur, _filter_url() should return the exact same text.
     // Case of a small and simple HTML document.
     $input = $expected = '<p>www.test.com</p>';
-    $result = _filter_url($input, $filter);
+    $result = \_filter_url($input, $filter);
     $this->assertSame($expected, $result, 'Simple HTML document was left intact when PCRE errors occurred.');
     // Case of a complex HTML document.
-    $input = $expected = file_get_contents($path . '/filter.url-input.txt');
-    $result = _filter_url($input, $filter);
+    $input = $expected = \file_get_contents($path . '/filter.url-input.txt');
+    $result = \_filter_url($input, $filter);
     $this->assertSame($expected, $result, 'Complex HTML document was left intact when PCRE errors occurred.');
 
     // Setting limit back to default.
-    ini_set('pcre.backtrack_limit', $pcre_backtrack_limit);
+    \ini_set('pcre.backtrack_limit', $pcre_backtrack_limit);
   }
 
   /**
@@ -1238,7 +1238,7 @@ body {color:red}
    * @internal
    */
   public function assertNormalized(string $haystack, string $needle, string $message = ''): void {
-    $this->assertStringContainsString($needle, strtolower(Html::decodeEntities($haystack)), $message);
+    $this->assertStringContainsString($needle, \strtolower(Html::decodeEntities($haystack)), $message);
   }
 
   /**
@@ -1260,7 +1260,7 @@ body {color:red}
    * @internal
    */
   public function assertNoNormalized(string $haystack, string $needle, string $message = ''): void {
-    $this->assertStringNotContainsString($needle, strtolower(Html::decodeEntities($haystack)), $message);
+    $this->assertStringNotContainsString($needle, \strtolower(Html::decodeEntities($haystack)), $message);
   }
 
 }

@@ -134,7 +134,7 @@ class ConfigImportSubscriber extends ConfigImportValidateEventSubscriberBase {
 
     // Get a list of modules with dependency weights as values.
     $module_data = $this->moduleExtensionList->getList();
-    $nonexistent_modules = array_keys(array_diff_key($core_extension['module'], $module_data));
+    $nonexistent_modules = \array_keys(\array_diff_key($core_extension['module'], $module_data));
     foreach ($nonexistent_modules as $module) {
       $config_importer->logError($this->t('Unable to install the %module module since it does not exist.', ['%module' => $module]));
     }
@@ -143,17 +143,17 @@ class ConfigImportSubscriber extends ConfigImportValidateEventSubscriberBase {
     $installs = $config_importer->getExtensionChangelist('module', 'install');
     foreach ($installs as $module) {
       $missing_dependencies = [];
-      foreach (array_keys($module_data[$module]->requires) as $required_module) {
+      foreach (\array_keys($module_data[$module]->requires) as $required_module) {
         if (!isset($core_extension['module'][$required_module])) {
           $missing_dependencies[] = $module_data[$required_module]->info['name'];
         }
       }
       if (!empty($missing_dependencies)) {
         $module_name = $module_data[$module]->info['name'];
-        $message = $this->formatPlural(count($missing_dependencies),
+        $message = $this->formatPlural(\count($missing_dependencies),
           'Unable to install the %module module since it requires the %required_module module.',
           'Unable to install the %module module since it requires the %required_module modules.',
-          ['%module' => $module_name, '%required_module' => implode(', ', $missing_dependencies)]
+          ['%module' => $module_name, '%required_module' => \implode(', ', $missing_dependencies)]
         );
         $config_importer->logError($message);
       }
@@ -200,7 +200,7 @@ class ConfigImportSubscriber extends ConfigImportValidateEventSubscriberBase {
     // Get all themes including those that are not installed.
     $theme_data = $this->getThemeData();
     $module_data = $this->moduleExtensionList->getList();
-    $nonexistent_themes = array_keys(array_diff_key($core_extension['theme'], $theme_data));
+    $nonexistent_themes = \array_keys(\array_diff_key($core_extension['theme'], $theme_data));
     foreach ($nonexistent_themes as $theme) {
       $config_importer->logError($this->t('Unable to install the %theme theme since it does not exist.', ['%theme' => $theme]));
     }
@@ -215,8 +215,8 @@ class ConfigImportSubscriber extends ConfigImportValidateEventSubscriberBase {
       // dependencies keyed by the module extension machine name. Therefore, we
       // can find the theme dependencies by finding array keys for 'requires'
       // that are not in $module_dependencies.
-      $theme_dependencies = array_diff_key($theme_data[$theme]->requires, $module_dependencies);
-      foreach (array_keys($theme_dependencies) as $required_theme) {
+      $theme_dependencies = \array_diff_key($theme_data[$theme]->requires, $module_dependencies);
+      foreach (\array_keys($theme_dependencies) as $required_theme) {
         if (!isset($core_extension['theme'][$required_theme])) {
           $theme_name = $theme_data[$theme]->info['name'];
           $required_theme_name = $theme_data[$required_theme]->info['name'];
@@ -226,7 +226,7 @@ class ConfigImportSubscriber extends ConfigImportValidateEventSubscriberBase {
           ]));
         }
       }
-      foreach (array_keys($module_dependencies) as $required_module) {
+      foreach (\array_keys($module_dependencies) as $required_module) {
         if (!isset($core_extension['module'][$required_module])) {
           $theme_name = $theme_data[$theme]->info['name'];
           $required_module_name = $module_data[$required_module]->info['name'];
@@ -242,8 +242,8 @@ class ConfigImportSubscriber extends ConfigImportValidateEventSubscriberBase {
     // will be installed after the import.
     $uninstalls = $config_importer->getExtensionChangelist('theme', 'uninstall');
     foreach ($uninstalls as $theme) {
-      foreach (array_keys($theme_data[$theme]->required_by) as $dependent_theme) {
-        if ($theme_data[$dependent_theme]->status && !in_array($dependent_theme, $uninstalls, TRUE)) {
+      foreach (\array_keys($theme_data[$theme]->required_by) as $dependent_theme) {
+        if ($theme_data[$dependent_theme]->status && !\in_array($dependent_theme, $uninstalls, TRUE)) {
           $theme_name = $theme_data[$theme]->info['name'];
           $dependent_theme_name = $theme_data[$dependent_theme]->info['name'];
           $config_importer->logError($this->t('Unable to uninstall the %theme theme since the %dependent_theme theme is installed.', [
@@ -265,8 +265,8 @@ class ConfigImportSubscriber extends ConfigImportValidateEventSubscriberBase {
     $core_extension = $config_importer->getStorageComparer()->getSourceStorage()->read('core.extension');
     $existing_dependencies = [
       'config' => $config_importer->getStorageComparer()->getSourceStorage()->listAll(),
-      'module' => array_keys($core_extension['module']),
-      'theme' => array_keys($core_extension['theme']),
+      'module' => \array_keys($core_extension['module']),
+      'theme' => \array_keys($core_extension['theme']),
     ];
 
     $theme_data = $this->getThemeData();
@@ -278,7 +278,7 @@ class ConfigImportSubscriber extends ConfigImportValidateEventSubscriberBase {
     foreach ($config_importer->getStorageComparer()->getSourceStorage()->listAll() as $name) {
       // Ensure that the config owner is installed. This checks all
       // configuration including configuration entities.
-      [$owner] = explode('.', $name, 2);
+      [$owner] = \explode('.', $name, 2);
       if ($owner !== 'core') {
         $message = FALSE;
         if (!isset($core_extension['module'][$owner]) && isset($module_data[$owner])) {
@@ -313,36 +313,36 @@ class ConfigImportSubscriber extends ConfigImportValidateEventSubscriberBase {
       // Configuration entities can be identified by having 'dependencies' and
       // 'uuid' keys.
       if (isset($data['dependencies']) && isset($data['uuid'])) {
-        $dependencies_to_check = array_intersect_key($data['dependencies'], array_flip(['module', 'theme', 'config']));
+        $dependencies_to_check = \array_intersect_key($data['dependencies'], \array_flip(['module', 'theme', 'config']));
         foreach ($dependencies_to_check as $type => $dependencies) {
-          $diffs = array_diff($dependencies, $existing_dependencies[$type]);
+          $diffs = \array_diff($dependencies, $existing_dependencies[$type]);
           if (!empty($diffs)) {
             $message = FALSE;
             switch ($type) {
               case 'module':
                 $message = $this->formatPlural(
-                  count($diffs),
+                  \count($diffs),
                   'Configuration %name depends on the %module module that will not be installed after import.',
                   'Configuration %name depends on modules (%module) that will not be installed after import.',
-                  ['%name' => $name, '%module' => implode(', ', $this->getNames($diffs, $module_data))]
+                  ['%name' => $name, '%module' => \implode(', ', $this->getNames($diffs, $module_data))]
                 );
                 break;
 
               case 'theme':
                 $message = $this->formatPlural(
-                  count($diffs),
+                  \count($diffs),
                   'Configuration %name depends on the %theme theme that will not be installed after import.',
                   'Configuration %name depends on themes (%theme) that will not be installed after import.',
-                  ['%name' => $name, '%theme' => implode(', ', $this->getNames($diffs, $theme_data))]
+                  ['%name' => $name, '%theme' => \implode(', ', $this->getNames($diffs, $theme_data))]
                 );
                 break;
 
               case 'config':
                 $message = $this->formatPlural(
-                  count($diffs),
+                  \count($diffs),
                   'Configuration %name depends on the %config configuration that will not exist after import.',
                   'Configuration %name depends on configuration (%config) that will not exist after import.',
-                  ['%name' => $name, '%config' => implode(', ', $diffs)]
+                  ['%name' => $name, '%config' => \implode(', ', $diffs)]
                 );
                 break;
             }
@@ -382,7 +382,7 @@ class ConfigImportSubscriber extends ConfigImportValidateEventSubscriberBase {
    *   human-readable names are not available.
    */
   protected function getNames(array $names, array $extension_data) {
-    return array_map(function ($name) use ($extension_data) {
+    return \array_map(function ($name) use ($extension_data) {
       if (isset($extension_data[$name])) {
         $name = $extension_data[$name]->info['name'];
       }

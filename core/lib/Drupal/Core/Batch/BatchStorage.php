@@ -57,7 +57,7 @@ class BatchStorage implements BatchStorageInterface {
       $batch = FALSE;
     }
     if ($batch) {
-      return unserialize($batch);
+      return \unserialize($batch);
     }
     return FALSE;
   }
@@ -82,7 +82,7 @@ class BatchStorage implements BatchStorageInterface {
   public function update(array $batch) {
     try {
       $this->connection->update('batch')
-        ->fields(['batch' => serialize($batch)])
+        ->fields(['batch' => \serialize($batch)])
         ->condition('bid', $batch['id'])
         ->execute();
     }
@@ -116,7 +116,7 @@ class BatchStorage implements BatchStorageInterface {
     $this->connection->update('batch')
       ->fields([
         'token' => $this->csrfToken->get($batch['id']),
-        'batch' => serialize($batch),
+        'batch' => \serialize($batch),
       ])
       ->condition('bid', $batch['id'])
       ->execute();

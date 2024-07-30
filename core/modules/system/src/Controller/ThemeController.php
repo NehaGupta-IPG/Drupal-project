@@ -137,11 +137,11 @@ class ThemeController extends ControllerBase {
         $config_objects = $e->flattenConfigObjects($e->getConfigObjects());
         $this->messenger()->addError(
           $this->formatPlural(
-            count($config_objects),
+            \count($config_objects),
             'Unable to install @extension, %config_names already exists in active configuration.',
             'Unable to install @extension, %config_names already exist in active configuration.',
             [
-              '%config_names' => implode(', ', $config_objects),
+              '%config_names' => \implode(', ', $config_objects),
               '@extension' => $theme,
             ])
         );
@@ -170,8 +170,8 @@ class ThemeController extends ControllerBase {
    */
   protected function willInstallExperimentalTheme($theme) {
     $all_themes = $this->themeList->getList();
-    $dependencies = array_keys($all_themes[$theme]->requires);
-    $themes_to_enable = array_merge([$theme], $dependencies);
+    $dependencies = \array_keys($all_themes[$theme]->requires);
+    $themes_to_enable = \array_merge([$theme], $dependencies);
 
     foreach ($themes_to_enable as $name) {
       if (isset($all_themes[$name]) && $all_themes[$name]->isExperimental() && $all_themes[$name]->status === 0) {

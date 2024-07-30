@@ -16,7 +16,7 @@ class MissingBundleClassException extends \Exception {
    *   The bundle class which should exist.
    */
   public function __construct(string $bundle_class) {
-    $message = sprintf('Bundle class %s does not exist.', $bundle_class);
+    $message = \sprintf('Bundle class %s does not exist.', $bundle_class);
     parent::__construct($message);
   }
 

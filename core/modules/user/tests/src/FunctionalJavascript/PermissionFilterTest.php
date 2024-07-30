@@ -57,17 +57,17 @@ class PermissionFilterTest extends WebDriverTestBase {
     $session->wait(1000, "jQuery('tr[data-drupal-selector=\"edit-permissions-access-content\"]').length == 0");
     $visible_rows = $this->filterVisibleElements($permission_rows);
     // Test Drupal.announce() message when multiple matches are expected.
-    $expected_message = count($visible_rows) . ' permissions are available in the modified list.';
+    $expected_message = \count($visible_rows) . ' permissions are available in the modified list.';
     $assertSession->elementTextContains('css', '#drupal-live-announce', $expected_message);
-    self::assertGreaterThan(count($visible_rows), count($permission_rows));
-    self::assertGreaterThan(1, count($visible_rows));
+    self::assertGreaterThan(\count($visible_rows), \count($permission_rows));
+    self::assertGreaterThan(1, \count($visible_rows));
 
     // Test Drupal.announce() message when one match is expected.
     // Using a very specific permission name, we expect only one row.
     $filter->setValue('Administer site configuration');
     $session->wait(1000, "jQuery('tr[data-drupal-selector=\"edit-permissions-access-content\"]').length == 0");
     $visible_rows = $this->filterVisibleElements($permission_rows);
-    self::assertEquals(1, count($visible_rows));
+    self::assertEquals(1, \count($visible_rows));
     $expected_message = '1 permission is available in the modified list.';
     $assertSession->elementTextContains('css', '#drupal-live-announce', $expected_message);
 
@@ -75,7 +75,7 @@ class PermissionFilterTest extends WebDriverTestBase {
     $filter->setValue('Pan-Galactic Gargle Blaster');
     $session->wait(1000, "jQuery('tr[data-drupal-selector=\"edit-permissions-access-content\"]').length == 0");
     $visible_rows = $this->filterVisibleElements($permission_rows);
-    self::assertEquals(0, count($visible_rows));
+    self::assertEquals(0, \count($visible_rows));
 
     $expected_message = '0 permissions are available in the modified list.';
     $assertSession->elementTextContains('css', '#drupal-live-announce', $expected_message);
@@ -91,7 +91,7 @@ class PermissionFilterTest extends WebDriverTestBase {
    *   An array of node elements.
    */
   protected function filterVisibleElements(array $elements): array {
-    $elements = array_filter($elements, function ($element) {
+    $elements = \array_filter($elements, function ($element) {
       return $element->isVisible();
     });
     return $elements;

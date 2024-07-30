@@ -150,8 +150,8 @@ class ChainedFastBackendTest extends UnitTestCase {
     $cache_item = (object) [
       'cid' => 'foo',
       'data' => 'baz',
-      'created' => time(),
-      'expire' => time() + 3600,
+      'created' => \time(),
+      'expire' => \time() + 3600,
       'tags' => ['tag'],
     ];
 

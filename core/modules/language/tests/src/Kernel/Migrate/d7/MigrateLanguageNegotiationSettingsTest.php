@@ -95,7 +95,7 @@ class MigrateLanguageNegotiationSettingsTest extends MigrateDrupal7TestBase {
    */
   public function testLanguageNegotiationWithDomain(): void {
     $this->sourceDatabase->update('variable')
-      ->fields(['value' => serialize(1)])
+      ->fields(['value' => \serialize(1)])
       ->condition('name', 'locale_language_negotiation_url_part')
       ->execute();
 
@@ -111,7 +111,7 @@ class MigrateLanguageNegotiationSettingsTest extends MigrateDrupal7TestBase {
     $this->assertSame(LanguageNegotiationUrl::CONFIG_DOMAIN, $config->get('url.source'));
     $this->assertSame('site_default', $config->get('selected_langcode'));
     $expected_domains = [
-      'en' => parse_url($base_url, PHP_URL_HOST),
+      'en' => \parse_url($base_url, PHP_URL_HOST),
       'fr' => 'fr.drupal.org',
       'is' => 'is.drupal.org',
     ];

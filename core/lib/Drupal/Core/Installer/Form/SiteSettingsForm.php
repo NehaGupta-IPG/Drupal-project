@@ -66,7 +66,7 @@ class SiteSettingsForm extends FormBase {
     $form['#title'] = $this->t('Database configuration');
 
     $drivers = $this->databaseDriverList->getInstallableList();
-    $drivers_keys = array_keys($drivers);
+    $drivers_keys = \array_keys($drivers);
 
     // Unless there is input for this form (for a non-interactive installation,
     // input originates from the $settings array passed into install_drupal()),
@@ -93,7 +93,7 @@ class SiteSettingsForm extends FormBase {
       // form element only allows to configure one default prefix for all
       // tables.
       $prefix = &$input[$default_driver]['prefix'];
-      if (isset($prefix) && is_array($prefix)) {
+      if (isset($prefix) && \is_array($prefix)) {
         $prefix = $prefix['default'];
       }
       $default_options = $input[$default_driver];
@@ -102,7 +102,7 @@ class SiteSettingsForm extends FormBase {
     // driver as default value, so that its settings form is made visible via
     // #states when JavaScript is enabled (see below).
     else {
-      $default_driver = current($drivers_keys);
+      $default_driver = \current($drivers_keys);
       $default_options = [];
     }
 
@@ -112,7 +112,7 @@ class SiteSettingsForm extends FormBase {
       '#required' => TRUE,
       '#default_value' => $default_driver,
     ];
-    if (count($drivers) == 1) {
+    if (\count($drivers) == 1) {
       $form['driver']['#disabled'] = TRUE;
     }
 
@@ -160,7 +160,7 @@ class SiteSettingsForm extends FormBase {
     $database = $form_state->getValue($driver);
 
     $database['driver'] = $driver;
-    $database = array_merge($database, $this->databaseDriverList->get($driver)->getAutoloadInfo());
+    $database = \array_merge($database, $this->databaseDriverList->get($driver)->getAutoloadInfo());
 
     $form_state->set('database', $database);
 
@@ -181,17 +181,17 @@ class SiteSettingsForm extends FormBase {
    *   An array of form errors keyed by the element name and parents.
    */
   protected function getDatabaseErrors(array $database, $settings_file) {
-    $errors = install_database_errors($database, $settings_file);
-    $form_errors = array_filter($errors, function ($value) {
+    $errors = \install_database_errors($database, $settings_file);
+    $form_errors = \array_filter($errors, function ($value) {
       // Errors keyed by something other than an integer already are linked to
       // form elements.
-      return is_int($value);
+      return \is_int($value);
     });
 
     // Find the generic errors.
-    $errors = array_diff_key($errors, $form_errors);
+    $errors = \array_diff_key($errors, $form_errors);
 
-    if (count($errors)) {
+    if (\count($errors)) {
       $error_message = static::getDatabaseErrorsTemplate($errors);
 
       // These are generic errors, so we do not have any specific key of the
@@ -240,8 +240,8 @@ class SiteSettingsForm extends FormBase {
     // For BC, just save the database driver name, not the database driver
     // extension name which equals the driver's namespace.
     $database = $form_state->get('database');
-    $namespaceParts = explode('\\', $database['driver']);
-    $database['driver'] = end($namespaceParts);
+    $namespaceParts = \explode('\\', $database['driver']);
+    $database['driver'] = \end($namespaceParts);
     $settings['databases']['default']['default'] = (object) [
       'value'    => $database,
       'required' => TRUE,
@@ -278,7 +278,7 @@ class SiteSettingsForm extends FormBase {
     $install_state['settings_verified'] = TRUE;
     $install_state['config_verified'] = TRUE;
     $install_state['database_verified'] = TRUE;
-    $install_state['completed_task'] = install_verify_completed_task();
+    $install_state['completed_task'] = \install_verify_completed_task();
   }
 
   /**
@@ -297,7 +297,7 @@ class SiteSettingsForm extends FormBase {
       // auto-created, we have to write out the README rather than just adding
       // it to the drupal core repo.
       $text = 'This directory contains configuration to be imported into your Drupal site. To make this configuration active, visit admin/config/development/configuration. For information about deploying configuration between servers, see https://www.drupal.org/documentation/administer/config';
-      file_put_contents($config_sync_directory . '/README.txt', $text);
+      \file_put_contents($config_sync_directory . '/README.txt', $text);
     }
 
     return $config_sync_directory;

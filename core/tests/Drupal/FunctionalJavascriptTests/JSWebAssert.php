@@ -54,7 +54,7 @@ class JSWebAssert extends WebAssert {
    */
   public function assertExpectedAjaxRequest(?int $count = NULL, $timeout = 10000, $message = 'Unable to complete AJAX request.'): void {
     // Wait for a very short time to allow page state to update after clicking.
-    usleep(5000);
+    \usleep(5000);
     $condition = <<<JS
       (function() {
         function isAjaxing(instance) {
@@ -108,8 +108,8 @@ JS);
     // Detect untracked AJAX requests. This will alert if the detection is
     // failing to provide an accurate count of requests.
     // @see core/modules/system/tests/modules/js_testing_ajax_request_test/js/js_testing_ajax_request_test.js
-    if (!is_null($count) && $drupal_ajax_request_count !== $browser_xhr_request_count) {
-      throw new \RuntimeException(sprintf('%d XHR requests through jQuery, but %d observed in the browser — this requires js_testing_ajax_request_test.js to be updated.', $drupal_ajax_request_count, $browser_xhr_request_count));
+    if (!\is_null($count) && $drupal_ajax_request_count !== $browser_xhr_request_count) {
+      throw new \RuntimeException(\sprintf('%d XHR requests through jQuery, but %d observed in the browser — this requires js_testing_ajax_request_test.js to be updated.', $drupal_ajax_request_count, $browser_xhr_request_count));
     }
 
     // Detect incomplete AJAX request.
@@ -121,7 +121,7 @@ JS);
     // unnecessary invocations.
     $current_page_ajax_response_count = $drupal_ajax_request_count;
 
-    if (!is_null($count)) {
+    if (!\is_null($count)) {
       Assert::assertSame($count, $drupal_ajax_request_count);
     }
   }
@@ -209,9 +209,9 @@ JS);
    */
   public function waitForText($text, $timeout = 10000) {
     return (bool) $this->waitForHelper($timeout, function (Element $page) use ($text) {
-      $actual = preg_replace('/\s+/u', ' ', $page->getText());
-      $regex = '/' . preg_quote($text, '/') . '/ui';
-      return (bool) preg_match($regex, $actual);
+      $actual = \preg_replace('/\s+/u', ' ', $page->getText());
+      $regex = '/' . \preg_quote($text, '/') . '/ui';
+      return (bool) \preg_match($regex, $actual);
     });
   }
 
@@ -326,8 +326,8 @@ JS);
   public function assertVisibleInViewport($selector_type, $selector, $corner = FALSE, $message = 'Element is not visible in the viewport.') {
     $node = $this->session->getPage()->find($selector_type, $selector);
     if ($node === NULL) {
-      if (is_array($selector)) {
-        $selector = implode(' ', $selector);
+      if (\is_array($selector)) {
+        $selector = \implode(' ', $selector);
       }
       throw new ElementNotFoundException($this->session->getDriver(), 'element', $selector_type, $selector);
     }
@@ -370,8 +370,8 @@ JS);
   public function assertNotVisibleInViewport($selector_type, $selector, $corner = FALSE, $message = 'Element is visible in the viewport.') {
     $node = $this->session->getPage()->find($selector_type, $selector);
     if ($node === NULL) {
-      if (is_array($selector)) {
-        $selector = implode(' ', $selector);
+      if (\is_array($selector)) {
+        $selector = \implode(' ', $selector);
       }
       throw new ElementNotFoundException($this->session->getDriver(), 'element', $selector_type, $selector);
     }
@@ -556,7 +556,7 @@ JS;
    *   When an element still exists on the page.
    */
   public function assertNoElementAfterWait($selector_type, $selector, $timeout = 10000, $message = 'Element exists on the page.') {
-    $start = microtime(TRUE);
+    $start = \microtime(TRUE);
     $end = $start + ($timeout / 1000);
     $page = $this->session->getPage();
 
@@ -565,8 +565,8 @@ JS;
       if (empty($node)) {
         return;
       }
-      usleep(100000);
-    } while (microtime(TRUE) < $end);
+      \usleep(100000);
+    } while (\microtime(TRUE) < $end);
 
     throw new ElementHtmlException($message, $this->session->getDriver(), $node);
   }
@@ -582,7 +582,7 @@ JS;
    *   interactable or visible.
    */
   public static function isExceptionNotClickable(Exception $exception): bool {
-    return (bool) preg_match('/not (clickable|interactable|visible)/', $exception->getMessage());
+    return (bool) \preg_match('/not (clickable|interactable|visible)/', $exception->getMessage());
   }
 
   /**
@@ -597,7 +597,7 @@ JS;
     $selector = $this->buildJavascriptStatusMessageSelector(NULL, $type);
     $status_message_element = $this->waitForElement('xpath', $selector, $timeout);
     if ($type) {
-      $failure_message = sprintf('A status message of type "%s" does not appear on this page, but it should.', $type);
+      $failure_message = \sprintf('A status message of type "%s" does not appear on this page, but it should.', $type);
     }
     else {
       $failure_message = 'A status message does not appear on this page, but it should.';
@@ -619,7 +619,7 @@ JS;
     $selector = $this->buildJavascriptStatusMessageSelector(NULL, $type);
     $status_message_element = $this->waitForElement('xpath', $selector, $timeout);
     if ($type) {
-      $failure_message = sprintf('A status message of type "%s" appears on this page, but it should not.', $type);
+      $failure_message = \sprintf('A status message of type "%s" appears on this page, but it should not.', $type);
     }
     else {
       $failure_message = 'A status message appears on this page, but it should not.';
@@ -641,10 +641,10 @@ JS;
     $selector = $this->buildJavascriptStatusMessageSelector($message, $type);
     $status_message_element = $this->waitForElement('xpath', $selector, $timeout);
     if ($type) {
-      $failure_message = sprintf('A status message of type "%s" containing "%s" does not appear on this page, but it should.', $type, $message);
+      $failure_message = \sprintf('A status message of type "%s" containing "%s" does not appear on this page, but it should.', $type, $message);
     }
     else {
-      $failure_message = sprintf('A status message containing "%s" does not appear on this page, but it should.', $type);
+      $failure_message = \sprintf('A status message containing "%s" does not appear on this page, but it should.', $type);
     }
     // There is no Assert::isNotNull() method, so we make our own constraint.
     $constraint = new LogicalNot(new IsNull());
@@ -665,10 +665,10 @@ JS;
     $selector = $this->buildJavascriptStatusMessageSelector($message, $type);
     $status_message_element = $this->waitForElement('xpath', $selector, $timeout);
     if ($type) {
-      $failure_message = sprintf('A status message of type "%s" containing "%s" appears on this page, but it should not.', $type, $message);
+      $failure_message = \sprintf('A status message of type "%s" containing "%s" appears on this page, but it should not.', $type, $message);
     }
     else {
-      $failure_message = sprintf('A status message containing "%s" appears on this page, but it should not.', $message);
+      $failure_message = \sprintf('A status message containing "%s" appears on this page, but it should not.', $message);
     }
     Assert::assertThat($status_message_element, Assert::isNull(), $failure_message);
   }
@@ -698,8 +698,8 @@ JS;
       'warning',
       NULL,
     ];
-    if (!in_array($type, $allowed_types, TRUE)) {
-      throw new \InvalidArgumentException(sprintf("If a status message type is specified, the allowed values are 'status', 'error', 'warning'. The value provided was '%s'.", $type));
+    if (!\in_array($type, $allowed_types, TRUE)) {
+      throw new \InvalidArgumentException(\sprintf("If a status message type is specified, the allowed values are 'status', 'error', 'warning'. The value provided was '%s'.", $type));
     }
 
     if ($type) {

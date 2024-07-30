@@ -53,7 +53,7 @@ class RollbackTest extends BrowserTestBase {
     $expected_core_extension_modules = $this->config('core.extension')->get('module');
 
     /** @var string $recipe_fixture */
-    $recipe_fixture = realpath(__DIR__ . "/../../../../fixtures/recipes/$recipe_fixture");
+    $recipe_fixture = \realpath(__DIR__ . "/../../../../fixtures/recipes/$recipe_fixture");
     $process = $this->applyRecipe($recipe_fixture, 1);
     $this->assertStringContainsString("There were validation errors in $expected_invalid_config_name:", $process->getErrorOutput());
     $this->assertCheckpointsExist([
@@ -77,8 +77,8 @@ class RollbackTest extends BrowserTestBase {
    */
   private function assertCheckpointsExist(array $expected_labels): void {
     $checkpoints = \Drupal::service('config.checkpoints');
-    $labels = array_map(fn (Checkpoint $c) => $c->label, iterator_to_array($checkpoints));
-    $this->assertSame($expected_labels, array_values($labels));
+    $labels = \array_map(fn (Checkpoint $c) => $c->label, \iterator_to_array($checkpoints));
+    $this->assertSame($expected_labels, \array_values($labels));
   }
 
 }

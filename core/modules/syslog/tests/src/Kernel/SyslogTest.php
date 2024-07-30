@@ -53,8 +53,8 @@ class SyslogTest extends KernelTestBase {
     \Drupal::logger('my_module')->warning('My warning message.', ['link' => '/my-link']);
 
     $log_filename = $this->container->get('file_system')->realpath('public://syslog.log');
-    $logs = explode(PHP_EOL, file_get_contents($log_filename));
-    $log = explode('|', $logs[0]);
+    $logs = \explode(PHP_EOL, \file_get_contents($log_filename));
+    $log = \explode('|', $logs[0]);
 
     global $base_url;
     $this->assertEquals($base_url, $log[0]);
@@ -71,7 +71,7 @@ class SyslogTest extends KernelTestBase {
     $config = $this->container->get('config.factory')->getEditable('syslog.settings');
     $config->set('format', '');
     $config->save();
-    unlink($log_filename);
+    \unlink($log_filename);
     \Drupal::logger('my_module')->warning('My warning message.', ['link' => '/my-link']);
     $this->assertFileDoesNotExist($log_filename);
   }
@@ -104,8 +104,8 @@ class SyslogTest extends KernelTestBase {
     \Drupal::logger('my_module')->warning('My warning message.');
 
     $log_filename = $this->container->get('file_system')->realpath('public://syslog.log');
-    $logs = explode(PHP_EOL, file_get_contents($log_filename));
-    $log = explode('|', $logs[0]);
+    $logs = \explode(PHP_EOL, \file_get_contents($log_filename));
+    $log = \explode('|', $logs[0]);
 
     $this->assertEquals('my_module', $log[0]);
     $this->assertEquals('My warning message.', $log[1]);

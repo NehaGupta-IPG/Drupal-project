@@ -26,13 +26,13 @@ trait InfoWriterTrait {
    *   No return value.
    */
   private function writeInfoFile(string $file_path, array $info): void {
-    $mtime = file_exists($file_path) ? filemtime($file_path) : FALSE;
+    $mtime = \file_exists($file_path) ? \filemtime($file_path) : FALSE;
 
-    file_put_contents($file_path, Yaml::encode($info));
+    \file_put_contents($file_path, Yaml::encode($info));
 
     // Ensure mtime changes.
-    if ($mtime === filemtime($file_path)) {
-      touch($file_path, max($mtime + 1, time()));
+    if ($mtime === \filemtime($file_path)) {
+      \touch($file_path, \max($mtime + 1, \time()));
     }
   }
 

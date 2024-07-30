@@ -57,10 +57,10 @@ class UnprocessableHttpEntityExceptionNormalizer extends HttpExceptionNormalizer
           . PlainTextOutput::renderFromHtml($violation->getMessage());
 
         $pointer = '/data/attributes/'
-          . str_replace('.', '/', $violation->getPropertyPath());
+          . \str_replace('.', '/', $violation->getPropertyPath());
         if ($cardinality == 1) {
           // Remove erroneous '/0/' index for single-value fields.
-          $pointer = str_replace("/data/attributes/$field_name/0/", "/data/attributes/$field_name/", $pointer);
+          $pointer = \str_replace("/data/attributes/$field_name/0/", "/data/attributes/$field_name/", $pointer);
         }
         $error['source']['pointer'] = $pointer;
 

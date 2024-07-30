@@ -48,10 +48,10 @@ class ReorderDisplays extends ViewsFormBase {
     ];
 
     $displays = $view->get('display');
-    $count = count($displays);
+    $count = \count($displays);
 
     // Sort the displays.
-    uasort($displays, function ($display1, $display2) {
+    \uasort($displays, function ($display1, $display2) {
       return $display1['position'] <=> $display2['position'];
     });
 
@@ -154,20 +154,20 @@ class ReorderDisplays extends ViewsFormBase {
     foreach ($user_input['displays'] as $display => $info) {
       // Add each value that is a field with a weight to our list, but only if
       // it has had its 'removed' checkbox checked.
-      if (is_array($info) && isset($info['weight']) && empty($info['removed']['checkbox'])) {
+      if (\is_array($info) && isset($info['weight']) && empty($info['removed']['checkbox'])) {
         $order[$display] = $info['weight'];
       }
     }
 
     // Sort the order array.
-    asort($order);
+    \asort($order);
 
     // Remove the default display from ordering.
     unset($order['default']);
     // Increment up positions.
     $position = 1;
 
-    foreach (array_keys($order) as $display) {
+    foreach (\array_keys($order) as $display) {
       $order[$display] = $position++;
     }
 

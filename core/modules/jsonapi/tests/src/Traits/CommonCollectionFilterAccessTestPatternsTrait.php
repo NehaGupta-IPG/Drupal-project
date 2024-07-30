@@ -33,7 +33,7 @@ trait CommonCollectionFilterAccessTestPatternsTrait {
    *   The referencing entity.
    */
   public function doTestCollectionFilterAccessBasedOnPermissions($label_field_name, $view_permission) {
-    assert($this instanceof ResourceTestBase);
+    \assert($this instanceof ResourceTestBase);
 
     // Set up data model.
     $this->assertTrue($this->container->get('module_installer')->install(['entity_test'], TRUE), 'Installed modules.');
@@ -140,7 +140,7 @@ trait CommonCollectionFilterAccessTestPatternsTrait {
    *   The referencing entity.
    */
   public function doTestCollectionFilterAccessForPublishableEntities($label_field_name, $view_permission, $admin_permission) {
-    assert($this->entity instanceof EntityPublishedInterface);
+    \assert($this->entity instanceof EntityPublishedInterface);
     $this->assertTrue($this->entity->isPublished());
 
     $referencing_entity = $this->doTestCollectionFilterAccessBasedOnPermissions($label_field_name, $view_permission);

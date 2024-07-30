@@ -167,7 +167,7 @@ class FieldStorageConfigAccessControlHandlerTest extends UnitTestCase {
    */
   public function assertAllowOperations(array $allow_operations, AccountInterface $user): void {
     foreach (['view', 'update', 'delete'] as $operation) {
-      $expected = in_array($operation, $allow_operations);
+      $expected = \in_array($operation, $allow_operations);
       $actual = $this->accessControlHandler->access($this->entity, $operation, $user);
       $this->assertSame($expected, $actual, "Access problem with '$operation' operation.");
     }

@@ -38,7 +38,7 @@ class SelectExtender implements SelectInterface {
   protected $placeholder = 0;
 
   public function __construct(SelectInterface $query, Connection $connection) {
-    $this->uniqueIdentifier = uniqid('', TRUE);
+    $this->uniqueIdentifier = \uniqid('', TRUE);
     $this->query = $query;
     $this->connection = $connection;
   }
@@ -76,14 +76,14 @@ class SelectExtender implements SelectInterface {
    * {@inheritdoc}
    */
   public function hasAllTags() {
-    return call_user_func_array([$this->query, 'hasAllTags'], func_get_args());
+    return \call_user_func_array([$this->query, 'hasAllTags'], \func_get_args());
   }
 
   /**
    * {@inheritdoc}
    */
   public function hasAnyTag() {
-    return call_user_func_array([$this->query, 'hasAnyTag'], func_get_args());
+    return \call_user_func_array([$this->query, 'hasAnyTag'], \func_get_args());
   }
 
   /**
@@ -221,8 +221,8 @@ class SelectExtender implements SelectInterface {
     // We cannot call $this->query->extend(), because with multiple extenders
     // you will replace all the earlier extenders with the last extender,
     // instead of creating list of objects that extend each other.
-    $parts = explode('\\', $extender_name);
-    $class = end($parts);
+    $parts = \explode('\\', $extender_name);
+    $class = \end($parts);
     $driver_class = $this->connection->getDriverClass($class);
     if ($driver_class !== $class) {
       return new $driver_class($this, $this->connection);
@@ -493,7 +493,7 @@ class SelectExtender implements SelectInterface {
    * {@inheritdoc}
    */
   public function __clone() {
-    $this->uniqueIdentifier = uniqid('', TRUE);
+    $this->uniqueIdentifier = \uniqid('', TRUE);
 
     // We need to deep-clone the query we're wrapping, which in turn may
     // deep-clone other objects.  Exciting!
@@ -510,7 +510,7 @@ class SelectExtender implements SelectInterface {
    * catch-all method to handle any additional methods.
    */
   public function __call($method, $args) {
-    $return = call_user_func_array([$this->query, $method], $args);
+    $return = \call_user_func_array([$this->query, $method], $args);
 
     // Some methods will return the called object as part of a fluent interface.
     // Others will return some useful value.  If it's a value, then the caller

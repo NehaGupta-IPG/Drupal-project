@@ -94,8 +94,8 @@ class MigrateFieldInstanceTest extends MigrateDrupal6TestBase {
       'handler_settings' => [],
     ];
     $field_settings = $field->getSettings();
-    ksort($expected);
-    ksort($field_settings);
+    \ksort($expected);
+    \ksort($field_settings);
     // This is the only way to compare arrays.
     $this->assertSame($expected, $field_settings);
 

@@ -32,7 +32,7 @@ class FileUriItemTest extends FileManagedUnitTestBase {
       'filemime' => 'text/plain',
     ]);
     $file->setPermanent();
-    file_put_contents($file->getFileUri(), 'hello world');
+    \file_put_contents($file->getFileUri(), 'hello world');
 
     $file->save();
 

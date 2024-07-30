@@ -108,7 +108,7 @@ class FormatDate extends ProcessPluginBase {
 
     $fromFormat = $this->configuration['from_format'];
     $toFormat = $this->configuration['to_format'];
-    $system_timezone = date_default_timezone_get();
+    $system_timezone = \date_default_timezone_get();
     $default_timezone = !empty($system_timezone) ? $system_timezone : 'UTC';
     $from_timezone = $this->configuration['from_timezone'] ?? $default_timezone;
     $to_timezone = $this->configuration['to_timezone'] ?? $default_timezone;
@@ -118,7 +118,7 @@ class FormatDate extends ProcessPluginBase {
     // known as "collected date attributes") resulted in invalid timestamps
     // getting stored.
     if ($fromFormat === 'Y-m-d\TH:i:s') {
-      $value = str_replace(['-00-00T', '-00T'], ['-01-01T', '-01T'], $value);
+      $value = \str_replace(['-00-00T', '-00T'], ['-01-01T', '-01T'], $value);
     }
 
     // Attempts to transform the supplied date using the defined input format.
@@ -128,10 +128,10 @@ class FormatDate extends ProcessPluginBase {
       $transformed = DateTimePlus::createFromFormat($fromFormat, $value, $from_timezone, $settings)->format($toFormat, ['timezone' => $to_timezone]);
     }
     catch (\InvalidArgumentException $e) {
-      throw new MigrateException(sprintf("Format date plugin could not transform '%s' using the format '%s'. Error: %s", $value, $fromFormat, $e->getMessage()), $e->getCode(), $e);
+      throw new MigrateException(\sprintf("Format date plugin could not transform '%s' using the format '%s'. Error: %s", $value, $fromFormat, $e->getMessage()), $e->getCode(), $e);
     }
     catch (\UnexpectedValueException $e) {
-      throw new MigrateException(sprintf("Format date plugin could not transform '%s' using the format '%s'. Error: %s", $value, $fromFormat, $e->getMessage()), $e->getCode(), $e);
+      throw new MigrateException(\sprintf("Format date plugin could not transform '%s' using the format '%s'. Error: %s", $value, $fromFormat, $e->getMessage()), $e->getCode(), $e);
     }
 
     return $transformed;

@@ -24,7 +24,7 @@ class RangeConstraintValidator extends ConstraintValidator {
       return;
     }
 
-    if (!is_numeric($value) && !$value instanceof \DateTimeInterface) {
+    if (!\is_numeric($value) && !$value instanceof \DateTimeInterface) {
       $this->context->buildViolation($constraint->invalidMessage)
         ->setParameter('{{ value }}', $this->formatValue($value, self::PRETTY_DATE))
         ->setCode(Range::INVALID_CHARACTERS_ERROR)

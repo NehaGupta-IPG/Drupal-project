@@ -37,7 +37,7 @@ class IdMapTableNoDummyTest extends MigrateDrupal6TestBase {
   public function testNoDummyTables(): void {
     $database = \Drupal::database();
     $tables = $database->schema()->findTables('%migrate_map%');
-    $dummy_tables = preg_grep("/.*migrate_map_([0-9a-fA-F]){13}/", $tables);
+    $dummy_tables = \preg_grep("/.*migrate_map_([0-9a-fA-F]){13}/", $tables);
     $this->assertCount(0, $dummy_tables);
   }
 

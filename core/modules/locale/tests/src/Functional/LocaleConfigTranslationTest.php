@@ -165,7 +165,7 @@ class LocaleConfigTranslationTest extends BrowserTestBase {
       'name' => 'image.style.medium',
     ]);
     $this->assertCount(1, $translations);
-    $translation = reset($translations);
+    $translation = \reset($translations);
     $this->assertEquals($string->source, $translation->source);
     $this->assertEmpty($translation->translation);
 

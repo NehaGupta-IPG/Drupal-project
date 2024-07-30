@@ -87,14 +87,14 @@ class StringItem extends StringItemBase {
     // When the maximum length is less than 15, or the field needs to be unique,
     // generate a random word using the maximum length.
     if ($max_length <= 15 || $field_definition->getConstraint('UniqueField')) {
-      $values['value'] = ucfirst($random->word($max_length));
+      $values['value'] = \ucfirst($random->word($max_length));
 
       return $values;
     }
 
     // The minimum length is either 10% of the maximum length, or 15 characters
     // long, whichever is greater.
-    $min_length = max(ceil($max_length * 0.10), 15);
+    $min_length = \max(\ceil($max_length * 0.10), 15);
 
     // Reduce the max length to allow us to add a period.
     $max_length -= 1;
@@ -105,23 +105,23 @@ class StringItem extends StringItemBase {
     // the bias towards minimum length is increased. This is because the default
     // maximum length of 255 is often used for fields that include shorter
     // values (i.e. title).
-    $length = mt_rand($min_length, mt_rand($min_length, $max_length >= 255 ? mt_rand($min_length, $max_length) : $max_length));
+    $length = \mt_rand($min_length, \mt_rand($min_length, $max_length >= 255 ? \mt_rand($min_length, $max_length) : $max_length));
 
     $string = $random->sentences(1);
-    while (mb_strlen($string) < $length) {
+    while (\mb_strlen($string) < $length) {
       $string .= " {$random->sentences(1)}";
     }
 
-    if (mb_strlen($string) > $max_length) {
-      $string = substr($string, 0, $length);
-      $string = substr($string, 0, strrpos($string, ' '));
+    if (\mb_strlen($string) > $max_length) {
+      $string = \substr($string, 0, $length);
+      $string = \substr($string, 0, \strrpos($string, ' '));
     }
 
-    $string = rtrim($string, ' .');
+    $string = \rtrim($string, ' .');
 
     // Ensure that the string ends with a full stop if there are multiple
     // sentences.
-    $values['value'] = $string . (str_contains($string, '.') ? '.' : '');
+    $values['value'] = $string . (\str_contains($string, '.') ? '.' : '');
 
     return $values;
   }

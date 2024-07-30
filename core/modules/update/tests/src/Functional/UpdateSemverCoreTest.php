@@ -31,7 +31,7 @@ class UpdateSemverCoreTest extends UpdateSemverCoreTestBase {
     // We need to think we're running a -dev snapshot to see dates.
     $this->mockDefaultExtensionsInfo([
       'version' => '8.1.0-dev',
-      'datestamp' => time(),
+      'datestamp' => \time(),
     ]);
     $this->refreshUpdateStatus(['drupal' => 'dev']);
     $this->assertSession()->pageTextNotContains('2001-Sep-');
@@ -62,17 +62,17 @@ class UpdateSemverCoreTest extends UpdateSemverCoreTestBase {
     ];
     $queue = \Drupal::queue('update_fetch_tasks');
     $this->assertEquals(0, $queue->numberOfItems(), 'Queue is empty');
-    update_create_fetch_task($project_a);
+    \update_create_fetch_task($project_a);
     $this->assertEquals(1, $queue->numberOfItems(), 'Queue contains one item');
-    update_create_fetch_task($project_b);
+    \update_create_fetch_task($project_b);
     $this->assertEquals(2, $queue->numberOfItems(), 'Queue contains two items');
     // Try to add a project again.
-    update_create_fetch_task($project_a);
+    \update_create_fetch_task($project_a);
     $this->assertEquals(2, $queue->numberOfItems(), 'Queue still contains two items');
 
     // Clear storage and try again.
-    update_storage_clear();
-    update_create_fetch_task($project_a);
+    \update_storage_clear();
+    \update_create_fetch_task($project_a);
     $this->assertEquals(2, $queue->numberOfItems(), 'Queue contains two items');
   }
 

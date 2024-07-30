@@ -87,7 +87,7 @@ class FrontMatter {
    *   \Drupal\Component\Serialization\SerializationInterface.
    */
   public function __construct(string $source, string $serializer = '\Drupal\Component\Serialization\Yaml') {
-    assert(is_subclass_of($serializer, SerializationInterface::class), sprintf('The $serializer parameter must reference a class that implements %s.', SerializationInterface::class));
+    \assert(\is_subclass_of($serializer, SerializationInterface::class), \sprintf('The $serializer parameter must reference a class that implements %s.', SerializationInterface::class));
     $this->serializer = $serializer;
     $this->source = $source;
   }
@@ -125,13 +125,13 @@ class FrontMatter {
       $line = 1;
 
       // Parse front matter data.
-      if (preg_match(static::REGEXP, $content, $matches)) {
+      if (\preg_match(static::REGEXP, $content, $matches)) {
         // Extract the source content.
-        $content = !empty($matches[3]) ? trim($matches[3]) : '';
+        $content = !empty($matches[3]) ? \trim($matches[3]) : '';
 
         // Extract the front matter data and typecast to an array to ensure
         // top level scalars are in an array.
-        $raw = !empty($matches[2]) ? trim($matches[2]) : '';
+        $raw = !empty($matches[2]) ? \trim($matches[2]) : '';
         if ($raw) {
           try {
             $data = (array) $this->serializer::decode($raw);
@@ -146,7 +146,7 @@ class FrontMatter {
         // match (which includes the front matter separators) and append a new
         // line to denote that the content should start after it.
         if (!empty($matches[1])) {
-          $line += preg_match_all('/\R/', $matches[1] . "\n");
+          $line += \preg_match_all('/\R/', $matches[1] . "\n");
         }
       }
 

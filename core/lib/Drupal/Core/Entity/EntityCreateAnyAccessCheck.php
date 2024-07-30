@@ -73,7 +73,7 @@ class EntityCreateAnyAccessCheck implements AccessInterface {
     }
 
     $access = AccessResult::neutral();
-    $bundles = array_keys($this->entityTypeBundleInfo->getBundleInfo($entity_type_id));
+    $bundles = \array_keys($this->entityTypeBundleInfo->getBundleInfo($entity_type_id));
 
     // Include list cache tag as access might change if more bundles are added.
     if ($entity_type->getBundleEntityType()) {

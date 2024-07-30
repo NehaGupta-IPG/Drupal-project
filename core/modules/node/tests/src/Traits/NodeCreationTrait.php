@@ -35,7 +35,7 @@ trait NodeCreationTrait {
       ->getStorage('node')
       ->loadByProperties(['title' => $title]);
     // Load the first node returned from the database.
-    $returned_node = reset($nodes);
+    $returned_node = \reset($nodes);
     return $returned_node;
   }
 
@@ -81,20 +81,20 @@ trait NodeCreationTrait {
 
     // If the node has a field named 'body', we assume it's a body field and
     // that the filter module is present.
-    if (!array_key_exists('body', $values) && $node->hasField('body')) {
+    if (!\array_key_exists('body', $values) && $node->hasField('body')) {
       $body = [
         'value' => $this->randomMachineName(32),
-        'format' => filter_default_format(),
+        'format' => \filter_default_format(),
       ];
       $node->set('body', $body);
     }
 
-    if (!array_key_exists('uid', $values)) {
+    if (!\array_key_exists('uid', $values)) {
       $user = User::load(\Drupal::currentUser()->id());
       if ($user) {
         $uid = $user->id();
       }
-      elseif (method_exists($this, 'setUpCurrentUser')) {
+      elseif (\method_exists($this, 'setUpCurrentUser')) {
         /** @var \Drupal\user\UserInterface $user */
         $user = $this->setUpCurrentUser();
         $uid = $user->id();

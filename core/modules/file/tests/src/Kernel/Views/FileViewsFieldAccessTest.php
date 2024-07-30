@@ -46,7 +46,7 @@ class FileViewsFieldAccessTest extends FieldFieldAccessTestBase {
     ]);
     $user->save();
 
-    file_put_contents('public://test.txt', 'test');
+    \file_put_contents('public://test.txt', 'test');
     $file = File::create([
       'filename' => 'test.txt',
       'uri' => 'public://test.txt',

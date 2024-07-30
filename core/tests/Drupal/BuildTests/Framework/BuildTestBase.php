@@ -166,7 +166,7 @@ abstract class BuildTestBase extends TestCase {
     // Set up the workspace directory.
     // @todo Glean working directory from env vars, etc.
     $fs = new SymfonyFilesystem();
-    $this->workspaceDir = $fs->tempnam(DrupalFilesystem::getOsTemporaryDirectory(), '/build_workspace_' . md5($this->name() . microtime(TRUE)));
+    $this->workspaceDir = $fs->tempnam(DrupalFilesystem::getOsTemporaryDirectory(), '/build_workspace_' . \md5($this->name() . \microtime(TRUE)));
     $fs->remove($this->workspaceDir);
     $fs->mkdir($this->workspaceDir);
     $this->initMink();
@@ -212,7 +212,7 @@ abstract class BuildTestBase extends TestCase {
     if ($working_dir) {
       $full_path .= '/' . $working_dir;
     }
-    if (!file_exists($full_path)) {
+    if (!\file_exists($full_path)) {
       $fs = new SymfonyFilesystem();
       $fs->mkdir($full_path);
     }
@@ -435,7 +435,7 @@ abstract class BuildTestBase extends TestCase {
       '-t',
       $working_path,
     ];
-    if (file_exists($working_path . DIRECTORY_SEPARATOR . '.ht.router.php')) {
+    if (\file_exists($working_path . DIRECTORY_SEPARATOR . '.ht.router.php')) {
       $server[] = $working_path . DIRECTORY_SEPARATOR . '.ht.router.php';
     }
     $ps = new Process($server, $working_path);
@@ -445,13 +445,13 @@ abstract class BuildTestBase extends TestCase {
     // Wait until the web server has started. It is started if the port is no
     // longer available.
     for ($i = 0; $i < 50; $i++) {
-      usleep(100000);
+      \usleep(100000);
       if (!$this->checkPortIsAvailable($port)) {
         return $ps;
       }
     }
 
-    throw new \RuntimeException(sprintf("Unable to start the web server.\nCMD: %s \nCODE: %d\nSTATUS: %s\nOUTPUT:\n%s\n\nERROR OUTPUT:\n%s", $ps->getCommandLine(), $ps->getExitCode(), $ps->getStatus(), $ps->getOutput(), $ps->getErrorOutput()));
+    throw new \RuntimeException(\sprintf("Unable to start the web server.\nCMD: %s \nCODE: %d\nSTATUS: %s\nOUTPUT:\n%s\n\nERROR OUTPUT:\n%s", $ps->getCommandLine(), $ps->getExitCode(), $ps->getStatus(), $ps->getOutput(), $ps->getErrorOutput()));
   }
 
   /**
@@ -483,7 +483,7 @@ abstract class BuildTestBase extends TestCase {
     $counter = 100;
     while ($counter--) {
       // Limit to 9999 as higher ports cause random fails on DrupalCI.
-      $port = random_int(1024, 9999);
+      $port = \random_int(1024, 9999);
 
       if (isset($this->portLocks[$port])) {
         continue;
@@ -523,7 +523,7 @@ abstract class BuildTestBase extends TestCase {
       return TRUE;
     }
     else {
-      fclose($fp);
+      \fclose($fp);
     }
     return FALSE;
   }
@@ -623,7 +623,7 @@ abstract class BuildTestBase extends TestCase {
     // Given this code is in the drupal/core package, $core cannot be NULL.
     /** @var string $core */
     $core = InstalledVersions::getInstallPath('drupal/core');
-    return realpath(dirname($core));
+    return \realpath(\dirname($core));
   }
 
   /**
@@ -634,7 +634,7 @@ abstract class BuildTestBase extends TestCase {
    */
   public function getComposerRoot(): string {
     $root = InstalledVersions::getRootPackage();
-    return realpath($root['install_path']);
+    return \realpath($root['install_path']);
   }
 
   /**

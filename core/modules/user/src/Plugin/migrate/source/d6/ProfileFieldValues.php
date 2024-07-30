@@ -46,13 +46,13 @@ class ProfileFieldValues extends DrupalSqlBase {
     foreach ($results as $profile_value) {
       // Check special case for date. We need to unserialize.
       if ($profile_value['type'] == 'date') {
-        $date = unserialize($profile_value['value']);
-        $date = date('Y-m-d', mktime(0, 0, 0, $date['month'], $date['day'], $date['year']));
+        $date = \unserialize($profile_value['value']);
+        $date = \date('Y-m-d', \mktime(0, 0, 0, $date['month'], $date['day'], $date['year']));
         $row->setSourceProperty($profile_value['name'], ['value' => $date]);
       }
       elseif ($profile_value['type'] == 'list') {
         // Explode by newline and comma.
-        $row->setSourceProperty($profile_value['name'], preg_split("/[\r\n,]+/", $profile_value['value']));
+        $row->setSourceProperty($profile_value['name'], \preg_split("/[\r\n,]+/", $profile_value['value']));
       }
       else {
         $row->setSourceProperty($profile_value['name'], [$profile_value['value']]);

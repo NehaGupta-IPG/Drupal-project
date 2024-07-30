@@ -34,14 +34,14 @@ class NoLanguageEntityTest extends ContentEntityBase {
    */
   public static function baseFieldDefinitions(EntityTypeInterface $entity_type) {
     $fields['id'] = BaseFieldDefinition::create('integer')
-      ->setLabel(t('ID'))
-      ->setDescription(t('The ID of the test entity.'))
+      ->setLabel(\t('ID'))
+      ->setDescription(\t('The ID of the test entity.'))
       ->setReadOnly(TRUE)
       ->setSetting('unsigned', TRUE);
 
     $fields['uuid'] = BaseFieldDefinition::create('uuid')
-      ->setLabel(t('UUID'))
-      ->setDescription(t('The UUID of the test entity.'))
+      ->setLabel(\t('UUID'))
+      ->setDescription(\t('The UUID of the test entity.'))
       ->setReadOnly(TRUE);
 
     return $fields;

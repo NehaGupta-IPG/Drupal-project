@@ -61,7 +61,7 @@ trait UserCreationTrait {
     // Creating an administrator or assigning custom permissions would result in
     // creating and assigning a new role to the user. This is not possible with
     // the anonymous user account.
-    if (($admin || $permissions) && isset($values['uid']) && is_numeric($values['uid']) && $values['uid'] == 0) {
+    if (($admin || $permissions) && isset($values['uid']) && \is_numeric($values['uid']) && $values['uid'] == 0) {
       throw new \LogicException('The anonymous user account cannot have additional roles.');
     }
 
@@ -247,7 +247,7 @@ trait UserCreationTrait {
     if (!isset($name)) {
       // In the role UI role names are trimmed and random string can start or
       // end with a space.
-      $name = trim($this->randomString(8));
+      $name = \trim($this->randomString(8));
     }
 
     // Check the all the permissions strings are valid.
@@ -270,7 +270,7 @@ trait UserCreationTrait {
       if (!empty($permissions)) {
         $this->grantPermissions($role, $permissions);
         $assigned_permissions = Role::load($role->id())->getPermissions();
-        $missing_permissions = array_diff($permissions, $assigned_permissions);
+        $missing_permissions = \array_diff($permissions, $assigned_permissions);
         $this->assertEmpty($missing_permissions);
       }
       return $role->id();
@@ -292,7 +292,7 @@ trait UserCreationTrait {
   protected function checkPermissions(array $permissions): bool {
     $available = array_keys(\Drupal::service('user.permissions')->getPermissions());
     foreach ($permissions as $permission) {
-      if (!in_array($permission, $available)) {
+      if (!\in_array($permission, $available)) {
         $this->fail("Invalid permission $permission.");
       }
     }

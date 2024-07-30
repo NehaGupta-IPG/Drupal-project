@@ -59,7 +59,7 @@ class MenuLinkContentDeriverTest extends KernelTestBase {
     $menu_tree = \Drupal::menuTree()->load('tools', new MenuTreeParameters());
     $this->assertCount(1, $menu_tree);
     /** @var \Drupal\Core\Menu\MenuLinkTreeElement $tree_element */
-    $tree_element = reset($menu_tree);
+    $tree_element = \reset($menu_tree);
     $this->assertEquals('route_name_1', $tree_element->link->getRouteName());
 
     // Change the underlying route and trigger the rediscovering.
@@ -72,7 +72,7 @@ class MenuLinkContentDeriverTest extends KernelTestBase {
     $menu_tree = \Drupal::menuTree()->load('tools', new MenuTreeParameters());
     $this->assertCount(1, $menu_tree);
     /** @var \Drupal\Core\Menu\MenuLinkTreeElement $tree_element */
-    $tree_element = reset($menu_tree);
+    $tree_element = \reset($menu_tree);
     $this->assertEquals('route_name_2', $tree_element->link->getRouteName());
     $title = $tree_element->link->getTitle();
     $this->assertNotInstanceOf(TranslatableMarkup::class, $title);
@@ -95,7 +95,7 @@ class MenuLinkContentDeriverTest extends KernelTestBase {
     $menu_tree = \Drupal::menuTree()->load('tools', new MenuTreeParameters());
     $this->assertCount(1, $menu_tree);
     /** @var \Drupal\Core\Menu\MenuLinkTreeElement $tree_element */
-    $tree_element = reset($menu_tree);
+    $tree_element = \reset($menu_tree);
     $this->assertTrue($tree_element->hasChildren);
     $this->assertCount(1, $tree_element->subtree);
 
@@ -107,7 +107,7 @@ class MenuLinkContentDeriverTest extends KernelTestBase {
     $menu_tree = \Drupal::menuTree()->load('tools', new MenuTreeParameters());
     $this->assertCount(1, $menu_tree);
     /** @var \Drupal\Core\Menu\MenuLinkTreeElement $tree_element */
-    $tree_element = reset($menu_tree);
+    $tree_element = \reset($menu_tree);
     $this->assertTrue($tree_element->hasChildren);
     $this->assertCount(1, $tree_element->subtree);
   }

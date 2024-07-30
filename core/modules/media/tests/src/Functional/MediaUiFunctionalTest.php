@@ -70,7 +70,7 @@ class MediaUiFunctionalTest extends MediaFunctionalTestBase {
       ->getQuery()
       ->accessCheck(FALSE)
       ->execute();
-    $media_id = reset($media_id);
+    $media_id = \reset($media_id);
     /** @var \Drupal\media\MediaInterface $media */
     $media = $this->container->get('entity_type.manager')
       ->getStorage('media')
@@ -226,7 +226,7 @@ class MediaUiFunctionalTest extends MediaFunctionalTestBase {
       ->getQuery()
       ->accessCheck(FALSE)
       ->execute();
-    $media_id = reset($media_id);
+    $media_id = \reset($media_id);
     $assert_session->addressEquals("media/$media_id/edit");
 
     // Test a redirect to the media overview for a user with the 'access media

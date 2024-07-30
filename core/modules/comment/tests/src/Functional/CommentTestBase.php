@@ -145,7 +145,7 @@ abstract class CommentTestBase extends BrowserTestBase {
       $this->assertSession()->fieldNotExists('subject[0][value]');
     }
 
-    if ($contact !== NULL && is_array($contact)) {
+    if ($contact !== NULL && \is_array($contact)) {
       $edit += $contact;
     }
     $preview_mode = CommentPreviewMode::from($preview_mode);
@@ -379,7 +379,7 @@ abstract class CommentTestBase extends BrowserTestBase {
    */
   protected function getUnapprovedComment($subject) {
     $this->drupalGet('admin/content/comment/approval');
-    preg_match('/href="(.*?)#comment-([^"]+)"(.*?)>(' . $subject . ')/', $this->getSession()->getPage()->getContent(), $match);
+    \preg_match('/href="(.*?)#comment-([^"]+)"(.*?)>(' . $subject . ')/', $this->getSession()->getPage()->getContent(), $match);
 
     return $match[2];
   }

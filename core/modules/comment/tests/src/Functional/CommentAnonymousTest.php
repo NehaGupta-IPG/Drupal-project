@@ -28,12 +28,12 @@ class CommentAnonymousTest extends CommentTestBase {
     parent::setUp();
 
     // Enable anonymous and authenticated user comments.
-    user_role_grant_permissions(RoleInterface::ANONYMOUS_ID, [
+    \user_role_grant_permissions(RoleInterface::ANONYMOUS_ID, [
       'access comments',
       'post comments',
       'skip comment approval',
     ]);
-    user_role_grant_permissions(RoleInterface::AUTHENTICATED_ID, [
+    \user_role_grant_permissions(RoleInterface::AUTHENTICATED_ID, [
       'access comments',
       'post comments',
       'skip comment approval',
@@ -60,7 +60,7 @@ class CommentAnonymousTest extends CommentTestBase {
     $this->assertStringContainsString($body, $preview, 'Anonymous user can preview comment body.');
 
     // Preview comments (without `skip comment approval` permission).
-    user_role_revoke_permissions(RoleInterface::ANONYMOUS_ID, ['skip comment approval']);
+    \user_role_revoke_permissions(RoleInterface::ANONYMOUS_ID, ['skip comment approval']);
     $edit = [];
     $title = 'comment title without skip comment approval';
     $body = 'comment body without skip comment approval';
@@ -72,7 +72,7 @@ class CommentAnonymousTest extends CommentTestBase {
     $preview = (string) $this->cssSelect('[data-drupal-selector="edit-comment-preview"]')[0]->getHtml();
     $this->assertStringContainsString($title, $preview, 'Anonymous user can preview comment title.');
     $this->assertStringContainsString($body, $preview, 'Anonymous user can preview comment body.');
-    user_role_grant_permissions(RoleInterface::ANONYMOUS_ID, ['skip comment approval']);
+    \user_role_grant_permissions(RoleInterface::ANONYMOUS_ID, ['skip comment approval']);
 
     // Post anonymous comment without contact info.
     $anonymous_comment1 = $this->postComment($this->node, $this->randomMachineName(), $this->randomMachineName());
@@ -175,7 +175,7 @@ class CommentAnonymousTest extends CommentTestBase {
     $this->assertSession()->statusCodeEquals(403);
 
     // Reset.
-    user_role_change_permissions(RoleInterface::ANONYMOUS_ID, [
+    \user_role_change_permissions(RoleInterface::ANONYMOUS_ID, [
       'access comments' => FALSE,
       'post comments' => FALSE,
       'skip comment approval' => FALSE,
@@ -193,7 +193,7 @@ class CommentAnonymousTest extends CommentTestBase {
     $this->drupalGet('comment/reply/node/' . $this->node->id() . '/comment');
     $this->assertSession()->statusCodeEquals(403);
 
-    user_role_change_permissions(RoleInterface::ANONYMOUS_ID, [
+    \user_role_change_permissions(RoleInterface::ANONYMOUS_ID, [
       'access comments' => TRUE,
       'post comments' => FALSE,
       'skip comment approval' => FALSE,
@@ -204,7 +204,7 @@ class CommentAnonymousTest extends CommentTestBase {
     $this->assertSession()->linkExists('Log in', 1, 'Link to login was found.');
     $this->assertSession()->linkExists('register', 1, 'Link to register was found.');
 
-    user_role_change_permissions(RoleInterface::ANONYMOUS_ID, [
+    \user_role_change_permissions(RoleInterface::ANONYMOUS_ID, [
       'access comments' => FALSE,
       'post comments' => TRUE,
       'skip comment approval' => TRUE,

@@ -86,7 +86,7 @@ class AliasManager implements AliasManagerInterface {
     }
 
     // Look for the alias within the cached map.
-    if (isset($this->lookupMap[$langcode]) && ($path = array_search($alias, $this->lookupMap[$langcode]))) {
+    if (isset($this->lookupMap[$langcode]) && ($path = \array_search($alias, $this->lookupMap[$langcode]))) {
       return $path;
     }
 
@@ -107,8 +107,8 @@ class AliasManager implements AliasManagerInterface {
    * {@inheritdoc}
    */
   public function getAliasByPath($path, $langcode = NULL) {
-    if (!str_starts_with($path, '/')) {
-      throw new \InvalidArgumentException(sprintf('Source path %s has to start with a slash.', $path));
+    if (!\str_starts_with($path, '/')) {
+      throw new \InvalidArgumentException(\sprintf('Source path %s has to start with a slash.', $path));
     }
     // If no language is explicitly specified we default to the current URL
     // language. If we used a language different from the one conveyed by the
@@ -182,7 +182,7 @@ class AliasManager implements AliasManagerInterface {
     // alias being loaded correctly, only less efficiently.
 
     if ($source) {
-      foreach (array_keys($this->lookupMap) as $lang) {
+      foreach (\array_keys($this->lookupMap) as $lang) {
         unset($this->lookupMap[$lang][$source]);
       }
     }

@@ -144,7 +144,7 @@ class EntityDisplayModeListBuilder extends ConfigEntityListBuilder {
         $table['#weight'] = -10;
       }
 
-      $short_type = str_replace(['entity_', '_mode'], '', $this->entityTypeId);
+      $short_type = \str_replace(['entity_', '_mode'], '', $this->entityTypeId);
       $table['#rows']['_add_new'][] = [
         'data' => [
           '#type' => 'link',
@@ -165,7 +165,7 @@ class EntityDisplayModeListBuilder extends ConfigEntityListBuilder {
             ],
           ],
         ],
-        'colspan' => count($table['#header']),
+        'colspan' => \count($table['#header']),
       ];
       $build[$entity_type] = $table;
     }

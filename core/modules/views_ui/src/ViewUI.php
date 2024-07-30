@@ -164,7 +164,7 @@ class ViewUI implements ViewEntityInterface {
    * {@inheritdoc}
    */
   public function get($property_name, $langcode = NULL) {
-    if (property_exists($this->storage, $property_name)) {
+    if (\property_exists($this->storage, $property_name)) {
       return $this->storage->get($property_name, $langcode);
     }
 
@@ -182,7 +182,7 @@ class ViewUI implements ViewEntityInterface {
    * {@inheritdoc}
    */
   public function set($property_name, $value, $notify = TRUE) {
-    if (property_exists($this->storage, $property_name)) {
+    if (\property_exists($this->storage, $property_name)) {
       $this->storage->set($property_name, $value);
     }
     else {
@@ -268,7 +268,7 @@ class ViewUI implements ViewEntityInterface {
     }
 
     $submit_handler = [$form_state->getFormObject(), 'submitForm'];
-    call_user_func_array($submit_handler, [&$form, $form_state]);
+    \call_user_func_array($submit_handler, [&$form, $form_state]);
   }
 
   /**
@@ -331,7 +331,7 @@ class ViewUI implements ViewEntityInterface {
       // button labels.
       if (isset($names)) {
         $form['actions']['submit']['#values'] = $names;
-        $form['actions']['submit']['#process'] = array_merge(['views_ui_form_button_was_clicked'], \Drupal::service('element_info')->getInfoProperty($form['actions']['submit']['#type'], '#process', []));
+        $form['actions']['submit']['#process'] = \array_merge(['views_ui_form_button_was_clicked'], \Drupal::service('element_info')->getInfoProperty($form['actions']['submit']['#type'], '#process', []));
       }
       // If a validation handler exists for the form, assign it to this button.
       $form['actions']['submit']['#validate'][] = [$form_state->getFormObject(), 'validateForm'];
@@ -381,7 +381,7 @@ class ViewUI implements ViewEntityInterface {
       if ($was_defaulted !== $is_defaulted && isset($form['#section'])) {
         // We're changing which display these values apply to.
         // Update the #section so it knows what to mark changed.
-        $form['#section'] = str_replace('default-', $form_state->get('display_id') . '-', $form['#section']);
+        $form['#section'] = \str_replace('default-', $form_state->get('display_id') . '-', $form['#section']);
       }
     }
     else {
@@ -409,7 +409,7 @@ class ViewUI implements ViewEntityInterface {
       $this->stack = [];
     }
 
-    $stack = [implode('-', array_filter([$key, $this->id(), $display_id, $type, $id])), $key, $display_id, $type, $id];
+    $stack = [\implode('-', \array_filter([$key, $this->id(), $display_id, $type, $id])), $key, $display_id, $type, $id];
     // If we're being asked to add this form to the bottom of the stack, no
     // special logic is required. Our work is equally easy if we were asked to
     // add to the top of the stack, but there's nothing in it yet.
@@ -420,9 +420,9 @@ class ViewUI implements ViewEntityInterface {
     // existing integer keys, so they can be used for the "2 of 3" progress
     // indicator (which will now read "2 of 4").
     else {
-      $keys = array_keys($this->stack);
-      $first = current($keys);
-      $last = end($keys);
+      $keys = \array_keys($this->stack);
+      $first = \current($keys);
+      $last = \end($keys);
       for ($i = $last; $i >= $first; $i--) {
         if (!isset($this->stack[$i])) {
           continue;
@@ -433,11 +433,11 @@ class ViewUI implements ViewEntityInterface {
       }
       // Now that the previously $first slot is free, move the new form into it.
       $this->stack[$first] = $stack;
-      ksort($this->stack);
+      \ksort($this->stack);
 
       // Start the keys from 0 again, if requested.
       if ($rebuild_keys) {
-        $this->stack = array_values($this->stack);
+        $this->stack = \array_values($this->stack);
       }
     }
   }
@@ -476,8 +476,8 @@ class ViewUI implements ViewEntityInterface {
       foreach (array_keys(array_filter($form_state->getValue('name'))) as $field) {
         [$table, $field] = explode('.', $field, 2);
 
-        if ($cut = strpos($field, '$')) {
-          $field = substr($field, 0, $cut);
+        if ($cut = \strpos($field, '$')) {
+          $field = \substr($field, 0, $cut);
         }
         $id = $this->getExecutable()->addHandler($display_id, $type, $table, $field);
 
@@ -571,8 +571,8 @@ class ViewUI implements ViewEntityInterface {
       // and query() to ensure we get have all the values exposed.
       // We also make sure to remove ajax-framework specific keys and form
       // tokens to avoid any problems.
-      $exposed_input = array_merge(\Drupal::request()->request->all(), \Drupal::request()->query->all());
-      foreach (array_merge(ViewAjaxController::FILTERED_QUERY_PARAMETERS, ['form_id', 'form_build_id', 'form_token']) as $key) {
+      $exposed_input = \array_merge(\Drupal::request()->request->all(), \Drupal::request()->query->all());
+      foreach (\array_merge(ViewAjaxController::FILTERED_QUERY_PARAMETERS, ['form_id', 'form_build_id', 'form_token']) as $key) {
         if (isset($exposed_input[$key])) {
           unset($exposed_input[$key]);
         }
@@ -636,7 +636,7 @@ class ViewUI implements ViewEntityInterface {
 
       $this->render_time = Timer::stop('entity.view.preview_form')['time'];
 
-      views_ui_contextual_links_suppress_pop();
+      \views_ui_contextual_links_suppress_pop();
 
       // Prepare the query information and statistics to show either above or
       // below the view preview.
@@ -655,8 +655,8 @@ class ViewUI implements ViewEntityInterface {
               $quoted = $query_string->getArguments();
               $connection = Database::getConnection();
               foreach ($quoted as $key => $val) {
-                if (is_array($val)) {
-                  $quoted[$key] = implode(', ', array_map([$connection, 'quote'], $val));
+                if (\is_array($val)) {
+                  $quoted[$key] = \implode(', ', \array_map([$connection, 'quote'], $val));
                 }
                 else {
                   $quoted[$key] = $connection->quote($val);
@@ -674,7 +674,7 @@ class ViewUI implements ViewEntityInterface {
                 'data' => [
                   '#type' => 'inline_template',
                   '#template' => '<pre>{{ query }}</pre>',
-                  '#context' => ['query' => strtr($query_string, $quoted)],
+                  '#context' => ['query' => \strtr($query_string, $quoted)],
                 ],
               ],
             ];
@@ -685,7 +685,7 @@ class ViewUI implements ViewEntityInterface {
                 '#suffix' => '</strong>',
               ];
               foreach ($this->additionalQueries as $query) {
-                $query_string = strtr($query['query'], $query['args']);
+                $query_string = \strtr($query['query'], $query['args']);
                 $queries[] = [
                   '#prefix' => "\n",
                   '#markup' => $this->t('[@time ms] @query', ['@time' => round($query['time'] * 100000, 1) / 100000.0, '@query' => $query_string]),
@@ -833,7 +833,7 @@ class ViewUI implements ViewEntityInterface {
       '#type' => 'table',
       '#prefix' => '<div class="views-query-info">',
       '#suffix' => '</div>',
-      '#rows' => array_merge($rows['query'], $rows['statistics']),
+      '#rows' => \array_merge($rows['query'], $rows['statistics']),
     ];
 
     if ($show_location == 'above') {
@@ -871,11 +871,11 @@ class ViewUI implements ViewEntityInterface {
     if (!empty($this->stack)) {
       // The forms on the stack have integer keys that don't change as the forms
       // are completed, so we can see which ones are still left.
-      $keys = array_keys($this->stack);
+      $keys = \array_keys($this->stack);
       // Add 1 to the array keys for the benefit of humans, who start counting
       // from 1 and not 0.
-      $current = reset($keys) + 1;
-      $total = end($keys) + 1;
+      $current = \reset($keys) + 1;
+      $total = \end($keys) + 1;
       if ($total > 1) {
         $progress = [];
         $progress['current'] = $current;
@@ -927,7 +927,7 @@ class ViewUI implements ViewEntityInterface {
    * Passes through all unknown calls onto the storage object.
    */
   public function __call($method, $args) {
-    return call_user_func_array([$this->storage, $method], $args);
+    return \call_user_func_array([$this->storage, $method], $args);
   }
 
   /**

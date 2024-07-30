@@ -23,9 +23,9 @@ class JqueryUiTestAssetsController extends ControllerBase {
   public function build($library) {
     // If there are pipes in $library, they are separating multiple library
     // names.
-    if (str_contains($library, '|')) {
-      $library = explode('|', $library);
-      $library = array_map(function ($item) {
+    if (\str_contains($library, '|')) {
+      $library = \explode('|', $library);
+      $library = \array_map(function ($item) {
         return "core/$item";
       }, $library);
     }

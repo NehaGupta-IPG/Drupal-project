@@ -119,7 +119,7 @@ class ViewsForm implements FormInterface, ContainerInjectionInterface {
       $this->viewDisplayId,
     ];
 
-    return implode('_', $parts);
+    return \implode('_', $parts);
   }
 
   /**
@@ -132,10 +132,10 @@ class ViewsForm implements FormInterface, ContainerInjectionInterface {
 
     if (!empty($this->viewArguments)) {
       // Append the passed arguments to ensure form uniqueness.
-      $parts = array_merge($parts, $this->viewArguments);
+      $parts = \array_merge($parts, $this->viewArguments);
     }
 
-    return implode('_', $parts);
+    return \implode('_', $parts);
   }
 
   /**

@@ -69,7 +69,7 @@ class CommentPreviewTest extends CommentTestBase {
     $this->assertSession()->responseContains('<em>' . $this->webUser->id() . '</em>');
 
     // Add a user picture.
-    $image = current($this->drupalGetTestFiles('image'));
+    $image = \current($this->drupalGetTestFiles('image'));
     $user_edit['files[user_picture_0]'] = \Drupal::service('file_system')->realpath($image->uri);
     $this->drupalGet('user/' . $this->webUser->id() . '/edit');
     $this->submitForm($user_edit, 'Save');

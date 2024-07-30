@@ -164,7 +164,7 @@ class DbLogController extends ControllerBase {
     foreach ($result as $dblog) {
       $message = $this->formatMessage($dblog);
       if ($message && isset($dblog->wid)) {
-        $title = Unicode::truncate(Html::decodeEntities(strip_tags($message)), 256, TRUE, TRUE);
+        $title = Unicode::truncate(Html::decodeEntities(\strip_tags($message)), 256, TRUE, TRUE);
         $log_text = Unicode::truncate($title, 56, TRUE, TRUE);
         // The link generator will escape any unsafe HTML entities in the final
         // text.
@@ -322,7 +322,7 @@ class DbLogController extends ControllerBase {
 
     $this->moduleHandler()->loadInclude('dblog', 'admin.inc');
 
-    $filters = dblog_filters();
+    $filters = \dblog_filters();
 
     // Build the condition.
     $condition_and = $query->getConnection()->condition('AND');
@@ -367,12 +367,12 @@ class DbLogController extends ControllerBase {
   public function formatMessage($row) {
     // Check for required properties.
     if (isset($row->message, $row->variables)) {
-      $variables = @unserialize($row->variables);
+      $variables = @\unserialize($row->variables);
       // Messages without variables or user specified text.
       if ($variables === NULL) {
         $message = Xss::filterAdmin($row->message);
       }
-      elseif (!is_array($variables)) {
+      elseif (!\is_array($variables)) {
         $message = $this->t('Log data is corrupted and cannot be unserialized: @message', ['@message' => Xss::filterAdmin($row->message)]);
       }
       // Message to translate with injected variables.
@@ -383,7 +383,7 @@ class DbLogController extends ControllerBase {
             '<pre class="backtrace">@backtrace_string</pre>', $variables
           );
           // Save a reference so the backtrace can be displayed separately.
-          if (!str_contains($row->message, '@backtrace_string')) {
+          if (!\str_contains($row->message, '@backtrace_string')) {
             $row->backtrace = $variables['@backtrace_string'];
           }
         }

@@ -17,7 +17,7 @@ class SysLogTest extends SysLog implements LoggerInterface {
    */
   protected function syslogWrapper($level, $entry) {
     $log_path = \Drupal::service('file_system')->realpath('public://syslog.log');
-    error_log($entry . PHP_EOL, 3, $log_path);
+    \error_log($entry . PHP_EOL, 3, $log_path);
   }
 
 }

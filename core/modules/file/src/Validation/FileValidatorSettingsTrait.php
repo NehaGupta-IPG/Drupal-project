@@ -32,7 +32,7 @@ trait FileValidatorSettingsTrait {
     // Cap the upload size according to the PHP limit.
     $maxFilesize = Bytes::toNumber(Environment::getUploadMaxSize());
     if (!empty($settings['max_filesize'])) {
-      $maxFilesize = min($maxFilesize, Bytes::toNumber($settings['max_filesize']));
+      $maxFilesize = \min($maxFilesize, Bytes::toNumber($settings['max_filesize']));
     }
 
     // There is always a file size limit due to the PHP server limit.

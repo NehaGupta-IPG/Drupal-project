@@ -100,7 +100,7 @@ class BaseFieldDefinition extends ListDataDefinition implements FieldDefinitionI
    */
   public static function createFromItemType($item_type) {
     // The data type of a field item is in the form of "field_item:$field_type".
-    $parts = explode(':', $item_type, 2);
+    $parts = \explode(':', $item_type, 2);
     return static::create($parts[1]);
   }
 
@@ -439,7 +439,7 @@ class BaseFieldDefinition extends ListDataDefinition implements FieldDefinitionI
   public function getDefaultValue(FieldableEntityInterface $entity) {
     // Allow custom default values function.
     if ($callback = $this->getDefaultValueCallback()) {
-      $value = call_user_func($callback, $entity, $this);
+      $value = \call_user_func($callback, $entity, $this);
     }
     else {
       $value = $this->getDefaultValueLiteral();
@@ -458,11 +458,11 @@ class BaseFieldDefinition extends ListDataDefinition implements FieldDefinitionI
       $value = [];
     }
     // Unless the value is an empty array, we may need to transform it.
-    if (!is_array($value) || !empty($value)) {
-      if (!is_array($value)) {
+    if (!\is_array($value) || !empty($value)) {
+      if (!\is_array($value)) {
         $value = [[$this->getMainPropertyName() => $value]];
       }
-      elseif (is_array($value) && !is_numeric(array_keys($value)[0])) {
+      elseif (\is_array($value) && !\is_numeric(\array_keys($value)[0])) {
         $value = [0 => $value];
       }
     }
@@ -474,7 +474,7 @@ class BaseFieldDefinition extends ListDataDefinition implements FieldDefinitionI
    * {@inheritdoc}
    */
   public function setDefaultValueCallback($callback) {
-    if (isset($callback) && !is_string($callback)) {
+    if (isset($callback) && !\is_string($callback)) {
       throw new \InvalidArgumentException('Default value callback must be a string, like "function_name" or "ClassName::methodName"');
     }
     $this->definition['default_value_callback'] = $callback;
@@ -562,7 +562,7 @@ class BaseFieldDefinition extends ListDataDefinition implements FieldDefinitionI
     // If the field item class implements the interface, create an orphaned
     // runtime item object, so that it can be used as the options provider
     // without modifying the entity being worked on.
-    if (is_subclass_of($this->getItemDefinition()->getClass(), OptionsProviderInterface::class)) {
+    if (\is_subclass_of($this->getItemDefinition()->getClass(), OptionsProviderInterface::class)) {
       $items = $entity->get($this->getName());
       return \Drupal::service('plugin.manager.field.field_type')->createFieldItem($items, 0);
     }
@@ -600,7 +600,7 @@ class BaseFieldDefinition extends ListDataDefinition implements FieldDefinitionI
    * {@inheritdoc}
    */
   public function getPropertyNames() {
-    return array_keys($this->getPropertyDefinitions());
+    return \array_keys($this->getPropertyDefinitions());
   }
 
   /**
@@ -616,9 +616,9 @@ class BaseFieldDefinition extends ListDataDefinition implements FieldDefinitionI
    */
   public function __sleep(): array {
     // Do not serialize the statically cached property definitions.
-    $vars = get_object_vars($this);
+    $vars = \get_object_vars($this);
     unset($vars['propertyDefinitions'], $vars['typedDataManager']);
-    return array_keys($vars);
+    return \array_keys($vars);
   }
 
   /**

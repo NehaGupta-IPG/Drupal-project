@@ -129,14 +129,14 @@ class EntityTypeManager extends DefaultPluginManager implements EntityTypeManage
    * {@inheritdoc}
    */
   public function getDefinition($entity_type_id, $exception_on_invalid = TRUE) {
-    if (($entity_type = parent::getDefinition($entity_type_id, FALSE)) && class_exists($entity_type->getClass())) {
+    if (($entity_type = parent::getDefinition($entity_type_id, FALSE)) && \class_exists($entity_type->getClass())) {
       return $entity_type;
     }
     elseif (!$exception_on_invalid) {
       return NULL;
     }
 
-    throw new PluginNotFoundException($entity_type_id, sprintf('The "%s" entity type does not exist.', $entity_type_id));
+    throw new PluginNotFoundException($entity_type_id, \sprintf('The "%s" entity type does not exist.', $entity_type_id));
   }
 
   /**
@@ -206,9 +206,9 @@ class EntityTypeManager extends DefaultPluginManager implements EntityTypeManage
     if (!$class = $this->getDefinition($entity_type_id, TRUE)->getFormClass($operation)) {
       $handlers = $this->getDefinition($entity_type_id, TRUE)->getHandlerClasses();
       if (!isset($handlers['form'][$operation])) {
-        throw new InvalidPluginDefinitionException($entity_type_id, sprintf('The "%s" entity type did not specify a "%s" form class.', $entity_type_id, $operation));
+        throw new InvalidPluginDefinitionException($entity_type_id, \sprintf('The "%s" entity type did not specify a "%s" form class.', $entity_type_id, $operation));
       }
-      throw new InvalidPluginDefinitionException($entity_type_id, sprintf('The "%s" form handler of the "%s" entity type specifies a non-existent class "%s".', $operation, $entity_type_id, $handlers['form'][$operation]));
+      throw new InvalidPluginDefinitionException($entity_type_id, \sprintf('The "%s" form handler of the "%s" entity type specifies a non-existent class "%s".', $operation, $entity_type_id, $handlers['form'][$operation]));
     }
 
     $form_object = $this->classResolver->getInstanceFromDefinition($class);
@@ -262,9 +262,9 @@ class EntityTypeManager extends DefaultPluginManager implements EntityTypeManage
       if (!$class) {
         $handlers = $definition->getHandlerClasses();
         if (!isset($handlers[$handler_type])) {
-          throw new InvalidPluginDefinitionException($entity_type_id, sprintf('The "%s" entity type did not specify a %s handler.', $entity_type_id, $handler_type));
+          throw new InvalidPluginDefinitionException($entity_type_id, \sprintf('The "%s" entity type did not specify a %s handler.', $entity_type_id, $handler_type));
         }
-        throw new InvalidPluginDefinitionException($entity_type_id, sprintf('The %s handler of the "%s" entity type specifies a non-existent class "%s".', $handler_type, $entity_type_id, $handlers[$handler_type]));
+        throw new InvalidPluginDefinitionException($entity_type_id, \sprintf('The %s handler of the "%s" entity type specifies a non-existent class "%s".', $handler_type, $entity_type_id, $handlers[$handler_type]));
       }
       $this->handlers[$handler_type][$entity_type_id] = $this->createHandlerInstance($class, $definition);
     }
@@ -276,16 +276,16 @@ class EntityTypeManager extends DefaultPluginManager implements EntityTypeManage
    * {@inheritdoc}
    */
   public function createHandlerInstance($class, ?EntityTypeInterface $definition = NULL) {
-    if (is_subclass_of($class, 'Drupal\Core\Entity\EntityHandlerInterface')) {
+    if (\is_subclass_of($class, 'Drupal\Core\Entity\EntityHandlerInterface')) {
       $handler = $class::createInstance($this->container, $definition);
     }
     else {
       $handler = new $class($definition);
     }
-    if (method_exists($handler, 'setModuleHandler')) {
+    if (\method_exists($handler, 'setModuleHandler')) {
       $handler->setModuleHandler($this->moduleHandler);
     }
-    if (method_exists($handler, 'setStringTranslation')) {
+    if (\method_exists($handler, 'setStringTranslation')) {
       $handler->setStringTranslation($this->stringTranslation);
     }
 

@@ -164,7 +164,7 @@ class OEmbedSourceTest extends MediaKernelTestBase {
 
     // The thumbnail directory should include the current date, as per the
     // default configuration of the oEmbed source plugin.
-    $date = date('Y-m', $this->container->get('datetime.time')->getRequestTime());
+    $date = \date('Y-m', $this->container->get('datetime.time')->getRequestTime());
 
     // The thumbnail should have a file extension, even if it wasn't in the URL.
     $expected_uri = "public://oembed_thumbnails/$date/this&that/" . Crypt::hashBase64($thumbnail_url) . ".$expected_extension";

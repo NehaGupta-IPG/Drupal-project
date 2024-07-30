@@ -167,7 +167,7 @@ class VariationCache implements VariationCacheInterface {
     // redirect. In case of the latter, we need to replace the overly specific
     // step with a simpler one.
     $chain = $this->getRedirectChain($keys, $initial_cacheability);
-    if (!array_key_exists($cid, $chain)) {
+    if (!\array_key_exists($cid, $chain)) {
       // We can easily find overly specific redirects by comparing their cache
       // contexts to the ones we have here. If a redirect has more or different
       // contexts, it needs to be replaced with a simplified version.
@@ -201,7 +201,7 @@ class VariationCache implements VariationCacheInterface {
       foreach ($chain as $chain_cid => $result) {
         if ($result && $result->data instanceof CacheRedirect) {
           $result_contexts = $result->data->getCacheContexts();
-          if (array_diff($result_contexts, $contexts)) {
+          if (\array_diff($result_contexts, $contexts)) {
             // Check whether we have an overlap scenario as we need to manually
             // create an extra redirect in that case.
             $common_contexts = array_intersect($result_contexts, $contexts);
@@ -441,10 +441,10 @@ class VariationCache implements VariationCacheInterface {
   protected function createCacheId(array $keys, CacheableMetadata &$cacheable_metadata) {
     if ($contexts = $cacheable_metadata->getCacheContexts()) {
       $context_cache_keys = $this->cacheContextsManager->convertTokensToKeys($contexts);
-      $keys = array_merge($keys, $context_cache_keys->getKeys());
+      $keys = \array_merge($keys, $context_cache_keys->getKeys());
       $cacheable_metadata = $cacheable_metadata->merge($context_cache_keys);
     }
-    return implode(':', $keys);
+    return \implode(':', $keys);
   }
 
   /**
@@ -464,9 +464,9 @@ class VariationCache implements VariationCacheInterface {
   protected function createCacheIdFast(array $keys, CacheableDependencyInterface $cacheability) {
     if ($contexts = $cacheability->getCacheContexts()) {
       $context_cache_keys = $this->cacheContextsManager->convertTokensToKeys($contexts);
-      $keys = array_merge($keys, $context_cache_keys->getKeys());
+      $keys = \array_merge($keys, $context_cache_keys->getKeys());
     }
-    return implode(':', $keys);
+    return \implode(':', $keys);
   }
 
   /**

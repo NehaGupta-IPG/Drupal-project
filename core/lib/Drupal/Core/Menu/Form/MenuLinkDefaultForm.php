@@ -70,7 +70,7 @@ class MenuLinkDefaultForm implements MenuLinkFormInterface, ContainerInjectionIn
     $this->stringTranslation = $string_translation;
     $this->moduleHandler = $module_handler;
     if ($this->moduleExtensionList === NULL) {
-      @trigger_error('Calling ' . __METHOD__ . '() without the $moduleExtensionList argument is deprecated in drupal:10.3.0 and will be required in drupal:12.0.0. See https://www.drupal.org/node/3310017', E_USER_DEPRECATED);
+      @\trigger_error('Calling ' . __METHOD__ . '() without the $moduleExtensionList argument is deprecated in drupal:10.3.0 and will be required in drupal:12.0.0. See https://www.drupal.org/node/3310017', E_USER_DEPRECATED);
       $this->moduleExtensionList = \Drupal::service('extension.list.module');
     }
   }
@@ -141,7 +141,7 @@ class MenuLinkDefaultForm implements MenuLinkFormInterface, ContainerInjectionIn
     $form['menu_parent']['#description'] = $this->t('The maximum depth for a link and all its children is fixed. Some menu links may not be available as parents if selecting them would exceed this limit.');
     $form['menu_parent']['#attributes']['class'][] = 'menu-title-select';
 
-    $delta = max(abs($this->menuLink->getWeight()), 50);
+    $delta = \max(\abs($this->menuLink->getWeight()), 50);
     $form['weight'] = [
       '#type' => 'number',
       '#min' => -$delta,
@@ -166,7 +166,7 @@ class MenuLinkDefaultForm implements MenuLinkFormInterface, ContainerInjectionIn
     $new_definition['enabled'] = $form_state->getValue('enabled') ? 1 : 0;
     $new_definition['weight'] = (int) $form_state->getValue('weight');
     $new_definition['expanded'] = $form_state->getValue('expanded') ? 1 : 0;
-    [$menu_name, $parent] = explode(':', $form_state->getValue('menu_parent'), 2);
+    [$menu_name, $parent] = \explode(':', $form_state->getValue('menu_parent'), 2);
     if (!empty($menu_name)) {
       $new_definition['menu_name'] = $menu_name;
     }

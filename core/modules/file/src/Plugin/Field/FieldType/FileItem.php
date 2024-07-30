@@ -192,7 +192,7 @@ class FileItem extends EntityReferenceItem {
     ];
 
     // Make the extension list a little more human-friendly by comma-separation.
-    $extensions = str_replace(' ', ', ', $settings['file_extensions']);
+    $extensions = \str_replace(' ', ', ', $settings['file_extensions']);
     $element['file_extensions'] = [
       '#type' => 'textfield',
       '#title' => $this->t('Allowed file extensions'),
@@ -241,7 +241,7 @@ class FileItem extends EntityReferenceItem {
    */
   public static function validateDirectory($element, FormStateInterface $form_state) {
     // Strip slashes from the beginning and end of $element['file_directory'].
-    $value = trim($element['#value'], '\\/');
+    $value = \trim($element['#value'], '\\/');
     $form_state->setValueForElement($element, $value);
   }
 
@@ -258,10 +258,10 @@ class FileItem extends EntityReferenceItem {
    */
   public static function validateExtensions($element, FormStateInterface $form_state) {
     if (!empty($element['#value'])) {
-      $extensions = preg_replace('/([, ]+\.?)/', ' ', trim(strtolower($element['#value'])));
-      $extension_array = array_unique(array_filter(explode(' ', $extensions)));
-      $extensions = implode(' ', $extension_array);
-      if (!preg_match('/^([a-z0-9]+([._][a-z0-9])* ?)+$/', $extensions)) {
+      $extensions = \preg_replace('/([, ]+\.?)/', ' ', \trim(\strtolower($element['#value'])));
+      $extension_array = \array_unique(\array_filter(\explode(' ', $extensions)));
+      $extensions = \implode(' ', $extension_array);
+      if (!\preg_match('/^([a-z0-9]+([._][a-z0-9])* ?)+$/', $extensions)) {
         $form_state->setError($element, new TranslatableMarkup("The list of allowed extensions is not valid. Allowed characters are a-z, 0-9, '.', and '_'. The first and last characters cannot be '.' or '_', and these two characters cannot appear next to each other. Separate extensions with a comma or space."));
       }
       else {
@@ -270,7 +270,7 @@ class FileItem extends EntityReferenceItem {
 
       // If insecure uploads are not allowed and txt is not in the list of
       // allowed extensions, ensure that no insecure extensions are allowed.
-      if (!in_array('txt', $extension_array, TRUE) && !\Drupal::config('system.file')->get('allow_insecure_uploads')) {
+      if (!\in_array('txt', $extension_array, TRUE) && !\Drupal::config('system.file')->get('allow_insecure_uploads')) {
         foreach ($extension_array as $extension) {
           if (preg_match(FileSystemInterface::INSECURE_EXTENSION_REGEX, 'test.' . $extension)) {
             $form_state->setError($element, new TranslatableMarkup('Add %txt_extension to the list of allowed extensions to securely upload files with a %extension extension. The %txt_extension extension will then be added automatically.', [
@@ -295,7 +295,7 @@ class FileItem extends EntityReferenceItem {
    * fieldSettingsForm().
    */
   public static function validateMaxFilesize($element, FormStateInterface $form_state) {
-    $element['#value'] = trim($element['#value']);
+    $element['#value'] = \trim($element['#value']);
     $form_state->setValue(['settings', 'max_filesize'], $element['#value']);
     if (!empty($element['#value']) && !Bytes::validate($element['#value'])) {
       $form_state->setError($element, new TranslatableMarkup('The "@name" option must contain a valid value. You may either leave the text field empty or enter a string like "512" (bytes), "80 KB" (kilobytes) or "50 MB" (megabytes).', ['@name' => $element['#title']]));
@@ -333,7 +333,7 @@ class FileItem extends EntityReferenceItem {
    * @see \Drupal\Core\Utility\Token::replace()
    */
   protected static function doGetUploadLocation(array $settings, $data = []) {
-    $destination = trim($settings['file_directory'], '/');
+    $destination = \trim($settings['file_directory'], '/');
 
     // Replace tokens. As the tokens might contain HTML we convert it to plain
     // text.

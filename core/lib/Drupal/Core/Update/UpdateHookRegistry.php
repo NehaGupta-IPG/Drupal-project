@@ -83,7 +83,7 @@ class UpdateHookRegistry {
     array $module_list,
     KeyValueFactoryInterface $key_value_factory,
   ) {
-    $this->enabledModules = array_keys($module_list);
+    $this->enabledModules = \array_keys($module_list);
     $this->keyValue = $key_value_factory->get('system.schema');
     $this->equivalentUpdates = $key_value_factory->get('core.equivalent_updates');
   }
@@ -106,7 +106,7 @@ class UpdateHookRegistry {
         $this->allAvailableSchemaVersions[$enabled_module] = [];
       }
 
-      $functions = get_defined_functions();
+      $functions = \get_defined_functions();
       // Narrow this down to functions ending with an integer, since all
       // hook_update_N() functions end this way, and there are other
       // possible functions which match '_update_'. We use preg_grep() here
@@ -116,15 +116,15 @@ class UpdateHookRegistry {
       foreach (preg_grep('/_\d+$/', $functions['user']) as $function) {
         // If this function is a module update function, add it to the list of
         // module updates.
-        if (preg_match(self::FUNC_NAME_REGEXP, $function, $matches)) {
+        if (\preg_match(self::FUNC_NAME_REGEXP, $function, $matches)) {
           $this->allAvailableSchemaVersions[$matches['module']][] = (int) $matches['version'];
         }
       }
       // Ensure that updates are applied in numerical order.
-      array_walk(
+      \array_walk(
         $this->allAvailableSchemaVersions,
         static function (&$module_updates) {
-          sort($module_updates, SORT_NUMERIC);
+          \sort($module_updates, SORT_NUMERIC);
         }
       );
     }
@@ -210,7 +210,7 @@ class UpdateHookRegistry {
     [$module, $ran_update_number] = $this->determineModuleAndVersion();
 
     if ($ran_update_number > $future_update_number) {
-      throw new \LogicException(sprintf(
+      throw new \LogicException(\sprintf(
         'Cannot mark the update %d as an equivalent since it is less than the current update %d for the %s module ',
         $future_update_number, $ran_update_number, $module
       ));
@@ -265,10 +265,10 @@ class UpdateHookRegistry {
    *   second value is the update number.
    */
   private function determineModuleAndVersion(): array {
-    $stack = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
+    $stack = \debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
 
-    for ($i = 0; $i < count($stack); $i++) {
-      if (preg_match(self::FUNC_NAME_REGEXP, $stack[$i]['function'], $matches)) {
+    for ($i = 0; $i < \count($stack); $i++) {
+      if (\preg_match(self::FUNC_NAME_REGEXP, $stack[$i]['function'], $matches)) {
         return [$matches['module'], $matches['version']];
       }
     }

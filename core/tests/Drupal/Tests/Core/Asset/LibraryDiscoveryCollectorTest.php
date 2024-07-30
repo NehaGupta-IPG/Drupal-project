@@ -220,7 +220,7 @@ class LibraryDiscoveryCollectorTest extends UnitTestCase {
       ]);
     $library_discovery_collector = new LibraryDiscoveryCollector($this->cache, $this->lock, $this->libraryDiscoveryParser, $this->themeManager);
     $libraries = $library_discovery_collector->get('test');
-    $this->assertSame(['foo.css', 'baz.css'], array_keys($libraries['test_3']['css']['theme']));
+    $this->assertSame(['foo.css', 'baz.css'], \array_keys($libraries['test_3']['css']['theme']));
   }
 
   /**

@@ -104,12 +104,12 @@ class CssCollectionOptimizerLazy implements AssetCollectionGroupOptimizerInterfa
     $query_args = [
       'language' => $this->languageManager->getCurrentLanguage()->getId(),
       'theme' => $this->themeManager->getActiveTheme()->getName(),
-      'include' => UrlHelper::compressQueryParameter(implode(',', $this->dependencyResolver->getMinimalRepresentativeSubset($libraries))),
+      'include' => UrlHelper::compressQueryParameter(\implode(',', $this->dependencyResolver->getMinimalRepresentativeSubset($libraries))),
     ];
     $ajax_page_state = $this->requestStack->getCurrentRequest()->get('ajax_page_state');
-    $already_loaded = isset($ajax_page_state) ? explode(',', $ajax_page_state['libraries']) : [];
+    $already_loaded = isset($ajax_page_state) ? \explode(',', $ajax_page_state['libraries']) : [];
     if ($already_loaded) {
-      $query_args['exclude'] = UrlHelper::compressQueryParameter(implode(',', $this->dependencyResolver->getMinimalRepresentativeSubset($already_loaded)));
+      $query_args['exclude'] = UrlHelper::compressQueryParameter(\implode(',', $this->dependencyResolver->getMinimalRepresentativeSubset($already_loaded)));
     }
 
     // Generate a URL for each group of assets, but do not process them inline,
@@ -170,9 +170,9 @@ class CssCollectionOptimizerLazy implements AssetCollectionGroupOptimizerInterfa
     $regexp = <<<'REGEXP'
 /@import\s*(?:'(?:\\'|.)*'|"(?:\\"|.)*"|url\(\s*(?:\\[\)\'\"]|[^'")])*\s*\)|url\(\s*'(?:\'|.)*'\s*\)|url\(\s*"(?:\"|.)*"\s*\)).*;/iU
 REGEXP;
-    preg_match_all($regexp, $data, $matches);
-    $data = preg_replace($regexp, '', $data);
-    return implode('', $matches[0]) . (!empty($matches[0]) ? "\n" : '') . $data;
+    \preg_match_all($regexp, $data, $matches);
+    $data = \preg_replace($regexp, '', $data);
+    return \implode('', $matches[0]) . (!empty($matches[0]) ? "\n" : '') . $data;
   }
 
 }

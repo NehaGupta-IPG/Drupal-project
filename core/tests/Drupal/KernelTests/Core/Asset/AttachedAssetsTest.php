@@ -212,11 +212,11 @@ class AttachedAssetsTest extends KernelTestBase {
     // Parse the generated drupalSettings <script> back to a PHP representation.
     $startToken = '{';
     $endToken = '}';
-    $start = strpos($rendered_js, $startToken);
-    $end = strrpos($rendered_js, $endToken);
+    $start = \strpos($rendered_js, $startToken);
+    $end = \strrpos($rendered_js, $endToken);
     // Convert to a string, as $renderer_js is a \Drupal\Core\Render\Markup
     // object.
-    $json = mb_substr($rendered_js, $start, $end - $start + 1);
+    $json = \mb_substr($rendered_js, $start, $end - $start + 1);
     $parsed_settings = Json::decode($json);
 
     // Test whether the settings for core/drupalSettings are available.
@@ -302,7 +302,7 @@ class AttachedAssetsTest extends KernelTestBase {
     $js_render_array = \Drupal::service('asset.js.collection_renderer')->render($js);
     $rendered_js = (string) $this->renderer->renderInIsolation($js_render_array);
     $matches = [];
-    if (preg_match_all('/weight_([-0-9]+_[0-9]+)/', $rendered_js, $matches)) {
+    if (\preg_match_all('/weight_([-0-9]+_[0-9]+)/', $rendered_js, $matches)) {
       $result = $matches[1];
     }
     else {
@@ -344,7 +344,7 @@ class AttachedAssetsTest extends KernelTestBase {
     $css_render_array = \Drupal::service('asset.css.collection_renderer')->render($css);
     $rendered_css = (string) $this->renderer->renderInIsolation($css_render_array);
     $matches = [];
-    if (preg_match_all('/([a-z]+)_weight_([-0-9]+_[0-9]+)/', $rendered_css, $matches)) {
+    if (\preg_match_all('/([a-z]+)_weight_([-0-9]+_[0-9]+)/', $rendered_css, $matches)) {
       $result = $matches[0];
     }
     else {
@@ -367,11 +367,11 @@ class AttachedAssetsTest extends KernelTestBase {
     $js_render_array = \Drupal::service('asset.js.collection_renderer')->render($js);
     $rendered_js = (string) $this->renderer->renderInIsolation($js_render_array);
     // Verify that lighter CSS assets are rendered first.
-    $this->assertLessThan(strpos($rendered_js, 'first.js'), strpos($rendered_js, 'lighter.css'));
+    $this->assertLessThan(\strpos($rendered_js, 'first.js'), \strpos($rendered_js, 'lighter.css'));
     // Verify that lighter JavaScript assets are rendered first.
-    $this->assertLessThan(strpos($rendered_js, 'first.js'), strpos($rendered_js, 'lighter.js'));
+    $this->assertLessThan(\strpos($rendered_js, 'first.js'), \strpos($rendered_js, 'lighter.js'));
     // Verify that a JavaScript file is rendered before jQuery.
-    $this->assertLessThan(strpos($rendered_js, 'core/assets/vendor/jquery/jquery.min.js'), strpos($rendered_js, 'before-jquery.js'));
+    $this->assertLessThan(\strpos($rendered_js, 'core/assets/vendor/jquery/jquery.min.js'), \strpos($rendered_js, 'before-jquery.js'));
   }
 
   /**
@@ -392,7 +392,7 @@ class AttachedAssetsTest extends KernelTestBase {
     $js_render_array = \Drupal::service('asset.js.collection_renderer')->render($js);
     $rendered_js = (string) $this->renderer->renderInIsolation($js_render_array);
     // Verify that JavaScript weight is correctly altered by the alter hook.
-    $this->assertLessThan(strpos($rendered_js, 'core/misc/tableselect.js'), strpos($rendered_js, 'alter.js'));
+    $this->assertLessThan(\strpos($rendered_js, 'core/misc/tableselect.js'), \strpos($rendered_js, 'alter.js'));
   }
 
   /**
@@ -465,8 +465,8 @@ class AttachedAssetsTest extends KernelTestBase {
     $js_render_array = \Drupal::service('asset.js.collection_renderer')->render($js);
     $rendered_js = (string) $this->renderer->renderInIsolation($js_render_array);
     $query_string = $this->container->get('asset.query_string')->get();
-    $this->assertStringContainsString('<link rel="stylesheet" media="all" href="' . str_replace('&', '&amp;', $this->fileUrlGenerator->generateString('core/modules/system/tests/modules/common_test/querystring.css?arg1=value1&arg2=value2')) . '&amp;' . $query_string . '" />', $rendered_css, 'CSS file with query string gets version query string correctly appended..');
-    $this->assertStringContainsString('<script src="' . str_replace('&', '&amp;', $this->fileUrlGenerator->generateString('core/modules/system/tests/modules/common_test/querystring.js?arg1=value1&arg2=value2')) . '&amp;' . $query_string . '"></script>', $rendered_js, 'JavaScript file with query string gets version query string correctly appended.');
+    $this->assertStringContainsString('<link rel="stylesheet" media="all" href="' . \str_replace('&', '&amp;', $this->fileUrlGenerator->generateString('core/modules/system/tests/modules/common_test/querystring.css?arg1=value1&arg2=value2')) . '&amp;' . $query_string . '" />', $rendered_css, 'CSS file with query string gets version query string correctly appended..');
+    $this->assertStringContainsString('<script src="' . \str_replace('&', '&amp;', $this->fileUrlGenerator->generateString('core/modules/system/tests/modules/common_test/querystring.js?arg1=value1&arg2=value2')) . '&amp;' . $query_string . '"></script>', $rendered_js, 'JavaScript file with query string gets version query string correctly appended.');
   }
 
   /**

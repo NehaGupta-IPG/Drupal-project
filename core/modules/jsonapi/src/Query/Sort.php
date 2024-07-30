@@ -97,7 +97,7 @@ class Sort {
     }
 
     // Expand a JSON:API compliant sort into a more expressive sort parameter.
-    if (is_string($parameter)) {
+    if (\is_string($parameter)) {
       $parameter = static::expandFieldString($parameter);
     }
 
@@ -120,12 +120,12 @@ class Sort {
    *   The expanded sort.
    */
   protected static function expandFieldString($fields) {
-    return array_map(function ($field) {
+    return \array_map(function ($field) {
       $sort = [];
 
       if ($field[0] == '-') {
         $sort[static::DIRECTION_KEY] = 'DESC';
-        $sort[static::PATH_KEY] = substr($field, 1);
+        $sort[static::PATH_KEY] = \substr($field, 1);
       }
       else {
         $sort[static::DIRECTION_KEY] = 'ASC';
@@ -133,7 +133,7 @@ class Sort {
       }
 
       return $sort;
-    }, explode(',', $fields));
+    }, \explode(',', $fields));
   }
 
   /**
@@ -162,10 +162,10 @@ class Sort {
       static::LANGUAGE_KEY,
     ];
 
-    $expanded = array_merge($defaults, $sort_item);
+    $expanded = \array_merge($defaults, $sort_item);
 
     // Verify correct sort keys.
-    if (count(array_diff($expected_keys, array_keys($expanded))) > 0) {
+    if (\count(\array_diff($expected_keys, \array_keys($expanded))) > 0) {
       throw new CacheableBadRequestHttpException($cacheability, 'You have provided an invalid set of sort keys.');
     }
 

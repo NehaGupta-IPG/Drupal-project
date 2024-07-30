@@ -18,7 +18,7 @@ class ProtocolVersionCacheContext extends RequestStackCacheContextBase implement
    * {@inheritdoc}
    */
   public static function getLabel() {
-    return t('Protocol version');
+    return \t('Protocol version');
   }
 
   /**

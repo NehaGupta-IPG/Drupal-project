@@ -173,7 +173,7 @@ class EntityResourceTest extends JsonapiKernelTestBase {
 
     // Give anonymous users permission to view user profiles, so that we can
     // verify the cache tags of cached versions of user profile pages.
-    array_map(function ($role_id) {
+    \array_map(function ($role_id) {
       Role::create([
         'id' => $role_id,
         'permissions' => [

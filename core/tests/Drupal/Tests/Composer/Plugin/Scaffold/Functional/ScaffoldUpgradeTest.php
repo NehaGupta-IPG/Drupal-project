@@ -92,7 +92,7 @@ class ScaffoldUpgradeTest extends TestCase {
 
     // Remove a scaffold file and run the scaffold command again to prove that
     // scaffolding is still working.
-    unlink("$sut/index.php");
+    \unlink("$sut/index.php");
     $stdout = $this->mustExec("composer scaffold", $sut);
     $this->assertStringContainsString("Scaffolding files for", $stdout);
     $this->assertFileExists("$sut/index.php");

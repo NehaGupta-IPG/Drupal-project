@@ -53,8 +53,8 @@ class StatusReport extends RenderElementBase {
     }
 
     // Order the grouped requirements by a set order.
-    $order = array_flip($element['#priorities']);
-    uksort($grouped_requirements, function ($a, $b) use ($order) {
+    $order = \array_flip($element['#priorities']);
+    \uksort($grouped_requirements, function ($a, $b) use ($order) {
       return $order[$a] <=> $order[$b];
     });
 

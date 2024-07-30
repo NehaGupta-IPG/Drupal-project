@@ -53,7 +53,7 @@ class FormattableMarkupTest extends TestCase {
   public function testCount(): void {
     $string = 'Can I have a @replacement';
     $formattable_string = new FormattableMarkup($string, ['@replacement' => 'kitten']);
-    $this->assertEquals(strlen($string), $formattable_string->count());
+    $this->assertEquals(\strlen($string), $formattable_string->count());
   }
 
   /**
@@ -85,7 +85,7 @@ class FormattableMarkupTest extends TestCase {
     $markup = new FormattableMarkup($string, $arguments);
     // Cast it to a string which will generate the errors.
     $output = (string) $markup;
-    restore_error_handler();
+    \restore_error_handler();
     // The string should not change.
     $this->assertEquals($string, $output);
     $this->assertEquals($error_number, $this->lastErrorNumber);

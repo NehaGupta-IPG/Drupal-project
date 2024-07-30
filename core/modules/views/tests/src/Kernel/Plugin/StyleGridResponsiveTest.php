@@ -49,15 +49,15 @@ class StyleGridResponsiveTest extends PluginKernelTestBase {
 
     // Confirm that the alignment class is added.
     $result = $this->xpath('//div[contains(@class, "views-view-responsive-grid") and contains(@class, :alignment)]', [':alignment' => 'views-view-responsive-grid--' . $expected['alignment']]);
-    $this->assertGreaterThan(0, count($result), "Alignment CSS variable value is detected and correct.");
+    $this->assertGreaterThan(0, \count($result), "Alignment CSS variable value is detected and correct.");
 
     // Check for CSS variables in style attribute.
     $result = $this->xpath('//div[contains(@class, "views-view-responsive-grid") and contains(@style, :columns)]', [':columns' => '--views-responsive-grid--column-count:' . $expected['columns']]);
-    $this->assertGreaterThan(0, count($result), "Max-columns CSS variable value is detected and correct.");
+    $this->assertGreaterThan(0, \count($result), "Max-columns CSS variable value is detected and correct.");
     $result = $this->xpath('//div[contains(@class, "views-view-responsive-grid") and contains(@style, :min-width)]', [':min-width' => '--views-responsive-grid--cell-min-width:' . $expected['cell_min_width'] . 'px']);
-    $this->assertGreaterThan(0, count($result), "Min-width CSS variable value is detected and correct.");
+    $this->assertGreaterThan(0, \count($result), "Min-width CSS variable value is detected and correct.");
     $result = $this->xpath('//div[contains(@class, "views-view-responsive-grid") and contains(@style, :gutter)]', [':gutter' => '--views-responsive-grid--layout-gap:' . $expected['grid_gutter'] . 'px']);
-    $this->assertGreaterThan(0, count($result), "Gutter CSS variable value is detected and correct.");
+    $this->assertGreaterThan(0, \count($result), "Gutter CSS variable value is detected and correct.");
 
     // Assert that the correct number of elements have been rendered and that
     // markup structure is correct.

@@ -146,7 +146,7 @@ class Fixtures extends FixturesBase {
    *   Output captured from tests that write to Fixtures::io().
    */
   public function runScaffold($cwd) {
-    chdir($cwd);
+    \chdir($cwd);
     $handler = new Handler($this->getComposer(), $this->io());
     $handler->scaffold();
     return $this->getOutput();

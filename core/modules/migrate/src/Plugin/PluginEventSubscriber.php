@@ -29,12 +29,12 @@ class PluginEventSubscriber implements EventSubscriberInterface {
 
     $source = $migration->getSourcePlugin();
     if ($source instanceof $plugin_interface) {
-      call_user_func([$source, $method], $event);
+      \call_user_func([$source, $method], $event);
     }
 
     $destination = $migration->getDestinationPlugin();
     if ($destination instanceof $plugin_interface) {
-      call_user_func([$destination, $method], $event);
+      \call_user_func([$destination, $method], $event);
     }
   }
 

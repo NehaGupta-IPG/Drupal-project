@@ -52,7 +52,7 @@ final class Announcement {
    *   Content of the announcement without markup.
    */
   public function getContent() {
-    return strip_tags($this->content_html);
+    return \strip_tags($this->content_html);
   }
 
   /**

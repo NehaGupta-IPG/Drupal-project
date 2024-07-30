@@ -272,7 +272,7 @@ abstract class NodeResourceTestBase extends EntityResourceTestBase {
     // Create node PATCH request.
     $request_options = [];
     $request_options[RequestOptions::HEADERS]['Content-Type'] = static::$mimeType;
-    $request_options = array_merge_recursive($request_options, $this->getAuthenticationRequestOptions('PATCH'));
+    $request_options = \array_merge_recursive($request_options, $this->getAuthenticationRequestOptions('PATCH'));
     $request_options[RequestOptions::BODY] = $this->serializer->encode($normalization, static::$format);
 
     // PATCH request: 403 when creating URL aliases unauthorized. Before

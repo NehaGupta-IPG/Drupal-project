@@ -102,7 +102,7 @@ class SecurityAdvisoryTest extends UnitTestCase {
     $data = $this->getValidData();
     unset($data[$missing_field]);
     $this->expectException(\UnexpectedValueException::class);
-    $expected_message = 'Malformed security advisory:.*' . preg_quote("[$missing_field]:", '/');
+    $expected_message = 'Malformed security advisory:.*' . \preg_quote("[$missing_field]:", '/');
     $expected_message .= '.*This field is missing';
     $this->expectExceptionMessageMatches("/$expected_message/s");
     SecurityAdvisory::createFromArray($data);
@@ -139,7 +139,7 @@ class SecurityAdvisoryTest extends UnitTestCase {
     // feed.
     $data[$invalid_field] = new \stdClass();
     $this->expectException(\UnexpectedValueException::class);
-    $expected_message = 'Malformed security advisory:.*' . preg_quote("[$invalid_field]:", '/');
+    $expected_message = 'Malformed security advisory:.*' . \preg_quote("[$invalid_field]:", '/');
     $expected_message .= ".*$expected_type_message";
     $this->expectExceptionMessageMatches("/$expected_message/s");
     SecurityAdvisory::createFromArray($data);

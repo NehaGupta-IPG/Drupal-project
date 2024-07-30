@@ -74,12 +74,12 @@ class ContextualController implements ContainerInjectionInterface {
 
     $rendered = [];
     foreach ($ids as $key => $id) {
-      if (!isset($tokens[$key]) || !hash_equals($tokens[$key], Crypt::hmacBase64($id, Settings::getHashSalt() . \Drupal::service('private_key')->get()))) {
+      if (!isset($tokens[$key]) || !\hash_equals($tokens[$key], Crypt::hmacBase64($id, Settings::getHashSalt() . \Drupal::service('private_key')->get()))) {
         throw new BadRequestHttpException('Invalid contextual ID specified.');
       }
       $element = [
         '#type' => 'contextual_links',
-        '#contextual_links' => _contextual_id_to_links($id),
+        '#contextual_links' => \_contextual_id_to_links($id),
       ];
       $rendered[$id] = $this->renderer->renderRoot($element);
     }

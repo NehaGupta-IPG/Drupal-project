@@ -78,7 +78,7 @@ class WorkflowTransitionAddForm extends EntityForm {
 
     // @todo https://www.drupal.org/node/2830584 Add some ajax to ensure that
     //   only valid transitions are selectable.
-    $states = array_map([State::class, 'labelCallback'], $workflow->getTypePlugin()->getStates());
+    $states = \array_map([State::class, 'labelCallback'], $workflow->getTypePlugin()->getStates());
     $form['from'] = [
       '#type' => 'checkboxes',
       '#title' => $this->t('From'),
@@ -141,7 +141,7 @@ class WorkflowTransitionAddForm extends EntityForm {
     }
     /** @var \Drupal\workflows\WorkflowInterface $entity */
     $values = $form_state->getValues();
-    $entity->getTypePlugin()->addTransition($values['id'], $values['label'], array_filter($values['from']), $values['to']);
+    $entity->getTypePlugin()->addTransition($values['id'], $values['label'], \array_filter($values['from']), $values['to']);
   }
 
   /**
@@ -153,7 +153,7 @@ class WorkflowTransitionAddForm extends EntityForm {
     $workflow_type = $workflow->getTypePlugin();
 
     $values = $form_state->getValues();
-    foreach (array_filter($values['from']) as $from_state_id) {
+    foreach (\array_filter($values['from']) as $from_state_id) {
       if ($workflow->getTypePlugin()->hasTransitionFromStateToState($from_state_id, $values['to'])) {
         $form_state->setErrorByName('from][' . $from_state_id, $this->t('The transition from %from to %to already exists.', [
           '%from' => $workflow->getTypePlugin()->getState($from_state_id)->label(),

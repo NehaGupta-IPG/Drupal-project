@@ -78,7 +78,7 @@ class EntityResolverManager {
       $controller = $defaults['_form'];
       // Check if the class exists and if so use the buildForm() method from the
       // interface.
-      if (class_exists($controller)) {
+      if (\class_exists($controller)) {
         return [$controller, 'buildForm'];
       }
     }
@@ -87,28 +87,28 @@ class EntityResolverManager {
       return NULL;
     }
 
-    if (!str_contains($controller, ':')) {
-      if (method_exists($controller, '__invoke')) {
+    if (!\str_contains($controller, ':')) {
+      if (\method_exists($controller, '__invoke')) {
         return [$controller, '__invoke'];
       }
-      if (function_exists($controller)) {
+      if (\function_exists($controller)) {
         return $controller;
       }
       return NULL;
     }
 
-    $count = substr_count($controller, ':');
+    $count = \substr_count($controller, ':');
     if ($count == 1) {
       // Controller in the service:method notation. Get the information from the
       // service. This is dangerous as the controller could depend on services
       // that could not exist at this point. There is however no other way to
       // do it, as the container does not allow static introspection.
-      [$class_or_service, $method] = explode(':', $controller, 2);
+      [$class_or_service, $method] = \explode(':', $controller, 2);
       return [$this->classResolver->getInstanceFromDefinition($class_or_service), $method];
     }
-    elseif (str_contains($controller, '::')) {
+    elseif (\str_contains($controller, '::')) {
       // Controller in the class::method notation.
-      return explode('::', $controller, 2);
+      return \explode('::', $controller, 2);
     }
 
     return NULL;
@@ -131,7 +131,7 @@ class EntityResolverManager {
 
     $result = FALSE;
 
-    if (is_array($controller)) {
+    if (\is_array($controller)) {
       [$instance, $method] = $controller;
       $reflection = new \ReflectionMethod($instance, $method);
     }
@@ -149,7 +149,7 @@ class EntityResolverManager {
         $entity_type = $entity_types[$parameter_name];
         $entity_class = $entity_type->getClass();
         $reflection_class = Reflection::getParameterClassName($parameter);
-        if ($reflection_class && (is_subclass_of($entity_class, $reflection_class) || $entity_class == $reflection_class)) {
+        if ($reflection_class && (\is_subclass_of($entity_class, $reflection_class) || $entity_class == $reflection_class)) {
           $parameter_definitions += [$parameter_name => []];
           $parameter_definitions[$parameter_name] += [
             'type' => 'entity:' . $parameter_name,
@@ -174,24 +174,24 @@ class EntityResolverManager {
    */
   protected function setParametersFromEntityInformation(Route $route) {
     if ($entity_view = $route->getDefault('_entity_view')) {
-      [$entity_type] = explode('.', $entity_view, 2);
+      [$entity_type] = \explode('.', $entity_view, 2);
     }
     elseif ($entity_form = $route->getDefault('_entity_form')) {
-      [$entity_type] = explode('.', $entity_form, 2);
+      [$entity_type] = \explode('.', $entity_form, 2);
     }
 
     // Do not add parameter information if the route does not declare a
     // parameter in the first place. This is the case for add forms, for
     // example.
-    if (isset($entity_type) && isset($this->getEntityTypes()[$entity_type]) && str_contains($route->getPath(), '{' . $entity_type . '}')) {
+    if (isset($entity_type) && isset($this->getEntityTypes()[$entity_type]) && \str_contains($route->getPath(), '{' . $entity_type . '}')) {
       $parameter_definitions = $route->getOption('parameters') ?: [];
 
       // First try to figure out whether there is already a parameter upcasting
       // the same entity type already.
       foreach ($parameter_definitions as $info) {
-        if (isset($info['type']) && str_starts_with($info['type'], 'entity:')) {
+        if (isset($info['type']) && \str_starts_with($info['type'], 'entity:')) {
           // The parameter types are in the form 'entity:$entity_type'.
-          [, $parameter_entity_type] = explode(':', $info['type'], 2);
+          [, $parameter_entity_type] = \explode(':', $info['type'], 2);
           if ($parameter_entity_type == $entity_type) {
             return;
           }

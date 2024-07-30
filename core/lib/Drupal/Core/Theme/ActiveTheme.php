@@ -219,7 +219,7 @@ class ActiveTheme {
    * @see system_region_list()
    */
   public function getRegions() {
-    return array_keys($this->regions);
+    return \array_keys($this->regions);
   }
 
   /**

@@ -194,7 +194,7 @@ abstract class FormTestBase extends UnitTestCase {
       ->setConstructorArgs([$this->requestStack, $this->urlGenerator, $this->redirectResponseSubscriber])
       ->onlyMethods(['batchGet'])
       ->getMock();
-    $this->root = dirname(substr(__DIR__, 0, -strlen(__NAMESPACE__)), 2);
+    $this->root = \dirname(\substr(__DIR__, 0, -\strlen(__NAMESPACE__)), 2);
 
     $this->formBuilder = new FormBuilder($this->formValidator, $this->formSubmitter, $this->formCache, $this->moduleHandler, $this->eventDispatcher, $this->requestStack, $this->classResolver, $this->elementInfo, $this->themeManager, $this->csrfToken);
   }
@@ -280,7 +280,7 @@ abstract class FormTestBase extends UnitTestCase {
   protected function assertFormElement(array $expected_form, array $actual_form, $form_key = NULL) {
     $expected_element = $form_key ? $expected_form[$form_key] : $expected_form;
     $actual_element = $form_key ? $actual_form[$form_key] : $actual_form;
-    $this->assertSame(array_intersect_key($expected_element, $actual_element), $expected_element);
+    $this->assertSame(\array_intersect_key($expected_element, $actual_element), $expected_element);
   }
 
   /**

@@ -49,7 +49,7 @@ class TestDatabase {
       // It is possible that we're running a test inside a test. In which case
       // $db_prefix will be something like test12345678test90123456 and the
       // generated lock ID for the running test method would be 90123456.
-      preg_match('/test(\d+)$/', $db_prefix, $matches);
+      \preg_match('/test(\d+)$/', $db_prefix, $matches);
       if (!isset($matches[1])) {
         throw new \InvalidArgumentException("Invalid database prefix: $db_prefix");
       }
@@ -91,13 +91,13 @@ class TestDatabase {
     // would cause different tests to try to use the same database prefix.
     // Therefore, if running with a concurrency of greater than 1, we need to
     // create a lock.
-    if (getenv('RUN_TESTS_CONCURRENCY') > 1) {
+    if (\getenv('RUN_TESTS_CONCURRENCY') > 1) {
       $create_lock = TRUE;
     }
 
     do {
-      $lock_id = mt_rand(10000000, 99999999);
-      if ($create_lock && @symlink(__FILE__, $this->getLockFile($lock_id)) === FALSE) {
+      $lock_id = \mt_rand(10000000, 99999999);
+      if ($create_lock && @\symlink(__FILE__, $this->getLockFile($lock_id)) === FALSE) {
         // If we can't create a symlink, the lock ID is in use. Generate another
         // one. Symlinks are used because they are atomic and reliable.
         $lock_id = NULL;
@@ -113,7 +113,7 @@ class TestDatabase {
    *   TRUE if successful, FALSE if not.
    */
   public function releaseLock(): bool {
-    return unlink($this->getLockFile($this->lockId));
+    return \unlink($this->getLockFile($this->lockId));
   }
 
   /**
@@ -123,14 +123,14 @@ class TestDatabase {
    */
   public static function releaseAllTestLocks(): void {
     $tmp = FileSystem::getOsTemporaryDirectory();
-    $dir = dir($tmp);
+    $dir = \dir($tmp);
     while (($entry = $dir->read()) !== FALSE) {
       if ($entry === '.' || $entry === '..') {
         continue;
       }
       $entry_path = $tmp . '/' . $entry;
-      if (preg_match('/^test_\d+/', $entry) && is_link($entry_path)) {
-        unlink($entry_path);
+      if (\preg_match('/^test_\d+/', $entry) && \is_link($entry_path)) {
+        \unlink($entry_path);
       }
     }
   }

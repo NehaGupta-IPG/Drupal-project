@@ -135,7 +135,7 @@ abstract class ImageToolkitBase extends PluginBase implements ImageToolkitInterf
         '@toolkit' => $this->getPluginId(),
         '@operation' => $operation,
         '@image' => $this->getSource(),
-        '@class' => get_class($t),
+        '@class' => \get_class($t),
         '@message' => $t->getMessage(),
       ]);
       return FALSE;

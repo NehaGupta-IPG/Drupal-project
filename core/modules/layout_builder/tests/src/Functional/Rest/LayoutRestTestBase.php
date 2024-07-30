@@ -105,7 +105,7 @@ abstract class LayoutRestTestBase extends ResourceTestBase {
    * {@inheritdoc}
    */
   protected function setUpAuthorization($method) {
-    $permissions = array_keys($this->container->get('user.permissions')->getPermissions());
+    $permissions = \array_keys($this->container->get('user.permissions')->getPermissions());
     // Give the test user all permissions on the site. There should be no
     // permission that gives the user access to layout sections over REST.
     $this->account = $this->drupalCreateUser($permissions);

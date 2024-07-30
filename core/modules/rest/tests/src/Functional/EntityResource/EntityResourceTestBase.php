@@ -342,7 +342,7 @@ abstract class EntityResourceTestBase extends ResourceTestBase {
       'DELETE' => 'delete',
     ];
     $operation = $http_method_to_entity_operation[$method];
-    $message = sprintf('You are not authorized to %s this %s entity', $operation, $this->entity->getEntityTypeId());
+    $message = \sprintf('You are not authorized to %s this %s entity', $operation, $this->entity->getEntityTypeId());
 
     if ($this->entity->bundle() !== $this->entity->getEntityTypeId()) {
       $message .= ' of bundle ' . $this->entity->bundle();
@@ -556,11 +556,11 @@ abstract class EntityResourceTestBase extends ResourceTestBase {
       $this->assertCount(0, $cache_items);
     }
     else {
-      $this->assertLessThanOrEqual(2, count($cache_items));
+      $this->assertLessThanOrEqual(2, \count($cache_items));
       $found_cached_200_response = FALSE;
       $other_cached_responses_are_4xx = TRUE;
       foreach ($cache_items as $cache_item) {
-        $cached_response = unserialize($cache_item->data);
+        $cached_response = \unserialize($cache_item->data);
         if (!$cached_response instanceof CacheRedirect) {
           if ($cached_response->getStatusCode() === 200) {
             $found_cached_200_response = TRUE;
@@ -590,7 +590,7 @@ abstract class EntityResourceTestBase extends ResourceTestBase {
     // Note: deserialization of the XML format is not supported, so only test
     // this for other formats.
     if (static::$format !== 'xml') {
-      $unserialized = $this->serializer->deserialize((string) $response->getBody(), get_class($this->entity), static::$format);
+      $unserialized = $this->serializer->deserialize((string) $response->getBody(), \get_class($this->entity), static::$format);
       $this->assertSame($unserialized->uuid(), $this->entity->uuid());
 
     }
@@ -598,20 +598,20 @@ abstract class EntityResourceTestBase extends ResourceTestBase {
     if ($this->entity->getEntityType()->getLinkTemplates()) {
       $this->assertArrayHasKey('Link', $response->getHeaders());
       $link_relation_type_manager = $this->container->get('plugin.manager.link_relation_type');
-      $expected_link_relation_headers = array_map(function ($relation_name) use ($link_relation_type_manager) {
+      $expected_link_relation_headers = \array_map(function ($relation_name) use ($link_relation_type_manager) {
         $link_relation_type = $link_relation_type_manager->createInstance($relation_name);
         return $link_relation_type->isRegistered()
           ? $link_relation_type->getRegisteredName()
           : $link_relation_type->getExtensionUri();
-      }, array_keys($this->entity->getEntityType()->getLinkTemplates()));
+      }, \array_keys($this->entity->getEntityType()->getLinkTemplates()));
       $parse_rel_from_link_header = function ($value) {
         $matches = [];
-        if (preg_match('/rel="([^"]+)"/', $value, $matches) === 1) {
+        if (\preg_match('/rel="([^"]+)"/', $value, $matches) === 1) {
           return $matches[1];
         }
         return FALSE;
       };
-      $this->assertSame($expected_link_relation_headers, array_map($parse_rel_from_link_header, $response->getHeader('Link')));
+      $this->assertSame($expected_link_relation_headers, \array_map($parse_rel_from_link_header, $response->getHeader('Link')));
     }
     $get_headers = $response->getHeaders();
 
@@ -630,7 +630,7 @@ abstract class EntityResourceTestBase extends ResourceTestBase {
     ];
     $header_cleaner = function ($headers) use ($ignored_headers) {
       foreach ($headers as $header => $value) {
-        if (str_starts_with($header, 'X-Drupal-Assertion-') || in_array($header, $ignored_headers)) {
+        if (\str_starts_with($header, 'X-Drupal-Assertion-') || \in_array($header, $ignored_headers)) {
           unset($headers[$header]);
         }
       }
@@ -701,13 +701,13 @@ abstract class EntityResourceTestBase extends ResourceTestBase {
    */
   protected static function castToString(array $normalization) {
     foreach ($normalization as $key => $value) {
-      if (is_bool($value)) {
+      if (\is_bool($value)) {
         $normalization[$key] = (string) (int) $value;
       }
-      elseif (is_int($value) || is_float($value)) {
+      elseif (\is_int($value) || \is_float($value)) {
         $normalization[$key] = (string) $value;
       }
-      elseif (is_array($value)) {
+      elseif (\is_array($value)) {
         $normalization[$key] = static::castToString($value);
       }
     }
@@ -848,7 +848,7 @@ abstract class EntityResourceTestBase extends ResourceTestBase {
     }
     $this->assertSame([], $response->getHeader('X-Drupal-Cache-Max-Age'));
     // If the entity is stored, perform extra checks.
-    if (get_class($this->entityStorage) !== ContentEntityNullStorage::class) {
+    if (\get_class($this->entityStorage) !== ContentEntityNullStorage::class) {
       // Assert that the entity was indeed created, and that the response body
       // contains the serialized created entity.
       $created_entity = $this->entityStorage->loadUnchanged(static::$firstCreatedEntityId);
@@ -882,7 +882,7 @@ abstract class EntityResourceTestBase extends ResourceTestBase {
       $response = $this->request('POST', $url, $request_options);
       $this->assertResourceResponse(201, FALSE, $response);
       $entities = $this->entityStorage->loadByProperties([$created_entity->getEntityType()->getKey('uuid') => $new_uuid]);
-      $new_entity = reset($entities);
+      $new_entity = \reset($entities);
       $this->assertNotNull($new_entity);
       $new_entity->delete();
     }
@@ -1224,7 +1224,7 @@ abstract class EntityResourceTestBase extends ResourceTestBase {
 
       // DX: 422 when no entity type bundle is specified.
       $response = $this->request($method, $url, $request_options);
-      $this->assertResourceErrorResponse(422, sprintf('Could not determine entity type bundle: "%s" field is missing.', $bundle_field_name), $response);
+      $this->assertResourceErrorResponse(422, \sprintf('Could not determine entity type bundle: "%s" field is missing.', $bundle_field_name), $response);
     }
   }
 
@@ -1233,10 +1233,10 @@ abstract class EntityResourceTestBase extends ResourceTestBase {
    */
   protected function assertPatchProtectedFieldNamesStructure() {
     $is_null_or_string = function ($value) {
-      return is_null($value) || is_string($value);
+      return \is_null($value) || \is_string($value);
     };
     $this->assertTrue(
-      Inspector::assertAllStrings(array_keys(static::$patchProtectedFieldNames)),
+      Inspector::assertAllStrings(\array_keys(static::$patchProtectedFieldNames)),
       'In Drupal 8.6, the structure of $patchProtectedFieldNames changed. It used to be an array with field names as values. Now those values are the keys, and their values should be either NULL or a string: a string containing the reason for why the field cannot be PATCHed, or NULL otherwise.'
     );
     $this->assertTrue(
@@ -1287,7 +1287,7 @@ abstract class EntityResourceTestBase extends ResourceTestBase {
   protected static function getModifiedEntityForPatchTesting(EntityInterface $entity) {
     $modified_entity = clone $entity;
     $original_values = [];
-    foreach (array_keys(static::$patchProtectedFieldNames) as $field_name) {
+    foreach (\array_keys(static::$patchProtectedFieldNames) as $field_name) {
       $field = $modified_entity->get($field_name);
       $original_values[$field_name] = $field->getValue();
       switch ($field->getItemDefinition()->getClass()) {
@@ -1308,7 +1308,7 @@ abstract class EntityResourceTestBase extends ResourceTestBase {
           // PathItem::generateSampleValue() doesn't set a PID, which causes
           // PathItem::postSave() to fail. Keep the PID (and other properties),
           // just modify the alias.
-          $field->alias = str_replace(' ', '-', strtolower((new Random())->sentences(3)));
+          $field->alias = \str_replace(' ', '-', \strtolower((new Random())->sentences(3)));
           break;
 
         default:
@@ -1384,7 +1384,7 @@ abstract class EntityResourceTestBase extends ResourceTestBase {
       $actual_link_header = $response->getHeader('Link');
       if ($actual_link_header) {
         $this->assertIsArray($actual_link_header);
-        $expected_type = explode(';', static::$mimeType)[0];
+        $expected_type = \explode(';', static::$mimeType)[0];
         $this->assertStringContainsString('?_format=' . static::$format . '>; rel="alternate"; type="' . $expected_type . '"', $actual_link_header[0]);
         $this->assertStringContainsString('?_format=foobar>; rel="alternate"', $actual_link_header[0]);
       }
@@ -1438,7 +1438,7 @@ abstract class EntityResourceTestBase extends ResourceTestBase {
           foreach ($field_normalization as $delta => $expected_field_item_normalization) {
             foreach ($property_definitions as $property_name => $property_definition) {
               // Not every property is required to be sent.
-              if (!array_key_exists($property_name, $field_normalization[$delta])) {
+              if (!\array_key_exists($property_name, $field_normalization[$delta])) {
                 continue;
               }
               // Computed properties are not stored.
@@ -1474,7 +1474,7 @@ abstract class EntityResourceTestBase extends ResourceTestBase {
    */
   protected function assertEntityArraySubset($expected, $actual) {
     foreach ($expected as $key => $value) {
-      if (is_array($value)) {
+      if (\is_array($value)) {
         $this->assertEntityArraySubset($value, $actual[$key]);
       }
       else {

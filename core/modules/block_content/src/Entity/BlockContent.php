@@ -209,23 +209,23 @@ class BlockContent extends EditorialContentEntityBase implements BlockContentInt
     /** @var \Drupal\Core\Field\BaseFieldDefinition[] $fields */
     $fields = parent::baseFieldDefinitions($entity_type);
 
-    $fields['id']->setLabel(t('Content block ID'))
-      ->setDescription(t('The content block ID.'));
+    $fields['id']->setLabel(\t('Content block ID'))
+      ->setDescription(\t('The content block ID.'));
 
-    $fields['uuid']->setDescription(t('The content block UUID.'));
+    $fields['uuid']->setDescription(\t('The content block UUID.'));
 
-    $fields['revision_id']->setDescription(t('The revision ID.'));
+    $fields['revision_id']->setDescription(\t('The revision ID.'));
 
-    $fields['langcode']->setDescription(t('The content block language code.'));
+    $fields['langcode']->setDescription(\t('The content block language code.'));
 
-    $fields['type']->setLabel(t('Block type'))
-      ->setDescription(t('The block type.'));
+    $fields['type']->setLabel(\t('Block type'))
+      ->setDescription(\t('The block type.'));
 
-    $fields['revision_log']->setDescription(t('The log entry explaining the changes in this revision.'));
+    $fields['revision_log']->setDescription(\t('The log entry explaining the changes in this revision.'));
 
     $fields['info'] = BaseFieldDefinition::create('string')
-      ->setLabel(t('Block description'))
-      ->setDescription(t('A brief description of your block.'))
+      ->setLabel(\t('Block description'))
+      ->setDescription(\t('A brief description of your block.'))
       ->setRevisionable(TRUE)
       ->setTranslatable(TRUE)
       ->setRequired(TRUE)
@@ -236,14 +236,14 @@ class BlockContent extends EditorialContentEntityBase implements BlockContentInt
       ->setDisplayConfigurable('form', TRUE);
 
     $fields['changed'] = BaseFieldDefinition::create('changed')
-      ->setLabel(t('Changed'))
-      ->setDescription(t('The time that the content block was last edited.'))
+      ->setLabel(\t('Changed'))
+      ->setDescription(\t('The time that the content block was last edited.'))
       ->setTranslatable(TRUE)
       ->setRevisionable(TRUE);
 
     $fields['reusable'] = BaseFieldDefinition::create('boolean')
-      ->setLabel(t('Reusable'))
-      ->setDescription(t('A boolean indicating whether this block is reusable.'))
+      ->setLabel(\t('Reusable'))
+      ->setDescription(\t('A boolean indicating whether this block is reusable.'))
       ->setTranslatable(FALSE)
       ->setRevisionable(FALSE)
       ->setDefaultValue(TRUE);

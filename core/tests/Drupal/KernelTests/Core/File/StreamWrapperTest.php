@@ -66,10 +66,10 @@ class StreamWrapperTest extends FileTestBase {
    */
   public function testGetInstanceByScheme(): void {
     $instance = \Drupal::service('stream_wrapper_manager')->getViaScheme($this->scheme);
-    $this->assertEquals($this->classname, get_class($instance), 'Got correct class type for dummy scheme.');
+    $this->assertEquals($this->classname, \get_class($instance), 'Got correct class type for dummy scheme.');
 
     $instance = \Drupal::service('stream_wrapper_manager')->getViaScheme('public');
-    $this->assertEquals('Drupal\Core\StreamWrapper\PublicStream', get_class($instance), 'Got correct class type for public scheme.');
+    $this->assertEquals('Drupal\Core\StreamWrapper\PublicStream', \get_class($instance), 'Got correct class type for public scheme.');
   }
 
   /**
@@ -80,10 +80,10 @@ class StreamWrapperTest extends FileTestBase {
     $stream_wrapper_manager = \Drupal::service('stream_wrapper_manager');
 
     $instance = $stream_wrapper_manager->getViaUri($this->scheme . '://foo');
-    $this->assertEquals($this->classname, get_class($instance), 'Got correct class type for dummy URI.');
+    $this->assertEquals($this->classname, \get_class($instance), 'Got correct class type for dummy URI.');
 
     $instance = $stream_wrapper_manager->getViaUri('public://foo');
-    $this->assertEquals('Drupal\Core\StreamWrapper\PublicStream', get_class($instance), 'Got correct class type for public URI.');
+    $this->assertEquals('Drupal\Core\StreamWrapper\PublicStream', \get_class($instance), 'Got correct class type for public URI.');
 
     // Test file_uri_target().
     $this->assertEquals('foo/bar.txt', $stream_wrapper_manager::getTarget('public://foo/bar.txt'), 'Got a valid stream target from public://foo/bar.txt.');
@@ -95,14 +95,14 @@ class StreamWrapperTest extends FileTestBase {
     // Test Drupal\Core\StreamWrapper\LocalStream::getDirectoryPath().
     $this->assertEquals(PublicStream::basePath(), $stream_wrapper_manager->getViaScheme('public')->getDirectoryPath(), 'Expected default directory path was returned.');
     $file_system = \Drupal::service('file_system');
-    assert($file_system instanceof FileSystemInterface);
+    \assert($file_system instanceof FileSystemInterface);
     $this->assertEquals($file_system->getTempDirectory(), $stream_wrapper_manager->getViaScheme('temporary')->getDirectoryPath(), 'Expected temporary directory path was returned.');
 
     // Test FileUrlGeneratorInterface::generateString()
     // TemporaryStream::getExternalUrl() uses Url::fromRoute(), which needs
     // route information to work.
     $file_url_generator = $this->container->get('file_url_generator');
-    assert($file_url_generator instanceof FileUrlGeneratorInterface);
+    \assert($file_url_generator instanceof FileUrlGeneratorInterface);
     $this->assertStringContainsString('system/temporary?file=test.txt', $file_url_generator->generateString('temporary://test.txt'), 'Temporary external URL correctly built.');
     $this->assertStringContainsString(Settings::get('file_public_path') . '/test.txt', $file_url_generator->generateString('public://test.txt'), 'Public external URL correctly built.');
     $this->assertStringContainsString('system/files/test.txt', $file_url_generator->generateString('private://test.txt'), 'Private external URL correctly built.');
@@ -113,31 +113,31 @@ class StreamWrapperTest extends FileTestBase {
    */
   public function testFileFunctions(): void {
     $filename = 'public://' . $this->randomMachineName();
-    file_put_contents($filename, str_repeat('d', 1000));
+    \file_put_contents($filename, \str_repeat('d', 1000));
 
     // Open for rw and place pointer at beginning of file so select will return.
-    $handle = fopen($filename, 'c+');
+    $handle = \fopen($filename, 'c+');
     $this->assertNotFalse($handle, 'Able to open a file for appending, reading and writing.');
 
     // Attempt to change options on the file stream: should all fail.
-    $this->assertFalse(@stream_set_blocking($handle, FALSE), 'Unable to set to non blocking using a local stream wrapper.');
-    $this->assertFalse(@stream_set_blocking($handle, TRUE), 'Unable to set to blocking using a local stream wrapper.');
-    $this->assertFalse(@stream_set_timeout($handle, 1), 'Unable to set read time out using a local stream wrapper.');
-    $this->assertEquals(-1 /*EOF*/, @stream_set_write_buffer($handle, 512), 'Unable to set write buffer using a local stream wrapper.');
+    $this->assertFalse(@\stream_set_blocking($handle, FALSE), 'Unable to set to non blocking using a local stream wrapper.');
+    $this->assertFalse(@\stream_set_blocking($handle, TRUE), 'Unable to set to blocking using a local stream wrapper.');
+    $this->assertFalse(@\stream_set_timeout($handle, 1), 'Unable to set read time out using a local stream wrapper.');
+    $this->assertEquals(-1 /*EOF*/, @\stream_set_write_buffer($handle, 512), 'Unable to set write buffer using a local stream wrapper.');
 
     // This will test stream_cast().
     $read = [$handle];
     $write = NULL;
     $except = NULL;
-    $this->assertEquals(1, stream_select($read, $write, $except, 0), 'Able to cast a stream via stream_select.');
+    $this->assertEquals(1, \stream_select($read, $write, $except, 0), 'Able to cast a stream via stream_select.');
 
     // This will test stream_truncate().
-    $this->assertEquals(1, ftruncate($handle, 0), 'Able to truncate a stream via ftruncate().');
-    fclose($handle);
-    $this->assertEquals(0, filesize($filename), 'Able to truncate a stream.');
+    $this->assertEquals(1, \ftruncate($handle, 0), 'Able to truncate a stream via ftruncate().');
+    \fclose($handle);
+    $this->assertEquals(0, \filesize($filename), 'Able to truncate a stream.');
 
     // Cleanup.
-    unlink($filename);
+    \unlink($filename);
   }
 
   /**

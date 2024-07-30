@@ -79,7 +79,7 @@ class PluginExistsConstraint extends SymfonyConstraint implements ContainerFacto
   public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
     $plugin_manager_id = $configuration['manager'] ?? $configuration['value'] ?? NULL;
     if ($plugin_manager_id === NULL) {
-      throw new MissingOptionsException(sprintf('The option "manager" must be set for constraint "%s".', static::class), ['manager']);
+      throw new MissingOptionsException(\sprintf('The option "manager" must be set for constraint "%s".', static::class), ['manager']);
     }
     return new static($container->get($plugin_manager_id), $configuration);
   }

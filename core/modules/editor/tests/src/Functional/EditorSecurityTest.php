@@ -421,7 +421,7 @@ class EditorSecurityTest extends BrowserTestBase {
         ];
         $client = $this->getHttpClient();
         $response = $client->post($this->buildUrl('/editor/filter_xss/' . $format), [
-          'body' => http_build_query($post),
+          'body' => \http_build_query($post),
           'cookies' => $cookies,
           'headers' => [
             'Accept' => 'application/json',

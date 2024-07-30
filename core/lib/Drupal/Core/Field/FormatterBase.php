@@ -122,7 +122,7 @@ abstract class FormatterBase extends PluginSettingsBase implements FormatterInte
         '#third_party_settings' => $this->getThirdPartySettings(),
       ];
 
-      $elements = array_merge($info, $elements);
+      $elements = \array_merge($info, $elements);
     }
 
     return $elements;

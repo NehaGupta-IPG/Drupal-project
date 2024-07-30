@@ -430,10 +430,10 @@ class MenuTreeStorageTest extends KernelTestBase {
     }
     $all = $query->execute()->fetchAll(FetchAs::Associative);
     $this->assertCount(1, $all, "Found link $id matching all the expected properties");
-    $raw = reset($all);
+    $raw = \reset($all);
 
     // Put the current link onto the front.
-    array_unshift($parents, $raw['id']);
+    \array_unshift($parents, $raw['id']);
 
     $query = $this->connection->select('menu_tree');
     $query->fields('menu_tree', ['id', 'mlid']);
@@ -444,21 +444,21 @@ class MenuTreeStorageTest extends KernelTestBase {
     $this->assertCount((int) $raw['depth'], $found_parents, 'Number of parents is the same as the depth');
 
     $materialized_path = $this->treeStorage->getRootPathIds($id);
-    $this->assertEquals(array_values($parents), array_values($materialized_path), 'Parents match the materialized path');
+    $this->assertEquals(\array_values($parents), \array_values($materialized_path), 'Parents match the materialized path');
     // Check that the selected mlid values of the parents are in the correct
     // column, including the link's own.
     for ($i = $raw['depth']; $i >= 1; $i--) {
-      $parent_id = array_shift($parents);
+      $parent_id = \array_shift($parents);
       $this->assertEquals($found_parents[$parent_id], $raw["p{$i}"], "mlid of parent matches at column p{$i}");
     }
     for ($i = $raw['depth'] + 1; $i <= $this->treeStorage->maxDepth(); $i++) {
       $this->assertEquals(0, $raw["p{$i}"], "parent is 0 at column p{$i} greater than depth");
     }
     if ($parents) {
-      $this->assertEquals(end($parents), $raw['parent'], 'Ensure that the parent field is set properly');
+      $this->assertEquals(\end($parents), $raw['parent'], 'Ensure that the parent field is set properly');
     }
     // Verify that the child IDs match.
-    $this->assertEqualsCanonicalizing($children, array_keys($this->treeStorage->loadAllChildren($id)));
+    $this->assertEqualsCanonicalizing($children, \array_keys($this->treeStorage->loadAllChildren($id)));
   }
 
 }

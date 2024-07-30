@@ -71,7 +71,7 @@ class ListStringItem extends ListItemBase {
    * {@inheritdoc}
    */
   protected static function validateAllowedValue($option) {
-    if (mb_strlen($option) > 255) {
+    if (\mb_strlen($option) > 255) {
       return new TranslatableMarkup('Allowed values list: each key must be a string at most 255 characters long.');
     }
     return NULL;
@@ -99,7 +99,7 @@ class ListStringItem extends ListItemBase {
       $element['allowed_values']['table'][$delta]['item']['key']['#machine_name'] = [
         'exists' => [static::class, 'exists'],
       ];
-      $element['allowed_values']['table'][$delta]['item']['key']['#process'] = array_merge(
+      $element['allowed_values']['table'][$delta]['item']['key']['#process'] = \array_merge(
         [[static::class, 'processAllowedValuesKey']],
         // Workaround for https://drupal.org/i/1300290#comment-12873635.
         \Drupal::service('plugin.manager.element_info')->getInfoProperty('machine_name', '#process', []),
@@ -118,7 +118,7 @@ class ListStringItem extends ListItemBase {
    */
   public static function processAllowedValuesKey(array &$element): array {
     $parents = $element['#parents'];
-    array_pop($parents);
+    \array_pop($parents);
     $parents[] = 'label';
     $element['#machine_name']['source'] = $parents;
 

@@ -70,7 +70,7 @@ trait CookieResourceTestTrait {
     $response = $this->request('POST', $user_login_url, $request_options);
 
     // Parse and store the session cookie.
-    $this->sessionCookie = explode(';', $response->getHeader('Set-Cookie')[0], 2)[0];
+    $this->sessionCookie = \explode(';', $response->getHeader('Set-Cookie')[0], 2)[0];
 
     // Parse and store the CSRF token and logout token.
     $data = $this->serializer->decode((string) $response->getBody(), static::$format);
@@ -84,7 +84,7 @@ trait CookieResourceTestTrait {
   protected function getAuthenticationRequestOptions($method) {
     $request_options[RequestOptions::HEADERS]['Cookie'] = $this->sessionCookie;
     // @see https://www.w3.org/Protocols/rfc2616/rfc2616-sec9.html
-    if (!in_array($method, ['HEAD', 'GET', 'OPTIONS', 'TRACE'])) {
+    if (!\in_array($method, ['HEAD', 'GET', 'OPTIONS', 'TRACE'])) {
       $request_options[RequestOptions::HEADERS]['X-CSRF-Token'] = $this->csrfToken;
     }
     return $request_options;
@@ -108,7 +108,7 @@ trait CookieResourceTestTrait {
       //   to cacheable anonymous responses: it updates their cacheability.
       // - A 403 response to a GET request is cacheable.
       // Therefore we must update our cacheability expectations accordingly.
-      if (in_array('user.permissions', $expected_cookie_403_cacheability->getCacheContexts(), TRUE)) {
+      if (\in_array('user.permissions', $expected_cookie_403_cacheability->getCacheContexts(), TRUE)) {
         $expected_cookie_403_cacheability->addCacheTags(['config:user.role.anonymous']);
       }
       $this->assertResourceErrorResponse(403, FALSE, $response, $expected_cookie_403_cacheability->getCacheTags(), $expected_cookie_403_cacheability->getCacheContexts(), 'MISS', FALSE);
@@ -125,7 +125,7 @@ trait CookieResourceTestTrait {
     // X-CSRF-Token request header is unnecessary for safe and side effect-free
     // HTTP methods. No need for additional assertions.
     // @see https://www.w3.org/Protocols/rfc2616/rfc2616-sec9.html
-    if (in_array($method, ['HEAD', 'GET', 'OPTIONS', 'TRACE'])) {
+    if (\in_array($method, ['HEAD', 'GET', 'OPTIONS', 'TRACE'])) {
       return;
     }
 

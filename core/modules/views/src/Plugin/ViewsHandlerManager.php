@@ -131,7 +131,7 @@ class ViewsHandlerManager extends DefaultPluginManager implements FallbackPlugin
       $plugin_id = $override_plugin_id ?: $definition['id'];
       // Try to use the overridden handler.
       $handler = $this->createInstance($plugin_id, $definition);
-      if ($override_plugin_id && method_exists($handler, 'broken') && $handler->broken()) {
+      if ($override_plugin_id && \method_exists($handler, 'broken') && $handler->broken()) {
         $handler = $this->createInstance($definition['id'], $definition);
       }
       return $handler;

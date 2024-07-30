@@ -52,7 +52,7 @@ abstract class StableLibraryOverrideTestBase extends KernelTestBase {
    */
   protected function enableVisibleAndStableCoreModules(): void {
     $all_modules = $this->container->get('extension.list.module')->getList();
-    $all_modules = array_filter($all_modules, function ($module) {
+    $all_modules = \array_filter($all_modules, function ($module) {
       // Filter contrib, hidden, experimental, deprecated, and already enabled
       // modules, and modules in the Testing package.
       if ($module->origin !== 'core'
@@ -65,7 +65,7 @@ abstract class StableLibraryOverrideTestBase extends KernelTestBase {
       }
       return TRUE;
     });
-    $this->allModules = array_keys($all_modules);
+    $this->allModules = \array_keys($all_modules);
     $this->allModules[] = 'system';
     $this->allModules[] = 'user';
     $this->allModules[] = 'path_alias';
@@ -73,7 +73,7 @@ abstract class StableLibraryOverrideTestBase extends KernelTestBase {
     if ($database_module !== 'core') {
       $this->allModules[] = $database_module;
     }
-    sort($this->allModules);
+    \sort($this->allModules);
     $this->container->get('module_installer')->install($this->allModules);
   }
 
@@ -95,12 +95,12 @@ abstract class StableLibraryOverrideTestBase extends KernelTestBase {
         }
         foreach (['css', 'js'] as $asset_type) {
           foreach ($library[$asset_type] as $index => $asset) {
-            if (str_contains($asset['data'], 'core/assets/vendor')) {
+            if (\str_contains($asset['data'], 'core/assets/vendor')) {
               unset($all_libraries[$extension][$library_name][$asset_type][$index]);
               // Re-key the array of assets. This is needed because
               // libraries-override doesn't always preserve the order.
               if (!empty($all_libraries[$extension][$library_name][$asset_type])) {
-                $all_libraries[$extension][$library_name][$asset_type] = array_values($all_libraries[$extension][$library_name][$asset_type]);
+                $all_libraries[$extension][$library_name][$asset_type] = \array_values($all_libraries[$extension][$library_name][$asset_type]);
               }
             }
           }
@@ -119,15 +119,15 @@ abstract class StableLibraryOverrideTestBase extends KernelTestBase {
    */
   protected function getAllLibraries() {
     $modules = \Drupal::moduleHandler()->getModuleList();
-    $module_list = array_keys($modules);
-    sort($module_list);
+    $module_list = \array_keys($modules);
+    \sort($module_list);
     $this->assertEquals($this->allModules, $module_list, 'All core modules are installed.');
 
     $libraries['core'] = $this->libraryDiscovery->getLibrariesByExtension('core');
 
     foreach ($modules as $module_name => $module) {
       $library_file = $module->getPath() . '/' . $module_name . '.libraries.yml';
-      if (is_file($this->root . '/' . $library_file)) {
+      if (\is_file($this->root . '/' . $library_file)) {
         $libraries[$module_name] = $this->libraryDiscovery->getLibrariesByExtension($module_name);
       }
     }

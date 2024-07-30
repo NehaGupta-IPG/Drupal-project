@@ -116,13 +116,13 @@ class GlossaryTest extends ViewTestBase {
     $this->assertSession()->statusCodeEquals(200);
     foreach ($nodes_per_char as $char => $count) {
       $href = Url::fromRoute('view.glossary.page_1', ['arg_0' => $char])->toString();
-      $label = mb_strtoupper($char);
+      $label = \mb_strtoupper($char);
       // Get the summary link for a certain character. Filter by label and href
       // to ensure that both of them are correct.
       $result = $this->assertSession()->elementExists('xpath', "//a[contains(@href, '{$href}') and normalize-space(text())='{$label}']/..");
       // The rendered output looks like "<a href="">X</a> | (count)" so let's
       // figure out the int.
-      $result_count = explode(' ', trim(str_replace(['|', '(', ')'], '', $result->getText())))[1];
+      $result_count = \explode(' ', \trim(\str_replace(['|', '(', ')'], '', $result->getText())))[1];
       $this->assertEquals($count, $result_count, 'The expected number got rendered.');
     }
   }

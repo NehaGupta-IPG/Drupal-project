@@ -144,7 +144,7 @@ class ContentTranslationSynchronizedFieldsConstraintValidator extends Constraint
       foreach ($properties as $property) {
         $items = $entity->get($field_name)->getValue();
         $original_items = $original->get($field_name)->getValue();
-        if (count($items) !== count($original_items)) {
+        if (\count($items) !== \count($original_items)) {
           return TRUE;
         }
         foreach ($items as $delta => $item) {
@@ -221,7 +221,7 @@ class ContentTranslationSynchronizedFieldsConstraintValidator extends Constraint
    */
   public function getSynchronizedPropertiesByField(array $field_definitions) {
     $synchronizer = $this->synchronizer;
-    $synchronized_properties = array_filter(array_map(
+    $synchronized_properties = \array_filter(\array_map(
       function (FieldDefinitionInterface $field_definition) use ($synchronizer) {
         return $synchronizer->getFieldSynchronizedProperties($field_definition);
       },

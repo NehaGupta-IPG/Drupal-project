@@ -41,7 +41,7 @@ class FieldTypeTest extends ViewsKernelTestBase {
     parent::setUp($import_test_views);
 
     if ($import_test_views) {
-      ViewTestData::createTestViews(get_class($this), ['block_content_test_views']);
+      ViewTestData::createTestViews(\get_class($this), ['block_content_test_views']);
     }
   }
 

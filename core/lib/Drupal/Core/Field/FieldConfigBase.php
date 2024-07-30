@@ -285,7 +285,7 @@ abstract class FieldConfigBase extends ConfigEntityBase implements FieldConfigIn
     $default_settings = \Drupal::service('plugin.manager.field.field_type')
       ->getDefaultFieldSettings($this->getType());
     // Filter out any unknown (unsupported) settings.
-    $supported_settings = array_intersect_key($this->getSettings(), $default_settings);
+    $supported_settings = \array_intersect_key($this->getSettings(), $default_settings);
     $this->set('settings', $supported_settings + $default_settings);
   }
 
@@ -387,7 +387,7 @@ abstract class FieldConfigBase extends ConfigEntityBase implements FieldConfigIn
    * {@inheritdoc}
    */
   public function getSetting($setting_name) {
-    if (array_key_exists($setting_name, $this->settings)) {
+    if (\array_key_exists($setting_name, $this->settings)) {
       return $this->settings[$setting_name];
     }
     else {
@@ -425,7 +425,7 @@ abstract class FieldConfigBase extends ConfigEntityBase implements FieldConfigIn
   public function getDefaultValue(FieldableEntityInterface $entity) {
     // Allow custom default values function.
     if ($callback = $this->getDefaultValueCallback()) {
-      $value = call_user_func($callback, $entity, $this);
+      $value = \call_user_func($callback, $entity, $this);
       $value = $this->normalizeValue($value, $this->getFieldStorageDefinition()->getMainPropertyName());
     }
     else {
@@ -476,13 +476,13 @@ abstract class FieldConfigBase extends ConfigEntityBase implements FieldConfigIn
    * @todo Investigate in https://www.drupal.org/node/1977206.
    */
   public function __sleep(): array {
-    $properties = get_object_vars($this);
+    $properties = \get_object_vars($this);
 
     // Only serialize necessary properties, excluding those that can be
     // recalculated.
     unset($properties['itemDefinition'], $properties['original']);
 
-    return array_keys($properties);
+    return \array_keys($properties);
   }
 
   /**

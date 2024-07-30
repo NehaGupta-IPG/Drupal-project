@@ -72,7 +72,7 @@ class DateTimeIso8601Normalizer extends DateTimeNormalizer {
     $is_date_only = $datetime_type === DateTimeItem::DATETIME_TYPE_DATE;
 
     if ($is_date_only) {
-      $context['datetime_allowed_formats'] = array_intersect_key($this->allowedFormats, ['date-only' => TRUE]);
+      $context['datetime_allowed_formats'] = \array_intersect_key($this->allowedFormats, ['date-only' => TRUE]);
       $datetime = parent::denormalize($data, $class, $format, $context);
       if (!$datetime instanceof \DateTime) {
         return $datetime;
@@ -80,7 +80,7 @@ class DateTimeIso8601Normalizer extends DateTimeNormalizer {
       return $datetime->format(DateTimeItemInterface::DATE_STORAGE_FORMAT);
     }
 
-    $context['datetime_allowed_formats'] = array_diff_key($this->allowedFormats, ['date-only' => TRUE]);
+    $context['datetime_allowed_formats'] = \array_diff_key($this->allowedFormats, ['date-only' => TRUE]);
     $datetime = parent::denormalize($data, $class, $format, $context);
     if (!$datetime instanceof \DateTime) {
       return $datetime;

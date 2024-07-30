@@ -81,7 +81,7 @@ class UserCancelForm extends ContentEntityConfirmFormBase {
    */
   public function buildForm(array $form, FormStateInterface $form_state) {
     $user = $this->currentUser();
-    $this->cancelMethods = user_cancel_methods();
+    $this->cancelMethods = \user_cancel_methods();
 
     // Display account cancellation method selection, if allowed.
     $own_account = $this->entity->id() == $user->id();
@@ -137,7 +137,7 @@ class UserCancelForm extends ContentEntityConfirmFormBase {
     // privileges, no confirmation mail shall be sent, and the user does not
     // attempt to cancel the own account.
     if (!$form_state->isValueEmpty('access') && $form_state->isValueEmpty('user_cancel_confirm') && $this->entity->id() != $this->currentUser()->id()) {
-      user_cancel($form_state->getValues(), $this->entity->id(), $form_state->getValue('user_cancel_method'));
+      \user_cancel($form_state->getValues(), $this->entity->id(), $form_state->getValue('user_cancel_method'));
 
       $form_state->setRedirectUrl($this->entity->toUrl('collection'));
     }

@@ -51,7 +51,7 @@ class MatcherDumper implements MatcherDumperInterface {
     protected LoggerInterface $logger,
     protected $table = 'router',
   ) {
-    if (is_null($this->tableName)) {
+    if (\is_null($this->tableName)) {
       $this->tableName = $table;
     }
   }
@@ -86,7 +86,7 @@ class MatcherDumper implements MatcherDumperInterface {
   public function dump(array $options = []): string {
     // Convert all of the routes into database records.
     // Accumulate the menu masks on top of any we found before.
-    $masks = array_flip($this->state->get('routing.menu_masks.' . $this->tableName, []));
+    $masks = \array_flip($this->state->get('routing.menu_masks.' . $this->tableName, []));
     // Delete any old records first, then insert the new ones. That avoids
     // stale data. The transaction makes it atomic to avoid unstable router
     // states due to random failures.
@@ -105,7 +105,7 @@ class MatcherDumper implements MatcherDumperInterface {
       }
 
       // Split the routes into chunks to avoid big INSERT queries.
-      $route_chunks = array_chunk($this->routes->all(), 50, TRUE);
+      $route_chunks = \array_chunk($this->routes->all(), 50, TRUE);
       foreach ($route_chunks as $routes) {
         $insert = $this->connection->insert($this->tableName)->fields([
           'name',
@@ -133,7 +133,7 @@ class MatcherDumper implements MatcherDumperInterface {
             'path' => $route->getPath(),
             'pattern_outline' => $compiled->getPatternOutline(),
             'number_parts' => $compiled->getNumParts(),
-            'route' => serialize($route),
+            'route' => \serialize($route),
           ];
           $insert->values($values);
         }
@@ -168,8 +168,8 @@ class MatcherDumper implements MatcherDumperInterface {
       throw $e;
     }
     // Sort the masks so they are in order of descending fit.
-    $masks = array_keys($masks);
-    rsort($masks);
+    $masks = \array_keys($masks);
+    \rsort($masks);
     $this->state->set('routing.menu_masks.' . $this->tableName, $masks);
 
     $this->routes = NULL;

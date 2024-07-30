@@ -100,8 +100,8 @@ class DecimalItem extends NumericItemBase {
     $element = parent::fieldSettingsForm($form, $form_state);
     $settings = $this->getSettings();
 
-    $element['min']['#step'] = pow(0.1, $settings['scale']);
-    $element['max']['#step'] = pow(0.1, $settings['scale']);
+    $element['min']['#step'] = \pow(0.1, $settings['scale']);
+    $element['max']['#step'] = \pow(0.1, $settings['scale']);
 
     return $element;
   }
@@ -110,7 +110,7 @@ class DecimalItem extends NumericItemBase {
    * {@inheritdoc}
    */
   public function preSave() {
-    $this->value = round($this->value, $this->getSetting('scale'));
+    $this->value = \round($this->value, $this->getSetting('scale'));
   }
 
   /**
@@ -124,8 +124,8 @@ class DecimalItem extends NumericItemBase {
     // point.
     // The maximum number you can get with 3 digits is 10^3 - 1 --> 999.
     // The minimum number you can get with 3 digits is -1 * (10^3 - 1).
-    $max = is_numeric($settings['max']) ? $settings['max'] : pow(10, ($precision - $scale)) - 1;
-    $min = is_numeric($settings['min']) ? $settings['min'] : -pow(10, ($precision - $scale)) + 1;
+    $max = \is_numeric($settings['max']) ? $settings['max'] : \pow(10, ($precision - $scale)) - 1;
+    $min = \is_numeric($settings['min']) ? $settings['min'] : -\pow(10, ($precision - $scale)) + 1;
 
     // Get the number of decimal digits for the $max.
     $decimal_digits = self::getDecimalDigits($max);
@@ -136,7 +136,7 @@ class DecimalItem extends NumericItemBase {
 
     // @see "Example #1 Calculate a random floating-point number" in
     // http://php.net/manual/function.mt-getrandmax.php
-    $random_decimal = $min + mt_rand() / mt_getrandmax() * ($max - $min);
+    $random_decimal = $min + \mt_rand() / \mt_getrandmax() * ($max - $min);
     $values['value'] = self::truncateDecimal($random_decimal, $scale);
     return $values;
   }
@@ -152,7 +152,7 @@ class DecimalItem extends NumericItemBase {
    */
   protected static function getDecimalDigits($decimal) {
     $digits = 0;
-    while ($decimal - round($decimal)) {
+    while ($decimal - \round($decimal)) {
       $decimal *= 10;
       $digits++;
     }

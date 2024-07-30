@@ -116,12 +116,12 @@ class HelpTopicTest extends BrowserTestBase {
 
     // Verify links for help topics and order.
     $page_text = $this->getTextContent();
-    $start = strpos($page_text, 'Topics can be provided');
+    $start = \strpos($page_text, 'Topics can be provided');
     $pos = $start;
     foreach ($this->getTopicList() as $info) {
       $name = $info['name'];
       $session->linkExists($name);
-      $new_pos = strpos($page_text, $name, $start);
+      $new_pos = \strpos($page_text, $name, $start);
       $this->assertGreaterThan($pos, $new_pos, "Order of $name is not correct on page");
       $pos = $new_pos;
     }

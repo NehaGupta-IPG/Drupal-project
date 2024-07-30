@@ -115,7 +115,7 @@ abstract class StorageTestBase extends KernelTestBase {
     $this->assertEquals(['foo' => $this->objects[5]], $result);
 
     // Verify that multiple items can be deleted.
-    $stores[0]->deleteMultiple(array_keys($values));
+    $stores[0]->deleteMultiple(\array_keys($values));
     $this->assertNull($stores[0]->get('foo'));
     $this->assertNull($stores[0]->get('bar'));
     $this->assertEmpty($stores[0]->getMultiple(['foo', 'bar']));

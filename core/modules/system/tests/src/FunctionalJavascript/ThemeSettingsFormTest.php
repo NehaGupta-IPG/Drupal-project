@@ -54,7 +54,7 @@ class ThemeSettingsFormTest extends WebDriverTestBase {
     $this->drupalGet("admin/appearance/settings/$theme");
 
     // Add a new managed file.
-    $file = current($this->getTestFiles('image'));
+    $file = \current($this->getTestFiles('image'));
     $image_file_path = \Drupal::service('file_system')->realpath($file->uri);
     $page->attachFileToField('files[custom_logo]', $image_file_path);
     $assert_session->waitForButton('custom_logo_remove_button');

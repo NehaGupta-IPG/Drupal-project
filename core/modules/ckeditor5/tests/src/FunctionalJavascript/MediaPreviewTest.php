@@ -66,7 +66,7 @@ class MediaPreviewTest extends MediaTestBase {
     // @see core/modules/media/templates/media-embed-error.html.twig
     // @see media_test_embed_preprocess_media_embed_error()
     $original_value = $this->host->body->value;
-    $this->host->body->value = str_replace($this->media->uuid(), 'invalid_uuid', $original_value);
+    $this->host->body->value = \str_replace($this->media->uuid(), 'invalid_uuid', $original_value);
     $this->host->save();
     $this->drupalGet($this->host->toUrl('edit-form'));
     $this->waitForEditor();

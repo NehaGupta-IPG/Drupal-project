@@ -172,7 +172,7 @@ class ImageStylesPathAndUrlTest extends BrowserTestBase {
 
     // Create a working copy of the file.
     $files = $this->drupalGetTestFiles('image');
-    $file = array_shift($files);
+    $file = \array_shift($files);
     /** @var \Drupal\Core\File\FileSystemInterface $file_system */
     $file_system = \Drupal::service('file_system');
     $original_uri = $file_system->copy($file->uri, $scheme . '://', FileExists::Rename);
@@ -195,7 +195,7 @@ class ImageStylesPathAndUrlTest extends BrowserTestBase {
     // a poorly constructed (but still valid) file URL that has an extra slash
     // in it.
     if ($extra_slash) {
-      $modified_uri = str_replace('://', ':///', $original_uri);
+      $modified_uri = \str_replace('://', ':///', $original_uri);
       $this->assertNotEquals($original_uri, $modified_uri, 'An extra slash was added to the generated file URI.');
       $generate_url = $this->style->buildUrl($modified_uri, $clean_url);
     }
@@ -203,10 +203,10 @@ class ImageStylesPathAndUrlTest extends BrowserTestBase {
       $this->assertStringContainsString('index.php/', $generate_url, 'When using non-clean URLS, the system path contains the script name.');
     }
     // Add some extra chars to the token.
-    $this->drupalGet(str_replace(IMAGE_DERIVATIVE_TOKEN . '=', IMAGE_DERIVATIVE_TOKEN . '=Zo', $generate_url));
+    $this->drupalGet(\str_replace(IMAGE_DERIVATIVE_TOKEN . '=', IMAGE_DERIVATIVE_TOKEN . '=Zo', $generate_url));
     $this->assertSession()->statusCodeEquals(404);
     // Change the parameter name so the token is missing.
-    $this->drupalGet(str_replace(IMAGE_DERIVATIVE_TOKEN . '=', 'wrong_parameter=', $generate_url));
+    $this->drupalGet(\str_replace(IMAGE_DERIVATIVE_TOKEN . '=', 'wrong_parameter=', $generate_url));
     $this->assertSession()->statusCodeEquals(404);
 
     // Check that the generated URL is the same when we pass in a relative path
@@ -224,7 +224,7 @@ class ImageStylesPathAndUrlTest extends BrowserTestBase {
     $this->assertSession()->statusCodeEquals(200);
     $this->assertFileExists($generated_uri);
     // assertRaw can't be used with string containing non UTF-8 chars.
-    $this->assertNotEmpty(file_get_contents($generated_uri), 'URL returns expected file.');
+    $this->assertNotEmpty(\file_get_contents($generated_uri), 'URL returns expected file.');
     $image = $this->container->get('image.factory')->get($generated_uri);
     $this->assertSession()->responseHeaderEquals('Content-Type', $image->getMimeType());
     $this->assertSession()->responseHeaderEquals('Content-Length', (string) $image->getFileSize());
@@ -259,7 +259,7 @@ class ImageStylesPathAndUrlTest extends BrowserTestBase {
 
       // Repeat this with a different file that we do not have access to and
       // make sure that access is denied.
-      $file_no_access = array_shift($files);
+      $file_no_access = \array_shift($files);
       $original_uri_no_access = $file_system->copy($file_no_access->uri, $scheme . '://', FileExists::Rename);
       $generated_uri_no_access = $scheme . '://styles/' . $this->style->id() . '/' . $scheme . '/' . basename($original_uri_no_access);
       $this->assertFileDoesNotExist($generated_uri_no_access);
@@ -269,7 +269,7 @@ class ImageStylesPathAndUrlTest extends BrowserTestBase {
       $this->assertSession()->statusCodeEquals(403);
       // Verify that images are not appended to the response.
       // Currently this test only uses PNG images.
-      if (!str_contains($generate_url, '.png')) {
+      if (!\str_contains($generate_url, '.png')) {
         $this->fail('Confirming that private image styles are not appended require PNG file.');
       }
       else {
@@ -277,7 +277,7 @@ class ImageStylesPathAndUrlTest extends BrowserTestBase {
         // (cf. http://www.libpng.org/pub/png/book/chapter08.html#png.ch08.div.2)
         // in the response body.
         $raw = $this->getSession()->getPage()->getContent();
-        $this->assertStringNotContainsString(chr(137) . chr(80) . chr(78) . chr(71) . chr(13) . chr(10) . chr(26) . chr(10), $raw);
+        $this->assertStringNotContainsString(\chr(137) . \chr(80) . \chr(78) . \chr(71) . \chr(13) . \chr(10) . \chr(26) . \chr(10), $raw);
       }
     }
     else {
@@ -286,7 +286,7 @@ class ImageStylesPathAndUrlTest extends BrowserTestBase {
 
       if ($clean_url) {
         // Add some extra chars to the token.
-        $this->drupalGet(str_replace(IMAGE_DERIVATIVE_TOKEN . '=', IMAGE_DERIVATIVE_TOKEN . '=Zo', $generate_url));
+        $this->drupalGet(\str_replace(IMAGE_DERIVATIVE_TOKEN . '=', IMAGE_DERIVATIVE_TOKEN . '=Zo', $generate_url));
         $this->assertSession()->statusCodeEquals(200);
       }
     }
@@ -299,7 +299,7 @@ class ImageStylesPathAndUrlTest extends BrowserTestBase {
 
     // Create another working copy of the file.
     $files = $this->drupalGetTestFiles('image');
-    $file = array_shift($files);
+    $file = \array_shift($files);
     $original_uri = $file_system->copy($file->uri, $scheme . '://', FileExists::Rename);
     // Let the image_module_test module know about this file, so it can claim
     // ownership in hook_file_download().
@@ -325,14 +325,14 @@ class ImageStylesPathAndUrlTest extends BrowserTestBase {
     $nested_url = $this->style->buildUrl($generated_uri, $clean_url);
     $matches_expected_url_format = (bool) preg_match('/styles\/' . $this->style->id() . '\/' . $scheme . '\/styles\/' . $this->style->id() . '\/' . $scheme . '/', $nested_url);
     $this->assertTrue($matches_expected_url_format, "URL for a derivative of an image style matches expected format.");
-    $nested_url_with_wrong_token = str_replace(IMAGE_DERIVATIVE_TOKEN . '=', 'wrong_parameter=', $nested_url);
+    $nested_url_with_wrong_token = \str_replace(IMAGE_DERIVATIVE_TOKEN . '=', 'wrong_parameter=', $nested_url);
     $this->drupalGet($nested_url_with_wrong_token);
     $this->assertSession()->statusCodeEquals(404);
     // Check that this restriction cannot be bypassed by adding extra slashes
     // to the URL.
-    $this->drupalGet(substr_replace($nested_url_with_wrong_token, '//styles/', strrpos($nested_url_with_wrong_token, '/styles/'), strlen('/styles/')));
+    $this->drupalGet(\substr_replace($nested_url_with_wrong_token, '//styles/', \strrpos($nested_url_with_wrong_token, '/styles/'), \strlen('/styles/')));
     $this->assertSession()->statusCodeEquals(404);
-    $this->drupalGet(substr_replace($nested_url_with_wrong_token, '////styles/', strrpos($nested_url_with_wrong_token, '/styles/'), strlen('/styles/')));
+    $this->drupalGet(\substr_replace($nested_url_with_wrong_token, '////styles/', \strrpos($nested_url_with_wrong_token, '/styles/'), \strlen('/styles/')));
     $this->assertSession()->statusCodeEquals(404);
     // Make sure the image can still be generated if a correct token is used.
     $this->drupalGet($nested_url);

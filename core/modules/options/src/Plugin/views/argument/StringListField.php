@@ -36,7 +36,7 @@ class StringListField extends StringArgument {
     parent::init($view, $display, $options);
 
     $field_storage = $this->getFieldStorageDefinition();
-    $this->allowedValues = options_allowed_values($field_storage);
+    $this->allowedValues = \options_allowed_values($field_storage);
   }
 
   /**

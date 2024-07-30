@@ -253,7 +253,7 @@ class ImageStyle extends ConfigEntityBase implements ImageStyleInterface, Entity
     // ensure that it is included. Once the file exists it's fine to fall back
     // to the actual file path, this avoids bootstrapping PHP once the files are
     // built.
-    if ($clean_urls === FALSE && $stream_wrapper_manager::getScheme($uri) == 'public' && !file_exists($uri)) {
+    if ($clean_urls === FALSE && $stream_wrapper_manager::getScheme($uri) == 'public' && !\file_exists($uri)) {
       $directory_path = $stream_wrapper_manager->getViaUri($uri)->getDirectoryPath();
       return Url::fromUri('base:' . $directory_path . '/' . $stream_wrapper_manager::getTarget($uri), ['absolute' => TRUE, 'query' => $token_query])->toString();
     }
@@ -263,7 +263,7 @@ class ImageStyle extends ConfigEntityBase implements ImageStyleInterface, Entity
     $file_url = $file_url_generator->generateAbsoluteString($uri);
     // Append the query string with the token, if necessary.
     if ($token_query) {
-      $file_url .= (str_contains($file_url, '?') ? '&' : '?') . UrlHelper::buildQuery($token_query);
+      $file_url .= (\str_contains($file_url, '?') ? '&' : '?') . UrlHelper::buildQuery($token_query);
     }
 
     return $file_url;
@@ -278,7 +278,7 @@ class ImageStyle extends ConfigEntityBase implements ImageStyleInterface, Entity
     $file_system = \Drupal::service('file_system');
     if (isset($path)) {
       $derivative_uri = $this->buildUri($path);
-      if (file_exists($derivative_uri)) {
+      if (\file_exists($derivative_uri)) {
         try {
           $file_system->delete($derivative_uri);
         }
@@ -291,7 +291,7 @@ class ImageStyle extends ConfigEntityBase implements ImageStyleInterface, Entity
       // Delete the style directory in each registered wrapper.
       $wrappers = $this->getStreamWrapperManager()->getWrappers(StreamWrapperInterface::WRITE_VISIBLE);
       foreach ($wrappers as $wrapper => $wrapper_data) {
-        if (file_exists($directory = $wrapper . '://styles/' . $this->id())) {
+        if (\file_exists($directory = $wrapper . '://styles/' . $this->id())) {
           try {
             $file_system->deleteRecursive($directory);
           }
@@ -340,7 +340,7 @@ class ImageStyle extends ConfigEntityBase implements ImageStyleInterface, Entity
     }
 
     if (!$image->save($derivative_uri)) {
-      if (file_exists($derivative_uri)) {
+      if (\file_exists($derivative_uri)) {
         \Drupal::logger('image')->error('Cached image file %destination already exists. There may be an issue with your rewrite configuration.', ['%destination' => $derivative_uri]);
       }
       return FALSE;
@@ -373,7 +373,7 @@ class ImageStyle extends ConfigEntityBase implements ImageStyleInterface, Entity
    */
   public function getPathToken($uri) {
     // Return the first 8 characters.
-    return substr(Crypt::hmacBase64($this->id() . ':' . $this->addExtension($uri), $this->getPrivateKey() . $this->getHashSalt()), 0, 8);
+    return \substr(Crypt::hmacBase64($this->id() . ':' . $this->addExtension($uri), $this->getPrivateKey() . $this->getHashSalt()), 0, 8);
   }
 
   /**
@@ -391,8 +391,8 @@ class ImageStyle extends ConfigEntityBase implements ImageStyleInterface, Entity
   public function supportsUri($uri) {
     // Only support the URI if its extension is supported by the current image
     // toolkit.
-    return in_array(
-      mb_strtolower(pathinfo($uri, PATHINFO_EXTENSION)),
+    return \in_array(
+      \mb_strtolower(\pathinfo($uri, PATHINFO_EXTENSION)),
       $this->getImageFactory()->getSupportedExtensions()
     );
   }
@@ -513,7 +513,7 @@ class ImageStyle extends ConfigEntityBase implements ImageStyleInterface, Entity
    *   path with the added extension if it does.
    */
   protected function addExtension($path) {
-    $original_extension = pathinfo($path, PATHINFO_EXTENSION);
+    $original_extension = \pathinfo($path, PATHINFO_EXTENSION);
     $extension = $this->getDerivativeExtension($original_extension);
     if ($original_extension !== $extension) {
       $path .= '.' . $extension;

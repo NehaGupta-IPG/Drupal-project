@@ -64,17 +64,17 @@ final class Finder {
         $graph[$dependency_uuid]['uuid'] = $dependency_uuid;
       }
     }
-    ksort($graph);
+    \ksort($graph);
 
     // Sort the dependency graph. The entities that are dependencies of other
     // entities should come first.
     $graph_object = new Graph($graph);
     $sorted = $graph_object->searchAndSort();
-    uasort($sorted, SortArray::sortByWeightElement(...));
+    \uasort($sorted, SortArray::sortByWeightElement(...));
 
     $entities = [];
     foreach ($sorted as ['uuid' => $uuid]) {
-      if (array_key_exists($uuid, $files)) {
+      if (\array_key_exists($uuid, $files)) {
         $entities[$uuid] = $files[$uuid];
       }
     }

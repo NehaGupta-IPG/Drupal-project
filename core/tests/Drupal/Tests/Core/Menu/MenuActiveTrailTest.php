@@ -219,7 +219,7 @@ class MenuActiveTrailTest extends UnitTestCase {
    */
   #[DataProvider('provider')]
   public function testGetActiveTrailIds(Request $request, $links, $menu_name, $expected_link, $expected_trail): void {
-    $expected_trail_ids = array_combine($expected_trail, $expected_trail);
+    $expected_trail_ids = \array_combine($expected_trail, $expected_trail);
 
     $this->requestStack->push($request);
     if ($links !== FALSE) {
@@ -281,7 +281,7 @@ class MenuActiveTrailTest extends UnitTestCase {
 
     $expected_link = $data[3];
     $expected_trail = $data[4];
-    $expected_trail_ids = array_combine($expected_trail, $expected_trail);
+    $expected_trail_ids = \array_combine($expected_trail, $expected_trail);
 
     $this->menuLinkManager->expects($this->any())
       ->method('getParentIds')
@@ -294,7 +294,7 @@ class MenuActiveTrailTest extends UnitTestCase {
     $this->cache->expects($this->once())
       ->method('set')
       // Ensure we normalize the serialized data by sorting them.
-      ->with('active-trail:route:baby_llama:route_parameters:' . serialize(['a' => 0, 'b' => 1]));
+      ->with('active-trail:route:baby_llama:route_parameters:' . \serialize(['a' => 0, 'b' => 1]));
     $this->lock->expects($this->any())
       ->method('acquire')
       ->willReturn(TRUE);

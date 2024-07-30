@@ -19,7 +19,7 @@ class ContentModerationStateForm extends WorkflowTypeStateFormBase {
   public function buildConfigurationForm(array $form, FormStateInterface $form_state, ?StateInterface $state = NULL) {
     /** @var \Drupal\content_moderation\ContentModerationState $state */
     $state = $form_state->get('state');
-    $is_required_state = isset($state) ? in_array($state->id(), $this->workflowType->getRequiredStates(), TRUE) : FALSE;
+    $is_required_state = isset($state) ? \in_array($state->id(), $this->workflowType->getRequiredStates(), TRUE) : FALSE;
 
     $form = [];
     $form['published'] = [

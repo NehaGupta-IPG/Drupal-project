@@ -38,14 +38,14 @@ class PluginFormFactory implements PluginFormFactoryInterface {
         $operation = $fallback_operation;
       }
       else {
-        throw new InvalidPluginDefinitionException($plugin->getPluginId(), sprintf('The "%s" plugin did not specify a "%s" form class', $plugin->getPluginId(), $operation));
+        throw new InvalidPluginDefinitionException($plugin->getPluginId(), \sprintf('The "%s" plugin did not specify a "%s" form class', $plugin->getPluginId(), $operation));
       }
     }
 
     $form_class = $plugin->getFormClass($operation);
 
     // If the form specified is the plugin itself, use it directly.
-    if (ltrim(get_class($plugin), '\\') === ltrim($form_class, '\\')) {
+    if (\ltrim(\get_class($plugin), '\\') === \ltrim($form_class, '\\')) {
       $form_object = $plugin;
     }
     else {
@@ -54,7 +54,7 @@ class PluginFormFactory implements PluginFormFactoryInterface {
 
     // Ensure the resulting object is a plugin form.
     if (!$form_object instanceof PluginFormInterface) {
-      throw new InvalidPluginDefinitionException($plugin->getPluginId(), sprintf('The "%s" plugin did not specify a valid "%s" form class, must implement \Drupal\Core\Plugin\PluginFormInterface', $plugin->getPluginId(), $operation));
+      throw new InvalidPluginDefinitionException($plugin->getPluginId(), \sprintf('The "%s" plugin did not specify a valid "%s" form class, must implement \Drupal\Core\Plugin\PluginFormInterface', $plugin->getPluginId(), $operation));
     }
 
     if ($form_object instanceof PluginAwareInterface) {

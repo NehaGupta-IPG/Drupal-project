@@ -36,7 +36,7 @@ class DirectoryTest extends FileTestBase {
     // Files directory already exists.
     $this->assertDirectoryExists($directory);
     // Make files directory writable only.
-    $old_mode = fileperms($directory);
+    $old_mode = \fileperms($directory);
 
     // Create the directories.
     $parent_path = $directory . DIRECTORY_SEPARATOR . $parent;
@@ -82,7 +82,7 @@ class DirectoryTest extends FileTestBase {
     // Make sure directory actually exists.
     $this->assertDirectoryExists($directory);
     $file_system = \Drupal::service('file_system');
-    if (!str_starts_with(PHP_OS, 'WIN')) {
+    if (!\str_starts_with(PHP_OS, 'WIN')) {
       // PHP on Windows doesn't support any kind of useful read-only mode for
       // directories. When executing a chmod() on a directory, PHP only sets the
       // read-only flag, which doesn't prevent files to actually be written
@@ -114,7 +114,7 @@ class DirectoryTest extends FileTestBase {
     $this->assertFileExists($default_scheme . '://.htaccess');
 
     // Verify contents of .htaccess file.
-    $file = file_get_contents($default_scheme . '://.htaccess');
+    $file = \file_get_contents($default_scheme . '://.htaccess');
     $this->assertEquals(FileSecurity::htaccessLines(FALSE), $file, 'The .htaccess file contains the proper content.');
   }
 
@@ -211,7 +211,7 @@ class DirectoryTest extends FileTestBase {
    * paths. This test forks the process to create the same situation.
    */
   public function testMultiplePrepareDirectory(): void {
-    if (!function_exists('pcntl_fork')) {
+    if (!\function_exists('pcntl_fork')) {
       $this->markTestSkipped('Requires the pcntl_fork() function');
     }
     $directories = [];
@@ -221,17 +221,17 @@ class DirectoryTest extends FileTestBase {
 
     $file_system = $this->container->get('file_system');
 
-    $time_to_start = microtime(TRUE) + 0.1;
+    $time_to_start = \microtime(TRUE) + 0.1;
     // This loop creates a new fork to create each directory.
     foreach ($directories as $directory) {
-      $pid = pcntl_fork();
+      $pid = \pcntl_fork();
       if ($pid == -1) {
         $this->fail("Error forking");
       }
       elseif ($pid == 0) {
         // Sleep so that all the forks start preparing the directory at the same
         // time.
-        usleep((int) (($time_to_start - microtime(TRUE)) * 1000000));
+        \usleep((int) (($time_to_start - \microtime(TRUE)) * 1000000));
         $file_system->prepareDirectory($directory, FileSystemInterface::CREATE_DIRECTORY);
         exit();
       }
@@ -239,7 +239,7 @@ class DirectoryTest extends FileTestBase {
 
     // This while loop holds the parent process until all the child threads
     // are complete - at which point the script continues to execute.
-    while (pcntl_waitpid(0, $status) != -1);
+    while (\pcntl_waitpid(0, $status) != -1);
 
     foreach ($directories as $directory) {
       $this->assertDirectoryExists($directory);

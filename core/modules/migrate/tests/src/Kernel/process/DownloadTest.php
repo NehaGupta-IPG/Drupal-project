@@ -117,9 +117,9 @@ class DownloadTest extends FileTestBase {
 
     // Assert that number of stream resources in use is the same before and
     // after the download.
-    $initial_count = count(get_resources('stream'));
+    $initial_count = \count(\get_resources('stream'));
     $return = $plugin->transform($value, $executable, $row, 'foo');
-    $this->assertCount($initial_count, get_resources('stream'));
+    $this->assertCount($initial_count, \get_resources('stream'));
     return $return;
   }
 

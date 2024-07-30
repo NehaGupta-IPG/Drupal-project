@@ -63,7 +63,7 @@ class MigrationTest extends KernelTestBase {
       'id' => 'foo',
       'process' => $process,
     ];
-    $destination = array_key_first(($process));
+    $destination = \array_key_first(($process));
 
     $migration = \Drupal::service('plugin.manager.migration')
       ->createStubMigration($plugin_definition);

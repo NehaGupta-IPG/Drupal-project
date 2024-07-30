@@ -329,7 +329,7 @@ class FieldDiscoveryTest extends MigrateDrupal7TestBase {
   public function testGetAllFields(): void {
     $field_discovery_test = new FieldDiscoveryTestClass($this->fieldPluginManager, $this->migrationPluginManager, $this->logger);
     $actual_fields = $field_discovery_test->getAllFields('7');
-    $this->assertSame(['comment', 'node', 'user', 'taxonomy_term'], array_keys($actual_fields));
+    $this->assertSame(['comment', 'node', 'user', 'taxonomy_term'], \array_keys($actual_fields));
     $this->assertArrayHasKey('test_vocabulary', $actual_fields['taxonomy_term']);
     $this->assertArrayHasKey('user', $actual_fields['user']);
     $this->assertArrayHasKey('test_content_type', $actual_fields['node']);

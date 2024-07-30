@@ -35,7 +35,7 @@ class ControllerResolver implements ControllerResolverInterface {
       $callable = $this->callableResolver->getCallableFromDefinition($controller);
     }
     catch (\InvalidArgumentException $e) {
-      throw new \InvalidArgumentException(sprintf('The controller for URI "%s" is not callable.', $path), 0, $e);
+      throw new \InvalidArgumentException(\sprintf('The controller for URI "%s" is not callable.', $path), 0, $e);
     }
     return $callable;
   }

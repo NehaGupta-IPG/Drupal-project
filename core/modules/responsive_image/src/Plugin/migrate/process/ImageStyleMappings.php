@@ -18,7 +18,7 @@ class ImageStyleMappings extends ProcessPluginBase {
    * {@inheritdoc}
    */
   public function transform($value, MigrateExecutableInterface $migrate_executable, Row $row, $destination_property) {
-    if (!is_array($value)) {
+    if (!\is_array($value)) {
       throw new MigrateException('Input should be an array');
     }
 
@@ -29,7 +29,7 @@ class ImageStyleMappings extends ProcessPluginBase {
       // The id is in the key with the form
       // "breakpoints.theme.my_theme_id.image_style_machine_name". We want the
       // identifier after the last period.
-      preg_match('/\.([a-z0-9_]+)$/', $mapping_id, $matches);
+      \preg_match('/\.([a-z0-9_]+)$/', $mapping_id, $matches);
       foreach ($mapping as $multiplier => $multiplier_settings) {
         if ($multiplier_settings['mapping_type'] == '_none') {
           continue;
@@ -64,7 +64,7 @@ class ImageStyleMappings extends ProcessPluginBase {
     elseif ($multiplier_settings['mapping_type'] == 'sizes') {
       $settings = [
         'sizes' => $multiplier_settings['sizes'],
-        'sizes_image_styles' => array_values($multiplier_settings['sizes_image_styles']),
+        'sizes_image_styles' => \array_values($multiplier_settings['sizes_image_styles']),
       ];
     }
 

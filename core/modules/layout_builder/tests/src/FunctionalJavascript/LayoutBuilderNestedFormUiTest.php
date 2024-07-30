@@ -58,7 +58,7 @@ class LayoutBuilderNestedFormUiTest extends WebDriverTestBase {
       'type' => 'bundle_with_section_field',
       'name' => 'Bundle with section field',
     ]);
-    for ($i = 1; $i <= count(static::FORM_BLOCK_LABELS); $i++) {
+    for ($i = 1; $i <= \count(static::FORM_BLOCK_LABELS); $i++) {
       $this->createNode([
         'type' => 'bundle_with_section_field',
         'title' => "Node $i title",

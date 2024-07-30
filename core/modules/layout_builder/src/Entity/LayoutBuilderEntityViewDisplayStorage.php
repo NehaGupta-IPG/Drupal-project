@@ -21,7 +21,7 @@ class LayoutBuilderEntityViewDisplayStorage extends ConfigEntityStorage {
     $record = parent::mapToStorageRecord($entity);
 
     if (!empty($record['third_party_settings']['layout_builder']['sections'])) {
-      $record['third_party_settings']['layout_builder']['sections'] = array_map(function (Section $section) {
+      $record['third_party_settings']['layout_builder']['sections'] = \array_map(function (Section $section) {
         return $section->toArray();
       }, $record['third_party_settings']['layout_builder']['sections']);
     }
@@ -35,7 +35,7 @@ class LayoutBuilderEntityViewDisplayStorage extends ConfigEntityStorage {
     foreach ($records as &$record) {
       if (!empty($record['third_party_settings']['layout_builder']['sections'])) {
         $sections = &$record['third_party_settings']['layout_builder']['sections'];
-        $sections = array_map([Section::class, 'fromArray'], $sections);
+        $sections = \array_map([Section::class, 'fromArray'], $sections);
       }
     }
     return parent::mapFromStorageRecords($records);

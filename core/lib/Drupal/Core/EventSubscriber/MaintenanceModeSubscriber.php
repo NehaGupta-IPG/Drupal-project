@@ -100,7 +100,7 @@ class MaintenanceModeSubscriber implements EventSubscriberInterface {
       $event->setResponse($response);
       return;
     }
-    drupal_maintenance_theme();
+    \drupal_maintenance_theme();
     $response = $this->bareHtmlPageRenderer->renderBarePage(['#markup' => $this->maintenanceMode->getSiteMaintenanceMessage()], $this->t('Site under maintenance'), 'maintenance_page');
     $response->setStatusCode(503);
     // Calling RequestEvent::setResponse() also stops propagation of the event.

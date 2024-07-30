@@ -77,7 +77,7 @@ class ViewsLocalTask extends DeriverBase implements ContainerDeriverInterface {
 
       $executable->setDisplay($display_id);
       $menu = $executable->display_handler->getOption('menu');
-      if (in_array($menu['type'], ['tab', 'default tab'])) {
+      if (\in_array($menu['type'], ['tab', 'default tab'])) {
         $plugin_id = 'view.' . $executable->storage->id() . '.' . $display_id;
         $route_name = $view_route_names[$executable->storage->id() . '.' . $display_id];
 
@@ -117,7 +117,7 @@ class ViewsLocalTask extends DeriverBase implements ContainerDeriverInterface {
       $menu = $executable->display_handler->getOption('menu');
 
       // We already have set the base_route for default tabs.
-      if (in_array($menu['type'], ['tab'])) {
+      if (\in_array($menu['type'], ['tab'])) {
         $plugin_id = 'view.' . $executable->storage->id() . '.' . $display_id;
         $view_route_name = $view_route_names[$executable->storage->id() . '.' . $display_id];
 
@@ -130,11 +130,11 @@ class ViewsLocalTask extends DeriverBase implements ContainerDeriverInterface {
         // Find out the parent route.
         // @todo Find out how to find both the root and parent tab.
         $path = $executable->display_handler->getPath();
-        $split = explode('/', $path);
-        array_pop($split);
-        $path = implode('/', $split);
+        $split = \explode('/', $path);
+        \array_pop($split);
+        $path = \implode('/', $split);
 
-        $pattern = '/' . str_replace('%', '{}', $path);
+        $pattern = '/' . \str_replace('%', '{}', $path);
         if ($routes = $this->routeProvider->getRoutesByPattern($pattern)) {
           foreach ($routes->all() as $name => $route) {
             $local_tasks['views_view:' . $plugin_id]['base_route'] = $name;

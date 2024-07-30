@@ -212,7 +212,7 @@ class ContentTranslationSyncImageTest extends ContentTranslationTestBase {
     $translation = $entity->getTranslation($langcode);
 
     // Check that one value has been dropped from the original values.
-    $assert = count($entity->{$this->fieldName}) == 2;
+    $assert = \count($entity->{$this->fieldName}) == 2;
     $this->assertTrue($assert, 'One item correctly removed from the synchronized field values.');
 
     // Check that fids have been synchronized and translatable column values
@@ -236,12 +236,12 @@ class ContentTranslationSyncImageTest extends ContentTranslationTestBase {
       'alt' => $langcode . '_' . $removed_fid . '_' . $this->randomMachineName(),
       'title' => $langcode . '_' . $removed_fid . '_' . $this->randomMachineName(),
     ];
-    $translation->{$this->fieldName}->setValue(array_values($values[$langcode]));
+    $translation->{$this->fieldName}->setValue(\array_values($values[$langcode]));
     $entity = $this->saveEntity($translation);
     $translation = $entity->getTranslation($langcode);
 
     // Check that the value has been added to the default language.
-    $assert = count($entity->{$this->fieldName}->getValue()) == 3;
+    $assert = \count($entity->{$this->fieldName}->getValue()) == 3;
     $this->assertTrue($assert, 'One item correctly added to the synchronized field values.');
 
     foreach ($entity->{$this->fieldName} as $delta => $item) {

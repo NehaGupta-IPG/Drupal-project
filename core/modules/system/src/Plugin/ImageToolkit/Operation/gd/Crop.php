@@ -57,7 +57,7 @@ class Crop extends GDImageToolkitOperationBase {
 
     // Assure integers for all arguments.
     foreach (['x', 'y', 'width', 'height'] as $key) {
-      $arguments[$key] = (int) round($arguments[$key]);
+      $arguments[$key] = (int) \round($arguments[$key]);
     }
 
     // Fail when width or height are 0 or negative.
@@ -82,12 +82,12 @@ class Crop extends GDImageToolkitOperationBase {
     $data = [
       'width' => $arguments['width'],
       'height' => $arguments['height'],
-      'extension' => image_type_to_extension($this->getToolkit()->getType(), FALSE),
+      'extension' => \image_type_to_extension($this->getToolkit()->getType(), FALSE),
       'transparent_color' => $this->getToolkit()->getTransparentColor(),
       'is_temp' => TRUE,
     ];
     if ($this->getToolkit()->apply('create_new', $data)) {
-      if (imagecopyresampled($this->getToolkit()->getImage(), $original_image, 0, 0, $arguments['x'], $arguments['y'], $arguments['width'], $arguments['height'], $arguments['width'], $arguments['height'])) {
+      if (\imagecopyresampled($this->getToolkit()->getImage(), $original_image, 0, 0, $arguments['x'], $arguments['y'], $arguments['width'], $arguments['height'], $arguments['width'], $arguments['height'])) {
         return TRUE;
       }
       // In case of failure, restore the original image.

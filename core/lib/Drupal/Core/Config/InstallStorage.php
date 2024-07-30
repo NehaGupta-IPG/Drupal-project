@@ -92,7 +92,7 @@ class InstallStorage extends FileStorage {
    * {@inheritdoc}
    */
   public function exists($name) {
-    return array_key_exists($name, $this->getAllFolders());
+    return \array_key_exists($name, $this->getAllFolders());
   }
 
   /**
@@ -126,14 +126,14 @@ class InstallStorage extends FileStorage {
    * {@inheritdoc}
    */
   public function listAll($prefix = '') {
-    $names = array_keys($this->getAllFolders());
+    $names = \array_keys($this->getAllFolders());
     if (!$prefix) {
       return $names;
     }
     else {
       $return = [];
       foreach ($names as $index => $name) {
-        if (str_starts_with($name, $prefix)) {
+        if (\str_starts_with($name, $prefix)) {
           $return[$index] = $names[$index];
         }
       }
@@ -188,22 +188,22 @@ class InstallStorage extends FileStorage {
    */
   public function getComponentNames(array $list) {
     $extension = '.' . $this->getFileExtension();
-    $pattern = '/' . preg_quote($extension, '/') . '$/';
+    $pattern = '/' . \preg_quote($extension, '/') . '$/';
     $folders = [];
     foreach ($list as $extension_object) {
       // We don't have to use ExtensionDiscovery here because our list of
       // extensions was already obtained through an ExtensionDiscovery scan.
       $directory = $this->getComponentFolder($extension_object);
-      if (is_dir($directory)) {
+      if (\is_dir($directory)) {
         // glob() directly calls into libc glob(), which is not aware of PHP
         // stream wrappers. Same for \GlobIterator (which additionally requires
         // an absolute realpath() on Windows).
         // @see https://github.com/mikey179/vfsStream/issues/2
-        $files = scandir($directory);
+        $files = \scandir($directory);
 
         foreach ($files as $file) {
-          if ($file[0] !== '.' && preg_match($pattern, $file)) {
-            $folders[basename($file, $extension)] = $directory;
+          if ($file[0] !== '.' && \preg_match($pattern, $file)) {
+            $folders[\basename($file, $extension)] = $directory;
           }
         }
       }
@@ -219,19 +219,19 @@ class InstallStorage extends FileStorage {
    */
   public function getCoreNames() {
     $extension = '.' . $this->getFileExtension();
-    $pattern = '/' . preg_quote($extension, '/') . '$/';
+    $pattern = '/' . \preg_quote($extension, '/') . '$/';
     $folders = [];
     $directory = $this->getCoreFolder();
-    if (is_dir($directory)) {
+    if (\is_dir($directory)) {
       // glob() directly calls into libc glob(), which is not aware of PHP
       // stream wrappers. Same for \GlobIterator (which additionally requires an
       // absolute realpath() on Windows).
       // @see https://github.com/mikey179/vfsStream/issues/2
-      $files = scandir($directory);
+      $files = \scandir($directory);
 
       foreach ($files as $file) {
-        if ($file[0] !== '.' && preg_match($pattern, $file)) {
-          $folders[basename($file, $extension)] = $directory;
+        if ($file[0] !== '.' && \preg_match($pattern, $file)) {
+          $folders[\basename($file, $extension)] = $directory;
         }
       }
     }

@@ -41,7 +41,7 @@ class EntityTestConstraints extends EntityTest implements EntityChangedInterface
     $fields = parent::baseFieldDefinitions($entity_type);
 
     $fields['changed'] = BaseFieldDefinition::create('changed')
-      ->setLabel(t('Changed'));
+      ->setLabel(\t('Changed'));
 
     return $fields;
   }

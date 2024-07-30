@@ -55,7 +55,7 @@ class NumberItemTest extends FieldKernelTestBase {
   public function testNumberItem(): void {
     // Verify entity creation.
     $entity = EntityTest::create();
-    $integer = rand(0, 10);
+    $integer = \rand(0, 10);
     $entity->field_integer = $integer;
     $float = 3.14;
     $entity->field_float = $float;
@@ -84,8 +84,8 @@ class NumberItemTest extends FieldKernelTestBase {
     $this->assertEquals((float) $decimal, $entity->field_decimal[0]->value);
 
     // Verify changing the number value.
-    $new_integer = rand(11, 20);
-    $new_float = rand(1001, 2000) / 100;
+    $new_integer = \rand(11, 20);
+    $new_float = \rand(1001, 2000) / 100;
     $new_decimal = '18.2';
     $entity->field_integer->value = $new_integer;
     $this->assertEquals($new_integer, $entity->field_integer->value);
@@ -231,9 +231,9 @@ class NumberItemTest extends FieldKernelTestBase {
     $completed_form = [];
     NumericItemBase::validateMinAndMaxConfig($element, $form_state, $completed_form);
     $errors = $form_state->getErrors();
-    $this->assertEquals($hasError, count($errors) > 0);
+    $this->assertEquals($hasError, \count($errors) > 0);
     if ($errors) {
-      $error = current($errors);
+      $error = \current($errors);
       $this->assertEquals($error, $message);
     }
   }

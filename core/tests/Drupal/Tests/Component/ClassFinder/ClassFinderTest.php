@@ -25,7 +25,7 @@ class ClassFinderTest extends TestCase {
 
     // The full path is returned therefore only tests with
     // assertStringEndsWith() so the test is portable.
-    $expected_path = str_replace('/', DIRECTORY_SEPARATOR, 'core/tests/Drupal/Tests/Component/ClassFinder/ClassFinderTest.php');
+    $expected_path = \str_replace('/', DIRECTORY_SEPARATOR, 'core/tests/Drupal/Tests/Component/ClassFinder/ClassFinderTest.php');
     $this->assertStringEndsWith($expected_path, $finder->findFile(ClassFinderTest::class));
     $class = 'Not\\A\\Class';
     $this->assertNull($finder->findFile($class));

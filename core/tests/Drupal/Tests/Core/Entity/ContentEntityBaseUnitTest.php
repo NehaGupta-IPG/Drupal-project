@@ -261,7 +261,7 @@ class ContentEntityBaseUnitTest extends UnitTestCase {
       ->with($this->entity, 'revision_id', NULL)
       ->willReturn($field_item_list);
 
-    $this->fieldDefinitions['revision_id']->getItemDefinition()->setClass(get_class($field_item));
+    $this->fieldDefinitions['revision_id']->getItemDefinition()->setClass(\get_class($field_item));
 
     $this->assertFalse($this->entity->isNewRevision());
     $this->assertTrue($this->entity->isNewRevision());
@@ -675,7 +675,7 @@ class ContentEntityBaseUnitTest extends UnitTestCase {
     // get() will never be called.
     $get_count = 0;
     if ($include_computed) {
-      $get_count = count($field_definitions);
+      $get_count = \count($field_definitions);
     }
 
     // Set up expectations for get(). It simply returns the name passed in.

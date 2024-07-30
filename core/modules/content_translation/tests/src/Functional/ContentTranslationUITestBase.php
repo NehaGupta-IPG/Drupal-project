@@ -101,7 +101,7 @@ abstract class ContentTranslationUITestBase extends ContentTranslationTestBase {
     $translation = $this->getTranslation($entity, $default_langcode);
     foreach ($values[$default_langcode] as $property => $value) {
       $stored_value = $this->getValue($translation, $property, $default_langcode);
-      $value = is_array($value) ? $value[0]['value'] : $value;
+      $value = \is_array($value) ? $value[0]['value'] : $value;
       $message = "$property correctly stored in the default language.";
       $this->assertEquals($value, $stored_value, $message);
     }
@@ -206,7 +206,7 @@ abstract class ContentTranslationUITestBase extends ContentTranslationTestBase {
       $translation = $this->getTranslation($entity, $langcode);
       foreach ($property_values as $property => $value) {
         $stored_value = $this->getValue($translation, $property, $langcode);
-        $value = is_array($value) ? $value[0]['value'] : $value;
+        $value = \is_array($value) ? $value[0]['value'] : $value;
         $message = "$property correctly stored with language $langcode.";
         $this->assertEquals($value, $stored_value, $message);
       }
@@ -326,7 +326,7 @@ abstract class ContentTranslationUITestBase extends ContentTranslationTestBase {
       $user = $this->drupalCreateUser();
       $values[$langcode] = [
         'uid' => $user->id(),
-        'created' => \Drupal::time()->getRequestTime() - mt_rand(0, 1000),
+        'created' => \Drupal::time()->getRequestTime() - \mt_rand(0, 1000),
       ];
       $edit = [
         'content_translation[uid]' => $user->getAccountName(),
@@ -414,7 +414,7 @@ abstract class ContentTranslationUITestBase extends ContentTranslationTestBase {
     $edit = $values[$langcode];
     $langcode = $new ? LanguageInterface::LANGCODE_NOT_SPECIFIED : $langcode;
     foreach ($values[$langcode] as $property => $value) {
-      if (is_array($value)) {
+      if (\is_array($value)) {
         $edit["{$property}[0][value]"] = $value[0]['value'];
         unset($edit[$property]);
       }
@@ -564,7 +564,7 @@ abstract class ContentTranslationUITestBase extends ContentTranslationTestBase {
 
       foreach ($entity->getTranslationLanguages() as $language) {
         // Ensure different timestamps.
-        sleep(1);
+        \sleep(1);
 
         $langcode = $language->getId();
 
@@ -588,7 +588,7 @@ abstract class ContentTranslationUITestBase extends ContentTranslationTestBase {
       $timestamps = [];
       foreach ($entity->getTranslationLanguages() as $language) {
         $next_timestamp = $entity->getTranslation($language->getId())->getChangedTime();
-        if (!in_array($next_timestamp, $timestamps)) {
+        if (!\in_array($next_timestamp, $timestamps)) {
           $timestamps[] = $next_timestamp;
         }
       }
@@ -621,7 +621,7 @@ abstract class ContentTranslationUITestBase extends ContentTranslationTestBase {
       $this->assertEquals($changed_timestamp, $entity->getChangedTime(), 'The entity\'s changed time wasn\'t updated after API save without changes.');
 
       // Ensure different save timestamps.
-      sleep(1);
+      \sleep(1);
 
       // Save the entity on the regular edit form.
       $language = $entity->language();

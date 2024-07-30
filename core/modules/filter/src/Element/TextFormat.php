@@ -107,7 +107,7 @@ class TextFormat extends RenderElementBase {
     // Move this element into sub-element 'value'.
     unset($element['value']);
     foreach (Element::properties($element) as $key) {
-      if (!in_array($key, $keys_not_to_copy)) {
+      if (!\in_array($key, $keys_not_to_copy)) {
         $element['value'][$key] = $element[$key];
       }
     }
@@ -130,7 +130,7 @@ class TextFormat extends RenderElementBase {
     ];
 
     // Get a list of formats that the current user has access to.
-    $formats = filter_formats($user);
+    $formats = \filter_formats($user);
 
     // Allow the list of formats to be restricted.
     if (isset($element['#allowed_formats'])) {
@@ -138,13 +138,13 @@ class TextFormat extends RenderElementBase {
       // certain text formats to be used for certain text areas. In case the
       // fallback format is supposed to be allowed as well, it must be added to
       // $element['#allowed_formats'] explicitly.
-      $formats = array_intersect_key($formats, array_flip($element['#allowed_formats']));
+      $formats = \array_intersect_key($formats, \array_flip($element['#allowed_formats']));
     }
 
     if (!isset($element['#format']) && !empty($formats)) {
       // If no text format was selected, use the allowed format with the highest
       // weight. This is equivalent to calling filter_default_format().
-      $element['#format'] = reset($formats)->id();
+      $element['#format'] = \reset($formats)->id();
     }
 
     // If #allowed_formats is set, the list of formats must not be modified in
@@ -159,7 +159,7 @@ class TextFormat extends RenderElementBase {
     $config = static::configFactory()->get('filter.settings');
     if (!isset($element['#allowed_formats']) && !$config->get('always_show_fallback_choice')) {
       $fallback_format = $config->get('fallback_format');
-      if ($element['#format'] !== $fallback_format && count($formats) > 1) {
+      if ($element['#format'] !== $fallback_format && \count($formats) > 1) {
         unset($formats[$fallback_format]);
       }
     }
@@ -189,13 +189,13 @@ class TextFormat extends RenderElementBase {
 
     $element['format']['format'] = [
       '#type' => 'select',
-      '#title' => t('Text format'),
+      '#title' => \t('Text format'),
       '#options' => $options,
       '#default_value' => $element['#format'],
-      '#access' => count($formats) > 1,
+      '#access' => \count($formats) > 1,
       '#weight' => 10,
       '#attributes' => ['class' => ['js-filter-list']],
-      '#parents' => array_merge($element['#parents'], ['format']),
+      '#parents' => \array_merge($element['#parents'], ['format']),
     ];
 
     $element['format']['help'] = [
@@ -205,7 +205,7 @@ class TextFormat extends RenderElementBase {
       ],
       'about' => [
         '#type' => 'link',
-        '#title' => t('About text formats'),
+        '#title' => \t('About text formats'),
         '#url' => new Url('filter.tips_all'),
         '#attributes' => ['target' => '_blank'],
       ],
@@ -239,7 +239,7 @@ class TextFormat extends RenderElementBase {
       // Prepend #pre_render callback to replace field value with user notice
       // prior to rendering.
       $element['value'] += ['#pre_render' => []];
-      array_unshift($element['value']['#pre_render'], [static::class, 'accessDeniedCallback']);
+      \array_unshift($element['value']['#pre_render'], [static::class, 'accessDeniedCallback']);
 
       // Cosmetic adjustments.
       if (isset($element['value']['#rows'])) {
@@ -277,7 +277,7 @@ class TextFormat extends RenderElementBase {
    *   The updated render array.
    */
   public static function accessDeniedCallback(array $element) {
-    $element['#value'] = t('This field has been disabled because you do not have sufficient permissions to edit it.');
+    $element['#value'] = \t('This field has been disabled because you do not have sufficient permissions to edit it.');
     return $element;
   }
 

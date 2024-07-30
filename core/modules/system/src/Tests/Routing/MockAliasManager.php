@@ -84,7 +84,7 @@ class MockAliasManager implements AliasManagerInterface {
    */
   public function getAliasByPath($path, $langcode = NULL) {
     if ($path[0] !== '/') {
-      throw new \InvalidArgumentException(sprintf('Source path %s has to start with a slash.', $path));
+      throw new \InvalidArgumentException(\sprintf('Source path %s has to start with a slash.', $path));
     }
 
     $langcode = $langcode ?: $this->defaultLanguage;

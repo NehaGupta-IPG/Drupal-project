@@ -155,10 +155,10 @@ class NodeLanguageTest extends NodeTestBase {
     $pos_es_max = 0;
     $pos_fr_min = 10000;
     foreach ($this->nodeTitles['es'] as $title) {
-      $pos_es_max = max($pos_es_max, strpos($page, $title));
+      $pos_es_max = \max($pos_es_max, \strpos($page, $title));
     }
     foreach ($this->nodeTitles['fr'] as $title) {
-      $pos_fr_min = min($pos_fr_min, strpos($page, $title));
+      $pos_fr_min = \min($pos_fr_min, \strpos($page, $title));
     }
     $this->assertLessThan($pos_fr_min, $pos_es_max, "The Spanish translation should appear before the French one on $message.");
 

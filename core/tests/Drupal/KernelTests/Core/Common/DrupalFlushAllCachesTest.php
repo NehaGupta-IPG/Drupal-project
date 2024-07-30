@@ -38,31 +38,31 @@ class DrupalFlushAllCachesTest extends KernelTestBase {
     $core_extension = \Drupal::configFactory()->getEditable('core.extension');
     $module = $core_extension->get('module');
     $module['system_test'] = -10;
-    $core_extension->set('module', module_config_sort($module))->save();
+    $core_extension->set('module', \module_config_sort($module))->save();
     $this->containerBuilds = 0;
-    drupal_flush_all_caches();
+    \drupal_flush_all_caches();
     $module_list = ['system_test', 'system'];
     $database_module = \Drupal::database()->getProvider();
     if ($database_module !== 'core') {
       $module_list[] = $database_module;
     }
-    sort($module_list);
-    $container_modules = array_keys($this->container->getParameter('container.modules'));
-    sort($container_modules);
+    \sort($module_list);
+    $container_modules = \array_keys($this->container->getParameter('container.modules'));
+    \sort($container_modules);
     $this->assertSame($module_list, $container_modules);
     $this->assertSame(1, $this->containerBuilds);
     $this->assertTrue(\Drupal::moduleHandler()->hasImplementations('help', ['system_test']));
 
     $core_extension->clear('module.system_test')->save();
     $this->containerBuilds = 0;
-    drupal_flush_all_caches();
+    \drupal_flush_all_caches();
     $module_list = ['system'];
     if ($database_module !== 'core') {
       $module_list[] = $database_module;
     }
-    sort($module_list);
-    $container_modules = array_keys($this->container->getParameter('container.modules'));
-    sort($container_modules);
+    \sort($module_list);
+    $container_modules = \array_keys($this->container->getParameter('container.modules'));
+    \sort($container_modules);
     $this->assertSame($module_list, $container_modules);
     $this->assertSame(1, $this->containerBuilds);
   }

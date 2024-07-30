@@ -30,17 +30,17 @@ trait XmlNormalizationQuirksTrait {
       if ($value === [] || $value === NULL) {
         $normalization[$key] = '';
       }
-      elseif (is_array($value)) {
+      elseif (\is_array($value)) {
         // Collapse single-item numeric arrays to just the single item.
-        if (count($value) === 1 && is_numeric(array_keys($value)[0]) && is_scalar($value[0])) {
+        if (\count($value) === 1 && \is_numeric(\array_keys($value)[0]) && \is_scalar($value[0])) {
           $value = $value[0];
         }
         // Restructure multiple-item arrays inside a single-item numeric array.
         // @see \Symfony\Component\Serializer\Encoder\XmlEncoder::buildXml()
-        elseif (count($value) === 1 && is_numeric(array_keys($value)[0]) && is_array(reset($value))) {
+        elseif (\count($value) === 1 && \is_numeric(\array_keys($value)[0]) && \is_array(\reset($value))) {
           $rewritten_value = [];
           foreach ($value[0] as $child_key => $child_value) {
-            if (is_numeric(array_keys(reset($value))[0])) {
+            if (\is_numeric(\array_keys(\reset($value))[0])) {
               $rewritten_value[$child_key] = ['@key' => $child_key] + $child_value;
             }
             else {
@@ -51,7 +51,7 @@ trait XmlNormalizationQuirksTrait {
         }
 
         // If the post-quirk value is still an array after the above, recurse.
-        if (is_array($value)) {
+        if (\is_array($value)) {
           $value = $this->applyXmlDecodingQuirks($value);
         }
 

@@ -50,7 +50,7 @@ class FieldTranslationSynchronizer implements FieldTranslationSynchronizerInterf
       if (!$translatable) {
         $field_type_definition = $this->fieldTypeManager->getDefinition($field_definition->getType());
         if (!empty($field_type_definition['column_groups'][$group]['columns'])) {
-          $properties = array_merge($properties, $field_type_definition['column_groups'][$group]['columns']);
+          $properties = \array_merge($properties, $field_type_definition['column_groups'][$group]['columns']);
         }
       }
     }
@@ -82,7 +82,7 @@ class FieldTranslationSynchronizer implements FieldTranslationSynchronizerInterf
     // If we have no information about what to sync to, if we are creating a new
     // entity, if we have no translations for the current entity and we are not
     // creating one, then there is nothing to synchronize.
-    if (empty($sync_langcode) || $entity->isNew() || count($translations) < 2) {
+    if (empty($sync_langcode) || $entity->isNew() || \count($translations) < 2) {
       return;
     }
 
@@ -119,9 +119,9 @@ class FieldTranslationSynchronizer implements FieldTranslationSynchronizerInterf
           ->getStorage($entity->getEntityTypeId())
           ->load($entity->id());
         if ($default_revision->getLoadedRevisionId() !== $entity->getLoadedRevisionId()) {
-          $other_langcodes = array_diff_key($default_revision->getTranslationLanguages(), [$sync_langcode => FALSE]);
+          $other_langcodes = \array_diff_key($default_revision->getTranslationLanguages(), [$sync_langcode => FALSE]);
           if ($other_langcodes) {
-            $sync_langcode = key($other_langcodes);
+            $sync_langcode = \key($other_langcodes);
           }
         }
       }
@@ -138,13 +138,13 @@ class FieldTranslationSynchronizer implements FieldTranslationSynchronizerInterf
       if (($translation_sync = $this->getFieldSynchronizationSettings($field_definition)) && !$items->isEmpty()) {
         // Retrieve all the untranslatable column groups and merge them into
         // single list.
-        $groups = array_keys(array_diff($translation_sync, array_filter($translation_sync)));
+        $groups = \array_keys(\array_diff($translation_sync, \array_filter($translation_sync)));
 
         // If a group was selected has the require_all_groups_for_translation
         // flag set, there are no untranslatable columns. This is done because
         // the UI adds JavaScript that disables the other checkboxes, so their
         // values are not saved.
-        foreach (array_filter($translation_sync) as $group) {
+        foreach (\array_filter($translation_sync) as $group) {
           if (!empty($column_groups[$group]['require_all_groups_for_translation'])) {
             $groups = [];
             break;
@@ -155,7 +155,7 @@ class FieldTranslationSynchronizer implements FieldTranslationSynchronizerInterf
           foreach ($groups as $group) {
             $info = $column_groups[$group];
             // A missing 'columns' key indicates we have a single-column group.
-            $columns = array_merge($columns, $info['columns'] ?? [$group]);
+            $columns = \array_merge($columns, $info['columns'] ?? [$group]);
           }
           if (!empty($columns)) {
             $values = [];
@@ -168,7 +168,7 @@ class FieldTranslationSynchronizer implements FieldTranslationSynchronizerInterf
             // to check against.
             $langcode = $original_langcode ?: $sync_langcode;
             $unchanged_items = $entity_unchanged->getTranslation($langcode)->get($field_name)->getValue();
-            $this->synchronizeItems($values, $unchanged_items, $sync_langcode, array_keys($translations), $columns);
+            $this->synchronizeItems($values, $unchanged_items, $sync_langcode, \array_keys($translations), $columns);
 
             foreach ($translations as $langcode => $language) {
               $entity->getTranslation($langcode)->get($field_name)->setValue($values[$langcode]);
@@ -211,7 +211,7 @@ class FieldTranslationSynchronizer implements FieldTranslationSynchronizerInterf
 
     // By picking the maximum size between updated and unchanged items, we make
     // sure to process also removed items.
-    $total = max([count($source_items), count($unchanged_items)]);
+    $total = \max([\count($source_items), \count($unchanged_items)]);
 
     // As a first step we build a map of the deltas corresponding to the column
     // values to be synchronized. Recording both the old values and the new
@@ -254,10 +254,10 @@ class FieldTranslationSynchronizer implements FieldTranslationSynchronizerInterf
 
           if ($item_id = $this->itemHash($source_items, $delta, $properties)) {
             if (!empty($change_map[$item_id]['old'])) {
-              $old_delta = array_shift($change_map[$item_id]['old']);
+              $old_delta = \array_shift($change_map[$item_id]['old']);
             }
             if (!empty($change_map[$item_id]['new'])) {
-              $new_delta = array_shift($change_map[$item_id]['new']);
+              $new_delta = \array_shift($change_map[$item_id]['new']);
             }
             $created = $created && !isset($old_delta);
             $removed = $removed && !isset($new_delta);
@@ -312,9 +312,9 @@ class FieldTranslationSynchronizer implements FieldTranslationSynchronizerInterf
    *   A merged item array.
    */
   protected function createMergedItem(array $source_item, array $target_item, array $properties) {
-    $property_keys = array_flip($properties);
-    $item_properties_to_sync = array_intersect_key($source_item, $property_keys);
-    $item_properties_to_keep = array_diff_key($target_item, $property_keys);
+    $property_keys = \array_flip($properties);
+    $item_properties_to_sync = \array_intersect_key($source_item, $property_keys);
+    $item_properties_to_keep = \array_diff_key($target_item, $property_keys);
     return $item_properties_to_sync + $item_properties_to_keep;
   }
 
@@ -340,7 +340,7 @@ class FieldTranslationSynchronizer implements FieldTranslationSynchronizerInterf
           $value = $items[$delta][$property];
           // String and integer values are by far the most common item values,
           // thus we special-case them to improve performance.
-          $values[] = is_string($value) || is_int($value) ? $value : hash('sha256', serialize($value));
+          $values[] = \is_string($value) || \is_int($value) ? $value : \hash('sha256', \serialize($value));
         }
         else {
           // Explicitly track also empty values.
@@ -349,7 +349,7 @@ class FieldTranslationSynchronizer implements FieldTranslationSynchronizerInterf
       }
     }
 
-    return implode('.', $values);
+    return \implode('.', $values);
   }
 
 }

@@ -31,22 +31,22 @@ class TagsTest extends UnitTestCase {
    * Explodes a series of tags.
    */
   public function testExplodeTags(): void {
-    $string = implode(', ', array_keys($this->validTags));
+    $string = \implode(', ', \array_keys($this->validTags));
     $tags = Tags::explode($string);
-    $this->assertEquals(array_values($this->validTags), $tags);
+    $this->assertEquals(\array_values($this->validTags), $tags);
   }
 
   /**
    * Implodes a series of tags.
    */
   public function testImplodeTags(): void {
-    $tags = array_values($this->validTags);
+    $tags = \array_values($this->validTags);
     // Let's explode and implode to our heart's content.
     for ($i = 0; $i < 10; $i++) {
       $string = Tags::implode($tags);
       $tags = Tags::explode($string);
     }
-    $this->assertEquals(array_values($this->validTags), $tags);
+    $this->assertEquals(\array_values($this->validTags), $tags);
   }
 
 }

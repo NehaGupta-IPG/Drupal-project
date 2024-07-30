@@ -102,7 +102,7 @@ class OptimizedPhpArrayDumperTest extends TestCase {
    */
   public function testDumpForEmptyContainer(): void {
     $serialized_definition = $this->dumper->dump();
-    $this->assertEquals(serialize($this->containerDefinition), $serialized_definition);
+    $this->assertEquals(\serialize($this->containerDefinition), $serialized_definition);
   }
 
   /**
@@ -472,7 +472,7 @@ class OptimizedPhpArrayDumperTest extends TestCase {
    * Used to override serialization.
    */
   protected static function serializeDefinition(array $service_definition) {
-    return serialize($service_definition);
+    return \serialize($service_definition);
   }
 
   /**
@@ -615,7 +615,7 @@ class OptimizedPhpArrayDumperTest extends TestCase {
    * @legacy-covers ::dumpValue
    */
   public function testGetServiceDefinitionForResource(): void {
-    $resource = fopen('php://memory', 'r');
+    $resource = \fopen('php://memory', 'r');
 
     $bar_definition = new Definition('\stdClass');
     $bar_definition->setPublic(TRUE);
@@ -674,7 +674,7 @@ class OptimizedPhpArrayDumperTest extends TestCase {
    */
   protected static function getPrivateServiceCall($id, $service_definition, $shared = FALSE) {
     if (!$id) {
-      $hash = Crypt::hashBase64(serialize($service_definition));
+      $hash = Crypt::hashBase64(\serialize($service_definition));
       $id = 'private__' . $hash;
     }
     return (object) [
@@ -735,7 +735,7 @@ class OptimizedPhpArrayDumperTest extends TestCase {
  */
 namespace Symfony\Component\ExpressionLanguage;
 
-if (!class_exists('\Symfony\Component\ExpressionLanguage\Expression')) {
+if (!\class_exists('\Symfony\Component\ExpressionLanguage\Expression')) {
   /**
    * Dummy class to ensure non-existent Symfony component can be tested.
    */

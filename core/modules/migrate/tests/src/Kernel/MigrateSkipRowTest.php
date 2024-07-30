@@ -70,7 +70,7 @@ class MigrateSkipRowTest extends KernelTestBase {
     // Check that the correct message has been logged for the second exception.
     $messages = $id_map_plugin->getMessages(['id' => 2])->fetchAll();
     $this->assertCount(1, $messages);
-    $message = reset($messages);
+    $message = \reset($messages);
     $this->assertEquals('skip_and_do_not_record message', $message->message);
     $this->assertEquals(MigrationInterface::MESSAGE_INFORMATIONAL, $message->level);
 

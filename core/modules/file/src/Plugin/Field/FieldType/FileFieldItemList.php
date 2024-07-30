@@ -58,7 +58,7 @@ class FileFieldItemList extends EntityReferenceFieldItemList {
       }
 
       // Decrement file usage by 1 for files that were removed from the field.
-      $removed_ids = array_filter(array_diff($original_ids, $ids));
+      $removed_ids = \array_filter(\array_diff($original_ids, $ids));
       $removed_files = \Drupal::entityTypeManager()->getStorage('file')->loadMultiple($removed_ids);
       foreach ($removed_files as $file) {
         \Drupal::service('file.usage')->delete($file, 'file', $entity->getEntityTypeId(), $entity->id());
@@ -66,7 +66,7 @@ class FileFieldItemList extends EntityReferenceFieldItemList {
 
       // Add new usage entries for newly added files.
       foreach ($files as $file) {
-        if (!in_array($file->id(), $original_ids)) {
+        if (!\in_array($file->id(), $original_ids)) {
           \Drupal::service('file.usage')->add($file, 'file', $entity->getEntityTypeId(), $entity->id());
         }
       }

@@ -28,7 +28,7 @@ class Batch extends DatabaseQueue {
     try {
       $item = $this->connection->queryRange('SELECT [data], [item_id] FROM {queue} q WHERE [name] = :name ORDER BY [item_id] ASC', 0, 1, [':name' => $this->name])->fetchObject();
       if ($item) {
-        $item->data = unserialize($item->data);
+        $item->data = \unserialize($item->data);
         return $item;
       }
     }
@@ -58,7 +58,7 @@ class Batch extends DatabaseQueue {
         ->fetchAll();
 
       foreach ($items as $item) {
-        $result[] = unserialize($item->data);
+        $result[] = \unserialize($item->data);
       }
     }
     catch (\Exception $e) {

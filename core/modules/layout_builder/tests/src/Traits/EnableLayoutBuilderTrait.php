@@ -35,7 +35,7 @@ trait EnableLayoutBuilderTrait {
    *   Whether custom layouts per entity should be allowed.
    */
   protected function enableLayoutBuilderFromUi(string $bundle, string $viewMode, bool $allowCustom = TRUE): void {
-    $path = sprintf('admin/structure/types/manage/%s/display/%s', $bundle, $viewMode);
+    $path = \sprintf('admin/structure/types/manage/%s/display/%s', $bundle, $viewMode);
     $page = $this->getSession()->getPage();
     $this->drupalGet($path);
     $page->checkField('layout[enabled]');
@@ -55,7 +55,7 @@ trait EnableLayoutBuilderTrait {
    *   The view mode that Layout Builder is being disabled on.
    */
   protected function disableLayoutBuilderFromUi(string $bundle, string $viewMode): void {
-    $path = sprintf('admin/structure/types/manage/%s/display/%s', $bundle, $viewMode);
+    $path = \sprintf('admin/structure/types/manage/%s/display/%s', $bundle, $viewMode);
     $page = $this->getSession()->getPage();
     $this->drupalGet($path);
     $page->uncheckField('layout[enabled]');

@@ -230,7 +230,7 @@ class EntityFieldManager implements EntityFieldManagerInterface, PreWarmableInte
     $entity_type = $this->entityTypeManager->getDefinition($entity_type_id);
     $class = $entity_type->getClass();
     /** @var string[] $keys */
-    $keys = array_filter($entity_type->getKeys());
+    $keys = \array_filter($entity_type->getKeys());
 
     // Fail with an exception for non-fieldable entity types.
     if (!$entity_type->entityClassImplements(FieldableEntityInterface::class)) {
@@ -328,7 +328,7 @@ class EntityFieldManager implements EntityFieldManagerInterface, PreWarmableInte
 
     // Ensure defined entity keys are there and have proper revisionable and
     // translatable values.
-    foreach (array_intersect_key($keys, array_flip(['id', 'revision', 'uuid', 'bundle'])) as $key => $field_name) {
+    foreach (\array_intersect_key($keys, \array_flip(['id', 'revision', 'uuid', 'bundle'])) as $key => $field_name) {
       if (!isset($base_field_definitions[$field_name])) {
         throw new \LogicException("The $field_name field definition does not exist and it is used as $key entity key.");
       }
@@ -369,7 +369,7 @@ class EntityFieldManager implements EntityFieldManagerInterface, PreWarmableInte
       // base fields, merge them together. Use array_replace() to replace base
       // fields with by bundle overrides and keep them in order, append
       // additional by bundle fields.
-      $this->fieldDefinitions[$entity_type_id][$bundle][$langcode] = array_replace($base_field_definitions, $bundle_field_definitions);
+      $this->fieldDefinitions[$entity_type_id][$bundle][$langcode] = \array_replace($base_field_definitions, $bundle_field_definitions);
     }
     return $this->fieldDefinitions[$entity_type_id][$bundle][$langcode];
   }
@@ -532,11 +532,11 @@ class EntityFieldManager implements EntityFieldManagerInterface, PreWarmableInte
         // types for this to become a bottleneck.
         foreach ($this->entityTypeManager->getDefinitions() as $entity_type_id => $entity_type) {
           if ($entity_type->entityClassImplements(FieldableEntityInterface::class)) {
-            $bundles = array_keys($this->entityTypeBundleInfo->getBundleInfo($entity_type_id));
+            $bundles = \array_keys($this->entityTypeBundleInfo->getBundleInfo($entity_type_id));
             foreach ($this->getBaseFieldDefinitions($entity_type_id) as $field_name => $base_field_definition) {
               $this->fieldMap[$entity_type_id][$field_name] = [
                 'type' => $base_field_definition->getType(),
-                'bundles' => array_combine($bundles, $bundles),
+                'bundles' => \array_combine($bundles, $bundles),
               ];
             }
           }

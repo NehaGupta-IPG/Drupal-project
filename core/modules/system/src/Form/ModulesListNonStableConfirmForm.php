@@ -89,7 +89,7 @@ class ModulesListNonStableConfirmForm extends ModulesListConfirmForm {
 
     if ($hasExperimentalModulesToEnable) {
       return $this->formatPlural(
-        count($this->groupedModuleInfo[ExtensionLifecycle::EXPERIMENTAL]),
+        \count($this->groupedModuleInfo[ExtensionLifecycle::EXPERIMENTAL]),
         'Are you sure you wish to install an experimental module?',
         'Are you sure you wish to install experimental modules?'
       );
@@ -97,7 +97,7 @@ class ModulesListNonStableConfirmForm extends ModulesListConfirmForm {
 
     if ($hasDeprecatedModulesToEnable) {
       return $this->formatPlural(
-        count($this->groupedModuleInfo[ExtensionLifecycle::DEPRECATED]),
+        \count($this->groupedModuleInfo[ExtensionLifecycle::DEPRECATED]),
         'Are you sure you wish to install a deprecated module?',
         'Are you sure you wish to install deprecated modules?'
       );
@@ -122,15 +122,15 @@ class ModulesListNonStableConfirmForm extends ModulesListConfirmForm {
       $this->messenger()->addWarning($this->t('<a href=":url">Experimental modules</a> are provided for testing purposes only. Use at your own risk.', [':url' => 'https://www.drupal.org/core/experimental']));
       // Add the list of experimental modules after any other messages.
       $items[] = $this->formatPlural(
-        count($this->groupedModuleInfo[ExtensionLifecycle::EXPERIMENTAL]),
+        \count($this->groupedModuleInfo[ExtensionLifecycle::EXPERIMENTAL]),
         'The following module is experimental: @modules.',
         'The following modules are experimental: @modules.',
-        ['@modules' => implode(', ', $this->groupedModuleInfo[ExtensionLifecycle::EXPERIMENTAL])]
+        ['@modules' => \implode(', ', $this->groupedModuleInfo[ExtensionLifecycle::EXPERIMENTAL])]
       );
     }
     if (!empty($this->groupedModuleInfo[ExtensionLifecycle::DEPRECATED])) {
       $this->messenger()->addWarning($this->buildDeprecatedMessage($this->coreDeprecatedModules, $this->contribDeprecatedModules));
-      $items = array_merge($items, $this->groupedModuleInfo[ExtensionLifecycle::DEPRECATED]);
+      $items = \array_merge($items, $this->groupedModuleInfo[ExtensionLifecycle::DEPRECATED]);
     }
 
     return $items;

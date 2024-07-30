@@ -106,7 +106,7 @@ class PoDatabaseReader implements PoReaderInterface {
     $options = $this->options;
     $conditions = [];
 
-    if (array_sum($options) == 0) {
+    if (\array_sum($options) == 0) {
       // If user asked to not include anything in the translation files,
       // that would not make sense, so just fall back on providing a template.
       $langcode = NULL;
@@ -153,7 +153,7 @@ class PoDatabaseReader implements PoReaderInterface {
     if (!isset($this->result)) {
       $this->result = $this->loadStrings();
     }
-    return array_shift($this->result);
+    return \array_shift($this->result);
   }
 
   /**

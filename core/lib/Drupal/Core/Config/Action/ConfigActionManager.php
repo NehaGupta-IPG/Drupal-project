@@ -98,7 +98,7 @@ class ConfigActionManager extends DefaultPluginManager {
     protected readonly TypedConfigManagerInterface $typedConfig,
     protected readonly ConfigFactoryInterface $configFactory,
   ) {
-    assert($namespaces instanceof \ArrayAccess, '$namespaces can be accessed like an array');
+    \assert($namespaces instanceof \ArrayAccess, '$namespaces can be accessed like an array');
     // Enable this namespace to be searched for plugins.
     $namespaces[__NAMESPACE__] = 'core/lib/Drupal/Core/Config/Action';
 
@@ -168,14 +168,14 @@ class ConfigActionManager extends DefaultPluginManager {
       $action->apply($name, $data);
       $typed_config = $this->typedConfig->createFromNameAndData($name, $this->configFactory->get($name)->getRawData());
       // All config objects are mappings.
-      assert($typed_config instanceof Mapping);
+      \assert($typed_config instanceof Mapping);
       foreach ($typed_config->getConstraints() as $constraint) {
         // Only validate the config if it has explicitly been marked as being
         // validatable.
         if ($constraint instanceof FullyValidatableConstraint) {
           /** @var \Symfony\Component\Validator\ConstraintViolationList $violations */
           $violations = $typed_config->validate();
-          if (count($violations) > 0) {
+          if (\count($violations) > 0) {
             throw new InvalidConfigException($violations, $typed_config);
           }
           break;
@@ -210,7 +210,7 @@ class ConfigActionManager extends DefaultPluginManager {
    */
   private function getConfigNamesMatchingExpression(string $expression): array {
     // If there are no wildcards, we can return the config name as-is.
-    if (!str_contains($expression, '.*')) {
+    if (!\str_contains($expression, '.*')) {
       return [$expression];
     }
 
@@ -226,8 +226,8 @@ class ConfigActionManager extends DefaultPluginManager {
     // Convert the expression to a regular expression. We assume that * should
     // match the characters allowed by
     // \Drupal\Core\Config\ConfigBase::validateName(), which is permissive.
-    $expression = str_replace('\\*', '[^.:?*<>"\'\/\\\\]+', preg_quote($expression));
-    $matches = @preg_grep("/^$expression$/", $this->configStorage->listAll("$prefix."));
+    $expression = \str_replace('\\*', '[^.:?*<>"\'\/\\\\]+', \preg_quote($expression));
+    $matches = @\preg_grep("/^$expression$/", $this->configStorage->listAll("$prefix."));
     if ($matches === FALSE) {
       throw new ConfigActionException("The expression '$expression' could not be parsed.");
     }
@@ -247,11 +247,11 @@ class ConfigActionManager extends DefaultPluginManager {
   protected function getShorthandActionIdsForEntityType(string $entityType): array {
     $map = [];
     foreach ($this->getDefinitions() as $plugin_id => $definition) {
-      if (in_array($entityType, $definition['entity_types'], TRUE) || in_array('*', $definition['entity_types'], TRUE)) {
+      if (\in_array($entityType, $definition['entity_types'], TRUE) || \in_array('*', $definition['entity_types'], TRUE)) {
         $regex = '/' . PluginBase::DERIVATIVE_SEPARATOR . '([^' . PluginBase::DERIVATIVE_SEPARATOR . ']*)$/';
-        $action_id = preg_match($regex, $plugin_id, $matches) ? $matches[1] : $plugin_id;
+        $action_id = \preg_match($regex, $plugin_id, $matches) ? $matches[1] : $plugin_id;
         if (isset($map[$action_id])) {
-          throw new DuplicateConfigActionIdException(sprintf('The plugins \'%s\' and \'%s\' both resolve to the same shorthand action ID for the \'%s\' entity type', $plugin_id, $map[$action_id], $entityType));
+          throw new DuplicateConfigActionIdException(\sprintf('The plugins \'%s\' and \'%s\' both resolve to the same shorthand action ID for the \'%s\' entity type', $plugin_id, $map[$action_id], $entityType));
         }
         $map[$action_id] = $plugin_id;
       }
@@ -276,9 +276,9 @@ class ConfigActionManager extends DefaultPluginManager {
   public function createInstance($plugin_id, array $configuration = []) {
     $instance = parent::createInstance($plugin_id, $configuration);
     // Trigger deprecation notices for renamed plugins.
-    if (array_key_exists($plugin_id, self::$deprecatedPluginIds)) {
+    if (\array_key_exists($plugin_id, self::$deprecatedPluginIds)) {
       // phpcs:ignore Drupal.Semantics.FunctionTriggerError
-      @trigger_error(self::$deprecatedPluginIds[$plugin_id]['message'], E_USER_DEPRECATED);
+      @\trigger_error(self::$deprecatedPluginIds[$plugin_id]['message'], E_USER_DEPRECATED);
     }
     return $instance;
   }

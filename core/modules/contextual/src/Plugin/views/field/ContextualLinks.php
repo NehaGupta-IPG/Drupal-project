@@ -47,7 +47,7 @@ class ContextualLinks extends FieldPluginBase {
   public function buildOptionsForm(&$form, FormStateInterface $form_state) {
     $all_fields = $this->view->display_handler->getFieldLabels();
     // Offer to include only those fields that follow this one.
-    $field_options = array_slice($all_fields, 0, array_search($this->options['id'], array_keys($all_fields)));
+    $field_options = \array_slice($all_fields, 0, \array_search($this->options['id'], \array_keys($all_fields)));
     $form['fields'] = [
       '#type' => 'checkboxes',
       '#title' => $this->t('Fields'),
@@ -110,7 +110,7 @@ class ContextualLinks extends FieldPluginBase {
       if (!empty($title) && !empty($path)) {
         // Make sure that tokens are replaced for this paths as well.
         $tokens = $this->getRenderTokens([]);
-        $path = strip_tags(Html::decodeEntities(strtr($path, $tokens)));
+        $path = \strip_tags(Html::decodeEntities(\strtr($path, $tokens)));
 
         $links[$field] = [
           'href' => $path,
@@ -136,7 +136,7 @@ class ContextualLinks extends FieldPluginBase {
 
       $element = [
         '#type' => 'contextual_links_placeholder',
-        '#id' => _contextual_links_to_id($contextual_links),
+        '#id' => \_contextual_links_to_id($contextual_links),
       ];
       return \Drupal::service('renderer')->render($element);
     }

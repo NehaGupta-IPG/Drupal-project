@@ -161,7 +161,7 @@ abstract class TranslateFormBase extends FormBase {
     $languages = $this->languageManager->getLanguages();
     $language_options = [];
     foreach ($languages as $langcode => $language) {
-      if (locale_is_translatable($langcode)) {
+      if (\locale_is_translatable($langcode)) {
         $language_options[$langcode] = $language->getName();
       }
     }
@@ -169,8 +169,8 @@ abstract class TranslateFormBase extends FormBase {
     // Pick the current interface language code for the filter.
     $default_langcode = $this->languageManager->getCurrentLanguage()->getId();
     if (!isset($language_options[$default_langcode])) {
-      $available_langcodes = array_keys($language_options);
-      $default_langcode = array_shift($available_langcodes);
+      $available_langcodes = \array_keys($language_options);
+      $default_langcode = \array_shift($available_langcodes);
     }
 
     $filters['string'] = [

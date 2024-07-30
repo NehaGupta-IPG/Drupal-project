@@ -55,7 +55,7 @@ class IdAuditor implements AuditorInterface {
       $migration_id = $migration->getPluginId();
       $conflicts[$migration_id] = $this->audit($migration);
     }
-    ksort($conflicts);
+    \ksort($conflicts);
     return $conflicts;
   }
 

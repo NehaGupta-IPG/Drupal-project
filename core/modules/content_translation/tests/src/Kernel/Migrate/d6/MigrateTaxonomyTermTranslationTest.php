@@ -116,9 +116,9 @@ class MigrateTaxonomyTermTranslationTest extends MigrateDrupal6TestBase {
     $term = $this->treeData[$vid][$tid];
     // PostgreSQL, MySQL and SQLite may not return the parent terms in the same
     // order so sort before testing.
-    sort($parent_ids);
-    $actual_terms = array_filter($term->parents);
-    sort($actual_terms);
+    \sort($parent_ids);
+    $actual_terms = \array_filter($term->parents);
+    \sort($actual_terms);
     $this->assertEquals($parent_ids, $actual_terms, "Term $tid has correct parents in taxonomy tree");
   }
 

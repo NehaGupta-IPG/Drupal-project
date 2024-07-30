@@ -143,7 +143,7 @@ class ProjectReleaseTest extends UnitTestCase {
     $data = $this->getValidData();
     unset($data[$missing_field]);
     $this->expectException(\UnexpectedValueException::class);
-    $expected_message = 'Malformed release data:.*' . preg_quote("[$missing_field]:", '/');
+    $expected_message = 'Malformed release data:.*' . \preg_quote("[$missing_field]:", '/');
     $expected_message .= '.*This field is missing';
     $this->expectExceptionMessageMatches("/$expected_message/s");
     ProjectRelease::createFromArray($data);
@@ -179,7 +179,7 @@ class ProjectReleaseTest extends UnitTestCase {
     // feed.
     $data[$invalid_field] = $invalid_value;
     $this->expectException(\UnexpectedValueException::class);
-    $expected_exception_message = 'Malformed release data:.*' . preg_quote("[$invalid_field]:", '/');
+    $expected_exception_message = 'Malformed release data:.*' . \preg_quote("[$invalid_field]:", '/');
     $expected_exception_message .= ".*$expected_message";
     $this->expectExceptionMessageMatches("/$expected_exception_message/s");
     ProjectRelease::createFromArray($data);

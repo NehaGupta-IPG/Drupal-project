@@ -120,7 +120,7 @@ class ViewsConfigUpdater {
     foreach ($displays as $display_id => &$display) {
       foreach ($handler_types as $handler_type => $handler_type_lookup) {
         if (!empty($display['display_options'][$handler_type_lookup])) {
-          if (in_array($handler_type_lookup, $compound_display_handlers)) {
+          if (\in_array($handler_type_lookup, $compound_display_handlers)) {
             if ($handler_processor($display['display_options'][$handler_type_lookup], $handler_type, NULL, $display_id)) {
               $changed = TRUE;
               if ($return_on_changed) {
@@ -130,7 +130,7 @@ class ViewsConfigUpdater {
             continue;
           }
           foreach ($display['display_options'][$handler_type_lookup] as $key => &$handler) {
-            if (is_array($handler) && $handler_processor($handler, $handler_type, $key, $display_id)) {
+            if (\is_array($handler) && $handler_processor($handler, $handler_type, $key, $display_id)) {
               $changed = TRUE;
               if ($return_on_changed) {
                 return $changed;
@@ -208,7 +208,7 @@ class ViewsConfigUpdater {
     $deprecations_triggered = &$this->triggeredDeprecations['2640994'][$view->id()];
     if ($this->areDeprecationsEnabled() && $changed && !$deprecations_triggered) {
       $deprecations_triggered = TRUE;
-      @trigger_error(sprintf('The update to convert "numeric" arguments to "entity_target_id" for entity reference fields for view "%s" is deprecated in drupal:10.3.0 and is removed from drupal:12.0.0. Profile, module and theme provided configuration should be updated. See https://www.drupal.org/node/3441945', $view->id()), E_USER_DEPRECATED);
+      @\trigger_error(\sprintf('The update to convert "numeric" arguments to "entity_target_id" for entity reference fields for view "%s" is deprecated in drupal:10.3.0 and is removed from drupal:12.0.0. Profile, module and theme provided configuration should be updated. See https://www.drupal.org/node/3441945', $view->id()), E_USER_DEPRECATED);
     }
 
     return $changed;

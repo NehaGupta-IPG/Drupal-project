@@ -56,7 +56,7 @@ class MemoryBackend implements CacheBackendInterface, CacheTagsInvalidatorInterf
   public function getMultiple(&$cids, $allow_invalid = FALSE) {
     $ret = [];
 
-    $items = array_intersect_key($this->cache, array_flip($cids));
+    $items = \array_intersect_key($this->cache, \array_flip($cids));
 
     foreach ($items as $item) {
       $item = $this->prepareItem($item, $allow_invalid);
@@ -65,7 +65,7 @@ class MemoryBackend implements CacheBackendInterface, CacheTagsInvalidatorInterf
       }
     }
 
-    $cids = array_diff($cids, array_keys($ret));
+    $cids = \array_diff($cids, \array_keys($ret));
 
     return $ret;
   }
@@ -96,7 +96,7 @@ class MemoryBackend implements CacheBackendInterface, CacheTagsInvalidatorInterf
     // manipulations of the returned object.
 
     $prepared = clone $cache;
-    $prepared->data = unserialize($prepared->data);
+    $prepared->data = \unserialize($prepared->data);
 
     // Check expire time.
     $prepared->valid = $prepared->expire == Cache::PERMANENT || $prepared->expire >= $this->time->getRequestTime();
@@ -112,13 +112,13 @@ class MemoryBackend implements CacheBackendInterface, CacheTagsInvalidatorInterf
    * {@inheritdoc}
    */
   public function set($cid, $data, $expire = Cache::PERMANENT, array $tags = []) {
-    assert(Inspector::assertAllStrings($tags), 'Cache Tags must be strings.');
-    $tags = array_unique($tags);
+    \assert(Inspector::assertAllStrings($tags), 'Cache Tags must be strings.');
+    $tags = \array_unique($tags);
     // Sort the cache tags so that they are stored consistently in the database.
-    sort($tags);
+    \sort($tags);
     $this->cache[$cid] = (object) [
       'cid' => $cid,
-      'data' => serialize($data),
+      'data' => \serialize($data),
       'created' => $this->time->getRequestTime(),
       'expire' => $expire,
       'tags' => $tags,
@@ -145,7 +145,7 @@ class MemoryBackend implements CacheBackendInterface, CacheTagsInvalidatorInterf
    * {@inheritdoc}
    */
   public function deleteMultiple(array $cids) {
-    $this->cache = array_diff_key($this->cache, array_flip($cids));
+    $this->cache = \array_diff_key($this->cache, \array_flip($cids));
   }
 
   /**
@@ -168,7 +168,7 @@ class MemoryBackend implements CacheBackendInterface, CacheTagsInvalidatorInterf
    * {@inheritdoc}
    */
   public function invalidateMultiple(array $cids) {
-    $items = array_intersect_key($this->cache, array_flip($cids));
+    $items = \array_intersect_key($this->cache, \array_flip($cids));
     foreach ($items as $cid => $item) {
       $this->cache[$cid]->expire = $this->time->getRequestTime() - 1;
     }
@@ -179,7 +179,7 @@ class MemoryBackend implements CacheBackendInterface, CacheTagsInvalidatorInterf
    */
   public function invalidateTags(array $tags) {
     foreach ($this->cache as $cid => $item) {
-      if (array_intersect($tags, $item->tags)) {
+      if (\array_intersect($tags, $item->tags)) {
         $this->cache[$cid]->expire = $this->time->getRequestTime() - 1;
       }
     }

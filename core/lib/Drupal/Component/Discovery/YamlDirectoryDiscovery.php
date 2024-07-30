@@ -72,7 +72,7 @@ class YamlDirectoryDiscovery implements DiscoverableInterface {
     $file_cache = FileCacheFactory::get('yaml_discovery:' . $this->fileCacheKeySuffix);
 
     // Try to load from the file cache first.
-    foreach ($file_cache->getMultiple(array_keys($files)) as $file => $data) {
+    foreach ($file_cache->getMultiple(\array_keys($files)) as $file => $data) {
       $all[$files[$file]][$this->getIdentifier($file, $data)] = $data;
       unset($files[$file]);
     }
@@ -84,7 +84,7 @@ class YamlDirectoryDiscovery implements DiscoverableInterface {
         // If a file is empty or its contents are commented out, return an empty
         // array instead of NULL for type consistency.
         try {
-          $data = Yaml::decode(file_get_contents($file)) ?: [];
+          $data = Yaml::decode(\file_get_contents($file)) ?: [];
         }
         catch (InvalidDataTypeException $e) {
           throw new DiscoveryException("The $file contains invalid YAML", 0, $e);
@@ -127,7 +127,7 @@ class YamlDirectoryDiscovery implements DiscoverableInterface {
     foreach ($this->directories as $provider => $directories) {
       $directories = (array) $directories;
       foreach ($directories as $directory) {
-        if (is_dir($directory)) {
+        if (\is_dir($directory)) {
           /** @var \SplFileInfo $fileInfo */
           foreach ($this->getDirectoryIterator($directory) as $fileInfo) {
             $file_list[$fileInfo->getPathname()] = $provider;

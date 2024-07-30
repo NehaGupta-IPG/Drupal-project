@@ -69,11 +69,11 @@ abstract class EntityKernelTestBase extends KernelTestBase {
     // trying to create the body field tables twice.
     $class = static::class;
     while ($class) {
-      if (property_exists($class, 'modules')) {
+      if (\property_exists($class, 'modules')) {
         // Only check the modules, if the $modules property was not inherited.
         $rp = new \ReflectionProperty($class, 'modules');
         if ($rp->class == $class) {
-          foreach (array_intersect(['node', 'comment'], $class::$modules) as $module) {
+          foreach (\array_intersect(['node', 'comment'], $class::$modules) as $module) {
             $this->installEntitySchema($module);
           }
           if (in_array('taxonomy', $class::$modules, TRUE)) {
@@ -81,7 +81,7 @@ abstract class EntityKernelTestBase extends KernelTestBase {
           }
         }
       }
-      $class = get_parent_class($class);
+      $class = \get_parent_class($class);
     }
 
     $this->installConfig(['field']);

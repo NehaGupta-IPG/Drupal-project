@@ -123,7 +123,7 @@ class NumericFormatPluralTest extends ViewTestBase {
     $config = $this->config('views.view.numeric_test');
     $field_config_prefix = 'display.default.display_options.fields.count.';
     $this->assertTrue($config->get($field_config_prefix . 'format_plural'));
-    $this->assertEquals(implode(PoItem::DELIMITER, array_values($edit)), $config->get($field_config_prefix . 'format_plural_string'));
+    $this->assertEquals(\implode(PoItem::DELIMITER, \array_values($edit)), $config->get($field_config_prefix . 'format_plural_string'));
 
     // The view should now use the new plural configuration.
     $this->drupalGet('sl/numeric-test');
@@ -165,7 +165,7 @@ class NumericFormatPluralTest extends ViewTestBase {
       'changed' => 1,
     ]);
     $file->setPermanent();
-    file_put_contents($file->getFileUri(), 'hello world');
+    \file_put_contents($file->getFileUri(), 'hello world');
 
     // Save it, inserting a new record.
     $file->save();

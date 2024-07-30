@@ -254,9 +254,9 @@ class MediaLibraryDisplayModeTest extends BrowserTestBase {
 
     $form_display = EntityFormDisplay::load('media.' . $type_id . '.media_library');
     $this->assertInstanceOf(EntityFormDisplay::class, $form_display);
-    $actual_components = array_keys($form_display->getComponents());
-    sort($components);
-    sort($actual_components);
+    $actual_components = \array_keys($form_display->getComponents());
+    \sort($components);
+    \sort($actual_components);
     $this->assertSame($components, $actual_components);
   }
 
@@ -274,7 +274,7 @@ class MediaLibraryDisplayModeTest extends BrowserTestBase {
     $view_display = EntityViewDisplay::load('media.' . $type_id . '.media_library');
     $this->assertInstanceOf(EntityViewDisplay::class, $view_display);
     // Assert the media library view display contains only the thumbnail.
-    $this->assertSame(['thumbnail'], array_keys($view_display->getComponents()));
+    $this->assertSame(['thumbnail'], \array_keys($view_display->getComponents()));
     // Assert the thumbnail image style.
     $thumbnail = $view_display->getComponent('thumbnail');
     $this->assertIsArray($thumbnail);

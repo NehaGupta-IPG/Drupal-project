@@ -78,8 +78,8 @@ class ImageUploadTest extends BrowserTestBase {
     ]);
 
     $url = $this->getUploadUrl();
-    $image_file = file_get_contents(current($this->getTestFiles('image'))->uri);
-    $non_image_file = file_get_contents(current($this->getTestFiles('php'))->uri);
+    $image_file = \file_get_contents(\current($this->getTestFiles('image'))->uri);
+    $non_image_file = \file_get_contents(\current($this->getTestFiles('php'))->uri);
     $response = $this->uploadRequest($url, $non_image_file, 'test.php');
     $this->assertSame(422, $response->getStatusCode());
 
@@ -112,10 +112,10 @@ class ImageUploadTest extends BrowserTestBase {
       return $size < 30000;
     });
 
-    $response = $this->uploadRequest($url, file_get_contents($large_image->uri), 'large.jpg');
+    $response = $this->uploadRequest($url, \file_get_contents($large_image->uri), 'large.jpg');
     $this->assertSame(422, $response->getStatusCode());
 
-    $response = $this->uploadRequest($url, file_get_contents($small_image->uri), 'small.jpg');
+    $response = $this->uploadRequest($url, \file_get_contents($small_image->uri), 'small.jpg');
     $this->assertSame(201, $response->getStatusCode());
   }
 
@@ -145,10 +145,10 @@ class ImageUploadTest extends BrowserTestBase {
     $small_image = $this->getTestImageByStat($images, 'size', function ($size) {
       return $size < 30000;
     });
-    $response = $this->uploadRequest($url, file_get_contents($large_image->uri), 'same.jpg');
+    $response = $this->uploadRequest($url, \file_get_contents($large_image->uri), 'same.jpg');
     $this->assertSame(422, $response->getStatusCode());
 
-    $response = $this->uploadRequest($url, file_get_contents($small_image->uri), 'same.jpg');
+    $response = $this->uploadRequest($url, \file_get_contents($small_image->uri), 'same.jpg');
     $this->assertSame(201, $response->getStatusCode());
   }
 
@@ -257,8 +257,8 @@ class ImageUploadTest extends BrowserTestBase {
    *   Objects with 'uri', 'filename', and 'name' properties.
    */
   protected function getTestImageByStat(array $images, string $stat, callable $condition) {
-    return current(array_filter($images, function ($image) use ($condition, $stat) {
-      $stats = stat($image->uri);
+    return \current(\array_filter($images, function ($image) use ($condition, $stat) {
+      $stats = \stat($image->uri);
       return $condition($stats[$stat]);
     }));
   }

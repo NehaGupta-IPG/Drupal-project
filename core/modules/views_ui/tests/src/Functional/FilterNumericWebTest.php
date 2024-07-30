@@ -131,7 +131,7 @@ class FilterNumericWebTest extends UITestBase {
     $this->assertSession()->elementsCount('xpath', '//fieldset[contains(@id, "edit-age-wrapper")]//label[contains(@for, "edit-age-min") and contains(text(), "Min")]', 1);
     $this->assertSession()->elementsCount('xpath', '//fieldset[contains(@id, "edit-age-wrapper")]//label[contains(@for, "edit-age-max") and contains(text(), "Max")]', 1);
     // Check that the description is shown in the right place.
-    $this->assertEquals('Description of the exposed filter', trim($this->cssSelect('#edit-age-wrapper--description')[0]->getText()));
+    $this->assertEquals('Description of the exposed filter', \trim($this->cssSelect('#edit-age-wrapper--description')[0]->getText()));
 
     // Change to an operation that only requires one form element ('>').
     $this->drupalGet('admin/structure/views/nojs/handler/test_view/default/filter/age');

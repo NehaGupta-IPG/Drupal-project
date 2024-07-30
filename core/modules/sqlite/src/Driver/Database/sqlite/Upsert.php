@@ -19,15 +19,15 @@ class Upsert extends QueryUpsert {
     $comments = $this->connection->makeComment($this->comments);
 
     // Default fields are always placed first for consistency.
-    $insert_fields = array_merge($this->defaultFields, $this->insertFields);
-    $insert_fields = array_map(function ($field) {
+    $insert_fields = \array_merge($this->defaultFields, $this->insertFields);
+    $insert_fields = \array_map(function ($field) {
       return $this->connection->escapeField($field);
     }, $insert_fields);
 
-    $query = $comments . 'INSERT INTO {' . $this->table . '} (' . implode(', ', $insert_fields) . ') VALUES ';
+    $query = $comments . 'INSERT INTO {' . $this->table . '} (' . \implode(', ', $insert_fields) . ') VALUES ';
 
     $values = $this->getInsertPlaceholderFragment($this->insertValues, $this->defaultFields);
-    $query .= implode(', ', $values);
+    $query .= \implode(', ', $values);
 
     // Updating the unique / primary key is not necessary.
     unset($insert_fields[$this->key]);
@@ -39,7 +39,7 @@ class Upsert extends QueryUpsert {
       $update[] = "$field = EXCLUDED.$field";
     }
 
-    $query .= ' ON CONFLICT (' . $this->connection->escapeField($this->key) . ') DO UPDATE SET ' . implode(', ', $update);
+    $query .= ' ON CONFLICT (' . $this->connection->escapeField($this->key) . ') DO UPDATE SET ' . \implode(', ', $update);
 
     return $query;
   }

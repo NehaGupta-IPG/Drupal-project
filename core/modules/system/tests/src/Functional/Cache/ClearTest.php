@@ -43,7 +43,7 @@ class ClearTest extends CacheTestBase {
     }
 
     // Remove all caches then make sure that they are cleared.
-    drupal_flush_all_caches();
+    \drupal_flush_all_caches();
 
     foreach ($bins as $bin => $cache_backend) {
       $cid = 'test_cid_clear' . $bin;

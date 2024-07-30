@@ -207,7 +207,7 @@ class RecursiveContextualValidatorTest extends UnitTestCase {
    */
   protected function setupTypedData(array $tree, $name = '') {
     $callback = function ($value, ExecutionContextInterface $context) {
-      $context->addViolation('violation: ' . (is_array($value) ? count($value) : $value));
+      $context->addViolation('violation: ' . (\is_array($value) ? \count($value) : $value));
     };
 
     $tree += ['constraints' => []];

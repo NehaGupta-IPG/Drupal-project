@@ -56,7 +56,7 @@ class MigrateFieldTest extends MigrateDrupal6TestBase {
     $settings = $field_storage->getSettings();
     $this->assertSame('file', $settings['target_type']);
     $this->assertSame('public', $settings['uri_scheme']);
-    $this->assertSame([], array_filter($settings['default_image']));
+    $this->assertSame([], \array_filter($settings['default_image']));
 
     // Phone field.
     $field_storage = FieldStorageConfig::load('node.field_test_phone');
@@ -134,7 +134,7 @@ class MigrateFieldTest extends MigrateDrupal6TestBase {
     $this->assertSame($migration->getSourcePlugin()->count(), $migration->getIdMap()->processedCount());
 
     // Check that we've reported on a conflict in widget_types.
-    $messages = iterator_to_array($migration->getIdMap()->getMessages());
+    $messages = \iterator_to_array($migration->getIdMap()->getMessages());
     $this->assertCount(1, $messages);
     $this->assertSame($messages[0]->message, 'Widget types optionwidgets_onoff, text_textfield are used in Drupal 6 field instances: widget type optionwidgets_onoff applied to the Drupal 8 base field');
   }

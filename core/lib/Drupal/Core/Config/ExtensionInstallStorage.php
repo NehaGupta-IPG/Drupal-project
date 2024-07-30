@@ -108,7 +108,7 @@ class ExtensionInstallStorage extends InstallStorage {
         }
         $module_list_scan = $listing->scan('module');
         $module_list = [];
-        foreach (array_keys($modules) as $module) {
+        foreach (\array_keys($modules) as $module) {
           if (isset($module_list_scan[$module])) {
             $module_list[$module] = $module_list_scan[$module];
           }
@@ -117,7 +117,7 @@ class ExtensionInstallStorage extends InstallStorage {
       }
       if (!empty($extensions['theme'])) {
         $theme_list_scan = $listing->scan('theme');
-        foreach (array_keys($extensions['theme']) as $theme) {
+        foreach (\array_keys($extensions['theme']) as $theme) {
           if (isset($theme_list_scan[$theme])) {
             $theme_list[$theme] = $theme_list_scan[$theme];
           }

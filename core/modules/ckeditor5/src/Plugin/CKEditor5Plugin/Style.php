@@ -35,7 +35,7 @@ class Style extends CKEditor5PluginDefault implements CKEditor5PluginConfigurabl
       $as_selectors = '';
       foreach ($this->configuration['styles'] as $style) {
         [$tag, $classes] = self::getTagAndClasses(HTMLRestrictions::fromString($style['element']));
-        $as_selectors .= sprintf("%s.%s|%s\n", $tag, implode('.', $classes), $style['label']);
+        $as_selectors .= \sprintf("%s.%s|%s\n", $tag, \implode('.', $classes), $style['label']);
       }
       $form['styles']['#default_value'] = $as_selectors;
     }
@@ -57,8 +57,8 @@ class Style extends CKEditor5PluginDefault implements CKEditor5PluginConfigurabl
    * @internal
    */
   public static function getTagAndClasses(HTMLRestrictions $style_element): array {
-    $tag = array_keys($style_element->getAllowedElements())[0];
-    $classes = array_keys($style_element->getAllowedElements()[$tag]['class']);
+    $tag = \array_keys($style_element->getAllowedElements())[0];
+    $classes = \array_keys($style_element->getAllowedElements()[$tag]['class']);
     return [$tag, $classes];
   }
 
@@ -70,14 +70,14 @@ class Style extends CKEditor5PluginDefault implements CKEditor5PluginConfigurabl
     $form_value = $form_state->getValue('styles');
     [$styles, $invalid_lines] = self::parseStylesFormValue($form_value);
     if (!empty($invalid_lines)) {
-      $line_numbers = array_keys($invalid_lines);
+      $line_numbers = \array_keys($invalid_lines);
       $form_state->setError($form['styles'], $this->formatPlural(
-        count($invalid_lines),
+        \count($invalid_lines),
         'Line @line-number does not contain a valid value. Enter a valid CSS selector containing one or more classes, followed by a pipe symbol and a label.',
         'Lines @line-numbers do not contain a valid value. Enter a valid CSS selector containing one or more classes, followed by a pipe symbol and a label.',
         [
-          '@line-number' => reset($line_numbers),
-          '@line-numbers' => implode(', ', $line_numbers),
+          '@line-number' => \reset($line_numbers),
+          '@line-numbers' => \implode(', ', $line_numbers),
         ]
       ));
     }
@@ -102,28 +102,28 @@ class Style extends CKEditor5PluginDefault implements CKEditor5PluginConfigurabl
   private static function parseStylesFormValue(string $form_value): array {
     $invalid_lines = [];
 
-    $lines = explode("\n", $form_value);
+    $lines = \explode("\n", $form_value);
     $styles = [];
     foreach ($lines as $index => $line) {
-      if (empty(trim($line))) {
+      if (empty(\trim($line))) {
         continue;
       }
 
       // Parse the line.
-      [$selector, $label] = array_map('trim', explode('|', $line));
+      [$selector, $label] = \array_map('trim', \explode('|', $line));
 
       // Validate the selector.
       $selector_matches = [];
       // @see https://www.w3.org/TR/CSS2/syndata.html#:~:text=In%20CSS%2C%20identifiers%20(including%20element,hyphen%20followed%20by%20a%20digit
-      if (!preg_match('/^([a-z][0-9a-zA-Z\-]*)((\.[a-zA-Z0-9\x{00A0}-\x{FFFF}\-_]+)+)$/u', $selector, $selector_matches)) {
+      if (!\preg_match('/^([a-z][0-9a-zA-Z\-]*)((\.[a-zA-Z0-9\x{00A0}-\x{FFFF}\-_]+)+)$/u', $selector, $selector_matches)) {
         $invalid_lines[$index + 1] = $line;
         continue;
       }
 
       // Parse selector into tag + classes and normalize.
       $tag = $selector_matches[1];
-      $classes = array_filter(explode('.', $selector_matches[2]));
-      $normalized = HTMLRestrictions::fromString(sprintf('<%s class="%s">', $tag, implode(' ', $classes)));
+      $classes = \array_filter(\explode('.', $selector_matches[2]));
+      $normalized = HTMLRestrictions::fromString(\sprintf('<%s class="%s">', $tag, \implode(' ', $classes)));
 
       $styles[] = [
         'label' => $label,
@@ -153,7 +153,7 @@ class Style extends CKEditor5PluginDefault implements CKEditor5PluginConfigurabl
    * {@inheritdoc}
    */
   public function getElementsSubset(): array {
-    return array_column($this->configuration['styles'], 'element');
+    return \array_column($this->configuration['styles'], 'element');
   }
 
   /**

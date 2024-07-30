@@ -50,7 +50,7 @@ class EntityReferenceFieldItemList extends FieldItemList implements EntityRefere
         }
       }
       // Ensure the returned array is ordered by deltas.
-      ksort($target_entities);
+      \ksort($target_entities);
     }
 
     return $target_entities;
@@ -96,7 +96,7 @@ class EntityReferenceFieldItemList extends FieldItemList implements EntityRefere
       }
 
       // Ensure we return consecutive deltas, in case we removed unknown UUIDs.
-      $default_value = array_values($default_value);
+      $default_value = \array_values($default_value);
     }
     return $default_value;
   }

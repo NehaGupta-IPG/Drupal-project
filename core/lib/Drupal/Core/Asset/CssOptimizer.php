@@ -61,7 +61,7 @@ class CssOptimizer implements AssetOptimizerInterface {
   public function clean($contents) {
     // Remove multiple charset declarations for standards compliance (and fixing
     // Safari problems).
-    $contents = preg_replace('/^@charset\s+[\'"](\S*?)\b[\'"];/i', '', $contents);
+    $contents = \preg_replace('/^@charset\s+[\'"](\S*?)\b[\'"];/i', '', $contents);
 
     return $contents;
   }
@@ -86,7 +86,7 @@ class CssOptimizer implements AssetOptimizerInterface {
     $contents = $this->clean($contents);
 
     // Get the parent directory of this file, relative to the Drupal root.
-    $css_base_path = substr($css_asset['data'], 0, strrpos($css_asset['data'], '/'));
+    $css_base_path = \substr($css_asset['data'], 0, \strrpos($css_asset['data'], '/'));
     // Store base path.
     $this->rewriteFileURIBasePath = $css_base_path . '/';
 
@@ -149,17 +149,17 @@ class CssOptimizer implements AssetOptimizerInterface {
     // stylesheets in their .info.yml file that don't exist in the theme's path,
     // but are merely there to disable certain module CSS files.
     $content = '';
-    if ($contents = @file_get_contents($file)) {
+    if ($contents = @\file_get_contents($file)) {
       // If a BOM is found, convert the file to UTF-8, then use substr() to
       // remove the BOM from the result.
       if ($encoding = (Unicode::encodingFromBOM($contents))) {
-        $contents = mb_substr(Unicode::convertToUtf8($contents, $encoding), 1);
+        $contents = \mb_substr(Unicode::convertToUtf8($contents, $encoding), 1);
       }
       // If no BOM, check for fallback encoding. Per CSS spec the regex is very
       // strict.
       elseif (preg_match('/^@charset "([^"]+)";/', $contents, $matches)) {
         if ($matches[1] !== 'utf-8' && $matches[1] !== 'UTF-8') {
-          $contents = substr($contents, strlen($matches[0]));
+          $contents = \substr($contents, \strlen($matches[0]));
           $contents = Unicode::convertToUtf8($contents, $matches[1]);
         }
       }
@@ -195,14 +195,14 @@ class CssOptimizer implements AssetOptimizerInterface {
     $file = $this->loadFile($filename, NULL, FALSE);
 
     // Determine the file's directory.
-    $directory = dirname($filename);
+    $directory = \dirname($filename);
     // If the file is in the current directory, make sure '.' doesn't appear in
     // the url() path.
     $directory = $directory == '.' ? '' : $directory . '/';
 
     // Alter all internal asset paths. Leave external paths alone. We don't need
     // to normalize absolute paths here because that will be done later.
-    return preg_replace('/url\(\s*([\'"]?)(?![a-z]+:|\/+)([^\'")]+)([\'"]?)\s*\)/i', 'url(\1' . $directory . '\2\3)', $file);
+    return \preg_replace('/url\(\s*([\'"]?)(?![a-z]+:|\/+)([^\'")]+)([\'"]?)\s*\)/i', 'url(\1' . $directory . '\2\3)', $file);
   }
 
   /**
@@ -230,7 +230,7 @@ class CssOptimizer implements AssetOptimizerInterface {
       // Regexp to match single quoted strings.
       $single_quot = "'[^'\\\\]*(?:\\\\.[^'\\\\]*)*'";
       // Strip all comment blocks, but keep double/single quoted strings.
-      $contents = preg_replace(
+      $contents = \preg_replace(
         "<($double_quot|$single_quot)|$comment>Ss",
         "$1",
         $contents
@@ -239,7 +239,7 @@ class CssOptimizer implements AssetOptimizerInterface {
       // There are different conditions for removing leading and trailing
       // whitespace.
       // @see http://php.net/manual/regexp.reference.subpatterns.php
-      $contents = preg_replace('<
+      $contents = \preg_replace('<
         # Do not strip any space from within single or double quotes
           (' . $double_quot . '|' . $single_quot . ')
         # Strip leading and trailing whitespace.
@@ -259,7 +259,7 @@ class CssOptimizer implements AssetOptimizerInterface {
         $contents
       );
       // End the file with a new line.
-      $contents = trim($contents);
+      $contents = \trim($contents);
       $contents .= "\n";
     }
 
@@ -297,7 +297,7 @@ class CssOptimizer implements AssetOptimizerInterface {
     $last = '';
     while ($path != $last) {
       $last = $path;
-      $path = preg_replace('`(^|/)(?!\.\./)([^/]+)/\.\./`', '$1', $path);
+      $path = \preg_replace('`(^|/)(?!\.\./)([^/]+)/\.\./`', '$1', $path);
     }
     return 'url(' . $this->fileUrlGenerator->generateString($path) . ')';
   }

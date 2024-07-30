@@ -238,7 +238,7 @@ class StringFilter extends FilterPluginBase implements FilterOperatorsInterface 
     if (!empty($options[$this->operator])) {
       $output = $options[$this->operator];
     }
-    if (in_array($this->operator, $this->operatorValues(1))) {
+    if (\in_array($this->operator, $this->operatorValues(1))) {
       $output .= ' ' . $this->value;
     }
     return $output;
@@ -275,7 +275,7 @@ class StringFilter extends FilterPluginBase implements FilterOperatorsInterface 
 
       if (empty($this->options['expose']['use_operator']) || empty($this->options['expose']['operator_id'])) {
         // Exposed and locked.
-        $which = in_array($this->operator, $this->operatorValues(1)) ? 'value' : 'none';
+        $which = \in_array($this->operator, $this->operatorValues(1)) ? 'value' : 'none';
       }
       else {
         $source = ':input[name="' . $this->options['expose']['operator_id'] . '"]';
@@ -385,19 +385,19 @@ class StringFilter extends FilterPluginBase implements FilterOperatorsInterface 
       return;
     }
 
-    preg_match_all(static::WORDS_PATTERN, ' ' . $this->value, $matches, PREG_SET_ORDER);
+    \preg_match_all(static::WORDS_PATTERN, ' ' . $this->value, $matches, PREG_SET_ORDER);
     $operator = $this->getConditionOperator('LIKE');
     foreach ($matches as $match) {
       $phrase = FALSE;
       // Strip off phrase quotes.
       if ($match[2][0] == '"') {
-        $match[2] = substr($match[2], 1, -1);
+        $match[2] = \substr($match[2], 1, -1);
         $phrase = TRUE;
       }
-      $words = trim($match[2], ',?!();:-');
-      $words = $phrase ? [$words] : preg_split('/ /', $words, -1, PREG_SPLIT_NO_EMPTY);
+      $words = \trim($match[2], ',?!();:-');
+      $words = $phrase ? [$words] : \preg_split('/ /', $words, -1, PREG_SPLIT_NO_EMPTY);
       foreach ($words as $word) {
-        $where->condition($field, '%' . $this->connection->escapeLike(trim($word, " ,!?")) . '%', $operator);
+        $where->condition($field, '%' . $this->connection->escapeLike(\trim($word, " ,!?")) . '%', $operator);
       }
     }
 

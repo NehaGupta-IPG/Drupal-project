@@ -52,7 +52,7 @@ final class RecipeRunner {
   public static function triggerEvent(Recipe $recipe, ?array &$context = NULL): void {
     $event = new RecipeAppliedEvent($recipe);
     \Drupal::service(EventDispatcherInterface::class)->dispatch($event);
-    $context['message'] = t('Applied %recipe recipe.', ['%recipe' => $recipe->name]);
+    $context['message'] = \t('Applied %recipe recipe.', ['%recipe' => $recipe->name]);
     $context['results']['recipe'][] = $recipe->name;
   }
 
@@ -191,16 +191,16 @@ final class RecipeRunner {
    *   pass to the callable.
    */
   protected static function toBatchOperationsRecipe(Recipe $recipe, array $recipes, array &$modules, array &$themes): array {
-    if (in_array($recipe->path, $recipes, TRUE)) {
+    if (\in_array($recipe->path, $recipes, TRUE)) {
       return [];
     }
     $steps = [];
     $recipes[] = $recipe->path;
 
     foreach ($recipe->recipes->recipes as $sub_recipe) {
-      $steps = array_merge($steps, static::toBatchOperationsRecipe($sub_recipe, $recipes, $modules, $themes));
+      $steps = \array_merge($steps, static::toBatchOperationsRecipe($sub_recipe, $recipes, $modules, $themes));
     }
-    $steps = array_merge($steps, static::toBatchOperationsInstall($recipe, $modules, $themes));
+    $steps = \array_merge($steps, static::toBatchOperationsInstall($recipe, $modules, $themes));
     if ($recipe->config->hasTasks()) {
       $steps[] = [[RecipeRunner::class, 'installConfig'], [$recipe]];
     }
@@ -231,14 +231,14 @@ final class RecipeRunner {
    */
   protected static function toBatchOperationsInstall(Recipe $recipe, array &$modules, array &$themes): array {
     foreach ($recipe->install->modules as $name) {
-      if (in_array($name, $modules, TRUE)) {
+      if (\in_array($name, $modules, TRUE)) {
         continue;
       }
       $modules[] = $name;
       $steps[] = [[RecipeRunner::class, 'installModule'], [$name, $recipe]];
     }
     foreach ($recipe->install->themes as $name) {
-      if (in_array($name, $themes, TRUE)) {
+      if (\in_array($name, $themes, TRUE)) {
         continue;
       }
       $themes[] = $name;
@@ -274,7 +274,7 @@ final class RecipeRunner {
 
     \Drupal::service('module_installer')->install([$module]);
     \Drupal::service('config.installer')->setSyncing(FALSE);
-    $context['message'] = t('Installed %module module.', ['%module' => \Drupal::service('extension.list.module')->getName($module)]);
+    $context['message'] = \t('Installed %module module.', ['%module' => \Drupal::service('extension.list.module')->getName($module)]);
     $context['results']['module'][] = $module;
   }
 
@@ -304,7 +304,7 @@ final class RecipeRunner {
 
     \Drupal::service('theme_installer')->install([$theme]);
     \Drupal::service('config.installer')->setSyncing(FALSE);
-    $context['message'] = t('Installed %theme theme.', ['%theme' => \Drupal::service('extension.list.theme')->getName($theme)]);
+    $context['message'] = \t('Installed %theme theme.', ['%theme' => \Drupal::service('extension.list.theme')->getName($theme)]);
     $context['results']['theme'][] = $theme;
   }
 
@@ -332,7 +332,7 @@ final class RecipeRunner {
    */
   public static function installContent(Recipe $recipe, ?array &$context = NULL): void {
     static::processContent($recipe->content);
-    $context['message'] = t('Created content for %recipe recipe.', ['%recipe' => $recipe->name]);
+    $context['message'] = \t('Created content for %recipe recipe.', ['%recipe' => $recipe->name]);
     $context['results']['content'][] = $recipe->name;
   }
 

@@ -73,8 +73,8 @@ abstract class UnitTestCase extends TestCase {
     // Ensure that FileCacheFactory has a prefix.
     FileCacheFactory::setPrefix('prefix');
 
-    $this->root = dirname(substr(__DIR__, 0, -strlen(__NAMESPACE__)), 2);
-    chdir($this->root);
+    $this->root = \dirname(\substr(__DIR__, 0, -\strlen(__NAMESPACE__)), 2);
+    \chdir($this->root);
   }
 
   /**
@@ -109,7 +109,7 @@ abstract class UnitTestCase extends TestCase {
         if (isset($config_values[$key])) {
           return $config_values[$key];
         }
-        $parts = explode('.', $key);
+        $parts = \explode('.', $key);
         $value = NestedArray::getValue($config_values, $parts, $key_exists);
         return $key_exists ? $value : NULL;
       };
@@ -201,7 +201,7 @@ abstract class UnitTestCase extends TestCase {
     $class_resolver->expects($this->any())
       ->method('getInstanceFromDefinition')
       ->willReturnCallback(function ($class) {
-        if (is_subclass_of($class, 'Drupal\Core\DependencyInjection\ContainerInjectionInterface')) {
+        if (\is_subclass_of($class, 'Drupal\Core\DependencyInjection\ContainerInjectionInterface')) {
           return $class::create(new ContainerBuilder());
         }
         else {

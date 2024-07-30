@@ -148,7 +148,7 @@ class LanguageNegotiationContentEntity extends LanguageNegotiationMethodBase imp
   public function getLanguageSwitchLinks(Request $request, $type, Url $url) {
     $links = [];
     $query = [];
-    parse_str($request->getQueryString() ?? '', $query);
+    \parse_str($request->getQueryString() ?? '', $query);
 
     foreach ($this->languageManager->getNativeLanguages() as $language) {
       $langcode = $language->getId();
@@ -194,7 +194,7 @@ class LanguageNegotiationContentEntity extends LanguageNegotiationMethodBase imp
         }
         if ($check_interface_method) {
           $max_weight = $content_method_weights[LanguageNegotiationUI::METHOD_ID];
-          $max_weight = isset($content_method_weights[LanguageNegotiationUrl::METHOD_ID]) ? max($max_weight, $content_method_weights[LanguageNegotiationUrl::METHOD_ID]) : $max_weight;
+          $max_weight = isset($content_method_weights[LanguageNegotiationUrl::METHOD_ID]) ? \max($max_weight, $content_method_weights[LanguageNegotiationUrl::METHOD_ID]) : $max_weight;
         }
         else {
           $max_weight = $content_method_weights[LanguageNegotiationUrl::METHOD_ID] ?? PHP_INT_MAX;
@@ -273,8 +273,8 @@ class LanguageNegotiationContentEntity extends LanguageNegotiationMethodBase imp
       $entity_types = $this->entityTypeManager->getDefinitions();
       foreach ($entity_types as $entity_type_id => $entity_type) {
         if ($entity_type->entityClassImplements(ContentEntityInterface::class)) {
-          $entity_paths = array_fill_keys($entity_type->getLinkTemplates(), $entity_type_id);
-          $this->contentEntityPaths = array_merge($this->contentEntityPaths, $entity_paths);
+          $entity_paths = \array_fill_keys($entity_type->getLinkTemplates(), $entity_type_id);
+          $this->contentEntityPaths = \array_merge($this->contentEntityPaths, $entity_paths);
         }
       }
     }

@@ -135,9 +135,9 @@ class DevReleaseTest extends KernelTestBase {
     $this->config('update_test.settings')
       ->set('system_info', $system_info)
       ->save();
-    update_storage_clear();
-    $available = update_get_available(TRUE);
-    return update_calculate_project_data($available);
+    \update_storage_clear();
+    $available = \update_get_available(TRUE);
+    return \update_calculate_project_data($available);
   }
 
 }

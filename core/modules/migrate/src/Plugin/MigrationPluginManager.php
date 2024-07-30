@@ -68,7 +68,7 @@ class MigrationPluginManager extends DefaultPluginManager implements MigrationPl
    */
   protected function getDiscovery() {
     if (!isset($this->discovery)) {
-      $directories = array_map(function ($directory) {
+      $directories = \array_map(function ($directory) {
         return [$directory . '/migrations'];
       }, $this->moduleHandler->getModuleDirectories());
 
@@ -94,7 +94,7 @@ class MigrationPluginManager extends DefaultPluginManager implements MigrationPl
    */
   public function createInstance($plugin_id, array $configuration = []) {
     $instances = $this->createInstances([$plugin_id], [$plugin_id => $configuration]);
-    return reset($instances);
+    return \reset($instances);
   }
 
   /**
@@ -102,7 +102,7 @@ class MigrationPluginManager extends DefaultPluginManager implements MigrationPl
    */
   public function createInstances($migration_id, array $configuration = []) {
     if (empty($migration_id)) {
-      $migration_id = array_keys($this->getDefinitions());
+      $migration_id = \array_keys($this->getDefinitions());
     }
 
     $factory = $this->getFactory();
@@ -135,10 +135,10 @@ class MigrationPluginManager extends DefaultPluginManager implements MigrationPl
    * {@inheritdoc}
    */
   public function createInstancesByTag($tag) {
-    $migrations = array_filter($this->getDefinitions(), function ($migration) use ($tag) {
-      return !empty($migration['migration_tags']) && in_array($tag, $migration['migration_tags']);
+    $migrations = \array_filter($this->getDefinitions(), function ($migration) use ($tag) {
+      return !empty($migration['migration_tags']) && \in_array($tag, $migration['migration_tags']);
     });
-    return $migrations ? $this->createInstances(array_keys($migrations)) : [];
+    return $migrations ? $this->createInstances(\array_keys($migrations)) : [];
   }
 
   /**
@@ -146,9 +146,9 @@ class MigrationPluginManager extends DefaultPluginManager implements MigrationPl
    */
   public function expandPluginIds(array $migration_ids) {
     $plugin_ids = [];
-    $all_ids = array_keys($this->getDefinitions());
+    $all_ids = \array_keys($this->getDefinitions());
     foreach ($migration_ids as $id) {
-      $plugin_ids = array_merge($plugin_ids, preg_grep('/^' . preg_quote($id, '/') . PluginBase::DERIVATIVE_SEPARATOR . '/', $all_ids));
+      $plugin_ids = \array_merge($plugin_ids, \preg_grep('/^' . \preg_quote($id, '/') . PluginBase::DERIVATIVE_SEPARATOR . '/', $all_ids));
       if ($this->hasDefinition($id)) {
         $plugin_ids[] = $id;
       }
@@ -205,11 +205,11 @@ class MigrationPluginManager extends DefaultPluginManager implements MigrationPl
       }
     }
     // Sort weights, labels, and keys in the same order as each other.
-    array_multisort(
+    \array_multisort(
       // Use the numerical weight as the primary sort.
       $weights, SORT_DESC, SORT_NUMERIC,
       // When migrations have the same weight, sort them alphabetically by ID.
-      array_keys($migrations), SORT_ASC, SORT_NATURAL,
+      \array_keys($migrations), SORT_ASC, SORT_NATURAL,
       $migrations
     );
 
@@ -233,14 +233,14 @@ class MigrationPluginManager extends DefaultPluginManager implements MigrationPl
     if (!isset($graph[$id]['edges'])) {
       $graph[$id]['edges'] = [];
     }
-    $graph[$id]['edges'] += array_combine($dependencies, $dependencies);
+    $graph[$id]['edges'] += \array_combine($dependencies, $dependencies);
   }
 
   /**
    * {@inheritdoc}
    */
   public function createStubMigration(array $definition) {
-    $id = $definition['id'] ?? uniqid();
+    $id = $definition['id'] ?? \uniqid();
     return Migration::create(\Drupal::getContainer(), [], $id, $definition);
   }
 

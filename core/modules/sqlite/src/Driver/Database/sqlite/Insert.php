@@ -30,10 +30,10 @@ class Insert extends QueryInsert {
     }
 
     // If there are any fields in the query, execute normal INSERT statements.
-    if (count($this->insertFields)) {
+    if (\count($this->insertFields)) {
       $stmt = $this->connection->prepareStatement((string) $this, $this->queryOptions);
 
-      if (count($this->insertValues) === 1) {
+      if (\count($this->insertValues) === 1) {
         // Inserting a single row does not require a transaction to be atomic,
         // and executes faster without a transaction wrapper.
         $insert_values = $this->insertValues[0];
@@ -94,21 +94,21 @@ class Insert extends QueryInsert {
     // Produce as many generic placeholders as necessary.
     $placeholders = [];
     if (!empty($this->insertFields)) {
-      $placeholders = array_fill(0, count($this->insertFields), '?');
+      $placeholders = \array_fill(0, \count($this->insertFields), '?');
     }
 
-    $insert_fields = array_map(function ($field) {
+    $insert_fields = \array_map(function ($field) {
       return $this->connection->escapeField($field);
     }, $this->insertFields);
 
     // If we're selecting from a SelectQuery, finish building the query and
     // pass it back, as any remaining options are irrelevant.
     if (!empty($this->fromQuery)) {
-      $insert_fields_string = $insert_fields ? ' (' . implode(', ', $insert_fields) . ') ' : ' ';
+      $insert_fields_string = $insert_fields ? ' (' . \implode(', ', $insert_fields) . ') ' : ' ';
       return $comments . 'INSERT INTO {' . $this->table . '}' . $insert_fields_string . $this->fromQuery;
     }
 
-    return $comments . 'INSERT INTO {' . $this->table . '} (' . implode(', ', $insert_fields) . ') VALUES (' . implode(', ', $placeholders) . ')';
+    return $comments . 'INSERT INTO {' . $this->table . '} (' . \implode(', ', $insert_fields) . ') VALUES (' . \implode(', ', $placeholders) . ')';
   }
 
 }

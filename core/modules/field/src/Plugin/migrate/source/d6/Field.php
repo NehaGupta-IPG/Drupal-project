@@ -81,20 +81,20 @@ class Field extends DrupalSqlBase {
     // Arbitrarily use the first widget_type - if there are multiples, let the
     // migrator know.
     $row->setSourceProperty('widget_type', $widget_types[0]);
-    if (count($widget_types) > 1) {
+    if (\count($widget_types) > 1) {
       $this->migration->getIdMap()->saveMessage(
         ['field_name' => $row->getSourceProperty('field_name')],
         $this->t('Widget types @types are used in Drupal 6 field instances: widget type @selected_type applied to the Drupal 8 base field', [
-          '@types' => implode(', ', $widget_types),
+          '@types' => \implode(', ', $widget_types),
           '@selected_type' => $widget_types[0],
         ])
       );
     }
 
     // Unserialize data.
-    $global_settings = unserialize($row->getSourceProperty('global_settings'));
+    $global_settings = \unserialize($row->getSourceProperty('global_settings'));
     $db_columns = $row->getSourceProperty('db_columns');
-    $db_columns = is_string($db_columns) ? unserialize($db_columns) : FALSE;
+    $db_columns = \is_string($db_columns) ? \unserialize($db_columns) : FALSE;
     $row->setSourceProperty('global_settings', $global_settings);
     $row->setSourceProperty('db_columns', $db_columns);
     return parent::prepareRow($row);

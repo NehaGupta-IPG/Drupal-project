@@ -124,11 +124,11 @@ class FinishResponseSubscriber implements EventSubscriberInterface {
       // X-Drupal-Cache-Contexts and X-Drupal-Cache-Tags header respectively.
       $response_cacheability = $response->getCacheableMetadata();
       $cache_tags = $response_cacheability->getCacheTags();
-      sort($cache_tags);
-      $response->headers->set('X-Drupal-Cache-Tags', implode(' ', $cache_tags));
+      \sort($cache_tags);
+      $response->headers->set('X-Drupal-Cache-Tags', \implode(' ', $cache_tags));
       $cache_contexts = $this->cacheContextsManager->optimizeTokens($response_cacheability->getCacheContexts());
-      sort($cache_contexts);
-      $response->headers->set('X-Drupal-Cache-Contexts', implode(' ', $cache_contexts));
+      \sort($cache_contexts);
+      $response->headers->set('X-Drupal-Cache-Contexts', \implode(' ', $cache_contexts));
       $max_age_message = $response_cacheability->getCacheMaxAge();
       if ($max_age_message === 0) {
         $max_age_message = '0 (Uncacheable)';
@@ -239,7 +239,7 @@ class FinishResponseSubscriber implements EventSubscriberInterface {
     // Last-Modified and an ETag header on the response.
     if (!$response->headers->has('Last-Modified')) {
       $timestamp = $this->time->getRequestTime();
-      $response->setLastModified(new \DateTime(gmdate(DateTimePlus::RFC7231, $this->time->getRequestTime())));
+      $response->setLastModified(new \DateTime(\gmdate(DateTimePlus::RFC7231, $this->time->getRequestTime())));
     }
     else {
       $timestamp = $response->getLastModified()->getTimestamp();

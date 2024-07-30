@@ -42,7 +42,7 @@ class SchemaTest extends DriverSpecificSchemaTestBase {
     $this->assertTrue($sequenceExists, 'Sequence was renamed.');
 
     // Rename the table again and repeat the check.
-    $anotherTableName = strtolower($this->getRandomGenerator()->name(63 - strlen($this->getDatabasePrefix())));
+    $anotherTableName = \strtolower($this->getRandomGenerator()->name(63 - \strlen($this->getDatabasePrefix())));
     $this->schema->renameTable($tableName, $anotherTableName);
 
     $sequenceExists = (bool) $this->connection->query("SELECT pg_get_serial_sequence('{" . $anotherTableName . "}', 'id')")->fetchField();
@@ -113,17 +113,17 @@ class SchemaTest extends DriverSpecificSchemaTestBase {
       ],
     ];
 
-    $table_name = strtolower($this->getRandomGenerator()->name());
+    $table_name = \strtolower($this->getRandomGenerator()->name());
     $this->schema->createTable($table_name, $table_specification);
 
     unset($table_specification['fields']);
 
-    $introspect_index_schema = new \ReflectionMethod(get_class($this->schema), 'introspectIndexSchema');
+    $introspect_index_schema = new \ReflectionMethod(\get_class($this->schema), 'introspectIndexSchema');
     $index_schema = $introspect_index_schema->invoke($this->schema, $table_name);
 
     // The PostgreSQL driver is using a custom naming scheme for its indexes, so
     // we need to adjust the initial table specification.
-    $ensure_identifier_length = new \ReflectionMethod(get_class($this->schema), 'ensureIdentifiersLength');
+    $ensure_identifier_length = new \ReflectionMethod(\get_class($this->schema), 'ensureIdentifiersLength');
 
     foreach ($table_specification['unique keys'] as $original_index_name => $columns) {
       unset($table_specification['unique keys'][$original_index_name]);
@@ -174,7 +174,7 @@ class SchemaTest extends DriverSpecificSchemaTestBase {
 
     // Finding all tables.
     $tables = $this->schema->findTables('%');
-    sort($tables);
+    \sort($tables);
     $this->assertEquals(['config', 'select'], $tables);
 
     // Renaming a table.
@@ -195,7 +195,7 @@ class SchemaTest extends DriverSpecificSchemaTestBase {
     $this->schema->addPrimaryKey($table_name_new, [$field_name]);
 
     // Check the primary key columns.
-    $find_primary_key_columns = new \ReflectionMethod(get_class($this->schema), 'findPrimaryKeyColumns');
+    $find_primary_key_columns = new \ReflectionMethod(\get_class($this->schema), 'findPrimaryKeyColumns');
     $this->assertEquals([$field_name], $find_primary_key_columns->invoke($this->schema, $table_name_new));
 
     // Dropping a primary key.
@@ -212,8 +212,8 @@ class SchemaTest extends DriverSpecificSchemaTestBase {
     $this->schema->addUniqueKey($table_name_new, $unique_key_name, [$field_name_new]);
 
     // Check the unique key columns.
-    $introspect_index_schema = new \ReflectionMethod(get_class($this->schema), 'introspectIndexSchema');
-    $ensure_identifiers_length = new \ReflectionMethod(get_class($this->schema), 'ensureIdentifiersLength');
+    $introspect_index_schema = new \ReflectionMethod(\get_class($this->schema), 'introspectIndexSchema');
+    $ensure_identifiers_length = new \ReflectionMethod(\get_class($this->schema), 'ensureIdentifiersLength');
     $unique_key_introspect_name = $ensure_identifiers_length->invoke($this->schema, $table_name_new, $unique_key_name, 'key');
     $this->assertEquals([$field_name_new], $introspect_index_schema->invoke($this->schema, $table_name_new)['unique keys'][$unique_key_introspect_name]);
 

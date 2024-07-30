@@ -22,7 +22,7 @@ class FieldInstanceOptionTranslation extends ProcessPluginBase {
   public function transform($value, MigrateExecutableInterface $migrate_executable, Row $row, $destination_property) {
     [$type, $data] = $value;
 
-    $data = unserialize($data);
+    $data = \unserialize($data);
     $property = $row->getSourceProperty('property');
     $option_key = ($property == 0) ? 'off_label' : 'on_label';
     $translation = '';

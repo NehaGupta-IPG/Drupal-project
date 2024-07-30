@@ -263,12 +263,12 @@ trait UiHelperTrait {
 
     $this->prepareRequest();
     foreach ($headers as $header_name => $header_value) {
-      if (is_int($header_name)) {
-        @trigger_error('Passing an integer as header name to ' . __METHOD__ . '() is deprecated in drupal:11.1.0 and will be removed from drupal:12.0.0. Update the calling code to pass the header name as a key. See https://www.drupal.org/node/3456178', E_USER_DEPRECATED);
-        [$header_name, $header_value] = explode(':', $header_value);
+      if (\is_int($header_name)) {
+        @\trigger_error('Passing an integer as header name to ' . __METHOD__ . '() is deprecated in drupal:11.1.0 and will be removed from drupal:12.0.0. Update the calling code to pass the header name as a key. See https://www.drupal.org/node/3456178', E_USER_DEPRECATED);
+        [$header_name, $header_value] = \explode(':', $header_value);
       }
-      if (is_null($header_value)) {
-        @trigger_error('Using null as a header value to ' . __METHOD__ . '() is deprecated in drupal:11.1.0 and will be removed from drupal:12.0.0. Use an empty string instead. See https://www.drupal.org/node/3456233', E_USER_DEPRECATED);
+      if (\is_null($header_value)) {
+        @\trigger_error('Using null as a header value to ' . __METHOD__ . '() is deprecated in drupal:11.1.0 and will be removed from drupal:12.0.0. Use an empty string instead. See https://www.drupal.org/node/3456233', E_USER_DEPRECATED);
         $header_value = '';
       }
       $session->setRequestHeader($header_name, $header_value);
@@ -324,13 +324,13 @@ trait UiHelperTrait {
     // interactive installer tests.
     elseif (\Drupal::hasService('url_generator')) {
       // Strip $base_path, if existent.
-      $length = strlen($base_path);
-      if (substr($path, 0, $length) === $base_path) {
-        $path = substr($path, $length);
+      $length = \strlen($base_path);
+      if (\substr($path, 0, $length) === $base_path) {
+        $path = \substr($path, $length);
       }
       // Additionally strip any forward slashes.
-      if (strlen($path) > 1) {
-        $path = ltrim($path, '/');
+      if (\strlen($path) > 1) {
+        $path = \ltrim($path, '/');
       }
 
       $force_internal = isset($options['external']) && $options['external'] == FALSE;
@@ -364,14 +364,14 @@ trait UiHelperTrait {
   protected function getAbsoluteUrl($path) {
     global $base_url, $base_path;
 
-    $parts = parse_url($path);
+    $parts = \parse_url($path);
     if (empty($parts['host'])) {
       // Ensure that we have a string (and no xpath object).
       $path = (string) $path;
       // Strip $base_path, if existent.
-      $length = strlen($base_path);
-      if (substr($path, 0, $length) === $base_path) {
-        $path = substr($path, $length);
+      $length = \strlen($base_path);
+      if (\substr($path, 0, $length) === $base_path) {
+        $path = \substr($path, $length);
       }
       // Ensure that we have an absolute path.
       if (empty($path) || $path[0] !== '/') {
@@ -393,7 +393,7 @@ trait UiHelperTrait {
    */
   protected function prepareRequest() {
     $session = $this->getSession();
-    $session->setCookie('SIMPLETEST_USER_AGENT', drupal_generate_test_ua($this->databasePrefix));
+    $session->setCookie('SIMPLETEST_USER_AGENT', \drupal_generate_test_ua($this->databasePrefix));
   }
 
   /**
@@ -490,7 +490,7 @@ trait UiHelperTrait {
     if (!empty($refresh) && (!isset($this->maximumMetaRefreshCount) || $this->metaRefreshCount < $this->maximumMetaRefreshCount)) {
       // Parse the content attribute of the meta tag for the format:
       // "[delay]: URL=[page_to_redirect_to]".
-      if (preg_match('/\d+;\s*URL=\'?(?<url>[^\']*)/i', $refresh[0]->getAttribute('content'), $match)) {
+      if (\preg_match('/\d+;\s*URL=\'?(?<url>[^\']*)/i', $refresh[0]->getAttribute('content'), $match)) {
         $this->metaRefreshCount++;
         return $this->drupalGet($this->getAbsoluteUrl(Html::decodeEntities($match['url'])));
       }

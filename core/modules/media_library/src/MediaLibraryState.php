@@ -142,31 +142,31 @@ class MediaLibraryState extends ParameterBag implements CacheableDependencyInter
    */
   protected function validateRequiredParameters($opener_id, array $allowed_media_type_ids, $selected_type_id, $remaining_slots) {
     // The opener ID must be a non-empty string.
-    if (!is_string($opener_id) || empty(trim($opener_id))) {
+    if (!\is_string($opener_id) || empty(\trim($opener_id))) {
       throw new \InvalidArgumentException('The opener ID parameter is required and must be a string.');
     }
 
     // The allowed media type IDs must be an array of non-empty strings.
-    if (empty($allowed_media_type_ids) || !is_array($allowed_media_type_ids)) {
+    if (empty($allowed_media_type_ids) || !\is_array($allowed_media_type_ids)) {
       throw new \InvalidArgumentException('The allowed types parameter is required and must be an array of strings.');
     }
     foreach ($allowed_media_type_ids as $allowed_media_type_id) {
-      if (!is_string($allowed_media_type_id) || empty(trim($allowed_media_type_id))) {
+      if (!\is_string($allowed_media_type_id) || empty(\trim($allowed_media_type_id))) {
         throw new \InvalidArgumentException('The allowed types parameter is required and must be an array of strings.');
       }
     }
 
     // The selected type ID must be a non-empty string.
-    if (!is_string($selected_type_id) || empty(trim($selected_type_id))) {
+    if (!\is_string($selected_type_id) || empty(\trim($selected_type_id))) {
       throw new \InvalidArgumentException('The selected type parameter is required and must be a string.');
     }
     // The selected type ID must be present in the list of allowed types.
-    if (!in_array($selected_type_id, $allowed_media_type_ids, TRUE)) {
+    if (!\in_array($selected_type_id, $allowed_media_type_ids, TRUE)) {
       throw new \InvalidArgumentException('The selected type parameter must be present in the list of allowed types.');
     }
 
     // The remaining slots must be numeric.
-    if (!is_numeric($remaining_slots)) {
+    if (!\is_numeric($remaining_slots)) {
       throw new \InvalidArgumentException('The remaining slots parameter is required and must be numeric.');
     }
   }
@@ -182,16 +182,16 @@ class MediaLibraryState extends ParameterBag implements CacheableDependencyInter
     // optional opener-specific parameters. Sort the allowed types and
     // opener parameters so that differences in order do not result in
     // different hashes.
-    $allowed_media_type_ids = array_values($this->getAllowedTypeIds());
-    sort($allowed_media_type_ids);
+    $allowed_media_type_ids = \array_values($this->getAllowedTypeIds());
+    \sort($allowed_media_type_ids);
     $opener_parameters = $this->getOpenerParameters();
-    ksort($opener_parameters);
-    $hash = implode(':', [
+    \ksort($opener_parameters);
+    $hash = \implode(':', [
       $this->getOpenerId(),
-      implode(':', $allowed_media_type_ids),
+      \implode(':', $allowed_media_type_ids),
       $this->getSelectedTypeId(),
       $this->getAvailableSlots(),
-      serialize($opener_parameters),
+      \serialize($opener_parameters),
     ]);
 
     return Crypt::hmacBase64($hash, \Drupal::service('private_key')->get() . Settings::getHashSalt());
@@ -207,7 +207,7 @@ class MediaLibraryState extends ParameterBag implements CacheableDependencyInter
    *   The hashed parameters.
    */
   public function isValidHash($hash) {
-    return hash_equals($this->getHash(), $hash);
+    return \hash_equals($this->getHash(), $hash);
   }
 
   /**

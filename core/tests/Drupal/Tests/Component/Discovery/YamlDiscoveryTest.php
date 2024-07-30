@@ -36,14 +36,14 @@ class YamlDiscoveryTest extends TestCase {
     vfsStreamWrapper::setRoot($root);
     $url = vfsStream::url('modules');
 
-    mkdir($url . '/test_1');
-    file_put_contents($url . '/test_1/test_1.test.yml', 'name: test');
-    file_put_contents($url . '/test_1/test_2.test.yml', 'name: test');
+    \mkdir($url . '/test_1');
+    \file_put_contents($url . '/test_1/test_1.test.yml', 'name: test');
+    \file_put_contents($url . '/test_1/test_2.test.yml', 'name: test');
 
-    mkdir($url . '/test_2');
-    file_put_contents($url . '/test_2/test_3.test.yml', 'name: test');
+    \mkdir($url . '/test_2');
+    \file_put_contents($url . '/test_2/test_3.test.yml', 'name: test');
     // Write an empty YAML file.
-    file_put_contents($url . '/test_2/test_4.test.yml', '');
+    \file_put_contents($url . '/test_2/test_4.test.yml', '');
 
     // Set up the directories to search.
     $directories = [
@@ -79,8 +79,8 @@ class YamlDiscoveryTest extends TestCase {
     vfsStreamWrapper::setRoot($root);
     $url = vfsStream::url('modules');
 
-    mkdir($url . '/test_broken');
-    file_put_contents($url . '/test_broken/test_broken.test.yml', "broken:\n:");
+    \mkdir($url . '/test_broken');
+    \file_put_contents($url . '/test_broken/test_broken.test.yml', "broken:\n:");
 
     $this->expectException(InvalidDataTypeException::class);
     $this->expectExceptionMessage('vfs://modules/test_broken/test_broken.test.yml');

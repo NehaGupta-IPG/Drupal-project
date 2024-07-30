@@ -89,8 +89,8 @@ class Config extends StorableConfigBase {
       return $this->overriddenData;
     }
     else {
-      $parts = explode('.', $key);
-      if (count($parts) == 1) {
+      $parts = \explode('.', $key);
+      if (\count($parts) == 1) {
         return $this->overriddenData[$key] ?? NULL;
       }
       else {
@@ -154,10 +154,10 @@ class Config extends StorableConfigBase {
    */
   protected function setOverriddenData() {
     $this->overriddenData = $this->data;
-    if (isset($this->moduleOverrides) && is_array($this->moduleOverrides)) {
+    if (isset($this->moduleOverrides) && \is_array($this->moduleOverrides)) {
       $this->overriddenData = NestedArray::mergeDeepArray([$this->overriddenData, $this->moduleOverrides], TRUE);
     }
-    if (isset($this->settingsOverrides) && is_array($this->settingsOverrides)) {
+    if (isset($this->settingsOverrides) && \is_array($this->settingsOverrides)) {
       $this->overriddenData = NestedArray::mergeDeepArray([$this->overriddenData, $this->settingsOverrides], TRUE);
     }
     return $this;
@@ -273,10 +273,10 @@ class Config extends StorableConfigBase {
     $original_data = $this->originalData;
     if ($apply_overrides) {
       // Apply overrides.
-      if (isset($this->moduleOverrides) && is_array($this->moduleOverrides)) {
+      if (isset($this->moduleOverrides) && \is_array($this->moduleOverrides)) {
         $original_data = NestedArray::mergeDeepArray([$original_data, $this->moduleOverrides], TRUE);
       }
-      if (isset($this->settingsOverrides) && is_array($this->settingsOverrides)) {
+      if (isset($this->settingsOverrides) && \is_array($this->settingsOverrides)) {
         $original_data = NestedArray::mergeDeepArray([$original_data, $this->settingsOverrides], TRUE);
       }
     }
@@ -285,8 +285,8 @@ class Config extends StorableConfigBase {
       return $original_data;
     }
     else {
-      $parts = explode('.', $key);
-      if (count($parts) == 1) {
+      $parts = \explode('.', $key);
+      if (\count($parts) == 1) {
         return $original_data[$key] ?? NULL;
       }
       else {
@@ -322,12 +322,12 @@ class Config extends StorableConfigBase {
       return !(empty($this->moduleOverrides) && empty($this->settingsOverrides));
     }
     else {
-      $parts = explode('.', $key);
+      $parts = \explode('.', $key);
       $override_exists = FALSE;
-      if (isset($this->moduleOverrides) && is_array($this->moduleOverrides)) {
+      if (isset($this->moduleOverrides) && \is_array($this->moduleOverrides)) {
         $override_exists = NestedArray::keyExists($this->moduleOverrides, $parts);
       }
-      if (!$override_exists && isset($this->settingsOverrides) && is_array($this->settingsOverrides)) {
+      if (!$override_exists && isset($this->settingsOverrides) && \is_array($this->settingsOverrides)) {
         $override_exists = NestedArray::keyExists($this->settingsOverrides, $parts);
       }
       return $override_exists;

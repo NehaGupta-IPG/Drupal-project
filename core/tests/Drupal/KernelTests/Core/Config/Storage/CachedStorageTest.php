@@ -80,7 +80,7 @@ class CachedStorageTest extends ConfigStorageTestBase {
    */
   protected function delete($name): void {
     $this->cache->delete($name);
-    unlink($this->fileStorage->getFilePath($name));
+    \unlink($this->fileStorage->getFilePath($name));
   }
 
 }

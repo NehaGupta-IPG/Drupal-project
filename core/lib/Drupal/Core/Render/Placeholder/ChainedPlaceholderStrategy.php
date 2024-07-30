@@ -40,7 +40,7 @@ class ChainedPlaceholderStrategy implements PlaceholderStrategyInterface {
     }
 
     // Assert that there is at least one strategy.
-    assert(!empty($this->placeholderStrategies), 'At least one placeholder strategy must be present; by default the fallback strategy \Drupal\Core\Render\Placeholder\SingleFlushStrategy is always present.');
+    \assert(!empty($this->placeholderStrategies), 'At least one placeholder strategy must be present; by default the fallback strategy \Drupal\Core\Render\Placeholder\SingleFlushStrategy is always present.');
 
     $new_placeholders = [];
 

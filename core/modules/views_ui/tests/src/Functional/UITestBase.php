@@ -77,12 +77,12 @@ abstract class UITestBase extends ViewTestBase {
     $url = $this->buildUrl($path, $options);
 
     // Ensure that each nojs page is accessible via ajax as well.
-    if (str_contains($url, '/nojs/')) {
-      $url = preg_replace('|/nojs/|', '/ajax/', $url, 1);
+    if (\str_contains($url, '/nojs/')) {
+      $url = \preg_replace('|/nojs/|', '/ajax/', $url, 1);
       $result = $this->drupalGet($url, $options);
       $this->assertSession()->statusCodeEquals(200);
       $this->assertSession()->responseHeaderEquals('Content-Type', 'application/json');
-      $this->assertNotEmpty(json_decode($result), 'Ensure that the AJAX request returned valid content.');
+      $this->assertNotEmpty(\json_decode($result), 'Ensure that the AJAX request returned valid content.');
     }
 
     return parent::drupalGet($path, $options, $headers);

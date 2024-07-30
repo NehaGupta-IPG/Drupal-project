@@ -83,7 +83,7 @@ class ProgrammaticTest extends KernelTestBase {
       // Fetching the values that were set in the submission handler.
       $stored_values = $form_state->get('programmatic_form_submit');
       foreach ($values as $key => $value) {
-        $this->assertEquals($value, $stored_values[$key], sprintf('Submission handler correctly executed: %s is %s', $key, print_r($value, TRUE)));
+        $this->assertEquals($value, $stored_values[$key], \sprintf('Submission handler correctly executed: %s is %s', $key, \print_r($value, TRUE)));
       }
     }
   }

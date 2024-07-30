@@ -62,7 +62,7 @@ class AccessAwareRouter implements AccessAwareRouterInterface {
    */
   public function __call($name, $arguments) {
     // Ensure to call every other function to the router.
-    return call_user_func_array([$this->router, $name], $arguments);
+    return \call_user_func_array([$this->router, $name], $arguments);
   }
 
   /**

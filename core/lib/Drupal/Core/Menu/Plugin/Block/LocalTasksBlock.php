@@ -107,7 +107,7 @@ class LocalTasksBlock extends BlockBase implements ContainerFactoryPluginInterfa
       $cacheability = $cacheability->merge($links['cacheability']);
       // Do not display single tabs.
       $tabs += [
-        '#primary' => count(Element::getVisibleChildren($links['tabs'])) > 1 ? $links['tabs'] : [],
+        '#primary' => \count(Element::getVisibleChildren($links['tabs'])) > 1 ? $links['tabs'] : [],
       ];
     }
     if ($config['secondary']) {
@@ -115,7 +115,7 @@ class LocalTasksBlock extends BlockBase implements ContainerFactoryPluginInterfa
       $cacheability = $cacheability->merge($links['cacheability']);
       // Do not display single tabs.
       $tabs += [
-        '#secondary' => count(Element::getVisibleChildren($links['tabs'])) > 1 ? $links['tabs'] : [],
+        '#secondary' => \count(Element::getVisibleChildren($links['tabs'])) > 1 ? $links['tabs'] : [],
       ];
     }
 

@@ -62,7 +62,7 @@ class AccountSwitcher implements AccountSwitcherInterface {
       $this->originalSessionSaving = $this->writeSafeHandler->isSessionWritable();
     }
     $this->writeSafeHandler->setSessionWritable(FALSE);
-    array_push($this->accountStack, $this->currentUser->getAccount());
+    \array_push($this->accountStack, $this->currentUser->getAccount());
     $this->currentUser->setAccount($account);
     return $this;
   }
@@ -73,7 +73,7 @@ class AccountSwitcher implements AccountSwitcherInterface {
   public function switchBack() {
     // Restore the previous account from the stack.
     if (!empty($this->accountStack)) {
-      $this->currentUser->setAccount(array_pop($this->accountStack));
+      $this->currentUser->setAccount(\array_pop($this->accountStack));
     }
     else {
       throw new \RuntimeException('No more accounts to revert to.');

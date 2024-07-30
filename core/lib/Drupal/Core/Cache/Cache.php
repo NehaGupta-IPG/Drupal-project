@@ -67,13 +67,13 @@ class Cache {
    */
   public static function mergeMaxAges(...$max_ages) {
     // Remove Cache::PERMANENT values to return the correct minimum value.
-    $max_ages = array_filter($max_ages, function ($max_age) {
+    $max_ages = \array_filter($max_ages, function ($max_age) {
       return $max_age !== Cache::PERMANENT;
     });
 
     // If there are no max ages left return Cache::PERMANENT, otherwise return
     // the minimum value.
-    return empty($max_ages) ? Cache::PERMANENT : min($max_ages);
+    return empty($max_ages) ? Cache::PERMANENT : \min($max_ages);
   }
 
   /**

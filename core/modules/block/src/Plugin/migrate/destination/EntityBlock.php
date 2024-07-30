@@ -23,8 +23,8 @@ class EntityBlock extends EntityConfigBase {
       'plugin' => $row->getDestinationProperty('plugin'),
       'theme' => $row->getDestinationProperty('theme'),
     ];
-    $blocks = array_keys($this->storage->loadByProperties($properties));
-    return reset($blocks);
+    $blocks = \array_keys($this->storage->loadByProperties($properties));
+    return \reset($blocks);
   }
 
   /**

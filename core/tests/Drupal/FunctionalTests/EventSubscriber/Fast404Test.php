@@ -96,7 +96,7 @@ class Fast404Test extends BrowserTestBase {
     \Drupal::service('file_system')->mkdir($this->privateFilesDirectory . '/test');
     $filepath = 'private://test/private-file-test.txt';
     $contents = "file_put_contents() doesn't seem to appreciate empty strings so let's put in some data.";
-    file_put_contents($filepath, $contents);
+    \file_put_contents($filepath, $contents);
     $file = File::create([
       'uri' => $filepath,
       'uid' => $admin->id(),

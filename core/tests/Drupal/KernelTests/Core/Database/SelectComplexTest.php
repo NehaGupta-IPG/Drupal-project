@@ -69,7 +69,7 @@ class SelectComplexTest extends DatabaseTestBase {
     // Verify that the results are returned in the correct order.
     foreach ($result as $record) {
       $num_records++;
-      $this->assertGreaterThanOrEqual(0, strcmp($record->$name_field, $last_name));
+      $this->assertGreaterThanOrEqual(0, \strcmp($record->$name_field, $last_name));
     }
 
     $this->assertEquals(8, $num_records, 'Returned the correct number of rows.');
@@ -224,7 +224,7 @@ class SelectComplexTest extends DatabaseTestBase {
       ->having('[age] + 1 > 0');
     $query->addField('test', 'age');
     $query->addExpression('[age] + 1');
-    $count = count($query->execute()->fetchCol());
+    $count = \count($query->execute()->fetchCol());
     $this->assertEquals(4, $count, 'Counted the correct number of records.');
   }
 
@@ -378,8 +378,8 @@ class SelectComplexTest extends DatabaseTestBase {
     $str = (string) $query;
 
     // Verify that the string only has one copy of condition placeholder 0.
-    $pos = strpos($str, 'db_condition_placeholder_0', 0);
-    $pos2 = strpos($str, 'db_condition_placeholder_0', $pos + 1);
+    $pos = \strpos($str, 'db_condition_placeholder_0', 0);
+    $pos2 = \strpos($str, 'db_condition_placeholder_0', $pos + 1);
     $this->assertFalse($pos2, 'Condition placeholder is not repeated.');
   }
 

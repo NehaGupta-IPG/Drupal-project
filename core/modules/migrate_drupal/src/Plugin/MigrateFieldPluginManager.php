@@ -98,8 +98,8 @@ class MigrateFieldPluginManager extends MigratePluginManager implements MigrateF
 
     $definitions = $this->getDefinitions();
     foreach ($definitions as $plugin_id => $definition) {
-      if (in_array($core, $definition['core'])) {
-        if (array_key_exists($field_type, $definition['type_map']) || $field_type === $plugin_id) {
+      if (\in_array($core, $definition['core'])) {
+        if (\array_key_exists($field_type, $definition['type_map']) || $field_type === $plugin_id) {
           return $plugin_id;
         }
       }
@@ -140,7 +140,7 @@ class MigrateFieldPluginManager extends MigratePluginManager implements MigrateF
    *   The definitions array to sort.
    */
   protected function sortDefinitions(array &$definitions) {
-    array_multisort(array_column($definitions, 'weight'), SORT_ASC, SORT_NUMERIC, array_keys($definitions), SORT_ASC, SORT_NATURAL, $definitions);
+    \array_multisort(\array_column($definitions, 'weight'), SORT_ASC, SORT_NUMERIC, \array_keys($definitions), SORT_ASC, SORT_NATURAL, $definitions);
   }
 
 }

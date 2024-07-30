@@ -97,7 +97,7 @@ class TestRun {
    *   The database prefix.
    */
   public function getDatabasePrefix(): string {
-    if (is_null($this->databasePrefix)) {
+    if (\is_null($this->databasePrefix)) {
       $state = $this->testRunResultsStorage->getCurrentTestRunState($this);
       $this->databasePrefix = $state['db_prefix'];
       $this->testClass = $state['test_class'];
@@ -112,7 +112,7 @@ class TestRun {
    *   The test class.
    */
   public function getTestClass(): string {
-    if (is_null($this->testClass)) {
+    if (\is_null($this->testClass)) {
       $state = $this->testRunResultsStorage->getCurrentTestRunState($this);
       $this->databasePrefix = $state['db_prefix'];
       $this->testClass = $state['test_class'];
@@ -170,9 +170,9 @@ class TestRun {
    */
   public function processPhpErrorLogFile(string $error_log_path, string $test_class): bool {
     $found = FALSE;
-    if (file_exists($error_log_path)) {
-      foreach (file($error_log_path) as $line) {
-        if (preg_match('/\[.*?\] (.*?): (.*?) in (.*) on line (\d+)/', $line, $match)) {
+    if (\file_exists($error_log_path)) {
+      foreach (\file($error_log_path) as $line) {
+        if (\preg_match('/\[.*?\] (.*?): (.*?) in (.*) on line (\d+)/', $line, $match)) {
           // Parse PHP fatal errors for example: PHP Fatal error: Call to
           // undefined function break_me() in /path/to/file.php on line 17.
           $this->insertLogEntry([

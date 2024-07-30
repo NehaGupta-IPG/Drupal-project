@@ -45,7 +45,7 @@ class ConvertImageEffect extends ConfigurableImageEffectBase {
    */
   public function getSummary() {
     $summary = [
-      '#markup' => mb_strtoupper($this->configuration['extension']),
+      '#markup' => \mb_strtoupper($this->configuration['extension']),
     ];
     $summary += parent::getSummary();
 
@@ -66,9 +66,9 @@ class ConvertImageEffect extends ConfigurableImageEffectBase {
    */
   public function buildConfigurationForm(array $form, FormStateInterface $form_state) {
     $extensions = \Drupal::service('image.toolkit.manager')->getDefaultToolkit()->getSupportedExtensions();
-    $options = array_combine(
+    $options = \array_combine(
       $extensions,
-      array_map('mb_strtoupper', $extensions)
+      \array_map('mb_strtoupper', $extensions)
     );
     $form['extension'] = [
       '#type' => 'select',

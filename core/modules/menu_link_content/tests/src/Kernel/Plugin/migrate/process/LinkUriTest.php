@@ -125,12 +125,12 @@ class LinkUriTest extends KernelTestBase {
 
     $value = '/test';
     $expected = 'internal:/test';
-    $exception_message = sprintf($message, $expected);
+    $exception_message = \sprintf($message, $expected);
     $tests['leading_slash'] = [$value, $exception_message];
 
     $value = 'test';
     $expected = 'internal:/test';
-    $exception_message = sprintf($message, $expected);
+    $exception_message = \sprintf($message, $expected);
     $tests['without_scheme'] = [$value, $exception_message];
 
     return $tests;

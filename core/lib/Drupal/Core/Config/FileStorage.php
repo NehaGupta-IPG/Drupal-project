@@ -92,7 +92,7 @@ class FileStorage implements StorageInterface {
    * {@inheritdoc}
    */
   public function exists($name) {
-    return file_exists($this->getFilePath($name));
+    return \file_exists($this->getFilePath($name));
   }
 
   /**
@@ -110,7 +110,7 @@ class FileStorage implements StorageInterface {
       return $data;
     }
 
-    $data = file_get_contents($filepath);
+    $data = \file_get_contents($filepath);
     try {
       $data = $this->decode($data);
     }
@@ -147,11 +147,11 @@ class FileStorage implements StorageInterface {
     }
 
     $target = $this->getFilePath($name);
-    $status = @file_put_contents($target, $encoded_data);
+    $status = @\file_put_contents($target, $encoded_data);
     if ($status === FALSE) {
       // Try to make sure the directory exists and try writing again.
       $this->ensureStorage();
-      $status = @file_put_contents($target, $encoded_data);
+      $status = @\file_put_contents($target, $encoded_data);
     }
     if ($status === FALSE) {
       throw new StorageException('Failed to write configuration file: ' . $target);
@@ -177,7 +177,7 @@ class FileStorage implements StorageInterface {
    * {@inheritdoc}
    */
   public function rename($name, $new_name) {
-    $status = @rename($this->getFilePath($name), $this->getFilePath($new_name));
+    $status = @\rename($this->getFilePath($name), $this->getFilePath($new_name));
     if ($status === FALSE) {
       return FALSE;
     }
@@ -199,7 +199,7 @@ class FileStorage implements StorageInterface {
   public function decode($raw) {
     $data = Yaml::decode($raw);
     // A simple string is valid YAML for any reason.
-    if (!is_array($data)) {
+    if (!\is_array($data)) {
       return FALSE;
     }
     return $data;
@@ -210,7 +210,7 @@ class FileStorage implements StorageInterface {
    */
   public function listAll($prefix = '') {
     $dir = $this->getCollectionDirectory();
-    if (!is_dir($dir)) {
+    if (!\is_dir($dir)) {
       return [];
     }
     $extension = '.' . static::getFileExtension();
@@ -219,13 +219,13 @@ class FileStorage implements StorageInterface {
     // wrappers. Same for \GlobIterator (which additionally requires an absolute
     // realpath() on Windows).
     // @see https://github.com/mikey179/vfsStream/issues/2
-    $files = scandir($dir);
+    $files = \scandir($dir);
 
     $names = [];
-    $pattern = '/^' . preg_quote($prefix, '/') . '.*' . preg_quote($extension, '/') . '$/';
+    $pattern = '/^' . \preg_quote($prefix, '/') . '.*' . \preg_quote($extension, '/') . '$/';
     foreach ($files as $file) {
-      if ($file[0] !== '.' && preg_match($pattern, $file)) {
-        $names[] = basename($file, $extension);
+      if ($file[0] !== '.' && \preg_match($pattern, $file)) {
+        $names[] = \basename($file, $extension);
       }
     }
 
@@ -273,11 +273,11 @@ class FileStorage implements StorageInterface {
    * {@inheritdoc}
    */
   public function getAllCollectionNames() {
-    if (!is_dir($this->directory)) {
+    if (!\is_dir($this->directory)) {
       return [];
     }
     $collections = $this->getAllCollectionNamesHelper($this->directory);
-    sort($collections);
+    \sort($collections);
     return $collections;
   }
 
@@ -310,7 +310,7 @@ class FileStorage implements StorageInterface {
    */
   protected function getAllCollectionNamesHelper($directory) {
     $collections = [];
-    $pattern = '/\.' . preg_quote($this->getFileExtension(), '/') . '$/';
+    $pattern = '/\.' . \preg_quote($this->getFileExtension(), '/') . '$/';
     foreach (new \DirectoryIterator($directory) as $fileinfo) {
       if ($fileinfo->isDir() && !$fileinfo->isDot()) {
         $collection = $fileinfo->getFilename();
@@ -329,8 +329,8 @@ class FileStorage implements StorageInterface {
         // objects. A directory without any configuration objects is not a valid
         // collection.
         // @see \Drupal\Core\Config\FileStorage::listAll()
-        foreach (scandir($directory . '/' . $collection) as $file) {
-          if ($file[0] !== '.' && preg_match($pattern, $file)) {
+        foreach (\scandir($directory . '/' . $collection) as $file) {
+          if ($file[0] !== '.' && \preg_match($pattern, $file)) {
             $collections[] = $collection;
             break;
           }
@@ -351,7 +351,7 @@ class FileStorage implements StorageInterface {
       $dir = $this->directory;
     }
     else {
-      $dir = $this->directory . '/' . str_replace('.', '/', $this->collection);
+      $dir = $this->directory . '/' . \str_replace('.', '/', $this->collection);
     }
     return $dir;
   }

@@ -65,7 +65,7 @@ class FieldUITest extends FieldTestBase {
 
     // Tests the available formatter options.
     $options = $this->assertSession()->selectExists('edit-options-type')->findAll('css', 'option');
-    $options = array_map(function ($item) {
+    $options = \array_map(function ($item) {
       return $item->getValue();
     }, $options);
     $this->assertEqualsCanonicalizing(['text_default', 'text_trimmed'], $options);
@@ -75,7 +75,7 @@ class FieldUITest extends FieldTestBase {
     $this->drupalGet($url);
     $this->assertTrue($this->assertSession()->optionExists('edit-options-type', 'text_trimmed')->isSelected());
 
-    $random_number = rand(100, 400);
+    $random_number = \rand(100, 400);
     $this->submitForm(['options[settings][trim_length]' => $random_number], 'Apply');
     $this->drupalGet($url);
     $this->assertSession()->fieldValueEquals('options[settings][trim_length]', $random_number);
@@ -121,7 +121,7 @@ class FieldUITest extends FieldTestBase {
     // Test the click sort column options.
     // Tests the available formatter options.
     $options = $this->assertSession()->selectExists('edit-options-click-sort-column')->findAll('css', 'option');
-    $options = array_map(function ($item) {
+    $options = \array_map(function ($item) {
       return $item->getValue();
     }, $options);
     $this->assertEqualsCanonicalizing(['format', 'value'], $options);

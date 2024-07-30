@@ -125,7 +125,7 @@ class AccessManager implements AccessManagerInterface {
 
     // Filter out checks which require the incoming request.
     if (!isset($request)) {
-      $checks = array_diff($checks, $this->checkProvider->getChecksNeedRequest());
+      $checks = \array_diff($checks, $this->checkProvider->getChecksNeedRequest());
     }
 
     $result = AccessResult::neutral();
@@ -157,7 +157,7 @@ class AccessManager implements AccessManagerInterface {
     $callable = $this->checkProvider->loadCheck($service_id);
     $arguments = $arguments_resolver->getArguments($callable);
     /** @var \Drupal\Core\Access\AccessResultInterface $service_access **/
-    $service_access = call_user_func_array($callable, $arguments);
+    $service_access = \call_user_func_array($callable, $arguments);
 
     if (!$service_access instanceof AccessResultInterface) {
       throw new AccessException("Access error in $service_id. Access services must return an object that implements AccessResultInterface.");

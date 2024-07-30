@@ -26,7 +26,7 @@ class ViewMode extends ViewModeBase {
     $rows = [];
     $result = $this->prepareQuery()->execute();
     while ($field_row = $result->fetchAssoc()) {
-      $field_row['display_settings'] = unserialize($field_row['display_settings']);
+      $field_row['display_settings'] = \unserialize($field_row['display_settings']);
       foreach ($this->getViewModes() as $view_mode) {
         // Append to the return value if the row has display settings for this
         // view mode and the view mode is neither hidden nor excluded.

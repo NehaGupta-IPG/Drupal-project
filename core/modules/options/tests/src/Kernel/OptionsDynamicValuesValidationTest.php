@@ -100,7 +100,7 @@ class OptionsDynamicValuesValidationTest extends OptionsFieldUnitTestBase {
 
     // Now verify that validation does not pass against anything else.
     foreach ($this->test as $key => $value) {
-      $this->entity->test_options->value = is_numeric($value) ? (100 - $value) : ('X' . $value);
+      $this->entity->test_options->value = \is_numeric($value) ? (100 - $value) : ('X' . $value);
       $violations = $this->entity->test_options->validate();
       $this->assertCount(1, $violations, "$key is not a valid value");
     }

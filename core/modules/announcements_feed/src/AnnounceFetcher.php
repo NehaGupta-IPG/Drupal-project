@@ -67,7 +67,7 @@ final class AnnounceFetcher {
    *   An array with ids of all announcements in the feed.
    */
   public function fetchIds(): array {
-    return array_column($this->fetch(), 'id');
+    return \array_column($this->fetch(), 'id');
   }
 
   /**
@@ -96,11 +96,11 @@ final class AnnounceFetcher {
     if (empty($url)) {
       return FALSE;
     }
-    $host = parse_url($url, PHP_URL_HOST);
+    $host = \parse_url($url, PHP_URL_HOST);
 
     // First character can only be a letter or a digit.
     // @see https://www.rfc-editor.org/rfc/rfc1123#page-13
-    return $host && preg_match('/^([a-zA-Z0-9][a-zA-Z0-9\-_]*\.)?drupal\.org$/', $host);
+    return $host && \preg_match('/^([a-zA-Z0-9][a-zA-Z0-9\-_]*\.)?drupal\.org$/', $host);
   }
 
   /**
@@ -149,7 +149,7 @@ final class AnnounceFetcher {
       $announcements = $announcements['items'] ?? [];
       // Ensure that announcements reference drupal.org and are applicable to
       // the current Drupal version.
-      $announcements = array_filter($announcements, function (array $announcement) {
+      $announcements = \array_filter($announcements, function (array $announcement) {
         return static::validateUrl($announcement['url'] ?? '') && static::isRelevantItem($announcement['_drupalorg']['version'] ?? '');
       });
 
@@ -160,11 +160,11 @@ final class AnnounceFetcher {
 
     // The drupal.org endpoint is sorted by created date in descending order.
     // We will limit the announcements based on the configuration limit.
-    $announcements = array_slice($announcements, 0, $this->config->get('limit') ?? 10);
+    $announcements = \array_slice($announcements, 0, $this->config->get('limit') ?? 10);
 
     // For the remaining announcements, put all the featured announcements
     // before the rest.
-    uasort($announcements, function ($a, $b) {
+    \uasort($announcements, function ($a, $b) {
       $a_value = (int) $a['_drupalorg']['featured'];
       $b_value = (int) $b['_drupalorg']['featured'];
       if ($a_value == $b_value) {
@@ -174,7 +174,7 @@ final class AnnounceFetcher {
     });
 
     // Map the multidimensional array into an array of Announcement objects.
-    $announcements = array_map(function ($announcement) {
+    $announcements = \array_map(function ($announcement) {
       return new Announcement(
         $announcement['id'],
         $announcement['title'],

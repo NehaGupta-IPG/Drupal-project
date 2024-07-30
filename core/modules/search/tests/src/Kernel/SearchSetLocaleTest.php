@@ -95,7 +95,7 @@ class SearchSetLocaleTest extends KernelTestBase {
    */
   public function testSearchWithNumericLocale(): void {
     // French decimal point is comma.
-    setlocale(LC_NUMERIC, 'fr_FR');
+    \setlocale(LC_NUMERIC, 'fr_FR');
     $this->nodeSearchPlugin->setSearch('tapir', [], []);
     // The call to execute will throw an exception if a float in the wrong
     // format is passed in the query to the database, so an assertion is not

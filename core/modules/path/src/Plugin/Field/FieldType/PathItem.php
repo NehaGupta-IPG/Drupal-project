@@ -29,11 +29,11 @@ class PathItem extends FieldItemBase {
    */
   public static function propertyDefinitions(FieldStorageDefinitionInterface $field_definition) {
     $properties['alias'] = DataDefinition::create('string')
-      ->setLabel(t('Path alias'));
+      ->setLabel(\t('Path alias'));
     $properties['pid'] = DataDefinition::create('integer')
-      ->setLabel(t('Path id'));
+      ->setLabel(\t('Path id'));
     $properties['langcode'] = DataDefinition::create('string')
-      ->setLabel(t('Language Code'));
+      ->setLabel(\t('Language Code'));
     return $properties;
   }
 
@@ -133,7 +133,7 @@ class PathItem extends FieldItemBase {
    */
   public static function generateSampleValue(FieldDefinitionInterface $field_definition) {
     $random = new Random();
-    $values['alias'] = '/' . str_replace(' ', '-', strtolower($random->sentences(3)));
+    $values['alias'] = '/' . \str_replace(' ', '-', \strtolower($random->sentences(3)));
     return $values;
   }
 

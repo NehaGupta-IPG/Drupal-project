@@ -107,7 +107,7 @@ class BreakpointManager extends DefaultPluginManager implements BreakpointManage
     $this->moduleHandler = $module_handler;
     $this->themeHandler = $theme_handler;
     if ($module_extension_list === NULL) {
-      @trigger_error('Calling ' . __METHOD__ . '() without the $module_extension_list argument is deprecated in drupal:10.3.0 and will be required in drupal:12.0.0. See https://www.drupal.org/node/3310017', E_USER_DEPRECATED);
+      @\trigger_error('Calling ' . __METHOD__ . '() without the $module_extension_list argument is deprecated in drupal:10.3.0 and will be required in drupal:12.0.0. See https://www.drupal.org/node/3310017', E_USER_DEPRECATED);
       $module_extension_list = \Drupal::service('extension.list.module');
     }
     $this->moduleExtensionList = $module_extension_list;
@@ -137,12 +137,12 @@ class BreakpointManager extends DefaultPluginManager implements BreakpointManage
       $definition['group'] = $definition['provider'];
     }
     // Ensure a 1x multiplier exists.
-    if (!in_array('1x', $definition['multipliers'])) {
+    if (!\in_array('1x', $definition['multipliers'])) {
       $definition['multipliers'][] = '1x';
     }
     // Ensure that multipliers are sorted numerically so 1x, 1.5x and 2x
     // come out in that order instead of 1.5x, 1x, 2x.
-    sort($definition['multipliers'], SORT_NUMERIC);
+    \sort($definition['multipliers'], SORT_NUMERIC);
   }
 
   /**
@@ -167,7 +167,7 @@ class BreakpointManager extends DefaultPluginManager implements BreakpointManage
             $breakpoints[$plugin_id] = $plugin_definition;
           }
         }
-        uasort($breakpoints, ['Drupal\Component\Utility\SortArray', 'sortByWeightElement']);
+        \uasort($breakpoints, ['Drupal\Component\Utility\SortArray', 'sortByWeightElement']);
         $this->cacheBackend->set($this->cacheKey . ':' . $group, $breakpoints, Cache::PERMANENT, ['breakpoints']);
         $this->breakpointsByGroup[$group] = $breakpoints;
       }
@@ -205,7 +205,7 @@ class BreakpointManager extends DefaultPluginManager implements BreakpointManage
     foreach ($groups as $group) {
       $group_labels[$group] = $this->getGroupLabel($group);
     }
-    asort($group_labels);
+    \asort($group_labels);
     return $group_labels;
   }
 

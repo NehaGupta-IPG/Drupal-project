@@ -55,7 +55,7 @@ class StaticMapTest extends MigrateProcessTestCase {
    */
   public function testMapWithInvalidSource(): void {
     $this->expectException(MigrateSkipRowException::class);
-    $this->expectExceptionMessage(sprintf("No static mapping found for '%s' and no default value provided for destination '%s'.", Variable::export(['bar']), 'destination_property'));
+    $this->expectExceptionMessage(\sprintf("No static mapping found for '%s' and no default value provided for destination '%s'.", Variable::export(['bar']), 'destination_property'));
     $this->plugin->transform(['bar'], $this->migrateExecutable, $this->row, 'destination_property');
   }
 

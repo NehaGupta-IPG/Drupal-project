@@ -86,7 +86,7 @@ class DatabaseQueue implements ReliableQueueInterface, QueueGarbageCollectionInt
     $query = $this->connection->insert(static::TABLE_NAME)
       ->fields([
         'name' => $this->name,
-        'data' => serialize($data),
+        'data' => \serialize($data),
         // We cannot rely on \Drupal::time()->getRequestTime() because many
         // items might be created by a single request which takes longer than
         // 1 second.
@@ -147,7 +147,7 @@ class DatabaseQueue implements ReliableQueueInterface, QueueGarbageCollectionInt
         ->condition('expire', 0);
       // If there are affected rows, this update succeeded.
       if ($update->execute()) {
-        $item->data = unserialize($item->data);
+        $item->data = \unserialize($item->data);
         return $item;
       }
     }

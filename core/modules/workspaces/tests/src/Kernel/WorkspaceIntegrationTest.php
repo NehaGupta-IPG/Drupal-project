@@ -187,7 +187,7 @@ class WorkspaceIntegrationTest extends KernelTestBase {
 
     // Unpublish node 1 in 'stage'. The new revision is also added to 'live' but
     // it is not the default revision.
-    $revision_state = array_replace_recursive($revision_state, [
+    $revision_state = \array_replace_recursive($revision_state, [
       'live' => [
         1 => [
           3 => [
@@ -213,7 +213,7 @@ class WorkspaceIntegrationTest extends KernelTestBase {
 
     // Publish node 2 in 'stage'. The new revision is also added to 'live' but
     // it is not the default revision.
-    $revision_state = array_replace_recursive($revision_state, [
+    $revision_state = \array_replace_recursive($revision_state, [
       'live' => [
         2 => [
           4 => [
@@ -239,7 +239,7 @@ class WorkspaceIntegrationTest extends KernelTestBase {
 
     // Adding a new unpublished node on 'stage' should create a single
     // unpublished revision on both 'stage' and 'live'.
-    $revision_state = array_replace_recursive($revision_state, [
+    $revision_state = \array_replace_recursive($revision_state, [
       'live' => [
         3 => [
           5 => [
@@ -264,7 +264,7 @@ class WorkspaceIntegrationTest extends KernelTestBase {
 
     // Adding a new published node on 'stage' should create two revisions, an
     // unpublished revision on 'live' and a published one on 'stage'.
-    $revision_state = array_replace_recursive($revision_state, [
+    $revision_state = \array_replace_recursive($revision_state, [
       'live' => [
         4 => [
           6 => [
@@ -299,7 +299,7 @@ class WorkspaceIntegrationTest extends KernelTestBase {
 
     // Publishing 'stage' to 'live' should simply make the latest revisions in
     // 'stage' the default ones in 'live'.
-    $revision_state = array_replace_recursive($revision_state, [
+    $revision_state = \array_replace_recursive($revision_state, [
       'live' => [
         1 => [
           1 => ['default_revision' => FALSE],
@@ -384,7 +384,7 @@ class WorkspaceIntegrationTest extends KernelTestBase {
 
     // Check that all the revisions that were published to 'Live' were also
     // marked as default revisions in their revision metadata field.
-    $published_revisions = $this->entityTypeManager->getStorage('node')->loadMultipleRevisions(array_keys($expected['node']));
+    $published_revisions = $this->entityTypeManager->getStorage('node')->loadMultipleRevisions(\array_keys($expected['node']));
     foreach ($published_revisions as $published_revision) {
       $this->assertTrue($published_revision->wasDefaultRevision());
     }
@@ -891,11 +891,11 @@ class WorkspaceIntegrationTest extends KernelTestBase {
 
       // Check that the 'Frontpage' view only shows published content that is
       // also considered as the default revision in the given workspace.
-      $expected_frontpage = array_filter($expected_values, function ($expected_value) {
+      $expected_frontpage = \array_filter($expected_values, function ($expected_value) {
         return $expected_value['status'] === TRUE && $expected_value['default_revision'] === TRUE;
       });
       // The 'Frontpage' view will output nodes in reverse creation order.
-      usort($expected_frontpage, function ($a, $b) {
+      \usort($expected_frontpage, function ($a, $b) {
         return $b['nid'] - $a['nid'];
       });
       $view = Views::getView('frontpage');
@@ -930,7 +930,7 @@ class WorkspaceIntegrationTest extends KernelTestBase {
    */
   protected function assertEntityLoad(array $expected_values, string $entity_type_id): void {
     // Filter the expected values so we can check only the default revisions.
-    $expected_default_revisions = array_filter($expected_values, function ($expected_value) {
+    $expected_default_revisions = \array_filter($expected_values, function ($expected_value) {
       return $expected_value['default_revision'] === TRUE;
     });
 
@@ -942,7 +942,7 @@ class WorkspaceIntegrationTest extends KernelTestBase {
 
     // Check \Drupal\Core\Entity\EntityStorageInterface::loadMultiple().
     /** @var \Drupal\Core\Entity\RevisionableInterface[]|\Drupal\Core\Entity\EntityPublishedInterface[] $entities */
-    $entities = $this->entityTypeManager->getStorage($entity_type_id)->loadMultiple(array_column($expected_default_revisions, $id_key));
+    $entities = $this->entityTypeManager->getStorage($entity_type_id)->loadMultiple(\array_column($expected_default_revisions, $id_key));
     foreach ($expected_default_revisions as $expected_default_revision) {
       $entity_id = $expected_default_revision[$id_key];
       $this->assertEquals($expected_default_revision[$revision_key], $entities[$entity_id]->getRevisionId());
@@ -990,7 +990,7 @@ class WorkspaceIntegrationTest extends KernelTestBase {
     $published_key = $entity_keys['published'];
 
     /** @var \Drupal\Core\Entity\RevisionableInterface[]|\Drupal\Core\Entity\EntityPublishedInterface[] $entities */
-    $entities = $this->entityTypeManager->getStorage($entity_type_id)->loadMultipleRevisions(array_column($expected_values, $revision_key));
+    $entities = $this->entityTypeManager->getStorage($entity_type_id)->loadMultipleRevisions(\array_column($expected_values, $revision_key));
     foreach ($expected_values as $expected_revision) {
       $revision_id = $expected_revision[$revision_key];
       $this->assertEquals($expected_revision[$id_key], $entities[$revision_id]->id());
@@ -1019,20 +1019,20 @@ class WorkspaceIntegrationTest extends KernelTestBase {
     $published_key = $entity_keys['published'];
 
     // Filter the expected values so we can check only the default revisions.
-    $expected_default_revisions = array_filter($expected_values, function ($expected_value) {
+    $expected_default_revisions = \array_filter($expected_values, function ($expected_value) {
       return $expected_value['default_revision'] === TRUE;
     });
 
     // Check entity query counts.
     $result = (int) $storage->getQuery()->accessCheck(FALSE)->count()->execute();
-    $this->assertSame(count($expected_default_revisions), $result);
+    $this->assertSame(\count($expected_default_revisions), $result);
 
     $result = (int) $storage->getAggregateQuery()->accessCheck(FALSE)->count()->execute();
-    $this->assertSame(count($expected_default_revisions), $result);
+    $this->assertSame(\count($expected_default_revisions), $result);
 
     // Check entity queries with no conditions.
     $result = $storage->getQuery()->accessCheck(FALSE)->execute();
-    $expected_result = array_combine(array_column($expected_default_revisions, $revision_key), array_column($expected_default_revisions, $id_key));
+    $expected_result = \array_combine(\array_column($expected_default_revisions, $revision_key), \array_column($expected_default_revisions, $id_key));
     $this->assertEquals($expected_result, $result);
 
     // Check latest revision queries.
@@ -1156,7 +1156,7 @@ class WorkspaceIntegrationTest extends KernelTestBase {
   public function testNodeAccessDifferringRevisionIdsOnTarget(): void {
     $this->initializeWorkspacesModule();
     \Drupal::service('module_installer')->install(['node_access_test']);
-    node_access_rebuild();
+    \node_access_rebuild();
 
     // Edit node 1 in 'stage'.
     $this->switchToWorkspace('stage');

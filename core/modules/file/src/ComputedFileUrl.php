@@ -24,7 +24,7 @@ class ComputedFileUrl extends TypedData {
       return $this->url;
     }
 
-    assert($this->getParent()->getEntity() instanceof FileInterface);
+    \assert($this->getParent()->getEntity() instanceof FileInterface);
 
     $uri = $this->getParent()->getEntity()->getFileUri();
     /** @var \Drupal\Core\File\FileUrlGeneratorInterface $file_url_generator */

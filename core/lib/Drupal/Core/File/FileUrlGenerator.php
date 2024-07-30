@@ -125,7 +125,7 @@ class FileUrlGenerator implements FileUrlGeneratorInterface {
     //   HTTP and to https://example.com/bar.jpg when viewing a HTTPS page)
     // Both types of relative URIs are characterized by a leading slash, hence
     // we can use a single check.
-    if (mb_substr($uri, 0, 1) == '/') {
+    if (\mb_substr($uri, 0, 1) == '/') {
       return $uri;
     }
     else {
@@ -166,11 +166,11 @@ class FileUrlGenerator implements FileUrlGeneratorInterface {
       //   HTTP and to https://example.com/bar.jpg when viewing a HTTPS page)
       // Both types of relative URIs are characterized by a leading slash, hence
       // we can use a single check.
-      if (mb_substr($uri, 0, 2) == '//') {
+      if (\mb_substr($uri, 0, 2) == '//') {
         return Url::fromUri($uri);
       }
-      elseif (mb_substr($uri, 0, 1) == '/') {
-        return Url::fromUri('base:' . str_replace($this->requestStack->getCurrentRequest()->getBasePath(), '', $uri));
+      elseif (\mb_substr($uri, 0, 1) == '/') {
+        return Url::fromUri('base:' . \str_replace($this->requestStack->getCurrentRequest()->getBasePath(), '', $uri));
       }
       else {
         // If this is not a properly formatted stream, then it is a shipped
@@ -183,7 +183,7 @@ class FileUrlGenerator implements FileUrlGeneratorInterface {
       // Check for HTTP and data URI-encoded URLs so that we don't have to
       // implement getExternalUrl() for the HTTP and data schemes.
       $options = UrlHelper::parse($uri);
-      return Url::fromUri(urldecode($options['path']), $options);
+      return Url::fromUri(\urldecode($options['path']), $options);
     }
     elseif ($wrapper = $this->streamWrapperManager->getViaUri($uri)) {
       $external_url = $wrapper->getExternalUrl();
@@ -193,10 +193,10 @@ class FileUrlGenerator implements FileUrlGeneratorInterface {
       // https://www.drupal.org/project/drupal/issues/3256884 is fixed.
       if (UrlHelper::externalIsLocal($external_url, \Drupal::service('router.request_context')->getCompleteBaseUrl())) {
         // Attempt to return an external URL using the appropriate wrapper.
-        return Url::fromUri('base:' . $this->transformRelative(urldecode($options['path']), FALSE), $options);
+        return Url::fromUri('base:' . $this->transformRelative(\urldecode($options['path']), FALSE), $options);
       }
       else {
-        return Url::fromUri(urldecode($options['path']), $options);
+        return Url::fromUri(\urldecode($options['path']), $options);
       }
     }
     throw new InvalidStreamWrapperException();
@@ -214,7 +214,7 @@ class FileUrlGenerator implements FileUrlGeneratorInterface {
     $port = $request->getPort() ?: 80;
 
     // Files may be accessible on a different port than the web request.
-    $file_url_port = parse_url($file_url, PHP_URL_PORT) ?? $port;
+    $file_url_port = \parse_url($file_url, PHP_URL_PORT) ?? $port;
     if ($file_url_port != $port) {
       return $file_url;
     }
@@ -223,11 +223,11 @@ class FileUrlGenerator implements FileUrlGeneratorInterface {
     // base path, add it to the host to be removed from the URL as well.
     $base_path = !$root_relative ? $request->getBasePath() : '';
 
-    $host = preg_quote($host, '@');
-    $port = preg_quote($port, '@');
-    $base_path = preg_quote($base_path, '@');
+    $host = \preg_quote($host, '@');
+    $port = \preg_quote($port, '@');
+    $base_path = \preg_quote($base_path, '@');
 
-    return preg_replace("@^https?://{$host}(:{$port})?{$base_path}($|/)@", '/', $file_url);
+    return \preg_replace("@^https?://{$host}(:{$port})?{$base_path}($|/)@", '/', $file_url);
   }
 
 }

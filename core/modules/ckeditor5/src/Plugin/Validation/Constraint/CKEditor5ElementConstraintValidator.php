@@ -27,7 +27,7 @@ class CKEditor5ElementConstraintValidator extends ConstraintValidator {
     }
 
     $parsed = HTMLRestrictions::fromString($element);
-    if ($parsed->allowsNothing() || count($parsed->getAllowedElements()) > 1 || $element !== $parsed->toCKEditor5ElementsArray()[0]) {
+    if ($parsed->allowsNothing() || \count($parsed->getAllowedElements()) > 1 || $element !== $parsed->toCKEditor5ElementsArray()[0]) {
       $this->context->buildViolation($constraint->message)
         ->setParameter('%provided_element', $element)
         ->addViolation();
@@ -37,13 +37,13 @@ class CKEditor5ElementConstraintValidator extends ConstraintValidator {
     // detailed validation.
     if (isset($constraint->requiredAttributes)) {
       $allowed_elements = $parsed->getAllowedElements();
-      $tag = array_keys($allowed_elements)[0];
+      $tag = \array_keys($allowed_elements)[0];
       $attribute_restrictions = $allowed_elements[$tag];
-      assert(is_array($constraint->requiredAttributes));
+      \assert(\is_array($constraint->requiredAttributes));
       foreach ($constraint->requiredAttributes as $required_attribute) {
         // Validate attributeName.
         $required_attribute_name = $required_attribute['attributeName'];
-        if (!is_array($attribute_restrictions) || !isset($attribute_restrictions[$required_attribute_name])) {
+        if (!\is_array($attribute_restrictions) || !isset($attribute_restrictions[$required_attribute_name])) {
           $this->context->buildViolation($constraint->missingRequiredAttributeMessage)
             ->setParameter('@provided_element', $element)
             ->setParameter('@required_attribute_name', $required_attribute_name)
@@ -56,7 +56,7 @@ class CKEditor5ElementConstraintValidator extends ConstraintValidator {
         // Validate minAttributeValueCount if specified.
         if (isset($required_attribute['minAttributeValueCount'])) {
           $min_attribute_value_count = $required_attribute['minAttributeValueCount'];
-          if (!is_array($attribute_values) || count($attribute_values) < $min_attribute_value_count) {
+          if (!\is_array($attribute_values) || \count($attribute_values) < $min_attribute_value_count) {
             $this->context->buildViolation($constraint->requiredAttributeMinValuesMessage)
               ->setParameter('@provided_element', $element)
               ->setParameter('@required_attribute_name', $required_attribute_name)

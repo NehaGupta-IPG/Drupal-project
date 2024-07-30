@@ -60,7 +60,7 @@ class ContentEntityCloneTest extends EntityKernelTestBase {
     $this->assertEquals($entity->getTranslationLanguages(), $clone->getTranslationLanguages(), 'The entity and its clone have the same translation languages.');
 
     $default_langcode = $entity->getUntranslated()->language()->getId();
-    foreach (array_keys($clone->getTranslationLanguages()) as $langcode) {
+    foreach (\array_keys($clone->getTranslationLanguages()) as $langcode) {
       $translation = $clone->getTranslation($langcode);
       foreach ($translation->getFields() as $field_name => $field) {
         if ($field->getFieldDefinition()->isTranslatable()) {
@@ -117,7 +117,7 @@ class ContentEntityCloneTest extends EntityKernelTestBase {
 
     $entity->addTranslation('de');
     $entity->save();
-    $fields = array_keys($entity->getFieldDefinitions());
+    $fields = \array_keys($entity->getFieldDefinitions());
 
     // Reload the entity, clone it and check that both entity objects reference
     // different field instances.
@@ -243,8 +243,8 @@ class ContentEntityCloneTest extends EntityKernelTestBase {
     // objects and put the field values into the entity property $values, so
     // that on accessing a field again it will be newly created with the value
     // from the $values property.
-    serialize($entity);
-    serialize($clone);
+    \serialize($entity);
+    \serialize($clone);
 
     // Assert that the original and the cloned entity both have different names.
     $this->assertEquals('original', $entity->getName());
@@ -337,7 +337,7 @@ class ContentEntityCloneTest extends EntityKernelTestBase {
       // modified in a non-consistent way and ContentEntityBase::__sleep() will
       // not be able to properly access all properties and this will cause
       // exceptions without a proper backtrace.
-      if (in_array($property->getName(), $translation_unique_properties)) {
+      if (\in_array($property->getName(), $translation_unique_properties)) {
         $this->assertEquals('default-value', $property->getValue($entity), "Entity property $property_name is not cloned properly.");
         $this->assertEquals('test-translation-cloning', $property->getValue($translation), "Entity property $property_name is not cloned properly.");
       }

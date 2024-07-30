@@ -19,7 +19,7 @@ class UpdateLobTest extends DatabaseTestBase {
    */
   public function testUpdateOneBlob(): void {
     $data = "This is\000a test.";
-    $this->assertSame(15, strlen($data), 'Test data contains a NULL.');
+    $this->assertSame(15, \strlen($data), 'Test data contains a NULL.');
     $id = $this->connection->insert('test_one_blob')
       ->fields(['blob1' => $data])
       ->execute();
@@ -31,7 +31,7 @@ class UpdateLobTest extends DatabaseTestBase {
       ->execute();
 
     $r = $this->connection->query('SELECT * FROM {test_one_blob} WHERE [id] = :id', [':id' => $id])->fetchAssoc();
-    $this->assertSame($data, $r['blob1'], "Can update a blob: id $id, " . serialize($r));
+    $this->assertSame($data, $r['blob1'], "Can update a blob: id $id, " . \serialize($r));
   }
 
   /**

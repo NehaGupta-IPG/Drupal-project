@@ -139,7 +139,7 @@ class UrlTest extends UnitTestCase {
 
     $urls = [];
     foreach ($this->map as $index => $values) {
-      $path = array_pop($values);
+      $path = \array_pop($values);
       $url = Url::createFromRequest(Request::create("$path"));
       $expected = Url::fromRoute($values[0], $values[1], $values[2]);
       $this->assertEquals($expected, $url);
@@ -363,7 +363,7 @@ class UrlTest extends UnitTestCase {
   #[Depends('testUrlFromRequest')]
   public function testToString($urls): void {
     foreach ($urls as $index => $url) {
-      $path = array_pop($this->map[$index]);
+      $path = \array_pop($this->map[$index]);
       $this->assertSame($path, $url->toString());
       $generated_url = $url->toString(TRUE);
       $this->assertSame($path, $generated_url->getGeneratedUrl());

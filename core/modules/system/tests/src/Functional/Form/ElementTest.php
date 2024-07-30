@@ -65,7 +65,7 @@ class ElementTest extends BrowserTestBase {
       $elements = $this->xpath('//input[@type=:type]', [':type' => $type]);
       $expected_values = ['0', 'foo', '1', 'bar', '>'];
       foreach ($elements as $element) {
-        $expected = array_shift($expected_values);
+        $expected = \array_shift($expected_values);
         $this->assertSame($expected, (string) $element->getAttribute('value'));
       }
     }
@@ -85,7 +85,7 @@ class ElementTest extends BrowserTestBase {
       $elements = $this->xpath('//input[@type=:type]', [':type' => $type]);
       $expected_values = ['0', 'foo', 'bar', '>', '1'];
       foreach ($elements as $element) {
-        $expected = array_shift($expected_values);
+        $expected = \array_shift($expected_values);
         $this->assertSame($expected, (string) $element->getAttribute('value'));
       }
     }

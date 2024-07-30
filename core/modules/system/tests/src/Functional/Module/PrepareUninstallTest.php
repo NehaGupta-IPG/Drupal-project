@@ -89,7 +89,7 @@ class PrepareUninstallTest extends BrowserTestBase {
 
     // Delete Taxonomy term data.
     $this->drupalGet('admin/modules/uninstall/entity/taxonomy_term');
-    $term_count = count($this->terms);
+    $term_count = \count($this->terms);
     for ($i = 1; $i < 11; $i++) {
       $this->assertSession()->pageTextContains($this->terms[$term_count - $i]->label());
     }

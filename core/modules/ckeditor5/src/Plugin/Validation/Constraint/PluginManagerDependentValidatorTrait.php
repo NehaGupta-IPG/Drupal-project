@@ -72,7 +72,7 @@ trait PluginManagerDependentValidatorTrait {
    *   A list of CKEditor 5 plugin definitions keyed by plugin ID.
    */
   private function getEnableableDisabledPlugins(EditorInterface $text_editor) {
-    $disabled_plugins = array_diff_key(
+    $disabled_plugins = \array_diff_key(
       $this->pluginManager->getDefinitions(),
       $this->pluginManager->getEnabledDefinitions($text_editor)
     );
@@ -83,7 +83,7 @@ trait PluginManagerDependentValidatorTrait {
     // In the future, we may choose to expand this, but it will require complex
     // infrastructure to generate messages that explain which of the conditions
     // are already fulfilled and which are not.
-    $enableable_disabled_plugins = array_filter($disabled_plugins, function (CKEditor5PluginDefinition $definition) {
+    $enableable_disabled_plugins = \array_filter($disabled_plugins, function (CKEditor5PluginDefinition $definition) {
       return $definition->hasToolbarItems() && !$definition->hasConditions();
     });
     return $enableable_disabled_plugins;

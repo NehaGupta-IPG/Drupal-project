@@ -42,18 +42,18 @@ abstract class FileManagedTestBase extends BrowserTestBase {
     $actual = array_keys(array_filter(FileTestHelper::getAllCalls()));
 
     // Determine if there were any expected that were not called.
-    $uncalled = array_diff($expected, $actual);
-    if (count($uncalled)) {
-      $this->assertTrue(FALSE, sprintf('Expected hooks %s to be called but %s was not called.', implode(', ', $expected), implode(', ', $uncalled)));
+    $uncalled = \array_diff($expected, $actual);
+    if (\count($uncalled)) {
+      $this->assertTrue(FALSE, \sprintf('Expected hooks %s to be called but %s was not called.', \implode(', ', $expected), \implode(', ', $uncalled)));
     }
     else {
-      $this->assertTrue(TRUE, sprintf('All the expected hooks were called: %s', empty($expected) ? '(none)' : implode(', ', $expected)));
+      $this->assertTrue(TRUE, \sprintf('All the expected hooks were called: %s', empty($expected) ? '(none)' : \implode(', ', $expected)));
     }
 
     // Determine if there were any unexpected calls.
-    $unexpected = array_diff($actual, $expected);
-    if (count($unexpected)) {
-      $this->assertTrue(FALSE, sprintf('Unexpected hooks were called: %s.', empty($unexpected) ? '(none)' : implode(', ', $unexpected)));
+    $unexpected = \array_diff($actual, $expected);
+    if (\count($unexpected)) {
+      $this->assertTrue(FALSE, \sprintf('Unexpected hooks were called: %s.', empty($unexpected) ? '(none)' : \implode(', ', $unexpected)));
     }
     else {
       $this->assertTrue(TRUE, 'No unexpected hooks were called.');
@@ -196,7 +196,7 @@ abstract class FileManagedTestBase extends BrowserTestBase {
       $contents = "file_put_contents() doesn't seem to appreciate empty strings so let's put in some data.";
     }
 
-    file_put_contents($filepath, $contents);
+    \file_put_contents($filepath, $contents);
     $this->assertFileExists($filepath);
     return $filepath;
   }

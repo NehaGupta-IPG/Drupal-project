@@ -85,10 +85,10 @@ class FilterHtmlImageSecureTest extends BrowserTestBase {
 
     $public_files_path = PublicStream::basePath();
 
-    $http_base_url = preg_replace('/^https?/', 'http', $base_url);
-    $https_base_url = preg_replace('/^https?/', 'https', $base_url);
+    $http_base_url = \preg_replace('/^https?/', 'http', $base_url);
+    $https_base_url = \preg_replace('/^https?/', 'https', $base_url);
     $files_path = base_path() . $public_files_path;
-    $csrf_path = $public_files_path . '/' . implode('/', array_fill(0, substr_count($public_files_path, '/') + 1, '..'));
+    $csrf_path = $public_files_path . '/' . \implode('/', \array_fill(0, \substr_count($public_files_path, '/') + 1, '..'));
 
     $druplicon = 'core/misc/druplicon.png';
     $red_x_image = base_path() . 'core/misc/icons/e32700/error.svg';
@@ -100,8 +100,8 @@ class FilterHtmlImageSecureTest extends BrowserTestBase {
     // Put a test image in the files directory with special filename.
     // cspell:ignore tést fïle nàme
     $special_filename = 'tést fïle nàme.png';
-    $special_image = rawurlencode($special_filename);
-    $special_uri = str_replace($test_images[0]->filename, $special_filename, $test_images[0]->uri);
+    $special_image = \rawurlencode($special_filename);
+    $special_uri = \str_replace($test_images[0]->filename, $special_filename, $test_images[0]->uri);
     \Drupal::service('file_system')->copy($test_images[0]->uri, $special_uri);
 
     // Create a list of test image sources.
@@ -113,10 +113,10 @@ class FilterHtmlImageSecureTest extends BrowserTestBase {
       $http_base_url . '/' . $druplicon => base_path() . $druplicon,
       $https_base_url . '/' . $druplicon => base_path() . $druplicon,
       // Test a URL that includes a port.
-      preg_replace($host_pattern, 'http://' . $host . ':', $http_base_url . '/' . $druplicon) => base_path() . $druplicon,
-      preg_replace($host_pattern, 'http://' . $host . ':80', $http_base_url . '/' . $druplicon) => base_path() . $druplicon,
-      preg_replace($host_pattern, 'http://' . $host . ':443', $http_base_url . '/' . $druplicon) => base_path() . $druplicon,
-      preg_replace($host_pattern, 'http://' . $host . ':8080', $http_base_url . '/' . $druplicon) => base_path() . $druplicon,
+      \preg_replace($host_pattern, 'http://' . $host . ':', $http_base_url . '/' . $druplicon) => base_path() . $druplicon,
+      \preg_replace($host_pattern, 'http://' . $host . ':80', $http_base_url . '/' . $druplicon) => base_path() . $druplicon,
+      \preg_replace($host_pattern, 'http://' . $host . ':443', $http_base_url . '/' . $druplicon) => base_path() . $druplicon,
+      \preg_replace($host_pattern, 'http://' . $host . ':8080', $http_base_url . '/' . $druplicon) => base_path() . $druplicon,
       base_path() . $druplicon => base_path() . $druplicon,
       $files_path . '/' . $test_image => $files_path . '/' . $test_image,
       $http_base_url . '/' . $public_files_path . '/' . $test_image => $files_path . '/' . $test_image,
@@ -135,16 +135,16 @@ class FilterHtmlImageSecureTest extends BrowserTestBase {
       $comment[] = $image . ':';
       // Hash the image source in a custom test attribute, because it might
       // contain characters that confuse XPath.
-      $comment[] = '<img src="' . $image . '" test-attribute="' . hash('sha256', $image) . '" />';
+      $comment[] = '<img src="' . $image . '" test-attribute="' . \hash('sha256', $image) . '" />';
     }
     $edit = [
-      'comment_body[0][value]' => implode("\n", $comment),
+      'comment_body[0][value]' => \implode("\n", $comment),
     ];
     $this->drupalGet('node/' . $node->id());
     $this->submitForm($edit, 'Save');
     foreach ($images as $image => $converted) {
       $found = FALSE;
-      foreach ($this->xpath('//img[@test-attribute="' . hash('sha256', $image) . '"]') as $element) {
+      foreach ($this->xpath('//img[@test-attribute="' . \hash('sha256', $image) . '"]') as $element) {
         $found = TRUE;
         if ($converted == $red_x_image) {
           $this->assertEquals($red_x_image, $element->getAttribute('src'));

@@ -89,13 +89,13 @@ class Action extends ConfigEntityBase implements ActionConfigEntityInterface, En
   public static function create(array $values = []) {
     // When no label is specified for this action config entity, default to the
     // label of the used action plugin.
-    if (!array_key_exists('label', $values) && array_key_exists('plugin', $values)) {
+    if (!\array_key_exists('label', $values) && \array_key_exists('plugin', $values)) {
       try {
         $action_plugin_manager = \Drupal::service('plugin.manager.action');
-        assert($action_plugin_manager instanceof PluginManagerInterface);
+        \assert($action_plugin_manager instanceof PluginManagerInterface);
         $action_plugin_definition = $action_plugin_manager->getDefinition($values['plugin']);
         // @see \Drupal\Core\Annotation\Action::$label
-        assert(array_key_exists('label', $action_plugin_definition));
+        \assert(\array_key_exists('label', $action_plugin_definition));
         $values['label'] = $action_plugin_definition['label'];
       }
       catch (PluginNotFoundException) {
@@ -176,7 +176,7 @@ class Action extends ConfigEntityBase implements ActionConfigEntityInterface, En
     $a_type = $a->getType();
     $b_type = $b->getType();
     if ($a_type != $b_type) {
-      return strnatcasecmp($a_type, $b_type);
+      return \strnatcasecmp($a_type, $b_type);
     }
     return parent::sort($a, $b);
   }

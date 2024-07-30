@@ -126,7 +126,7 @@ class EntityRevisionsTest extends BrowserTestBase {
           $this->randomMachineName(32),
           $this->randomMachineName(32),
         ],
-        'created' => time() + $i + 1,
+        'created' => \time() + $i + 1,
       ];
       $entity->set('name', $values['en'][$i]['name']);
       $entity->set('translatable_test_field', $values['en'][$i]['translatable_test_field']);

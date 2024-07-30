@@ -25,8 +25,8 @@ class BatchMemory extends Memory {
    */
   public function claimItem($lease_time = 0) {
     if (!empty($this->queue)) {
-      reset($this->queue);
-      return current($this->queue);
+      \reset($this->queue);
+      return \current($this->queue);
     }
     return FALSE;
   }

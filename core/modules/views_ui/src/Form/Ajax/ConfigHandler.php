@@ -85,7 +85,7 @@ class ConfigHandler extends ViewsFormBase {
         if ($executable->display_handler->defaultableSections($types[$type]['plural'])) {
           $section = $types[$type]['plural'];
           $form_state->set('section', $section);
-          views_ui_standard_display_dropdown($form, $form_state, $section);
+          \views_ui_standard_display_dropdown($form, $form_state, $section);
         }
 
         // A whole bunch of code to figure out what relationships are valid for
@@ -121,12 +121,12 @@ class ConfigHandler extends ViewsFormBase {
           // it to none.
           $base_fields = Views::viewsDataHelper()->fetchFields($view->get('base_table'), $type, $executable->display_handler->useGroupBy());
           if (isset($base_fields[$item['table'] . '.' . $item['field']])) {
-            $relationship_options = array_merge(['none' => $this->t('Do not use a relationship')], $relationship_options);
+            $relationship_options = \array_merge(['none' => $this->t('Do not use a relationship')], $relationship_options);
           }
           $rel = empty($item['relationship']) ? 'none' : $item['relationship'];
           if (empty($relationship_options[$rel])) {
             // Pick the first relationship.
-            $rel = key($relationship_options);
+            $rel = \key($relationship_options);
             // We want this relationship option to get saved even if the user
             // skips submitting the form.
             $executable->setHandlerOption($display_id, $type, $id, 'relationship', $rel);

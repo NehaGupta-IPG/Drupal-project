@@ -102,7 +102,7 @@ class ImageUrlFormatter extends ImageFormatterBase {
 
     unset($element['image_link'], $element['image_loading']);
 
-    $image_styles = image_style_options(FALSE);
+    $image_styles = \image_style_options(FALSE);
     $description_link = Link::fromTextAndUrl(
       $this->t('Configure Image Styles'),
       Url::fromRoute('entity.image_style.collection')
@@ -127,7 +127,7 @@ class ImageUrlFormatter extends ImageFormatterBase {
   public function settingsSummary() {
     $summary = [];
 
-    $image_styles = image_style_options(FALSE);
+    $image_styles = \image_style_options(FALSE);
     // Unset possible 'No defined styles' option.
     unset($image_styles['']);
     // Styles could be lost because of enabled/disabled modules that defines
@@ -140,7 +140,7 @@ class ImageUrlFormatter extends ImageFormatterBase {
       $summary[] = $this->t('Original image');
     }
 
-    return array_merge($summary, parent::settingsSummary());
+    return \array_merge($summary, parent::settingsSummary());
   }
 
   /**

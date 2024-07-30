@@ -18,7 +18,7 @@ class YamlDiscovery extends ComponentYamlDiscovery {
    */
   protected function decode($file) {
     try {
-      return Yaml::decode(file_get_contents($file)) ?: [];
+      return Yaml::decode(\file_get_contents($file)) ?: [];
     }
     catch (InvalidDataTypeException $e) {
       throw new InvalidDataTypeException($file . ': ' . $e->getMessage(), $e->getCode(), $e);

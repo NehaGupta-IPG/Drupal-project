@@ -44,17 +44,17 @@ class EntityValidationException extends MigrateException {
     $locator = $entity->getEntityTypeId();
 
     if ($entity_id = $entity->id()) {
-      $locator = sprintf('%s: %s', $locator, $entity_id);
+      $locator = \sprintf('%s: %s', $locator, $entity_id);
 
       if ($entity instanceof RevisionableInterface && $revision_id = $entity->getRevisionId()) {
-        $locator .= sprintf(', revision: %s', $revision_id);
+        $locator .= \sprintf(', revision: %s', $revision_id);
       }
     }
 
     // Example: "[user]: field_a=Violation 1., field_b=Violation 2.".
     // Example: "[user: 1]: field_a=Violation 1., field_b=Violation 2.".
     // Example: "[node: 19, revision: 12129]: field_a=Violation 1.".
-    parent::__construct(sprintf('[%s]: %s', $locator, implode(static::MESSAGES_SEPARATOR, $this->getViolationMessages())));
+    parent::__construct(\sprintf('[%s]: %s', $locator, \implode(static::MESSAGES_SEPARATOR, $this->getViolationMessages())));
   }
 
   /**
@@ -67,8 +67,8 @@ class EntityValidationException extends MigrateException {
     $messages = [];
 
     foreach ($this->violations as $violation) {
-      assert($violation instanceof ConstraintViolationInterface);
-      $messages[] = sprintf('%s=%s', $violation->getPropertyPath(), $violation->getMessage());
+      \assert($violation instanceof ConstraintViolationInterface);
+      $messages[] = \sprintf('%s=%s', $violation->getPropertyPath(), $violation->getMessage());
     }
 
     return $messages;

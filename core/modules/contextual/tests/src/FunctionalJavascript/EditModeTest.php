@@ -158,7 +158,7 @@ class EditModeTest extends WebDriverTestBase {
     // Mark all tabbable elements.
     $this->getSession()->executeScript("jQuery(window.tabbable.tabbable(document.body)).attr('data-marked', '');");
     // Count all marked elements.
-    $count = count($this->getSession()->getPage()->findAll('css', "[data-marked]"));
+    $count = \count($this->getSession()->getPage()->findAll('css', "[data-marked]"));
     // Remove set attributes.
     $this->getSession()->executeScript("jQuery('[data-marked]').removeAttr('data-marked');");
     return $count;

@@ -71,7 +71,7 @@ class ContentEntityHasChangesTest extends KernelTestBase {
     // ContentEntityBase::hasTranslationChanges().
     $entity_previous_rev_id = $entity->getRevisionId();
     // Revision metadata field revision_timestamp.
-    $entity->setRevisionCreationTime(time() + 1);
+    $entity->setRevisionCreationTime(\time() + 1);
     // Revision metadata field revision_uid.
     $entity->setRevisionUserId($user2->id());
     // Revision metadata field revision_log.
@@ -79,7 +79,7 @@ class ContentEntityHasChangesTest extends KernelTestBase {
     // Revision metadata field revision_translation_affected.
     $entity->setRevisionTranslationAffected(TRUE);
     // Changed field.
-    $entity->setChangedTime(time() + 1);
+    $entity->setChangedTime(\time() + 1);
 
     // Check that the revision metadata fields and the changed field have been
     // skipped when comparing same revisions.

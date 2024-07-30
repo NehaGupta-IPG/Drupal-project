@@ -23,7 +23,7 @@ class FilterHtmlEscape extends FilterBase {
    * {@inheritdoc}
    */
   public function process($text, $langcode) {
-    return new FilterProcessResult(_filter_html_escape($text));
+    return new FilterProcessResult(\_filter_html_escape($text));
   }
 
   /**

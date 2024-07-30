@@ -112,7 +112,7 @@ class EntityDisplayRepository implements EntityDisplayRepositoryInterface {
       else {
         $this->displayModeInfo[$display_type] = [];
         foreach ($this->entityTypeManager->getStorage($entity_type_id)->loadMultiple() as $display_mode) {
-          [$display_mode_entity_type, $display_mode_name] = explode('.', $display_mode->id(), 2);
+          [$display_mode_entity_type, $display_mode_name] = \explode('.', $display_mode->id(), 2);
           $this->displayModeInfo[$display_type][$display_mode_entity_type][$display_mode_name] = $display_mode->toArray();
         }
         $this->moduleHandler->alter($key, $this->displayModeInfo[$display_type]);
@@ -218,7 +218,7 @@ class EntityDisplayRepository implements EntityDisplayRepositoryInterface {
     // (or non-existent).
     $load_ids = [];
     // Get the list of available entity displays for the current bundle.
-    foreach (array_keys($options) as $mode) {
+    foreach (\array_keys($options) as $mode) {
       $load_ids[] = $entity_type_id . '.' . $bundle . '.' . $mode;
     }
 
@@ -228,7 +228,7 @@ class EntityDisplayRepository implements EntityDisplayRepositoryInterface {
       ->loadMultiple($load_ids);
 
     // Unset the display modes that are not active or do not exist.
-    foreach (array_keys($options) as $mode) {
+    foreach (\array_keys($options) as $mode) {
       $display_id = $entity_type_id . '.' . $bundle . '.' . $mode;
       if (!isset($displays[$display_id]) || !$displays[$display_id]->status()) {
         unset($options[$mode]);

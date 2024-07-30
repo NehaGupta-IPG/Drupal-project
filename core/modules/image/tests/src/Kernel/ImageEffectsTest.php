@@ -269,7 +269,7 @@ class ImageEffectsTest extends KernelTestBase {
 
     $errors = $form_state->getErrors();
     $this->assertCount(1, $errors);
-    $error = reset($errors);
+    $error = \reset($errors);
     $this->assertEquals('Width and height can not both be blank.', $error);
   }
 

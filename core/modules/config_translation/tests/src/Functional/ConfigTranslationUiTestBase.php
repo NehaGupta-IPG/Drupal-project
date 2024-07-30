@@ -84,7 +84,7 @@ abstract class ConfigTranslationUiTestBase extends BrowserTestBase {
     /** @var \Drupal\filter\FilterFormatInterface $full_html_format */
     $full_html_format = FilterFormat::load('full_html');
 
-    $admin_permissions = array_merge(
+    $admin_permissions = \array_merge(
       $translator_permissions,
       [
         'administer languages',
@@ -144,7 +144,7 @@ abstract class ConfigTranslationUiTestBase extends BrowserTestBase {
           'language' => $langcode,
         ];
         $translations = $this->localeStorage->getTranslations($conditions + ['translated' => TRUE]);
-        return reset($translations);
+        return \reset($translations);
       }
     }
     return FALSE;
@@ -181,7 +181,7 @@ abstract class ConfigTranslationUiTestBase extends BrowserTestBase {
     $this->assertSame('textarea', $textarea->getTagName());
     $this->assertSame('This field has been disabled because you do not have sufficient permissions to edit it.', $textarea->getText());
     // Make sure the text format select is not shown.
-    $select_id = str_replace('value', 'format--2', $id);
+    $select_id = \str_replace('value', 'format--2', $id);
     $xpath = $this->assertSession()->buildXPathQuery('//select[@id=:id]', [':id' => $select_id]);
     $this->assertSession()->elementNotExists('xpath', $xpath);
   }

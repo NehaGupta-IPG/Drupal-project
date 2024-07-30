@@ -52,11 +52,11 @@ class Language extends TypedData {
    */
   public function setValue($value, $notify = TRUE) {
     // Support passing language objects.
-    if (is_object($value)) {
+    if (\is_object($value)) {
       $this->id = $value->getId();
       $this->language = $value;
     }
-    elseif (isset($value) && !is_scalar($value)) {
+    elseif (isset($value) && !\is_scalar($value)) {
       throw new \InvalidArgumentException('Value is no valid langcode or language object.');
     }
     else {

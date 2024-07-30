@@ -60,14 +60,14 @@ class DateRangeFieldItemList extends DateTimeFieldItemList {
    */
   public function defaultValuesFormValidate(array $element, array &$form, FormStateInterface $form_state) {
     if ($form_state->getValue(['default_value_input', 'default_date_type']) == static::DEFAULT_VALUE_CUSTOM) {
-      $is_strtotime = @strtotime($form_state->getValue(['default_value_input', 'default_date']));
+      $is_strtotime = @\strtotime($form_state->getValue(['default_value_input', 'default_date']));
       if (!$is_strtotime) {
         $form_state->setErrorByName('default_value_input][default_date', $this->t('The relative start date value entered is invalid.'));
       }
     }
 
     if ($form_state->getValue(['default_value_input', 'default_end_date_type']) == static::DEFAULT_VALUE_CUSTOM) {
-      $is_strtotime = @strtotime($form_state->getValue(['default_value_input', 'default_end_date']));
+      $is_strtotime = @\strtotime($form_state->getValue(['default_value_input', 'default_end_date']));
       if (!$is_strtotime) {
         $form_state->setErrorByName('default_value_input][default_end_date', $this->t('The relative end date value entered is invalid.'));
       }

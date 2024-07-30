@@ -119,7 +119,7 @@ class ConfigTranslationUiTest extends ConfigTranslationUiTestBase {
       // Import a .po file to add a new language with a given number of plural
       // forms.
       $name = \Drupal::service('file_system')->tempnam('temporary://', $langcode . '_') . '.po';
-      file_put_contents($name, $this->getPoFile($data['plurals']));
+      \file_put_contents($name, $this->getPoFile($data['plurals']));
       $this->drupalGet('admin/config/regional/translate/import');
       $this->submitForm([
         'langcode' => $langcode,
@@ -156,7 +156,7 @@ class ConfigTranslationUiTest extends ConfigTranslationUiTestBase {
     // First import a .po file with multiple plural forms.
     // This will also automatically add the 'sl' language.
     $name = \Drupal::service('file_system')->tempnam('temporary://', "sl_") . '.po';
-    file_put_contents($name, $this->getPoFile(4));
+    \file_put_contents($name, $this->getPoFile(4));
     $this->drupalGet('admin/config/regional/translate/import');
     $this->submitForm([
       'langcode' => 'sl',

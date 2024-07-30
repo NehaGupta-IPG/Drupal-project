@@ -60,8 +60,8 @@ final class RecipeCommand extends Command {
     $io = new SymfonyStyle($input, $output);
 
     $recipe_path = $input->getArgument('path');
-    if (!is_string($recipe_path) || !is_dir($recipe_path)) {
-      $io->error(sprintf('The supplied path %s is not a directory', $recipe_path));
+    if (!\is_string($recipe_path) || !\is_dir($recipe_path)) {
+      $io->error(\sprintf('The supplied path %s is not a directory', $recipe_path));
       return 1;
     }
     // Recipes can only be applied to an already-installed site.
@@ -96,7 +96,7 @@ final class RecipeCommand extends Command {
       /** @var array{message?: \Stringable|string, results: array{module?: string[], theme?: string[], content?: string[], recipe?: string[]}} $context */
       $context = ['results' => []];
       foreach ($steps as $step) {
-        call_user_func_array($step[0], array_merge($step[1], [&$context]));
+        \call_user_func_array($step[0], \array_merge($step[1], [&$context]));
         if (isset($context['message'])) {
           $progress_bar->setMessage($this->toPlainString($context['message']));
         }

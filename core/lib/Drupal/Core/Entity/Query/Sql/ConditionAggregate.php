@@ -39,13 +39,13 @@ class ConditionAggregate extends ConditionAggregateBase {
         $sql_query->condition($sql_condition);
       }
       else {
-        $type = ((strtoupper($this->conjunction) == 'OR') || ($condition['operator'] == 'IS NULL')) ? 'LEFT' : 'INNER';
+        $type = ((\strtoupper($this->conjunction) == 'OR') || ($condition['operator'] == 'IS NULL')) ? 'LEFT' : 'INNER';
         $field = $tables->addField($condition['field'], $type, $condition['langcode']);
         $condition_class = QueryBase::getClass($this->namespaces, 'Condition');
         $condition_class::translateCondition($condition, $sql_query, $tables->isFieldCaseSensitive($condition['field']));
         $function = $condition['function'];
         $placeholder = ':db_placeholder_' . $conditionContainer->nextPlaceholder();
-        $sql_field_escaped = '[' . str_replace('.', '].[', $field) . ']';
+        $sql_field_escaped = '[' . \str_replace('.', '].[', $field) . ']';
         $conditionContainer->having("$function($sql_field_escaped) {$condition['operator']} $placeholder", [$placeholder => $condition['value']]);
       }
     }

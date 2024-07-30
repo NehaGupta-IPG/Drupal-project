@@ -65,8 +65,8 @@ abstract class FormElementBase implements ElementInterface {
     $build['source'] = $this->getSourceElement($source_language, $source_config);
     $build['translation'] = $this->getTranslationElement($translation_language, $source_config, $translation_config);
 
-    $build['source']['#parents'] = array_merge(['source'], $parents);
-    $build['translation']['#parents'] = array_merge(['translation'], $parents);
+    $build['source']['#parents'] = \array_merge(['source'], $parents);
+    $build['translation']['#parents'] = \array_merge(['translation'], $parents);
     return $build;
   }
 

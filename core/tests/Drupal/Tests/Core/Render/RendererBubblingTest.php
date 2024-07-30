@@ -484,7 +484,7 @@ class RendererBubblingTest extends RendererTestBase {
     $output = (string) $this->renderer->renderRoot($test_element);
 
     // First, assert the render array is of the expected form.
-    $this->assertEquals('Cache context!Cache tag!Asset!Placeholder!barstoolNested!Cached nested!', trim($output), 'Expected HTML generated.');
+    $this->assertEquals('Cache context!Cache tag!Asset!Placeholder!barstoolNested!Cached nested!', \trim($output), 'Expected HTML generated.');
     $this->assertEquals(['child.cache_context'], $test_element['#cache']['contexts'], 'Expected cache contexts found.');
     $this->assertEquals(['child:cache_tag'], $test_element['#cache']['tags'], 'Expected cache tags found.');
     $expected_attached = [

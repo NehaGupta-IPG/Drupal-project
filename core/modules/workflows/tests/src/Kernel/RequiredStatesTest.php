@@ -126,11 +126,11 @@ class RequiredStatesTest extends KernelTestBase {
       'cooked',
       'fresh',
       'rotten',
-    ], array_keys($workflow->getTypePlugin()->getConfiguration()['states']));
+    ], \array_keys($workflow->getTypePlugin()->getConfiguration()['states']));
     $this->assertSame([
       'cook',
       'rot',
-    ], array_keys($workflow->getTypePlugin()->getConfiguration()['transitions']));
+    ], \array_keys($workflow->getTypePlugin()->getConfiguration()['transitions']));
 
     // Ensure that transitions can be deleted.
     $workflow->getTypePlugin()->deleteTransition('rot');

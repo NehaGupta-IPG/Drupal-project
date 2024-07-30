@@ -28,9 +28,9 @@ class TestFileParser {
    *   Array of fully qualified class names within the PHP file.
    */
   public function getTestListFromFile($file) {
-    $test_list = $this->parseContents(file_get_contents($file));
-    return array_filter($test_list, function ($class) {
-      return is_subclass_of($class, TestCase::class);
+    $test_list = $this->parseContents(\file_get_contents($file));
+    return \array_filter($test_list, function ($class) {
+      return \is_subclass_of($class, TestCase::class);
     });
   }
 
@@ -46,12 +46,12 @@ class TestFileParser {
   protected function parseContents($contents) {
     // Extract a potential namespace.
     $namespace = FALSE;
-    if (preg_match('@^\s*namespace ([^ ;]+)@m', $contents, $matches)) {
+    if (\preg_match('@^\s*namespace ([^ ;]+)@m', $contents, $matches)) {
       $namespace = $matches[1];
     }
     $test_list = [];
     // Extract all class names. Abstract classes are excluded on purpose.
-    preg_match_all('@^\s*(?!abstract\s+)(?:final\s+|\s*)class ([^ ]+)@m', $contents, $matches);
+    \preg_match_all('@^\s*(?!abstract\s+)(?:final\s+|\s*)class ([^ ]+)@m', $contents, $matches);
     if (!$namespace) {
       $test_list = $matches[1];
     }

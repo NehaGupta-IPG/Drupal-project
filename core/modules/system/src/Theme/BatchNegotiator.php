@@ -52,7 +52,7 @@ class BatchNegotiator implements ThemeNegotiatorInterface {
   public function determineActiveTheme(RouteMatchInterface $route_match) {
     // Retrieve the current state of the batch.
     $request = $this->requestStack->getCurrentRequest();
-    $batch = &batch_get();
+    $batch = &\batch_get();
     if (!$batch && $request->request->has('id')) {
       $batch = $this->batchStorage->load($request->request->get('id'));
     }

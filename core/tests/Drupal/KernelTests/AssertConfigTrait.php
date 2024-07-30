@@ -28,7 +28,7 @@ trait AssertConfigTrait {
    */
   protected function assertConfigDiff(Diff $result, $config_name, array $skipped_config) {
     foreach ($result->getEdits() as $op) {
-      switch (get_class($op)) {
+      switch (\get_class($op)) {
         case 'Drupal\Component\Diff\Engine\DiffOpCopy':
           // Nothing to do, a copy is what we expect.
           break;
@@ -37,8 +37,8 @@ trait AssertConfigTrait {
         case 'Drupal\Component\Diff\Engine\DiffOpChange':
           // It is not part of the skipped config, so we can directly throw the
           // exception.
-          if (!in_array($config_name, array_keys($skipped_config))) {
-            throw new \Exception($config_name . ': ' . var_export($op, TRUE));
+          if (!\in_array($config_name, \array_keys($skipped_config))) {
+            throw new \Exception($config_name . ': ' . \var_export($op, TRUE));
           }
 
           // Allow to skip entire config files.
@@ -51,14 +51,14 @@ trait AssertConfigTrait {
           // skipped.
           $all_skipped = TRUE;
 
-          $changes = get_class($op) == 'Drupal\Component\Diff\Engine\DiffOpDelete' ? $op->orig : $op->closing;
+          $changes = \get_class($op) == 'Drupal\Component\Diff\Engine\DiffOpDelete' ? $op->orig : $op->closing;
           foreach ($changes as $closing) {
             // Skip some of the changes, as they are caused by module install
             // code.
             $found = FALSE;
             if (!empty($skipped_config[$config_name])) {
               foreach ($skipped_config[$config_name] as $line) {
-                if (str_contains($closing, $line)) {
+                if (\str_contains($closing, $line)) {
                   $found = TRUE;
                   break;
                 }
@@ -68,7 +68,7 @@ trait AssertConfigTrait {
           }
 
           if (!$all_skipped) {
-            throw new \Exception($config_name . ': ' . var_export($op, TRUE));
+            throw new \Exception($config_name . ': ' . \var_export($op, TRUE));
           }
           break;
 
@@ -79,15 +79,15 @@ trait AssertConfigTrait {
           }
           foreach ($op->closing as $closing) {
             // The UUIDs don't exist in the default config.
-            if (str_starts_with($closing, 'uuid: ')) {
+            if (\str_starts_with($closing, 'uuid: ')) {
               break;
             }
-            throw new \Exception($config_name . ': ' . var_export($op, TRUE));
+            throw new \Exception($config_name . ': ' . \var_export($op, TRUE));
           }
           break;
 
         default:
-          throw new \Exception($config_name . ': ' . var_export($op, TRUE));
+          throw new \Exception($config_name . ': ' . \var_export($op, TRUE));
       }
     }
   }

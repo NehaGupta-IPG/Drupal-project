@@ -85,14 +85,14 @@ class DrupalTestBrowser extends AbstractBrowser {
   protected function doRequest($request): object {
     $headers = [];
     foreach ($request->getServer() as $key => $val) {
-      $key = strtolower(str_replace('_', '-', $key));
+      $key = \strtolower(\str_replace('_', '-', $key));
       $content_headers = [
         'content-length' => TRUE,
         'content-md5' => TRUE,
         'content-type' => TRUE,
       ];
-      if (str_starts_with($key, 'http-')) {
-        $headers[substr($key, 5)] = $val;
+      if (\str_starts_with($key, 'http-')) {
+        $headers[\substr($key, 5)] = $val;
       }
       // "CONTENT_*" are not prefixed with "HTTP_".
       elseif (isset($content_headers[$key])) {
@@ -102,7 +102,7 @@ class DrupalTestBrowser extends AbstractBrowser {
 
     $cookies = CookieJar::fromArray(
       $this->getCookieJar()->allRawValues($request->getUri()),
-      parse_url($request->getUri(), PHP_URL_HOST)
+      \parse_url($request->getUri(), PHP_URL_HOST)
     );
 
     $request_options = [
@@ -178,7 +178,7 @@ class DrupalTestBrowser extends AbstractBrowser {
       if (\is_array($info)) {
         if (isset($info['tmp_name'])) {
           if ($info['tmp_name'] !== '') {
-            $file['contents'] = fopen($info['tmp_name'], 'r');
+            $file['contents'] = \fopen($info['tmp_name'], 'r');
             if (isset($info['name'])) {
               $file['filename'] = $info['name'];
             }
@@ -193,7 +193,7 @@ class DrupalTestBrowser extends AbstractBrowser {
         }
       }
       else {
-        $file['contents'] = fopen($info, 'r');
+        $file['contents'] = \fopen($info, 'r');
       }
 
       $multipart[] = $file;

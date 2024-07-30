@@ -123,7 +123,7 @@ class EntityConverter implements ParamConverterInterface {
       if (
         !empty($definition['bundle']) &&
         $entity instanceof EntityInterface &&
-        !in_array($entity->bundle(), $definition['bundle'], TRUE)
+        !\in_array($entity->bundle(), $definition['bundle'], TRUE)
       ) {
         return NULL;
       }
@@ -136,7 +136,7 @@ class EntityConverter implements ParamConverterInterface {
     if (
       !empty($definition['bundle']) &&
       $entity instanceof EntityInterface &&
-      !in_array($entity->bundle(), $definition['bundle'], TRUE)
+      !\in_array($entity->bundle(), $definition['bundle'], TRUE)
     ) {
       return NULL;
     }
@@ -148,11 +148,11 @@ class EntityConverter implements ParamConverterInterface {
    * {@inheritdoc}
    */
   public function applies($definition, $name, Route $route) {
-    if (!empty($definition['type']) && str_starts_with($definition['type'], 'entity:')) {
-      $entity_type_id = substr($definition['type'], strlen('entity:'));
-      if (str_contains($definition['type'], '{')) {
-        $entity_type_slug = substr($entity_type_id, 1, -1);
-        return $name != $entity_type_slug && in_array($entity_type_slug, $route->compile()->getVariables(), TRUE);
+    if (!empty($definition['type']) && \str_starts_with($definition['type'], 'entity:')) {
+      $entity_type_id = \substr($definition['type'], \strlen('entity:'));
+      if (\str_contains($definition['type'], '{')) {
+        $entity_type_slug = \substr($entity_type_id, 1, -1);
+        return $name != $entity_type_slug && \in_array($entity_type_slug, $route->compile()->getVariables(), TRUE);
       }
       return $this->entityTypeManager->hasDefinition($entity_type_id);
     }

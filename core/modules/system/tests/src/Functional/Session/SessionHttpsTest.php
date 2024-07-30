@@ -54,7 +54,7 @@ class SessionHttpsTest extends BrowserTestBase {
     $request = Request::createFromGlobals();
     if ($request->isSecure()) {
       $this->secureSessionName = $this->getSessionName();
-      $this->insecureSessionName = substr($this->getSessionName(), 1);
+      $this->insecureSessionName = \substr($this->getSessionName(), 1);
     }
     else {
       $this->secureSessionName = 'S' . $this->getSessionName();
@@ -161,10 +161,10 @@ class SessionHttpsTest extends BrowserTestBase {
 
     // Follow the location header.
     $path = $this->getPathFromLocationHeader($response, FALSE);
-    $parsed_path = parse_url($path);
+    $parsed_path = \parse_url($path);
     $query = [];
     if (isset($parsed_path['query'])) {
-      parse_str($parsed_path['query'], $query);
+      \parse_str($parsed_path['query'], $query);
     }
     $this->drupalGet($this->httpUrl($parsed_path['path']), ['query' => $query]);
     $this->assertSession()->statusCodeEquals(200);
@@ -212,10 +212,10 @@ class SessionHttpsTest extends BrowserTestBase {
 
     // Follow the location header.
     $path = $this->getPathFromLocationHeader($response, TRUE);
-    $parsed_path = parse_url($path);
+    $parsed_path = \parse_url($path);
     $query = [];
     if (isset($parsed_path['query'])) {
-      parse_str($parsed_path['query'], $query);
+      \parse_str($parsed_path['query'], $query);
     }
     $this->drupalGet($this->httpsUrl($parsed_path['path']), ['query' => $query]);
     $this->assertSession()->statusCodeEquals(200);
@@ -234,10 +234,10 @@ class SessionHttpsTest extends BrowserTestBase {
    */
   protected function getPathFromLocationHeader(ResponseInterface $response, $https = FALSE): string {
     if ($https) {
-      $base_url = str_replace('http://', 'https://', $this->baseUrl);
+      $base_url = \str_replace('http://', 'https://', $this->baseUrl);
     }
     else {
-      $base_url = str_replace('https://', 'http://', $this->baseUrl);
+      $base_url = \str_replace('https://', 'http://', $this->baseUrl);
     }
 
     // The mock front controllers (http.php and https.php) add the script name
@@ -250,7 +250,7 @@ class SessionHttpsTest extends BrowserTestBase {
     $location = $response->getHeader('location')[0];
 
     $this->assertStringStartsWith($base_url, $location, 'Location header contains expected base URL');
-    return substr($location, strlen($base_url));
+    return \substr($location, \strlen($base_url));
   }
 
   /**

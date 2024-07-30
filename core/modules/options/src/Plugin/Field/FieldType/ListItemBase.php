@@ -38,7 +38,7 @@ abstract class ListItemBase extends FieldItemBase implements OptionsProviderInte
     // Flatten options firstly, because Possible Options may contain group
     // arrays.
     $flatten_options = OptGroup::flattenOptions($this->getPossibleOptions($account));
-    return array_keys($flatten_options);
+    return \array_keys($flatten_options);
   }
 
   /**
@@ -55,14 +55,14 @@ abstract class ListItemBase extends FieldItemBase implements OptionsProviderInte
     // Flatten options firstly, because Settable Options may contain group
     // arrays.
     $flatten_options = OptGroup::flattenOptions($this->getSettableOptions($account));
-    return array_keys($flatten_options);
+    return \array_keys($flatten_options);
   }
 
   /**
    * {@inheritdoc}
    */
   public function getSettableOptions(?AccountInterface $account = NULL) {
-    $allowed_options = options_allowed_values($this->getFieldDefinition()->getFieldStorageDefinition(), $this->getEntity());
+    $allowed_options = \options_allowed_values($this->getFieldDefinition()->getFieldStorageDefinition(), $this->getEntity());
     return $allowed_options;
   }
 
@@ -70,12 +70,12 @@ abstract class ListItemBase extends FieldItemBase implements OptionsProviderInte
    * {@inheritdoc}
    */
   public static function generateSampleValue(FieldDefinitionInterface $field_definition) {
-    $allowed_options = options_allowed_values($field_definition->getFieldStorageDefinition());
+    $allowed_options = \options_allowed_values($field_definition->getFieldStorageDefinition());
     if (empty($allowed_options)) {
       $values['value'] = NULL;
       return $values;
     }
-    $values['value'] = array_rand($allowed_options);
+    $values['value'] = \array_rand($allowed_options);
     return $values;
   }
 
@@ -92,7 +92,7 @@ abstract class ListItemBase extends FieldItemBase implements OptionsProviderInte
    * {@inheritdoc}
    */
   public function storageSettingsForm(array &$form, FormStateInterface $form_state, $has_data) {
-    if (!array_key_exists('allowed_values', $form_state->getStorage())) {
+    if (!\array_key_exists('allowed_values', $form_state->getStorage())) {
       $form_state->set('allowed_values', $this->getFieldDefinition()->getSetting('allowed_values'));
     }
     $form['field_storage_submit']['#submit'][] = [static::class, 'submitFieldStorageUpdate'];
@@ -102,7 +102,7 @@ abstract class ListItemBase extends FieldItemBase implements OptionsProviderInte
     $allowed_values_function = $this->getSetting('allowed_values_function');
 
     if (!$form_state->get('items_count')) {
-      $form_state->set('items_count', max(count($allowed_values), 0));
+      $form_state->set('items_count', \max(\count($allowed_values), 0));
     }
 
     $wrapper_id = Html::getUniqueId('allowed-values-wrapper');
@@ -146,7 +146,7 @@ abstract class ListItemBase extends FieldItemBase implements OptionsProviderInte
     $max = $form_state->get('items_count');
     $entity_type_id = $this->getFieldDefinition()->getTargetEntityTypeId();
     $field_name = $this->getFieldDefinition()->getName();
-    $current_keys = array_keys($allowed_values);
+    $current_keys = \array_keys($allowed_values);
     for ($delta = 0; $delta <= $max; $delta++) {
       $element['allowed_values']['table'][$delta] = [
         '#attributes' => [
@@ -197,7 +197,7 @@ abstract class ListItemBase extends FieldItemBase implements OptionsProviderInte
       if ($max === 0) {
         $element['allowed_values']['table'][0]['delete']['#attributes']['disabled'] = 'disabled';
       }
-      if ($delta < count($allowed_values)) {
+      if ($delta < \count($allowed_values)) {
         $query = \Drupal::entityQuery($entity_type_id)
           ->accessCheck(FALSE)
           ->condition($field_name, $current_keys[$delta]);
@@ -269,7 +269,7 @@ abstract class ListItemBase extends FieldItemBase implements OptionsProviderInte
     $button = $form_state->getTriggeringElement();
 
     // Go one level up in the form.
-    $element = NestedArray::getValue($form, array_slice($button['#array_parents'], 0, -1));
+    $element = NestedArray::getValue($form, \array_slice($button['#array_parents'], 0, -1));
     $delta = $element['table']['#max_delta'];
     $element['table'][$delta]['item']['#prefix'] = '<div class="ajax-new-content" data-drupal-selector="field-list-add-more-focus-target">' . ($element['table'][$delta]['item']['#prefix'] ?? '');
     $element['table'][$delta]['item']['#suffix'] = ($element['table'][$delta]['item']['#suffix'] ?? '') . '</div>';
@@ -296,9 +296,9 @@ abstract class ListItemBase extends FieldItemBase implements OptionsProviderInte
   public static function deleteSubmit(array $form, FormStateInterface $form_state) {
     $allowed_values = $form_state->getStorage()['allowed_values'];
     $button = $form_state->getTriggeringElement();
-    $element = NestedArray::getValue($form, array_slice($button['#array_parents'], 0, -1));
+    $element = NestedArray::getValue($form, \array_slice($button['#array_parents'], 0, -1));
     $item_to_be_removed = $element['item']['label']['#default_value'];
-    $remaining_allowed_values = array_diff($allowed_values, [$item_to_be_removed]);
+    $remaining_allowed_values = \array_diff($allowed_values, [$item_to_be_removed]);
     $form_state->set('allowed_values', $remaining_allowed_values);
 
     // The user input is directly modified to preserve the rest of the data on
@@ -308,8 +308,8 @@ abstract class ListItemBase extends FieldItemBase implements OptionsProviderInte
 
     // Reset the keys in the array.
     $table_parents = $element['#parents'];
-    array_pop($table_parents);
-    $new_values = array_values(NestedArray::getValue($user_input, $table_parents));
+    \array_pop($table_parents);
+    $new_values = \array_values(NestedArray::getValue($user_input, $table_parents));
     NestedArray::setValue($user_input, $table_parents, $new_values);
 
     $form_state->setUserInput($user_input);
@@ -324,7 +324,7 @@ abstract class ListItemBase extends FieldItemBase implements OptionsProviderInte
   public static function deleteAjax(array $form, FormStateInterface $form_state) {
     $button = $form_state->getTriggeringElement();
 
-    return NestedArray::getValue($form, array_slice($button['#array_parents'], 0, -3));
+    return NestedArray::getValue($form, \array_slice($button['#array_parents'], 0, -3));
   }
 
   /**
@@ -349,7 +349,7 @@ abstract class ListItemBase extends FieldItemBase implements OptionsProviderInte
    * @see \Drupal\Core\Render\Element\FormElementBase::processPattern()
    */
   public static function validateAllowedValues($element, FormStateInterface $form_state) {
-    $items = array_filter(array_map(function ($item) use ($element) {
+    $items = \array_filter(\array_map(function ($item) use ($element) {
       $current_element = $element['table'][$item];
       $key_has_input = isset($current_element['item']['key']['#value']) && $current_element['item']['key']['#value'] !== '';
       $label_has_input = isset($current_element['item']['label']['#value']) && $current_element['item']['label']['#value'] !== '';
@@ -370,7 +370,7 @@ abstract class ListItemBase extends FieldItemBase implements OptionsProviderInte
       return $item;
     });
     if ($reordered_items = $form_state->getValue([...$element['#parents'], 'table'])) {
-      uksort($items, function ($a, $b) use ($reordered_items) {
+      \uksort($items, function ($a, $b) use ($reordered_items) {
         $a_weight = $reordered_items[$a]['weight'] ?? 0;
         $b_weight = $reordered_items[$b]['weight'] ?? 0;
         return $a_weight <=> $b_weight;
@@ -378,7 +378,7 @@ abstract class ListItemBase extends FieldItemBase implements OptionsProviderInte
     }
     $values = static::extractAllowedValues($items, $element['#field_has_data']);
 
-    if (!is_array($values)) {
+    if (!\is_array($values)) {
       $form_state->setError($element, new TranslatableMarkup('Allowed values list: invalid input.'));
     }
     else {
@@ -414,10 +414,10 @@ abstract class ListItemBase extends FieldItemBase implements OptionsProviderInte
     foreach ($list as $position => $text) {
       // Check for an explicit key.
       $matches = [];
-      if (preg_match('/(.*)\|(.*)/', $text, $matches)) {
+      if (\preg_match('/(.*)\|(.*)/', $text, $matches)) {
         // Trim key and value to avoid unwanted spaces issues.
-        $key = trim($matches[1]);
-        $value = trim($matches[2]);
+        $key = \trim($matches[1]);
+        $value = \trim($matches[2]);
         $explicit_keys = TRUE;
       }
       // Otherwise see if we can use the value as the key.
@@ -478,7 +478,7 @@ abstract class ListItemBase extends FieldItemBase implements OptionsProviderInte
     foreach ($values as $key => $value) {
       $lines[] = "$key|$value";
     }
-    return implode("\n", $lines);
+    return \implode("\n", $lines);
   }
 
   /**
@@ -517,7 +517,7 @@ abstract class ListItemBase extends FieldItemBase implements OptionsProviderInte
   protected static function simplifyAllowedValues(array $structured_values) {
     $values = [];
     foreach ($structured_values as $item) {
-      if (is_array($item['label'])) {
+      if (\is_array($item['label'])) {
         // Nested elements are embedded in the label.
         $item['label'] = static::simplifyAllowedValues($item['label']);
       }
@@ -542,7 +542,7 @@ abstract class ListItemBase extends FieldItemBase implements OptionsProviderInte
   protected static function structureAllowedValues(array $values) {
     $structured_values = [];
     foreach ($values as $value => $label) {
-      if (is_array($label)) {
+      if (\is_array($label)) {
         $label = static::structureAllowedValues($label);
       }
       $structured_values[] = [
@@ -570,7 +570,7 @@ abstract class ListItemBase extends FieldItemBase implements OptionsProviderInte
    * Resets the static variable on field storage update.
    */
   public static function submitFieldStorageUpdate() {
-    drupal_static_reset('options_allowed_values');
+    \drupal_static_reset('options_allowed_values');
   }
 
 }

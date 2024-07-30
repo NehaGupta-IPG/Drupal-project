@@ -70,15 +70,15 @@ class ListFloatItem extends ListItemBase {
   protected static function extractAllowedValues($string, $has_data) {
     $values = parent::extractAllowedValues($string, $has_data);
     if ($values) {
-      $keys = array_keys($values);
-      $labels = array_values($values);
-      $keys = array_map(function ($key) {
+      $keys = \array_keys($values);
+      $labels = \array_values($values);
+      $keys = \array_map(function ($key) {
         // Float keys are represented as strings and need to be disambiguated
         // ('.5' is '0.5').
-        return is_numeric($key) ? (string) (float) $key : $key;
+        return \is_numeric($key) ? (string) (float) $key : $key;
       }, $keys);
 
-      return array_combine($keys, $labels);
+      return \array_combine($keys, $labels);
     }
     return $values;
   }
@@ -87,7 +87,7 @@ class ListFloatItem extends ListItemBase {
    * {@inheritdoc}
    */
   protected static function validateAllowedValue($option) {
-    if (!is_numeric($option)) {
+    if (!\is_numeric($option)) {
       return new TranslatableMarkup('Allowed values list: each key must be a valid integer or decimal.');
     }
     return NULL;
@@ -100,7 +100,7 @@ class ListFloatItem extends ListItemBase {
     $values = [];
     foreach ($structured_values as $item) {
       // Nested elements are embedded in the label.
-      if (is_array($item['label'])) {
+      if (\is_array($item['label'])) {
         $item['label'] = static::simplifyAllowedValues($item['label']);
       }
       // Cast the value to a float first so that .5 and 0.5 are the same value

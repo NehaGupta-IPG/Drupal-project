@@ -23,7 +23,7 @@ class MenuActiveTrailsCacheContext implements CalculatedCacheContextInterface {
    * {@inheritdoc}
    */
   public static function getLabel() {
-    return t("Active menu trail");
+    return \t("Active menu trail");
   }
 
   /**
@@ -35,7 +35,7 @@ class MenuActiveTrailsCacheContext implements CalculatedCacheContextInterface {
     }
 
     $active_trail = $this->menuActiveTrailService->getActiveTrailIds($menu_name);
-    return 'menu_trail.' . $menu_name . '|' . implode('|', $active_trail);
+    return 'menu_trail.' . $menu_name . '|' . \implode('|', $active_trail);
   }
 
   /**

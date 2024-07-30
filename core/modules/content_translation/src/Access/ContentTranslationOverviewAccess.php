@@ -54,7 +54,7 @@ class ContentTranslationOverviewAccess implements AccessInterface {
       $definition = $this->entityTypeManager->getDefinition($entity_type_id);
       $translation = $definition->get('translation');
       $access_callback = $translation['content_translation']['access_callback'];
-      $access = call_user_func($access_callback, $entity);
+      $access = \call_user_func($access_callback, $entity);
       if ($access->isAllowed()) {
         return $access;
       }

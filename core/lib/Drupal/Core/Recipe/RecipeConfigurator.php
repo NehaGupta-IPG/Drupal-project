@@ -30,7 +30,7 @@ final class RecipeConfigurator {
    *   The recipe's include path.
    */
   public function __construct(array $recipes, string $include_path) {
-    $this->recipes = array_map(fn(string $name) => static::getIncludedRecipe($include_path, $name), $recipes);
+    $this->recipes = \array_map(fn(string $name) => static::getIncludedRecipe($include_path, $name), $recipes);
   }
 
   /**
@@ -56,7 +56,7 @@ final class RecipeConfigurator {
     // the same parent directory as the recipe being applied. Note, only linux
     // style directory separators are supported. PHP on Windows can resolve the
     // mix of directory separators.
-    if (str_contains($name, '/')) {
+    if (\str_contains($name, '/')) {
       $path = \Drupal::root() . "/$name/recipe.yml";
     }
     else {
@@ -69,8 +69,8 @@ final class RecipeConfigurator {
     if (file_exists($path)) {
       return static::$cache[$path] = Recipe::createFromDirectory(dirname($path));
     }
-    $search_path = dirname($path, 2);
-    throw new UnknownRecipeException($name, $search_path, sprintf("Can not find the %s recipe, search path: %s", $name, $search_path));
+    $search_path = \dirname($path, 2);
+    throw new UnknownRecipeException($name, $search_path, \sprintf("Can not find the %s recipe, search path: %s", $name, $search_path));
   }
 
   /**
@@ -83,9 +83,9 @@ final class RecipeConfigurator {
     $recipes = [];
     foreach ($this->recipes as $recipe) {
       $recipes[] = $recipe;
-      $recipes = array_merge($recipes, $recipe->recipes->listAllRecipes());
+      $recipes = \array_merge($recipes, $recipe->recipes->listAllRecipes());
     }
-    return array_values(array_unique($recipes, SORT_REGULAR));
+    return \array_values(\array_unique($recipes, SORT_REGULAR));
   }
 
   /**
@@ -98,9 +98,9 @@ final class RecipeConfigurator {
   public function listAllExtensions(): array {
     $extensions = [];
     foreach ($this->listAllRecipes() as $recipe) {
-      $extensions = array_merge($extensions, $recipe->install->modules, $recipe->install->themes);
+      $extensions = \array_merge($extensions, $recipe->install->modules, $recipe->install->themes);
     }
-    return array_values(array_unique($extensions));
+    return \array_values(\array_unique($extensions));
   }
 
 }

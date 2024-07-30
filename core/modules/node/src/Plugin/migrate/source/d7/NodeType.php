@@ -103,7 +103,7 @@ class NodeType extends DrupalSqlBase {
     $source_options = $this->variableGet('node_options_' . $type, ['promote', 'sticky']);
     $options = [];
     foreach (['promote', 'sticky', 'status', 'revision'] as $item) {
-      $options[$item] = in_array($item, $source_options);
+      $options[$item] = \in_array($item, $source_options);
     }
     $row->setSourceProperty('options', $options);
 
@@ -121,7 +121,7 @@ class NodeType extends DrupalSqlBase {
         ->fetchAssoc();
       if ($body) {
         $row->setSourceProperty('create_body', TRUE);
-        $body['data'] = unserialize($body['data']);
+        $body['data'] = \unserialize($body['data']);
         $row->setSourceProperty('body_label', $body['data']['label']);
       }
     }
@@ -136,7 +136,7 @@ class NodeType extends DrupalSqlBase {
     }
 
     if ($this->moduleExists('comment')) {
-      foreach (array_keys($this->getCommentFields()) as $field) {
+      foreach (\array_keys($this->getCommentFields()) as $field) {
         $row->setSourceProperty($field, $this->variableGet($field . '_' . $type, NULL));
       }
     }

@@ -73,17 +73,17 @@ class Bytes {
    */
   public static function toNumber($size): float {
     // Remove the non-unit characters from the size.
-    $unit = preg_replace('/[^bkmgtpezy]/i', '', $size);
+    $unit = \preg_replace('/[^bkmgtpezy]/i', '', $size);
     // Remove the non-numeric characters from the size.
-    $size = preg_replace('/[^0-9\.]/', '', $size);
+    $size = \preg_replace('/[^0-9\.]/', '', $size);
     if ($unit) {
       // Find the position of the unit in the ordered string which is the power
       // of magnitude to multiply a kilobyte by.
-      return round($size * pow(self::KILOBYTE, stripos('bkmgtpezy', $unit[0])));
+      return \round($size * \pow(self::KILOBYTE, \stripos('bkmgtpezy', $unit[0])));
     }
     else {
       // Ensure size is a proper number type.
-      return round((float) $size);
+      return \round((float) $size);
     }
   }
 
@@ -98,17 +98,17 @@ class Bytes {
    */
   public static function validate($string): bool {
     // Ensure that the string starts with a numeric character.
-    if (!preg_match('/^[0-9]/', $string)) {
+    if (!\preg_match('/^[0-9]/', $string)) {
       return FALSE;
     }
 
     // Remove the numeric characters from the beginning of the value.
-    $string = preg_replace('/^[0-9\.]+/', '', $string);
+    $string = \preg_replace('/^[0-9\.]+/', '', $string);
 
     // Remove remaining spaces from the value.
-    $string = trim($string);
+    $string = \trim($string);
 
-    return in_array(strtolower($string), self::ALLOWED_SUFFIXES);
+    return \in_array(\strtolower($string), self::ALLOWED_SUFFIXES);
   }
 
   /**

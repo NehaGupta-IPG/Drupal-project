@@ -95,8 +95,8 @@ class DrupalKernelTest extends KernelTestBase {
     $this->assertTrue($is_compiled_container);
     // Verify that the list of modules is the same for the initial and the
     // compiled container.
-    $module_list = array_keys($container->get('module_handler')->getModuleList());
-    $this->assertEquals(array_values($modules_enabled), $module_list);
+    $module_list = \array_keys($container->get('module_handler')->getModuleList());
+    $this->assertEquals(\array_values($modules_enabled), $module_list);
 
     // Get the container another time, simulating a "production" environment.
     $container = $this->getTestKernel($request, NULL)
@@ -108,8 +108,8 @@ class DrupalKernelTest extends KernelTestBase {
 
     // Verify that the list of modules is the same for the initial and the
     // compiled container.
-    $module_list = array_keys($container->get('module_handler')->getModuleList());
-    $this->assertEquals(array_values($modules_enabled), $module_list);
+    $module_list = \array_keys($container->get('module_handler')->getModuleList());
+    $this->assertEquals(\array_values($modules_enabled), $module_list);
 
     // Test that our synthetic services are there.
     $class_loader = $container->get('class_loader');
@@ -323,11 +323,11 @@ class DrupalKernelTest extends KernelTestBase {
   public function testLocale(): void {
     $utf8_string = 'äöüßαβγδεζηθικλμνξοσὠ';
     // Test environment locale should be UTF-8.
-    $this->assertSame($utf8_string, escapeshellcmd($utf8_string));
+    $this->assertSame($utf8_string, \escapeshellcmd($utf8_string));
     $request = Request::createFromGlobals();
     $this->getTestKernel($request);
     // Kernel environment locale should be UTF-8.
-    $this->assertSame($utf8_string, escapeshellcmd($utf8_string));
+    $this->assertSame($utf8_string, \escapeshellcmd($utf8_string));
   }
 
 }

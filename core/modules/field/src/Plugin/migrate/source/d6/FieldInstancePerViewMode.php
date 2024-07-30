@@ -29,8 +29,8 @@ class FieldInstancePerViewMode extends ViewModeBase {
     $result = $this->prepareQuery()->execute();
     while ($field_row = $result->fetchAssoc()) {
       // These are added to every view mode row.
-      $field_row['display_settings'] = unserialize($field_row['display_settings']);
-      $field_row['widget_settings'] = unserialize($field_row['widget_settings']);
+      $field_row['display_settings'] = \unserialize($field_row['display_settings']);
+      $field_row['widget_settings'] = \unserialize($field_row['widget_settings']);
       $bundle = $field_row['type_name'];
       $field_name = $field_row['field_name'];
 

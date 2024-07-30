@@ -73,7 +73,7 @@ class UserPasswordResetTest extends BrowserTestBase {
 
     // Set the last login time that is used to generate the one-time link so
     // that it is definitely over a second ago.
-    $account->login = \Drupal::time()->getRequestTime() - mt_rand(10, 100000);
+    $account->login = \Drupal::time()->getRequestTime() - \mt_rand(10, 100000);
     Database::getConnection()->update('users_field_data')
       ->fields(['login' => $account->getLastLoginTime()])
       ->condition('uid', $account->id())
@@ -163,7 +163,7 @@ class UserPasswordResetTest extends BrowserTestBase {
 
     // Request a new password again, this time using the email address.
     // Count email messages before to compare with after.
-    $before = count($this->drupalGetMails(['id' => 'user_password_reset']));
+    $before = \count($this->drupalGetMails(['id' => 'user_password_reset']));
     $this->drupalGet('user/password');
     $edit = ['name' => $this->account->getEmail()];
     $this->submitForm($edit, 'Submit');
@@ -202,24 +202,24 @@ class UserPasswordResetTest extends BrowserTestBase {
     $timeout = $this->config('user.settings')->get('password_reset_timeout');
     $bogus_timestamp = \Drupal::time()->getRequestTime() - $timeout - 60;
     $_uid = $this->account->id();
-    $this->drupalGet("user/reset/$_uid/$bogus_timestamp/" . user_pass_rehash($this->account, $bogus_timestamp));
+    $this->drupalGet("user/reset/$_uid/$bogus_timestamp/" . \user_pass_rehash($this->account, $bogus_timestamp));
     $this->assertSession()->pageTextContains('You have tried to use a one-time login link that has expired. Request a new one using the form below.');
-    $this->drupalGet("user/reset/$_uid/$bogus_timestamp/" . user_pass_rehash($this->account, $bogus_timestamp) . '/login');
+    $this->drupalGet("user/reset/$_uid/$bogus_timestamp/" . \user_pass_rehash($this->account, $bogus_timestamp) . '/login');
     $this->assertSession()->pageTextContains('You have tried to use a one-time login link that has expired. Request a new one using the form below.');
 
     // Create a user, block the account, and verify that a login link is denied.
     $timestamp = \Drupal::time()->getRequestTime() - 1;
     $blocked_account = $this->drupalCreateUser()->block();
     $blocked_account->save();
-    $this->drupalGet("user/reset/" . $blocked_account->id() . "/$timestamp/" . user_pass_rehash($blocked_account, $timestamp));
+    $this->drupalGet("user/reset/" . $blocked_account->id() . "/$timestamp/" . \user_pass_rehash($blocked_account, $timestamp));
     $this->assertSession()->statusCodeEquals(403);
-    $this->drupalGet("user/reset/" . $blocked_account->id() . "/$timestamp/" . user_pass_rehash($blocked_account, $timestamp) . '/login');
+    $this->drupalGet("user/reset/" . $blocked_account->id() . "/$timestamp/" . \user_pass_rehash($blocked_account, $timestamp) . '/login');
     $this->assertSession()->statusCodeEquals(403);
 
     // Verify a blocked user can not request a new password.
     $this->drupalGet('user/password');
     // Count email messages before to compare with after.
-    $before = count($this->drupalGetMails(['id' => 'user_password_reset']));
+    $before = \count($this->drupalGetMails(['id' => 'user_password_reset']));
     $edit = ['name' => $blocked_account->getAccountName()];
     $this->submitForm($edit, 'Submit');
     $this->assertCount($before, $this->drupalGetMails(['id' => 'user_password_reset']), 'No email was sent when requesting password reset for a blocked account');
@@ -253,11 +253,11 @@ class UserPasswordResetTest extends BrowserTestBase {
     $timestamp = \Drupal::time()->getRequestTime() - 1;
     $blocked_account = $this->drupalCreateUser()->block();
     $blocked_account->save();
-    $this->drupalGet("user/reset/" . $blocked_account->id() . "/$timestamp/" . user_pass_rehash($blocked_account, $timestamp) . '/login');
+    $this->drupalGet("user/reset/" . $blocked_account->id() . "/$timestamp/" . \user_pass_rehash($blocked_account, $timestamp) . '/login');
     $this->assertSession()->statusCodeEquals(403);
 
     $blocked_account->delete();
-    $this->drupalGet("user/reset/" . $blocked_account->id() . "/$timestamp/" . user_pass_rehash($blocked_account, $timestamp) . '/login');
+    $this->drupalGet("user/reset/" . $blocked_account->id() . "/$timestamp/" . \user_pass_rehash($blocked_account, $timestamp) . '/login');
     $this->assertSession()->statusCodeEquals(403);
   }
 
@@ -277,7 +277,7 @@ class UserPasswordResetTest extends BrowserTestBase {
     $this->rebuildContainer();
 
     foreach ($this->languagePrefixTestProvider() as $scenario) {
-      [$setPreferredLangcode, $activeLangcode, $prefix, $visitingUrl, $expectedResetUrl, $unexpectedResetUrl] = array_values($scenario);
+      [$setPreferredLangcode, $activeLangcode, $prefix, $visitingUrl, $expectedResetUrl, $unexpectedResetUrl] = \array_values($scenario);
       $this->account->preferred_langcode = $setPreferredLangcode;
       $this->account->save();
       $this->assertSame($setPreferredLangcode, $this->account->getPreferredLangcode(FALSE));
@@ -343,9 +343,9 @@ class UserPasswordResetTest extends BrowserTestBase {
   public function getResetURL() {
     // Assume the most recent email.
     $_emails = $this->drupalGetMails();
-    $email = end($_emails);
+    $email = \end($_emails);
     $urls = [];
-    preg_match('#.+user/reset/.+#', $email['body'], $urls);
+    \preg_match('#.+user/reset/.+#', $email['body'], $urls);
 
     return $urls[0];
   }
@@ -400,7 +400,7 @@ class UserPasswordResetTest extends BrowserTestBase {
     // Logged in users should not be able to access the user.reset.login or the
     // user.reset.form routes.
     $timestamp = \Drupal::time()->getRequestTime() - 1;
-    $this->drupalGet("user/reset/" . $this->account->id() . "/$timestamp/" . user_pass_rehash($this->account, $timestamp) . '/login');
+    $this->drupalGet("user/reset/" . $this->account->id() . "/$timestamp/" . \user_pass_rehash($this->account, $timestamp) . '/login');
     $this->assertSession()->statusCodeEquals(403);
     $this->drupalGet("user/reset/" . $this->account->id());
     $this->assertSession()->statusCodeEquals(403);
@@ -444,7 +444,7 @@ class UserPasswordResetTest extends BrowserTestBase {
     $edit = ['name' => $this->account->getAccountName()];
 
     // Count email messages before to compare with after.
-    $before = count($this->drupalGetMails(['id' => 'user_password_reset']));
+    $before = \count($this->drupalGetMails(['id' => 'user_password_reset']));
 
     // Try 3 requests that should not trigger flood control.
     for ($i = 0; $i < 3; $i++) {
@@ -502,7 +502,7 @@ class UserPasswordResetTest extends BrowserTestBase {
     $edit = ['name' => $this->account->getAccountName()];
 
     // Count email messages before to compare with after.
-    $before = count($this->drupalGetMails(['id' => 'user_password_reset']));
+    $before = \count($this->drupalGetMails(['id' => 'user_password_reset']));
 
     // Try 3 requests that should not trigger flood control.
     for ($i = 0; $i < 3; $i++) {
@@ -658,8 +658,8 @@ class UserPasswordResetTest extends BrowserTestBase {
 
     // The password reset URL must not be valid for the second user when only
     // the user ID is changed in the URL.
-    $reset_url = user_pass_reset_url($user1);
-    $attack_reset_url = str_replace("user/reset/{$user1->id()}", "user/reset/{$user2->id()}", $reset_url);
+    $reset_url = \user_pass_reset_url($user1);
+    $attack_reset_url = \str_replace("user/reset/{$user1->id()}", "user/reset/{$user2->id()}", $reset_url);
     $this->drupalGet($attack_reset_url);
     // Verify that the invalid password reset page does not show the user name.
     $this->assertSession()->pageTextNotContains($user2->getAccountName());

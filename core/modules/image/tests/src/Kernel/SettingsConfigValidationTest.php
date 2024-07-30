@@ -31,8 +31,8 @@ class SettingsConfigValidationTest extends KernelTestBase {
     // implements an extension-based mimetype guesser. Therefore, we must use
     // an incorrect extension here instead of writing text to a supposed PNG
     // file and depending on a check of the file contents.
-    $file = sys_get_temp_dir() . '/fake_image.png.txt';
-    file_put_contents($file, 'Not an image!');
+    $file = \sys_get_temp_dir() . '/fake_image.png.txt';
+    \file_put_contents($file, 'Not an image!');
 
     $this->expectException(SchemaIncompleteException::class);
     $this->expectExceptionMessage('[preview_image] This file is not a valid image.');

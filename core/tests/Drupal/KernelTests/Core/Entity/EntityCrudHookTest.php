@@ -84,14 +84,14 @@ class EntityCrudHookTest extends EntityKernelTestBase {
     $positions = [];
     foreach ($messages as $message) {
       // Verify that each message is found and record its position.
-      $position = array_search($message, $GLOBALS['entity_crud_hook_test']);
+      $position = \array_search($message, $GLOBALS['entity_crud_hook_test']);
       $this->assertNotFalse($position, $message);
       $positions[] = $position;
     }
 
     // Sort the positions and ensure they remain in the same order.
     $sorted = $positions;
-    sort($sorted);
+    \sort($sorted);
     $this->assertSame($positions, $sorted, 'The hook messages appear in the correct order.');
   }
 
@@ -242,14 +242,14 @@ class EntityCrudHookTest extends EntityKernelTestBase {
     $this->installEntitySchema('file');
 
     $url = 'public://entity_crud_hook_test.file';
-    file_put_contents($url, 'Test test test');
+    \file_put_contents($url, 'Test test test');
     $file = File::create([
       'fid' => NULL,
       'uid' => 1,
       'filename' => 'entity_crud_hook_test.file',
       'uri' => $url,
       'filemime' => 'text/plain',
-      'filesize' => filesize($url),
+      'filesize' => \filesize($url),
       'status' => 1,
       'created' => \Drupal::time()->getRequestTime(),
       'changed' => \Drupal::time()->getRequestTime(),

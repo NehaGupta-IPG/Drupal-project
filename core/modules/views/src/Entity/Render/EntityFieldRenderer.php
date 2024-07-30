@@ -215,7 +215,7 @@ class EntityFieldRenderer extends RendererBase {
       // be obtained from any of the fields handlers, so we arbitrarily use the
       // first one.
       $entities_by_bundles = [];
-      $field = $this->view->field[current($field_ids)];
+      $field = $this->view->field[\current($field_ids)];
       foreach ($values as $result_row) {
         if ($entity = $field->getEntity($result_row)) {
           $relationship = $field->options['relationship'] ?? 'none';

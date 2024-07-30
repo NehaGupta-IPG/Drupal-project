@@ -43,7 +43,7 @@ trait TaxonomyIndexDepthQueryTrait {
    */
   protected function addSubQueryJoin($tids): void {
     $connection = $this->query->getConnection();
-    $operator = is_array($tids) ? 'IN' : '=';
+    $operator = \is_array($tids) ? 'IN' : '=';
     // Create the depth 0 subquery.
     $subquery = $connection->select('taxonomy_index', 'tn');
     $subquery->addField('tn', 'nid');
@@ -61,7 +61,7 @@ trait TaxonomyIndexDepthQueryTrait {
         $right_field = 'parent_target_id';
       }
       // Traverse the hierarchy to check the child or parent terms.
-      foreach (range(1, abs($this->options['depth'])) as $count) {
+      foreach (\range(1, \abs($this->options['depth'])) as $count) {
         $union_query = $connection->select('taxonomy_index', 'tn');
         $union_query->addField('tn', 'nid');
         $left_join = "[tn].[tid]";
@@ -69,7 +69,7 @@ trait TaxonomyIndexDepthQueryTrait {
           $union_query->join('taxonomy_term__parent', "th", "$left_join = [th].[entity_id]");
           $left_join = "[th].[$left_field]";
         }
-        foreach (range(1, $count) as $inner_count) {
+        foreach (\range(1, $count) as $inner_count) {
           $union_query->join('taxonomy_term__parent', "th$inner_count", "$left_join = [th$inner_count].[$right_field]");
           $left_join = "[th$inner_count].[$left_field]";
         }

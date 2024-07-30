@@ -59,14 +59,14 @@ class ComponentLoader implements LoaderInterface {
       return $path;
     }
 
-    throw new LoaderError(sprintf('Unable to find template "%s" in the components registry.', $name));
+    throw new LoaderError(\sprintf('Unable to find template "%s" in the components registry.', $name));
   }
 
   /**
    * {@inheritdoc}
    */
   public function exists($name): bool {
-    if (!preg_match('/^[a-zA-Z][a-zA-Z0-9:_-]*[a-zA-Z0-9]?$/', $name)) {
+    if (!\preg_match('/^[a-zA-Z][a-zA-Z0-9:_-]*[a-zA-Z0-9]?$/', $name)) {
       return FALSE;
     }
     try {
@@ -90,7 +90,7 @@ class ComponentLoader implements LoaderInterface {
     catch (ComponentNotFoundException) {
       return new Source('', $name, '');
     }
-    $original_code = file_get_contents($path);
+    $original_code = \file_get_contents($path);
     return new Source($original_code, $name, $path);
   }
 
@@ -104,7 +104,7 @@ class ComponentLoader implements LoaderInterface {
     catch (ComponentNotFoundException) {
       throw new LoaderError('Unable to find component');
     }
-    return implode('--', array_filter([
+    return \implode('--', \array_filter([
       'components',
       $name,
       $component->getPluginDefinition()['provider'] ?? '',
@@ -115,7 +115,7 @@ class ComponentLoader implements LoaderInterface {
    * {@inheritdoc}
    */
   public function isFresh(string $name, int $time): bool {
-    $file_is_fresh = static fn(string $path) => filemtime($path) < $time;
+    $file_is_fresh = static fn(string $path) => \filemtime($path) < $time;
     try {
       $component = $this->pluginManager->find($name);
     }

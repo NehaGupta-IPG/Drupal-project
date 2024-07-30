@@ -103,7 +103,7 @@ class DisplayFeedTranslationTest extends ViewTestBase {
       'body' => [
         0 => [
           'value' => 'Something in English.',
-          'format' => filter_default_format(),
+          'format' => \filter_default_format(),
         ],
       ],
       'langcode' => 'en',

@@ -68,7 +68,7 @@ class AdvancedSettingsForm extends ConfigFormBase {
         '#open' => TRUE,
       ];
       $form['extenders']['display_extenders'] = [
-        '#default_value' => array_filter($config->get('display_extenders')),
+        '#default_value' => \array_filter($config->get('display_extenders')),
         '#options' => $options,
         '#type' => 'checkboxes',
         '#description' => $this->t('Select extensions of the views interface.'),
@@ -94,7 +94,7 @@ class AdvancedSettingsForm extends ConfigFormBase {
    * Submission handler to clear the Views cache.
    */
   public function cacheSubmit() {
-    views_invalidate_cache();
+    \views_invalidate_cache();
     $this->messenger()->addStatus($this->t('The cache has been cleared.'));
   }
 

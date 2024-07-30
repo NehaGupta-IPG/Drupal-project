@@ -19,7 +19,7 @@ class VersionById extends NegotiatorBase implements VersionNegotiatorInterface {
    * {@inheritdoc}
    */
   protected function getRevisionId(EntityInterface $entity, $version_argument) {
-    if (!is_numeric($version_argument)) {
+    if (!\is_numeric($version_argument)) {
       throw new InvalidVersionIdentifierException('The revision ID must be an integer.');
     }
     return $version_argument;

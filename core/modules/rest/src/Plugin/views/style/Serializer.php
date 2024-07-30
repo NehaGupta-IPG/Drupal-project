@@ -113,7 +113,7 @@ class Serializer extends StylePluginBase implements CacheableDependencyInterface
     parent::submitOptionsForm($form, $form_state);
 
     $formats = $form_state->getValue(['style_options', 'formats']);
-    $form_state->setValue(['style_options', 'formats'], array_filter($formats));
+    $form_state->setValue(['style_options', 'formats'], \array_filter($formats));
   }
 
   /**
@@ -138,7 +138,7 @@ class Serializer extends StylePluginBase implements CacheableDependencyInterface
       $content_type = $this->displayHandler->getContentType();
     }
     else {
-      $content_type = !empty($this->options['formats']) ? reset($this->options['formats']) : 'json';
+      $content_type = !empty($this->options['formats']) ? \reset($this->options['formats']) : 'json';
     }
     return $this->serializer->serialize($rows, $content_type, ['views_style_plugin' => $this]);
   }
@@ -183,12 +183,12 @@ class Serializer extends StylePluginBase implements CacheableDependencyInterface
   public function calculateDependencies() {
     $dependencies = parent::calculateDependencies();
     $formats = $this->getFormats();
-    $providers = array_intersect_key($this->formatProviders, array_flip($formats));
+    $providers = \array_intersect_key($this->formatProviders, \array_flip($formats));
     // The plugin always uses services from the serialization module.
     $providers[] = 'serialization';
 
     $dependencies += ['module' => []];
-    $dependencies['module'] = array_merge($dependencies['module'], $providers);
+    $dependencies['module'] = \array_merge($dependencies['module'], $providers);
     return $dependencies;
   }
 
@@ -199,8 +199,8 @@ class Serializer extends StylePluginBase implements CacheableDependencyInterface
    *   An array of format options. Both key and value are the same.
    */
   protected function getFormatOptions() {
-    $formats = array_keys($this->formatProviders);
-    return array_combine($formats, $formats);
+    $formats = \array_keys($this->formatProviders);
+    return \array_combine($formats, $formats);
   }
 
 }

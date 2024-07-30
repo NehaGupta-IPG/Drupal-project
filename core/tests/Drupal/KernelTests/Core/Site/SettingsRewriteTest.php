@@ -104,9 +104,9 @@ EXPECTED
     ];
     foreach ($tests as $test) {
       $filename = Settings::get('file_public_path', $site_path . '/files') . '/mock_settings.php';
-      file_put_contents($filename, "<?php\n" . $test['original'] . "\n");
+      \file_put_contents($filename, "<?php\n" . $test['original'] . "\n");
       SettingsEditor::rewrite($filename, $test['settings']);
-      $this->assertEquals("<?php\n" . $test['expected'] . "\n", file_get_contents($filename));
+      $this->assertEquals("<?php\n" . $test['expected'] . "\n", \file_get_contents($filename));
     }
 
     // Test that <?php gets added to the start of an empty settings file.
@@ -122,13 +122,13 @@ EXPECTED
     ];
     // Make an empty file.
     $filename = Settings::get('file_public_path', $site_path . '/files') . '/mock_settings.php';
-    file_put_contents($filename, "");
+    \file_put_contents($filename, "");
 
     // Write the setting to the file.
     SettingsEditor::rewrite($filename, $test['settings']);
 
     // Check that the result is just the php opening tag and the settings.
-    $this->assertEquals("<?php\n" . $test['expected'] . "\n", file_get_contents($filename));
+    $this->assertEquals("<?php\n" . $test['expected'] . "\n", \file_get_contents($filename));
   }
 
 }

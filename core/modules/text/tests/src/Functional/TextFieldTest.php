@@ -81,7 +81,7 @@ class TextFieldTest extends StringFieldTest {
     // Test validation with valid and invalid values.
     $entity = EntityTest::create();
     for ($i = 0; $i <= $max_length + 2; $i++) {
-      $entity->{$field_name}->value = str_repeat('x', $i);
+      $entity->{$field_name}->value = \str_repeat('x', $i);
       $violations = $entity->{$field_name}->validate();
       if ($i <= $max_length) {
         $this->assertCount(0, $violations, "Length $i does not cause validation error when max_length is $max_length");
@@ -140,7 +140,7 @@ class TextFieldTest extends StringFieldTest {
       ->setComponent($file_field_name)
       ->save();
 
-    $test_file = current($this->drupalGetTestFiles('text'));
+    $test_file = \current($this->drupalGetTestFiles('text'));
     $edit['files[file_field_0]'] = \Drupal::service('file_system')->realpath($test_file->uri);
     $this->drupalGet('entity_test/add');
     $this->submitForm($edit, 'Upload');
@@ -207,7 +207,7 @@ class TextFieldTest extends StringFieldTest {
     // Grant access to both formats to the user.
     $roles = $this->webUser->getRoles();
     $rid = $roles[0];
-    user_role_grant_permissions($rid, [
+    \user_role_grant_permissions($rid, [
       $format1->getPermissionName(),
       $format2->getPermissionName(),
       $format3->getPermissionName(),
@@ -253,7 +253,7 @@ class TextFieldTest extends StringFieldTest {
       "{$field_name}[0][value]" => $filtered_markup,
     ];
     $this->submitForm($edit, 'Save');
-    preg_match('|entity_test/manage/(\d+)|', $this->getUrl(), $match);
+    \preg_match('|entity_test/manage/(\d+)|', $this->getUrl(), $match);
     $id = $match[1];
     $this->assertSession()->pageTextContains('entity_test ' . $id . ' has been created.');
 
@@ -336,7 +336,7 @@ class TextFieldTest extends StringFieldTest {
 
     // Disable all text formats besides the plain text fallback format.
     $this->drupalLogin($this->adminUser);
-    foreach (filter_formats() as $format) {
+    foreach (\filter_formats() as $format) {
       if (!$format->isFallbackFormat()) {
         $this->drupalGet('admin/config/content/formats/manage/' . $format->id() . '/disable');
         $this->submitForm([], 'Disable');
@@ -356,7 +356,7 @@ class TextFieldTest extends StringFieldTest {
       "{$field_name}[0][value]" => $value,
     ];
     $this->submitForm($edit, 'Save');
-    preg_match('|entity_test/manage/(\d+)|', $this->getUrl(), $match);
+    \preg_match('|entity_test/manage/(\d+)|', $this->getUrl(), $match);
     $id = $match[1];
     $this->assertSession()->pageTextContains('entity_test ' . $id . ' has been created.');
 
@@ -377,13 +377,13 @@ class TextFieldTest extends StringFieldTest {
     ];
     $this->drupalGet('admin/config/content/formats/add');
     $this->submitForm($edit, 'Save configuration');
-    filter_formats_reset();
+    \filter_formats_reset();
     $format = FilterFormat::load($edit['format']);
     $format_id = $format->id();
     $permission = $format->getPermissionName();
     $roles = $this->webUser->getRoles();
     $rid = $roles[0];
-    user_role_grant_permissions($rid, [$permission]);
+    \user_role_grant_permissions($rid, [$permission]);
     $this->drupalLogin($this->webUser);
 
     // Display edition form.

@@ -21,7 +21,7 @@ class ProxyServicesPass implements CompilerPassInterface {
     foreach ($container->getDefinitions() as $service_id => $definition) {
       if ($definition->isLazy()) {
         $proxy_class = ProxyBuilder::buildProxyClassName($definition->getClass());
-        if (class_exists($proxy_class)) {
+        if (\class_exists($proxy_class)) {
           // Copy the existing definition to a new entry.
           $definition->setLazy(FALSE);
           // Ensure that the service is accessible.
@@ -37,7 +37,7 @@ class ProxyServicesPass implements CompilerPassInterface {
 
           // Find the root namespace.
           $match = [];
-          preg_match('/([a-zA-Z0-9_]+\\\\[a-zA-Z0-9_]+)\\\\(.+)/', $class_name, $match);
+          \preg_match('/([a-zA-Z0-9_]+\\\\[a-zA-Z0-9_]+)\\\\(.+)/', $class_name, $match);
           $root_namespace = $match[1];
 
           // Find the root namespace path.
@@ -60,7 +60,7 @@ Use the following command to generate the proxy class:
 
 
 EOF;
-          trigger_error($message, E_USER_WARNING);
+          \trigger_error($message, E_USER_WARNING);
         }
       }
     }

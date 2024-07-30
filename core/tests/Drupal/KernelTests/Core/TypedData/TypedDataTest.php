@@ -63,7 +63,7 @@ class TypedDataTest extends KernelTestBase {
    * @see \Drupal\Core\TypedData\TypedDataManager::create()
    */
   protected function createTypedData($definition, $value = NULL, $name = NULL) {
-    if (is_array($definition)) {
+    if (\is_array($definition)) {
       $definition = DataDefinition::create($definition['type']);
     }
     $data = $this->typedDataManager->create($definition, $value, $name);
@@ -109,12 +109,12 @@ class TypedDataTest extends KernelTestBase {
     $this->assertEquals(1, $typed_data->validate()->count(), 'Validation detected invalid value.');
 
     // Integer type.
-    $value = rand();
+    $value = \rand();
     $typed_data = $this->createTypedData(['type' => 'integer'], $value);
     $this->assertInstanceOf(IntegerInterface::class, $typed_data);
     $this->assertSame($value, $typed_data->getValue(), 'Integer value was fetched.');
     $this->assertEquals(0, $typed_data->validate()->count());
-    $new_value = rand();
+    $new_value = \rand();
     $typed_data->setValue($new_value);
     $this->assertSame($new_value, $typed_data->getValue(), 'Integer value was changed.');
     $this->assertIsString($typed_data->getString());
@@ -126,12 +126,12 @@ class TypedDataTest extends KernelTestBase {
     $this->assertEquals(1, $typed_data->validate()->count(), 'Validation detected invalid value.');
 
     // Decimal type.
-    $value = (string) (mt_rand(1, 10000) / 100);
+    $value = (string) (\mt_rand(1, 10000) / 100);
     $typed_data = $this->createTypedData(['type' => 'decimal'], $value);
     $this->assertInstanceOf(DecimalInterface::class, $typed_data);
     $this->assertSame($value, $typed_data->getValue(), 'Decimal value was fetched.');
     $this->assertEquals(0, $typed_data->validate()->count());
-    $new_value = (string) (mt_rand(1, 10000) / 100);
+    $new_value = (string) (\mt_rand(1, 10000) / 100);
     $typed_data->setValue($new_value);
     $this->assertSame($new_value, $typed_data->getValue(), 'Decimal value was changed.');
     $this->assertIsString($typed_data->getString());
@@ -355,12 +355,12 @@ class TypedDataTest extends KernelTestBase {
     $this->assertEquals(0, $typed_data->validate()->count());
     // Try setting by URI.
     $typed_data->setValue($files[1]->getFileUri());
-    $this->assertEquals(fgets(fopen($files[1]->getFileUri(), 'r')), fgets($typed_data->getValue()), 'Binary value was changed.');
+    $this->assertEquals(\fgets(\fopen($files[1]->getFileUri(), 'r')), \fgets($typed_data->getValue()), 'Binary value was changed.');
     $this->assertIsString($typed_data->getString());
     $this->assertEquals(0, $typed_data->validate()->count());
     // Try setting by resource.
-    $typed_data->setValue(fopen($files[2]->getFileUri(), 'r'));
-    $this->assertEquals(fgets($typed_data->getValue()), fgets(fopen($files[2]->getFileUri(), 'r')), 'Binary value was changed.');
+    $typed_data->setValue(\fopen($files[2]->getFileUri(), 'r'));
+    $this->assertEquals(\fgets($typed_data->getValue()), \fgets(\fopen($files[2]->getFileUri(), 'r')), 'Binary value was changed.');
     $this->assertIsString($typed_data->getString());
     $this->assertEquals(0, $typed_data->validate()->count());
     $typed_data->setValue(NULL);
@@ -531,7 +531,7 @@ class TypedDataTest extends KernelTestBase {
     $this->assertEquals(3, $count);
 
     // Test retrieving metadata.
-    $this->assertEquals(array_keys($value), array_keys($typed_data->getDataDefinition()->getPropertyDefinitions()));
+    $this->assertEquals(\array_keys($value), \array_keys($typed_data->getDataDefinition()->getPropertyDefinitions()));
     $definition = $typed_data->getDataDefinition()->getPropertyDefinition('one');
     $this->assertEquals('string', $definition->getDataType());
     $this->assertNull($typed_data->getDataDefinition()->getPropertyDefinition('invalid'));
@@ -546,14 +546,14 @@ class TypedDataTest extends KernelTestBase {
     $this->assertEquals(['one' => 'alpha', 'two' => 'beta', 'three' => 'gamma'], $value);
 
     $properties = $typed_data->getProperties();
-    $this->assertEquals(array_keys($value), array_keys($properties));
+    $this->assertEquals(\array_keys($value), \array_keys($properties));
     $this->assertSame($typed_data->get('one'), $properties['one'], 'Properties are identical.');
 
     // Test setting a not defined property. It shouldn't show up in the
     // properties, but be kept in the values.
     $typed_data->setValue(['foo' => 'bar']);
-    $this->assertEquals(['one', 'two', 'three'], array_keys($typed_data->getProperties()));
-    $this->assertEquals(['foo', 'one', 'two', 'three'], array_keys($typed_data->getValue()));
+    $this->assertEquals(['one', 'two', 'three'], \array_keys($typed_data->getProperties()));
+    $this->assertEquals(['foo', 'one', 'two', 'three'], \array_keys($typed_data->getValue()));
 
     // Test getting the string representation.
     $typed_data->setValue(['one' => 'eins', 'two' => '', 'three' => 'gamma']);

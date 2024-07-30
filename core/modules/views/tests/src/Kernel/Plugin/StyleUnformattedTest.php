@@ -33,7 +33,7 @@ class StyleUnformattedTest extends StyleTestBase {
 
     $rows = $this->elements->body->div->div;
     $count = 0;
-    $count_result = count($view->result);
+    $count_result = \count($view->result);
     foreach ($rows as $row) {
       $count++;
       $attributes = $row->attributes();

@@ -231,7 +231,7 @@ class ContentTranslationHandler implements ContentTranslationHandlerInterface, E
    *   TRUE if translatable field storage definition exists, FALSE otherwise.
    */
   protected function checkFieldStorageDefinitionTranslatability($field_name) {
-    return array_key_exists($field_name, $this->fieldStorageDefinitions) && $this->fieldStorageDefinitions[$field_name]->isTranslatable();
+    return \array_key_exists($field_name, $this->fieldStorageDefinitions) && $this->fieldStorageDefinitions[$field_name]->isTranslatable();
   }
 
   /**
@@ -293,7 +293,7 @@ class ContentTranslationHandler implements ContentTranslationHandlerInterface, E
       unset($translations[$form_langcode]);
     }
     $is_translation = $new_translation || ($entity->language()->getId() != $entity_langcode);
-    $has_translations = count($translations) > 1;
+    $has_translations = \count($translations) > 1;
 
     // Adjust page title to specify the current language being edited, if we
     // have at least one translation.
@@ -517,7 +517,7 @@ class ContentTranslationHandler implements ContentTranslationHandlerInterface, E
     // Handle entity form submission before the entity has been saved.
     foreach (Element::children($form['actions']) as $action) {
       if (isset($form['actions'][$action]['#type']) && $form['actions'][$action]['#type'] == 'submit') {
-        array_unshift($form['actions'][$action]['#submit'], [$this, 'entityFormSubmit']);
+        \array_unshift($form['actions'][$action]['#submit'], [$this, 'entityFormSubmit']);
       }
     }
   }
@@ -533,7 +533,7 @@ class ContentTranslationHandler implements ContentTranslationHandlerInterface, E
     // @todo Find a more reliable way to determine if a form element concerns a
     //   multilingual value.
     if (!isset($ignored_types)) {
-      $ignored_types = array_flip(['actions', 'value', 'hidden', 'vertical_tabs', 'token', 'details', 'link']);
+      $ignored_types = \array_flip(['actions', 'value', 'hidden', 'vertical_tabs', 'token', 'details', 'link']);
     }
 
     /** @var \Drupal\Core\Entity\ContentEntityForm $form_object */
@@ -548,7 +548,7 @@ class ContentTranslationHandler implements ContentTranslationHandlerInterface, E
     // We use field definitions to identify untranslatable field widgets to be
     // hidden. Fields that are not involved in translation changes checks should
     // not be affected by this logic (the "revision_log" field, for instance).
-    $field_definitions = array_diff_key($entity->getFieldDefinitions(), array_flip($this->getFieldsToSkipFromTranslationChangesCheck($entity)));
+    $field_definitions = \array_diff_key($entity->getFieldDefinitions(), \array_flip($this->getFieldsToSkipFromTranslationChangesCheck($entity)));
 
     foreach (Element::children($element) as $key) {
       if (!isset($element[$key]['#type'])) {
@@ -616,7 +616,7 @@ class ContentTranslationHandler implements ContentTranslationHandlerInterface, E
     // Elements which can have a #title attribute according to FAPI Reference.
     if (!isset($suffix)) {
       $suffix = ' <span class="translation-entity-all-languages">(' . $this->t('all languages') . ')</span>';
-      $fapi_title_elements = array_flip(['checkbox', 'checkboxes', 'date', 'details', 'fieldset', 'file', 'item', 'password', 'password_confirm', 'radio', 'radios', 'select', 'text_format', 'textarea', 'textfield', 'weight']);
+      $fapi_title_elements = \array_flip(['checkbox', 'checkboxes', 'date', 'details', 'fieldset', 'file', 'item', 'password', 'password_confirm', 'radio', 'radios', 'select', 'text_format', 'textarea', 'textfield', 'weight']);
     }
 
     // Update #title attribute for all elements that are allowed to have a
@@ -661,7 +661,7 @@ class ContentTranslationHandler implements ContentTranslationHandlerInterface, E
     $metadata = $this->manager->getTranslationMetadata($entity);
     $metadata->setAuthor(!empty($values['uid']) ? User::load($values['uid']) : User::load(0));
     $metadata->setPublished(!empty($values['status']));
-    $metadata->setCreatedTime(!empty($values['created']) ? strtotime($values['created']) : $this->time->getRequestTime());
+    $metadata->setCreatedTime(!empty($values['created']) ? \strtotime($values['created']) : $this->time->getRequestTime());
 
     $metadata->setOutdated(!empty($values['outdated']));
     if (!empty($values['retranslate'])) {
@@ -682,7 +682,7 @@ class ContentTranslationHandler implements ContentTranslationHandlerInterface, E
         $form_state->setErrorByName('content_translation][uid', $this->t('The translation authoring username %name does not exist.', ['%name' => $account->getAccountName()]));
       }
       // Validate the "authored on" field.
-      if (!empty($translation['created']) && strtotime($translation['created']) === FALSE) {
+      if (!empty($translation['created']) && \strtotime($translation['created']) === FALSE) {
         $form_state->setErrorByName('content_translation][created', $this->t('You have to specify a valid translation authoring date.'));
       }
     }
@@ -740,7 +740,7 @@ class ContentTranslationHandler implements ContentTranslationHandlerInterface, E
   public function entityFormDelete($form, FormStateInterface $form_state) {
     $form_object = $form_state->getFormObject();
     $entity = $form_object->getEntity();
-    if (count($entity->getTranslationLanguages()) > 1) {
+    if (\count($entity->getTranslationLanguages()) > 1) {
       $this->messenger->addWarning($this->t('This will delete all the translations of %label.', ['%label' => $entity->label() ?? $entity->id()]));
     }
   }

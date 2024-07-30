@@ -165,7 +165,7 @@ class RenderCacheIntegrationTest extends ViewsKernelTestBase {
       $this->setRawContent($build['#markup']);
 
       $result = $this->cssSelect('div.views-row');
-      $count = count($result);
+      $count = \count($result);
       $this->assertEquals(1, $count);
 
       $this->assertEquals((string) $entity->id(), (string) $result[0]->div->span);

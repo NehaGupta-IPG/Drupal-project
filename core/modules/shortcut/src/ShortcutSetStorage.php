@@ -153,7 +153,7 @@ class ShortcutSetStorage extends ConfigEntityStorage implements ShortcutSetStora
     // have one, we allow the last module which returns a valid result to take
     // precedence. If no module returns a valid set, fall back on the site-wide
     // default, which is the lowest-numbered shortcut set.
-    $suggestions = array_reverse($this->moduleHandler->invokeAll('shortcut_default_set', [$account]));
+    $suggestions = \array_reverse($this->moduleHandler->invokeAll('shortcut_default_set', [$account]));
     $suggestions[] = 'default';
     $shortcut_set = NULL;
     foreach ($suggestions as $name) {

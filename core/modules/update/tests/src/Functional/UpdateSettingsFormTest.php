@@ -67,7 +67,7 @@ class UpdateSettingsFormTest extends BrowserTestBase {
     $this->assertSame([], $this->config('update.settings')->get('notification.emails'));
 
     // Next, set an invalid email addresses, but make sure it's second entry.
-    $this->assertSession()->fieldExists('update_notify_emails')->setValue(implode("\n", array_slice($values_to_enter, 1, 2)));
+    $this->assertSession()->fieldExists('update_notify_emails')->setValue(\implode("\n", \array_slice($values_to_enter, 1, 2)));
     $this->submitForm([], 'Save configuration');
     $this->assertSession()->statusMessageNotExists(MessengerInterface::TYPE_STATUS);
     $this->assertSession()->statusMessageNotExists(MessengerInterface::TYPE_WARNING);
@@ -77,7 +77,7 @@ class UpdateSettingsFormTest extends BrowserTestBase {
 
     // Next, set multiple invalid email addresses, and assert the same as above
     // except the message should be adjusted now.
-    $this->assertSession()->fieldExists('update_notify_emails')->setValue(implode("\n", $values_to_enter));
+    $this->assertSession()->fieldExists('update_notify_emails')->setValue(\implode("\n", $values_to_enter));
     $this->submitForm([], 'Save configuration');
     $this->assertSession()->statusMessageNotExists(MessengerInterface::TYPE_STATUS);
     $this->assertSession()->statusMessageNotExists(MessengerInterface::TYPE_WARNING);

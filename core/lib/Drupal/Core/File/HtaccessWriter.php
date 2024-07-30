@@ -88,7 +88,7 @@ class HtaccessWriter implements HtaccessWriterInterface {
       $directory = $this->streamWrapperManager->normalizeUri($directory);
     }
     else {
-      $directory = rtrim($directory, '/\\');
+      $directory = \rtrim($directory, '/\\');
     }
 
     if (FileSecurity::writeHtaccess($directory, $deny_public_access, $force_overwrite)) {

@@ -63,14 +63,14 @@ class EntityTypedDataDefinitionTest extends KernelTestBase {
     $this->assertInstanceOf(ComplexDataDefinitionInterface::class, $field_item_definition);
 
     // Derive metadata about field item properties.
-    $this->assertEquals(['value'], array_keys($field_item_definition->getPropertyDefinitions()));
+    $this->assertEquals(['value'], \array_keys($field_item_definition->getPropertyDefinitions()));
     $this->assertEquals('integer', $field_item_definition->getPropertyDefinition('value')->getDataType());
     $this->assertEquals('value', $field_item_definition->getMainPropertyName());
     $this->assertNull($field_item_definition->getPropertyDefinition('invalid'));
 
     // Test accessing field item property metadata via the field definition.
     $this->assertInstanceOf(FieldDefinitionInterface::class, $field_definition);
-    $this->assertEquals(['value'], array_keys($field_definition->getPropertyDefinitions()));
+    $this->assertEquals(['value'], \array_keys($field_definition->getPropertyDefinitions()));
     $this->assertEquals('integer', $field_definition->getPropertyDefinition('value')->getDataType());
     $this->assertEquals('value', $field_definition->getMainPropertyName());
     $this->assertNull($field_definition->getPropertyDefinition('invalid'));
@@ -81,12 +81,12 @@ class EntityTypedDataDefinitionTest extends KernelTestBase {
     $this->assertInstanceOf(ComplexDataDefinitionInterface::class, $field_item);
     // Comparison should ignore the internal static cache, so compare the
     // serialized objects instead.
-    $this->assertEquals(serialize($field_item_definition), serialize($field_item));
+    $this->assertEquals(\serialize($field_item_definition), \serialize($field_item));
 
     $field_definition2 = $this->typedDataManager->createListDataDefinition('field_item:integer');
     $this->assertInstanceOf(ListDataDefinitionInterface::class, $field_definition2);
     $this->assertNotInstanceOf(ComplexDataDefinitionInterface::class, $field_definition2);
-    $this->assertEquals(serialize($field_definition), serialize($field_definition2));
+    $this->assertEquals(\serialize($field_definition), \serialize($field_definition2));
   }
 
   /**
@@ -121,7 +121,7 @@ class EntityTypedDataDefinitionTest extends KernelTestBase {
     $entity_definition2 = $this->typedDataManager->createDataDefinition('entity:entity_test_with_bundle');
     $this->assertNotInstanceOf(ListDataDefinitionInterface::class, $entity_definition2);
     $this->assertInstanceOf(ComplexDataDefinitionInterface::class, $entity_definition2);
-    $this->assertEquals(serialize($entity_definition), serialize($entity_definition2));
+    $this->assertEquals(\serialize($entity_definition), \serialize($entity_definition2));
 
     // Test that the definition factory creates the right definitions for all
     // entity data types variants.
@@ -147,7 +147,7 @@ class EntityTypedDataDefinitionTest extends KernelTestBase {
     // Test that the definition factory creates the right definition object.
     $reference_definition2 = $this->typedDataManager->createDataDefinition('entity_reference');
     $this->assertInstanceOf(DataReferenceDefinitionInterface::class, $reference_definition2);
-    $this->assertEquals(serialize($reference_definition), serialize($reference_definition2));
+    $this->assertEquals(\serialize($reference_definition), \serialize($reference_definition2));
   }
 
   /**

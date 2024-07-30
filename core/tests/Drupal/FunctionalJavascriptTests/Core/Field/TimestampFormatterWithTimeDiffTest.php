@@ -102,8 +102,8 @@ class TimestampFormatterWithTimeDiffTest extends WebDriverTestBase {
       $from = \DateTime::createFromFormat(\DateTimeInterface::RFC3339, $case['from'])->getTimestamp();
       $to = \DateTime::createFromFormat(\DateTimeInterface::RFC3339, $case['to'])->getTimestamp();
       $diff = $to - $from;
-      $options = json_encode($case['options']);
-      $expected_value = json_encode($case['expected_value']);
+      $options = \json_encode($case['options']);
+      $expected_value = \json_encode($case['expected_value']);
       $expected_formatted_value = $case['expected_formatted_value'];
 
       // Test the returned value.
@@ -116,7 +116,7 @@ class TimestampFormatterWithTimeDiffTest extends WebDriverTestBase {
     // provider mechanism here in order to avoid reinstalling the site for each
     // case.
     foreach ($this->getRefreshIntervalTestCases() as $case) {
-      $interval = json_encode($case['time_diff']);
+      $interval = \json_encode($case['time_diff']);
       $this->assertJsCondition("Drupal.timeDiff.refreshInterval($interval, {$case['configured_refresh_interval']}, {$case['granularity']}) === {$case['computed_refresh_interval']}");
     }
 
@@ -124,20 +124,20 @@ class TimestampFormatterWithTimeDiffTest extends WebDriverTestBase {
     $time_element = $this->getSession()->getPage()->find('css', 'time');
 
     $time_diff = $time_element->getText();
-    [$seconds_value] = explode(' ', $time_diff, 2);
+    [$seconds_value] = \explode(' ', $time_diff, 2);
 
     // Wait up to 2 seconds to make sure that the last time difference value
     // has been refreshed.
     $this->assertJsCondition("document.getElementsByTagName('time')[0].textContent != '$time_diff'", 2000);
     $time_diff = $time_element->getText();
-    [$new_seconds_value] = explode(' ', $time_diff, 2);
+    [$new_seconds_value] = \explode(' ', $time_diff, 2);
     $this->assertGreaterThan($seconds_value, $new_seconds_value);
 
     // Once again.
     $this->assertJsCondition("document.getElementsByTagName('time')[0].textContent != '$time_diff'", 2000);
     $time_diff = $time_element->getText();
     $seconds_value = $new_seconds_value;
-    [$new_seconds_value] = explode(' ', $time_diff, 2);
+    [$new_seconds_value] = \explode(' ', $time_diff, 2);
     $this->assertGreaterThan($seconds_value, $new_seconds_value);
   }
 

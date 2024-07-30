@@ -23,7 +23,7 @@ class Element {
    *   TRUE of the key is a property, FALSE otherwise.
    */
   public static function property($key) {
-    return is_string($key) && $key[0] == '#';
+    return \is_string($key) && $key[0] == '#';
   }
 
   /**
@@ -36,7 +36,7 @@ class Element {
    *   An array of property keys for the element.
    */
   public static function properties(array $element) {
-    return array_filter(array_keys($element), [static::class, 'property']);
+    return \array_filter(\array_keys($element), [static::class, 'property']);
   }
 
   /**
@@ -73,13 +73,13 @@ class Element {
     $sort = isset($elements['#sorted']) ? !$elements['#sorted'] : $sort;
 
     // Filter out properties from the element, leaving only children.
-    $count = count($elements);
+    $count = \count($elements);
     $child_weights = [];
     $i = 0;
     $sortable = FALSE;
     foreach ($elements as $key => $value) {
-      if (is_int($key) || $key === '' || $key[0] !== '#') {
-        if (is_array($value)) {
+      if (\is_int($key) || $key === '' || $key[0] !== '#') {
+        if (\is_array($value)) {
           if (isset($value['#weight'])) {
             $weight = $value['#weight'];
             $sortable = TRUE;
@@ -89,12 +89,12 @@ class Element {
           }
           // Supports weight with up to three digit precision and conserve
           // the insertion order.
-          $child_weights[$key] = floor($weight * 1000) + $i / $count;
+          $child_weights[$key] = \floor($weight * 1000) + $i / $count;
         }
         // Only trigger an exception if the value is not null.
         // @see https://www.drupal.org/node/1283892
         elseif (isset($value)) {
-          throw new \InvalidArgumentException(sprintf('"%s" is an invalid render array key. Value should be an array but got a %s.', $key, gettype($value)));
+          throw new \InvalidArgumentException(\sprintf('"%s" is an invalid render array key. Value should be an array but got a %s.', $key, \gettype($value)));
         }
       }
       $i++;
@@ -102,7 +102,7 @@ class Element {
 
     // Sort the children if necessary.
     if ($sort && $sortable) {
-      asort($child_weights);
+      \asort($child_weights);
       // Put the sorted children back into $elements in the correct order, to
       // preserve sorting if the same element is passed through
       // \Drupal\Core\Render\Element::children() twice.
@@ -114,7 +114,7 @@ class Element {
       $elements['#sorted'] = TRUE;
     }
 
-    return array_keys($child_weights);
+    return \array_keys($child_weights);
   }
 
   /**
@@ -140,7 +140,7 @@ class Element {
       $visible_children[$key] = $child;
     }
 
-    return array_keys($visible_children);
+    return \array_keys($visible_children);
   }
 
   /**
@@ -153,7 +153,7 @@ class Element {
    *   TRUE if the element is visible, otherwise FALSE.
    */
   public static function isVisibleElement($element) {
-    return (!isset($element['#type']) || !in_array($element['#type'], ['value', 'hidden', 'token']))
+    return (!isset($element['#type']) || !\in_array($element['#type'], ['value', 'hidden', 'token']))
       && (!isset($element['#access'])
       || (($element['#access'] instanceof AccessResultInterface && $element['#access']->isAllowed()) || ($element['#access'] === TRUE)));
   }
@@ -173,7 +173,7 @@ class Element {
   public static function setAttributes(array &$element, array $map) {
     foreach ($map as $property => $attribute) {
       // If the key is numeric, the attribute name needs to be taken over.
-      if (is_int($property)) {
+      if (\is_int($property)) {
         $property = '#' . $attribute;
       }
       // Do not overwrite already existing attributes.
@@ -209,17 +209,17 @@ class Element {
    *   TRUE if it's a render array. FALSE otherwise.
    */
   public static function isRenderArray($candidate): bool {
-    if (!is_array($candidate)) {
+    if (!\is_array($candidate)) {
       return FALSE;
     }
     if (empty($candidate)) {
       return FALSE;
     }
     foreach ($candidate as $key => $value) {
-      if (!is_int($key) && $key !== '' && $key[0] === '#') {
+      if (!\is_int($key) && $key !== '' && $key[0] === '#') {
         continue;
       }
-      if (!is_array($value)) {
+      if (!\is_array($value)) {
         return FALSE;
       }
       if (!static::isRenderArray($value)) {

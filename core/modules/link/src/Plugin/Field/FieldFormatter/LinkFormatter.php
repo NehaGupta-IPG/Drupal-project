@@ -202,7 +202,7 @@ class LinkFormatter extends FormatterBase {
           // Piggyback on the metadata attributes, which will be placed in the
           // field template wrapper, and set the URL value in a content
           // attribute.
-          $content = str_replace('internal:/', '', $item->uri);
+          $content = \str_replace('internal:/', '', $item->uri);
           $item->_attributes += ['content' => $content];
         }
       }

@@ -34,22 +34,22 @@ class PrimitiveTypeConstraintValidator extends ConstraintValidator {
 
     $typed_data = $this->getTypedData();
     $valid = TRUE;
-    if ($typed_data instanceof BinaryInterface && !is_resource($value)) {
+    if ($typed_data instanceof BinaryInterface && !\is_resource($value)) {
       $valid = FALSE;
     }
-    if ($typed_data instanceof BooleanInterface && !(is_bool($value) || $value === 0 || $value === '0' || $value === 1 || $value == '1')) {
+    if ($typed_data instanceof BooleanInterface && !(\is_bool($value) || $value === 0 || $value === '0' || $value === 1 || $value == '1')) {
       $valid = FALSE;
     }
-    if ($typed_data instanceof FloatInterface && filter_var($value, FILTER_VALIDATE_FLOAT) === FALSE) {
+    if ($typed_data instanceof FloatInterface && \filter_var($value, FILTER_VALIDATE_FLOAT) === FALSE) {
       $valid = FALSE;
     }
-    if ($typed_data instanceof IntegerInterface && filter_var($value, FILTER_VALIDATE_INT) === FALSE) {
+    if ($typed_data instanceof IntegerInterface && \filter_var($value, FILTER_VALIDATE_INT) === FALSE) {
       $valid = FALSE;
     }
-    if ($typed_data instanceof DecimalInterface && !preg_match('/^[+-]?((\d+(\.\d*)?)|(\.\d+))$/i', $value)) {
+    if ($typed_data instanceof DecimalInterface && !\preg_match('/^[+-]?((\d+(\.\d*)?)|(\.\d+))$/i', $value)) {
       $valid = FALSE;
     }
-    if ($typed_data instanceof StringInterface && !is_scalar($value) && !($value instanceof MarkupInterface)) {
+    if ($typed_data instanceof StringInterface && !\is_scalar($value) && !($value instanceof MarkupInterface)) {
       $valid = FALSE;
     }
     // Ensure that URIs comply with http://tools.ietf.org/html/rfc3986, which
@@ -57,7 +57,7 @@ class PrimitiveTypeConstraintValidator extends ConstraintValidator {
     // - That it is well formed (parse_url() returns FALSE if not).
     // - That it contains a scheme (parse_url(, PHP_URL_SCHEME) returns NULL if
     //   not).
-    if ($typed_data instanceof UriInterface && in_array(parse_url($value, PHP_URL_SCHEME), [NULL, FALSE], TRUE)) {
+    if ($typed_data instanceof UriInterface && \in_array(\parse_url($value, PHP_URL_SCHEME), [NULL, FALSE], TRUE)) {
       $valid = FALSE;
     }
     // @todo Move those to separate constraint validators.
@@ -77,7 +77,7 @@ class PrimitiveTypeConstraintValidator extends ConstraintValidator {
     if (!$valid) {
       // @todo Provide a good violation message for each problem.
       $this->context->addViolation($constraint->message, [
-        '%value' => is_object($value) ? get_class($value) : (is_array($value) ? 'Array' : (string) $value),
+        '%value' => \is_object($value) ? \get_class($value) : (\is_array($value) ? 'Array' : (string) $value),
       ]);
     }
   }

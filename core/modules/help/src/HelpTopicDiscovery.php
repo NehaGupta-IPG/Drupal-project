@@ -86,7 +86,7 @@ class HelpTopicDiscovery implements DiscoveryInterface {
     $file_cache = FileCacheFactory::get('help_topic_discovery:help_topics');
 
     // Try to load from the file cache first.
-    foreach ($file_cache->getMultiple(array_keys($files)) as $file => $data) {
+    foreach ($file_cache->getMultiple(\array_keys($files)) as $file => $data) {
       $all[$files[$file]][$data['id']] = $data;
       unset($files[$file]);
     }
@@ -95,9 +95,9 @@ class HelpTopicDiscovery implements DiscoveryInterface {
     // parse them now. This list was flipped above and is keyed by filename.
     if ($files) {
       foreach ($files as $file => $provider) {
-        $plugin_id = substr(basename($file), 0, -10);
+        $plugin_id = \substr(\basename($file), 0, -10);
         // The plugin ID begins with provider.
-        [$file_name_provider] = explode('.', $plugin_id, 2);
+        [$file_name_provider] = \explode('.', $plugin_id, 2);
         $data = [
           // The plugin ID is derived from the filename. The extension
           // '.html.twig' is removed.
@@ -110,22 +110,22 @@ class HelpTopicDiscovery implements DiscoveryInterface {
         // Get the rest of the plugin definition from front matter contained in
         // the help topic Twig file.
         try {
-          $front_matter = FrontMatter::create(file_get_contents($file), Yaml::class)->getData();
+          $front_matter = FrontMatter::create(\file_get_contents($file), Yaml::class)->getData();
         }
         catch (InvalidDataTypeException $e) {
-          throw new DiscoveryException(sprintf('Malformed YAML in help topic "%s": %s.', $file, $e->getMessage()));
+          throw new DiscoveryException(\sprintf('Malformed YAML in help topic "%s": %s.', $file, $e->getMessage()));
         }
         foreach ($front_matter as $key => $value) {
           switch ($key) {
             case 'related':
-              if (!is_array($value)) {
+              if (!\is_array($value)) {
                 throw new DiscoveryException("$file contains invalid value for 'related' key, the value must be an array of strings");
               }
               $data[$key] = $value;
               break;
 
             case 'top_level':
-              if (!is_bool($value)) {
+              if (!\is_bool($value)) {
                 throw new DiscoveryException("$file contains invalid value for 'top_level' key, the value must be a Boolean");
               }
               $data[$key] = $value;
@@ -163,7 +163,7 @@ class HelpTopicDiscovery implements DiscoveryInterface {
     foreach ($this->directories as $provider => $directories) {
       $directories = (array) $directories;
       foreach ($directories as $directory) {
-        if (is_dir($directory)) {
+        if (\is_dir($directory)) {
           /** @var \SplFileInfo $fileInfo */
           $iterator = new RegexDirectoryIterator($directory, '/\.html\.twig$/i');
           foreach ($iterator as $fileInfo) {

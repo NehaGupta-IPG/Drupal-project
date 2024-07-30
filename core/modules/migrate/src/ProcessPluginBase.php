@@ -43,13 +43,13 @@ abstract class ProcessPluginBase extends PluginBase implements MigrateProcessInt
   public function transform($value, MigrateExecutableInterface $migrate_executable, Row $row, $destination_property) {
     // Do not call this method from children.
     if (isset($this->configuration['method'])) {
-      if (method_exists($this, $this->configuration['method'])) {
+      if (\method_exists($this, $this->configuration['method'])) {
         return $this->{$this->configuration['method']}($value, $migrate_executable, $row, $destination_property);
       }
-      throw new \BadMethodCallException(sprintf('The %s method does not exist in the %s plugin.', $this->configuration['method'], $this->pluginId));
+      throw new \BadMethodCallException(\sprintf('The %s method does not exist in the %s plugin.', $this->configuration['method'], $this->pluginId));
     }
     else {
-      throw new \BadMethodCallException(sprintf('The "method" key in the plugin configuration must to be set for the %s plugin.', $this->pluginId));
+      throw new \BadMethodCallException(\sprintf('The "method" key in the plugin configuration must to be set for the %s plugin.', $this->pluginId));
     }
   }
 

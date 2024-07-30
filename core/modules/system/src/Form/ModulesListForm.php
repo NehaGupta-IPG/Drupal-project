@@ -144,7 +144,7 @@ class ModulesListForm extends FormBase {
    */
   public function buildForm(array $form, FormStateInterface $form_state) {
     require_once DRUPAL_ROOT . '/core/includes/install.inc';
-    $distribution = drupal_install_profile_distribution_name();
+    $distribution = \drupal_install_profile_distribution_name();
 
     $form['filters'] = [
       '#type' => 'container',
@@ -174,10 +174,10 @@ class ModulesListForm extends FormBase {
       $modules = $this->moduleExtensionList->reset()->getList();
 
       // Remove obsolete modules.
-      $modules = array_filter($modules, function ($module) {
+      $modules = \array_filter($modules, function ($module) {
         return !$module->isObsolete();
       });
-      uasort($modules, [ModuleExtensionList::class, 'sortByName']);
+      \uasort($modules, [ModuleExtensionList::class, 'sortByName']);
     }
     catch (InfoParserException $e) {
       $this->messenger()->addError($this->t('Modules could not be listed due to an error: %error', ['%error' => $e->getMessage()]));
@@ -223,7 +223,7 @@ class ModulesListForm extends FormBase {
     }
 
     // Lastly, sort all packages by title.
-    uasort($form['modules'], ['\Drupal\Component\Utility\SortArray', 'sortByTitleProperty']);
+    \uasort($form['modules'], ['\Drupal\Component\Utility\SortArray', 'sortByTitleProperty']);
 
     $form['#attached']['library'][] = 'core/drupal.tableresponsive';
     $form['#attached']['library'][] = 'system/drupal.system.modules';
@@ -259,13 +259,13 @@ class ModulesListForm extends FormBase {
     $lifecycle = $module->info[ExtensionLifecycle::LIFECYCLE_IDENTIFIER];
     $row['name']['#markup'] = $module->info['name'];
     if ($lifecycle !== ExtensionLifecycle::STABLE && !empty($module->info[ExtensionLifecycle::LIFECYCLE_LINK_IDENTIFIER])) {
-      $row['name']['#markup'] .= ' ' . Link::fromTextAndUrl('(' . $this->t('@lifecycle', ['@lifecycle' => ucfirst($lifecycle)]) . ')',
+      $row['name']['#markup'] .= ' ' . Link::fromTextAndUrl('(' . $this->t('@lifecycle', ['@lifecycle' => \ucfirst($lifecycle)]) . ')',
           Url::fromUri($module->info[ExtensionLifecycle::LIFECYCLE_LINK_IDENTIFIER], [
             'attributes' =>
               [
                 'class' => ['module-link--non-stable'],
                 'aria-label' => $this->t('View information on the @lifecycle status of the module @module', [
-                  '@lifecycle' => ucfirst($lifecycle),
+                  '@lifecycle' => \ucfirst($lifecycle),
                   '@module' => $module->info['name'],
                 ]),
               ],
@@ -354,16 +354,16 @@ class ModulesListForm extends FormBase {
     // PHP.
     if (version_compare(phpversion(), $module->info['php']) < 0) {
       $compatible = FALSE;
-      $required = $module->info['php'] . (substr_count($module->info['php'], '.') < 2 ? '.*' : '');
+      $required = $module->info['php'] . (\substr_count($module->info['php'], '.') < 2 ? '.*' : '');
       $reasons[] = $this->t('This module requires PHP version @php_required and is incompatible with PHP version @php_version.', [
         '@php_required' => $required,
-        '@php_version' => phpversion(),
+        '@php_version' => \phpversion(),
       ]);
     }
 
     // If this module is not compatible, disable the checkbox.
     if (!$compatible) {
-      $status = implode(' ', $reasons);
+      $status = \implode(' ', $reasons);
       $row['enable']['#disabled'] = TRUE;
       $row['description']['#markup'] = $status;
       $row['#attributes']['class'][] = 'incompatible';
@@ -440,7 +440,7 @@ class ModulesListForm extends FormBase {
 
     // Add all dependencies to a list.
     foreach ($modules['install'] as $module => $value) {
-      foreach (array_keys($data[$module]->requires) as $dependency) {
+      foreach (\array_keys($data[$module]->requires) as $dependency) {
         if (!isset($modules['install'][$dependency]) && !$this->moduleHandler->moduleExists($dependency)) {
           $dependency_info = $data[$dependency]->info;
           $modules['dependencies'][$module][$dependency] = $dependency_info['name'];
@@ -460,11 +460,11 @@ class ModulesListForm extends FormBase {
 
     // Invoke hook_requirements('install'). If failures are detected, make
     // sure the dependent modules aren't installed either.
-    foreach (array_keys($modules['install']) as $module) {
-      if (!drupal_check_module($module)) {
+    foreach (\array_keys($modules['install']) as $module) {
+      if (!\drupal_check_module($module)) {
         unset($modules['install'][$module]);
         unset($modules['non_stable'][$module]);
-        foreach (array_keys($data[$module]->required_by) as $dependent) {
+        foreach (\array_keys($data[$module]->required_by) as $dependent) {
           unset($modules['install'][$dependent]);
           unset($modules['dependencies'][$dependent]);
         }
@@ -500,7 +500,7 @@ class ModulesListForm extends FormBase {
     // Install the given modules.
     if (!empty($modules['install'])) {
       try {
-        $this->moduleInstaller->install(array_keys($modules['install']));
+        $this->moduleInstaller->install(\array_keys($modules['install']));
         $this->messenger()
           ->addStatus($this->modulesEnabledConfirmationMessage($modules['install']));
       }

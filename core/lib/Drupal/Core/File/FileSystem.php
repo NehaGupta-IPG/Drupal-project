@@ -72,16 +72,16 @@ class FileSystem implements FileSystemInterface {
    * {@inheritdoc}
    */
   public function moveUploadedFile($filename, $uri) {
-    $result = @move_uploaded_file($filename, $uri);
+    $result = @\move_uploaded_file($filename, $uri);
     // PHP's move_uploaded_file() does not properly support streams if
     // open_basedir is enabled so if the move failed, try finding a real path
     // and retry the move operation.
     if (!$result) {
       if ($realpath = $this->realpath($uri)) {
-        $result = move_uploaded_file($filename, $realpath);
+        $result = \move_uploaded_file($filename, $realpath);
       }
       else {
-        $result = move_uploaded_file($filename, $uri);
+        $result = \move_uploaded_file($filename, $uri);
       }
     }
 
@@ -93,7 +93,7 @@ class FileSystem implements FileSystemInterface {
    */
   public function chmod($uri, $mode = NULL) {
     if (!isset($mode)) {
-      if (is_dir($uri)) {
+      if (\is_dir($uri)) {
         $mode = $this->settings->get('file_chmod_directory', static::CHMOD_DIRECTORY);
       }
       else {
@@ -101,21 +101,21 @@ class FileSystem implements FileSystemInterface {
       }
     }
 
-    return @chmod($uri, $mode);
+    return @\chmod($uri, $mode);
   }
 
   /**
    * {@inheritdoc}
    */
   public function unlink($uri, $context = NULL) {
-    if (!$this->streamWrapperManager->isValidUri($uri) && str_starts_with(PHP_OS, 'WIN')) {
-      chmod($uri, 0600);
+    if (!$this->streamWrapperManager->isValidUri($uri) && \str_starts_with(PHP_OS, 'WIN')) {
+      \chmod($uri, 0600);
     }
     if ($context) {
-      return unlink($uri, $context);
+      return \unlink($uri, $context);
     }
     else {
-      return unlink($uri);
+      return \unlink($uri);
     }
   }
 
@@ -130,7 +130,7 @@ class FileSystem implements FileSystemInterface {
       return $wrapper->realpath();
     }
 
-    return realpath($uri);
+    return \realpath($uri);
   }
 
   /**
@@ -143,7 +143,7 @@ class FileSystem implements FileSystemInterface {
       return $this->streamWrapperManager->getViaScheme($scheme)->dirname($uri);
     }
     else {
-      return dirname($uri);
+      return \dirname($uri);
     }
   }
 
@@ -162,13 +162,13 @@ class FileSystem implements FileSystemInterface {
       $separators .= DIRECTORY_SEPARATOR;
     }
     // Remove right-most slashes when $uri points to directory.
-    $uri = rtrim($uri, $separators);
+    $uri = \rtrim($uri, $separators);
     // Returns the trailing part of the $uri starting after one of the directory
     // separators.
-    $filename = preg_match('@[^' . preg_quote($separators, '@') . ']+$@', $uri, $matches) ? $matches[0] : '';
+    $filename = \preg_match('@[^' . \preg_quote($separators, '@') . ']+$@', $uri, $matches) ? $matches[0] : '';
     // Cuts off a suffix from the filename.
     if ($suffix) {
-      $filename = preg_replace('@' . preg_quote($suffix, '@') . '$@', '', $filename);
+      $filename = \preg_replace('@' . \preg_quote($suffix, '@') . '$@', '', $filename);
     }
     return $filename;
   }
@@ -193,34 +193,34 @@ class FileSystem implements FileSystemInterface {
       // Ensure the path is using DIRECTORY_SEPARATOR, and trim off any trailing
       // slashes because they can throw off the loop when creating the parent
       // directories.
-      $uri = rtrim(str_replace('/', DIRECTORY_SEPARATOR, $uri), DIRECTORY_SEPARATOR);
+      $uri = \rtrim(\str_replace('/', DIRECTORY_SEPARATOR, $uri), DIRECTORY_SEPARATOR);
       // Determine the components of the path.
-      $components = explode(DIRECTORY_SEPARATOR, $uri);
+      $components = \explode(DIRECTORY_SEPARATOR, $uri);
       // If the filepath is absolute the first component will be empty as there
       // will be nothing before the first slash.
       if ($components[0] == '') {
         $recursive_path = DIRECTORY_SEPARATOR;
         // Get rid of the empty first component.
-        array_shift($components);
+        \array_shift($components);
       }
       else {
         $recursive_path = '';
       }
       // Don't handle the top-level directory in this loop.
-      array_pop($components);
+      \array_pop($components);
       // Create each component if necessary.
       foreach ($components as $component) {
         $recursive_path .= $component;
 
-        if (!file_exists($recursive_path)) {
+        if (!\file_exists($recursive_path)) {
           $success = $this->mkdirCall($recursive_path, $mode, FALSE, $context);
           // If the operation failed, check again if the directory was created
           // by another process/server, only report a failure if not.
-          if (!$success && !file_exists($recursive_path)) {
+          if (!$success && !\file_exists($recursive_path)) {
             return FALSE;
           }
           // Not necessary to use self::chmod() as there is no scheme.
-          if (!chmod($recursive_path, $mode)) {
+          if (!\chmod($recursive_path, $mode)) {
             return FALSE;
           }
         }
@@ -235,7 +235,7 @@ class FileSystem implements FileSystemInterface {
       return FALSE;
     }
     // Not necessary to use self::chmod() as there is no scheme.
-    return chmod($uri, $mode);
+    return \chmod($uri, $mode);
   }
 
   /**
@@ -244,11 +244,11 @@ class FileSystem implements FileSystemInterface {
    * @see self::mkdir()
    */
   protected function mkdirCall($uri, $mode, $recursive, $context) {
-    if (is_null($context)) {
-      return mkdir($uri, $mode, $recursive);
+    if (\is_null($context)) {
+      return \mkdir($uri, $mode, $recursive);
     }
     else {
-      return mkdir($uri, $mode, $recursive, $context);
+      return \mkdir($uri, $mode, $recursive, $context);
     }
   }
 
@@ -256,14 +256,14 @@ class FileSystem implements FileSystemInterface {
    * {@inheritdoc}
    */
   public function rmdir($uri, $context = NULL) {
-    if (!$this->streamWrapperManager->isValidUri($uri) && str_starts_with(PHP_OS, 'WIN')) {
-      chmod($uri, 0700);
+    if (!$this->streamWrapperManager->isValidUri($uri) && \str_starts_with(PHP_OS, 'WIN')) {
+      \chmod($uri, 0700);
     }
     if ($context) {
-      return rmdir($uri, $context);
+      return \rmdir($uri, $context);
     }
     else {
-      return rmdir($uri);
+      return \rmdir($uri);
     }
   }
 
@@ -285,7 +285,7 @@ class FileSystem implements FileSystemInterface {
     }
     else {
       // Handle as a normal tempnam() call.
-      return tempnam($directory, $prefix);
+      return \tempnam($directory, $prefix);
     }
   }
 
@@ -299,12 +299,12 @@ class FileSystem implements FileSystemInterface {
     }
     $this->prepareDestination($source, $destination, $fileExists);
 
-    if (!@copy($source, $destination)) {
+    if (!@\copy($source, $destination)) {
       // If the copy failed and realpaths exist, retry the operation using them
       // instead.
       $real_source = $this->realpath($source) ?: $source;
       $real_destination = $this->realpath($destination) ?: $destination;
-      if ($real_source === FALSE || $real_destination === FALSE || !@copy($real_source, $real_destination)) {
+      if ($real_source === FALSE || $real_destination === FALSE || !@\copy($real_source, $real_destination)) {
         throw new FileWriteException("The specified file '$source' could not be copied to '$destination'.");
       }
     }
@@ -333,13 +333,13 @@ class FileSystem implements FileSystemInterface {
       return TRUE;
     }
 
-    if (is_dir($path)) {
+    if (\is_dir($path)) {
       throw new NotRegularFileException("Cannot delete '$path' because it is a directory. Use deleteRecursive() instead.");
     }
 
     // Return TRUE for non-existent file as the current state is the intended
     // result.
-    if (!file_exists($path)) {
+    if (!\file_exists($path)) {
       return TRUE;
     }
 
@@ -358,7 +358,7 @@ class FileSystem implements FileSystemInterface {
     }
 
     if ($callback) {
-      call_user_func($callback, $path);
+      \call_user_func($callback, $path);
     }
 
     // Allow broken links to be removed.
@@ -395,8 +395,8 @@ class FileSystem implements FileSystemInterface {
 
     // Ensure compatibility with Windows.
     // @see \Drupal\Core\File\FileSystemInterface::unlink().
-    if (!$this->streamWrapperManager->isValidUri($source) && str_starts_with(PHP_OS, 'WIN')) {
-      chmod($source, 0600);
+    if (!$this->streamWrapperManager->isValidUri($source) && \str_starts_with(PHP_OS, 'WIN')) {
+      \chmod($source, 0600);
     }
     // Attempt to resolve the URIs. This is necessary in certain
     // configurations (see above) and can also permit fast moves across local
@@ -404,15 +404,15 @@ class FileSystem implements FileSystemInterface {
     $real_source = $this->realpath($source) ?: $source;
     $real_destination = $this->realpath($destination) ?: $destination;
     // Perform the move operation.
-    if (!@rename($real_source, $real_destination)) {
+    if (!@\rename($real_source, $real_destination)) {
       // Fall back to slow copy and unlink procedure. This is necessary for
       // renames across schemes that are not local, or where rename() has not
       // been implemented. It's not necessary to use FileSystem::unlink() as the
       // Windows issue has already been resolved above.
-      if (!@copy($real_source, $real_destination)) {
+      if (!@\copy($real_source, $real_destination)) {
         throw new FileWriteException("The specified file '$source' could not be moved to '$destination'.");
       }
-      if (!@unlink($real_source)) {
+      if (!@\unlink($real_source)) {
         throw new FileException("The source file '$source' could not be unlinked after copying to '$destination'.");
       }
     }
@@ -454,7 +454,7 @@ class FileSystem implements FileSystemInterface {
     }
     $original_source = $source;
 
-    if (!file_exists($source)) {
+    if (!\file_exists($source)) {
       if (($realpath = $this->realpath($original_source)) !== FALSE) {
         throw new FileNotExistsException("File '$original_source' ('$realpath') could not be copied because it does not exist.");
       }
@@ -500,7 +500,7 @@ class FileSystem implements FileSystemInterface {
     }
     // Write the data to a temporary file.
     $temp_name = $this->tempnam('temporary://', 'file');
-    if (file_put_contents($temp_name, $data) === FALSE) {
+    if (\file_put_contents($temp_name, $data) === FALSE) {
       throw new FileWriteException("Temporary file '$temp_name' could not be created.");
     }
 
@@ -514,10 +514,10 @@ class FileSystem implements FileSystemInterface {
   public function prepareDirectory(&$directory, $options = self::MODIFY_PERMISSIONS) {
     if (!$this->streamWrapperManager->isValidUri($directory)) {
       // Only trim if we're not dealing with a stream.
-      $directory = rtrim($directory, '/\\');
+      $directory = \rtrim($directory, '/\\');
     }
 
-    if (!is_dir($directory)) {
+    if (!\is_dir($directory)) {
       if (!($options & static::CREATE_DIRECTORY)) {
         return FALSE;
       }
@@ -531,12 +531,12 @@ class FileSystem implements FileSystemInterface {
       // If the operation failed, check again if the directory was created
       // by another process/server, only report a failure if not. In this case
       // we still need to ensure the directory is writable.
-      if (!is_dir($directory)) {
+      if (!\is_dir($directory)) {
         return FALSE;
       }
     }
 
-    $writable = is_writable($directory);
+    $writable = \is_writable($directory);
     if (!$writable && ($options & static::MODIFY_PERMISSIONS)) {
       return $this->chmod($directory);
     }
@@ -554,9 +554,9 @@ class FileSystem implements FileSystemInterface {
     }
     $basename = basename($destination);
     if (!Unicode::validateUtf8($basename)) {
-      throw new FileException(sprintf("Invalid filename '%s'", $basename));
+      throw new FileException(\sprintf("Invalid filename '%s'", $basename));
     }
-    if (file_exists($destination)) {
+    if (\file_exists($destination)) {
       switch ($fileExists) {
         case FileExists::Replace:
           // Do nothing here, we want to overwrite the existing file.
@@ -582,17 +582,17 @@ class FileSystem implements FileSystemInterface {
     $original = $basename;
     // Strip control characters (ASCII value < 32). Though these are allowed in
     // some filesystems, not many applications handle them well.
-    $basename = preg_replace('/[\x00-\x1F]/u', '_', $basename);
-    if (preg_last_error() !== PREG_NO_ERROR) {
-      throw new FileException(sprintf("Invalid filename '%s'", $original));
+    $basename = \preg_replace('/[\x00-\x1F]/u', '_', $basename);
+    if (\preg_last_error() !== PREG_NO_ERROR) {
+      throw new FileException(\sprintf("Invalid filename '%s'", $original));
     }
-    if (str_starts_with(PHP_OS, 'WIN')) {
+    if (\str_starts_with(PHP_OS, 'WIN')) {
       // These characters are not allowed in Windows filenames.
-      $basename = str_replace([':', '*', '?', '"', '<', '>', '|'], '_', $basename);
+      $basename = \str_replace([':', '*', '?', '"', '<', '>', '|'], '_', $basename);
     }
 
     // A URI or path may already have a trailing slash or look like "public://".
-    if (str_ends_with($directory, '/')) {
+    if (\str_ends_with($directory, '/')) {
       $separator = '';
     }
     else {
@@ -601,12 +601,12 @@ class FileSystem implements FileSystemInterface {
 
     $destination = $directory . $separator . $basename;
 
-    if (file_exists($destination)) {
+    if (\file_exists($destination)) {
       // Destination file already exists, generate an alternative.
-      $pos = strrpos($basename, '.');
+      $pos = \strrpos($basename, '.');
       if ($pos !== FALSE) {
-        $name = substr($basename, 0, $pos);
-        $ext = substr($basename, $pos);
+        $name = \substr($basename, 0, $pos);
+        $ext = \substr($basename, $pos);
       }
       else {
         $name = $basename;
@@ -616,7 +616,7 @@ class FileSystem implements FileSystemInterface {
       $counter = 0;
       do {
         $destination = $directory . $separator . $name . '_' . $counter++ . $ext;
-      } while (file_exists($destination));
+      } while (\file_exists($destination));
     }
 
     return $destination;
@@ -643,7 +643,7 @@ class FileSystem implements FileSystemInterface {
       // will not accept a path which contains both a slash and a backslash.
       // Since the 'file_public_path' variable may have either format, we
       // sanitize everything to use slash which is supported on all platforms.
-      $temporary_directory = str_replace('\\', '/', $temporary_directory);
+      $temporary_directory = \str_replace('\\', '/', $temporary_directory);
     }
     return $temporary_directory;
   }
@@ -660,7 +660,7 @@ class FileSystem implements FileSystemInterface {
       'min_depth' => 0,
     ];
     $dir = $this->streamWrapperManager->normalizeUri($dir);
-    if (!is_dir($dir)) {
+    if (!\is_dir($dir)) {
       throw new NotRegularDirectoryException("$dir is not a directory.");
     }
     // Allow directories specified in settings.php to be ignored. You can use
@@ -669,12 +669,12 @@ class FileSystem implements FileSystemInterface {
     // directories is a performance boost.
     if (!isset($options['nomask'])) {
       $ignore_directories = $this->settings->get('file_scan_ignore_directories', []);
-      array_walk($ignore_directories, function (&$value) {
-        $value = preg_quote($value, '/');
+      \array_walk($ignore_directories, function (&$value) {
+        $value = \preg_quote($value, '/');
       });
-      $options['nomask'] = '/^' . implode('|', $ignore_directories) . '$/';
+      $options['nomask'] = '/^' . \implode('|', $ignore_directories) . '$/';
     }
-    $options['key'] = in_array($options['key'], ['uri', 'filename', 'name']) ? $options['key'] : 'uri';
+    $options['key'] = \in_array($options['key'], ['uri', 'filename', 'name']) ? $options['key'] : 'uri';
     return $this->doScanDirectory($dir, $mask, $options);
   }
 
@@ -703,26 +703,26 @@ class FileSystem implements FileSystemInterface {
     $files_in_this_directory = [];
     // Avoid warnings when opendir does not have the permissions to open a
     // directory.
-    if ($handle = @opendir($dir)) {
-      while (FALSE !== ($filename = readdir($handle))) {
+    if ($handle = @\opendir($dir)) {
+      while (FALSE !== ($filename = \readdir($handle))) {
         // Skip this file if it matches the nomask or starts with a dot.
-        if ($filename[0] != '.' && !(preg_match($options['nomask'], $filename))) {
-          if (str_ends_with($dir, '/')) {
+        if ($filename[0] != '.' && !(\preg_match($options['nomask'], $filename))) {
+          if (\str_ends_with($dir, '/')) {
             $uri = "$dir$filename";
           }
           else {
             $uri = "$dir/$filename";
           }
-          if ($options['recurse'] && is_dir($uri)) {
+          if ($options['recurse'] && \is_dir($uri)) {
             $files_in_sub_dirs[] = $this->doScanDirectory($uri, $mask, $options, $depth + 1);
           }
-          elseif ($depth >= $options['min_depth'] && preg_match($mask, $filename)) {
+          elseif ($depth >= $options['min_depth'] && \preg_match($mask, $filename)) {
             // Always use this match over anything already set with the same
             // $options['key'].
             $file = new \stdClass();
             $file->uri = $uri;
             $file->filename = $filename;
-            $file->name = pathinfo($filename, PATHINFO_FILENAME);
+            $file->name = \pathinfo($filename, PATHINFO_FILENAME);
             $key = $options['key'];
             $files_in_this_directory[$file->$key] = $file;
             if ($options['callback']) {
@@ -731,12 +731,12 @@ class FileSystem implements FileSystemInterface {
           }
         }
       }
-      closedir($handle);
+      \closedir($handle);
     }
 
     // Give priority to files in this folder by merging them after
     // any subdirectory files.
-    return array_merge(array_merge(...$files_in_sub_dirs), $files_in_this_directory);
+    return \array_merge(\array_merge(...$files_in_sub_dirs), $files_in_this_directory);
   }
 
 }

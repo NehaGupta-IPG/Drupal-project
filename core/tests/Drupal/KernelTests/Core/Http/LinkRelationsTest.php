@@ -48,9 +48,9 @@ class LinkRelationsTest extends KernelTestBase {
     $this->assertEquals('', $add_form->getNotes());
 
     // Test a couple of examples.
-    $this->assertContains('about', array_keys($link_relation_type_manager->getDefinitions()));
-    $this->assertContains('original', array_keys($link_relation_type_manager->getDefinitions()));
-    $this->assertContains('type', array_keys($link_relation_type_manager->getDefinitions()));
+    $this->assertContains('about', \array_keys($link_relation_type_manager->getDefinitions()));
+    $this->assertContains('original', \array_keys($link_relation_type_manager->getDefinitions()));
+    $this->assertContains('type', \array_keys($link_relation_type_manager->getDefinitions()));
   }
 
 }

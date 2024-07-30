@@ -103,7 +103,7 @@ class OEmbedResourceConstraintValidator extends ConstraintValidator implements C
     }
 
     // Ensure that the provider is allowed.
-    if (!in_array($provider->getName(), $source->getProviders(), TRUE)) {
+    if (!\in_array($provider->getName(), $source->getProviders(), TRUE)) {
       $this->context->addViolation($constraint->disallowedProviderMessage, [
         '@name' => $provider->getName(),
       ]);

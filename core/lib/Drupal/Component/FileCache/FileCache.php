@@ -80,11 +80,11 @@ class FileCache implements FileCacheInterface {
 
     // First load from the static cache what we can.
     foreach ($filepaths as $filepath) {
-      if (!file_exists($filepath)) {
+      if (!\file_exists($filepath)) {
         continue;
       }
 
-      $realpath = realpath($filepath);
+      $realpath = \realpath($filepath);
       // If the file exists but realpath returns nothing, it is using a stream
       // wrapper, those are not supported.
       if (empty($realpath)) {
@@ -92,7 +92,7 @@ class FileCache implements FileCacheInterface {
       }
 
       $cid = $this->prefix . ':' . $this->collection . ':' . $realpath;
-      if (isset(static::$cached[$cid]) && static::$cached[$cid]['mtime'] == filemtime($filepath)) {
+      if (isset(static::$cached[$cid]) && static::$cached[$cid]['mtime'] == \filemtime($filepath)) {
         $file_data[$filepath] = static::$cached[$cid]['data'];
       }
       else {
@@ -104,10 +104,10 @@ class FileCache implements FileCacheInterface {
 
     // If there are any cache IDs left to fetch from the cache backend.
     if ($remaining_cids && $this->cache) {
-      $cache_results = $this->cache->fetch(array_keys($remaining_cids)) ?: [];
+      $cache_results = $this->cache->fetch(\array_keys($remaining_cids)) ?: [];
       foreach ($cache_results as $cid => $cached) {
         $filepath = $remaining_cids[$cid];
-        if ($cached['mtime'] == filemtime($filepath)) {
+        if ($cached['mtime'] == \filemtime($filepath)) {
           $file_data[$cached['filepath']] = $cached['data'];
           static::$cached[$cid] = $cached;
         }
@@ -121,9 +121,9 @@ class FileCache implements FileCacheInterface {
    * {@inheritdoc}
    */
   public function set($filepath, $data) {
-    $realpath = realpath($filepath);
+    $realpath = \realpath($filepath);
     $cached = [
-      'mtime' => filemtime($filepath),
+      'mtime' => \filemtime($filepath),
       'filepath' => $filepath,
       'data' => $data,
     ];
@@ -139,7 +139,7 @@ class FileCache implements FileCacheInterface {
    * {@inheritdoc}
    */
   public function delete($filepath) {
-    $realpath = realpath($filepath);
+    $realpath = \realpath($filepath);
     $cid = $this->prefix . ':' . $this->collection . ':' . $realpath;
 
     unset(static::$cached[$cid]);

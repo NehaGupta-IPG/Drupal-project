@@ -30,7 +30,7 @@ class PluralTranslatableMarkupTest extends UnitTestCase {
 
     // Create an object to serialize and unserialize.
     $markup = new PluralTranslatableMarkup($count, 'singular @count', 'plural @count');
-    $serialized_markup = unserialize(serialize($markup));
+    $serialized_markup = \unserialize(\serialize($markup));
     $this->assertEquals($expected_text, $serialized_markup->render());
   }
 

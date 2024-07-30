@@ -63,7 +63,7 @@ class SimpleConfigValidationTest extends KernelTestBase {
     // Config hashes can only contain certain characters, and spaces aren't one
     // of them. If we replace the final character of the original hash with a
     // space, we should get an error.
-    $data['_core']['default_config_hash'] = substr($original_hash, 0, -1) . ' ';
+    $data['_core']['default_config_hash'] = \substr($original_hash, 0, -1) . ' ';
     $violations = $typed_config_manager->createFromNameAndData($config->getName(), $data)
       ->validate();
     $this->assertCount(1, $violations);
@@ -92,13 +92,13 @@ class SimpleConfigValidationTest extends KernelTestBase {
       $data["label $code_point"] = [
         'system.site',
         'name',
-        mb_chr($code_point),
+        \mb_chr($code_point),
         'Labels are not allowed to span multiple lines or contain control characters.',
       ];
       $data["text $code_point"] = [
         'system.maintenance',
         'message',
-        mb_chr($code_point),
+        \mb_chr($code_point),
         'Text is not allowed to contain control characters, only visible characters.',
       ];
     }
@@ -155,7 +155,7 @@ class SimpleConfigValidationTest extends KernelTestBase {
       $this->assertCount(0, $violations);
     }
     else {
-      $code_point = mb_ord($character);
+      $code_point = \mb_ord($character);
       $this->assertCount(1, $violations, "Character $code_point did not raise a constraint violation.");
       $this->assertSame($property, $violations[0]->getPropertyPath());
       $this->assertSame($expected_error_message, (string) $violations[0]->getMessage());

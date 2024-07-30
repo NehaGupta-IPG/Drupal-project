@@ -34,7 +34,7 @@ class ConstraintFactory extends ContainerFactory {
     }
 
     // If the plugin provides a factory method, pass the container to it.
-    if (is_subclass_of($plugin_class, ContainerFactoryPluginInterface::class)) {
+    if (\is_subclass_of($plugin_class, ContainerFactoryPluginInterface::class)) {
       return $plugin_class::create(\Drupal::getContainer(), $configuration, $plugin_id, $plugin_definition);
     }
 

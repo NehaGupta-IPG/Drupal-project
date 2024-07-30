@@ -153,7 +153,7 @@ class CommentDefaultFormatter extends FormatterBase {
       // Comments are added to the search results and search index by
       // comment_node_update_index() instead of by this formatter, so don't
       // return anything if the view mode is search_index or search_result.
-      !in_array($this->viewMode, ['search_result', 'search_index'])) {
+      !\in_array($this->viewMode, ['search_result', 'search_index'])) {
       $comment_settings = $this->getFieldSettings();
 
       // Only attempt to render comments if the entity has visible comments.
@@ -230,12 +230,12 @@ class CommentDefaultFormatter extends FormatterBase {
       '#default_value' => $this->getSetting('view_mode'),
       '#options' => $view_modes,
       // Only show the select element when there are more than one options.
-      '#access' => count($view_modes) > 1,
+      '#access' => \count($view_modes) > 1,
     ];
     $element['pager_id'] = [
       '#type' => 'select',
       '#title' => $this->t('Pager ID'),
-      '#options' => range(0, 10),
+      '#options' => \range(0, 10),
       '#default_value' => $this->getSetting('pager_id'),
       '#description' => $this->t("Unless you're experiencing problems with pagers related to this field, you should leave this at 0. If using multiple pagers on one page you may need to set this number to a higher value so as not to conflict within the ?page= array. Large values will add a lot of commas to your URLs, so avoid if possible."),
     ];

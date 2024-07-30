@@ -40,25 +40,25 @@ class ExtensionViewsFieldTest extends ViewsKernelTestBase {
 
     $this->installEntitySchema('file');
 
-    file_put_contents('public://file.png', '');
+    \file_put_contents('public://file.png', '');
     File::create([
       'uri' => 'public://file.png',
       'filename' => 'file.png',
     ])->save();
 
-    file_put_contents('public://file.tar', '');
+    \file_put_contents('public://file.tar', '');
     File::create([
       'uri' => 'public://file.tar',
       'filename' => 'file.tar',
     ])->save();
 
-    file_put_contents('public://file.tar.gz', '');
+    \file_put_contents('public://file.tar.gz', '');
     File::create([
       'uri' => 'public://file.tar.gz',
       'filename' => 'file.tar.gz',
     ])->save();
 
-    file_put_contents('public://file', '');
+    \file_put_contents('public://file', '');
     File::create([
       'uri' => 'public://file',
       'filename' => 'file',

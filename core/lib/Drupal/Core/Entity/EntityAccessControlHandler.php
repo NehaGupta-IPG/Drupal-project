@@ -96,7 +96,7 @@ class EntityAccessControlHandler extends EntityHandlerBase implements EntityAcce
     // We grant access to the entity if both of these conditions are met:
     // - No modules say to deny access.
     // - At least one module says to grant access.
-    $access = array_merge(
+    $access = \array_merge(
       $this->moduleHandler()->invokeAll('entity_access', [$entity, $operation, $account]),
       $this->moduleHandler()->invokeAll($entity->getEntityTypeId() . '_access', [$entity, $operation, $account])
     );
@@ -135,7 +135,7 @@ class EntityAccessControlHandler extends EntityHandlerBase implements EntityAcce
     }
 
     /** @var \Drupal\Core\Access\AccessResultInterface $result */
-    $result = array_shift($access);
+    $result = \array_shift($access);
     foreach ($access as $other) {
       $result = $result->orIf($other);
     }
@@ -253,7 +253,7 @@ class EntityAccessControlHandler extends EntityHandlerBase implements EntityAcce
     // We grant access to the entity if both of these conditions are met:
     // - No modules say to deny access.
     // - At least one module says to grant access.
-    $access = array_merge(
+    $access = \array_merge(
       $this->moduleHandler()->invokeAll('entity_create_access', [$account, $context, $entity_bundle]),
       $this->moduleHandler()->invokeAll($this->entityTypeId . '_create_access', [$account, $context, $entity_bundle])
     );
@@ -355,7 +355,7 @@ class EntityAccessControlHandler extends EntityHandlerBase implements EntityAcce
       }
     );
     // Our default access flag is masked under the ':default' key.
-    $grants = array_merge([':default' => $default], ...$grants);
+    $grants = \array_merge([':default' => $default], ...$grants);
 
     // Also allow modules to alter the returned grants/denies.
     $context = [

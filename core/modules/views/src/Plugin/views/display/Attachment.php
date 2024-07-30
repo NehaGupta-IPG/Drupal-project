@@ -89,12 +89,12 @@ class Attachment extends DisplayPluginBase {
       ],
     ];
 
-    $displays = array_filter($this->getOption('displays'));
-    if (count($displays) > 1) {
+    $displays = \array_filter($this->getOption('displays'));
+    if (\count($displays) > 1) {
       $attach_to = $this->t('Multiple displays');
     }
-    elseif (count($displays) == 1) {
-      $display = array_shift($displays);
+    elseif (\count($displays) == 1) {
+      $display = \array_shift($displays);
       if ($display = $this->view->storage->getDisplay($display)) {
         $attach_to = $display['display_title'];
       }
@@ -213,7 +213,7 @@ class Attachment extends DisplayPluginBase {
           '#title' => $this->t('Displays'),
           '#type' => 'checkboxes',
           '#description' => $this->t('Select which display or displays this should attach to.'),
-          '#options' => array_map('\Drupal\Component\Utility\Html::escape', $displays),
+          '#options' => \array_map('\Drupal\Component\Utility\Html::escape', $displays),
           '#default_value' => $this->getOption('displays'),
         ];
         break;
@@ -231,7 +231,7 @@ class Attachment extends DisplayPluginBase {
     $section = $form_state->get('section');
     switch ($section) {
       case 'displays':
-        $form_state->setValue($section, array_filter($form_state->getValue($section)));
+        $form_state->setValue($section, \array_filter($form_state->getValue($section)));
       case 'inherit_arguments':
       case 'inherit_pager':
       case 'render_pager':

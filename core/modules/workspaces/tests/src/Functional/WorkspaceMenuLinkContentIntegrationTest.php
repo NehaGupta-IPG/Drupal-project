@@ -78,7 +78,7 @@ class WorkspaceMenuLinkContentIntegrationTest extends BrowserTestBase {
     $menu_links = \Drupal::entityTypeManager()
       ->getStorage('menu_link_content')
       ->loadByProperties(['title' => $default_title]);
-    $menu_link = reset($menu_links);
+    $menu_link = \reset($menu_links);
 
     $pending_title = 'pending';
     $pending_link = 'http://example.com';

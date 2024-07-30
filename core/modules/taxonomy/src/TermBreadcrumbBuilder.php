@@ -71,8 +71,8 @@ class TermBreadcrumbBuilder implements BreadcrumbBuilderInterface {
     //   vocabulary or term.
     $parents = $this->entityTypeManager->getStorage('taxonomy_term')->loadAllParents($term->id());
     // Remove current term being accessed.
-    array_shift($parents);
-    foreach (array_reverse($parents) as $term) {
+    \array_shift($parents);
+    foreach (\array_reverse($parents) as $term) {
       $term = $this->entityRepository->getTranslationFromContext($term);
       $breadcrumb->addCacheableDependency($term);
       $breadcrumb->addLink(Link::createFromRoute($term->getName(), 'entity.taxonomy_term.canonical', ['taxonomy_term' => $term->id()]));

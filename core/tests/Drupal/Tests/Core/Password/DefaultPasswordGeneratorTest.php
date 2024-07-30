@@ -24,10 +24,10 @@ class DefaultPasswordGeneratorTest extends UnitTestCase {
   public function testGenerate(): void {
     $generator = new DefaultPasswordGenerator();
     $password = $generator->generate();
-    $this->assertEquals(10, strlen($password));
+    $this->assertEquals(10, \strlen($password));
 
     $password = $generator->generate(32);
-    $this->assertEquals(32, strlen($password));
+    $this->assertEquals(32, \strlen($password));
   }
 
 }

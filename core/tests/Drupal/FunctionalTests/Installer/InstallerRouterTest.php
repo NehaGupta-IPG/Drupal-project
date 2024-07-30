@@ -43,11 +43,11 @@ class InstallerRouterTest extends InstallerTestBase {
     ];
     // File API functions are not available yet.
     $path = $this->siteDirectory . '/profiles/test_profile';
-    mkdir($path, 0777, TRUE);
-    file_put_contents("$path/test_profile.info.yml", Yaml::encode($info));
+    \mkdir($path, 0777, TRUE);
+    \file_put_contents("$path/test_profile.info.yml", Yaml::encode($info));
 
     $settings_services_file = DRUPAL_ROOT . '/sites/default/default.services.yml';
-    copy($settings_services_file, $this->siteDirectory . '/services.yml');
+    \copy($settings_services_file, $this->siteDirectory . '/services.yml');
     PerformanceTestRecorder::registerService($this->siteDirectory . '/services.yml', TRUE);
   }
 

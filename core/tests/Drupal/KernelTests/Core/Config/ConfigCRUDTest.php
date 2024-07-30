@@ -218,7 +218,7 @@ class ConfigCRUDTest extends KernelTestBase {
         unset($test_characters[$i]);
       }
     }
-    $this->assertEmpty($test_characters, sprintf('Expected ConfigNameException was thrown for all invalid name characters: %s', implode(' ', $characters)));
+    $this->assertEmpty($test_characters, \sprintf('Expected ConfigNameException was thrown for all invalid name characters: %s', \implode(' ', $characters)));
 
     // Verify that a valid config object name can be saved.
     $name = 'namespace.object';
@@ -295,7 +295,7 @@ class ConfigCRUDTest extends KernelTestBase {
       'mapping_with_some_required_keys' => [],
       'mapping_with_only_optional_keys' => [],
     ];
-    $data = ['_core' => ['default_config_hash' => Crypt::hashBase64(serialize($data))]] + $data;
+    $data = ['_core' => ['default_config_hash' => Crypt::hashBase64(\serialize($data))]] + $data;
     $this->assertSame($data, $config->get());
 
     // Re-set each key using Config::set().
@@ -323,7 +323,7 @@ class ConfigCRUDTest extends KernelTestBase {
     // Test that setting an unsupported type for a config object with a schema
     // fails.
     try {
-      $config->set('stream', fopen(__FILE__, 'r'))->save();
+      $config->set('stream', \fopen(__FILE__, 'r'))->save();
       $this->fail('No Exception thrown upon saving invalid data type.');
     }
     catch (UnsupportedDataTypeConfigException) {
@@ -338,7 +338,7 @@ class ConfigCRUDTest extends KernelTestBase {
     $this->assertFalse($typed_config_manager->hasConfigSchema($config_name));
 
     try {
-      $config->set('stream', fopen(__FILE__, 'r'))->save();
+      $config->set('stream', \fopen(__FILE__, 'r'))->save();
       $this->fail('No Exception thrown upon saving invalid data type.');
     }
     catch (UnsupportedDataTypeConfigException) {

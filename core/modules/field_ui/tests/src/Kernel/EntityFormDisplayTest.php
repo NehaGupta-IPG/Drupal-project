@@ -306,7 +306,7 @@ class EntityFormDisplayTest extends KernelTestBase {
     // Remove the langcode.
     $form_display->removeComponent('langcode');
 
-    $unserialized = unserialize(serialize($form_display));
+    $unserialized = \unserialize(\serialize($form_display));
     // Verify that components are retained upon unserialization.
     $this->assertEquals($form_display->getComponents(), $unserialized->getComponents());
   }

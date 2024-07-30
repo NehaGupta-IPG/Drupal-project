@@ -37,7 +37,7 @@ class InstallerLanguageTest extends KernelTestBase {
     foreach ($expected_translation_files as $data) {
       [$langcode, $files_expected] = $data;
       $files_found = $file_translation->findTranslationFiles($langcode);
-      $this->assertSameSize($files_expected, $files_found, count($files_expected) . ' installer languages found.');
+      $this->assertSameSize($files_expected, $files_found, \count($files_expected) . ' installer languages found.');
       foreach ($files_found as $file) {
         $this->assertContains($file->filename, $files_expected, $file->filename . ' found.');
       }
@@ -59,8 +59,8 @@ class InstallerLanguageTest extends KernelTestBase {
     assert($profile_list instanceof ProfileExtensionList);
     $profile_list->setPathname('testing', 'core/profiles/tests/testing/testing.info.yml');
 
-    $info_en = install_profile_info('testing', 'en');
-    $info_nl = install_profile_info('testing', 'nl');
+    $info_en = \install_profile_info('testing', 'en');
+    $info_nl = \install_profile_info('testing', 'nl');
 
     $this->assertNotContains('locale', $info_en['install'], 'Locale is not set when installing in English.');
     $this->assertContains('locale', $info_nl['install'], 'Locale is set when installing in Dutch.');

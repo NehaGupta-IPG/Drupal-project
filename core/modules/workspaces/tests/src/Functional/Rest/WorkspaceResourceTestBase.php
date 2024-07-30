@@ -170,7 +170,7 @@ abstract class WorkspaceResourceTestBase extends EntityResourceTestBase {
    * {@inheritdoc}
    */
   protected function getNormalizedPatchEntity() {
-    return array_diff_key($this->getNormalizedPostEntity(), ['id' => TRUE]);
+    return \array_diff_key($this->getNormalizedPostEntity(), ['id' => TRUE]);
   }
 
   /**

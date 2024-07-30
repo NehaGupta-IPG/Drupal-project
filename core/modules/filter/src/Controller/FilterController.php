@@ -27,7 +27,7 @@ class FilterController {
     $build = [
       '#theme' => 'filter_tips',
       '#long' => TRUE,
-      '#tips' => _filter_tips($tips, TRUE),
+      '#tips' => \_filter_tips($tips, TRUE),
     ];
 
     return $build;

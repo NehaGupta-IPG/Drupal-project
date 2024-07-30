@@ -148,18 +148,18 @@ namespace {{ namespace }} {
 
 EOS;
 
-    $expected_methods_body = implode("\n", array_map(function ($value) {
+    $expected_methods_body = \implode("\n", \array_map(function ($value) {
       if ($value === '') {
         return $value;
       }
       return "        $value";
-    }, explode("\n", $expected_methods_body)));
+    }, \explode("\n", $expected_methods_body)));
 
-    $expected_string = str_replace('{{ proxy_class }}', $proxy_class, $expected_string);
-    $expected_string = str_replace('{{ namespace }}', $namespace, $expected_string);
-    $expected_string = str_replace('{{ class }}', $class, $expected_string);
-    $expected_string = str_replace('{{ expected_methods_body }}', $expected_methods_body, $expected_string);
-    $expected_string = str_replace('{{ interface_string }}', $interface_string, $expected_string);
+    $expected_string = \str_replace('{{ proxy_class }}', $proxy_class, $expected_string);
+    $expected_string = \str_replace('{{ namespace }}', $namespace, $expected_string);
+    $expected_string = \str_replace('{{ class }}', $class, $expected_string);
+    $expected_string = \str_replace('{{ expected_methods_body }}', $expected_methods_body, $expected_string);
+    $expected_string = \str_replace('{{ interface_string }}', $interface_string, $expected_string);
 
     return $expected_string;
   }

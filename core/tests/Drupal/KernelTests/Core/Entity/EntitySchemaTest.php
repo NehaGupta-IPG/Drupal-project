@@ -74,8 +74,8 @@ class EntitySchemaTest extends EntityKernelTestBase {
     \Drupal::service('field_storage_definition.listener')->onFieldStorageDefinitionCreate($storage_definitions['custom_bundle_field']);
     /** @var \Drupal\Core\Entity\Sql\DefaultTableMapping $table_mapping */
     $table_mapping = $this->entityTypeManager->getStorage('entity_test_update')->getTableMapping();
-    $base_table = current($table_mapping->getTableNames());
-    $base_column = current($table_mapping->getColumnNames('custom_base_field'));
+    $base_table = \current($table_mapping->getTableNames());
+    $base_column = \current($table_mapping->getColumnNames('custom_base_field'));
     $this->assertTrue($this->database->schema()->fieldExists($base_table, $base_column), 'Table column created');
     $table = $table_mapping->getDedicatedDataTableName($storage_definitions['custom_bundle_field']);
     $this->assertTrue($this->database->schema()->tableExists($table), 'Table created');
@@ -246,7 +246,7 @@ class EntitySchemaTest extends EntityKernelTestBase {
     $revision_data_table = $entity_type->getRevisionDataTable();
 
     $schema = $this->database->schema();
-    $find_primary_key_columns = new \ReflectionMethod(get_class($schema), 'findPrimaryKeyColumns');
+    $find_primary_key_columns = new \ReflectionMethod(\get_class($schema), 'findPrimaryKeyColumns');
 
     // Build up a map of primary keys depending on the entity type
     // configuration. If the field that is being removed is part of a table's
@@ -341,9 +341,9 @@ class EntitySchemaTest extends EntityKernelTestBase {
     // after uninstall we can be sure there were some to be deleted.
     $entity_type_id_count = 0;
 
-    foreach (array_keys($schema) as $storage_definition_name) {
-      [$entity_type_id] = explode('.', $storage_definition_name);
-      if (in_array($entity_type_id, $entity_type_ids)) {
+    foreach (\array_keys($schema) as $storage_definition_name) {
+      [$entity_type_id] = \explode('.', $storage_definition_name);
+      if (\in_array($entity_type_id, $entity_type_ids)) {
         $entity_type_id_count++;
       }
     }
@@ -362,9 +362,9 @@ class EntitySchemaTest extends EntityKernelTestBase {
     // the entity_test module.
     $entity_type_id_count = 0;
 
-    foreach (array_keys($schema) as $storage_definition_name) {
-      [$entity_type_id] = explode('.', $storage_definition_name);
-      if (in_array($entity_type_id, $entity_type_ids)) {
+    foreach (\array_keys($schema) as $storage_definition_name) {
+      [$entity_type_id] = \explode('.', $storage_definition_name);
+      if (\in_array($entity_type_id, $entity_type_ids)) {
         $entity_type_id_count++;
       }
     }

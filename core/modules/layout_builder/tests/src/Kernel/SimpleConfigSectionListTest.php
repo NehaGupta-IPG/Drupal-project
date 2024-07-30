@@ -33,7 +33,7 @@ class SimpleConfigSectionListTest extends SectionListTestBase {
    */
   protected function getSectionList(array $section_data) {
     $config = $this->container->get('config.factory')->getEditable('layout_builder_test.test_simple_config.foobar');
-    $section_data = array_map(function (Section $section) {
+    $section_data = \array_map(function (Section $section) {
       return $section->toArray();
     }, $section_data);
     $config->set('sections', $section_data)->save();

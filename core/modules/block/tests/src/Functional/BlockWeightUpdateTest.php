@@ -39,11 +39,11 @@ class BlockWeightUpdateTest extends UpdatePathTestBase {
       ->condition('name', 'block.block.claro_content')
       ->execute()
       ->fetchField();
-    $block = unserialize($block);
+    $block = \unserialize($block);
     $block['weight'] = NULL;
     $database->update('config')
       ->fields([
-        'data' => serialize($block),
+        'data' => \serialize($block),
       ])
       ->condition('name', 'block.block.claro_content')
       ->execute();

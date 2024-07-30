@@ -253,7 +253,7 @@ class ConfigEntityBaseUnitTest extends UnitTestCase {
     // Test sorting of dependency types.
     $method->invoke($this->entity, 'entity', 'system.action.id');
     $dependencies = $this->entity->getDependencies();
-    $this->assertEquals(['entity', 'module'], array_keys($dependencies));
+    $this->assertEquals(['entity', 'module'], \array_keys($dependencies));
   }
 
   /**
@@ -712,22 +712,22 @@ class ConfigEntityBaseUnitTest extends UnitTestCase {
 
     // Test sorting by label.
     $list = [$entity_a, $entity_b];
-    usort($list, '\Drupal\Core\Config\Entity\ConfigEntityBase::sort');
+    \usort($list, '\Drupal\Core\Config\Entity\ConfigEntityBase::sort');
     $this->assertSame($entity_b, $list[0]);
 
     $list = [$entity_b, $entity_a];
-    usort($list, '\Drupal\Core\Config\Entity\ConfigEntityBase::sort');
+    \usort($list, '\Drupal\Core\Config\Entity\ConfigEntityBase::sort');
     $this->assertSame($entity_b, $list[0]);
 
     // Test sorting by weight.
     $entity_a->weight = 0;
     $entity_b->weight = 1;
     $list = [$entity_b, $entity_a];
-    usort($list, '\Drupal\Core\Config\Entity\ConfigEntityBase::sort');
+    \usort($list, '\Drupal\Core\Config\Entity\ConfigEntityBase::sort');
     $this->assertSame($entity_a, $list[0]);
 
     $list = [$entity_a, $entity_b];
-    usort($list, '\Drupal\Core\Config\Entity\ConfigEntityBase::sort');
+    \usort($list, '\Drupal\Core\Config\Entity\ConfigEntityBase::sort');
     $this->assertSame($entity_a, $list[0]);
   }
 

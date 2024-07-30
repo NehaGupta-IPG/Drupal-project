@@ -39,13 +39,13 @@ class EntitySerializedField extends EntityTest {
     $fields = parent::baseFieldDefinitions($entity_type);
 
     $fields['serialized'] = BaseFieldDefinition::create('serialized_item_test')
-      ->setLabel(t('Serialized'));
+      ->setLabel(\t('Serialized'));
 
     $fields['serialized_text'] = BaseFieldDefinition::create('serialized_property_item_test')
-      ->setLabel(t('Serialized text'));
+      ->setLabel(\t('Serialized text'));
 
     $fields['serialized_long'] = BaseFieldDefinition::create('string_long')
-      ->setLabel(t('Serialized long string'));
+      ->setLabel(\t('Serialized long string'));
 
     return $fields;
   }

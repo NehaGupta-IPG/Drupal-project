@@ -44,7 +44,7 @@ class FileStorageTest extends ConfigStorageTestBase {
    * {@inheritdoc}
    */
   protected function read($name) {
-    $data = file_get_contents($this->storage->getFilePath($name));
+    $data = \file_get_contents($this->storage->getFilePath($name));
     return Yaml::decode($data);
   }
 
@@ -96,7 +96,7 @@ class FileStorageTest extends ConfigStorageTestBase {
     $path = $this->storage->getFilePath($name);
     $this->expectException(UnsupportedDataTypeConfigException::class);
     $this->expectExceptionMessageMatches("@Invalid data type in config $name, found in file $path: @");
-    file_put_contents($path, PHP_EOL . 'foo : @bar', FILE_APPEND);
+    \file_put_contents($path, PHP_EOL . 'foo : @bar', FILE_APPEND);
     $this->storage->read($name);
   }
 

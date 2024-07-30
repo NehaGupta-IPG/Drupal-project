@@ -60,12 +60,12 @@ class ConfigExportUITest extends BrowserTestBase {
 
     // Test if header contains file name with hostname and timestamp.
     $request = \Drupal::request();
-    $hostname = str_replace('.', '-', $request->getHttpHost());
-    $this->assertSession()->responseHeaderMatches('content-disposition', '/attachment; filename="config-' . preg_quote($hostname) . '-\d{4}-\d{2}-\d{2}-\d{2}-\d{2}\.tar\.gz"/');
+    $hostname = \str_replace('.', '-', $request->getHttpHost());
+    $this->assertSession()->responseHeaderMatches('content-disposition', '/attachment; filename="config-' . \preg_quote($hostname) . '-\d{4}-\d{2}-\d{2}-\d{2}-\d{2}\.tar\.gz"/');
 
     // Extract the archive and verify it's not empty.
     $file_system = \Drupal::service('file_system');
-    assert($file_system instanceof FileSystemInterface);
+    \assert($file_system instanceof FileSystemInterface);
     $temp_directory = $file_system->getTempDirectory();
     $file_path = $temp_directory . '/config.tar.gz';
     $archiver = new ArchiveTar($file_path);

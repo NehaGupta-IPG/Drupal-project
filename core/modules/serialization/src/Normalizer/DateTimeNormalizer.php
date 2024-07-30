@@ -87,7 +87,7 @@ class DateTimeNormalizer extends NormalizerBase implements DenormalizerInterface
   public function denormalize($data, $class, $format = NULL, array $context = []): mixed {
     // This only knows how to denormalize datetime strings and timestamps. If
     // something else is received, let validation constraints handle this.
-    if (!is_string($data) && !is_numeric($data)) {
+    if (!\is_string($data) && !\is_numeric($data)) {
       return $data;
     }
 
@@ -110,8 +110,8 @@ class DateTimeNormalizer extends NormalizerBase implements DenormalizerInterface
       $format_strings[] = "\"$format\" ($label)";
     }
 
-    $formats = implode(', ', $format_strings);
-    throw new UnexpectedValueException(sprintf('The specified date "%s" is not in an accepted format: %s.', $data, $formats));
+    $formats = \implode(', ', $format_strings);
+    throw new UnexpectedValueException(\sprintf('The specified date "%s" is not in an accepted format: %s.', $data, $formats));
   }
 
   /**

@@ -51,7 +51,7 @@ class TermNameFieldTest extends TaxonomyTestBase {
     $view->storage->invalidateCaches();
     $this->executeView($view);
 
-    $this->assertEquals(str_replace(' ', '-', $this->term1->getName()), $view->getStyle()->getField(0, 'name'));
+    $this->assertEquals(\str_replace(' ', '-', $this->term1->getName()), $view->getStyle()->getField(0, 'name'));
     $this->assertEquals($this->term2->getName(), $view->getStyle()->getField(1, 'name'));
 
     // Enable link_to_entity option and ensure that title is displayed properly.
@@ -62,7 +62,7 @@ class TermNameFieldTest extends TaxonomyTestBase {
     $view->storage->invalidateCaches();
     $this->executeView($view);
 
-    $expected_link1 = Link::fromTextAndUrl(str_replace(' ', '-', $this->term1->getName()), $this->term1->toUrl());
+    $expected_link1 = Link::fromTextAndUrl(\str_replace(' ', '-', $this->term1->getName()), $this->term1->toUrl());
     $expected_link2 = Link::fromTextAndUrl($this->term2->getName(), $this->term2->toUrl());
     $this->assertEquals($expected_link1->toString(), $view->getStyle()->getField(0, 'name'));
     $this->assertEquals($expected_link2->toString(), $view->getStyle()->getField(1, 'name'));

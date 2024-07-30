@@ -56,7 +56,7 @@ class RearrangeFilter extends ViewsFormBase {
     if ($display->defaultableSections($types[$type]['plural'])) {
       $section = $types[$type]['plural'];
       $form_state->set('section', $section);
-      views_ui_standard_display_dropdown($form, $form_state, $section);
+      \views_ui_standard_display_dropdown($form, $form_state, $section);
     }
 
     if (!empty($view->form_cache)) {
@@ -87,7 +87,7 @@ class RearrangeFilter extends ViewsFormBase {
      * ];
      */
 
-    $grouping = count(array_keys($groups['groups'])) > 1;
+    $grouping = \count(\array_keys($groups['groups'])) > 1;
 
     $form['filter_groups']['#tree'] = TRUE;
     $form['filter_groups']['operator'] = [
@@ -246,7 +246,7 @@ class RearrangeFilter extends ViewsFormBase {
     foreach ($form_state->getValue('filters') as $field => $info) {
       // Add each value that is a field with a weight to our list, but only if
       // it has had its 'removed' checkbox checked.
-      if (is_array($info) && empty($info['removed'])) {
+      if (\is_array($info) && empty($info['removed'])) {
         if (isset($info['weight'])) {
           $order[$field] = $info['weight'];
         }
@@ -262,7 +262,7 @@ class RearrangeFilter extends ViewsFormBase {
     asort($order);
 
     // Create a new list of fields in the new order.
-    foreach (array_keys($order) as $field) {
+    foreach (\array_keys($order) as $field) {
       $new_fields[$field] = $old_fields[$field];
     }
 
@@ -276,7 +276,7 @@ class RearrangeFilter extends ViewsFormBase {
       }
       else {
         // Renumber groups above the removed one down.
-        foreach (array_keys($groups['groups']) as $group_id) {
+        foreach (\array_keys($groups['groups']) as $group_id) {
           if ($group_id >= $triggering_element['#group']) {
             $old_group = $group_id + 1;
             if (isset($groups['groups'][$old_group])) {
@@ -308,12 +308,12 @@ class RearrangeFilter extends ViewsFormBase {
     else {
       // The actual update button was clicked. Remove the empty groups, and
       // renumber them sequentially.
-      ksort($remember_groups);
-      $groups['groups'] = static::arrayKeyPlus(array_values(array_intersect_key($groups['groups'], $remember_groups)));
+      \ksort($remember_groups);
+      $groups['groups'] = static::arrayKeyPlus(\array_values(\array_intersect_key($groups['groups'], $remember_groups)));
       // Change the 'group' key on each field to match. Here, $mapping is an
       // array whose keys are the old group numbers and whose values are the new
       // (sequentially numbered) ones.
-      $mapping = array_flip(static::arrayKeyPlus(array_keys($remember_groups)));
+      $mapping = \array_flip(static::arrayKeyPlus(\array_keys($remember_groups)));
       foreach ($new_fields as &$new_field) {
         $new_field['group'] = $mapping[$new_field['group']];
       }
@@ -342,16 +342,16 @@ class RearrangeFilter extends ViewsFormBase {
    *   The array with incremented keys.
    */
   public static function arrayKeyPlus($array) {
-    $keys = array_keys($array);
+    $keys = \array_keys($array);
     // Sort the keys in reverse order so incrementing them doesn't overwrite any
     // existing keys.
-    rsort($keys);
+    \rsort($keys);
     foreach ($keys as $key) {
       $array[$key + 1] = $array[$key];
       unset($array[$key]);
     }
     // Sort the keys back to ascending order.
-    ksort($array);
+    \ksort($array);
     return $array;
   }
 

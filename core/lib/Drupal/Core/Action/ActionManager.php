@@ -48,7 +48,7 @@ class ActionManager extends DefaultPluginManager implements CategorizingPluginMa
    *   An array of plugin definitions for this entity type.
    */
   public function getDefinitionsByType($type) {
-    return array_filter($this->getDefinitions(), function ($definition) use ($type) {
+    return \array_filter($this->getDefinitions(), function ($definition) use ($type) {
       return $definition['type'] === $type;
     });
   }

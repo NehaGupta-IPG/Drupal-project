@@ -141,8 +141,8 @@ class UrlGenerator implements UrlGeneratorInterface {
     // Router-based paths may have a querystring on them but Drupal paths may
     // not have one, so remove any ? and anything after it. For generate() this
     // is handled in processPath().
-    $path = preg_replace('/\?.*/', '', $path);
-    return trim($path, '/');
+    $path = \preg_replace('/\?.*/', '', $path);
+    return \trim($path, '/');
   }
 
   /**
@@ -181,8 +181,8 @@ class UrlGenerator implements UrlGeneratorInterface {
    *   not match the requirement.
    */
   protected function doGenerate(array $variables, array $defaults, array $tokens, array $parameters, array &$query_params, string $name) {
-    $variables = array_flip($variables);
-    $mergedParams = array_replace($defaults, $this->context->getParameters(), $parameters);
+    $variables = \array_flip($variables);
+    $mergedParams = \array_replace($defaults, $this->context->getParameters(), $parameters);
 
     // All params must be given.
     if ($diff = array_diff_key($variables, $mergedParams)) {
@@ -239,7 +239,7 @@ class UrlGenerator implements UrlGeneratorInterface {
     }
 
     // Add extra parameters to the query parameters.
-    $query_params += array_diff_key($parameters, $variables, $defaults);
+    $query_params += \array_diff_key($parameters, $variables, $defaults);
 
     return $url;
   }
@@ -274,7 +274,7 @@ class UrlGenerator implements UrlGeneratorInterface {
    * {@inheritdoc}
    */
   public function generate(string $name, array $parameters = [], bool|int $referenceType = self::ABSOLUTE_PATH): string {
-    $options['absolute'] = is_bool($referenceType) ? $referenceType : $referenceType === self::ABSOLUTE_URL;
+    $options['absolute'] = \is_bool($referenceType) ? $referenceType : $referenceType === self::ABSOLUTE_URL;
     return $this->generateFromRoute($name, $parameters, $options);
   }
 
@@ -283,7 +283,7 @@ class UrlGenerator implements UrlGeneratorInterface {
    */
   public function generateFromRoute(string $name, array $parameters = [], array $options = [], bool $collect_bubbleable_metadata = FALSE) {
     $options += ['prefix' => ''];
-    if (!isset($options['query']) || !is_array($options['query'])) {
+    if (!isset($options['query']) || !\is_array($options['query'])) {
       $options['query'] = [];
     }
 
@@ -295,7 +295,7 @@ class UrlGenerator implements UrlGeneratorInterface {
       $query = $options['query'] ? '?' . UrlHelper::buildQuery($options['query']) : '';
       $fragment = '';
       if (isset($options['fragment'])) {
-        if (($fragment = trim($options['fragment'])) != '') {
+        if (($fragment = \trim($options['fragment'])) != '') {
           $fragment = '#' . $fragment;
         }
       }
@@ -316,12 +316,12 @@ class UrlGenerator implements UrlGeneratorInterface {
     }
     // Ensure the resulting path has at most one leading slash, to prevent it
     // becoming an external URL without a protocol like //example.com.
-    if (str_starts_with($path, '//')) {
-      $path = '/' . ltrim($path, '/');
+    if (\str_starts_with($path, '//')) {
+      $path = '/' . \ltrim($path, '/');
     }
     // The contexts base URL is already encoded
     // (see Symfony\Component\HttpFoundation\Request).
-    $path = str_replace($this->decodedChars[0], $this->decodedChars[1], rawurlencode($path));
+    $path = \str_replace($this->decodedChars[0], $this->decodedChars[1], \rawurlencode($path));
 
     // Drupal paths rarely include dots, so skip this processing if possible.
     if (str_contains($path, '/.')) {
@@ -335,22 +335,22 @@ class UrlGenerator implements UrlGeneratorInterface {
       if (str_ends_with($path, '/..')) {
         $path = substr($path, 0, -2) . '%2E%2E';
       }
-      elseif (str_ends_with($path, '/.')) {
-        $path = substr($path, 0, -1) . '%2E';
+      elseif (\str_ends_with($path, '/.')) {
+        $path = \substr($path, 0, -1) . '%2E';
       }
     }
 
     if (!empty($options['prefix'])) {
-      $path = ltrim($path, '/');
-      $prefix = empty($path) ? rtrim($options['prefix'], '/') : $options['prefix'];
-      $path = '/' . str_replace('%2F', '/', rawurlencode($prefix)) . $path;
+      $path = \ltrim($path, '/');
+      $prefix = empty($path) ? \rtrim($options['prefix'], '/') : $options['prefix'];
+      $path = '/' . \str_replace('%2F', '/', \rawurlencode($prefix)) . $path;
     }
 
     $query = $options['query'] ? '?' . UrlHelper::buildQuery($options['query']) : '';
 
     $fragment = '';
     if (isset($options['fragment'])) {
-      if (($fragment = trim($options['fragment'])) != '') {
+      if (($fragment = \trim($options['fragment'])) != '') {
         $fragment = '#' . $fragment;
       }
     }
@@ -361,10 +361,10 @@ class UrlGenerator implements UrlGeneratorInterface {
 
       if (isset($options['https'])) {
         if ($options['https'] === TRUE) {
-          $base_url = str_replace('http://', 'https://', $base_url);
+          $base_url = \str_replace('http://', 'https://', $base_url);
         }
         elseif ($options['https'] === FALSE) {
-          $base_url = str_replace('https://', 'http://', $base_url);
+          $base_url = \str_replace('https://', 'http://', $base_url);
         }
       }
 
@@ -410,7 +410,7 @@ class UrlGenerator implements UrlGeneratorInterface {
    * Passes the path to a processor manager to allow alterations.
    */
   protected function processPath(string $path, array &$options = [], ?BubbleableMetadata $bubbleable_metadata = NULL) {
-    $actual_path = $path === '/' ? $path : rtrim($path, '/');
+    $actual_path = $path === '/' ? $path : \rtrim($path, '/');
     return $this->pathProcessor->processOutbound($actual_path, $options, $this->requestStack->getCurrentRequest(), $bubbleable_metadata);
   }
 

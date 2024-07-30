@@ -60,11 +60,11 @@ class ThemeTest extends KernelTestBase {
     $types = ['null' => NULL, 'false' => FALSE, 'integer' => 1, 'string' => 'foo', 'empty_string' => ''];
     foreach ($types as $type => $example) {
       $output = \Drupal::theme()->render('theme_test_foo', ['foo' => $example]);
-      $this->assertTrue($output instanceof MarkupInterface || is_string($output), "\Drupal::theme() returns an object that implements MarkupInterface or a string for data type $type.");
+      $this->assertTrue($output instanceof MarkupInterface || \is_string($output), "\Drupal::theme() returns an object that implements MarkupInterface or a string for data type $type.");
       if ($output instanceof MarkupInterface) {
         $this->assertSame((string) $example, $output->__toString());
       }
-      elseif (is_string($output)) {
+      elseif (\is_string($output)) {
         $this->assertSame('', $output, 'A string will be return when the theme returns an empty string.');
       }
     }
@@ -83,22 +83,22 @@ class ThemeTest extends KernelTestBase {
     // test runner fails.
     $this->config('system.site')->set('page.front', '/nobody-home')->save();
     $args = ['node', '1', 'edit'];
-    $suggestions = theme_get_suggestions($args, 'page');
+    $suggestions = \theme_get_suggestions($args, 'page');
     $this->assertEquals(['page__node', 'page__node__%', 'page__node__1', 'page__node__edit'], $suggestions, 'Found expected node edit page suggestions');
     // Check attack vectors.
     $args = ['node', '\\1'];
-    $suggestions = theme_get_suggestions($args, 'page');
+    $suggestions = \theme_get_suggestions($args, 'page');
     $this->assertEquals(['page__node', 'page__node__%', 'page__node__1'], $suggestions, 'Removed invalid \\ from suggestions');
     $args = ['node', '1/'];
-    $suggestions = theme_get_suggestions($args, 'page');
+    $suggestions = \theme_get_suggestions($args, 'page');
     $this->assertEquals(['page__node', 'page__node__%', 'page__node__1'], $suggestions, 'Removed invalid / from suggestions');
     $args = ['node', "1\0"];
-    $suggestions = theme_get_suggestions($args, 'page');
+    $suggestions = \theme_get_suggestions($args, 'page');
     $this->assertEquals(['page__node', 'page__node__%', 'page__node__1'], $suggestions, 'Removed invalid \\0 from suggestions');
     // Define path with hyphens to be used to generate suggestions.
     $args = ['node', '1', 'hyphen-path'];
     $result = ['page__node', 'page__node__%', 'page__node__1', 'page__node__hyphen_path'];
-    $suggestions = theme_get_suggestions($args, 'page');
+    $suggestions = \theme_get_suggestions($args, 'page');
     $this->assertEquals($result, $suggestions, 'Found expected page suggestions for paths containing hyphens.');
   }
 
@@ -153,7 +153,7 @@ class ThemeTest extends KernelTestBase {
    */
   public function testFindThemeTemplates(): void {
     $registry = $this->container->get('theme.registry')->get();
-    $templates = drupal_find_theme_templates($registry, '.html.twig', $this->getThemePath('test_theme'));
+    $templates = \drupal_find_theme_templates($registry, '.html.twig', $this->getThemePath('test_theme'));
     $this->assertEquals('node--1', $templates['node__1']['template'], 'Template node--1.html.twig was found in test_theme.');
   }
 

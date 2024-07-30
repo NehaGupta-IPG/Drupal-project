@@ -350,7 +350,7 @@ class ModerationLocaleTest extends ModerationStateTestBase {
     // moderation form is never displayed on revision pages.
     /** @var \Drupal\node\NodeStorageInterface $storage */
     $storage = $this->container->get('entity_type.manager')->getStorage('node');
-    foreach (range(11, 16) as $revision_id) {
+    foreach (\range(11, 16) as $revision_id) {
       /** @var \Drupal\node\NodeInterface $revision */
       $revision = $storage->loadRevision($revision_id);
       foreach (array_keys($revision->getTranslationLanguages()) as $langcode) {
@@ -566,7 +566,7 @@ class ModerationLocaleTest extends ModerationStateTestBase {
    *   A node object if a new one is being created, NULL otherwise.
    */
   protected function submitNodeForm($title, $moderation_state, $default_translation = FALSE, $langcode = 'en') {
-    $is_new = str_contains($this->getSession()->getCurrentUrl(), '/node/add/');
+    $is_new = \str_contains($this->getSession()->getCurrentUrl(), '/node/add/');
     $edit = [
       'title[0][value]' => $title,
       'moderation_state[0][state]' => $moderation_state,

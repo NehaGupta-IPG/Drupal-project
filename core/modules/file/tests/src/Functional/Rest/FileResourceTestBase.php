@@ -108,7 +108,7 @@ abstract class FileResourceTestBase extends EntityResourceTestBase {
     $file->setPermanent();
     $file->save();
 
-    file_put_contents($file->getFileUri(), 'Drupal');
+    \file_put_contents($file->getFileUri(), 'Drupal');
 
     return $file;
   }
@@ -204,7 +204,7 @@ abstract class FileResourceTestBase extends EntityResourceTestBase {
    * {@inheritdoc}
    */
   protected function getNormalizedPatchEntity() {
-    return array_diff_key($this->getNormalizedPostEntity(), ['uid' => TRUE]);
+    return \array_diff_key($this->getNormalizedPostEntity(), ['uid' => TRUE]);
   }
 
   /**

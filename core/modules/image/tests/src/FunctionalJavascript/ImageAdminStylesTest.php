@@ -66,7 +66,7 @@ class ImageAdminStylesTest extends ImageFieldTestBase {
       $this->getSession()->getPage()->pressButton('Ajax refresh');
       $this->assertTrue($page->waitFor(10, function ($page) {
         $ajax_value = $page->find('css', '#ajax-value')->getText();
-        return (bool) preg_match('/^Ajax value [0-9.]+ [0-9.]+$/', $ajax_value);
+        return (bool) \preg_match('/^Ajax value [0-9.]+ [0-9.]+$/', $ajax_value);
       }));
       $page->pressButton('Update effect');
       $assert->statusMessageContains('The image effect was successfully applied.', 'status');

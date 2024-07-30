@@ -94,8 +94,8 @@ class TranslationsTest extends WebDriverTestBase {
     ];
     // cSpell:enable
     foreach ($media_items as $translations) {
-      $default_langcode = key($translations);
-      $default_name = array_shift($translations);
+      $default_langcode = \key($translations);
+      $default_name = \array_shift($translations);
 
       $media = Media::create([
         'name' => $default_name,
@@ -136,7 +136,7 @@ class TranslationsTest extends WebDriverTestBase {
     foreach ($media_items as $media_item) {
       $media_names[] = $media_item->getText();
     }
-    sort($media_names);
+    \sort($media_names);
     // cSpell:disable-next-line
     $this->assertSame(['Ardilla', 'Eekhoorn', 'Hert', 'Tejón', 'Vos', 'Zorro'], $media_names);
 
@@ -147,7 +147,7 @@ class TranslationsTest extends WebDriverTestBase {
     foreach ($media_items as $media_item) {
       $media_names[] = $media_item->getText();
     }
-    sort($media_names);
+    \sort($media_names);
     // cSpell:disable-next-line
     $this->assertSame(['Ardilla', 'Eekhoorn', 'Hert', 'Tejón', 'Vos', 'Zorro'], $media_names);
 
@@ -162,7 +162,7 @@ class TranslationsTest extends WebDriverTestBase {
     foreach ($media_items as $media_item) {
       $media_names[] = $media_item->getText();
     }
-    sort($media_names);
+    \sort($media_names);
     // cSpell:disable-next-line
     $this->assertSame(['Eekhoorn', 'Hert', 'Tejón', 'Vos'], $media_names);
 
@@ -175,7 +175,7 @@ class TranslationsTest extends WebDriverTestBase {
     foreach ($media_items as $media_item) {
       $media_names[] = $media_item->getText();
     }
-    sort($media_names);
+    \sort($media_names);
     // cSpell:disable-next-line
     $this->assertSame(['Ardilla', 'Hert', 'Tejón', 'Zorro'], $media_names);
   }

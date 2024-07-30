@@ -33,7 +33,7 @@ class TextCustom extends TokenizeAreaPluginBase {
       '#title' => $this->t('Content'),
       '#type' => 'textarea',
       '#description' => $this->t('You may enter data from this view as per the "Available global token replacements" above. You may include the following allowed HTML tags: <code>@tags</code>', [
-        '@tags' => '<' . implode('> <', Xss::getAdminTagList()) . '>',
+        '@tags' => '<' . \implode('> <', Xss::getAdminTagList()) . '>',
       ]),
       '#default_value' => $this->options['content'],
       '#rows' => 6,

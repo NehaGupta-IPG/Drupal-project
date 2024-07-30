@@ -93,7 +93,7 @@ class MachineName extends ProcessPluginBase implements ContainerFactoryPluginInt
     $this->transliteration = $transliteration;
 
     $this->replacePattern = $this->configuration['replace_pattern'] ?? '/[^a-z0-9_]+/';
-    if (!is_string($this->replacePattern)) {
+    if (!\is_string($this->replacePattern)) {
       throw new MigrateException('The replace pattern should be a string');
     }
   }
@@ -115,9 +115,9 @@ class MachineName extends ProcessPluginBase implements ContainerFactoryPluginInt
    */
   public function transform($value, MigrateExecutableInterface $migrate_executable, Row $row, $destination_property) {
     $new_value = $this->transliteration->transliterate($value, LanguageInterface::LANGCODE_DEFAULT, '_');
-    $new_value = strtolower($new_value);
-    $new_value = preg_replace($this->replacePattern, '_', $new_value);
-    return preg_replace('/_+/', '_', $new_value);
+    $new_value = \strtolower($new_value);
+    $new_value = \preg_replace($this->replacePattern, '_', $new_value);
+    return \preg_replace('/_+/', '_', $new_value);
   }
 
 }

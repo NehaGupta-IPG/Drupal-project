@@ -130,7 +130,7 @@ abstract class PagerPluginBase extends PluginBase {
    *   the page number will be set from the global page array.
    */
   public function setCurrentPage($number = NULL) {
-    if (!is_numeric($number) || $number < 0) {
+    if (!\is_numeric($number) || $number < 0) {
       $number = 0;
     }
     $this->current_page = $number;
@@ -198,7 +198,7 @@ abstract class PagerPluginBase extends PluginBase {
       $this->total_items -= $this->options['offset'];
     }
     // Prevent from being negative.
-    $this->total_items = max(0, $this->total_items);
+    $this->total_items = \max(0, $this->total_items);
 
     return $this->total_items;
   }
@@ -253,7 +253,7 @@ abstract class PagerPluginBase extends PluginBase {
    */
   public function hasMoreRecords() {
     return $this->getItemsPerPage()
-      && $this->total_items > (intval($this->current_page) + 1) * $this->getItemsPerPage();
+      && $this->total_items > (\intval($this->current_page) + 1) * $this->getItemsPerPage();
   }
 
   /**

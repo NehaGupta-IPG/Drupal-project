@@ -98,17 +98,17 @@ class Date extends NumericFilter {
     $operators = $this->operators();
 
     if ($operators[$operator]['values'] == 1) {
-      $convert = strtotime($value['value']);
+      $convert = \strtotime($value['value']);
       if (!empty($form['value']) && ($convert == -1 || $convert === FALSE)) {
         $form_state->setError($form['value'], $this->t('Invalid date format.'));
       }
     }
     elseif ($operators[$operator]['values'] == 2) {
-      $min = strtotime($value['min']);
+      $min = \strtotime($value['min']);
       if ($min == -1 || $min === FALSE) {
         $form_state->setError($form['min'], $this->t('Invalid date format.'));
       }
-      $max = strtotime($value['max']);
+      $max = \strtotime($value['max']);
       if ($max == -1 || $max === FALSE) {
         $form_state->setError($form['max'], $this->t('Invalid date format.'));
       }
@@ -119,7 +119,7 @@ class Date extends NumericFilter {
    * {@inheritdoc}
    */
   protected function hasValidGroupedValue(array $group) {
-    if (!is_array($group['value']) || empty($group['value'])) {
+    if (!\is_array($group['value']) || empty($group['value'])) {
       return FALSE;
     }
 
@@ -129,7 +129,7 @@ class Date extends NumericFilter {
     // one greater.
     $operators = $this->operators();
     $expected = $operators[$group['operator']]['values'] + 1;
-    $actual = count(array_filter($group['value'], [static::class, 'arrayFilterZero']));
+    $actual = \count(\array_filter($group['value'], [static::class, 'arrayFilterZero']));
 
     return $actual == $expected;
   }
@@ -145,7 +145,7 @@ class Date extends NumericFilter {
     // Store this because it will get overwritten.
     $type = NULL;
     if ($this->isAGroup()) {
-      if (is_array($this->group_info)) {
+      if (\is_array($this->group_info)) {
         $type = $this->group_info['type'];
       }
     }
@@ -155,7 +155,7 @@ class Date extends NumericFilter {
     $rc = parent::acceptExposedInput($input);
 
     // Restore what got overwritten by the parent.
-    if (!is_null($type)) {
+    if (!\is_null($type)) {
       $this->value['type'] = $type;
     }
 
@@ -190,14 +190,14 @@ class Date extends NumericFilter {
    * {@inheritdoc}
    */
   protected function opBetween($field) {
-    $a = intval(strtotime($this->value['min'], 0));
-    $b = intval(strtotime($this->value['max'], 0));
+    $a = \intval(\strtotime($this->value['min'], 0));
+    $b = \intval(\strtotime($this->value['max'], 0));
 
     if ($this->value['type'] == 'offset') {
       // Keep sign.
-      $a = '***CURRENT_TIME***' . sprintf('%+d', $a);
+      $a = '***CURRENT_TIME***' . \sprintf('%+d', $a);
       // Keep sign.
-      $b = '***CURRENT_TIME***' . sprintf('%+d', $b);
+      $b = '***CURRENT_TIME***' . \sprintf('%+d', $b);
     }
     // This is safe because we are manually scrubbing the values. It is
     // necessary to do it this way because $a and $b are formulas when using an
@@ -210,10 +210,10 @@ class Date extends NumericFilter {
    * {@inheritdoc}
    */
   protected function opSimple($field) {
-    $value = intval(strtotime($this->value['value'], 0));
+    $value = \intval(\strtotime($this->value['value'], 0));
     if (!empty($this->value['type']) && $this->value['type'] == 'offset') {
       // Keep sign.
-      $value = '***CURRENT_TIME***' . sprintf('%+d', $value);
+      $value = '***CURRENT_TIME***' . \sprintf('%+d', $value);
     }
     // This is safe because we are manually scrubbing the value. It is necessary
     // to do it this way because $value is a formula when using an offset.

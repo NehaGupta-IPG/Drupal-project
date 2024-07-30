@@ -159,7 +159,7 @@ class DbUpdateController extends ControllerBase {
     require_once $this->root . '/core/includes/install.inc';
     require_once $this->root . '/core/includes/update.inc';
 
-    drupal_load_updates();
+    \drupal_load_updates();
 
     if ($request->query->get('continue')) {
       $request->getSession()->set('update_ignore_warnings', TRUE);
@@ -198,7 +198,7 @@ class DbUpdateController extends ControllerBase {
         default:
           require_once $this->root . '/core/includes/batch.inc';
           $regions['sidebar_first'] = $this->updateTasksList('run');
-          $output = _batch_page($request);
+          $output = \_batch_page($request);
           break;
       }
     }
@@ -233,7 +233,7 @@ class DbUpdateController extends ControllerBase {
 
     $info[] = $this->t("<strong>Back up your code</strong>. Hint: when backing up module code, do not leave that backup in the 'modules' or 'sites/*/modules' directories as this may confuse Drupal's auto-discovery mechanism.");
     // @todo Simplify with https://www.drupal.org/node/2548095
-    $base_url = str_replace('/update.php', '', $request->getBaseUrl());
+    $base_url = \str_replace('/update.php', '', $request->getBaseUrl());
     $info[] = $this->t('Put your site into <a href=":url">maintenance mode</a>.', [
       ':url' => Url::fromRoute('system.site_maintenance_mode')->setOption('base_url', $base_url)->toString(TRUE)->getGeneratedUrl(),
     ]);
@@ -287,7 +287,7 @@ class DbUpdateController extends ControllerBase {
     foreach (['update', 'post_update'] as $update_type) {
       switch ($update_type) {
         case 'update':
-          $updates = update_get_update_list();
+          $updates = \update_get_update_list();
           break;
 
         case 'post_update':
@@ -308,7 +308,7 @@ class DbUpdateController extends ControllerBase {
         }
         if (!empty($update['pending'])) {
           $updates_per_extension += [$extension => []];
-          $updates_per_extension[$extension] = array_merge($updates_per_extension[$extension], $update['pending']);
+          $updates_per_extension[$extension] = \array_merge($updates_per_extension[$extension], $update['pending']);
           $build['start'][$extension] = [
             '#type' => 'hidden',
             '#value' => $update['start'],
@@ -326,20 +326,20 @@ class DbUpdateController extends ControllerBase {
           }
         }
         if (isset($update['pending'])) {
-          $count = $count + count($update['pending']);
+          $count = $count + \count($update['pending']);
         }
       }
     }
 
     // Find and label any incompatible updates.
-    foreach (update_resolve_dependencies($starting_updates) as $data) {
+    foreach (\update_resolve_dependencies($starting_updates) as $data) {
       if (!$data['allowed']) {
         $incompatible_updates_exist = TRUE;
         $incompatible_count++;
         $module_update_key = $data['module'] . '_updates';
         if (isset($build['start'][$module_update_key]['#items'][$data['number']])) {
           if ($data['missing_dependencies']) {
-            $text = $this->t('This update will been skipped due to the following missing dependencies:') . '<em>' . implode(', ', $data['missing_dependencies']) . '</em>';
+            $text = $this->t('This update will been skipped due to the following missing dependencies:') . '<em>' . \implode(', ', $data['missing_dependencies']) . '</em>';
           }
           else {
             $text = $this->t("This update will be skipped due to an error in the module's code.");
@@ -365,7 +365,7 @@ class DbUpdateController extends ControllerBase {
       ];
 
       // No updates to run, so caches won't get flushed later.  Clear them now.
-      drupal_flush_all_caches();
+      \drupal_flush_all_caches();
     }
     else {
       $build['help'] = [
@@ -384,7 +384,7 @@ class DbUpdateController extends ControllerBase {
         $build['start']['#title'] = $this->formatPlural($count, '1 pending update', '@count pending updates');
       }
       // @todo Simplify with https://www.drupal.org/node/2548095
-      $base_url = str_replace('/update.php', '', $request->getBaseUrl());
+      $base_url = \str_replace('/update.php', '', $request->getBaseUrl());
       $url = (new Url('system.db_update', ['op' => 'run']))->setOption('base_url', $base_url);
       $build['link'] = [
         '#type' => 'link',
@@ -410,7 +410,7 @@ class DbUpdateController extends ControllerBase {
    */
   protected function results(Request $request) {
     // @todo Simplify with https://www.drupal.org/node/2548095
-    $base_url = str_replace('/update.php', '', $request->getBaseUrl());
+    $base_url = \str_replace('/update.php', '', $request->getBaseUrl());
 
     // Retrieve and remove session information.
     $session = $request->getSession();
@@ -434,8 +434,8 @@ class DbUpdateController extends ControllerBase {
     }
     else {
       $last = $session->get('updates_remaining');
-      $last = reset($last);
-      [$module, $version] = array_pop($last);
+      $last = \reset($last);
+      [$module, $version] = \array_pop($last);
       $message = '<p class="error">' . $this->t('The update process was aborted prematurely while running <strong>update #@version in @module.module</strong>.', [
         '@version' => $version,
         '@module' => $module,
@@ -489,11 +489,11 @@ class DbUpdateController extends ControllerBase {
 
             if ($messages) {
               $extension_has_message = TRUE;
-              if (is_numeric($name)) {
+              if (\is_numeric($name)) {
                 $title = $this->t('Update #@count', ['@count' => $name]);
               }
               else {
-                $title = $this->t('Update @name', ['@name' => trim($name, '_')]);
+                $title = $this->t('Update @name', ['@name' => \trim($name, '_')]);
               }
               $info_messages[] = [
                 '#theme' => 'item_list',
@@ -615,7 +615,7 @@ class DbUpdateController extends ControllerBase {
     // Resolve any update dependencies to determine the actual updates that will
     // be run and the order they will be run in.
     $start = $this->getModuleUpdates();
-    $updates = update_resolve_dependencies($start);
+    $updates = \update_resolve_dependencies($start);
 
     // Store the dependencies for each update function in an array which the
     // batch API can pass in to the batch operation each time it is called. (We
@@ -623,7 +623,7 @@ class DbUpdateController extends ControllerBase {
     // potentially very large.)
     $dependency_map = [];
     foreach ($updates as $function => $update) {
-      $dependency_map[$function] = !empty($update['reverse_paths']) ? array_keys($update['reverse_paths']) : [];
+      $dependency_map[$function] = !empty($update['reverse_paths']) ? \array_keys($update['reverse_paths']) : [];
     }
 
     // Determine updates to be performed.
@@ -651,10 +651,10 @@ class DbUpdateController extends ControllerBase {
       }
     }
 
-    batch_set($batch_builder->toArray());
+    \batch_set($batch_builder->toArray());
 
     // @todo Revisit once https://www.drupal.org/node/2548095 is in.
-    return batch_process(Url::fromUri('base://results'), Url::fromUri('base://start'));
+    return \batch_process(Url::fromUri('base://results'), Url::fromUri('base://start'));
   }
 
   /**
@@ -675,7 +675,7 @@ class DbUpdateController extends ControllerBase {
    */
   public static function batchFinished($success, $results, $operations) {
     // No updates to run, so caches won't get flushed later.  Clear them now.
-    drupal_flush_all_caches();
+    \drupal_flush_all_caches();
 
     $session = \Drupal::request()->getSession();
     $session->set('update_results', $results);
@@ -700,7 +700,7 @@ class DbUpdateController extends ControllerBase {
    */
   protected function helpfulLinks(Request $request) {
     // @todo Simplify with https://www.drupal.org/node/2548095
-    $base_url = str_replace('/update.php', '', $request->getBaseUrl());
+    $base_url = \str_replace('/update.php', '', $request->getBaseUrl());
     $links['front'] = [
       'title' => $this->t('Front page'),
       'url' => Url::fromRoute('<front>')->setOption('base_url', $base_url),
@@ -732,7 +732,7 @@ class DbUpdateController extends ControllerBase {
    */
   protected function getModuleUpdates() {
     $return = [];
-    $updates = update_get_update_list();
+    $updates = \update_get_update_list();
     foreach ($updates as $module => $update) {
       $return[$module] = $update['start'];
     }

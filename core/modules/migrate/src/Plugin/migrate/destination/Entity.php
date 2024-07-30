@@ -127,7 +127,7 @@ abstract class Entity extends DestinationBase implements ContainerFactoryPluginI
       $plugin_definition,
       $migration,
       $container->get('entity_type.manager')->getStorage($entity_type_id),
-      array_keys($container->get('entity_type.bundle.info')->getBundleInfo($entity_type_id))
+      \array_keys($container->get('entity_type.bundle.info')->getBundleInfo($entity_type_id))
     );
   }
 
@@ -165,7 +165,7 @@ abstract class Entity extends DestinationBase implements ContainerFactoryPluginI
    *   The entity we are importing into.
    */
   protected function getEntity(Row $row, array $old_destination_id_values) {
-    $entity_id = reset($old_destination_id_values) ?: $this->getEntityId($row);
+    $entity_id = \reset($old_destination_id_values) ?: $this->getEntityId($row);
     if (!empty($entity_id) && ($entity = $this->storage->load($entity_id))) {
       // Allow updateEntity() to change the entity.
       $entity = $this->updateEntity($entity, $row) ?: $entity;
@@ -248,7 +248,7 @@ abstract class Entity extends DestinationBase implements ContainerFactoryPluginI
    */
   public function rollback(array $destination_identifier) {
     // Delete the specified entity from Drupal if it exists.
-    $entity = $this->storage->load(reset($destination_identifier));
+    $entity = $this->storage->load(\reset($destination_identifier));
     if ($entity) {
       if ($entity instanceof ContentEntityInterface) {
         $entity->setSyncing(TRUE);

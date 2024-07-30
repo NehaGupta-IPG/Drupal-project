@@ -37,10 +37,10 @@ class DrupalTranslator implements TranslatorInterface {
    */
   public function transChoice($id, $number, array $parameters = [], $domain = NULL, $locale = NULL) {
     // Violation messages can separated singular and plural versions by "|".
-    $ids = explode('|', $id);
+    $ids = \explode('|', $id);
 
     if (!isset($ids[1])) {
-      throw new \InvalidArgumentException(sprintf('The message "%s" cannot be pluralized, because it is missing a plural (e.g. "There is one apple|There are @count apples").', $id));
+      throw new \InvalidArgumentException(\sprintf('The message "%s" cannot be pluralized, because it is missing a plural (e.g. "There is one apple|There are @count apples").', $id));
     }
 
     // Normally, calls to formatPlural() need to use literal strings, like
@@ -82,14 +82,14 @@ class DrupalTranslator implements TranslatorInterface {
       if ($value instanceof MarkupInterface) {
         $value = (string) $value;
       }
-      if (is_object($value)) {
+      if (\is_object($value)) {
         // TranslatableMarkup does not work with objects being passed as
         // replacement strings.
       }
       // Check for symfony replacement patterns in the form "{{ name }}".
-      elseif (str_starts_with($key, '{{ ') && strrpos($key, ' }}') == strlen($key) - 3) {
+      elseif (\str_starts_with($key, '{{ ') && \strrpos($key, ' }}') == \strlen($key) - 3) {
         // Transform it into a Drupal pattern using the format %name.
-        $key = '%' . substr($key, 3, strlen($key) - 6);
+        $key = '%' . \substr($key, 3, \strlen($key) - 6);
         $return[$key] = $value;
       }
       else {

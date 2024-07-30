@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Drupal\deprecation_test\Deprecation;
 
 // phpcs:ignore Drupal.Semantics.FunctionTriggerError
-@trigger_error(__NAMESPACE__ . '\FixtureDeprecatedClass is deprecated.', E_USER_DEPRECATED);
+@\trigger_error(__NAMESPACE__ . '\FixtureDeprecatedClass is deprecated.', E_USER_DEPRECATED);
 
 /**
  * Fixture class for use by DrupalStandardsListenerDeprecationTest.

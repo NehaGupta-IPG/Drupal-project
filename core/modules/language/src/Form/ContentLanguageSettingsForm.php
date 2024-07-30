@@ -122,7 +122,7 @@ class ContentLanguageSettingsForm extends FormBase {
       }
     }
 
-    asort($labels);
+    \asort($labels);
 
     $form = [
       '#labels' => $labels,

@@ -106,7 +106,7 @@ class HandlerTest extends UITestBase {
       $add_handler_url = "admin/structure/views/nojs/add-handler/test_view_empty/default/$type";
 
       // Area handler types need to use a different handler.
-      if (in_array($type, ['header', 'footer', 'empty'])) {
+      if (\in_array($type, ['header', 'footer', 'empty'])) {
         $this->drupalGet($add_handler_url);
         $this->submitForm([
           'name[views.area]' => TRUE,

@@ -36,19 +36,19 @@ abstract class InstallerConfigDirectoryTestBase extends InstallerTestBase {
    *   Destination directory.
    */
   protected function copyDirectory(string $source, string $destination): void {
-    if (!is_dir($destination)) {
-      mkdir($destination, 0755, TRUE);
+    if (!\is_dir($destination)) {
+      \mkdir($destination, 0755, TRUE);
     }
-    $files = scandir($source);
+    $files = \scandir($source);
     foreach ($files as $file) {
       if ($file !== '.' && $file !== '..') {
         $sourceFile = $source . '/' . $file;
         $destinationFile = $destination . '/' . $file;
-        if (is_dir($sourceFile)) {
+        if (\is_dir($sourceFile)) {
           $this->copyDirectory($sourceFile, $destinationFile);
         }
         else {
-          copy($sourceFile, $destinationFile);
+          \copy($sourceFile, $destinationFile);
         }
       }
     }
@@ -62,7 +62,7 @@ abstract class InstallerConfigDirectoryTestBase extends InstallerTestBase {
 
     if ($this->profile === NULL) {
       $core_extension_location = $this->getConfigLocation() . '/core.extension.yml';
-      $core_extension = Yaml::decode(file_get_contents($core_extension_location));
+      $core_extension = Yaml::decode(\file_get_contents($core_extension_location));
       $this->profile = $core_extension['profile'];
     }
 
@@ -82,8 +82,8 @@ abstract class InstallerConfigDirectoryTestBase extends InstallerTestBase {
       // Put the sync directory inside the profile.
       $config_sync_directory = $path . '/config/sync';
 
-      mkdir($path, 0777, TRUE);
-      file_put_contents("$path/{$this->profile}.info.yml", Yaml::encode($info));
+      \mkdir($path, 0777, TRUE);
+      \file_put_contents("$path/{$this->profile}.info.yml", Yaml::encode($info));
     }
     else {
       // If we have no profile we must use an existing sync directory.
@@ -100,28 +100,28 @@ abstract class InstallerConfigDirectoryTestBase extends InstallerTestBase {
     }
 
     // Create config/sync directory and extract tarball contents to it.
-    mkdir($config_sync_directory, 0777, TRUE);
+    \mkdir($config_sync_directory, 0777, TRUE);
     $this->copyDirectory($this->getConfigLocation(), $config_sync_directory);
 
     // Add the module that is providing the database driver to the list of
     // modules that can not be uninstalled in the core.extension configuration.
-    if (file_exists($config_sync_directory . '/core.extension.yml')) {
-      $core_extension = Yaml::decode(file_get_contents($config_sync_directory . '/core.extension.yml'));
+    if (\file_exists($config_sync_directory . '/core.extension.yml')) {
+      $core_extension = Yaml::decode(\file_get_contents($config_sync_directory . '/core.extension.yml'));
       $module = Database::getConnection()->getProvider();
       if ($module !== 'core') {
         $core_extension['module'][$module] = 0;
-        $core_extension['module'] = module_config_sort($core_extension['module']);
+        $core_extension['module'] = \module_config_sort($core_extension['module']);
       }
-      if ($this->profile === FALSE && array_key_exists('profile', $core_extension)) {
+      if ($this->profile === FALSE && \array_key_exists('profile', $core_extension)) {
         // Remove the profile.
         unset($core_extension['module'][$core_extension['profile']]);
         unset($core_extension['profile']);
 
         // Set a default theme to the first theme that will be installed as this
         // can not be retrieved from the profile.
-        $this->defaultTheme = array_key_first($core_extension['theme']);
+        $this->defaultTheme = \array_key_first($core_extension['theme']);
       }
-      file_put_contents($config_sync_directory . '/core.extension.yml', Yaml::encode($core_extension));
+      \file_put_contents($config_sync_directory . '/core.extension.yml', Yaml::encode($core_extension));
     }
   }
 

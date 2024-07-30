@@ -36,14 +36,14 @@ trait ModulesEnabledTrait {
    *   page for those modules.
    */
   protected function modulesEnabledConfirmationMessage(array $modules): PluralTranslatableMarkup {
-    $machine_names = implode(',', array_keys($modules));
+    $machine_names = \implode(',', \array_keys($modules));
     $url = Url::fromRoute('user.admin_permissions.module', ['modules' => $machine_names]);
-    $module_names = implode(', ', array_values($modules));
+    $module_names = \implode(', ', \array_values($modules));
     $t_args = ['%name' => $module_names, '%names' => $module_names];
 
     if ($url->access($this->currentUser())) {
       return $this->formatPlural(
-        count($modules),
+        \count($modules),
         'Module %name has been installed. Configure <a href=":link">related permissions</a>.',
         '@count modules have been installed: %names. Configure <a href=":link">related permissions</a>.',
         $t_args + [':link' => $url->toString()]
@@ -51,7 +51,7 @@ trait ModulesEnabledTrait {
     }
 
     return $this->formatPlural(
-      count($modules),
+      \count($modules),
       'Module %name has been installed.',
       '@count modules have been installed: %names.',
       $t_args
@@ -74,11 +74,11 @@ trait ModulesEnabledTrait {
   protected function modulesFailToEnableMessage(array $modules, PreExistingConfigException $exception): PluralTranslatableMarkup {
     $config_objects = $exception->flattenConfigObjects($exception->getConfigObjects());
     return $this->formatPlural(
-      count($config_objects),
+      \count($config_objects),
       'Unable to install @extension, %config_names already exists in active configuration.',
       'Unable to install @extension, %config_names already exist in active configuration.',
       [
-        '%config_names' => implode(', ', $config_objects),
+        '%config_names' => \implode(', ', $config_objects),
         '@extension' => $modules['install'][$exception->getExtension()],
       ]);
   }

@@ -221,7 +221,7 @@ class StyleSerializerTest extends ViewTestBase {
     $serializer = $this->container->get('serializer');
     // Check if the field_group_rows field is grouped.
     $expected = [];
-    $expected[] = [$field_name => implode(', ', $grouped_field_values)];
+    $expected[] = [$field_name => \implode(', ', $grouped_field_values)];
     $this->assertEquals($serializer->serialize($expected, 'json'), (string) $this->renderer->renderRoot($build));
     // Set the group rows setting to false.
     $view = Views::getView('test_serializer_node_display_field');
@@ -331,7 +331,7 @@ class StyleSerializerTest extends ViewTestBase {
     foreach ($decoded as $item) {
       $names[] = $item['name'][0]['value'];
     }
-    sort($names);
+    \sort($names);
 
     // Check that the names are correct.
     $expected = ['mul-l1-l2', 'mul-l1-orig', 'mul-l2-l1', 'mul-l2-orig', 'mul-none'];

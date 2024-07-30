@@ -63,7 +63,7 @@ class Constraint {
    */
   public function isCompatible($version) {
     foreach ($this->constraintArray as $constraint) {
-      if (!version_compare($version, $constraint['version'], $constraint['op'])) {
+      if (!\version_compare($version, $constraint['version'], $constraint['op'])) {
         return FALSE;
       }
     }
@@ -84,12 +84,12 @@ class Constraint {
     // supports. Also, op is optional and defaults to equals.
     $p_op = '(?<operation>!=|==|=|<|<=|>|>=|<>)?';
     // Core version is always optional: 8.x-2.x and 2.x is treated the same.
-    $p_core = '(?:' . preg_quote($core_compatibility) . '-)?';
+    $p_core = '(?:' . \preg_quote($core_compatibility) . '-)?';
     $p_major = '(?<major>\d+)';
     // By setting the minor version to x, branches can be matched.
     $p_minor = '(?<minor>(?:\d+|x)(?:-[A-Za-z]+\d+)?)';
-    foreach (explode(',', $constraint_string) as $constraint) {
-      if (preg_match("/^\s*$p_op\s*$p_core$p_major\.$p_minor/", $constraint, $matches)) {
+    foreach (\explode(',', $constraint_string) as $constraint) {
+      if (\preg_match("/^\s*$p_op\s*$p_core$p_major\.$p_minor/", $constraint, $matches)) {
         $op = !empty($matches['operation']) ? $matches['operation'] : '=';
         if ($matches['minor'] == 'x') {
           // Drupal considers "2.x" to mean any version that begins with

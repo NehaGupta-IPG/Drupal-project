@@ -54,7 +54,7 @@ abstract class MigrateUpgradeTestBase extends BrowserTestBase {
     $this->sourceDatabase = Database::getConnection('default', 'migrate_drupal_ui');
 
     // Get the current major version.
-    [$this->destinationSiteVersion] = explode('.', \Drupal::VERSION, 2);
+    [$this->destinationSiteVersion] = \explode('.', \Drupal::VERSION, 2);
 
     // Log in as user 1. Migrations in the UI can only be performed as user 1.
     $this->drupalLogin($this->rootUser);
@@ -84,7 +84,7 @@ abstract class MigrateUpgradeTestBase extends BrowserTestBase {
     $default_db = Database::getConnection()->getKey();
     Database::setActiveConnection($this->sourceDatabase->getKey());
 
-    if (str_ends_with($path, '.gz')) {
+    if (\str_ends_with($path, '.gz')) {
       $path = 'compress.zlib://' . $path;
     }
     require $path;
@@ -104,7 +104,7 @@ abstract class MigrateUpgradeTestBase extends BrowserTestBase {
       // \Drupal\Tests\BrowserTestBase::cleanupEnvironment() will delete this
       // once the test is complete.
       $file = $this->publicFilesDirectory . '/' . $this->testId . '-migrate.db.sqlite';
-      touch($file);
+      \touch($file);
       $connection_info['database'] = $file;
       $connection_info['prefix'] = '';
     }
@@ -224,8 +224,8 @@ abstract class MigrateUpgradeTestBase extends BrowserTestBase {
     }
 
     // Test the total count of missing and available paths.
-    $session->elementsCount('xpath', "//td[contains(@class, 'upgrade-analysis-report__status-icon--error')]", count($missing_paths));
-    $session->elementsCount('xpath', "//td[contains(@class, 'upgrade-analysis-report__status-icon--checked')]", count($available_paths));
+    $session->elementsCount('xpath', "//td[contains(@class, 'upgrade-analysis-report__status-icon--error')]", \count($missing_paths));
+    $session->elementsCount('xpath', "//td[contains(@class, 'upgrade-analysis-report__status-icon--checked')]", \count($available_paths));
   }
 
   /**
@@ -246,10 +246,10 @@ abstract class MigrateUpgradeTestBase extends BrowserTestBase {
     $this->resetAll();
     // Check that the expected number of entities is the same as the actual
     // number of entities.
-    $entity_definitions = array_keys(\Drupal::entityTypeManager()->getDefinitions());
-    ksort($entity_counts);
-    $expected_count_keys = array_keys($entity_counts);
-    sort($entity_definitions);
+    $entity_definitions = \array_keys(\Drupal::entityTypeManager()->getDefinitions());
+    \ksort($entity_counts);
+    $expected_count_keys = \array_keys($entity_counts);
+    \sort($entity_definitions);
     $this->assertSame($expected_count_keys, $entity_definitions);
 
     // Assert the correct number of entities exists.
@@ -271,7 +271,7 @@ abstract class MigrateUpgradeTestBase extends BrowserTestBase {
         // expected.
         $source_id_values = array_values(unserialize($source_id, ['allowed_classes' => FALSE]));
         $row = $id_map->getRowBySource($source_id_values);
-        $destination = serialize($id_map->currentDestination());
+        $destination = \serialize($id_map->currentDestination());
         $message = "Migration of $source_id to $destination as part of the {$migration->id()} migration. The source row status is " . $row['source_row_status'];
         // A completed migration should have maps with
         // MigrateIdMapInterface::STATUS_IGNORED or
@@ -302,7 +302,7 @@ abstract class MigrateUpgradeTestBase extends BrowserTestBase {
     // database settings. This supports all of the databases we test against.
     $drivers = Database::getDriverList()->getInstallableList();
     $form = $drivers[$driver]->getInstallTasks()->getFormOptions($connection_options);
-    $connection_options = array_intersect_key($connection_options, $form + $form['advanced_options']);
+    $connection_options = \array_intersect_key($connection_options, $form + $form['advanced_options']);
     // Remove isolation_level since that option is not configurable in the UI.
     unset($connection_options['isolation_level']);
     $edit = [
@@ -317,7 +317,7 @@ abstract class MigrateUpgradeTestBase extends BrowserTestBase {
       $edit['source_base_path'] = $this->getSourceBasePath();
       $edit['source_private_file_path'] = $this->getSourcePrivateBasePath();
     }
-    if (count($drivers) !== 1) {
+    if (\count($drivers) !== 1) {
       $edit['driver'] = $driver;
     }
     return $edit;
@@ -359,7 +359,7 @@ abstract class MigrateUpgradeTestBase extends BrowserTestBase {
     $fs = \Drupal::service('file_system');
     $files = $this->getManagedFiles();
     foreach ($files as $file) {
-      preg_match('/^(private|public|temporary):/', $file['uri'], $matches);
+      \preg_match('/^(private|public|temporary):/', $file['uri'], $matches);
       $scheme = $matches[1];
       $filepath = $fs->realpath($file['uri']);
       if ($scheme === 'temporary') {

@@ -82,7 +82,7 @@ class RelationshipUserImageDataTest extends ViewsKernelTestBase {
     ]);
     $file->setPermanent();
     $file->enforceIsNew();
-    file_put_contents($file->getFileUri(), file_get_contents('core/tests/fixtures/files/image-1.png'));
+    \file_put_contents($file->getFileUri(), \file_get_contents('core/tests/fixtures/files/image-1.png'));
     $file->save();
 
     $account = User::create([

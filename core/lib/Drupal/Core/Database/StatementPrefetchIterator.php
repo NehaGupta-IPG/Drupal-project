@@ -149,7 +149,7 @@ class StatementPrefetchIterator extends StatementBase {
     $this->markResultsetIterable($return);
 
     if (isset($options['fetch'])) {
-      if (is_string($options['fetch'])) {
+      if (\is_string($options['fetch'])) {
         // Default to an object. Note: db fields will be added to the object
         // before the constructor is run. If you need to assign fields after
         // the constructor is run. See https://www.drupal.org/node/315092.

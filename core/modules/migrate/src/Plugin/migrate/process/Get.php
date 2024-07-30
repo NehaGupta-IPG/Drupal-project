@@ -106,7 +106,7 @@ class Get extends ProcessPluginBase {
    */
   public function transform($value, MigrateExecutableInterface $migrate_executable, Row $row, $destination_property) {
     $source = $this->configuration['source'];
-    $properties = is_string($source) ? [$source] : $source;
+    $properties = \is_string($source) ? [$source] : $source;
     $return = [];
     foreach ($properties as $property) {
       if ($property || (string) $property === '0') {
@@ -117,8 +117,8 @@ class Get extends ProcessPluginBase {
       }
     }
 
-    if (is_string($source)) {
-      $this->multiple = is_array($return[0]);
+    if (\is_string($source)) {
+      $this->multiple = \is_array($return[0]);
       return $return[0];
     }
     return $return;

@@ -44,7 +44,7 @@ class ReadOnlyStreamWrapperTest extends FileTestBase {
     $filename = $this->randomMachineName();
     $site_path = $this->container->getParameter('site.path');
     $filepath = $site_path . '/files/' . $filename;
-    file_put_contents($filepath, $filename);
+    \file_put_contents($filepath, $filename);
 
     // Generate a read-only stream wrapper instance.
     $uri = $this->scheme . '://' . $filename;

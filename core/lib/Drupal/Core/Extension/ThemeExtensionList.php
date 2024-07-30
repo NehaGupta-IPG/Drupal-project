@@ -148,7 +148,7 @@ class ThemeExtensionList extends ExtensionList {
       // dependencies. The module dependencies are copied to their own property
       // so they are available to operations specific to module dependencies.
       if (isset($theme->requires)) {
-        $theme->module_dependencies = array_diff_key($theme->requires, $themes);
+        $theme->module_dependencies = \array_diff_key($theme->requires, $themes);
       }
       else {
         // Even if no requirements are specified, the theme installation process
@@ -178,13 +178,13 @@ class ThemeExtensionList extends ExtensionList {
       // empty() cannot be used here, since static::doGetBaseThemes() adds
       // the key of a base theme with a value of NULL in case it is not found,
       // in order to prevent needless iterations.
-      if (!current($sub_theme->base_themes)) {
+      if (!\current($sub_theme->base_themes)) {
         continue;
       }
       // Determine the root base theme.
-      $root_key = key($sub_theme->base_themes);
+      $root_key = \key($sub_theme->base_themes);
       // Build the list of sub-themes for each of the theme's base themes.
-      foreach (array_keys($sub_theme->base_themes) as $base_theme) {
+      foreach (\array_keys($sub_theme->base_themes) as $base_theme) {
         $themes[$base_theme]->sub_themes[$name] = $sub_theme->info['name'];
       }
       // Add the theme engine info from the root base theme.
@@ -217,7 +217,7 @@ class ThemeExtensionList extends ExtensionList {
    * @see https://www.drupal.org/node/3413187
    */
   public function getBaseThemes(array $themes, $theme) {
-    @trigger_error("\Drupal\Core\Extension\ThemeExtensionList::getBaseThemes() is deprecated in drupal:10.3.0 and is removed from drupal:12.0.0. There is no direct replacement. See https://www.drupal.org/node/3413187", E_USER_DEPRECATED);
+    @\trigger_error("\Drupal\Core\Extension\ThemeExtensionList::getBaseThemes() is deprecated in drupal:10.3.0 and is removed from drupal:12.0.0. There is no direct replacement. See https://www.drupal.org/node/3413187", E_USER_DEPRECATED);
     return $this->doGetBaseThemes($themes, $theme);
   }
 
@@ -272,7 +272,7 @@ class ThemeExtensionList extends ExtensionList {
     $info = parent::createExtensionInfo($extension);
 
     if (!isset($info['base theme'])) {
-      throw new InfoParserException(sprintf('Missing required key ("base theme") in %s, see https://www.drupal.org/node/3066038', $extension->getPathname()));
+      throw new InfoParserException(\sprintf('Missing required key ("base theme") in %s, see https://www.drupal.org/node/3066038', $extension->getPathname()));
     }
 
     // Remove the base theme when 'base theme: false' is set in a theme
@@ -301,7 +301,7 @@ class ThemeExtensionList extends ExtensionList {
     if (!isset($this->installedThemes)) {
       $this->installedThemes = $this->configFactory->get('core.extension')->get('theme') ?: [];
     }
-    return array_keys($this->installedThemes);
+    return \array_keys($this->installedThemes);
   }
 
   /**

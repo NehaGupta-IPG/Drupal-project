@@ -64,7 +64,7 @@ class FieldLayoutBuilder implements ContainerInjectionInterface {
     $layout_definition = $this->layoutPluginManager->getDefinition($display->getLayoutId(), FALSE);
     if ($layout_definition && $fields = $this->getFields($build, $display, 'view')) {
       // Add the regions to the $build in the correct order.
-      $regions = array_fill_keys($layout_definition->getRegionNames(), []);
+      $regions = \array_fill_keys($layout_definition->getRegionNames(), []);
 
       foreach ($fields as $name => $field) {
         // If the region is controlled by the layout, move the field from the
@@ -99,7 +99,7 @@ class FieldLayoutBuilder implements ContainerInjectionInterface {
       $fill['#process'][] = '\Drupal\Core\Render\Element\RenderElementBase::processGroup';
       $fill['#pre_render'][] = '\Drupal\Core\Render\Element\RenderElementBase::preRenderGroup';
       // Add the regions to the $build in the correct order.
-      $regions = array_fill_keys($layout_definition->getRegionNames(), $fill);
+      $regions = \array_fill_keys($layout_definition->getRegionNames(), $fill);
 
       foreach ($fields as $name => $field) {
         // As this is a form, #group can be used to relocate the fields. This
@@ -108,7 +108,7 @@ class FieldLayoutBuilder implements ContainerInjectionInterface {
         // do not overwrite it.
         if (isset($regions[$field['region']]) && !isset($build[$name]['#group'])) {
           if (!empty($build['#parents'])) {
-            $build[$name]['#group'] = implode('][', array_merge($build['#parents'], ['_field_layout', $field['region']]));
+            $build[$name]['#group'] = \implode('][', \array_merge($build['#parents'], ['_field_layout', $field['region']]));
           }
           else {
             $build[$name]['#group'] = $field['region'];
@@ -141,19 +141,19 @@ class FieldLayoutBuilder implements ContainerInjectionInterface {
     // Ignore any extra fields from the list of field definitions. Field
     // definitions can have a non-configurable display, but all extra fields are
     // always displayed.
-    $field_definitions = array_diff_key(
+    $field_definitions = \array_diff_key(
       $this->entityFieldManager->getFieldDefinitions($display->getTargetEntityTypeId(), $display->getTargetBundle()),
       $this->entityFieldManager->getExtraFields($display->getTargetEntityTypeId(), $display->getTargetBundle())
     );
 
-    $fields_to_exclude = array_filter($field_definitions, function (FieldDefinitionInterface $field_definition) use ($display_context) {
+    $fields_to_exclude = \array_filter($field_definitions, function (FieldDefinitionInterface $field_definition) use ($display_context) {
       // Remove fields with a non-configurable display.
       return !$field_definition->isDisplayConfigurable($display_context);
     });
-    $components = array_diff_key($components, $fields_to_exclude);
+    $components = \array_diff_key($components, $fields_to_exclude);
 
     // Only include fields present in the build.
-    $components = array_intersect_key($components, $build);
+    $components = \array_intersect_key($components, $build);
 
     return $components;
   }

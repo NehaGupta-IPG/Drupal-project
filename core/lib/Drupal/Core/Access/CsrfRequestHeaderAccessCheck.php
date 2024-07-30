@@ -49,13 +49,13 @@ class CsrfRequestHeaderAccessCheck implements AccessCheckInterface {
    */
   public function applies(Route $route) {
     $requirements = $route->getRequirements();
-    if (array_key_exists('_csrf_request_header_token', $requirements)) {
+    if (\array_key_exists('_csrf_request_header_token', $requirements)) {
       if (isset($requirements['_method'])) {
         // There could be more than one method requirement separated with '|'.
-        $methods = explode('|', $requirements['_method']);
+        $methods = \explode('|', $requirements['_method']);
         // CSRF protection only applies to write operations, so we can filter
         // out any routes that require reading methods only.
-        $write_methods = array_diff($methods, ['GET', 'HEAD', 'OPTIONS', 'TRACE']);
+        $write_methods = \array_diff($methods, ['GET', 'HEAD', 'OPTIONS', 'TRACE']);
         if (empty($write_methods)) {
           return FALSE;
         }
@@ -81,7 +81,7 @@ class CsrfRequestHeaderAccessCheck implements AccessCheckInterface {
     $method = $request->getMethod();
 
     // Read-only operations are always allowed.
-    if (in_array($method, ['GET', 'HEAD', 'OPTIONS', 'TRACE'], TRUE)) {
+    if (\in_array($method, ['GET', 'HEAD', 'OPTIONS', 'TRACE'], TRUE)) {
       return AccessResult::allowed();
     }
 

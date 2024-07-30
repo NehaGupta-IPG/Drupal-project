@@ -65,12 +65,12 @@ class File extends DrupalSqlBase {
     if (isset($this->configuration['scheme'])) {
       $schemes = [];
       // Remove 'temporary' scheme.
-      $valid_schemes = array_diff((array) $this->configuration['scheme'], ['temporary']);
+      $valid_schemes = \array_diff((array) $this->configuration['scheme'], ['temporary']);
       // Accept either a single scheme, or a list.
       foreach ((array) $valid_schemes as $scheme) {
-        $schemes[] = rtrim($scheme) . '://';
+        $schemes[] = \rtrim($scheme) . '://';
       }
-      $schemes = array_map([$this->getDatabase(), 'escapeLike'], $schemes);
+      $schemes = \array_map([$this->getDatabase(), 'escapeLike'], $schemes);
 
       // Add conditions, uri LIKE 'public://%' OR uri LIKE 'private://%'.
       $conditions = $this->getDatabase()->condition('OR');
@@ -98,11 +98,11 @@ class File extends DrupalSqlBase {
   public function prepareRow(Row $row) {
     // Compute the filepath property, which is a physical representation of
     // the URI relative to the Drupal root.
-    $path = str_replace(['public:/', 'private:/'], [$this->publicPath, $this->privatePath], $row->getSourceProperty('uri'));
+    $path = \str_replace(['public:/', 'private:/'], [$this->publicPath, $this->privatePath], $row->getSourceProperty('uri'));
     // At this point, $path could be an absolute path or a relative path,
     // depending on how the scheme's variable was set. So we need to shear out
     // the source_base_path in order to make them all relative.
-    $path = preg_replace('#' . preg_quote($this->configuration['constants']['source_base_path']) . '#', '', $path, 1);
+    $path = \preg_replace('#' . \preg_quote($this->configuration['constants']['source_base_path']) . '#', '', $path, 1);
     $row->setSourceProperty('filepath', $path);
     return parent::prepareRow($row);
   }

@@ -50,7 +50,7 @@ final class ConfigAction extends Plugin {
     public readonly ?string $deriver = NULL,
   ) {
     if ($this->admin_label === NULL && $this->deriver === NULL) {
-      throw new InvalidPluginDefinitionException($id, sprintf("The '%s' config action plugin must have either an admin label or a deriver", $id));
+      throw new InvalidPluginDefinitionException($id, \sprintf("The '%s' config action plugin must have either an admin label or a deriver", $id));
     }
   }
 

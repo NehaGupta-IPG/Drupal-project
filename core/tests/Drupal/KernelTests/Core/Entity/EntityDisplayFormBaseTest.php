@@ -136,7 +136,7 @@ class EntityDisplayFormBaseTest extends KernelTestBase {
     $form_object->setEntity($entity->reveal());
 
     $form = [
-      '#fields' => array_keys($field_values),
+      '#fields' => \array_keys($field_values),
       '#extra' => [],
     ];
     $form_state = new FormState();

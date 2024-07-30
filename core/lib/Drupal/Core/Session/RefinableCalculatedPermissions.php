@@ -78,7 +78,7 @@ class RefinableCalculatedPermissions implements RefinableCalculatedPermissionsIn
     // Admin items don't need to have any permissions.
     $permissions = [];
     if (!$is_admin) {
-      $permissions = array_unique(array_merge($a->getPermissions(), $b->getPermissions()));
+      $permissions = \array_unique(\array_merge($a->getPermissions(), $b->getPermissions()));
     }
 
     return new CalculatedPermissionsItem($permissions, $is_admin, $a->getScope(), $a->getIdentifier());

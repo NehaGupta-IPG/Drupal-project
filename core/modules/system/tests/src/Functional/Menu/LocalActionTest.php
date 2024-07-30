@@ -93,7 +93,7 @@ class LocalActionTest extends BrowserTestBase {
       // so use a pattern instead to check the raw content.
       // This behavior is a bug in libxml, see
       // https://bugs.php.net/bug.php?id=49437.
-      $this->assertSession()->responseMatches('@<a [^>]*class="[^"]*button-action[^"]*"[^>]*>' . preg_quote($title, '@') . '</@');
+      $this->assertSession()->responseMatches('@<a [^>]*class="[^"]*button-action[^"]*"[^>]*>' . \preg_quote($title, '@') . '</@');
       $this->assertEquals($url->toString(), $elements[$index]->getAttribute('href'));
       $index++;
     }

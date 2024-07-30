@@ -77,7 +77,7 @@ class Cron implements CronInterface {
    */
   public function run() {
     // Allow execution to continue even if the request gets cancelled.
-    @ignore_user_abort(TRUE);
+    @\ignore_user_abort(TRUE);
 
     // Force the current user to anonymous to ensure consistent permissions on
     // cron runs.
@@ -156,7 +156,7 @@ class Cron implements CronInterface {
 
     // Work through stack of queues, re-adding to the stack when a delay is
     // necessary.
-    while ($item = array_shift($queues)) {
+    while ($item = \array_shift($queues)) {
       [
         'queue' => $queue,
         'worker' => $worker,
@@ -166,7 +166,7 @@ class Cron implements CronInterface {
       // Each queue will be processed immediately when it is reached for the
       // first time, as zero > currentTime will never be true.
       if ($process_from > $this->time->getCurrentMicroTime()) {
-        $this->usleep((int) round($process_from - $this->time->getCurrentMicroTime(), 3) * 1000000);
+        $this->usleep((int) \round($process_from - $this->time->getCurrentMicroTime(), 3) * 1000000);
       }
 
       try {
@@ -178,12 +178,12 @@ class Cron implements CronInterface {
         if ($e->isDelayable() && ($e->getDelay() < $max_wait)) {
           $item['process_from'] = $this->time->getCurrentMicroTime() + $e->getDelay();
           // Place this queue back in the stack for processing later.
-          array_push($queues, $item);
+          \array_push($queues, $item);
         }
       }
 
       // Reorder the queue by next 'process_from' timestamp.
-      usort($queues, function (array $queueA, array $queueB) {
+      \usort($queues, function (array $queueA, array $queueB) {
         return $queueA['process_from'] <=> $queueB['process_from'];
       });
     }
@@ -296,7 +296,7 @@ class Cron implements CronInterface {
    *   Halt time in microseconds.
    */
   protected function usleep(int $microseconds): void {
-    usleep($microseconds);
+    \usleep($microseconds);
   }
 
 }

@@ -18,7 +18,7 @@ abstract class DatabaseEvent extends Event {
    * Constructs a DatabaseEvent object.
    */
   public function __construct() {
-    $this->time = microtime(TRUE);
+    $this->time = \microtime(TRUE);
   }
 
 }

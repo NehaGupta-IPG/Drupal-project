@@ -280,7 +280,7 @@ class MenuTreeStorage implements MenuTreeStorageInterface {
       //   $fields contains typed values.
       // - MenuTreeStorage::preSave() removes the 'mlid' from $fields.
       // - The order of the keys in $original and $fields is different.
-      if (array_diff_assoc($fields, $original) == [] && array_diff_assoc($original, $fields) == ['mlid' => $link['mlid']]) {
+      if (\array_diff_assoc($fields, $original) == [] && \array_diff_assoc($original, $fields) == ['mlid' => $link['mlid']]) {
         return $affected_menus;
       }
     }
@@ -357,16 +357,16 @@ class MenuTreeStorage implements MenuTreeStorageInterface {
         $link[$name] = $default;
       }
     }
-    $fields = array_intersect_key($link, $schema_fields);
+    $fields = \array_intersect_key($link, $schema_fields);
     // Sort the route parameters so that the query string will be the same.
-    asort($fields['route_parameters']);
+    \asort($fields['route_parameters']);
     // Since this will be urlencoded, it's safe to store and match against a
     // text field.
     $fields['route_param_key'] = $fields['route_parameters'] ? UrlHelper::buildQuery($fields['route_parameters']) : '';
 
     foreach ($this->serializedFields() as $name) {
       if (isset($fields[$name])) {
-        $fields[$name] = serialize($fields[$name]);
+        $fields[$name] = \serialize($fields[$name]);
       }
     }
     $this->setParents($fields, $parent, $original);
@@ -525,7 +525,7 @@ class MenuTreeStorage implements MenuTreeStorageInterface {
       // overwrite the old ones before they can be used because "Single-table
       // UPDATE assignments are generally evaluated from left to right".
       // @see http://dev.mysql.com/doc/refman/5.0/en/update.html
-      $expressions = array_reverse($expressions);
+      $expressions = \array_reverse($expressions);
     }
     foreach ($expressions as $expression) {
       $query->expression($expression[0], $expression[1], $expression[2]);
@@ -620,11 +620,11 @@ class MenuTreeStorage implements MenuTreeStorageInterface {
   protected function prepareLink(array $link, $intersect = FALSE) {
     foreach ($this->serializedFields() as $name) {
       if (isset($link[$name])) {
-        $link[$name] = unserialize($link[$name]);
+        $link[$name] = \unserialize($link[$name]);
       }
     }
     if ($intersect) {
-      $link = array_intersect_key($link, array_flip($this->definitionFields()));
+      $link = \array_intersect_key($link, \array_flip($this->definitionFields()));
     }
     $this->definitions[$link['id']] = $link;
     return $link;
@@ -637,8 +637,8 @@ class MenuTreeStorage implements MenuTreeStorageInterface {
     $query = $this->connection->select($this->table, NULL, $this->options);
     $query->fields($this->table, $this->definitionFields());
     foreach ($properties as $name => $value) {
-      if (!in_array($name, $this->definitionFields(), TRUE)) {
-        $fields = implode(', ', $this->definitionFields());
+      if (!\in_array($name, $this->definitionFields(), TRUE)) {
+        $fields = \implode(', ', $this->definitionFields());
         throw new \InvalidArgumentException("An invalid property name, $name was specified. Allowed property names are: $fields.");
       }
       $query->condition($name, $value);
@@ -655,7 +655,7 @@ class MenuTreeStorage implements MenuTreeStorageInterface {
    */
   public function loadByRoute($route_name, array $route_parameters = [], $menu_name = NULL) {
     // Sort the route parameters so that the query string will be the same.
-    asort($route_parameters);
+    \asort($route_parameters);
     // Since this will be urlencoded, it's safe to store and match against a
     // text field.
     // @todo Standardize an efficient way to load by route name and parameters
@@ -683,7 +683,7 @@ class MenuTreeStorage implements MenuTreeStorageInterface {
    * {@inheritdoc}
    */
   public function loadMultiple(array $ids) {
-    $missing_ids = array_diff($ids, array_keys($this->definitions));
+    $missing_ids = \array_diff($ids, \array_keys($this->definitions));
 
     if ($missing_ids) {
       $query = $this->connection->select($this->table, NULL, $this->options);
@@ -694,7 +694,7 @@ class MenuTreeStorage implements MenuTreeStorageInterface {
         $this->definitions[$id] = $this->prepareLink($link);
       }
     }
-    return array_intersect_key($this->definitions, array_flip($ids));
+    return \array_intersect_key($this->definitions, \array_flip($ids));
   }
 
   /**
@@ -739,7 +739,7 @@ class MenuTreeStorage implements MenuTreeStorageInterface {
     foreach ($loaded as &$link) {
       foreach ($this->serializedFields() as $name) {
         if (isset($link[$name])) {
-          $link[$name] = unserialize($link[$name]);
+          $link[$name] = \unserialize($link[$name]);
         }
       }
     }
@@ -821,7 +821,7 @@ class MenuTreeStorage implements MenuTreeStorageInterface {
    * {@inheritdoc}
    */
   public function loadTreeData($menu_name, MenuTreeParameters $parameters) {
-    $tree_cid = "tree-data:$menu_name:" . serialize($parameters);
+    $tree_cid = "tree-data:$menu_name:" . \serialize($parameters);
     $cache = $this->menuCacheBackend->get($tree_cid);
     if ($cache && isset($cache->data)) {
       $data = $cache->data;
@@ -926,18 +926,18 @@ class MenuTreeStorage implements MenuTreeStorageInterface {
     // Add custom query conditions, if any were passed.
     if (!empty($parameters->conditions)) {
       // Only allow conditions that are testing definition fields.
-      $parameters->conditions = array_intersect_key($parameters->conditions, array_flip($this->definitionFields()));
+      $parameters->conditions = \array_intersect_key($parameters->conditions, \array_flip($this->definitionFields()));
       $serialized_fields = $this->serializedFields();
       foreach ($parameters->conditions as $column => $value) {
-        if (is_array($value)) {
+        if (\is_array($value)) {
           $operator = $value[1];
           $value = $value[0];
         }
         else {
           $operator = '=';
         }
-        if (in_array($column, $serialized_fields)) {
-          $value = serialize($value);
+        if (\in_array($column, $serialized_fields)) {
+          $value = \serialize($value);
         }
         $query->condition($column, $value, $operator);
       }
@@ -960,7 +960,7 @@ class MenuTreeStorage implements MenuTreeStorageInterface {
    *   Array of route names, with all values being unique.
    */
   protected function collectRoutesAndDefinitions(array $tree, array &$definitions) {
-    return array_values($this->doCollectRoutesAndDefinitions($tree, $definitions));
+    return \array_values($this->doCollectRoutesAndDefinitions($tree, $definitions));
   }
 
   /**
@@ -976,7 +976,7 @@ class MenuTreeStorage implements MenuTreeStorageInterface {
    */
   protected function doCollectRoutesAndDefinitions(array $tree, array &$definitions) {
     $route_names = [];
-    foreach (array_keys($tree) as $id) {
+    foreach (\array_keys($tree) as $id) {
       $definitions[$id] = $this->definitions[$id];
       if (!empty($definitions[$id]['route_name'])) {
         $route_names[$definitions[$id]['route_name']] = $definitions[$id]['route_name'];
@@ -1071,7 +1071,7 @@ class MenuTreeStorage implements MenuTreeStorageInterface {
    */
   protected function doBuildTreeData(array $links, array $parents = [], $depth = 1) {
     // Reverse the array so we can use the more efficient array_pop() function.
-    $links = array_reverse($links);
+    $links = \array_reverse($links);
     return $this->treeDataRecursive($links, $parents, $depth);
   }
 
@@ -1099,26 +1099,26 @@ class MenuTreeStorage implements MenuTreeStorageInterface {
    */
   protected function treeDataRecursive(array &$links, array $parents, $depth) {
     $tree = [];
-    while ($tree_link_definition = array_pop($links)) {
+    while ($tree_link_definition = \array_pop($links)) {
       $tree[$tree_link_definition['id']] = [
         'definition' => $this->prepareLink($tree_link_definition, TRUE),
         'has_children' => $tree_link_definition['has_children'],
         // We need to determine if we're on the path to root so we can later
         // build the correct active trail.
-        'in_active_trail' => in_array($tree_link_definition['id'], $parents),
+        'in_active_trail' => \in_array($tree_link_definition['id'], $parents),
         'subtree' => [],
         'depth' => $tree_link_definition['depth'],
       ];
       // Look ahead to the next link, but leave it on the array so it's
       // available to other recursive function calls if we return or build a
       // sub-tree.
-      $next = end($links);
+      $next = \end($links);
       // Check whether the next link is the first in a new sub-tree.
       if ($next && $next['depth'] > $depth) {
         // Recursively call doBuildTreeData to build the sub-tree.
         $tree[$tree_link_definition['id']]['subtree'] = $this->treeDataRecursive($links, $parents, $next['depth']);
         // Fetch next link after filling the sub-tree.
-        $next = end($links);
+        $next = \end($links);
       }
       // Determine if we should exit the loop and return.
       if (!$next || $next['depth'] < $depth) {
@@ -1174,7 +1174,7 @@ class MenuTreeStorage implements MenuTreeStorageInterface {
    *   The list of the subset of fields that are part of the plugin definition.
    */
   protected function definitionFields() {
-    return array_keys($this->defaults);
+    return \array_keys($this->defaults);
   }
 
   /**
@@ -1437,7 +1437,7 @@ class MenuTreeStorage implements MenuTreeStorageInterface {
       $query = $this->connection->select($this->table, NULL, $this->options);
       $query->addField($this->table, 'id');
       $query->condition('discovered', 1);
-      $query->condition('id', array_keys($definitions), 'NOT IN');
+      $query->condition('id', \array_keys($definitions), 'NOT IN');
       // Starting from links with the greatest depth will minimize the amount
       // of re-parenting done by the menu storage.
       $query->orderBy('depth', 'DESC');

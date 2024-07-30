@@ -69,10 +69,10 @@ abstract class LinksetControllerTestBase extends BrowserTestBase {
    */
   protected function doRequest(string $method, Url $url, $expected_status = 200, ?UserInterface $account = NULL): Response {
     $request_options = [];
-    if (!is_null($account)) {
+    if (!\is_null($account)) {
       $credentials = $account->name->value . ':' . $account->passRaw;
       $request_options[RequestOptions::HEADERS] = [
-        'Authorization' => 'Basic ' . base64_encode($credentials),
+        'Authorization' => 'Basic ' . \base64_encode($credentials),
       ];
     }
     $response = $this->makeApiRequest($method, $url, $request_options);
@@ -128,7 +128,7 @@ abstract class LinksetControllerTestBase extends BrowserTestBase {
       $values['link'] = ['uri' => $values['link'], 'options' => $options];
     }
     $link_content = MenuLinkContent::create($values);
-    assert($link_content instanceof MenuLinkContentInterface);
+    \assert($link_content instanceof MenuLinkContentInterface);
     $link_content->save();
     return $link_content;
   }
@@ -158,7 +158,7 @@ abstract class LinksetControllerTestBase extends BrowserTestBase {
    *   The Json representation of the reference data in the file.
    */
   protected function getReferenceLinksetDataFromFile(string $filename) {
-    $data = Json::decode(file_get_contents($filename));
+    $data = Json::decode(\file_get_contents($filename));
     // Ensure that the URLs are correct if Drupal is being served from a
     // subdirectory.
     $data['linkset'][0]['anchor'] = Url::fromUri('base:' . $data['linkset'][0]['anchor'])->toString();

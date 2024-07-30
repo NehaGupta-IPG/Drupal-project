@@ -238,7 +238,7 @@ class Relationship implements TopLevelDataInterface {
         }
         $links = $links->withLink('self', new Link(new CacheableMetadata(), $self_link, 'self'));
       }
-      $has_non_internal_resource_type = array_reduce($context_resource_type->getRelatableResourceTypesByField($public_field_name), function ($carry, ResourceType $target) {
+      $has_non_internal_resource_type = \array_reduce($context_resource_type->getRelatableResourceTypesByField($public_field_name), function ($carry, ResourceType $target) {
         return $carry ?: !$target->isInternal();
       }, FALSE);
       // If a `related` link was not provided, automatically generate one from

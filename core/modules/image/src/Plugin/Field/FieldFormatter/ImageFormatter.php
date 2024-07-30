@@ -117,7 +117,7 @@ class ImageFormatter extends ImageFormatterBase {
   public function settingsForm(array $form, FormStateInterface $form_state) {
     $element = parent::settingsForm($form, $form_state);
 
-    $image_styles = image_style_options(FALSE);
+    $image_styles = \image_style_options(FALSE);
     $description_link = Link::fromTextAndUrl(
       $this->t('Configure Image Styles'),
       Url::fromRoute('entity.image_style.collection')
@@ -176,7 +176,7 @@ class ImageFormatter extends ImageFormatterBase {
   public function settingsSummary() {
     $summary = [];
 
-    $image_styles = image_style_options(FALSE);
+    $image_styles = \image_style_options(FALSE);
     // Unset possible 'No defined styles' option.
     unset($image_styles['']);
     // Styles could be lost because of enabled/disabled modules that defines
@@ -204,7 +204,7 @@ class ImageFormatter extends ImageFormatterBase {
       '@attribute' => $image_loading['attribute'],
     ]);
 
-    return array_merge($summary, parent::settingsSummary());
+    return \array_merge($summary, parent::settingsSummary());
   }
 
   /**

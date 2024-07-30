@@ -155,7 +155,7 @@ class EntityReferenceAutocompleteWidgetTest extends WebDriverTestBase {
     $assert_session->pageTextContains('Autocomplete suggestion list size: 1');
     // Click on the widget settings button to open the widget settings form.
     $this->submitForm([], $field_name . "_settings_edit");
-    $this->assertSession()->waitForElement('css', sprintf('[name="fields[%s][settings_edit_form][settings][match_limit]"]', $field_name));
+    $this->assertSession()->waitForElement('css', \sprintf('[name="fields[%s][settings_edit_form][settings][match_limit]"]', $field_name));
     $page->fillField('Number of results', 2);
     $page->pressButton('Save');
     $assert_session->pageTextContains('Your settings have been saved.');

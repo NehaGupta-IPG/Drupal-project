@@ -57,7 +57,7 @@ class Select extends QuerySelect {
     // Emulate MySQL default behavior to sort NULL values first for ascending,
     // and last for descending.
     // @see http://www.postgresql.org/docs/9.3/static/queries-order.html
-    $direction = strtoupper($direction) == 'DESC' ? 'DESC NULLS LAST' : 'ASC NULLS FIRST';
+    $direction = \strtoupper($direction) == 'DESC' ? 'DESC NULLS LAST' : 'ASC NULLS FIRST';
     $this->order[$field] = $direction;
 
     if ($this->hasTag('entity_query')) {
@@ -65,8 +65,8 @@ class Select extends QuerySelect {
     }
 
     // If there is a table alias specified, split it up.
-    if (str_contains($field, '.')) {
-      [$table, $table_field] = explode('.', $field);
+    if (\str_contains($field, '.')) {
+      [$table, $table_field] = \explode('.', $field);
     }
     // Figure out if the field has already been added.
     foreach ($this->fields as $existing_field) {

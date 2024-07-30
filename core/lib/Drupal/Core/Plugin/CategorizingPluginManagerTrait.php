@@ -69,7 +69,7 @@ trait CategorizingPluginManagerTrait {
    * @see https://www.drupal.org/node/3310017
    */
   public function getModuleHandler() {
-    @trigger_error(__METHOD__ . '() is deprecated in drupal:10.3.0 and is removed from drupal:12.0.0. There is no replacement. See https://www.drupal.org/node/3310017', E_USER_DEPRECATED);
+    @\trigger_error(__METHOD__ . '() is deprecated in drupal:10.3.0 and is removed from drupal:12.0.0. There is no replacement. See https://www.drupal.org/node/3310017', E_USER_DEPRECATED);
     // If the class has an injected module handler, use it. Otherwise fall back
     // to fetch it from the service container.
     if (isset($this->moduleHandler)) {
@@ -98,10 +98,10 @@ trait CategorizingPluginManagerTrait {
    */
   public function getCategories() {
     // Fetch all categories from definitions and remove duplicates.
-    $categories = array_unique(array_values(array_map(function ($definition) {
+    $categories = \array_unique(\array_values(\array_map(function ($definition) {
       return $definition['category'];
     }, $this->getDefinitions())));
-    natcasesort($categories);
+    \natcasesort($categories);
     return $categories;
   }
 
@@ -111,11 +111,11 @@ trait CategorizingPluginManagerTrait {
   public function getSortedDefinitions(?array $definitions = NULL, $label_key = 'label') {
     // Sort the plugins first by category, then by label.
     $definitions = $definitions ?? $this->getDefinitions();
-    uasort($definitions, function ($a, $b) use ($label_key) {
+    \uasort($definitions, function ($a, $b) use ($label_key) {
       if ((string) $a['category'] != (string) $b['category']) {
-        return strnatcasecmp($a['category'], $b['category']);
+        return \strnatcasecmp($a['category'], $b['category']);
       }
-      return strnatcasecmp($a[$label_key], $b[$label_key]);
+      return \strnatcasecmp($a[$label_key], $b[$label_key]);
     });
     return $definitions;
   }

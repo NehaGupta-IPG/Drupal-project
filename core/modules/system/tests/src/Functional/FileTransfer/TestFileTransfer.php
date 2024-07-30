@@ -42,7 +42,7 @@ class TestFileTransfer extends FileTransfer {
    * Factory method to create a TestFileTransfer instance.
    */
   public static function factory($jail, $settings) {
-    assert(is_array($settings));
+    \assert(\is_array($settings));
     return new TestFileTransfer($jail);
   }
 

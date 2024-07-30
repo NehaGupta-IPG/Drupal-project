@@ -51,9 +51,9 @@ class BrokenCacheUpdateTest extends BrowserTestBase {
     ];
     $insert->fields($fields);
     $fields['cid'] = 'element_info_build:claro';
-    $insert->values(array_values($fields));
+    $insert->values(\array_values($fields));
     $fields['cid'] = 'element_info_build:stark';
-    $insert->values(array_values($fields));
+    $insert->values(\array_values($fields));
     $insert->execute();
 
     $this->runUpdates();

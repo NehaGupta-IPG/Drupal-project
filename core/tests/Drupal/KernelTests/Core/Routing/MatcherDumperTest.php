@@ -142,7 +142,7 @@ class MatcherDumperTest extends KernelTestBase {
       ->execute()
       ->fetchObject();
 
-    $loaded_route = unserialize($record->route);
+    $loaded_route = \unserialize($record->route);
 
     $this->assertEquals('test_route', $record->name, 'Dumped route has correct name.');
     $this->assertEquals('/test/{my}/path', $record->path, 'Dumped route has correct pattern.');
@@ -174,10 +174,10 @@ class MatcherDumperTest extends KernelTestBase {
     // Using binary for readability, we expect a 0 at any wildcard slug. They
     // should be ordered from longest to shortest.
     $expected = [
-      bindec('1011111'),
-      bindec('10111'),
-      bindec('111'),
-      bindec('101'),
+      \bindec('1011111'),
+      \bindec('10111'),
+      \bindec('111'),
+      \bindec('101'),
     ];
     $this->assertEquals($expected, $this->state->get('routing.menu_masks.test_routes'));
   }

@@ -111,7 +111,7 @@ class DerivativeDiscoveryDecoratorTest extends UnitTestCase {
 
     // Ensure that both test derivatives got added.
     $this->assertContainsOnlyInstancesOf(DerivablePluginDefinitionInterface::class, $definitions);
-    $this->assertEquals(['non_container_aware_discovery:test_discovery_0', 'non_container_aware_discovery:test_discovery_1'], array_keys($definitions));
+    $this->assertEquals(['non_container_aware_discovery:test_discovery_0', 'non_container_aware_discovery:test_discovery_1'], \array_keys($definitions));
   }
 
   /**
@@ -249,10 +249,10 @@ class DerivativeDiscoveryDecoratorTest extends UnitTestCase {
       $derivative_definition['id'],
       $base_definition['id'],
     ];
-    $this->discoveryMain->expects($this->exactly(count($ids)))
+    $this->discoveryMain->expects($this->exactly(\count($ids)))
       ->method('getDefinition')
       ->with($this->callback(function (string $id) use (&$ids): bool {
-        return array_shift($ids) === $id;
+        return \array_shift($ids) === $id;
       }))
       ->willReturnOnConsecutiveCalls(
         $derivative_definition,

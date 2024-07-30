@@ -49,7 +49,7 @@ abstract class MigrateTestCase extends UnitTestCase {
   protected function getMigration($id_map = NULL) {
     $this->migrationConfiguration += ['migrationClass' => 'Drupal\migrate\Plugin\Migration'];
     $this->idMap = $id_map;
-    if (is_null($id_map)) {
+    if (\is_null($id_map)) {
       $this->idMap = $this->createMock(MigrateIdMapInterface::class);
       $this->idMap
         ->method('getQualifiedMapTableName')
@@ -112,7 +112,7 @@ abstract class MigrateTestCase extends UnitTestCase {
    *   The database connection.
    */
   protected function getDatabase(array $database_contents, $connection_options = []) {
-    if (extension_loaded('pdo_sqlite')) {
+    if (\extension_loaded('pdo_sqlite')) {
       $connection_options['database'] = ':memory:';
       $pdo = Connection::open($connection_options);
       $connection = new Connection($pdo, $connection_options);
@@ -127,12 +127,12 @@ abstract class MigrateTestCase extends UnitTestCase {
     \Drupal::setContainer($container);
 
     // Create the tables and load them up with data, skipping empty ones.
-    foreach (array_filter($database_contents) as $table => $rows) {
-      $pilot_row = reset($rows);
+    foreach (\array_filter($database_contents) as $table => $rows) {
+      $pilot_row = \reset($rows);
       $connection->schema()->createTable($table, $this->createSchemaFromRow($pilot_row));
 
-      $insert = $connection->insert($table)->fields(array_keys($pilot_row));
-      array_walk($rows, [$insert, 'values']);
+      $insert = $connection->insert($table)->fields(\array_keys($pilot_row));
+      \array_walk($rows, [$insert, 'values']);
       $insert->execute();
     }
 
@@ -151,7 +151,7 @@ abstract class MigrateTestCase extends UnitTestCase {
   protected function createSchemaFromRow(array $row) {
     // SQLite uses loose ("affinity") typing, so it is OK for every column to be
     // a text field.
-    $fields = array_map(function () {
+    $fields = \array_map(function () {
       return ['type' => 'text'];
     }, $row);
     return ['fields' => $fields];
@@ -172,10 +172,10 @@ abstract class MigrateTestCase extends UnitTestCase {
       $expected_row = $expected_results[$count];
       $count++;
       foreach ($expected_row as $key => $expected_value) {
-        $this->retrievalAssertHelper($expected_value, $this->getValue($data_row, $key), sprintf('Value matches for key "%s"', $key));
+        $this->retrievalAssertHelper($expected_value, $this->getValue($data_row, $key), \sprintf('Value matches for key "%s"', $key));
       }
     }
-    $this->assertSame(count($expected_results), $count);
+    $this->assertSame(\count($expected_results), $count);
   }
 
   /**
@@ -204,7 +204,7 @@ abstract class MigrateTestCase extends UnitTestCase {
    *   The tested result as a formatted string.
    */
   protected function retrievalAssertHelper($expected_value, $actual_value, $message) {
-    if (is_array($expected_value)) {
+    if (\is_array($expected_value)) {
       // If the expected and actual values are empty, no need to array compare.
       if (empty($expected_value && $actual_value)) {
         return;

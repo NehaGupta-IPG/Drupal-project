@@ -49,7 +49,7 @@ class ContentEntityType extends EntityType implements ContentEntityTypeInterface
    */
   protected function checkStorageClass($class) {
     $required_interface = ContentEntityStorageInterface::class;
-    if (!is_subclass_of($class, $required_interface)) {
+    if (!\is_subclass_of($class, $required_interface)) {
       throw new \InvalidArgumentException("$class does not implement $required_interface");
     }
   }

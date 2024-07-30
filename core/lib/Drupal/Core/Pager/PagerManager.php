@@ -85,13 +85,13 @@ class PagerManager implements PagerManagerInterface {
       $currentPage = ($pager = $this->getPager($i)) ? $pager->getCurrentPage() : NULL;
       $element_pages[] = ($i == $element) ? $index : $currentPage;
     }
-    $query['page'] = implode(',', $element_pages);
+    $query['page'] = \implode(',', $element_pages);
 
     // Merge the query parameters passed to this function with the parameters
     // from the current request. In case of collision, the parameters passed
     // into this function take precedence.
     if ($current_query = $this->pagerParams->getQueryParameters()) {
-      $query = array_merge($current_query, $query);
+      $query = \array_merge($current_query, $query);
     }
     return $query;
   }
@@ -107,7 +107,7 @@ class PagerManager implements PagerManagerInterface {
    * {@inheritdoc}
    */
   public function reservePagerElementId(int $element): void {
-    $this->maxPagerElementId = max($element, $this->maxPagerElementId);
+    $this->maxPagerElementId = \max($element, $this->maxPagerElementId);
   }
 
   /**
@@ -119,7 +119,7 @@ class PagerManager implements PagerManagerInterface {
    *   The pager index.
    */
   protected function setPager(Pager $pager, $element = 0) {
-    $this->maxPagerElementId = max($element, $this->maxPagerElementId);
+    $this->maxPagerElementId = \max($element, $this->maxPagerElementId);
     $this->pagers[$element] = $pager;
   }
 

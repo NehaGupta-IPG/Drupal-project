@@ -59,7 +59,7 @@ class EditorPrivateFileReferenceFilterTest extends BrowserTestBase {
     $file->setTemporary();
     $file->setOwner($author);
     // Create the file itself.
-    file_put_contents($file->getFileUri(), $this->randomString());
+    \file_put_contents($file->getFileUri(), $this->randomString());
     $file->save();
 
     // The image should be visible for its author.

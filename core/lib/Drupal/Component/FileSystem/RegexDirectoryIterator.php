@@ -26,7 +26,7 @@ class RegexDirectoryIterator extends \RegexIterator {
   public function accept(): bool {
     /** @var \SplFileInfo $file_info */
     $file_info = $this->getInnerIterator()->current();
-    return $file_info->isFile() && preg_match($this->getRegex(), $file_info->getFilename());
+    return $file_info->isFile() && \preg_match($this->getRegex(), $file_info->getFilename());
   }
 
 }

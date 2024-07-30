@@ -141,7 +141,7 @@ class Block extends DisplayPluginBase {
       ],
     ];
 
-    $block_description = strip_tags($this->getOption('block_description'));
+    $block_description = \strip_tags($this->getOption('block_description'));
     if (empty($block_description)) {
       $block_description = $this->t('None');
     }
@@ -158,7 +158,7 @@ class Block extends DisplayPluginBase {
       'value' => Unicode::truncate($block_category, 24, FALSE, TRUE),
     ];
 
-    $filtered_allow = array_filter($this->getOption('allow'));
+    $filtered_allow = \array_filter($this->getOption('allow'));
 
     $options['allow'] = [
       'category' => 'block',
@@ -227,7 +227,7 @@ class Block extends DisplayPluginBase {
           'items_per_page' => $this->t('Items per page'),
         ];
 
-        $allow = array_keys(array_filter($this->getOption('allow')));
+        $allow = \array_keys(\array_filter($this->getOption('allow')));
         $form['allow'] = [
           '#type' => 'checkboxes',
           '#default_value' => $allow,
@@ -273,7 +273,7 @@ class Block extends DisplayPluginBase {
    * @see \Drupal\views\Plugin\Block\ViewsBlock::blockForm()
    */
   public function blockForm(ViewsBlock $block, array &$form, FormStateInterface $form_state) {
-    $allow_settings = array_filter($this->getOption('allow'));
+    $allow_settings = \array_filter($this->getOption('allow'));
 
     $block_configuration = $block->getConfiguration();
 

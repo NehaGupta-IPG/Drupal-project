@@ -105,7 +105,7 @@ class NodeTokenReplaceTest extends TokenReplaceKernelTestBase {
     $metadata_tests['[node:changed:since]'] = $bubbleable_metadata;
 
     // Test to make sure that we generated something for each token.
-    $this->assertNotContains(0, array_map('strlen', $tests), 'No empty tokens generated.');
+    $this->assertNotContains(0, \array_map('strlen', $tests), 'No empty tokens generated.');
 
     foreach ($tests as $input => $expected) {
       $bubbleable_metadata = new BubbleableMetadata();
@@ -128,7 +128,7 @@ class NodeTokenReplaceTest extends TokenReplaceKernelTestBase {
     $tests['[node:published_status]'] = 'Unpublished';
 
     // Test to make sure that we generated something for each token.
-    $this->assertFalse(in_array(0, array_map('strlen', $tests)), 'No empty tokens generated for unpublished node.');
+    $this->assertFalse(\in_array(0, \array_map('strlen', $tests)), 'No empty tokens generated for unpublished node.');
 
     foreach ($tests as $input => $expected) {
       $output = $this->tokenService->replace($input, ['node' => $node], ['language' => $this->interfaceLanguage]);

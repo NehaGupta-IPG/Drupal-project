@@ -218,7 +218,7 @@ class EntityFormTest extends BrowserTestBase {
     $entity_storage = $this->container->get('entity_type.manager')->getStorage($entity_type);
     $entity_storage->resetCache();
     $entities = $entity_storage->loadByProperties(['name' => $name]);
-    return $entities ? current($entities) : NULL;
+    return $entities ? \current($entities) : NULL;
   }
 
   /**

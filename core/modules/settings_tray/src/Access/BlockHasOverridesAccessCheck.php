@@ -23,7 +23,7 @@ class BlockHasOverridesAccessCheck implements AccessInterface {
    *   The access result.
    */
   public function access(BlockInterface $block) {
-    return AccessResult::allowedIf(!_settings_tray_has_block_overrides($block));
+    return AccessResult::allowedIf(!\_settings_tray_has_block_overrides($block));
   }
 
 }

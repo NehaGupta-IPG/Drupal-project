@@ -160,11 +160,11 @@ class Table extends FormElementBase {
       // @todo D8: Remove this inconsistency.
       if ($input === FALSE) {
         $element += ['#default_value' => []];
-        $value = array_keys(array_filter($element['#default_value']));
-        return array_combine($value, $value);
+        $value = \array_keys(\array_filter($element['#default_value']));
+        return \array_combine($value, $value);
       }
       else {
-        return is_array($input) ? array_combine($input, $input) : [];
+        return \is_array($input) ? \array_combine($input, $input) : [];
       }
     }
   }
@@ -188,7 +188,7 @@ class Table extends FormElementBase {
   public static function processTable(&$element, FormStateInterface $form_state, &$complete_form) {
     if ($element['#tableselect']) {
       if ($element['#multiple']) {
-        $value = is_array($element['#value']) ? $element['#value'] : [];
+        $value = \is_array($element['#value']) ? $element['#value'] : [];
       }
       // Advanced selection behavior makes no sense for radios.
       else {
@@ -198,12 +198,12 @@ class Table extends FormElementBase {
       // @todo D8: Rename into #select_all?
       if ($element['#js_select']) {
         $element['#attached']['library'][] = 'core/drupal.tableselect';
-        array_unshift($element['#header'], ['class' => ['select-all']]);
+        \array_unshift($element['#header'], ['class' => ['select-all']]);
       }
       // Add an empty header column for radio buttons or when a "Select all"
       // checkbox is not desired.
       else {
-        array_unshift($element['#header'], '');
+        \array_unshift($element['#header'], '');
       }
 
       if (!isset($element['#default_value']) || $element['#default_value'] === 0) {
@@ -218,14 +218,14 @@ class Table extends FormElementBase {
         // Their values have to be located in child keys (#tree is ignored),
         // since Table::validateTable() has to be able to validate whether input
         // (for the parent #type 'table' element) has been submitted.
-        $element_parents = array_merge($element['#parents'], [$key]);
+        $element_parents = \array_merge($element['#parents'], [$key]);
 
         // Since the #parents of the tableselect form element will equal the
         // #parents of the row element, prevent FormBuilder from auto-generating
         // an #id for the row element, since
         // \Drupal\Component\Utility\Html::getUniqueId() would automatically
         // append a suffix to the tableselect form element's #id otherwise.
-        $row['#id'] = HtmlUtility::getUniqueId('edit-' . implode('-', $element_parents) . '-row');
+        $row['#id'] = HtmlUtility::getUniqueId('edit-' . \implode('-', $element_parents) . '-row');
 
         // Do not overwrite manually created children.
         if (!isset($row['select'])) {
@@ -255,7 +255,7 @@ class Table extends FormElementBase {
               }
             }
             if (isset($title) && $title !== '') {
-              $title = t('Update @title', ['@title' => $title]);
+              $title = \t('Update @title', ['@title' => $title]);
             }
           }
 
@@ -319,12 +319,12 @@ class Table extends FormElementBase {
       return;
     }
     if ($element['#multiple']) {
-      if (!is_array($element['#value']) || !count(array_filter($element['#value']))) {
-        $form_state->setError($element, t('No items selected.'));
+      if (!\is_array($element['#value']) || !\count(\array_filter($element['#value']))) {
+        $form_state->setError($element, \t('No items selected.'));
       }
     }
     elseif (!isset($element['#value']) || $element['#value'] === '') {
-      $form_state->setError($element, t('No item selected.'));
+      $form_state->setError($element, \t('No item selected.'));
     }
   }
 
@@ -428,7 +428,7 @@ class Table extends FormElementBase {
     Element::setAttributes($element, ['id']);
 
     // Add sticky headers, if applicable.
-    if (count($element['#header']) && $element['#sticky']) {
+    if (\count($element['#header']) && $element['#sticky']) {
       $element['#attached']['library'][] = 'core/drupal.tableheader';
       $element['#attributes']['class'][] = 'sticky-header';
     }
@@ -448,7 +448,7 @@ class Table extends FormElementBase {
     if (!empty($element['#tabledrag']) && isset($element['#attributes']['id'])) {
       foreach ($element['#tabledrag'] as $options) {
         $options['table_id'] = $element['#attributes']['id'];
-        drupal_attach_tabledrag($element, $options);
+        \drupal_attach_tabledrag($element, $options);
       }
     }
 

@@ -35,14 +35,14 @@ class RequestSanitizerTest extends UnitTestCase {
   protected function setUp(): void {
     parent::setUp();
     $this->errors = [];
-    set_error_handler([$this, "errorHandler"]);
+    \set_error_handler([$this, "errorHandler"]);
   }
 
   /**
    * {@inheritdoc}
    */
   protected function tearDown(): void {
-    restore_error_handler();
+    \restore_error_handler();
     parent::tearDown();
   }
 
@@ -68,15 +68,15 @@ class RequestSanitizerTest extends UnitTestCase {
     $_GET = $request->query->all();
     $_POST = $request->request->all();
     $_COOKIE = $request->cookies->all();
-    $_REQUEST = array_merge($request->query->all(), $request->request->all());
-    $request->server->set('QUERY_STRING', http_build_query($request->query->all()));
+    $_REQUEST = \array_merge($request->query->all(), $request->request->all());
+    $request->server->set('QUERY_STRING', \http_build_query($request->query->all()));
     $_SERVER['QUERY_STRING'] = $request->server->get('QUERY_STRING');
 
     $request = RequestSanitizer::sanitize($request, $allow_list, is_null($expected_errors) ? FALSE : TRUE);
 
     // Normalize the expected data.
     $expected += ['cookies' => [], 'query' => [], 'request' => []];
-    $expected_query_string = http_build_query($expected['query']);
+    $expected_query_string = \http_build_query($expected['query']);
 
     // Test the request.
     $this->assertEquals($expected['cookies'], $request->cookies->all());
@@ -90,7 +90,7 @@ class RequestSanitizerTest extends UnitTestCase {
     $this->assertEquals($expected['cookies'], $_COOKIE);
     $this->assertEquals($expected['query'], $_GET);
     $this->assertEquals($expected['request'], $_POST);
-    $expected_request = array_merge($expected['query'], $expected['request']);
+    $expected_request = \array_merge($expected['query'], $expected['request']);
     $this->assertEquals($expected_request, $_REQUEST);
     $this->assertEquals($expected_query_string, $_SERVER['QUERY_STRING']);
 
@@ -313,8 +313,8 @@ class RequestSanitizerTest extends UnitTestCase {
     $_GET = $request->query->all();
     $_POST = $request->request->all();
     $_COOKIE = $request->cookies->all();
-    $_REQUEST = array_merge($request->query->all(), $request->request->all());
-    $request->server->set('QUERY_STRING', http_build_query($request->query->all()));
+    $_REQUEST = \array_merge($request->query->all(), $request->request->all());
+    $request->server->set('QUERY_STRING', \http_build_query($request->query->all()));
     $_SERVER['QUERY_STRING'] = $request->server->get('QUERY_STRING');
     return $request;
   }
@@ -376,7 +376,7 @@ class RequestSanitizerTest extends UnitTestCase {
         return;
       }
     }
-    $this->fail("Error with level $errno and message '$errstr' not found in " . var_export($this->errors, TRUE));
+    $this->fail("Error with level $errno and message '$errstr' not found in " . \var_export($this->errors, TRUE));
   }
 
 }

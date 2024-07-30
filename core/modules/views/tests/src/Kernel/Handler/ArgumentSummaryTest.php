@@ -144,7 +144,7 @@ class ArgumentSummaryTest extends ViewsKernelTestBase {
     // assertions more clear.
     $renderer = $this->container->get('renderer');
     $output = (string) $renderer->renderRoot($result);
-    $output = trim(preg_replace('/\s+/', ' ', strip_tags($output)));
+    $output = \trim(\preg_replace('/\s+/', ' ', \strip_tags($output)));
 
     // Output should show first tag on 4 nodes, the second tag on only 2.
     $this->assertStringContainsString($tags[0]->label() . ' (4)', $output);

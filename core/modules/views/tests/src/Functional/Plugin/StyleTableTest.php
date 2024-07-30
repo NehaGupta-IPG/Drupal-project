@@ -117,12 +117,12 @@ class StyleTableTest extends ViewTestBase {
     // an age of zero.
     $data_set = $this->dataSet();
     $query = Database::getConnection()->insert('views_test_data')
-      ->fields(array_keys($data_set[0]));
+      ->fields(\array_keys($data_set[0]));
     $query->values([
       'name' => 'James McCartney',
       'age' => 0,
       'job' => 'Baby',
-      'created' => gmmktime(6, 30, 10, 1, 1, 2000),
+      'created' => \gmmktime(6, 30, 10, 1, 1, 2000),
       'status' => 1,
     ]);
     $query->execute();
@@ -177,12 +177,12 @@ class StyleTableTest extends ViewTestBase {
       'name' => 'Marshall',
       'age' => 42,
       'job' => $unsafe_markup,
-      'created' => gmmktime(0, 0, 0, 2, 15, 2001),
+      'created' => \gmmktime(0, 0, 0, 2, 15, 2001),
       'status' => 1,
     ];
     $database = $this->container->get('database');
     $database->insert('views_test_data')
-      ->fields(array_keys($unsafe_markup_data))
+      ->fields(\array_keys($unsafe_markup_data))
       ->values($unsafe_markup_data)
       ->execute();
 

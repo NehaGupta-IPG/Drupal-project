@@ -74,7 +74,7 @@ trait DraggableListBuilderTrait {
   public function buildHeader() {
     $header = [];
     if (!empty($this->weightKey)) {
-      $header['weight'] = t('Weight');
+      $header['weight'] = \t('Weight');
     }
     return $header + parent::buildHeader();
   }
@@ -99,7 +99,7 @@ trait DraggableListBuilderTrait {
       // Add weight column.
       $row['weight'] = [
         '#type' => 'weight',
-        '#title' => t('Weight for @title', ['@title' => $entity->label()]),
+        '#title' => \t('Weight for @title', ['@title' => $entity->label()]),
         '#title_display' => 'invisible',
         '#default_value' => $this->getWeight($entity),
         '#attributes' => ['class' => ['weight']],
@@ -140,7 +140,7 @@ trait DraggableListBuilderTrait {
     $form[$this->entitiesKey] = [
       '#type' => 'table',
       '#header' => $this->buildHeader(),
-      '#empty' => t('There are no @label yet.', ['@label' => $this->entityType->getPluralLabel()]),
+      '#empty' => \t('There are no @label yet.', ['@label' => $this->entityType->getPluralLabel()]),
       '#tabledrag' => [
         [
           'action' => 'order',
@@ -154,9 +154,9 @@ trait DraggableListBuilderTrait {
     $delta = 10;
     // Change the delta of the weight field if there are more than 20 entities.
     if (!empty($this->weightKey)) {
-      $count = count($this->entities);
+      $count = \count($this->entities);
       if ($count > 20) {
-        $delta = ceil($count / 2);
+        $delta = \ceil($count / 2);
       }
     }
     foreach ($this->entities as $entity) {
@@ -173,7 +173,7 @@ trait DraggableListBuilderTrait {
     $form['actions']['#type'] = 'actions';
     $form['actions']['submit'] = [
       '#type' => 'submit',
-      '#value' => t('Save'),
+      '#value' => \t('Save'),
       '#button_type' => 'primary',
     ];
 

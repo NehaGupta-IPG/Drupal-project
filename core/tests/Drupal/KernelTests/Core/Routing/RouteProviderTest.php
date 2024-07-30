@@ -133,7 +133,7 @@ class RouteProviderTest extends KernelTestBase {
 
     $candidates = $provider->getCandidateOutlines($parts);
 
-    $candidates = array_flip($candidates);
+    $candidates = \array_flip($candidates);
 
     $this->assertCount(7, $candidates, 'Correct number of candidates found');
     $this->assertArrayHasKey('/node/5/edit', $candidates);
@@ -456,7 +456,7 @@ class RouteProviderTest extends KernelTestBase {
       $routes_array = $routes->all();
 
       $this->assertCount(2, $routes, 'The correct number of routes was found.');
-      $this->assertEquals(['Lassie', 'foo'], array_keys($routes_array), 'Ensure the fitness was taken into account.');
+      $this->assertEquals(['Lassie', 'foo'], \array_keys($routes_array), 'Ensure the fitness was taken into account.');
       $this->assertNotNull($routes->get('Lassie'), 'The first matching route was found.');
       $this->assertNotNull($routes->get('foo'), 'The second matching route was found.');
       $this->assertNull($routes->get('eep'), 'Non-matching route was not found.');
@@ -495,7 +495,7 @@ class RouteProviderTest extends KernelTestBase {
       $routes_array = $routes->all();
 
       $this->assertCount(2, $routes, 'The correct number of routes was found.');
-      $this->assertEquals(['foo', 'foo2'], array_keys($routes_array), 'Ensure the fitness and name were taken into account in the sort.');
+      $this->assertEquals(['foo', 'foo2'], \array_keys($routes_array), 'Ensure the fitness and name were taken into account in the sort.');
       $this->assertNotNull($routes->get('foo'), 'The first matching route was found.');
       $this->assertNotNull($routes->get('foo2'), 'The second matching route was found.');
       $this->assertNull($routes->get('eep'), 'Non-matching route was not found.');
@@ -704,13 +704,13 @@ class RouteProviderTest extends KernelTestBase {
     $shortest = '/test/1/test2';
     $result = $provider->getRoutesByPattern($shortest);
     $this->assertEquals(0, $result->count());
-    $candidates = $provider->getCandidateOutlines(explode('/', trim($shortest, '/')));
+    $candidates = $provider->getCandidateOutlines(\explode('/', \trim($shortest, '/')));
     $this->assertCount(7, $candidates);
     // A longer patten is not found and returns no candidates.
     $path_to_test = '/test/1/test2/2/test3/3/4/5/6/test4';
     $result = $provider->getRoutesByPattern($path_to_test);
     $this->assertEquals(0, $result->count());
-    $candidates = $provider->getCandidateOutlines(explode('/', trim($path_to_test, '/')));
+    $candidates = $provider->getCandidateOutlines(\explode('/', \trim($path_to_test, '/')));
     $this->assertCount(0, $candidates);
 
     // Add a matching route and dump it.
@@ -724,9 +724,9 @@ class RouteProviderTest extends KernelTestBase {
     $this->assertEquals(1, $result->count());
     // We can't compare the values of the routes directly, nor use
     // spl_object_hash() because they are separate instances.
-    $this->assertEquals(serialize($collection->get('long_pattern')), serialize($result->get('long_pattern')), 'The right route was found.');
+    $this->assertEquals(\serialize($collection->get('long_pattern')), \serialize($result->get('long_pattern')), 'The right route was found.');
     // We now have a single candidate outline.
-    $candidates = $provider->getCandidateOutlines(explode('/', trim($path_to_test, '/')));
+    $candidates = $provider->getCandidateOutlines(\explode('/', \trim($path_to_test, '/')));
     $this->assertCount(1, $candidates);
     // Longer and shorter patterns are not found. Both are longer than 3, so
     // we should not have any candidates either. The fact that we do not
@@ -734,18 +734,18 @@ class RouteProviderTest extends KernelTestBase {
     $longer = '/test/1/test2/2/test3/3/4/5/6/test4/trailing/more/parts';
     $result = $provider->getRoutesByPattern($longer);
     $this->assertEquals(0, $result->count());
-    $candidates = $provider->getCandidateOutlines(explode('/', trim($longer, '/')));
+    $candidates = $provider->getCandidateOutlines(\explode('/', \trim($longer, '/')));
     $this->assertCount(1, $candidates);
     $shorter = '/test/1/test2/2/test3';
     $result = $provider->getRoutesByPattern($shorter);
     $this->assertEquals(0, $result->count());
-    $candidates = $provider->getCandidateOutlines(explode('/', trim($shorter, '/')));
+    $candidates = $provider->getCandidateOutlines(\explode('/', \trim($shorter, '/')));
     $this->assertCount(0, $candidates);
     // This pattern has only 3 parts, so we will get candidates, but no routes.
     // This result is unchanged by running the dumper.
     $result = $provider->getRoutesByPattern($shortest);
     $this->assertEquals(0, $result->count());
-    $candidates = $provider->getCandidateOutlines(explode('/', trim($shortest, '/')));
+    $candidates = $provider->getCandidateOutlines(\explode('/', \trim($shortest, '/')));
     $this->assertCount(7, $candidates);
   }
 

@@ -73,9 +73,9 @@ class JsonApiRequestValidator implements EventSubscriberInterface {
    */
   protected function validateQueryParams(Request $request) {
     $invalid_query_params = [];
-    foreach (array_keys($request->query->all()) as $query_parameter_name) {
+    foreach (\array_keys($request->query->all()) as $query_parameter_name) {
       // Ignore reserved (official) query parameters.
-      if (in_array($query_parameter_name, JsonApiSpec::getReservedQueryParameters())) {
+      if (\in_array($query_parameter_name, JsonApiSpec::getReservedQueryParameters())) {
         continue;
       }
 
@@ -91,14 +91,14 @@ class JsonApiRequestValidator implements EventSubscriberInterface {
     // Drupal uses the `_format` query parameter for Content-Type negotiation.
     // Using it violates the JSON:API spec. Nudge people nicely in the correct
     // direction. (This is special cased because using it is pretty common.)
-    if (in_array('_format', $invalid_query_params, TRUE)) {
+    if (\in_array('_format', $invalid_query_params, TRUE)) {
       $uri_without_query_string = $request->getSchemeAndHttpHost() . $request->getBaseUrl() . $request->getPathInfo();
       $exception = new CacheableBadRequestHttpException((new CacheableMetadata())->addCacheContexts(['url.query_args']), 'JSON:API does not need that ugly \'_format\' query string! 🤘 Use the URL provided in \'links\' 🙏');
       $exception->setHeaders(['Link' => $uri_without_query_string]);
       throw $exception;
     }
 
-    $message = sprintf('The following query parameters violate the JSON:API spec: \'%s\'.', implode("', '", $invalid_query_params));
+    $message = \sprintf('The following query parameters violate the JSON:API spec: \'%s\'.', \implode("', '", $invalid_query_params));
     $exception = new CacheableBadRequestHttpException((new CacheableMetadata())->addCacheContexts(['url.query_args']), $message);
     $exception->setHeaders(['Link' => 'http://jsonapi.org/format/#query-parameters']);
     throw $exception;

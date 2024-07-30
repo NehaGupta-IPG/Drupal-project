@@ -34,7 +34,7 @@ class CommentType extends DrupalSqlBase {
    */
   public function prepareRow(Row $row) {
     $node_type = $row->getSourceProperty('type');
-    foreach (array_keys($this->getCommentFields()) as $field) {
+    foreach (\array_keys($this->getCommentFields()) as $field) {
       $row->setSourceProperty($field, $this->variableGet($field . '_' . $node_type, NULL));
     }
 

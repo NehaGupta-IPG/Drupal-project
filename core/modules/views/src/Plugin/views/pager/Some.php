@@ -95,7 +95,7 @@ class Some extends PagerPluginBase {
    * {@inheritdoc}
    */
   public function postExecute(&$result): void {
-    $this->total_items = count($result);
+    $this->total_items = \count($result);
   }
 
 }

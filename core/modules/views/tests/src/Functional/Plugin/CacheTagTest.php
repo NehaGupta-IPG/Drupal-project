@@ -167,7 +167,7 @@ class CacheTagTest extends ViewTestBase {
     $this->assertTrue($cache_plugin->cacheGet('results'), 'Results cache found.');
     $this->assertNotEmpty($this->getRenderCache($view), 'Output cache found.');
 
-    $node = reset($this->pages);
+    $node = \reset($this->pages);
     $node->save();
 
     $this->assertFalse($cache_plugin->cacheGet('results'), 'Results cache empty after a page node is saved.');

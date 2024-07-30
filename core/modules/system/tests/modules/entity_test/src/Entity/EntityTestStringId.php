@@ -51,8 +51,8 @@ class EntityTestStringId extends EntityTest {
   public static function baseFieldDefinitions(EntityTypeInterface $entity_type) {
     $fields = parent::baseFieldDefinitions($entity_type);
     $fields['id'] = BaseFieldDefinition::create('string')
-      ->setLabel(t('ID'))
-      ->setDescription(t('The ID of the test entity.'))
+      ->setLabel(\t('ID'))
+      ->setDescription(\t('The ID of the test entity.'))
       ->setReadOnly(TRUE)
       // In order to work around the InnoDB 191 character limit on utf8mb4
       // primary keys, we set the character set for the field to ASCII.

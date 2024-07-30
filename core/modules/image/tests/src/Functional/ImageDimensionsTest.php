@@ -45,7 +45,7 @@ class ImageDimensionsTest extends BrowserTestBase {
     $image_factory = $this->container->get('image.factory');
     // Create a working copy of the file.
     $files = $this->drupalGetTestFiles('image');
-    $file = reset($files);
+    $file = \reset($files);
     /** @var \Drupal\Core\File\FileSystemInterface $file_system */
     $file_system = \Drupal::service('file_system');
     $original_uri = $file_system->copy($file->uri, 'public://', FileExists::Rename);

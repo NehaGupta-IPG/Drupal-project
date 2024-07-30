@@ -78,7 +78,7 @@ class FieldImportDeleteUninstallUiTest extends FieldTestBase {
     $entity = EntityTest::create();
     $value = '+0123456789';
     $entity->field_tel = $value;
-    $entity->field_date = time();
+    $entity->field_date = \time();
     $entity->name->value = $this->randomMachineName();
     $entity->save();
 

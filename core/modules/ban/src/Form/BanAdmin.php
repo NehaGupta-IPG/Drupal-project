@@ -107,14 +107,14 @@ class BanAdmin extends FormBase {
    * {@inheritdoc}
    */
   public function validateForm(array &$form, FormStateInterface $form_state) {
-    $ip = trim($form_state->getValue('ip'));
+    $ip = \trim($form_state->getValue('ip'));
     if ($this->ipManager->isBanned($ip)) {
       $form_state->setErrorByName('ip', $this->t('This IP address is already banned.'));
     }
     elseif ($ip == $this->getRequest()->getClientIP()) {
       $form_state->setErrorByName('ip', $this->t('You may not ban your own IP address.'));
     }
-    elseif (filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_NO_RES_RANGE) == FALSE) {
+    elseif (\filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_NO_RES_RANGE) == FALSE) {
       $form_state->setErrorByName('ip', $this->t('Enter a valid IP address.'));
     }
   }
@@ -123,7 +123,7 @@ class BanAdmin extends FormBase {
    * {@inheritdoc}
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {
-    $ip = trim($form_state->getValue('ip'));
+    $ip = \trim($form_state->getValue('ip'));
     $this->ipManager->banIp($ip);
     $this->messenger()->addStatus($this->t('The IP address %ip has been banned.', ['%ip' => $ip]));
     $form_state->setRedirect('ban.admin_page');

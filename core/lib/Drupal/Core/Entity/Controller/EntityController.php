@@ -147,9 +147,9 @@ class EntityController implements ContainerInjectionInterface {
 
     $form_route_name = 'entity.' . $entity_type_id . '.add_form';
     // Redirect if there's only one bundle available.
-    if (count($bundles) == 1) {
-      $bundle_names = array_keys($bundles);
-      $bundle_name = reset($bundle_names);
+    if (\count($bundles) == 1) {
+      $bundle_names = \array_keys($bundles);
+      $bundle_name = \reset($bundle_names);
       $parameters = $this->routeMatch->getRawParameters()->all();
       $parameters[$bundle_argument] = $bundle_name;
       $query = $request->query->all();
@@ -199,7 +199,7 @@ class EntityController implements ContainerInjectionInterface {
     // If the entity has bundle entities, the parameter might have been upcasted
     // so fetch the raw parameter.
     $bundle = $route_match->getRawParameter($bundle_parameter);
-    if ((count($bundles) > 1) && isset($bundles[$bundle])) {
+    if ((\count($bundles) > 1) && isset($bundles[$bundle])) {
       return $this->t('Add @bundle', ['@bundle' => $bundles[$bundle]['label']]);
     }
     // If the entity supports bundles generally, but only has a single bundle,
@@ -310,7 +310,7 @@ class EntityController implements ContainerInjectionInterface {
     if (!$bundle_entity_type->entityClassImplements(EntityDescriptionInterface::class)) {
       return $bundles;
     }
-    $bundle_names = array_keys($bundles);
+    $bundle_names = \array_keys($bundles);
     $storage = $this->entityTypeManager->getStorage($bundle_entity_type->id());
     /** @var \Drupal\Core\Entity\EntityDescriptionInterface[] $bundle_entities */
     $bundle_entities = $storage->loadMultiple($bundle_names);

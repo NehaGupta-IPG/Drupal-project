@@ -99,7 +99,7 @@ class ProcessField extends ProcessPluginBase implements ContainerFactoryPluginIn
    * {@inheritdoc}
    */
   public function transform($value, MigrateExecutableInterface $migrate_executable, Row $row, $destination_property) {
-    if (!is_string($value)) {
+    if (!\is_string($value)) {
       throw new MigrateException('The input value must be a string.');
     }
 
@@ -134,10 +134,10 @@ class ProcessField extends ProcessPluginBase implements ContainerFactoryPluginIn
   protected function callMethodOnFieldPlugin(MigrateFieldPluginManagerInterface $field_plugin_manager, $field_type, $method, Row $row) {
     $plugin_id = $field_plugin_manager->getPluginIdFromFieldType($field_type, [], $this->migration);
     $plugin_instance = $field_plugin_manager->createInstance($plugin_id, [], $this->migration);
-    if (!is_callable([$plugin_instance, $method])) {
+    if (!\is_callable([$plugin_instance, $method])) {
       throw new MigrateException('The specified method does not exist or is not callable.');
     }
-    return call_user_func_array([$plugin_instance, $method], [$row]);
+    return \call_user_func_array([$plugin_instance, $method], [$row]);
   }
 
 }

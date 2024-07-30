@@ -111,7 +111,7 @@ class TimestampFormatterTest extends KernelTestBase {
     $data = [];
 
     // Test standard formats.
-    $date_formats = array_keys(\Drupal::entityTypeManager()->getStorage('date_format')->loadMultiple());
+    $date_formats = \array_keys(\Drupal::entityTypeManager()->getStorage('date_format')->loadMultiple());
 
     foreach ($date_formats as $date_format) {
       $data[] = ['date_format' => $date_format, 'custom_date_format' => '', 'timezone' => ''];
@@ -121,7 +121,7 @@ class TimestampFormatterTest extends KernelTestBase {
     $data[] = ['date_format' => 'custom', 'custom_date_format' => 'e', 'timezone' => 'Asia/Tokyo'];
 
     foreach ($data as $settings) {
-      [$date_format, $custom_date_format, $timezone] = array_values($settings);
+      [$date_format, $custom_date_format, $timezone] = \array_values($settings);
       if (empty($timezone)) {
         $timezone = NULL;
       }

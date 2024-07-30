@@ -103,7 +103,7 @@ final class ComponentsTwigExtension extends AbstractExtension {
    * @throws \Drupal\Core\Render\Component\Exception\InvalidComponentException
    */
   public function validateProps(array &$context, string $component_id): void {
-    assert($this->doValidateProps($context, $component_id));
+    \assert($this->doValidateProps($context, $component_id));
   }
 
   /**

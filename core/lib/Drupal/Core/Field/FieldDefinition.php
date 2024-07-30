@@ -176,7 +176,7 @@ class FieldDefinition extends ListDataDefinition implements FieldDefinitionInter
    * @return $this
    */
   public function setDefaultValueCallback($callback) {
-    if (isset($callback) && !is_string($callback)) {
+    if (isset($callback) && !\is_string($callback)) {
       throw new \InvalidArgumentException('Default value callback must be a string, like "function_name" or "ClassName::methodName"');
     }
     $this->definition['default_value_callback'] = $callback;
@@ -209,7 +209,7 @@ class FieldDefinition extends ListDataDefinition implements FieldDefinitionInter
   public function getDefaultValue(FieldableEntityInterface $entity) {
     // Allow custom default values function.
     if ($callback = $this->getDefaultValueCallback()) {
-      $value = call_user_func($callback, $entity, $this);
+      $value = \call_user_func($callback, $entity, $this);
     }
     else {
       $value = $this->getDefaultValueLiteral();
@@ -286,7 +286,7 @@ class FieldDefinition extends ListDataDefinition implements FieldDefinitionInter
    * {@inheritdoc}
    */
   public function getSetting($setting_name) {
-    if (array_key_exists($setting_name, $this->itemDefinition->getSettings())) {
+    if (\array_key_exists($setting_name, $this->itemDefinition->getSettings())) {
       return $this->itemDefinition->getSetting($setting_name);
     }
     else {

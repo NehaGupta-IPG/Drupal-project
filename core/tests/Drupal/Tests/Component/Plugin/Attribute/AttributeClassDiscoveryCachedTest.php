@@ -90,7 +90,7 @@ class AttributeClassDiscoveryCachedTest extends TestCase {
     // content to test against.
     $file_cache->set($file_path, [
       'id' => 'wrong_id',
-      'content' => serialize(['an' => 'array']),
+      'content' => \serialize(['an' => 'array']),
     ]);
 
     // Now perform the same query and check for the cached results.

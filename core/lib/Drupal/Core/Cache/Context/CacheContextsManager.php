@@ -105,20 +105,20 @@ class CacheContextsManager {
    *   cacheability metadata.
    */
   public function convertTokensToKeys(array $context_tokens) {
-    assert($this->assertValidTokens($context_tokens));
+    \assert($this->assertValidTokens($context_tokens));
     $cacheable_metadata = new CacheableMetadata();
     $optimized_tokens = $this->optimizeTokens($context_tokens);
     // Iterate over cache contexts that have been optimized away and get their
     // cacheability metadata.
-    foreach (static::parseTokens(array_diff($context_tokens, $optimized_tokens)) as $context_token) {
+    foreach (static::parseTokens(\array_diff($context_tokens, $optimized_tokens)) as $context_token) {
       [$context_id, $parameter] = $context_token;
       $context = $this->getService($context_id);
       $cacheable_metadata = $cacheable_metadata->merge($context->getCacheableMetadata($parameter));
     }
 
-    sort($optimized_tokens);
+    \sort($optimized_tokens);
     $keys = [];
-    foreach (array_combine($optimized_tokens, static::parseTokens($optimized_tokens)) as $context_token => $context) {
+    foreach (\array_combine($optimized_tokens, static::parseTokens($optimized_tokens)) as $context_token => $context) {
       [$context_id, $parameter] = $context;
       $keys[] = '[' . $context_token . ']=' . $this->getService($context_id)->getContext($parameter);
     }
@@ -168,15 +168,15 @@ class CacheContextsManager {
       // Extract the parameter if available.
       $parameter = NULL;
       $context_id = $context_token;
-      if (str_contains($context_token, ':')) {
-        [$context_id, $parameter] = explode(':', $context_token);
+      if (\str_contains($context_token, ':')) {
+        [$context_id, $parameter] = \explode(':', $context_token);
       }
 
       // Context tokens without:
       // - a period means they don't have a parent
       // - a colon means they're not a specific value of a cache context
       // hence no optimizations are possible.
-      if (!str_contains($context_token, '.') && !str_contains($context_token, ':')) {
+      if (!\str_contains($context_token, '.') && !\str_contains($context_token, ':')) {
         $optimized_content_tokens[] = $context_token;
       }
       // Check cacheability. If the context defines a max-age of 0, then it
@@ -190,16 +190,16 @@ class CacheContextsManager {
         $ancestor_found = FALSE;
         // Treat a colon like a period, that allows us to consider 'a' the
         // ancestor of 'a:foo', without any additional code for the colon.
-        $ancestor = str_replace(':', '.', $context_token);
+        $ancestor = \str_replace(':', '.', $context_token);
         do {
-          $ancestor = substr($ancestor, 0, strrpos($ancestor, '.'));
-          if (in_array($ancestor, $context_tokens)) {
+          $ancestor = \substr($ancestor, 0, \strrpos($ancestor, '.'));
+          if (\in_array($ancestor, $context_tokens)) {
             // An ancestor cache context is in $context_tokens, hence this cache
             // context is implied.
             $ancestor_found = TRUE;
           }
 
-        } while (!$ancestor_found && str_contains($ancestor, '.'));
+        } while (!$ancestor_found && \str_contains($ancestor, '.'));
         if (!$ancestor_found) {
           $optimized_content_tokens[] = $context_token;
         }
@@ -240,8 +240,8 @@ class CacheContextsManager {
     foreach ($context_tokens as $context) {
       $context_id = $context;
       $parameter = NULL;
-      if (str_contains($context, ':')) {
-        [$context_id, $parameter] = explode(':', $context, 2);
+      if (\str_contains($context, ':')) {
+        [$context_id, $parameter] = \explode(':', $context, 2);
       }
       $contexts_with_parameters[] = [$context_id, $parameter];
     }
@@ -267,12 +267,12 @@ class CacheContextsManager {
 
     // Initialize the set of valid context tokens with the container's contexts.
     if (!isset($this->validContextTokens)) {
-      $this->validContextTokens = array_flip($this->contexts);
+      $this->validContextTokens = \array_flip($this->contexts);
     }
 
     foreach ($context_tokens as $context_token) {
-      if (!is_string($context_token)) {
-        throw new \LogicException(sprintf('Cache contexts must be strings, %s given.', gettype($context_token)));
+      if (!\is_string($context_token)) {
+        throw new \LogicException(\sprintf('Cache contexts must be strings, %s given.', \gettype($context_token)));
       }
 
       if (isset($this->validContextTokens[$context_token])) {
@@ -285,15 +285,15 @@ class CacheContextsManager {
       // throw an exception, otherwise cache it, including the parameter, to
       // minimize the amount of work in future ::validateContexts() calls.
       $context_id = $context_token;
-      $colon_pos = strpos($context_id, ':');
+      $colon_pos = \strpos($context_id, ':');
       if ($colon_pos !== FALSE) {
-        $context_id = substr($context_id, 0, $colon_pos);
+        $context_id = \substr($context_id, 0, $colon_pos);
       }
       if (isset($this->validContextTokens[$context_id])) {
         $this->validContextTokens[$context_token] = TRUE;
       }
       else {
-        throw new \LogicException(sprintf('"%s" is not a valid cache context ID.', $context_id));
+        throw new \LogicException(\sprintf('"%s" is not a valid cache context ID.', $context_id));
       }
     }
   }
@@ -313,7 +313,7 @@ class CacheContextsManager {
    *   TRUE if context_tokens is an array of valid tokens.
    */
   public function assertValidTokens($context_tokens) {
-    if (!is_array($context_tokens)) {
+    if (!\is_array($context_tokens)) {
       return FALSE;
     }
 

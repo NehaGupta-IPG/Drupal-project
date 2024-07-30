@@ -54,7 +54,7 @@ class SelectProfileForm extends FormBase {
 
     // Display radio buttons alphabetically by human-readable name, but always
     // put the core profiles first (if they are present in the filesystem).
-    natcasesort($names);
+    \natcasesort($names);
     if (isset($names['minimal'])) {
       // If the expert ("Minimal") core profile is present, put it in front of
       // any non-core profiles rather than including it with them
@@ -76,7 +76,7 @@ class SelectProfileForm extends FormBase {
       '#type' => 'radios',
       '#title' => $this->t('Select an installation profile'),
       '#title_display' => 'invisible',
-      '#options' => array_map([$this, 't'], $names),
+      '#options' => \array_map([$this, 't'], $names),
       '#default_value' => 'standard',
     ];
     foreach (array_keys($names) as $profile_name) {
@@ -91,7 +91,7 @@ class SelectProfileForm extends FormBase {
       $site = $sync->read('system.site');
       if (isset($site['name'])) {
         $install_from_config = FALSE;
-        if (isset($extensions['profile']) && array_key_exists($extensions['profile'], $names)) {
+        if (isset($extensions['profile']) && \array_key_exists($extensions['profile'], $names)) {
           // Ensure the profile can be installed from configuration. Install
           // profile's which implement hook_INSTALL() are not supported.
           // @todo https://www.drupal.org/project/drupal/issues/2982052 Remove
@@ -99,10 +99,10 @@ class SelectProfileForm extends FormBase {
           $root = \Drupal::root();
           include_once $root . '/core/includes/install.inc';
           $file = $root . '/' . $install_state['profiles'][$extensions['profile']]->getPath() . "/{$extensions['profile']}.install";
-          if (is_file($file)) {
+          if (\is_file($file)) {
             require_once $file;
           }
-          if (!function_exists($extensions['profile'] . '_install')) {
+          if (!\function_exists($extensions['profile'] . '_install')) {
             $install_from_config = TRUE;
           }
         }

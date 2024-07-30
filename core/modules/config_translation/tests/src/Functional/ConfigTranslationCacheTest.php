@@ -87,7 +87,7 @@ class ConfigTranslationCacheTest extends BrowserTestBase {
     /** @var \Drupal\filter\FilterFormatInterface $full_html_format */
     $full_html_format = FilterFormat::load('full_html');
 
-    $admin_permissions = array_merge($translator_permissions, [
+    $admin_permissions = \array_merge($translator_permissions, [
       'administer languages',
       'administer site configuration',
       'link to any page',

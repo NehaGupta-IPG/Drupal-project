@@ -74,8 +74,8 @@ class FilterID extends StaticMap implements ContainerFactoryPluginInterface {
     // If the static map is bypassed on failure, the returned plugin ID will be
     // an array if $value was. Plugin IDs cannot be arrays, so flatten it before
     // passing it into the filter manager.
-    if (is_array($plugin_id)) {
-      $plugin_id = implode(':', $plugin_id);
+    if (\is_array($plugin_id)) {
+      $plugin_id = \implode(':', $plugin_id);
     }
 
     if ($this->filterManager->hasDefinition($plugin_id)) {
@@ -94,7 +94,7 @@ class FilterID extends StaticMap implements ContainerFactoryPluginInterface {
       $fallback = $this->filterManager->getFallbackPluginId($plugin_id);
 
       // @see \Drupal\filter\Plugin\migrate\process\FilterSettings::transform()
-      $message = sprintf('Filter %s could not be mapped to an existing filter plugin; defaulting to %s and dropping all settings. Either redo the migration with the module installed that provides an equivalent filter, or modify the text format after the migration to remove this filter if it is no longer necessary.', $plugin_id, $fallback);
+      $message = \sprintf('Filter %s could not be mapped to an existing filter plugin; defaulting to %s and dropping all settings. Either redo the migration with the module installed that provides an equivalent filter, or modify the text format after the migration to remove this filter if it is no longer necessary.', $plugin_id, $fallback);
       $migrate_executable->saveMessage($message, MigrationInterface::MESSAGE_WARNING);
 
       return $fallback;

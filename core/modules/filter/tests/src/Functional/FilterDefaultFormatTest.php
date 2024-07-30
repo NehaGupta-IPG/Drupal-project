@@ -64,10 +64,10 @@ class FilterDefaultFormatTest extends BrowserTestBase {
 
     // Check that each user's default format is the lowest weighted format that
     // the user has access to.
-    $actual = filter_default_format($first_user);
+    $actual = \filter_default_format($first_user);
     $expected = $first_format->id();
     $this->assertEquals($expected, $actual, "First user's default format {$actual} is the expected lowest weighted format {$expected} that the user has access to.");
-    $actual = filter_default_format($second_user);
+    $actual = \filter_default_format($second_user);
     $expected = $second_format->id();
     $this->assertEquals($expected, $actual, "Second user's default format {$actual} is the expected lowest weighted format {$expected} that the user has access to, and different to the first user's.");
 
@@ -78,7 +78,7 @@ class FilterDefaultFormatTest extends BrowserTestBase {
     $this->drupalGet('admin/config/content/formats');
     $this->submitForm($edit, 'Save');
     $this->resetFilterCaches();
-    $this->assertEquals(filter_default_format($first_user), filter_default_format($second_user), 'After the formats are reordered, both users have the same default format.');
+    $this->assertEquals(\filter_default_format($first_user), \filter_default_format($second_user), 'After the formats are reordered, both users have the same default format.');
   }
 
   /**

@@ -60,7 +60,7 @@ class FieldCounterTest extends ViewsKernelTestBase {
     $view->storage->invalidateCaches();
 
     $view->setDisplay();
-    $rand_start = rand(5, 10);
+    $rand_start = \rand(5, 10);
     $view->displayHandlers->get('default')->overrideOption('fields', [
       'counter' => [
         'id' => 'counter',

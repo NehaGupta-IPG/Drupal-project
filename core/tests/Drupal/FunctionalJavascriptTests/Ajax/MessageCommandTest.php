@@ -74,7 +74,7 @@ class MessageCommandTest extends WebDriverTestBase {
     for ($i = 1; $i < 7; $i++) {
       $page->pressButton('Make Message In Alternate Location');
       $expected_count = $page->waitFor(10, function () use ($i, $page) {
-        return count($page->findAll('css', '#alternate-message-container .messages')) === $i;
+        return \count($page->findAll('css', '#alternate-message-container .messages')) === $i;
       });
       $this->assertTrue($expected_count);
       $this->assertAnnounceContains('I am a message in an alternate location.');

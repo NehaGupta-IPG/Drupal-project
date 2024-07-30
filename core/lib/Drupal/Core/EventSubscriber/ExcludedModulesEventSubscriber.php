@@ -79,7 +79,7 @@ final class ExcludedModulesEventSubscriber implements EventSubscriberInterface {
       return;
     }
 
-    foreach (array_merge([StorageInterface::DEFAULT_COLLECTION], $this->activeStorage->getAllCollectionNames()) as $collectionName) {
+    foreach (\array_merge([StorageInterface::DEFAULT_COLLECTION], $this->activeStorage->getAllCollectionNames()) as $collectionName) {
       $collection = $storage->createCollection($collectionName);
       $activeCollection = $this->activeStorage->createCollection($collectionName);
       foreach ($this->getDependentConfigNames() as $configName) {
@@ -95,14 +95,14 @@ final class ExcludedModulesEventSubscriber implements EventSubscriberInterface {
 
     $modules = $extension['module'];
     foreach ($this->getExcludedModules() as $module) {
-      if (array_key_exists($module, $existing['module'])) {
+      if (\array_key_exists($module, $existing['module'])) {
         // Set the modules weight from the active store.
         $modules[$module] = $existing['module'][$module];
       }
     }
 
     // Sort the extensions.
-    $extension['module'] = module_config_sort($modules);
+    $extension['module'] = \module_config_sort($modules);
     // Set the modified extension.
     $storage->write('core.extension', $extension);
   }
@@ -124,7 +124,7 @@ final class ExcludedModulesEventSubscriber implements EventSubscriberInterface {
       return;
     }
 
-    foreach (array_merge([StorageInterface::DEFAULT_COLLECTION], $storage->getAllCollectionNames()) as $collectionName) {
+    foreach (\array_merge([StorageInterface::DEFAULT_COLLECTION], $storage->getAllCollectionNames()) as $collectionName) {
       $collection = $storage->createCollection($collectionName);
       foreach ($this->getDependentConfigNames() as $configName) {
         $collection->delete($configName);
@@ -133,7 +133,7 @@ final class ExcludedModulesEventSubscriber implements EventSubscriberInterface {
 
     $extension = $storage->read('core.extension');
     // Remove all the excluded modules from the extensions list.
-    $extension['module'] = array_diff_key($extension['module'], array_flip($this->getExcludedModules()));
+    $extension['module'] = \array_diff_key($extension['module'], \array_flip($this->getExcludedModules()));
 
     $storage->write('core.extension', $extension);
   }
@@ -165,15 +165,15 @@ final class ExcludedModulesEventSubscriber implements EventSubscriberInterface {
       foreach ($dependencyManager->getDependentEntities('module', $module) as $dependent) {
         $config[] = $dependent->getConfigDependencyName();
       }
-      $config = array_merge($config, $this->activeStorage->listAll($module . '.'));
+      $config = \array_merge($config, $this->activeStorage->listAll($module . '.'));
     }
 
     // Find all configuration that depends on the configuration found above.
-    foreach ($this->manager->findConfigEntityDependencies('config', array_unique($config)) as $dependent) {
+    foreach ($this->manager->findConfigEntityDependencies('config', \array_unique($config)) as $dependent) {
       $config[] = $dependent->getConfigDependencyName();
     }
 
-    return array_unique($config);
+    return \array_unique($config);
   }
 
 }

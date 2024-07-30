@@ -31,9 +31,9 @@ class FieldNormalizer extends NormalizerBase implements DenormalizerInterface {
   public function doNormalize($field, $format = NULL, array $context = []): array|string|int|float|bool|\ArrayObject|NULL {
     /** @var \Drupal\Core\Field\FieldItemListInterface $field */
     $normalized_items = $this->normalizeFieldItems($field, $format, $context);
-    assert($context['resource_object'] instanceof ResourceObject);
+    \assert($context['resource_object'] instanceof ResourceObject);
     return $context['resource_object']->getResourceType()->getFieldByInternalName($field->getName())->hasOne()
-      ? array_shift($normalized_items) ?: CacheableNormalization::permanent(NULL)
+      ? \array_shift($normalized_items) ?: CacheableNormalization::permanent(NULL)
       : CacheableNormalization::aggregate($normalized_items);
   }
 
@@ -42,15 +42,15 @@ class FieldNormalizer extends NormalizerBase implements DenormalizerInterface {
    */
   public function denormalize($data, $class, $format = NULL, array $context = []): mixed {
     $field_definition = $context['field_definition'];
-    assert($field_definition instanceof FieldDefinitionInterface);
+    \assert($field_definition instanceof FieldDefinitionInterface);
     $resource_type = $context['resource_type'];
-    assert($resource_type instanceof ResourceType);
+    \assert($resource_type instanceof ResourceType);
 
     // If $data contains items (recognizable by numerical array keys, which
     // Drupal's Field API calls "deltas"), then it already is itemized; it's not
     // using the simplified JSON structure that JSON:API generates.
-    $is_already_itemized = is_array($data) && array_reduce(array_keys($data), function ($carry, $index) {
-      return $carry && is_numeric($index);
+    $is_already_itemized = \is_array($data) && \array_reduce(\array_keys($data), function ($carry, $index) {
+      return $carry && \is_numeric($index);
     }, TRUE);
 
     $itemized_data = $is_already_itemized
@@ -59,7 +59,7 @@ class FieldNormalizer extends NormalizerBase implements DenormalizerInterface {
 
     // Single-cardinality fields don't need itemization.
     $field_item_class = $field_definition->getItemDefinition()->getClass();
-    if (count($itemized_data) === 1 && $resource_type->getFieldByInternalName($field_definition->getName())->hasOne()) {
+    if (\count($itemized_data) === 1 && $resource_type->getFieldByInternalName($field_definition->getName())->hasOne()) {
       return $this->serializer->denormalize($itemized_data[0], $field_item_class, $format, $context);
     }
 

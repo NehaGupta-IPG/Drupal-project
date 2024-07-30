@@ -145,7 +145,7 @@ class CommentInterfaceTest extends CommentTestBase {
     $this->assertTrue($this->commentExists($reply, TRUE), 'Reply found.');
     $this->assertEquals($comment->id(), $reply_loaded->getParentComment()->id(), 'Pid of a reply to a comment is set correctly.');
     // Check the thread of reply grows correctly.
-    $this->assertEquals(rtrim($comment->getThread(), '/') . '.00/', $reply_loaded->getThread());
+    $this->assertEquals(\rtrim($comment->getThread(), '/') . '.00/', $reply_loaded->getThread());
 
     // Second reply to comment #2 creating comment #4.
     $this->drupalGet('comment/reply/node/' . $this->node->id() . '/comment/' . $comment->id());
@@ -155,7 +155,7 @@ class CommentInterfaceTest extends CommentTestBase {
     $reply_loaded = Comment::load($reply->id());
     $this->assertTrue($this->commentExists($reply, TRUE), 'Second reply found.');
     // Check the thread of second reply grows correctly.
-    $this->assertEquals(rtrim($comment->getThread(), '/') . '.01/', $reply_loaded->getThread());
+    $this->assertEquals(\rtrim($comment->getThread(), '/') . '.01/', $reply_loaded->getThread());
 
     // Reply to comment #4 creating comment #5.
     $this->drupalGet('comment/reply/node/' . $this->node->id() . '/comment/' . $reply_loaded->id());
@@ -165,7 +165,7 @@ class CommentInterfaceTest extends CommentTestBase {
     $reply_loaded = Comment::load($reply->id());
     $this->assertTrue($this->commentExists($reply, TRUE), 'Second reply found.');
     // Check the thread of reply to second reply grows correctly.
-    $this->assertEquals(rtrim($comment->getThread(), '/') . '.01.00/', $reply_loaded->getThread());
+    $this->assertEquals(\rtrim($comment->getThread(), '/') . '.01.00/', $reply_loaded->getThread());
 
     // Edit reply.
     $this->drupalGet('comment/' . $reply->id() . '/edit');

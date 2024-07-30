@@ -54,17 +54,17 @@ class GenerateProxyClassCommand extends Command {
    * {@inheritdoc}
    */
   protected function execute(InputInterface $input, OutputInterface $output): int {
-    $class_name = ltrim($input->getArgument('class_name'), '\\');
+    $class_name = \ltrim($input->getArgument('class_name'), '\\');
     $namespace_root = $input->getArgument('namespace_root_path');
 
     $match = [];
-    preg_match('/([a-zA-Z0-9_]+\\\\[a-zA-Z0-9_]+)\\\\(.+)/', $class_name, $match);
+    \preg_match('/([a-zA-Z0-9_]+\\\\[a-zA-Z0-9_]+)\\\\(.+)/', $class_name, $match);
 
     if ($match) {
       $root_namespace = $match[1];
       $rest_fqcn = $match[2];
 
-      $proxy_filename = $namespace_root . '/ProxyClass/' . str_replace('\\', '/', $rest_fqcn) . '.php';
+      $proxy_filename = $namespace_root . '/ProxyClass/' . \str_replace('\\', '/', $rest_fqcn) . '.php';
       $proxy_class_name = $root_namespace . '\\ProxyClass\\' . $rest_fqcn;
 
       $proxy_class_string = $this->proxyBuilder->build($class_name);
@@ -84,10 +84,10 @@ EOF;
         $file_string
       );
 
-      mkdir(dirname($proxy_filename), 0775, TRUE);
-      file_put_contents($proxy_filename, $file_string);
+      \mkdir(\dirname($proxy_filename), 0775, TRUE);
+      \file_put_contents($proxy_filename, $file_string);
 
-      $output->writeln(sprintf('Proxy of class %s written to %s', $class_name, $proxy_filename));
+      $output->writeln(\sprintf('Proxy of class %s written to %s', $class_name, $proxy_filename));
     }
 
     return 0;

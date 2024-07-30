@@ -15,7 +15,7 @@ class SessionCacheContext extends RequestStackCacheContextBase {
    * {@inheritdoc}
    */
   public static function getLabel() {
-    return t('Session');
+    return \t('Session');
   }
 
   /**

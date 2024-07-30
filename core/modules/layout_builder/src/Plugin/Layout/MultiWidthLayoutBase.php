@@ -76,8 +76,8 @@ abstract class MultiWidthLayoutBase extends LayoutDefault implements PluginFormI
    */
   protected function getDefaultWidth() {
     // Return the first available key from the list of options.
-    $width_classes = array_keys($this->getWidthOptions());
-    return array_shift($width_classes);
+    $width_classes = \array_keys($this->getWidthOptions());
+    return \array_shift($width_classes);
   }
 
 }

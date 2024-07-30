@@ -46,11 +46,11 @@ class SecurityFileUploadEventSubscriber implements EventSubscriberInterface {
   public function sanitizeName(FileUploadSanitizeNameEvent $event): void {
     $filename = $event->getFilename();
     // Dot files are renamed regardless of security settings.
-    $filename = trim($filename, '.');
+    $filename = \trim($filename, '.');
 
     // Remove any null bytes. See
     // http://php.net/manual/security.filesystem.nullbytes.php
-    $filename = str_replace(chr(0), '', $filename);
+    $filename = \str_replace(\chr(0), '', $filename);
 
     if ($filename !== $event->getFilename()) {
       $event->setFilename($filename)->setSecurityRename();
@@ -58,14 +58,14 @@ class SecurityFileUploadEventSubscriber implements EventSubscriberInterface {
 
     // Split up the filename by periods. The first part becomes the basename,
     // the last part the final extension.
-    $filename_parts = explode('.', $filename);
+    $filename_parts = \explode('.', $filename);
     // Remove file basename.
     $filename = array_shift($filename_parts);
     // Remove final extension. In the case of dot filenames this will be empty.
     $final_extension = (string) array_pop($filename_parts);
 
     $extensions = $event->getAllowedExtensions();
-    if (!empty($extensions) && !in_array(strtolower($final_extension), $extensions, TRUE)) {
+    if (!empty($extensions) && !\in_array(\strtolower($final_extension), $extensions, TRUE)) {
       // This upload will be rejected by FileExtension constraint anyway so do
       // not make any alterations to the filename. This prevents a file named
       // 'example.php' being renamed to 'example.php_.txt' and uploaded if the
@@ -93,7 +93,7 @@ class SecurityFileUploadEventSubscriber implements EventSubscriberInterface {
 
     // If there are any insecure extensions in the filename munge all the
     // internal extensions.
-    $munge_everything = !empty(array_intersect(array_map('strtolower', $filename_parts), FileSystemInterface::INSECURE_EXTENSIONS));
+    $munge_everything = !empty(\array_intersect(\array_map('strtolower', $filename_parts), FileSystemInterface::INSECURE_EXTENSIONS));
 
     // Munge the filename to protect against possible malicious extension hiding
     // within an unknown file type (i.e. filename.html.foo). This was introduced
@@ -107,7 +107,7 @@ class SecurityFileUploadEventSubscriber implements EventSubscriberInterface {
       if ($munge_everything) {
         $filename .= '_';
       }
-      elseif (!empty($extensions) && !in_array(strtolower($filename_part), $extensions) && preg_match("/^[a-zA-Z]{2,5}\d?$/", $filename_part)) {
+      elseif (!empty($extensions) && !\in_array(\strtolower($filename_part), $extensions) && \preg_match("/^[a-zA-Z]{2,5}\d?$/", $filename_part)) {
         $filename .= '_';
       }
     }

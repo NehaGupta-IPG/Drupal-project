@@ -52,7 +52,7 @@ class MigrateSearchPageTest extends MigrateDrupal6TestBase {
     // Test that we can re-import using the EntitySearchPage destination.
     Database::getConnection('default', 'migrate')
       ->update('variable')
-      ->fields(['value' => serialize(4)])
+      ->fields(['value' => \serialize(4)])
       ->condition('name', 'node_rank_comments')
       ->execute();
 

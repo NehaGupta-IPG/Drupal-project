@@ -193,9 +193,9 @@ class LinearHistoryTest extends UnitTestCase {
     $time = $this->prophesize(TimeInterface::class);
     $checkpoints = new LinearHistory($state->reveal(), $time->reveal());
 
-    $this->assertSame(['hash2' => $test_data['hash2'], 'hash1' => $test_data['hash1']], iterator_to_array($checkpoints->getParents('hash3')));
-    $this->assertSame(['hash1' => $test_data['hash1']], iterator_to_array($checkpoints->getParents('hash2')));
-    $this->assertSame([], iterator_to_array($checkpoints->getParents('hash1')));
+    $this->assertSame(['hash2' => $test_data['hash2'], 'hash1' => $test_data['hash1']], \iterator_to_array($checkpoints->getParents('hash3')));
+    $this->assertSame(['hash1' => $test_data['hash1']], \iterator_to_array($checkpoints->getParents('hash2')));
+    $this->assertSame([], \iterator_to_array($checkpoints->getParents('hash1')));
   }
 
   /**
@@ -215,7 +215,7 @@ class LinearHistoryTest extends UnitTestCase {
 
     $this->expectException(UnknownCheckpointException::class);
     $this->expectExceptionMessage('The checkpoint "hash3" does not exist');
-    iterator_to_array($checkpoints->getParents('hash3'));
+    \iterator_to_array($checkpoints->getParents('hash3'));
   }
 
 }

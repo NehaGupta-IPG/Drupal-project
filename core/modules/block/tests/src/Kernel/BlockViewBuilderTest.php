@@ -116,7 +116,7 @@ class BlockViewBuilderTest extends KernelTestBase {
     $expected[] = '      ';
     $expected[] = '  </div>';
     $expected[] = '';
-    $expected_output = implode("\n", $expected);
+    $expected_output = \implode("\n", $expected);
     $this->assertSame($expected_output, (string) $this->renderer->renderRoot($output));
 
     // Reset the HTML IDs so that the next render is not affected.
@@ -141,7 +141,7 @@ class BlockViewBuilderTest extends KernelTestBase {
     $expected[] = '      ';
     $expected[] = '  </div>';
     $expected[] = '';
-    $expected_output = implode("\n", $expected);
+    $expected_output = \implode("\n", $expected);
     $this->assertSame($expected_output, (string) $this->renderer->renderRoot($output));
   }
 
@@ -277,14 +277,14 @@ class BlockViewBuilderTest extends KernelTestBase {
     // Establish baseline.
     $build = $this->getBlockRenderArray();
     $this->setRawContent((string) $this->renderer->renderRoot($build));
-    $this->assertSame('Llamas > unicorns!', trim((string) $this->cssSelect('div')[0]));
+    $this->assertSame('Llamas > unicorns!', \trim((string) $this->cssSelect('div')[0]));
 
     // Enable the block view alter hook that adds a foo=bar attribute.
     \Drupal::state()->set('block_test_view_alter_suffix', TRUE);
     Cache::invalidateTags($this->block->getCacheTagsToInvalidate());
     $build = $this->getBlockRenderArray();
     $this->setRawContent((string) $this->renderer->renderRoot($build));
-    $this->assertSame('Llamas > unicorns!', trim((string) $this->cssSelect('[foo=bar]')[0]));
+    $this->assertSame('Llamas > unicorns!', \trim((string) $this->cssSelect('[foo=bar]')[0]));
     \Drupal::state()->set('block_test_view_alter_suffix', FALSE);
 
     \Drupal::keyValue('block_test')->set('content', NULL);
@@ -321,7 +321,7 @@ class BlockViewBuilderTest extends KernelTestBase {
     // hook_block_build_alter() adds an additional cache key.
     $alter_add_key = $this->randomMachineName();
     \Drupal::state()->set('block_test_block_alter_cache_key', $alter_add_key);
-    $this->assertBlockRenderedWithExpectedCacheability(array_merge($default_keys, [$alter_add_key]), $default_contexts, $default_tags, $default_max_age);
+    $this->assertBlockRenderedWithExpectedCacheability(\array_merge($default_keys, [$alter_add_key]), $default_contexts, $default_tags, $default_max_age);
     \Drupal::state()->set('block_test_block_alter_cache_key', NULL);
 
     // hook_block_build_alter() adds an additional cache context.
@@ -347,7 +347,7 @@ class BlockViewBuilderTest extends KernelTestBase {
     \Drupal::state()->set('block_test_block_alter_cache_context', $alter_add_context);
     \Drupal::state()->set('block_test_block_alter_cache_tag', $alter_add_tag);
     \Drupal::state()->set('block_test_block_alter_cache_max_age', $alter_max_age);
-    $this->assertBlockRenderedWithExpectedCacheability(array_merge($default_keys, [$alter_add_key]), Cache::mergeContexts($default_contexts, [$alter_add_context]), Cache::mergeTags($default_tags, [$alter_add_tag]), $alter_max_age);
+    $this->assertBlockRenderedWithExpectedCacheability(\array_merge($default_keys, [$alter_add_key]), Cache::mergeContexts($default_contexts, [$alter_add_context]), Cache::mergeTags($default_tags, [$alter_add_tag]), $alter_max_age);
     \Drupal::state()->set('block_test_block_alter_cache_key', NULL);
     \Drupal::state()->set('block_test_block_alter_cache_context', NULL);
     \Drupal::state()->set('block_test_block_alter_cache_tag', NULL);

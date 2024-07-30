@@ -24,7 +24,7 @@ class FieldInstanceSettings extends ProcessPluginBase {
     [$instance_settings, $widget_settings, $field_definition] = $value;
     $widget_type = $widget_settings['type'];
 
-    $field_data = unserialize($field_definition['data']);
+    $field_data = \unserialize($field_definition['data']);
 
     // Get taxonomy term reference handler settings from allowed values.
     if ($row->getSourceProperty('type') == 'taxonomy_term_reference') {
@@ -48,7 +48,7 @@ class FieldInstanceSettings extends ProcessPluginBase {
         'field' => '_none',
         'direction' => 'ASC',
       ];
-      if (!empty(array_filter($field_settings['handler_settings']['sort']))) {
+      if (!empty(\array_filter($field_settings['handler_settings']['sort']))) {
         if ($field_settings['handler_settings']['sort']['type'] == "property") {
           $sort = [
             'field' => $field_settings['handler_settings']['sort']['property'],
@@ -77,7 +77,7 @@ class FieldInstanceSettings extends ProcessPluginBase {
           'field' => '_none',
           'direction' => 'ASC',
         ],
-        'target_bundles' => array_filter($field_data['settings']['referenceable_types'] ?? []),
+        'target_bundles' => \array_filter($field_data['settings']['referenceable_types'] ?? []),
       ];
     }
 

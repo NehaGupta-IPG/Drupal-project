@@ -148,7 +148,7 @@ class ConfigurableLanguage extends ConfigEntityBase implements ConfigurableLangu
 
     // Update URL Prefixes for all languages after the
     // LanguageManagerInterface::getLanguages() cache is flushed.
-    language_negotiation_url_prefixes_update();
+    \language_negotiation_url_prefixes_update();
 
     // If after adding this language the site will become multilingual, we need
     // to rebuild language services.
@@ -193,7 +193,7 @@ class ConfigurableLanguage extends ConfigEntityBase implements ConfigurableLangu
     parent::postDelete($storage, $entities);
     $language_manager = \Drupal::languageManager();
     $language_manager->reset();
-    $entity = reset($entities);
+    $entity = \reset($entities);
     if ($language_manager instanceof ConfigurableLanguageManagerInterface && !$entity->isUninstalling() && !$entity->isSyncing()) {
       $language_manager->updateLockedLanguageWeights();
     }

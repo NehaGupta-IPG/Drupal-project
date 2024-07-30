@@ -119,7 +119,7 @@ class LayoutBuilderEntityViewDisplay extends BaseEntityViewDisplay implements La
       $this->unsetThirdPartySetting('layout_builder', 'sections');
     }
     else {
-      $this->setThirdPartySetting('layout_builder', 'sections', array_values($sections));
+      $this->setThirdPartySetting('layout_builder', 'sections', \array_values($sections));
     }
     return $this;
   }
@@ -153,7 +153,7 @@ class LayoutBuilderEntityViewDisplay extends BaseEntityViewDisplay implements La
         // section-based components.
         $components = $this->getComponents();
         // Sort the components by weight.
-        uasort($components, 'Drupal\Component\Utility\SortArray::sortByWeightElement');
+        \uasort($components, 'Drupal\Component\Utility\SortArray::sortByWeightElement');
         foreach ($components as $name => $component) {
           // We need to call setComponent so fields are added to the default
           // section if enabled. However, this also adds the fields to the
@@ -361,7 +361,7 @@ class LayoutBuilderEntityViewDisplay extends BaseEntityViewDisplay implements La
    *   An array of context objects for a given entity.
    */
   protected function getContextsForEntity(FieldableEntityInterface $entity) {
-    $available_context_ids = array_keys($this->contextRepository()->getAvailableContexts());
+    $available_context_ids = \array_keys($this->contextRepository()->getAvailableContexts());
     return [
       'view_mode' => new Context(ContextDefinition::create('string'), $this->getMode()),
       'entity' => EntityContext::fromEntity($entity),
@@ -455,8 +455,8 @@ class LayoutBuilderEntityViewDisplay extends BaseEntityViewDisplay implements La
       ];
       if ($is_view_configurable_non_extra_field) {
         $configuration['id'] = 'field_block:' . $this->getTargetEntityTypeId() . ':' . $this->getTargetBundle() . ':' . $name;
-        $keys = array_flip(['type', 'label', 'settings', 'third_party_settings']);
-        $configuration['formatter'] = array_intersect_key($options, $keys);
+        $keys = \array_flip(['type', 'label', 'settings', 'third_party_settings']);
+        $configuration['formatter'] = \array_intersect_key($options, $keys);
       }
       else {
         $configuration['id'] = 'extra_field_block:' . $this->getTargetEntityTypeId() . ':' . $this->getTargetBundle() . ':' . $name;
@@ -526,10 +526,10 @@ class LayoutBuilderEntityViewDisplay extends BaseEntityViewDisplay implements La
     foreach ($this->getSections() as $section) {
       foreach ($section->getComponents() as $component) {
         $plugin = $component->getPlugin();
-        if ($plugin instanceof DerivativeInspectionInterface && in_array($plugin->getBaseId(), ['field_block', 'extra_field_block'], TRUE)) {
+        if ($plugin instanceof DerivativeInspectionInterface && \in_array($plugin->getBaseId(), ['field_block', 'extra_field_block'], TRUE)) {
           // FieldBlock derivative IDs are in the format
           // [entity_type]:[bundle]:[field].
-          [, , $field_block_field_name] = explode(PluginBase::DERIVATIVE_SEPARATOR, $plugin->getDerivativeId());
+          [, , $field_block_field_name] = \explode(PluginBase::DERIVATIVE_SEPARATOR, $plugin->getDerivativeId());
           if ($field_block_field_name === $field_name) {
             return $component;
           }

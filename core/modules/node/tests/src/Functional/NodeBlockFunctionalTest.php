@@ -73,7 +73,7 @@ class NodeBlockFunctionalTest extends NodeTestBase {
     $this->drupalLogin($this->adminUser);
 
     // Disallow anonymous users to view content.
-    user_role_change_permissions(RoleInterface::ANONYMOUS_ID, [
+    \user_role_change_permissions(RoleInterface::ANONYMOUS_ID, [
       'access content' => FALSE,
     ]);
 

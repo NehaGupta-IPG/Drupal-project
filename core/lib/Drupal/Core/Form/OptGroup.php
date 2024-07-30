@@ -38,10 +38,10 @@ class OptGroup {
    */
   protected static function doFlattenOptions(array $array, array &$options) {
     foreach ($array as $key => $value) {
-      if (is_object($value) && isset($value->option)) {
+      if (\is_object($value) && isset($value->option)) {
         static::doFlattenOptions($value->option, $options);
       }
-      elseif (is_array($value)) {
+      elseif (\is_array($value)) {
         static::doFlattenOptions($value, $options);
       }
       else {

@@ -77,7 +77,7 @@ class ConfigImportForm extends FormBase {
    */
   public function buildForm(array $form, FormStateInterface $form_state) {
     $directory = $this->settings->get('config_sync_directory');
-    $directory_is_writable = is_writable($directory);
+    $directory_is_writable = \is_writable($directory);
     if (!$directory_is_writable) {
       $this->messenger()->addError($this->t('The directory %directory is not writable.', ['%directory' => $directory]));
     }

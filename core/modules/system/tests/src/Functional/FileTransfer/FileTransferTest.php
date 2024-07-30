@@ -76,7 +76,7 @@ class FileTransferTest extends BrowserTestBase {
   public function _writeDirectory($base, $files = []): void {
     mkdir($base);
     foreach ($files as $key => $file) {
-      if (is_array($file)) {
+      if (\is_array($file)) {
         $this->_writeDirectory($base . DIRECTORY_SEPARATOR . $key, $file);
       }
       else {

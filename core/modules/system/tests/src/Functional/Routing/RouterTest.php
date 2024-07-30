@@ -53,7 +53,7 @@ class RouterTest extends BrowserTestBase {
     $this->assertSession()->responseHeaderEquals('Content-language', 'en');
     $this->assertSession()->responseHeaderEquals('X-Content-Type-Options', 'nosniff');
     $this->assertSession()->responseHeaderEquals('X-Frame-Options', 'SAMEORIGIN');
-    if (strcasecmp($session->getResponseHeader('vary'), 'accept-encoding') !== 0) {
+    if (\strcasecmp($session->getResponseHeader('vary'), 'accept-encoding') !== 0) {
       $this->assertSession()->responseHeaderDoesNotExist('Vary');
     }
 
@@ -88,8 +88,8 @@ class RouterTest extends BrowserTestBase {
       'url',
       'user.roles',
     ]);
-    sort($expected_cache_contexts);
-    $this->assertSession()->responseHeaderEquals('X-Drupal-Cache-Contexts', implode(' ', $expected_cache_contexts));
+    \sort($expected_cache_contexts);
+    $this->assertSession()->responseHeaderEquals('X-Drupal-Cache-Contexts', \implode(' ', $expected_cache_contexts));
     $this->assertSession()->responseHeaderEquals('X-Drupal-Cache-Tags', 'config:user.role.anonymous foo http_response rendered');
     // 3. controller result: Response object, globally cacheable route access.
     $this->drupalGet('router_test/test1');

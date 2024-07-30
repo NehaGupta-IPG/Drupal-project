@@ -297,7 +297,7 @@ class LayoutBuilderDisableInteractionsTest extends WebDriverTestBase {
     // moved slightly because the current block being configured will have a
     // border that was not present when the dialog was not open.
     $new_body_block_top_position = $this->getElementVerticalPosition($body_field_selector, 'top');
-    $distance_body_block_moved = abs($body_block_top_position - $new_body_block_top_position);
+    $distance_body_block_moved = \abs($body_block_top_position - $new_body_block_top_position);
     // Confirm that body moved only slightly compared to the distance the mouse
     // moved and therefore was not dragged when the mouse moved.
     $this->assertGreaterThan($distance_body_block_moved * 20, $minimum_distance_mouse_moved);

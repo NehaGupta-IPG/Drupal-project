@@ -81,7 +81,7 @@ class ViewValidationTest extends ConfigEntityValidationTestBase {
 
     $display = &$this->entity->getDisplay('default');
     NestedArray::setValue($display, $parents, 'non_existent');
-    $property_path = 'display.default.' . implode('.', $parents);
+    $property_path = 'display.default.' . \implode('.', $parents);
     $this->assertValidationErrors([
       $property_path => "The 'non_existent' plugin does not exist.",
     ]);

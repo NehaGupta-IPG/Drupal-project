@@ -27,7 +27,7 @@ class ListCacheBinsPass implements CompilerPassInterface {
     ];
     foreach ($tag_info as $service_tag => $section) {
       foreach ($container->findTaggedServiceIds($service_tag) as $id => $attributes) {
-        $bin = substr($id, strpos($id, '.') + 1);
+        $bin = \substr($id, \strpos($id, '.') + 1);
         $cache_info[$section]['bins'][$id] = $bin;
         if (isset($attributes[0]['default_backend'])) {
           $cache_info[$section]['default_bin_backends'][$bin] = $attributes[0]['default_backend'];

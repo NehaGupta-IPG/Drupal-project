@@ -110,7 +110,7 @@ class LibraryDiscoveryTest extends UnitTestCase {
       $this->assertSame('The "test/test_3" asset library is deprecated in drupal:8.8.0 and is removed from drupal:9.0.0. Use the test_2 library instead. See https://www.example.com', $e->getMessage());
     }
 
-    restore_error_handler();
+    \restore_error_handler();
   }
 
 }

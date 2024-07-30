@@ -51,7 +51,7 @@ class TimeZoneResolver implements EventSubscriberInterface {
    */
   public function setDefaultTimeZone() {
     if ($time_zone = $this->getTimeZone()) {
-      date_default_timezone_set($time_zone);
+      \date_default_timezone_set($time_zone);
     }
   }
 

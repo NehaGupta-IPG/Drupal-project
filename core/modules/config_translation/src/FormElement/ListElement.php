@@ -53,7 +53,7 @@ class ListElement implements ElementInterface {
       $definition = $element->getDataDefinition();
 
       if ($form_element = ConfigTranslationFormBase::createFormElement($element)) {
-        $element_parents = array_merge($parents, [$key]);
+        $element_parents = \array_merge($parents, [$key]);
         $sub_build += $form_element->getTranslationBuild($source_language, $translation_language, $source_config[$key], $translation_config[$key], $element_parents, $element_key);
 
         if (empty($sub_build)) {
@@ -118,8 +118,8 @@ class ListElement implements ElementInterface {
       $title = $group_build['label']['source']['#markup'];
     }
     else {
-      foreach (array_keys($group_build) as $title_key) {
-        if (isset($group_build[$title_key]['source']) && (str_contains($title_key, 'title') || str_contains($title_key, 'label'))) {
+      foreach (\array_keys($group_build) as $title_key) {
+        if (isset($group_build[$title_key]['source']) && (\str_contains($title_key, 'title') || \str_contains($title_key, 'label'))) {
           $title = $group_build[$title_key]['source']['#markup'];
           break;
         }

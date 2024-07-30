@@ -295,13 +295,13 @@ abstract class JsonApiFunctionalTestBase extends BrowserTestBase {
       }
       else {
         // Get N random tags.
-        $selected_tags = mt_rand(1, $num_tags);
+        $selected_tags = \mt_rand(1, $num_tags);
         $tags = [];
-        while (count($tags) < $selected_tags) {
-          $tags[] = mt_rand(1, $num_tags);
-          $tags = array_unique($tags);
+        while (\count($tags) < $selected_tags) {
+          $tags[] = \mt_rand(1, $num_tags);
+          $tags = \array_unique($tags);
         }
-        $values['field_tags'] = array_map(function ($tag) {
+        $values['field_tags'] = \array_map(function ($tag) {
           return ['target_id' => $tag];
         }, $tags);
       }
@@ -317,9 +317,9 @@ abstract class JsonApiFunctionalTestBase extends BrowserTestBase {
       if ($article_has_link) {
         $values['field_link'] = [
           'title' => $this->getRandomGenerator()->name(),
-          'uri' => sprintf(
+          'uri' => \sprintf(
             '%s://%s.%s',
-            'http' . (mt_rand(0, 2) > 1 ? '' : 's'),
+            'http' . (\mt_rand(0, 2) > 1 ? '' : 's'),
             $this->getRandomGenerator()->name(),
             'org'
           ),
@@ -330,7 +330,7 @@ abstract class JsonApiFunctionalTestBase extends BrowserTestBase {
       // sorting:
       // - field_sort1 increments every 5 articles, starting at zero
       // - field_sort2 decreases every article, ending at zero.
-      $values['field_sort1'] = ['value' => floor($created_nodes / 5)];
+      $values['field_sort1'] = ['value' => \floor($created_nodes / 5)];
       $values['field_sort2'] = ['value' => $num_articles - $created_nodes];
 
       $node = $this->createNode($values);

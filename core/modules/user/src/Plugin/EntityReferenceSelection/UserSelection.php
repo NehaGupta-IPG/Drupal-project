@@ -136,7 +136,7 @@ class UserSelection extends DefaultSelection {
       $roles = Role::loadMultiple();
       unset($roles[RoleInterface::ANONYMOUS_ID]);
       unset($roles[RoleInterface::AUTHENTICATED_ID]);
-      $roles = array_map(fn(RoleInterface $role) => $role->label(), $roles);
+      $roles = \array_map(fn(RoleInterface $role) => $role->label(), $roles);
       $form['filter']['settings']['role'] = [
         '#type' => 'checkboxes',
         '#title' => $this->t('Restrict to the selected roles'),
@@ -205,13 +205,13 @@ class UserSelection extends DefaultSelection {
     $entities = parent::validateReferenceableNewEntities($entities);
     // Mirror the conditions checked in buildEntityQuery().
     if ($role = $this->getConfiguration()['filter']['role']) {
-      $entities = array_filter($entities, function ($user) use ($role) {
+      $entities = \array_filter($entities, function ($user) use ($role) {
         /** @var \Drupal\user\UserInterface $user */
-        return !empty(array_intersect($user->getRoles(), $role));
+        return !empty(\array_intersect($user->getRoles(), $role));
       });
     }
     if (!$this->currentUser->hasPermission('administer users')) {
-      $entities = array_filter($entities, function ($user) {
+      $entities = \array_filter($entities, function ($user) {
         /** @var \Drupal\user\UserInterface $user */
         return $user->isActive();
       });
@@ -236,7 +236,7 @@ class UserSelection extends DefaultSelection {
       // database.
       $conditions = &$query->conditions();
       foreach ($conditions as $key => $condition) {
-        if ($key !== '#conjunction' && is_string($condition['field']) && $condition['field'] === 'users_field_data.name') {
+        if ($key !== '#conjunction' && \is_string($condition['field']) && $condition['field'] === 'users_field_data.name') {
           // Remove the condition.
           unset($conditions[$key]);
 
@@ -254,7 +254,7 @@ class UserSelection extends DefaultSelection {
           $value_part->condition('anonymous_name', $condition['value'], $condition['operator']);
           $value_part->compile($this->connection, $query);
           $or->condition(($this->connection->condition('AND'))
-            ->where(str_replace($query->escapeField('anonymous_name'), ':anonymous_name', (string) $value_part), $value_part->arguments() + [':anonymous_name' => \Drupal::config('user.settings')->get('anonymous')])
+            ->where(\str_replace($query->escapeField('anonymous_name'), ':anonymous_name', (string) $value_part), $value_part->arguments() + [':anonymous_name' => \Drupal::config('user.settings')->get('anonymous')])
             ->condition('base_table.uid', 0)
           );
           $query->condition($or);

@@ -29,11 +29,11 @@ class BooleanItemNormalizer extends FieldItemNormalizer implements DenormalizerI
     // Just like \Drupal\serialization\Normalizer\FieldItemNormalizer's logic
     // for denormalization, which uses TypedDataInterface::setValue(), allow the
     // keying by main property name ("value") to be implied.
-    if (!is_array($data)) {
+    if (!\is_array($data)) {
       $data = ['value' => $data];
     }
 
-    if (!in_array($data['value'], ['👍', '👎'], TRUE)) {
+    if (!\in_array($data['value'], ['👍', '👎'], TRUE)) {
       throw new \UnexpectedValueException('Only 👍 and 👎 are acceptable values.');
     }
     $data['value'] = ($data['value'] === '👍');

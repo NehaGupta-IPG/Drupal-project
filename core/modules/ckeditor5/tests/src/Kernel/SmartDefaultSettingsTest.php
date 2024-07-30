@@ -185,7 +185,7 @@ class SmartDefaultSettingsTest extends KernelTestBase {
 
     $allowed_html_parents = ['filters', 'filter_html', 'settings', 'allowed_html'];
     $current_value = NestedArray::getValue($basic_html_format, $allowed_html_parents);
-    $new_value = str_replace(['<h4 id> ', '<h6 id> '], '', $current_value);
+    $new_value = \str_replace(['<h4 id> ', '<h6 id> '], '', $current_value);
     $basic_html_format_without_h4_h6 = $basic_html_format;
     $basic_html_format_without_h4_h6['name'] .= ' (without H4 and H6)';
     $basic_html_format_without_h4_h6['format'] = 'basic_html_without_h4_h6';
@@ -197,7 +197,7 @@ class SmartDefaultSettingsTest extends KernelTestBase {
       Yaml::parseFile('core/modules/ckeditor5/tests/fixtures/ckeditor4_config/editor.editor.basic_html.yml')
     )->save();
 
-    $new_value = str_replace(['<h2 id> ', '<h3 id> ', '<h4 id> ', '<h5 id> ', '<h6 id> '], '', $current_value);
+    $new_value = \str_replace(['<h2 id> ', '<h3 id> ', '<h4 id> ', '<h5 id> ', '<h6 id> '], '', $current_value);
     $basic_html_format_without_headings = $basic_html_format;
     $basic_html_format_without_headings['name'] .= ' (without H*)';
     $basic_html_format_without_headings['format'] = 'basic_html_without_headings';
@@ -231,7 +231,7 @@ class SmartDefaultSettingsTest extends KernelTestBase {
       Yaml::parseFile('core/modules/ckeditor5/tests/fixtures/ckeditor4_config/editor.editor.basic_html.yml')
     )->save();
 
-    $new_value = str_replace('<p>', '<p class="text-align-center text-align-justify">', $current_value);
+    $new_value = \str_replace('<p>', '<p class="text-align-center text-align-justify">', $current_value);
     $basic_html_format_with_alignable_p = $basic_html_format;
     $basic_html_format_with_alignable_p['name'] .= ' (with alignable paragraph support)';
     $basic_html_format_with_alignable_p['format'] = 'basic_html_with_alignable_p';
@@ -267,7 +267,7 @@ class SmartDefaultSettingsTest extends KernelTestBase {
     $basic_html_format_with_media_embed_view_mode_invalid['name'] = ' (with Media Embed support, view mode enabled but no view modes configured)';
     $basic_html_format_with_media_embed_view_mode_invalid['format'] = 'basic_html_with_media_embed_view_mode_enabled_no_view_modes_configured';
     $current_value_media_embed = NestedArray::getValue($basic_html_format_with_media_embed, $allowed_html_parents);
-    $new_value = str_replace('<drupal-media data-entity-type data-entity-uuid data-align data-caption alt>', '<drupal-media data-entity-type data-entity-uuid data-align data-caption alt data-view-mode>', $current_value_media_embed);
+    $new_value = \str_replace('<drupal-media data-entity-type data-entity-uuid data-align data-caption alt>', '<drupal-media data-entity-type data-entity-uuid data-align data-caption alt data-view-mode>', $current_value_media_embed);
     NestedArray::setValue($basic_html_format_with_media_embed_view_mode_invalid, $allowed_html_parents, $new_value);
     FilterFormat::create($basic_html_format_with_media_embed_view_mode_invalid)->save();
     $basic_html_editor_with_media_embed_view_mode_enabled_no_view_modes_configured = Editor::create(
@@ -282,7 +282,7 @@ class SmartDefaultSettingsTest extends KernelTestBase {
     $basic_html_editor_with_media_embed_view_mode_enabled_no_view_modes_configured->setSettings($settings);
     $basic_html_editor_with_media_embed_view_mode_enabled_no_view_modes_configured->save();
 
-    $new_value = str_replace('<img src alt height width data-entity-type data-entity-uuid data-align data-caption>', '<img src alt height width data-*>', $current_value);
+    $new_value = \str_replace('<img src alt height width data-entity-type data-entity-uuid data-align data-caption>', '<img src alt height width data-*>', $current_value);
     $basic_html_format_with_any_data_attr = $basic_html_format;
     $basic_html_format_with_any_data_attr['name'] .= ' (with any data-* attribute on images)';
     $basic_html_format_with_any_data_attr['format'] = 'basic_html_with_any_data_attr';
@@ -438,7 +438,7 @@ class SmartDefaultSettingsTest extends KernelTestBase {
     if (!empty($filters_to_drop)) {
       foreach ($filters_to_drop as $filter_name => $is_fundamentally_incompatible) {
         // Assert if it should appear in the pre-CKE5 switch validation errors.
-        $this->assertSame($is_fundamentally_incompatible, mb_strpos(implode("\n\n", $pre_ck5_validation_errors[''] ?? []), $filter_name) !== FALSE);
+        $this->assertSame($is_fundamentally_incompatible, \mb_strpos(\implode("\n\n", $pre_ck5_validation_errors[''] ?? []), $filter_name) !== FALSE);
         $text_format->setFilterConfig($filter_name, [
           'status' => FALSE,
         ]);
@@ -448,7 +448,7 @@ class SmartDefaultSettingsTest extends KernelTestBase {
       // validate the text format + minimal CKEditor 5 text editor config again
       // after dropping those filters from the text format. This allows us to be
       // confident that we have caught all fundamental compatibility problems.
-      if (!empty(array_filter($filters_to_drop))) {
+      if (!empty(\array_filter($filters_to_drop))) {
         $post_filter_drop_validation_errors = $this->validatePairToViolationsArray($minimal_valid_cke5_text_editor, $text_format, FALSE);
         $this->assertSame($expected_post_filter_drop_fundamental_compatibility_violations, $post_filter_drop_validation_errors);
       }
@@ -499,14 +499,14 @@ class SmartDefaultSettingsTest extends KernelTestBase {
     // If the text format has HTML restrictions, ensure that a strict superset
     // is allowed after switching to CKEditor 5.
     $html_restrictions = $text_format->getHtmlRestrictions();
-    if (is_array($html_restrictions) && array_key_exists('allowed', $html_restrictions)) {
+    if (\is_array($html_restrictions) && \array_key_exists('allowed', $html_restrictions)) {
       $allowed_tags = HTMLRestrictions::fromTextFormat($text_format);
-      $enabled_plugins = array_keys($this->manager->getEnabledDefinitions($updated_text_editor));
+      $enabled_plugins = \array_keys($this->manager->getEnabledDefinitions($updated_text_editor));
       $updated_allowed_tags = new HTMLRestrictions($this->manager->getProvidedElements($enabled_plugins, $updated_text_editor));
       $unsupported_tags_attributes = $allowed_tags->diff($updated_allowed_tags);
       $superset_tags_attributes = $updated_allowed_tags->diff($allowed_tags);
       $this->assertSame($expected_superset, $superset_tags_attributes->toFilterHtmlAllowedTagsString());
-      $this->assertTrue($unsupported_tags_attributes->allowsNothing(), "The following tags/attributes are not allowed in the updated text format:" . implode(' ', $unsupported_tags_attributes->toCKEditor5ElementsArray()));
+      $this->assertTrue($unsupported_tags_attributes->allowsNothing(), "The following tags/attributes are not allowed in the updated text format:" . \implode(' ', $unsupported_tags_attributes->toCKEditor5ElementsArray()));
 
       // Update the text format like ckeditor5_form_filter_format_form_alter()
       // would.
@@ -828,7 +828,7 @@ class SmartDefaultSettingsTest extends KernelTestBase {
             'multiBlock' => TRUE,
           ],
           'ckeditor5_sourceEditing' => [
-            'allowed_tags' => array_values(array_diff(
+            'allowed_tags' => \array_values(\array_diff(
               $basic_html_test_case['expected_ckeditor5_settings']['plugins']['ckeditor5_sourceEditing']['allowed_tags'],
               ['<h4 id>', '<h6 id>'],
             )),
@@ -888,10 +888,10 @@ class SmartDefaultSettingsTest extends KernelTestBase {
             'multiBlock' => TRUE,
           ],
           'ckeditor5_sourceEditing' => [
-            'allowed_tags' => array_merge(
-              array_slice($basic_html_test_case['expected_ckeditor5_settings']['plugins']['ckeditor5_sourceEditing']['allowed_tags'], 0, 5),
+            'allowed_tags' => \array_merge(
+              \array_slice($basic_html_test_case['expected_ckeditor5_settings']['plugins']['ckeditor5_sourceEditing']['allowed_tags'], 0, 5),
               ['<h1>'],
-              array_slice($basic_html_test_case['expected_ckeditor5_settings']['plugins']['ckeditor5_sourceEditing']['allowed_tags'], 5),
+              \array_slice($basic_html_test_case['expected_ckeditor5_settings']['plugins']['ckeditor5_sourceEditing']['allowed_tags'], 5),
             ),
           ],
         ],
@@ -943,7 +943,7 @@ class SmartDefaultSettingsTest extends KernelTestBase {
             'multiBlock' => TRUE,
           ],
           'ckeditor5_sourceEditing' => [
-            'allowed_tags' => array_values(array_diff(
+            'allowed_tags' => \array_values(\array_diff(
               $basic_html_test_case['expected_ckeditor5_settings']['plugins']['ckeditor5_sourceEditing']['allowed_tags'],
               ['<h2 id>', '<h3 id>', '<h4 id>', '<h5 id>', '<h6 id>'],
             )),
@@ -983,10 +983,10 @@ class SmartDefaultSettingsTest extends KernelTestBase {
       'filters_to_drop' => $basic_html_test_case['filters_to_drop'],
       'expected_ckeditor5_settings' => [
         'toolbar' => [
-          'items' => array_merge(
-            array_slice($basic_html_test_case['expected_ckeditor5_settings']['toolbar']['items'], 0, 10),
+          'items' => \array_merge(
+            \array_slice($basic_html_test_case['expected_ckeditor5_settings']['toolbar']['items'], 0, 10),
             ['codeBlock'],
-            array_slice($basic_html_test_case['expected_ckeditor5_settings']['toolbar']['items'], -2),
+            \array_slice($basic_html_test_case['expected_ckeditor5_settings']['toolbar']['items'], -2),
           ),
         ],
         'plugins' => [
@@ -1043,13 +1043,13 @@ class SmartDefaultSettingsTest extends KernelTestBase {
       'filters_to_drop' => $basic_html_test_case['filters_to_drop'],
       'expected_ckeditor5_settings' => [
         'toolbar' => [
-          'items' => array_merge(
-            array_slice($basic_html_test_case['expected_ckeditor5_settings']['toolbar']['items'], 0, 10),
+          'items' => \array_merge(
+            \array_slice($basic_html_test_case['expected_ckeditor5_settings']['toolbar']['items'], 0, 10),
             ['alignment'],
-            array_slice($basic_html_test_case['expected_ckeditor5_settings']['toolbar']['items'], -2),
+            \array_slice($basic_html_test_case['expected_ckeditor5_settings']['toolbar']['items'], -2),
           ),
         ],
-        'plugins' => array_merge(
+        'plugins' => \array_merge(
           [
             'ckeditor5_alignment' => [
               'enabled_alignments' => ['center', 'justify', 'left', 'right'],
@@ -1058,7 +1058,7 @@ class SmartDefaultSettingsTest extends KernelTestBase {
           $basic_html_test_case['expected_ckeditor5_settings']['plugins'],
         ),
       ],
-      'expected_superset' => implode(' ', [
+      'expected_superset' => \implode(' ', [
         // Note that aligning left and right is being added, on top of what the
         // original format allowed: center and justify.
         // Note that aligning left/center/right/justify is possible on *all*
@@ -1111,7 +1111,7 @@ class SmartDefaultSettingsTest extends KernelTestBase {
         'toolbar' => [
           'items' => $basic_html_test_case['expected_ckeditor5_settings']['toolbar']['items'],
         ],
-        'plugins' => array_merge($basic_html_test_case['expected_ckeditor5_settings']['plugins'], ['media_media' => ['allow_view_mode_override' => FALSE]]),
+        'plugins' => \array_merge($basic_html_test_case['expected_ckeditor5_settings']['plugins'], ['media_media' => ['allow_view_mode_override' => FALSE]]),
       ],
       'expected_superset' => $basic_html_test_case['expected_superset'],
       'expected_fundamental_compatibility_violations' => $basic_html_test_case['expected_fundamental_compatibility_violations'],
@@ -1153,7 +1153,7 @@ class SmartDefaultSettingsTest extends KernelTestBase {
           'ckeditor5_imageResize' => $basic_html_test_case['expected_ckeditor5_settings']['plugins']['ckeditor5_imageResize'],
           'ckeditor5_list' => $basic_html_test_case['expected_ckeditor5_settings']['plugins']['ckeditor5_list'],
           'ckeditor5_sourceEditing' => [
-            'allowed_tags' => array_merge(
+            'allowed_tags' => \array_merge(
               $basic_html_test_case['expected_ckeditor5_settings']['plugins']['ckeditor5_sourceEditing']['allowed_tags'],
               ['<drupal-media data-view-mode>'],
             ),
@@ -1179,7 +1179,7 @@ class SmartDefaultSettingsTest extends KernelTestBase {
           ],
         ],
       ],
-      'expected_messages' => array_merge_recursive($basic_html_test_case['expected_messages'], [
+      'expected_messages' => \array_merge_recursive($basic_html_test_case['expected_messages'], [
         'status' => [
           'To maintain the capabilities of this text format, <a target="_blank" href="/admin/help/ckeditor5#migration-settings">the CKEditor 5 migration</a> did the following: Enabled these plugins: (<em class="placeholder">Link, Block quote, Code, List, Image, Image Upload, Image align, Image caption</em>). Added these tags/attributes to the Source Editing Plugin\'s <a target="_blank" href="/admin/help/ckeditor5#source-editing">Manually editable HTML tags</a> setting: &lt;cite&gt; &lt;dl&gt; &lt;dt&gt; &lt;dd&gt; &lt;span&gt; &lt;a hreflang&gt; &lt;blockquote cite&gt; &lt;h2 id&gt; &lt;h3 id&gt; &lt;h4 id&gt; &lt;h5 id&gt; &lt;h6 id&gt; &lt;drupal-media data-view-mode&gt;. Additional details are available in your logs.',
         ],
@@ -1205,7 +1205,7 @@ class SmartDefaultSettingsTest extends KernelTestBase {
           'ckeditor5_imageResize' => $basic_html_test_case['expected_ckeditor5_settings']['plugins']['ckeditor5_imageResize'],
           'ckeditor5_list' => $basic_html_test_case['expected_ckeditor5_settings']['plugins']['ckeditor5_list'],
           'ckeditor5_sourceEditing' => [
-            'allowed_tags' => array_merge(
+            'allowed_tags' => \array_merge(
               $basic_html_test_case['expected_ckeditor5_settings']['plugins']['ckeditor5_sourceEditing']['allowed_tags'],
               ['<drupal-media data-view-mode>'],
             ),
@@ -1231,7 +1231,7 @@ class SmartDefaultSettingsTest extends KernelTestBase {
           ],
         ],
       ],
-      'expected_messages' => array_merge_recursive($basic_html_test_case['expected_messages'], [
+      'expected_messages' => \array_merge_recursive($basic_html_test_case['expected_messages'], [
         'status' => [
           'To maintain the capabilities of this text format, <a target="_blank" href="/admin/help/ckeditor5#migration-settings">the CKEditor 5 migration</a> did the following: Enabled these plugins: (<em class="placeholder">Link, Block quote, Code, List, Image, Image Upload, Image align, Image caption</em>). Added these tags/attributes to the Source Editing Plugin\'s <a target="_blank" href="/admin/help/ckeditor5#source-editing">Manually editable HTML tags</a> setting: &lt;cite&gt; &lt;dl&gt; &lt;dt&gt; &lt;dd&gt; &lt;span&gt; &lt;a hreflang&gt; &lt;blockquote cite&gt; &lt;h2 id&gt; &lt;h3 id&gt; &lt;h4 id&gt; &lt;h5 id&gt; &lt;h6 id&gt; &lt;drupal-media data-view-mode&gt;. Additional details are available in your logs.',
         ],

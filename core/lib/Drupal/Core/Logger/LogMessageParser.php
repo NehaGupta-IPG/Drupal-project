@@ -13,11 +13,11 @@ class LogMessageParser implements LogMessageParserInterface {
   public function parseMessagePlaceholders(&$message, array &$context) {
     $variables = [];
     $has_psr3 = FALSE;
-    if (($start = strpos($message, '{')) !== FALSE && strpos($message, '}') > $start) {
+    if (($start = \strpos($message, '{')) !== FALSE && \strpos($message, '}') > $start) {
       $has_psr3 = TRUE;
       // Transform PSR3 style messages containing placeholders to
       // \Drupal\Component\Render\FormattableMarkup style.
-      $message = preg_replace('/\{([^\{}]*)\}/U', '@$1', $message);
+      $message = \preg_replace('/\{([^\{}]*)\}/U', '@$1', $message);
     }
     foreach ($context as $key => $variable) {
       // PSR3 style placeholders.
@@ -25,7 +25,7 @@ class LogMessageParser implements LogMessageParserInterface {
         // Keys are not prefixed with anything according to PSR3 specs.
         // If the message is "User {username} created" the variable key will be
         // just "username".
-        if (str_contains($message, '@' . $key)) {
+        if (\str_contains($message, '@' . $key)) {
           $key = '@' . $key;
         }
       }
@@ -36,7 +36,7 @@ class LogMessageParser implements LogMessageParserInterface {
       // placeholders are deprecated and may throw an error in the future.
       // @see https://www.drupal.org/node/3318826
       if (!empty($key) && ($key[0] === '@' || $key[0] === '%' || $key[0] === ':')) {
-        if (is_scalar($variable) || is_null($variable) || $variable instanceof \Stringable) {
+        if (\is_scalar($variable) || \is_null($variable) || $variable instanceof \Stringable) {
           $variables[$key] = $variable;
         }
       }

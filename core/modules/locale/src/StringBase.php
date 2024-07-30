@@ -97,14 +97,14 @@ abstract class StringBase implements StringInterface {
    * {@inheritdoc}
    */
   public function getPlurals() {
-    return explode(PoItem::DELIMITER, $this->getString());
+    return \explode(PoItem::DELIMITER, $this->getString());
   }
 
   /**
    * {@inheritdoc}
    */
   public function setPlurals($plurals) {
-    $this->setString(implode(PoItem::DELIMITER, $plurals));
+    $this->setString(\implode(PoItem::DELIMITER, $plurals));
     return $this;
   }
 
@@ -128,7 +128,7 @@ abstract class StringBase implements StringInterface {
    */
   public function setValues(array $values, $override = TRUE) {
     foreach ($values as $key => $value) {
-      if (property_exists($this, $key) && ($override || !isset($this->$key))) {
+      if (\property_exists($this, $key) && ($override || !isset($this->$key))) {
         $this->$key = $value;
       }
     }

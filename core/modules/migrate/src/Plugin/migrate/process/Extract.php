@@ -68,17 +68,17 @@ class Extract extends ProcessPluginBase {
    * {@inheritdoc}
    */
   public function transform($value, MigrateExecutableInterface $migrate_executable, Row $row, $destination_property) {
-    if (!is_array($value)) {
-      throw new MigrateException(sprintf("Input should be an array, instead it was of type '%s'", gettype($value)));
+    if (!\is_array($value)) {
+      throw new MigrateException(\sprintf("Input should be an array, instead it was of type '%s'", \gettype($value)));
     }
     $new_value = NestedArray::getValue($value, $this->configuration['index'], $key_exists);
 
     if (!$key_exists) {
-      if (array_key_exists('default', $this->configuration)) {
+      if (\array_key_exists('default', $this->configuration)) {
         $new_value = $this->configuration['default'];
       }
       else {
-        throw new MigrateException(sprintf("Array index missing, extraction failed for '%s'. Consider adding a `default` key to the configuration.", Variable::export($value)));
+        throw new MigrateException(\sprintf("Array index missing, extraction failed for '%s'. Consider adding a `default` key to the configuration.", Variable::export($value)));
       }
     }
     return $new_value;

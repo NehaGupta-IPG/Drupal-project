@@ -205,7 +205,7 @@ class MigrateUserRoleTest extends MigrateDrupal7TestBase {
     ];
 
     foreach ($id_map->getMessages() as $message) {
-      $expected_permissions = implode("', '", $permissions[$message->src_rid]);
+      $expected_permissions = \implode("', '", $permissions[$message->src_rid]);
       $expected_message = "Permission(s) '" . $expected_permissions . "' not found.";
       $this->assertSame($expected_message, $message->message);
       $this->assertSame(MigrationInterface::MESSAGE_WARNING, (int) $message->level);

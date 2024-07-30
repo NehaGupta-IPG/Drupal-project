@@ -76,21 +76,21 @@ class MediaLibrary extends CKEditor5PluginDefault implements ContainerFactoryPlu
       // Optionally limit the allowed media types based on the MediaEmbed
       // setting. If the setting is empty, do not limit the options.
       if (!empty($media_embed_filter->settings['allowed_media_types'])) {
-        $media_type_ids = array_intersect_key($media_type_ids, $media_embed_filter->settings['allowed_media_types']);
+        $media_type_ids = \array_intersect_key($media_type_ids, $media_embed_filter->settings['allowed_media_types']);
       }
     }
-    if (in_array('image', $media_type_ids, TRUE)) {
+    if (\in_array('image', $media_type_ids, TRUE)) {
       // Move image to first position.
       // This workaround can be removed once this issue is fixed:
       // @see https://www.drupal.org/project/drupal/issues/3073799
-      array_unshift($media_type_ids, 'image');
-      $media_type_ids = array_unique($media_type_ids);
+      \array_unshift($media_type_ids, 'image');
+      $media_type_ids = \array_unique($media_type_ids);
     }
 
     $state = MediaLibraryState::create(
       'media_library.opener.editor',
       $media_type_ids,
-      reset($media_type_ids),
+      \reset($media_type_ids),
       1,
       ['filter_format_id' => $editor->getFilterFormat()->id()],
     );

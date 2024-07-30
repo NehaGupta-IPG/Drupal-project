@@ -192,7 +192,7 @@ class ModuleHandler implements ModuleHandlerInterface {
     if (isset($this->moduleList[$name])) {
       return $this->moduleList[$name];
     }
-    throw new UnknownExtensionException(sprintf('The module %s does not exist.', $name));
+    throw new UnknownExtensionException(\sprintf('The module %s does not exist.', $name));
   }
 
   /**
@@ -243,7 +243,7 @@ class ModuleHandler implements ModuleHandlerInterface {
   public function buildModuleDependencies(array $modules) {
     foreach ($modules as $module) {
       $graph[$module->getName()]['edges'] = [];
-      if (isset($module->info['dependencies']) && is_array($module->info['dependencies'])) {
+      if (isset($module->info['dependencies']) && \is_array($module->info['dependencies'])) {
         foreach ($module->info['dependencies'] as $dependency) {
           $dependency_data = Dependency::createFromString($dependency);
           $graph[$module->getName()]['edges'][$dependency_data->getName()] = $dependency_data;
@@ -293,7 +293,7 @@ class ModuleHandler implements ModuleHandlerInterface {
     }
     if (isset($this->moduleList[$module])) {
       $file = $this->root . '/' . $this->moduleList[$module]->getPath() . "/$name.$type";
-      if (is_file($file)) {
+      if (\is_file($file)) {
         require_once $file;
         $this->includeFileKeys[$key] = $file;
         return $file;
@@ -386,8 +386,8 @@ class ModuleHandler implements ModuleHandlerInterface {
   public function invokeAll($hook, array $args = []) {
     $return = [];
     $this->invokeAllWith($hook, function (callable $hook, string $module) use ($args, &$return) {
-      $result = call_user_func_array($hook, $args);
-      if (isset($result) && is_array($result)) {
+      $result = \call_user_func_array($hook, $args);
+      if (isset($result) && \is_array($result)) {
         $return = NestedArray::mergeDeep($return, $result);
       }
       elseif (isset($result)) {
@@ -644,10 +644,10 @@ class ModuleHandler implements ModuleHandlerInterface {
     // internally, but we have to extract the proper $cid in order to discover
     // implementations.
     $cid = $type;
-    if (is_array($type)) {
-      $cid = implode(',', $type);
+    if (\is_array($type)) {
+      $cid = \implode(',', $type);
       $extra_types = $type;
-      $type = array_shift($extra_types);
+      $type = \array_shift($extra_types);
     }
     if (!empty($this->alterHookListeners[$cid])) {
       $functions = [];
@@ -679,7 +679,7 @@ class ModuleHandler implements ModuleHandlerInterface {
    * {@inheritdoc}
    */
   public function getName($module) {
-    @trigger_error(__METHOD__ . '() is deprecated in drupal:10.3.0 and is removed from drupal:12.0.0. Use \Drupal\Core\Extension\ModuleExtensionList::getName($module) instead. See https://www.drupal.org/node/3310017', E_USER_DEPRECATED);
+    @\trigger_error(__METHOD__ . '() is deprecated in drupal:10.3.0 and is removed from drupal:12.0.0. Use \Drupal\Core\Extension\ModuleExtensionList::getName($module) instead. See https://www.drupal.org/node/3310017', E_USER_DEPRECATED);
     return \Drupal::service('extension.list.module')->getName($module);
   }
 

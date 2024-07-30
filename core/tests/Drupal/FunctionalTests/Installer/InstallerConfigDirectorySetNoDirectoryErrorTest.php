@@ -38,9 +38,9 @@ class InstallerConfigDirectorySetNoDirectoryErrorTest extends InstallerTestBase 
       'required' => TRUE,
     ];
     // Create the files directory early so we can test the error case.
-    mkdir($this->publicFilesDirectory);
+    \mkdir($this->publicFilesDirectory);
     // Create a file so the directory can not be created.
-    file_put_contents($this->configDirectory, 'Test');
+    \file_put_contents($this->configDirectory, 'Test');
   }
 
   /**

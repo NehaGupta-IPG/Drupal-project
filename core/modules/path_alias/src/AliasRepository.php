@@ -56,7 +56,7 @@ class AliasRepository implements AliasRepositoryInterface {
     // reversed.
     $results = $select->execute()->fetchAll(FetchAs::Associative);
     $aliases = [];
-    foreach (array_reverse($results) as $result) {
+    foreach (\array_reverse($results) as $result) {
       $aliases[$result['path']] = $result['alias'];
     }
 
@@ -137,7 +137,7 @@ class AliasRepository implements AliasRepositoryInterface {
     // 'xx-lolspeak' is more than 'und' so the order needs to be DESC.
     $langcode_list = [$langcode, LanguageInterface::LANGCODE_NOT_SPECIFIED];
     if ($langcode === LanguageInterface::LANGCODE_NOT_SPECIFIED) {
-      array_pop($langcode_list);
+      \array_pop($langcode_list);
     }
     elseif ($langcode > LanguageInterface::LANGCODE_NOT_SPECIFIED) {
       $query->orderBy('base_table.langcode', 'DESC');

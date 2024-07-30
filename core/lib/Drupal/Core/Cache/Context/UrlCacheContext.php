@@ -15,7 +15,7 @@ class UrlCacheContext extends RequestStackCacheContextBase implements CacheConte
    * {@inheritdoc}
    */
   public static function getLabel() {
-    return t('URL');
+    return \t('URL');
   }
 
   /**

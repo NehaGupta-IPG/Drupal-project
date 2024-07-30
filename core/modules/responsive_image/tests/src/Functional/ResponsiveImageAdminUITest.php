@@ -93,9 +93,9 @@ class ResponsiveImageAdminUITest extends BrowserTestBase {
       ['wide', '1x'],
       ['wide', '2x'],
     ];
-    $image_styles = array_merge(
+    $image_styles = \array_merge(
       [ResponsiveImageStyleInterface::EMPTY_IMAGE, ResponsiveImageStyleInterface::ORIGINAL_IMAGE],
-      array_keys(image_style_options(FALSE))
+      \array_keys(\image_style_options(FALSE))
     );
     foreach ($cases as $case) {
       // Check if the radio buttons are present.

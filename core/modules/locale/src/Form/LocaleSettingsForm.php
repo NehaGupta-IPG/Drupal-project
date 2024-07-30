@@ -122,7 +122,7 @@ class LocaleSettingsForm extends ConfigFormBase {
     // Invalidate the cached translation status when the configuration setting
     // of 'use_source' changes.
     if ($form['use_source']['#default_value'] != $form_state->getValue('use_source')) {
-      locale_translation_clear_status();
+      \locale_translation_clear_status();
     }
 
     parent::submitForm($form, $form_state);

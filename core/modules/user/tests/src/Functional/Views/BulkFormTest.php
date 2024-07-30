@@ -63,7 +63,7 @@ class BulkFormTest extends UserTestBase {
     $roles = Role::loadMultiple();
     unset($roles[RoleInterface::ANONYMOUS_ID]);
     unset($roles[RoleInterface::AUTHENTICATED_ID]);
-    $role = key($roles);
+    $role = \key($roles);
 
     $this->assertFalse($account->hasRole($role), 'The user currently does not have a custom role.');
     $edit = [
@@ -147,7 +147,7 @@ class BulkFormTest extends UserTestBase {
     User::load($this->users[0]->id());
     $view = Views::getView('test_user_bulk_form_combine_filter');
     $errors = $view->validate();
-    $this->assertEquals(sprintf('Field User: Bulk update set in Global: Combine fields filter is not usable for this filter type. Combined field filter only works for simple fields.'), reset($errors['default']));
+    $this->assertEquals(\sprintf('Field User: Bulk update set in Global: Combine fields filter is not usable for this filter type. Combined field filter only works for simple fields.'), \reset($errors['default']));
   }
 
 }

@@ -590,7 +590,7 @@ class ConfigImporterTest extends KernelTestBase {
         'Configuration <em class="placeholder">config_test.dynamic.dotted.theme</em> depends on the <em class="placeholder">unknown</em> theme that will not be installed after import.',
         'Configuration <em class="placeholder">unknown.config</em> depends on the <em class="placeholder">unknown</em> extension that will not be installed after import.',
       ];
-      $this->assertEquals(implode(PHP_EOL, $expected), $e->getMessage());
+      $this->assertEquals(\implode(PHP_EOL, $expected), $e->getMessage());
       $error_log = $config_importer->getErrors();
       $expected = [
         'Unable to install the <em class="placeholder">unknown_module</em> module since it does not exist.',
@@ -633,7 +633,7 @@ class ConfigImporterTest extends KernelTestBase {
         'Configuration <em class="placeholder">config_test.dynamic.dotted.theme</em> depends on themes (<em class="placeholder">unknown, Stark</em>) that will not be installed after import.',
         'Configuration <em class="placeholder">unknown.config</em> depends on the <em class="placeholder">unknown</em> extension that will not be installed after import.',
       ];
-      $this->assertEquals(implode(PHP_EOL, $expected), $e->getMessage());
+      $this->assertEquals(\implode(PHP_EOL, $expected), $e->getMessage());
       $error_log = $config_importer->getErrors();
       $expected = [
         'Configuration <em class="placeholder">config_test.dynamic.dotted.config</em> depends on configuration (<em class="placeholder">unknown, unknown2</em>) that will not exist after import.',
@@ -844,7 +844,7 @@ class ConfigImporterTest extends KernelTestBase {
     // uninstalled.
     $extensions['module']['module_test'] = 0;
     $extensions['module']['system_test'] = 0;
-    $extensions['module'] = module_config_sort($extensions['module']);
+    $extensions['module'] = \module_config_sort($extensions['module']);
     $sync->write('core.extension', $extensions);
     $this->configImporter()->import();
 

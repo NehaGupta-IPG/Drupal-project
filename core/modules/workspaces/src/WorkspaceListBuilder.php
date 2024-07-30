@@ -259,7 +259,7 @@ class WorkspaceListBuilder extends EntityListBuilder {
       if (!$has_active_workspace) {
         $row_live['class'] = ['active-workspace', 'active-workspace--default'];
       }
-      array_unshift($build['table']['#rows'], $row_live);
+      \array_unshift($build['table']['#rows'], $row_live);
 
       $build['#attached'] = [
         'library' => ['workspaces/drupal.workspaces.overview'],
@@ -292,7 +292,7 @@ class WorkspaceListBuilder extends EntityListBuilder {
       '#type' => 'container',
       '#weight' => -20,
       '#attributes' => [
-        'class' => array_merge(['active-workspace'], $active_workspace_classes),
+        'class' => \array_merge(['active-workspace'], $active_workspace_classes),
       ],
       'title' => [
         '#type' => 'html_tag',
@@ -360,13 +360,13 @@ class WorkspaceListBuilder extends EntityListBuilder {
     }
 
     $items = [];
-    $rows = array_slice($build['table']['#rows'], 0, 5, TRUE);
+    $rows = \array_slice($build['table']['#rows'], 0, 5, TRUE);
     foreach ($rows as $id => $row) {
       if (!$active_workspace || $active_workspace->id() !== $id) {
         $url = Url::fromRoute('entity.workspace.activate_form', ['workspace' => $id], ['query' => $this->getDestinationArray()]);
         $items[] = [
           '#type' => 'link',
-          '#title' => ltrim($row['data']['label']['data']['#title']),
+          '#title' => \ltrim($row['data']['label']['data']['#title']),
           '#url' => $url,
           '#attributes' => [
             'class' => ['use-ajax', 'workspaces__item', 'workspaces__item--not-default'],

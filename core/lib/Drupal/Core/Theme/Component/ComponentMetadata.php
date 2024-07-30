@@ -122,17 +122,17 @@ class ComponentMetadata {
   public function __construct(array $metadata_info, string $app_root, bool $enforce_schemas) {
     $path = $metadata_info['path'];
     // Make the absolute path, relative to the Drupal root.
-    $app_root = rtrim($app_root, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR;
-    if (str_starts_with($path, $app_root)) {
-      $path = substr($path, strlen($app_root));
+    $app_root = \rtrim($app_root, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR;
+    if (\str_starts_with($path, $app_root)) {
+      $path = \substr($path, \strlen($app_root));
     }
     $this->id = $metadata_info['id'];
     $this->mandatorySchemas = $enforce_schemas;
     $this->path = $path;
 
-    [, $machine_name] = explode(':', $metadata_info['id'] ?? []);
+    [, $machine_name] = \explode(':', $metadata_info['id'] ?? []);
     $this->machineName = $machine_name;
-    $this->name = $metadata_info['name'] ?? mb_convert_case($machine_name, MB_CASE_TITLE);
+    $this->name = $metadata_info['name'] ?? \mb_convert_case($machine_name, MB_CASE_TITLE);
     $this->description = $metadata_info['description'] ?? $this->t('- Description not available -');
     $this->status = ExtensionLifecycle::isValid($metadata_info['status'] ?? '')
       ? $metadata_info['status']
@@ -198,7 +198,7 @@ class ComponentMetadata {
         // All props should also support "object" this allows deferring
         // rendering in Twig to the render pipeline.
         $type = $prop_schema['type'] ?? '';
-        $schema['properties'][$name]['type'] = array_unique([
+        $schema['properties'][$name]['type'] = \array_unique([
           ...(array) $type,
           'object',
         ]);
@@ -215,8 +215,8 @@ class ComponentMetadata {
    */
   public function getThumbnailPath(): string {
     if (!isset($this->thumbnailPath)) {
-      $thumbnail_path = sprintf('%s/thumbnail.png', $this->path);
-      $this->thumbnailPath = file_exists($thumbnail_path) ? $thumbnail_path : '';
+      $thumbnail_path = \sprintf('%s/thumbnail.png', $this->path);
+      $this->thumbnailPath = \file_exists($thumbnail_path) ? $thumbnail_path : '';
     }
     return $this->thumbnailPath;
   }

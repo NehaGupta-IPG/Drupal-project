@@ -65,8 +65,8 @@ class EntityTestWithBundle extends ContentEntityBase {
     $fields = parent::baseFieldDefinitions($entity_type);
 
     $fields['name'] = BaseFieldDefinition::create('string')
-      ->setLabel(t('Name'))
-      ->setDescription(t('The name of the test entity.'))
+      ->setLabel(\t('Name'))
+      ->setDescription(\t('The name of the test entity.'))
       ->setTranslatable(TRUE)
       ->setSetting('max_length', 32)
       ->setDisplayConfigurable('view', TRUE)

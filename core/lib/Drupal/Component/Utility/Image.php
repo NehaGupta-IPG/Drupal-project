@@ -40,10 +40,10 @@ class Image {
     // are specified then the dimension calculated is the one that would not be
     // calculated to be bigger than its target.
     if (($width && !$height) || ($width && $height && $aspect < $height / $width)) {
-      $height = (int) round($width * $aspect);
+      $height = (int) \round($width * $aspect);
     }
     else {
-      $width = (int) round($height / $aspect);
+      $width = (int) \round($height / $aspect);
     }
 
     // Don't upscale if the option isn't enabled.

@@ -50,7 +50,7 @@ class Weight extends FormElementBase {
     // If the number of options is small enough, use a select field. Otherwise,
     // use a number field.
     $type = $element['#delta'] <= \Drupal::config('system.site')->get('weight_select_max') ? 'select' : 'number';
-    $element = array_merge($element, \Drupal::service('element_info')->getInfo($type));
+    $element = \array_merge($element, \Drupal::service('element_info')->getInfo($type));
     $element['#is_weight'] = TRUE;
 
     if ($type === 'select') {
@@ -61,7 +61,7 @@ class Weight extends FormElementBase {
       $default_value = (int) $element['#default_value'];
       if (!isset($weights[$default_value])) {
         $weights[$default_value] = $default_value;
-        ksort($weights);
+        \ksort($weights);
       }
       $element['#options'] = $weights;
     }

@@ -18,7 +18,7 @@ class UpdateScriptTestController extends ControllerBase {
    */
   public function databaseUpdatesMenuItem(Request $request) {
     // @todo Simplify with https://www.drupal.org/node/2548095
-    $base_url = str_replace('/update.php', '', $request->getBaseUrl());
+    $base_url = \str_replace('/update.php', '', $request->getBaseUrl());
     $url = (new Url('system.db_update'))->setOption('base_url', $base_url);
     $build['main'] = [
       '#type' => 'link',

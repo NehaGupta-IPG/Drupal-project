@@ -102,7 +102,7 @@ class ConfigSingleImportForm extends ConfirmFormBase {
 
     $args = [
       '%name' => $name,
-      '@type' => strtolower($type),
+      '@type' => \strtolower($type),
     ];
     if ($this->configExists) {
       $question = $this->t('Are you sure you want to update the %name @type?', $args);
@@ -129,7 +129,7 @@ class ConfigSingleImportForm extends ConfirmFormBase {
       }
     }
     // Sort the entity types by label, then add the simple config to the top.
-    uasort($entity_types, 'strnatcasecmp');
+    \uasort($entity_types, 'strnatcasecmp');
     $config_types = [
       'system.simple' => $this->t('Simple configuration'),
     ] + $entity_types;
@@ -296,7 +296,7 @@ class ConfigSingleImportForm extends ConfirmFormBase {
         foreach ($sync_steps as $sync_step) {
           $batch_builder->addOperation([ConfigImporterBatch::class, 'process'], [$config_importer, $sync_step]);
         }
-        batch_set($batch_builder->toArray());
+        \batch_set($batch_builder->toArray());
       }
       catch (ConfigImporterException) {
         // There are validation errors.

@@ -79,7 +79,7 @@ class Field extends DrupalSqlBase {
    * {@inheritdoc}
    */
   public function prepareRow(Row $row, $keep = TRUE) {
-    foreach (unserialize($row->getSourceProperty('data')) as $key => $value) {
+    foreach (\unserialize($row->getSourceProperty('data')) as $key => $value) {
       $row->setSourceProperty($key, $value);
     }
 

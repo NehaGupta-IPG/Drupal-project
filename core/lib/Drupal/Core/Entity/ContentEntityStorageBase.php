@@ -178,18 +178,18 @@ abstract class ContentEntityStorageBase extends EntityStorageBase implements Con
     // \Drupal\Core\Field\FieldInputValueNormalizerTrait::normalizeValue()
     // because we just need the scalar value.
     $bundle_value = $values[$this->bundleKey];
-    if (!is_array($bundle_value)) {
+    if (!\is_array($bundle_value)) {
       // The bundle value is a scalar, use it as-is.
       $bundle = $bundle_value;
     }
-    elseif (is_numeric(array_keys($bundle_value)[0])) {
+    elseif (\is_numeric(\array_keys($bundle_value)[0])) {
       // The bundle value is a field item list array, keyed by delta.
-      $bundle = reset($bundle_value[0]);
+      $bundle = \reset($bundle_value[0]);
     }
     else {
       // The bundle value is a field item array, keyed by the field's main
       // property name.
-      $bundle = reset($bundle_value);
+      $bundle = \reset($bundle_value);
     }
     return $bundle;
   }
@@ -209,10 +209,10 @@ abstract class ContentEntityStorageBase extends EntityStorageBase implements Con
 
     // Bundle classes should exist and extend the main entity class.
     if ($bundle_class) {
-      if (!class_exists($bundle_class)) {
+      if (!\class_exists($bundle_class)) {
         throw new MissingBundleClassException($bundle_class);
       }
-      elseif (!is_subclass_of($bundle_class, $entity_class)) {
+      elseif (!\is_subclass_of($bundle_class, $entity_class)) {
         throw new BundleClassInheritanceException($bundle_class, $entity_class);
       }
       return $bundle_class;
@@ -236,19 +236,19 @@ abstract class ContentEntityStorageBase extends EntityStorageBase implements Con
       if (!$bundle) {
         throw new EntityStorageException("No entity bundle was specified");
       }
-      if (!array_key_exists($bundle, $this->entityTypeBundleInfo->getBundleInfo($this->entityTypeId))) {
-        throw new EntityStorageException(sprintf("Missing entity bundle. The \"%s\" bundle does not exist", $bundle));
+      if (!\array_key_exists($bundle, $this->entityTypeBundleInfo->getBundleInfo($this->entityTypeId))) {
+        throw new EntityStorageException(\sprintf("Missing entity bundle. The \"%s\" bundle does not exist", $bundle));
       }
       $values[$bundle_key] = $bundle;
       // Bundle is already set.
       $forbidden_keys[] = $bundle_key;
     }
     // Forbid sample generation on any keys whose values were submitted.
-    $forbidden_keys = array_merge($forbidden_keys, array_keys($values));
+    $forbidden_keys = \array_merge($forbidden_keys, \array_keys($values));
     /** @var \Drupal\Core\Entity\FieldableEntityInterface $entity */
     $entity = $this->create($values);
     foreach ($entity as $field_name => $value) {
-      if (!in_array($field_name, $forbidden_keys, TRUE)) {
+      if (!\in_array($field_name, $forbidden_keys, TRUE)) {
         $entity->get($field_name)->generateSampleItems();
       }
     }
@@ -274,7 +274,7 @@ abstract class ContentEntityStorageBase extends EntityStorageBase implements Con
         if (isset($values[$name])) {
           $entity->$name = $values[$name];
         }
-        elseif (!array_key_exists($name, $values)) {
+        elseif (!\array_key_exists($name, $values)) {
           $entity->get($name)->applyDefaultValue();
         }
       }
@@ -358,10 +358,10 @@ abstract class ContentEntityStorageBase extends EntityStorageBase implements Con
    */
   public function createTranslation(ContentEntityInterface $entity, $langcode, array $values = []) {
     $translation = $entity->getTranslation($langcode);
-    $definitions = array_filter($translation->getFieldDefinitions(), function (FieldDefinitionInterface $definition) {
+    $definitions = \array_filter($translation->getFieldDefinitions(), function (FieldDefinitionInterface $definition) {
       return $definition->isTranslatable();
     });
-    $field_names = array_map(function (FieldDefinitionInterface $definition) {
+    $field_names = \array_map(function (FieldDefinitionInterface $definition) {
       return $definition->getName();
     }, $definitions);
     $values[$this->langcodeKey] = $langcode;
@@ -386,7 +386,7 @@ abstract class ContentEntityStorageBase extends EntityStorageBase implements Con
     // new default revision without reverting changes in other languages.
     if (!$entity->isNew() && !$entity->isDefaultRevision() && $entity->isTranslatable() && $this->isAnyRevisionTranslated($entity)) {
       $active_langcode = $entity->language()->getId();
-      $skipped_field_names = array_flip($this->getRevisionTranslationMergeSkippedFieldNames());
+      $skipped_field_names = \array_flip($this->getRevisionTranslationMergeSkippedFieldNames());
 
       // By default we copy untranslatable field values from the default
       // revision, unless they are configured to affect only the default
@@ -410,7 +410,7 @@ abstract class ContentEntityStorageBase extends EntityStorageBase implements Con
           $new_revision->getTranslation($langcode) : $new_revision->addTranslation($langcode);
 
         /** @var \Drupal\Core\Field\FieldItemListInterface[] $sync_items */
-        $sync_items = array_diff_key(
+        $sync_items = \array_diff_key(
           $keep_untranslatable_fields ? $default_revision_translation->getTranslatableFields() : $default_revision_translation->getFields(),
           $skipped_field_names
         );
@@ -426,7 +426,7 @@ abstract class ContentEntityStorageBase extends EntityStorageBase implements Con
       }
 
       // Make sure we do not inadvertently recreate removed translations.
-      foreach (array_diff_key($new_revision->getTranslationLanguages(), $translation_languages) as $langcode => $language) {
+      foreach (\array_diff_key($new_revision->getTranslationLanguages(), $translation_languages) as $langcode => $language) {
         // Allow a new revision to be created for the active language.
         if ($langcode !== $active_langcode) {
           $new_revision->removeTranslation($langcode);
@@ -474,7 +474,7 @@ abstract class ContentEntityStorageBase extends EntityStorageBase implements Con
       $entity_type->getKey('revision'),
       $entity_type->getKey('revision_translation_affected'),
     ];
-    $field_names = array_merge($field_names, array_values($entity_type->getRevisionMetadataKeys()));
+    $field_names = \array_merge($field_names, \array_values($entity_type->getRevisionMetadataKeys()));
 
     return $field_names;
   }
@@ -576,7 +576,7 @@ abstract class ContentEntityStorageBase extends EntityStorageBase implements Con
       $items->delete();
       $this->purgeFieldItems($items->getEntity(), $field_definition);
     }
-    return count($items_by_entity);
+    return \count($items_by_entity);
   }
 
   /**
@@ -627,16 +627,16 @@ abstract class ContentEntityStorageBase extends EntityStorageBase implements Con
       // If any entities were pre-loaded, remove them from the IDs still to
       // load.
       if ($ids !== NULL) {
-        $ids = array_keys(array_diff_key(array_flip($ids), $entities));
+        $ids = \array_keys(\array_diff_key(\array_flip($ids), $entities));
       }
       // If we had to load all the entities ($ids was set to NULL), get an array
       // of IDs that still need to be loaded.
       else {
         $result = $this->getQuery()
           ->accessCheck(FALSE)
-          ->condition($this->entityType->getKey('id'), array_keys($entities), 'NOT IN')
+          ->condition($this->entityType->getKey('id'), \array_keys($entities), 'NOT IN')
           ->execute();
-        $ids = array_values($result);
+        $ids = \array_values($result);
       }
     }
 
@@ -1054,14 +1054,14 @@ abstract class ContentEntityStorageBase extends EntityStorageBase implements Con
    */
   protected function invokeFieldMethod($method, ContentEntityInterface $entity) {
     $result = [];
-    $args = array_slice(func_get_args(), 2);
-    $langcodes = array_keys($entity->getTranslationLanguages());
+    $args = \array_slice(\func_get_args(), 2);
+    $langcodes = \array_keys($entity->getTranslationLanguages());
     // Ensure that the field method is invoked as first on the current entity
     // translation and then on all other translations.
     $current_entity_langcode = $entity->language()->getId();
-    if (reset($langcodes) != $current_entity_langcode) {
-      $langcodes = array_diff($langcodes, [$current_entity_langcode]);
-      array_unshift($langcodes, $current_entity_langcode);
+    if (\reset($langcodes) != $current_entity_langcode) {
+      $langcodes = \array_diff($langcodes, [$current_entity_langcode]);
+      \array_unshift($langcodes, $current_entity_langcode);
     }
     foreach ($langcodes as $langcode) {
       $translation = $entity->getTranslation($langcode);
@@ -1073,7 +1073,7 @@ abstract class ContentEntityStorageBase extends EntityStorageBase implements Con
       foreach ($fields as $name => $items) {
         // call_user_func_array() is way slower than a direct call so we avoid
         // using it if have no parameters.
-        $result[$langcode][$name] = $args ? call_user_func_array([$items, $method], $args) : $items->{$method}();
+        $result[$langcode][$name] = $args ? \call_user_func_array([$items, $method], $args) : $items->{$method}();
       }
     }
 
@@ -1115,10 +1115,10 @@ abstract class ContentEntityStorageBase extends EntityStorageBase implements Con
     // by field name, thus we merge them to obtain a list of fields to resave.
     $resave = [];
     foreach ($this->invokeFieldMethod('postSave', $entity, $update) as $translation_results) {
-      $resave += array_filter($translation_results);
+      $resave += \array_filter($translation_results);
     }
     if ($resave) {
-      $this->doSaveFieldItems($entity, array_keys($resave));
+      $this->doSaveFieldItems($entity, \array_keys($resave));
     }
   }
 
@@ -1137,8 +1137,8 @@ abstract class ContentEntityStorageBase extends EntityStorageBase implements Con
    */
   protected function hasFieldValueChanged(FieldDefinitionInterface $field_definition, ContentEntityInterface $entity, ContentEntityInterface $original) {
     $field_name = $field_definition->getName();
-    $langcodes = array_keys($entity->getTranslationLanguages());
-    if ($langcodes !== array_keys($original->getTranslationLanguages())) {
+    $langcodes = \array_keys($entity->getTranslationLanguages());
+    if ($langcodes !== \array_keys($original->getTranslationLanguages())) {
       // If the list of langcodes has changed, we need to save.
       return TRUE;
     }
@@ -1200,10 +1200,10 @@ abstract class ContentEntityStorageBase extends EntityStorageBase implements Con
     $definitions = $this->entityFieldManager->getActiveFieldStorageDefinitions($this->entityTypeId);
     $field_name = $this->entityType->getKey($entity_key);
     if ($field_name && $definitions[$field_name]->getType() == 'integer') {
-      $ids = array_filter($ids, function ($id) {
-        return is_numeric($id) && $id == (int) $id;
+      $ids = \array_filter($ids, function ($id) {
+        return \is_numeric($id) && $id == (int) $id;
       });
-      $ids = array_map('intval', $ids);
+      $ids = \array_map('intval', $ids);
     }
     return $ids;
   }
@@ -1228,7 +1228,7 @@ abstract class ContentEntityStorageBase extends EntityStorageBase implements Con
     foreach ($ids as $id) {
       $cid_map[$id] = $this->buildCacheId($id);
     }
-    $cids = array_values($cid_map);
+    $cids = \array_values($cid_map);
     if ($cache = $this->cacheBackend->getMultiple($cids)) {
       // Get the entities that were found in the cache.
       foreach ($ids as $index => $id) {

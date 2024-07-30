@@ -42,7 +42,7 @@ class FileManagedAccessTest extends KernelTestBase {
 
     $anonymous = User::create(['uid' => 0, 'name' => '']);
     $anonymous->save();
-    user_role_grant_permissions(AccountInterface::ANONYMOUS_ROLE, ['access content']);
+    \user_role_grant_permissions(AccountInterface::ANONYMOUS_ROLE, ['access content']);
 
     // Create an authenticated user to check file access.
     $account = $this->createUser(['access site reports', 'access content'], NULL, FALSE, ['uid' => 2]);

@@ -32,7 +32,7 @@ abstract class GenericRecipeTestBase extends BrowserTestBase {
    */
   protected function getRecipePath(): string {
     // Assume this test in located in RECIPE_DIR/tests/src/Functional.
-    return dirname((new \ReflectionObject($this))->getFileName(), 4);
+    return \dirname((new \ReflectionObject($this))->getFileName(), 4);
   }
 
   /**

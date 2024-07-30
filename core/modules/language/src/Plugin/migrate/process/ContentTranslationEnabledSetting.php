@@ -23,7 +23,7 @@ class ContentTranslationEnabledSetting extends ProcessPluginBase {
    * {@inheritdoc}
    */
   public function transform($value, MigrateExecutableInterface $migrate_executable, Row $row, $destination_property) {
-    if (!is_array($value)) {
+    if (!\is_array($value)) {
       throw new MigrateException('Input should be an array');
     }
 

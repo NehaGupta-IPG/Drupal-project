@@ -137,7 +137,7 @@ class MigrateRollbackTest extends MigrateTestBase {
     $term_executable->rollback();
     foreach ($term_data_rows as $row) {
       $term = Term::load($row['id']);
-      if (in_array($row['id'], $preserved_term_ids)) {
+      if (\in_array($row['id'], $preserved_term_ids)) {
         $this->assertNotNull($term);
       }
       else {

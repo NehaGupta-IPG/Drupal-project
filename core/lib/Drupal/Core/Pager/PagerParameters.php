@@ -55,7 +55,7 @@ class PagerParameters implements PagerParametersInterface {
    */
   public function getPagerQuery() {
     $query = $this->getPagerParameter();
-    return !empty($query) ? explode(',', $query) : [];
+    return !empty($query) ? \explode(',', $query) : [];
   }
 
   /**

@@ -117,10 +117,10 @@ class StaticMenuLinkOverridesTest extends UnitTestCase {
       $definition_save_1['definitions'],
       $definitions_save_2['definitions'],
     ];
-    $config->expects($this->exactly(count($definitions)))
+    $config->expects($this->exactly(\count($definitions)))
       ->method('set')
       ->with('definitions', $this->callback(function (array $value) use (&$definitions): bool {
-        return array_shift($definitions) === $value;
+        return \array_shift($definitions) === $value;
       }))
       ->willReturnSelf();
     $config->expects($this->exactly(2))
@@ -172,7 +172,7 @@ class StaticMenuLinkOverridesTest extends UnitTestCase {
 
     $static_override = new StaticMenuLinkOverrides($config_factory);
 
-    if (is_array($ids)) {
+    if (\is_array($ids)) {
       $static_override->deleteMultipleOverrides($ids);
     }
     else {

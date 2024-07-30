@@ -101,17 +101,17 @@ class SearchTokenizerTest extends KernelTestBase {
     $chars = [];
     foreach ($starts as $key => $value) {
       $chars[] = $this->code2utf($starts[$key]);
-      $mid = round(0.5 * ($starts[$key] + $ends[$key]));
+      $mid = \round(0.5 * ($starts[$key] + $ends[$key]));
       $chars[] = $this->code2utf($mid);
       $chars[] = $this->code2utf($ends[$key]);
     }
 
     // Merge into a string and tokenize.
-    $string = implode('', $chars);
+    $string = \implode('', $chars);
     $text_processor = \Drupal::service('search.text_processor');
-    assert($text_processor instanceof SearchTextProcessorInterface);
-    $out = trim($text_processor->analyze($string));
-    $expected = mb_strtolower(implode(' ', $chars));
+    \assert($text_processor instanceof SearchTextProcessorInterface);
+    $out = \trim($text_processor->analyze($string));
+    $expected = \mb_strtolower(\implode(' ', $chars));
 
     // Verify that the output matches what we expect.
     $this->assertEquals($expected, $out, 'CJK tokenizer worked on all supplied CJK characters');
@@ -133,8 +133,8 @@ class SearchTokenizerTest extends KernelTestBase {
 
     $letters = 'abcdefghijklmnopqrstuvwxyz';
     $text_processor = \Drupal::service('search.text_processor');
-    assert($text_processor instanceof SearchTextProcessorInterface);
-    $out = trim($text_processor->analyze($letters));
+    \assert($text_processor instanceof SearchTextProcessorInterface);
+    $out = \trim($text_processor->analyze($letters));
 
     $this->assertEquals($letters, $out, 'Letters are not CJK tokenized');
   }
@@ -148,19 +148,19 @@ class SearchTokenizerTest extends KernelTestBase {
    */
   public function code2utf($num) {
     if ($num < 128) {
-      return chr($num);
+      return \chr($num);
     }
 
     if ($num < 2048) {
-      return chr(($num >> 6) + 192) . chr(($num & 63) + 128);
+      return \chr(($num >> 6) + 192) . \chr(($num & 63) + 128);
     }
 
     if ($num < 65536) {
-      return chr(($num >> 12) + 224) . chr((($num >> 6) & 63) + 128) . chr(($num & 63) + 128);
+      return \chr(($num >> 12) + 224) . \chr((($num >> 6) & 63) + 128) . \chr(($num & 63) + 128);
     }
 
     if ($num < 2097152) {
-      return chr(($num >> 18) + 240) . chr((($num >> 12) & 63) + 128) . chr((($num >> 6) & 63) + 128) . chr(($num & 63) + 128);
+      return \chr(($num >> 18) + 240) . \chr((($num >> 12) & 63) + 128) . \chr((($num >> 6) & 63) + 128) . \chr(($num & 63) + 128);
     }
 
     return '';

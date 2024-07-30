@@ -42,19 +42,19 @@ class DatabaseStorageExpirableTest extends StorageTestBase {
 
     // Verify that an item can be stored with setWithExpire().
     // Use a random expiration in each test.
-    $stores[0]->setWithExpire('foo', $this->objects[0], rand(500, 100000));
+    $stores[0]->setWithExpire('foo', $this->objects[0], \rand(500, 100000));
     $this->assertEquals($this->objects[0], $stores[0]->get('foo'));
     // Verify that the other collection is not affected.
     $this->assertNull($stores[1]->get('foo'));
 
     // Verify that an item can be updated with setWithExpire().
-    $stores[0]->setWithExpire('foo', $this->objects[1], rand(500, 100000));
+    $stores[0]->setWithExpire('foo', $this->objects[1], \rand(500, 100000));
     $this->assertEquals($this->objects[1], $stores[0]->get('foo'));
     // Verify that the other collection is still not affected.
     $this->assertNull($stores[1]->get('foo'));
 
     // Verify that the expirable data key is unique.
-    $stores[1]->setWithExpire('foo', $this->objects[2], rand(500, 100000));
+    $stores[1]->setWithExpire('foo', $this->objects[2], \rand(500, 100000));
     $this->assertEquals($this->objects[1], $stores[0]->get('foo'));
     $this->assertEquals($this->objects[2], $stores[1]->get('foo'));
 
@@ -63,7 +63,7 @@ class DatabaseStorageExpirableTest extends StorageTestBase {
       'foo' => $this->objects[3],
       'bar' => $this->objects[4],
     ];
-    $stores[0]->setMultipleWithExpire($values, rand(500, 100000));
+    $stores[0]->setMultipleWithExpire($values, \rand(500, 100000));
     $result = $stores[0]->getMultiple(['foo', 'bar']);
     foreach ($values as $j => $value) {
       $this->assertEquals($value, $result[$j]);
@@ -85,7 +85,7 @@ class DatabaseStorageExpirableTest extends StorageTestBase {
     $this->assertEquals(['foo' => $this->objects[5]], $result);
 
     // Verify that multiple items can be deleted.
-    $stores[0]->deleteMultiple(array_keys($values));
+    $stores[0]->deleteMultiple(\array_keys($values));
     $this->assertNull($stores[0]->get('foo'));
     $this->assertNull($stores[0]->get('bar'));
     $this->assertEmpty($stores[0]->getMultiple(['foo', 'bar']));
@@ -97,7 +97,7 @@ class DatabaseStorageExpirableTest extends StorageTestBase {
     for ($i = 0; $i <= 1; $i++) {
       // setWithExpireIfNotExists() should be TRUE the first time (when $i is
       // 0) and FALSE the second time (when $i is 1).
-      $this->assertEquals(!$i, $stores[0]->setWithExpireIfNotExists($key, $this->objects[$i], rand(500, 100000)));
+      $this->assertEquals(!$i, $stores[0]->setWithExpireIfNotExists($key, $this->objects[$i], \rand(500, 100000)));
       $this->assertEquals($this->objects[0], $stores[0]->get($key));
       // Verify that the other collection is not affected.
       $this->assertNull($stores[1]->get($key));
@@ -105,7 +105,7 @@ class DatabaseStorageExpirableTest extends StorageTestBase {
 
     // Remove the item and try to set it again.
     $stores[0]->delete($key);
-    $stores[0]->setWithExpireIfNotExists($key, $this->objects[1], rand(500, 100000));
+    $stores[0]->setWithExpireIfNotExists($key, $this->objects[1], \rand(500, 100000));
     // This time it should succeed.
     $this->assertEquals($this->objects[1], $stores[0]->get($key));
     // Verify that the other collection is still not affected.

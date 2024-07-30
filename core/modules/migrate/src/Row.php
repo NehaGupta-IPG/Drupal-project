@@ -102,7 +102,7 @@ class Row {
     $this->source = $values;
     $this->sourceIds = $source_ids;
     $this->isStub = $is_stub;
-    foreach (array_keys($source_ids) as $id) {
+    foreach (\array_keys($source_ids) as $id) {
       if (!$this->hasSourceProperty($id)) {
         throw new \InvalidArgumentException("'$id' is defined as a source ID but has no value.");
       }
@@ -117,7 +117,7 @@ class Row {
    *   in the same order as defined in $this->sourceIds.
    */
   public function getSourceIdValues() {
-    return array_merge($this->sourceIds, array_intersect_key($this->source, $this->sourceIds));
+    return \array_merge($this->sourceIds, \array_intersect_key($this->source, $this->sourceIds));
   }
 
   /**
@@ -130,7 +130,7 @@ class Row {
    *   TRUE if the source has property; FALSE otherwise.
    */
   public function hasSourceProperty($property) {
-    return NestedArray::keyExists($this->source, explode(static::PROPERTY_SEPARATOR, $property));
+    return NestedArray::keyExists($this->source, \explode(static::PROPERTY_SEPARATOR, $property));
   }
 
   /**
@@ -150,7 +150,7 @@ class Row {
    *   The found returned property or NULL if not found.
    */
   public function getSourceProperty($property) {
-    $return = NestedArray::getValue($this->source, explode(static::PROPERTY_SEPARATOR, $property), $key_exists);
+    $return = NestedArray::getValue($this->source, \explode(static::PROPERTY_SEPARATOR, $property), $key_exists);
     if ($key_exists) {
       return $return;
     }
@@ -186,7 +186,7 @@ class Row {
       throw new \Exception("The source is frozen and can't be changed any more");
     }
     else {
-      NestedArray::setValue($this->source, explode(static::PROPERTY_SEPARATOR, $property), $data, TRUE);
+      NestedArray::setValue($this->source, \explode(static::PROPERTY_SEPARATOR, $property), $data, TRUE);
     }
   }
 
@@ -219,7 +219,7 @@ class Row {
    *   TRUE if the destination property exists.
    */
   public function hasDestinationProperty($property) {
-    return NestedArray::keyExists($this->destination, explode(static::PROPERTY_SEPARATOR, $property));
+    return NestedArray::keyExists($this->destination, \explode(static::PROPERTY_SEPARATOR, $property));
   }
 
   /**
@@ -232,7 +232,7 @@ class Row {
    */
   public function setDestinationProperty($property, $value) {
     $this->rawDestination[$property] = $value;
-    NestedArray::setValue($this->destination, explode(static::PROPERTY_SEPARATOR, $property), $value, TRUE);
+    NestedArray::setValue($this->destination, \explode(static::PROPERTY_SEPARATOR, $property), $value, TRUE);
   }
 
   /**
@@ -243,7 +243,7 @@ class Row {
    */
   public function removeDestinationProperty($property) {
     unset($this->rawDestination[$property]);
-    NestedArray::unsetValue($this->destination, explode(static::PROPERTY_SEPARATOR, $property));
+    NestedArray::unsetValue($this->destination, \explode(static::PROPERTY_SEPARATOR, $property));
   }
 
   /**
@@ -332,7 +332,7 @@ class Row {
    *   The destination value.
    */
   public function getDestinationProperty($property) {
-    return NestedArray::getValue($this->destination, explode(static::PROPERTY_SEPARATOR, $property));
+    return NestedArray::getValue($this->destination, \explode(static::PROPERTY_SEPARATOR, $property));
   }
 
   /**
@@ -352,7 +352,7 @@ class Row {
    */
   public function get($property) {
     $values = $this->getMultiple([$property]);
-    return reset($values);
+    return \reset($values);
   }
 
   /**
@@ -370,13 +370,13 @@ class Row {
       $property = $orig_property;
       $is_source = TRUE;
       if ($property[0] == '@') {
-        $property = preg_replace_callback('/^(@?)((?:@@)*)([^@]|$)/', function ($matches) use (&$is_source) {
+        $property = \preg_replace_callback('/^(@?)((?:@@)*)([^@]|$)/', function ($matches) use (&$is_source) {
           // If there are an odd number of @ in the beginning, it's a
           // destination.
           $is_source = empty($matches[1]);
           // Remove the possible escaping and do not lose the terminating
           // non-@ either.
-          return str_replace('@@', '@', $matches[2]) . $matches[3];
+          return \str_replace('@@', '@', $matches[2]) . $matches[3];
         }, $property);
       }
       if ($is_source) {
@@ -414,7 +414,7 @@ class Row {
    */
   public function rehash() {
     $this->idMap['original_hash'] = $this->idMap['hash'];
-    $this->idMap['hash'] = hash('sha256', serialize($this->source));
+    $this->idMap['hash'] = \hash('sha256', \serialize($this->source));
   }
 
   /**

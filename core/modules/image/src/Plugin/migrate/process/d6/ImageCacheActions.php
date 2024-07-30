@@ -25,12 +25,12 @@ class ImageCacheActions extends ProcessPluginBase {
       if (empty($action['action'])) {
         continue;
       }
-      $id = preg_replace('/^imagecache/', 'image', $action['action']);
+      $id = \preg_replace('/^imagecache/', 'image', $action['action']);
 
       if ($id === 'image_crop') {
         $action['data']['anchor'] = $action['data']['xoffset'] . '-' . $action['data']['yoffset'];
 
-        if (!preg_match('/^[a-z]*\-[a-z]*/', $action['data']['anchor'])) {
+        if (!\preg_match('/^[a-z]*\-[a-z]*/', $action['data']['anchor'])) {
           $migrate_executable->message->display(
             'The Drupal 8 image crop effect does not support numeric values for x and y offsets. Use keywords to set crop effect offsets instead.',
             'error'

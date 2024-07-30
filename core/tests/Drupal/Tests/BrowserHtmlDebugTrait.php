@@ -82,7 +82,7 @@ trait BrowserHtmlDebugTrait {
         return $header;
       }
     }, $headers);
-    return '<hr />Headers: <pre>' . Html::escape(var_export($flattened_headers, TRUE)) . '</pre>';
+    return '<hr />Headers: <pre>' . Html::escape(\var_export($flattened_headers, TRUE)) . '</pre>';
   }
 
   /**
@@ -113,8 +113,8 @@ trait BrowserHtmlDebugTrait {
     $message = $message ?: $this->getSession()->getPage()->getContent();
     $message = '<hr />ID #' . $this->htmlOutputCounter . ' (<a href="' . $this->htmlOutputClassName . '-' . ($this->htmlOutputCounter - 1) . '-' . $this->htmlOutputTestId . '.html">Previous</a> | <a href="' . $this->htmlOutputClassName . '-' . ($this->htmlOutputCounter + 1) . '-' . $this->htmlOutputTestId . '.html">Next</a>)<hr />' . $message;
     $html_output_filename = $this->htmlOutputClassName . '-' . $this->htmlOutputCounter . '-' . $this->htmlOutputTestId . '.html';
-    file_put_contents($this->htmlOutputDirectory . '/' . $html_output_filename, $message);
-    file_put_contents($this->htmlOutputCounterStorage, $this->htmlOutputCounter++);
+    \file_put_contents($this->htmlOutputDirectory . '/' . $html_output_filename, $message);
+    \file_put_contents($this->htmlOutputCounterStorage, $this->htmlOutputCounter++);
     // Do not use the file_url_generator service as the module_handler service
     // might not be available.
     $uri = $this->htmlOutputBaseUrl . '/sites/simpletest/browser_output/' . $html_output_filename;
@@ -125,27 +125,27 @@ trait BrowserHtmlDebugTrait {
    * Creates the directory to store browser output.
    */
   protected function initBrowserOutputFile() {
-    $browserOutputFile = getenv('BROWSERTEST_OUTPUT_FILE');
+    $browserOutputFile = \getenv('BROWSERTEST_OUTPUT_FILE');
     $this->htmlOutputEnabled = $browserOutputFile !== FALSE;
-    $this->htmlOutputBaseUrl = getenv('BROWSERTEST_OUTPUT_BASE_URL') ?: $GLOBALS['base_url'];
+    $this->htmlOutputBaseUrl = \getenv('BROWSERTEST_OUTPUT_BASE_URL') ?: $GLOBALS['base_url'];
     if ($this->htmlOutputEnabled) {
-      $this->htmlOutputClassName = str_replace("\\", "_", static::class);
+      $this->htmlOutputClassName = \str_replace("\\", "_", static::class);
       $this->htmlOutputDirectory = DRUPAL_ROOT . '/sites/simpletest/browser_output';
       // Do not use the file_system service so this method can be called before
       // it is available. Checks !is_dir() twice around mkdir() because a
       // concurrent test might have made the directory and caused mkdir() to
       // fail. In this case we can still use the directory even though we failed
       // to make it.
-      if (!is_dir($this->htmlOutputDirectory) && !@mkdir($this->htmlOutputDirectory, 0775, TRUE) && !is_dir($this->htmlOutputDirectory)) {
-        throw new \RuntimeException(sprintf('Unable to create directory: %s', $this->htmlOutputDirectory));
+      if (!\is_dir($this->htmlOutputDirectory) && !@\mkdir($this->htmlOutputDirectory, 0775, TRUE) && !\is_dir($this->htmlOutputDirectory)) {
+        throw new \RuntimeException(\sprintf('Unable to create directory: %s', $this->htmlOutputDirectory));
       }
-      if (!file_exists($this->htmlOutputDirectory . '/.htaccess')) {
-        file_put_contents($this->htmlOutputDirectory . '/.htaccess', "<IfModule mod_expires.c>\nExpiresActive Off\n</IfModule>\n");
+      if (!\file_exists($this->htmlOutputDirectory . '/.htaccess')) {
+        \file_put_contents($this->htmlOutputDirectory . '/.htaccess', "<IfModule mod_expires.c>\nExpiresActive Off\n</IfModule>\n");
       }
       $this->htmlOutputCounterStorage = $this->htmlOutputDirectory . '/' . $this->htmlOutputClassName . '.counter';
-      $this->htmlOutputTestId = str_replace('sites/simpletest/', '', $this->siteDirectory);
-      if (is_file($this->htmlOutputCounterStorage)) {
-        $this->htmlOutputCounter = max(1, (int) file_get_contents($this->htmlOutputCounterStorage)) + 1;
+      $this->htmlOutputTestId = \str_replace('sites/simpletest/', '', $this->siteDirectory);
+      if (\is_file($this->htmlOutputCounterStorage)) {
+        $this->htmlOutputCounter = \max(1, (int) \file_get_contents($this->htmlOutputCounterStorage)) + 1;
       }
     }
   }
@@ -183,7 +183,7 @@ trait BrowserHtmlDebugTrait {
               // debug output file in their browser.
               $status_code = (string) $response->getStatusCode();
               if ($status_code[0] === '3') {
-                $body = preg_replace('#<meta http-equiv="refresh" content=.+/>#', '', $body, 1);
+                $body = \preg_replace('#<meta http-equiv="refresh" content=.+/>#', '', $body, 1);
               }
               $html_output .= '<hr />' . $body;
               $html_output .= $this->formatHtmlOutputHeaders($response->getHeaders());
@@ -203,7 +203,7 @@ trait BrowserHtmlDebugTrait {
    *   An associative array with keys 'file', 'line' and 'function'.
    */
   protected function getTestMethodCaller() {
-    $backtrace = debug_backtrace();
+    $backtrace = \debug_backtrace();
     // Find the test class that has the test method.
     while ($caller = Error::getLastCaller($backtrace)) {
       if (isset($caller['class']) && $caller['class'] === static::class) {
@@ -213,7 +213,7 @@ trait BrowserHtmlDebugTrait {
       // class name of $this will not be part of the backtrace.
       // In that case we process the backtrace until the caller is not a
       // subclass of $this and return the previous caller.
-      if (isset($last_caller) && (!isset($caller['class']) || !is_subclass_of($this, $caller['class']))) {
+      if (isset($last_caller) && (!isset($caller['class']) || !\is_subclass_of($this, $caller['class']))) {
         // Return the last caller since that has to be the test class.
         $caller = $last_caller;
         break;
@@ -221,7 +221,7 @@ trait BrowserHtmlDebugTrait {
       // Otherwise we have not reached our test class yet: save the last caller
       // and remove an element from to backtrace to process the next call.
       $last_caller = $caller;
-      array_shift($backtrace);
+      \array_shift($backtrace);
     }
 
     return $caller;

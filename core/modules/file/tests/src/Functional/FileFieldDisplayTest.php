@@ -72,7 +72,7 @@ class FileFieldDisplayTest extends FileFieldTestBase {
     $test_file = File::create([
       'uri' => 'public://escaped-&-text.txt',
       'name' => 'escaped-&-text',
-      'filesize' => filesize('public://escaped-&-text.txt'),
+      'filesize' => \filesize('public://escaped-&-text.txt'),
     ]);
 
     // Create a new node with the uploaded file.
@@ -178,7 +178,7 @@ class FileFieldDisplayTest extends FileFieldTestBase {
     ];
     $this->fieldUIAddNewField('/admin/structure/types/manage/' . $type_name, $field_name, $this->randomString(), $field_type, [], $field_edit);
     // Add a node of our new type and upload a file to it.
-    $file = current($this->drupalGetTestFiles('text'));
+    $file = \current($this->drupalGetTestFiles('text'));
     $title = $this->randomString();
     $edit = [
       'title[0][value]' => $title,

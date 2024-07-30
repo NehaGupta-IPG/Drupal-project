@@ -44,7 +44,7 @@ abstract class Schema implements PlaceholderInterface {
   protected $uniqueIdentifier;
 
   public function __construct($connection) {
-    $this->uniqueIdentifier = uniqid('', TRUE);
+    $this->uniqueIdentifier = \uniqid('', TRUE);
     $this->connection = $connection;
   }
 
@@ -52,7 +52,7 @@ abstract class Schema implements PlaceholderInterface {
    * Implements the magic __clone function.
    */
   public function __clone() {
-    $this->uniqueIdentifier = uniqid('', TRUE);
+    $this->uniqueIdentifier = \uniqid('', TRUE);
   }
 
   /**
@@ -93,11 +93,11 @@ abstract class Schema implements PlaceholderInterface {
     // contains a schema reference in which case we will change the schema key
     // to the value before the period in the prefix. Everything after the dot
     // will be prefixed onto the front of the table.
-    if (($pos = strpos($table, '.')) !== FALSE) {
+    if (($pos = \strpos($table, '.')) !== FALSE) {
       // Grab everything before the period.
-      $info['schema'] = substr($table, 0, $pos);
+      $info['schema'] = \substr($table, 0, $pos);
       // Grab everything after the dot.
-      $info['table'] = substr($table, ++$pos);
+      $info['table'] = \substr($table, ++$pos);
     }
     else {
       $info['table'] = $table;
@@ -111,10 +111,10 @@ abstract class Schema implements PlaceholderInterface {
    * This prevents using {} around non-table names like indexes and keys.
    */
   public function prefixNonTable($table) {
-    $args = func_get_args();
+    $args = \func_get_args();
     $info = $this->getPrefixInfo($table);
     $args[0] = $info['table'];
-    return implode('_', $args);
+    return \implode('_', $args);
   }
 
   /**
@@ -226,7 +226,7 @@ abstract class Schema implements PlaceholderInterface {
     $condition->compile($this->connection, $this);
 
     $prefix = $this->connection->getPrefix();
-    $prefix_length = strlen($prefix);
+    $prefix_length = \strlen($prefix);
     $tables = [];
     // Normally, we would heartily discourage the use of string
     // concatenation for conditionals like this however, we
@@ -235,14 +235,14 @@ abstract class Schema implements PlaceholderInterface {
     // Don't use {} around information_schema.tables table.
     $results = $this->connection->query("SELECT table_name AS table_name FROM information_schema.tables WHERE " . (string) $condition, $condition->arguments());
     foreach ($results as $table) {
-      if ($prefix && substr($table->table_name, 0, $prefix_length) !== $prefix) {
+      if ($prefix && \substr($table->table_name, 0, $prefix_length) !== $prefix) {
         // This table name does not start the prefix, which means that it is
         // not managed by Drupal so it should be excluded from the result.
         continue;
       }
 
       // Remove the prefix from the returned tables.
-      $unprefixed_table_name = substr($table->table_name, $prefix_length);
+      $unprefixed_table_name = \substr($table->table_name, $prefix_length);
 
       // The pattern can match a table which is the same as the prefix. That
       // will become an empty string when we remove the prefix, which will
@@ -255,8 +255,8 @@ abstract class Schema implements PlaceholderInterface {
 
     // Convert the table expression from its SQL LIKE syntax to a regular
     // expression and escape the delimiter that will be used for matching.
-    $table_expression = str_replace(['%', '_'], ['.*?', '.'], preg_quote($table_expression, '/'));
-    $tables = preg_grep('/^' . $table_expression . '$/i', $tables);
+    $table_expression = \str_replace(['%', '_'], ['.*?', '.'], \preg_quote($table_expression, '/'));
+    $tables = \preg_grep('/^' . $table_expression . '$/i', $tables);
 
     return $tables;
   }
@@ -674,7 +674,7 @@ abstract class Schema implements PlaceholderInterface {
    *   an abstract method here for implementation in each driver.
    */
   protected function createTableSql($name, $table) {
-    throw new \BadMethodCallException(get_class($this) . '::createTableSql() not implemented.');
+    throw new \BadMethodCallException(\get_class($this) . '::createTableSql() not implemented.');
   }
 
   /**
@@ -692,7 +692,7 @@ abstract class Schema implements PlaceholderInterface {
   public function fieldNames($fields) {
     $return = [];
     foreach ($fields as $field) {
-      if (is_array($field)) {
+      if (\is_array($field)) {
         $return[] = $field[0];
       }
       else {
@@ -715,7 +715,7 @@ abstract class Schema implements PlaceholderInterface {
    */
   public function prepareComment($comment, $length = NULL) {
     // Remove semicolons to avoid triggering multi-statement check.
-    $comment = strtr($comment, [';' => '.']);
+    $comment = \strtr($comment, [';' => '.']);
     return $this->connection->quote($comment);
   }
 
@@ -729,10 +729,10 @@ abstract class Schema implements PlaceholderInterface {
    *   The escaped value.
    */
   protected function escapeDefaultValue($value) {
-    if (is_null($value)) {
+    if (\is_null($value)) {
       return 'NULL';
     }
-    return is_string($value) ? $this->connection->quote($value) : $value;
+    return \is_string($value) ? $this->connection->quote($value) : $value;
   }
 
   /**
@@ -749,7 +749,7 @@ abstract class Schema implements PlaceholderInterface {
    *   do not define 'not null' as TRUE.
    */
   protected function ensureNotNullPrimaryKey(array $primary_key, array $fields) {
-    foreach (array_intersect($primary_key, array_keys($fields)) as $field_name) {
+    foreach (\array_intersect($primary_key, \array_keys($fields)) as $field_name) {
       if (!isset($fields[$field_name]['not null']) || $fields[$field_name]['not null'] !== TRUE) {
         throw new SchemaException("The '$field_name' field specification does not define 'not null' as TRUE.");
       }

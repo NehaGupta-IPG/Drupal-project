@@ -39,8 +39,8 @@ class FieldInstancePerFormDisplay extends DrupalSqlBase {
       $rows[$index]['module'] = $field_row['module'];
       $rows[$index]['weight'] = $field_row['weight'];
       $rows[$index]['widget_type'] = $field_row['widget_type'];
-      $rows[$index]['widget_settings'] = unserialize($field_row['widget_settings']);
-      $rows[$index]['display_settings'] = unserialize($field_row['display_settings']);
+      $rows[$index]['widget_settings'] = \unserialize($field_row['widget_settings']);
+      $rows[$index]['display_settings'] = \unserialize($field_row['display_settings']);
     }
 
     return new \ArrayIterator($rows);

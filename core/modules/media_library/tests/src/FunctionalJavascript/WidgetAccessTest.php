@@ -120,23 +120,23 @@ class WidgetAccessTest extends MediaLibraryTestBase {
     // Assert the media library can not be accessed if the required state
     // parameters are changed without changing the hash.
     $this->drupalGet('media-library', [
-      'query' => array_merge($url_options['query'], ['media_library_opener_id' => 'fail']),
+      'query' => \array_merge($url_options['query'], ['media_library_opener_id' => 'fail']),
     ]);
     $assert_session->responseContains('Access denied');
     $this->drupalGet('media-library', [
-      'query' => array_merge($url_options['query'], ['media_library_allowed_types' => ['type_one', 'type_two']]),
+      'query' => \array_merge($url_options['query'], ['media_library_allowed_types' => ['type_one', 'type_two']]),
     ]);
     $assert_session->responseContains('Access denied');
     $this->drupalGet('media-library', [
-      'query' => array_merge($url_options['query'], ['media_library_selected_type' => 'type_one']),
+      'query' => \array_merge($url_options['query'], ['media_library_selected_type' => 'type_one']),
     ]);
     $assert_session->responseContains('Access denied');
     $this->drupalGet('media-library', [
-      'query' => array_merge($url_options['query'], ['media_library_remaining' => 3]),
+      'query' => \array_merge($url_options['query'], ['media_library_remaining' => 3]),
     ]);
     $assert_session->responseContains('Access denied');
     $this->drupalGet('media-library', [
-      'query' => array_merge($url_options['query'], ['hash' => 'fail']),
+      'query' => \array_merge($url_options['query'], ['hash' => 'fail']),
     ]);
     $assert_session->responseContains('Access denied');
   }
@@ -147,7 +147,7 @@ class WidgetAccessTest extends MediaLibraryTestBase {
   public function testRequiredFieldNoAccess(): void {
     // Make field_single_media_type required.
     $fieldConfig = FieldConfig::loadByName('node', 'basic_page', 'field_single_media_type');
-    assert($fieldConfig instanceof FieldConfig);
+    \assert($fieldConfig instanceof FieldConfig);
     $fieldConfig->setRequired(TRUE)
       ->save();
 

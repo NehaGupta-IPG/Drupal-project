@@ -94,7 +94,7 @@ class MenuUiLanguageTest extends BrowserTestBase {
     $this->submitForm($edit, 'Save');
     // Check the link was added with the correct menu link default language.
     $menu_links = \Drupal::entityTypeManager()->getStorage('menu_link_content')->loadByProperties(['title' => $link_title]);
-    $menu_link = reset($menu_links);
+    $menu_link = \reset($menu_links);
     $this->assertMenuLink([
       'menu_name' => $menu_name,
       'route_name' => '<front>',
@@ -117,7 +117,7 @@ class MenuUiLanguageTest extends BrowserTestBase {
     $this->submitForm($edit, 'Save');
     // Check the link was added with the correct new menu link default language.
     $menu_links = \Drupal::entityTypeManager()->getStorage('menu_link_content')->loadByProperties(['title' => $link_title]);
-    $menu_link = reset($menu_links);
+    $menu_link = \reset($menu_links);
     $this->assertMenuLink([
       'menu_name' => $menu_name,
       'route_name' => '<front>',

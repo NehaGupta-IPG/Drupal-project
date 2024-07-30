@@ -58,7 +58,7 @@ class MediaMappingsConstraintValidatorTest extends KernelTestBase {
     $typed_data = $this->container->get('typed_data_manager');
     $definition = $typed_data->createDataDefinition('entity:media_type');
     $violations = $typed_data->create($definition, $media_type)->validate();
-    assert($violations instanceof ConstraintViolationListInterface);
+    \assert($violations instanceof ConstraintViolationListInterface);
     $this->assertCount(1, $violations);
     $this->assertEquals('It is not possible to map the source field ' . $source_field_name . ' of a media type.', $violations[0]->getMessage());
   }

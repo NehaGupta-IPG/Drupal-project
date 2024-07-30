@@ -76,7 +76,7 @@ trait AssertContentTrait {
     if (!isset($this->plainTextContent)) {
       $raw_content = $this->getRawContent();
       // Strip everything between the HEAD tags.
-      $raw_content = preg_replace('@<head>(.+?)</head>@si', '', $raw_content);
+      $raw_content = \preg_replace('@<head>(.+?)</head>@si', '', $raw_content);
       $this->plainTextContent = Xss::filter($raw_content, []);
     }
     return $this->plainTextContent;
@@ -93,7 +93,7 @@ trait AssertContentTrait {
    * caused by HTML output templates.
    */
   protected function removeWhiteSpace() {
-    $this->content = preg_replace('@>\s+<@', '><', $this->content);
+    $this->content = \preg_replace('@>\s+<@', '><', $this->content);
     $this->plainTextContent = NULL;
     $this->elements = NULL;
   }
@@ -129,7 +129,7 @@ trait AssertContentTrait {
       if ($dom) {
         // It's much easier to work with simplexml than DOM, luckily enough
         // we can just simply import our DOM tree.
-        $this->elements = @simplexml_import_dom($dom);
+        $this->elements = @\simplexml_import_dom($dom);
       }
     }
     $this->assertNotFalse($this->elements, 'The current HTML page should be available for DOM navigation.');
@@ -160,15 +160,15 @@ trait AssertContentTrait {
     // Replace placeholders.
     foreach ($args as $placeholder => $value) {
       // Cast MarkupInterface objects to string.
-      if (is_object($value)) {
+      if (\is_object($value)) {
         $value = (string) $value;
       }
       // XPath 1.0 doesn't support a way to escape single or double quotes in a
       // string literal. We split double quotes out of the string, and encode
       // them separately.
-      if (is_string($value)) {
+      if (\is_string($value)) {
         // Explode the text at the quote characters.
-        $parts = explode('"', $value);
+        $parts = \explode('"', $value);
 
         // Quote the parts.
         foreach ($parts as &$part) {
@@ -176,7 +176,7 @@ trait AssertContentTrait {
         }
 
         // Return the string.
-        $value = count($parts) > 1 ? 'concat(' . implode(', \'"\', ', $parts) . ')' : $parts[0];
+        $value = \count($parts) > 1 ? 'concat(' . \implode(', \'"\', ', $parts) . ')' : $parts[0];
       }
 
       // Use preg_replace_callback() instead of preg_replace() to prevent the
@@ -258,7 +258,7 @@ trait AssertContentTrait {
       foreach ($element->optgroup as $group) {
         $nested_options[] = $this->getAllOptions($group);
       }
-      $options = array_merge($options, ...$nested_options);
+      $options = \array_merge($options, ...$nested_options);
     }
     return $options;
   }
@@ -643,12 +643,12 @@ trait AssertContentTrait {
     if (!$message) {
       $message = '"' . $text . '"' . ($be_unique ? ' found only once' : ' found more than once');
     }
-    $first_occurrence = strpos($this->getTextContent(), $text);
+    $first_occurrence = \strpos($this->getTextContent(), $text);
     if ($first_occurrence === FALSE) {
       $this->fail($message);
     }
-    $offset = $first_occurrence + strlen($text);
-    $second_occurrence = strpos($this->getTextContent(), $text, $offset);
+    $offset = $first_occurrence + \strlen($text);
+    $second_occurrence = \strpos($this->getTextContent(), $text, $offset);
     $this->assertEquals($be_unique, $second_occurrence === FALSE, $message);
     return TRUE;
   }
@@ -738,7 +738,7 @@ trait AssertContentTrait {
    */
   protected function assertTitle($title, $message = '') {
     // Don't use xpath as it messes with HTML escaping.
-    preg_match('@<title>(.*)</title>@', $this->getRawContent(), $matches);
+    \preg_match('@<title>(.*)</title>@', $this->getRawContent(), $matches);
     if (isset($matches[1])) {
       $actual = $matches[1];
       if (!$message) {
@@ -1404,7 +1404,7 @@ trait AssertContentTrait {
     $status = TRUE;
     foreach ($this->xpath('//*[@id]') as $element) {
       $id = (string) $element['id'];
-      if (isset($seen_ids[$id]) && !in_array($id, $ids_to_skip)) {
+      if (isset($seen_ids[$id]) && !\in_array($id, $ids_to_skip)) {
         $this->fail(new FormattableMarkup('The HTML ID %id is unique.', ['%id' => $id]));
         $status = FALSE;
       }

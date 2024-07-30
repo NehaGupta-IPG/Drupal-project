@@ -71,7 +71,7 @@ class ContentTranslationSyncUnitTest extends KernelTestBase {
 
     $this->synchronizer = new FieldTranslationSynchronizer($this->container->get('entity_type.manager'), $this->container->get('plugin.manager.field.field_type'));
     $this->synchronized = ['sync1', 'sync2'];
-    $this->columns = array_merge($this->synchronized, ['var1', 'var2']);
+    $this->columns = \array_merge($this->synchronized, ['var1', 'var2']);
     $this->langcodes = ['en', 'it', 'fr', 'de', 'es'];
     $this->cardinality = 4;
     $this->unchangedFieldValues = [];
@@ -81,7 +81,7 @@ class ContentTranslationSyncUnitTest extends KernelTestBase {
     foreach ($this->langcodes as $langcode) {
       for ($delta = 0; $delta < $this->cardinality; $delta++) {
         foreach ($this->columns as $column) {
-          $sync = in_array($column, $this->synchronized) && $langcode != $this->langcodes[0];
+          $sync = \in_array($column, $this->synchronized) && $langcode != $this->langcodes[0];
           $value = $sync ? $this->unchangedFieldValues[$this->langcodes[0]][$delta][$column] : $langcode . '-' . $delta . '-' . $column;
           $this->unchangedFieldValues[$langcode][$delta][$column] = $value;
         }
@@ -124,10 +124,10 @@ class ContentTranslationSyncUnitTest extends KernelTestBase {
     $sync_langcode = $this->langcodes[1];
     $unchanged_items = $this->unchangedFieldValues[$sync_langcode];
     $field_values = $this->unchangedFieldValues;
-    $sync_delta = mt_rand(0, count($field_values[$sync_langcode]) - 1);
+    $sync_delta = \mt_rand(0, \count($field_values[$sync_langcode]) - 1);
     unset($field_values[$sync_langcode][$sync_delta]);
     // Renumber deltas to start from 0.
-    $field_values[$sync_langcode] = array_values($field_values[$sync_langcode]);
+    $field_values[$sync_langcode] = \array_values($field_values[$sync_langcode]);
     $this->synchronizer->synchronizeItems($field_values, $unchanged_items, $sync_langcode, $this->langcodes, $this->synchronized);
     $result = TRUE;
     foreach ($this->unchangedFieldValues as $langcode => $items) {
@@ -157,14 +157,14 @@ class ContentTranslationSyncUnitTest extends KernelTestBase {
       $field_values[$sync_langcode][$new_delta] = $item;
     }
     // Renumber deltas to start from 0.
-    ksort($field_values[$sync_langcode]);
+    \ksort($field_values[$sync_langcode]);
     $this->synchronizer->synchronizeItems($field_values, $unchanged_items, $sync_langcode, $this->langcodes, $this->synchronized);
     $result = TRUE;
     foreach ($field_values as $langcode => $items) {
       for ($delta = 0; $delta < $this->cardinality; $delta++) {
         foreach ($this->columns as $column) {
           $value = $field_values[$langcode][$delta][$column];
-          if (in_array($column, $this->synchronized)) {
+          if (\in_array($column, $this->synchronized)) {
             // If we are dealing with a synchronize column the current value is
             // supposed to be the same of the source items.
             $result = $result && $field_values[$sync_langcode][$delta][$column] == $value;
@@ -214,7 +214,7 @@ class ContentTranslationSyncUnitTest extends KernelTestBase {
       for ($delta = 0; $delta < $this->cardinality; $delta++) {
         if ($delta_callback($delta)) {
           foreach ($this->columns as $column) {
-            if (in_array($column, $this->synchronized)) {
+            if (\in_array($column, $this->synchronized)) {
               $field_values[$sync_langcode][$delta][$column] = $field_values[$sync_langcode][0][$column];
             }
           }
@@ -231,7 +231,7 @@ class ContentTranslationSyncUnitTest extends KernelTestBase {
             // synchronization process. The other ones are retained or synced
             // depending on the logic implemented by the delta callback and
             // whether it is a sync column or not.
-            $value = $delta > 0 && $delta_callback($delta) && in_array($column, $this->synchronized) ? $changed_items[0][$column] : $unchanged_items[$delta][$column];
+            $value = $delta > 0 && $delta_callback($delta) && \in_array($column, $this->synchronized) ? $changed_items[0][$column] : $unchanged_items[$delta][$column];
             $this->assertEquals($field_values[$langcode][$delta][$column], $value, "Item $delta column $column for langcode $langcode synced correctly");
           }
         }
@@ -260,7 +260,7 @@ class ContentTranslationSyncUnitTest extends KernelTestBase {
         foreach ($this->columns as $column) {
           // If the column is synchronized, the value should have been synced,
           // for columns that are not synchronized, the value must not change.
-          $expected_value = in_array($column, $this->synchronized) ? $changed_items[$delta][$column] : $this->unchangedFieldValues[$langcode][$delta][$column];
+          $expected_value = \in_array($column, $this->synchronized) ? $changed_items[$delta][$column] : $this->unchangedFieldValues[$langcode][$delta][$column];
           $this->assertEquals($expected_value, $field_values[$langcode][$delta][$column], "Differing Item {$delta} column {$column} for langcode {$langcode} synced correctly");
         }
       }

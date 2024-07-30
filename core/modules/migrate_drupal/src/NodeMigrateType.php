@@ -62,7 +62,7 @@ final class NodeMigrateType {
         ->findTables('migrate_map_d' . $version . '_node%');
       foreach ($bases as $base) {
         $has_rows = $base . '_has_rows';
-        $base_tables = preg_grep('/^migrate_map_d' . $version . '_' . $base . '_{2}.*$/', $tables);
+        $base_tables = \preg_grep('/^migrate_map_d' . $version . '_' . $base . '_{2}.*$/', $tables);
         // Set the has_rows True when a map table has rows with a positive
         // count for the matched migration.
         foreach ($base_tables as $base_table) {

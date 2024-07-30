@@ -134,7 +134,7 @@ class TermTest extends ResourceTestBase {
     $self_url = clone $base_url;
     $version_identifier = 'id:' . $this->entity->getRevisionId();
     $self_url = $self_url->setOption('query', ['resourceVersion' => $version_identifier]);
-    $version_query_string = '?resourceVersion=' . urlencode($version_identifier);
+    $version_query_string = '?resourceVersion=' . \urlencode($version_identifier);
 
     // We test with multiple parent terms, and combinations thereof.
     // @see ::createEntity()
@@ -410,7 +410,7 @@ class TermTest extends ResourceTestBase {
     $this->config('jsonapi.settings')->set('read_only', FALSE)->save(TRUE);
 
     // @todo Remove line below in favor of commented line in https://www.drupal.org/project/drupal/issues/2878463.
-    $url = Url::fromRoute(sprintf('jsonapi.%s.individual', static::$resourceTypeName), ['entity' => $this->entity->uuid()]);
+    $url = Url::fromRoute(\sprintf('jsonapi.%s.individual', static::$resourceTypeName), ['entity' => $this->entity->uuid()]);
     // $url = $this->entity->toUrl('jsonapi');
     $request_options = [];
     $request_options[RequestOptions::HEADERS]['Accept'] = 'application/vnd.api+json';
@@ -439,7 +439,7 @@ class TermTest extends ResourceTestBase {
    */
   protected function getExpectedCacheTags(?array $sparse_fieldset = NULL) {
     $tags = parent::getExpectedCacheTags($sparse_fieldset);
-    if ($sparse_fieldset === NULL || in_array('description', $sparse_fieldset)) {
+    if ($sparse_fieldset === NULL || \in_array('description', $sparse_fieldset)) {
       $tags = Cache::mergeTags($tags, ['config:filter.format.plain_text', 'config:filter.settings']);
     }
     return $tags;
@@ -450,7 +450,7 @@ class TermTest extends ResourceTestBase {
    */
   protected function getExpectedCacheContexts(?array $sparse_fieldset = NULL) {
     $contexts = parent::getExpectedCacheContexts($sparse_fieldset);
-    if ($sparse_fieldset === NULL || in_array('description', $sparse_fieldset)) {
+    if ($sparse_fieldset === NULL || \in_array('description', $sparse_fieldset)) {
       $contexts = Cache::mergeContexts($contexts, ['languages:language_interface', 'theme']);
     }
     return $contexts;
@@ -475,7 +475,7 @@ class TermTest extends ResourceTestBase {
     $this->entity->set('parent', $parent_term_ids)->save();
 
     // @todo Remove line below in favor of commented line in https://www.drupal.org/project/drupal/issues/2878463.
-    $url = Url::fromRoute(sprintf('jsonapi.%s.individual', static::$resourceTypeName), ['entity' => $this->entity->uuid()]);
+    $url = Url::fromRoute(\sprintf('jsonapi.%s.individual', static::$resourceTypeName), ['entity' => $this->entity->uuid()]);
     // $url = $this->entity->toUrl('jsonapi');
     $request_options = [];
     $request_options[RequestOptions::HEADERS]['Accept'] = 'application/vnd.api+json';

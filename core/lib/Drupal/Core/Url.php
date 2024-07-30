@@ -212,7 +212,7 @@ class Url implements TrustedCallbackInterface {
     // passed is a relative URI reference rather than an absolute URI,
     // because these are URI reserved characters that a scheme name may not
     // start with.
-    if (!str_starts_with($user_input, '/') && !str_starts_with($user_input, '#') && !str_starts_with($user_input, '?')) {
+    if (!\str_starts_with($user_input, '/') && !\str_starts_with($user_input, '#') && !\str_starts_with($user_input, '?')) {
       throw new \InvalidArgumentException("The user-entered string '$user_input' must begin with a '/', '?', or '#'.");
     }
 
@@ -278,15 +278,15 @@ class Url implements TrustedCallbackInterface {
   public static function fromUri($uri, $options = []) {
     // parse_url() incorrectly parses base:number/... as hostname:port/...
     // and not the scheme. Prevent that by prefixing the path with a slash.
-    if (preg_match('/^base:\d/', $uri)) {
-      $uri = str_replace('base:', 'base:/', $uri);
+    if (\preg_match('/^base:\d/', $uri)) {
+      $uri = \str_replace('base:', 'base:/', $uri);
     }
-    $uri_parts = parse_url($uri);
+    $uri_parts = \parse_url($uri);
     if ($uri_parts === FALSE) {
       throw new \InvalidArgumentException("The URI '$uri' is malformed.");
     }
     // We support protocol-relative URLs.
-    if (str_starts_with($uri, '//')) {
+    if (\str_starts_with($uri, '//')) {
       $uri_parts['scheme'] = '';
     }
     elseif (empty($uri_parts['scheme'])) {
@@ -294,7 +294,7 @@ class Url implements TrustedCallbackInterface {
     }
     $uri_parts += ['path' => ''];
     // Discard empty fragment in $options for consistency with parse_url().
-    if (isset($options['fragment']) && strlen($options['fragment']) == 0) {
+    if (isset($options['fragment']) && \strlen($options['fragment']) == 0) {
       unset($options['fragment']);
     }
     // Extract query parameters and fragment and merge them into $uri_options,
@@ -307,7 +307,7 @@ class Url implements TrustedCallbackInterface {
 
     if (!empty($uri_parts['query'])) {
       $uri_query = [];
-      parse_str($uri_parts['query'], $uri_query);
+      \parse_str($uri_parts['query'], $uri_query);
       $uri_options['query'] = isset($uri_options['query']) ? $uri_options['query'] + $uri_query : $uri_query;
       unset($uri_parts['query']);
     }
@@ -351,7 +351,7 @@ class Url implements TrustedCallbackInterface {
    *   Thrown if the entity URI is invalid.
    */
   protected static function fromEntityUri(array $uri_parts, array $options, $uri) {
-    [$entity_type_id, $entity_id] = explode('/', $uri_parts['path'], 2);
+    [$entity_type_id, $entity_id] = \explode('/', $uri_parts['path'], 2);
     if ($uri_parts['scheme'] != 'entity' || $entity_id === '') {
       throw new \InvalidArgumentException("The entity URI '$uri' is invalid. You must specify the entity id in the URL. e.g., entity:node/1 for loading the canonical path to node entity with id 1.");
     }
@@ -416,7 +416,7 @@ class Url implements TrustedCallbackInterface {
         throw new \InvalidArgumentException("The internal path component '{$uri_parts['path']}' is invalid. Its path component must have a leading slash, e.g. internal:/foo.");
       }
       // Remove the leading slash.
-      $uri_parts['path'] = substr($uri_parts['path'], 1);
+      $uri_parts['path'] = \substr($uri_parts['path'], 1);
 
       if (UrlHelper::isExternal($uri_parts['path'])) {
         throw new \InvalidArgumentException("The internal path component '{$uri_parts['path']}' is external. You are not allowed to specify an external URL together with internal:/.");
@@ -450,14 +450,14 @@ class Url implements TrustedCallbackInterface {
    *   Thrown when the route URI does not have a route name.
    */
   protected static function fromRouteUri(array $uri_parts, array $options, $uri) {
-    $route_parts = explode(';', $uri_parts['path'], 2);
+    $route_parts = \explode(';', $uri_parts['path'], 2);
     $route_name = $route_parts[0];
     if ($route_name === '') {
       throw new \InvalidArgumentException("The route URI '$uri' is invalid. You must have a route name in the URI. e.g., route:system.admin");
     }
     $route_parameters = [];
     if (!empty($route_parts[1])) {
-      parse_str($route_parts[1], $route_parameters);
+      \parse_str($route_parts[1], $route_parameters);
     }
 
     return new static($route_name, $route_parameters, $options);
@@ -536,7 +536,7 @@ class Url implements TrustedCallbackInterface {
       $uri = $this->uri;
     }
     $query = !empty($this->options['query']) ? ('?' . UrlHelper::buildQuery($this->options['query'])) : '';
-    $fragment = isset($this->options['fragment']) && strlen($this->options['fragment']) ? '#' . $this->options['fragment'] : '';
+    $fragment = isset($this->options['fragment']) && \strlen($this->options['fragment']) ? '#' . $this->options['fragment'] : '';
     return $uri . $query . $fragment;
   }
 

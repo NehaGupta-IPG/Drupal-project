@@ -112,7 +112,7 @@ class RecursiveContextualValidator implements ContextualValidatorInterface {
 
     // You can pass a single constraint or an array of constraints.
     // Make sure to deal with an array in the rest of the code.
-    if (isset($constraints) && !is_array($constraints)) {
+    if (isset($constraints) && !\is_array($constraints)) {
       $constraints = [$constraints];
     }
 
@@ -155,7 +155,7 @@ class RecursiveContextualValidator implements ContextualValidatorInterface {
     // Prefer a specific instance of the typed data manager stored by the data
     // if it is available. This is necessary for specialized typed data objects,
     // for example those using the typed config subclass of the manager.
-    $typed_data_manager = method_exists($data, 'getTypedDataManager') ? $data->getTypedDataManager() : $this->typedDataManager;
+    $typed_data_manager = \method_exists($data, 'getTypedDataManager') ? $data->getTypedDataManager() : $this->typedDataManager;
 
     // Pass the canonical representation of the data as validated value to
     // constraint validators, such that they do not have to care about Typed
@@ -207,7 +207,7 @@ class RecursiveContextualValidator implements ContextualValidatorInterface {
       // Prevent duplicate validation of constraints, in the case
       // that constraints belong to multiple validated groups.
       if (isset($cache_key)) {
-        $constraint_hash = spl_object_hash($constraint);
+        $constraint_hash = \spl_object_hash($constraint);
 
         if ($this->context->isConstraintValidated($cache_key, $constraint_hash)) {
           continue;
@@ -238,7 +238,7 @@ class RecursiveContextualValidator implements ContextualValidatorInterface {
     if (isset($groups)) {
       throw new \LogicException('Passing custom groups is not supported.');
     }
-    if (!is_object($object)) {
+    if (!\is_object($object)) {
       throw new \InvalidArgumentException('Passing class name is not supported.');
     }
     elseif (!$object instanceof TypedDataInterface) {
@@ -254,7 +254,7 @@ class RecursiveContextualValidator implements ContextualValidatorInterface {
    * {@inheritdoc}
    */
   public function validatePropertyValue($object, $property_name, $value, $groups = NULL): static {
-    if (!is_object($object)) {
+    if (!\is_object($object)) {
       throw new \InvalidArgumentException('Passing class name is not supported.');
     }
     elseif (!$object instanceof TypedDataInterface) {

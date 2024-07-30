@@ -134,7 +134,7 @@ class Feed extends PathPluginBase implements ResponseDisplayPluginInterface {
 
       // Drupal treats the HTTP response status code like a header, even though
       // it really is not.
-      if (strtolower($name) === 'status') {
+      if (\strtolower($name) === 'status') {
         $response->setStatusCode($value);
       }
       else {
@@ -186,7 +186,7 @@ class Feed extends PathPluginBase implements ResponseDisplayPluginInterface {
   public function defaultableSections($section = NULL) {
     $sections = parent::defaultableSections($section);
 
-    if (in_array($section, ['style', 'row'])) {
+    if (\in_array($section, ['style', 'row'])) {
       return FALSE;
     }
 
@@ -230,7 +230,7 @@ class Feed extends PathPluginBase implements ResponseDisplayPluginInterface {
     // which we don't know until init().
     if (empty($this->options['row']['type']) || $this->options['row']['type'] === 'rss_fields') {
       $row_plugins = Views::fetchPluginNames('row', $this->getType(), [$this->view->storage->get('base_table')]);
-      $default_row_plugin = key($row_plugins);
+      $default_row_plugin = \key($row_plugins);
 
       $options = $this->getOption('row');
       $options['type'] = $default_row_plugin;
@@ -258,12 +258,12 @@ class Feed extends PathPluginBase implements ResponseDisplayPluginInterface {
       $options['title']['value'] = $this->t('Using the site name');
     }
 
-    $displays = array_filter($this->getOption('displays'));
-    if (count($displays) > 1) {
+    $displays = \array_filter($this->getOption('displays'));
+    if (\count($displays) > 1) {
       $attach_to = $this->t('Multiple displays');
     }
-    elseif (count($displays) == 1) {
-      $display = array_shift($displays);
+    elseif (\count($displays) == 1) {
+      $display = \array_shift($displays);
       $displays = $this->view->storage->get('display');
       if (!empty($displays[$display])) {
         $attach_to = $displays[$display]['display_title'];
@@ -319,7 +319,7 @@ class Feed extends PathPluginBase implements ResponseDisplayPluginInterface {
           '#title' => $this->t('Displays'),
           '#type' => 'checkboxes',
           '#description' => $this->t('The feed icon will be available only to the selected displays.'),
-          '#options' => array_map('\Drupal\Component\Utility\Html::escape', $displays),
+          '#options' => \array_map('\Drupal\Component\Utility\Html::escape', $displays),
           '#default_value' => $this->getOption('displays'),
         ];
         break;

@@ -256,7 +256,7 @@ class EntityResource {
       // by the user. Field access makes no distinction between 'create' and
       // 'update', so the 'edit' operation is used here.
       $document = Json::decode($request->getContent());
-      $field_mapping = array_map(function (ResourceTypeField $field) {
+      $field_mapping = \array_map(function (ResourceTypeField $field) {
         return $field->getPublicName();
       }, $resource_type->getFields());
       // User resource objects contain a read-only attribute that is not a
@@ -264,15 +264,15 @@ class EntityResource {
       // @see \Drupal\jsonapi\JsonApiResource\ResourceObject::extractContentEntityFields()
       // @todo Eliminate this special casing in https://www.drupal.org/project/drupal/issues/3079254.
       if ($resource_type->getEntityTypeId() === 'user') {
-        $field_mapping = array_diff($field_mapping, [$resource_type->getPublicName('display_name')]);
+        $field_mapping = \array_diff($field_mapping, [$resource_type->getPublicName('display_name')]);
       }
       foreach (['attributes', 'relationships'] as $data_member_name) {
         if (isset($document['data'][$data_member_name])) {
-          foreach (array_intersect_key(array_flip($field_mapping), $document['data'][$data_member_name]) as $internal_field_name) {
+          foreach (\array_intersect_key(\array_flip($field_mapping), $document['data'][$data_member_name]) as $internal_field_name) {
             $field_access = $parsed_entity->get($internal_field_name)->access('edit', NULL, TRUE);
             if (!$field_access->isAllowed()) {
               $public_field_name = $field_mapping[$internal_field_name];
-              throw new EntityAccessDeniedHttpException(NULL, $field_access, "/data/$data_member_name/$public_field_name", sprintf('The current user is not allowed to POST the selected field (%s).', $public_field_name));
+              throw new EntityAccessDeniedHttpException(NULL, $field_access, "/data/$data_member_name/$public_field_name", \sprintf('The current user is not allowed to POST the selected field (%s).', $public_field_name));
             }
           }
         }
@@ -333,24 +333,24 @@ class EntityResource {
     $body = Json::decode($request->getContent());
     $data = $body['data'];
     if (!isset($data['id']) || $data['id'] != $entity->uuid()) {
-      throw new BadRequestHttpException(sprintf(
+      throw new BadRequestHttpException(\sprintf(
         'The selected entity (%s) does not match the ID in the payload (%s).',
         $entity->uuid(),
         $data['id'] ?? '',
       ));
     }
     $data += ['attributes' => [], 'relationships' => []];
-    $field_names = array_map([$resource_type, 'getInternalName'], array_merge(array_keys($data['attributes']), array_keys($data['relationships'])));
+    $field_names = \array_map([$resource_type, 'getInternalName'], \array_merge(\array_keys($data['attributes']), \array_keys($data['relationships'])));
 
     // User resource objects contain a read-only attribute that is not a real
     // field on the user entity type.
     // @see \Drupal\jsonapi\JsonApiResource\ResourceObject::extractContentEntityFields()
     // @todo Eliminate this special casing in https://www.drupal.org/project/drupal/issues/3079254.
     if ($entity->getEntityTypeId() === 'user') {
-      $field_names = array_diff($field_names, [$resource_type->getPublicName('display_name')]);
+      $field_names = \array_diff($field_names, [$resource_type->getPublicName('display_name')]);
     }
 
-    array_reduce($field_names, function (EntityInterface $destination, $field_name) use ($resource_type, $parsed_entity) {
+    \array_reduce($field_names, function (EntityInterface $destination, $field_name) use ($resource_type, $parsed_entity) {
       $this->updateEntityField($resource_type, $parsed_entity, $destination, $field_name);
       return $destination;
     }, $entity);
@@ -392,14 +392,14 @@ class EntityResource {
 
       // Allow other modules to act.
 
-      user_cancel([], $entity->id(), $cancel_method);
+      \user_cancel([], $entity->id(), $cancel_method);
       // Since user_cancel() is not invoked via Form API, batch processing
       // needs to be invoked manually.
-      $batch =& batch_get();
+      $batch =& \batch_get();
       // Mark this batch as non-progressive to bypass the progress bar and
       // redirect.
       $batch['progressive'] = FALSE;
-      batch_process();
+      \batch_process();
     }
     else {
       $entity->delete();
@@ -446,11 +446,11 @@ class EntityResource {
       // For example: getting users with a particular role, which is a config
       // entity type: https://www.drupal.org/project/drupal/issues/2959445.
       // @todo Remove the message parsing in https://www.drupal.org/project/drupal/issues/3028967.
-      if (str_starts_with($e->getMessage(), 'Getting the base fields is not supported for entity type')) {
-        preg_match('/entity type (.*)\./', $e->getMessage(), $matches);
+      if (\str_starts_with($e->getMessage(), 'Getting the base fields is not supported for entity type')) {
+        \preg_match('/entity type (.*)\./', $e->getMessage(), $matches);
         $config_entity_type_id = $matches[1];
         $cacheability = (new CacheableMetadata())->addCacheContexts(['url.path', 'url.query_args:filter']);
-        throw new CacheableBadRequestHttpException($cacheability, sprintf("Filtering on config entities is not supported by Drupal's entity API. You tried to filter on a %s config entity.", $config_entity_type_id));
+        throw new CacheableBadRequestHttpException($cacheability, \sprintf("Filtering on config entities is not supported by Drupal's entity API. You tried to filter on a %s config entity.", $config_entity_type_id));
       }
       else {
         throw $e;
@@ -461,9 +461,9 @@ class EntityResource {
     // We request N+1 items to find out if there is a next page for the pager.
     // We may need to remove that extra item before loading the entities.
     $pager_size = $query->getMetaData('pager_size');
-    if ($has_next_page = $pager_size < count($results)) {
+    if ($has_next_page = $pager_size < \count($results)) {
       // Drop the last result.
-      array_pop($results);
+      \array_pop($results);
     }
     // Each item of the collection data contains an array with 'entity' and
     // 'access' elements.
@@ -554,7 +554,7 @@ class EntityResource {
     // though the normalizer skips disabled references, we can avoid unnecessary
     // work by checking here too.
     /** @var \Drupal\Core\Entity\EntityInterface[] $referenced_entities */
-    $referenced_entities = array_filter(
+    $referenced_entities = \array_filter(
       $field_list->referencedEntities(),
       function (EntityInterface $entity) {
         return (bool) $this->resourceTypeRepository->get(
@@ -656,12 +656,12 @@ class EntityResource {
     $field_definition = $field_list->getFieldDefinition();
     $is_multiple = $field_definition->getFieldStorageDefinition()->isMultiple();
     if (!$is_multiple) {
-      throw new ConflictHttpException(sprintf('You can only POST to to-many relationships. %s is a to-one relationship.', $related));
+      throw new ConflictHttpException(\sprintf('You can only POST to to-many relationships. %s is a to-one relationship.', $related));
     }
 
     $original_resource_identifiers = ResourceIdentifier::toResourceIdentifiersWithArityRequired($field_list);
-    $new_resource_identifiers = array_udiff(
-      ResourceIdentifier::deduplicate(array_merge($original_resource_identifiers, $resource_identifiers)),
+    $new_resource_identifiers = \array_udiff(
+      ResourceIdentifier::deduplicate(\array_merge($original_resource_identifiers, $resource_identifiers)),
       $original_resource_identifiers,
       [ResourceIdentifier::class, 'compare']
     );
@@ -678,7 +678,7 @@ class EntityResource {
       $new_field_value = ['entity' => $this->getEntityFromResourceIdentifier($new_resource_identifier)];
       // Remove `arity` from the received extra properties, otherwise this
       // will fail field validation.
-      $new_field_value += array_diff_key($new_resource_identifier->getMeta(), array_flip([ResourceIdentifier::ARITY_KEY]));
+      $new_field_value += \array_diff_key($new_resource_identifier->getMeta(), \array_flip([ResourceIdentifier::ARITY_KEY]));
       $field_list->appendItem($new_field_value);
     }
 
@@ -743,8 +743,8 @@ class EntityResource {
    *   Thrown when a "to-one" relationship is not provided.
    */
   protected function doPatchIndividualRelationship(EntityInterface $entity, array $resource_identifiers, FieldDefinitionInterface $field_definition) {
-    if (count($resource_identifiers) > 1) {
-      throw new BadRequestHttpException(sprintf('Provide a single relationship so to-one relationship fields (%s).', $field_definition->getName()));
+    if (\count($resource_identifiers) > 1) {
+      throw new BadRequestHttpException(\sprintf('Provide a single relationship so to-one relationship fields (%s).', $field_definition->getName()));
     }
     $this->doPatchMultipleRelationship($entity, $resource_identifiers, $field_definition);
   }
@@ -767,7 +767,7 @@ class EntityResource {
       $field_properties = ['entity' => $this->getEntityFromResourceIdentifier($resource_identifier)];
       // Remove `arity` from the received extra properties, otherwise this
       // will fail field validation.
-      $field_properties += array_diff_key($resource_identifier->getMeta(), array_flip([ResourceIdentifier::ARITY_KEY]));
+      $field_properties += \array_diff_key($resource_identifier->getMeta(), \array_flip([ResourceIdentifier::ARITY_KEY]));
       return $field_properties;
     }, $resource_identifiers);
   }
@@ -803,12 +803,12 @@ class EntityResource {
       ->getFieldStorageDefinition()
       ->isMultiple();
     if (!$is_multiple) {
-      throw new ConflictHttpException(sprintf('You can only DELETE from to-many relationships. %s is a to-one relationship.', $related));
+      throw new ConflictHttpException(\sprintf('You can only DELETE from to-many relationships. %s is a to-one relationship.', $related));
     }
 
     // Compute the list of current values and remove the ones in the payload.
     $original_resource_identifiers = ResourceIdentifier::toResourceIdentifiersWithArityRequired($field_list);
-    $removed_resource_identifiers = array_uintersect($resource_identifiers, $original_resource_identifiers, [ResourceIdentifier::class, 'compare']);
+    $removed_resource_identifiers = \array_uintersect($resource_identifiers, $original_resource_identifiers, [ResourceIdentifier::class, 'compare']);
     $deltas_to_be_removed = [];
     foreach ($removed_resource_identifiers as $removed_resource_identifier) {
       foreach ($original_resource_identifiers as $delta => $existing_resource_identifier) {
@@ -821,7 +821,7 @@ class EntityResource {
     // Field item deltas are reset when an item is removed. This removes
     // items in descending order so that the deltas yet to be removed will
     // continue to exist.
-    rsort($deltas_to_be_removed);
+    \rsort($deltas_to_be_removed);
     foreach ($deltas_to_be_removed as $delta) {
       $field_list->removeItem($delta);
     }
@@ -856,12 +856,12 @@ class EntityResource {
    *   Thrown if the request body cannot be denormalized.
    */
   protected function deserialize(ResourceType $resource_type, Request $request, $class, $relationship_field_name = NULL) {
-    assert($class === JsonApiDocumentTopLevel::class || $class === ResourceIdentifier::class && !empty($relationship_field_name) && is_string($relationship_field_name));
+    \assert($class === JsonApiDocumentTopLevel::class || $class === ResourceIdentifier::class && !empty($relationship_field_name) && \is_string($relationship_field_name));
     $received = (string) $request->getContent();
     if (!$received) {
-      assert($request->isMethod('POST') || $request->isMethod('PATCH') || $request->isMethod('DELETE'));
+      \assert($request->isMethod('POST') || $request->isMethod('PATCH') || $request->isMethod('DELETE'));
       if ($request->isMethod('DELETE') && $relationship_field_name) {
-        throw new BadRequestHttpException(sprintf('You need to provide a body for DELETE operations on a relationship (%s).', $relationship_field_name));
+        throw new BadRequestHttpException(\sprintf('You need to provide a body for DELETE operations on a relationship (%s).', $relationship_field_name));
       }
       else {
         throw new BadRequestHttpException('Empty request body.');
@@ -1014,7 +1014,7 @@ class EntityResource {
    *   client-sent data.
    */
   protected static function relationshipResponseRequiresBody(array $received_resource_identifiers, array $final_resource_identifiers) {
-    return !empty(array_udiff($final_resource_identifiers, $received_resource_identifiers, [ResourceIdentifier::class, 'compare']));
+    return !empty(\array_udiff($final_resource_identifiers, $received_resource_identifiers, [ResourceIdentifier::class, 'compare']));
   }
 
   /**
@@ -1078,7 +1078,7 @@ class EntityResource {
    *   The response.
    */
   protected function respondWithCollection(ResourceObjectData $primary_data, Data $includes, Request $request, ResourceType $resource_type, OffsetPage $page_param) {
-    assert(Inspector::assertAllObjects([$includes], IncludedData::class, NullIncludedData::class));
+    \assert(Inspector::assertAllObjects([$includes], IncludedData::class, NullIncludedData::class));
     $link_context = [
       'has_next_page' => $primary_data->hasNextPage(),
     ];
@@ -1153,7 +1153,7 @@ class EntityResource {
    * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
    */
   public function getIncludes(Request $request, $data) {
-    assert($data instanceof ResourceObject || $data instanceof ResourceObjectData);
+    \assert($data instanceof ResourceObject || $data instanceof ResourceObjectData);
     return $request->query->has('include') && ($include_parameter = $request->query->get('include')) && !empty($include_parameter)
       ? $this->includeResolver->resolve($data, $include_parameter)
       : new NullIncludedData();
@@ -1202,7 +1202,7 @@ class EntityResource {
     // It's helpful and safe to let the user know when they are not allowed to
     // update a field.
     $field_name = $received_field->getName();
-    throw new EntityAccessDeniedHttpException($original_field->getEntity(), $field_edit_access, '/data/attributes/' . $field_name, sprintf('The current user is not allowed to PATCH the selected field (%s).', $field_name));
+    throw new EntityAccessDeniedHttpException($original_field->getEntity(), $field_edit_access, '/data/attributes/' . $field_name, \sprintf('The current user is not allowed to PATCH the selected field (%s).', $field_name));
   }
 
   /**
@@ -1222,8 +1222,8 @@ class EntityResource {
   protected function loadEntitiesWithAccess(EntityStorageInterface $storage, array $ids, $load_latest_revisions) {
     $output = [];
     if ($load_latest_revisions) {
-      assert($storage instanceof RevisionableStorageInterface);
-      $entities = $storage->loadMultipleRevisions(array_keys($ids));
+      \assert($storage instanceof RevisionableStorageInterface);
+      $entities = $storage->loadMultipleRevisions(\array_keys($ids));
     }
     else {
       $entities = $storage->loadMultiple($ids);
@@ -1231,7 +1231,7 @@ class EntityResource {
     foreach ($entities as $entity) {
       $output[$entity->id()] = $this->entityAccessChecker->getAccessCheckedResourceObject($entity);
     }
-    return array_values($output);
+    return \array_values($output);
   }
 
   /**
@@ -1322,7 +1322,7 @@ class EntityResource {
     $size = $page_param->getSize();
     if ($size <= 0) {
       $cacheability = (new CacheableMetadata())->addCacheContexts(['url.query_args:page']);
-      throw new CacheableBadRequestHttpException($cacheability, sprintf('The page size needs to be a positive integer.'));
+      throw new CacheableBadRequestHttpException($cacheability, \sprintf('The page size needs to be a positive integer.'));
     }
     $query = (array) $request->query->getIterator();
     // Check if this is not the last page.
@@ -1389,7 +1389,7 @@ class EntityResource {
         if ($total) {
           $extra_query = [
             'page' => [
-              'offset' => (ceil($total / $size) - 1) * $size,
+              'offset' => (\ceil($total / $size) - 1) * $size,
               'limit' => $size,
             ],
           ];
@@ -1399,13 +1399,13 @@ class EntityResource {
       case 'prev':
         $extra_query = [
           'page' => [
-            'offset' => max($offset - $size, 0),
+            'offset' => \max($offset - $size, 0),
             'limit' => $size,
           ],
         ];
         break;
     }
-    return array_merge($query, $extra_query);
+    return \array_merge($query, $extra_query);
   }
 
 }

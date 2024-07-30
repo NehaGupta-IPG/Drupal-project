@@ -103,7 +103,7 @@ class TokenReplaceTest extends ViewsKernelTestBase {
     foreach ($expected as $token => $expected_output) {
       $bubbleable_metadata = new BubbleableMetadata();
       $output = $token_handler->replace($token, ['view' => $view], [], $bubbleable_metadata);
-      $this->assertSame($expected_output, $output, sprintf('Token %s replaced correctly.', $token));
+      $this->assertSame($expected_output, $output, \sprintf('Token %s replaced correctly.', $token));
       $this->assertEquals($base_bubbleable_metadata, $bubbleable_metadata);
     }
   }
@@ -121,7 +121,7 @@ class TokenReplaceTest extends ViewsKernelTestBase {
 
     $total_rows_in_table = ViewTestData::dataSet();
     $this->assertTrue($view->get_total_rows, 'The query was set to calculate the total number of rows.');
-    $this->assertGreaterThan(3, count($total_rows_in_table));
+    $this->assertGreaterThan(3, \count($total_rows_in_table));
 
     $expected = [
       '[view:label]' => 'Test tokens',
@@ -137,7 +137,7 @@ class TokenReplaceTest extends ViewsKernelTestBase {
     foreach ($expected as $token => $expected_output) {
       $bubbleable_metadata = new BubbleableMetadata();
       $output = $token_handler->replace($token, ['view' => $view], [], $bubbleable_metadata);
-      $this->assertSame($expected_output, $output, sprintf('Token %s replaced correctly.', $token));
+      $this->assertSame($expected_output, $output, \sprintf('Token %s replaced correctly.', $token));
       $this->assertEquals($base_bubbleable_metadata, $bubbleable_metadata);
     }
   }

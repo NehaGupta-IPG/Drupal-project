@@ -77,7 +77,7 @@ final class PhpRequirements {
     // The string cast ensures the value is a string, even if the PHP EOL date
     // array is empty. As of PHP 8.1, version_compare() no longer accepts NULL
     // as a parameter; empty string must be used instead.
-    $lowest_supported_version = (string) array_key_last(static::$phpEolDates);
+    $lowest_supported_version = (string) \array_key_last(static::$phpEolDates);
 
     // Next, look at versions that are end-of-life after the current date.
     // Find the lowest PHP version that is still supported.
@@ -87,7 +87,7 @@ final class PhpRequirements {
       if ($eol_datetime > $date) {
         // If $version is less than the previously discovered lowest supported
         // version, use $version as the lowest supported version instead.
-        if (version_compare($version, $lowest_supported_version) < 0) {
+        if (\version_compare($version, $lowest_supported_version) < 0) {
           $lowest_supported_version = $version;
         }
       }
@@ -95,7 +95,7 @@ final class PhpRequirements {
 
     // If PHP versions older than the Drupal minimum PHP version are still
     // supported, return Drupal minimum PHP version instead.
-    if (version_compare($lowest_supported_version, static::$drupalMinimumPhp) < 0) {
+    if (\version_compare($lowest_supported_version, static::$drupalMinimumPhp) < 0) {
       return static::$drupalMinimumPhp;
     }
 

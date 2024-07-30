@@ -222,7 +222,7 @@ class Editor extends ConfigEntityBase implements EditorInterface {
    * @internal
    */
   public static function getValidStreamWrappers(): array {
-    return array_keys(\Drupal::service('stream_wrapper_manager')->getNames(StreamWrapperInterface::WRITE_VISIBLE));
+    return \array_keys(\Drupal::service('stream_wrapper_manager')->getNames(StreamWrapperInterface::WRITE_VISIBLE));
   }
 
 }

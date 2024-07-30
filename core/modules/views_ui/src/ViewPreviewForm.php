@@ -51,7 +51,7 @@ class ViewPreviewForm extends ViewFormBase implements WorkspaceSafeFormInterface
 
     $args = [];
     if ($form_state->getValue('view_args', '') !== '') {
-      $args = explode('/', $form_state->getValue('view_args'));
+      $args = \explode('/', $form_state->getValue('view_args'));
     }
 
     $user_input = $form_state->getUserInput();

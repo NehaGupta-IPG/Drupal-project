@@ -45,7 +45,7 @@ trait StubTestTrait {
     $destination_plugin = $migration->getDestinationPlugin(TRUE);
     $stub_row = new Row([], [], TRUE);
     $destination_ids = $destination_plugin->import($stub_row);
-    return reset($destination_ids);
+    return \reset($destination_ids);
   }
 
   /**

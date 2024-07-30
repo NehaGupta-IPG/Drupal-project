@@ -31,7 +31,7 @@ class ImageFieldValidateTest extends ImageFieldTestBase {
     $this->drupalGet('node/add/article');
     /** @var \Drupal\file\FileInterface[] $text_files */
     $text_files = $this->drupalGetTestFiles('text');
-    $text_file = reset($text_files);
+    $text_file = \reset($text_files);
 
     $field = $this->getSession()->getPage()->findField('files[' . $field_name . '_0][]');
     $field->attachFile($this->container->get('file_system')->realpath($text_file->uri));

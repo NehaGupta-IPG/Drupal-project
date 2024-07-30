@@ -38,24 +38,24 @@ class ConfigValidationTest extends KernelTestBase {
    *   A wrapper around the created recipe.
    */
   private function createRecipeWithInvalidDataInFile(string $file): Recipe {
-    $dir = uniqid('public://');
-    mkdir($dir . '/config', recursive: TRUE);
+    $dir = \uniqid('public://');
+    \mkdir($dir . '/config', recursive: TRUE);
 
-    $data = file_get_contents($this->getDrupalRoot() . '/core/modules/config/tests/config_test/config/install/config_test.types.yml');
-    assert(is_string($data));
+    $data = \file_get_contents($this->getDrupalRoot() . '/core/modules/config/tests/config_test/config/install/config_test.types.yml');
+    \assert(\is_string($data));
     $data = Yaml::decode($data);
     // The `array` key needs to be an array, not an integer. If the config is
     // validated, this will raise a validation error.
     /** @var mixed[] $data */
     $data['array'] = 39;
-    file_put_contents($dir . '/config/' . $file, Yaml::encode($data));
+    \file_put_contents($dir . '/config/' . $file, Yaml::encode($data));
 
     $recipe = <<<YAML
 name: Config validation test
 install:
   - config_test
 YAML;
-    file_put_contents($dir . '/recipe.yml', $recipe);
+    \file_put_contents($dir . '/recipe.yml', $recipe);
 
     return Recipe::createFromDirectory($dir);
   }

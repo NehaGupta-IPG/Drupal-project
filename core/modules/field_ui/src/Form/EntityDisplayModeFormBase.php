@@ -45,7 +45,7 @@ abstract class EntityDisplayModeFormBase extends EntityForm {
   protected function init(FormStateInterface $form_state) {
     parent::init($form_state);
     $this->entityType = $this->entityTypeManager->getDefinition($this->entity->getEntityTypeId());
-    $this->displayContext = str_replace(['entity_', '_mode'], '', $this->entityType->id());
+    $this->displayContext = \str_replace(['entity_', '_mode'], '', $this->entityType->id());
   }
 
   /**
@@ -117,11 +117,11 @@ abstract class EntityDisplayModeFormBase extends EntityForm {
 
     $bundles_by_entity = [];
     $defaults = [];
-    foreach (array_keys($bundles[$definition->id()]) as $bundle) {
+    foreach (\array_keys($bundles[$definition->id()]) as $bundle) {
       $bundles_by_entity[$bundle] = $bundles[$definition->id()][$bundle]['label'];
       // Determine default display modes.
       if (!$this->entity->isNew()) {
-        [, $display_mode_name] = explode('.', $this->entity->id());
+        [, $display_mode_name] = \explode('.', $this->entity->id());
         if ($this->getDisplayByContext($bundle, $display_mode_name)) {
           $defaults[$bundle] = $bundle;
         }
@@ -172,7 +172,7 @@ abstract class EntityDisplayModeFormBase extends EntityForm {
     \Drupal::service('entity_field.manager')->clearCachedFieldDefinitions();
     $form_state->setRedirectUrl($this->entity->toUrl('collection'));
 
-    [, $display_mode_name] = explode('.', $form_state->getValue('id'));
+    [, $display_mode_name] = \explode('.', $form_state->getValue('id'));
     $target_entity_id = $this->targetEntityTypeId;
 
     foreach ($form_state->getValue('bundles_by_entity') as $bundle => $value) {

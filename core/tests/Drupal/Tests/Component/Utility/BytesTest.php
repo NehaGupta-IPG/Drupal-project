@@ -54,15 +54,15 @@ class BytesTest extends TestCase {
       ['1', 1.0],
       ['1 byte', 1.0],
       ['1 KB'  , (float) Bytes::KILOBYTE],
-      ['1 MB'  , (float) pow(Bytes::KILOBYTE, 2)],
-      ['1 GB'  , (float) pow(Bytes::KILOBYTE, 3)],
-      ['1 TB'  , (float) pow(Bytes::KILOBYTE, 4)],
-      ['1 PB'  , (float) pow(Bytes::KILOBYTE, 5)],
-      ['1 EB'  , (float) pow(Bytes::KILOBYTE, 6)],
+      ['1 MB'  , (float) \pow(Bytes::KILOBYTE, 2)],
+      ['1 GB'  , (float) \pow(Bytes::KILOBYTE, 3)],
+      ['1 TB'  , (float) \pow(Bytes::KILOBYTE, 4)],
+      ['1 PB'  , (float) \pow(Bytes::KILOBYTE, 5)],
+      ['1 EB'  , (float) \pow(Bytes::KILOBYTE, 6)],
       // Zettabytes and yottabytes cannot be represented by integers on 64-bit
       // systems, so pow() returns a float.
-      ['1 ZB'  , pow(Bytes::KILOBYTE, 7)],
-      ['1 YB'  , pow(Bytes::KILOBYTE, 8)],
+      ['1 ZB'  , \pow(Bytes::KILOBYTE, 7)],
+      ['1 YB'  , \pow(Bytes::KILOBYTE, 8)],
       ['23476892 bytes', 23476892.0],
       // 76 MB.
       ['76MRandomStringThatShouldBeIgnoredByParseSize.', 79691776.0],

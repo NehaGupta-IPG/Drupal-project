@@ -220,7 +220,7 @@ class FileRepository implements FileRepositoryInterface {
     $fileStorage = $this->entityTypeManager->getStorage('file');
     /** @var \Drupal\file\FileInterface[] $files */
     $files = $fileStorage->loadByProperties(['uri' => $uri]);
-    if (count($files)) {
+    if (\count($files)) {
       foreach ($files as $item) {
         // Since some database servers sometimes use a case-insensitive
         // comparison by default, double check that the filename is an exact

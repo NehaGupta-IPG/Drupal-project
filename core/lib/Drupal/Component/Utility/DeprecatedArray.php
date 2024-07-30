@@ -31,7 +31,7 @@ class DeprecatedArray extends \ArrayObject {
    * {@inheritdoc}
    */
   public function offsetExists($offset): bool {
-    @trigger_error($this->message, E_USER_DEPRECATED);
+    @\trigger_error($this->message, E_USER_DEPRECATED);
     return parent::offsetExists($offset);
   }
 
@@ -39,7 +39,7 @@ class DeprecatedArray extends \ArrayObject {
    * {@inheritdoc}
    */
   public function offsetGet($offset): mixed {
-    @trigger_error($this->message, E_USER_DEPRECATED);
+    @\trigger_error($this->message, E_USER_DEPRECATED);
     return parent::offsetGet($offset);
   }
 
@@ -47,7 +47,7 @@ class DeprecatedArray extends \ArrayObject {
    * {@inheritdoc}
    */
   public function offsetSet($offset, $value): void {
-    @trigger_error($this->message, E_USER_DEPRECATED);
+    @\trigger_error($this->message, E_USER_DEPRECATED);
     parent::offsetSet($offset, $value);
   }
 
@@ -55,7 +55,7 @@ class DeprecatedArray extends \ArrayObject {
    * {@inheritdoc}
    */
   public function offsetUnset($offset): void {
-    @trigger_error($this->message, E_USER_DEPRECATED);
+    @\trigger_error($this->message, E_USER_DEPRECATED);
     parent::offsetUnset($offset);
   }
 
@@ -63,7 +63,7 @@ class DeprecatedArray extends \ArrayObject {
    * {@inheritdoc}
    */
   public function getIterator(): \ArrayIterator {
-    @trigger_error($this->message, E_USER_DEPRECATED);
+    @\trigger_error($this->message, E_USER_DEPRECATED);
     return parent::getIterator();
   }
 
@@ -71,7 +71,7 @@ class DeprecatedArray extends \ArrayObject {
    * {@inheritdoc}
    */
   public function unserialize($serialized): void {
-    @trigger_error($this->message, E_USER_DEPRECATED);
+    @\trigger_error($this->message, E_USER_DEPRECATED);
     parent::unserialize($serialized);
   }
 
@@ -79,7 +79,7 @@ class DeprecatedArray extends \ArrayObject {
    * {@inheritdoc}
    */
   public function serialize(): string {
-    @trigger_error($this->message, E_USER_DEPRECATED);
+    @\trigger_error($this->message, E_USER_DEPRECATED);
     return parent::serialize();
   }
 
@@ -87,7 +87,7 @@ class DeprecatedArray extends \ArrayObject {
    * {@inheritdoc}
    */
   public function count(): int {
-    @trigger_error($this->message, E_USER_DEPRECATED);
+    @\trigger_error($this->message, E_USER_DEPRECATED);
     return parent::count();
   }
 

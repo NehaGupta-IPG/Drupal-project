@@ -82,7 +82,7 @@ class ThemeInstallController extends ControllerBase {
    *   A render array confirming installation.
    */
   private function installTheme($theme, $default_or_admin): array {
-    assert(in_array($default_or_admin, ['default', 'admin']), 'The $default_or_admin parameter must be `default` or `admin`');
+    \assert(\in_array($default_or_admin, ['default', 'admin']), 'The $default_or_admin parameter must be `default` or `admin`');
     $config = $this->configFactory->getEditable('system.theme');
     $this->themeInstaller->install([$theme]);
     $config->set($default_or_admin, $theme)->save();

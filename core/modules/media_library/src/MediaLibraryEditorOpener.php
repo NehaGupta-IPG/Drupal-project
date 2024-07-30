@@ -61,7 +61,7 @@ class MediaLibraryEditorOpener implements MediaLibraryOpenerInterface {
    * {@inheritdoc}
    */
   public function getSelectionResponse(MediaLibraryState $state, array $selected_ids) {
-    $selected_media = $this->mediaStorage->load(reset($selected_ids));
+    $selected_media = $this->mediaStorage->load(\reset($selected_ids));
 
     $response = new AjaxResponse();
     $values = [

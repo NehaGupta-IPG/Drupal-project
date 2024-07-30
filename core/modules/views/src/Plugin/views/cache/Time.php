@@ -85,7 +85,7 @@ class Time extends CachePluginBase {
   public function buildOptionsForm(&$form, FormStateInterface $form_state) {
     parent::buildOptionsForm($form, $form_state);
     $options = [60, 300, 1800, 3600, 21600, 518400];
-    $options = array_map([$this->dateFormatter, 'formatInterval'], array_combine($options, $options));
+    $options = \array_map([$this->dateFormatter, 'formatInterval'], \array_combine($options, $options));
     $options = [0 => $this->t('Never cache')] + $options + ['custom' => $this->t('Custom')];
 
     $form['results_lifespan'] = [
@@ -137,7 +137,7 @@ class Time extends CachePluginBase {
     $custom_fields = ['output_lifespan', 'results_lifespan'];
     foreach ($custom_fields as $field) {
       $cache_options = $form_state->getValue('cache_options');
-      if ($cache_options[$field] == 'custom' && !is_numeric($cache_options[$field . '_custom'])) {
+      if ($cache_options[$field] == 'custom' && !\is_numeric($cache_options[$field . '_custom'])) {
         $form_state->setError($form[$field . '_custom'], $this->t('Custom time values must be numeric.'));
       }
     }

@@ -69,7 +69,7 @@ class NodeAdminTest extends NodeTestBase {
     // Remove the "view own unpublished content" permission which is set
     // by default for authenticated users so we can test this permission
     // correctly.
-    user_role_revoke_permissions(RoleInterface::AUTHENTICATED_ID, ['view own unpublished content']);
+    \user_role_revoke_permissions(RoleInterface::AUTHENTICATED_ID, ['view own unpublished content']);
 
     $this->adminUser = $this->drupalCreateUser([
       'access administration pages',
@@ -153,7 +153,7 @@ class NodeAdminTest extends NodeTestBase {
     // admin listing. We want these to appear in the table in the same order as
     // they appear in the following code, and the 'content' View has a table
     // style configuration with a default sort on the 'changed' field DESC.
-    $time = time();
+    $time = \time();
     $nodes['published_page'] = $this->drupalCreateNode(['type' => 'page', 'changed' => $time--]);
     $nodes['published_article'] = $this->drupalCreateNode(['type' => 'article', 'changed' => $time--]);
     $nodes['unpublished_page_1'] = $this->drupalCreateNode([
@@ -180,7 +180,7 @@ class NodeAdminTest extends NodeTestBase {
       $this->assertSession()->linkByHrefExists('node/' . $node->id() . '/edit');
       $this->assertSession()->linkByHrefExists('node/' . $node->id() . '/delete');
       // Verify that we can see the content type label.
-      $this->assertEquals(trim($node_type_labels[$delta]->getText()), $node->type->entity->label());
+      $this->assertEquals(\trim($node_type_labels[$delta]->getText()), $node->type->entity->label());
       $delta++;
     }
 
@@ -248,8 +248,8 @@ class NodeAdminTest extends NodeTestBase {
     // Ensure that the language table column and the language exposed filter are
     // not visible on monolingual sites.
     $this->assertSession()->fieldNotExists('langcode');
-    $this->assertEquals(0, count($this->cssSelect('td.views-field-langcode')));
-    $this->assertEquals(0, count($this->cssSelect('td.views-field-langcode')));
+    $this->assertEquals(0, \count($this->cssSelect('td.views-field-langcode')));
+    $this->assertEquals(0, \count($this->cssSelect('td.views-field-langcode')));
   }
 
   /**
@@ -368,8 +368,8 @@ class NodeAdminTest extends NodeTestBase {
     // Ensure that both the language table column as well as the language
     // exposed filter are visible on multilingual sites.
     $this->assertSession()->fieldExists('langcode');
-    $this->assertEquals(2, count($this->cssSelect('td.views-field-langcode')));
-    $this->assertEquals(2, count($this->cssSelect('td.views-field-langcode')));
+    $this->assertEquals(2, \count($this->cssSelect('td.views-field-langcode')));
+    $this->assertEquals(2, \count($this->cssSelect('td.views-field-langcode')));
 
     $this->assertSession()->pageTextContains('English title');
     $this->assertSession()->pageTextContains('Spanish title');
@@ -390,11 +390,11 @@ class NodeAdminTest extends NodeTestBase {
     $this->assertSession()->pageTextNotContains('English title');
     $this->assertSession()->pageTextNotContains('Spanish title');
 
-    $this->drupalGet('admin/content', ['query' => ['langcode' => html_entity_decode('***LANGUAGE_language_interface***')]]);
+    $this->drupalGet('admin/content', ['query' => ['langcode' => \html_entity_decode('***LANGUAGE_language_interface***')]]);
     $this->assertSession()->pageTextContains('English title');
     $this->assertSession()->pageTextNotContains('Spanish title');
 
-    $this->drupalGet('es/admin/content', ['query' => ['langcode' => html_entity_decode('***LANGUAGE_language_interface***')]]);
+    $this->drupalGet('es/admin/content', ['query' => ['langcode' => \html_entity_decode('***LANGUAGE_language_interface***')]]);
     $this->assertSession()->pageTextNotContains('English title');
     $this->assertSession()->pageTextContains('Spanish title');
   }

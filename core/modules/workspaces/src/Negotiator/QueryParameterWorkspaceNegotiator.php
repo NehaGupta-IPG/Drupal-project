@@ -21,8 +21,8 @@ class QueryParameterWorkspaceNegotiator extends SessionWorkspaceNegotiator {
    * {@inheritdoc}
    */
   public function applies(Request $request) {
-    return is_string($request->query->get('workspace'))
-      && is_string($request->query->get('token'))
+    return \is_string($request->query->get('workspace'))
+      && \is_string($request->query->get('token'))
       && parent::applies($request);
   }
 
@@ -34,7 +34,7 @@ class QueryParameterWorkspaceNegotiator extends SessionWorkspaceNegotiator {
 
     $workspace_id = (string) $request->query->get('workspace');
     $token = (string) $request->query->get('token');
-    $is_valid_token = hash_equals($this->getQueryToken($workspace_id), $token);
+    $is_valid_token = \hash_equals($this->getQueryToken($workspace_id), $token);
 
     // This negotiator receives a workspace ID from user input, so a minimal
     // validation is needed to ensure that we protect against fake input before
@@ -88,7 +88,7 @@ class QueryParameterWorkspaceNegotiator extends SessionWorkspaceNegotiator {
    */
   protected function getQueryToken(string $workspace_id): string {
     // Return the first 8 characters.
-    return substr(Crypt::hmacBase64($workspace_id, Settings::getHashSalt()), 0, 8);
+    return \substr(Crypt::hmacBase64($workspace_id, Settings::getHashSalt()), 0, 8);
   }
 
 }

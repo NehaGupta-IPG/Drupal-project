@@ -29,7 +29,7 @@ abstract class FileProcessBase extends ProcessPluginBase {
    *   The plugin definition.
    */
   public function __construct(array $configuration, $plugin_id, array $plugin_definition) {
-    if (array_key_exists('file_exists', $configuration)) {
+    if (\array_key_exists('file_exists', $configuration)) {
       switch ($configuration['file_exists']) {
         case 'use existing':
           $configuration['file_exists'] = FileExists::Error;

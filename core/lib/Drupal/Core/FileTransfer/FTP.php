@@ -35,7 +35,7 @@ abstract class FTP extends FileTransfer {
     $hostname = empty($settings['advanced']['hostname']) ? 'localhost' : $settings['advanced']['hostname'];
     $port = empty($settings['advanced']['port']) ? 21 : $settings['advanced']['port'];
 
-    if (function_exists('ftp_connect')) {
+    if (\function_exists('ftp_connect')) {
       $class = 'Drupal\Core\FileTransfer\FTPExtension';
     }
     else {

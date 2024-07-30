@@ -20,17 +20,17 @@ class ConfigOverrider implements ConfigFactoryOverrideInterface {
    */
   public function loadOverrides($names) {
     $overrides = [];
-    if (in_array('block.block.overridden_block', $names)) {
+    if (\in_array('block.block.overridden_block', $names)) {
       if (\Drupal::state()->get('settings_tray_override_test.block')) {
         $overrides = $overrides + ['block.block.overridden_block' => ['settings' => ['label' => 'Now this will be the label.']]];
       }
     }
-    if (in_array('system.site', $names)) {
+    if (\in_array('system.site', $names)) {
       if (\Drupal::state()->get('settings_tray_override_test.site_name')) {
         $overrides = $overrides + ['system.site' => ['name' => 'Llama Fan Club']];
       }
     }
-    if (in_array('system.menu.main', $names)) {
+    if (\in_array('system.menu.main', $names)) {
       if (\Drupal::state()->get('settings_tray_override_test.menu')) {
         $overrides = $overrides + ['system.menu.main' => ['label' => 'Foo label']];
       }

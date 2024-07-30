@@ -120,7 +120,7 @@ class FileUploadTest extends ResourceTestBase {
    * {@inheritdoc}
    */
   protected function setUp(): void {
-    if (in_array($this->name(), static::SKIP_METHODS, TRUE)) {
+    if (\in_array($this->name(), static::SKIP_METHODS, TRUE)) {
       $this->markTestSkipped('Irrelevant for this test');
     }
 
@@ -191,7 +191,7 @@ class FileUploadTest extends ResourceTestBase {
 
     // DX: 405 when read-only mode is enabled.
     $response = $this->fileRequest($uri, $this->testFileData);
-    $this->assertResourceErrorResponse(405, sprintf("JSON:API is configured to accept only read operations. Site administrators can configure this at %s.", Url::fromUri('base:/admin/config/services/jsonapi')->setAbsolute()->toString(TRUE)->getGeneratedUrl()), $uri, $response);
+    $this->assertResourceErrorResponse(405, \sprintf("JSON:API is configured to accept only read operations. Site administrators can configure this at %s.", Url::fromUri('base:/admin/config/services/jsonapi')->setAbsolute()->toString(TRUE)->getGeneratedUrl()), $uri, $response);
     $this->assertSame(['GET'], $response->getHeader('Allow'));
 
     $this->config('jsonapi.settings')->set('read_only', FALSE)->save(TRUE);
@@ -215,7 +215,7 @@ class FileUploadTest extends ResourceTestBase {
     $this->assertResponseData($expected, $response);
 
     // Check the actual file data.
-    $this->assertSame($this->testFileData, file_get_contents('public://foobar/example.txt'));
+    $this->assertSame($this->testFileData, \file_get_contents('public://foobar/example.txt'));
 
     // Test the file again but using 'filename' in the Content-Disposition
     // header with no 'file' prefix.
@@ -225,7 +225,7 @@ class FileUploadTest extends ResourceTestBase {
     $this->assertResponseData($expected, $response);
 
     // Check the actual file data.
-    $this->assertSame($this->testFileData, file_get_contents('public://foobar/example_0.txt'));
+    $this->assertSame($this->testFileData, \file_get_contents('public://foobar/example_0.txt'));
     $this->assertTrue($this->fileStorage->loadUnchanged(1)->isTemporary());
 
     // Verify that we can create an entity that references the uploaded file.
@@ -254,8 +254,8 @@ class FileUploadTest extends ResourceTestBase {
     \Drupal::service('router.builder')->rebuild();
     // Update the test entity so it already has a file. This allows verifying
     // that this route appends files, and does not replace them.
-    mkdir('public://foobar');
-    file_put_contents('public://foobar/existing.txt', $this->testFileData);
+    \mkdir('public://foobar');
+    \file_put_contents('public://foobar/existing.txt', $this->testFileData);
     $existing_file = File::create([
       'uri' => 'public://foobar/existing.txt',
     ]);
@@ -270,7 +270,7 @@ class FileUploadTest extends ResourceTestBase {
 
     // DX: 405 when read-only mode is enabled.
     $response = $this->fileRequest($uri, $this->testFileData);
-    $this->assertResourceErrorResponse(405, sprintf("JSON:API is configured to accept only read operations. Site administrators can configure this at %s.", Url::fromUri('base:/admin/config/services/jsonapi')->setAbsolute()->toString(TRUE)->getGeneratedUrl()), $uri, $response);
+    $this->assertResourceErrorResponse(405, \sprintf("JSON:API is configured to accept only read operations. Site administrators can configure this at %s.", Url::fromUri('base:/admin/config/services/jsonapi')->setAbsolute()->toString(TRUE)->getGeneratedUrl()), $uri, $response);
     $this->assertSame(['GET'], $response->getHeader('Allow'));
 
     $this->config('jsonapi.settings')->set('read_only', FALSE)->save(TRUE);
@@ -334,8 +334,8 @@ class FileUploadTest extends ResourceTestBase {
     $this->assertResponseData($expected, $response);
 
     // Check the actual file data.
-    $this->assertSame($this->testFileData, file_get_contents('public://foobar/example.txt'));
-    $this->assertSame($this->testFileData, file_get_contents('public://foobar/example_0.txt'));
+    $this->assertSame($this->testFileData, \file_get_contents('public://foobar/example.txt'));
+    $this->assertSame($this->testFileData, \file_get_contents('public://foobar/example_0.txt'));
   }
 
   /**
@@ -431,13 +431,13 @@ class FileUploadTest extends ResourceTestBase {
     $this->assertResponseData($expected, $response);
 
     // Check the actual file data.
-    $this->assertSame($this->testFileData, file_get_contents('public://foobar/example_0.txt'));
+    $this->assertSame($this->testFileData, \file_get_contents('public://foobar/example_0.txt'));
 
     // Simulate a race condition where two files are uploaded at almost the same
     // time, by removing the first uploaded file from disk (leaving the entry in
     // the file_managed table) before trying to upload another file with the
     // same name.
-    unlink(\Drupal::service('file_system')->realpath('public://foobar/example.txt'));
+    \unlink(\Drupal::service('file_system')->realpath('public://foobar/example.txt'));
 
     // Make the same request again. The upload should fail validation.
     $response = $this->fileRequest($uri, $this->testFileData);
@@ -463,7 +463,7 @@ class FileUploadTest extends ResourceTestBase {
 
     // Check the actual file data. It should have been written to the configured
     // directory, not /foobar/directory/example.txt.
-    $this->assertSame($this->testFileData, file_get_contents('public://foobar/example.txt'));
+    $this->assertSame($this->testFileData, \file_get_contents('public://foobar/example.txt'));
 
     $response = $this->fileRequest($uri, $this->testFileData, ['Content-Disposition' => 'file; filename="../../example_2.txt"']);
     $this->assertSame(201, $response->getStatusCode());
@@ -472,7 +472,7 @@ class FileUploadTest extends ResourceTestBase {
 
     // Check the actual file data. It should have been written to the configured
     // directory, not /foobar/directory/example.txt.
-    $this->assertSame($this->testFileData, file_get_contents('public://foobar/example_2.txt'));
+    $this->assertSame($this->testFileData, \file_get_contents('public://foobar/example_2.txt'));
     $this->assertFileDoesNotExist('../../example_2.txt');
 
     // Check a path from the root. Extensions have to be empty to allow a file
@@ -490,7 +490,7 @@ class FileUploadTest extends ResourceTestBase {
 
     // Check the actual file data. It should have been written to the configured
     // directory, not /foobar/directory/example.txt.
-    $this->assertSame($this->testFileData, file_get_contents('public://foobar/passwd'));
+    $this->assertSame($this->testFileData, \file_get_contents('public://foobar/passwd'));
   }
 
   /**
@@ -522,7 +522,7 @@ class FileUploadTest extends ResourceTestBase {
     $this->assertSame(201, $response->getStatusCode());
     $expected = $this->getExpectedDocument(1, 'Èxample-✓.txt', TRUE);
     $this->assertResponseData($expected, $response);
-    $this->assertSame($this->testFileData, file_get_contents('public://foobar/Èxample-✓.txt'));
+    $this->assertSame($this->testFileData, \file_get_contents('public://foobar/Èxample-✓.txt'));
   }
 
   /**
@@ -544,7 +544,7 @@ class FileUploadTest extends ResourceTestBase {
     $this->assertResponseData($expected, $response);
 
     // Check the actual file data.
-    $this->assertSame('', file_get_contents('public://foobar/example.txt'));
+    $this->assertSame('', \file_get_contents('public://foobar/example.txt'));
   }
 
   /**
@@ -599,7 +599,7 @@ class FileUploadTest extends ResourceTestBase {
     // extension to apache.
     $expected = $this->getExpectedDocument(1, 'example.php_.txt', TRUE);
     // Override the expected filesize.
-    $expected['data']['attributes']['filesize'] = strlen($php_string);
+    $expected['data']['attributes']['filesize'] = \strlen($php_string);
     $this->assertResponseData($expected, $response);
     $this->assertFileExists('public://foobar/example.php_.txt');
 
@@ -610,7 +610,7 @@ class FileUploadTest extends ResourceTestBase {
     $response = $this->fileRequest($uri, $php_string, ['Content-Disposition' => 'filename="example_2.php"']);
     $expected = $this->getExpectedDocument(2, 'example_2.php_.txt', TRUE);
     // Override the expected filesize.
-    $expected['data']['attributes']['filesize'] = strlen($php_string);
+    $expected['data']['attributes']['filesize'] = \strlen($php_string);
     $this->assertResponseData($expected, $response);
     $this->assertFileExists('public://foobar/example_2.php_.txt');
     $this->assertFileDoesNotExist('public://foobar/example_2.php');
@@ -624,7 +624,7 @@ class FileUploadTest extends ResourceTestBase {
     // The filename is munged.
     $expected = $this->getExpectedDocument(3, 'example_3.php_.doc', TRUE);
     // Override the expected filesize.
-    $expected['data']['attributes']['filesize'] = strlen($php_string);
+    $expected['data']['attributes']['filesize'] = \strlen($php_string);
     // The file mime should be 'application/msword'.
     $expected['data']['attributes']['filemime'] = 'application/msword';
     $this->assertResponseData($expected, $response);
@@ -640,7 +640,7 @@ class FileUploadTest extends ResourceTestBase {
     // The filename is munged.
     $expected = $this->getExpectedDocument(4, 'example_4.php_.doc', TRUE);
     // Override the expected filesize.
-    $expected['data']['attributes']['filesize'] = strlen($php_string);
+    $expected['data']['attributes']['filesize'] = \strlen($php_string);
     // The file mime should be 'application/msword'.
     $expected['data']['attributes']['filemime'] = 'application/msword';
     $this->assertResponseData($expected, $response);
@@ -652,7 +652,7 @@ class FileUploadTest extends ResourceTestBase {
     $response = $this->fileRequest($uri, $php_string, ['Content-Disposition' => 'filename="example_5.php.png"']);
     $expected = $this->getExpectedDocument(5, 'example_5.php_.png', TRUE);
     // Override the expected filesize.
-    $expected['data']['attributes']['filesize'] = strlen($php_string);
+    $expected['data']['attributes']['filesize'] = \strlen($php_string);
     // The file mime should still see this as a PNG image.
     $expected['data']['attributes']['filemime'] = 'image/png';
     $this->assertResponseData($expected, $response);
@@ -662,7 +662,7 @@ class FileUploadTest extends ResourceTestBase {
     $response = $this->fileRequest($uri, $php_string, ['Content-Disposition' => 'filename="example_6.cgi.png.txt"']);
     $expected = $this->getExpectedDocument(6, 'example_6.cgi_.png_.txt', TRUE);
     // Override the expected filesize.
-    $expected['data']['attributes']['filesize'] = strlen($php_string);
+    $expected['data']['attributes']['filesize'] = \strlen($php_string);
     // The file mime should also now be text.
     $expected['data']['attributes']['filemime'] = 'text/plain';
     $this->assertResponseData($expected, $response);
@@ -690,7 +690,7 @@ class FileUploadTest extends ResourceTestBase {
     $response = $this->fileRequest($uri, $php_string, ['Content-Disposition' => 'filename="example_7.php"']);
     $expected = $this->getExpectedDocument(7, 'example_7.php', TRUE);
     // Override the expected filesize.
-    $expected['data']['attributes']['filesize'] = strlen($php_string);
+    $expected['data']['attributes']['filesize'] = \strlen($php_string);
     // The file mime should also now be PHP.
     $expected['data']['attributes']['filemime'] = 'application/x-httpd-php';
     $this->assertResponseData($expected, $response);
@@ -788,12 +788,12 @@ class FileUploadTest extends ResourceTestBase {
           'changed' => (new \DateTime())->setTimestamp($file->getChangedTime())->setTimezone(new \DateTimeZone('UTC'))->format(\DateTime::RFC3339),
           'filemime' => 'text/plain',
           'filename' => $expected_as_filename ? $expected_filename : 'example.txt',
-          'filesize' => strlen($this->testFileData),
+          'filesize' => \strlen($this->testFileData),
           'langcode' => 'en',
           'status' => $expected_status,
           'uri' => [
             'value' => 'public://foobar/' . $expected_filename,
-            'url' => base_path() . $this->siteDirectory . '/files/foobar/' . rawurlencode($expected_filename),
+            'url' => base_path() . $this->siteDirectory . '/files/foobar/' . \rawurlencode($expected_filename),
           ],
           'drupal_internal__fid' => (int) $file->id(),
         ],
@@ -843,7 +843,7 @@ class FileUploadTest extends ResourceTestBase {
       // Set the required JSON:API Accept header.
       'Accept' => 'application/vnd.api+json',
     ];
-    $request_options[RequestOptions::HEADERS] = array_filter($headers, function ($value) {
+    $request_options[RequestOptions::HEADERS] = \array_filter($headers, function ($value) {
       return $value !== FALSE;
     });
     $request_options[RequestOptions::BODY] = $file_contents;

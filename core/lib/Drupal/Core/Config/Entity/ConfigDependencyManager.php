@@ -168,7 +168,7 @@ class ConfigDependencyManager {
     }
     else {
       if ($type == 'module' || $type == 'theme' || $type == 'content') {
-        $dependent_entities = array_filter($this->data, function (ConfigEntityDependency $entity) use ($type, $name) {
+        $dependent_entities = \array_filter($this->data, function (ConfigEntityDependency $entity) use ($type, $name) {
           return $entity->hasDependency($type, $name);
         });
       }
@@ -178,15 +178,15 @@ class ConfigDependencyManager {
         $entities_to_check[] = $entity->getConfigDependencyName();
       }
     }
-    $dependencies = array_merge($this->createGraphConfigEntityDependencies($entities_to_check), $dependent_entities);
+    $dependencies = \array_merge($this->createGraphConfigEntityDependencies($entities_to_check), $dependent_entities);
     // Sort dependencies in the reverse order of the graph. So the least
     // dependent is at the top. For example, this ensures that fields are
     // always after field storages. This is because field storages need to be
     // created before a field.
     $graph = $this->getGraph();
     $sorts = $this->prepareMultisort($graph, ['weight', 'name']);
-    array_multisort($sorts['weight'], SORT_DESC, SORT_NUMERIC, $sorts['name'], SORT_ASC, SORT_NATURAL | SORT_FLAG_CASE, $graph);
-    return array_replace(array_intersect_key($graph, $dependencies), $dependencies);
+    \array_multisort($sorts['weight'], SORT_DESC, SORT_NUMERIC, $sorts['name'], SORT_ASC, SORT_NATURAL | SORT_FLAG_CASE, $graph);
+    return \array_replace(\array_intersect_key($graph, $dependencies), $dependencies);
   }
 
   /**
@@ -203,7 +203,7 @@ class ConfigDependencyManager {
    *   from the graph.
    */
   protected function prepareMultisort($graph, $keys) {
-    $return = array_fill_keys($keys, []);
+    $return = \array_fill_keys($keys, []);
     foreach ($graph as $graph_key => $graph_row) {
       foreach ($keys as $key) {
         $return[$key][$graph_key] = $graph_row[$key];
@@ -224,9 +224,9 @@ class ConfigDependencyManager {
     // Sort by weight and alphabetically. The most dependent entities
     // are last and entities with the same weight are alphabetically ordered.
     $sorts = $this->prepareMultisort($graph, ['weight', 'name']);
-    array_multisort($sorts['weight'], SORT_ASC, SORT_NUMERIC, $sorts['name'], SORT_ASC, SORT_NATURAL | SORT_FLAG_CASE, $graph);
+    \array_multisort($sorts['weight'], SORT_ASC, SORT_NUMERIC, $sorts['name'], SORT_ASC, SORT_NATURAL | SORT_FLAG_CASE, $graph);
     // Use array_intersect_key() to exclude modules and themes from the list.
-    return array_keys(array_intersect_key($graph, $this->data));
+    return \array_keys(\array_intersect_key($graph, $this->data));
   }
 
   /**
@@ -275,13 +275,13 @@ class ConfigDependencyManager {
         }
         // Include all dependencies in the graph so that topographical sorting
         // works.
-        foreach (array_merge($entity->getDependencies('config'), $entity->getDependencies('module'), $entity->getDependencies('theme')) as $dependency) {
+        foreach (\array_merge($entity->getDependencies('config'), $entity->getDependencies('module'), $entity->getDependencies('theme')) as $dependency) {
           $graph[$dependency]['edges'][$graph_key] = TRUE;
           $graph[$dependency]['name'] = $dependency;
         }
       }
       // Ensure that order of the graph is consistent.
-      krsort($graph);
+      \krsort($graph);
       $graph_object = new Graph($graph);
       $this->graph = $graph_object->searchAndSort();
     }
@@ -300,7 +300,7 @@ class ConfigDependencyManager {
    * @return $this
    */
   public function setData(array $data) {
-    array_walk($data, function (&$config, $name) {
+    \array_walk($data, function (&$config, $name) {
       $config = new ConfigEntityDependency($name, $config);
     });
     $this->data = $data;

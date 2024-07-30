@@ -125,7 +125,7 @@ class ElementInfoManager extends DefaultPluginManager implements ElementInfoMana
       }
       $info[$element_type] = $element_info;
     }
-    restore_error_handler();
+    \restore_error_handler();
 
     foreach ($info as $element_type => $element) {
       $info[$element_type]['#type'] = $element_type;

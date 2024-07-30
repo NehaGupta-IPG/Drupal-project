@@ -21,7 +21,7 @@ class CacheabilityMetadataConfigOverride implements ConfigFactoryOverrideInterfa
 
     // Override the test block depending on the state set in the test.
     $state = \Drupal::state()->get('config_override_integration_test.enabled', FALSE);
-    if (in_array('block.block.config_override_test', $names) && $state !== FALSE) {
+    if (\in_array('block.block.config_override_test', $names) && $state !== FALSE) {
       $overrides = $overrides + [
         'block.block.config_override_test' => [
           'settings' => ['label' => 'Overridden block label'],

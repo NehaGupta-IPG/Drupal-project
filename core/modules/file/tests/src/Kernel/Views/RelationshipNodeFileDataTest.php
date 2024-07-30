@@ -79,7 +79,7 @@ class RelationshipNodeFileDataTest extends ViewsKernelTestBase {
       'status' => FileInterface::STATUS_PERMANENT,
     ]);
     $file1->enforceIsNew();
-    file_put_contents($file1->getFileUri(), file_get_contents('core/tests/fixtures/files/image-1.png'));
+    \file_put_contents($file1->getFileUri(), \file_get_contents('core/tests/fixtures/files/image-1.png'));
     $file1->save();
 
     $file2 = File::create([
@@ -91,7 +91,7 @@ class RelationshipNodeFileDataTest extends ViewsKernelTestBase {
       'status' => FileInterface::STATUS_PERMANENT,
     ]);
     $file2->enforceIsNew();
-    file_put_contents($file2->getFileUri(), file_get_contents('core/tests/fixtures/files/image-1.png'));
+    \file_put_contents($file2->getFileUri(), \file_get_contents('core/tests/fixtures/files/image-1.png'));
     $file2->save();
 
     $node1 = Node::create([
@@ -141,7 +141,7 @@ class RelationshipNodeFileDataTest extends ViewsKernelTestBase {
       'status' => FileInterface::STATUS_PERMANENT,
     ]);
     $file1->enforceIsNew();
-    file_put_contents($file1->getFileUri(), file_get_contents('core/tests/fixtures/files/image-1.png'));
+    \file_put_contents($file1->getFileUri(), \file_get_contents('core/tests/fixtures/files/image-1.png'));
     $file1->save();
 
     $file2 = File::create([
@@ -153,7 +153,7 @@ class RelationshipNodeFileDataTest extends ViewsKernelTestBase {
       'status' => FileInterface::STATUS_PERMANENT,
     ]);
     $file2->enforceIsNew();
-    file_put_contents($file2->getFileUri(), file_get_contents('core/tests/fixtures/files/image-1.png'));
+    \file_put_contents($file2->getFileUri(), \file_get_contents('core/tests/fixtures/files/image-1.png'));
     $file2->save();
 
     $node1 = Node::create([

@@ -138,7 +138,7 @@ class ViewsSelection extends SelectionPluginBase implements ContainerFactoryPlug
     foreach ($displays as $data) {
       [$view_id, $display_id] = $data;
       $view = $view_storage->load($view_id);
-      if (in_array($view->get('base_table'), [$entity_type->getBaseTable(), $entity_type->getDataTable()])) {
+      if (\in_array($view->get('base_table'), [$entity_type->getBaseTable(), $entity_type->getDataTable()])) {
         $display = $view->get('display');
         $options[$view_id . ':' . $display_id] = $view_id . ' - ' . $display[$display_id]['display_title'];
       }
@@ -161,7 +161,7 @@ class ViewsSelection extends SelectionPluginBase implements ContainerFactoryPlug
         '#description' => '<p>' . $this->t('Choose the view and display that select the entities that can be referenced.<br />Only views with a display of type "Entity Reference" are eligible.') . '</p>',
       ];
 
-      $default = !empty($view_settings['arguments']) ? implode(', ', $view_settings['arguments']) : '';
+      $default = !empty($view_settings['arguments']) ? \implode(', ', $view_settings['arguments']) : '';
       $form['view']['arguments'] = [
         '#type' => 'textfield',
         '#title' => $this->t('View arguments'),
@@ -279,7 +279,7 @@ class ViewsSelection extends SelectionPluginBase implements ContainerFactoryPlug
    */
   protected function stripAdminAndAnchorTagsFromResults(array $results) {
     $allowed_tags = Xss::getAdminTagList();
-    if (($key = array_search('a', $allowed_tags)) !== FALSE) {
+    if (($key = \array_search('a', $allowed_tags)) !== FALSE) {
       unset($allowed_tags[$key]);
     }
 
@@ -309,7 +309,7 @@ class ViewsSelection extends SelectionPluginBase implements ContainerFactoryPlug
     $entities = $this->getDisplayExecutionResults(NULL, 'CONTAINS', 0, $ids);
     $result = [];
     if ($entities) {
-      $result = array_keys($entities);
+      $result = \array_keys($entities);
     }
     return $result;
   }
@@ -320,7 +320,7 @@ class ViewsSelection extends SelectionPluginBase implements ContainerFactoryPlug
   public static function settingsFormValidate($element, FormStateInterface $form_state, $form) {
     // Split view name and display name from the 'view_and_display' value.
     if (!empty($element['view_and_display']['#value'])) {
-      [$view, $display] = explode(':', $element['view_and_display']['#value']);
+      [$view, $display] = \explode(':', $element['view_and_display']['#value']);
     }
     else {
       $form_state->setError($element, new TranslatableMarkup('The views entity selection mode requires a view.'));
@@ -330,13 +330,13 @@ class ViewsSelection extends SelectionPluginBase implements ContainerFactoryPlug
     // Explode the 'arguments' string into an actual array. Beware, explode()
     // turns an empty string into an array with one empty string. We'll need an
     // empty array instead.
-    $arguments_string = trim($element['arguments']['#value']);
+    $arguments_string = \trim($element['arguments']['#value']);
     if ($arguments_string === '') {
       $arguments = [];
     }
     else {
       // array_map() is called to trim whitespaces from the arguments.
-      $arguments = array_map('trim', explode(',', $arguments_string));
+      $arguments = \array_map('trim', \explode(',', $arguments_string));
     }
 
     $value = [

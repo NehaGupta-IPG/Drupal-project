@@ -34,7 +34,7 @@ class DbImportCommand extends DbCommandBase {
    */
   protected function execute(InputInterface $input, OutputInterface $output): int {
     $script = $input->getArgument('script');
-    if (!is_file($script)) {
+    if (!\is_file($script)) {
       $output->writeln('File must exist.');
       return 1;
     }
@@ -56,7 +56,7 @@ class DbImportCommand extends DbCommandBase {
   protected function runScript(Connection $connection, $script) {
     $old_key = Database::setActiveConnection($connection->getKey());
 
-    if (str_ends_with($script, '.gz')) {
+    if (\str_ends_with($script, '.gz')) {
       $script = "compress.zlib://$script";
     }
     try {

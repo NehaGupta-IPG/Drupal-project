@@ -168,8 +168,8 @@ class SiteMaintenanceTest extends BrowserTestBase {
     $this->drupalGet('user/password');
     $this->submitForm($edit, 'Submit');
     $mails = $this->drupalGetMails();
-    $start = strpos($mails[0]['body'], 'user/reset/' . $this->user->id());
-    $path = substr($mails[0]['body'], $start, 66 + strlen($this->user->id()));
+    $start = \strpos($mails[0]['body'], 'user/reset/' . $this->user->id());
+    $path = \substr($mails[0]['body'], $start, 66 + \strlen($this->user->id()));
 
     // Log in with temporary login link.
     $this->drupalGet($path);

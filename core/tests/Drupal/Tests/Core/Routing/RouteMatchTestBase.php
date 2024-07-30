@@ -111,7 +111,7 @@ abstract class RouteMatchTestBase extends UnitTestCase {
     foreach ($expected_filtered_parameters as $name => $expected_value) {
       $this->assertSame($expected_value, $route_match->getParameter($name));
     }
-    foreach (array_diff_key($parameters, $expected_filtered_parameters) as $name) {
+    foreach (\array_diff_key($parameters, $expected_filtered_parameters) as $name) {
       $this->assertNull($route_match->getParameter($name));
     }
   }
@@ -138,7 +138,7 @@ abstract class RouteMatchTestBase extends UnitTestCase {
     foreach ($expected_filtered_parameters as $name => $expected_value) {
       $this->assertSame($expected_value, $route_match->getRawParameter($name));
     }
-    foreach (array_diff_key($parameters, $expected_filtered_parameters) as $name) {
+    foreach (\array_diff_key($parameters, $expected_filtered_parameters) as $name) {
       $this->assertNull($route_match->getRawParameter($name));
     }
   }

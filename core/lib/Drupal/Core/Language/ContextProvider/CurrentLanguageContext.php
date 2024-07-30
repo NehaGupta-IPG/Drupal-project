@@ -43,7 +43,7 @@ class CurrentLanguageContext implements ContextProviderInterface {
 
     if ($unqualified_context_ids) {
       foreach ($unqualified_context_ids as $unqualified_context_id) {
-        if (array_search($unqualified_context_id, $language_types) === FALSE) {
+        if (\array_search($unqualified_context_id, $language_types) === FALSE) {
           unset($language_types[$unqualified_context_id]);
         }
       }

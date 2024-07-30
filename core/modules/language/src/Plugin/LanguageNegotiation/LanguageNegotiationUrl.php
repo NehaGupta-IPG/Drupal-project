@@ -56,9 +56,9 @@ class LanguageNegotiationUrl extends LanguageNegotiationMethodBase implements In
 
       switch ($config['source']) {
         case LanguageNegotiationUrl::CONFIG_PATH_PREFIX:
-          $request_path = urldecode(trim($request->getPathInfo(), '/'));
-          $path_args = explode('/', $request_path);
-          $prefix = array_shift($path_args);
+          $request_path = \urldecode(\trim($request->getPathInfo(), '/'));
+          $path_args = \explode('/', $request_path);
+          $prefix = \array_shift($path_args);
 
           // Search prefix within added languages.
           $negotiated_language = FALSE;
@@ -82,8 +82,8 @@ class LanguageNegotiationUrl extends LanguageNegotiationMethodBase implements In
             if (!empty($config['domains'][$language->getId()])) {
               // Ensure that there is exactly one protocol in the URL when
               // checking the hostname.
-              $host = 'http://' . str_replace(['http://', 'https://'], '', $config['domains'][$language->getId()]);
-              $host = parse_url($host, PHP_URL_HOST);
+              $host = 'http://' . \str_replace(['http://', 'https://'], '', $config['domains'][$language->getId()]);
+              $host = \parse_url($host, PHP_URL_HOST);
               if ($http_host == $host) {
                 $langcode = $language->getId();
                 break;
@@ -104,14 +104,14 @@ class LanguageNegotiationUrl extends LanguageNegotiationMethodBase implements In
     $config = $this->config->get('language.negotiation')->get('url');
 
     if ($config['source'] == LanguageNegotiationUrl::CONFIG_PATH_PREFIX) {
-      $parts = explode('/', trim($path, '/'));
-      $prefix = array_shift($parts);
+      $parts = \explode('/', \trim($path, '/'));
+      $prefix = \array_shift($parts);
 
       // Search prefix within added languages.
       foreach ($this->languageManager->getLanguages() as $language) {
         if (isset($config['prefixes'][$language->getId()]) && $config['prefixes'][$language->getId()] == $prefix) {
           // Rebuild $path with the language removed.
-          $path = '/' . implode('/', $parts);
+          $path = '/' . \implode('/', $parts);
           break;
         }
       }
@@ -130,19 +130,19 @@ class LanguageNegotiationUrl extends LanguageNegotiationMethodBase implements In
       $url_scheme = $request->getScheme();
       $port = $request->getPort();
     }
-    $languages = array_flip(array_keys($this->languageManager->getLanguages()));
+    $languages = \array_flip(\array_keys($this->languageManager->getLanguages()));
     // Language can be passed as an option, or we go for current URL language.
     if (!isset($options['language']) || ($options['language'] instanceof LanguageInterface && $options['language']->getId() == LanguageInterface::LANGCODE_NOT_SPECIFIED)) {
       $language_url = $this->languageManager->getCurrentLanguage(LanguageInterface::TYPE_URL);
       $options['language'] = $language_url;
     }
     // We allow only added languages here.
-    elseif (!is_object($options['language']) || !isset($languages[$options['language']->getId()])) {
+    elseif (!\is_object($options['language']) || !isset($languages[$options['language']->getId()])) {
       return $path;
     }
     $config = $this->config->get('language.negotiation')->get('url');
     if ($config['source'] == LanguageNegotiationUrl::CONFIG_PATH_PREFIX) {
-      if (is_object($options['language']) && !empty($config['prefixes'][$options['language']->getId()])) {
+      if (\is_object($options['language']) && !empty($config['prefixes'][$options['language']->getId()])) {
         $options['prefix'] = $config['prefixes'][$options['language']->getId()] . '/';
         if ($bubbleable_metadata) {
           $bubbleable_metadata->addCacheContexts(['languages:' . LanguageInterface::TYPE_URL]);
@@ -150,7 +150,7 @@ class LanguageNegotiationUrl extends LanguageNegotiationMethodBase implements In
       }
     }
     elseif ($config['source'] == LanguageNegotiationUrl::CONFIG_DOMAIN) {
-      if (is_object($options['language']) && !empty($config['domains'][$options['language']->getId()])) {
+      if (\is_object($options['language']) && !empty($config['domains'][$options['language']->getId()])) {
 
         // Check if the base URLs match, return early if they do.
         if (isset($options['base_url']) && $request && $request->getHost() === parse_url($options['base_url'], PHP_URL_HOST)) {
@@ -161,7 +161,7 @@ class LanguageNegotiationUrl extends LanguageNegotiationMethodBase implements In
         // retain it below.
         if (!empty($options['base_url'])) {
           // The colon in the URL scheme messes up the port checking below.
-          $normalized_base_url = str_replace(['https://', 'http://'], '', $options['base_url']);
+          $normalized_base_url = \str_replace(['https://', 'http://'], '', $options['base_url']);
         }
 
         // Ask for an absolute URL with our modified base URL only if the domain
@@ -206,7 +206,7 @@ class LanguageNegotiationUrl extends LanguageNegotiationMethodBase implements In
   public function getLanguageSwitchLinks(Request $request, $type, Url $url) {
     $links = [];
     $query = [];
-    parse_str($request->getQueryString() ?? '', $query);
+    \parse_str($request->getQueryString() ?? '', $query);
 
     foreach ($this->languageManager->getNativeLanguages() as $language) {
       $links[$language->getId()] = [

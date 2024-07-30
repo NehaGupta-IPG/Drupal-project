@@ -45,13 +45,13 @@ class Component extends PluginBase {
    */
   public function __construct(array $configuration, $plugin_id, $plugin_definition) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
-    if (str_contains($plugin_id, '/')) {
-      $message = sprintf('Component ID cannot contain slashes: %s', $plugin_id);
+    if (\str_contains($plugin_id, '/')) {
+      $message = \sprintf('Component ID cannot contain slashes: %s', $plugin_id);
       throw new InvalidComponentException($message);
     }
     $template = $plugin_definition['template'] ?? NULL;
     if (!$template) {
-      $message = sprintf(
+      $message = \sprintf(
         'Unable to find the Twig template for the component "%s".',
         $plugin_id
       );
@@ -85,8 +85,8 @@ class Component extends PluginBase {
    */
   public function getLibraryName(): string {
     $library_id = $this->getPluginId();
-    $library_id = str_replace(':', '--', $library_id);
-    return sprintf('core/components.%s', $library_id);
+    $library_id = \str_replace(':', '--', $library_id);
+    return \sprintf('core/components.%s', $library_id);
   }
 
 }

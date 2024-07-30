@@ -214,7 +214,7 @@ class TermTest extends MigrateSqlSourceTestBase {
     $tests[3]['source_data'] = $tests[0]['source_data'];
     $tests[3]['expected_data'] = $tests[0]['expected_data'];
     // Remove the last element because it is for vid 3.
-    array_pop($tests[3]['expected_data']);
+    \array_pop($tests[3]['expected_data']);
     $tests[3]['expected_count'] = NULL;
     $tests[3]['configuration']['bundle'] = ['5', '6'];
 

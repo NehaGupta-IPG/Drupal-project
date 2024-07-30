@@ -49,7 +49,7 @@ class BatchController implements ContainerInjectionInterface {
    * @throws \Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException
    */
   public function batchPage(Request $request) {
-    $output = _batch_page($request);
+    $output = \_batch_page($request);
 
     if ($output === FALSE) {
       throw new AccessDeniedHttpException();
@@ -100,7 +100,7 @@ class BatchController implements ContainerInjectionInterface {
       return '';
     }
 
-    $current_set = _batch_current_set();
+    $current_set = \_batch_current_set();
     return !empty($current_set['title']) ? $current_set['title'] : '';
   }
 

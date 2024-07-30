@@ -116,7 +116,7 @@ class EntityUser extends EntityContentBase {
       $plugin_definition,
       $migration,
       $container->get('entity_type.manager')->getStorage($entity_type),
-      array_keys($container->get('entity_type.bundle.info')->getBundleInfo($entity_type)),
+      \array_keys($container->get('entity_type.bundle.info')->getBundleInfo($entity_type)),
       $container->get('entity_field.manager'),
       $container->get('plugin.manager.field.field_type'),
       $container->get('password'),
@@ -170,13 +170,13 @@ class EntityUser extends EntityContentBase {
     // uniqueness and a valid length.
     // @todo Remove this as part of https://www.drupal.org/node/3352288.
     $name = UserNameItem::generateSampleValue($field_definitions['name']);
-    $row->setDestinationProperty('name', reset($name));
+    $row->setDestinationProperty('name', \reset($name));
 
     // Email address is not defined as required in the base field definition but
     // is effectively required by the UserMailRequired constraint. This means
     // that Entity::processStubRow() did not populate it - we do it here.
     $mail = EmailItem::generateSampleValue($field_definitions['mail']);
-    $row->setDestinationProperty('mail', reset($mail));
+    $row->setDestinationProperty('mail', \reset($mail));
   }
 
   /**

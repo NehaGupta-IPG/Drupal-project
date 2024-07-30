@@ -39,7 +39,7 @@ class BooleanItem extends FieldItemBase implements OptionsProviderInterface {
    */
   public static function propertyDefinitions(FieldStorageDefinitionInterface $field_definition) {
     $properties['value'] = DataDefinition::create('boolean')
-      ->setLabel(t('Boolean value'))
+      ->setLabel(\t('Boolean value'))
       ->setRequired(TRUE);
 
     return $properties;
@@ -116,7 +116,7 @@ class BooleanItem extends FieldItemBase implements OptionsProviderInterface {
    * {@inheritdoc}
    */
   public static function generateSampleValue(FieldDefinitionInterface $field_definition) {
-    $values['value'] = mt_rand(0, 1);
+    $values['value'] = \mt_rand(0, 1);
     return $values;
   }
 

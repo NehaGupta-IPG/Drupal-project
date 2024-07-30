@@ -38,7 +38,7 @@ class Datelist extends DateElementBase {
       '#date_year_range' => '1900:2050',
       '#date_increment' => 1,
       '#date_date_callbacks' => [],
-      '#date_timezone' => date_default_timezone_get(),
+      '#date_timezone' => \date_default_timezone_get(),
     ];
   }
 
@@ -69,7 +69,7 @@ class Datelist extends DateElementBase {
           $date = DrupalDateTime::createFromArray($input, $element['#date_timezone']);
         }
         catch (\Exception) {
-          $form_state->setError($element, t('Selected combination of day and month is not valid.'));
+          $form_state->setError($element, \t('Selected combination of day and month is not valid.'));
         }
         if ($date instanceof DrupalDateTime && !$date->hasErrors()) {
           static::incrementRound($date, $increment);
@@ -77,7 +77,7 @@ class Datelist extends DateElementBase {
       }
     }
     else {
-      $return = array_fill_keys($parts, '');
+      $return = \array_fill_keys($parts, '');
       if (!empty($element['#default_value'])) {
         $date = $element['#default_value'];
         if ($date instanceof DrupalDateTime && !$date->hasErrors()) {
@@ -98,7 +98,7 @@ class Datelist extends DateElementBase {
                 break;
 
               case 'hour':
-                $format = in_array('ampm', $element['#date_part_order']) ? 'g' : 'G';
+                $format = \in_array('ampm', $element['#date_part_order']) ? 'g' : 'G';
                 break;
 
               case 'minute':
@@ -198,44 +198,44 @@ class Datelist extends DateElementBase {
         case 'day':
           $options = $date_helper->days($element['#required']);
           $format = 'j';
-          $title = t('Day');
+          $title = \t('Day');
           break;
 
         case 'month':
           $options = $date_helper->monthNamesAbbr($element['#required']);
           $format = 'n';
-          $title = t('Month');
+          $title = \t('Month');
           break;
 
         case 'year':
           $range = static::datetimeRangeYears($element['#date_year_range'], $date);
           $options = $date_helper->years($range[0], $range[1], $element['#required']);
           $format = 'Y';
-          $title = t('Year');
+          $title = \t('Year');
           break;
 
         case 'hour':
-          $format = in_array('ampm', $element['#date_part_order']) ? 'g' : 'G';
+          $format = \in_array('ampm', $element['#date_part_order']) ? 'g' : 'G';
           $options = $date_helper->hours($format, $element['#required']);
-          $title = t('Hour');
+          $title = \t('Hour');
           break;
 
         case 'minute':
           $format = 'i';
           $options = $date_helper->minutes($format, $element['#required'], $element['#date_increment']);
-          $title = t('Minute');
+          $title = \t('Minute');
           break;
 
         case 'second':
           $format = 's';
           $options = $date_helper->seconds($format, $element['#required'], $element['#date_increment']);
-          $title = t('Second');
+          $title = \t('Second');
           break;
 
         case 'ampm':
           $format = 'a';
           $options = $date_helper->ampm($element['#required']);
-          $title = t('AM/PM');
+          $title = \t('AM/PM');
           break;
 
         default:
@@ -244,15 +244,15 @@ class Datelist extends DateElementBase {
           $title = '';
       }
 
-      $default = isset($element['#value'][$part]) && trim($element['#value'][$part]) != '' ? $element['#value'][$part] : '';
+      $default = isset($element['#value'][$part]) && \trim($element['#value'][$part]) != '' ? $element['#value'][$part] : '';
       $value = $date instanceof DrupalDateTime && !$date->hasErrors() ? $date->format($format) : $default;
       if (!empty($value) && $part != 'ampm') {
-        $value = intval($value);
+        $value = \intval($value);
       }
 
       $element['#attributes']['title'] = $title;
       $element[$part] = [
-        '#type' => in_array($part, $text_parts) ? 'textfield' : 'select',
+        '#type' => \in_array($part, $text_parts) ? 'textfield' : 'select',
         '#title' => $title,
         '#value' => $value,
         '#attributes' => $element['#attributes'],
@@ -266,7 +266,7 @@ class Datelist extends DateElementBase {
     // Allows custom callbacks to alter the element.
     if (!empty($element['#date_date_callbacks'])) {
       foreach ($element['#date_date_callbacks'] as $callback) {
-        $message = sprintf('Datelist element #date_date_callbacks callbacks must be methods of a class that implements \Drupal\Core\Security\TrustedCallbackInterface or be an anonymous function. The callback was %s. See https://www.drupal.org/node/3217966', Variable::callableToString($callback));
+        $message = \sprintf('Datelist element #date_date_callbacks callbacks must be methods of a class that implements \Drupal\Core\Security\TrustedCallbackInterface or be an anonymous function. The callback was %s. See https://www.drupal.org/node/3217966', Variable::callableToString($callback));
         StaticTrustedCallbackHelper::callback($callback, [&$element, $form_state, $date], $message);
       }
     }
@@ -303,12 +303,12 @@ class Datelist extends DateElementBase {
       }
       // If there's empty input and the field is required, set an error.
       elseif (empty($input['year']) && empty($input['month']) && empty($input['day']) && $element['#required']) {
-        $form_state->setError($element, t('The %field date is required.', ['%field' => $title]));
+        $form_state->setError($element, \t('The %field date is required.', ['%field' => $title]));
       }
       elseif (!empty($all_empty)) {
         foreach ($all_empty as $value) {
-          $form_state->setError($element, t('The %field date is incomplete.', ['%field' => $title]));
-          $form_state->setError($element[$value], t('A value must be selected for %part.', ['%part' => $value]));
+          $form_state->setError($element, \t('The %field date is incomplete.', ['%field' => $title]));
+          $form_state->setError($element[$value], \t('A value must be selected for %part.', ['%part' => $value]));
         }
       }
       else {
@@ -319,7 +319,7 @@ class Datelist extends DateElementBase {
         }
         // If the input is invalid and an error doesn't exist, set one.
         elseif ($form_state->getError($element) === NULL) {
-          $form_state->setError($element, t('The %field date is invalid.', ['%field' => $title]));
+          $form_state->setError($element, \t('The %field date is invalid.', ['%field' => $title]));
         }
       }
     }
@@ -367,15 +367,15 @@ class Datelist extends DateElementBase {
   protected static function incrementRound(&$date, $increment) {
     // Round minutes and seconds, if necessary.
     if ($date instanceof DrupalDateTime && $increment > 1) {
-      $day = intval($date->format('j'));
-      $hour = intval($date->format('H'));
-      $second = intval(round(intval($date->format('s')) / $increment) * $increment);
-      $minute = intval($date->format('i'));
+      $day = \intval($date->format('j'));
+      $hour = \intval($date->format('H'));
+      $second = \intval(\round(\intval($date->format('s')) / $increment) * $increment);
+      $minute = \intval($date->format('i'));
       if ($second == 60) {
         $minute += 1;
         $second = 0;
       }
-      $minute = intval(round($minute / $increment) * $increment);
+      $minute = \intval(\round($minute / $increment) * $increment);
       if ($minute == 60) {
         $hour += 1;
         $minute = 0;

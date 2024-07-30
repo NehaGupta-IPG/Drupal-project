@@ -55,7 +55,7 @@ class CommentLinksTest extends CommentTestBase {
     // Remove additional user permissions from $this->webUser added by setUp(),
     // since this test is limited to anonymous and authenticated roles only.
     $roles = $this->webUser->getRoles();
-    \Drupal::entityTypeManager()->getStorage('user_role')->load(reset($roles))->delete();
+    \Drupal::entityTypeManager()->getStorage('user_role')->load(\reset($roles))->delete();
 
     // Create a comment via CRUD API functionality, since
     // $this->postComment() relies on actual user permissions.
@@ -97,7 +97,7 @@ class CommentLinksTest extends CommentTestBase {
       'skip comment approval' => 1,
       'edit own comments' => 1,
     ];
-    user_role_change_permissions(RoleInterface::ANONYMOUS_ID, $perms);
+    \user_role_change_permissions(RoleInterface::ANONYMOUS_ID, $perms);
 
     $nid = $this->node->id();
 
@@ -123,7 +123,7 @@ class CommentLinksTest extends CommentTestBase {
     $this->drupalGet($this->node->toUrl());
     $element = $this->cssSelect('article.js-comment > div');
     // Get last child element.
-    $element = end($element);
+    $element = \end($element);
     $this->assertSame('div', $element->getTagName(), 'Last element is comment body.');
 
     // Change weight to make links go after comment body.
@@ -133,7 +133,7 @@ class CommentLinksTest extends CommentTestBase {
     $this->drupalGet($this->node->toUrl());
     $element = $this->cssSelect('article.js-comment > div');
     // Get last child element.
-    $element = end($element);
+    $element = \end($element);
     $this->assertNotEmpty($element->find('css', 'ul.links'), 'Last element is comment links.');
 
     // Make sure we can hide node links.

@@ -49,7 +49,7 @@ class ProfileField extends DrupalSqlBase {
   public function prepareRow(Row $row) {
     if ($row->getSourceProperty('type') == 'selection') {
       // Get the current options.
-      $current_options = preg_split("/[\r\n]+/", $row->getSourceProperty('options'));
+      $current_options = \preg_split("/[\r\n]+/", $row->getSourceProperty('options'));
       // Select the list values from the profile_values table to ensure we get
       // them all since they can get out of sync with profile_fields.
       $options = $this->select($this->valueTable, 'pv')
@@ -58,9 +58,9 @@ class ProfileField extends DrupalSqlBase {
         ->condition('fid', $row->getSourceProperty('fid'))
         ->execute()
         ->fetchCol();
-      $options = array_merge($current_options, $options);
+      $options = \array_merge($current_options, $options);
       // array_combine() takes care of any duplicates options.
-      $row->setSourceProperty('options', array_combine($options, $options));
+      $row->setSourceProperty('options', \array_combine($options, $options));
     }
 
     if ($row->getSourceProperty('type') == 'checkbox') {

@@ -90,7 +90,7 @@ class LanguageNegotiationUrlTest extends UnitTestCase {
   public function testPathPrefix($prefix, $prefixes, $expected_langcode): void {
     $this->languageManager->expects($this->any())
       ->method('getCurrentLanguage')
-      ->willReturn($this->languages[(in_array($expected_langcode, [
+      ->willReturn($this->languages[(\in_array($expected_langcode, [
         'en',
         'de',
       ])) ? $expected_langcode : 'en']);
@@ -389,7 +389,7 @@ class LanguageNegotiationUrlTest extends UnitTestCase {
 // @todo Remove as part of https://www.drupal.org/node/2481833.
 namespace Drupal\language\Plugin\LanguageNegotiation;
 
-if (!function_exists('base_path')) {
+if (!\function_exists('base_path')) {
 
   /**
    * Returns the base path.

@@ -41,7 +41,7 @@ trait EntityTranslationRenderTrait {
         $this->entityTranslationRenderer = new $class($view, $this->getLanguageManager(), $entity_type);
       }
       else {
-        if (str_contains($rendering_language, '***LANGUAGE_')) {
+        if (\str_contains($rendering_language, '***LANGUAGE_')) {
           $langcode = PluginBase::queryLanguageSubstitutions()[$rendering_language];
         }
         else {
@@ -72,7 +72,7 @@ trait EntityTranslationRenderTrait {
     // belonging to a single row, even if they are attached to different entity
     // types. Below we apply language fallback to ensure a valid value is always
     // picked.
-    if ($entity instanceof TranslatableInterface && count($entity->getTranslationLanguages()) > 1) {
+    if ($entity instanceof TranslatableInterface && \count($entity->getTranslationLanguages()) > 1) {
       $langcode = $this->getEntityTranslationRenderer()->getLangcodeByRelationship($row, $relationship);
       $translation = $this->getEntityRepository()->getTranslationFromContext($entity, $langcode);
     }

@@ -35,10 +35,10 @@ class Percentage {
     else {
       // We add a new digit at 200, 2000, etc. (since, for example, 199/200
       // would round up to 100% if we didn't).
-      $decimal_places = max(0, floor(log10($total / 2.0)) - 1);
+      $decimal_places = \max(0, \floor(\log10($total / 2.0)) - 1);
       do {
         // Calculate the percentage to the specified number of decimal places.
-        $percentage = sprintf('%01.' . $decimal_places . 'f', round($current / $total * 100, $decimal_places));
+        $percentage = \sprintf('%01.' . $decimal_places . 'f', \round($current / $total * 100, $decimal_places));
         // When $current is an integer, the above calculation will always be
         // correct. However, if $current is a floating point number (in the case
         // of a multi-step batch operation that is not yet complete),

@@ -265,14 +265,14 @@ class ActiveLinkResponseFilterTest extends UnitTestCase {
 
     // Loop over the surrounding HTML variations.
     $data = [];
-    for ($h = 0; $h < count($html); $h++) {
+    for ($h = 0; $h < \count($html); $h++) {
       $html_prefix = $html[$h]['prefix'];
       $html_suffix = $html[$h]['suffix'];
       // Loop over the tag variations.
-      for ($t = 0; $t < count($tags); $t++) {
+      for ($t = 0; $t < \count($tags); $t++) {
         $tag = $tags[$t];
         // Loop over the tag contents variations.
-        for ($c = 0; $c < count($contents); $c++) {
+        for ($c = 0; $c < \count($contents); $c++) {
           $tag_content = $contents[$c];
 
           $create_markup = function (Attribute $attributes) use ($html_prefix, $html_suffix, $tag, $tag_content) {
@@ -280,7 +280,7 @@ class ActiveLinkResponseFilterTest extends UnitTestCase {
           };
 
           // Loop over the situations.
-          for ($s = 0; $s < count($situations); $s++) {
+          for ($s = 0; $s < \count($situations); $s++) {
             $situation = $situations[$s];
 
             // Attribute hreflang allowed only in a tag.

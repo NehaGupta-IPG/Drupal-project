@@ -99,7 +99,7 @@ class DynamicLocalTasks extends DeriverBase implements ContainerDeriverInterface
     }
 
     // Add the latest version tab to entities.
-    $latest_version_entities = array_filter($this->entityTypeManager->getDefinitions(), function (EntityTypeInterface $type) {
+    $latest_version_entities = \array_filter($this->entityTypeManager->getDefinitions(), function (EntityTypeInterface $type) {
       return $this->moderationInfo->canModerateEntitiesOfEntityType($type) && $type->hasLinkTemplate('latest-version');
     });
 

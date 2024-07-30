@@ -112,15 +112,15 @@ class FilePathTest extends MigrateUpgradeTestBase {
 
     // Set the source db variables.
     $this->sourceDatabase->update('variable')
-      ->fields(['value' => serialize($file_private_path)])
+      ->fields(['value' => \serialize($file_private_path)])
       ->condition('name', 'file_private_path')
       ->execute();
     $this->sourceDatabase->update('variable')
-      ->fields(['value' => serialize($file_public_path)])
+      ->fields(['value' => \serialize($file_public_path)])
       ->condition('name', 'file_public_path')
       ->execute();
     $this->sourceDatabase->update('variable')
-      ->fields(['value' => serialize($file_temporary_path)])
+      ->fields(['value' => \serialize($file_temporary_path)])
       ->condition('name', 'file_temporary_path')
       ->execute();
 
@@ -131,14 +131,14 @@ class FilePathTest extends MigrateUpgradeTestBase {
     // database settings. This supports all of the databases we test against.
     $drivers = Database::getDriverList()->getInstallableList();
     $form = $drivers[$driver]->getInstallTasks()->getFormOptions($connection_options);
-    $connection_options = array_intersect_key($connection_options, $form + $form['advanced_options']);
+    $connection_options = \array_intersect_key($connection_options, $form + $form['advanced_options']);
     // Remove isolation_level since that option is not configurable in the UI.
     unset($connection_options['isolation_level']);
     $edit = [
       $driver => $connection_options,
       'version' => '7',
     ];
-    if (count($drivers) !== 1) {
+    if (\count($drivers) !== 1) {
       $edit['driver'] = $driver;
     }
     // Set the public and private base paths for the Credential Form.
@@ -153,9 +153,9 @@ class FilePathTest extends MigrateUpgradeTestBase {
 
     // The migrations are now in store - remove all but the file migrations.
     $store = \Drupal::service('tempstore.private')->get('migrate_drupal_ui');
-    $migration_array = array_intersect_key(
+    $migration_array = \array_intersect_key(
       $store->get('migrations'),
-      array_flip(['d7_file', 'd7_file_private'])
+      \array_flip(['d7_file', 'd7_file_private'])
     );
     $store->set('migrations', $migration_array);
 
@@ -229,25 +229,25 @@ class FilePathTest extends MigrateUpgradeTestBase {
   protected function makeFiles(): void {
     // Get file information from the source database.
     foreach ($this->getManagedFiles() as $file) {
-      $this->assertSame(1, preg_match('/^(private|public|temporary):/', $file['uri'], $matches));
+      $this->assertSame(1, \preg_match('/^(private|public|temporary):/', $file['uri'], $matches));
       $scheme = $matches[1];
       $path = $this->sourceFileScheme[$scheme] ?? '';
-      $filepath = implode('/', [
+      $filepath = \implode('/', [
         $this->getSourcePath($scheme),
         $path,
         $file['filename'],
       ]);
       // Create the file.
-      $source_file = @fopen($filepath, 'w');
+      $source_file = @\fopen($filepath, 'w');
       if (!$source_file) {
         // If fopen didn't work, make sure there's a writable directory in
         // place.
         $dir = $this->fs->dirname($filepath);
         $this->fs->prepareDirectory($dir, FileSystemInterface:: CREATE_DIRECTORY | FileSystemInterface::MODIFY_PERMISSIONS);
         // Let's try that fopen again.
-        $source_file = @fopen($filepath, 'w');
+        $source_file = @\fopen($filepath, 'w');
       }
-      fwrite($source_file, '42');
+      \fwrite($source_file, '42');
     }
   }
 

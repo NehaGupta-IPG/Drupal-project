@@ -62,7 +62,7 @@ class PhpMail implements MailInterface {
    */
   public function format(array $message) {
     // Join the body array into one string.
-    $message['body'] = implode("\n\n", $message['body']);
+    $message['body'] = \implode("\n\n", $message['body']);
 
     // Convert any HTML to plain text (which also wraps the mail body).
     $message['body'] = MailFormatHelper::htmlToText($message['body']);
@@ -86,7 +86,7 @@ class PhpMail implements MailInterface {
     // If 'Return-Path' isn't already set in php.ini, we pass it separately
     // as an additional parameter instead of in the header.
     if (isset($message['headers']['Return-Path'])) {
-      $return_path_set = strpos(ini_get('sendmail_path'), ' -f');
+      $return_path_set = \strpos(\ini_get('sendmail_path'), ' -f');
       if (!$return_path_set) {
         $message['Return-Path'] = $message['headers']['Return-Path'];
         unset($message['headers']['Return-Path']);
@@ -95,7 +95,7 @@ class PhpMail implements MailInterface {
 
     $headers = new Headers();
     foreach ($message['headers'] as $name => $value) {
-      if (in_array(strtolower($name), self::MAILBOX_LIST_HEADERS, TRUE)) {
+      if (\in_array(\strtolower($name), self::MAILBOX_LIST_HEADERS, TRUE)) {
         // Split values by comma, but ignore commas encapsulated in double
         // quotes.
         $value = str_getcsv($value, escape: '\\');
@@ -109,10 +109,10 @@ class PhpMail implements MailInterface {
     // on Unix and CRLF on Windows. Drupal automatically guesses the
     // line-ending format appropriate for your system. If you need to
     // override this, adjust $settings['mail_line_endings'] in settings.php.
-    $mail_body = preg_replace('@\r?\n@', $line_endings, $message['body']);
+    $mail_body = \preg_replace('@\r?\n@', $line_endings, $message['body']);
     $mail_headers = $headers->toString();
 
-    if (!$this->request->server->has('WINDIR') && !str_contains($this->request->server->get('SERVER_SOFTWARE'), 'Win32')) {
+    if (!$this->request->server->has('WINDIR') && !\str_contains($this->request->server->get('SERVER_SOFTWARE'), 'Win32')) {
       // On most non-Windows systems, the "-f" option to the sendmail command
       // is used to set the Return-Path. There is no space between -f and
       // the value of the return path.
@@ -131,15 +131,15 @@ class PhpMail implements MailInterface {
     else {
       // On Windows, PHP will use the value of sendmail_from for the
       // Return-Path header.
-      $old_from = ini_get('sendmail_from');
-      ini_set('sendmail_from', $message['Return-Path']);
+      $old_from = \ini_get('sendmail_from');
+      \ini_set('sendmail_from', $message['Return-Path']);
       $mail_result = $this->doMail(
         $message['to'],
         $mail_subject,
         $mail_body,
         $mail_headers
       );
-      ini_set('sendmail_from', $old_from);
+      \ini_set('sendmail_from', $old_from);
     }
 
     return $mail_result;
@@ -166,7 +166,7 @@ class PhpMail implements MailInterface {
    * @see mail()
    */
   protected function doMail(string $to, string $subject, string $message, array|string $additional_headers = [], string $additional_params = ''): bool {
-    return @mail(
+    return @\mail(
       $to,
       $subject,
       $message,
@@ -195,10 +195,10 @@ class PhpMail implements MailInterface {
    *   location for this helper.
    */
   protected static function _isShellSafe($string) {
-    if (escapeshellcmd($string) !== $string || !in_array(escapeshellarg($string), ["'$string'", "\"$string\""])) {
+    if (\escapeshellcmd($string) !== $string || !\in_array(\escapeshellarg($string), ["'$string'", "\"$string\""])) {
       return FALSE;
     }
-    if (preg_match('/[^a-zA-Z0-9@_\-.]/', $string) !== 0) {
+    if (\preg_match('/[^a-zA-Z0-9@_\-.]/', $string) !== 0) {
       return FALSE;
     }
     return TRUE;

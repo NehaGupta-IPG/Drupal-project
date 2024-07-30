@@ -75,7 +75,7 @@ final class EntityMethod implements ConfigActionPluginInterface, ContainerFactor
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition): static {
-    assert(is_array($plugin_definition) && is_array($plugin_definition['constructor_args']), '$plugin_definition contains the expected settings');
+    \assert(\is_array($plugin_definition) && \is_array($plugin_definition['constructor_args']), '$plugin_definition contains the expected settings');
     return new static(
       $plugin_id,
       $container->get('config.manager'),
@@ -109,8 +109,8 @@ final class EntityMethod implements ConfigActionPluginInterface, ContainerFactor
    *   The unsaved entity with the action applied.
    */
   private function applyPluralized(ConfigEntityInterface $entity, mixed $values): ConfigEntityInterface {
-    if (!is_array($values)) {
-      throw new EntityMethodException(sprintf('The pluralized entity method config action \'%s\' requires an array value in order to call %s::%s() multiple times', $this->pluginId, $entity->getEntityType()->getClass(), $this->method));
+    if (!\is_array($values)) {
+      throw new EntityMethodException(\sprintf('The pluralized entity method config action \'%s\' requires an array value in order to call %s::%s() multiple times', $this->pluginId, $entity->getEntityType()->getClass(), $this->method));
     }
     foreach ($values as $value) {
       $entity = $this->applySingle($entity, $value);
@@ -134,9 +134,9 @@ final class EntityMethod implements ConfigActionPluginInterface, ContainerFactor
     // number of parameters or required parameters is 1. If there is only 1
     // parameter and $value is an array then assume that the parameter expects
     // an array.
-    if (!is_array($value) || $this->numberOfParams === 1) {
+    if (!\is_array($value) || $this->numberOfParams === 1) {
       if ($this->numberOfRequiredParams !== 1 && $this->numberOfParams !== 1) {
-        throw new EntityMethodException(sprintf('Entity method config action \'%s\' requires an array value. The number of parameters or required parameters for %s::%s() is not 1', $this->pluginId, $entity->getEntityType()->getClass(), $this->method));
+        throw new EntityMethodException(\sprintf('Entity method config action \'%s\' requires an array value. The number of parameters or required parameters for %s::%s() is not 1', $this->pluginId, $entity->getEntityType()->getClass(), $this->method));
       }
       $result = $entity->{$this->method}($value);
     }

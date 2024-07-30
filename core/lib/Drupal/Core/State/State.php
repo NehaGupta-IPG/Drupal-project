@@ -63,7 +63,7 @@ class State extends CacheCollector implements StateInterface {
     // deprecation message about it.
     if (isset(self::$deprecatedState[$key])) {
       // phpcs:ignore Drupal.Semantics.FunctionTriggerError
-      @trigger_error(self::$deprecatedState[$key]['message'], E_USER_DEPRECATED);
+      @\trigger_error(self::$deprecatedState[$key]['message'], E_USER_DEPRECATED);
       $key = self::$deprecatedState[$key]['replacement'];
     }
     return parent::get($key) ?? $default;
@@ -97,7 +97,7 @@ class State extends CacheCollector implements StateInterface {
   public function set($key, $value) {
     if (isset(self::$deprecatedState[$key])) {
       // phpcs:ignore Drupal.Semantics.FunctionTriggerError
-      @trigger_error(self::$deprecatedState[$key]['message'], E_USER_DEPRECATED);
+      @\trigger_error(self::$deprecatedState[$key]['message'], E_USER_DEPRECATED);
       $key = self::$deprecatedState[$key]['replacement'];
     }
     $this->registerKeySetDuringRequest($key, $value, parent::get($key));

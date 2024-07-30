@@ -15,7 +15,7 @@ class IpCacheContext extends RequestStackCacheContextBase implements CacheContex
    * {@inheritdoc}
    */
   public static function getLabel() {
-    return t('IP address');
+    return \t('IP address');
   }
 
   /**

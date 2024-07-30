@@ -69,7 +69,7 @@ class NodeAccessTest extends ModerationStateTestBase {
 
     // Rebuild permissions because hook_node_grants() is implemented by the
     // node_access_test_empty module.
-    node_access_rebuild();
+    \node_access_rebuild();
   }
 
   /**

@@ -93,7 +93,7 @@ class ContactFormEditForm extends EntityForm implements ContainerInjectionInterf
     $form['recipients'] = [
       '#type' => 'textarea',
       '#title' => $this->t('Recipients'),
-      '#default_value' => implode(', ', $contact_form->getRecipients()),
+      '#default_value' => \implode(', ', $contact_form->getRecipients()),
       '#description' => $this->t("Example: 'webmaster@example.com' or 'sales@example.com,support@example.com' . To specify multiple recipients, separate each email address with a comma."),
       '#required' => TRUE,
     ];
@@ -138,10 +138,10 @@ class ContactFormEditForm extends EntityForm implements ContainerInjectionInterf
     parent::validateForm($form, $form_state);
 
     // Validate and each email recipient.
-    $recipients = explode(',', $form_state->getValue('recipients'));
+    $recipients = \explode(',', $form_state->getValue('recipients'));
 
     foreach ($recipients as &$recipient) {
-      $recipient = trim($recipient);
+      $recipient = \trim($recipient);
       if (!$this->emailValidator->isValid($recipient)) {
         $form_state->setErrorByName('recipients', $this->t('%recipient is an invalid email address.', ['%recipient' => $recipient]));
       }
@@ -149,7 +149,7 @@ class ContactFormEditForm extends EntityForm implements ContainerInjectionInterf
     $form_state->setValue('recipients', $recipients);
     $redirect_url = $form_state->getValue('redirect');
     if ($redirect_url && $this->pathValidator->isValid($redirect_url)) {
-      if (mb_substr($redirect_url, 0, 1) !== '/') {
+      if (\mb_substr($redirect_url, 0, 1) !== '/') {
         $form_state->setErrorByName('redirect', $this->t('The path should start with /.'));
       }
     }

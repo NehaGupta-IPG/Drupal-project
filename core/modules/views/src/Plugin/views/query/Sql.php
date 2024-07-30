@@ -350,7 +350,7 @@ class Sql extends QueryPluginBase {
       '#type' => 'textfield',
       '#title' => $this->t('Query Tags'),
       '#description' => $this->t('If set, these tags will be appended to the query and can be used to identify the query in a module. This can be helpful for altering queries.'),
-      '#default_value' => implode(', ', $this->options['query_tags']),
+      '#default_value' => \implode(', ', $this->options['query_tags']),
       '#element_validate' => ['views_element_validate_tags'],
     ];
   }
@@ -364,10 +364,10 @@ class Sql extends QueryPluginBase {
     // When toggling a display to override defaults or vice-versa the submit
     // handler gets invoked twice, and we don't want to bash the values from the
     // original call.
-    if (is_array($value)) {
+    if (\is_array($value)) {
       return;
     }
-    $value = array_filter(array_map('trim', explode(',', $value)));
+    $value = \array_filter(\array_map('trim', \explode(',', $value)));
     $form_state->setValueForElement($element, $value);
   }
 
@@ -405,7 +405,7 @@ class Sql extends QueryPluginBase {
     if (empty($link_point)) {
       $link_point = $this->view->storage->get('base_table');
     }
-    elseif (!array_key_exists($link_point, $this->relationships)) {
+    elseif (!\array_key_exists($link_point, $this->relationships)) {
       return FALSE;
     }
 
@@ -524,7 +524,7 @@ class Sql extends QueryPluginBase {
       $relationship = $this->view->storage->get('base_table');
     }
 
-    if (!array_key_exists($relationship, $this->relationships)) {
+    if (!\array_key_exists($relationship, $this->relationships)) {
       return FALSE;
     }
 
@@ -638,7 +638,7 @@ class Sql extends QueryPluginBase {
       return $this->tables[$relationship][$table]['alias'];
     }
 
-    if (!array_key_exists($relationship, $this->relationships)) {
+    if (!\array_key_exists($relationship, $this->relationships)) {
       return FALSE;
     }
 
@@ -708,7 +708,7 @@ class Sql extends QueryPluginBase {
       $relationship = $this->view->storage->get('base_table');
     }
 
-    if (!array_key_exists($relationship, $this->relationships)) {
+    if (!\array_key_exists($relationship, $this->relationships)) {
       return FALSE;
     }
 
@@ -728,7 +728,7 @@ class Sql extends QueryPluginBase {
       ($join && $join->leftTable == $this->relationships[$relationship]['table'])) {
 
       // Make sure that we're linking to the correct table for our relationship.
-      foreach (array_reverse($add) as $table => $path_join) {
+      foreach (\array_reverse($add) as $table => $path_join) {
         $this->queueTable($table, $relationship, $this->adjustJoin($path_join, $relationship));
       }
       return TRUE;
@@ -1102,7 +1102,7 @@ class Sql extends QueryPluginBase {
 
     $this->orderby[] = [
       'field' => $as,
-      'direction' => strtoupper($order),
+      'direction' => \strtoupper($order),
     ];
   }
 
@@ -1114,7 +1114,7 @@ class Sql extends QueryPluginBase {
    */
   public function addGroupBy($clause) {
     // Only add it if it's not already in there.
-    if (!in_array($clause, $this->groupby)) {
+    if (!\in_array($clause, $this->groupby)) {
       $this->groupby[] = $clause;
     }
   }
@@ -1282,7 +1282,7 @@ class Sql extends QueryPluginBase {
 
       if (!empty($field['function'])) {
         $info = $this->getAggregationInfo();
-        if (!empty($info[$field['function']]['method']) && is_callable([$this, $info[$field['function']]['method']])) {
+        if (!empty($info[$field['function']]['method']) && \is_callable([$this, $info[$field['function']]['method']])) {
           $string = $this::{$info[$field['function']]['method']}($field['function'], $string);
           $placeholders = !empty($field['placeholders']) ? $field['placeholders'] : [];
           $query->addExpression($string, $fieldname, $placeholders);
@@ -1295,7 +1295,7 @@ class Sql extends QueryPluginBase {
         $placeholders = !empty($field['placeholders']) ? $field['placeholders'] : [];
         $query->addExpression($string, $fieldname, $placeholders);
       }
-      elseif ($this->distinct && !in_array($fieldname, $this->groupby)) {
+      elseif ($this->distinct && !\in_array($fieldname, $this->groupby)) {
         $query->addField(!empty($field['table']) ? $field['table'] : $this->view->storage->get('base_table'), $field['field'], $fieldname);
       }
       elseif (empty($field['aggregate'])) {
@@ -1376,7 +1376,7 @@ class Sql extends QueryPluginBase {
 
     // Add all the tables to the query via joins. We assume all LEFT joins.
     foreach ($this->tableQueue as $table) {
-      if (is_object($table['join'])) {
+      if (\is_object($table['join'])) {
         $table['join']->buildJoin($query, $table, $this);
       }
     }
@@ -1384,7 +1384,7 @@ class Sql extends QueryPluginBase {
     // Assemble the groupby clause, if any.
     $this->hasAggregate = FALSE;
     $non_aggregates = $this->getNonAggregates();
-    if (count($this->having)) {
+    if (\count($this->having)) {
       $this->hasAggregate = TRUE;
     }
     elseif (!$this->hasAggregate) {
@@ -1393,7 +1393,7 @@ class Sql extends QueryPluginBase {
     }
     $groupby = [];
     if ($this->hasAggregate && (!empty($this->groupby) || !empty($non_aggregates))) {
-      $groupby = array_unique(array_merge($this->groupby, $non_aggregates));
+      $groupby = \array_unique(\array_merge($this->groupby, $non_aggregates));
     }
 
     // Make sure each entity table has the base field added so that the
@@ -1473,7 +1473,7 @@ class Sql extends QueryPluginBase {
    * Get the arguments attached to the WHERE and HAVING clauses of this query.
    */
   public function getWhereArgs() {
-    return array_merge(...array_column($this->where, 'args'), ...array_column($this->having, 'args'));
+    return \array_merge(...\array_column($this->where, 'args'), ...\array_column($this->having, 'args'));
   }
 
   /**
@@ -1555,7 +1555,7 @@ class Sql extends QueryPluginBase {
         // $count_query->where('1 = 1', $additional_arguments);
       }
 
-      $start = microtime(TRUE);
+      $start = \microtime(TRUE);
 
       try {
         if ($view->pager->useCountQuery() || !empty($view->get_total_rows)) {
@@ -1577,8 +1577,8 @@ class Sql extends QueryPluginBase {
         $result->setFetchMode(FetchAs::ClassObject, 'Drupal\views\ResultRow');
 
         // Setup the result row objects.
-        $view->result = iterator_to_array($result);
-        array_walk($view->result, function (ResultRow $row, $index) {
+        $view->result = \iterator_to_array($result);
+        \array_walk($view->result, function (ResultRow $row, $index) {
           $row->index = $index;
         });
 
@@ -1601,9 +1601,9 @@ class Sql extends QueryPluginBase {
 
     }
     else {
-      $start = microtime(TRUE);
+      $start = \microtime(TRUE);
     }
-    $view->execute_time = microtime(TRUE) - $start;
+    $view->execute_time = \microtime(TRUE) - $start;
   }
 
   /**
@@ -1660,9 +1660,9 @@ class Sql extends QueryPluginBase {
     // Load all entities and assign them to the correct result row.
     foreach ($entity_ids_by_type as $entity_type => $ids) {
       $entity_storage = $this->entityTypeManager->getStorage($entity_type);
-      $flat_ids = iterator_to_array(new \RecursiveIteratorIterator(new \RecursiveArrayIterator($ids)), FALSE);
+      $flat_ids = \iterator_to_array(new \RecursiveIteratorIterator(new \RecursiveArrayIterator($ids)), FALSE);
 
-      $entities = $entity_storage->loadMultiple(array_unique($flat_ids));
+      $entities = $entity_storage->loadMultiple(\array_unique($flat_ids));
       $results = $this->assignEntitiesToResult($ids, $entities, $results);
     }
 
@@ -1864,15 +1864,15 @@ class Sql extends QueryPluginBase {
    * Builds a simple SQL expression.
    */
   public function aggregationMethodSimple($group_type, $field) {
-    return strtoupper($group_type) . '(' . $field . ')';
+    return \strtoupper($group_type) . '(' . $field . ')';
   }
 
   /**
    * Builds a SQL expression using DISTINCT.
    */
   public function aggregationMethodDistinct($group_type, $field) {
-    $group_type = str_replace('_distinct', '', $group_type);
-    return strtoupper($group_type) . '(DISTINCT ' . $field . ')';
+    $group_type = \str_replace('_distinct', '', $group_type);
+    return \strtoupper($group_type) . '(DISTINCT ' . $field . ')';
   }
 
   /**

@@ -109,7 +109,7 @@ class OEmbedForm extends AddFormBase {
         '@type' => $this->getMediaType($form_state)->label(),
       ]),
       '#description' => $this->t('Allowed providers: @providers.', [
-        '@providers' => implode(', ', $providers),
+        '@providers' => \implode(', ', $providers),
       ]),
       '#required' => TRUE,
       '#attributes' => [

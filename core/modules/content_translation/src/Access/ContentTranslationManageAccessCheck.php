@@ -77,7 +77,7 @@ class ContentTranslationManageAccessCheck implements AccessInterface {
 
       $entity_type = $this->entityTypeManager->getDefinition($entity_type_id);
 
-      if (in_array($operation, ['update', 'delete'])) {
+      if (\in_array($operation, ['update', 'delete'])) {
         // Translation operations cannot be performed on the default
         // translation.
         if ($language->getId() == $entity->getUntranslated()->language()->getId()) {

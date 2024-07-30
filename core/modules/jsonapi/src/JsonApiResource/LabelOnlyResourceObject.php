@@ -66,7 +66,7 @@ final class LabelOnlyResourceObject extends ResourceObject {
   protected static function extractFieldsFromEntity(ResourceType $resource_type, EntityInterface $entity) {
     $fields = parent::extractFieldsFromEntity($resource_type, $entity);
     $public_label_field_name = $resource_type->getPublicName(static::getLabelFieldName($entity));
-    return array_intersect_key($fields, [$public_label_field_name => TRUE]);
+    return \array_intersect_key($fields, [$public_label_field_name => TRUE]);
   }
 
 }

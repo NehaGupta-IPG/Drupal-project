@@ -34,20 +34,20 @@ class ManyAssetsLoadOrderTest extends BrowserTestBase {
     $this->drupalGet('many_assets_test');
 
     $js = $this->getSession()->getPage()->findAll('css', 'script[data-weight]');
-    $js_files = array_map(fn ($item) => $item->getAttribute('data-weight'), $js);
-    $this->assertGreaterThan(0, count($js_files));
+    $js_files = \array_map(fn ($item) => $item->getAttribute('data-weight'), $js);
+    $this->assertGreaterThan(0, \count($js_files));
     $js_files_sorted = $js_files;
-    asort($js_files_sorted);
+    \asort($js_files_sorted);
 
     // If the JavaScript files are loading in the proper order, the sorted array
     // should match the unsorted one.
     $this->assertSame($js_files_sorted, $js_files);
 
     $css = $this->getSession()->getPage()->findAll('css', 'link[data-weight]');
-    $css_files = array_map(fn($item) => $item->getAttribute('data-weight'), $css);
-    $this->assertGreaterThan(0, count($css_files));
+    $css_files = \array_map(fn($item) => $item->getAttribute('data-weight'), $css);
+    $this->assertGreaterThan(0, \count($css_files));
     $css_files_sorted = $css_files;
-    asort($css_files_sorted);
+    \asort($css_files_sorted);
 
     // If the CSS files are loading in the proper order, the sorted array should
     // match the unsorted one.

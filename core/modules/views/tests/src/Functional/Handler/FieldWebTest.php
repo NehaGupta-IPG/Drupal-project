@@ -114,14 +114,14 @@ class FieldWebTest extends ViewTestBase {
     $this->assertSession()->linkByHrefExists($href);
     // Check that the output has the expected order (asc).
     $ids = $this->clickSortLoadIdsFromOutput();
-    $this->assertEquals(range(1, 5), $ids);
+    $this->assertEquals(\range(1, 5), $ids);
     // Check that the rel attribute has the correct value.
     $this->assertSession()->elementAttributeContains('xpath', "//a[@href='$href']", 'rel', 'nofollow');
 
     $this->clickLink('ID Sort descending');
     // Check that the output has the expected order (desc).
     $ids = $this->clickSortLoadIdsFromOutput();
-    $this->assertEquals(range(5, 1, -1), $ids);
+    $this->assertEquals(\range(5, 1, -1), $ids);
   }
 
   /**
@@ -204,7 +204,7 @@ class FieldWebTest extends ViewTestBase {
    */
   protected function parseContent($content) {
     $htmlDom = Html::load($content);
-    $elements = simplexml_import_dom($htmlDom);
+    $elements = \simplexml_import_dom($htmlDom);
 
     return $elements;
   }
@@ -348,13 +348,13 @@ class FieldWebTest extends ViewTestBase {
     $output = (string) $renderer->executeInRenderContext(new RenderContext(), function () use ($id_field, $row) {
       return $id_field->theme($row);
     });
-    $this->assertSubString($output, str_replace(' ', '-', $path));
+    $this->assertSubString($output, \str_replace(' ', '-', $path));
     $id_field->options['alter']['replace_spaces'] = FALSE;
     $output = (string) $renderer->executeInRenderContext(new RenderContext(), function () use ($id_field, $row) {
       return $id_field->theme($row);
     });
     // The URL has a space in it, so to check we have to decode the URL output.
-    $this->assertSubString(urldecode($output), $path);
+    $this->assertSubString(\urldecode($output), $path);
 
     // Tests the external flag.
     // Switch on the external flag should output an external URL as well.
@@ -386,12 +386,12 @@ class FieldWebTest extends ViewTestBase {
     $output = (string) $renderer->executeInRenderContext(new RenderContext(), function () use ($id_field, $row) {
       return $id_field->theme($row);
     });
-    $this->assertSubString($output, strtoupper($path));
+    $this->assertSubString($output, \strtoupper($path));
     $id_field->options['alter']['path_case'] = 'lower';
     $output = (string) $renderer->executeInRenderContext(new RenderContext(), function () use ($id_field, $row) {
       return $id_field->theme($row);
     });
-    $this->assertSubString($output, strtolower($path));
+    $this->assertSubString($output, \strtolower($path));
 
     // Switch to ucfirst and ucwords.
     $id_field->options['alter']['path_case'] = 'ucfirst';
@@ -558,7 +558,7 @@ class FieldWebTest extends ViewTestBase {
       'marquee',
     ];
 
-    $this->assertEquals($expected_elements, array_keys($element_types));
+    $this->assertEquals($expected_elements, \array_keys($element_types));
   }
 
   /**
@@ -628,7 +628,7 @@ class FieldWebTest extends ViewTestBase {
     // Tests for simple trimming by string length.
     $row->views_test_data_name = $this->randomMachineName(8);
     $name_field->options['alter']['max_length'] = 5;
-    $trimmed_name = mb_substr($row->views_test_data_name, 0, 5);
+    $trimmed_name = \mb_substr($row->views_test_data_name, 0, 5);
 
     $output = (string) $renderer->executeInRenderContext(new RenderContext(), function () use ($name_field, $row) {
       return $name_field->advancedRender($row);

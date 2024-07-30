@@ -111,7 +111,7 @@ class MigrationPluginListTest extends KernelTestBase {
     // Any database-based source plugins should fail a requirements test in the
     // absence of a source database connection (e.g., a connection with the
     // 'migrate' key).
-    $source_plugins = array_map(function ($migration_plugin) {
+    $source_plugins = \array_map(function ($migration_plugin) {
       return $migration_plugin->getSourcePlugin();
     }, $migration_plugins);
     foreach ($source_plugins as $id => $source_plugin) {
@@ -151,7 +151,7 @@ class MigrationPluginListTest extends KernelTestBase {
       if ($source_plugin instanceof SqlBase) {
         $source_plugin->getDatabase();
       }
-      $this->assertNotEmpty(serialize($source_plugin));
+      $this->assertNotEmpty(\serialize($source_plugin));
     }
 
     $migration_plugins = $this->container->get('plugin.manager.migration')->getDefinitions();

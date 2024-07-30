@@ -54,7 +54,7 @@ class EntryPointTest extends BrowserTestBase {
     ];
     $this->assertTrue($response->hasHeader('X-Drupal-Cache-Contexts'));
     $optimized_expected_cache_contexts = \Drupal::service('cache_contexts_manager')->optimizeTokens($expected_cache_contexts);
-    $this->assertSame($optimized_expected_cache_contexts, explode(' ', $response->getHeader('X-Drupal-Cache-Contexts')[0]));
+    $this->assertSame($optimized_expected_cache_contexts, \explode(' ', $response->getHeader('X-Drupal-Cache-Contexts')[0]));
     $links = $document['links'];
     $this->assertMatchesRegularExpression('/.*\/jsonapi/', $links['self']['href']);
     $this->assertMatchesRegularExpression('/.*\/jsonapi\/user\/user/', $links['user--user']['href']);
@@ -63,7 +63,7 @@ class EntryPointTest extends BrowserTestBase {
 
     // A `me` link must be present for authenticated users.
     $user = $this->createUser();
-    $request_options[RequestOptions::HEADERS]['Authorization'] = 'Basic ' . base64_encode($user->name->value . ':' . $user->passRaw);
+    $request_options[RequestOptions::HEADERS]['Authorization'] = 'Basic ' . \base64_encode($user->name->value . ':' . $user->passRaw);
     $response = $this->request('GET', Url::fromUri('base://jsonapi'), $request_options);
     $document = $this->getDocumentFromResponse($response);
     $this->assertArrayHasKey('meta', $document);

@@ -104,10 +104,10 @@ class PermissionHandlerTest extends UnitTestCase {
       ]);
 
     $url = vfsStream::url('modules');
-    mkdir($url . '/module_a');
-    file_put_contents($url . '/module_a/module_a.permissions.yml', "access_module_a: single_description");
-    mkdir($url . '/module_b');
-    file_put_contents($url . '/module_b/module_b.permissions.yml', <<<EOF
+    \mkdir($url . '/module_a');
+    \file_put_contents($url . '/module_a/module_a.permissions.yml', "access_module_a: single_description");
+    \mkdir($url . '/module_b');
+    \file_put_contents($url . '/module_b/module_b.permissions.yml', <<<EOF
 'access module b':
   title: 'Access B'
   description: 'bla bla'
@@ -116,8 +116,8 @@ class PermissionHandlerTest extends UnitTestCase {
   provider: 'module_a'
 EOF
     );
-    mkdir($url . '/module_c');
-    file_put_contents($url . '/module_c/module_c.permissions.yml', <<<EOF
+    \mkdir($url . '/module_c');
+    \file_put_contents($url . '/module_c/module_c.permissions.yml', <<<EOF
 'access_module_c':
   title: 'Access C'
   description: 'bla bla'
@@ -128,7 +128,7 @@ EOF
 
     $this->moduleHandler->expects($this->any())
       ->method('getModuleList')
-      ->willReturn(array_flip($modules));
+      ->willReturn(\array_flip($modules));
 
     $this->callableResolver->expects($this->never())
       ->method('getCallableFromDefinition');
@@ -177,30 +177,30 @@ EOF
       ]);
 
     $url = vfsStream::url('modules');
-    mkdir($url . '/module_a');
-    file_put_contents($url . '/module_a/module_a.permissions.yml', <<<EOF
+    \mkdir($url . '/module_a');
+    \file_put_contents($url . '/module_a/module_a.permissions.yml', <<<EOF
 access_module_a2: single_description2
 access_module_a1: single_description1
 EOF
     );
-    mkdir($url . '/module_b');
-    file_put_contents($url . '/module_b/module_b.permissions.yml',
+    \mkdir($url . '/module_b');
+    \file_put_contents($url . '/module_b/module_b.permissions.yml',
       "access_module_a3: single_description"
     );
-    mkdir($url . '/module_c');
-    file_put_contents($url . '/module_c/module_c.permissions.yml',
+    \mkdir($url . '/module_c');
+    \file_put_contents($url . '/module_c/module_c.permissions.yml',
       "access_module_a4: single_description"
     );
 
     $modules = ['module_a', 'module_b', 'module_c'];
     $this->moduleHandler->expects($this->once())
       ->method('getModuleList')
-      ->willReturn(array_flip($modules));
+      ->willReturn(\array_flip($modules));
 
     $permissionHandler = new PermissionHandler($this->moduleHandler, $this->stringTranslation, $this->callableResolver, $module_extension_list);
     $actual_permissions = $permissionHandler->getPermissions();
     $this->assertEquals(['access_module_a4', 'access_module_a1', 'access_module_a2', 'access_module_a3'],
-      array_keys($actual_permissions));
+      \array_keys($actual_permissions));
   }
 
   /**
@@ -225,21 +225,21 @@ EOF
       ]);
 
     $url = vfsStream::url('modules');
-    mkdir($url . '/module_a');
-    file_put_contents($url . '/module_a/module_a.permissions.yml', <<<EOF
+    \mkdir($url . '/module_a');
+    \file_put_contents($url . '/module_a/module_a.permissions.yml', <<<EOF
 permission_callbacks:
   - 'Drupal\\user\\Tests\\TestPermissionCallbacks::singleDescription'
 EOF
     );
-    mkdir($url . '/module_b');
-    file_put_contents($url . '/module_b/module_b.permissions.yml', <<<EOF
+    \mkdir($url . '/module_b');
+    \file_put_contents($url . '/module_b/module_b.permissions.yml', <<<EOF
 permission_callbacks:
   - 'Drupal\\user\\Tests\\TestPermissionCallbacks::titleDescription'
   - 'Drupal\\user\\Tests\\TestPermissionCallbacks::titleProvider'
 EOF
     );
-    mkdir($url . '/module_c');
-    file_put_contents($url . '/module_c/module_c.permissions.yml', <<<EOF
+    \mkdir($url . '/module_c');
+    \file_put_contents($url . '/module_c/module_c.permissions.yml', <<<EOF
 permission_callbacks:
   - 'Drupal\\user\\Tests\\TestPermissionCallbacks::titleDescriptionRestrictAccess'
 EOF
@@ -249,7 +249,7 @@ EOF
 
     $this->moduleHandler->expects($this->any())
       ->method('getModuleList')
-      ->willReturn(array_flip($modules));
+      ->willReturn(\array_flip($modules));
 
     $this->callableResolver->expects($this->exactly(4))
       ->method('getCallableFromDefinition')
@@ -296,8 +296,8 @@ EOF
       ]);
 
     $url = vfsStream::url('modules');
-    mkdir($url . '/module_a');
-    file_put_contents($url . '/module_a/module_a.permissions.yml', <<<EOF
+    \mkdir($url . '/module_a');
+    \file_put_contents($url . '/module_a/module_a.permissions.yml', <<<EOF
 'access module a':
   title: 'Access A'
   description: 'bla bla'
@@ -310,7 +310,7 @@ EOF
 
     $this->moduleHandler->expects($this->any())
       ->method('getModuleList')
-      ->willReturn(array_flip($modules));
+      ->willReturn(\array_flip($modules));
 
     $this->callableResolver->expects($this->once())
       ->method('getCallableFromDefinition')

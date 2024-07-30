@@ -117,7 +117,7 @@ class InstallHelper implements ContainerInjectionInterface {
     $this->termIdMap = [];
     $this->mediaImageIdMap = [];
     $this->nodeIdMap = [];
-    $this->enabledLanguages = array_keys(\Drupal::languageManager()->getLanguages());
+    $this->enabledLanguages = \array_keys(\Drupal::languageManager()->getLanguages());
   }
 
   /**
@@ -190,7 +190,7 @@ class InstallHelper implements ContainerInjectionInterface {
           $keyed_content[$language][$line_counter] = array_combine($header, $content);
           $line_counter++;
         }
-        fclose($handle);
+        \fclose($handle);
       }
       else {
         // Language directory exists, but the file in this language was not
@@ -214,7 +214,7 @@ class InstallHelper implements ContainerInjectionInterface {
    *   Term ID, or 0 if Term ID could not be found.
    */
   protected function getTermId($vocabulary, $term_csv_id) {
-    if (array_key_exists($vocabulary, $this->termIdMap) && array_key_exists($term_csv_id, $this->termIdMap[$vocabulary])) {
+    if (\array_key_exists($vocabulary, $this->termIdMap) && \array_key_exists($term_csv_id, $this->termIdMap[$vocabulary])) {
       return $this->termIdMap[$vocabulary][$term_csv_id];
     }
     return 0;
@@ -244,7 +244,7 @@ class InstallHelper implements ContainerInjectionInterface {
    *   Media Image ID, or 0 if Media Image ID could not be found.
    */
   protected function getMediaImageId($media_image_csv_id) {
-    if (array_key_exists($media_image_csv_id, $this->mediaImageIdMap)) {
+    if (\array_key_exists($media_image_csv_id, $this->mediaImageIdMap)) {
       return $this->mediaImageIdMap[$media_image_csv_id];
     }
     return 0;
@@ -276,9 +276,9 @@ class InstallHelper implements ContainerInjectionInterface {
    *   Node path, or 0 if node CSV ID could not be found.
    */
   protected function getNodePath($langcode, $content_type, $node_csv_id) {
-    if (array_key_exists($langcode, $this->nodeIdMap) &&
-        array_key_exists($content_type, $this->nodeIdMap[$langcode]) &&
-        array_key_exists($node_csv_id, $this->nodeIdMap[$langcode][$content_type])) {
+    if (\array_key_exists($langcode, $this->nodeIdMap) &&
+        \array_key_exists($content_type, $this->nodeIdMap[$langcode]) &&
+        \array_key_exists($node_csv_id, $this->nodeIdMap[$langcode][$content_type])) {
       return $this->nodeIdMap[$langcode][$content_type][$node_csv_id];
     }
     return 0;
@@ -336,7 +336,7 @@ class InstallHelper implements ContainerInjectionInterface {
         'roles' => $user_data['roles'],
         'preferred_langcode' => $user_data['preferred_language'],
         'preferred_admin_langcode' => $user_data['preferred_language'],
-        'mail' => \Drupal::transliteration()->transliterate(mb_strtolower(str_replace(' ', '.', $name))) . '@example.com',
+        'mail' => \Drupal::transliteration()->transliterate(\mb_strtolower(\str_replace(' ', '.', $name))) . '@example.com',
       ]);
       $user->enforceIsNew();
       $user->save();
@@ -357,7 +357,7 @@ class InstallHelper implements ContainerInjectionInterface {
    *   Data structured as a term.
    */
   protected function processTerm(array $data, $vocabulary) {
-    $term_name = trim($data['term']);
+    $term_name = \trim($data['term']);
 
     // Prepare content.
     $values = [
@@ -479,7 +479,7 @@ class InstallHelper implements ContainerInjectionInterface {
     // Set field_recipe_category if exists.
     if (!empty($data['recipe_category'])) {
       $values['field_recipe_category'] = [];
-      $tags = array_filter(explode(',', $data['recipe_category']));
+      $tags = \array_filter(\explode(',', $data['recipe_category']));
       foreach ($tags as $tag_id) {
         if ($tid = $this->getTermId('recipe_category', $tag_id)) {
           $values['field_recipe_category'][] = ['target_id' => $tid];
@@ -504,7 +504,7 @@ class InstallHelper implements ContainerInjectionInterface {
     }
     // Set field_ingredients field.
     if (!empty($data['ingredients'])) {
-      $ingredients = explode(',', $data['ingredients']);
+      $ingredients = \explode(',', $data['ingredients']);
       $values['field_ingredients'] = [];
       foreach ($ingredients as $ingredient) {
         $values['field_ingredients'][] = ['value' => $ingredient];
@@ -513,7 +513,7 @@ class InstallHelper implements ContainerInjectionInterface {
     // Set field_recipe_instruction field.
     if (!empty($data['recipe_instruction'])) {
       $recipe_instruction_path = $this->module_path . '/default_content/languages/' . $langcode . '/recipe_instructions/' . $data['recipe_instruction'];
-      $recipe_instructions = file_get_contents($recipe_instruction_path);
+      $recipe_instructions = \file_get_contents($recipe_instruction_path);
       if ($recipe_instructions !== FALSE) {
         $values['field_recipe_instruction'] = [['value' => $recipe_instructions, 'format' => 'basic_html']];
       }
@@ -521,7 +521,7 @@ class InstallHelper implements ContainerInjectionInterface {
     // Set field_tags if exists.
     if (!empty($data['tags'])) {
       $values['field_tags'] = [];
-      $tags = array_filter(explode(',', $data['tags']));
+      $tags = \array_filter(\explode(',', $data['tags']));
       foreach ($tags as $tag_id) {
         if ($tid = $this->getTermId('tags', $tag_id)) {
           $values['field_tags'][] = ['target_id' => $tid];
@@ -554,7 +554,7 @@ class InstallHelper implements ContainerInjectionInterface {
     // Set field_body field.
     if (!empty($data['field_body'])) {
       $body_path = $this->module_path . '/default_content/languages/' . $langcode . '/article_body/' . $data['field_body'];
-      $body = file_get_contents($body_path);
+      $body = \file_get_contents($body_path);
       if ($body !== FALSE) {
         $values['field_body'] = [['value' => $body, 'format' => 'basic_html']];
       }
@@ -579,7 +579,7 @@ class InstallHelper implements ContainerInjectionInterface {
     // Set field_tags if exists.
     if (!empty($data['tags'])) {
       $values['field_tags'] = [];
-      $tags = explode(',', $data['tags']);
+      $tags = \explode(',', $data['tags']);
       foreach ($tags as $tag_id) {
         if ($tid = $this->getTermId('tags', $tag_id)) {
           $values['field_tags'][] = ['target_id' => $tid];
@@ -644,7 +644,7 @@ class InstallHelper implements ContainerInjectionInterface {
         'format' => 'basic_html',
       ],
       'field_copyright' => [
-        'value' => '&copy; ' . date("Y") . ' ' . $data['field_copyright'],
+        'value' => '&copy; ' . \date("Y") . ' ' . $data['field_copyright'],
         'format' => 'basic_html',
       ],
     ];
@@ -757,7 +757,7 @@ class InstallHelper implements ContainerInjectionInterface {
     [$all_content, $translated_languages] = $this->readMultilingualContent($filename);
 
     // English is no longer needed in the list of languages to translate.
-    $key = array_search('en', $translated_languages);
+    $key = \array_search('en', $translated_languages);
     unset($translated_languages[$key]);
 
     // Start the loop with English (default) recipes.
@@ -784,7 +784,7 @@ class InstallHelper implements ContainerInjectionInterface {
       foreach ($translated_languages as $translated_language) {
 
         // Find the translated content ID that corresponds to original content.
-        $translation_id = array_search($current_content['id'], array_column($all_content[$translated_language], 'id'));
+        $translation_id = \array_search($current_content['id'], \array_column($all_content[$translated_language], 'id'));
 
         // Check if translation was found.
         if ($translation_id !== FALSE) {
@@ -812,7 +812,7 @@ class InstallHelper implements ContainerInjectionInterface {
    */
   public function deleteImportedContent() {
     $uuids = $this->state->get('demo_umami_content_uuids', []);
-    $by_entity_type = array_reduce(array_keys($uuids), function ($carry, $uuid) use ($uuids) {
+    $by_entity_type = \array_reduce(\array_keys($uuids), function ($carry, $uuid) use ($uuids) {
       $entity_type_id = $uuids[$uuid];
       $carry[$entity_type_id][] = $uuid;
       return $carry;
@@ -843,14 +843,14 @@ class InstallHelper implements ContainerInjectionInterface {
         'name' => $name,
         'status' => 1,
         'roles' => ['author'],
-        'mail' => mb_strtolower(str_replace(' ', '.', $name)) . '@example.com',
+        'mail' => \mb_strtolower(\str_replace(' ', '.', $name)) . '@example.com',
       ]);
       $user->enforceIsNew();
       $user->save();
       $this->storeCreatedContentUuids([$user->uuid() => 'user']);
       return $user->id();
     }
-    $user = reset($users);
+    $user = \reset($users);
     return $user->id();
   }
 
@@ -864,7 +864,7 @@ class InstallHelper implements ContainerInjectionInterface {
    *   File ID.
    */
   protected function createFileEntity($path) {
-    $filename = basename($path);
+    $filename = \basename($path);
     try {
       $uri = $this->fileSystem->copy($path, 'public://' . $filename, FileExists::Replace);
     }

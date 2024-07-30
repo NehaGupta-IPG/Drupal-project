@@ -134,7 +134,7 @@ class DisplayLink extends AreaPluginBase {
       'pager' => $this->t('Pager'),
       'arguments' => $this->t('Contextual filters'),
     ];
-    foreach (array_keys($unequal_options) as $option) {
+    foreach (\array_keys($unequal_options) as $option) {
       if ($this->hasEqualOptions($linked_display_id, $option)) {
         unset($unequal_options[$option]);
       }
@@ -145,7 +145,7 @@ class DisplayLink extends AreaPluginBase {
         '%current_display' => $this->displayHandler->display['display_title'],
         '%area' => $this->areaType,
         '%linked_display' => $this->view->displayHandlers->get($linked_display_id)->display['display_title'],
-        '%unequal_options' => implode(', ', $unequal_options),
+        '%unequal_options' => \implode(', ', $unequal_options),
       ]);
       $this->messenger()->addWarning($warning);
     }

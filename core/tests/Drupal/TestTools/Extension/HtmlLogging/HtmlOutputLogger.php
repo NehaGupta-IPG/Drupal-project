@@ -50,7 +50,7 @@ final class HtmlOutputLogger implements Extension {
     ParameterCollection $parameters,
   ): void {
     // Determine output directory.
-    $envDirectory = getenv('BROWSERTEST_OUTPUT_DIRECTORY');
+    $envDirectory = \getenv('BROWSERTEST_OUTPUT_DIRECTORY');
     if ($envDirectory === "") {
       print "HTML output disabled by BROWSERTEST_OUTPUT_DIRECTORY = ''.\n\n";
       return;
@@ -65,15 +65,15 @@ final class HtmlOutputLogger implements Extension {
       print "HTML output directory not specified.\n\n";
       return;
     }
-    $realDirectory = realpath($directory);
-    if ($realDirectory === FALSE || !is_dir($realDirectory) || !is_writable($realDirectory)) {
+    $realDirectory = \realpath($directory);
+    if ($realDirectory === FALSE || !\is_dir($realDirectory) || !\is_writable($realDirectory)) {
       print "HTML output directory {$directory} is not a writable directory.\n\n";
       return;
     }
     $this->outputDirectory = $realDirectory;
 
     // Determine output verbosity.
-    $envVerbose = getenv('BROWSERTEST_OUTPUT_VERBOSE');
+    $envVerbose = \getenv('BROWSERTEST_OUTPUT_VERBOSE');
     if ($envVerbose !== FALSE) {
       $verbose = $envVerbose;
     }
@@ -83,7 +83,7 @@ final class HtmlOutputLogger implements Extension {
     else {
       $verbose = FALSE;
     }
-    $this->outputVerbose = filter_var($verbose, \FILTER_VALIDATE_BOOLEAN);
+    $this->outputVerbose = \filter_var($verbose, \FILTER_VALIDATE_BOOLEAN);
 
     $facade->registerSubscriber(new TestRunnerStartedSubscriber($this));
     $facade->registerSubscriber(new TestRunnerFinishedSubscriber($this));
@@ -100,11 +100,11 @@ final class HtmlOutputLogger implements Extension {
    * @throws \RuntimeException
    */
   public static function log(string $logEntry): void {
-    $browserOutputFile = getenv('BROWSERTEST_OUTPUT_FILE');
+    $browserOutputFile = \getenv('BROWSERTEST_OUTPUT_FILE');
     if ($browserOutputFile === FALSE) {
       throw new \RuntimeException("HTML output is not enabled");
     }
-    file_put_contents($browserOutputFile, $logEntry . "\n", FILE_APPEND);
+    \file_put_contents($browserOutputFile, $logEntry . "\n", FILE_APPEND);
   }
 
   /**
@@ -117,14 +117,14 @@ final class HtmlOutputLogger implements Extension {
 
     // Convert to a canonicalized absolute pathname just in case the current
     // working directory is changed.
-    $this->browserOutputFile = tempnam($this->outputDirectory, 'browser_output_');
+    $this->browserOutputFile = \tempnam($this->outputDirectory, 'browser_output_');
     if ($this->browserOutputFile) {
-      touch($this->browserOutputFile);
-      putenv('BROWSERTEST_OUTPUT_FILE=' . $this->browserOutputFile);
+      \touch($this->browserOutputFile);
+      \putenv('BROWSERTEST_OUTPUT_FILE=' . $this->browserOutputFile);
     }
     else {
       // Remove any environment variable.
-      putenv('BROWSERTEST_OUTPUT_FILE');
+      \putenv('BROWSERTEST_OUTPUT_FILE');
       throw new \RuntimeException("Unable to create a temporary file in {$this->outputDirectory}.");
     }
   }
@@ -137,7 +137,7 @@ final class HtmlOutputLogger implements Extension {
       throw new \RuntimeException("HTML output is not enabled");
     }
 
-    $contents = file_get_contents($this->browserOutputFile);
+    $contents = \file_get_contents($this->browserOutputFile);
     if ($contents) {
       print "\n\n";
       if ($this->outputVerbose) {
@@ -145,13 +145,13 @@ final class HtmlOutputLogger implements Extension {
         print $contents;
       }
       else {
-        print "HTML output was generated, " . count(explode("\n", $contents)) . " page(s).\n";
+        print "HTML output was generated, " . \count(\explode("\n", $contents)) . " page(s).\n";
       }
     }
 
     // No need to keep the file around any more.
-    unlink($this->browserOutputFile);
-    putenv('BROWSERTEST_OUTPUT_FILE');
+    \unlink($this->browserOutputFile);
+    \putenv('BROWSERTEST_OUTPUT_FILE');
     $this->browserOutputFile = NULL;
   }
 

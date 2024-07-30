@@ -23,7 +23,7 @@ trait FileUploadLocationTrait {
    *   the token replacement is then converted to plain text and returned.
    */
   public function getUploadLocation(FieldDefinitionInterface $fieldDefinition): string {
-    assert(is_a($fieldDefinition->getClass(), FileFieldItemList::class, TRUE));
+    \assert(\is_a($fieldDefinition->getClass(), FileFieldItemList::class, TRUE));
     $fieldItemDataDefinition = FieldItemDataDefinition::create($fieldDefinition);
     $fileItem = new FileItem($fieldItemDataDefinition);
     return $fileItem->getUploadLocation();

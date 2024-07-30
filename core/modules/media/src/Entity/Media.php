@@ -213,7 +213,7 @@ class Media extends EditorialContentEntityBase implements MediaInterface {
 
     $existing = $file_storage->loadByProperties($values);
     if ($existing) {
-      $file = reset($existing);
+      $file = \reset($existing);
     }
     else {
       /** @var \Drupal\file\FileInterface $file */
@@ -498,7 +498,7 @@ class Media extends EditorialContentEntityBase implements MediaInterface {
     $fields += static::ownerBaseFieldDefinitions($entity_type);
 
     $fields['name'] = BaseFieldDefinition::create('string')
-      ->setLabel(t('Name'))
+      ->setLabel(\t('Name'))
       ->setRequired(TRUE)
       ->setTranslatable(TRUE)
       ->setRevisionable(TRUE)
@@ -512,8 +512,8 @@ class Media extends EditorialContentEntityBase implements MediaInterface {
       ->setDisplayConfigurable('view', TRUE);
 
     $fields['thumbnail'] = BaseFieldDefinition::create('image')
-      ->setLabel(t('Thumbnail'))
-      ->setDescription(t('The thumbnail of the media item.'))
+      ->setLabel(\t('Thumbnail'))
+      ->setDescription(\t('The thumbnail of the media item.'))
       ->setRevisionable(TRUE)
       ->setTranslatable(TRUE)
       ->setDisplayOptions('view', [
@@ -528,8 +528,8 @@ class Media extends EditorialContentEntityBase implements MediaInterface {
       ->setReadOnly(TRUE);
 
     $fields['uid']
-      ->setLabel(t('Authored by'))
-      ->setDescription(t('The user ID of the author.'))
+      ->setLabel(\t('Authored by'))
+      ->setDescription(\t('The user ID of the author.'))
       ->setRevisionable(TRUE)
       ->setDisplayOptions('form', [
         'type' => 'entity_reference_autocomplete',
@@ -560,8 +560,8 @@ class Media extends EditorialContentEntityBase implements MediaInterface {
       ->setDisplayConfigurable('form', TRUE);
 
     $fields['created'] = BaseFieldDefinition::create('created')
-      ->setLabel(t('Authored on'))
-      ->setDescription(t('The time the media item was created.'))
+      ->setLabel(\t('Authored on'))
+      ->setDescription(\t('The time the media item was created.'))
       ->setTranslatable(TRUE)
       ->setRevisionable(TRUE)
       ->setDefaultValueCallback(static::class . '::getRequestTime')
@@ -578,8 +578,8 @@ class Media extends EditorialContentEntityBase implements MediaInterface {
       ->setDisplayConfigurable('view', TRUE);
 
     $fields['changed'] = BaseFieldDefinition::create('changed')
-      ->setLabel(t('Changed'))
-      ->setDescription(t('The time the media item was last edited.'))
+      ->setLabel(\t('Changed'))
+      ->setDescription(\t('The time the media item was last edited.'))
       ->setTranslatable(TRUE)
       ->setRevisionable(TRUE);
 

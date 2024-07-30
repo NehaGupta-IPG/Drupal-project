@@ -36,7 +36,7 @@ class WidgetOverflowTest extends MediaLibraryTestBase {
     parent::setUp();
 
     foreach ($this->getTestFiles('image') as $image) {
-      $extension = pathinfo($image->filename, PATHINFO_EXTENSION);
+      $extension = \pathinfo($image->filename, PATHINFO_EXTENSION);
       if ($extension === 'png') {
         $this->image = $image;
       }
@@ -82,7 +82,7 @@ class WidgetOverflowTest extends MediaLibraryTestBase {
         ->uploadFileAndGetRemoteFilePath($path);
     }
     $page = $this->getSession()->getPage();
-    $page->fillField('Add files', implode("\n", $remote_paths));
+    $page->fillField('Add files', \implode("\n", $remote_paths));
     $this->assertMediaAdded();
     $assert_session = $this->assertSession();
     foreach ($filenames as $i => $filename) {

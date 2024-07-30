@@ -102,9 +102,9 @@ class Language extends CKEditor5PluginDefault implements CKEditor5PluginConfigur
     }
 
     // Sort on full language name.
-    ksort($language_list);
+    \ksort($language_list);
     $dynamic_plugin_config = $static_plugin_config;
-    $dynamic_plugin_config['language']['textPartLanguage'] = array_values($language_list);
+    $dynamic_plugin_config['language']['textPartLanguage'] = \array_values($language_list);
     return $dynamic_plugin_config;
   }
 
@@ -114,9 +114,9 @@ class Language extends CKEditor5PluginDefault implements CKEditor5PluginConfigur
    * @see editor_image_upload_settings_form()
    */
   public function buildConfigurationForm(array $form, FormStateInterface $form_state) {
-    $configured = count($this->languageManager->getLanguages());
-    $predefined = count(LanguageManager::getStandardLanguageList());
-    $united_nations = count(LanguageManager::getUnitedNationsLanguageList());
+    $configured = \count($this->languageManager->getLanguages());
+    $predefined = \count(LanguageManager::getStandardLanguageList());
+    $united_nations = \count(LanguageManager::getUnitedNationsLanguageList());
 
     $language_list_description_args = [
       ':united-nations-official' => 'https://www.un.org/en/sections/about-un/official-languages',

@@ -18,7 +18,7 @@ class ProxyBuilder {
    */
   public static function buildProxyClassName($class_name) {
     $match = [];
-    preg_match('/([a-zA-Z0-9_]+\\\\[a-zA-Z0-9_]+)\\\\(.+)/', $class_name, $match);
+    \preg_match('/([a-zA-Z0-9_]+\\\\[a-zA-Z0-9_]+)\\\\(.+)/', $class_name, $match);
     $root_namespace = $match[1];
     $rest_fqcn = $match[2];
     $proxy_class_name = $root_namespace . '\\ProxyClass\\' . $rest_fqcn;
@@ -38,7 +38,7 @@ class ProxyBuilder {
   public static function buildProxyNamespace($class_name) {
     $proxy_classname = static::buildProxyClassName($class_name);
 
-    preg_match('/(.+)\\\\[a-zA-Z0-9]+/', $proxy_classname, $match);
+    \preg_match('/(.+)\\\\[a-zA-Z0-9]+/', $proxy_classname, $match);
     $proxy_namespace = $match[1];
     return $proxy_namespace;
   }
@@ -57,7 +57,7 @@ class ProxyBuilder {
 
     $proxy_class_name = $this->buildProxyClassName($class_name);
     $proxy_namespace = $this->buildProxyNamespace($class_name);
-    $proxy_class_shortname = str_replace($proxy_namespace . '\\', '', $proxy_class_name);
+    $proxy_class_shortname = \str_replace($proxy_namespace . '\\', '', $proxy_class_name);
 
     $output = '';
     $class_documentation = <<<'EOS'
@@ -93,7 +93,7 @@ EOS;
       foreach ($interfaces as $interface) {
         $interface_names[] = '\\' . $interface->getName();
       }
-      $class_start .= ' implements ' . implode(', ', $interface_names);
+      $class_start .= ' implements ' . \implode(', ', $interface_names);
     }
 
     $output .= $this->buildUseStatements();
@@ -144,21 +144,21 @@ EOS;
       }
     }
 
-    $output .= implode("\n", $methods);
+    $output .= \implode("\n", $methods);
 
     // Indent the output.
-    $output = implode("\n", array_map(function ($value) {
+    $output = \implode("\n", \array_map(function ($value) {
       if ($value === '') {
         return $value;
       }
       return "        $value";
-    }, explode("\n", $output)));
+    }, \explode("\n", $output)));
 
     $final_output = $class_documentation . $class_start . "\n    {\n\n" . $output . "\n    }\n\n}\n";
 
-    $final_output = str_replace('{{ class_name }}', $class_name, $final_output);
-    $final_output = str_replace('{{ namespace }}', $proxy_namespace ? $proxy_namespace . ' ' : '', $final_output);
-    $final_output = str_replace('{{ proxy_class_shortname }}', $proxy_class_shortname, $final_output);
+    $final_output = \str_replace('{{ class_name }}', $class_name, $final_output);
+    $final_output = \str_replace('{{ namespace }}', $proxy_namespace ? $proxy_namespace . ' ' : '', $final_output);
+    $final_output = \str_replace('{{ proxy_class_shortname }}', $proxy_class_shortname, $final_output);
 
     return $final_output;
   }
@@ -228,7 +228,7 @@ EOS;
       $signature_line .= 'public function ' . $reference . $function_name . '(';
     }
 
-    $signature_line .= implode(', ', $parameters);
+    $signature_line .= \implode(', ', $parameters);
     $signature_line .= ')';
     if ($reflection_method->hasReturnType()) {
       $signature_line .= ': ';
@@ -291,7 +291,7 @@ EOS;
 
     if ($parameter->isDefaultValueAvailable()) {
       $parameter_string .= ' = ';
-      $parameter_string .= var_export($parameter->getDefaultValue(), TRUE);
+      $parameter_string .= \var_export($parameter->getDefaultValue(), TRUE);
     }
 
     return $parameter_string;
@@ -330,7 +330,7 @@ EOS;
       $parameters[] = '$' . $parameter->getName();
     }
 
-    $output .= implode(', ', $parameters) . ');';
+    $output .= \implode(', ', $parameters) . ');';
 
     return $output;
   }

@@ -110,7 +110,7 @@ abstract class BaseFieldFileFormatterBase extends FormatterBase {
         ];
       }
       else {
-        $elements[$delta] = is_array($view_value) ? $view_value : ['#markup' => $view_value];
+        $elements[$delta] = \is_array($view_value) ? $view_value : ['#markup' => $view_value];
       }
     }
 

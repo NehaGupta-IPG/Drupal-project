@@ -37,7 +37,7 @@ class RecipeConfiguratorTest extends KernelTestBase {
     // Test methods.
     /** @var \Drupal\Core\Recipe\Recipe[] $recipes */
     $recipes = (array) $reflection->invoke($recipe_configurator);
-    $recipes_names = array_map(fn(Recipe $recipe) => $recipe->name, $recipes);
+    $recipes_names = \array_map(fn(Recipe $recipe) => $recipe->name, $recipes);
     $recipe_extensions = $recipe_configurator->listAllExtensions();
     $expected_recipes_names = [
       'Install two modules',
@@ -56,8 +56,8 @@ class RecipeConfiguratorTest extends KernelTestBase {
 
     $this->assertEquals($expected_recipes_names, $recipes_names);
     $this->assertEquals($expected_recipe_extensions, $recipe_extensions);
-    $this->assertEquals(1, array_count_values($recipes_names)['Install node with config']);
-    $this->assertEquals(1, array_count_values($recipe_extensions)['field']);
+    $this->assertEquals(1, \array_count_values($recipes_names)['Install node with config']);
+    $this->assertEquals(1, \array_count_values($recipe_extensions)['field']);
   }
 
   /**

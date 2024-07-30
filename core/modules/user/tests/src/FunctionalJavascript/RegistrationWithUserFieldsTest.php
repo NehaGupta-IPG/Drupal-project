@@ -106,13 +106,13 @@ class RegistrationWithUserFieldsTest extends WebDriverTestBase {
     $this->webAssert->pageTextContains($field->label() . ' does not accept the value -1.');
 
     // Submit with valid data.
-    $value = (string) mt_rand(1, 255);
+    $value = (string) \mt_rand(1, 255);
     $this->page->fillField('edit-test-user-field-0-value', $value);
     $this->page->pressButton('edit-submit');
     // Check user fields.
     $accounts = $this->container->get('entity_type.manager')->getStorage('user')
       ->loadByProperties(['name' => $name, 'mail' => $name . '@example.com']);
-    $new_user = reset($accounts);
+    $new_user = \reset($accounts);
     $this->assertEquals($value, $new_user->test_user_field->value, 'The field value was correctly saved.');
 
     // Check that the 'add more' button works.
@@ -138,7 +138,7 @@ class RegistrationWithUserFieldsTest extends WebDriverTestBase {
     $accounts = $this->container->get('entity_type.manager')
       ->getStorage('user')
       ->loadByProperties(['name' => $name, 'mail' => $name . '@example.com']);
-    $new_user = reset($accounts);
+    $new_user = \reset($accounts);
     $this->assertEquals($value, $new_user->test_user_field[0]->value);
     $this->assertEquals($value . '1', $new_user->test_user_field[1]->value);
     $this->assertEquals($value . '2', $new_user->test_user_field[2]->value);

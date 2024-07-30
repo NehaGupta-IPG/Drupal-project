@@ -107,7 +107,7 @@ class FileUpload {
     $entity->save();
 
     $route_parameters = ['entity' => $entity->uuid()];
-    $route_name = sprintf('jsonapi.%s.%s.related', $resource_type->getTypeName(), $resource_type->getPublicName($file_field_name));
+    $route_name = \sprintf('jsonapi.%s.%s.related', $resource_type->getTypeName(), $resource_type->getPublicName($file_field_name));
     $related_url = Url::fromRoute($route_name, $route_parameters)->toString(TRUE);
     $request = Request::create($related_url->getGeneratedUrl(), 'GET', [], $request->cookies->all(), [], $request->server->all());
     return $this->httpKernel->handle($request, HttpKernelInterface::SUB_REQUEST);
@@ -139,7 +139,7 @@ class FileUpload {
     $links = new LinkCollection(['self' => $self_link]);
 
     $relatable_resource_types = $resource_type->getRelatableResourceTypesByField($resource_type->getPublicName($file_field_name));
-    $file_resource_type = reset($relatable_resource_types);
+    $file_resource_type = \reset($relatable_resource_types);
     $resource_object = ResourceObject::createFromEntity($file_resource_type, $file);
     return new ResourceResponse(new JsonApiDocumentTopLevel(new ResourceObjectData([$resource_object], 1), new NullIncludedData(), $links), 201, []);
   }
@@ -167,11 +167,11 @@ class FileUpload {
 
     $filename = ContentDispositionFilenameParser::parseFilename($request);
     $tempPath = $this->inputStreamFileWriter->writeStreamToFile();
-    $uploadedFile = new InputStreamUploadedFile($filename, $filename, $tempPath, @filesize($tempPath));
+    $uploadedFile = new InputStreamUploadedFile($filename, $filename, $tempPath, @\filesize($tempPath));
 
     $settings = $field_definition->getSettings();
     $validators = $this->getFileUploadValidators($settings);
-    if (!array_key_exists('FileExtension', $validators) && $settings['file_extensions'] === '') {
+    if (!\array_key_exists('FileExtension', $validators) && $settings['file_extensions'] === '') {
       // An empty string means 'all file extensions' but the FileUploadHandler
       // needs the FileExtension entry to be present and empty in order for this
       // to be respected. An empty array means 'all file extensions'.
@@ -210,7 +210,7 @@ class FileUpload {
 
     if ($result->hasViolations()) {
       $message = "Unprocessable Entity: file validation failed.\n";
-      $message .= implode("\n", array_map(function (ConstraintViolationInterface $violation) {
+      $message .= \implode("\n", \array_map(function (ConstraintViolationInterface $violation) {
         return PlainTextOutput::renderFromHtml($violation->getMessage());
       }, (array) $result->getViolations()->getIterator()));
       throw new UnprocessableEntityHttpException($message);
@@ -235,10 +235,10 @@ class FileUpload {
    *   The file upload access result.
    */
   public static function checkFileUploadAccess(AccountInterface $account, FieldDefinitionInterface $field_definition, ?EntityInterface $entity = NULL) {
-    assert(is_null($entity) ||
+    \assert(\is_null($entity) ||
       $field_definition->getTargetEntityTypeId() === $entity->getEntityTypeId() &&
       // Base fields do not have target bundles.
-      (is_null($field_definition->getTargetBundle()) || $field_definition->getTargetBundle() === $entity->bundle())
+      (\is_null($field_definition->getTargetBundle()) || $field_definition->getTargetBundle() === $entity->bundle())
     );
     $entity_type_manager = \Drupal::entityTypeManager();
     $entity_access_control_handler = $entity_type_manager->getAccessControlHandler($field_definition->getTargetEntityTypeId());
@@ -295,13 +295,13 @@ class FileUpload {
   protected function validateAndLoadFieldDefinition($entity_type_id, $bundle, $field_name) {
     $field_definitions = $this->fieldManager->getFieldDefinitions($entity_type_id, $bundle);
     if (!isset($field_definitions[$field_name])) {
-      throw new NotFoundHttpException(sprintf('Field "%s" does not exist.', $field_name));
+      throw new NotFoundHttpException(\sprintf('Field "%s" does not exist.', $field_name));
     }
 
     /** @var \Drupal\Core\Field\FieldDefinitionInterface $field_definition */
     $field_definition = $field_definitions[$field_name];
     if ($field_definition->getSetting('target_type') !== 'file') {
-      throw new AccessDeniedException(sprintf('"%s" is not a file field', $field_name));
+      throw new AccessDeniedException(\sprintf('"%s" is not a file field', $field_name));
     }
 
     return $field_definition;

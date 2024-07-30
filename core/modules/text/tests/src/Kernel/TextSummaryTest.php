@@ -251,7 +251,7 @@ class TextSummaryTest extends KernelTestBase {
    * @internal
    */
   public function assertTextSummary(string $text, string $expected, ?string $format = NULL, ?int $size = NULL): void {
-    $summary = text_summary($text, $format, $size);
+    $summary = \text_summary($text, $format, $size);
     $this->assertSame($expected, $summary, '<pre style="white-space: pre-wrap">' . $summary . '</pre> is identical to <pre style="white-space: pre-wrap">' . $expected . '</pre>');
   }
 
@@ -352,14 +352,14 @@ class TextSummaryTest extends KernelTestBase {
     $filtered_markup = FilteredMarkup::create('<div><strong><span>Hello World</span></strong></div>');
     // With either HTML filter enabled, text_summary() will normalize the text
     // using HTML::normalize().
-    $summary = text_summary($filtered_markup, 'filter_html_enabled', 30);
+    $summary = \text_summary($filtered_markup, 'filter_html_enabled', 30);
     $this->assertStringContainsString('<div><strong><span>', $summary);
     $this->assertStringContainsString('</span></strong></div>', $summary);
-    $summary = text_summary($filtered_markup, 'filter_htmlcorrector_enabled', 30);
+    $summary = \text_summary($filtered_markup, 'filter_htmlcorrector_enabled', 30);
     $this->assertStringContainsString('<div><strong><span>', $summary);
     $this->assertStringContainsString('</span></strong></div>', $summary);
     // If neither filter is enabled, the text will not be normalized.
-    $summary = text_summary($filtered_markup, 'neither_filter_enabled', 30);
+    $summary = \text_summary($filtered_markup, 'neither_filter_enabled', 30);
     $this->assertStringContainsString('<div><strong><span>', $summary);
     $this->assertStringNotContainsString('</span></strong></div>', $summary);
   }

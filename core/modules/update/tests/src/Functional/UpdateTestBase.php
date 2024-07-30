@@ -117,7 +117,7 @@ abstract class UpdateTestBase extends BrowserTestBase {
     $page = $this->getSession()->getPage();
     $this->standardTests();
     $assert_session->elementTextNotContains('css', $update_element_css_locator, 'Not supported');
-    $all_security_release_urls = array_map(function ($link) {
+    $all_security_release_urls = \array_map(function ($link) {
       return $link->getAttribute('href');
     }, $page->findAll('css', "$update_element_css_locator .version-security a[href$='-release']"));
     if ($expected_security_releases) {
@@ -134,7 +134,7 @@ abstract class UpdateTestBase extends BrowserTestBase {
       }
       $assert_session->elementTextNotContains('css', $update_element_css_locator, 'Up to date');
       foreach ($expected_security_releases as $expected_security_release) {
-        $expected_url_version = str_replace('.', '-', $expected_security_release);
+        $expected_url_version = \str_replace('.', '-', $expected_security_release);
         $release_url = "http://example.com/$project_path_part-$expected_url_version-release";
         $assert_session->responseNotContains("http://example.com/$project_path_part-$expected_url_version.tar.gz");
         $expected_release_urls[] = $release_url;
@@ -143,7 +143,7 @@ abstract class UpdateTestBase extends BrowserTestBase {
         $assert_session->linkByHrefExists($release_url);
       }
       // Ensure no other links are shown as security releases.
-      $this->assertEquals([], array_diff($all_security_release_urls, $expected_release_urls));
+      $this->assertEquals([], \array_diff($all_security_release_urls, $expected_release_urls));
     }
     else {
       // Ensure there were no security links.
@@ -176,7 +176,7 @@ abstract class UpdateTestBase extends BrowserTestBase {
   protected function assertVersionUpdateLinks($label, $version, int $index = 0) {
     $update_element = $this->findUpdateElementByLabel($label, $index);
     // In the release notes URL the periods are replaced with dashes.
-    $url_version = str_replace('.', '-', $version);
+    $url_version = \str_replace('.', '-', $version);
 
     $this->assertEquals($update_element->findLink($version)->getAttribute('href'), "http://example.com/{$this->updateProject}-$url_version-release");
     $this->assertStringNotContainsString("http://example.com/{$this->updateProject}-$version.tar.gz", $update_element->getOuterHtml());
@@ -298,7 +298,7 @@ abstract class UpdateTestBase extends BrowserTestBase {
   protected function findUpdateElementByLabel($label, int $index = 0): NodeElement {
     $update_elements = $this->getSession()->getPage()
       ->findAll('css', $this->updateTableLocator . " .project-update__version:contains(\"$label\")");
-    $this->assertGreaterThanOrEqual($index, count($update_elements));
+    $this->assertGreaterThanOrEqual($index, \count($update_elements));
     return $update_elements[$index];
   }
 

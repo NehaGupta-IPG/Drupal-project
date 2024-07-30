@@ -15,7 +15,7 @@ class IsSuperUserCacheContext extends UserCacheContextBase implements CacheConte
    * {@inheritdoc}
    */
   public static function getLabel() {
-    return t('Is super user');
+    return \t('Is super user');
   }
 
   /**

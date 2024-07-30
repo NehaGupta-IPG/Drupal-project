@@ -37,7 +37,7 @@ class AjaxResponse extends JsonResponse implements AttachmentsInterface {
    */
   public function addCommand(CommandInterface $command, $prepend = FALSE) {
     if ($prepend) {
-      array_unshift($this->commands, $command->render());
+      \array_unshift($this->commands, $command->render());
     }
     else {
       $this->commands[] = $command->render();

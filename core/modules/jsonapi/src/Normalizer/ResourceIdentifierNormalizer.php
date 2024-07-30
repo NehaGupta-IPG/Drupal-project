@@ -44,7 +44,7 @@ class ResourceIdentifierNormalizer extends NormalizerBase implements Denormalize
    * {@inheritdoc}
    */
   public function normalize($object, $format = NULL, array $context = []): array|string|int|float|bool|\ArrayObject|NULL {
-    assert($object instanceof ResourceIdentifier);
+    \assert($object instanceof ResourceIdentifier);
     $normalization = [
       'type' => $object->getTypeName(),
       'id' => $object->getId(),
@@ -73,20 +73,20 @@ class ResourceIdentifierNormalizer extends NormalizerBase implements Denormalize
     /** @var \Drupal\field\Entity\FieldConfig $field_definition */
     $field_definition = $field_definitions[$context['related']];
     $target_resource_types = $resource_type->getRelatableResourceTypesByField($resource_type->getPublicName($context['related']));
-    $target_resource_type_names = array_map(function (ResourceType $resource_type) {
+    $target_resource_type_names = \array_map(function (ResourceType $resource_type) {
       return $resource_type->getTypeName();
     }, $target_resource_types);
 
     $is_multiple = $field_definition->getFieldStorageDefinition()->isMultiple();
     $data = $this->massageRelationshipInput($data, $is_multiple);
-    $resource_identifiers = array_map(function ($value) use ($target_resource_type_names) {
+    $resource_identifiers = \array_map(function ($value) use ($target_resource_type_names) {
       // Make sure that the provided type is compatible with the targeted
       // resource.
-      if (!in_array($value['type'], $target_resource_type_names)) {
-        throw new BadRequestHttpException(sprintf(
+      if (!\in_array($value['type'], $target_resource_type_names)) {
+        throw new BadRequestHttpException(\sprintf(
           'The provided type (%s) does not match the destination resource types (%s).',
           $value['type'],
-          implode(', ', $target_resource_type_names)
+          \implode(', ', $target_resource_type_names)
         ));
       }
       return new ResourceIdentifier($value['type'], $value['id'], $value['meta'] ?? []);
@@ -110,11 +110,11 @@ class ResourceIdentifierNormalizer extends NormalizerBase implements Denormalize
    */
   protected function massageRelationshipInput(array $data, $is_multiple) {
     if ($is_multiple) {
-      if (!is_array($data['data'])) {
+      if (!\is_array($data['data'])) {
         throw new BadRequestHttpException('Invalid body payload for the relationship.');
       }
       // Leave the invalid elements.
-      $invalid_elements = array_filter($data['data'], function ($element) {
+      $invalid_elements = \array_filter($data['data'], function ($element) {
         return empty($element['type']) || empty($element['id']);
       });
       if ($invalid_elements) {
@@ -123,7 +123,7 @@ class ResourceIdentifierNormalizer extends NormalizerBase implements Denormalize
     }
     else {
       // For to-one relationships you can have a NULL value.
-      if (is_null($data['data'])) {
+      if (\is_null($data['data'])) {
         return ['data' => []];
       }
       if (empty($data['data']['type']) || empty($data['data']['id'])) {

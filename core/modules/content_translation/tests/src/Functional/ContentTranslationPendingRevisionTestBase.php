@@ -109,14 +109,14 @@ abstract class ContentTranslationPendingRevisionTestBase extends ContentTranslat
       "view {$this->bundle} revisions",
       "delete {$this->bundle} revisions",
     ];
-    return array_merge($editor_permissions, $this->commonPermissions);
+    return \array_merge($editor_permissions, $this->commonPermissions);
   }
 
   /**
    * {@inheritdoc}
    */
   protected function getTranslatorPermissions() {
-    return array_merge(parent::getTranslatorPermissions(), $this->commonPermissions);
+    return \array_merge(parent::getTranslatorPermissions(), $this->commonPermissions);
   }
 
   /**

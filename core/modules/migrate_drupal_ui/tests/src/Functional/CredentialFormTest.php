@@ -156,14 +156,14 @@ class CredentialFormTest extends MigrateUpgradeTestBase {
     // database settings. This supports all of the databases we test against.
     $drivers = Database::getDriverList()->getInstallableList();
     $form = $drivers[$driver]->getInstallTasks()->getFormOptions($connection_options);
-    $connection_options = array_intersect_key($connection_options, $form + $form['advanced_options']);
+    $connection_options = \array_intersect_key($connection_options, $form + $form['advanced_options']);
     // Remove isolation_level since that option is not configurable in the UI.
     unset($connection_options['isolation_level']);
     $edit = [
       $driver => $connection_options,
       'version' => $version,
     ];
-    if (count($drivers) !== 1) {
+    if (\count($drivers) !== 1) {
       $edit['driver'] = $driver;
     }
     return $edit;

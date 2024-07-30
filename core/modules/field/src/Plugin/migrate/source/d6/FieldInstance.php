@@ -78,9 +78,9 @@ class FieldInstance extends DrupalSqlBase {
    */
   public function prepareRow(Row $row) {
     // Unserialize data.
-    $widget_settings = unserialize($row->getSourceProperty('widget_settings'));
-    $display_settings = unserialize($row->getSourceProperty('display_settings'));
-    $global_settings = unserialize($row->getSourceProperty('global_settings'));
+    $widget_settings = \unserialize($row->getSourceProperty('widget_settings'));
+    $display_settings = \unserialize($row->getSourceProperty('display_settings'));
+    $global_settings = \unserialize($row->getSourceProperty('global_settings'));
     $row->setSourceProperty('widget_settings', $widget_settings);
     $row->setSourceProperty('display_settings', $display_settings);
     $row->setSourceProperty('global_settings', $global_settings);
@@ -89,7 +89,7 @@ class FieldInstance extends DrupalSqlBase {
     $translatable = TRUE;
     $synchronized_fields = $this->variableGet('i18nsync_nodeapi_' . $row->getSourceProperty('type_name'), NULL);
     if ($synchronized_fields) {
-      if (in_array($row->getSourceProperty('field_name'), $synchronized_fields)) {
+      if (\in_array($row->getSourceProperty('field_name'), $synchronized_fields)) {
         $translatable = FALSE;
       }
     }

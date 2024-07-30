@@ -75,14 +75,14 @@ class TwigPhpStorageCache implements CacheInterface {
    * {@inheritdoc}
    */
   public function generateKey(string $name, string $className): string {
-    if (str_starts_with($name, '{# inline_template_start #}')) {
+    if (\str_starts_with($name, '{# inline_template_start #}')) {
       // $name is an inline template, and can have characters that are not valid
       // for a filename. $suffix is unique for each inline template so we just
       // use the generic name 'inline-template' here.
       $name = 'inline-template';
     }
     else {
-      $name = basename($name);
+      $name = \basename($name);
     }
 
     // Windows (and some encrypted Linux systems) only support 255 characters in
@@ -92,8 +92,8 @@ class TwigPhpStorageCache implements CacheInterface {
     // characters long. Using the default PHP file storage class, the Twig cache
     // file path will be 124 characters long at most, which provides a margin of
     // safety.
-    $suffix = substr($name, 0, self::SUFFIX_SUBSTRING_LENGTH) . '_';
-    $suffix .= substr(Crypt::hashBase64($className), 0, self::SUFFIX_SUBSTRING_LENGTH);
+    $suffix = \substr($name, 0, self::SUFFIX_SUBSTRING_LENGTH) . '_';
+    $suffix .= \substr(Crypt::hashBase64($className), 0, self::SUFFIX_SUBSTRING_LENGTH);
 
     // The cache prefix is what gets invalidated.
     return $this->templateCacheFilenamePrefix . '_' . $suffix;

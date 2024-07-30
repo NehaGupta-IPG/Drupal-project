@@ -114,10 +114,10 @@ class ItemsPerPageTest extends WizardTestBase {
     $this->assertSession()->pageTextContains($node2->label());
     $this->assertSession()->pageTextNotContains($node1->label());
     $this->assertSession()->pageTextNotContains($page_node->label());
-    $pos5 = strpos($content, $node5->label());
-    $pos4 = strpos($content, $node4->label());
-    $pos3 = strpos($content, $node3->label());
-    $pos2 = strpos($content, $node2->label());
+    $pos5 = \strpos($content, $node5->label());
+    $pos4 = \strpos($content, $node4->label());
+    $pos3 = \strpos($content, $node3->label());
+    $pos2 = \strpos($content, $node2->label());
     $this->assertGreaterThan($pos5, $pos4);
     $this->assertGreaterThan($pos4, $pos3);
     $this->assertGreaterThan($pos3, $pos2);

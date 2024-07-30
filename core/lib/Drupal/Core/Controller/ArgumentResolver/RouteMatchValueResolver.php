@@ -17,7 +17,7 @@ final class RouteMatchValueResolver implements ValueResolverInterface {
    * {@inheritdoc}
    */
   public function resolve(Request $request, ArgumentMetadata $argument): array {
-    return $argument->getType() === RouteMatchInterface::class || is_subclass_of($argument->getType(), RouteMatchInterface::class) ? [RouteMatch::createFromRequest($request)] : [];
+    return $argument->getType() === RouteMatchInterface::class || \is_subclass_of($argument->getType(), RouteMatchInterface::class) ? [RouteMatch::createFromRequest($request)] : [];
   }
 
 }

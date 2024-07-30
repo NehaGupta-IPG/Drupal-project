@@ -33,7 +33,7 @@ class InstallerIsolationLevelExistingSettingsTest extends InstallerExistingSetti
    * Verifies that isolation_level is not set in the database settings.
    */
   public function testInstaller(): void {
-    $contents = file_get_contents($this->container->getParameter('app.root') . '/' . $this->siteDirectory . '/settings.php');
+    $contents = \file_get_contents($this->container->getParameter('app.root') . '/' . $this->siteDirectory . '/settings.php');
 
     // Test that isolation_level was not set.
     $this->assertStringNotContainsString("'isolation_level' => 'READ COMMITTED'", $contents);

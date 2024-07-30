@@ -58,7 +58,7 @@ class PreExistingConfigException extends ConfigException {
   public static function create($extension, array $config_objects) {
     $message = new FormattableMarkup('Configuration objects (@config_names) provided by @extension already exist in active configuration',
       [
-        '@config_names' => implode(', ', static::flattenConfigObjects($config_objects)),
+        '@config_names' => \implode(', ', static::flattenConfigObjects($config_objects)),
         '@extension' => $extension,
       ]
     );
@@ -82,15 +82,15 @@ class PreExistingConfigException extends ConfigException {
   public static function flattenConfigObjects(array $config_objects) {
     $flat_config_objects = [];
     foreach ($config_objects as $collection => $config_names) {
-      $config_names = array_map(function ($config_name) use ($collection) {
+      $config_names = \array_map(function ($config_name) use ($collection) {
         if ($collection != StorageInterface::DEFAULT_COLLECTION) {
-          $config_name = str_replace('.', DIRECTORY_SEPARATOR, $collection) . DIRECTORY_SEPARATOR . $config_name;
+          $config_name = \str_replace('.', DIRECTORY_SEPARATOR, $collection) . DIRECTORY_SEPARATOR . $config_name;
         }
         return $config_name;
       }, $config_names);
       $flat_config_objects[] = $config_names;
     }
-    return array_merge(...$flat_config_objects);
+    return \array_merge(...$flat_config_objects);
   }
 
 }

@@ -180,7 +180,7 @@ class JsonApiPatchRegressionTest extends JsonApiFunctionalTestBase {
     $article_node->save();
 
     // Test.
-    $url = Url::fromUri(sprintf('internal:/jsonapi/node/journal_article/%s', $article_node->uuid()));
+    $url = Url::fromUri(\sprintf('internal:/jsonapi/node/journal_article/%s', $article_node->uuid()));
     $request_options = [
       RequestOptions::HEADERS => [
         'Content-Type' => 'application/vnd.api+json',
@@ -307,7 +307,7 @@ class JsonApiPatchRegressionTest extends JsonApiFunctionalTestBase {
     $page->save();
 
     // Test.
-    $url = Url::fromUri(sprintf('internal:/jsonapi/node/page/%s/?include=uid', $page->uuid()));
+    $url = Url::fromUri(\sprintf('internal:/jsonapi/node/page/%s/?include=uid', $page->uuid()));
     $request_options = [
       RequestOptions::HEADERS => [
         'Content-Type' => 'application/vnd.api+json',

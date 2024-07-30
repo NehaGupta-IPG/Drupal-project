@@ -112,14 +112,14 @@ class Grid extends StylePluginBase {
   public function getCustomClass($result_index, $type) {
     $class = $this->options[$type . '_class_custom'];
     if ($this->usesFields() && $this->view->field) {
-      $class = strip_tags($this->tokenizeValue($class, $result_index));
+      $class = \strip_tags($this->tokenizeValue($class, $result_index));
     }
 
-    $classes = explode(' ', $class);
+    $classes = \explode(' ', $class);
     foreach ($classes as &$class) {
       $class = Html::cleanCssIdentifier($class);
     }
-    return implode(' ', $classes);
+    return \implode(' ', $classes);
   }
 
 }

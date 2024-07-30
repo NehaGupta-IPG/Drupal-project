@@ -315,14 +315,14 @@ class HtmlRenderer implements MainContentRendererInterface {
         $hook($attachments);
       }
     );
-    if (array_diff(array_keys($attachments), ['#attached', '#cache']) !== []) {
+    if (\array_diff(\array_keys($attachments), ['#attached', '#cache']) !== []) {
       throw new \LogicException('Only #attached and #cache may be set in hook_page_attachments().');
     }
 
     // Modules and themes can alter page attachments.
     $this->moduleHandler->alter('page_attachments', $attachments);
     $this->themeManager->alter('page_attachments', $attachments);
-    if (array_diff(array_keys($attachments), ['#attached', '#cache']) !== []) {
+    if (\array_diff(\array_keys($attachments), ['#attached', '#cache']) !== []) {
       throw new \LogicException('Only #attached and #cache may be set in hook_page_attachments_alter().');
     }
 

@@ -41,11 +41,11 @@ class UpdatePostUpdateTest extends BrowserTestBase {
       ->condition('name', 'core.extension')
       ->execute()
       ->fetchField();
-    $extensions = unserialize($extensions);
+    $extensions = \unserialize($extensions);
     $extensions['module']['update_test_postupdate'] = 8000;
     $connection->update('config')
       ->fields([
-        'data' => serialize($extensions),
+        'data' => \serialize($extensions),
       ])
       ->condition('collection', '')
       ->condition('name', 'core.extension')
@@ -62,7 +62,7 @@ class UpdatePostUpdateTest extends BrowserTestBase {
       'update_test_postupdate_post_update_pub',
       'update_test_postupdate_post_update_baz',
     ];
-    $key_value->get('post_update')->set('existing_updates', array_merge($existing_updates, $post_updates));
+    $key_value->get('post_update')->set('existing_updates', \array_merge($existing_updates, $post_updates));
   }
 
   /**
@@ -105,7 +105,7 @@ class UpdatePostUpdateTest extends BrowserTestBase {
 
     // Test post_update key value stores contains a list of the update functions
     // that have run.
-    $existing_updates = array_count_values(\Drupal::keyValue('post_update')->get('existing_updates'));
+    $existing_updates = \array_count_values(\Drupal::keyValue('post_update')->get('existing_updates'));
     $expected_updates = [
       'update_test_postupdate_post_update_first',
       'update_test_postupdate_post_update_second',

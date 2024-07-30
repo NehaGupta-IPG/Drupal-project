@@ -52,7 +52,7 @@ class WorkspaceInformation implements WorkspaceInformationInterface {
   public function isEntityTypeSupported(EntityTypeInterface $entity_type): bool {
     if (!isset($this->supported[$entity_type->id()])) {
       if ($entity_type->hasHandlerClass('workspace')) {
-        $supported = !is_a($entity_type->getHandlerClass('workspace'), IgnoredWorkspaceHandler::class, TRUE);
+        $supported = !\is_a($entity_type->getHandlerClass('workspace'), IgnoredWorkspaceHandler::class, TRUE);
       }
       else {
         // Fallback for cases when entity type info hasn't been altered yet, for
@@ -103,7 +103,7 @@ class WorkspaceInformation implements WorkspaceInformationInterface {
   public function isEntityTypeIgnored(EntityTypeInterface $entity_type): bool {
     if (!isset($this->ignored[$entity_type->id()])) {
       $this->ignored[$entity_type->id()] = $entity_type->hasHandlerClass('workspace')
-        && is_a($entity_type->getHandlerClass('workspace'), IgnoredWorkspaceHandler::class, TRUE);
+        && \is_a($entity_type->getHandlerClass('workspace'), IgnoredWorkspaceHandler::class, TRUE);
     }
 
     return $this->ignored[$entity_type->id()];
@@ -115,7 +115,7 @@ class WorkspaceInformation implements WorkspaceInformationInterface {
   public function isEntityDeletable(EntityInterface $entity, WorkspaceInterface $workspace): bool {
     $initial_revisions = $this->workspaceTracker->getTrackedInitialRevisions($workspace->id(), $entity->getEntityTypeId());
 
-    return in_array($entity->id(), $initial_revisions, TRUE);
+    return \in_array($entity->id(), $initial_revisions, TRUE);
   }
 
 }

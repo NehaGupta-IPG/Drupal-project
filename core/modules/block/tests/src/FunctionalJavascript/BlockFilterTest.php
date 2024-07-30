@@ -59,12 +59,12 @@ class BlockFilterTest extends WebDriverTestBase {
     $filter->setValue('ad');
     $session->wait(10000, 'jQuery("#drupal-live-announce").html().indexOf("blocks are available") > -1');
     $visible_rows = $this->filterVisibleElements($block_rows);
-    if (count($block_rows) > 0) {
+    if (\count($block_rows) > 0) {
       $this->assertNotSameSize($block_rows, $visible_rows);
     }
 
     // Test Drupal.announce() message when multiple matches are expected.
-    $expected_message = count($visible_rows) . ' blocks are available in the modified list.';
+    $expected_message = \count($visible_rows) . ' blocks are available in the modified list.';
     $this->assertAnnounceContains($expected_message);
 
     // Test Drupal.announce() message when only one match is expected.
@@ -94,7 +94,7 @@ class BlockFilterTest extends WebDriverTestBase {
    *   An array of visible elements.
    */
   protected function filterVisibleElements(array $elements): array {
-    $elements = array_filter($elements, function (NodeElement $element) {
+    $elements = \array_filter($elements, function (NodeElement $element) {
       return $element->isVisible();
     });
     return $elements;

@@ -42,7 +42,7 @@ class Theme extends Updater implements UpdaterInterface {
       // The return value of
       // \Drupal::service('extension.list.theme')->getPath() is always relative
       // to the site, so prepend DRUPAL_ROOT.
-      return DRUPAL_ROOT . '/' . dirname($relative_path);
+      return DRUPAL_ROOT . '/' . \dirname($relative_path);
     }
     else {
       // When installing a new theme, prepend the requested root directory.

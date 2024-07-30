@@ -26,12 +26,12 @@ abstract class NormalizerBase implements SerializerAwareInterface, CacheableNorm
   public function supportsNormalization($data, ?string $format = NULL, array $context = []): bool {
     // If we aren't dealing with an object or the format is not supported return
     // now.
-    if (!is_object($data) || !$this->checkFormat($format)) {
+    if (!\is_object($data) || !$this->checkFormat($format)) {
       return FALSE;
     }
-    $supported = array_keys($this->getSupportedTypes($format));
+    $supported = \array_keys($this->getSupportedTypes($format));
 
-    return (bool) array_filter($supported, function ($name) use ($data) {
+    return (bool) \array_filter($supported, function ($name) use ($data) {
       return $data instanceof $name;
     });
   }
@@ -49,13 +49,13 @@ abstract class NormalizerBase implements SerializerAwareInterface, CacheableNorm
       return FALSE;
     }
 
-    $supported = array_keys($this->getSupportedTypes($format));
+    $supported = \array_keys($this->getSupportedTypes($format));
 
     $subclass_check = function ($name) use ($type) {
-      return (class_exists($name) || interface_exists($name)) && is_subclass_of($type, $name, TRUE);
+      return (\class_exists($name) || \interface_exists($name)) && \is_subclass_of($type, $name, TRUE);
     };
 
-    return in_array($type, $supported) || array_filter($supported, $subclass_check);
+    return \in_array($type, $supported) || \array_filter($supported, $subclass_check);
   }
 
   /**
@@ -75,7 +75,7 @@ abstract class NormalizerBase implements SerializerAwareInterface, CacheableNorm
       return TRUE;
     }
 
-    return in_array($format, (array) $this->format, TRUE);
+    return \in_array($format, (array) $this->format, TRUE);
   }
 
   /**

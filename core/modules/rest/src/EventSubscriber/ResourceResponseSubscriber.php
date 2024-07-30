@@ -95,8 +95,8 @@ class ResourceResponseSubscriber implements EventSubscriberInterface {
    */
   public function getResponseFormat(RouteMatchInterface $route_match, Request $request) {
     $route = $route_match->getRouteObject();
-    $acceptable_response_formats = $route->hasRequirement('_format') ? explode('|', $route->getRequirement('_format')) : [];
-    $acceptable_request_formats = $route->hasRequirement('_content_type_format') ? explode('|', $route->getRequirement('_content_type_format')) : [];
+    $acceptable_response_formats = $route->hasRequirement('_format') ? \explode('|', $route->getRequirement('_format')) : [];
+    $acceptable_request_formats = $route->hasRequirement('_content_type_format') ? \explode('|', $route->getRequirement('_content_type_format')) : [];
     $acceptable_formats = $request->isMethodCacheable() ? $acceptable_response_formats : $acceptable_request_formats;
 
     $requested_format = $request->getRequestFormat();
@@ -106,14 +106,14 @@ class ResourceResponseSubscriber implements EventSubscriberInterface {
     // including and particularly when the client forgot to specify a response
     // format, then use heuristics to select the format that is most likely
     // expected.
-    if (in_array($requested_format, $acceptable_response_formats, TRUE)) {
+    if (\in_array($requested_format, $acceptable_response_formats, TRUE)) {
       return $requested_format;
     }
 
     // If a request body is present, then use the format corresponding to the
     // request body's Content-Type for the response, if it's an acceptable
     // format for the request.
-    if (!empty($request->getContent()) && in_array($content_type_format, $acceptable_request_formats, TRUE)) {
+    if (!empty($request->getContent()) && \in_array($content_type_format, $acceptable_request_formats, TRUE)) {
       return $content_type_format;
     }
 

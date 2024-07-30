@@ -81,7 +81,7 @@ class AddFeedTest extends KernelTestBase {
    */
   public function urlToRSSLinkPattern($url, $title = '') {
     // Escape any regular expression characters in the URL ('?' is the worst).
-    $url = preg_replace('/([+?.*])/', '[$0]', $url);
+    $url = \preg_replace('/([+?.*])/', '[$0]', $url);
     $generated_pattern = '%<link +href="' . $url . '" +rel="alternate" +title="' . $title . '" +type="application/rss.xml" */>%';
     return $generated_pattern;
   }
@@ -98,7 +98,7 @@ class AddFeedTest extends KernelTestBase {
       '#title' => '<>&"\'',
     ];
     $text = (string) \Drupal::service('renderer')->renderRoot($variables);
-    $this->assertEquals('Subscribe to &lt;&gt;&amp;&quot;&#039;', trim(strip_tags($text)), 'feed_icon template escapes reserved HTML characters.');
+    $this->assertEquals('Subscribe to &lt;&gt;&amp;&quot;&#039;', \trim(\strip_tags($text)), 'feed_icon template escapes reserved HTML characters.');
   }
 
   /**

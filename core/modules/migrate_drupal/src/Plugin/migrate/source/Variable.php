@@ -103,7 +103,7 @@ class Variable extends DrupalSqlBase {
     parent::__construct($configuration, $plugin_id, $plugin_definition, $migration, $state, $entity_type_manager);
     $this->variablesNoRowIfMissing = $this->configuration['variables_no_row_if_missing'] ?? [];
     $variables = $this->configuration['variables'] ?? [];
-    $this->variables = array_unique(array_merge(array_values($variables), array_values($this->variablesNoRowIfMissing)));
+    $this->variables = \array_unique(\array_merge(\array_values($variables), \array_values($this->variablesNoRowIfMissing)));
   }
 
   /**
@@ -142,9 +142,9 @@ class Variable extends DrupalSqlBase {
     if (empty($this->variablesNoRowIfMissing)) {
       return 1;
     }
-    $variable_names = array_keys($this->query()->execute()->fetchAllAssoc('name'));
+    $variable_names = \array_keys($this->query()->execute()->fetchAllAssoc('name'));
 
-    if (!empty(array_diff($this->variablesNoRowIfMissing, $variable_names))) {
+    if (!empty(\array_diff($this->variablesNoRowIfMissing, $variable_names))) {
       return 0;
     }
     return 1;
@@ -154,7 +154,7 @@ class Variable extends DrupalSqlBase {
    * {@inheritdoc}
    */
   public function fields() {
-    return array_combine($this->variables, $this->variables);
+    return \array_combine($this->variables, $this->variables);
   }
 
   /**

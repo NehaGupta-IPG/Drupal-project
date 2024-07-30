@@ -75,7 +75,7 @@ class Html {
   public static function getClass($class) {
     $class = (string) $class;
     if (!isset(static::$classes[$class])) {
-      static::$classes[$class] = static::cleanCssIdentifier(mb_strtolower($class));
+      static::$classes[$class] = static::cleanCssIdentifier(\mb_strtolower($class));
     }
     return static::$classes[$class];
   }
@@ -111,13 +111,13 @@ class Html {
     // placeholder after checking that it is not defined as a filter.
     $double_underscore_replacements = 0;
     if (!isset($filter['__'])) {
-      $identifier = str_replace('__', '##', $identifier, $double_underscore_replacements);
+      $identifier = \str_replace('__', '##', $identifier, $double_underscore_replacements);
     }
-    $identifier = str_replace(array_keys($filter), array_values($filter), $identifier);
+    $identifier = \str_replace(\array_keys($filter), \array_values($filter), $identifier);
     // Replace temporary placeholder '##' with '__' only if the original
     // $identifier contained '__'.
     if ($double_underscore_replacements > 0) {
-      $identifier = str_replace('##', '__', $identifier);
+      $identifier = \str_replace('##', '__', $identifier);
     }
 
     // Valid characters in a CSS identifier are:
@@ -224,7 +224,7 @@ class Html {
    * @see self::getUniqueId()
    */
   public static function getId($id) {
-    $id = str_replace([' ', '_', '[', ']'], ['-', '-', '-', ''], mb_strtolower($id));
+    $id = \str_replace([' ', '_', '[', ']'], ['-', '-', '-', ''], \mb_strtolower($id));
 
     // As defined in https://www.w3.org/TR/html4/types.html#type-name, HTML IDs
     // can only contain letters, digits ([0-9]), hyphens ("-"), underscores
@@ -235,7 +235,7 @@ class Html {
     $id = preg_replace('/[^A-Za-z0-9\-_]/', '', $id);
 
     // Removing multiple consecutive hyphens.
-    $id = preg_replace('/\-+/', '-', $id);
+    $id = \preg_replace('/\-+/', '-', $id);
     return $id;
   }
 
@@ -317,19 +317,19 @@ class Html {
 
       // Serialize the body using our custom set of rules.
       // @see \Masterminds\HTML5::saveHTML()
-      $stream = fopen('php://temp', 'wb');
+      $stream = \fopen('php://temp', 'wb');
       $rules = new HtmlSerializerRules($stream);
       foreach ($body_node->childNodes as $node) {
         $traverser = new Traverser($node, $stream, $rules);
         $traverser->walk();
       }
       $rules->unsetTraverser();
-      $html = stream_get_contents($stream, -1, 0);
-      fclose($stream);
+      $html = \stream_get_contents($stream, -1, 0);
+      \fclose($stream);
     }
 
     // Normalize all newlines.
-    $html = str_replace(["\r\n", "\r"], "\n", $html);
+    $html = \str_replace(["\r\n", "\r"], "\n", $html);
 
     return $html;
   }
@@ -357,7 +357,7 @@ class Html {
     foreach ($node->childNodes as $child_node) {
       if ($child_node instanceof \DOMCdataSection) {
         $data = $child_node->data;
-        if (!str_contains($child_node->data, 'CDATA')) {
+        if (!\str_contains($child_node->data, 'CDATA')) {
           $embed_prefix = "\n{$comment_start}<![CDATA[{$comment_end}\n";
           $embed_suffix = "\n{$comment_start}]]>{$comment_end}\n";
 
@@ -393,7 +393,7 @@ class Html {
    * @see \Drupal\Component\Utility\Html::escape()
    */
   public static function decodeEntities(string $text): string {
-    return html_entity_decode($text, ENT_QUOTES, 'UTF-8');
+    return \html_entity_decode($text, ENT_QUOTES, 'UTF-8');
   }
 
   /**
@@ -431,7 +431,7 @@ class Html {
    * @ingroup sanitization
    */
   public static function escape(string $text): string {
-    return htmlspecialchars($text, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+    return \htmlspecialchars($text, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
   }
 
   /**
@@ -462,9 +462,9 @@ class Html {
    *   The updated HTML snippet.
    */
   public static function transformRootRelativeUrlsToAbsolute($html, $scheme_and_host) {
-    assert(empty(array_diff(array_keys(parse_url($scheme_and_host)), ["scheme", "host", "port"])), '$scheme_and_host contains scheme, host and port at most.');
-    assert(isset(parse_url($scheme_and_host)["scheme"]), '$scheme_and_host is absolute and hence has a scheme.');
-    assert(isset(parse_url($scheme_and_host)["host"]), '$base_url is absolute and hence has a host.');
+    \assert(empty(\array_diff(\array_keys(\parse_url($scheme_and_host)), ["scheme", "host", "port"])), '$scheme_and_host contains scheme, host and port at most.');
+    \assert(isset(\parse_url($scheme_and_host)["scheme"]), '$scheme_and_host is absolute and hence has a scheme.');
+    \assert(isset(\parse_url($scheme_and_host)["host"]), '$base_url is absolute and hence has a host.');
 
     $html_dom = Html::load($html);
     $xpath = new \DOMXPath($html_dom);
@@ -480,14 +480,14 @@ class Html {
     foreach ($xpath->query("//*[@srcset]") as $node) {
       // @see https://html.spec.whatwg.org/multipage/embedded-content.html#attr-img-srcset
       // @see https://html.spec.whatwg.org/multipage/embedded-content.html#image-candidate-string
-      $image_candidate_strings = explode(',', $node->getAttribute('srcset'));
-      $image_candidate_strings = array_filter(array_map('trim', $image_candidate_strings));
+      $image_candidate_strings = \explode(',', $node->getAttribute('srcset'));
+      $image_candidate_strings = \array_filter(\array_map('trim', $image_candidate_strings));
       foreach ($image_candidate_strings as $key => $image_candidate_string) {
         if ($image_candidate_string[0] === '/' && $image_candidate_string[1] !== '/') {
           $image_candidate_strings[$key] = $scheme_and_host . $image_candidate_string;
         }
       }
-      $node->setAttribute('srcset', implode(', ', $image_candidate_strings));
+      $node->setAttribute('srcset', \implode(', ', $image_candidate_strings));
     }
     return Html::serialize($html_dom);
   }

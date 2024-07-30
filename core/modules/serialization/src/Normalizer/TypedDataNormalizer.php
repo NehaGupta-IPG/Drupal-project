@@ -19,7 +19,7 @@ class TypedDataNormalizer extends NormalizerBase {
     $this->addCacheableDependency($context, $object);
     $value = $object->getValue();
     // Support for stringable value objects: avoid numerous custom normalizers.
-    if (is_object($value) && method_exists($value, '__toString')) {
+    if (\is_object($value) && \method_exists($value, '__toString')) {
       $value = (string) $value;
     }
     return $value;

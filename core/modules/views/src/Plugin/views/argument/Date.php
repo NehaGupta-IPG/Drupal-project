@@ -119,19 +119,19 @@ class Date extends Formula implements ContainerFactoryPluginInterface {
    */
   public function getDefaultArgument($raw = FALSE) {
     if (!$raw && $this->options['default_argument_type'] == 'date') {
-      return date($this->argFormat, $this->time->getRequestTime());
+      return \date($this->argFormat, $this->time->getRequestTime());
     }
-    elseif (!$raw && in_array($this->options['default_argument_type'], ['node_created', 'node_changed'])) {
+    elseif (!$raw && \in_array($this->options['default_argument_type'], ['node_created', 'node_changed'])) {
       $node = $this->routeMatch->getParameter('node');
 
       if (!($node instanceof NodeInterface)) {
         return parent::getDefaultArgument();
       }
       elseif ($this->options['default_argument_type'] == 'node_created') {
-        return date($this->argFormat, $node->getCreatedTime());
+        return \date($this->argFormat, $node->getCreatedTime());
       }
       elseif ($this->options['default_argument_type'] == 'node_changed') {
-        return date($this->argFormat, $node->getChangedTime());
+        return \date($this->argFormat, $node->getChangedTime());
       }
     }
 

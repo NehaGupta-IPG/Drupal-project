@@ -55,7 +55,7 @@ class SchemaCheckTraitTest extends KernelTestBase {
     $this->assertTrue($ret);
 
     // Test it is possible to mark any schema type as required (not nullable).
-    $nulled_config_data = array_fill_keys(array_keys($config_data), NULL);
+    $nulled_config_data = \array_fill_keys(\array_keys($config_data), NULL);
     $ret = $this->checkConfigSchema($this->typedConfig, $type_to_validate_against, $nulled_config_data, $validate_constraints);
     $this->assertSame($nulled_expectations, $ret);
 
@@ -205,7 +205,7 @@ class SchemaCheckTraitTest extends KernelTestBase {
       ],
     ];
 
-    return array_merge($basic_cases, $opt_in_cases);
+    return \array_merge($basic_cases, $opt_in_cases);
   }
 
 }

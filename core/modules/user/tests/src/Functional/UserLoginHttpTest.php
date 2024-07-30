@@ -273,7 +273,7 @@ class UserLoginHttpTest extends BrowserTestBase {
    */
   protected function getResultValue(ResponseInterface $response, $key, $format) {
     $decoded = $this->serializer->decode((string) $response->getBody(), $format);
-    if (is_array($decoded)) {
+    if (\is_array($decoded)) {
       return $decoded[$key];
     }
     else {
@@ -561,7 +561,7 @@ class UserLoginHttpTest extends BrowserTestBase {
       ->range(0, 1)
       ->execute()
       ->fetchField();
-    $this->assertEquals(serialize($arguments), $logged);
+    $this->assertEquals(\serialize($arguments), $logged);
 
     $response = $this->passwordRequest(['mail' => $account->getEmail()], $format);
     $this->assertEquals(200, $response->getStatusCode());
@@ -579,7 +579,7 @@ class UserLoginHttpTest extends BrowserTestBase {
       ->range(0, 1)
       ->execute()
       ->fetchField();
-    $this->assertEquals(serialize($arguments), $logged);
+    $this->assertEquals(\serialize($arguments), $logged);
 
     $account
       ->activate()
@@ -601,9 +601,9 @@ class UserLoginHttpTest extends BrowserTestBase {
    */
   protected function loginFromResetEmail(): void {
     $_emails = $this->drupalGetMails();
-    $email = end($_emails);
+    $email = \end($_emails);
     $urls = [];
-    preg_match('#.+user/reset/.+#', $email['body'], $urls);
+    \preg_match('#.+user/reset/.+#', $email['body'], $urls);
     $resetURL = $urls[0];
     $this->drupalGet($resetURL);
     $this->submitForm([], 'Log in');

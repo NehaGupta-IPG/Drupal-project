@@ -105,13 +105,13 @@ class SearchNumbersTest extends BrowserTestBase {
    * Tests that all the numbers can be searched.
    */
   public function testNumberSearching(): void {
-    $types = array_keys($this->numbers);
+    $types = \array_keys($this->numbers);
 
     foreach ($types as $type) {
       $number = $this->numbers[$type];
       // If the number is negative, remove the - sign, because - indicates
       // "not keyword" when searching.
-      $number = ltrim($number, '-');
+      $number = \ltrim($number, '-');
       $node = $this->nodes[$type];
 
       // Verify that the node title does not appear on the search page

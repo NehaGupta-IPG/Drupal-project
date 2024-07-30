@@ -94,7 +94,7 @@ class EntityTestBundleClass extends EntityTest {
   public static function postLoad(EntityStorageInterface $storage, array &$entities) {
     parent::postLoad($storage, $entities);
     self::$postLoadCount++;
-    self::$postLoadEntitiesCount[] = count($entities);
+    self::$postLoadEntitiesCount[] = \count($entities);
   }
 
 }

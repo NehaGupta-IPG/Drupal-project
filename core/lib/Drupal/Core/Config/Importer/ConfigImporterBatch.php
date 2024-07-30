@@ -33,7 +33,7 @@ class ConfigImporterBatch {
       if (!isset($context['results']['errors'])) {
         $context['results']['errors'] = [];
       }
-      $context['results']['errors'] = array_merge($errors, $context['results']['errors']);
+      $context['results']['errors'] = \array_merge($errors, $context['results']['errors']);
     }
   }
 
@@ -59,11 +59,11 @@ class ConfigImporterBatch {
           $messenger->addError($error);
           $logger->error($error);
         }
-        $messenger->addWarning(t('The configuration was imported with errors.'));
+        $messenger->addWarning(\t('The configuration was imported with errors.'));
       }
       elseif (!InstallerKernel::installationAttempted()) {
         // Display a success message when not installing Drupal.
-        $messenger->addStatus(t('The configuration was imported successfully.'));
+        $messenger->addStatus(\t('The configuration was imported successfully.'));
       }
     }
     else {

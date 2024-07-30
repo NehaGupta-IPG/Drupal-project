@@ -56,9 +56,9 @@ class UserRegistrationTest extends BrowserTestBase {
     /** @var EntityStorageInterface $storage */
     $storage = $this->container->get('entity_type.manager')->getStorage('user');
     $accounts = $storage->loadByProperties(['name' => $name, 'mail' => $mail]);
-    $new_user = reset($accounts);
+    $new_user = \reset($accounts);
     $this->assertTrue($new_user->isActive(), 'New account is active after registration.');
-    $resetURL = user_pass_reset_url($new_user);
+    $resetURL = \user_pass_reset_url($new_user);
     $this->drupalGet($resetURL);
     $this->assertSession()->titleEquals('Set password | Drupal');
 
@@ -71,7 +71,7 @@ class UserRegistrationTest extends BrowserTestBase {
     $this->submitForm($edit, 'Create new account');
     $this->container->get('entity_type.manager')->getStorage('user')->resetCache();
     $accounts = $storage->loadByProperties(['name' => $name, 'mail' => $mail]);
-    $new_user = reset($accounts);
+    $new_user = \reset($accounts);
     $this->assertFalse($new_user->isActive(), 'New account is blocked until approved by an administrator.');
   }
 
@@ -106,7 +106,7 @@ class UserRegistrationTest extends BrowserTestBase {
     $this->container->get('entity_type.manager')->getStorage('user')->resetCache();
     $accounts = $this->container->get('entity_type.manager')->getStorage('user')
       ->loadByProperties(['name' => $name, 'mail' => $mail]);
-    $new_user = reset($accounts);
+    $new_user = \reset($accounts);
     $this->assertNotNull($new_user, 'New account successfully created with matching passwords.');
     $this->assertSession()->pageTextContains('Registration successful. You are now logged in.');
     $this->drupalLogout();
@@ -134,7 +134,7 @@ class UserRegistrationTest extends BrowserTestBase {
     // Activate the new account.
     $accounts = $this->container->get('entity_type.manager')->getStorage('user')
       ->loadByProperties(['name' => $name, 'mail' => $mail]);
-    $new_user = reset($accounts);
+    $new_user = \reset($accounts);
     $admin_user = $this->drupalCreateUser(['administer users']);
     $this->drupalLogin($admin_user);
     $edit = [
@@ -283,7 +283,7 @@ class UserRegistrationTest extends BrowserTestBase {
     // Check user fields.
     $accounts = $this->container->get('entity_type.manager')->getStorage('user')
       ->loadByProperties(['name' => $name, 'mail' => $mail]);
-    $new_user = reset($accounts);
+    $new_user = \reset($accounts);
     $this->assertEquals($name, $new_user->getAccountName(), 'Username matches.');
     $this->assertEquals($mail, $new_user->getEmail(), 'Email address matches.');
     // Verify that the creation time is correct.
@@ -375,13 +375,13 @@ class UserRegistrationTest extends BrowserTestBase {
     $this->assertSession()->pageTextContains("{$field->label()} does not accept the value -1.");
 
     // Submit with valid data.
-    $value = rand(1, 255);
+    $value = \rand(1, 255);
     $edit['test_user_field[0][value]'] = $value;
     $this->submitForm($edit, 'Create new account');
     // Check user fields.
     $accounts = $this->container->get('entity_type.manager')->getStorage('user')
       ->loadByProperties(['name' => $name, 'mail' => $mail]);
-    $new_user = reset($accounts);
+    $new_user = \reset($accounts);
     $this->assertEquals($value, $new_user->test_user_field->value, 'The field value was correctly saved.');
 
     // Check that the 'add more' button works.
@@ -390,7 +390,7 @@ class UserRegistrationTest extends BrowserTestBase {
     $this->drupalGet('user/register');
     $this->assertRegistrationFormCacheTagsWithUserFields();
     // Add two inputs.
-    $value = rand(1, 255);
+    $value = \rand(1, 255);
     $edit = [];
     $edit['test_user_field[0][value]'] = $value;
     $this->submitForm($edit, 'Add another item');
@@ -404,7 +404,7 @@ class UserRegistrationTest extends BrowserTestBase {
     // Check user fields.
     $accounts = $this->container->get('entity_type.manager')->getStorage('user')
       ->loadByProperties(['name' => $name, 'mail' => $mail]);
-    $new_user = reset($accounts);
+    $new_user = \reset($accounts);
     $this->assertEquals($value, $new_user->test_user_field[0]->value, 'The field value was correctly saved.');
     $this->assertEquals($value + 1, $new_user->test_user_field[1]->value, 'The field value was correctly saved.');
     $this->assertEquals($value + 2, $new_user->test_user_field[2]->value, 'The field value was correctly saved.');

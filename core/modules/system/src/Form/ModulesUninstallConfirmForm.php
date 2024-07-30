@@ -155,12 +155,12 @@ class ModulesUninstallConfirmForm extends ConfirmFormBase {
     $form['text']['#markup'] = '<p>' . $this->t('The following modules will be completely uninstalled from your site, and <em>all data from these modules will be lost</em>!') . '</p>';
     $form['modules'] = [
       '#theme' => 'item_list',
-      '#items' => array_map(function ($module) use ($data) {
+      '#items' => \array_map(function ($module) use ($data) {
         return $data[$module]->info['name'];
       }, $this->modules),
     ];
 
-    if (!empty($this->installProfile) && in_array($this->installProfile, $this->modules, TRUE)) {
+    if (!empty($this->installProfile) && \in_array($this->installProfile, $this->modules, TRUE)) {
       $form['profile']['#markup'] = '<p>' . $this->t('Once uninstalled, the %install_profile profile cannot be reinstalled.', ['%install_profile' => $data[$this->installProfile]->info['name']]) . '</p>';
     }
 

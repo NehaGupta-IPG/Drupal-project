@@ -64,8 +64,8 @@ class AreaOrderTest extends ViewsKernelTestBase {
     $renderable = $view->buildRenderable();
     $output = $this->render($renderable);
 
-    $position_powered = strpos($output, 'block-id-olivero-powered');
-    $position_branding = strpos($output, 'block-id-olivero-branding');
+    $position_powered = \strpos($output, 'block-id-olivero-powered');
+    $position_branding = \strpos($output, 'block-id-olivero-branding');
 
     $this->assertNotEquals(0, $position_powered, 'ID olivero-powered found.');
     $this->assertNotEquals(0, $position_branding, 'ID olivero-branding found');

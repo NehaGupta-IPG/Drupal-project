@@ -91,16 +91,16 @@ class WorkspaceSelection extends DefaultSelection {
     else {
       $options = [];
       foreach ($entities as $entity) {
-        $options[$entity->bundle()][$entity->id()] = str_repeat('-', $workspace_tree[$entity->id()]['depth']) . Html::escape($this->entityRepository->getTranslationFromContext($entity)->label());
+        $options[$entity->bundle()][$entity->id()] = \str_repeat('-', $workspace_tree[$entity->id()]['depth']) . Html::escape($this->entityRepository->getTranslationFromContext($entity)->label());
       }
     }
 
     $restricted_access_entities = [];
     foreach ($options as $bundle => $bundle_options) {
-      foreach (array_keys($bundle_options) as $id) {
+      foreach (\array_keys($bundle_options) as $id) {
         // If a user can not view a workspace, we need to prevent them from
         // referencing that workspace as well as its descendants.
-        if (in_array($id, $restricted_access_entities) || !$entities[$id]->access('view', $this->currentUser)) {
+        if (\in_array($id, $restricted_access_entities) || !$entities[$id]->access('view', $this->currentUser)) {
           $restricted_access_entities += $workspace_tree[$id]['descendants'];
           unset($options[$bundle][$id]);
         }

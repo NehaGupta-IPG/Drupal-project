@@ -31,7 +31,7 @@ class ConfirmFormHelper {
       $options = UrlHelper::parse($query->get('destination'));
       // @todo Revisit this in https://www.drupal.org/node/2418219.
       try {
-        $url = Url::fromUserInput('/' . ltrim($options['path'], '/'), $options);
+        $url = Url::fromUserInput('/' . \ltrim($options['path'], '/'), $options);
       }
       catch (\InvalidArgumentException) {
         // Suppress the exception and fall back to the form's cancel URL.

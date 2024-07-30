@@ -60,17 +60,17 @@ abstract class PhpassHashedPasswordBase implements PasswordInterface {
     $output = '';
     $i = 0;
     do {
-      $value = ord($input[$i++]);
+      $value = \ord($input[$i++]);
       $output .= static::$ITOA64[$value & 0x3f];
       if ($i < $count) {
-        $value |= ord($input[$i]) << 8;
+        $value |= \ord($input[$i]) << 8;
       }
       $output .= static::$ITOA64[($value >> 6) & 0x3f];
       if ($i++ >= $count) {
         break;
       }
       if ($i < $count) {
-        $value |= ord($input[$i]) << 16;
+        $value |= \ord($input[$i]) << 16;
       }
       $output .= static::$ITOA64[($value >> 12) & 0x3f];
       if ($i++ >= $count) {
@@ -126,12 +126,12 @@ abstract class PhpassHashedPasswordBase implements PasswordInterface {
    */
   protected function crypt($algo, #[\SensitiveParameter] $password, $setting) {
     // Prevent DoS attacks by refusing to hash large passwords.
-    if (strlen($password) > PasswordInterface::PASSWORD_MAX_LENGTH) {
+    if (\strlen($password) > PasswordInterface::PASSWORD_MAX_LENGTH) {
       return FALSE;
     }
 
     // The first 12 characters of an existing hash are its setting string.
-    $setting = substr($setting, 0, 12);
+    $setting = \substr($setting, 0, 12);
 
     if ($setting[0] != '$' || $setting[2] != '$') {
       return FALSE;
@@ -143,26 +143,26 @@ abstract class PhpassHashedPasswordBase implements PasswordInterface {
     if ($count_log2 != $this->enforceLog2Boundaries($count_log2)) {
       return FALSE;
     }
-    $salt = substr($setting, 4, 8);
+    $salt = \substr($setting, 4, 8);
     // Hashes must have an 8 character salt.
-    if (strlen($salt) != 8) {
+    if (\strlen($salt) != 8) {
       return FALSE;
     }
 
     // Convert the base 2 logarithm into an integer.
     $count = 1 << $count_log2;
 
-    $hash = hash($algo, $salt . $password, TRUE);
+    $hash = \hash($algo, $salt . $password, TRUE);
     do {
-      $hash = hash($algo, $hash . $password, TRUE);
+      $hash = \hash($algo, $hash . $password, TRUE);
     } while (--$count);
 
-    $len = strlen($hash);
+    $len = \strlen($hash);
     $output = $setting . $this->base64Encode($hash, $len);
     // $this->base64Encode() of a 16 byte MD5 will always be 22 characters.
     // $this->base64Encode() of a 64 byte sha512 will always be 86 characters.
-    $expected = 12 + ceil((8 * $len) / 6);
-    return (strlen($output) == $expected) ? substr($output, 0, static::HASH_LENGTH) : FALSE;
+    $expected = 12 + \ceil((8 * $len) / 6);
+    return (\strlen($output) == $expected) ? \substr($output, 0, static::HASH_LENGTH) : FALSE;
   }
 
   /**
@@ -176,7 +176,7 @@ abstract class PhpassHashedPasswordBase implements PasswordInterface {
    *   The log2 iteration count.
    */
   public function getCountLog2($setting) {
-    return strpos(static::$ITOA64, $setting[3]);
+    return \strpos(static::$ITOA64, $setting[3]);
   }
 
   /**
@@ -194,18 +194,18 @@ abstract class PhpassHashedPasswordBase implements PasswordInterface {
     if ($hash === NULL || $hash === '') {
       return FALSE;
     }
-    if (str_starts_with($hash, 'U$')) {
+    if (\str_starts_with($hash, 'U$')) {
       // This may be an updated password from user_update_7000(). Such hashes
       // have 'U' added as the first character and need an extra md5() (see the
       // Drupal 7 documentation).
-      $stored_hash = substr($hash, 1);
-      $password = md5($password);
+      $stored_hash = \substr($hash, 1);
+      $password = \md5($password);
     }
     else {
       $stored_hash = $hash;
     }
 
-    $type = substr($stored_hash, 0, 3);
+    $type = \substr($stored_hash, 0, 3);
     switch ($type) {
       case '$S$':
         // A normal Drupal 7 password using sha512.
@@ -226,7 +226,7 @@ abstract class PhpassHashedPasswordBase implements PasswordInterface {
     }
 
     // Compare using hash_equals() instead of === to mitigate timing attacks.
-    return $computed_hash && hash_equals($stored_hash, $computed_hash);
+    return $computed_hash && \hash_equals($stored_hash, $computed_hash);
   }
 
   /**

@@ -95,7 +95,7 @@ class PhpTransliteration implements TransliterationInterface {
   public function removeDiacritics($string) {
     $result = '';
 
-    foreach (preg_split('//u', $string, 0, PREG_SPLIT_NO_EMPTY) as $character) {
+    foreach (\preg_split('//u', $string, 0, PREG_SPLIT_NO_EMPTY) as $character) {
       $code = self::ordUTF8($character);
 
       // These two Unicode ranges include the accented US-ASCII letters, with a
@@ -107,9 +107,9 @@ class PhpTransliteration implements TransliterationInterface {
       $exclusions_range2 = [0x01DD, 0x01f7, 0x021c, 0x021d, 0x0220, 0x0221, 0x0241, 0x0242, 0x0245];
 
       $replacement = $character;
-      if (($range1 && !in_array($code, $exclusions_range1)) || ($range2 && !in_array($code, $exclusions_range2))) {
+      if (($range1 && !\in_array($code, $exclusions_range1)) || ($range2 && !\in_array($code, $exclusions_range2))) {
         $to_add = $this->lookupReplacement($code, 'xyz');
-        if (strlen($to_add) === 1) {
+        if (\strlen($to_add) === 1) {
           $replacement = $to_add;
         }
         elseif (isset($this->fixTransliterateForRemoveDiacritics[$to_add])) {
@@ -134,26 +134,26 @@ class PhpTransliteration implements TransliterationInterface {
     // Replace question marks with a unique hash if necessary. This because
     // mb_convert_encoding() replaces all invalid characters with a question
     // mark.
-    if ($unknown_character != '?' && str_contains($string, '?')) {
-      $hash = hash('sha256', $string);
-      $string = str_replace('?', $hash, $string);
+    if ($unknown_character != '?' && \str_contains($string, '?')) {
+      $hash = \hash('sha256', $string);
+      $string = \str_replace('?', $hash, $string);
     }
 
     // Ensure the string is valid UTF8 for preg_split(). Unknown characters will
     // be replaced by a question mark.
-    $string = mb_convert_encoding($string, 'UTF-8', 'UTF-8');
+    $string = \mb_convert_encoding($string, 'UTF-8', 'UTF-8');
 
     // Use the provided unknown character instead of a question mark.
     if ($unknown_character != '?') {
-      $string = str_replace('?', $unknown_character, $string);
+      $string = \str_replace('?', $unknown_character, $string);
       // Restore original question marks if necessary.
       if ($hash !== FALSE) {
-        $string = str_replace($hash, '?', $string);
+        $string = \str_replace($hash, '?', $string);
       }
     }
 
     // Split into Unicode characters and transliterate each one.
-    foreach (preg_split('//u', $string, 0, PREG_SPLIT_NO_EMPTY) as $character) {
+    foreach (\preg_split('//u', $string, 0, PREG_SPLIT_NO_EMPTY) as $character) {
       $code = self::ordUTF8($character);
       if ($code == -1) {
         $to_add = $unknown_character;
@@ -164,7 +164,7 @@ class PhpTransliteration implements TransliterationInterface {
 
       // Check if this exceeds the maximum allowed length.
       if (isset($max_length)) {
-        $length += strlen($to_add);
+        $length += \strlen($to_add);
         if ($length > $max_length) {
           // There is no more space.
           return $result;
@@ -187,7 +187,7 @@ class PhpTransliteration implements TransliterationInterface {
    *   The character code, or -1 if an illegal character is found.
    */
   protected static function ordUTF8($character) {
-    $first_byte = ord($character[0]);
+    $first_byte = \ord($character[0]);
 
     if (($first_byte & 0x80) == 0) {
       // Single-byte form: 0xxxxxxxx.
@@ -195,15 +195,15 @@ class PhpTransliteration implements TransliterationInterface {
     }
     if (($first_byte & 0xe0) == 0xc0) {
       // Two-byte form: 110xxxxx 10xxxxxx.
-      return (($first_byte & 0x1f) << 6) + (ord($character[1]) & 0x3f);
+      return (($first_byte & 0x1f) << 6) + (\ord($character[1]) & 0x3f);
     }
     if (($first_byte & 0xf0) == 0xe0) {
       // Three-byte form: 1110xxxx 10xxxxxx 10xxxxxx.
-      return (($first_byte & 0x0f) << 12) + ((ord($character[1]) & 0x3f) << 6) + (ord($character[2]) & 0x3f);
+      return (($first_byte & 0x0f) << 12) + ((\ord($character[1]) & 0x3f) << 6) + (\ord($character[2]) & 0x3f);
     }
     if (($first_byte & 0xf8) == 0xf0) {
       // Four-byte form: 11110xxx 10xxxxxx 10xxxxxx 10xxxxxx.
-      return (($first_byte & 0x07) << 18) + ((ord($character[1]) & 0x3f) << 12) + ((ord($character[2]) & 0x3f) << 6) + (ord($character[3]) & 0x3f);
+      return (($first_byte & 0x07) << 18) + ((\ord($character[1]) & 0x3f) << 12) + ((\ord($character[2]) & 0x3f) << 6) + (\ord($character[3]) & 0x3f);
     }
 
     // Other forms are not legal.
@@ -229,7 +229,7 @@ class PhpTransliteration implements TransliterationInterface {
   protected function replace($code, $langcode, $unknown_character) {
     if ($code < 0x80) {
       // Already lower ASCII.
-      return chr($code);
+      return \chr($code);
     }
 
     // See if there is a language-specific override for this character.
@@ -283,12 +283,12 @@ class PhpTransliteration implements TransliterationInterface {
   protected function readLanguageOverrides($langcode) {
     // Figure out the file name to use by sanitizing the language code,
     // just in case.
-    $file = $this->dataDirectory . '/' . preg_replace('/[^a-zA-Z\-]/', '', $langcode) . '.php';
+    $file = $this->dataDirectory . '/' . \preg_replace('/[^a-zA-Z\-]/', '', $langcode) . '.php';
 
     // Read in this file, which should set up a variable called $overrides,
     // which will be local to this function.
     $overrides[$langcode] = [];
-    if (is_file($file)) {
+    if (\is_file($file)) {
       include $file;
     }
     $this->languageOverrides[$langcode] = $overrides[$langcode];
@@ -309,12 +309,12 @@ class PhpTransliteration implements TransliterationInterface {
    */
   protected function readGenericData($bank) {
     // Figure out the file name.
-    $file = $this->dataDirectory . '/x' . sprintf('%02x', $bank) . '.php';
+    $file = $this->dataDirectory . '/x' . \sprintf('%02x', $bank) . '.php';
 
     // Read in this file, which should set up a variable called $base, which
     // will be local to this function.
     $base = [];
-    if (is_file($file)) {
+    if (\is_file($file)) {
       include $file;
     }
     $this->genericMap[$bank] = $base;

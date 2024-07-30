@@ -56,7 +56,7 @@ class AttributeClassDiscovery implements DiscoveryInterface {
     protected readonly array $pluginNamespaces = [],
     protected readonly string $pluginDefinitionAttributeName = Plugin::class,
   ) {
-    $file_cache_suffix = str_replace('\\', '_', $this->pluginDefinitionAttributeName);
+    $file_cache_suffix = \str_replace('\\', '_', $this->pluginDefinitionAttributeName);
     $this->fileCache = FileCacheFactory::get('attribute_discovery:' . $this->getFileCacheSuffix($file_cache_suffix));
     $this->rootTwoLevelNamespaces = array_unique(array_map(fn($namespace) => $this->getTwoLevelNamespace($namespace), array_keys($this->getPluginNamespaces())));
   }
@@ -89,12 +89,12 @@ class AttributeClassDiscovery implements DiscoveryInterface {
     // Search for classes within all PSR-4 namespace locations.
     foreach ($this->getPluginNamespaces() as $namespace => $dirs) {
       foreach ($dirs as $dir) {
-        if (file_exists($dir)) {
+        if (\file_exists($dir)) {
           $iterator = new \RecursiveIteratorIterator(
             new \RecursiveDirectoryIterator($dir, \RecursiveDirectoryIterator::SKIP_DOTS)
           );
           foreach ($iterator as $fileinfo) {
-            assert($fileinfo instanceof \SplFileInfo);
+            \assert($fileinfo instanceof \SplFileInfo);
             if ($fileinfo->getExtension() === 'php') {
               if ($cached = $this->fileCache->get($fileinfo->getPathName())) {
                 if (isset($cached['id'])) {
@@ -109,7 +109,7 @@ class AttributeClassDiscovery implements DiscoveryInterface {
               }
 
               $sub_path = $iterator->getSubIterator()->getSubPath();
-              $sub_path = $sub_path ? str_replace(DIRECTORY_SEPARATOR, '\\', $sub_path) . '\\' : '';
+              $sub_path = $sub_path ? \str_replace(DIRECTORY_SEPARATOR, '\\', $sub_path) . '\\' : '';
               $class = $namespace . '\\' . $sub_path . $fileinfo->getBasename('.php');
               // Plugins may rely on Attribute classes defined by modules that
               // are not installed. In such a case, a 'class not found' error
@@ -210,7 +210,7 @@ class AttributeClassDiscovery implements DiscoveryInterface {
     // Plugin discovery is a memory expensive process due to reflection and the
     // number of files involved. Collect cycles at the end of discovery to be as
     // efficient as possible.
-    gc_collect_cycles();
+    \gc_collect_cycles();
     return $definitions;
   }
 

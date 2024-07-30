@@ -238,8 +238,8 @@ class ContentLanguageSettings extends ConfigEntityBase implements ContentLanguag
    */
   public static function getAllValidDefaultLangcodes(): array {
     $language_manager = \Drupal::service('language_manager');
-    return array_unique([
-      ...array_keys($language_manager->getLanguages(LanguageInterface::STATE_ALL)),
+    return \array_unique([
+      ...\array_keys($language_manager->getLanguages(LanguageInterface::STATE_ALL)),
       LanguageInterface::LANGCODE_SITE_DEFAULT,
       'current_interface',
       'authors_default',

@@ -69,7 +69,7 @@ class FieldItemNormalizerTest extends JsonapiKernelTestBase {
     $item->getValue()->willReturn('Direct call to getValue');
 
     $result = $this->normalizer->normalize($item->reveal(), 'api_json');
-    assert($result instanceof CacheableNormalization);
+    \assert($result instanceof CacheableNormalization);
     $this->assertSame('Direct call to getValue', $result->getNormalization());
   }
 
@@ -102,12 +102,12 @@ class FieldItemNormalizerTest extends JsonapiKernelTestBase {
 
     // Verify a field with one property is flattened.
     $result = $this->normalizer->normalize($entity->get('name')->first());
-    assert($result instanceof CacheableNormalization);
+    \assert($result instanceof CacheableNormalization);
     $this->assertEquals('Test entity', $result->getNormalization());
 
     // Verify a field with multiple public properties has all of them returned.
     $result = $this->normalizer->normalize($entity->get('links')->first());
-    assert($result instanceof CacheableNormalization);
+    \assert($result instanceof CacheableNormalization);
     $this->assertEquals([
       'uri' => 'https://www.drupal.org',
       'title' => 'Drupal.org',
@@ -119,14 +119,14 @@ class FieldItemNormalizerTest extends JsonapiKernelTestBase {
     // Verify a field with one public property and one internal only returns the
     // public property, and is flattened.
     $result = $this->normalizer->normalize($entity->get('internal_property_value')->first());
-    assert($result instanceof CacheableNormalization);
+    \assert($result instanceof CacheableNormalization);
     // Property `internal_value` will not exist.
     $this->assertEquals('Internal property testing!', $result->getNormalization());
 
     // Verify a field with one public property but no main property is not
     // flattened.
     $result = $this->normalizer->normalize($entity->get('no_main_property_value')->first());
-    assert($result instanceof CacheableNormalization);
+    \assert($result instanceof CacheableNormalization);
     $this->assertEquals([
       'value' => 'No main property testing!',
     ], $result->getNormalization());

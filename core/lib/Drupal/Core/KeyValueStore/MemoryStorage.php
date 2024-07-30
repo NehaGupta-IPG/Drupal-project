@@ -18,21 +18,21 @@ class MemoryStorage extends StorageBase {
    * {@inheritdoc}
    */
   public function has($key) {
-    return array_key_exists($key, $this->data);
+    return \array_key_exists($key, $this->data);
   }
 
   /**
    * {@inheritdoc}
    */
   public function get($key, $default = NULL) {
-    return array_key_exists($key, $this->data) ? $this->data[$key] : $default;
+    return \array_key_exists($key, $this->data) ? $this->data[$key] : $default;
   }
 
   /**
    * {@inheritdoc}
    */
   public function getMultiple(array $keys) {
-    return array_intersect_key($this->data, array_flip($keys));
+    return \array_intersect_key($this->data, \array_flip($keys));
   }
 
   /**

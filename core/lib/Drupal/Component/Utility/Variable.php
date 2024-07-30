@@ -22,13 +22,13 @@ class Variable {
     if ($callable instanceof \Closure) {
       return '[closure]';
     }
-    elseif (is_array($callable) && $callable) {
-      if (is_object($callable[0])) {
-        $callable[0] = get_class($callable[0]);
+    elseif (\is_array($callable) && $callable) {
+      if (\is_object($callable[0])) {
+        $callable[0] = \get_class($callable[0]);
       }
-      return implode('::', $callable);
+      return \implode('::', $callable);
     }
-    elseif (is_string($callable)) {
+    elseif (\is_string($callable)) {
       return $callable;
     }
     else {
@@ -49,36 +49,36 @@ class Variable {
    *   The variable exported in a way compatible to Drupal's coding standards.
    */
   public static function export($var, $prefix = '') {
-    if (is_array($var)) {
+    if (\is_array($var)) {
       if (empty($var)) {
         $output = '[]';
       }
       else {
         $output = "[\n";
         // Don't export keys if the array is non associative.
-        $export_keys = array_values($var) != $var;
+        $export_keys = \array_values($var) != $var;
         foreach ($var as $key => $value) {
           $output .= '  ' . ($export_keys ? static::export($key) . ' => ' : '') . static::export($value, '  ') . ",\n";
         }
         $output .= ']';
       }
     }
-    elseif (is_bool($var)) {
+    elseif (\is_bool($var)) {
       $output = $var ? 'TRUE' : 'FALSE';
     }
-    elseif (is_string($var)) {
-      if (str_contains($var, "\n") || str_contains($var, "'")) {
+    elseif (\is_string($var)) {
+      if (\str_contains($var, "\n") || \str_contains($var, "'")) {
         // If the string contains a line break or a single quote, use the
         // double quote export mode. Encode backslash, dollar symbols, and
         // double quotes and transform some common control characters.
-        $var = str_replace(['\\', '$', '"', "\n", "\r", "\t"], ['\\\\', '\$', '\"', '\n', '\r', '\t'], $var);
+        $var = \str_replace(['\\', '$', '"', "\n", "\r", "\t"], ['\\\\', '\$', '\"', '\n', '\r', '\t'], $var);
         $output = '"' . $var . '"';
       }
       else {
         $output = "'" . $var . "'";
       }
     }
-    elseif (is_object($var) && get_class($var) === 'stdClass') {
+    elseif (\is_object($var) && \get_class($var) === 'stdClass') {
       // var_export() will export stdClass objects using an undefined
       // magic method __set_state() leaving the export broken. This
       // workaround avoids this by casting the object as an array for
@@ -92,7 +92,7 @@ class Variable {
     }
 
     if ($prefix) {
-      $output = str_replace("\n", "\n$prefix", $output);
+      $output = \str_replace("\n", "\n$prefix", $output);
     }
 
     return $output;

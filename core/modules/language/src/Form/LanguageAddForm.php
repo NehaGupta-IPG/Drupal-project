@@ -32,7 +32,7 @@ class LanguageAddForm extends LanguageFormBase {
     $predefined_languages = $this->languageManager->getStandardLanguageListWithoutConfigured();
 
     $predefined_languages['custom'] = $this->t('Custom language...');
-    $predefined_default = $form_state->getValue('predefined_langcode', key($predefined_languages));
+    $predefined_default = $form_state->getValue('predefined_langcode', \key($predefined_languages));
     $form['predefined_langcode'] = [
       '#type' => 'select',
       '#title' => $this->t('Language name'),
@@ -165,7 +165,7 @@ class LanguageAddForm extends LanguageFormBase {
     // There is no weight on the edit form. Fetch all configurable languages
     // ordered by weight and set the new language to be placed after them.
     $languages = \Drupal::languageManager()->getLanguages(ConfigurableLanguage::STATE_CONFIGURABLE);
-    $last_language = end($languages);
+    $last_language = \end($languages);
     $entity->setWeight($last_language->getWeight() + 1);
   }
 

@@ -17,7 +17,7 @@ trait FilteredPluginManagerTrait {
    * Implements \Drupal\Core\Plugin\FilteredPluginManagerInterface::getFilteredDefinitions().
    */
   public function getFilteredDefinitions($consumer, $contexts = NULL, array $extra = []) {
-    if (!is_null($contexts)) {
+    if (!\is_null($contexts)) {
       $definitions = $this->getDefinitionsForContexts($contexts);
     }
     else {
@@ -51,7 +51,7 @@ trait FilteredPluginManagerTrait {
    *   The module handler.
    */
   protected function moduleHandler() {
-    if (property_exists($this, 'moduleHandler') && $this->moduleHandler instanceof ModuleHandlerInterface) {
+    if (\property_exists($this, 'moduleHandler') && $this->moduleHandler instanceof ModuleHandlerInterface) {
       return $this->moduleHandler;
     }
 
@@ -65,7 +65,7 @@ trait FilteredPluginManagerTrait {
    *   The theme manager.
    */
   protected function themeManager() {
-    if (property_exists($this, 'themeManager') && $this->themeManager instanceof ThemeManagerInterface) {
+    if (\property_exists($this, 'themeManager') && $this->themeManager instanceof ThemeManagerInterface) {
       return $this->themeManager;
     }
 

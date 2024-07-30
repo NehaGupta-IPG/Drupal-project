@@ -108,7 +108,7 @@ abstract class ContentTranslationTestBase extends BrowserTestBase {
     foreach ($this->langcodes as $langcode) {
       ConfigurableLanguage::createFromLangcode($langcode)->save();
     }
-    array_unshift($this->langcodes, \Drupal::languageManager()->getDefaultLanguage()->getId());
+    \array_unshift($this->langcodes, \Drupal::languageManager()->getDefaultLanguage()->getId());
   }
 
   /**
@@ -233,7 +233,7 @@ abstract class ContentTranslationTestBase extends BrowserTestBase {
     $storage = $this->container->get('entity_type.manager')->getStorage($this->entityTypeId);
     if (!($storage instanceof SqlContentEntityStorage)) {
       foreach ($values as $property => $value) {
-        if (is_array($value)) {
+        if (\is_array($value)) {
           $entity_values[$property] = [$langcode => $value];
         }
       }

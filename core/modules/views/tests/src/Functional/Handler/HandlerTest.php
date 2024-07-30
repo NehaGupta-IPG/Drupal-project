@@ -220,7 +220,7 @@ class HandlerTest extends ViewTestBase {
     // Store the order of handlers before saving the view.
     $original_order = [];
     foreach ($handler_types as $type) {
-      $original_order[$type] = array_keys($view->display_handler->getOption($type));
+      $original_order[$type] = \array_keys($view->display_handler->getOption($type));
     }
 
     // Save the view and see if our filters are in the same order.
@@ -229,7 +229,7 @@ class HandlerTest extends ViewTestBase {
     $view->initDisplay();
 
     foreach ($handler_types as $type) {
-      $loaded_order = array_keys($view->display_handler->getOption($type));
+      $loaded_order = \array_keys($view->display_handler->getOption($type));
       $this->assertSame($original_order[$type], $loaded_order);
     }
   }
@@ -386,7 +386,7 @@ class HandlerTest extends ViewTestBase {
     $view->initHandlers();
 
     foreach ($views_data['access_callback'] as $type => $info) {
-      if (!in_array($type, ['title', 'help'])) {
+      if (!\in_array($type, ['title', 'help'])) {
         $this->assertInstanceOf(HandlerBase::class, $view->field['access_callback']);
         $this->assertFalse(isset($view->field['access_callback_arguments']), 'Make sure the user got no access to the access_callback_arguments field ');
       }
@@ -400,7 +400,7 @@ class HandlerTest extends ViewTestBase {
     $view->initHandlers();
 
     foreach ($views_data['access_callback'] as $type => $info) {
-      if (!in_array($type, ['title', 'help'])) {
+      if (!\in_array($type, ['title', 'help'])) {
         $this->assertFalse(isset($view->field['access_callback']), 'Make sure the user got no access to the access_callback field ');
         $this->assertInstanceOf(HandlerBase::class, $view->field['access_callback_arguments']);
       }

@@ -32,10 +32,10 @@ class Permissions {
             '%transition' => $transition->label(),
           ]),
           'description' => $this->formatPlural(
-            count($transition->from()),
+            \count($transition->from()),
             'Move content from %from state to %to state.',
             'Move content from %from states to %to state.', [
-              '%from' => implode(', ', array_map([State::class, 'labelCallback'], $transition->from())),
+              '%from' => \implode(', ', \array_map([State::class, 'labelCallback'], $transition->from())),
               '%to' => $transition->to()->label(),
             ]
           ),

@@ -61,7 +61,7 @@ abstract class FileMediaFormatterTestBase extends BrowserTestBase {
       'field_name' => $field_name,
       'bundle' => $bundle,
       'settings' => [
-        'file_extensions' => trim($file_extensions),
+        'file_extensions' => \trim($file_extensions),
       ],
     ]);
     $field_config->save();

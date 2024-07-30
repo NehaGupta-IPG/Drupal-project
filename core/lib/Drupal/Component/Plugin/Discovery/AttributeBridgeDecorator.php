@@ -33,7 +33,7 @@ class AttributeBridgeDecorator implements DiscoveryInterface {
       // Attribute constructors expect an array of values. If the definition is
       // not an array, it usually means it has been processed already and can be
       // ignored.
-      if (is_array($definition)) {
+      if (\is_array($definition)) {
         $class = $definition['class'] ?? NULL;
         $provider = $definition['provider'] ?? NULL;
         unset($definition['class'], $definition['provider']);

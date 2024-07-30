@@ -138,11 +138,11 @@ class MediaSourceOEmbedVideoTest extends MediaSourceTestBase {
     // Ensure the iframe exists and has the expected CSS class, and that its src
     // attribute contains a coherent URL with the query parameters we expect.
     $iframe = $assert_session->elementExists('css', 'iframe.media-oembed-content');
-    $iframe_url = parse_url($iframe->getAttribute('src'));
+    $iframe_url = \parse_url($iframe->getAttribute('src'));
     $this->assertStringEndsWith('/media/oembed', $iframe_url['path']);
     $this->assertNotEmpty($iframe_url['query']);
     $query = [];
-    parse_str($iframe_url['query'], $query);
+    \parse_str($iframe_url['query'], $query);
     $this->assertSame($video_url, $query['url']);
     $this->assertNotEmpty($query['hash']);
     // Ensure that the outer iframe's width respects the formatter settings.
@@ -218,7 +218,7 @@ class MediaSourceOEmbedVideoTest extends MediaSourceTestBase {
     $this->drupalLogout();
 
     // Without a hash should be denied.
-    $no_hash_query = array_diff_key($query, ['hash' => '']);
+    $no_hash_query = \array_diff_key($query, ['hash' => '']);
     $this->drupalGet('media/oembed', ['query' => $no_hash_query]);
     $assert_session->pageTextNotContains('Vimeo works!');
     $assert_session->pageTextContains('This resource is not available');

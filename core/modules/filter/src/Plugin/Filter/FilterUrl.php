@@ -41,7 +41,7 @@ class FilterUrl extends FilterBase {
    * {@inheritdoc}
    */
   public function process($text, $langcode) {
-    return new FilterProcessResult(_filter_url($text, $this));
+    return new FilterProcessResult(\_filter_url($text, $this));
   }
 
   /**

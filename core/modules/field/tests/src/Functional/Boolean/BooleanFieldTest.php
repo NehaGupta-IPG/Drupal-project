@@ -117,7 +117,7 @@ class BooleanFieldTest extends BrowserTestBase {
       "{$field_name}[value]" => 1,
     ];
     $this->submitForm($edit, 'Save');
-    preg_match('|entity_test/manage/(\d+)|', $this->getUrl(), $match);
+    \preg_match('|entity_test/manage/(\d+)|', $this->getUrl(), $match);
     $id = $match[1];
     $this->assertSession()->pageTextContains('entity_test ' . $id . ' has been created.');
 
@@ -231,7 +231,7 @@ class BooleanFieldTest extends BrowserTestBase {
 
     // Should be posted OK.
     $this->submitForm([], 'Save');
-    preg_match('|entity_test/manage/(\d+)|', $this->getUrl(), $match);
+    \preg_match('|entity_test/manage/(\d+)|', $this->getUrl(), $match);
     $id = $match[1];
     $this->assertSession()->pageTextContains('entity_test ' . $id . ' has been created.');
 
@@ -242,7 +242,7 @@ class BooleanFieldTest extends BrowserTestBase {
     $this->assertSession()->fieldNotExists("{$field_name}[value]");
     // Should still be able to post the form.
     $this->submitForm([], 'Save');
-    preg_match('|entity_test/manage/(\d+)|', $this->getUrl(), $match);
+    \preg_match('|entity_test/manage/(\d+)|', $this->getUrl(), $match);
     $id = $match[1];
     $this->assertSession()->pageTextContains('entity_test ' . $id . ' has been created.');
   }

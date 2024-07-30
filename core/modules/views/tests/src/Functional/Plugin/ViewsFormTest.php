@@ -34,7 +34,7 @@ class ViewsFormTest extends ViewTestBase {
     $xpath = $this->cssSelect('.views-form form');
     $this->assertCount(1, $xpath, 'There is one views form on the page.');
     // Ensure we don't have nested form elements.
-    $result = (bool) preg_match('#<form[^>]*?>(?!/form).*<form#s', $this->getSession()->getPage()->getContent());
+    $result = (bool) \preg_match('#<form[^>]*?>(?!/form).*<form#s', $this->getSession()->getPage()->getContent());
     $this->assertFalse($result, 'The views form element is not nested.');
 
     // Test the form isn't shown when the display doesn't use fields.

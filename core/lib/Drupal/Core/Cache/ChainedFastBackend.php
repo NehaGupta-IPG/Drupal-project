@@ -103,7 +103,7 @@ class ChainedFastBackend implements CacheBackendInterface, CacheTagsInvalidatorI
   public function get($cid, $allow_invalid = FALSE) {
     $cids = [$cid];
     $cache = $this->getMultiple($cids, $allow_invalid);
-    return reset($cache);
+    return \reset($cache);
   }
 
   /**
@@ -164,7 +164,7 @@ class ChainedFastBackend implements CacheBackendInterface, CacheTagsInvalidatorI
       // written to in the consistent backend, so only keep ones that aren't.
       foreach ($items as $item) {
         if ($item->created < $last_write_timestamp) {
-          $cids[array_search($item->cid, $cids_copy)] = $item->cid;
+          $cids[\array_search($item->cid, $cids_copy)] = $item->cid;
         }
         else {
           $cache[$item->cid] = $item;

@@ -24,7 +24,7 @@ class TrustedHostsTestController {
    */
   public function bagType($bag) {
     $request = Request::create('/');
-    return ['#markup' => 'Type: ' . get_class($request->$bag)];
+    return ['#markup' => 'Type: ' . \get_class($request->$bag)];
   }
 
 }

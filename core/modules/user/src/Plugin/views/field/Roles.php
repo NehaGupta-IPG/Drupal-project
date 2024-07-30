@@ -89,13 +89,13 @@ class Roles extends PrerenderList {
         $this->items[$role->uid][$role->rid]['rid'] = $role->rid;
       }
       // Sort the roles for each user by role weight.
-      $ordered_roles = array_flip(array_keys($roles));
+      $ordered_roles = \array_flip(\array_keys($roles));
       foreach ($this->items as &$user_roles) {
         // Create an array of rids that the user has in the role weight order.
-        $sorted_keys = array_intersect_key($ordered_roles, $user_roles);
+        $sorted_keys = \array_intersect_key($ordered_roles, $user_roles);
         // Merge with the unsorted array of role information which has the
         // effect of sorting it.
-        $user_roles = array_replace($sorted_keys, $user_roles);
+        $user_roles = \array_replace($sorted_keys, $user_roles);
       }
     }
   }

@@ -75,7 +75,7 @@ class DateRangeCustomFormatter extends DateTimeCustomFormatter {
    * {@inheritdoc}
    */
   public function settingsSummary() {
-    return array_merge(parent::settingsSummary(), $this->dateTimeRangeSettingsSummary());
+    return \array_merge(parent::settingsSummary(), $this->dateTimeRangeSettingsSummary());
   }
 
 }

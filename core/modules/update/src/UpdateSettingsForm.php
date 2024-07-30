@@ -39,7 +39,7 @@ class UpdateSettingsForm extends ConfigFormBase {
       '#config_target' => new ConfigTarget(
         'update.settings',
         'check.interval_days',
-        toConfig: fn($value) => intval($value)),
+        toConfig: fn($value) => \intval($value)),
       '#options' => [
         1 => $this->t('Daily'),
         7 => $this->t('Weekly'),
@@ -99,7 +99,7 @@ class UpdateSettingsForm extends ConfigFormBase {
     foreach ($violations as $violation) {
       $invalid_email_addresses[] = $violation->getInvalidValue();
     }
-    return $this->t('%emails are not valid email addresses.', ['%emails' => implode(', ', $invalid_email_addresses)]);
+    return $this->t('%emails are not valid email addresses.', ['%emails' => \implode(', ', $invalid_email_addresses)]);
   }
 
   /**
@@ -110,7 +110,7 @@ class UpdateSettingsForm extends ConfigFormBase {
     // See if the update_check_disabled setting is being changed, and if so,
     // invalidate all update status data.
     if ($form_state->getValue('update_check_disabled') != $config->get('check.disabled_extensions')) {
-      update_storage_clear();
+      \update_storage_clear();
     }
 
     parent::submitForm($form, $form_state);
@@ -139,7 +139,7 @@ class UpdateSettingsForm extends ConfigFormBase {
    *   The value of the form element.
    */
   public static function arrayToMultiLineString(array $value): string {
-    return implode("\n", $value);
+    return \implode("\n", $value);
   }
 
 }

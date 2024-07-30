@@ -63,7 +63,7 @@ class ViewsFormMainForm implements FormInterface, TrustedCallbackInterface {
     }
 
     // Apply substitutions to the rendered output.
-    $output = str_replace($search, $replace, \Drupal::service('renderer')->render($element['output']));
+    $output = \str_replace($search, $replace, \Drupal::service('renderer')->render($element['output']));
     $element['output'] = ['#markup' => ViewsRenderPipelineMarkup::create($output)];
 
     return $element;
@@ -103,17 +103,17 @@ class ViewsFormMainForm implements FormInterface, TrustedCallbackInterface {
     $substitutions = [];
     foreach ($view->field as $field_name => $field) {
       $form_element_name = $field_name;
-      if (method_exists($field, 'form_element_name')) {
+      if (\method_exists($field, 'form_element_name')) {
         $form_element_name = $field->form_element_name();
       }
       $method_form_element_row_id_exists = FALSE;
-      if (method_exists($field, 'form_element_row_id')) {
+      if (\method_exists($field, 'form_element_row_id')) {
         $method_form_element_row_id_exists = TRUE;
       }
 
       // If the field provides a views form, allow it to modify the $form array.
       $has_form = FALSE;
-      if (method_exists($field, 'viewsForm')) {
+      if (\method_exists($field, 'viewsForm')) {
         $field->viewsForm($form, $form_state);
 
         // Allow the views form to determine whether it's safe to be submitted
@@ -145,10 +145,10 @@ class ViewsFormMainForm implements FormInterface, TrustedCallbackInterface {
     }
 
     // Give the area handlers a chance to extend the form.
-    $area_handlers = array_merge(array_values($view->header), array_values($view->footer));
+    $area_handlers = \array_merge(\array_values($view->header), \array_values($view->footer));
     $empty = empty($view->result);
     foreach ($area_handlers as $area) {
-      if (method_exists($area, 'viewsForm') && !$area->viewsFormEmpty($empty)) {
+      if (\method_exists($area, 'viewsForm') && !$area->viewsFormEmpty($empty)) {
         $area->viewsForm($form, $form_state);
       }
     }
@@ -169,7 +169,7 @@ class ViewsFormMainForm implements FormInterface, TrustedCallbackInterface {
 
     // Call the validation method on every field handler that has it.
     foreach ($view->field as $field) {
-      if (method_exists($field, 'viewsFormValidate')) {
+      if (\method_exists($field, 'viewsFormValidate')) {
         $field->viewsFormValidate($form, $form_state);
       }
     }
@@ -177,7 +177,7 @@ class ViewsFormMainForm implements FormInterface, TrustedCallbackInterface {
     // Call the validate method on every area handler that has it.
     foreach (['header', 'footer'] as $area) {
       foreach ($view->{$area} as $area_handler) {
-        if (method_exists($area_handler, 'viewsFormValidate')) {
+        if (\method_exists($area_handler, 'viewsFormValidate')) {
           $area_handler->viewsFormValidate($form, $form_state);
         }
       }
@@ -192,7 +192,7 @@ class ViewsFormMainForm implements FormInterface, TrustedCallbackInterface {
 
     // Call the submit method on every field handler that has it.
     foreach ($view->field as $field) {
-      if (method_exists($field, 'viewsFormSubmit')) {
+      if (\method_exists($field, 'viewsFormSubmit')) {
         $field->viewsFormSubmit($form, $form_state);
       }
     }
@@ -200,7 +200,7 @@ class ViewsFormMainForm implements FormInterface, TrustedCallbackInterface {
     // Call the submit method on every area handler that has it.
     foreach (['header', 'footer'] as $area) {
       foreach ($view->{$area} as $area_handler) {
-        if (method_exists($area_handler, 'viewsFormSubmit')) {
+        if (\method_exists($area_handler, 'viewsFormSubmit')) {
           $area_handler->viewsFormSubmit($form, $form_state);
         }
       }

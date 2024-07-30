@@ -165,7 +165,7 @@ class VocabularyListBuilder extends DraggableListBuilder {
     $entities = $this->load();
     // If there are not multiple vocabularies, disable dragging by unsetting the
     // weight key.
-    if (count($entities) <= 1) {
+    if (\count($entities) <= 1) {
       unset($this->weightKey);
     }
     $build = parent::render();

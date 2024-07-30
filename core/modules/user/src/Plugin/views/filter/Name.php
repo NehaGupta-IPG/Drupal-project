@@ -61,7 +61,7 @@ class Name extends InOperator {
       foreach ($values as $value) {
         $uids[] = $value['target_id'];
       }
-      sort($uids);
+      \sort($uids);
     }
     $form_state->setValue(['options', 'value'], $uids);
   }

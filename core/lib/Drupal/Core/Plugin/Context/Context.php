@@ -50,7 +50,7 @@ class Context extends ComponentContext implements ContextInterface {
   public function __construct(ContextDefinitionInterface $context_definition, $context_value = NULL) {
     parent::__construct($context_definition, NULL);
     $this->cacheabilityMetadata = new CacheableMetadata();
-    if (!is_null($context_value)) {
+    if (!\is_null($context_value)) {
       $this->setContextValue($context_value);
     }
   }
@@ -174,7 +174,7 @@ class Context extends ComponentContext implements ContextInterface {
   public static function createFromContext(ContextInterface $old_context, $value) {
     $context = new static($old_context->getContextDefinition(), $value);
     $context->addCacheableDependency($old_context);
-    if (method_exists($old_context, 'getTypedDataManager')) {
+    if (\method_exists($old_context, 'getTypedDataManager')) {
       $context->setTypedDataManager($old_context->getTypedDataManager());
     }
     return $context;

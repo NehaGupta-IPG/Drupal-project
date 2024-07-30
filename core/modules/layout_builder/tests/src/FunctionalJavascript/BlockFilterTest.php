@@ -101,7 +101,7 @@ class BlockFilterTest extends WebDriverTestBase {
     $this->assertCount(3, $visible_categories);
 
     // Test Drupal.announce() message when multiple matches are present.
-    $expected_message = count($visible_rows) . $fewer_blocks_message;
+    $expected_message = \count($visible_rows) . $fewer_blocks_message;
     $this->assertAnnounceContains($expected_message);
 
     // Test 3 letter search.
@@ -139,7 +139,7 @@ class BlockFilterTest extends WebDriverTestBase {
     $this->assertCount(0, $visible_categories);
     $announce_element = $page->find('css', '#drupal-live-announce');
     $page->waitFor(2, function () use ($announce_element) {
-      return str_starts_with($announce_element->getText(), '0 blocks are available');
+      return \str_starts_with($announce_element->getText(), '0 blocks are available');
     });
 
     // Test Drupal.announce() message when all blocks are listed.
@@ -159,7 +159,7 @@ class BlockFilterTest extends WebDriverTestBase {
    *   An array of visible node elements.
    */
   protected function filterVisibleElements(array $elements): array {
-    return array_filter($elements, function (NodeElement $element) {
+    return \array_filter($elements, function (NodeElement $element) {
       return $element->isVisible();
     });
   }

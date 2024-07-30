@@ -70,18 +70,18 @@ class EntityReferenceFieldItemNormalizer extends FieldItemNormalizer {
       /** @var \Drupal\Core\Field\Plugin\Field\FieldType\EntityReferenceItem $field_item */
       $field_item = $context['target_instance'];
       if (empty($data['target_uuid'])) {
-        throw new InvalidArgumentException(sprintf('If provided "target_uuid" cannot be empty for field "%s".', $field_item->getName()));
+        throw new InvalidArgumentException(\sprintf('If provided "target_uuid" cannot be empty for field "%s".', $field_item->getName()));
       }
       $target_type = $field_item->getFieldDefinition()->getSetting('target_type');
       if (!empty($data['target_type']) && $target_type !== $data['target_type']) {
-        throw new UnexpectedValueException(sprintf('The field "%s" property "target_type" must be set to "%s" or omitted.', $field_item->getFieldDefinition()->getName(), $target_type));
+        throw new UnexpectedValueException(\sprintf('The field "%s" property "target_type" must be set to "%s" or omitted.', $field_item->getFieldDefinition()->getName(), $target_type));
       }
       if ($entity = $this->entityRepository->loadEntityByUuid($target_type, $data['target_uuid'])) {
-        return ['target_id' => $entity->id()] + array_intersect_key($data, $field_item->getProperties());
+        return ['target_id' => $entity->id()] + \array_intersect_key($data, $field_item->getProperties());
       }
       else {
         // Unable to load entity by uuid.
-        throw new InvalidArgumentException(sprintf('No "%s" entity found with UUID "%s" for field "%s".', $data['target_type'], $data['target_uuid'], $field_item->getName()));
+        throw new InvalidArgumentException(\sprintf('No "%s" entity found with UUID "%s" for field "%s".', $data['target_type'], $data['target_uuid'], $field_item->getName()));
       }
     }
     return parent::constructValue($data, $context);

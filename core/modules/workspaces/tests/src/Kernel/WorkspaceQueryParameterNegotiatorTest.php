@@ -64,7 +64,7 @@ class WorkspaceQueryParameterNegotiatorTest extends KernelTestBase {
     // generate a good token here.
     if ($token === 'good_token') {
       $hash_salt = $this->container->get('settings')->get('hash_salt');
-      $token = substr(Crypt::hmacBase64($workspace, $hash_salt), 0, 8);
+      $token = \substr(Crypt::hmacBase64($workspace, $hash_salt), 0, 8);
     }
 
     $request = \Drupal::request();

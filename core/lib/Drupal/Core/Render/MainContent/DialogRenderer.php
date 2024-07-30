@@ -85,7 +85,7 @@ class DialogRenderer implements MainContentRendererInterface {
       // If the target was nominated in the incoming options, use that.
       $target = $options['target'];
       // Ensure the target includes the #.
-      if (!str_starts_with($target, '#')) {
+      if (!\str_starts_with($target, '#')) {
         $target = '#' . $target;
       }
       // This shouldn't be passed on to jQuery.ui.dialog.
@@ -133,7 +133,7 @@ class DialogRenderer implements MainContentRendererInterface {
    */
   protected function getTitleAsStringable(array $main_content, Request $request, RouteMatchInterface $route_match): \Stringable|string|null {
     $title = $main_content['#title'] ?? $this->titleResolver->getTitle($request, $route_match->getRouteObject());
-    if (is_array($title)) {
+    if (\is_array($title)) {
       $title = $this->renderer->renderInIsolation($title);
     }
     return $title;

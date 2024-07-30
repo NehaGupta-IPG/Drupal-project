@@ -25,10 +25,10 @@ class MultiValueTestItem extends FieldItemBase {
    */
   public static function propertyDefinitions(FieldStorageDefinitionInterface $field_definition) {
     $properties['value1'] = DataDefinition::create('string')
-      ->setLabel(t('First value'));
+      ->setLabel(\t('First value'));
 
     $properties['value2'] = DataDefinition::create('string')
-      ->setLabel(t('Second value'));
+      ->setLabel(\t('Second value'));
 
     return $properties;
   }

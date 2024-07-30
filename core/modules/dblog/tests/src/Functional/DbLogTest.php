@@ -481,7 +481,7 @@ class DbLogTest extends BrowserTestBase {
     $this->submitForm($edit, 'Create new account');
     $this->assertSession()->statusCodeEquals(200);
     // Retrieve the user object.
-    $user = user_load_by_name($name);
+    $user = \user_load_by_name($name);
     $this->assertNotNull($user, "User $name was loaded");
     // pass_raw property is needed by drupalLogin.
     $user->passRaw = $pass;
@@ -494,7 +494,7 @@ class DbLogTest extends BrowserTestBase {
     foreach ($result as $row) {
       $ids[] = $row->wid;
     }
-    $count_before = (isset($ids)) ? count($ids) : 0;
+    $count_before = (isset($ids)) ? \count($ids) : 0;
     $this->assertGreaterThan(0, $count_before, "DBLog contains $count_before records for {$user->getAccountName()}");
 
     // Log in the admin user.
@@ -524,11 +524,11 @@ class DbLogTest extends BrowserTestBase {
     $link = FALSE;
     if ($links = $this->xpath('//a[text()="' . $message_text . '"]')) {
       // Found link with the message text.
-      $links = array_shift($links);
+      $links = \array_shift($links);
       $value = $links->getAttribute('href');
 
       // Extract link to details page.
-      $link = mb_substr($value, strpos($value, 'admin/reports/dblog/event/'));
+      $link = \mb_substr($value, \strpos($value, 'admin/reports/dblog/event/'));
       $this->drupalGet($link);
       // Check for full message text on the details page.
       $this->assertSession()->pageTextContains($message);
@@ -705,7 +705,7 @@ class DbLogTest extends BrowserTestBase {
       }
 
       $count = $this->getTypeCount($types);
-      $this->assertEquals($type_count, array_sum($count), 'Count matched');
+      $this->assertEquals($type_count, \array_sum($count), 'Count matched');
     }
 
     // Set the filter to match each of the two filter-type attributes and
@@ -714,7 +714,7 @@ class DbLogTest extends BrowserTestBase {
       $this->filterLogsEntries($type['type'], $type['severity']);
 
       $count = $this->getTypeCount($types);
-      $this->assertEquals($type['count'], array_sum($count), 'Count matched');
+      $this->assertEquals($type['count'], \array_sum($count), 'Count matched');
     }
 
     $this->drupalGet('admin/reports/dblog', ['query' => ['order' => 'Type']]);
@@ -777,7 +777,7 @@ class DbLogTest extends BrowserTestBase {
    */
   protected function getTypeCount(array $types): array {
     $entries = $this->getLogEntries();
-    $count = array_fill(0, count($types), 0);
+    $count = \array_fill(0, \count($types), 0);
     foreach ($entries as $entry) {
       foreach ($types as $key => $type) {
         if ($entry['type'] == $type['type'] && $entry['severity'] == $type['severity']) {
@@ -799,10 +799,10 @@ class DbLogTest extends BrowserTestBase {
    *   The watchdog severity constant or NULL if not found.
    */
   protected function getSeverityConstant($class) {
-    $map = array_flip(DbLogController::getLogLevelClassMap());
+    $map = \array_flip(DbLogController::getLogLevelClassMap());
 
     // Find the class that contains the severity.
-    $classes = explode(' ', $class);
+    $classes = \explode(' ', $class);
     foreach ($classes as $class) {
       if (isset($map[$class])) {
         return $map[$class];

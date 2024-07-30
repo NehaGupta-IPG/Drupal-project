@@ -81,18 +81,18 @@ class ConfigInstallProfileUnmetDependenciesTest extends InstallerTestBase {
     $iterator = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($source, \RecursiveDirectoryIterator::SKIP_DOTS), \RecursiveIteratorIterator::SELF_FIRST);
     foreach ($iterator as $item) {
       if ($item->isDir()) {
-        mkdir($dest . DIRECTORY_SEPARATOR . $iterator->getSubPathName());
+        \mkdir($dest . DIRECTORY_SEPARATOR . $iterator->getSubPathName());
       }
       else {
-        copy((string) $item, $dest . DIRECTORY_SEPARATOR . $iterator->getSubPathName());
+        \copy((string) $item, $dest . DIRECTORY_SEPARATOR . $iterator->getSubPathName());
       }
     }
 
     // Add a dependency that can not be met.
     $config_file = $dest . DIRECTORY_SEPARATOR . InstallStorage::CONFIG_INSTALL_DIRECTORY . DIRECTORY_SEPARATOR . 'system.action.user_block_user_action.yml';
-    $action = Yaml::decode(file_get_contents($config_file));
+    $action = Yaml::decode(\file_get_contents($config_file));
     $action['dependencies']['module'][] = 'does_not_exist';
-    file_put_contents($config_file, Yaml::encode($action));
+    \file_put_contents($config_file, Yaml::encode($action));
   }
 
   /**

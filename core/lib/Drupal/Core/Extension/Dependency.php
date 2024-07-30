@@ -123,15 +123,15 @@ class Dependency {
    * @return static
    */
   public static function createFromString($dependency) {
-    if (str_contains($dependency, ':')) {
-      [$project, $dependency] = explode(':', $dependency);
+    if (\str_contains($dependency, ':')) {
+      [$project, $dependency] = \explode(':', $dependency);
     }
     else {
       $project = '';
     }
-    $parts = explode('(', $dependency, 2);
-    $name = trim($parts[0]);
-    $version_string = isset($parts[1]) ? rtrim($parts[1], ") ") : '';
+    $parts = \explode('(', $dependency, 2);
+    $name = \trim($parts[0]);
+    $version_string = isset($parts[1]) ? \rtrim($parts[1], ") ") : '';
     return new static($name, $project, $version_string);
   }
 

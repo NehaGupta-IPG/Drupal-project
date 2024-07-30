@@ -63,7 +63,7 @@ class HandlerStackConfigurator {
       $this->middlewares = [];
       foreach ($this->middlewareIds as $middleware_id) {
         $middleware = $this->container->get($middleware_id);
-        if (is_callable($middleware)) {
+        if (\is_callable($middleware)) {
           $this->middlewares[$middleware_id] = $middleware();
         }
         else {

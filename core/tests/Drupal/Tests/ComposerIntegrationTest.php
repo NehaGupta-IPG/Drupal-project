@@ -27,8 +27,8 @@ class ComposerIntegrationTest extends UnitTestCase {
    * @see https://www.drupal.org/about/core/policies/core-dependencies-policies/managing-composer-updates-for-drupal-core
    */
   public function testComposerLockHash(): void {
-    $content_hash = self::getContentHash(file_get_contents($this->root . '/composer.json'));
-    $lock = json_decode(file_get_contents($this->root . '/composer.lock'), TRUE);
+    $content_hash = self::getContentHash(\file_get_contents($this->root . '/composer.json'));
+    $lock = \json_decode(\file_get_contents($this->root . '/composer.lock'), TRUE);
     $this->assertSame($content_hash, $lock['content-hash']);
 
     // @see \Composer\Repository\PathRepository::initialize()
@@ -41,7 +41,7 @@ class ComposerIntegrationTest extends UnitTestCase {
         break;
       }
     }
-    $core_content_hash = sha1(file_get_contents($this->root . '/core/composer.json') . serialize($options));
+    $core_content_hash = \sha1(\file_get_contents($this->root . '/core/composer.json') . \serialize($options));
     $this->assertSame($core_content_hash, $core_lock_file_hash);
   }
 
@@ -53,11 +53,11 @@ class ComposerIntegrationTest extends UnitTestCase {
    */
   #[DataProvider('providerTestComposerJson')]
   public function testComposerTilde(string $path): void {
-    if (str_ends_with($path, 'composer/Metapackage/CoreRecommended/composer.json')) {
+    if (\str_ends_with($path, 'composer/Metapackage/CoreRecommended/composer.json')) {
       $this->markTestSkipped("$path has tilde");
     }
-    $content = json_decode(file_get_contents($path), TRUE);
-    $composer_keys = array_intersect(['require', 'require-dev'], array_keys($content));
+    $content = \json_decode(\file_get_contents($path), TRUE);
+    $composer_keys = \array_intersect(['require', 'require-dev'], \array_keys($content));
     if (empty($composer_keys)) {
       $this->markTestSkipped("$path has no keys to test");
     }
@@ -65,7 +65,7 @@ class ComposerIntegrationTest extends UnitTestCase {
       foreach ($content[$composer_key] as $dependency => $version) {
         // We allow tildes if the dependency is a Symfony component.
         // @see https://www.drupal.org/node/2887000
-        if (str_starts_with($dependency, 'symfony/')) {
+        if (\str_starts_with($dependency, 'symfony/')) {
           continue;
         }
         $this->assertStringNotContainsString('~', $version, "Dependency $dependency in $path contains a tilde, use a caret.");
@@ -81,7 +81,7 @@ class ComposerIntegrationTest extends UnitTestCase {
    */
   public static function providerTestComposerJson(): array {
     $data = [];
-    $composer_json_finder = self::getComposerJsonFinder(realpath(__DIR__ . '/../../../../'));
+    $composer_json_finder = self::getComposerJsonFinder(\realpath(__DIR__ . '/../../../../'));
     foreach ($composer_json_finder->getIterator() as $composer_json) {
       $data[$composer_json->getPathname()] = [$composer_json->getPathname()];
     }
@@ -99,7 +99,7 @@ class ComposerIntegrationTest extends UnitTestCase {
     $components_path = $this->root . '/core/lib/Drupal/Component';
 
     // Grab the 'replace' section of the core composer.json file.
-    $json = json_decode(file_get_contents($this->root . '/core/composer.json'), FALSE);
+    $json = \json_decode(\file_get_contents($this->root . '/core/composer.json'), FALSE);
     $composer_replace_packages = (array) $json->replace;
 
     // Get a list of all the composer.json files in the components path.
@@ -115,12 +115,12 @@ class ComposerIntegrationTest extends UnitTestCase {
     }
 
     $this->assertNotEmpty($components_composer_json_files);
-    $this->assertCount(count($composer_replace_packages), $components_composer_json_files);
+    $this->assertCount(\count($composer_replace_packages), $components_composer_json_files);
 
     // Assert that each core components has a corresponding 'replace' in
     // composer.json.
     foreach ($components_composer_json_files as $components_composer_json_file) {
-      $json = json_decode(file_get_contents(reset($components_composer_json_file)), FALSE);
+      $json = \json_decode(\file_get_contents(\reset($components_composer_json_file)), FALSE);
       $component_name = $json->name;
 
       $this->assertArrayHasKey(
@@ -188,7 +188,7 @@ class ComposerIntegrationTest extends UnitTestCase {
   #[DataProvider('providerTestExpectedScaffoldFiles')]
   public function testExpectedScaffoldFiles($destRelPath, $sourceRelPath, $expectedDestination = '[web-root]'): void {
     // Grab the 'file-mapping' section of the core composer.json file.
-    $json = json_decode(file_get_contents($this->root . '/core/composer.json'));
+    $json = \json_decode(\file_get_contents($this->root . '/core/composer.json'));
     $scaffold_file_mapping = (array) $json->extra->{'drupal-scaffold'}->{'file-mapping'};
 
     // Assert that the 'file-mapping' section has the expected entry.
@@ -255,16 +255,16 @@ class ComposerIntegrationTest extends UnitTestCase {
    * Tests the vendor cleanup utilities do not have obsolete packages listed.
    */
   public function testVendorCleanup(): void {
-    $lock = json_decode(file_get_contents($this->root . '/composer.lock'), TRUE);
+    $lock = \json_decode(\file_get_contents($this->root . '/composer.lock'), TRUE);
     $packages = [];
-    foreach (array_merge($lock['packages'], $lock['packages-dev']) as $package) {
+    foreach (\array_merge($lock['packages'], $lock['packages-dev']) as $package) {
       $packages[] = $package['name'];
     }
 
     $reflection = new \ReflectionProperty(Config::class, 'defaultConfig');
     $config = $reflection->getValue();
-    foreach (array_keys($config) as $package) {
-      $this->assertContains(strtolower($package), $packages);
+    foreach (\array_keys($config) as $package) {
+      $this->assertContains(\strtolower($package), $packages);
     }
   }
 

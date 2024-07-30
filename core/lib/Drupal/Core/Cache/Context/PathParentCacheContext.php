@@ -18,7 +18,7 @@ class PathParentCacheContext extends RequestStackCacheContextBase implements Cac
    * {@inheritdoc}
    */
   public static function getLabel() {
-    return t('Parent path');
+    return \t('Parent path');
   }
 
   /**
@@ -26,9 +26,9 @@ class PathParentCacheContext extends RequestStackCacheContextBase implements Cac
    */
   public function getContext() {
     $request = $this->requestStack->getCurrentRequest();
-    $path_elements = explode('/', trim($request->getPathInfo(), '/'));
-    array_pop($path_elements);
-    return implode('/', $path_elements);
+    $path_elements = \explode('/', \trim($request->getPathInfo(), '/'));
+    \array_pop($path_elements);
+    return \implode('/', $path_elements);
   }
 
   /**

@@ -163,7 +163,7 @@ class StaticMap extends ProcessPluginBase {
     }
 
     $new_value = $value;
-    if (is_array($value)) {
+    if (\is_array($value)) {
       if (!$value) {
         throw new MigrateException('Can not lookup without a value.');
       }
@@ -173,14 +173,14 @@ class StaticMap extends ProcessPluginBase {
     }
     $new_value = NestedArray::getValue($this->configuration['map'], $new_value, $key_exists);
     if (!$key_exists) {
-      if (array_key_exists('default_value', $this->configuration)) {
+      if (\array_key_exists('default_value', $this->configuration)) {
         if (!empty($this->configuration['bypass'])) {
           throw new MigrateException('Setting both default_value and bypass is invalid.');
         }
         return $this->configuration['default_value'];
       }
       if (empty($this->configuration['bypass'])) {
-        throw new MigrateSkipRowException(sprintf("No static mapping found for '%s' and no default value provided for destination '%s'.", Variable::export($value), $destination_property));
+        throw new MigrateSkipRowException(\sprintf("No static mapping found for '%s' and no default value provided for destination '%s'.", Variable::export($value), $destination_property));
       }
       else {
         return $value;

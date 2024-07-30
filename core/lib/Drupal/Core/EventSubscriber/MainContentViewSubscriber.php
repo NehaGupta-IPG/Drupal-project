@@ -80,7 +80,7 @@ class MainContentViewSubscriber implements EventSubscriberInterface {
     $result = $event->getControllerResult();
 
     // Render the controller result into a response if it's a render array.
-    if (is_array($result) && ($request->query->has(static::WRAPPER_FORMAT) || $request->getRequestFormat() == 'html')) {
+    if (\is_array($result) && ($request->query->has(static::WRAPPER_FORMAT) || $request->getRequestFormat() == 'html')) {
       $wrapper = $request->query->get(static::WRAPPER_FORMAT, 'html');
 
       // Fall back to HTML if the requested wrapper envelope is not available.

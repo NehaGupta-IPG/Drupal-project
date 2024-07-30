@@ -42,7 +42,7 @@ class MemoryBackend implements FloodInterface, PrefixFloodInterface {
     }
     // We can't use REQUEST_TIME here, because that would not guarantee
     // uniqueness.
-    $time = microtime(TRUE);
+    $time = \microtime(TRUE);
     $this->events[$name][$identifier][] = ['expire' => $time + $window, 'time' => $time];
   }
 
@@ -61,9 +61,9 @@ class MemoryBackend implements FloodInterface, PrefixFloodInterface {
    */
   public function clearByPrefix(string $name, string $prefix): void {
     foreach ($this->events as $event_name => $identifier) {
-      $identifier_key = key($identifier);
-      $identifier_parts = explode("-", $identifier_key);
-      $identifier_prefix = reset($identifier_parts);
+      $identifier_key = \key($identifier);
+      $identifier_parts = \explode("-", $identifier_key);
+      $identifier_prefix = \reset($identifier_parts);
       if ($prefix == $identifier_prefix && $name == $event_name) {
         unset($this->events[$event_name][$identifier_key]);
       }
@@ -80,8 +80,8 @@ class MemoryBackend implements FloodInterface, PrefixFloodInterface {
     if (!isset($this->events[$name][$identifier])) {
       return $threshold > 0;
     }
-    $limit = microtime(TRUE) - $window;
-    $number = count(array_filter($this->events[$name][$identifier], function ($entry) use ($limit) {
+    $limit = \microtime(TRUE) - $window;
+    $number = \count(\array_filter($this->events[$name][$identifier], function ($entry) use ($limit) {
       return $entry['time'] > $limit;
     }));
     return ($number < $threshold);
@@ -94,8 +94,8 @@ class MemoryBackend implements FloodInterface, PrefixFloodInterface {
     foreach ($this->events as $name => $identifiers) {
       foreach ($this->events[$name] as $identifier => $entries) {
         // Remove expired entries.
-        $this->events[$name][$identifier] = array_filter($entries, function ($entry) {
-          return $entry['expire'] > microtime(TRUE);
+        $this->events[$name][$identifier] = \array_filter($entries, function ($entry) {
+          return $entry['expire'] > \microtime(TRUE);
         });
       }
     }

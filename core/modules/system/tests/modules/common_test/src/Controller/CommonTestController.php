@@ -68,7 +68,7 @@ class CommonTestController {
    */
   public function jsAndCssQuerystring() {
     $module_extension_list = \Drupal::service('extension.list.module');
-    assert($module_extension_list instanceof ExtensionList);
+    \assert($module_extension_list instanceof ExtensionList);
     $attached = [
       '#attached' => [
         'library' => [

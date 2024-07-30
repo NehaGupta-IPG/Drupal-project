@@ -68,13 +68,13 @@ class AnnotatedClassDiscoveryTest extends TestCase {
 
     // Make a directory for discovery.
     $url = vfsStream::url('root');
-    mkdir($url . '/DrupalTest');
+    \mkdir($url . '/DrupalTest');
 
     // Create a class docblock with our annotation.
     $php_file = "<?php\nnamespace DrupalTest;\n/**\n";
     $php_file .= " * @$annotation\n";
     $php_file .= " */\nclass TestClass {}";
-    file_put_contents($url . '/DrupalTest/TestClass.php', $php_file);
+    \file_put_contents($url . '/DrupalTest/TestClass.php', $php_file);
 
     // Create an AnnotatedClassDiscovery object referencing the virtual file.
     $discovery = new AnnotatedClassDiscovery(
@@ -84,17 +84,17 @@ class AnnotatedClassDiscoveryTest extends TestCase {
     // Register our class loader which will fail if the annotation reader tries
     // to autoload disallowed annotations.
     $class_loader = function ($class_name) use ($annotation) {
-      $name_array = explode('\\', $class_name);
-      $name = array_pop($name_array);
+      $name_array = \explode('\\', $class_name);
+      $name = \array_pop($name_array);
       if ($name == $annotation) {
         $this->fail('Attempted to autoload a non-plugin annotation: ' . $name);
       }
     };
-    spl_autoload_register($class_loader, TRUE, TRUE);
+    \spl_autoload_register($class_loader, TRUE, TRUE);
     // Now try to get plugin definitions.
     $definitions = $discovery->getDefinitions();
     // Unregister to clean up.
-    spl_autoload_unregister($class_loader);
+    \spl_autoload_unregister($class_loader);
     // Assert that no annotations were loaded.
     $this->assertEmpty($definitions);
   }

@@ -49,7 +49,7 @@ class TestSetupTraitTest extends UnitTestCase {
     $reflection->getProperty('databasePrefix')->setValue($test_setup, 'testDbPrefix');
     $reflection->getProperty('root')->setValue($test_setup, $root);
 
-    $method = new \ReflectionMethod(get_class($test_setup), 'changeDatabasePrefix');
+    $method = new \ReflectionMethod(\get_class($test_setup), 'changeDatabasePrefix');
     $method->invoke($test_setup);
 
     // Ensure that SIMPLETEST_DB defines the default database connection after

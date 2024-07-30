@@ -102,8 +102,8 @@ class UpdateFetcher implements UpdateFetcherInterface {
     }
     catch (ClientExceptionInterface $exception) {
       Error::logException($this->logger, $exception);
-      if ($with_http_fallback && !str_contains($url, "http://")) {
-        $url = str_replace('https://', 'http://', $url);
+      if ($with_http_fallback && !\str_contains($url, "http://")) {
+        $url = \str_replace('https://', 'http://', $url);
         return $this->doRequest($url, $options, FALSE);
       }
     }
@@ -121,22 +121,22 @@ class UpdateFetcher implements UpdateFetcherInterface {
     // Only append usage information if we have a site key and the project is
     // installed. We do not want to record usage statistics for uninstalled
     // projects.
-    if (!empty($site_key) && !str_contains($project['project_type'], 'disabled')) {
+    if (!empty($site_key) && !\str_contains($project['project_type'], 'disabled')) {
       // Append the site key.
-      $url .= str_contains($url, '?') ? '&' : '?';
+      $url .= \str_contains($url, '?') ? '&' : '?';
       $url .= 'site_key=';
-      $url .= rawurlencode($site_key);
+      $url .= \rawurlencode($site_key);
 
       // Append the version.
       if (!empty($project['info']['version'])) {
         $url .= '&version=';
-        $url .= rawurlencode($project['info']['version']);
+        $url .= \rawurlencode($project['info']['version']);
       }
 
       // Append the list of modules or themes installed.
-      $list = array_keys($project['includes']);
+      $list = \array_keys($project['includes']);
       $url .= '&list=';
-      $url .= rawurlencode(implode(',', $list));
+      $url .= \rawurlencode(\implode(',', $list));
     }
     return $url;
   }

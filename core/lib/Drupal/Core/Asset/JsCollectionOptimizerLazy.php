@@ -112,13 +112,13 @@ class JsCollectionOptimizerLazy implements AssetCollectionGroupOptimizerInterfac
       $query_args = [
         'language' => $language,
         'theme' => $this->themeManager->getActiveTheme()->getName(),
-        'include' => UrlHelper::compressQueryParameter(implode(',', $this->dependencyResolver->getMinimalRepresentativeSubset($libraries))),
+        'include' => UrlHelper::compressQueryParameter(\implode(',', $this->dependencyResolver->getMinimalRepresentativeSubset($libraries))),
       ];
       $ajax_page_state = $this->requestStack->getCurrentRequest()
         ->get('ajax_page_state');
-      $already_loaded = isset($ajax_page_state) ? explode(',', $ajax_page_state['libraries']) : [];
+      $already_loaded = isset($ajax_page_state) ? \explode(',', $ajax_page_state['libraries']) : [];
       if ($already_loaded) {
-        $query_args['exclude'] = UrlHelper::compressQueryParameter(implode(',', $this->dependencyResolver->getMinimalRepresentativeSubset($already_loaded)));
+        $query_args['exclude'] = UrlHelper::compressQueryParameter(\implode(',', $this->dependencyResolver->getMinimalRepresentativeSubset($already_loaded)));
       }
 
       // Generate a URL for the group, but do not process it inline, this is
@@ -164,7 +164,7 @@ class JsCollectionOptimizerLazy implements AssetCollectionGroupOptimizerInterfac
       $current_license = $js_asset['license'];
       // Optimize this JS file, but only if it's not yet minified.
       if (isset($js_asset['minified']) && $js_asset['minified']) {
-        $data .= file_get_contents($js_asset['data']);
+        $data .= \file_get_contents($js_asset['data']);
       }
       else {
         $data .= $this->optimizer->optimize($js_asset);

@@ -89,7 +89,7 @@ class LibrariesDirectoryFileFinder {
     }
 
     foreach ($directories as $dir) {
-      if (file_exists($this->root . '/' . $dir . $path)) {
+      if (\file_exists($this->root . '/' . $dir . $path)) {
         return $dir . $path;
       }
     }

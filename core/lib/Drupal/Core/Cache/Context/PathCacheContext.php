@@ -20,7 +20,7 @@ class PathCacheContext extends RequestStackCacheContextBase implements CacheCont
    * {@inheritdoc}
    */
   public static function getLabel() {
-    return t('Path');
+    return \t('Path');
   }
 
   /**

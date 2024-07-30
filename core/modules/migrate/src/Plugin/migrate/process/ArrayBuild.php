@@ -84,17 +84,17 @@ class ArrayBuild extends ProcessPluginBase {
 
     foreach ((array) $value as $old_value) {
       // Checks that $old_value is an array.
-      if (!is_array($old_value)) {
+      if (!\is_array($old_value)) {
         throw new MigrateException("The input should be an array of arrays");
       }
 
       // Checks that the key exists.
-      if (!array_key_exists($this->configuration['key'], $old_value)) {
+      if (!\array_key_exists($this->configuration['key'], $old_value)) {
         throw new MigrateException("The key '" . $this->configuration['key'] . "' does not exist");
       }
 
       // Checks that the value exists.
-      if (!array_key_exists($this->configuration['value'], $old_value)) {
+      if (!\array_key_exists($this->configuration['value'], $old_value)) {
         throw new MigrateException("The key '" . $this->configuration['value'] . "' does not exist");
       }
 

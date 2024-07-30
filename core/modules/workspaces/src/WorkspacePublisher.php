@@ -165,7 +165,7 @@ class WorkspacePublisher implements WorkspacePublisherInterface {
       // workspace to the latest revision IDs of those entities and the
       // difference between these two arrays gives us all the entities which
       // have been modified on the target.
-      if ($revision_difference = array_diff_key($result, $tracked_revisions)) {
+      if ($revision_difference = \array_diff_key($result, $tracked_revisions)) {
         $target_revision_difference[$entity_type_id] = $revision_difference;
       }
     }
@@ -186,7 +186,7 @@ class WorkspacePublisher implements WorkspacePublisherInterface {
    */
   public function getNumberOfChangesOnTarget() {
     $total_changes = $this->getDifferringRevisionIdsOnTarget();
-    return count($total_changes, COUNT_RECURSIVE) - count($total_changes);
+    return \count($total_changes, COUNT_RECURSIVE) - \count($total_changes);
   }
 
   /**
@@ -194,7 +194,7 @@ class WorkspacePublisher implements WorkspacePublisherInterface {
    */
   public function getNumberOfChangesOnSource() {
     $total_changes = $this->getDifferringRevisionIdsOnSource();
-    return count($total_changes, COUNT_RECURSIVE) - count($total_changes);
+    return \count($total_changes, COUNT_RECURSIVE) - \count($total_changes);
   }
 
 }

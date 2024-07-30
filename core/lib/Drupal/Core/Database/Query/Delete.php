@@ -45,7 +45,7 @@ class Delete extends Query implements ConditionInterface {
    */
   public function execute() {
     $values = [];
-    if (count($this->condition)) {
+    if (\count($this->condition)) {
       $this->condition->compile($this->connection, $this);
       $values = $this->condition->arguments();
     }
@@ -72,7 +72,7 @@ class Delete extends Query implements ConditionInterface {
 
     $query = $comments . 'DELETE FROM {' . $this->connection->escapeTable($this->table) . '} ';
 
-    if (count($this->condition)) {
+    if (\count($this->condition)) {
 
       $this->condition->compile($this->connection, $this);
       $query .= "\nWHERE " . $this->condition;

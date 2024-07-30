@@ -463,17 +463,17 @@ class PagerTest extends ViewTestBase {
     // On the first round don't initialize the pager.
 
     $this->assertNull($view->getItemsPerPage(), 'If the pager is not initialized and no manual override there is no items per page.');
-    $rand_number = rand(1, 5);
+    $rand_number = \rand(1, 5);
     $view->setItemsPerPage($rand_number);
     $this->assertEquals($rand_number, $view->getItemsPerPage(), 'Make sure getItemsPerPage uses the settings of setItemsPerPage.');
 
     $this->assertNull($view->getOffset(), 'If the pager is not initialized and no manual override there is no offset.');
-    $rand_number = rand(1, 5);
+    $rand_number = \rand(1, 5);
     $view->setOffset($rand_number);
     $this->assertEquals($rand_number, $view->getOffset(), 'Make sure getOffset uses the settings of setOffset.');
 
     $this->assertNull($view->getCurrentPage(), 'If the pager is not initialized and no manual override there is no current page.');
-    $rand_number = rand(1, 5);
+    $rand_number = \rand(1, 5);
     $view->setCurrentPage($rand_number);
     $this->assertEquals($rand_number, $view->getCurrentPage(), 'Make sure getCurrentPage uses the settings of set_current_page.');
 
@@ -485,23 +485,23 @@ class PagerTest extends ViewTestBase {
     $view->initPager();
 
     $this->assertEquals(5, $view->getItemsPerPage(), 'Per default the view has 5 items per page.');
-    $rand_number = rand(1, 5);
+    $rand_number = \rand(1, 5);
     $view->setItemsPerPage($rand_number);
-    $rand_number = rand(6, 11);
+    $rand_number = \rand(6, 11);
     $view->pager->setItemsPerPage($rand_number);
     $this->assertEquals($rand_number, $view->getItemsPerPage(), 'Make sure getItemsPerPage uses the settings of setItemsPerPage.');
 
     $this->assertEquals(0, $view->getOffset(), 'Per default a view has a 0 offset.');
-    $rand_number = rand(1, 5);
+    $rand_number = \rand(1, 5);
     $view->setOffset($rand_number);
-    $rand_number = rand(6, 11);
+    $rand_number = \rand(6, 11);
     $view->pager->setOffset($rand_number);
     $this->assertEquals($rand_number, $view->getOffset(), 'Make sure getOffset uses the settings of setOffset.');
 
     $this->assertEquals(0, $view->getCurrentPage(), 'Per default the current page is 0.');
-    $rand_number = rand(1, 5);
+    $rand_number = \rand(1, 5);
     $view->setCurrentPage($rand_number);
-    $rand_number = rand(6, 11);
+    $rand_number = \rand(6, 11);
     $view->pager->setCurrentPage($rand_number);
     $this->assertEquals($rand_number, $view->getCurrentPage(), 'Make sure getCurrentPage uses the settings of set_current_page.');
 

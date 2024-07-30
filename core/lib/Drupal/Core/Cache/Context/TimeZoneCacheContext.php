@@ -17,7 +17,7 @@ class TimeZoneCacheContext implements CacheContextInterface {
    * {@inheritdoc}
    */
   public static function getLabel() {
-    return t("Time zone");
+    return \t("Time zone");
   }
 
   /**
@@ -26,7 +26,7 @@ class TimeZoneCacheContext implements CacheContextInterface {
   public function getContext() {
     // date_default_timezone_set() is called in AccountProxy::setAccount(), so
     // we can safely retrieve the timezone.
-    return date_default_timezone_get();
+    return \date_default_timezone_get();
   }
 
   /**

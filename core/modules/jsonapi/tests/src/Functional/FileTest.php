@@ -116,7 +116,7 @@ class FileTest extends ResourceTestBase {
     $file->set('status', FileInterface::STATUS_PERMANENT);
     $file->save();
 
-    file_put_contents($file->getFileUri(), 'Drupal');
+    \file_put_contents($file->getFileUri(), 'Drupal');
 
     return $file;
   }

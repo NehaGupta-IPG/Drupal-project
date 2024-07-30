@@ -21,7 +21,7 @@ class FactoryTest extends PluginTestBase {
   public function testDefaultFactory(): void {
     // Ensure a non-derivative plugin can be instantiated.
     $plugin = $this->testPluginManager->createInstance('user_login', ['title' => 'Enter your login name and password']);
-    $this->assertSame('Drupal\\plugin_test\\Plugin\\plugin_test\\mock_block\\MockUserLoginBlock', get_class($plugin), 'Correct plugin class instantiated with default factory.');
+    $this->assertSame('Drupal\\plugin_test\\Plugin\\plugin_test\\mock_block\\MockUserLoginBlock', \get_class($plugin), 'Correct plugin class instantiated with default factory.');
     $this->assertSame('Enter your login name and password', $plugin->getTitle(), 'Plugin instance correctly configured.');
 
     // Ensure that attempting to instantiate non-existing plugins throws a
@@ -48,7 +48,7 @@ class FactoryTest extends PluginTestBase {
   public function testReflectionFactory(): void {
     // Ensure a non-derivative plugin can be instantiated.
     $plugin = $this->mockBlockManager->createInstance('user_login', ['title' => 'Enter your login name and password']);
-    $this->assertSame('Drupal\\plugin_test\\Plugin\\plugin_test\\mock_block\\MockUserLoginBlock', get_class($plugin), 'Correct plugin class instantiated.');
+    $this->assertSame('Drupal\\plugin_test\\Plugin\\plugin_test\\mock_block\\MockUserLoginBlock', \get_class($plugin), 'Correct plugin class instantiated.');
     $this->assertSame('Enter your login name and password', $plugin->getTitle(), 'Plugin instance correctly configured.');
 
     // Ensure a derivative plugin can be instantiated.

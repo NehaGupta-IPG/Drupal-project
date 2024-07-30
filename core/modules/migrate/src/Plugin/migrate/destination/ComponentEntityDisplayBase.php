@@ -68,7 +68,7 @@ abstract class ComponentEntityDisplayBase extends DestinationBase implements Con
     $values = [];
     // array_intersect_key() won't work because the order is important because
     // this is also the return value.
-    foreach (array_keys($this->getIds()) as $id) {
+    foreach (\array_keys($this->getIds()) as $id) {
       $values[$id] = $row->getDestinationProperty($id);
     }
     $entity = $this->getEntity($values['entity_type'], $values['bundle'], $values[static::MODE_NAME]);
@@ -79,7 +79,7 @@ abstract class ComponentEntityDisplayBase extends DestinationBase implements Con
       $entity->removeComponent($values['field_name']);
     }
     $entity->save();
-    return array_values($values);
+    return \array_values($values);
   }
 
   /**

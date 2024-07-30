@@ -154,7 +154,7 @@ class SetInlineBlockDependency implements EventSubscriberInterface {
    */
   protected function isBlockRevisionUsedInEntity(EntityInterface $layout_entity, BlockContentInterface $block_content) {
     $sections_blocks_revision_ids = $this->getInlineBlockRevisionIdsInSections($this->getEntitySections($layout_entity));
-    return in_array($block_content->getRevisionId(), $sections_blocks_revision_ids);
+    return \in_array($block_content->getRevisionId(), $sections_blocks_revision_ids);
   }
 
 }

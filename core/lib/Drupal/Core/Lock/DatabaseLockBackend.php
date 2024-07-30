@@ -35,7 +35,7 @@ class DatabaseLockBackend extends LockBackendAbstract {
   public function __construct(Connection $database) {
     // __destruct() is causing problems with garbage collections, register a
     // shutdown function instead.
-    drupal_register_shutdown_function([$this, 'releaseAll']);
+    \drupal_register_shutdown_function([$this, 'releaseAll']);
     $this->database = $database;
   }
 
@@ -46,8 +46,8 @@ class DatabaseLockBackend extends LockBackendAbstract {
     $name = $this->normalizeName($name);
 
     // Insure that the timeout is at least 1 ms.
-    $timeout = max($timeout, 0.001);
-    $expire = microtime(TRUE) + $timeout;
+    $timeout = \max($timeout, 0.001);
+    $expire = \microtime(TRUE) + $timeout;
     if (isset($this->locks[$name])) {
       // Try to extend the expiration of a lock we already acquired.
       $success = (bool) $this->database->update('semaphore')
@@ -123,7 +123,7 @@ class DatabaseLockBackend extends LockBackendAbstract {
       return TRUE;
     }
     $expire = (float) $lock['expire'];
-    $now = microtime(TRUE);
+    $now = \microtime(TRUE);
     if ($now > $expire) {
       // We check two conditions to prevent a race condition where another
       // request acquired the lock and set a new expire time. We add a small
@@ -227,9 +227,9 @@ class DatabaseLockBackend extends LockBackendAbstract {
    */
   protected function normalizeName($name) {
     // Nothing to do if the name is a US ASCII string of 255 characters or less.
-    $name_is_ascii = mb_check_encoding($name, 'ASCII');
+    $name_is_ascii = \mb_check_encoding($name, 'ASCII');
 
-    if (strlen($name) <= 255 && $name_is_ascii) {
+    if (\strlen($name) <= 255 && $name_is_ascii) {
       return $name;
     }
     // Return a string that uses as much as possible of the original name with
@@ -240,7 +240,7 @@ class DatabaseLockBackend extends LockBackendAbstract {
       return $hash;
     }
 
-    return substr($name, 0, 255 - strlen($hash)) . $hash;
+    return \substr($name, 0, 255 - \strlen($hash)) . $hash;
   }
 
   /**

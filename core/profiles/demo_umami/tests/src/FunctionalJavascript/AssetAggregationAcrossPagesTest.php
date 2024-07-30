@@ -43,7 +43,7 @@ class AssetAggregationAcrossPagesTest extends PerformanceTestBase {
   public function testFrontAndRecipesPagesAuthenticated(): void {
     $user = $this->createUser();
     $this->drupalLogin($user);
-    sleep(2);
+    \sleep(2);
     $performance_data = $this->collectPerformanceData(function () {
       $this->doRequests();
     }, 'umamiFrontAndRecipePagesAuthenticated');
@@ -85,11 +85,11 @@ class AssetAggregationAcrossPagesTest extends PerformanceTestBase {
     $this->drupalGet('<front>');
     // Give additional time for the request and all assets to be returned
     // before making the next request.
-    sleep(2);
+    \sleep(2);
     $this->drupalGet('articles');
-    sleep(2);
+    \sleep(2);
     $this->drupalGet('recipes');
-    sleep(2);
+    \sleep(2);
     $this->drupalGet('recipes/deep-mediterranean-quiche');
   }
 

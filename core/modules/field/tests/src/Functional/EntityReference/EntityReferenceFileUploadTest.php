@@ -137,7 +137,7 @@ class EntityReferenceFileUploadTest extends BrowserTestBase {
     ]);
     $this->drupalLogin($user1);
 
-    $test_file = current($this->getTestFiles('text'));
+    $test_file = \current($this->getTestFiles('text'));
     $edit['files[file_field_0]'] = \Drupal::service('file_system')->realpath($test_file->uri);
     $this->drupalGet('node/add/' . $this->referencingType);
     $this->submitForm($edit, 'Upload');

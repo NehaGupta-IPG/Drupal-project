@@ -309,7 +309,7 @@ class SearchCommentTest extends BrowserTestBase {
       'access comments' => $access_comments,
       'search content' => $search_content,
     ];
-    user_role_change_permissions($rid, $permissions);
+    \user_role_change_permissions($rid, $permissions);
   }
 
   /**

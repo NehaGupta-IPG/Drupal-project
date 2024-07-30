@@ -78,7 +78,7 @@ class LinkGenerator implements LinkGeneratorInterface {
     // service from the container.
     $url->setUrlGenerator($this->urlGenerator);
 
-    if (is_array($text)) {
+    if (\is_array($text)) {
       $text = $this->renderer->render($text);
     }
 
@@ -106,7 +106,7 @@ class LinkGenerator implements LinkGeneratorInterface {
     }
 
     // Ensure that query values are strings.
-    array_walk($variables['options']['query'], function (&$value) {
+    \array_walk($variables['options']['query'], function (&$value) {
       if ($value instanceof MarkupInterface) {
         $value = (string) $value;
       }
@@ -118,7 +118,7 @@ class LinkGenerator implements LinkGeneratorInterface {
       // drupal.active-link library know the query in a standardized manner.
       if (!empty($variables['options']['query'])) {
         $query = $variables['options']['query'];
-        ksort($query);
+        \ksort($query);
         $variables['options']['attributes']['data-drupal-link-query'] = Json::encode($query);
       }
 

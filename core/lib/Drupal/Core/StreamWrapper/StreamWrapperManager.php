@@ -78,7 +78,7 @@ class StreamWrapperManager implements StreamWrapperManagerInterface {
    */
   public function getNames($filter = StreamWrapperInterface::ALL) {
     $names = [];
-    foreach (array_keys($this->getWrappers($filter)) as $scheme) {
+    foreach (\array_keys($this->getWrappers($filter)) as $scheme) {
       $names[$scheme] = $this->getViaScheme($scheme)->getName();
     }
 
@@ -90,7 +90,7 @@ class StreamWrapperManager implements StreamWrapperManagerInterface {
    */
   public function getDescriptions($filter = StreamWrapperInterface::ALL) {
     $descriptions = [];
-    foreach (array_keys($this->getWrappers($filter)) as $scheme) {
+    foreach (\array_keys($this->getWrappers($filter)) as $scheme) {
       $descriptions[$scheme] = $this->getViaScheme($scheme)->getDescription();
     }
 
@@ -186,8 +186,8 @@ class StreamWrapperManager implements StreamWrapperManagerInterface {
     // $this->wrappers may be empty although wrappers are still registered
     // globally. Thus an isset() check is needed before iterating.
     if (isset($this->wrappers[StreamWrapperInterface::ALL])) {
-      foreach (array_keys($this->wrappers[StreamWrapperInterface::ALL]) as $scheme) {
-        stream_wrapper_unregister($scheme);
+      foreach (\array_keys($this->wrappers[StreamWrapperInterface::ALL]) as $scheme) {
+        \stream_wrapper_unregister($scheme);
       }
     }
   }
@@ -196,15 +196,15 @@ class StreamWrapperManager implements StreamWrapperManagerInterface {
    * {@inheritdoc}
    */
   public function registerWrapper($scheme, $class, $type) {
-    if (in_array($scheme, stream_get_wrappers(), TRUE)) {
-      stream_wrapper_unregister($scheme);
+    if (\in_array($scheme, \stream_get_wrappers(), TRUE)) {
+      \stream_wrapper_unregister($scheme);
     }
 
     if (($type & StreamWrapperInterface::LOCAL) == StreamWrapperInterface::LOCAL) {
-      stream_wrapper_register($scheme, $class);
+      \stream_wrapper_register($scheme, $class);
     }
     else {
-      stream_wrapper_register($scheme, $class, STREAM_IS_URL);
+      \stream_wrapper_register($scheme, $class, STREAM_IS_URL);
     }
 
     // Pre-populate the static cache with the filters most typically used.
@@ -222,7 +222,7 @@ class StreamWrapperManager implements StreamWrapperManagerInterface {
   public static function getTarget($uri) {
     // Remove the scheme from the URI and remove erroneous leading or trailing,
     // forward-slashes and backslashes.
-    $target = trim(preg_replace('/^[\w\-]+:\/\/|^data:/', '', $uri), '\/');
+    $target = \trim(\preg_replace('/^[\w\-]+:\/\/|^data:/', '', $uri), '\/');
 
     // If nothing was replaced, the URI doesn't have a valid scheme.
     return $target !== $uri ? $target : FALSE;
@@ -251,17 +251,17 @@ class StreamWrapperManager implements StreamWrapperManagerInterface {
 
       if ($target !== FALSE) {
 
-        if (!in_array($scheme, Settings::get('file_sa_core_2023_005_schemes', []))) {
+        if (!\in_array($scheme, Settings::get('file_sa_core_2023_005_schemes', []))) {
           $class = $this->getClass($scheme);
-          $is_local = is_subclass_of($class, LocalStream::class);
+          $is_local = \is_subclass_of($class, LocalStream::class);
           if ($is_local) {
-            $target = str_replace(DIRECTORY_SEPARATOR, '/', $target);
+            $target = \str_replace(DIRECTORY_SEPARATOR, '/', $target);
           }
 
-          $parts = explode('/', $target);
+          $parts = \explode('/', $target);
           $normalized_parts = [];
           while ($parts) {
-            $part = array_shift($parts);
+            $part = \array_shift($parts);
             if ($part === '' || $part === '.') {
               continue;
             }
@@ -270,14 +270,14 @@ class StreamWrapperManager implements StreamWrapperManagerInterface {
               break;
             }
             elseif ($part === '..') {
-              array_pop($normalized_parts);
+              \array_pop($normalized_parts);
             }
             else {
               $normalized_parts[] = $part;
             }
           }
 
-          $target = implode('/', array_merge($normalized_parts, $parts));
+          $target = \implode('/', \array_merge($normalized_parts, $parts));
         }
 
         $uri = $scheme . '://' . $target;
@@ -291,9 +291,9 @@ class StreamWrapperManager implements StreamWrapperManagerInterface {
    * {@inheritdoc}
    */
   public static function getScheme($uri) {
-    if (preg_match('/^([\w\-]+):\/\/|^(data):/', $uri, $matches)) {
+    if (\preg_match('/^([\w\-]+):\/\/|^(data):/', $uri, $matches)) {
       // The scheme will always be the last element in the matches array.
-      return array_pop($matches);
+      return \array_pop($matches);
     }
 
     return FALSE;
@@ -306,7 +306,7 @@ class StreamWrapperManager implements StreamWrapperManagerInterface {
     if (!$scheme) {
       return FALSE;
     }
-    return class_exists($this->getClass($scheme));
+    return \class_exists($this->getClass($scheme));
   }
 
   /**

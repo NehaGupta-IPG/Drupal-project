@@ -116,10 +116,10 @@ class ServerCommand extends Command {
   protected function findAvailablePort($host) {
     $port = 8888;
     while ($port >= 8888 && $port <= 9999) {
-      $connection = @fsockopen($host, $port);
-      if (is_resource($connection)) {
+      $connection = @\fsockopen($host, $port);
+      if (\is_resource($connection)) {
         // Port is being used.
-        fclose($connection);
+        \fclose($connection);
       }
       else {
         // Port is available.
@@ -139,13 +139,13 @@ class ServerCommand extends Command {
    *   The IO.
    */
   protected function openBrowser($url, SymfonyStyle $io) {
-    $is_windows = defined('PHP_WINDOWS_VERSION_BUILD');
+    $is_windows = \defined('PHP_WINDOWS_VERSION_BUILD');
     if ($is_windows) {
       // Handle escaping ourselves.
       $cmd = 'start "web" "' . $url . '""';
     }
     else {
-      $url = escapeshellarg($url);
+      $url = \escapeshellarg($url);
     }
 
     $is_linux = Process::fromShellCommandline('which xdg-open')->run();
@@ -168,7 +168,7 @@ class ServerCommand extends Command {
     }
 
     // Need to escape double quotes in the command so the PHP will work.
-    $cmd = str_replace('"', '\"', $cmd);
+    $cmd = \str_replace('"', '\"', $cmd);
     // Sleep for 2 seconds before opening the browser. This allows the command
     // to start up the PHP built-in webserver in the meantime. We use a
     // PhpProcess so that Windows powershell users also get a browser opened
@@ -187,7 +187,7 @@ class ServerCommand extends Command {
   protected function getOneTimeLoginUrl() {
     $user = User::load(1);
     \Drupal::moduleHandler()->load('user');
-    return user_pass_reset_url($user);
+    return \user_pass_reset_url($user);
   }
 
   /**
@@ -221,7 +221,7 @@ class ServerCommand extends Command {
     $io->writeln('Press Ctrl-C to quit the Drupal development server.');
 
     if (!$input->getOption('suppress-login')) {
-      if ($this->openBrowser("$one_time_login?destination=" . urlencode("/"), $io) === 1) {
+      if ($this->openBrowser("$one_time_login?destination=" . \urlencode("/"), $io) === 1) {
         $io->error('Error while opening up a one time login URL');
       }
     }
@@ -242,23 +242,23 @@ class ServerCommand extends Command {
     $descriptors[0] = STDIN;
     $descriptors[1] = ['pipe', 'w'];
     $descriptors[2] = ['pipe', 'w'];
-    $server = proc_open($process->getCommandLine(), $descriptors, $pipes, $kernel->getAppRoot());
-    if (is_resource($server)) {
+    $server = \proc_open($process->getCommandLine(), $descriptors, $pipes, $kernel->getAppRoot());
+    if (\is_resource($server)) {
       if ($io->isVerbose()) {
         // Write a blank line so that server output and the useful information
         // are visually separated.
         $io->writeln('');
       }
-      $server_status = proc_get_status($server);
+      $server_status = \proc_get_status($server);
       while ($server_status['running']) {
         if ($io->isVerbose()) {
-          fpassthru($pipes[2]);
+          \fpassthru($pipes[2]);
         }
-        sleep(1);
-        $server_status = proc_get_status($server);
+        \sleep(1);
+        $server_status = \proc_get_status($server);
       }
     }
-    return proc_close($server);
+    return \proc_close($server);
   }
 
   /**
@@ -271,7 +271,7 @@ class ServerCommand extends Command {
    *   The site path to use.
    */
   protected function getSitePath() {
-    return getenv('DRUPAL_DEV_SITE_PATH') ?: 'sites/default';
+    return \getenv('DRUPAL_DEV_SITE_PATH') ?: 'sites/default';
   }
 
 }

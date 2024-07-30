@@ -77,7 +77,7 @@ class Rss extends RssPluginBase {
     global $base_url;
 
     $cid = $row->{$this->field_alias};
-    if (!is_numeric($cid)) {
+    if (!\is_numeric($cid)) {
       return;
     }
 
@@ -94,7 +94,7 @@ class Rss extends RssPluginBase {
     $comment->rss_elements = [
       [
         'key' => 'pubDate',
-        'value' => gmdate('r', $comment->getCreatedTime()),
+        'value' => \gmdate('r', $comment->getCreatedTime()),
       ],
       [
         'key' => 'dc:creator',
@@ -113,7 +113,7 @@ class Rss extends RssPluginBase {
     unset($build['#theme']);
 
     if (!empty($comment->rss_namespaces)) {
-      $this->view->style_plugin->namespaces = array_merge($this->view->style_plugin->namespaces, $comment->rss_namespaces);
+      $this->view->style_plugin->namespaces = \array_merge($this->view->style_plugin->namespaces, $comment->rss_namespaces);
     }
 
     $item = new \stdClass();

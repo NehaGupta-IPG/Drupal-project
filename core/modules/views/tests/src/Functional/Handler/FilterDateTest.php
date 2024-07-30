@@ -89,7 +89,7 @@ class FilterDateTest extends ViewTestBase {
     $this->nodes[] = $this->drupalCreateNode(['created' => 100000, 'field_date' => 10000]);
     $this->nodes[] = $this->drupalCreateNode(['created' => 200000, 'field_date' => 20000]);
     $this->nodes[] = $this->drupalCreateNode(['created' => 300000, 'field_date' => 30000]);
-    $this->nodes[] = $this->drupalCreateNode(['created' => time() + 86400, 'field_date' => time() + 86400]);
+    $this->nodes[] = $this->drupalCreateNode(['created' => \time() + 86400, 'field_date' => \time() + 86400]);
 
     $this->map = [
       'nid' => 'nid',
@@ -243,7 +243,7 @@ class FilterDateTest extends ViewTestBase {
     $this->drupalGet('admin/structure/views/nojs/handler/test_filter_date_between/default/filter/created');
     foreach ($edit as $name => $value) {
       $this->assertSession()->fieldValueEquals($name, $value);
-      if (strpos($name, '[value][type]')) {
+      if (\strpos($name, '[value][type]')) {
         $radio = $this->cssSelect('input[name="' . $name . '"][checked="checked"][type="radio"]');
         $this->assertEquals($value, $radio[0]->getAttribute('value'));
       }

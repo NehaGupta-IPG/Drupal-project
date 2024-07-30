@@ -81,7 +81,7 @@ class BlockController extends ControllerBase {
 
     // Show descriptions in each visible page region, nothing else.
     $visible_regions = $this->getVisibleRegionNames($theme);
-    foreach (array_keys($visible_regions) as $region) {
+    foreach (\array_keys($visible_regions) as $region) {
       $page[$region]['block_description'] = [
         '#type' => 'inline_template',
         '#template' => '<div class="block-region demo-block">{{ region_name }}</div>',
@@ -102,7 +102,7 @@ class BlockController extends ControllerBase {
    *   An array of human-readable region names keyed by machine name.
    */
   protected function getVisibleRegionNames($theme) {
-    return system_region_list($theme, REGIONS_VISIBLE);
+    return \system_region_list($theme, REGIONS_VISIBLE);
   }
 
 }

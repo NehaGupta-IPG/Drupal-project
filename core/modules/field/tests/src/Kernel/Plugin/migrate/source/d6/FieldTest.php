@@ -64,10 +64,10 @@ class FieldTest extends MigrateSqlSourceTestBase {
     ];
 
     // The source data.
-    $tests[0]['source_data']['content_node_field'] = array_map(
+    $tests[0]['source_data']['content_node_field'] = \array_map(
       function (array $row) {
-        $row['global_settings'] = serialize($row['global_settings']);
-        $row['db_columns'] = serialize($row['db_columns']);
+        $row['global_settings'] = \serialize($row['global_settings']);
+        $row['db_columns'] = \serialize($row['db_columns']);
         return $row;
       },
       $tests[0]['expected_data']

@@ -34,7 +34,7 @@ class FieldInstanceOptionTranslation extends ProcessPluginBase {
           $option = preg_replace('/^option_/', '', $row->getSourceProperty('property'));
           for ($i = 0; $i < 2; $i++) {
             $value = $list[$i];
-            $tmp = explode("|", $value);
+            $tmp = \explode("|", $value);
             $original_option_key = $tmp[0] ?? NULL;
             $option_key = ($i === 0) ? 'off_label' : 'on_label';
             // Find property with name matching the original option.

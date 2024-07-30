@@ -160,7 +160,7 @@ class AddToAllBundlesConfigActionTest extends KernelTestBase {
    *   any bundle. Defaults to FALSE.
    */
   private function applyAction(string $config_name, bool $fail_if_exists = FALSE): void {
-    $fail_if_exists = var_export($fail_if_exists, TRUE);
+    $fail_if_exists = \var_export($fail_if_exists, TRUE);
     $contents = <<<YAML
 name: Instantiate field on all bundles
 config:

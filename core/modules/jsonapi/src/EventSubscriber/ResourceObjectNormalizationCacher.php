@@ -147,8 +147,8 @@ class ResourceObjectNormalizationCacher implements EventSubscriberInterface {
    *   The normalization parts to cache.
    */
   public function saveOnTerminate(ResourceObject $object, array $normalization_parts) {
-    assert(
-      array_keys($normalization_parts) === [
+    \assert(
+      \array_keys($normalization_parts) === [
         static::RESOURCE_CACHE_SUBSET_BASE,
         static::RESOURCE_CACHE_SUBSET_FIELDS,
       ]
@@ -231,7 +231,7 @@ class ResourceObjectNormalizationCacher implements EventSubscriberInterface {
    */
   protected static function mergeCacheableDependencies(array $dependencies) {
     $merged_cacheability = new CacheableMetadata();
-    array_walk($dependencies, function ($dependency) use ($merged_cacheability) {
+    \array_walk($dependencies, function ($dependency) use ($merged_cacheability) {
       $merged_cacheability->addCacheableDependency($dependency);
     });
     return $merged_cacheability;

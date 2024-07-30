@@ -60,23 +60,23 @@ class FieldLink extends ProcessPluginBase {
     // If the path starts with 2 slashes then it is always considered an
     // external URL without an explicit protocol part.
     // @todo Remove this when https://www.drupal.org/node/2744729 lands.
-    if (str_starts_with($uri, '//')) {
-      return $this->configuration['uri_scheme'] . ltrim($uri, '/');
+    if (\str_starts_with($uri, '//')) {
+      return $this->configuration['uri_scheme'] . \ltrim($uri, '/');
     }
 
     // If we already have a scheme, we're fine.
-    if (parse_url($uri, PHP_URL_SCHEME)) {
+    if (\parse_url($uri, PHP_URL_SCHEME)) {
       return $uri;
     }
 
     // Empty URI and non-links are allowed.
-    if (empty($uri) || in_array($uri, ['<nolink>', '<none>'])) {
+    if (empty($uri) || \in_array($uri, ['<nolink>', '<none>'])) {
       return 'route:<nolink>';
     }
 
     // Remove the <front> component of the URL.
-    if (str_starts_with($uri, '<front>')) {
-      $uri = substr($uri, strlen('<front>'));
+    if (\str_starts_with($uri, '<front>')) {
+      $uri = \substr($uri, \strlen('<front>'));
     }
     else {
       // List of unicode-encoded characters that were allowed in URLs,
@@ -98,7 +98,7 @@ class FieldLink extends ProcessPluginBase {
       // The rest of the path for a standard URL.
       $end = $directories . '?' . $query . '?' . $anchor . '?$/i';
 
-      if (!preg_match($internal_pattern . $end, $uri)) {
+      if (!\preg_match($internal_pattern . $end, $uri)) {
         $link_domains = '[a-z][a-z0-9-]{1,62}';
 
         // Starting a parenthesis group with (?: means that it is grouped, but
@@ -111,29 +111,29 @@ class FieldLink extends ProcessPluginBase {
 
         // Pattern specific to external links.
         $external_pattern = '/^' . $authentication . '?(' . $domain . '|' . $ipv4 . '|' . $ipv6 . ' |localhost)' . $port . '?';
-        if (preg_match($external_pattern . $end, $uri)) {
+        if (\preg_match($external_pattern . $end, $uri)) {
           return $this->configuration['uri_scheme'] . $uri;
         }
       }
     }
 
     // Add the internal: scheme and ensure a leading slash.
-    return 'internal:/' . ltrim($uri, '/');
+    return 'internal:/' . \ltrim($uri, '/');
   }
 
   /**
    * {@inheritdoc}
    */
   public function transform($value, MigrateExecutableInterface $migrate_executable, Row $row, $destination_property) {
-    $attributes = unserialize($value['attributes']);
+    $attributes = \unserialize($value['attributes']);
     // Drupal 6/7 link attributes might be double serialized.
-    if (!is_array($attributes)) {
-      $attributes = unserialize($attributes);
+    if (!\is_array($attributes)) {
+      $attributes = \unserialize($attributes);
     }
 
     // In rare cases Drupal 6/7 link attributes are triple serialized. To avoid
     // further problems with them we set them to an empty array in this case.
-    if (!is_array($attributes)) {
+    if (!\is_array($attributes)) {
       $attributes = [];
     }
 

@@ -38,7 +38,7 @@ class EntityTypeWithoutViewsDataTest extends KernelTestBase {
    */
   public function testEntityTypeWithoutViewsData(): void {
     $view_yaml = $this->getModulePath('taxonomy') . '/' . InstallStorage::CONFIG_OPTIONAL_DIRECTORY . '/views.view.taxonomy_term.yml';
-    $values = Yaml::decode(file_get_contents($view_yaml));
+    $values = Yaml::decode(\file_get_contents($view_yaml));
     $this->assertEquals(SAVED_NEW, View::create($values)->save());
   }
 

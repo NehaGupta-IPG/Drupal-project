@@ -63,10 +63,10 @@ class CommentBlockTest extends CommentTestBase {
     // Test that a user without the 'access comments' permission cannot see the
     // block.
     $this->drupalLogout();
-    user_role_revoke_permissions(RoleInterface::ANONYMOUS_ID, ['access comments']);
+    \user_role_revoke_permissions(RoleInterface::ANONYMOUS_ID, ['access comments']);
     $this->drupalGet('');
     $this->assertSession()->pageTextNotContains('Recent comments');
-    user_role_grant_permissions(RoleInterface::ANONYMOUS_ID, ['access comments']);
+    \user_role_grant_permissions(RoleInterface::ANONYMOUS_ID, ['access comments']);
 
     // Test that a user with the 'access comments' permission can see the
     // block.
@@ -80,10 +80,10 @@ class CommentBlockTest extends CommentTestBase {
       $this->assertSession()->pageTextContains($comments[$i]->getSubject());
       if ($i > 1) {
         $previous_position = $position;
-        $position = strpos($this->getSession()->getPage()->getContent(), $comments[$i]->getSubject());
-        $this->assertGreaterThan($previous_position, $position, sprintf('Comment %d does not appear after comment %d', 10 - $i, 11 - $i));
+        $position = \strpos($this->getSession()->getPage()->getContent(), $comments[$i]->getSubject());
+        $this->assertGreaterThan($previous_position, $position, \sprintf('Comment %d does not appear after comment %d', 10 - $i, 11 - $i));
       }
-      $position = strpos($this->getSession()->getPage()->getContent(), $comments[$i]->getSubject());
+      $position = \strpos($this->getSession()->getPage()->getContent(), $comments[$i]->getSubject());
     }
 
     // Test that links to comments work when comments are across pages.

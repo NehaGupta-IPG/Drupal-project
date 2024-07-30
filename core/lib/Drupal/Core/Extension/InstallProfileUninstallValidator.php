@@ -43,18 +43,18 @@ class InstallProfileUninstallValidator implements ModuleUninstallValidatorInterf
     if ($module === $this->installProfile) {
       $profile_name = $this->moduleExtensionList->get($module)->info['name'];
 
-      $profile_only_modules = array_diff_key($this->moduleExtensionList->getAllInstalledInfo(), $this->getExtensionDiscovery()->scan('module'));
+      $profile_only_modules = \array_diff_key($this->moduleExtensionList->getAllInstalledInfo(), $this->getExtensionDiscovery()->scan('module'));
       // Remove the install profile as we're uninstalling it.
       unset($profile_only_modules[$module]);
       if (!empty($profile_only_modules)) {
         $reasons[] = $this->t("The install profile '@profile_name' is providing the following module(s): @profile_modules",
-          ['@profile_name' => $profile_name, '@profile_modules' => implode(', ', array_keys($profile_only_modules))]);
+          ['@profile_name' => $profile_name, '@profile_modules' => \implode(', ', \array_keys($profile_only_modules))]);
       }
 
-      $profile_only_themes = array_diff_key($this->themeExtensionList->getAllInstalledInfo(), $this->getExtensionDiscovery()->scan('theme'));
+      $profile_only_themes = \array_diff_key($this->themeExtensionList->getAllInstalledInfo(), $this->getExtensionDiscovery()->scan('theme'));
       if (!empty($profile_only_themes)) {
         $reasons[] = $this->t("The install profile '@profile_name' is providing the following theme(s): @profile_themes",
-          ['@profile_name' => $profile_name, '@profile_themes' => implode(', ', array_keys($profile_only_themes))]);
+          ['@profile_name' => $profile_name, '@profile_themes' => \implode(', ', \array_keys($profile_only_themes))]);
       }
     }
     elseif (!empty($this->installProfile)) {

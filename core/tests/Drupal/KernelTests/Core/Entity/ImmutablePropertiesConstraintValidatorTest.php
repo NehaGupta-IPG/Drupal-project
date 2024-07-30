@@ -55,7 +55,7 @@ class ImmutablePropertiesConstraintValidatorTest extends KernelTestBase {
       'label' => 'Test',
     ]);
     $entity->save();
-    $this->assertFalse(property_exists($entity, 'non_existent'));
+    $this->assertFalse(\property_exists($entity, 'non_existent'));
 
     $definition = DataDefinition::createFromDataType('entity:block_content_type')
       ->addConstraint('ImmutableProperties', ['non_existent']);

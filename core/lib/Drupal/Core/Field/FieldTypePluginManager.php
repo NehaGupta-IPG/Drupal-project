@@ -180,7 +180,7 @@ class FieldTypePluginManager extends DefaultPluginManager implements FieldTypePl
     // Ensure that all the referenced categories exist.
     foreach ($grouped_categories as $group => $definitions) {
       if (!isset($category_info[$group])) {
-        assert(FALSE, "\"$group\" must be defined in MODULE_NAME.field_type_categories.yml");
+        \assert(FALSE, "\"$group\" must be defined in MODULE_NAME.field_type_categories.yml");
         if (!isset($grouped_categories[FieldTypeCategoryManagerInterface::FALLBACK_CATEGORY])) {
           $grouped_categories[FieldTypeCategoryManagerInterface::FALLBACK_CATEGORY] = [];
         }
@@ -204,15 +204,15 @@ class FieldTypePluginManager extends DefaultPluginManager implements FieldTypePl
     $definitions = $this->getDefinitions();
 
     // Filter out definitions that can not be configured in Field UI.
-    $definitions = array_filter($definitions, function ($definition) {
+    $definitions = \array_filter($definitions, function ($definition) {
       return empty($definition['no_ui']);
     });
 
     // Add preconfigured definitions.
     foreach ($definitions as $id => $definition) {
-      if (is_subclass_of($definition['class'], '\Drupal\Core\Field\PreconfiguredFieldUiOptionsInterface')) {
+      if (\is_subclass_of($definition['class'], '\Drupal\Core\Field\PreconfiguredFieldUiOptionsInterface')) {
         foreach ($this->getPreconfiguredOptions($definition['id']) as $key => $option) {
-          $definitions["field_ui:$id:$key"] = array_intersect_key(
+          $definitions["field_ui:$id:$key"] = \array_intersect_key(
             $option,
             ['label' => 0, 'category' => 1, 'weight' => 1, 'description' => 0]
           ) + $definition;
@@ -238,7 +238,7 @@ class FieldTypePluginManager extends DefaultPluginManager implements FieldTypePl
   public function getPreconfiguredOptions($field_type) {
     $options = [];
     $class = $this->getPluginClass($field_type);
-    if (is_subclass_of($class, '\Drupal\Core\Field\PreconfiguredFieldUiOptionsInterface')) {
+    if (\is_subclass_of($class, '\Drupal\Core\Field\PreconfiguredFieldUiOptionsInterface')) {
       $options = $class::getPreconfiguredOptions();
       $this->moduleHandler->alter('field_ui_preconfigured_options', $options, $field_type);
     }

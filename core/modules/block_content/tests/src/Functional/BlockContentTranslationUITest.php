@@ -75,7 +75,7 @@ class BlockContentTranslationUITest extends ContentTranslationUITestBase {
    * {@inheritdoc}
    */
   public function getTranslatorPermissions() {
-    return array_merge(parent::getTranslatorPermissions(), [
+    return \array_merge(parent::getTranslatorPermissions(), [
       'translate any entity',
       'access administration pages',
       'administer blocks',

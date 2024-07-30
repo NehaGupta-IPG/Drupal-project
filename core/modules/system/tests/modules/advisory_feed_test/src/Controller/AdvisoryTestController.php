@@ -29,12 +29,12 @@ class AdvisoryTestController {
   public function getPsaJson(string $json_name): Response {
     $file = __DIR__ . "/../../../../fixtures/psa_feed/$json_name.json";
     $headers = ['Content-Type' => 'application/json; charset=utf-8'];
-    if (!is_file($file)) {
+    if (!\is_file($file)) {
       // Return an empty response.
       return new Response('', 404, $headers);
     }
-    $contents = file_get_contents($file);
-    $contents = str_replace('[CORE_VERSION]', \Drupal::VERSION, $contents);
+    $contents = \file_get_contents($file);
+    $contents = \str_replace('[CORE_VERSION]', \Drupal::VERSION, $contents);
     return new JsonResponse($contents, 200, $headers, TRUE);
   }
 

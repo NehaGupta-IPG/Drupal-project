@@ -41,9 +41,9 @@ trait LayoutBuilderContextTrait {
    */
   protected function getPopulatedContexts(SectionStorageInterface $section_storage): array {
     // Get all known globally available contexts IDs.
-    $available_context_ids = array_keys($this->contextRepository()->getAvailableContexts());
+    $available_context_ids = \array_keys($this->contextRepository()->getAvailableContexts());
     // Filter to those that are populated.
-    $contexts = array_filter($this->contextRepository()->getRuntimeContexts($available_context_ids), function (ContextInterface $context) {
+    $contexts = \array_filter($this->contextRepository()->getRuntimeContexts($available_context_ids), function (ContextInterface $context) {
       return $context->hasContextValue();
     });
 

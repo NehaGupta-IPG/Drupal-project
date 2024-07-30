@@ -67,7 +67,7 @@ class ImageTest extends UnitTestCase {
    */
   protected function getToolkitMock(array $stubs = []) {
     $mock_builder = $this->getMockBuilder('Drupal\system\Plugin\ImageToolkit\GDToolkit');
-    $stubs = array_merge(['getPluginId', 'save'], $stubs);
+    $stubs = \array_merge(['getPluginId', 'save'], $stubs);
     return $mock_builder
       ->disableOriginalConstructor()
       ->onlyMethods($stubs)
@@ -107,8 +107,8 @@ class ImageTest extends UnitTestCase {
    *   An image object.
    */
   protected function getTestImage($load_expected = TRUE, array $stubs = []) {
-    if (!$load_expected && !in_array('load', $stubs)) {
-      $stubs = array_merge(['load'], $stubs);
+    if (!$load_expected && !\in_array('load', $stubs)) {
+      $stubs = \array_merge(['load'], $stubs);
     }
 
     $this->toolkit = $this->getToolkitMock($stubs);

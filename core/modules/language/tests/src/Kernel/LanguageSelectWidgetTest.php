@@ -60,7 +60,7 @@ class LanguageSelectWidgetTest extends KernelTestBase {
     ])->save();
     $entity = EntityTest::create(['name' => $this->randomString()]);
     $form = $this->container->get('entity.form_builder')->getForm($entity);
-    $options = array_keys($form['langcode']['widget'][0]['value']['#options']);
+    $options = \array_keys($form['langcode']['widget'][0]['value']['#options']);
     $this->assertSame(['en', 'und', 'zxx'], $options);
   }
 
@@ -74,7 +74,7 @@ class LanguageSelectWidgetTest extends KernelTestBase {
     ])->save();
     $entity = EntityTest::create(['name' => $this->randomString()]);
     $form = $this->container->get('entity.form_builder')->getForm($entity);
-    $options = array_keys($form['langcode']['widget'][0]['value']['#options']);
+    $options = \array_keys($form['langcode']['widget'][0]['value']['#options']);
     $this->assertSame(['en'], $options);
   }
 

@@ -68,7 +68,7 @@ abstract class ViewsFormBase extends FormBase implements ViewsFormInterface {
    */
   public function getFormState(ViewEntityInterface $view, $display_id, $js) {
     // $js may already have been converted to a Boolean.
-    $ajax = is_string($js) ? $js === 'ajax' : $js;
+    $ajax = \is_string($js) ? $js === 'ajax' : $js;
     return (new FormState())
       ->set('form_id', $this->getFormId())
       ->set('form_key', $this->getFormKey())
@@ -111,7 +111,7 @@ abstract class ViewsFormBase extends FormBase implements ViewsFormInterface {
       next($view->stack);
       unset($view->stack[$stack_key]);
 
-      if (array_shift($top) != $identifier) {
+      if (\array_shift($top) != $identifier) {
         $view->stack = [];
       }
     }
@@ -123,7 +123,7 @@ abstract class ViewsFormBase extends FormBase implements ViewsFormInterface {
       unset($view->form_cache);
     }
 
-    $form_class = get_class($form_state->getFormObject());
+    $form_class = \get_class($form_state->getFormObject());
     $response = $this->ajaxFormWrapper($form_class, $form_state);
 
     // If the form has not been submitted, or was not set for rerendering, stop.
@@ -134,15 +134,15 @@ abstract class ViewsFormBase extends FormBase implements ViewsFormInterface {
     // Sometimes we need to re-generate the form for multi-step type operations.
     if (!empty($view->stack)) {
       $stack = $view->stack;
-      $top = array_shift($stack);
+      $top = \array_shift($stack);
 
       // Build the new form state for the next form in the stack.
       $reflection = new \ReflectionClass($view::$forms[$top[1]]);
-      $form_state = $reflection->newInstanceArgs(array_slice($top, 3, 2))->getFormState($view, $top[2], $form_state->get('ajax'));
-      $form_class = get_class($form_state->getFormObject());
+      $form_state = $reflection->newInstanceArgs(\array_slice($top, 3, 2))->getFormState($view, $top[2], $form_state->get('ajax'));
+      $form_class = \get_class($form_state->getFormObject());
 
       $form_state->setUserInput([]);
-      $form_url = views_ui_build_form_url($form_state);
+      $form_url = \views_ui_build_form_url($form_state);
       if (!$form_state->get('ajax')) {
         return new RedirectResponse($form_url->setAbsolute()->toString());
       }

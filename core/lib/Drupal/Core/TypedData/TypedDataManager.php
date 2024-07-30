@@ -94,7 +94,7 @@ class TypedDataManager extends DefaultPluginManager implements TypedDataManagerI
     $class = $data_definition->getClass();
 
     if (!isset($class)) {
-      throw new PluginException(sprintf('The plugin (%s) did not specify an instance class.', $data_type));
+      throw new PluginException(\sprintf('The plugin (%s) did not specify an instance class.', $data_type));
     }
     $typed_data = $class::createInstance($data_definition, $configuration['name'], $configuration['parent']);
     $typed_data->setTypedDataManager($this);
@@ -127,7 +127,7 @@ class TypedDataManager extends DefaultPluginManager implements TypedDataManagerI
     $class = $type_definition['definition_class'];
     $data_definition = $class::createFromDataType($data_type);
 
-    if (method_exists($data_definition, 'setTypedDataManager')) {
+    if (\method_exists($data_definition, 'setTypedDataManager')) {
       $data_definition->setTypedDataManager($this);
     }
 
@@ -174,7 +174,7 @@ class TypedDataManager extends DefaultPluginManager implements TypedDataManagerI
     if ($settings = $root_definition->getSettings()) {
       // Include the settings serialized as JSON as part of the key. The JSON is
       // a shorter string than the serialized form, so array access is faster.
-      $parts[] = json_encode($settings);
+      $parts[] = \json_encode($settings);
     }
     // Property path for the requested data object.
     $parts[] = $object->getPropertyPath();
@@ -186,7 +186,7 @@ class TypedDataManager extends DefaultPluginManager implements TypedDataManagerI
     if ($object instanceof ComplexDataInterface) {
       $parts[] = $property_name;
     }
-    $key = implode(':', $parts);
+    $key = \implode(':', $parts);
 
     // Create the prototype if needed.
     if (!isset($this->prototypes[$key])) {
@@ -264,7 +264,7 @@ class TypedDataManager extends DefaultPluginManager implements TypedDataManagerI
     $type_definition = $this->getDefinition($definition->getDataType());
     // Auto-generate a constraint for data types implementing a primitive
     // interface.
-    if (is_subclass_of($type_definition['class'], '\Drupal\Core\TypedData\PrimitiveInterface')) {
+    if (\is_subclass_of($type_definition['class'], '\Drupal\Core\TypedData\PrimitiveInterface')) {
       $constraints['PrimitiveType'] = [];
     }
     // Add in constraints specified by the data type.
@@ -276,7 +276,7 @@ class TypedDataManager extends DefaultPluginManager implements TypedDataManagerI
       $constraints['NotNull'] = [];
     }
     // Check if the class provides allowed values.
-    if (is_subclass_of($definition->getClass(), 'Drupal\Core\TypedData\OptionsProviderInterface')) {
+    if (\is_subclass_of($definition->getClass(), 'Drupal\Core\TypedData\OptionsProviderInterface')) {
       $constraints['AllowedValues'] = [];
     }
     return $constraints;

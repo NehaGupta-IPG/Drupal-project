@@ -47,7 +47,7 @@ class ResourceTypeBuildEvent extends Event {
    *   The fields of the resource type to be built.
    */
   protected function __construct($resource_type_name, array $fields) {
-    assert(Inspector::assertAllObjects($fields, ResourceTypeField::class));
+    \assert(Inspector::assertAllObjects($fields, ResourceTypeField::class));
     $this->resourceTypeName = $resource_type_name;
     $this->fields = $fields;
   }

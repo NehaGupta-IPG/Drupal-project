@@ -106,7 +106,7 @@ class RelationshipNodeTermDataTest extends TaxonomyTestBase {
     foreach ([$main_query, $count_query] as $query) {
       $tables = $query->getTables();
       foreach ($tables as $join_table) {
-        if (is_object($join_table['table'])) {
+        if (\is_object($join_table['table'])) {
           $this->assertSame($join_table['table']->hasTag('taxonomy_term_access'), $hasTag);
         }
       }

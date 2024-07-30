@@ -381,7 +381,7 @@ class OptionsFieldUITest extends FieldTestBase {
     // Verify that the page does not have double escaped HTML tags.
     $this->assertSession()->responseNotContains('&amp;lt;');
 
-    if (is_string($result)) {
+    if (\is_string($result)) {
       $this->assertSession()->pageTextContains($result);
     }
     else {

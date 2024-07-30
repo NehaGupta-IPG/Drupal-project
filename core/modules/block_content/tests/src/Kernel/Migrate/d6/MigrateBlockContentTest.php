@@ -47,7 +47,7 @@ class MigrateBlockContentTest extends MigrateDrupal6TestBase {
     $this->assertSame('My block 1', $block->label());
     $requestTime = \Drupal::time()->getRequestTime();
     $this->assertGreaterThanOrEqual($requestTime, (int) $block->getChangedTime());
-    $this->assertLessThanOrEqual(time(), $block->getChangedTime());
+    $this->assertLessThanOrEqual(\time(), $block->getChangedTime());
     $this->assertSame('en', $block->language()->getId());
     $this->assertSame('<h3>My first content block body</h3>', $block->body->value);
     $this->assertSame('full_html', $block->body->format);
@@ -56,7 +56,7 @@ class MigrateBlockContentTest extends MigrateDrupal6TestBase {
     $this->assertSame('My block 2', $block->label());
     $this->assertGreaterThanOrEqual($requestTime, (int) $block->getChangedTime());
     $this->assertGreaterThanOrEqual($requestTime, (int) $block->getChangedTime());
-    $this->assertLessThanOrEqual(time(), $block->getChangedTime());
+    $this->assertLessThanOrEqual(\time(), $block->getChangedTime());
     $this->assertSame('en', $block->language()->getId());
     $this->assertSame('<h3>My second content block body</h3>', $block->body->value);
     $this->assertSame('full_html', $block->body->format);

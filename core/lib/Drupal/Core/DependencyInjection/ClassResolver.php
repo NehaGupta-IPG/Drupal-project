@@ -28,11 +28,11 @@ class ClassResolver implements ClassResolverInterface {
       $instance = $this->container->get($definition);
     }
     else {
-      if (!class_exists($definition)) {
-        throw new \InvalidArgumentException(sprintf('Class "%s" does not exist.', $definition));
+      if (!\class_exists($definition)) {
+        throw new \InvalidArgumentException(\sprintf('Class "%s" does not exist.', $definition));
       }
 
-      if (is_subclass_of($definition, 'Drupal\Core\DependencyInjection\ContainerInjectionInterface')) {
+      if (\is_subclass_of($definition, 'Drupal\Core\DependencyInjection\ContainerInjectionInterface')) {
         $instance = $definition::create($this->container);
       }
       else {

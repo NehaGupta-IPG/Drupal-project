@@ -454,7 +454,7 @@ class TaggedHandlersPassTest extends UnitTestCase {
     $method_calls = $container->getDefinition('consumer_id')->getMethodCalls();
     $this->assertCount(5, $method_calls[0][1]);
     $expected = [new Reference('handler1'), 'extra1', 0, 'default2', 'extra3'];
-    $this->assertEquals($expected, array_values($method_calls[0][1]));
+    $this->assertEquals($expected, \array_values($method_calls[0][1]));
   }
 
 }

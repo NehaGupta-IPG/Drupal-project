@@ -51,8 +51,8 @@ class AliasPathProcessor implements InboundPathProcessorInterface, OutboundPathP
       // also, to protect against this problem in arbitrary path processors,
       // but it is duplicated here to protect any other URL generation code
       // that might call this method separately.
-      if (str_starts_with($path, '//')) {
-        $path = '/' . ltrim($path, '/');
+      if (\str_starts_with($path, '//')) {
+        $path = '/' . \ltrim($path, '/');
       }
     }
     return $path;

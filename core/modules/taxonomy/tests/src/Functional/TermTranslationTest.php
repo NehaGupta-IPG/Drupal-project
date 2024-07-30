@@ -69,7 +69,7 @@ class TermTranslationTest extends TaxonomyTestBase {
       $breadcrumb[$term->toUrl()->toString()] = $term->label();
     }
     // The last item will not be in the breadcrumb.
-    array_pop($breadcrumb);
+    \array_pop($breadcrumb);
 
     // Check the breadcrumb on the leaf term page.
     $term = $this->getLeafTerm();
@@ -84,7 +84,7 @@ class TermTranslationTest extends TaxonomyTestBase {
       $url = $translated->toUrl('canonical', ['language' => $languages[$this->translateToLangcode]])->toString();
       $breadcrumb[$url] = $translated->label();
     }
-    array_pop($breadcrumb);
+    \array_pop($breadcrumb);
 
     // Check for the translated breadcrumb on the translated leaf term page.
     $term = $this->getLeafTerm();
@@ -153,7 +153,7 @@ class TermTranslationTest extends TaxonomyTestBase {
    *   The final term in the hierarchy.
    */
   protected function getLeafTerm() {
-    return $this->terms[count($this->termTranslationMap) - 1];
+    return $this->terms[\count($this->termTranslationMap) - 1];
   }
 
 }

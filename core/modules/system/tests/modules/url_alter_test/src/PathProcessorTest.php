@@ -20,8 +20,8 @@ class PathProcessorTest implements InboundPathProcessorInterface, OutboundPathPr
    */
   public function processInbound($path, Request $request) {
     // Rewrite user/username to user/uid.
-    if (preg_match('!^/user/([^/]+)(/.*)?!', $path, $matches)) {
-      if ($account = user_load_by_name($matches[1])) {
+    if (\preg_match('!^/user/([^/]+)(/.*)?!', $path, $matches)) {
+      if ($account = \user_load_by_name($matches[1])) {
         $matches += [2 => ''];
         $path = '/user/' . $account->id() . $matches[2];
       }
@@ -38,7 +38,7 @@ class PathProcessorTest implements InboundPathProcessorInterface, OutboundPathPr
    */
   public function processOutbound($path, &$options = [], ?Request $request = NULL, ?BubbleableMetadata $bubbleable_metadata = NULL) {
     // Rewrite user/uid to user/username.
-    if (preg_match('!^/user/([0-9]+)(/.*)?!', $path, $matches)) {
+    if (\preg_match('!^/user/([0-9]+)(/.*)?!', $path, $matches)) {
       if ($account = User::load($matches[1])) {
         $matches += [2 => ''];
         $path = '/user/' . $account->getAccountName() . $matches[2];

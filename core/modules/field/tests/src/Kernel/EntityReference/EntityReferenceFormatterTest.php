@@ -191,9 +191,9 @@ class EntityReferenceFormatterTest extends EntityKernelTestBase {
     $formatter = 'entity_reference_entity_id';
     $build = $this->buildRenderArray([$this->referencedEntity, $this->unsavedReferencedEntity], $formatter);
 
-    $this->assertEquals($this->referencedEntity->id(), $build[0]['#plain_text'], sprintf('The markup returned by the %s formatter is correct for an item with a saved entity.', $formatter));
-    $this->assertEquals($this->referencedEntity->getCacheTags(), $build[0]['#cache']['tags'], sprintf('The %s formatter has the expected cache tags.', $formatter));
-    $this->assertTrue(!isset($build[1]), sprintf('The markup returned by the %s formatter is correct for an item with a unsaved entity.', $formatter));
+    $this->assertEquals($this->referencedEntity->id(), $build[0]['#plain_text'], \sprintf('The markup returned by the %s formatter is correct for an item with a saved entity.', $formatter));
+    $this->assertEquals($this->referencedEntity->getCacheTags(), $build[0]['#cache']['tags'], \sprintf('The %s formatter has the expected cache tags.', $formatter));
+    $this->assertTrue(!isset($build[1]), \sprintf('The markup returned by the %s formatter is correct for an item with a unsaved entity.', $formatter));
   }
 
   /**
@@ -216,7 +216,7 @@ class EntityReferenceFormatterTest extends EntityKernelTestBase {
           </div>
 ';
     $renderer->renderRoot($build[0]);
-    $this->assertSame('default | ' . $this->referencedEntity->label() . $expected_rendered_name_field_1 . $expected_rendered_body_field_1, (string) $build[0]['#markup'], sprintf('The markup returned by the %s formatter is correct for an item with a saved entity.', $formatter));
+    $this->assertSame('default | ' . $this->referencedEntity->label() . $expected_rendered_name_field_1 . $expected_rendered_body_field_1, (string) $build[0]['#markup'], \sprintf('The markup returned by the %s formatter is correct for an item with a saved entity.', $formatter));
     $expected_cache_tags = Cache::mergeTags(\Drupal::entityTypeManager()->getViewBuilder($this->entityType)->getCacheTags(), $this->referencedEntity->getCacheTags());
     $expected_cache_tags = Cache::mergeTags($expected_cache_tags, FilterFormat::load('full_html')->getCacheTags());
     $this->assertEquals($expected_cache_tags, $build[0]['#cache']['tags'], "The $formatter formatter has the expected cache tags.");
@@ -233,7 +233,7 @@ class EntityReferenceFormatterTest extends EntityKernelTestBase {
 ';
 
     $renderer->renderRoot($build[1]);
-    $this->assertSame('default | ' . $this->unsavedReferencedEntity->label() . $expected_rendered_name_field_2 . $expected_rendered_body_field_2, (string) $build[1]['#markup'], sprintf('The markup returned by the %s formatter is correct for an item with a unsaved entity.', $formatter));
+    $this->assertSame('default | ' . $this->unsavedReferencedEntity->label() . $expected_rendered_name_field_2 . $expected_rendered_body_field_2, (string) $build[1]['#markup'], \sprintf('The markup returned by the %s formatter is correct for an item with a unsaved entity.', $formatter));
   }
 
   /**
@@ -273,7 +273,7 @@ class EntityReferenceFormatterTest extends EntityKernelTestBase {
     // the entity title because we're rendering the full entity, not just the
     // reference field.
     $expected_occurrences = EntityReferenceEntityFormatter::RECURSIVE_RENDER_LIMIT * 2 + 2;
-    $actual_occurrences = substr_count($output, $referencing_entity_1->label());
+    $actual_occurrences = \substr_count($output, $referencing_entity_1->label());
     $this->assertEquals($expected_occurrences, $actual_occurrences);
 
     // Repeat the process with another entity in order to check that the
@@ -286,17 +286,17 @@ class EntityReferenceFormatterTest extends EntityKernelTestBase {
     $build = $view_builder->view($referencing_entity_2, 'default');
     $output = (string) $renderer->renderRoot($build);
 
-    $actual_occurrences = substr_count($output, $referencing_entity_2->label());
+    $actual_occurrences = \substr_count($output, $referencing_entity_2->label());
     $this->assertEquals($expected_occurrences, $actual_occurrences);
 
     // Now render both entities at the same time and check again.
     $build = $view_builder->viewMultiple([$referencing_entity_1, $referencing_entity_2], 'default');
     $output = (string) $renderer->renderRoot($build);
 
-    $actual_occurrences = substr_count($output, $referencing_entity_1->label());
+    $actual_occurrences = \substr_count($output, $referencing_entity_1->label());
     $this->assertEquals($expected_occurrences, $actual_occurrences);
 
-    $actual_occurrences = substr_count($output, $referencing_entity_2->label());
+    $actual_occurrences = \substr_count($output, $referencing_entity_2->label());
     $this->assertEquals($expected_occurrences, $actual_occurrences);
   }
 
@@ -320,8 +320,8 @@ class EntityReferenceFormatterTest extends EntityKernelTestBase {
     /** @var \Drupal\Core\Entity\ContentEntityInterface $referenced_entity */
     $referenced_entity = $storage->create(['name' => $this->randomMachineName()]);
 
-    $range = range(0, 30);
-    $referencing_entities = array_map(function () use ($storage, $referenced_entity) {
+    $range = \range(0, 30);
+    $referencing_entities = \array_map(function () use ($storage, $referenced_entity) {
       $referencing_entity = $storage->create([
         'name' => $this->randomMachineName(),
         $this->fieldName => $referenced_entity,
@@ -339,7 +339,7 @@ class EntityReferenceFormatterTest extends EntityKernelTestBase {
     // the entity title because we're rendering the full entity, not just the
     // reference field.
     $expected_occurrences = 30 * 2 + 2;
-    $actual_occurrences = substr_count($output, $referenced_entity->get('name')->value);
+    $actual_occurrences = \substr_count($output, $referenced_entity->get('name')->value);
     $this->assertEquals($expected_occurrences, $actual_occurrences);
   }
 
@@ -380,7 +380,7 @@ class EntityReferenceFormatterTest extends EntityKernelTestBase {
         'tags' => $this->referencedEntity->getCacheTags(),
       ],
     ];
-    $this->assertEquals($renderer->renderRoot($expected_item_1), $renderer->renderRoot($build[0]), sprintf('The markup returned by the %s formatter is correct for an item with a saved entity.', $formatter));
+    $this->assertEquals($renderer->renderRoot($expected_item_1), $renderer->renderRoot($build[0]), \sprintf('The markup returned by the %s formatter is correct for an item with a saved entity.', $formatter));
     $this->assertEquals(CacheableMetadata::createFromRenderArray($expected_item_1), CacheableMetadata::createFromRenderArray($build[0]));
 
     // The second referenced entity is "autocreated", therefore not saved and
@@ -396,12 +396,12 @@ class EntityReferenceFormatterTest extends EntityKernelTestBase {
         'max-age' => Cache::PERMANENT,
       ],
     ];
-    $this->assertEquals($expected_item_2, $build[1], sprintf('The render array returned by the %s formatter is correct for an item with a unsaved entity.', $formatter));
+    $this->assertEquals($expected_item_2, $build[1], \sprintf('The render array returned by the %s formatter is correct for an item with a unsaved entity.', $formatter));
 
     // Test with the 'link' setting set to FALSE.
     $build = $this->buildRenderArray([$this->referencedEntity, $this->unsavedReferencedEntity], $formatter, ['link' => FALSE]);
-    $this->assertEquals($this->referencedEntity->label(), $build[0]['#plain_text'], sprintf('The markup returned by the %s formatter is correct for an item with a saved entity.', $formatter));
-    $this->assertEquals($this->unsavedReferencedEntity->label(), $build[1]['#plain_text'], sprintf('The markup returned by the %s formatter is correct for an item with a unsaved entity.', $formatter));
+    $this->assertEquals($this->referencedEntity->label(), $build[0]['#plain_text'], \sprintf('The markup returned by the %s formatter is correct for an item with a saved entity.', $formatter));
+    $this->assertEquals($this->unsavedReferencedEntity->label(), $build[1]['#plain_text'], \sprintf('The markup returned by the %s formatter is correct for an item with a unsaved entity.', $formatter));
 
     // Test an entity type that doesn't have any link templates.
     $field_storage_config = FieldStorageConfig::loadByName($this->entityType, $this->fieldName);

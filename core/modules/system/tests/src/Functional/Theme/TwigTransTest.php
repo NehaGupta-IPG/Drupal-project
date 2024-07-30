@@ -204,7 +204,7 @@ class TwigTransTest extends BrowserTestBase {
     // Makes sure https://www.drupal.org/node/2489024 doesn't happen without
     // twig debug.
     // Ensure that running php code inside a Twig trans is not possible.
-    $this->assertSession()->pageTextNotContains((string) pi());
+    $this->assertSession()->pageTextNotContains((string) \pi());
   }
 
   /**
@@ -231,7 +231,7 @@ class TwigTransTest extends BrowserTestBase {
 
         // Import the custom .po contents for the language.
         $filename = $file_system->tempnam('temporary://', "po_") . '.po';
-        file_put_contents($filename, $contents);
+        \file_put_contents($filename, $contents);
         $options = [
           'files[file]' => $filename,
           'langcode' => $langcode,

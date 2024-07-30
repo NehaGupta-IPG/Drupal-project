@@ -23,7 +23,7 @@ class JsonapiServiceProvider implements ServiceModifierInterface, ServiceProvide
    * {@inheritdoc}
    */
   public function alter(ContainerBuilder $container) {
-    if ($container->has('http_middleware.negotiation') && is_a($container->getDefinition('http_middleware.negotiation')->getClass(), NegotiationMiddleware::class, TRUE)) {
+    if ($container->has('http_middleware.negotiation') && \is_a($container->getDefinition('http_middleware.negotiation')->getClass(), NegotiationMiddleware::class, TRUE)) {
       // @see http://www.iana.org/assignments/media-types/application/vnd.api+json
       $container->getDefinition('http_middleware.negotiation')
         ->addMethodCall('registerFormat', [

@@ -49,7 +49,7 @@ trait EntityViewTrait {
       // the element is rendered into the final text.
       if (isset($elements['#pre_render'])) {
         foreach ($elements['#pre_render'] as $callable) {
-          $elements = call_user_func($callable, $elements);
+          $elements = \call_user_func($callable, $elements);
         }
       }
 

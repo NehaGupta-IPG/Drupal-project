@@ -223,14 +223,14 @@ class StorageComparer implements StorageComparerInterface {
    */
   protected function addChangeList($collection, $op, array $changes, ?array $sort_order = NULL) {
     // Only add changes that aren't already listed.
-    $changes = array_diff($changes, $this->changelist[$collection][$op]);
-    $this->changelist[$collection][$op] = array_merge($this->changelist[$collection][$op], $changes);
+    $changes = \array_diff($changes, $this->changelist[$collection][$op]);
+    $this->changelist[$collection][$op] = \array_merge($this->changelist[$collection][$op], $changes);
     if (isset($sort_order)) {
-      $count = count($this->changelist[$collection][$op]);
+      $count = \count($this->changelist[$collection][$op]);
       // Sort the changelist in the same order as the $sort_order array and
       // ensure the array is keyed from 0.
-      $this->changelist[$collection][$op] = array_values(array_intersect($sort_order, $this->changelist[$collection][$op]));
-      if ($count != count($this->changelist[$collection][$op])) {
+      $this->changelist[$collection][$op] = \array_values(\array_intersect($sort_order, $this->changelist[$collection][$op]));
+      if ($count != \count($this->changelist[$collection][$op])) {
         throw new \InvalidArgumentException("Sorting the $op changelist should not change its length.");
       }
     }
@@ -265,7 +265,7 @@ class StorageComparer implements StorageComparerInterface {
    *   The storage collection to operate on.
    */
   protected function addChangelistDelete($collection) {
-    $deletes = array_diff(array_reverse($this->targetNames[$collection]), $this->sourceNames[$collection]);
+    $deletes = \array_diff(\array_reverse($this->targetNames[$collection]), $this->sourceNames[$collection]);
     $this->addChangeList($collection, 'delete', $deletes);
   }
 
@@ -280,7 +280,7 @@ class StorageComparer implements StorageComparerInterface {
    *   The storage collection to operate on.
    */
   protected function addChangelistCreate($collection) {
-    $creates = array_diff($this->sourceNames[$collection], $this->targetNames[$collection]);
+    $creates = \array_diff($this->sourceNames[$collection], $this->targetNames[$collection]);
     $this->addChangeList($collection, 'create', $creates);
   }
 
@@ -296,7 +296,7 @@ class StorageComparer implements StorageComparerInterface {
    */
   protected function addChangelistUpdate($collection) {
     $recreates = [];
-    foreach (array_intersect($this->sourceNames[$collection], $this->targetNames[$collection]) as $name) {
+    foreach (\array_intersect($this->sourceNames[$collection], $this->targetNames[$collection]) as $name) {
       $source_data = $this->getSourceStorage($collection)->read($name);
       $target_data = $this->getTargetStorage($collection)->read($name);
       if ($source_data !== $target_data) {
@@ -316,7 +316,7 @@ class StorageComparer implements StorageComparerInterface {
       // Recreates should become deletes and creates. Deletes should be ordered
       // so that dependencies are deleted first.
       $this->addChangeList($collection, 'create', $recreates, $this->sourceNames[$collection]);
-      $this->addChangeList($collection, 'delete', $recreates, array_reverse($this->targetNames[$collection]));
+      $this->addChangeList($collection, 'delete', $recreates, \array_reverse($this->targetNames[$collection]));
 
     }
   }
@@ -342,7 +342,7 @@ class StorageComparer implements StorageComparerInterface {
     $create_uuids = [];
     foreach ($this->sourceNames[$collection] as $name) {
       $data = $this->getSourceStorage($collection)->read($name);
-      if (isset($data['uuid']) && in_array($name, $create_list)) {
+      if (isset($data['uuid']) && \in_array($name, $create_list)) {
         $create_uuids[$data['uuid']] = $name;
       }
     }
@@ -386,7 +386,7 @@ class StorageComparer implements StorageComparerInterface {
    *   The name of the configuration to remove.
    */
   protected function removeFromChangelist($collection, $op, $name) {
-    $key = array_search($name, $this->changelist[$collection][$op]);
+    $key = \array_search($name, $this->changelist[$collection][$op]);
     if ($key !== FALSE) {
       unset($this->changelist[$collection][$op][$key]);
     }
@@ -484,7 +484,7 @@ class StorageComparer implements StorageComparerInterface {
    * {@inheritdoc}
    */
   public function extractRenameNames($name) {
-    $names = explode('::', $name, 2);
+    $names = \explode('::', $name, 2);
     return [
       'old_name' => $names[0],
       'new_name' => $names[1],
@@ -495,9 +495,9 @@ class StorageComparer implements StorageComparerInterface {
    * {@inheritdoc}
    */
   public function getAllCollectionNames($include_default = TRUE) {
-    $collections = array_unique(array_merge($this->sourceStorage->getAllCollectionNames(), $this->targetStorage->getAllCollectionNames()));
+    $collections = \array_unique(\array_merge($this->sourceStorage->getAllCollectionNames(), $this->targetStorage->getAllCollectionNames()));
     if ($include_default) {
-      array_unshift($collections, StorageInterface::DEFAULT_COLLECTION);
+      \array_unshift($collections, StorageInterface::DEFAULT_COLLECTION);
     }
     return $collections;
   }
@@ -506,7 +506,7 @@ class StorageComparer implements StorageComparerInterface {
    * {@inheritdoc}
    */
   public function __sleep(): array {
-    return array_diff($this->defaultSleep(), ['targetStorages']);
+    return \array_diff($this->defaultSleep(), ['targetStorages']);
   }
 
   /**

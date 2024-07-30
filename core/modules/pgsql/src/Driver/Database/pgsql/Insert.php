@@ -36,9 +36,9 @@ class Insert extends QueryInsert {
     foreach ($this->insertValues as $insert_values) {
       foreach ($this->insertFields as $idx => $field) {
         if (isset($table_information->blob_fields[$field]) && $insert_values[$idx] !== NULL) {
-          $blobs[$blob_count] = fopen('php://memory', 'a');
-          fwrite($blobs[$blob_count], $insert_values[$idx]);
-          rewind($blobs[$blob_count]);
+          $blobs[$blob_count] = \fopen('php://memory', 'a');
+          \fwrite($blobs[$blob_count], $insert_values[$idx]);
+          \rewind($blobs[$blob_count]);
 
           $stmt->getClientStatement()->bindParam(':db_insert_placeholder_' . $max_placeholder++, $blobs[$blob_count], \PDO::PARAM_LOB);
 
@@ -52,7 +52,7 @@ class Insert extends QueryInsert {
       // Check if values for a serial field has been passed.
       if (!empty($table_information->serial_fields)) {
         foreach ($table_information->serial_fields as $index => $serial_field) {
-          $serial_key = array_search($serial_field, $this->insertFields);
+          $serial_key = \array_search($serial_field, $this->insertFields);
           if ($serial_key !== FALSE) {
             $serial_value = $insert_values[$serial_key];
 
@@ -113,23 +113,23 @@ class Insert extends QueryInsert {
     $comments = $this->connection->makeComment($this->comments);
 
     // Default fields are always placed first for consistency.
-    $insert_fields = array_merge($this->defaultFields, $this->insertFields);
+    $insert_fields = \array_merge($this->defaultFields, $this->insertFields);
 
-    $insert_fields = array_map(function ($f) {
+    $insert_fields = \array_map(function ($f) {
       return $this->connection->escapeField($f);
     }, $insert_fields);
 
     // If we're selecting from a SelectQuery, finish building the query and
     // pass it back, as any remaining options are irrelevant.
     if (!empty($this->fromQuery)) {
-      $insert_fields_string = $insert_fields ? ' (' . implode(', ', $insert_fields) . ') ' : ' ';
+      $insert_fields_string = $insert_fields ? ' (' . \implode(', ', $insert_fields) . ') ' : ' ';
       $query = $comments . 'INSERT INTO {' . $this->table . '}' . $insert_fields_string . $this->fromQuery;
     }
     else {
-      $query = $comments . 'INSERT INTO {' . $this->table . '} (' . implode(', ', $insert_fields) . ') VALUES ';
+      $query = $comments . 'INSERT INTO {' . $this->table . '} (' . \implode(', ', $insert_fields) . ') VALUES ';
 
       $values = $this->getInsertPlaceholderFragment($this->insertValues, $this->defaultFields);
-      $query .= implode(', ', $values);
+      $query .= \implode(', ', $values);
     }
     try {
       // Fetch the list of blobs and sequences used on that table.

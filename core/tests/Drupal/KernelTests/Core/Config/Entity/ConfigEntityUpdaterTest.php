@@ -46,7 +46,7 @@ class ConfigEntityUpdaterTest extends KernelTestBase {
 
     $callback = function ($config_entity) {
       /** @var \Drupal\config_test\Entity\ConfigTest $config_entity */
-      $number = (int) str_replace('config_test_', '', $config_entity->id());
+      $number = (int) \str_replace('config_test_', '', $config_entity->id());
       // Only update even numbered entities.
       if ($number % 2 == 0) {
         $config_entity->set('label', $config_entity->label . ' (updated)');

@@ -113,12 +113,12 @@ class HelpTest extends BrowserTestBase {
     // have a different order if it was done by machine name instead.
     $this->drupalGet('admin/help');
     $page_text = $this->getTextContent();
-    $start = strpos($page_text, 'Module overviews');
+    $start = \strpos($page_text, 'Module overviews');
     $pos = $start;
     $list = ['Block', 'Block Content', 'Breakpoint', 'Text Editor'];
     foreach ($list as $name) {
       $this->assertSession()->linkExists($name);
-      $new_pos = strpos($page_text, $name, $start);
+      $new_pos = \strpos($page_text, $name, $start);
       $this->assertGreaterThan($pos, $new_pos, "Order of $name is not correct on page");
       $pos = $new_pos;
     }

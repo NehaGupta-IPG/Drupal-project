@@ -63,7 +63,7 @@ class ImageCachePreset extends DrupalSqlBase {
 
     foreach ($results as $key => $result) {
       $actions[$key] = $result;
-      $actions[$key]['data'] = unserialize($result['data']);
+      $actions[$key]['data'] = \unserialize($result['data']);
     }
 
     $row->setSourceProperty('actions', $actions);

@@ -47,7 +47,7 @@ class ConditionTest extends UnitTestCase {
   public function testSimpleCondition($expected, $field_name): void {
     $connection = $this->prophesize(Connection::class);
     $connection->escapeField($field_name)->will(function ($args) {
-      return preg_replace('/[^A-Za-z0-9_.]+/', '', $args[0]);
+      return \preg_replace('/[^A-Za-z0-9_.]+/', '', $args[0]);
     });
     $connection->mapConditionOperator('=')->willReturn(['operator' => '=']);
     $connection->condition('AND')->willReturn(new Condition('AND'));
@@ -90,7 +90,7 @@ class ConditionTest extends UnitTestCase {
   public function testCompileWithKnownOperators($expected, $field, $value, $operator, $expected_arguments = NULL): void {
     $connection = $this->prophesize(Connection::class);
     $connection->escapeField(Argument::any())->will(function ($args) {
-      return preg_replace('/[^A-Za-z0-9_.]+/', '', $args[0]);
+      return \preg_replace('/[^A-Za-z0-9_.]+/', '', $args[0]);
     });
     $connection->mapConditionOperator(Argument::any())->willReturn(NULL);
     $connection->condition('AND')->willReturn(new Condition('AND'));
@@ -161,7 +161,7 @@ class ConditionTest extends UnitTestCase {
   public function testCompileWithSqlInjectionForOperator($operator): void {
     $connection = $this->prophesize(Connection::class);
     $connection->escapeField(Argument::any())->will(function ($args) {
-      return preg_replace('/[^A-Za-z0-9_.]+/', '', $args[0]);
+      return \preg_replace('/[^A-Za-z0-9_.]+/', '', $args[0]);
     });
     $connection->mapConditionOperator(Argument::any())->willReturn(NULL);
     $connection->condition('AND')->willReturn(new Condition('AND'));
@@ -205,7 +205,7 @@ class ConditionTest extends UnitTestCase {
       'prefix' => '',
     ]);
     $condition = $connection->condition('AND');
-    $this->assertSame(StubCondition::class, get_class($condition));
+    $this->assertSame(StubCondition::class, \get_class($condition));
   }
 
 }

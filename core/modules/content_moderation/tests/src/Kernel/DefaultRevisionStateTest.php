@@ -140,7 +140,7 @@ class DefaultRevisionStateTest extends KernelTestBase {
     $this->assertCount(1, $results);
 
     $moderation_state = $moderation_state_storage
-      ->loadRevision(key($results))
+      ->loadRevision(\key($results))
       ->getTranslation($langcode);
     $this->assertEquals($expected_state, $moderation_state->get('moderation_state')->value);
     $this->assertEquals($expected_workflow, $moderation_state->get('workflow')->target_id);

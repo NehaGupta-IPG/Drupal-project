@@ -55,7 +55,7 @@ class BlockContentIntegrationTest extends BlockContentTestBase {
     /** @var \Drupal\block_content\Entity\BlockContentType[] $types*/
     foreach ($types as $type) {
       $this->drupalGet("test-block_content-view/{$type->id()}");
-      $this->assertIds(array_keys($block_contents[$type->id()]));
+      $this->assertIds(\array_keys($block_contents[$type->id()]));
     }
   }
 

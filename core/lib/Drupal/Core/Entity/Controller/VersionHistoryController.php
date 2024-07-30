@@ -221,7 +221,7 @@ class VersionHistoryController extends ControllerBase {
     $entityType = $entity->getEntityType();
     $translatable = $entityType->isTranslatable();
     $entityStorage = $this->entityTypeManager->getStorage($entity->getEntityTypeId());
-    assert($entityStorage instanceof RevisionableStorageInterface);
+    \assert($entityStorage instanceof RevisionableStorageInterface);
 
     $result = $entityStorage->getQuery()
       ->accessCheck(FALSE)
@@ -234,7 +234,7 @@ class VersionHistoryController extends ControllerBase {
     $currentLangcode = $this->languageManager
       ->getCurrentLanguage(LanguageInterface::TYPE_CONTENT)
       ->getId();
-    foreach ($entityStorage->loadMultipleRevisions(array_keys($result)) as $revision) {
+    foreach ($entityStorage->loadMultipleRevisions(\array_keys($result)) as $revision) {
       // Only show revisions that are affected by the language that is being
       // displayed.
       if (!$translatable || ($revision->hasTranslation($currentLangcode) && $revision->getTranslation($currentLangcode)->isRevisionTranslationAffected())) {
@@ -300,7 +300,7 @@ class VersionHistoryController extends ControllerBase {
 
     // Operation links.
     $links = $this->getOperationLinks($revision);
-    if (count($links) > 0) {
+    if (\count($links) > 0) {
       $row['operations']['data']['operations'] = [
         '#type' => 'operations',
         '#links' => $links,
@@ -321,7 +321,7 @@ class VersionHistoryController extends ControllerBase {
    */
   protected function getOperationLinks(RevisionableInterface $revision): array {
     // Removes links which are inaccessible or not rendered.
-    return array_filter([
+    return \array_filter([
       $this->buildRevertRevisionLink($revision),
       $this->buildDeleteRevisionLink($revision),
     ]);

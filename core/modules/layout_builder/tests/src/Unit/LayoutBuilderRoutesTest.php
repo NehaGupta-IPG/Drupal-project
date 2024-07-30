@@ -84,7 +84,7 @@ class LayoutBuilderRoutesTest extends UnitTestCase {
     $event = new RouteBuildEvent($collection);
     $this->routeBuilder->onAlterRoutes($event);
     $this->assertEquals($expected, $collection->all());
-    $this->assertSame(array_keys($expected), array_keys($collection->all()));
+    $this->assertSame(\array_keys($expected), \array_keys($collection->all()));
   }
 
 }

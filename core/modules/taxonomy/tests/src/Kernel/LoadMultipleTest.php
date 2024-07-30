@@ -54,15 +54,15 @@ class LoadMultipleTest extends KernelTestBase {
     // Load the terms from the vocabulary.
     $term_storage = \Drupal::entityTypeManager()->getStorage('taxonomy_term');
     $terms = $term_storage->loadByProperties(['vid' => $vocabulary->id()]);
-    $count = count($terms);
+    $count = \count($terms);
     $this->assertEquals(5, $count, "Correct number of terms were loaded. $count terms.");
 
     // Load the same terms again by tid.
-    $terms2 = Term::loadMultiple(array_keys($terms));
+    $terms2 = Term::loadMultiple(\array_keys($terms));
     $this->assertEquals($terms, $terms2, 'Both arrays contain the same terms.');
 
     // Remove one term from the array, then delete it.
-    $deleted = array_shift($terms2);
+    $deleted = \array_shift($terms2);
     $deleted->delete();
     $deleted_term = Term::load($deleted->id());
     $this->assertNull($deleted_term);
@@ -76,7 +76,7 @@ class LoadMultipleTest extends KernelTestBase {
     $term = $this->createTerm($vocabulary);
     $loaded_terms = $term_storage->loadByProperties(['name' => $term->getName()]);
     $this->assertCount(1, $loaded_terms, 'One term was loaded.');
-    $loaded_term = reset($loaded_terms);
+    $loaded_term = \reset($loaded_terms);
     $this->assertEquals($term->id(), $loaded_term->id(), 'Term loaded by name successfully.');
   }
 

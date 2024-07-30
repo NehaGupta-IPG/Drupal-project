@@ -226,13 +226,13 @@ class AssetResolver implements AssetResolverInterface {
         $options['license'] = $definition['license'];
 
         // Files with a query string cannot be preprocessed.
-        if ($options['type'] === 'file' && $options['preprocess'] && str_contains($options['data'], '?')) {
+        if ($options['type'] === 'file' && $options['preprocess'] && \str_contains($options['data'], '?')) {
           $options['preprocess'] = FALSE;
         }
 
         // Always add a tiny value to the weight, to conserve the insertion
         // order.
-        $options['weight'] += count($css) / 30000;
+        $options['weight'] += \count($css) / 30000;
 
         // CSS files are being keyed by the full path.
         $css[$options['data']] = $options;
@@ -245,10 +245,10 @@ class AssetResolver implements AssetResolverInterface {
 
     if (!empty($css)) {
       // Sort CSS items, so that they appear in the correct order.
-      uasort($css, [static::class, 'sort']);
+      \uasort($css, [static::class, 'sort']);
 
       if ($optimize) {
-        $css = \Drupal::service('asset.css.collection_optimizer')->optimize($css, array_values($libraries_to_load), $language);
+        $css = \Drupal::service('asset.css.collection_optimizer')->optimize($css, \array_values($libraries_to_load), $language);
       }
     }
     $this->cache->set($cid, $css, CacheBackendInterface::CACHE_PERMANENT, ['library_info']);
@@ -301,7 +301,7 @@ class AssetResolver implements AssetResolverInterface {
     // Collect all libraries that contain JS assets and are in the header.
     $header_js_libraries = [];
     foreach ($libraries_to_load as $key => $library) {
-      [$extension, $name] = explode('/', $library, 2);
+      [$extension, $name] = \explode('/', $library, 2);
       $definition = $this->libraryDiscovery->getLibraryByName($extension, $name);
       if (!empty($definition['header'])) {
         $header_js_libraries[] = $library;
@@ -340,7 +340,7 @@ class AssetResolver implements AssetResolverInterface {
       $header_js_libraries = $this->libraryDependencyResolver->getLibrariesWithDependencies($header_js_libraries);
 
       foreach ($libraries_to_load as $library) {
-        [$extension, $name] = explode('/', $library, 2);
+        [$extension, $name] = \explode('/', $library, 2);
         $definition = $this->libraryDiscovery->getLibraryByName($extension, $name);
         foreach ($definition['js'] as $options) {
           $options += $default_options;
@@ -349,7 +349,7 @@ class AssetResolver implements AssetResolverInterface {
 
           // 'scope' is a calculated option, based on which libraries are
           // marked to be loaded from the header (see above).
-          $options['scope'] = in_array($library, $header_js_libraries) ? 'header' : 'footer';
+          $options['scope'] = \in_array($library, $header_js_libraries) ? 'header' : 'footer';
 
           // Preprocess can only be set if caching is enabled and no
           // attributes are set.
@@ -357,7 +357,7 @@ class AssetResolver implements AssetResolverInterface {
 
           // Always add a tiny value to the weight, to conserve the insertion
           // order.
-          $options['weight'] += count($javascript) / 30000;
+          $options['weight'] += \count($javascript) / 30000;
 
           // Local and external files must keep their name as the associative
           // key so the same JavaScript file is not added twice.
@@ -370,7 +370,7 @@ class AssetResolver implements AssetResolverInterface {
       $this->themeManager->alter('js', $javascript, $assets, $language);
 
       // Sort JavaScript assets, so that they appear in the correct order.
-      uasort($javascript, [static::class, 'sort']);
+      \uasort($javascript, [static::class, 'sort']);
 
       // Prepare the return value: filter JavaScript assets per scope.
       $js_assets_header = [];

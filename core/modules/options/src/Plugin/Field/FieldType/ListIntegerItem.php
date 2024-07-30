@@ -67,7 +67,7 @@ class ListIntegerItem extends ListItemBase {
    * {@inheritdoc}
    */
   protected static function validateAllowedValue($option) {
-    if (!preg_match('/^-?\d+$/', $option)) {
+    if (!\preg_match('/^-?\d+$/', $option)) {
       return new TranslatableMarkup('Allowed values list: keys must be integers.');
     }
     return NULL;

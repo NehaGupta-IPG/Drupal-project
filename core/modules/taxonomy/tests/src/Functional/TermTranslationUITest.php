@@ -67,7 +67,7 @@ class TermTranslationUITest extends ContentTranslationUITestBase {
       'description' => $this->randomMachineName(),
       'vid' => $this->bundle,
       'langcode' => LanguageInterface::LANGCODE_NOT_SPECIFIED,
-      'weight' => mt_rand(0, 10),
+      'weight' => \mt_rand(0, 10),
     ]);
     $this->vocabulary->save();
   }
@@ -76,7 +76,7 @@ class TermTranslationUITest extends ContentTranslationUITestBase {
    * {@inheritdoc}
    */
   protected function getTranslatorPermissions(): array {
-    return array_merge(parent::getTranslatorPermissions(), ['administer taxonomy']);
+    return \array_merge(parent::getTranslatorPermissions(), ['administer taxonomy']);
   }
 
   /**
@@ -145,7 +145,7 @@ class TermTranslationUITest extends ContentTranslationUITestBase {
       'description' => $this->randomMachineName(),
       'vid' => 'untranslatable_voc',
       'langcode' => LanguageInterface::LANGCODE_NOT_SPECIFIED,
-      'weight' => mt_rand(0, 10),
+      'weight' => \mt_rand(0, 10),
     ]);
     $untranslatable_vocabulary->save();
 

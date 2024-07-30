@@ -45,7 +45,7 @@ class FileUploadSanitizeNameEvent extends Event {
   public function __construct(string $filename, string $allowed_extensions) {
     $this->setFilename($filename);
     if ($allowed_extensions !== '') {
-      $this->allowedExtensions = array_unique(explode(' ', trim(strtolower($allowed_extensions))));
+      $this->allowedExtensions = \array_unique(\explode(' ', \trim(\strtolower($allowed_extensions))));
     }
   }
 
@@ -71,8 +71,8 @@ class FileUploadSanitizeNameEvent extends Event {
    *   Thrown when $filename contains path information.
    */
   public function setFilename(string $filename): self {
-    if (dirname($filename) !== '.') {
-      throw new \InvalidArgumentException(sprintf('$filename must be a filename with no path information, "%s" provided', $filename));
+    if (\dirname($filename) !== '.') {
+      throw new \InvalidArgumentException(\sprintf('$filename must be a filename with no path information, "%s" provided', $filename));
     }
     $this->filename = $filename;
     return $this;

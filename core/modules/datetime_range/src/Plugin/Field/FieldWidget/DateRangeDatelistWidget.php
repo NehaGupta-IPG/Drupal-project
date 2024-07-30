@@ -63,11 +63,11 @@ class DateRangeDatelistWidget extends DateRangeWidgetBase {
     }
     switch ($time_type) {
       case '24':
-        $date_part_order = array_merge($date_part_order, ['hour', 'minute']);
+        $date_part_order = \array_merge($date_part_order, ['hour', 'minute']);
         break;
 
       case '12':
-        $date_part_order = array_merge($date_part_order, ['hour', 'minute', 'ampm']);
+        $date_part_order = \array_merge($date_part_order, ['hour', 'minute', 'ampm']);
         break;
 
       case 'none':

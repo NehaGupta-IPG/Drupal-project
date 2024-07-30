@@ -75,7 +75,7 @@ abstract class TokenizeAreaPluginBase extends AreaPluginBase {
       $form['tokens']['help'] = [
         '#markup' => '<p>' . $this->t('The following tokens are available. You may use Twig syntax in this field.') . '</p>',
       ];
-      foreach (array_keys($options) as $type) {
+      foreach (\array_keys($options) as $type) {
         if (!empty($options[$type])) {
           $items = [];
           foreach ($options[$type] as $key => $value) {
@@ -89,7 +89,7 @@ abstract class TokenizeAreaPluginBase extends AreaPluginBase {
       }
       $form['tokens']['html_help'] = [
         '#markup' => '<p>' . $this->t('You may include the following allowed HTML tags with these "Replacement patterns": <code>@tags</code>', [
-          '@tags' => '<' . implode('> <', Xss::getAdminTagList()) . '>',
+          '@tags' => '<' . \implode('> <', Xss::getAdminTagList()) . '>',
         ]) . '</p>',
       ];
     }

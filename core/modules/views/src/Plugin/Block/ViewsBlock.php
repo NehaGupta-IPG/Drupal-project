@@ -54,7 +54,7 @@ class ViewsBlock extends ViewsBlockBase {
     // We ask ViewExecutable::buildRenderable() to avoid creating a render cache
     // entry for the view output by passing FALSE, because we're going to cache
     // the whole block instead.
-    if ($output = $this->view->buildRenderable($this->displayID, array_values($args), FALSE)) {
+    if ($output = $this->view->buildRenderable($this->displayID, \array_values($args), FALSE)) {
       // Before returning the block output, convert it to a renderable array
       // with contextual links.
       $this->addContextualLinks($output);

@@ -46,11 +46,11 @@ trait EntityValidationTrait {
     // Filter violations based on the given fields.
     if ($field_names !== NULL) {
       $violations->filterByFields(
-        array_diff(array_keys($entity->getFieldDefinitions()), $field_names)
+        \array_diff(\array_keys($entity->getFieldDefinitions()), $field_names)
       );
     }
 
-    if (count($violations) > 0) {
+    if (\count($violations) > 0) {
       // Instead of returning a generic 400 response we use the more specific
       // 422 Unprocessable Entity code from RFC 4918. That way clients can
       // distinguish between general syntax errors in bad serializations (code

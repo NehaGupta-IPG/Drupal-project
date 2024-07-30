@@ -110,7 +110,7 @@ class FilterFormatListBuilder extends DraggableListBuilder {
     else {
       $row['roles'] = [
         '#theme' => 'item_list',
-        '#items' => filter_get_roles_by_format($entity),
+        '#items' => \filter_get_roles_by_format($entity),
         '#empty' => $this->t('No roles may use this format'),
         '#context' => ['list_style' => 'comma-list'],
       ];
@@ -168,7 +168,7 @@ class FilterFormatListBuilder extends DraggableListBuilder {
   public function submitForm(array &$form, FormStateInterface $form_state) {
     parent::submitForm($form, $form_state);
 
-    filter_formats_reset();
+    \filter_formats_reset();
     $this->messenger->addStatus($this->t('The text format ordering has been saved.'));
   }
 

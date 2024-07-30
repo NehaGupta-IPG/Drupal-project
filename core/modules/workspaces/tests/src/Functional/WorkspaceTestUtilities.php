@@ -45,7 +45,7 @@ trait WorkspaceTestUtilities {
     $entity_type_manager = \Drupal::service('entity_type.manager');
     $property = $entity_type_manager->getDefinition($type)->getKey('label');
     $entity_list = $entity_type_manager->getStorage($type)->loadByProperties([$property => $label]);
-    $entity = current($entity_list);
+    $entity = \current($entity_list);
     if (!$entity) {
       $this->fail("No {$type} entity named {$label} found.");
     }

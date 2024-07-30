@@ -48,7 +48,7 @@ class EntityTestAccessControlHandler extends EntityAccessControlHandler {
       // Viewing the label of the 'entity_test_label' entity type is allowed.
       return AccessResult::allowed();
     }
-    elseif (in_array($operation, ['view', 'view label'])) {
+    elseif (\in_array($operation, ['view', 'view label'])) {
       if (!$entity->isDefaultTranslation()) {
         if ($entity instanceof EntityPublishedInterface && !$entity->isPublished()) {
           return AccessResult::allowedIfHasPermission($account, 'view unpublished test entity translations');
@@ -62,7 +62,7 @@ class EntityTestAccessControlHandler extends EntityAccessControlHandler {
       }
       return AccessResult::allowedIfHasPermission($account, 'view test entity');
     }
-    elseif (in_array($operation, ['update', 'delete'])) {
+    elseif (\in_array($operation, ['update', 'delete'])) {
       $access = AccessResult::allowedIfHasPermission($account, 'administer entity_test content');
       if (!$access->isAllowed() && $operation === 'update' && $account->hasPermission('edit own entity_test content')) {
         $access = $access->orIf(AccessResult::allowedIf($entity->getOwnerId() === $account->id()))->cachePerUser()->addCacheableDependency($entity);
@@ -72,19 +72,19 @@ class EntityTestAccessControlHandler extends EntityAccessControlHandler {
 
     // Access to revisions is based on labels, so access can vary by individual
     // revisions, since the 'name' field can vary by revision.
-    $labels = explode(',', $entity->label());
-    $labels = array_map('trim', $labels);
-    if (in_array($operation, [
+    $labels = \explode(',', $entity->label());
+    $labels = \array_map('trim', $labels);
+    if (\in_array($operation, [
       'view all revisions',
       'view revision',
     ], TRUE)) {
-      return AccessResult::allowedIf(in_array($operation, $labels, TRUE));
+      return AccessResult::allowedIf(\in_array($operation, $labels, TRUE));
     }
     elseif ($operation === 'revert') {
-      return AccessResult::allowedIf(in_array('revert', $labels, TRUE));
+      return AccessResult::allowedIf(\in_array('revert', $labels, TRUE));
     }
     elseif ($operation === 'delete revision') {
-      return AccessResult::allowedIf(in_array('delete revision', $labels, TRUE));
+      return AccessResult::allowedIf(\in_array('delete revision', $labels, TRUE));
     }
 
     // No opinion.

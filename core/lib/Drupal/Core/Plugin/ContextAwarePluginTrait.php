@@ -104,7 +104,7 @@ trait ContextAwarePluginTrait {
   public function setContextMapping(array $context_mapping) {
     if ($this instanceof ConfigurableInterface) {
       $configuration = $this->getConfiguration();
-      $configuration['context_mapping'] = array_filter($context_mapping);
+      $configuration['context_mapping'] = \array_filter($context_mapping);
       $this->setConfiguration($configuration);
     }
     else {
@@ -149,7 +149,7 @@ trait ContextAwarePluginTrait {
     elseif (!empty($definition['context_definitions'][$name])) {
       return $definition['context_definitions'][$name];
     }
-    throw new ContextException(sprintf("The %s context is not a valid context.", $name));
+    throw new ContextException(\sprintf("The %s context is not a valid context.", $name));
   }
 
   /**

@@ -101,7 +101,7 @@ class EntityReferenceTranslationDeriver extends DeriverBase implements Container
           $target_type = $field_definitions[$field_name]->getSetting('target_type');
 
           // If the field's target type is not supported, skip it.
-          if (!array_key_exists($target_type, $base_plugin_definition['target_types'])) {
+          if (!\array_key_exists($target_type, $base_plugin_definition['target_types'])) {
             continue;
           }
 

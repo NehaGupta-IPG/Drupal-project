@@ -32,7 +32,7 @@ class NodeTranslationHandler extends ContentTranslationHandler {
     // Change the submit button labels if there was a status field they affect
     // in which case their publishing / unpublishing may or may not apply
     // to all translations.
-    if (!$entity->isNew() && (!isset($translations[$form_langcode]) || count($translations) > 1)) {
+    if (!$entity->isNew() && (!isset($translations[$form_langcode]) || \count($translations) > 1)) {
       foreach ($entity->getFieldDefinitions() as $property_name => $definition) {
         if ($property_name == 'status') {
           $status_translatable = $definition->isTranslatable();

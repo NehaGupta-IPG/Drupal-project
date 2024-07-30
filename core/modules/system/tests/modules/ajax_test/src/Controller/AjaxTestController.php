@@ -265,7 +265,7 @@ class AjaxTestController {
           'attributes' => [
             'class' => ['use-ajax'],
             'data-dialog-type' => 'modal',
-            'data-dialog-options' => json_encode([
+            'data-dialog-options' => \json_encode([
               'width' => 400,
             ]),
           ],
@@ -276,7 +276,7 @@ class AjaxTestController {
           'attributes' => [
             'class' => ['use-ajax'],
             'data-dialog-type' => 'dialog',
-            'data-dialog-options' => json_encode([
+            'data-dialog-options' => \json_encode([
               'target' => 'ajax-test-dialog-wrapper-1',
               'width' => 800,
             ]),
@@ -304,7 +304,7 @@ class AjaxTestController {
           'attributes' => [
             'class' => ['use-ajax'],
             'data-dialog-type' => 'modal',
-            'data-dialog-options' => json_encode([
+            'data-dialog-options' => \json_encode([
               'width' => 800,
               'height' => 500,
             ]),
@@ -316,7 +316,7 @@ class AjaxTestController {
           'attributes' => [
             'class' => ['use-ajax'],
             'data-dialog-type' => 'dialog',
-            'data-dialog-options' => json_encode([
+            'data-dialog-options' => \json_encode([
               'width' => 800,
             ]),
           ],
@@ -327,7 +327,7 @@ class AjaxTestController {
           'attributes' => [
             'class' => ['use-ajax'],
             'data-dialog-type' => 'modal',
-            'data-dialog-options' => json_encode([
+            'data-dialog-options' => \json_encode([
               'width' => 400,
             ]),
           ],
@@ -401,7 +401,7 @@ class AjaxTestController {
           'ajax_test/global_events',
         ],
       ],
-      '#markup' => implode('', [
+      '#markup' => \implode('', [
         '<div id="test_global_events_log"></div>',
         '<a id="test_global_events_drupal_ajax_link" class="use-ajax" href="' . Url::fromRoute('ajax_test.global_events_clear_log')->toString() . '">Drupal Ajax</a>',
         '<div id="test_global_events_log2"></div>',

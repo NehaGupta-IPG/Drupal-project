@@ -50,7 +50,7 @@ class PublicStream extends LocalStream {
    * {@inheritdoc}
    */
   public function getExternalUrl() {
-    $path = str_replace('\\', '/', $this->getTarget());
+    $path = \str_replace('\\', '/', $this->getTarget());
     return static::baseUrl() . '/' . UrlHelper::encodePath($path);
   }
 
@@ -123,7 +123,7 @@ class PublicStream extends LocalStream {
    */
   protected function getLocalPath($uri = NULL) {
     $path = parent::getLocalPath($uri);
-    if (!$path || str_starts_with($path, 'vfs://')) {
+    if (!$path || \str_starts_with($path, 'vfs://')) {
       return $path;
     }
 
@@ -133,8 +133,8 @@ class PublicStream extends LocalStream {
 
     $private_path = Settings::get('file_private_path');
     if ($private_path) {
-      $private_path = realpath($private_path);
-      if ($private_path && str_starts_with($path, $private_path)) {
+      $private_path = \realpath($private_path);
+      if ($private_path && \str_starts_with($path, $private_path)) {
         return FALSE;
       }
     }

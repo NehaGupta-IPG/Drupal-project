@@ -80,7 +80,7 @@ class RegistryTest extends KernelTestBase {
     \Drupal::service('theme_installer')->install(['test_base_theme', 'test_subtheme', 'test_subsubtheme']);
 
     $module_list = $this->container->get('extension.list.module');
-    assert($module_list instanceof ModuleExtensionList);
+    \assert($module_list instanceof ModuleExtensionList);
 
     $registry_subsub_theme = new Registry($this->root, \Drupal::cache(), \Drupal::lock(), \Drupal::moduleHandler(), $theme_handler, \Drupal::service('theme.initialization'), \Drupal::service('cache.bootstrap'), $module_list, \Drupal::service('kernel'), 'test_subsubtheme', \Drupal::service('keyvalue'));
     $registry_subsub_theme->setThemeManager(\Drupal::theme());
@@ -131,7 +131,7 @@ class RegistryTest extends KernelTestBase {
       $expected_preprocess_functions[] = "test_theme_preprocess_$hook";
       $preprocess_functions = $registry_theme->get()[$hook]['preprocess functions'];
       $this->assertSame($expected_preprocess_functions, $preprocess_functions, "$hook has correct preprocess functions.");
-    } while ($suggestion = array_shift($suggestions));
+    } while ($suggestion = \array_shift($suggestions));
 
     $expected_preprocess_functions = [
       'theme_test_preprocess_theme_test_preprocess_suggestions',

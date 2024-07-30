@@ -58,8 +58,8 @@ class TranslationStatusForm extends FormBase {
    * @ingroup forms
    */
   public function buildForm(array $form, FormStateInterface $form_state) {
-    $languages = locale_translatable_language_list();
-    $status = locale_translation_get_status();
+    $languages = \locale_translatable_language_list();
+    $status = \locale_translation_get_status();
     $options = [];
     $languages_update = [];
     $languages_not_found = [];
@@ -98,10 +98,10 @@ class TranslationStatusForm extends FormBase {
         }
       }
       // Sort the table data on language name.
-      uasort($options, function ($a, $b) {
-        return strcasecmp($a['title']['data']['#title'], $b['title']['data']['#title']);
+      \uasort($options, function ($a, $b) {
+        return \strcasecmp($a['title']['data']['#title'], $b['title']['data']['#title']);
       });
-      $languages_not_found = array_diff($languages_not_found, $languages_update);
+      $languages_not_found = \array_diff($languages_not_found, $languages_update);
     }
 
     $last_checked = $this->state->get('locale.translation_last_checked');
@@ -185,7 +185,7 @@ class TranslationStatusForm extends FormBase {
     //   https://www.drupal.org/node/1842362 the project name will be stored to
     //   display use, like here.
     $this->moduleHandler->loadInclude('locale', 'compare.inc');
-    $project_data = locale_translation_build_projects();
+    $project_data = \locale_translation_build_projects();
 
     foreach ($status as $project) {
       foreach ($project as $langcode => $project_info) {
@@ -201,7 +201,7 @@ class TranslationStatusForm extends FormBase {
         elseif ($project_info->type == LOCALE_TRANSLATION_LOCAL || $project_info->type == LOCALE_TRANSLATION_REMOTE) {
           $local = $project_info->files[LOCALE_TRANSLATION_LOCAL] ?? NULL;
           $remote = $project_info->files[LOCALE_TRANSLATION_REMOTE] ?? NULL;
-          $recent = _locale_translation_source_compare($local, $remote) == LOCALE_TRANSLATION_SOURCE_COMPARE_LT ? $remote : $local;
+          $recent = \_locale_translation_source_compare($local, $remote) == LOCALE_TRANSLATION_SOURCE_COMPARE_LT ? $remote : $local;
           $updates[$langcode]['updates'][] = [
             'name' => $project_info->name == 'drupal' ? $this->t('Drupal core') : $project_data[$project_info->name]->info['name'],
             'version' => $project_info->version,
@@ -232,7 +232,7 @@ class TranslationStatusForm extends FormBase {
     $remote_path = $project_info->files['remote']->uri ?? FALSE;
     $local_path = $project_info->files['local']->uri ?? FALSE;
 
-    if (locale_translation_use_remote_source() && $remote_path && $local_path) {
+    if (\locale_translation_use_remote_source() && $remote_path && $local_path) {
       return $this->t('File not found at %remote_path nor at %local_path', [
         '%remote_path' => $remote_path,
         '%local_path' => $local_path,
@@ -249,7 +249,7 @@ class TranslationStatusForm extends FormBase {
    */
   public function validateForm(array &$form, FormStateInterface $form_state) {
     // Check if a language has been selected. 'tableselect' doesn't.
-    if (!array_filter($form_state->getValue('langcodes'))) {
+    if (!\array_filter($form_state->getValue('langcodes'))) {
       $form_state->setErrorByName('', $this->t('Select a language to update.'));
     }
   }
@@ -261,29 +261,29 @@ class TranslationStatusForm extends FormBase {
     $this->moduleHandler->loadInclude('locale', 'fetch.inc');
     $this->moduleHandler->loadInclude('locale', 'bulk.inc');
 
-    $langcodes = array_filter($form_state->getValue('langcodes'));
-    $projects = array_filter($form_state->getValue('projects_update'));
+    $langcodes = \array_filter($form_state->getValue('langcodes'));
+    $projects = \array_filter($form_state->getValue('projects_update'));
 
     // Set the translation import options. This determines if existing
     // translations will be overwritten by imported strings.
-    $options = _locale_translation_default_update_options();
+    $options = \_locale_translation_default_update_options();
 
     // If the status was updated recently we can immediately start fetching the
     // translation updates. If the status is expired we clear it and run a batch
     // to update the status and then fetch the translation updates.
     $last_checked = $this->state->get('locale.translation_last_checked');
     if ($last_checked < $this->time->getRequestTime() - LOCALE_TRANSLATION_STATUS_TTL) {
-      locale_translation_clear_status();
-      $batch = locale_translation_batch_update_build([], $langcodes, $options);
-      batch_set($batch);
+      \locale_translation_clear_status();
+      $batch = \locale_translation_batch_update_build([], $langcodes, $options);
+      \batch_set($batch);
     }
     else {
       // Set a batch to download and import translations.
-      $batch = locale_translation_batch_fetch_build($projects, $langcodes, $options);
-      batch_set($batch);
+      $batch = \locale_translation_batch_fetch_build($projects, $langcodes, $options);
+      \batch_set($batch);
       // Set a batch to update configuration as well.
-      if ($batch = locale_config_batch_update_components($options, $langcodes)) {
-        batch_set($batch);
+      if ($batch = \locale_config_batch_update_components($options, $langcodes)) {
+        \batch_set($batch);
       }
     }
   }

@@ -52,7 +52,7 @@ class LocaleTranslationTest extends KernelTestBase {
 
     // Prove that serialization and deserialization works without errors.
     $this->assertNotNull($translation);
-    $unserialized = unserialize(serialize($translation));
+    $unserialized = \unserialize(\serialize($translation));
     $this->assertInstanceOf(LocaleTranslation::class, $unserialized);
   }
 

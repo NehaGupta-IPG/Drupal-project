@@ -51,7 +51,7 @@ class DataFieldRow extends RowPluginBase {
       $options = (array) $this->options['field_options'];
       // Prepare a trimmed version of replacement aliases.
       $aliases = static::extractFromOptionsArray('alias', $options);
-      $this->replacementAliases = array_filter(array_map('trim', $aliases));
+      $this->replacementAliases = \array_filter(\array_map('trim', $aliases));
       // Prepare an array of raw output field options.
       $this->rawOutputOptions = static::extractFromOptionsArray('raw_output', $options);
     }
@@ -112,7 +112,7 @@ class DataFieldRow extends RowPluginBase {
    * Form element validation handler.
    */
   public function validateAliasName($element, FormStateInterface $form_state) {
-    if (preg_match('@[^A-Za-z0-9_-]+@', $element['#value'])) {
+    if (\preg_match('@[^A-Za-z0-9_-]+@', $element['#value'])) {
       $form_state->setError($element, $this->t('The machine-readable name must contain only letters, numbers, dashes and underscores.'));
     }
   }
@@ -126,7 +126,7 @@ class DataFieldRow extends RowPluginBase {
 
     // If array filter returns empty, no values have been entered. Unique keys
     // should only be validated if we have some.
-    if (($filtered = array_filter($aliases)) && (array_unique($filtered) !== $filtered)) {
+    if (($filtered = \array_filter($aliases)) && (\array_unique($filtered) !== $filtered)) {
       $form_state->setErrorByName('aliases', $this->t('All field aliases must be unique'));
     }
   }
@@ -189,7 +189,7 @@ class DataFieldRow extends RowPluginBase {
    *   A regular one dimensional array of values.
    */
   protected static function extractFromOptionsArray($key, $options) {
-    return array_map(function ($item) use ($key) {
+    return \array_map(function ($item) use ($key) {
       return $item[$key] ?? NULL;
     }, $options);
   }

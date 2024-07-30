@@ -64,31 +64,31 @@ class FieldEntitySettingsTest extends KernelTestBase {
     $storage_settings = $field_storage->setSettings(['size' => 'big'])
       ->get('settings');
     // There should be no missing settings.
-    $missing_storage_settings = array_diff_key($default_storage_settings, $storage_settings);
+    $missing_storage_settings = \array_diff_key($default_storage_settings, $storage_settings);
     $this->assertEmpty($missing_storage_settings);
     // The value we set should be remembered.
     $this->assertSame('big', $storage_settings['size']);
 
     $field_settings = $field->setSetting('min', 10)->getSettings();
-    $missing_field_settings = array_diff_key($default_field_settings, $field_settings);
+    $missing_field_settings = \array_diff_key($default_field_settings, $field_settings);
     $this->assertEmpty($missing_field_settings);
     $this->assertSame(10, $field_settings['min']);
 
     $field_settings = $field->setSettings(['max' => 39])->get('settings');
-    $missing_field_settings = array_diff_key($default_field_settings, $field_settings);
+    $missing_field_settings = \array_diff_key($default_field_settings, $field_settings);
     $this->assertEmpty($missing_field_settings);
     $this->assertSame(39, $field_settings['max']);
 
     // Test that saving settings with incomplete settings is not triggering
     // error, and values are retained.
     $field_storage->save();
-    $missing_storage_settings = array_diff_key($default_storage_settings, $storage_settings);
+    $missing_storage_settings = \array_diff_key($default_storage_settings, $storage_settings);
     $this->assertEmpty($missing_storage_settings);
     // The value we set should be remembered.
     $this->assertSame('big', $storage_settings['size']);
 
     $field->save();
-    $missing_field_settings = array_diff_key($default_field_settings, $field_settings);
+    $missing_field_settings = \array_diff_key($default_field_settings, $field_settings);
     $this->assertEmpty($missing_field_settings);
     $this->assertSame(39, $field_settings['max']);
   }

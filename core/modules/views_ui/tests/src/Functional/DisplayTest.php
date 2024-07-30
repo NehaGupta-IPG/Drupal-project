@@ -66,7 +66,7 @@ class DisplayTest extends UITestBase {
 
     // Ensure the view displays are in the expected order in configuration.
     $expected_display_order = ['default', 'block_1', 'page_1'];
-    $this->assertEquals($expected_display_order, array_keys(Views::getView($view['id'])->storage->get('display')), 'The correct display names are present.');
+    $this->assertEquals($expected_display_order, \array_keys(Views::getView($view['id'])->storage->get('display')), 'The correct display names are present.');
     // Put the block display in front of the page display.
     $edit = [
       'displays[page_1][weight]' => 2,
@@ -82,7 +82,7 @@ class DisplayTest extends UITestBase {
     $this->assertEquals(2, $displays['page_1']['position'], 'Make sure the page display comes after the block display.');
 
     // Ensure the view displays are in the expected order in configuration.
-    $this->assertEquals($expected_display_order, array_keys($view->storage->get('display')), 'The correct display names are present.');
+    $this->assertEquals($expected_display_order, \array_keys($view->storage->get('display')), 'The correct display names are present.');
   }
 
   /**

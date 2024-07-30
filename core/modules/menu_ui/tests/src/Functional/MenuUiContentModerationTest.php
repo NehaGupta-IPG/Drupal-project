@@ -227,7 +227,7 @@ class MenuUiContentModerationTest extends BrowserTestBase {
     $this->assertTrue($node->access('view', $editor_with_unpublished_content_access));
     $this->assertEquals($edit['title[0][value]'], $node->getTitle());
     $this->drupalGet('node/add/page');
-    $link_id = menu_ui_get_menu_link_defaults($node)['entity_id'];
+    $link_id = \menu_ui_get_menu_link_defaults($node)['entity_id'];
     /** @var \Drupal\menu_link_content\Entity\MenuLinkContent $link */
     $link = MenuLinkContent::load($link_id);
     $this->assertSession()->optionExists('edit-menu-menu-parent', 'main:' . $link->getPluginId());

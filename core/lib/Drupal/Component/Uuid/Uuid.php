@@ -25,7 +25,7 @@ class Uuid {
    *   TRUE if the string is well formed, FALSE otherwise.
    */
   public static function isValid($uuid) {
-    return (bool) preg_match('/^' . self::VALID_PATTERN . '$/', $uuid);
+    return (bool) \preg_match('/^' . self::VALID_PATTERN . '$/', $uuid);
   }
 
 }

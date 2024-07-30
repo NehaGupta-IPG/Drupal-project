@@ -172,7 +172,7 @@ class Filter {
     $expanded = [];
     foreach ($original as $key => $item) {
       // Allow extreme shorthand filters, f.e. `?filter[promote]=1`.
-      if (!is_array($item)) {
+      if (!\is_array($item)) {
         $item = [
           EntityCondition::VALUE_KEY => $item,
         ];
@@ -181,7 +181,7 @@ class Filter {
       // Throw an exception if the query uses the reserved filter id for the
       // root group.
       if ($key == static::ROOT_ID) {
-        $msg = sprintf("'%s' is a reserved filter id.", static::ROOT_ID);
+        $msg = \sprintf("'%s' is a reserved filter id.", static::ROOT_ID);
         throw new \UnexpectedValueException($msg);
       }
 
@@ -280,11 +280,11 @@ class Filter {
     foreach ($items as $item) {
       if ($item[static::MEMBER_KEY] == $id) {
         if (isset($item[static::GROUP_KEY])) {
-          array_push($members, static::buildTree($item, $items));
+          \array_push($members, static::buildTree($item, $items));
         }
         elseif (isset($item[static::CONDITION_KEY])) {
           $condition = EntityCondition::createFromQueryParameter($item[static::CONDITION_KEY]);
-          array_push($members, $condition);
+          \array_push($members, $condition);
         }
       }
     }

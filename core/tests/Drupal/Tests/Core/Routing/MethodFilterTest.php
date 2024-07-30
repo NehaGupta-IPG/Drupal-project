@@ -127,7 +127,7 @@ class MethodFilterTest extends UnitTestCase {
     $method_filter = new MethodFilter();
     $result_collection = $method_filter->filter($collection, $request);
 
-    $this->assertEquals(['entity.taxonomy_term.canonical', 'views.view.taxonomy_term_page'], array_keys($result_collection->all()));
+    $this->assertEquals(['entity.taxonomy_term.canonical', 'views.view.taxonomy_term_page'], \array_keys($result_collection->all()));
   }
 
 }

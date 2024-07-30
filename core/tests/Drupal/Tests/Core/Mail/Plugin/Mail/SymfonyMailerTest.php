@@ -59,7 +59,7 @@ class SymfonyMailerTest extends UnitTestCase {
     $plugin = new SymfonyMailer($logger, $mailer);
     $message = $plugin->format($message);
 
-    $expect = MailFormatHelper::wrapMail($plain . "\n\n" . strtr($template, $variables) . "\n");
+    $expect = MailFormatHelper::wrapMail($plain . "\n\n" . \strtr($template, $variables) . "\n");
     $this->assertEquals($expect, $message['body']);
 
     $base_path = $original_base_path;

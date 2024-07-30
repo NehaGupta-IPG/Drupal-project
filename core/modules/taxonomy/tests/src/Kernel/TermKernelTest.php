@@ -171,7 +171,7 @@ class TermKernelTest extends KernelTestBase {
 
     // Confirm we can render said view.
     $rendered = (string) \Drupal::service('renderer')->renderInIsolation($render_array);
-    $this->assertNotEmpty(trim($rendered), 'Term is able to be rendered.');
+    $this->assertNotEmpty(\trim($rendered), 'Term is able to be rendered.');
   }
 
   /**

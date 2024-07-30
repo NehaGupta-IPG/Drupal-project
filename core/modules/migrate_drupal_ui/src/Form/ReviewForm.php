@@ -127,7 +127,7 @@ class ReviewForm extends MigrateUpgradeFormBase {
     $form = parent::buildForm($form, $form_state);
     $form['#title'] = $this->t('What will be upgraded?');
 
-    $migrations = $this->migrationPluginManager->createInstances(array_keys($this->store->get('migrations')));
+    $migrations = $this->migrationPluginManager->createInstances(\array_keys($this->store->get('migrations')));
 
     // Get the upgrade states for the source modules.
     $display = $this->migrationState->getUpgradeStates($version, $this->systemData, $migrations);
@@ -248,9 +248,9 @@ class ReviewForm extends MigrateUpgradeFormBase {
       ->addOperation([
         MigrateUpgradeImportBatch::class,
         'run',
-      ], [array_keys($this->migrations), $config])
+      ], [\array_keys($this->migrations), $config])
       ->setFinishCallback([MigrateUpgradeImportBatch::class, 'finished']);
-    batch_set($batch_builder->toArray());
+    \batch_set($batch_builder->toArray());
     $form_state->setRedirect('<front>');
     $this->store->set('step', 'overview');
     $this->state->set('migrate_drupal_ui.performed', $this->time->getRequestTime());
@@ -292,7 +292,7 @@ class ReviewForm extends MigrateUpgradeFormBase {
       // Get the names of all the destination modules.
       $destination_module_names = [];
       if (!empty($destination_modules)) {
-        $destination_modules = explode(', ', $destination_modules);
+        $destination_modules = \explode(', ', $destination_modules);
         foreach ($destination_modules as $destination_module) {
           if ($destination_module === 'core') {
             $destination_module_names[] = 'Core';
@@ -307,15 +307,15 @@ class ReviewForm extends MigrateUpgradeFormBase {
           }
         }
       }
-      sort($destination_module_names);
+      \sort($destination_module_names);
       $output[$source_machine_name] = [
         'source_module_name' => $source_module_name,
         'source_machine_name' => $source_machine_name,
-        'destination' => implode(', ', $destination_module_names),
+        'destination' => \implode(', ', $destination_module_names),
       ];
     }
-    usort($output, function ($a, $b) {
-      return strcmp($a['source_module_name'], $b['source_module_name']);
+    \usort($output, function ($a, $b) {
+      return \strcmp($a['source_module_name'], $b['source_module_name']);
     });
     return $output;
   }

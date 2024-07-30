@@ -214,13 +214,13 @@ class RouteBuilderTest extends UnitTestCase {
     $this->controllerResolver->expects($this->any())
       ->method('getControllerFromDefinition')
       ->willReturnCallback(function ($controller) use ($container) {
-        $count = substr_count($controller, ':');
+        $count = \substr_count($controller, ':');
         if ($count == 1) {
-          [$service, $method] = explode(':', $controller, 2);
+          [$service, $method] = \explode(':', $controller, 2);
           $object = $container->get($service);
         }
         else {
-          [$class, $method] = explode('::', $controller, 2);
+          [$class, $method] = \explode('::', $controller, 2);
           $object = new $class();
         }
 

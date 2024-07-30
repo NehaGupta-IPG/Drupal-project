@@ -46,7 +46,7 @@ class YamlDiscovery implements DiscoverableInterface {
     $all = [];
 
     $files = $this->findFiles();
-    $provider_by_files = array_flip($files);
+    $provider_by_files = \array_flip($files);
 
     $file_cache = FileCacheFactory::get('yaml_discovery:' . $this->name);
 
@@ -81,7 +81,7 @@ class YamlDiscovery implements DiscoverableInterface {
    */
   protected function decode($file) {
     try {
-      return Yaml::decode(file_get_contents($file)) ?: [];
+      return Yaml::decode(\file_get_contents($file)) ?: [];
     }
     catch (InvalidDataTypeException $e) {
       throw new InvalidDataTypeException($file . ': ' . $e->getMessage(), $e->getCode(), $e);
@@ -98,7 +98,7 @@ class YamlDiscovery implements DiscoverableInterface {
     $files = [];
     foreach ($this->directories as $provider => $directory) {
       $file = $directory . '/' . $provider . '.' . $this->name . '.yml';
-      if (file_exists($file)) {
+      if (\file_exists($file)) {
         $files[$provider] = $file;
       }
     }

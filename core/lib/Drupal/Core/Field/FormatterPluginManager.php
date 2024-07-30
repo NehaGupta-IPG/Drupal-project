@@ -61,7 +61,7 @@ class FormatterPluginManager extends DefaultPluginManager {
     //   Find a way to restore sanity to
     //   \Drupal\Core\Field\FormatterBase::__construct().
     // If the plugin provides a factory method, pass the container to it.
-    if (is_subclass_of($plugin_class, 'Drupal\Core\Plugin\ContainerFactoryPluginInterface')) {
+    if (\is_subclass_of($plugin_class, 'Drupal\Core\Plugin\ContainerFactoryPluginInterface')) {
       return $plugin_class::create(\Drupal::getContainer(), $configuration, $plugin_id, $plugin_definition);
     }
 
@@ -111,7 +111,7 @@ class FormatterPluginManager extends DefaultPluginManager {
     // - the field type is not allowed for the formatter
     // - the formatter is not applicable to the field definition.
     $definition = $this->getDefinition($configuration['type'], FALSE);
-    if (!isset($definition['class']) || !in_array($field_type, $definition['field_types']) || !$definition['class']::isApplicable($field_definition)) {
+    if (!isset($definition['class']) || !\in_array($field_type, $definition['field_types']) || !$definition['class']::isApplicable($field_definition)) {
       // Grab the default widget for the field type.
       $field_type_definition = $this->fieldTypeManager->getDefinition($field_type);
       if (empty($field_type_definition['default_formatter'])) {
@@ -152,7 +152,7 @@ class FormatterPluginManager extends DefaultPluginManager {
     }
     // Filter out unknown settings, and fill in defaults for missing settings.
     $default_settings = $this->getDefaultSettings($configuration['type']);
-    $configuration['settings'] = array_intersect_key($configuration['settings'], $default_settings) + $default_settings;
+    $configuration['settings'] = \array_intersect_key($configuration['settings'], $default_settings) + $default_settings;
 
     return $configuration;
   }
@@ -172,7 +172,7 @@ class FormatterPluginManager extends DefaultPluginManager {
       $options = [];
       $field_types = $this->fieldTypeManager->getDefinitions();
       $formatter_types = $this->getDefinitions();
-      uasort($formatter_types, ['Drupal\Component\Utility\SortArray', 'sortByWeightElement']);
+      \uasort($formatter_types, ['Drupal\Component\Utility\SortArray', 'sortByWeightElement']);
       foreach ($formatter_types as $name => $formatter_type) {
         foreach ($formatter_type['field_types'] as $formatter_field_type) {
           // Check that the field type exists.

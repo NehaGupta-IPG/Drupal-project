@@ -139,8 +139,8 @@ class NodeTypeForm extends BundleEntityFormBase {
       'revision' => $type->shouldCreateNewRevision(),
     ];
     // Prepare workflow options to be used for 'checkboxes' form element.
-    $keys = array_keys(array_filter($workflow_options));
-    $workflow_options = array_combine($keys, $keys);
+    $keys = \array_keys(\array_filter($workflow_options));
+    $workflow_options = \array_combine($keys, $keys);
     $form['workflow']['options'] = [
       '#type' => 'checkboxes',
       '#title' => $this->t('Default options'),
@@ -191,7 +191,7 @@ class NodeTypeForm extends BundleEntityFormBase {
   public function validateForm(array &$form, FormStateInterface $form_state) {
     parent::validateForm($form, $form_state);
 
-    $id = trim($form_state->getValue('type'));
+    $id = \trim($form_state->getValue('type'));
     // '0' is invalid, since elsewhere we check it using empty().
     if ($id == '0') {
       $form_state->setErrorByName('type', $this->t("Invalid machine-readable name. Enter a name other than %invalid.", ['%invalid' => $id]));
@@ -206,10 +206,10 @@ class NodeTypeForm extends BundleEntityFormBase {
     $entity = parent::buildEntity($form, $form_state);
 
     // The description and help text cannot be empty strings.
-    if (trim($form_state->getValue('description')) === '') {
+    if (\trim($form_state->getValue('description')) === '') {
       $entity->set('description', NULL);
     }
-    if (trim($form_state->getValue('help')) === '') {
+    if (\trim($form_state->getValue('help')) === '') {
       $entity->set('help', NULL);
     }
     return $entity;
@@ -221,8 +221,8 @@ class NodeTypeForm extends BundleEntityFormBase {
   public function save(array $form, FormStateInterface $form_state) {
     $type = $this->entity;
     $type->setNewRevision($form_state->getValue(['options', 'revision']));
-    $type->set('type', trim($type->id()));
-    $type->set('name', trim($type->label()));
+    $type->set('type', \trim($type->id()));
+    $type->set('name', \trim($type->label()));
 
     $status = $type->save();
 
@@ -233,7 +233,7 @@ class NodeTypeForm extends BundleEntityFormBase {
     }
     elseif ($status == SAVED_NEW) {
       $this->messenger()->addStatus($this->t('The content type %name has been added.', $t_args));
-      $context = array_merge($t_args, ['link' => $type->toLink($this->t('View'), 'collection')->toString()]);
+      $context = \array_merge($t_args, ['link' => $type->toLink($this->t('View'), 'collection')->toString()]);
       $this->logger('node')->notice('Added content type %name.', $context);
     }
 

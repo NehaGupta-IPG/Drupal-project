@@ -51,7 +51,7 @@ class FormSubmitter implements FormSubmitterInterface {
       $batch['form_state'] = $form_state;
 
       $batch['progressive'] = !$form_state->isProgrammed();
-      $response = batch_process();
+      $response = \batch_process();
       // If the batch has been completed and _batch_finished() called then
       // $batch will be NULL.
       if ($batch && $batch['progressive']) {
@@ -102,7 +102,7 @@ class FormSubmitter implements FormSubmitterInterface {
         $batch['has_form_submits'] = TRUE;
       }
       else {
-        call_user_func_array($form_state->prepareCallback($callback), [&$form, &$form_state]);
+        \call_user_func_array($form_state->prepareCallback($callback), [&$form, &$form_state]);
       }
     }
   }
@@ -146,7 +146,7 @@ class FormSubmitter implements FormSubmitterInterface {
    * Wraps batch_get().
    */
   protected function &batchGet() {
-    return batch_get();
+    return \batch_get();
   }
 
 }

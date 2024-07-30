@@ -76,7 +76,7 @@ class User extends FieldableEntity {
       ->fetchCol();
     $row->setSourceProperty('roles', $roles);
 
-    $row->setSourceProperty('data', unserialize($row->getSourceProperty('data') ?? ''));
+    $row->setSourceProperty('data', \unserialize($row->getSourceProperty('data') ?? ''));
 
     // If this entity was translated using Entity Translation, we need to get
     // its source language to get the field values in the right language.
@@ -107,13 +107,13 @@ class User extends FieldableEntity {
 
       foreach ($results as $profile_value) {
         if ($profile_value['type'] == 'date') {
-          $date = unserialize($profile_value['value']);
-          $date = date('Y-m-d', mktime(0, 0, 0, $date['month'], $date['day'], $date['year']));
+          $date = \unserialize($profile_value['value']);
+          $date = \date('Y-m-d', \mktime(0, 0, 0, $date['month'], $date['day'], $date['year']));
           $row->setSourceProperty($profile_value['name'], ['value' => $date]);
         }
         elseif ($profile_value['type'] == 'list') {
           // Explode by newline and comma.
-          $row->setSourceProperty($profile_value['name'], preg_split("/[\r\n,]+/", $profile_value['value']));
+          $row->setSourceProperty($profile_value['name'], \preg_split("/[\r\n,]+/", $profile_value['value']));
         }
         else {
           $row->setSourceProperty($profile_value['name'], [$profile_value['value']]);

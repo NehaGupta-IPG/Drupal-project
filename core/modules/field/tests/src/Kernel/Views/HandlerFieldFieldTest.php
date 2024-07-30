@@ -166,7 +166,7 @@ class HandlerFieldFieldTest extends KernelTestBase {
     for ($i = 0; $i < 2; $i++) {
       $field_name = $this->fieldStorages[5]->getName();
       $rendered_field = (string) $view->style_plugin->getField($i, $field_name);
-      $this->assertEquals(3, strlen(html_entity_decode($rendered_field)));
+      $this->assertEquals(3, \strlen(\html_entity_decode($rendered_field)));
     }
   }
 
@@ -187,13 +187,13 @@ class HandlerFieldFieldTest extends KernelTestBase {
       $rendered_field = $view->style_plugin->getField($i, $field_name);
       $items = [];
       $pure_items = $this->nodes[$i]->{$field_name}->getValue();
-      $pure_items = array_splice($pure_items, 0, 3);
+      $pure_items = \array_splice($pure_items, 0, 3);
       foreach ($pure_items as $j => $item) {
         $items[] = $pure_items[$j]['value'];
       }
 
       // Check that the amount of items is limited.
-      $this->assertEquals(implode(', ', $items), $rendered_field);
+      $this->assertEquals(\implode(', ', $items), $rendered_field);
     }
 
     // Test that an empty field is rendered without error.
@@ -211,13 +211,13 @@ class HandlerFieldFieldTest extends KernelTestBase {
       $rendered_field = $view->style_plugin->getField($i, $field_name);
       $items = [];
       $pure_items = $this->nodes[$i]->{$field_name}->getValue();
-      $pure_items = array_splice($pure_items, 1, 3);
+      $pure_items = \array_splice($pure_items, 1, 3);
       foreach ($pure_items as $j => $item) {
         $items[] = $pure_items[$j]['value'];
       }
 
       // Check that the amount of items is limited and the offset is correct.
-      $this->assertEquals(implode(', ', $items), $rendered_field);
+      $this->assertEquals(\implode(', ', $items), $rendered_field);
     }
     $view->destroy();
 
@@ -233,14 +233,14 @@ class HandlerFieldFieldTest extends KernelTestBase {
       $rendered_field = $view->style_plugin->getField($i, $field_name);
       $items = [];
       $pure_items = $this->nodes[$i]->{$field_name}->getValue();
-      array_splice($pure_items, 0, -3);
-      $pure_items = array_reverse($pure_items);
+      \array_splice($pure_items, 0, -3);
+      $pure_items = \array_reverse($pure_items);
       foreach ($pure_items as $j => $item) {
         $items[] = $pure_items[$j]['value'];
       }
 
       // Check that the amount of items is limited and they are reversed.
-      $this->assertEquals(implode(', ', $items), $rendered_field);
+      $this->assertEquals(\implode(', ', $items), $rendered_field);
     }
     $view->destroy();
 
@@ -260,7 +260,7 @@ class HandlerFieldFieldTest extends KernelTestBase {
       $items[] = $pure_items[4]['value'];
 
       // Check that items are limited to first and last.
-      $this->assertEquals(implode(', ', $items), $rendered_field);
+      $this->assertEquals(\implode(', ', $items), $rendered_field);
     }
     $view->destroy();
 
@@ -276,14 +276,14 @@ class HandlerFieldFieldTest extends KernelTestBase {
       $rendered_field = $view->style_plugin->getField($i, $field_name);
       $items = [];
       $pure_items = $this->nodes[$i]->{$field_name}->getValue();
-      $pure_items = array_splice($pure_items, 0, 3);
+      $pure_items = \array_splice($pure_items, 0, 3);
       foreach ($pure_items as $j => $item) {
         $items[] = $pure_items[$j]['value'];
       }
 
       // Check that the amount of items is limited and the custom separator is
       // correct.
-      $this->assertEquals(implode(':', $items), $rendered_field);
+      $this->assertEquals(\implode(':', $items), $rendered_field);
     }
     $view->destroy();
 
@@ -298,13 +298,13 @@ class HandlerFieldFieldTest extends KernelTestBase {
       $rendered_field = $view->style_plugin->getField($i, $field_name);
       $items = [];
       $pure_items = $this->nodes[$i]->{$field_name}->getValue();
-      $pure_items = array_splice($pure_items, 0, 3);
+      $pure_items = \array_splice($pure_items, 0, 3);
       foreach ($pure_items as $j => $item) {
         $items[] = $pure_items[$j]['value'];
       }
 
       // Check that the custom separator is correctly escaped.
-      $this->assertSame(implode('<h2>test</h2>', $items), (string) $rendered_field);
+      $this->assertSame(\implode('<h2>test</h2>', $items), (string) $rendered_field);
     }
   }
 

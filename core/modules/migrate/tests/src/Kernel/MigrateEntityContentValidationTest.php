@@ -172,7 +172,7 @@ class MigrateEntityContentValidationTest extends KernelTestBase {
   public function testEntityOwnerValidation(): void {
     // Text format access is impacted by user permissions.
     $filter_test_format = FilterFormat::load('filter_test');
-    assert($filter_test_format instanceof FilterFormatInterface);
+    \assert($filter_test_format instanceof FilterFormatInterface);
 
     // Create 2 users, an admin user who has permission to use this text format
     // and another who does not have said access.
@@ -181,7 +181,7 @@ class MigrateEntityContentValidationTest extends KernelTestBase {
       'label' => 'admin',
       'is_admin' => TRUE,
     ]);
-    assert($role instanceof RoleInterface);
+    \assert($role instanceof RoleInterface);
     $role->grantPermission($filter_test_format->getPermissionName());
     $role->save();
     $admin_user = User::create([
@@ -250,7 +250,7 @@ class MigrateEntityContentValidationTest extends KernelTestBase {
 
     // The second user import should fail validation because they do not have
     // access to use "filter_test" filter.
-    $this->assertSame(sprintf('2: [entity_test: 2]: user_id.0.target_id=This entity (<em class="placeholder">user</em>: <em class="placeholder">%s</em>) cannot be referenced.||%s.0.format=The value you selected is not a valid choice.', $normal_user->id(), $field_name), $this->messages[0]);
+    $this->assertSame(\sprintf('2: [entity_test: 2]: user_id.0.target_id=This entity (<em class="placeholder">user</em>: <em class="placeholder">%s</em>) cannot be referenced.||%s.0.format=The value you selected is not a valid choice.', $normal_user->id(), $field_name), $this->messages[0]);
     $this->assertArrayNotHasKey(1, $this->messages);
   }
 

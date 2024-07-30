@@ -38,7 +38,7 @@ class AssetQueryString implements AssetQueryStringInterface {
    */
   public function reset(): void {
     // The timestamp is converted to base 36 in order to make it more compact.
-    $this->state->set(self::STATE_KEY, base_convert(strval($this->time->getRequestTime()), 10, 36));
+    $this->state->set(self::STATE_KEY, \base_convert(\strval($this->time->getRequestTime()), 10, 36));
   }
 
   /**

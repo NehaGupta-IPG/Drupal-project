@@ -61,23 +61,23 @@ class CallableResolver {
    */
   public function getCallableFromDefinition(callable|array|string $definition): callable {
     // If the definition is natively a callable, we can return it immediately.
-    if (is_callable($definition)) {
+    if (\is_callable($definition)) {
       return $definition;
     }
 
-    if (is_array($definition)) {
-      throw new \InvalidArgumentException(sprintf('The callable definition provided "[%s]" is not a valid callable.', implode(",", $definition)));
+    if (\is_array($definition)) {
+      throw new \InvalidArgumentException(\sprintf('The callable definition provided "[%s]" is not a valid callable.', \implode(",", $definition)));
     }
 
-    if (!is_string($definition)) {
-      throw new \InvalidArgumentException(sprintf('The callable definition provided was invalid. Illegal format of type: %s', gettype($definition)));
+    if (!\is_string($definition)) {
+      throw new \InvalidArgumentException(\sprintf('The callable definition provided was invalid. Illegal format of type: %s', \gettype($definition)));
     }
 
     // Callable with __invoke().
-    if (!str_contains($definition, ':')) {
+    if (!\str_contains($definition, ':')) {
       $instance = $this->classResolver->getInstanceFromDefinition($definition);
-      if (!is_callable($instance)) {
-        throw new \InvalidArgumentException(sprintf('The callable definition provided was invalid. Class "%s" does not have a method "__invoke" and is not callable.', $instance::class));
+      if (!\is_callable($instance)) {
+        throw new \InvalidArgumentException(\sprintf('The callable definition provided was invalid. Class "%s" does not have a method "__invoke" and is not callable.', $instance::class));
       }
       return $instance;
     }
@@ -85,21 +85,21 @@ class CallableResolver {
     // Callable in the service:method notation.
     $class_or_service = NULL;
     $method = NULL;
-    $count = substr_count($definition, ':');
+    $count = \substr_count($definition, ':');
     if ($count == 1) {
-      [$class_or_service, $method] = explode(':', $definition, 2);
+      [$class_or_service, $method] = \explode(':', $definition, 2);
     }
     // Callable in the class::method notation.
-    if (str_contains($definition, '::')) {
-      [$class_or_service, $method] = explode('::', $definition, 2);
+    if (\str_contains($definition, '::')) {
+      [$class_or_service, $method] = \explode('::', $definition, 2);
     }
     if (empty($class_or_service) || empty($method)) {
-      throw new \InvalidArgumentException(sprintf('The callable definition provided was invalid. Could not get class and method from definition "%s".', $definition));
+      throw new \InvalidArgumentException(\sprintf('The callable definition provided was invalid. Could not get class and method from definition "%s".', $definition));
     }
 
     $instance = $this->classResolver->getInstanceFromDefinition($class_or_service);
-    if (!is_callable([$instance, $method])) {
-      throw new \InvalidArgumentException(sprintf('The callable definition provided was invalid. Either class "%s" does not have a method "%s", or it is not callable.', $instance::class, $method));
+    if (!\is_callable([$instance, $method])) {
+      throw new \InvalidArgumentException(\sprintf('The callable definition provided was invalid. Either class "%s" does not have a method "%s", or it is not callable.', $instance::class, $method));
     }
     return [$instance, $method];
   }

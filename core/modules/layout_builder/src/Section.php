@@ -193,7 +193,7 @@ class Section implements ThirdPartySettingsInterface {
    */
   public function getComponent($uuid) {
     if (!isset($this->components[$uuid])) {
-      throw new \InvalidArgumentException(sprintf('Invalid UUID "%s"', $uuid));
+      throw new \InvalidArgumentException(\sprintf('Invalid UUID "%s"', $uuid));
     }
 
     return $this->components[$uuid];
@@ -250,10 +250,10 @@ class Section implements ThirdPartySettingsInterface {
    */
   protected function getNextHighestWeight($region) {
     $components = $this->getComponentsByRegion($region);
-    $weights = array_map(function (SectionComponent $component) {
+    $weights = \array_map(function (SectionComponent $component) {
       return $component->getWeight();
     }, $components);
-    return $weights ? max($weights) + 1 : 0;
+    return $weights ? \max($weights) + 1 : 0;
   }
 
   /**
@@ -266,10 +266,10 @@ class Section implements ThirdPartySettingsInterface {
    *   An array of components in the specified region, sorted by weight.
    */
   public function getComponentsByRegion($region) {
-    $components = array_filter($this->getComponents(), function (SectionComponent $component) use ($region) {
+    $components = \array_filter($this->getComponents(), function (SectionComponent $component) use ($region) {
       return $component->getRegion() === $region;
     });
-    uasort($components, function (SectionComponent $a, SectionComponent $b) {
+    \uasort($components, function (SectionComponent $a, SectionComponent $b) {
       return $a->getWeight() <=> $b->getWeight();
     });
     return $components;
@@ -290,10 +290,10 @@ class Section implements ThirdPartySettingsInterface {
    */
   public function insertAfterComponent($preceding_uuid, SectionComponent $component) {
     // Find the delta of the specified UUID.
-    $uuids = array_keys($this->getComponentsByRegion($component->getRegion()));
-    $delta = array_search($preceding_uuid, $uuids, TRUE);
+    $uuids = \array_keys($this->getComponentsByRegion($component->getRegion()));
+    $delta = \array_search($preceding_uuid, $uuids, TRUE);
     if ($delta === FALSE) {
-      throw new \InvalidArgumentException(sprintf('Invalid preceding UUID "%s"', $preceding_uuid));
+      throw new \InvalidArgumentException(\sprintf('Invalid preceding UUID "%s"', $preceding_uuid));
     }
     return $this->insertComponent($delta + 1, $component);
   }
@@ -313,9 +313,9 @@ class Section implements ThirdPartySettingsInterface {
    */
   public function insertComponent($delta, SectionComponent $new_component) {
     $components = $this->getComponentsByRegion($new_component->getRegion());
-    $count = count($components);
+    $count = \count($components);
     if ($delta > $count) {
-      throw new \OutOfBoundsException(sprintf('Invalid delta "%s" for the "%s" component', $delta, $new_component->getUuid()));
+      throw new \OutOfBoundsException(\sprintf('Invalid delta "%s" for the "%s" component', $delta, $new_component->getUuid()));
     }
 
     // If the delta is the end of the list, append the component instead.
@@ -324,11 +324,11 @@ class Section implements ThirdPartySettingsInterface {
     }
 
     // Find the weight of the component that exists at the specified delta.
-    $weight = array_values($components)[$delta]->getWeight();
+    $weight = \array_values($components)[$delta]->getWeight();
     $this->setComponent($new_component->setWeight($weight++));
 
     // Increase the weight of every subsequent component.
-    foreach (array_slice($components, $delta) as $component) {
+    foreach (\array_slice($components, $delta) as $component) {
       $component->setWeight($weight++);
     }
     return $this;
@@ -356,7 +356,7 @@ class Section implements ThirdPartySettingsInterface {
     return [
       'layout_id' => $this->getLayoutId(),
       'layout_settings' => $this->getLayoutSettings(),
-      'components' => array_map(function (SectionComponent $component) {
+      'components' => \array_map(function (SectionComponent $component) {
         return $component->toArray();
       }, $this->getComponents()),
       'third_party_settings' => $this->thirdPartySettings,
@@ -385,7 +385,7 @@ class Section implements ThirdPartySettingsInterface {
     return new static(
       $section['layout_id'],
       $section['layout_settings'],
-      array_map([SectionComponent::class, 'fromArray'], $section['components']),
+      \array_map([SectionComponent::class, 'fromArray'], $section['components']),
       $section['third_party_settings']
     );
   }
@@ -438,7 +438,7 @@ class Section implements ThirdPartySettingsInterface {
    * {@inheritdoc}
    */
   public function getThirdPartyProviders() {
-    return array_keys($this->thirdPartySettings);
+    return \array_keys($this->thirdPartySettings);
   }
 
   /**

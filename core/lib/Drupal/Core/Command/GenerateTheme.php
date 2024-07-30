@@ -48,7 +48,7 @@ class GenerateTheme extends Command {
   public function __construct(?string $name = NULL, ?string $root = NULL) {
     parent::__construct($name);
 
-    $this->root = $root ?? dirname(__DIR__, 5);
+    $this->root = $root ?? \dirname(__DIR__, 5);
   }
 
   /**
@@ -75,7 +75,7 @@ class GenerateTheme extends Command {
     }
 
     // Change the directory to the Drupal root.
-    chdir($this->root);
+    \chdir($this->root);
   }
 
   /**
@@ -92,8 +92,8 @@ class GenerateTheme extends Command {
 
     $io->writeln("<info>Generating theme $theme_label ($destination_theme) from $starterkit_id starterkit.</info>");
 
-    $destination = trim($input->getOption('path'), '/') . '/' . $destination_theme;
-    if (is_dir($destination)) {
+    $destination = \trim($input->getOption('path'), '/') . '/' . $destination_theme;
+    if (\is_dir($destination)) {
       $io->getErrorStyle()->error("Theme could not be generated because the destination directory $destination exists already.");
       return 1;
     }
@@ -149,43 +149,43 @@ class GenerateTheme extends Command {
       'new' => self::namePatterns($destination_theme, $theme_label),
     ];
     $filesToEdit = self::createFilesFinder($tmpDir)
-      ->contains(array_values($patterns['old']))
+      ->contains(\array_values($patterns['old']))
       ->notPath($starterkit_config['no_edit']);
     foreach ($filesToEdit as $file) {
-      $contents = file_get_contents($file->getRealPath());
-      $contents = str_replace($patterns['old'], $patterns['new'], $contents);
-      file_put_contents($file->getRealPath(), $contents);
+      $contents = \file_get_contents($file->getRealPath());
+      $contents = \str_replace($patterns['old'], $patterns['new'], $contents);
+      \file_put_contents($file->getRealPath(), $contents);
     }
 
     $filesToRename = self::createFilesFinder($tmpDir)
-      ->name(array_map(static fn (string $pattern) => "*$pattern*", array_values($patterns['old'])))
+      ->name(\array_map(static fn (string $pattern) => "*$pattern*", \array_values($patterns['old'])))
       ->notPath($starterkit_config['no_rename']);
     foreach ($filesToRename as $file) {
-      $filepath_segments = explode('/', $file->getRealPath());
-      $filename = array_pop($filepath_segments);
-      $filename = str_replace($patterns['old'], $patterns['new'], $filename);
+      $filepath_segments = \explode('/', $file->getRealPath());
+      $filename = \array_pop($filepath_segments);
+      $filename = \str_replace($patterns['old'], $patterns['new'], $filename);
       $filepath_segments[] = $filename;
-      $filesystem->rename($file->getRealPath(), implode('/', $filepath_segments));
+      $filesystem->rename($file->getRealPath(), \implode('/', $filepath_segments));
     }
 
     $io->writeln("Updating $destination_theme.info.yml.", OutputInterface::VERBOSITY_DEBUG);
     $info_file = "$tmpDir/$destination_theme.info.yml";
-    $info = Yaml::decode(file_get_contents($info_file));
-    $info = array_filter(
-      array_merge($info, $starterkit_config['info']),
+    $info = Yaml::decode(\file_get_contents($info_file));
+    $info = \array_filter(
+      \array_merge($info, $starterkit_config['info']),
       static fn (mixed $value) => $value !== NULL,
     );
     // Ensure the generated theme is not hidden.
     unset($info['hidden']);
-    file_put_contents($info_file, Yaml::encode($info));
+    \file_put_contents($info_file, Yaml::encode($info));
 
     $loader = new ClassLoader();
     $loader->addPsr4("Drupal\\{$starterkit->getName()}\\", "{$starterkit->getPath()}/src");
     $loader->register();
 
     $generator_classname = "Drupal\\{$starterkit->getName()}\\StarterKit";
-    if (class_exists($generator_classname)) {
-      if (is_a($generator_classname, StarterKitInterface::class, TRUE)) {
+    if (\class_exists($generator_classname)) {
+      if (\is_a($generator_classname, StarterKitInterface::class, TRUE)) {
         $io->writeln("Running post processing.", OutputInterface::VERBOSITY_DEBUG);
         $generator_classname::postProcess($tmpDir, $destination_theme, $theme_label);
       }
@@ -202,7 +202,7 @@ class GenerateTheme extends Command {
     $io->writeln("Copying $destination_theme to $destination.", OutputInterface::VERBOSITY_DEBUG);
     $filesystem->mirror($tmpDir, $destination);
 
-    $io->writeln(sprintf('Theme generated successfully to %s', $destination));
+    $io->writeln(\sprintf('Theme generated successfully to %s', $destination));
 
     return 0;
   }
@@ -214,7 +214,7 @@ class GenerateTheme extends Command {
    *   A temporary path.
    */
   private function getUniqueTmpDirPath(): string {
-    return sys_get_temp_dir() . '/drupal-starterkit-theme-' . uniqid(md5(microtime()), TRUE);
+    return \sys_get_temp_dir() . '/drupal-starterkit-theme-' . \uniqid(\md5(\microtime()), TRUE);
   }
 
   /**
@@ -255,14 +255,14 @@ class GenerateTheme extends Command {
     string $description,
   ): array {
     $starterkit_config_file = $theme->getPath() . '/' . $theme->getName() . '.starterkit.yml';
-    if (!file_exists($starterkit_config_file)) {
+    if (!\file_exists($starterkit_config_file)) {
       throw new \RuntimeException("Theme source theme {$theme->getName()} is not a valid starter kit.");
     }
     $starterkit_config_defaults = [
       'info' => [
         'name' => $name,
         'description' => $description,
-        'core_version_requirement' => '^' . explode('.', \Drupal::VERSION)[0],
+        'core_version_requirement' => '^' . \explode('.', \Drupal::VERSION)[0],
         'version' => '1.0.0',
         'generator' => "{$theme->getName()}:$version",
       ],
@@ -273,31 +273,31 @@ class GenerateTheme extends Command {
       'no_edit' => [],
       'no_rename' => [],
     ];
-    $starterkit_config = Yaml::decode(file_get_contents($starterkit_config_file));
-    if (!is_array($starterkit_config)) {
+    $starterkit_config = Yaml::decode(\file_get_contents($starterkit_config_file));
+    if (!\is_array($starterkit_config)) {
       throw new \RuntimeException('Starterkit config is was not able to be parsed.');
     }
     if (!isset($starterkit_config['info'])) {
       $starterkit_config['info'] = [];
     }
-    $starterkit_config['info'] = array_merge($starterkit_config_defaults['info'], $starterkit_config['info']);
+    $starterkit_config['info'] = \array_merge($starterkit_config_defaults['info'], $starterkit_config['info']);
 
     foreach (['ignore', 'no_edit', 'no_rename'] as $key) {
       if (!isset($starterkit_config[$key])) {
         $starterkit_config[$key] = $starterkit_config_defaults[$key];
       }
-      if (!is_array($starterkit_config[$key])) {
+      if (!\is_array($starterkit_config[$key])) {
         throw new \RuntimeException("$key in starterkit.yml must be an array");
       }
-      $starterkit_config[$key] = array_map(
-        static fn (string $path) => Glob::toRegex(trim($path, '/')),
+      $starterkit_config[$key] = \array_map(
+        static fn (string $path) => Glob::toRegex(\trim($path, '/')),
         $starterkit_config[$key]
       );
 
-      if (count($starterkit_config[$key]) > 0) {
+      if (\count($starterkit_config[$key]) > 0) {
         $files = self::createFilesFinder($theme->getPath())->path($starterkit_config[$key]);
-        $starterkit_config[$key] = array_map(static fn ($file) => $file->getRelativePathname(), iterator_to_array($files));
-        if (count($starterkit_config[$key]) === 0) {
+        $starterkit_config[$key] = \array_map(static fn ($file) => $file->getRelativePathname(), \iterator_to_array($files));
+        if (\count($starterkit_config[$key]) === 0) {
           throw new \RuntimeException("Paths were defined `$key` but no files found.");
         }
       }
@@ -315,7 +315,7 @@ class GenerateTheme extends Command {
   ): string {
     $source_version = $theme->info['version'] ?? '';
     if ($source_version === '') {
-      $confirm = new ConfirmationQuestion(sprintf(
+      $confirm = new ConfirmationQuestion(\sprintf(
         'The source theme %s does not have a version specified. This makes tracking changes in the source theme difficult. Are you sure you want to continue?',
         $theme->getName()
       ));
@@ -335,7 +335,7 @@ class GenerateTheme extends Command {
       $git_check->run();
       if ($git_check->getExitCode()) {
         throw new \RuntimeException(
-          sprintf(
+          \sprintf(
             'The source theme %s has a development version number (%s). Determining a specific commit is not possible because git is not installed. Either install git or use a tagged release to generate a theme.',
             $theme->getName(),
             $source_version
@@ -347,7 +347,7 @@ class GenerateTheme extends Command {
       $git_get_commit = Process::fromShellCommandline("git rev-list --max-count=1 --abbrev-commit HEAD -C {$theme->getPath()}");
       $git_get_commit->run();
       if (!$git_get_commit->isSuccessful() || $git_get_commit->getOutput() === '') {
-        $confirm = new ConfirmationQuestion(sprintf(
+        $confirm = new ConfirmationQuestion(\sprintf(
           'The source theme %s has a development version number (%s). Because it is not a git checkout, a specific commit could not be identified. This makes tracking changes in the source theme difficult. Are you sure you want to continue?',
           $theme->getName(),
           $source_version
@@ -358,7 +358,7 @@ class GenerateTheme extends Command {
         $source_version .= '#unknown-commit';
       }
       else {
-        $source_version .= '#' . trim($git_get_commit->getOutput());
+        $source_version .= '#' . \trim($git_get_commit->getOutput());
       }
     }
     return $source_version;

@@ -174,7 +174,7 @@ class MigrationTest extends UnitTestCase {
       ->method('expandPluginIds')
       ->willReturnArgument(0);
 
-    if (!is_null($source)) {
+    if (!\is_null($source)) {
       $migration->set('migration_dependencies', $source);
     }
     $this->assertSame($migration->getMigrationDependencies(), $expected_value);

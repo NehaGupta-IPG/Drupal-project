@@ -96,19 +96,19 @@ abstract class HttpExceptionSubscriberBase implements EventSubscriberInterface {
 
     $format = $request->query->get(MainContentViewSubscriber::WRAPPER_FORMAT, $request->getRequestFormat());
 
-    if ($exception instanceof HttpExceptionInterface && (empty($handled_formats) || in_array($format, $handled_formats))) {
+    if ($exception instanceof HttpExceptionInterface && (empty($handled_formats) || \in_array($format, $handled_formats))) {
       $method = 'on' . $exception->getStatusCode();
       // Keep just the leading number of the status code to produce either a
       // 400 or a 500 method callback.
-      $method_fallback = 'on' . substr((string) $exception->getStatusCode(), 0, 1) . 'xx';
+      $method_fallback = 'on' . \substr((string) $exception->getStatusCode(), 0, 1) . 'xx';
       // We want to allow the method to be called and still not set a response
       // if it has additional filtering logic to determine when it will apply.
       // It is therefore the method's responsibility to set the response on the
       // event if appropriate.
-      if (method_exists($this, $method)) {
+      if (\method_exists($this, $method)) {
         $this->$method($event);
       }
-      elseif (method_exists($this, $method_fallback)) {
+      elseif (\method_exists($this, $method_fallback)) {
         $this->$method_fallback($event);
       }
     }

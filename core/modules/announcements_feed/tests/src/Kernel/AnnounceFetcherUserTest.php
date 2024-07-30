@@ -101,8 +101,8 @@ class AnnounceFetcherUserTest extends AnnounceTestBase {
           'featured' => TRUE,
           'version' => '^10',
         ],
-        'date_modified' => date('c', 1611041378),
-        'date_published' => date('c', 1610958578),
+        'date_modified' => \date('c', 1611041378),
+        'date_published' => \date('c', 1610958578),
       ],
       [
         'id' => '1002',
@@ -113,8 +113,8 @@ class AnnounceFetcherUserTest extends AnnounceTestBase {
           'featured' => TRUE,
           'version' => '^10',
         ],
-        'date_modified' => date('c', 1611041378),
-        'date_published' => date('c', 1610958578),
+        'date_modified' => \date('c', 1611041378),
+        'date_published' => \date('c', 1610958578),
       ],
       [
 
@@ -126,8 +126,8 @@ class AnnounceFetcherUserTest extends AnnounceTestBase {
           'featured' => TRUE,
           'version' => '^10',
         ],
-        'date_modified' => date('c', 1611041378),
-        'date_published' => date('c', 1610958578),
+        'date_modified' => \date('c', 1611041378),
+        'date_published' => \date('c', 1610958578),
       ],
       [
         'id' => '1004',
@@ -138,8 +138,8 @@ class AnnounceFetcherUserTest extends AnnounceTestBase {
           'featured' => TRUE,
           'version' => '^10',
         ],
-        'date_modified' => date('c', 1611041378),
-        'date_published' => date('c', 1610958578),
+        'date_modified' => \date('c', 1611041378),
+        'date_published' => \date('c', 1610958578),
       ],
     ];
   }
@@ -159,8 +159,8 @@ class AnnounceFetcherUserTest extends AnnounceTestBase {
           'featured' => TRUE,
           'version' => '^10',
         ],
-        'date_modified' => date('c', 1611041378),
-        'date_published' => date('c', 1610958578),
+        'date_modified' => \date('c', 1611041378),
+        'date_published' => \date('c', 1610958578),
       ],
       [
         'id' => '1001',
@@ -171,8 +171,8 @@ class AnnounceFetcherUserTest extends AnnounceTestBase {
           'featured' => TRUE,
           'version' => '^10',
         ],
-        'date_modified' => date('c', 1611041378),
-        'date_published' => date('c', 1610958578),
+        'date_modified' => \date('c', 1611041378),
+        'date_published' => \date('c', 1610958578),
       ],
       [
         'id' => '1002',
@@ -183,8 +183,8 @@ class AnnounceFetcherUserTest extends AnnounceTestBase {
           'featured' => TRUE,
           'version' => '^10',
         ],
-        'date_modified' => date('c', 1611041378),
-        'date_published' => date('c', 1610958578),
+        'date_modified' => \date('c', 1611041378),
+        'date_published' => \date('c', 1610958578),
       ],
       [
 
@@ -196,8 +196,8 @@ class AnnounceFetcherUserTest extends AnnounceTestBase {
           'featured' => TRUE,
           'version' => '^10',
         ],
-        'date_modified' => date('c', 1611041378),
-        'date_published' => date('c', 1610958578),
+        'date_modified' => \date('c', 1611041378),
+        'date_published' => \date('c', 1610958578),
       ],
       [
         'id' => '1004',
@@ -208,8 +208,8 @@ class AnnounceFetcherUserTest extends AnnounceTestBase {
           'featured' => TRUE,
           'version' => '^10',
         ],
-        'date_modified' => date('c', 1611041378),
-        'date_published' => date('c', 1610958578),
+        'date_modified' => \date('c', 1611041378),
+        'date_published' => \date('c', 1610958578),
       ],
     ];
   }
@@ -223,9 +223,9 @@ class AnnounceFetcherUserTest extends AnnounceTestBase {
    *   'url' are omitted because they do not need to vary between test cases.
    */
   protected function setFeedItems(array $feed_items): void {
-    $responses[] = new Response(200, [], json_encode(['items' => $feed_items]));
-    $responses[] = new Response(200, [], json_encode(['items' => $feed_items]));
-    $responses[] = new Response(200, [], json_encode(['items' => $feed_items]));
+    $responses[] = new Response(200, [], \json_encode(['items' => $feed_items]));
+    $responses[] = new Response(200, [], \json_encode(['items' => $feed_items]));
+    $responses[] = new Response(200, [], \json_encode(['items' => $feed_items]));
 
     $this->setTestFeedResponses($responses);
   }

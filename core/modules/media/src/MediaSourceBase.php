@@ -170,7 +170,7 @@ abstract class MediaSourceBase extends PluginBase implements MediaSourceInterfac
     // If there are existing fields to choose from, allow the user to reuse one.
     $options = [];
     foreach ($this->entityFieldManager->getFieldStorageDefinitions('media') as $field_name => $field) {
-      $allowed_type = in_array($field->getType(), $this->pluginDefinition['allowed_field_types'], TRUE);
+      $allowed_type = \in_array($field->getType(), $this->pluginDefinition['allowed_field_types'], TRUE);
       if ($allowed_type && !$field->isBaseField()) {
         $options[$field_name] = $field->getLabel();
       }
@@ -194,7 +194,7 @@ abstract class MediaSourceBase extends PluginBase implements MediaSourceInterfac
 
     if (!$options && $form_state->get('operation') === 'add') {
       $form['source_field']['#access'] = FALSE;
-      $field_definition = $this->fieldTypeManager->getDefinition(reset($this->pluginDefinition['allowed_field_types']));
+      $field_definition = $this->fieldTypeManager->getDefinition(\reset($this->pluginDefinition['allowed_field_types']));
       $form['source_field_message'] = [
         '#markup' => $this->t('%field_type field will be automatically created on this type to store the essential information about the media item.', [
           '%field_type' => $field_definition['label'],
@@ -224,7 +224,7 @@ abstract class MediaSourceBase extends PluginBase implements MediaSourceInterfac
    * {@inheritdoc}
    */
   public function submitConfigurationForm(array &$form, FormStateInterface $form_state) {
-    foreach (array_intersect_key($form_state->getValues(), $this->configuration) as $config_key => $config_value) {
+    foreach (\array_intersect_key($form_state->getValues(), $this->configuration) as $config_key => $config_value) {
       $this->configuration[$config_key] = $config_value;
     }
 
@@ -251,7 +251,7 @@ abstract class MediaSourceBase extends PluginBase implements MediaSourceInterfac
       ->create([
         'entity_type' => 'media',
         'field_name' => $this->getSourceFieldName(),
-        'type' => reset($this->pluginDefinition['allowed_field_types']),
+        'type' => \reset($this->pluginDefinition['allowed_field_types']),
       ]);
   }
 
@@ -318,7 +318,7 @@ abstract class MediaSourceBase extends PluginBase implements MediaSourceInterfac
       ->get('field_prefix') ?? 'field_';
     // Some media sources are using a deriver, so their plugin IDs may contain
     // a separator (usually ':') which is not allowed in field names.
-    $base_id = $prefix . 'media_' . str_replace(static::DERIVATIVE_SEPARATOR, '_', $this->getPluginId());
+    $base_id = $prefix . 'media_' . \str_replace(static::DERIVATIVE_SEPARATOR, '_', $this->getPluginId());
     $tries = 0;
     $storage = $this->entityTypeManager->getStorage('field_storage_config');
 

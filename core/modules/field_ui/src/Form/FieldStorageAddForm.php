@@ -121,7 +121,7 @@ class FieldStorageAddForm extends FormBase {
       '#description' => $this->t('A unique machine-readable name containing letters, numbers, and underscores.'),
       // Calculate characters depending on the length of the field prefix
       // setting. Maximum length is 32.
-      '#maxlength' => FieldStorageConfig::NAME_MAX_LENGTH - strlen($field_prefix),
+      '#maxlength' => FieldStorageConfig::NAME_MAX_LENGTH - \strlen($field_prefix),
       '#machine_name' => [
         'source' => ['label'],
         'exists' => [$this, 'fieldNameExists'],
@@ -384,7 +384,7 @@ class FieldStorageAddForm extends FormBase {
     foreach (['entity_form_display', 'entity_view_display'] as $key) {
       if (isset($field_options[$key])) {
         $default_options[$key] = [
-          'default' => array_intersect_key($field_options[$key], ['type' => '', 'settings' => []]),
+          'default' => \array_intersect_key($field_options[$key], ['type' => '', 'settings' => []]),
         ];
       }
       else {

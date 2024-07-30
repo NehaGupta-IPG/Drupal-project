@@ -93,7 +93,7 @@ class ConfigEntityListTest extends BrowserTestBase {
 
     $actual_operations = $controller->getOperations($entity);
     // Sort the operations to normalize link order.
-    uasort($actual_operations, ['Drupal\Component\Utility\SortArray', 'sortByWeightElement']);
+    \uasort($actual_operations, ['Drupal\Component\Utility\SortArray', 'sortByWeightElement']);
     $this->assertEquals($expected_operations, $actual_operations, 'The operations are identical.');
 
     // Test buildHeader() method.
@@ -137,7 +137,7 @@ class ConfigEntityListTest extends BrowserTestBase {
     ]);
     $entity->save();
     $list = $controller->load();
-    $this->assertSame(['beta', 'dotted.default', 'alpha', 'omega'], array_keys($list));
+    $this->assertSame(['beta', 'dotted.default', 'alpha', 'omega'], \array_keys($list));
 
     // Test that config entities that do not support status, do not have
     // enable/disable operations.
@@ -175,7 +175,7 @@ class ConfigEntityListTest extends BrowserTestBase {
 
     $actual_operations = $controller->getOperations($entity);
     // Sort the operations to normalize link order.
-    uasort($actual_operations, ['Drupal\Component\Utility\SortArray', 'sortByWeightElement']);
+    \uasort($actual_operations, ['Drupal\Component\Utility\SortArray', 'sortByWeightElement']);
     $this->assertEquals($expected_operations, $actual_operations, 'The operations are identical.');
 
     // Test getOperations when label doesn't exist.
@@ -209,7 +209,7 @@ class ConfigEntityListTest extends BrowserTestBase {
 
     $actual_operations = $controller->getOperations($entity);
     // Sort the operations to normalize link order.
-    uasort($actual_operations, ['Drupal\Component\Utility\SortArray', 'sortByWeightElement']);
+    \uasort($actual_operations, ['Drupal\Component\Utility\SortArray', 'sortByWeightElement']);
     $this->assertEquals($expected_operations, $actual_operations, 'The operations are identical.');
   }
 
@@ -324,7 +324,7 @@ class ConfigEntityListTest extends BrowserTestBase {
     // Create 51 test entities.
     for ($i = 1; $i < 52; $i++) {
       $storage->create([
-        'id' => str_pad((string) $i, 2, '0', STR_PAD_LEFT),
+        'id' => \str_pad((string) $i, 2, '0', STR_PAD_LEFT),
         'label' => 'Test config entity ' . $i,
         'weight' => $i,
         'protected_property' => $i,

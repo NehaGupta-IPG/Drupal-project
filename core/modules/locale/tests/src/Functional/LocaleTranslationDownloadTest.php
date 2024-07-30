@@ -63,12 +63,12 @@ class LocaleTranslationDownloadTest extends LocaleUpdateBase {
       'uri' => $uri,
     ];
 
-    $result = locale_translation_download_source($source_file, 'translations://');
+    $result = \locale_translation_download_source($source_file, 'translations://');
 
     $this->assertEquals('translations://contrib_module_one-8.x-1.1.de._po', $result->uri);
     $this->assertFileDoesNotExist('translations://contrib_module_one-8.x-1.1.de_0._po');
     $this->assertFileExists('translations://contrib_module_one-8.x-1.1.de._po');
-    $this->assertStringNotContainsString('__old_content__', file_get_contents('translations://contrib_module_one-8.x-1.1.de._po'));
+    $this->assertStringNotContainsString('__old_content__', \file_get_contents('translations://contrib_module_one-8.x-1.1.de._po'));
   }
 
 }

@@ -52,8 +52,8 @@ abstract class WebDriverTestBase extends BrowserTestBase {
    * {@inheritdoc}
    */
   protected function initMink() {
-    if (!is_a($this->minkDefaultDriverClass, DrupalSelenium2Driver::class, TRUE)) {
-      throw new \UnexpectedValueException(sprintf("%s has to be an instance of %s", $this->minkDefaultDriverClass, DrupalSelenium2Driver::class));
+    if (!\is_a($this->minkDefaultDriverClass, DrupalSelenium2Driver::class, TRUE)) {
+      throw new \UnexpectedValueException(\sprintf("%s has to be an instance of %s", $this->minkDefaultDriverClass, DrupalSelenium2Driver::class));
     }
     $this->minkDefaultDriverArgs = ['chrome', ['goog:chromeOptions' => ['w3c' => FALSE]], 'http://localhost:4444'];
 
@@ -112,9 +112,9 @@ abstract class WebDriverTestBase extends BrowserTestBase {
 
       $warnings = $this->getSession()->evaluateScript("JSON.parse(sessionStorage.getItem('js_testing_log_test.warnings') || JSON.stringify([]))");
       foreach ($warnings as $warning) {
-        if (str_starts_with($warning, '[Deprecation]')) {
+        if (\str_starts_with($warning, '[Deprecation]')) {
           // phpcs:ignore Drupal.Semantics.FunctionTriggerError
-          @trigger_error('Javascript Deprecation:' . substr($warning, 13), E_USER_DEPRECATED);
+          @\trigger_error('Javascript Deprecation:' . \substr($warning, 13), E_USER_DEPRECATED);
         }
       }
     }
@@ -131,7 +131,7 @@ abstract class WebDriverTestBase extends BrowserTestBase {
     if ($this->failOnJavascriptConsoleErrors) {
       $errors = $this->getSession()->evaluateScript("JSON.parse(sessionStorage.getItem('js_testing_log_test.errors') || JSON.stringify([]))");
       if (!empty($errors)) {
-        $this->fail(implode("\n", $errors));
+        $this->fail(\implode("\n", $errors));
       }
     }
   }
@@ -141,15 +141,15 @@ abstract class WebDriverTestBase extends BrowserTestBase {
    */
   protected function getMinkDriverArgs() {
     if ($this->minkDefaultDriverClass === DrupalSelenium2Driver::class) {
-      $json = getenv('MINK_DRIVER_ARGS_WEBDRIVER') ?: parent::getMinkDriverArgs();
+      $json = \getenv('MINK_DRIVER_ARGS_WEBDRIVER') ?: parent::getMinkDriverArgs();
       if (!($json === FALSE || $json === '')) {
-        $args = json_decode($json, TRUE);
+        $args = \json_decode($json, TRUE);
         if (isset($args[0]) && $args[0] === 'chrome' && !isset($args[1]['goog:chromeOptions']['w3c'])) {
           // @todo https://www.drupal.org/project/drupal/issues/3421202
           //   Deprecate defaulting behavior and require w3c to be set.
           $args[1]['goog:chromeOptions']['w3c'] = FALSE;
         }
-        $json = json_encode($args);
+        $json = \json_encode($args);
       }
       return $json;
     }
@@ -198,7 +198,7 @@ abstract class WebDriverTestBase extends BrowserTestBase {
       $session->executeScript("document.body.style.backgroundColor = 'white';");
     }
     $image = $session->getScreenshot();
-    file_put_contents($filename, $image);
+    \file_put_contents($filename, $image);
   }
 
   /**

@@ -55,7 +55,7 @@ class NodeSelection extends DefaultSelection {
     $entities = parent::validateReferenceableNewEntities($entities);
     // Mirror the conditions checked in buildEntityQuery().
     if (!$this->currentUser->hasPermission('bypass node access') && !$this->moduleHandler->hasImplementations('node_grants')) {
-      $entities = array_filter($entities, function ($node) {
+      $entities = \array_filter($entities, function ($node) {
         /** @var \Drupal\node\NodeInterface $node */
         return $node->isPublished();
       });

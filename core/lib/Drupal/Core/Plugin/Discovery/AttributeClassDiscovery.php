@@ -54,7 +54,7 @@ class AttributeClassDiscovery extends ComponentAttributeClassDiscovery {
         $subdir = '/' . $subdir;
       }
       $this->directorySuffix = $subdir;
-      $this->namespaceSuffix = str_replace('/', '\\', $subdir);
+      $this->namespaceSuffix = \str_replace('/', '\\', $subdir);
     }
     parent::__construct([], $pluginDefinitionAttributeName);
   }
@@ -80,10 +80,10 @@ class AttributeClassDiscovery extends ComponentAttributeClassDiscovery {
    *   The matching provider name, or NULL otherwise.
    */
   protected function getProviderFromNamespace(string $namespace): ?string {
-    preg_match('|^Drupal\\\\(?<provider>[\w]+)\\\\|', $namespace, $matches);
+    \preg_match('|^Drupal\\\\(?<provider>[\w]+)\\\\|', $namespace, $matches);
 
     if (isset($matches['provider'])) {
-      return mb_strtolower($matches['provider']);
+      return \mb_strtolower($matches['provider']);
     }
 
     return NULL;

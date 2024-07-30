@@ -117,10 +117,10 @@ class LanguageSelectElementTest extends BrowserTestBase {
     // Check that the options in the language field are exactly the same,
     // including the order, as the languages sent as a parameter.
     $found_options = $this->assertSession()->selectExists($id)->findAll('css', 'option');
-    $found_options = array_map(function ($item) {
+    $found_options = \array_map(function ($item) {
       return $item->getText();
     }, $found_options);
-    $this->assertEquals(array_values($options), $found_options);
+    $this->assertEquals(\array_values($options), $found_options);
   }
 
 }

@@ -19,7 +19,7 @@ class InstallTest extends BuildTestBase {
 
   public function testInstall(): void {
     $sqlite = (new \PDO('sqlite::memory:'))->query('select sqlite_version()')->fetch()[0];
-    if (version_compare($sqlite, Tasks::SQLITE_MINIMUM_VERSION) < 0) {
+    if (\version_compare($sqlite, Tasks::SQLITE_MINIMUM_VERSION) < 0) {
       $this->markTestSkipped();
     }
     $this->copyCodebase();
@@ -44,9 +44,9 @@ class InstallTest extends BuildTestBase {
       '--install-profile=minimal',
       '--json',
     ];
-    $this->assertNotEmpty($output_json = $this->executeCommand(implode(' ', $install_command))->getOutput());
+    $this->assertNotEmpty($output_json = $this->executeCommand(\implode(' ', $install_command))->getOutput());
     $this->assertCommandSuccessful();
-    $connection_details = json_decode($output_json, TRUE);
+    $connection_details = \json_decode($output_json, TRUE);
     foreach (['db_prefix', 'user_agent', 'site_path'] as $key) {
       $this->assertArrayHasKey($key, $connection_details);
     }

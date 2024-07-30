@@ -132,11 +132,11 @@ class FormErrorHandlerTest extends UnitTestCase {
       '3 errors have been found: <ul-comma-list-mock><li-mock>Test 1</li-mock><li-mock>Test 2 &amp; a half</li-mock><li-mock>Test 3</li-mock></ul-comma-list-mock>',
     ];
 
-    $this->messenger->expects($this->exactly(count($messages)))
+    $this->messenger->expects($this->exactly(\count($messages)))
       ->method('addError')
       ->with(
         $this->callback(function (string $message) use (&$messages): bool {
-          return array_shift($messages) === $message;
+          return \array_shift($messages) === $message;
         }),
         FALSE
       );
@@ -146,10 +146,10 @@ class FormErrorHandlerTest extends UnitTestCase {
       ->willReturnCallback(function ($render_array) {
         $links = [];
         foreach ($render_array[1]['#items'] as $item) {
-          $links[] = htmlspecialchars($item['#title']);
+          $links[] = \htmlspecialchars($item['#title']);
         }
 
-        return $render_array[0]['#markup'] . '<ul-comma-list-mock><li-mock>' . implode('</li-mock><li-mock>', $links) . '</li-mock></ul-comma-list-mock>';
+        return $render_array[0]['#markup'] . '<ul-comma-list-mock><li-mock>' . \implode('</li-mock><li-mock>', $links) . '</li-mock></ul-comma-list-mock>';
       });
 
     $form_state = new FormState();
@@ -186,11 +186,11 @@ class FormErrorHandlerTest extends UnitTestCase {
       'this missing element is invalid',
     ];
 
-    $this->messenger->expects($this->exactly(count($messages)))
+    $this->messenger->expects($this->exactly(\count($messages)))
       ->method('addMessage')
       ->with(
         $this->callback(function (string $message) use (&$messages): bool {
-          return array_shift($messages) === $message;
+          return \array_shift($messages) === $message;
         }),
         'error',
         FALSE

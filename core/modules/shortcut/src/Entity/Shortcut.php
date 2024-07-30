@@ -123,18 +123,18 @@ class Shortcut extends ContentEntityBase implements ShortcutInterface {
     /** @var \Drupal\Core\Field\BaseFieldDefinition[] $fields */
     $fields = parent::baseFieldDefinitions($entity_type);
 
-    $fields['id']->setDescription(t('The ID of the shortcut.'));
+    $fields['id']->setDescription(\t('The ID of the shortcut.'));
 
-    $fields['uuid']->setDescription(t('The UUID of the shortcut.'));
+    $fields['uuid']->setDescription(\t('The UUID of the shortcut.'));
 
-    $fields['shortcut_set']->setLabel(t('Shortcut set'))
-      ->setDescription(t('The bundle of the shortcut.'));
+    $fields['shortcut_set']->setLabel(\t('Shortcut set'))
+      ->setDescription(\t('The bundle of the shortcut.'));
 
-    $fields['langcode']->setDescription(t('The language code of the shortcut.'));
+    $fields['langcode']->setDescription(\t('The language code of the shortcut.'));
 
     $fields['title'] = BaseFieldDefinition::create('string')
-      ->setLabel(t('Name'))
-      ->setDescription(t('The name of the shortcut.'))
+      ->setLabel(\t('Name'))
+      ->setDescription(\t('The name of the shortcut.'))
       ->setRequired(TRUE)
       ->setTranslatable(TRUE)
       ->setSetting('max_length', 255)
@@ -147,12 +147,12 @@ class Shortcut extends ContentEntityBase implements ShortcutInterface {
       ]);
 
     $fields['weight'] = BaseFieldDefinition::create('integer')
-      ->setLabel(t('Weight'))
-      ->setDescription(t('Weight among shortcuts in the same shortcut set.'));
+      ->setLabel(\t('Weight'))
+      ->setDescription(\t('Weight among shortcuts in the same shortcut set.'));
 
     $fields['link'] = BaseFieldDefinition::create('link')
-      ->setLabel(t('Path'))
-      ->setDescription(t('The location this shortcut points to.'))
+      ->setLabel(\t('Path'))
+      ->setDescription(\t('The location this shortcut points to.'))
       ->setRequired(TRUE)
       ->setSettings([
         'link_type' => LinkItemInterface::LINK_INTERNAL,
@@ -191,7 +191,7 @@ class Shortcut extends ContentEntityBase implements ShortcutInterface {
     $a_weight = $a->getWeight();
     $b_weight = $b->getWeight();
     if ($a_weight == $b_weight) {
-      return strnatcasecmp($a->getTitle(), $b->getTitle());
+      return \strnatcasecmp($a->getTitle(), $b->getTitle());
     }
     return $a_weight <=> $b_weight;
   }

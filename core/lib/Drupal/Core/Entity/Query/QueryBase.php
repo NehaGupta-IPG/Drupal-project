@@ -193,7 +193,7 @@ abstract class QueryBase implements QueryInterface {
    * {@inheritdoc}
    */
   public function range($start = NULL, $length = NULL) {
-    $this->range = is_null($start) && is_null($length) ? [] : [
+    $this->range = \is_null($start) && \is_null($length) ? [] : [
       'start' => $start ?? 0,
       'length' => $length,
     ];
@@ -237,7 +237,7 @@ abstract class QueryBase implements QueryInterface {
   public function sort($field, $direction = 'ASC', $langcode = NULL) {
     $this->sort[] = [
       'field' => $field,
-      'direction' => strtoupper($direction),
+      'direction' => \strtoupper($direction),
       'langcode' => $langcode,
     ];
     return $this;
@@ -326,7 +326,7 @@ abstract class QueryBase implements QueryInterface {
   public function tableSort(&$headers) {
     // If 'field' is not initialized, the header columns aren't clickable.
     foreach ($headers as $key => $header) {
-      if (is_array($header) && isset($header['specifier'])) {
+      if (\is_array($header) && isset($header['specifier'])) {
         $headers[$key]['field'] = '';
       }
     }
@@ -334,7 +334,7 @@ abstract class QueryBase implements QueryInterface {
     $order = TableSort::getOrder($headers, \Drupal::request());
     $direction = TableSort::getSort($headers, \Drupal::request());
     foreach ($headers as $header) {
-      if (is_array($header) && ($header['data'] == $order['name'])) {
+      if (\is_array($header) && ($header['data'] == $order['name'])) {
         $this->sort($header['specifier'], $direction, $header['langcode'] ?? NULL);
       }
     }
@@ -462,7 +462,7 @@ abstract class QueryBase implements QueryInterface {
    *   The alias for the field.
    */
   protected function getAggregationAlias($field, $function) {
-    return strtolower($field . '_' . $function);
+    return \strtolower($field . '_' . $function);
   }
 
   /**
@@ -482,8 +482,8 @@ abstract class QueryBase implements QueryInterface {
    */
   public static function getNamespaces($object) {
     $namespaces = [];
-    for ($class = get_class($object); $class; $class = get_parent_class($class)) {
-      $namespaces[] = substr($class, 0, strrpos($class, '\\'));
+    for ($class = \get_class($object); $class; $class = \get_parent_class($class)) {
+      $namespaces[] = \substr($class, 0, \strrpos($class, '\\'));
     }
     return $namespaces;
   }
@@ -504,7 +504,7 @@ abstract class QueryBase implements QueryInterface {
   public static function getClass(array $namespaces, $short_class_name) {
     foreach ($namespaces as $namespace) {
       $class = $namespace . '\\' . $short_class_name;
-      if (class_exists($class)) {
+      if (\class_exists($class)) {
         return $class;
       }
     }

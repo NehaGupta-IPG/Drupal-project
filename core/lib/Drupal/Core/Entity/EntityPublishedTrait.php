@@ -25,7 +25,7 @@ trait EntityPublishedTrait {
    *   or if it does not have a "published" entity key.
    */
   public static function publishedBaseFieldDefinitions(EntityTypeInterface $entity_type) {
-    if (!is_subclass_of($entity_type->getClass(), EntityPublishedInterface::class)) {
+    if (!\is_subclass_of($entity_type->getClass(), EntityPublishedInterface::class)) {
       throw new UnsupportedEntityTypeDefinitionException('The entity type ' . $entity_type->id() . ' does not implement \Drupal\Core\Entity\EntityPublishedInterface.');
     }
     if (!$entity_type->hasKey('published')) {

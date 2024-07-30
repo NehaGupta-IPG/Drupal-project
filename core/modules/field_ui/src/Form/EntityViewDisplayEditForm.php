@@ -54,8 +54,8 @@ class EntityViewDisplayEditForm extends EntityDisplayFormBase {
       ],
     ];
 
-    $label_position = array_search('plugin', array_keys($field_row));
-    $field_row = array_slice($field_row, 0, $label_position, TRUE) + $label + array_slice($field_row, $label_position, count($field_row) - 1, TRUE);
+    $label_position = \array_search('plugin', \array_keys($field_row));
+    $field_row = \array_slice($field_row, 0, $label_position, TRUE) + $label + \array_slice($field_row, $label_position, \count($field_row) - 1, TRUE);
 
     // Update the (invisible) title of the 'plugin' column.
     $field_row['plugin']['#title'] = $this->t('Formatter for @title', ['@title' => $field_definition->getLabel()]);
@@ -79,8 +79,8 @@ class EntityViewDisplayEditForm extends EntityDisplayFormBase {
         '#markup' => '&nbsp;',
       ],
     ];
-    $label_position = array_search('plugin', array_keys($extra_field_row));
-    $extra_field_row = array_slice($extra_field_row, 0, $label_position, TRUE) + $label + array_slice($extra_field_row, $label_position, count($extra_field_row) - 1, TRUE);
+    $label_position = \array_search('plugin', \array_keys($extra_field_row));
+    $extra_field_row = \array_slice($extra_field_row, 0, $label_position, TRUE) + $label + \array_slice($extra_field_row, $label_position, \count($extra_field_row) - 1, TRUE);
 
     return $extra_field_row;
   }

@@ -36,17 +36,17 @@ class MigrateLookup implements MigrateLookupInterface {
     $results = [];
     $migrations = $this->migrationPluginManager->createInstances($migration_id);
     if (!$migrations) {
-      if (is_array($migration_id)) {
-        if (count($migration_id) != 1) {
-          throw new PluginException("Plugin IDs '" . implode("', '", $migration_id) . "' were not found.");
+      if (\is_array($migration_id)) {
+        if (\count($migration_id) != 1) {
+          throw new PluginException("Plugin IDs '" . \implode("', '", $migration_id) . "' were not found.");
         }
-        $migration_id = reset($migration_id);
+        $migration_id = \reset($migration_id);
       }
       throw new PluginNotFoundException($migration_id);
     }
     foreach ($migrations as $migration) {
       if ($result = $this->doLookup($migration, $source_id_values)) {
-        $results = array_merge($results, $result);
+        $results = \array_merge($results, $result);
       }
     }
     return $results;
@@ -68,12 +68,12 @@ class MigrateLookup implements MigrateLookupInterface {
    *   of keys.
    */
   protected function doLookup(MigrationInterface $migration, array $source_id_values) {
-    $destination_keys = array_keys($migration->getDestinationPlugin()->getIds());
+    $destination_keys = \array_keys($migration->getDestinationPlugin()->getIds());
     $indexed_ids = $migration->getIdMap()
       ->lookupDestinationIds($source_id_values);
     $keyed_ids = [];
     foreach ($indexed_ids as $id) {
-      $keyed_ids[] = array_combine($destination_keys, $id);
+      $keyed_ids[] = \array_combine($destination_keys, $id);
     }
     return $keyed_ids;
   }

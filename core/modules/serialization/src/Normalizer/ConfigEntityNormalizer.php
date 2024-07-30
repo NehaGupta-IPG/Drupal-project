@@ -39,7 +39,7 @@ class ConfigEntityNormalizer extends EntityNormalizer {
    * @see https://www.drupal.org/node/2653358
    */
   protected static function getDataWithoutInternals(array $data) {
-    return array_diff_key($data, ['_core' => TRUE]);
+    return \array_diff_key($data, ['_core' => TRUE]);
   }
 
   /**

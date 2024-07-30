@@ -460,7 +460,7 @@ class OverridesSectionStorageTest extends UnitTestCase {
 
     $this->plugin->buildRoutes($collection);
     $this->assertEquals($expected, $collection->all());
-    $this->assertSame(array_keys($expected), array_keys($collection->all()));
+    $this->assertSame(\array_keys($expected), \array_keys($collection->all()));
   }
 
 }

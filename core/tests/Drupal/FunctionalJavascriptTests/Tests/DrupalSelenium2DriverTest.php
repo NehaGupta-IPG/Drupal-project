@@ -59,7 +59,7 @@ class DrupalSelenium2DriverTest extends WebDriverTestBase {
     $entity = EntityTest::create();
     $entity->save();
 
-    $files = array_slice($this->getTestFiles('text'), 0, 3);
+    $files = \array_slice($this->getTestFiles('text'), 0, 3);
     $real_paths = [];
     foreach ($files as $file) {
       $real_paths[] = $file_system->realpath($file->uri);
@@ -72,7 +72,7 @@ class DrupalSelenium2DriverTest extends WebDriverTestBase {
     // Tests that uploading multiple remote files works with remote path.
     $this->drupalGet($entity->toUrl('edit-form'));
     $multiple_field = $this->assertSession()->elementExists('xpath', '//input[@multiple]');
-    $multiple_field->setValue(implode("\n", $remote_paths));
+    $multiple_field->setValue(\implode("\n", $remote_paths));
     $this->assertSession()->assertWaitOnAjaxRequest();
     $this->getSession()->getPage()->findButton('Save')->click();
     $entity = EntityTest::load($entity->id());

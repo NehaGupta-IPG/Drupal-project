@@ -603,7 +603,7 @@ class ViewExecutableTest extends UnitTestCase {
       ->with('default')
       ->willReturn(TRUE);
 
-    foreach (array_keys($view->getHandlerTypes()) as $type) {
+    foreach (\array_keys($view->getHandlerTypes()) as $type) {
       $view->$type = [];
     }
 

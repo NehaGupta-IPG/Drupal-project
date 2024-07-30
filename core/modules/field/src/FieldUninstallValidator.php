@@ -63,7 +63,7 @@ class FieldUninstallValidator implements ConfigImportModuleUninstallValidatorInt
       if (!empty($fields_in_use)) {
         foreach ($fields_in_use as $field_type => $field_storages) {
           $field_type_label = $this->getFieldTypeLabel($field_type);
-          $reasons[] = $this->formatPlural(count($fields_in_use[$field_type]), 'The %field_type_label field type is used in the following field: @fields', 'The %field_type_label field type is used in the following fields: @fields', ['%field_type_label' => $field_type_label, '@fields' => implode(', ', $field_storages)]);
+          $reasons[] = $this->formatPlural(\count($fields_in_use[$field_type]), 'The %field_type_label field type is used in the following field: @fields', 'The %field_type_label field type is used in the following fields: @fields', ['%field_type_label' => $field_type_label, '@fields' => \implode(', ', $field_storages)]);
         }
       }
       else {

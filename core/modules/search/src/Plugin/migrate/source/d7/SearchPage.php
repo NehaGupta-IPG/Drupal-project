@@ -44,7 +44,7 @@ class SearchPage extends Variable {
         ];
         // Add the node_rank_* variables (only relevant to the node module).
         if ($module === 'node') {
-          $tmp = array_merge($tmp, parent::values());
+          $tmp = \array_merge($tmp, parent::values());
         }
         $values[] = $tmp;
       }

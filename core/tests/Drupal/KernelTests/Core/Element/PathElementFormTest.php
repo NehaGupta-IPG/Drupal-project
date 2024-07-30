@@ -215,7 +215,7 @@ class PathElementFormTest extends KernelTestBase implements FormInterface {
     $form_builder->submitForm($this, $form_state);
     // Valid form state.
     $errors = $form_state->getErrors();
-    $this->assertEquals(count($errors), 2);
+    $this->assertEquals(\count($errors), 2);
     $this->assertEquals($errors, [
       'optional_validate' => 'This path does not exist or you do not have permission to link to user/74.',
       'optional_validate_route' => 'This path does not exist or you do not have permission to link to user/74.',

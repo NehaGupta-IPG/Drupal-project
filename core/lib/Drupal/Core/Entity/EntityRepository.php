@@ -63,7 +63,7 @@ class EntityRepository implements EntityRepositoryInterface {
 
     $entities = $this->entityTypeManager->getStorage($entity_type_id)->loadByProperties([$uuid_key => $uuid]);
 
-    return ($entities) ? reset($entities) : NULL;
+    return ($entities) ? \reset($entities) : NULL;
   }
 
   /**
@@ -94,7 +94,7 @@ class EntityRepository implements EntityRepositoryInterface {
   public function getTranslationFromContext(EntityInterface $entity, $langcode = NULL, $context = []) {
     $translation = $entity;
 
-    if ($entity instanceof TranslatableDataInterface && count($entity->getTranslationLanguages()) > 1) {
+    if ($entity instanceof TranslatableDataInterface && \count($entity->getTranslationLanguages()) > 1) {
       if (empty($langcode)) {
         $langcode = $this->languageManager->getCurrentLanguage(LanguageInterface::TYPE_CONTENT)->getId();
         $entity->addCacheContexts(['languages:' . LanguageInterface::TYPE_CONTENT]);
@@ -128,7 +128,7 @@ class EntityRepository implements EntityRepositoryInterface {
    * {@inheritdoc}
    */
   public function getActive($entity_type_id, $entity_id, ?array $contexts = NULL) {
-    return current($this->getActiveMultiple($entity_type_id, [$entity_id], $contexts)) ?: NULL;
+    return \current($this->getActiveMultiple($entity_type_id, [$entity_id], $contexts)) ?: NULL;
   }
 
   /**
@@ -172,7 +172,7 @@ class EntityRepository implements EntityRepositoryInterface {
    * {@inheritdoc}
    */
   public function getCanonical($entity_type_id, $entity_id, ?array $contexts = NULL) {
-    return current($this->getCanonicalMultiple($entity_type_id, [$entity_id], $contexts)) ?: NULL;
+    return \current($this->getCanonicalMultiple($entity_type_id, [$entity_id], $contexts)) ?: NULL;
   }
 
   /**
@@ -192,7 +192,7 @@ class EntityRepository implements EntityRepositoryInterface {
 
     $key = '@entity.repository:legacy_context_operation';
     if (isset($contexts[$key])) {
-      @trigger_error('Providing an \Drupal\Core\Entity\EntityRepositoryInterface::CONTEXT_ID_LEGACY_CONTEXT_OPERATION context to EntityRepository::getCanonicalMultiple() is deprecated in drupal:10.3.0 and is removed from drupal:12.0.0. There is no replacement. See https://www.drupal.org/node/3437685', E_USER_DEPRECATED);
+      @\trigger_error('Providing an \Drupal\Core\Entity\EntityRepositoryInterface::CONTEXT_ID_LEGACY_CONTEXT_OPERATION context to EntityRepository::getCanonicalMultiple() is deprecated in drupal:10.3.0 and is removed from drupal:12.0.0. There is no replacement. See https://www.drupal.org/node/3437685', E_USER_DEPRECATED);
       $contexts['operation'] = $contexts[$key]->getContextValue();
     }
 
@@ -230,7 +230,7 @@ class EntityRepository implements EntityRepositoryInterface {
     foreach ([LanguageInterface::TYPE_CONTENT, LanguageInterface::TYPE_INTERFACE] as $language_type) {
       $context_id = '@language.current_language_context:' . $language_type;
       if (isset($contexts[$context_id]) && $contexts[$context_id] instanceof ContextInterface) {
-        @trigger_error('Providing the language as ' . $context_id . ' context to EntityRepository is deprecated in drupal:10.3.0 and is removed from drupal:12.0.0. Use the langcode key instead. See https://www.drupal.org/node/3437685', E_USER_DEPRECATED);
+        @\trigger_error('Providing the language as ' . $context_id . ' context to EntityRepository is deprecated in drupal:10.3.0 and is removed from drupal:12.0.0. Use the langcode key instead. See https://www.drupal.org/node/3437685', E_USER_DEPRECATED);
         return $contexts[$context_id]->getContextValue()->getId();
       }
     }

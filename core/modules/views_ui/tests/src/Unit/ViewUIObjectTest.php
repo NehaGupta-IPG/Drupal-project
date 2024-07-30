@@ -76,7 +76,7 @@ class ViewUIObjectTest extends UnitTestCase {
       foreach ($args as $arg) {
         $method_mock->with($this->equalTo($arg));
       }
-      call_user_func_array([$view_ui, $method], $args);
+      \call_user_func_array([$view_ui, $method], $args);
     }
 
     $storage->expects($this->once())
@@ -140,12 +140,12 @@ class ViewUIObjectTest extends UnitTestCase {
     // Make sure the executable is returned before serializing.
     $this->assertInstanceOf('Drupal\views\ViewExecutable', $view_ui->getExecutable());
 
-    $serialized = serialize($view_ui);
+    $serialized = \serialize($view_ui);
 
     // Make sure the ViewExecutable class is not found in the serialized string.
     $this->assertStringNotContainsString('"Drupal\views\ViewExecutable"', $serialized);
 
-    $unserialized = unserialize($serialized);
+    $unserialized = \unserialize($serialized);
     $this->assertInstanceOf('Drupal\views_ui\ViewUI', $unserialized);
   }
 

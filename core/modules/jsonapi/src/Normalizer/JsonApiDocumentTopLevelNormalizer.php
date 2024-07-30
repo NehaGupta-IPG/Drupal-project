@@ -96,7 +96,7 @@ class JsonApiDocumentTopLevelNormalizer extends NormalizerBase implements Denorm
     if (!empty($data['data']['relationships'])) {
       // Turn all single object relationship data fields into an array of
       // objects.
-      $relationships = array_map(function ($relationship) {
+      $relationships = \array_map(function ($relationship) {
         if (isset($relationship['data']['type']) && isset($relationship['data']['id'])) {
           return ['data' => [$relationship['data']]];
         }
@@ -106,14 +106,14 @@ class JsonApiDocumentTopLevelNormalizer extends NormalizerBase implements Denorm
       }, $data['data']['relationships']);
 
       // Get an array of ids for every relationship.
-      $relationships = array_map(function ($relationship) {
+      $relationships = \array_map(function ($relationship) {
         if (empty($relationship['data'])) {
           return [];
         }
         if (empty($relationship['data'][0]['id'])) {
           throw new BadRequestHttpException("No ID specified for related resource");
         }
-        $id_list = array_column($relationship['data'], 'id');
+        $id_list = \array_column($relationship['data'], 'id');
         if (empty($relationship['data'][0]['type'])) {
           throw new BadRequestHttpException("No type specified for related resource");
         }
@@ -132,7 +132,7 @@ class JsonApiDocumentTopLevelNormalizer extends NormalizerBase implements Denorm
         // to load the entities and create a mapping between id and uuid.
         $uuid_key = $this->entityTypeManager
           ->getDefinition($entity_type_id)->getKey('uuid');
-        $related_entities = array_values($entity_storage->loadByProperties([$uuid_key => $id_list]));
+        $related_entities = \array_values($entity_storage->loadByProperties([$uuid_key => $id_list]));
         $map = [];
         foreach ($related_entities as $related_entity) {
           $map[$related_entity->uuid()] = $related_entity->id();
@@ -148,7 +148,7 @@ class JsonApiDocumentTopLevelNormalizer extends NormalizerBase implements Denorm
             if ($uuid === 'virtual') {
               continue;
             }
-            throw new NotFoundHttpException(sprintf('The resource identified by `%s:%s` (given as a relationship item) could not be found.', $relationship['data'][$delta]['type'], $uuid));
+            throw new NotFoundHttpException(\sprintf('The resource identified by `%s:%s` (given as a relationship item) could not be found.', $relationship['data'][$delta]['type'], $uuid));
           }
           $reference_item = [
             'target_id' => $map[$uuid],
@@ -156,16 +156,16 @@ class JsonApiDocumentTopLevelNormalizer extends NormalizerBase implements Denorm
           if (isset($relationship['data'][$delta]['meta'])) {
             $reference_item += $relationship['data'][$delta]['meta'];
           }
-          $canonical_ids[] = array_filter($reference_item, function ($key) {
-            return !str_starts_with($key, 'drupal_internal__');
+          $canonical_ids[] = \array_filter($reference_item, function ($key) {
+            return !\str_starts_with($key, 'drupal_internal__');
           }, ARRAY_FILTER_USE_KEY);
         }
 
-        return array_filter($canonical_ids);
+        return \array_filter($canonical_ids);
       }, $relationships);
 
       // Add the relationship ids.
-      $normalized = array_merge($normalized, $relationships);
+      $normalized = \array_merge($normalized, $relationships);
     }
     // Override deserialization target class with the one in the ResourceType.
     $class = $context['resource_type']->getDeserializationTargetClass();
@@ -202,7 +202,7 @@ class JsonApiDocumentTopLevelNormalizer extends NormalizerBase implements Denorm
       // Add omissions and metadata.
       $normalized_omissions = $this->normalizeOmissionsLinks($object->getOmissions(), $format, $context);
       $meta = !$normalized_omissions instanceof CacheableOmission
-        ? array_merge($object->getMeta(), ['omitted' => $normalized_omissions->getNormalization()])
+        ? \array_merge($object->getMeta(), ['omitted' => $normalized_omissions->getNormalization()])
         : $object->getMeta();
       $document['meta'] = (new CacheableNormalization($normalized_omissions, $meta))->omitIfEmpty();
     }
@@ -228,14 +228,14 @@ class JsonApiDocumentTopLevelNormalizer extends NormalizerBase implements Denorm
    * @todo Refactor this to use CacheableNormalization::aggregate in https://www.drupal.org/project/drupal/issues/3036284.
    */
   protected function normalizeErrorDocument(JsonApiDocumentTopLevel $document, $format, array $context = []) {
-    $normalized_values = array_map(function (HttpExceptionInterface $exception) use ($format, $context) {
+    $normalized_values = \array_map(function (HttpExceptionInterface $exception) use ($format, $context) {
       return $this->serializer->normalize($exception, $format, $context);
     }, (array) $document->getData()->getIterator());
     $cacheability = new CacheableMetadata();
     $errors = [];
     foreach ($normalized_values as $normalized_error) {
       $cacheability->addCacheableDependency($normalized_error);
-      $errors = array_merge($errors, $normalized_error->getNormalization());
+      $errors = \array_merge($errors, $normalized_error->getNormalization());
     }
     return new CacheableNormalization($cacheability, $errors);
   }
@@ -256,7 +256,7 @@ class JsonApiDocumentTopLevelNormalizer extends NormalizerBase implements Denorm
    * @todo Refactor this to use link collections in https://www.drupal.org/project/drupal/issues/3036279.
    */
   protected function normalizeOmissionsLinks(OmittedData $omissions, $format, array $context = []) {
-    $normalized_omissions = array_map(function (HttpExceptionInterface $exception) use ($format, $context) {
+    $normalized_omissions = \array_map(function (HttpExceptionInterface $exception) use ($format, $context) {
       return $this->serializer->normalize($exception, $format, $context);
     }, $omissions->toArray());
     $cacheability = CacheableMetadata::createFromObject(CacheableNormalization::aggregate($normalized_omissions));
@@ -315,10 +315,10 @@ class JsonApiDocumentTopLevelNormalizer extends NormalizerBase implements Denorm
     // Ensure that no relationship fields are being set via the attributes
     // resource object member.
     if (isset($document['data']['attributes'])) {
-      $received_attribute_field_names = array_keys($document['data']['attributes']);
-      $relationship_field_names = array_keys($resource_type->getRelatableResourceTypes());
-      if ($relationship_fields_sent_as_attributes = array_intersect($received_attribute_field_names, $relationship_field_names)) {
-        throw new UnprocessableEntityHttpException(sprintf("The following relationship fields were provided as attributes: [ %s ]", implode(', ', $relationship_fields_sent_as_attributes)));
+      $received_attribute_field_names = \array_keys($document['data']['attributes']);
+      $relationship_field_names = \array_keys($resource_type->getRelatableResourceTypes());
+      if ($relationship_fields_sent_as_attributes = \array_intersect($received_attribute_field_names, $relationship_field_names)) {
+        throw new UnprocessableEntityHttpException(\sprintf("The following relationship fields were provided as attributes: [ %s ]", \implode(', ', $relationship_fields_sent_as_attributes)));
       }
     }
   }
@@ -335,7 +335,7 @@ class JsonApiDocumentTopLevelNormalizer extends NormalizerBase implements Denorm
    *   A 7 character hash.
    */
   protected static function getLinkHash($salt, $link_href) {
-    return substr(str_replace(['-', '_'], '', Crypt::hashBase64($salt . $link_href)), 0, 7);
+    return \substr(\str_replace(['-', '_'], '', Crypt::hashBase64($salt . $link_href)), 0, 7);
   }
 
   /**

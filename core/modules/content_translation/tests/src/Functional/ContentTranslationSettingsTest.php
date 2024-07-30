@@ -239,7 +239,7 @@ class ContentTranslationSettingsTest extends BrowserTestBase {
       'zxx',
     ];
     $options = $this->assertSession()->selectExists('edit-settings-node-article-settings-language-langcode')->findAll('css', 'option');
-    $options = array_map(function ($item) {
+    $options = \array_map(function ($item) {
       return $item->getValue();
     }, $options);
     $this->assertSame($expected_elements, $options);

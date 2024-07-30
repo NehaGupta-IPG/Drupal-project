@@ -228,7 +228,7 @@ class FileListingTest extends FileFieldTestBase {
       'filemime' => 'text/plain',
     ]);
     $file->setPermanent();
-    file_put_contents($file->getFileUri(), 'hello world');
+    \file_put_contents($file->getFileUri(), 'hello world');
     $file->save();
 
     // Create entity and attach the created file.
@@ -274,7 +274,7 @@ class FileListingTest extends FileFieldTestBase {
       'changed' => 1,
     ]);
     $file->setPermanent();
-    file_put_contents($file->getFileUri(), 'hello world');
+    \file_put_contents($file->getFileUri(), 'hello world');
 
     // Save it, inserting a new record.
     $file->save();

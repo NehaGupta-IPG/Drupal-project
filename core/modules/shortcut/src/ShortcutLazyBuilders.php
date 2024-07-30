@@ -59,10 +59,10 @@ class ShortcutLazyBuilders implements TrustedCallbackInterface {
     $shortcut_set = $this->entityTypeManager->getStorage('shortcut_set')
       ->getDisplayedToUser($this->currentUser);
 
-    $links = shortcut_renderable_links();
+    $links = \shortcut_renderable_links();
 
     $configure_link = NULL;
-    if ($show_configure_link && shortcut_set_edit_access($shortcut_set)->isAllowed()) {
+    if ($show_configure_link && \shortcut_set_edit_access($shortcut_set)->isAllowed()) {
       $configure_link = [
         '#type' => 'link',
         '#title' => $this->t('Edit shortcuts'),

@@ -21,9 +21,9 @@ class InstallerTranslationNonStandardFilenamesTest extends InstallerTranslationM
   protected function prepareEnvironment(): void {
     BrowserTestBase::prepareEnvironment();
     // Place custom local translations in the translations directory.
-    mkdir(DRUPAL_ROOT . '/' . $this->siteDirectory . '/files/translations', 0777, TRUE);
-    file_put_contents(DRUPAL_ROOT . '/' . $this->siteDirectory . '/files/translations/drupal.de.po', $this->getPo('de'));
-    file_put_contents(DRUPAL_ROOT . '/' . $this->siteDirectory . '/files/translations/drupal.es.po', $this->getPo('es'));
+    \mkdir(DRUPAL_ROOT . '/' . $this->siteDirectory . '/files/translations', 0777, TRUE);
+    \file_put_contents(DRUPAL_ROOT . '/' . $this->siteDirectory . '/files/translations/drupal.de.po', $this->getPo('de'));
+    \file_put_contents(DRUPAL_ROOT . '/' . $this->siteDirectory . '/files/translations/drupal.es.po', $this->getPo('es'));
   }
 
   /**

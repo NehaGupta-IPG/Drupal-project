@@ -71,7 +71,7 @@ abstract class Query implements PlaceholderInterface {
    *   Array of query options.
    */
   public function __construct(Connection $connection, $options) {
-    $this->uniqueIdentifier = uniqid('', TRUE);
+    $this->uniqueIdentifier = \uniqid('', TRUE);
 
     $this->connection = $connection;
     $this->connectionKey = $this->connection->getKey();
@@ -84,9 +84,9 @@ abstract class Query implements PlaceholderInterface {
    * Implements the magic __sleep function to disconnect from the database.
    */
   public function __sleep(): array {
-    $keys = get_object_vars($this);
+    $keys = \get_object_vars($this);
     unset($keys['connection']);
-    return array_keys($keys);
+    return \array_keys($keys);
   }
 
   /**
@@ -100,7 +100,7 @@ abstract class Query implements PlaceholderInterface {
    * Implements the magic __clone function.
    */
   public function __clone() {
-    $this->uniqueIdentifier = uniqid('', TRUE);
+    $this->uniqueIdentifier = \uniqid('', TRUE);
   }
 
   /**

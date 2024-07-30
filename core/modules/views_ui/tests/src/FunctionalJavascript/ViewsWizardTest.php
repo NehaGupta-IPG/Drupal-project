@@ -57,7 +57,7 @@ class ViewsWizardTest extends WebDriverTestBase {
 
     // Test if the title and path have been populated.
     $this->assertEquals($label_value, $page->findField('page[title]')->getValue());
-    $this->assertEquals(str_replace(' ', '-', $label_value), $page->findField('page[path]')->getValue());
+    $this->assertEquals(\str_replace(' ', '-', $label_value), $page->findField('page[path]')->getValue());
 
     // Create a menu item.
     $page->findField('page[link]')->click();

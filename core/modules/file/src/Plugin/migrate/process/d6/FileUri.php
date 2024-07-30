@@ -25,16 +25,16 @@ class FileUri extends ProcessPluginBase {
     [$filepath, $file_directory_path, $temp_directory_path, $is_public] = $value;
 
     // Specific handling using $temp_directory_path for temporary files.
-    if (str_starts_with($filepath, $temp_directory_path)) {
-      $uri = preg_replace('/^' . preg_quote($temp_directory_path, '/') . '/', '', $filepath);
-      return 'temporary://' . ltrim($uri, '/');
+    if (\str_starts_with($filepath, $temp_directory_path)) {
+      $uri = \preg_replace('/^' . \preg_quote($temp_directory_path, '/') . '/', '', $filepath);
+      return 'temporary://' . \ltrim($uri, '/');
     }
 
     // Strip the files path from the uri instead of using basename
     // so any additional folders in the path are preserved.
-    $uri = preg_replace('/^' . preg_quote($file_directory_path, '/') . '/', '', $filepath);
+    $uri = \preg_replace('/^' . \preg_quote($file_directory_path, '/') . '/', '', $filepath);
 
-    return ($is_public ? 'public' : 'private') . '://' . ltrim($uri, '/');
+    return ($is_public ? 'public' : 'private') . '://' . \ltrim($uri, '/');
   }
 
 }

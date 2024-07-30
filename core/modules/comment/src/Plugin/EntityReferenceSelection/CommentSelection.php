@@ -56,7 +56,7 @@ class CommentSelection extends DefaultSelection {
     $entities = parent::validateReferenceableNewEntities($entities);
     // Mirror the conditions checked in buildEntityQuery().
     if (!$this->currentUser->hasPermission('administer comments')) {
-      $entities = array_filter($entities, function ($comment) {
+      $entities = \array_filter($entities, function ($comment) {
         /** @var \Drupal\comment\CommentInterface $comment */
         return $comment->isPublished();
       });
@@ -174,7 +174,7 @@ class CommentSelection extends DefaultSelection {
    */
   public function countReferenceableEntities($match = NULL, $match_operator = 'CONTAINS') {
     $options = $this->getReferenceableEntities($match, $match_operator);
-    return count($options, COUNT_RECURSIVE) - count($options);
+    return \count($options, COUNT_RECURSIVE) - \count($options);
   }
 
 }

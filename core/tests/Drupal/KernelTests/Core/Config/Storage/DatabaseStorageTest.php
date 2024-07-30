@@ -32,7 +32,7 @@ class DatabaseStorageTest extends ConfigStorageTestBase {
    */
   protected function read($name) {
     $data = Database::getConnection()->select('config', 'c')->fields('c', ['data'])->condition('name', $name)->execute()->fetchField();
-    return unserialize($data);
+    return \unserialize($data);
   }
 
   /**

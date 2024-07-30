@@ -26,10 +26,10 @@ class FilterTestRestrictTagsAndAttributes extends FilterBase {
    * {@inheritdoc}
    */
   public function process($text, $langcode) {
-    $allowed_tags = array_filter($this->settings['restrictions']['allowed'], function ($value) {
-      return is_array($value) || (bool) $value !== FALSE;
+    $allowed_tags = \array_filter($this->settings['restrictions']['allowed'], function ($value) {
+      return \is_array($value) || (bool) $value !== FALSE;
     });
-    return new FilterProcessResult(Xss::filter($text, array_keys($allowed_tags)));
+    return new FilterProcessResult(Xss::filter($text, \array_keys($allowed_tags)));
   }
 
   /**
@@ -41,12 +41,12 @@ class FilterTestRestrictTagsAndAttributes extends FilterBase {
     // The configuration system stores FALSE as '0' and TRUE as '1'. Fix that.
     if (isset($restrictions['allowed'])) {
       foreach ($restrictions['allowed'] as $tag => $attributes_or_bool) {
-        if (!is_array($attributes_or_bool)) {
+        if (!\is_array($attributes_or_bool)) {
           $restrictions['allowed'][$tag] = (bool) $attributes_or_bool;
         }
         else {
           foreach ($attributes_or_bool as $attr => $attribute_values_or_bool) {
-            if (!is_array($attribute_values_or_bool)) {
+            if (!\is_array($attribute_values_or_bool)) {
               $restrictions['allowed'][$tag][$attr] = (bool) $attribute_values_or_bool;
             }
             else {

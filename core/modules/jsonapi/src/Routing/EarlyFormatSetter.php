@@ -28,7 +28,7 @@ final class EarlyFormatSetter extends RequestFormatRouteFilter {
    * {@inheritdoc}
    */
   public function filter(RouteCollection $collection, Request $request) {
-    if (is_null($request->getRequestFormat(NULL))) {
+    if (\is_null($request->getRequestFormat(NULL))) {
       $possible_formats = static::getAvailableFormats($collection);
       if ($possible_formats === ['api_json']) {
         $request->setRequestFormat('api_json');

@@ -149,7 +149,7 @@ class BlockTest extends ConfigEntityResourceTestBase {
    */
   protected function getExpectedCacheContexts(?array $sparse_fieldset = NULL): array {
     // @see ::createEntity()
-    return array_values(array_diff(parent::getExpectedCacheContexts(), ['user.permissions']));
+    return \array_values(\array_diff(parent::getExpectedCacheContexts(), ['user.permissions']));
   }
 
   /**
@@ -158,7 +158,7 @@ class BlockTest extends ConfigEntityResourceTestBase {
   protected function getExpectedCacheTags(?array $sparse_fieldset = NULL): array {
     // Because the 'user.permissions' cache context is missing, the cache tag
     // for the anonymous user role is never added automatically.
-    return array_values(array_diff(parent::getExpectedCacheTags(), ['config:user.role.anonymous']));
+    return \array_values(\array_diff(parent::getExpectedCacheTags(), ['config:user.role.anonymous']));
   }
 
   /**

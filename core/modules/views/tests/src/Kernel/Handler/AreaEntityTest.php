@@ -67,23 +67,23 @@ class AreaEntityTest extends ViewsKernelTestBase {
     $data = $this->container->get('views.views_data')->get('views');
     $entity_types = $this->container->get('entity_type.manager')->getDefinitions();
 
-    $expected_entities = array_filter($entity_types, function (EntityTypeInterface $entity_type) {
+    $expected_entities = \array_filter($entity_types, function (EntityTypeInterface $entity_type) {
       return $entity_type->hasViewBuilderClass();
     });
 
     // Test that all expected entity types have data.
-    foreach (array_keys($expected_entities) as $entity) {
+    foreach (\array_keys($expected_entities) as $entity) {
       $this->assertNotEmpty($data['entity_' . $entity], "Views entity '$entity' should have a data area.");
       // Test that entity_type is set correctly in the area data.
       $this->assertEquals($data['entity_' . $entity]['area']['entity_type'], $entity, "Correct entity_type set for $entity");
     }
 
-    $expected_entities = array_filter($entity_types, function (EntityTypeInterface $type) {
+    $expected_entities = \array_filter($entity_types, function (EntityTypeInterface $type) {
       return !$type->hasViewBuilderClass();
     });
 
     // Test that no configuration entity types have data.
-    foreach (array_keys($expected_entities) as $entity) {
+    foreach (\array_keys($expected_entities) as $entity) {
       $this->assertArrayNotHasKey('entity_' . $entity, $data, "Views config entity '$entity' should not have a data area.");
     }
   }

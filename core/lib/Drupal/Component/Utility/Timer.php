@@ -26,7 +26,7 @@ class Timer {
    *   The name of the timer.
    */
   public static function start($name) {
-    static::$timers[$name]['start'] = microtime(TRUE);
+    static::$timers[$name]['start'] = \microtime(TRUE);
     static::$timers[$name]['count'] = isset(static::$timers[$name]['count']) ? ++static::$timers[$name]['count'] : 1;
   }
 
@@ -41,8 +41,8 @@ class Timer {
    */
   public static function read($name) {
     if (isset(static::$timers[$name]['start'])) {
-      $stop = microtime(TRUE);
-      $diff = round(($stop - static::$timers[$name]['start']) * 1000, 2);
+      $stop = \microtime(TRUE);
+      $diff = \round(($stop - static::$timers[$name]['start']) * 1000, 2);
 
       if (isset(static::$timers[$name]['time'])) {
         $diff += static::$timers[$name]['time'];
@@ -64,8 +64,8 @@ class Timer {
    */
   public static function stop($name) {
     if (isset(static::$timers[$name]['start'])) {
-      $stop = microtime(TRUE);
-      $diff = round(($stop - static::$timers[$name]['start']) * 1000, 2);
+      $stop = \microtime(TRUE);
+      $diff = \round(($stop - static::$timers[$name]['start']) * 1000, 2);
       if (isset(static::$timers[$name]['time'])) {
         static::$timers[$name]['time'] += $diff;
       }

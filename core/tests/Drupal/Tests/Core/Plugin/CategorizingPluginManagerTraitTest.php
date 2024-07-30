@@ -62,7 +62,7 @@ class CategorizingPluginManagerTraitTest extends UnitTestCase {
     $this->assertSame([
       'fruits',
       'vegetables',
-    ], array_values($this->pluginManager->getCategories()));
+    ], \array_values($this->pluginManager->getCategories()));
   }
 
   /**
@@ -72,7 +72,7 @@ class CategorizingPluginManagerTraitTest extends UnitTestCase {
    */
   public function testGetSortedDefinitions(): void {
     $sorted = $this->pluginManager->getSortedDefinitions();
-    $this->assertSame(['apple', 'mango', 'cucumber'], array_keys($sorted));
+    $this->assertSame(['apple', 'mango', 'cucumber'], \array_keys($sorted));
   }
 
   /**
@@ -82,9 +82,9 @@ class CategorizingPluginManagerTraitTest extends UnitTestCase {
    */
   public function testGetGroupedDefinitions(): void {
     $grouped = $this->pluginManager->getGroupedDefinitions();
-    $this->assertSame(['fruits', 'vegetables'], array_keys($grouped));
-    $this->assertSame(['apple', 'mango'], array_keys($grouped['fruits']));
-    $this->assertSame(['cucumber'], array_keys($grouped['vegetables']));
+    $this->assertSame(['fruits', 'vegetables'], \array_keys($grouped));
+    $this->assertSame(['apple', 'mango'], \array_keys($grouped['fruits']));
+    $this->assertSame(['cucumber'], \array_keys($grouped['vegetables']));
   }
 
   /**

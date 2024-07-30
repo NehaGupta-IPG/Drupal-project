@@ -65,7 +65,7 @@ class SearchNodeUpdateAndDeletionTest extends BrowserTestBase {
     // Update the search index.
     $node_search_plugin->updateIndex();
     $search_index = \Drupal::service('search.index');
-    assert($search_index instanceof SearchIndexInterface);
+    \assert($search_index instanceof SearchIndexInterface);
 
     // Search the node to verify it appears in search results.
     $edit = ['keys' => 'knights'];

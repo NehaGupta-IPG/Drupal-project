@@ -159,7 +159,7 @@ class MenuLink extends DrupalSqlBase {
     $row->setSourceProperty('is_localized', NULL);
     $default_language = $this->variableGet('language_default', (object) ['language' => 'und']);
     $default_language = $default_language->language;
-    $options = unserialize($row->getSourceProperty('options'));
+    $options = \unserialize($row->getSourceProperty('options'));
     if (isset($options['langcode'])) {
       if ($options['langcode'] != $default_language) {
         $row->setSourceProperty('language', $options['langcode']);
@@ -167,7 +167,7 @@ class MenuLink extends DrupalSqlBase {
       }
     }
 
-    $row->setSourceProperty('options', unserialize($row->getSourceProperty('options')));
+    $row->setSourceProperty('options', \unserialize($row->getSourceProperty('options')));
     $row->setSourceProperty('enabled', !$row->getSourceProperty('hidden'));
     $description = $row->getSourceProperty('options/attributes/title');
     if ($description !== NULL) {

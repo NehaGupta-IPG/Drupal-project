@@ -49,7 +49,7 @@ abstract class TextItemBase extends FieldItemBase {
    * @see static::fieldSettingsForm()
    */
   public static function validateAllowedFormats(array &$element, FormStateInterface $form_state) {
-    $value = array_values(array_filter($form_state->getValue($element['#parents'])));
+    $value = \array_values(\array_filter($form_state->getValue($element['#parents'])));
     $form_state->setValueForElement($element, $value);
   }
 
@@ -60,13 +60,13 @@ abstract class TextItemBase extends FieldItemBase {
     // Add explicitly allowed formats as config dependencies.
     $format_dependencies = [];
     $dependencies = parent::calculateDependencies($field_definition);
-    if (!is_null($field_definition->getSetting('allowed_formats'))) {
-      $format_dependencies = array_map(function (string $format_id) {
+    if (!\is_null($field_definition->getSetting('allowed_formats'))) {
+      $format_dependencies = \array_map(function (string $format_id) {
         return 'filter.format.' . $format_id;
       }, $field_definition->getSetting('allowed_formats'));
     }
     $config = $dependencies['config'] ?? [];
-    $dependencies['config'] = array_merge($config, $format_dependencies);
+    $dependencies['config'] = \array_merge($config, $format_dependencies);
     return $dependencies;
   }
 
@@ -75,16 +75,16 @@ abstract class TextItemBase extends FieldItemBase {
    */
   public static function propertyDefinitions(FieldStorageDefinitionInterface $field_definition) {
     $properties['value'] = DataDefinition::create('string')
-      ->setLabel(t('Text'))
+      ->setLabel(\t('Text'))
       ->setRequired(TRUE);
 
     $properties['format'] = DataDefinition::create('filter_format')
-      ->setLabel(t('Text format'))
+      ->setLabel(\t('Text format'))
       ->setSetting('allowed_formats', $field_definition->getSetting('allowed_formats'));
 
     $properties['processed'] = DataDefinition::create('string')
-      ->setLabel(t('Processed text'))
-      ->setDescription(t('The text with the text format applied.'))
+      ->setLabel(\t('Processed text'))
+      ->setDescription(\t('The text with the text format applied.'))
       ->setComputed(TRUE)
       ->setClass('\Drupal\text\TextProcessed')
       ->setSetting('text source', 'value')
@@ -138,14 +138,14 @@ abstract class TextItemBase extends FieldItemBase {
     }
     else {
       // Textfield handling.
-      $max = (int) ceil($settings['max_length'] / 3);
-      $value = substr($random->sentences(mt_rand(1, $max), FALSE), 0, $settings['max_length']);
+      $max = (int) \ceil($settings['max_length'] / 3);
+      $value = \substr($random->sentences(\mt_rand(1, $max), FALSE), 0, $settings['max_length']);
     }
 
     $values = [
       'value' => $value,
       'summary' => $value,
-      'format' => filter_fallback_format(),
+      'format' => \filter_fallback_format(),
     ];
     return $values;
   }

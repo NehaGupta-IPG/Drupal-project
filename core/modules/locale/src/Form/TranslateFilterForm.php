@@ -87,7 +87,7 @@ class TranslateFilterForm extends TranslateFormBase {
     $session_filters = $this->getRequest()->getSession()->get('locale_translate_filter', []);
     foreach ($filters as $name => $filter) {
       if ($form_state->hasValue($name)) {
-        $session_filters[$name] = trim($form_state->getValue($name));
+        $session_filters[$name] = \trim($form_state->getValue($name));
       }
     }
     $this->getRequest()->getSession()->set('locale_translate_filter', $session_filters);

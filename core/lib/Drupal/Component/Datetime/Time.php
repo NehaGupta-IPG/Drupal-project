@@ -65,14 +65,14 @@ class Time implements TimeInterface {
    * {@inheritdoc}
    */
   public function getCurrentTime() {
-    return time();
+    return \time();
   }
 
   /**
    * {@inheritdoc}
    */
   public function getCurrentMicroTime() {
-    return microtime(TRUE);
+    return \microtime(TRUE);
   }
 
   /**

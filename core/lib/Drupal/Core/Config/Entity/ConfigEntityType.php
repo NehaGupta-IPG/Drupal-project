@@ -89,7 +89,7 @@ class ConfigEntityType extends EntityType implements ConfigEntityTypeInterface {
       $config_prefix = $this->provider . '.' . $this->id();
     }
 
-    if (strlen($config_prefix) > static::PREFIX_LENGTH) {
+    if (\strlen($config_prefix) > static::PREFIX_LENGTH) {
       throw new ConfigPrefixLengthException("The configuration file name prefix $config_prefix exceeds the maximum character limit of " . static::PREFIX_LENGTH);
     }
     return $config_prefix;
@@ -140,7 +140,7 @@ class ConfigEntityType extends EntityType implements ConfigEntityTypeInterface {
    * @see \Drupal\Core\Config\Entity\ConfigEntityStorage
    */
   protected function checkStorageClass($class) {
-    if (!is_a($class, 'Drupal\Core\Config\Entity\ConfigEntityStorage', TRUE)) {
+    if (!\is_a($class, 'Drupal\Core\Config\Entity\ConfigEntityStorage', TRUE)) {
       throw new ConfigEntityStorageClassException("$class is not \\Drupal\\Core\\Config\\Entity\\ConfigEntityStorage or it does not extend it");
     }
   }
@@ -166,7 +166,7 @@ class ConfigEntityType extends EntityType implements ConfigEntityTypeInterface {
         '_core' => '_core',
       ];
       foreach ($this->config_export as $property => $name) {
-        if (is_numeric($property)) {
+        if (\is_numeric($property)) {
           $this->mergedConfigExport[$name] = $name;
         }
         else {

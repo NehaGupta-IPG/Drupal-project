@@ -21,7 +21,7 @@ class NumericArgumentValidator extends ArgumentValidatorPluginBase {
    * {@inheritdoc}
    */
   public function validateArgument($argument) {
-    return is_numeric($argument);
+    return \is_numeric($argument);
   }
 
   /**

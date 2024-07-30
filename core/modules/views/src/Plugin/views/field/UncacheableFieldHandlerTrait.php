@@ -26,7 +26,7 @@ trait UncacheableFieldHandlerTrait {
   public function postRender(ResultRow $row, $output) {
     $placeholder = $this->getFieldTokenPlaceholder();
     $value = $this->doRender($row);
-    $this->last_render = str_replace($placeholder, $value, $output);
+    $this->last_render = \str_replace($placeholder, $value, $output);
     return [$placeholder => $value];
   }
 

@@ -18,10 +18,10 @@ class Color {
    *   TRUE if $hex is valid or FALSE if it is not.
    */
   public static function validateHex($hex) {
-    if (!is_string($hex)) {
+    if (!\is_string($hex)) {
       return FALSE;
     }
-    return preg_match('/^[#]?([0-9a-fA-F]{3}){1,2}$/', $hex) === 1;
+    return \preg_match('/^[#]?([0-9a-fA-F]{3}){1,2}$/', $hex) === 1;
   }
 
   /**
@@ -41,14 +41,14 @@ class Color {
     }
 
     // Ignore '#' prefixes.
-    $hex = ltrim($hex, '#');
+    $hex = \ltrim($hex, '#');
 
     // Convert shorthands like '#abc' to '#aabbcc'.
-    if (strlen($hex) == 3) {
+    if (\strlen($hex) == 3) {
       $hex = $hex[0] . $hex[0] . $hex[1] . $hex[1] . $hex[2] . $hex[2];
     }
 
-    $c = hexdec($hex);
+    $c = \hexdec($hex);
 
     return [
       'red' => $c >> 16 & 0xFF,
@@ -70,13 +70,13 @@ class Color {
    */
   public static function rgbToHex($input) {
     // Remove named array keys if input comes from Color::hex2rgb().
-    if (is_array($input)) {
-      $rgb = array_values($input);
+    if (\is_array($input)) {
+      $rgb = \array_values($input);
     }
     // Parse string input in CSS notation ('10, 20, 30').
-    elseif (is_string($input)) {
-      preg_match('/(\d+), ?(\d+), ?(\d+)/', $input, $rgb);
-      array_shift($rgb);
+    elseif (\is_string($input)) {
+      \preg_match('/(\d+), ?(\d+), ?(\d+)/', $input, $rgb);
+      \array_shift($rgb);
     }
 
     $out = 0;
@@ -84,7 +84,7 @@ class Color {
       $out |= $v << (16 - $k * 8);
     }
 
-    return '#' . str_pad(dechex($out), 6, '0', STR_PAD_LEFT);
+    return '#' . \str_pad(\dechex($out), 6, '0', STR_PAD_LEFT);
   }
 
   /**
@@ -98,9 +98,9 @@ class Color {
    */
   public static function normalizeHexLength($hex) {
     // Ignore '#' prefixes.
-    $hex = ltrim($hex, '#');
+    $hex = \ltrim($hex, '#');
 
-    if (strlen($hex) === 3) {
+    if (\strlen($hex) === 3) {
       $hex[5] = $hex[2];
       $hex[4] = $hex[2];
       $hex[3] = $hex[1];

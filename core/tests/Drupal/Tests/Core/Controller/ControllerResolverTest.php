@@ -141,7 +141,7 @@ class ControllerResolverTest extends UnitTestCase {
       // Tests a method on an object.
       [[new MockController(), 'getResult'], 'This is a regular controller.'],
       // Tests a function.
-      ['phpversion', phpversion()],
+      ['phpversion', \phpversion()],
       // Tests an object using __invoke().
       [new MockInvokeController(), 'This used __invoke().'],
       // Tests a class using __invoke().
@@ -178,7 +178,7 @@ class ControllerResolverTest extends UnitTestCase {
       $this->assertInstanceOf($class, $controller[0]);
     }
     $this->assertIsCallable($controller);
-    $this->assertSame($output, call_user_func($controller));
+    $this->assertSame($output, \call_user_func($controller));
   }
 
 }

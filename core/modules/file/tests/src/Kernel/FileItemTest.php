@@ -74,7 +74,7 @@ class FileItemTest extends FieldKernelTestBase {
       'bundle' => 'entity_test',
       'settings' => ['file_directory' => $this->directory],
     ])->save();
-    file_put_contents('public://example.txt', $this->randomMachineName());
+    \file_put_contents('public://example.txt', $this->randomMachineName());
     $this->file = File::create([
       'uri' => 'public://example.txt',
     ]);
@@ -110,7 +110,7 @@ class FileItemTest extends FieldKernelTestBase {
     $this->assertEquals($this->file->uuid(), $entity->file_test->entity->uuid());
 
     // Make sure the computed files reflects updates to the file.
-    file_put_contents('public://example-2.txt', $this->randomMachineName());
+    \file_put_contents('public://example-2.txt', $this->randomMachineName());
     $file2 = File::create([
       'uri' => 'public://example-2.txt',
     ]);
@@ -135,10 +135,10 @@ class FileItemTest extends FieldKernelTestBase {
     /** @var \Drupal\Core\StreamWrapper\StreamWrapperManagerInterface $stream_wrapper_manager */
     $stream_wrapper_manager = \Drupal::service('stream_wrapper_manager');
 
-    $this->assertEquals($this->directory, dirname($stream_wrapper_manager::getTarget($uri)));
+    $this->assertEquals($this->directory, \dirname($stream_wrapper_manager::getTarget($uri)));
 
     // Make sure the computed files reflects updates to the file.
-    file_put_contents('public://example-3.txt', $this->randomMachineName());
+    \file_put_contents('public://example-3.txt', $this->randomMachineName());
     // Test unsaved file entity.
     $file3 = File::create([
       'uri' => 'public://example-3.txt',

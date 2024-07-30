@@ -63,7 +63,7 @@ class BasicAuth implements AuthenticationProviderInterface, AuthenticationProvid
   public function __construct(ConfigFactoryInterface $config_factory, UserAuthInterface|UserAuthenticationInterface $user_auth, FloodInterface $flood, EntityTypeManagerInterface $entity_type_manager) {
     $this->configFactory = $config_factory;
     if (!$user_auth instanceof UserAuthenticationInterface) {
-      @trigger_error('The $user_auth parameter implementing UserAuthInterface is deprecated in drupal:10.3.0 and will be removed in drupal:12.0.0. Implement UserAuthenticationInterface instead. See https://www.drupal.org/node/3411040');
+      @\trigger_error('The $user_auth parameter implementing UserAuthInterface is deprecated in drupal:10.3.0 and will be removed in drupal:12.0.0. Implement UserAuthenticationInterface instead. See https://www.drupal.org/node/3411040');
     }
     $this->userAuth = $user_auth;
     $this->flood = $flood;
@@ -103,7 +103,7 @@ class BasicAuth implements AuthenticationProviderInterface, AuthenticationProvid
       }
       else {
         $accounts = $this->entityTypeManager->getStorage('user')->loadByProperties(['name' => $username, 'status' => 1]);
-        $account = reset($accounts);
+        $account = \reset($accounts);
       }
       if ($account) {
         if ($flood_config->get('uid_only')) {

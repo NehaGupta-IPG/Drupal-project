@@ -44,7 +44,7 @@ class UserData implements UserDataInterface {
     if (isset($name) && isset($uid)) {
       $result = $result->fetchAllAssoc('uid');
       if (isset($result[$uid])) {
-        return $result[$uid]->serialized ? unserialize($result[$uid]->value) : $result[$uid]->value;
+        return $result[$uid]->serialized ? \unserialize($result[$uid]->value) : $result[$uid]->value;
       }
       return NULL;
     }
@@ -52,20 +52,20 @@ class UserData implements UserDataInterface {
     // If $module and $uid were passed, return data keyed by name.
     if (isset($uid)) {
       foreach ($result as $record) {
-        $return[$record->name] = ($record->serialized ? unserialize($record->value) : $record->value);
+        $return[$record->name] = ($record->serialized ? \unserialize($record->value) : $record->value);
       }
       return $return;
     }
     // If $module and $name were passed, return data keyed by uid.
     if (isset($name)) {
       foreach ($result as $record) {
-        $return[$record->uid] = ($record->serialized ? unserialize($record->value) : $record->value);
+        $return[$record->uid] = ($record->serialized ? \unserialize($record->value) : $record->value);
       }
       return $return;
     }
     // If only $module was passed, return data keyed by uid and name.
     foreach ($result as $record) {
-      $return[$record->uid][$record->name] = ($record->serialized ? unserialize($record->value) : $record->value);
+      $return[$record->uid][$record->name] = ($record->serialized ? \unserialize($record->value) : $record->value);
     }
     return $return;
   }
@@ -74,9 +74,9 @@ class UserData implements UserDataInterface {
    * {@inheritdoc}
    */
   public function set($module, $uid, $name, $value) {
-    $serialized = (int) !is_scalar($value);
+    $serialized = (int) !\is_scalar($value);
     if ($serialized) {
-      $value = serialize($value);
+      $value = \serialize($value);
     }
     $this->connection->merge('users_data')
       ->keys([

@@ -142,7 +142,7 @@ class BigPipeTestController implements TrustedCallbackInterface {
    */
   public static function currentTime() {
     return [
-      '#markup' => '<time datetime="' . date('Y-m-d', 668948400) . '"></time>',
+      '#markup' => '<time datetime="' . \date('Y-m-d', 668948400) . '"></time>',
       '#cache' => ['max-age' => 0],
     ];
   }

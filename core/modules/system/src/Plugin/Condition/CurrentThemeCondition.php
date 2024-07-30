@@ -82,7 +82,7 @@ class CurrentThemeCondition extends ConditionPluginBase implements ContainerFact
       '#type' => 'select',
       '#title' => $this->t('Theme'),
       '#default_value' => $this->configuration['theme'],
-      '#options' => array_map(function ($theme_info) {
+      '#options' => \array_map(function ($theme_info) {
         return $theme_info->info['name'];
       }, $this->themeHandler->listInfo()),
     ];

@@ -42,7 +42,7 @@ class HtmlEscapedText implements MarkupInterface, \Countable {
    * {@inheritdoc}
    */
   public function count(): int {
-    return mb_strlen($this->string);
+    return \mb_strlen($this->string);
   }
 
   /**

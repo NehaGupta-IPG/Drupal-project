@@ -68,7 +68,7 @@ class FilterCaption extends FilterBase implements ContainerFactoryPluginInterfac
   public function process($text, $langcode) {
     $result = new FilterProcessResult($text);
 
-    if (stristr($text, 'data-caption') !== FALSE) {
+    if (\stristr($text, 'data-caption') !== FALSE) {
       $dom = Html::load($text);
       $xpath = new \DOMXPath($dom);
       $html_filter = $this->filterManager->createInstance('filter_html', [
@@ -98,7 +98,7 @@ class FilterCaption extends FilterBase implements ContainerFactoryPluginInterfac
         // a raw caption value of ' ' as valid and adding the wrapping figure
         // element.
         // @see core/modules/media/js/plugins/drupalmedia/plugin.js
-        if (mb_strlen($caption) === 0 && $raw_caption !== ' ') {
+        if (\mb_strlen($caption) === 0 && $raw_caption !== ' ') {
           continue;
         }
 

@@ -249,8 +249,8 @@ class Node extends DrupalSqlBase {
       foreach ($this->fieldInfo as $type => $fields) {
         foreach ($fields as $field => $info) {
           foreach ($info as $property => $value) {
-            if ($property == 'db_columns' || str_ends_with($property, '_settings')) {
-              $this->fieldInfo[$type][$field][$property] = unserialize($value);
+            if ($property == 'db_columns' || \str_ends_with($property, '_settings')) {
+              $this->fieldInfo[$type][$field][$property] = \unserialize($value);
             }
           }
         }
@@ -298,7 +298,7 @@ class Node extends DrupalSqlBase {
     }
 
     if (isset($query)) {
-      $columns = array_keys($field['db_columns']);
+      $columns = \array_keys($field['db_columns']);
       // If there are no columns then there are no values to return.
       if (empty($columns)) {
         return [];

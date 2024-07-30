@@ -47,9 +47,9 @@ class CommentLockTest extends UnitTestCase {
     $container->set('cache_tags.invalidator', $cache_tag_invalidator);
 
     \Drupal::setContainer($container);
-    $methods = get_class_methods('Drupal\comment\Entity\Comment');
-    unset($methods[array_search('preSave', $methods)]);
-    unset($methods[array_search('postSave', $methods)]);
+    $methods = \get_class_methods('Drupal\comment\Entity\Comment');
+    unset($methods[\array_search('preSave', $methods)]);
+    unset($methods[\array_search('postSave', $methods)]);
     $methods[] = 'invalidateTagsOnSave';
     $comment = $this->getMockBuilder('Drupal\comment\Entity\Comment')
       ->disableOriginalConstructor()

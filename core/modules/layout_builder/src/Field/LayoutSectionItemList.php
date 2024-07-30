@@ -45,7 +45,7 @@ class LayoutSectionItemList extends FieldItemList implements SectionListInterfac
    */
   protected function setSections(array $sections) {
     $this->list = [];
-    $sections = array_values($sections);
+    $sections = \array_values($sections);
     /** @var \Drupal\layout_builder\Plugin\Field\FieldType\LayoutSectionItem $item */
     foreach ($sections as $section) {
       $item = $this->appendItem();
@@ -88,7 +88,7 @@ class LayoutSectionItemList extends FieldItemList implements SectionListInterfac
 
     // Convert arrays of section objects to array values for comparison.
     $convert = function (LayoutSectionItemList $list) {
-      return array_map(function (Section $section) {
+      return \array_map(function (Section $section) {
         return $section->toArray();
       }, $list->getSections());
     };

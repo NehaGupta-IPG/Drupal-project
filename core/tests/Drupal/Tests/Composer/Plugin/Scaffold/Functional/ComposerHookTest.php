@@ -96,20 +96,20 @@ class ComposerHookTest extends BuildTestBase {
     $this->assertStringContainsString('Package fixtures/scaffold-override-fixture has scaffold operations, and is already allowed in the root-level composer.json file.', $stdout);
     // Delete one scaffold file, just for test purposes, then run
     // 'composer update' and see if the scaffold file is replaced.
-    @unlink($sut . '/sites/default/default.settings.php');
+    @\unlink($sut . '/sites/default/default.settings.php');
     $this->assertFileDoesNotExist($sut . '/sites/default/default.settings.php');
     $this->mustExec("composer update --no-ansi", $sut);
     $this->assertScaffoldedFile($sut . '/sites/default/default.settings.php', FALSE, 'scaffolded from the scaffold-override-fixture');
     // Delete the same test scaffold file again, then run
     // 'composer drupal:scaffold' and see if the scaffold file is
     // re-scaffolded.
-    @unlink($sut . '/sites/default/default.settings.php');
+    @\unlink($sut . '/sites/default/default.settings.php');
     $this->assertFileDoesNotExist($sut . '/sites/default/default.settings.php');
     $this->mustExec("composer install --no-ansi", $sut);
     $this->assertScaffoldedFile($sut . '/sites/default/default.settings.php', FALSE, 'scaffolded from the scaffold-override-fixture');
     // Delete the same test scaffold file yet again, then run
     // 'composer install' and see if the scaffold file is re-scaffolded.
-    @unlink($sut . '/sites/default/default.settings.php');
+    @\unlink($sut . '/sites/default/default.settings.php');
     $this->assertFileDoesNotExist($sut . '/sites/default/default.settings.php');
     $this->mustExec("composer drupal:scaffold --no-ansi", $sut);
     $this->assertScaffoldedFile($sut . '/sites/default/default.settings.php', FALSE, 'scaffolded from the scaffold-override-fixture');
@@ -143,7 +143,7 @@ class ComposerHookTest extends BuildTestBase {
     $this->assertEquals('', $stdout);
 
     // Delete a file and run it again. It should re-scaffold the removed file.
-    unlink("$sut/index.php");
+    \unlink("$sut/index.php");
     $stdout = $this->mustExec("composer scaffold --no-ansi", $sut);
     $this->assertStringContainsString('- Copy [web-root]/index.php from assets/index.php', $stdout);
     $this->assertStringNotContainsString('- Copy [web-root]/update.php from assets/update.php', $stdout);

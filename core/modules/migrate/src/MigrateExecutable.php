@@ -202,7 +202,7 @@ class MigrateExecutable implements MigrateExecutableInterface {
         }
         catch (MigrateException $e) {
           $this->getIdMap()->saveIdMapping($row, [], $e->getStatus());
-          $msg = sprintf("%s:%s:%s", $this->migration->getPluginId(), $destination_property_name, $e->getMessage());
+          $msg = \sprintf("%s:%s:%s", $this->migration->getPluginId(), $destination_property_name, $e->getMessage());
           $this->saveMessage($msg, $e->getLevel());
           $save = FALSE;
         }
@@ -210,8 +210,8 @@ class MigrateExecutable implements MigrateExecutableInterface {
           if ($e->getSaveToMap()) {
             $id_map->saveIdMapping($row, [], MigrateIdMapInterface::STATUS_IGNORED);
           }
-          if ($message = trim($e->getMessage())) {
-            $msg = sprintf("%s:%s: %s", $this->migration->getPluginId(), $destination_property_name, $message);
+          if ($message = \trim($e->getMessage())) {
+            $msg = \sprintf("%s:%s: %s", $this->migration->getPluginId(), $destination_property_name, $message);
             $this->saveMessage($msg, MigrationInterface::MESSAGE_INFORMATIONAL);
           }
           $save = FALSE;
@@ -222,7 +222,7 @@ class MigrateExecutable implements MigrateExecutableInterface {
             $this->getEventDispatcher()
               ->dispatch(new MigratePreRowSaveEvent($this->migration, $this->message, $row), MigrateEvents::PRE_ROW_SAVE);
             $destination_ids = $id_map->lookupDestinationIds($this->sourceIdValues);
-            $destination_id_values = $destination_ids ? reset($destination_ids) : [];
+            $destination_id_values = $destination_ids ? \reset($destination_ids) : [];
             $destination_id_values = $destination->import($row, $destination_id_values);
             $this->getEventDispatcher()
               ->dispatch(new MigratePostRowSaveEvent($this->migration, $this->message, $row, $destination_id_values), MigrateEvents::POST_ROW_SAVE);
@@ -389,8 +389,8 @@ class MigrateExecutable implements MigrateExecutableInterface {
       // separately transformed.
       if ($multiple && !$definition['handle_multiples']) {
         $new_value = [];
-        if (!is_array($value)) {
-          throw new MigrateException(sprintf('Pipeline failed at %s plugin for destination %s: %s received instead of an array,', $plugin->getPluginId(), $destination, $value));
+        if (!\is_array($value)) {
+          throw new MigrateException(\sprintf('Pipeline failed at %s plugin for destination %s: %s received instead of an array,', $plugin->getPluginId(), $destination, $value));
         }
         $break = FALSE;
         foreach ($value as $scalar_value) {
@@ -404,7 +404,7 @@ class MigrateExecutable implements MigrateExecutableInterface {
           }
           catch (MigrateException $e) {
             // Prepend the process plugin id to the message.
-            $message = sprintf("%s: %s", $plugin->getPluginId(), $e->getMessage());
+            $message = \sprintf("%s: %s", $plugin->getPluginId(), $e->getMessage());
             throw new MigrateException($message);
           }
           if ($plugin->isPipelineStopped()) {
@@ -427,7 +427,7 @@ class MigrateExecutable implements MigrateExecutableInterface {
         }
         catch (MigrateException $e) {
           // Prepend the process plugin id to the message.
-          $message = sprintf("%s: %s", $plugin->getPluginId(), $e->getMessage());
+          $message = \sprintf("%s: %s", $plugin->getPluginId(), $e->getMessage());
           throw new MigrateException($message);
         }
         if ($plugin->isPipelineStopped()) {

@@ -48,13 +48,13 @@ class BackendCompilerPassTest extends UnitTestCase {
     $service = (new Definition($prefix . 'Default'))->addTag('backend_overridable');
     $container = $this->getMysqlContainer($service);
     $this->backendPass->process($container);
-    $this->assertEquals($prefix . 'Default', get_class($container->get('service')));
+    $this->assertEquals($prefix . 'Default', \get_class($container->get('service')));
 
     // Set the default_backend so the mysql service should be used.
     $container = $this->getMysqlContainer($service);
     $container->setParameter('default_backend', 'mysql');
     $this->backendPass->process($container);
-    $this->assertEquals($prefix . 'Mysql', get_class($container->get('service')));
+    $this->assertEquals($prefix . 'Mysql', \get_class($container->get('service')));
 
     // Configure a manual alias for the service, so ensure that it is not
     // overridden by the default backend.
@@ -63,18 +63,18 @@ class BackendCompilerPassTest extends UnitTestCase {
     $container->setDefinition('mariadb.service', new Definition($prefix . 'MariaDb'));
     $container->setAlias('service', new Alias('mariadb.service'));
     $this->backendPass->process($container);
-    $this->assertEquals($prefix . 'MariaDb', get_class($container->get('service')));
+    $this->assertEquals($prefix . 'MariaDb', \get_class($container->get('service')));
 
     // Check the database driver is the default.
     $container = $this->getSqliteContainer($service);
     $this->backendPass->process($container);
-    $this->assertEquals($prefix . 'Sqlite', get_class($container->get('service')));
+    $this->assertEquals($prefix . 'Sqlite', \get_class($container->get('service')));
 
     // Test the opt out.
     $container = $this->getSqliteContainer($service);
     $container->setParameter('default_backend', '');
     $this->backendPass->process($container);
-    $this->assertEquals($prefix . 'Default', get_class($container->get('service')));
+    $this->assertEquals($prefix . 'Default', \get_class($container->get('service')));
 
     // Set the mysql and the DriverTestMysql service, now the DriverTestMysql
     // service, as it is the driver override, should be used.
@@ -89,7 +89,7 @@ class BackendCompilerPassTest extends UnitTestCase {
     $container = $this->getDriverTestMysqlContainer($service);
     $container->setDefinition('mysql.service', new Definition(__NAMESPACE__ . '\\ServiceClassMysql'));
     $this->backendPass->process($container);
-    $this->assertEquals($prefix . 'Mysql', get_class($container->get('service')));
+    $this->assertEquals($prefix . 'Mysql', \get_class($container->get('service')));
 
     // Set the DriverTestMysql service, now the DriverTestMysql service, as it
     // is the driver override, should be used.

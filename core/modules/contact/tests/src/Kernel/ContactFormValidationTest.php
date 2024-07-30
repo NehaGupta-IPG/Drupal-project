@@ -41,7 +41,7 @@ class ContactFormValidationTest extends ConfigEntityValidationTestBase {
    * Tests validation of message.
    */
   public function testMessageValidation(): void {
-    assert($this->entity instanceof ContactFormInterface);
+    \assert($this->entity instanceof ContactFormInterface);
     // Messages should be able to span multiple lines.
     $this->entity->setMessage("Multi\nLine");
     $this->assertValidationErrors([]);

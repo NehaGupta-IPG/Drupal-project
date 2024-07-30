@@ -240,8 +240,8 @@ class MediaSourceTest extends MediaKernelTestBase {
    * Tests the thumbnail functionality.
    */
   public function testThumbnail(): void {
-    file_put_contents('public://thumbnail1.jpg', '');
-    file_put_contents('public://thumbnail2.jpg', '');
+    \file_put_contents('public://thumbnail1.jpg', '');
+    \file_put_contents('public://thumbnail2.jpg', '');
 
     // Save a media item and make sure thumbnail was added.
     \Drupal::state()->set('media_source_test_attributes', [

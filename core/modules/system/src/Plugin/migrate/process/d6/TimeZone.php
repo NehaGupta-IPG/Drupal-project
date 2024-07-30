@@ -21,7 +21,7 @@ class TimeZone extends ProcessPluginBase {
     // Convert the integer value of the offset (which can be either
     // negative or positive) to a timezone name.
     // Note: Daylight saving time is not to be used.
-    $timezone_name = timezone_name_from_abbr('', intval($offset), 0);
+    $timezone_name = \timezone_name_from_abbr('', \intval($offset), 0);
     if (!$timezone_name) {
       $timezone_name = 'UTC';
     }

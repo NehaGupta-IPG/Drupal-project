@@ -34,7 +34,7 @@ final class ReverseContainer {
    */
   public function __construct(private readonly Container|SymfonyContainer $serviceContainer) {
     $this->getServiceId = \Closure::bind(function ($service): ?string {
-      return array_search($service, $this->services, TRUE) ?: NULL;
+      return \array_search($service, $this->services, TRUE) ?: NULL;
     }, $serviceContainer, $serviceContainer);
   }
 
@@ -72,7 +72,7 @@ final class ReverseContainer {
     $service_recorder = \Closure::bind(function () : array {
       return $this->services;
     }, $this->serviceContainer, $this->serviceContainer);
-    self::$recordedServices = array_merge(self::$recordedServices, array_flip(array_map([$this, 'generateServiceIdHash'], $service_recorder())));
+    self::$recordedServices = \array_merge(self::$recordedServices, \array_flip(\array_map([$this, 'generateServiceIdHash'], $service_recorder())));
   }
 
   /**
@@ -90,7 +90,7 @@ final class ReverseContainer {
     // guarantee to be unique but makes collisions incredibly difficult and even
     // then the interface would be preserved.
     // @see https://php.net/spl_object_hash#refsect1-function.spl-object-hash-notes
-    return get_class($object) . spl_object_hash($object);
+    return \get_class($object) . \spl_object_hash($object);
   }
 
 }

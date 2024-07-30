@@ -23,12 +23,12 @@ class TestHttpClientMiddleware {
     // database prefix were stored statically in a file or database variable.
     return function ($handler) {
       return function (RequestInterface $request, array $options) use ($handler) {
-        if ($user_agent = drupal_generate_test_ua(drupal_valid_test_ua())) {
+        if ($user_agent = \drupal_generate_test_ua(\drupal_valid_test_ua())) {
           $request = $request->withHeader('User-Agent', $user_agent);
         }
         return $handler($request, $options)
           ->then(function (ResponseInterface $response) {
-            if (!drupal_valid_test_ua()) {
+            if (!\drupal_valid_test_ua()) {
               return $response;
             }
             if (!empty($response->getHeader('X-Drupal-Wait-Terminate')[0])) {
@@ -40,16 +40,16 @@ class TestHttpClientMiddleware {
             }
             $headers = $response->getHeaders();
             foreach ($headers as $header_name => $header_values) {
-              if (preg_match('/^X-Drupal-Assertion-[0-9]+$/', $header_name, $matches)) {
+              if (\preg_match('/^X-Drupal-Assertion-[0-9]+$/', $header_name, $matches)) {
                 foreach ($header_values as $header_value) {
-                  $parameters = unserialize(urldecode($header_value));
-                  if (count($parameters) === 3) {
+                  $parameters = \unserialize(\urldecode($header_value));
+                  if (\count($parameters) === 3) {
                     if ($parameters[1] === 'User deprecated function') {
                       // Fire the same deprecation message to allow it to be
                       // collected by
                       // \Drupal\TestTools\Extension\DeprecationBridge\DeprecationHandler::collectActualDeprecation().
                       // phpcs:ignore Drupal.Semantics.FunctionTriggerError
-                      @trigger_error((string) $parameters[0], E_USER_DEPRECATED);
+                      @\trigger_error((string) $parameters[0], E_USER_DEPRECATED);
                     }
                     else {
                       throw new \Exception($parameters[1] . ': ' . $parameters[0] . "\n" . Error::formatBacktrace([$parameters[2]]));

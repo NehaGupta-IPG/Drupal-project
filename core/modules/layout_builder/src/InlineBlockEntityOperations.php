@@ -117,12 +117,12 @@ class InlineBlockEntityOperations implements ContainerInjectionInterface {
     // also in the current sections.
     $current_block_content_revision_ids = $this->getInlineBlockRevisionIdsInSections($current_sections);
     $original_block_content_revision_ids = $this->getInlineBlockRevisionIdsInSections($original_sections);
-    if ($unused_original_revision_ids = array_diff($original_block_content_revision_ids, $current_block_content_revision_ids)) {
+    if ($unused_original_revision_ids = \array_diff($original_block_content_revision_ids, $current_block_content_revision_ids)) {
       // If there are any revisions in the original that aren't in the current
       // there may some blocks that need to be removed.
       $current_block_content_ids = $this->getBlockIdsForRevisionIds($current_block_content_revision_ids);
       $unused_original_block_content_ids = $this->getBlockIdsForRevisionIds($unused_original_revision_ids);
-      return array_diff($unused_original_block_content_ids, $current_block_content_ids);
+      return \array_diff($unused_original_block_content_ids, $current_block_content_ids);
     }
     return [];
   }

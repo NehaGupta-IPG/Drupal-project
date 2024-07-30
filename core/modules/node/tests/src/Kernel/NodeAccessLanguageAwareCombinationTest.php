@@ -86,7 +86,7 @@ class NodeAccessLanguageAwareCombinationTest extends NodeAccessTestBase {
     ])->save();
 
     // After enabling a node access module, the access table has to be rebuild.
-    node_access_rebuild();
+    \node_access_rebuild();
 
     // Add Hungarian and Catalan.
     ConfigurableLanguage::createFromLangcode('hu')->save();

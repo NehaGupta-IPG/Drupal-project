@@ -60,9 +60,9 @@ class SortingTest extends WizardTestBase {
     $this->assertSession()->pageTextContains($node1->label());
     $this->assertSession()->pageTextContains($node2->label());
     $this->assertSession()->pageTextContains($node3->label());
-    $pos1 = strpos($content, $node1->label());
-    $pos2 = strpos($content, $node2->label());
-    $pos3 = strpos($content, $node3->label());
+    $pos1 = \strpos($content, $node1->label());
+    $pos2 = \strpos($content, $node2->label());
+    $pos3 = \strpos($content, $node3->label());
     $this->assertGreaterThan($pos1, $pos2);
     $this->assertGreaterThan($pos2, $pos3);
 
@@ -87,9 +87,9 @@ class SortingTest extends WizardTestBase {
     $this->assertSession()->pageTextContains($node3->label());
     $this->assertSession()->pageTextContains($node2->label());
     $this->assertSession()->pageTextContains($node1->label());
-    $pos3 = strpos($content, $node3->label());
-    $pos2 = strpos($content, $node2->label());
-    $pos1 = strpos($content, $node1->label());
+    $pos3 = \strpos($content, $node3->label());
+    $pos2 = \strpos($content, $node2->label());
+    $pos1 = \strpos($content, $node1->label());
     $this->assertGreaterThan($pos3, $pos2);
     $this->assertGreaterThan($pos2, $pos1);
   }

@@ -106,7 +106,7 @@ class FieldOrLanguageJoinTest extends RelationshipJoinTestBase {
     $this->assertStringContainsString('views_test_data.uid = users3.uid', $join_info['condition']);
     $this->assertStringContainsString('users3.name = :views_join_condition_0', $join_info['condition']);
     $this->assertStringContainsString('users3.name <> :views_join_condition_1', $join_info['condition']);
-    $this->assertSame(array_values($join_info['arguments']), [$random_name_1, $random_name_2]);
+    $this->assertSame(\array_values($join_info['arguments']), [$random_name_1, $random_name_2]);
 
     // Test that 'IN' conditions are properly built.
     $random_name_1 = $this->randomMachineName();
@@ -159,7 +159,7 @@ class FieldOrLanguageJoinTest extends RelationshipJoinTestBase {
     $join_info = $this->buildJoin($view, $configuration, 'node__field_tags');
     $this->assertStringContainsString('AND (node__field_tags.langcode = views_test_data.langcode)', $join_info['condition']);
 
-    array_unshift($configuration['extra'], [
+    \array_unshift($configuration['extra'], [
       'field' => 'deleted',
       'value' => 0,
       'numeric' => TRUE,

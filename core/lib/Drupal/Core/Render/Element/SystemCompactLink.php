@@ -60,19 +60,19 @@ class SystemCompactLink extends Link {
     // By default, link options to pass to l() are normally set in #options.
     $element += ['#options' => []];
 
-    if (system_admin_compact_mode()) {
-      $element['#title'] = t('Show descriptions');
+    if (\system_admin_compact_mode()) {
+      $element['#title'] = \t('Show descriptions');
       $element['#url'] = BaseUrl::fromRoute('system.admin_compact_page', ['mode' => 'off']);
       $element['#options'] = [
-        'attributes' => ['title' => t('Expand layout to include descriptions.')],
+        'attributes' => ['title' => \t('Expand layout to include descriptions.')],
         'query' => \Drupal::destination()->getAsArray(),
       ];
     }
     else {
-      $element['#title'] = t('Hide descriptions');
+      $element['#title'] = \t('Hide descriptions');
       $element['#url'] = BaseUrl::fromRoute('system.admin_compact_page', ['mode' => 'on']);
       $element['#options'] = [
-        'attributes' => ['title' => t('Compress layout by hiding descriptions.')],
+        'attributes' => ['title' => \t('Compress layout by hiding descriptions.')],
         'query' => \Drupal::destination()->getAsArray(),
       ];
     }

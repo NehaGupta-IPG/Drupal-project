@@ -90,22 +90,22 @@ class FileCopyTest extends FileTestBase {
   #[DataProvider('providerSuccessfulReuse')]
   public function testSuccessfulReuse($source_path, $destination_path): void {
     $file_reuse = $this->doTransform($source_path, $destination_path);
-    clearstatcache(TRUE, $destination_path);
+    \clearstatcache(TRUE, $destination_path);
 
     $timestamp = (new \SplFileInfo($file_reuse))->getMTime();
     $this->assertIsInt($timestamp);
 
     // We need to make sure the modified timestamp on the file is sooner than
     // the attempted migration.
-    sleep(1);
+    \sleep(1);
     $configuration = ['file_exists' => 'use existing'];
     $this->doTransform($source_path, $destination_path, $configuration);
-    clearstatcache(TRUE, $destination_path);
+    \clearstatcache(TRUE, $destination_path);
     $modified_timestamp = (new \SplFileInfo($destination_path))->getMTime();
     $this->assertEquals($timestamp, $modified_timestamp);
 
     $this->doTransform($source_path, $destination_path);
-    clearstatcache(TRUE, $destination_path);
+    \clearstatcache(TRUE, $destination_path);
     $modified_timestamp = (new \SplFileInfo($destination_path))->getMTime();
     $this->assertGreaterThan($timestamp, $modified_timestamp);
   }

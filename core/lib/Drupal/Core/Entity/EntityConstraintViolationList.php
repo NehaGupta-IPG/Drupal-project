@@ -64,7 +64,7 @@ class EntityConstraintViolationList extends ConstraintViolationList implements E
       foreach ($this as $offset => $violation) {
         if ($path = $violation->getPropertyPath()) {
           // An example of $path might be 'title.0.value'.
-          [$field_name] = explode('.', $path, 2);
+          [$field_name] = \explode('.', $path, 2);
           if ($this->entity->hasField($field_name)) {
             $this->violationOffsetsByField[$field_name][$offset] = $offset;
           }
@@ -106,7 +106,7 @@ class EntityConstraintViolationList extends ConstraintViolationList implements E
   public function getByFields(array $field_names) {
     $this->groupViolationOffsets();
     $violations = [];
-    foreach (array_intersect_key($this->violationOffsetsByField, array_flip($field_names)) as $offsets) {
+    foreach (\array_intersect_key($this->violationOffsetsByField, \array_flip($field_names)) as $offsets) {
       foreach ($offsets as $offset) {
         $violations[] = $this->get($offset);
       }
@@ -120,7 +120,7 @@ class EntityConstraintViolationList extends ConstraintViolationList implements E
   public function filterByFields(array $field_names) {
     $this->groupViolationOffsets();
     $new_violations = [];
-    foreach (array_intersect_key($this->violationOffsetsByField, array_flip($field_names)) as $field_name => $offsets) {
+    foreach (\array_intersect_key($this->violationOffsetsByField, \array_flip($field_names)) as $field_name => $offsets) {
       foreach ($offsets as $offset) {
         $violation = $this->get($offset);
         // Take care of composite field violations and re-map them to some
@@ -130,14 +130,14 @@ class EntityConstraintViolationList extends ConstraintViolationList implements E
 
           // Keep the composite field if it covers some remaining field and put
           // a violation on some other covered field instead.
-          if ($remaining_fields = array_diff($covered_fields, $field_names)) {
+          if ($remaining_fields = \array_diff($covered_fields, $field_names)) {
             $message_params = ['%field_name' => $field_name];
             $violation = new ConstraintViolation(
               $this->t('The validation failed because the value conflicts with the value in %field_name, which you cannot access.', $message_params),
               'The validation failed because the value conflicts with the value in %field_name, which you cannot access.',
               $message_params,
               $violation->getRoot(),
-              reset($remaining_fields),
+              \reset($remaining_fields),
               $violation->getInvalidValue(),
               $violation->getPlural(),
               $violation->getCode(),
@@ -176,7 +176,7 @@ class EntityConstraintViolationList extends ConstraintViolationList implements E
   public function findByCodes(string|array $codes): static {
     $violations = [];
     foreach ($this as $violation) {
-      if (in_array($violation->getCode(), $codes, TRUE)) {
+      if (\in_array($violation->getCode(), $codes, TRUE)) {
         $violations[] = $violation;
       }
     }
@@ -189,7 +189,7 @@ class EntityConstraintViolationList extends ConstraintViolationList implements E
    */
   public function getFieldNames() {
     $this->groupViolationOffsets();
-    return array_keys($this->violationOffsetsByField);
+    return \array_keys($this->violationOffsetsByField);
   }
 
   /**

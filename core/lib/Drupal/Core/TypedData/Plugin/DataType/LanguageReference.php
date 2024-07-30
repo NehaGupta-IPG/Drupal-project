@@ -48,12 +48,12 @@ class LanguageReference extends DataReferenceBase {
   public static function getAllValidLangcodes(): array {
     $language_manager = \Drupal::languageManager();
 
-    return array_unique([
-      ...array_keys($language_manager::getStandardLanguageList()),
+    return \array_unique([
+      ...\array_keys($language_manager::getStandardLanguageList()),
       // We can't use LanguageInterface::STATE_ALL because it will exclude the
       // site default language in certain situations.
       // @see \Drupal\Core\Language\LanguageManager::filterLanguages()
-      ...array_keys($language_manager->getLanguages(LanguageInterface::STATE_LOCKED | LanguageInterface::STATE_CONFIGURABLE | LanguageInterface::STATE_SITE_DEFAULT)),
+      ...\array_keys($language_manager->getLanguages(LanguageInterface::STATE_LOCKED | LanguageInterface::STATE_CONFIGURABLE | LanguageInterface::STATE_SITE_DEFAULT)),
       // Include special language codes used internally.
       LanguageInterface::LANGCODE_NOT_APPLICABLE,
       LanguageInterface::LANGCODE_SITE_DEFAULT,

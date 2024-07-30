@@ -133,10 +133,10 @@ class ContextualLinkManagerTest extends UnitTestCase {
     $this->assertEmpty($result);
 
     $result = $this->contextualLinkManager->getContextualLinkPluginsByGroup('group1');
-    $this->assertEquals(['test_plugin1', 'test_plugin2'], array_keys($result));
+    $this->assertEquals(['test_plugin1', 'test_plugin2'], \array_keys($result));
 
     $result = $this->contextualLinkManager->getContextualLinkPluginsByGroup('group2');
-    $this->assertEquals(['test_plugin3'], array_keys($result));
+    $this->assertEquals(['test_plugin3'], \array_keys($result));
   }
 
   /**

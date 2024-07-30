@@ -31,7 +31,7 @@ class LanguagesCacheContext implements CalculatedCacheContextInterface {
    * {@inheritdoc}
    */
   public static function getLabel() {
-    return t('Language');
+    return \t('Language');
   }
 
   /**
@@ -59,12 +59,12 @@ class LanguagesCacheContext implements CalculatedCacheContextInterface {
       else {
         $context_parts[] = $this->languageManager->getCurrentLanguage()->getId();
       }
-      return implode(',', $context_parts);
+      return \implode(',', $context_parts);
     }
     else {
       $language_types = $this->languageManager->getDefinedLanguageTypesInfo();
       if (!isset($language_types[$type])) {
-        throw new \RuntimeException(sprintf('The language type "%s" is invalid.', $type));
+        throw new \RuntimeException(\sprintf('The language type "%s" is invalid.', $type));
       }
       return $this->languageManager->getCurrentLanguage($type)->getId();
     }

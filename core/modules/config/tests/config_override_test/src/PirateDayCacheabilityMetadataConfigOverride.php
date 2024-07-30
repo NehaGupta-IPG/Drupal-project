@@ -22,10 +22,10 @@ class PirateDayCacheabilityMetadataConfigOverride implements ConfigFactoryOverri
 
     // Override the theme and the 'call_to_action' block on Pirate Day.
     if (PirateDayCacheContext::isPirateDay()) {
-      if (in_array('system.theme', $names)) {
+      if (\in_array('system.theme', $names)) {
         $overrides = $overrides + ['system.theme' => ['default' => 'pirate']];
       }
-      if (in_array('block.block.call_to_action', $names)) {
+      if (\in_array('block.block.call_to_action', $names)) {
         $overrides = $overrides + [
           'block.block.call_to_action' => [
             'settings' => ['label' => 'Draw yer cutlasses!'],

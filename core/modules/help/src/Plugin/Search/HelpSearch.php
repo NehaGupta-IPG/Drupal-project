@@ -211,7 +211,7 @@ class HelpSearch extends SearchPluginBase implements AccessibleInterface, Search
       ->condition('permission', '', '<>')
       ->execute()
       ->fetchCol();
-    $denied_permissions = array_filter($permissions, function ($permission) {
+    $denied_permissions = \array_filter($permissions, function ($permission) {
       return !$this->account->hasPermission($permission);
     });
 
@@ -294,7 +294,7 @@ class HelpSearch extends SearchPluginBase implements AccessibleInterface, Search
           $results[] = [
             'title' => $topic['title'],
             'link' => $topic['url']->toString(),
-            'snippet' => search_excerpt($keys, $topic['title'] . ' ' . $topic['text'], $item->langcode),
+            'snippet' => \search_excerpt($keys, $topic['title'] . ' ' . $topic['text'], $item->langcode),
             'langcode' => $item->langcode,
           ];
         }
@@ -327,7 +327,7 @@ class HelpSearch extends SearchPluginBase implements AccessibleInterface, Search
 
     // If there is still space in the indexing limit, index items that have
     // been indexed before, but are currently marked as needing a re-index.
-    if (count($items) < $limit) {
+    if (\count($items) < $limit) {
       $query = $this->database->select('help_search_items', 'hsi');
       $query->fields('hsi', ['sid', 'section_plugin_id', 'topic_id']);
       $query->leftJoin('search_dataset', 'sd', '[sd].[sid] = [hsi].[sid] AND [sd].[type] = :type', [':type' => $this->getType()]);
@@ -335,7 +335,7 @@ class HelpSearch extends SearchPluginBase implements AccessibleInterface, Search
       $query->groupBy('hsi.sid')
         ->groupBy('hsi.section_plugin_id')
         ->groupBy('hsi.topic_id')
-        ->range(0, $limit - count($items));
+        ->range(0, $limit - \count($items));
       $items = $items + $query->execute()->fetchAll();
     }
 
@@ -495,7 +495,7 @@ class HelpSearch extends SearchPluginBase implements AccessibleInterface, Search
 
     // Remove items from our table in batches of 100, to avoid problems
     // with having too many placeholders in database queries.
-    foreach (array_chunk($sids, 100) as $this_list) {
+    foreach (\array_chunk($sids, 100) as $this_list) {
       $this->database->delete('help_search_items')
         ->condition('sid', $this_list, 'IN')
         ->execute();

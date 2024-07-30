@@ -114,7 +114,7 @@ class PerformanceForm extends ConfigFormBase {
     // Identical options to the ones for block caching.
     // @see \Drupal\Core\Block\BlockBase::buildConfigurationForm()
     $period = [0, 60, 180, 300, 600, 900, 1800, 2700, 3600, 10800, 21600, 32400, 43200, 86400];
-    $period = array_map([$this->dateFormatter, 'formatInterval'], array_combine($period, $period));
+    $period = \array_map([$this->dateFormatter, 'formatInterval'], \array_combine($period, $period));
     $period[0] = '<' . $this->t('no caching') . '>';
     $form['caching']['page_cache_maximum_age'] = [
       '#type' => 'select',
@@ -129,7 +129,7 @@ class PerformanceForm extends ConfigFormBase {
     ];
 
     $directory = 'assets://';
-    $is_writable = is_dir($directory) && is_writable($directory);
+    $is_writable = \is_dir($directory) && \is_writable($directory);
     $disabled = !$is_writable;
     $disabled_message = '';
     if (!$is_writable) {

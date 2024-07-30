@@ -56,7 +56,7 @@ class MachineNameTest extends MigrateProcessTestCase {
       ->method('transliterate')
       ->with($human_name)
       ->willReturnCallback(function (string $string): string {
-        return str_replace(['á', 'é', 'ő'], ['a', 'e', 'o'], $string);
+        return \str_replace(['á', 'é', 'ő'], ['a', 'e', 'o'], $string);
       });
 
     $plugin = new MachineName($configuration, 'machine_name', [], $this->transliteration);

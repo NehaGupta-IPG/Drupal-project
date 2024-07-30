@@ -258,7 +258,7 @@ class EntityAdapterUnitTest extends UnitTestCase {
    * @legacy-covers ::getRoot
    */
   public function testGetRoot(): void {
-    $this->assertSame(spl_object_hash($this->entityAdapter), spl_object_hash($this->entityAdapter->getRoot()));
+    $this->assertSame(\spl_object_hash($this->entityAdapter), \spl_object_hash($this->entityAdapter->getRoot()));
   }
 
   /**
@@ -487,7 +487,7 @@ class EntityAdapterUnitTest extends UnitTestCase {
   public function testGetIterator(): void {
     // Content entity test.
     $iterator = $this->entityAdapter->getIterator();
-    $fields = iterator_to_array($iterator);
+    $fields = \iterator_to_array($iterator);
     $this->assertArrayHasKey('id', $fields);
     $this->assertArrayHasKey('revision_id', $fields);
     $this->assertCount(2, $fields);

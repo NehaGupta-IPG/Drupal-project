@@ -109,8 +109,8 @@ class MimeTypeGuesser implements MimeTypeGuesserInterface {
    *   A sorted array of MIME type guesser objects.
    */
   protected function sortGuessers() {
-    krsort($this->guessers);
-    return array_merge(...$this->guessers);
+    \krsort($this->guessers);
+    return \array_merge(...$this->guessers);
   }
 
   /**

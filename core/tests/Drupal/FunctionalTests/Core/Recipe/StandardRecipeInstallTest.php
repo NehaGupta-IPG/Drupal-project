@@ -114,7 +114,7 @@ class StandardRecipeInstallTest extends InstallerTestBase {
     $yaml = new SymfonyYaml();
     $services = [];
     $services['parameters']['security.enable_super_user'] = FALSE;
-    file_put_contents($services_file, $yaml->dump($services));
+    \file_put_contents($services_file, $yaml->dump($services));
     parent::setUpSite();
   }
 

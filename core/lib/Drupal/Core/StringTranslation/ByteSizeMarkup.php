@@ -27,7 +27,7 @@ final class ByteSizeMarkup {
    */
   public static function create(float|int $size, ?string $langcode = NULL, ?TranslationInterface $stringTranslation = NULL): TranslatableMarkup {
     $options = ['langcode' => $langcode];
-    $absolute_size = abs($size);
+    $absolute_size = \abs($size);
     if ($absolute_size < Bytes::KILOBYTE) {
       return new PluralTranslatableMarkup($size, '1 byte', '@count bytes', [], $options, $stringTranslation);
     }
@@ -35,7 +35,7 @@ final class ByteSizeMarkup {
     $sign = $absolute_size / $size;
     foreach (['KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'] as $unit) {
       $absolute_size /= Bytes::KILOBYTE;
-      $rounded_size = round($absolute_size, 2);
+      $rounded_size = \round($absolute_size, 2);
       if ($rounded_size < Bytes::KILOBYTE) {
         break;
       }

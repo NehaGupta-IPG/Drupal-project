@@ -94,7 +94,7 @@ class ViewStorageTest extends ViewsKernelTestBase {
 
     // Check the displays have been loaded correctly from config display data.
     $expected_displays = ['default', 'block_1', 'page_1'];
-    $this->assertEquals($expected_displays, array_keys($view->get('display')), 'The correct display names are present.');
+    $this->assertEquals($expected_displays, \array_keys($view->get('display')), 'The correct display names are present.');
 
     // Check each ViewDisplay object and confirm that it has the correct key and
     // property values.
@@ -124,7 +124,7 @@ class ViewStorageTest extends ViewsKernelTestBase {
     $this->assertInstanceOf(View::class, $created);
     // Check that the View contains all of the properties.
     foreach ($this->configProperties as $property) {
-      $this->assertTrue(property_exists($created, $property), "Property: $property created on View.");
+      $this->assertTrue(\property_exists($created, $property), "Property: $property created on View.");
     }
 
     // Create a new View instance with config values.
@@ -137,7 +137,7 @@ class ViewStorageTest extends ViewsKernelTestBase {
     // Check that the View contains all of the properties.
     $properties = $this->configProperties;
     // Remove display from list.
-    array_pop($properties);
+    \array_pop($properties);
 
     // Test all properties except displays.
     foreach ($properties as $property) {

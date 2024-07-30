@@ -44,12 +44,12 @@ class SourceEditingRedundantTagsConstraintValidator extends ConstraintValidator 
     $enableable_disabled_plugins = $this->getEnableableDisabledPlugins($text_editor);
 
     // An array of tags enabled by every plugin other than Source Editing.
-    $enabled_plugin_elements = new HTMLRestrictions($this->pluginManager->getProvidedElements(array_keys($other_enabled_plugins), $text_editor, FALSE));
-    $enabled_plugin_elements_optional = (new HTMLRestrictions($this->pluginManager->getProvidedElements(array_keys($other_enabled_plugins))))
+    $enabled_plugin_elements = new HTMLRestrictions($this->pluginManager->getProvidedElements(\array_keys($other_enabled_plugins), $text_editor, FALSE));
+    $enabled_plugin_elements_optional = (new HTMLRestrictions($this->pluginManager->getProvidedElements(\array_keys($other_enabled_plugins))))
       ->diff($enabled_plugin_elements);
-    $disabled_plugin_elements = new HTMLRestrictions($this->pluginManager->getProvidedElements(array_keys($enableable_disabled_plugins), $text_editor, FALSE));
-    $enabled_plugin_plain_tags = new HTMLRestrictions($this->pluginManager->getProvidedElements(array_keys($other_enabled_plugins), $text_editor, FALSE, TRUE));
-    $disabled_plugin_plain_tags = new HTMLRestrictions($this->pluginManager->getProvidedElements(array_keys($enableable_disabled_plugins), $text_editor, FALSE, TRUE));
+    $disabled_plugin_elements = new HTMLRestrictions($this->pluginManager->getProvidedElements(\array_keys($enableable_disabled_plugins), $text_editor, FALSE));
+    $enabled_plugin_plain_tags = new HTMLRestrictions($this->pluginManager->getProvidedElements(\array_keys($other_enabled_plugins), $text_editor, FALSE, TRUE));
+    $disabled_plugin_plain_tags = new HTMLRestrictions($this->pluginManager->getProvidedElements(\array_keys($enableable_disabled_plugins), $text_editor, FALSE, TRUE));
 
     // The single element for which source editing is enabled, which we are
     // checking now.
@@ -62,7 +62,7 @@ class SourceEditingRedundantTagsConstraintValidator extends ConstraintValidator 
     //   necessary because CKEditor5ElementConstraintValidator does not run
     //   before this, which means that this validator cannot assume it receives
     //   valid values.
-    if (count($source_enabled_element->getAllowedElements()) !== 1) {
+    if (\count($source_enabled_element->getAllowedElements()) !== 1) {
       return;
     }
 
@@ -89,8 +89,8 @@ class SourceEditingRedundantTagsConstraintValidator extends ConstraintValidator 
         };
 
         // Determine which element type is relevant for the violation message.
-        assert(count($overlap->getAllowedElements(FALSE)) === 1);
-        $overlap_tag = array_keys($overlap->getAllowedElements(FALSE))[0];
+        \assert(\count($overlap->getAllowedElements(FALSE)) === 1);
+        $overlap_tag = \array_keys($overlap->getAllowedElements(FALSE))[0];
         $is_attr_overlap = self::tagHasAttributeRestrictions($overlap, $overlap_tag);
 
         // If one or more attributes (and all of the allowed attribute values)
@@ -165,8 +165,8 @@ class SourceEditingRedundantTagsConstraintValidator extends ConstraintValidator 
    */
   private static function tagHasAttributeRestrictions(HTMLRestrictions $r, string $tag_name): bool {
     $all_elements = $r->getAllowedElements(FALSE);
-    assert(isset($all_elements[$tag_name]));
-    return is_array($r->getAllowedElements(FALSE)[$tag_name]);
+    \assert(isset($all_elements[$tag_name]));
+    return \is_array($r->getAllowedElements(FALSE)[$tag_name]);
   }
 
   /**
@@ -187,7 +187,7 @@ class SourceEditingRedundantTagsConstraintValidator extends ConstraintValidator 
     $message_string = '';
     foreach ($plugin_definitions as $definition) {
       if ($definition->hasElements()) {
-        $plugin_capabilities = HTMLRestrictions::fromString(implode(' ', $definition->getElements()));
+        $plugin_capabilities = HTMLRestrictions::fromString(\implode(' ', $definition->getElements()));
 
         // If this plugin supports wildcards, resolve them.
         if (!$plugin_capabilities->getWildcardSubset()->allowsNothing()) {
@@ -210,11 +210,11 @@ class SourceEditingRedundantTagsConstraintValidator extends ConstraintValidator 
       }
     }
     foreach ($message_array as $plugin_label => $tag_list) {
-      $tags_string = implode(', ', $tag_list);
+      $tags_string = \implode(', ', $tag_list);
       $message_string .= "$plugin_label ($tags_string), ";
     }
 
-    return trim($message_string, ' ,');
+    return \trim($message_string, ' ,');
   }
 
 }

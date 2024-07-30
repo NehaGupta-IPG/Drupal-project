@@ -224,9 +224,9 @@ class SearchQuery extends SelectExtender {
   protected function parseSearchExpression() {
     // Matches words optionally prefixed by a - sign. A word in this case is
     // something between two spaces, optionally quoted.
-    preg_match_all('/ (-?)("[^"]+"|[^" ]+)/i', ' ' . $this->searchExpression, $keywords, PREG_SET_ORDER);
+    \preg_match_all('/ (-?)("[^"]+"|[^" ]+)/i', ' ' . $this->searchExpression, $keywords, PREG_SET_ORDER);
 
-    if (count($keywords) == 0) {
+    if (\count($keywords) == 0) {
       return;
     }
 
@@ -249,7 +249,7 @@ class SearchQuery extends SelectExtender {
       // Strip off phrase quotes.
       $phrase = FALSE;
       if ($match[2][0] == '"') {
-        $match[2] = substr($match[2], 1, -1);
+        $match[2] = \substr($match[2], 1, -1);
         $phrase = TRUE;
         $this->simple = FALSE;
       }
@@ -260,17 +260,17 @@ class SearchQuery extends SelectExtender {
       $words = $text_processor->analyze($match[2]);
       // Re-explode in case simplification added more words, except when
       // matching a phrase.
-      $words = $phrase ? [$words] : preg_split('/ /', $words, -1, PREG_SPLIT_NO_EMPTY);
+      $words = $phrase ? [$words] : \preg_split('/ /', $words, -1, PREG_SPLIT_NO_EMPTY);
       // Negative matches.
       if ($match[1] == '-') {
-        $this->keys['negative'] = array_merge($this->keys['negative'], $words);
+        $this->keys['negative'] = \array_merge($this->keys['negative'], $words);
       }
       // OR operator: instead of a single keyword, we store an array of all
       // ORed keywords.
-      elseif ($match[2] == 'OR' && count($this->keys['positive'])) {
-        $last = array_pop($this->keys['positive']);
+      elseif ($match[2] == 'OR' && \count($this->keys['positive'])) {
+        $last = \array_pop($this->keys['positive']);
         // Starting a new OR?
-        if (!is_array($last)) {
+        if (!\is_array($last)) {
           $last = [$last];
         }
         $this->keys['positive'][] = $last;
@@ -291,10 +291,10 @@ class SearchQuery extends SelectExtender {
         }
         if ($in_or) {
           // Add to last element (which is an array).
-          $this->keys['positive'][count($this->keys['positive']) - 1] = array_merge($this->keys['positive'][count($this->keys['positive']) - 1], $words);
+          $this->keys['positive'][\count($this->keys['positive']) - 1] = \array_merge($this->keys['positive'][\count($this->keys['positive']) - 1], $words);
         }
         else {
-          $this->keys['positive'] = array_merge($this->keys['positive'], $words);
+          $this->keys['positive'] = \array_merge($this->keys['positive'], $words);
           $and_count++;
         }
       }
@@ -307,7 +307,7 @@ class SearchQuery extends SelectExtender {
     // Positive matches.
     foreach ($this->keys['positive'] as $key) {
       // Group of ORed terms.
-      if (is_array($key) && count($key)) {
+      if (\is_array($key) && \count($key)) {
         // If we had already found one OR, this is another one ANDed with the
         // first, meaning it is not a simple query.
         if ($has_or) {
@@ -321,7 +321,7 @@ class SearchQuery extends SelectExtender {
           $has_new_scores |= $num_new_scores;
           $query_or->condition('d.data', "% $or %", 'LIKE');
         }
-        if (count($query_or)) {
+        if (\count($query_or)) {
           $this->conditions->condition($query_or);
           // A group of OR keywords only needs to match once.
           $this->matches += ($has_new_scores > 0);
@@ -362,10 +362,10 @@ class SearchQuery extends SelectExtender {
     $num_valid_words = 0;
 
     // Determine the scorewords of this word/phrase.
-    $split = explode(' ', $word);
+    $split = \explode(' ', $word);
     foreach ($split as $s) {
-      $num = is_numeric($s);
-      if ($num || mb_strlen($s) >= \Drupal::config('search.settings')->get('index.minimum_word_size')) {
+      $num = \is_numeric($s);
+      if ($num || \mb_strlen($s) >= \Drupal::config('search.settings')->get('index.minimum_word_size')) {
         if (!isset($this->words[$s])) {
           $this->words[$s] = $s;
           $num_new_scores++;
@@ -394,7 +394,7 @@ class SearchQuery extends SelectExtender {
     $this->parseSearchExpression();
     $this->executedPrepare = TRUE;
 
-    if (count($this->words) == 0) {
+    if (\count($this->words) == 0) {
       // Although the query could proceed, there is no point in joining
       // with other tables and attempting to normalize if there are no
       // keywords present.
@@ -431,7 +431,7 @@ class SearchQuery extends SelectExtender {
     // simple, we do not need them for normalization.
     if (!$this->simple) {
       $normalize_query->join('search_dataset', 'd', '[i].[sid] = [d].[sid] AND [i].[type] = [d].[type] AND [i].[langcode] = [d].[langcode]');
-      if (count($this->conditions)) {
+      if (\count($this->conditions)) {
         $normalize_query->condition($this->conditions);
       }
     }
@@ -502,7 +502,7 @@ class SearchQuery extends SelectExtender {
    */
   public function addScore($score, $arguments = [], $multiply = FALSE) {
     if ($multiply) {
-      $i = count($this->multiply);
+      $i = \count($this->multiply);
       // Modify the score expression so it is multiplied by the multiplier,
       // with a divisor to renormalize. Note that the ROUND here is necessary
       // for PostgreSQL and SQLite in order to ensure that the :multiply_* and
@@ -522,9 +522,9 @@ class SearchQuery extends SelectExtender {
     // search expression. So, use string replacement to change this to a
     // calculated query expression, counting the number of occurrences so
     // in the execute() method we can add arguments.
-    while (str_contains($score, 'i.relevance')) {
-      $pieces = explode('i.relevance', $score, 2);
-      $score = implode('((ROUND(:normalization_' . $this->relevance_count . ', 4)) * i.score * t.count)', $pieces);
+    while (\str_contains($score, 'i.relevance')) {
+      $pieces = \explode('i.relevance', $score, 2);
+      $score = \implode('((ROUND(:normalization_' . $this->relevance_count . ', 4)) * i.score * t.count)', $pieces);
       $this->relevance_count++;
     }
 
@@ -553,7 +553,7 @@ class SearchQuery extends SelectExtender {
 
     // Add conditions to the query.
     $this->join('search_dataset', 'd', '[i].[sid] = [d].[sid] AND [i].[type] = [d].[type] AND [i].[langcode] = [d].[langcode]');
-    if (count($this->conditions)) {
+    if (\count($this->conditions)) {
       $this->condition($this->conditions);
     }
 
@@ -562,12 +562,12 @@ class SearchQuery extends SelectExtender {
       $this->addScore('i.relevance');
     }
 
-    if (count($this->multiply)) {
+    if (\count($this->multiply)) {
       // Re-normalize scores with multipliers by dividing by the total of all
       // multipliers. The expressions were altered in addScore(), so here just
       // add the arguments for the total.
-      $sum = array_sum($this->multiply);
-      for ($i = 0; $i < count($this->multiply); $i++) {
+      $sum = \array_sum($this->multiply);
+      for ($i = 0; $i < \count($this->multiply); $i++) {
         $this->scoresArguments[':total_' . $i] = $sum;
       }
     }
@@ -579,11 +579,11 @@ class SearchQuery extends SelectExtender {
     }
 
     // Add all scores together to form a query field.
-    $this->addExpression('SUM(' . implode(' + ', $this->scores) . ')', 'calculated_score', $this->scoresArguments);
+    $this->addExpression('SUM(' . \implode(' + ', $this->scores) . ')', 'calculated_score', $this->scoresArguments);
 
     // If an order has not yet been set for this query, add a default order
     // that sorts by the calculated sum of scores.
-    if (count($this->getOrderBy()) == 0) {
+    if (\count($this->getOrderBy()) == 0) {
       $this->orderBy('calculated_score', 'DESC');
     }
 
@@ -611,7 +611,7 @@ class SearchQuery extends SelectExtender {
 
     // Add conditions to query.
     $inner->join('search_dataset', 'd', '[i].[sid] = [d].[sid] AND [i].[type] = [d].[type]');
-    if (count($this->conditions)) {
+    if (\count($this->conditions)) {
       $inner->condition($this->conditions);
     }
 

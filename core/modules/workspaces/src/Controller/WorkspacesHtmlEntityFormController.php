@@ -63,7 +63,7 @@ class WorkspacesHtmlEntityFormController extends FormController {
             $entity->getTypedData(),
             $constraints[0]
           );
-          if (count($violations)) {
+          if (\count($violations)) {
             $build['#markup'] = $violations->get(0)->getMessage();
 
             return $build;

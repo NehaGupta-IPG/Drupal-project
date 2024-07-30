@@ -49,7 +49,7 @@ class LanguageContentSettings extends DrupalSqlBase {
     $type = $row->getSourceProperty('type');
     $row->setSourceProperty('language_content_type', $this->variableGet('language_content_type_' . $type, NULL));
     $i18n_node_options = $this->variableGet('i18n_node_options_' . $type, NULL);
-    if ($i18n_node_options && in_array('lock', $i18n_node_options)) {
+    if ($i18n_node_options && \in_array('lock', $i18n_node_options)) {
       $row->setSourceProperty('i18n_lock_node', 1);
     }
     else {

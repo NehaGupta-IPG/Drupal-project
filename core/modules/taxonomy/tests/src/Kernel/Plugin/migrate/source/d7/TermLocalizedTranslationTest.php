@@ -143,7 +143,7 @@ class TermLocalizedTranslationTest extends TermTest {
 
     // The source data.
     $tests[1] = $tests[0];
-    array_push($tests[1]['source_data']['i18n_string'],
+    \array_push($tests[1]['source_data']['i18n_string'],
       [
         'lid' => 10,
         'objectid' => 5,
@@ -160,7 +160,7 @@ class TermLocalizedTranslationTest extends TermTest {
         'objectindex' => '5',
         'format' => 0,
       ]);
-    array_push($tests[1]['source_data']['locales_target'],
+    \array_push($tests[1]['source_data']['locales_target'],
       [
         'lid' => 10,
         'language' => 'fr',
@@ -179,7 +179,7 @@ class TermLocalizedTranslationTest extends TermTest {
       ]);
 
     // The expected results.
-    array_push($tests[1]['expected_data'],
+    \array_push($tests[1]['expected_data'],
       [
         'tid' => 3,
         'vid' => 6,

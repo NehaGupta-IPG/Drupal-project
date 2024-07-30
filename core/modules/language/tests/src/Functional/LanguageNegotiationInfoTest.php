@@ -140,7 +140,7 @@ class LanguageNegotiationInfoTest extends BrowserTestBase {
     $last = \Drupal::keyValue('language_test')->get('language_negotiation_last');
     foreach ($this->languageManager()->getDefinedLanguageTypes() as $type) {
       $langcode = $last[$type];
-      $value = $type == LanguageInterface::TYPE_CONTENT || str_contains($type, 'test') ? 'it' : 'en';
+      $value = $type == LanguageInterface::TYPE_CONTENT || \str_contains($type, 'test') ? 'it' : 'en';
       $this->assertEquals($langcode, $value, "The negotiated language for $type is $value");
     }
 
@@ -174,9 +174,9 @@ class LanguageNegotiationInfoTest extends BrowserTestBase {
   protected function checkFixedLanguageTypes(): void {
     $configurable = $this->languageManager()->getLanguageTypes();
     foreach ($this->languageManager()->getDefinedLanguageTypesInfo() as $type => $info) {
-      if (!in_array($type, $configurable) && isset($info['fixed'])) {
+      if (!\in_array($type, $configurable) && isset($info['fixed'])) {
         $negotiation = $this->config('language.types')->get('negotiation.' . $type . '.enabled');
-        $equal = array_keys($negotiation) === array_values($info['fixed']);
+        $equal = \array_keys($negotiation) === \array_values($info['fixed']);
         $this->assertTrue($equal, "language negotiation for $type is properly set up");
       }
     }
@@ -218,7 +218,7 @@ class LanguageNegotiationInfoTest extends BrowserTestBase {
    */
   protected function isLanguageTypeConfigurable($type): bool {
     $configurable_types = $this->config('language.types')->get('configurable');
-    return in_array($type, $configurable_types);
+    return \in_array($type, $configurable_types);
   }
 
 }

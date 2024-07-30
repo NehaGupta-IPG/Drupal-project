@@ -219,10 +219,10 @@ class MenuLinkTreeTest extends UnitTestCase {
       'access_cache_contexts' => [],
     ];
 
-    for ($i = 0; $i < count($access_scenarios); $i++) {
+    for ($i = 0; $i < \count($access_scenarios); $i++) {
       [$access, $access_cache_contexts] = $access_scenarios[$i];
 
-      for ($j = 0; $j < count($links_scenarios); $j++) {
+      for ($j = 0; $j < \count($links_scenarios); $j++) {
         $links = $links_scenarios[$j];
 
         // Single-element tree.
@@ -237,7 +237,7 @@ class MenuLinkTreeTest extends UnitTestCase {
         else {
           $expected_build = $base_expected_build_empty;
         }
-        $expected_build['#cache']['contexts'] = array_merge($expected_build['#cache']['contexts'], $access_cache_contexts, $links[0]->getCacheContexts());
+        $expected_build['#cache']['contexts'] = \array_merge($expected_build['#cache']['contexts'], $access_cache_contexts, $links[0]->getCacheContexts());
         $data[] = [
           'description' => "Single-item tree; access=$i; link=$j.",
           'tree' => $tree,
@@ -257,7 +257,7 @@ class MenuLinkTreeTest extends UnitTestCase {
           $expected_build['#items']['test.example1'] = $get_built_element($tree[0]);
         }
         $expected_build['#items']['test.example2'] = $get_built_element($tree[1]);
-        $expected_build['#cache']['contexts'] = array_merge($expected_build['#cache']['contexts'], $access_cache_contexts, $links[0]->getCacheContexts(), $links[1]->getCacheContexts());
+        $expected_build['#cache']['contexts'] = \array_merge($expected_build['#cache']['contexts'], $access_cache_contexts, $links[0]->getCacheContexts(), $links[1]->getCacheContexts());
         $data[] = [
           'description' => "Single-level tree; access=$i; link=$j.",
           'tree' => $tree,
@@ -301,7 +301,7 @@ class MenuLinkTreeTest extends UnitTestCase {
         }
         $expected_build['#items']['test.root_b'] = $get_built_element($tree[1]);
         $expected_build['#items']['test.root_b']['below']['test.example2'] = $get_built_element($tree[1]->subtree[0]);
-        $expected_build['#cache']['contexts'] = array_merge($expected_build['#cache']['contexts'], $access_cache_contexts, $links[0]->getCacheContexts(), $links[1]->getCacheContexts());
+        $expected_build['#cache']['contexts'] = \array_merge($expected_build['#cache']['contexts'], $access_cache_contexts, $links[0]->getCacheContexts(), $links[1]->getCacheContexts());
         $data[] = [
           'description' => "Multi-level tree; access=$i; link=$j.",
           'tree' => $tree,

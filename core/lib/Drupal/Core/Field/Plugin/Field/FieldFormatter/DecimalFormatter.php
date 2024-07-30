@@ -65,7 +65,7 @@ class DecimalFormatter extends NumericFormatterBase {
    * {@inheritdoc}
    */
   protected function numberFormat($number) {
-    return number_format($number, $this->getSetting('scale'), $this->getSetting('decimal_separator'), $this->getSetting('thousand_separator'));
+    return \number_format($number, $this->getSetting('scale'), $this->getSetting('decimal_separator'), $this->getSetting('thousand_separator'));
   }
 
 }

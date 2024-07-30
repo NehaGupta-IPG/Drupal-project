@@ -65,7 +65,7 @@ class ConfigImportAllTest extends ModuleTestBase {
 
     // Get a list of modules to install.
     $all_modules = $this->container->get('extension.list.module')->getList();
-    $all_modules = array_filter($all_modules, function ($module) {
+    $all_modules = \array_filter($all_modules, function ($module) {
       // Filter out contrib, hidden, testing, experimental, and deprecated
       // modules. We also don't need to enable modules that are already enabled.
       if ($module->origin !== 'core'
@@ -79,9 +79,9 @@ class ConfigImportAllTest extends ModuleTestBase {
     });
 
     // Install every module possible.
-    \Drupal::service('module_installer')->install(array_keys($all_modules));
+    \Drupal::service('module_installer')->install(\array_keys($all_modules));
 
-    $this->assertModules(array_keys($all_modules), TRUE);
+    $this->assertModules(\array_keys($all_modules), TRUE);
     foreach ($all_modules as $module => $info) {
       $this->assertModuleConfig($module);
       $this->assertModuleTablesExist($module);
@@ -108,7 +108,7 @@ class ConfigImportAllTest extends ModuleTestBase {
     }
 
     // Purge the field data.
-    field_purge_batch(1000);
+    \field_purge_batch(1000);
 
     $all_modules = \Drupal::service('extension.list.module')->getList();
     $database_module = \Drupal::service('database')->getProvider();
@@ -123,7 +123,7 @@ class ConfigImportAllTest extends ModuleTestBase {
     $validation_modules = array_keys($validation_reasons);
     $this->assertEqualsCanonicalizing($expected_modules, $validation_modules);
 
-    $modules_to_uninstall = array_filter($all_modules, function ($module) {
+    $modules_to_uninstall = \array_filter($all_modules, function ($module) {
       // Filter profiles, and required and not enabled modules.
       if (!empty($module->info['required']) || $module->status == FALSE || $module->getType() === 'profile') {
         return FALSE;
@@ -145,9 +145,9 @@ class ConfigImportAllTest extends ModuleTestBase {
     $this->assertTrue(isset($modules_to_uninstall['editor']), 'The Editor module will be disabled');
 
     // Uninstall all modules that can be uninstalled.
-    \Drupal::service('module_installer')->uninstall(array_keys($modules_to_uninstall));
+    \Drupal::service('module_installer')->uninstall(\array_keys($modules_to_uninstall));
 
-    $this->assertModules(array_keys($modules_to_uninstall), FALSE);
+    $this->assertModules(\array_keys($modules_to_uninstall), FALSE);
     foreach ($modules_to_uninstall as $module => $info) {
       $this->assertNoModuleConfig($module);
       $this->assertModuleTablesDoNotExist($module);
@@ -163,7 +163,7 @@ class ConfigImportAllTest extends ModuleTestBase {
     $this->assertSame([], $this->configImporter()->getErrors());
 
     // Check that all modules that were uninstalled are now reinstalled.
-    $this->assertModules(array_keys($modules_to_uninstall), TRUE);
+    $this->assertModules(\array_keys($modules_to_uninstall), TRUE);
     foreach ($modules_to_uninstall as $module => $info) {
       $this->assertModuleConfig($module);
       $this->assertModuleTablesExist($module);

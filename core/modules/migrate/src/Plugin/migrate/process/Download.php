@@ -134,7 +134,7 @@ class Download extends FileProcessBase implements ContainerFactoryPluginInterfac
     // Try opening the file first, to avoid calling prepareDirectory()
     // unnecessarily. We're suppressing fopen() errors because we want to try
     // to prepare the directory before we give up and fail.
-    $destination_stream = @fopen($final_destination, 'w');
+    $destination_stream = @\fopen($final_destination, 'w');
     if (!$destination_stream) {
       // If fopen didn't work, make sure there's a writable directory in place.
       $dir = $this->fileSystem->dirname($final_destination);
@@ -142,7 +142,7 @@ class Download extends FileProcessBase implements ContainerFactoryPluginInterfac
         throw new MigrateException("Could not create or write to directory '$dir'");
       }
       // Let's try that fopen again.
-      $destination_stream = @fopen($final_destination, 'w');
+      $destination_stream = @\fopen($final_destination, 'w');
       if (!$destination_stream) {
         throw new MigrateException("Could not write to file '$final_destination'");
       }
@@ -159,8 +159,8 @@ class Download extends FileProcessBase implements ContainerFactoryPluginInterfac
       throw new MigrateException("{$e->getMessage()} ($source)");
     }
 
-    if (is_resource($destination_stream)) {
-      fclose($destination_stream);
+    if (\is_resource($destination_stream)) {
+      \fclose($destination_stream);
     }
 
     return $final_destination;

@@ -262,7 +262,7 @@ class ContainerTest extends TestCase {
    */
   public function testGetForSerializedServiceDefinition(): void {
     $container_definition = $this->containerDefinition;
-    $container_definition['services']['other.service'] = serialize($container_definition['services']['other.service']);
+    $container_definition['services']['other.service'] = \serialize($container_definition['services']['other.service']);
     $container = new $this->containerClass($container_definition);
 
     // Retrieve services of the container.
@@ -420,8 +420,8 @@ class ContainerTest extends TestCase {
    */
   public function testGetWithFileInclude(): void {
     $this->container->get('container_test_file_service_test');
-    $this->assertTrue(function_exists('container_test_file_service_test_service_function'));
-    $this->assertEquals('Hello Container', container_test_file_service_test_service_function());
+    $this->assertTrue(\function_exists('container_test_file_service_test_service_function'));
+    $this->assertEquals('Hello Container', \container_test_file_service_test_service_function());
   }
 
   /**
@@ -473,7 +473,7 @@ class ContainerTest extends TestCase {
     $service = $this->container->get('service.provider');
     $factory_service = $this->container->get('factory_class');
 
-    $this->assertInstanceOf(get_class($service), $factory_service);
+    $this->assertInstanceOf(\get_class($service), $factory_service);
     $this->assertEquals('bar', $factory_service->getSomeParameter(), 'Correct parameter was passed via the factory class instantiation.');
     $this->assertEquals($this->container, $factory_service->getContainer(), 'Container was injected via setter injection.');
   }
@@ -587,7 +587,7 @@ class ContainerTest extends TestCase {
     $other_service = $this->container->get('other.service');
     $factory_function = $service->getSomeOtherService();
     $this->assertInstanceOf(\Closure::class, $factory_function);
-    $this->assertEquals($other_service, call_user_func($factory_function));
+    $this->assertEquals($other_service, \call_user_func($factory_function));
   }
 
   /**
@@ -660,7 +660,7 @@ class ContainerTest extends TestCase {
    * @legacy-covers ::getServiceIds
    */
   public function testGetServiceIds(): void {
-    $service_definition_keys = array_merge(['service_container'], array_keys($this->containerDefinition['services']));
+    $service_definition_keys = \array_merge(['service_container'], \array_keys($this->containerDefinition['services']));
     $this->assertEquals($service_definition_keys, $this->container->getServiceIds(), 'Retrieved service IDs match definition.');
 
     $mock_service = new MockService();
@@ -723,21 +723,21 @@ class ContainerTest extends TestCase {
   protected function getMockContainerDefinition(): array {
     $fake_service = new \stdClass();
     $parameters = [];
-    $parameters['some_parameter_class'] = get_class($fake_service);
+    $parameters['some_parameter_class'] = \get_class($fake_service);
     $parameters['some_private_config'] = 'really_private_lama';
     $parameters['some_config'] = 'foo';
     $parameters['some_other_config'] = 'lama';
-    $parameters['factory_service_class'] = get_class($fake_service);
+    $parameters['factory_service_class'] = \get_class($fake_service);
     // Also test alias resolving.
     $parameters['service_from_parameter'] = $this->getServiceCall('service.provider_alias');
 
     $services = [];
     $services['other.service'] = [
-      'class' => get_class($fake_service),
+      'class' => \get_class($fake_service),
     ];
 
     $services['non_shared_service'] = [
-      'class' => get_class($fake_service),
+      'class' => \get_class($fake_service),
       'shared' => FALSE,
     ];
 
@@ -745,7 +745,7 @@ class ContainerTest extends TestCase {
       'class' => $this->getParameterCall('some_parameter_class'),
     ];
     $services['late.service'] = [
-      'class' => get_class($fake_service),
+      'class' => \get_class($fake_service),
     ];
     $services['service.provider'] = [
       'class' => '\Drupal\Tests\Component\DependencyInjection\MockService',
@@ -1043,7 +1043,7 @@ class ContainerTest extends TestCase {
    */
   protected function getPrivateServiceCall($id, $service_definition, $shared = FALSE) {
     if (!$id) {
-      $hash = Crypt::hashBase64(serialize($service_definition));
+      $hash = Crypt::hashBase64(\serialize($service_definition));
       $id = 'private__' . $hash;
     }
     return (object) [
@@ -1111,7 +1111,7 @@ class MockInstantiationService {
    * Construct a mock instantiation service.
    */
   public function __construct() {
-    $this->arguments = func_get_args();
+    $this->arguments = \func_get_args();
   }
 
   /**
@@ -1168,7 +1168,7 @@ class MockService {
    *   (optional) An injected parameter.
    */
   public function __construct($some_other_service = NULL, $some_parameter = NULL) {
-    if (is_array($some_other_service)) {
+    if (\is_array($some_other_service)) {
       $some_other_service = $some_other_service[0];
     }
     $this->someOtherService = $some_other_service;

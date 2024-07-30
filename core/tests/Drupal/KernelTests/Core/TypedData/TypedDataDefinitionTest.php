@@ -74,7 +74,7 @@ class TypedDataDefinitionTest extends KernelTestBase {
     $this->assertInstanceOf(ComplexDataDefinitionInterface::class, $map_definition);
 
     // Test retrieving metadata about contained properties.
-    $this->assertEquals(['one', 'two', 'three'], array_keys($map_definition->getPropertyDefinitions()));
+    $this->assertEquals(['one', 'two', 'three'], \array_keys($map_definition->getPropertyDefinitions()));
     $this->assertEquals('string', $map_definition->getPropertyDefinition('one')->getDataType());
     $this->assertNull($map_definition->getMainPropertyName());
     $this->assertNull($map_definition->getPropertyDefinition('invalid'));
@@ -85,7 +85,7 @@ class TypedDataDefinitionTest extends KernelTestBase {
     $map_definition2->setPropertyDefinition('one', DataDefinition::create('string'))
       ->setPropertyDefinition('two', DataDefinition::create('string'))
       ->setPropertyDefinition('three', DataDefinition::create('string'));
-    $this->assertEquals(serialize($map_definition2), serialize($map_definition));
+    $this->assertEquals(\serialize($map_definition2), \serialize($map_definition));
   }
 
   /**
@@ -101,7 +101,7 @@ class TypedDataDefinitionTest extends KernelTestBase {
     // Test using the definition factory.
     $language_reference_definition2 = $this->typedDataManager->createDataDefinition('language_reference');
     $this->assertInstanceOf(DataReferenceDefinitionInterface::class, $language_reference_definition2);
-    $this->assertEquals(serialize($language_reference_definition2), serialize($language_reference_definition));
+    $this->assertEquals(\serialize($language_reference_definition2), \serialize($language_reference_definition));
   }
 
   /**

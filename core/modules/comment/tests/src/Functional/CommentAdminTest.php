@@ -38,7 +38,7 @@ class CommentAdminTest extends CommentTestBase {
    */
   public function testApprovalAdminInterface(): void {
     // Set anonymous comments to require approval.
-    user_role_change_permissions(RoleInterface::ANONYMOUS_ID, [
+    \user_role_change_permissions(RoleInterface::ANONYMOUS_ID, [
       'access comments' => TRUE,
       'post comments' => TRUE,
       'skip comment approval' => FALSE,
@@ -131,7 +131,7 @@ class CommentAdminTest extends CommentTestBase {
    */
   public function testApprovalNodeInterface(): void {
     // Set anonymous comments to require approval.
-    user_role_change_permissions(RoleInterface::ANONYMOUS_ID, [
+    \user_role_change_permissions(RoleInterface::ANONYMOUS_ID, [
       'access comments' => TRUE,
       'post comments' => TRUE,
       'skip comment approval' => FALSE,
@@ -206,7 +206,7 @@ class CommentAdminTest extends CommentTestBase {
    */
   public function testEditComment(): void {
     // Enable anonymous user comments.
-    user_role_grant_permissions(RoleInterface::ANONYMOUS_ID, [
+    \user_role_grant_permissions(RoleInterface::ANONYMOUS_ID, [
       'access comments',
       'post comments',
       'skip comment approval',

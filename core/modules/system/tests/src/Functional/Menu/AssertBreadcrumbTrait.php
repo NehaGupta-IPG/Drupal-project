@@ -85,7 +85,7 @@ trait AssertBreadcrumbTrait {
         else {
           $url = $path;
         }
-        $part = array_shift($parts);
+        $part = \array_shift($parts);
         $pass = ($pass && $part['href'] === $url && $part['text'] === Html::escape($title));
       }
     }
@@ -98,10 +98,10 @@ trait AssertBreadcrumbTrait {
     // No parts must be left, or an expected "Home" will always pass.
     $pass = ($pass && empty($parts));
 
-    $this->assertTrue($pass, sprintf('Expected breadcrumb %s on %s but found %s.',
-      implode(' » ', $trail),
+    $this->assertTrue($pass, \sprintf('Expected breadcrumb %s on %s but found %s.',
+      \implode(' » ', $trail),
       $this->getUrl(),
-      implode(' » ', array_map(function (array $item) {
+      \implode(' » ', \array_map(function (array $item) {
         return $item['text'];
       }, $found)),
     ));

@@ -80,7 +80,7 @@ class PoStreamWriter implements PoWriterInterface, PoStreamInterface {
    */
   public function open() {
     // Open in write mode. Will overwrite the stream if it already exists.
-    $this->fd = fopen($this->getURI(), 'w');
+    $this->fd = \fopen($this->getURI(), 'w');
     // Write the header at the start.
     $this->writeHeader();
   }
@@ -93,7 +93,7 @@ class PoStreamWriter implements PoWriterInterface, PoStreamInterface {
    */
   public function close() {
     if ($this->fd) {
-      fclose($this->fd);
+      \fclose($this->fd);
     }
     else {
       throw new \Exception('Cannot close stream that is not open.');
@@ -111,9 +111,9 @@ class PoStreamWriter implements PoWriterInterface, PoStreamInterface {
    *   If writing the data is not possible.
    */
   private function write($data) {
-    $result = fwrite($this->fd, $data);
-    if ($result === FALSE || $result != strlen($data)) {
-      throw new \Exception('Unable to write data: ' . substr($data, 0, 20));
+    $result = \fwrite($this->fd, $data);
+    if ($result === FALSE || $result != \strlen($data)) {
+      throw new \Exception('Unable to write data: ' . \substr($data, 0, 20));
     }
   }
 

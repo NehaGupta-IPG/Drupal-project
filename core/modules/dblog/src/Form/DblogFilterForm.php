@@ -23,7 +23,7 @@ class DblogFilterForm extends FormBase {
    * {@inheritdoc}
    */
   public function buildForm(array $form, FormStateInterface $form_state) {
-    $filters = dblog_filters();
+    $filters = \dblog_filters();
 
     $form['filters'] = [
       '#type' => 'details',
@@ -77,7 +77,7 @@ class DblogFilterForm extends FormBase {
    * {@inheritdoc}
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {
-    $filters = dblog_filters();
+    $filters = \dblog_filters();
     $session_filters = $this->getRequest()->getSession()->get('dblog_overview_filter', []);
     foreach ($filters as $name => $filter) {
       if ($form_state->hasValue($name)) {

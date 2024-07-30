@@ -21,17 +21,17 @@ trait StorageCopyTrait {
    */
   protected static function replaceStorageContents(StorageInterface $source, StorageInterface &$target) {
     // Remove all collections from the target which are not in the source.
-    foreach (array_diff($target->getAllCollectionNames(), $source->getAllCollectionNames()) as $collection) {
+    foreach (\array_diff($target->getAllCollectionNames(), $source->getAllCollectionNames()) as $collection) {
       // We do this first so we don't have to loop over the added collections.
       $target->createCollection($collection)->deleteAll();
     }
     // Copy all the configuration from all the collections.
-    foreach (array_merge([StorageInterface::DEFAULT_COLLECTION], $source->getAllCollectionNames()) as $collection) {
+    foreach (\array_merge([StorageInterface::DEFAULT_COLLECTION], $source->getAllCollectionNames()) as $collection) {
       $source_collection = $source->createCollection($collection);
       $target_collection = $target->createCollection($collection);
       $names = $source_collection->listAll();
       // First we delete all the config which shouldn't be in the target.
-      foreach (array_diff($target_collection->listAll(), $names) as $name) {
+      foreach (\array_diff($target_collection->listAll(), $names) as $name) {
         $target_collection->delete($name);
       }
       // Then we loop over the config which needs to be there.

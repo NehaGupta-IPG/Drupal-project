@@ -35,8 +35,8 @@ class AttributeHelper {
     if ($collection instanceof Attribute) {
       return $collection->hasAttribute($name);
     }
-    elseif (is_array($collection)) {
-      return array_key_exists($name, $collection);
+    elseif (\is_array($collection)) {
+      return \array_key_exists($name, $collection);
     }
     throw new \InvalidArgumentException('Invalid collection argument');
   }
@@ -58,11 +58,11 @@ class AttributeHelper {
    *   array.
    */
   public static function mergeCollections($a, $b) {
-    if (!($a instanceof Attribute || is_array($a)) || !($b instanceof Attribute || is_array($b))) {
+    if (!($a instanceof Attribute || \is_array($a)) || !($b instanceof Attribute || \is_array($b))) {
       throw new \InvalidArgumentException('Invalid collection argument');
     }
     // If both collections are arrays, just merge them.
-    if (is_array($a) && is_array($b)) {
+    if (\is_array($a) && \is_array($b)) {
       return NestedArray::mergeDeep($a, $b);
     }
     // If at least one collections is an Attribute object, merge through

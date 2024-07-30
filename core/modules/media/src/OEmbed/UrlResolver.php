@@ -197,14 +197,14 @@ class UrlResolver implements UrlResolverInterface {
    */
   protected function getEndpointMatchingUrl($url, Provider $provider) {
     $endpoints = $provider->getEndpoints();
-    $resource_url = reset($endpoints)->buildResourceUrl($url);
+    $resource_url = \reset($endpoints)->buildResourceUrl($url);
     foreach ($endpoints as $endpoint) {
       if ($endpoint->matchUrl($url)) {
         $resource_url = $endpoint->buildResourceUrl($url);
         break;
       }
     }
-    return $resource_url ?? reset($endpoints)->buildResourceUrl($url);
+    return $resource_url ?? \reset($endpoints)->buildResourceUrl($url);
   }
 
 }

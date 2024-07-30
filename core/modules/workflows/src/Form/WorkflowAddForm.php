@@ -66,7 +66,7 @@ class WorkflowAddForm extends EntityForm {
       ],
     ];
 
-    $workflow_types = array_column($this->workflowTypePluginManager->getDefinitions(), 'label', 'id');
+    $workflow_types = \array_column($this->workflowTypePluginManager->getDefinitions(), 'label', 'id');
 
     $form['workflow_type'] = [
       '#type' => 'select',

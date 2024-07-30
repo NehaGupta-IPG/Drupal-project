@@ -170,7 +170,7 @@ class PrepareModulesEntityUninstallForm extends ConfirmFormBase {
           '#theme' => 'item_list',
           '#items' => $labels,
         ];
-        $more_count = $count - count($labels);
+        $more_count = $count - \count($labels);
         $form['total'] = [
           '#markup' => $this->formatPlural(
             $more_count,
@@ -221,7 +221,7 @@ class PrepareModulesEntityUninstallForm extends ConfirmFormBase {
       ->setProgressMessage('')
       ->setFinishCallback([__CLASS__, 'moduleBatchFinished'])
       ->addOperation([__CLASS__, 'deleteContentEntities'], [$entity_type_id]);
-    batch_set($batch_builder->toArray());
+    \batch_set($batch_builder->toArray());
   }
 
   /**
@@ -262,9 +262,9 @@ class PrepareModulesEntityUninstallForm extends ConfirmFormBase {
 
     // Inform the batch engine that we are not finished and provide an
     // estimation of the completion level we reached.
-    if (count($entity_ids) > 0 && $context['sandbox']['progress'] != $context['sandbox']['max']) {
+    if (\count($entity_ids) > 0 && $context['sandbox']['progress'] != $context['sandbox']['max']) {
       $context['finished'] = $context['sandbox']['progress'] / $context['sandbox']['max'];
-      $context['message'] = new TranslatableMarkup('Deleting items... Completed @percentage% (@current of @total).', ['@percentage' => round(100 * $context['sandbox']['progress'] / $context['sandbox']['max']), '@current' => $context['sandbox']['progress'], '@total' => $context['sandbox']['max']]);
+      $context['message'] = new TranslatableMarkup('Deleting items... Completed @percentage% (@current of @total).', ['@percentage' => \round(100 * $context['sandbox']['progress'] / $context['sandbox']['max']), '@current' => $context['sandbox']['progress'], '@total' => $context['sandbox']['max']]);
 
     }
     else {

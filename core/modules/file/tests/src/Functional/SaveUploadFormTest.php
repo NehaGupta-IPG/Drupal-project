@@ -71,12 +71,12 @@ class SaveUploadFormTest extends FileManagedTestBase {
     $this->drupalLogin($account);
 
     $image_files = $this->drupalGetTestFiles('image');
-    $this->image = File::create((array) current($image_files));
+    $this->image = File::create((array) \current($image_files));
 
-    [, $this->imageExtension] = explode('.', $this->image->getFilename());
+    [, $this->imageExtension] = \explode('.', $this->image->getFilename());
     $this->assertFileExists($this->image->getFileUri());
 
-    $this->phpFile = current($this->drupalGetTestFiles('php'));
+    $this->phpFile = \current($this->drupalGetTestFiles('php'));
     $this->assertFileExists($this->phpFile->uri);
 
     $this->maxFidBefore = (int) \Drupal::entityQueryAggregate('file')
@@ -115,13 +115,13 @@ class SaveUploadFormTest extends FileManagedTestBase {
     $file1 = File::load($max_fid_after);
     $this->assertInstanceOf(File::class, $file1);
     // MIME type of the uploaded image may be either image/jpeg or image/png.
-    $this->assertEquals('image', substr($file1->getMimeType(), 0, 5), 'A MIME type was set.');
+    $this->assertEquals('image', \substr($file1->getMimeType(), 0, 5), 'A MIME type was set.');
 
     // Reset the hook counters to get rid of the 'load' we just called.
     FileTestHelper::reset();
 
     // Upload a second file.
-    $image2 = current($this->drupalGetTestFiles('image'));
+    $image2 = \current($this->drupalGetTestFiles('image'));
     /** @var \Drupal\Core\File\FileSystemInterface $file_system */
     $file_system = \Drupal::service('file_system');
     $edit = ['files[file_test_upload][]' => $file_system->realpath($image2->uri)];
@@ -140,7 +140,7 @@ class SaveUploadFormTest extends FileManagedTestBase {
     $file2 = File::load($max_fid_after);
     $this->assertInstanceOf(File::class, $file2);
     // MIME type of the uploaded image may be either image/jpeg or image/png.
-    $this->assertEquals('image', substr($file2->getMimeType(), 0, 5), 'A MIME type was set.');
+    $this->assertEquals('image', \substr($file2->getMimeType(), 0, 5), 'A MIME type was set.');
 
     // Load both files using File::loadMultiple().
     $files = File::loadMultiple([$file1->id(), $file2->id()]);
@@ -148,7 +148,7 @@ class SaveUploadFormTest extends FileManagedTestBase {
     $this->assertTrue(isset($files[$file2->id()]), 'File was loaded successfully');
 
     // Upload a third file to a subdirectory.
-    $image3 = current($this->drupalGetTestFiles('image'));
+    $image3 = \current($this->drupalGetTestFiles('image'));
     $image3_realpath = $file_system->realpath($image3->uri);
     $dir = $this->randomMachineName();
     $edit = [
@@ -316,7 +316,7 @@ class SaveUploadFormTest extends FileManagedTestBase {
     ];
 
     $munged_filename = $this->image->getFilename();
-    $munged_filename = substr($munged_filename, 0, strrpos($munged_filename, '.'));
+    $munged_filename = \substr($munged_filename, 0, \strrpos($munged_filename, '.'));
     $munged_filename .= '_.' . $this->imageExtension;
 
     $this->drupalGet('file-test/save_upload_from_form_test');
@@ -336,11 +336,11 @@ class SaveUploadFormTest extends FileManagedTestBase {
     $extensions = $this->imageExtension;
     $edit = [
       'files[file_test_upload][]' => $file_system->realpath($this->image->getFileUri()),
-      'extensions' => mb_strtoupper($extensions),
+      'extensions' => \mb_strtoupper($extensions),
     ];
 
     $munged_filename = $this->image->getFilename();
-    $munged_filename = substr($munged_filename, 0, strrpos($munged_filename, '.'));
+    $munged_filename = \substr($munged_filename, 0, \strrpos($munged_filename, '.'));
     $munged_filename .= '_.' . $this->imageExtension;
 
     $this->drupalGet('file-test/save_upload_from_form_test');
@@ -551,7 +551,7 @@ class SaveUploadFormTest extends FileManagedTestBase {
    * Tests that multiple validation errors are combined in one message.
    */
   public function testCombinedErrorMessages(): void {
-    $text_file = current($this->drupalGetTestFiles('text'));
+    $text_file = \current($this->drupalGetTestFiles('text'));
     $this->assertFileExists($text_file->uri);
 
     /** @var \Drupal\Core\File\FileSystemInterface $file_system */

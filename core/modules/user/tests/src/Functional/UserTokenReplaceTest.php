@@ -113,7 +113,7 @@ class UserTokenReplaceTest extends BrowserTestBase {
     $metadata_tests['[current-user:display-name]'] = $base_bubbleable_metadata->merge(BubbleableMetadata::createFromObject($global_account)->addCacheContexts(['user']));
 
     // Test to make sure that we generated something for each token.
-    $this->assertNotContains(0, array_map('strlen', $tests), 'No empty tokens generated.');
+    $this->assertNotContains(0, \array_map('strlen', $tests), 'No empty tokens generated.');
 
     foreach ($tests as $input => $expected) {
       $bubbleable_metadata = new BubbleableMetadata();
@@ -146,8 +146,8 @@ class UserTokenReplaceTest extends BrowserTestBase {
 
     // Generate login and cancel link.
     $tests = [];
-    $tests['[user:one-time-login-url]'] = user_pass_reset_url($account);
-    $tests['[user:cancel-url]'] = user_cancel_url($account);
+    $tests['[user:one-time-login-url]'] = \user_pass_reset_url($account);
+    $tests['[user:cancel-url]'] = \user_cancel_url($account);
 
     // Generate tokens with interface language.
     $link = Url::fromRoute('user.page', [], ['absolute' => TRUE])->toString();

@@ -64,13 +64,13 @@ class LocalTasksTest extends BrowserTestBase {
     $elements = $this->xpath('//*[contains(@class, :class)]//a', [
       ':class' => $level == 0 ? 'tabs primary' : 'tabs secondary',
     ]);
-    $this->assertGreaterThan(0, count($elements), 'Local tasks found.');
+    $this->assertGreaterThan(0, \count($elements), 'Local tasks found.');
     foreach ($routes as $index => $route_info) {
       [$route_name, $route_parameters] = $route_info;
       $expected = Url::fromRoute($route_name, $route_parameters)->toString();
       $this->assertEquals($expected, $elements[$index]->getAttribute('href'), "Task " . ($index + 1) . "number href " . $elements[$index]->getAttribute('href') . " equals $expected.");
     }
-    $this->assertEquals(count($routes), count($elements), 'Only expected local tasks are found.');
+    $this->assertEquals(\count($routes), \count($elements), 'Only expected local tasks are found.');
   }
 
   /**
@@ -86,7 +86,7 @@ class LocalTasksTest extends BrowserTestBase {
     // so use a pattern instead to check the raw content.
     // This behavior is a bug in libxml, see
     // https://bugs.php.net/bug.php?id=49437.
-    $this->assertSession()->responseMatches('@<a [^>]*>' . preg_quote($title, '@') . '</a>@');
+    $this->assertSession()->responseMatches('@<a [^>]*>' . \preg_quote($title, '@') . '</a>@');
   }
 
   /**

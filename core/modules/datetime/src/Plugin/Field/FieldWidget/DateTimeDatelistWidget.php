@@ -55,8 +55,8 @@ class DateTimeDatelistWidget extends DateTimeWidgetBase {
       'DMY' => ['day', 'month', 'year'],
     };
     $date_part_order = match ($time_type) {
-      '24' => array_merge($date_part_order, ['hour', 'minute']),
-      '12' => array_merge($date_part_order, ['hour', 'minute', 'ampm']),
+      '24' => \array_merge($date_part_order, ['hour', 'minute']),
+      '12' => \array_merge($date_part_order, ['hour', 'minute', 'ampm']),
       default => $date_part_order,
     };
 

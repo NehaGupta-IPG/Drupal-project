@@ -235,7 +235,7 @@ class SqlTest extends UnitTestCase {
       foreach ($entities as $entity_id => $entity) {
         $entity_storages[$entity_type_id]->load($entity_id)->willReturn($entity);
       }
-      $entity_storages[$entity_type_id]->loadMultiple(array_keys($entities))->willReturn($entities);
+      $entity_storages[$entity_type_id]->loadMultiple(\array_keys($entities))->willReturn($entities);
     }
 
     foreach ($entity_revisions_by_type as $entity_type_id => $entity_revisions) {
@@ -448,9 +448,9 @@ class SqlTest extends UnitTestCase {
     $this->assertEquals([], $result[1]->_relationship_entities);
 
     // This is an entity table and should be in $entity_information.
-    $this->assertContains('first', array_keys($entity_information));
+    $this->assertContains('first', \array_keys($entity_information));
     // This is not an entity table and should not be in $entity_information.
-    $this->assertNotContains('entity_first_field_data__entity_first_field_data', array_keys($entity_information));
+    $this->assertNotContains('entity_first_field_data__entity_first_field_data', \array_keys($entity_information));
   }
 
   /**

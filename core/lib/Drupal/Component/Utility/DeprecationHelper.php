@@ -42,7 +42,7 @@ final class DeprecationHelper {
     // "10.2.0".
     $normalizedVersion = str_ends_with($currentVersion, '-dev') ? str_replace(['.x-dev', '-dev'], '.0', $currentVersion) : $currentVersion;
 
-    return version_compare($normalizedVersion, $deprecatedVersion, '>=') ? $currentCallable() : $deprecatedCallable();
+    return \version_compare($normalizedVersion, $deprecatedVersion, '>=') ? $currentCallable() : $deprecatedCallable();
   }
 
 }

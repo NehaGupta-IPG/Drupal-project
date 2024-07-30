@@ -96,7 +96,7 @@ abstract class Tasks {
    *   TRUE if the PDO driver is supported, otherwise FALSE.
    */
   protected function hasPdoDriver() {
-    return in_array($this->pdoDriver, \PDO::getAvailableDrivers());
+    return \in_array($this->pdoDriver, \PDO::getAvailableDrivers());
   }
 
   /**
@@ -155,9 +155,9 @@ abstract class Tasks {
         if (!isset($task['function'])) {
           $task['function'] = 'runTestQuery';
         }
-        if (method_exists($this, $task['function'])) {
+        if (\method_exists($this, $task['function'])) {
           // Returning false is fatal. No other tasks can run.
-          if (FALSE === call_user_func_array([$this, $task['function']], $task['arguments'])) {
+          if (FALSE === \call_user_func_array([$this, $task['function']], $task['arguments'])) {
             break;
           }
         }
@@ -262,8 +262,8 @@ abstract class Tasks {
     // @todo https:///www.drupal.org/node/3123240 Provide a better way to get
     //   the driver name.
     $reflection = new \ReflectionClass($this);
-    $dir_parts = explode(DIRECTORY_SEPARATOR, dirname($reflection->getFileName(), 2));
-    $driver = array_pop($dir_parts);
+    $dir_parts = \explode(DIRECTORY_SEPARATOR, \dirname($reflection->getFileName(), 2));
+    $driver = \array_pop($dir_parts);
 
     $form['database'] = [
       '#type' => 'textfield',

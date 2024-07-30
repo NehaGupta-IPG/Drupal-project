@@ -41,7 +41,7 @@ class PhpRequirementTest extends BrowserTestBase {
     // Configure them so that the site is properly configured and so that we
     // can cleanly test the errors related to PHP versions.
     $settings['settings']['trusted_host_patterns'] = (object) [
-      'value' => ['^' . preg_quote(\Drupal::request()->getHost()) . '$'],
+      'value' => ['^' . \preg_quote(\Drupal::request()->getHost()) . '$'],
       'required' => TRUE,
     ];
 
@@ -57,13 +57,13 @@ class PhpRequirementTest extends BrowserTestBase {
     $this->drupalGet('admin/reports/status');
     $this->assertSession()->statusCodeEquals(200);
 
-    $phpversion = phpversion();
+    $phpversion = \phpversion();
     // Verify that the PHP version is shown on the page.
     $this->assertSession()->pageTextContains($phpversion);
 
     // Verify that an error is displayed about the PHP version if it is below
     // the minimum supported PHP.
-    if (version_compare($phpversion, $minimum_php_version) < 0) {
+    if (\version_compare($phpversion, $minimum_php_version) < 0) {
       $this->assertErrorSummaries(['PHP']);
       $this->assertSession()->pageTextContains('Your PHP installation is too old. Drupal requires at least PHP ' . $minimum_php_version);
     }
@@ -75,7 +75,7 @@ class PhpRequirementTest extends BrowserTestBase {
 
     // There should be an informational message if the PHP version is below the
     // recommended version.
-    if (version_compare($phpversion, \Drupal::RECOMMENDED_PHP) < 0) {
+    if (\version_compare($phpversion, \Drupal::RECOMMENDED_PHP) < 0) {
       $this->assertSession()->pageTextContains('It is recommended to upgrade to PHP version ' . \Drupal::RECOMMENDED_PHP . ' or higher');
     }
     // Otherwise, the message should not be there.

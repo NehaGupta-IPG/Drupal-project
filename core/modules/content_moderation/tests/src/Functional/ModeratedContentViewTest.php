@@ -149,7 +149,7 @@ class ModeratedContentViewTest extends BrowserTestBase {
       $assert_session->linkByHrefExists('node/' . $node->id() . '/edit');
       $assert_session->linkByHrefExists('node/' . $node->id() . '/delete');
       // Verify that we can see the content type label.
-      $this->assertEquals($node->type->entity->label(), trim($node_type_labels[$delta]->getText()));
+      $this->assertEquals($node->type->entity->label(), \trim($node_type_labels[$delta]->getText()));
       $delta++;
     }
 

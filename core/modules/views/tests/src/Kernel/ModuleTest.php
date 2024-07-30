@@ -95,7 +95,7 @@ class ModuleTest extends ViewsKernelTestBase {
           'field' => $field,
         ];
         foreach ($data as $id => $field_data) {
-          if (!in_array($id, ['title', 'help'])) {
+          if (!\in_array($id, ['title', 'help'])) {
             $handler = $this->container->get('plugin.manager.views.' . $id)->getHandler($item);
             $this->assertInstanceHandler($handler, $table, $field, $id);
           }
@@ -123,33 +123,33 @@ class ModuleTest extends ViewsKernelTestBase {
 
     // Test views_view_is_enabled/disabled.
     $archive = $storage->load('archive');
-    $this->assertTrue(views_view_is_disabled($archive), 'views_view_is_disabled works as expected.');
+    $this->assertTrue(\views_view_is_disabled($archive), 'views_view_is_disabled works as expected.');
     // Enable the view and check this.
     $archive->enable();
-    $this->assertTrue(views_view_is_enabled($archive), ' views_view_is_enabled works as expected.');
+    $this->assertTrue(\views_view_is_enabled($archive), ' views_view_is_enabled works as expected.');
 
     // We can store this now, as we have enabled/disabled above.
     $all_views = $storage->loadMultiple();
 
     // Test Views::getAllViews().
-    ksort($all_views);
-    $this->assertEquals(array_keys($all_views), array_keys(Views::getAllViews()), 'Views::getAllViews works as expected.');
+    \ksort($all_views);
+    $this->assertEquals(\array_keys($all_views), \array_keys(Views::getAllViews()), 'Views::getAllViews works as expected.');
 
     // Test Views::getEnabledViews().
-    $expected_enabled = array_filter($all_views, function ($view) {
-      return views_view_is_enabled($view);
+    $expected_enabled = \array_filter($all_views, function ($view) {
+      return \views_view_is_enabled($view);
     });
-    $this->assertEquals(array_keys($expected_enabled), array_keys(Views::getEnabledViews()), 'Expected enabled views returned.');
+    $this->assertEquals(\array_keys($expected_enabled), \array_keys(Views::getEnabledViews()), 'Expected enabled views returned.');
 
     // Test Views::getDisabledViews().
-    $expected_disabled = array_filter($all_views, function ($view) {
-      return views_view_is_disabled($view);
+    $expected_disabled = \array_filter($all_views, function ($view) {
+      return \views_view_is_disabled($view);
     });
-    $this->assertEquals(array_keys($expected_disabled), array_keys(Views::getDisabledViews()), 'Expected disabled views returned.');
+    $this->assertEquals(\array_keys($expected_disabled), \array_keys(Views::getDisabledViews()), 'Expected disabled views returned.');
 
     // Test Views::getViewsAsOptions().
     // Test the $views_only parameter.
-    $this->assertSame(array_keys($all_views), array_keys(Views::getViewsAsOptions(TRUE)), 'Expected option keys for all views were returned.');
+    $this->assertSame(\array_keys($all_views), \array_keys(Views::getViewsAsOptions(TRUE)), 'Expected option keys for all views were returned.');
     $expected_options = [];
     foreach ($all_views as $id => $view) {
       $expected_options[$id] = $view->label();
@@ -165,8 +165,8 @@ class ModuleTest extends ViewsKernelTestBase {
 
     // Test the sort parameter.
     $all_views_sorted = $all_views;
-    ksort($all_views_sorted);
-    $this->assertSame(array_keys($all_views_sorted), array_keys(Views::getViewsAsOptions(TRUE, 'all', NULL, FALSE, TRUE)), 'All view id keys returned in expected sort order');
+    \ksort($all_views_sorted);
+    $this->assertSame(\array_keys($all_views_sorted), \array_keys(Views::getViewsAsOptions(TRUE, 'all', NULL, FALSE, TRUE)), 'All view id keys returned in expected sort order');
 
     // Test $exclude_view parameter.
     $this->assertArrayNotHasKey('archive', Views::getViewsAsOptions(TRUE, 'all', 'archive'));
@@ -191,13 +191,13 @@ class ModuleTest extends ViewsKernelTestBase {
 
     $this->assertFalse($view->status(), 'The view status is disabled.');
 
-    views_enable_view($view);
+    \views_enable_view($view);
     $this->assertTrue($view->status(), 'A view has been enabled.');
-    $this->assertEquals(views_view_is_enabled($view), $view->status(), 'views_view_is_enabled is correct.');
+    $this->assertEquals(\views_view_is_enabled($view), $view->status(), 'views_view_is_enabled is correct.');
 
-    views_disable_view($view);
+    \views_disable_view($view);
     $this->assertFalse($view->status(), 'A view has been disabled.');
-    $this->assertEquals(views_view_is_disabled($view), !$view->status(), 'views_view_is_disabled is correct.');
+    $this->assertEquals(\views_view_is_disabled($view), !$view->status(), 'views_view_is_disabled is correct.');
   }
 
   /**
@@ -211,13 +211,13 @@ class ModuleTest extends ViewsKernelTestBase {
     foreach ($definitions as $id => $definition) {
       $expected[$id] = $definition['title'];
     }
-    asort($expected);
-    $this->assertSame(array_keys($expected), array_keys($plugins));
+    \asort($expected);
+    $this->assertSame(\array_keys($expected), \array_keys($plugins));
 
     // Test using the 'test' style plugin type only returns the test_style and
     // mapping_test plugins.
     $plugins = Views::fetchPluginNames('style', 'test');
-    $this->assertSame(['mapping_test', 'test_style', 'test_template_style'], array_keys($plugins));
+    $this->assertSame(['mapping_test', 'test_style', 'test_template_style'], \array_keys($plugins));
 
     // Test a non existent style plugin type returns no plugins.
     $plugins = Views::fetchPluginNames('style', $this->randomString());
@@ -231,7 +231,7 @@ class ModuleTest extends ViewsKernelTestBase {
     $plugin_list = Views::pluginList();
     // Only plugins used by 'test_view' should be in the plugin list.
     foreach (['display:default', 'pager:none'] as $key) {
-      [$plugin_type, $plugin_id] = explode(':', $key);
+      [$plugin_type, $plugin_id] = \explode(':', $key);
       $plugin_def = $this->container->get("plugin.manager.views.$plugin_type")->getDefinition($plugin_id);
 
       $this->assertTrue(isset($plugin_list[$key]), "The expected $key plugin list key was found.");
@@ -251,23 +251,23 @@ class ModuleTest extends ViewsKernelTestBase {
     /** @var \Drupal\Core\Render\RendererInterface $renderer */
     $renderer = \Drupal::service('renderer');
 
-    $result = views_embed_view('test_argument');
+    $result = \views_embed_view('test_argument');
     $renderer->renderInIsolation($result);
     $this->assertCount(5, $result['view_build']['#view']->result);
 
-    $result = views_embed_view('test_argument', 'default', 1);
+    $result = \views_embed_view('test_argument', 'default', 1);
     $renderer->renderInIsolation($result);
     $this->assertCount(1, $result['view_build']['#view']->result);
 
-    $result = views_embed_view('test_argument', 'default', '1,2');
+    $result = \views_embed_view('test_argument', 'default', '1,2');
     $renderer->renderInIsolation($result);
     $this->assertCount(2, $result['view_build']['#view']->result);
 
-    $result = views_embed_view('test_argument', 'default', '1,2', 'John');
+    $result = \views_embed_view('test_argument', 'default', '1,2', 'John');
     $renderer->renderInIsolation($result);
     $this->assertCount(1, $result['view_build']['#view']->result);
 
-    $result = views_embed_view('test_argument', 'default', '1,2', 'John,George');
+    $result = \views_embed_view('test_argument', 'default', '1,2', 'John,George');
     $renderer->renderInIsolation($result);
     $this->assertCount(2, $result['view_build']['#view']->result);
   }

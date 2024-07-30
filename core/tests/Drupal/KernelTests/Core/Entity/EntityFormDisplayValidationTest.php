@@ -86,7 +86,7 @@ class EntityFormDisplayValidationTest extends ConfigEntityValidationTestBase {
     $text_field_config->save();
 
     // Then, configure a form display widget for this field.
-    assert($this->entity instanceof EntityFormDisplayInterface);
+    \assert($this->entity instanceof EntityFormDisplayInterface);
     $this->entity->setComponent('novel', [
       'type' => 'text_textarea',
       'region' => 'content',

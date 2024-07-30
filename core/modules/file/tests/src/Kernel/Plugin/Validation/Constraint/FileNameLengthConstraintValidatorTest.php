@@ -29,14 +29,14 @@ class FileNameLengthConstraintValidatorTest extends FileValidatorTestBase {
     $file = File::create();
 
     // Add a filename with an allowed length and test it.
-    $file->setFilename(str_repeat('x', 240));
-    $this->assertEquals(240, strlen($file->getFilename()));
+    $file->setFilename(\str_repeat('x', 240));
+    $this->assertEquals(240, \strlen($file->getFilename()));
     $validators = ['FileNameLength' => []];
     $violations = $this->validator->validate($file, $validators);
     $this->assertCount(0, $violations, 'No errors reported for 240 length filename.');
 
     // Add a filename with a length too long and test it.
-    $file->setFilename(str_repeat('x', 241));
+    $file->setFilename(\str_repeat('x', 241));
     $violations = $this->validator->validate($file, $validators);
     $this->assertCount(1, $violations, 'An error reported for 241 length filename.');
 

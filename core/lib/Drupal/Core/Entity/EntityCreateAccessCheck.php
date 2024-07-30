@@ -51,18 +51,18 @@ class EntityCreateAccessCheck implements AccessInterface {
    *   The access result.
    */
   public function access(Route $route, RouteMatchInterface $route_match, AccountInterface $account) {
-    [$entity_type, $bundle] = explode(':', $route->getRequirement($this->requirementsKey) . ':');
+    [$entity_type, $bundle] = \explode(':', $route->getRequirement($this->requirementsKey) . ':');
 
     // The bundle argument can contain request argument placeholders like
     // {name}, loop over the raw variables and attempt to replace them in the
     // bundle name. If a placeholder does not exist, it won't get replaced.
-    if ($bundle && str_contains($bundle, '{')) {
+    if ($bundle && \str_contains($bundle, '{')) {
       foreach ($route_match->getRawParameters()->all() as $name => $value) {
-        $bundle = str_replace('{' . $name . '}', $value, $bundle);
+        $bundle = \str_replace('{' . $name . '}', $value, $bundle);
       }
       // If we were unable to replace all placeholders, deny access.
-      if (str_contains($bundle, '{')) {
-        return AccessResult::neutral(sprintf("Could not find '%s' request argument, therefore cannot check create access.", $bundle));
+      if (\str_contains($bundle, '{')) {
+        return AccessResult::neutral(\sprintf("Could not find '%s' request argument, therefore cannot check create access.", $bundle));
       }
     }
     return $this->entityTypeManager->getAccessControlHandler($entity_type)->createAccess($bundle, $account, [], TRUE);

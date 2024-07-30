@@ -234,7 +234,7 @@ class MenuAccessTest extends BrowserTestBase {
     // the menu.
     $this->assertUserRoutesAccess(
       $noParentAccessUser,
-      array_diff($tree_routes, [
+      \array_diff($tree_routes, [
         'menu_test.parent_test',
         'menu_test.child3_test_block',
       ]),
@@ -364,7 +364,7 @@ class MenuAccessTest extends BrowserTestBase {
   private function assertMenuItemRoutesAccess(int $expected_status, string|Url ...$paths): void {
     foreach ($paths as $path) {
       $this->drupalGet($path);
-      if (!is_string($path)) {
+      if (!\is_string($path)) {
         $path = $path->toString();
       }
       // We don't use \Behat\Mink\WebAssert::statusCodeEquals() here because it
@@ -394,8 +394,8 @@ class MenuAccessTest extends BrowserTestBase {
    */
   private function assertUserRoutesAccess(AccountInterface $user, array $expectedAccessibleRoutes, array $allRoutes): void {
     $this->drupalLogin($user);
-    $expectedInaccessibleRoutes = array_diff($allRoutes, $expectedAccessibleRoutes);
-    $this->assertEmpty(array_diff($expectedAccessibleRoutes, $allRoutes));
+    $expectedInaccessibleRoutes = \array_diff($allRoutes, $expectedAccessibleRoutes);
+    $this->assertEmpty(\array_diff($expectedAccessibleRoutes, $allRoutes));
     $actualAccessibleRoutes = [];
     $actualInaccessibleRoutes = [];
     foreach ($allRoutes as $route) {
@@ -415,7 +415,7 @@ class MenuAccessTest extends BrowserTestBase {
 
       }
     }
-    $debug = fn($accessibleRoutes, $inaccessibleRoutes) => "\nAccessible routes: " . implode(', ', $accessibleRoutes) . "\nInaccessible routes: " . implode(', ', $inaccessibleRoutes);
+    $debug = fn($accessibleRoutes, $inaccessibleRoutes) => "\nAccessible routes: " . \implode(', ', $accessibleRoutes) . "\nInaccessible routes: " . \implode(', ', $inaccessibleRoutes);
     $expected = $debug($expectedAccessibleRoutes, $expectedInaccessibleRoutes);
     $actual = $debug($actualAccessibleRoutes, $actualInaccessibleRoutes);
     $this->assertSession()->assert($expected === $actual, "Routes do not match. \nExpected routes:$expected\nActual routes: $actual");

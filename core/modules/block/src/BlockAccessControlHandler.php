@@ -88,7 +88,7 @@ class BlockAccessControlHandler extends EntityAccessControlHandler implements En
       foreach ($entity->getVisibilityConditions() as $condition_id => $condition) {
         if ($condition instanceof ContextAwarePluginInterface) {
           try {
-            $contexts = $this->contextRepository->getRuntimeContexts(array_values($condition->getContextMapping()));
+            $contexts = $this->contextRepository->getRuntimeContexts(\array_values($condition->getContextMapping()));
             $this->contextHandler->applyContextMapping($condition, $contexts);
           }
           catch (MissingValueContextException) {
@@ -118,7 +118,7 @@ class BlockAccessControlHandler extends EntityAccessControlHandler implements En
         $block_plugin = $entity->getPlugin();
         try {
           if ($block_plugin instanceof ContextAwarePluginInterface) {
-            $contexts = $this->contextRepository->getRuntimeContexts(array_values($block_plugin->getContextMapping()));
+            $contexts = $this->contextRepository->getRuntimeContexts(\array_values($block_plugin->getContextMapping()));
             $this->contextHandler->applyContextMapping($block_plugin, $contexts);
           }
           $access = $block_plugin->access($account, TRUE);
@@ -136,10 +136,10 @@ class BlockAccessControlHandler extends EntityAccessControlHandler implements En
         }
       }
       else {
-        $reason = count($conditions) > 1
+        $reason = \count($conditions) > 1
           ? "One of the block visibility conditions ('%s') denied access."
           : "The block visibility condition '%s' denied access.";
-        $access = AccessResult::forbidden(sprintf($reason, implode("', '", array_keys($conditions))));
+        $access = AccessResult::forbidden(\sprintf($reason, \implode("', '", \array_keys($conditions))));
       }
 
       $this->mergeCacheabilityFromConditions($access, $conditions);

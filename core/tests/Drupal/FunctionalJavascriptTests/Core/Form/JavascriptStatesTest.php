@@ -153,7 +153,7 @@ class JavascriptStatesTest extends WebDriverTestBase {
       '//input[@name=:name][@value=:value]',
       [':name' => 'radios_all_disabled_when_checkbox_trigger_checked', ':value' => 'value2']);
     $this->assertCount(1, $radios_all_disabled_value2);
-    $radios_all_disabled_value2 = reset($radios_all_disabled_value2);
+    $radios_all_disabled_value2 = \reset($radios_all_disabled_value2);
 
     $radios_some_disabled_value1 = $this->xpath(
       '//input[@name=:name][@value=:value]',
@@ -164,7 +164,7 @@ class JavascriptStatesTest extends WebDriverTestBase {
       '//input[@name=:name][@value=:value]',
       [':name' => 'radios_some_disabled_when_checkbox_trigger_checked', ':value' => 'value2']);
     $this->assertCount(1, $radios_some_disabled_value2);
-    $radios_some_disabled_value2 = reset($radios_some_disabled_value2);
+    $radios_some_disabled_value2 = \reset($radios_some_disabled_value2);
 
     // Verify initial state.
     $this->assertTrue($textfield_invisible_element->isVisible());

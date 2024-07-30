@@ -57,7 +57,7 @@ class MediaLinkabilityTest extends MediaTestBase {
       function (ConstraintViolationInterface $v) {
         return (string) $v->getMessage();
       },
-      iterator_to_array(CKEditor5::validatePair(
+      \iterator_to_array(CKEditor5::validatePair(
         Editor::load('test_format'),
         FilterFormat::load('test_format')
       ))
@@ -163,7 +163,7 @@ class MediaLinkabilityTest extends MediaTestBase {
     $this->pressEditorButton('Source');
     $source_text_area = $assert_session->waitForElement('css', '.ck-source-editing-area textarea');
     $this->assertNotEmpty($source_text_area);
-    $new_value = str_replace('<a ', '<a class="trusted" ', $source_text_area->getValue());
+    $new_value = \str_replace('<a ', '<a class="trusted" ', $source_text_area->getValue());
     $source_text_area->setValue('<p>temp</p>');
     $source_text_area->setValue($new_value);
     $this->pressEditorButton('Source');

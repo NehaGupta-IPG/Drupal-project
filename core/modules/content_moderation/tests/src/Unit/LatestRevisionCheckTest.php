@@ -72,7 +72,7 @@ class LatestRevisionCheckTest extends UnitTestCase {
       'view own unpublished content',
     ];
     foreach ($possible_permissions as $permission) {
-      $account->hasPermission($permission)->willReturn(in_array($permission, $account_permissions));
+      $account->hasPermission($permission)->willReturn(\in_array($permission, $account_permissions));
     }
     $account->id()->willReturn(42);
 
@@ -81,7 +81,7 @@ class LatestRevisionCheckTest extends UnitTestCase {
     $entity->getCacheContexts()->willReturn([]);
     $entity->getCacheTags()->willReturn([]);
     $entity->getCacheMaxAge()->willReturn(0);
-    if (is_subclass_of($entity_class, EntityOwnerInterface::class)) {
+    if (\is_subclass_of($entity_class, EntityOwnerInterface::class)) {
       $entity->getOwnerId()->willReturn($is_owner ? 42 : 3);
     }
 

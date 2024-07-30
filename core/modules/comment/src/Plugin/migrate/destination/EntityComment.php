@@ -76,7 +76,7 @@ class EntityComment extends EntityContentBase {
       $plugin_definition,
       $migration,
       $container->get('entity_type.manager')->getStorage($entity_type),
-      array_keys($container->get('entity_type.bundle.info')->getBundleInfo($entity_type)),
+      \array_keys($container->get('entity_type.bundle.info')->getBundleInfo($entity_type)),
       $container->get('entity_field.manager'),
       $container->get('plugin.manager.field.field_type'),
       $container->get('state'),

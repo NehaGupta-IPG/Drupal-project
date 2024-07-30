@@ -78,8 +78,8 @@ class EntityTest extends ContentEntityBase implements EntityOwnerInterface {
     $fields = parent::baseFieldDefinitions($entity_type);
 
     $fields['name'] = BaseFieldDefinition::create('string')
-      ->setLabel(t('Name'))
-      ->setDescription(t('The name of the test entity.'))
+      ->setLabel(\t('Name'))
+      ->setDescription(\t('The name of the test entity.'))
       ->setTranslatable(TRUE)
       ->setSetting('max_length', 64)
       ->setDisplayOptions('view', [
@@ -93,13 +93,13 @@ class EntityTest extends ContentEntityBase implements EntityOwnerInterface {
       ]);
 
     $fields['created'] = BaseFieldDefinition::create('created')
-      ->setLabel(t('Authored on'))
-      ->setDescription(t('Time the entity was created'))
+      ->setLabel(\t('Authored on'))
+      ->setDescription(\t('Time the entity was created'))
       ->setTranslatable(TRUE);
 
     $fields['user_id'] = BaseFieldDefinition::create('entity_reference')
-      ->setLabel(t('User ID'))
-      ->setDescription(t('The ID of the associated user.'))
+      ->setLabel(\t('User ID'))
+      ->setDescription(\t('The ID of the associated user.'))
       ->setSetting('target_type', 'user')
       ->setSetting('handler', 'default')
       // Default EntityTest entities to have the root user as the owner, to

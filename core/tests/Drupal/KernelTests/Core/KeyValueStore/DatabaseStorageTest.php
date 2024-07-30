@@ -41,7 +41,7 @@ class DatabaseStorageTest extends StorageTestBase {
    */
   public function testConcurrent(): void {
     $this->markTestSkipped("Skipped due to frequent random test failures. See https://www.drupal.org/project/drupal/issues/3398063");
-    if (!function_exists('pcntl_fork')) {
+    if (!\function_exists('pcntl_fork')) {
       $this->markTestSkipped('Requires the pcntl_fork() function');
     }
 
@@ -54,11 +54,11 @@ class DatabaseStorageTest extends StorageTestBase {
     $default_connection = Database::getConnectionInfo();
     Database::removeConnection('default');
 
-    $time_to_start = microtime(TRUE) + 0.1;
+    $time_to_start = \microtime(TRUE) + 0.1;
 
     // This loop creates a new fork to set or get key values keys.
     foreach ($functions as $i => $function) {
-      $pid = pcntl_fork();
+      $pid = \pcntl_fork();
       if ($pid == -1) {
         $this->fail("Error forking");
       }
@@ -70,7 +70,7 @@ class DatabaseStorageTest extends StorageTestBase {
         $factory = new KeyValueDatabaseFactory($this->container->get('serialization.phpserialize'), Database::getConnection());
         $store = $factory->get('test');
         // Sleep so that all the forks start at the same time.
-        usleep((int) (($time_to_start - microtime(TRUE)) * 1000000));
+        \usleep((int) (($time_to_start - \microtime(TRUE)) * 1000000));
         if ($function === 'getAll') {
           $this->assertIsArray($store->getAll());
         }
@@ -83,7 +83,7 @@ class DatabaseStorageTest extends StorageTestBase {
 
     // This while loop holds the parent process until all the child threads
     // are complete - at which point the script continues to execute.
-    while (pcntl_waitpid(0, $status) != -1);
+    while (\pcntl_waitpid(0, $status) != -1);
 
     Database::addConnectionInfo('default', 'default', $default_connection['default']);
     $factory = new KeyValueDatabaseFactory($this->container->get('serialization.phpserialize'), Database::getConnection());

@@ -45,25 +45,25 @@ class PathProcessorImageStyles implements InboundPathProcessorInterface {
    */
   public function processInbound($path, Request $request) {
     $directory_path = $this->streamWrapperManager->getViaScheme('public')->getDirectoryPath();
-    if (str_starts_with($path, '/' . $directory_path . '/styles/')) {
+    if (\str_starts_with($path, '/' . $directory_path . '/styles/')) {
       $path_prefix = '/' . $directory_path . '/styles/';
     }
     // Check if the string '/system/files/styles/' exists inside the path,
     // that means we have a case of private file's image style.
-    elseif (str_contains($path, '/system/files/styles/')) {
+    elseif (\str_contains($path, '/system/files/styles/')) {
       $path_prefix = '/system/files/styles/';
-      $path = substr($path, strpos($path, $path_prefix), strlen($path));
+      $path = \substr($path, \strpos($path, $path_prefix), \strlen($path));
     }
     else {
       return $path;
     }
 
     // Strip out path prefix.
-    $rest = preg_replace('|^' . preg_quote($path_prefix, '|') . '|', '', $path);
+    $rest = \preg_replace('|^' . \preg_quote($path_prefix, '|') . '|', '', $path);
 
     // Get the image style, scheme and path.
-    if (substr_count($rest, '/') >= 2) {
-      [$image_style, $scheme, $file] = explode('/', $rest, 3);
+    if (\substr_count($rest, '/') >= 2) {
+      [$image_style, $scheme, $file] = \explode('/', $rest, 3);
 
       // Set the file as query parameter.
       $request->query->set('file', $file);

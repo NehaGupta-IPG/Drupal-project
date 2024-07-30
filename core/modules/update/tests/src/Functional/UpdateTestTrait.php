@@ -37,7 +37,7 @@ trait UpdateTestTrait {
    * @throws \Exception
    */
   protected function mockInstalledExtensionsInfo(array $installed_extensions): void {
-    if (in_array('#all', array_keys($installed_extensions), TRUE)) {
+    if (\in_array('#all', \array_keys($installed_extensions), TRUE)) {
       throw new \Exception("#all (default value) shouldn't be set here instead use ::mockDefaultExtensionsInfo().");
     }
     $system_info = $this->config('update_test.settings')->get('system_info');

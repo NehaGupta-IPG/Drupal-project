@@ -135,7 +135,7 @@ class PathProcessorLanguage implements InboundPathProcessorInterface, OutboundPa
     foreach ($this->languageManager->getLanguageTypes() as $type) {
       foreach ($this->negotiator->getNegotiationMethods($type) as $method_id => $method) {
         if (!isset($this->processors[$scope][$method_id])) {
-          if (is_subclass_of($method['class'], $interface)) {
+          if (\is_subclass_of($method['class'], $interface)) {
             $this->processors[$scope][$method_id] = $this->negotiator->getNegotiationMethodInstance($method_id);
             $weights[$method_id] = $method['weight'];
           }
@@ -145,7 +145,7 @@ class PathProcessorLanguage implements InboundPathProcessorInterface, OutboundPa
 
     // Sort the processors list, so that their functions are called in the
     // order specified by the weight of the methods.
-    uksort($this->processors[$scope], function ($method_id_a, $method_id_b) use ($weights) {
+    \uksort($this->processors[$scope], function ($method_id_a, $method_id_b) use ($weights) {
       return $weights[$method_id_a] <=> $weights[$method_id_b];
     });
   }

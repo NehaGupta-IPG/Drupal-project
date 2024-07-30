@@ -70,7 +70,7 @@ class MediaTranslationUITest extends ContentTranslationUITestBase {
    * {@inheritdoc}
    */
   protected function getTranslatorPermissions(): array {
-    return array_merge(parent::getTranslatorPermissions(), [
+    return \array_merge(parent::getTranslatorPermissions(), [
       'administer media',
       'edit any test media',
     ]);
@@ -87,7 +87,7 @@ class MediaTranslationUITest extends ContentTranslationUITestBase {
    * {@inheritdoc}
    */
   protected function getAdministratorPermissions(): array {
-    return array_merge(parent::getAdministratorPermissions(), [
+    return \array_merge(parent::getAdministratorPermissions(), [
       'access administration pages',
       'administer media types',
       'access media overview',

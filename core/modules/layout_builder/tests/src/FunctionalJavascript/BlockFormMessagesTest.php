@@ -102,7 +102,7 @@ class BlockFormMessagesTest extends WebDriverTestBase {
     $top_form_elements = $page->findAll('css', '#drupal-off-canvas form > *');
     // Ensure the messages are the first top level element of the form.
     $this->assertStringContainsStringIgnoringCase('Title field is required.', $top_form_elements[0]->getText());
-    $this->assertGreaterThan(4, count($top_form_elements));
+    $this->assertGreaterThan(4, \count($top_form_elements));
   }
 
 }

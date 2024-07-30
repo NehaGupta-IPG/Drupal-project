@@ -98,7 +98,7 @@ class Language extends ConditionPluginBase implements ContainerFactoryPluginInte
    * {@inheritdoc}
    */
   public function submitConfigurationForm(array &$form, FormStateInterface $form_state) {
-    $this->configuration['langcodes'] = array_filter($form_state->getValue('langcodes'));
+    $this->configuration['langcodes'] = \array_filter($form_state->getValue('langcodes'));
     parent::submitConfigurationForm($form, $form_state);
   }
 
@@ -109,7 +109,7 @@ class Language extends ConditionPluginBase implements ContainerFactoryPluginInte
     $language_list = $this->languageManager->getLanguages(LanguageInterface::STATE_ALL);
     $selected = $this->configuration['langcodes'];
     // Reduce the language list to an array of language names.
-    $language_names = array_reduce($language_list, function ($result, $item) use ($selected) {
+    $language_names = \array_reduce($language_list, function ($result, $item) use ($selected) {
       // If the current item of the $language_list array is one of the selected
       // languages, add it to the $results array.
       if (!empty($selected[$item->getId()])) {
@@ -119,12 +119,12 @@ class Language extends ConditionPluginBase implements ContainerFactoryPluginInte
     }, []);
 
     // If we have more than one language selected, separate them by commas.
-    if (count($this->configuration['langcodes']) > 1) {
-      $languages = implode(', ', $language_names);
+    if (\count($this->configuration['langcodes']) > 1) {
+      $languages = \implode(', ', $language_names);
     }
     else {
       // If we have just one language just grab the only present value.
-      $languages = array_pop($language_names);
+      $languages = \array_pop($language_names);
     }
     if (!empty($this->configuration['negate'])) {
       return $this->t('The language is not @languages.', ['@languages' => $languages]);

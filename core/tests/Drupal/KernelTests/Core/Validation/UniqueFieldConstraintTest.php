@@ -109,8 +109,8 @@ class UniqueFieldConstraintTest extends KernelTestBase {
       'without an id' => [NULL],
       'zero as integer' => [0],
       'zero as string' => ["0"],
-      'non-zero as integer' => [mt_rand(1, 127)],
-      'non-zero as string' => [(string) mt_rand(1, 127)],
+      'non-zero as integer' => [\mt_rand(1, 127)],
+      'non-zero as string' => [(string) \mt_rand(1, 127)],
       'alphanumeric' => [Random::machineName()],
     ];
   }

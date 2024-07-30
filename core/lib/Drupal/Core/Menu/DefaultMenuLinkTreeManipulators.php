@@ -117,7 +117,7 @@ class DefaultMenuLinkTreeManipulators {
     $node_links = [];
     $this->collectNodeLinks($tree, $node_links);
     if ($node_links) {
-      $nids = array_keys($node_links);
+      $nids = \array_keys($node_links);
 
       $query = $this->entityTypeManager->getStorage('node')->getQuery();
       $query->accessCheck(TRUE);
@@ -213,7 +213,7 @@ class DefaultMenuLinkTreeManipulators {
       // index insures that it is unique.
       $new_tree[(50000 + $instance->getWeight()) . ' ' . $instance->getTitle() . ' ' . $instance->getPluginId()] = $tree[$key];
     }
-    ksort($new_tree);
+    \ksort($new_tree);
     return $new_tree;
   }
 

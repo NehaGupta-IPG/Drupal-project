@@ -46,7 +46,7 @@ class FilterSecurityTest extends BrowserTestBase {
     /** @var \Drupal\filter\Entity\FilterFormat $filtered_html_format */
     $filtered_html_format = FilterFormat::load('filtered_html');
     $filtered_html_permission = $filtered_html_format->getPermissionName();
-    user_role_grant_permissions(RoleInterface::ANONYMOUS_ID, [$filtered_html_permission]);
+    \user_role_grant_permissions(RoleInterface::ANONYMOUS_ID, [$filtered_html_permission]);
 
     $this->adminUser = $this->drupalCreateUser([
       'administer modules',

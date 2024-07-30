@@ -66,8 +66,8 @@ class EntityExists extends ProcessPluginBase implements ContainerFactoryPluginIn
    * {@inheritdoc}
    */
   public function transform($value, MigrateExecutableInterface $migrate_executable, Row $row, $destination_property) {
-    if (is_array($value)) {
-      $value = reset($value);
+    if (\is_array($value)) {
+      $value = \reset($value);
     }
 
     $entity = $this->storage->load($value);

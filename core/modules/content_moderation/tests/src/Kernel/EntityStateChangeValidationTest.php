@@ -58,7 +58,7 @@ class EntityStateChangeValidationTest extends KernelTestBase {
     $this->installEntitySchema('content_moderation_state');
     $this->installConfig('content_moderation');
 
-    $this->adminUser = $this->createUser(array_keys($this->container->get('user.permissions')->getPermissions()));
+    $this->adminUser = $this->createUser(\array_keys($this->container->get('user.permissions')->getPermissions()));
   }
 
   /**

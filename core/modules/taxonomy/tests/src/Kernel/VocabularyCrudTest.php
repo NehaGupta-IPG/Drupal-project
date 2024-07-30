@@ -102,7 +102,7 @@ class VocabularyCrudTest extends KernelTestBase {
       $vocabulary2->id(),
       $vocabulary1->id(),
     ]);
-    $loaded_order = array_keys($vocabularies);
+    $loaded_order = \array_keys($vocabularies);
     $expected_order = [
       $vocabulary3->id(),
       $vocabulary2->id(),
@@ -113,11 +113,11 @@ class VocabularyCrudTest extends KernelTestBase {
     // Test loading vocabularies by their properties.
     $storage = $this->container->get('entity_type.manager')->getStorage('taxonomy_vocabulary');
     // Fetch vocabulary 1 by name.
-    $vocabulary = current($storage->loadByProperties(['name' => $vocabulary1->label()]));
+    $vocabulary = \current($storage->loadByProperties(['name' => $vocabulary1->label()]));
     $this->assertEquals($vocabulary1->id(), $vocabulary->id());
 
     // Fetch vocabulary 2 by name and ID.
-    $vocabulary = current($storage->loadByProperties([
+    $vocabulary = \current($storage->loadByProperties([
       'name' => $vocabulary2->label(),
       'vid' => $vocabulary2->id(),
     ]));

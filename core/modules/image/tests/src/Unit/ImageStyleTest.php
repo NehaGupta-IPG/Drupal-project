@@ -66,7 +66,7 @@ class ImageStyleTest extends UnitTestCase {
         ['effects' => [$image_effect_id => ['id' => $image_effect_id]]],
         $this->entityTypeId,
       ])
-      ->onlyMethods(array_merge($default_stubs, $stubs))
+      ->onlyMethods(\array_merge($default_stubs, $stubs))
       ->getMock();
 
     $image_style->expects($this->any())

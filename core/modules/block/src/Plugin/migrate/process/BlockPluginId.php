@@ -73,11 +73,11 @@ class BlockPluginId extends ProcessPluginBase implements ContainerFactoryPluginI
    * Set the block plugin id.
    */
   public function transform($value, MigrateExecutableInterface $migrate_executable, Row $row, $destination_property) {
-    if (is_array($value)) {
+    if (\is_array($value)) {
       [$module, $delta] = $value;
       switch ($module) {
         case 'aggregator':
-          [$type] = explode('-', $delta);
+          [$type] = \explode('-', $delta);
           if ($type == 'feed') {
             return 'aggregator_feed_block';
           }

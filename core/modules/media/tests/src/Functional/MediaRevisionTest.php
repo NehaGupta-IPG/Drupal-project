@@ -86,7 +86,7 @@ class MediaRevisionTest extends MediaFunctionalTestBase {
 
     // Test 'view all media revisions' permission ('view media' permission is
     // needed as well).
-    user_role_revoke_permissions($role->id(), [
+    \user_role_revoke_permissions($role->id(), [
       'view all media revisions',
     ]);
     $this->drupalGet($media->toUrl('revision'));
@@ -94,7 +94,7 @@ class MediaRevisionTest extends MediaFunctionalTestBase {
     $this->grantPermissions($role, ['view any test media revisions']);
     $this->drupalGet($media->toUrl('revision'));
     $assert->statusCodeEquals(200);
-    user_role_revoke_permissions($role->id(), ['view any test media revisions']);
+    \user_role_revoke_permissions($role->id(), ['view any test media revisions']);
     $this->grantPermissions($role, ['view all media revisions']);
     $this->drupalGet($media->toUrl('revision'));
     $assert->statusCodeEquals(200);
@@ -110,7 +110,7 @@ class MediaRevisionTest extends MediaFunctionalTestBase {
     $assert = $this->assertSession();
 
     $uri = 'temporary://foo.txt';
-    file_put_contents($uri, $this->randomString(128));
+    \file_put_contents($uri, $this->randomString(128));
 
     $this->createMediaType('file', ['id' => 'document', 'new_revision' => TRUE]);
 

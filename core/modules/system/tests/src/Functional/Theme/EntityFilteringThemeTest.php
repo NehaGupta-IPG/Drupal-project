@@ -91,14 +91,14 @@ class EntityFilteringThemeTest extends BrowserTestBase {
     $this->themes = $listing->scan('theme', FALSE);
     /** @var \Drupal\Core\Extension\ThemeHandlerInterface $theme_handler */
     $theme_data = \Drupal::service('extension.list.theme')->reset()->getList();
-    foreach (array_keys($this->themes) as $theme) {
+    foreach (\array_keys($this->themes) as $theme) {
       // Skip obsolete and deprecated themes.
       $info = $theme_data[$theme]->info;
       if ($info[ExtensionLifecycle::LIFECYCLE_IDENTIFIER] === ExtensionLifecycle::OBSOLETE || $info[ExtensionLifecycle::LIFECYCLE_IDENTIFIER] === ExtensionLifecycle::DEPRECATED) {
         unset($this->themes[$theme]);
       }
     }
-    \Drupal::service('theme_installer')->install(array_keys($this->themes));
+    \Drupal::service('theme_installer')->install(\array_keys($this->themes));
 
     // Create a test user.
     $this->user = $this->drupalCreateUser([

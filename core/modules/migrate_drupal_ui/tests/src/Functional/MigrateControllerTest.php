@@ -90,7 +90,7 @@ class MigrateControllerTest extends BrowserTestBase {
   public function clickViewsOperationsLink($label, $href_part) {
     $links = $this->xpath('//a[normalize-space(text())=:label]', [':label' => (string) $label]);
     foreach ($links as $link_index => $link) {
-      $position = strpos($link->getAttribute('href'), $href_part);
+      $position = \strpos($link->getAttribute('href'), $href_part);
       if ($position !== FALSE) {
         $index = $link_index;
         $this->clickLink((string) $label, $index);

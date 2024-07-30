@@ -106,7 +106,7 @@ class ShortcutSetsTest extends ShortcutTestBase {
     $this->assertSession()->elementTextEquals('xpath', '//div[@class="layout-content"]//table/thead/tr/th[3]', 'Operations');
 
     // Look for test shortcuts in the table.
-    $weight = count($shortcuts);
+    $weight = \count($shortcuts);
     $edit = [];
     foreach ($shortcuts as $shortcut) {
       $title = $shortcut->getTitle();
@@ -128,7 +128,7 @@ class ShortcutSetsTest extends ShortcutTestBase {
     \Drupal::entityTypeManager()->getStorage('shortcut')->resetCache();
     // Check to ensure that the shortcut weights have changed and that
     // ShortcutSet::.getShortcuts() returns shortcuts in the new order.
-    $this->assertSame(array_reverse(array_keys($shortcuts)), array_keys($set->getShortcuts()));
+    $this->assertSame(\array_reverse(\array_keys($shortcuts)), \array_keys($set->getShortcuts()));
   }
 
   /**

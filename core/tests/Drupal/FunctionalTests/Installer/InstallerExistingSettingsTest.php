@@ -55,7 +55,7 @@ class InstallerExistingSettingsTest extends InstallerTestBase {
       'value' => $site_path . '/files/config_sync',
       'required' => TRUE,
     ];
-    mkdir($this->settings['settings']['config_sync_directory']->value, 0777, TRUE);
+    \mkdir($this->settings['settings']['config_sync_directory']->value, 0777, TRUE);
   }
 
   /**

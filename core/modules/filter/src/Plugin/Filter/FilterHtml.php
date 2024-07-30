@@ -72,7 +72,7 @@ class FilterHtml extends FilterBase {
       // The javascript in core/modules/filter/filter.filter_html.admin.js
       // removes new lines and double spaces so, for consistency when javascript
       // is disabled, remove them.
-      $configuration['settings']['allowed_html'] = preg_replace('/\s+/', ' ', $configuration['settings']['allowed_html']);
+      $configuration['settings']['allowed_html'] = \preg_replace('/\s+/', ' ', $configuration['settings']['allowed_html']);
     }
     parent::setConfiguration($configuration);
     // Force restrictions to be calculated again.
@@ -88,7 +88,7 @@ class FilterHtml extends FilterBase {
     // we rely on the well-tested Xss::filter() code. Since there is no '*' tag
     // that needs to be removed from the list.
     unset($restrictions['allowed']['*']);
-    $text = Xss::filter($text, array_keys($restrictions['allowed']));
+    $text = Xss::filter($text, \array_keys($restrictions['allowed']));
     // After we've done tag filtering, we do attribute and attribute value
     // filtering as the second part.
     return new FilterProcessResult($this->filterAttributes($text));
@@ -105,7 +105,7 @@ class FilterHtml extends FilterBase {
    */
   public function filterAttributes($text) {
     $restrictions = $this->getHTMLRestrictions();
-    $global_allowed_attributes = array_filter($restrictions['allowed']['*']);
+    $global_allowed_attributes = \array_filter($restrictions['allowed']['*']);
     unset($restrictions['allowed']['*']);
 
     // Apply attribute restrictions to tags.
@@ -121,14 +121,14 @@ class FilterHtml extends FilterBase {
       $allowed_attributes = ['exact' => [], 'prefix' => []];
       foreach (($global_allowed_attributes + $tag_attributes) as $name => $values) {
         // A trailing * indicates wildcard, but it must have some prefix.
-        if (str_ends_with($name, '*') && $name[0] !== '*') {
-          $allowed_attributes['prefix'][str_replace('*', '', $name)] = $this->prepareAttributeValues($values);
+        if (\str_ends_with($name, '*') && $name[0] !== '*') {
+          $allowed_attributes['prefix'][\str_replace('*', '', $name)] = $this->prepareAttributeValues($values);
         }
         else {
           $allowed_attributes['exact'][$name] = $this->prepareAttributeValues($values);
         }
       }
-      krsort($allowed_attributes['prefix']);
+      \krsort($allowed_attributes['prefix']);
 
       // Find all matching elements that have any attributes and filter the
       // attributes by name and value.
@@ -145,7 +145,7 @@ class FilterHtml extends FilterBase {
     }
     $text = Html::serialize($html_dom);
 
-    return trim($text);
+    return \trim($text);
   }
 
   /**
@@ -166,7 +166,7 @@ class FilterHtml extends FilterBase {
       }
       elseif ($allowed_value !== TRUE) {
         // Check the list of allowed attribute values.
-        $attribute_values = preg_split('/\s+/', $attribute->value, -1, PREG_SPLIT_NO_EMPTY);
+        $attribute_values = \preg_split('/\s+/', $attribute->value, -1, PREG_SPLIT_NO_EMPTY);
         $modified_attributes[$name] = [];
         foreach ($attribute_values as $value) {
           if ($this->findAllowedValue($allowed_value, $value)) {
@@ -179,7 +179,7 @@ class FilterHtml extends FilterBase {
     // appear in this array so the value on the DOM element is left unchanged.
     foreach ($modified_attributes as $name => $values) {
       if ($values) {
-        $element->setAttribute($name, implode(' ', $values));
+        $element->setAttribute($name, \implode(' ', $values));
       }
       else {
         $element->removeAttribute($name);
@@ -204,7 +204,7 @@ class FilterHtml extends FilterBase {
     }
     // Handle prefix (wildcard) matches.
     foreach ($allowed['prefix'] as $prefix => $value) {
-      if (str_starts_with($name, $prefix)) {
+      if (\str_starts_with($name, $prefix)) {
         return $value;
       }
     }
@@ -231,14 +231,14 @@ class FilterHtml extends FilterBase {
     $result = ['exact' => [], 'prefix' => []];
     foreach ($attribute_values as $name => $allowed) {
       // A trailing * indicates wildcard, but it must have some prefix.
-      if (str_ends_with($name, '*') && $name[0] !== '*') {
-        $result['prefix'][str_replace('*', '', $name)] = $allowed;
+      if (\str_ends_with($name, '*') && $name[0] !== '*') {
+        $result['prefix'][\str_replace('*', '', $name)] = $allowed;
       }
       else {
         $result['exact'][$name] = $allowed;
       }
     }
-    krsort($result['prefix']);
+    \krsort($result['prefix']);
     return $result;
   }
 
@@ -259,7 +259,7 @@ class FilterHtml extends FilterBase {
     // strips them as invalid.
     // cSpell:disable-next-line
     $star_protector = '__zqh6vxfbk3cg__';
-    $html = str_replace('*', $star_protector, $html);
+    $html = \str_replace('*', $star_protector, $html);
 
     // Use HTML5 parser with a custom tokenizer to correctly parse tags that
     // normally use text mode, such as iframe.
@@ -306,11 +306,11 @@ class FilterHtml extends FilterBase {
             continue;
           }
           // Put back any trailing * on wildcard attribute name.
-          $name = str_replace($star_protector, '*', $name);
+          $name = \str_replace($star_protector, '*', $name);
 
           // Put back any trailing * on wildcard attribute value and parse out
           // the allowed attribute values.
-          $allowed_attribute_values = preg_split('/\s+/', str_replace($star_protector, '*', $attribute->value), -1, PREG_SPLIT_NO_EMPTY);
+          $allowed_attribute_values = \preg_split('/\s+/', \str_replace($star_protector, '*', $attribute->value), -1, PREG_SPLIT_NO_EMPTY);
 
           // Sanitize the attribute value: it lists the allowed attribute values
           // but one allowed attribute value that some may be tempted to use
@@ -318,7 +318,7 @@ class FilterHtml extends FilterBase {
           // allowed attribute values with a wildcard. A wildcard by itself
           // would mean allowing all possible attribute values. But in that
           // case, one would not specify an attribute value at all.
-          $allowed_attribute_values = array_filter($allowed_attribute_values, function ($value) {
+          $allowed_attribute_values = \array_filter($allowed_attribute_values, function ($value) {
             return $value !== '*';
           });
 
@@ -453,7 +453,7 @@ class FilterHtml extends FilterBase {
       'h6' => [$this->t('Heading'), '<h6>' . $this->t('Subtitle six') . '</h6>'],
     ];
     $header = [$this->t('Tag Description'), $this->t('You Type'), $this->t('You Get')];
-    preg_match_all('/<([a-z0-9]+)[^a-z0-9]/i', $allowed_html, $out);
+    \preg_match_all('/<([a-z0-9]+)[^a-z0-9]/i', $allowed_html, $out);
     foreach ($out[1] as $tag) {
       if (!empty($tips[$tag])) {
         $rows[] = [

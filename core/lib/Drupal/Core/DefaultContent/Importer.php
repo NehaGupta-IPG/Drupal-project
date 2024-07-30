@@ -90,9 +90,9 @@ final class Importer implements LoggerAwareInterface {
       /** @var array{_meta: array<mixed>} $decoded */
       foreach ($content->data as $decoded) {
         ['uuid' => $uuid, 'entity_type' => $entity_type_id, 'path' => $path] = $decoded['_meta'];
-        assert(is_string($uuid));
-        assert(is_string($entity_type_id));
-        assert(is_string($path));
+        \assert(\is_string($uuid));
+        \assert(\is_string($entity_type_id));
+        \assert(\is_string($path));
 
         // The event subscribers asked to skip importing this entity. If they
         // explained why, log that.
@@ -133,10 +133,10 @@ final class Importer implements LoggerAwareInterface {
         // If a file exists in the same folder, copy it to the designated
         // target URI.
         if ($entity instanceof FileInterface) {
-          $this->copyFileAssociatedWithEntity(dirname($path), $entity);
+          $this->copyFileAssociatedWithEntity(\dirname($path), $entity);
         }
         $violations = $entity->validate();
-        if (count($violations) > 0) {
+        if (\count($violations) > 0) {
           throw new InvalidEntityException($violations, $path);
         }
         $entity->save();
@@ -157,11 +157,11 @@ final class Importer implements LoggerAwareInterface {
    */
   private function copyFileAssociatedWithEntity(string $path, FileInterface &$entity): void {
     $destination = $entity->getFileUri();
-    assert(is_string($destination));
+    \assert(\is_string($destination));
 
     // If the source file doesn't exist, there's nothing we can do.
-    $source = $path . '/' . basename($destination);
-    if (!file_exists($source)) {
+    $source = $path . '/' . \basename($destination);
+    if (!\file_exists($source)) {
       $this->logger?->warning("File entity %name was imported, but the associated file (@path) was not found.", [
         '%name' => $entity->label(),
         '@path' => $source,
@@ -170,13 +170,13 @@ final class Importer implements LoggerAwareInterface {
     }
 
     $copy_file = TRUE;
-    if (file_exists($destination)) {
-      $source_hash = hash_file('sha256', $source);
-      assert(is_string($source_hash));
-      $destination_hash = hash_file('sha256', $destination);
-      assert(is_string($destination_hash));
+    if (\file_exists($destination)) {
+      $source_hash = \hash_file('sha256', $source);
+      \assert(\is_string($source_hash));
+      $destination_hash = \hash_file('sha256', $destination);
+      \assert(\is_string($destination_hash));
 
-      if (hash_equals($source_hash, $destination_hash) && $this->entityTypeManager->getStorage('file')->loadByProperties(['uri' => $destination]) === []) {
+      if (\hash_equals($source_hash, $destination_hash) && $this->entityTypeManager->getStorage('file')->loadByProperties(['uri' => $destination]) === []) {
         // If the file hashes match and the file is not already a managed file
         // then do not copy a new version to the file system. This prevents
         // re-installs during development from creating unnecessary duplicates.
@@ -225,14 +225,14 @@ final class Importer implements LoggerAwareInterface {
     if ($this->dependencies === NULL && !empty($data['_meta']['depends'])) {
       $is_root = TRUE;
       foreach ($data['_meta']['depends'] as $uuid => $entity_type) {
-        assert(is_string($uuid));
-        assert(is_string($entity_type));
+        \assert(\is_string($uuid));
+        \assert(\is_string($entity_type));
         $this->dependencies[$uuid] = [$entity_type, $uuid];
       }
     }
 
     ['entity_type' => $entity_type] = $data['_meta'];
-    assert(is_string($entity_type));
+    \assert(\is_string($entity_type));
     /** @var \Drupal\Core\Entity\EntityTypeInterface $entity_type */
     $entity_type = $this->entityTypeManager->getDefinition($entity_type);
 
@@ -302,13 +302,13 @@ final class Importer implements LoggerAwareInterface {
           if (\is_string($value)) {
             throw new ImportException("Received string for serialized property $field_name.$delta.$property_name");
           }
-          $value = serialize($value);
+          $value = \serialize($value);
         }
 
         $property = $item->get($property_name);
 
         if ($property instanceof EntityReference) {
-          if (is_array($value)) {
+          if (\is_array($value)) {
             $value = $this->toEntity($value);
           }
           else {
@@ -341,10 +341,10 @@ final class Importer implements LoggerAwareInterface {
       $definition = $field_item->getPluginDefinition();
       $serialized_fields = $field_item->getEntity()->getEntityType()->get('serialized_field_property_names');
       $field_name = $field_item->getFieldDefinition()->getName();
-      if (is_array($serialized_fields) && isset($serialized_fields[$field_name]) && is_array($serialized_fields[$field_name])) {
+      if (\is_array($serialized_fields) && isset($serialized_fields[$field_name]) && \is_array($serialized_fields[$field_name])) {
         return $serialized_fields[$field_name];
       }
-      if (isset($definition['serialized_property_names']) && is_array($definition['serialized_property_names'])) {
+      if (isset($definition['serialized_property_names']) && \is_array($definition['serialized_property_names'])) {
         return $definition['serialized_property_names'];
       }
     }
@@ -361,9 +361,9 @@ final class Importer implements LoggerAwareInterface {
    *   The loaded entity.
    */
   private function loadEntityDependency(string $target_uuid): ?ContentEntityInterface {
-    if ($this->dependencies && array_key_exists($target_uuid, $this->dependencies)) {
+    if ($this->dependencies && \array_key_exists($target_uuid, $this->dependencies)) {
       $entity = $this->entityRepository->loadEntityByUuid(...$this->dependencies[$target_uuid]);
-      assert($entity instanceof ContentEntityInterface || $entity === NULL);
+      \assert($entity instanceof ContentEntityInterface || $entity === NULL);
       return $entity;
     }
     return NULL;

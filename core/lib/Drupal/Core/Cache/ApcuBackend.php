@@ -81,7 +81,7 @@ class ApcuBackend implements CacheBackendInterface {
    * {@inheritdoc}
    */
   public function get($cid, $allow_invalid = FALSE) {
-    $cache = apcu_fetch($this->getApcuKey($cid));
+    $cache = \apcu_fetch($this->getApcuKey($cid));
     return $this->prepareItem($cache, $allow_invalid);
   }
 
@@ -95,7 +95,7 @@ class ApcuBackend implements CacheBackendInterface {
       $map[$this->getApcuKey($cid)] = $cid;
     }
 
-    $result = apcu_fetch(array_keys($map));
+    $result = \apcu_fetch(\array_keys($map));
     $cache = [];
     if ($result) {
       // Before checking the validity of each item individually, register the
@@ -119,7 +119,7 @@ class ApcuBackend implements CacheBackendInterface {
     }
     unset($result);
 
-    $cids = array_diff($cids, array_keys($cache));
+    $cids = \array_diff($cids, \array_keys($cache));
     return $cache;
   }
 
@@ -140,7 +140,7 @@ class ApcuBackend implements CacheBackendInterface {
    *   An APCUIterator containing matched items.
    */
   protected function getAll($prefix = '') {
-    return $this->getIterator('/^' . preg_quote($this->getApcuKey($prefix), '/') . '/');
+    return $this->getIterator('/^' . \preg_quote($this->getApcuKey($prefix), '/') . '/');
   }
 
   /**
@@ -162,7 +162,7 @@ class ApcuBackend implements CacheBackendInterface {
       return FALSE;
     }
 
-    $cache->tags = $cache->tags ? explode(' ', $cache->tags) : [];
+    $cache->tags = $cache->tags ? \explode(' ', $cache->tags) : [];
 
     // Check expire time.
     $cache->valid = $cache->expire == Cache::PERMANENT || $cache->expire >= $this->time->getRequestTime();
@@ -183,20 +183,20 @@ class ApcuBackend implements CacheBackendInterface {
    * {@inheritdoc}
    */
   public function set($cid, $data, $expire = CacheBackendInterface::CACHE_PERMANENT, array $tags = []) {
-    assert(Inspector::assertAllStrings($tags), 'Cache tags must be strings.');
-    $tags = array_unique($tags);
+    \assert(Inspector::assertAllStrings($tags), 'Cache tags must be strings.');
+    $tags = \array_unique($tags);
     $cache = new \stdClass();
     $cache->cid = $cid;
-    $cache->created = round(microtime(TRUE), 3);
+    $cache->created = \round(\microtime(TRUE), 3);
     $cache->expire = $expire;
-    $cache->tags = implode(' ', $tags);
+    $cache->tags = \implode(' ', $tags);
     $cache->checksum = $this->checksumProvider->getCurrentChecksum($tags);
     // APCu serializes/unserializes any structure itself.
     $cache->serialized = 0;
     $cache->data = $data;
 
     // Expiration is handled by our own prepareItem(), not APCu.
-    apcu_store($this->getApcuKey($cid), $cache);
+    \apcu_store($this->getApcuKey($cid), $cache);
   }
 
   /**
@@ -212,21 +212,21 @@ class ApcuBackend implements CacheBackendInterface {
    * {@inheritdoc}
    */
   public function delete($cid) {
-    apcu_delete($this->getApcuKey($cid));
+    \apcu_delete($this->getApcuKey($cid));
   }
 
   /**
    * {@inheritdoc}
    */
   public function deleteMultiple(array $cids) {
-    apcu_delete(array_map([$this, 'getApcuKey'], $cids));
+    \apcu_delete(\array_map([$this, 'getApcuKey'], $cids));
   }
 
   /**
    * {@inheritdoc}
    */
   public function deleteAll() {
-    apcu_delete($this->getIterator('/^' . preg_quote($this->binPrefix, '/') . '/'));
+    \apcu_delete($this->getIterator('/^' . \preg_quote($this->binPrefix, '/') . '/'));
   }
 
   /**
@@ -240,7 +240,7 @@ class ApcuBackend implements CacheBackendInterface {
    * {@inheritdoc}
    */
   public function removeBin() {
-    apcu_delete($this->getIterator('/^' . preg_quote($this->binPrefix, '/') . '/'));
+    \apcu_delete($this->getIterator('/^' . \preg_quote($this->binPrefix, '/') . '/'));
   }
 
   /**
@@ -265,7 +265,7 @@ class ApcuBackend implements CacheBackendInterface {
   public function invalidateAll() {
     @trigger_error("CacheBackendInterface::invalidateAll() is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Use CacheBackendInterface::deleteAll() or cache tag invalidation instead. See https://www.drupal.org/node/3500622", E_USER_DEPRECATED);
     foreach ($this->getAll() as $data) {
-      $cid = str_replace($this->binPrefix, '', $data['key']);
+      $cid = \str_replace($this->binPrefix, '', $data['key']);
       $this->set($cid, $data['value'], $this->time->getRequestTime() - 1);
     }
   }

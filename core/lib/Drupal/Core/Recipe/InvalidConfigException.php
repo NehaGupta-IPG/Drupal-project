@@ -48,13 +48,13 @@ final class InvalidConfigException extends \RuntimeException {
    */
   private function formatMessage(): string {
     $lines = [
-      sprintf('There were validation errors in %s:', $this->data->getName()),
+      \sprintf('There were validation errors in %s:', $this->data->getName()),
     ];
     /** @var \Symfony\Component\Validator\ConstraintViolationInterface $violation */
     foreach ($this->violations as $violation) {
-      $lines[] = sprintf('- %s: %s', $violation->getPropertyPath(), $violation->getMessage());
+      $lines[] = \sprintf('- %s: %s', $violation->getPropertyPath(), $violation->getMessage());
     }
-    return implode("\n", $lines);
+    return \implode("\n", $lines);
   }
 
 }

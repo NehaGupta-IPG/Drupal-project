@@ -26,7 +26,7 @@ final class RunnerVersion {
    *   The major version of the PHPUnit runner being used.
    */
   public static function getMajor() {
-    return (int) explode('.', Version::id())[0];
+    return (int) \explode('.', Version::id())[0];
   }
 
 }

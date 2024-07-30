@@ -63,8 +63,8 @@ class ToolbarItemConstraintValidator extends ConstraintValidator implements Cont
       return TRUE;
     }
 
-    $available_toolbar_items = array_keys($this->pluginManager->getToolbarItems());
-    return in_array($toolbar_item, $available_toolbar_items, TRUE);
+    $available_toolbar_items = \array_keys($this->pluginManager->getToolbarItems());
+    return \in_array($toolbar_item, $available_toolbar_items, TRUE);
   }
 
 }

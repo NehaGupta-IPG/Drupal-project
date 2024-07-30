@@ -82,7 +82,7 @@ class BlockContentBlock extends BlockBase implements ContainerFactoryPluginInter
       '#title' => $this->t('View mode'),
       '#description' => $this->t('Output the block in this view mode.'),
       '#default_value' => $this->configuration['view_mode'],
-      '#access' => (count($options) > 1),
+      '#access' => (\count($options) > 1),
     ];
     return $form;
   }

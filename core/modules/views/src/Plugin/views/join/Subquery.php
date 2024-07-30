@@ -62,13 +62,13 @@ class Subquery extends JoinPluginBase {
     // This is just copied verbatim from the parent class, which itself has a
     // bug: https://www.drupal.org/node/1118100.
     if (isset($this->extra)) {
-      if (is_array($this->extra)) {
+      if (\is_array($this->extra)) {
         $extras = [];
         foreach ($this->extra as $info) {
           // Figure out the table name. Remember, only use aliases provided
           // if at all possible.
           $join_table = '';
-          if (!array_key_exists('table', $info)) {
+          if (!\array_key_exists('table', $info)) {
             $join_table = $table['alias'] . '.';
           }
           elseif (isset($info['table'])) {
@@ -77,11 +77,11 @@ class Subquery extends JoinPluginBase {
 
           $placeholder = ':views_join_condition_' . $select_query->nextPlaceholder();
 
-          if (is_array($info['value'])) {
+          if (\is_array($info['value'])) {
             $operator = !empty($info['operator']) ? $info['operator'] : 'IN';
             // Transform from IN() notation to = notation if just one value.
-            if (count($info['value']) == 1) {
-              $info['value'] = array_shift($info['value']);
+            if (\count($info['value']) == 1) {
+              $info['value'] = \array_shift($info['value']);
               $operator = $operator == 'NOT IN' ? '!=' : '=';
             }
           }
@@ -94,15 +94,15 @@ class Subquery extends JoinPluginBase {
         }
 
         if ($extras) {
-          if (count($extras) == 1) {
-            $condition .= ' AND ' . array_shift($extras);
+          if (\count($extras) == 1) {
+            $condition .= ' AND ' . \array_shift($extras);
           }
           else {
-            $condition .= ' AND (' . implode(' ' . $this->extraOperator . ' ', $extras) . ')';
+            $condition .= ' AND (' . \implode(' ' . $this->extraOperator . ' ', $extras) . ')';
           }
         }
       }
-      elseif ($this->extra && is_string($this->extra)) {
+      elseif ($this->extra && \is_string($this->extra)) {
         $condition .= " AND ($this->extra)";
       }
     }

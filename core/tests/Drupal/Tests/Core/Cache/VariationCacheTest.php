@@ -241,7 +241,7 @@ class VariationCacheTest extends UnitTestCase {
     ];
 
     foreach ($possible_outcomes as $cache_context_values => $data) {
-      [$this->housingType, $this->gardenType, $this->houseOrientation] = explode('|', $cache_context_values . '||');
+      [$this->housingType, $this->gardenType, $this->houseOrientation] = \explode('|', $cache_context_values . '||');
 
       $cacheability = $this->housingTypeCacheability;
       if (!empty($this->houseOrientation)) {
@@ -292,7 +292,7 @@ class VariationCacheTest extends UnitTestCase {
     ];
 
     foreach ($possible_outcomes as $cache_context_values => $data) {
-      [$this->housingType, $this->gardenType, $this->houseOrientation] = explode('|', $cache_context_values . '||');
+      [$this->housingType, $this->gardenType, $this->houseOrientation] = \explode('|', $cache_context_values . '||');
       $this->setVariationCacheItem($data, $this->houseOrientationCacheability, $this->housingTypeCacheability);
     }
 
@@ -308,7 +308,7 @@ class VariationCacheTest extends UnitTestCase {
 
     // Verify that the previously set outcomes are all inaccessible now.
     foreach ($possible_outcomes as $cache_context_values => $data) {
-      [$this->housingType, $this->gardenType, $this->houseOrientation] = explode('|', $cache_context_values . '||');
+      [$this->housingType, $this->gardenType, $this->houseOrientation] = \explode('|', $cache_context_values . '||');
       $this->assertVariationCacheMiss($this->housingTypeCacheability);
     }
 
@@ -317,7 +317,7 @@ class VariationCacheTest extends UnitTestCase {
 
     // Verify that the previously set outcomes are all accessible again.
     foreach ($possible_outcomes as $cache_context_values => $data) {
-      [$this->housingType, $this->gardenType, $this->houseOrientation] = explode('|', $cache_context_values . '||');
+      [$this->housingType, $this->gardenType, $this->houseOrientation] = \explode('|', $cache_context_values . '||');
       $this->assertVariationCacheItem($data, $this->houseOrientationCacheability, $this->housingTypeCacheability);
     }
 

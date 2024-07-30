@@ -54,7 +54,7 @@ class FileSelection extends DefaultSelection {
    */
   public function validateReferenceableNewEntities(array $entities) {
     $entities = parent::validateReferenceableNewEntities($entities);
-    $entities = array_filter($entities, function ($file) {
+    $entities = \array_filter($entities, function ($file) {
       /** @var \Drupal\file\FileInterface $file */
       return $file->isPermanent() || $file->getOwnerId() === $this->currentUser->id();
     });

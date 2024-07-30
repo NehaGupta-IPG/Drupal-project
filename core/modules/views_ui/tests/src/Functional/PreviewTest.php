@@ -135,12 +135,12 @@ SQL;
     $this->assertSession()->assertEscaped($query_string);
 
     // Test that the statistics and query are rendered above the preview.
-    $this->assertLessThan(strpos($this->getSession()->getPage()->getContent(), 'js-view-dom-id'), strpos($this->getSession()->getPage()->getContent(), 'views-query-info'));
+    $this->assertLessThan(\strpos($this->getSession()->getPage()->getContent(), 'js-view-dom-id'), \strpos($this->getSession()->getPage()->getContent(), 'views-query-info'));
 
     // Test that statistics and query rendered below the preview.
     $settings->set('ui.show.sql_query.where', 'below')->save();
     $this->submitForm($edit = ['view_args' => '100'], 'Update preview');
-    $this->assertLessThan(strpos($this->getSession()->getPage()->getContent(), 'views-query-info'), strpos($this->getSession()->getPage()->getContent(), 'js-view-dom-id'), 'Statistics shown below the preview.');
+    $this->assertLessThan(\strpos($this->getSession()->getPage()->getContent(), 'views-query-info'), \strpos($this->getSession()->getPage()->getContent(), 'js-view-dom-id'), 'Statistics shown below the preview.');
 
     // Test that the preview title isn't double escaped.
     $this->drupalGet("admin/structure/views/nojs/display/test_preview/default/title");

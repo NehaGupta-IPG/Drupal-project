@@ -52,9 +52,9 @@ class InstallerNonEnglishProfileWithoutLocaleModuleTest extends InstallerTestBas
     // File API functions are not available yet.
     $profile_dir = "{$this->root}/{$this->siteDirectory}/profiles/" . self::PROFILE;
     $profile_config_dir = "$profile_dir/config/install";
-    mkdir($profile_config_dir, 0777, TRUE);
+    \mkdir($profile_config_dir, 0777, TRUE);
     $profile_info_file = $profile_dir . '/' . static::PROFILE . '.info.yml';
-    file_put_contents($profile_info_file, Yaml::encode($profile_info));
+    \file_put_contents($profile_info_file, Yaml::encode($profile_info));
 
     // Copy a non-English language config YAML to be installed with the profile.
     copy($this->root . '/core/profiles/tests/testing_multilingual/config/install/language.entity.de.yml', $profile_config_dir . '/language.entity.de.yml');

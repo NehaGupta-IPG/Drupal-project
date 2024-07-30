@@ -40,7 +40,7 @@ class Module extends Updater implements UpdaterInterface {
     if ($this->isInstalled() && ($relative_path = \Drupal::service('extension.list.module')->getPath($this->name))) {
       // The return value of ExtensionList::getPath() is always relative to the
       // site, so prepend DRUPAL_ROOT.
-      return DRUPAL_ROOT . '/' . dirname($relative_path);
+      return DRUPAL_ROOT . '/' . \dirname($relative_path);
     }
     else {
       // When installing a new module, prepend the requested root directory.

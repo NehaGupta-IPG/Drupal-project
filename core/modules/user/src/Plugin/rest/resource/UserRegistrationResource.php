@@ -184,7 +184,7 @@ class UserRegistrationResource extends ResourceBase {
     }
     // Administrator approval required.
     elseif ($approval_settings == UserInterface::REGISTER_VISITORS_ADMINISTRATIVE_APPROVAL) {
-      _user_mail_notify('register_pending_approval', $account);
+      \_user_mail_notify('register_pending_approval', $account);
     }
   }
 

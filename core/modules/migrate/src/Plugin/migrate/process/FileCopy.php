@@ -131,7 +131,7 @@ class FileCopy extends FileProcessBase implements ContainerFactoryPluginInterfac
     }
 
     // Ensure the source file exists, if it's a local URI or path.
-    if (!file_exists($source)) {
+    if (!\file_exists($source)) {
       throw new MigrateException("File '$source' does not exist");
     }
 
@@ -145,7 +145,7 @@ class FileCopy extends FileProcessBase implements ContainerFactoryPluginInterfac
     // If the directory exists and is writable, avoid
     // \Drupal\Core\File\FileSystemInterface::prepareDirectory() call and write
     // the file to destination.
-    if (!is_dir($dir) || !is_writable($dir)) {
+    if (!\is_dir($dir) || !\is_writable($dir)) {
       if (!$this->fileSystem->prepareDirectory($dir, FileSystemInterface::CREATE_DIRECTORY | FileSystemInterface::MODIFY_PERMISSIONS)) {
         throw new MigrateException("Could not create or write to directory '$dir'");
       }
@@ -213,7 +213,7 @@ class FileCopy extends FileProcessBase implements ContainerFactoryPluginInterfac
    */
   protected function getDirectory($uri) {
     $dir = $this->fileSystem->dirname($uri);
-    if (str_ends_with($dir, '://')) {
+    if (\str_ends_with($dir, '://')) {
       return $this->fileSystem->realpath($dir);
     }
     return $dir;

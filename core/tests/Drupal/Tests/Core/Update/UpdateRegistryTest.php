@@ -309,11 +309,11 @@ EOS;
     ], $key_value, $theme_handler, 'post_update');
 
     // Confirm the updates are sorted alphabetically.
-    $this->assertEquals(array_values([
+    $this->assertEquals(\array_values([
       'module_a_post_update_b',
       'module_b_post_update_a',
       'theme_d_post_update_c',
-    ]), array_values($update_registry->getPendingUpdateFunctions()));
+    ]), \array_values($update_registry->getPendingUpdateFunctions()));
 
   }
 
@@ -481,9 +481,9 @@ EOS;
         ],
     ], $key_value, $theme_handler, 'post_update');
 
-    $this->assertEquals(['module_a_post_update_a', 'module_a_post_update_b'], array_values($update_registry->getUpdateFunctions('module_a')));
-    $this->assertEquals(['module_b_post_update_a'], array_values($update_registry->getUpdateFunctions('module_b')));
-    $this->assertEquals(['theme_d_post_update_b', 'theme_d_post_update_c'], array_values($update_registry->getUpdateFunctions('theme_d')));
+    $this->assertEquals(['module_a_post_update_a', 'module_a_post_update_b'], \array_values($update_registry->getUpdateFunctions('module_a')));
+    $this->assertEquals(['module_b_post_update_a'], \array_values($update_registry->getUpdateFunctions('module_b')));
+    $this->assertEquals(['theme_d_post_update_b', 'theme_d_post_update_c'], \array_values($update_registry->getUpdateFunctions('theme_d')));
   }
 
   /**

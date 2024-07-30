@@ -216,11 +216,11 @@ class FormBuilder implements FormBuilderInterface, FormValidatorInterface, FormS
   public function getFormId($form_arg, FormStateInterface &$form_state) {
     // If the $form_arg is the name of a class, instantiate it. Don't allow
     // arbitrary strings to be passed to the class resolver.
-    if (is_string($form_arg) && class_exists($form_arg)) {
+    if (\is_string($form_arg) && \class_exists($form_arg)) {
       $form_arg = $this->classResolver->getInstanceFromDefinition($form_arg);
     }
 
-    if (!is_object($form_arg)) {
+    if (!\is_object($form_arg)) {
       throw new \InvalidArgumentException(("The form class $form_arg could not be found or loaded."));
     }
     elseif (!($form_arg instanceof FormInterface)) {
@@ -550,9 +550,9 @@ class FormBuilder implements FormBuilderInterface, FormValidatorInterface, FormS
     // We need to pass $form_state by reference in order for forms to modify it,
     // since call_user_func_array() requires that referenced variables are
     // passed explicitly.
-    $args = array_merge([$form, &$form_state], $args);
+    $args = \array_merge([$form, &$form_state], $args);
 
-    $form = call_user_func_array($callback, $args);
+    $form = \call_user_func_array($callback, $args);
     // If the form returns a response, skip subsequent page construction by
     // throwing an exception.
     // @see Drupal\Core\EventSubscriber\EnforcedFormResponseSubscriber
@@ -606,8 +606,8 @@ class FormBuilder implements FormBuilderInterface, FormValidatorInterface, FormS
       // exactly one submit button in the form, and if so, automatically use it
       // as triggering_element.
       $buttons = $form_state->getButtons();
-      if ($form_state->isProgrammed() && !$form_state->getTriggeringElement() && count($buttons) == 1) {
-        $form_state->setTriggeringElement(reset($buttons));
+      if ($form_state->isProgrammed() && !$form_state->getTriggeringElement() && \count($buttons) == 1) {
+        $form_state->setTriggeringElement(\reset($buttons));
       }
       $this->formValidator->validateForm($form_id, $form, $form_state);
 
@@ -990,7 +990,7 @@ class FormBuilder implements FormBuilderInterface, FormValidatorInterface, FormS
         global $base_root;
 
         // Not an external URL so ensure that it is secure.
-        $element['#action'] = str_replace('http://', 'https://', $base_root) . $element['#action'];
+        $element['#action'] = \str_replace('http://', 'https://', $base_root) . $element['#action'];
       }
 
       // Store a reference to the complete form in $form_state prior to building
@@ -1036,7 +1036,7 @@ class FormBuilder implements FormBuilderInterface, FormValidatorInterface, FormS
     }
 
     if (!isset($element['#id'])) {
-      $unprocessed_id = 'edit-' . implode('-', $element['#parents']);
+      $unprocessed_id = 'edit-' . \implode('-', $element['#parents']);
       $element['#id'] = Html::getUniqueId($unprocessed_id);
       // Provide a selector usable by JavaScript. As the ID is unique, it's not
       // possible to rely on it in JavaScript.
@@ -1113,7 +1113,7 @@ class FormBuilder implements FormBuilderInterface, FormValidatorInterface, FormS
       if (!isset($element[$key]['#parents'])) {
         // Check to see if a tree of child elements is present. If so,
         // continue down the tree if required.
-        $element[$key]['#parents'] = $element[$key]['#tree'] && $element['#tree'] ? array_merge($element['#parents'], [$key]) : [$key];
+        $element[$key]['#parents'] = $element[$key]['#tree'] && $element['#tree'] ? \array_merge($element['#parents'], [$key]) : [$key];
       }
       // Ensure #array_parents follows the actual form structure.
       $array_parents = $element['#array_parents'];
@@ -1137,7 +1137,7 @@ class FormBuilder implements FormBuilderInterface, FormValidatorInterface, FormS
     // after normal input parsing has been completed.
     if (isset($element['#after_build']) && !isset($element['#after_build_done'])) {
       foreach ($element['#after_build'] as $callback) {
-        $element = call_user_func_array($form_state->prepareCallback($callback), [$element, &$form_state]);
+        $element = \call_user_func_array($form_state->prepareCallback($callback), [$element, &$form_state]);
       }
       $element['#after_build_done'] = TRUE;
     }
@@ -1217,10 +1217,10 @@ class FormBuilder implements FormBuilderInterface, FormValidatorInterface, FormS
    *   otherwise.
    */
   protected function valueCallableIsSafe(callable $value_callable) {
-    if (is_callable($value_callable, FALSE, $callable_name)) {
+    if (\is_callable($value_callable, FALSE, $callable_name)) {
       // The third parameter of is_callable() is set to a string form, but we
       // still have to normalize further by stripping a leading '\'.
-      return in_array(ltrim($callable_name, '\\'), $this->safeCoreValueCallables);
+      return \in_array(\ltrim($callable_name, '\\'), $this->safeCoreValueCallables);
     }
     return FALSE;
   }
@@ -1230,7 +1230,7 @@ class FormBuilder implements FormBuilderInterface, FormValidatorInterface, FormS
    */
   protected function handleInputElement($form_id, &$element, FormStateInterface &$form_state) {
     if (!isset($element['#name'])) {
-      $name = array_shift($element['#parents']);
+      $name = \array_shift($element['#parents']);
       $element['#name'] = $name;
       if ($element['#type'] == 'file') {
         // To make it easier to handle files, we place all
@@ -1239,10 +1239,10 @@ class FormBuilder implements FormBuilderInterface, FormValidatorInterface, FormS
         // @todo Remove this files prefix now?
         $element['#name'] = 'files[' . $element['#name'] . ']';
       }
-      elseif (count($element['#parents'])) {
-        $element['#name'] .= '[' . implode('][', $element['#parents']) . ']';
+      elseif (\count($element['#parents'])) {
+        $element['#name'] .= '[' . \implode('][', $element['#parents']) . ']';
       }
-      array_unshift($element['#parents'], $name);
+      \array_unshift($element['#parents'], $name);
     }
 
     // Setting #disabled to TRUE results in user input being ignored regardless
@@ -1280,16 +1280,16 @@ class FormBuilder implements FormBuilderInterface, FormValidatorInterface, FormS
     // submitted with self::submitForm() may bypass access restriction and be
     // treated as high-privilege users instead.
     $process_input = empty($element['#disabled']) &&
-      !in_array($element['#type'], ['item', 'value'], TRUE) &&
+      !\in_array($element['#type'], ['item', 'value'], TRUE) &&
       (
         ($form_state->isProgrammed() && $form_state->isBypassingProgrammedAccessChecks()) ||
         ($form_state->isProcessingInput() && $this->isElementAccessible($element))
       );
 
     // Set the element's #value property.
-    if (!isset($element['#value']) && !array_key_exists('#value', $element)) {
+    if (!isset($element['#value']) && !\array_key_exists('#value', $element)) {
       $value_callable = $element['#value_callback'] ?? NULL;
-      if (!is_callable($value_callable)) {
+      if (!\is_callable($value_callable)) {
         $value_callable = '\Drupal\Core\Render\Element\FormElementBase::valueCallback';
       }
 
@@ -1319,7 +1319,7 @@ class FormBuilder implements FormBuilderInterface, FormValidatorInterface, FormS
           // Skip all value callbacks except safe ones like text if the CSRF
           // token was invalid.
           if (!$form_state->hasInvalidToken() || $this->valueCallableIsSafe($value_callable)) {
-            $element['#value'] = call_user_func_array($value_callable, [&$element, $input, &$form_state]);
+            $element['#value'] = \call_user_func_array($value_callable, [&$element, $input, &$form_state]);
           }
           else {
             $input = NULL;
@@ -1338,7 +1338,7 @@ class FormBuilder implements FormBuilderInterface, FormValidatorInterface, FormS
       if (!isset($element['#value'])) {
         // Call #type_value without a second argument to request default_value
         // handling.
-        $element['#value'] = call_user_func_array($value_callable, [&$element, FALSE, &$form_state]);
+        $element['#value'] = \call_user_func_array($value_callable, [&$element, FALSE, &$form_state]);
 
         // Final catch. If we haven't set a value yet, use the explicit default
         // value. Avoid image buttons (which come with garbage value), so we

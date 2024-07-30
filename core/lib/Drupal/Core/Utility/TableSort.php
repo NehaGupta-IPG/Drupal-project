@@ -85,7 +85,7 @@ class TableSort {
         '@image' => $image,
       ]), '<current>', [], [
         'attributes' => ['title' => $title, 'rel' => 'nofollow'],
-        'query' => array_merge($context['query'], [
+        'query' => \array_merge($context['query'], [
           'sort' => $context['sort'],
           'order' => $cell_content,
         ]),
@@ -111,21 +111,21 @@ class TableSort {
   public static function getOrder(array $headers, Request $request) {
     $order = $request->query->get('order', '');
     foreach ($headers as $header) {
-      if (is_array($header)) {
+      if (\is_array($header)) {
         if (isset($header['data']) && $order == $header['data']) {
           $default = $header;
           break;
         }
 
-        if (empty($default) && isset($header['sort']) && in_array($header['sort'], [self::ASC, self::DESC])) {
+        if (empty($default) && isset($header['sort']) && \in_array($header['sort'], [self::ASC, self::DESC])) {
           $default = $header;
         }
       }
     }
 
     if (!isset($default)) {
-      $default = reset($headers);
-      if (!is_array($default)) {
+      $default = \reset($headers);
+      if (!\is_array($default)) {
         $default = ['data' => $default];
       }
     }
@@ -148,14 +148,14 @@ class TableSort {
   public static function getSort(array $headers, Request $request) {
     $query = $request->query;
     if ($query->has('sort')) {
-      return (strtolower($query->get('sort')) == self::DESC) ? self::DESC : self::ASC;
+      return (\strtolower($query->get('sort')) == self::DESC) ? self::DESC : self::ASC;
     }
     // The user has not specified a sort. Use the default for the currently
     // sorted header if specified; otherwise use "asc".
     // Find out which header is currently being sorted.
     $order = static::getOrder($headers, $request);
     foreach ($headers as $header) {
-      if (is_array($header) && isset($header['data']) && $header['data'] == $order['name']) {
+      if (\is_array($header) && isset($header['data']) && $header['data'] == $order['name']) {
         if (isset($header['sort'])) {
           return $header['sort'];
         }

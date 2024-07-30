@@ -91,7 +91,7 @@ abstract class AttributeBase implements AttributeInterface {
    * {@inheritdoc}
    */
   public function get(): array|object {
-    return array_filter(get_object_vars($this) + [
+    return \array_filter(\get_object_vars($this) + [
       'class' => $this->getClass(),
       'provider' => $this->getProvider(),
     ], function ($value, $key) {

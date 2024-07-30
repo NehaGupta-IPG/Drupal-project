@@ -80,11 +80,11 @@ class Stable9LibraryOverrideTest extends StableLibraryOverrideTestBase {
     foreach ($libraries_before as $extension => $libraries) {
       foreach ($libraries as $library_name => $library) {
         // Allow skipping libraries.
-        if (in_array("$extension/$library_name", $this->librariesToSkip)) {
+        if (\in_array("$extension/$library_name", $this->librariesToSkip)) {
           continue;
         }
         // Skip internal libraries.
-        if (str_starts_with($library_name, 'internal.')) {
+        if (\str_starts_with($library_name, 'internal.')) {
           continue;
         }
         $library_after = $libraries_after[$extension][$library_name];
@@ -98,7 +98,7 @@ class Stable9LibraryOverrideTest extends StableLibraryOverrideTestBase {
           $replacements = [
             'core/misc/' => "core/modules/core/css/",
           ];
-          $expected_path = strtr($clean_path, $replacements);
+          $expected_path = \strtr($clean_path, $replacements);
 
           // Adjust the module asset paths to correspond with the Stable 9
           // folder structure.
@@ -106,8 +106,8 @@ class Stable9LibraryOverrideTest extends StableLibraryOverrideTestBase {
             "core/modules/$extension/css/" => "core/themes/stable9/css/$extension/",
             "core/modules/$extension/layouts/" => "core/themes/stable9/layouts/$extension/",
           ];
-          $expected_path = strtr($expected_path, $replacements);
-          $assert_path = str_replace("core/modules/$extension/", '', $clean_path);
+          $expected_path = \strtr($expected_path, $replacements);
+          $assert_path = \str_replace("core/modules/$extension/", '', $clean_path);
 
           $this->assertEquals($expected_path, $stable_path, "$assert_path from the $extension/$library_name library is overridden in Stable 9.");
           $this->assertFileExists("{$this->root}/$clean_path");

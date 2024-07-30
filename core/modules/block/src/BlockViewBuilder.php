@@ -32,7 +32,7 @@ class BlockViewBuilder extends EntityViewBuilder implements TrustedCallbackInter
    */
   public function view(EntityInterface $entity, $view_mode = 'full', $langcode = NULL) {
     $build = $this->viewMultiple([$entity], $view_mode, $langcode);
-    return reset($build);
+    return \reset($build);
   }
 
   /**

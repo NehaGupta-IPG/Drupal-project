@@ -77,12 +77,12 @@ class AddHandler extends ViewsFormBase {
     $form['#section'] = $display_id . 'add-handler';
 
     // Add the display override dropdown.
-    views_ui_standard_display_dropdown($form, $form_state, $section);
+    \views_ui_standard_display_dropdown($form, $form_state, $section);
 
     // Figure out all the base tables allowed based upon what the relationships
     // provide.
     $base_tables = $executable->getBaseTables();
-    $options = Views::viewsDataHelper()->fetchFields(array_keys($base_tables), $type, $display->useGroupBy(), $form_state->get('type'));
+    $options = Views::viewsDataHelper()->fetchFields(\array_keys($base_tables), $type, $display->useGroupBy(), $form_state->get('type'));
 
     if (!empty($options)) {
       $form['override']['controls'] = [
@@ -116,10 +116,10 @@ class AddHandler extends ViewsFormBase {
 
       $grouped_options = [];
       foreach ($options as $key => $option) {
-        $group = preg_replace('/[^a-z0-9]/', '-', strtolower($option['group']));
+        $group = \preg_replace('/[^a-z0-9]/', '-', \strtolower($option['group']));
         $groups[$group] = $option['group'];
         $grouped_options[$group][$key] = $option;
-        if (!empty($option['aliases']) && is_array($option['aliases'])) {
+        if (!empty($option['aliases']) && \is_array($option['aliases'])) {
           foreach ($option['aliases'] as $id => $alias) {
             if (empty($alias['base']) || !empty($base_tables[$alias['base']])) {
               $copy = $option;
@@ -129,7 +129,7 @@ class AddHandler extends ViewsFormBase {
                 $copy['help'] = $alias['help'];
               }
 
-              $group = preg_replace('/[^a-z0-9]/', '-', strtolower($copy['group']));
+              $group = \preg_replace('/[^a-z0-9]/', '-', \strtolower($copy['group']));
               $groups[$group] = $copy['group'];
               $grouped_options[$group][$key . '$' . $id] = $copy;
             }
@@ -179,8 +179,8 @@ class AddHandler extends ViewsFormBase {
     $view->getStandardButtons($form, $form_state, 'views_ui_add_handler_form', $this->t('Add and configure @types', ['@types' => $ltitle]));
 
     // Remove the default submit function.
-    $form['actions']['submit']['#submit'] = array_filter($form['actions']['submit']['#submit'], function ($var) {
-      return !(is_array($var) && isset($var[1]) && $var[1] == 'standardSubmit');
+    $form['actions']['submit']['#submit'] = \array_filter($form['actions']['submit']['#submit'], function ($var) {
+      return !(\is_array($var) && isset($var[1]) && $var[1] == 'standardSubmit');
     });
     $form['actions']['submit']['#submit'][] = [$view, 'submitItemAdd'];
 

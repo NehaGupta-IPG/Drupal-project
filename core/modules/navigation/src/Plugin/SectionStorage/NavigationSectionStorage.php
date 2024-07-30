@@ -113,9 +113,9 @@ final class NavigationSectionStorage extends PluginBase implements SectionStorag
    * {@inheritdoc}
    */
   public function getSections(): array {
-    if (is_null($this->sections)) {
+    if (\is_null($this->sections)) {
       $sections = $this->configFactory->get($this->getConfigName())->get('sections') ?: [];
-      $this->setSections(array_map([Section::class, 'fromArray'], $sections));
+      $this->setSections(\array_map([Section::class, 'fromArray'], $sections));
     }
     return $this->sections;
   }
@@ -124,7 +124,7 @@ final class NavigationSectionStorage extends PluginBase implements SectionStorag
    * {@inheritdoc}
    */
   protected function setSections(array $sections): static {
-    $this->sections = array_values($sections);
+    $this->sections = \array_values($sections);
     return $this;
   }
 
@@ -132,7 +132,7 @@ final class NavigationSectionStorage extends PluginBase implements SectionStorag
    * {@inheritdoc}
    */
   public function save(): int {
-    $sections = array_map(function (Section $section) {
+    $sections = \array_map(function (Section $section) {
       return $section->toArray();
     }, $this->getSections());
 

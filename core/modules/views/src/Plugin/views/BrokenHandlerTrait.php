@@ -53,7 +53,7 @@ trait BrokenHandlerTrait {
     $description_top = $this->t('The handler for this item is broken or missing. The following details are available:');
 
     foreach ($this->definition['original_configuration'] as $key => $value) {
-      if (is_scalar($value)) {
+      if (\is_scalar($value)) {
         $items[] = new FormattableMarkup('@key: @value', ['@key' => $key, '@value' => $value]);
       }
     }

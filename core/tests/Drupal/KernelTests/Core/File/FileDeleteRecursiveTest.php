@@ -20,7 +20,7 @@ class FileDeleteRecursiveTest extends FileTestBase {
   public function testSingleFile(): void {
     // Create a file for testing.
     $filepath = 'public://' . $this->randomMachineName();
-    file_put_contents($filepath, '');
+    \file_put_contents($filepath, '');
 
     // Delete the file.
     $this->assertTrue(\Drupal::service('file_system')->deleteRecursive($filepath), 'Function reported success.');
@@ -47,8 +47,8 @@ class FileDeleteRecursiveTest extends FileTestBase {
     $directory = $this->createDirectory();
     $filepathA = $directory . '/A';
     $filepathB = $directory . '/B';
-    file_put_contents($filepathA, '');
-    file_put_contents($filepathB, '');
+    \file_put_contents($filepathA, '');
+    \file_put_contents($filepathB, '');
 
     // Delete the directory.
     $this->assertTrue(\Drupal::service('file_system')->deleteRecursive($directory), 'Function reported success.');
@@ -66,8 +66,8 @@ class FileDeleteRecursiveTest extends FileTestBase {
     $subdirectory = $this->createDirectory($directory . '/sub');
     $filepathA = $directory . '/A';
     $filepathB = $subdirectory . '/B';
-    file_put_contents($filepathA, '');
-    file_put_contents($filepathB, '');
+    \file_put_contents($filepathA, '');
+    \file_put_contents($filepathB, '');
 
     // Delete the directory.
     $this->assertTrue(\Drupal::service('file_system')->deleteRecursive($directory), 'Function reported success.');

@@ -94,7 +94,7 @@ class NewDefaultThemeBlocksTest extends KernelTestBase {
       // Remove the matching block from the list of blocks in the new theme.
       // For example, if the old theme has block.block.stark_admin,
       // unset block.block.olivero_admin.
-      unset($new_blocks[str_replace($default_theme . '_', $new_theme . '_', $default_block_name)]);
+      unset($new_blocks[\str_replace($default_theme . '_', $new_theme . '_', $default_block_name)]);
     }
     $this->assertEmpty($new_blocks);
 
@@ -126,7 +126,7 @@ class NewDefaultThemeBlocksTest extends KernelTestBase {
 
     // Add an instance of a different block.
     $this->placeBlock('system_powered_by_block', [
-      'id' => $default_theme . '_' . strtolower($this->randomMachineName(8)),
+      'id' => $default_theme . '_' . \strtolower($this->randomMachineName(8)),
     ]);
 
     // Install a different theme that does not have blocks.
@@ -157,7 +157,7 @@ class NewDefaultThemeBlocksTest extends KernelTestBase {
       // Remove the matching block from the list of blocks in the new theme.
       // For example, if the old theme has block.block.stark_admin,
       // unset block.block.olivero_admin.
-      unset($new_blocks[str_replace($default_theme . '_', $new_theme . '_', $default_block_name)]);
+      unset($new_blocks[\str_replace($default_theme . '_', $new_theme . '_', $default_block_name)]);
     }
     // The test_theme_user_login_block machine name is already in use, so
     // therefore \Drupal\block\BlockRepository::getUniqueMachineName appends a

@@ -55,7 +55,7 @@ class Action extends DrupalSqlBase {
    */
   public function prepareRow(Row $row) {
     $aid = $row->getSourceProperty('aid');
-    if (is_numeric($aid)) {
+    if (\is_numeric($aid)) {
       if ($this->getModuleSchemaVersion('system') >= 7000) {
         $label = $row->getSourceProperty('label');
       }

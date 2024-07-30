@@ -18,7 +18,7 @@ class NoCorrespondingEntityClassException extends \Exception {
    *   The class which does not correspond to an entity type.
    */
   public function __construct($class) {
-    $message = sprintf('The %s class does not correspond to an entity type.', $class);
+    $message = \sprintf('The %s class does not correspond to an entity type.', $class);
     parent::__construct($message);
   }
 

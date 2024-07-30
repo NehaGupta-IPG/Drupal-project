@@ -93,7 +93,7 @@ class ImageThemeFunctionTest extends KernelTestBase {
 
     // Create an image.
     $files = $this->drupalGetTestFiles('image');
-    $file = reset($files);
+    $file = \reset($files);
     $original_uri = \Drupal::service('file_system')->copy($file->uri, 'public://', FileExists::Rename);
 
     // Create a style.
@@ -171,7 +171,7 @@ class ImageThemeFunctionTest extends KernelTestBase {
 
     // Create an image.
     $files = $this->drupalGetTestFiles('image');
-    $file = reset($files);
+    $file = \reset($files);
     $original_uri = \Drupal::service('file_system')->copy($file->uri, 'public://', FileExists::Rename);
 
     // Create a style.

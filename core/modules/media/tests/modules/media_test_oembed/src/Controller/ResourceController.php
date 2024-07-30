@@ -31,9 +31,9 @@ class ResourceController {
       $response = new Response('Not Found', 404);
     }
     else {
-      $content = file_get_contents($resource);
+      $content = \file_get_contents($resource);
       $response = new Response($content);
-      $response->headers->set('Content-Type', 'application/' . pathinfo($resource, PATHINFO_EXTENSION));
+      $response->headers->set('Content-Type', 'application/' . \pathinfo($resource, PATHINFO_EXTENSION));
     }
 
     return $response;

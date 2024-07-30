@@ -62,13 +62,13 @@ trait ExpectDeprecationTrait {
     if (!get_error_handler() instanceof TestErrorHandler) {
       throw new \RuntimeException(sprintf('%s registered its own error handler without restoring the previous one before or during tear down. This can cause unpredictable test results. Ensure the test cleans up after itself.', $this->name()));
     }
-    restore_error_handler();
+    \restore_error_handler();
 
     // Checks if collected deprecations match the expectations.
     if (DeprecationHandler::getExpectedDeprecations()) {
       $prefix = "@expectedDeprecation:\n";
-      $expDep = $prefix . '%A  ' . implode("\n%A  ", DeprecationHandler::getExpectedDeprecations()) . "\n%A";
-      $actDep = $prefix . '  ' . implode("\n  ", DeprecationHandler::getCollectedDeprecations()) . "\n";
+      $expDep = $prefix . '%A  ' . \implode("\n%A  ", DeprecationHandler::getExpectedDeprecations()) . "\n%A";
+      $actDep = $prefix . '  ' . \implode("\n  ", DeprecationHandler::getCollectedDeprecations()) . "\n";
       $this->assertStringMatchesFormat($expDep, $actDep);
     }
   }

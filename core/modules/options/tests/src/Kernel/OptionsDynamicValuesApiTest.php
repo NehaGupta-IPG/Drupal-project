@@ -83,10 +83,10 @@ class OptionsDynamicValuesApiTest extends OptionsFieldUnitTestBase {
    */
   public function testOptionsAllowedValues(): void {
     // Test allowed values without passed $items.
-    $values = options_allowed_values($this->fieldStorage);
+    $values = \options_allowed_values($this->fieldStorage);
     $this->assertEquals([], $values);
 
-    $values = options_allowed_values($this->fieldStorage, $this->entity);
+    $values = \options_allowed_values($this->fieldStorage, $this->entity);
 
     $expected_values = [
       $this->entity->label(),
@@ -94,7 +94,7 @@ class OptionsDynamicValuesApiTest extends OptionsFieldUnitTestBase {
       $this->entity->uuid(),
       $this->entity->bundle(),
     ];
-    $expected_values = array_combine($expected_values, $expected_values);
+    $expected_values = \array_combine($expected_values, $expected_values);
     $this->assertEquals($expected_values, $values);
   }
 

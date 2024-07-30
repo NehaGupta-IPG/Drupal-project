@@ -34,12 +34,12 @@ class PermissionAccessCheck implements AccessInterface {
     }
 
     // Allow to conjunct the permissions with OR ('+') or AND (',').
-    $split = explode(',', $permission);
-    if (count($split) > 1) {
+    $split = \explode(',', $permission);
+    if (\count($split) > 1) {
       return AccessResult::allowedIfHasPermissions($account, $split, 'AND');
     }
     else {
-      $split = explode('+', $permission);
+      $split = \explode('+', $permission);
       return AccessResult::allowedIfHasPermissions($account, $split, 'OR');
     }
   }

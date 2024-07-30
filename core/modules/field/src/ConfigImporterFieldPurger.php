@@ -30,7 +30,7 @@ class ConfigImporterFieldPurger {
     // Get the list of field storages to purge.
     $field_storages = static::getFieldStoragesToPurge($context['sandbox']['field']['extensions'], $config_importer->getUnprocessedConfiguration('delete'));
     // Get the first field storage to process.
-    $field_storage = reset($field_storages);
+    $field_storage = \reset($field_storages);
     if (!isset($context['sandbox']['field']['current_storage_id']) || $context['sandbox']['field']['current_storage_id'] != $field_storage->id()) {
       $context['sandbox']['field']['current_storage_id'] = $field_storage->id();
       // If the storage has not been deleted yet we need to do that. This is the
@@ -39,9 +39,9 @@ class ConfigImporterFieldPurger {
         $field_storage->delete();
       }
     }
-    field_purge_batch($context['sandbox']['field']['purge_batch_size'], $field_storage->getUniqueStorageIdentifier());
+    \field_purge_batch($context['sandbox']['field']['purge_batch_size'], $field_storage->getUniqueStorageIdentifier());
     $context['sandbox']['field']['current_progress']++;
-    $fields_to_delete_count = count(static::getFieldStoragesToPurge($context['sandbox']['field']['extensions'], $config_importer->getUnprocessedConfiguration('delete')));
+    $fields_to_delete_count = \count(static::getFieldStoragesToPurge($context['sandbox']['field']['extensions'], $config_importer->getUnprocessedConfiguration('delete')));
     if ($fields_to_delete_count == 0) {
       $context['finished'] = 1;
     }
@@ -77,13 +77,13 @@ class ConfigImporterFieldPurger {
         // The number of steps to delete each field is determined by the
         // purge_batch_size setting. For example if the field has 9 rows and the
         // batch size is 10 then this will add 1 step to $number_of_steps.
-        $how_many_steps = ceil($row_count / $context['sandbox']['field']['purge_batch_size']);
+        $how_many_steps = \ceil($row_count / $context['sandbox']['field']['purge_batch_size']);
         $context['sandbox']['field']['steps_to_delete'] += $how_many_steps;
       }
     }
     // Each field possibly needs one last field_purge_batch() call to remove the
     // last field and the field storage itself.
-    $context['sandbox']['field']['steps_to_delete'] += count($fields);
+    $context['sandbox']['field']['steps_to_delete'] += \count($fields);
 
     $context['sandbox']['field']['current_progress'] = 0;
   }
@@ -109,7 +109,7 @@ class ConfigImporterFieldPurger {
    *   synchronized.
    */
   public static function getFieldStoragesToPurge(array $extensions, array $deletes) {
-    $providers = array_keys($extensions['module']);
+    $providers = \array_keys($extensions['module']);
     $providers[] = 'core';
     $storages_to_delete = [];
 
@@ -118,7 +118,7 @@ class ConfigImporterFieldPurger {
     $field_storage_ids = [];
     foreach ($deletes as $config_name) {
       $field_storage_config_prefix = \Drupal::entityTypeManager()->getDefinition('field_storage_config')->getConfigPrefix();
-      if (str_starts_with($config_name, $field_storage_config_prefix . '.')) {
+      if (\str_starts_with($config_name, $field_storage_config_prefix . '.')) {
         $field_storage_ids[] = ConfigEntityStorage::getIDFromConfigName($config_name, $field_storage_config_prefix);
       }
     }
@@ -136,7 +136,7 @@ class ConfigImporterFieldPurger {
     /** @var \Drupal\field\FieldStorageConfigInterface[] $deleted_storage_definitions */
     $deleted_storage_definitions = \Drupal::service('entity_field.deleted_fields_repository')->getFieldStorageDefinitions();
     foreach ($deleted_storage_definitions as $field_storage_definition) {
-      if ($field_storage_definition instanceof FieldStorageConfigInterface && !in_array($field_storage_definition->getTypeProvider(), $providers)) {
+      if ($field_storage_definition instanceof FieldStorageConfigInterface && !\in_array($field_storage_definition->getTypeProvider(), $providers)) {
         $storages_to_delete[$field_storage_definition->id()] = $field_storage_definition;
       }
     }

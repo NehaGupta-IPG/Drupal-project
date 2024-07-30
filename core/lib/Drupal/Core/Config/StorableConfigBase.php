@@ -144,8 +144,8 @@ abstract class StorableConfigBase extends ConfigBase {
       return $original_data;
     }
 
-    $parts = explode('.', $key);
-    if (count($parts) == 1) {
+    $parts = \explode('.', $key);
+    if (\count($parts) == 1) {
       return $original_data[$key] ?? NULL;
     }
 
@@ -193,12 +193,12 @@ abstract class StorableConfigBase extends ConfigBase {
    */
   protected function validateValue($key, $value) {
     // Minimal validation. Should not try to serialize resources or non-arrays.
-    if (is_array($value)) {
+    if (\is_array($value)) {
       foreach ($value as $nested_value_key => $nested_value) {
         $this->validateValue($key . '.' . $nested_value_key, $nested_value);
       }
     }
-    elseif ($value !== NULL && !is_scalar($value)) {
+    elseif ($value !== NULL && !\is_scalar($value)) {
       throw new UnsupportedDataTypeConfigException("Invalid data type for config element {$this->getName()}:$key");
     }
   }
@@ -231,7 +231,7 @@ abstract class StorableConfigBase extends ConfigBase {
       $this->validateValue($key, $value);
       return $value;
     }
-    if (is_scalar($value) || $value === NULL) {
+    if (\is_scalar($value) || $value === NULL) {
       if ($element && $element instanceof PrimitiveInterface) {
         // Special handling for integers and floats since the configuration
         // system is primarily concerned with saving values from the Form API
@@ -250,7 +250,7 @@ abstract class StorableConfigBase extends ConfigBase {
     }
     else {
       // Throw exception on any non-scalar or non-array value.
-      if (!is_array($value)) {
+      if (!\is_array($value)) {
         throw new UnsupportedDataTypeConfigException("Invalid data type for config element {$this->getName()}:$key");
       }
       // Recurse into any nested keys.
@@ -260,13 +260,13 @@ abstract class StorableConfigBase extends ConfigBase {
       }
 
       // Only sort maps when we have more than 1 element to sort.
-      if ($element instanceof Mapping && count($value) > 1) {
+      if ($element instanceof Mapping && \count($value) > 1) {
         $mapping = $element->getDataDefinition()['mapping'];
-        if (is_array($mapping)) {
+        if (\is_array($mapping)) {
           // Only sort the keys in $value.
-          $mapping = array_intersect_key($mapping, $value);
+          $mapping = \array_intersect_key($mapping, $value);
           // Sort the array in $value using the mapping definition.
-          $value = array_replace($mapping, $value);
+          $value = \array_replace($mapping, $value);
         }
       }
 
@@ -276,7 +276,7 @@ abstract class StorableConfigBase extends ConfigBase {
           // Apply any sorting defined on the schema.
           switch ($data_definition->getOrderBy()) {
             case 'key':
-              ksort($value);
+              \ksort($value);
               break;
 
             case 'value':
@@ -286,7 +286,7 @@ abstract class StorableConfigBase extends ConfigBase {
               // \Drupal\Core\Config\StorableConfigBase::castValue() has
               // already cast all values to the same type using the
               // configuration schema.
-              sort($value);
+              \sort($value);
               break;
 
           }

@@ -108,7 +108,7 @@ class MenuLinkContentForm extends ContentEntityForm {
     /** @var \Drupal\menu_link_content\MenuLinkContentInterface $entity */
     $entity = parent::buildEntity($form, $form_state);
 
-    [$menu_name, $parent] = explode(':', $form_state->getValue('menu_parent'), 2);
+    [$menu_name, $parent] = \explode(':', $form_state->getValue('menu_parent'), 2);
 
     $entity->parent->value = $parent;
     $entity->menu_name->value = $menu_name;

@@ -93,9 +93,9 @@ class Tables extends BaseTables {
       // 'revision_id' string used when joining dedicated field tables.
       // If those two conditions are met, we have to update the join condition
       // to also look for a possible workspace-specific revision using COALESCE.
-      $condition_parts = explode(' = ', $join_condition);
-      $condition_parts_1 = str_replace(['[', ']'], '', $condition_parts[1]);
-      [$base_table, $id_field] = explode('.', $condition_parts_1);
+      $condition_parts = \explode(' = ', $join_condition);
+      $condition_parts_1 = \str_replace(['[', ']'], '', $condition_parts[1]);
+      [$base_table, $id_field] = \explode('.', $condition_parts_1);
 
       if (isset($this->baseTablesEntityType[$base_table])) {
         $entity_type_id = $this->baseTablesEntityType[$base_table];

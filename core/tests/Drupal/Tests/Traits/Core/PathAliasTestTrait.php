@@ -56,7 +56,7 @@ trait PathAliasTestTrait {
     }
     $entities = $storage->loadMultiple($query->execute());
 
-    return $entities ? reset($entities) : NULL;
+    return $entities ? \reset($entities) : NULL;
   }
 
   /**

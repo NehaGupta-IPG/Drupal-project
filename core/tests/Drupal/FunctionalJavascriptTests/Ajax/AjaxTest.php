@@ -137,7 +137,7 @@ class AjaxTest extends WebDriverTestBase {
       $render_multiple_root_wrapper["$key--effect"] = '<div>' . $render . '</div>';
     }
 
-    $expected_renders = array_merge(
+    $expected_renders = \array_merge(
       $render_single_root,
       $render_multiple_root_wrapper,
       $render_multiple_root_unwrap
@@ -183,7 +183,7 @@ JS;
   public function testGlobalEvents(): void {
     $session = $this->getSession();
     $assert = $this->assertSession();
-    $expected_event_order = implode('', ['ajaxSuccess', 'ajaxComplete', 'ajaxStop']);
+    $expected_event_order = \implode('', ['ajaxSuccess', 'ajaxComplete', 'ajaxStop']);
 
     $this->drupalGet('ajax-test/global-events');
 
@@ -203,8 +203,8 @@ JS;
     // text that was added above.
     $session->executeScript('jQuery.get(Drupal.url("ajax-test/global-events/clear-log"))');
     $assert->assertWaitOnAjaxRequest();
-    $assert->elementTextEquals('css', '#test_global_events_log', str_repeat($expected_event_order, 2));
-    $assert->elementTextEquals('css', '#test_global_events_log2', str_repeat($expected_event_order, 2));
+    $assert->elementTextEquals('css', '#test_global_events_log', \str_repeat($expected_event_order, 2));
+    $assert->elementTextEquals('css', '#test_global_events_log2', \str_repeat($expected_event_order, 2));
 
     // Ensure that a Drupal Ajax request triggers the expected events, in the
     // correct order, a single time.
@@ -219,7 +219,7 @@ JS;
     $this->click('#test_global_events_drupal_ajax_link');
     $assert->assertWaitOnAjaxRequest();
     $assert->elementTextEquals('css', '#test_global_events_log', $expected_event_order);
-    $assert->elementTextEquals('css', '#test_global_events_log2', str_repeat($expected_event_order, 3));
+    $assert->elementTextEquals('css', '#test_global_events_log2', \str_repeat($expected_event_order, 3));
   }
 
   /**
@@ -270,8 +270,8 @@ JS;
     $page = $this->getSession()->getPage();
     $this->assertTrue($page->waitFor(10, function () use ($page, $expected) {
       // Clear content from empty styles and "processed" classes after effect.
-      $content = str_replace([' class="processed"', ' processed', ' style=""'], '', $page->getContent());
-      return stripos($content, $expected) !== FALSE;
+      $content = \str_replace([' class="processed"', ' processed', ' style=""'], '', $page->getContent());
+      return \stripos($content, $expected) !== FALSE;
     }), "Page contains expected value: $expected");
   }
 

@@ -76,7 +76,7 @@ class NodeAccessLanguageAwareTest extends NodeAccessTestBase {
     ])->save();
 
     // After enabling a node access module, the access table has to be rebuild.
-    node_access_rebuild();
+    \node_access_rebuild();
 
     // Create a normal authenticated user.
     $this->webUser = $this->drupalCreateUser(['access content']);

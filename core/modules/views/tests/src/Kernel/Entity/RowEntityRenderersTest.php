@@ -129,13 +129,13 @@ class RowEntityRenderersTest extends ViewsKernelTestBase {
     $controller = \Drupal::entityTypeManager()->getStorage('node');
     $langcode_index = 0;
 
-    for ($i = 0; $i < count($this->langcodes); $i++) {
+    for ($i = 0; $i < \count($this->langcodes); $i++) {
       // Create a node with a different default language each time.
       $default_langcode = $this->langcodes[$langcode_index++];
       $node = $controller->create(['type' => 'test', 'uid' => $this->testAuthor->id(), 'langcode' => $default_langcode]);
 
       // Ensure the default language is processed first.
-      $langcodes = array_merge([$default_langcode], array_diff($this->langcodes, [$default_langcode]));
+      $langcodes = \array_merge([$default_langcode], \array_diff($this->langcodes, [$default_langcode]));
 
       foreach ($langcodes as $langcode) {
         // Ensure we have a predictable result order.
@@ -387,7 +387,7 @@ class RowEntityRenderersTest extends ViewsKernelTestBase {
       if (!empty($view->result[$index])) {
         $build = $view->rowPlugin->render($view->result[$index]);
         $output = (string) \Drupal::service('renderer')->renderRoot($build);
-        $result = str_contains($output, $expected_output);
+        $result = \str_contains($output, $expected_output);
         if (!$result) {
           break;
         }

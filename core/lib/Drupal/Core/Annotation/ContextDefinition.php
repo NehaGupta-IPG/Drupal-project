@@ -112,7 +112,7 @@ class ContextDefinition extends Plugin {
         $values[$key] = NULL;
       }
     }
-    if (isset($values['class']) && !in_array('Drupal\Core\Plugin\Context\ContextDefinitionInterface', class_implements($values['class']))) {
+    if (isset($values['class']) && !\in_array('Drupal\Core\Plugin\Context\ContextDefinitionInterface', \class_implements($values['class']))) {
       throw new \Exception('ContextDefinition class must implement \Drupal\Core\Plugin\Context\ContextDefinitionInterface.');
     }
 
@@ -145,7 +145,7 @@ class ContextDefinition extends Plugin {
     if (isset($values['class'])) {
       return $values['class'];
     }
-    if (str_starts_with($values['value'], 'entity:')) {
+    if (\str_starts_with($values['value'], 'entity:')) {
       return 'Drupal\Core\Plugin\Context\EntityContextDefinition';
     }
     return 'Drupal\Core\Plugin\Context\ContextDefinition';

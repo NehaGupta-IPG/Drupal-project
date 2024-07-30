@@ -32,7 +32,7 @@ class TimeZoneFormHelper {
       $zones[$zone] = new TranslatableMarkup(str_replace('_', ' ', $zone));
     }
     // Sort the translated time zones alphabetically.
-    asort($zones);
+    \asort($zones);
     return $zones;
   }
 
@@ -55,19 +55,19 @@ class TimeZoneFormHelper {
     $zones = static::getOptionsList($blank);
     $grouped_zones = [];
     foreach ($zones as $key => $value) {
-      $split = explode('/', $value);
-      $city = array_pop($split);
-      $region = array_shift($split);
+      $split = \explode('/', $value);
+      $city = \array_pop($split);
+      $region = \array_shift($split);
       if (!empty($region)) {
-        $grouped_zones[$region][$key] = empty($split) ? $city : $city . ' (' . implode('/', $split) . ')';
+        $grouped_zones[$region][$key] = empty($split) ? $city : $city . ' (' . \implode('/', $split) . ')';
       }
       else {
         $grouped_zones[$key] = $value;
       }
     }
     foreach ($grouped_zones as $key => $value) {
-      if (is_array($grouped_zones[$key])) {
-        asort($grouped_zones[$key]);
+      if (\is_array($grouped_zones[$key])) {
+        \asort($grouped_zones[$key]);
       }
     }
     return $grouped_zones;

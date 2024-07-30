@@ -85,12 +85,12 @@ class ImageStyleDownloadAccessControlTest extends BrowserTestBase {
       'status' => 0,
       'filename' => 'image.png',
       'uri' => 'private://image.png',
-      'filesize' => filesize('private://image.png'),
+      'filesize' => \filesize('private://image.png'),
       'filemime' => 'image/png',
     ];
     $private_file = File::create($values);
     $private_file->save();
-    $this->assertNotFalse(getimagesize($private_file->getFileUri()));
+    $this->assertNotFalse(\getimagesize($private_file->getFileUri()));
 
     $token = $this->style->getPathToken('private://image.png');
     $public_route_private_scheme = Url::fromRoute(

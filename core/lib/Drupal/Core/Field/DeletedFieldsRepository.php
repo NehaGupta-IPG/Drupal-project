@@ -35,7 +35,7 @@ class DeletedFieldsRepository implements DeletedFieldsRepositoryInterface {
     $deleted_field_definitions = $this->state->get('field.field.deleted', []);
 
     if ($field_storage_unique_id) {
-      $deleted_field_definitions = array_filter($deleted_field_definitions, function (FieldDefinitionInterface $field_definition) use ($field_storage_unique_id) {
+      $deleted_field_definitions = \array_filter($deleted_field_definitions, function (FieldDefinitionInterface $field_definition) use ($field_storage_unique_id) {
         return $field_definition->getFieldStorageDefinition()->getUniqueStorageIdentifier() === $field_storage_unique_id;
       });
     }

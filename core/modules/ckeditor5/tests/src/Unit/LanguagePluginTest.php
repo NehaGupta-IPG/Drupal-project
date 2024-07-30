@@ -119,8 +119,8 @@ class LanguagePluginTest extends UnitTestCase {
       }
       $expected_language_config[$item['title']] = $item;
     }
-    ksort($expected_language_config);
-    return array_values($expected_language_config);
+    \ksort($expected_language_config);
+    return \array_values($expected_language_config);
   }
 
   /**

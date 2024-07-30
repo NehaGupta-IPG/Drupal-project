@@ -135,7 +135,7 @@ class EntityMethodConfigActionsTest extends KernelTestBase {
       $value,
     );
 
-    $expected_values = array_is_list($value) ? $value : [$value];
+    $expected_values = \array_is_list($value) ? $value : [$value];
     $entity = $storage->load('foo');
     foreach ($expected_values as ['property_name' => $name, 'value' => $value]) {
       $this->assertSame($value, $entity->get($name));
@@ -197,7 +197,7 @@ class EntityMethodConfigActionsTest extends KernelTestBase {
 
     // The underlying action name should not be available. It should be hidden
     // by the alias.
-    $plugin_id = str_replace('hide', 'remove', $action_name);
+    $plugin_id = \str_replace('hide', 'remove', $action_name);
     $this->assertFalse($this->configActionManager->hasDefinition($plugin_id));
   }
 

@@ -48,7 +48,7 @@ class WorkspacePermissionsTest extends BrowserTestBase {
     $etm = \Drupal::service('entity_type.manager');
     /** @var \Drupal\workspaces\WorkspaceInterface $bears */
     $entity_list = $etm->getStorage('workspace')->loadByProperties(['label' => 'Bears']);
-    $bears = current($entity_list);
+    $bears = \current($entity_list);
 
     $this->drupalGet("/admin/config/workflow/workspaces/manage/{$bears->id()}/edit");
     $this->assertSession()->statusCodeEquals(403);
@@ -129,7 +129,7 @@ class WorkspacePermissionsTest extends BrowserTestBase {
 
     // Now login as a different user and ensure they don't have edit access,
     // and vice versa.
-    $admin = $this->drupalCreateUser(array_merge($permissions, ['edit any workspace']));
+    $admin = $this->drupalCreateUser(\array_merge($permissions, ['edit any workspace']));
 
     $this->drupalLogin($admin);
     $this->createWorkspaceThroughUi('Packers', 'packers');
@@ -198,7 +198,7 @@ class WorkspacePermissionsTest extends BrowserTestBase {
 
     // Now login as a different user and ensure they have delete access on both
     // workspaces.
-    $admin = $this->drupalCreateUser(array_merge($permissions, ['delete any workspace']));
+    $admin = $this->drupalCreateUser(\array_merge($permissions, ['delete any workspace']));
 
     $this->drupalLogin($admin);
     $packers = $this->createWorkspaceThroughUi('Packers', 'packers');

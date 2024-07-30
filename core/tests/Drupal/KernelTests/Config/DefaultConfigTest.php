@@ -122,13 +122,13 @@ class DefaultConfigTest extends KernelTestBase {
     foreach ($optional_config_storage->listAll() as $config_name) {
       $data = $optional_config_storage->read($config_name);
       $dependency = new ConfigEntityDependency($config_name, $data);
-      $modules_to_install = array_merge($modules_to_install, $dependency->getDependencies('module'));
-      $themes_to_install = array_merge($themes_to_install, $dependency->getDependencies('theme'));
+      $modules_to_install = \array_merge($modules_to_install, $dependency->getDependencies('module'));
+      $themes_to_install = \array_merge($themes_to_install, $dependency->getDependencies('theme'));
     }
     // Remove core and standard because they cannot be installed.
-    $modules_to_install = array_diff(array_unique($modules_to_install), ['core', 'standard']);
+    $modules_to_install = \array_diff(\array_unique($modules_to_install), ['core', 'standard']);
     $this->container->get('module_installer')->install($modules_to_install);
-    $this->container->get('theme_installer')->install(array_unique($themes_to_install));
+    $this->container->get('theme_installer')->install(\array_unique($themes_to_install));
 
     // Test configuration in the extension's config/install directory.
     $this->doTestsOnConfigStorage($extension_config_storage, $name, $type);
@@ -147,12 +147,12 @@ class DefaultConfigTest extends KernelTestBase {
    *   of the theme.
    */
   public static function themeListDataProvider() {
-    $prefix = dirname(__DIR__, 4) . DIRECTORY_SEPARATOR . 'themes';
-    $theme_dirs = array_keys(iterator_to_array(new \FilesystemIterator($prefix)));
-    $theme_names = array_map(function ($path) use ($prefix) {
-      return str_replace($prefix . DIRECTORY_SEPARATOR, '', $path);
+    $prefix = \dirname(__DIR__, 4) . DIRECTORY_SEPARATOR . 'themes';
+    $theme_dirs = \array_keys(\iterator_to_array(new \FilesystemIterator($prefix)));
+    $theme_names = \array_map(function ($path) use ($prefix) {
+      return \str_replace($prefix . DIRECTORY_SEPARATOR, '', $path);
     }, $theme_dirs);
-    $themes_keyed = array_combine($theme_names, $theme_names);
+    $themes_keyed = \array_combine($theme_names, $theme_names);
 
     // Engines is not a theme.
     unset($themes_keyed['engines']);
@@ -160,7 +160,7 @@ class DefaultConfigTest extends KernelTestBase {
     // Add a deprecated theme with config.
     $themes_keyed['test_deprecated_theme'] = 'test_deprecated_theme';
 
-    return array_map(function ($theme) {
+    return \array_map(function ($theme) {
       return [$theme];
     }, $themes_keyed);
   }

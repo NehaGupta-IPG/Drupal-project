@@ -57,9 +57,9 @@ class UserTimeZoneTest extends BrowserTestBase {
     // One date in PDT (summer time):
     $date3 = '2007-03-20 21:00:00 -0700';
     $this->drupalCreateContentType(['type' => 'article']);
-    $node1 = $this->drupalCreateNode(['created' => strtotime($date1), 'type' => 'article']);
-    $node2 = $this->drupalCreateNode(['created' => strtotime($date2), 'type' => 'article']);
-    $node3 = $this->drupalCreateNode(['created' => strtotime($date3), 'type' => 'article']);
+    $node1 = $this->drupalCreateNode(['created' => \strtotime($date1), 'type' => 'article']);
+    $node2 = $this->drupalCreateNode(['created' => \strtotime($date2), 'type' => 'article']);
+    $node3 = $this->drupalCreateNode(['created' => \strtotime($date3), 'type' => 'article']);
 
     // Confirm date format and time zone.
     $this->drupalGet('node/' . $node1->id());

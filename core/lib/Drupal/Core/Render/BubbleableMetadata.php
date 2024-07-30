@@ -162,7 +162,7 @@ class BubbleableMetadata extends CacheableMetadata implements AttachmentsInterfa
       unset($b['placeholders']);
     }
     // Apply the normal merge.
-    $a = array_merge_recursive($a, $b);
+    $a = \array_merge_recursive($a, $b);
     if (isset($drupalSettings)) {
       // Save the custom merge for the drupalSettings.
       $a['drupalSettings'] = $drupalSettings;

@@ -49,7 +49,7 @@ class DatabaseBackendTest extends GenericCacheBackendUnitTestBase {
 
     // Set up a cache ID that is not ASCII and longer than 255 characters so we
     // can test cache ID normalization.
-    $cid_long = str_repeat('愛€', 500);
+    $cid_long = \str_repeat('愛€', 500);
     $cached_value_long = $this->randomMachineName();
     $backend->set($cid_long, $cached_value_long);
     $this->assertSame($cached_value_long, $backend->get($cid_long)->data, "Backend contains the correct value for long, non-ASCII cache id.");
@@ -84,7 +84,7 @@ class DatabaseBackendTest extends GenericCacheBackendUnitTestBase {
       // by waiting 1 ms (1000 microseconds). The garbage collection might
       // otherwise keep less than exactly 100 records (which is acceptable for
       // real-world cases, but not for this test).
-      usleep(1000);
+      \usleep(1000);
       $backend->set("test$i", $i);
     }
     $this->assertSame($max_rows, $this->getNumRows());

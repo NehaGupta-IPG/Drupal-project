@@ -78,7 +78,7 @@ class ContextDefinition implements ContextDefinitionInterface {
    *   The created context definition object.
    */
   public static function create($data_type = 'any') {
-    if (str_starts_with($data_type, 'entity:')) {
+    if (\str_starts_with($data_type, 'entity:')) {
       return new EntityContextDefinition($data_type);
     }
     return new static(
@@ -116,7 +116,7 @@ class ContextDefinition implements ContextDefinitionInterface {
       $this->addConstraint($constraint_name, $options);
     }
 
-    assert(!str_starts_with($data_type, 'entity:') || $this instanceof EntityContextDefinition);
+    \assert(!\str_starts_with($data_type, 'entity:') || $this instanceof EntityContextDefinition);
   }
 
   /**
@@ -283,7 +283,7 @@ class ContextDefinition implements ContextDefinitionInterface {
       // Allow a more generic data type like 'entity' to be fulfilled by a more
       // specific data type like 'entity:user'. However, if this type is more
       // specific, do not consider a more generic type to be a match.
-      str_starts_with($that_type, "$this_type:")
+      \str_starts_with($that_type, "$this_type:")
     );
   }
 
@@ -310,7 +310,7 @@ class ContextDefinition implements ContextDefinitionInterface {
 
     $validator = $this->getTypedDataManager()->getValidator();
     foreach ($values as $value) {
-      $constraints = array_values($this->getConstraintObjects());
+      $constraints = \array_values($this->getConstraintObjects());
       if ($definition->isMultiple()) {
         $violations = new ConstraintViolationList();
         foreach ($value as $item) {
@@ -322,7 +322,7 @@ class ContextDefinition implements ContextDefinitionInterface {
       }
       foreach ($violations as $delta => $violation) {
         // Remove any violation that does not correspond to the constraints.
-        if (!in_array($violation->getConstraint(), $constraints)) {
+        if (!\in_array($violation->getConstraint(), $constraints)) {
           $violations->remove($delta);
         }
       }

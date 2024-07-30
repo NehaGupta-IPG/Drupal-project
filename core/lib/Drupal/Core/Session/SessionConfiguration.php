@@ -103,10 +103,10 @@ class SessionConfiguration implements SessionConfigurationInterface {
       $session_name = $request->getHost() . $request->getBasePath() . $this->options['name_suffix'];
       // Replace "core" out of session_name so core scripts redirect properly,
       // specifically install.php.
-      $session_name = preg_replace('#/core$#', '', $session_name);
+      $session_name = \preg_replace('#/core$#', '', $session_name);
     }
 
-    return substr(hash('sha256', $session_name), 0, 32);
+    return \substr(\hash('sha256', $session_name), 0, 32);
   }
 
   /**
@@ -141,7 +141,7 @@ class SessionConfiguration implements SessionConfigurationInterface {
     // for top-level domains. Also IP addresses may not be used in the domain
     // attribute of a Set-Cookie header. IPv6 addresses will not pass the first
     // test, so it's acceptable to bias the second test to IPv4.
-    if (count(explode('.', $cookie_domain)) > 2 && !is_numeric(str_replace('.', '', $cookie_domain))) {
+    if (\count(\explode('.', $cookie_domain)) > 2 && !\is_numeric(\str_replace('.', '', $cookie_domain))) {
       return $cookie_domain;
     }
   }
@@ -155,7 +155,7 @@ class SessionConfiguration implements SessionConfigurationInterface {
    *   HMAC and timestamp.
    */
   protected function drupalValidTestUa() {
-    return drupal_valid_test_ua();
+    return \drupal_valid_test_ua();
   }
 
 }

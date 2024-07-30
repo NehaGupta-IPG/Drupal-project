@@ -208,7 +208,7 @@ class StatementTest extends DatabaseTestBase {
    */
   public function testStatementCountTwice(): void {
     $statement = $this->connection->query('SELECT * FROM {test}');
-    $rowCount = iterator_count($statement);
+    $rowCount = \iterator_count($statement);
     $this->assertSame(4, $rowCount);
 
     $this->expectException(DatabaseExceptionWrapper::class);
@@ -224,9 +224,9 @@ class StatementTest extends DatabaseTestBase {
    */
   public function testEmptyStatementCountTwice(): void {
     $statement = $this->connection->query('SELECT * FROM {test} WHERE 1 = 0');
-    $rowCount = iterator_count($statement);
+    $rowCount = \iterator_count($statement);
     $this->assertSame(0, $rowCount);
-    $rowCount = iterator_count($statement);
+    $rowCount = \iterator_count($statement);
     $this->assertSame(0, $rowCount);
   }
 

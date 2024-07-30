@@ -126,7 +126,7 @@ abstract class MigrateUpgradeExecuteTestBase extends MigrateUpgradeTestBase {
    */
   protected function assertEntityRevisionsCount(string $content_entity_type_id, int $expected_revision_count) {
     $entity_storage = \Drupal::entityTypeManager()->getStorage($content_entity_type_id);
-    assert($entity_storage instanceof ContentEntityStorageInterface);
+    \assert($entity_storage instanceof ContentEntityStorageInterface);
     $revision_ids = $entity_storage
       ->getQuery()
       ->allRevisions()
@@ -135,7 +135,7 @@ abstract class MigrateUpgradeExecuteTestBase extends MigrateUpgradeTestBase {
     $this->assertCount(
       $expected_revision_count,
       $revision_ids,
-      sprintf(
+      \sprintf(
         "The number of %s revisions is different than expected",
         $content_entity_type_id
       )

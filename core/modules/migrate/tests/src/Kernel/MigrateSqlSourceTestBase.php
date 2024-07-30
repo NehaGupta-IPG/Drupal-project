@@ -47,22 +47,22 @@ abstract class MigrateSqlSourceTestBase extends MigrateSourceTestBase {
     // Create the tables and fill them with data.
     foreach ($source_data as $table => $rows) {
       // Use the biggest row to build the table schema.
-      $counts = array_map('count', $rows);
-      asort($counts);
-      $pilot = $rows[array_key_last($counts)];
+      $counts = \array_map('count', $rows);
+      \asort($counts);
+      $pilot = $rows[\array_key_last($counts)];
 
       $connection->schema()
         ->createTable($table, [
           // SQLite uses loose affinity typing, so it's OK for every field to
           // be a text field.
-          'fields' => array_map(function () {
+          'fields' => \array_map(function () {
             return ['type' => 'text'];
           }, $pilot),
         ]);
 
-      $fields = array_keys($pilot);
+      $fields = \array_keys($pilot);
       $insert = $connection->insert($table)->fields($fields);
-      array_walk($rows, [$insert, 'values']);
+      \array_walk($rows, [$insert, 'values']);
       $insert->execute();
     }
 

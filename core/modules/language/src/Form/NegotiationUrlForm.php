@@ -146,7 +146,7 @@ class NegotiationUrlForm extends ConfigFormBase {
     $languages = $this->languageManager->getLanguages();
 
     // Count repeated values for uniqueness check.
-    $count = array_count_values($form_state->getValue('prefix'));
+    $count = \array_count_values($form_state->getValue('prefix'));
     $default_langcode = $this->config('language.negotiation')->get('selected_langcode');
     if ($default_langcode == LanguageInterface::LANGCODE_SITE_DEFAULT) {
       $default_langcode = $this->languageManager->getDefaultLanguage()->getId();
@@ -162,7 +162,7 @@ class NegotiationUrlForm extends ConfigFormBase {
           ]));
         }
       }
-      elseif (str_contains($value, '/')) {
+      elseif (\str_contains($value, '/')) {
         // Throw a form error if the string contains a slash,
         // which would not work.
         $form_state->setErrorByName("prefix][$langcode", $this->t('The prefix may not contain a slash.'));
@@ -175,7 +175,7 @@ class NegotiationUrlForm extends ConfigFormBase {
     }
 
     // Count repeated values for uniqueness check.
-    $count = array_count_values($form_state->getValue('domain'));
+    $count = \array_count_values($form_state->getValue('domain'));
     foreach ($languages as $langcode => $language) {
       $value = $form_state->getValue(['domain', $langcode]);
 
@@ -199,8 +199,8 @@ class NegotiationUrlForm extends ConfigFormBase {
       $value = $form_state->getValue(['domain', $langcode]);
       if (!empty($value)) {
         // Ensure we have exactly one protocol when checking the hostname.
-        $host = 'http://' . str_replace(['http://', 'https://'], '', $value);
-        if (parse_url($host, PHP_URL_HOST) != $value) {
+        $host = 'http://' . \str_replace(['http://', 'https://'], '', $value);
+        if (\parse_url($host, PHP_URL_HOST) != $value) {
           $form_state->setErrorByName("domain][$langcode", $this->t('The domain for %language may only contain the domain name, not a trailing slash, protocol and/or port.', ['%language' => $language->getName()]));
         }
       }

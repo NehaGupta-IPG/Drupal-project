@@ -102,7 +102,7 @@ abstract class MigrateDrupal6TestBase extends MigrateDrupalTestBase {
    *   'revisions' or 'translations'.
    */
   protected function migrateContent(array $include = []) {
-    if (in_array('translations', $include)) {
+    if (\in_array('translations', $include)) {
       $this->executeMigrations(['language']);
     }
     $this->migrateUsers(FALSE);
@@ -111,10 +111,10 @@ abstract class MigrateDrupal6TestBase extends MigrateDrupalTestBase {
     $this->installEntitySchema('node');
     $this->executeMigrations(['d6_node_settings', 'd6_node']);
 
-    if (in_array('translations', $include)) {
+    if (\in_array('translations', $include)) {
       $this->executeMigrations(['d6_node_translation']);
     }
-    if (in_array('revisions', $include)) {
+    if (\in_array('revisions', $include)) {
       $this->executeMigrations(['d6_node_revision']);
     }
   }

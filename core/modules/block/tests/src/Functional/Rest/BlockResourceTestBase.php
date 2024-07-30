@@ -131,7 +131,7 @@ abstract class BlockResourceTestBase extends ConfigEntityResourceTestBase {
   protected function getExpectedCacheTags() {
     // Because the 'user.permissions' cache context is missing, the cache tag
     // for the anonymous user role is never added automatically.
-    return array_values(array_diff(parent::getExpectedCacheTags(), ['config:user.role.anonymous']));
+    return \array_values(\array_diff(parent::getExpectedCacheTags(), ['config:user.role.anonymous']));
   }
 
   /**

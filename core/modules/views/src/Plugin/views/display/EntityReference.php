@@ -212,7 +212,7 @@ class EntityReference extends DisplayPluginBase {
     }
     else {
       // Verify that the search fields used actually exist.
-      $fields = array_keys($this->handlers['field']);
+      $fields = \array_keys($this->handlers['field']);
       foreach ($style['options']['search_fields'] as $field_alias => $enabled) {
         if ($enabled && !in_array($field_alias, $fields)) {
           $errors[] = $this->t('Display "@display" uses field %field as search field, but the field is no longer present. See the settings for the Entity Reference list format.', [

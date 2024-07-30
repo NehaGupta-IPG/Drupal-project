@@ -47,13 +47,13 @@ class Schema extends DatabaseSchema {
    * {@inheritdoc}
    */
   public function createTableSql($name, $table) {
-    if (!empty($table['primary key']) && is_array($table['primary key'])) {
+    if (!empty($table['primary key']) && \is_array($table['primary key'])) {
       $this->ensureNotNullPrimaryKey($table['primary key'], $table['fields']);
     }
 
     $sql = [];
     $sql[] = "CREATE TABLE {" . $name . "} (\n" . $this->createColumnsSql($name, $table) . "\n)\n";
-    return array_merge($sql, $this->createIndexSql($name, $table));
+    return \array_merge($sql, $this->createIndexSql($name, $table));
   }
 
   /**
@@ -84,7 +84,7 @@ class Schema extends DatabaseSchema {
     // Add the SQL statement for each field.
     foreach ($schema['fields'] as $name => $field) {
       if (isset($field['type']) && $field['type'] == 'serial') {
-        if (isset($schema['primary key']) && ($key = array_search($name, $schema['primary key'])) !== FALSE) {
+        if (isset($schema['primary key']) && ($key = \array_search($name, $schema['primary key'])) !== FALSE) {
           unset($schema['primary key'][$key]);
         }
       }
@@ -96,7 +96,7 @@ class Schema extends DatabaseSchema {
       $sql_array[] = " PRIMARY KEY (" . $this->createKeySql($schema['primary key']) . ")";
     }
 
-    return implode(", \n", $sql_array);
+    return \implode(", \n", $sql_array);
   }
 
   /**
@@ -105,14 +105,14 @@ class Schema extends DatabaseSchema {
   protected function createKeySql($fields) {
     $return = [];
     foreach ($fields as $field) {
-      if (is_array($field)) {
+      if (\is_array($field)) {
         $return[] = '[' . $field[0] . ']';
       }
       else {
         $return[] = '[' . $field . ']';
       }
     }
-    return implode(', ', $return);
+    return \implode(', ', $return);
   }
 
   /**
@@ -129,7 +129,7 @@ class Schema extends DatabaseSchema {
     // Set the correct database-engine specific datatype.
     // In case one is already provided, force it to uppercase.
     if (isset($field['sqlite_type'])) {
-      $field['sqlite_type'] = mb_strtoupper($field['sqlite_type']);
+      $field['sqlite_type'] = \mb_strtoupper($field['sqlite_type']);
     }
     else {
       $map = $this->getFieldTypeMap();
@@ -170,7 +170,7 @@ class Schema extends DatabaseSchema {
     else {
       $sql = $name . ' ' . $spec['sqlite_type'];
 
-      if (in_array($spec['sqlite_type'], ['VARCHAR', 'TEXT'])) {
+      if (\in_array($spec['sqlite_type'], ['VARCHAR', 'TEXT'])) {
         if (isset($spec['length'])) {
           $sql .= '(' . $spec['length'] . ')';
         }
@@ -194,7 +194,7 @@ class Schema extends DatabaseSchema {
       }
 
       if (isset($spec['default'])) {
-        if (is_string($spec['default'])) {
+        if (\is_string($spec['default'])) {
           $spec['default'] = $this->connection->quote($spec['default']);
         }
         $sql .= ' DEFAULT ' . $spec['default'];
@@ -320,7 +320,7 @@ class Schema extends DatabaseSchema {
     if ($this->fieldExists($table, $field)) {
       throw new SchemaObjectExistsException("Cannot add field '$table.$field': field already exists.");
     }
-    if (isset($keys_new['primary key']) && in_array($field, $keys_new['primary key'], TRUE)) {
+    if (isset($keys_new['primary key']) && \in_array($field, $keys_new['primary key'], TRUE)) {
       $this->ensureNotNullPrimaryKey($keys_new['primary key'], [$field => $specification]);
     }
 
@@ -392,7 +392,7 @@ class Schema extends DatabaseSchema {
       }
 
       // Add the new indexes.
-      $new_schema = array_merge($new_schema, $keys_new);
+      $new_schema = \array_merge($new_schema, $keys_new);
 
       $this->alterTable($table, $old_schema, $new_schema, $mapping);
     }
@@ -431,8 +431,8 @@ class Schema extends DatabaseSchema {
     $select = $this->connection->select($table);
 
     // Complete the mapping.
-    $possible_keys = array_keys($new_schema['fields']);
-    $mapping += array_combine($possible_keys, $possible_keys);
+    $possible_keys = \array_keys($new_schema['fields']);
+    $mapping += \array_combine($possible_keys, $possible_keys);
 
     // Now add the fields.
     foreach ($mapping as $field_alias => $field_source) {
@@ -441,7 +441,7 @@ class Schema extends DatabaseSchema {
         continue;
       }
 
-      if (is_array($field_source)) {
+      if (\is_array($field_source)) {
         $select->addExpression($field_source['expression'], $field_alias, $field_source['arguments']);
       }
       else {
@@ -479,7 +479,7 @@ class Schema extends DatabaseSchema {
    *   If a column of the table could not be parsed.
    */
   protected function introspectSchema($table) {
-    $mapped_fields = array_flip($this->getFieldTypeMap());
+    $mapped_fields = \array_flip($this->getFieldTypeMap());
     $schema = [
       'fields' => [],
       'primary key' => [],
@@ -490,7 +490,7 @@ class Schema extends DatabaseSchema {
     $info = $this->getPrefixInfo($table);
     $result = $this->connection->query('PRAGMA [' . $info['schema'] . '].table_info([' . $info['table'] . '])');
     foreach ($result as $row) {
-      if (preg_match('/^([^(]+)\((.*)\)$/', $row->type, $matches)) {
+      if (\preg_match('/^([^(]+)\((.*)\)$/', $row->type, $matches)) {
         $type = $matches[1];
         $length = $matches[2];
       }
@@ -499,7 +499,7 @@ class Schema extends DatabaseSchema {
         $length = NULL;
       }
       if (isset($mapped_fields[$type])) {
-        [$type, $size] = explode(':', $mapped_fields[$type]);
+        [$type, $size] = \explode(':', $mapped_fields[$type]);
         $schema['fields'][$row->name] = [
           'type' => $type,
           'size' => $size,
@@ -513,12 +513,12 @@ class Schema extends DatabaseSchema {
         if ($row->dflt_value === 'NULL') {
           $schema['fields'][$row->name]['default'] = NULL;
         }
-        elseif (is_string($row->dflt_value) && $row->dflt_value[0] === '\'') {
+        elseif (\is_string($row->dflt_value) && $row->dflt_value[0] === '\'') {
           // Remove the wrapping single quotes. And replace duplicate single
           // quotes with a single quote.
-          $schema['fields'][$row->name]['default'] = str_replace("''", "'", substr($row->dflt_value, 1, -1));
+          $schema['fields'][$row->name]['default'] = \str_replace("''", "'", \substr($row->dflt_value, 1, -1));
         }
-        elseif (is_numeric($row->dflt_value)) {
+        elseif (\is_numeric($row->dflt_value)) {
           // Adding 0 to a string will cause PHP to convert it to a float or
           // an integer depending on what the string is. For example:
           // - '1' + 0 = 1
@@ -539,14 +539,14 @@ class Schema extends DatabaseSchema {
         throw new \Exception("Unable to parse the column type " . $row->type);
       }
     }
-    ksort($schema['primary key']);
+    \ksort($schema['primary key']);
     // Re-key the array because $row->pk starts counting at 1.
-    $schema['primary key'] = array_values($schema['primary key']);
+    $schema['primary key'] = \array_values($schema['primary key']);
 
     $indexes = [];
     $result = $this->connection->query('PRAGMA [' . $info['schema'] . '].index_list([' . $info['table'] . '])');
     foreach ($result as $row) {
-      if (!str_starts_with($row->name, 'sqlite_autoindex_')) {
+      if (!\str_starts_with($row->name, 'sqlite_autoindex_')) {
         $indexes[] = [
           'schema_key' => $row->unique ? 'unique keys' : 'indexes',
           'name' => $row->name,
@@ -556,7 +556,7 @@ class Schema extends DatabaseSchema {
     foreach ($indexes as $index) {
       $name = $index['name'];
       // Get index name without prefix.
-      $index_name = substr($name, strlen($info['table']) + 1);
+      $index_name = \substr($name, \strlen($info['table']) + 1);
       $result = $this->connection->query('PRAGMA [' . $info['schema'] . '].index_info([' . $name . '])');
       foreach ($result as $row) {
         $schema[$index['schema_key']][$index_name][] = $row->name;
@@ -581,7 +581,7 @@ class Schema extends DatabaseSchema {
     // Drop the primary key if the field to drop is part of it. This is
     // consistent with the behavior on PostgreSQL.
     // @see \Drupal\mysql\Driver\Database\mysql\Schema::dropField()
-    if (isset($new_schema['primary key']) && in_array($field, $new_schema['primary key'], TRUE)) {
+    if (isset($new_schema['primary key']) && \in_array($field, $new_schema['primary key'], TRUE)) {
       unset($new_schema['primary key']);
     }
 
@@ -611,7 +611,7 @@ class Schema extends DatabaseSchema {
     if (($field != $field_new) && $this->fieldExists($table, $field_new)) {
       throw new SchemaObjectExistsException("Cannot rename field '$table.$field' to '$field_new': target field already exists.");
     }
-    if (isset($keys_new['primary key']) && in_array($field_new, $keys_new['primary key'], TRUE)) {
+    if (isset($keys_new['primary key']) && \in_array($field_new, $keys_new['primary key'], TRUE)) {
       $this->ensureNotNullPrimaryKey($keys_new['primary key'], [$field_new => $spec]);
     }
 
@@ -666,7 +666,7 @@ class Schema extends DatabaseSchema {
         $field = &$field[0];
       }
 
-      $mapped_field = array_search($field, $mapping, TRUE);
+      $mapped_field = \array_search($field, $mapping, TRUE);
       if ($mapped_field !== FALSE) {
         $field = $mapped_field;
       }

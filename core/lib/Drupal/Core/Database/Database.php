@@ -194,7 +194,7 @@ abstract class Database {
     // possible connections for this target. Pick one at random. That allows
     // us to have, for example, multiple replica servers.
     if (empty($info['driver'])) {
-      $info = $info[mt_rand(0, count($info) - 1)];
+      $info = $info[\mt_rand(0, \count($info) - 1)];
     }
 
     // Prefix information, default to an empty prefix.
@@ -203,8 +203,8 @@ abstract class Database {
     // Backwards compatibility layer for Drupal 8 style database connection
     // arrays. Those have the wrong 'namespace' key set, or not set at all
     // for core supported database drivers.
-    if (empty($info['namespace']) || str_starts_with($info['namespace'], 'Drupal\\Core\\Database\\Driver\\')) {
-      switch (strtolower($info['driver'])) {
+    if (empty($info['namespace']) || \str_starts_with($info['namespace'], 'Drupal\\Core\\Database\\Driver\\')) {
+      switch (\strtolower($info['driver'])) {
         case 'mysql':
           $info['namespace'] = 'Drupal\\mysql\\Driver\\Database\\mysql';
           break;
@@ -222,7 +222,7 @@ abstract class Database {
     // arrays. Those do not have the 'autoload' key set for core database
     // drivers.
     if (empty($info['autoload'])) {
-      switch (trim($info['namespace'], '\\')) {
+      switch (\trim($info['namespace'], '\\')) {
         case "Drupal\\mysql\\Driver\\Database\\mysql":
           $info['autoload'] = "core/modules/mysql/src/Driver/Database/mysql/";
           break;
@@ -288,7 +288,7 @@ abstract class Database {
         // then add autoload directory for the parent database driver modules
         // as well.
         if (!empty($info['dependencies'])) {
-          assert(is_array($info['dependencies']));
+          \assert(\is_array($info['dependencies']));
           foreach ($info['dependencies'] as $dependency) {
             if (isset($dependency['namespace']) && isset($dependency['autoload'])) {
               $class_loader->addPsr4($dependency['namespace'] . '\\', $app_root . '/' . $dependency['autoload']);
@@ -472,7 +472,7 @@ abstract class Database {
 
     // Force garbage collection to run. This ensures that client connection
     // objects and results in the connection being closed are destroyed.
-    gc_collect_cycles();
+    \gc_collect_cycles();
   }
 
   /**
@@ -525,7 +525,7 @@ abstract class Database {
 
     // Check that the URL is well formed, starting with 'scheme://', where
     // 'scheme' is a database driver name.
-    if (preg_match('/^(.*):\/\//', $url, $matches) !== 1) {
+    if (\preg_match('/^(.*):\/\//', $url, $matches) !== 1) {
       throw new \InvalidArgumentException("Missing scheme in URL '$url'");
     }
     $driverName = $matches[1];
@@ -533,9 +533,9 @@ abstract class Database {
     // Determine if the database driver is provided by a module.
     // @todo https://www.drupal.org/project/drupal/issues/3250999. Refactor when
     // all database drivers are provided by modules.
-    $url_components = parse_url($url);
+    $url_components = \parse_url($url);
     $url_component_query = $url_components['query'] ?? '';
-    parse_str($url_component_query, $query);
+    \parse_str($url_component_query, $query);
 
     // Use the driver name as the module name when the module name is not
     // provided.
@@ -555,7 +555,7 @@ abstract class Database {
     $additional_class_loader->addPsr4($driverNamespace . '\\', $driver->getPath());
     $additional_class_loader->register();
     $connection_class = $driverNamespace . '\\Connection';
-    if (!class_exists($connection_class)) {
+    if (!\class_exists($connection_class)) {
       throw new \InvalidArgumentException("Can not convert '$url' to a database connection, class '$connection_class' does not exist");
     }
 
@@ -618,7 +618,7 @@ abstract class Database {
     // Add the module name to the connection options to make it easy for the
     // connection class's createUrlFromConnectionOptions() method to add it to
     // the URL.
-    $db_info['default']['module'] = explode('\\', $namespace)[1];
+    $db_info['default']['module'] = \explode('\\', $namespace)[1];
     $connection_class = $namespace . '\\Connection';
     return $connection_class::createUrlFromConnectionOptions($db_info['default']);
   }
@@ -652,13 +652,13 @@ abstract class Database {
       return;
     }
 
-    if (!function_exists('drupal_register_shutdown_function')) {
+    if (!\function_exists('drupal_register_shutdown_function')) {
       return;
     }
 
     if (!$registered) {
       $registered = TRUE;
-      drupal_register_shutdown_function('\Drupal\Core\Database\Database::commitAllOnShutdown', TRUE);
+      \drupal_register_shutdown_function('\Drupal\Core\Database\Database::commitAllOnShutdown', TRUE);
     }
   }
 

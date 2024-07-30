@@ -59,7 +59,7 @@ trait MarkupTrait {
    *   The length of the string.
    */
   public function count(): int {
-    return mb_strlen($this->string);
+    return \mb_strlen($this->string);
   }
 
   /**

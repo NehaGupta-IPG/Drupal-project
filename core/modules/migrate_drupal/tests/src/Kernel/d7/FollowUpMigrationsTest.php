@@ -100,7 +100,7 @@ class FollowUpMigrationsTest extends MigrateDrupal7TestBase {
     $migration_plugin_manager = $this->container->get('plugin.manager.migration');
     $migration_plugin_manager->clearCachedDefinitions();
     $follow_up_migrations = $migration_plugin_manager->createInstances('d7_entity_reference_translation');
-    $this->executeMigrations(array_keys($follow_up_migrations));
+    $this->executeMigrations(\array_keys($follow_up_migrations));
 
     // Test the entity reference field after the follow-up migrations.
     $node = Node::load(2);

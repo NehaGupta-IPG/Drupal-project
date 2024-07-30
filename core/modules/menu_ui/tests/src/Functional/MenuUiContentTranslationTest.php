@@ -95,7 +95,7 @@ class MenuUiContentTranslationTest extends BrowserTestBase {
     $entities = $storage->loadByProperties([
       'title' => $title,
     ]);
-    return reset($entities);
+    return \reset($entities);
   }
 
   /**
@@ -138,12 +138,12 @@ class MenuUiContentTranslationTest extends BrowserTestBase {
 
     // Assert that node exists and node language is English.
     $node = $this->getContentEntityByTitle('node', $node_title);
-    $this->assertTrue(is_object($node));
+    $this->assertTrue(\is_object($node));
     $this->assertTrue($node->language()->getId() == 'en');
 
     // Assert that menu link exists and menu link language is English.
     $menu_link = $this->getContentEntityByTitle('menu_link_content', $menu_link_title_en);
-    $this->assertTrue(is_object($menu_link));
+    $this->assertTrue(\is_object($menu_link));
     $this->assertTrue($menu_link->language()->getId() == 'en');
     $this->assertTrue($menu_link->hasTranslation('en'));
 
@@ -161,12 +161,12 @@ class MenuUiContentTranslationTest extends BrowserTestBase {
 
     // Assert that node exists and node language is target language.
     $node = $this->getContentEntityByTitle('node', $node_title);
-    $this->assertTrue(is_object($node));
+    $this->assertTrue(\is_object($node));
     $this->assertTrue($node->language()->getId() == $langcode);
 
     // Assert that menu link exists and menu link language is target language.
     $menu_link = $this->getContentEntityByTitle('menu_link_content', $menu_link_title_pseudo);
-    $this->assertTrue(is_object($menu_link));
+    $this->assertTrue(\is_object($menu_link));
     $this->assertTrue($menu_link->language()->getId() == $langcode);
     $this->assertFalse($menu_link->hasTranslation('en'));
 

@@ -85,7 +85,7 @@ class ViewsThemeIntegrationTest extends ViewTestBase {
     $this->assertSession()->responseContains("test_base_theme_views_post_render");
 
     // Verify that the views group title is added.
-    $this->assertSession()->responseContains('<em class="placeholder">' . count($this->dataSet()) . '</em> items found.');
+    $this->assertSession()->responseContains('<em class="placeholder">' . \count($this->dataSet()) . '</em> items found.');
   }
 
 }

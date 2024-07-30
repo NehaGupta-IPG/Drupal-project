@@ -29,25 +29,25 @@ trait MenuUiTrait {
     $entity = NULL;
 
     // Pull the path from the menu link content.
-    if (str_starts_with($menu_plugin_id, 'menu_link_content')) {
-      [, $uuid] = explode(':', $menu_plugin_id, 2);
+    if (\str_starts_with($menu_plugin_id, 'menu_link_content')) {
+      [, $uuid] = \explode(':', $menu_plugin_id, 2);
       /** @var \Drupal\menu_link_content\Entity\MenuLinkContent $entity */
       $entity = \Drupal::service('entity.repository')
         ->loadEntityByUuid('menu_link_content', $uuid);
     }
 
     if (isset($expected_item['children'])) {
-      $child_ids = array_values($menu_link_manager->getChildIds($menu_plugin_id));
-      sort($expected_item['children']);
+      $child_ids = \array_values($menu_link_manager->getChildIds($menu_plugin_id));
+      \sort($expected_item['children']);
       if ($child_ids) {
-        sort($child_ids);
+        \sort($child_ids);
       }
       $this->assertSame($expected_item['children'], $child_ids);
       unset($expected_item['children']);
     }
 
     if (isset($expected_item['parents'])) {
-      $parent_ids = array_values($menu_link_manager->getParentIds($menu_plugin_id));
+      $parent_ids = \array_values($menu_link_manager->getParentIds($menu_plugin_id));
       $this->assertSame($expected_item['parents'], $parent_ids);
       unset($expected_item['parents']);
     }

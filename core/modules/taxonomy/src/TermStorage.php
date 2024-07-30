@@ -166,7 +166,7 @@ class TermStorage extends SqlContentEntityStorage implements TermStorageInterfac
       $this->ancestors[$term->id()] = [$term->id() => $term];
       $search[] = $term->id();
 
-      while ($tid = array_shift($search)) {
+      while ($tid = \array_shift($search)) {
         foreach ($this->getParents(static::load($tid)) as $id => $parent) {
           if ($parent && !isset($this->ancestors[$term->id()][$id])) {
             $this->ancestors[$term->id()][$id] = $parent;
@@ -206,7 +206,7 @@ class TermStorage extends SqlContentEntityStorage implements TermStorageInterfac
    * {@inheritdoc}
    */
   public function loadTree($vid, $parent = 0, $max_depth = NULL, $load_entities = FALSE) {
-    $cache_key = implode(':', func_get_args());
+    $cache_key = \implode(':', \func_get_args());
     if (!isset($this->trees[$cache_key])) {
       // We cache trees, so it's not CPU-intensive to call on a term and its
       // children, too.
@@ -236,10 +236,10 @@ class TermStorage extends SqlContentEntityStorage implements TermStorageInterfac
       // caches the results.
       $term_entities = [];
       if ($load_entities) {
-        $term_entities = $this->loadMultiple(array_keys($this->treeTerms[$vid]));
+        $term_entities = $this->loadMultiple(\array_keys($this->treeTerms[$vid]));
       }
 
-      $max_depth = (!isset($max_depth)) ? count($this->treeChildren[$vid]) : $max_depth;
+      $max_depth = (!isset($max_depth)) ? \count($this->treeChildren[$vid]) : $max_depth;
       $tree = [];
 
       // Keeps track of the parents we have to process, the last entry is used
@@ -249,13 +249,13 @@ class TermStorage extends SqlContentEntityStorage implements TermStorageInterfac
 
       // Loops over the parent terms and adds its children to the tree array.
       // Uses a loop instead of a recursion, because it's more efficient.
-      while (count($process_parents)) {
-        $parent = array_pop($process_parents);
+      while (\count($process_parents)) {
+        $parent = \array_pop($process_parents);
         // The number of parents determines the current depth.
-        $depth = count($process_parents);
+        $depth = \count($process_parents);
         if ($max_depth > $depth && !empty($this->treeChildren[$vid][$parent])) {
           $has_children = FALSE;
-          $child = current($this->treeChildren[$vid][$parent]);
+          $child = \current($this->treeChildren[$vid][$parent]);
           do {
             if (empty($child)) {
               break;
@@ -283,17 +283,17 @@ class TermStorage extends SqlContentEntityStorage implements TermStorageInterfac
 
               // Reset pointers for child lists because we step in there more
               // often with multi parents.
-              reset($this->treeChildren[$vid][$tid]);
+              \reset($this->treeChildren[$vid][$tid]);
               // Move pointer so that we get the correct term the next time.
-              next($this->treeChildren[$vid][$parent]);
+              \next($this->treeChildren[$vid][$parent]);
               break;
             }
-          } while ($child = next($this->treeChildren[$vid][$parent]));
+          } while ($child = \next($this->treeChildren[$vid][$parent]));
 
           if (!$has_children) {
             // We processed all terms in this hierarchy-level, reset pointer
             // so that this function works the next time it gets called.
-            reset($this->treeChildren[$vid][$parent]);
+            \reset($this->treeChildren[$vid][$parent]);
           }
         }
       }

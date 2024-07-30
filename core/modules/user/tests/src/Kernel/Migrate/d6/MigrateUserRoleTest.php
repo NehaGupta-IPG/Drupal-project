@@ -40,7 +40,7 @@ class MigrateUserRoleTest extends MigrateDrupal6TestBase {
    */
   public function assertMessages(array $role_data, MigrateIdMapInterface $id_map): void {
     foreach ($id_map->getMessages() as $message) {
-      $permissions = implode("', '", $role_data[$message->dest_id]['invalid']);
+      $permissions = \implode("', '", $role_data[$message->dest_id]['invalid']);
       $expected_message = "Permission(s) '" . $permissions . "' not found.";
       $this->assertSame($expected_message, $message->message);
       $this->assertSame(MigrationInterface::MESSAGE_WARNING, (int) $message->level);

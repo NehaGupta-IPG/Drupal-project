@@ -67,8 +67,8 @@ class JqueryUiLibraryAssetsTest extends BrowserTestBase {
       'drupal.dialog',
     ];
 
-    $this->coreLibrariesWithJqueryUiAssets = array_filter($core_libraries, function ($key) use ($libraries_to_check) {
-      return in_array($key, $libraries_to_check);
+    $this->coreLibrariesWithJqueryUiAssets = \array_filter($core_libraries, function ($key) use ($libraries_to_check) {
+      return \in_array($key, $libraries_to_check);
     }, ARRAY_FILTER_USE_KEY);
 
     // Loop through the core libraries with jQuery assets to build an array that
@@ -77,7 +77,7 @@ class JqueryUiLibraryAssetsTest extends BrowserTestBase {
       foreach (['js', 'css'] as $type) {
         foreach ($library[$type] as $asset) {
           $file = $asset['data'];
-          if (!str_contains($file, 'jquery.ui')) {
+          if (!\str_contains($file, 'jquery.ui')) {
             continue;
           }
           $weight = $asset['weight'];
@@ -85,10 +85,10 @@ class JqueryUiLibraryAssetsTest extends BrowserTestBase {
         }
       }
     }
-    $this->weightGroupedAssets = array_map(function ($item) {
-      return array_unique($item);
+    $this->weightGroupedAssets = \array_map(function ($item) {
+      return \array_unique($item);
     }, $this->weightGroupedAssets);
-    ksort($this->weightGroupedAssets);
+    \ksort($this->weightGroupedAssets);
   }
 
   /**
@@ -154,7 +154,7 @@ class JqueryUiLibraryAssetsTest extends BrowserTestBase {
       ['core/assets/vendor/jquery.ui/themes/base/theme.css'],
     ];
 
-    $configured_weights = array_keys($this->weightGroupedAssets);
+    $configured_weights = \array_keys($this->weightGroupedAssets);
 
     // Loop through the necessary loading order and compare to the configured
     // loading order.
@@ -178,7 +178,7 @@ class JqueryUiLibraryAssetsTest extends BrowserTestBase {
         foreach ($library[$type] as $asset) {
           $file = $asset['data'];
 
-          if (str_contains($file, 'jquery.ui')) {
+          if (\str_contains($file, 'jquery.ui')) {
             // If this is the first time a given file is checked, add the weight
             // value to an array.
             if (!isset($asset_weights[$file])) {
@@ -205,12 +205,12 @@ class JqueryUiLibraryAssetsTest extends BrowserTestBase {
    *   The trimmed path.
    */
   protected function trimFilePath($path) {
-    $base_path_position = strpos($path, base_path());
+    $base_path_position = \strpos($path, base_path());
     if ($base_path_position !== FALSE) {
-      $path = substr_replace($path, '', $base_path_position, strlen(base_path()));
+      $path = \substr_replace($path, '', $base_path_position, \strlen(base_path()));
     }
-    $query_pos = strpos($path, '?');
-    return $query_pos !== FALSE ? substr($path, 0, $query_pos) : $path;
+    $query_pos = \strpos($path, '?');
+    return $query_pos !== FALSE ? \substr($path, 0, $query_pos) : $path;
   }
 
   /**
@@ -222,7 +222,7 @@ class JqueryUiLibraryAssetsTest extends BrowserTestBase {
     $this->assertSession()->statusCodeEquals(200);
 
     // A pipe character in $libraries is delimiting multiple library names.
-    $libraries = str_contains($library, '|') ? explode('|', $library) : [$library];
+    $libraries = \str_contains($library, '|') ? \explode('|', $library) : [$library];
     $files_to_check = [];
 
     // Populate an array with the filenames of every jQuery UI asset in the
@@ -232,7 +232,7 @@ class JqueryUiLibraryAssetsTest extends BrowserTestBase {
       foreach (['css', 'js'] as $type) {
         $assets = $this->coreLibrariesWithJqueryUiAssets[$library_name][$type];
         foreach ($assets as $asset) {
-          if (str_contains($asset['data'], 'jquery.ui')) {
+          if (\str_contains($asset['data'], 'jquery.ui')) {
             $files_to_check[$asset['data']] = TRUE;
           }
         }
@@ -248,7 +248,7 @@ class JqueryUiLibraryAssetsTest extends BrowserTestBase {
       $file = $this->trimFilePath($item->getAttribute('href'));
       $found = FALSE;
       foreach ($this->weightGroupedAssets as $key => $array) {
-        if (in_array($file, $array)) {
+        if (\in_array($file, $array)) {
           $found = TRUE;
           $this->assertGreaterThanOrEqual($css_weight, $key, "The file $file not loading in the expected order based on its weight value.");
           $css_weight = $key;
@@ -265,7 +265,7 @@ class JqueryUiLibraryAssetsTest extends BrowserTestBase {
       $file = $this->trimFilePath($item->getAttribute('src'));
       $found = FALSE;
       foreach ($this->weightGroupedAssets as $key => $array) {
-        if (in_array($file, $array)) {
+        if (\in_array($file, $array)) {
           $found = TRUE;
           $this->assertGreaterThanOrEqual($js_weight, $key, "The file $file not loading in the expected order based on its weight value.");
           $js_weight = $key;
@@ -309,7 +309,7 @@ class JqueryUiLibraryAssetsTest extends BrowserTestBase {
       $css_loaded_by_page[] = $file;
     }
 
-    $this->assertEmpty(array_diff($css_loaded_by_page, $expected_css));
+    $this->assertEmpty(\array_diff($css_loaded_by_page, $expected_css));
 
     // Find all jQuery UI JavaScript files loaded to the page.
     $js = $this->getSession()->getPage()->findAll('css', 'script[src*="jquery.ui"]');
@@ -324,7 +324,7 @@ class JqueryUiLibraryAssetsTest extends BrowserTestBase {
     // to pass before and after the jQuery UI asset changes in
     // http://drupal.org/node/3113400, which, by necessity, results in loading
     // order changes.
-    $this->assertEmpty(array_diff($js_loaded_by_page, $expected_js));
+    $this->assertEmpty(\array_diff($js_loaded_by_page, $expected_js));
   }
 
   /**

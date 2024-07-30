@@ -26,13 +26,13 @@ class MediaMappingsConstraintValidator extends ConstraintValidator {
     // The source field cannot be the target of a field mapping because that
     // would cause it to be overwritten, possibly with invalid data. This is
     // also enforced in the UI.
-    if (is_array($value->getFieldMap())) {
+    if (\is_array($value->getFieldMap())) {
       try {
         $source_field_name = $value->getSource()
           ->getSourceFieldDefinition($value)
           ?->getName();
 
-        if (in_array($source_field_name, $value->getFieldMap(), TRUE)) {
+        if (\in_array($source_field_name, $value->getFieldMap(), TRUE)) {
           $this->context->addViolation($constraint->invalidMappingMessage, [
             '@source_field_name' => $source_field_name,
           ]);

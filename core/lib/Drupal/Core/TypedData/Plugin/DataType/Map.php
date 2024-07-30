@@ -79,7 +79,7 @@ class Map extends TypedData implements \IteratorAggregate, ComplexDataInterface 
    *   avoid being notified again.
    */
   public function setValue($values, $notify = TRUE) {
-    if (isset($values) && !is_array($values)) {
+    if (isset($values) && !\is_array($values)) {
       throw new \InvalidArgumentException("Invalid values given. Values must be represented as an associative array.");
     }
     $this->values = $values;

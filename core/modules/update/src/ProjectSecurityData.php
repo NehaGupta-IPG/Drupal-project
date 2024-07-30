@@ -133,11 +133,11 @@ final class ProjectSecurityData {
 
     // Check if the installed version has a specific end date defined.
     $version_suffix = $existing_release_version->getMajorVersion() . '_' . $this->getSemanticMinorVersion($this->existingVersion);
-    if (defined("self::SECURITY_COVERAGE_END_DATE_$version_suffix")) {
-      $info['security_coverage_end_date'] = constant("self::SECURITY_COVERAGE_END_DATE_$version_suffix");
+    if (\defined("self::SECURITY_COVERAGE_END_DATE_$version_suffix")) {
+      $info['security_coverage_end_date'] = \constant("self::SECURITY_COVERAGE_END_DATE_$version_suffix");
       $info['security_coverage_ending_warn_date'] =
-        defined("self::SECURITY_COVERAGE_ENDING_WARN_DATE_$version_suffix")
-          ? constant("self::SECURITY_COVERAGE_ENDING_WARN_DATE_$version_suffix")
+        \defined("self::SECURITY_COVERAGE_ENDING_WARN_DATE_$version_suffix")
+          ? \constant("self::SECURITY_COVERAGE_ENDING_WARN_DATE_$version_suffix")
           : NULL;
     }
     elseif ($security_coverage_until_version = $this->getSecurityCoverageUntilVersion()) {
@@ -225,7 +225,7 @@ final class ProjectSecurityData {
         // Ignore releases that are in an invalid format. Although this is
         // highly unlikely we should still process releases in the correct
         // format.
-        Error::logException(\Drupal::logger('update'), $exception, 'Invalid project format: @release', ['@release' => print_r($release_info, TRUE)]);
+        Error::logException(\Drupal::logger('update'), $exception, 'Invalid project format: @release', ['@release' => \print_r($release_info, TRUE)]);
         continue;
       }
       $release_version = ExtensionVersion::createFromVersionString($release->getVersion());
@@ -254,7 +254,7 @@ final class ProjectSecurityData {
    *   The minor version as an integer.
    */
   private function getSemanticMinorVersion($version) {
-    return (int) (explode('.', $version)[1]);
+    return (int) (\explode('.', $version)[1]);
   }
 
 }

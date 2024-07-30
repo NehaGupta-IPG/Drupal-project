@@ -112,12 +112,12 @@ final class EntityMethodDeriver extends DeriverBase implements ContainerDeriverI
     $this->addDerivative($action_name, $entity_type, $derivative, $method->name);
 
     $pluralized_name = match(TRUE) {
-      is_string($action_attribute->pluralize) => $action_attribute->pluralize,
+      \is_string($action_attribute->pluralize) => $action_attribute->pluralize,
       $action_attribute->pluralize === FALSE => '',
       default => $this->inflector->pluralize($action_name)[0]
     };
     // Add a pluralized version of the plugin.
-    if (strlen($pluralized_name) > 0) {
+    if (\strlen($pluralized_name) > 0) {
       $derivative['constructor_args']['pluralized'] = TRUE;
       $derivative['admin_label'] = $this->t('@admin_label (multiple calls)', ['@admin_label' => $derivative['admin_label']]);
       $this->addDerivative($pluralized_name, $entity_type, $derivative, $method->name);
@@ -139,7 +139,7 @@ final class EntityMethodDeriver extends DeriverBase implements ContainerDeriverI
   private function addDerivative(string $action_id, ConfigEntityTypeInterface $entity_type, array $derivative, string $methodName): void {
     $id = $entity_type->getConfigPrefix() . PluginBase::DERIVATIVE_SEPARATOR . $action_id;
     if (isset($this->derivatives[$id])) {
-      throw new EntityMethodException(sprintf('Duplicate action can not be created for ID \'%s\' for %s::%s(). The existing action is for the ::%s() method', $id, $entity_type->getClass(), $methodName, $this->derivatives[$id]['constructor_args']['method']));
+      throw new EntityMethodException(\sprintf('Duplicate action can not be created for ID \'%s\' for %s::%s(). The existing action is for the ::%s() method', $id, $entity_type->getClass(), $methodName, $this->derivatives[$id]['constructor_args']['method']));
     }
     $this->derivatives[$id] = $derivative;
   }

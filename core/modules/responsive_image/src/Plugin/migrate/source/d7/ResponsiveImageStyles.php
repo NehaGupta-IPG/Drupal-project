@@ -55,7 +55,7 @@ class ResponsiveImageStyles extends DrupalSqlBase {
    * {@inheritdoc}
    */
   public function prepareRow(Row $row) {
-    $row->setSourceProperty('mapping', unserialize($row->getSourceProperty('mapping')));
+    $row->setSourceProperty('mapping', \unserialize($row->getSourceProperty('mapping')));
     return parent::prepareRow($row);
   }
 

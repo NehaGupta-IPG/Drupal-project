@@ -92,7 +92,7 @@ class MediaLibraryUiBuilder {
       'classes' => [
         'ui-dialog' => 'media-library-widget-modal',
       ],
-      'title' => t('Add or select media'),
+      'title' => \t('Add or select media'),
       'height' => '75%',
       'width' => '75%',
     ];
@@ -223,7 +223,7 @@ class MediaLibraryUiBuilder {
     // Add the menu for each type if we have more than 1 media type enabled for
     // the field.
     $allowed_type_ids = $state->getAllowedTypeIds();
-    if (count($allowed_type_ids) <= 1) {
+    if (\count($allowed_type_ids) <= 1) {
       return [];
     }
 

@@ -146,11 +146,11 @@ class ResponsiveImageStyle extends ConfigEntityBase implements ResponsiveImageSt
     if (empty($breakpoints)) {
       return;
     }
-    usort($this->image_style_mappings, static function (array $a, array $b) use ($breakpoints): int {
+    \usort($this->image_style_mappings, static function (array $a, array $b) use ($breakpoints): int {
       $breakpoint_a = $breakpoints[$a['breakpoint_id']] ?? NULL;
       $breakpoint_b = $breakpoints[$b['breakpoint_id']] ?? NULL;
-      $first = ((float) mb_substr($a['multiplier'], 0, -1)) * 100;
-      $second = ((float) mb_substr($b['multiplier'], 0, -1)) * 100;
+      $first = ((float) \mb_substr($a['multiplier'], 0, -1)) * 100;
+      $second = ((float) \mb_substr($b['multiplier'], 0, -1)) * 100;
       return [$breakpoint_b ? $breakpoint_b->getWeight() : 0, $first] <=> [$breakpoint_a ? $breakpoint_a->getWeight() : 0, $second];
     });
   }
@@ -240,7 +240,7 @@ class ResponsiveImageStyle extends ConfigEntityBase implements ResponsiveImageSt
     }
     // Extract all the styles from the image style mappings.
     $styles = ImageStyle::loadMultiple($this->getImageStyleIds());
-    array_walk($styles, function ($style) {
+    \array_walk($styles, function ($style) {
       $this->addDependency('config', $style->getConfigDependencyName());
     });
     return $this;
@@ -295,12 +295,12 @@ class ResponsiveImageStyle extends ConfigEntityBase implements ResponsiveImageSt
             break;
 
           case 'sizes':
-            $image_styles = array_merge($image_styles, $image_style_mapping['image_mapping']['sizes_image_styles']);
+            $image_styles = \array_merge($image_styles, $image_style_mapping['image_mapping']['sizes_image_styles']);
             break;
         }
       }
     }
-    return array_values(array_filter(array_unique($image_styles)));
+    return \array_values(\array_filter(\array_unique($image_styles)));
   }
 
 }

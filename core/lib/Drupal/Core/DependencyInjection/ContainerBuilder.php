@@ -76,8 +76,8 @@ class ContainerBuilder extends SymfonyContainerBuilder implements ContainerInter
    * {@inheritdoc}
    */
   public function __sleep(): array {
-    assert(FALSE, 'The container was serialized.');
-    return array_keys(get_object_vars($this));
+    \assert(FALSE, 'The container was serialized.');
+    return \array_keys(\get_object_vars($this));
   }
 
 }

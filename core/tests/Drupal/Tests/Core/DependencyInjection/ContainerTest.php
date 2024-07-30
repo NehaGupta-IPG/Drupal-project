@@ -22,7 +22,7 @@ class ContainerTest extends UnitTestCase {
   public function testSerialize(): void {
     $container = new Container();
     $this->expectException(\AssertionError::class);
-    serialize($container);
+    \serialize($container);
   }
 
 }

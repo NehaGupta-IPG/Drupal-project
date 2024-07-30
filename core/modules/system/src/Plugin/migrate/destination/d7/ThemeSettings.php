@@ -67,7 +67,7 @@ class ThemeSettings extends DestinationBase implements ContainerFactoryPluginInt
     unset($theme_settings['theme_name']);
     unset($theme_settings['legacy_theme_name']);
     if (isset($theme_settings)) {
-      theme_settings_convert_to_config($theme_settings, $config);
+      \theme_settings_convert_to_config($theme_settings, $config);
       $config->save();
       $imported = TRUE;
     }

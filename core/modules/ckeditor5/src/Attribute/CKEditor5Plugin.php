@@ -67,7 +67,7 @@ class CKEditor5Plugin extends Plugin {
     // @see \Drupal\ckeditor5\Plugin\CKEditor5PluginDefinition::validateDrupalAspects()
     if (!$drupal instanceof DrupalAspectsOfCKEditor5Plugin) {
       if ($drupal === NULL) {
-        throw new InvalidPluginDefinitionException($id, sprintf('The "%s" CKEditor 5 plugin definition must contain a "drupal" key.', $id));
+        throw new InvalidPluginDefinitionException($id, \sprintf('The "%s" CKEditor 5 plugin definition must contain a "drupal" key.', $id));
       }
       // TRICKY: $this->deriver is incorrect due to AttributeBridgeDecorator!
       // If there's no deriver, validate here. Otherwise: the base definition is
@@ -76,22 +76,22 @@ class CKEditor5Plugin extends Plugin {
       // @see \Drupal\ckeditor5\Plugin\CKEditor5PluginDefinition::getDeriver()
       // @see \Drupal\Component\Plugin\Discovery\AttributeBridgeDecorator::getDefinitions()
       if (!isset($drupal['deriver'])) {
-        if (isset($drupal['label']) && !is_string($drupal['label']) && !$drupal['label'] instanceof TranslatableMarkup) {
-          throw new InvalidPluginDefinitionException($id, sprintf('The "%s" CKEditor 5 plugin definition has a "drupal.label" value that is not a string nor a TranslatableMarkup instance.', $id));
+        if (isset($drupal['label']) && !\is_string($drupal['label']) && !$drupal['label'] instanceof TranslatableMarkup) {
+          throw new InvalidPluginDefinitionException($id, \sprintf('The "%s" CKEditor 5 plugin definition has a "drupal.label" value that is not a string nor a TranslatableMarkup instance.', $id));
         }
         if (!$ckeditor5 instanceof CKEditor5AspectsOfCKEditor5Plugin) {
           if ($ckeditor5 === NULL) {
-            throw new InvalidPluginDefinitionException($id, sprintf('The "%s" CKEditor 5 plugin definition must contain a "ckeditor5" key.', $id));
+            throw new InvalidPluginDefinitionException($id, \sprintf('The "%s" CKEditor 5 plugin definition must contain a "ckeditor5" key.', $id));
           }
           if (!isset($ckeditor5['plugins'])) {
-            throw new InvalidPluginDefinitionException($id, sprintf('The "%s" CKEditor 5 plugin definition must contain a "ckeditor5.plugins" key.', $id));
+            throw new InvalidPluginDefinitionException($id, \sprintf('The "%s" CKEditor 5 plugin definition must contain a "ckeditor5.plugins" key.', $id));
           }
         }
       }
     }
 
-    $this->ckeditor5 = is_array($ckeditor5) ? new CKEditor5AspectsOfCKEditor5Plugin(...$ckeditor5) : $ckeditor5;
-    $this->drupal = is_array($drupal) ? new DrupalAspectsOfCKEditor5Plugin(...$drupal) : $drupal;
+    $this->ckeditor5 = \is_array($ckeditor5) ? new CKEditor5AspectsOfCKEditor5Plugin(...$ckeditor5) : $ckeditor5;
+    $this->drupal = \is_array($drupal) ? new DrupalAspectsOfCKEditor5Plugin(...$drupal) : $drupal;
   }
 
   /**

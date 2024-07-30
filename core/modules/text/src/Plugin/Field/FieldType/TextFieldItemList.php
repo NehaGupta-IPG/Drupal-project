@@ -21,7 +21,7 @@ class TextFieldItemList extends FieldItemList {
         $field_name,
       ]);
       foreach ($submitted_values as $delta => $value) {
-        if (!in_array($value['format'], $allowed_formats, TRUE)) {
+        if (!\in_array($value['format'], $allowed_formats, TRUE)) {
           $form_state->setErrorByName(
             "default_value_input][{$field_name}][{$delta}][format",
             $this->t("The selected text format is not allowed.")

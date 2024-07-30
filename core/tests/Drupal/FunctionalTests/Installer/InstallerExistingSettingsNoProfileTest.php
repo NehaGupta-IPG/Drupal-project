@@ -53,7 +53,7 @@ class InstallerExistingSettingsNoProfileTest extends InstallerTestBase {
       'value' => DrupalKernel::findSitePath(Request::createFromGlobals()) . '/files/config_sync',
       'required' => TRUE,
     ];
-    mkdir($this->settings['settings']['config_sync_directory']->value, 0777, TRUE);
+    \mkdir($this->settings['settings']['config_sync_directory']->value, 0777, TRUE);
   }
 
   /**

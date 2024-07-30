@@ -58,7 +58,7 @@ class Permissions extends ManyToOne {
 
     $this->permissionHandler = $permission_handler;
     if ($module_extension_list instanceof ModuleHandlerInterface) {
-      @trigger_error('Calling ' . __METHOD__ . '() with the $module_extension_list argument as ModuleHandlerInterface is deprecated in drupal:10.3.0 and will be required in drupal:12.0.0. See https://www.drupal.org/node/3310017', E_USER_DEPRECATED);
+      @\trigger_error('Calling ' . __METHOD__ . '() with the $module_extension_list argument as ModuleHandlerInterface is deprecated in drupal:10.3.0 and will be required in drupal:12.0.0. See https://www.drupal.org/node/3310017', E_USER_DEPRECATED);
       $module_extension_list = \Drupal::service('extension.list.module');
     }
     $this->moduleExtensionList = $module_extension_list;
@@ -86,7 +86,7 @@ class Permissions extends ManyToOne {
       foreach ($permissions as $perm => $perm_item) {
         $provider = $perm_item['provider'];
         $display_name = $this->moduleExtensionList->getName($provider);
-        $this->valueOptions[$display_name][$perm] = Html::escape(strip_tags($perm_item['title']));
+        $this->valueOptions[$display_name][$perm] = Html::escape(\strip_tags($perm_item['title']));
       }
       return $this->valueOptions;
     }
@@ -106,13 +106,13 @@ class Permissions extends ManyToOne {
     $all_roles = Role::loadMultiple();
     // Get all role IDs that have the configured permissions.
     foreach ($this->value as $permission) {
-      $roles = array_filter($all_roles, fn(RoleInterface $role) => $role->hasPermission($permission));
+      $roles = \array_filter($all_roles, fn(RoleInterface $role) => $role->hasPermission($permission));
       // Method Role::loadMultiple() returns an array with the role IDs as keys,
       // so take the array keys and merge them with previously found role IDs.
-      $rids = array_merge($rids, array_keys($roles));
+      $rids = \array_merge($rids, \array_keys($roles));
     }
     // Remove any duplicate role IDs.
-    $rids = array_unique($rids);
+    $rids = \array_unique($rids);
     $this->value = $rids;
 
     // $this->value contains the role IDs that have the configured permission.

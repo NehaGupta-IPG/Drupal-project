@@ -172,7 +172,7 @@ class DefaultTableMapping implements TableMappingInterface {
     $uuid_key = $entity_type->getKey('uuid');
     $langcode_key = $entity_type->getKey('langcode');
 
-    $shared_table_definitions = array_filter($storage_definitions, function (FieldStorageDefinitionInterface $definition) use ($table_mapping) {
+    $shared_table_definitions = \array_filter($storage_definitions, function (FieldStorageDefinitionInterface $definition) use ($table_mapping) {
       return $table_mapping->allowsSharedTableStorage($definition);
     });
 
@@ -184,10 +184,10 @@ class DefaultTableMapping implements TableMappingInterface {
       return $definition->isRevisionable();
     }));
     // Make sure the key fields come first in the list of fields.
-    $all_fields = array_merge($key_fields, array_diff($all_fields, $key_fields));
+    $all_fields = \array_merge($key_fields, \array_diff($all_fields, $key_fields));
 
-    $revision_metadata_fields = $revisionable ? array_values($entity_type->getRevisionMetadataKeys()) : [];
-    $revision_metadata_fields = array_intersect($revision_metadata_fields, array_keys($storage_definitions));
+    $revision_metadata_fields = $revisionable ? \array_values($entity_type->getRevisionMetadataKeys()) : [];
+    $revision_metadata_fields = \array_intersect($revision_metadata_fields, \array_keys($storage_definitions));
 
     if (!$revisionable && !$translatable) {
       // The base layout stores all the base field values in the base table.
@@ -198,9 +198,9 @@ class DefaultTableMapping implements TableMappingInterface {
       // table, except for revision metadata fields. Revisionable fields
       // denormalized in the base table but also stored in the revision table
       // together with the entity ID and the revision ID as identifiers.
-      $table_mapping->setFieldNames($table_mapping->baseTable, array_diff($all_fields, $revision_metadata_fields));
+      $table_mapping->setFieldNames($table_mapping->baseTable, \array_diff($all_fields, $revision_metadata_fields));
       $revision_key_fields = [$id_key, $revision_key];
-      $table_mapping->setFieldNames($table_mapping->revisionTable, array_merge($revision_key_fields, $revisionable_fields));
+      $table_mapping->setFieldNames($table_mapping->revisionTable, \array_merge($revision_key_fields, $revisionable_fields));
     }
     elseif (!$revisionable && $translatable) {
       // Multilingual layouts store key field values in the base table. The
@@ -230,16 +230,16 @@ class DefaultTableMapping implements TableMappingInterface {
       $data_fields = array_values(array_unique(array_merge([$id_key], array_diff($all_fields, [$uuid_key], $revision_metadata_fields))));
       $table_mapping->setFieldNames($table_mapping->dataTable, $data_fields);
 
-      $revision_base_fields = array_merge([$id_key, $revision_key, $langcode_key], $revision_metadata_fields);
+      $revision_base_fields = \array_merge([$id_key, $revision_key, $langcode_key], $revision_metadata_fields);
       $table_mapping->setFieldNames($table_mapping->revisionTable, $revision_base_fields);
 
       $revision_data_key_fields = [$id_key, $revision_key, $langcode_key];
-      $revision_data_fields = array_diff($revisionable_fields, $revision_metadata_fields, [$langcode_key]);
-      $table_mapping->setFieldNames($table_mapping->revisionDataTable, array_merge($revision_data_key_fields, $revision_data_fields));
+      $revision_data_fields = \array_diff($revisionable_fields, $revision_metadata_fields, [$langcode_key]);
+      $table_mapping->setFieldNames($table_mapping->revisionDataTable, \array_merge($revision_data_key_fields, $revision_data_fields));
     }
 
     // Add dedicated tables.
-    $dedicated_table_definitions = array_filter($table_mapping->fieldStorageDefinitions, function (FieldStorageDefinitionInterface $definition) use ($table_mapping) {
+    $dedicated_table_definitions = \array_filter($table_mapping->fieldStorageDefinitions, function (FieldStorageDefinitionInterface $definition) use ($table_mapping) {
       return $table_mapping->requiresDedicatedTableStorage($definition);
     });
     $extra_columns = [
@@ -316,7 +316,7 @@ class DefaultTableMapping implements TableMappingInterface {
    * {@inheritdoc}
    */
   public function getTableNames() {
-    return array_unique(array_merge(array_keys($this->fieldNames), array_keys($this->extraColumns)));
+    return \array_unique(\array_merge(\array_keys($this->fieldNames), \array_keys($this->extraColumns)));
   }
 
   /**
@@ -327,7 +327,7 @@ class DefaultTableMapping implements TableMappingInterface {
       $this->allColumns[$table_name] = [];
 
       foreach ($this->getFieldNames($table_name) as $field_name) {
-        $this->allColumns[$table_name] = array_merge($this->allColumns[$table_name], array_values($this->getColumnNames($field_name)));
+        $this->allColumns[$table_name] = \array_merge($this->allColumns[$table_name], \array_values($this->getColumnNames($field_name)));
       }
 
       // There is just one field for each dedicated storage table, thus
@@ -335,10 +335,10 @@ class DefaultTableMapping implements TableMappingInterface {
       if (isset($field_name) && $this->requiresDedicatedTableStorage($this->fieldStorageDefinitions[$field_name])) {
         // Unlike in shared storage tables, in dedicated ones field columns are
         // positioned last.
-        $this->allColumns[$table_name] = array_merge($this->getExtraColumns($table_name), $this->allColumns[$table_name]);
+        $this->allColumns[$table_name] = \array_merge($this->getExtraColumns($table_name), $this->allColumns[$table_name]);
       }
       else {
-        $this->allColumns[$table_name] = array_merge($this->allColumns[$table_name], $this->getExtraColumns($table_name));
+        $this->allColumns[$table_name] = \array_merge($this->allColumns[$table_name], $this->getExtraColumns($table_name));
       }
     }
     return $this->allColumns[$table_name];
@@ -367,7 +367,7 @@ class DefaultTableMapping implements TableMappingInterface {
       // storing field data. Revision metadata is an exception as it's stored
       // only in the revision table.
       $storage_definition = $this->fieldStorageDefinitions[$field_name];
-      $table_names = array_filter([
+      $table_names = \array_filter([
         $this->dataTable,
         $this->baseTable,
         $this->revisionTable,
@@ -376,7 +376,7 @@ class DefaultTableMapping implements TableMappingInterface {
 
       // Collect field columns.
       $field_columns = [];
-      foreach (array_keys($storage_definition->getColumns()) as $property_name) {
+      foreach (\array_keys($storage_definition->getColumns()) as $property_name) {
         $field_columns[] = $this->getFieldColumnName($storage_definition, $property_name);
       }
 
@@ -384,7 +384,7 @@ class DefaultTableMapping implements TableMappingInterface {
         $columns = $this->getAllColumns($table_name);
         // We assume finding one field column belonging to the mapping is enough
         // to identify the field table.
-        if (array_intersect($columns, $field_columns)) {
+        if (\array_intersect($columns, $field_columns)) {
           $result = $table_name;
           break;
         }
@@ -402,8 +402,8 @@ class DefaultTableMapping implements TableMappingInterface {
    * {@inheritdoc}
    */
   public function getAllFieldTableNames($field_name) {
-    return array_keys(array_filter($this->fieldNames, function ($table_fields) use ($field_name) {
-      return in_array($field_name, $table_fields, TRUE);
+    return \array_keys(\array_filter($this->fieldNames, function ($table_fields) use ($field_name) {
+      return \in_array($field_name, $table_fields, TRUE);
     }));
   }
 
@@ -414,7 +414,7 @@ class DefaultTableMapping implements TableMappingInterface {
     if (!isset($this->columnMapping[$field_name])) {
       $this->columnMapping[$field_name] = [];
       if (isset($this->fieldStorageDefinitions[$field_name]) && !$this->fieldStorageDefinitions[$field_name]->hasCustomStorage()) {
-        foreach (array_keys($this->fieldStorageDefinitions[$field_name]->getColumns()) as $property_name) {
+        foreach (\array_keys($this->fieldStorageDefinitions[$field_name]->getColumns()) as $property_name) {
           $this->columnMapping[$field_name][$property_name] = $this->getFieldColumnName($this->fieldStorageDefinitions[$field_name], $property_name);
         }
       }
@@ -429,14 +429,14 @@ class DefaultTableMapping implements TableMappingInterface {
     $field_name = $storage_definition->getName();
 
     if ($this->allowsSharedTableStorage($storage_definition)) {
-      $column_name = count($storage_definition->getColumns()) == 1 ? $field_name : $field_name . '__' . $property_name;
+      $column_name = \count($storage_definition->getColumns()) == 1 ? $field_name : $field_name . '__' . $property_name;
     }
     elseif ($this->requiresDedicatedTableStorage($storage_definition)) {
       if ($property_name == TableMappingInterface::DELTA) {
         $column_name = 'delta';
       }
       else {
-        $column_name = !in_array($property_name, $this->getReservedColumns()) ? $field_name . '_' . $property_name : $property_name;
+        $column_name = !\in_array($property_name, $this->getReservedColumns()) ? $field_name . '_' . $property_name : $property_name;
       }
     }
     else {
@@ -534,16 +534,16 @@ class DefaultTableMapping implements TableMappingInterface {
    */
   public function getDedicatedTableNames() {
     $table_mapping = $this;
-    $definitions = array_filter($this->fieldStorageDefinitions, function ($definition) use ($table_mapping) {
+    $definitions = \array_filter($this->fieldStorageDefinitions, function ($definition) use ($table_mapping) {
       return $table_mapping->requiresDedicatedTableStorage($definition);
     });
-    $data_tables = array_map(function ($definition) use ($table_mapping) {
+    $data_tables = \array_map(function ($definition) use ($table_mapping) {
       return $table_mapping->getDedicatedDataTableName($definition);
     }, $definitions);
-    $revision_tables = array_map(function ($definition) use ($table_mapping) {
+    $revision_tables = \array_map(function ($definition) use ($table_mapping) {
       return $table_mapping->getDedicatedRevisionTableName($definition);
     }, $definitions);
-    $dedicated_tables = array_merge(array_values($data_tables), array_values($revision_tables));
+    $dedicated_tables = \array_merge(\array_values($data_tables), \array_values($revision_tables));
     return $dedicated_tables;
   }
 
@@ -573,7 +573,7 @@ class DefaultTableMapping implements TableMappingInterface {
       // with table names longer than 64 characters, we hash the unique storage
       // identifier and return the first 10 characters so we end up with a short
       // unique ID.
-      return "field_deleted_data_" . substr(hash('sha256', $storage_definition->getUniqueStorageIdentifier()), 0, 10);
+      return "field_deleted_data_" . \substr(\hash('sha256', $storage_definition->getUniqueStorageIdentifier()), 0, 10);
     }
     else {
       return $this->generateFieldTableName($storage_definition, FALSE);
@@ -599,7 +599,7 @@ class DefaultTableMapping implements TableMappingInterface {
       // up with table names longer than 64 characters, we hash the unique
       // storage identifier and return the first 10 characters so we end up with
       // a short unique ID.
-      return "field_deleted_revision_" . substr(hash('sha256', $storage_definition->getUniqueStorageIdentifier()), 0, 10);
+      return "field_deleted_revision_" . \substr(\hash('sha256', $storage_definition->getUniqueStorageIdentifier()), 0, 10);
     }
     else {
       return $this->generateFieldTableName($storage_definition, TRUE);
@@ -622,17 +622,17 @@ class DefaultTableMapping implements TableMappingInterface {
    */
   protected function generateFieldTableName(FieldStorageDefinitionInterface $storage_definition, $revision) {
     // The maximum length of an entity type ID is 32 characters.
-    $entity_type_id = substr($storage_definition->getTargetEntityTypeId(), 0, EntityTypeInterface::ID_MAX_LENGTH);
+    $entity_type_id = \substr($storage_definition->getTargetEntityTypeId(), 0, EntityTypeInterface::ID_MAX_LENGTH);
     $separator = $revision ? '_revision__' : '__';
 
     $table_name = $this->prefix . $entity_type_id . $separator . $storage_definition->getName();
     // Limit the string to 48 characters, keeping a 16 characters margin for db
     // prefixes.
-    if (strlen($table_name) > 48) {
+    if (\strlen($table_name) > 48) {
       // Use a shorter separator and a hash of the field storage unique
       // identifier.
       $separator = $revision ? '_r__' : '__';
-      $field_hash = substr(hash('sha256', $storage_definition->getUniqueStorageIdentifier()), 0, 10);
+      $field_hash = \substr(\hash('sha256', $storage_definition->getUniqueStorageIdentifier()), 0, 10);
 
       $table_name = $this->prefix . $entity_type_id . $separator . $field_hash;
 
@@ -641,8 +641,8 @@ class DefaultTableMapping implements TableMappingInterface {
       // - prefix: max 34 chars;
       // - separator: max 4 chars;
       // - field_hash: max 10 chars.
-      if (strlen($table_name) > 48) {
-        $prefix = substr($this->prefix, 0, 34);
+      if (\strlen($table_name) > 48) {
+        $prefix = \substr($this->prefix, 0, 34);
         $table_name = $prefix . $separator . $field_hash;
       }
     }

@@ -52,7 +52,7 @@ class FileValidator implements FileValidatorInterface {
     $this->eventDispatcher->dispatch(new FileValidationEvent($file, $violations));
 
     // Always check the insecure upload constraint.
-    if (count($violations) === 0) {
+    if (\count($violations) === 0) {
       $insecureUploadConstraint = $this->constraintManager->create('FileExtensionSecure', []);
       $violations = $this->validator->validate($fileTypedData, $insecureUploadConstraint);
     }

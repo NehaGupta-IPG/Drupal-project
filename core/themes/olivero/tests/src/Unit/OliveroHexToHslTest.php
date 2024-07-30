@@ -32,7 +32,7 @@ final class OliveroHexToHslTest extends UnitTestCase {
    */
   #[DataProvider('hexCodes')]
   public function testHexToHsl(string $hex, array $expected_hsl): void {
-    self::assertEquals($expected_hsl, _olivero_hex_to_hsl($hex));
+    self::assertEquals($expected_hsl, \_olivero_hex_to_hsl($hex));
   }
 
   /**

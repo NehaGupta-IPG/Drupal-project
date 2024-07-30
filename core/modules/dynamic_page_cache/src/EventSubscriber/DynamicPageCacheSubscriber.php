@@ -263,12 +263,12 @@ class DynamicPageCacheSubscriber implements EventSubscriberInterface {
     $cacheability->setCacheContexts($this->cacheContextsManager->optimizeTokens($cacheability->getCacheContexts()));
 
     // Response has a high-cardinality cache context.
-    if (array_intersect($cacheability->getCacheContexts(), $conditions['contexts'])) {
+    if (\array_intersect($cacheability->getCacheContexts(), $conditions['contexts'])) {
       return FALSE;
     }
 
     // Response has a high-invalidation frequency cache tag.
-    if (array_intersect($cacheability->getCacheTags(), $conditions['tags'])) {
+    if (\array_intersect($cacheability->getCacheTags(), $conditions['tags'])) {
       return FALSE;
     }
 

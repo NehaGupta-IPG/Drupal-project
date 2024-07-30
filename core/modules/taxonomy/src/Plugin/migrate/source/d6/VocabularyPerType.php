@@ -44,7 +44,7 @@ class VocabularyPerType extends Vocabulary {
     $i18ntaxonomy_vocab = $this->variableGet('i18ntaxonomy_vocabulary', []);
     $vid = $row->getSourceProperty('vid');
     $i18ntaxonomy_vocabulary = FALSE;
-    if (array_key_exists($vid, $i18ntaxonomy_vocab)) {
+    if (\array_key_exists($vid, $i18ntaxonomy_vocab)) {
       $i18ntaxonomy_vocabulary = $i18ntaxonomy_vocab[$vid];
     }
     $row->setSourceProperty('i18ntaxonomy_vocabulary', $i18ntaxonomy_vocabulary);

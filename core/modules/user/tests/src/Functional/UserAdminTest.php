@@ -112,8 +112,8 @@ class UserAdminTest extends BrowserTestBase {
 
     // Filter the users by role. Grab the system-generated role name for User C.
     $roles = $user_c->getRoles();
-    unset($roles[array_search(RoleInterface::AUTHENTICATED_ID, $roles)]);
-    $this->drupalGet('admin/people', ['query' => ['role' => reset($roles)]]);
+    unset($roles[\array_search(RoleInterface::AUTHENTICATED_ID, $roles)]);
+    $this->drupalGet('admin/people', ['query' => ['role' => \reset($roles)]]);
 
     // Check if the correct users show up when filtered by role.
     $this->assertSession()->elementNotExists('xpath', static::getLinkSelectorForUser($user_a));

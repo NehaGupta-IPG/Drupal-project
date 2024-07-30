@@ -129,7 +129,7 @@ class TermParentsTest extends BrowserTestBase {
       ->condition('name', $name)
       ->execute();
     /** @var \Drupal\taxonomy\TermInterface $term_1 */
-    $term_1 = $this->termStorage->load(reset($result));
+    $term_1 = $this->termStorage->load(\reset($result));
     $this->assertInstanceOf(TermInterface::class, $term_1);
     return $term_1;
   }
@@ -139,8 +139,8 @@ class TermParentsTest extends BrowserTestBase {
    */
   public function testEditingParents(): void {
     $terms = $this->doTestEditingSingleParent();
-    $term_5 = array_pop($terms);
-    $term_4 = array_pop($terms);
+    $term_5 = \array_pop($terms);
+    $term_4 = \array_pop($terms);
 
     // Create a term with multiple parents.
     $term_6 = $this->createTerm('Test term 6', [
@@ -170,8 +170,8 @@ class TermParentsTest extends BrowserTestBase {
     $this->assertSession()->fieldDisabled('Parent terms');
 
     $terms = $this->doTestEditingSingleParent();
-    $term_5 = array_pop($terms);
-    $term_4 = array_pop($terms);
+    $term_5 = \array_pop($terms);
+    $term_4 = \array_pop($terms);
 
     // Create a term with multiple parents.
     $term_6 = $this->createTerm('Test term 6', [

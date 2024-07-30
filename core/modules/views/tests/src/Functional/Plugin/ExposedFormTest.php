@@ -384,7 +384,7 @@ class ExposedFormTest extends ViewTestBase {
     // @see https://www.drupal.org/node/535868
     $on_demand_text = 'Select any filter and click Apply to see results.';
     $display['display_options']['exposed_form']['options']['text_input_required'] = $on_demand_text;
-    $display['display_options']['exposed_form']['options']['text_input_required_format'] = filter_default_format();
+    $display['display_options']['exposed_form']['options']['text_input_required_format'] = \filter_default_format();
     $view->save();
 
     // Ensure that the "on demand text" is displayed when no exposed filters are
@@ -416,11 +416,11 @@ class ExposedFormTest extends ViewTestBase {
 
     $this->drupalGet('test_exposed_form_sort_items_per_page');
     $this->assertCacheContexts($contexts);
-    $this->assertIds(range(1, 10, 1));
+    $this->assertIds(\range(1, 10, 1));
 
     $this->drupalGet('test_exposed_form_sort_items_per_page', ['query' => ['sort_order' => 'DESC']]);
     $this->assertCacheContexts($contexts);
-    $this->assertIds(range(50, 41, 1));
+    $this->assertIds(\range(50, 41, 1));
 
     $this->drupalGet('test_exposed_form_sort_items_per_page', [
       'query' => [
@@ -429,7 +429,7 @@ class ExposedFormTest extends ViewTestBase {
       ],
     ]);
     $this->assertCacheContexts($contexts);
-    $this->assertIds(range(50, 26, 1));
+    $this->assertIds(\range(50, 26, 1));
 
     $this->drupalGet('test_exposed_form_sort_items_per_page', [
       'query' => [
@@ -439,7 +439,7 @@ class ExposedFormTest extends ViewTestBase {
       ],
     ]);
     $this->assertCacheContexts($contexts);
-    $this->assertIds(range(40, 16, 1));
+    $this->assertIds(\range(40, 16, 1));
 
     $view = Views::getView('test_exposed_form_sort_items_per_page');
     $view->setDisplay();
@@ -471,9 +471,9 @@ class ExposedFormTest extends ViewTestBase {
     // Check that the custom field identifier is used in the URL query string.
     $this->submitForm(['sort_order' => 'DESC'], 'Apply');
     $this->assertCacheContexts($contexts);
-    $this->assertIds(range(50, 41));
+    $this->assertIds(\range(50, 41));
     $url = $this->getSession()->getCurrentUrl();
-    $this->assertStringContainsString('sort_by=' . urlencode($field_identifier), $url);
+    $this->assertStringContainsString('sort_by=' . \urlencode($field_identifier), $url);
   }
 
   /**
@@ -566,7 +566,7 @@ class ExposedFormTest extends ViewTestBase {
    */
   protected function assertNodesExist(array $bundles): void {
     foreach ($this->nodes as $node) {
-      if (in_array($node->bundle(), $bundles)) {
+      if (\in_array($node->bundle(), $bundles)) {
         $this->assertSession()->pageTextContains($node->label());
       }
       else {

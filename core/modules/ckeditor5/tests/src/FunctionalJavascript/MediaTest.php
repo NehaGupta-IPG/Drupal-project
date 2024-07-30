@@ -61,7 +61,7 @@ class MediaTest extends MediaTestBase {
     $assert_session->waitForElementVisible('css', 'img[src*="image-test.png"]', 1000);
     $editor_html = $this->getEditorDataAsHtmlString();
     // Observe that `<drupal-media>` was moved into its own block element.
-    $this->assertEquals('<p>foo</p>' . $original_value, str_replace('&nbsp;', '', $editor_html));
+    $this->assertEquals('<p>foo</p>' . $original_value, \str_replace('&nbsp;', '', $editor_html));
   }
 
   /**
@@ -71,7 +71,7 @@ class MediaTest extends MediaTestBase {
    */
   protected function testOnlyDrupalMediaTagProcessed(): void {
     $original_value = $this->host->body->value;
-    $this->host->body->value = str_replace('drupal-media', 'p', $original_value);
+    $this->host->body->value = \str_replace('drupal-media', 'p', $original_value);
     $this->host->save();
 
     // Assert that `<p data-* …>` is not upcast into a CKEditor Widget.
@@ -109,7 +109,7 @@ class MediaTest extends MediaTestBase {
       ],
       'multiBlock' => TRUE,
     ];
-    $settings['toolbar']['items'] = array_merge($settings['toolbar']['items'], ['bulletedList', 'numberedList']);
+    $settings['toolbar']['items'] = \array_merge($settings['toolbar']['items'], ['bulletedList', 'numberedList']);
     $editor->setSettings($settings);
     $editor->save();
 
@@ -127,7 +127,7 @@ class MediaTest extends MediaTestBase {
       function (ConstraintViolationInterface $v) {
         return (string) $v->getMessage();
       },
-      iterator_to_array(CKEditor5::validatePair(
+      \iterator_to_array(CKEditor5::validatePair(
         Editor::load('test_format'),
         FilterFormat::load('test_format')
       ))
@@ -181,7 +181,7 @@ class MediaTest extends MediaTestBase {
       function (ConstraintViolationInterface $v) {
         return (string) $v->getMessage();
       },
-      iterator_to_array(CKEditor5::validatePair(
+      \iterator_to_array(CKEditor5::validatePair(
         Editor::load('test_format'),
         FilterFormat::load('test_format')
       ))
@@ -189,7 +189,7 @@ class MediaTest extends MediaTestBase {
 
     // Add data-foo use to an existing drupal-media tag.
     $original_value = $this->host->body->value;
-    $this->host->body->value = '<div data-bar="baz">' . str_replace('drupal-media', 'drupal-media data-foo="bar" ', $original_value) . '</div>';
+    $this->host->body->value = '<div data-bar="baz">' . \str_replace('drupal-media', 'drupal-media data-foo="bar" ', $original_value) . '</div>';
     $this->host->save();
     $this->drupalGet($this->host->toUrl('edit-form'));
 
@@ -219,7 +219,7 @@ class MediaTest extends MediaTestBase {
     // Test that setting caption to blank string doesn't break 'Edit media'
     // button.
     $original_value = $this->host->body->value;
-    $this->host->body->value = str_replace('data-caption="baz"', 'data-caption=""', $original_value);
+    $this->host->body->value = \str_replace('data-caption="baz"', 'data-caption=""', $original_value);
     $this->host->save();
     $this->drupalGet($this->host->toUrl('edit-form'));
     $this->waitForEditor();
@@ -248,7 +248,7 @@ class MediaTest extends MediaTestBase {
 
     // Restore caption in saved body value.
     $original_value = $this->host->body->value;
-    $this->host->body->value = str_replace('data-caption=""', 'data-caption="baz"', $original_value);
+    $this->host->body->value = \str_replace('data-caption=""', 'data-caption="baz"', $original_value);
     $this->host->save();
     $this->drupalGet($this->host->toUrl('edit-form'));
     $this->waitForEditor();
@@ -317,7 +317,7 @@ class MediaTest extends MediaTestBase {
     $this->pressEditorButton('Source');
     $source_text_area = $assert_session->waitForElement('css', '.ck-source-editing-area textarea');
     $source_text = $source_text_area->getValue();
-    $source_text_area->setValue(str_replace('data-caption="Llamas are the most awesome ever"', 'data-caption="Llamas are the most<br>awesome ever"', $source_text));
+    $source_text_area->setValue(\str_replace('data-caption="Llamas are the most awesome ever"', 'data-caption="Llamas are the most<br>awesome ever"', $source_text));
     // Click source again to make source inactive.
     $this->pressEditorButton('Source');
     // Check that the source mode is toggled off.
@@ -326,7 +326,7 @@ class MediaTest extends MediaTestBase {
     $this->pressEditorButton('Source');
     $source_text_area = $assert_session->waitForElement('css', '.ck-source-editing-area textarea');
     $source_text = $source_text_area->getValue();
-    $source_text_area->setValue(str_replace('data-caption="Llamas are the most&lt;br&gt;awesome ever"', 'data-caption="Llamas are the most awesome ever"', $source_text));
+    $source_text_area->setValue(\str_replace('data-caption="Llamas are the most&lt;br&gt;awesome ever"', 'data-caption="Llamas are the most awesome ever"', $source_text));
     // Click source again to make source inactive.
     $this->pressEditorButton('Source');
     // Check that the source mode is toggled off.
@@ -722,7 +722,7 @@ class MediaTest extends MediaTestBase {
       function (ConstraintViolationInterface $v) {
         return (string) $v->getMessage();
       },
-      iterator_to_array(CKEditor5::validatePair(
+      \iterator_to_array(CKEditor5::validatePair(
         Editor::load('test_format'),
         FilterFormat::load('test_format')
       ))
@@ -807,7 +807,7 @@ class MediaTest extends MediaTestBase {
     ])->save();
 
     if (!$with_alignment) {
-      $filter_format->filters('filter_align')->setConfiguration(array_merge($filter_format->filters('filter_align')->getConfiguration(), ['status' => FALSE]));
+      $filter_format->filters('filter_align')->setConfiguration(\array_merge($filter_format->filters('filter_align')->getConfiguration(), ['status' => FALSE]));
     }
 
     // Test that view mode dependencies are returned from the MediaEmbed
@@ -951,7 +951,7 @@ class MediaTest extends MediaTestBase {
     // preserves the empty editable caption when the preview reloads.
     $this->assertNotEmpty($assert_session->waitForElementVisible('css', '.drupal-media figcaption'));
     $original_value = $this->host->body->value;
-    $this->host->body->value = str_replace('data-caption="baz"', '', $original_value);
+    $this->host->body->value = \str_replace('data-caption="baz"', '', $original_value);
     $this->host->save();
     $this->getSession()->reload();
     $this->waitForEditor();

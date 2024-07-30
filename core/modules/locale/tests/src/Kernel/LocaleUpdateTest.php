@@ -35,7 +35,7 @@ class LocaleUpdateTest extends KernelTestBase {
     \Drupal::state()->set('locale.test_system_info_alter', TRUE);
 
     // Check if interface translation data is collected from hook_info.
-    $projects = locale_translation_project_list();
+    $projects = \locale_translation_project_list();
     $this->assertArrayNotHasKey('locale_test_translate', $projects);
     $this->assertEquals('core/modules/locale/test/test.%language.po', $projects['locale_test']['info']['interface translation server pattern']);
     $this->assertEquals('locale_test', $projects['locale_test']['name']);

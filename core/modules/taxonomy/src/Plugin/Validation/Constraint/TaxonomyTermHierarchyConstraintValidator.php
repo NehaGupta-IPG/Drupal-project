@@ -45,7 +45,7 @@ class TaxonomyTermHierarchyConstraintValidator extends ConstraintValidator imple
    */
   public function validate($entity, Constraint $constraint): void {
     $term_storage = $this->entityTypeManager->getStorage($entity->getEntityTypeId());
-    assert($term_storage instanceof TermStorageInterface);
+    \assert($term_storage instanceof TermStorageInterface);
 
     // Newly created entities should be able to specify a parent.
     if ($entity && $entity->isNew()) {
@@ -55,10 +55,10 @@ class TaxonomyTermHierarchyConstraintValidator extends ConstraintValidator imple
     $is_pending_revision = !$entity->isDefaultRevision();
     $pending_term_ids = $term_storage->getTermIdsWithPendingRevisions();
     $ancestors = $term_storage->loadAllParents($entity->id());
-    $ancestor_is_pending_revision = (bool) array_intersect_key($ancestors, array_flip($pending_term_ids));
+    $ancestor_is_pending_revision = (bool) \array_intersect_key($ancestors, \array_flip($pending_term_ids));
 
-    $new_parents = array_column($entity->parent->getValue(), 'target_id');
-    $original_parents = array_keys($term_storage->loadParents($entity->id())) ?: [0];
+    $new_parents = \array_column($entity->parent->getValue(), 'target_id');
+    $original_parents = \array_keys($term_storage->loadParents($entity->id())) ?: [0];
     if (($is_pending_revision || $ancestor_is_pending_revision) && $new_parents != $original_parents) {
       $this->context->buildViolation($constraint->message)
         ->atPath('parent')

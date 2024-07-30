@@ -253,7 +253,7 @@ class BlockContentCreationTest extends BlockContentTestBase {
 
     // Place the block.
     $instance = [
-      'id' => mb_strtolower($edit['info[0][value]']),
+      'id' => \mb_strtolower($edit['info[0][value]']),
       'settings[label]' => $edit['info[0][value]'],
       'region' => 'sidebar_first',
     ];
@@ -308,7 +308,7 @@ class BlockContentCreationTest extends BlockContentTestBase {
   public function testConfigDependencies(): void {
     $block = $this->createBlockContent();
     // Place the block.
-    $block_placement_id = mb_strtolower($block->label());
+    $block_placement_id = \mb_strtolower($block->label());
     $instance = [
       'id' => $block_placement_id,
       'settings[label]' => $block->label(),
@@ -320,7 +320,7 @@ class BlockContentCreationTest extends BlockContentTestBase {
     $this->submitForm($instance, 'Save block');
 
     $dependencies = \Drupal::service('config.manager')->findConfigEntityDependenciesAsEntities('content', [$block->getConfigDependencyName()]);
-    $block_placement = reset($dependencies);
+    $block_placement = \reset($dependencies);
     $this->assertEquals($block_placement_id, $block_placement->id(), "The block placement config entity has a dependency on the block content entity.");
   }
 
@@ -334,7 +334,7 @@ class BlockContentCreationTest extends BlockContentTestBase {
     if (empty($blocks)) {
       return NULL;
     }
-    return reset($blocks);
+    return \reset($blocks);
   }
 
 }

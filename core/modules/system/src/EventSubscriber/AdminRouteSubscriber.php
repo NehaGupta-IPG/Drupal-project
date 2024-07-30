@@ -18,7 +18,7 @@ class AdminRouteSubscriber extends RouteSubscriberBase {
   protected function alterRoutes(RouteCollection $collection) {
     foreach ($collection->all() as $route) {
       $path = $route->getPath();
-      if (($path == '/admin' || str_starts_with($path, '/admin/')) && !$route->hasOption('_admin_route') && static::isHtmlRoute($route)) {
+      if (($path == '/admin' || \str_starts_with($path, '/admin/')) && !$route->hasOption('_admin_route') && static::isHtmlRoute($route)) {
         $route->setOption('_admin_route', TRUE);
       }
     }
@@ -49,8 +49,8 @@ class AdminRouteSubscriber extends RouteSubscriberBase {
    */
   protected static function isHtmlRoute(Route $route) {
     // If a route has no explicit format, then HTML is valid.
-    $format = $route->hasRequirement('_format') ? explode('|', $route->getRequirement('_format')) : ['html'];
-    return in_array('html', $format, TRUE);
+    $format = $route->hasRequirement('_format') ? \explode('|', $route->getRequirement('_format')) : ['html'];
+    return \in_array('html', $format, TRUE);
   }
 
 }

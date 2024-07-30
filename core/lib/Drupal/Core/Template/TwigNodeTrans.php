@@ -59,7 +59,7 @@ class TwigNodeTrans extends Node {
 
     if ($this->hasNode('plural')) {
       [$plural, $pluralTokens] = $this->compileString($this->getNode('plural'));
-      $tokens = array_merge($tokens, $pluralTokens);
+      $tokens = \array_merge($tokens, $pluralTokens);
     }
 
     // Start writing with the function to be called.
@@ -120,7 +120,7 @@ class TwigNodeTrans extends Node {
     }
 
     $tokens = [];
-    if (count($body)) {
+    if (\count($body)) {
       $text = '';
 
       foreach ($body as $node) {
@@ -172,17 +172,17 @@ class TwigNodeTrans extends Node {
                 $argName[] = $args->getNode('attribute')->getAttribute('value');
               }
             }
-            $argName = array_reverse($argName);
-            $argName = implode('.', $argName);
+            $argName = \array_reverse($argName);
+            $argName = \implode('.', $argName);
           }
           else {
             $argName = $n->getAttribute('name');
-            if (!is_null($args)) {
+            if (!\is_null($args)) {
               $argName = $args->getAttribute('name');
             }
             $expr = new ContextVariable($argName, $n->getTemplateLine());
           }
-          $placeholder = sprintf('%s%s', $argPrefix, $argName);
+          $placeholder = \sprintf('%s%s', $argPrefix, $argName);
           $text .= $placeholder;
           $expr->setAttribute('placeholder', $placeholder);
           $tokens[] = $expr;

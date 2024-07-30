@@ -145,8 +145,8 @@ class PageCache implements HttpKernelInterface {
     // 1. There is a session cookie on the request.
     // 2. The Vary: Cookie header is on the response.
     // 3. The Cache-Control header does not contain the no-cache directive.
-    if ($request->cookies->has(session_name()) &&
-      in_array('Cookie', $response->getVary()) &&
+    if ($request->cookies->has(\session_name()) &&
+      \in_array('Cookie', $response->getVary()) &&
       !$response->headers->hasCacheControlDirective('no-cache')) {
 
       $response->setPrivate();
@@ -158,8 +158,8 @@ class PageCache implements HttpKernelInterface {
     $last_modified = $response->getLastModified();
     if ($last_modified) {
       // See if the client has provided the required HTTP headers.
-      $if_modified_since = $request->server->has('HTTP_IF_MODIFIED_SINCE') ? strtotime($request->server->get('HTTP_IF_MODIFIED_SINCE')) : FALSE;
-      $if_none_match = $request->server->has('HTTP_IF_NONE_MATCH') ? stripslashes($request->server->get('HTTP_IF_NONE_MATCH')) : FALSE;
+      $if_modified_since = $request->server->has('HTTP_IF_MODIFIED_SINCE') ? \strtotime($request->server->get('HTTP_IF_MODIFIED_SINCE')) : FALSE;
+      $if_none_match = $request->server->has('HTTP_IF_NONE_MATCH') ? \stripslashes($request->server->get('HTTP_IF_NONE_MATCH')) : FALSE;
 
       if ($if_modified_since && $if_none_match
         // ETag must match.
@@ -171,8 +171,8 @@ class PageCache implements HttpKernelInterface {
 
         // In the case of a 304 response, certain headers must be sent, and the
         // remaining may not (see RFC 2616, section 10.3.5).
-        foreach (array_keys($response->headers->all()) as $name) {
-          if (!in_array($name, ['content-location', 'expires', 'cache-control', 'vary'])) {
+        foreach (\array_keys($response->headers->all()) as $name) {
+          if (!\in_array($name, ['content-location', 'expires', 'cache-control', 'vary'])) {
             $response->headers->remove($name);
           }
         }
@@ -372,7 +372,7 @@ class PageCache implements HttpKernelInterface {
         $request->getSchemeAndHttpHost() . $request->getRequestUri(),
         $request->getRequestFormat(NULL),
       ];
-      $this->cid = implode(':', $cid_parts);
+      $this->cid = \implode(':', $cid_parts);
     }
     return $this->cid;
   }

@@ -51,7 +51,7 @@ class MigrationPluginManagerTest extends MigrateTestBase {
     $migration = $this->migrationPluginManager->createInstances(['tag_test_no_tag']);
     $this->assertArrayHasKey('tag_test_no_tag', $migration);
     $migrations = $this->migrationPluginManager->createInstancesByTag($tags);
-    $actual = array_keys($migrations);
+    $actual = \array_keys($migrations);
     $this->assertSame($expected, $actual);
   }
 

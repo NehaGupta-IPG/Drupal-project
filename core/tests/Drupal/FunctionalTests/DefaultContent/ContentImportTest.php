@@ -155,15 +155,15 @@ class ContentImportTest extends BrowserTestBase {
    * Tests that the importer validates entities before saving them.
    */
   public function testEntityValidationIsTriggered(): void {
-    $dir = uniqid('public://');
-    mkdir($dir);
+    $dir = \uniqid('public://');
+    \mkdir($dir);
 
     /** @var string $data */
-    $data = file_get_contents($this->contentDir . '/node/2d3581c3-92c7-4600-8991-a0d4b3741198.yml');
+    $data = \file_get_contents($this->contentDir . '/node/2d3581c3-92c7-4600-8991-a0d4b3741198.yml');
     $data = Yaml::decode($data);
     /** @var array{default: array{sticky: array<int, array{value: mixed}>}} $data */
     $data['default']['sticky'][0]['value'] = 'not a boolean!';
-    file_put_contents($dir . '/invalid.yml', Yaml::encode($data));
+    \file_put_contents($dir . '/invalid.yml', Yaml::encode($data));
 
     $this->expectException(InvalidEntityException::class);
     $this->expectExceptionMessage("$dir/invalid.yml: sticky.0.value=This value should be of the correct primitive type.");

@@ -97,7 +97,7 @@ class VariableTranslation extends DrupalSqlBase {
    * {@inheritdoc}
    */
   public function fields() {
-    return array_combine($this->variables, $this->variables);
+    return \array_combine($this->variables, $this->variables);
   }
 
   /**

@@ -15,7 +15,7 @@ class RequestFormatCacheContext extends RequestStackCacheContextBase {
    * {@inheritdoc}
    */
   public static function getLabel() {
-    return t('Request format');
+    return \t('Request format');
   }
 
   /**

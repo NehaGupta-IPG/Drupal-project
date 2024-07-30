@@ -117,7 +117,7 @@ class MigrationLookupTest extends MigrationLookupTestCase {
     $configuration = [
       'migration' => 'foo',
     ];
-    $migration_plugin->id()->willReturn(uniqid());
+    $migration_plugin->id()->willReturn(\uniqid());
     $migration_plugin_manager->createInstances(['foo'])
       ->willReturn(['foo' => $migration_plugin->reveal()]);
     $migration = MigrationLookup::create($this->prepareContainer(), $configuration, '', [], $migration_plugin->reveal());
@@ -159,7 +159,7 @@ class MigrationLookupTest extends MigrationLookupTestCase {
       'migration' => 'foo',
       'no_stub' => TRUE,
     ];
-    $migration_plugin->id()->willReturn(uniqid());
+    $migration_plugin->id()->willReturn(\uniqid());
     $migration_plugin_manager->createInstances(['foo'])
       ->willReturn(['foo' => $migration_plugin->reveal()]);
     $migration = MigrationLookup::create($this->prepareContainer(), $configuration, '', [], $migration_plugin->reveal());

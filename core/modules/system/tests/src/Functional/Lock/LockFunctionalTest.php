@@ -48,7 +48,7 @@ class LockFunctionalTest extends BrowserTestBase {
 
     // Try a very short timeout and lock breaking.
     $this->assertTrue($lock->acquire('system_test_lock_acquire', 0.5), 'Lock acquired by this request.');
-    sleep(1);
+    \sleep(1);
     // The other request should break our lock.
     $this->drupalGet('system-test/lock-acquire');
     $this->assertSession()->pageTextContains($lock_acquired);

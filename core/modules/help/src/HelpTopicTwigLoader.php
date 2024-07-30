@@ -46,8 +46,8 @@ class HelpTopicTwigLoader extends FilesystemLoader {
     // Add help_topics directories for modules and themes in the 'help_topic'
     // namespace, plus core.
     $this->addExtension($root_path . '/core');
-    array_map([$this, 'addExtension'], $module_handler->getModuleDirectories());
-    array_map([$this, 'addExtension'], $theme_handler->getThemeDirectories());
+    \array_map([$this, 'addExtension'], $module_handler->getModuleDirectories());
+    \array_map([$this, 'addExtension'], $theme_handler->getThemeDirectories());
   }
 
   /**
@@ -58,9 +58,9 @@ class HelpTopicTwigLoader extends FilesystemLoader {
    */
   protected function addExtension($path) {
     $path .= DIRECTORY_SEPARATOR . 'help_topics';
-    if (is_dir($path)) {
+    if (\is_dir($path)) {
       $this->cache = $this->errorCache = [];
-      $this->paths[self::MAIN_NAMESPACE][] = rtrim($path, '/\\');
+      $this->paths[self::MAIN_NAMESPACE][] = \rtrim($path, '/\\');
     }
   }
 
@@ -70,7 +70,7 @@ class HelpTopicTwigLoader extends FilesystemLoader {
   public function getSourceContext(string $name): Source {
     $path = $this->findTemplate($name);
 
-    $contents = file_get_contents($path);
+    $contents = \file_get_contents($path);
     try {
       // Note: always use \Drupal\Core\Serialization\Yaml here instead of the
       // "serialization.yaml" service. This allows the core serializer to
@@ -87,7 +87,7 @@ class HelpTopicTwigLoader extends FilesystemLoader {
       }
     }
     catch (InvalidDataTypeException $e) {
-      throw new LoaderError(sprintf('Malformed YAML in help topic "%s": %s.', $path, $e->getMessage()));
+      throw new LoaderError(\sprintf('Malformed YAML in help topic "%s": %s.', $path, $e->getMessage()));
     }
 
     return new Source($contents, $name, $path);
@@ -101,8 +101,8 @@ class HelpTopicTwigLoader extends FilesystemLoader {
       if (!$throw) {
         return NULL;
       }
-      $extension = pathinfo($name, PATHINFO_EXTENSION);
-      throw new LoaderError(sprintf("Help topic %s has an invalid file extension (%s). Only help topics ending .html.twig are allowed.", $name, $extension));
+      $extension = \pathinfo($name, PATHINFO_EXTENSION);
+      throw new LoaderError(\sprintf("Help topic %s has an invalid file extension (%s). Only help topics ending .html.twig are allowed.", $name, $extension));
     }
     return parent::findTemplate($name, $throw);
   }

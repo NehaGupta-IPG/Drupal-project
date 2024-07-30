@@ -336,7 +336,7 @@ class EntityForm extends FormBase implements EntityFormInterface {
 
     if ($this->entity instanceof EntityWithPluginCollectionInterface) {
       // Do not manually update values represented by plugin collections.
-      $values = array_diff_key($values, $this->entity->getPluginCollections());
+      $values = \array_diff_key($values, $this->entity->getPluginCollections());
     }
 
     // @todo This relies on a method that only exists for config and content

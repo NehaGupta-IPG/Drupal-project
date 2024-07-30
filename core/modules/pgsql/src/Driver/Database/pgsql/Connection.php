@@ -98,7 +98,7 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
     // Sanitize the schema name here, so we do not have to do it in other
     // functions.
     if (isset($connection_options['schema']) && ($connection_options['schema'] !== 'public')) {
-      $connection_options['schema'] = preg_replace('/[^A-Za-z0-9_]+/', '', $connection_options['schema']);
+      $connection_options['schema'] = \preg_replace('/[^A-Za-z0-9_]+/', '', $connection_options['schema']);
     }
 
     // We need to set the connectionOptions before the parent, because setPrefix
@@ -112,7 +112,7 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
 
     // Execute PostgreSQL init_commands.
     if (isset($connection_options['init_commands'])) {
-      $this->connection->exec(implode('; ', $connection_options['init_commands']));
+      $this->connection->exec(\implode('; ', $connection_options['init_commands']));
     }
   }
 
@@ -120,7 +120,7 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
    * {@inheritdoc}
    */
   protected function setPrefix($prefix) {
-    assert(is_string($prefix), 'The \'$prefix\' argument to ' . __METHOD__ . '() must be a string');
+    \assert(\is_string($prefix), 'The \'$prefix\' argument to ' . __METHOD__ . '() must be a string');
     $this->prefix = $prefix;
 
     // Add the schema name if it is not set to public, otherwise it will use the
@@ -131,7 +131,7 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
     }
 
     $this->tablePlaceholderReplacements = [
-      $quoted_schema . $this->identifierQuotes[0] . str_replace('.', $this->identifierQuotes[1] . '.' . $this->identifierQuotes[0], $prefix),
+      $quoted_schema . $this->identifierQuotes[0] . \str_replace('.', $this->identifierQuotes[1] . '.' . $this->identifierQuotes[0], $prefix),
       $this->identifierQuotes[1],
     ];
   }
@@ -157,7 +157,7 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
     // version.
     // "elseif (phpversion('pdo_pgsql') < 'version_this_was_fixed_in') {".
     else {
-      $connection_options['password'] = str_replace('\\', '\\\\', $connection_options['password']);
+      $connection_options['password'] = \str_replace('\\', '\\\\', $connection_options['password']);
     }
 
     $connection_options['database'] = (!empty($connection_options['database']) ? $connection_options['database'] : 'template1');
@@ -191,10 +191,10 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
     }
     catch (\PDOException $e) {
       if (static::getSQLState($e) == static::CONNECTION_FAILURE) {
-        if (str_contains($e->getMessage(), 'password authentication failed for user')) {
+        if (\str_contains($e->getMessage(), 'password authentication failed for user')) {
           throw new DatabaseAccessDeniedException($e->getMessage(), $e->getCode(), $e);
         }
-        elseif (str_contains($e->getMessage(), 'database') && str_contains($e->getMessage(), 'does not exist')) {
+        elseif (\str_contains($e->getMessage(), 'database') && \str_contains($e->getMessage(), 'does not exist')) {
           throw new DatabaseNotFoundException($e->getMessage(), $e->getCode(), $e);
         }
       }
@@ -214,7 +214,7 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
     // correctly when parameters are bound using associative arrays.
     // @see http://bugs.php.net/bug.php?id=48383
     foreach ($args as &$value) {
-      if (is_bool($value)) {
+      if (\is_bool($value)) {
         $value = (int) $value;
       }
     }
@@ -225,10 +225,10 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
     // - The query is not a savepoint query.
     $wrap_with_savepoint = $this->inTransaction() &&
       !$this->transactionManager()->has('mimic_implicit_commit') &&
-      !(is_string($query) && (
-        stripos($query, 'ROLLBACK TO SAVEPOINT ') === 0 ||
-        stripos($query, 'RELEASE SAVEPOINT ') === 0 ||
-        stripos($query, 'SAVEPOINT ') === 0
+      !(\is_string($query) && (
+        \stripos($query, 'ROLLBACK TO SAVEPOINT ') === 0 ||
+        \stripos($query, 'RELEASE SAVEPOINT ') === 0 ||
+        \stripos($query, 'SAVEPOINT ') === 0
       )
     );
     if ($wrap_with_savepoint) {
@@ -261,7 +261,7 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
     // PostgreSQL equivalents (ILIKE, ~*, etc.). However PostgreSQL doesn't
     // automatically cast the fields to the right type for these operators,
     // so we need to alter the query and add the type-cast.
-    $query = preg_replace('/ ([^ ]+) +(I*LIKE|NOT +I*LIKE|~\*|!~\*) /i', ' ${1}::text ${2} ', $query);
+    $query = \preg_replace('/ ([^ ]+) +(I*LIKE|NOT +I*LIKE|~\*|!~\*) /i', ' ${1}::text ${2} ', $query);
     return parent::prepareStatement($query, $options, $allow_row_count);
   }
 
@@ -276,7 +276,7 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
    * {@inheritdoc}
    */
   public function queryTemporary($query, array $args = [], array $options = []) {
-    $tablename = 'db_temporary_' . uniqid();
+    $tablename = 'db_temporary_' . \uniqid();
     $this->query('CREATE TEMPORARY TABLE {' . $tablename . '} AS ' . $query, $args, $options);
     return $tablename;
   }
@@ -311,8 +311,8 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
     // Try to determine the proper locales for character classification and
     // collation. If we could determine locales other than 'en_US', try creating
     // the database with these first.
-    $ctype = setlocale(LC_CTYPE, 0);
-    $collate = setlocale(LC_COLLATE, 0);
+    $ctype = \setlocale(LC_CTYPE, 0);
+    $collate = \setlocale(LC_COLLATE, 0);
     if ($ctype && $collate) {
       try {
         $this->connection->exec("CREATE DATABASE $database WITH TEMPLATE template0 ENCODING='UTF8' LC_CTYPE='$ctype.UTF-8' LC_COLLATE='$collate.UTF-8'");
@@ -363,7 +363,7 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
     $sequence_name = $this->prefixTables('{' . $table . '}_' . $field . '_seq');
     // Remove identifier quotes as we are constructing a new name from a
     // prefixed and quoted table name.
-    return str_replace($this->identifierQuotes, '', $sequence_name);
+    return \str_replace($this->identifierQuotes, '', $sequence_name);
   }
 
   /**

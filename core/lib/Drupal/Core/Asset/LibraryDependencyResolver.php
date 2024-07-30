@@ -42,7 +42,7 @@ class LibraryDependencyResolver implements LibraryDependencyResolverInterface {
       }
       $return += $this->librariesDependencies[$library];
     }
-    return array_values($return);
+    return \array_values($return);
   }
 
   /**
@@ -64,7 +64,7 @@ class LibraryDependencyResolver implements LibraryDependencyResolverInterface {
   protected function doGetDependencies(array $libraries_with_unresolved_dependencies, array $final_libraries = []) {
     foreach ($libraries_with_unresolved_dependencies as $library) {
       if (!isset($final_libraries[$library])) {
-        [$extension, $name] = explode('/', $library, 2);
+        [$extension, $name] = \explode('/', $library, 2);
         $definition = $this->libraryDiscovery->getLibraryByName($extension, $name);
         if (!empty($definition['dependencies'])) {
           $final_libraries = $this->doGetDependencies($definition['dependencies'], $final_libraries);
@@ -79,17 +79,17 @@ class LibraryDependencyResolver implements LibraryDependencyResolverInterface {
    * {@inheritdoc}
    */
   public function getMinimalRepresentativeSubset(array $libraries) {
-    assert(count($libraries) === count(array_unique($libraries)), '$libraries can\'t contain duplicate items.');
+    \assert(\count($libraries) === \count(\array_unique($libraries)), '$libraries can\'t contain duplicate items.');
 
     // Determine each library's dependencies.
     $all_dependencies = [];
     foreach ($libraries as $library) {
       $with_deps = $this->getLibrariesWithDependencies([$library]);
       // We don't need library itself listed in the dependencies.
-      $all_dependencies = array_unique(array_merge($all_dependencies, array_diff($with_deps, [$library])));
+      $all_dependencies = \array_unique(\array_merge($all_dependencies, \array_diff($with_deps, [$library])));
     }
 
-    return array_values(array_diff($libraries, array_intersect($all_dependencies, $libraries)));
+    return \array_values(\array_diff($libraries, \array_intersect($all_dependencies, $libraries)));
   }
 
 }

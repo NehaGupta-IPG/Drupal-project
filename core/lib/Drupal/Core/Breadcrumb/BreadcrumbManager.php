@@ -88,7 +88,7 @@ class BreadcrumbManager implements ChainBreadcrumbBuilderInterface {
         break;
       }
       else {
-        throw new \UnexpectedValueException('Invalid breadcrumb returned by ' . get_class($builder) . '::build().');
+        throw new \UnexpectedValueException('Invalid breadcrumb returned by ' . \get_class($builder) . '::build().');
       }
     }
 
@@ -110,9 +110,9 @@ class BreadcrumbManager implements ChainBreadcrumbBuilderInterface {
   protected function getSortedBuilders() {
     if (!isset($this->sortedBuilders)) {
       // Sort the builders according to priority.
-      krsort($this->builders);
+      \krsort($this->builders);
       // Merge nested builders from $this->builders into $this->sortedBuilders.
-      $this->sortedBuilders = array_merge(...$this->builders);
+      $this->sortedBuilders = \array_merge(...$this->builders);
     }
     return $this->sortedBuilders;
   }

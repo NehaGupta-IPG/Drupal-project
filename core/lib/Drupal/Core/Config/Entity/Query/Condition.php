@@ -17,7 +17,7 @@ class Condition extends ConditionBase {
    * {@inheritdoc}
    */
   public function compile($configs) {
-    $and = strtoupper($this->conjunction) == 'AND';
+    $and = \strtoupper($this->conjunction) == 'AND';
     $single_conditions = [];
     $condition_groups = [];
     foreach ($this->conditions as $condition) {
@@ -26,17 +26,17 @@ class Condition extends ConditionBase {
       }
       else {
         if (!isset($condition['operator'])) {
-          $condition['operator'] = is_array($condition['value']) ? 'IN' : '=';
+          $condition['operator'] = \is_array($condition['value']) ? 'IN' : '=';
         }
 
         // Process the value for operator that use it.
-        if (!in_array($condition['operator'], ['IS NULL', 'IS NOT NULL'], TRUE)) {
+        if (!\in_array($condition['operator'], ['IS NULL', 'IS NOT NULL'], TRUE)) {
           // Lowercase condition value(s) for case-insensitive matches.
-          if (is_array($condition['value'])) {
-            $condition['value'] = array_map('mb_strtolower', $condition['value']);
+          if (\is_array($condition['value'])) {
+            $condition['value'] = \array_map('mb_strtolower', $condition['value']);
           }
-          elseif (!is_bool($condition['value'])) {
-            $condition['value'] = mb_strtolower($condition['value']);
+          elseif (!\is_bool($condition['value'])) {
+            $condition['value'] = \mb_strtolower($condition['value']);
           }
         }
 
@@ -47,7 +47,7 @@ class Condition extends ConditionBase {
     if ($single_conditions) {
       foreach ($configs as $config_name => $config) {
         foreach ($single_conditions as $condition) {
-          $match = $this->matchArray($condition, $config, explode('.', $condition['field']));
+          $match = $this->matchArray($condition, $config, \explode('.', $condition['field']));
           // If AND and it's not matching, then the rest of conditions do not
           // matter and this config object does not match.
           // If OR and it is matching, then the rest of conditions do not
@@ -72,7 +72,7 @@ class Condition extends ConditionBase {
     foreach ($condition_groups as $condition) {
       $group_entities = $condition['field']->compile($configs);
       if ($and) {
-        $return = array_intersect_key($return, $group_entities);
+        $return = \array_intersect_key($return, $group_entities);
       }
       else {
         $return = $return + $group_entities;
@@ -113,9 +113,9 @@ class Condition extends ConditionBase {
    *   TRUE when the condition matched to the data else FALSE.
    */
   protected function matchArray(array $condition, array $data, array $needs_matching, array $parents = []) {
-    $parent = array_shift($needs_matching);
+    $parent = \array_shift($needs_matching);
     if ($parent === '*') {
-      $candidates = array_keys($data);
+      $candidates = \array_keys($data);
     }
     else {
       // Avoid a notice when calling match() later.
@@ -126,7 +126,7 @@ class Condition extends ConditionBase {
     }
     foreach ($candidates as $key) {
       if ($needs_matching) {
-        if (is_array($data[$key])) {
+        if (\is_array($data[$key])) {
           $new_parents = $parents;
           $new_parents[] = $key;
           if ($this->matchArray($condition, $data[$key], $needs_matching, $new_parents)) {
@@ -163,15 +163,15 @@ class Condition extends ConditionBase {
   protected function match(array $condition, $value) {
     // "IS NULL" and "IS NOT NULL" conditions can also deal with array values,
     // so we return early for them to avoid problems.
-    if (in_array($condition['operator'], ['IS NULL', 'IS NOT NULL'], TRUE)) {
+    if (\in_array($condition['operator'], ['IS NULL', 'IS NOT NULL'], TRUE)) {
       $should_be_set = $condition['operator'] === 'IS NOT NULL';
       return $should_be_set === isset($value);
     }
 
     if (isset($value)) {
       // We always want a case-insensitive match.
-      if (!is_bool($value)) {
-        $value = mb_strtolower($value);
+      if (!\is_bool($value)) {
+        $value = \mb_strtolower($value);
       }
 
       switch ($condition['operator']) {
@@ -194,19 +194,19 @@ class Condition extends ConditionBase {
           return $value != $condition['value'];
 
         case 'IN':
-          return array_search($value, $condition['value']) !== FALSE;
+          return \array_search($value, $condition['value']) !== FALSE;
 
         case 'NOT IN':
-          return array_search($value, $condition['value']) === FALSE;
+          return \array_search($value, $condition['value']) === FALSE;
 
         case 'STARTS_WITH':
-          return str_starts_with($value, $condition['value']);
+          return \str_starts_with($value, $condition['value']);
 
         case 'CONTAINS':
-          return str_contains($value, $condition['value']);
+          return \str_contains($value, $condition['value']);
 
         case 'ENDS_WITH':
-          return str_ends_with($value, $condition['value']);
+          return \str_ends_with($value, $condition['value']);
 
         default:
           throw new QueryException('Invalid condition operator.');

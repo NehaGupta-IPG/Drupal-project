@@ -93,7 +93,7 @@ class TestToolkit extends ImageToolkitBase {
    * {@inheritdoc}
    */
   public function buildConfigurationForm(array $form, FormStateInterface $form_state) {
-    $this->logCall('settings', func_get_args());
+    $this->logCall('settings', \func_get_args());
     $form['test_parameter'] = [
       '#type' => 'number',
       '#title' => $this->t('Test toolkit parameter'),
@@ -134,9 +134,9 @@ class TestToolkit extends ImageToolkitBase {
    * {@inheritdoc}
    */
   public function parseFile() {
-    $this->logCall('parseFile', func_get_args());
-    $data = @getimagesize($this->getSource());
-    if ($data && in_array($data[2], static::supportedTypes())) {
+    $this->logCall('parseFile', \func_get_args());
+    $data = @\getimagesize($this->getSource());
+    if ($data && \in_array($data[2], static::supportedTypes())) {
       $this->setType($data[2]);
       $this->width = $data[0];
       $this->height = $data[1];
@@ -149,7 +149,7 @@ class TestToolkit extends ImageToolkitBase {
    * {@inheritdoc}
    */
   public function save($destination) {
-    $this->logCall('save', func_get_args());
+    $this->logCall('save', \func_get_args());
     // Return false so that image_save() doesn't try to chmod the destination
     // file that we didn't bother to create.
     return FALSE;
@@ -173,8 +173,8 @@ class TestToolkit extends ImageToolkitBase {
     // array of arguments are logged as separate arguments, this because at the
     // ImageInterface level we still have methods named after the operations.
     if ($op === 'apply') {
-      $operation = array_shift($args);
-      $results[$operation][] = array_values(reset($args));
+      $operation = \array_shift($args);
+      $results[$operation][] = \array_values(\reset($args));
     }
     $this->state->set('image_test.results', $results);
   }
@@ -214,7 +214,7 @@ class TestToolkit extends ImageToolkitBase {
    * @return $this
    */
   public function setType($type) {
-    if (in_array($type, static::supportedTypes())) {
+    if (\in_array($type, static::supportedTypes())) {
       $this->type = $type;
     }
     return $this;
@@ -224,7 +224,7 @@ class TestToolkit extends ImageToolkitBase {
    * {@inheritdoc}
    */
   public function getMimeType() {
-    return $this->getType() ? image_type_to_mime_type($this->getType()) : '';
+    return $this->getType() ? \image_type_to_mime_type($this->getType()) : '';
   }
 
   /**
@@ -240,7 +240,7 @@ class TestToolkit extends ImageToolkitBase {
   public static function getSupportedExtensions() {
     $extensions = [];
     foreach (static::supportedTypes() as $image_type) {
-      $extensions[] = mb_strtolower(image_type_to_extension($image_type, FALSE));
+      $extensions[] = \mb_strtolower(\image_type_to_extension($image_type, FALSE));
     }
     return $extensions;
   }
@@ -264,7 +264,7 @@ class TestToolkit extends ImageToolkitBase {
    * {@inheritdoc}
    */
   public function apply($operation, array $arguments = []) {
-    $this->logCall('apply', func_get_args());
+    $this->logCall('apply', \func_get_args());
     return parent::apply($operation, $arguments);
   }
 

@@ -117,13 +117,13 @@ abstract class MigrateSourceTestBase extends KernelTestBase {
       return $this->plugin;
     }
 
-    $class = ltrim($this->getPluginClass(), '\\');
+    $class = \ltrim($this->getPluginClass(), '\\');
 
     /** @var \Drupal\migrate\Plugin\MigratePluginManager $plugin_manager */
     $plugin_manager = $this->container->get('plugin.manager.migrate.source');
 
     foreach ($plugin_manager->getDefinitions() as $id => $definition) {
-      if (ltrim($definition['class'], '\\') == $class) {
+      if (\ltrim($definition['class'], '\\') == $class) {
         $this->plugin = $plugin_manager
           ->createInstance($id, $configuration, $this->migration->reveal());
 
@@ -169,12 +169,12 @@ abstract class MigrateSourceTestBase extends KernelTestBase {
         ->set($this->migration->reveal()->id(), $high_water);
     }
 
-    if (is_null($expected_count)) {
-      $expected_count = count($expected_data);
+    if (\is_null($expected_count)) {
+      $expected_count = \count($expected_data);
     }
     // If an expected count was given, assert it only if the plugin is
     // countable.
-    if (is_numeric($expected_count)) {
+    if (\is_numeric($expected_count)) {
       $this->assertInstanceOf('\Countable', $plugin);
       $this->assertCount($expected_count, $plugin);
     }
@@ -190,10 +190,10 @@ abstract class MigrateSourceTestBase extends KernelTestBase {
       foreach ($expected as $key => $value) {
         $this->assertArrayHasKey($key, $actual);
 
-        $msg = sprintf("Value at 'array[%s][%s]' is not correct.", $i - 1, $key);
-        if (is_array($value)) {
-          ksort($value);
-          ksort($actual[$key]);
+        $msg = \sprintf("Value at 'array[%s][%s]' is not correct.", $i - 1, $key);
+        if (\is_array($value)) {
+          \ksort($value);
+          \ksort($actual[$key]);
           $this->assertEquals($value, $actual[$key], $msg);
         }
         else {

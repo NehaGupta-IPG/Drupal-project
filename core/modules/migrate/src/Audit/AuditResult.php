@@ -42,12 +42,12 @@ class AuditResult implements MarkupInterface, \Countable {
    *   (optional) The reasons why the migration passed or failed the audit.
    */
   public function __construct(MigrationInterface $migration, $status, array $reasons = []) {
-    if (!is_bool($status)) {
+    if (!\is_bool($status)) {
       throw new \InvalidArgumentException('Audit results must have a boolean status.');
     }
     $this->migration = $migration;
     $this->status = $status;
-    array_walk($reasons, [$this, 'addReason']);
+    \array_walk($reasons, [$this, 'addReason']);
   }
 
   /**
@@ -80,7 +80,7 @@ class AuditResult implements MarkupInterface, \Countable {
    * @return $this
    */
   public function addReason($reason) {
-    array_push($this->reasons, (string) $reason);
+    \array_push($this->reasons, (string) $reason);
     return $this;
   }
 
@@ -121,7 +121,7 @@ class AuditResult implements MarkupInterface, \Countable {
    * @see \Drupal\Component\Render\MarkupInterface
    */
   public function count(): int {
-    return count($this->reasons);
+    return \count($this->reasons);
   }
 
   /**
@@ -133,7 +133,7 @@ class AuditResult implements MarkupInterface, \Countable {
    * @see \Drupal\Component\Render\MarkupInterface
    */
   public function __toString() {
-    return implode("\n", $this->reasons);
+    return \implode("\n", $this->reasons);
   }
 
   /**

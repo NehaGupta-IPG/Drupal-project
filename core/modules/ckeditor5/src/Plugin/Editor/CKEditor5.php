@@ -241,8 +241,8 @@ class CKEditor5 extends EditorBase implements ContainerFactoryPluginInterface {
     // irrelevant details such as a PrimitiveTypeConstraint in filter settings,
     // which do not affect CKEditor 5 anyway.
     foreach ($violations as $i => $violation) {
-      assert($violation instanceof ConstraintViolation);
-      if (explode('.', $violation->getPropertyPath())[0] === 'filters' && is_a($violation->getConstraint(), PrimitiveTypeConstraint::class)) {
+      \assert($violation instanceof ConstraintViolation);
+      if (\explode('.', $violation->getPropertyPath())[0] === 'filters' && \is_a($violation->getConstraint(), PrimitiveTypeConstraint::class)) {
         $violations->remove($i);
       }
     }
@@ -265,7 +265,7 @@ class CKEditor5 extends EditorBase implements ContainerFactoryPluginInterface {
    */
   public function buildConfigurationForm(array $form, FormStateInterface $form_state) {
     $editor = $form_state->get('editor');
-    assert($editor instanceof EditorEntity);
+    \assert($editor instanceof EditorEntity);
     $language = $this->languageManager->getCurrentLanguage();
 
     // When enabling CKEditor 5, generate sensible settings from the
@@ -273,9 +273,9 @@ class CKEditor5 extends EditorBase implements ContainerFactoryPluginInterface {
     // whenever possible.
     // @todo Remove after https://www.drupal.org/project/drupal/issues/3226673.
     $format = $form_state->getFormObject()->getEntity();
-    assert($format instanceof FilterFormatInterface);
+    \assert($format instanceof FilterFormatInterface);
     if ($editor->isNew() && !$form_state->get('ckeditor5_is_active') && $form_state->get('ckeditor5_is_selected')) {
-      assert($editor->getSettings() === $this->getDefaultSettings());
+      \assert($editor->getSettings() === $this->getDefaultSettings());
       if (!$format->isNew()) {
         [$editor, $messages] = $this->smartDefaultSettings->computeSmartDefaultSettings($editor, $format);
         $form_state->set('used_smart_default_settings', TRUE);
@@ -409,7 +409,7 @@ class CKEditor5 extends EditorBase implements ContainerFactoryPluginInterface {
    *   Whether this configurable plugin's settings form should be visible.
    */
   private function shouldHaveVisiblePluginSettingsForm(CKEditor5PluginDefinition $definition, EditorInterface $editor): bool {
-    assert($definition->isConfigurable());
+    \assert($definition->isConfigurable());
     $enabled_plugins = $this->ckeditor5PluginManager->getEnabledDefinitions($editor);
 
     $plugin_id = $definition->id();
@@ -429,24 +429,24 @@ class CKEditor5 extends EditorBase implements ContainerFactoryPluginInterface {
     // and that toolbar item is active.
     if ($definition->hasConditions()) {
       $conditions = $definition->getConditions();
-      if (!array_key_exists('toolbarItem', $conditions)) {
+      if (!\array_key_exists('toolbarItem', $conditions)) {
         $conclusion = TRUE;
         // The filter this plugin depends on must be enabled.
-        if (array_key_exists('filter', $conditions)) {
+        if (\array_key_exists('filter', $conditions)) {
           $required_filter = $conditions['filter'];
           $format_filters = $editor->getFilterFormat()->filters();
           $conclusion = $conclusion && $format_filters->has($required_filter) && $format_filters->get($required_filter)->status;
         }
         // The CKEditor 5 plugins this plugin depends on must be enabled.
-        if (array_key_exists('plugins', $conditions)) {
+        if (\array_key_exists('plugins', $conditions)) {
           $all_plugins = $this->ckeditor5PluginManager->getDefinitions();
-          $dependencies = array_intersect_key($all_plugins, array_flip($conditions['plugins']));
-          $unmet_dependencies = array_diff_key($dependencies, $enabled_plugins);
+          $dependencies = \array_intersect_key($all_plugins, \array_flip($conditions['plugins']));
+          $unmet_dependencies = \array_diff_key($dependencies, $enabled_plugins);
           $conclusion = $conclusion && empty($unmet_dependencies);
         }
         return $conclusion;
       }
-      elseif (in_array($conditions['toolbarItem'], $editor->getSettings()['toolbar']['items'], TRUE)) {
+      elseif (\in_array($conditions['toolbarItem'], $editor->getSettings()['toolbar']['items'], TRUE)) {
         return TRUE;
       }
     }
@@ -666,11 +666,11 @@ class CKEditor5 extends EditorBase implements ContainerFactoryPluginInterface {
     $eventual_editor_and_format = $this->getEventualEditorWithPrimedFilterFormat($form_state, $submitted_editor);
     $violations = CKEditor5::validatePair($eventual_editor_and_format, $eventual_editor_and_format->getFilterFormat());
     foreach ($violations as $violation) {
-      $property_path_parts = explode('.', $violation->getPropertyPath());
+      $property_path_parts = \explode('.', $violation->getPropertyPath());
 
       // Special case: AJAX updates that do not submit the form (that cannot
       // result in configuration being saved).
-      if (in_array('editor_form_filter_admin_format_editor_configure', $form_state->getSubmitHandlers(), TRUE)) {
+      if (\in_array('editor_form_filter_admin_format_editor_configure', $form_state->getSubmitHandlers(), TRUE)) {
         // Ensure that plugins' validation constraints do not immediately
         // trigger a validation error: the user may choose to configure other
         // CKEditor 5 aspects first.
@@ -727,15 +727,15 @@ class CKEditor5 extends EditorBase implements ContainerFactoryPluginInterface {
    */
   protected static function getSubmittedFilterFormat(FormStateInterface $filter_format_form_state): FilterFormatInterface {
     $submitted_filter_format = clone $filter_format_form_state->getFormObject()->getEntity();
-    assert($submitted_filter_format instanceof FilterFormatInterface);
+    \assert($submitted_filter_format instanceof FilterFormatInterface);
 
     // Get only the values of the filter_format form state that are relevant for
     // checking compatibility. This logic is copied from FilterFormatFormBase.
     // @see \Drupal\ckeditor5\Plugin\Validation\Constraint\FundamentalCompatibilityConstraintValidator
     // @see \Drupal\filter\FilterFormatFormBase::submitForm()
-    $filter_format_form_values = array_intersect_key(
+    $filter_format_form_values = \array_intersect_key(
       $filter_format_form_state->getValues(),
-      array_flip(['filters', 'filter_settings']
+      \array_flip(['filters', 'filter_settings']
     ));
     foreach ($filter_format_form_values as $key => $value) {
       if ($key !== 'filters') {
@@ -784,13 +784,13 @@ class CKEditor5 extends EditorBase implements ContainerFactoryPluginInterface {
       }
     }
     $updated_settings = [
-      'plugins' => array_intersect_key($original_settings['plugins'], $enabled_plugins + $config_enabled_plugins),
+      'plugins' => \array_intersect_key($original_settings['plugins'], $enabled_plugins + $config_enabled_plugins),
     ] + $original_settings;
     $pair->setSettings($updated_settings);
 
     if ($pair->getFilterFormat()->filters('filter_html')->status) {
       // Compute elements provided by the current CKEditor 5 settings.
-      $restrictions = new HTMLRestrictions($this->ckeditor5PluginManager->getProvidedElements(array_keys($enabled_plugins), $pair));
+      $restrictions = new HTMLRestrictions($this->ckeditor5PluginManager->getProvidedElements(\array_keys($enabled_plugins), $pair));
 
       // Compute eventual filter_html setting. Eventual as in: this is the list
       // of eventually allowed HTML tags.
@@ -856,22 +856,22 @@ class CKEditor5 extends EditorBase implements ContainerFactoryPluginInterface {
    *   The corresponding form name in the subform.
    */
   protected static function mapViolationPropertyPathsToFormNames(string $property_path, array $subform): string {
-    $parts = explode('.', $property_path);
+    $parts = \explode('.', $property_path);
     // The "settings" form element does exist, but one level above the Text
     // Editor-specific form. This is operating on a subform.
-    $shifted = array_shift($parts);
-    assert($shifted === 'settings');
+    $shifted = \array_shift($parts);
+    \assert($shifted === 'settings');
 
     // It is not required (nor sensible) for the form structure to match the
     // config schema structure 1:1. Automatically identify the relevant form
     // name. Try to be specific. Worst case, an entire plugin settings vertical
     // tab is targeted. (Hence the minimum of 2 parts: the property path gets at
     // minimum mapped to 'toolbar.items' or 'plugins.<plugin ID>'.)
-    while (count($parts) > 2 && !NestedArray::keyExists($subform, $parts)) {
-      array_pop($parts);
+    while (\count($parts) > 2 && !NestedArray::keyExists($subform, $parts)) {
+      \array_pop($parts);
     }
-    assert(NestedArray::keyExists($subform, $parts));
-    return implode('][', array_merge(['settings'], $parts));
+    \assert(NestedArray::keyExists($subform, $parts));
+    return \implode('][', \array_merge(['settings'], $parts));
   }
 
   /**
@@ -893,16 +893,16 @@ class CKEditor5 extends EditorBase implements ContainerFactoryPluginInterface {
     }
 
     // Filters are top-level.
-    if (preg_match('/^filters\..*/', $property_path)) {
-      return implode('][', array_merge(explode('.', $property_path), ['settings']));
+    if (\preg_match('/^filters\..*/', $property_path)) {
+      return \implode('][', \array_merge(\explode('.', $property_path), ['settings']));
     }
 
     // Image upload settings are stored out-of-band and may also trigger
     // validation errors.
     // @see \Drupal\ckeditor5\Plugin\CKEditor5Plugin\Image
-    if (str_starts_with($property_path, 'image_upload.')) {
-      $image_upload_setting_property_path = str_replace('image_upload.', '', $property_path);
-      return 'editor][settings][plugins][ckeditor5_image][' . implode('][', explode('.', $image_upload_setting_property_path));
+    if (\str_starts_with($property_path, 'image_upload.')) {
+      $image_upload_setting_property_path = \str_replace('image_upload.', '', $property_path);
+      return 'editor][settings][plugins][ckeditor5_image][' . \implode('][', \explode('.', $image_upload_setting_property_path));
     }
 
     // Everything else is in the subform.
@@ -938,7 +938,7 @@ class CKEditor5 extends EditorBase implements ContainerFactoryPluginInterface {
     $settings = [
       'toolbar' => [
         'items' => $toolbar_items,
-        'shouldNotGroupWhenFull' => in_array('-', $toolbar_items, TRUE),
+        'shouldNotGroupWhenFull' => \in_array('-', $toolbar_items, TRUE),
       ],
     ] + $plugin_config;
 

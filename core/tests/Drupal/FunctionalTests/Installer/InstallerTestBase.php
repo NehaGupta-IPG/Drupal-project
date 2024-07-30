@@ -108,7 +108,7 @@ abstract class InstallerTestBase extends BrowserTestBase {
     // settings.php, so as to resemble a regular installation.
     if (!empty($this->settings)) {
       // Not using File API; a potential error must trigger a PHP warning.
-      copy(DRUPAL_ROOT . '/sites/default/default.settings.php', DRUPAL_ROOT . '/' . $this->siteDirectory . '/settings.php');
+      \copy(DRUPAL_ROOT . '/sites/default/default.settings.php', DRUPAL_ROOT . '/' . $this->siteDirectory . '/settings.php');
       $this->writeSettings($this->settings);
     }
 
@@ -190,7 +190,7 @@ abstract class InstallerTestBase extends BrowserTestBase {
       // directory has to be writable.
       // BrowserTestBase::tearDown() will delete the entire test site directory.
       // Not using File API; a potential error must trigger a PHP warning.
-      chmod($this->container->getParameter('app.root') . '/' . $this->siteDirectory, 0777);
+      \chmod($this->container->getParameter('app.root') . '/' . $this->siteDirectory, 0777);
       $this->kernel = DrupalKernel::createFromRequest($request, $class_loader, 'prod', FALSE);
       $this->kernel->boot();
       $this->kernel->preHandle($request);
@@ -273,7 +273,7 @@ abstract class InstallerTestBase extends BrowserTestBase {
    * @see \Drupal\system\Install\SystemRequirements
    */
   protected function setUpRequirementsProblem() {
-    if (version_compare(phpversion(), PhpRequirements::getMinimumSupportedPhp()) < 0) {
+    if (\version_compare(\phpversion(), PhpRequirements::getMinimumSupportedPhp()) < 0) {
       $this->continueOnExpectedWarnings(['PHP']);
     }
   }

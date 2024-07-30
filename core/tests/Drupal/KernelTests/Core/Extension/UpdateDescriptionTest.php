@@ -30,7 +30,7 @@ class UpdateDescriptionTest extends KernelTestBase {
     \Drupal::service('update.update_hook_registry')->setInstalledVersion('update_test_description', 8000);
     \Drupal::moduleHandler()->loadInclude('update_test_description', 'install');
 
-    $updates = update_get_update_list();
+    $updates = \update_get_update_list();
     $expected = [
       'pending' => [
         8001 => '8001 - Update test of slash in description and/or.',

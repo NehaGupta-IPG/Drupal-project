@@ -62,7 +62,7 @@ class ViewsListTest extends UITestBase {
     $this->assertSession()->linkByHrefExists('admin/structure/views/view/content/delete?destination');
 
     // Count default views to be subtracted from the limit.
-    $views = count(Views::getEnabledViews());
+    $views = \count(Views::getEnabledViews());
 
     // Create multiples views.
     $limit = 51;

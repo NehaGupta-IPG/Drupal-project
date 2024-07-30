@@ -35,7 +35,7 @@ class EditorConfigTranslationSubscriber implements EventSubscriberInterface {
    */
   public static function getSubscribedEvents(): array {
     $events = [];
-    if (class_exists('Drupal\config_translation\Event\ConfigTranslationEvents')) {
+    if (\class_exists('Drupal\config_translation\Event\ConfigTranslationEvents')) {
       $events[ConfigTranslationEvents::POPULATE_MAPPER][] = ['addConfigNames'];
     }
     return $events;

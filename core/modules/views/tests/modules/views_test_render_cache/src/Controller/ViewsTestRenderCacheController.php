@@ -30,9 +30,9 @@ class ViewsTestRenderCacheController extends ControllerBase {
   public function double(string $view_id, string $display_id, string $args_1, string $args_2) {
     $build = [];
     $view = Views::getView($view_id);
-    $build[] = $view->buildRenderable($display_id, explode(",", $args_1));
+    $build[] = $view->buildRenderable($display_id, \explode(",", $args_1));
     $view = Views::getView($view_id);
-    $build[] = $view->buildRenderable($display_id, explode(",", $args_2));
+    $build[] = $view->buildRenderable($display_id, \explode(",", $args_2));
     return $build;
   }
 

@@ -39,7 +39,7 @@ class Number {
     // remainder. Since that remainder can't even be represented with a single
     // precision float the following computation of the remainder makes no sense
     // and we can safely ignore it instead.
-    if ($double_value / pow(2.0, 53) > $step) {
+    if ($double_value / \pow(2.0, 53) > $step) {
       return TRUE;
     }
 
@@ -77,10 +77,10 @@ class Number {
    * @see \Drupal\Component\Utility\Number::alphadecimalToInt
    */
   public static function intToAlphadecimal($i = 0) {
-    $num = base_convert((string) $i, 10, 36);
-    $length = strlen($num);
+    $num = \base_convert((string) $i, 10, 36);
+    $length = \strlen($num);
 
-    return chr($length + ord('0') - 1) . $num;
+    return \chr($length + \ord('0') - 1) . $num;
   }
 
   /**

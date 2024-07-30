@@ -149,7 +149,7 @@ class Date extends FieldPluginBase {
       '#options' => ['' => $this->t('- Default site/user timezone -')] + TimeZoneFormHelper::getOptionsListByRegion(),
       '#default_value' => $this->options['timezone'],
     ];
-    foreach (array_merge(['custom'], array_keys($date_formats)) as $timezone_date_formats) {
+    foreach (\array_merge(['custom'], \array_keys($date_formats)) as $timezone_date_formats) {
       $form['timezone']['#states']['visible'][] = [
         ':input[name="options[date_format]"]' => ['value' => $timezone_date_formats],
       ];
@@ -186,16 +186,16 @@ class Date extends FieldPluginBase {
       $time_diff = $this->time->getRequestTime() - $value;
       switch ($format) {
         case 'raw time ago':
-          return $this->dateFormatter->formatTimeDiffSince($value, ['granularity' => is_numeric($custom_format) ? $custom_format : 2]);
+          return $this->dateFormatter->formatTimeDiffSince($value, ['granularity' => \is_numeric($custom_format) ? $custom_format : 2]);
 
         case 'time ago':
-          return $this->t('%time ago', ['%time' => $this->dateFormatter->formatTimeDiffSince($value, ['granularity' => is_numeric($custom_format) ? $custom_format : 2])]);
+          return $this->t('%time ago', ['%time' => $this->dateFormatter->formatTimeDiffSince($value, ['granularity' => \is_numeric($custom_format) ? $custom_format : 2])]);
 
         case 'raw time hence':
-          return $this->dateFormatter->formatTimeDiffUntil($value, ['granularity' => is_numeric($custom_format) ? $custom_format : 2]);
+          return $this->dateFormatter->formatTimeDiffUntil($value, ['granularity' => \is_numeric($custom_format) ? $custom_format : 2]);
 
         case 'time hence':
-          return $this->t('%time hence', ['%time' => $this->dateFormatter->formatTimeDiffUntil($value, ['granularity' => is_numeric($custom_format) ? $custom_format : 2])]);
+          return $this->t('%time hence', ['%time' => $this->dateFormatter->formatTimeDiffUntil($value, ['granularity' => \is_numeric($custom_format) ? $custom_format : 2])]);
 
         case 'raw time span':
           return ($time_diff < 0 ? '-' : '') . $this->dateFormatter->formatTimeDiffSince($value, [

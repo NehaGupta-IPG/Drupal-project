@@ -94,7 +94,7 @@ class FileAccessControlHandler extends EntityAccessControlHandler {
    * @see file_get_file_references()
    */
   protected function getFileReferences(FileInterface $file) {
-    return file_get_file_references($file, NULL, EntityStorageInterface::FIELD_LOAD_REVISION, NULL);
+    return \file_get_file_references($file, NULL, EntityStorageInterface::FIELD_LOAD_REVISION, NULL);
   }
 
   /**
@@ -111,7 +111,7 @@ class FileAccessControlHandler extends EntityAccessControlHandler {
     // The operation is 'edit' when the entity is being created or updated.
     // Determine if the entity is being updated by checking if it is new.
     $field_name = $field_definition->getName();
-    if ($operation === 'edit' && $items && ($entity = $items->getEntity()) && !$entity->isNew() && in_array($field_name, $create_only_fields, TRUE)) {
+    if ($operation === 'edit' && $items && ($entity = $items->getEntity()) && !$entity->isNew() && \in_array($field_name, $create_only_fields, TRUE)) {
       return AccessResult::forbidden();
     }
     // Regardless of whether the entity exists access should be denied to the

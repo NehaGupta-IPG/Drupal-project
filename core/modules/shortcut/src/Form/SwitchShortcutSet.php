@@ -66,7 +66,7 @@ class SwitchShortcutSet extends FormBase {
     $this->user = $user;
 
     // Prepare the list of shortcut sets.
-    $options = array_map(function (ShortcutSet $set) {
+    $options = \array_map(function (ShortcutSet $set) {
       return $set->label();
     }, $this->shortcutSetStorage->loadMultiple());
 
@@ -79,7 +79,7 @@ class SwitchShortcutSet extends FormBase {
     }
 
     $account_is_user = $this->user->id() == $account->id();
-    if (count($options) > 1) {
+    if (\count($options) > 1) {
       $form['set'] = [
         '#type' => 'radios',
         '#title' => $account_is_user ? $this->t('Choose a set of shortcuts to use') : $this->t('Choose a set of shortcuts for this user'),
@@ -160,7 +160,7 @@ class SwitchShortcutSet extends FormBase {
   public function validateForm(array &$form, FormStateInterface $form_state) {
     if ($form_state->getValue('set') == 'new') {
       // Check to prevent creating a shortcut set with an empty title.
-      if (trim($form_state->getValue('label')) == '') {
+      if (\trim($form_state->getValue('label')) == '') {
         $form_state->setErrorByName('label', $this->t('The new set label is required.'));
       }
     }
@@ -224,7 +224,7 @@ class SwitchShortcutSet extends FormBase {
    *   The access result.
    */
   public function checkAccess(?UserInterface $user = NULL) {
-    return shortcut_set_switch_access($user);
+    return \shortcut_set_switch_access($user);
   }
 
 }

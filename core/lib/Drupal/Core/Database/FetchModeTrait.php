@@ -54,7 +54,7 @@ trait FetchModeTrait {
    *   The row in FETCH_NUM format.
    */
   protected function assocToNum(array $rowAssoc): array {
-    return array_values($rowAssoc);
+    return \array_values($rowAssoc);
   }
 
   /**

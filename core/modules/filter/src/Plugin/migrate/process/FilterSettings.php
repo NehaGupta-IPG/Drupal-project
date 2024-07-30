@@ -43,7 +43,7 @@ class FilterSettings extends ProcessPluginBase {
     // Only the filter_html filter's settings have a changed format.
     if ($row->getDestinationProperty('id') === 'filter_html') {
       if (!empty($value['allowed_html'])) {
-        $value['allowed_html'] = str_replace(array_keys($this->allowedHtmlDefaultAttributes), array_values($this->allowedHtmlDefaultAttributes), $value['allowed_html']);
+        $value['allowed_html'] = \str_replace(\array_keys($this->allowedHtmlDefaultAttributes), \array_values($this->allowedHtmlDefaultAttributes), $value['allowed_html']);
       }
     }
     // Filters that don't exist in Drupal 8 will have been mapped to filter_null

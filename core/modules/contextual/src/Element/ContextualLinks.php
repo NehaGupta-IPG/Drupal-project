@@ -72,7 +72,7 @@ class ContextualLinks extends RenderElementBase {
       $items += $contextual_links_manager->getContextualLinksArrayByGroup($group, $args['route_parameters'], $args['metadata']);
     }
 
-    uasort($items, [SortArray::class, 'sortByWeightElement']);
+    \uasort($items, [SortArray::class, 'sortByWeightElement']);
 
     // Transform contextual links into parameters suitable for links.html.twig.
     $links = [];

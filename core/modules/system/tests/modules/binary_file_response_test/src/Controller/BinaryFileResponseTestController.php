@@ -28,11 +28,11 @@ class BinaryFileResponseTestController {
 
     // A relative URL for a file contains '%20' instead of spaces. A relative
     // file path contains spaces.
-    $relative_file_path = rawurldecode($relative_file_url);
+    $relative_file_path = \rawurldecode($relative_file_url);
 
     // Ensure the file path does not start with a slash to prevent exploring
     // the file system root.
-    $relative_file_path = ltrim($relative_file_path, '/');
+    $relative_file_path = \ltrim($relative_file_path, '/');
 
     return new BinaryFileResponse($relative_file_path);
   }

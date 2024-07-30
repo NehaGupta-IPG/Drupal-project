@@ -65,9 +65,9 @@ class ManyPlaceholderTest extends UnitTestCase {
     $response->setContent($content);
 
     // Capture the result to avoid PHPUnit complaining.
-    ob_start();
+    \ob_start();
     $bigpipe->sendContent($response);
-    $result = ob_get_clean();
+    $result = \ob_get_clean();
 
     $this->assertNotEmpty($result);
   }

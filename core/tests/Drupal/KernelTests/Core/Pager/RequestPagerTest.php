@@ -48,7 +48,7 @@ class RequestPagerTest extends KernelTestBase {
     $test_parameters = [
       'other' => 'arbitrary',
     ];
-    $request = Request::create('http://example.com', 'GET', array_merge(['page' => '0,10'], $test_parameters));
+    $request = Request::create('http://example.com', 'GET', \array_merge(['page' => '0,10'], $test_parameters));
     $request->setSession(new Session(new MockArraySessionStorage()));
 
     /** @var \Symfony\Component\HttpFoundation\RequestStack $request_stack */

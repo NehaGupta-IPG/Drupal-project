@@ -36,7 +36,7 @@ final class PermissionsPerBundle implements ConfigActionPluginInterface, Contain
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
-    assert(is_array($plugin_definition));
+    \assert(\is_array($plugin_definition));
     $target_entity_type = $plugin_definition['target_entity_type'];
 
     return new static(
@@ -52,24 +52,24 @@ final class PermissionsPerBundle implements ConfigActionPluginInterface, Contain
   public function apply(string $configName, mixed $value): void {
     $role = $this->configManager->loadConfigEntityByName($configName);
     if (!($role instanceof RoleInterface)) {
-      throw new ConfigActionException(sprintf("Cannot determine role from %s", $configName));
+      throw new ConfigActionException(\sprintf("Cannot determine role from %s", $configName));
     }
 
-    assert(is_string($value) || is_array($value));
+    \assert(\is_string($value) || \is_array($value));
     [$permissions, $except_bundles] = self::parseValue($value);
 
     if (empty($permissions) || !Inspector::assertAllMatch('%bundle', $permissions, TRUE)) {
-      throw new ConfigActionException(sprintf("The permissions provided %s must be an array of strings that contain '%%bundle'.", var_export($value, TRUE)));
+      throw new ConfigActionException(\sprintf("The permissions provided %s must be an array of strings that contain '%%bundle'.", \var_export($value, TRUE)));
     }
 
     $bundles = $this->entityTypeBundleInfo->getBundleInfo($this->targetEntityType);
-    foreach (array_keys($bundles) as $bundle_id) {
-      if (in_array($bundle_id, $except_bundles, TRUE)) {
+    foreach (\array_keys($bundles) as $bundle_id) {
+      if (\in_array($bundle_id, $except_bundles, TRUE)) {
         continue;
       }
       /** @var string[] $actual_permissions */
-      $actual_permissions = str_replace('%bundle', $bundle_id, $permissions);
-      array_walk($actual_permissions, $role->grantPermission(...));
+      $actual_permissions = \str_replace('%bundle', $bundle_id, $permissions);
+      \array_walk($actual_permissions, $role->grantPermission(...));
     }
     $role->save();
   }
@@ -91,11 +91,11 @@ final class PermissionsPerBundle implements ConfigActionPluginInterface, Contain
    *   and the list of bundles to ignore.
    */
   private static function parseValue(string|array $value): array {
-    if (is_string($value)) {
+    if (\is_string($value)) {
       return [[$value], []];
     }
 
-    if (array_is_list($value)) {
+    if (\array_is_list($value)) {
       return [$value, []];
     }
 

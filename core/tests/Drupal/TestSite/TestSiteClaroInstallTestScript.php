@@ -22,12 +22,12 @@ class TestSiteClaroInstallTestScript implements TestSetupInterface {
   public function setup() {
     // Install required module for the Olivero front page.
     $module_installer = \Drupal::service('module_installer');
-    assert($module_installer instanceof ModuleInstallerInterface);
+    \assert($module_installer instanceof ModuleInstallerInterface);
     $module_installer->install(['olivero_test']);
 
     // Install Claro instead of Olivero and set it as the default theme.
     $theme_installer = \Drupal::service('theme_installer');
-    assert($theme_installer instanceof ThemeInstallerInterface);
+    \assert($theme_installer instanceof ThemeInstallerInterface);
     $theme_installer->install(['claro'], TRUE);
     $system_theme_config = \Drupal::configFactory()->getEditable('system.theme');
     $system_theme_config->set('default', 'claro')->save();

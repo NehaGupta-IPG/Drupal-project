@@ -173,7 +173,7 @@ class RandomTest extends TestCase {
     $random = new Random();
     for ($i = 0; $i <= 1; $i++) {
       $obj = $random->object($i);
-      $this->assertCount($i, get_object_vars($obj), 'Generated random object has expected number of properties');
+      $this->assertCount($i, \get_object_vars($obj), 'Generated random object has expected number of properties');
     }
   }
 

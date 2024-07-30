@@ -71,7 +71,7 @@ class FieldOrLanguageJoin extends JoinPluginBase {
       return;
     }
 
-    if (is_array($this->extra)) {
+    if (\is_array($this->extra)) {
       $extras = [];
       foreach ($this->extra as $extra) {
         $extras[] = $this->buildExtra($extra, $arguments, $table, $select_query, $left_table);
@@ -80,25 +80,25 @@ class FieldOrLanguageJoin extends JoinPluginBase {
       // Remove and store the langcode OR bundle join condition extra.
       $language_bundle_conditions = [];
       foreach ($extras as $key => $extra) {
-        if (str_contains($extra, '.langcode') || str_contains($extra, '.bundle')) {
+        if (\str_contains($extra, '.langcode') || \str_contains($extra, '.bundle')) {
           $language_bundle_conditions[] = $extra;
           unset($extras[$key]);
         }
       }
 
-      if (count($extras) > 1) {
-        $condition .= ' AND (' . implode(' ' . $this->extraOperator . ' ', $extras) . ')';
+      if (\count($extras) > 1) {
+        $condition .= ' AND (' . \implode(' ' . $this->extraOperator . ' ', $extras) . ')';
       }
       elseif ($extras) {
-        $condition .= ' AND ' . array_shift($extras);
+        $condition .= ' AND ' . \array_shift($extras);
       }
 
       // Tack on the langcode OR bundle join condition extra.
       if (!empty($language_bundle_conditions)) {
-        $condition .= ' AND (' . implode(' OR ', $language_bundle_conditions) . ')';
+        $condition .= ' AND (' . \implode(' OR ', $language_bundle_conditions) . ')';
       }
     }
-    elseif (is_string($this->extra)) {
+    elseif (\is_string($this->extra)) {
       $condition .= " AND ($this->extra)";
     }
   }

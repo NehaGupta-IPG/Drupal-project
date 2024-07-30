@@ -76,7 +76,7 @@ class PathWithNodeAccessGrantsTest extends PathTestBase {
    */
   public function testAliasTranslation() : void {
     // Rebuild the permissions to update 'node_access' table.
-    node_access_rebuild();
+    \node_access_rebuild();
     $alias = $this->randomMachineName();
     $permissions = [
       'access administration pages',

@@ -182,7 +182,7 @@ class ViewAddForm extends ViewFormBase {
     if (!empty($path)) {
       // @todo https://www.drupal.org/node/2423913 Views should expect and store
       //   a leading /.
-      $path = ltrim($path, '/ ');
+      $path = \ltrim($path, '/ ');
     }
     $errors = $wizard_instance->validateView($form, $form_state);
 

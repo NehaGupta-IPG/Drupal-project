@@ -79,7 +79,7 @@ class ResourceTypeRepositoryTest extends JsonapiKernelTestBase {
     // Make sure that there are resources being created.
     $all = $this->resourceTypeRepository->all();
     $this->assertNotEmpty($all);
-    array_walk($all, function (ResourceType $resource_type) {
+    \array_walk($all, function (ResourceType $resource_type) {
       $this->assertNotEmpty($resource_type->getDeserializationTargetClass());
       $this->assertNotEmpty($resource_type->getEntityTypeId());
       $this->assertNotEmpty($resource_type->getTypeName());

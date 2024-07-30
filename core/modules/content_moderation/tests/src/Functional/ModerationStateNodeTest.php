@@ -138,7 +138,7 @@ class ModerationStateNodeTest extends ModerationStateTestBase {
    */
   public function testPagers(): void {
     // Create 51 nodes to force the pager.
-    foreach (range(1, 51) as $delta) {
+    foreach (\range(1, 51) as $delta) {
       Node::create([
         'type' => 'moderated_content',
         'uid' => $this->adminUser->id(),
@@ -152,7 +152,7 @@ class ModerationStateNodeTest extends ModerationStateTestBase {
     $element = $this->cssSelect('nav.pager li.is-active a');
     $url = $element[0]->getAttribute('href');
     $query = [];
-    parse_str(parse_url($url, PHP_URL_QUERY), $query);
+    \parse_str(\parse_url($url, PHP_URL_QUERY), $query);
     $this->assertEquals(0, $query['page']);
   }
 

@@ -120,7 +120,7 @@ class UserAuthenticationController extends ControllerBase implements ContainerIn
     $this->userStorage = $user_storage;
     $this->csrfToken = $csrf_token;
     if (!$user_auth instanceof UserAuthenticationInterface) {
-      @trigger_error('The $user_auth parameter implementing UserAuthInterface is deprecated in drupal:10.3.0 and will be removed in drupal:12.0.0. Implement UserAuthenticationInterface instead. See https://www.drupal.org/node/3411040');
+      @\trigger_error('The $user_auth parameter implementing UserAuthInterface is deprecated in drupal:10.3.0 and will be removed in drupal:12.0.0. Implement UserAuthenticationInterface instead. See https://www.drupal.org/node/3411040');
     }
     $this->userAuth = $user_auth;
     $this->serializer = $serializer;
@@ -190,7 +190,7 @@ class UserAuthenticationController extends ControllerBase implements ContainerIn
     else {
       $accounts = $this->userStorage->loadByProperties(['name' => $credentials['name']]);
       if ($accounts) {
-        $account = reset($accounts);
+        $account = \reset($accounts);
       }
     }
 
@@ -223,7 +223,7 @@ class UserAuthenticationController extends ControllerBase implements ContainerIn
 
         $logout_route = $this->routeProvider->getRouteByName('user.logout.http');
         // Trim '/' off path to match \Drupal\Core\Access\CsrfAccessCheck.
-        $logout_path = ltrim($logout_route->getPath(), '/');
+        $logout_path = \ltrim($logout_route->getPath(), '/');
         $response_data['logout_token'] = $this->csrfToken->get($logout_path);
 
         $encoded_response_data = $this->serializer->encode($response_data, $format);
@@ -264,15 +264,15 @@ class UserAuthenticationController extends ControllerBase implements ContainerIn
     $identifier = '';
     if (isset($credentials['name'])) {
       $identifier = $credentials['name'];
-      $users = $this->userStorage->loadByProperties(['name' => trim($identifier)]);
+      $users = $this->userStorage->loadByProperties(['name' => \trim($identifier)]);
     }
     elseif (isset($credentials['mail'])) {
       $identifier = $credentials['mail'];
-      $users = $this->userStorage->loadByProperties(['mail' => trim($identifier)]);
+      $users = $this->userStorage->loadByProperties(['mail' => \trim($identifier)]);
     }
 
     /** @var \Drupal\user\UserInterface $account */
-    $account = reset($users);
+    $account = \reset($users);
     if ($account && $account->id()) {
       if ($account->isBlocked()) {
         $this->logger->error('Unable to send password reset email for blocked or not yet activated user %identifier.', [
@@ -282,7 +282,7 @@ class UserAuthenticationController extends ControllerBase implements ContainerIn
       }
 
       // Send the password reset email.
-      $mail = _user_mail_notify('password_reset', $account);
+      $mail = \_user_mail_notify('password_reset', $account);
       if (empty($mail)) {
         throw new BadRequestHttpException('Unable to send email. Contact the site administrator if the problem persists.');
       }
@@ -313,8 +313,8 @@ class UserAuthenticationController extends ControllerBase implements ContainerIn
    * @see https://www.drupal.org/node/3425340
    */
   protected function userIsBlocked($name) {
-    @trigger_error(__METHOD__ . ' is deprecated in drupal:10.3.0 and is removed from drupal:12.0.0. There is no replacement. See https://www.drupal.org/node/3425340', E_USER_DEPRECATED);
-    return user_is_blocked($name);
+    @\trigger_error(__METHOD__ . ' is deprecated in drupal:10.3.0 and is removed from drupal:12.0.0. There is no replacement. See https://www.drupal.org/node/3425340', E_USER_DEPRECATED);
+    return \user_is_blocked($name);
   }
 
   /**
@@ -324,7 +324,7 @@ class UserAuthenticationController extends ControllerBase implements ContainerIn
    *   The user.
    */
   protected function userLoginFinalize(UserInterface $user) {
-    user_login_finalize($user);
+    \user_login_finalize($user);
   }
 
   /**
@@ -342,7 +342,7 @@ class UserAuthenticationController extends ControllerBase implements ContainerIn
    * Logs the user out.
    */
   protected function userLogout() {
-    user_logout();
+    \user_logout();
   }
 
   /**
@@ -398,7 +398,7 @@ class UserAuthenticationController extends ControllerBase implements ContainerIn
       // Default is to allow 5 failed attempts every 6 hours.
       if (!$this->userFloodControl->isAllowed('user.http_login', $flood_config->get('user_limit'), $flood_config->get('user_window'), $identifier)) {
         if ($flood_config->get('uid_only')) {
-          $error_message = sprintf('There have been more than %s failed login attempts for this account. It is temporarily blocked. Try again later or request a new password.', $flood_config->get('user_limit'));
+          $error_message = \sprintf('There have been more than %s failed login attempts for this account. It is temporarily blocked. Try again later or request a new password.', $flood_config->get('user_limit'));
         }
         else {
           $error_message = 'Too many failed login attempts from your IP address. This IP address is temporarily blocked.';
@@ -422,7 +422,7 @@ class UserAuthenticationController extends ControllerBase implements ContainerIn
   protected function getLoginFloodIdentifier(Request $request, $username) {
     $flood_config = $this->config('user.flood');
     $accounts = $this->userStorage->loadByProperties(['name' => $username, 'status' => 1]);
-    if ($account = reset($accounts)) {
+    if ($account = \reset($accounts)) {
       if ($flood_config->get('uid_only')) {
         // Register flood events based on the uid only, so they apply for any
         // IP address. This is the most secure option.

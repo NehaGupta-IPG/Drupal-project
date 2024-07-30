@@ -55,7 +55,7 @@ class FieldTypeCategoriesIntegrationTest extends BrowserTestBase {
       'comment/drupal.comment-icon',
       'link/drupal.link-icon',
     ];
-    $libraries = explode(',', $settings['ajaxPageState']['libraries']);
+    $libraries = \explode(',', $settings['ajaxPageState']['libraries']);
     foreach ($css_libraries as $css_library) {
       $this->assertContains($css_library, $libraries);
     }

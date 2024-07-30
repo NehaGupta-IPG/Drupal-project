@@ -68,8 +68,8 @@ class LocaleConfigSubscriberTest extends KernelTestBase {
     // or normal environment.
     // @see locale_modules_installed()
     // @see locale_system_update()
-    locale_system_set_config_langcodes();
-    $langcodes = array_keys(\Drupal::languageManager()->getLanguages());
+    \locale_system_set_config_langcodes();
+    $langcodes = \array_keys(\Drupal::languageManager()->getLanguages());
     $locale_config_manager = \Drupal::service('locale.config_manager');
     $names = $locale_config_manager->getComponentNames();
     $locale_config_manager->updateConfigTranslations($names, $langcodes);
@@ -498,7 +498,7 @@ class LocaleConfigSubscriberTest extends KernelTestBase {
       'translated' => TRUE,
     ]);
     $this->assertCount(1, $strings);
-    $string = reset($strings);
+    $string = \reset($strings);
     $this->assertInstanceOf(StringInterface::class, $string);
     /** @var \Drupal\locale\StringInterface $string */
     $this->assertSame($translation, $string->getString());

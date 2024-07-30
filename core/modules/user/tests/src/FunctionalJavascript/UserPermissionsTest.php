@@ -47,8 +47,8 @@ class UserPermissionsTest extends WebDriverTestBase {
 
     // Find the new role ID.
     $all_rids = $this->adminUser->getRoles();
-    unset($all_rids[array_search(RoleInterface::AUTHENTICATED_ID, $all_rids)]);
-    $this->rid = reset($all_rids);
+    unset($all_rids[\array_search(RoleInterface::AUTHENTICATED_ID, $all_rids)]);
+    $this->rid = \reset($all_rids);
   }
 
   /**

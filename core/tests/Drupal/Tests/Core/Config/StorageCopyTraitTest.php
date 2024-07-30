@@ -48,11 +48,11 @@ class StorageCopyTraitTest extends UnitTestCase {
     // Set the active collection to a random one on both source and target.
     if ($source_collections) {
       $collections = $source->getAllCollectionNames();
-      $source = $source->createCollection($collections[array_rand($collections)]);
+      $source = $source->createCollection($collections[\array_rand($collections)]);
     }
     if ($target_collections) {
       $collections = $target->getAllCollectionNames();
-      $target = $target->createCollection($collections[array_rand($collections)]);
+      $target = $target->createCollection($collections[\array_rand($collections)]);
     }
 
     $source_data = self::toArray($source);
@@ -109,13 +109,13 @@ class StorageCopyTraitTest extends UnitTestCase {
    */
   protected function generateRandomData(StorageInterface $storage, $collections = TRUE): void {
     $generator = $this->getRandomGenerator();
-    for ($i = 0; $i < rand(2, 10); $i++) {
+    for ($i = 0; $i < \rand(2, 10); $i++) {
       $storage->write($this->randomMachineName(), (array) $generator->object());
     }
     if ($collections) {
-      for ($i = 0; $i < rand(1, 5); $i++) {
+      for ($i = 0; $i < \rand(1, 5); $i++) {
         $collection = $storage->createCollection($this->randomMachineName());
-        for ($i = 0; $i < rand(2, 10); $i++) {
+        for ($i = 0; $i < \rand(2, 10); $i++) {
           $collection->write($this->randomMachineName(), (array) $generator->object());
         }
       }
@@ -135,7 +135,7 @@ class StorageCopyTraitTest extends UnitTestCase {
     // false. It mimics a config storage read return value when that config
     // storage has an invalid configuration.
     $names = $source->listAll();
-    $test_name = reset($names);
+    $test_name = \reset($names);
     $source->setValue($test_name, FALSE);
 
     $logger_factory = $this->prophesize(LoggerChannelFactoryInterface::class);

@@ -174,7 +174,7 @@ abstract class EntityBase implements EntityInterface {
    */
   public function toUrl($rel = NULL, array $options = []) {
     if ($this->id() === NULL) {
-      throw new EntityMalformedException(sprintf('The "%s" entity cannot have a URI as it does not have an ID', $this->getEntityTypeId()));
+      throw new EntityMalformedException(\sprintf('The "%s" entity cannot have a URI as it does not have an ID', $this->getEntityTypeId()));
     }
 
     // The links array might contain URI templates set in annotations.
@@ -203,7 +203,7 @@ abstract class EntityBase implements EntityInterface {
 
     if ($rel !== NULL && isset($link_templates[$rel])) {
       $route_parameters = $this->urlRouteParameters($rel);
-      $route_name = "entity.{$this->entityTypeId}." . str_replace(['-', 'drupal:'], ['_', ''], $rel);
+      $route_name = "entity.{$this->entityTypeId}." . \str_replace(['-', 'drupal:'], ['_', ''], $rel);
       $uri = new Url($route_name, $route_parameters);
     }
     else {
@@ -220,8 +220,8 @@ abstract class EntityBase implements EntityInterface {
 
       // Invoke the callback to get the URI. If there is no callback, use the
       // default URI format.
-      if (isset($uri_callback) && is_callable($uri_callback)) {
-        $uri = call_user_func($uri_callback, $this);
+      if (isset($uri_callback) && \is_callable($uri_callback)) {
+        $uri = \call_user_func($uri_callback, $this);
       }
       else {
         throw new UndefinedLinkTemplateException($exception_message);
@@ -237,7 +237,7 @@ abstract class EntityBase implements EntityInterface {
     // Display links by default based on the current language.
     // Link relations that do not require an existing entity should not be
     // affected by this entity's language, however.
-    if (!in_array($rel, ['collection', 'add-page', 'add-form'], TRUE)) {
+    if (!\in_array($rel, ['collection', 'add-page', 'add-form'], TRUE)) {
       $options += ['language' => $this->language()];
     }
 
@@ -294,7 +294,7 @@ abstract class EntityBase implements EntityInterface {
   protected function urlRouteParameters($rel) {
     $uri_route_parameters = [];
 
-    if (!in_array($rel, ['collection', 'add-page', 'add-form'], TRUE)) {
+    if (!\in_array($rel, ['collection', 'add-page', 'add-form'], TRUE)) {
       // The entity ID is needed as a route parameter.
       $uri_route_parameters[$this->getEntityTypeId()] = $this->id();
     }
@@ -302,7 +302,7 @@ abstract class EntityBase implements EntityInterface {
       $parameter_name = $this->getEntityType()->getBundleEntityType() ?: $this->getEntityType()->getKey('bundle');
       $uri_route_parameters[$parameter_name] = $this->bundle();
     }
-    if ($this instanceof RevisionableInterface && str_starts_with($rel, 'revision')) {
+    if ($this instanceof RevisionableInterface && \str_starts_with($rel, 'revision')) {
       $uri_route_parameters[$this->getEntityTypeId() . '_revision'] = $this->getRevisionId();
     }
 
@@ -313,7 +313,7 @@ abstract class EntityBase implements EntityInterface {
    * {@inheritdoc}
    */
   public function uriRelationships() {
-    return array_filter(array_keys($this->linkTemplates()), function ($link_relation_type) {
+    return \array_filter(\array_keys($this->linkTemplates()), function ($link_relation_type) {
       // It's not guaranteed that every link relation type also has a
       // corresponding route. For some, additional modules or configuration may
       // be necessary. The interface demands that we only return supported URI

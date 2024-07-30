@@ -75,11 +75,11 @@ class MigrateTaxonomyTermTest extends MigrateDrupal6TestBase {
         'parent' => [4, 5],
       ],
     ];
-    $terms = Term::loadMultiple(array_keys($expected_results));
+    $terms = Term::loadMultiple(\array_keys($expected_results));
 
     // Find each term in the tree.
     $storage = \Drupal::entityTypeManager()->getStorage('taxonomy_term');
-    $vids = array_unique(array_column($expected_results, 'vid'));
+    $vids = \array_unique(\array_column($expected_results, 'vid'));
     $tree_terms = [];
     foreach ($vids as $vid) {
       foreach ($storage->loadTree($vid) as $term) {
@@ -112,9 +112,9 @@ class MigrateTaxonomyTermTest extends MigrateDrupal6TestBase {
       // PostgreSQL, MySQL and SQLite may not return the parent terms in the
       // same order so sort before testing.
       $expected_parents = $values['parent'];
-      sort($expected_parents);
+      \sort($expected_parents);
       $actual_parents = $tree_term->parents;
-      sort($actual_parents);
+      \sort($actual_parents);
       $this->assertEquals($expected_parents, $actual_parents, "Term $tid has correct parents in vocabulary tree");
     }
   }

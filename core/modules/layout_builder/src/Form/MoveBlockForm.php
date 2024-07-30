@@ -108,9 +108,9 @@ class MoveBlockForm extends FormBase implements WorkspaceDynamicSafeFormInterfac
    *   The form array.
    */
   public function buildForm(array $form, FormStateInterface $form_state, ?SectionStorageInterface $section_storage = NULL, $delta = NULL, $region = NULL, $uuid = NULL) {
-    $parameters = array_slice(func_get_args(), 2);
+    $parameters = \array_slice(\func_get_args(), 2);
     foreach ($parameters as $parameter) {
-      if (is_null($parameter)) {
+      if (\is_null($parameter)) {
         throw new \InvalidArgumentException('MoveBlockForm requires all parameters.');
       }
     }
@@ -192,7 +192,7 @@ class MoveBlockForm extends FormBase implements WorkspaceDynamicSafeFormInterfac
     if (!isset($components[$uuid])) {
       $components[$uuid] = $sections[$delta]->getComponent($uuid);
     }
-    $state_weight_delta = round(count($components) / 2);
+    $state_weight_delta = \round(\count($components) / 2);
     foreach ($components as $component_uuid => $component) {
       /** @var \Drupal\Core\Block\BlockPluginInterface $plugin */
       $plugin = $component->getPlugin();
@@ -298,7 +298,7 @@ class MoveBlockForm extends FormBase implements WorkspaceDynamicSafeFormInterfac
    */
   protected function getSelectedRegion(FormStateInterface $form_state) {
     if ($form_state->hasValue('region')) {
-      return explode(':', $form_state->getValue('region'), 2)[1];
+      return \explode(':', $form_state->getValue('region'), 2)[1];
     }
     return $this->region;
   }
@@ -314,7 +314,7 @@ class MoveBlockForm extends FormBase implements WorkspaceDynamicSafeFormInterfac
    */
   protected function getSelectedDelta(FormStateInterface $form_state) {
     if ($form_state->hasValue('region')) {
-      return (int) explode(':', $form_state->getValue('region'))[0];
+      return (int) \explode(':', $form_state->getValue('region'))[0];
     }
     return (int) $this->delta;
   }

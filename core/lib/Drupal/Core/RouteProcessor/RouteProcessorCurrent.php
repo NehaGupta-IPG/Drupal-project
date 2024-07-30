@@ -46,7 +46,7 @@ class RouteProcessorCurrent implements OutboundRouteProcessorInterface {
         $route->setMethods($current_route->getMethods());
         $route->setOptions($current_route->getOptions());
         $route->setDefaults($current_route->getDefaults());
-        $parameters = array_merge($parameters, $this->routeMatch->getRawParameters()->all());
+        $parameters = \array_merge($parameters, $this->routeMatch->getRawParameters()->all());
         if ($bubbleable_metadata) {
           $bubbleable_metadata->addCacheContexts(['route']);
         }

@@ -22,7 +22,7 @@ class DateTimeWidgetBase extends WidgetBase {
       '#type' => 'datetime',
       '#default_value' => NULL,
       '#date_increment' => 1,
-      '#date_timezone' => date_default_timezone_get(),
+      '#date_timezone' => \date_default_timezone_get(),
       '#required' => $element['#required'],
     ];
 

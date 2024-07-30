@@ -40,11 +40,11 @@ class UpdatePostUpdateFailingTest extends BrowserTestBase {
       ->condition('name', 'core.extension')
       ->execute()
       ->fetchField();
-    $extensions = unserialize($extensions);
+    $extensions = \unserialize($extensions);
     $extensions['module']['update_test_failing'] = 8000;
     $connection->update('config')
       ->fields([
-        'data' => serialize($extensions),
+        'data' => \serialize($extensions),
       ])
       ->condition('collection', '')
       ->condition('name', 'core.extension')

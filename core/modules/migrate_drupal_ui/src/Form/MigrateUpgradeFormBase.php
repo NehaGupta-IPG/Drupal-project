@@ -68,7 +68,7 @@ abstract class MigrateUpgradeFormBase extends FormBase {
    */
   public function buildForm(array $form, FormStateInterface $form_state) {
     // Get the current major version.
-    [$this->destinationSiteVersion] = explode('.', \Drupal::VERSION, 2);
+    [$this->destinationSiteVersion] = \explode('.', \Drupal::VERSION, 2);
     $form = [];
     $form['actions']['#type'] = 'actions';
     $form['actions']['submit'] = [

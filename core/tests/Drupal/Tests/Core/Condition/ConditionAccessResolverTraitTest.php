@@ -48,7 +48,7 @@ class ConditionAccessResolverTraitTest extends UnitTestCase {
       ->method('isNegated')
       ->willReturn(TRUE);
 
-    $conditions = array_map(fn($id) => $mocks[$id], $conditions);
+    $conditions = \array_map(fn($id) => $mocks[$id], $conditions);
 
     $trait_object = new TestConditionAccessResolverTrait();
     $this->assertEquals($expected, $trait_object->resolveConditions($conditions, $logic));

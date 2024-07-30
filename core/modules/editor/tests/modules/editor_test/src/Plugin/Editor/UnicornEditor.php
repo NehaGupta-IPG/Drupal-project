@@ -43,7 +43,7 @@ class UnicornEditor extends EditorBase {
       '#default_value' => TRUE,
     ];
     $form_state->loadInclude('editor', 'admin.inc');
-    $form['image_upload'] = editor_image_upload_settings_form($form_state->get('editor'));
+    $form['image_upload'] = \editor_image_upload_settings_form($form_state->get('editor'));
     $form['image_upload']['#element_validate'][] = [$this, 'validateImageUploadSettings'];
     return $form;
   }

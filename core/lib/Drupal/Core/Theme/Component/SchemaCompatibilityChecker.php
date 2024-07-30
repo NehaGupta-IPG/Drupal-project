@@ -46,7 +46,7 @@ class SchemaCompatibilityChecker {
     ];
     // Finally, raise any potential issues that we might have detected.
     if (!empty($error_messages)) {
-      $message = implode("\n", $error_messages);
+      $message = \implode("\n", $error_messages);
       throw new IncompatibleComponentSchema($message);
     }
   }
@@ -66,18 +66,18 @@ class SchemaCompatibilityChecker {
     $error_messages = [];
     $original_required = $original_schema['required'] ?? [];
     $new_required = $new_schema['required'] ?? [];
-    $missing_required = array_diff($original_required, $new_required);
+    $missing_required = \array_diff($original_required, $new_required);
     if (!empty($missing_required)) {
-      $error_messages[] = sprintf(
+      $error_messages[] = \sprintf(
         'Some of the required properties are missing in the new schema: [%s].',
-        implode(', ', $missing_required)
+        \implode(', ', $missing_required)
       );
     }
-    $additional_required = array_diff($new_required, $original_required);
+    $additional_required = \array_diff($new_required, $original_required);
     if (!empty($additional_required)) {
-      $error_messages[] = sprintf(
+      $error_messages[] = \sprintf(
         'Some of the new required properties are not allowed by the original schema: [%s].',
-        implode(', ', $additional_required)
+        \implode(', ', $additional_required)
       );
     }
     return $error_messages;
@@ -98,11 +98,11 @@ class SchemaCompatibilityChecker {
     $error_messages = [];
     $original_properties = $original_schema['properties'] ?? [];
     $new_properties = $new_schema['properties'] ?? [];
-    $shared_properties = array_intersect(
-      array_keys($original_properties),
-      array_keys($new_properties)
+    $shared_properties = \array_intersect(
+      \array_keys($original_properties),
+      \array_keys($new_properties)
     );
-    return array_reduce(
+    return \array_reduce(
       $shared_properties,
       function (array $errors, string $property_name) use ($original_properties, $new_properties) {
         $original_types = $original_properties[$property_name]['type'] ?? [];
@@ -110,25 +110,25 @@ class SchemaCompatibilityChecker {
         // The type for the new property should, at least, accept all types for
         // the original property. Type in JSON Schema can be either a string or
         // an array of strings.
-        $original_types = is_string($original_types) ? [$original_types] : $original_types;
-        $new_types = is_string($new_types) ? [$new_types] : $new_types;
-        $unsupported_types = array_diff($original_types, $new_types);
+        $original_types = \is_string($original_types) ? [$original_types] : $original_types;
+        $new_types = \is_string($new_types) ? [$new_types] : $new_types;
+        $unsupported_types = \array_diff($original_types, $new_types);
         if (!empty($unsupported_types)) {
-          $errors[] = sprintf(
+          $errors[] = \sprintf(
             'Property "%s" does not support the types [%s]. These types are supported in the original schema and should be supported in the new schema for compatibility.',
             $property_name,
-            implode(', ', $unsupported_types)
+            \implode(', ', $unsupported_types)
           );
         }
         // If there are enums, those also need to be compatible.
         $original_enums = $original_properties[$property_name]['enum'] ?? [];
         $new_enums = $new_properties[$property_name]['enum'] ?? [];
-        $unsupported_enums = array_diff($original_enums, $new_enums);
+        $unsupported_enums = \array_diff($original_enums, $new_enums);
         if (!empty($unsupported_enums)) {
-          $errors[] = sprintf(
+          $errors[] = \sprintf(
             'Property "%s" does not allow some necessary enum values [%s]. These are supported in the original schema and should be supported in the new schema for compatibility.',
             $property_name,
-            implode(', ', $unsupported_enums),
+            \implode(', ', $unsupported_enums),
           );
         }
         // If the property is an object, then ensure sub-schema compatibility.

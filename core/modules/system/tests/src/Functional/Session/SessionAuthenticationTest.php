@@ -69,14 +69,14 @@ class SessionAuthenticationTest extends BrowserTestBase {
     $this->assertSession()->statusCodeEquals(200);
 
     // Check that the correct user is logged in.
-    $this->assertEquals($this->user->id(), json_decode($session->getPage()->getContent())->user, 'The correct user is authenticated on a route with basic authentication.');
+    $this->assertEquals($this->user->id(), \json_decode($session->getPage()->getContent())->user, 'The correct user is authenticated on a route with basic authentication.');
     $session->restart();
 
     // If we now try to access a page without basic authentication then we
     // should no longer be logged in.
     $this->drupalGet($unprotected_url);
     $this->assertSession()->statusCodeEquals(200);
-    $this->assertEquals(0, json_decode($session->getPage()->getContent())->user, 'The user is no longer authenticated after visiting a page without basic authentication.');
+    $this->assertEquals(0, \json_decode($session->getPage()->getContent())->user, 'The user is no longer authenticated after visiting a page without basic authentication.');
 
     // If we access the protected page again without basic authentication we
     // should get 401 Unauthorized.
@@ -111,7 +111,7 @@ class SessionAuthenticationTest extends BrowserTestBase {
    * @internal
    */
   protected function assertSessionData(string $response, string $expected): void {
-    $response = json_decode($response, TRUE);
+    $response = \json_decode($response, TRUE);
     $this->assertEquals(['test_value' => $expected], $response['session'], 'The session data matches the expected value.');
 
     // Check that we are logged in as the correct user.

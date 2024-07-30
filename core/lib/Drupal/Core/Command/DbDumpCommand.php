@@ -58,7 +58,7 @@ class DbDumpCommand extends DbCommandBase {
     }
 
     $schema_tables = $input->getOption('schema-only');
-    $schema_tables = explode(',', $schema_tables);
+    $schema_tables = \explode(',', $schema_tables);
     $insert_count = (int) $input->getOption('insert-count');
 
     $output->writeln($this->generateScript($connection, $schema_tables, $insert_count), OutputInterface::OUTPUT_RAW);
@@ -89,7 +89,7 @@ class DbDumpCommand extends DbCommandBase {
     foreach ($this->getTables($connection) as $table) {
       $schema = $this->getTableSchema($connection, $table);
       // Check for schema only.
-      if (empty($schema_only_patterns) || preg_replace($schema_only_patterns, '', $table)) {
+      if (empty($schema_only_patterns) || \preg_replace($schema_only_patterns, '', $table)) {
         $data = $this->getTableData($connection, $table);
       }
       else {
@@ -99,10 +99,10 @@ class DbDumpCommand extends DbCommandBase {
     }
     $script = $this->getTemplate();
     // Substitute in the version.
-    $script = str_replace('{{VERSION}}', \Drupal::VERSION, $script);
+    $script = \str_replace('{{VERSION}}', \Drupal::VERSION, $script);
     // Substitute in the tables.
-    $script = str_replace('{{TABLES}}', trim($tables), $script);
-    return trim($script);
+    $script = \str_replace('{{TABLES}}', \trim($tables), $script);
+    return \trim($script);
   }
 
   /**
@@ -115,19 +115,19 @@ class DbDumpCommand extends DbCommandBase {
    *   An array of table names.
    */
   protected function getTables(Connection $connection) {
-    $tables = array_values($connection->schema()->findTables('%'));
+    $tables = \array_values($connection->schema()->findTables('%'));
 
     foreach ($tables as $key => $table) {
       // Remove any explicitly excluded tables.
       foreach ($this->excludeTables as $pattern) {
-        if (preg_match('/^' . $pattern . '$/', $table)) {
+        if (\preg_match('/^' . $pattern . '$/', $table)) {
           unset($tables[$key]);
         }
       }
     }
 
     // Keep the table names sorted alphabetically.
-    asort($tables);
+    \asort($tables);
 
     return $tables;
   }
@@ -156,7 +156,7 @@ class DbDumpCommand extends DbCommandBase {
     while (($row = $query->fetchAssoc()) !== FALSE) {
       $name = $row['Field'];
       // Parse out the field type and meta information.
-      preg_match('@([a-z]+)(?:\((\d+)(?:,(\d+))?\))?\s*(unsigned)?@', $row['Type'], $matches);
+      \preg_match('@([a-z]+)(?:\((\d+)(?:,(\d+))?\))?\s*(unsigned)?@', $row['Type'], $matches);
       $type = $this->fieldTypeMap($connection, $matches[1]);
       if ($row['Extra'] === 'auto_increment') {
         // If this is an auto increment, then the type is 'serial'.
@@ -277,13 +277,13 @@ class DbDumpCommand extends DbCommandBase {
   protected function getTableCollation(Connection $connection, $table, &$definition) {
     // Remove identifier quotes from the table name. See
     // \Drupal\mysql\Driver\Database\mysql\Connection::$identifierQuotes.
-    $table = trim($connection->prefixTables('{' . $table . '}'), '"');
+    $table = \trim($connection->prefixTables('{' . $table . '}'), '"');
     $query = $connection->query("SHOW TABLE STATUS WHERE NAME = :table_name", [':table_name' => $table]);
     $data = $query->fetchAssoc();
 
     // Map the collation to a character set. For example, 'utf8mb4_general_ci'
     // (MySQL 5) or 'utf8mb4_0900_ai_ci' (MySQL 8) will be mapped to 'utf8mb4'.
-    [$charset] = explode('_', $data['Collation'], 2);
+    [$charset] = \explode('_', $data['Collation'], 2);
 
     // Set `mysql_character_set`. This will be ignored by other backends.
     $definition['mysql_character_set'] = $charset;
@@ -326,11 +326,11 @@ class DbDumpCommand extends DbCommandBase {
    */
   protected function fieldTypeMap(Connection $connection, $type) {
     // Convert everything to lowercase.
-    $map = array_map('strtolower', $connection->schema()->getFieldTypeMap());
-    $map = array_flip($map);
+    $map = \array_map('strtolower', $connection->schema()->getFieldTypeMap());
+    $map = \array_flip($map);
 
     // The MySql map contains type:size. Remove the size part.
-    return isset($map[$type]) ? explode(':', $map[$type])[0] : $type;
+    return isset($map[$type]) ? \explode(':', $map[$type])[0] : $type;
   }
 
   /**
@@ -346,19 +346,19 @@ class DbDumpCommand extends DbCommandBase {
    */
   protected function fieldSizeMap(Connection $connection, $type) {
     // Convert everything to lowercase.
-    $map = array_map('strtolower', $connection->schema()->getFieldTypeMap());
-    $map = array_flip($map);
+    $map = \array_map('strtolower', $connection->schema()->getFieldTypeMap());
+    $map = \array_flip($map);
 
     // Do nothing if the field type is not defined.
     if (!isset($map[$type])) {
       return NULL;
     }
 
-    $schema_type = explode(':', $map[$type])[0];
+    $schema_type = \explode(':', $map[$type])[0];
     // Only specify size on these types.
-    if (in_array($schema_type, ['blob', 'float', 'int', 'text'])) {
+    if (\in_array($schema_type, ['blob', 'float', 'int', 'text'])) {
       // The MySql map contains type:size. Remove the type part.
-      return explode(':', $map[$type])[1];
+      return \explode(':', $map[$type])[1];
     }
   }
 
@@ -389,7 +389,7 @@ class DbDumpCommand extends DbCommandBase {
       $order .= $row['COLUMN_NAME'] . ', ';
     }
     if (!empty($order)) {
-      $order = ' ORDER BY ' . rtrim($order, ', ');
+      $order = ' ORDER BY ' . \rtrim($order, ', ');
     }
     return $order;
   }
@@ -453,13 +453,13 @@ END_OF_SCRIPT;
     $output = '';
     $output .= "\$connection->schema()->createTable('" . $table . "', " . Variable::export($schema) . ");\n\n";
     if (!empty($data)) {
-      $data_chunks = array_chunk($data, $insert_count);
+      $data_chunks = \array_chunk($data, $insert_count);
       foreach ($data_chunks as $data_chunk) {
         $insert = '';
         foreach ($data_chunk as $record) {
           $insert .= "->values(" . Variable::export($record) . ")\n";
         }
-        $fields = Variable::export(array_keys($schema['fields']));
+        $fields = Variable::export(\array_keys($schema['fields']));
         $output .= <<<EOT
 \$connection->insert('$table')
 ->fields($fields)

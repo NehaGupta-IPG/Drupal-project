@@ -63,40 +63,40 @@ class ContentModerationState extends ContentEntityBase implements ContentModerat
     $fields += static::ownerBaseFieldDefinitions($entity_type);
 
     $fields['uid']
-      ->setLabel(t('User'))
-      ->setDescription(t('The username of the entity creator.'))
+      ->setLabel(\t('User'))
+      ->setDescription(\t('The username of the entity creator.'))
       ->setRevisionable(TRUE);
 
     $fields['workflow'] = BaseFieldDefinition::create('entity_reference')
-      ->setLabel(t('Workflow'))
-      ->setDescription(t('The workflow the moderation state is in.'))
+      ->setLabel(\t('Workflow'))
+      ->setDescription(\t('The workflow the moderation state is in.'))
       ->setSetting('target_type', 'workflow')
       ->setRequired(TRUE)
       ->setRevisionable(TRUE);
 
     $fields['moderation_state'] = BaseFieldDefinition::create('string')
-      ->setLabel(t('Moderation state'))
-      ->setDescription(t('The moderation state of the referenced content.'))
+      ->setLabel(\t('Moderation state'))
+      ->setDescription(\t('The moderation state of the referenced content.'))
       ->setRequired(TRUE)
       ->setTranslatable(TRUE)
       ->setRevisionable(TRUE);
 
     $fields['content_entity_type_id'] = BaseFieldDefinition::create('string')
-      ->setLabel(t('Content entity type ID'))
-      ->setDescription(t('The ID of the content entity type this moderation state is for.'))
+      ->setLabel(\t('Content entity type ID'))
+      ->setDescription(\t('The ID of the content entity type this moderation state is for.'))
       ->setRequired(TRUE)
       ->setSetting('max_length', EntityTypeInterface::ID_MAX_LENGTH)
       ->setRevisionable(TRUE);
 
     $fields['content_entity_id'] = BaseFieldDefinition::create('integer')
-      ->setLabel(t('Content entity ID'))
-      ->setDescription(t('The ID of the content entity this moderation state is for.'))
+      ->setLabel(\t('Content entity ID'))
+      ->setDescription(\t('The ID of the content entity this moderation state is for.'))
       ->setRequired(TRUE)
       ->setRevisionable(TRUE);
 
     $fields['content_entity_revision_id'] = BaseFieldDefinition::create('integer')
-      ->setLabel(t('Content entity revision ID'))
-      ->setDescription(t('The revision ID of the content entity this moderation state is for.'))
+      ->setLabel(\t('Content entity revision ID'))
+      ->setDescription(\t('The revision ID of the content entity this moderation state is for.'))
       ->setRequired(TRUE)
       ->setRevisionable(TRUE);
 
@@ -154,7 +154,7 @@ class ContentModerationState extends ContentEntityBase implements ContentModerat
 
       if ($ids) {
         /** @var \Drupal\content_moderation\Entity\ContentModerationStateInterface $content_moderation_state */
-        $content_moderation_state = $storage->loadRevision(key($ids));
+        $content_moderation_state = $storage->loadRevision(\key($ids));
       }
     }
 

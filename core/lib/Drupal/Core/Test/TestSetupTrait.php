@@ -152,7 +152,7 @@ trait TestSetupTrait {
     }
 
     // If the test is run with argument dburl then use it.
-    $db_url = getenv('SIMPLETEST_DB');
+    $db_url = \getenv('SIMPLETEST_DB');
     if (!empty($db_url)) {
       // Ensure no existing database gets in the way. If a default database
       // exists already it must be removed.
@@ -163,7 +163,7 @@ trait TestSetupTrait {
 
     // Clone the current connection and replace the current prefix.
     $connection_info = Database::getConnectionInfo('default');
-    if (is_null($connection_info)) {
+    if (\is_null($connection_info)) {
       throw new \InvalidArgumentException('There is no database connection so no tests can be run. You must provide a SIMPLETEST_DB environment variable to run PHPUnit based functional tests outside of run-tests.sh.');
     }
     else {
@@ -188,13 +188,13 @@ trait TestSetupTrait {
     $class = static::class;
     $exceptions = [];
     while ($class) {
-      if (property_exists($class, 'configSchemaCheckerExclusions')) {
+      if (\property_exists($class, 'configSchemaCheckerExclusions')) {
         $exceptions[] = $class::$configSchemaCheckerExclusions;
       }
-      $class = get_parent_class($class);
+      $class = \get_parent_class($class);
     }
     // Filter out any duplicates.
-    return array_unique(array_merge(...$exceptions));
+    return \array_unique(\array_merge(...$exceptions));
   }
 
   /**

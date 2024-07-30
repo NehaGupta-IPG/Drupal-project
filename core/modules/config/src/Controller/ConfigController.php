@@ -147,7 +147,7 @@ class ConfigController implements ContainerInjectionInterface {
     foreach ($this->exportStorage->getAllCollectionNames() as $collection) {
       $collection_storage = $this->exportStorage->createCollection($collection);
       foreach ($collection_storage->listAll() as $name) {
-        $archiver->addString(str_replace('.', '/', $collection) . "/$name.yml", Yaml::encode($collection_storage->read($name)));
+        $archiver->addString(\str_replace('.', '/', $collection) . "/$name.yml", Yaml::encode($collection_storage->read($name)));
       }
     }
 

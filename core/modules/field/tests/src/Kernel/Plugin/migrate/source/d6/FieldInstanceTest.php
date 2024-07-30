@@ -77,11 +77,11 @@ class FieldInstanceTest extends MigrateSqlSourceTestBase {
     ];
 
     // The source data.
-    $tests[0]['source_data']['content_node_field_instance'] = array_map(
+    $tests[0]['source_data']['content_node_field_instance'] = \array_map(
       function (array $row) {
-        $row['widget_settings'] = serialize($row['widget_settings']);
-        $row['display_settings'] = serialize($row['display_settings']);
-        $row['global_settings'] = serialize($row['global_settings']);
+        $row['widget_settings'] = \serialize($row['widget_settings']);
+        $row['display_settings'] = \serialize($row['display_settings']);
+        $row['global_settings'] = \serialize($row['global_settings']);
         return $row;
       },
       $tests[0]['expected_data']
@@ -92,7 +92,7 @@ class FieldInstanceTest extends MigrateSqlSourceTestBase {
         'required' => 1,
         'type' => 'text',
         'active' => 1,
-        'global_settings' => serialize([]),
+        'global_settings' => \serialize([]),
       ],
     ];
 

@@ -45,7 +45,7 @@ class ActiveWorkspaceUpdateTest extends BrowserTestBase {
     // Ensure the workspace_update_test_post_update_check_active_workspace()
     // update runs.
     $existing_updates = \Drupal::keyValue('post_update')->get('existing_updates', []);
-    $index = array_search('workspace_update_test_post_update_check_active_workspace', $existing_updates);
+    $index = \array_search('workspace_update_test_post_update_check_active_workspace', $existing_updates);
     unset($existing_updates[$index]);
     \Drupal::keyValue('post_update')->set('existing_updates', $existing_updates);
 

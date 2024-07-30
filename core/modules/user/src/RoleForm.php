@@ -53,7 +53,7 @@ class RoleForm extends EntityForm {
     $entity = $this->entity;
 
     // Prevent leading and trailing spaces in role names.
-    $entity->set('label', trim($entity->label()));
+    $entity->set('label', \trim($entity->label()));
     $status = $entity->save();
 
     $edit_link = $this->entity->toLink($this->t('Edit'), 'edit-form')->toString();

@@ -43,7 +43,7 @@ class EntityConditionGroup {
    *   (optional) The group conjunction to use.
    */
   public function __construct($conjunction, array $members = []) {
-    if (!in_array($conjunction, self::$allowedConjunctions)) {
+    if (!\in_array($conjunction, self::$allowedConjunctions)) {
       throw new \InvalidArgumentException('Allowed conjunctions: AND, OR.');
     }
     $this->conjunction = $conjunction;

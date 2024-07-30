@@ -80,7 +80,7 @@ class BlockRenderOrderTest extends BrowserTestBase {
       $id = $return_block->id();
       if ($return_block_weight = $return_block->getWeight()) {
         $this->assertSame((int) $test_blocks[$id]['weight'], $return_block_weight, 'Block weight is set as "' . $return_block_weight . '" for ' . $id . ' block.');
-        $position[$id] = strpos($test_content, Html::getClass('block-' . $test_blocks[$id]['id']));
+        $position[$id] = \strpos($test_content, Html::getClass('block-' . $test_blocks[$id]['id']));
       }
     }
     // Verify that blocks with different weight are rendered in the correct

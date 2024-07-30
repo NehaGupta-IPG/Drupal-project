@@ -35,7 +35,7 @@ class OptionsSelectWidget extends OptionsWidgetBase {
       '#options' => $this->getOptions($items->getEntity()),
       '#default_value' => $this->getSelectedOptions($items),
       // Do not display a 'multiple' select box if there is only one option.
-      '#multiple' => $this->multiple && count($this->options) > 1,
+      '#multiple' => $this->multiple && \count($this->options) > 1,
     ];
 
     return $element;
@@ -46,7 +46,7 @@ class OptionsSelectWidget extends OptionsWidgetBase {
    */
   protected function sanitizeLabel(&$label) {
     // Select form inputs allow unencoded HTML entities, but no HTML tags.
-    $label = Html::decodeEntities(strip_tags($label));
+    $label = Html::decodeEntities(\strip_tags($label));
   }
 
   /**

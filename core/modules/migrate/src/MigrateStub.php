@@ -66,24 +66,24 @@ class MigrateStub implements MigrateStubInterface {
     if (!$migrations) {
       throw new PluginNotFoundException($migration_id);
     }
-    if (count($migrations) !== 1) {
-      throw new \LogicException(sprintf('Cannot stub derivable migration "%s".  You must specify the id of a specific derivative to stub.', $migration_id));
+    if (\count($migrations) !== 1) {
+      throw new \LogicException(\sprintf('Cannot stub derivable migration "%s".  You must specify the id of a specific derivative to stub.', $migration_id));
     }
-    $migration = reset($migrations);
-    $source_id_keys = array_keys($migration->getSourcePlugin()->getIds());
-    if (count($source_id_keys) !== count($source_ids)) {
+    $migration = \reset($migrations);
+    $source_id_keys = \array_keys($migration->getSourcePlugin()->getIds());
+    if (\count($source_id_keys) !== \count($source_ids)) {
       throw new \InvalidArgumentException('Expected and provided source id counts do not match.');
     }
-    if (array_keys($source_ids) === range(0, count($source_ids) - 1)) {
-      $source_ids = array_combine($source_id_keys, $source_ids);
+    if (\array_keys($source_ids) === \range(0, \count($source_ids) - 1)) {
+      $source_ids = \array_combine($source_id_keys, $source_ids);
     }
     $stub = $this->doCreateStub($migration, $source_ids, $default_values);
 
     // If the return from ::import is numerically indexed, and we aren't
     // requesting the raw return value, index it associatively using the
     // destination id keys.
-    if (($key_by_destination_ids !== FALSE) && array_keys($stub) === range(0, count($stub) - 1)) {
-      $stub = array_combine(array_keys($migration->getDestinationPlugin()->getIds()), $stub);
+    if (($key_by_destination_ids !== FALSE) && \array_keys($stub) === \range(0, \count($stub) - 1)) {
+      $stub = \array_combine(\array_keys($migration->getDestinationPlugin()->getIds()), $stub);
     }
     return $stub;
   }

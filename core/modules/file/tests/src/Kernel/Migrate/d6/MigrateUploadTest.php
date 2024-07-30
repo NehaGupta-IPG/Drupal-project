@@ -50,7 +50,7 @@ class MigrateUploadTest extends MigrateDrupal6TestBase {
       ]);
       $file->setPermanent();
       $file->enforceIsNew();
-      file_put_contents($file->getFileUri(), 'hello world');
+      \file_put_contents($file->getFileUri(), 'hello world');
 
       // Save it, inserting a new record.
       $file->save();

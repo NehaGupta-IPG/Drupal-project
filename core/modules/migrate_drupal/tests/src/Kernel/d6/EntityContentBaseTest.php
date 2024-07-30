@@ -123,7 +123,7 @@ class EntityContentBaseTest extends MigrateDrupal6TestBase {
     // Match the expected message. Can't use default argument types, because
     // we need to convert to string from TranslatableMarkup.
     $argument = Argument::that(function ($msg) {
-      return str_contains((string) $msg, htmlentities('The "no_language_entity_test" entity type does not support translations.'));
+      return \str_contains((string) $msg, \htmlentities('The "no_language_entity_test" entity type does not support translations.'));
     });
     $message->display($argument, Argument::any())
       ->shouldBeCalled();

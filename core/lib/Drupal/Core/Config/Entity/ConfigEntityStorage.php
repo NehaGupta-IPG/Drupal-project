@@ -135,7 +135,7 @@ class ConfigEntityStorage extends EntityStorageBase implements ConfigEntityStora
    * {@inheritdoc}
    */
   public static function getIDFromConfigName($config_name, $config_prefix) {
-    return substr($config_name, strlen($config_prefix . '.'));
+    return \substr($config_name, \strlen($config_prefix . '.'));
   }
 
   /**
@@ -187,7 +187,7 @@ class ConfigEntityStorage extends EntityStorageBase implements ConfigEntityStora
       // 3. Fewer cache tags is better for performance.
       $self_referring_cache_tag = ['config:' . $configs[$id]->getName()];
       $config_cacheability = CacheableMetadata::createFromObject($configs[$id]);
-      $config_cacheability->setCacheTags(array_diff($config_cacheability->getCacheTags(), $self_referring_cache_tag));
+      $config_cacheability->setCacheTags(\array_diff($config_cacheability->getCacheTags(), $self_referring_cache_tag));
       $entity->addCacheableDependency($config_cacheability);
     }
 
@@ -232,7 +232,7 @@ class ConfigEntityStorage extends EntityStorageBase implements ConfigEntityStora
     // @see \Drupal\Core\Config\Entity\ConfigEntityStorage::MAX_ID_LENGTH
     // @todo Consider moving this to a protected method on the parent class, and
     //   abstracting it for all entity types.
-    if (strlen($id) > static::MAX_ID_LENGTH) {
+    if (\strlen($id) > static::MAX_ID_LENGTH) {
       throw new ConfigEntityIdLengthException("Configuration entity ID {$id} exceeds maximum allowed length of " . static::MAX_ID_LENGTH . " characters.");
     }
 
@@ -263,9 +263,9 @@ class ConfigEntityStorage extends EntityStorageBase implements ConfigEntityStora
     // that configuration schema has casted some of the values.
     if (!$entity->hasTrustedData()) {
       $data = $this->mapFromStorageRecords([$config->get()]);
-      $updated_entity = current($data);
+      $updated_entity = \current($data);
 
-      foreach (array_keys($config->get()) as $property) {
+      foreach (\array_keys($config->get()) as $property) {
         $value = $updated_entity->get($property);
         $entity->set($property, $value);
       }
@@ -307,7 +307,7 @@ class ConfigEntityStorage extends EntityStorageBase implements ConfigEntityStora
    * {@inheritdoc}
    */
   protected function buildCacheId($id) {
-    return parent::buildCacheId($id) . ':' . ($this->overrideFree ? '' : implode(':', $this->configFactory->getCacheKeys()));
+    return parent::buildCacheId($id) . ':' . ($this->overrideFree ? '' : \implode(':', $this->configFactory->getCacheKeys()));
   }
 
   /**
@@ -436,7 +436,7 @@ class ConfigEntityStorage extends EntityStorageBase implements ConfigEntityStora
     $entity->setOriginal(clone $entity);
 
     $data = $this->mapFromStorageRecords([$values]);
-    $updated_entity = current($data);
+    $updated_entity = \current($data);
 
     /** @var \Drupal\Core\Config\Entity\ConfigEntityTypeInterface $entity_type */
     $entity_type = $this->getEntityType();
@@ -447,7 +447,7 @@ class ConfigEntityStorage extends EntityStorageBase implements ConfigEntityStora
       // Fallback to using the provided values. If the properties cannot be
       // determined for the config entity type annotation or configuration
       // schema.
-      $properties = array_keys($values);
+      $properties = \array_keys($values);
     }
     foreach ($properties as $property) {
       if ($property === $this->uuidKey) {

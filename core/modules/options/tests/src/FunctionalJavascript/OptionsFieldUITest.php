@@ -185,7 +185,7 @@ class OptionsFieldUITest extends WebDriverTestBase {
     // Ensure that the machine name was saved correctly.
     $allowed_values = FieldStorageConfig::loadByName('node', $this->fieldName)
       ->getSetting('allowed_values');
-    $this->assertSame(['.hello #world'], array_keys($allowed_values));
+    $this->assertSame(['.hello #world'], \array_keys($allowed_values));
   }
 
   /**

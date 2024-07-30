@@ -109,7 +109,7 @@ class HelpTopicPluginManager extends DefaultPluginManager implements HelpTopicPl
   protected function getDiscovery() {
     if (!isset($this->discovery)) {
       $module_directories = $this->moduleHandler->getModuleDirectories();
-      $all_directories = array_merge(
+      $all_directories = \array_merge(
         ['core' => $this->root . '/core'],
         $module_directories,
         $this->themeHandler->getThemeDirectories()
@@ -117,7 +117,7 @@ class HelpTopicPluginManager extends DefaultPluginManager implements HelpTopicPl
 
       // Search for Twig help topics in subdirectory help_topics, under
       // modules/profiles, themes, and the core directory.
-      $all_directories = array_map(function ($dir) {
+      $all_directories = \array_map(function ($dir) {
         return [$dir . '/help_topics'];
       }, $all_directories);
       $discovery = new HelpTopicDiscovery($all_directories);
@@ -160,7 +160,7 @@ class HelpTopicPluginManager extends DefaultPluginManager implements HelpTopicPl
           continue;
         }
         // Make the related relationship bi-directional.
-        if (isset($definitions[$related_id]) && !in_array($plugin_id, $definitions[$related_id]['related'], TRUE)) {
+        if (isset($definitions[$related_id]) && !\in_array($plugin_id, $definitions[$related_id]['related'], TRUE)) {
           $definitions[$related_id]['related'][] = $plugin_id;
         }
       }

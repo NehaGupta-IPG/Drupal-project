@@ -146,8 +146,8 @@ abstract class TaxonomyTestBase extends ViewTestBase {
    *   The created taxonomy term.
    */
   protected function createTerm(array $settings = []) {
-    $filter_formats = filter_formats();
-    $format = array_pop($filter_formats);
+    $filter_formats = \filter_formats();
+    $format = \array_pop($filter_formats);
     $settings += [
       'name' => $this->randomMachineName(),
       'description' => $this->randomMachineName(),

@@ -70,7 +70,7 @@ class TestSectionList implements SectionListInterface {
    * {@inheritdoc}
    */
   protected function setSections(array $sections): array {
-    $this->sections = array_values($sections);
+    $this->sections = \array_values($sections);
     return $sections;
   }
 

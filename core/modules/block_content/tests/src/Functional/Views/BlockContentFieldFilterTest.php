@@ -117,7 +117,7 @@ class BlockContentFieldFilterTest extends BlockContentTestBase {
     $text = $this->getTextContent();
 
     foreach ($counts as $langcode => $count) {
-      $this->assertEquals($count, substr_count($text, $this->blockContentInfos[$langcode]), 'Translation ' . $langcode . ' has count ' . $count . ' with ' . $message);
+      $this->assertEquals($count, \substr_count($text, $this->blockContentInfos[$langcode]), 'Translation ' . $langcode . ' has count ' . $count . ' with ' . $message);
     }
   }
 

@@ -29,7 +29,7 @@ class ComplexDataConstraint extends SymfonyConstraint {
    */
   public function __construct($options = NULL) {
     // Allow skipping the 'properties' key in the options.
-    if (is_array($options) && !array_key_exists('properties', $options)) {
+    if (\is_array($options) && !\array_key_exists('properties', $options)) {
       $options = ['properties' => $options];
     }
     parent::__construct($options);
@@ -38,7 +38,7 @@ class ComplexDataConstraint extends SymfonyConstraint {
     // Instantiate constraint objects for array definitions.
     foreach ($this->properties as &$constraints) {
       foreach ($constraints as $id => $options) {
-        if (!is_object($options)) {
+        if (!\is_object($options)) {
           $constraints[$id] = $constraint_manager->create($id, $options);
         }
       }

@@ -62,7 +62,7 @@ class FileDownloadController extends ControllerBase {
     // Merge remaining path arguments into relative file path.
     $uri = $this->streamWrapperManager->normalizeUri($scheme . '://' . $target);
 
-    if ($this->streamWrapperManager->isValidScheme($scheme) && is_file($uri)) {
+    if ($this->streamWrapperManager->isValidScheme($scheme) && \is_file($uri)) {
       // Let other modules provide headers and controls access to the file.
       $headers = $this->moduleHandler()->invokeAll('file_download', [$uri]);
 
@@ -72,7 +72,7 @@ class FileDownloadController extends ControllerBase {
         }
       }
 
-      if (count($headers)) {
+      if (\count($headers)) {
         // \Drupal\Core\EventSubscriber\FinishResponseSubscriber::onRespond()
         // sets response as not cacheable if the Cache-Control header is not
         // already modified. Pass in FALSE for the $public parameter so that

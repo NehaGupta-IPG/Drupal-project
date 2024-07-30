@@ -95,7 +95,7 @@ class ResourceObjectNormalizerCacherTest extends KernelTestBase {
     $normalized_links = $this->serializer
       ->normalize($resource_object->getLinks(), 'api_json')
       ->withCacheableDependency((new CacheableMetadata())->addCacheTags([$cache_tag_to_invalidate]));
-    assert($normalized_links instanceof CacheableNormalization);
+    \assert($normalized_links instanceof CacheableNormalization);
     $normalization_parts = [
       ResourceObjectNormalizationCacher::RESOURCE_CACHE_SUBSET_BASE => [
         'type' => CacheableNormalization::permanent($resource_object->getTypeName()),

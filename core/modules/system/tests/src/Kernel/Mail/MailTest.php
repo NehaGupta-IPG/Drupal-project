@@ -113,7 +113,7 @@ class MailTest extends KernelTestBase {
     \Drupal::service('plugin.manager.mail')->mail('mail_cancel_test', 'cancel_test', 'cancel@example.com', $language_interface->getId());
     // Retrieve sent message.
     $captured_emails = \Drupal::state()->get('system.test_mail_collector');
-    $sent_message = end($captured_emails);
+    $sent_message = \end($captured_emails);
 
     // Assert that the message was not actually sent.
     // Message was canceled.
@@ -135,7 +135,7 @@ class MailTest extends KernelTestBase {
     // Test that the reply-to email is just the email and not the site name
     // and default sender email.
     $captured_emails = \Drupal::state()->get('system.test_mail_collector');
-    $sent_message = end($captured_emails);
+    $sent_message = \end($captured_emails);
     // Message is sent from the site email account.
     $this->assertEquals($from_email, $sent_message['headers']['From']);
     // Message reply-to headers are set.
@@ -149,11 +149,11 @@ class MailTest extends KernelTestBase {
     // Send an email and check that the From-header contains the site name.
     \Drupal::service('plugin.manager.mail')->mail('mail_cancel_test', 'from_test', 'from_test@example.com', $language);
     $captured_emails = \Drupal::state()->get('system.test_mail_collector');
-    $sent_message = end($captured_emails);
+    $sent_message = \end($captured_emails);
     // From header is correctly encoded.
     $this->assertEquals('=?utf-8?Q?Dr=C3=A9pal?= this is a very long test sentence to test what happens with very long site names <mailtest@example.com>', $sent_message['headers']['From']);
     // From header is correctly encoded.
-    $this->assertEquals('Drépal this is a very long test sentence to test what happens with very long site names <mailtest@example.com>', iconv_mime_decode($sent_message['headers']['From']));
+    $this->assertEquals('Drépal this is a very long test sentence to test what happens with very long site names <mailtest@example.com>', \iconv_mime_decode($sent_message['headers']['From']));
     $this->assertFalse(isset($sent_message['headers']['Reply-to']), 'Message reply-to is not set if not specified.');
     // Errors-to header must not be set, it is deprecated.
     $this->assertFalse(isset($sent_message['headers']['Errors-To']));
@@ -163,7 +163,7 @@ class MailTest extends KernelTestBase {
     // Send an email and check that the From-header contains the site name.
     \Drupal::service('plugin.manager.mail')->mail('mail_cancel_test', 'from_test', 'from_test@example.com', $language);
     $captured_emails = \Drupal::state()->get('system.test_mail_collector');
-    $sent_message = end($captured_emails);
+    $sent_message = \end($captured_emails);
     // From header contains the quoted site name with commas.
     $this->assertEquals('"Foo, Bar, and Baz" <mailtest@example.com>', $sent_message['headers']['From']);
 
@@ -173,14 +173,14 @@ class MailTest extends KernelTestBase {
     // hardcode some double-quotes and backslash to validate these are escaped
     // properly too.
     $specials = '()<>[]:;@\,."';
-    $site_name = 'Drupal' . $specials[rand(0, strlen($specials) - 1)] . ' "si\te"';
+    $site_name = 'Drupal' . $specials[\rand(0, \strlen($specials) - 1)] . ' "si\te"';
     $this->config('system.site')->set('name', $site_name)->save();
     // Send an email and check that the From-header contains the site name
     // within double-quotes. Also make sure double-quotes and "\" are escaped.
     \Drupal::service('plugin.manager.mail')->mail('mail_cancel_test', 'from_test', 'from_test@example.com', $language);
     $captured_emails = \Drupal::state()->get('system.test_mail_collector');
-    $sent_message = end($captured_emails);
-    $escaped_site_name = str_replace(['\\', '"'], ['\\\\', '\\"'], $site_name);
+    $sent_message = \end($captured_emails);
+    $escaped_site_name = \str_replace(['\\', '"'], ['\\\\', '\\"'], $site_name);
     // From header is correctly quoted.
     $this->assertEquals('"' . $escaped_site_name . '" <mailtest@example.com>', $sent_message['headers']['From']);
 
@@ -190,11 +190,11 @@ class MailTest extends KernelTestBase {
     // Send an email and check that the From-header contains the site name.
     \Drupal::service('plugin.manager.mail')->mail('mail_cancel_test', 'from_test', 'from_test@example.com', $language);
     $captured_emails = \Drupal::state()->get('system.test_mail_collector');
-    $sent_message = end($captured_emails);
+    $sent_message = \end($captured_emails);
     // From header is correctly encoded.
     $this->assertEquals('=?utf-8?Q?Dr=C3=A9pal=2C_=22si=5Cte=22?= <mailtest@example.com>', $sent_message['headers']['From']);
     // From header is correctly encoded.
-    $this->assertEquals($site_name . ' <mailtest@example.com>', iconv_mime_decode($sent_message['headers']['From']));
+    $this->assertEquals($site_name . ' <mailtest@example.com>', \iconv_mime_decode($sent_message['headers']['From']));
   }
 
   /**
@@ -212,7 +212,7 @@ class MailTest extends KernelTestBase {
     $random = new Random();
 
     // One random tag name.
-    $tag_name = strtolower($random->name(8, TRUE));
+    $tag_name = \strtolower($random->name(8, TRUE));
 
     // Test root relative URLs.
     foreach (['href', 'src'] as $attribute) {
@@ -229,7 +229,7 @@ class MailTest extends KernelTestBase {
       \Drupal::service('plugin.manager.mail')->mail('mail_html_test', 'render_from_message_param', 'relative_url@example.com', $language_interface->getId(), ['message' => $render]);
       // Retrieve sent message.
       $captured_emails = \Drupal::state()->get('system.test_mail_collector');
-      $sent_message = end($captured_emails);
+      $sent_message = \end($captured_emails);
 
       // Wrap the expected HTML and assert.
       $expected_html = MailFormatHelper::wrapMail($expected_html);
@@ -251,7 +251,7 @@ class MailTest extends KernelTestBase {
       \Drupal::service('plugin.manager.mail')->mail('mail_html_test', 'render_from_message_param', 'relative_url@example.com', $language_interface->getId(), ['message' => $render]);
       // Retrieve sent message.
       $captured_emails = \Drupal::state()->get('system.test_mail_collector');
-      $sent_message = end($captured_emails);
+      $sent_message = \end($captured_emails);
 
       // Wrap the expected HTML and assert.
       $expected_html = MailFormatHelper::wrapMail($expected_html);
@@ -273,7 +273,7 @@ class MailTest extends KernelTestBase {
       \Drupal::service('plugin.manager.mail')->mail('mail_html_test', 'render_from_message_param', 'relative_url@example.com', $language_interface->getId(), ['message' => $render]);
       // Retrieve sent message.
       $captured_emails = \Drupal::state()->get('system.test_mail_collector');
-      $sent_message = end($captured_emails);
+      $sent_message = \end($captured_emails);
 
       // Wrap the expected HTML and assert.
       $expected_html = MailFormatHelper::wrapMail($expected_html);
@@ -302,7 +302,7 @@ class MailTest extends KernelTestBase {
     $test_base_url = 'http://localhost';
     $this->setSetting('file_public_base_url', $test_base_url);
     $filepath = \Drupal::service('file_system')->createFilename("{$image_name}.png", '');
-    $directory_uri = 'public://' . dirname($filepath);
+    $directory_uri = 'public://' . \dirname($filepath);
     \Drupal::service('file_system')->prepareDirectory($directory_uri, FileSystemInterface::CREATE_DIRECTORY);
 
     // Create an image file.
@@ -335,7 +335,7 @@ class MailTest extends KernelTestBase {
       \Drupal::service('plugin.manager.mail')->mail('mail_html_test', 'render_from_message_param', 'relative_url@example.com', $language_interface->getId(), ['message' => $render]);
       // Retrieve sent message.
       $captured_emails = \Drupal::state()->get('system.test_mail_collector');
-      $sent_message = end($captured_emails);
+      $sent_message = \end($captured_emails);
 
       // Wrap the expected HTML and assert.
       $expected_html = MailFormatHelper::wrapMail($expected_html);
@@ -367,7 +367,7 @@ class MailTest extends KernelTestBase {
       \Drupal::service('plugin.manager.mail')->mail('mail_html_test', 'render_from_message_param', 'relative_url@example.com', $language_interface->getId(), ['message' => $render]);
       // Retrieve sent message.
       $captured_emails = \Drupal::state()->get('system.test_mail_collector');
-      $sent_message = end($captured_emails);
+      $sent_message = \end($captured_emails);
 
       // Wrap the expected HTML and assert.
       $expected_html = MailFormatHelper::wrapMail($expected_html);

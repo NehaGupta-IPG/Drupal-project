@@ -151,7 +151,7 @@ abstract class EntityDisplayFormBase extends EntityForm {
    */
   protected function getFieldDefinitions() {
     $context = $this->displayContext;
-    return array_filter($this->entityFieldManager->getFieldDefinitions($this->entity->getTargetEntityTypeId(), $this->entity->getTargetBundle()), function (FieldDefinitionInterface $field_definition) use ($context) {
+    return \array_filter($this->entityFieldManager->getFieldDefinitions($this->entity->getTargetEntityTypeId(), $this->entity->getTargetBundle()), function (FieldDefinitionInterface $field_definition) use ($context) {
       return $field_definition->isDisplayConfigurable($context);
     });
   }
@@ -168,8 +168,8 @@ abstract class EntityDisplayFormBase extends EntityForm {
     $form += [
       '#entity_type' => $this->entity->getTargetEntityTypeId(),
       '#bundle' => $this->entity->getTargetBundle(),
-      '#fields' => array_keys($field_definitions),
-      '#extra' => array_keys($extra_fields),
+      '#fields' => \array_keys($field_definitions),
+      '#extra' => \array_keys($extra_fields),
     ];
 
     if (empty($field_definitions) && empty($extra_fields) && $route_info = FieldUI::getOverviewRouteInfo($this->entity->getTargetEntityTypeId(), $this->entity->getTargetBundle())) {
@@ -233,10 +233,10 @@ abstract class EntityDisplayFormBase extends EntityForm {
         ];
         // Prepare default values for the 'Custom display settings' checkboxes.
         $default = [];
-        if ($enabled_displays = array_filter($this->getDisplayStatuses())) {
-          $default = array_keys(array_intersect_key($display_mode_options, $enabled_displays));
+        if ($enabled_displays = \array_filter($this->getDisplayStatuses())) {
+          $default = \array_keys(\array_intersect_key($display_mode_options, $enabled_displays));
         }
-        natcasesort($display_mode_options);
+        \natcasesort($display_mode_options);
         $form['modes']['display_modes_custom'] = [
           '#type' => 'checkboxes',
           '#title' => $this->t('Use custom display settings for the following @display_context modes', ['@display_context' => $this->displayContext]),
@@ -311,7 +311,7 @@ abstract class EntityDisplayFormBase extends EntityForm {
       $display_options = $this->entity->getComponent($field_name);
     }
 
-    $regions = array_keys($this->getRegions());
+    $regions = \array_keys($this->getRegions());
     $field_row = [
       '#attributes' => ['class' => ['draggable', 'tabledrag-leaf']],
       '#row_type' => 'field',
@@ -340,7 +340,7 @@ abstract class EntityDisplayFormBase extends EntityForm {
           '#type' => 'select',
           '#title' => $this->t('Label display for @title', ['@title' => $label]),
           '#title_display' => 'invisible',
-          '#options' => array_combine($regions, $regions),
+          '#options' => \array_combine($regions, $regions),
           '#empty_value' => '',
           '#attributes' => ['class' => ['js-field-parent', 'field-parent']],
           '#parents' => ['fields', $field_name, 'parent'],
@@ -491,7 +491,7 @@ abstract class EntityDisplayFormBase extends EntityForm {
   protected function buildExtraFieldRow($field_id, $extra_field) {
     $display_options = $this->entity->getComponent($field_id);
 
-    $regions = array_keys($this->getRegions());
+    $regions = \array_keys($this->getRegions());
     $extra_field_row = [
       '#attributes' => ['class' => ['draggable', 'tabledrag-leaf']],
       '#row_type' => 'extra_field',
@@ -517,7 +517,7 @@ abstract class EntityDisplayFormBase extends EntityForm {
           '#type' => 'select',
           '#title' => $this->t('Parents for @title', ['@title' => $extra_field['label']]),
           '#title_display' => 'invisible',
-          '#options' => array_combine($regions, $regions),
+          '#options' => \array_combine($regions, $regions),
           '#empty_value' => '',
           '#attributes' => ['class' => ['js-field-parent', 'field-parent']],
           '#parents' => ['fields', $field_id, 'parent'],
@@ -607,7 +607,7 @@ abstract class EntityDisplayFormBase extends EntityForm {
 
     if ($this->entity instanceof EntityWithPluginCollectionInterface) {
       // Do not manually update values represented by plugin collections.
-      $form_values = array_diff_key($form_values, $this->entity->getPluginCollections());
+      $form_values = \array_diff_key($form_values, $this->entity->getPluginCollections());
     }
 
     // Collect data for 'regular' fields.
@@ -624,7 +624,7 @@ abstract class EntityDisplayFormBase extends EntityForm {
         if ($form_state->get('plugin_settings_update') === $field_name) {
           // Only store settings actually used by the selected plugin.
           $default_settings = $this->pluginManager->getDefaultSettings($options['type']);
-          $options['settings'] = isset($values['settings_edit_form']['settings']) ? array_intersect_key($values['settings_edit_form']['settings'], $default_settings) : [];
+          $options['settings'] = isset($values['settings_edit_form']['settings']) ? \array_intersect_key($values['settings_edit_form']['settings'], $default_settings) : [];
           $options['third_party_settings'] = $values['settings_edit_form']['third_party_settings'] ?? [];
           $form_state->set('plugin_settings_update', NULL);
         }
@@ -685,9 +685,9 @@ abstract class EntityDisplayFormBase extends EntityForm {
       case 'refresh_table':
         // If the currently edited field is one of the rows to be refreshed, set
         // it back to 'non edit' mode.
-        $updated_rows = explode(' ', $form_state->getValue('refresh_rows'));
+        $updated_rows = \explode(' ', $form_state->getValue('refresh_rows'));
         $plugin_settings_edit = $form_state->get('plugin_settings_edit');
-        if ($plugin_settings_edit && in_array($plugin_settings_edit, $updated_rows)) {
+        if ($plugin_settings_edit && \in_array($plugin_settings_edit, $updated_rows)) {
           $form_state->set('plugin_settings_edit', NULL);
         }
         break;
@@ -708,7 +708,7 @@ abstract class EntityDisplayFormBase extends EntityForm {
     $updated_rows = match ($op) {
       'edit' => [$trigger['#field_name']],
       'update', 'cancel' => [$trigger['#field_name']],
-      'refresh_table' => array_values(explode(' ', $form_state->getValue('refresh_rows')))
+      'refresh_table' => \array_values(\explode(' ', $form_state->getValue('refresh_rows')))
     };
     $updated_columns = match ($op) {
       'edit' => ['plugin'],
@@ -728,7 +728,7 @@ abstract class EntityDisplayFormBase extends EntityForm {
     $response->addCommand(new ReplaceCommand('#field-display-overview-wrapper', $form['fields']));
 
     // Add "row updated" warning after the table has been replaced.
-    if (!in_array($op, ['cancel', 'edit'])) {
+    if (!\in_array($op, ['cancel', 'edit'])) {
       foreach ($updated_rows as $name) {
         // The ID of the rendered table row is `$name` processed by getClass().
         // @see \Drupal\field_ui\Element\FieldUiTable::tablePreRender
@@ -854,8 +854,8 @@ abstract class EntityDisplayFormBase extends EntityForm {
     $config_prefix = $entity_type->getConfigPrefix();
     $ids = $this->configFactory()->listAll($config_prefix . '.' . $this->entity->getTargetEntityTypeId() . '.' . $this->entity->getTargetBundle() . '.');
     foreach ($ids as $id) {
-      $config_id = str_replace($config_prefix . '.', '', $id);
-      [,, $display_mode] = explode('.', $config_id);
+      $config_id = \str_replace($config_prefix . '.', '', $id);
+      [,, $display_mode] = \explode('.', $config_id);
       if ($display_mode != 'default') {
         $load_ids[] = $config_id;
       }

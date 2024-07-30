@@ -33,10 +33,10 @@ class TemporaryQueryTest extends TemporaryQueryTestBase {
     $temp_table_name = $connection->queryTemporary('SELECT * FROM {test}');
     $temp_table_fields = $connection->query("SELECT * FROM $temp_table_name")->fetch();
 
-    $normal_table_fields = array_keys(get_object_vars($normal_table_fields));
-    $temp_table_fields = array_keys(get_object_vars($temp_table_fields));
+    $normal_table_fields = \array_keys(\get_object_vars($normal_table_fields));
+    $temp_table_fields = \array_keys(\get_object_vars($temp_table_fields));
 
-    $this->assertEmpty(array_diff($normal_table_fields, $temp_table_fields));
+    $this->assertEmpty(\array_diff($normal_table_fields, $temp_table_fields));
   }
 
 }

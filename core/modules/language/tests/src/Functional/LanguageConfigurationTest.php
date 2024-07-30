@@ -206,7 +206,7 @@ class LanguageConfigurationTest extends BrowserTestBase {
     \Drupal::languageManager()->reset();
     $max_configurable_language_weight = $this->getHighestConfigurableLanguageWeight();
     foreach (\Drupal::languageManager()->getLanguages(LanguageInterface::STATE_LOCKED) as $locked_language) {
-      $this->assertGreaterThan($max_configurable_language_weight, $locked_language->getWeight(), sprintf('System language %s does not have higher weight than configurable languages %s', $locked_language->getName(), $state));
+      $this->assertGreaterThan($max_configurable_language_weight, $locked_language->getWeight(), \sprintf('System language %s does not have higher weight than configurable languages %s', $locked_language->getName(), $state));
     }
   }
 
@@ -226,7 +226,7 @@ class LanguageConfigurationTest extends BrowserTestBase {
     $languages = $storage->loadMultiple();
     foreach ($languages as $language) {
       if (!$language->isLocked()) {
-        $max_weight = max($max_weight, $language->getWeight());
+        $max_weight = \max($max_weight, $language->getWeight());
       }
     }
 

@@ -171,7 +171,7 @@ class ConfigExportImportUITest extends BrowserTestBase {
 
     // Import the configuration.
     $filename = 'temporary://' . $this->randomMachineName();
-    file_put_contents($filename, $this->tarball);
+    \file_put_contents($filename, $this->tarball);
     $this->drupalGet('admin/config/development/configuration/full/import');
     $this->submitForm(['files[import_tarball]' => $filename], 'Upload');
     // There is no snapshot yet because an import has never run.
@@ -240,7 +240,7 @@ class ConfigExportImportUITest extends BrowserTestBase {
     $this->submitForm([], 'Export');
     $this->tarball = $this->getSession()->getPage()->getContent();
     $filename = \Drupal::service('file_system')->getTempDirectory() . '/' . $this->randomMachineName();
-    file_put_contents($filename, $this->tarball);
+    \file_put_contents($filename, $this->tarball);
 
     // Set up the active storage collections to test import.
     $test1_storage->delete('config_test.create');

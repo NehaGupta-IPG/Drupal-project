@@ -49,12 +49,12 @@ class Condition extends ConditionBase {
         $sql_condition = $sql_query->getConnection()->condition($condition['field']->getConjunction());
         // Add the SQL query to the object before calling this method again.
         $condition['field']->sqlQuery = $sql_query;
-        $condition['field']->nestedInsideOrCondition = $this->nestedInsideOrCondition || strtoupper($this->conjunction) === 'OR';
+        $condition['field']->nestedInsideOrCondition = $this->nestedInsideOrCondition || \strtoupper($this->conjunction) === 'OR';
         $condition['field']->compile($sql_condition);
         $conditionContainer->condition($sql_condition);
       }
       else {
-        $type = $this->nestedInsideOrCondition || strtoupper($this->conjunction) === 'OR' || $condition['operator'] === 'IS NULL' ? 'LEFT' : 'INNER';
+        $type = $this->nestedInsideOrCondition || \strtoupper($this->conjunction) === 'OR' || $condition['operator'] === 'IS NULL' ? 'LEFT' : 'INNER';
         $field = $tables->addField($condition['field'], $type, $condition['langcode']);
         // If the field is trying to query on %delta for a single value field
         // then the only supported delta is 0. No other value than 0 makes
@@ -109,7 +109,7 @@ class Condition extends ConditionBase {
    */
   public static function translateCondition(&$condition, SelectInterface $sql_query, $case_sensitive) {
     // // There is nothing we can do for IN ().
-    if (is_array($condition['value'])) {
+    if (\is_array($condition['value'])) {
       return;
     }
 

@@ -70,8 +70,8 @@ class AttributeArray extends AttributeValueBase implements \ArrayAccess, \Iterat
    */
   public function __toString() {
     // Filter out any empty values before printing.
-    $this->value = array_unique(array_filter($this->value));
-    return Html::escape(implode(' ', $this->value));
+    $this->value = \array_unique(\array_filter($this->value));
+    return Html::escape(\implode(' ', $this->value));
   }
 
   /**

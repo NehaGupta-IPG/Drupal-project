@@ -111,7 +111,7 @@ class Search extends FilterPluginBase {
     $key = $this->options['expose']['identifier'];
     if (!$form_state->isValueEmpty($key)) {
       $this->queryParseSearchExpression($form_state->getValue($key));
-      if (count($this->searchQuery->words()) == 0) {
+      if (\count($this->searchQuery->words()) == 0) {
         $form_state->setErrorByName($key, $this->formatPlural(\Drupal::config('search.settings')->get('index.minimum_word_size'), 'You must include at least one keyword to match in the content, and punctuation is ignored.', 'You must include at least one keyword to match in the content. Keywords must be at least @count characters, and punctuation is ignored.'));
       }
     }
@@ -182,13 +182,13 @@ class Search extends FilterPluginBase {
       $condition_conditions =& $conditions->conditions();
       foreach ($condition_conditions as $key => &$condition) {
         // Make sure we just look at real conditions.
-        if (is_numeric($key)) {
+        if (\is_numeric($key)) {
           // Replace the conditions with the table alias of views.
           $this->searchQuery->conditionReplaceString('d.', "$search_dataset.", $condition);
         }
       }
       $search_conditions =& $search_condition->conditions();
-      $search_conditions = array_merge($search_conditions, $condition_conditions);
+      $search_conditions = \array_merge($search_conditions, $condition_conditions);
 
       // Add the keyword conditions, as is done in
       // SearchQuery::prepareAndNormalize(), but simplified because we are

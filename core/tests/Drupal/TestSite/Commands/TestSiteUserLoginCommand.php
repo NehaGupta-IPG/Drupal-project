@@ -44,8 +44,8 @@ class TestSiteUserLoginCommand extends Command {
    * @throws \Symfony\Component\Console\Exception\InvalidArgumentException
    */
   protected function execute(InputInterface $input, OutputInterface $output): int {
-    $root = dirname(__DIR__, 5);
-    chdir($root);
+    $root = \dirname(__DIR__, 5);
+    \chdir($root);
 
     $this->classLoader = require 'autoload.php';
     $kernel = new DrupalKernel('prod', $this->classLoader, FALSE);
@@ -60,13 +60,13 @@ class TestSiteUserLoginCommand extends Command {
 
     $container = $kernel->getContainer();
     $uid = $input->getArgument('uid');
-    if (!is_numeric($uid)) {
-      throw new InvalidArgumentException(sprintf('The "uid" argument needs to be an integer, but it is "%s".', $uid));
+    if (!\is_numeric($uid)) {
+      throw new InvalidArgumentException(\sprintf('The "uid" argument needs to be an integer, but it is "%s".', $uid));
     }
     $userEntity = $container->get('entity_type.manager')
       ->getStorage('user')
       ->load($uid);
-    $url = user_pass_reset_url($userEntity) . '/login';
+    $url = \user_pass_reset_url($userEntity) . '/login';
     $output->writeln($url);
 
     return 0;

@@ -26,7 +26,7 @@ class ListField extends ManyToOne {
 
     $field_storage = $this->getFieldStorageDefinition();
     // Set valueOptions here so getValueOptions() will just return it.
-    $this->valueOptions = options_allowed_values($field_storage);
+    $this->valueOptions = \options_allowed_values($field_storage);
   }
 
 }

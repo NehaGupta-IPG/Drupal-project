@@ -173,17 +173,17 @@ class DateTest extends UnitTestCase {
    * @legacy-covers \Drupal\Core\Datetime\DateFormatter::getSampleDateFormats
    */
   public function testGetSampleDateFormats(): void {
-    $timestamp = strtotime('2015-03-22 14:23:00');
+    $timestamp = \strtotime('2015-03-22 14:23:00');
     $expected = $this->dateFormatter->getSampleDateFormats('en', $timestamp, 'Australia/Sydney');
 
     // Removed characters related to timezone 'e' and 'T', as test does not have
     // timezone set.
     // cspell:disable-next-line
     $date_characters = 'dDjlNSwzWFmMntLoYyaABgGhHisuIOPZcrU';
-    $date_chars = str_split($date_characters);
+    $date_chars = \str_split($date_characters);
 
     foreach ($date_chars as $val) {
-      $this->assertEquals($expected[$val], date($val, $timestamp));
+      $this->assertEquals($expected[$val], \date($val, $timestamp));
     }
   }
 
@@ -440,7 +440,7 @@ class DateTest extends UnitTestCase {
    */
   public function testRfc2822DateFormat(): void {
     $timestamp = 1549110600;
-    $langcodes = array_keys(LanguageManager::getStandardLanguageList());
+    $langcodes = \array_keys(LanguageManager::getStandardLanguageList());
     $langcodes[] = NULL;
     foreach ($langcodes as $langcode) {
       $formatted_date = $this->dateFormatter->format($timestamp, 'custom', 'r', 'Europe/Berlin', $langcode);

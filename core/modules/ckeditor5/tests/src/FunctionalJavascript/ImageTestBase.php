@@ -76,9 +76,9 @@ abstract class ImageTestBase extends CKEditor5TestBase {
       $string[] = $key . '="' . $value . '"';
     }
     if ($reverse) {
-      $string = array_reverse($string);
+      $string = \array_reverse($string);
     }
-    return implode(' ', $string);
+    return \implode(' ', $string);
   }
 
   /**

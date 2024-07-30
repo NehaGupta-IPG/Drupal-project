@@ -80,7 +80,7 @@ class StyleSensibleElementConstraintValidator extends ConstraintValidator implem
 
     // The single tag for which a style is specified, which we are checking now.
     $style_element = HTMLRestrictions::fromString($element);
-    assert(count($style_element->getAllowedElements()) === 1);
+    \assert(\count($style_element->getAllowedElements()) === 1);
     [$tag, $classes] = Style::getTagAndClasses($style_element);
 
     // Ensure the tag is in the range supported by the Style plugin.
@@ -88,7 +88,7 @@ class StyleSensibleElementConstraintValidator extends ConstraintValidator implem
     $supported_range = $superset->merge($style_element->extractPlainTagsSubset());
     if (!$style_element->diff($supported_range)->allowsNothing()) {
       $this->context->buildViolation($constraint->nonHtml5TagMessage)
-        ->setParameter('@tag', sprintf("<%s>", $tag))
+        ->setParameter('@tag', \sprintf("<%s>", $tag))
         ->addViolation();
       return;
     }
@@ -97,15 +97,15 @@ class StyleSensibleElementConstraintValidator extends ConstraintValidator implem
     $other_enabled_plugins = $this->getOtherEnabledPlugins($text_editor, 'ckeditor5_style');
     $enableable_disabled_plugins = $this->getEnableableDisabledPlugins($text_editor);
 
-    $other_enabled_plugin_elements = new HTMLRestrictions($this->pluginManager->getProvidedElements(array_keys($other_enabled_plugins), $text_editor, FALSE));
-    $disabled_plugin_elements = new HTMLRestrictions($this->pluginManager->getProvidedElements(array_keys($enableable_disabled_plugins), $text_editor, FALSE));
+    $other_enabled_plugin_elements = new HTMLRestrictions($this->pluginManager->getProvidedElements(\array_keys($other_enabled_plugins), $text_editor, FALSE));
+    $disabled_plugin_elements = new HTMLRestrictions($this->pluginManager->getProvidedElements(\array_keys($enableable_disabled_plugins), $text_editor, FALSE));
 
     // Next, validate that the classes specified for this style are not
     // supported by an enabled plugin.
     if (self::intersectionWithClasses($style_element, $other_enabled_plugin_elements)) {
       $this->context->buildViolation($constraint->conflictingEnabledPluginMessage)
-        ->setParameter('@tag', sprintf("<%s>", $tag))
-        ->setParameter('@classes', implode(", ", $classes))
+        ->setParameter('@tag', \sprintf("<%s>", $tag))
+        ->setParameter('@classes', \implode(", ", $classes))
         ->setParameter('%plugin', $this->findStyleConflictingPluginLabel($style_element))
         ->addViolation();
     }
@@ -113,8 +113,8 @@ class StyleSensibleElementConstraintValidator extends ConstraintValidator implem
     // supported by a disabled plugin.
     elseif (self::intersectionWithClasses($style_element, $disabled_plugin_elements)) {
       $this->context->buildViolation($constraint->conflictingDisabledPluginMessage)
-        ->setParameter('@tag', sprintf("<%s>", $tag))
-        ->setParameter('@classes', implode(", ", $classes))
+        ->setParameter('@tag', \sprintf("<%s>", $tag))
+        ->setParameter('@classes', \implode(", ", $classes))
         ->setParameter('%plugin', $this->findStyleConflictingPluginLabel($style_element))
         ->addViolation();
     }
@@ -122,10 +122,10 @@ class StyleSensibleElementConstraintValidator extends ConstraintValidator implem
     // Finally, while the configuration is technically valid if this point was
     // reached, there are some known compatibility issues. Inform the user that
     // for that reason, this configuration must be considered invalid.
-    $unsupported = $style_element->intersect(HTMLRestrictions::fromString(implode(' ', static::KNOWN_UNSUPPORTED_TAGS)));
+    $unsupported = $style_element->intersect(HTMLRestrictions::fromString(\implode(' ', static::KNOWN_UNSUPPORTED_TAGS)));
     if (!$unsupported->allowsNothing()) {
       $this->context->buildViolation($constraint->unsupportedTagMessage)
-        ->setParameter('@tag', sprintf("<%s>", $tag))
+        ->setParameter('@tag', \sprintf("<%s>", $tag))
         ->addViolation();
     }
   }
@@ -148,10 +148,10 @@ class StyleSensibleElementConstraintValidator extends ConstraintValidator implem
     // For example: a plugin may support `<$text-container class="foo">`. On its
     // own that would not trigger an intersection, but when resolved into
     // concrete tags it could.
-    $tags_from_a = array_diff(array_keys($a->getConcreteSubset()->getAllowedElements()), ['*']);
-    $tags_from_b = array_diff(array_keys($b->getConcreteSubset()->getAllowedElements()), ['*']);
-    $a = $a->merge(new HTMLRestrictions(array_fill_keys($tags_from_b, FALSE)));
-    $b = $b->merge(new HTMLRestrictions(array_fill_keys($tags_from_a, FALSE)));
+    $tags_from_a = \array_diff(\array_keys($a->getConcreteSubset()->getAllowedElements()), ['*']);
+    $tags_from_b = \array_diff(\array_keys($b->getConcreteSubset()->getAllowedElements()), ['*']);
+    $a = $a->merge(new HTMLRestrictions(\array_fill_keys($tags_from_b, FALSE)));
+    $b = $b->merge(new HTMLRestrictions(\array_fill_keys($tags_from_a, FALSE)));
     // When a plugin allows all classes on a tag, we assume there is no
     // problem with having the style plugin adding classes to that element.
     // When allowing all classes we don't expect a specific user experience
@@ -174,7 +174,7 @@ class StyleSensibleElementConstraintValidator extends ConstraintValidator implem
     // Leverage the "GHS configuration" representation to easily find whether
     // there is an intersection for classes. Other implementations are possible.
     $intersection_as_ghs_config = $intersection->toGeneralHtmlSupportConfig();
-    $ghs_config_classes = array_column($intersection_as_ghs_config, 'classes');
+    $ghs_config_classes = \array_column($intersection_as_ghs_config, 'classes');
     return !empty($ghs_config_classes);
   }
 
@@ -198,12 +198,12 @@ class StyleSensibleElementConstraintValidator extends ConstraintValidator implem
         continue;
       }
 
-      assert($definition instanceof CKEditor5PluginDefinition);
+      \assert($definition instanceof CKEditor5PluginDefinition);
       if (!$definition->hasElements()) {
         continue;
       }
 
-      $haystack = HTMLRestrictions::fromString(implode($definition->getElements()));
+      $haystack = HTMLRestrictions::fromString(\implode($definition->getElements()));
       if ($id === 'ckeditor5_sourceEditing') {
         // The Source Editing plugin's allowed elements are based on stored
         // config. This differs from all other plugins, which establish allowed
@@ -213,7 +213,7 @@ class StyleSensibleElementConstraintValidator extends ConstraintValidator implem
         $editor_plugins = $text_editor->getSettings()['plugins'];
         if (!empty($editor_plugins['ckeditor5_sourceEditing'])) {
           $source_tags = $editor_plugins['ckeditor5_sourceEditing']['allowed_tags'];
-          $haystack = HTMLRestrictions::fromString(implode($source_tags));
+          $haystack = HTMLRestrictions::fromString(\implode($source_tags));
         }
       }
       if (self::intersectionWithClasses($needle, $haystack)) {

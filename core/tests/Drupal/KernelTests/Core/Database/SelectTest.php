@@ -370,7 +370,7 @@ class SelectTest extends DatabaseTestBase {
     $count = (int) $query_1->countQuery()->execute()->fetchField();
 
     // Ensure the counts match.
-    $this->assertSame(count($names), $count, "The count query's result matched the number of rows in the UNION query.");
+    $this->assertSame(\count($names), $count, "The count query's result matched the number of rows in the UNION query.");
   }
 
   /**
@@ -456,7 +456,7 @@ class SelectTest extends DatabaseTestBase {
     }
 
     // First select the items in order and make sure we get an ordered list.
-    $expected_ids = range(1, $number_of_items);
+    $expected_ids = \range(1, $number_of_items);
     $ordered_ids = $this->connection->select('test', 't')
       ->fields('t', ['id'])
       ->range(0, $number_of_items)
@@ -476,7 +476,7 @@ class SelectTest extends DatabaseTestBase {
       ->fetchCol();
     $this->assertNotEquals($ordered_ids, $randomized_ids, 'A query with random ordering returns an unordered set of IDs.');
     $sorted_ids = $randomized_ids;
-    sort($sorted_ids);
+    \sort($sorted_ids);
     $this->assertEquals($ordered_ids, $sorted_ids, 'After sorting the random list, the result matches the original query.');
 
     // Now perform the exact same query again, and make sure the order is
@@ -489,7 +489,7 @@ class SelectTest extends DatabaseTestBase {
       ->fetchCol();
     $this->assertNotEquals($randomized_ids, $randomized_ids_second_set, 'Performing the query with random ordering a second time returns IDs in a different order.');
     $sorted_ids_second_set = $randomized_ids_second_set;
-    sort($sorted_ids_second_set);
+    \sort($sorted_ids_second_set);
     $this->assertEquals($sorted_ids, $sorted_ids_second_set, 'After sorting the second random list, the result matches the sorted version of the first random list.');
   }
 
@@ -539,7 +539,7 @@ class SelectTest extends DatabaseTestBase {
     $query->addField('t', 'name');
     $query->condition("t.$column", $pattern, $operator);
     $result = $query->execute()->fetchCol();
-    sort($result);
+    \sort($result);
 
     $this->assertEquals($expected, $result);
   }

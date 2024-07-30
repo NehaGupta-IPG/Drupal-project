@@ -213,7 +213,7 @@ class EntityTranslationTest extends EntityLanguageTestBase {
           'name' => [0 => $this->randomMachineName()],
           // Note that the user ID here is intentionally random, which is not
           // what we normally do in tests.
-          'user_id' => [0 => mt_rand(128, 256)],
+          'user_id' => [0 => \mt_rand(128, 256)],
         ];
       }
       else {
@@ -287,7 +287,7 @@ class EntityTranslationTest extends EntityLanguageTestBase {
 
     // Test mixed property and field conditions.
     $storage->resetCache($result);
-    $entity = $storage->load(reset($result));
+    $entity = $storage->load(\reset($result));
     $field_value = $this->randomString();
     $entity->getTranslation($langcode)->set($this->fieldName, [['value' => $field_value]]);
     $entity->save();
@@ -517,7 +517,7 @@ class EntityTranslationTest extends EntityLanguageTestBase {
     // left around.
     $entity = $this->reloadEntity($entity);
     $translation = $entity->getTranslation($langcode);
-    $entity = unserialize(serialize($entity));
+    $entity = \unserialize(\serialize($entity));
     $entity->name->value = $this->randomMachineName();
     $name = $default_langcode . '_' . $this->randomMachineName();
     $entity->getTranslation($default_langcode)->name->value = $name;
@@ -543,10 +543,10 @@ class EntityTranslationTest extends EntityLanguageTestBase {
     $entity = $this->reloadEntity($entity);
     $type = $this->randomMachineName();
     $entity->getTranslation($langcode)->type->value = $type;
-    $entity = unserialize(serialize($entity));
+    $entity = \unserialize(\serialize($entity));
     $cloned = clone $entity;
     $translation = $cloned->getTranslation($langcode);
-    $translation->type->value = strrev($type);
+    $translation->type->value = \strrev($type);
     $this->assertEquals($cloned->type->value, $translation->type->value, 'Untranslatable field references keep working after serializing and cloning the entity.');
 
     // Check that per-language defaults are properly populated. The
@@ -656,7 +656,7 @@ class EntityTranslationTest extends EntityLanguageTestBase {
     $renderer->renderRoot($build);
     $this->assertEquals($values[$current_langcode]['name'], $build['label']['#markup'], 'By default the entity is rendered in the current language.');
 
-    $langcodes = array_combine($this->langcodes, $this->langcodes);
+    $langcodes = \array_combine($this->langcodes, $this->langcodes);
     // We have no translation for the $langcode2 language, hence the expected
     // result is the topmost existing translation, that is $langcode.
     $langcodes[$langcode2] = $langcode;
@@ -792,7 +792,7 @@ class EntityTranslationTest extends EntityLanguageTestBase {
       $entity->addTranslation($langcode, $values[$langcode]);
     }
 
-    $langcodes = array_merge([$default_langcode], $this->langcodes);
+    $langcodes = \array_merge([$default_langcode], $this->langcodes);
     foreach ($langcodes as $langcode) {
       $adapter = $entity->getTranslation($langcode)->getTypedData();
       $name = $adapter->get('name')->value;
@@ -814,7 +814,7 @@ class EntityTranslationTest extends EntityLanguageTestBase {
     }
 
     $default_langcode = $entity->getUntranslated()->language()->getId();
-    foreach (array_keys($entity->getTranslationLanguages()) as $langcode) {
+    foreach (\array_keys($entity->getTranslationLanguages()) as $langcode) {
       $translation = $entity->getTranslation($langcode);
       foreach ($translation->getFields() as $field_name => $field) {
         if ($field->getFieldDefinition()->isTranslatable()) {
@@ -893,8 +893,8 @@ class EntityTranslationTest extends EntityLanguageTestBase {
     // langcodes are in the deleted languages list.
     $actual = \Drupal::state()->get('entity_test.delete.translatable_test_field');
     $expected_translatable = ['l1', 'l2'];
-    sort($actual);
-    sort($expected_translatable);
+    \sort($actual);
+    \sort($expected_translatable);
     $this->assertEquals($expected_translatable, $actual);
     // Ensure that the untranslatable test field is untouched.
     $this->assertNull(\Drupal::state()->get('entity_test.delete.untranslatable_test_field'));
@@ -906,16 +906,16 @@ class EntityTranslationTest extends EntityLanguageTestBase {
     $actual = \Drupal::state()->get('entity_test.delete.translatable_test_field');
     $expected_translatable[] = 'en';
     $expected_translatable[] = 'l0';
-    sort($actual);
-    sort($expected_translatable);
+    \sort($actual);
+    \sort($expected_translatable);
     $this->assertEquals($expected_translatable, $actual);
 
     // The untranslatable field is shared and only deleted once, for the
     // default langcode.
     $actual = \Drupal::state()->get('entity_test.delete.untranslatable_test_field');
     $expected_untranslatable = ['en'];
-    sort($actual);
-    sort($expected_untranslatable);
+    \sort($actual);
+    \sort($expected_untranslatable);
     $this->assertEquals($expected_untranslatable, $actual);
   }
 
@@ -995,7 +995,7 @@ class EntityTranslationTest extends EntityLanguageTestBase {
     // TRANSLATION_EXISTING for all of its translations.
     $storage->resetCache();
     $entity = $storage->load($entity->id());
-    foreach (array_keys($entity->getTranslationLanguages()) as $langcode) {
+    foreach (\array_keys($entity->getTranslationLanguages()) as $langcode) {
       $this->assertEquals(TranslationStatusInterface::TRANSLATION_EXISTING, $entity->getTranslationStatus($langcode));
     }
   }
@@ -1017,14 +1017,14 @@ class EntityTranslationTest extends EntityLanguageTestBase {
     // Test that the default translation object is put into the translation
     // object cache when a new translation object is initialized.
     $entity = \Drupal::entityTypeManager()->getStorage($entity->getEntityTypeId())->loadUnchanged($entity->id());
-    $default_translation_spl_object_hash = spl_object_hash($entity);
-    $this->assertEquals($default_translation_spl_object_hash, spl_object_hash($entity->getTranslation($translation_langcode)->getTranslation($default_langcode)));
+    $default_translation_spl_object_hash = \spl_object_hash($entity);
+    $this->assertEquals($default_translation_spl_object_hash, \spl_object_hash($entity->getTranslation($translation_langcode)->getTranslation($default_langcode)));
 
     // Test that non-default translations are always served from the translation
     // object cache.
     $entity = \Drupal::entityTypeManager()->getStorage($entity->getEntityTypeId())->loadUnchanged($entity->id());
-    $this->assertEquals(spl_object_hash($entity->getTranslation($translation_langcode)), spl_object_hash($entity->getTranslation($translation_langcode)));
-    $this->assertEquals(spl_object_hash($entity->getTranslation($translation_langcode)), spl_object_hash($entity->getTranslation($translation_langcode)->getTranslation($default_langcode)->getTranslation($translation_langcode)));
+    $this->assertEquals(\spl_object_hash($entity->getTranslation($translation_langcode)), \spl_object_hash($entity->getTranslation($translation_langcode)));
+    $this->assertEquals(\spl_object_hash($entity->getTranslation($translation_langcode)), \spl_object_hash($entity->getTranslation($translation_langcode)->getTranslation($default_langcode)->getTranslation($translation_langcode)));
   }
 
 }

@@ -27,24 +27,24 @@ class Statement extends StatementPrefetchIterator implements StatementInterface 
    * See http://bugs.php.net/bug.php?id=45259 for more details.
    */
   protected function getStatement(string $query, ?array &$args = []): object {
-    if (is_array($args) && !empty($args)) {
+    if (\is_array($args) && !empty($args)) {
       // Check if $args is a simple numeric array.
-      if (range(0, count($args) - 1) === array_keys($args)) {
+      if (\range(0, \count($args) - 1) === \array_keys($args)) {
         // In that case, we have unnamed placeholders.
         $count = 0;
         $new_args = [];
         foreach ($args as $value) {
-          if (is_float($value) || is_int($value)) {
-            if (is_float($value)) {
+          if (\is_float($value) || \is_int($value)) {
+            if (\is_float($value)) {
               // Force the conversion to float so as not to loose precision
               // in the automatic cast.
-              $value = sprintf('%F', $value);
+              $value = \sprintf('%F', $value);
             }
-            $query = substr_replace($query, $value, strpos($query, '?'), 1);
+            $query = \substr_replace($query, $value, \strpos($query, '?'), 1);
           }
           else {
             $placeholder = ':db_statement_placeholder_' . $count++;
-            $query = substr_replace($query, $placeholder, strpos($query, '?'), 1);
+            $query = \substr_replace($query, $placeholder, \strpos($query, '?'), 1);
             $new_args[$placeholder] = $value;
           }
         }
@@ -53,11 +53,11 @@ class Statement extends StatementPrefetchIterator implements StatementInterface 
       else {
         // Else, this is using named placeholders.
         foreach ($args as $placeholder => $value) {
-          if (is_float($value) || is_int($value)) {
-            if (is_float($value)) {
+          if (\is_float($value) || \is_int($value)) {
+            if (\is_float($value)) {
               // Force the conversion to float so as not to loose precision
               // in the automatic cast.
-              $value = sprintf('%F', $value);
+              $value = \sprintf('%F', $value);
             }
 
             // We will remove this placeholder from the query as PDO throws an

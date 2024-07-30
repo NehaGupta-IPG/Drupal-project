@@ -69,8 +69,8 @@ class CssCollectionOptimizerLazyUnitTest extends UnitTestCase {
     $mock_optimizer = $this->createMock(AssetOptimizerInterface::class);
     $mock_optimizer->method('optimize')
       ->willReturn(
-        file_get_contents(__DIR__ . '/css_test_files/css_input_with_import.css.optimized.css'),
-        file_get_contents(__DIR__ . '/css_test_files/css_subfolder/css_input_with_import.css.optimized.css')
+        \file_get_contents(__DIR__ . '/css_test_files/css_input_with_import.css.optimized.css'),
+        \file_get_contents(__DIR__ . '/css_test_files/css_subfolder/css_input_with_import.css.optimized.css')
       );
     $mock_theme_manager = $this->createMock(ThemeManagerInterface::class);
     $mock_dependency_resolver = $this->createMock(LibraryDependencyResolverInterface::class);
@@ -127,9 +127,9 @@ class CssCollectionOptimizerLazyUnitTest extends UnitTestCase {
     $mock_optimizer = $this->createMock(AssetOptimizerInterface::class);
     $mock_optimizer->method('optimize')
       ->willReturn(
-        file_get_contents(__DIR__ . '/css_test_files/css_input_with_import.css.optimized.css'),
-        file_get_contents(__DIR__ . '/css_test_files/css_subfolder/css_input_with_import.css.optimized.css'),
-        file_get_contents(__DIR__ . '/css_test_files/css_input_without_import.css.optimized.css')
+        \file_get_contents(__DIR__ . '/css_test_files/css_input_with_import.css.optimized.css'),
+        \file_get_contents(__DIR__ . '/css_test_files/css_subfolder/css_input_with_import.css.optimized.css'),
+        \file_get_contents(__DIR__ . '/css_test_files/css_input_without_import.css.optimized.css')
       );
     $mock_theme_manager = $this->createMock(ThemeManagerInterface::class);
     $mock_dependency_resolver = $this->createMock(LibraryDependencyResolverInterface::class);

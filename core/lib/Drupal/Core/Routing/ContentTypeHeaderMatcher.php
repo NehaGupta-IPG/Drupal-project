@@ -25,18 +25,18 @@ class ContentTypeHeaderMatcher implements FilterInterface {
     $format = $request->getContentTypeFormat();
 
     foreach ($collection as $name => $route) {
-      $supported_formats = array_filter(explode('|', $route->getRequirement('_content_type_format') ?? ''));
+      $supported_formats = \array_filter(\explode('|', $route->getRequirement('_content_type_format') ?? ''));
       if (empty($supported_formats)) {
         // No restriction on the route, so we move the route to the end of the
         // collection by re-adding it. That way generic routes sink down in the
         // list and exact matching routes stay on top.
         $collection->add($name, $route);
       }
-      elseif (!in_array($format, $supported_formats)) {
+      elseif (!\in_array($format, $supported_formats)) {
         $collection->remove($name);
       }
     }
-    if (count($collection)) {
+    if (\count($collection)) {
       return $collection;
     }
     // We do not throw a

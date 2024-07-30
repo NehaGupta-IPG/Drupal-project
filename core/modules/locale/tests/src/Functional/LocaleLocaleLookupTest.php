@@ -89,7 +89,7 @@ class LocaleLocaleLookupTest extends BrowserTestBase {
       'language' => 'fr',
       'translation' => $translation_value,
     ])->save();
-    _locale_refresh_translations(['fr'], [$lid]);
+    \_locale_refresh_translations(['fr'], [$lid]);
 
     // Check that 'count[2]' was fixed for render value.
     $this->drupalGet('');

@@ -19,30 +19,30 @@ class EntityTestRevlogAccessControlHandler extends EntityAccessControlHandler {
    * {@inheritdoc}
    */
   protected function checkAccess(EntityInterface $entity, $operation, AccountInterface $account) {
-    assert($entity instanceof EntityTestWithRevisionLog);
+    \assert($entity instanceof EntityTestWithRevisionLog);
 
     // Access to revisions is based on labels, so access can vary by individual
     // revisions, since the 'name' field can vary by revision.
-    $labels = explode(',', $entity->label());
-    $labels = array_map('trim', $labels);
-    if (in_array($operation, [
+    $labels = \explode(',', $entity->label());
+    $labels = \array_map('trim', $labels);
+    if (\in_array($operation, [
       'view',
       'view label',
       'view all revisions',
       'view revision',
     ], TRUE)) {
-      return AccessResult::allowedIf(in_array($operation, $labels, TRUE));
+      return AccessResult::allowedIf(\in_array($operation, $labels, TRUE));
     }
     elseif ($operation === 'revert') {
       return AccessResult::allowedIf(
         // Disallow reverting to latest.
-        (!$entity->isDefaultRevision() && !$entity->isLatestRevision() && in_array('revert', $labels, TRUE))
+        (!$entity->isDefaultRevision() && !$entity->isLatestRevision() && \in_array('revert', $labels, TRUE))
       );
     }
     elseif ($operation === 'delete revision') {
       return AccessResult::allowedIf(
         // Disallow deleting latest and current revision.
-        (!$entity->isLatestRevision() && in_array('delete revision', $labels, TRUE))
+        (!$entity->isLatestRevision() && \in_array('delete revision', $labels, TRUE))
       );
     }
 

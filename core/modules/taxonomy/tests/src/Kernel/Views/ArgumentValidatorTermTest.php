@@ -74,7 +74,7 @@ class ArgumentValidatorTermTest extends TaxonomyTestBase {
     }
 
     // Pass in an invalid term.
-    $this->assertFalse($view->argument['tid']->setArgument(rand(1000, 10000)));
+    $this->assertFalse($view->argument['tid']->setArgument(\rand(1000, 10000)));
     $this->assertEmpty($view->argument['tid']->getTitle());
     $view->argument['tid']->validated_title = NULL;
     $view->argument['tid']->argument_validated = NULL;
@@ -90,25 +90,25 @@ class ArgumentValidatorTermTest extends TaxonomyTestBase {
     $view->argument['tid']->argument_validated = NULL;
 
     // Check for multiple valid terms separated by commas.
-    $this->assertTrue($view->argument['tid']->setArgument(implode(',', $this->ids)));
-    $this->assertEquals(implode(', ', $this->names), $view->argument['tid']->getTitle());
+    $this->assertTrue($view->argument['tid']->setArgument(\implode(',', $this->ids)));
+    $this->assertEquals(\implode(', ', $this->names), $view->argument['tid']->getTitle());
     $view->argument['tid']->validated_title = NULL;
     $view->argument['tid']->argument_validated = NULL;
 
     // Check for multiple valid terms separated by plus signs.
-    $this->assertTrue($view->argument['tid']->setArgument(implode('+', $this->ids)));
-    $this->assertEquals(implode(' + ', $this->names), $view->argument['tid']->getTitle());
+    $this->assertTrue($view->argument['tid']->setArgument(\implode('+', $this->ids)));
+    $this->assertEquals(\implode(' + ', $this->names), $view->argument['tid']->getTitle());
     $view->argument['tid']->validated_title = NULL;
     $view->argument['tid']->argument_validated = NULL;
 
     // Check for a single invalid term.
-    $this->assertFalse($view->argument['tid']->setArgument(rand(1000, 10000)));
+    $this->assertFalse($view->argument['tid']->setArgument(\rand(1000, 10000)));
     $this->assertEmpty($view->argument['tid']->getTitle());
     $view->argument['tid']->validated_title = NULL;
     $view->argument['tid']->argument_validated = NULL;
 
     // Check for multiple invalid terms.
-    $this->assertFalse($view->argument['tid']->setArgument(implode(',', [rand(1000, 10000), rand(1000, 10000)])));
+    $this->assertFalse($view->argument['tid']->setArgument(\implode(',', [\rand(1000, 10000), \rand(1000, 10000)])));
     $this->assertEmpty($view->argument['tid']->getTitle());
     $view->argument['tid']->validated_title = NULL;
     $view->argument['tid']->argument_validated = NULL;

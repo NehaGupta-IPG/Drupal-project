@@ -67,7 +67,7 @@ abstract class EntityActionDeriverBase extends DeriverBase implements ContainerD
       foreach ($this->getApplicableEntityTypes() as $entity_type_id => $entity_type) {
         $definition = $base_plugin_definition;
         $definition['type'] = $entity_type_id;
-        $definition['label'] = sprintf('%s %s', $base_plugin_definition['action_label'], $entity_type->getSingularLabel());
+        $definition['label'] = \sprintf('%s %s', $base_plugin_definition['action_label'], $entity_type->getSingularLabel());
         $definitions[$entity_type_id] = $definition;
       }
       $this->derivatives = $definitions;
@@ -89,7 +89,7 @@ abstract class EntityActionDeriverBase extends DeriverBase implements ContainerD
    */
   protected function getApplicableEntityTypes() {
     $entity_types = $this->entityTypeManager->getDefinitions();
-    $entity_types = array_filter($entity_types, function (EntityTypeInterface $entity_type) {
+    $entity_types = \array_filter($entity_types, function (EntityTypeInterface $entity_type) {
       return $this->isApplicable($entity_type);
     });
 

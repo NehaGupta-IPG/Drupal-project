@@ -44,7 +44,7 @@ abstract class NodeTitleTestBase extends NodeTestBase {
    *   The theme to test.
    */
   protected function getTheme(): string {
-    return explode('\\', get_class($this))[2];
+    return \explode('\\', \get_class($this))[2];
   }
 
   /**

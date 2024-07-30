@@ -93,7 +93,7 @@ class MenuLinkDefault extends MenuLinkBase implements ContainerFactoryPluginInte
    */
   public function updateLink(array $new_definition_values, $persist) {
     // Filter the list of updates to only those that are allowed.
-    $overrides = array_intersect_key($new_definition_values, $this->overrideAllowed);
+    $overrides = \array_intersect_key($new_definition_values, $this->overrideAllowed);
     // Update the definition.
     $this->pluginDefinition = $overrides + $this->getPluginDefinition();
     if ($persist) {

@@ -370,7 +370,7 @@ class ValidKeysConstraintValidatorTest extends KernelTestBase {
 
     // Reference to the mapping in the schema, to allow adjusting it for testing
     // purposes.
-    assert($this->config->getDataDefinition() instanceof MapDataDefinition);
+    \assert($this->config->getDataDefinition() instanceof MapDataDefinition);
     $mapping = $this->config->getDataDefinition()['mapping'];
 
     // Removing a key-value pair should trigger a validation error.
@@ -416,15 +416,15 @@ class ValidKeysConstraintValidatorTest extends KernelTestBase {
       }
       else {
         // Transform value from string to array.
-        if (is_string($actual_messages[$property_path])) {
+        if (\is_string($actual_messages[$property_path])) {
           $actual_messages[$property_path] = (array) $actual_messages[$violation->getPropertyPath()];
         }
         // And append.
         $actual_messages[$property_path][] = (string) $violation->getMessage();
       }
     }
-    ksort($expected_messages);
-    ksort($actual_messages);
+    \ksort($expected_messages);
+    \ksort($actual_messages);
     $this->assertSame($expected_messages, $actual_messages);
   }
 

@@ -56,7 +56,7 @@ class DisplayAttachmentTest extends UITestBase {
 
     $view = Views::getView('test_attachment_ui');
     $view->initDisplay();
-    $this->assertEquals(['page_1'], array_keys(array_filter($view->displayHandlers->get('attachment_1')->getOption('displays'))), 'The attached displays got saved as expected');
+    $this->assertEquals(['page_1'], \array_keys(\array_filter($view->displayHandlers->get('attachment_1')->getOption('displays'))), 'The attached displays got saved as expected');
 
     $this->drupalGet($attachment_display_url);
     $this->submitForm([
@@ -68,7 +68,7 @@ class DisplayAttachmentTest extends UITestBase {
 
     $view = Views::getView('test_attachment_ui');
     $view->initDisplay();
-    $this->assertEquals(['default', 'page_1'], array_keys($view->displayHandlers->get('attachment_1')->getOption('displays')), 'The attached displays got saved as expected');
+    $this->assertEquals(['default', 'page_1'], \array_keys($view->displayHandlers->get('attachment_1')->getOption('displays')), 'The attached displays got saved as expected');
   }
 
   /**

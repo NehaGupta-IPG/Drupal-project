@@ -150,16 +150,16 @@ class MigrateMessageController extends ControllerBase {
     catch (DatabaseConnectionRefusedException | DatabaseNotFoundException | RequirementsException | \PDOException) {
     }
 
-    $source_id_field_names = array_keys($source_plugin->getIds());
+    $source_id_field_names = \array_keys($source_plugin->getIds());
     $count = 1;
     foreach ($source_id_field_names as $source_id_field_name) {
-      $display_name = preg_replace(
+      $display_name = \preg_replace(
         [
           '/^[Tt]he /',
           '/\.$/',
         ], '', $fields[$source_id_field_name] ?? $source_id_field_name);
       $header[] = [
-        'data' => ucfirst($display_name),
+        'data' => \ucfirst($display_name),
         'field' => 'sourceid' . $count++,
         'class' => [RESPONSIVE_PRIORITY_MEDIUM],
       ];
@@ -199,7 +199,7 @@ class MigrateMessageController extends ControllerBase {
     // Build the rows to display.
     $rows = [];
     $add_explanation = FALSE;
-    $num_ids = count($source_id_field_names);
+    $num_ids = \count($source_id_field_names);
     foreach ($result as $message_row) {
       $new_row = [];
       for ($count = 1; $count <= $num_ids; $count++) {

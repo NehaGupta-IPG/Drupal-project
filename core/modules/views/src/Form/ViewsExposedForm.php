@@ -200,8 +200,8 @@ class ViewsExposedForm extends FormBase implements WorkspaceSafeFormInterface {
     $exposed_form_plugin = $view->display_handler->getPlugin('exposed_form');
     $exposed_form_plugin->exposedFormSubmit($form, $form_state, $exclude);
     foreach ($values as $key => $value) {
-      if (!empty($key) && !in_array($key, $exclude)) {
-        if (is_array($value)) {
+      if (!empty($key) && !\in_array($key, $exclude)) {
+        if (\is_array($value)) {
           // Handle checkboxes, we only want to include the checked options.
           // @todo revisit the need for this when
           //   https://www.drupal.org/node/342316 is resolved.

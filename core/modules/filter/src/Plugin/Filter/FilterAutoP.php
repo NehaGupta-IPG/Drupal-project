@@ -22,7 +22,7 @@ class FilterAutoP extends FilterBase {
    * {@inheritdoc}
    */
   public function process($text, $langcode) {
-    return new FilterProcessResult(_filter_autop($text));
+    return new FilterProcessResult(\_filter_autop($text));
   }
 
   /**

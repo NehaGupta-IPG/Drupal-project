@@ -54,7 +54,7 @@ class ContactCategoryTest extends MigrateSqlSourceTestBase {
     ];
 
     foreach ($tests[0]['expected_data'] as $k => $row) {
-      $row['recipients'] = implode(',', $row['recipients']);
+      $row['recipients'] = \implode(',', $row['recipients']);
       $tests[0]['source_data']['contact'][$k] = $row;
     }
     return $tests;

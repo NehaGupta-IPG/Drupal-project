@@ -57,7 +57,7 @@ trait AssertMailTrait {
    */
   protected function assertMail($name, $value = '', $message = '') {
     $captured_emails = $this->container->get('state')->get('system.test_mail_collector') ?: [];
-    $email = end($captured_emails);
+    $email = \end($captured_emails);
     $this->assertIsArray($email, $message);
     $this->assertArrayHasKey($name, $email, $message);
     $this->assertEquals($value, $email[$name], $message);
@@ -85,13 +85,13 @@ trait AssertMailTrait {
     $string_found = FALSE;
     // Cast MarkupInterface objects to string.
     $string = (string) $string;
-    for ($i = count($mails) - 1; $i >= count($mails) - $email_depth && $i >= 0; $i--) {
+    for ($i = \count($mails) - 1; $i >= \count($mails) - $email_depth && $i >= 0; $i--) {
       $mail = $mails[$i];
       // Normalize whitespace, as we don't know what the mail system might have
       // done. Any run of whitespace becomes a single space.
-      $normalized_mail = preg_replace('/\s+/', ' ', $mail[$field_name]);
-      $normalized_string = preg_replace('/\s+/', ' ', $string);
-      $string_found = str_contains($normalized_mail, $normalized_string);
+      $normalized_mail = \preg_replace('/\s+/', ' ', $mail[$field_name]);
+      $normalized_string = \preg_replace('/\s+/', ' ', $string);
+      $string_found = \str_contains($normalized_mail, $normalized_string);
       if ($string_found) {
         break;
       }
@@ -121,8 +121,8 @@ trait AssertMailTrait {
    */
   protected function assertMailPattern($field_name, $regex, $message = '') {
     $mails = $this->getMails();
-    $mail = end($mails);
-    $regex_found = preg_match("/$regex/", $mail[$field_name]);
+    $mail = \end($mails);
+    $regex_found = \preg_match("/$regex/", $mail[$field_name]);
     if (!$message) {
       $message = new FormattableMarkup('Expected text found in @field of email message: "@expected".', [
         '@field' => $field_name,

@@ -75,7 +75,7 @@ class NodeFieldMultilingualTest extends BrowserTestBase {
    */
   public function testMultilingualNodeForm(): void {
     // Create "Basic page" content.
-    $langcode = language_get_default_langcode('node', 'page');
+    $langcode = \language_get_default_langcode('node', 'page');
     $title_key = 'title[0][value]';
     $title_value = $this->randomMachineName(8);
     $body_key = 'body[0][value]';

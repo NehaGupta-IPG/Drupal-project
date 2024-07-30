@@ -156,8 +156,8 @@ class MappingTest extends KernelTestBase {
       $mapping = $mapping->get($property_path);
     }
 
-    assert($mapping instanceof Mapping);
-    $expected_required_keys = array_values(array_diff($expected_valid_keys, $expected_optional_keys));
+    \assert($mapping instanceof Mapping);
+    $expected_required_keys = \array_values(\array_diff($expected_valid_keys, $expected_optional_keys));
     $this->assertSame($expected_valid_keys, $mapping->getValidKeys());
     $this->assertSame($expected_required_keys, $mapping->getRequiredKeys());
     $this->assertSame($expected_dynamically_valid_keys, $mapping->getDynamicallyValidKeys());

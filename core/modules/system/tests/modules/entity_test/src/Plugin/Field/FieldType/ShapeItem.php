@@ -34,10 +34,10 @@ class ShapeItem extends FieldItemBase {
    */
   public static function propertyDefinitions(FieldStorageDefinitionInterface $field_definition) {
     $properties['shape'] = DataDefinition::create('string')
-      ->setLabel(t('Shape'));
+      ->setLabel(\t('Shape'));
 
     $properties['color'] = DataDefinition::create('string')
-      ->setLabel(t('Color'));
+      ->setLabel(\t('Color'));
 
     return $properties;
   }

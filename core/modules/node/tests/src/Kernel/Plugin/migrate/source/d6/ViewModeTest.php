@@ -32,7 +32,7 @@ class ViewModeTest extends MigrateSqlSourceTestBase {
     // The source data.
     $tests[0]['source_data']['content_node_field_instance'] = [
       [
-        'display_settings' => serialize([
+        'display_settings' => \serialize([
           'weight' => '31',
           'parent' => '',
           'label' => [

@@ -79,7 +79,7 @@ class NumberWidget extends WidgetBase {
     // Set the step for floating point and decimal numbers.
     switch ($this->fieldDefinition->getType()) {
       case 'decimal':
-        $element['#step'] = pow(0.1, $field_settings['scale']);
+        $element['#step'] = \pow(0.1, $field_settings['scale']);
         break;
 
       case 'float':
@@ -88,21 +88,21 @@ class NumberWidget extends WidgetBase {
     }
 
     // Set minimum and maximum.
-    if (is_numeric($field_settings['min'])) {
+    if (\is_numeric($field_settings['min'])) {
       $element['#min'] = $field_settings['min'];
     }
-    if (is_numeric($field_settings['max'])) {
+    if (\is_numeric($field_settings['max'])) {
       $element['#max'] = $field_settings['max'];
     }
 
     // Add prefix and suffix.
     if ($field_settings['prefix']) {
-      $prefixes = explode('|', $field_settings['prefix']);
-      $element['#field_prefix'] = FieldFilteredMarkup::create(array_pop($prefixes));
+      $prefixes = \explode('|', $field_settings['prefix']);
+      $element['#field_prefix'] = FieldFilteredMarkup::create(\array_pop($prefixes));
     }
     if ($field_settings['suffix']) {
-      $suffixes = explode('|', $field_settings['suffix']);
-      $element['#field_suffix'] = FieldFilteredMarkup::create(array_pop($suffixes));
+      $suffixes = \explode('|', $field_settings['suffix']);
+      $element['#field_suffix'] = FieldFilteredMarkup::create(\array_pop($suffixes));
     }
 
     return ['value' => $element];

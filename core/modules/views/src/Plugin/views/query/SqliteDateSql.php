@@ -83,7 +83,7 @@ class SqliteDateSql implements DateSqlInterface {
    * {@inheritdoc}
    */
   public function getDateFormat($field, $format) {
-    $format = strtr($format, static::$replace);
+    $format = \strtr($format, static::$replace);
 
     // SQLite does not have an ISO week substitution string, so it needs special
     // handling.
@@ -102,7 +102,7 @@ class SqliteDateSql implements DateSqlInterface {
     // @see \Drupal\sqlite\Driver\Database\sqlite\Connection::expandArguments()
     // @see http://www.sqlite.org/lang_datefunc.html
     // @see http://www.sqlite.org/lang_expr.html#castexpr
-    if (preg_match('/^(?:%\w)+$/', $format)) {
+    if (\preg_match('/^(?:%\w)+$/', $format)) {
       $expression = "CAST($expression AS NUMERIC)";
     }
     return $expression;

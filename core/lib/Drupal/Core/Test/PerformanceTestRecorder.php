@@ -102,7 +102,7 @@ class PerformanceTestRecorder implements EventSubscriberInterface {
    */
   public static function registerService(string $services_file, bool $persistent): void {
 
-    $services = Yaml::parse(file_get_contents($services_file));
+    $services = Yaml::parse(\file_get_contents($services_file));
     if (isset($services['services']['core.performance.test.recorder'])) {
       // Once the service has been marked as persistent don't change that.
       $persistent = $persistent || $services['services']['core.performance.test.recorder']['arguments'][0];
@@ -112,7 +112,7 @@ class PerformanceTestRecorder implements EventSubscriberInterface {
       'arguments' => [$persistent, $persistent ? '@state' : NULL],
       'tags' => [['name' => 'event_subscriber']],
     ];
-    file_put_contents($services_file, Yaml::dump($services));
+    \file_put_contents($services_file, Yaml::dump($services));
   }
 
 }

@@ -34,7 +34,7 @@ final class AddModeration implements ConfigActionPluginInterface, ContainerFacto
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition): static {
-    assert(is_array($plugin_definition));
+    \assert(\is_array($plugin_definition));
     $target_entity_type = $plugin_definition['target_entity_type'];
 
     return new static(
@@ -50,14 +50,14 @@ final class AddModeration implements ConfigActionPluginInterface, ContainerFacto
    */
   public function apply(string $configName, mixed $value): void {
     $workflow = $this->configManager->loadConfigEntityByName($configName);
-    assert($workflow instanceof WorkflowInterface);
+    \assert($workflow instanceof WorkflowInterface);
 
     $plugin = $workflow->getTypePlugin();
     if (!$plugin instanceof ContentModerationInterface) {
       throw new ConfigActionException("The $this->pluginId config action only works with Content Moderation workflows.");
     }
 
-    assert($value === '*' || is_array($value));
+    \assert($value === '*' || \is_array($value));
     if ($value === '*') {
       /** @var \Drupal\Core\Entity\EntityTypeInterface $definition */
       $definition = $this->entityTypeManager->getDefinition($this->targetEntityType);

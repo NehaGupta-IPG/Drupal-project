@@ -69,7 +69,7 @@ class NestedArray {
   public static function &getValue(array &$array, array $parents, &$key_exists = NULL) {
     $ref = &$array;
     foreach ($parents as $parent) {
-      if (is_array($ref) && \array_key_exists($parent, $ref)) {
+      if (\is_array($ref) && \array_key_exists($parent, $ref)) {
         $ref = &$ref[$parent];
       }
       else {
@@ -220,9 +220,9 @@ class NestedArray {
    * @see NestedArray::getValue()
    */
   public static function unsetValue(array &$array, array $parents, &$key_existed = NULL) {
-    $unset_key = array_pop($parents);
+    $unset_key = \array_pop($parents);
     $ref = &self::getValue($array, $parents, $key_existed);
-    if ($key_existed && is_array($ref) && \array_key_exists($unset_key, $ref)) {
+    if ($key_existed && \is_array($ref) && \array_key_exists($unset_key, $ref)) {
       $key_existed = TRUE;
       unset($ref[$unset_key]);
     }
@@ -331,11 +331,11 @@ class NestedArray {
         // Renumber integer keys as array_merge_recursive() does unless
         // $preserve_integer_keys is set to TRUE. Note that PHP automatically
         // converts array keys that are integer strings (e.g., '1') to integers.
-        if (is_int($key) && !$preserve_integer_keys) {
+        if (\is_int($key) && !$preserve_integer_keys) {
           $result[] = $value;
         }
         // Recurse when both values are arrays.
-        elseif (isset($result[$key]) && is_array($result[$key]) && is_array($value)) {
+        elseif (isset($result[$key]) && \is_array($result[$key]) && \is_array($value)) {
           $result[$key] = self::mergeDeepArray([$result[$key], $value], $preserve_integer_keys);
         }
         // Otherwise, use the latter value, overriding any previous value.
@@ -359,9 +359,9 @@ class NestedArray {
    *   The filtered array.
    */
   public static function filter(array $array, ?callable $callable = NULL) {
-    $array = is_callable($callable) ? array_filter($array, $callable) : array_filter($array);
+    $array = \is_callable($callable) ? \array_filter($array, $callable) : \array_filter($array);
     foreach ($array as &$element) {
-      if (is_array($element)) {
+      if (\is_array($element)) {
         $element = static::filter($element, $callable);
       }
     }

@@ -102,7 +102,7 @@ class RectangleTest extends TestCase {
   public static function providerPhp55RotateDimensions() {
     // The dataset is stored in a .json file because it is very large and causes
     // problems for PHPCS.
-    return json_decode(file_get_contents(__DIR__ . '/fixtures/RectangleTest.json'));
+    return \json_decode(\file_get_contents(__DIR__ . '/fixtures/RectangleTest.json'));
   }
 
 }

@@ -18,7 +18,7 @@ class ViewsTestCacheContext implements CacheContextInterface {
    * {@inheritdoc}
    */
   public static function getLabel() {
-    return t('Views test cache context');
+    return \t('Views test cache context');
   }
 
   /**

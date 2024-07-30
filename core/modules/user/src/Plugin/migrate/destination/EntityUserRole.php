@@ -62,10 +62,10 @@ class EntityUserRole extends EntityConfigBase {
       $plugin_definition,
       $migration,
       $container->get('entity_type.manager')->getStorage($entity_type_id),
-      array_keys($container->get('entity_type.bundle.info')->getBundleInfo($entity_type_id)),
+      \array_keys($container->get('entity_type.bundle.info')->getBundleInfo($entity_type_id)),
       $container->get('language_manager'),
       $container->get('config.factory'),
-      array_keys($container->get('user.permissions')->getPermissions()),
+      \array_keys($container->get('user.permissions')->getPermissions()),
     );
   }
 
@@ -76,16 +76,16 @@ class EntityUserRole extends EntityConfigBase {
     $permissions = $row->getDestinationProperty('permissions') ?? [];
 
     // Get permissions that do not exist on the destination.
-    $invalid_permissions = array_diff($permissions, $this->destinationPermissions);
+    $invalid_permissions = \array_diff($permissions, $this->destinationPermissions);
     if ($invalid_permissions) {
-      sort($invalid_permissions);
+      \sort($invalid_permissions);
       // Log the message in the migration message table.
-      $message = "Permission(s) '" . implode("', '", $invalid_permissions) . "' not found.";
+      $message = "Permission(s) '" . \implode("', '", $invalid_permissions) . "' not found.";
       $this->migration->getIdMap()
         ->saveMessage($row->getSourceIdValues(), $message, MigrationInterface::MESSAGE_WARNING);
     }
 
-    $valid_permissions = array_intersect($permissions, $this->destinationPermissions);
+    $valid_permissions = \array_intersect($permissions, $this->destinationPermissions);
     $row->setDestinationProperty('permissions', $valid_permissions);
     return parent::import($row, $old_destination_id_values);
   }

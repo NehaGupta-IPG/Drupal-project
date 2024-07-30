@@ -51,7 +51,7 @@ class Image implements ImageInterface {
       $this->getToolkit()->setSource($this->source);
       // Defer image file validity check to the toolkit.
       if ($this->getToolkit()->parseFile()) {
-        $this->fileSize = filesize($this->source);
+        $this->fileSize = \filesize($this->source);
       }
     }
   }
@@ -124,8 +124,8 @@ class Image implements ImageInterface {
     $destination = $destination ?: $this->getSource();
     if ($return = $this->getToolkit()->save($destination)) {
       // Clear the cached file size and refresh the image information.
-      clearstatcache(TRUE, $destination);
-      $this->fileSize = filesize($destination);
+      \clearstatcache(TRUE, $destination);
+      $this->fileSize = \filesize($destination);
       $this->source = $destination;
 
       if (\Drupal::service('file_system')->chmod($destination)) {

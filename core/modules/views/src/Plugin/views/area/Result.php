@@ -60,7 +60,7 @@ class Result extends AreaPluginBase {
    * {@inheritdoc}
    */
   public function query() {
-    if (str_contains($this->options['content'], '@total')) {
+    if (\str_contains($this->options['content'], '@total')) {
       $this->view->get_total_rows = TRUE;
     }
   }
@@ -80,7 +80,7 @@ class Result extends AreaPluginBase {
     $per_page = (int) $this->view->getItemsPerPage();
     // @todo Maybe use a possible is views empty functionality.
     // Not every view has total_rows set, use view->result instead.
-    $total = $this->view->total_rows ?? count($this->view->result);
+    $total = $this->view->total_rows ?? \count($this->view->result);
     $label = Html::escape($this->view->storage->label());
     // If there is no result the "start" and "current_record_count" should be
     // equal to 0. To have the same calculation logic, we use a "start offset"
@@ -92,7 +92,7 @@ class Result extends AreaPluginBase {
       $end = $total;
     }
     else {
-      $page_count = (int) ceil($total / $per_page);
+      $page_count = (int) \ceil($total / $per_page);
       $total_count = $current_page * $per_page;
       if ($total_count > $total) {
         $total_count = $total;
@@ -113,7 +113,7 @@ class Result extends AreaPluginBase {
     $replacements['@page_count'] = $page_count;
     // Send the output.
     if (!empty($total) || !empty($this->options['empty'])) {
-      $output .= str_replace(array_keys($replacements), array_values($replacements), $format);
+      $output .= \str_replace(\array_keys($replacements), \array_values($replacements), $format);
       // Return as render array.
       return [
         '#markup' => $output,

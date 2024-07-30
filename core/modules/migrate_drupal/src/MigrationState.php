@@ -220,7 +220,7 @@ class MigrationState {
   public function __construct(MigrateFieldPluginManagerInterface $fieldPluginManager, ModuleHandlerInterface $moduleHandler, MessengerInterface $messenger, TranslationInterface $stringTranslation) {
     $this->fieldPluginManager = $fieldPluginManager;
     $this->moduleHandler = $moduleHandler;
-    $this->enabledModules = array_keys($this->moduleHandler->getModuleList());
+    $this->enabledModules = \array_keys($this->moduleHandler->getModuleList());
     $this->enabledModules[] = 'core';
     $this->messenger = $messenger;
     $this->stringTranslation = $stringTranslation;
@@ -254,7 +254,7 @@ class MigrationState {
   protected function getMigrationStates() {
     // Always instantiate a new YamlDiscovery object so that we always search on
     // the up-to-date list of modules.
-    $discovery = new YamlDiscovery('migrate_drupal', array_map(function ($value) {
+    $discovery = new YamlDiscovery('migrate_drupal', \array_map(function ($value) {
       return $value . '/migrations/state';
     }, $this->moduleHandler->getModuleDirectories()));
     return $discovery->findAll();
@@ -308,12 +308,12 @@ class MigrationState {
       // source_modules are enabled so do the same here.
       if ($module['status']) {
         $source_module = $module['name'];
-        $upgrade_state[$this->getSourceState($version, $source_module)][$source_module] = implode(', ', $this->getDestinationsForSource($version, $source_module));
+        $upgrade_state[$this->getSourceState($version, $source_module)][$source_module] = \implode(', ', $this->getDestinationsForSource($version, $source_module));
       }
 
     }
     foreach ($upgrade_state as $key => $value) {
-      ksort($upgrade_state[$key]);
+      \ksort($upgrade_state[$key]);
     }
     return $upgrade_state;
   }
@@ -356,18 +356,18 @@ class MigrationState {
     foreach ($definitions as $definition) {
       // This is not strict so that we find field plugins with an annotation
       // where the Drupal core version is an integer and when it is a string.
-      if (in_array($version, $definition['core'])) {
+      if (\in_array($version, $definition['core'])) {
         $source_module = $definition['source_module'];
         $destination_module = $definition['destination_module'];
         $discovered_upgrade_paths[$source_module][] = $destination_module;
         $table_data[$source_module][$destination_module][$definition['id']] = $definition['id'];
       }
     }
-    ksort($table_data);
+    \ksort($table_data);
     foreach ($table_data as $source_module => $destination_module_info) {
-      ksort($table_data[$source_module]);
+      \ksort($table_data[$source_module]);
     }
-    $this->discoveredBySource[$version] = array_map('array_unique', $discovered_upgrade_paths);
+    $this->discoveredBySource[$version] = \array_map('array_unique', $discovered_upgrade_paths);
   }
 
   /**
@@ -390,13 +390,13 @@ class MigrationState {
             $state_by_source[$source][] = $state;
             // Add the destination modules.
             $dest_by_source += [$source => []];
-            $dest_by_source[$source] = array_merge($dest_by_source[$source], (array) $destination);
+            $dest_by_source[$source] = \array_merge($dest_by_source[$source], (array) $destination);
           }
         }
       }
     }
-    $this->stateBySource[$version] = array_map('array_unique', $state_by_source);
-    $this->declaredBySource[$version] = array_map('array_unique', $dest_by_source);
+    $this->stateBySource[$version] = \array_map('array_unique', $state_by_source);
+    $this->declaredBySource[$version] = \array_map('array_unique', $dest_by_source);
   }
 
   /**
@@ -421,10 +421,10 @@ class MigrationState {
       // No declared state.
       return MigrationState::NOT_FINISHED;
     }
-    if (in_array(MigrationState::NOT_FINISHED, $this->stateBySource[$version][$source_module], TRUE) || !in_array(MigrationState::FINISHED, $this->stateBySource[$version][$source_module], TRUE)) {
+    if (\in_array(MigrationState::NOT_FINISHED, $this->stateBySource[$version][$source_module], TRUE) || !\in_array(MigrationState::FINISHED, $this->stateBySource[$version][$source_module], TRUE)) {
       return MigrationState::NOT_FINISHED;
     }
-    if (array_diff($destinations, $this->enabledModules)) {
+    if (\array_diff($destinations, $this->enabledModules)) {
       return MigrationState::NOT_FINISHED;
     }
     return MigrationState::FINISHED;
@@ -446,8 +446,8 @@ class MigrationState {
     if (!isset($this->destinations[$version][$source_module])) {
       $this->discoveredBySource[$version] += [$source_module => []];
       $this->declaredBySource[$version] += [$source_module => []];
-      $destination = array_unique(array_merge($this->discoveredBySource[$version][$source_module], $this->declaredBySource[$version][$source_module]));
-      sort($destination);
+      $destination = \array_unique(\array_merge($this->discoveredBySource[$version][$source_module], $this->declaredBySource[$version][$source_module]));
+      \sort($destination);
       $this->destinations[$version][$source_module] = $destination;
     }
     return $this->destinations[$version][$source_module];

@@ -82,11 +82,11 @@ class SearchAdvancedSearchFormTest extends BrowserTestBase {
 
     // Search by node type.
     $this->drupalGet('search/node');
-    $this->submitForm(array_merge($edit, ['type[page]' => 'page']), 'edit-submit--2');
+    $this->submitForm(\array_merge($edit, ['type[page]' => 'page']), 'edit-submit--2');
     $this->assertSession()->pageTextContains($this->node->label());
 
     $this->drupalGet('search/node');
-    $this->submitForm(array_merge($edit, ['type[article]' => 'article']), 'edit-submit--2');
+    $this->submitForm(\array_merge($edit, ['type[article]' => 'article']), 'edit-submit--2');
     $this->assertSession()->pageTextContains('search yielded no results');
   }
 
