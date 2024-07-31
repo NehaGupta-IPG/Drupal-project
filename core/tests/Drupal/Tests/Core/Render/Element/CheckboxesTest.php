@@ -57,7 +57,7 @@ class CheckboxesTest extends UnitTestCase {
    */
   public function testProcessCheckboxes(): void {
     $form_state = new FormState();
-
+    // Create a Checkboxes form element and process it.
     $element = [
       '#type' => 'checkboxes',
       '#options' => [
@@ -65,7 +65,7 @@ class CheckboxesTest extends UnitTestCase {
         'test2' => 'Test2',
         'test3' => 'Test3',
       ],
-      '#value' => ['test1'],
+      '#check_all' => TRUE,
     ];
 
     $complete_form = [
@@ -74,19 +74,32 @@ class CheckboxesTest extends UnitTestCase {
 
     $form_state->setCompleteForm($complete_form);
     $element = Checkboxes::processCheckboxes($element, $form_state, $complete_form);
-
-    $this->assertNotNull($element['test1']);
-    $this->assertNotNull($element['test2']);
-    $this->assertNotNull($element['test3']);
+    // Check that the checkboxes and checkAll button have been created.
+    $this->assertArrayHasKey('test1', $element);
+    $this->assertArrayHasKey('test2', $element);
+    $this->assertArrayHasKey('test3', $element);
     $this->assertEquals($element['test1']['#type'], 'checkbox');
     $this->assertEquals($element['test1']['#title'], 'Test1');
     $this->assertEquals($element['test2']['#type'], 'checkbox');
     $this->assertEquals($element['test2']['#title'], 'Test2');
     $this->assertEquals($element['test3']['#type'], 'checkbox');
     $this->assertEquals($element['test3']['#title'], 'Test3');
-    $this->assertNotNull($element['all_wrapper']);
-    $this->assertNotNull($element['all_wrapper']['check_all']);
-    $this->assertNotNull($element['all_wrapper']['uncheck_all']);
+    $this->assertArrayHasKey('all_wrapper', $element);
+    // Remove check_all (set it to FALSE) and see that the button is gone.
+    $element = [
+      '#type' => 'checkboxes',
+      '#options' => [
+        'test1' => 'Test1',
+      ],
+    ];
+
+    $complete_form = [
+      'test_checkboxes' => $element,
+    ];
+
+    $form_state->setCompleteForm($complete_form);
+    $element = Checkboxes::processCheckboxes($element, $form_state, $complete_form);
+    $this->assertArrayNotHasKey('all_wrapper', $element);
   }
 
 }

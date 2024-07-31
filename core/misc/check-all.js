@@ -20,7 +20,14 @@
             const checkboxes = container.querySelectorAll(
               'input[type="checkbox"]',
             );
-            const checkAll = typeof clickedBtn.dataset.checkAll !== 'undefined';
+            let checkedAmount = 0;
+            checkboxes.forEach(function (checkbox) {
+              if (checkbox.checked) {
+                checkedAmount++;
+              }
+            });
+            // If not all are checked, we should check all.
+            const checkAll = checkedAmount < checkboxes.length;
             checkboxes.forEach(function (checkbox) {
               checkbox.checked = checkAll;
             });
