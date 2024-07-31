@@ -27,7 +27,7 @@ class PathProcessorDecode implements InboundPathProcessorInterface {
    * {@inheritdoc}
    */
   public function processInbound($path, Request $request) {
-    trigger_error('PathProcessorDecode is deprecated in drupal:10.4.0 and is removed from drupal:12.0.0. There is no replacement. See https://www.drupal.org/node/3461941', E_USER_DEPRECATED);
+    trigger_error('PathProcessorDecode is deprecated in drupal:11.1.0 and is removed from drupal:12.0.0. There is no replacement. See https://www.drupal.org/node/3461941', E_USER_DEPRECATED);
     return urldecode($path);
   }
 
