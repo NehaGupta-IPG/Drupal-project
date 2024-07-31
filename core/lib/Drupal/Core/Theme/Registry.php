@@ -966,7 +966,8 @@ class Registry implements DestructableInterface {
    *   Functions grouped by the first prefix.
    */
   public function getPrefixGroupedUserFunctions($prefixes = []) {
-    $functions = \get_defined_functions();
+    // phpcs:ignore SlevomatCodingStandard.Namespaces.FullyQualifiedGlobalFunctions
+    $functions = get_defined_functions();
 
     // If a list of prefixes is supplied, trim down the list to those items
     // only as efficiently as possible.
