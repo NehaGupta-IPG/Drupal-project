@@ -65,14 +65,16 @@ class Time implements TimeInterface {
    * {@inheritdoc}
    */
   public function getCurrentTime() {
-    return \time();
+    // phpcs:ignore SlevomatCodingStandard.Namespaces.FullyQualifiedGlobalFunctions
+    return time();
   }
 
   /**
    * {@inheritdoc}
    */
   public function getCurrentMicroTime() {
-    return \microtime(TRUE);
+    // phpcs:ignore SlevomatCodingStandard.Namespaces.FullyQualifiedGlobalFunctions
+    return microtime(TRUE);
   }
 
   /**
