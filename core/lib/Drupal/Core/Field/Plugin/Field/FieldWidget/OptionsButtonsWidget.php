@@ -43,6 +43,7 @@ class OptionsButtonsWidget extends OptionsWidgetBase {
         '#type' => 'checkboxes',
         '#default_value' => $selected,
         '#options' => $options,
+        '#check_all' => $this->getSetting('check_all_enabled'),
       ];
     }
     else {
@@ -66,6 +67,39 @@ class OptionsButtonsWidget extends OptionsWidgetBase {
     if (!$this->required && !$this->multiple) {
       return $this->t('N/A');
     }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function defaultSettings() {
+    return [
+      'check_all_enabled' => FALSE,
+    ] + parent::defaultSettings();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function settingsForm(array $form, FormStateInterface $form_state) {
+    $element['check_all_enabled'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('Show "Check all / none" button'),
+      '#default_value' => $this->getSetting('check_all_enabled'),
+    ];
+
+    return $element;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function settingsSummary() {
+    $summary = [];
+
+    $summary[] = $this->t('"Check all / none" button enabled: @check_all_enabled', ['@check_all_enabled' => $this->getSetting('check_all_enabled') ? $this->t('Yes') : $this->t('No')]);
+
+    return $summary;
   }
 
 }
