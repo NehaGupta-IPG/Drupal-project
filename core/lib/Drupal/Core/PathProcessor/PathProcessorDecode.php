@@ -17,7 +17,7 @@ use Symfony\Component\HttpFoundation\Request;
  *   controllers should be required to implement this logic themselves. If we
  *   decide to keep this code, remove this TODO.
  *
- * @deprecated in drupal:10.4.0 and is removed from drupal:12.0.0. There is no
+ * @deprecated in drupal:11.1.0 and is removed from drupal:12.0.0. There is no
  *   replacement.
  * @see https://www.drupal.org/node/3461941
  */
