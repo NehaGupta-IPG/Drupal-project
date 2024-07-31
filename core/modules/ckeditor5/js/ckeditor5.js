@@ -702,6 +702,7 @@
   window.addEventListener(
     'dialog:afterclose',
     (e, dialog, element, dialogSettings) => {
+      dialogSettings = dialogSettings || {};
       const options = dialogSettings.options || {};
       const selector = options.selector || '#drupal-modal';
       if (Drupal.ckeditor5.saveCallback.has(selector)) {
