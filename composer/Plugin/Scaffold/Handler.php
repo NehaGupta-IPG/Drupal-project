@@ -174,7 +174,7 @@ class Handler {
     }
 
     // Add the managed scaffold files to .gitignore if applicable.
-    $gitIgnoreManager = new ManageGitIgnore($this->io, getcwd());
+    $gitIgnoreManager = new ManageGitIgnore($this->io, \getcwd());
     $gitIgnoreManager->manageIgnored($scaffold_results, $scaffold_options);
 
     // Call post-scaffold scripts.
@@ -190,7 +190,7 @@ class Handler {
   protected function getVendorPath() {
     $vendor_dir = $this->composer->getConfig()->get('vendor-dir');
     $filesystem = new Filesystem();
-    return $filesystem->normalizePath(realpath($vendor_dir));
+    return $filesystem->normalizePath(\realpath($vendor_dir));
   }
 
   /**

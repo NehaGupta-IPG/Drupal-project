@@ -65,7 +65,7 @@ class Interpolator {
    * @return $this
    */
   public function addData(array $data) {
-    $this->data = array_merge($this->data, $data);
+    $this->data = \array_merge($this->data, $data);
     return $this;
   }
 
@@ -97,7 +97,7 @@ class Interpolator {
   public function interpolate($message, array $extra = [], $default = '') {
     $data = $extra + $this->data;
     $replacements = $this->replacements($message, $data, $default);
-    return strtr($message, $replacements);
+    return \strtr($message, $replacements);
   }
 
   /**
@@ -124,7 +124,7 @@ class Interpolator {
     $tokens = $this->findTokens($message);
     $replacements = [];
     foreach ($tokens as $sourceText => $key) {
-      $replacement_text = array_key_exists($key, $data) ? $data[$key] : $default;
+      $replacement_text = \array_key_exists($key, $data) ? $data[$key] : $default;
       if ($replacement_text !== FALSE) {
         $replacements[$sourceText] = $replacement_text;
       }
@@ -143,7 +143,7 @@ class Interpolator {
    */
   protected function findTokens($message) {
     $reg_ex = '#' . $this->startToken . '([a-zA-Z0-9._-]+)' . $this->endToken . '#';
-    if (!preg_match_all($reg_ex, $message, $matches, PREG_SET_ORDER)) {
+    if (!\preg_match_all($reg_ex, $message, $matches, PREG_SET_ORDER)) {
       return [];
     }
     $tokens = [];

@@ -206,7 +206,7 @@ class OperationData {
    *   Normalized scaffold metadata.
    */
   protected function convertScaffoldMetadata($destination, $value) {
-    if (is_bool($value)) {
+    if (\is_bool($value)) {
       if (!$value) {
         return [self::MODE => SkipOp::ID];
       }
@@ -215,7 +215,7 @@ class OperationData {
     if (empty($value)) {
       throw new \RuntimeException("File mapping {$destination} cannot be empty.");
     }
-    if (is_string($value)) {
+    if (\is_string($value)) {
       $value = [self::PATH => $value];
     }
     // If there is no 'mode', but there is an 'append' or a 'prepend' path,

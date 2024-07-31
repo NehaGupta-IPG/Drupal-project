@@ -123,7 +123,7 @@ class Config {
     // Get the root package config.
     $package_config = $this->rootPackage->getExtra();
     if (isset($package_config['drupal-core-vendor-hardening'])) {
-      $this->configData = array_change_key_case($package_config['drupal-core-vendor-hardening'], CASE_LOWER);
+      $this->configData = \array_change_key_case($package_config['drupal-core-vendor-hardening'], CASE_LOWER);
     }
 
     // Find the packages which should not be cleaned up.
@@ -132,13 +132,13 @@ class Config {
     });
 
     // Ensure the values are arrays.
-    $this->configData = array_map(function ($paths) {
+    $this->configData = \array_map(function ($paths) {
       return (array) $paths;
     }, $this->configData);
 
     // Merge root config with defaults.
-    foreach (array_change_key_case(static::$defaultConfig, CASE_LOWER) as $package => $paths) {
-      $this->configData[$package] = array_merge(
+    foreach (\array_change_key_case(static::$defaultConfig, CASE_LOWER) as $package => $paths) {
+      $this->configData[$package] = \array_merge(
         $this->configData[$package] ?? [],
         $paths);
     }
@@ -159,7 +159,7 @@ class Config {
    *   Array of paths to remove, relative to the package.
    */
   public function getPathsForPackage($package) {
-    $package = strtolower($package);
+    $package = \strtolower($package);
     $paths = $this->getAllCleanupPaths();
     return $paths[$package] ?? [];
   }

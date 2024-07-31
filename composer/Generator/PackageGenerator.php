@@ -25,7 +25,7 @@ class PackageGenerator {
    * PackageGenerator constructor.
    */
   public function __construct() {
-    $this->generatedProjectBaseDir = dirname(__DIR__) . '/Metapackage';
+    $this->generatedProjectBaseDir = \dirname(__DIR__) . '/Metapackage';
   }
 
   /**
@@ -90,14 +90,14 @@ class PackageGenerator {
     // Load the existing composer.json file for drupal/core-recommended.
     $relative_path = $builder->getPath() . '/composer.json';
     $composer_json_path = $this->generatedProjectBaseDir . '/' . $relative_path;
-    $original_composer_json = file_exists($composer_json_path) ? file_get_contents($composer_json_path) : '';
+    $original_composer_json = \file_exists($composer_json_path) ? \file_get_contents($composer_json_path) : '';
 
     // Get the composer.json file from the builder.
     $composer_json_data = $builder->getPackage();
     $updated_composer_json = static::encode($composer_json_data);
 
     // Exit early if nothing changed.
-    if (trim($original_composer_json, " \t\r\0\x0B") == trim($updated_composer_json, " \t\r\0\x0B")) {
+    if (\trim($original_composer_json, " \t\r\0\x0B") == \trim($updated_composer_json, " \t\r\0\x0B")) {
       return FALSE;
     }
 
@@ -106,8 +106,8 @@ class PackageGenerator {
 
     // Write the composer.json file back to disk.
     $fs = new Filesystem();
-    $fs->ensureDirectoryExists(dirname($composer_json_path));
-    file_put_contents($composer_json_path, $updated_composer_json);
+    $fs->ensureDirectoryExists(\dirname($composer_json_path));
+    \file_put_contents($composer_json_path, $updated_composer_json);
 
     return TRUE;
   }
@@ -122,7 +122,7 @@ class PackageGenerator {
    *   Encoded version of provided json data.
    */
   public static function encode($composer_json_data) {
-    return json_encode($composer_json_data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) . "\n";
+    return \json_encode($composer_json_data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) . "\n";
   }
 
 }

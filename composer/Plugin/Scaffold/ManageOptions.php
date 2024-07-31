@@ -81,9 +81,9 @@ class ManageOptions {
   protected function ensureLocations() {
     $fs = new Filesystem();
     $locations = $this->getOptions()->locations() + ['web_root' => './'];
-    $locations = array_map(function ($location) use ($fs) {
+    $locations = \array_map(function ($location) use ($fs) {
       $fs->ensureDirectoryExists($location);
-      $location = realpath($location);
+      $location = \realpath($location);
       return $location;
     }, $locations);
     return $locations;

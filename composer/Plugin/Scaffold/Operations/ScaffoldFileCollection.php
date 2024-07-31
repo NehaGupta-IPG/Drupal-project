@@ -82,7 +82,7 @@ class ScaffoldFileCollection implements \IteratorAggregate {
   public function filterFiles(array $files_to_filter) {
     foreach ($this->scaffoldFilesByProject as $project_name => $scaffold_files) {
       foreach ($scaffold_files as $destination_rel_path => $scaffold_file) {
-        if (in_array($destination_rel_path, $files_to_filter, TRUE)) {
+        if (\in_array($destination_rel_path, $files_to_filter, TRUE)) {
           unset($scaffold_files[$destination_rel_path]);
         }
       }

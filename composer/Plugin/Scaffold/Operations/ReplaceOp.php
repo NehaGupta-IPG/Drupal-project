@@ -51,7 +51,7 @@ class ReplaceOp extends AbstractOperation {
    * {@inheritdoc}
    */
   protected function generateContents() {
-    return file_get_contents($this->source->fullPath());
+    return \file_get_contents($this->source->fullPath());
   }
 
   /**
@@ -62,7 +62,7 @@ class ReplaceOp extends AbstractOperation {
     $destination_path = $destination->fullPath();
     // Do nothing if overwrite is 'false' and a file already exists at the
     // destination.
-    if ($this->overwrite === FALSE && file_exists($destination_path)) {
+    if ($this->overwrite === FALSE && \file_exists($destination_path)) {
       $interpolator = $destination->getInterpolator();
       $io->write($interpolator->interpolate("  - Skip <info>[dest-rel-path]</info> because it already exists and overwrite is <comment>false</comment>."));
       return new ScaffoldResult($destination, FALSE);
@@ -71,7 +71,7 @@ class ReplaceOp extends AbstractOperation {
     // Get rid of the destination if it exists, and make sure that
     // the directory where it's going to be placed exists.
     $fs->remove($destination_path);
-    $fs->ensureDirectoryExists(dirname($destination_path));
+    $fs->ensureDirectoryExists(\dirname($destination_path));
     if ($options->symlink()) {
       return $this->symlinkScaffold($destination, $io);
     }
@@ -92,7 +92,7 @@ class ReplaceOp extends AbstractOperation {
   protected function copyScaffold(ScaffoldFilePath $destination, IOInterface $io) {
     $interpolator = $destination->getInterpolator();
     $this->source->addInterpolationData($interpolator);
-    if (file_put_contents($destination->fullPath(), $this->contents()) === FALSE) {
+    if (\file_put_contents($destination->fullPath(), $this->contents()) === FALSE) {
       throw new \RuntimeException($interpolator->interpolate("Could not copy source file <info>[src-rel-path]</info> to <info>[dest-rel-path]</info>!"));
     }
     $io->write($interpolator->interpolate("  - Copy <info>[dest-rel-path]</info> from <info>[src-rel-path]</info>"));

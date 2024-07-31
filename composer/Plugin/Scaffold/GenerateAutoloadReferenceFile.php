@@ -44,7 +44,7 @@ final class GenerateAutoloadReferenceFile {
     // autoload.php) to the vendor directory.
     $fs = new Filesystem();
     $relative_autoload_path = $fs->findShortestPath($autoload_path->fullPath(), "$vendor/autoload.php");
-    file_put_contents($autoload_path->fullPath(), static::autoLoadContents($relative_autoload_path));
+    \file_put_contents($autoload_path->fullPath(), static::autoLoadContents($relative_autoload_path));
     return new ScaffoldResult($autoload_path, TRUE);
   }
 
@@ -64,8 +64,8 @@ final class GenerateAutoloadReferenceFile {
   public static function autoloadFileCommitted(IOInterface $io, $package_name, $web_root) {
     $autoload_path = static::autoloadPath($package_name, $web_root);
     $autoload_file = $autoload_path->fullPath();
-    $location = dirname($autoload_file);
-    if (!file_exists($autoload_file)) {
+    $location = \dirname($autoload_file);
+    if (!\file_exists($autoload_file)) {
       return FALSE;
     }
     return Git::checkTracked($io, $autoload_file, $location);
@@ -99,7 +99,7 @@ final class GenerateAutoloadReferenceFile {
    *   Return the contents for the autoload.php.
    */
   protected static function autoLoadContents($relative_autoload_path) {
-    $relative_autoload_path = preg_replace('#^\./#', '', $relative_autoload_path);
+    $relative_autoload_path = \preg_replace('#^\./#', '', $relative_autoload_path);
     return <<<EOF
 <?php
 

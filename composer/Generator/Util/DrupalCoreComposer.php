@@ -117,7 +117,7 @@ class DrupalCoreComposer {
    *   The contents of the json data for the specified file.
    */
   protected static function loadJsonFromPath($path) {
-    return file_exists($path) ? json_decode(file_get_contents($path), TRUE) : [];
+    return \file_exists($path) ? \json_decode(\file_get_contents($path), TRUE) : [];
   }
 
 }

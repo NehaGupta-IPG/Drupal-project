@@ -29,7 +29,7 @@ class Composer {
    */
   public static function generateMetapackages(Event $event): void {
     $generator = new PackageGenerator();
-    $generator->generate($event->getIO(), getcwd());
+    $generator->generate($event->getIO(), \getcwd());
   }
 
   /**
@@ -40,7 +40,7 @@ class Composer {
    */
   public static function generateComponentPackages(Event $event): void {
     $generator = new ComponentGenerator();
-    $generator->generate($event, getcwd());
+    $generator->generate($event, \getcwd());
   }
 
   /**
@@ -61,9 +61,9 @@ class Composer {
 
     // Rewrite Drupal.php with the provided version string.
     $drupal_static_path = "$root/core/lib/Drupal.php";
-    $drupal_static_source = file_get_contents($drupal_static_path);
-    $drupal_static_source = preg_replace('#const VERSION = [^;]*#', "const VERSION = '$version'", $drupal_static_source);
-    file_put_contents($drupal_static_path, $drupal_static_source);
+    $drupal_static_source = \file_get_contents($drupal_static_path);
+    $drupal_static_source = \preg_replace('#const VERSION = [^;]*#', "const VERSION = '$version'", $drupal_static_source);
+    \file_put_contents($drupal_static_path, $drupal_static_source);
 
     // Update the template project stability to match the version we set.
     static::setTemplateProjectStability($root, $version);
@@ -82,10 +82,10 @@ class Composer {
 
     $templateProjectPaths = static::composerSubprojectPaths($root, 'Template');
     foreach ($templateProjectPaths as $path) {
-      $dir = dirname($path);
-      exec("composer --working-dir=$dir config minimum-stability $stability", $output, $status);
+      $dir = \dirname($path);
+      \exec("composer --working-dir=$dir config minimum-stability $stability", $output, $status);
       if ($status) {
-        throw new \Exception('Could not set minimum-stability for template project ' . basename($dir));
+        throw new \Exception('Could not set minimum-stability for template project ' . \basename($dir));
       }
     }
   }
@@ -96,7 +96,7 @@ class Composer {
    * Throw an exception if Composer is too old.
    */
   public static function ensureComposerVersion(): void {
-    $composerVersion = method_exists(ComposerApp::class, 'getVersion') ?
+    $composerVersion = \method_exists(ComposerApp::class, 'getVersion') ?
       ComposerApp::getVersion() : ComposerApp::VERSION;
     if (Comparator::lessThan($composerVersion, '2.3.6')) {
       throw new \RuntimeException("Drupal core development requires Composer 2.3.6, but Composer $composerVersion is installed. Run 'composer self-update'.");
@@ -110,7 +110,7 @@ class Composer {
    *   A branch name, e.g. 8.9.x or 9.0.x.
    */
   public static function drupalVersionBranch(): string {
-    return preg_replace('#\.[0-9]+-dev#', '.x-dev', \Drupal::VERSION);
+    return \preg_replace('#\.[0-9]+-dev#', '.x-dev', \Drupal::VERSION);
   }
 
   /**

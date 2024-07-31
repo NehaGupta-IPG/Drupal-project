@@ -71,7 +71,7 @@ class ScaffoldFilePath {
     // not exist yet.
     $fs = new Filesystem();
     if (!$fs->isAbsolutePath($this->fullPath)) {
-      $this->fullPath = getcwd() . '/' . $this->fullPath;
+      $this->fullPath = \getcwd() . '/' . $this->fullPath;
     }
   }
 
@@ -131,10 +131,10 @@ class ScaffoldFilePath {
     }
     // Calculate the full path to the source scaffold file.
     $source_full_path = $package_path . '/' . $source;
-    if (!file_exists($source_full_path)) {
+    if (!\file_exists($source_full_path)) {
       throw new \RuntimeException("Scaffold file {$source} not found in package {$package_name}.");
     }
-    if (is_dir($source_full_path)) {
+    if (\is_dir($source_full_path)) {
       throw new \RuntimeException("Scaffold file {$source} in package {$package_name} is a directory; only files may be scaffolded.");
     }
     return new self('src', $package_name, $source, $source_full_path);

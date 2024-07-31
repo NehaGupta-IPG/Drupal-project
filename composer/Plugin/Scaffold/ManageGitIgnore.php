@@ -61,8 +61,8 @@ class ManageGitIgnore {
       if (!$is_ignored) {
         $is_tracked = Git::checkTracked($this->io, $path, $this->dir);
         if (!$is_tracked && $scaffoldResult->isManaged()) {
-          $dir = realpath(dirname($path));
-          $name = basename($path);
+          $dir = \realpath(\dirname($path));
+          $name = \basename($path);
           $add_to_git_ignore[$dir][] = '/' . $name;
         }
       }
@@ -108,20 +108,20 @@ class ManageGitIgnore {
    *   Entries to write to .gitignore file.
    */
   protected function addToGitIgnore($dir, array $entries) {
-    sort($entries);
+    \sort($entries);
     $git_ignore_path = $dir . '/.gitignore';
     $contents = '';
 
     // Appending to existing .gitignore files.
-    if (file_exists($git_ignore_path)) {
-      $contents = file_get_contents($git_ignore_path);
-      if (!empty($contents) && !str_ends_with($contents, "\n")) {
+    if (\file_exists($git_ignore_path)) {
+      $contents = \file_get_contents($git_ignore_path);
+      if (!empty($contents) && !\str_ends_with($contents, "\n")) {
         $contents .= "\n";
       }
     }
 
-    $contents .= implode("\n", $entries);
-    file_put_contents($git_ignore_path, $contents);
+    $contents .= \implode("\n", $entries);
+    \file_put_contents($git_ignore_path, $contents);
   }
 
 }

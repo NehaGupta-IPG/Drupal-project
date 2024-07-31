@@ -118,13 +118,13 @@ EOF;
   protected static function writeFile($directory, $filename, $contents, $force) {
     $file_path = $directory . DIRECTORY_SEPARATOR . $filename;
     // Don't overwrite if the file exists unless forced.
-    if (file_exists($file_path) && !$force) {
+    if (\file_exists($file_path) && !$force) {
       return TRUE;
     }
     // Try to write the file. This can fail if concurrent requests are both
     // trying to write a the same time.
-    if (@file_put_contents($file_path, $contents)) {
-      return @chmod($file_path, 0444);
+    if (@\file_put_contents($file_path, $contents)) {
+      return @\chmod($file_path, 0444);
     }
     return FALSE;
   }

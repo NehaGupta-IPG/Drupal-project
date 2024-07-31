@@ -51,7 +51,7 @@ class ScaffoldOptions {
    *   True if scaffold options have been declared
    */
   public static function hasOptions(array $extras) {
-    return array_key_exists('drupal-scaffold', $extras);
+    return \array_key_exists('drupal-scaffold', $extras);
   }
 
   /**
@@ -134,7 +134,7 @@ class ScaffoldOptions {
    *   True if the specified named location exist.
    */
   protected function hasLocation($name) {
-    return array_key_exists($name, $this->locations());
+    return \array_key_exists($name, $this->locations());
   }
 
   /**
