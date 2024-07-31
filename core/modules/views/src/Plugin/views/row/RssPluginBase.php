@@ -63,9 +63,9 @@ abstract class RssPluginBase extends RowPluginBase {
    *   The entity type manager.
    * @param \Drupal\Core\Entity\EntityDisplayRepositoryInterface $entity_display_repository
    *   The entity display repository.
-   * @param \Drupal\Core\Language\LanguageManagerInterface $language_manager
+   * @param \Drupal\Core\Language\LanguageManagerInterface|null $language_manager
    *   The language manager.
-   * @param \Drupal\Core\Entity\EntityRepositoryInterface $entity_repository
+   * @param \Drupal\Core\Entity\EntityRepositoryInterface|null $entity_repository
    *   The entity repository.
    */
   public function __construct(array $configuration, $plugin_id, $plugin_definition, EntityTypeManagerInterface $entity_type_manager, EntityDisplayRepositoryInterface $entity_display_repository, LanguageManagerInterface $language_manager = NULL, EntityRepositoryInterface $entity_repository = NULL) {
@@ -74,12 +74,12 @@ abstract class RssPluginBase extends RowPluginBase {
     $this->entityTypeManager = $entity_type_manager;
     $this->entityDisplayRepository = $entity_display_repository;
     if ($language_manager === NULL) {
-      @trigger_error('The language_manager service must be passed to RssPluginBase::__construct(), it is required before Drupal 10.0.0.', E_USER_DEPRECATED);
+      @trigger_error('The language_manager service must be passed to RssPluginBase::__construct(), it is required before Drupal 10.0.0.', E_USER_WARNING);
       $language_manager = \Drupal::service('language_manager');
     }
     $this->languageManager = $language_manager;
     if ($entity_repository === NULL) {
-      @trigger_error('The entity.repository service must be passed to RssPluginBase::__construct(), it is required before Drupal 10.0.0.', E_USER_DEPRECATED);
+      @trigger_error('The entity.repository service must be passed to RssPluginBase::__construct(), it is required before Drupal 10.0.0.', E_USER_WARNING);
       $entity_repository = \Drupal::service('entity.repository');
     }
     $this->entityRepository = $entity_repository;
