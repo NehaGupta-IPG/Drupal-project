@@ -416,6 +416,8 @@ class LocaleTranslationUiTest extends BrowserTestBase {
     $langcode = 'xx';
     // The English name for the language. This will be translated.
     $name = $this->randomMachineName(16);
+    // The context for the translated string.
+    $context = $this->randomMachineName(16);
     // This will be the translation of $name.
     $translation = $this->randomMachineName(16);
 
@@ -440,16 +442,17 @@ class LocaleTranslationUiTest extends BrowserTestBase {
     $this->submitForm($edit, 'Add custom language');
 
     // Add string.
-    $this->t($name, [], ['langcode' => $langcode])->render();
+    $this->t($name, [], ['context' => $context, 'langcode' => $langcode])->render();
     // Reset locale cache.
     $this->container->get('string_translation')->reset();
     $this->drupalLogout();
 
-    // Search for the name.
+    // Search for the name and context.
     $this->drupalLogin($translate_user);
     $search = [
       'string' => $name,
       'langcode' => $langcode,
+      'context' => $context,
       'translation' => 'all',
     ];
     $this->drupalGet('admin/config/regional/translate');
@@ -458,6 +461,19 @@ class LocaleTranslationUiTest extends BrowserTestBase {
     // could be found, so this is not a false assert. See how
     // pageTextNotContains succeeds later.
     $this->assertSession()->pageTextContains($name);
+
+    // Ensure untranslated string doesn't appear if searching for 'unknown
+    // context'.
+    $unknown_context = $this->randomMachineName(16);
+    $search = [
+      'string' => $name,
+      'langcode' => $langcode,
+      'context' => $unknown_context,
+      'translation' => 'translated',
+    ];
+    $this->drupalGet('admin/config/regional/translate');
+    $this->submitForm($search, 'Filter');
+    $this->assertSession()->pageTextContains('No strings available.');
 
     // Ensure untranslated string doesn't appear if searching on 'only
     // translated strings'.
