@@ -568,11 +568,11 @@ class LocaleTranslationUiTest extends BrowserTestBase {
     // Register strings with contexts
     t($str_with_context, [], [
       'context' => $context,
-      'langcode' => $langcode
+      'langcode' => $langcode,
     ])->render();
     t($str_with_context2, [], [
       'context' => $context2,
-      'langcode' => $langcode
+      'langcode' => $langcode,
     ])->render();
 
     // Reset locale cache again.
