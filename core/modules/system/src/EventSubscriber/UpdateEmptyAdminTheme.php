@@ -13,7 +13,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
  * @internal
  *   Tagged services are internal.
  */
-class UpdateEmptyAdminTheme implements EventSubscriberInterface {
+final class UpdateEmptyAdminTheme implements EventSubscriberInterface {
 
   public function __construct(private readonly RequestStack $requestStack) {
   }
@@ -29,7 +29,7 @@ class UpdateEmptyAdminTheme implements EventSubscriberInterface {
     if ($saved_config->getName() === 'system.theme' && $saved_config->get('admin') === '') {
       $saved_config->set('admin', NULL)->save(TRUE);
       if (!str_contains($this->requestStack->getMainRequest()->getBaseUrl(), 'update.php')) {
-        @trigger_error("Setting the admin theme to an empty string is deprecated in drupal:11.0.0 and will not be allowed in drupal:12.0.0. See https://www.drupal.org/node/3441503", E_USER_DEPRECATED);
+        @trigger_error("Setting the admin theme to an empty string is deprecated in drupal:11.1.0 and will not be allowed in drupal:12.0.0. See https://www.drupal.org/node/3441503", E_USER_DEPRECATED);
       }
     }
   }
