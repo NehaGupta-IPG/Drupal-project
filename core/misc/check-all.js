@@ -10,10 +10,10 @@
    */
   Drupal.behaviors.checkAll = {
     attach(context) {
-      once('check-all-btn', '.form-checkboxes', context).forEach(
+      once('button--check-all', '.form-checkboxes', context).forEach(
         (container) => {
           container.addEventListener('click', function (e) {
-            const clickedBtn = e.target.closest('.check-all-btn');
+            const clickedBtn = e.target.closest('.button--check-all');
 
             if (!clickedBtn) return;
 
