@@ -469,7 +469,7 @@ class LocaleTranslationUiTest extends BrowserTestBase {
       'string' => $name,
       'langcode' => $langcode,
       'context' => $unknown_context,
-      'translation' => 'translated',
+      'translation' => 'all',
     ];
     $this->drupalGet('admin/config/regional/translate');
     $this->submitForm($search, 'Filter');
