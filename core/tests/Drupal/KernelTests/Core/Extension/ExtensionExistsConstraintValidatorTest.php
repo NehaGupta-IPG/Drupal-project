@@ -85,12 +85,11 @@ class ExtensionExistsConstraintValidatorTest extends KernelTestBase {
   }
 
   /**
-   * Tests the ExtensionExistsConstraint having 'mustBeInstalled' option set to FALSE.
+   * Tests the validator when the extension does not have to be installed.
    */
   public function testExtensionDoesNotNeedToBeInstalled(): void {
-    // Set the constraint with 'mustBeInstalled' option. We are setting
-    // this option to false here which means that the extension should
-    // be present in the file system but need not be installed.
+    // Set the constraint 'mustBeInstalled' to indicate that the module should
+    // be present in the file system but it does not need to be installed.
     $definition = DataDefinition::create('string')
       ->setConstraints([
         'ExtensionExists' => [
@@ -108,10 +107,12 @@ class ExtensionExistsConstraintValidatorTest extends KernelTestBase {
     $this->assertCount(1, $violations);
     $this->assertSame("Module 'module_not_in_filesystem' was not found.", (string) $violations->get(0)->getMessage());
 
+    // Test that an installed module passes validation..
     $data->setValue('user');
     $violations = $data->validate();
     $this->assertCount(0, $violations);
 
+    // Test again for a theme.
     $definition->setConstraints([
       'ExtensionExists' => [
         'type' => 'theme',
@@ -125,6 +126,7 @@ class ExtensionExistsConstraintValidatorTest extends KernelTestBase {
     $this->assertCount(1, $violations);
     $this->assertSame("Theme 'theme_not_in_filesystem' was not found.", (string) $violations->get(0)->getMessage());
 
+    // Test that an installed theme passes validation.
     $data = $typed_data->create($definition, 'stark');
     $violations = $data->validate();
     $this->assertCount(0, $violations);

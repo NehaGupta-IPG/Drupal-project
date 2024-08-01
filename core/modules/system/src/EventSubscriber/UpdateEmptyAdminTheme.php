@@ -8,7 +8,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
- * Updates system.theme:admin config if it's still at the default empty string.
+ * Updates system.theme:admin config when it is an empty string.
  *
  * @internal
  *   Tagged services are internal.
