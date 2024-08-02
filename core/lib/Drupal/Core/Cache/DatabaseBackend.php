@@ -494,6 +494,11 @@ class DatabaseBackend implements CacheBackendInterface {
    *   An ASCII-encoded cache ID that is at most 255 characters long.
    */
   protected function normalizeCid($cid) {
+    // Trim trailing spaces from the cache ID because MySQL does not take
+    // trailing spaces into account with primary key indexes, at least on
+    // certain collations.
+    // @see https://dev.mysql.com/doc/refman/8.4/en/charset-binary-collations.html
+    $cid = rtrim($cid);
     // Nothing to do if the ID is a US ASCII string of 255 characters or less.
     // Additionally check for trailing spaces in the cache ID because MySQL
     // may or may not take these into account when making comparisons.
