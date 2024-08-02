@@ -160,12 +160,13 @@ abstract class RssPluginBase extends RowPluginBase {
       $view_mode = $this->entityTypeManager
         ->getStorage('entity_view_mode')
         ->load($this->entityTypeId . '.' . $this->options['view_mode']);
-
-      if ($view_mode) {
-        $dependencies[$view_mode->getConfigDependencyKey()][] = $view_mode->getConfigDependencyName();
-      }
     }
     catch (InvalidPluginDefinitionException | PluginNotFoundException $e) {
+      $view_mode = NULL;
+    }
+
+    if ($view_mode) {
+      $dependencies[$view_mode->getConfigDependencyKey()][] = $view_mode->getConfigDependencyName();
     }
 
     return $dependencies;
