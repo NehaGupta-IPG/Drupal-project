@@ -3,6 +3,7 @@
 namespace Drupal\link\Plugin\Field\FieldFormatter;
 
 use Drupal\Component\Utility\Unicode;
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Field\Attribute\FieldFormatter;
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
@@ -45,8 +46,22 @@ class LinkSeparateFormatter extends LinkFormatter {
     $settings = $this->getSettings();
 
     foreach ($items as $delta => $item) {
+      // Run access check if specified.
+      if (!empty($settings['access_check'])) {
+        $access = $this->checkAccess($item);
+        CacheableMetadata::createFromRenderArray($element)
+          ->merge(CacheableMetadata::createFromObject($access))
+          ->applyTo($element);
+
+        if (!$access->isAllowed()) {
+          // Access is not allowed, skip this item.
+          continue;
+        }
+      }
+
       // By default use the full URL as the link text.
-      $url = $this->buildUrl($item);
+      /** @var \Drupal\Core\Url $url */
+      $url = $item->_url;
       $link_title = $url->toString();
 
       // If the link text field value is available, use it for the text.

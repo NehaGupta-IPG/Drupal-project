@@ -3,6 +3,9 @@
 namespace Drupal\link\Plugin\Field\FieldFormatter;
 
 use Drupal\Component\Utility\Unicode;
+use Drupal\Core\Access\AccessManagerInterface;
+use Drupal\Core\Access\AccessResult;
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Field\Attribute\FieldFormatter;
 use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Field\FieldItemListInterface;
@@ -34,6 +37,13 @@ class LinkFormatter extends FormatterBase {
   protected $pathValidator;
 
   /**
+   * The access manager.
+   *
+   * @var \Drupal\Core\Access\AccessManagerInterface
+   */
+  protected $accessManager;
+
+  /**
    * Constructs a new LinkFormatter.
    *
    * @param string $plugin_id
@@ -52,10 +62,13 @@ class LinkFormatter extends FormatterBase {
    *   Third party settings.
    * @param \Drupal\Core\Path\PathValidatorInterface $path_validator
    *   The path validator service.
+   * @param \Drupal\Core\Access\AccessManagerInterface $access_manager
+   *   The access manager.
    */
-  public function __construct($plugin_id, $plugin_definition, FieldDefinitionInterface $field_definition, array $settings, $label, $view_mode, array $third_party_settings, PathValidatorInterface $path_validator) {
+  public function __construct($plugin_id, $plugin_definition, FieldDefinitionInterface $field_definition, array $settings, $label, $view_mode, array $third_party_settings, PathValidatorInterface $path_validator, AccessManagerInterface $access_manager) {
     parent::__construct($plugin_id, $plugin_definition, $field_definition, $settings, $label, $view_mode, $third_party_settings);
     $this->pathValidator = $path_validator;
+    $this->accessManager = $access_manager;
   }
 
   /**
@@ -68,6 +81,7 @@ class LinkFormatter extends FormatterBase {
       'url_plain' => '',
       'rel' => '',
       'target' => '',
+      'access_check' => '',
     ] + parent::defaultSettings();
   }
 
@@ -119,6 +133,12 @@ class LinkFormatter extends FormatterBase {
       '#return_value' => '_blank',
       '#default_value' => $this->getSetting('target'),
     ];
+    $elements['access_check'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('Run access checks'),
+      '#description' => $this->t('Prevents inaccessible links from being displayed.'),
+      '#default_value' => $this->getSetting('access_check'),
+    ];
 
     return $elements;
   }
@@ -150,6 +170,9 @@ class LinkFormatter extends FormatterBase {
     if (!empty($settings['target'])) {
       $summary[] = $this->t('Open link in new window');
     }
+    if (!empty($settings['access_check'])) {
+      $summary[] = $this->t('Run access checks');
+    }
 
     return $summary;
   }
@@ -159,14 +182,39 @@ class LinkFormatter extends FormatterBase {
    *
    * @phpstan-param \Drupal\Core\Field\FieldItemListInterface<\Drupal\link\LinkItemInterface> $items
    */
+  public function prepareView(array $entities_items) {
+    foreach ($entities_items as $items) {
+      foreach ($items as $item) {
+        $item->_url = $this->buildUrl($item);
+      }
+    }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function viewElements(FieldItemListInterface $items, $langcode) {
     $element = [];
     $entity = $items->getEntity();
     $settings = $this->getSettings();
 
     foreach ($items as $delta => $item) {
+      // Run access check if specified.
+      if (!empty($settings['access_check'])) {
+        $access = $this->checkAccess($item);
+        CacheableMetadata::createFromRenderArray($element)
+          ->merge(CacheableMetadata::createFromObject($access))
+          ->applyTo($element);
+
+        if (!$access->isAllowed()) {
+          // Access is not allowed, skip this item.
+          continue;
+        }
+      }
+
       // By default use the full URL as the link text.
-      $url = $this->buildUrl($item);
+      /** @var \Drupal\Core\Url $url */
+      $url = $item->_url;
       $link_title = $url->toString();
 
       // If the title field value is available, use it for the link text.
@@ -252,6 +300,27 @@ class LinkFormatter extends FormatterBase {
 
     $url->setOptions($options);
     return $url;
+  }
+
+  /**
+   * Checks access to the given link item.
+   *
+   * @param \Drupal\link\LinkItemInterface $item
+   *   The link field item to check.
+   *
+   * @return \Drupal\Core\Access\AccessResult
+   *   A cacheable access result.
+   */
+  protected function checkAccess(LinkItemInterface $item) {
+    $access = AccessResult::allowed();
+
+    /** @var \Drupal\core\Url $url */
+    $url = $item->_url;
+    if ($url->isRouted()) {
+      $access = $this->accessManager->checkNamedRoute($url->getRouteName(), $url->getRouteParameters(), NULL, TRUE);
+    }
+
+    return $access;
   }
 
 }
