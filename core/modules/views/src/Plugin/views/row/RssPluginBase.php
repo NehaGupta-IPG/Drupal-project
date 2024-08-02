@@ -167,10 +167,12 @@ abstract class RssPluginBase extends RowPluginBase {
         ->getStorage('entity_view_mode')
         ->load($this->entityTypeId . '.' . $this->options['view_mode']);
     }
-    catch (InvalidPluginDefinitionException $e) {
-      $view_mode = NULL;
-    }
-    catch (PluginNotFoundException $e) {
+    catch (InvalidPluginDefinitionException | PluginNotFoundException $e) {
+      \Drupal::logger('views')->error('Could not load entity view mode %view_mode', [
+        '%view_mode' => $this->entityTypeId . '.' . $this->options['view_mode'],
+        'exception' => $e,
+      ]);
+
       $view_mode = NULL;
     }
 
