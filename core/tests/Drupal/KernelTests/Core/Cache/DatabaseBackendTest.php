@@ -57,6 +57,12 @@ class DatabaseBackendTest extends GenericCacheBackendUnitTestBase {
     $backend->set($cid_short, $cached_value_short);
     $this->assertSame($cached_value_short, $backend->get($cid_short)->data, "Backend contains the correct value for short, non-ASCII cache id.");
 
+    // Test a cid with and without a trailing space.
+    $cid_nospace = 'trailing-space-test';
+    $backend->set($cid_nospace, $cid_nospace);
+    $this->assertSame($cid_nospace, $backend->get($cid_nospace)->data);
+    $this->assertSame($cid_nospace, $backend->get($cid_nospace . ' ')->data);
+
     // Set multiple items to test exceeding the chunk size.
     $backend->deleteAll();
     $items = [];
