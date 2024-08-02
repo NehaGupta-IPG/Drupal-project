@@ -597,7 +597,7 @@ class RouteProviderTest extends KernelTestBase {
     $this->assertEquals([], $cache->data['query']);
     $this->assertCount(3, $cache->data['routes']);
     $cache = $this->cache->get('route:[language]=en:[query_parameters]=:/path/add/one%20');
-    $this->assertFalse($cache);
+    $this->assertFalse($cache->data['routes']);
 
     // A path with query parameters.
     $path = '/path/add/one?foo=bar';
