@@ -137,7 +137,7 @@ class DisplayFeedTranslationTest extends ViewTestBase {
   /**
    * Tests that rendered node content is in current language.
    */
-  public function testFeedTranslation() {
+  public function testFeedTranslation(): void {
     $node = $this->drupalCreateNode([
       'type' => 'page',
       'title' => 'Something in English',

@@ -2,12 +2,15 @@
 
 namespace Drupal\views\Plugin\views\row;
 
+use Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException;
+use Drupal\Component\Plugin\Exception\PluginNotFoundException;
 use Drupal\Core\Entity\EntityDisplayRepositoryInterface;
 use Drupal\Core\Entity\EntityRepositoryInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\views\Entity\Render\EntityTranslationRenderTrait;
+use Drupal\views\ViewExecutable;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -27,28 +30,35 @@ abstract class RssPluginBase extends RowPluginBase {
    *
    * @var \Drupal\Core\Entity\EntityTypeManagerInterface
    */
-  protected $entityTypeManager;
+  protected EntityTypeManagerInterface $entityTypeManager;
 
   /**
    * The entity display repository.
    *
    * @var \Drupal\Core\Entity\EntityDisplayRepositoryInterface
    */
-  protected $entityDisplayRepository;
+  protected EntityDisplayRepositoryInterface $entityDisplayRepository;
 
   /**
    * The language manager.
    *
    * @var \Drupal\Core\Language\LanguageManagerInterface
    */
-  protected $languageManager;
+  protected LanguageManagerInterface $languageManager;
 
   /**
    * The entity repository.
    *
    * @var \Drupal\Core\Entity\EntityRepositoryInterface
    */
-  protected $entityRepository;
+  protected EntityRepositoryInterface $entityRepository;
+
+  /**
+   * The ID of the entity type for which this is an RSS row plugin.
+   *
+   * @var string
+   */
+  protected string $entityTypeId;
 
   /**
    * Constructs a RssPluginBase  object.
@@ -74,12 +84,12 @@ abstract class RssPluginBase extends RowPluginBase {
     $this->entityTypeManager = $entity_type_manager;
     $this->entityDisplayRepository = $entity_display_repository;
     if ($language_manager === NULL) {
-      @trigger_error('The language_manager service must be passed to RssPluginBase::__construct(), it is required before Drupal 10.0.0.', E_USER_WARNING);
+      @trigger_error('Passing null as the language_manager service to RssPluginBase::__construct() is deprecated in drupal:10.4.0 and is required from drupal:12.0.0. See https://www.drupal.org/project/drupal/issues/1231241', E_USER_DEPRECATED);
       $language_manager = \Drupal::service('language_manager');
     }
     $this->languageManager = $language_manager;
     if ($entity_repository === NULL) {
-      @trigger_error('The entity.repository service must be passed to RssPluginBase::__construct(), it is required before Drupal 10.0.0.', E_USER_WARNING);
+      @trigger_error('Passing null as the entity.repository service to RssPluginBase::__construct() is deprecated in drupal:10.4.0 and is required from drupal:12.0.0. See https://www.drupal.org/project/drupal/issues/1231241', E_USER_DEPRECATED);
       $entity_repository = \Drupal::service('entity.repository');
     }
     $this->entityRepository = $entity_repository;
@@ -95,7 +105,7 @@ abstract class RssPluginBase extends RowPluginBase {
   /**
    * {@inheritdoc}
    */
-  protected function defineOptions() {
+  protected function defineOptions(): array {
     $options = parent::defineOptions();
 
     // Select the rss view mode by default, otherwise select the first available
@@ -114,7 +124,7 @@ abstract class RssPluginBase extends RowPluginBase {
   /**
    * {@inheritdoc}
    */
-  public function buildOptionsForm(&$form, FormStateInterface $form_state) {
+  public function buildOptionsForm(&$form, FormStateInterface $form_state): void {
     parent::buildOptionsForm($form, $form_state);
 
     $form['view_mode'] = [
@@ -127,6 +137,9 @@ abstract class RssPluginBase extends RowPluginBase {
 
   /**
    * Return the main options, which are shown in the summary title.
+   *
+   * @return array
+   *   The main options for the summary.
    */
   public function buildOptionsForm_summary_options() {
     $view_modes = $this->entityDisplayRepository->getViewModes($this->entityTypeId);
@@ -140,14 +153,19 @@ abstract class RssPluginBase extends RowPluginBase {
   /**
    * {@inheritdoc}
    */
-  public function calculateDependencies() {
+  public function calculateDependencies(): array {
     $dependencies = parent::calculateDependencies();
 
-    $view_mode = $this->entityTypeManager
-      ->getStorage('entity_view_mode')
-      ->load($this->entityTypeId . '.' . $this->options['view_mode']);
-    if ($view_mode) {
-      $dependencies[$view_mode->getConfigDependencyKey()][] = $view_mode->getConfigDependencyName();
+    try {
+      $view_mode = $this->entityTypeManager
+        ->getStorage('entity_view_mode')
+        ->load($this->entityTypeId . '.' . $this->options['view_mode']);
+
+      if ($view_mode) {
+        $dependencies[$view_mode->getConfigDependencyKey()][] = $view_mode->getConfigDependencyName();
+      }
+    }
+    catch (InvalidPluginDefinitionException | PluginNotFoundException $e) {
     }
 
     return $dependencies;
@@ -156,7 +174,7 @@ abstract class RssPluginBase extends RowPluginBase {
   /**
    * {@inheritdoc}
    */
-  public function query() {
+  public function query(): void {
     parent::query();
     $this->getEntityTranslationRenderer()->query($this->view->getQuery());
   }
@@ -164,21 +182,27 @@ abstract class RssPluginBase extends RowPluginBase {
   /**
    * {@inheritdoc}
    */
-  public function getEntityTypeId() {
+  public function getEntityTypeId(): string {
     return $this->entityTypeId;
   }
 
   /**
-   * {@inheritdoc}
+   * Returns the entity type manager.
+   *
+   * @return \Drupal\Core\Entity\EntityTypeManagerInterface
+   *   The entity type manager.
    */
-  protected function getEntityTypeManager() {
+  protected function getEntityTypeManager(): EntityTypeManagerInterface {
     return $this->entityTypeManager;
   }
 
   /**
-   * {@inheritdoc}
+   * Returns the entity repository.
+   *
+   * @return \Drupal\Core\Entity\EntityRepositoryInterface
+   *   The entity repository.
    */
-  protected function getEntityRepository() {
+  protected function getEntityRepository(): EntityRepositoryInterface {
     return $this->entityRepository;
   }
 
@@ -192,7 +216,7 @@ abstract class RssPluginBase extends RowPluginBase {
   /**
    * {@inheritdoc}
    */
-  protected function getView() {
+  protected function getView(): ?ViewExecutable {
     return $this->view;
   }
 
