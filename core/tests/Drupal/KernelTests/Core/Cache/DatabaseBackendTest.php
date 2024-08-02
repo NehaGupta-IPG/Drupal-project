@@ -61,7 +61,7 @@ class DatabaseBackendTest extends GenericCacheBackendUnitTestBase {
     $cid_nospace = 'trailing-space-test';
     $backend->set($cid_nospace, $cid_nospace);
     $this->assertSame($cid_nospace, $backend->get($cid_nospace)->data);
-    $this->assertSame($cid_nospace, $backend->get($cid_nospace . ' ')->data);
+    $this->assertFalse($backend->get($cid_nospace . ' '));
 
     // Set multiple items to test exceeding the chunk size.
     $backend->deleteAll();
