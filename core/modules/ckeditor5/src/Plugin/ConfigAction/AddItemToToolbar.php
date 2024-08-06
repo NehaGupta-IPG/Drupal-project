@@ -72,8 +72,9 @@ final class AddItemToToolbar implements ConfigActionPluginInterface, ContainerFa
     $editor_settings = $editor->getSettings();
 
     // If the item is already in the toolbar and we're not allowing duplicate
-    // items, we're done.
-    if (in_array($item_name, $editor_settings['toolbar']['items'], TRUE) && $allow_duplicate === FALSE && $item_name !== '|') {
+    // items, we're done. Dividers and wrapping separators are exempt, because
+    // a toolbar can legitimately contain more than one of each.
+    if (in_array($item_name, $editor_settings['toolbar']['items'], TRUE) && $allow_duplicate === FALSE && $item_name !== '|' && $item_name !== '-') {
       return;
     }
 
@@ -86,17 +87,9 @@ final class AddItemToToolbar implements ConfigActionPluginInterface, ContainerFa
     else {
       $editor_settings['toolbar']['items'][] = $item_name;
     }
-
-    // If we're just adding a vertical separator, there's nothing else we need
-    // to do at this point.
-    if ($item_name === '|') {
-      $editor->setSettings($editor_settings)->save();
-      return;
-    }
-
-    // If we're just adding a wrapping, there's nothing else we need
-    // to do at this point.
-    if ($item_name === '-') {
+    // If we're just adding a divider (vertical separator) or a wrapping
+    // separator, there's nothing else we need to do at this point.
+    if ($item_name === '|' || $item_name === '-') {
       $editor->setSettings($editor_settings)->save();
       return;
     }
