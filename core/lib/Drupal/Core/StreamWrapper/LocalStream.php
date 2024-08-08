@@ -2,6 +2,9 @@
 
 namespace Drupal\Core\StreamWrapper;
 
+use Drupal\Core\File\Exception\FileException;
+use Drupal\Core\File\FileSystemInterface;
+
 /**
  * Defines a Drupal stream wrapper base class for local files.
  *
@@ -36,6 +39,24 @@ abstract class LocalStream implements StreamWrapperInterface {
    * @var string
    */
   protected $uri;
+
+  /**
+   * LocalStream constructor.
+   */
+  protected function ensureDirectory() {
+    // Prevent errors by ensuring our directory (e.g. for translation directory
+    // on a fresh development deploy). Doing this in a (fat) constructor might
+    // bring all kinds of problems so we call this in methods where the stream
+    // is used.
+    $directoryPath = $this->getDirectoryPath();
+    if (!is_dir($directoryPath)) {
+      $success = $this->getFileSystem()->prepareDirectory($directoryPath,
+          FileSystemInterface::CREATE_DIRECTORY || FileSystemInterface::MODIFY_PERMISSIONS);
+      if (!$success) {
+        throw new FileException("Failed to prepare directory '$directoryPath'");
+      }
+    }
+  }
 
   /**
    * {@inheritdoc}
@@ -97,6 +118,7 @@ abstract class LocalStream implements StreamWrapperInterface {
    * {@inheritdoc}
    */
   public function realpath() {
+    $this->ensureDirectory();
     return $this->getLocalPath();
   }
 
@@ -145,6 +167,7 @@ abstract class LocalStream implements StreamWrapperInterface {
    * {@inheritdoc}
    */
   public function stream_open($uri, $mode, $options, &$opened_path) {
+    $this->ensureDirectory();
     $this->uri = $uri;
     $path = $this->getLocalPath();
     if ($path === FALSE) {
@@ -330,6 +353,7 @@ abstract class LocalStream implements StreamWrapperInterface {
    * {@inheritdoc}
    */
   public function mkdir($uri, $mode, $options) {
+    $this->ensureDirectory();
     $this->uri = $uri;
     $recursive = (bool) ($options & STREAM_MKDIR_RECURSIVE);
     if ($recursive) {
@@ -369,6 +393,7 @@ abstract class LocalStream implements StreamWrapperInterface {
    * {@inheritdoc}
    */
   public function url_stat($uri, $flags) {
+    $this->ensureDirectory();
     $this->uri = $uri;
     $path = $this->getLocalPath();
     // Suppress warnings if requested or if the file or directory does not
@@ -385,6 +410,7 @@ abstract class LocalStream implements StreamWrapperInterface {
    * {@inheritdoc}
    */
   public function dir_opendir($uri, $options) {
+    $this->ensureDirectory();
     $this->uri = $uri;
     $this->handle = opendir($this->getLocalPath());
 

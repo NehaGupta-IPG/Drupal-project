@@ -23,7 +23,7 @@ class StreamWrapperTest extends FileTestBase {
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['file_test'];
+  protected static $modules = ['file_test', 'locale'];
 
   /**
    * A stream wrapper scheme to register for the test.
@@ -138,6 +138,51 @@ class StreamWrapperTest extends FileTestBase {
 
     // Cleanup.
     unlink($filename);
+  }
+  /**
+   * Checks if a directory gets autocreated on file upload.
+   *
+   * @dataProvider providerAutocreateDirectory
+   */
+  public function testAutocreateDirectory($callable) {
+    $directory = Settings::get('file_public_path') . '/' . $this->randomMachineName();
+    $this->config('locale.settings')
+      ->set('translation.path', $directory)
+      ->save();
+
+    $this->assertDirectoryNotExists($directory);
+    $callable();
+    $this->assertDirectoryExists($directory);
+  }
+
+  public function providerAutocreateDirectory() {
+    $data = [];
+    $data[] = [
+      function () {
+        realpath('translations://');
+      },
+    ];
+    $data[] = [
+      function () {
+        fopen('translations://' . $this->randomMachineName(), 'w');
+      },
+    ];
+    $data[] = [
+      function () {
+        mkdir('translations://' . $this->randomMachineName());
+      },
+    ];
+    $data[] = [
+      function () {
+        stat('translations://');
+      },
+    ];
+    $data[] = [
+      function () {
+        opendir('translations://');
+      },
+    ];
+    return $data;
   }
 
   /**
