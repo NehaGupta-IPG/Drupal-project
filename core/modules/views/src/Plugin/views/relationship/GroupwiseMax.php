@@ -200,11 +200,7 @@ class GroupwiseMax extends RelationshipPluginBase {
       $temp_view = $this->getTemporaryView();
 
       // Add the sort from the options to the default display.
-      // This is broken, in that the sort order field also gets added as a
-      // select field. See https://www.drupal.org/node/844910.
-      // We work around this further down.
-      $sort = $options['subquery_sort'];
-      [$sort_table, $sort_field] = explode('.', $sort);
+      [$sort_table, $sort_field] = explode('.', $options['subquery_sort']);
       $sort_options = ['order' => $options['subquery_order']];
       $temp_view->addHandler('default', 'sort', $sort_table, $sort_field, $sort_options);
     }
@@ -254,8 +250,13 @@ class GroupwiseMax extends RelationshipPluginBase {
     // Make every alias in the subquery safe within the outer query by
     // appending a namespace to it, '_inner' by default.
     $tables = &$subquery->getTables();
+    // Store the used aliases, so we can apply them in all kind of places.
+    $this->table_aliases = [];
     foreach (array_keys($tables) as $table_name) {
-      $tables[$table_name]['alias'] .= $this->subquery_namespace;
+      $this->table_aliases[$table_name] = $tables[$table_name]['alias'] . $this->subquery_namespace;
+    }
+    foreach (array_keys($tables) as $table_name) {
+      $tables[$table_name]['alias'] = $this->table_aliases[$table_name];
       // Namespace the join on every table.
       if (isset($tables[$table_name]['condition'])) {
         $tables[$table_name]['condition'] = $this->conditionNamespace($tables[$table_name]['condition']);
@@ -275,10 +276,10 @@ class GroupwiseMax extends RelationshipPluginBase {
     //   In the meantime, this works, but with a leap of faith.
     $orders = &$subquery->getOrderBy();
     foreach ($orders as $order_key => $order) {
-      // But if we're using a whole view, we don't know what we have!
-      if ($options['subquery_view']) {
-        [$sort_table, $sort_field] = explode('.', $order_key);
-      }
+      // Until http://drupal.org/node/844910 is fixed, $order_key is a field
+      // alias from SELECT. De-alias it using the View object.
+      $sort_table = $temp_view->query->fields[$order_key]['table'];
+      $sort_field = $temp_view->query->fields[$order_key]['field'];
       $orders[$sort_table . $this->subquery_namespace . '.' . $sort_field] = $order;
       unset($orders[$order_key]);
     }
@@ -286,16 +287,31 @@ class GroupwiseMax extends RelationshipPluginBase {
     // The query we get doesn't include the LIMIT, so add it here.
     $subquery->range(0, 1);
 
+    // Clone the query object to force recompilation of the underlying WHERE and
+    // HAVING objects on the next step.
+    $subquery = clone $subquery;
+
+    // Add in Views Query Substitutions such as ***CURRENT_TIME***.
+    views_query_views_alter($subquery);
+
     // Extract the SQL the temporary view built.
     $subquery_sql = $subquery->__toString();
 
-    // Replace the placeholder with the outer, correlated field.
-    // Eg, change the placeholder ':users_uid' into the outer field 'users.uid'.
-    // We have to work directly with the SQL, because putting a name of a field
-    // into a SelectQuery that it does not recognize (because it's outer) just
-    // makes it treat it as a string.
-    $outer_placeholder = ':' . str_replace('.', '_', $this->definition['outer field']);
-    $subquery_sql = str_replace($outer_placeholder, $this->definition['outer field'], $subquery_sql);
+    // Replace subquery argument placeholders.
+    $quoted = $subquery->getArguments();
+    $connection = $subquery->getConnection();
+    foreach ($quoted as $key => $val) {
+      // Replace the **CORRELATED** placeholder with the outer field name.
+      if ($val === '**CORRELATED**') {
+        $quoted[$key] = $this->definition['outer field'];
+      }
+      // Add quotes for all other values.
+      else {
+        $quoted[$key] = $connection->quote($val);
+      }
+    }
+
+    $subquery_sql = strtr($subquery_sql, $quoted);
 
     return $subquery_sql;
   }
@@ -330,14 +346,10 @@ class GroupwiseMax extends RelationshipPluginBase {
    * need to quote each single part to prevent from query exceptions.
    */
   protected function conditionNamespace($string) {
-    $parts = explode(' = ', $string);
-    foreach ($parts as &$part) {
-      if (str_contains($part, '.')) {
-        $part = '"' . str_replace('.', $this->subquery_namespace . '".', $part);
-      }
+    foreach ($this->table_aliases as $table_name => $table_alias) {
+      $string = preg_replace("/\b{$table_name}\b/", '"' . $table_alias . '"', $string);
     }
-
-    return implode(' = ', $parts);
+    return $string;
   }
 
   /**
