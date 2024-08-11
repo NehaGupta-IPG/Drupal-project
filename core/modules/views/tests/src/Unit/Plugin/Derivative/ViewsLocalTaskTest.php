@@ -252,7 +252,7 @@ class ViewsLocalTaskTest extends UnitTestCase {
     $display_plugin->expects($this->exactly(2))
       ->method('getOption')
       ->with($this->logicalOr('menu', 'tab_options'))
-      ->will($this->returnValueMap([
+      ->willReturnMap([
         [
           'menu',
           [
@@ -262,7 +262,7 @@ class ViewsLocalTaskTest extends UnitTestCase {
           ],
         ],
         ['tab_options', ['type' => 'none']],
-      ]));
+      ]);
     $executable->display_handler = $display_plugin;
 
     $result = [['example_view', 'page_1']];
@@ -311,7 +311,7 @@ class ViewsLocalTaskTest extends UnitTestCase {
       ->getMock();
     $storage->expects($this->any())
       ->method('id')
-      ->will($this->returnValue('example_view'));
+      ->willReturnValue('example_view');
     $storage->expects($this->any())
       ->method('getExecutable')
       ->willReturn($executable);
@@ -329,7 +329,7 @@ class ViewsLocalTaskTest extends UnitTestCase {
     $display_plugin->expects($this->exactly(4))
       ->method('getOption')
       ->with($this->logicalOr('menu', 'tab_options'))
-      ->will($this->returnValueMap([
+      ->willReturnMap([
         [
           'menu',
           [
@@ -346,10 +346,10 @@ class ViewsLocalTaskTest extends UnitTestCase {
             'title' => 'Example parent title',
           ],
         ],
-      ]));
+      ]);
     $display_plugin->expects($this->once())
       ->method('getPath')
-      ->will($this->returnValue('path/example'));
+      ->willReturnValue('path/example');
     $executable->display_handler = $display_plugin;
 
     $result = [['example_view', 'page_1']];
@@ -361,7 +361,7 @@ class ViewsLocalTaskTest extends UnitTestCase {
     $this->state->expects($this->exactly(2))
       ->method('get')
       ->with('views.view_route_names')
-      ->will($this->returnValue($view_route_names));
+      ->willReturnValue($view_route_names);
 
     // Mock the route provider.
     $route_collection = new RouteCollection();
@@ -369,7 +369,7 @@ class ViewsLocalTaskTest extends UnitTestCase {
     $this->routeProvider->expects($this->any())
       ->method('getRoutesByPattern')
       ->with('/path')
-      ->will($this->returnValue($route_collection));
+      ->willReturnValue($route_collection);
 
     $definitions = $this->localTaskDerivative->getDerivativeDefinitions($this->baseDefinition);
     $this->assertCount(2, $definitions);

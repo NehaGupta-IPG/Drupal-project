@@ -29,7 +29,7 @@ class ViewsLocalTask extends DeriverBase implements ContainerDeriverInterface {
   public function __construct(
     protected RouteProviderInterface $routeProvider,
     protected StateInterface $state,
-    protected EntityStorageInterface $viewStorage
+    protected EntityStorageInterface $viewStorage,
   ) {}
 
   /**
