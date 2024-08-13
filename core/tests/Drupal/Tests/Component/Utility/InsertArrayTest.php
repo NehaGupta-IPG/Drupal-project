@@ -54,7 +54,7 @@ class InsertArrayTest extends TestCase {
    * Tests \Drupal\Component\Utility\InsertArray::insertBefore().
    */
   #[DataProvider('dataInsertBefore')]
-   public function testInsertBefore(array $array, string $key, array $insert_array, array $expected_array) {
+   public function testInsertBefore(array $array, $key, array $insert_array, array $expected_array) {
      InsertArray::insertBefore($array, $key, $insert_array);
      $this->assertSame($expected_array, $array);
   }
@@ -101,9 +101,48 @@ class InsertArrayTest extends TestCase {
    * Tests \Drupal\Component\Utility\InsertArray::insertAfter().
    */
   #[DataProvider('dataInsertAfter')]
-  public function testInsertAfter(array $array, string $key, array $insert_array, array $expected_array) {
+  public function testInsertAfter(array $array, $key, array $insert_array, array $expected_array) {
     InsertArray::insertAfter($array, $key, $insert_array);
     $this->assertSame($expected_array, $array);
+  }
+
+  /**
+   * Data provider for testInsertAfter().
+   */
+  public static function dataExceptions() {
+    return [
+      'nonexistent_key' => [
+        [
+          'first' => 'first item',
+          'third' => 'third item',
+        ],
+        'nonexistent',
+        [
+          'first' => 'first item',
+        ],
+      ],
+      'repeated_key' => [
+        [
+          'first' => 'first item',
+          'third' => 'third item',
+        ],
+        'first',
+        [
+          'first' => 'duplicate item',
+        ],
+      ],
+    ];
+  }
+
+  /**
+   * Tests exceptions thrown by InsertArray.
+   */
+  #[DataProvider('dataExceptions')]
+  public function testExceptions(array $array, $key, array $insert_array) {
+    $this->expectException(\InvalidArgumentException::class);
+    // It doesn't matter whether we use insertAfter() or insertBefore() as both
+    // use the same helper method.
+    InsertArray::insertAfter($array, $key, $insert_array);
   }
 
 }
