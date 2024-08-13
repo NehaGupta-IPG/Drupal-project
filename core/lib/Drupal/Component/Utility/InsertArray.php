@@ -94,11 +94,7 @@ class InsertArray {
     $array_before = array_slice($array, 0, $pos);
     $array_after = array_slice($array, $pos);
 
-    $array = array_merge(
-      $array_before,
-      $insert_array,
-      $array_after
-    );
+    $array = $array_before + $insert_array + $array_after;
   }
 
 }
