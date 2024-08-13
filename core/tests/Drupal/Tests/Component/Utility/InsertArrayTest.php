@@ -3,6 +3,7 @@
 namespace Drupal\Tests\Component\Utility;
 
 use Drupal\Component\Utility\InsertArray;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -12,88 +13,97 @@ use PHPUnit\Framework\TestCase;
 class InsertArrayTest extends TestCase {
 
   /**
+   * Data provider for testInsertBefore().
+   */
+  public static function dataInsertBefore() {
+    return [
+      'in_between' => [
+        [
+          'first' => 'first item',
+          'third' => 'third item',
+        ],
+        'third',
+        [
+          'second' => 'second item',
+        ],
+        [
+          'first' => 'first item',
+          'second' => 'second item',
+          'third' => 'third item',
+        ],
+      ],
+      'first' => [
+        [
+          'first' => 'first item',
+          'second' => 'second item',
+        ],
+        'first',
+        [
+          'zero' => 'zero item',
+        ],
+        [
+          'zero' => 'zero item',
+          'first' => 'first item',
+          'second' => 'second item',
+        ],
+      ],
+    ];
+  }
+
+  /**
    * Tests \Drupal\Component\Utility\InsertArray::insertBefore().
    */
-  public function testInsertBefore() {
-    // Test that we can insert an item in between other items in an associative
-    // array.
-    $array = [
-      'first' => 'first item',
-      'third' => 'third item',
+  #[DataProvider('dataInsertBefore')]
+   public function testInsertBefore(array $array, string $key, array $insert_array, array $expected_array) {
+     InsertArray::insertBefore($array, $key, $insert_array);
+     $this->assertSame($expected_array, $array);
+  }
+
+  /**
+   * Data provider for testInsertAfter().
+   */
+  public static function dataInsertAfter() {
+    return [
+      'in_between' => [
+        [
+          'first' => 'first item',
+          'third' => 'third item',
+        ],
+        'first',
+        [
+          'second' => 'second item',
+        ],
+        [
+          'first' => 'first item',
+          'second' => 'second item',
+          'third' => 'third item',
+        ],
+      ],
+      'last' => [
+        [
+          'first' => 'first item',
+          'second' => 'second item',
+        ],
+        'second',
+        [
+          'last' => 'last item',
+        ],
+        [
+          'first' => 'first item',
+          'second' => 'second item',
+          'last' => 'last item',
+        ],
+      ],
     ];
-
-    $second = [
-      'second' => 'second item',
-    ];
-
-    InsertArray::insertBefore($array, 'third', $second);
-
-    $expected_array = [
-      'first' => 'first item',
-      'second' => 'second item',
-      'third' => 'third item',
-    ];
-    $this->assertSame($expected_array, $array, "The item was inserted before another item in the associative array.");
-
-    // Test that we can properly insert an item to the beginning of an
-    // associative array.
-    $zero = [
-      'zero' => 'zero item',
-    ];
-
-    InsertArray::insertBefore($array, 'first', $zero);
-
-    $expected_array = [
-      'zero' => 'zero item',
-      'first' => 'first item',
-      'second' => 'second item',
-      'third' => 'third item',
-    ];
-
-    $this->assertSame($expected_array, $array, "The item was inserted at the beginning of the associative array.");
   }
 
   /**
    * Tests \Drupal\Component\Utility\InsertArray::insertAfter().
    */
-  public function testInsertAfter() {
-    // Test that we can insert an item in between other items in an associative
-    // array.
-    $array = [
-      'first' => 'first item',
-      'third' => 'third item',
-    ];
-
-    $second = [
-      'second' => 'second item',
-    ];
-
-    InsertArray::insertAfter($array, 'first', $second);
-
-    $expected_array = [
-      'first' => 'first item',
-      'second' => 'second item',
-      'third' => 'third item',
-    ];
-
-    $this->assertSame($expected_array, $array, "The item was inserted after another item in the associative array.");
-
-    // Test that we can properly insert an item to the end of an associative
-    // array.
-    $last = [
-      'last' => 'last item',
-    ];
-
-    InsertArray::insertAfter($array, 'third', $last);
-
-    $expected_array = [
-      'first' => 'first item',
-      'second' => 'second item',
-      'third' => 'third item',
-      'last' => 'last item',
-    ];
-
-    $this->assertSame($expected_array, $array, "The item was inserted at the end of the associative array.");
+  #[DataProvider('dataInsertAfter')]
+  public function testInsertAfter(array $array, string $key, array $insert_array, array $expected_array) {
+    InsertArray::insertAfter($array, $key, $insert_array);
+    $this->assertSame($expected_array, $array);
   }
 
 }
