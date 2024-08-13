@@ -22,7 +22,9 @@ class InsertArray {
    *   An array whose keys and values should be inserted.
    *
    * @throws \InvalidArgumentException
-   *   Throws an exception if the array does not have the key $key.
+   *   Throws an exception in the following cases:
+   *    - The $array does not have the key $key.
+   *    - The $array and the $insert_array have keys in common.
    */
   public static function insertBefore(&$array, $key, $insert_array) {
     static::insert($array, $key, $insert_array, TRUE);
@@ -41,7 +43,9 @@ class InsertArray {
    *   An array whose keys and values should be inserted.
    *
    * @throws \InvalidArgumentException
-   *   Throws an exception if the array does not have the key $key.
+   *   Throws an exception in the following cases:
+   *    - The $array does not have the key $key.
+   *    - The $array and the $insert_array have keys in common.
    */
   public static function insertAfter(&$array, $key, $insert_array) {
     static::insert($array, $key, $insert_array, FALSE);
@@ -65,11 +69,16 @@ class InsertArray {
    *   If TRUE, insert before the given key; if FALSE, insert after it.
    *
    * @throws \InvalidArgumentException
-   *   Throws an exception if the array does not have the key $key.
+   *   Throws an exception in the following cases:
+   *    - The $array does not have the key $key.
+   *    - The $array and the $insert_array have keys in common.
    */
   protected static function insert(&$array, $key, $insert_array, $before) {
     if (!isset($array[$key])) {
       throw new \InvalidArgumentException("The array does not have the key $key.");
+    }
+    if ($common = array_intersect_key($array, $insert_array)) {
+      throw new \InvalidArgumentException("The target array and the insert array have common keys: " . implode(', ', array_keys($common)));
     }
 
     if ($before) {
