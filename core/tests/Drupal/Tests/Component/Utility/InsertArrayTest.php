@@ -90,9 +90,9 @@ class InsertArrayTest extends TestCase {
    * Tests \Drupal\Component\Utility\InsertArray::insertBefore().
    */
   #[DataProvider('dataInsertBefore')]
-   public function testInsertBefore(array $array, $key, array $insert_array, array $expected_array) {
-     InsertArray::insertBefore($array, $key, $insert_array);
-     $this->assertSame($expected_array, $array);
+  public function testInsertBefore(array $array, $key, array $insert_array, array $expected_array) {
+    InsertArray::insertBefore($array, $key, $insert_array);
+    $this->assertSame($expected_array, $array);
   }
 
   /**
