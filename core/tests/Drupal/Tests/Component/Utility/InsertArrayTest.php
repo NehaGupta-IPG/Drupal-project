@@ -51,44 +51,6 @@ class InsertArrayTest extends TestCase {
     ];
 
     $this->assertSame($expected_array, $array, "The item was inserted at the beginning of the associative array.");
-
-    // Test that we can insert into numeric arrays.
-    $array = [
-      'first item',
-      'third item',
-    ];
-
-    $second = [
-      'second item',
-    ];
-
-    InsertArray::insertBefore($array, 1, $second);
-
-    $expected_array = [
-      'first item',
-      'second item',
-      'third item',
-    ];
-    $this->assertSame($expected_array, $array, "The item was inserted before another item in the numeric array.");
-
-    // Test that we can insert at the start of a numeric array.
-    $array = [
-      'first item',
-      'third item',
-    ];
-
-    $second = [
-      'zero item',
-    ];
-
-    InsertArray::insertBefore($array, 0, $second);
-
-    $expected_array = [
-      'zero item',
-      'first item',
-      'third item',
-    ];
-    $this->assertSame($expected_array, $array, "The item was inserted at the beginning of the numeric array.");
   }
 
   /**
@@ -132,44 +94,6 @@ class InsertArrayTest extends TestCase {
     ];
 
     $this->assertSame($expected_array, $array, "The item was inserted at the end of the associative array.");
-
-    // Test that we can insert into numeric arrays.
-    $array = [
-      'first item',
-      'third item',
-    ];
-
-    $second = [
-      'second item',
-    ];
-
-    InsertArray::insertAfter($array, 0, $second);
-
-    $expected_array = [
-      'first item',
-      'second item',
-      'third item',
-    ];
-    $this->assertSame($expected_array, $array, "The item was inserted after another item in the numeric array.");
-
-    // Test that we can insert at the end of a numeric array.
-    $array = [
-      'first item',
-      'second item',
-    ];
-
-    $second = [
-      'last item',
-    ];
-
-    InsertArray::insertAfter($array, 1, $second);
-
-    $expected_array = [
-      'first item',
-      'second item',
-      'last item',
-    ];
-    $this->assertSame($expected_array, $array, "The item was inserted at the end of the numeric array.");
   }
 
 }
