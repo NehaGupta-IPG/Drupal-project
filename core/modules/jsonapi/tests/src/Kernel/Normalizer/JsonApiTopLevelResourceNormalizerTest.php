@@ -372,7 +372,7 @@ class JsonApiTopLevelResourceNormalizerTest extends JsonapiKernelTestBase {
       'width' => 10,
       'height' => 11,
       'drupal_internal__target_id' => $this->file->id(),
-      'display' => null,
+      'display' => NULL,
     ], $normalized['data']['relationships']['field_image']['data']['meta']);
     $this->assertSame('node--article', $normalized['data']['type']);
     $this->assertEquals([
