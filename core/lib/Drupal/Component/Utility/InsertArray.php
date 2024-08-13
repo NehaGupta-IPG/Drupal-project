@@ -21,7 +21,7 @@ class InsertArray {
    * @param array $insert_array
    *   An array whose keys and values should be inserted.
    *
-   * @throws \Exception
+   * @throws \InvalidArgumentException
    *   Throws an exception if the array does not have the key $key.
    */
   public static function insertBefore(&$array, $key, $insert_array) {
@@ -40,7 +40,7 @@ class InsertArray {
    * @param array $insert_array
    *   An array whose keys and values should be inserted.
    *
-   * @throws \Exception
+   * @throws \InvalidArgumentException
    *   Throws an exception if the array does not have the key $key.
    */
   public static function insertAfter(&$array, $key, $insert_array) {
@@ -64,12 +64,12 @@ class InsertArray {
    * @param bool $before
    *   If TRUE, insert before the given key; if FALSE, insert after it.
    *
-   * @throws \Exception
+   * @throws \InvalidArgumentException
    *   Throws an exception if the array does not have the key $key.
    */
   protected static function insert(&$array, $key, $insert_array, $before) {
     if (!isset($array[$key])) {
-      throw new \Exception("The array does not have the key $key.");
+      throw new \InvalidArgumentException("The array does not have the key $key.");
     }
 
     if ($before) {
