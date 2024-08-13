@@ -14,6 +14,9 @@ class InsertArray {
    *
    * Values from $insert_array are inserted into $array before $key.
    *
+   * Arrays with numeric keys are supported, but indexed arrays are not, as
+   * duplicate keys are not supported.
+   *
    * @param array $array
    *   The array to insert into, passed by reference and altered in place.
    * @param mixed $key
@@ -34,6 +37,9 @@ class InsertArray {
    * Inserts values into an associative array after a given key.
    *
    * Values from $insert_array are inserted into $array after $key.
+   *
+   * Arrays with numeric keys are supported, but indexed arrays are not, as
+   * duplicate keys are not supported.
    *
    * @param array $array
    *   The array to insert into, passed by reference and altered in place.
@@ -91,8 +97,8 @@ class InsertArray {
     $pos = array_search($key, array_keys($array));
     $pos += $offset;
 
-    $array_before = array_slice($array, 0, $pos);
-    $array_after = array_slice($array, $pos);
+    $array_before = array_slice($array, 0, $pos, preserve_keys: TRUE);
+    $array_after = array_slice($array, $pos, preserve_keys: TRUE);
 
     $array = $array_before + $insert_array + $array_after;
   }
