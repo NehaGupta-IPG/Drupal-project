@@ -204,6 +204,7 @@ abstract class MediaResourceTestBase extends EntityResourceTestBase {
           'target_uuid' => $thumbnail->uuid(),
           'title' => NULL,
           'url' => $thumbnail->createFileUrl(FALSE),
+          'display' => '',
         ],
       ],
       'status' => [
