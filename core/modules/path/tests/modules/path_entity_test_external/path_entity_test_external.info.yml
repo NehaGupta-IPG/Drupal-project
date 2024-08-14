@@ -1,0 +1,5 @@
+name: 'Path entity_test_external'
+type: module
+description: 'Supports test with entity_test_external entity type.'
+package: Testing
+version: VERSION

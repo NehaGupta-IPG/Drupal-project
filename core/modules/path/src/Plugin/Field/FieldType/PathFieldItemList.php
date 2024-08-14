@@ -25,7 +25,7 @@ class PathFieldItemList extends FieldItemList {
     $value = ['langcode' => $this->getLangcode()];
 
     $entity = $this->getEntity();
-    if (!$entity->isNew()) {
+    if (!$entity->isNew() && $entity->toUrl()->isRouted()) {
       /** @var \Drupal\path_alias\AliasRepositoryInterface $path_alias_repository */
       $path_alias_repository = \Drupal::service('path_alias.repository');
 
@@ -57,12 +57,14 @@ class PathFieldItemList extends FieldItemList {
   public function delete() {
     // Delete all aliases associated with this entity in the current language.
     $entity = $this->getEntity();
-    $path_alias_storage = \Drupal::entityTypeManager()->getStorage('path_alias');
-    $entities = $path_alias_storage->loadByProperties([
-      'path' => '/' . $entity->toUrl()->getInternalPath(),
-      'langcode' => $entity->language()->getId(),
-    ]);
-    $path_alias_storage->delete($entities);
+    if ($entity->toUrl()->isRouted()) {
+      $path_alias_storage = \Drupal::entityTypeManager()->getStorage('path_alias');
+      $entities = $path_alias_storage->loadByProperties([
+        'path' => '/' . $entity->toUrl()->getInternalPath(),
+        'langcode' => $entity->language()->getId(),
+      ]);
+      $path_alias_storage->delete($entities);
+    }
   }
 
 }

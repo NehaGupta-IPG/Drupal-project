@@ -42,7 +42,7 @@ class PathWidget extends WidgetBase {
     ];
     $element['source'] = [
       '#type' => 'value',
-      '#value' => !$entity->isNew() ? '/' . $entity->toUrl()->getInternalPath() : NULL,
+      '#value' => !$entity->isNew() && $entity->toUrl()->isRouted() ? '/' . $entity->toUrl()->getInternalPath() : NULL,
     ];
     $element['langcode'] = [
       '#type' => 'value',
@@ -85,6 +85,11 @@ class PathWidget extends WidgetBase {
     $alias = rtrim(trim($element['alias']['#value']), " \\/");
     if ($alias !== '') {
       $form_state->setValueForElement($element['alias'], $alias);
+
+      $entity = $form_state->getFormObject()->getEntity();
+      if (!$entity->isNew() && !$entity->toUrl()->isRouted()) {
+        $form_state->setError($element['alias'], t('An entity without a route cannot have a path.'));
+      }
 
       /** @var \Drupal\path_alias\PathAliasInterface $path_alias */
       $path_alias = \Drupal::entityTypeManager()->getStorage('path_alias')->create([

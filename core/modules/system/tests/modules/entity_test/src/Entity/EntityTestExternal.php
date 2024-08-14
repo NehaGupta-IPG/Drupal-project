@@ -10,14 +10,26 @@ use Drupal\Core\Url;
  * @ContentEntityType(
  *   id = "entity_test_external",
  *   label = @Translation("Entity test external"),
+ *   handlers = {
+ *     "access" = "Drupal\entity_test\EntityTestAccessControlHandler",
+ *     "form" = {
+ *       "default" = "Drupal\entity_test\EntityTestForm",
+ *     },
+ *     "route_provider" = {
+ *       "html" = "Drupal\Core\Entity\Routing\DefaultHtmlRouteProvider",
+ *     },
+ *   },
  *   base_table = "entity_test_external",
  *   entity_keys = {
  *     "id" = "id",
  *     "uuid" = "uuid",
  *     "bundle" = "type",
+ *     "label" = "name",
  *   },
  *   links = {
- *     "canonical" = "/entity_test_external/{entity_test_external}"
+ *     "canonical" = "/entity_test_external/{entity_test_external}",
+ *     "add-form" = "/entity_test_external/add",
+ *     "edit-form" = "/entity_test_external/{entity_test_external}/edit",
  *   },
  * )
  */
