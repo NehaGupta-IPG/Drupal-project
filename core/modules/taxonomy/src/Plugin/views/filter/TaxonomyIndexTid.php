@@ -365,7 +365,13 @@ class TaxonomyIndexTid extends ManyToOne {
       return;
     }
 
-    $identifier = $this->options['expose']['identifier'];
+    if ($this->options['is_grouped']) {
+      $identifier = $this->options['group_info']['identifier'];
+    }
+    else {
+      $identifier = $this->options['expose']['identifier'];
+    }
+
     $input = $form_state->getValue($identifier);
 
     if ($this->options['is_grouped'] && isset($this->options['group_info']['group_items'][$input])) {
