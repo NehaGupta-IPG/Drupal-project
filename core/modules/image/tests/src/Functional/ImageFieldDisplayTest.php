@@ -8,6 +8,7 @@ use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\Core\StreamWrapper\StreamWrapperManager;
 use Drupal\Core\Url;
 use Drupal\field\Entity\FieldStorageConfig;
+use Drupal\file\Entity\File;
 use Drupal\image\Entity\ImageStyle;
 use Drupal\Tests\system\Functional\Cache\AssertPageCacheContextsAndTagsTrait;
 use Drupal\Tests\TestFileCreationTrait;
@@ -608,6 +609,109 @@ class ImageFieldDisplayTest extends ImageFieldTestBase {
     // Default private image should be displayed when no user supplied image
     // is present.
     $this->assertSession()->responseContains($default_output);
+  }
+
+  /**
+   * Tests normal formatter display on node display.
+   */
+  public function testNodeDisplay(): void {
+    $field_name = $this->randomMachineName();
+    $type_name = 'article';
+    $field_storage_settings = [
+      'display_field' => '1',
+      'display_default' => '1',
+      'cardinality' => '1',
+    ];
+    $field_settings = [];
+    $widget_settings = [];
+    $this->createImageField($field_name, 'node', $type_name, $field_storage_settings, $field_settings, $widget_settings);
+
+    // Create a new node *without* the image field set, and check that the field
+    // is not shown for each node display.
+    $node = $this->drupalCreateNode(['type' => $type_name]);
+    // Check image last as the assertions below assume that this is the case.
+    $image_formatters = ['hidden', 'image'];
+    foreach ($image_formatters as $formatter) {
+      if ($formatter === 'hidden') {
+        $edit = [
+          "fields[$field_name][region]" => 'hidden',
+        ];
+      }
+      else {
+        $edit = [
+          "fields[$field_name][type]" => $formatter,
+          "fields[$field_name][region]" => 'content',
+        ];
+      }
+      $this->drupalGet("admin/structure/types/manage/{$type_name}/display");
+      $this->submitForm($edit, 'Save');
+      $this->drupalGet('node/' . $node->id());
+      // Verify that the field label is hidden when no image is attached.
+      $this->assertSession()->pageTextNotContains($field_name);
+    }
+
+    $test_image = current($this->drupalGetTestFiles('image'));
+
+    // Create a new node with the uploaded file.
+    $nid = $this->uploadNodeImage($test_image, $field_name, $type_name, 'image');
+
+    // Check that the default formatter is displaying with the file name.
+    $node_storage = $this->container->get('entity_type.manager')->getStorage('node');
+    $node_storage->resetCache([$nid]);
+    $node = $node_storage->load($nid);
+    $file = $node->{$field_name}->entity;
+    $image = [
+      '#theme' => 'image',
+      '#uri' => $file->getFileUri(),
+      '#width' => 40,
+      '#height' => 20,
+      '#alt' => 'image',
+      '#attributes' => ['loading' => 'lazy'],
+    ];
+    $default_output = str_replace("\n", '', (string) \Drupal::service('renderer')->renderRoot($image));
+    $this->assertSession()->responseContains($default_output);
+
+    // Turn the "display" option off and check that the file is no longer displayed.
+    $edit = [$field_name . '[0][display]' => FALSE];
+    $this->drupalGet('node/' . $nid . '/edit');
+    $this->submitForm($edit, 'Save');
+
+    $this->assertSession()->responseNotContains($default_output);
+
+    // Uncheck the display checkboxes and go to the preview.
+    $this->drupalGet("node/{$nid}/edit");
+    $edit[$field_name . '[0][display]'] = FALSE;
+    $this->submitForm($edit, 'Preview');
+    $this->clickLink('Back to content editing');
+    $this->assertSession()->responseContains($field_name . '[0][display]');
+
+    // Check that the file fields don't contain duplicate HTML IDs.
+    $this->assertSession()->pageContainsNoDuplicateId();
+  }
+
+  /**
+   * Tests default display of Image Field.
+   */
+  public function testDefaultImageFieldDisplay(): void {
+    $field_name = $this->randomMachineName();
+    $type_name = 'article';
+    $field_storage_settings = [
+      'display_field' => '1',
+      'display_default' => '0',
+      'cardinality' => '1',
+    ];
+    $field_settings = [];
+    $widget_settings = [];
+    $this->createImageField($field_name, 'node', $type_name, $field_storage_settings, $field_settings, $widget_settings);
+
+    $test_image = current($this->drupalGetTestFiles('image'));
+
+    // Create a new node with the uploaded file.
+    $nid = $this->uploadNodeImage($test_image, $field_name, $type_name, 'image');
+
+    $this->drupalGet('node/' . $nid . '/edit');
+    $this->assertSession()->fieldExists($field_name . '[0][display]');
+    $this->assertSession()->checkboxNotChecked($field_name . '[0][display]');
   }
 
 }
