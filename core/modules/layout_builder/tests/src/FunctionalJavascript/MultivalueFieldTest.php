@@ -159,7 +159,7 @@ class MultivalueFieldTest extends WebDriverTestBase {
   /**
    * Provider for testMultiValueField().
    */
-  public function testMultiValueFieldProvider() {
+  public static function testMultiValueFieldProvider() {
     return [
       'offset' => [
         'params' => [
