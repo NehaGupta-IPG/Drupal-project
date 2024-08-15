@@ -57,12 +57,9 @@ class MediaTranslationTest extends MediaKernelTestBase {
    * Tests media title is not overridden when resaved.
    */
   public function testMediaNameNotOverridden(): void {
-    ConfigurableLanguage::createFromLangcode('nl')->save();
-
     // Create two test image files: one for the media item in its original
     // language, and one in its Dutch translation.
     $images = $this->getTestFiles('image');
-    $this->assertGreaterThan(1, count($images));
 
     $original_image = File::create([
       'uri' => reset($images)->uri,
@@ -74,18 +71,13 @@ class MediaTranslationTest extends MediaKernelTestBase {
     ]);
     $translated_image->save();
 
-    $media_type = $this->createMediaType('image', [
-      'field_map' => [
-        'name' => 'name',
-      ],
-    ]);
-    $source_field_name = $media_type->getSource()
-      ->getSourceFieldDefinition($media_type)
+    $source_field_name = $this->testTranslationMediaType->getSource()
+      ->getSourceFieldDefinition($this->testTranslationMediaType)
       ->getName();
 
     // The media's name should be derived from the filename of the image.
     $media = Media::create([
-      'bundle' => $media_type->id(),
+      'bundle' => $this->testTranslationMediaType->id(),
       $source_field_name => $original_image->id(),
     ]);
     $media->save();
@@ -93,7 +85,7 @@ class MediaTranslationTest extends MediaKernelTestBase {
 
     // Create a Dutch translation which uses a different image, but also sets
     // an arbitrary title.
-    $translation = $media->addTranslation('nl');
+    $translation = $media->addTranslation('l1');
     $this->assertNotSame($media->language()->getId(), $translation->language()->getId());
     $translation->set($source_field_name, $translated_image->id());
     $translation->setName('Capricious and arbitrary');
