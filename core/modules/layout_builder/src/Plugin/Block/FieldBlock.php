@@ -279,12 +279,12 @@ class FieldBlock extends BlockBase implements ContextAwarePluginInterface, Conta
           'display_all' => $this->t('Display all items'),
           'display_some' => $this->t('Display a specified number of items'),
         ],
-        '#default_value' => isset($config['display_items']) ? $config['display_items'] : 'display_all',
+        '#default_value' => $config['display_items'] ?? 'display_all',
       ],
       'items_to_display' => [
         '#title' => $this->t('Number of items to display'),
         '#type' => 'number',
-        '#default_value' => isset($config['items_to_display']) ? $config['items_to_display'] : 0,
+        '#default_value' => $config['items_to_display'] ?? 0,
         '#description' => $this->t('Enter 0 for no limit.'),
         '#states' => [
           'invisible' => [
@@ -295,7 +295,7 @@ class FieldBlock extends BlockBase implements ContextAwarePluginInterface, Conta
       'offset' => [
         '#title' => $this->t('Offset (number of items to skip)'),
         '#type' => 'number',
-        '#default_value' => isset($config['offset']) ? $config['offset'] : 0,
+        '#default_value' => $config['offset'] ?? 0,
         '#description' => $this->t('For example, set this to 3 and the first 3 items will not be displayed.'),
         '#states' => [
           'invisible' => [
