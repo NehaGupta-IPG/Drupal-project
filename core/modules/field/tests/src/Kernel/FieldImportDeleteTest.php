@@ -40,7 +40,7 @@ class FieldImportDeleteTest extends FieldKernelTestBase {
     // - field.storage.entity_test.field_test_import_2
     // - field.field.entity_test.entity_test.field_test_import
     // - field.field.entity_test.entity_test.field_test_import_2
-    // - field.field.entity_test.test_bundle.field_test_import_2
+    // - field.field.entity_test.test_bundle.field_test_import_2.
 
     $field_name = 'field_test_import';
     $field_storage_id = "entity_test.$field_name";

@@ -76,7 +76,7 @@ class LocaleConfigTranslationImportTest extends BrowserTestBase {
 
     // Check if configuration translations have been imported.
     $override = \Drupal::languageManager()->getLanguageConfigOverride('af', 'system.maintenance');
-    // cSpell:disable-next-line
+    // cSpell:disable-next-line.
     $this->assertEquals('Ons is tans besig met onderhoud op @site. Wees asseblief geduldig, ons sal binnekort weer terug wees.', $override->get('message'));
 
     // Ensure that \Drupal\locale\LocaleConfigSubscriber::onConfigSave() works

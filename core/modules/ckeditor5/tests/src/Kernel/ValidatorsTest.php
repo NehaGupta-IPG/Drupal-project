@@ -1067,7 +1067,7 @@ class ValidatorsTest extends KernelTestBase {
               // Tag + attributes; attributes supported by disabled plugin.
               '<code class="language-*">',
               // Tag + attributes; tag already supported by enabled plugin,
-              // attributes supported by disabled plugin
+              // attributes supported by disabled plugin.
               '<h2 class="text-align-center">',
               // Tag + attributes; tag already supported by enabled plugin,
               // attribute not supported by no plugin.

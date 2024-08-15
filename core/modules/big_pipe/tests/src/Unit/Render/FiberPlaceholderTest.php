@@ -99,7 +99,7 @@ class FiberPlaceholderTest extends UnitTestCase {
     $response->setAttachments($attachments);
 
     // Construct minimal HTML response.
-    // cspell:disable-next-line
+    // cspell:disable-next-line.
     $content = '<html><body><span data-big-pipe-placeholder-id="callback=%5CDrupal%5CTests%5Cbig_pipe%5CUnit%5CRender%5CTurtleLazyBuilder%3A%3Aturtle&amp;&amp;token=uhKFNfT4eF449_W-kDQX8E5z4yHyt0-nSHUlwaGAQeU"></body></html>';
     $response->setContent($content);
 

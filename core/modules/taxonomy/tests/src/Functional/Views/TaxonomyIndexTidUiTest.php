@@ -411,12 +411,12 @@ class TaxonomyIndexTidUiTest extends UITestBase {
     // up the second group as an 'OR' group. The first subgroup of the second
     // filter group will vary as follows:
     // - multiple values vs single value
-    // - not vs or operator values
+    // - not vs or operator values.
     $view = View::load('test_filter_taxonomy_index_tid');
     $display =& $view->getDisplay('default');
     // Case 1:
     // - filter "tid" with multiple terms as "is none of"
-    // - filter "tid_2" with a single term as "is one of"
+    // - filter "tid_2" with a single term as "is one of".
     $display['display_options']['filters']['tid']['value'][0] = $this->terms[1][0]->id();
     $display['display_options']['filters']['tid']['value'][1] = $this->terms[1][1]->id();
     $display['display_options']['filters']['tid']['operator'] = 'not';
@@ -445,7 +445,7 @@ class TaxonomyIndexTidUiTest extends UITestBase {
 
     // Case 2:
     // - filter "tid" with multiple terms as "is one of"
-    // - filter "tid_2" with a single term as "is one of"
+    // - filter "tid_2" with a single term as "is one of".
     $view = View::load('test_filter_taxonomy_index_tid');
     $display =& $view->getDisplay('default');
     $display['display_options']['filters']['tid']['value'][0] = $this->terms[1][0]->id();
@@ -470,7 +470,7 @@ class TaxonomyIndexTidUiTest extends UITestBase {
 
     // Case 3:
     // - filter "tid" with a single term as "is none of"
-    // - filter "tid_2" with a single term as "is one of"
+    // - filter "tid_2" with a single term as "is one of".
     $view = View::load('test_filter_taxonomy_index_tid');
     $display =& $view->getDisplay('default');
     $display['display_options']['filters']['tid']['value'] = [];
@@ -494,7 +494,7 @@ class TaxonomyIndexTidUiTest extends UITestBase {
 
     // Case 4:
     // - filter "tid" with a single term as "is one of"
-    // - filter "tid_2" with a single term as "is one of"
+    // - filter "tid_2" with a single term as "is one of".
     $view = View::load('test_filter_taxonomy_index_tid');
     $display =& $view->getDisplay('default');
     $display['display_options']['filters']['tid']['value'] = [];

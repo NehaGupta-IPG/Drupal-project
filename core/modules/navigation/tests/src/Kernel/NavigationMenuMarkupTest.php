@@ -114,7 +114,7 @@ class NavigationMenuMarkupTest extends KernelTestBase {
     // This creates a tree with the following structure:
     // - 1
     // - 2
-    //   - 3
+    //   - 3.
     // phpcs:disable
     $links = [
       1 => MenuLinkMock::create(['id' => 'test.example1', 'route_name' => 'example1', 'title' => 'title 1', 'parent' => '', 'weight' => 0]),

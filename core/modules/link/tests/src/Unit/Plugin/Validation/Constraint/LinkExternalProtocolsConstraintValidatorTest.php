@@ -64,7 +64,7 @@ class LinkExternalProtocolsConstraintValidatorTest extends UnitTestCase {
     // Test allowed protocols.
     $data[] = ['http://www.example.com', TRUE];
     $data[] = ['https://www.example.com', TRUE];
-    // cSpell:disable-next-line
+    // cSpell:disable-next-line.
     $data[] = ['magnet:?xt=urn:sha1:YNCKHTQCWBTRNJIV4WNAE52SJUQCZO5C', TRUE];
 
     // Invalid protocols.

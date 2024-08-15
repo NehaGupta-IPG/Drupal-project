@@ -409,7 +409,7 @@ class MediaTest extends MediaTestBase {
     $this->assertSame('', $alt_override_input->getValue());
 
     // Fill in the alt field and submit.
-    // cSpell:disable-next-line
+    // cSpell:disable-next-line.
     $who_is_zartan = 'Zartan is the leader of the Dreadnoks.';
     $alt_override_input->setValue($who_is_zartan);
     $this->getBalloonButton('Save')->click();
@@ -539,7 +539,7 @@ class MediaTest extends MediaTestBase {
     $host->save();
 
     $translation = $host->addTranslation('fr');
-    // cSpell:disable-next-line
+    // cSpell:disable-next-line.
     $translation->title = 'Animaux avec des noms Ã©tranges';
     $translation->body->value = $host->body->value;
     $translation->body->format = $host->body->format;
@@ -555,10 +555,10 @@ class MediaTest extends MediaTestBase {
     $this->waitForEditor();
 
     // Test that the default alt attribute displays without an override.
-    // cSpell:disable-next-line
+    // cSpell:disable-next-line.
     $this->assertNotEmpty($assert_session->waitForElementVisible('xpath', '//img[contains(@alt, "texte alternatif par dÃ©faut")]'));
     // Test `aria-label` attribute appears on the preview wrapper.
-    // cSpell:disable-next-line
+    // cSpell:disable-next-line.
     $assert_session->elementExists('css', '[data-drupal-media-preview][aria-label="Tatou poilu hurlant"]');
     $this->click('.ck-widget.drupal-media');
     $this->assertVisibleBalloon('[aria-label="Drupal Media toolbar"]');
@@ -567,11 +567,11 @@ class MediaTest extends MediaTestBase {
     $this->assertVisibleBalloon('.ck-media-alternative-text-form');
     // Assert that the default alt on the UI is the default alt text from the
     // media entity.
-    // cSpell:disable-next-line
+    // cSpell:disable-next-line.
     $assert_session->elementTextEquals('css', '.ck-media-alternative-text-form .ck-labeled-field-view__status', 'Leave blank to use the default alternative text: "texte alternatif par dÃ©faut".');
 
     // Fill in the alt field in the balloon form.
-    // cSpell:disable-next-line
+    // cSpell:disable-next-line.
     $qui_est_zartan = 'Zartan est le chef des Dreadnoks.';
     $alt_override_input = $page->find('css', '.ck-balloon-panel .ck-media-alternative-text-form input[type=text]');
     $alt_override_input->setValue($qui_est_zartan);

@@ -42,7 +42,7 @@ class UserValidationTest extends KernelTestBase {
    */
   #[IgnoreDeprecations]
   public function testUsernames(): void {
-    // cSpell:disable
+    // cSpell:disable.
     $test_cases = [
       // '<username>' => ['<description>', 'assert<testName>'].
       'foo'                    => ['Valid username', 'assertNull'],
@@ -69,7 +69,7 @@ class UserValidationTest extends KernelTestBase {
       str_repeat('x', UserInterface::USERNAME_MAX_LENGTH + 1) => ['Invalid excessively long username', 'assertNotNull'],
     ];
     $this->expectDeprecation('user_validate_name() is deprecated in drupal:10.3.0 and is removed from drupal:12.0.0. Use \Drupal\user\UserNameValidator::validateName() instead. See https://www.drupal.org/node/3431205');
-    // cSpell:enable
+    // cSpell:enable.
     foreach ($test_cases as $name => $test_case) {
       [$description, $test] = $test_case;
       $result = user_validate_name($name);

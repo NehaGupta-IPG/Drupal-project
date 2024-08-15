@@ -749,7 +749,7 @@ class FormTest extends BrowserTestBase {
     }
 
     // Tests invalid values are rejected.
-    // cspell:ignore fffffg
+    // cspell:ignore fffffg.
     $values = ['#0008', '#1234', '#fffffg', '#abcdef22', '17', '#uaa'];
     foreach ($values as $input) {
       $edit = [

@@ -511,7 +511,7 @@ final class HTMLRestrictions {
     // - `<tag bar on*>` will become `<tag bar>` since the `on*` attribute is
     //   globally disallowed by FilterHtml
     // - `<tag ontouch baz>` will become `<tag baz>` since the `on*` attribute
-    //   is globally disallowed by FilterHtml
+    //   is globally disallowed by FilterHtml.
     // @see ::validateAllowedRestrictionsPhase5()
     // @see \Drupal\filter\Plugin\Filter\FilterHtml::process()
     // @see \Drupal\filter\Plugin\Filter\FilterHtml::getHTMLRestrictions()
@@ -677,7 +677,7 @@ final class HTMLRestrictions {
     // Attribute-level postprocessing for two special cases:
     // - wildcard attribute names
     // - per attribute name: attribute value restrictions in $this vs all values
-    //   allowed in $other
+    //   allowed in $other.
     foreach ($diff_elements as $tag => $tag_config) {
       // If there are no per-attribute restrictions for this tag in either
       // operand, then no postprocessing is needed.
@@ -1175,7 +1175,7 @@ final class HTMLRestrictions {
     // - then $naive will be `<p class="foo">`
     // - merging them yields `<p class> <$text-container class="foo">`
     //   again
-    // - diffing the wildcard subsets yields just `<p class>`
+    // - diffing the wildcard subsets yields just `<p class>`.
     return $r->merge($naive_resolution)->doDiff($r->getWildcardSubset());
   }
 

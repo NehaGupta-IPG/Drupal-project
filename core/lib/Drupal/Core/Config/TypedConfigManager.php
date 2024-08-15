@@ -165,7 +165,7 @@ class TypedConfigManager extends TypedDataManager implements TypedConfigManagerI
       // consider its schema-defined keys to require values:
       // - use_site_logo
       // - use_site_name
-      // - use_site_slogan
+      // - use_site_slogan.
       $static_type_root = TypedConfigManager::getStaticTypeRoot($parent);
       $static_type_root_type = $static_type_root->getDataDefinition()->getDataType();
       if ($root_type !== $static_type_root_type) {

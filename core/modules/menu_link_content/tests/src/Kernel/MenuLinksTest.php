@@ -71,7 +71,7 @@ class MenuLinksTest extends KernelTestBase {
     //   - child-1
     //     - child-1-1
     //     - child-1-2
-    //   - child-2
+    //   - child-2.
     $base_options = [
       'title' => 'Menu link test',
       'provider' => $module,

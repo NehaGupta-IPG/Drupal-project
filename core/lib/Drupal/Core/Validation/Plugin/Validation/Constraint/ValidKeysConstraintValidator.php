@@ -71,7 +71,7 @@ class ValidKeysConstraintValidator extends ConstraintValidator {
       // valid keys when the block plugin is `system_branding_block`:
       // - use_site_logo
       // - use_site_name
-      // - use_site_slogan
+      // - use_site_slogan.
       // @see \Drupal\KernelTests\Config\Schema\MappingTest::providerMappingInterpretation()
       $resolved_type_dynamically_valid_keys = $dynamically_valid_keys[$resolved_type] ?? [];
       // But if the `local_tasks_block` plugin is being used, then the
@@ -133,7 +133,7 @@ class ValidKeysConstraintValidator extends ConstraintValidator {
     // consider its schema-defined keys to be required:
     // - use_site_logo
     // - use_site_name
-    // - use_site_slogan
+    // - use_site_slogan.
     $static_type_root = TypedConfigManager::getStaticTypeRoot($this->context->getObject());
     $static_type_root_type = $static_type_root->getDataDefinition()->getDataType();
     if ($root_type !== $static_type_root_type) {

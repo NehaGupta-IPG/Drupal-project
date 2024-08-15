@@ -68,7 +68,7 @@ PO;
    */
   public function testInstallerTranslations(): void {
     $this->drupalGet('user/login');
-    // cSpell:disable-next-line
+    // cSpell:disable-next-line.
     $this->assertSession()->responseContains('Geben sie das Passwort für ihren Benutzernamen ein.');
   }
 

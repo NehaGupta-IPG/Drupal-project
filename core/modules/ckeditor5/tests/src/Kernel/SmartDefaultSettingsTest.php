@@ -123,7 +123,7 @@ class SmartDefaultSettingsTest extends KernelTestBase {
             // 2. `<p style>` even though `style` is globally disallowed by
             //    filter_html
             // 3. `<a onclick>` even though `on*` is globally disallowed by
-            //    filter_html
+            //    filter_html.
             'allowed_html' => '<p style> <br> <a onclick>',
           ],
         ],

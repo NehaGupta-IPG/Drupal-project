@@ -355,7 +355,7 @@ JS;
 
     // Select the first paragraph and observe changes in:
     // - styles dropdown label
-    // - button states
+    // - button states.
     $this->selectTextInsideElement('p');
     $this->assertSame('Styles', $style_dropdown->getText());
     $style_dropdown->click();
@@ -382,7 +382,7 @@ JS;
 
     // Select the blockquote and observe changes in:
     // - styles dropdown label
-    // - button states
+    // - button states.
     $this->selectTextInsideElement('blockquote');
     $this->assertSame('Famous', $style_dropdown->getText());
     $style_dropdown->click();

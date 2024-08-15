@@ -101,7 +101,7 @@ JS;
       'Language configuration conflict' => [
         'langcode' => 'fr',
         'toolbar_item_name' => 'textPartLanguage',
-        // cSpell:disable-next-line
+        // cSpell:disable-next-line.
         'toolbar_item_translation' => 'Choisir la langue',
       ],
     ];

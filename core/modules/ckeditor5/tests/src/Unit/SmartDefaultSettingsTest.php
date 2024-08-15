@@ -62,7 +62,7 @@ class SmartDefaultSettingsTest extends UnitTestCase {
     ];
 
     yield 'surplus: 2 attributes, 4 allowed attribute values' => [
-      // cSpell:disable-next-line
+      // cSpell:disable-next-line.
       HTMLRestrictions::fromString('<code class="language-php language-js" data-library="highlightjs something">'),
       $needed,
       2004,

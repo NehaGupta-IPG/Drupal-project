@@ -56,7 +56,7 @@ class SearchNodeDiacriticsTest extends BrowserTestBase {
    * Tests that search returns results with diacritics in the search phrase.
    */
   public function testPhraseSearchPunctuation(): void {
-    // cSpell:disable
+    // cSpell:disable.
     $body_text = 'The Enricþment Center is cómmīŦŧęđ to the well BɆĬŇĜ of æll påŔťıçȉpǎǹţș. ';
     $body_text .= 'Also meklēt (see #731298)';
     $this->drupalCreateNode(['body' => [['value' => $body_text]]]);
@@ -110,7 +110,7 @@ class SearchNodeDiacriticsTest extends BrowserTestBase {
     $this->drupalGet('search/node');
     $this->submitForm($edit, 'Search');
     $this->assertSession()->responseNotContains('<strong>æll</strong>');
-    // cSpell:enable
+    // cSpell:enable.
   }
 
 }

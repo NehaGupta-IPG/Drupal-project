@@ -209,7 +209,7 @@ class RouteProviderTest extends KernelTestBase {
    * Data provider for testMixedCasePaths()
    */
   public static function providerMixedCaseRoutePaths() {
-    // cSpell:disable
+    // cSpell:disable.
     return [
       ['/path/one', 'route_a'],
       ['/path/two', NULL],
@@ -224,7 +224,7 @@ class RouteProviderTest extends KernelTestBase {
       ['/place/meΦω', 'route_e', 'HEAD'],
       ['/place/meφΩ', 'route_e', 'HEAD'],
     ];
-    // cSpell:enable
+    // cSpell:enable.
   }
 
   /**

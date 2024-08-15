@@ -104,7 +104,7 @@ class SourceEditingRedundantTagsConstraintValidator extends ConstraintValidator 
         // - value `<img data-*>` does NOT trigger a violation because only
         //   concrete `data-`-attributes are supported by the
         //   `ckeditor5_imageUpload`, `ckeditor5_imageCaption` and
-        //   `ckeditor5_imageAlign` plugins
+        //   `ckeditor5_imageAlign` plugins.
         if ($is_attr_overlap && $source_enabled_element->diff($overlap)->getAllowedElements(FALSE) == $source_enabled_element->getAllowedElements(FALSE)) {
           continue;
         }

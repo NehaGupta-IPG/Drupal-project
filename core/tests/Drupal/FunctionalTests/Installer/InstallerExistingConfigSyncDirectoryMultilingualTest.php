@@ -93,7 +93,7 @@ class InstallerExistingConfigSyncDirectoryMultilingualTest extends InstallerConf
 
     // Ensure that the Spanish translation of anonymous is the one from
     // configuration and not the PO file.
-    // cspell:disable-next-line
+    // cspell:disable-next-line.
     $this->assertSame('Anónimo', \Drupal::languageManager()->getLanguageConfigOverride('es', 'user.settings')->get('anonymous'));
 
     /** @var \Drupal\locale\StringStorageInterface $locale_storage */

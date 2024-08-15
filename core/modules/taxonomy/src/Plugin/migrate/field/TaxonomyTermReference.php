@@ -6,7 +6,7 @@ use Drupal\migrate\Plugin\MigrationInterface;
 use Drupal\migrate_drupal\Attribute\MigrateField;
 use Drupal\migrate_drupal\Plugin\migrate\field\FieldPluginBase;
 
-// cspeLL:ignore entityreference
+// cspeLL:ignore entityreference.
 /**
  * MigrateField Plugin for Drupal 6 & Drupal 7 taxonomy term reference fields.
  */

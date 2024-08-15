@@ -5,7 +5,7 @@ namespace Drupal\pgsql\Driver\Database\pgsql;
 use Drupal\Core\Database\DatabaseExceptionWrapper;
 use Drupal\Core\Database\Query\Insert as QueryInsert;
 
-// cSpell:ignore nextval setval
+// cSpell:ignore nextval setval.
 
 /**
  * @ingroup database

@@ -69,7 +69,7 @@ class PrimitiveTypeConstraintValidatorTest extends UnitTestCase {
     $data[] = [new StringData(DataDefinition::create('string')), 'test', TRUE];
     $data[] = [new StringData(DataDefinition::create('string')), new TranslatableMarkup('test'), TRUE];
     // It is odd that 1 is a valid string.
-    // $data[] = [$this->createMock('Drupal\Core\TypedData\Type\StringInterface'), 1, FALSE];
+    // $data[] = [$this->createMock('Drupal\Core\TypedData\Type\StringInterface'), 1, FALSE];.
     $data[] = [new StringData(DataDefinition::create('string')), [], FALSE];
     $data[] = [new Uri(DataDefinition::create('uri')), 'http://www.example.com', TRUE];
     $data[] = [new Uri(DataDefinition::create('uri')), 'https://www.example.com', TRUE];

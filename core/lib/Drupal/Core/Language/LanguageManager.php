@@ -344,7 +344,7 @@ class LanguageManager implements LanguageManagerInterface {
       'zh-hans' => ['Chinese, Simplified', '简体中文'],
       'zh-hant' => ['Chinese, Traditional', '繁體中文'],
     ];
-    // cSpell:enable
+    // cSpell:enable.
   }
 
   /**
@@ -358,7 +358,7 @@ class LanguageManager implements LanguageManagerInterface {
    *   names as values.
    */
   public static function getUnitedNationsLanguageList() {
-    // cSpell:disable
+    // cSpell:disable.
     return [
       'ar' => ['Arabic', /* Left-to-right marker "‭" */ 'العربية', LanguageInterface::DIRECTION_RTL],
       'zh-hans' => ['Chinese, Simplified', '简体中文'],
@@ -367,7 +367,7 @@ class LanguageManager implements LanguageManagerInterface {
       'ru' => ['Russian', 'Русский'],
       'es' => ['Spanish', 'Español'],
     ];
-    // cSpell:enable
+    // cSpell:enable.
   }
 
   /**

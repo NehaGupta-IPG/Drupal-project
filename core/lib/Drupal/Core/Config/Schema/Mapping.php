@@ -153,7 +153,7 @@ class Mapping extends ArrayElement {
     // the original mapping type. To continue the previous example:
     // - `editor.settings.unicorn`
     // - `editor.image_upload_settings.*`
-    // - `editor.image_upload_settings.1`
+    // - `editor.image_upload_settings.1`.
     $possible_types = $this->getPossibleTypes($original_mapping_type);
 
     // TRICKY: it is tempting to not consider this a dynamic type if only one

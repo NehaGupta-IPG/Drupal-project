@@ -200,10 +200,10 @@ class ConfigFileContentTest extends KernelTestBase {
         // HTML/XML in values.
         'HTML' => '<strong> <bold> <em> <blockquote>',
         // UTF-8 in values.
-        // cspell:disable-next-line
+        // cspell:disable-next-line.
         'UTF-8' => 'FrançAIS is ÜBER-åwesome',
         // Unicode in keys and values.
-        // cSpell:disable-next-line
+        // cSpell:disable-next-line.
         'ΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΣὨ' => 'αβγδεζηθικλμνξοσὠ',
       ],
       'invalid xml' => '</title><script type="text/javascript">alert("Title XSS!");</script> & < > " \' ',
@@ -226,7 +226,7 @@ class ConfigFileContentTest extends KernelTestBase {
     $key = 'UTF-8';
     $this->assertSame($config_data['nested keys'][$key], $config_parsed['nested keys'][$key]);
 
-    // cSpell:disable-next-line
+    // cSpell:disable-next-line.
     $key = 'ΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΣὨ';
     $this->assertSame($config_data['nested keys'][$key], $config_parsed['nested keys'][$key]);
 
