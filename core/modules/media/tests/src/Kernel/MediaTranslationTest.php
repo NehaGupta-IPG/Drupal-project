@@ -71,13 +71,15 @@ class MediaTranslationTest extends MediaKernelTestBase {
     ]);
     $translated_image->save();
 
-    $source_field_name = $this->testTranslationMediaType->getSource()
-      ->getSourceFieldDefinition($this->testTranslationMediaType)
+    $media_type = $this->createMediaType('image');
+
+    $source_field_name = $media_type->getSource()
+      ->getSourceFieldDefinition($media_type)
       ->getName();
 
     // The media's name should be derived from the filename of the image.
     $media = Media::create([
-      'bundle' => $this->testTranslationMediaType->id(),
+      'bundle' => $media_type->id(),
       $source_field_name => $original_image->id(),
     ]);
     $media->save();
