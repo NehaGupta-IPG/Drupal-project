@@ -453,6 +453,16 @@ class Media extends EditorialContentEntityBase implements MediaInterface {
         $original = $this->getOriginal();
         foreach ($translation->bundle->entity->getFieldMap() as $metadata_attribute_name => $entity_field_name) {
           if ($translation->hasField($entity_field_name)) {
+            // Get the new field item, if it is empty, we can set the meta data
+            // right away and continue:
+            $new_field_item = $translation->get($entity_field_name);
+            if ($new_field_item->isEmpty()) {
+              $translation->set($entity_field_name, $media_source->getMetadata($translation, $metadata_attribute_name));
+              continue;
+            }
+            // Get the new value, it can't be empty anymore:
+            $new_value = $new_field_item->getValue();
+
             // Check the old value and new value to determine if the field value
             // needs to be saved.
             $old_value = NULL;
@@ -464,16 +474,14 @@ class Media extends EditorialContentEntityBase implements MediaInterface {
             elseif ($this->original && $this->original->hasField($entity_field_name)) {
               $old_value = $this->original->get($entity_field_name)->getValue();
             }
-            $new_field_item = $translation->get($entity_field_name);
-            $new_value = $new_field_item->getValue();
             // Determine if the field is being changed. For this, perform a
-            // strict comparison only when the old value and the new value are
-            // not empty.
-            $is_new_field_data_being_provided = !(empty($old_value) && empty($new_value)) && $new_value !== $old_value;
+            // strict comparison only when the old value is not empty (the new
+            // value can not be empty at this point).
+            $is_new_field_data_being_provided = !empty($old_value) && $new_value !== $old_value;
             // Finally, save the field value in two cases. One, when the value
             // is empty. The other is when the field value has changed *and* the
             // field is not actively being changed.
-            if ($new_field_item->isEmpty() || ($translation->hasSourceFieldChanged() && $is_new_field_data_being_provided === FALSE)) {
+            if ($translation->hasSourceFieldChanged() && $is_new_field_data_being_provided === FALSE) {
               $translation->set($entity_field_name, $media_source->getMetadata($translation, $metadata_attribute_name));
             }
           }
