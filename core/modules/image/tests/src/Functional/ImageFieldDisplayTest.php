@@ -8,7 +8,6 @@ use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\Core\StreamWrapper\StreamWrapperManager;
 use Drupal\Core\Url;
 use Drupal\field\Entity\FieldStorageConfig;
-use Drupal\file\Entity\File;
 use Drupal\image\Entity\ImageStyle;
 use Drupal\Tests\system\Functional\Cache\AssertPageCacheContextsAndTagsTrait;
 use Drupal\Tests\TestFileCreationTrait;
