@@ -6,6 +6,7 @@
 
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\menu_link_content\Entity\MenuLinkContent;
+use Drupal\menu_ui\EntityDeleteMenuDescendants;
 use Drupal\node\NodeTypeInterface;
 use Drupal\node\NodeInterface;
 
@@ -231,4 +232,13 @@ function menu_ui_preprocess_block(&$variables): void {
   if ($variables['configuration']['provider'] == 'menu_ui') {
     $variables['attributes']['role'] = 'navigation';
   }
+}
+
+/**
+ * Implements hook_form_alter().
+ */
+function menu_ui_form_alter(array &$form, FormStateInterface $form_state, string $form_id): void {
+  /** @var \Drupal\menu_ui\EntityDeleteMenuDescendants $entityDeleteMenuDescendants */
+  $entityDeleteMenuDescendants = \Drupal::service(EntityDeleteMenuDescendants::class);
+  $entityDeleteMenuDescendants->formAlter($form, $form_state, $form_id);
 }

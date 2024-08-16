@@ -99,6 +99,11 @@ class AutowireTest extends KernelTestBase {
 
     $expected = [];
     foreach ($services as $id => $class) {
+      // Skip services declared with the class (no ID).
+      if ($id === $class) {
+        continue;
+      }
+
       // Skip services that share a class.
       if (count(array_keys($services, $class)) > 1) {
         continue;

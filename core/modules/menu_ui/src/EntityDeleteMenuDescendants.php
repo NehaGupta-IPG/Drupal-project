@@ -1,0 +1,152 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Drupal\menu_ui;
+
+use Drupal\Core\Entity\ContentEntityFormInterface;
+use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Entity\EntityRepositoryInterface;
+use Drupal\Core\Entity\EntityTypeManagerInterface;
+use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Menu\MenuLinkTreeInterface;
+use Drupal\Core\Menu\MenuTreeParameters;
+use Drupal\Core\Messenger\MessengerInterface;
+use Drupal\Core\StringTranslation\StringTranslationTrait;
+use Drupal\Core\StringTranslation\TranslationInterface;
+use Drupal\menu_link_content\MenuLinkContentInterface;
+
+/**
+ * Warns the user about menu item changes after an entity is deleted.
+ *
+ * @internal
+ */
+final class EntityDeleteMenuDescendants {
+
+  use StringTranslationTrait;
+
+  /**
+   * Constructs a new EntityDeleteMenuDescendants.
+   */
+  public function __construct(
+    private readonly MenuLinkTreeInterface $menuLinkTree,
+    private readonly EntityTypeManagerInterface $entityTypeManager,
+    private readonly EntityRepositoryInterface $entityRepository,
+    private readonly MessengerInterface $messenger,
+    TranslationInterface $stringTranslation,
+  ) {
+    $this->setStringTranslation($stringTranslation);
+  }
+
+  /**
+   * Implements hook_form_alter().
+   */
+  public function formAlter(&$form, FormStateInterface $form_state, $form_id): void {
+    $formObject = $form_state->getFormObject();
+    if (!$formObject instanceof ContentEntityFormInterface || $formObject->getOperation() !== 'delete') {
+      return;
+    }
+
+    $entity = $formObject->getEntity();
+    $tree = $this->getDescendantTree($entity);
+    if (count($tree) === 0) {
+      return;
+    }
+
+    $form['menu_ui_affected_descendants'] = [
+      '#type' => 'inline_template',
+      '#template' => '<p>{{ message }}</p>{{ menu }}',
+      '#context' => [
+        'message' => [
+          '#markup' => $this->formatPlural(
+            count($tree),
+            'The menu item for this @singular_label has @count child menu item. Deleting this @singular_label will cause this child menu item to move to the same level as the deleted menu item. The affected menu item is:',
+            'The menu items for this @singular_label has @count children menu items. Deleting this @singular_label will cause these children menu items to move to the same level as the deleted menu item. Affected menu items include:',
+            ['@singular_label' => $entity->getEntityType()->getSingularLabel()],
+          ),
+        ],
+        'menu' => $this->menuLinkTree->build($tree),
+      ],
+    ];
+
+    // Execute submit handler before the entity is saved, so we have an
+    // opportunity to get the menu items before the menu is modified.
+    array_unshift(
+      $form['actions']['submit']['#submit'],
+      [$this, 'submitCallback'],
+    );
+  }
+
+  public function submitCallback(array $form, FormStateInterface $form_state): void {
+    $entity = $form_state->getFormObject()->getEntity();
+    $tree = $this->getDescendantTree($entity);
+    if (count($tree) === 0) {
+      return;
+    }
+
+    $this->messenger->addWarning([
+      '#type' => 'inline_template',
+      '#template' => '<p>{{ message }}</p>{{ menu }}',
+      '#context' => [
+        'message' => [
+          '#markup' => $this->formatPlural(
+            count($tree),
+            'The menu item for @entity had @count child menu item. This child menu item moved to the same level as the now-deleted menu item. The affected menu item is:',
+            'The menu items for @entity had @count children menu items. These children menu items moved to the same level as the now-deleted menu item. Affected menu items include:',
+            ['@entity' => $entity->label()]),
+        ],
+        'menu' => $this->menuLinkTree->build($tree),
+      ],
+    ]);
+  }
+
+  /**
+   * Gets the menu link tree below the menu link representing this entity.
+   *
+   * The mechanism for matching an entity to a Menu Link Content is similar to
+   * menu_ui_get_menu_link_defaults().
+   *
+   * @param \Drupal\Core\Entity\EntityInterface $entity
+   *   An entity.
+   *
+   * @return \Drupal\Core\Menu\MenuLinkTreeElement[]
+   *   The descendant menu link tree.
+   */
+  private function getDescendantTree(EntityInterface $entity): array {
+    if ($entity instanceof MenuLinkContentInterface) {
+      // Deleting a menu link content entity directly.
+      $menuLink = $entity;
+    }
+    else {
+      $menuLinkContentStorage = $this->entityTypeManager->getStorage('menu_link_content');
+      $query = $menuLinkContentStorage
+        ->getQuery()
+        ->accessCheck(TRUE)
+        ->condition('link.uri', 'entity:' . $entity->getEntityTypeId() . '/' . $entity->id())
+        ->sort('id', 'ASC')
+        ->range(0, 1);
+      $ids = $query->execute();
+      $id = reset($ids);
+      /** @var \Drupal\menu_link_content\Entity\MenuLinkContent|null $menuLink */
+      $menuLink = $id !== FALSE ? $menuLinkContentStorage->load($id) : NULL;
+      if ($menuLink === NULL) {
+        return [];
+      }
+
+      $menuLink = $this->entityRepository->getTranslationFromContext($menuLink);
+    }
+
+    $parameters = (new MenuTreeParameters())
+      ->setRoot($menuLink->getPluginId())
+      ->excludeRoot()
+      ->setMinDepth(1)
+      ->setMaxDepth(1);
+    return $this->menuLinkTree->transform(
+      tree: $this->menuLinkTree->load($menuLink->getMenuName(), $parameters),
+      manipulators: [
+        ['callable' => 'menu.default_tree_manipulators:checkAccess'],
+      ],
+    );
+  }
+
+}

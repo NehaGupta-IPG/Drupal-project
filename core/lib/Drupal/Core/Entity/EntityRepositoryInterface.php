@@ -61,7 +61,7 @@ interface EntityRepositoryInterface {
    * and if not, it will fall back to the most appropriate translation based on
    * the provided context.
    *
-   * @param \Drupal\Core\Entity\EntityInterface $entity
+   * @param T $entity
    *   The entity whose translation will be returned.
    * @param string $langcode
    *   (optional) The language of the current context. Defaults to the current
@@ -71,11 +71,13 @@ interface EntityRepositoryInterface {
    *   determine the proper fallback sequence. See
    *   \Drupal\Core\Language\LanguageManagerInterface::getFallbackCandidates().
    *
-   * @return \Drupal\Core\Entity\EntityInterface|null
+   * @return T|null
    *   An entity object for the translated data, or NULL if the requested
    *   translation is missing, forbidden, or unavailable.
    *
    * @see \Drupal\Core\Language\LanguageManagerInterface::getFallbackCandidates()
+   *
+   * @template T of \Drupal\Core\Entity\EntityInterface
    */
   public function getTranslationFromContext(EntityInterface $entity, $langcode = NULL, $context = []);
 
