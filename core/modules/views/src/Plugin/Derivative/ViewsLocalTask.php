@@ -79,7 +79,7 @@ class ViewsLocalTask extends DeriverBase implements ContainerDeriverInterface {
           // If the user has chosen a "Menu tab" as the parent for the default
           // tab, then it must also be created and the parent relationship must
           // be established.
-          if (!empty($tab_options['type']) && $tab_options['type'] == 'tab') {
+          if (!empty($tab_options['type']) && $tab_options['type'] === 'tab') {
             $parent_id = $plugin_id . '.parent';
             $this->derivatives[$parent_id] = [
               'route_name' => $route_name,
@@ -111,7 +111,7 @@ class ViewsLocalTask extends DeriverBase implements ContainerDeriverInterface {
       $menu = $executable->display_handler->getOption('menu');
 
       // We already have set the base_route for default tabs.
-      if ($menu['type'] == 'tab') {
+      if (in_array($menu['type'], ['tab'])) {
         $plugin_id = 'view.' . $executable->storage->id() . '.' . $display_id;
         $view_route_name = $view_route_names[$executable->storage->id() . '.' . $display_id];
 
@@ -127,16 +127,16 @@ class ViewsLocalTask extends DeriverBase implements ContainerDeriverInterface {
       }
       // Although the base route for the default tab has been taken care of, we
       // would still have to adjust the parent tab, if it's being created.
-      elseif ($menu['type'] == 'default tab') {
+      elseif ($menu['type'] === 'default tab') {
         $tab_options = $executable->display_handler->getOption('tab_options');
-        if ($tab_options['type'] == 'tab') {
-          $parent_id = 'view.' . $executable->storage->id() . '.' . $display_id . '.parent';
+        if ($tab_options['type'] === 'tab') {
+          $parent_id = 'view.' . $executable->id() . '.' . $display_id . '.parent';
           $this->applyBaseRoute($executable, 'views_view:' . $parent_id, $local_tasks);
         }
-        elseif ($tab_options['type'] == 'none') {
-          $plugin_id = 'view.' . $executable->storage->id() . '.' . $display_id;
-          $route_name = $view_route_names[$executable->storage->id() . '.' . $display_id];
-          if (!($route_name != $plugin_id)) {
+        elseif ($tab_options['type'] === 'none') {
+          $plugin_id = 'view.' . $executable->id() . '.' . $display_id;
+          $route_name = $view_route_names[$executable->id() . '.' . $display_id];
+          if (!($route_name !== $plugin_id)) {
             $this->applyBaseRoute($executable, 'views_view:' . $plugin_id, $local_tasks);
           }
         }
@@ -162,32 +162,31 @@ class ViewsLocalTask extends DeriverBase implements ContainerDeriverInterface {
     array_pop($split);
     $path = implode('/', $split);
     $pattern = '/' . str_replace('%', '{}', $path);
-    if ($routes = $this->routeProvider->getRoutesByPattern($pattern)) {
-      foreach ($routes->all() as $name => $route) {
-        // Add parent for default menu tab with type = tab.
-        $parent_id = 'views_view:' . $name . '.parent';
-        $menu = $view->display_handler->getOption('menu');
-        if (!empty($local_tasks[$parent_id]) && $parent_id != $task_id) {
-          $local_tasks[$task_id]['parent_id'] = $parent_id;
-        }
-        else {
-          $local_tasks[$task_id]['base_route'] = $name;
-          if ($menu['type'] == 'default tab') {
-            $tab_options = $view->display_handler->getOption('tab_options');
-            if ($tab_options['type'] == 'tab') {
-              $split = explode('.', $task_id);
-              array_pop($split);
-              $parent_id = implode('.', $split);
-              $local_tasks[$parent_id]['parent_id'] = $task_id;
-            }
-            elseif ($tab_options['type'] == 'none') {
-              $local_tasks[$task_id]['parent_id'] = $name;
-            }
+
+    foreach ($this->routeProvider->getRoutesByPattern($pattern)->all() as $name => $route) {
+      // Add parent for default menu tab with type = tab.
+      $parent_id = 'views_view:' . $name . '.parent';
+      $menu = $view->display_handler->getOption('menu');
+      if (!empty($local_tasks[$parent_id]) && $parent_id !== $task_id) {
+        $local_tasks[$task_id]['parent_id'] = $parent_id;
+      }
+      else {
+        $local_tasks[$task_id]['base_route'] = $name;
+        if ($menu['type'] === 'default tab') {
+          $tab_options = $view->display_handler->getOption('tab_options');
+          if ($tab_options['type'] === 'tab') {
+            $split = explode('.', $task_id);
+            array_pop($split);
+            $parent_id = implode('.', $split);
+            $local_tasks[$parent_id]['parent_id'] = $task_id;
+          }
+          elseif ($tab_options['type'] === 'none') {
+            $local_tasks[$task_id]['parent_id'] = $name;
           }
         }
-        // Skip after the first found route.
-        break;
       }
+      // Skip after the first found route.
+      break;
     }
   }
 
