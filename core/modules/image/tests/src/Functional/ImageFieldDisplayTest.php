@@ -651,10 +651,10 @@ class ImageFieldDisplayTest extends ImageFieldTestBase {
 
     $test_image = current($this->drupalGetTestFiles('image'));
 
-    // Create a new node with the uploaded file.
+    // Create a new node with the uploaded image.
     $nid = $this->uploadNodeImage($test_image, $field_name, $type_name, 'image');
 
-    // Check that the default formatter is displaying with the file name.
+    // Check that the default formatter is displaying with the image name.
     $node_storage = $this->container->get('entity_type.manager')->getStorage('node');
     $node_storage->resetCache([$nid]);
     $node = $node_storage->load($nid);
@@ -670,7 +670,7 @@ class ImageFieldDisplayTest extends ImageFieldTestBase {
     $default_output = str_replace("\n", '', (string) \Drupal::service('renderer')->renderRoot($image));
     $this->assertSession()->responseContains($default_output);
 
-    // Turn the "display" option off and check that the file is no longer displayed.
+    // Turn the "display" option off and check that the image is no longer displayed.
     $edit = [$field_name . '[0][display]' => FALSE];
     $this->drupalGet('node/' . $nid . '/edit');
     $this->submitForm($edit, 'Save');
@@ -684,7 +684,7 @@ class ImageFieldDisplayTest extends ImageFieldTestBase {
     $this->clickLink('Back to content editing');
     $this->assertSession()->responseContains($field_name . '[0][display]');
 
-    // Check that the file fields don't contain duplicate HTML IDs.
+    // Check that the image fields don't contain duplicate HTML IDs.
     $this->assertSession()->pageContainsNoDuplicateId();
   }
 
@@ -705,7 +705,7 @@ class ImageFieldDisplayTest extends ImageFieldTestBase {
 
     $test_image = current($this->drupalGetTestFiles('image'));
 
-    // Create a new node with the uploaded file.
+    // Create a new node with the uploaded image.
     $nid = $this->uploadNodeImage($test_image, $field_name, $type_name, 'image');
 
     $this->drupalGet('node/' . $nid . '/edit');
