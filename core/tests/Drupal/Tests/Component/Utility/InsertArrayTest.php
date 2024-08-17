@@ -177,7 +177,7 @@ class InsertArrayTest extends TestCase {
   }
 
   /**
-   * Data provider for testInsertAfter().
+   * Data provider for testExceptions().
    */
   public static function dataExceptions(): array {
     return [
