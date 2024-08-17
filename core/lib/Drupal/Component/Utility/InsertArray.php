@@ -53,7 +53,7 @@ class InsertArray {
    *    - The $array does not have the key $key.
    *    - The $array and the $insert_array have keys in common.
    */
-  public static function insertAfter(&$array, $key, $insert_array) {
+  public static function insertAfter(array &$array, mixed $key, array $insert_array): void {
     static::insert($array, $key, $insert_array, FALSE);
   }
 
