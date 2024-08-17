@@ -537,6 +537,7 @@ drupal.dialog:
       assets/vendor/jquery.ui/themes/base/checkboxradio.css: { weight: -11.6 }
       assets/vendor/jquery.ui/themes/base/resizable.css: { weight: -11.6 }
       assets/vendor/jquery.ui/themes/base/controlgroup.css: { weight: -11.7 }
+      misc/dialog/dialog.css: {}
   dependencies:
     - core/jquery
     - core/internal.jquery_ui
@@ -544,6 +545,7 @@ drupal.dialog:
     - core/drupalSettings
     - core/drupal.debounce
     - core/drupal.displace
+    - core/internal.floating-ui
     - core/once
     - core/drupal.jquery.position
     - core/tabbable
