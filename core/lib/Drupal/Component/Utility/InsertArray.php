@@ -79,7 +79,7 @@ class InsertArray {
    *    - The $array does not have the key $key.
    *    - The $array and the $insert_array have keys in common.
    */
-  protected static function insert(&$array, $key, $insert_array, $before) {
+  protected static function insert(array &$array, mixed $key, array $insert_array, bool $before): void {
     if (!isset($array[$key])) {
       throw new \InvalidArgumentException("The array does not have the key $key.");
     }
