@@ -98,7 +98,7 @@ class InsertArrayTest extends TestCase {
   /**
    * Data provider for testInsertAfter().
    */
-  public static function dataInsertAfter() {
+  public static function dataInsertAfter(): array {
     return [
       'in_between' => [
         [
