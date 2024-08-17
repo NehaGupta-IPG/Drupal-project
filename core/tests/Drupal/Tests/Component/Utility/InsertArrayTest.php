@@ -179,7 +179,7 @@ class InsertArrayTest extends TestCase {
   /**
    * Data provider for testInsertAfter().
    */
-  public static function dataExceptions() {
+  public static function dataExceptions(): array {
     return [
       'nonexistent_key' => [
         [
