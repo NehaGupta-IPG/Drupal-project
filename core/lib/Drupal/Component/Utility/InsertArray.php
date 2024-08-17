@@ -96,11 +96,11 @@ class InsertArray {
       $offset = 1;
     }
 
-    $pos = array_search($key, array_keys($array));
-    $pos += $offset;
+    $position = array_search($key, array_keys($array));
+    $position += $offset;
 
-    $array_before = array_slice($array, 0, $pos, preserve_keys: TRUE);
-    $array_after = array_slice($array, $pos, preserve_keys: TRUE);
+    $array_before = array_slice($array, 0, $position, preserve_keys: TRUE);
+    $array_after = array_slice($array, $position, preserve_keys: TRUE);
 
     $array = $array_before + $insert_array + $array_after;
   }
