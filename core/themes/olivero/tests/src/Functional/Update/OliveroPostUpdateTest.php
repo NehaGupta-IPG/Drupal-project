@@ -22,16 +22,16 @@ class OliveroPostUpdateTest extends UpdatePathTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function setDatabaseDumpFiles() {
+  protected function setDatabaseDumpFiles(): void {
     $this->databaseDumpFiles = [
       __DIR__ . '/../../../../../../modules/system/tests/fixtures/update/drupal-10.3.0.filled.standard.php.gz',
     ];
   }
 
   /**
-   * Tests update hook setting base primary color.
+   * Tests update hook setting comment form position.
    */
-  public function testOliveroPrimaryColorUpdate(): void {
+  public function testOliveroCommentFormPositionUpdate(): void {
     $config = $this->config('olivero.settings');
     $this->assertEmpty($config->get('comment_form_position'));
 

@@ -17,7 +17,7 @@ function olivero_removed_post_updates(): array {
 /**
  * Sets the `comment_form_position` value of Olivero's theme settings.
  */
-function olivero_post_update_add_comment_form_position() {
+function olivero_post_update_add_comment_form_position(): void {
   \Drupal::configFactory()->getEditable('olivero.settings')
     ->set('comment_form_position', 'before')
     ->save(TRUE);
