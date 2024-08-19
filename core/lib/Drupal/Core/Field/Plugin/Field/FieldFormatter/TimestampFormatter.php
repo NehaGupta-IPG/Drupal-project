@@ -179,6 +179,7 @@ class TimestampFormatter extends FormatterBase {
 
     $form['time_diff']['description'] = [
       '#type' => 'item',
+      '#input' => FALSE,
       '#title' => $this->t('Fallback configuration'),
       '#description' => $this->t('The configuration below is used as a fallback when JavaScript is not available on the page.'),
       '#states' => $states,
