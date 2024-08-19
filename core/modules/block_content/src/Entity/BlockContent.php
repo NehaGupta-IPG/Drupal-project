@@ -75,6 +75,7 @@ use Drupal\block_content\BlockContentInterface;
     'revision-revert-form' => '/admin/content/block/{block_content}/revision/{block_content_revision}/revert',
     'version-history' => '/admin/content/block/{block_content}/revisions',
   ],
+  permission_granularity: 'bundle',
   admin_permission: 'administer block content',
   collection_permission: 'access block library',
   bundle_entity_type: 'block_content_type',
