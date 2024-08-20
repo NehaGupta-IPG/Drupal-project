@@ -85,7 +85,7 @@ class CheckboxesTest extends UnitTestCase {
     $this->assertEquals($element['test3']['#type'], 'checkbox');
     $this->assertEquals($element['test3']['#title'], 'Test3');
     $this->assertArrayHasKey('all_wrapper', $element);
-    // Remove check_all (set it to FALSE) and see that the button is gone.
+    // Remove check_all (set it to FALSE) and see that there is no 'check all' button.
     $element = [
       '#type' => 'checkboxes',
       '#options' => [
