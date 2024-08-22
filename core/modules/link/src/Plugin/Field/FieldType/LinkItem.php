@@ -33,6 +33,10 @@ use Drupal\link\LinkTitleVisibility;
       "label" => new TranslatableMarkup("Title"),
       "translatable" => TRUE,
     ],
+    "options" => [
+      "label" => new TranslatableMarkup("Options"),
+      "translatable" => TRUE,
+    ],
   ],
   constraints: [
     "LinkType" => [],
