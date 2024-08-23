@@ -114,6 +114,11 @@
         states.postponed.shift()();
       }
     },
+    detach(context, settings, trigger) {
+      if (trigger === 'unload') {
+        $(once.remove('states', '[data-drupal-states]'));
+      }
+    },
   };
 
   /**
