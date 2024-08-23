@@ -116,7 +116,7 @@
     },
     detach(context, settings, trigger) {
       if (trigger === 'unload') {
-        $(once.remove('states', '[data-drupal-states]'));
+        $(once.remove('states', '[data-drupal-states]', context));
       }
     },
   };
