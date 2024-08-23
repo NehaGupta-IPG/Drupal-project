@@ -93,8 +93,7 @@
    */
   Drupal.behaviors.states = {
     attach(context, settings) {
-      // Uses once to avoid duplicates if attach is called multiple times.
-      const elements = once('states', '[data-drupal-states]', context);
+      const elements = $(context).find('[data-drupal-states]');
       const il = elements.length;
       for (let i = 0; i < il; i++) {
         const config = JSON.parse(
@@ -112,11 +111,6 @@
       // Execute all postponed functions now.
       while (states.postponed.length) {
         states.postponed.shift()();
-      }
-    },
-    detach(context, settings, trigger) {
-      if (trigger === 'unload') {
-        $(once.remove('states', '[data-drupal-states]', context));
       }
     },
   };
@@ -207,7 +201,9 @@
         let state = dependeeStates[i];
         // Make sure we're not initializing this selector/state combination
         // twice.
-        if ($.inArray(state, dependeeStates) === -1) {
+        // Make sure we are not initializing if the trigger was already initialized
+        // for the selector
+        if ($.inArray(state, dependeeStates) === -1 || $(selector).data(`trigger:${state}`)) {
           return;
         }
 
