@@ -203,7 +203,10 @@
         // twice.
         // Make sure we are not initializing if the trigger was already initialized
         // for the selector
-        if ($.inArray(state, dependeeStates) === -1 || $(selector).data(`trigger:${state}`)) {
+        if (
+          $.inArray(state, dependeeStates) === -1 ||
+          $(selector).data(`trigger:${state}`)
+        ) {
           return;
         }
 
