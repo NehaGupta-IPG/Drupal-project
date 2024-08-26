@@ -155,23 +155,21 @@ class GDToolkit extends ImageToolkitBase {
       '#field_suffix' => $this->t('%'),
     ];
 
-    // In PHP 8.1, the GD extension supports lossless encoding,
+    // In PHP 8.1+, the GD extension supports lossless encoding,
     // and declares a new PHP constant IMG_WEBP_LOSSLESS which
     // can be passed to imagewebp function to enable lossless
     // encoding of a GdImage object.
-    if (defined('IMG_WEBP_LOSSLESS')) {
-      $form['image_webp_lossless'] = [
-        '#type' => 'checkbox',
-        '#title' => $this->t('Lossless WEBP'),
-        '#description' => $this->t('Define the image quality for WEBP to lossless compression. This will override the WEBP quality setting below.'),
-        '#default_value' => $this->configFactory->getEditable('system.image.gd')
-          ->get('webp_lossless', FALSE),
-      ];
-    }
+    $form['image_webp_lossless'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('Lossless WebP'),
+      '#description' => $this->t('Define the image quality for WebP to lossless compression. This will override the WebP quality setting below.'),
+      '#default_value' => $this->configFactory->getEditable('system.image.gd')
+        ->get('webp_lossless', FALSE),
+    ];
     $form['image_webp_quality'] = [
       '#type' => 'number',
-      '#title' => $this->t('WEBP quality'),
-      '#description' => $this->t('Define the image quality for WEBP manipulations. Ranges from 0 to 100. Higher values mean better image quality but bigger files.'),
+      '#title' => $this->t('WebP quality'),
+      '#description' => $this->t('Define the image quality for WebP manipulations. Ranges from 0 to 100. Higher values mean better image quality but bigger files.'),
       '#min' => 0,
       '#max' => 100,
       '#default_value' => $this->configFactory->getEditable('system.image.gd')
@@ -320,7 +318,7 @@ class GDToolkit extends ImageToolkitBase {
       }
       try {
         if ($this->getType() == IMAGETYPE_WEBP) {
-          $webp_quality = defined('IMG_WEBP_LOSSLESS') && $this->configFactory->get('system.image.gd')->get('webp_lossless')
+          $webp_quality = $this->configFactory->get('system.image.gd')->get('webp_lossless')
             ? constant('IMG_WEBP_LOSSLESS')
             : $this->configFactory->get('system.image.gd')->get('webp_quality');
           $success = $function($this->getImage(), $destination, $webp_quality);

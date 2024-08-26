@@ -374,10 +374,15 @@ system.image.gd:
           max: 100
     webp_quality:
       type: integer
-      label: 'WEBP quality'
+      label: 'WebP quality'
+      constraints:
+        # @see \Drupal\system\Plugin\ImageToolkit\GDToolkit::buildConfigurationForm()
+        Range:
+          min: 0
+          max: 100
     webp_lossless:
       type: boolean
-      label: 'Toggle WEBP lossless'
+      label: 'Toggle WebP lossless'
 
 system.mail:
   type: config_object
