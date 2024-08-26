@@ -150,7 +150,7 @@ function system_post_update_delete_rss_config(array &$sandbox): void {
 }
 
 /**
- * Update the WEBP quality setting to defaulta value.
+ * Update the WEBP quality setting to default value.
  */
 function system_post_update_webp_quality_default_value() {
   $config = \Drupal::configFactory()->getEditable('system.image.gd');
