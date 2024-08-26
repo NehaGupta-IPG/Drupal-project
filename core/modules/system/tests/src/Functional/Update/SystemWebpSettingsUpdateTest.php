@@ -35,7 +35,7 @@ class SystemWebpSettingsUpdateTest extends UpdatePathTestBase {
 
     $config = $this->config('system.image.gd');
     $this->assertSame(75, $config->get('webp_quality'));
-    $this->assertSame(FALSE, $config->get('webp_lossless'));
+    $this->assertFalse($config->get('webp_lossless'));
   }
 
 }
