@@ -248,7 +248,7 @@
    */
   Drupal.theme.message = ({ text }, { type, id }) => {
     const template = document.createElement('template');
-    template.innerHTML = drupalSettings[type + 'MessagesTemplate'];
+    template.innerHTML = drupalSettings[`${type}MessagesTemplate`];
     template.querySelector('[data-drupal-message-template]').innerHTML = text;
     return template.content.getRootNode();
   };
