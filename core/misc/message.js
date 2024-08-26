@@ -247,9 +247,11 @@
    *   A DOM Node.
    */
   Drupal.theme.message = ({ text }, { type, id }) => {
-    const template = document.createElement('template');
-    template.innerHTML = drupalSettings[`${type}MessagesTemplate`];
-    template.querySelector('[data-drupal-message-template]').innerHTML = text;
-    return template.content.getRootNode();
+    const element = document.createElement('div');
+    element.innerHTML = drupalSettings[`${type}MessagesTemplate`];
+    element.querySelector('[data-drupal-message-template]').innerHTML = text;
+    const fragment = document.createDocumentFragment();
+    fragment.appendChild(element);
+    return fragment.firstElementChild.firstElementChild;
   };
 })(Drupal);
