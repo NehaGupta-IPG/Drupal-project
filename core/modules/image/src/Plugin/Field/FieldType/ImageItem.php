@@ -16,6 +16,7 @@ use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\TypedData\DataDefinition;
 use Drupal\file\Entity\File;
 use Drupal\file\FileInterface;
+use Drupal\file\Plugin\Field\FieldType\FileFieldItemList;
 use Drupal\file\Plugin\Field\FieldType\FileItem;
 
 /**
@@ -32,7 +33,7 @@ use Drupal\file\Plugin\Field\FieldType\FileItem;
   category: "file_upload",
   default_widget: "image_image",
   default_formatter: "image",
-  list_class: ImageFieldItemList::class,
+  list_class: FileFieldItemList::class,
   constraints: ["ReferenceAccess" => [], "FileValidation" => []],
   column_groups: [
     "file" => [
