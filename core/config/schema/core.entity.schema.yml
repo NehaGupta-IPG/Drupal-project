@@ -374,6 +374,13 @@ field.formatter.settings.string:
             - edit-form
       requiredKey: false
 
+field.formatter.settings.title:
+  type: field.formatter.settings.string
+  mapping:
+    tag:
+      type: string
+      label: 'Tag'
+
 field.formatter.settings.language:
   type: field.formatter.settings.string
   mapping:
