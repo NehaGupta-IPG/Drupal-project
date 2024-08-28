@@ -95,16 +95,10 @@ class TimestampDatetimeWidget extends WidgetBase {
       elseif (isset($item['value']['object']) && $item['value']['object'] instanceof DrupalDateTime) {
         $date = $item['value']['object'];
       }
-      if (isset($date) && $date instanceof DrupalDateTime) {
-        $item['value'] = $date->getTimestamp();
-      }
-      if ($this->getSetting('use_current_time') == FALSE) {
-        $item['value'] = $item['value'] ?? NULL;
-      }
-      else {
+      elseif ($this->getSetting('use_current_time')) {
         $date = new DrupalDateTime();
-        $item['value'] = $date->getTimestamp();
       }
+      $item['value'] = $date->getTimestamp();
     }
     return $values;
   }
