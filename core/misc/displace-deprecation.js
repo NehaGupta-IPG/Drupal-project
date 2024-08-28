@@ -21,7 +21,7 @@
       if (docEvents[event.type]) {
         docEvents[event.type].forEach((listener) => {
           Drupal.deprecationError({
-            message: `jQuery event drupalViewportOffsetChange is deprecated in 10.3.0 and is removed from Drupal:11.1. See https://www.drupal.org/node/3449016`,
+            message: `jQuery event drupalViewportOffsetChange is deprecated in 10.3.0 and is removed from Drupal:11.1.0. See https://www.drupal.org/node/3449016`,
           });
         });
       }
