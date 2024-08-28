@@ -17,6 +17,12 @@
      * An array of functions that should be postponed.
      */
     postponed: [],
+    /**
+     * Object with trigger elements.
+     *
+     * Trigger element id has array of dependent field id.
+     */
+    triggerSource: {},
   };
 
   Drupal.states = states;
@@ -114,6 +120,18 @@
         states.postponed.shift()();
       }
     },
+    detach(context, settings, trigger) {
+      if (trigger === 'unload') {
+        Object.keys(states.triggerSource).forEach((selector) => {
+          const element = $(context).find(selector);
+          if (element.length > 0) {
+            for (const item in states.triggerSource[selector]) {
+              $(once.remove('states', $(states.triggerSource[selector][item]), $(states.triggerSource[selector][item])));
+            }
+          }
+        });
+      }
+    },
   };
 
   /**
@@ -137,6 +155,8 @@
 
     this.dependees = this.getDependees();
     Object.keys(this.dependees || {}).forEach((selector) => {
+      states.triggerSource[selector] = states.triggerSource[selector] || [];
+      states.triggerSource[selector].push('#' + this.element.attr('id'))
       this.initializeDependee(selector, this.dependees[selector]);
     });
   };
