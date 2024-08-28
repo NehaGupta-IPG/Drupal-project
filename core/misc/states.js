@@ -125,7 +125,7 @@
         Object.keys(states.triggerSource).forEach((selector) => {
           const element = $(context).find(selector);
           if (element.length > 0) {
-            states.triggerSource[selector].forEach(item => {
+            states.triggerSource[selector].forEach((item) => {
               $(once.remove('states', $(item), $(item)));
             });
           }
