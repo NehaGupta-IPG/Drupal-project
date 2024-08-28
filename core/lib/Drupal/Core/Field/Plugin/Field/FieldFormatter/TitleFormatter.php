@@ -67,7 +67,7 @@ class TitleFormatter extends StringFormatter {
   public function viewElements(FieldItemListInterface $items, $langcode = NULL) {
     $items = parent::viewElements($items, $langcode);
 
-    foreach ($items as $delta => &$item) {
+    foreach ($items as &$item) {
       $tag = $this->getSetting('tag');
       $item['#prefix'] = "<$tag>";
       $item['#suffix'] = "</$tag>";
