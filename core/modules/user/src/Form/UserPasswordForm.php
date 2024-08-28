@@ -11,8 +11,8 @@ use Drupal\Core\Form\WorkspaceSafeFormInterface;
 use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\Core\Render\Element\Email;
 use Drupal\user\UserInterface;
-use Drupal\user\UserStorageInterface;
 use Drupal\user\UserNameValidator;
+use Drupal\user\UserStorageInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
