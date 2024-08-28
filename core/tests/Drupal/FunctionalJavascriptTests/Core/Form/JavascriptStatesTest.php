@@ -469,6 +469,15 @@ class JavascriptStatesTest extends WebDriverTestBase {
     $this->assertTrue($textfield_visible_value3->isVisible());
     $this->assertTrue($textfield_visible_value2_or_value3->isVisible());
 
+    $js_states_reload = $page->findField('reload');
+    $js_states_select = $page->findField('select_field');
+    $js_select_field_textfield = $page->findField('js_select_field_textfield');
+    $this->assertFalse($js_select_field_textfield->isVisible());
+    $js_states_reload->check();
+    sleep(1);
+    $js_states_select->setValue('1');
+    $this->assertTrue($js_select_field_textfield->isVisible());
+
     $this->container->get('module_installer')->install(['big_pipe']);
     $this->drupalGet('form-test/javascript-states-form');
     $select_visible_2 = $this->assertSession()->elementExists('css', 'select[name="select_visible_2"]');

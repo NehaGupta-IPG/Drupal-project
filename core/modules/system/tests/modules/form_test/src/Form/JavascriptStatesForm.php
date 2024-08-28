@@ -483,6 +483,36 @@ class JavascriptStatesForm extends FormBase {
       ],
     ];
 
+    $form['js_states_test'] = [
+      '#type' => 'details',
+      '#open' => TRUE,
+      '#prefix' => '<div id="js_states_test_wrapper">',
+      '#suffix' => '</div>',
+    ];
+    $form['js_states_test']['reload'] = [
+      '#type' => 'checkbox',
+      '#title' => 'Check me to reload Select Field field',
+      '#ajax' => [
+        'callback' => '::buildAjax',
+        'wrapper' => 'js_states_test_wrapper',
+      ],
+    ];
+    $form['js_states_test']['select_field'] = [
+      '#type' => 'select',
+      '#title' => 'Select Field',
+      '#options' => [0 => 0, 1 => 1],
+      '#default_value' => 0,
+    ];
+    $form['js_select_field_textfield'] = [
+      '#type' => 'select',
+      '#title' => 'Select should show when 1 is selected in select_field after ajax',
+      '#states' => [
+        'visible' => [
+          ':input[name="select_field"]' => ['value' => 1],
+        ],
+      ],
+    ];
+
     // Multiple select trigger.
     $form['header_multiple_select'] = [
       '#type' => 'html_tag',
@@ -772,6 +802,13 @@ class JavascriptStatesForm extends FormBase {
    * {@inheritdoc}
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {
+  }
+
+  /**
+   * Return ajax.
+   */
+  public function buildAjax(array &$form, FormStateInterface $form_state) {
+    return $form['js_states_test'];
   }
 
 }

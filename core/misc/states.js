@@ -93,7 +93,8 @@
    */
   Drupal.behaviors.states = {
     attach(context, settings) {
-      const elements = $(context).find('[data-drupal-states]');
+      // Uses once to avoid duplicates if attach is called multiple times.
+      const elements = once('states', '[data-drupal-states]', context);
       const il = elements.length;
       for (let i = 0; i < il; i++) {
         const config = JSON.parse(
@@ -201,12 +202,7 @@
         let state = dependeeStates[i];
         // Make sure we're not initializing this selector/state combination
         // twice.
-        // Make sure we are not initializing if the trigger was already initialized
-        // for the selector
-        if (
-          $.inArray(state, dependeeStates) === -1 ||
-          $(selector).data(`trigger:${state}`)
-        ) {
+        if ($.inArray(state, dependeeStates) === -1) {
           return;
         }
 
