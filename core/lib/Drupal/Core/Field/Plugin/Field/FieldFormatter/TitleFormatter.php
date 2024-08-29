@@ -2,26 +2,27 @@
 
 namespace Drupal\Core\Field\Plugin\Field\FieldFormatter;
 
+use Drupal\Core\Field\Attribute\FieldFormatter;
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 
 /**
- * A field formatter for entity titles.
- *
- * @FieldFormatter(
- *   id = "title",
- *   label = @Translation("Title"),
- *   field_types = {
- *     "string"
- *   }
- * )
+ * Plugin implementation of the 'title' formatter.
  */
+#[FieldFormatter(
+  id: 'title',
+  label: new TranslatableMarkup('Title'),
+  field_types: [
+    'string',
+  ],
+)]
 class TitleFormatter extends StringFormatter {
 
   /**
    * {@inheritdoc}
    */
-  public function settingsForm(array $form, FormStateInterface $form_state) {
+  public function settingsForm(array $form, FormStateInterface $form_state): array {
     $form = parent::settingsForm($form, $form_state);
     $heading_options = [
       'span' => 'span',
@@ -45,7 +46,7 @@ class TitleFormatter extends StringFormatter {
   /**
    * {@inheritdoc}
    */
-  public static function defaultSettings() {
+  public static function defaultSettings(): array {
     return [
       'tag' => 'h2',
       'link_to_entity' => TRUE,
@@ -55,7 +56,7 @@ class TitleFormatter extends StringFormatter {
   /**
    * {@inheritdoc}
    */
-  public function settingsSummary() {
+  public function settingsSummary(): array {
     $summary = parent::settingsSummary();
     $summary[] = $this->t('Display as @tag', ['@tag' => $this->getSetting('tag')]);
     return $summary;
@@ -64,7 +65,7 @@ class TitleFormatter extends StringFormatter {
   /**
    * {@inheritdoc}
    */
-  public function viewElements(FieldItemListInterface $items, $langcode = NULL) {
+  public function viewElements(FieldItemListInterface $items, $langcode = NULL): array {
     $items = parent::viewElements($items, $langcode);
 
     foreach ($items as &$item) {
