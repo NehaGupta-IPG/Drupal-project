@@ -116,19 +116,19 @@ class Xss {
    * @see \Drupal\Component\Utility\Xss::filter()
    */
   protected static $safeAttributes = [
-    'title',
     'alt',
     'class',
-    'value',
-    'name',
-    'property',
-    'typeof',
-    'rel',
-    'rev',
     'datetime',
     'mailto',
     'media',
+    'name',
+    'property',
+    'rel',
+    'rev',
     'sizes',
+    'title',
+    'typeof',
+    'value',
   ];
 
   /**
