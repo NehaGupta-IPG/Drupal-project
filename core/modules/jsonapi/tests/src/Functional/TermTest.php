@@ -118,7 +118,6 @@ class TermTest extends ResourceTestBase {
     // Create a "Llama" taxonomy term.
     $term = Term::create(['vid' => $vocabulary->id()])
       ->setName('Llama')
-      ->setDescription("It is a little known fact that llamas cannot count higher than seven.")
       ->setChangedTime(123456789)
       ->set('path', '/llama');
     $term->save();
@@ -270,11 +269,6 @@ class TermTest extends ResourceTestBase {
         'attributes' => [
           'changed' => (new \DateTime())->setTimestamp($this->entity->getChangedTime())->setTimezone(new \DateTimeZone('UTC'))->format(\DateTime::RFC3339),
           'default_langcode' => TRUE,
-          'description' => [
-            'value' => 'It is a little known fact that llamas cannot count higher than seven.',
-            'format' => NULL,
-            'processed' => "<p>It is a little known fact that llamas cannot count higher than seven.</p>\n",
-          ],
           'langcode' => 'en',
           'name' => 'Llama',
           'path' => [
@@ -356,10 +350,6 @@ class TermTest extends ResourceTestBase {
         'type' => 'taxonomy_term--camelids',
         'attributes' => [
           'name' => 'Drama llama',
-          'description' => [
-            'value' => 'Drama llamas are the coolest camelids.',
-            'format' => NULL,
-          ],
         ],
       ],
     ];
