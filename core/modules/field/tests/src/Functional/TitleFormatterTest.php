@@ -18,9 +18,7 @@ use Drupal\Tests\BrowserTestBase;
 class TitleFormatterTest extends BrowserTestBase {
 
   /**
-   * Modules to install.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['node'];
 
@@ -54,15 +52,6 @@ class TitleFormatterTest extends BrowserTestBase {
       'required' => FALSE,
       'settings' => [
         'max_length' => 255,
-      ],
-    ])->save();
-    // Configure display.
-    $display = EntityViewDisplay::load('node.page.default');
-    $display->setComponent('field_subtitle', [
-      'type' => 'title',
-      'settings' => [
-        'link_to_entity' => 1,
-        'tag' => 'h2',
       ],
     ])->save();
     // Configure display.
