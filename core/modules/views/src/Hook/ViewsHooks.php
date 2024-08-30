@@ -3,6 +3,7 @@
 namespace Drupal\views\Hook;
 
 use Drupal\block\BlockInterface;
+use Drupal\Component\Utility\UrlHelper;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\views\ViewsConfigUpdater;
 use Drupal\views\ViewEntityInterface;
@@ -73,6 +74,7 @@ class ViewsHooks {
             'view_display_id' => $view->current_display,
             'view_args' => Html::escape(implode('/', $view->args)),
             'view_path' => Html::escape(\Drupal::service('path.current')->getPath()),
+            'view_query' => UrlHelper::buildQuery(\Drupal::request()->query->all()),
             'view_base_path' => $view->getPath(),
             'view_dom_id' => $view->dom_id,
                     // To fit multiple views on a page, the programmer may have

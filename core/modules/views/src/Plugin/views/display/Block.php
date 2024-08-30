@@ -2,17 +2,25 @@
 
 namespace Drupal\views\Plugin\views\display;
 
-use Drupal\Component\Utility\Unicode;
-use Drupal\Core\StringTranslation\TranslatableMarkup;
-use Drupal\Core\Url;
+use Drupal\Component\Plugin\ContextAwarePluginInterface;
 use Drupal\Component\Plugin\Discovery\CachedDiscoveryInterface;
+use Drupal\Component\Utility\Crypt;
+use Drupal\Component\Utility\Unicode;
+use Drupal\Component\Utility\UrlHelper;
 use Drupal\Core\Block\BlockManagerInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\KeyValueStore\KeyValueFactoryInterface;
+use Drupal\Core\Plugin\Context\ContextHandlerInterface;
+use Drupal\Core\Plugin\Context\ContextRepositoryInterface;
+use Drupal\Core\Site\Settings;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\Core\Url;
 use Drupal\views\Attribute\ViewsDisplay;
 use Drupal\views\Plugin\Block\ViewsBlock;
 use Drupal\views\PostSaveProcess;
 use Drupal\views\PostSaveViewInterface;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
 /**
  * The plugin that handles a block.
@@ -56,6 +64,34 @@ class Block extends DisplayPluginBase implements PostSaveViewInterface {
   protected $blockManager;
 
   /**
+   * The key/value manager service.
+   *
+   * @var \Drupal\Core\KeyValueStore\KeyValueFactoryInterface
+   */
+  protected $keyValue;
+
+  /**
+   * The context repository.
+   *
+   * @var \Drupal\Core\Plugin\Context\ContextRepositoryInterface
+   */
+  protected $contextRepository;
+
+  /**
+   * The plugin context handler.
+   *
+   * @var \Drupal\Core\Plugin\Context\ContextHandlerInterface
+   */
+  protected $contextHandler;
+
+  /**
+   * A hashed key of the key/value entry that holds block instance settings.
+   *
+   * @var string
+   */
+  protected $blockConfigKey;
+
+  /**
    * Constructs a new Block instance.
    *
    * @param array $configuration
@@ -68,12 +104,21 @@ class Block extends DisplayPluginBase implements PostSaveViewInterface {
    *   The entity type manager.
    * @param \Drupal\Core\Block\BlockManagerInterface $block_manager
    *   The block manager.
+   * @param \Drupal\Core\KeyValueStore\KeyValueFactoryInterface $key_value
+   *   The key/value manager service.
+   * @param \Drupal\Core\Plugin\Context\ContextRepositoryInterface $context_repository
+   *   The context repository.
+   * @param \Drupal\Core\Plugin\Context\ContextHandlerInterface $context_handler
+   *   The ContextHandler for applying contexts to conditions properly.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, EntityTypeManagerInterface $entity_type_manager, BlockManagerInterface $block_manager) {
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, EntityTypeManagerInterface $entity_type_manager, BlockManagerInterface $block_manager, ?KeyValueFactoryInterface $key_value = NULL, ?ContextRepositoryInterface $context_repository = NULL, ?ContextHandlerInterface $context_handler = NULL) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
 
     $this->entityTypeManager = $entity_type_manager;
     $this->blockManager = $block_manager;
+    $this->keyValue = $key_value ?: \Drupal::service('keyvalue');
+    $this->contextRepository = $context_repository ?: \Drupal::service('context.repository');
+    $this->contextHandler = $context_handler ?: \Drupal::service('context.handler');
   }
 
   /**
@@ -342,7 +387,7 @@ class Block extends DisplayPluginBase implements PostSaveViewInterface {
    *
    * @see \Drupal\views\Plugin\Block\ViewsBlock::blockSubmit()
    */
-  public function blockSubmit(ViewsBlock $block, $form, FormStateInterface $form_state) {
+  public function blockSubmit(ViewsBlock $block, array $form, FormStateInterface $form_state) {
     if ($items_per_page = $form_state->getValue(['override', 'items_per_page'])) {
       $block->setConfigurationValue('items_per_page', $items_per_page === 'none' ? NULL : intval($items_per_page));
     }
@@ -357,10 +402,178 @@ class Block extends DisplayPluginBase implements PostSaveViewInterface {
    */
   public function preBlockBuild(ViewsBlock $block) {
     $config = $block->getConfiguration();
+
+    // If this block is being rebuilt as part of an AJAX call, the AJAX handler
+    // does not have block instance settings and context information available.
+    // Because of that, the first time this block is rendered (normally during
+    // a non-AJAX request, but it could be AJAX as well), we store the block
+    // instance overrides in the key/value store, to be retrieved when
+    // subsequent AJAX calls happen. This will be possible as long as all
+    // following calls pass along the 'block_config_key' query param and it
+    // matches the key we are generating here for this view+display combination.
+    // See \Drupal\views\Plugin\views\display\Block::preview().
+    // See \Drupal\views\Plugin\views\display\Block::getConfigurationFromHashedKey().
+    $key = $this->view->getRequest()->request->get('block_config_key');
+    if (empty($key)) {
+      // Calculate a brand new key.
+      $this->blockConfigKey = $this->calculateConfigurationHash($config);
+      $key_value_storage = $this->keyValue->get('views_block_overrides');
+      if (!$key_value_storage->has($this->blockConfigKey)) {
+        $key_value_storage->set($this->blockConfigKey, $config);
+      }
+    }
+    elseif ($this->getConfigurationFromHashedKey($key)) {
+      // If we can retrieve valid configuration from the received key, persist
+      // it between requests.
+      $this->blockConfigKey = $key;
+    }
+    else {
+      // If the received key does not validate, mark the build as failed, which
+      // will abort the rendering process.
+      // See \Drupal\views\ViewExecutable::render().
+      $this->view->build_info['fail'] = TRUE;
+      return;
+    }
+
     if (is_numeric($config['items_per_page']) && $config['items_per_page'] > 0) {
       // @todo Delete the intval() in https://www.drupal.org/project/drupal/issues/3521221
       $this->view->setItemsPerPage(intval($config['items_per_page']));
     }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function preview() {
+    // In AJAX requests, we have to figure out the block config ourselves and
+    // prepare the view using that.
+    if ($block_instance = $this->getBlockFromAjaxRequest()) {
+      $this->preBlockBuild($block_instance);
+    }
+    return parent::preview();
+  }
+
+  /**
+   * Returns a configured views block plugin instance on an AJAX request.
+   *
+   * @return \Drupal\views\Plugin\Block\ViewsBlock|null
+   *   The views block or NULL if this is not an AJAX request or the block
+   *   can't be instantiated.
+   */
+  protected function getBlockFromAjaxRequest() {
+    if (!$this->view->getRequest()->isXmlHttpRequest()) {
+      return NULL;
+    }
+
+    // We expect to receive here the "block_config_key" parameter, which will
+    // allow us to retrieve the block config from the key/value store.
+    $query_args = $this->view->getRequest()->request->all();
+    // In order to have exposed filters submissions preserve the query args as
+    // well, they are injected in the 'view_query' param. We merge them all
+    // together here.
+    if (!empty($query_args['view_query'])) {
+      $parsed_view_query = UrlHelper::parse('?' . $query_args['view_query']);
+      $query_args += $parsed_view_query['query'];
+    }
+    if (empty($query_args['block_config_key'])) {
+      return NULL;
+    }
+
+    // Retrieve the block configuration values from the key/value store, ensure
+    // that is been generated for the same view.
+    $configuration = $this->keyValue->get('views_block_overrides')
+      ->get($query_args['block_config_key']);
+    if ($configuration && !empty($configuration['id'])) {
+      $calculated_hash = $this->calculateConfigurationHash($configuration);
+      if ($calculated_hash !== $query_args['block_config_key']) {
+        throw new AccessDeniedHttpException('Invalid block config key.');
+      }
+    }
+
+    // Create a block instance with those settings.
+    /** @var \Drupal\views\Plugin\Block\ViewsBlock $block_instance */
+    try {
+      $block_instance = $this->blockManager->createInstance($configuration['id'], $configuration);
+      $plugin_definition = $block_instance->getPluginDefinition();
+      if ($plugin_definition['id'] == 'broken') {
+        return NULL;
+      }
+      if ($block_instance instanceof ContextAwarePluginInterface) {
+        $context_mapping = $block_instance->getContextMapping();
+        $context_mapping = array_filter($context_mapping, function ($x) {
+          return $x !== 'layout_builder.entity';
+        });
+        $contexts = $this->contextRepository->getRuntimeContexts($context_mapping);
+        $this->contextHandler->applyContextMapping($block_instance, $contexts);
+        return $block_instance;
+      }
+    }
+    catch (\Exception) {
+      return NULL;
+    }
+  }
+
+  /**
+   * Retrieve the stored configuration from a given hashed key.
+   *
+   * @param string $key
+   *   The hashed key.
+   *
+   * @return array|false
+   *   The configuration array if the received key is valid and matches with
+   *   the view/display being executed, FALSE otherwise.
+   */
+  protected function getConfigurationFromHashedKey($key) {
+    $configuration = $this->keyValue->get('views_block_overrides')
+      ->get($key);
+    if ($configuration && !empty($configuration['id'])) {
+      $calculated_hash = $this->calculateConfigurationHash($configuration);
+      if ($calculated_hash === $key) {
+        return $configuration;
+      }
+    }
+    return FALSE;
+  }
+
+  /**
+   * Generates a hash for the given configuration and current view/display.
+   *
+   * @param array $configuration
+   *   The block configuration.
+   *
+   * @return string
+   *   The generated hash.
+   */
+  protected function calculateConfigurationHash(array $configuration) {
+    $data = serialize($configuration) . $this->view->id() . $this->view->current_display;
+    return Crypt::hmacBase64($data, Settings::getHashSalt());
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function elementPreRender(array $element) {
+    $element = parent::elementPreRender($element);
+    /** @var \Drupal\views\ViewExecutable $view */
+    $view = $element['#view'];
+
+    // Add the overrides key as a query param, so subsequent AJAX calls for
+    // other pages have this info available.
+    if (!empty($element['#pager']) && !empty($this->blockConfigKey)) {
+      $element['#pager']['#parameters']['block_config_key'] = $this->blockConfigKey;
+    }
+
+    // Do the same for exposed filters. However, once here the submission
+    // happens in a POST request, we inject our overrides key in the view JS
+    // settings, that will be appended to the real query string later in the
+    // AJAX behavior. See views_views_pre_render() and Drupal.views.ajaxView
+    // for more information.
+    if ($view->ajaxEnabled() && !empty($view->exposed_widgets) && empty($view->is_attachment) && empty($view->live_preview)) {
+      $view_query = "block_config_key={$this->blockConfigKey}";
+      $view->element['#attached']['drupalSettings']['views']['ajaxViews']['views_dom_id:' . $view->dom_id]['view_query'] = $view_query;
+    }
+
+    return $element;
   }
 
   /**

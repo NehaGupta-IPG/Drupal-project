@@ -80,11 +80,19 @@
     }
 
     // Check if there are any GET parameters to send to views.
-    let queryString = window.location.search || '';
+    let queryString = '';
+    if (window.location.search) {
+      queryString = window.location.search.slice(1);
+    }
+    // Prepend the query parameters that built the view to the query string.
+    if (settings.view_query && settings.view_query.length) {
+      if (queryString.length) {
+        queryString = `${settings.view_query}&${queryString}`;
+      } else {
+        queryString = settings.view_query;
+      }
+    }
     if (queryString !== '') {
-      // Remove the question mark and Drupal path component if any.
-      queryString = queryString.slice(1);
-
       // Remove current exposed filters.
       const params = decodeURI(queryString)
         .split('&')

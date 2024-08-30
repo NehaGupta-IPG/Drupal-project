@@ -24,14 +24,14 @@ class BlockExposedFilterAJAXTest extends WebDriverTestBase {
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['node', 'views', 'block', 'views_test_config'];
+  protected static $modules = ['node', 'user', 'views', 'block', 'views_test_config'];
 
   /**
    * The views to use for testing.
    *
    * @var string[]
    */
-  public static $testViews = ['test_block_exposed_ajax', 'test_block_exposed_ajax_with_page'];
+  public static $testViews = ['test_block_exposed_ajax', 'test_block_exposed_ajax2', 'test_block_exposed_ajax_with_page'];
 
   /**
    * {@inheritdoc}
@@ -52,6 +52,8 @@ class BlockExposedFilterAJAXTest extends WebDriverTestBase {
 
     $this->drupalLogin($this->drupalCreateUser([
       'access content',
+      'administer site configuration',
+      'access content overview',
     ]));
   }
 
@@ -100,6 +102,32 @@ class BlockExposedFilterAJAXTest extends WebDriverTestBase {
     $this->assertSession()->waitForElementRemoved('xpath', '//*[text()="Article A"]');
     $this->submitForm([], 'Reset');
     $this->assertSession()->addressEquals('some-path');
+  }
+
+  /**
+   * Tests that clicking filter doesn't unset sort.
+   */
+  public function testSortPersistence() {
+    $this->drupalPlaceBlock('views_exposed_filter_block:block_exposed_ajax2-page_1');
+    $this->drupalGet('/test-exposed-block');
+    $page = $this->getSession()->getPage();
+    $assert_session = $this->assertSession();
+    // Enable sort by title.
+    $page->clickLink('sort by Title');
+    $assert_session->waitForElement('css', '#view-title-table-column.is-active');
+    $this->assertStringContainsString('sort=asc', $this->getUrl());
+    $assert_session->elementsCount('css', 'td.views-field-title', 2);
+    $page->selectFieldOption('Items per page', '3');
+    $page->pressButton('Filter');
+    // Wait for the filter to apply and three rows of nodes to be visible.
+    $has_three = $page->waitFor(10, function () use ($page) {
+      $title_rows = $page->findAll('css', 'td.views-field-title');
+      return count($title_rows) === 3;
+    });
+    $this->assertTrue($has_three);
+    // Assert that sort by title is still present.
+    $assert_session->elementExists('css', '#view-title-table-column.is-active');
+    $this->assertStringContainsString('sort=asc', $this->getUrl());
   }
 
 }

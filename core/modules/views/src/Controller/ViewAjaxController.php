@@ -37,6 +37,7 @@ class ViewAjaxController implements ContainerInjectionInterface {
     'view_display_id',
     'view_args',
     'view_path',
+    'view_query',
     'view_dom_id',
     'pager_element',
     'view_base_path',
