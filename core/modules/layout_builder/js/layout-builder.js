@@ -95,7 +95,7 @@
           // Show all categories since filter is turned off.
           $categories.find('.js-layout-builder-category').show();
           // Show all li tags since filter is turned off.
-          $filterLinks.get().forEach(({parentElement}) {
+          $filterLinks.get().forEach(({ parentElement }) => {
             $(parentElement).show();
           });
           announce(Drupal.t('All available blocks are listed.'));
