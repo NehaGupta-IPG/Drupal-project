@@ -28,9 +28,9 @@ use Drupal\Core\TypedData\DataDefinition;
     "ComplexData" => [
       'properties' => [
         "value" => [
-          "Range" => [
-            "min" => "-2147483648",
-            "max" => "2147483648",
+            "Range" => [
+              "min" => "-9223372036854775807",
+              "max" => "9223372036854775807",
           ],
         ],
       ],
@@ -57,6 +57,7 @@ class TimestampItem extends FieldItemBase {
       'columns' => [
         'value' => [
           'type' => 'int',
+          'size' => 'big',
         ],
       ],
     ];
