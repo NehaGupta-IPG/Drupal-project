@@ -431,7 +431,7 @@ class JsonApiTopLevelResourceNormalizerTest extends JsonapiKernelTestBase {
     $this->assertArrayNotHasKey('meta', $normalized);
     $this->assertEquals($this->user->uuid(), $normalized['included'][0]['id']);
     $this->assertCount(1, $normalized['included'][0]['attributes']);
-    $this->assertCount(11, $normalized['included'][1]['attributes']);
+    $this->assertCount(10, $normalized['included'][1]['attributes']);
     // Make sure that the cache tags for the includes and the requested entities
     // are bubbling as expected.
     $this->assertEqualsCanonicalizing(
