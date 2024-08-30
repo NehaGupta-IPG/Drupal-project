@@ -74,10 +74,26 @@ class Y2038SchemaUpdateTest extends UpdatePathTestBase {
       $this->markTestSkipped("This test does not support the SQLite database driver.");
     }
 
+    // Test the update can be skipped.
+    $settings['settings']['timestamp_field_update_y2038'] = (object) [
+      'value' => FALSE,
+    ];
+    $this->writeSettings($settings);
+    $this->assertBeforeSpecification(['int', 'integer', 'bigint']);
+    $this->runUpdates();
+    // Confirm the specifications have not changed.
     $this->assertBeforeSpecification(['int', 'integer', 'bigint']);
 
+    // Test the update with an additional field that does not have a database
+    // column. First, set this update to run.
+    $settings['settings']['timestamp_field_update_y2038'] = (object) [
+      'value' => TRUE,
+    ];
+    $this->writeSettings($settings);
+    // Add the field that does not have a database column.
+    require DRUPAL_ROOT . '/core/modules/system/tests/fixtures/update/drupal-y2038-timestamp-2885413.php';
+    $this->assertBeforeSpecification(['int', 'integer', 'bigint']);
     $this->runUpdates();
-
     $this->assertAfterSpecifications(['int']);
   }
 
