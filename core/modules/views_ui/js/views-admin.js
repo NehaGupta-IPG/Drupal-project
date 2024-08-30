@@ -393,7 +393,6 @@
       });
       actionList.firstElementChild.classList.add('first');
       actionList.lastElementChild.classList.add('last');
-
       $displayButtons.each(function () {
         const $this = $(this);
         this.value = $this.attr('data-drupal-dropdown-label');
