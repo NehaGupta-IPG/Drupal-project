@@ -384,15 +384,17 @@
         )}</a><ul class="action-list" style="display:none;"></ul></li>`,
       );
       const $displayButtons = $menu.nextAll('input.add-display').detach();
-
-      const actionList = $addDisplayDropdown[0].querySelector('.action-list');
-      $displayButtons.toArray().forEach((button) => {
-        const li = document.createElement('li');
-        actionList.appendChild(li);
-        li.appendChild(button);
-      });
-      actionList.firstElementChild.classList.add('first');
-      actionList.lastElementChild.classList.add('last');
+      /* eslint-disable jquery/no-parent */
+      $displayButtons
+        /* eslint-enable jquery/no-parent */
+        .appendTo($addDisplayDropdown.find('.action-list'))
+        .wrap('<li>')
+        .parent()
+        .eq(0)
+        .addClass('first')
+        .end()
+        .eq(-1)
+        .addClass('last');
       $displayButtons.each(function () {
         const $this = $(this);
         this.value = $this.attr('data-drupal-dropdown-label');
