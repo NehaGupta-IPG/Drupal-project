@@ -72,7 +72,6 @@ class TaxonomyTermFilterTest extends TaxonomyTestBase {
     $this->assertSession()->pageTextContains($secondTerm->label());
     $this->assertSession()->pageTextNotContains($thirdTerm->label());
 
-
   }
 
   public function testTaxonomyTermOverviewFilterWithHierarchy(): void {
@@ -128,7 +127,6 @@ class TaxonomyTermFilterTest extends TaxonomyTestBase {
     $this->assertSession()->pageTextContains($secondTermChild->label());
     $this->assertSession()->pageTextContains($secondTermGrandChild->label());
     $this->assertSession()->pageTextNotContains($thirdTerm->label());
-
 
   }
 
