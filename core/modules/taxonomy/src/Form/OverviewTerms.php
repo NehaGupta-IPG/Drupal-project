@@ -13,6 +13,7 @@ use Drupal\Core\Form\WorkspaceSafeFormInterface;
 use Drupal\Core\Pager\PagerManagerInterface;
 use Drupal\Core\Render\RendererInterface;
 use Drupal\Core\Url;
+use Drupal\taxonomy\TermInterface;
 use Drupal\taxonomy\TermStorageInterface;
 use Drupal\taxonomy\VocabularyInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -127,9 +128,41 @@ class OverviewTerms extends EntityForm implements WorkspaceSafeFormInterface {
     $tree_index = 0;
     $complete_tree = NULL;
 
-    // Filter tree if filter has a value.
-    if ($this->termFilter = $form_state->getValue('filter')) {
-      $tree = array_values(array_filter($tree, [$this, 'filter']));
+    // Filter tree preserving each complete up-branch of matching terms.
+    $this->termFilter = $form_state->getValue('filter');
+    if ($this->termFilter) {
+      $matchingTerms = $this->filterTerms($tree, $this->termFilter);
+      $matchingTids = array_map(
+        static function(\stdClass $term) {
+          return $term->tid;
+        }, $matchingTerms
+      );
+
+      /** @var \Drupal\taxonomy\TermStorageInterface $taxonomyStorage */
+      $termStorage = $this->entityTypeManager->getStorage('taxonomy_term');
+
+      // Determine the matching terms parents to make them visible too.
+      $parentsTids = [];
+      foreach ($matchingTerms as $term) {
+        $parentsTids = array_unique(
+          array_merge(
+            $parentsTids,
+            array_map(
+              static function(TermInterface $term) {
+                return $term->id();
+              },
+              $termStorage->loadAllParents($term->tid)
+            )
+          )
+        );
+      }
+
+      $matchingPlusParentsTids = array_unique(array_merge($matchingTids, $parentsTids));
+
+      // Filter the tree to only show the matching terms and their parents.
+      $tree = array_values(array_filter($tree, static function ($term) use ($matchingPlusParentsTids) {
+        return in_array($term->tid, $matchingPlusParentsTids, FALSE);
+      }));
     }
 
     do {
@@ -355,6 +388,12 @@ class OverviewTerms extends EntityForm implements WorkspaceSafeFormInterface {
       if (in_array($term->id(), $pending_term_ids)) {
         $form['terms'][$key]['#attributes']['class'][] = 'color-warning';
         $form['terms'][$key]['#attributes']['class'][] = 'taxonomy-term--pending-revision';
+      }
+
+      // Add a special class for filter matching terms so we can highlight
+      // them in the form too.
+      if (in_array($term->id(), $matchingTids ?? [])) {
+        $form['terms'][$key]['#attributes']['class'][] = 'color-warning';
       }
 
       if ($update_tree_access->isAllowed() && count($tree) > 1) {
@@ -616,6 +655,24 @@ class OverviewTerms extends EntityForm implements WorkspaceSafeFormInterface {
    */
   public function filter(\stdClass $term): bool {
     return stripos($term->name, $this->termFilter) !== FALSE;
+  }
+
+  /**
+   * Return the terms from a taxonomy tree that match the filter.
+   *
+   * Whether the term matches the filter.
+   *
+   * @param array $tree
+   *   The taxonomy term tree to search in.
+   * @param string $searchString
+   *   The search string.
+   *
+   * @return array
+   */
+  protected function filterTerms(array $tree, string $searchString): array {
+    return array_filter($tree, static function (\stdClass $term)  use ($searchString) {
+      return stripos($term->name, $searchString) !== FALSE;
+    });
   }
 
 }
