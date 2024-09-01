@@ -292,6 +292,7 @@ class OverviewTerms extends EntityForm implements WorkspaceSafeFormInterface {
     $form['filter']['submit'] = [
       '#type' => 'submit',
       '#value' => t('Filter'),
+      '#id' => 'filter-submit',
     ];
 
     $errors = $form_state->getErrors();
@@ -497,8 +498,9 @@ class OverviewTerms extends EntityForm implements WorkspaceSafeFormInterface {
    *   The current state of the form.
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {
-    $triggering_element = $form_state->getTriggeringElement()['#array_parents'];
-    if (in_array('filter', $triggering_element)) {
+
+    // Rebuild form if filter is submitted and discard a possible page query parameter.
+    if ('filter-submit' === $form_state->getTriggeringElement()['#id']) {
       $this->getRequest()->query->remove('page');
       return $form_state->setRebuild(TRUE);
     }
