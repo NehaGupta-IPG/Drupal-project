@@ -35,6 +35,13 @@ class OverviewTerms extends EntityForm implements WorkspaceSafeFormInterface {
   protected EntityListBuilderInterface $termListBuilder;
 
   /**
+   * The term filter.
+   *
+   * @var string|null
+   */
+  protected ?string $termFilter;
+
+  /**
    * Constructs an OverviewTerms object.
    */
   public function __construct(
@@ -80,7 +87,7 @@ class OverviewTerms extends EntityForm implements WorkspaceSafeFormInterface {
    *   An associative array containing the structure of the form.
    * @param \Drupal\Core\Form\FormStateInterface $form_state
    *   The current state of the form.
-   * @param \Drupal\taxonomy\VocabularyInterface $taxonomy_vocabulary
+   * @param \Drupal\taxonomy\VocabularyInterface|null $taxonomy_vocabulary
    *   The vocabulary to display the overview form for.
    *
    * @return array
@@ -119,6 +126,12 @@ class OverviewTerms extends EntityForm implements WorkspaceSafeFormInterface {
     $tree = $this->storageController->loadTree($taxonomy_vocabulary->id(), 0, NULL, FALSE);
     $tree_index = 0;
     $complete_tree = NULL;
+
+    // Filter tree if filter has a value.
+    if ($this->termFilter = $form_state->getValue('filter')) {
+      $tree = array_values(array_filter($tree, [$this, 'filter']));
+    }
+
     do {
       // In case this tree is completely empty.
       if (empty($tree[$tree_index])) {
@@ -140,7 +153,7 @@ class OverviewTerms extends EntityForm implements WorkspaceSafeFormInterface {
       $raw_term = $tree[$tree_index];
       if (isset($raw_term->depth) && ($raw_term->depth > 0) && !isset($back_step)) {
         $back_step = 0;
-        while ($parent_term = $tree[--$tree_index]) {
+        while ($tree_index > 0 && $parent_term = $tree[--$tree_index]) {
           $before_entries--;
           $back_step++;
           if ($parent_term->depth == 0) {
@@ -197,8 +210,11 @@ class OverviewTerms extends EntityForm implements WorkspaceSafeFormInterface {
     // If this form was already submitted once, it's probably hit a validation
     // error. Ensure the form is rebuilt in the same order as the user
     // submitted.
-    $user_input = $form_state->getUserInput();
-    if (!empty($user_input['terms'])) {
+    // ->getUserInput() gives problems when using the filter, so we use ->getValues() instead.
+    $user_input = $form_state->getValues();
+    $triggering_element = $form_state->getTriggeringElement() ? $form_state->getTriggeringElement()['#array_parents'] : NULL;
+    $filter = !empty($triggering_element) && in_array('filter', $triggering_element);
+    if (!empty($user_input) && !$filter) {
       // Get the POST order.
       $order = array_flip(array_keys($user_input['terms']));
       // Update our form with the new order.
@@ -261,6 +277,22 @@ class OverviewTerms extends EntityForm implements WorkspaceSafeFormInterface {
     if ($operations_access) {
       $form['help']['#attributes']['class'] = ['messages', 'messages--warning'];
     }
+
+    // Add filter field.
+    $form['filter'] = [
+      '#type' => 'container',
+      '#attributes' => [
+        'class' => ['container-inline'],
+      ],
+    ];
+    $form['filter']['filter'] = [
+      '#type' => 'textfield',
+      '#size' => 30,
+    ];
+    $form['filter']['submit'] = [
+      '#type' => 'submit',
+      '#value' => t('Filter'),
+    ];
 
     $errors = $form_state->getErrors();
     $row_position = 0;
@@ -465,6 +497,12 @@ class OverviewTerms extends EntityForm implements WorkspaceSafeFormInterface {
    *   The current state of the form.
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {
+    $triggering_element = $form_state->getTriggeringElement()['#array_parents'];
+    if (in_array('filter', $triggering_element)) {
+      $this->getRequest()->query->remove('page');
+      return $form_state->setRebuild(TRUE);
+    }
+
     // Sort term order based on weight.
     uasort($form_state->getValue('terms'), ['Drupal\Component\Utility\SortArray', 'sortByWeightElement']);
 
@@ -562,6 +600,20 @@ class OverviewTerms extends EntityForm implements WorkspaceSafeFormInterface {
     /** @var \Drupal\taxonomy\VocabularyInterface $vocabulary */
     $vocabulary = $form_state->get(['taxonomy', 'vocabulary']);
     $form_state->setRedirectUrl($vocabulary->toUrl('reset-form'));
+  }
+
+  /**
+   * Filter terms.
+   *
+   * Whether the term matches the filter.
+   *
+   * @param \stdClass $term
+   *   The taxonomy term to compare against.
+   *
+   * @return bool
+   */
+  public function filter(\stdClass $term): bool {
+    return stripos($term->name, $this->termFilter) !== FALSE;
   }
 
 }
