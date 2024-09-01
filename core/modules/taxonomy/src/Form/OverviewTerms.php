@@ -133,7 +133,7 @@ class OverviewTerms extends EntityForm implements WorkspaceSafeFormInterface {
     if ($this->termFilter) {
       $matchingTerms = $this->filterTerms($tree, $this->termFilter);
       $matchingTids = array_map(
-        static function(\stdClass $term) {
+        static function (\stdClass $term) {
           return $term->tid;
         }, $matchingTerms
       );
@@ -148,7 +148,7 @@ class OverviewTerms extends EntityForm implements WorkspaceSafeFormInterface {
           array_merge(
             $parentsTids,
             array_map(
-              static function(TermInterface $term) {
+              static function (TermInterface $term) {
                 return $term->id();
               },
               $termStorage->loadAllParents($term->tid)
@@ -683,7 +683,7 @@ class OverviewTerms extends EntityForm implements WorkspaceSafeFormInterface {
    * @return array
    */
   protected function filterTerms(array $tree, string $searchString): array {
-    return array_filter($tree, static function (\stdClass $term)  use ($searchString) {
+    return array_filter($tree, static function (\stdClass $term) use ($searchString) {
       return stripos($term->name, $searchString) !== FALSE;
     });
   }
