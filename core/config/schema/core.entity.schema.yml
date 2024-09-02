@@ -380,6 +380,16 @@ field.formatter.settings.title:
     tag:
       type: string
       label: 'Tag'
+      constraints:
+        Choice:
+          choices:
+            - 'span'
+            - 'div'
+            - 'h1'
+            - 'h2'
+            - 'h3'
+            - 'h4'
+            - 'h5'
 
 field.formatter.settings.language:
   type: field.formatter.settings.string
