@@ -186,11 +186,12 @@ class BasicAuthTest extends BrowserTestBase {
     $this->assertSession()->pageTextNotContains('Exception');
     $this->assertSession()->pageTextContains('Log in to access this page.');
 
-    // Case when empty credentials are passed, a user friendly access denied
+    // Case when empty credentials are passed, a user friendly access
     // message is displayed.
     $this->basicAuthGet($url, NULL, NULL);
-    $this->assertSession()->statusCodeEquals(403);
-    $this->assertSession()->pageTextContains('Access denied');
+    $this->assertSession()->statusCodeEquals(401);
+    $this->assertSession()->pageTextNotContains('Exception');
+    $this->assertSession()->pageTextContains('Log in to access this page');
 
     // Case when wrong credentials are passed, a user friendly access denied
     // message is displayed.
