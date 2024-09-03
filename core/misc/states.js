@@ -235,12 +235,14 @@
         });
 
         // Make sure the event we just bound ourselves to is actually fired.
-        this.triggers.push(new states.Trigger({ selector, state, dependent: this}));
+        this.triggers.push(
+          new states.Trigger({ selector, state, dependent: this})
+        );
       });
     },
 
     /**
-     * Remove all the event listners.
+     * Remove all the event listeners.
      */
     destroy() {
       Object.keys(this.values).forEach((selector) => {
@@ -252,7 +254,6 @@
         });
       });
     },
-
 
     /**
      * Compares a value with a reference value.
