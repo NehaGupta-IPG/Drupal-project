@@ -18,11 +18,9 @@
      */
     postponed: [],
     /**
-     * Object with trigger elements.
-     *
-     * Trigger element id has array of dependent field id.
+     * States instances.
      */
-    triggerSource: {},
+    statesObjects: {},
   };
 
   Drupal.states = states;
@@ -122,11 +120,11 @@
     },
     detach(context, settings, trigger) {
       if (trigger === 'unload') {
-        Object.keys(states.triggerSource).forEach((selector) => {
+        Object.keys(states.statesObjects).forEach((selector) => {
           const element = $(context).find(selector);
           if (element.length > 0) {
-            states.triggerSource[selector].forEach((item) => {
-              $(once.remove('states', $(item), $(item)));
+            states.statesObjects[selector].forEach((item) => {
+              item.destroy();
             });
           }
         });
@@ -151,12 +149,12 @@
    *   arbitrary AND and OR clauses.
    */
   states.Dependent = function (args) {
-    $.extend(this, { values: {}, oldValue: null }, args);
+    $.extend(this, { values: {}, oldValue: null, triggers: [] }, args);
 
     this.dependees = this.getDependees();
     Object.keys(this.dependees || {}).forEach((selector) => {
-      states.triggerSource[selector] = states.triggerSource[selector] || [];
-      states.triggerSource[selector].push(`#${this.element.attr('id')}`);
+      states.statesObjects[selector] = states.statesObjects[selector] || [];
+      states.statesObjects[selector].push(this);
       this.initializeDependee(selector, this.dependees[selector]);
     });
   };
@@ -237,9 +235,24 @@
         });
 
         // Make sure the event we just bound ourselves to is actually fired.
-        new states.Trigger({ selector, state });
+        this.triggers.push(new states.Trigger({ selector, state, dependent: this}));
       });
     },
+
+    /**
+     * Remove all the event listners.
+     */
+    destroy() {
+      Object.keys(this.values).forEach((selector) => {
+        const dependeeStates = this.dependees[selector];
+        Object.keys(dependeeStates).forEach((i) => {
+          $(selector).off(`state:${dependeeStates[i]}`);
+          this.triggers.forEach((trigger) => trigger.destroy());
+          $(once.remove('states', $(this.element)));
+        });
+      });
+    },
+
 
     /**
      * Compares a value with a reference value.
@@ -492,6 +505,13 @@
 
       // Mark this trigger as initialized for this element.
       this.element.data(`trigger:${this.state}`, true);
+    },
+
+    /**
+     * Mark this trigger initialization was removed for this element.
+     */
+    destroy() {
+      this.element.data(`trigger:${this.state}`, false);
     },
 
     /**

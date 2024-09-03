@@ -474,8 +474,9 @@ class JavascriptStatesTest extends WebDriverTestBase {
     $js_select_field_textfield = $page->findField('js_select_field_textfield');
     $this->assertFalse($js_select_field_textfield->isVisible());
     $js_states_reload->check();
-    sleep(1);
+    $this->assertSession()->waitForElementVisible('css', '.select-field-on-reload');
     $js_states_select->setValue('1');
+    $page->findField('select_field_no_ajax')->setValue('1');
     $this->assertTrue($js_select_field_textfield->isVisible());
 
     $this->container->get('module_installer')->install(['big_pipe']);

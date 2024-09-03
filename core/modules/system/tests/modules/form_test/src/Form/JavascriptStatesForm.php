@@ -503,12 +503,28 @@ class JavascriptStatesForm extends FormBase {
       '#options' => [0 => 0, 1 => 1],
       '#default_value' => 0,
     ];
+    $form['js_states_test']['select_field_on_reload'] = [
+      '#type' => 'select',
+      '#title' => 'Select Field',
+      '#options' => [0 => 0, 1 => 1],
+      '#default_value' => 0,
+      '#attributes' => ['class' => ['select-field-on-reload']],
+      '#access' => $form_state->getValue('reload'),
+    ];
+
+    $form['select_field_no_ajax'] = [
+      '#type' => 'select',
+      '#title' => 'Select Field No Ajax',
+      '#options' => [0 => 0, 1 => 1],
+      '#default_value' => 0,
+    ];
     $form['js_select_field_textfield'] = [
       '#type' => 'select',
       '#title' => 'Select should show when 1 is selected in select_field after ajax',
       '#states' => [
         'visible' => [
           ':input[name="select_field"]' => ['value' => 1],
+          ':input[name="select_field_no_ajax"]' => ['value' => 1],
         ],
       ],
     ];
