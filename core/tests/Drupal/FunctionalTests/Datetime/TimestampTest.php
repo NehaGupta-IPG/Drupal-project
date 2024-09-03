@@ -175,6 +175,14 @@ class TimestampTest extends BrowserTestBase {
     $this->assertSession()->fieldExists('field_timestamp[0][value][time]');
     $this->assertSession()->fieldValueEquals('field_timestamp[0][value][time]', '');
 
+    $this->submitForm([], 'Save');
+
+    // Look for the widget elements and make sure they are still empty.
+    $this->assertSession()->fieldExists('field_timestamp[0][value][date]');
+    $this->assertSession()->fieldValueEquals('field_timestamp[0][value][date]', '');
+    $this->assertSession()->fieldExists('field_timestamp[0][value][time]');
+    $this->assertSession()->fieldValueEquals('field_timestamp[0][value][time]', '');
+
     // Submit the date.
     $date_format = DateFormat::load('html_date')->getPattern();
     $time_format = DateFormat::load('html_time')->getPattern();

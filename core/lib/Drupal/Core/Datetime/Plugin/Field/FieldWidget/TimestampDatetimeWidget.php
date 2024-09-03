@@ -98,7 +98,9 @@ class TimestampDatetimeWidget extends WidgetBase {
       elseif ($this->getSetting('use_current_time')) {
         $date = new DrupalDateTime();
       }
-      $item['value'] = $date->getTimestamp();
+      if (isset($date)) {
+        $item['value'] = $date->getTimestamp();
+      }
     }
     return $values;
   }
