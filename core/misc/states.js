@@ -235,7 +235,11 @@
         });
 
         // Make sure the event we just bound ourselves to is actually fired.
-        const trigger = new states.Trigger({ selector, state, dependent: this});
+        const trigger = new states.Trigger({
+          selector,
+          state,
+          dependent: this
+        });
         this.triggers.push(trigger);
       });
     },
