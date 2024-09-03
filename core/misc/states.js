@@ -238,7 +238,7 @@
         const trigger = new states.Trigger({
           selector,
           state,
-          dependent: this
+          dependent: this,
         });
         this.triggers.push(trigger);
       });
