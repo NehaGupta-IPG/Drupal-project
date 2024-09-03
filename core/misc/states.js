@@ -236,7 +236,7 @@
 
         // Make sure the event we just bound ourselves to is actually fired.
         this.triggers.push(
-          new states.Trigger({ selector, state, dependent: this})
+          new states.Trigger({ selector, state, dependent: this}),
         );
       });
     },
