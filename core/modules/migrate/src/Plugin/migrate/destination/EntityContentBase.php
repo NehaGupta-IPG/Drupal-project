@@ -2,6 +2,7 @@
 
 namespace Drupal\migrate\Plugin\migrate\destination;
 
+use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Entity\EntityFieldManagerInterface;
 use Drupal\Core\Entity\EntityInterface;
