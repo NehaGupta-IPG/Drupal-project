@@ -384,9 +384,7 @@
         )}</a><ul class="action-list" style="display:none;"></ul></li>`,
       );
       const $displayButtons = $menu.nextAll('input.add-display').detach();
-      /* eslint-disable jquery/no-parent */
       $displayButtons
-        /* eslint-enable jquery/no-parent */
         .appendTo($addDisplayDropdown.find('.action-list'))
         .wrap('<li>')
         .parent()
