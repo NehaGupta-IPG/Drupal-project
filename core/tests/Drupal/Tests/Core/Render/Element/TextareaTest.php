@@ -39,7 +39,7 @@ class TextareaTest extends UnitTestCase {
     $data[] = ['123', 123];
     // New lines normalizatrion is enabled (default).
     $data[] = ["some\ndifferent\nline\nendings", "some\r\ndifferent\rline\nendings"];
-    // New lines normalizatrion is disabled (default).
+    // New lines normalizatrion is disabled (manually).
     $data[] = [
       "some\r\ndifferent\rline\nendings",
       "some\r\ndifferent\rline\nendings",
