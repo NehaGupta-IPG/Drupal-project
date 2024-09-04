@@ -1228,15 +1228,19 @@ class SqlContentEntityStorage extends ContentEntityStorageBase implements SqlEnt
       // Ensure that only values having valid languages are retrieved. Since we
       // are loading values for multiple entities, we cannot limit the query to
       // the available translations.
-      $results = $this->database->select($table, 't')
+      $query = $this->database->select($table, 't')
         ->fields('t')
         ->condition(!$load_from_revision ? 'entity_id' : 'revision_id', $ids, 'IN')
         ->condition('deleted', 0)
         ->condition('langcode', $langcodes, 'IN')
-        ->orderBy('delta')
-        ->execute();
+        ->orderBy('delta');
 
-      foreach ($results as $row) {
+      if ($load_from_revision && $field_name === 'body') {
+        $query->innerJoin($table . '__interned', 'i', '[t].[interned_hash] = [i].[interned_hash]');
+        $query->fields('i');
+      }
+
+      foreach ($query->execute() as $row) {
         $bundle = $row->bundle;
 
         $value_key = !$load_from_revision ? $row->entity_id : $row->revision_id;
