@@ -5,6 +5,8 @@ namespace Drupal\media_library\Plugin\views\field;
 use Drupal\Core\Ajax\AjaxResponse;
 use Drupal\Core\Ajax\CloseDialogCommand;
 use Drupal\Core\Ajax\MessageCommand;
+use Drupal\Core\Ajax\PrependCommand;
+use Drupal\Core\Ajax\RemoveCommand;
 use Drupal\Core\Form\FormBuilderInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Form\WorkspaceSafeFormInterface;
@@ -156,6 +158,13 @@ class MediaLibrarySelectForm extends FieldPluginBase implements WorkspaceSafeFor
     $field_id = $form_state->getTriggeringElement()['#field_id'];
     $selected_ids = $form_state->getValue($field_id);
     $selected_ids = $selected_ids ? array_filter(explode(',', $selected_ids)) : [];
+    if (empty($selected_ids) || $form_state->hasAnyErrors()) {
+      $response = new AjaxResponse();
+      $messages = ['#type' => 'status_messages'];
+      $response->addCommand(new RemoveCommand('#media-library-add-form-wrapper [data-drupal-messages]'));
+      $response->addCommand(new PrependCommand('#media-library-add-form-wrapper', \Drupal::service('renderer')->renderRoot($messages)));
+      return $response;
+    }
 
     // Allow the opener service to handle the selection.
     $state = MediaLibraryState::fromRequest($request);
@@ -183,7 +192,7 @@ class MediaLibrarySelectForm extends FieldPluginBase implements WorkspaceSafeFor
    * {@inheritdoc}
    */
   public function viewsFormValidate(array &$form, FormStateInterface $form_state) {
-    $selected = array_filter($form_state->getValue($this->options['id']));
+    $selected = $form_state->getValue($this->options['id']) !== NULL ? array_filter($form_state->getValue($this->options['id'])) : [];
     if (empty($selected)) {
       $form_state->setErrorByName('', $this->t('No items selected.'));
     }
