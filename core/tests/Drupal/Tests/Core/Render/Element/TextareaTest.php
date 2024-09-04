@@ -49,9 +49,8 @@ class TextareaTest extends UnitTestCase {
   public function testNormalizeNewlinesDisabled() {
     $form_state = $this->prophesize(FormStateInterface::class)->reveal();
     $element = ['#normalize_newlines' => FALSE];
-    $input = "some\r\ndifferent\rline\nendings";
-    $expected = "some\r\ndifferent\rline\nendings";
-    $this->assertSame($expected, Textarea::valueCallback($element, $input, $form_state));
+    $value = "some\r\ndifferent\rline\nendings";
+    $this->assertSame($value, Textarea::valueCallback($element, $value, $form_state));
   }
 
 }

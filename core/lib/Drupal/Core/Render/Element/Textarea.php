@@ -14,7 +14,7 @@ use Drupal\Core\Render\Attribute\FormElement;
  * - #resizable: Controls whether the text area is resizable.  Allowed values
  *   are "none", "vertical", "horizontal", or "both" (defaults to "vertical").
  * - #maxlength: The maximum amount of characters to accept as input.
- * - #normalize_newlines: Whether convert all newlines (\r\n|\r|\n) to \n, TRUE by default.
+ * - #normalize_newlines: Whether to convert all newlines (\r\n|\r|\n) to \n, TRUE by default.
  *
  * Usage example:
  * @code
