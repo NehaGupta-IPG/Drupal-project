@@ -2408,6 +2408,42 @@ class SqlContentEntityStorageSchema implements DynamicallyFieldableEntityStorage
       $revision_schema['primary key'] = ['entity_id', 'revision_id', 'deleted', 'delta', 'langcode'];
       $revision_schema['fields']['revision_id']['not null'] = TRUE;
       $revision_schema['fields']['revision_id']['description'] = 'The entity revision id this data is attached to';
+
+      if ($storage_definition->getName() == 'body') {
+        // Set up interned data table and matching revision table field.
+        $interned_schema = [
+          'fields' => [
+            'interned_hash' => [
+              'type' => 'char',
+              'length' => 64,
+              'not null' => TRUE,
+              'default' => '',
+            ],
+          ],
+          'primary key' => ['interned_hash'],
+        ];
+        $revision_schema['fields']['interned_hash'] = $interned_schema['fields']['interned_hash'];
+
+        // Move data columns from revision table to interned table.
+        foreach ($schema['columns'] as $column_name => $attributes) {
+          $real_name = $table_mapping->getFieldColumnName($storage_definition, $column_name);
+          $interned_schema['fields'][$real_name] = $revision_schema['fields'][$real_name];
+          unset($revision_schema['fields'][$real_name]);
+        }
+
+        // Move indexes from revision table to interned table.
+        foreach ($schema['indexes'] as $index_name => $columns) {
+          $real_name = $this->getFieldIndexName($storage_definition, $index_name);
+          if (isset($revision_schema['indexes'][$real_name])) {
+            $interned_schema['indexes'][$real_name] = $revision_schema['indexes'][$real_name];
+            unset($revision_schema['indexes'][$real_name]);
+          }
+        }
+
+        $interned_table = $table_mapping->getDedicatedRevisionTableName($storage_definition) . '__interned';
+        $dedicated_table_schema[$interned_table] = $interned_schema;
+      }
+
       $dedicated_table_schema += [$table_mapping->getDedicatedRevisionTableName($storage_definition) => $revision_schema];
     }
 
