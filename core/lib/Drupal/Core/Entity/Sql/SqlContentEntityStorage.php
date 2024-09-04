@@ -1338,13 +1338,19 @@ class SqlContentEntityStorage extends ContentEntityStorageBase implements SqlEnt
 
       // Prepare the multi-insert query.
       $do_insert = FALSE;
-      $columns = ['entity_id', 'revision_id', 'bundle', 'delta', 'langcode'];
+      $base_columns = ['entity_id', 'revision_id', 'bundle', 'delta', 'langcode'];
+      $columns = [];
       foreach ($storage_definition->getColumns() as $column => $attributes) {
         $columns[] = $table_mapping->getFieldColumnName($storage_definition, $column);
       }
-      $query = $this->database->insert($table_name)->fields($columns);
+      $query = $this->database->insert($table_name)->fields(array_merge($base_columns, $columns));
       if ($this->entityType->isRevisionable()) {
-        $revision_query = $this->database->insert($revision_name)->fields($columns);
+        if ($field_name === 'body') {
+          $revision_query = $this->database->insert($revision_name)->fields(array_merge($base_columns, ['interned_hash']));
+        }
+        else {
+          $revision_query = $this->database->insert($revision_name)->fields(array_merge($base_columns, $columns));
+        }
       }
 
       $langcodes = $field_definition->isTranslatable() ? $translation_langcodes : [$default_langcode];
@@ -1362,6 +1368,7 @@ class SqlContentEntityStorage extends ContentEntityStorageBase implements SqlEnt
             'delta' => $delta,
             'langcode' => $langcode,
           ];
+          $values = [];
           foreach ($storage_definition->getColumns() as $column => $attributes) {
             $column_name = $table_mapping->getFieldColumnName($storage_definition, $column);
             // Serialize the value if specified in the column schema.
@@ -1369,11 +1376,21 @@ class SqlContentEntityStorage extends ContentEntityStorageBase implements SqlEnt
             if (!empty($attributes['serialize'])) {
               $value = serialize($value);
             }
-            $record[$column_name] = SqlContentEntityStorageSchema::castValue($attributes, $value);
+            $values[$column_name] = SqlContentEntityStorageSchema::castValue($attributes, $value);
           }
-          $query->values($record);
+          $query->values($record + $values);
           if ($this->entityType->isRevisionable()) {
-            $revision_query->values($record);
+            if ($field_name === 'body') {
+              $hash = hash('sha256', serialize($values));
+              $revision_query->values($record + ['interned_hash' => $hash]);
+              $this->database->merge($revision_name . '__interned')
+                ->key('interned_hash', $hash)
+                ->fields($values)
+                ->execute();
+            }
+            else {
+              $revision_query->values($record + $values);
+            }
           }
 
           if ($storage_definition->getCardinality() != FieldStorageDefinitionInterface::CARDINALITY_UNLIMITED && ++$delta_count == $storage_definition->getCardinality()) {
