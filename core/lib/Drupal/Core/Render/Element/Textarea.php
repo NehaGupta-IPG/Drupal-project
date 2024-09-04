@@ -14,7 +14,7 @@ use Drupal\Core\Render\Attribute\FormElement;
  * - #resizable: Controls whether the text area is resizable.  Allowed values
  *   are "none", "vertical", "horizontal", or "both" (defaults to "vertical").
  * - #maxlength: The maximum amount of characters to accept as input.
- * - #normalize_newlines: Convert all newlines (\r\n|\r|\n) to \n.
+ * - #normalize_newlines: Whether convert all newlines (\r\n|\r|\n) to \n, TRUE by default.
  *
  * Usage example:
  * @code
@@ -69,12 +69,9 @@ class Textarea extends FormElementBase {
       // This should be a string, but allow other scalars since they might be
       // valid input in programmatic form submissions.
       $value = is_scalar($input) ? (string) $input : '';
-      if (!empty($element['#normalize_newlines'])) {
-        // Convert all Windows and Mac newlines to a single newline,
-        // so filters only need to deal with one possibility.
-        $value = str_replace(["\r\n", "\r"], "\n", $value);
-      }
-      return $value;
+      // If enabled, convert all Windows and Mac newlines to a single newline,
+      // so filters only need to deal with one possibility.
+      return $element['#normalize_newlines'] === TRUE ? str_replace(["\r\n", "\r"], "\n", $value) : $value;
     }
     return NULL;
   }
