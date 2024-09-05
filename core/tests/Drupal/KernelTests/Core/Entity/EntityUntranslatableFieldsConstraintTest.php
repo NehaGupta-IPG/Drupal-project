@@ -136,7 +136,7 @@ class EntityUntranslatableFieldsConstraintTest extends EntityKernelTestBase {
   /**
    * Data provider for ::testEntityUntranslatableFieldsConstraint().
    */
-  public function accessValues() {
+  public static function accessValues() {
     return [
       [TRUE],
       [FALSE],
