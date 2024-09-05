@@ -2,7 +2,6 @@
 
 declare(strict_types=1);
 
-// cspell:ignore analyse
 namespace Drupal\KernelTests\Core\Entity;
 
 use Drupal\Core\Entity\Entity\EntityFormDisplay;
