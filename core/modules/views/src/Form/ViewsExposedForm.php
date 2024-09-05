@@ -146,9 +146,9 @@ class ViewsExposedForm extends FormBase implements WorkspaceSafeFormInterface {
         $parameters[$k] = $parameter;
       }
       if (!empty($parameters)) {
-        $views_url->setRouteParameters($parameters);
+        $view_url->setRouteParameters($parameters);
       }
-      $form_action = $views_url->toString();
+      $form_action = $view_url->toString();
     }
 
     $form['#action'] = $form_action;
