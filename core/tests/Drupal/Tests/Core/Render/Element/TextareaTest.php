@@ -23,7 +23,7 @@ class TextareaTest extends UnitTestCase {
    */
   #[DataProvider('providerTestValueCallback')]
   public function testValueCallback($expected, $input, array $element = []): void {
-    // Make sure element has it's defaults added.
+    // Make sure element has its defaults added.
     // @see \Drupal\Core\Render\Element\Textarea::getInfo()
     $element += [
       '#cols' => 60,
