@@ -129,17 +129,6 @@ class ViewsExposedForm extends FormBase implements WorkspaceSafeFormInterface {
       '#id' => Html::getUniqueId('edit-submit-' . $view->storage->id()),
     ];
 
-    if ($view->hasUrl()) {
-      foreach ($view->getUrl()->getRouteParameters() as $k => $parameter) {
-        if ($parameter != 'all') {
-          $newParameters[$k] = $parameter;
-        }
-      }
-      if (isset($newParameters)) {
-        $view_url = $view->getUrl()->setRouteParameters($newParameters);
-      }
-    }
-
     if (!$view->hasUrl()) {
       // On any non views.ajax route, use the current route for the form action.
       if ($this->getRouteMatch()->getRouteName() !== 'views.ajax') {
@@ -150,11 +139,16 @@ class ViewsExposedForm extends FormBase implements WorkspaceSafeFormInterface {
         $form_action = Url::fromUserInput($this->currentPathStack->getPath())->toString();
       }
     }
-    elseif (isset($view_url)) {
-      $form_action = $view_url->toString();
-    }
     else {
-      $form_action = $view->getUrl()->toString();
+      $view_url = $view->getUrl();
+      $parameters = [];
+      foreach ($view_url->getRouteParameters() as $k => $parameter) {
+        $parameters[$k] = $parameter;
+      }
+      if (!empty($parameters)) {
+        $views_url->setRouteParameters($parameters);
+      }
+      $form_action = $views_url->toString();
     }
 
     $form['#action'] = $form_action;
