@@ -334,6 +334,18 @@ class OverviewTerms extends EntityForm implements WorkspaceSafeFormInterface {
       '#id' => 'filter-reset',
     ];
 
+    if ($update_tree_access->isAllowed() && $this->termFilter) {
+      $form['tabledrag_disabled_help'] = [
+        '#type' => 'container',
+        'message' => [
+          '#markup' => $this->t('Term reordering has been disabled because terms are being filtered. To enable term reordering, please reset the filter.'),
+        ],
+        '#attributes' => [
+          'class' => ['messages', 'messages--warning'],
+        ],
+      ];
+    }
+
     $errors = $form_state->getErrors();
     $row_position = 0;
     // Build the actual form.
@@ -352,7 +364,7 @@ class OverviewTerms extends EntityForm implements WorkspaceSafeFormInterface {
         'term' => $this->t('Name'),
         'status' => $this->t('Status'),
         'operations' => $this->t('Operations'),
-        'weight' => !$operations_access ? $this->t('Weight') : NULL,
+        'weight' => !$operations_access && !$this->termFilter ? $this->t('Weight') : NULL,
       ],
       '#attributes' => [
         'id' => 'taxonomy',
@@ -365,7 +377,7 @@ class OverviewTerms extends EntityForm implements WorkspaceSafeFormInterface {
         'term' => [],
         'status' => [],
         'operations' => [],
-        'weight' => $update_tree_access->isAllowed() ? [] : NULL,
+        'weight' => $update_tree_access->isAllowed() && !$this->termFilter ? [] : NULL,
       ];
       /** @var \Drupal\Core\Entity\EntityInterface $term */
       $term = $this->entityRepository->getTranslationFromContext($term);
@@ -431,7 +443,7 @@ class OverviewTerms extends EntityForm implements WorkspaceSafeFormInterface {
         ];
       }
 
-      if ($update_tree_access->isAllowed()) {
+      if ($update_tree_access->isAllowed() && !$this->termFilter) {
         $form['terms'][$key]['weight'] = [
           '#type' => 'weight',
           '#delta' => $delta,
@@ -477,7 +489,7 @@ class OverviewTerms extends EntityForm implements WorkspaceSafeFormInterface {
     }
 
     $this->renderer->addCacheableDependency($form['terms'], $update_tree_access);
-    if ($update_tree_access->isAllowed()) {
+    if ($update_tree_access->isAllowed() && !$this->termFilter) {
       if ($parent_fields) {
         $form['terms']['#tabledrag'][] = [
           'action' => 'match',
@@ -493,11 +505,6 @@ class OverviewTerms extends EntityForm implements WorkspaceSafeFormInterface {
           'group' => 'term-depth',
           'hidden' => FALSE,
         ];
-        $form['terms']['#attached']['library'][] = 'taxonomy/drupal.taxonomy';
-        $form['terms']['#attached']['drupalSettings']['taxonomy'] = [
-          'backStep' => $back_step,
-          'forwardStep' => $forward_step,
-        ];
       }
       $form['terms']['#tabledrag'][] = [
         'action' => 'order',
@@ -505,6 +512,11 @@ class OverviewTerms extends EntityForm implements WorkspaceSafeFormInterface {
         'group' => 'term-weight',
       ];
     }
+    $form['terms']['#attached']['library'][] = 'taxonomy/drupal.taxonomy';
+    $form['terms']['#attached']['drupalSettings']['taxonomy'] = [
+      'backStep' => $back_step,
+      'forwardStep' => $forward_step,
+    ];
 
     if ($update_tree_access->isAllowed() && count($tree) > 1) {
       $form['actions'] = ['#type' => 'actions', '#tree' => FALSE];
