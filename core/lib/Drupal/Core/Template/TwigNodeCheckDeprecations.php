@@ -37,12 +37,10 @@ class TwigNodeCheckDeprecations extends Node {
       $usedNamesNode->addElement(new ConstantExpression($name, $this->getTemplateLine()));
     }
 
-    $compiler->write("\$this->env->getExtension('\Drupal\Core\Template\TwigExtension')\n");
-    $compiler->indent();
-    $compiler->write("->checkDeprecations(\$context, ");
+    $compiler->write("\Drupal::service('twig.extension')->checkDeprecations(\$context, ");
     $compiler->subcompile($usedNamesNode);
     $compiler->raw(");");
-    $compiler->outdent();
+
   }
 
 }
