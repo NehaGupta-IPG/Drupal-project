@@ -5,8 +5,9 @@ declare(strict_types=1);
 namespace Drupal\Tests\system\Functional\Form;
 
 use Drupal\Core\Form\FormState;
-use Drupal\form_test\Callbacks;
+use Drupal\Core\Render\RenderContext;
 use Drupal\Tests\BrowserTestBase;
+use Drupal\form_test\Callbacks;
 
 /**
  * Tests the tableselect form element for expected behavior.
@@ -231,7 +232,11 @@ class ElementsTableSelectTest extends BrowserTestBase {
 
     \Drupal::formBuilder()->prepareForm($form_id, $form, $form_state);
 
-    \Drupal::formBuilder()->processForm($form_id, $form, $form_state);
+    /** @var \Drupal\Core\Render\RendererInterface $renderer */
+    $renderer = $this->container->get('renderer');
+    $renderer->executeInRenderContext(new RenderContext(), function () use ($form_id, &$form, &$form_state) {
+      \Drupal::formBuilder()->processForm($form_id, $form, $form_state);
+    });
 
     $errors = $form_state->getErrors();
 

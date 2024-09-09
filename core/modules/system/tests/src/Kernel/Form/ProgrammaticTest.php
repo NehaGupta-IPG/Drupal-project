@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\Tests\system\Kernel\Form;
 
 use Drupal\Core\Form\FormState;
+use Drupal\Core\Render\RenderContext;
 use Drupal\KernelTests\KernelTestBase;
 
 /**
@@ -67,7 +68,11 @@ class ProgrammaticTest extends KernelTestBase {
   protected function doSubmitForm($values, $valid_input): void {
     // Programmatically submit the given values.
     $form_state = (new FormState())->setValues($values);
-    \Drupal::formBuilder()->submitForm('\Drupal\form_test\Form\FormTestProgrammaticForm', $form_state);
+    /** @var \Drupal\Core\Render\RendererInterface $renderer */
+    $renderer = $this->container->get('renderer');
+    $renderer->executeInRenderContext(new RenderContext(), function () use (&$form_state) {
+      \Drupal::formBuilder()->submitForm('\Drupal\form_test\Form\FormTestProgrammaticForm', $form_state);
+    });
 
     // Check that the form returns an error when expected, and vice versa.
     $errors = $form_state->getErrors();

@@ -8,6 +8,7 @@ use Drupal\Core\Form\FormInterface;
 use Drupal\Core\Form\FormState;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Render\Element\PathElement;
+use Drupal\Core\Render\RenderContext;
 use Drupal\Core\Url;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\user\Entity\Role;
@@ -139,6 +140,9 @@ class PathElementFormTest extends KernelTestBase implements FormInterface {
    * Tests that default handlers are added even if custom are specified.
    */
   public function testPathElement(): void {
+    /** @var \Drupal\Core\Render\RendererInterface $renderer */
+    $renderer = $this->container->get('renderer');
+
     $form_state = (new FormState())
       ->setValues([
         'required_validate' => 'user/' . $this->testUser->id(),
@@ -187,7 +191,9 @@ class PathElementFormTest extends KernelTestBase implements FormInterface {
         'required_validate_url' => 'user/74',
       ]);
     $form_builder = $this->container->get('form_builder');
-    $form_builder->submitForm($this, $form_state);
+    $renderer->executeInRenderContext(new RenderContext(), function () use ($form_builder, &$form_state) {
+      $form_builder->submitForm($this, $form_state);
+    });
 
     // Valid form state.
     $errors = $form_state->getErrors();
@@ -210,7 +216,10 @@ class PathElementFormTest extends KernelTestBase implements FormInterface {
       'optional_validate_route' => 'user/74',
     ]);
     $form_builder = $this->container->get('form_builder');
-    $form_builder->submitForm($this, $form_state);
+    $renderer->executeInRenderContext(new RenderContext(), function () use ($form_builder, &$form_state) {
+      $form_builder->submitForm($this, $form_state);
+    });
+
     // Valid form state.
     $errors = $form_state->getErrors();
     $this->assertEquals(count($errors), 2);

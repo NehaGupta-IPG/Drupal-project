@@ -56,6 +56,32 @@ class ConfigTranslationUiTest extends ConfigTranslationUiTestBase {
   }
 
   /**
+   * Test that configuration translation is validated on form submit.
+   *
+   * @dataProvider providerInvalidConfigTranslations
+   */
+  public function testValidConfigurationTranslation($string): void {
+    $this->drupalLogin($this->adminUser);
+    $translation_base_url = 'admin/config/system/site-information/translate';
+    $this->drupalGet("$translation_base_url/fr/edit");
+    $edit = [
+      'translation[config_names][system.site][slogan]' => $string,
+    ];
+    $this->submitForm($edit, 'Save translation');
+    $this->assertSession()->pageTextContains('The submitted string contains disallowed HTML.');
+  }
+
+  /**
+   * Data provider for test functions that should test block types.
+   */
+  public static function providerInvalidConfigTranslations(): array {
+    return [
+      ['Hello <img src="world.png" alt="world" />!'],
+      ['Hi <iframe src="drupal.org"></iframe>'],
+    ];
+  }
+
+  /**
    * Tests source and target language edge cases.
    */
   public function testSourceAndTargetLanguage(): void {

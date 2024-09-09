@@ -217,7 +217,7 @@ class ConfigTranslationUiModulesTest extends ConfigTranslationUiTestBase {
       'type' => 'test_field',
     ]);
 
-    $translatable_storage_setting = $this->randomString();
+    $translatable_storage_setting = $this->randomMachineName();
     $field_storage->setSetting('translatable_storage_setting', $translatable_storage_setting);
     $field_storage->save();
 
@@ -229,7 +229,7 @@ class ConfigTranslationUiModulesTest extends ConfigTranslationUiTestBase {
       'bundle' => $bundle,
     ]);
 
-    $translatable_field_setting = $this->randomString();
+    $translatable_field_setting = $this->randomMachineName();
     $field->setSetting('translatable_field_setting', $translatable_field_setting);
     $field->save();
 
