@@ -1385,7 +1385,7 @@ class SqlContentEntityStorage extends ContentEntityStorageBase implements SqlEnt
           $query->values($record + $values);
           if ($this->entityType->isRevisionable()) {
             if ($field_name === 'body') {
-              $hash = hash('sha256', serialize($values));
+              $hash = hash('xxh128', serialize($values));
               $revision_query->values($record + ['interned_hash' => $hash]);
               $this->database->merge($revision_name . '__interned')
                 ->key('interned_hash', $hash)
