@@ -63,6 +63,9 @@ field.storage.*.*:
     custom_storage:
       type: boolean
       label: 'Enable custom storage'
+    interned:
+      type: boolean
+      label: 'Enable interned storage'
 
 field.field.*.*.*:
   type: field_config_base
