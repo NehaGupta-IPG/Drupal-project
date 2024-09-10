@@ -1235,7 +1235,7 @@ class SqlContentEntityStorage extends ContentEntityStorageBase implements SqlEnt
         ->condition('langcode', $langcodes, 'IN')
         ->orderBy('delta');
 
-      if ($load_from_revision && $field_name === 'body') {
+      if ($load_from_revision && $storage_definition->isInterned()) {
         $query->innerJoin($table . '__interned', 'i', '[t].[interned_hash] = [i].[interned_hash]');
         $query->fields('i');
       }
@@ -1349,7 +1349,7 @@ class SqlContentEntityStorage extends ContentEntityStorageBase implements SqlEnt
       }
       $query = $this->database->insert($table_name)->fields(array_merge($base_columns, $columns));
       if ($this->entityType->isRevisionable()) {
-        if ($field_name === 'body') {
+        if ($storage_definition->isInterned()) {
           $revision_query = $this->database->insert($revision_name)->fields(array_merge($base_columns, ['interned_hash']));
         }
         else {
@@ -1384,7 +1384,7 @@ class SqlContentEntityStorage extends ContentEntityStorageBase implements SqlEnt
           }
           $query->values($record + $values);
           if ($this->entityType->isRevisionable()) {
-            if ($field_name === 'body') {
+            if ($storage_definition->isInterned()) {
               $hash = hash('xxh128', serialize($values));
               $revision_query->values($record + ['interned_hash' => $hash]);
               $this->database->merge($revision_name . '__interned')

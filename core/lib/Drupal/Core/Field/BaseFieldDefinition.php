@@ -703,6 +703,20 @@ class BaseFieldDefinition extends ListDataDefinition implements FieldDefinitionI
   /**
    * {@inheritdoc}
    */
+  public function supportsInterning(): bool {
+    return FALSE;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function isInterned(): bool {
+    return FALSE;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function isBaseField() {
     return TRUE;
   }

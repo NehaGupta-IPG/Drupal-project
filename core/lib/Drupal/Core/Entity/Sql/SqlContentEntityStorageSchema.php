@@ -2409,7 +2409,7 @@ class SqlContentEntityStorageSchema implements DynamicallyFieldableEntityStorage
       $revision_schema['fields']['revision_id']['not null'] = TRUE;
       $revision_schema['fields']['revision_id']['description'] = 'The entity revision id this data is attached to';
 
-      if ($storage_definition->getName() == 'body') {
+      if ($storage_definition->isInterned()) {
         // Set up interned data table and matching revision table field.
         $interned_schema = [
           'fields' => [

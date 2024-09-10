@@ -60,6 +60,7 @@ use Drupal\field\FieldStorageConfigStorage;
     'indexes',
     'persist_with_no_fields',
     'custom_storage',
+    'interned',
   ],
 )]
 class FieldStorageConfig extends ConfigEntityBase implements FieldStorageConfigInterface {
@@ -183,6 +184,11 @@ class FieldStorageConfig extends ConfigEntityBase implements FieldStorageConfigI
    * @var bool
    */
   public $custom_storage = FALSE;
+
+  /**
+   * A boolean indicating whether the field storage is interned.
+   */
+  protected bool $interned = FALSE;
 
   /**
    * The custom storage indexes for the field data storage.
@@ -504,6 +510,26 @@ class FieldStorageConfig extends ConfigEntityBase implements FieldStorageConfigI
    */
   public function hasCustomStorage() {
     return $this->custom_storage;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function supportsInterning(): bool {
+    foreach ($this->getSchema()['columns'] as $column) {
+      if ($column['type'] === 'text') {
+        return TRUE;
+      }
+    }
+
+    return FALSE;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function isInterned(): bool {
+    return $this->interned && $this->supportsInterning();
   }
 
   /**
