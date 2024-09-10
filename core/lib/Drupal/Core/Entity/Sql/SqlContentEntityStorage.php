@@ -1759,6 +1759,9 @@ class SqlContentEntityStorage extends ContentEntityStorageBase implements SqlEnt
         $table_name = $table_mapping->getDedicatedDataTableName($storage_definition, $is_deleted);
       }
       $query = $this->database->select($table_name, 't');
+      if ($this->entityType->isRevisionable() && $storage_definition->isInterned()) {
+        $query->innerJoin($table_name . '__interned', 'i', '[t].[interned_hash] = [i].[interned_hash]');
+      }
       $or = $query->orConditionGroup();
       foreach ($storage_definition->getColumns() as $column_name => $data) {
         $or->isNotNull($table_mapping->getFieldColumnName($storage_definition, $column_name));
