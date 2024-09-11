@@ -155,10 +155,10 @@ class GDToolkit extends ImageToolkitBase {
       '#field_suffix' => $this->t('%'),
     ];
 
-    // In PHP 8.1+, the GD extension supports lossless encoding,
-    // and declares a new PHP constant IMG_WEBP_LOSSLESS which
-    // can be passed to imagewebp function to enable lossless
-    // encoding of a GdImage object.
+    // The PHP GD extension offers lossless encoding for WebP images. It
+    // provides a constant IMG_WEBP_LOSSLESS. When this constant is passed to
+    // the imagewebp function, it enables lossless compression of a GdImage
+    // object.
     $form['image_webp_lossless'] = [
       '#type' => 'checkbox',
       '#title' => $this->t('Lossless WebP'),
