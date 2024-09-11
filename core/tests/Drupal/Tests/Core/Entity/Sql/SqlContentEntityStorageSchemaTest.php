@@ -1029,9 +1029,8 @@ class SqlContentEntityStorageSchemaTest extends UnitTestCase {
     $field_name = $this->getRandomGenerator()->name();
     $this->setUpStorageDefinition($field_name, [
       'columns' => [
-        'shape' => [
-          'type' => 'varchar',
-          'length' => 32,
+        'json' => [
+          'type' => 'text',
           'not null' => FALSE,
         ],
         'color' => [
@@ -1060,7 +1059,6 @@ class SqlContentEntityStorageSchemaTest extends UnitTestCase {
       ],
       'unique keys' => [
         'area' => ['area'],
-        'shape' => [['shape', 10]],
       ],
       'indexes' => [
         'depth' => ['depth'],
@@ -1146,9 +1144,8 @@ class SqlContentEntityStorageSchemaTest extends UnitTestCase {
             'not null' => TRUE,
             'description' => 'The sequence number for this data item, used for multi-value fields',
           ],
-          $field_name . '_shape' => [
-            'type' => 'varchar',
-            'length' => 32,
+          $field_name . '_json' => [
+            'type' => 'text',
             'not null' => FALSE,
           ],
           $field_name . '_color' => [
@@ -1176,7 +1173,6 @@ class SqlContentEntityStorageSchemaTest extends UnitTestCase {
         ],
         'unique keys' => [
           $field_name . '_area' => [$field_name . '_area'],
-          $field_name . '_shape' => [[$field_name . '_shape', 10]],
         ],
         'foreign keys' => [
           $field_name . '_color' => [
@@ -1195,9 +1191,8 @@ class SqlContentEntityStorageSchemaTest extends UnitTestCase {
             'not null' => TRUE,
             'default' => '',
           ],
-          $field_name . '_shape' => [
-            'type' => 'varchar',
-            'length' => 32,
+          $field_name . '_json' => [
+            'type' => 'text',
             'not null' => FALSE,
           ],
           $field_name . '_color' => [
@@ -1223,7 +1218,6 @@ class SqlContentEntityStorageSchemaTest extends UnitTestCase {
         ],
         'unique keys' => [
           $field_name . '_area' => [$field_name . '_area'],
-          $field_name . '_shape' => [[$field_name . '_shape', 10]],
         ],
         'foreign keys' => [
           $field_name . '_color' => [
