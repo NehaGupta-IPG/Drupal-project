@@ -2440,6 +2440,11 @@ class SqlContentEntityStorageSchema implements DynamicallyFieldableEntityStorage
           }
         }
 
+        // Move unique and foreign keys from revision table to interned table.
+        $interned_schema['unique keys'] = $revision_schema['unique keys'];
+        $interned_schema['foreign keys'] = $revision_schema['foreign keys'];
+        unset($revision_schema['unique keys'], $revision_schema['foreign keys']);
+
         $interned_table = $table_mapping->getDedicatedRevisionTableName($storage_definition) . '__interned';
         $dedicated_table_schema[$interned_table] = $interned_schema;
       }

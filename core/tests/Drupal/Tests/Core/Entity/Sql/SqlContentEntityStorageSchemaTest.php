@@ -1009,6 +1009,304 @@ class SqlContentEntityStorageSchemaTest extends UnitTestCase {
   }
 
   /**
+   * Tests the schema for dedicated tables with revisioned interned data.
+   *
+   * @covers ::onFieldStorageDefinitionCreate
+   * @covers ::getDedicatedTableSchema
+   * @covers ::createDedicatedTableSchema
+   */
+  public function testDedicatedTableSchemaInterned(): void {
+    $entity_type_id = 'entity_test';
+    $this->entityType = new ContentEntityType([
+      'id' => 'entity_test',
+      'entity_keys' => [
+        'id' => 'id',
+        'revision' => 'vid',
+      ],
+    ]);
+
+    // Setup a field having a dedicated interned schema.
+    $field_name = $this->getRandomGenerator()->name();
+    $this->setUpStorageDefinition($field_name, [
+      'columns' => [
+        'shape' => [
+          'type' => 'varchar',
+          'length' => 32,
+          'not null' => FALSE,
+        ],
+        'color' => [
+          'type' => 'varchar',
+          'length' => 32,
+          'not null' => FALSE,
+        ],
+        'area' => [
+          'type' => 'int',
+          'unsigned' => TRUE,
+          'not null' => TRUE,
+        ],
+        'depth' => [
+          'type' => 'int',
+          'unsigned' => TRUE,
+          'not null' => TRUE,
+        ],
+      ],
+      'foreign keys' => [
+        'color' => [
+          'table' => 'color',
+          'columns' => [
+            'color' => 'id',
+          ],
+        ],
+      ],
+      'unique keys' => [
+        'area' => ['area'],
+        'shape' => [['shape', 10]],
+      ],
+      'indexes' => [
+        'depth' => ['depth'],
+        'color' => [['color', 3]],
+      ],
+    ]);
+
+    $field_storage = $this->storageDefinitions[$field_name];
+    $field_storage
+      ->expects($this->any())
+      ->method('getType')
+      ->willReturn('shape');
+    $field_storage
+      ->expects($this->any())
+      ->method('getTargetEntityTypeId')
+      ->willReturn($entity_type_id);
+    $field_storage
+      ->expects($this->any())
+      ->method('isMultiple')
+      ->willReturn(TRUE);
+    $field_storage
+      ->expects($this->any())
+      ->method('isInterned')
+      ->willReturn(TRUE);
+
+    $this->storageDefinitions['id']
+      ->expects($this->any())
+      ->method('getType')
+      ->willReturn('integer');
+
+    $this->setUpStorageDefinition('vid', [
+      'columns' => [
+        'value' => [
+          'type' => 'int',
+        ],
+      ],
+    ]);
+    $this->storageDefinitions['vid']
+      ->expects($this->any())
+      ->method('getType')
+      ->willReturn('integer');
+
+    $expected = [
+      $entity_type_id . '__' . $field_name => [
+        'description' => "Data storage for $entity_type_id field $field_name.",
+        'fields' => [
+          'bundle' => [
+            'type' => 'varchar_ascii',
+            'length' => 128,
+            'not null' => TRUE,
+            'default' => '',
+            'description' => 'The field instance bundle to which this row belongs, used when deleting a field instance',
+          ],
+          'deleted' => [
+            'type' => 'int',
+            'size' => 'tiny',
+            'not null' => TRUE,
+            'default' => 0,
+            'description' => 'A boolean indicating whether this data item has been deleted',
+          ],
+          'entity_id' => [
+            'type' => 'int',
+            'unsigned' => TRUE,
+            'not null' => TRUE,
+            'description' => 'The entity id this data is attached to',
+          ],
+          'revision_id' => [
+            'type' => 'int',
+            'unsigned' => TRUE,
+            'not null' => TRUE,
+            'description' => 'The entity revision id this data is attached to',
+          ],
+          'langcode' => [
+            'type' => 'varchar_ascii',
+            'length' => 32,
+            'not null' => TRUE,
+            'default' => '',
+            'description' => 'The language code for this data item.',
+          ],
+          'delta' => [
+            'type' => 'int',
+            'unsigned' => TRUE,
+            'not null' => TRUE,
+            'description' => 'The sequence number for this data item, used for multi-value fields',
+          ],
+          $field_name . '_shape' => [
+            'type' => 'varchar',
+            'length' => 32,
+            'not null' => FALSE,
+          ],
+          $field_name . '_color' => [
+            'type' => 'varchar',
+            'length' => 32,
+            'not null' => FALSE,
+          ],
+          $field_name . '_area' => [
+            'type' => 'int',
+            'unsigned' => TRUE,
+            'not null' => TRUE,
+          ],
+          $field_name . '_depth' => [
+            'type' => 'int',
+            'unsigned' => TRUE,
+            'not null' => TRUE,
+          ],
+        ],
+        'primary key' => ['entity_id', 'deleted', 'delta', 'langcode'],
+        'indexes' => [
+          'bundle' => ['bundle'],
+          'revision_id' => ['revision_id'],
+          $field_name . '_depth' => [$field_name . '_depth'],
+          $field_name . '_color' => [[$field_name . '_color', 3]],
+        ],
+        'unique keys' => [
+          $field_name . '_area' => [$field_name . '_area'],
+          $field_name . '_shape' => [[$field_name . '_shape', 10]],
+        ],
+        'foreign keys' => [
+          $field_name . '_color' => [
+            'table' => 'color',
+            'columns' => [
+              $field_name . '_color' => 'id',
+            ],
+          ],
+        ],
+      ],
+      $entity_type_id . '_revision__' . $field_name . '__interned' => [
+        'fields' => [
+          'interned_hash' => [
+            'type' => 'char',
+            'length' => 32,
+            'not null' => TRUE,
+            'default' => '',
+          ],
+          $field_name . '_shape' => [
+            'type' => 'varchar',
+            'length' => 32,
+            'not null' => FALSE,
+          ],
+          $field_name . '_color' => [
+            'type' => 'varchar',
+            'length' => 32,
+            'not null' => FALSE,
+          ],
+          $field_name . '_area' => [
+            'type' => 'int',
+            'unsigned' => TRUE,
+            'not null' => TRUE,
+          ],
+          $field_name . '_depth' => [
+            'type' => 'int',
+            'unsigned' => TRUE,
+            'not null' => TRUE,
+          ],
+        ],
+        'primary key' => ['interned_hash'],
+        'indexes' => [
+          $field_name . '_depth' => [$field_name . '_depth'],
+          $field_name . '_color' => [[$field_name . '_color', 3]],
+        ],
+        'unique keys' => [
+          $field_name . '_area' => [$field_name . '_area'],
+          $field_name . '_shape' => [[$field_name . '_shape', 10]],
+        ],
+        'foreign keys' => [
+          $field_name . '_color' => [
+            'table' => 'color',
+            'columns' => [
+              $field_name . '_color' => 'id',
+            ],
+          ],
+        ],
+      ],
+      $entity_type_id . '_revision__' . $field_name => [
+        'description' => "Revision archive storage for $entity_type_id field $field_name.",
+        'fields' => [
+          'bundle' => [
+            'type' => 'varchar_ascii',
+            'length' => 128,
+            'not null' => TRUE,
+            'default' => '',
+            'description' => 'The field instance bundle to which this row belongs, used when deleting a field instance',
+          ],
+          'deleted' => [
+            'type' => 'int',
+            'size' => 'tiny',
+            'not null' => TRUE,
+            'default' => 0,
+            'description' => 'A boolean indicating whether this data item has been deleted',
+          ],
+          'entity_id' => [
+            'type' => 'int',
+            'unsigned' => TRUE,
+            'not null' => TRUE,
+            'description' => 'The entity id this data is attached to',
+          ],
+          'revision_id' => [
+            'type' => 'int',
+            'unsigned' => TRUE,
+            'not null' => TRUE,
+            'description' => 'The entity revision id this data is attached to',
+          ],
+          'langcode' => [
+            'type' => 'varchar_ascii',
+            'length' => 32,
+            'not null' => TRUE,
+            'default' => '',
+            'description' => 'The language code for this data item.',
+          ],
+          'delta' => [
+            'type' => 'int',
+            'unsigned' => TRUE,
+            'not null' => TRUE,
+            'description' => 'The sequence number for this data item, used for multi-value fields',
+          ],
+          'interned_hash' => [
+            'type' => 'char',
+            'length' => 32,
+            'not null' => TRUE,
+            'default' => '',
+          ],
+        ],
+        'primary key' => ['entity_id', 'revision_id', 'deleted', 'delta', 'langcode'],
+        'indexes' => [
+          'bundle' => ['bundle'],
+          'revision_id' => ['revision_id'],
+        ],
+      ],
+    ];
+
+    $this->setUpStorageSchema($expected);
+
+    $table_mapping = new TestSqlContentDefaultTableMapping($this->entityType, $this->storageDefinitions);
+    $table_mapping->setFieldNames($entity_type_id, array_keys($this->storageDefinitions));
+    $table_mapping->setExtraColumns($entity_type_id, ['default_langcode']);
+
+    $this->storageSchema->expects($this->any())
+      ->method('getTableMapping')
+      ->willReturn($table_mapping);
+
+    $this->assertNull(
+      $this->storageSchema->onFieldStorageDefinitionCreate($field_storage)
+    );
+  }
+
+  /**
    * Tests the schema for a field dedicated table for an entity with a string identifier.
    *
    * @covers ::onFieldStorageDefinitionCreate
