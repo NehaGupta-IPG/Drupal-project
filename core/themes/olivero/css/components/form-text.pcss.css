@@ -88,3 +88,10 @@ textarea {
   width: var(--sp3);
   padding: 0;
 }
+
+/* with below css overlapping of collapseable field will befixed in smaller screen like tablet. */
+
+.text-full.form-element,
+.form-element--type-text {
+  width: 100%;
+}
