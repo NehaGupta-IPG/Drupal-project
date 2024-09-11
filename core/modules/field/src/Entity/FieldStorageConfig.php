@@ -188,7 +188,7 @@ class FieldStorageConfig extends ConfigEntityBase implements FieldStorageConfigI
   /**
    * A boolean indicating whether the field storage is interned.
    */
-  protected bool $interned = FALSE;
+  protected ?bool $interned = FALSE;
 
   /**
    * The custom storage indexes for the field data storage.
