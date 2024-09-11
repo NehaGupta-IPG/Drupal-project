@@ -460,11 +460,14 @@ class Media extends EditorialContentEntityBase implements MediaInterface {
               $translation->set($entity_field_name, $media_source->getMetadata($translation, $metadata_attribute_name));
               continue;
             }
+            if (!$translation->hasSourceFieldChanged()) {
+              // @todo Some comment about not having anything to do.
+              continue;
+            }
             // Get the new value, it can't be empty anymore:
             $new_value = $new_field_item->getValue();
 
-            // Check the old value and new value to determine if the field value
-            // needs to be saved.
+            // Get the old value from the translation original if it is available.
             $old_value = NULL;
             if ($translation_original) {
               $old_value = $translation_original->get($entity_field_name)->getValue();
@@ -474,14 +477,14 @@ class Media extends EditorialContentEntityBase implements MediaInterface {
             elseif ($this->original && $this->original->hasField($entity_field_name)) {
               $old_value = $this->original->get($entity_field_name)->getValue();
             }
+
             // Determine if the field is being changed. For this, perform a
             // strict comparison only when the old value is not empty (the new
             // value can not be empty at this point).
             $is_new_field_data_being_provided = !empty($old_value) && $new_value !== $old_value;
-            // Finally, save the field value in two cases. One, when the value
-            // is empty. The other is when the field value has changed *and* the
-            // field is not actively being changed.
-            if ($translation->hasSourceFieldChanged() && $is_new_field_data_being_provided === FALSE) {
+
+            // Only save the field value when the field is not actively being changed.
+            if (!$is_new_field_data_being_provided) {
               $translation->set($entity_field_name, $media_source->getMetadata($translation, $metadata_attribute_name));
             }
           }
