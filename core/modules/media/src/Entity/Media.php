@@ -461,10 +461,11 @@ class Media extends EditorialContentEntityBase implements MediaInterface {
               continue;
             }
             if (!$translation->hasSourceFieldChanged()) {
-              // @todo Some comment about not having anything to do.
+              // The source field hasn't changed. Simply continue to the
+              // next metadata attribute:
               continue;
             }
-            // Get the new value, it can't be empty anymore:
+            // Get the new field item value (it can't be empty here):
             $new_value = $new_field_item->getValue();
 
             // Get the old value from the translation original if it is available.
@@ -487,6 +488,7 @@ class Media extends EditorialContentEntityBase implements MediaInterface {
             if (!$is_new_field_data_being_provided) {
               $translation->set($entity_field_name, $media_source->getMetadata($translation, $metadata_attribute_name));
             }
+
           }
         }
 
