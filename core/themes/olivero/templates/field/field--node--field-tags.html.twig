@@ -33,5 +33,5 @@
   label_display,
   title_attributes,
   label,
-  items
+  tags: items|map(item => { content: item.content|render, attributes: item.attributes }),
 } only %}
