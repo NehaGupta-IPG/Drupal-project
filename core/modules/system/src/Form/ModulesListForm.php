@@ -168,6 +168,7 @@ class ModulesListForm extends FormBase {
         'data-singular' => $this->t('1 module is available in the modified list.'),
         'data-plural' => $this->t('@count modules are available in the modified list.'),
         'data-full' => $this->t('All available modules are listed.'),
+        'data-search-start' => 'true',
         'autocomplete' => 'off',
       ],
     ];

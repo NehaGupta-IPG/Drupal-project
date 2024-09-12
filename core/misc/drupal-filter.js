@@ -18,19 +18,6 @@
     element.style.display = 'revert';
   }
 
-  function searchMethod(target, query) {
-    return target?.textContent.toLowerCase().includes(query) || false;
-  }
-
-  function foundInItem(query, item) {
-    if (item.searchTargets) {
-      return Array.from(item.searchTargets).some((target) =>
-        searchMethod(target, query),
-      );
-    }
-    return searchMethod(item, query);
-  }
-
   /**
    * Filters the table by a text input search string.
    *
@@ -52,17 +39,31 @@
    * Plural.
    * `.table-filter-text[data-plural]`
    *
+   * Min length of search query.
+   * `.table-filter-text[data-min-length]`
+   *
+   * Search only from start of words.
+   * `.table-filter-text[data-search-start]`
+   *
    * @type {Drupal~behavior}
    *
    * @prop {Drupal~behaviorAttach} attach
    *   Attaches the behavior for the text filtering.
    */
   Drupal.behaviors.drupalFilterByText = {
-    attach(context, settings) {
+    attach(context) {
       once('drupal-filter-text', '.table-filter-text', context).forEach(
         (input) => {
-          const { table, items, targets, singular, plural, full } =
-            input.dataset;
+          const {
+            table,
+            items,
+            targets,
+            singular,
+            plural,
+            full,
+            minLength = 2,
+            searchStart = false,
+          } = input.dataset;
 
           const ALL_PHRASE = Drupal.t('All available items are listed.');
           const SINGULAR_PHRASE = '1 item is available in the modified list.';
@@ -78,6 +79,24 @@
               ),
             );
           };
+
+          function searchMethod(target, query) {
+            if (searchStart === 'true') {
+              return (
+                target?.textContent.toLowerCase().startsWith(query) || false
+              );
+            }
+            return target?.textContent.toLowerCase().includes(query) || false;
+          }
+
+          function foundInItem(query, item) {
+            if (item.searchTargets) {
+              return Array.from(item.searchTargets).some((target) =>
+                searchMethod(target, query),
+              );
+            }
+            return searchMethod(item, query);
+          }
 
           // Table can be in another context so we have to search in document.
           const tables = document.querySelectorAll(table);
@@ -125,9 +144,8 @@
 
             const filterTableList = (e) => {
               const query = e.target.value.toLowerCase();
-
               // Filter if the length of the query is at least 2 characters.
-              if (query.length >= 2) {
+              if (query.length >= minLength) {
                 let matches = 0;
 
                 filterItems.forEach((item) => {
