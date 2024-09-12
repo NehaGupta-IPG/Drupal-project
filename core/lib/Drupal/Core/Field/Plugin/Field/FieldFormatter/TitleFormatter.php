@@ -28,7 +28,7 @@ class TitleFormatter extends StringFormatter {
       'span' => 'span',
       'div' => 'div',
     ];
-    foreach (range(1, 5) as $level) {
+    foreach (range(1, 6) as $level) {
       $heading_options['h' . $level] = 'H' . $level;
     }
 
