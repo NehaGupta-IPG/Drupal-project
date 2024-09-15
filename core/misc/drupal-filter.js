@@ -80,37 +80,51 @@
             );
           };
 
-          function searchMethod(target, query) {
-            if (searchStart === 'true') {
-              return (
-                target?.textContent.toLowerCase().startsWith(query) || false
-              );
-            }
-            return target?.textContent.toLowerCase().includes(query) || false;
+          function normalizeString(str) {
+            return str.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
           }
 
-          function foundInItem(query, item) {
-            if (item.searchTargets) {
-              return Array.from(item.searchTargets).some((target) =>
-                searchMethod(target, query),
-              );
-            }
-            return searchMethod(item, query);
+          const reStartsWith = (query) => new RegExp(`\\b${query}`);
+
+          function searchMethod(target, query) {
+            return (searchStart === 'true')
+              ? target.search(reStartsWith(query)) !== -1
+              : target.includes(query);
           }
 
           // Table can be in another context so we have to search in document.
           const tables = document.querySelectorAll(table);
 
           const initTable = (tableElement) => {
-            const filterItems = tableElement.querySelectorAll(items);
 
-            // If we need to search deeper in row elements.
-            if (targets) {
-              // To avoid search in item on every query let's store them in item object.
-              filterItems.forEach((item) => {
-                item.searchTargets = item.querySelectorAll(targets);
-              });
-            }
+            // Transitional information helping accelerate queries.
+            let filterItemsTransitional = null;
+            let queryTransitional = "";
+
+            // Prepare items for accelerated filtering.
+            const filterItems = Array.from(
+              tableElement.querySelectorAll(items)
+            ).map((source) => {
+
+              // If we need to search deeper in row elements.
+              const textContent = (targets)
+                ?
+                  Array.from(
+                    source.querySelectorAll(targets)
+                  ).reduce((acc, target) => {
+                    return acc + ' ' + target.textContent;
+                  }, ' ').trim()
+                :
+                  source.textContent;
+
+              return {
+                node: source,
+                textContent: normalizeString(textContent),
+              };
+            });
+
+            filterItemsTransitional = filterItems;
+
             const labels = tableElement.querySelectorAll('[data-filter-label]');
 
             labels.forEach((label) => {
@@ -143,31 +157,49 @@
             };
 
             const filterTableList = (e) => {
-              const query = e.target.value.toLowerCase();
+              const query = normalizeString(e.target.value);
+              const queryContinuation = query.startsWith(queryTransitional);
+
+              // Return earlier and save resources.
+              // console.warn('transitional recordset is', filterItemsTransitional);
+              if (queryContinuation && filterItemsTransitional.length === 0) {console.log('returning earlier'); return;}
+
+              // Test if the updated input text is a continuation of the previous query.
+              if (!searchMethod(query, queryTransitional)) {
+                filterItemsTransitional = filterItems;
+              }
+
               // Filter if the length of the query is at least 2 characters.
               if (query.length >= minLength) {
-                let matches = 0;
+                let matches = [];
 
-                filterItems.forEach((item) => {
-                  if (!foundInItem(query, item)) {
-                    hideElement(item);
+                filterItemsTransitional.forEach((item) => {
+                  if (!searchMethod(item.textContent, query)) {
+                    hideElement(item.node);
                   } else {
-                    showElement(item);
-                    matches += 1;
+                    showElement(item.node);
+                    matches.push(item);
                   }
                 });
-                makeAnnounce(matches);
+                makeAnnounce(matches.length);
                 checkLabels();
+                filterItemsTransitional = matches;
               } else {
-                filterItems.forEach(showElement);
+                filterItems.forEach((item) => {
+                  showElement(item.node);
+                });
                 Drupal.announce(full || ALL_PHRASE);
                 checkLabels(true);
+                filterItemsTransitional = filterItems
               }
+
+              // Updates the transitional information.
+              queryTransitional = query;
             };
 
-            tableElement.addEventListener(FILTER_EVENT, (e) =>
-              filterTableList(e.detail.event),
-            );
+            tableElement.addEventListener(FILTER_EVENT, (e) => {
+              return filterTableList(e.detail.event);
+            });
           };
 
           tables.forEach(initTable);
