@@ -105,6 +105,7 @@ class EntityDisplayTest extends KernelTestBase {
       'settings' => [
         'link_to_entity' => FALSE,
         'link_rel' => 'canonical',
+        'tag' => NULL,
       ],
       'third_party_settings' => [],
       'region' => 'content',
