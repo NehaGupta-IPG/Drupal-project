@@ -206,7 +206,6 @@
         'input',
         debounce((event) => {
           tables.forEach((tableElement) => {
-            console.time('timer')
             tableElement.dispatchEvent(
               new CustomEvent(FILTER_EVENT, {
                 detail: {
@@ -214,7 +213,6 @@
                 },
               }),
             );
-            console.timeEnd('timer')
           });
         }, 200),
       );
