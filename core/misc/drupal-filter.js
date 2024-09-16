@@ -66,8 +66,7 @@
 
       const ALL_PHRASE = Drupal.t('All available items are listed.');
       const SINGULAR_PHRASE = '1 item is available in the modified list.';
-      const PLURAL_PHRASE =
-        '@count items are available in the modified list.';
+      const PLURAL_PHRASE = '@count items are available in the modified list.';
 
       const makeAnnounce = (matches) => {
         Drupal.announce(
@@ -80,13 +79,16 @@
       };
 
       function normalizeString(str) {
-        return str.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+        return str
+          .normalize('NFD')
+          .replace(/[\u0300-\u036f]/g, '')
+          .toLowerCase();
       }
 
       const reStartsWith = (query) => new RegExp(`\\b${query}`);
 
       function searchMethod(target, query) {
-        return (searchStart === 'true')
+        return searchStart === 'true'
           ? target.search(reStartsWith(query)) !== -1
           : target.includes(query);
       }
@@ -95,26 +97,22 @@
       const tables = document.querySelectorAll(table);
 
       const initTable = (tableElement) => {
-
         // Transitional information helping accelerate queries.
         let filterItemsTransitional = null;
-        let queryTransitional = "";
+        let queryTransitional = '';
 
         // Prepare items for accelerated filtering.
         const filterItems = Array.from(
-          tableElement.querySelectorAll(items)
+          tableElement.querySelectorAll(items),
         ).map((source) => {
-
           // If we need to search deeper in row elements.
-          const textContent = (targets)
-            ?
-              Array.from(
-                source.querySelectorAll(targets)
-              ).reduce((acc, target) => {
-                return acc + ' ' + target.textContent;
-              }, ' ').trim()
-            :
-              source.textContent;
+          const textContent = targets
+            ? Array.from(source.querySelectorAll(targets))
+                .reduce((acc, target) => {
+                  return `${acc} ${target.textContent}`;
+                }, ' ')
+                .trim()
+            : source.textContent;
 
           return {
             node: source,
@@ -169,7 +167,7 @@
 
           // Filter if the length of the query is at least 2 characters.
           if (query.length >= minLength) {
-            let matches = [];
+            const matches = [];
 
             filterItemsTransitional.forEach((item) => {
               if (!searchMethod(item.textContent, query)) {
@@ -188,7 +186,7 @@
             });
             Drupal.announce(full || ALL_PHRASE);
             checkLabels(true);
-            filterItemsTransitional = filterItems
+            filterItemsTransitional = filterItems;
           }
 
           // Updates the transitional information.
