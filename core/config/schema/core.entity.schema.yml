@@ -373,16 +373,13 @@ field.formatter.settings.string:
             - canonical
             - edit-form
       requiredKey: false
-
-field.formatter.settings.title:
-  type: field.formatter.settings.string
-  mapping:
     tag:
       type: string
       label: 'Tag'
       constraints:
         Choice:
           choices:
+            - ''
             - 'span'
             - 'div'
             - 'h1'

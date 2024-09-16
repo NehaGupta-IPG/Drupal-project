@@ -11,11 +11,11 @@ use Drupal\node\Entity\Node;
 use Drupal\Tests\BrowserTestBase;
 
 /**
- * Tests for title field formatter.
+ * Tests for text fields.
  *
  * @group field
  */
-class TitleFormatterTest extends BrowserTestBase {
+class StringFormatterTest extends BrowserTestBase {
 
   /**
    * {@inheritdoc}
@@ -57,7 +57,7 @@ class TitleFormatterTest extends BrowserTestBase {
     // Configure display.
     $display = EntityViewDisplay::load('node.page.default');
     $display->setComponent('field_subtitle', [
-      'type' => 'title',
+      'type' => 'string',
       'settings' => [
         'link_to_entity' => 1,
         'tag' => 'h2',
@@ -66,9 +66,9 @@ class TitleFormatterTest extends BrowserTestBase {
   }
 
   /**
-   * Test title formatter output.
+   * Test string formatter output with tag.
    */
-  public function testTitleFormatter(): void {
+  public function testStringFormatterWithTag(): void {
     $user = $this->drupalCreateUser();
     $node = Node::create([
       'title' => 'Test node',
@@ -80,7 +80,7 @@ class TitleFormatterTest extends BrowserTestBase {
     $assert = $this->assertSession();
     $subtitle = $node->get('field_subtitle')->getValue();
 
-    // Verify title formatter output.
+    // Verify string formatter output with tag.
     $this->drupalGet('node/' . $node->id());
     $assert->elementTextContains('css', 'div > h2 a[href="' . $node->toUrl()->toString() . '"]', $subtitle[0]['value']);
   }

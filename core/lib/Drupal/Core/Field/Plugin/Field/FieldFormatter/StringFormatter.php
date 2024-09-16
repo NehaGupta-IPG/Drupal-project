@@ -67,6 +67,7 @@ class StringFormatter extends FormatterBase {
 
     $options['link_to_entity'] = FALSE;
     $options['link_rel'] = 'canonical';
+    $options['tag'] = '';
     return $options;
   }
 
@@ -110,6 +111,22 @@ class StringFormatter extends FormatterBase {
       }
     }
 
+    $heading_options = [
+      '' => '- None -',
+      'span' => 'span',
+      'div' => 'div',
+    ];
+    foreach (range(1, 6) as $level) {
+      $heading_options['h' . $level] = 'H' . $level;
+    }
+
+    $form['tag'] = [
+      '#title' => $this->t('Display as'),
+      '#type' => 'select',
+      '#options' => $heading_options,
+      '#default_value' => $this->getSetting('tag'),
+    ];
+
     return $form;
   }
 
@@ -129,6 +146,9 @@ class StringFormatter extends FormatterBase {
         default => $this->t('Linked to @link_template', ['@link_template' => $link_rel]),
       };
     }
+    if ($this->getSetting('tag')) {
+      $summary[] = $this->t('Displayed as @tag', ['@tag' => $this->getSetting('tag')]);
+    }
     return $summary;
   }
 
@@ -137,6 +157,7 @@ class StringFormatter extends FormatterBase {
    */
   public function viewElements(FieldItemListInterface $items, $langcode) {
     $elements = [];
+    $tag = NULL;
     $entity = $items->getEntity();
     $entity_type = $entity->getEntityType();
 
@@ -148,6 +169,9 @@ class StringFormatter extends FormatterBase {
         ->addCacheableDependency($access)
         ->applyTo($elements);
       $render_as_link = $access->isAllowed();
+    }
+    if ($this->getSetting('tag')) {
+      $tag = $this->getSetting('tag');
     }
 
     foreach ($items as $delta => $item) {
@@ -161,6 +185,11 @@ class StringFormatter extends FormatterBase {
       }
       else {
         $elements[$delta] = $this->viewValue($item);
+      }
+
+      if ($tag) {
+        $elements[$delta]['#prefix'] = "<$tag>";
+        $elements[$delta]['#suffix'] = "</$tag>";
       }
     }
 
