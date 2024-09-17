@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\Component\Serialization;
 
+use Drupal\Component\Serialization\Exception\InvalidDataTypeException;
 use Drupal\Component\Serialization\Json;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
@@ -117,6 +118,42 @@ class JsonTest extends TestCase {
     $json_decoded = Json::decode($json);
     $this->assertNotSame($source, $json, 'An array encoded in JSON is identical to the source.');
     $this->assertSame($source, $json_decoded, 'Encoding structured data to JSON and decoding back not results in the original data.');
+  }
+
+  /**
+   * Tests basic JSON encoding and decoding.
+   */
+  public function testJsonEncodingDecoding() {
+    $data = ['name' => 'Alice', 'age' => 30];
+    $encoded = Json::encode($data);
+    $decoded = Json::decode($encoded);
+
+    $this->assertEquals($data, $decoded);
+  }
+
+  /**
+   * Tests handling of invalid JSON data during decoding.
+   *
+   * @throws \Drupal\Component\Serialization\Exception\InvalidDataTypeException
+   */
+  public function testInvalidJsonDecoding() {
+    $invalidJson = 'Invalid JSON String';
+
+    $this->expectException(InvalidDataTypeException::class);
+    Json::decode($invalidJson);
+  }
+
+  /**
+   * Tests JSON encoding failure on circular references.
+   *
+   * @throws \Drupal\Component\Serialization\Exception\InvalidDataTypeException
+   */
+  public function testJsonEncodingFailure() {
+    $data = [];
+    $data['self'] = &$data;
+
+    $this->expectException(InvalidDataTypeException::class);
+    Json::encode($data);
   }
 
 }
