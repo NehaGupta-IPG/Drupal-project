@@ -5,6 +5,12 @@ search.view:
 entity.search_page.collection:
   title: 'Search pages'
   parent: system.admin_config_search
-  description: 'Configure search pages and search indexing options.'
+  description: 'Configure search pages.'
   route_name: entity.search_page.collection
   weight: -10
+search.index_settings:
+  title: Search index settings
+  parent: system.admin_config_search
+  route_name: search.index_settings
+  description: 'Config search index options.'
+  weight: -5
