@@ -163,7 +163,7 @@ class StringFormatterTest extends KernelTestBase {
     $this->assertLinkByHref($entity->toUrl()->toString());
 
     // Verify string formatter output with specified h5 tag.
-    $this->assertRaw('<h5><a href="'.$entity->toUrl()->toString().'" hreflang="en">'.$value.'</a></h5>');
+    $this->assertRaw('<h5><a href="' . $entity->toUrl()->toString() . '" hreflang="en">' . $value . '</a></h5>');
 
     // $entity->toUrl('revision') falls back to the canonical URL if this is no
     // revision.
