@@ -67,7 +67,7 @@ class StringFormatter extends FormatterBase {
 
     $options['link_to_entity'] = FALSE;
     $options['link_rel'] = 'canonical';
-    $options['tag'] = '';
+    $options['tag'] = NULL;
     return $options;
   }
 
