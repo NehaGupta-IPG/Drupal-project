@@ -153,6 +153,7 @@ class StringFormatterTest extends KernelTestBase {
       'type' => 'string',
       'settings' => [
         'link_to_entity' => TRUE,
+        'tag' => 'h5',
       ],
     ]);
     $this->display->save();
@@ -160,6 +161,9 @@ class StringFormatterTest extends KernelTestBase {
     $this->renderEntityFields($entity, $this->display);
     $this->assertLink($value, 0);
     $this->assertLinkByHref($entity->toUrl()->toString());
+
+    // Verify string formatter output with specified h5 tag.
+    $this->assertRaw('<h5><a href="'.$entity->toUrl()->toString().'" hreflang="en">'.$value.'</a></h5>');
 
     // $entity->toUrl('revision') falls back to the canonical URL if this is no
     // revision.
