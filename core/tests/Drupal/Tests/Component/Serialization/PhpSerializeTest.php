@@ -10,6 +10,8 @@ use PHPUnit\Framework\TestCase;
 
 /**
  * Unit test for the PhpSerialize class.
+ *
+ * @group serialization
  */
 class PhpSerializeTest extends TestCase {
 
