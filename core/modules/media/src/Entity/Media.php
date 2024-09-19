@@ -479,13 +479,10 @@ class Media extends EditorialContentEntityBase implements MediaInterface {
               $old_value = $this->original->get($entity_field_name)->getValue();
             }
 
-            // Determine if the field is being changed. For this, perform a
-            // strict comparison only when the old value is not empty (the new
-            // value can not be empty at this point).
-            $is_new_field_data_being_provided = !empty($old_value) && $new_value !== $old_value;
-
-            // Only save the field value when the field is not actively being changed.
-            if (!$is_new_field_data_being_provided) {
+            // Only save the field value when the field is not actively being
+            // changed. For this, perform a strict comparison only when the old
+            // value is not empty (the new value can not be empty).
+            if (empty($old_value) || $new_value === $old_value) {
               $translation->set($entity_field_name, $media_source->getMetadata($translation, $metadata_attribute_name));
             }
 
