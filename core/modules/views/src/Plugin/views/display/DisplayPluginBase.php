@@ -460,6 +460,7 @@ abstract class DisplayPluginBase extends PluginBase implements DisplayPluginInte
 
           'display_description' => FALSE,
           'use_ajax' => TRUE,
+          'disable_scroll_to_top' => FALSE,
           'hide_attachment_summary' => TRUE,
           'show_admin_links' => TRUE,
           'pager' => TRUE,
@@ -1464,6 +1465,12 @@ abstract class DisplayPluginBase extends PluginBase implements DisplayPluginInte
           '#title' => $this->t('Use AJAX'),
           '#default_value' => $this->getOption('use_ajax') ? 1 : 0,
         ];
+        $form['disable_scroll_to_top'] = [
+          '#description' => $this->t('Disable the Scroll To Top behavior when AJAX actions happen.'),
+          '#type' => 'checkbox',
+          '#title' => $this->t('Disable Scroll to Top'),
+          '#default_value' => $this->getOption('disable_scroll_to_top') ? 1 : 0,
+        ];
         break;
 
       case 'hide_attachment_summary':
@@ -1979,6 +1986,10 @@ abstract class DisplayPluginBase extends PluginBase implements DisplayPluginInte
         break;
 
       case 'use_ajax':
+        $this->setOption($section, (bool) $form_state->getValue($section));
+        $this->setOption('disable_scroll_to_top', (bool) $form_state->getValue('disable_scroll_to_top'));
+        break;
+
       case 'hide_attachment_summary':
       case 'show_admin_links':
       case 'exposed_block':
