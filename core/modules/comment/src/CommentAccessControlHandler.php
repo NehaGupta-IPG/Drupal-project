@@ -31,13 +31,13 @@ class CommentAccessControlHandler extends EntityAccessControlHandler {
 
     if ($comment_admin) {
       $access = AccessResult::allowed()->cachePerPermissions();
-      return ($operation != 'view') ? $access : $access->andIf($entity->getCommentedEntity()->access($operation, $account, TRUE));
+      return ($operation != 'view' || !$entity->getCommentedEntity()) ? $access : $access->andIf($entity->getCommentedEntity()->access($operation, $account, TRUE));
     }
 
     switch ($operation) {
       case 'view':
         $access_result = AccessResult::allowedIf($account->hasPermission('access comments') && $entity->isPublished())->cachePerPermissions()->addCacheableDependency($entity)
-          ->andIf($entity->getCommentedEntity()->access($operation, $account, TRUE));
+          ->andIf($entity->getCommentedEntity() ? $entity->getCommentedEntity()->access($operation, $account, TRUE) : AccessResult::neutral());
         if (!$access_result->isAllowed()) {
           $access_result->setReason("The 'access comments' permission is required and the comment must be published.");
         }
