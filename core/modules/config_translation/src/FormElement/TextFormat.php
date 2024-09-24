@@ -26,7 +26,7 @@ class TextFormat extends FormElementBase {
   /**
    * {@inheritdoc}
    */
-  protected function isSafeConfig($config): bool {
+  protected function isSafeConfig(mixed $config): bool {
     return locale_string_is_safe($config['value']);
   }
 

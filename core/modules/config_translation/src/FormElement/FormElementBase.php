@@ -98,7 +98,7 @@ abstract class FormElementBase implements ElementInterface {
    *
    * @see locale_string_is_safe()
    */
-  protected function isSafeConfig($config): bool {
+  protected function isSafeConfig(mixed $config): bool {
     if (empty($config)) {
       return TRUE;
     }
@@ -223,7 +223,7 @@ abstract class FormElementBase implements ElementInterface {
    * @param \Drupal\Core\Form\FormStateInterface $form_state
    *   The form state.
    */
-  public static function validateInput(array $element, FormStateInterface $form_state) {
+  public static function validateInput(array $element, FormStateInterface $form_state): void {
     if (isset($element['#value']) && !locale_string_is_safe($element['#value'])) {
       $form_state->setError($element, 'The submitted string contains disallowed HTML.');
     }
