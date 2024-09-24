@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\demo_umami\FunctionalJavascript;
 
-use Drupal\Core\Cache\Cache;
 use Drupal\FunctionalJavascriptTests\PerformanceTestBase;
 
 /**
