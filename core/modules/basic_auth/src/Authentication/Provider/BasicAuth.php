@@ -97,18 +97,15 @@ class BasicAuth implements AuthenticationProviderInterface, AuthenticationProvid
    */
   public function applies(Request $request) {
     $request = $this->requestStack->getCurrentRequest();
-    $username = $request->headers->get('PHP_AUTH_USER');
-    $password = $request->headers->get('PHP_AUTH_PW');
 
-    if (isset($username) && isset($password)) {
-      if ($request) {
+    if ($request) {
+      $username = $request->headers->get('PHP_AUTH_USER');
+      $password = $request->headers->get('PHP_AUTH_PW');
+      if (isset($username) && isset($password)) {
         $route = $this->routeMatch->getRouteObject();
         if ($route) {
           $options = $route->getOptions();
-          if ($options['_auth'] && in_array('basic_auth', $options['_auth'])) {
-            return (bool) $this->entityTypeManager->getStorage('user')
-              ->loadByProperties(['name' => $username, 'status' => 1]);
-          }
+          return isset($options['_auth']) && in_array('basic_auth', $options['_auth']);
         }
       }
     }
