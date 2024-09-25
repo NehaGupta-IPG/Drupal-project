@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\system\Functional\System;
 
 use Drupal\Tests\BrowserTestBase;
@@ -34,7 +36,7 @@ class MissingCacheBackendTest extends BrowserTestBase {
   /**
    * Tests warnings correctly appear on status page.
    */
-  public function testStatusPage() {
+  public function testStatusPage(): void {
     $assert_session = $this->assertSession();
     $this->drupalGet('admin/reports/status');
 
