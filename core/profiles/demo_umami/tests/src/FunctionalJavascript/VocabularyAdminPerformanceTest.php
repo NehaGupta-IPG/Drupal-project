@@ -57,9 +57,7 @@ class VocabularyAdminPerformanceTest extends PerformanceTestBase {
     $this->collectPerformanceData(function () {
       $this->drupalGet('admin/structure/taxonomy/manage/tags/overview');
     }, 'umamiVocabularyAdminPageColdCache');
-    // Umami lists all tags at a block at the bottom of the page, so use a more
-    // specific query to find the text.
-    $this->assertSession()->elementTextContains('xpath', '//table[@id="taxonomy"]', 'Baked');
+    $this->assertTermInVocabularyAdminPage();
   }
 
   /**
@@ -76,13 +74,23 @@ class VocabularyAdminPerformanceTest extends PerformanceTestBase {
     $performance_data = $this->collectPerformanceData(function () {
       $this->drupalGet('admin/structure/taxonomy/manage/tags/overview');
     }, 'umamiVocabularyAdminPageHotCache');
-    $this->assertSession()->pageTextContains('Baked');
+    $this->assertTermInVocabularyAdminPage();
     $this->assertSame($performance_data->getQueryCount(), 9);
     $this->assertSame($performance_data->getCacheGetCount(), 116);
     $this->assertSame($performance_data->getCacheSetCount(), 0);
     $this->assertSame($performance_data->getCacheDeleteCount(), 0);
     $this->assertSame(0, $performance_data->getCacheTagChecksumCount());
     $this->assertSame(72, $performance_data->getCacheTagIsValidCount());
+  }
+
+  /**
+   * Helper to find a known term in the list post page request.
+   *
+   * @param string $term_name
+   *   Term to find.
+   */
+  protected function assertTermInVocabularyAdminPage(string $term_name = 'Baked') {
+    $this->assertSession()->elementTextContains('xpath', '//table[@id="taxonomy"]', $term_name);
   }
 
 }
