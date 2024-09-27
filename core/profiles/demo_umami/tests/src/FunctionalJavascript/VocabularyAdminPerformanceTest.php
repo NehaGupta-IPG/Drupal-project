@@ -20,6 +20,16 @@ class VocabularyAdminPerformanceTest extends PerformanceTestBase {
   protected $profile = 'demo_umami';
 
   /**
+   * {@inheritdoc}
+   */
+  protected function setUp(): void {
+    parent::setUp();
+    $this->drupalLogin($this->drupalCreateUser([
+      'administer taxonomy',
+    ]));
+  }
+
+  /**
    * Test vocabulary admin page performance with various cache permutations.
    */
   public function testPerformance(): void {
@@ -39,7 +49,9 @@ class VocabularyAdminPerformanceTest extends PerformanceTestBase {
     $this->collectPerformanceData(function () {
       $this->drupalGet('admin/structure/taxonomy/manage/tags/overview');
     }, 'umamiVocabularyAdminPageColdCache');
-    $this->assertSession()->pageTextContains('Baked');
+    // umami lists all tags at a block at the bottom of the page, so use a more
+    // specific query to find the text.
+    $this->assertSession()->elementTextContains('xpath', '//table[@id="taxonomy"]', 'Baked');
   }
 
   /**
@@ -57,12 +69,12 @@ class VocabularyAdminPerformanceTest extends PerformanceTestBase {
       $this->drupalGet('admin/structure/taxonomy/manage/tags/overview');
     }, 'umamiVocabularyAdminPageHotCache');
     $this->assertSession()->pageTextContains('Baked');
-    $this->assertSame($performance_data->getQueryCount(), 0);
-    $this->assertSame($performance_data->getCacheGetCount(), 1);
+    $this->assertSame($performance_data->getQueryCount(), 9);
+    $this->assertSame($performance_data->getCacheGetCount(), 128);
     $this->assertSame($performance_data->getCacheSetCount(), 0);
     $this->assertSame($performance_data->getCacheDeleteCount(), 0);
     $this->assertSame(0, $performance_data->getCacheTagChecksumCount());
-    $this->assertSame(1, $performance_data->getCacheTagIsValidCount());
+    $this->assertSame(76, $performance_data->getCacheTagIsValidCount());
   }
 
 }
