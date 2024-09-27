@@ -49,7 +49,7 @@ class VocabularyAdminPerformanceTest extends PerformanceTestBase {
     $this->collectPerformanceData(function () {
       $this->drupalGet('admin/structure/taxonomy/manage/tags/overview');
     }, 'umamiVocabularyAdminPageColdCache');
-    // umami lists all tags at a block at the bottom of the page, so use a more
+    // Umami lists all tags at a block at the bottom of the page, so use a more
     // specific query to find the text.
     $this->assertSession()->elementTextContains('xpath', '//table[@id="taxonomy"]', 'Baked');
   }
