@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\demo_umami\FunctionalJavascript;
 
+use Drupal\block\Entity\Block;
 use Drupal\FunctionalJavascriptTests\PerformanceTestBase;
 
 /**
@@ -27,6 +28,13 @@ class VocabularyAdminPerformanceTest extends PerformanceTestBase {
     $this->drupalLogin($this->drupalCreateUser([
       'administer taxonomy',
     ]));
+    // Remove the block showing tags terms on the footer, to be able to not
+    // load terms there by default on every page directly.
+    $block = $this->container->get('entity_type.manager')
+      ->getStorage('block')
+      ->load('umami_views_block__recipe_collections_block');
+    $this->assertTrue($block instanceof Block);
+    $block->delete();
   }
 
   /**
@@ -70,11 +78,11 @@ class VocabularyAdminPerformanceTest extends PerformanceTestBase {
     }, 'umamiVocabularyAdminPageHotCache');
     $this->assertSession()->pageTextContains('Baked');
     $this->assertSame($performance_data->getQueryCount(), 9);
-    $this->assertSame($performance_data->getCacheGetCount(), 128);
+    $this->assertSame($performance_data->getCacheGetCount(), 116);
     $this->assertSame($performance_data->getCacheSetCount(), 0);
     $this->assertSame($performance_data->getCacheDeleteCount(), 0);
     $this->assertSame(0, $performance_data->getCacheTagChecksumCount());
-    $this->assertSame(76, $performance_data->getCacheTagIsValidCount());
+    $this->assertSame(72, $performance_data->getCacheTagIsValidCount());
   }
 
 }
