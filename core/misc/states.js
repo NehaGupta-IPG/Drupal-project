@@ -173,7 +173,8 @@
     let allNotInDom = true;
 
     Object.keys(this.dependees || {}).forEach((selector) => {
-      states.processedDependees[selector] = states.processedDependees[selector] || [];
+      states.processedDependees[selector] =
+        states.processedDependees[selector] || [];
       let inDom = true;
       // Check if the dependee is present in the DOM.
       if ($(selector).length === 0) {
@@ -185,7 +186,7 @@
       }
       states.processedDependees[selector].push({
         dependent: this,
-        inDOM: inDom
+        inDOM: inDom,
       });
       this.initializeDependee(selector, this.dependees[selector]);
     });
@@ -314,7 +315,9 @@
         // Remove the dependent from states.statesObjects[selector] to ensure
         // duplicates don't get added when states are re-processed.
         if (states.processedDependees[selector]) {
-          states.processedDependees[selector] = states.processedDependees[selector].filter(obj => obj.dependent !== this);
+          states.processedDependees[selector] = states.processedDependees[
+            selector
+          ].filter((obj) => obj.dependent !== this);
 
           // If the dependee selector array is empty after filtering,
           // delete the selector entry.
