@@ -99,8 +99,13 @@
     attach(context, settings) {
       // Check if any previously missing dependees are now present in the DOM.
       // This may occur when elements added via ajax.
+      // Keep track of any empty states.processedDependees keys to clean up.
       const keysToDelete = [];
       Object.keys(states.processedDependees).forEach((selector) => {
+        if (states.processedDependees[selector].length === 0) {
+          keysToDelete.push(selector);
+          return;
+        }
         if (!states.processedDependees[selector][0].inDOM) {
           const element = $(selector);
           if (element.length > 0) {
@@ -110,7 +115,6 @@
               obj.dependent.destroy();
             });
           }
-          // Add to list to clean up if empty.
           if (states.processedDependees[selector].length === 0) {
             keysToDelete.push(selector);
           }
@@ -143,8 +147,12 @@
     },
     detach(context, settings, trigger) {
       if (trigger === 'unload') {
+        // Keep track of any empty states.processedDependees keys to clean up.
         const keysToDelete = [];
         Object.keys(states.processedDependees).forEach((selector) => {
+          keysToDelete.forEach((key) => {
+            delete states.processedDependees[key];
+          });
           const element = $(context).find(selector);
           if (element.length > 0) {
             // Dependee is being unloaded. Remove all existing events to ensure
@@ -152,7 +160,6 @@
             states.processedDependees[selector].forEach((item) => {
               item.dependent.destroy();
             });
-            // Add to list to clean up if empty.
             if (states.processedDependees[selector].length === 0) {
               keysToDelete.push(selector);
             }
