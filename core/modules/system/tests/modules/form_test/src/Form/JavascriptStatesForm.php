@@ -483,44 +483,6 @@ class JavascriptStatesForm extends FormBase {
       ],
     ];
 
-    $form['js_states_test'] = [
-      '#type' => 'details',
-      '#open' => TRUE,
-      '#prefix' => '<div id="js_states_test_wrapper">',
-      '#suffix' => '</div>',
-    ];
-    $form['js_states_test']['reload'] = [
-      '#type' => 'checkbox',
-      '#title' => 'Check me to reload Select Field field',
-      '#ajax' => [
-        'callback' => '::buildAjax',
-        'wrapper' => 'js_states_test_wrapper',
-      ],
-    ];
-    $form['js_states_test']['select_field'] = [
-      '#type' => 'select',
-      '#title' => 'Select Field',
-      '#options' => [0 => 0, 1 => 1],
-      '#default_value' => 0,
-    ];
-
-    $form['select_field_no_ajax'] = [
-      '#type' => 'select',
-      '#title' => 'Select Field No Ajax',
-      '#options' => [0 => 0, 1 => 1],
-      '#default_value' => 0,
-    ];
-    $form['js_select_field_textfield'] = [
-      '#type' => 'select',
-      '#title' => 'Select should show when 1 is selected in select_field after ajax',
-      '#states' => [
-        'visible' => [
-          ':input[name="select_field"]' => ['value' => 1],
-          ':input[name="select_field_no_ajax"]' => ['value' => 1],
-        ],
-      ],
-    ];
-
     // Multiple select trigger.
     $form['header_multiple_select'] = [
       '#type' => 'html_tag',
@@ -803,6 +765,107 @@ class JavascriptStatesForm extends FormBase {
       ],
     ];
 
+    // Ajax related testing.
+    $form['header_ajax_affected_triggers'] = [
+      '#type' => 'html_tag',
+      '#tag' => 'h3',
+      '#value' => 'Ajax affected triggers tests',
+    ];
+    // Ajax wrapper.
+    $form['states_ajax_test'] = [
+      '#type' => 'details',
+      '#open' => TRUE,
+      '#prefix' => '<div id="states_ajax_test_wrapper">',
+      '#suffix' => '</div>',
+    ];
+    // Ajax trigger.
+    $form['states_ajax_test']['ajax_reload'] = [
+      '#type' => 'checkbox',
+      '#title' => 'Check me to reload elements with the states_ajax_test_wrapper',
+      '#ajax' => [
+        'callback' => '::buildAjax',
+        'wrapper' => 'states_ajax_test_wrapper',
+      ],
+    ];
+    $form['states_ajax_test']['ajax_select_trigger'] = [
+      '#type' => 'select',
+      '#title' => 'Ajax Affected Select Trigger',
+      '#options' => [0 => 0, 1 => 1],
+      '#default_value' => 0,
+    ];
+    // Add element added via ajax when ajax_reload is checked.
+    if ($form_state->getValue('ajax_reload')) {
+      $form['states_ajax_test']['ajax_added_trigger'] = [
+        '#type' => 'checkbox',
+        '#title' => 'Ajax Added Trigger',
+      ];
+    }
+    $form['not_ajax_select_trigger'] = [
+      '#type' => 'select',
+      '#title' => 'Not Ajax Affected Select Trigger',
+      '#options' => [0 => 0, 1 => 1],
+      '#default_value' => 0,
+    ];
+    $form['textfield_visible_when_ajax_select_trigger_is_1'] = [
+      '#type' => 'textfield',
+      '#title' => 'Textfield visible when Ajax Affected Select Trigger is 1',
+      '#states' => [
+        'visible' => [
+          ':input[name="ajax_select_trigger"]' => ['value' => 1],
+        ],
+      ],
+    ];
+    $form['textfield_visible_when_not_ajax_select_trigger_is_1'] = [
+      '#type' => 'textfield',
+      '#title' => 'Textfield visible when Not Ajax Affected Select Trigger is 1',
+      '#states' => [
+        'visible' => [
+          ':input[name="not_ajax_select_trigger"]' => ['value' => 1],
+        ],
+      ],
+    ];
+    $form['textfield_visible_when_ajax_trigger_is_1_and_not_ajax_trigger_is_1'] = [
+      '#type' => 'textfield',
+      '#title' => 'Textfield visible when Ajax Affected Select Trigger is 1 and Not Ajax Affected Select Trigger is 1',
+      '#states' => [
+        'visible' => [
+          ':input[name="ajax_select_trigger"]' => ['value' => 1],
+          ':input[name="not_ajax_select_trigger"]' => ['value' => 1],
+        ],
+      ],
+    ];
+
+    $form['textfield_invisible_when_ajax_added_trigger_is_checked'] = [
+      '#type' => 'textfield',
+      '#title' => 'Textfield invisible when Ajax Added Trigger is checked',
+      '#states' => [
+        'invisible' => [
+          ':input[name="ajax_added_trigger"]' => ['checked' => TRUE],
+        ],
+      ],
+    ];
+    $form['textfield_invisible_when_ajax_added_trigger_is_checked_and_not_ajax_trigger_is_1'] = [
+      '#type' => 'textfield',
+      '#title' => 'Textfield invisible when Ajax Added Trigger is checked AND Not Ajax Affected Select Trigger is 1',
+      '#states' => [
+        'invisible' => [
+          ':input[name="ajax_added_trigger"]' => ['checked' => TRUE],
+          ':input[name="not_ajax_select_trigger"]' => ['value' => 1],
+        ],
+      ],
+    ];
+    $form['textfield_invisible_when_ajax_added_trigger_is_checked_or_not_ajax_trigger_is_1'] = [
+      '#type' => 'textfield',
+      '#title' => 'Textfield invisible when Ajax Added Trigger is checked OR Not Ajax Affected Select Trigger is 1',
+      '#states' => [
+        'invisible' => [
+          [':input[name="ajax_added_trigger"]' => ['checked' => TRUE]],
+          'or',
+          [':input[name="not_ajax_select_trigger"]' => ['value' => 1]],
+        ],
+      ],
+    ];
+
     return $form;
   }
 
@@ -816,7 +879,7 @@ class JavascriptStatesForm extends FormBase {
    * Return ajax.
    */
   public function buildAjax(array &$form, FormStateInterface $form_state) {
-    return $form['js_states_test'];
+    return $form['states_ajax_test'];
   }
 
 }
