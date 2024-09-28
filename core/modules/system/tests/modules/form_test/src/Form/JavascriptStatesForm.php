@@ -834,7 +834,6 @@ class JavascriptStatesForm extends FormBase {
         ],
       ],
     ];
-
     $form['textfield_invisible_when_ajax_added_trigger_is_checked'] = [
       '#type' => 'textfield',
       '#title' => 'Textfield invisible when Ajax Added Trigger is checked',
@@ -862,6 +861,17 @@ class JavascriptStatesForm extends FormBase {
           [':input[name="ajax_added_trigger"]' => ['checked' => TRUE]],
           'or',
           [':input[name="not_ajax_select_trigger"]' => ['value' => 1]],
+        ],
+      ],
+    ];
+    // Use a selector which includes a form identifier. This is valid if there
+    // are multiple forms on a page which may have duplicate field names.
+    $form['textfield_visible_when_ajax_added_trigger_is_checked_form_selector'] = [
+      '#type' => 'textfield',
+      '#title' => 'Textfield visible when Ajax Added Trigger is checked',
+      '#states' => [
+        'visible' => [
+          'form :input[name="ajax_added_trigger"]' => ['checked' => TRUE],
         ],
       ],
     ];

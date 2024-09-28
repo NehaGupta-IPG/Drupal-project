@@ -658,6 +658,8 @@ class JavascriptStatesTest extends WebDriverTestBase {
     $this->assertNotEmpty($textfield_invisible_multiple_ajax_added_and);
     $textfield_invisible_multiple_ajax_added_or = $page->findField('textfield_invisible_when_ajax_added_trigger_is_checked_or_not_ajax_trigger_is_1');
     $this->assertNotEmpty($textfield_invisible_multiple_ajax_added_or);
+    $textfield_visible_single_ajax_added = $page->findField('textfield_visible_when_ajax_added_trigger_is_checked_form_selector');
+    $this->assertNotEmpty($textfield_visible_single_ajax_added);
 
     // Verify initial state.
     $this->assertFalse($textfield_visible_ajax_single->isVisible());
@@ -666,6 +668,7 @@ class JavascriptStatesTest extends WebDriverTestBase {
     $this->assertTrue($textfield_invisible_single_ajax_added->isVisible());
     $this->assertTrue($textfield_invisible_multiple_ajax_added_and->isVisible());
     $this->assertTrue($textfield_invisible_multiple_ajax_added_or->isVisible());
+    $this->assertFalse($textfield_visible_single_ajax_added->isVisible());
 
     // Change state: select the ajax_affected_select_trigger 1 option.
     $ajax_affected_select_trigger->setValue(1);
@@ -676,6 +679,7 @@ class JavascriptStatesTest extends WebDriverTestBase {
     $this->assertTrue($textfield_invisible_single_ajax_added->isVisible());
     $this->assertTrue($textfield_invisible_multiple_ajax_added_and->isVisible());
     $this->assertTrue($textfield_invisible_multiple_ajax_added_or->isVisible());
+    $this->assertFalse($textfield_visible_single_ajax_added->isVisible());
 
     // Change state: select the select_trigger value2 option.
     $not_ajax_select_trigger->setValue(1);
@@ -688,6 +692,7 @@ class JavascriptStatesTest extends WebDriverTestBase {
     $this->assertTrue($textfield_invisible_multiple_ajax_added_and->isVisible());
     // $textfield_invisible_multiple_ajax_added_or is now invisible.
     $this->assertFalse($textfield_invisible_multiple_ajax_added_or->isVisible());
+    $this->assertFalse($textfield_visible_single_ajax_added->isVisible());
 
     // Trigger Ajax reload.
     $ajax_reload->check();
@@ -705,6 +710,7 @@ class JavascriptStatesTest extends WebDriverTestBase {
     $this->assertTrue($textfield_invisible_single_ajax_added->isVisible());
     $this->assertTrue($textfield_invisible_multiple_ajax_added_and->isVisible());
     $this->assertFalse($textfield_invisible_multiple_ajax_added_or->isVisible());
+    $this->assertFalse($textfield_visible_single_ajax_added->isVisible());
 
     // Change state: check the ajax_added_trigger.
     $ajax_added_trigger->check();
@@ -717,6 +723,8 @@ class JavascriptStatesTest extends WebDriverTestBase {
     // $textfield_invisible_multiple_ajax_added_and is now invisible.
     $this->assertFalse($textfield_invisible_multiple_ajax_added_and->isVisible());
     $this->assertFalse($textfield_invisible_multiple_ajax_added_or->isVisible());
+    // $textfield_visible_single_ajax_added is now visible.
+    $this->assertTrue($textfield_visible_single_ajax_added->isVisible());
 
     // Change state: select the not_ajax_select_trigger 0 option.
     $not_ajax_select_trigger->setValue(0);
@@ -729,6 +737,7 @@ class JavascriptStatesTest extends WebDriverTestBase {
     // $textfield_invisible_multiple_ajax_added_and is now visible.
     $this->assertTrue($textfield_invisible_multiple_ajax_added_and->isVisible());
     $this->assertFalse($textfield_invisible_multiple_ajax_added_or->isVisible());
+    $this->assertTrue($textfield_visible_single_ajax_added->isVisible());
 
     // Change state: select the ajax_affected_select_trigger 0 option.
     $ajax_affected_select_trigger->setValue(0);
@@ -739,6 +748,7 @@ class JavascriptStatesTest extends WebDriverTestBase {
     $this->assertFalse($textfield_invisible_single_ajax_added->isVisible());
     $this->assertTrue($textfield_invisible_multiple_ajax_added_and->isVisible());
     $this->assertFalse($textfield_invisible_multiple_ajax_added_or->isVisible());
+    $this->assertTrue($textfield_visible_single_ajax_added->isVisible());
 
     // Trigger Ajax reload.
     $ajax_reload->uncheck();
@@ -756,6 +766,8 @@ class JavascriptStatesTest extends WebDriverTestBase {
     $this->assertTrue($textfield_invisible_multiple_ajax_added_and->isVisible());
     // $textfield_invisible_multiple_ajax_added_or is now visible.
     $this->assertTrue($textfield_invisible_multiple_ajax_added_or->isVisible());
+    // $textfield_visible_single_ajax_added in now invisible.
+    $this->assertTrue($textfield_visible_single_ajax_added->isVisible());
 
     // Change state: select the not_ajax_select_trigger 1 option.
     $not_ajax_select_trigger->setValue(1);
@@ -767,6 +779,7 @@ class JavascriptStatesTest extends WebDriverTestBase {
     $this->assertTrue($textfield_invisible_multiple_ajax_added_and->isVisible());
     // $textfield_invisible_multiple_ajax_added_or is now invisible.
     $this->assertFalse($textfield_invisible_multiple_ajax_added_or->isVisible());
+    $this->assertTrue($textfield_visible_single_ajax_added->isVisible());
 
     // Change state: select the ajax_affected_select_trigger 1 option.
     $ajax_affected_select_trigger->setValue(1);
@@ -778,6 +791,7 @@ class JavascriptStatesTest extends WebDriverTestBase {
     $this->assertTrue($textfield_invisible_single_ajax_added->isVisible());
     $this->assertTrue($textfield_invisible_multiple_ajax_added_and->isVisible());
     $this->assertFalse($textfield_invisible_multiple_ajax_added_or->isVisible());
+    $this->assertTrue($textfield_visible_single_ajax_added->isVisible());
 
   }
 
