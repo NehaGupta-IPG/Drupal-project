@@ -18,9 +18,9 @@
      */
     postponed: [],
     /**
-     * States instances.
+     * Stores processed Dependees and their associated Dependents.
      */
-    statesObjects: {},
+    processedDependees: {},
   };
 
   Drupal.states = states;
@@ -97,6 +97,20 @@
    */
   Drupal.behaviors.states = {
     attach(context, settings) {
+      // Check if any previously missing dependees are now present.
+      // This may occur when elements added via ajax.
+      Object.keys(states.processedDependees).forEach((selector) => {
+        if (!states.processedDependees[selector][0].inDOM) {
+          const element = $(context).find(selector);
+          if (element.length > 0) {
+            // The previously missing dependee is now present. Remove all
+            // existing events to ensure associated states are re-processed.
+            states.processedDependees[selector].forEach((obj) => {
+              obj.dependent.destroy();
+            });
+          }
+        }
+      });
       // Uses once to avoid duplicates if attach is called multiple times.
       const elements = once('states', '[data-drupal-states]', context);
       const il = elements.length;
@@ -120,11 +134,13 @@
     },
     detach(context, settings, trigger) {
       if (trigger === 'unload') {
-        Object.keys(states.statesObjects).forEach((selector) => {
+        Object.keys(states.processedDependees).forEach((selector) => {
           const element = $(context).find(selector);
           if (element.length > 0) {
-            states.statesObjects[selector].forEach((item) => {
-              item.destroy();
+            // Dependee is being unloaded. Remove all existing events to ensure
+            // associated states are re-processed.
+            states.processedDependees[selector].forEach((item) => {
+              item.dependent.destroy();
             });
           }
         });
@@ -152,11 +168,35 @@
     $.extend(this, { values: {}, oldValue: null, triggers: [] }, args);
 
     this.dependees = this.getDependees();
+
+    // Track if all dependee selectors are not in the DOM.
+    let allNotInDom = true;
+
     Object.keys(this.dependees || {}).forEach((selector) => {
-      states.statesObjects[selector] = states.statesObjects[selector] || [];
-      states.statesObjects[selector].push(this);
+      states.processedDependees[selector] = states.processedDependees[selector] || [];
+      let inDom = true;
+      // Check if the dependee is present in the DOM.
+      if ($(selector).length === 0) {
+        inDom = false;
+      }
+      // If at least one element is found in the DOM, mark allNotInDom as false.
+      if (inDom) {
+        allNotInDom = false;
+      }
+      states.processedDependees[selector].push({
+        dependent: this,
+        inDOM: inDom
+      });
       this.initializeDependee(selector, this.dependees[selector]);
     });
+
+    // If all selectors are not in the DOM, ensure this dependent is
+    // reevaluated as its constraints results may have changed.
+    // This may occur if a previously present dependee is removed/added via
+    // ajax.
+    if (allNotInDom) {
+      this.reevaluate();
+    }
   };
 
   /**
@@ -229,10 +269,12 @@
         // Initialize the value of this state.
         this.values[selector][state.name] = null;
 
+        // Bind the event handler and store the reference for later usage.
+        const handler = this.handleStateChange.bind(this);
+        this.values[selector][`${state.name}_handler`] = handler;
+
         // Monitor state changes of the specified state for this dependee.
-        $(selector).on(`state:${state}`, { selector, state }, (e) => {
-          this.update(e.data.selector, e.data.state, e.value);
-        });
+        $(selector).on(`state:${state}`, { selector, state }, handler);
 
         // Make sure the event we just bound ourselves to is actually fired.
         const trigger = new states.Trigger({
@@ -245,17 +287,45 @@
     },
 
     /**
+     * State changes event handler.
+     */
+    handleStateChange(e) {
+      this.update(e.data.selector, e.data.state, e.value);
+    },
+
+    /**
      * Remove all the event listeners.
      */
     destroy() {
+      // Remove all the trigger associated events for this Dependent.
+      this.triggers.forEach((trigger) => trigger.destroy());
+      // Loop through the dependee selectors.
       Object.keys(this.values).forEach((selector) => {
         const dependeeStates = this.dependees[selector];
         Object.keys(dependeeStates).forEach((i) => {
-          $(selector).off(`state:${dependeeStates[i]}`);
-          this.triggers.forEach((trigger) => trigger.destroy());
-          $(once.remove('states', $(this.element)));
+          // Retrieve the stored handler reference to ensure we only remove
+          // the event associated with this Dependent.
+          const handler = this.values[selector][`${dependeeStates[i]}_handler`];
+          if (handler) {
+            $(selector).off(`state:${dependeeStates[i]}`, handler);
+            delete this.values[selector][`${dependeeStates[i]}_handler`];
+          }
         });
+        // Remove the dependent from states.statesObjects[selector] to ensure
+        // duplicates don't get added when states are re-processed.
+        if (states.processedDependees[selector]) {
+          states.processedDependees[selector] = states.processedDependees[selector].filter(obj => obj.dependent !== this);
+
+          // If the dependee selector array is empty after filtering,
+          // delete the selector entry.
+          if (states.processedDependees[selector].length === 0) {
+            delete states.processedDependees[selector];
+          }
+        }
       });
+      // Remove the drupal once id to ensure states get reprocessed for this
+      // dependent.
+      $(once.remove('states', $(this.element)));
     },
 
     /**
@@ -512,9 +582,17 @@
     },
 
     /**
-     * Mark this trigger initialization was removed for this element.
+     * Remove trigger related event listeners to enable re-initialization.
      */
     destroy() {
+      // Remove the associated trigger event handlers.
+      const trigger = states.Trigger.states[this.state];
+      if (typeof trigger !== 'function') {
+        Object.keys(trigger || {}).forEach((event) => {
+          this.element.off(event);
+        });
+      }
+      // Mark this trigger as not initialized for this element.
       this.element.data(`trigger:${this.state}`, false);
     },
 
