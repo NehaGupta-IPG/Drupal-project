@@ -316,7 +316,7 @@
         if (states.processedDependees[selector]) {
           states.processedDependees[selector] = states.processedDependees[
             selector
-            ].filter((obj) => obj.dependent !== this);
+          ].filter((obj) => obj.dependent !== this);
 
           // If the dependee selector array is empty after filtering,
           // delete the selector entry.
@@ -444,8 +444,8 @@
           }
         }
       }
-        // Make sure we don't try to iterate over things other than objects. This
-        // shouldn't normally occur, but in case the condition definition is
+      // Make sure we don't try to iterate over things other than objects. This
+      // shouldn't normally occur, but in case the condition definition is
       // bogus, we don't want to end up with an infinite loop.
       else if ($.isPlainObject(constraints)) {
         // This constraint is an object (AND).
