@@ -99,6 +99,7 @@
     attach(context, settings) {
       // Check if any previously missing dependees are now present in the DOM.
       // This may occur when elements added via ajax.
+      const keysToDelete = [];
       Object.keys(states.processedDependees).forEach((selector) => {
         if (!states.processedDependees[selector][0].inDOM) {
           const element = $(selector);
@@ -109,7 +110,15 @@
               obj.dependent.destroy();
             });
           }
+          // Add to list to clean up if empty.
+          if (states.processedDependees[selector].length === 0) {
+            keysToDelete.push(selector);
+          }
         }
+      });
+      // Cleanup empty states.processedDependees selectors.
+      keysToDelete.forEach((key) => {
+        delete states.processedDependees[key];
       });
       // Uses once to avoid duplicates if attach is called multiple times.
       const elements = once('states', '[data-drupal-states]', context);
@@ -134,6 +143,7 @@
     },
     detach(context, settings, trigger) {
       if (trigger === 'unload') {
+        const keysToDelete = [];
         Object.keys(states.processedDependees).forEach((selector) => {
           const element = $(context).find(selector);
           if (element.length > 0) {
@@ -142,7 +152,15 @@
             states.processedDependees[selector].forEach((item) => {
               item.dependent.destroy();
             });
+            // Add to list to clean up if empty.
+            if (states.processedDependees[selector].length === 0) {
+              keysToDelete.push(selector);
+            }
           }
+        });
+        // Cleanup empty states.processedDependees selectors.
+        keysToDelete.forEach((key) => {
+          delete states.processedDependees[key];
         });
       }
     },
@@ -317,12 +335,6 @@
           states.processedDependees[selector] = states.processedDependees[
             selector
           ].filter((obj) => obj.dependent !== this);
-
-          // If the dependee selector array is empty after filtering,
-          // delete the selector entry.
-          if (states.processedDependees[selector].length === 0) {
-            delete states.processedDependees[selector];
-          }
         }
       });
       // Remove the drupal once id to ensure states get reprocessed for this
