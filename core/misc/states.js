@@ -97,11 +97,11 @@
    */
   Drupal.behaviors.states = {
     attach(context, settings) {
-      // Check if any previously missing dependees are now present.
+      // Check if any previously missing dependees are now present in the DOM.
       // This may occur when elements added via ajax.
       Object.keys(states.processedDependees).forEach((selector) => {
         if (!states.processedDependees[selector][0].inDOM) {
-          const element = $(context).find(selector);
+          const element = $(selector);
           if (element.length > 0) {
             // The previously missing dependee is now present. Remove all
             // existing events to ensure associated states are re-processed.
@@ -193,8 +193,7 @@
 
     // If all selectors are not in the DOM, ensure this dependent is
     // reevaluated as its constraints results may have changed.
-    // This may occur if a previously present dependee is removed/added via
-    // ajax.
+    // This may occur if a previously present dependee is removed via ajax.
     if (allNotInDom) {
       this.reevaluate();
     }
@@ -317,7 +316,7 @@
         if (states.processedDependees[selector]) {
           states.processedDependees[selector] = states.processedDependees[
             selector
-          ].filter((obj) => obj.dependent !== this);
+            ].filter((obj) => obj.dependent !== this);
 
           // If the dependee selector array is empty after filtering,
           // delete the selector entry.
@@ -445,8 +444,8 @@
           }
         }
       }
-      // Make sure we don't try to iterate over things other than objects. This
-      // shouldn't normally occur, but in case the condition definition is
+        // Make sure we don't try to iterate over things other than objects. This
+        // shouldn't normally occur, but in case the condition definition is
       // bogus, we don't want to end up with an infinite loop.
       else if ($.isPlainObject(constraints)) {
         // This constraint is an object (AND).
