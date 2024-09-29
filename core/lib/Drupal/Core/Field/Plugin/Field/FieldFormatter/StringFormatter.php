@@ -187,6 +187,11 @@ class StringFormatter extends FormatterBase {
       else {
         $elements[$delta] = $this->viewValue($item);
       }
+
+      if ($tag) {
+        $elements[$delta]['#prefix'] = "<$tag>";
+        $elements[$delta]['#suffix'] = "</$tag>";
+      }
     }
 
     if ($tag) {
