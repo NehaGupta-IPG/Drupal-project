@@ -76,7 +76,12 @@ class BasicAuth implements AuthenticationProviderInterface, AuthenticationProvid
   public function applies(Request $request) {
     $username = $request->headers->get('PHP_AUTH_USER');
     $password = $request->headers->get('PHP_AUTH_PW');
-    return isset($username) && isset($password);
+
+    if (isset($username) && isset($password)) {
+      return (bool) $this->entityTypeManager->getStorage('user')->loadByProperties(['name' => $username, 'status' => 1]);
+    }
+
+    return FALSE;
   }
 
   /**
