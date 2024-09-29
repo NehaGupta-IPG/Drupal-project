@@ -39,11 +39,17 @@
    * Plural.
    * `.table-filter-text[data-plural]`
    *
+   * Full.
+   * `.table-filter-text[data-full]`
+   *
    * Min length of search query.
    * `.table-filter-text[data-min-length]`
    *
    * Search only from start of words.
    * `.table-filter-text[data-search-start]`
+   *
+   * Debug.
+   * `.table-filter-text[data-debug]`
    *
    * @type {Drupal~behavior}
    *
@@ -62,6 +68,7 @@
         full,
         minLength = 2,
         searchStart = false,
+        debug = false,
       } = input.dataset;
 
       const ALL_PHRASE = Drupal.t('All available items are listed.');
@@ -91,6 +98,18 @@
         return searchStart === 'true'
           ? target.search(reStartsWith(query)) !== -1
           : target.includes(query);
+      }
+
+      function initDebug(table) {
+        table.style.outline = '2px solid red';
+        table.querySelectorAll(items)?.forEach((item) => {
+          item.style.backgroundColor = 'yellow';
+          if (targets) {
+            item.querySelectorAll(targets)?.forEach((target) => {
+              target.style.outline = 'green 2px dotted';
+            });
+          }
+        });
       }
 
       // Table can be in another context so we have to search in document.
@@ -196,6 +215,10 @@
         tableElement.addEventListener(FILTER_EVENT, (e) => {
           return filterTableList(e.detail.event);
         });
+
+        if (debug) {
+          initDebug(tableElement);
+        }
       };
 
       tables.forEach(initTable);
