@@ -170,6 +170,7 @@ class StringFormatter extends FormatterBase {
         ->applyTo($elements);
       $render_as_link = $access->isAllowed();
     }
+
     if ($this->getSetting('tag')) {
       $tag = $this->getSetting('tag');
     }
@@ -186,11 +187,11 @@ class StringFormatter extends FormatterBase {
       else {
         $elements[$delta] = $this->viewValue($item);
       }
+    }
 
-      if ($tag) {
-        $elements[$delta]['#prefix'] = "<$tag>";
-        $elements[$delta]['#suffix'] = "</$tag>";
-      }
+    if ($tag) {
+      $elements[$delta]['#prefix'] = "<$tag>";
+      $elements[$delta]['#suffix'] = "</$tag>";
     }
 
     return $elements;
