@@ -93,6 +93,12 @@ abstract class ConfigFormBase extends FormBase {
     return $form;
   }
 
+  protected function buildFormForConfig(string $config_name) {
+    $config_definition = $this->typedConfigManager->getDefinition($config_name);
+    dump($config_definition);
+
+  }
+
   /**
    * Process callback to recursively load default values from #config_target.
    *

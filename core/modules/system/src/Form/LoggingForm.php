@@ -25,6 +25,15 @@ class LoggingForm extends ConfigFormBase {
    * {@inheritdoc}
    */
   public function buildForm(array $form, FormStateInterface $form_state) {
+    $config_names = ['system.logging'];
+
+    $config_factory = \Drupal::service('config.factory');
+    foreach ($config_names as $config_name) {
+      $config_values = $config_factory->get($config_name)->getOriginal();
+      dsm($config_values);
+    }
+
+
     $form['error_level'] = [
       '#type' => 'radios',
       '#title' => $this->t('Error messages to display'),
