@@ -606,10 +606,10 @@ drupal.fieldgroup:
     component:
       misc/components/fieldgroup.module.css: {}
 
-drupal.filter:
+drupal.list-filter:
   version: VERSION
   js:
-    misc/drupal-filter.js: {}
+    misc/drupal-list-filter.js: {}
   dependencies:
     - core/drupal
     - core/drupal.announce

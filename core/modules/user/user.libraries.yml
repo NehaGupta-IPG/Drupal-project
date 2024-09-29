@@ -26,7 +26,7 @@ drupal.user.permissions:
     - core/once
     - core/drupal
     - core/drupalSettings
-    - core/drupal.filter
+    - core/drupal.list-filter
     - user/drupal.user.admin
     - core/drupal.checkbox
     - core/drupal.announce

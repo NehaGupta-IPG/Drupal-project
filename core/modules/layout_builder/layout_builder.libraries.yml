@@ -10,7 +10,7 @@ drupal.layout_builder:
     - core/sortable
     - core/drupal.dialog.off_canvas
     - core/drupal.announce
-    - core/drupal.filter
+    - core/drupal.list-filter
 
 # CSS libraries for Layout plugins.
 twocol_section:

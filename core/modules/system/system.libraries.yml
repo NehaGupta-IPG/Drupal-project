@@ -47,7 +47,7 @@ drupal.system:
 drupal.system.modules:
   version: VERSION
   dependencies:
-    - core/drupal.filter
+    - core/drupal.list-filter
 
 diff:
   version: VERSION
