@@ -251,8 +251,8 @@ class ImageFormatter extends ImageFormatterBase {
           '%entity' => $fieldDefinitionForMessage->getTargetEntityTypeId(),
           '%bundle' => $fieldDefinitionForMessage->getTargetBundle(),
           '%extraNodeMessage' => $fieldDefinitionForMessage->getTargetEntityTypeId() == 'node'
-          ? "\nTry (re)setting the image style in the display settings and form display settings."
-          : '',
+            ? "\nTry (re)setting the image style in the display settings and form display settings."
+            : '',
         ]);
         \Drupal::messenger()->addError($message);
         return [
