@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests;
 
+use Drupal\Core\Cache\Cache;
 use Drupal\Core\Database\Event\DatabaseEvent;
 use Drupal\performance_test\Cache\CacheTagOperation;
 use OpenTelemetry\API\Trace\SpanKind;
@@ -717,6 +718,15 @@ trait PerformanceTestTrait {
    */
   protected static function normalizeQuery(string $query_string, string $database_prefix): string {
     return str_replace([$database_prefix, "\r\n", "\r", "\n"], ['', ' ', ' ', ' '], $query_string);
+  }
+
+  /**
+   * Clears all cache bins.
+   */
+  protected function clearCaches(): void {
+    foreach (Cache::getBins() as $bin) {
+      $bin->deleteAll();
+    }
   }
 
 }
