@@ -27,7 +27,7 @@ use Drupal\Core\Cache\Cache;
   ],
 )]
 /**
- *
+ * Defines the image formatter for rendering image fields.
  */
 class ImageFormatter extends ImageFormatterBase {
 
