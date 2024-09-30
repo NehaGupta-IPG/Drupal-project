@@ -207,7 +207,7 @@ trait ImageTestProviderTrait {
     // of the image.
     $expected_computed_height = $width;
     if (!str_ends_with($width, '%')) {
-      $ratio = $width / (int) $this->imageAttributes()['width'];
+      $ratio = (int) $width / (int) $this->imageAttributes()['width'];
       $expected_computed_height = (string) (int) round($ratio * (int) $this->imageAttributes()['height']);
     }
 

@@ -108,7 +108,9 @@ class BasicAuthTest extends BrowserTestBase {
 
     $user = $this->drupalCreateUser([]);
     $incorrect_user = clone $user;
-    $incorrect_user->pass_raw .= 'incorrect';
+    /** @var string $pass_raw */
+    $pass_raw = $incorrect_user->pass_raw;
+    $incorrect_user->pass_raw = $pass_raw . 'incorrect';
     $url = Url::fromRoute('router_test.11');
 
     // Try 2 failed logins.
@@ -133,7 +135,9 @@ class BasicAuthTest extends BrowserTestBase {
 
     $user = $this->drupalCreateUser([]);
     $incorrect_user = clone $user;
-    $incorrect_user->pass_raw .= 'incorrect';
+    /** @var string $pass_raw */
+    $pass_raw = $incorrect_user->pass_raw;
+    $incorrect_user->pass_raw = $pass_raw . 'incorrect';
     $user2 = $this->drupalCreateUser([]);
     $url = Url::fromRoute('router_test.11');
 
