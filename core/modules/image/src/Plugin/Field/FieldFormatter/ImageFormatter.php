@@ -26,6 +26,9 @@ use Drupal\Core\Cache\Cache;
     'image',
   ],
 )]
+/**
+ *
+ */
 class ImageFormatter extends ImageFormatterBase {
 
   /**
@@ -238,7 +241,28 @@ class ImageFormatter extends ImageFormatterBase {
     $base_cache_tags = [];
     if (!empty($image_style_setting)) {
       $image_style = $this->imageStyleStorage->load($image_style_setting);
-      $base_cache_tags = $image_style->getCacheTags();
+      if (!empty($image_style)) {
+        $base_cache_tags = $image_style->getCacheTags();
+      }
+      else {
+        $fieldDefinitionForMessage = $items->getFieldDefinition();
+        $message = $this->t('The image style of %field field is broken on the %entity bundle %bundle.%extraNodeMessage', [
+          '%field' => $fieldDefinitionForMessage->getName(),
+          '%entity' => $fieldDefinitionForMessage->getTargetEntityTypeId(),
+          '%bundle' => $fieldDefinitionForMessage->getTargetBundle(),
+          '%extraNodeMessage' => $fieldDefinitionForMessage->getTargetEntityTypeId() == 'node'
+          ? "\nTry (re)setting the image style in the display settings and form display settings."
+          : '',
+        ]);
+        \Drupal::messenger()->addError($message);
+        return [
+          '#type' => 'markup',
+          '#markup' => '<pre>' . $message . '</pre>',
+          '#cache' => [
+            'max-age' => 0,
+          ],
+        ];
+      }
     }
 
     foreach ($files as $delta => $file) {
