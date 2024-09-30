@@ -43,6 +43,7 @@ class VocabularyAdminPerformanceTest extends PerformanceTestBase {
   public function testPerformance(): void {
     $this->testColdCache();
     $this->testHotCache();
+    $this->testCoolCache();
   }
 
   /**
@@ -81,6 +82,25 @@ class VocabularyAdminPerformanceTest extends PerformanceTestBase {
     $this->assertSame($performance_data->getCacheDeleteCount(), 0);
     $this->assertSame(0, $performance_data->getCacheTagChecksumCount());
     $this->assertSame(72, $performance_data->getCacheTagIsValidCount());
+  }
+
+  /**
+   * Logs vocabulary admin page tracing data with a cool cache.
+   *
+   * Cool here means that 'global' site caches are warm but anything
+   * specific to the route or path is cold.
+   */
+  protected function testCoolCache(): void {
+    // Visit a page without the tags terms loaded.
+    $this->drupalGet('user/login');
+    $this->clearCaches();
+    // Now visit it post cache rebuild to warm non-route-specific
+    // caches.
+    $this->drupalGet('user/login');
+    $this->collectPerformanceData(function () {
+      $this->drupalGet('admin/structure/taxonomy/manage/tags/overview');
+    }, 'umamiVocabularyAdminPageCoolCache');
+    $this->assertTermInVocabularyAdminPage();
   }
 
   /**
