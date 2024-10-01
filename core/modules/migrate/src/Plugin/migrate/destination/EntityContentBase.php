@@ -338,10 +338,7 @@ class EntityContentBase extends Entity implements HighestIdInterface, MigrateVal
       if ($field instanceof TypedDataInterface) {
         $values = $field->getValue();
 
-        /*
-         * For multivalued fields,
-         * we empty the property on each existing value.
-         */
+        // For multivalued fields, empty the property on each existing value.
         foreach (array_keys($values) as $delta) {
           NestedArray::setValue($values, array_merge([$delta], $parts), NULL);
         }
