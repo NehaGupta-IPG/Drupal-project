@@ -49,10 +49,14 @@ class PathWidget extends WidgetBase {
       '#value' => $items[$delta]->langcode,
     ];
 
+    $name = $this->fieldDefinition->getName();
+    $field_component = $form_state->get('form_display')->getComponent($name);
+
     // If the advanced settings tabs-set is available (normally rendered in the
     // second column on wide-resolutions), place the field as a details element
     // in this tab-set.
-    if (isset($form['advanced'])) {
+    // Not to do this if the field is placed in a different region.
+    if (isset($form['advanced']) && empty($field_component['region'])) {
       $element += [
         '#type' => 'details',
         '#title' => $this->t('URL path settings'),
