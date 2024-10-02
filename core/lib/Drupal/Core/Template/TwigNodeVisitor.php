@@ -63,6 +63,9 @@ class TwigNodeVisitor implements NodeVisitorInterface {
         // Store that we have a filter active already that knows
         // how to deal with render arrays.
         $this->skipRenderVarFunction = TRUE;
+      } else if ('spaceless' == $name) {
+        // Use our own spaceless filter that is MarkupInterface aware.
+        $node->setAttribute('twig_callable', $env->getFilter('drupal_spaceless'));
       }
     }
 

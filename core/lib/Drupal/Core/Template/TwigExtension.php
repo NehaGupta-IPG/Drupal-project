@@ -140,6 +140,9 @@ class TwigExtension extends AbstractExtension {
       new TwigFilter('e', [$this, 'escapeFilter'], $escape_options),
       new TwigFilter('drupal_escape', [$this, 'escapeFilter'], $escape_options),
 
+      // Replace deprecated spaceless filter with our own.
+      new TwigFilter('drupal_spaceless', [$this, 'spacelessFilter'], ['is_safe' => ['html']]),
+
       // Implements safe joining.
       // @todo Make that the default for |join? Upstream issue:
       //   https://github.com/fabpot/Twig/issues/1420
@@ -514,6 +517,18 @@ class TwigExtension extends AbstractExtension {
     }
     $arg['#printed'] = FALSE;
     return $this->renderer->render($arg);
+  }
+
+  /**
+   * Removes whitespaces between HTML tags.
+   *
+   * @param string|null $content
+   *
+   * @internal
+   */
+  public static function spacelessFilter($content): string
+  {
+    return trim(preg_replace('/>\s+</', '><', $content ?? ''));
   }
 
   /**
