@@ -522,12 +522,11 @@ class TwigExtension extends AbstractExtension {
   /**
    * Removes whitespaces between HTML tags.
    *
-   * @param string|null $content
+   * @param string|null $content The content to remove whitespaces from.
    *
-   * @internal
+   * @return string
    */
-  public static function spacelessFilter($content): string
-  {
+  public static function spacelessFilter(?string $content): string {
     return trim(preg_replace('/>\s+</', '><', $content ?? ''));
   }
 
