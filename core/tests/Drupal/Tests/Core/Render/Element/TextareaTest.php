@@ -23,15 +23,6 @@ class TextareaTest extends UnitTestCase {
    */
   #[DataProvider('providerTestValueCallback')]
   public function testValueCallback($expected, $input, array $element = []): void {
-    // Make sure element has its defaults added.
-    // @see \Drupal\Core\Render\Element\Textarea::getInfo()
-    $element += [
-      '#cols' => 60,
-      '#rows' => 5,
-      '#resizable' => 'vertical',
-      '#maxlength' => NULL,
-      '#normalize_newlines' => TRUE,
-    ];
     $form_state = $this->prophesize(FormStateInterface::class)->reveal();
     $this->assertSame($expected, Textarea::valueCallback($element, $input, $form_state));
   }
@@ -40,25 +31,43 @@ class TextareaTest extends UnitTestCase {
    * Data provider for testValueCallback().
    */
   public static function providerTestValueCallback(): array {
-    $data = [];
-    $data[] = [NULL, FALSE];
-    $data[] = [NULL, NULL];
-    $data[] = ['', ['test']];
-    $data[] = ['test', 'test'];
-    $data[] = ['123', 123];
-    // New lines normalization is enabled (default).
-    $data[] = [
-      "some\ndifferent\nline\nendings",
-      "some\r\ndifferent\rline\nendings",
+    return [
+      'False' => [
+        NULL,
+        FALSE,
+        ['#normalize_newlines' => TRUE],
+      ],
+      'NULL' => [
+        NULL,
+        NULL,
+        ['#normalize_newlines' => TRUE],
+      ],
+      'empty array' => [
+        '',
+        ['test'],
+        ['#normalize_newlines' => TRUE],
+      ],
+      'string' => [
+        'test',
+        'test',
+        ['#normalize_newlines' => TRUE],
+      ],
+      'integer' => [
+        '123',
+        123,
+        ['#normalize_newlines' => TRUE],
+      ],
+      'normalize new lines' => [
+        "some\ndifferent\nline\nendings",
+        "some\r\ndifferent\rline\nendings",
+        ['#normalize_newlines' => TRUE],
+      ],
+      'do not normalize new lines' => [
+        "some\r\ndifferent\rline\nendings",
+        "some\r\ndifferent\rline\nendings",
+        ['#normalize_newlines' => FALSE],
+      ],
     ];
-    // New lines normalization is disabled.
-    $data[] = [
-      "some\r\ndifferent\rline\nendings",
-      "some\r\ndifferent\rline\nendings",
-      ['#normalize_newlines' => FALSE],
-    ];
-
-    return $data;
   }
 
 }
