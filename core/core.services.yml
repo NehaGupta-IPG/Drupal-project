@@ -1477,6 +1477,7 @@ services:
   maintenance_mode_subscriber:
     class: Drupal\Core\EventSubscriber\MaintenanceModeSubscriber
     autowire: true
+  Drupal\Core\EventSubscriber\MaintenanceModeSubscriber: '@maintenance_mode_subscriber'
   route_access_response_subscriber:
     class: Drupal\Core\EventSubscriber\RouteAccessResponseSubscriber
   client_error_response_subscriber:
