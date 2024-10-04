@@ -49,18 +49,12 @@ final class IndexSettingsForm extends FormBase {
   /**
    * Constructs a new SearchPageListBuilder object.
    *
-   * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
-   *   The entity type definition.
-   * @param \Drupal\Core\Entity\EntityStorageInterface $storage
-   *   The entity storage class.
-   * @param \Drupal\search\SearchPluginManager $search_manager
-   *   The search plugin manager.
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
-   *   The factory for configuration objects.
    * @param \Drupal\Core\Messenger\MessengerInterface $messenger
    *   The messenger.
    * @param \Drupal\search\SearchIndexInterface $search_index
    *   The search index.
+   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
+   *   The module handler.
    */
   public function __construct(MessengerInterface $messenger, SearchIndexInterface $search_index, ModuleHandlerInterface $module_handler) {
     $this->messenger = $messenger;
