@@ -97,6 +97,12 @@ abstract class ConfigFormBase extends FormBase {
     $config_definition = $this->typedConfigManager->getDefinition($config_name);
     dump($config_definition);
 
+    foreach ($config_definition['mapping'] as $property_name => $property_schema) {
+      // check type.
+      // if mapping, recurse
+      // if inherits from mapping, recurse???
+    }
+
   }
 
   /**
