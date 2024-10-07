@@ -93,21 +93,21 @@ class SearchConfigSettingsFormTest extends BrowserTestBase {
 
     // Test that the settings form displays the correct count of items left to
     // index.
-    $this->drupalGet('admin/config/search/pages');
+    $this->drupalGet('admin/config/search/index-settings');
     $this->assertSession()->pageTextContains('There are 0 items left to index.');
 
     // Test the re-index button.
-    $this->drupalGet('admin/config/search/pages');
+    $this->drupalGet('admin/config/search/index-settings');
     $this->submitForm([], 'Re-index site');
     $this->assertSession()->pageTextContains('Are you sure you want to re-index the site');
     $this->drupalGet('admin/config/search/pages/reindex');
     $this->submitForm([], 'Re-index site');
     $this->assertSession()->statusMessageContains('All search indexes will be rebuilt', 'status');
-    $this->drupalGet('admin/config/search/pages');
+    $this->drupalGet('admin/config/search/index-settings');
     $this->assertSession()->pageTextContains('There is 1 item left to index.');
 
     // Test that the form saves with the default values.
-    $this->drupalGet('admin/config/search/pages');
+    $this->drupalGet('admin/config/search/index-settings');
     $this->submitForm([], 'Save configuration');
     $this->assertSession()->statusMessageContains('The configuration options have been saved.', 'status');
 
@@ -115,7 +115,7 @@ class SearchConfigSettingsFormTest extends BrowserTestBase {
     $edit = [
       'minimum_word_size' => $this->randomMachineName(3),
     ];
-    $this->drupalGet('admin/config/search/pages');
+    $this->drupalGet('admin/config/search/index-settings');
     $this->submitForm($edit, 'Save configuration');
     $this->assertSession()->statusMessageNotContains('The configuration options have been saved.');
     $this->assertSession()->statusMessageContains('Minimum word length to index must be a number.', 'error');
@@ -129,7 +129,7 @@ class SearchConfigSettingsFormTest extends BrowserTestBase {
 
     // Turn on logging.
     $edit = ['logging' => TRUE];
-    $this->drupalGet('admin/config/search/pages');
+    $this->drupalGet('admin/config/search/index-settings');
     $this->submitForm($edit, 'Save configuration');
     $text = $this->randomMachineName(5);
     $this->drupalGet('search/node');

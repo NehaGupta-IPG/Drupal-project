@@ -636,7 +636,7 @@ class NodeTranslationUITest extends ContentTranslationUITestBase {
     $translation->save();
 
     // Check if 1 page is listed for indexing.
-    $this->drupalGet('admin/config/search/pages');
+    $this->drupalGet('admin/config/search/index-settings');
     $this->assertSession()->pageTextContains('There is 1 item left to index.');
 
     // Run cron.
@@ -644,7 +644,7 @@ class NodeTranslationUITest extends ContentTranslationUITestBase {
     $this->getSession()->getPage()->pressButton('Run cron');
 
     // Assert no items are left for indexing.
-    $this->drupalGet('admin/config/search/pages');
+    $this->drupalGet('admin/config/search/index-settings');
     $this->assertSession()->pageTextContains('There are 0 items left to index.');
 
     // Search for French content.
@@ -660,7 +660,7 @@ class NodeTranslationUITest extends ContentTranslationUITestBase {
     $this->getSession()->getPage()->pressButton('Run cron');
 
     // Assert no items are left for indexing.
-    $this->drupalGet('admin/config/search/pages');
+    $this->drupalGet('admin/config/search/index-settings');
     $this->assertSession()->pageTextContains('There are 0 items left to index.');
 
     // Search for French content.
