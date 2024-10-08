@@ -18,6 +18,8 @@ class CommentTitleTest extends CommentTestBase {
 
   /**
    * Tests markup for comments with empty titles.
+   *
+   * @group legacy
    */
   public function testCommentEmptyTitles(): void {
     // Create a node.
@@ -37,6 +39,7 @@ class CommentTitleTest extends CommentTestBase {
 
     // Set comments to have a subject with preview disabled.
     $this->setCommentPreview(DRUPAL_DISABLED);
+    $this->expectDeprecation('Accessing the $message property is deprecated in drupal:11.1.0 and is removed from drupal:12.0.0. There is no replacement. See https://www.drupal.org/node/3479310');
     $this->setCommentForm(TRUE);
     $this->setCommentSubject(TRUE);
 
@@ -66,10 +69,13 @@ class CommentTitleTest extends CommentTestBase {
 
   /**
    * Tests markup for comments with populated titles.
+   *
+   * @group legacy
    */
   public function testCommentPopulatedTitles(): void {
     // Set comments to have a subject with preview disabled.
     $this->setCommentPreview(DRUPAL_DISABLED);
+    $this->expectDeprecation('Accessing the $message property is deprecated in drupal:11.1.0 and is removed from drupal:12.0.0. There is no replacement. See https://www.drupal.org/node/3479310');
     $this->setCommentForm(TRUE);
     $this->setCommentSubject(TRUE);
 

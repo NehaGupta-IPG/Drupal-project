@@ -22,6 +22,8 @@ class CommentPagerTest extends CommentTestBase {
 
   /**
    * Confirms comment paging works correctly with flat and threaded comments.
+   *
+   * @group legacy
    */
   public function testCommentPaging(): void {
     $this->drupalLogin($this->adminUser);
@@ -39,6 +41,7 @@ class CommentPagerTest extends CommentTestBase {
     $comments[] = $this->postComment($node, $this->randomMachineName(), $this->randomMachineName(), TRUE);
 
     $this->setCommentSettings('default_mode', CommentManagerInterface::COMMENT_MODE_FLAT, 'Comment paging changed.');
+    $this->expectDeprecation('Accessing the $message property is deprecated in drupal:11.1.0 and is removed from drupal:12.0.0. There is no replacement. See https://www.drupal.org/node/3479310');
 
     // Set "Comments per page" as zero and verify that all comments are
     // appearing on the page.
@@ -87,6 +90,8 @@ class CommentPagerTest extends CommentTestBase {
     // should be bumped to the first page and comment 6 should be bumped
     // to the second page.
     $this->setCommentSettings('default_mode', CommentManagerInterface::COMMENT_MODE_THREADED, 'Switched to threaded mode.');
+    $this->expectDeprecation('Accessing the $message property is deprecated in drupal:11.1.0 and is removed from drupal:12.0.0. There is no replacement. See https://www.drupal.org/node/3479310');
+
     $this->drupalGet('node/' . $node->id(), ['query' => ['page' => 0]]);
     $this->assertTrue($this->commentExists($reply, TRUE), 'In threaded mode, reply appears on page 1.');
     $this->assertFalse($this->commentExists($comments[1]), 'In threaded mode, comment 2 has been bumped off of page 1.');
@@ -112,6 +117,8 @@ class CommentPagerTest extends CommentTestBase {
 
   /**
    * Confirms comment paging works correctly with flat and threaded comments.
+   *
+   * @group legacy
    */
   public function testCommentPermalink(): void {
     $this->drupalLogin($this->adminUser);
@@ -129,6 +136,7 @@ class CommentPagerTest extends CommentTestBase {
     $comments[] = $this->postComment($node, 'comment 3: ' . $this->randomMachineName(), $this->randomMachineName(), TRUE);
 
     $this->setCommentSettings('default_mode', CommentManagerInterface::COMMENT_MODE_FLAT, 'Comment paging changed.');
+    $this->expectDeprecation('Accessing the $message property is deprecated in drupal:11.1.0 and is removed from drupal:12.0.0. There is no replacement. See https://www.drupal.org/node/3479310');
 
     // Set comments to one per page so that we are able to test paging without
     // needing to insert large numbers of comments.
@@ -144,6 +152,8 @@ class CommentPagerTest extends CommentTestBase {
 
   /**
    * Tests comment ordering and threading.
+   *
+   * @group legacy
    */
   public function testCommentOrderingThreading(): void {
     $this->drupalLogin($this->adminUser);
@@ -189,6 +199,7 @@ class CommentPagerTest extends CommentTestBase {
     //   - 5
 
     $this->setCommentSettings('default_mode', CommentManagerInterface::COMMENT_MODE_FLAT, 'Comment paging changed.');
+    $this->expectDeprecation('Accessing the $message property is deprecated in drupal:11.1.0 and is removed from drupal:12.0.0. There is no replacement. See https://www.drupal.org/node/3479310');
 
     $expected_order = [
       0,
@@ -203,6 +214,7 @@ class CommentPagerTest extends CommentTestBase {
     $this->assertCommentOrder($comments, $expected_order);
 
     $this->setCommentSettings('default_mode', CommentManagerInterface::COMMENT_MODE_THREADED, 'Switched to threaded mode.');
+    $this->expectDeprecation('Accessing the $message property is deprecated in drupal:11.1.0 and is removed from drupal:12.0.0. There is no replacement. See https://www.drupal.org/node/3479310');
 
     $expected_order = [
       0,
@@ -245,6 +257,8 @@ class CommentPagerTest extends CommentTestBase {
 
   /**
    * Tests calculation of first page with new comment.
+   *
+   * @group legacy
    */
   public function testCommentNewPageIndicator(): void {
     $this->drupalLogin($this->adminUser);
@@ -286,6 +300,7 @@ class CommentPagerTest extends CommentTestBase {
     //   - 5
 
     $this->setCommentSettings('default_mode', CommentManagerInterface::COMMENT_MODE_FLAT, 'Comment paging changed.');
+    $this->expectDeprecation('Accessing the $message property is deprecated in drupal:11.1.0 and is removed from drupal:12.0.0. There is no replacement. See https://www.drupal.org/node/3479310');
 
     $expected_pages = [
       // Page of comment 5
@@ -310,6 +325,7 @@ class CommentPagerTest extends CommentTestBase {
     }
 
     $this->setCommentSettings('default_mode', CommentManagerInterface::COMMENT_MODE_THREADED, 'Switched to threaded mode.');
+    $this->expectDeprecation('Accessing the $message property is deprecated in drupal:11.1.0 and is removed from drupal:12.0.0. There is no replacement. See https://www.drupal.org/node/3479310');
 
     $expected_pages = [
       // Page of comment 5
@@ -337,6 +353,8 @@ class CommentPagerTest extends CommentTestBase {
 
   /**
    * Confirms comment paging works correctly with two pagers.
+   *
+   * @group legacy
    */
   public function testTwoPagers(): void {
     // Add another field to article content-type.
@@ -382,6 +400,7 @@ class CommentPagerTest extends CommentTestBase {
       $this->setCommentForm(TRUE, $field_name);
       $this->setCommentPreview(DRUPAL_OPTIONAL, $field_name);
       $this->setCommentSettings('default_mode', CommentManagerInterface::COMMENT_MODE_FLAT, 'Comment paging changed.', $field_name);
+      $this->expectDeprecation('Accessing the $message property is deprecated in drupal:11.1.0 and is removed from drupal:12.0.0. There is no replacement. See https://www.drupal.org/node/3479310');
 
       // Set comments to one per page so that we are able to test paging without
       // needing to insert large numbers of comments.

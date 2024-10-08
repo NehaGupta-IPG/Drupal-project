@@ -54,6 +54,8 @@ class CommentAdminTest extends CommentBrowserTestBase {
 
   /**
    * Tests comment approval functionality through admin/content/comment.
+   *
+   * @group legacy
    */
   public function testApprovalAdminInterface(): void {
     // Set anonymous comments to require approval.
@@ -66,6 +68,7 @@ class CommentAdminTest extends CommentBrowserTestBase {
     $this->drupalLogin($this->adminUser);
     // Ensure that doesn't require contact info.
     $this->setCommentAnonymous(CommentInterface::ANONYMOUS_MAYNOT_CONTACT);
+    $this->expectDeprecation('Accessing the $message property is deprecated in drupal:11.1.0 and is removed from drupal:12.0.0. There is no replacement. See https://www.drupal.org/node/3479310');
 
     // Test that the comments page loads correctly when there are no comments.
     $this->drupalGet('admin/content/comment');

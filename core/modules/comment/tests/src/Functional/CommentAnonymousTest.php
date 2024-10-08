@@ -40,6 +40,8 @@ class CommentAnonymousTest extends CommentTestBase {
 
   /**
    * Tests anonymous comment functionality.
+   *
+   * @group legacy
    */
   public function testAnonymous(): void {
     $this->setCommentAnonymous(CommentInterface::ANONYMOUS_MAYNOT_CONTACT);
@@ -88,6 +90,7 @@ class CommentAnonymousTest extends CommentTestBase {
     // Allow contact info.
     $this->drupalLogin($this->adminUser);
     $this->setCommentAnonymous(CommentInterface::ANONYMOUS_MAY_CONTACT);
+    $this->expectDeprecation('Accessing the $message property is deprecated in drupal:11.1.0 and is removed from drupal:12.0.0. There is no replacement. See https://www.drupal.org/node/3479310');
 
     // Attempt to edit anonymous comment.
     $this->drupalGet('comment/' . $anonymous_comment1->id() . '/edit');

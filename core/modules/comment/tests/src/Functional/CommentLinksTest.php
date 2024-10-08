@@ -48,6 +48,8 @@ class CommentLinksTest extends CommentTestBase {
 
   /**
    * Tests that comment links are output and can be hidden.
+   *
+   * @group legacy
    */
   public function testCommentLinks(): void {
     // Remove additional user permissions from $this->webUser added by setUp(),
@@ -76,15 +78,18 @@ class CommentLinksTest extends CommentTestBase {
     // Tests that reply link is not visible when threading is disabled.
     $this->drupalLogin($this->webUser);
     $this->setCommentSettings('default_mode', CommentManagerInterface::COMMENT_MODE_FLAT, 'Comment paging changed.');
+    $this->expectDeprecation('Accessing the $message property is deprecated in drupal:11.1.0 and is removed from drupal:12.0.0. There is no replacement. See https://www.drupal.org/node/3479310');
     $this->drupalGet('node/' . $this->node->id());
     $this->assertSession()->linkNotExists('Reply');
     // Tests that reply link is visible when threading is enabled.
     $this->setCommentSettings('default_mode', CommentManagerInterface::COMMENT_MODE_THREADED, 'Comment paging changed.');
+    $this->expectDeprecation('Accessing the $message property is deprecated in drupal:11.1.0 and is removed from drupal:12.0.0. There is no replacement. See https://www.drupal.org/node/3479310');
     $this->drupalGet('node/' . $this->node->id());
     $this->assertSession()->linkExists('Reply');
 
     // Change comment settings.
     $this->setCommentSettings('form_location', CommentItemInterface::FORM_BELOW, 'Set comment form location');
+    $this->expectDeprecation('Accessing the $message property is deprecated in drupal:11.1.0 and is removed from drupal:12.0.0. There is no replacement. See https://www.drupal.org/node/3479310');
     $this->node->comment = CommentItemInterface::OPEN;
     $this->node->save();
 

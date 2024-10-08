@@ -50,6 +50,8 @@ class CommentNodeAccessTest extends CommentTestBase {
 
   /**
    * Tests that threaded comments can be viewed.
+   *
+   * @group legacy
    */
   public function testThreadedCommentView(): void {
     // Set comments to have subject required and preview disabled.
@@ -57,6 +59,7 @@ class CommentNodeAccessTest extends CommentTestBase {
     $this->setCommentForm(TRUE);
     $this->setCommentSubject(TRUE);
     $this->setCommentSettings('default_mode', CommentManagerInterface::COMMENT_MODE_THREADED, 'Comment paging changed.');
+    $this->expectDeprecation('Accessing the $message property is deprecated in drupal:11.1.0 and is removed from drupal:12.0.0. There is no replacement. See https://www.drupal.org/node/3479310');
 
     // Post comment.
     $this->drupalLogin($this->webUser);

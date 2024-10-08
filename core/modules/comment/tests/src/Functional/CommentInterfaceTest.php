@@ -45,6 +45,8 @@ class CommentInterfaceTest extends CommentTestBase {
 
   /**
    * Tests the comment interface.
+   *
+   * @group legacy
    */
   public function testCommentInterface(): void {
 
@@ -66,6 +68,7 @@ class CommentInterfaceTest extends CommentTestBase {
     $this->drupalLogout();
     $this->setCommentSubject(TRUE);
     $this->setCommentPreview(DRUPAL_REQUIRED);
+    $this->expectDeprecation('Accessing the $message property is deprecated in drupal:11.1.0 and is removed from drupal:12.0.0. There is no replacement. See https://www.drupal.org/node/3479310');
 
     // Create comment #2 that allows subject and requires preview.
     $this->drupalLogin($this->webUser);
@@ -226,6 +229,8 @@ class CommentInterfaceTest extends CommentTestBase {
    * When the subject field is blank or disabled, the first 29 characters of the
    * comment body are used for the subject. If this would break within a word,
    * then the break is put at the previous word boundary instead.
+   *
+   * @group legacy
    */
   public function testAutoFilledSubject(): void {
     $this->drupalLogin($this->webUser);
@@ -251,6 +256,7 @@ class CommentInterfaceTest extends CommentTestBase {
     // generating the subject. This occurs when the comment body is empty.
     $comment2 = $this->postComment(NULL, '', '', TRUE);
     $this->assertEquals('(No subject)', $comment2->getSubject());
+    $this->expectDeprecation('Accessing the $message property is deprecated in drupal:11.1.0 and is removed from drupal:12.0.0. There is no replacement. See https://www.drupal.org/node/3479310');
   }
 
   /**
@@ -259,6 +265,8 @@ class CommentInterfaceTest extends CommentTestBase {
    * This is the same test as in CommentInterfaceTest::testAutoFilledSubject()
    * with the additional check that HTML is stripped appropriately prior to
    * character-counting.
+   *
+   * @group legacy
    */
   public function testAutoFilledHtmlSubject(): void {
     // Set up two default (i.e. filtered HTML) input formats, because then we
@@ -304,10 +312,13 @@ class CommentInterfaceTest extends CommentTestBase {
     ];
     $this->submitForm($edit2, 'Save');
     $this->assertEquals('(No subject)', Comment::load(2)->getSubject());
+    $this->expectDeprecation('Accessing the $message property is deprecated in drupal:11.1.0 and is removed from drupal:12.0.0. There is no replacement. See https://www.drupal.org/node/3479310');
   }
 
   /**
    * Tests the comment formatter configured with a custom comment view mode.
+   *
+   * @group legacy
    */
   public function testViewMode(): void {
     $this->drupalLogin($this->webUser);
@@ -315,6 +326,7 @@ class CommentInterfaceTest extends CommentTestBase {
     $comment_text = $this->randomMachineName();
     // Post a comment.
     $this->postComment($this->node, $comment_text);
+    $this->expectDeprecation('Accessing the $message property is deprecated in drupal:11.1.0 and is removed from drupal:12.0.0. There is no replacement. See https://www.drupal.org/node/3479310');
 
     // Comment displayed in 'default' display mode found and has body text.
     $comment_element = $this->cssSelect('#comment-1');
