@@ -88,7 +88,7 @@ class OverviewTerms extends EntityForm implements WorkspaceSafeFormInterface {
    *   An associative array containing the structure of the form.
    * @param \Drupal\Core\Form\FormStateInterface $form_state
    *   The current state of the form.
-   * @param \Drupal\taxonomy\VocabularyInterface|null $taxonomy_vocabulary
+   * @param \Drupal\taxonomy\VocabularyInterface $taxonomy_vocabulary
    *   The vocabulary to display the overview form for.
    *
    * @return array
@@ -243,7 +243,7 @@ class OverviewTerms extends EntityForm implements WorkspaceSafeFormInterface {
     // If this form was already submitted once, it's probably hit a validation
     // error. Ensure the form is rebuilt in the same order as the user
     // submitted.
-    // ->getUserInput() gives problems when using the filter, so we use ->getValues() instead.
+    // The method ->getUserInput() gives problems when using the filter, so we use ->getValues() instead.
     $user_input = $form_state->getValues();
     $triggering_element = $form_state->getTriggeringElement() ? $form_state->getTriggeringElement()['#array_parents'] : NULL;
     $filter = !empty($triggering_element) && in_array('filter', $triggering_element);

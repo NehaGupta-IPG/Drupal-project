@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\taxonomy\Functional;
 
+use Drupal\taxonomy\VocabularyInterface;
+
 /**
  * Ensure that the term overview page filtering works properly.
  *
@@ -28,7 +30,7 @@ class TaxonomyTermFilterTest extends TaxonomyTestBase {
    *
    * @var \Drupal\taxonomy\VocabularyInterface
    */
-  protected $vocabulary;
+  protected VocabularyInterface $vocabulary;
 
   /**
    * {@inheritdoc}
