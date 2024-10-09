@@ -30,7 +30,7 @@ class AccessPolicyProcessor implements AccessPolicyProcessorInterface {
     protected ?TimeInterface $time = NULL,
   ) {
     if ($this->time === NULL) {
-      @trigger_error('Calling ' . __CLASS__ . '() without the $time argument is deprecated in drupal:10.4.0 and will be required in drupal:12.0.0. See https://www.drupal.org/node/3447821', E_USER_DEPRECATED);
+      @trigger_error('Calling ' . __CLASS__ . '() without the $time argument is deprecated in drupal:11.1.0 and will be required in drupal:12.0.0. See https://www.drupal.org/node/3447821', E_USER_DEPRECATED);
       $this->time = \Drupal::service('datetime.time');
     }
   }
