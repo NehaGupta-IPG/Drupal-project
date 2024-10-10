@@ -77,7 +77,7 @@ class LocaleConfigManagerTest extends KernelTestBase {
   /**
    * Tests getDefaultConfigLangcode() with an invalid translatable item.
    */
-  public function testInvalidStringTranslation() {
+  public function testInvalidStringTranslation(): void {
     $this->installSchema('locale', ['locales_location', 'locales_source', 'locales_target']);
     $this->installSchema('dblog', ['watchdog']);
     $this->installConfig(['locale_test']);
