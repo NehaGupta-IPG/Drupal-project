@@ -34,6 +34,7 @@ class LocaleDefaultConfigStorageTest extends KernelTestBase {
     );
 
     $expected = [
+      'locale_test.invalid_translatable',
       'locale_test.no_translation',
       'locale_test.translation',
       'locale_test.translation_multiple',

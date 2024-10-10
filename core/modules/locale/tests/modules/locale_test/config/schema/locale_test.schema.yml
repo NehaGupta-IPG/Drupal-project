@@ -56,3 +56,13 @@ locale_test.translation_multiple:
           type: string
           label: 'Another string'
           translatable: true
+
+locale_test.invalid_translatable:
+  type: config_object
+  label: 'Invalid translation settings'
+  mapping:
+    test_invalid_translatable:
+      type: integer
+      label: 'Invalid translatable'
+      # See \Drupal\Tests\locale\Kernel\LocaleConfigSubscriberTest
+      translatable: true

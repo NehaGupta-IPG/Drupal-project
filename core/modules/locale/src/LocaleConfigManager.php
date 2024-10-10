@@ -7,6 +7,7 @@ use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Config\ConfigManagerInterface;
 use Drupal\Core\Config\StorageInterface;
 use Drupal\Core\Config\TypedConfigManagerInterface;
+use Drupal\Core\Logger\LoggerChannelFactoryInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\TypedData\TraversableTypedDataInterface;
 use Drupal\Core\TypedData\TypedDataInterface;
@@ -99,6 +100,13 @@ class LocaleConfigManager {
   protected $configManager;
 
   /**
+   * The locale logger channel.
+   *
+   * @var \Drupal\Core\Logger\LoggerChannelInterface
+   */
+  protected $logger;
+
+  /**
    * Creates a new typed configuration manager.
    *
    * @param \Drupal\Core\Config\StorageInterface $config_storage
@@ -115,8 +123,10 @@ class LocaleConfigManager {
    *   The locale default configuration storage.
    * @param \Drupal\Core\Config\ConfigManagerInterface $config_manager
    *   The configuration manager.
+   * @param \Drupal\Core\Logger\LoggerChannelFactoryInterface|null $logger_channel_factory
+   *   The logger channel factory.
    */
-  public function __construct(StorageInterface $config_storage, StringStorageInterface $locale_storage, ConfigFactoryInterface $config_factory, TypedConfigManagerInterface $typed_config, ConfigurableLanguageManagerInterface $language_manager, LocaleDefaultConfigStorage $default_config_storage, ConfigManagerInterface $config_manager) {
+  public function __construct(StorageInterface $config_storage, StringStorageInterface $locale_storage, ConfigFactoryInterface $config_factory, TypedConfigManagerInterface $typed_config, ConfigurableLanguageManagerInterface $language_manager, LocaleDefaultConfigStorage $default_config_storage, ConfigManagerInterface $config_manager, LoggerChannelFactoryInterface $logger_channel_factory = NULL) {
     $this->configStorage = $config_storage;
     $this->localeStorage = $locale_storage;
     $this->configFactory = $config_factory;
@@ -124,6 +134,11 @@ class LocaleConfigManager {
     $this->languageManager = $language_manager;
     $this->defaultConfigStorage = $default_config_storage;
     $this->configManager = $config_manager;
+    if ($logger_channel_factory === NULL) {
+      @trigger_error('Calling ' . __METHOD__ . ' without the $logger_channel_factory argument is deprecated in drupal:10.2.0 and will be required in drupal:11.0.0. See https://www.drupal.org/node/3377384', E_USER_DEPRECATED);
+      $logger_channel_factory = \Drupal::service('logger.factory');
+    }
+    $this->logger = $logger_channel_factory->get('locale');
   }
 
   /**
@@ -180,8 +195,12 @@ class LocaleConfigManager {
         if (isset($definition['translation context'])) {
           $options['context'] = $definition['translation context'];
         }
-        // phpcs:ignore Drupal.Semantics.FunctionT.NotLiteralString
-        return new TranslatableMarkup($value, [], $options);
+        try {
+          return new TranslatableMarkup($value, [], $options);
+        }
+        catch (\InvalidArgumentException $exception) {
+          $this->logger->error('Error translating: %element. Element is not a translatable type.', ['%element' => $element->getName()]);
+        }
       }
     }
     return $translatable;

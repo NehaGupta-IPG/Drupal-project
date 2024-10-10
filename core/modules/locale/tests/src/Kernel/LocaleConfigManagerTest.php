@@ -26,6 +26,7 @@ class LocaleConfigManagerTest extends KernelTestBase {
     'locale',
     'locale_test',
     'block',
+    'dblog',
   ];
 
   /**
@@ -74,12 +75,38 @@ class LocaleConfigManagerTest extends KernelTestBase {
   }
 
   /**
+   * Tests getDefaultConfigLangcode() with an invalid translatable item.
+   */
+  public function testInvalidStringTranslation() {
+    $this->installSchema('locale', ['locales_location', 'locales_source', 'locales_target']);
+    $this->installSchema('dblog', ['watchdog']);
+    $this->installConfig(['locale_test']);
+
+    $locale_config_manager = \Drupal::service('locale.config_manager');
+
+    $count = \Drupal::database()->select('watchdog')->countQuery()->execute()->fetchField();
+    $this->assertEquals(0, $count);
+
+    $invalid_translatable = $locale_config_manager->getTranslatableDefaultConfig('locale_test.invalid_translatable');
+
+    $this->assertEmpty($invalid_translatable);
+    $logged = \Drupal::database()->select('watchdog')
+      ->fields('watchdog', ['variables'])
+      ->condition('type', 'locale')
+      ->condition('message', "Error translating: %element. Element is not a translatable type.")
+      ->execute()
+      ->fetchField();
+    $this->assertEquals(serialize(['%element' => 'test_invalid_translatable']), $logged);
+  }
+
+  /**
    * Tests getDefaultConfigLangcode().
    */
   public function testGetDefaultConfigLangcode(): void {
     // Install the Language module's configuration so we can use the
     // module_installer service.
     $this->installConfig(['language']);
+    $this->installSchema('dblog', ['watchdog']);
     $this->assertNull(\Drupal::service('locale.config_manager')->getDefaultConfigLangcode('locale_test_translate.settings'), 'Before installing a module the locale config manager can not access the shipped configuration.');
     \Drupal::service('module_installer')->install(['locale_test_translate']);
     $this->assertEquals('en', \Drupal::service('locale.config_manager')->getDefaultConfigLangcode('locale_test_translate.settings'), 'After installing a module the locale config manager can get the shipped configuration langcode.');
