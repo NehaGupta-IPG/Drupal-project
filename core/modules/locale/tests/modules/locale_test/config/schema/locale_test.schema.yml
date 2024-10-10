@@ -60,6 +60,7 @@ locale_test.translation_multiple:
 locale_test.invalid_translatable:
   type: config_object
   label: 'Invalid translation settings'
+  langcode: en
   mapping:
     test_invalid_translatable:
       type: integer
