@@ -466,12 +466,14 @@ class PathAliasTest extends PathTestBase {
     // Switch to French language and check if the French alias works.
     $this->drupalGet('/fr');
     $this->drupalGet('/french-node');
-    $this->assertSession()->pageTextContains('French Node');
+    $node_title_fr_xpath = $this->assertSession()->buildXPathQuery('//span');
+    $this->assertSession()->elementTextEquals('xpath', $node_title_fr_xpath, 'French Node');
 
     // Switch to English language and check if the English alias works.
     $this->drupalGet('/en');
     $this->drupalGet('/english-node');
-    $this->assertSession()->pageTextContains('English Node');
+    $node_title_en_xpath = $this->assertSession()->buildXPathQuery('//span');
+    $this->assertSession()->elementTextEquals('xpath', $node_title_en_xpath, 'English Node');
 
     // Cleanup: Delete the test nodes.
     $node_en->delete();
