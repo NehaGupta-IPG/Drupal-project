@@ -84,7 +84,7 @@ class HelpTopicSearchTest extends HelpTopicTranslatedTestBase {
     $this->assertEmpty($remaining);
 
     // Visit the Search settings page and verify it says 100% indexed.
-    $this->drupalGet('admin/config/search/pages');
+    $this->drupalGet('admin/config/search/index-settings');
     $this->assertSession()->pageTextContains('100% of the site has been indexed');
     // Search and verify there is no warning.
     $this->drupalGet('search/help');
