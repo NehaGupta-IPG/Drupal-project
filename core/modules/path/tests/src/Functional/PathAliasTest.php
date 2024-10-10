@@ -453,8 +453,15 @@ class PathAliasTest extends PathTestBase {
 
     // Assert that the aliases were created successfully.
     $this->drupalGet('admin/config/search/path');
-    $this->assertSession()->pageTextContains('/english-node');
-    $this->assertSession()->pageTextContains('/french-node');
+
+    // Verify that one link is found, with the expected link text.
+    $xpath = $this->assertSession()->buildXPathQuery('//a[contains(@href, :href)]', [':href' => '/english-node']);
+    $this->assertSession()->elementsCount('xpath', $xpath, 1);
+    $this->assertSession()->elementTextEquals('xpath', $xpath, '/english-node');
+    // Verify that one link is found, with the expected link text.
+    $xpath = $this->assertSession()->buildXPathQuery('//a[contains(@href, :href)]', [':href' => '/french-node']);
+    $this->assertSession()->elementsCount('xpath', $xpath, 1);
+    $this->assertSession()->elementTextEquals('xpath', $xpath, '/french-node');
 
     // Switch to French language and check if the French alias works.
     $this->drupalGet('/fr');
