@@ -428,4 +428,47 @@ class PathAliasTest extends PathTestBase {
     $this->assertSession()->linkByHrefExists('#edit-path-0-alias');
   }
 
+  /**
+   * Tests path alias functionality across language switches.
+   */
+  public function testLanguageSwitchAlias(): void {
+    // Create test nodes in different languages.
+    $node_en = $this->drupalCreateNode(['title' => 'English Node']);
+    $node_fr = $this->drupalCreateNode(['title' => 'French Node']);
+
+    // Create aliases for the nodes in their respective languages.
+    // For English node.
+    $edit_en = [];
+    $edit_en['path[0][value]'] = '/node/' . $node_en->id();
+    $edit_en['alias[0][value]'] = '/english-node';
+    $this->drupalGet('admin/config/search/path/add');
+    $this->submitForm($edit_en, 'Save');
+
+    // For French node.
+    $edit_fr = [];
+    $edit_fr['path[0][value]'] = '/node/' . $node_fr->id();
+    $edit_fr['alias[0][value]'] = '/french-node';
+    $this->drupalGet('admin/config/search/path/add');
+    $this->submitForm($edit_fr, 'Save');
+
+    // Assert that the aliases were created successfully.
+    $this->drupalGet('admin/config/search/path');
+    $this->assertSession()->pageTextContains('/english-node');
+    $this->assertSession()->pageTextContains('/french-node');
+
+    // Switch to French language and check if the French alias works.
+    $this->drupalGet('/fr');
+    $this->drupalGet('/french-node');
+    $this->assertSession()->pageTextContains('French Node');
+
+    // Switch to English language and check if the English alias works.
+    $this->drupalGet('/en');
+    $this->drupalGet('/english-node');
+    $this->assertSession()->pageTextContains('English Node');
+
+    // Cleanup: Delete the test nodes.
+    $node_en->delete();
+    $node_fr->delete();
+  }
+
 }
