@@ -126,7 +126,7 @@ class LocaleConfigManager {
    * @param \Drupal\Core\Logger\LoggerChannelFactoryInterface|null $logger_channel_factory
    *   The logger channel factory.
    */
-  public function __construct(StorageInterface $config_storage, StringStorageInterface $locale_storage, ConfigFactoryInterface $config_factory, TypedConfigManagerInterface $typed_config, ConfigurableLanguageManagerInterface $language_manager, LocaleDefaultConfigStorage $default_config_storage, ConfigManagerInterface $config_manager, LoggerChannelFactoryInterface $logger_channel_factory = NULL) {
+  public function __construct(StorageInterface $config_storage, StringStorageInterface $locale_storage, ConfigFactoryInterface $config_factory, TypedConfigManagerInterface $typed_config, ConfigurableLanguageManagerInterface $language_manager, LocaleDefaultConfigStorage $default_config_storage, ConfigManagerInterface $config_manager, ?LoggerChannelFactoryInterface $logger_channel_factory = NULL) {
     $this->configStorage = $config_storage;
     $this->localeStorage = $locale_storage;
     $this->configFactory = $config_factory;
@@ -198,7 +198,7 @@ class LocaleConfigManager {
         try {
           return new TranslatableMarkup($value, [], $options);
         }
-        catch (\InvalidArgumentException $exception) {
+        catch (\InvalidArgumentException) {
           $this->logger->error('Error translating: %element. Element is not a translatable type.', ['%element' => $element->getName()]);
         }
       }
