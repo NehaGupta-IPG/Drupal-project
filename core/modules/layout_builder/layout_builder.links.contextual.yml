@@ -27,3 +27,11 @@ layout_builder_block_remove:
       class: ['use-ajax']
       data-dialog-type: dialog
       data-dialog-renderer: off_canvas
+
+layout_builder_block_hide:
+  title: 'Toggle hidden'
+  route_name: 'layout_builder.hide_block'
+  group: 'layout_builder_block'
+  options:
+    attributes:
+      class: ['use-ajax']

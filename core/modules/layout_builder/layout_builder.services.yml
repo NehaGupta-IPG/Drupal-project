@@ -51,6 +51,10 @@ services:
   layout_builder.render_block_component_subscriber:
     class: Drupal\layout_builder\EventSubscriber\BlockComponentRenderArray
     arguments: ['@current_user']
+  layout_builder.section_component_hidden_subscriber:
+    class: Drupal\layout_builder\EventSubscriber\SectionComponentHidden
+    tags:
+      - { name: event_subscriber }
   logger.channel.layout_builder:
     parent: logger.channel_base
     arguments: ['layout_builder']

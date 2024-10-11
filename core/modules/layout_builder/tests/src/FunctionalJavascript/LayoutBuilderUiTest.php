@@ -309,4 +309,58 @@ class LayoutBuilderUiTest extends WebDriverTestBase {
     $assert_session->assertNoElementAfterWait('css', '.is-layout-builder-highlighted');
   }
 
+
+  /**
+   * Tests for hide block functionality.
+   */
+  public function testHideBlock() {
+    // Enable layout builder for each content.
+    $this->drupalGet(static::FIELD_UI_PREFIX . '/display/default');
+    $this->submitForm(['layout[allow_custom]' => TRUE], 'Save');
+
+    $this->createNode([
+      'type' => 'bundle_with_section_field',
+    ]);
+
+    $page = $this->getSession()->getPage();
+    $assert_session = $this->assertSession();
+
+    $this->drupalGet('node/1/layout');
+
+    $page->clickLink('Add section');
+    $assert_session->waitForElementVisible('named', ['link', 'One column']);
+    $assert_session->pageTextNotContains('You have unsaved changes.');
+    $page->clickLink('One column');
+    $assert_session->waitForElementVisible('named', ['button', 'Add section']);
+    $page->pressButton('Add section');
+    $assert_session->assertWaitOnAjaxRequest();
+
+    $page->clickLink('Add block');
+    $this->assertNotEmpty($assert_session->waitForElementVisible('css', 'a:contains("Recent content")'));
+    $assert_session->assertWaitOnAjaxRequest();
+    $page->clickLink('Recent content');
+    $this->assertNotEmpty($assert_session->waitForElementVisible('css', '#drupal-off-canvas input[value="Add block"]'));
+    $page->pressButton('Add block');
+    $assert_session->assertWaitOnAjaxRequest();
+
+    // Test "Hide block" functionality.
+    $this->clickContextualLink('.block-views-blockcontent-recent-block-1', 'Toggle hidden');
+    $assert_session->assertWaitOnAjaxRequest();
+    $assert_session->pageTextContains('The "Recent content" block is hidden');
+    $page->pressButton('Save layout');
+    $assert_session->pageTextNotContains('You have unsaved changes.');
+    $this->drupalGet('node/1');
+    $assert_session->pageTextNotContains('Recent content');
+
+    // Test "Show block" functionality.
+    $this->drupalGet('node/1/layout');
+    $this->clickContextualLink('.block-views-blockcontent-recent-block-1', 'Toggle hidden');
+    $assert_session->assertWaitOnAjaxRequest();
+    $assert_session->pageTextNotContains('The "Recent content" block is hidden');
+    $page->pressButton('Save layout');
+    $assert_session->pageTextNotContains('You have unsaved changes.');
+    $this->drupalGet('node/1');
+    $assert_session->pageTextContains('Recent content');
+  }
+
 }
