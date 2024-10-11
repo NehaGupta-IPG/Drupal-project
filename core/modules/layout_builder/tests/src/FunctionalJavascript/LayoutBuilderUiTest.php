@@ -313,7 +313,7 @@ class LayoutBuilderUiTest extends WebDriverTestBase {
   /**
    * Tests for hide block functionality.
    */
-  public function testHideBlock() {
+  public function testHideBlock(): void {
     // Enable layout builder for each content.
     $this->drupalGet(static::FIELD_UI_PREFIX . '/display/default');
     $this->submitForm(['layout[allow_custom]' => TRUE], 'Save');
