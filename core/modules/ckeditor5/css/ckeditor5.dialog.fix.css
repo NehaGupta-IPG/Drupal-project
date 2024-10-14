@@ -1,5 +1,4 @@
 .ck-body-wrapper {
-  --ck-z-modal: 1262;
-  --ck-z-panel: 1262;
-  --ck-z-dialog: 1262;
+  --ck-z-panel: calc(var(--ck-z-default) + 1261);
+  --ck-z-dialog: 9999;
 }
