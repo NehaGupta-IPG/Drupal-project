@@ -19,7 +19,7 @@ use Drupal\views\ViewExecutable;
 #[ViewsArgument(
   id: 'formula',
 )]
-class Formula extends ArgumentPluginBase {
+class Formula extends ArgumentPluginBase implements ArgumentInterface {
 
   /**
    * An appropriate SQL string for the DB type and field type.
@@ -42,7 +42,7 @@ class Formula extends ArgumentPluginBase {
   /**
    * Gets the prepared formula.
    */
-  public function getFormula() {
+  public function getFormula(): string {
     return str_replace('***table***', $this->tableAlias, $this->formula);
   }
 
@@ -73,6 +73,30 @@ class Formula extends ArgumentPluginBase {
       $placeholder => $this->argument,
     ];
     $this->query->addWhere(0, $formula, $placeholders, 'formula');
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getField($field = NULL): string {
+    if (!isset($field)) {
+      $field = $this->getFormula();
+    }
+
+    // If grouping, check to see if the aggregation method needs to modify the field.
+    if ($this->view->display_handler->useGroupBy()) {
+      $this->view->initQuery();
+      if ($this->query) {
+        $info = $this->query->getAggregationInfo();
+        if (!empty($info[$this->options['group_type']]['method'])) {
+          $method = $info[$this->options['group_type']]['method'];
+          if (method_exists($this->query, $method)) {
+            return $this->query->$method($this->options['group_type'], $field);
+          }
+        }
+      }
+    }
+    return $field;
   }
 
 }

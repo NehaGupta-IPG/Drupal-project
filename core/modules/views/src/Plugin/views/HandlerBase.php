@@ -176,12 +176,7 @@ abstract class HandlerBase extends PluginBase implements ViewsHandlerInterface {
    */
   public function getField($field = NULL) {
     if (!isset($field)) {
-      if (!empty($this->formula)) {
-        $field = $this->getFormula();
-      }
-      else {
-        $field = $this->tableAlias . '.' . $this->realField;
-      }
+      $field = $this->tableAlias . '.' . $this->realField;
     }
 
     // If grouping, check to see if the aggregation method needs to modify the

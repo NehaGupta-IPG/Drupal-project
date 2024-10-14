@@ -21,7 +21,7 @@ use Drupal\views\ManyToOneHelper;
 #[ViewsArgument(
   id: 'string',
 )]
-class StringArgument extends ArgumentPluginBase {
+class StringArgument extends ArgumentPluginBase implements ArgumentInterface {
 
   /**
    * The many-to-one helper.
@@ -187,7 +187,7 @@ class StringArgument extends ArgumentPluginBase {
    *
    * $this->ensureMyTable() MUST have been called prior to this.
    */
-  public function getFormula() {
+  public function getFormula(): string {
     $formula = "SUBSTRING($this->tableAlias.$this->realField, 1, " . intval($this->options['limit']) . ")";
 
     if ($this->options['case'] != 'none') {
