@@ -66,7 +66,7 @@ final class IndexSettingsForm extends FormBase {
   /**
    * {@inheritdoc}
    */
-  public static function create(ContainerInterface $container) {
+  public static function create(ContainerInterface $container): IndexSettingsForm {
     return new static(
       $container->get('messenger'),
       $container->get('search.index'),
@@ -222,7 +222,7 @@ final class IndexSettingsForm extends FormBase {
   /**
    * Form submission handler for reindex button on search admin settings form.
    */
-  public function searchAdminReindexSubmit(array &$form, FormStateInterface $form_state) {
+  public function searchAdminReindexSubmit(array &$form, FormStateInterface $form_state): void {
     // Send the user to the confirmation page.
     $form_state->setRedirect('search.reindex_confirm');
   }
