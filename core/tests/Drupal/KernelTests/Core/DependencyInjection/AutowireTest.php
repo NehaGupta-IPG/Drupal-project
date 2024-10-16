@@ -115,6 +115,12 @@ class AutowireTest extends KernelTestBase {
         continue;
       }
 
+      // Skip classes with EventSubscriber in the path, to exclude listeners
+      // that use the AsEventListener attribute instead of event_subscriber tag.
+      if (str_contains($class, '\\EventSubscriber\\')) {
+        continue;
+      }
+
       // Expect standalone classes to be aliased.
       $implements = class_implements($class);
       if (!$implements) {
