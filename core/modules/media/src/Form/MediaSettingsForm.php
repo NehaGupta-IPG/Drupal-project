@@ -90,6 +90,13 @@ class MediaSettingsForm extends ConfigFormBase {
     $description = '<p>' . $this->t('Displaying media assets from third-party services, such as YouTube or Twitter, can be risky. This is because many of these services return arbitrary HTML to represent those assets, and that HTML may contain executable JavaScript code. If handled improperly, this can increase the risk of your site being compromised.') . '</p>';
     $description .= '<p>' . $this->t('In order to mitigate the risks, third-party assets are displayed in an iFrame, which effectively sandboxes any executable code running inside it. For even more security, the iFrame can be served from an alternate domain (that also points to your Drupal site), which you can configure on this page. This helps safeguard cookies and other sensitive information.') . '</p>';
 
+    $form['oembed_discovery'] = [
+      '#prefix' => '<hr>',
+      '#type' => 'checkbox',
+      '#title' => $this->t('Perform oEmbed discover'),
+      '#config_target' => 'media.settings:oembed_discovery',
+      '#description' => $this->t("When a user provides a URL for an oEmbed media object that doesn't match the provider list, fetch that URL to attempt to read oEmbed data from metadata."),
+    ];
     $form['security'] = [
       '#type' => 'details',
       '#title' => $this->t('Security'),

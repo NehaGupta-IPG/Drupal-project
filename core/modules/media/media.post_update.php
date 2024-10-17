@@ -20,7 +20,6 @@ function media_removed_post_updates(): array {
     'media_post_update_remove_mappings_targeting_source_field' => '11.0.0',
   ];
 }
-
 /**
  * Empty update function to clear the Views data cache.
  */
