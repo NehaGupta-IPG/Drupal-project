@@ -21,7 +21,7 @@ function image_removed_post_updates(): array {
 /**
  * Add a table column for "Enable Display field" checkbox.
  */
-function image_post_update_add_display_checkbox(&$sandbox = []) {
+function image_post_update_add_display_checkbox(&$sandbox = []): void {
   $properties = ['display'];
 
   foreach ($properties as $property) {
