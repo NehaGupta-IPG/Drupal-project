@@ -213,7 +213,7 @@ class TraversableObject extends NonNormalizableObject implements \IteratorAggreg
   /**
    * {@inheritdoc}
    */
-  public function getIterator() {
+  public function getIterator(): \ArrayIterator {
     return new \ArrayIterator($this);
   }
 
