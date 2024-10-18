@@ -17,7 +17,8 @@ class AnyNormalizer extends NormalizerBase {
   /**
    * {@inheritdoc}
    */
-  public function normalize($object, $format = NULL, array $context = []) {
+  public function normalize($object, $format = NULL, array $context = []): array|string|int|float|bool|\ArrayObject|NULL {
+    assert($object instanceof Any);
     $this->addCacheableDependency($context, $object);
     $value = $object->getValue();
     // If the value is object or array, continue normalize it, object must be
