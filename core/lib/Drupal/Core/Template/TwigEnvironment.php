@@ -97,6 +97,9 @@ class TwigEnvironment extends Environment {
 
     $this->setLoader($loader);
     parent::__construct($this->getLoader(), $options);
+    // Add extension that provides spaceless filter that overrides the filter
+    // provided by Twig's CoreExtension.
+    $this->addExtension(new SpacelessBCExtension());
     $policy = new TwigSandboxPolicy();
     $sandbox = new SandboxExtension($policy, TRUE);
     $this->addExtension($sandbox);
