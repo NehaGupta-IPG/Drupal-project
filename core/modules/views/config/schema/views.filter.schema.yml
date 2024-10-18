@@ -144,7 +144,7 @@ views.filter.entity_reference:
       type: string
       label: 'Selection type'
     list_max:
-      type: integer
+      type: string
       label: 'Maximum entities in select list'      
     sub_handler_settings:
       type: entity_reference_selection.[%parent.sub_handler]
