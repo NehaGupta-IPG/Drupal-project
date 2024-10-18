@@ -41,11 +41,6 @@ class EntityReference extends ManyToOne {
   const WIDGET_SELECT = 'select';
 
   /**
-   * Max number of entities in the select widget.
-   */
-  const WIDGET_SELECT_LIMIT = 100;
-
-  /**
    * The subform prefix.
    */
   const SUBFORM_PREFIX = 'reference_';
@@ -147,6 +142,7 @@ class EntityReference extends ManyToOne {
     ];
     $options['sub_handler_settings'] = ['default' => []];
     $options['widget'] = ['default' => static::WIDGET_AUTOCOMPLETE];
+    $options['list_max'] = ['default' => '100'];
     return $options;
   }
 
@@ -271,9 +267,19 @@ class EntityReference extends ManyToOne {
         static::WIDGET_SELECT => $this->t('Select list'),
         static::WIDGET_AUTOCOMPLETE => $this->t('Autocomplete'),
       ],
-      '#description' => $this->t('For performance and UX reasons, the maximum count of selectable entities for the "Select list" selection type is limited to @count. If more is expected, select "Autocomplete" instead.', [
-        '@count' => static::WIDGET_SELECT_LIMIT,
-      ]),
+    ];
+    $form['list_max'] = [
+      '#type' => 'number',
+      '#title' => $this->t('Maximum entities in select list'),
+      '#description' => $this->t('This is the limit to the number of entities to allow for select type of widget. It is strongly recommended to set a limit to avoid performance issues. When this limit is reached the widget switches automatically to an autocomplete widget. Set the limit to "0" to allow unlimited entities.'),
+      '#default_value' => $this->options['list_max'],
+      '#min' => 0,
+      '#max' => 1000,
+      '#states' => [
+        'visible' => [
+          ':input[name="options[widget]"]' => ['value' => static::WIDGET_SELECT],
+        ],
+      ],
     ];
   }
 
@@ -389,11 +395,11 @@ class EntityReference extends ManyToOne {
     $field_id = '_' . $this->getFieldDefinition()->getName() . '-widget';
     $form[$field_id] = [
       '#type' => 'hidden',
-      '#value' => $this->options['widget'],
+      '#value' => $form['value']['#type'],
     ];
 
     $previous_widget = $form_state->getUserInput()[$field_id] ?? NULL;
-    if ($previous_widget && $previous_widget !== $this->options['widget']) {
+    if ($previous_widget && $previous_widget !== $form['value']['#type']) {
       $form['value']['#value_callback'] = function ($element) {
         return $element['#default_value'] ?? '';
       };
@@ -489,11 +495,22 @@ class EntityReference extends ManyToOne {
    *   The current state of the form.
    */
   protected function valueFormAddSelect(array &$form, FormStateInterface $form_state): void {
-    $is_exposed = $form_state->get('exposed');
-
+    $list_max = (int) $this->options['list_max'];
     $options = $this->getValueOptions();
+    // If list max is not set to unlimited (0) and the number of options has
+    // hit the list max, then we need to use an autocomplete widget.
+    if ($list_max !== 0 && count($options) >= $list_max) {
+      $this->valueFormAddAutocomplete($form, $form_state);
+      if (!empty($this->view->live_preview)) {
+        $this->messenger->addWarning($this->t("Limit of maximum :limit entities reached for entity reference filter ':filter', switching to autocomplete widget.", [
+          ':filter' => $this->getFieldDefinition()->getName(),
+          ':limit' => $list_max,
+        ]));
+      }
+      return;
+    }
     $default_value = (array) $this->value;
-
+    $is_exposed = $form_state->get('exposed');
     if ($is_exposed) {
       $identifier = $this->options['expose']['identifier'];
 
@@ -565,7 +582,8 @@ class EntityReference extends ManyToOne {
   protected function getValueOptionsCallback(SelectionInterface $selection_handler): array {
     $entity_data = [];
     if ($this->options['widget'] === static::WIDGET_SELECT) {
-      $entity_data = $selection_handler->getReferenceableEntities(NULL, 'CONTAINS', static::WIDGET_SELECT_LIMIT);
+      $limit = (int) $this->options['list_max'];
+      $entity_data = $selection_handler->getReferenceableEntities(NULL, 'CONTAINS', $limit);
     }
 
     $options = [];
@@ -643,7 +661,7 @@ class EntityReference extends ManyToOne {
 
     // Set the validated exposed input from the select list when not the all
     // value option.
-    if ($this->options['widget'] == static::WIDGET_SELECT) {
+    if ($this->options['widget'] == static::WIDGET_SELECT && $form[$identifier]['#type'] !== 'entity_autocomplete') {
       if ($form_state->getValue($identifier) != static::ALL_VALUE) {
         $this->validatedExposedInput = (array) $form_state->getValue($identifier);
       }

@@ -218,6 +218,34 @@ class FilterEntityReferenceTest extends ViewsKernelTestBase {
   }
 
   /**
+   * Tests filtered results for autocomplete widget switched from select.
+   */
+  public function testViewEntityReferenceAsAutocompleteFromSelect(): void {
+    $view = Views::getView('test_filter_entity_reference');
+    $view->setDisplay();
+    // Set list max to be small to ensure it switches to autocomplete.
+    $filters = $view->displayHandlers->get('default')->getOption('filters');
+    $filters['field_test_target_id']['list_max'] = '3';
+    $view->displayHandlers->get('default')->overrideOption('filters', $filters);
+    $view->setExposedInput([
+      'field_test_target_id' => [
+        ['target_id' => $this->targetNodes[0]->id()],
+        ['target_id' => $this->targetNodes[3]->id()],
+      ],
+    ]);
+    $this->executeView($view);
+
+    // Expect to have Page 0 and 1, with Article 0 and 3 referenced.
+    $expected = [
+      ['title' => 'Page 0'],
+      ['title' => 'Page 1'],
+    ];
+    $this->assertIdenticalResultset($view, $expected, [
+      'title' => 'title',
+    ]);
+  }
+
+  /**
    * Tests that content dependencies are added to the view.
    */
   public function testViewContentDependencies(): void {
