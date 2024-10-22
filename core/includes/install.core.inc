@@ -1425,8 +1425,12 @@ function install_select_language(&$install_state) {
  */
 function install_download_translation(&$install_state) {
   // Check whether all conditions are met to download. Download the translation
-  // if possible.
-  $requirements = install_check_translations($install_state['parameters']['langcode'], $install_state['server_pattern']);
+  // if possible and enabled.
+  $server_pattern = $install_state["download_translation"]
+    ? $install_state['server_pattern']
+    : NULL;
+
+  $requirements = install_check_translations($install_state['parameters']['langcode'], $server_pattern);
   // Render requirements if any warnings or errors returned.
   if ($output = install_display_requirements($install_state, $requirements)) {
     return $output;
@@ -1787,8 +1791,10 @@ function install_import_translations(&$install_state) {
   // should import translations.
   $batch_builder = (new BatchBuilder())
     ->setFile(\Drupal::service('extension.path.resolver')->getPath('module', 'locale') . '/locale.batch.inc');
-  foreach (install_download_additional_translations_operations($install_state) as $operation) {
-    $batch_builder->addOperation($operation[0], $operation[1]);
+  if ($install_state['download_translation']) {
+    foreach (install_download_additional_translations_operations($install_state) as $operation) {
+      $batch_builder->addOperation($operation[0], $operation[1]);
+    }
   }
   $languages = \Drupal::languageManager()->getLanguages();
   if (count($languages) > 1 || !isset($languages['en'])) {
@@ -1958,7 +1964,7 @@ function _install_module_batch(array $modules, array $module_names, array &$cont
  *
  * @param string $langcode
  *   Language code to check for download.
- * @param string $server_pattern
+ * @param string|null $server_pattern
  *   Server access pattern (to replace language code, version number, etc. in).
  *
  * @return array
@@ -2008,24 +2014,73 @@ function install_check_translations($langcode, $server_pattern): array {
     '%core' => 'all',
     '%language' => $langcode,
   ];
-  $translation_url = strtr($server_pattern, $variables);
 
-  $elements = parse_url($translation_url);
-  $server_url = $elements['scheme'] . '://' . $elements['host'];
-
-  // Build the language name for display.
-  $languages = LanguageManager::getStandardLanguageList();
-  $language = isset($languages[$langcode]) ? $languages[$langcode][0] : $langcode;
-
-  // Check if any of the desired translation files are available or if the
-  // translation server can be reached. In other words, check if we are online
-  // and have an internet connection.
-  if ($translation_available = install_check_localization_server($translation_url)) {
-    $online = TRUE;
+  if ($server_pattern === NULL) {
+    $translation_available = FALSE;
+    $requirements['online'] = [
+      'title' => t('Internet'),
+      'value' => t('The translation downloading is disabled.'),
+      'description' => t('The installer has disabled downloading translations from remote sources.'),
+    ];
   }
-  if (!$translation_available) {
-    if (install_check_localization_server($server_url)) {
+  else {
+    $translation_url = strtr($server_pattern, $variables);
+
+    $elements = parse_url($translation_url);
+    $server_url = $elements['scheme'] . '://' . $elements['host'];
+
+    // Build the language name for display.
+    $languages = LanguageManager::getStandardLanguageList();
+    $language = isset($languages[$langcode]) ? $languages[$langcode][0] : $langcode;
+
+    // Check if any of the desired translation files are available or if the
+    // translation server can be reached. In other words, check if we are online
+    // and have an internet connection.
+    if ($translation_available = install_check_localization_server($translation_url)) {
       $online = TRUE;
+    }
+    if (!$translation_available) {
+      if (install_check_localization_server($server_url)) {
+        $online = TRUE;
+      }
+    }
+
+    // If the translations server can not be contacted, throw an error.
+    if (!$online) {
+      $requirements['online'] = [
+        'title' => t('Internet'),
+        'value' => t('The translation server is offline.'),
+        'severity' => RequirementSeverity::Error,
+        'description' => t('The installer requires to contact the translation server to download a translation file. Check your internet connection and verify that your website can reach the translation server at <a href=":server_url">@server_url</a>.', [
+          ':server_url' => $server_url,
+          '@server_url' => $server_url,
+        ]),
+      ];
+    }
+    else {
+      $requirements['online'] = [
+        'title' => t('Internet'),
+        'value' => t('The translation server is online.'),
+      ];
+      // If translation file is not found at the translation server, throw an
+      // error.
+      if (!$translation_available) {
+        $requirements['translation available'] = [
+          'title' => t('Translation'),
+          'value' => t('The %language translation is not available.', ['%language' => $language]),
+          'severity' => RequirementSeverity::Error,
+          'description' => t('The %language translation file is not available at the translation server. <a href=":url">Choose a different language</a> or select English and translate your website later.', [
+            '%language' => $language,
+            ':url' => $_SERVER['SCRIPT_NAME'],
+          ]),
+        ];
+      }
+      else {
+        $requirements['translation available'] = [
+          'title' => t('Translation'),
+          'value' => t('The %language translation is available.', ['%language' => $language]),
+        ];
+      }
     }
   }
 
@@ -2074,44 +2129,6 @@ function install_check_translations($langcode, $server_pattern): array {
       $requirements['translations directory writable'] = [
         'title'       => t('Translations directory'),
         'value'       => t('The translations directory is writable.'),
-      ];
-    }
-  }
-
-  // If the translations server can not be contacted, throw an error.
-  if (!$online) {
-    $requirements['online'] = [
-      'title'       => t('Internet'),
-      'value'       => t('The translation server is offline.'),
-      'severity'    => RequirementSeverity::Error,
-      'description' => t('The installer requires to contact the translation server to download a translation file. Check your internet connection and verify that your website can reach the translation server at <a href=":server_url">@server_url</a>.', [
-        ':server_url' => $server_url,
-        '@server_url' => $server_url,
-      ]),
-    ];
-  }
-  else {
-    $requirements['online'] = [
-      'title'       => t('Internet'),
-      'value'       => t('The translation server is online.'),
-    ];
-    // If translation file is not found at the translation server, throw an
-    // error.
-    if (!$translation_available) {
-      $requirements['translation available'] = [
-        'title'       => t('Translation'),
-        'value'       => t('The %language translation is not available.', ['%language' => $language]),
-        'severity'    => RequirementSeverity::Error,
-        'description' => t('The %language translation file is not available at the translation server. <a href=":url">Choose a different language</a> or select English and translate your website later.', [
-          '%language' => $language,
-          ':url' => $_SERVER['SCRIPT_NAME'],
-        ]),
-      ];
-    }
-    else {
-      $requirements['translation available'] = [
-        'title'       => t('Translation'),
-        'value'       => t('The %language translation is available.', ['%language' => $language]),
       ];
     }
   }
