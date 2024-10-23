@@ -1,0 +1,4 @@
+name: Import maps test
+description: 'Provides test functionality for import maps'
+type: module
+version: VERSION

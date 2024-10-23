@@ -1,0 +1,7 @@
+foo:
+  js:
+    js/foo.js: { attributes: { type: module }, minified: true }
+
+foo-scoped:
+  js:
+    js/scope/foo.js: { attributes: { type: module }, minified: true }

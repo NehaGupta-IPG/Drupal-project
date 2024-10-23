@@ -1388,5 +1388,42 @@ function hook_icon_pack_alter(array &$icon_packs): void {
 }
 
 /**
+ * Alter importmaps.
+ *
+ * Allows modules and themes to change importmaps.
+ *
+ * @param array $import_maps
+ *   Array of importmaps information. Will contain two top level keys 'imports'
+ *   and 'scopes'. Entries under 'imports' is a resolved URL to the file to
+ *   import and are keyed by the import names. Each entry under 'scopes' has
+ *   the same shape as 'imports' i.e. an array keyed by import identifiers with
+ *   each entry a resolved URL to the file to import. Entries under 'scopes' are
+ *   keyed by the path to consuming modules under which the scope rule applies.
+ *   @code
+ *   imports:
+ *     identifier1: '/absolute/url/to/import1.js'
+ *     identifier2: '/absolute/url/to/import2.js'
+ *   scopes:
+ *     /when/loading/code/is/here:
+ *       identifier1: '/has/a/different/path.js'
+ *   @endcode
+ * @param string $extension
+ *   The module or theme machine name that provided the import maps being
+ *   altered.
+ *
+ * @see https://developer.mozilla.org/en-US/docs/Web/HTML/Element/script/type/importmap
+ * @see \Drupal\Core\Asset\ImportMapsManagerInterface
+ */
+function hook_importmaps_alter(array &$import_maps, string $extension): void {
+  if ($extension !== 'react') {
+    return;
+  }
+  // Swap out the path to react-dom.
+  if (\array_key_exists('react-dom', $import_maps['imports'])) {
+    $import_maps['imports']['react-dom'] = \Drupal::service(\Drupal\Core\File\FileUrlGeneratorInterface::class)->generateString('/my/react-dom-esmodule.js');
+  }
+}
+
+/**
  * @} End of "addtogroup hooks".
  */

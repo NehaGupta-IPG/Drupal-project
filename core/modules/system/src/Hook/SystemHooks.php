@@ -2,6 +2,8 @@
 
 namespace Drupal\system\Hook;
 
+use Drupal\Component\Serialization\Json;
+use Drupal\Core\Asset\ImportMapsManagerInterface;
 use Drupal\Core\StreamWrapper\StreamWrapperManager;
 use Drupal\Core\StreamWrapper\LocalStream;
 use Drupal\Core\Site\Settings;
@@ -409,7 +411,7 @@ class SystemHooks {
    * Implements hook_page_top().
    */
   #[Hook('page_top')]
-  public function pageTop(): void {
+  public function pageTop(array &$page_top): void {
     /** @var \Drupal\Core\Routing\AdminContext $admin_context */
     $admin_context = \Drupal::service('router.admin_context');
     if ($admin_context->isAdminRoute() && \Drupal::currentUser()->hasPermission('administer site configuration')) {
@@ -448,6 +450,17 @@ class SystemHooks {
           }
         }
       }
+    }
+    $map = \Drupal::service(ImportMapsManagerInterface::class)->getImportMapForTheme(\Drupal::theme()->getActiveTheme()->getName());
+    if (\array_key_exists('imports', $map) && \count($map['imports']) > 0) {
+      $page_top['importmaps'] = [
+        '#type' => 'html_tag',
+        '#tag' => 'script',
+        '#value' => Json::encode($map),
+        '#attributes' => ['type' => 'importmap'],
+        // This varies by route because of the active theme resolution.
+        '#cache' => ['contexts' => ['route']],
+      ];
     }
   }
 

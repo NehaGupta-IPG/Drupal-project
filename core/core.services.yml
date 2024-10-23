@@ -2016,3 +2016,6 @@ services:
       - { name: needs_destruction }
   Drupal\Core\Extension\ThemeSettingsProvider:
     autowire: true
+  Drupal\Core\Asset\ImportMapsManagerInterface:
+    class: Drupal\Core\Asset\ImportMapsManager
+    autowire: true
