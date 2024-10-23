@@ -10,6 +10,7 @@ use Drupal\Component\Utility\NestedArray;
 use Drupal\Component\Utility\UrlHelper;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Cache\CacheCollector;
+use Drupal\Core\Extension\Exception\UnknownExtensionException;
 use Drupal\Core\Extension\ExtensionPathResolver;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Extension\ThemeExtensionList;
@@ -174,7 +175,12 @@ final class ImportMapsManager extends CacheCollector implements ImportMapsManage
     }
     // Build import maps for the given theme.
     $base_theme_import_maps = \array_reduce($this->collectBaseThemes($key), fn (array $carry, string $base_theme) => NestedArray::mergeDeep($carry, $this->get($base_theme)), []);
-    $theme = $this->themeHandler->getTheme($key);
+    try {
+      $theme = $this->themeHandler->getTheme($key);
+    }
+    catch (UnknownExtensionException) {
+      return $import_maps;
+    }
     $import_maps = NestedArray::mergeDeep($base_theme_import_maps, $this->buildImportMapsForExtensionNameAndPath($key, $theme->getPath()));
     return $import_maps;
   }
@@ -190,7 +196,12 @@ final class ImportMapsManager extends CacheCollector implements ImportMapsManage
    */
   protected function collectBaseThemes(string $theme): array {
     $base_themes = [];
-    $info = $this->themeExtensionList->getExtensionInfo($theme);
+    try {
+      $info = $this->themeExtensionList->getExtensionInfo($theme);
+    }
+    catch (UnknownExtensionException) {
+      return $base_themes;
+    }
     if (\array_key_exists('base theme', $info)) {
       $base_themes[] = $info['base theme'];
       $base_themes = \array_merge($base_themes, $this->collectBaseThemes($info['base theme']));
