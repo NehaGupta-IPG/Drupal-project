@@ -66,6 +66,10 @@ class AutowireTest extends KernelTestBase {
           if ($id === $service['class']) {
             continue;
           }
+          // Ignore services named by an interface.
+          if (\interface_exists($id) && \is_subclass_of($service['class'], $id)) {
+            continue;
+          }
           // Ignore certain tagged services.
           if (isset($service['tags'])) {
             foreach ($service['tags'] as $tag) {
