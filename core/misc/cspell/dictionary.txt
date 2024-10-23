@@ -224,6 +224,9 @@ idekey
 iframeupload
 imageavif
 imagecache
+importmap
+importmaps
+indexname
 inglés
 inited
 inno

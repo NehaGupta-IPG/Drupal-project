@@ -1420,6 +1420,7 @@ function hook_importmaps_alter(array &$import_maps, string $extension): void {
   }
   // Swap out the path to react-dom.
   if (\array_key_exists('react-dom', $import_maps['imports'])) {
+    // @cspell:ignore esmodule
     $import_maps['imports']['react-dom'] = \Drupal::service(\Drupal\Core\File\FileUrlGeneratorInterface::class)->generateString('/my/react-dom-esmodule.js');
   }
 }

@@ -1,5 +1,10 @@
 <?php
 
+/**
+ * @file
+ * Contains main module functions.
+ */
+
 declare(strict_types=1);
 
 /**

@@ -21,8 +21,6 @@ use Drupal\Core\Serialization\Yaml;
 use Drupal\Core\Theme\ThemeManagerInterface;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
-// @cspell:ignore importmaps
-
 /**
  * Defines a plugin manager for import maps.
  *
@@ -131,7 +129,7 @@ final class ImportMapsManager extends CacheCollector implements ImportMapsManage
     #[Autowire('@logger.channel.default')]
     protected readonly LoggerChannelInterface $loggerChannel,
     protected readonly FileUrlGeneratorInterface $fileUrlGenerator,
-    protected readonly ThemeManagerInterface $themeManager
+    protected readonly ThemeManagerInterface $themeManager,
   ) {
     parent::__construct('importmaps', $cache, $lock, ['importmaps']);
     $this->fileCache = FileCacheFactory::get('importmaps');
