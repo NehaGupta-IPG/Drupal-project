@@ -264,7 +264,6 @@ final class ImportMapsManager extends CacheCollector implements ImportMapsManage
           $this->loggerChannel->warning('Missing or invalid path entry for @import entry in @file', [
             '@file' => $import_maps_file,
             '@import' => $name,
-            '@scope' => $scope,
           ]);
           continue;
         }

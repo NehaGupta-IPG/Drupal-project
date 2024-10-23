@@ -21,7 +21,7 @@ final class ImportMapsTest extends WebDriverTestBase {
   /**
    * {@inheritdoc}
    */
-  public static $modules = ['importmaps_test'];
+  protected static $modules = ['importmaps_test'];
 
   /**
    * Tests importmap functionality.
