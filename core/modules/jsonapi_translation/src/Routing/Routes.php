@@ -121,7 +121,7 @@ final class Routes extends JsonApiRoutes {
     $translation_creation_route->addDefaults([RouteObjectInterface::CONTROLLER_NAME => static::CONTROLLER_SERVICE_NAME . ':createIndividualTranslation']);
     $translation_creation_route->setMethods(['POST']);
     // @todo Allow users with translation permissions and no edit permissions to
-    //   handle translations. See TODO.
+    //   handle translations. https://www.drupal.org/i/3483404
     $translation_creation_route->setRequirement('_entity_access', 'entity.update');
     $translation_creation_route->setRequirement('_csrf_request_header_token', 'TRUE');
     $routes->add(static::getRouteName($resource_type, 'individual.translation.post'), $translation_creation_route);
