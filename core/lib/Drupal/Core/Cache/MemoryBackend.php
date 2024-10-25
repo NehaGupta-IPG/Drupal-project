@@ -99,7 +99,7 @@ class MemoryBackend implements CacheBackendInterface, CacheTagsInvalidatorInterf
     $prepared->data = unserialize($prepared->data);
 
     // Check expire time.
-    $prepared->valid = $prepared->expire == Cache::PERMANENT || $prepared->expire >= $this->time->getRequestTime();
+    $prepared->valid = $prepared->expire == Cache::PERMANENT || $prepared->expire >= $this->time->getCurrentTime();
 
     if (!$allow_invalid && !$prepared->valid) {
       return FALSE;
@@ -119,7 +119,7 @@ class MemoryBackend implements CacheBackendInterface, CacheTagsInvalidatorInterf
     $this->cache[$cid] = (object) [
       'cid' => $cid,
       'data' => serialize($data),
-      'created' => $this->time->getRequestTime(),
+      'created' => $this->time->getCurrentTime(),
       'expire' => $expire,
       'tags' => $tags,
     ];
@@ -158,11 +158,11 @@ class MemoryBackend implements CacheBackendInterface, CacheTagsInvalidatorInterf
   /**
    * {@inheritdoc}
    */
-  public function invalidate($cid) {
-    if (isset($this->cache[$cid])) {
-      $this->cache[$cid]->expire = $this->time->getRequestTime() - 1;
-    }
+public function invalidate($cid) {
+  if (isset($this->cache[$cid])) {
+    $this->cache[$cid]->expire = $this->time->getCurrentTime() - 1;
   }
+}
 
   /**
    * {@inheritdoc}
@@ -170,7 +170,7 @@ class MemoryBackend implements CacheBackendInterface, CacheTagsInvalidatorInterf
   public function invalidateMultiple(array $cids) {
     $items = array_intersect_key($this->cache, array_flip($cids));
     foreach ($items as $cid => $item) {
-      $this->cache[$cid]->expire = $this->time->getRequestTime() - 1;
+      $this->cache[$cid]->expire = $this->time->getCurrentTime() - 1;
     }
   }
 
@@ -180,7 +180,7 @@ class MemoryBackend implements CacheBackendInterface, CacheTagsInvalidatorInterf
   public function invalidateTags(array $tags) {
     foreach ($this->cache as $cid => $item) {
       if (array_intersect($tags, $item->tags)) {
-        $this->cache[$cid]->expire = $this->time->getRequestTime() - 1;
+        $this->cache[$cid]->expire = $this->time->getCurrentTime() - 1;
       }
     }
   }
