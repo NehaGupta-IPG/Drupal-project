@@ -158,11 +158,11 @@ class MemoryBackend implements CacheBackendInterface, CacheTagsInvalidatorInterf
   /**
    * {@inheritdoc}
    */
-public function invalidate($cid) {
-  if (isset($this->cache[$cid])) {
-    $this->cache[$cid]->expire = $this->time->getCurrentTime() - 1;
+  public function invalidate($cid) {
+    if (isset($this->cache[$cid])) {
+      $this->cache[$cid]->expire = $this->time->getCurrentTime() - 1;
+    }
   }
-}
 
   /**
    * {@inheritdoc}
