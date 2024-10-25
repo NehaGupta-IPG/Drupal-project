@@ -2,6 +2,7 @@ name: JSON:API Translation
 type: module
 description: Adds multilingual and translations support to the JSON:API module.
 package: Core (Experimental)
+lifecycle: experimental
 version: VERSION
 dependencies:
   - drupal:content_translation
