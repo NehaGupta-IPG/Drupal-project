@@ -20,20 +20,12 @@ use Symfony\Component\Routing\RouteCollection;
 final class RouteSubscriber extends RouteSubscriberBase {
 
   /**
-   * The JSON:API resource type repository.
-   *
-   * @var \Drupal\jsonapi\ResourceType\ResourceTypeRepositoryInterface
-   */
-  protected ResourceTypeRepositoryInterface $resourceTypeRepository;
-
-  /**
    * RouteSubscriber constructor.
    *
-   * @param \Drupal\jsonapi\ResourceType\ResourceTypeRepositoryInterface $resource_type_repository
+   * @param \Drupal\jsonapi\ResourceType\ResourceTypeRepositoryInterface $resourceTypeRepository
    *   The JSON:API resource type repository.
    */
-  public function __construct(ResourceTypeRepositoryInterface $resource_type_repository) {
-    $this->resourceTypeRepository = $resource_type_repository;
+  public function __construct(protected ResourceTypeRepositoryInterface $resourceTypeRepository) {
   }
 
   /**
