@@ -191,6 +191,19 @@ class DisplayTest extends UITestBase {
     $this->assertSession()->addressEquals('admin/structure/views/view/test_display/edit/block_2');
     $this->clickLink('Custom URL');
     $this->assertSession()->fieldValueEquals('link_url', 'a-custom-url');
+
+    // Test to verify that the link_url field accepts URLs
+    // with a length greater than 128 characters.
+    $this->drupalGet($link_display_path);
+    // Attempt to set a long URL exceeding the maximum length.
+    $long_url = str_repeat('a', 129);
+    $this->submitForm([
+      'link_display' => 'custom_url',
+      'link_url' => $long_url,
+    ], 'Apply');
+
+    // Ensure that specific error message does not appear in the page text.
+    $this->assertSession()->pageTextNotContains("Custom URL cannot be longer than 128 characters but is currently " . strlen($long_url) . " characters long.");
   }
 
   /**
