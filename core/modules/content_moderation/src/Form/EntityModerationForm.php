@@ -115,7 +115,6 @@ class EntityModerationForm extends FormBase implements WorkspaceSafeFormInterfac
       '#type' => 'select',
       '#title' => $this->t('Change to'),
       '#options' => $target_states,
-      '#required' => TRUE,
     ];
 
     $form['revision_log'] = [
