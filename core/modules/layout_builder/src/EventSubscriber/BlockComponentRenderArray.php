@@ -138,6 +138,9 @@ class BlockComponentRenderArray implements EventSubscriberInterface {
             if ($key < $offset || $key > $top_range) {
               $content[0][$key]['#access'] = FALSE;
             }
+            if ($event->inPreview() && $key < $total_items) {
+              $content[0][$key]['#prefix'] = '(Index: ' . $key . ') ';
+            }
           }
         }
       }
