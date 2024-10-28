@@ -415,7 +415,7 @@ class FieldBlock extends BlockBase implements ContextAwarePluginInterface, Conta
    *   The field cardinality or
    *   FieldStorageDefinitionInterface::CARDINALITY_UNLIMITED.
    */
-  public function getFieldCardinality() {
+  public function getFieldCardinality(): int {
     return $this->fieldDefinition->getFieldStorageDefinition()->getCardinality();
   }
 
