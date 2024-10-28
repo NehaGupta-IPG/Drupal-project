@@ -125,9 +125,14 @@ class BlockComponentRenderArray implements EventSubscriberInterface {
       // remove those field items from the render array.
       $block_configuration = $block->getConfiguration();
       if (!$is_content_empty && isset($block_configuration['display_items']) && $block_configuration['display_items'] == 'display_some') {
-        if ($items_to_display = (int) $block_configuration['items_to_display']) {
-          $offset = (int) $block_configuration['offset'];
-          $range = range(0, $content[0]['#items']->count());
+        $total_items = $content[0]['#items']->count();
+        $offset = (int) $block_configuration['offset'];
+        $items_to_display = (int) $block_configuration['items_to_display'] ?? $total_items - $offset;
+        if ($offset || $items_to_display) {
+          if (!$items_to_display) {
+            $items_to_display = $total_items;
+          }
+          $range = range(0, $total_items);
           foreach ($range as $key) {
             $top_range = $offset + $items_to_display - 1;
             if ($key < $offset || $key > $top_range) {
