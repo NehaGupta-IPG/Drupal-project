@@ -38,12 +38,16 @@ class StatusReport extends RenderElementBase {
     $grouped_requirements = [];
     /** @var array{title: \Drupal\Core\StringTranslation\TranslatableMarkup, value: mixed, description: \Drupal\Core\StringTranslation\TranslatableMarkup, severity: \Drupal\Core\Extension\Requirement\RequirementSeverity} $requirement */
     foreach ($element['#requirements'] as $key => $requirement) {
-      $severity = RequirementSeverity::Info;
       if (isset($requirement['severity'])) {
         $severity = $requirement['severity'] === RequirementSeverity::OK ? RequirementSeverity::Info : $requirement['severity'];
       }
-      elseif (defined('MAINTENANCE_MODE') && MAINTENANCE_MODE == 'install') {
-        $severity = RequirementSeverity::OK;
+      else {
+        if (defined('MAINTENANCE_MODE') && MAINTENANCE_MODE === 'install') {
+          $severity = RequirementSeverity::OK;
+        }
+        else {
+          $severity = RequirementSeverity::Info;
+        }
       }
 
       $grouped_requirements[$severity->status()]['title'] = $severity->title();
