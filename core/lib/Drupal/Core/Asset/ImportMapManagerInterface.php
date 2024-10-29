@@ -8,12 +8,12 @@ use Drupal\Core\Cache\CacheCollectorInterface;
 use Drupal\Core\DestructableInterface;
 
 /**
- * Defines an interface for import maps manager.
+ * Defines an interface for an import map manager.
  */
 interface ImportMapManagerInterface extends CacheCollectorInterface, DestructableInterface {
 
   /**
-   * Gets import maps for given theme.
+   * Gets all the import maps for given theme.
    *
    * @param string $theme
    *   Theme machine name.

@@ -29,6 +29,7 @@ use Symfony\Component\DependencyInjection\Attribute\Autowire;
  * root of your module. The file should contain a top level key 'imports'. Each
  * entry under 'imports' represents an entry in the import map.
  *
+ * Example:
  * @code
  * imports:
  *   my-library:
@@ -36,7 +37,6 @@ use Symfony\Component\DependencyInjection\Attribute\Autowire;
  *   another-library:
  *     path: js/dist/another-library.js
  * @endcode
- *
  * JavaScript code that wishes to consume your imports in an ES module.
  *
  * @code
@@ -44,10 +44,8 @@ use Symfony\Component\DependencyInjection\Attribute\Autowire;
  * import myLibrary from 'my-library';
  * @endcode
  *
- * If making use of a bundler to build the consuming code, you will need to
- * configure the build step to mark these imports as external. For example with
- * Vite.
- *
+ * To make use of a bundler to build the consuming code, you need to configure
+ * the build step to mark these imports as external. For example with Vite.
  * @code
  * const viteConfig = {
  *   // ...
@@ -58,13 +56,12 @@ use Symfony\Component\DependencyInjection\Attribute\Autowire;
  *   // ...
  * }
  * @endcode
- *
  * This will make sure that the naked import is retained in the built code.
  * Similar options exist for other front-end bundlers.
  *
  * Consuming code can make use of the attributes key in libraries.yml to set
  * type="module" on the script tag.
- *
+ * Example:
  * @code
  *   cards:
  *    css:
@@ -76,9 +73,9 @@ use Symfony\Component\DependencyInjection\Attribute\Autowire;
  *     js/dist/card.js: { minified: true, attributes: { type: module } }}
  * @endcode
  *
- * If you need to load two different versions of a module in an import map you
- * can also add a top-level 'scopes' key to the MODULE_NAME.importmaps.yml file
- *
+ * To load two different versions of a module in an import map add a top-level
+ * 'scopes' key to the MODULE_NAME.importmaps.yml file.
+ * Example:
  * @code
  *  imports:
  *    my-library:
@@ -88,19 +85,18 @@ use Symfony\Component\DependencyInjection\Attribute\Autowire;
  *      my-library:
  *       path: js/dist/my-library-v1.js
  * @endcode
- *
- * In this example, consuming code from inside js/v1 (relative to the module
- * declaring the importmaps.yml file) will resolve 'my-library' to
- * js/dist/my-library-v1.js. All other consuming code that imports from
- * 'my-library' will resolve to js/dist/my-library-v2.js.
+ * In this example, consuming code from the directory "js/v1" (relative to the
+ * module declaring the importmaps.yml file) will resolve my-library" to
+ * "js/dist/my-library-v1.js". All other consuming code that imports from
+ * "my-library" will resolve to "js/dist/my-library-v2.js".
  *
  * The MODULE_NAME.importmaps.yml file must contain at least one of the 'scopes'
  * and 'imports' top-level keys.
  *
  * @see https://developer.mozilla.org/en-US/docs/Web/HTML/Element/script/type/importmap
+ * @see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Modules
  * @see https://rollupjs.org/configuration-options/#external
  * @see https://webpack.js.org/configuration/externals/#externals
- * @see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Modules
  */
 final class ImportMapManager extends CacheCollector implements ImportMapManagerInterface {
 

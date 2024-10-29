@@ -9,7 +9,7 @@ use Drupal\Core\Url;
 /**
  * Tests importmap and scopes.
  *
- * @group importmaps
+ * @group Asset
  */
 final class ImportMapTest extends WebDriverTestBase {
 

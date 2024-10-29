@@ -15,7 +15,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
 /**
  * Tests ImportMapManager.
  *
- * @group importmaps
+ * @group Asset
  * @covers \Drupal\Core\Asset\ImportMapManager
  */
 final class ImportMapManagerTest extends KernelTestBase {
