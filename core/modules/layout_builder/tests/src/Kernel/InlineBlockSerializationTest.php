@@ -2,6 +2,7 @@
 
 namespace Drupal\Tests\layout_builder\Kernel;
 
+use Drupal\Component\Uuid\UuidInterface;
 use Drupal\Core\Entity\EntityStorageException;
 use Drupal\KernelTests\Core\Entity\EntityKernelTestBase;
 use Drupal\layout_builder\Entity\LayoutBuilderEntityViewDisplay;
@@ -66,7 +67,7 @@ class InlineBlockSerializationTest extends EntityKernelTestBase {
    */
   public function testCreationBlockWithSerializedData(): void {
     // Create inline block with serialized data not representing block entity.
-    $component = new SectionComponent($this->uuidGenerator->generate(), 'content', [
+    $component = new SectionComponent($this->container->get(UuidInterface::class)->generate(), 'content', [
       "id" => "inline_block:basic",
       "label" => "Test title",
       "label_display" => "visible",
@@ -94,7 +95,7 @@ class InlineBlockSerializationTest extends EntityKernelTestBase {
       $this->assertEquals('Call to a member function setNewRevision() on array', $t->getMessage());
     }
     // Create inline block with incorrect serialized data.
-    $component = new SectionComponent($this->uuidGenerator->generate(), 'content', [
+    $component = new SectionComponent($this->container->get(UuidInterface::class)->generate(), 'content', [
       "id" => "inline_block:basic",
       "label" => "Test title",
       "label_display" => "visible",
