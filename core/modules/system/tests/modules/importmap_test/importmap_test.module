@@ -10,8 +10,8 @@ declare(strict_types=1);
 /**
  * Implements hook_importmaps_alter().
  */
-function importmaps_test_importmaps_alter(array &$import_maps, string $extension): void {
-  if ($extension === 'importmaps_test_theme') {
+function importmap_test_importmaps_alter(array &$import_maps, string $extension): void {
+  if ($extension === 'importmap_test_theme') {
     $import_maps['imports']['foo'] = '/absolute/js/foo.js';
   }
 }
