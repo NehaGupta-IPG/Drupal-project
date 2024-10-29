@@ -280,8 +280,8 @@ final class ImportMapManager extends CacheCollector implements ImportMapManagerI
     $import_maps = \array_filter($import_maps);
 
     // Allow modules and themes to alter import maps.
-    $this->moduleHandler->alter('importmaps', $import_maps, $extension);
-    $this->themeManager->alter('importmaps', $import_maps, $extension);
+    $this->moduleHandler->alter('importmap', $import_maps, $extension);
+    $this->themeManager->alter('importmap', $import_maps, $extension);
 
     return $import_maps;
   }

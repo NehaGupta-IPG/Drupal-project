@@ -1414,7 +1414,7 @@ function hook_icon_pack_alter(array &$icon_packs): void {
  * @see https://developer.mozilla.org/en-US/docs/Web/HTML/Element/script/type/importmap
  * @see \Drupal\Core\Asset\ImportMapManagerInterface
  */
-function hook_importmaps_alter(array &$import_maps, string $extension): void {
+function hook_importmap_alter(array &$import_maps, string $extension): void {
   if ($extension !== 'react') {
     return;
   }

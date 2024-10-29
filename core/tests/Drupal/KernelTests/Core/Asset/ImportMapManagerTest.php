@@ -89,7 +89,7 @@ final class ImportMapManagerTest extends KernelTestBase {
     $theme_imports = NestedArray::mergeDeep($base_import_maps, [
       'imports' => [
         'baz' => "{$basePath}/$import_maps_test_theme_path/js/baz.js",
-        // @see \importmap_test_importmaps_alter()
+        // @see \importmap_test_importmap_alter()
         'foo' => "{$basePath}/absolute/js/foo.js",
       ],
       'scopes' => [
