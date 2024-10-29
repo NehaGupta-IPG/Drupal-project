@@ -37,7 +37,7 @@ final class ImportMapsManagerTest extends KernelTestBase {
     parent::setUp();
     $this->container->get('theme_installer')->install([
       'importmaps_test_theme',
-      'importmaps_test_basetheme',
+      'importmaps_test_base_theme',
     ]);
     /** @var \Drupal\Core\Theme\ThemeInitializationInterface $theme_initializer */
     $theme_initializer = $this->container->get(ThemeInitializationInterface::class);
@@ -58,13 +58,13 @@ final class ImportMapsManagerTest extends KernelTestBase {
     $import_maps_test_imports_only_path = $extension_path_resolver->getPath('module', 'importmaps_test_imports_only');
     $import_maps_test_scopes_only_path = $extension_path_resolver->getPath('module', 'importmaps_test_scopes_only');
     $import_maps_test_theme_path = $extension_path_resolver->getPath('theme', 'importmaps_test_theme');
-    $import_maps_test_basetheme_path = $extension_path_resolver->getPath('theme', 'importmaps_test_basetheme');
+    $import_maps_test_base_theme_path = $extension_path_resolver->getPath('theme', 'importmaps_test_base_theme');
 
     $basePath = $this->container->get(RequestStack::class)->getCurrentRequest()->getBasePath();
 
     $base_import_maps = [
       'imports' => [
-        'wow' => "{$basePath}/$import_maps_test_basetheme_path/js/wow.js",
+        'wow' => "{$basePath}/$import_maps_test_base_theme_path/js/wow.js",
         'absolute' => "{$basePath}/dist/absolute.js",
         'url' => "https://example.com/url.js",
         'bar' => "{$basePath}/$import_maps_test_path/js/bar.js",
@@ -83,7 +83,7 @@ final class ImportMapsManagerTest extends KernelTestBase {
       ],
     ];
 
-    $import_maps = $manager->getImportMapForTheme('importmaps_test_basetheme');
+    $import_maps = $manager->getImportMapForTheme('importmaps_test_base_theme');
     self::assertEquals($base_import_maps, $import_maps);
 
     $theme_imports = NestedArray::mergeDeep($base_import_maps, [

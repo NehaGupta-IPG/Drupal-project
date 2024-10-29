@@ -2,4 +2,4 @@ name: Import maps test theme
 description: ''
 type: theme
 version: VERSION
-base theme: importmaps_test_basetheme
+base theme: importmaps_test_base_theme
