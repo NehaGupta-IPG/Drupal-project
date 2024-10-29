@@ -97,6 +97,8 @@ use Symfony\Component\DependencyInjection\Attribute\Autowire;
  * @see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Modules
  * @see https://rollupjs.org/configuration-options/#external
  * @see https://webpack.js.org/configuration/externals/#externals
+ *
+ * @phpstan-type ImportMap array{'imports': array<string, string>, 'scopes': array<string, array<string, string>|null}
  */
 final class ImportMapManager extends CacheCollector implements ImportMapManagerInterface {
 
@@ -157,7 +159,7 @@ final class ImportMapManager extends CacheCollector implements ImportMapManagerI
    * @param string $key
    *   Either self::MODULE_IMPORT_MAPS or a theme machine name.
    *
-   * @return array
+   * @return ImportMap
    *   Built import maps, with any paths resolved.
    */
   protected function buildImportMap(string $key): array {
@@ -213,7 +215,7 @@ final class ImportMapManager extends CacheCollector implements ImportMapManagerI
    * @param string $directory
    *   Directory of the extension.
    *
-   * @return array
+   * @return ImportMap
    *   Import maps.
    *
    * @see \Drupal\Core\Asset\ImportMapManagerInterface::getImportMapForTheme()
