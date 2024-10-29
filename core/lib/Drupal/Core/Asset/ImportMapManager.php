@@ -102,7 +102,7 @@ use Symfony\Component\DependencyInjection\Attribute\Autowire;
  * @see https://webpack.js.org/configuration/externals/#externals
  * @see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Modules
  */
-final class ImportMapsManager extends CacheCollector implements ImportMapsManagerInterface {
+final class ImportMapManager extends CacheCollector implements ImportMapManagerInterface {
 
   protected const MODULE_IMPORT_MAPS = '__modules';
 
@@ -114,7 +114,7 @@ final class ImportMapsManager extends CacheCollector implements ImportMapsManage
   protected readonly FileCacheInterface $fileCache;
 
   /**
-   * Constructs an ImportMapsManager object.
+   * Constructs an ImportMapManager object.
    */
   public function __construct(
     #[Autowire('@cache.discovery')]
@@ -140,7 +140,7 @@ final class ImportMapsManager extends CacheCollector implements ImportMapsManage
    * {@inheritdoc}
    */
   protected function resolveCacheMiss($key): array {
-    $this->storage[$key] = $this->buildImportMaps($key);
+    $this->storage[$key] = $this->buildImportMap($key);
     $this->persist($key);
 
     return $this->storage[$key];
@@ -164,12 +164,12 @@ final class ImportMapsManager extends CacheCollector implements ImportMapsManage
    * @return array
    *   Built import maps, with any paths resolved.
    */
-  protected function buildImportMaps(string $key): array {
+  protected function buildImportMap(string $key): array {
     $import_maps = [];
     if ($key === self::MODULE_IMPORT_MAPS) {
       // We need to build for modules.
       foreach ($this->moduleHandler->getModuleList() as $extension => $info) {
-        $import_maps = NestedArray::mergeDeep($import_maps, $this->buildImportMapsForExtensionNameAndPath($extension, $info->getPath()));
+        $import_maps = NestedArray::mergeDeep($import_maps, $this->buildImportMapForExtensionNameAndPath($extension, $info->getPath()));
       }
       return $import_maps;
     }
@@ -181,7 +181,7 @@ final class ImportMapsManager extends CacheCollector implements ImportMapsManage
     catch (UnknownExtensionException) {
       return $import_maps;
     }
-    $import_maps = NestedArray::mergeDeep($base_theme_import_maps, $this->buildImportMapsForExtensionNameAndPath($key, $theme->getPath()));
+    $import_maps = NestedArray::mergeDeep($base_theme_import_maps, $this->buildImportMapForExtensionNameAndPath($key, $theme->getPath()));
     return $import_maps;
   }
 
@@ -220,9 +220,9 @@ final class ImportMapsManager extends CacheCollector implements ImportMapsManage
    * @return array
    *   Import maps.
    *
-   * @see \Drupal\Core\Asset\ImportMapsManagerInterface::getImportMapForTheme()
+   * @see \Drupal\Core\Asset\ImportMapManagerInterface::getImportMapForTheme()
    */
-  protected function buildImportMapsForExtensionNameAndPath(string $extension, string $directory): array {
+  protected function buildImportMapForExtensionNameAndPath(string $extension, string $directory): array {
     $import_maps_file = $this->rootPath . '/' . $directory . '/' . $extension . '.importmaps.yml';
     if (!\file_exists($import_maps_file)) {
       return [];

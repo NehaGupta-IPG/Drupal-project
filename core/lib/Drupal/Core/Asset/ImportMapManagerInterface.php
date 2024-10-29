@@ -10,7 +10,7 @@ use Drupal\Core\DestructableInterface;
 /**
  * Defines an interface for import maps manager.
  */
-interface ImportMapsManagerInterface extends CacheCollectorInterface, DestructableInterface {
+interface ImportMapManagerInterface extends CacheCollectorInterface, DestructableInterface {
 
   /**
    * Gets import maps for given theme.

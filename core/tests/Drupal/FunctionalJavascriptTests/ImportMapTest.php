@@ -11,7 +11,7 @@ use Drupal\Core\Url;
  *
  * @group importmaps
  */
-final class ImportMapsTest extends WebDriverTestBase {
+final class ImportMapTest extends WebDriverTestBase {
 
   /**
    * {@inheritdoc}
@@ -26,7 +26,7 @@ final class ImportMapsTest extends WebDriverTestBase {
   /**
    * Tests importmap functionality.
    */
-  public function testImportMaps(): void {
+  public function testImportMap(): void {
     $url = Url::fromRoute('importmaps_test.test');
     $this->drupalGet($url);
     $this->assertSession()->elementExists('css', '#importmaps-test');

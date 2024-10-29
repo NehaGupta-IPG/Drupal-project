@@ -3,7 +3,7 @@
 namespace Drupal\system\Hook;
 
 use Drupal\Component\Serialization\Json;
-use Drupal\Core\Asset\ImportMapsManagerInterface;
+use Drupal\Core\Asset\ImportMapManagerInterface;
 use Drupal\Core\StreamWrapper\StreamWrapperManager;
 use Drupal\Core\StreamWrapper\LocalStream;
 use Drupal\Core\Site\Settings;
@@ -451,7 +451,7 @@ class SystemHooks {
         }
       }
     }
-    $map = \Drupal::service(ImportMapsManagerInterface::class)->getImportMapForTheme(\Drupal::theme()->getActiveTheme()->getName());
+    $map = \Drupal::service(ImportMapManagerInterface::class)->getImportMapForTheme(\Drupal::theme()->getActiveTheme()->getName());
     if (\array_key_exists('imports', $map) && \count($map['imports']) > 0) {
       $page_top['importmaps'] = [
         '#type' => 'html_tag',

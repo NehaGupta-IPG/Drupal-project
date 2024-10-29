@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Drupal\KernelTests\Core\Asset;
 
 use Drupal\Component\Utility\NestedArray;
-use Drupal\Core\Asset\ImportMapsManagerInterface;
+use Drupal\Core\Asset\ImportMapManagerInterface;
 use Drupal\Core\Extension\ExtensionPathResolver;
 use Drupal\Core\Theme\ThemeInitializationInterface;
 use Drupal\Core\Theme\ThemeManagerInterface;
@@ -13,12 +13,12 @@ use Drupal\KernelTests\KernelTestBase;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
- * Tests ImportMapsManager.
+ * Tests ImportMapManager.
  *
  * @group importmaps
- * @covers \Drupal\Core\Asset\ImportMapsManager
+ * @covers \Drupal\Core\Asset\ImportMapManager
  */
-final class ImportMapsManagerTest extends KernelTestBase {
+final class ImportMapManagerTest extends KernelTestBase {
 
   /**
    * {@inheritdoc}
@@ -50,8 +50,8 @@ final class ImportMapsManagerTest extends KernelTestBase {
    * Tests import map discovery.
    */
   public function testImportDiscovery(): void {
-    /** @var \Drupal\Core\Asset\ImportMapsManagerInterface $manager */
-    $manager = $this->container->get(ImportMapsManagerInterface::class);
+    /** @var \Drupal\Core\Asset\ImportMapManagerInterface $manager */
+    $manager = $this->container->get(ImportMapManagerInterface::class);
 
     $extension_path_resolver = $this->container->get(ExtensionPathResolver::class);
     $import_maps_test_path = $extension_path_resolver->getPath('module', 'importmaps_test');
