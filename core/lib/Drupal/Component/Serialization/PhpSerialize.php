@@ -21,7 +21,7 @@ class PhpSerialize implements ObjectAwareSerializationInterface {
    */
   public static function decode($raw) {
     // Suppress warnings and errors from unserialize.
-    $decoded = @unserialize($raw, ['allowed_classes' => FALSE]);
+    $decoded = @unserialize($raw, ['allowed_classes' => TRUE]);
 
     // Check if unserialize returned FALSE.
     if ($decoded === FALSE && $raw !== 'b:0;') {
