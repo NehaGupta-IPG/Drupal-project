@@ -25,7 +25,7 @@ use Symfony\Component\DependencyInjection\Attribute\Autowire;
 /**
  * Defines a plugin manager for import maps.
  *
- * To declare an import map, add a file named MODULE_NAME.importmaps.yml to the
+ * To declare an import map, add a file named MODULE_NAME.importmap.yml to the
  * root of your module. The file should contain a top level key 'imports'. Each
  * entry under 'imports' represents an entry in the import map.
  *
@@ -74,7 +74,7 @@ use Symfony\Component\DependencyInjection\Attribute\Autowire;
  * @endcode
  *
  * To load two different versions of a module in an import map add a top-level
- * 'scopes' key to the MODULE_NAME.importmaps.yml file.
+ * 'scopes' key to the MODULE_NAME.importmap.yml file.
  * Example:
  * @code
  *  imports:
@@ -86,11 +86,11 @@ use Symfony\Component\DependencyInjection\Attribute\Autowire;
  *       path: js/dist/my-library-v1.js
  * @endcode
  * In this example, consuming code from the directory "js/v1" (relative to the
- * module declaring the importmaps.yml file) will resolve my-library" to
+ * module declaring the importmap.yml file) will resolve my-library" to
  * "js/dist/my-library-v1.js". All other consuming code that imports from
  * "my-library" will resolve to "js/dist/my-library-v2.js".
  *
- * The MODULE_NAME.importmaps.yml file must contain at least one of the 'scopes'
+ * The MODULE_NAME.importmap.yml file must contain at least one of the 'scopes'
  * and 'imports' top-level keys.
  *
  * @see https://developer.mozilla.org/en-US/docs/Web/HTML/Element/script/type/importmap
@@ -128,8 +128,8 @@ final class ImportMapManager extends CacheCollector implements ImportMapManagerI
     protected readonly FileUrlGeneratorInterface $fileUrlGenerator,
     protected readonly ThemeManagerInterface $themeManager,
   ) {
-    parent::__construct('importmaps', $cache, $lock, ['importmaps']);
-    $this->fileCache = FileCacheFactory::get('importmaps');
+    parent::__construct('importmap', $cache, $lock, ['importmap']);
+    $this->fileCache = FileCacheFactory::get('importmap');
   }
 
   /**
@@ -219,7 +219,7 @@ final class ImportMapManager extends CacheCollector implements ImportMapManagerI
    * @see \Drupal\Core\Asset\ImportMapManagerInterface::getImportMapForTheme()
    */
   protected function buildImportMapForExtensionNameAndPath(string $extension, string $directory): array {
-    $import_maps_file = $this->rootPath . '/' . $directory . '/' . $extension . '.importmaps.yml';
+    $import_maps_file = $this->rootPath . '/' . $directory . '/' . $extension . '.importmap.yml';
     if (!\file_exists($import_maps_file)) {
       return [];
     }

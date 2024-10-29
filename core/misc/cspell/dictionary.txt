@@ -225,7 +225,6 @@ iframeupload
 imageavif
 imagecache
 importmap
-importmaps
 indexname
 inglés
 inited

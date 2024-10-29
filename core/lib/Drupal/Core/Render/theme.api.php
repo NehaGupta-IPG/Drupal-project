@@ -1388,12 +1388,12 @@ function hook_icon_pack_alter(array &$icon_packs): void {
 }
 
 /**
- * Alter importmaps.
+ * Alter any importmap.
  *
- * Allows modules and themes to change importmaps.
+ * Allows modules and themes to change any importmap.
  *
  * @param array $import_maps
- *   Array of importmaps information. Will contain two top level keys 'imports'
+ *   Array of importmap information. Will contain two top level keys 'imports'
  *   and 'scopes'. Entries under 'imports' is a resolved URL to the file to
  *   import and are keyed by the import names. Each entry under 'scopes' has
  *   the same shape as 'imports' i.e. an array keyed by import identifiers with

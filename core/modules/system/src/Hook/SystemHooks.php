@@ -453,7 +453,7 @@ class SystemHooks {
     }
     $map = \Drupal::service(ImportMapManagerInterface::class)->getImportMapForTheme(\Drupal::theme()->getActiveTheme()->getName());
     if (\array_key_exists('imports', $map) && \count($map['imports']) > 0) {
-      $page_top['importmaps'] = [
+      $page_top['importmap'] = [
         '#type' => 'html_tag',
         '#tag' => 'script',
         '#value' => Json::encode($map),
