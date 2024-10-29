@@ -66,7 +66,7 @@ class InlineBlockSerializationTest extends EntityKernelTestBase {
    */
   public function testCreationBlockWithSerializedData(): void {
     // Create inline block with serialized data not representing block entity.
-    $component = new SectionComponent('17901944-a4b6-11ee-a506-0242ac120002', 'content', [
+    $component = new SectionComponent($this->uuidGenerator->generate(), 'content', [
       "id" => "inline_block:basic",
       "label" => "Test title",
       "label_display" => "visible",
@@ -94,7 +94,7 @@ class InlineBlockSerializationTest extends EntityKernelTestBase {
       $this->assertEquals('Call to a member function setNewRevision() on array', $t->getMessage());
     }
     // Create inline block with incorrect serialized data.
-    $component = new SectionComponent('17901944-a4b6-11ee-a506-0242ac120003', 'content', [
+    $component = new SectionComponent($this->uuidGenerator->generate(), 'content', [
       "id" => "inline_block:basic",
       "label" => "Test title",
       "label_display" => "visible",
