@@ -116,7 +116,7 @@ class ProviderRepository implements ProviderRepositoryInterface {
 
     $providers = NULL;
     try {
-      $providers = Json::decode((string)$response->getBody());
+      $providers = Json::decode((string) $response->getBody());
     }
     catch (InvalidDataTypeException) {
       // Ignore Json::decode() failure and allow later validation logic to

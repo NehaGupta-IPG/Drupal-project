@@ -18,7 +18,7 @@ class PhpSerializeTest extends TestCase {
   /**
    * Tests basic PHP serialization and deserialization.
    */
-  public function testPhpSerialization() {
+  public function testPhpSerialization(): void {
     $data = ['name' => 'Bob', 'age' => 25];
     $encoded = PhpSerialize::encode($data);
     $decoded = PhpSerialize::decode($encoded);
@@ -31,7 +31,7 @@ class PhpSerializeTest extends TestCase {
    *
    * @throws \Drupal\Component\Serialization\Exception\InvalidDataTypeException
    */
-  public function testInvalidPhpUnserialization() {
+  public function testInvalidPhpUnserialization(): void {
     $invalidSerializedData = 'O:8:"stdClass":1:{s:4:"name";s:3:"Bob";';
 
     $this->expectException(InvalidDataTypeException::class);
@@ -41,7 +41,7 @@ class PhpSerializeTest extends TestCase {
   /**
    * Tests deserialization of serialized boolean FALSE.
    */
-  public function testSerializedFalse() {
+  public function testSerializedFalse(): void {
     $data = serialize(FALSE);
 
     $decoded = PhpSerialize::decode($data);

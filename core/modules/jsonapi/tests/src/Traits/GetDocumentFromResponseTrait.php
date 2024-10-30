@@ -34,7 +34,7 @@ trait GetDocumentFromResponseTrait {
     // Tests calling getDocumentFormResponse() anticipate NULL on error.
     $document = NULL;
     try {
-      $document = Json::decode((string)$response->getBody());
+      $document = Json::decode((string) $response->getBody());
     }
     catch (InvalidDataTypeException) {
       if ($validate) {

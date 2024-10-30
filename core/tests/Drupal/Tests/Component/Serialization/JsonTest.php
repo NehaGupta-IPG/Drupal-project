@@ -123,7 +123,7 @@ class JsonTest extends TestCase {
   /**
    * Tests basic JSON encoding and decoding.
    */
-  public function testJsonEncodingDecoding() {
+  public function testJsonEncodingDecoding(): void {
     $data = ['name' => 'Alice', 'age' => 30];
     $encoded = Json::encode($data);
     $decoded = Json::decode($encoded);
@@ -136,7 +136,7 @@ class JsonTest extends TestCase {
    *
    * @throws \Drupal\Component\Serialization\Exception\InvalidDataTypeException
    */
-  public function testInvalidJsonDecoding() {
+  public function testInvalidJsonDecoding(): void {
     $invalidJson = 'Invalid JSON String';
 
     $this->expectException(InvalidDataTypeException::class);
@@ -148,7 +148,7 @@ class JsonTest extends TestCase {
    *
    * @throws \Drupal\Component\Serialization\Exception\InvalidDataTypeException
    */
-  public function testJsonEncodingFailure() {
+  public function testJsonEncodingFailure(): void {
     $data = [];
     $data['self'] = &$data;
 
