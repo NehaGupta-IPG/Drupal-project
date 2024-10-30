@@ -57,8 +57,8 @@ class ResourceFetcher implements ResourceFetcherInterface {
       try {
         $data = Json::decode($content);
       }
-      catch (InvalidDataTypeException) {
-        throw new ResourceException('Error decoding oEmbed resource: ' . json_last_error_msg(), $url);
+      catch (InvalidDataTypeException $e) {
+        throw new ResourceException('Error decoding oEmbed resource: ' . $e->getMessage(), $url);
       }
     }
     if (empty($data) || !is_array($data)) {

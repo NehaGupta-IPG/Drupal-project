@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\jsonapi\Traits;
 
+use Drupal\Component\Serialization\Exception\InvalidDataTypeException;
 use Drupal\Component\Serialization\Json;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ResponseInterface;
@@ -30,7 +31,16 @@ trait GetDocumentFromResponseTrait {
   protected function getDocumentFromResponse(ResponseInterface $response, bool $validate = TRUE): ?array {
     assert($this instanceof TestCase);
 
-    $document = Json::decode((string) $response->getBody());
+    // Tests calling getDocumentFormResponse() anticipate NULL on error.
+    $document = NULL;
+    try {
+      $document = Json::decode((string)$response->getBody());
+    }
+    catch (InvalidDataTypeException) {
+      if ($validate) {
+        $this->fail('Response did not contain a well-formatted JSON string');
+      }
+    }
 
     if (isset($document['data']) && isset($document['errors'])) {
       $this->fail('Document contains both data and errors members; only one is allowed.');
