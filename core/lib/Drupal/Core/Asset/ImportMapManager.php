@@ -91,7 +91,7 @@ use Symfony\Component\DependencyInjection\Attribute\Autowire;
  * "my-library" will resolve to "js/dist/my-library-v2.js".
  *
  * The MODULE_NAME.importmap.yml file must contain at least one of the 'scopes'
- * and 'imports' top-level keys.
+ * or 'imports' top-level keys.
  *
  * @see https://developer.mozilla.org/en-US/docs/Web/HTML/Element/script/type/importmap
  * @see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Modules
