@@ -458,8 +458,8 @@ class SystemHooks {
         '#tag' => 'script',
         '#value' => Json::encode($map),
         '#attributes' => ['type' => 'importmap'],
-        // This varies by route because of the active theme resolution.
-        '#cache' => ['contexts' => ['route']],
+        // This varies by theme because of the active theme resolution.
+        '#cache' => ['contexts' => ['theme']],
       ];
     }
   }
