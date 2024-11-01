@@ -117,7 +117,7 @@ function system_update_12002(): void {
 /**
  * Update TimestampItem field schema size to support dates greater than 2038.
  */
-function system_update_12003(&$sandbox) {
+function system_update_12003(&$sandbox): string|null {
   // Execute only if allowed setting, 'timestamp_field_update_y2038', is true.
   if (Settings::get('timestamp_field_update_y2038', TRUE) === FALSE) {
     return t("Update '11001 - Update TimestampItem field schema size to support dates greater than 2038' skipped due to setting of 'timestamp_field_update_y2038' in settings.php");
@@ -145,6 +145,7 @@ function system_update_12003(&$sandbox) {
   $sandbox['current']++;
 
   $sandbox['#finished'] = empty($sandbox['max']) ? 1 : ($sandbox['current'] / $sandbox['max']);
+  return NULL;
 }
 
 /**
