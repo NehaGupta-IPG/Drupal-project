@@ -7,7 +7,6 @@ namespace Drupal\search\Form;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\Core\Messenger\MessengerInterface;
 use Drupal\Core\Url;
 use Drupal\search\Entity\SearchPage;
 use Drupal\search\SearchIndexInterface;
@@ -23,43 +22,21 @@ final class IndexSettingsForm extends FormBase {
    *
    * @var \Drupal\search\SearchPageInterface[]
    */
-  protected $entities = [];
-
-  /**
-   * The search index.
-   *
-   * @var \Drupal\search\SearchIndexInterface
-   */
-  protected $searchIndex;
-
-  /**
-   * The messenger.
-   *
-   * @var \Drupal\Core\Messenger\MessengerInterface
-   */
-  protected $messenger;
-
-  /**
-   * Module handler.
-   *
-   * @var \Drupal\Core\Extension\ModuleHandlerInterface
-   */
-  protected $moduleHandler;
+  protected array $entities = [];
 
   /**
    * Constructs a new SearchPageListBuilder object.
    *
    * @param \Drupal\Core\Messenger\MessengerInterface $messenger
    *   The messenger.
-   * @param \Drupal\search\SearchIndexInterface $search_index
+   * @param \Drupal\search\SearchIndexInterface $searchIndex
    *   The search index.
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
+   * @param \Drupal\Core\Extension\ModuleHandlerInterface $moduleHandler
    *   The module handler.
    */
-  public function __construct(MessengerInterface $messenger, SearchIndexInterface $search_index, ModuleHandlerInterface $module_handler) {
-    $this->messenger = $messenger;
-    $this->searchIndex = $search_index;
-    $this->moduleHandler = $module_handler;
+  public function __construct(
+    protected SearchIndexInterface   $searchIndex,
+    protected ModuleHandlerInterface $moduleHandler) {
     $this->entities = SearchPage::loadMultiple();
   }
 
@@ -68,7 +45,6 @@ final class IndexSettingsForm extends FormBase {
    */
   public static function create(ContainerInterface $container): IndexSettingsForm {
     return new static(
-      $container->get('messenger'),
       $container->get('search.index'),
       $container->get('module_handler')
     );
@@ -178,22 +154,6 @@ final class IndexSettingsForm extends FormBase {
     ];
 
     return $form;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function validateForm(array &$form, FormStateInterface $form_state): void {
-    // @todo Validate the form here.
-    // Example:
-    // @code
-    //   if (mb_strlen($form_state->getValue('message')) < 10) {
-    //     $form_state->setErrorByName(
-    //       'message',
-    //       $this->t('Message should be at least 10 characters.'),
-    //     );
-    //   }
-    // @endcode
   }
 
   /**
