@@ -109,7 +109,7 @@ class VocabularyAdminPerformanceTest extends PerformanceTestBase {
    * @param string $term_name
    *   Term to find.
    */
-  protected function assertTermInVocabularyAdminPage(string $term_name = 'Baked') {
+  protected function assertTermInVocabularyAdminPage(string $term_name = 'Baked'): void {
     $this->assertSession()->elementTextContains('xpath', '//table[@id="taxonomy"]', $term_name);
   }
 
