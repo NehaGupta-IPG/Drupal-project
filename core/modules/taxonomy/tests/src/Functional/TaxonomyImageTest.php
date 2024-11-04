@@ -72,7 +72,7 @@ class TaxonomyImageTest extends TaxonomyTestBase {
    * Tests that a file can be uploaded before the taxonomy term has a name.
    */
   public function testTaxonomyImageUpload(): void {
-    $user = $this->drupalCreateUser(['administer taxonomy']);
+    $user = $this->drupalCreateUser(['administer taxonomy', 'access content']);
     $this->drupalLogin($user);
 
     $files = $this->drupalGetTestFiles('image');
