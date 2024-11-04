@@ -211,6 +211,16 @@ class UrlHelper {
       // If there is a query string, transform it into keyed query parameters.
       if (isset($parts[1])) {
         parse_str($parts[1], $options['query']);
+
+        // Since parse_str() does not distinguish between '?key' and '?key=',
+        // feeding the url '/?key' through ::parse() and ::buildQuery()
+        // incorrectly appends a '=' to the end. Replacing empty string values
+        // with NULL should solve that problem.
+        foreach ($options['query'] as $key => &$value) {
+          if ($value === '' && strpos($parts[1], $key . '=') === FALSE) {
+            $value = NULL;
+          }
+        }
       }
     }
     // Internal URLs.
