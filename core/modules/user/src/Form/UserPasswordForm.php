@@ -194,8 +194,8 @@ class UserPasswordForm extends FormBase implements WorkspaceSafeFormInterface {
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {
     $account = $form_state->getValue('account');
-    if ($account) {
-      // Mail one time login URL and instructions using current language.
+    if ($account && !empty($account->get('mail')->value)) {
+      // Mail one time login URL and instructions using current language if email exists.
       $mail = _user_mail_notify('password_reset', $account);
       if (!empty($mail)) {
         $this->logger('user')
