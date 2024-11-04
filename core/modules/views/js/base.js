@@ -23,6 +23,8 @@
     if (query.includes('?')) {
       query = query.substring(query.indexOf('?') + 1);
     }
+    } else {
+      return {};
     let pair;
     const pairs = query.split('&');
     for (let i = 0; i < pairs.length; i++) {
