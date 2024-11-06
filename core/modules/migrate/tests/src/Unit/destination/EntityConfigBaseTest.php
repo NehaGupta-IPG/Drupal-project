@@ -119,7 +119,7 @@ class EntityConfigBaseTest extends UnitTestCase {
   }
 
   /**
-   * Tests the initial and subsequent import of a config entity.
+   * Tests the initial and update imports of a config entity.
    *
    * @covers ::import
    */
@@ -132,7 +132,7 @@ class EntityConfigBaseTest extends UnitTestCase {
     // Ensure that the source and destination IDs are the same.
     $this->assertEquals(array_values($this->row->getSourceIdValues()), $initial_destination_ids);
 
-    // Test a subsequent import.
+    // Test an update.
     // Initialize a preexisting configuration entity.
     $preexisting_config = $this->getMockForAbstractClass(
       ConfigEntityBase::class,
@@ -153,12 +153,12 @@ class EntityConfigBaseTest extends UnitTestCase {
       ->willReturn($preexisting_config);
 
     $this->row->setDestinationProperty('test_property', 'updated value');
-    $subsequent_destination_ids = $this->plugin->import(
+    $update_destination_ids = $this->plugin->import(
       $this->row,
       $destination_ids
     );
 
-    $this->assertEquals(array_values($this->row->getSourceIdValues()), $subsequent_destination_ids);
+    $this->assertEquals(array_values($this->row->getSourceIdValues()), $update_destination_ids);
     // Ensure the property was updated.
     $this->assertEquals('updated value', $preexisting_config->get('test_property'));
   }

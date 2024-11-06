@@ -330,9 +330,7 @@ class EntityConfigBase extends Entity {
    */
   protected function getEntityId(Row $row) {
     $destination_id_key = $this->getKey('id');
-    $destination_id = $row->hasDestinationProperty($destination_id_key)
-      ? $row->getDestinationProperty($this->getKey('id'))
-      : NULL;
+    $destination_id = $row->getDestinationProperty($destination_id_key);
 
     if (!empty($destination_id)) {
       return $destination_id;
