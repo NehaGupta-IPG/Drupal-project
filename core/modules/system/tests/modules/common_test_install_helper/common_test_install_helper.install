@@ -10,7 +10,7 @@ declare(strict_types=1);
 /**
  * Implements hook_install().
  */
-function common_test_install_helper_install() {
+function common_test_install_helper_install(): void {
   // Throw an exception here to simulate a fault.
   throw new Exception('Bad code!');
 }
