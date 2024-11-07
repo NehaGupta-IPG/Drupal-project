@@ -373,8 +373,10 @@ class MigrateSqlIdMapTest extends MigrateTestCase {
     $row = [
       'sourceid1' => 'source_id_value_3',
       'sourceid2' => 'source_id_value_4',
-      'source_ids_hash' => $this->getIdMap()
-        ->getSourceIdsHash(['source_id_property' => 'source_id_value_3', 'sourceid2' => 'source_id_value_4']),
+      'source_ids_hash' => $this->getIdMap()->getSourceIdsHash([
+        'source_id_property' => 'source_id_value_3',
+        'sourceid2' => 'source_id_value_4',
+      ]),
       'destid1' => 'destination_id_value_2',
     ] + $this->idMapDefaults();
     $this->saveMap($row);
@@ -534,6 +536,11 @@ class MigrateSqlIdMapTest extends MigrateTestCase {
     // Lookup by partial associative list.
     $this->assertEquals([[101, 'en'], [101, 'fr'], [101, 'de']], $id_map->lookupDestinationIds(['nid' => 1]));
     $this->assertEquals([[102, 'en']], $id_map->lookupDestinationIds(['nid' => 2]));
+    $this->assertEquals([], $id_map->lookupDestinationIds(['nid' => 99]));
+    $this->assertEquals([[101, 'en'], [101, 'fr'], [101, 'de']], $id_map->lookupDestinationIds([
+      'nid' => 1,
+      'language' => NULL,
+    ]));
     $this->assertEquals([[102, 'en']], $id_map->lookupDestinationIds(['nid' => 2, 'language' => NULL]));
     $this->assertEquals([], $id_map->lookupDestinationIds(['nid' => 99]));
     $this->assertEquals(
@@ -1100,7 +1107,7 @@ class MigrateSqlIdMapTest extends MigrateTestCase {
   /**
    * Provides data for testMapTableCreation.
    */
-  public function providerTestMapTableCreation() {
+  public static function providerTestMapTableCreation(): array {
     return [
       'short_name' => [
         'sql_idmap_test',

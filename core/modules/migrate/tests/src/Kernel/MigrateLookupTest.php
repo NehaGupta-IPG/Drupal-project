@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\migrate\Kernel;
 
-use Drupal\migrate\MigrateException;
 use Drupal\Tests\node\Traits\ContentTypeCreationTrait;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
+use Drupal\migrate\MigrateException;
 
 /**
  * Tests the Migrate Lookup service.

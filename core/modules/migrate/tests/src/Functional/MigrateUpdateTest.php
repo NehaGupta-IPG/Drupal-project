@@ -19,14 +19,17 @@ class MigrateUpdateTest extends UpdatePathTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function setDatabaseDumpFiles() {
+  protected function setDatabaseDumpFiles(): void {
     $this->databaseDumpFiles = [
       __DIR__ . '/../../../../system/tests/fixtures/update/drupal-8.8.0.bare.standard.php.gz',
       __DIR__ . '/../../fixtures/drupal-9-update-9201.php',
     ];
   }
 
-  public function testUpdateTableNames() {
+  /**
+   * Test upgrade path for table names.
+   */
+  public function testUpdateTableNames(): void {
     $this->runUpdates();
 
     // Confirm the updated tables names exist.
