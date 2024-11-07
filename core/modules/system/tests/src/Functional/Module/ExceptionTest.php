@@ -30,7 +30,7 @@ class ExceptionTest extends ModuleTestBase {
    *
    * It expects exceptions to pass through and for them to be logged.
    */
-  public function testInstallException() {
+  public function testInstallException(): void {
     // Check that dblog module is installed.
     $this->assertModules(['dblog'], TRUE);
     // Record total watchdog messages.
