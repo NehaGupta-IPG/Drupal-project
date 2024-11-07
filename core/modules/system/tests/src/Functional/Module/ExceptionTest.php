@@ -42,7 +42,7 @@ class ExceptionTest extends ModuleTestBase {
       // If we get here, no exceptions were caught.
       $this->fail('An exception was not thrown');
     }
-    catch (\Exception $e) {
+    catch (\Exception) {
       // Expected exception; just continue testing.
     }
 
