@@ -2,6 +2,8 @@
 
 namespace Drupal\migrate;
 
+use Drupal\Core\Database\Connection;
+
 /**
  * Helper for migrate update hook.
  */
@@ -12,7 +14,7 @@ class MigrateUpdateHelper {
    *
    * @var \Drupal\Core\Database\Connection
    */
-  protected $database;
+  protected Connection $database;
 
   /**
    * Update migrate table names.
@@ -20,8 +22,8 @@ class MigrateUpdateHelper {
    * Migrate tables for discovered migrations are updated. If tables exist for
    * a migration that is not available then the table names will not be updated.
    */
-  public function updateTableNames() {
-    /** @var \Drupal\Core\Database\Connection $this->database */
+  public function updateTableNames(): void {
+    /** @var \Drupal\Core\Database\Connection $database */
     $this->database = \Drupal::service('database');
 
     $current_map_table_names = $this->database->schema()->findTables('migrate_map%');

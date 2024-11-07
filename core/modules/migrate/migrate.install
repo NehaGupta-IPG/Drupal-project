@@ -17,6 +17,6 @@ function migrate_update_last_removed(): int {
 /**
  * Rename migrate tables for existing migrations to avoid naming conflicts.
  */
-function migrate_update_9201(&$sandbox) {
+function migrate_update_9201(&$sandbox): void {
   \Drupal::classResolver(MigrateUpdateHelper::class)->updateTableNames();
 }
