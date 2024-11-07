@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Core\Template;
 
 use Twig\Extension\AbstractExtension;
