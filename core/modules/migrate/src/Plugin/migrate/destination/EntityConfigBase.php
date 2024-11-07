@@ -305,7 +305,11 @@ class EntityConfigBase extends Entity {
       $entity_id = static::buildId($id_values);
       $language = $destination_identifier['langcode'];
 
-      $config = $this->storage->load($entity_id)->getConfigDependencyName();
+      $config_entity = $this->storage->load($entity_id);
+      if (empty($config_entity)) {
+        return;
+      }
+      $config = $config_entity->getConfigDependencyName();
       $config_override = $this->languageManager->getLanguageConfigOverride($language, $config);
       // Rollback the translation.
       $config_override->delete();

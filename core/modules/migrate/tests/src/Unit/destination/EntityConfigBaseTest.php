@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\migrate\Unit\destination;
 
 use Drupal\Core\Config\Entity\ConfigEntityBase;
@@ -79,12 +81,15 @@ class EntityConfigBaseTest extends UnitTestCase {
     $this->entityStorage = $this->getMockBuilder(EntityStorageInterface::class)->getMock();
     $this->entityStorage->method('getEntityType')->willReturn($entity_type->reveal());
     $this->entityStorage->method('create')
-      ->will($this->returnCallback(function ($values) {
-        return $this->getMockForAbstractClass(ConfigEntityBase::class, [
-          $values,
-          self::ENTITY_TYPE_ID,
-        ]);
-      }));
+      ->willReturnCallback(function ($values) {
+        return $this->getMockBuilder(ConfigEntityBase::class)
+          ->setConstructorArgs([
+            $values,
+            self::ENTITY_TYPE_ID,
+          ])
+          ->onlyMethods([])
+          ->getMock();
+      });
 
     $this->languageManager = $this->getMockBuilder(ConfigurableLanguageManagerInterface::class)
       ->getMock();
@@ -123,7 +128,7 @@ class EntityConfigBaseTest extends UnitTestCase {
    *
    * @covers ::import
    */
-  public function testEntityImportUpdate() {
+  public function testEntityImportUpdate(): void {
     // Execute an initial import: no previous destination IDs.
     $initial_destination_ids = $this->plugin->import(
       $this->row,
@@ -134,13 +139,13 @@ class EntityConfigBaseTest extends UnitTestCase {
 
     // Test an update.
     // Initialize a preexisting configuration entity.
-    $preexisting_config = $this->getMockForAbstractClass(
-      ConfigEntityBase::class,
-      [
+    $preexisting_config = $this->getMockBuilder(ConfigEntityBase::class)
+      ->setConstructorArgs([
         $this->row->getDestination(),
         self::ENTITY_TYPE_ID,
-      ]
-    );
+      ])
+      ->onlyMethods([])
+      ->getMock();
     // Ensure that the preexisting config entity has the expected initial
     // property value. In this test, the source and destination IDs are the
     // same.
