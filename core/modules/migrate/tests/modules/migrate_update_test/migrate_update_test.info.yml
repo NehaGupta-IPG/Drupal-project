@@ -1,0 +1,5 @@
+name: migrate update test
+type: module
+description: Migrations for testing unique migrate table names
+package: Testing
+version: VERSION

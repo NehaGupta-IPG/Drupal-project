@@ -5,9 +5,18 @@
  * Contains install and update functions for Migrate.
  */
 
+use Drupal\migrate\MigrateUpdateHelper;
+
 /**
  * Implements hook_update_last_removed().
  */
 function migrate_update_last_removed(): int {
   return 10100;
+}
+
+/**
+ * Rename migrate tables for existing migrations to avoid naming conflicts.
+ */
+function migrate_update_9201(&$sandbox) {
+  \Drupal::classResolver(MigrateUpdateHelper::class)->updateTableNames();
 }

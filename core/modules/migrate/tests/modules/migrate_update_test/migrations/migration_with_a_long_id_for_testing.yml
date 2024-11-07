@@ -1,0 +1,13 @@
+id: migration_with_a_long_id_for_testing
+label: Migration with a long ID for testing
+source:
+  plugin: embedded_data
+  data_rows:
+    - id: 0
+  ids:
+    id:
+      type: integer
+process:
+  id: id
+destination:
+  plugin: null

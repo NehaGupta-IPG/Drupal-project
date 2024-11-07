@@ -93,7 +93,14 @@ class SqlTest extends MigrateTestBase {
     $map->ensureTables();
 
     // Checks that the map table was created.
-    $exists = $this->database->schema()->tableExists('migrate_map_test');
+    // The test database type use different prefix lengths so we recalculate the
+    // table name.
+    $prefix_length = strlen(\Drupal::database()->tablePrefix());
+    $table_name = 'migrate_map_' . mb_strtolower('test');
+    $table_name = mb_substr($table_name, 0, 63 - $prefix_length) === $table_name
+      ? $table_name
+      : mb_substr($table_name, 0, 45 - $prefix_length) . '_' . substr(md5($table_name), 0, 17);
+    $exists = $this->database->schema()->tableExists($table_name);
     $this->assertTrue($exists);
   }
 

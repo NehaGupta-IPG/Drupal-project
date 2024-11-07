@@ -1073,15 +1073,18 @@ class MigrateSqlIdMapTest extends MigrateTestCase {
 
   /**
    * Tests the delayed creation of the "map" and "message" migrate tables.
+   *
+   * @dataProvider providerTestMapTableCreation
    */
-  public function testMapTableCreation(): void {
+  public function testMapTableCreation($configuration, $expected_map_table, $expected_message_table): void {
+    $this->migrationConfiguration = ['id' => $configuration];
     $id_map = $this->getIdMap();
     $map_table_name = $id_map->mapTableName();
     $message_table_name = $id_map->messageTableName();
 
     // Check that tables names do exist.
-    $this->assertEquals('migrate_map_sql_idmap_test', $map_table_name);
-    $this->assertEquals('migrate_message_sql_idmap_test', $message_table_name);
+    $this->assertEquals($expected_map_table, $map_table_name);
+    $this->assertEquals($expected_message_table, $message_table_name);
 
     // Check that tables don't exist.
     $this->assertFalse($this->database->schema()->tableExists($map_table_name));
@@ -1092,6 +1095,29 @@ class MigrateSqlIdMapTest extends MigrateTestCase {
     // Check that tables do exist.
     $this->assertTrue($this->database->schema()->tableExists($map_table_name));
     $this->assertTrue($this->database->schema()->tableExists($message_table_name));
+  }
+
+  /**
+   * Provides data for testMapTableCreation.
+   */
+  public function providerTestMapTableCreation() {
+    return [
+      'short_name' => [
+        'sql_idmap_test',
+        'migrate_map_sql_idmap_test',
+        'migrate_message_sql_idmap_test',
+      ],
+      'too long for message table' => [
+        'migration_with_a_long_id_for_testing_table_names',
+        'migrate_map_migration_with_a_long_id_for_testing_table_names',
+        'migrate_message_migration_with_a_long_id_for__5a6490b98f599fdca',
+      ],
+      'too long for map and message table' => [
+        'migration_with_a_long_id_for_testing_migrate_table_names',
+        'migrate_map_migration_with_a_long_id_for_test_45d8c7015ff9da8a8',
+        'migrate_message_migration_with_a_long_id_for__45d8c7015ff9da8a8',
+      ],
+    ];
   }
 
   /**

@@ -75,8 +75,16 @@ class MigrateLookupTest extends MigrateTestBase {
   public function testInvalidIdLookup(): void {
     $this->executeMigration('sample_lookup_migration');
     $this->expectException(MigrateException::class);
-    $this->expectExceptionMessage("Extra unknown items for map migrate_map_sample_lookup_migration in source IDs: array (\n  'invalid_id' => 25,\n)");
 
+    // The test database type use different prefix lengths so we recalculate the
+    // table name.
+    $prefix_length = strlen(\Drupal::database()->tablePrefix());
+    $table_name = 'migrate_map_' . mb_strtolower('sample_lookup_migration');
+    $table_name = mb_substr($table_name, 0, 63 - $prefix_length) === $table_name
+      ? $table_name
+      : mb_substr($table_name, 0, 45 - $prefix_length) . '_' . substr(md5($table_name), 0, 17);
+
+    $this->expectExceptionMessage("Extra unknown items for map $table_name in source IDs: array (\n  'invalid_id' => 25,\n)");
     // Test invalidly indexed source id.
     $this->migrateLookup->lookup('sample_lookup_migration', ['invalid_id' => 25]);
   }
