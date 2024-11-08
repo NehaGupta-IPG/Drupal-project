@@ -44,7 +44,7 @@ class MigrateUpdateHelper {
       });
       // Filter out non-sql migration maps and those without a legacy table.
       array_filter($sandbox['migrations'], function ($definition) use ($migration_plugin_manager, $current_map_table_names) {
-        [$legacy_map_table_name,] = $this->getLegacyTableNames($definition['id']);
+        [$legacy_map_table_name] = $this->getLegacyTableNames($definition['id']);
         $migration = $migration_plugin_manager->createStubMigration($definition);
         $id_map = $migration->getIdMap();
         return $id_map instanceof Sql &&
