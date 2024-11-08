@@ -175,27 +175,26 @@ class Sql extends PluginBase implements MigrateIdMapInterface, ContainerFactoryP
     parent::__construct($configuration, $plugin_id, $plugin_definition);
     $this->migration = $migration;
     $this->eventDispatcher = $event_dispatcher;
+    $this->migrationPluginManager = $migration_plugin_manager;
     $this->message = new MigrateMessage();
 
     if (!isset($this->database)) {
       $this->database = \Drupal::database();
     }
 
-    // Default generated table names, limited to 63 characters.
+    // Generate default table names and ensure they fit in the 48 characters
+    // limit, keeping a 16 characters margin for db prefixes.
     $machine_name = str_replace(':', '__', $this->migration->id());
-    $prefix_length = strlen($this->database->getPrefix());
 
-    $map_table_name = 'migrate_map_' . mb_strtolower($machine_name);
-    $this->mapTableName = mb_substr($map_table_name, 0, 63 - $prefix_length) === $map_table_name
-      ? $map_table_name
-      : mb_substr($map_table_name, 0, 45 - $prefix_length) . '_' . substr(md5($machine_name), 0, 17);
+    $this->mapTableName = 'migrate_map_' . mb_strtolower($machine_name);
+    if (strlen($this->mapTableName) > 48) {
+      $this->mapTableName = 'migrate_map_' . substr(hash('sha256', $machine_name), 0, 10);
+    }
 
-    $message_table_name = 'migrate_message_' . mb_strtolower($machine_name);
-    $this->messageTableName = mb_substr($message_table_name, 0, 63 - $prefix_length) === $message_table_name
-      ? $message_table_name
-      : mb_substr($message_table_name, 0, 45 - $prefix_length) . '_' . substr(md5($machine_name), 0, 17);
-
-    $this->migrationPluginManager = $migration_plugin_manager;
+    $this->messageTableName = 'migrate_message_' . mb_strtolower($machine_name);
+    if (strlen($this->messageTableName) > 48) {
+      $this->messageTableName = 'migrate_message_' . substr(hash('sha256', $machine_name), 0, 10);
+    }
   }
 
   /**
