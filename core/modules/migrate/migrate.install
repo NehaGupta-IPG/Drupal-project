@@ -15,8 +15,8 @@ function migrate_update_last_removed(): int {
 }
 
 /**
- * Rename migrate tables for existing migrations to avoid naming conflicts.
+ * Copy values from legacy migration map and message tables to new ones.
  */
 function migrate_update_10101(&$sandbox): void {
-  \Drupal::classResolver(MigrateUpdateHelper::class)->updateTableNames();
+  \Drupal::classResolver(MigrateUpdateHelper::class)->updateMapAndMessageTables();
 }

@@ -18,12 +18,12 @@ class MigrateUpdateHelper {
   protected Connection $database;
 
   /**
-   * Update migrate table names.
+   * Update migrate map and message tables.
    *
    * Migrate tables for discovered migrations are updated. If tables exist for
    * a migration that is not available then the table names will not be updated.
    */
-  public function updateTableNames(): void {
+  public function updateMapAndMessageTables(): void {
     /** @var \Drupal\Core\Database\Connection $database */
     $this->database = \Drupal::service('database');
 
