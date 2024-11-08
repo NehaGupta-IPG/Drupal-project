@@ -68,24 +68,6 @@ class Feed extends PathPluginBase implements ResponseDisplayPluginInterface {
    *   The state key value store.
    * @param \Drupal\Core\Render\RendererInterface $renderer
    *   The renderer.
-   * @param \Drupal\views\ViewsData|null $views_data
-   *   The views data.
-   * @param \Drupal\views\Plugin\ViewsPluginManager|null $access_plugin_manager
-   *   The plugin manager for views access plugins.
-   * @param \Drupal\views\Plugin\ViewsPluginManager|null $cache_plugin_manager
-   *   The plugin manager for views cache plugins.
-   * @param \Drupal\views\Plugin\ViewsPluginManager|null $display_extender_plugin_manager
-   *   The plugin manager for views display extender plugins.
-   * @param \Drupal\views\Plugin\ViewsPluginManager|null $exposed_form_plugin_manager
-   *   The plugin manager for views exposed form plugins.
-   * @param \Drupal\views\Plugin\ViewsPluginManager|null $pager_plugin_manager
-   *   The plugin manager for views pager plugins.
-   * @param \Drupal\views\Plugin\ViewsPluginManager|null $row_plugin_manager
-   *   The plugin manager for views row plugins.
-   * @param \Drupal\views\Plugin\ViewsPluginManager|null $style_plugin_manager
-   *   The plugin manager for views style plugins.
-   * @param \Drupal\views\Plugin\ViewsPluginManager|null $query_plugin_manager
-   *   The plugin manager for views style plugins.
    */
   public function __construct(
     array $configuration,
@@ -94,17 +76,17 @@ class Feed extends PathPluginBase implements ResponseDisplayPluginInterface {
     RouteProviderInterface $route_provider,
     StateInterface $state,
     RendererInterface $renderer,
-    ?ViewsData $views_data = NULL,
-    ?ViewsPluginManager $access_plugin_manager = NULL,
-    ?ViewsPluginManager $cache_plugin_manager = NULL,
-    ?ViewsPluginManager $display_extender_plugin_manager = NULL,
-    ?ViewsPluginManager $exposed_form_plugin_manager = NULL,
-    ?ViewsPluginManager $pager_plugin_manager = NULL,
-    ?ViewsPluginManager $row_plugin_manager = NULL,
-    ?ViewsPluginManager $style_plugin_manager = NULL,
-    ?ViewsPluginManager $query_plugin_manager = NULL,
+    protected ?ViewsData $viewsData = NULL,
+    protected ?ViewsPluginManager $accessPluginManager = NULL,
+    protected ?ViewsPluginManager $cachePluginManager = NULL,
+    protected ?ViewsPluginManager $displayExtenderPluginManager = NULL,
+    protected ?ViewsPluginManager $exposedFormPluginManager = NULL,
+    protected ?ViewsPluginManager $pagerPluginManager = NULL,
+    protected ?ViewsPluginManager $rowPluginManager = NULL,
+    protected ?ViewsPluginManager $stylePluginManager = NULL,
+    protected ?ViewsPluginManager $queryPluginManager = NULL,
   ) {
-    parent::__construct($configuration, $plugin_id, $plugin_definition, $route_provider, $state, $views_data, $access_plugin_manager, $cache_plugin_manager, $display_extender_plugin_manager, $exposed_form_plugin_manager, $pager_plugin_manager, $row_plugin_manager, $style_plugin_manager, $query_plugin_manager);
+    parent::__construct($configuration, $plugin_id, $plugin_definition, $route_provider, $state, $viewsData, $accessPluginManager, $cachePluginManager, $displayExtenderPluginManager, $exposedFormPluginManager, $pagerPluginManager, $rowPluginManager, $stylePluginManager, $queryPluginManager);
     $this->renderer = $renderer;
   }
 
