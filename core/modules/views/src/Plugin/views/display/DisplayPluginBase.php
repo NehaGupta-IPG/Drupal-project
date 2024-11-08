@@ -175,18 +175,19 @@ abstract class DisplayPluginBase extends PluginBase implements DisplayPluginInte
    * @todo Replace DisplayPluginBase::$display with
    *   DisplayPluginBase::$configuration to standardize with other plugins.
    */
-  public function __construct(array $configuration,
-  $plugin_id,
-  $plugin_definition,
-  protected ?ViewsData $viewsData = NULL,
-  protected ?ViewsPluginManager $accessPluginManager = NULL,
-  protected ?ViewsPluginManager $cachePluginManager = NULL,
-  protected ?ViewsPluginManager $displayExtenderPluginManager = NULL,
-  protected ?ViewsPluginManager $exposedFormPluginManager = NULL,
-  protected ?ViewsPluginManager $pagerPluginManager = NULL,
-  protected ?ViewsPluginManager $rowPluginManager = NULL,
-  protected ?ViewsPluginManager $stylePluginManager = NULL,
-  protected ?ViewsPluginManager $queryPluginManager = NULL,
+  public function __construct(
+    array $configuration,
+    $plugin_id,
+    $plugin_definition,
+    protected ?ViewsData $viewsData = NULL,
+    protected ?ViewsPluginManager $accessPluginManager = NULL,
+    protected ?ViewsPluginManager $cachePluginManager = NULL,
+    protected ?ViewsPluginManager $displayExtenderPluginManager = NULL,
+    protected ?ViewsPluginManager $exposedFormPluginManager = NULL,
+    protected ?ViewsPluginManager $pagerPluginManager = NULL,
+    protected ?ViewsPluginManager $rowPluginManager = NULL,
+    protected ?ViewsPluginManager $stylePluginManager = NULL,
+    protected ?ViewsPluginManager $queryPluginManager = NULL,
   ) {
     parent::__construct([], $plugin_id, $plugin_definition);
 

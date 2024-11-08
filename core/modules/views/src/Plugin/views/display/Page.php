@@ -97,22 +97,24 @@ class Page extends PathPluginBase {
    * @param \Drupal\views\Plugin\ViewsPluginManager|null $query_plugin_manager
    *   The plugin manager for views query plugins.
    */
-  public function __construct(array $configuration,
-  $plugin_id,
-  $plugin_definition,
-  RouteProviderInterface $route_provider,
-  StateInterface $state,
-  EntityStorageInterface $menu_storage,
-  MenuParentFormSelectorInterface $parent_form_selector,
-  ViewsData $views_data = NULL,
-  ViewsPluginManager $access_plugin_manager = NULL,
-  ViewsPluginManager $cache_plugin_manager = NULL,
-  ViewsPluginManager $display_extender_plugin_manager = NULL,
-  ViewsPluginManager $exposed_form_plugin_manager = NULL,
-  ViewsPluginManager $pager_plugin_manager = NULL,
-  ViewsPluginManager $row_plugin_manager = NULL,
-  ViewsPluginManager $style_plugin_manager = NULL,
-  ViewsPluginManager $query_plugin_manager = NULL) {
+  public function __construct(
+    array $configuration,
+    $plugin_id,
+    $plugin_definition,
+    RouteProviderInterface $route_provider,
+    StateInterface $state,
+    EntityStorageInterface $menu_storage,
+    MenuParentFormSelectorInterface $parent_form_selector,
+    ?ViewsData $views_data = NULL,
+    ?ViewsPluginManager $access_plugin_manager = NULL,
+    ?ViewsPluginManager $cache_plugin_manager = NULL,
+    ?ViewsPluginManager $display_extender_plugin_manager = NULL,
+    ?ViewsPluginManager $exposed_form_plugin_manager = NULL,
+    ?ViewsPluginManager $pager_plugin_manager = NULL,
+    ?ViewsPluginManager $row_plugin_manager = NULL,
+    ?ViewsPluginManager $style_plugin_manager = NULL,
+    ?ViewsPluginManager $query_plugin_manager = NULL,
+  ) {
     parent::__construct($configuration, $plugin_id, $plugin_definition, $route_provider, $state, $views_data, $access_plugin_manager, $cache_plugin_manager, $display_extender_plugin_manager, $exposed_form_plugin_manager, $pager_plugin_manager, $row_plugin_manager, $style_plugin_manager, $query_plugin_manager);
     $this->menuStorage = $menu_storage;
     $this->parentFormSelector = $parent_form_selector;
