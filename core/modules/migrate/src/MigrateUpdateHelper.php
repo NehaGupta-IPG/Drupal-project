@@ -106,10 +106,10 @@ class MigrateUpdateHelper {
         $insert_query->execute();
       }
 
-      $message = new FormattableMarkup('Migration @mid - Copied @rprogress of @rtotal rows', [
+      $message = new FormattableMarkup('Migration @mid - Copied @progress of @total rows', [
         '@mid' => $sandbox['current_migration']['id'],
-        '@rprogress' => array_sum($sandbox['current_migration']['tables_progress']),
-        '@rtotal' => array_sum($sandbox['current_migration']['tables_row_count']),
+        '@progress' => array_sum($sandbox['current_migration']['tables_progress']),
+        '@total' => array_sum($sandbox['current_migration']['tables_row_count']),
       ]);
 
       if (array_sum($sandbox['current_migration']['tables_progress']) === array_sum($sandbox['current_migration']['tables_row_count'])) {
