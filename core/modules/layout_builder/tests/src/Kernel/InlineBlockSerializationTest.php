@@ -122,7 +122,7 @@ class InlineBlockSerializationTest extends EntityKernelTestBase {
       $node->save();
     }
     catch (EntityStorageException $e) {
-      $this->fail('unserialize(): Error at offset 50 of 52 bytes');
+      $this->fail($e->getMessage());
     }
   }
 
