@@ -118,7 +118,7 @@ class PathPluginBaseTest extends UnitTestCase {
 
     $access_plugin = $this->getMockBuilder('\Drupal\views\Plugin\views\access\AccessPluginBase')
       ->disableOriginalConstructor()
-      ->getMockForAbstractClass();
+      ->getMock();
     $this->accessPluginManager = $this->createMock(ViewsPluginManager::class);
     $this->accessPluginManager->expects($this->any())
       ->method('createInstance')
@@ -126,7 +126,7 @@ class PathPluginBaseTest extends UnitTestCase {
 
     $cache_plugin = $this->getMockBuilder('\Drupal\views\Plugin\views\cache\CachePluginBase')
       ->disableOriginalConstructor()
-      ->getMockForAbstractClass();
+      ->getMock();
     $this->cachePluginManager = $this->createMock(ViewsPluginManager::class);
     $this->cachePluginManager->expects($this->any())
       ->method('createInstance')
@@ -134,7 +134,7 @@ class PathPluginBaseTest extends UnitTestCase {
 
     $display_extender_plugin = $this->getMockBuilder('\Drupal\views\Plugin\views\display_extender\DisplayExtenderPluginBase')
       ->disableOriginalConstructor()
-      ->getMockForAbstractClass();
+      ->getMock();
     $this->displayExtenderPluginManager = $this->createMock(ViewsPluginManager::class);
     $this->displayExtenderPluginManager->expects($this->any())
       ->method('createInstance')
@@ -142,7 +142,7 @@ class PathPluginBaseTest extends UnitTestCase {
 
     $exposed_form_plugin = $this->getMockBuilder('\Drupal\views\Plugin\views\exposed_form\ExposedFormPluginBase')
       ->disableOriginalConstructor()
-      ->getMockForAbstractClass();
+      ->getMock();
     $this->exposedFormPluginManager = $this->createMock(ViewsPluginManager::class);
     $this->exposedFormPluginManager->expects($this->any())
       ->method('createInstance')
@@ -150,7 +150,7 @@ class PathPluginBaseTest extends UnitTestCase {
 
     $pager_plugin = $this->getMockBuilder('\Drupal\views\Plugin\views\pager\PagerPluginBase')
       ->disableOriginalConstructor()
-      ->getMockForAbstractClass();
+      ->getMock();
     $this->pagerPluginManager = $this->createMock(ViewsPluginManager::class);
     $this->pagerPluginManager->expects($this->any())
       ->method('createInstance')
@@ -158,7 +158,7 @@ class PathPluginBaseTest extends UnitTestCase {
 
     $row_plugin = $this->getMockBuilder('\Drupal\views\Plugin\views\row\RowPluginBase')
       ->disableOriginalConstructor()
-      ->getMockForAbstractClass();
+      ->getMock();
     $this->rowPluginManager = $this->createMock(ViewsPluginManager::class);
     $this->rowPluginManager->expects($this->any())
       ->method('createInstance')
@@ -166,7 +166,7 @@ class PathPluginBaseTest extends UnitTestCase {
 
     $style_plugin = $this->getMockBuilder('\Drupal\views\Plugin\views\style\StylePluginBase')
       ->disableOriginalConstructor()
-      ->getMockForAbstractClass();
+      ->getMock();
     $this->stylePluginManager = $this->createMock(ViewsPluginManager::class);
     $this->stylePluginManager->expects($this->any())
       ->method('createInstance')
@@ -174,7 +174,7 @@ class PathPluginBaseTest extends UnitTestCase {
 
     $query_plugin = $this->getMockBuilder('\Drupal\views\Plugin\views\query\QueryPluginBase')
       ->disableOriginalConstructor()
-      ->getMockForAbstractClass();
+      ->getMock();
     $this->queryPluginManager = $this->createMock(ViewsPluginManager::class);
     $this->queryPluginManager->expects($this->any())
       ->method('createInstance')
