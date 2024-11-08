@@ -69,6 +69,24 @@ class Block extends DisplayPluginBase {
    *   The entity type manager.
    * @param \Drupal\Core\Block\BlockManagerInterface $block_manager
    *   The block manager.
+   * @param \Drupal\views\ViewsData|null $viewsData
+   *   The views data.
+   * @param \Drupal\views\Plugin\ViewsPluginManager|null $accessPluginManager
+   *   The plugin manager for views access plugins.
+   * @param \Drupal\views\Plugin\ViewsPluginManager|null $cachePluginManager
+   *   The plugin manager for views cache plugins.
+   * @param \Drupal\views\Plugin\ViewsPluginManager|null $displayExtenderPluginManager
+   *   The plugin manager for views display extender plugins.
+   * @param \Drupal\views\Plugin\ViewsPluginManager|null $exposedFormPluginManager
+   *   The plugin manager for views exposed form plugins.
+   * @param \Drupal\views\Plugin\ViewsPluginManager|null $pagerPluginManager
+   *   The plugin manager for views pager plugins.
+   * @param \Drupal\views\Plugin\ViewsPluginManager|null $rowPluginManager
+   *   The plugin manager for views row plugins.
+   * @param \Drupal\views\Plugin\ViewsPluginManager|null $stylePluginManager
+   *   The plugin manager for views style plugins.
+   * @param \Drupal\views\Plugin\ViewsPluginManager|null $queryPluginManager
+   *   The plugin manager for views query plugins.
    */
   public function __construct(
     array $configuration,
