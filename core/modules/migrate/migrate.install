@@ -5,6 +5,7 @@
  * Contains install and update functions for Migrate.
  */
 
+use Drupal\Component\Render\FormattableMarkup;
 use Drupal\migrate\MigrateUpdateHelper;
 
 /**
@@ -17,6 +18,6 @@ function migrate_update_last_removed(): int {
 /**
  * Copy values from legacy migration map and message tables to new ones.
  */
-function migrate_update_10101(&$sandbox): void {
-  \Drupal::classResolver(MigrateUpdateHelper::class)->updateMapAndMessageTables();
+function migrate_update_10101(&$sandbox): ?FormattableMarkup {
+  return \Drupal::classResolver(MigrateUpdateHelper::class)->updateMapAndMessageTables($sandbox);
 }
