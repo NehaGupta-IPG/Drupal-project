@@ -80,6 +80,7 @@ class ImageWidget extends FileWidget {
       $configuration['settings'],
       $configuration['third_party_settings'],
       $container->get('element_info'),
+      $container->get('image.factory'),
       $container->get('entity.repository'));
   }
 
