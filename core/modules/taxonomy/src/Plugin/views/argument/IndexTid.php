@@ -2,9 +2,12 @@
 
 namespace Drupal\taxonomy\Plugin\views\argument;
 
+use Drupal\Core\Entity\EntityRepositoryInterface;
+use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\taxonomy\Entity\Term;
 use Drupal\views\Attribute\ViewsArgument;
 use Drupal\views\Plugin\views\argument\ManyToOne;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Allow taxonomy term ID(s) as argument.
@@ -14,7 +17,26 @@ use Drupal\views\Plugin\views\argument\ManyToOne;
 #[ViewsArgument(
   id: 'taxonomy_index_tid',
 )]
-class IndexTid extends ManyToOne {
+class IndexTid extends ManyToOne implements ContainerFactoryPluginInterface {
+
+  /**
+   * {@inheritdoc}
+   */
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, protected EntityRepositoryInterface $entityRepository) {
+    parent::__construct($configuration, $plugin_id, $plugin_definition);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
+    return new static(
+      $configuration,
+      $plugin_id,
+      $plugin_definition,
+      $container->get('entity.repository')
+    );
+  }
 
   /**
    * {@inheritdoc}
@@ -23,7 +45,7 @@ class IndexTid extends ManyToOne {
     $titles = [];
     $terms = Term::loadMultiple($this->value);
     foreach ($terms as $term) {
-      $titles[] = \Drupal::service('entity.repository')->getTranslationFromContext($term)->label();
+      $titles[] = $this->entityRepository->getTranslationFromContext($term)->label();
     }
     return $titles;
   }

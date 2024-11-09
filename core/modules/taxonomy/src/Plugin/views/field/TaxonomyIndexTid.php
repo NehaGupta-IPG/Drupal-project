@@ -2,6 +2,7 @@
 
 namespace Drupal\taxonomy\Plugin\views\field;
 
+use Drupal\Core\Entity\EntityRepositoryInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\views\Attribute\ViewsField;
 use Drupal\views\ViewExecutable;
@@ -36,8 +37,10 @@ class TaxonomyIndexTid extends PrerenderList {
    *   The plugin implementation definition.
    * @param \Drupal\taxonomy\VocabularyStorageInterface $vocabulary_storage
    *   The vocabulary storage.
+   * @param \Drupal\Core\Entity\EntityRepositoryInterface|null $entityRepository
+   *   The entity repository.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, VocabularyStorageInterface $vocabulary_storage) {
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, VocabularyStorageInterface $vocabulary_storage, protected ?EntityRepositoryInterface $entityRepository = NULL) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
     $this->vocabularyStorage = $vocabulary_storage;
   }
@@ -50,7 +53,8 @@ class TaxonomyIndexTid extends PrerenderList {
       $configuration,
       $plugin_id,
       $plugin_definition,
-      $container->get('entity_type.manager')->getStorage('taxonomy_vocabulary')
+      $container->get('entity_type.manager')->getStorage('taxonomy_vocabulary'),
+      $container->get('entity.repository'),
     );
   }
 
@@ -149,7 +153,7 @@ class TaxonomyIndexTid extends PrerenderList {
 
       foreach ($result as $node_nid => $data) {
         foreach ($data as $tid => $term) {
-          $this->items[$node_nid][$tid]['name'] = \Drupal::service('entity.repository')->getTranslationFromContext($term)->label();
+          $this->items[$node_nid][$tid]['name'] = $this->entityRepository->getTranslationFromContext($term)->label();
           $this->items[$node_nid][$tid]['tid'] = $tid;
           $this->items[$node_nid][$tid]['vocabulary_vid'] = $term->bundle();
           $this->items[$node_nid][$tid]['vocabulary'] = $vocabularies[$term->bundle()]->label();
