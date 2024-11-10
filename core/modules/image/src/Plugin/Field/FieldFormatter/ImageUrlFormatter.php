@@ -3,6 +3,7 @@
 namespace Drupal\image\Plugin\Field\FieldFormatter;
 
 use Drupal\Core\Cache\CacheableMetadata;
+use Drupal\Core\Entity\EntityRepositoryInterface;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Field\Attribute\FieldFormatter;
 use Drupal\Core\Field\FieldDefinitionInterface;
@@ -61,9 +62,11 @@ class ImageUrlFormatter extends ImageFormatterBase {
    *   The image style storage.
    * @param \Drupal\Core\Session\AccountInterface $current_user
    *   The current user.
+   * @param \Drupal\Core\Entity\EntityRepositoryInterface|null $entityRepository
+   *   The entity repository.
    */
-  public function __construct($plugin_id, $plugin_definition, FieldDefinitionInterface $field_definition, array $settings, $label, $view_mode, array $third_party_settings, EntityStorageInterface $image_style_storage, AccountInterface $current_user) {
-    parent::__construct($plugin_id, $plugin_definition, $field_definition, $settings, $label, $view_mode, $third_party_settings);
+  public function __construct($plugin_id, $plugin_definition, FieldDefinitionInterface $field_definition, array $settings, $label, $view_mode, array $third_party_settings, EntityStorageInterface $image_style_storage, AccountInterface $current_user, protected ?EntityRepositoryInterface $entityRepository = NULL) {
+    parent::__construct($plugin_id, $plugin_definition, $field_definition, $settings, $label, $view_mode, $third_party_settings, $entityRepository);
     $this->imageStyleStorage = $image_style_storage;
     $this->currentUser = $current_user;
   }
@@ -82,6 +85,7 @@ class ImageUrlFormatter extends ImageFormatterBase {
       $configuration['third_party_settings'],
       $container->get('entity_type.manager')->getStorage('image_style'),
       $container->get('current_user'),
+      $container->get('entity.repository'),
     );
   }
 
