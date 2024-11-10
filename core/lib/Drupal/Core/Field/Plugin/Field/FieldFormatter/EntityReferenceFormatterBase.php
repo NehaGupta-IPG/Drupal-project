@@ -35,6 +35,8 @@ abstract class EntityReferenceFormatterBase extends FormatterBase {
    *   The view mode.
    * @param array $third_party_settings
    *   Any third party settings.
+   * @param \Drupal\Core\Entity\EntityRepositoryInterface|null $entityRepository
+   *   The entity repository.
    */
   public function __construct($plugin_id, $plugin_definition, FieldDefinitionInterface $field_definition, array $settings, $label, $view_mode, array $third_party_settings, protected ?EntityRepositoryInterface $entityRepository = NULL) {
     parent::__construct($plugin_id, $plugin_definition, $field_definition, $settings, $label, $view_mode, $third_party_settings);
