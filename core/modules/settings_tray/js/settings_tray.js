@@ -212,7 +212,7 @@
   });
 
   $(document).on('keyup.settingstray', (e) => {
-    if (isInEditMode() && e.keyCode === 27) {
+    if (isInEditMode() && e.key === 'Escape') {
       Drupal.announce(Drupal.t('Exited edit mode.'));
       toggleEditMode();
     }

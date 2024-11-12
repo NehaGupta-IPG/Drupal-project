@@ -558,7 +558,7 @@
     // Add arrow-key support to the handle.
     $handle.on('keydown', (event) => {
       // If a rowObject doesn't yet exist and this isn't the tab key.
-      if (event.keyCode !== 9 && !self.rowObject) {
+      if (event.key !== 'Tab' && !self.rowObject) {
         self.rowObject = new self.row(
           item,
           'keyboard',
@@ -573,19 +573,15 @@
 
       /* eslint-disable no-fallthrough */
 
-      switch (event.keyCode) {
+      switch (event.key) {
         // Left arrow.
-        case 37:
-        // Safari left arrow.
-        case 63234:
+        case 'ArrowLeft':
           keyChange = true;
           self.rowObject.indent(-1 * self.rtl);
           break;
 
         // Up arrow.
-        case 38:
-        // Safari up arrow.
-        case 63232: {
+        case 'ArrowUp': {
           let $previousRow = $(self.rowObject.element).prev('tr').eq(0);
           let previousRow = $previousRow.get(0);
           while (previousRow && Drupal.elementIsHidden(previousRow)) {
@@ -633,17 +629,13 @@
           break;
         }
         // Right arrow.
-        case 39:
-        // Safari right arrow.
-        case 63235:
+        case 'ArrowRight':
           keyChange = true;
           self.rowObject.indent(self.rtl);
           break;
 
         // Down arrow.
-        case 40:
-        // Safari down arrow.
-        case 63233: {
+        case 'ArrowDown': {
           let $nextRow = $(self.rowObject.group).eq(-1).next('tr').eq(0);
           let nextRow = $nextRow.get(0);
           while (nextRow && Drupal.elementIsHidden(nextRow)) {
@@ -718,15 +710,15 @@
     $handle.on('keypress', (event) => {
       /* eslint-disable no-fallthrough */
 
-      switch (event.keyCode) {
+      switch (event.key) {
         // Left arrow.
-        case 37:
+        case 'ArrowLeft':
         // Up arrow.
-        case 38:
+        case 'ArrowUp':
         // Right arrow.
-        case 39:
+        case 'ArrowRight':
         // Down arrow.
-        case 40:
+        case 'ArrowDown':
           return false;
       }
 

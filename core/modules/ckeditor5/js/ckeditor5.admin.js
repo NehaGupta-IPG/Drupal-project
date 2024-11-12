@@ -605,16 +605,9 @@
       // correctly.
       once('safari-focus-fix', '.ckeditor5-toolbar-item').forEach((item) => {
         item.addEventListener('keydown', (e) => {
-          const keyCodeDirections = {
-            9: 'tab',
-            37: 'left',
-            38: 'up',
-            39: 'right',
-            40: 'down',
-          };
           if (
-            ['tab', 'left', 'up', 'right', 'down'].includes(
-              keyCodeDirections[e.keyCode],
+            ['Tab', 'ArrowLeft', 'ArrowUp', 'ArrowRight', 'ArrowDown'].includes(
+              e.key,
             )
           ) {
             let hideTip = false;
@@ -623,13 +616,13 @@
             );
             if (isActive) {
               if (
-                ['tab', 'left', 'up', 'right'].includes(
-                  keyCodeDirections[e.keyCode],
+                ['Tab', 'ArrowLeft', 'ArrowUp', 'ArrowRight'].includes(
+                  e.key,
                 )
               ) {
                 hideTip = true;
               }
-            } else if (['tab', 'down'].includes(keyCodeDirections[e.keyCode])) {
+            } else if (['Tab', 'ArrowDown'].includes(e.key)) {
               hideTip = true;
             }
             if (hideTip) {
