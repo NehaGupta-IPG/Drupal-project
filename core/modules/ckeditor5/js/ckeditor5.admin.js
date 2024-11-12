@@ -616,9 +616,7 @@
             );
             if (isActive) {
               if (
-                ['Tab', 'ArrowLeft', 'ArrowUp', 'ArrowRight'].includes(
-                  e.key,
-                )
+                ['Tab', 'ArrowLeft', 'ArrowUp', 'ArrowRight'].includes(e.key)
               ) {
                 hideTip = true;
               }
