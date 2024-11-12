@@ -445,7 +445,7 @@ class WidgetOEmbedTest extends MediaLibraryTestBase {
   /**
    * Tests if an oembed error gets logged correctly.
    */
-  public function testWidgetOEmbedErrorGetsLogged() {
+  public function testWidgetOEmbedErrorGetsLogged(): void {
     $this->hijackProviderEndpoints();
     $assert_session = $this->assertSession();
     $page = $this->getSession()->getPage();
