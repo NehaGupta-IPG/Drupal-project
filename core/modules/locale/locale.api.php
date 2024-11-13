@@ -41,6 +41,11 @@
  * @code
  * 'interface translation server pattern': public://translations/%project-%version.%language.po
  * @endcode
+ * And an additional streamwrapper "module://" is available to set the relative
+ * path to the current module:
+ * @code
+ * 'interface translation server pattern': module://translations/%version.%language.po
+ * @endcode
  *
  * Multiple custom modules or themes sharing the same po file should have
  * matching definitions. Such as modules and sub-modules or multiple modules in
