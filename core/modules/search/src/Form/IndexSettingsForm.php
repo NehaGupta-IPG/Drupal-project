@@ -27,16 +27,15 @@ final class IndexSettingsForm extends FormBase {
   /**
    * Constructs a new SearchPageListBuilder object.
    *
-   * @param \Drupal\Core\Messenger\MessengerInterface $messenger
-   *   The messenger.
    * @param \Drupal\search\SearchIndexInterface $searchIndex
    *   The search index.
    * @param \Drupal\Core\Extension\ModuleHandlerInterface $moduleHandler
    *   The module handler.
    */
   public function __construct(
-    protected SearchIndexInterface   $searchIndex,
-    protected ModuleHandlerInterface $moduleHandler) {
+    protected SearchIndexInterface $searchIndex,
+    protected ModuleHandlerInterface $moduleHandler,
+  ) {
     $this->entities = SearchPage::loadMultiple();
   }
 
