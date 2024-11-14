@@ -248,14 +248,14 @@ class SearchPageListBuilder extends DraggableListBuilder implements FormInterfac
   /**
    * {@inheritdoc}
    */
-  public function submitForm(array &$form, FormStateInterface $form_state) {
+  public function submitForm(array &$form, FormStateInterface $form_state): void {
     parent::submitForm($form, $form_state);
   }
 
   /**
    * Form validation handler for adding a new search page.
    */
-  public function validateAddSearchPage(array &$form, FormStateInterface $form_state) {
+  public function validateAddSearchPage(array &$form, FormStateInterface $form_state): void {
     if ($form_state->isValueEmpty('search_type')) {
       $form_state->setErrorByName('search_type', $this->t('You must select the new search page type.'));
     }
@@ -264,7 +264,7 @@ class SearchPageListBuilder extends DraggableListBuilder implements FormInterfac
   /**
    * Form submission handler for adding a new search page.
    */
-  public function submitAddSearchPage(array &$form, FormStateInterface $form_state) {
+  public function submitAddSearchPage(array &$form, FormStateInterface $form_state): void {
     $form_state->setRedirect(
       'search.add_type',
       ['search_plugin_id' => $form_state->getValue('search_type')]
