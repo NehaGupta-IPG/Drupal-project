@@ -31,7 +31,7 @@ final class RouteSubscriber extends RouteSubscriberBase {
   /**
    * {@inheritdoc}
    */
-  protected function alterRoutes(RouteCollection $collection) {
+  protected function alterRoutes(RouteCollection $collection): void {
     // The individual delete route method's signature does not feature all the
     // available parameters. To avoid BC issues, we need to replace the original
     // method with a new one, to get access to all the available parameters,

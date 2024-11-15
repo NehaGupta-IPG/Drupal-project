@@ -8,7 +8,7 @@
 /**
  * Implements hook_help().
  */
-function jsonapi_translation_help($route_name) {
+function jsonapi_translation_help($route_name): ?string {
   switch ($route_name) {
     case 'help.page.jsonapi_translation':
       $output = '<h3>' . t('About') . '</h3>';

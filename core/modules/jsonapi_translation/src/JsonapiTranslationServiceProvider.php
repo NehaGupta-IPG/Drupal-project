@@ -24,7 +24,7 @@ final class JsonapiTranslationServiceProvider extends ServiceProviderBase {
   /**
    * {@inheritdoc}
    */
-  public function alter(ContainerBuilder $container) {
+  public function alter(ContainerBuilder $container): void {
     $definition = $container->getDefinition('paramconverter.jsonapi.entity_uuid');
     $definition->setClass(EntityUuidConverter::class);
     $definition = $container->getDefinition('jsonapi.entity_access_checker');

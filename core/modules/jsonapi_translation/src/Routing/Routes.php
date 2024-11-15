@@ -61,7 +61,7 @@ final class Routes extends JsonApiRoutes {
   /**
    * {@inheritdoc}
    */
-  public static function create(ContainerInterface $container) {
+  public static function create(ContainerInterface $container): Routes {
     return new static(
       $container->get('jsonapi.resource_type.repository'),
       $container->getParameter('authentication_providers'),
@@ -73,7 +73,7 @@ final class Routes extends JsonApiRoutes {
   /**
    * {@inheritdoc}
    */
-  public function routes() {
+  public function routes(): RouteCollection {
     $routes = new RouteCollection();
 
     foreach ($this->resourceTypeRepository->all() as $resource_type) {

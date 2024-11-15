@@ -69,7 +69,7 @@ final class EntityResource extends JsonApiEntityResource {
   /**
    * Injects the language manager.
    */
-  public function setLanguageManager(LanguageManagerInterface $language_manager) {
+  public function setLanguageManager(LanguageManagerInterface $language_manager): void {
     $this->languageManager = $language_manager;
   }
 
