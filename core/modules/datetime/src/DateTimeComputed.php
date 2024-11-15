@@ -45,10 +45,16 @@ class DateTimeComputed extends TypedData {
     /** @var \Drupal\Core\Field\FieldItemInterface $item */
     $item = $this->getParent();
     $value = $item->{($this->definition->getSetting('date source'))};
-    $value = is_array($value) ? array_shift($value) : $value;
 
     // A date cannot be created from a NULL value.
     if ($value === NULL) {
+      return NULL;
+    }
+
+    // When the field is empty, the returned value will be an array with empty
+    // values. Treat it as an empty value. Valid values will return a formatted
+    // string.
+    if (is_array($value)) {
       return NULL;
     }
 
