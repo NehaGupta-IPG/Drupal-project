@@ -495,7 +495,7 @@ class NodeTranslationUITest extends ContentTranslationUITestBase {
   /**
    * Tests that unpublished translations fallback to the original language.
    */
-  public function testUnpublishedTranslations() {
+  public function testUnpublishedTranslations(): void {
     $storage = \Drupal::entityTypeManager()->getStorage('node');
 
     // Create a node.
