@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\entity_test\Entity;
 
+use Drupal\content_translation\ContentTranslationHandler;
 use Drupal\Core\Entity\Attribute\ContentEntityType;
 use Drupal\Core\Entity\Routing\DefaultHtmlRouteProvider;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
@@ -40,6 +41,7 @@ use Drupal\views\EntityViewsData;
     'route_provider' => [
       'html' => DefaultHtmlRouteProvider::class,
     ],
+    'translation' => ContentTranslationHandler::class,
     'views_data' => EntityViewsData::class,
   ],
   links: [
@@ -64,6 +66,12 @@ class EntityTestMulChanged extends EntityTestMul implements EntityChangedInterfa
    */
   public static function baseFieldDefinitions(EntityTypeInterface $entity_type) {
     $fields = parent::baseFieldDefinitions($entity_type);
+
+    // Show the created field in the edit form.
+    $fields['created']->setDisplayOptions('form', [
+      'type' => 'datetime_timestamp',
+      'weight' => 10,
+    ]);
 
     $fields['changed'] = BaseFieldDefinition::create('changed_test')
       ->setLabel(t('Changed'))

@@ -70,7 +70,17 @@ class EntityTestMulRevPub extends EntityTestMulRev implements EntityPublishedInt
    * {@inheritdoc}
    */
   public static function baseFieldDefinitions(EntityTypeInterface $entity_type) {
-    return parent::baseFieldDefinitions($entity_type) + static::publishedBaseFieldDefinitions($entity_type);
+    $fields = parent::baseFieldDefinitions($entity_type) + static::publishedBaseFieldDefinitions($entity_type);
+
+    $fields['status']
+      ->setDisplayOptions('form', [
+        'type' => 'boolean_checkbox',
+        'settings' => [
+          'display_label' => TRUE,
+        ],
+      ])
+      ->setDisplayConfigurable('form', TRUE);
+    return $fields;
   }
 
 }

@@ -447,6 +447,8 @@ class ContentTranslationHandler implements ContentTranslationHandlerInterface, E
         '#default_value' => $status,
         '#description' => $description,
         '#disabled' => !$enabled,
+        // Show status field if it is not natively provided by the entity type.
+        '#access' => !$this->hasPublishedStatus(),
       ];
 
       $translate = !$new_translation && $metadata->isOutdated();
@@ -493,6 +495,7 @@ class ContentTranslationHandler implements ContentTranslationHandlerInterface, E
         '#validate_reference' => FALSE,
         '#maxlength' => 1024,
         '#description' => $this->t('Leave blank for %anonymous.', ['%anonymous' => \Drupal::config('user.settings')->get('anonymous')]),
+        '#access' => !$this->hasAuthor(),
       ];
 
       $date = $new_translation ? $this->time->getRequestTime() : $metadata->getCreatedTime();
@@ -502,6 +505,7 @@ class ContentTranslationHandler implements ContentTranslationHandlerInterface, E
         '#maxlength' => 25,
         '#description' => $this->t('Leave blank to use the time of form submission.'),
         '#default_value' => $new_translation || !$date ? '' : $this->dateFormatter->format($date, 'custom', 'Y-m-d H:i:s O'),
+        '#access' => !$this->hasCreatedTime(),
       ];
 
       $form['#process'][] = [$this, 'entityFormSharedElements'];
@@ -680,9 +684,15 @@ class ContentTranslationHandler implements ContentTranslationHandlerInterface, E
     $values = &$form_state->getValue('content_translation', []);
 
     $metadata = $this->manager->getTranslationMetadata($entity);
-    $metadata->setAuthor(!empty($values['uid']) ? User::load($values['uid']) : User::load(0));
-    $metadata->setPublished(!empty($values['status']));
-    $metadata->setCreatedTime(!empty($values['created']) ? strtotime($values['created']) : $this->time->getRequestTime());
+    if (isset($form['content_translation']['uid']) && $form['content_translation']['uid']['#access']) {
+      $metadata->setAuthor(!empty($values['uid']) ? User::load($values['uid']) : User::load(0));
+    }
+    if (isset($form['content_translation']['status']) && $form['content_translation']['status']['#access']) {
+      $metadata->setPublished(!empty($values['status']));
+    }
+    if (isset($form['content_translation']['created']) && $form['content_translation']['created']['#access']) {
+      $metadata->setCreatedTime(!empty($values['created']) ? strtotime($values['created']) : $this->time->getRequestTime());
+    }
 
     $metadata->setOutdated(!empty($values['outdated']));
     if (!empty($values['retranslate'])) {

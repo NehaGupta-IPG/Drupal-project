@@ -20,6 +20,7 @@ use Drupal\user\UserInterface;
 abstract class ContentTranslationUITestBase extends ContentTranslationTestBase {
 
   use AssertPageCacheContextsAndTagsTrait;
+  use ContentTranslationMetadataTrait;
 
   /**
    * The id of the entity being translated.
@@ -295,8 +296,8 @@ abstract class ContentTranslationUITestBase extends ContentTranslationTestBase {
     foreach ($this->langcodes as $index => $langcode) {
       if ($index > 0) {
         $url = $entity->toUrl('edit-form', ['language' => ConfigurableLanguage::load($langcode)]);
-        $edit = ['content_translation[status]' => FALSE];
         $this->drupalGet($url);
+        $edit = $this->getMetadataValueAndAssertNoField('status', FALSE);
         $this->submitForm($edit, $this->getFormSubmitAction($entity, $langcode));
         $storage = $this->container->get('entity_type.manager')
           ->getStorage($this->entityTypeId);
@@ -306,10 +307,13 @@ abstract class ContentTranslationUITestBase extends ContentTranslationTestBase {
       }
     }
 
-    // Check that the last published translation cannot be unpublished.
-    $this->drupalGet($entity->toUrl('edit-form'));
-    $this->assertSession()->fieldDisabled('content_translation[status]');
-    $this->assertSession()->fieldValueEquals('content_translation[status]', TRUE);
+    // Check that the last published translation cannot be unpublished, this
+    // only applies to the translation specific status field.
+    if (!$this->hasMetadataField('status')) {
+      $this->drupalGet($entity->toUrl('edit-form'));
+      $this->assertSession()->fieldDisabled('content_translation[status]');
+      $this->assertSession()->fieldValueEquals('content_translation[status]', TRUE);
+    }
   }
 
   /**
@@ -324,16 +328,14 @@ abstract class ContentTranslationUITestBase extends ContentTranslationTestBase {
     // Post different authoring information for each translation.
     foreach ($this->langcodes as $langcode) {
       $user = $this->drupalCreateUser();
+      $url = $entity->toUrl('edit-form', ['language' => ConfigurableLanguage::load($langcode)]);
+      $this->drupalGet($url);
       $values[$langcode] = [
         'uid' => $user->id(),
         'created' => \Drupal::time()->getRequestTime() - mt_rand(0, 1000),
       ];
-      $edit = [
-        'content_translation[uid]' => $user->getAccountName(),
-        'content_translation[created]' => $this->container->get('date.formatter')->format($values[$langcode]['created'], 'custom', 'Y-m-d H:i:s O'),
-      ];
-      $url = $entity->toUrl('edit-form', ['language' => ConfigurableLanguage::load($langcode)]);
-      $this->drupalGet($url);
+      $edit = $this->getMetadataValueAndAssertNoField('uid', $user->getAccountName());
+      $edit += $this->getMetadataValueAndAssertNoField('created', $values[$langcode]['created']);
       $this->submitForm($edit, $this->getFormSubmitAction($entity, $langcode));
     }
 
@@ -348,12 +350,9 @@ abstract class ContentTranslationUITestBase extends ContentTranslationTestBase {
 
     // Try to post non valid values and check that they are rejected.
     $langcode = 'en';
-    $edit = [
-      // User names have by default length 8.
-      'content_translation[uid]' => $this->randomMachineName(12),
-      'content_translation[created]' => '19/11/1978',
-    ];
     $this->drupalGet($entity->toUrl('edit-form'));
+    $edit = $this->getMetadataValueAndAssertNoField('uid', $this->randomMachineName(12));
+    $edit += $this->getMetadataValueAndAssertNoField('created', '19/11/1978');
     $this->submitForm($edit, $this->getFormSubmitAction($entity, $langcode));
     $this->assertSession()->statusMessageExists('error');
     $metadata = $this->manager->getTranslationMetadata($entity->getTranslation($langcode));

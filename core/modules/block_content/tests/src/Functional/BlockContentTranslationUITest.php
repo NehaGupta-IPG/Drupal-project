@@ -111,6 +111,21 @@ class BlockContentTranslationUITest extends ContentTranslationUITestBase {
   /**
    * {@inheritdoc}
    */
+  protected function hasMetadataField($field_name): bool {
+    $result = parent::hasMetadataField($field_name);
+    // Block content entities have a status field but do not expose it.
+    // @todo This will not be necessary once this issue lands:
+    //   https://www.drupal.org/project/drupal/issues/2834546
+    if ($field_name === 'status') {
+      return FALSE;
+    }
+
+    return $result;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   protected function doTestBasicTranslation(): void {
     parent::doTestBasicTranslation();
 
