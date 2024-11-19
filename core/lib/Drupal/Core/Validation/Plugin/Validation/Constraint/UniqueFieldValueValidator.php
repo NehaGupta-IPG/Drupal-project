@@ -146,7 +146,7 @@ class UniqueFieldValueValidator extends ConstraintValidator implements Container
    */
   private function caseInsensitiveArrayIntersect(array $orig_values, array $comp_values): array {
     $lowercase_comp_values = array_map('strtolower', $comp_values);
-    $intersect_map = array_map(fn (string $x) => in_array(strtolower($x), $lowercase_comp_values, TRUE) ? iconv('UTF-8', 'ISO-8859-1//TRANSLIT', $x) : NULL, $orig_values);
+    $intersect_map = array_map(fn (string $x) => in_array(strtolower($x), $lowercase_comp_values, TRUE) ? $x : NULL, $orig_values);
 
     return array_filter($intersect_map, function ($x) {
       return $x !== NULL;
