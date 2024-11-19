@@ -90,6 +90,13 @@ class UniqueFieldValueValidator extends ConstraintValidator implements Container
       $column_key = key(reset($results));
       $other_entity_values = array_column($results, $column_key);
 
+      // These values from the database area always strings, so we can change
+      // the case of all of them.
+      $other_entity_values = array_map(fn(string $value) => iconv('UTF-8', 'ASCII//TRANSLIT', $value) , $other_entity_values);
+      // Item values could be of any type, only change the case of string
+      // values.
+      $item_values = array_map(fn(mixed $value) => is_string($value) ? iconv('UTF-8', 'ASCII//TRANSLIT', $value) : $value, $item_values);
+
       // If our entity duplicates field values in any other entity, the query
       // will return all field values that belong to those entities. Narrow
       // down to only the specific duplicate values.
@@ -139,7 +146,7 @@ class UniqueFieldValueValidator extends ConstraintValidator implements Container
    */
   private function caseInsensitiveArrayIntersect(array $orig_values, array $comp_values): array {
     $lowercase_comp_values = array_map('strtolower', $comp_values);
-    $intersect_map = array_map(fn (string $x) => in_array(strtolower($x), $lowercase_comp_values, TRUE) ? $x : NULL, $orig_values);
+    $intersect_map = array_map(fn (string $x) => in_array(strtolower($x), $lowercase_comp_values, TRUE) ? iconv('UTF-8', 'ISO-8859-1//TRANSLIT', $x) : NULL, $orig_values);
 
     return array_filter($intersect_map, function ($x) {
       return $x !== NULL;
