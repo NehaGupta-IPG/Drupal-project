@@ -309,7 +309,7 @@ abstract class ConfigEntityBase extends EntityBase implements ConfigEntityInterf
     // Ensure this entity's UUID does not exist with a different ID, regardless
     // of whether it's new or updated.
     $matching_entities = $storage->getQuery()
-      ->condition('uuid', $this->uuid())
+      ->condition('uuid', $this->uuid() ?? '')
       ->execute();
     $matched_entity = reset($matching_entities);
     if (!empty($matched_entity) && ($matched_entity != $this->id()) && $matched_entity != $this->getOriginalId()) {
