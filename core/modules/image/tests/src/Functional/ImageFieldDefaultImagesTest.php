@@ -81,6 +81,12 @@ class ImageFieldDefaultImagesTest extends ImageFieldTestBase {
     ];
     $field = $this->createImageField($field_name, 'node', 'article', $storage_settings, $field_settings, $widget_settings);
 
+    // Confirm file usage entries are added.
+    $storage_image_usage = \Drupal::service('file.usage')->listUsage($default_images['field_storage']);
+    $this->assertSame(['image' => ['field_storage_config' => ["node.$field_name" => '1']]], $storage_image_usage);
+    $field_image_usage = \Drupal::service('file.usage')->listUsage($default_images['field']);
+    $this->assertSame(['image' => ['field_config' => ["node.article.$field_name" => '1']]], $field_image_usage);
+
     // The field default image id should be 2.
     $this->assertEquals($default_images['field']->uuid(), $field->getSetting('default_image')['uuid']);
 

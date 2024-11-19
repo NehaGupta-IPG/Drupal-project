@@ -281,6 +281,43 @@ class ImageHooks {
   }
 
   /**
+   * Implements hook_ENTITY_TYPE_insert() for 'field_storage_config'.
+   */
+  #[Hook('field_storage_config_insert')]
+  public function fieldStorageConfigInsert(FieldStorageConfigInterface $field_storage): void {
+    if ($field_storage->getType() != 'image') {
+      // Only act on image fields.
+      return;
+    }
+    $default_image_uuid = $field_storage->getSetting('default_image')['uuid'];
+    $file = $default_image_uuid ? \Drupal::service('entity.repository')->loadEntityByUuid('file', $default_image_uuid) : FALSE;
+    if ($file) {
+      $file->setPermanent();
+      $file->save();
+      \Drupal::service('file.usage')->add($file, 'image', 'field_storage_config', $field_storage->id());
+    }
+  }
+
+  /**
+   * Implements hook_ENTITY_TYPE_insert() for 'field_config'.
+   */
+  #[Hook('field_config_insert')]
+  public function fieldConfigInsert(FieldConfigInterface $field): void {
+    if ($field->getType() != 'image') {
+      // Only act on image fields.
+      return;
+    }
+    $default_image_uuid = $field->getSetting('default_image')['uuid'];
+    $file = $default_image_uuid ? \Drupal::service('entity.repository')->loadEntityByUuid('file', $default_image_uuid) : FALSE;
+    if ($file) {
+      $file->setPermanent();
+      $file->save();
+      \Drupal::service('file.usage')->add($file, 'image', 'field_config', $field->id());
+    }
+
+  }
+
+  /**
    * Implements hook_ENTITY_TYPE_update() for 'field_storage_config'.
    */
   #[Hook('field_storage_config_update')]
@@ -299,11 +336,11 @@ class ImageHooks {
       if ($file_new) {
         $file_new->setPermanent();
         $file_new->save();
-        \Drupal::service('file.usage')->add($file_new, 'image', 'default_image', $field_storage->uuid());
+        \Drupal::service('file.usage')->add($file_new, 'image', 'field_storage_config', $field_storage->id());
       }
       // Is there an old file?
       if ($uuid_old && ($file_old = \Drupal::service('entity.repository')->loadEntityByUuid('file', $uuid_old))) {
-        \Drupal::service('file.usage')->delete($file_old, 'image', 'default_image', $field_storage->uuid());
+        \Drupal::service('file.usage')->delete($file_old, 'image', 'field_storage_config', $field_storage->id());
       }
     }
     // If the upload destination changed, then move the file.
@@ -334,11 +371,11 @@ class ImageHooks {
       if ($file_new) {
         $file_new->setPermanent();
         $file_new->save();
-        \Drupal::service('file.usage')->add($file_new, 'image', 'default_image', $field->uuid());
+        \Drupal::service('file.usage')->add($file_new, 'image', 'field_config', $field->id());
       }
       // Delete the old file, if present.
       if ($uuid_old && ($file_old = \Drupal::service('entity.repository')->loadEntityByUuid('file', $uuid_old))) {
-        \Drupal::service('file.usage')->delete($file_old, 'image', 'default_image', $field->uuid());
+        \Drupal::service('file.usage')->delete($file_old, 'image', 'field_config', $field->id());
       }
     }
     // If the upload destination changed, then move the file.
@@ -361,7 +398,7 @@ class ImageHooks {
     // The value of a managed_file element can be an array if #extended == TRUE.
     $uuid = $field->getSetting('default_image')['uuid'];
     if ($uuid && ($file = \Drupal::service('entity.repository')->loadEntityByUuid('file', $uuid))) {
-      \Drupal::service('file.usage')->delete($file, 'image', 'default_image', $field->uuid());
+      \Drupal::service('file.usage')->delete($file, 'image', 'field_storage_config', $field->id());
     }
   }
 
@@ -379,7 +416,7 @@ class ImageHooks {
     $uuid = $field->getSetting('default_image')['uuid'];
     // Remove the default image when the instance is deleted.
     if ($uuid && ($file = \Drupal::service('entity.repository')->loadEntityByUuid('file', $uuid))) {
-      \Drupal::service('file.usage')->delete($file, 'image', 'default_image', $field->uuid());
+      \Drupal::service('file.usage')->delete($file, 'image', 'field_config', $field->id());
     }
   }
 
