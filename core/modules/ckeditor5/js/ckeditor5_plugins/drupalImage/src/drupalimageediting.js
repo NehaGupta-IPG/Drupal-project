@@ -629,6 +629,18 @@ export default class DrupalImageEditing extends Plugin {
       .attributeToAttribute({
         view: {
           name: 'img',
+          key: 'src',
+        },
+        model: {
+          key: 'src',
+          value: (viewElement) => {
+            return viewElement.getAttribute('src');
+          },
+        },
+      })
+      .attributeToAttribute({
+        view: {
+          name: 'img',
           key: 'width',
         },
         model: {
