@@ -3,7 +3,6 @@
 namespace Drupal\node\Plugin\views\field;
 
 use Drupal\Core\Url;
-use Drupal\node\Entity\Node;
 use Drupal\views\Attribute\ViewsField;
 use Drupal\views\ResultRow;
 
