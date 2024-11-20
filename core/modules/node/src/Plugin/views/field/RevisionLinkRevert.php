@@ -31,7 +31,7 @@ class RevisionLinkRevert extends RevisionLink {
     $translation = $this->getEntityTranslationByRelationship($node, $row);
     $langcode = $translation->language()->getId();
     // Detect if the latest version has any translation.
-    $original = Node::load($nid);
+    $original = $node->original;
     $languages = $original->getTranslationLanguages();
     $has_translations = (count($languages) > 1);
 
