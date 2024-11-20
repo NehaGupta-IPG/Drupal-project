@@ -3,7 +3,7 @@
  * CKEditor 5 implementation of {@link Drupal.editors} API.
  */
 
-((Drupal, debounce, CKEditor5, $, once) => {
+((Drupal, CKEditor5, $, once) => {
   /**
    * The CKEditor 5 instances.
    *
@@ -520,7 +520,7 @@
      *   Callback called with the value of the editor.
      */
     onChange(element, callback) {
-      callbacks.set(getElementId(element), debounce(callback, 400, true));
+      callbacks.set(getElementId(element), callback);
     },
 
     /**
@@ -677,4 +677,4 @@
       Drupal.ckeditor5.saveCallback = null;
     }
   });
-})(Drupal, Drupal.debounce, CKEditor5, jQuery, once);
+})(Drupal, CKEditor5, jQuery, once);
