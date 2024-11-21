@@ -113,7 +113,7 @@ class MigrateCommentTest extends MigrateDrupal7TestBase {
     $comment = Comment::load(4);
     $this->assertInstanceOf(Comment::class, $comment);
     $this->assertSame('Comment without language', $comment->getSubject());
-    $this->assertSame('1426781880', $comment->getCreatedTime());
+    $this->assertSame(1426781880, $comment->getCreatedTime());
     $this->assertSame(1426781880, $comment->getChangedTime());
     $this->assertTrue($comment->isPublished());
     $this->assertSame('Bob', $comment->getAuthorName());
