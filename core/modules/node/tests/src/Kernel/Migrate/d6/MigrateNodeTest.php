@@ -61,7 +61,7 @@ class MigrateNodeTest extends MigrateNodeTestBase {
     $this->assertSame('filtered_html', $node->body->format);
     $this->assertSame('story', $node->getType(), 'Node has the correct bundle.');
     $this->assertSame('Test title rev 3', $node->getTitle(), 'Node has the correct title.');
-    $this->assertSame('1390095702', $node->getCreatedTime(), 'Node has the correct created time.');
+    $this->assertSame(1390095702, $node->getCreatedTime(), 'Node has the correct created time.');
     $this->assertFalse($node->isSticky());
     $this->assertSame('1', $node->getOwnerId());
     $this->assertSame('1420861423', $node->getRevisionCreationTime());

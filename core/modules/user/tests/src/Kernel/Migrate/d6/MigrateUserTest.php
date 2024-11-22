@@ -104,7 +104,7 @@ class MigrateUserTest extends MigrateDrupal6TestBase {
       $this->assertSame($source->uid, $user->id());
       $this->assertSame($source->name, $user->label());
       $this->assertSame($source->mail, $user->getEmail());
-      $this->assertSame($source->created, $user->getCreatedTime());
+      $this->assertSame((int) $source->created, $user->getCreatedTime());
       $this->assertSame($source->access, $user->getLastAccessedTime());
       $this->assertSame($source->login, $user->getLastLoginTime());
       $is_blocked = $source->status == 0;

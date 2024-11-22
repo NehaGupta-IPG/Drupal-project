@@ -100,7 +100,7 @@ class MigrateUserTest extends MigrateDrupal7TestBase {
     $this->assertSame($label, $user->label());
     $this->assertSame($mail, $user->getEmail());
     $this->assertSame($password, $user->getPassword());
-    $this->assertSame($created, (int) $user->getCreatedTime());
+    $this->assertSame($created, $user->getCreatedTime());
     $this->assertSame($access, (int) $user->getLastAccessedTime());
     $this->assertSame($login, (int) $user->getLastLoginTime());
     $this->assertNotSame($blocked, (bool) $user->isBlocked());
@@ -243,7 +243,7 @@ class MigrateUserTest extends MigrateDrupal7TestBase {
     $metadata_fr = $manager->getTranslationMetadata($user_fr);
     $this->assertSame('en', $metadata_fr->getSource());
     $this->assertSame('1', $metadata_fr->getAuthor()->uid->value);
-    $this->assertSame('1531663916', $metadata_fr->getCreatedTime());
+    $this->assertSame(1531663916, $metadata_fr->getCreatedTime());
     $this->assertFalse($metadata_fr->isOutdated());
     $this->assertFalse($metadata_fr->isPublished());
 
@@ -251,7 +251,7 @@ class MigrateUserTest extends MigrateDrupal7TestBase {
     $metadata_is = $manager->getTranslationMetadata($user_is);
     $this->assertSame('en', $metadata_is->getSource());
     $this->assertSame('2', $metadata_is->getAuthor()->uid->value);
-    $this->assertSame('1531663925', $metadata_is->getCreatedTime());
+    $this->assertSame(1531663925, $metadata_is->getCreatedTime());
     $this->assertTrue($metadata_is->isOutdated());
     $this->assertTrue($metadata_is->isPublished());
 
