@@ -785,11 +785,11 @@ class LibraryDiscoveryParserTest extends UnitTestCase {
    * @covers ::getLatestOverridePath
    * @covers ::setLatestOverridePath
    */
-  public function testLatestOverridePath() {
-    $latest = $this->libraryDiscoveryParser->getLatestOverridePath('original-path', 'type', 'extension', 'library_name');
+  public function testLatestOverridePath(): void {
+    $latest = $this->libraryDiscoveryParser->getLatestOverridePath('original-path', 'type', 'library_name', 'extension');
     $this->assertEquals('original-path', $latest);
-    $this->libraryDiscoveryParser->setLatestOverridePath('latest-path', 'original-path', 'type', 'extension', 'library_name');
-    $latest = $this->libraryDiscoveryParser->getLatestOverridePath('original-path', 'type', 'extension', 'library_name');
+    $this->libraryDiscoveryParser->setLatestOverridePath('latest-path', 'original-path', 'type', 'library_name', 'extension');
+    $latest = $this->libraryDiscoveryParser->getLatestOverridePath('original-path', 'type', 'library_name', 'extension');
     $this->assertEquals('latest-path', $latest);
   }
 
@@ -908,12 +908,12 @@ class TestLibraryDiscoveryParser extends LibraryDiscoveryParser {
     $this->validUris[$source] = $valid;
   }
 
-  public function getLatestOverridePath($original_path, $type, $extension, $library_name) {
-    return parent::getLatestOverridePath($original_path, $type, $extension, $library_name);
+  public function getLatestOverridePath(string $original_path, string $type, string $library_name, string $extension): string|false {
+    return parent::getLatestOverridePath($original_path, $type, $library_name, $extension);
   }
 
-  public function setLatestOverridePath($new_path, $original_path, $type, $extension, $library_name) {
-    parent::setLatestOverridePath($new_path, $original_path, $type, $extension, $library_name);
+  public function setLatestOverridePath(bool|string $new_path, string $original_path, string $type, string $library_name, string $extension): void {
+    parent::setLatestOverridePath($new_path, $original_path, $type, $library_name, $extension);
   }
 
 }

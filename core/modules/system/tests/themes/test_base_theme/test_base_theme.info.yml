@@ -18,10 +18,10 @@ libraries-override:
     css:
       base:
         assets/vendor/normalize-css/normalize.css: css/normalize.css
-    core/drupal.vertical-tabs:
-      css:
-        component:
-          misc/vertical-tabs.css: css/vertical-tabs.css
+  core/drupal.vertical-tabs:
+    css:
+      component:
+        misc/vertical-tabs.css: css/vertical-tabs.css
   theme_test/theme_stylesheets_override_and_remove_test:
     css:
       base:

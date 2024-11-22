@@ -181,7 +181,7 @@ class LibraryDiscoveryIntegrationTest extends KernelTestBase {
   /**
    * Tests that libraries-override will not affect order of assets.
    */
-  public function testLibrariesOverrideOverriddenOrder() {
+  public function testLibrariesOverrideOverriddenOrder(): void {
     $this->assertNoAssetInLibrary('core/modules/system/tests/themes/test_subtheme/css/ensure-order.css', 'test_base_theme', 'global-styling', 'css');
     // Get assets for base_theme.
     $original_assets = array_column($this->libraryDiscovery->getLibraryByName('test_base_theme', 'global-styling')['css'], 'data');
@@ -194,6 +194,11 @@ class LibraryDiscoveryIntegrationTest extends KernelTestBase {
 
     // Get overridden assets.
     $overridden_assets = array_column($this->libraryDiscovery->getLibraryByName('test_base_theme', 'global-styling')['css'], 'data');
+
+    // Remove the sub-removed from overridden.
+    $sub_remove_key = array_search('base-add.sub-remove.css', $original_assets);
+    unset($original_assets[$sub_remove_key]);
+    $original_assets = array_values($original_assets);
 
     // Overridden asset should be at same position in array.
     $this->assertEquals(
@@ -218,12 +223,11 @@ class LibraryDiscoveryIntegrationTest extends KernelTestBase {
   /**
    * Tests library-override on already overridden libraries.
    */
-  public function testLibrariesOverrideOverridden() {
+  public function testLibrariesOverrideOverridden(): void {
     // Activate a sub-theme that doesn't override a library override.
     $this->activateTheme('test_subtheme');
 
     // Assert that effective libraries override is from the test_subsubtheme.
-    $this->assertAssetInLibrary('core/modules/system/tests/themes/test_base_theme/css/farbtastic.css', 'core', 'jquery.farbtastic', 'css');
     $this->assertAssetInLibrary('core/modules/system/tests/themes/test_base_theme/css/normalize.css', 'core', 'normalize', 'css');
 
     // Activate a sub-theme that overrides a library override.
@@ -244,13 +248,13 @@ class LibraryDiscoveryIntegrationTest extends KernelTestBase {
    *
    * @group legacy
    */
-  public function testLibrariesOverrideLegacyOverride() {
+  public function testLibrariesOverrideLegacyOverride(): void {
     // Activate a sub-theme that overrides a library override.
     $this->activateTheme('test_legacy_subtheme');
     // Assert that effective libraries override is from the test_legacy_subtheme.
-    $this->assertNoAssetInLibrary('core/modules/system/tests/themes/test_base_theme/css/farbtastic.css', 'core', 'jquery.farbtastic', 'css');
-    $this->assertAssetInLibrary('core/modules/system/tests/themes/test_legacy_subtheme/css/legacy-subtheme-farbtastic.css', 'core', 'jquery.farbtastic', 'css');
-    $this->expectDeprecation('Overriding a library asset using an overridden path as the key is deprecated in drupal:9.3.0 and is removed from drupal:10.0.0. Please use the original path (/core/modules/system/tests/themes/test_base_theme/css/farbtastic.css) as the key. See http://drupal.org/node/XXXX');
+    $this->assertNoAssetInLibrary('core/modules/system/tests/themes/test_base_theme/base-add.sub-remove.css', 'test_base_theme', 'global-styling', 'css');
+    $this->assertAssetInLibrary('core/modules/system/tests/themes/test_legacy_subtheme/css/legacy-sub-theme-libraries-extend.css', 'test_base_theme', 'global-styling', 'css');
+    $this->expectDeprecation('Overriding a library asset using an overridden path as the key is deprecated in drupal:9.3.0 and is removed from drupal:10.0.0. Please use the original path (/core/modules/system/tests/themes/test_base_theme/css/base-libraries-extend.css) as the key. See https://www.drupal.org/node/3489303');
   }
 
   /**
@@ -376,7 +380,7 @@ class LibraryDiscoveryIntegrationTest extends KernelTestBase {
    */
   protected function assertAssetInLibrary(string $asset, string $extension, string $library_name, string $sub_key, ?string $message = NULL): void {
     if (!isset($message)) {
-      $message = sprintf('Asset %s found in library "%s/%s"', $asset, $extension, $library_name);
+      $message = sprintf('Asset %s not found in library "%s/%s" but was expected', $asset, $extension, $library_name);
     }
     $library = $this->container->get('library.discovery')->getLibraryByName($extension, $library_name);
     foreach ($library[$sub_key] as $definition) {
@@ -405,7 +409,7 @@ class LibraryDiscoveryIntegrationTest extends KernelTestBase {
    */
   protected function assertNoAssetInLibrary(string $asset, string $extension, string $library_name, string $sub_key, ?string $message = NULL): void {
     if (!isset($message)) {
-      $message = sprintf('Asset %s not found in library "%s/%s"', $asset, $extension, $library_name);
+      $message = sprintf('Asset %s found in library "%s/%s" but was not expected', $asset, $extension, $library_name);
     }
     $library = $this->container->get('library.discovery')->getLibraryByName($extension, $library_name);
     foreach ($library[$sub_key] as $definition) {

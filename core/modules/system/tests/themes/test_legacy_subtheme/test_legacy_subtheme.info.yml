@@ -5,7 +5,7 @@ version: VERSION
 base theme: test_subtheme
 
 libraries-override:
-  core/jquery.farbtastic:
+  test_base_theme/global-styling:
     css:
-      component:
-        /core/modules/system/tests/themes/test_basetheme/css/farbtastic.css: css/legacy-subtheme-farbtastic.css
+      base:
+        /core/modules/system/tests/themes/test_base_theme/css/base-libraries-extend.css: css/legacy-sub-theme-libraries-extend.css

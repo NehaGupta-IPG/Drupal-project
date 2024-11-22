@@ -59,9 +59,9 @@ class LibraryDiscoveryParser {
    * libraries-override behavior where overriding of already overridden paths
    * required using the full Drupal-root-relative path of the last override.
    *
-   * @todo Remove BC layer in Drupal 10.0.0 https://www.drupal.org/node/2852314.
-   *
    * @var array
+   *
+   * @todo Remove BC layer in Drupal 10.0.0 https://www.drupal.org/node/2852314.
    */
   protected $originalLibraryPaths = [];
 
@@ -629,19 +629,19 @@ class LibraryDiscoveryParser {
    * @param string $theme_path
    *   The path to the theme defining the libraries-override.
    */
-  protected function setOverrideValue(array $overrides, $type, $library_name, $extension, $theme_path) {
+  protected function setOverrideValue(array $overrides, string $type, string $library_name, string $extension, string $theme_path): void {
     foreach ($overrides as $original => $replacement) {
       // $original can either be the last overridden path or the original
       // library definition path.
 
       // For BC we check if $original still refers to base-theme overrides.
-      // @todo Remove BC in Drupal 10.0.0 https://www.drupal.org/node/2852314.
+      // @todo Remove BC in Drupal 12.0.0 https://www.drupal.org/node/2852314.
       if (isset($this->originalLibraryPaths[$original])) {
         // Here $original actually refers to an overridden path (maybe from a
         // base theme), so get the actual original path by which the library
         // asset was keyed.
         @trigger_error(sprintf(
-          'Overriding a library asset using an overridden path as the key is deprecated in drupal:9.3.0 and is removed from drupal:10.0.0. Please use the original path (%s) as the key. See INSERT_CHANGE_RECORD_LINK_HERE',
+          'Overriding a library asset using an overridden path as the key is deprecated in drupal:9.3.0 and is removed from drupal:10.0.0. Please use the original path (%s) as the key. See https://www.drupal.org/node/3489303',
           $original
         ), E_USER_DEPRECATED);
         $original = $this->originalLibraryPaths[$original];
@@ -667,10 +667,14 @@ class LibraryDiscoveryParser {
    *   false if the asset is to be removed.
    */
   protected function resolveThemeAssetPath($theme_path, $overriding_asset) {
-    if ($overriding_asset == FALSE) {
+    if ($overriding_asset === FALSE) {
       return FALSE;
     }
-    if ($overriding_asset[0] !== '/' && !$this->isValidUri($overriding_asset)) {
+    if (
+      isset($overriding_asset[0])
+      && $overriding_asset[0] !== '/'
+      && !$this->isValidUri($overriding_asset)
+    ) {
       // The destination is not an absolute path and it's not a URI (e.g.
       // public://generated_js/example.js or https://example.com/js/my_js.js),
       // so it's relative to the theme.
@@ -726,11 +730,9 @@ class LibraryDiscoveryParser {
    *   if the asset is not overridden. Returns false if the asset is to be
    *   removed.
    */
-  protected function getLatestOverridePath($original_path, $type, $library_name, $extension) {
+  protected function getLatestOverridePath(string $original_path, string $type, string $library_name, string $extension): string|false {
     $key = $extension . ':' . $library_name . ':' . $type . ':' . $original_path;
-    return isset($this->overriddenLibraryPaths[$key])
-      ? $this->overriddenLibraryPaths[$key]
-      : $original_path;
+    return $this->overriddenLibraryPaths[$key] ?? $original_path;
   }
 
   /**
@@ -748,7 +750,7 @@ class LibraryDiscoveryParser {
    * @param string $extension
    *   The extension name.
    */
-  protected function setLatestOverridePath($new_path, $original_path, $type, $library_name, $extension) {
+  protected function setLatestOverridePath(string|bool $new_path, string $original_path, string $type, string $library_name, string $extension): void {
     $this->overriddenLibraryPaths[$extension . ':' . $library_name . ':' . $type . ':' . $original_path] = $new_path;
   }
 
