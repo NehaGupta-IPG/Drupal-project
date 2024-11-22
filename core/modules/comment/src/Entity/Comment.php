@@ -475,8 +475,7 @@ class Comment extends ContentEntityBase implements CommentInterface {
    * {@inheritdoc}
    */
   public function getCreatedTime() {
-    $value = $this->get('created')->value;
-    return isset($value) ? (int) $value : NULL;
+    return (int) $this->get('created')->value;
   }
 
   /**
