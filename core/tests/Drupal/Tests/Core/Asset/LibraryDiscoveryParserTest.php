@@ -782,6 +782,18 @@ class LibraryDiscoveryParserTest extends UnitTestCase {
   }
 
   /**
+   * @covers ::getLatestOverridePath
+   * @covers ::setLatestOverridePath
+   */
+  public function testLatestOverridePath() {
+    $latest = $this->libraryDiscoveryParser->getLatestOverridePath('original-path', 'type', 'extension', 'library_name');
+    $this->assertEquals('original-path', $latest);
+    $this->libraryDiscoveryParser->setLatestOverridePath('latest-path', 'original-path', 'type', 'extension', 'library_name');
+    $latest = $this->libraryDiscoveryParser->getLatestOverridePath('original-path', 'type', 'extension', 'library_name');
+    $this->assertEquals('latest-path', $latest);
+  }
+
+  /**
    * Tests non core libraries found.
    *
    * @legacy-covers ::buildByExtension
@@ -894,6 +906,14 @@ class TestLibraryDiscoveryParser extends LibraryDiscoveryParser {
 
   public function setFileValidUri($source, $valid): void {
     $this->validUris[$source] = $valid;
+  }
+
+  public function getLatestOverridePath($original_path, $type, $extension, $library_name) {
+    return parent::getLatestOverridePath($original_path, $type, $extension, $library_name);
+  }
+
+  public function setLatestOverridePath($new_path, $original_path, $type, $extension, $library_name) {
+    parent::setLatestOverridePath($new_path, $original_path, $type, $extension, $library_name);
   }
 
 }

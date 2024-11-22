@@ -179,6 +179,30 @@ class LibraryDiscoveryIntegrationTest extends KernelTestBase {
   }
 
   /**
+   * Tests that libraries-override will not affect order of assets.
+   */
+  public function testLibrariesOverrideOverriddenOrder() {
+    $this->assertNoAssetInLibrary('core/modules/system/tests/themes/test_subtheme/css/ensure-order.css', 'test_base_theme', 'global-styling', 'css');
+    // Get assets for base_theme.
+    $original_assets = array_column($this->libraryDiscovery->getLibraryByName('test_base_theme', 'global-styling')['css'], 'data');
+
+    // Activate a subtheme with overrides.
+    $this->activateTheme('test_subtheme');
+    // Assert asset is applied in subtheme.
+    $this->assertNoAssetInLibrary('core/modules/system/tests/themes/test_base_theme/ensure-order.css', 'test_base_theme', 'global-styling', 'css');
+    $this->assertAssetInLibrary('core/modules/system/tests/themes/test_subtheme/css/ensure-order.css', 'test_base_theme', 'global-styling', 'css');
+
+    // Get overridden assets.
+    $overridden_assets = array_column($this->libraryDiscovery->getLibraryByName('test_base_theme', 'global-styling')['css'], 'data');
+
+    // Overridden asset should be at same position in array.
+    $this->assertEquals(
+      array_search('core/modules/system/tests/themes/test_base_theme/ensure-order.css', $original_assets, TRUE),
+      array_search('core/modules/system/tests/themes/test_subtheme/css/ensure-order.css', $overridden_assets, TRUE)
+    );
+  }
+
+  /**
    * Tests that base theme libraries-override still apply in sub themes.
    */
   public function testBaseThemeLibrariesOverrideInSubTheme(): void {
@@ -189,6 +213,44 @@ class LibraryDiscoveryIntegrationTest extends KernelTestBase {
     // in the sub theme.
     $this->assertNoAssetInLibrary('core/misc/dialog/dialog.js', 'core', 'drupal.dialog', 'js');
     $this->assertAssetInLibrary('core/modules/system/tests/themes/test_base_theme/js/loadjs.min.js', 'core', 'loadjs', 'js');
+  }
+
+  /**
+   * Tests library-override on already overridden libraries.
+   */
+  public function testLibrariesOverrideOverridden() {
+    // Activate a sub-theme that doesn't override a library override.
+    $this->activateTheme('test_subtheme');
+
+    // Assert that effective libraries override is from the test_subsubtheme.
+    $this->assertAssetInLibrary('core/modules/system/tests/themes/test_base_theme/css/farbtastic.css', 'core', 'jquery.farbtastic', 'css');
+    $this->assertAssetInLibrary('core/modules/system/tests/themes/test_base_theme/css/normalize.css', 'core', 'normalize', 'css');
+
+    // Activate a sub-theme that overrides a library override.
+    $this->activateTheme('test_subsubtheme');
+
+    // Assert that effective libraries override is from the test_subsubtheme.
+    $this->assertNoAssetInLibrary('core/modules/system/tests/themes/test_base_theme/css/normalize.css', 'core', 'normalize', 'css');
+    $this->assertNoAssetInLibrary('core/assets/vendor/normalize-css/normalize.css', 'core', 'normalize', 'css');
+    $this->assertAssetInLibrary('core/modules/system/tests/themes/test_subsubtheme/js/subsubtheme-dialog.js', 'core', 'drupal.dialog', 'js');
+
+    // Assert that the override occurs from parent theme to child theme.
+    $this->assertNoAssetInLibrary('core/modules/system/tests/themes/test_base_theme/css/vertical-tabs.css', 'core', 'drupal.vertical-tabs', 'css');
+    $this->assertAssetInLibrary('core/modules/system/tests/themes/test_subtheme/css/vertical-tabs.css', 'core', 'drupal.vertical-tabs', 'css');
+  }
+
+  /**
+   * Tests previous behavior of using the last overridden path.
+   *
+   * @group legacy
+   */
+  public function testLibrariesOverrideLegacyOverride() {
+    // Activate a sub-theme that overrides a library override.
+    $this->activateTheme('test_legacy_subtheme');
+    // Assert that effective libraries override is from the test_legacy_subtheme.
+    $this->assertNoAssetInLibrary('core/modules/system/tests/themes/test_base_theme/css/farbtastic.css', 'core', 'jquery.farbtastic', 'css');
+    $this->assertAssetInLibrary('core/modules/system/tests/themes/test_legacy_subtheme/css/legacy-subtheme-farbtastic.css', 'core', 'jquery.farbtastic', 'css');
+    $this->expectDeprecation('Overriding a library asset using an overridden path as the key is deprecated in drupal:9.3.0 and is removed from drupal:10.0.0. Please use the original path (/core/modules/system/tests/themes/test_base_theme/css/farbtastic.css) as the key. See http://drupal.org/node/XXXX');
   }
 
   /**

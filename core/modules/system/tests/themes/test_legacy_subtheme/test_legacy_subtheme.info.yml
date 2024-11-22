@@ -1,0 +1,11 @@
+name: 'Theme test legacy subtheme'
+type: theme
+description: 'Test theme which uses test_subtheme as the base theme.'
+version: VERSION
+base theme: test_subtheme
+
+libraries-override:
+  core/jquery.farbtastic:
+    css:
+      component:
+        /core/modules/system/tests/themes/test_basetheme/css/farbtastic.css: css/legacy-subtheme-farbtastic.css

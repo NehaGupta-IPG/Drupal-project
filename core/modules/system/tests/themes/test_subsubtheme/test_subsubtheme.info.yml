@@ -8,3 +8,10 @@ libraries-override:
     css:
       base:
         css/sub-sub-last-override.css: false
+  core/drupal.dialog:
+    js:
+      misc/dialog/dialog.js: js/subsubtheme-dialog.js
+  core/normalize:
+    css:
+      base:
+        assets/vendor/normalize-css/normalize.css: false
