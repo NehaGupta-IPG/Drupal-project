@@ -641,7 +641,7 @@ class LibraryDiscoveryParser {
         // base theme), so get the actual original path by which the library
         // asset was keyed.
         @trigger_error(sprintf(
-          'Overriding a library asset using an overridden path as the key is deprecated in drupal:9.3.0 and is removed from drupal:10.0.0. Please use the original path (%s) as the key. See https://www.drupal.org/node/3489303',
+          'Overriding a library asset using an overridden path as the key is deprecated in drupal:9.3.0 and is removed from drupal:10.0.0. Use the original path (%s) as the key. See https://www.drupal.org/node/3489303',
           $original
         ), E_USER_DEPRECATED);
         $original = $this->originalLibraryPaths[$original];

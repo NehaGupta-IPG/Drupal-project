@@ -254,7 +254,7 @@ class LibraryDiscoveryIntegrationTest extends KernelTestBase {
     // Assert that effective libraries override is from the test_legacy_subtheme.
     $this->assertNoAssetInLibrary('core/modules/system/tests/themes/test_base_theme/base-add.sub-remove.css', 'test_base_theme', 'global-styling', 'css');
     $this->assertAssetInLibrary('core/modules/system/tests/themes/test_legacy_subtheme/css/legacy-sub-theme-libraries-extend.css', 'test_base_theme', 'global-styling', 'css');
-    $this->expectDeprecation('Overriding a library asset using an overridden path as the key is deprecated in drupal:9.3.0 and is removed from drupal:10.0.0. Please use the original path (/core/modules/system/tests/themes/test_base_theme/css/base-libraries-extend.css) as the key. See https://www.drupal.org/node/3489303');
+    $this->expectDeprecation('Overriding a library asset using an overridden path as the key is deprecated in drupal:9.3.0 and is removed from drupal:10.0.0. Use the original path (/core/modules/system/tests/themes/test_base_theme/css/base-libraries-extend.css) as the key. See https://www.drupal.org/node/3489303');
   }
 
   /**
