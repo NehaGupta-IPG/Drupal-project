@@ -371,9 +371,9 @@ class EntityTypeInfo implements ContainerInjectionInterface {
       }
     }
     elseif ($form_id === 'language_content_settings_form') {
-     // We use an after build to alter the form after content_translation.
-     // @see _content_translation_form_language_content_settings_form_alter()
-     $form['#after_build'][] = [$this, 'languageContentSettingsFormAfterBuild'];
+      // We use an after build to alter the form after content_translation.
+      // @see _content_translation_form_language_content_settings_form_alter()
+      $form['#after_build'][] = [$this, 'languageContentSettingsFormAfterBuild'];
     }
   }
 
@@ -385,7 +385,7 @@ class EntityTypeInfo implements ContainerInjectionInterface {
    * @param \Drupal\Core\Form\FormStateInterface $form_state
    *   The current state of the form.
    */
-  public function languageContentSettingsFormAfterBuild(array $form, FormStateInterface $form_state) {
+  public function languageContentSettingsFormAfterBuild(array $form, FormStateInterface $form_state): array {
     // Prevent the creation of base field overrides for "moderation_state"
     // which causes issues during clean install from existing config.
     foreach ($form['#labels'] as $entity_type_id => $label) {
@@ -397,7 +397,7 @@ class EntityTypeInfo implements ContainerInjectionInterface {
       }
     }
     return $form;
-   }
+  }
 
   /**
    * Checks whether the specified form allows to edit a moderated entity.
