@@ -11,3 +11,16 @@
 function content_moderation_update_last_removed(): int {
   return 8700;
 }
+
+/**
+ * Remove all base field overrides for moderation_state.
+ */
+function content_moderation_update_11001(): void {
+  $config_factory = \Drupal::configFactory();
+  foreach ($config_factory->listAll('core.base_field_override.') as $config_name) {
+    $config = $config_factory->getEditable($config_name);
+    if ($config->get('field_name') === 'moderation_state') {
+      $config->delete();
+    }
+  }
+}
