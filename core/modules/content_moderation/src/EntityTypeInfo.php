@@ -370,7 +370,34 @@ class EntityTypeInfo implements ContainerInjectionInterface {
         $form['meta']['published']['#markup'] = $this->moderationInfo->getWorkflowForEntity($entity)->getTypePlugin()->getState($entity->moderation_state->value)->label();
       }
     }
+    elseif ($form_id === 'language_content_settings_form') {
+     // We use an after build to alter the form after content_translation.
+     // @see _content_translation_form_language_content_settings_form_alter()
+     $form['#after_build'][] = [$this, 'languageContentSettingsFormAfterBuild'];
+    }
   }
+
+  /**
+   * Form after build handler for language_content_settings_form.
+   *
+   * @param array $form
+   *   An associative array containing the structure of the form.
+   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   *   The current state of the form.
+   */
+  public function languageContentSettingsFormAfterBuild(array $form, FormStateInterface $form_state) {
+    // Prevent the creation of base field overrides for "moderation_state"
+    // which causes issues during clean install from existing config.
+    foreach ($form['#labels'] as $entity_type_id => $label) {
+      foreach ($this->bundleInfo->getBundleInfo($entity_type_id) as $bundle => $bundle_info) {
+        if (isset($form['settings'][$entity_type_id][$bundle]['fields']['moderation_state'])) {
+          unset($form['settings'][$entity_type_id][$bundle]['fields']['moderation_state']);
+          $form_state->unsetValue(['settings', $entity_type_id, $bundle, 'fields', 'moderation_state']);
+        }
+      }
+    }
+    return $form;
+   }
 
   /**
    * Checks whether the specified form allows to edit a moderated entity.
