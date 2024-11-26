@@ -140,7 +140,7 @@ class TwigSandboxTest extends UnitTestCase {
     $this->assertEquals('testing', $result, 'Sandbox policy allows bundle() to be called.');
   }
 
-  public static function provideAllowedEntityMethods() {
+  public static function provideAllowedEntityMethods(): array {
     return [
       ['id'],
       ['bundle'],
@@ -156,15 +156,15 @@ class TwigSandboxTest extends UnitTestCase {
   public function testEntitySafeMethodsOnGenerics(): void {
     $sot = new class () {
 
-      public function id() {
+      public function id(): string {
         return 'id';
       }
 
-      public function label() {
+      public function label(): string {
         return 'label';
       }
 
-      public function bundle() {
+      public function bundle(): string {
         return 'bundle';
       }
 
@@ -190,7 +190,7 @@ class TwigSandboxTest extends UnitTestCase {
 
     $sot = new class () {
 
-      public function get($arg) {
+      public function get(string $arg): string {
         return $arg;
       }
 
@@ -208,7 +208,7 @@ class TwigSandboxTest extends UnitTestCase {
 
     $sot = new class () {
 
-      public function toString() {
+      public function toString(): string {
         return 'toString';
       }
 
