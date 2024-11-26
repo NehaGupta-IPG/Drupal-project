@@ -63,25 +63,7 @@ class TwigSandboxPolicy implements SecurityPolicyInterface {
     // Flip the array so we can check using isset().
     $this->allowed_classes = array_flip($allowed_classes);
 
-    $allowed_methods = static::getMethodsAllowedOnAllObjects();
-
-    // Align the array, so we can check using isset() during checks.
-    foreach ($allowed_methods as $method) {
-      if (!str_contains($method, '::')) {
-        @trigger_error('Not specifying a fully-qualified method name to twig_sandbox_allowed_methods is deprecated in drupal:11.0.0 and will throw an error in drupal:12.0.0. See https://www.drupal.org/node/3263019', E_USER_DEPRECATED);
-        $method = '::' . $method;
-      }
-      [$class, $name] = explode('::', $method);
-      if (isset($this->allowed_methods[$name])) {
-        $this->allowed_methods[$name][] = $class;
-      }
-      elseif ($class) {
-        $this->allowed_methods[$name] = [$class];
-      }
-      else {
-        $this->allowed_methods[$name] = [];
-      }
-    }
+    $this->allowed_methods = static::getMethodsAllowedOnAllObjects();
 
     $this->allowed_prefixes = Settings::get('twig_sandbox_allowed_prefixes', [
       'get',
@@ -146,16 +128,36 @@ class TwigSandboxPolicy implements SecurityPolicyInterface {
    *   The list of allowed methods on all objects.
    */
   public static function getMethodsAllowedOnAllObjects(): array {
-    return Settings::get('twig_sandbox_allowed_methods', [
-      // Only allow idempotent methods.
-      EntityInterface::class . '::id',
-      EntityInterface::class . '::label',
-      EntityInterface::class . '::bundle',
-      LayoutDefinition::class . '::id',
-      '::get',
-      '::__toString',
-      '::toString',
-    ]);
+    $allowed_methods = [];
+    // Align the array, so we can check using isset() during checks.
+    foreach (
+      Settings::get('twig_sandbox_allowed_methods', [
+        // Only allow idempotent methods.
+        EntityInterface::class . '::id',
+        EntityInterface::class . '::label',
+        EntityInterface::class . '::bundle',
+        LayoutDefinition::class . '::id',
+        '::get',
+        '::__toString',
+        '::toString',
+      ]) as $method
+    ) {
+      if (!str_contains($method, '::')) {
+        @trigger_error('Not specifying a fully-qualified method name to twig_sandbox_allowed_methods is deprecated in drupal:11.0.0 and will throw an error in drupal:12.0.0. See https://www.drupal.org/node/3263019', E_USER_DEPRECATED);
+        $method = '::' . $method;
+      }
+      [$class, $name] = explode('::', $method);
+      if (isset($allowed_methods[$name])) {
+        $allowed_methods[$name][] = $class;
+      }
+      elseif ($class) {
+        $allowed_methods[$name] = [$class];
+      }
+      else {
+        $allowed_methods[$name] = [];
+      }
+    }
+    return $allowed_methods;
   }
 
 }

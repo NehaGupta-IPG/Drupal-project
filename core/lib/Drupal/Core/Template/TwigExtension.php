@@ -169,7 +169,7 @@ class TwigExtension extends AbstractExtension {
       new TwigNodeVisitor(),
       new TwigNodeVisitorCheckDeprecations(),
     ];
-    if (\in_array('__toString', TwigSandboxPolicy::getMethodsAllowedOnAllObjects(), TRUE)) {
+    if (\in_array('::__toString', TwigSandboxPolicy::getMethodsAllowedOnAllObjects(), TRUE)) {
       // When __toString is an allowed method, there is no point in running
       // \Twig\Extension\SandboxExtension::ensureToStringAllowed, so we add a
       // node visitor to remove any CheckToStringNode nodes added by the
