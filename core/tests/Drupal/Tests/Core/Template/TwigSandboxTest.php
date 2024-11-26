@@ -180,7 +180,7 @@ class TwigSandboxTest extends UnitTestCase {
    * @covers ::checkMethodAllowed
    */
   public function testGloballySafeMethods(): void {
-    // get
+    // Calls to get method.
     $entity = $this->prophesize(ContentEntityBase::class);
     $entity->get('title')
       ->shouldBeCalled()
