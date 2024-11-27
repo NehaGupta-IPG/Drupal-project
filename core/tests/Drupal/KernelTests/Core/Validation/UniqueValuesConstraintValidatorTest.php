@@ -348,7 +348,7 @@ class UniqueValuesConstraintValidatorTest extends KernelTestBase {
       'id' => (int) rand(0, getrandmax()),
       'user_id' => 0,
       'field_test_text' => [
-        'éxample',
+        'brûlée',
       ],
     ];
     $entity = EntityTestUniqueConstraint::create($definition);
@@ -360,7 +360,7 @@ class UniqueValuesConstraintValidatorTest extends KernelTestBase {
       'id' => (int) rand(0, getrandmax()),
       'user_id' => 0,
       'field_test_text' => [
-        'example',
+        'brulee',
       ],
     ];
     $entity = EntityTestUniqueConstraint::create($definition);
