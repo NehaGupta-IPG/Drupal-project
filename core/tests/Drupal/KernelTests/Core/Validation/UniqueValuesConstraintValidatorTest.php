@@ -337,4 +337,35 @@ class UniqueValuesConstraintValidatorTest extends KernelTestBase {
     $this->assertEquals('field_test_text.0', $violations[0]->getPropertyPath());
   }
 
+  /**
+   * Username validation with Unique field validations.
+   *
+   * Case sensitivity and ASCII value comparison.
+   */
+  public function testUsernameUniqueValidation(): void {
+    // Create entity with two values for the testing field.
+    $definition = [
+      'id' => (int) rand(0, getrandmax()),
+      'user_id' => 0,
+      'field_test_text' => [
+        'éxample',
+      ],
+    ];
+    $entity = EntityTestUniqueConstraint::create($definition);
+    $violations = $entity->validate();
+    $this->assertCount(0, $violations);
+    $entity->save();
+
+    $definition = [
+      'id' => (int) rand(0, getrandmax()),
+      'user_id' => 0,
+      'field_test_text' => [
+        'example',
+      ],
+    ];
+    $entity = EntityTestUniqueConstraint::create($definition);
+    $violations = $entity->validate();
+    $this->assertCount(1, $violations);
+  }
+
 }
