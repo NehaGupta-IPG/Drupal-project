@@ -14,9 +14,11 @@
    */
   const states = {
     /**
-     * An array of functions that should be postponed.
+     * A list of functions that should be postponed.
+     *
+     * Functions will be executed at the end of the `attach` function.
      */
-    postponed: [],
+    postponed: new Map(),
     /**
      * Stores processed Dependees and their associated Dependents.
      */
@@ -141,9 +143,11 @@
       }
 
       // Execute all postponed functions now.
-      while (states.postponed.length) {
-        states.postponed.shift()();
-      }
+      states.postponed.forEach((func) => {
+        func();
+      });
+      // Clear the Map after execution.
+      states.postponed.clear();
     },
     detach(context, settings, trigger) {
       if (trigger === 'unload') {
@@ -574,11 +578,19 @@
     if (this.state in states.Trigger.states) {
       this.element = $(this.selector);
 
-      // Only call the trigger initializer when it wasn't yet attached to this
-      // element. Otherwise we'd end up with duplicate events.
-      if (!this.element.data(`trigger:${this.state}`)) {
-        this.initialize();
+      // If the trigger has already been initialized, check there is a postponed
+      // function to trigger its state. If there isn't one, destroy the trigger
+      // and re-initialize to ensure all states are applied when a target
+      // element is loaded. This will also ensure duplicate events are not
+      // added.
+      if (this.element.data(`trigger:${this.state}`)) {
+        const key = `${this.selector}|${this.state.name}`;
+        if (states.postponed.has(key)) {
+          return;
+        }
+        this.destroy();
       }
+      this.initialize();
     }
   };
 
@@ -645,16 +657,23 @@
         }.bind(this),
       );
 
-      states.postponed.push(
-        function () {
-          // Trigger the event once for initialization purposes.
-          this.element.trigger({
-            type: `state:${this.state}`,
-            value: oldValue,
-            oldValue: null,
-          });
-        }.bind(this),
-      );
+      // Add a postponed function to trigger the state. This will be called at
+      // the end of the `attach` function.
+      const postponedFunction = function () {
+        this.element.trigger({
+          type: `state:${this.state}`,
+          value: oldValue,
+          oldValue: null,
+        });
+      }.bind(this);
+
+      // Create a unique key based on selector and state.
+      const key = `${this.selector}|${this.state.name}`;
+
+      // Each state only needs to be triggered once per selector.
+      if (!states.postponed.has(key)) {
+        states.postponed.set(key, postponedFunction);
+      }
     },
   };
 
