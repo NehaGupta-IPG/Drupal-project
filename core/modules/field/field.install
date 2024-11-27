@@ -40,6 +40,7 @@ function field_update_10001() {
 
     // Set the new precision and scale values if they changed:
     if ($precisionValue !== $newPrecisionValue || $scaleValue !== $newScaleValue) {
+      $decimalFieldStorageEntity->setSetting('column_changes_handled', TRUE);
       $decimalFieldStorageEntity->setSetting('precision', $newPrecisionValue);
       $decimalFieldStorageEntity->setSetting('scale', $newScaleValue);
       // Update the field storage definition:
