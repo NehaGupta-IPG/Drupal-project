@@ -771,21 +771,26 @@ class JavascriptStatesForm extends FormBase {
       '#tag' => 'h3',
       '#value' => 'Ajax affected triggers tests',
     ];
-    // Ajax wrapper.
-    $form['states_ajax_test'] = [
-      '#type' => 'details',
-      '#open' => TRUE,
-      '#prefix' => '<div id="states_ajax_test_wrapper">',
-      '#suffix' => '</div>',
-    ];
     // Ajax trigger.
-    $form['states_ajax_test']['ajax_reload'] = [
+    $form['ajax_reload'] = [
       '#type' => 'checkbox',
       '#title' => 'Check me to reload elements with the states_ajax_test_wrapper',
       '#ajax' => [
         'callback' => '::buildAjax',
         'wrapper' => 'states_ajax_test_wrapper',
       ],
+    ];
+    $form['checkbox_trigger'] = [
+      '#type' => 'checkbox',
+      '#title' => 'Checkbox Trigger',
+    ];
+
+    // Ajax wrapper.
+    $form['states_ajax_test'] = [
+      '#type' => 'details',
+      '#open' => TRUE,
+      '#prefix' => '<div id="states_ajax_test_wrapper">',
+      '#suffix' => '</div>',
     ];
     $form['states_ajax_test']['ajax_select_trigger'] = [
       '#type' => 'select',
@@ -799,7 +804,25 @@ class JavascriptStatesForm extends FormBase {
         '#type' => 'checkbox',
         '#title' => 'Ajax Added Trigger',
       ];
+      $form['states_ajax_test']['ajax_added_textfield_enabled_when_checkbox_trigger_checked'] = [
+        '#type' => 'textfield',
+        '#title' => 'Ajax added Textfield enabled when Checkbox Trigger is checked',
+        '#states' => [
+          'enabled' => [
+            ':input[name="checkbox_trigger"]' => ['checked' => TRUE],
+          ],
+        ],
+      ];
     }
+    $form['textfield_enabled_when_checkbox_trigger_is_checked'] = [
+      '#type' => 'textfield',
+      '#title' => 'Textfield enabled when Checkbox Trigger is checked',
+      '#states' => [
+        'enabled' => [
+          ':input[name="checkbox_trigger"]' => ['checked' => TRUE],
+        ],
+      ],
+    ];
     $form['not_ajax_select_trigger'] = [
       '#type' => 'select',
       '#title' => 'Not Ajax Affected Select Trigger',

@@ -640,12 +640,18 @@ class JavascriptStatesTest extends WebDriverTestBase {
     // Find trigger and target elements.
     $ajax_reload = $page->findField('ajax_reload');
     $this->assertNotEmpty($ajax_reload);
+    $checkbox_trigger = $page->findField('checkbox_trigger');
+    $this->assertNotEmpty($ajax_reload);
     $not_ajax_select_trigger = $page->findField('not_ajax_select_trigger');
     $this->assertNotEmpty($not_ajax_select_trigger);
     $ajax_affected_select_trigger = $page->findField('ajax_select_trigger');
     $this->assertNotEmpty($ajax_affected_select_trigger);
     $ajax_added_trigger = $page->findField('ajax_added_trigger');
     $this->assertEmpty($ajax_added_trigger);
+    $ajax_added_textfield_enabled_when_checkbox_trigger_checked = $page->findField('ajax_added_textfield_enabled_when_checkbox_trigger_checked');
+    $this->assertEmpty($ajax_added_textfield_enabled_when_checkbox_trigger_checked);
+    $textfield_enabled_when_checkbox_trigger_is_checked = $page->findField('textfield_enabled_when_checkbox_trigger_is_checked');
+    $this->assertNotEmpty($textfield_enabled_when_checkbox_trigger_is_checked);
     $textfield_visible_ajax_single = $page->findField('textfield_visible_when_ajax_select_trigger_is_1');
     $this->assertNotEmpty($textfield_visible_ajax_single);
     $textfield_visible_not_ajax_single = $page->findField('textfield_visible_when_not_ajax_select_trigger_is_1');
@@ -669,6 +675,8 @@ class JavascriptStatesTest extends WebDriverTestBase {
     $this->assertTrue($textfield_invisible_multiple_ajax_added_and->isVisible());
     $this->assertTrue($textfield_invisible_multiple_ajax_added_or->isVisible());
     $this->assertFalse($textfield_visible_single_ajax_added->isVisible());
+    $this->assertFalse($checkbox_trigger->isChecked());
+    $this->assertTrue($textfield_enabled_when_checkbox_trigger_is_checked->hasAttribute('disabled'));
 
     // Change state: select the ajax_affected_select_trigger 1 option.
     $ajax_affected_select_trigger->setValue(1);
@@ -680,6 +688,8 @@ class JavascriptStatesTest extends WebDriverTestBase {
     $this->assertTrue($textfield_invisible_multiple_ajax_added_and->isVisible());
     $this->assertTrue($textfield_invisible_multiple_ajax_added_or->isVisible());
     $this->assertFalse($textfield_visible_single_ajax_added->isVisible());
+    $this->assertFalse($checkbox_trigger->isChecked());
+    $this->assertTrue($textfield_enabled_when_checkbox_trigger_is_checked->hasAttribute('disabled'));
 
     // Change state: select the select_trigger value2 option.
     $not_ajax_select_trigger->setValue(1);
@@ -693,6 +703,8 @@ class JavascriptStatesTest extends WebDriverTestBase {
     // $textfield_invisible_multiple_ajax_added_or is now invisible.
     $this->assertFalse($textfield_invisible_multiple_ajax_added_or->isVisible());
     $this->assertFalse($textfield_visible_single_ajax_added->isVisible());
+    $this->assertFalse($checkbox_trigger->isChecked());
+    $this->assertTrue($textfield_enabled_when_checkbox_trigger_is_checked->hasAttribute('disabled'));
 
     // Trigger Ajax reload.
     $ajax_reload->check();
@@ -711,6 +723,14 @@ class JavascriptStatesTest extends WebDriverTestBase {
     $this->assertTrue($textfield_invisible_multiple_ajax_added_and->isVisible());
     $this->assertFalse($textfield_invisible_multiple_ajax_added_or->isVisible());
     $this->assertFalse($textfield_visible_single_ajax_added->isVisible());
+    $this->assertFalse($checkbox_trigger->isChecked());
+    // $ajax_added_textfield_enabled_when_checkbox_trigger_checked is now
+    // present in the dom.
+    $ajax_added_textfield_enabled_when_checkbox_trigger_checked = $page->findField('ajax_added_textfield_enabled_when_checkbox_trigger_checked');
+    $this->assertNotEmpty($ajax_added_textfield_enabled_when_checkbox_trigger_checked);
+    // The ajax added textfield should be disabled.
+    $this->assertTrue($ajax_added_textfield_enabled_when_checkbox_trigger_checked->hasAttribute('disabled'));
+    $this->assertTrue($textfield_enabled_when_checkbox_trigger_is_checked->hasAttribute('disabled'));
 
     // Change state: check the ajax_added_trigger.
     $ajax_added_trigger->check();
@@ -725,6 +745,9 @@ class JavascriptStatesTest extends WebDriverTestBase {
     $this->assertFalse($textfield_invisible_multiple_ajax_added_or->isVisible());
     // $textfield_visible_single_ajax_added is now visible.
     $this->assertTrue($textfield_visible_single_ajax_added->isVisible());
+    $this->assertFalse($checkbox_trigger->isChecked());
+    $this->assertTrue($ajax_added_textfield_enabled_when_checkbox_trigger_checked->hasAttribute('disabled'));
+    $this->assertTrue($textfield_enabled_when_checkbox_trigger_is_checked->hasAttribute('disabled'));
 
     // Change state: select the not_ajax_select_trigger 0 option.
     $not_ajax_select_trigger->setValue(0);
@@ -738,6 +761,9 @@ class JavascriptStatesTest extends WebDriverTestBase {
     $this->assertTrue($textfield_invisible_multiple_ajax_added_and->isVisible());
     $this->assertFalse($textfield_invisible_multiple_ajax_added_or->isVisible());
     $this->assertTrue($textfield_visible_single_ajax_added->isVisible());
+    $this->assertFalse($checkbox_trigger->isChecked());
+    $this->assertTrue($ajax_added_textfield_enabled_when_checkbox_trigger_checked->hasAttribute('disabled'));
+    $this->assertTrue($textfield_enabled_when_checkbox_trigger_is_checked->hasAttribute('disabled'));
 
     // Change state: select the ajax_affected_select_trigger 0 option.
     $ajax_affected_select_trigger->setValue(0);
@@ -749,6 +775,22 @@ class JavascriptStatesTest extends WebDriverTestBase {
     $this->assertTrue($textfield_invisible_multiple_ajax_added_and->isVisible());
     $this->assertFalse($textfield_invisible_multiple_ajax_added_or->isVisible());
     $this->assertTrue($textfield_visible_single_ajax_added->isVisible());
+    $this->assertFalse($checkbox_trigger->isChecked());
+    $this->assertTrue($ajax_added_textfield_enabled_when_checkbox_trigger_checked->hasAttribute('disabled'));
+    $this->assertTrue($textfield_enabled_when_checkbox_trigger_is_checked->hasAttribute('disabled'));
+
+    // Change state: check the checkbox trigger.
+    $checkbox_trigger->check();
+    $this->assertFalse($textfield_visible_ajax_single->isVisible());
+    $this->assertFalse($textfield_visible_not_ajax_single->isVisible());
+    $this->assertFalse($textfield_visible_multiple->isVisible());
+    $this->assertFalse($textfield_invisible_single_ajax_added->isVisible());
+    $this->assertTrue($textfield_invisible_multiple_ajax_added_and->isVisible());
+    $this->assertFalse($textfield_invisible_multiple_ajax_added_or->isVisible());
+    $this->assertTrue($textfield_visible_single_ajax_added->isVisible());
+    $this->assertTrue($checkbox_trigger->isChecked());
+    $this->assertFalse($ajax_added_textfield_enabled_when_checkbox_trigger_checked->hasAttribute('disabled'));
+    $this->assertFalse($textfield_enabled_when_checkbox_trigger_is_checked->hasAttribute('disabled'));
 
     // Trigger Ajax reload.
     $ajax_reload->uncheck();
@@ -768,6 +810,12 @@ class JavascriptStatesTest extends WebDriverTestBase {
     $this->assertTrue($textfield_invisible_multiple_ajax_added_or->isVisible());
     // $textfield_visible_single_ajax_added in now invisible.
     $this->assertTrue($textfield_visible_single_ajax_added->isVisible());
+    $this->assertTrue($checkbox_trigger->isChecked());
+    // $ajax_added_textfield_enabled_when_checkbox_trigger_checked is no
+    // longer in the dom.
+    $ajax_added_textfield_enabled_when_checkbox_trigger_checked = $page->findField('ajax_added_textfield_enabled_when_checkbox_trigger_checked');
+    $this->assertEmpty($ajax_added_textfield_enabled_when_checkbox_trigger_checked);
+    $this->assertFalse($textfield_enabled_when_checkbox_trigger_is_checked->hasAttribute('disabled'));
 
     // Change state: select the not_ajax_select_trigger 1 option.
     $not_ajax_select_trigger->setValue(1);
@@ -792,6 +840,19 @@ class JavascriptStatesTest extends WebDriverTestBase {
     $this->assertTrue($textfield_invisible_multiple_ajax_added_and->isVisible());
     $this->assertFalse($textfield_invisible_multiple_ajax_added_or->isVisible());
     $this->assertTrue($textfield_visible_single_ajax_added->isVisible());
+
+    // Change state: uncheck the checkbox trigger.
+    $checkbox_trigger->uncheck();
+    $this->assertTrue($textfield_visible_ajax_single->isVisible());
+    $this->assertTrue($textfield_visible_not_ajax_single->isVisible());
+    $this->assertTrue($textfield_visible_multiple->isVisible());
+    $this->assertTrue($textfield_invisible_single_ajax_added->isVisible());
+    $this->assertTrue($textfield_invisible_multiple_ajax_added_and->isVisible());
+    $this->assertFalse($textfield_invisible_multiple_ajax_added_or->isVisible());
+    $this->assertTrue($textfield_visible_single_ajax_added->isVisible());
+    $ajax_added_textfield_enabled_when_checkbox_trigger_checked = $page->findField('ajax_added_textfield_enabled_when_checkbox_trigger_checked');
+    $this->assertEmpty($ajax_added_textfield_enabled_when_checkbox_trigger_checked);
+    $this->assertTrue($textfield_enabled_when_checkbox_trigger_is_checked->hasAttribute('disabled'));
 
   }
 
