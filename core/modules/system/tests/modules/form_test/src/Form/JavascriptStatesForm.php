@@ -888,7 +888,7 @@ class JavascriptStatesForm extends FormBase {
   /**
    * Return ajax.
    */
-  public function buildAjax(array &$form, FormStateInterface $form_state) {
+  public function buildAjax(array &$form, FormStateInterface $form_state): array {
     return $form['states_ajax_test'];
   }
 
