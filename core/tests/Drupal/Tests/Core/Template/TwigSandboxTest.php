@@ -279,7 +279,7 @@ class TwigSandboxTest extends UnitTestCase {
         'id',
       ],
     ]);
-    $this->expectDeprecation('Not specifying a fully-qualified method name to twig_sandbox_allowed_methods is deprecated in drupal:11.0.0 and will throw an error in drupal:12.0.0. See https://www.drupal.org/node/3263019');
+    $this->expectDeprecation('Not specifying a fully-qualified method name to twig_sandbox_allowed_methods is deprecated in drupal:11.2.0 and will throw an error in drupal:12.0.0. See https://www.drupal.org/node/3263019');
     new TwigSandboxPolicy();
   }
 

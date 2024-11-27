@@ -143,7 +143,7 @@ class TwigSandboxPolicy implements SecurityPolicyInterface {
       ]) as $method
     ) {
       if (!str_contains($method, '::')) {
-        @trigger_error('Not specifying a fully-qualified method name to twig_sandbox_allowed_methods is deprecated in drupal:11.0.0 and will throw an error in drupal:12.0.0. See https://www.drupal.org/node/3263019', E_USER_DEPRECATED);
+        @trigger_error('Not specifying a fully-qualified method name to twig_sandbox_allowed_methods is deprecated in drupal:11.2.0 and will throw an error in drupal:12.0.0. See https://www.drupal.org/node/3263019', E_USER_DEPRECATED);
         $method = '::' . $method;
       }
       [$class, $name] = explode('::', $method);
