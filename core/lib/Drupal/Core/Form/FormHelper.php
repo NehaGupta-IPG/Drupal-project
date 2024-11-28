@@ -208,7 +208,7 @@ class FormHelper {
     // In cases like 'item' that are not actual form input elements or
     // those like 'password_confirm' that have child elements,
     // use #wrapper_attributes.
-    $key = (($elements['#markup'] ?? FALSE) === '' && ($elements['#input'] ?? FALSE) === TRUE) ? '#wrapper_attributes' : '#attributes';
+    $key = ($elements['#type'] == 'item' || $elements['#type'] == 'password_confirm') ? '#wrapper_attributes' : '#attributes';
     $elements[$key]['data-drupal-states'] = Json::encode($elements['#states']);
   }
 
