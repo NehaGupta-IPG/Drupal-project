@@ -127,6 +127,19 @@ class FormHelperTest extends UnitTestCase {
         ],
         '#wrapper_attributes',
       ],
+      [
+        [
+          '#type' => 'item',
+          '#states' => [
+            'visible' => [
+              ':input[name="foo"]' => ['value' => 'bar'],
+            ],
+          ],
+          '#markup' => 'a non empty string value',
+          '#input' => TRUE,
+        ],
+        '#wrapper_attributes',
+      ],
     ];
   }
 
