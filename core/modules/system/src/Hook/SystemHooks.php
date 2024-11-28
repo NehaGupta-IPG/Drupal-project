@@ -337,6 +337,8 @@ class SystemHooks {
     // Ensure that all of Drupal's standard directories (e.g., the public files
     // directory and config directory) have appropriate .htaccess files.
     \Drupal::service('file.htaccess_writer')->ensure();
+    // Clean old and/or failed batches.
+    \Drupal::service('batch.storage')->cleanup();
     if (\Drupal::config('system.advisories')->get('enabled')) {
       // Fetch the security advisories so that they will be pre-fetched during
       // systemAdvisoriesRequirements() and system_page_top().
