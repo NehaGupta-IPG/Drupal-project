@@ -14,6 +14,7 @@ use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Url;
 use Drupal\file\Plugin\Field\FieldFormatter\FileFormatterBase;
+use Drupal\file\Trait\UrlSuggestionTrait;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -27,6 +28,8 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
   ],
 )]
 class ImageUrlFormatter extends ImageFormatterBase {
+
+  use UrlSuggestionTrait;
 
   /**
    * The image style entity storage.
@@ -78,7 +81,7 @@ class ImageUrlFormatter extends ImageFormatterBase {
     $this->imageStyleStorage = $entity_type_manager->getStorage('image_style');
     $this->currentUser = $current_user;
     if ($file_url_generator === NULL) {
-      @trigger_error('Calling ' . __METHOD__ . ' without the $file_url_generator argument is deprecated in drupal:10.3.0 and it will be required in drupal:11.0.0. See https://www.drupal.org/node/3410078', E_USER_DEPRECATED);
+      @trigger_error('Calling ' . __METHOD__ . ' without the $file_url_generator argument is deprecated in drupal:10.4.0 and it will be required in drupal:11.1.0. See https://www.drupal.org/node/3410078', E_USER_DEPRECATED);
       $file_url_generator = \Drupal::service('file_url_generator');
     }
     $this->fileUrlGenerator = $file_url_generator;
@@ -128,24 +131,16 @@ class ImageUrlFormatter extends ImageFormatterBase {
         FileFormatterBase::RELATIVE_URL => $this->t('Relative URL'),
       ],
     ];
-    $element['absolute_url_suggestion'] = [
-      '#type' => 'item',
-      '#title' => '',
-      '#description' => $this->t('<strong>Example</strong>: https://www.example.com/sites/default/files/image.png'),
-      '#states' => [
-        'visible' => [
-          ':input[name="fields[' . $this->fieldDefinition->getName() . '][settings_edit_form][settings][show_link_as]"]' => ['value' => 'absolute'],
-        ],
+    $element['absolute_url_suggestion'] = $this->absoluteUrlSuggestion();
+    $element['absolute_url_suggestion']['#states'] = [
+      'visible' => [
+        ':input[name="fields[' . $this->fieldDefinition->getName() . '][settings_edit_form][settings][show_link_as]"]' => ['value' => 'absolute'],
       ],
     ];
-    $element['relative_url_suggestion'] = [
-      '#type' => 'item',
-      '#title' => '',
-      '#description' => $this->t('<strong>Example</strong>: /sites/default/files/image.png'),
-      '#states' => [
-        'visible' => [
-          ':input[name="fields[' . $this->fieldDefinition->getName() . '][settings_edit_form][settings][show_link_as]"]' => ['value' => 'relative'],
-        ],
+    $element['relative_url_suggestion'] = $this->relativeUrlSuggestion();
+    $element['relative_url_suggestion']['#states'] = [
+      'visible' => [
+        ':input[name="fields[' . $this->fieldDefinition->getName() . '][settings_edit_form][settings][show_link_as]"]' => ['value' => 'relative'],
       ],
     ];
 

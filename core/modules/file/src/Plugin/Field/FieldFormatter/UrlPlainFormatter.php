@@ -7,6 +7,7 @@ use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\file\FileInterface;
+use Drupal\file\Trait\UrlSuggestionTrait;
 
 /**
  * Plugin implementation of the 'file_url_plain' formatter.
@@ -19,6 +20,8 @@ use Drupal\file\FileInterface;
   ],
 )]
 class UrlPlainFormatter extends FileFormatterBase {
+
+  use UrlSuggestionTrait;
 
   /**
    * {@inheritdoc}
@@ -44,24 +47,16 @@ class UrlPlainFormatter extends FileFormatterBase {
         FileFormatterBase::RELATIVE_URL => $this->t('Relative URL'),
       ],
     ];
-    $form['absolute_url_suggestion'] = [
-      '#type' => 'item',
-      '#title' => '',
-      '#description' => $this->t('<strong>Example</strong>: https://www.example.com/sites/default/files/image.png'),
-      '#states' => [
-        'visible' => [
-          ':input[name="fields[' . $this->fieldDefinition->getName() . '][settings_edit_form][settings][show_link_as]"]' => ['value' => 'absolute'],
-        ],
+    $form['absolute_url_suggestion'] = $this->absoluteUrlSuggestion();
+    $form['absolute_url_suggestion']['#states'] = [
+      'visible' => [
+        ':input[name="fields[' . $this->fieldDefinition->getName() . '][settings_edit_form][settings][show_link_as]"]' => ['value' => 'absolute'],
       ],
     ];
-    $form['relative_url_suggestion'] = [
-      '#type' => 'item',
-      '#title' => '',
-      '#description' => $this->t('<strong>Example</strong>: /sites/default/files/image.png'),
-      '#states' => [
-        'visible' => [
-          ':input[name="fields[' . $this->fieldDefinition->getName() . '][settings_edit_form][settings][show_link_as]"]' => ['value' => 'relative'],
-        ],
+    $form['relative_url_suggestion'] = $this->relativeUrlSuggestion();
+    $form['relative_url_suggestion']['#states'] = [
+      'visible' => [
+        ':input[name="fields[' . $this->fieldDefinition->getName() . '][settings_edit_form][settings][show_link_as]"]' => ['value' => 'relative'],
       ],
     ];
 

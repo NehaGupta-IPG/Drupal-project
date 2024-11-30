@@ -37,26 +37,26 @@ function file_post_update_add_playsinline(array &$sandbox = []): ?TranslatableMa
 /**
  * Set the default value for "absolute_url" field formatter setting.
  */
-function file_post_update_set_default_absolute_url(): void {
-  $displays = EntityViewDisplay::loadMultiple();
-  foreach ($displays as $display) {
-    /** @var \Drupal\Core\Entity\Entity\EntityViewDisplay $display */
-    $fields_settings = $display->get('content');
-    $changed = FALSE;
-    foreach ($fields_settings as $field_name => $settings) {
-      if (!empty($settings['type'])) {
-        switch ($settings['type']) {
-          case 'file_url_plain':
-          case 'image_url':
-            $fields_settings[$field_name]['settings']['show_link_as'] = FileFormatterBase::RELATIVE_URL;
-            $changed = TRUE;
-            break;
-
+function file_post_update_set_default_absolute_url(array &$sandbox = []): void {
+  \Drupal::classResolver(ConfigEntityUpdater::class)
+    ->update($sandbox, 'entity_view_display', function (EntityViewDisplay $display): bool {
+      $fields_settings = $display->get('content');
+      $changed = FALSE;
+      foreach ($fields_settings as $field_name => $settings) {
+        if (!empty($settings['type'])) {
+          switch ($settings['type']) {
+            case 'file_url_plain':
+            case 'image_url':
+              $fields_settings[$field_name]['settings']['show_link_as'] = FileFormatterBase::RELATIVE_URL;
+              $changed = TRUE;
+              break;
+          }
         }
       }
-    }
-    if ($changed === TRUE) {
-      $display->set('content', $fields_settings)->save();
-    }
-  }
+      if ($changed === TRUE) {
+        $display->set('content', $fields_settings)->save();
+        return TRUE;
+      }
+      return FALSE;
+    });
 }
