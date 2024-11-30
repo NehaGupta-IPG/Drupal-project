@@ -191,7 +191,7 @@ class CommentAdminOverview extends FormBase {
       /** @var \Drupal\Core\Entity\EntityInterface $commented_entity */
       $commented_entity = $commented_entities[$comment->getCommentedEntityTypeId()][$comment->getCommentedEntityId()];
       $comment_permalink = $comment->permalink();
-      if ($comment->hasField('comment_body') && ($body = $comment->get('comment_body')->value)) {
+      if ($body = $comment->get('comment_body')?->value) {
         $attributes = $comment_permalink->getOption('attributes') ?: [];
         $attributes += ['title' => Unicode::truncate($body, 128)];
         $comment_permalink->setOption('attributes', $attributes);
