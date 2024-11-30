@@ -614,7 +614,7 @@ abstract class ContentEntityBase extends EntityBase implements \IteratorAggregat
     if (!isset($this->fields[$name][$langcode])) {
       $definition = $this->getFieldDefinition($name);
       if (!$definition) {
-        throw new \InvalidArgumentException("Field $name is unknown.");
+        return NULL;
       }
       // Non-translatable fields are always stored with
       // LanguageInterface::LANGCODE_DEFAULT as key.
