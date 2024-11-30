@@ -688,10 +688,8 @@ class FieldStorageConfig extends ConfigEntityBase implements FieldStorageConfigI
     // runtime item object, so that it can be used as the options provider
     // without modifying the entity being worked on.
     if (is_subclass_of($this->getFieldItemClass(), OptionsProviderInterface::class)) {
-      try {
-        $items = $entity->get($this->getName());
-      }
-      catch (\InvalidArgumentException) {
+      $items = $entity->get($this->getName());
+      if (!$items) {
         // When a field doesn't exist, create a new field item list using a
         // temporary base field definition. This step is necessary since there
         // may not be a field configuration for the storage when creating a new
