@@ -67,7 +67,8 @@ trait RevisionLogEntityTrait {
    * {@inheritdoc}
    */
   public function getRevisionCreationTime() {
-    return $this->{$this->getEntityType()->getRevisionMetadataKey('revision_created')}->value;
+    $value = $this->{$this->getEntityType()->getRevisionMetadataKey('revision_created')}->value;
+    return isset($value) ? (int) $value : NULL;
   }
 
   /**

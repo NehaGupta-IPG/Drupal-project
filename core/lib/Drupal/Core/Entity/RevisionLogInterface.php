@@ -14,8 +14,8 @@ interface RevisionLogInterface extends RevisionableInterface {
   /**
    * Gets the entity revision creation timestamp.
    *
-   * @return int
-   *   The UNIX timestamp of when this revision was created.
+   * @return int|null
+   *   The UNIX timestamp of when this revision was created, or NULL if unknown.
    */
   public function getRevisionCreationTime();
 
