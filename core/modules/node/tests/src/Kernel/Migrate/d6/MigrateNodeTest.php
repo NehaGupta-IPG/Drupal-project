@@ -64,7 +64,7 @@ class MigrateNodeTest extends MigrateNodeTestBase {
     $this->assertSame(1390095702, $node->getCreatedTime(), 'Node has the correct created time.');
     $this->assertFalse($node->isSticky());
     $this->assertSame('1', $node->getOwnerId());
-    $this->assertSame('1420861423', $node->getRevisionCreationTime());
+    $this->assertSame(1420861423, $node->getRevisionCreationTime());
 
     /** @var \Drupal\node\NodeInterface $node_revision */
     $node_revision = \Drupal::entityTypeManager()->getStorage('node')->loadRevision(2001);
