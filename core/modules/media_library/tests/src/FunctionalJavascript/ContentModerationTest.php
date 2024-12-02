@@ -244,30 +244,37 @@ class ContentModerationTest extends WebDriverTestBase {
   public function testWidget(): void {
     $assert_session = $this->assertSession();
 
-    // All users should only be able to see published media items.
+    // The media admin user should be able to see all media items.
     $this->drupalLogin($this->userAdmin);
     $this->drupalGet('node/add/article');
     $assert_session->elementExists('css', '.js-media-library-open-button[name^="field_media"]')->click();
     $assert_session->assertWaitOnAjaxRequest();
-    $this->assertOnlyPublishedMedia();
+    $this->assertAllMedia();
+    // The media viewer user should be able to see only published media items.
     $this->drupalLogin($this->userViewer);
     $this->drupalGet('node/add/article');
     $assert_session->elementExists('css', '.js-media-library-open-button[name^="field_media"]')->click();
     $assert_session->assertWaitOnAjaxRequest();
     $this->assertOnlyPublishedMedia();
+    // The media viewer user that can also view its own unpublished media should
+    // also be able to see only published media items since it is not the owner
+    // of the created media items.
     $this->drupalLogin($this->userViewOwnUnpublished);
     $this->drupalGet('node/add/article');
     $assert_session->elementExists('css', '.js-media-library-open-button[name^="field_media"]')->click();
     $assert_session->assertWaitOnAjaxRequest();
+    // When content moderation is enabled, a media viewer that can view any
+    // unpublished content should be able to see all media.
+    // @see content_moderation_entity_access()
     $this->assertOnlyPublishedMedia();
     $this->drupalLogin($this->userViewAnyUnpublished);
     $this->drupalGet('node/add/article');
     $assert_session->elementExists('css', '.js-media-library-open-button[name^="field_media"]')->click();
     $assert_session->assertWaitOnAjaxRequest();
-    $this->assertOnlyPublishedMedia();
+    $this->assertAllMedia();
 
-    // After we change the owner to the user with 'view own unpublished media'
-    // permission, all users should still only be able to see published media.
+    // Assign all media to the user with the 'view own unpublished media'
+    // permission.
     foreach (Media::loadMultiple() as $media) {
       $media->setOwner($this->userViewOwnUnpublished);
       $media->save();
@@ -277,22 +284,29 @@ class ContentModerationTest extends WebDriverTestBase {
     $this->drupalGet('node/add/article');
     $assert_session->elementExists('css', '.js-media-library-open-button[name^="field_media"]')->click();
     $assert_session->assertWaitOnAjaxRequest();
-    $this->assertOnlyPublishedMedia();
+    $this->assertAllMedia();
+    // The media viewer user should still be able to see only published media
+    // items.
     $this->drupalLogin($this->userViewer);
     $this->drupalGet('node/add/article');
     $assert_session->elementExists('css', '.js-media-library-open-button[name^="field_media"]')->click();
     $assert_session->assertWaitOnAjaxRequest();
     $this->assertOnlyPublishedMedia();
+    // The media viewer user that can also view its own unpublished media
+    // should now be able to see all media items since it is the owner of the
+    // created media items.
     $this->drupalLogin($this->userViewOwnUnpublished);
     $this->drupalGet('node/add/article');
     $assert_session->elementExists('css', '.js-media-library-open-button[name^="field_media"]')->click();
     $assert_session->assertWaitOnAjaxRequest();
-    $this->assertOnlyPublishedMedia();
+    $this->assertAllMedia();
+    // The media viewer that can view any unpublished content should still be
+    // able to see all media.
     $this->drupalLogin($this->userViewAnyUnpublished);
     $this->drupalGet('node/add/article');
     $assert_session->elementExists('css', '.js-media-library-open-button[name^="field_media"]')->click();
     $assert_session->assertWaitOnAjaxRequest();
-    $this->assertOnlyPublishedMedia();
+    $this->assertAllMedia();
   }
 
   /**
