@@ -39,6 +39,7 @@ class EntityReferenceSelectionAccessTest extends KernelTestBase {
    */
   protected static $modules = [
     'comment',
+    'content_moderation',
     'field',
     'file',
     'image',
@@ -48,6 +49,7 @@ class EntityReferenceSelectionAccessTest extends KernelTestBase {
     'taxonomy',
     'text',
     'user',
+    'workflows',
   ];
 
   /**
@@ -60,13 +62,15 @@ class EntityReferenceSelectionAccessTest extends KernelTestBase {
     $this->installSchema('file', ['file_usage']);
 
     $this->installEntitySchema('comment');
+    $this->installEntitySchema('content_moderation_state');
     $this->installEntitySchema('file');
     $this->installEntitySchema('media');
     $this->installEntitySchema('node');
     $this->installEntitySchema('taxonomy_term');
     $this->installEntitySchema('user');
+    $this->installEntitySchema('workflow');
 
-    $this->installConfig(['comment', 'field', 'media', 'node', 'taxonomy', 'user', 'system']);
+    $this->installConfig(['comment', 'content_moderation', 'field', 'media', 'node', 'taxonomy', 'user', 'system']);
 
     // Create the anonymous and the admin users.
     $anonymous_user = User::create([
@@ -762,6 +766,71 @@ class EntityReferenceSelectionAccessTest extends KernelTestBase {
       ],
     ];
     $this->assertReferenceable($selection_options, $referenceable_tests, 'Media handler');
+
+    // Test as media owner.
+    $view_own_unpublished_user = $this->createUser(['view media', 'view own unpublished media']);
+    $this->setCurrentUser($view_own_unpublished_user);
+    // Assign all media to the user with the 'view own unpublished media'
+    // permission.
+    foreach (Media::loadMultiple() as $media) {
+      $media->setOwner($view_own_unpublished_user);
+      $media->save();
+    }
+    $referenceable_tests = [
+      [
+        'arguments' => [
+          [NULL, 'CONTAINS'],
+        ],
+        'result' => [
+          $media_type->id() => [
+            $media_entities['published']->id() => $media_labels['published'],
+            $media_entities['unpublished']->id() => $media_labels['unpublished'],
+          ],
+        ],
+      ],
+      [
+        'arguments' => [
+          ['Media unpublished', 'CONTAINS'],
+        ],
+        'result' => [
+          $media_type->id() => [
+            $media_entities['unpublished']->id() => $media_labels['unpublished'],
+          ],
+        ],
+      ],
+    ];
+    $this->assertReferenceable($selection_options, $referenceable_tests, 'Media handler (view own unpublished media)');
+
+    // Test with the view any unpublished content permission.
+    // In this instance content applies to all moderated content including
+    // media.
+    // @see https://www.drupal.org/project/drupal/i/3480675
+    $view_any_unpublished_content = $this->createUser(['view media', 'view any unpublished content']);
+    $this->setCurrentUser($view_any_unpublished_content);
+    $referenceable_tests = [
+      [
+        'arguments' => [
+          [NULL, 'CONTAINS'],
+        ],
+        'result' => [
+          $media_type->id() => [
+            $media_entities['published']->id() => $media_labels['published'],
+            $media_entities['unpublished']->id() => $media_labels['unpublished'],
+          ],
+        ],
+      ],
+      [
+        'arguments' => [
+          ['Media unpublished', 'CONTAINS'],
+        ],
+        'result' => [
+          $media_type->id() => [
+            $media_entities['unpublished']->id() => $media_labels['unpublished'],
+          ],
+        ],
+      ],
+    ];
+    $this->assertReferenceable($selection_options, $referenceable_tests, 'Media handler (view any unpublished media)');
 
     // Test as an admin.
     $admin_user = $this->createUser(['view media', 'administer media']);
