@@ -25,8 +25,10 @@ class MediaSelection extends DefaultSelection {
     $query = parent::buildEntityQuery($match, $match_operator);
 
     // Ensure that users with insufficient permission cannot see unpublished
-    // entities.
-    if (!$this->currentUser->hasPermission('administer media')) {
+    // entities. In this instance the permission 'view any unpublished content'
+    // applies to all moderated content including media.
+    // @see https://www.drupal.org/project/drupal/i/3480675
+    if (!$this->currentUser->hasPermission('administer media') && !$this->currentUser->hasPermission('view any unpublished content')) {
       // Permission to "view own unpublished media" allows
       // the user to reference any published media or own unpublished media.
       if ($this->currentUser->hasPermission('view own unpublished media')) {
