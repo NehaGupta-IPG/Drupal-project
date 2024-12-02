@@ -170,7 +170,7 @@ class Condition extends ConditionBase {
 
     if (isset($value)) {
       // We always want a case-insensitive match.
-      if (!is_bool($value)) {
+      if (!is_bool($condition['value']) && !empty($condition['value'])) {
         $value = mb_strtolower($value);
       }
 
