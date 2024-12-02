@@ -8,9 +8,11 @@ use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\entity_test\Entity\EntityTest;
 use Drupal\field\Entity\FieldConfig;
+use Drupal\media\Entity\Media;
 use Drupal\node\Entity\Node;
 use Drupal\node\NodeInterface;
 use Drupal\Tests\field\Traits\EntityReferenceFieldCreationTrait;
+use Drupal\Tests\media\Traits\MediaTypeCreationTrait;
 use Drupal\Tests\node\Traits\ContentTypeCreationTrait;
 use Drupal\user\Entity\Role;
 use Drupal\user\Entity\User;
@@ -26,6 +28,7 @@ class ValidReferenceConstraintValidatorTest extends EntityKernelTestBase {
 
   use EntityReferenceFieldCreationTrait;
   use ContentTypeCreationTrait;
+  use MediaTypeCreationTrait;
 
   /**
    * The typed data manager to use.
@@ -37,7 +40,16 @@ class ValidReferenceConstraintValidatorTest extends EntityKernelTestBase {
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['field', 'node', 'user'];
+  protected static $modules = [
+    'content_moderation',
+    'field',
+    'file',
+    'image',
+    'media',
+    'node',
+    'user',
+    'workflows',
+  ];
 
   /**
    * {@inheritdoc}
@@ -46,6 +58,8 @@ class ValidReferenceConstraintValidatorTest extends EntityKernelTestBase {
     parent::setUp();
     $this->installSchema('user', ['users_data']);
     $this->installSchema('node', ['node_access']);
+    $this->installEntitySchema('media');
+    $this->installConfig('media');
     $this->installConfig('node');
     $this->typedDataManager = $this->container->get('typed_data_manager');
 
@@ -231,6 +245,68 @@ class ValidReferenceConstraintValidatorTest extends EntityKernelTestBase {
     $this->assertCount(2, $violations);
     $this->assertEquals(sprintf('This entity (node: %s) cannot be referenced.', $different_bundle_node->id()), $violations[0]->getMessage());
     $this->assertEquals(sprintf('The referenced entity (node: %s) does not exist.', $deleted_node->id()), $violations[1]->getMessage());
+  }
+
+  /**
+   * Tests the validation new entities in an entity reference field.
+   */
+  public function testNewEntitiesValidation():void {
+    $media_type = $this->createMediaType('file');
+
+    // Add an entity reference field.
+    $this->createEntityReferenceField(
+      'entity_test',
+      'entity_test',
+      'field_test',
+      'Field test',
+      'media',
+      'default',
+      ['target_bundles' => [$media_type->id()]],
+      FieldStorageDefinitionInterface::CARDINALITY_UNLIMITED
+    );
+
+    $media = Media::create([
+      'bundle' => $media_type->id(),
+      'status' => 0,
+      'name' => 'Media unpublished',
+      'uid' => 1,
+    ]);
+
+    $referencing_entity = EntityTest::create([
+      'field_test' => [
+        ['entity' => $media],
+      ],
+    ]);
+
+    // Check that users with administer media permission are able to pass the
+    // validation for field with new entities.
+    $admin_user = $this->createUser(['view media', 'administer media']);
+    $this->setCurrentUser($admin_user);
+    $violations = $referencing_entity->field_test->validate();
+    $this->assertCount(0, $violations);
+
+    // Check that users with view unpublished content permission are able to
+    // pass the validation for field with new entities.
+    $view_any_unpublished_user = $this->createUser(['view media', 'view any unpublished content']);
+    $this->setCurrentUser($view_any_unpublished_user);
+    $violations = $referencing_entity->field_test->validate();
+    $this->assertCount(0, $violations);
+
+    // A user that can also view its own unpublished media does not have access
+    // to the unpublished media as they are not the owner.
+    $view_own_user = $this->createUser(['view media', 'view own unpublished media']);
+    $this->setCurrentUser($view_own_user);
+    $violations = $referencing_entity->field_test->validate();
+    $this->assertCount(1, $violations);
+    $this->assertEquals(sprintf('This entity (media: %s) cannot be referenced.', $media->label()), $violations[0]->getMessage());
+
+    // Assign media to the user with the 'view own unpublished media'
+    // permission.
+    $media->setOwner($view_own_user);
+    // A user that can also view its own unpublished media now has access to the
+    // unpublished media as they are the owner.
+    $violations = $referencing_entity->field_test->validate();
+    $this->assertCount(0, $violations);
   }
 
 }
