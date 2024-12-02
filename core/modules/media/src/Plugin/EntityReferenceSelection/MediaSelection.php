@@ -63,7 +63,7 @@ class MediaSelection extends DefaultSelection {
   public function validateReferenceableNewEntities(array $entities) {
     $entities = parent::validateReferenceableNewEntities($entities);
     // Mirror the conditions checked in buildEntityQuery().
-    if (!$this->currentUser->hasPermission('administer media')) {
+    if (!$this->currentUser->hasPermission('administer media') && !$this->currentUser->hasPermission('view any unpublished content')) {
       $uid = $this->currentUser->id();
       $unpublished_permission = $this->currentUser->hasPermission('view own unpublished media');
       $entities = array_filter($entities, function ($media) use ($unpublished_permission, $uid) {
