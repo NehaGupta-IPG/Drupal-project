@@ -9,6 +9,14 @@ use Drupal\Core\Field\Plugin\Field\FieldType\EntityReferenceItem;
  */
 trait EntityReferenceFieldItemNormalizerTrait {
 
+  /**
+   * Normalizes empty reference values for taxonomy terms.
+   *
+   * @param array &$values
+   *   The field item values.
+   * @param \Drupal\Core\Field\Plugin\Field\FieldType\EntityReferenceItem $field_item
+   *   The entity reference item.
+   */
   protected function normalizeRootReferenceValue(&$values, EntityReferenceItem $field_item) {
     // @todo Generalize for all tree-structured entity types.
     if ($this->fieldItemReferencesTaxonomyTerm($field_item) && empty($values['target_id'])) {
