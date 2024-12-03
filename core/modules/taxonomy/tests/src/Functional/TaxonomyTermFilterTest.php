@@ -16,9 +16,7 @@ use Drupal\taxonomy\VocabularyInterface;
 class TaxonomyTermFilterTest extends TaxonomyTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['taxonomy'];
 
