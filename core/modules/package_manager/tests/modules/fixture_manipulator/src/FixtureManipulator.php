@@ -500,7 +500,7 @@ class FixtureManipulator {
     $runner = \Drupal::service(ComposerProcessRunnerInterface::class);
     $command_options[] = "--working-dir={$this->dir}";
     $runner->run($command_options, callback: $plain_output, env: [
-      'COMPOSER_NO_AUDIT' => '1',
+      'COMPOSER_NO_AUDIT' => '0',
     ]);
     return $plain_output;
   }
