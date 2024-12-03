@@ -7,6 +7,7 @@ namespace Drupal\search\Form;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Messenger\MessengerInterface;
 use Drupal\Core\Url;
 use Drupal\search\Entity\SearchPage;
 use Drupal\search\SearchIndexInterface;
@@ -25,17 +26,28 @@ final class IndexSettingsForm extends FormBase {
   protected array $entities = [];
 
   /**
+   * The messenger.
+   *
+   * @var \Drupal\Core\Messenger\MessengerInterface
+   */
+  protected $messenger;
+
+  /**
    * Constructs a new SearchPageListBuilder object.
    *
+   * @param \Drupal\Core\Messenger\MessengerInterface $messenger
+   *   The messenger.
    * @param \Drupal\search\SearchIndexInterface $searchIndex
    *   The search index.
    * @param \Drupal\Core\Extension\ModuleHandlerInterface $moduleHandler
    *   The module handler.
    */
   public function __construct(
+    MessengerInterface $messenger,
     protected SearchIndexInterface $searchIndex,
     protected ModuleHandlerInterface $moduleHandler,
   ) {
+    $this->messenger = $messenger;
     $this->entities = SearchPage::loadMultiple();
   }
 
@@ -44,8 +56,10 @@ final class IndexSettingsForm extends FormBase {
    */
   public static function create(ContainerInterface $container): IndexSettingsForm {
     return new static(
+      $container->get('messenger'),
       $container->get('search.index'),
-      $container->get('module_handler')
+      $container->get('module_handler'),
+
     );
   }
 
