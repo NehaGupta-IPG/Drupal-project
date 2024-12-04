@@ -196,7 +196,7 @@ class ContentTranslationWorkflowsTest extends ContentTranslationTestBase {
       'add_translation' => 403,
       'edit_translation' => 403,
       'delete_translation' => 403,
-      'view_unpublished_translation' => 403,
+      'view_unpublished_translation' => 200,
       'view_unpublished_translation_reference' => FALSE,
     ];
     $this->doTestWorkflows($this->editor, $expected_status);
@@ -373,8 +373,6 @@ class ContentTranslationWorkflowsTest extends ContentTranslationTestBase {
     }
     $this->assertSession()->statusCodeEquals($expected_status['edit_translation']);
 
-    // When viewing an unpublished entity directly, access is currently denied
-    // completely. See https://www.drupal.org/node/2978048.
     $this->drupalGet($this->entity->getTranslation($langcode)->toUrl());
     $this->assertSession()->statusCodeEquals($expected_status['view_unpublished_translation']);
 
