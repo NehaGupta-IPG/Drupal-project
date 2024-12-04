@@ -41,7 +41,7 @@ class Some extends PagerPluginBase {
   }
 
   /**
-   * Provide the default form for setting options.
+   * {@inheritdoc}
    */
   public function buildOptionsForm(&$form, FormStateInterface $form_state) {
     parent::buildOptionsForm($form, $form_state);

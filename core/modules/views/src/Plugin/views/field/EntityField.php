@@ -687,7 +687,6 @@ class EntityField extends FieldPluginBase implements CacheableDependencyInterfac
     parent::buildGroupByForm($form, $form_state);
     // With "field API" fields, the column target of the grouping function
     // and any additional grouping columns must be specified.
-
     $field_columns = array_keys($this->getFieldDefinition()->getColumns());
     $group_columns = [
       'entity_id' => $this->t('Entity ID'),

@@ -674,10 +674,8 @@ class Sql extends QueryPluginBase {
       // the same table with the same join multiple times.  For
       // example, a view that filters on 3 taxonomy terms using AND
       // needs to join taxonomy_term_data 3 times with the same join.
-
       // Scan through the table queue to see if a matching join and
       // relationship exists.  If so, use it instead of this join.
-
       // @todo Scanning through $this->tableQueue results in an
       //   O(N^2) algorithm, and this code runs every time the view is
       //   instantiated (Views 2 does not currently cache queries).
@@ -770,7 +768,6 @@ class Sql extends QueryPluginBase {
     if ($relationship != $this->view->storage->get('base_table')) {
       // If we're linking to the primary table, the relationship to use will
       // be the prior relationship. Unless it's a direct link.
-
       // Safety! Don't modify an original here.
       $join = clone $join;
 
@@ -887,7 +884,6 @@ class Sql extends QueryPluginBase {
 
     // PostgreSQL truncates aliases to 63 characters:
     // https://www.drupal.org/node/571548.
-
     // We limit the length of the original alias up to 60 characters
     // to get a unique alias later if its have duplicates.
     $alias = strtolower(substr($alias, 0, 60));
