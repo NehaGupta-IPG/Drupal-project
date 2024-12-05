@@ -45,6 +45,13 @@ class Message {
     $this->eventName = $event_name;
   }
 
+  /**
+   * Retrieves the message text for the current event.
+   *
+   * @return array
+   *   The message text, either retrieved from the configuration or generated from a file,
+   *   along with any structured support info from the `composer.json` file.
+   */
   public function getText() {
     if ($this->messageText) {
       return $this->messageText;

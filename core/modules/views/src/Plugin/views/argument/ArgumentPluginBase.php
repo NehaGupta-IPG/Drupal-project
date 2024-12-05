@@ -34,7 +34,7 @@ use Drupal\views\Views;
 /**
  * Base class for argument (contextual filter) handler plugins.
  *
- * The basic argument works for very simple arguments such as nid and uid
+ * The basic argument works for very simple arguments such as nid and uid.
  *
  * Definition terms for this handler:
  * - name field: The field to use for the name to use in the summary, which is
@@ -861,7 +861,7 @@ abstract class ArgumentPluginBase extends HandlerBase implements CacheableDepend
    * Default action: empty.
    *
    * If an argument was expected and was not given, in this case, display
-   * the view's empty text
+   * the view's empty text.
    */
   public function defaultEmpty() {
     // We return with no query; this will force the empty text.
@@ -965,7 +965,6 @@ abstract class ArgumentPluginBase extends HandlerBase implements CacheableDepend
   protected function summaryNameField() {
     // Add the 'name' field. For example, if this is a uid argument, the
     // name field would be 'name' (i.e, the username).
-
     if (isset($this->name_table)) {
       // If the alias is different then we're probably added, not ensured,
       // so look up the join and add it instead.
