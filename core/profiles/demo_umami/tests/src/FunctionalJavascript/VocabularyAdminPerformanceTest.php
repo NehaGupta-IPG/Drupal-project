@@ -77,7 +77,7 @@ class VocabularyAdminPerformanceTest extends PerformanceTestBase {
     }, 'umamiVocabularyAdminPageHotCache');
     $this->assertTermInVocabularyAdminPage();
     $this->assertSame($performance_data->getQueryCount(), 9);
-    $this->assertSame($performance_data->getCacheGetCount(), 116);
+    $this->assertSame($performance_data->getCacheGetCount(), 115);
     $this->assertSame($performance_data->getCacheSetCount(), 0);
     $this->assertSame($performance_data->getCacheDeleteCount(), 0);
     $this->assertSame(0, $performance_data->getCacheTagChecksumCount());
