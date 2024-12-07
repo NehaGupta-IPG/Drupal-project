@@ -62,7 +62,7 @@ trait FileFieldCreationTrait {
    * @param array $widget_settings
    *   A list of widget settings that will be added to the widget defaults.
    */
-  protected function attachFileField($name, $entity_type, $bundle, $field_settings = [], $widget_settings = []) {
+  protected function attachFileField($name, $entity_type, $bundle, $field_settings = [], $widget_settings = []): void {
     $field = [
       'field_name' => $name,
       'label' => $name,
