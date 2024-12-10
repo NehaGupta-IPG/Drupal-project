@@ -328,11 +328,15 @@ class OverviewTerms extends EntityForm implements WorkspaceSafeFormInterface {
       '#value' => t('Filter'),
       '#id' => 'filter-submit',
     ];
-    $form['filter']['reset'] = [
-      '#type' => 'submit',
-      '#value' => t('Reset'),
-      '#id' => 'filter-reset',
-    ];
+
+    // Only show the reset button when a filter is active.
+    if ($this->termFilter) {
+      $form['filter']['reset'] = [
+        '#type' => 'submit',
+        '#value' => t('Reset'),
+        '#id' => 'filter-reset',
+      ];
+    }
 
     if ($update_tree_access->isAllowed() && $this->termFilter) {
       $form['tabledrag_disabled_help'] = [
