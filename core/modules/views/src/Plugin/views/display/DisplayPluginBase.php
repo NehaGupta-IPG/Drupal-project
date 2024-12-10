@@ -192,47 +192,47 @@ abstract class DisplayPluginBase extends PluginBase implements DisplayPluginInte
     parent::__construct([], $plugin_id, $plugin_definition);
 
     if ($viewsData === NULL) {
-      @trigger_error('Calling ' . __METHOD__ . ' without the $viewsData argument is deprecated in drupal:11.1.0 and it will be required in drupal:12.0.0. See https://www.drupal.org/node/3421323', E_USER_DEPRECATED);
+      @trigger_error('Calling ' . __METHOD__ . ' without the $viewsData argument is deprecated in drupal:11.2.0 and it will be required in drupal:12.0.0. See https://www.drupal.org/node/3421323', E_USER_DEPRECATED);
       $this->viewsData = \Drupal::service(ViewsData::class);
     }
 
     if ($accessPluginManager === NULL) {
-      @trigger_error('Calling ' . __METHOD__ . ' without the $accessPluginManager argument is deprecated in drupal:11.1.0 and it will be required in drupal:12.0.0. See https://www.drupal.org/node/3421323', E_USER_DEPRECATED);
+      @trigger_error('Calling ' . __METHOD__ . ' without the $accessPluginManager argument is deprecated in drupal:11.2.0 and it will be required in drupal:12.0.0. See https://www.drupal.org/node/3421323', E_USER_DEPRECATED);
       $this->accessPluginManager = \Drupal::service('plugin.manager.views.access');
     }
 
     if ($cachePluginManager === NULL) {
-      @trigger_error('Calling ' . __METHOD__ . ' without the $cachePluginManager argument is deprecated in drupal:11.1.0 and it will be required in drupal:12.0.0. See https://www.drupal.org/node/3421323', E_USER_DEPRECATED);
+      @trigger_error('Calling ' . __METHOD__ . ' without the $cachePluginManager argument is deprecated in drupal:11.2.0 and it will be required in drupal:12.0.0. See https://www.drupal.org/node/3421323', E_USER_DEPRECATED);
       $this->accessPluginManager = \Drupal::service('plugin.manager.views.cache');
     }
 
     if ($displayExtenderPluginManager === NULL) {
-      @trigger_error('Calling ' . __METHOD__ . ' without the $displayExtenderPluginManager argument is deprecated in drupal:11.1.0 and it will be required in drupal:12.0.0. See https://www.drupal.org/node/3421323', E_USER_DEPRECATED);
+      @trigger_error('Calling ' . __METHOD__ . ' without the $displayExtenderPluginManager argument is deprecated in drupal:11.2.0 and it will be required in drupal:12.0.0. See https://www.drupal.org/node/3421323', E_USER_DEPRECATED);
       $this->displayExtenderPluginManager = \Drupal::service('plugin.manager.views.display_extender');
     }
 
     if ($exposedFormPluginManager === NULL) {
-      @trigger_error('Calling ' . __METHOD__ . ' without the $exposedFormPluginManager argument is deprecated in drupal:11.1.0 and it will be required in drupal:12.0.0. See https://www.drupal.org/node/3421323', E_USER_DEPRECATED);
+      @trigger_error('Calling ' . __METHOD__ . ' without the $exposedFormPluginManager argument is deprecated in drupal:11.2.0 and it will be required in drupal:12.0.0. See https://www.drupal.org/node/3421323', E_USER_DEPRECATED);
       $this->exposedFormPluginManager = \Drupal::service('plugin.manager.views.exposed_form');
     }
 
     if ($pagerPluginManager === NULL) {
-      @trigger_error('Calling ' . __METHOD__ . ' without the $pagerPluginManager argument is deprecated in drupal:11.1.0 and it will be required in drupal:12.0.0. See https://www.drupal.org/node/3421323', E_USER_DEPRECATED);
+      @trigger_error('Calling ' . __METHOD__ . ' without the $pagerPluginManager argument is deprecated in drupal:11.2.0 and it will be required in drupal:12.0.0. See https://www.drupal.org/node/3421323', E_USER_DEPRECATED);
       $this->pagerPluginManager = \Drupal::service('plugin.manager.views.pager');
     }
 
     if ($rowPluginManager === NULL) {
-      @trigger_error('Calling ' . __METHOD__ . ' without the $rowPluginManager argument is deprecated in drupal:11.1.0 and it will be required in drupal:12.0.0. See https://www.drupal.org/node/3421323', E_USER_DEPRECATED);
+      @trigger_error('Calling ' . __METHOD__ . ' without the $rowPluginManager argument is deprecated in drupal:11.2.0 and it will be required in drupal:12.0.0. See https://www.drupal.org/node/3421323', E_USER_DEPRECATED);
       $this->rowPluginManager = \Drupal::service('plugin.manager.views.row');
     }
 
     if ($stylePluginManager === NULL) {
-      @trigger_error('Calling ' . __METHOD__ . ' without the $stylePluginManager argument is deprecated in drupal:11.1.0 and it will be required in drupal:12.0.0. See https://www.drupal.org/node/3421323', E_USER_DEPRECATED);
+      @trigger_error('Calling ' . __METHOD__ . ' without the $stylePluginManager argument is deprecated in drupal:11.2.0 and it will be required in drupal:12.0.0. See https://www.drupal.org/node/3421323', E_USER_DEPRECATED);
       $this->stylePluginManager = \Drupal::service('plugin.manager.views.style');
     }
 
     if ($queryPluginManager === NULL) {
-      @trigger_error('Calling ' . __METHOD__ . ' without the $queryPluginManager argument is deprecated in drupal:11.1.0 and it will be required in drupal:12.0.0. See https://www.drupal.org/node/3421323', E_USER_DEPRECATED);
+      @trigger_error('Calling ' . __METHOD__ . ' without the $queryPluginManager argument is deprecated in drupal:11.2.0 and it will be required in drupal:12.0.0. See https://www.drupal.org/node/3421323', E_USER_DEPRECATED);
       $this->queryPluginManager = \Drupal::service('plugin.manager.views.query');
     }
   }
