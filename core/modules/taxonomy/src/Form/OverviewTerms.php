@@ -522,7 +522,7 @@ class OverviewTerms extends EntityForm implements WorkspaceSafeFormInterface {
       'forwardStep' => $forward_step,
     ];
 
-    if ($update_tree_access->isAllowed() && count($tree) > 1) {
+    if ($update_tree_access->isAllowed() && count($tree) > 1 && !$this->termFilter) {
       $form['actions'] = ['#type' => 'actions', '#tree' => FALSE];
       $form['actions']['submit'] = [
         '#type' => 'submit',
