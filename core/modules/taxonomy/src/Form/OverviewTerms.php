@@ -342,10 +342,10 @@ class OverviewTerms extends EntityForm implements WorkspaceSafeFormInterface {
       $form['tabledrag_disabled_help'] = [
         '#type' => 'container',
         'message' => [
-          '#markup' => $this->t('Term reordering has been disabled because terms are being filtered. To enable term reordering, reset the filter.'),
+          '#markup' => $this->t('Reordering is disabled while terms are filtered.'),
         ],
         '#attributes' => [
-          'class' => ['messages', 'messages--warning'],
+          'class' => ['messages'],
         ],
       ];
     }
