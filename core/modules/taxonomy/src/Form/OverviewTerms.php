@@ -347,6 +347,14 @@ class OverviewTerms extends EntityForm implements WorkspaceSafeFormInterface {
       ];
     }
 
+    // Help message for the icon indicating matching terms.
+    if ($this->termFilter) {
+      $form['filter_results_help'] = [
+        '#type' => 'container',
+        'message' => ['#markup' => t('[►] indicates matching terms. Parents of matching terms are also shown.')],
+      ];
+    }
+
     $errors = $form_state->getErrors();
     $row_position = 0;
     // Build the actual form.
@@ -365,7 +373,6 @@ class OverviewTerms extends EntityForm implements WorkspaceSafeFormInterface {
         'term' => $this->t('Name'),
         'status' => $this->t('Status'),
         'operations' => $this->t('Operations'),
-        'weight' => !$operations_access && !$this->termFilter ? $this->t('Weight') : NULL,
       ],
       '#attributes' => [
         'id' => 'taxonomy',
@@ -386,15 +393,37 @@ class OverviewTerms extends EntityForm implements WorkspaceSafeFormInterface {
       /** @var \Drupal\Core\Entity\EntityInterface $term */
       $term = $this->entityRepository->getTranslationFromContext($term);
       $form['terms'][$key]['#term'] = $term;
-      $indentation = [];
+      $prefix = [];
+      if ($this->termFilter) {
+        $resultType = [
+          '#type' => 'html_tag',
+          '#tag' => 'span',
+          'child' => [
+            '#markup' => '►',
+          ],
+          '#attributes' => [
+            'title' => '',
+            'class' => [],
+          ],
+        ];
+        if (!empty($matchingTids) && in_array($term->id(), $matchingTids, FALSE)) {
+          $resultType['#attributes']['title'] = t('Matching term');
+          $resultType['#attributes']['class'] = [];
+        }
+        else {
+          $resultType['#attributes']['title'] = t('Non matching term');
+          $resultType['#attributes']['class'] = ['visually-hidden'];
+        }
+        $prefix[] = $resultType;
+      }
       if (isset($term->depth) && $term->depth > 0) {
-        $indentation = [
+        $prefix[] = [
           '#theme' => 'indentation',
           '#size' => $term->depth,
         ];
       }
       $form['terms'][$key]['term'] = [
-        '#prefix' => !empty($indentation) ? $this->renderer->render($indentation) : '',
+        '#prefix' => !empty($prefix) ? $this->renderer->render($prefix) : '',
         '#type' => 'link',
         '#title' => $term->getName(),
         '#url' => $term->toUrl(),
@@ -410,12 +439,6 @@ class OverviewTerms extends EntityForm implements WorkspaceSafeFormInterface {
       if (in_array($term->id(), $pending_term_ids)) {
         $form['terms'][$key]['#attributes']['class'][] = 'color-warning';
         $form['terms'][$key]['#attributes']['class'][] = 'taxonomy-term--pending-revision';
-      }
-
-      // Add a special class for filter matching terms so we can highlight
-      // them in the form too.
-      if (in_array($term->id(), $matchingTids ?? [])) {
-        $form['terms'][$key]['#attributes']['class'][] = 'color-warning';
       }
 
       if ($update_tree_access->isAllowed() && count($tree) > 1) {
