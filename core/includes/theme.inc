@@ -250,28 +250,45 @@ function theme_get_setting($setting_name, $theme = NULL) {
       /** @var \Drupal\Core\File\FileUrlGeneratorInterface $file_url_generator */
       $file_url_generator = \Drupal::service('file_url_generator');
 
+      // A dummy query-string is added to filenames, to gain control over
+      // browser-caching. The string changes on every update or full cache
+      // flush, forcing browsers to load a new copy of the files, as the
+      // URL changed.
+      // We need try-catch due to the installer not having a state yet.
+      try {
+        $query_string = \Drupal::service('asset.query_string')->get();
+      }
+      catch (Exception $e) {
+        $query_string = '0';
+      }
+
       // Generate the path to the logo image.
       if ($cache[$theme]->get('logo.use_default')) {
-        $logo = \Drupal::service('theme.initialization')->getActiveThemeByName($theme)->getLogo();
-        $cache[$theme]->set('logo.url', $file_url_generator->generateString($logo));
+        $logo_path = \Drupal::service('theme.initialization')->getActiveThemeByName($theme)->getLogo();
       }
-      elseif ($logo_path = $cache[$theme]->get('logo.path')) {
-        $cache[$theme]->set('logo.url', $file_url_generator->generateString($logo_path));
+      else {
+        $logo_path = $cache[$theme]->get('logo.path');
+      }
+      if (isset($logo_path) && is_string($logo_path)) {
+        $query_string_separator = (strpos($logo_path, '?') !== FALSE) ? '&' : '?';
+        $cache[$theme]->set('logo.url', $file_url_generator->generateString($logo_path) . $query_string_separator . $query_string);
       }
 
       // Generate the path to the favicon.
       if ($cache[$theme]->get('features.favicon')) {
-        $favicon_path = $cache[$theme]->get('favicon.path');
         if ($cache[$theme]->get('favicon.use_default')) {
-          if (file_exists($favicon = $theme_object->getPath() . '/favicon.ico')) {
-            $cache[$theme]->set('favicon.url', $file_url_generator->generateString($favicon));
-          }
-          else {
-            $cache[$theme]->set('favicon.url', $file_url_generator->generateString('core/misc/favicon.ico'));
+          $favicon_path = $theme_object->getPath() . '/favicon.ico';
+          if (!file_exists($favicon_path)) {
+            $favicon_path = 'core/misc/favicon.ico';
           }
         }
-        elseif ($favicon_path) {
-          $cache[$theme]->set('favicon.url', $file_url_generator->generateString($favicon_path));
+        else {
+          $favicon_path = $cache[$theme]->get('favicon.path');
+        }
+
+        if ($favicon_path) {
+          $query_string_separator = (strpos($favicon_path, '?') !== FALSE) ? '&' : '?';
+          $cache[$theme]->set('favicon.url', $file_url_generator->generateString($favicon_path) . $query_string_separator . $query_string);
         }
         else {
           $cache[$theme]->set('features.favicon', FALSE);
