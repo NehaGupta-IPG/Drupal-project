@@ -14,6 +14,7 @@ use Drupal\Core\Database\SchemaDefinition\Schema;
 use Drupal\Core\Database\SchemaDefinition\SchemaDefinitionType;
 use Drupal\Core\Database\SchemaDefinition\StringValue;
 use Drupal\Core\Database\SchemaDefinition\Table;
+use Drupal\user\Entity\Role;
 
 /**
  * Implements hook_schema().
@@ -112,6 +113,20 @@ function dblog_schema(): Schema {
  */
 function dblog_update_last_removed(): int {
   return 10101;
+}
+
+/**
+ * Implements hook_update_N().
+ */
+function dblog_update_111001(&$sandbox): void {
+  $roles = Role::loadMultiple();
+
+  foreach ($roles as $role) {
+    if ($role->hasPermission('access site reports')) {
+      $role->grantPermission('access dblog reports');
+      $role->save();
+    }
+  }
 }
 
 /**

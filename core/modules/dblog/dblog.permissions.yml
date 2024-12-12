@@ -1,0 +1,3 @@
+access dblog reports:
+  title: 'View recent log messages'
+  restrict access: true
