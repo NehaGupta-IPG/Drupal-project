@@ -305,6 +305,12 @@ class OverviewTerms extends EntityForm implements WorkspaceSafeFormInterface {
       '#type' => 'container',
       'message' => ['#markup' => $help_message],
     ];
+    if ($update_tree_access->isAllowed()) {
+      $form['filter_warning'] = [
+        '#type' => 'container',
+        'message' => ['#markup' => '<strong>' . $this->t('Reordering is disabled while terms are filtered.') . '</strong>'],
+      ];
+    }
 
     $operations_access = !empty($pending_term_ids) || $vocabulary_hierarchy === VocabularyInterface::HIERARCHY_MULTIPLE;
     if ($operations_access) {
@@ -338,23 +344,6 @@ class OverviewTerms extends EntityForm implements WorkspaceSafeFormInterface {
       ];
     }
 
-    if ($update_tree_access->isAllowed() && $this->termFilter) {
-      $form['tabledrag_disabled_help'] = [
-        '#type' => 'container',
-        'message' => [
-          '#markup' => '<strong>' . $this->t('Reordering is disabled while terms are filtered.') . '</strong>',
-        ],
-      ];
-    }
-
-    // Help message for the icon indicating matching terms.
-    if ($this->termFilter) {
-      $form['filter_results_help'] = [
-        '#type' => 'container',
-        'message' => ['#markup' => t('[►] indicates matching terms. Parents of matching terms are also shown.')],
-      ];
-    }
-
     $errors = $form_state->getErrors();
     $row_position = 0;
     // Build the actual form.
@@ -381,6 +370,16 @@ class OverviewTerms extends EntityForm implements WorkspaceSafeFormInterface {
     if (!$operations_access && !$this->termFilter) {
       $form['terms']['#header']['weight'] = $this->t('Weight');
     }
+    // Table caption.
+    if ($this->termFilter) {
+      $form['terms']['#caption'] = [
+        '#type' => 'html_tag',
+        '#tag' => 'div',
+        'child' => [
+          '#markup' => t('<span class="color-success">⇒</span> indicates matching terms. Parents of matching terms are also shown.'),
+        ],
+      ];
+    }
     $this->renderer->addCacheableDependency($form['terms'], $create_access);
 
     foreach ($current_page as $key => $term) {
@@ -399,19 +398,15 @@ class OverviewTerms extends EntityForm implements WorkspaceSafeFormInterface {
           '#type' => 'html_tag',
           '#tag' => 'span',
           'child' => [
-            '#markup' => '►',
-          ],
-          '#attributes' => [
-            'title' => '',
-            'class' => [],
+            '#markup' => '⇒',
           ],
         ];
         if (!empty($matchingTids) && in_array($term->id(), $matchingTids, FALSE)) {
           $resultType['#attributes']['title'] = t('Matching term');
-          $resultType['#attributes']['class'] = [];
+          $resultType['#attributes']['class'] = ['color-success'];
         }
         else {
-          $resultType['#attributes']['title'] = t('Non matching term');
+          $resultType['#attributes']['title'] = t('Non-matching term');
           $resultType['#attributes']['class'] = ['visually-hidden'];
         }
         $prefix[] = $resultType;
@@ -428,6 +423,15 @@ class OverviewTerms extends EntityForm implements WorkspaceSafeFormInterface {
         '#title' => $term->getName(),
         '#url' => $term->toUrl(),
       ];
+      if ($this->termFilter) {
+        if (!empty($matchingTids) && in_array($term->id(), $matchingTids, FALSE)) {
+          $form['terms'][$key]['term']['#attributes']['aria-label'] = t('Matching term: @name', ['@name' => $term->getName()]);
+          $form['terms'][$key]['term']['#attributes']['class'][] = 'color-success';
+        }
+        else {
+          $form['terms'][$key]['term']['#attributes']['aria-label'] = t('Non-matching term: @name', ['@name' => $term->getName()]);
+        }
+      }
       $form['terms'][$key]['status'] = [
         '#type' => 'item',
         '#markup' => ($term->isPublished()) ? $this->t('Published') : $this->t('Unpublished'),
