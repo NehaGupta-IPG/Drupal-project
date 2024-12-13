@@ -31,7 +31,7 @@ class Watchdog extends WizardPluginBase {
 
     // Add permission-based access control.
     $display_options['access']['type'] = 'perm';
-    $display_options['access']['options']['perm'] = 'access site reports';
+    $display_options['access']['options']['perm'] = 'access dblog reports';
 
     return $display_options;
   }
