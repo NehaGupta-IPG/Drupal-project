@@ -53,7 +53,7 @@ class PathProcessorFront implements InboundPathProcessorInterface, OutboundPathP
   /**
    * {@inheritdoc}
    */
-  public function processOutbound($path, &$options = [], Request $request = NULL, BubbleableMetadata $bubbleable_metadata = NULL) {
+  public function processOutbound($path, &$options = [], ?Request $request = NULL, ?BubbleableMetadata $bubbleable_metadata = NULL) {
     if ($path === $this->getFrontPagePath()) {
       $path = '/';
     }
