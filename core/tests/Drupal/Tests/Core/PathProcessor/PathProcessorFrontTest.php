@@ -84,4 +84,32 @@ class PathProcessorFrontTest extends UnitTestCase {
     $processor->processInbound('/', new Request());
   }
 
+  /**
+   * Tests basic outbound processing functionality.
+   *
+   * @covers ::processOutbound
+   * @dataProvider providerProcessOutbound
+   */
+  public function testProcessOutbound($frontpage_path, $path, $expected, array $expected_query = []): void {
+    $config_factory = $this->prophesize(ConfigFactoryInterface::class);
+    $config = $this->prophesize(ImmutableConfig::class);
+    $config_factory->get('system.site')
+      ->willReturn($config->reveal());
+    $config->get('page.front')
+      ->willReturn($frontpage_path);
+    $processor = new PathProcessorFront($config_factory->reveal());
+    $request = new Request();
+    $this->assertEquals($expected, $processor->processOutbound($path, $request));
+    $this->assertEquals($expected_query, $request->query->all());
+  }
+
+  /**
+   * Inbound paths and expected results.
+   */
+  public static function providerProcessOutbound() {
+    return [
+      'frontpage path is turned into a single slash' => ['/node', '/node', '/'],
+    ];
+  }
+
 }
