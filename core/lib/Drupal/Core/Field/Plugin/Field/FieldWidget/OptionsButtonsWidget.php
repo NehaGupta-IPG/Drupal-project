@@ -33,11 +33,6 @@ class OptionsButtonsWidget extends OptionsWidgetBase {
     $options = $this->getOptions($items->getEntity());
     $selected = $this->getSelectedOptions($items);
 
-    // If required and there is one single option, preselect it.
-    if ($this->required && count($options) == 1) {
-      $selected = [array_key_first($options)];
-    }
-
     if ($this->multiple) {
       $element += [
         '#type' => 'checkboxes',
@@ -66,6 +61,39 @@ class OptionsButtonsWidget extends OptionsWidgetBase {
     if (!$this->required && !$this->multiple) {
       return $this->t('N/A');
     }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function getSelectedOptions(FieldItemListInterface $items) {
+    $options = $this->getOptions($items->getEntity());
+    $selected = parent::getSelectedOptions($items);
+
+    if (!$this->required || count($options) > 1) {
+      return $selected;
+    }
+
+    $first = reset($options);
+    if ($this->supportsGroups() && is_array($first)) {
+      // First group has multiple options.
+      if (count($first) > 1) {
+        return $selected;
+      }
+
+      // Only a single option in the group, preselect it.
+      return [key($first)];
+    }
+
+    // No groups and there is one single option, preselect it.
+    return [key($options)];
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function supportsGroups() {
+    return $this->multiple;
   }
 
 }

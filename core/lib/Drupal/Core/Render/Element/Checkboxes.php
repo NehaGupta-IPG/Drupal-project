@@ -2,6 +2,7 @@
 
 namespace Drupal\Core\Render\Element;
 
+use Drupal\Component\Utility\Html;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Render\Attribute\FormElement;
 
@@ -85,25 +86,61 @@ class Checkboxes extends FormElementBase {
         // sub-elements.
         $weight += 0.001;
 
-        // Only enabled checkboxes receive their values from the form
-        // submission, the disabled checkboxes use their default value.
-        $default_value = NULL;
-        if (isset($value[$key]) || (!empty($element[$key]['#disabled']) && in_array($key, $element['#default_value'], TRUE))) {
-          $default_value = $key;
+        if (is_array($choice)) {
+          $label = $key;
+          $key = Html::cleanCssIdentifier(strtolower($key));
+          $container_key = $key . '_container';
+          $element += [$container_key => []];
+          $element[$container_key] += [
+            '#type' => 'fieldset',
+            '#title' => Html::escape($label),
+            '#attributes' => [
+              'class' => [
+                'checkbox-group',
+                'checkbox-group-' . $key,
+              ],
+            ],
+            '#weight' => $weight,
+            '#parents' => $element['#parents'],
+          ];
+          $element[$container_key] += [$key => []];
+          foreach ($choice as $checkbox_value => $checkbox_label) {
+            $weight += 0.001;
+            $element[$container_key] += [$checkbox_value => []];
+            $element[$container_key][$checkbox_value] += [
+              '#type' => 'checkbox',
+              '#title' => $checkbox_label,
+              '#return_value' => $checkbox_value,
+              '#default_value' => isset($value[$checkbox_value]) ? $checkbox_value : NULL,
+              '#attributes' => $element['#attributes'],
+              '#ajax' => $element['#ajax'] ?? NULL,
+              // Errors should only be shown on the parent checkboxes element.
+              '#error_no_message' => TRUE,
+              '#weight' => $weight,
+            ];
+          }
         }
+        else {
+          // Only enabled checkboxes receive their values from the form
+          // submission, the disabled checkboxes use their default value.
+          $default_value = NULL;
+          if (isset($value[$key]) || (!empty($element[$key]['#disabled']) && in_array($key, $element['#default_value'], TRUE))) {
+            $default_value = $key;
+          }
 
-        $element += [$key => []];
-        $element[$key] += [
-          '#type' => 'checkbox',
-          '#title' => $choice,
-          '#return_value' => $key,
-          '#default_value' => $default_value,
-          '#attributes' => $child_attributes,
-          '#ajax' => $element['#ajax'] ?? NULL,
-          // Errors should only be shown on the parent checkboxes element.
-          '#error_no_message' => TRUE,
-          '#weight' => $weight,
-        ];
+          $element += [$key => []];
+          $element[$key] += [
+            '#type' => 'checkbox',
+            '#title' => $choice,
+            '#return_value' => $key,
+            '#default_value' => $default_value,
+            '#attributes' => $element['#attributes'],
+            '#ajax' => $element['#ajax'] ?? NULL,
+            // Errors should only be shown on the parent checkboxes element.
+            '#error_no_message' => TRUE,
+            '#weight' => $weight,
+          ];
+        }
       }
     }
     return $element;

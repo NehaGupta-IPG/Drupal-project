@@ -6,6 +6,7 @@ namespace Drupal\Tests\field\Functional\EntityReference;
 
 use Drupal\Core\Entity\Entity\EntityFormDisplay;
 use Drupal\Core\Entity\Entity\EntityViewDisplay;
+use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\Tests\BrowserTestBase;
 use Drupal\Tests\field\Traits\EntityReferenceFieldCreationTrait;
 use PHPUnit\Framework\Attributes\Group;
@@ -33,7 +34,7 @@ class EntityReferenceXSSTest extends BrowserTestBase {
   /**
    * Tests markup is escaped in the entity reference select and label formatter.
    */
-  public function testEntityReferenceXSS(): void {
+  public function testEntityReferenceXss(): void {
     $this->drupalCreateContentType(['type' => 'article']);
 
     // Create a node with markup in the title.
@@ -44,7 +45,7 @@ class EntityReferenceXSSTest extends BrowserTestBase {
     ];
     $referenced_node = $this->drupalCreateNode($node);
 
-    $node_type_two = $this->drupalCreateContentType(['name' => '<em>bundle with markup</em>']);
+    $node_type_two = $this->drupalCreateContentType(['name' => '<em>bundle with markup<script>alert("label")</script></em>']);
     $this->drupalCreateNode([
       'type' => $node_type_two->id(),
       'title' => 'My bundle has markup',
@@ -82,14 +83,30 @@ class EntityReferenceXSSTest extends BrowserTestBase {
     $this->submitForm($edit, 'Save');
     $this->assertSession()->assertEscaped($referenced_node->getTitle());
 
-    // Test the options_buttons type.
+    // Test the options_buttons type for radios.
     EntityFormDisplay::load('node.article.default')
       ->setComponent('entity_reference_test', ['type' => 'options_buttons'])
       ->save();
     $this->drupalGet('node/add/article');
     $this->assertSession()->assertEscaped($referenced_node->getTitle());
-    // options_buttons does not support optgroups.
+    // options_buttons does not support optgroups for radios.
     $this->assertSession()->pageTextNotContains('bundle with markup');
+
+    $this->createEntityReferenceField('node', 'article', 'entity_reference_test_multiple',
+    'Entity Reference test', 'node', 'default',
+    ['target_bundles' => [$node_type_one->id(), $node_type_two->id()]],
+    FieldStorageDefinitionInterface::CARDINALITY_UNLIMITED);
+
+    // Test the options_buttons type for checkboxes.
+    EntityFormDisplay::load('node.article.default')
+      ->setComponent('entity_reference_test_multiple', ['type' => 'options_buttons'])
+      ->save();
+    $this->drupalGet('node/add/article');
+
+    // A legend inside a fieldset is allowed to contain phrasing content.
+    // But allowing html can cause render issues or inconsistencies for
+    // displaying referenced bundles.
+    $this->assertSession()->assertEscaped('<em>bundle with markup<script>alert("label")</script></em>');
   }
 
 }
