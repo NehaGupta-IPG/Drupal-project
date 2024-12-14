@@ -202,8 +202,9 @@ class DisplayTest extends UITestBase {
       'link_url' => $long_url,
     ], 'Apply');
 
-    // Ensure that specific error message does not appear in the page text.
-    $this->assertSession()->pageTextNotContains("Custom URL cannot be longer than 128 characters but is currently " . strlen($long_url) . " characters long.");
+    // This is borrowed from the function 'assertNoMessages() at lines 202- 212 of ErrorHandlerTest.php'.
+    // It ensures that there are no errors printed on the page.
+    $this->assertSession()->elementNotExists('xpath', '//div[contains(@class, "messages")]');
   }
 
   /**
