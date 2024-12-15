@@ -369,9 +369,7 @@ function _responsive_image_build_source_attributes(array $variables, BreakpointI
   $source_attributes = new Attribute([
     'srcset' => implode(', ', array_unique($srcset)),
   ]);
-  if (!empty($breakpoint->getMediaQuery())) {
-    $media_query = trim((string) $breakpoint->getMediaQuery());
-  }
+  $media_query = $breakpoint->getMediaQuery();
   if (!empty($media_query)) {
     $source_attributes->setAttribute('media', $media_query);
   }
