@@ -90,6 +90,39 @@ class BreakpointTest extends UnitTestCase {
   }
 
   /**
+   * @covers ::getMediaQuery
+   * @dataProvider providerGetMediaQueryReturnsTrimmedString
+   */
+  public function testGetMediaQueryReturnsTrimmedString($defined, $expected): void {
+    $this->pluginDefinition['mediaQuery'] = $defined;
+    $this->setupBreakpoint();
+    $this->assertEquals($expected, $this->breakpoint->getMediaQuery());
+  }
+
+  /**
+   * Test cases for ::testGetMediaQueryReturnsTrimmedString.
+   */
+  public static function providerGetMediaQueryReturnsTrimmedString(): array {
+    $mediaQuery = 'only screen and (min-width: 1220px)';
+    return [
+      [$mediaQuery, $mediaQuery],
+      [" $mediaQuery", $mediaQuery],
+      ["$mediaQuery ", $mediaQuery],
+      [" $mediaQuery ", $mediaQuery],
+      ["   $mediaQuery   ", $mediaQuery],
+    ];
+  }
+
+  /**
+   * @covers ::getMediaQuery
+   */
+  public function testGetMediaQueryReturnsStringWhenUndefined(): void {
+    $this->pluginDefinition['mediaQuery'] = NULL;
+    $this->setupBreakpoint();
+    $this->assertSame('', $this->breakpoint->getMediaQuery());
+  }
+
+  /**
    * @covers ::getMultipliers
    */
   public function testGetMultipliers(): void {
