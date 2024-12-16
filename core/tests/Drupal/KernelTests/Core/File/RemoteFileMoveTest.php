@@ -14,6 +14,14 @@ class RemoteFileMoveTest extends FileMoveTest {
   /**
    * {@inheritdoc}
    */
+  public function setUp(): void {
+    parent::setUp();
+    $this->config('system.file')->set('default_scheme', 'dummy-remote')->save();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   protected static $modules = ['file_test'];
 
   /**
@@ -29,13 +37,5 @@ class RemoteFileMoveTest extends FileMoveTest {
    * @var string
    */
   protected $classname = 'Drupal\file_test\StreamWrapper\DummyRemoteStreamWrapper';
-
-  /**
-   * {@inheritdoc}
-   */
-  protected function setUp(): void {
-    parent::setUp();
-    $this->config('system.file')->set('default_scheme', 'dummy-remote')->save();
-  }
 
 }

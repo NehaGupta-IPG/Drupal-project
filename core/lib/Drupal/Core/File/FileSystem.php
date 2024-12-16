@@ -9,6 +9,7 @@ use Drupal\Core\File\Exception\DirectoryNotReadyException;
 use Drupal\Core\File\Exception\FileException;
 use Drupal\Core\File\Exception\FileExistsException;
 use Drupal\Core\File\Exception\FileNotExistsException;
+use Drupal\Core\File\Exception\FileReadException;
 use Drupal\Core\File\Exception\FileWriteException;
 use Drupal\Core\File\Exception\NotRegularDirectoryException;
 use Drupal\Core\File\Exception\NotRegularFileException;
@@ -397,6 +398,12 @@ class FileSystem implements FileSystemInterface {
     // configurations (see above) and can also permit fast moves across local
     // schemes.
     $real_source = $this->realpath($source) ?: $source;
+
+    // Check the source is readable.
+    if (!is_readable($real_source)) {
+      throw new FileReadException("The specified file '$source' could not be read.");
+    }
+
     $real_destination = $this->realpath($destination) ?: $destination;
     // Perform the move operation.
     if (!@rename($real_source, $real_destination)) {
