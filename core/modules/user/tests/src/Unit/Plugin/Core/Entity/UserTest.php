@@ -4,42 +4,50 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\user\Unit\Plugin\Core\Entity;
 
-use Drupal\Tests\UnitTestCase;
-use Drupal\user\Entity\User;
+use Drupal\Core\Entity\ContentEntityBase;
+use Drupal\Core\Language\LanguageInterface;
+use Drupal\Tests\Core\Session\UserSessionTest;
 use Drupal\user\RoleInterface;
-use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\MockObject\MockObject;
 
 /**
- * Tests Drupal\user\Entity\User.
+ * @coversDefaultClass \Drupal\user\Entity\User
+ * @group user
  */
-#[CoversClass(User::class)]
-#[Group('user')]
-class UserTest extends UnitTestCase {
+class UserTest extends UserSessionTest {
 
   /**
    * {@inheritdoc}
    */
-  protected function createUserSession(array $rids = [], $authenticated = FALSE): User&MockObject {
-    $user = $this->getMockBuilder('Drupal\user\Entity\User')
-      ->disableOriginalConstructor()
-      ->onlyMethods(['get', 'id'])
-      ->getMock();
-    $user->expects($this->once())
-      ->method('id')
-      // @todo Also test the uid = 1 handling.
-      ->willReturn($authenticated ? 2 : 0);
+  protected function createUserSession(array $rids = [], $authenticated = FALSE) {
     $roles = [];
     foreach ($rids as $rid) {
-      $roles[] = (object) [
+      $roles[] = [
         'target_id' => $rid,
       ];
     }
-    $user->expects($this->atLeastOnce())
-      ->method('get')
-      ->with('roles')
-      ->willReturn($roles);
+    $values = ['roles' => [LanguageInterface::LANGCODE_DEFAULT => $roles]];
+
+    $user = $this->getMockBuilder('Drupal\user\Entity\User')
+      ->disableOriginalConstructor()
+      ->onlyMethods(['id'])
+      ->getMock();
+
+    $reflect = new \ReflectionObject($user);
+    $property = $reflect->getProperty('values');
+    $property->setAccessible(TRUE);
+    $property->setValue($user, $values);
+
+    $translations = [LanguageInterface::LANGCODE_DEFAULT => ['status' => ContentEntityBase::TRANSLATION_EXISTING]];
+    $reflect = new \ReflectionObject($user);
+    $property = $reflect->getProperty('translations');
+    $property->setAccessible(TRUE);
+    $property->setValue($user, $translations);
+
+    $user->expects($this->any())
+      ->method('id')
+      // @todo Also test the uid = 1 handling.
+      ->willReturn($authenticated ? 2 : 0);
+
     return $user;
   }
 
@@ -47,7 +55,7 @@ class UserTest extends UnitTestCase {
    * Tests the method getRoles exclude or include locked roles based in param.
    *
    * @see \Drupal\user\Entity\User::getRoles()
-   * @legacy-covers ::getRoles
+   * @covers ::getRoles
    */
   public function testUserGetRoles(): void {
     // Anonymous user.
