@@ -27,17 +27,17 @@ class LoggingForm extends ConfigFormBase {
   public function buildForm(array $form, FormStateInterface $form_state) {
     $config_names = ['system.logging'];
 
-    $config_factory = \Drupal::service('config.factory');
-    foreach ($config_names as $config_name) {
-      $config_values = $config_factory->get($config_name)->getOriginal();
-      dsm($config_values);
-    }
+    $form = $this->buildFormForConfig('system.logging');
+    // dsm($form);
 
+
+    // $config_factory = \Drupal::service('config.factory');
+    // foreach ($config_names as $config_name) {
+    //   $config_values = $config_factory->get($config_name)->getOriginal();
+    //   dsm($config_values);
+    // }
 
     $form['error_level'] = [
-      '#type' => 'radios',
-      '#title' => $this->t('Error messages to display'),
-      '#config_target' => 'system.logging:error_level',
       '#options' => [
         ERROR_REPORTING_HIDE => $this->t('None'),
         ERROR_REPORTING_DISPLAY_SOME => $this->t('Errors and warnings'),
@@ -45,7 +45,21 @@ class LoggingForm extends ConfigFormBase {
         ERROR_REPORTING_DISPLAY_VERBOSE => $this->t('All messages, with backtrace information'),
       ],
       '#description' => $this->t('It is recommended that sites running on production environments do not display any errors.'),
-    ];
+    ] + $form['error_level'];
+
+
+    // $form['error_level'] = [
+    //   '#type' => 'radios',
+    //   '#title' => $this->t('Error messages to display'),
+    //   '#config_target' => 'system.logging:error_level',
+    //   '#options' => [
+    //     ERROR_REPORTING_HIDE => $this->t('None'),
+    //     ERROR_REPORTING_DISPLAY_SOME => $this->t('Errors and warnings'),
+    //     ERROR_REPORTING_DISPLAY_ALL => $this->t('All messages'),
+    //     ERROR_REPORTING_DISPLAY_VERBOSE => $this->t('All messages, with backtrace information'),
+    //   ],
+    //   '#description' => $this->t('It is recommended that sites running on production environments do not display any errors.'),
+    // ];
 
     return parent::buildForm($form, $form_state);
   }

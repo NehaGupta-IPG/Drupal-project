@@ -95,14 +95,54 @@ abstract class ConfigFormBase extends FormBase {
 
   protected function buildFormForConfig(string $config_name) {
     $config_definition = $this->typedConfigManager->getDefinition($config_name);
-    dump($config_definition);
+    // dump($config_definition);
 
-    foreach ($config_definition['mapping'] as $property_name => $property_schema) {
+    $form = $this->buildFormElementForConfig($config_name, $config_definition['mapping']);
+
+    return $form;
+  }
+
+  protected function buildFormElementForConfig(string $config_name, array $schema_definition): array {
+    $element = [];
+
+    foreach ($schema_definition as $property_name => $property_schema) {
+      // Skip special properties.
+      if (str_starts_with('_', $property_name)) {
+        continue;
+      }
+
+      // dsm($property_schema);
+
+      if ($property_schema['type'] == 'string') {
+        $element[$property_name] = [
+          '#title' => $property_schema['label'] ?? $property_name,
+          '#config_target' => $config_name . ':' . $property_name,
+        ];
+
+        if (isset($property_schema['constraints']['Choice'])) {
+          $element[$property_name]['#type'] = 'radios';
+          $element[$property_name]['#options'] = array_combine(
+            $property_schema['constraints']['Choice']['choices'],
+            $property_schema['constraints']['Choice']['choices'],
+          );
+        }
+        else {
+          $element[$property_name]['#type'] = 'textfield';
+        }
+
+
+        // $element[$property_name] = [
+        //   '#type' => 'textfield',
+        //   '#title' => $property_schema['label'] ?? $property_name,
+        // ];
+      }
+
       // check type.
       // if mapping, recurse
       // if inherits from mapping, recurse???
     }
 
+    return $element;
   }
 
   /**
