@@ -95,14 +95,21 @@ abstract class ConfigFormBase extends FormBase {
 
   protected function buildFormForConfig(array $form, string $config_name): array {
     $config_definition = $this->typedConfigManager->getDefinition($config_name);
-    // dsm($config_definition);
+    dump($config_definition);
 
-    $form = $this->buildFormElementForConfig($form, $config_name, NULL, $config_definition['mapping']);
+    $set_config_targets = match ($config_definition['type']) {
+      'config_object' => TRUE,
+      // Config entities do not yet support config targets on form elements.
+      'config_entity' => FALSE,
+      default => throw new \InvalidArgumentException(sprintf("Invalid config name '%s'.", $config_name)),
+    };
+
+    $form = $this->buildFormElementForConfig($form, $config_name, NULL, $config_definition['mapping'], $set_config_targets);
     // dsm($form);
     return $form;
   }
 
-  protected function buildFormElementForConfig(array $element, string $config_name, ?string $property_address, array $schema_definition): array {
+  protected function buildFormElementForConfig(array $element, string $config_name, ?string $property_address, array $schema_definition, bool $set_config_targets): array {
     foreach ($schema_definition as $child_property_name => $child_property_schema) {
       // Form the address of this property.
       $child_property_address = ($property_address ? $property_address . '.' : '') . $child_property_name;
@@ -126,11 +133,13 @@ abstract class ConfigFormBase extends FormBase {
           '#open' => TRUE,
         ];
 
-        $child_element = $this->buildFormElementForConfig($child_element, $config_name, $child_property_address, $child_property_schema['mapping']);
+        $child_element = $this->buildFormElementForConfig($child_element, $config_name, $child_property_address, $child_property_schema['mapping'], $set_config_targets);
       }
       else {
         // Simple config item.
-        $child_element['#config_target'] = $config_name . ':' . $child_property_address;
+        if ($set_config_targets) {
+          $child_element['#config_target'] = $config_name . ':' . $child_property_address;
+        }
 
         if (isset($child_property_schema['constraints']['Choice'])) {
           // Item with options. It doesn't matter what the data type is.
