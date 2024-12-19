@@ -125,6 +125,20 @@ abstract class ConfigFormBase extends FormBase {
         // arrrgh we need $property_name to go in, to form an address!!
         $element[$property_name] = $this->buildFormElementForConfig($element[$property_name], $config_name, $property_schema['mapping']);
       }
+      elseif (isset($property_schema['constraints']['Choice'])) {
+        // Item with options.
+        $element[$property_name] = [
+          '#title' => $property_schema['label'] ?? $property_name,
+          // only for plain config, not for entities!
+          '#config_target' => $config_name . ':' . $property_name,
+        ];
+
+        $element[$property_name]['#type'] = 'radios';
+        $element[$property_name]['#options'] = array_combine(
+          $property_schema['constraints']['Choice']['choices'],
+          $property_schema['constraints']['Choice']['choices'],
+        );
+      }
       elseif ($property_schema['type'] == 'string') {
         $element[$property_name] = [
           '#title' => $property_schema['label'] ?? $property_name,
@@ -132,16 +146,7 @@ abstract class ConfigFormBase extends FormBase {
           '#config_target' => $config_name . ':' . $property_name,
         ];
 
-        if (isset($property_schema['constraints']['Choice'])) {
-          $element[$property_name]['#type'] = 'radios';
-          $element[$property_name]['#options'] = array_combine(
-            $property_schema['constraints']['Choice']['choices'],
-            $property_schema['constraints']['Choice']['choices'],
-          );
-        }
-        else {
-          $element[$property_name]['#type'] = 'textfield';
-        }
+        $element[$property_name]['#type'] = 'textfield';
 
 
         // $element[$property_name] = [
