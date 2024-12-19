@@ -93,14 +93,12 @@ abstract class ConfigFormBase extends FormBase {
     return $form;
   }
 
-  protected function buildFormForConfig(string $config_name) {
+  protected function buildFormForConfig(array $form, string $config_name): array {
     $config_definition = $this->typedConfigManager->getDefinition($config_name);
-    // dump($config_definition);
-
-    $form = [];
+    // dsm($config_definition);
 
     $form = $this->buildFormElementForConfig($form, $config_name, NULL, $config_definition['mapping']);
-
+    // dsm($form);
     return $form;
   }
 

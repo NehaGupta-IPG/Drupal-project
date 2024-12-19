@@ -26,7 +26,7 @@ class JsonApiSettingsForm extends ConfigFormBase {
    * {@inheritdoc}
    */
   public function buildForm(array $form, FormStateInterface $form_state) {
-    $form = $this->buildFormForConfig('jsonapi.settings');
+    $form = $this->buildFormForConfig($form, 'jsonapi.settings');
 
     $form['read_only'] = [
       '#type' => 'radios',
