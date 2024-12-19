@@ -126,7 +126,7 @@ abstract class ConfigFormBase extends FormBase {
         $element[$property_name] = $this->buildFormElementForConfig($element[$property_name], $config_name, $property_schema['mapping']);
       }
       elseif (isset($property_schema['constraints']['Choice'])) {
-        // Item with options.
+        // Item with options. It doesn't matter what the data type is.
         $element[$property_name] = [
           '#title' => $property_schema['label'] ?? $property_name,
           // only for plain config, not for entities!
