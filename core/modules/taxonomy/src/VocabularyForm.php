@@ -4,6 +4,7 @@ namespace Drupal\taxonomy;
 
 use Drupal\Core\Entity\BundleEntityFormBase;
 use Drupal\Core\Entity\EntityTypeInterface;
+use Drupal\Core\Form\ConfigSchemaFormTrait;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\language\Entity\ContentLanguageSettings;
@@ -15,6 +16,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  * @internal
  */
 class VocabularyForm extends BundleEntityFormBase {
+  use ConfigSchemaFormTrait;
 
   /**
    * The vocabulary storage.

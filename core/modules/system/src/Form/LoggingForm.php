@@ -3,6 +3,7 @@
 namespace Drupal\system\Form;
 
 use Drupal\Core\Form\ConfigFormBase;
+use Drupal\Core\Form\ConfigSchemaFormTrait;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Form\RedundantEditableConfigNamesTrait;
 
@@ -12,6 +13,7 @@ use Drupal\Core\Form\RedundantEditableConfigNamesTrait;
  * @internal
  */
 class LoggingForm extends ConfigFormBase {
+  use ConfigSchemaFormTrait;
   use RedundantEditableConfigNamesTrait;
 
   /**
