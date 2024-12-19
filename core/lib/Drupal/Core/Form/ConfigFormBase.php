@@ -114,60 +114,43 @@ abstract class ConfigFormBase extends FormBase {
         continue;
       }
 
+      $child_element = [
+        '#title' => $child_property_schema['label'] ?? $child_property_name,
+      ];
+
       // dsm($child_property_schema);
 
       if ($child_property_schema['type'] == 'mapping') {
-        // Mapping item: recurse into this method to build multiple form
-        // elements.
-        $element[$child_property_name] = [
+        // Compound element for a mapping item: recurse into this method to
+        // build multiple form elements.
+        $child_element += [
           '#type' => 'details',
-          '#title' => $child_property_schema['label'] ?? $child_property_name,
           '#open' => TRUE,
         ];
 
-        $element[$child_property_name] = $this->buildFormElementForConfig($element[$child_property_name], $config_name, $child_property_address, $child_property_schema['mapping']);
+        $child_element = $this->buildFormElementForConfig($child_element, $config_name, $child_property_address, $child_property_schema['mapping']);
       }
-      elseif (isset($child_property_schema['constraints']['Choice'])) {
-        // Item with options. It doesn't matter what the data type is.
-        $element[$child_property_name] = [
-          '#title' => $child_property_schema['label'] ?? $child_property_name,
-          // only for plain config, not for entities!
-          '#config_target' => $config_name . ':' . $child_property_address,
-        ];
+      else {
+        // Simple config item.
+        $child_element['#config_target'] = $config_name . ':' . $child_property_address;
 
-        $element[$child_property_name]['#type'] = 'radios';
-        $element[$child_property_name]['#options'] = array_combine(
-          $child_property_schema['constraints']['Choice']['choices'],
-          $child_property_schema['constraints']['Choice']['choices'],
-        );
-      }
-      elseif ($child_property_schema['type'] == 'string') {
-        $element[$child_property_name] = [
-          '#title' => $child_property_schema['label'] ?? $child_property_name,
-          // only for plain config, not for entities!
-          '#config_target' => $config_name . ':' . $child_property_address,
-        ];
-
-        $element[$child_property_name]['#type'] = 'textfield';
-
-
-        // $element[$child_property_name] = [
-        //   '#type' => 'textfield',
-        //   '#title' => $child_property_schema['label'] ?? $child_property_name,
-        // ];
-      }
-      elseif ($child_property_schema['type'] == 'boolean') {
-        $element[$child_property_name] = [
-          '#title' => $child_property_schema['label'] ?? $child_property_name,
-          '#type' => 'checkbox',
-          // only for plain config, not for entities!
-          '#config_target' => $config_name . ':' . $child_property_address,
-        ];
+        if (isset($child_property_schema['constraints']['Choice'])) {
+          // Item with options. It doesn't matter what the data type is.
+          $child_element['#type'] = 'radios';
+          $child_element['#options'] = array_combine(
+            $child_property_schema['constraints']['Choice']['choices'],
+            $child_property_schema['constraints']['Choice']['choices'],
+          );
+        }
+        elseif ($child_property_schema['type'] == 'string') {
+          $child_element['#type'] = 'textfield';
+        }
+        elseif ($child_property_schema['type'] == 'boolean') {
+          $child_element['#type'] = 'checkbox';
+        }
       }
 
-      // check type.
-      // if mapping, recurse
-      // if inherits from mapping, recurse???
+      $element[$child_property_name] = $child_element;
     }
 
     return $element;
