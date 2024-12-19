@@ -114,6 +114,8 @@ abstract class ConfigFormBase extends FormBase {
       // dsm($property_schema);
 
       if ($property_schema['type'] == 'mapping') {
+        // Mapping item: recurse into this method to build multiple form
+        // elements.
         $element[$property_name] = [
           '#type' => 'details',
           '#title' => $property_schema['label'] ?? $property_name,
