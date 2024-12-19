@@ -97,14 +97,14 @@ abstract class ConfigFormBase extends FormBase {
     $config_definition = $this->typedConfigManager->getDefinition($config_name);
     // dump($config_definition);
 
-    $form = $this->buildFormElementForConfig($config_name, $config_definition['mapping']);
+    $form = [];
+
+    $form = $this->buildFormElementForConfig($form, $config_name, $config_definition['mapping']);
 
     return $form;
   }
 
-  protected function buildFormElementForConfig(string $config_name, array $schema_definition): array {
-    $element = [];
-
+  protected function buildFormElementForConfig(array $element, string $config_name, array $schema_definition): array {
     foreach ($schema_definition as $property_name => $property_schema) {
       // Skip special properties.
       if (str_starts_with('_', $property_name)) {
@@ -113,9 +113,20 @@ abstract class ConfigFormBase extends FormBase {
 
       // dsm($property_schema);
 
-      if ($property_schema['type'] == 'string') {
+      if ($property_schema['type'] == 'mapping') {
+        $element[$property_name] = [
+          '#type' => 'details',
+          '#title' => $property_schema['label'] ?? $property_name,
+          '#open' => TRUE,
+        ];
+
+        // arrrgh we need $property_name to go in, to form an address!!
+        $element[$property_name] = $this->buildFormElementForConfig($element[$property_name], $config_name, $property_schema['mapping']);
+      }
+      elseif ($property_schema['type'] == 'string') {
         $element[$property_name] = [
           '#title' => $property_schema['label'] ?? $property_name,
+          // only for plain config, not for entities!
           '#config_target' => $config_name . ':' . $property_name,
         ];
 
