@@ -104,8 +104,11 @@ abstract class ConfigFormBase extends FormBase {
     return $form;
   }
 
-  protected function buildFormElementForConfig(array $element, string $config_name, ?string $property_name, array $schema_definition): array {
+  protected function buildFormElementForConfig(array $element, string $config_name, ?string $property_address, array $schema_definition): array {
     foreach ($schema_definition as $child_property_name => $child_property_schema) {
+      // Form the address of this property.
+      $child_property_address = ($property_address ? $property_address . '.' : '') . $child_property_name;
+
       // Skip special properties.
       if (str_starts_with('_', $child_property_name)) {
         continue;
@@ -122,15 +125,14 @@ abstract class ConfigFormBase extends FormBase {
           '#open' => TRUE,
         ];
 
-        // arrrgh we need $child_property_name to go in, to form an address!!
-        $element[$child_property_name] = $this->buildFormElementForConfig($element[$child_property_name], $config_name, $child_property_name, $child_property_schema['mapping']);
+        $element[$child_property_name] = $this->buildFormElementForConfig($element[$child_property_name], $config_name, $child_property_address, $child_property_schema['mapping']);
       }
       elseif (isset($child_property_schema['constraints']['Choice'])) {
         // Item with options. It doesn't matter what the data type is.
         $element[$child_property_name] = [
           '#title' => $child_property_schema['label'] ?? $child_property_name,
           // only for plain config, not for entities!
-          '#config_target' => $config_name . ':' . $child_property_name,
+          '#config_target' => $config_name . ':' . $child_property_address,
         ];
 
         $element[$child_property_name]['#type'] = 'radios';
@@ -143,7 +145,7 @@ abstract class ConfigFormBase extends FormBase {
         $element[$child_property_name] = [
           '#title' => $child_property_schema['label'] ?? $child_property_name,
           // only for plain config, not for entities!
-          '#config_target' => $config_name . ':' . $child_property_name,
+          '#config_target' => $config_name . ':' . $child_property_address,
         ];
 
         $element[$child_property_name]['#type'] = 'textfield';
@@ -159,7 +161,7 @@ abstract class ConfigFormBase extends FormBase {
           '#title' => $child_property_schema['label'] ?? $child_property_name,
           '#type' => 'checkbox',
           // only for plain config, not for entities!
-          '#config_target' => $config_name . ':' . $child_property_name,
+          '#config_target' => $config_name . ':' . $child_property_address,
         ];
       }
 
