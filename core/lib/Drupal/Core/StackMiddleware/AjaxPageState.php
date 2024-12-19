@@ -64,7 +64,7 @@ class AjaxPageState implements HttpKernelInterface {
   /**
    * Parse the ajax_page_state variable in the request.
    *
-   * Decompresses the libraries array key.
+   * Decompresses the libraries array key, if any.
    *
    * @param array $ajax_page_state
    *   An array of query parameters, where the libraries parameter is
@@ -75,7 +75,9 @@ class AjaxPageState implements HttpKernelInterface {
    *   changed to be uncompressed.
    */
   private function parseAjaxPageState(array $ajax_page_state): array {
-    $ajax_page_state['libraries'] = UrlHelper::uncompressQueryParameter($ajax_page_state['libraries']);
+    if (isset($ajax_page_state['libraries']) && is_string($ajax_page_state['libraries'])) {
+      $ajax_page_state['libraries'] = UrlHelper::uncompressQueryParameter($ajax_page_state['libraries']);
+    }
     return $ajax_page_state;
   }
 
