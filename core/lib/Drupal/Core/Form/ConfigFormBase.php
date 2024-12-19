@@ -136,6 +136,14 @@ abstract class ConfigFormBase extends FormBase {
         //   '#title' => $property_schema['label'] ?? $property_name,
         // ];
       }
+      elseif ($property_schema['type'] == 'boolean') {
+        $element[$property_name] = [
+          '#title' => $property_schema['label'] ?? $property_name,
+          '#type' => 'checkbox',
+          // only for plain config, not for entities!
+          '#config_target' => $config_name . ':' . $property_name,
+        ];
+      }
 
       // check type.
       // if mapping, recurse
