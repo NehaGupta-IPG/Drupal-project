@@ -99,67 +99,67 @@ abstract class ConfigFormBase extends FormBase {
 
     $form = [];
 
-    $form = $this->buildFormElementForConfig($form, $config_name, $config_definition['mapping']);
+    $form = $this->buildFormElementForConfig($form, $config_name, NULL, $config_definition['mapping']);
 
     return $form;
   }
 
-  protected function buildFormElementForConfig(array $element, string $config_name, array $schema_definition): array {
-    foreach ($schema_definition as $property_name => $property_schema) {
+  protected function buildFormElementForConfig(array $element, string $config_name, ?string $property_name, array $schema_definition): array {
+    foreach ($schema_definition as $child_property_name => $child_property_schema) {
       // Skip special properties.
-      if (str_starts_with('_', $property_name)) {
+      if (str_starts_with('_', $child_property_name)) {
         continue;
       }
 
-      // dsm($property_schema);
+      // dsm($child_property_schema);
 
-      if ($property_schema['type'] == 'mapping') {
+      if ($child_property_schema['type'] == 'mapping') {
         // Mapping item: recurse into this method to build multiple form
         // elements.
-        $element[$property_name] = [
+        $element[$child_property_name] = [
           '#type' => 'details',
-          '#title' => $property_schema['label'] ?? $property_name,
+          '#title' => $child_property_schema['label'] ?? $child_property_name,
           '#open' => TRUE,
         ];
 
-        // arrrgh we need $property_name to go in, to form an address!!
-        $element[$property_name] = $this->buildFormElementForConfig($element[$property_name], $config_name, $property_schema['mapping']);
+        // arrrgh we need $child_property_name to go in, to form an address!!
+        $element[$child_property_name] = $this->buildFormElementForConfig($element[$child_property_name], $config_name, $child_property_name, $child_property_schema['mapping']);
       }
-      elseif (isset($property_schema['constraints']['Choice'])) {
+      elseif (isset($child_property_schema['constraints']['Choice'])) {
         // Item with options. It doesn't matter what the data type is.
-        $element[$property_name] = [
-          '#title' => $property_schema['label'] ?? $property_name,
+        $element[$child_property_name] = [
+          '#title' => $child_property_schema['label'] ?? $child_property_name,
           // only for plain config, not for entities!
-          '#config_target' => $config_name . ':' . $property_name,
+          '#config_target' => $config_name . ':' . $child_property_name,
         ];
 
-        $element[$property_name]['#type'] = 'radios';
-        $element[$property_name]['#options'] = array_combine(
-          $property_schema['constraints']['Choice']['choices'],
-          $property_schema['constraints']['Choice']['choices'],
+        $element[$child_property_name]['#type'] = 'radios';
+        $element[$child_property_name]['#options'] = array_combine(
+          $child_property_schema['constraints']['Choice']['choices'],
+          $child_property_schema['constraints']['Choice']['choices'],
         );
       }
-      elseif ($property_schema['type'] == 'string') {
-        $element[$property_name] = [
-          '#title' => $property_schema['label'] ?? $property_name,
+      elseif ($child_property_schema['type'] == 'string') {
+        $element[$child_property_name] = [
+          '#title' => $child_property_schema['label'] ?? $child_property_name,
           // only for plain config, not for entities!
-          '#config_target' => $config_name . ':' . $property_name,
+          '#config_target' => $config_name . ':' . $child_property_name,
         ];
 
-        $element[$property_name]['#type'] = 'textfield';
+        $element[$child_property_name]['#type'] = 'textfield';
 
 
-        // $element[$property_name] = [
+        // $element[$child_property_name] = [
         //   '#type' => 'textfield',
-        //   '#title' => $property_schema['label'] ?? $property_name,
+        //   '#title' => $child_property_schema['label'] ?? $child_property_name,
         // ];
       }
-      elseif ($property_schema['type'] == 'boolean') {
-        $element[$property_name] = [
-          '#title' => $property_schema['label'] ?? $property_name,
+      elseif ($child_property_schema['type'] == 'boolean') {
+        $element[$child_property_name] = [
+          '#title' => $child_property_schema['label'] ?? $child_property_name,
           '#type' => 'checkbox',
           // only for plain config, not for entities!
-          '#config_target' => $config_name . ':' . $property_name,
+          '#config_target' => $config_name . ':' . $child_property_name,
         ];
       }
 
