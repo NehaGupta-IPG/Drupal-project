@@ -29,7 +29,7 @@ class LoggingForm extends ConfigFormBase {
   public function buildForm(array $form, FormStateInterface $form_state) {
     $config_names = ['system.logging'];
 
-    $form = $this->buildFormForConfig('system.logging');
+    $form = $this->buildFormForConfig($form, 'system.logging');
     // dsm($form);
 
 
