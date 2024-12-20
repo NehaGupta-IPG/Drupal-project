@@ -71,6 +71,10 @@ class VocabularyForm extends BundleEntityFormBase {
       $form['#title'] = $this->t('Edit vocabulary');
     }
 
+    $form = $this->buildFormForConfig($form, 'taxonomy.vocabulary.*');
+
+    // return $form;
+
     $form['name'] = [
       '#type' => 'textfield',
       '#title' => $this->t('Name'),
