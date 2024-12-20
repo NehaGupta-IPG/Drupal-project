@@ -14,6 +14,8 @@ trait ConfigSchemaFormTrait {
       'config_object' => TRUE,
       // Config entities do not yet support config targets on form elements.
       'config_entity' => FALSE,
+      // We don't handle any other type of config as our top-level config
+      // definition.
       default => throw new \InvalidArgumentException(sprintf("Invalid config name '%s'.", $config_name)),
     };
 
