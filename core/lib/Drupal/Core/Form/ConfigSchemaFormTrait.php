@@ -68,6 +68,12 @@ trait ConfigSchemaFormTrait {
         elseif ($child_property_schema['type'] == 'boolean') {
           $child_element['#type'] = 'checkbox';
         }
+        elseif ($child_property_schema['type'] == 'text') {
+          $child_element['#type'] = 'textarea';
+        }
+        elseif ($child_property_schema['type'] == 'langcode') {
+          $child_element['#type'] = 'language_select';
+        }
       }
 
       $element[$child_property_name] = $child_element;
