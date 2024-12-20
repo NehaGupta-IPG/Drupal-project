@@ -90,20 +90,15 @@ class MigrateUpdateHelper {
       foreach ($sandbox['current_migration']['tables_names'] as $legacy_name => $new_name) {
         $progress = &$sandbox['current_migration']['tables_progress'][$legacy_name];
         $total = $sandbox['current_migration']['tables_row_count'][$legacy_name];
-        if ($progress === $total) {
+        if ($progress >= $total) {
           continue;
         }
 
         $select_query = $this->database->select($legacy_name, 't')
           ->fields('t')
-          ->range($progress, 50)
-          ->execute();
-        $insert_query = $this->database->insert($new_name);
-        while ($row = $select_query->fetchAssoc()) {
-          $insert_query->fields($row);
-          $progress++;
-        }
-        $insert_query->execute();
+          ->range($progress, 50);
+        $this->database->insert($new_name)->from($select_query)->execute();
+        $progress += 50;
       }
 
       $message = new FormattableMarkup('Migration @mid - Copied @progress of @total rows', [
