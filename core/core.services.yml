@@ -1023,6 +1023,11 @@ services:
     arguments: ['@kernel', '@request_stack']
     tags:
       - { name: http_middleware, priority: 100 }
+  http_middleware.install:
+    class: Drupal\Core\StackMiddleware\Install
+    arguments: ['@state']
+    tags:
+      - { name: http_middleware, priority: 101 }
   http_middleware.session:
     class: Drupal\Core\StackMiddleware\Session
     autowire: true
