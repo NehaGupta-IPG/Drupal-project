@@ -107,9 +107,12 @@ class State extends CacheCollector implements StateInterface {
     // database and could write that value to the cache to the end of the
     // request. To avoid this race condition, write to the cache immediately
     // after calling parent::set(). This allows the race condition detection in
-    // CacheCollector::set() to work.
+    // CacheCollector::set() to work. Additionally, attempt to acquire the lock
+    // to prevent any requests from writing to cache until this request has
+    // finished.
     parent::set($key, $value);
     $this->persist($key);
+    $this->lock->acquire($this->getCid() . ':' . CacheCollector::class);
     $this->cache->set($this->getCid(), [$key => $value], CacheBackendInterface::CACHE_PERMANENT, $this->tags);
   }
 
