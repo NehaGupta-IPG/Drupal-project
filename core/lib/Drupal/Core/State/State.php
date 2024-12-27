@@ -112,7 +112,7 @@ class State extends CacheCollector implements StateInterface {
     $this->persist($key);
     $lock_name = $lock_name = $this->getCid() . ':' . __CLASS__;
     if (!$this->lock->acquire($lock_name)) {
-      $this->lock->wait();
+      $this->lock->wait($lock_name);
     }
     static::updateCache();
   }
