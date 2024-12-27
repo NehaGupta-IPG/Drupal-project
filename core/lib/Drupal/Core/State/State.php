@@ -105,11 +105,9 @@ class State extends CacheCollector implements StateInterface {
     // If another request had a cache miss before this request, and also hasn't
     // written to cache yet, then it may already have read this value from the
     // database and could write that value to the cache to the end of the
-    // request. To avoid this race condition, write to the cache immediately
-    // after calling parent::set(). This allows the race condition detection in
-    // CacheCollector::set() to work. Additionally, attempt to acquire the lock
-    // to prevent any requests from writing to cache until this request has
-    // finished.
+    // request. To avoid this race condition, attempt to acquire a the lock and
+    // write to the cache immediately after calling parent::set(). This allows
+    // the race condition detection in CacheCollector::updateCache() to work.
     parent::set($key, $value);
     $this->persist($key);
     $this->lock->acquire($this->getCid() . ':' . CacheCollector::class);
@@ -126,6 +124,14 @@ class State extends CacheCollector implements StateInterface {
       parent::set($key, $value);
       $this->persist($key);
     }
+    // If another request had a cache miss before this request, and also hasn't
+    // written to cache yet, then it may already have read this value from the
+    // database and could write that value to the cache to the end of the
+    // request. To avoid this race condition, attempt to acquire a the lock and
+    // write to the cache immediately after calling parent::set(). This allows
+    // the race condition detection in CacheCollector::updateCache() to work.
+    $this->lock->acquire($this->getCid() . ':' . CacheCollector::class);
+    $this->cache->set($this->getCid(), [$data], CacheBackendInterface::CACHE_PERMANENT, $this->tags);
   }
 
   /**

@@ -276,9 +276,6 @@ abstract class CacheCollector implements CacheCollectorInterface, DestructableIn
       // the existing cache data from earlier with the new data.
       // A future request will properly hydrate the cache from scratch.
       $write_cache = FALSE;
-      if ($this->cacheInvalidated) {
-        $this->cache->delete($cid);
-      }
     }
     // Remove keys marked for deletion.
     foreach ($this->keysToRemove as $delete_key) {
