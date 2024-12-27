@@ -112,7 +112,7 @@ class State extends CacheCollector implements StateInterface {
     $this->persist($key);
 
     // Attempt to acquire the lock, and wait if it's not acquired, before
-    // calling ::updateCache(), to maximise the chance that this process
+    // calling ::updateCache(), to maximize the chance that this process
     // invalidates the cache regardless of what is going on in other processes.
     $lock_name = $this->getCid() . ':' . get_class($this);
     if (!$this->lock->acquire($lock_name)) {
