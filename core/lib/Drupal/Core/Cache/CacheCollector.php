@@ -255,11 +255,16 @@ abstract class CacheCollector implements CacheCollectorInterface, DestructableIn
         $write_cache = FALSE;
       }
       // If there wasn't a cache item at the beginning of the request, but
-      // there is now, then there has been a cache write in the interim.
-      // Discard our data if so since the cache may have been written by
-      // a request that was also setting data.
+      // there is now, then there has been a cache write in the interim. Discard
+      // our data since the other request may have set new data as well as
+      // written the cache item.
       if (!$this->cacheCreated) {
         $write_cache = FALSE;
+        // If this request is invalidating the cache, delete the cache item we
+        // found and allow the cache to rebuild in later requests.
+        if ($this->cacheInvalidated) {
+          $this->cache->delete($cid);
+        }
       }
       $data = array_merge($cache->data, $data);
     }
@@ -276,7 +281,9 @@ abstract class CacheCollector implements CacheCollectorInterface, DestructableIn
     foreach ($this->keysToRemove as $delete_key) {
       unset($data[$delete_key]);
     }
-    if (($write_cache && $lock_acquired) || $this->cacheInvalidated) {
+    // Even if we didn't acquire a lock write the cache item if we're attempting
+    // to invalidate the cache.
+    if ($write_cache && ($lock_acquired || $this->cacheInvalidated)) {
       $this->cache->set($cid, $data, Cache::PERMANENT, $this->tags);
     }
     if ($lock && $lock_acquired) {
