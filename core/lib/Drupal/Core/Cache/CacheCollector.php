@@ -238,7 +238,7 @@ abstract class CacheCollector implements CacheCollectorInterface, DestructableIn
     // Try to acquire a lock. However even if the lock is not acquired,
     // run all of the logic except for setting the cache item anyway, since we
     // may need to delete the item due to operations taken in ::set().
-    if (!$lock) {
+    if ($lock) {
       $lock_acquired = $this->lock->acquire($lock_name);
     }
     // Set and delete operations invalidate the cache item. Try to also load
