@@ -286,7 +286,7 @@ abstract class CacheCollector implements CacheCollectorInterface, DestructableIn
     if ($write_cache && ($lock_acquired || $this->cacheInvalidated)) {
       $this->cache->set($cid, $data, Cache::PERMANENT, $this->tags);
     }
-    if ($lock && $lock_acquired) {
+    if ($lock_acquired) {
       $this->lock->release($lock_name);
     }
 
