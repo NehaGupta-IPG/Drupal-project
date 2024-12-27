@@ -43,6 +43,7 @@ class DatabaseLockBackend extends LockBackendAbstract {
    * {@inheritdoc}
    */
   public function acquire($name, $timeout = 30.0) {
+    file_put_contents('/tmp/lock_name.txt', $name . "\n", FILE_APPEND);
     $name = $this->normalizeName($name);
 
     // Insure that the timeout is at least 1 ms.
