@@ -110,6 +110,10 @@ class State extends CacheCollector implements StateInterface {
     // CacheCollector::set() to work.
     parent::set($key, $value);
     $this->persist($key);
+    $lock_name = $lock_name = $this->getCid() . ':' . __CLASS__;
+    if (!$this->lock->acquire($lock_name)) {
+      $this->lock->wait();
+    }
     static::updateCache();
   }
 
