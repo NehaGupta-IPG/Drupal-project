@@ -68,13 +68,13 @@ interface TranslationInterface {
    *
    * For example:
    * @code
-   *   $output = $string_translation->formatPlural($node->comment_count, '1 comment', '@count comments');
+   *   $output = $string_translation->formatPlural($node->comment_count, '@count comment', '@count comments');
    * @endcode
    *
    * Example with additional replacements:
    * @code
    *   $output = $string_translation->formatPlural($update_count,
-   *     'Changed the content type of 1 post from %old-type to %new-type.',
+   *     'Changed the content type of @count post from %old-type to %new-type.',
    *     'Changed the content type of @count posts from %old-type to %new-type.',
    *     ['%old-type' => $info->old_type, '%new-type' => $info->new_type)];
    * @endcode
@@ -83,8 +83,10 @@ interface TranslationInterface {
    *   The item count to display.
    * @param string $singular
    *   The string for the singular case. Make sure it is clear this is singular,
-   *   to ease translation (e.g. use "1 new comment" instead of "1 new"). Do not
-   *   use @count in the singular string.
+   *   to ease translation (e.g. use "@count new comment" instead of "@count
+   *   new"). Do not put "1" or "one" in the string, always use "@count". This
+   *   ensures valid .po files and is necessary to correctly translate such
+   *   strings in certain languages.
    * @param string $plural
    *   The string for the plural case. Make sure it is clear this is plural, to
    *   ease translation. Use @count in place of the item count, as in
