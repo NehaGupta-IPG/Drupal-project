@@ -115,25 +115,29 @@ class State extends CacheCollector implements StateInterface {
     if (!$lock_acquired) {
       // Wait for the lock to become available for a maximum of one second, then
       // attempt to acquire the lock again. If we can't acquire the lock, then
-      // the one second that has passed should have given most processes time to
-      // complete anyway.
+      // the one second that has passed should have given most processes that
+      // were in progress time to complete anyway.
       $this->lock->wait($lock_name, 1);
+      $lock_acquired = $this->lock->acquire($lock_name);
     }
     else {
       // Cache items are stored with millisecond precision, and are compared by
       // created time in CacheCollector. This allows for a race condition where:
       // Process A: writes a cache item.
       // Process B: reads the cache item.
-      // Process C: (this process) writes a new cache item in the same
-      // millisecond.
+      // Process C: (this process) writes a new cache item (all in the same
+      // millisecond).
       // Process B: reaches CacheCollector::destruct(), and the race condition
       // protection logic compares the created timestamps of two different cache
       // items and finds them the same. By sleeping for 10 milliseconds both
       // prior to and after writing the cache item, we ensure that this
-      // situation  doesn't occur as long as the lock was acquired.
+      // situation doesn't occur as long as the lock was acquired.
+      // Only acquiring the lock isn't sufficient, because if the lock is
+      // acquired and cache item set by two processes within the same
+      // millisecond, the race condition detection won't detect that situation.
       // @todo this still doesn't account for the case where due to a clock
       // offset between servers, identical timestamps are recorded despite
-      // happening at different times. Consider a more unique indentifier in
+      // happening at different times. Consider a more unique identifier in
       // CacheCollector.
       usleep(10000);
     }
