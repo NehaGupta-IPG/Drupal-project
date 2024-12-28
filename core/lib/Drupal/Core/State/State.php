@@ -131,10 +131,10 @@ class State extends CacheCollector implements StateInterface {
       // items and finds them the same. By sleeping for 10 milliseconds both
       // prior to and after writing the cache item, we ensure that this
       // situation  doesn't occur as long as the lock was acquired.
-      // @todo: this still doesn't account for the case where due to a clock
+      // @todo this still doesn't account for the case where due to a clock
       // offset between servers, identical timestamps are recorded despite
       // happening at different times. Consider a more unique indentifier in
-      // cache collector.
+      // CacheCollector.
       usleep(10000);
     }
     $this->cache->set($this->getCid(), [$key => $value], CacheBackendInterface::CACHE_PERMANENT, $this->tags);
