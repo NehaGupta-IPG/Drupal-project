@@ -72,7 +72,7 @@ SetHandler Drupal_Security_Do_Not_Remove_See_SA_2006_006
   # PHP-FPM SetHandler is inside an If
   # which is applied after Files. Need to be inside another If to override.
   # only block php, not other files e.g. advagg css
-  <If "%{REQUEST_URI} =~ /.+\.ph(?:ar|p|tml)$/">
+  <If "%{REQUEST_URI} =~ /.+\.ph(ar|p|tml)$/">
     SetHandler Drupal_Security_Do_Not_Remove_See_SA_2013_003
   </If>
 </Files>
