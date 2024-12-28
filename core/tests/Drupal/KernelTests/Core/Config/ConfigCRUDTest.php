@@ -9,7 +9,6 @@ use Drupal\Core\Config\Config;
 use Drupal\Core\Config\ConfigNameException;
 use Drupal\Core\Config\ConfigValueException;
 use Drupal\Core\Config\DatabaseStorage;
-use Drupal\Core\Config\UnsupportedDataTypeConfigException;
 use Drupal\KernelTests\KernelTestBase;
 
 /**
@@ -262,7 +261,7 @@ class ConfigCRUDTest extends KernelTestBase {
    * Tests data type handling.
    */
   public function testDataTypes(): void {
-    \Drupal::service('module_installer')->install(['config_test']);
+    \Drupal::service('module_installer')->install(['config_test', 'dblog']);
     $storage = new DatabaseStorage($this->container->get('database'), 'config');
     $name = 'config_test.types';
     $config = $this->config($name);
@@ -325,28 +324,26 @@ class ConfigCRUDTest extends KernelTestBase {
 
     // Test that setting an unsupported type for a config object with a schema
     // fails.
-    try {
-      $config->set('stream', fopen(__FILE__, 'r'))->save();
-      $this->fail('No Exception thrown upon saving invalid data type.');
-    }
-    catch (UnsupportedDataTypeConfigException) {
-      // Expected exception; just continue testing.
-    }
+    // does not throw an exception but logs an error.
+    $config->set('stream', fopen(__FILE__, 'r'))->save();
+    $last_watchdog = \Drupal::database()->query('SELECT * FROM {watchdog} ORDER BY wid DESC')->fetchAssoc();
+    $variables = unserialize($last_watchdog['variables']);
+    $this->assertEquals('Invalid data type for config element config_test.types:stream', $variables['@message']);
+    $this->assertEquals('Drupal\Core\Config\UnsupportedDataTypeConfigException', $variables['%type']);
 
     // Test that setting an unsupported type for a config object with no schema
     // also fails.
+    // also logs an error.
     $typed_config_manager = $this->container->get('config.typed');
     $config_name = 'config_test.no_schema';
     $config = $this->config($config_name);
     $this->assertFalse($typed_config_manager->hasConfigSchema($config_name));
 
-    try {
-      $config->set('stream', fopen(__FILE__, 'r'))->save();
-      $this->fail('No Exception thrown upon saving invalid data type.');
-    }
-    catch (UnsupportedDataTypeConfigException) {
-      // Expected exception; just continue testing.
-    }
+    $config->set('stream', fopen(__FILE__, 'r'))->save();
+    $last_watchdog = \Drupal::database()->query('SELECT * FROM {watchdog} ORDER BY wid DESC')->fetchAssoc();
+    $variables = unserialize($last_watchdog['variables']);
+    $this->assertEquals('Invalid data type for config element config_test.no_schema:stream', $variables['@message']);
+    $this->assertEquals('Drupal\Core\Config\UnsupportedDataTypeConfigException', $variables['%type']);
   }
 
 }
