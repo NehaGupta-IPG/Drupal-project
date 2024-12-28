@@ -78,7 +78,7 @@ abstract class CacheCollector implements CacheCollectorInterface, DestructableIn
    * This is used to check if an invalidated cache item has been overwritten in
    * the meantime.
    *
-   * @var int
+   * @var float
    */
   protected $cacheCreated;
 
