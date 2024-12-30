@@ -147,6 +147,11 @@ class State extends CacheCollector implements StateInterface {
       usleep(10000);
     }
     $this->cache->set($this->getCid(), [$key => $value], CacheBackendInterface::CACHE_PERMANENT, $this->tags);
+    // Now that the cache item has been created, immediately read it back to
+    // update cacheCreated with the new timstamp, this will be compared in
+    // ::updateCache later.
+    $cached = $this->cache->get($this->getCid());
+    $this->cacheCreated = $cached->created;
 
     // Even if we've acquired a lock, don't release it here, allow
     // CacheCollector::updateCache() to release the lock at the end of the
