@@ -258,7 +258,7 @@ abstract class CacheCollector implements CacheCollectorInterface, DestructableIn
       // there is now, then there has been a cache write in the interim. Discard
       // our data since the other request may have set new data as well as
       // written the cache item.
-      if (!$this->cacheCreated) {
+      elseif (!$this->cacheCreated) {
         $write_cache = FALSE;
         // If this request is invalidating the cache, delete the cache item we
         // found and allow the cache to rebuild in later requests.
