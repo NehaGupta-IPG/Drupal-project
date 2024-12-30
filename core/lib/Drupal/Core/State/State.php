@@ -105,7 +105,7 @@ class State extends CacheCollector implements StateInterface {
     // If another request had a cache miss before this request, and also hasn't
     // written to cache yet, then it may already have read this value from the
     // database and could write that value to the cache to the end of the
-    // request. To avoid this race condition, attempt to acquire a the lock and
+    // request. To avoid this race condition, attempt to acquire a lock and
     // write to the cache immediately after calling parent::set(). This allows
     // the race condition detection in CacheCollector::updateCache() to work.
     // We write to the cache whether or not we acquire the lock, because
