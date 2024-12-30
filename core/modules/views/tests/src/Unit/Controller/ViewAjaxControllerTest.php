@@ -441,6 +441,56 @@ class ViewAjaxControllerTest extends UnitTestCase {
   }
 
   /**
+   * Tests ajax pager without scrollTop command.
+   */
+  public function testAjaxViewWithoutScrollTop(): void {
+    $request = new Request();
+    $request->request->set('view_name', 'test_view');
+    $request->request->set('view_display_id', 'page_1');
+    $dom_id = $this->randomMachineName(20);
+    $request->request->set('view_dom_id', $dom_id);
+    $request->request->set('pager_element', '0');
+
+    $executable = $this->setupValidMocks();
+
+    $display_handler = $this->getMockBuilder('Drupal\views\Plugin\views\display\DisplayPluginBase')
+      ->disableOriginalConstructor()
+      ->getMock();
+
+    $display_handler->expects($this->any())
+      ->method('ajaxEnabled')
+      ->willReturn(self::USE_AJAX);
+
+    $display_handler->expects($this->once())
+      ->method('setOption')
+      ->with($this->equalTo('pager_element'));
+
+    $display_handler->expects($this->once())
+      ->method('getOption')
+      ->with('disable_scroll_to_top')
+      ->willReturn(TRUE);
+
+    $display_collection = $this->getMockBuilder('Drupal\views\DisplayPluginCollection')
+      ->disableOriginalConstructor()
+      ->getMock();
+    $display_collection->expects($this->any())
+      ->method('get')
+      ->with('page_1')
+      ->willReturn($display_handler);
+
+    $executable->display_handler = $display_handler;
+    $executable->displayHandlers = $display_collection;
+
+    $response = $this->viewAjaxController->ajaxView($request);
+    $this->assertInstanceOf(ViewAjaxResponse::class, $response);
+
+    $commands = $this->getCommands($response);
+    $this->assertNotEquals('scrollTop', $commands[0]['command']);
+
+    $this->assertViewResultCommand($response);
+  }
+
+  /**
    * Sets up a bunch of valid mocks of the view executable.
    *
    * @param bool $use_ajax
