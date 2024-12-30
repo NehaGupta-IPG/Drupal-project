@@ -147,12 +147,11 @@ class State extends CacheCollector implements StateInterface {
       usleep(10000);
     }
     $this->cache->set($this->getCid(), [$key => $value], CacheBackendInterface::CACHE_PERMANENT, $this->tags);
-    // Sleep for another 10 milliseconds so that a process doesn't immediately
-    // overwrite this cache item with one with an identical timestamp.
-    usleep(10000);
-    if ($lock_acquired) {
-      $this->lock->release($lock_name);
-    }
+
+    // Even if we've acquired a lock, don't release it here, allow
+    // CacheCollector::updateCache() to release the lock at the end of the
+    // request. This ensures we don't delete the cache item we've just set,
+    // which would undo its utility as a tombstone record.
   }
 
   /**
