@@ -194,20 +194,30 @@ class UserPasswordForm extends FormBase implements WorkspaceSafeFormInterface {
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {
     $account = $form_state->getValue('account');
-    if ($account && !empty($account->get('mail')->value)) {
-      // Mail one time login URL and instructions using current language if email exists.
-      $mail = _user_mail_notify('password_reset', $account);
-      if (!empty($mail)) {
+    if ($account && $account->isActive()) {
+      if (!empty($account->get('mail')->value)) {
+        // Mail one time login URL and instructions using current language.
+        $mail = _user_mail_notify('password_reset', $account);
+        if (!empty($mail)) {
+          $this->logger('user')
+            ->info('Password reset instructions mailed to %name at %email.', [
+              '%name' => $account->getAccountName(),
+              '%email' => $account->getEmail(),
+            ]);
+        }
+      }
+      else {
+        // Account exists and is active but has no email address
         $this->logger('user')
-          ->info('Password reset instructions mailed to %name at %email.', [
+          ->notice('Password reset form was submitted for account without email address: %name.', [
             '%name' => $account->getAccountName(),
-            '%email' => $account->getEmail(),
           ]);
       }
     }
     else {
+      // Account doesn't exist or is blocked
       $this->logger('user')
-        ->info('Password reset form was submitted with an unknown or inactive account: %name.', [
+        ->notice('Password reset form was submitted with an unknown or inactive account: %name.', [
           '%name' => $form_state->getValue('name'),
         ]);
     }

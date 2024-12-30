@@ -40,7 +40,7 @@ class UserPasswordResetTest extends BrowserTestBase {
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['block', 'language'];
+  protected static $modules = ['block', 'language', 'user'];
 
   /**
    * {@inheritdoc}
@@ -677,6 +677,34 @@ class UserPasswordResetTest extends BrowserTestBase {
     $this->drupalGet('user/password');
     $field = $this->getSession()->getPage()->findField('name');
     $this->assertEquals('username', $field->getAttribute('autocomplete'));
+  }
+
+  /**
+   * Tests that password reset doesn't throw error for users without email.
+   */
+  public function testNoEmailPasswordReset(): void {
+    // Create a user without an email address.
+    $user = $this->drupalCreateUser();
+    $user->set('mail', NULL)->save();
+
+    // Try to reset password.
+    $this->drupalGet('user/password');
+    $edit = ['name' => $user->getAccountName()];
+    $this->submitForm($edit, 'Submit');
+
+    // Assert no PHP error is thrown.
+    $this->assertSession()->statusCodeEquals(200);
+
+    // Verify the generic message is shown.
+    $expected_message = sprintf('If %s is a valid account, an email will be sent with instructions to reset your password.',
+      $user->getAccountName()
+    );
+    $this->assertSession()->pageTextContains($expected_message);
+
+    // Verify that no email was actually sent since the user has no email address
+    $this->assertCount(0, $this->drupalGetMails(['id' => 'user_password_reset']),
+      'No email was sent when requesting password reset for an account without email.'
+    );
   }
 
 }
