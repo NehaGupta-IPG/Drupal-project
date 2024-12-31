@@ -148,7 +148,7 @@ class State extends CacheCollector implements StateInterface {
     }
     $this->cache->set($this->getCid(), [$key => $value], CacheBackendInterface::CACHE_PERMANENT, $this->tags);
     // Now that the cache item has been created, immediately read it back to
-    // update cacheCreated with the new timstamp, this will be compared in
+    // update cacheCreated with the new timestamp, this will be compared in
     // ::updateCache later.
     $cached = $this->cache->get($this->getCid());
     $this->cacheCreated = $cached->created;
