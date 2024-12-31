@@ -1025,7 +1025,7 @@ services:
       - { name: http_middleware, priority: 100 }
   http_middleware.install:
     class: Drupal\Core\StackMiddleware\Install
-    arguments: ['@state']
+    autowire: true
     tags:
       - { name: http_middleware, priority: 101 }
   http_middleware.session:
