@@ -307,6 +307,18 @@ class EntityTestHooks {
     if ($entity instanceof ContentEntityInterface) {
       \Drupal::state()->set('entity_test.loadedRevisionId', $entity->getLoadedRevisionId());
     }
+    // Stack original entity labels to be able to test $entity->getOriginal() method in the entity_update hook.
+    $global_var_name = 'entity_test_entity_update_original_labels';
+    $original_entity = $entity->getOriginal();
+    if ($original_entity) {
+      if (!isset($GLOBALS[$global_var_name])) {
+        $GLOBALS[$global_var_name] = [];
+      }
+      if (!isset($GLOBALS[$global_var_name][$original_entity->id()])) {
+        $GLOBALS[$global_var_name][$original_entity->id()] = [];
+      }
+      $GLOBALS[$global_var_name][$original_entity->id()][] = $original_entity->label();
+    }
   }
 
   /**
@@ -389,6 +401,18 @@ class EntityTestHooks {
     }
     if ($entity->getEntityType()->id() == 'entity_view_display') {
       $entity->setThirdPartySetting('entity_test', 'foo', 'bar');
+    }
+    // Stack original entity labels to be able to test $entity->getOriginal() method in the entity_presave hook.
+    $global_var_name = 'entity_test_entity_presave_original_labels';
+    $original_entity = $entity->getOriginal();
+    if ($original_entity) {
+      if (!isset($GLOBALS[$global_var_name])) {
+        $GLOBALS[$global_var_name] = [];
+      }
+      if (!isset($GLOBALS[$global_var_name][$original_entity->id()])) {
+        $GLOBALS[$global_var_name][$original_entity->id()] = [];
+      }
+      $GLOBALS[$global_var_name][$original_entity->id()][] = $original_entity->label();
     }
   }
 
