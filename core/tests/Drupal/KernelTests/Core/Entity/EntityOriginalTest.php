@@ -57,9 +57,9 @@ class EntityOriginalTest extends EntityKernelTestBase {
       ->create([
         'name' => 'Title 1',
       ]);
-    // The original is set in the first save.
     $custom_entity->save();
-    $this->assertEmpty($GLOBALS[$global_var_name][$custom_entity->id()]);
+    // The original entity is not set in the first save.
+    $this->assertArrayNotHasKey($custom_entity->id(), $GLOBALS[$global_var_name]);
 
     // First update.
     $custom_entity->set('name', 'Title 2');
