@@ -262,7 +262,7 @@ class UrlHelper {
    * @return bool
    *   TRUE or FALSE, where TRUE indicates an external path.
    */
-  public static function isExternal($path, $allowed_protocols = []) {
+  public static function isExternal($path, array $allowed_protocols = []) {
     $colon_position = strpos($path, ':');
     // Some browsers treat \ as / so normalize to forward slashes.
     $path = str_replace('\\', '/', $path);
@@ -403,7 +403,7 @@ class UrlHelper {
    * @see \Drupal\Core\Url::toString()
    * @see \Drupal\Core\Url::fromUri()
    */
-  public static function stripDangerousProtocols($uri, $allowed_protocols = []) {
+  public static function stripDangerousProtocols($uri, array $allowed_protocols = []) {
     $allowed_protocols = array_flip(array_merge(static::$allowedProtocols, $allowed_protocols));
 
     // Iteratively remove any invalid protocol found.
