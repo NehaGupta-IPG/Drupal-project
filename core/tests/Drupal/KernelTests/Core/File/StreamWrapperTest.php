@@ -139,6 +139,7 @@ class StreamWrapperTest extends FileTestBase {
     // Cleanup.
     unlink($filename);
   }
+
   /**
    * Checks if a directory gets autocreated on file upload.
    *
