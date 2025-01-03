@@ -128,7 +128,7 @@ class LinkItem extends FieldItemBase implements LinkItemInterface {
   /**
    * Validate the format of the allowed_protocols list.
    */
-  public static function validateSettingsFormElementAllowedProtocols($element, FormStateInterface $form_state, $form) {
+  public static function validateSettingsFormElementAllowedProtocols($element, FormStateInterface $form_state, $form): void {
     $allowed_protocols = array_map('trim', explode(',', $element['#value']));
     $allowed_protocols = $allowed_protocols == [''] ? [] : $allowed_protocols;
 
