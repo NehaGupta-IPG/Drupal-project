@@ -153,4 +153,11 @@ abstract class FilterBase extends PluginBase implements FilterInterface {
   public function tips() {
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function onDependencyRemoval(array $dependencies): bool {
+    return FALSE;
+  }
+
 }
