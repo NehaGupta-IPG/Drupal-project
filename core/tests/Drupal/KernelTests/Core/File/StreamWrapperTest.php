@@ -165,12 +165,12 @@ class StreamWrapperTest extends FileTestBase {
     ];
     $data[] = [
       function () {
-        fopen('translations://' . $this->randomMachineName(), 'w');
+        fopen('translations://' . self::randomMachineName(), 'w');
       },
     ];
     $data[] = [
       function () {
-        mkdir('translations://' . $this->randomMachineName());
+        mkdir('translations://' . self::randomMachineName());
       },
     ];
     $data[] = [
