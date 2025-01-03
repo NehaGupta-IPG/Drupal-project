@@ -151,12 +151,12 @@ class StreamWrapperTest extends FileTestBase {
       ->set('translation.path', $directory)
       ->save();
 
-    $this->assertDirectoryNotExists($directory);
+    $this->assertDirectoryDoesNotExist($directory);
     $callable();
     $this->assertDirectoryExists($directory);
   }
 
-  public function providerAutocreateDirectory() {
+  public static function providerAutocreateDirectory() {
     $data = [];
     $data[] = [
       function () {
