@@ -156,7 +156,7 @@ class StreamWrapperTest extends FileTestBase {
     $this->assertDirectoryExists($directory);
   }
 
-  public static function providerAutocreateDirectory() {
+  public function providerAutocreateDirectory() {
     $data = [];
     $data[] = [
       function () {
@@ -165,12 +165,12 @@ class StreamWrapperTest extends FileTestBase {
     ];
     $data[] = [
       function () {
-        fopen('translations://' . self::randomMachineName(), 'w');
+        fopen('translations://' . $this->randomMachineName(), 'w');
       },
     ];
     $data[] = [
       function () {
-        mkdir('translations://' . self::randomMachineName());
+        mkdir('translations://' . $this->randomMachineName());
       },
     ];
     $data[] = [
