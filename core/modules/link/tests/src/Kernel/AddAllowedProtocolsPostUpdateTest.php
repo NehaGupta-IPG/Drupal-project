@@ -72,6 +72,7 @@ class AddAllowedProtocolsPostUpdateTest extends KernelTestBase {
 
     // Run the post_update hook.
     $sandbox = [];
+    include_once \Drupal::service('extension.list.module')->getPath('link') . '/link.post_update.php';
     link_post_update_add_allowed_protocols($sandbox);
 
     // Reload the field configuration.
