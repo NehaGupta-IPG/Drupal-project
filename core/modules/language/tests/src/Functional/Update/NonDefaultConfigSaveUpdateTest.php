@@ -17,7 +17,7 @@ class NonDefaultConfigSaveUpdateTest extends UpdatePathTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function setDatabaseDumpFiles() {
+  protected function setDatabaseDumpFiles(): void {
     $this->databaseDumpFiles = [
       __DIR__ . '/../../../../../system/tests/fixtures/update/drupal-9.4.0.filled.standard.php.gz',
       __DIR__ . '/../../../../../system/tests/fixtures/update/drupal-8.config-non-default-language.php',
