@@ -48,8 +48,8 @@ class RoleListBuilderTest extends BrowserTestBase {
     $this->assertSession()->pageTextContains('Description');
 
     // Check that the role values are displayed correctly.
-    $this->assertSession()->pageTextContains($role->label());
-    $this->assertSession()->pageTextContains($role->getDescription());
+    $this->assertSession()->pageTextContains('My Role');
+    $this->assertSession()->pageTextContains('Lorem ipsum');
 
   }
 
