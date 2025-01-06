@@ -33,7 +33,9 @@ class RoleForm extends EntityForm {
       '#type' => 'textarea',
       '#title' => $this->t('Description'),
       '#default_value' => $entity->getDescription(),
-      '#description' => $this->t('The description for this role.'),
+      '#description' => $this->t('Displays on the %page page.', [
+        '%page' => $this->t('Roles'),
+      ]),
     ];
     $form['id'] = [
       '#type' => 'machine_name',
