@@ -58,6 +58,7 @@ class RoleTest extends ConfigEntityResourceTestBase {
     $role = Role::create([
       'id' => 'llama',
       'label' => 'Llama',
+      'description' => '',
     ]);
     $role->save();
 
@@ -93,6 +94,7 @@ class RoleTest extends ConfigEntityResourceTestBase {
           'status' => TRUE,
           'dependencies' => [],
           'label' => 'Llama',
+          'description' => '',
           'is_admin' => FALSE,
           'permissions' => [],
           'drupal_internal__id' => 'llama',

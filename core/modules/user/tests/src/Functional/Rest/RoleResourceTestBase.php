@@ -41,6 +41,7 @@ abstract class RoleResourceTestBase extends ConfigEntityResourceTestBase {
     $role = Role::create([
       'id' => 'llama',
       'label' => 'Llama',
+      'description' => '',
     ]);
     $role->save();
 
@@ -59,6 +60,7 @@ abstract class RoleResourceTestBase extends ConfigEntityResourceTestBase {
       'dependencies' => [],
       'id' => 'llama',
       'label' => 'Llama',
+      'description' => '',
       'is_admin' => FALSE,
       'permissions' => [],
     ];
