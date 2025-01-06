@@ -29,7 +29,6 @@ class RoleListBuilderTest extends BrowserTestBase {
    * Ensures the rows of the list are built correctly.
    */
   public function testListBuilder() {
-
     // Create a role to view.
     /** @var \Drupal\user\RoleInterface $role */
     $role = Role::create([

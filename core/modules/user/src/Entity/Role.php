@@ -80,7 +80,7 @@ class Role extends ConfigEntityBase implements RoleInterface {
    *
    * @var string
    */
-  public $description;
+  protected $description;
 
   /**
    * The weight of this role in administrative listings.

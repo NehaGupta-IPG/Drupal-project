@@ -58,8 +58,7 @@ class RoleForm extends EntityForm {
    * {@inheritdoc}
    */
   public function save(array $form, FormStateInterface $form_state) {
-
-    /** @var RoleInterface $entity */
+    /** @var \Drupal\role\RoleInterface $entity */
     $entity = $this->entity;
 
     // Prevent leading and trailing spaces in role names.
