@@ -163,8 +163,9 @@ class State extends CacheCollector implements StateInterface {
     // Now that the cache item has been created, immediately read it back to
     // update cacheCreated with the new timestamp, this will be compared in
     // ::updateCache later.
-    $cached = $this->cache->get($this->getCid());
-    $this->cacheCreated = $cached->created;
+    if ($cached = $this->cache->get($this->getCid())) {
+      $this->cacheCreated = $cached->created;
+    }
 
     // Even if we've acquired a lock, don't release it here, allow
     // CacheCollector::updateCache() to release the lock at the end of the

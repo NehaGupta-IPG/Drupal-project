@@ -242,8 +242,8 @@ class StateTest extends UnitTestCase {
     $this->setUpStateWithMockStorage();
 
     $this->keyValueStorage->expects($this->once())
-      ->method('set')
-      ->with('key', 'value');
+      ->method('setMultiple')
+      ->with(['key' => 'value']);
 
     $this->state->set('key', 'value');
     return $this->state;
