@@ -51,7 +51,7 @@ class LinkExternalProtocolsConstraintValidator extends ConstraintValidator {
    * @return array
    *   The list of protocols.
    */
-  protected function getAllowedProtocols($value) {
+  protected function getAllowedProtocols(mixed $value): array {
     if (!is_null($value->getFieldDefinition()) && !empty($value->getFieldDefinition()->getSettings()['allowed_protocols'])) {
       return $value->getFieldDefinition()->getSettings()['allowed_protocols'];
     }
