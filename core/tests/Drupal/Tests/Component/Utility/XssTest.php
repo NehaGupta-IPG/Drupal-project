@@ -116,6 +116,119 @@ class XssTest extends TestCase {
         'Custom element with dashes in tag name.',
         ['test-element'],
       ],
+      // Token-like attributes 1.
+      [
+        '<img src="[something:like:a:token]">',
+        '<img src="[something:like:a:token]">',
+        'Token-like attributes 1, no change',
+        ['img'],
+      ],
+      // Token-like attributes 2.
+      [
+        '<img src="[something:like:a:token]/">',
+        '<img src="[something:like:a:token]/">',
+        'Token-like attributes 2, no change',
+        ['img'],
+      ],
+      // Token-like attributes 3.
+      [
+        '<img src="[something:like:a:token]/[another:token]">',
+        '<img src="[something:like:a:token]/[another:token]">',
+        'Token-like attributes 3, no change',
+        ['img'],
+      ],
+      // Token-like attributes 4.
+      [
+        '<img src="[something:like:a:token]/[another:token]/foo">',
+        '<img src="[something:like:a:token]/[another:token]/foo">',
+        'Token-like attributes 4, no change',
+        ['img'],
+      ],
+      // Token-like attributes 5.
+      [
+        '<img src="[something:like:a:token]/foo/[another:token]">',
+        '<img src="[something:like:a:token]/foo/[another:token]">',
+        'Token-like attributes 5, no change',
+        ['img'],
+      ],
+      // Token-like attributes 6.
+      [
+        '<img src="/foo/bar/[my:token:here]">',
+        '<img src="/foo/bar/[my:token:here]">',
+        'Token-like attributes 6, no change',
+        ['img'],
+      ],
+      // Token-like attributes 7.
+      [
+        '<img src="[my:token:here]foo/[another:token]">',
+        '<img src="[my:token:here]foo/[another:token]">',
+        'Token-like attributes 7, no change',
+        ['img'],
+      ],
+      // Token-like attributes 8.
+      [
+        '<a href="foo[my:token:here]/[another:token]">',
+        '<a href="foo[my:token:here]/[another:token]">',
+        'Token-like attributes 8, no change',
+        ['a'],
+      ],
+
+      // Token-like attributes 9.
+      [
+        '<a href="[something:like:a:token]">',
+        '<a href="[something:like:a:token]">',
+        'Token-like attributes 9, no change',
+        ['a'],
+      ],
+      // Token-like attributes 10.
+      [
+        '<a href="[something:like:a:token]/">',
+        '<a href="[something:like:a:token]/">',
+        'Token-like attributes 10, no change',
+        ['a'],
+      ],
+      // Token-like attributes 11.
+      [
+        '<a href="[something:like:a:token]/[another:token]">',
+        '<a href="[something:like:a:token]/[another:token]">',
+        'Token-like attributes 11, no change',
+        ['a'],
+      ],
+      // Token-like attributes 12.
+      [
+        '<a href="[something:like:a:token]/[another:token]/foo">',
+        '<a href="[something:like:a:token]/[another:token]/foo">',
+        'Token-like attributes 12, no change',
+        ['a'],
+      ],
+      // Token-like attributes 13.
+      [
+        '<a href="[something:like:a:token]/foo/[another:token]">',
+        '<a href="[something:like:a:token]/foo/[another:token]">',
+        'Token-like attributes 13, no change',
+        ['a'],
+      ],
+      // Token-like attributes 14.
+      [
+        '<a href="/foo/bar/[my:token:here]">',
+        '<a href="/foo/bar/[my:token:here]">',
+        'Token-like attributes 14, no change',
+        ['a'],
+      ],
+      // Token-like attributes 15.
+      [
+        '<a href="[my:token:here]foo/[another:token]">',
+        '<a href="[my:token:here]foo/[another:token]">',
+        'Token-like attributes 15, no change',
+        ['a'],
+      ],
+      // Token-like attributes 16.
+      [
+        '<a href="foo[my:token:here]/[another:token]">',
+        '<a href="foo[my:token:here]/[another:token]">',
+        'Token-like attributes 16, no change',
+        ['a'],
+      ],
     ];
   }
 

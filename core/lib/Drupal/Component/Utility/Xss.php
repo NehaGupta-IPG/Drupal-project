@@ -351,6 +351,20 @@ class Xss {
           $working = 1;
           // Attribute value, a URL after href= for instance.
           if (preg_match('/^"([^"]*)"(\s+|$)/', $attributes, $match)) {
+
+            // Skip tokens.
+            $attributes_allowing_tokens = ['src', 'html', 'href'];
+
+            $firstSectionOfToken = static::fetchFirstSectionOfToken($match[1]);
+
+            if (!$skip_protocol_filtering && in_array($attribute_name, $attributes_allowing_tokens) &&
+              // Skip tokens.
+              !empty($match[1]) &&
+              $firstSectionOfToken !== NULL
+            ) {
+              $match_val = explode('/', $match[1]);
+              $skip_protocol_filtering = strpos($match_val[0], ']') !== FALSE;
+            }
             $value = $skip_protocol_filtering ? $match[1] : UrlHelper::filterBadProtocol($match[1]);
 
             if (!$skip) {
@@ -403,6 +417,30 @@ class Xss {
       $attributes_array[] = $attribute_name;
     }
     return $attributes_array;
+  }
+
+  /**
+   * Fetch the first part of the token string when available.
+   *
+   * @param string $string
+   *   String to check for tokens.
+   *
+   * @return string|null
+   *   first section of the token string including the open square bracket, NULL when not present.
+   */
+  protected static function fetchFirstSectionOfToken(string $string): ?string {
+
+    if (str_starts_with($string, '[')) {
+      return '[';
+    }
+    $pattern = '/^[a-zA-Z0-9]+\[/';
+    preg_match($pattern, $string, $matches);
+
+    if (count($matches) === 0) {
+      return NULL;
+    }
+
+    return $matches[0];
   }
 
   /**
