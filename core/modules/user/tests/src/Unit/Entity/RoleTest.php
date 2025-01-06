@@ -18,7 +18,7 @@ class RoleTest extends UnitTestCase {
    *
    * @covers ::getDescription
    */
-  public function testGetDescription() {
+  public function testGetDescription(): void {
     $role = new Role([
       'id' => 'test_role',
       'description' => 'Lorem ipsum.',
@@ -31,7 +31,7 @@ class RoleTest extends UnitTestCase {
    *
    * @covers ::getDescription
    */
-  public function testGetEmptyDescription() {
+  public function testGetEmptyDescription(): void {
     $role = new Role([
       'id' => 'test_role',
     ], 'user_role');
@@ -44,7 +44,7 @@ class RoleTest extends UnitTestCase {
    * @covers ::getDescription
    * @covers ::setDescription
    */
-  public function testSetDescription() {
+  public function testSetDescription(): void {
     $role = new Role([
       'id' => 'test_role',
     ], 'user_role');

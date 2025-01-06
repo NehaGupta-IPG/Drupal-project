@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\user\Functional;
 
 use Drupal\Tests\BrowserTestBase;
@@ -28,7 +30,7 @@ class RoleListBuilderTest extends BrowserTestBase {
   /**
    * Ensures the rows of the list are built correctly.
    */
-  public function testListBuilder() {
+  public function testListBuilder(): void {
     // Create a role to view.
     /** @var \Drupal\user\RoleInterface $role */
     $role = Role::create([
