@@ -116,14 +116,17 @@ class Role extends ConfigEntityBase implements RoleInterface {
   /**
    * {@inheritdoc}
    */
-  public function getDescription() {
+  public function getDescription(): string {
+    if (!isset($this->description)) {
+      return '';
+    }
     return $this->description;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function setDescription($description) {
+  public function setDescription(string $description) {
     $this->description = $description;
     return $this;
   }

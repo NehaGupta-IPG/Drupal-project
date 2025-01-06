@@ -58,7 +58,6 @@ class RoleTest extends ConfigEntityResourceTestBase {
     $role = Role::create([
       'id' => 'llama',
       'label' => 'Llama',
-      'description' => '',
     ]);
     $role->save();
 

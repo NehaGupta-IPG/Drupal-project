@@ -85,7 +85,7 @@ interface RoleInterface extends ConfigEntityInterface {
    * @return string
    *   The description.
    */
-  public function getDescription();
+  public function getDescription(): string;
 
   /**
    * Sets the description to the given value.
@@ -95,7 +95,7 @@ interface RoleInterface extends ConfigEntityInterface {
    *
    * @return $this
    */
-  public function setDescription($description);
+  public function setDescription(string $description);
 
   /**
    * Returns the weight.

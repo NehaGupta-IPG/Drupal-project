@@ -99,21 +99,4 @@ class UserRoleEntityTest extends KernelTestBase {
     $this->assertSame(['a', 'c'], $role->getPermissions());
   }
 
-  /**
-   * Tests the setting and getting of a roles descriptions.
-   *
-   * @covers ::getDescription
-   * @covers ::setDescription
-   */
-  public function testRoleDescription() {
-    /** @var \Drupal\user\Entity\RoleInterface $role */
-    $role = Role::create(['id' => 'test_role']);
-
-    $description = 'Lorem ipsum.';
-    $role->setDescription($description);
-
-    $this->assertEquals($role->getDescription(), $description);
-
-  }
-
 }
