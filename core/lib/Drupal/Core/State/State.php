@@ -40,6 +40,10 @@ class State extends CacheCollector implements StateInterface {
    */
   protected array $keysSetDuringRequest = [];
 
+   * Whether to write to the cache at the end of the request.
+   */
+  protected bool $writeCache = TRUE;
+
   /**
    * Constructs a State object.
    *
@@ -158,19 +162,14 @@ class State extends CacheCollector implements StateInterface {
       // CacheCollector.
       usleep(10000);
     }
+    // Because we've updated the cache here, we don't need to do so again at the
+    // end of the request, allow other requests to continue building the cache.
     $this->cache->set($this->getCid(), $data, CacheBackendInterface::CACHE_PERMANENT, $this->tags);
+    $this->writeCache = FALSE;
 
-    // Now that the cache item has been created, immediately read it back to
-    // update cacheCreated with the new timestamp, this will be compared in
-    // ::updateCache later.
-    if ($cached = $this->cache->get($this->getCid())) {
-      $this->cacheCreated = $cached->created;
+    if ($lock_acquired) {
+      $this->lock->release($lock_name);
     }
-
-    // Even if we've acquired a lock, don't release it here, allow
-    // CacheCollector::updateCache() to release the lock at the end of the
-    // request. This ensures we don't delete the cache item we've just set,
-    // which would undo its utility as a tombstone record.
   }
 
   /**
@@ -225,6 +224,7 @@ class State extends CacheCollector implements StateInterface {
   /**
    * {@inheritdoc}
    */
+<<<<<<< HEAD
   public function getValuesSetDuringRequest(string $key): ?array {
     return $this->keysSetDuringRequest[$key] ?? NULL;
   }
@@ -243,6 +243,11 @@ class State extends CacheCollector implements StateInterface {
     $this->keysSetDuringRequest[$key]['value'] = $value;
     if (!array_key_exists('original', $this->keysSetDuringRequest[$key])) {
       $this->keysSetDuringRequest[$key]['original'] = $previousValue;
+=======
+  protected function updateCache($lock = TRUE): void {
+    if ($this->writeCache) {
+      parent::updateCache($lock);
+>>>>>>> 19414dd1767 (Don't write to the cache at the end of the request if we've just written to it in ::set())
     }
   }
 
