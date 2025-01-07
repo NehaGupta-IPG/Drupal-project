@@ -13,22 +13,7 @@ use Symfony\Component\HttpKernel\KernelEvents;
  */
 class MaxInputVarsSubscriber implements EventSubscriberInterface {
 
-  /**
-   * The messenger.
-   *
-   * @var \Drupal\Core\Messenger\MessengerInterface
-   */
-  protected $messenger;
-
-  /**
-   * Constructs a new MaxInputVarSubscriber.
-   *
-   * @param \Drupal\Core\Messenger\MessengerInterface $messenger
-   *   The messenger.
-   */
-  public function __construct(MessengerInterface $messenger) {
-    $this->messenger = $messenger;
-  }
+  public function __construct(private readonly MessengerInterface $messenger) {}
 
   /**
    * {@inheritdoc}
