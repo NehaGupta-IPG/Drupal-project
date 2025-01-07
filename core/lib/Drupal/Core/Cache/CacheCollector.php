@@ -254,9 +254,9 @@ abstract class CacheCollector implements CacheCollectorInterface, DestructableIn
       }
       // If this request invalidated the cache, ensure the cache item is
       // invalidated.
-      elseif ($this->cacheInvalidated) {
+      if ($this->cacheInvalidated) {
         $write_cache = FALSE;
-        $this->cache->invalidate($cid);
+        $this->cache->delete($cid);
       }
       $data = array_merge($cache->data, $data);
     }
