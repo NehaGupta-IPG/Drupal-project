@@ -246,25 +246,17 @@ abstract class CacheCollector implements CacheCollectorInterface, DestructableIn
     // entry if the creation date did not change as this could result in an
     // inconsistent cache.
     if ($cache = $this->cache->get($cid, $this->cacheInvalidated)) {
-      if ($this->cacheInvalidated && $cache->created != $this->cacheCreated) {
-        // We have invalidated the cache in this request and got a different
-        // cache entry. Do not attempt to overwrite data that might have been
-        // changed in a different request. We'll let the cache rebuild in
-        // later requests.
-        $this->cache->delete($cid);
+      // If a cache item exists, but either there wasn't a cache item at the
+      // beginning of this request, or it has changed, prevent writing back to
+      // the cache.
+      if ($cache->created !== $this->cacheCreated) {
         $write_cache = FALSE;
       }
-      // If there wasn't a cache item at the beginning of the request, but
-      // there is now, then there has been a cache write in the interim. Discard
-      // our data since the other request may have set new data as well as
-      // written the cache item.
-      elseif (!$this->cacheCreated) {
+      // If this request invalidated the cache, ensure the cache item is
+      // invalidated.
+      elseif ($this->cacheInvalidated) {
         $write_cache = FALSE;
-        // If this request is invalidating the cache, delete the cache item we
-        // found and allow the cache to rebuild in later requests.
-        if ($this->cacheInvalidated) {
-          $this->cache->delete($cid);
-        }
+        $this->cache->invalidate($cid);
       }
       $data = array_merge($cache->data, $data);
     }
@@ -286,9 +278,6 @@ abstract class CacheCollector implements CacheCollectorInterface, DestructableIn
     if ($write_cache) {
       if ($lock_acquired) {
         $this->cache->set($cid, $data, Cache::PERMANENT, $this->tags);
-      }
-      elseif ($this->cacheInvalidated) {
-        $this->cache->delete($cid);
       }
     }
     if ($lock_acquired) {
