@@ -134,6 +134,12 @@ class State extends CacheCollector implements StateInterface {
     $lock_name = $this->getCid() . ':' . CacheCollector::class;
     $lock_acquired = $this->lock->acquire($lock_name);
     if (!$lock_acquired) {
+      // If we were unable to acquire a lock, immediately write the cache item
+      // anyway. This acts as a tombstone for other requests that have not
+      // reached a cache write yet. It also ensures that the end of this request
+      // will detect that the cache item has changed in ::updateCache().
+      $this->cache->set($this->getCid(), $data, CacheBackendInterface::CACHE_PERMANENT, $this->tags);
+      $this->cacheInvalidated = TRUE;
       // Wait for the lock to become available for a maximum of one second, then
       // attempt to acquire the lock again. If we can't acquire the lock, then
       // the one second that has passed should have given most processes that
@@ -162,12 +168,12 @@ class State extends CacheCollector implements StateInterface {
       // CacheCollector.
       usleep(10000);
     }
-    // Because we've updated the cache here, we don't need to do so again at the
-    // end of the request, allow other requests to continue building the cache.
-    $this->cache->set($this->getCid(), $data, CacheBackendInterface::CACHE_PERMANENT, $this->tags);
-    $this->writeCache = FALSE;
-
     if ($lock_acquired) {
+      // Because we've updated the cache within a lock here, we don't need to do
+      // so again at the end of the request. Other requests can safely start
+      // rebuilding the cache after this point.
+      $this->cache->set($this->getCid(), $data, CacheBackendInterface::CACHE_PERMANENT, $this->tags);
+      $this->writeCache = FALSE;
       $this->lock->release($lock_name);
     }
   }

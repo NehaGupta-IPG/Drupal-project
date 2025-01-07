@@ -159,9 +159,9 @@ abstract class CacheCollector implements CacheCollectorInterface, DestructableIn
    * persistent caching in procedural code. Extending classes may wish to alter
    * this behavior, for example by adding a call to persist(). If you are
    * writing data to somewhere in addition to the cache item in ::set(), you
-   * should call static::updateCache() at the end of your ::set implementation.
-   * This avoids a race condition if another request starts with an empty cache
-   * before your ::set() call. For example: Drupal\Core\State\State.
+   * should invalidate the cache item within a lock to ensure that another
+   * request that starts with an empty cache item does not overwrite with the
+   * previous value. For example: Drupal\Core\State\State.
    */
   public function set($key, $value) {
     $this->lazyLoadCache();
