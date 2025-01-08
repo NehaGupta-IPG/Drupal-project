@@ -173,9 +173,10 @@ class State extends CacheCollector implements StateInterface {
       // so again at the end of the request. Other requests can safely start
       // rebuilding the cache after this point.
       $this->cache->set($this->getCid(), $data, CacheBackendInterface::CACHE_PERMANENT, $this->tags);
-      $this->writeCache = FALSE;
       $this->lock->release($lock_name);
     }
+    $this->keysToPersist = [];
+    $this->keysToRemove = [];
   }
 
   /**
@@ -230,7 +231,6 @@ class State extends CacheCollector implements StateInterface {
   /**
    * {@inheritdoc}
    */
-<<<<<<< HEAD
   public function getValuesSetDuringRequest(string $key): ?array {
     return $this->keysSetDuringRequest[$key] ?? NULL;
   }
@@ -249,11 +249,15 @@ class State extends CacheCollector implements StateInterface {
     $this->keysSetDuringRequest[$key]['value'] = $value;
     if (!array_key_exists('original', $this->keysSetDuringRequest[$key])) {
       $this->keysSetDuringRequest[$key]['original'] = $previousValue;
-=======
+    }
+  }
+
+  /**
+   * {@inheridoc}
+   */
   protected function updateCache($lock = TRUE): void {
     if ($this->writeCache) {
       parent::updateCache($lock);
->>>>>>> 19414dd1767 (Don't write to the cache at the end of the request if we've just written to it in ::set())
     }
   }
 
