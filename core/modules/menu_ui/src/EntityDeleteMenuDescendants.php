@@ -12,6 +12,7 @@ use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Menu\MenuLinkTreeInterface;
 use Drupal\Core\Menu\MenuTreeParameters;
 use Drupal\Core\Messenger\MessengerInterface;
+use Drupal\Core\Render\RendererInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\StringTranslation\TranslationInterface;
 use Drupal\menu_link_content\MenuLinkContentInterface;
@@ -33,6 +34,7 @@ final class EntityDeleteMenuDescendants {
     private readonly EntityTypeManagerInterface $entityTypeManager,
     private readonly EntityRepositoryInterface $entityRepository,
     private readonly MessengerInterface $messenger,
+    private readonly RendererInterface $renderer,
     TranslationInterface $stringTranslation,
   ) {
     $this->setStringTranslation($stringTranslation);
@@ -60,8 +62,8 @@ final class EntityDeleteMenuDescendants {
         'message' => [
           '#markup' => $this->formatPlural(
             count($tree),
-            'The menu item for this @singular_label has @count child menu item. Deleting this @singular_label will cause this child menu item to move to the same level as the deleted menu item. The affected menu item is:',
-            'The menu items for this @singular_label has @count children menu items. Deleting this @singular_label will cause these children menu items to move to the same level as the deleted menu item. Affected menu items include:',
+            'Deleting this @singular_label will make this @count child menu item top level:',
+            'Deleting this @singular_label will make these @count child menu items top level:',
             ['@singular_label' => $entity->getEntityType()->getSingularLabel()],
           ),
         ],
@@ -84,7 +86,7 @@ final class EntityDeleteMenuDescendants {
       return;
     }
 
-    $this->messenger->addWarning([
+    $message = [
       '#type' => 'inline_template',
       '#template' => '<p>{{ message }}</p>{{ menu }}',
       '#context' => [
@@ -97,7 +99,9 @@ final class EntityDeleteMenuDescendants {
         ],
         'menu' => $this->menuLinkTree->build($tree),
       ],
-    ]);
+    ];
+    $message = $this->renderer->render($message);
+    $this->messenger->addWarning($message);
   }
 
   /**
