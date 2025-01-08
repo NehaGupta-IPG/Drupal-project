@@ -112,14 +112,14 @@ final class MenuUiEntityDeleteMenuDescendantsTest extends BrowserTestBase {
 
     $this->assertSession()->pageTextContains('Are you sure you want to delete the');
     if ($hasMultipleMenuItemChildren) {
-      $this->assertSession()->pageTextContains($testingAsMenuDelete ? 'Deleting this custom menu link will make these 2 child menu items top level:' : 'The menu items for this Test entity has 2 children menu items. Deleting this test entity will cause these children menu items to move to the same level as the deleted menu item. Affected menu items include:');
+      $this->assertSession()->pageTextContains($testingAsMenuDelete ? 'Deleting this custom menu link will make these 2 child menu items top level:' : 'Deleting this test entity will make these 2 child menu items top level:');
       $this->assertSession()->linkNotExists('Menu link for Test entity #1');
       $this->assertSession()->linkNotExists('Menu link for Test entity #2');
       $this->assertSession()->linkExists('Menu link for Test entity #3');
       $this->assertSession()->linkExists('Another menu item');
     }
     else {
-      $this->assertSession()->pageTextContains($testingAsMenuDelete ? 'Deleting this custom menu link will make this 1 child menu item top level:' : 'The menu item for this Test entity has 1 child menu item. Deleting this test entity will cause this child menu item to move to the same level as the deleted menu item. The affected menu item is:');
+      $this->assertSession()->pageTextContains($testingAsMenuDelete ? 'Deleting this custom menu link will make this 1 child menu item top level:' : 'Deleting this test entity will make this 1 child menu item top level:');
       $this->assertSession()->linkNotExists('Menu link for Test entity #1');
       $this->assertSession()->linkNotExists('Menu link for Test entity #2');
       $this->assertSession()->linkExists('Menu link for Test entity #3');
