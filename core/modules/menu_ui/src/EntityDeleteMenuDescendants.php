@@ -58,7 +58,6 @@ final class EntityDeleteMenuDescendants {
 
     $suggested_action = "";
     if ($entity->getEntityTypeId() !== 'menu_link_content') {
-      /** @var MenuLinkContentInterface $menu */
       $menu = current($tree)->link;
       $suggested_action = $this->t("You may want to move these menu items to another menu before deleting this @singular_label. <a target='_blank' href=':menu_link_page'>Got to menu page</a>", [
         '@singular_label' => $entity->getEntityType()->getSingularLabel(),
