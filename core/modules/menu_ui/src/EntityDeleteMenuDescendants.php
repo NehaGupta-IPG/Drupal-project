@@ -15,6 +15,7 @@ use Drupal\Core\Messenger\MessengerInterface;
 use Drupal\Core\Render\RendererInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\StringTranslation\TranslationInterface;
+use Drupal\Core\Url;
 use Drupal\menu_link_content\MenuLinkContentInterface;
 
 /**
@@ -55,9 +56,19 @@ final class EntityDeleteMenuDescendants {
       return;
     }
 
+    $suggested_action = "";
+    if ($entity->getEntityTypeId() !== 'menu_link_content') {
+      /** @var MenuLinkContentInterface $menu */
+      $menu = current($tree)->link;
+      $suggested_action = $this->t("You may want to move these menu items to another menu before deleting this @singular_label. <a target='_blank' href=':menu_link_page'>Got to menu page</a>", [
+        '@singular_label' => $entity->getEntityType()->getSingularLabel(),
+        ':menu_link_page' => Url::fromRoute('entity.menu.edit_form', ['menu' => $menu->getMenuName()])->toString(),
+      ]);
+    }
+
     $form['menu_ui_affected_descendants'] = [
       '#type' => 'inline_template',
-      '#template' => '<p>{{ message }}</p>{{ menu }}',
+      '#template' => '<p>{{ message }}</p>{{ menu }}<p>{{ suggested_action }}</p>',
       '#context' => [
         'message' => [
           '#markup' => $this->formatPlural(
@@ -68,6 +79,7 @@ final class EntityDeleteMenuDescendants {
           ),
         ],
         'menu' => $this->menuLinkTree->build($tree),
+        'suggested_action' => $suggested_action,
       ],
     ];
 
