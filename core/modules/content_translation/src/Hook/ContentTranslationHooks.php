@@ -2,7 +2,9 @@
 
 namespace Drupal\content_translation\Hook;
 
+use Drupal\content_translation\ContentTranslationPermissions;
 use Drupal\Core\Cache\CacheableMetadata;
+use Drupal\Core\Config\Entity\ConfigEntityDependency;
 use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Entity\ContentEntityFormInterface;
 use Drupal\Core\Form\FormStateInterface;
@@ -18,6 +20,7 @@ use Drupal\Core\Url;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Hook\Attribute\Hook;
 use Drupal\Core\Hook\Order\Order;
+use Drupal\user\Entity\Role;
 
 /**
  * Hook implementations for content_translation.
@@ -213,8 +216,23 @@ class ContentTranslationHooks {
   #[Hook('language_content_settings_update')]
   public function languageContentSettingsUpdate(ContentLanguageSettingsInterface $settings): void {
     $original_settings = $settings->getOriginal();
-    if ($settings->getThirdPartySetting('content_translation', 'enabled', FALSE) && !$original_settings->getThirdPartySetting('content_translation', 'enabled', FALSE)) {
+    $enabled = $settings->getThirdPartySetting('content_translation', 'enabled', FALSE);
+    $original_enabled = $original_settings->getThirdPartySetting('content_translation', 'enabled', FALSE);
+    if ($enabled && !$original_enabled) {
       _content_translation_install_field_storage_definitions($settings->getTargetEntityTypeId());
+    }
+    if (!$enabled && $original_enabled) {
+      // Remove permissions from roles.
+      foreach (Role::loadMultiple() as $role) {
+        $role_dependencies = new ConfigEntityDependency($role->id, $role->toArray());
+        if ($role_dependencies->hasDependency($settings->getConfigDependencyKey(), $settings->getConfigDependencyName())) {
+          $target_entity_type = \Drupal::entityTypeManager()->getDefinition($settings->getTargetEntityTypeId());
+          $permission_id = ContentTranslationPermissions::permissionKey($target_entity_type, $settings->getTargetBundle());
+          if ($permission_id !== NULL && $role->hasPermission($permission_id)) {
+            $role->revokePermission($permission_id)->save();
+          }
+        }
+      }
     }
     \Drupal::service('entity_type.bundle.info')->clearCachedBundles();
   }
