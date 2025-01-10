@@ -118,7 +118,7 @@ class State extends CacheCollector implements StateInterface {
     $this->keyValueStore->setMultiple($data);
     // If another request had a cache miss before this request, and also hasn't
     // written to cache yet, then it may already have read the previous value
-    // from the database and could write it to the cache to the end of the
+    // from the database and could write it to the cache at the end of the
     // request. To avoid this race condition, attempt to acquire a lock and
     // write to the cache immediately after calling parent::set(). This allows
     // the race condition detection in CacheCollector::updateCache() to work.
@@ -162,10 +162,11 @@ class State extends CacheCollector implements StateInterface {
       // Only acquiring the lock isn't sufficient, because if the lock is
       // acquired and cache item set by two processes within the same
       // millisecond, the race condition detection won't detect that situation.
-      // @todo this still doesn't account for the case where due to a clock
+      // @todo This still doesn't account for the case where due to a clock
       // offset between servers, identical timestamps are recorded despite
       // happening at different times. Consider a more unique identifier in
       // CacheCollector.
+      // @see https://www.drupal.org/project/drupal/issues/3496328
       usleep(10000);
     }
     if ($lock_acquired) {

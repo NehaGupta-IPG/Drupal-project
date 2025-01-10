@@ -368,7 +368,6 @@ class CacheCollectorTest extends UnitTestCase {
   public function testUpdateCacheDelete(): void {
     $this->setUpMockCacheBackend();
     $this->setUpMockLockBackend();
-
     $key = $this->randomMachineName();
     $value = $this->randomMachineName();
 
