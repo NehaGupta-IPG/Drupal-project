@@ -8,6 +8,8 @@ use Drupal\KernelTests\KernelTestBase;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
+// cspell:ignore endapply
+
 /**
  * Tests Drupal's Twig filters.
  */
