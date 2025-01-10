@@ -178,9 +178,9 @@ class State extends CacheCollector implements StateInterface {
       // rebuilding the cache after this point.
       $this->cache->set($this->getCid(), $data, CacheBackendInterface::CACHE_PERMANENT, $this->tags);
       $this->lock->release($lock_name);
+      $this->keysToPersist = [];
+      $this->keysToRemove = [];
     }
-    $this->keysToPersist = [];
-    $this->keysToRemove = [];
   }
 
   /**
