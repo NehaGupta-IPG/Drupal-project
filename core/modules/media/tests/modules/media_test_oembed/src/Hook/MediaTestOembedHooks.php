@@ -26,10 +26,11 @@ class MediaTestOembedHooks {
   * Implements hook_oembed_resource_data_alter().
   */
   #[Hook('oembed_resource_data_alter')]
-  function oembedResourceDataAlter(array &$data, $url) {
+  public function oembedResourceDataAlter(array &$data, $url): void {
     if (str_contains($url, 'twitter.com/oembed')) {
       // Change the width property.
       $data['width'] = 600;
     }
   }
+
 }
