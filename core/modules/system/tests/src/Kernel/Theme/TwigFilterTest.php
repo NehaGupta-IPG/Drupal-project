@@ -160,19 +160,6 @@ class TwigFilterTest extends KernelTestBase {
 EOT,
     ];
     $this->assertSame('<div><span>Use the spaceless filter to remove whitespace between HTML tags, not whitespace within HTML tags or whitespace in plain text.</span></div>', (string) $renderer->renderRoot($element));
-
-    // Also test drupal_spaceless filter directly.
-    $element = [
-      '#type' => 'inline_template',
-      '#template' => <<<'EOT'
-{% apply drupal_spaceless %}
-<div>
-  <span>Use the drupal_spaceless filter to remove whitespace between HTML tags, not whitespace within HTML tags or whitespace in plain text.</span>
-</div>
-{% endapply %}
-EOT,
-    ];
-    $this->assertSame('<div><span>Use the drupal_spaceless filter to remove whitespace between HTML tags, not whitespace within HTML tags or whitespace in plain text.</span></div>', (string) $renderer->renderRoot($element));
   }
 
 }
