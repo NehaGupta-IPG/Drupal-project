@@ -4,6 +4,7 @@ namespace Drupal\media\OEmbed;
 
 use Drupal\Component\Serialization\Json;
 use Drupal\Core\Cache\CacheBackendInterface;
+use Drupal\Core\Extension\ModuleHandlerInterface;
 use GuzzleHttp\ClientInterface;
 use GuzzleHttp\RequestOptions;
 use Psr\Http\Client\ClientExceptionInterface;
@@ -21,8 +22,14 @@ class ResourceFetcher implements ResourceFetcherInterface {
     protected ProviderRepositoryInterface $providers,
     #[Autowire(service: 'cache.default')]
     protected CacheBackendInterface $cacheBackend,
+    protected ModuleHandlerInterface $moduleHandler,
     protected int $timeout = 5,
   ) {
+    if (empty($moduleHandler)) {
+      $moduleHandler = \Drupal::moduleHandler();
+      @trigger_error('Passing NULL as the $module_handler parameter to ' . __METHOD__ . '() is deprecated in drupal:10.1.0 and is removed from drupal:11.0.0. See https://www.drupal.org/node/3042423', E_USER_DEPRECATED);
+    }
+    $this->moduleHandler = $moduleHandler;
   }
 
   /**
@@ -62,6 +69,8 @@ class ResourceFetcher implements ResourceFetcherInterface {
     if (empty($data) || !is_array($data)) {
       throw new ResourceException('The oEmbed resource could not be decoded.', $url);
     }
+
+    $this->moduleHandler->alter('oembed_resource_data', $data, $url);
 
     $this->cacheBackend->set($cache_id, $data);
 

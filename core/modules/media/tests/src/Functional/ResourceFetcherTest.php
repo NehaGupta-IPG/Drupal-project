@@ -79,4 +79,19 @@ class ResourceFetcherTest extends MediaFunctionalTestBase {
     $this->assertSame($title, $resource->getTitle());
   }
 
+  /**
+   * Tests that hook_oembed_resource_data_alter() is invoked.
+   */
+  public function testResourceDataAlter(): void {
+    $this->container->get('module_installer')->install(['media_test_oembed']);
+
+    // Get the resource.
+    $resource_url = $this->container->get('media.oembed.resource_fetcher')
+      ->fetchResource('https://publish.twitter.com/oembed?url=https://twitter.com/Dries/status/999985431595880448');
+
+    // Check media_test_oembed_oembed_resource_data_alter
+    // to see the hook implementation.
+    $this->assertEquals(600, $resource_url->getWidth());
+  }
+
 }

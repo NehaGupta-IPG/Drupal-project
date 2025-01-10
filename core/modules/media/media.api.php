@@ -27,6 +27,21 @@ function hook_media_source_info_alter(array &$sources) {
 }
 
 /**
+ * Alters the information provided by the oEmbed resource url.
+ *
+ * @param array $data
+ *   Data provided by the oEmbed resource.
+ * @param $url
+ *   The oEmbed resource URL.
+ */
+function hook_oembed_resource_data_alter(array &$data, $url) {
+  if (str_contains($url, 'youtube.com/oembed')) {
+    // Get the maximum resolution thumbnail from YouTube.
+    $data['thumbnail_url'] = str_replace('hqdefault', 'maxresdefault', $data['thumbnail_url']);
+  }
+}
+
+/**
  * Alters an oEmbed resource URL before it is fetched.
  *
  * @param array $parsed_url

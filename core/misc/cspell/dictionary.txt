@@ -217,6 +217,7 @@ htmlcorrector
 htmx
 httpheader
 httponly
+hqdefault
 icann
 iconwrap
 idekey
@@ -265,6 +266,7 @@ mainpage
 maryjane
 maximumred
 maxlifetime
+maxresdefault
 maynot
 mbytes
 mediumint
