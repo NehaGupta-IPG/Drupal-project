@@ -106,6 +106,8 @@ class State extends CacheCollector implements StateInterface {
    * {@inheritdoc}
    */
   public function setMultiple(array $data) {
+    $lock_name = $this->getCid() . ':' . CacheCollector::class;
+    $lock_acquired = $this->lock->acquire($lock_name);
     $this->lazyLoadCache();
     foreach ($data as $key => $value) {
       $this->registerKeySetDuringRequest($key, $value, parent::get($key));
@@ -134,8 +136,6 @@ class State extends CacheCollector implements StateInterface {
       unset($this->keysToRemove[$key]);
       $this->persist($key);
     }
-    $lock_name = $this->getCid() . ':' . CacheCollector::class;
-    $lock_acquired = $this->lock->acquire($lock_name);
     if (!$lock_acquired) {
       // If we were unable to acquire a lock, immediately write the cache item
       // anyway. This acts as a tombstone for other requests that have not
