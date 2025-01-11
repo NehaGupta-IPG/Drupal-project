@@ -147,7 +147,7 @@ class State extends CacheCollector implements StateInterface {
       // attempt to acquire the lock again. If we can't acquire the lock, then
       // the one second that has passed should have given most processes that
       // were in progress time to complete anyway.
-      $this->lock->wait($lock_name, 1);
+      $this->lock->wait($lock_name);
       $lock_acquired = $this->lock->acquire($lock_name);
       // If we were unable to acquire the lock even after waiting, write the
       // cache item a second time, this will override any cache writes in the
