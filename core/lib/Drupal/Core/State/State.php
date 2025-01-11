@@ -141,7 +141,7 @@ class State extends CacheCollector implements StateInterface {
       // anyway. This acts as a tombstone for other requests that have not
       // reached a cache write yet. It also ensures that the end of this request
       // will detect that the cache item has changed in ::updateCache().
-      $this->cache->set($this->getCid(), $data, CacheBackendInterface::CACHE_PERMANENT, $this->tags);
+      $this->cache->set($this->getCid(), [], CacheBackendInterface::CACHE_PERMANENT, $this->tags);
       $this->cacheInvalidated = TRUE;
       // Wait for the lock to become available for a maximum of one second, then
       // attempt to acquire the lock again. If we can't acquire the lock, then
@@ -153,7 +153,7 @@ class State extends CacheCollector implements StateInterface {
       // cache item a second time, this will override any cache writes in the
       // interim.
       if (!$lock_acquired) {
-        $this->cache->set($this->getCid(), $data, CacheBackendInterface::CACHE_PERMANENT, $this->tags);
+        $this->cache->set($this->getCid(), [], CacheBackendInterface::CACHE_PERMANENT, $this->tags);
       }
     }
     else {
