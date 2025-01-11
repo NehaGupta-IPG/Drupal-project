@@ -2,6 +2,7 @@
 
 namespace Drupal\Core\EventSubscriber;
 
+use Drupal\Core\Form\FormBuilder;
 use Drupal\Core\Messenger\MessengerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
@@ -32,6 +33,9 @@ class MaxInputVarsSubscriber implements EventSubscriberInterface {
   public function onRequest(RequestEvent $event) {
     $error = error_get_last();
     if (!empty($error['message']) && strstr($error['message'], 'Input variables exceeded') !== FALSE) {
+      // Prevent forms from processing.
+      FormBuilder::setMaxInputVars();
+
       // Add the error message as a Drupal Error.
       $this->messenger->addError($error['message']);
 
