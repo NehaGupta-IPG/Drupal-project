@@ -149,6 +149,12 @@ class State extends CacheCollector implements StateInterface {
       // were in progress time to complete anyway.
       $this->lock->wait($lock_name, 1);
       $lock_acquired = $this->lock->acquire($lock_name);
+      // If we were unable to acquire the lock even after waiting, write the
+      // cache item a second time, this will override any cache writes in the
+      // interim.
+      if (!$lock_acquired) {
+        $this->cache->set($this->getCid(), $data, CacheBackendInterface::CACHE_PERMANENT, $this->tags);
+      }
     }
     else {
       // Cache items are stored with millisecond precision, and are compared by
@@ -178,6 +184,7 @@ class State extends CacheCollector implements StateInterface {
       // rebuilding the cache after this point.
       $this->cache->set($this->getCid(), $data, CacheBackendInterface::CACHE_PERMANENT, $this->tags);
       $this->lock->release($lock_name);
+      $this->cacheInvalidated = FALSE;
       $this->keysToPersist = [];
       $this->keysToRemove = [];
     }
