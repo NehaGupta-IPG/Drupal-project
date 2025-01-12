@@ -232,7 +232,7 @@ final class RecipeRunner {
     }
     $steps[] = [[RecipeRunner::class, 'triggerEvent'], [$recipe]];
 
-    return $steps;
+    return array_unique($steps, SORT_REGULAR);
   }
 
   /**
