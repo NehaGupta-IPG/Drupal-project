@@ -1008,7 +1008,7 @@ class FormBuilder implements FormBuilderInterface, FormValidatorInterface, FormS
       // for programmed forms coming from self::submitForm(), or if the form_id
       // coming from the POST data is set and matches the current form_id.
       $input = $form_state->getUserInput();
-      if (!self::$isMaxInputVars && ($this->isProgrammed() || (!empty($input) && (isset($input['form_id']) && ($input['form_id'] == $form_id))))) {
+      if (!self::$isMaxInputVars && ($form_state->isProgrammed() || (!empty($input) && (isset($input['form_id']) && ($input['form_id'] == $form_id))))) {
         $form_state->setProcessInput();
         if (isset($element['#token'])) {
           $input = $form_state->getUserInput();
