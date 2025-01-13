@@ -1491,6 +1491,8 @@ class FormBuilder implements FormBuilderInterface, FormValidatorInterface, FormS
 
   /**
    * Sets if this request has exceeded the PHP max input vars.
+   *
+   * @return void
    */
   public static function setMaxInputVars() {
     static::$isMaxInputVars = TRUE;

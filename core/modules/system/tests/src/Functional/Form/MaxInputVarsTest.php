@@ -22,9 +22,7 @@ class MaxInputVarsTest extends BrowserTestBase {
   protected $defaultTheme = 'stark';
 
   /**
-   * Tests loading a module.
-   *
-   * @covers ::load
+   * Tests PHP Max Input Vars error.
    */
   public function testMaxInputVars(): void {
     $this->drupalGet('/max-input-vars-test');

@@ -29,6 +29,8 @@ class MaxInputVarsSubscriber implements EventSubscriberInterface {
    *
    * @param \Symfony\Component\HttpKernel\Event\RequestEvent $event
    *   The request event.
+   *
+   * @return void
    */
   public function onRequest(RequestEvent $event) {
     $error = error_get_last();
