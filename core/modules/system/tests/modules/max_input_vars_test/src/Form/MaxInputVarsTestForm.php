@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\max_input_vars_test\Form;
 
 use Drupal\Core\Form\FormBase;
