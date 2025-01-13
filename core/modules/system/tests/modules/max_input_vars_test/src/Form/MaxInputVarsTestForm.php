@@ -11,14 +11,14 @@ use Drupal\Core\Form\FormStateInterface;
 class MaxInputVarsTestForm extends FormBase implements FormInterface {
 
   /**
-   * {@inheritDoc}
+   * {@inheritdoc}
    */
   public function getFormId() {
     return 'max-input-vars-test-form';
   }
 
   /**
-   * {@inheritDoc}
+   * {@inheritdoc}
    */
   public function buildForm(array $form, FormStateInterface $form_state) {
     $max_vars = ini_get('max_input_vars');
@@ -37,7 +37,7 @@ class MaxInputVarsTestForm extends FormBase implements FormInterface {
   }
 
   /**
-   * {@inheritDoc}
+   * {@inheritdoc}
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {
     $this->messenger()->addError('This should not happen');
