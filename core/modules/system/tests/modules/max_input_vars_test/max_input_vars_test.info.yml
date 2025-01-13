@@ -1,0 +1,6 @@
+name: 'Test PHP max input vars'
+type: module
+description: 'Module containing a form used to test when a form submit exceeds the PHP max_input_vars limit.'
+package: Testing
+version: VERSION
+core_version_requirement: ^10 || ^11
