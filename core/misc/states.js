@@ -157,8 +157,7 @@
           keysToDelete.forEach((key) => {
             delete states.processedDependees[key];
           });
-          const element = $(context).find(selector);
-          if (element.length > 0) {
+          if ($(selector).closest(context).length) {
             // Dependee is being unloaded. Remove all existing events to ensure
             // associated states are re-processed.
             states.processedDependees[selector].forEach((item) => {
