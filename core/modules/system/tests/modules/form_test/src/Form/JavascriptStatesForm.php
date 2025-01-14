@@ -798,6 +798,14 @@ class JavascriptStatesForm extends FormBase {
       '#options' => [0 => 0, 1 => 1],
       '#default_value' => 0,
     ];
+    $form['states_ajax_test']['ajax_set_trigger'] = [
+      '#type' => 'radios',
+      '#title' => 'Ajax Set trigger',
+      '#options' => [
+        'value1' => 'Value 1',
+        'value2' => 'Value 2',
+      ],
+    ];
     // Add element added via ajax when ajax_reload is checked.
     if ($form_state->getValue('ajax_reload')) {
       $form['states_ajax_test']['ajax_added_trigger'] = [
@@ -813,6 +821,7 @@ class JavascriptStatesForm extends FormBase {
           ],
         ],
       ];
+      $form['states_ajax_test']['ajax_set_trigger']['#default_value'] = 'value1';
     }
     $form['textfield_enabled_when_checkbox_trigger_is_checked'] = [
       '#type' => 'textfield',
@@ -895,6 +904,15 @@ class JavascriptStatesForm extends FormBase {
       '#states' => [
         'visible' => [
           'form :input[name="ajax_added_trigger"]' => ['checked' => TRUE],
+        ],
+      ],
+    ];
+    $form['textfield_visible_when_ajax_set_trigger_is_value1_form_selector'] = [
+      '#type' => 'textfield',
+      '#title' => 'Textfield visible when Ajax Set Trigger is Value 1',
+      '#states' => [
+        'visible' => [
+          'form :input[name="ajax_set_trigger"]' => ['value' => 'value1'],
         ],
       ],
     ];
