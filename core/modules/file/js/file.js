@@ -200,7 +200,7 @@
             '%name': this.value.replace('C:\\fakepath\\', ''),
             '%filesize': humanFileSize(file.size),
             '%maxsize': drupalSettings.file.human_max_size,
-          }
+          },
         );
         $('.upload-button').hide();
         $(this)
