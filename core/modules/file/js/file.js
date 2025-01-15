@@ -211,11 +211,9 @@
         this.value = '';
         // Cancel all other change event handlers.
         event.stopImmediatePropagation();
-      }
-      else {
+      } else {
         $('.upload-button').show();
       }
-
     },
 
     /**
