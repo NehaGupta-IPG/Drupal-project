@@ -4,6 +4,11 @@ declare(strict_types=1);
 
 use Drupal\Tests\BrowserTestBase;
 
+/**
+ * Tests max input variable on forms.
+ *
+ * @group Form
+ */
 class MaxInputVarsTest extends BrowserTestBase {
 
   /**
