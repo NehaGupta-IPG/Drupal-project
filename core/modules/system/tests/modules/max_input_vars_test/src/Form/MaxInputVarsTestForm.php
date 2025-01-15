@@ -22,7 +22,7 @@ class MaxInputVarsTestForm extends FormBase implements FormInterface {
    */
   public function buildForm(array $form, FormStateInterface $form_state) {
     $max_vars = ini_get('max_input_vars');
-    for ($i = 0; $i < $max_vars + 1; $i ++) {
+    for ($i = 0; $i < $max_vars + 1; $i++) {
       $form["box-$i"] = [
         '#type' => 'checkbox',
         '#title' => $i,
@@ -39,7 +39,7 @@ class MaxInputVarsTestForm extends FormBase implements FormInterface {
   /**
    * {@inheritdoc}
    */
-  public function submitForm(array &$form, FormStateInterface $form_state) {
+  public function submitForm(array &$form, FormStateInterface $form_state): void {
     $this->messenger()->addError('This should not happen');
   }
 
