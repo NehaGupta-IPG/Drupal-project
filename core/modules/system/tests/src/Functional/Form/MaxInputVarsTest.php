@@ -2,6 +2,9 @@
 
 declare(strict_types=1);
 
+namespace Drupal\Tests\system\Functional\Form;
+
+use Drupal\Core\Url;
 use Drupal\Tests\BrowserTestBase;
 
 /**
@@ -20,9 +23,7 @@ class MaxInputVarsTest extends BrowserTestBase {
   ];
 
   /**
-   * Theme to enable.
-   *
-   * @var string
+   * {@inheritdoc}
    */
   protected $defaultTheme = 'stark';
 
@@ -30,7 +31,7 @@ class MaxInputVarsTest extends BrowserTestBase {
    * Tests PHP Max Input Vars error.
    */
   public function testMaxInputVars(): void {
-    $this->drupalGet('/max-input-vars-test');
+    $this->drupalGet(Url::fromRoute('max_input_vars_test'));
     $this->assertSession()->titleEquals('Max Input Vars Test | Drupal');
 
     $max_vars = ini_get('max_input_vars');

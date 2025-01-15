@@ -1,4 +1,4 @@
-entity.workspace.publish_form:
+max_input_vars_test:
   path: '/max-input-vars-test'
   defaults:
     _form: '\Drupal\max_input_vars_test\Form\MaxInputVarsTestForm'
