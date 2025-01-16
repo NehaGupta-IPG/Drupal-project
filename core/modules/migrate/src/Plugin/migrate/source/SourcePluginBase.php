@@ -412,6 +412,8 @@ abstract class SourcePluginBase extends PluginBase implements MigrateSourceInter
 
       // Preparing the row gives source plugins the chance to skip.
       if ($this->prepareRow($row) === FALSE) {
+        $this->idMap->saveIdMapping($row, [], MigrateIdMapInterface::STATUS_IGNORED);
+        $this->idMap->saveMessage($row->getSourceIdValues(), 'Row skipped by source plugin.');
         continue;
       }
 
