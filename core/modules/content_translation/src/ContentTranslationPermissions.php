@@ -119,7 +119,7 @@ class ContentTranslationPermissions implements ContainerInjectionInterface {
    */
   public static function permissionKey(EntityTypeInterface $entity_type, ?string $bundle = NULL): ?string {
     return match ($entity_type->getPermissionGranularity()) {
-      'bundle' => "translate $bundle " . $entity_type->id(),
+      'bundle' => $bundle ? "translate $bundle " . $entity_type->id() : NULL,
       'entity_type' => "translate " . $entity_type->id(),
       default => NULL,
     };
@@ -156,7 +156,9 @@ class ContentTranslationPermissions implements ContainerInjectionInterface {
     }
 
     $config = $this->entityTypeManager->getStorage('language_content_settings')->load($entity_type->id() . '.' . $bundle);
-    $permission['dependencies'][$config->getConfigDependencyKey()][] = $config->getConfigDependencyName();
+    if ($config) {
+      $permission['dependencies'][$config->getConfigDependencyKey()][] = $config->getConfigDependencyName();
+    }
     return $permission;
   }
 
