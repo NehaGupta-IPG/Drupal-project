@@ -5,6 +5,8 @@ namespace Drupal\field_ui\Hook;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\Theme\ThemePreprocess;
+use Drupal\field_ui\ConfigTranslation\EntityDisplayMapper;
+use Drupal\field_ui\FormElement\EntityDisplayElement;
 use Drupal\field_ui\Plugin\Derivative\FieldUiLocalTask;
 use Drupal\Core\Entity\EntityFormModeInterface;
 use Drupal\Core\Entity\EntityViewModeInterface;
@@ -101,6 +103,25 @@ class FieldUiHooks {
         'render element' => 'element',
       ],
     ];
+  }
+
+  /**
+   * Implements hook_config_schema_info_alter().
+   */
+  #[Hook('config_schema_info_alter')]
+  public function configSchemaInfoAlter(&$definitions): void {
+    $map = [
+      'core.entity_form_display.*.*.*' => EntityDisplayElement::class,
+      'core.entity_view_display.*.*.*' => EntityDisplayElement::class,
+    ];
+
+    // Enhance entity view and form display definitions with above class
+    // in order to generate translatable labels.
+    foreach ($definitions as $type => &$definition) {
+      if (isset($map[$type]) && !isset($definition['form_element_class'])) {
+        $definition['form_element_class'] = $map[$type];
+      }
+    }
   }
 
   /**
@@ -288,6 +309,44 @@ class FieldUiHooks {
     $id = $form_state->getFormObject()->getEntity()->id();
     if ($form_state->getTriggeringElement()['#parents'][0] === 'save_continue' && $route_info = FieldUI::getOverviewRouteInfo($provider, $id)) {
       $form_state->setRedirectUrl($route_info);
+    }
+  }
+
+  /**
+   * Implements hook_config_translation_info().
+   */
+  #[Hook('config_translation_info')]
+  public function configTranslationInfo(&$info): void {
+    $entity_type_manager = \Drupal::entityTypeManager();
+
+    // Add fields entity mappers to all fieldable entity types defined.
+    foreach ($entity_type_manager->getDefinitions() as $entity_type_id => $entity_type) {
+      // Make sure entity type has field UI enabled and has a base route.
+      if ($entity_type->get('field_ui_base_route')) {
+        $info[$entity_type_id . '_fields'] = [
+          'base_route_name' => "entity.field_config.{$entity_type_id}_field_edit_form",
+          'entity_type' => 'field_config',
+          'class' => '\Drupal\config_translation\ConfigFieldMapper',
+          'base_entity_type' => $entity_type_id,
+          'weight' => 10,
+        ];
+        $info[$entity_type_id . '_form_display'] = [
+          'base_route_name' => "entity.entity_form_display.{$entity_type_id}.form_mode",
+          'entity_type' => 'entity_form_display',
+          'class' => EntityDisplayMapper::class,
+          'base_entity_type' => $entity_type_id,
+          'display_context' => 'form',
+          'weight' => 10,
+        ];
+        $info[$entity_type_id . '_view_display'] = [
+          'base_route_name' => "entity.entity_view_display.{$entity_type_id}.view_mode",
+          'entity_type' => 'entity_view_display',
+          'class' => EntityDisplayMapper::class,
+          'base_entity_type' => $entity_type_id,
+          'display_context' => 'view',
+          'weight' => 10,
+        ];
+      }
     }
   }
 

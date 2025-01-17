@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\Tests\config_translation\Functional;
 
 use Drupal\block_content\Entity\BlockContentType;
+use Drupal\Component\Utility\Html;
 use Drupal\filter\Entity\FilterFormat;
 use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\locale\Model\TranslationUpdateMode;
@@ -39,6 +40,7 @@ class ConfigTranslationListUiTest extends BrowserTestBase {
     'taxonomy',
     'image',
     'responsive_image',
+    'layout_builder',
   ];
 
   /**
@@ -77,6 +79,9 @@ class ConfigTranslationListUiTest extends BrowserTestBase {
       'administer image styles',
       'administer responsive images',
       'translate configuration',
+      'configure any layout',
+      'administer node display',
+      'administer display modes',
     ];
 
     // Create and log in user.
@@ -427,6 +432,116 @@ class ConfigTranslationListUiTest extends BrowserTestBase {
   }
 
   /**
+   * Test entity form translation operation.
+   */
+  public function doEntityFormTest(): void {
+    $content_type = $this->drupalCreateContentType([
+      'type' => mb_strtolower($this->randomMachineName(16)),
+      'name' => $this->randomMachineName(),
+    ]);
+
+    ConfigurableLanguage::createFromLangcode('de')->save();
+
+    $this->drupalGet('admin/config/regional/config-translation');
+    $this->assertSession()->linkByHrefExists('admin/config/regional/config-translation/node_form_display');
+
+    $this->drupalGet('admin/config/regional/config-translation/node_form_display');
+    $this->assertSession()->statusCodeEquals(200);
+    $this->assertSession()->linkByHrefExists('admin/structure/types/manage/' . $content_type->id() . '/form-display/default/translate');
+
+    $this->drupalGet('admin/structure/types/manage/' . $content_type->id() . '/form-display/default/translate');
+    $this->assertSession()->statusCodeEquals(200);
+
+    $this->drupalGet('admin/structure/types/manage/' . $content_type->id() . '/form-display/default/translate/de/edit');
+    $this->assertSession()->statusCodeEquals(200);
+    $this->assertSession()->pageTextContains('Field widgets');
+    $this->assertSession()->pageTextContains('Body');
+  }
+
+  /**
+   * Test entity view display translation operation.
+   */
+  public function doViewDisplayTest(): void {
+    $content_type = $this->drupalCreateContentType([
+      'type' => mb_strtolower($this->randomMachineName(16)),
+      'name' => $this->randomMachineName(),
+    ]);
+
+    // Add a field that will be visible under
+    // config-translation/node_view_display.
+    $id = $content_type->id();
+    $this->drupalGet("admin/structure/types/manage/$id/fields/add-field");
+    $this->clickLink('Boolean');
+    $this->submitForm([
+      'label' => 'Bool field label',
+      'field_name' => 'boolean',
+    ], 'Continue');
+    $this->getSession()->getPage()->pressButton('Save');
+
+    // Before layout builder is enabled.
+    $this->drupalGet('admin/structure/types/manage/' . $id . '/display/default/translate/de/edit');
+    // Initially select the deepest element.
+    $expected_labels = [
+      'Boolean format settings',
+      "Bool field label    Field: field_boolean, type: Boolean",
+      'Field formatters',
+    ];
+    $xpath = new \DOMXPath(Html::load($this->getSession()->getPage()->getHtml()));
+    $element = $xpath->query('//details/summary[text()=" format settings"]')->item(0)->parentNode;
+    foreach ($expected_labels as $expected_label) {
+      $this->assertStringStartsWith($expected_label, trim($element->nodeValue));
+      $element = $element->parentNode;
+    }
+
+    // Setup layout builder.
+    $field_ui_prefix = "admin/structure/types/manage/$id/display";
+    $page = $this->getSession()->getPage();
+    // Enable Layout Builder for the default view modes, and overrides.
+    $this->drupalGet("$field_ui_prefix/default");
+    $page->checkField('layout[enabled]');
+    $page->pressButton('Save');
+    $page->checkField('layout[allow_custom]');
+    $page->pressButton('Save');
+
+    $this->drupalGet("$field_ui_prefix/default/layout");
+    $this->clickLink('Configure Section 1');
+    $this->submitForm([
+      'layout_settings[label]' => 'Custom section',
+    ], 'Update');
+    $this->getSession()->getPage()->pressButton('Save layout');
+
+    $this->drupalGet('admin/config/regional/config-translation');
+    $this->assertSession()->linkByHrefExists('admin/config/regional/config-translation/node_view_display');
+
+    $this->drupalGet('admin/config/regional/config-translation/node_view_display');
+    $this->assertSession()->statusCodeEquals(200);
+    $this->assertSession()->linkByHrefExists('/admin/structure/types/manage/' . $id . '/display/default/translate');
+    $this->drupalGet('admin/structure/types/manage/' . $id . '/display/default/translate/de/edit');
+    $this->assertSession()->statusCodeEquals(200);
+    // Assert duplicate field formatter settings is not found.
+    $this->assertSession()->pageTextNotContains('Field formatters');
+    $xpath = new \DOMXPath(Html::load($this->getSession()->getPage()->getHtml()));
+    $expected_labels = [
+      'Boolean format settings',
+      "Bool field label    Field: field_boolean, type: Boolean",
+      'Block settings',
+      'Bool field label',
+      'Components',
+      'Custom section',
+      'Sequence',
+      'Per-view-mode Layout Builder settings',
+      'Third party settings',
+    ];
+    // Initially select the deepest element.
+    $element = $xpath->query('//details/summary[text()=" format settings"]')->item(0)->parentNode;
+    foreach ($expected_labels as $expected_label) {
+      $this->assertStringStartsWith($expected_label, trim($element->nodeValue));
+      $element = $element->parentNode;
+    }
+
+  }
+
+  /**
    * Tests if translate link is added to operations in all configuration lists.
    */
   public function testTranslateOperationInListUi(): void {
@@ -443,6 +558,8 @@ class ConfigTranslationListUiTest extends BrowserTestBase {
     $this->doResponsiveImageListTest();
     $this->doDateFormatListTest();
     $this->doFieldListTest();
+    $this->doEntityFormTest();
+    $this->doViewDisplayTest();
 
     // Views is tested in
     // Drupal\config_translation\Tests\ConfigTranslationViewListUiTest.

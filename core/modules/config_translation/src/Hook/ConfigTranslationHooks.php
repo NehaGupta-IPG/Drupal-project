@@ -2,7 +2,9 @@
 
 namespace Drupal\config_translation\Hook;
 
+use Drupal\config_translation\Controller\ConfigTranslationEntityDisplayListBuilder;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
+use Drupal\Core\Entity\Display\EntityDisplayInterface;
 use Drupal\field\FieldConfigInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Config\Entity\ConfigEntityInterface;
@@ -119,6 +121,9 @@ class ConfigTranslationHooks {
           // \Drupal\field\Entity\FieldConfig::linkTemplates().
           $entity_type->setLinkTemplate('config-translation-overview', $entity_type->getLinkTemplate('edit-form') . '/translate');
         }
+        elseif ($entity_type->entityClassImplements(EntityDisplayInterface::class)) {
+          $class = ConfigTranslationEntityDisplayListBuilder::class;
+        }
         else {
           $class = 'Drupal\config_translation\Controller\ConfigTranslationEntityListBuilder';
         }
@@ -136,23 +141,7 @@ class ConfigTranslationHooks {
   #[Hook('config_translation_info')]
   public function configTranslationInfo(&$info): void {
     $entity_type_manager = \Drupal::entityTypeManager();
-    // If field UI is not enabled, the base routes of the type
-    // "entity.field_config.{$entity_type}_field_edit_form" are not defined.
-    if (\Drupal::moduleHandler()->moduleExists('field_ui')) {
-      // Add fields entity mappers to all fieldable entity types defined.
-      foreach ($entity_type_manager->getDefinitions() as $entity_type_id => $entity_type) {
-        // Make sure entity type has field UI enabled and has a base route.
-        if ($entity_type->get('field_ui_base_route')) {
-          $info[$entity_type_id . '_fields'] = [
-            'base_route_name' => "entity.field_config.{$entity_type_id}_field_edit_form",
-            'entity_type' => 'field_config',
-            'class' => '\Drupal\config_translation\ConfigFieldMapper',
-            'base_entity_type' => $entity_type_id,
-            'weight' => 10,
-          ];
-        }
-      }
-    }
+
     // Discover configuration entities automatically.
     foreach ($entity_type_manager->getDefinitions() as $entity_type_id => $entity_type) {
       // Determine base path for entities automatically if provided via the
