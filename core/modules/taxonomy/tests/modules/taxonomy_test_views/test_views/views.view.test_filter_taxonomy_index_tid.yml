@@ -134,7 +134,7 @@ display:
           admin_label: ''
           operator: or
           value:
-            - 2
+            - '3dec3e87-5e46-455d-b49c-1695fb74b756'
           group: 1
           exposed: false
           expose:

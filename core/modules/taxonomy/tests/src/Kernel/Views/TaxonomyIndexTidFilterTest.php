@@ -66,11 +66,15 @@ class TaxonomyIndexTidFilterTest extends TaxonomyTestBase {
   public function testConfigDependency(): void {
     /** @var \Drupal\views\Entity\View $view */
     $view = View::load('test_filter_taxonomy_index_tid__non_existing_dependency');
+    $display =& $view->getDisplay('default');
+    $display['display_options']['filters']['tid']['value'][0] = $this->terms[3]->uuid();
+    $display['display_options']['filters']['tid']['value'][1] = $this->terms[4]->uuid();
+    $view->save();
 
     // Dependencies are sorted.
     $content_dependencies = [
-      $this->terms[3]->getConfigDependencyName(),
-      $this->terms[4]->getConfigDependencyName(),
+      'taxonomy_term:tags:' . $this->terms[3]->uuid(),
+      'taxonomy_term:tags:' . $this->terms[4]->uuid(),
     ];
     sort($content_dependencies);
 
@@ -93,7 +97,7 @@ class TaxonomyIndexTidFilterTest extends TaxonomyTestBase {
         'taxonomy.vocabulary.tags',
       ],
       'content' => [
-        $this->terms[4]->getConfigDependencyName(),
+        'taxonomy_term:tags:' . $this->terms[4]->uuid(),
       ],
       'module' => [
         'node',

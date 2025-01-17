@@ -5,6 +5,7 @@ namespace Drupal\taxonomy\Plugin\views\filter;
 use Drupal\Core\Entity\Element\EntityAutocomplete;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Session\AccountInterface;
+use Drupal\Component\Uuid\Uuid;
 use Drupal\taxonomy\Entity\Term;
 use Drupal\taxonomy\TermStorageInterface;
 use Drupal\taxonomy\VocabularyStorageInterface;
@@ -92,11 +93,47 @@ class TaxonomyIndexTid extends ManyToOne {
    * {@inheritdoc}
    */
   public function init(ViewExecutable $view, DisplayPluginBase $display, ?array &$options = NULL) {
+    if (!empty($options['value'])) {
+      $options['value'] = $this->getEntityIdsFromUuids($options['value']);
+    }
+
     parent::init($view, $display, $options);
 
     if (!empty($this->definition['vocabulary'])) {
       $this->options['vid'] = $this->definition['vocabulary'];
     }
+  }
+
+  /**
+   * Get entity IDs from UUIDs.
+   *
+   * @param array $uuids
+   *   UUIDs to retrieve entity IDs for.
+   *
+   * @return array
+   *   Entity IDs for the given UUIDs.
+   */
+  protected function getEntityIdsFromUuids(array $uuids): array {
+    foreach ($uuids as $uuid) {
+      if (!Uuid::isValid($uuid)) {
+        // Abandon conversion if we already have IDs and not UUIDs.
+        return $uuids;
+      }
+    }
+
+    $result = $this->termStorage
+      ->getAggregateQuery()
+      // Access was already checked during configuration time.
+      ->accessCheck(FALSE)
+      ->condition('uuid', $uuids, 'IN')
+      ->groupBy('tid')
+      ->execute();
+
+    $tids = array_map(function ($item) {
+      return $item['tid'];
+    }, $result);
+
+    return array_combine($tids, $tids);
   }
 
   /**
@@ -396,7 +433,14 @@ class TaxonomyIndexTid extends ManyToOne {
    * {@inheritdoc}
    */
   protected function valueSubmit($form, FormStateInterface $form_state) {
-    // Prevent array_filter from messing up our arrays in parent submit.
+    $term_ids = $form_state->getValue(['options', 'value']);
+
+    $uuids = [];
+    foreach ($this->termStorage->loadMultiple($term_ids) as $term) {
+      $uuids[] = $term->uuid();
+    }
+
+    $form_state->setValue(['options', 'value'], $uuids);
   }
 
   /**

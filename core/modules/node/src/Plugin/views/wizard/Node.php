@@ -5,6 +5,7 @@ namespace Drupal\node\Plugin\views\wizard;
 use Drupal\Core\Entity\EntityDisplayRepositoryInterface;
 use Drupal\Core\Entity\EntityFieldManagerInterface;
 use Drupal\Core\Entity\EntityTypeBundleInfoInterface;
+use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Menu\MenuParentFormSelectorInterface;
@@ -34,20 +35,6 @@ class Node extends WizardPluginBase {
   protected $createdColumn = 'node_field_data-created';
 
   /**
-   * The entity display repository.
-   *
-   * @var \Drupal\Core\Entity\EntityDisplayRepositoryInterface
-   */
-  protected $entityDisplayRepository;
-
-  /**
-   * The entity field manager.
-   *
-   * @var \Drupal\Core\Entity\EntityFieldManagerInterface
-   */
-  protected $entityFieldManager;
-
-  /**
    * Node constructor.
    *
    * @param array $configuration
@@ -58,14 +45,16 @@ class Node extends WizardPluginBase {
    *   The plugin definition.
    * @param \Drupal\Core\Entity\EntityTypeBundleInfoInterface $bundle_info_service
    *   The entity bundle info service.
-   * @param \Drupal\Core\Entity\EntityDisplayRepositoryInterface $entity_display_repository
+   * @param \Drupal\Core\Entity\EntityDisplayRepositoryInterface $entityDisplayRepository
    *   The entity display repository service.
-   * @param \Drupal\Core\Entity\EntityFieldManagerInterface $entity_field_manager
+   * @param \Drupal\Core\Entity\EntityFieldManagerInterface $entityFieldManager
    *   The entity field manager.
    * @param \Drupal\Core\Menu\MenuParentFormSelectorInterface $parent_form_selector
    *   The parent form selector service.
+   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
+   *   The entity field manager.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, EntityTypeBundleInfoInterface $bundle_info_service, EntityDisplayRepositoryInterface $entity_display_repository, EntityFieldManagerInterface $entity_field_manager, MenuParentFormSelectorInterface $parent_form_selector) {
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, EntityTypeBundleInfoInterface $bundle_info_service, protected EntityDisplayRepositoryInterface $entityDisplayRepository, protected EntityFieldManagerInterface $entityFieldManager, MenuParentFormSelectorInterface $parent_form_selector, protected EntityTypeManagerInterface $entityTypeManager,) {
     parent::__construct($configuration, $plugin_id, $plugin_definition, $bundle_info_service, $parent_form_selector);
 
     $this->entityDisplayRepository = $entity_display_repository;
@@ -146,12 +135,25 @@ class Node extends WizardPluginBase {
       }
     }
     if (!empty($tids)) {
+
+      // The term filter should reference the UUIDs, so we load the terms that
+      // were selected in the wizard to retrieve their target UUIDs.
+      $terms = $this->entityTypeManager
+        ->getStorage('taxonomy_term')
+        ->loadMultiple($tids);
+      $term_uuids = [];
+      foreach ($terms as $term) {
+        $term_uuids[] = $term->uuid();
+      }
+      if (empty($term_uuids)) {
+        return $filters;
+      }
       $vid = reset($form['displays']['show']['tagged_with']['#selection_settings']['target_bundles']);
       $filters['tid'] = [
         'id' => 'tid',
         'table' => 'taxonomy_index',
         'field' => 'tid',
-        'value' => $tids,
+        'value' => $term_uuids,
         'vid' => $vid,
         'plugin_id' => 'taxonomy_index_tid',
       ];
