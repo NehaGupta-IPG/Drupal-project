@@ -91,12 +91,6 @@ class ContentTranslationPermissions implements ContainerInjectionInterface {
                 'title' => $this->t('Translate @entity_label', ['@entity_label' => $entity_type->getSingularLabel()]),
                 'dependencies' => ['module' => [$entity_type->getProvider()]],
               ];
-              // @see \Drupal\content_translation\ContentTranslationManager::isEnabled()
-              $bundles = array_keys($this->entityTypeBundleInfo->getBundleInfo($entity_type_id));
-              foreach ($bundles as $bundle) {
-                $config = $this->entityTypeManager->getStorage('language_content_settings')->load($entity_type->id() . '.' . $bundle);
-                $permission['dependencies'][$config->getConfigDependencyKey()][] = $config->getConfigDependencyName();
-              }
             }
             break;
         }
