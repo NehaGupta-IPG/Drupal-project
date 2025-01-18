@@ -118,6 +118,12 @@ class MigrateDrupalHooks {
         $source_connection = $source_plugin->getDatabase();
         $version = NodeMigrateType::getLegacyDrupalVersion($source_connection);
       }
+      catch (RequirementsException) {
+        // This code currently runs whenever the definitions are being loaded
+        // and if you have a Drupal 8+ source site then the requirements will
+        // not be met for the system_site migration since the 'variables'
+        // subsystem was replaced with config entities in Drupal 8.
+      }
       catch (\Exception $e) {
         \Drupal::messenger()->addError($this->t('Failed to connect to your database server. The server reports the following message: %error.<ul><li>Is the database server running?</li><li>Does the database exist, and have you entered the correct database name?</li><li>Have you entered the correct username and password?</li><li>Have you entered the correct database hostname?</li></ul>', ['%error' => $e->getMessage()]));
       }
