@@ -129,3 +129,14 @@ function views_post_update_block_items_per_page(?array &$sandbox = NULL): void {
 function views_post_update_add_date_default_arguments(): void {
   // Empty update to cause a cache rebuild so that schema additions are read.
 }
+
+/**
+ * Update boolean filter settings.
+ */
+function views_post_update_boolean_filter_accept_null(?array &$sandbox = NULL): void {
+  /** @var \Drupal\views\ViewsConfigUpdater $view_config_updater */
+  $view_config_updater = \Drupal::classResolver(ViewsConfigUpdater::class);
+  \Drupal::classResolver(ConfigEntityUpdater::class)->update($sandbox, 'view', function (ViewEntityInterface $view) use ($view_config_updater) {
+    return $view_config_updater->needsBooleanFilterAcceptNullUpdate($view);
+  }, TRUE);
+}

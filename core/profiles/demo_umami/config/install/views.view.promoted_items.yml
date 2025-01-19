@@ -127,6 +127,7 @@ display:
             operator: ''
             operator_limit_selection: false
             operator_list: {  }
+          accept_null: false
         promote:
           id: promote
           table: node_field_data
@@ -167,6 +168,7 @@ display:
             default_group: All
             default_group_multiple: {  }
             group_items: {  }
+          accept_null: false
         type:
           id: type
           table: node_field_data
@@ -262,6 +264,7 @@ display:
             operator: ''
             operator_limit_selection: false
             operator_list: {  }
+          accept_null: false
         promote:
           id: promote
           table: node_field_data
@@ -302,6 +305,7 @@ display:
             default_group: All
             default_group_multiple: {  }
             group_items: {  }
+          accept_null: false
         type:
           id: type
           table: node_field_data
@@ -384,6 +388,7 @@ display:
             default_group: All
             default_group_multiple: {  }
             group_items: {  }
+          accept_null: false
       filter_groups:
         operator: AND
         groups:
@@ -436,6 +441,7 @@ display:
             operator: ''
             operator_limit_selection: false
             operator_list: {  }
+          accept_null: false
         promote:
           id: promote
           table: node_field_data
@@ -476,6 +482,7 @@ display:
             default_group: All
             default_group_multiple: {  }
             group_items: {  }
+          accept_null: false
         type:
           id: type
           table: node_field_data
@@ -558,6 +565,7 @@ display:
             default_group: All
             default_group_multiple: {  }
             group_items: {  }
+          accept_null: false
       filter_groups:
         operator: AND
         groups:

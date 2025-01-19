@@ -714,6 +714,7 @@ display:
                 title: Unpublished
                 operator: '='
                 value: '0'
+          accept_null: false
         status_extra:
           id: status_extra
           table: media_field_data

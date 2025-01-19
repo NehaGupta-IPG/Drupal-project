@@ -438,6 +438,7 @@ display:
             default_group: All
             default_group_multiple: {  }
             group_items: {  }
+          accept_null: false
       style:
         type: table
         options:
