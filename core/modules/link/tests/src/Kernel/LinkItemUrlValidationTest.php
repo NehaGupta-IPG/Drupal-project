@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\link\Kernel;
 
+use Drupal\Core\Entity\EntityInterface;
+use Drupal\entity_test\Entity\EntityTest;
+use Drupal\link\LinkItemInterface;
 use Drupal\Tests\field\Kernel\FieldKernelTestBase;
 
 /**
@@ -19,18 +22,58 @@ class LinkItemUrlValidationTest extends FieldKernelTestBase {
   protected static $modules = ['link'];
 
   /**
-   * Tests link validation.
+   * Entity with no access.
+   *
+   * @var \Drupal\Core\Entity\EntityInterface
    */
-  public function testExternalLinkValidation(): void {
+  protected EntityInterface $forbiddenEntity;
+
+  /**
+   * Entity with no access.
+   *
+   * @var \Drupal\link\LinkItemInterface
+   */
+  protected LinkItemInterface $linkItem;
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function setUp(): void {
+    parent::setUp();
     $definition = \Drupal::typedDataManager()
       ->createDataDefinition('field_item:link');
-    $link_item = \Drupal::typedDataManager()->create($definition);
-    $test_links = $this->getTestLinks();
+    $this->linkItem = \Drupal::typedDataManager()->create($definition);
+  }
 
+  /**
+   * Tests external link validation.
+   */
+  public function testExternalLinkValidation(): void {
+    $this->checkViolations($this->getExternalTestLinks());
+  }
+
+  /**
+   * Tests internal link validation.
+   */
+  public function testInternalLinkValidation(): void {
+    $this->forbiddenEntity = EntityTest::create(['name' => 'forbid_access']);
+    $this->forbiddenEntity->save();
+
+    $this->checkViolations($this->getInternalTestLinks());
+  }
+
+  /**
+   * Helper method to validate url.
+   *
+   * @param array $test_links
+   *   The first element of the array is the link value to test. The second
+   *   value is an array of expected violation messages.
+   */
+  protected function checkViolations(array $test_links): void {
     foreach ($test_links as $data) {
       [$value, $expected_violations] = $data;
-      $link_item->setValue($value);
-      $violations = $link_item->validate();
+      $this->linkItem->setValue($value);
+      $violations = $this->linkItem->validate();
       $expected_count = count($expected_violations);
       $this->assertCount($expected_count, $violations, sprintf('Violation message count error for %s', $value));
       if ($expected_count) {
@@ -47,13 +90,13 @@ class LinkItemUrlValidationTest extends FieldKernelTestBase {
   }
 
   /**
-   * Builds an array of links to test.
+   * Builds an array of external links to test.
    *
    * @return array
    *   The first element of the array is the link value to test. The second
    *   value is an array of expected violation messages.
    */
-  protected function getTestLinks(): array {
+  protected function getExternalTestLinks(): array {
     $violation_0 = "The path '%s' is invalid.";
     $violation_1 = 'This value should be of the correct primitive type.';
     return [
@@ -118,6 +161,20 @@ class LinkItemUrlValidationTest extends FieldKernelTestBase {
       ["///a", [$violation_0, $violation_1]],
       ["///", [$violation_0, $violation_1]],
       ["http:///a", [$violation_0, $violation_1]],
+    ];
+  }
+
+  /**
+   * Builds an array of internal links to test.
+   *
+   * @return array
+   *   The first element of the array is the link value to test. The second
+   *   value is an array of expected violation messages.
+   */
+  protected function getInternalTestLinks(): array {
+    $violation_0 = "The path '%s' is inaccessible.";
+    return [
+      ['entity:entity_test/' . $this->forbiddenEntity->id(), [$violation_0]],
     ];
   }
 
