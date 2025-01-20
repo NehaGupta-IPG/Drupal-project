@@ -1,5 +1,5 @@
 module.exports = {
-  '@tags': ['core'],
+  '@tags': ['core', 'a11y'],
   before(browser) {
     browser
       .drupalInstall({
@@ -18,8 +18,10 @@ module.exports = {
       .axeInject()
       .axeRun('.pager', {
         rules: {
+          // Disabling the heading-order rule because the pagination
+          // by default has h4 which breaks the heading order rule.
           'heading-order': { enabled: false },
-        }
+        },
       });
   },
 };
