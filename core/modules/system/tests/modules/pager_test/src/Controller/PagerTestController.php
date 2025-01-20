@@ -72,8 +72,11 @@ class PagerTestController extends ControllerBase implements TrustedCallbackInter
    *
    * The 'pager_calls' parameter counts the calls to the pager, subsequent
    * to the initial call.
+   *
+   * @return array
+   *   A render array containing the pager element.
    */
-  public function queryParameters() {
+  public function queryParameters():array {
 
     // Example query.
     $build['pager_table_0'] = $this->buildTestTable(0, 5);
@@ -99,9 +102,12 @@ class PagerTestController extends ControllerBase implements TrustedCallbackInter
   }
 
   /**
-   * Returns a page with multiple pagers.
+   * Builds a page with multiple pagers.
+   *
+   * @return array
+   *   A render array containing the table and pager elements.
    */
-  public function multiplePagers() {
+  public function multiplePagers():array {
     $build['pager_table_0'] = $this->buildTestTable(0, 20);
     $build['pager_pager_0'] = [
       '#type' => 'container',
@@ -139,9 +145,12 @@ class PagerTestController extends ControllerBase implements TrustedCallbackInter
   }
 
   /**
-   * Returns a page with ellipsis.
+   * Builds a page with ellipsis.
+   *
+   * @return array
+   *   A render array containing the table and pager elements.
    */
-  public function ellipsis() {
+  public function ellipsis(): array {
 
     // Build three tables with same query and different pagers.
     $build['pager_table'] = $this->buildTestTable(0, 1);
