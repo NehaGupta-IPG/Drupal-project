@@ -126,6 +126,13 @@ class MenuLinkContent extends EditorialContentEntityBase implements MenuLinkCont
   /**
    * {@inheritdoc}
    */
+  public function getAdminDescription() {
+    return $this->get('admin_description')->value;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function getPluginId() {
     return 'menu_link_content:' . $this->uuid();
   }
@@ -184,6 +191,7 @@ class MenuLinkContent extends EditorialContentEntityBase implements MenuLinkCont
 
     $definition['title'] = $this->getTitle();
     $definition['description'] = $this->getDescription();
+    $definition['admin_description'] = $this->getAdminDescription();
     $definition['weight'] = $this->getWeight();
     $definition['id'] = $this->getPluginId();
     $definition['metadata'] = ['entity_id' => $this->id()];
@@ -318,6 +326,22 @@ class MenuLinkContent extends EditorialContentEntityBase implements MenuLinkCont
     $fields['description'] = BaseFieldDefinition::create('string')
       ->setLabel(t('Description'))
       ->setDescription(t('Shown when hovering over the menu link.'))
+      ->setTranslatable(TRUE)
+      ->setRevisionable(TRUE)
+      ->setSetting('max_length', 255)
+      ->setDisplayOptions('view', [
+        'label' => 'hidden',
+        'type' => 'string',
+        'weight' => 0,
+      ])
+      ->setDisplayOptions('form', [
+        'type' => 'string_textfield',
+        'weight' => 0,
+      ]);
+
+    $fields['admin_description'] = BaseFieldDefinition::create('string')
+      ->setLabel(t('Admin Description'))
+      ->setDescription(t('Shown when displaying on the admin menu interface.'))
       ->setTranslatable(TRUE)
       ->setRevisionable(TRUE)
       ->setSetting('max_length', 255)

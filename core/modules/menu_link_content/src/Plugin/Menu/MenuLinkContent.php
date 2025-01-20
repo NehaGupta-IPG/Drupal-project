@@ -36,6 +36,7 @@ class MenuLinkContent extends MenuLinkBase implements ContainerFactoryPluginInte
     'enabled' => 1,
     'title' => 1,
     'description' => 1,
+    'admin_description' => 1,
     'route_name' => 1,
     'route_parameters' => 1,
     'url' => 1,
@@ -187,6 +188,19 @@ class MenuLinkContent extends MenuLinkBase implements ContainerFactoryPluginInte
       return $this->getEntity()->getDescription();
     }
     return $this->pluginDefinition['description'];
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getAdminDescription() {
+    // We only need to get the description from the actual entity if it may be a
+    // translation based on the current language context. This can only happen
+    // if the site is configured to be multilingual.
+    if ($this->languageManager->isMultilingual()) {
+      return $this->getEntity()->getAdminDescription();
+    }
+    return $this->pluginDefinition['admin_description'];
   }
 
   /**

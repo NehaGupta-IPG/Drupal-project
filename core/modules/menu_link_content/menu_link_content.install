@@ -5,9 +5,33 @@
  * Install, update and uninstall functions for the menu_link_content module.
  */
 
+use Drupal\Core\Field\BaseFieldDefinition;
+
 /**
  * Implements hook_update_last_removed().
  */
 function menu_link_content_update_last_removed(): int {
   return 8601;
+}
+
+function menu_link_content_update_11002() {
+
+  $field_storage_definition = BaseFieldDefinition::create('string')
+    ->setLabel(t('Admin Description'))
+    ->setDescription(t('Shown when displaying on the admin menu interface.'))
+    ->setTranslatable(TRUE)
+    ->setRevisionable(TRUE)
+    ->setSetting('max_length', 255);
+
+  \Drupal::entityDefinitionUpdateManager()
+    ->installFieldStorageDefinition('admin_description', 'menu_link_content', 'menu_link_content', $field_storage_definition);
+
+  $schema = \Drupal::database()->schema();
+  $schema->addField('menu_tree', 'admin_description', [
+    'type' => 'varchar',
+    'length' => 255,
+    'not null' => FALSE,
+    'default' => NULL,
+  ]);
+
 }

@@ -29,6 +29,8 @@ trait MenuLinkFieldDefinitions {
     // The description. If this came from a YAML definition or other safe source
     // this may be be a TranslatableMarkup object.
     'description' => '',
+    // The description used for the admin UI.
+    'admin_description' => '',
     // The plugin ID of the parent link (or NULL for a top-level link).
     'parent' => '',
     // The weight of the link.
