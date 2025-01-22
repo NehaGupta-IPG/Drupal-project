@@ -102,6 +102,8 @@ class PagerTestController extends ControllerBase implements TrustedCallbackInter
    * Returns a page with multiple pagers.
    */
   public function multiplePagers() {
+
+    // Build three tables with same query and different pagers.
     $build['pager_table_0'] = $this->buildTestTable(0, 20);
     $build['pager_pager_0'] = [
       '#type' => 'container',
