@@ -27,7 +27,7 @@ class AccessibilityTest extends WebDriverTestBase {
   /**
    * Test some pages.
    *
-   * ::@dataProvider providerTestAnonymousPages
+   * @dataProvider providerTestAnonymousPages
    */
   public function testAnonymousPages($uri) {
     $this->drupalGet($uri);
@@ -40,7 +40,7 @@ class AccessibilityTest extends WebDriverTestBase {
    *
    * @return array
    */
-  public function providerTestAnonymousPages() {
+  public static function providerTestAnonymousPages() {
     return [
       [''],
       ['user/login'],
