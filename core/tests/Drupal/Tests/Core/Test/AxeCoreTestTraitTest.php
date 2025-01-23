@@ -42,10 +42,14 @@ Accessibility test failures (2 total)
 1. [serious] Elements must meet minimum color contrast ratio thresholds
 Test URL: http://web/accessibility-test
 Axe rule: `color-contrast`
+Violating targets (1):
+  * `span`
 
 2. [critical] Form elements must have labels
 Test URL: http://web/accessibility-test
 Axe rule: `label`
+Violating targets (1):
+  * `input`
 Failed asserting that an array is empty.
 TEXT
     );
@@ -173,6 +177,8 @@ Accessibility test failures (1 total)
 1. [critical] Form elements must have labels
 Test URL: http://web/accessibility-test
 Axe rule: `label`
+Violating targets (1):
+  * `input`
 Failed asserting that an array is empty.
 TEXT
     ];
@@ -187,6 +193,8 @@ Accessibility test failures (1 total)
 1. [serious] Elements must meet minimum color contrast ratio thresholds
 Test URL: http://web/accessibility-test
 Axe rule: `color-contrast`
+Violating targets (1):
+  * `span`
 Failed asserting that an array is empty.
 TEXT
     ];
@@ -204,6 +212,8 @@ Accessibility test failures (1 total)
 1. [critical] Form elements must have labels
 Test URL: http://web/accessibility-test
 Axe rule: `label`
+Violating targets (1):
+  * `input`
 Failed asserting that an array is empty.
 TEXT
     ];

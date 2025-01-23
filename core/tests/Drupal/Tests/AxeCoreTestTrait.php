@@ -92,13 +92,12 @@ trait AxeCoreTestTrait {
   }
 
   /**
-   * Format the Axe violations report.
+   * Formats the Axe violations report.
    *
    * @param array $results
    *   Array of violations returned from `axe.run()`.
    */
   protected function formatViolationsReport(array $results): string {
-
     $message = 'Accessibility test failures';
     $message .= ' (' . count($results['violations']) . ' total)';
 
@@ -107,6 +106,31 @@ trait AxeCoreTestTrait {
       $message .= $key + 1 . ". [{$violation['impact']}] {$violation['help']}" . PHP_EOL;
       $message .= "Test URL: {$results['url']}" . PHP_EOL;
       $message .= "Axe rule: `{$violation['id']}`";
+
+      if (!empty($violation['nodes'])) {
+        $message .= PHP_EOL;
+        $message .= $this->formatViolationTargets($violation['nodes']);
+      }
+    }
+
+    return $message;
+  }
+
+  /**
+   * Formats the individual nodes for the violations report.
+   *
+   * The `target` property is used instead of the `html` property brevity.
+   *
+   * @param array $nodes
+   *   Array of nodes for a single violation.
+   */
+  protected function formatViolationTargets(array $nodes): string {
+    $message = 'Violating targets';
+    $message .= ' (' . count($nodes) . '):';
+
+    foreach ($nodes as $node) {
+      $message .= PHP_EOL;
+      $message .= "  * `{$node['target'][0]}`";
     }
 
     return $message;
