@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Drupal\Tests\olivero\FunctionalJavascriptTests;
+namespace Drupal\Tests\olivero\FunctionalJavascript;
 
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
 use Drupal\Tests\AxeCoreTestTrait;
@@ -11,6 +11,7 @@ use Drupal\Tests\AxeCoreTestTrait;
  * Run a basic axe-core test on some pages.
  *
  * @group olivero
+ * @group accessibility
  */
 class AccessibilityTest extends WebDriverTestBase {
 
