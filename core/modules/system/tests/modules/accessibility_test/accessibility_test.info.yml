@@ -1,0 +1,5 @@
+name: 'Accessibility test'
+type: module
+description: 'Support module for automated accessibility testing.'
+package: Testing
+version: VERSION

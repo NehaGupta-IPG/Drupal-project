@@ -1,0 +1,9 @@
+accessibility_test.page:
+  path: '/accessibility-test'
+  defaults:
+    _title: 'Accessibility test'
+    _controller: '\Drupal\accessibility_test\Controller\AccessibilityTestController::page'
+  options:
+    no_cache: TRUE
+  requirements:
+    _access: 'TRUE'
