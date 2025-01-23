@@ -49,6 +49,22 @@ trait AxeCoreTestTrait {
    * @param ?array $options
    *   (optional) An associative array of additional Axe options.
    *   The provided options will be passed to `axe.run()` as a Javascript object.
+   *   Examples:
+   *   ```php
+   *   [
+   *     'runOnly' => [
+   *       'type' => 'rule',
+   *       'values' => ['region'],
+   *     ],
+   *   ]
+   *   ```
+   *   ```php
+   *   [
+   *     'rules' => [
+   *       'region' => ['enabled' => false]
+   *     ]
+   *   ]
+   *   ```
    *
    * @throws \Behat\Mink\Exception\DriverException
    * @throws \Behat\Mink\Exception\UnsupportedDriverActionException
