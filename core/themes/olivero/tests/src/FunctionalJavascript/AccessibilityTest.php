@@ -30,6 +30,11 @@ class AccessibilityTest extends WebDriverTestBase {
   /**
    * Test some pages.
    *
+   * @param string $uri
+   *   The path to be tested.
+   * @param ?array $options
+   *   (optional) Associative array of Axe options.
+   *
    * @dataProvider providerTestAnonymousPages
    */
   public function testAnonymousPages(string $uri, ?array $options = NULL): void {
