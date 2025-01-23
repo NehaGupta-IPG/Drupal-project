@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\olivero\FunctionalJavascriptTests;
 
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
@@ -29,23 +31,24 @@ class AccessibilityTest extends WebDriverTestBase {
    *
    * @dataProvider providerTestAnonymousPages
    */
-  public function testAnonymousPages($uri) {
+  public function testAnonymousPages(string $uri, ?array $options = NULL): void {
     $this->drupalGet($uri);
-    $this->disableFailuresForImpact('moderate');
-    $this->executeAxe();
+    $this->executeAxe($options);
   }
 
   /**
    * Data provider for testPages.
    *
    * @return array
+   *   Test cases.
    */
-  public static function providerTestAnonymousPages() {
+  public static function providerTestAnonymousPages(): array {
     return [
       [''],
       ['user/login'],
       ['user/register'],
       ['user/password'],
+      ['search/node'],
     ];
   }
 
