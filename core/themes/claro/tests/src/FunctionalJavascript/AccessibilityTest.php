@@ -24,14 +24,9 @@ class AccessibilityTest extends WebDriverTestBase {
   protected static $modules = [];
 
   /**
-   * The profile to install as a basis for testing.
-   *
-   * @var string
-   *
-   * Using standard profile because some pages aren't working with
-   * `nightwatch_a11y_testing` profile.
+   * {@inheritdoc}
    */
-  protected $profile = 'standard';
+  protected $profile = 'nightwatch_a11y_testing';
 
   /**
    * A user with permission to access all admin pages & functionality.
@@ -78,10 +73,10 @@ class AccessibilityTest extends WebDriverTestBase {
         '/user/1/edit',
       ],
       'Create Article' => [
-        '/node/add/article?destination=/admin/content',
+        '/node/add/article',
       ],
       'Create Page' => [
-        '/node/add/page?destination=/admin/content',
+        '/node/add/page',
       ],
       'Content Page' => [
         '/admin/content',
