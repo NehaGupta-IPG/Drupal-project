@@ -75,13 +75,17 @@ class VocabularyAdminPerformanceTest extends PerformanceTestBase {
     $performance_data = $this->collectPerformanceData(function () {
       $this->drupalGet('admin/structure/taxonomy/manage/tags/overview');
     }, 'umamiVocabularyAdminPageHotCache');
+
+    $expected = [
+      'queryCount' => 12,
+      'cacheGetCount' => 115,
+      'cacheSetCount' => 0,
+      'cacheDeleteCount' => 0,
+      'cacheTagChecksumCount' => 0,
+      'cacheTagIsValidCount' => 72,
+    ];
     $this->assertTermInVocabularyAdminPage();
-    $this->assertSame($performance_data->getQueryCount(), 9);
-    $this->assertSame($performance_data->getCacheGetCount(), 115);
-    $this->assertSame($performance_data->getCacheSetCount(), 0);
-    $this->assertSame($performance_data->getCacheDeleteCount(), 0);
-    $this->assertSame(0, $performance_data->getCacheTagChecksumCount());
-    $this->assertSame(72, $performance_data->getCacheTagIsValidCount());
+    $this->assertMetrics($expected, $performance_data);
   }
 
   /**
