@@ -47,6 +47,7 @@ class AccessibilityTest extends WebDriverTestBase {
     return [
       'Homepage' => [
         '/',
+        // @todo remove the disabled 'region' rule in https://drupal.org/i/3318396.
         [
           'rules' => [
             'region' => ['enabled' => FALSE],
@@ -55,6 +56,7 @@ class AccessibilityTest extends WebDriverTestBase {
       ],
       'Login' => [
         '/user/login',
+        // @todo remove the disabled 'region' rule in https://drupal.org/i/3318396.
         [
           'rules' => [
             'region' => ['enabled' => FALSE],
@@ -63,6 +65,8 @@ class AccessibilityTest extends WebDriverTestBase {
       ],
       'Search' => [
         '/search/node',
+        // @todo remove the heading and duplicate id rules below in
+        //   https://drupal.org/i/3318398.
         [
           'rules' => [
             'heading-order' => ['enabled' => FALSE],
