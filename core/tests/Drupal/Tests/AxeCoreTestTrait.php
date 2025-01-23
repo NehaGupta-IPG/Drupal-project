@@ -12,38 +12,6 @@ namespace Drupal\Tests;
 trait AxeCoreTestTrait {
 
   /**
-   * @var array Violations' impacts to be considered as a failure
-   */
-  protected $axeViolationImpactFailures = [
-    'minor' => FALSE,
-    'moderate' => TRUE,
-    'serious' => TRUE,
-    'critical' => TRUE,
-  ];
-
-  /**
-   * Setter to disable failures for a given violation impact.
-   *
-   * @param string $impact
-   *   The violation impact to disable failures for.
-   */
-  protected function disableFailuresForImpact(string $impact) {
-    assert(array_key_exists($impact, $this->axeViolationImpactFailures), '$impact is not a valid value');
-    $this->axeViolationImpactFailures[$impact] = FALSE;
-  }
-
-  /**
-   * Setter to enable failures for a given violation impact.
-   *
-   * @param string $impact
-   *   The violation impact to enable failures for.
-   */
-  protected function enableFailuresForImpact(string $impact) {
-    assert(array_key_exists($impact, $this->axeViolationImpactFailures), '$impact is not a valid value');
-    $this->axeViolationImpactFailures[$impact] = TRUE;
-  }
-
-  /**
    * Executes axe on the current session and checks the results.
    *
    * @param ?array $options
