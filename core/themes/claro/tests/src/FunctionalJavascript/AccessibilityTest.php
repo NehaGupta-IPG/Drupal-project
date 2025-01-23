@@ -34,7 +34,7 @@ class AccessibilityTest extends WebDriverTestBase {
   protected $profile = 'standard';
 
   /**
-   * A user with permission to access toolbar and access announcements.
+   * A user with permission to access all admin pages & functionality.
    *
    * @var \Drupal\user\UserInterface
    */
@@ -58,10 +58,10 @@ class AccessibilityTest extends WebDriverTestBase {
    *   The path to be tested.
    * @param ?array $options
    *   (optional) Associative array of Axe options.
-   * 
-   * @dataProvider providerTestAnonymousPages
+   *
+   * @dataProvider providerTestAdminPages
    */
-  public function testAnonymousPages(string $uri, ?array $options = NULL): void {
+  public function testAdminPages(string $uri, ?array $options = NULL): void {
     $this->drupalGet($uri);
     $this->executeAxe($options);
   }
@@ -72,7 +72,7 @@ class AccessibilityTest extends WebDriverTestBase {
    * @return array
    *   Test cases.
    */
-  public static function providerTestAnonymousPages(): array {
+  public static function providerTestAdminPages(): array {
     return [
       'User Edit' => [
         '/user/1/edit',
