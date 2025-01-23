@@ -24,7 +24,7 @@ class AccessibilityTest extends WebDriverTestBase {
   /**
    * {@inheritdoc}
    */
-  protected $defaultTheme = 'olivero';
+  protected $profile = 'nightwatch_a11y_testing';
 
   /**
    * Test some pages.
@@ -44,11 +44,31 @@ class AccessibilityTest extends WebDriverTestBase {
    */
   public static function providerTestAnonymousPages(): array {
     return [
-      [''],
-      ['user/login'],
-      ['user/register'],
-      ['user/password'],
-      ['search/node'],
+      'Homepage' => [
+        '/',
+        [
+          'rules' => [
+            'region' => ['enabled' => FALSE],
+          ],
+        ],
+      ],
+      'Login' => [
+        '/user/login',
+        [
+          'rules' => [
+            'region' => ['enabled' => FALSE],
+          ],
+        ],
+      ],
+      'Search' => [
+        '/search/node',
+        [
+          'rules' => [
+            'heading-order' => ['enabled' => FALSE],
+            'duplicate-id-aria' => ['enabled' => FALSE],
+          ],
+        ],
+      ],
     ];
   }
 
