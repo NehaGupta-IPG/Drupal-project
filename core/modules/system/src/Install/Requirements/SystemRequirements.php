@@ -727,13 +727,17 @@ class SystemRequirements implements InstallRequirementsInterface {
         // Check for the string which was added to the recommended .htaccess
         // file in the latest security update.
         if (!file_exists($htaccess_file) || !($contents = @file_get_contents($htaccess_file)) || !str_contains($contents, 'Drupal_Security_Do_Not_Remove_See_SA_2013_003')) {
-          $url = 'https://www.drupal.org/SA-CORE-2013-003';
           $requirements[$htaccess_file] = [
             // phpcs:ignore Drupal.Semantics.FunctionT.NotLiteralString
             'title' => new TranslatableMarkup($protected_dir->getTitle()),
             'value' => t('Not fully protected'),
             'severity' => RequirementSeverity::Error,
-            'description' => t('See <a href=":url">@url</a> for information about the recommended .htaccess file which should be added to the %directory directory to help protect against arbitrary code execution.', [':url' => $url, '@url' => $url, '%directory' => $protected_dir->getPath()]),
+            'description' => t('See <a href=":doc">@doc</a> for the recommended .htaccess file to add to the %directory to protect against arbitrary code execution.',
+              [
+                ':doc' => 'https://www.drupal.org/docs/installing-drupal/some-directory-not-fully-protected',
+                '@doc' => t('how to protect a directory'),
+                '%directory' => Drupal::service('file_system')->realpath($protected_dir->getPath()),
+              ]),
           ];
         }
       }
