@@ -349,6 +349,9 @@ class FieldViewsDataProvider {
           if ($field_storage->getType() == 'boolean') {
             $filter = 'boolean';
           }
+          elseif ($field_storage->getType() == 'timestamp') {
+            $filter = 'date';
+          }
           break;
 
         case 'blob':
