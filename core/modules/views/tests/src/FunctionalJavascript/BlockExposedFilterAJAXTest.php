@@ -107,7 +107,7 @@ class BlockExposedFilterAJAXTest extends WebDriverTestBase {
   /**
    * Tests that clicking filter doesn't unset sort.
    */
-  public function testSortPersistence() {
+  public function testSortPersistence(): void {
     $this->drupalPlaceBlock('views_exposed_filter_block:block_exposed_ajax2-page_1');
     $this->drupalGet('/test-exposed-block');
     $page = $this->getSession()->getPage();

@@ -73,7 +73,7 @@ class BlockOverridesAJAXTest extends WebDriverTestBase {
   /**
    * Tests if block overrides are persisted through AJAX requests.
    */
-  public function testBlockOverridesAjax() {
+  public function testBlockOverridesAjax(): void {
     $page = $this->getSession()->getPage();
     $assert_session = $this->assertSession();
 
