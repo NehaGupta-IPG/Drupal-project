@@ -74,18 +74,20 @@ class LinkItemUrlValidationTest extends FieldKernelTestBase {
       [$value, $expected_violations] = $data;
       $this->linkItem->setValue($value);
       $violations = $this->linkItem->validate();
+
+      $i = 0;
+      foreach ($violations as $violation) {
+        $this->assertTrue(isset($expected_violations[$i]), 'Unexpected violation: ' . $violation->getMessage());
+        $error_msg = $expected_violations[$i++];
+        // If the expected message contains a '%' add the current link value.
+        if (strpos($error_msg, '%')) {
+          $error_msg = sprintf($error_msg, $value);
+        }
+        $this->assertEquals($error_msg, $violation->getMessage());
+      }
+
       $expected_count = count($expected_violations);
       $this->assertCount($expected_count, $violations, sprintf('Violation message count error for %s', $value));
-      if ($expected_count) {
-        $i = 0;
-        foreach ($expected_violations as $error_msg) {
-          // If the expected message contains a '%' add the current link value.
-          if (strpos($error_msg, '%')) {
-            $error_msg = sprintf($error_msg, $value);
-          }
-          $this->assertEquals($error_msg, $violations[$i++]->getMessage());
-        }
-      }
     }
   }
 
@@ -174,7 +176,28 @@ class LinkItemUrlValidationTest extends FieldKernelTestBase {
   protected function getInternalTestLinks(): array {
     $violation_0 = "The path '%s' is inaccessible.";
     return [
+      // Text-only links.
+      ['route:<nolink>', []],
+      ['route:<button>', []],
+      ['route:<button>', []],
+
+      // Query string and fragment.
+      ['internal:?example=llama', []],
+      ['internal:#example', []],
+
+      // Complex query string. Similar to facet links.
+      ['internal:?a[]=1&a[]=2', []],
+      ['internal:?b[0]=1&b[1]=2', []],
+      ['internal:?e[f][g]=h', []],
+      ['internal:?i[j[k]]=l', []],
+      ['internal:?x=1&x=2', []],
+      ['internal:?z[0]=1&z[0]=2', []],
+
+      // URI for an entity that doesn't exist, but with a valid ID.
+      ['entity:user/99999', [$violation_0]],
+      // URI for an entity that exists, but is not accessible.
       ['entity:entity_test/' . $this->forbiddenEntity->id(), [$violation_0]],
+
     ];
   }
 
