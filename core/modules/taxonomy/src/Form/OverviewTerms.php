@@ -376,7 +376,9 @@ class OverviewTerms extends EntityForm implements WorkspaceSafeFormInterface {
         '#type' => 'html_tag',
         '#tag' => 'div',
         'child' => [
-          '#markup' => t('<span class="color-success">⇒</span> indicates matching terms. Parents of matching terms are also shown.'),
+          '#markup' => t('<span class="color-success">@indicator</span> indicates matching terms. Parents of matching terms are also shown.', [
+            '@indicator' => self::MATCHING_TERM_INDICATOR,
+          ]),
         ],
       ];
     }
@@ -398,7 +400,7 @@ class OverviewTerms extends EntityForm implements WorkspaceSafeFormInterface {
           '#type' => 'html_tag',
           '#tag' => 'span',
           'child' => [
-            '#markup' => '⇒',
+            '#markup' => self::MATCHING_TERM_INDICATOR,
           ],
         ];
         if (!empty($matchingTids) && in_array($term->id(), $matchingTids, FALSE)) {
