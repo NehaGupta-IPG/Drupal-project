@@ -293,7 +293,7 @@ class FileFieldDisplayTest extends FileFieldTestBase {
     $this->assertEquals($expected_url, $node->{$field_name}->view($display_options)[0]['#markup']);
     $this->assertContains('url.site', $node->{$field_name}->view($display_options)[0]['#cache']['contexts']);
 
-    // Disable the "absolute_url" option and validate the cache context.
+    // Disable the "absolute_url" option and check the cache context is valid.
     $display_options = [
       'type' => 'file_url_plain',
       'settings' => [
