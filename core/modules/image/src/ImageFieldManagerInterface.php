@@ -27,7 +27,7 @@ interface ImageFieldManagerInterface {
   public function getDefaultImageFields(): array;
 
   /**
-   * Check access to a default image.
+   * Checks the access to a default image.
    *
    * This is used in image_file_download() to determine whether to grant access
    * to an image stored in the private file storage.
