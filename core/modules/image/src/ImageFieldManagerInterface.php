@@ -17,7 +17,7 @@ interface ImageFieldManagerInterface {
   public const string DEFAULT_IMAGE_DIRECTORY = 'default_images';
 
   /**
-   * Map default values for image fields, and those fields' definitions.
+   * Maps default values for image fields, and those fields' definitions.
    *
    * @return array<string, \Drupal\Core\Field\FieldDefinitionInterface[]>
    *   An associative array, where the keys are image file URIs, and the values
