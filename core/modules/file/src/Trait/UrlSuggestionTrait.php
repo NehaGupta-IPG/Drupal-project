@@ -27,7 +27,7 @@ trait UrlSuggestionTrait {
   }
 
   /**
-   * Get the URL suggestion for the absolute URL.
+   * Get the URL suggestion for the relative URL.
    *
    * @return array
    */
