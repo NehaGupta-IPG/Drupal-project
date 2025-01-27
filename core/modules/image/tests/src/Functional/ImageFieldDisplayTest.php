@@ -611,15 +611,15 @@ class ImageFieldDisplayTest extends ImageFieldTestBase {
 
     // Check that the default image itself can be downloaded; i.e.: not just the
     // HTML markup.
-    $urlForPrivateDefaultImageInNodeField = \Drupal::service('file_url_generator')->generateAbsoluteString($file->getFileUri());
+    $private_default_image_url = \Drupal::service('file_url_generator')->generateAbsoluteString($file->getFileUri());
     // Check that a user can download the default image attached to a node field
     // configured to store data in the private file storage.
-    $this->drupalGet($urlForPrivateDefaultImageInNodeField);
+    $this->drupalGet($private_default_image_url);
     $this->assertSession()->statusCodeEquals(200);
     // Now, install a module that denies access to the field; and check that the
     // same user now receives a 403 Access Denied.
     \Drupal::service('module_installer')->install(['image_field_display_test_default_private_storage']);
-    $this->drupalGet($urlForPrivateDefaultImageInNodeField);
+    $this->drupalGet($private_default_image_url);
     $this->assertSession()->statusCodeEquals(403);
   }
 
