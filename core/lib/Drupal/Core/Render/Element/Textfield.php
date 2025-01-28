@@ -45,7 +45,6 @@ class Textfield extends FormElementBase {
     return [
       '#input' => TRUE,
       '#size' => 60,
-      '#maxlength' => 128,
       '#autocomplete_route_name' => FALSE,
       '#process' => [
         [static::class, 'processAutocomplete'],
