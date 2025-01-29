@@ -99,20 +99,22 @@ class EntityAccessControlHandler extends EntityHandlerBase implements EntityAcce
 
     $return = $this->processAccessHookResults($access);
 
+    // Unless specifically allowed, it is not possible to delete or revert the
+    // default revision.
+    if (!$return->isAllowed()
+      && $entity instanceof RevisionableInterface
+      && $entity->isDefaultRevision()
+      && ($operation === 'revert' || $operation === 'delete revision')
+    ) {
+      $return = AccessResult::forbidden();
+    }
+
     // Also execute the default access check except when the access result is
     // already forbidden, as in that case, it can not be anything else.
     if (!$return->isForbidden()) {
-      // It is not possible to delete or revert the default revision.
-      if ($entity instanceof RevisionableInterface
-        && $entity->isDefaultRevision()
-        && ($operation === 'revert' || $operation === 'delete revision')
-      ) {
-        $return = AccessResult::forbidden();
-      }
-      else {
-        $return = $return->orIf($this->checkAccess($entity, $operation, $account));
-      }
+      $return = $return->orIf($this->checkAccess($entity, $operation, $account));
     }
+
     $result = $this->setCache($return, $cid, $operation, $langcode, $account);
     return $return_as_object ? $result : $result->isAllowed();
   }
