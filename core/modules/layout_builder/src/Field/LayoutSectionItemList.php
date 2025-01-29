@@ -35,9 +35,12 @@ class LayoutSectionItemList extends FieldItemList implements SectionListInterfac
   public function getSections() {
     $sections = [];
     foreach ($this->list as $delta => $item) {
-      $sections[$delta] = $item->section;
+      $section = $item->section;
+      if ($section->hasLayout()) {
+        $sections[$delta] = $item->section;
+      }
     }
-    return $sections;
+    return array_values($sections);
   }
 
   /**
@@ -48,8 +51,10 @@ class LayoutSectionItemList extends FieldItemList implements SectionListInterfac
     $sections = array_values($sections);
     /** @var \Drupal\layout_builder\Plugin\Field\FieldType\LayoutSectionItem $item */
     foreach ($sections as $section) {
-      $item = $this->appendItem();
-      $item->section = $section;
+      if ($section->hasLayout()) {
+        $item = $this->appendItem();
+        $item->section = $section;
+      }
     }
 
     return $this;
@@ -73,8 +78,14 @@ class LayoutSectionItemList extends FieldItemList implements SectionListInterfac
     parent::preSave();
     // Loop through each section and reconstruct it to ensure that all default
     // values are present.
-    foreach ($this->list as $item) {
-      $item->section = Section::fromArray($item->section->toArray());
+    foreach ($this->list as $delta => $item) {
+      $section = $item->section;
+      if ($section->hasLayout()) {
+        $item->section = Section::fromArray($section->toArray());
+      }
+      else {
+        unset($this->list[$delta]);
+      }
     }
   }
 

@@ -48,7 +48,7 @@ class LayoutPluginManager extends DefaultPluginManager implements LayoutPluginMa
     $this->themeHandler = $theme_handler;
 
     $type = $this->getType();
-    $this->setCacheBackend($cache_backend, $type);
+    $this->setCacheBackend($cache_backend, $type, ['config:core.extension']);
     $this->alterInfo($type);
   }
 
