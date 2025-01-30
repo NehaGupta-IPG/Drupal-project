@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+namespace Drupal\image_field_display_test_default_private_storage\Hook;
+
 use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Access\AccessResultInterface;
 use Drupal\Core\Field\FieldDefinitionInterface;
