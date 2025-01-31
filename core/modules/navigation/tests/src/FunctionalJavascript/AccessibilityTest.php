@@ -9,7 +9,7 @@ use Drupal\Tests\AxeCoreTestTrait;
 use Drupal\user\UserInterface;
 
 /**
- * Performs accessibility tests for navigation module.
+ * Performs accessibility tests for the navigation module.
  *
  * @group navigation
  * @group accessibility
@@ -47,7 +47,7 @@ class AccessibilityTest extends WebDriverTestBase {
   }
 
   /**
-   * Performs accessibility tests for navigation module.
+   * Performs accessibility tests for the navigation module.
    *
    * @param string $uri
    *   The path to be tested.

@@ -62,7 +62,7 @@ class AccessibilityTest extends WebDriverTestBase {
   }
 
   /**
-   * Data provider for testPages.
+   * Data provider for testAdminPages.
    *
    * @return array
    *   Test cases.
