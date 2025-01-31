@@ -7,7 +7,7 @@ namespace Drupal\accessibility_test\Controller;
 use Drupal\Core\Controller\ControllerBase;
 
 /**
- * Controller providing page callbacks for accessibility_test module.
+ * Controller providing page callbacks for the accessibility_test module.
  */
 class AccessibilityTestController extends ControllerBase {
 
