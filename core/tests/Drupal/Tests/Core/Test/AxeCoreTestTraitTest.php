@@ -103,8 +103,12 @@ TEXT
     try {
       $this->executeAxe();
     }
-    catch (AssertionFailedError) {
-      // No-op just to swallow expected violations.
+    catch (AssertionFailedError $exception) {
+      // Test setup requires existence of violations from this run.
+      $this->assertStringContainsString(
+        'Accessibility test failures',
+        $exception->getMessage()
+      );
     }
 
     // Run again on arbitrary tag that should not have violations or errors.
