@@ -55,16 +55,16 @@ trait AxeCoreTestTrait {
       window.axe_errors = undefined;
 
       // Analyze page.
-      axe.run('body', {$options_json})
+      axe
+        .run('body', {$options_json})
         .then((results) => {
-            window.axe_results = results
-          })
+          window.axe_results = results;
+        })
         .catch((e) => {
           if (window.axe_errors) {
-              window.axe_errors.push(e.message);
-          }
-          else {
-              window.axe_errors = [e.message];
+            window.axe_errors.push(e.message);
+          } else {
+            window.axe_errors = [e.message];
           }
         });
     JS);
