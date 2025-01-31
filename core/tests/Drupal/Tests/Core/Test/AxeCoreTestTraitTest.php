@@ -11,7 +11,7 @@ use PHPUnit\Framework\AssertionFailedError;
 /**
  * Tests AxeCoreTestTrait.
  *
- * @coversDefaultClass \Drupal\Core\Test\AxeCoreTestTrait
+ * @coversDefaultClass \Drupal\Tests\AxeCoreTestTrait
  * @group Testing
  */
 class AxeCoreTestTraitTest extends WebDriverTestBase {
