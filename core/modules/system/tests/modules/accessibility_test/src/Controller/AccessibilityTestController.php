@@ -7,17 +7,17 @@ namespace Drupal\accessibility_test\Controller;
 use Drupal\Core\Controller\ControllerBase;
 
 /**
- * Controller providing page callbacks for the action admin interface.
+ * Controller providing page callbacks for accessibility_test module.
  */
 class AccessibilityTestController extends ControllerBase {
 
   /**
-   * Prints the stored session value to the screen.
+   * Prints known accessibility failures to the screen.
    *
-   * @return string
-   *   A notification message.
+   * @return array
+   *   A render array.
    */
-  public function page() {
+  public function page(): array {
     $html = <<<HTML
       <section>
         <h2>Poor contrast (WCAG 2 AA)</h2>
