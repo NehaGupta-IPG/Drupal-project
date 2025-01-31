@@ -104,7 +104,6 @@ TEXT
       $this->executeAxe();
     }
     catch (AssertionFailedError) {
-      // var_dump($exception->getMessage());
       // No-op just to swallow expected violations.
     }
 
