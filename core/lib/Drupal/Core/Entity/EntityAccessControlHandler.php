@@ -76,6 +76,13 @@ class EntityAccessControlHandler extends EntityHandlerBase implements EntityAcce
     if ($entity instanceof RevisionableInterface) {
       /** @var \Drupal\Core\Entity\RevisionableInterface $entity */
       $cid .= ':' . $entity->getRevisionId();
+      // It is not possible to delete or revert the default revision.
+      if ($operation === 'delete revision' && $entity->isDefaultRevision()) {
+        return $return_as_object ? AccessResult::forbidden() : FALSE;
+      }
+      elseif ($operation === 'revert' && $entity->isLatestRevision()) {
+        return $return_as_object ? AccessResult::forbidden() : FALSE;
+      }
     }
 
     if (($return = $this->getCache($cid, $operation, $langcode, $account)) !== NULL) {
@@ -99,22 +106,11 @@ class EntityAccessControlHandler extends EntityHandlerBase implements EntityAcce
 
     $return = $this->processAccessHookResults($access);
 
-    // Unless specifically allowed, it is not possible to delete or revert the
-    // default revision.
-    if (!$return->isAllowed()
-      && $entity instanceof RevisionableInterface
-      && $entity->isDefaultRevision()
-      && ($operation === 'revert' || $operation === 'delete revision')
-    ) {
-      $return = AccessResult::forbidden();
-    }
-
     // Also execute the default access check except when the access result is
     // already forbidden, as in that case, it can not be anything else.
     if (!$return->isForbidden()) {
       $return = $return->orIf($this->checkAccess($entity, $operation, $account));
     }
-
     $result = $this->setCache($return, $cid, $operation, $langcode, $account);
     return $return_as_object ? $result : $result->isAllowed();
   }
