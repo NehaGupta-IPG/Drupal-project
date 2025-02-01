@@ -31,7 +31,7 @@ class AxeCoreTestTraitTest extends WebDriverTestBase {
   /**
    * Tests Axe call with no options.
    */
-  public function testAxeCoreTestTraitDefaults() {
+  public function testAxeCoreTestTraitDefaults(): void {
 
     $this->drupalGet('accessibility-test');
 
@@ -62,7 +62,7 @@ TEXT
    *
    * @dataProvider providerAxeCoreTestTraitWithOptions
    */
-  public function testAxeCoreTestTraitWithRuleOptions(array $axe_options, string $expected_message) {
+  public function testAxeCoreTestTraitWithRuleOptions(array $axe_options, string $expected_message): void {
     $this->drupalGet('accessibility-test');
 
     $this->expectException(AssertionFailedError::class);
@@ -73,7 +73,7 @@ TEXT
   /**
    * Tests that Axe errors are reported as PHPUnit failures.
    */
-  public function testAxeCoreTestTraitReportsErrors() {
+  public function testAxeCoreTestTraitReportsErrors(): void {
 
     $this->drupalGet('accessibility-test');
 
@@ -94,7 +94,10 @@ TEXT
     ]);
   }
 
-  public function testAxeCoreTestTraitClearsPreviousResults() {
+  /**
+   * Tests that results do not bleed into subsequent runs on same session.
+   */
+  public function testAxeCoreTestTraitClearsPreviousResults(): void {
 
     // Violations
     $this->drupalGet('accessibility-test');

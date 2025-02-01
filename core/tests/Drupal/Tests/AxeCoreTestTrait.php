@@ -87,7 +87,7 @@ trait AxeCoreTestTrait {
 
     $this->assertEmpty(
       $results['violations'],
-      $this->formatViolationsReport($results, $results['url'])
+      $this->formatViolationsReport($results)
     );
   }
 
