@@ -32,6 +32,14 @@ interface BreakpointInterface {
   public function getMediaQuery();
 
   /**
+   * Checks if the breakpoint has a media query.
+   *
+   * @return bool
+   *   TRUE if the breakpoint has a media query, FALSE otherwise.
+   */
+  public function hasMediaQuery(): bool;
+
+  /**
    * Returns the multipliers.
    *
    * @return array

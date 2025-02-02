@@ -90,6 +90,29 @@ class BreakpointTest extends UnitTestCase {
   }
 
   /**
+   * @covers ::hasMediaQuery
+   * @dataProvider providerHasMediaQuery
+   */
+  public function testHasMediaQuery(?string $mediaQuery, bool $expectedValue): void {
+    $this->pluginDefinition['mediaQuery'] = $mediaQuery;
+    $this->setupBreakpoint();
+    $this->assertEquals($expectedValue, $this->breakpoint->hasMediaQuery());
+  }
+
+  /**
+   * Test cases for ::testHasMediaQuery.
+   */
+  public static function providerHasMediaQuery(): array {
+    return [
+      'Empty string' => ['', FALSE],
+      'NULL' => [NULL, FALSE],
+      'Not empty string' => ['not empty string', TRUE],
+      'Not empty but "0" falsy string' => ['0', TRUE],
+      'Not empty but "FALSE" falsy string' => ['FALSE', TRUE],
+    ];
+  }
+
+  /**
    * @covers ::getMediaQuery
    * @dataProvider providerGetMediaQueryReturnsTrimmedString
    */

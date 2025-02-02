@@ -32,10 +32,17 @@ class Breakpoint extends PluginBase implements BreakpointInterface {
    * {@inheritdoc}
    */
   public function getMediaQuery() {
-    if (!empty($this->pluginDefinition['mediaQuery'])) {
+    if ($this->hasMediaQuery()) {
       return trim((string) $this->pluginDefinition['mediaQuery']);
     }
     return '';
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function hasMediaQuery(): bool {
+    return isset($this->pluginDefinition['mediaQuery']) && '' !== $this->pluginDefinition['mediaQuery'];
   }
 
   /**
