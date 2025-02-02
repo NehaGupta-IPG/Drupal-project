@@ -19,7 +19,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 abstract class EntityReferenceFormatterBase extends FormatterBase {
 
   /**
-   * Constructs a FormatterBase object.
+   * Constructs a EntityReferenceFormatterBase object.
    *
    * @param string $plugin_id
    *   The plugin ID for the formatter.

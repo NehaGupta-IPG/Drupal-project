@@ -64,7 +64,7 @@ class ImageWidget extends FileWidget {
     parent::__construct($plugin_id, $plugin_definition, $field_definition, $settings, $third_party_settings, $element_info);
     $this->imageFactory = $image_factory ?: \Drupal::service('image.factory');
     if ($this->entityRepository === NULL) {
-      @trigger_error('Calling ' . __METHOD__ . ' without the $entityRepository argument is deprecated in drupal:11.1.0 and it will be required in drupal:12.0.0. See https://www.drupal.org/node/3486475', E_USER_DEPRECATED);
+      @trigger_error('Calling ' . __METHOD__ . ' without the $entityRepository argument is deprecated in drupal:11.2.0 and it will be required in drupal:12.0.0. See https://www.drupal.org/node/3486475', E_USER_DEPRECATED);
       $this->entityRepository = \Drupal::service('entity.repository');
     }
   }
