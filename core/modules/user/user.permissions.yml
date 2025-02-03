@@ -22,3 +22,6 @@ select account cancellation method:
 cancel account:
   title: 'Cancel own user account'
   description: 'Note: content may be kept, unpublished, deleted or transferred to the anonymous user depending on the configured user settings.'
+view own account details:
+  title: 'View own account details'
+  description: 'Allow the user to access their own account information.'
