@@ -70,10 +70,10 @@ class InstallerTranslationTest extends InstallerTestBase {
     parent::setUpSettings();
 
     // Ensure that the error message translation is working.
-    // cSpell:disable.
+    // cSpell:disable
     $this->assertSession()->responseContains('Beheben Sie alle Probleme unten, um die Installation fortzusetzen. Informationen zur Konfiguration der Datenbankserver finden Sie in der <a href="https://www.drupal.org/docs/installing-drupal">Installationshandbuch</a>, oder kontaktieren Sie Ihren Hosting-Anbieter.');
     $this->assertSession()->responseContains('<strong>CREATE</strong> ein Test-Tabelle auf Ihrem Datenbankserver mit dem Befehl <em class="placeholder">CREATE TABLE {drupal_install_test} (id int NOT NULL PRIMARY KEY)</em> fehlgeschlagen.');
-    // cSpell:enable.
+    // cSpell:enable
 
     // Now do it successfully.
     Database::getConnection('default')->schema()->dropTable('drupal_install_test');

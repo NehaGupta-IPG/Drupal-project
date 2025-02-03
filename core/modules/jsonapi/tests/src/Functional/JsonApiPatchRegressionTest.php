@@ -438,7 +438,7 @@ class JsonApiPatchRegressionTest extends JsonApiFunctionalTestBase {
               // Intentional typo in the property name!
               'form' => 'plain_text',
               // Another intentional typo.
-              // cSpell:disable-next-line.
+              // cSpell:disable-next-line
               'sumary' => 'Boring old "Hello World".',
               // And finally, one that is completely absurd.
               'foobar' => '<script>alert("HI!");</script>',
@@ -453,7 +453,7 @@ class JsonApiPatchRegressionTest extends JsonApiFunctionalTestBase {
     $data = $this->getDocumentFromResponse($response, FALSE);
     $this->assertSame(422, $response->getStatusCode());
     $this->assertNotNull($data);
-    // cSpell:disable-next-line.
+    // cSpell:disable-next-line
     $this->assertSame("The properties 'form', 'sumary', 'foobar' do not exist on the 'body' field of type 'text_with_summary'. Writable properties are: 'value', 'format', 'summary'.", $data['errors'][0]['detail']);
 
     $request_options = [
@@ -473,7 +473,7 @@ class JsonApiPatchRegressionTest extends JsonApiFunctionalTestBase {
               // Intentional typo in the property name!
               'form' => 'plain_text',
               // Another intentional typo.
-              // cSpell:disable-next-line.
+              // cSpell:disable-next-line
               'sumary' => 'Boring old "Hello World".',
             ],
           ],
@@ -486,7 +486,7 @@ class JsonApiPatchRegressionTest extends JsonApiFunctionalTestBase {
     $data = $this->getDocumentFromResponse($response, FALSE);
     $this->assertSame(422, $response->getStatusCode());
     $this->assertNotNull($data);
-    // cSpell:disable-next-line.
+    // cSpell:disable-next-line
     $this->assertSame("The properties 'form', 'sumary' do not exist on the 'body' field of type 'text_with_summary'. Did you mean 'format', 'summary'?", $data['errors'][0]['detail']);
   }
 

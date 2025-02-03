@@ -132,7 +132,7 @@ class HtmlTest extends TestCase {
    *   Test data.
    */
   public static function providerTestHtmlGetUniqueId() {
-    // cSpell:disable.
+    // cSpell:disable
     $id = 'abcdefghijklmnopqrstuvwxyz-0123456789';
     return [
       // Verify that letters, digits, and hyphens are not stripped from the ID.
@@ -146,7 +146,7 @@ class HtmlTest extends TestCase {
       ['test-unique-id--2', 'test-unique-id'],
       ['test-unique-id--3', 'test-unique-id'],
     ];
-    // cSpell:enable.
+    // cSpell:enable
   }
 
   /**
@@ -215,7 +215,7 @@ class HtmlTest extends TestCase {
    *   Test data.
    */
   public static function providerTestHtmlGetId() {
-    // cSpell:disable.
+    // cSpell:disable
     $id = 'abcdefghijklmnopqrstuvwxyz-0123456789';
     return [
       // Verify that letters, digits, and hyphens are not stripped from the ID.
@@ -228,7 +228,7 @@ class HtmlTest extends TestCase {
       ['test-unique-id', 'test-unique-id'],
       ['test-unique-id', 'test-unique-id'],
     ];
-    // cSpell:enable.
+    // cSpell:enable
   }
 
   /**

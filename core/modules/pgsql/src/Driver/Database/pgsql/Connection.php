@@ -13,7 +13,7 @@ use Drupal\Core\Database\SupportsTemporaryTablesInterface;
 use Drupal\Core\Database\Transaction\TransactionManagerInterface;
 use Pdo\Pgsql;
 
-// cSpell:ignore ilike nextval.
+// cSpell:ignore ilike nextval
 
 /**
  * @addtogroup database

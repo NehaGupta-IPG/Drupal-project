@@ -301,7 +301,7 @@ class MediaEntityMetadataApiTest extends BrowserTestBase {
     $media_fi->field_media_image->setValue([
       [
         'target_id' => '1',
-        // cSpell:disable-next-line.
+        // cSpell:disable-next-line
         'alt' => 'oletus alt-teksti kuvalle',
       ],
     ]);
@@ -314,7 +314,7 @@ class MediaEntityMetadataApiTest extends BrowserTestBase {
     // Ensure that translation is returned when language is specified.
     $this->drupalGet($path, ['query' => ['uuid' => $uuid, 'token' => $token], 'language' => $media_fi->language()]);
     $this->assertSession()->statusCodeEquals(200);
-    // cSpell:disable-next-line.
+    // cSpell:disable-next-line
     $this->assertSame(json_encode(['type' => 'image', 'imageSourceMetadata' => ['alt' => 'oletus alt-teksti kuvalle']]), $this->getSession()->getPage()->getContent());
 
     // Ensure that default translation is returned when no language is

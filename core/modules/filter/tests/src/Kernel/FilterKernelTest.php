@@ -412,7 +412,7 @@ class FilterKernelTest extends KernelTestBase {
     // Since the line break filter naturally needs plenty of newlines in test
     // strings and expectations, we're using "\n" instead of regular newlines
     // here.
-    // cSpell:disable.
+    // cSpell:disable
     $tests = [
       // Single line breaks should be changed to <br /> tags, while paragraphs
       // separated with double line breaks should be enclosed with <p></p> tags.
@@ -486,7 +486,7 @@ class FilterKernelTest extends KernelTestBase {
         '<p><drupal-media data-caption=" " data-entity-type="media" data-entity-uuid="dbb16f97-cd11-4357-acde-cd09e19e312b"></drupal-media></p>' => FALSE,
       ],
     ];
-    // cSpell:enable.
+    // cSpell:enable
     $this->assertFilteredString($filter, $tests);
 
     // Very long string hitting PCRE limits.
@@ -1157,10 +1157,10 @@ class FilterKernelTest extends KernelTestBase {
     $f = Html::normalize('<p>test\n</p>\n');
     $this->assertEquals('<p>test\n</p>\n', $f, 'HTML corrector -- New-lines are accepted and kept as-is.');
 
-    // cSpell:disable.
+    // cSpell:disable
     $f = Html::normalize('<p>دروبال');
     $this->assertEquals('<p>دروبال</p>', $f, 'HTML corrector -- Encoding is correctly kept.');
-    // cSpell:enable.
+    // cSpell:enable
 
     $html = '<script>alert("test")</script>';
     $this->assertEquals($html, Html::normalize($html), 'HTML corrector -- script element');

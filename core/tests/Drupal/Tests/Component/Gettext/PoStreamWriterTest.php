@@ -95,7 +95,7 @@ class PoStreamWriterTest extends TestCase {
    *   - Content longer than 10 bytes.
    */
   public static function providerWriteData() {
-    // cSpell:disable.
+    // cSpell:disable
     return [
       ['', '', FALSE],
       ["\r\n", "\r\n", FALSE],
@@ -105,7 +105,7 @@ class PoStreamWriterTest extends TestCase {
       ['中文 890', '中文 890', FALSE],
       ['中文 89012', '中文 890', TRUE],
     ];
-    // cSpell:enable.
+    // cSpell:enable
   }
 
   /**

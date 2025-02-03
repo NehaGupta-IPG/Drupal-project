@@ -202,7 +202,7 @@ class MenuRouterTest extends BrowserTestBase {
       // Characters that look like a percent-escaped string.
       "%23%25%26%2B%2F%3F" .
       // Characters from various non-ASCII alphabets.
-      // cSpell:disable-next-line.
+      // cSpell:disable-next-line
       "éøïвβ中國書۞";
     $this->drupalGet($path);
     $this->assertSession()->pageTextContains('This is the menuTestCallback content.');

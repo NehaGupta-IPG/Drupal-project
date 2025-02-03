@@ -246,7 +246,7 @@ class Random {
    *   Nonsense latin words which form sentence(s).
    */
   public function sentences($min_word_count, $capitalize = FALSE) {
-    // cSpell:disable.
+    // cSpell:disable
     $dictionary = ["abbas", "abdo", "abico", "abigo", "abluo", "accumsan",
       "acsi", "ad", "adipiscing", "aliquam", "aliquip", "amet", "antehabeo",
       "appellatio", "aptent", "at", "augue", "autem", "bene", "blandit",
@@ -278,7 +278,7 @@ class Random {
       "virtus", "voco", "volutpat", "vulpes", "vulputate", "wisi", "ymo",
       "zelus",
     ];
-    // cSpell:enable.
+    // cSpell:enable
     $dictionary_flipped = array_flip($dictionary);
     $greeking = '';
 

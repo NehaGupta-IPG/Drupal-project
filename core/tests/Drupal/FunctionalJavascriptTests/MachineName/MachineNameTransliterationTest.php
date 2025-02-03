@@ -72,7 +72,7 @@ class MachineNameTransliterationTest extends WebDriverTestBase {
    */
   public static function machineNameInputOutput(): array {
     return [
-      // cSpell:disable.
+      // cSpell:disable
       ['en', 'Bob', 'bob'],
       ['en', 'Äwesome', 'awesome'],
       ['de', 'Äwesome', 'aewesome'],
@@ -89,7 +89,7 @@ class MachineNameTransliterationTest extends WebDriverTestBase {
       ['da', 'Ä Ö Ü Å Ø äöüåøhello', 'a_o_u_aa_oe_aouaaoehello'],
       ['kg', 'ц', 'ts'],
       ['en', ' Hello Abventor! ', 'hello_abventor'],
-      // cSpell:enable.
+      // cSpell:enable
     ];
   }
 

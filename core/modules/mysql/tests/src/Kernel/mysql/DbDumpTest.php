@@ -104,7 +104,7 @@ class DbDumpTest extends DriverSpecificKernelTestBase {
     $storage->write('test_config', $this->data);
 
     // Create user account with some potential syntax issues.
-    // cspell:disable-next-line.
+    // cspell:disable-next-line
     $account = User::create(['mail' => 'q\'uote$dollar@example.com', 'name' => '$dollar']);
     $account->save();
 
@@ -162,7 +162,7 @@ class DbDumpTest extends DriverSpecificKernelTestBase {
     $this->assertMatchesRegularExpression('/' . $pattern . '/', $command_tester->getDisplay(), 'Generated data is found in the exported script.');
 
     // Check that the user account name and email address was properly escaped.
-    // cspell:disable-next-line.
+    // cspell:disable-next-line
     $pattern = preg_quote('"q\'uote\$dollar@example.com"');
     $this->assertMatchesRegularExpression('/' . $pattern . '/', $command_tester->getDisplay(), 'The user account email address was properly escaped in the exported script.');
     $pattern = preg_quote('\'$dollar\'');

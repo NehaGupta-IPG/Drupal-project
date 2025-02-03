@@ -257,7 +257,7 @@ class FilterHtml extends FilterBase {
 
     // Protect any trailing * characters in attribute names, since DomDocument
     // strips them as invalid.
-    // cSpell:disable-next-line.
+    // cSpell:disable-next-line
     $star_protector = '__zqh6vxfbk3cg__';
     $html = str_replace('*', $star_protector, $html);
 
