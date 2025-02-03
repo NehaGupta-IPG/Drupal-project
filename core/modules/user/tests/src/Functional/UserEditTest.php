@@ -6,6 +6,7 @@ namespace Drupal\Tests\user\Functional;
 
 use Drupal\Core\Cache\Cache;
 use Drupal\Tests\BrowserTestBase;
+use Drupal\user\RoleInterface;
 
 /**
  * Tests user edit page.
@@ -282,5 +283,52 @@ class UserEditTest extends BrowserTestBase {
     $this->assertSession()->fieldEnabled('edit-status-0');
     $this->assertSession()->fieldEnabled('edit-status-1');
   }
+  /**
+   * Tests the account form roles viewing/editing behavior.
+   */
+  public function testUserRolesAccess(): void {
+    $roleWithoutAnyPermission = $this->drupalCreateRole([]);
+    $userWithoutAnyPermission = $this->drupalCreateUser();
+    $userWithoutAnyPermission->addRole($roleWithoutAnyPermission)->save();
 
+    $roleWithViewOwnAccountDetailsPermission = $this->drupalCreateRole(['view own account details']);
+    $userWithViewOwnAccountDetailsPermission = $this->drupalCreateUser();
+    $userWithViewOwnAccountDetailsPermission->addRole($roleWithViewOwnAccountDetailsPermission)->save();
+
+    $roleWithAdministerPermissionsPermission = $this->drupalCreateRole(['administer permissions']);
+    $userWithAdministerPermissionsPermission = $this->drupalCreateUser();
+    $userWithAdministerPermissionsPermission->addRole($roleWithAdministerPermissionsPermission)->save();
+
+    // Check that the user without any permission can't view the roles field.
+    $this->drupalLogin($userWithoutAnyPermission);
+    $this->drupalGet("user/" . $userWithoutAnyPermission->id() . "/edit");
+    $this->assertSession()->elementNotExists('css', '#edit-roles');
+
+    // Check that the user with view own account details permission can
+    // view the roles field.
+    $this->drupalLogin($userWithViewOwnAccountDetailsPermission);
+    $this->drupalGet("user/" . $userWithViewOwnAccountDetailsPermission->id() . "/edit");
+    // They can view but not edit the authenticated role.
+    $this->assertSession()->fieldExists(sprintf('roles[%s]', RoleInterface::AUTHENTICATED_ID));
+    $this->assertSession()->fieldDisabled(sprintf('roles[%s]', RoleInterface::AUTHENTICATED_ID));
+    // They can view but not edit their own role.
+    $this->assertSession()->fieldExists(sprintf('roles[%s]', $roleWithViewOwnAccountDetailsPermission));
+    $this->assertSession()->fieldDisabled(sprintf('roles[%s]', $roleWithViewOwnAccountDetailsPermission));
+    // They can't view other roles.
+    $this->assertSession()->fieldNotExists(sprintf('roles[%s]', $roleWithAdministerPermissionsPermission));
+
+    // Check that the user with view and edit access to roles can
+    // view and edit the roles field.
+    $this->drupalLogin($userWithAdministerPermissionsPermission);
+    $this->drupalGet("user/" . $userWithAdministerPermissionsPermission->id() . "/edit");
+    // They can view but not edit the authenticated role.
+    $this->assertSession()->fieldExists(sprintf('roles[%s]', RoleInterface::AUTHENTICATED_ID));
+    $this->assertSession()->fieldDisabled(sprintf('roles[%s]', RoleInterface::AUTHENTICATED_ID));
+    // They can view and edit their own role.
+    $this->assertSession()->fieldExists(sprintf('roles[%s]', $roleWithAdministerPermissionsPermission));
+    $this->assertSession()->fieldEnabled(sprintf('roles[%s]', $roleWithAdministerPermissionsPermission));
+    // They can view and edit other roles.
+    $this->assertSession()->fieldExists(sprintf('roles[%s]', $roleWithViewOwnAccountDetailsPermission));
+    $this->assertSession()->fieldEnabled(sprintf('roles[%s]', $roleWithViewOwnAccountDetailsPermission));
+  }
 }

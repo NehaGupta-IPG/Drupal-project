@@ -207,13 +207,23 @@ abstract class AccountForm extends ContentEntityForm implements TrustedCallbackI
     $roles = Role::loadMultiple();
     unset($roles[RoleInterface::ANONYMOUS_ID]);
     $roles = array_map(fn(RoleInterface $role) => Html::escape($role->label()), $roles);
-
+    $rolesViewAccess = $rolesEditAccess = ($roles && $user->hasPermission('administer permissions'));
+    if ($account->id() === $user->id()) {
+      // The user is editing their own account, so they may view their own roles.
+      $rolesViewAccess = $roles && $user->hasPermission('view own account details');
+      if (!$rolesEditAccess) {
+        // Remove from the roles array any roles the user doesn't have to
+        // prevent disclosing their existence.
+        $roles = array_intersect_key($roles, array_flip($user->getRoles()));
+      }
+    }
     $form['account']['roles'] = [
       '#type' => 'checkboxes',
       '#title' => $this->t('Roles'),
       '#default_value' => (!$register ? $account->getRoles() : []),
       '#options' => $roles,
-      '#access' => $roles && $user->hasPermission('administer permissions'),
+      '#access' => $rolesViewAccess || $rolesEditAccess,
+      '#disabled' => !$rolesEditAccess,
     ];
 
     // Special handling for the inevitable "Authenticated user" role.
