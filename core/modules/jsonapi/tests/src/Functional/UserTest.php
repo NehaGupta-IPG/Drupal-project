@@ -459,6 +459,46 @@ class UserTest extends ResourceTestBase {
   }
 
   /**
+   * Tests GETting 'roles' relationship only if allowed.
+   */
+  public function testGetRolesRelationshipOnlyIfAllowed(): void {
+
+    $collection_url = Url::fromRoute('jsonapi.user--user.collection', [], ['query' => ['sort' => 'drupal_internal__uid']]);
+    $user_url = Url::fromRoute(sprintf('jsonapi.user--user.individual'), ['entity' => $this->account->uuid()]);
+    $request_options = [];
+    $request_options[RequestOptions::HEADERS]['Accept'] = 'application/vnd.api+json';
+    $request_options = NestedArray::mergeDeep($request_options, $this->getAuthenticationRequestOptions());
+
+    $user_url->setOption('query', ['include' => 'roles']);
+
+    // Check that the 'roles' relationship is not visible by default.
+    $response = $this->request('GET', $user_url, $request_options);
+    $doc = $this->getDocumentFromResponse($response);
+    $this->assertArrayNotHasKey('roles', $doc['data']['relationships'] ?? [], "Own user--user.individual resource's 'roles' relationship is not visible.");
+    // Also when looking at the collection.
+    $response = $this->request('GET', $collection_url, $request_options);
+    $doc = $this->getDocumentFromResponse($response);
+    $this->assertSame($this->account->uuid(), $doc['data']['2']['id']);
+    $this->assertArrayNotHasKey('roles', $doc['data'][2]['relationships'] ?? [], "Own user--user.collection resource's 'roles' relationship is not visible.");
+
+    // Now grant permission to view own account details.
+    $this->grantPermissionsToTestedRole(['view own account details']);
+
+    // Check that the 'roles' relationship is now visible.
+    $response = $this->request('GET', $user_url, $request_options);
+    $doc = $this->getDocumentFromResponse($response);
+    $this->assertArrayHasKey('relationships', $doc['data']);
+    $this->assertArrayHasKey('roles', $doc['data']['relationships'], "Own user--user.individual resource's 'roles' relationship is visible.");
+    // Also when looking at the collection.
+    $response = $this->request('GET', $collection_url, $request_options);
+    $doc = $this->getDocumentFromResponse($response);
+    $this->assertSame($this->account->uuid(), $doc['data']['2']['id']);
+    $this->assertArrayHasKey('relationships', $doc['data'][2]);
+    $this->assertArrayHasKey('roles', $doc['data'][2]['relationships'] ?? [], "Own user--user.collection resource's 'roles' relationship is visible.");
+
+  }
+
+  /**
    * Tests good error DX when trying to filter users by role.
    */
   public function testQueryInvolvingRoles(): void {
