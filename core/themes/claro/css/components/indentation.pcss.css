@@ -1,0 +1,101 @@
+/**
+ * @file
+ * Styles for custom indentation and tree item visibility for view access.
+ */
+
+/**
+ * Indentation.
+ */
+.indentation {
+  position: relative;
+  inset-inline-start: calc(var(--space-xs) * -0.5);
+  float: left; /* LTR */
+  width: 25px;
+  height: 25px;
+  background: none !important;
+  line-height: 0;
+
+  @nest .tabledrag-cell-content & {
+    /* Fixes Safari bug (16.1 at least) where table rows are overly large when
+      using indentation (e.g. re-ordering menu items. */
+    display: inline-flex;
+    float: none;
+    overflow: hidden;
+    flex-direction: column;
+    height: 100%;
+  }
+
+  @nest [dir="rtl"] & {
+    float: right;
+  }
+}
+
+/**
+ * Tree is the visual representation for the simultaneously moved draggable
+ * rows.
+ *
+ * These rules are styling the inline SVG that is placed inside the .indentation
+ * element.
+ */
+.tree {
+  width: 25px;
+  height: 25px;
+}
+
+.tree__item {
+  display: none;
+}
+
+/* LTR tree child. */
+.tree-child path {
+  &:not(.tree__item-child-ltr) {
+    display: none;
+  }
+
+  &.tree__item-child-ltr {
+    display: block;
+  }
+}
+
+/* RTL tree child. */
+[dir="rtl"] {
+  & .tree-child path {
+    &:not(.tree__item-child-rtl) {
+      display: none;
+    }
+    &.tree__item-child-rtl {
+      display: block;
+    }
+  }
+
+  /* Last RTL tree child. */
+  & .tree-child-last path {
+    &:not(.tree__item-child-last-rtl) {
+      display: none;
+    }
+    &.tree__item-child-last-rtl {
+      display: block;
+    }
+  }
+}
+
+/* Last LTR tree child. */
+.tree-child-last path {
+  &:not(.tree__item-child-last-ltr) {
+    display: none;
+  }
+  &.tree__item-child-last-ltr {
+    display: block;
+  }
+}
+
+/* Horizontal line. */
+.tree-child-horizontal path {
+  &:not(.tree__item-horizontal) {
+    display: none;
+  }
+
+  &.tree__item-horizontal {
+    display: block;
+  }
+}

@@ -39,6 +39,7 @@ global-styling:
       css/components/form--select.css: {}
       css/components/help.css: {}
       css/components/image-preview.css: {}
+      css/components/indentation.css: {}
       css/components/menus-and-lists.css: {}
       css/components/modules-page.css: {}
       css/components/node.css: {}
