@@ -74,19 +74,6 @@
     <include-pattern>core/profiles/*/tests/*</include-pattern>
   </rule>
 
-  <!-- The Drupal ruleset disables this rule, but core enables it for tests. -->
-  <rule ref="SlevomatCodingStandard.TypeHints.DeclareStrictTypes">
-    <include-pattern>*/tests/*</include-pattern>
-    <exclude-pattern>*/fixtures/*</exclude-pattern>
-  </rule>
-  <!-- This rule explicitly re-enables the disabled rule. -->
-  <rule ref="SlevomatCodingStandard.TypeHints.DeclareStrictTypes.DeclareStrictTypesMissing">
-    <severity>5</severity>
-  </rule>
-
-  <!-- Additional sniffs not in the Drupal ruleset. -->
-  <rule ref="SlevomatCodingStandard.Exceptions.RequireNonCapturingCatch" />
-
   <!-- Drupal best practice sniffs -->
   <rule ref="DrupalPractice">
     <exclude name="DrupalPractice.CodeAnalysis.VariableAnalysis.UndefinedUnsetVariable"/>
@@ -140,6 +127,19 @@
          <element value="/@inheritDoc/"/>
        </property>
     </properties>
+  </rule>
+
+  <!-- Additional sniffs not in the Drupal ruleset. -->
+  <rule ref="SlevomatCodingStandard.Exceptions.RequireNonCapturingCatch" />
+
+  <!-- The Drupal ruleset disables this rule, but core enables it for tests. -->
+  <rule ref="SlevomatCodingStandard.TypeHints.DeclareStrictTypes">
+    <include-pattern>*/tests/*</include-pattern>
+    <exclude-pattern>*/fixtures/*</exclude-pattern>
+  </rule>
+  <!-- This rule explicitly re-enables the disabled rule. -->
+  <rule ref="SlevomatCodingStandard.TypeHints.DeclareStrictTypes.DeclareStrictTypesMissing">
+    <severity>5</severity>
   </rule>
 
 </ruleset>

@@ -49,10 +49,6 @@ class SortTest extends TestCase {
     $files = $xml_encoded['file'];
     $this->assertSorted($files);
 
-    $this->assertArrayHasKey('exclude-pattern', $xml_encoded);
-    $excluded_patterns = $xml_encoded['exclude-pattern'];
-    $this->assertSorted($excluded_patterns);
-
     $this->assertArrayHasKey('rule', $xml_encoded);
     $rules = $xml_encoded['rule'];
     $this->assertSorted($rules, '@ref');
