@@ -10,8 +10,6 @@ use Drupal\taxonomy\VocabularyInterface;
 /**
  * Ensure that the term overview page filtering works properly.
  *
- * {@inheritdoc}
- *
  * @group taxonomy
  */
 class TaxonomyTermFilterTest extends TaxonomyTestBase {

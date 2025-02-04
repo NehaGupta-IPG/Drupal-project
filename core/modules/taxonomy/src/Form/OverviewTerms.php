@@ -26,6 +26,11 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 class OverviewTerms extends EntityForm implements WorkspaceSafeFormInterface {
 
   /**
+   * Indicator that a term matches the filter.
+   */
+  protected const MATCHING_TERM_INDICATOR = '⇒';
+
+  /**
    * The term storage handler.
    */
   protected TermStorageInterface $storageController;
