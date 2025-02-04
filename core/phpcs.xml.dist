@@ -25,7 +25,7 @@
   <file>scripts/run-tests.sh</file>
   <file>scripts/update-countries.sh</file>
 
-  <!-- Drupal sniffs -->
+  <!-- Drupal sniffs, excluding rules that core does not meet yet. -->
   <rule ref="Drupal">
     <exclude name="Drupal.Arrays.Array.LongLineDeclaration"/>
     <exclude name="Drupal.Commenting.ClassComment.Missing"/>
@@ -48,6 +48,8 @@
     <exclude name="Squiz.Arrays.ArrayDeclaration.KeySpecified"/>
     <exclude name="Squiz.Arrays.ArrayDeclaration.NoKeySpecified"/>
   </rule>
+
+  <!-- Drupal sniffs that core partially meets. -->
   <rule ref="Drupal.Commenting.FunctionComment.Missing">
     <include-pattern>core/modules/*/Plugin/views/argument/*</include-pattern>
     <include-pattern>core/modules/*/Plugin/views/filter/*</include-pattern>
@@ -79,7 +81,20 @@
     <include-pattern>core/profiles/*/tests/*</include-pattern>
   </rule>
 
-  <!-- Drupal Practice sniffs -->
+  <!-- The Drupal ruleset disables this rule, but we enable it for tests. -->
+  <rule ref="SlevomatCodingStandard.TypeHints.DeclareStrictTypes">
+    <include-pattern>*/tests/*</include-pattern>
+    <exclude-pattern>*/fixtures/*</exclude-pattern>
+  </rule>
+  <!-- This rule explicitly re-enables the disabled rule. -->
+  <rule ref="SlevomatCodingStandard.TypeHints.DeclareStrictTypes.DeclareStrictTypesMissing">
+    <severity>5</severity>
+  </rule>
+
+  <!-- Additional sniffs not in the Drupal ruleset. -->
+  <rule ref="SlevomatCodingStandard.Exceptions.RequireNonCapturingCatch" />
+
+  <!-- Drupal best practice sniffs -->
   <rule ref="DrupalPractice">
     <exclude name="DrupalPractice.CodeAnalysis.VariableAnalysis.UndefinedUnsetVariable"/>
     <exclude name="DrupalPractice.Commenting.CommentEmptyLine.SpacingAfter"/>
@@ -117,16 +132,7 @@
     <include-pattern>./core/lib/*</include-pattern>
   </rule>
 
-  <!-- Generic sniffs -->
-  <rule ref="Generic.Arrays.DisallowLongArraySyntax"/>
-
-  <!-- Internal sniffs -->
-  <rule ref="Internal.NoCodeFound">
-    <!-- No PHP code in *.yml -->
-    <exclude-pattern>*.yml</exclude-pattern>
-  </rule>
-
-  <!-- SlevomatCodingStandard sniffs -->
+  <!-- Prevent misuse of the @inheritdoc PHPDoc tag. -->
   <rule ref="SlevomatCodingStandard.Commenting.ForbiddenAnnotations">
     <properties>
       <property name="forbiddenAnnotations" type="array">
@@ -141,11 +147,6 @@
          <element value="/@inheritDoc/"/>
        </property>
     </properties>
-  </rule>
-  <rule ref="SlevomatCodingStandard.Exceptions.RequireNonCapturingCatch" />
-  <rule ref="SlevomatCodingStandard.TypeHints.DeclareStrictTypes">
-    <include-pattern>*/tests/*</include-pattern>
-    <exclude-pattern>*/fixtures/*</exclude-pattern>
   </rule>
 
 </ruleset>
