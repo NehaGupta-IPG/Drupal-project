@@ -68,7 +68,6 @@
     <include-pattern>*/Database/*</include-pattern>
     <include-pattern>*/FunctionalJavascript/*</include-pattern>
   </rule>
-  <rule ref="Drupal.Commenting.FunctionComment.MissingParamType"/>
   <rule ref="Drupal.Commenting.FunctionComment.MissingReturnComment">
     <include-pattern>core/lib/Drupal/Core/*</include-pattern>
     <include-pattern>core/lib/Drupal/Component/*</include-pattern>
@@ -84,7 +83,7 @@
     <include-pattern>core/profiles/*/tests/*</include-pattern>
   </rule>
 
-  <!-- The Drupal ruleset disables this rule, but we enable it for tests. -->
+  <!-- The Drupal ruleset disables this rule, but core enables it for tests. -->
   <rule ref="SlevomatCodingStandard.TypeHints.DeclareStrictTypes">
     <include-pattern>*/tests/*</include-pattern>
     <exclude-pattern>*/fixtures/*</exclude-pattern>
