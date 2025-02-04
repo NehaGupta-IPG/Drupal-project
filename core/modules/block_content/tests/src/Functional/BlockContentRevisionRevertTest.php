@@ -73,7 +73,6 @@ class BlockContentRevisionRevertTest extends BlockContentTestBase {
     $this->assertSession()->linkExists('Cancel');
     $this->assertTrue($revision->access('revert', $this->adminUser, FALSE));
 
-
     // Reload the non default entity.
     $revision2 = \Drupal::entityTypeManager()->getStorage('block_content')
       ->loadRevision($nonDefaultRevisionId);
