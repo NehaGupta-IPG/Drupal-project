@@ -61,6 +61,12 @@ class SortTest extends TestCase {
         });
         $this->assertSorted($excluded, '@name');
       }
+      if (array_key_exists('include-pattern', $item) && is_array($item['include-pattern'])) {
+        $this->assertSorted($item['include-pattern']);
+      }
+      if (array_key_exists('exclude-pattern', $item) && is_array($item['exclude-pattern'])) {
+        $this->assertSorted($item['exclude-pattern']);
+      }
     }
   }
 

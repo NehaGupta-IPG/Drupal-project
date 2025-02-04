@@ -49,25 +49,25 @@
 
   <!-- Drupal sniffs that core partially meets. -->
   <rule ref="Drupal.Commenting.FunctionComment.Missing">
-    <include-pattern>core/modules/*/Plugin/views/argument/*</include-pattern>
-    <include-pattern>core/modules/*/Plugin/views/filter/*</include-pattern>
+    <include-pattern>*/Database/*</include-pattern>
+    <include-pattern>*/FunctionalJavascript/*</include-pattern>
     <include-pattern>core/modules/*/Plugin/views/access/*</include-pattern>
+    <include-pattern>core/modules/*/Plugin/views/argument/*</include-pattern>
     <include-pattern>core/modules/*/Plugin/views/cache/*</include-pattern>
-    <include-pattern>core/modules/*/Plugin/views/query/*</include-pattern>
-    <include-pattern>core/modules/*/Plugin/views/sort/*</include-pattern>
     <include-pattern>core/modules/*/Plugin/views/display/*</include-pattern>
     <include-pattern>core/modules/*/Plugin/views/exposed_form/*</include-pattern>
     <include-pattern>core/modules/*/Plugin/views/field/*</include-pattern>
+    <include-pattern>core/modules/*/Plugin/views/filter/*</include-pattern>
     <include-pattern>core/modules/*/Plugin/views/pager/*</include-pattern>
+    <include-pattern>core/modules/*/Plugin/views/query/*</include-pattern>
+    <include-pattern>core/modules/*/Plugin/views/sort/*</include-pattern>
     <include-pattern>core/modules/*/Plugin/views/style/*</include-pattern>
-    <include-pattern>*/Database/*</include-pattern>
-    <include-pattern>*/FunctionalJavascript/*</include-pattern>
   </rule>
   <rule ref="Drupal.Commenting.FunctionComment.MissingReturnComment">
-    <exclude-pattern>core/lib/Drupal/Core/*</exclude-pattern>
-    <exclude-pattern>core/lib/Drupal/Component/*</exclude-pattern>
-    <exclude-pattern>core/tests/*</exclude-pattern>
     <exclude-pattern>core/*/tests/*</exclude-pattern>
+    <exclude-pattern>core/lib/Drupal/Component/*</exclude-pattern>
+    <exclude-pattern>core/lib/Drupal/Core/*</exclude-pattern>
+    <exclude-pattern>core/tests/*</exclude-pattern>
   </rule>
   <rule ref="Drupal.Commenting.VariableComment.MissingVar">
     <include-pattern>core/modules/*/tests/*</include-pattern>
@@ -96,18 +96,18 @@
     <exclude name="DrupalPractice.Yaml.RoutingAccess.PermissionFound"/>
   </rule>
   <rule ref="DrupalPractice.CodeAnalysis.VariableAnalysis">
-    <exclude-pattern>*/core/tests/*</exclude-pattern>
-    <exclude-pattern>*/core/profiles/*/tests/*</exclude-pattern>
     <!-- Do not run this sniff on API files or transliteration data. -->
     <exclude-pattern>*.api.php</exclude-pattern>
     <exclude-pattern>core/lib/Drupal/Component/Transliteration/data/*.php</exclude-pattern>
+    <exclude-pattern>core/profiles/*/tests/*</exclude-pattern>
+    <exclude-pattern>core/tests/*</exclude-pattern>
   </rule>
   <rule ref="DrupalPractice.Objects.GlobalFunction">
-    <include-pattern>*/Plugin/*</include-pattern>
-    <include-pattern>*/ListBuilder/*</include-pattern>
-    <include-pattern>*/tests/*/Form/*</include-pattern>
-    <include-pattern>*/modules/system/tests/modules/*</include-pattern>
     <include-pattern>*/Kernel*/*</include-pattern>
+    <include-pattern>*/ListBuilder/*</include-pattern>
+    <include-pattern>*/Plugin/*</include-pattern>
+    <include-pattern>*/modules/system/tests/modules/*</include-pattern>
+    <include-pattern>*/tests/*/Form/*</include-pattern>
     <include-pattern>*/tests/*/Functional*/*</include-pattern>
     <include-pattern>./core/lib/*</include-pattern>
   </rule>
