@@ -182,18 +182,17 @@ class NodeController extends ControllerBase implements ContainerInjectionInterfa
             'username' => $username,
             'message' => ['#markup' => $revision->revision_log->value, '#allowed_tags' => Xss::getHtmlTagList()],
           ],
-          // @todo Fix this properly in https://www.drupal.org/project/drupal/issues/3227637.
-          '#cache' => [
-            'max-age' => 0,
-          ],
-        ],
-      ];
+        ];
+      // @todo Simplify once https://www.drupal.org/node/2334319 lands.
+      $this->renderer->addCacheableDependency($column['data'], $username);
       $row[] = $column;
 
       $links = [];
       if ($revision->access('revert revision')) {
         $links['revert'] = [
-          'title' => $vid < $node->getRevisionId() ? $this->t('Revert') : $this->t('Set as current revision'),
+          'title' => $vid < $node->getRevisionId()
+            ? $this->t('Revert')
+            : $this->t('Set as current revision'),
           'url' => $has_translations
             ? Url::fromRoute('node.revision_revert_translation_confirm', [
               'node' => $node->id(),
