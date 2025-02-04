@@ -4,18 +4,21 @@
   <arg name="extensions" value="engine,inc,install,module,php,profile,test,theme,yml"/>
   <description>Default PHP CodeSniffer configuration for Drupal core.</description>
 
-  <!--Exclude folders used by common frontend tools. These folders match the file_scan_ignore_directories setting in default.settings.php-->
+  <!-- Exclude folders used by common frontend tools. These folders match the file_scan_ignore_directories setting in default.settings.php. -->
   <exclude-pattern>*/bower_components/*</exclude-pattern>
   <exclude-pattern>*/node_modules/*</exclude-pattern>
-  <!--Exclude the PHPStan baseline and temp dir from coding standards.-->
-  <exclude-pattern>./core/.phpstan-baseline.php</exclude-pattern>
-  <!--Exclude third party code.-->
+
+  <!-- Exclude third party code. -->
   <exclude-pattern>./core/assets/vendor/*</exclude-pattern>
-  <!-- Exclude third-party code maintained within core that does not follow our standards. -->
+
+  <!-- Exclude the PHPStan baseline and temp dir. -->
+  <exclude-pattern>./core/.phpstan-baseline.php</exclude-pattern>
   <exclude-pattern>./core/phpstan-tmp/*</exclude-pattern>
+
+  <!-- Exclude third-party code maintained within core that does not follow our standards. -->
   <exclude-pattern>./core/tests/Drupal/Tests/Component/Annotation/Doctrine/</exclude-pattern>
 
-  <!--Exclude test files that are intentionally empty, or intentionally violate coding standards.-->
+  <!-- Exclude test files that are intentionally empty, or intentionally violate coding standards. -->
   <exclude-pattern>./modules/system/tests/fixtures/HtaccessTest</exclude-pattern>
 
   <file>.</file>
