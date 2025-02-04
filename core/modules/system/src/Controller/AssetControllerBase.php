@@ -60,6 +60,12 @@ abstract class AssetControllerBase extends FileDownloadController {
    * cached from PHP, while another is serving a version cached from disk.
    * Should there be any discrepancy in behavior between those files, this
    * can make debugging very difficult.
+   *
+   * Sites swapping out the assets:// stream wrapper for a non-local driver
+   * and placing this path behind a CDN or other caching reverse proxy are
+   * responsible for deciding whether to override this value at that level.
+   *
+   * @see https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/Expiration.html
    */
   protected const CACHE_CONTROL = 'private, no-store';
 
