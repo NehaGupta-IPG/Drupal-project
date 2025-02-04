@@ -143,7 +143,7 @@ class UserPasswordForm extends FormBase implements WorkspaceSafeFormInterface {
     }
     $form['actions'] = ['#type' => 'actions'];
     $form['actions']['submit'] = ['#type' => 'submit', '#value' => $this->t('Submit')];
-    $form['#cache']['contexts'][] = 'url.query_args';
+    $form['#cache']['contexts'][] = 'url.query_args:name';
 
     return $form;
   }
