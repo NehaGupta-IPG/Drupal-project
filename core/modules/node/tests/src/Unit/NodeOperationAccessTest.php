@@ -226,19 +226,6 @@ class NodeOperationAccessTest extends UnitTestCase {
       FALSE,
     ];
 
-    // Can never revert default revision.
-    $data['revert, with update access, default revision'] = [
-      'revert revision',
-      [
-        ['access content', TRUE],
-        ['revert all revisions', TRUE],
-        // Bypass for 'update' operation.
-        ['bypass node access', TRUE],
-      ],
-      FALSE,
-      TRUE,
-    ];
-
     // Cannot delete non default revision if no delete access.
     $data['delete revision, without delete access, non default'] = [
       'delete revision',

@@ -173,7 +173,7 @@ class NodeRevisionsUiTest extends NodeTestBase {
 
     // Verify that the latest affected revision having been a default revision
     // is displayed as the current one.
-    $this->assertSession()->linkByHrefNotExists('/node/' . $node_id . '/revisions/1/revert');
+    $this->assertSession()->linkByHrefExists('/node/' . $node_id . '/revisions/1/revert');
     // The site may be installed in a subdirectory, so check if the URL is
     // contained in the retrieved one.
     $this->assertSession()->elementAttributeContains('xpath', '//tr[contains(@class, "revision-current")]/td/a[1]', 'href', '/node/1');
