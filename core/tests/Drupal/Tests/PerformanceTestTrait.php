@@ -720,13 +720,4 @@ trait PerformanceTestTrait {
     return str_replace([$database_prefix, "\r\n", "\r", "\n"], ['', ' ', ' ', ' '], $query_string);
   }
 
-  /**
-   * Clears all cache bins.
-   */
-  protected function clearCaches(): void {
-    foreach (Cache::getBins() as $bin) {
-      $bin->deleteAll();
-    }
-  }
-
 }
