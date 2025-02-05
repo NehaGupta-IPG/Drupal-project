@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\Tests\demo_umami\FunctionalJavascript;
 
 use Drupal\block\Entity\Block;
+use Drupal\Core\Cache\Cache;
 use Drupal\FunctionalJavascriptTests\PerformanceTestBase;
 
 /**
@@ -115,6 +116,15 @@ class VocabularyAdminPerformanceTest extends PerformanceTestBase {
    */
   protected function assertTermInVocabularyAdminPage(string $term_name = 'Baked'): void {
     $this->assertSession()->elementTextContains('xpath', '//table[@id="taxonomy"]', $term_name);
+  }
+
+  /**
+   * Clears all cache bins.
+   */
+  protected function clearCaches(): void {
+    foreach (Cache::getBins() as $bin) {
+      $bin->deleteAll();
+    }
   }
 
 }
