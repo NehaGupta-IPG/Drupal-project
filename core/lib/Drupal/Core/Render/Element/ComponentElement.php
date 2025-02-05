@@ -7,6 +7,7 @@ use Drupal\Core\Render\Component\Exception\InvalidComponentDataException;
 use Drupal\Core\Render\Attribute\FormElement;
 use Drupal\Core\Render\Element;
 use Drupal\Core\Security\DoTrustedCallbackTrait;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Template\Attribute;
 
 /**
@@ -139,6 +140,11 @@ class ComponentElement extends RenderElementBase implements FormElementInterface
       if (\is_scalar($slot_value)) {
         $slot_value = [
           "#plain_text" => (string) $slot_value,
+        ];
+      }
+      if ($slot_value instanceof TranslatableMarkup) {
+        $slot_value = [
+          "#markup" => $slot_value,
         ];
       }
       if (!Element::isRenderArray($slot_value)) {
