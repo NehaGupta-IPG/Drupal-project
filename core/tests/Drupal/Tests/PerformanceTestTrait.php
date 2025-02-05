@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\Tests;
 
-use Drupal\Core\Cache\Cache;
 use Drupal\Core\Database\Event\DatabaseEvent;
 use Drupal\performance_test\Cache\CacheTagOperation;
 use OpenTelemetry\API\Trace\SpanKind;
