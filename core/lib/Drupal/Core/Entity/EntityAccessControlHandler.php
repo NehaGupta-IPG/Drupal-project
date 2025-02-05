@@ -80,8 +80,8 @@ class EntityAccessControlHandler extends EntityHandlerBase implements EntityAcce
       if ($operation === 'delete revision' && $entity->isDefaultRevision()) {
         return $return_as_object ? AccessResult::forbidden() : FALSE;
       }
-      // The 'revert' operation is not allowed for the latest pending revision.
-      elseif ($operation === 'revert' && !$entity->isDefaultRevision() && $entity->isLatestRevision()) {
+      // The 'revert' operation is not allowed for the latest revision.
+      elseif ($operation === 'revert' && $entity->isLatestRevision()) {
         return $return_as_object ? AccessResult::forbidden() : FALSE;
       }
     }

@@ -165,9 +165,8 @@ class NodeAccessControlHandler extends EntityAccessControlHandler implements Nod
       if ($operation === 'delete revision' && $node->isDefaultRevision()) {
         return AccessResult::forbidden()->addCacheableDependency($cacheability);
       }
-      // The 'revert revision' operation is not allowed for the latest pending
-      // revision.
-      elseif ($operation === 'revert revision' && !$node->isDefaultRevision() && $node->isLatestRevision()) {
+      // The 'revert revision' operation is not allowed for the latest revision.
+      elseif ($operation === 'revert revision' && $node->isLatestRevision()) {
         return AccessResult::forbidden()->addCacheableDependency($cacheability);
       }
       elseif ($account->hasPermission('administer nodes')) {

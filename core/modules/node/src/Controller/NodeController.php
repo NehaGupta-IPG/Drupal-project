@@ -182,9 +182,12 @@ class NodeController extends ControllerBase implements ContainerInjectionInterfa
             'username' => $username,
             'message' => ['#markup' => $revision->revision_log->value, '#allowed_tags' => Xss::getHtmlTagList()],
           ],
-        ];
-      // @todo Simplify once https://www.drupal.org/node/2334319 lands.
-      $this->renderer->addCacheableDependency($column['data'], $username);
+          // @todo Fix this properly in https://www.drupal.org/project/drupal/issues/3227637.
+          '#cache' => [
+            'max-age' => 0,
+          ],
+        ],
+      ];
       $row[] = $column;
 
       $links = [];
@@ -194,15 +197,8 @@ class NodeController extends ControllerBase implements ContainerInjectionInterfa
             ? $this->t('Revert')
             : $this->t('Set as current revision'),
           'url' => $has_translations
-            ? Url::fromRoute('node.revision_revert_translation_confirm', [
-              'node' => $node->id(),
-              'node_revision' => $vid,
-              'langcode' => $langcode,
-            ])
-            : Url::fromRoute('node.revision_revert_confirm', [
-              'node' => $node->id(),
-              'node_revision' => $vid,
-            ]),
+            ? Url::fromRoute('node.revision_revert_translation_confirm', ['node' => $node->id(), 'node_revision' => $vid, 'langcode' => $langcode])
+            : Url::fromRoute('node.revision_revert_confirm', ['node' => $node->id(), 'node_revision' => $vid]),
         ];
       }
 
