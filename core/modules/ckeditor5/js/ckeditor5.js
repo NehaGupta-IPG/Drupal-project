@@ -693,21 +693,28 @@
 
   // Respond to dialogs that are saved, sending data back to CKEditor.
   $(window).on('editor:dialogsave', (e, values, selector) => {
-    if (Drupal.ckeditor5.saveCallback.has(selector)) {
-      Drupal.ckeditor5.saveCallback.get(selector)(values);
+    if (Drupal.ckeditor5.saveCallback) {
+      if (Object.hasOwn(Drupal.ckeditor5.saveCallback, 'has') && Drupal.ckeditor5.saveCallback.has(selector)) {
+        Drupal.ckeditor5.saveCallback.get(selector)(values);
+      }
+      else {
+        Drupal.ckeditor5.saveCallback(values);
+      }
     }
   });
 
   // Respond to dialogs that are closed, removing the current save handler.
-  window.addEventListener(
-    'dialog:afterclose',
-    (e, dialog, element, dialogSettings) => {
-      dialogSettings = dialogSettings || {};
-      const options = dialogSettings.options || {};
-      const selector = options.selector || '#drupal-modal';
-      if (Drupal.ckeditor5.saveCallback.has(selector)) {
+  $(window).on('dialog:afterclose', (e, dialog, element, dialogSettings) => {
+    dialogSettings = dialogSettings || {};
+    const options = dialogSettings.options || {};
+    const selector = options.selector || '#drupal-modal';
+    if (Drupal.ckeditor5.saveCallback) {
+      if (Object.hasOwn(Drupal.ckeditor5.saveCallback, 'has') && Drupal.ckeditor5.saveCallback.has(selector)) {
         Drupal.ckeditor5.saveCallback.delete(selector);
       }
-    },
-  );
+      else {
+        Drupal.ckeditor5.saveCallback = null;
+      }
+    }
+  });
 })(Drupal, Drupal.debounce, CKEditor5, jQuery, once);
