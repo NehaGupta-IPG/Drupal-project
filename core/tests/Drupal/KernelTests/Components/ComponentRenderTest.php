@@ -459,7 +459,7 @@ class ComponentRenderTest extends ComponentKernelTestBase {
       [
         '#plain_text' => 'This is the contents of the banner body.',
       ],
-      $this->t('This is the translated contents of the banner body.'),
+      $this->t('This is the contents of the banner body.'),
     ];
     foreach ($slots as $slot) {
       $build = [
