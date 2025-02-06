@@ -192,7 +192,7 @@ class ModerationStateChange extends ConfigurableActionBase implements ContainerF
    *
    * @see static::buildConfigurationForm()
    */
-  public static function configurationFormAjax($form, FormStateInterface $form_state) {
+  public static function configurationFormAjax($form, FormStateInterface $form_state): array {
     return $form['state-wrapper'];
   }
 
@@ -201,7 +201,7 @@ class ModerationStateChange extends ConfigurableActionBase implements ContainerF
    *
    * @see static::buildConfigurationForm()
    */
-  public static function configurationFormAjaxSubmit($form, FormStateInterface $form_state) {
+  public static function configurationFormAjaxSubmit($form, FormStateInterface $form_state): void {
     // Rebuild the form.
     $form_state->setRebuild();
   }
@@ -209,7 +209,7 @@ class ModerationStateChange extends ConfigurableActionBase implements ContainerF
   /**
    * {@inheritdoc}
    */
-  public function submitConfigurationForm(array &$form, FormStateInterface $form_state) {
+  public function submitConfigurationForm(array &$form, FormStateInterface $form_state): void {
     $this->configuration['workflow'] = $form_state->getValue('workflow');
     $this->configuration['state'] = $form_state->getValue('state');
     $this->configuration['revision_log_message'] = $form_state->getValue('revision_log_message');
@@ -218,7 +218,7 @@ class ModerationStateChange extends ConfigurableActionBase implements ContainerF
   /**
    * {@inheritdoc}
    */
-  public function calculateDependencies() {
+  public function calculateDependencies(): array {
     if (!empty($this->configuration['workflow'])) {
       $this->addDependency('config', 'workflows.workflow.' . $this->configuration['workflow']);
     }
@@ -228,7 +228,7 @@ class ModerationStateChange extends ConfigurableActionBase implements ContainerF
   /**
    * {@inheritdoc}
    */
-  public function execute(?ContentEntityInterface $entity = NULL) {
+  public function execute(?ContentEntityInterface $entity = NULL): void {
     /** @var \Drupal\node\Entity\Node $revision */
     $revision = $this->loadLatestRevision($entity);
     // Create a new revision if the states don't match.
