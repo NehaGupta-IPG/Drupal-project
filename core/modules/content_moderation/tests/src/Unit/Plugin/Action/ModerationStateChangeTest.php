@@ -20,6 +20,7 @@ use Drupal\workflows\StateInterface;
 use Drupal\content_moderation\StateTransitionValidationInterface;
 use Drupal\workflows\WorkflowInterface;
 use Drupal\workflows\WorkflowTypeInterface;
+use 
 
 /**
  * @coversDefaultClass \Drupal\content_moderation\Plugin\Action\ModerationStateChange
@@ -110,7 +111,7 @@ class ModerationStateChangeTest extends UnitTestCase {
   /**
    * Tests the execute method.
    */
-  public function testExecuteModerationStateChange() {
+  public function testExecuteModerationStateChange(): void {
     $this->moderationInfo = $this->createMock(ModerationInformationInterface::class);
 
     $this->node->expects($this->once())
@@ -133,7 +134,7 @@ class ModerationStateChangeTest extends UnitTestCase {
   /**
    * Data provider for the access method test.
    */
-  public static function accessModerationStateChangeDataProvider() {
+  public static function accessModerationStateChangeDataProvider(): array {
     $instance = new self("test");
 
     $instance->setupMocks();
@@ -453,7 +454,7 @@ class ModerationStateChangeTest extends UnitTestCase {
    *
    * @dataProvider accessModerationStateChangeDataProvider
    */
-  public function testAccessModerationStateChange(ModerationInformationInterface $moderation_info, $node, $result, ?AccountInterface $account = NULL, ?StateTransitionValidationInterface $validator = NULL) {
+  public function testAccessModerationStateChange(ModerationInformationInterface $moderation_info, $node, $result, ?AccountInterface $account = NULL, ?StateTransitionValidationInterface $validator = NULL): void {
     $config = ['workflow' => 'foo', 'state' => 'bar'];
     $plugin = $this->getModerationStateChangeMock($config, $moderation_info, $node, $validator);
     $this->assertEquals($result, $plugin->access($node, $account));
@@ -462,7 +463,7 @@ class ModerationStateChangeTest extends UnitTestCase {
   /**
    * Mock required objects.
    */
-  protected function setupMocks() {
+  protected function setupMocks(): void {
     $this->node = $this->getMockBuilder(NodeInterface::class)
       ->disableOriginalConstructor()
       ->getMock();
@@ -527,7 +528,7 @@ class ModerationStateChangeTest extends UnitTestCase {
   /**
    * Mocks Moderation state change action.
    */
-  protected function getModerationStateChangeMock($config, $moderation_info, $node, ?StateTransitionValidationInterface $validator = NULL) {
+  protected function getModerationStateChangeMock($config, $moderation_info, $node, ?StateTransitionValidationInterface $validator = NULL): object {
     $usedValidator = $this->validator;
     if ($validator != NULL) {
       $usedValidator = $validator;

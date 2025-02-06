@@ -82,7 +82,7 @@ class ActionConfigSchemaTest extends KernelTestBase {
   /**
    * Tests whether the change_moderation_state action config schema is valid.
    */
-  public function testValidActionConfigSchema() {
+  public function testValidActionConfigSchema(): void {
 
     // Test change_moderation_state_to_draft configuration.
     $config = $this->config('system.action.change_moderation_state_to_draft');
