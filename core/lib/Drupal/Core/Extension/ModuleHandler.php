@@ -335,10 +335,13 @@ class ModuleHandler implements ModuleHandlerInterface {
     foreach ($this->getHookListeners($hook) as $listeners) {
       foreach ($listeners as $listener) {
         $result = call_user_func_array($listener, $args);
-        if ($result !== NULL && is_array($result)) {
+        if ($result === NULL) {
+          continue;
+        }
+        if (is_array($result)) {
           $return = NestedArray::mergeDeep($return, $result);
         }
-        elseif ($result !== NULL) {
+        else {
           $return[] = $result;
         }
       }
