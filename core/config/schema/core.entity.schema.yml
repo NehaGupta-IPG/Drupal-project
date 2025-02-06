@@ -276,8 +276,8 @@ field.widget.settings.datetime_timestamp:
   label: 'Datetime timestamp display format settings'
   mapping:
     use_current_time:
-      type: boolean
-      label: 'Use current time on empty'
+      type: string
+      label: 'Current time option'
 
 field.widget.settings.boolean_checkbox:
   type: mapping
