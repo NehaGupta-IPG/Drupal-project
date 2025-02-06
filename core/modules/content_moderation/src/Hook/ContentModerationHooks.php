@@ -344,6 +344,11 @@ class ContentModerationHooks {
     if (\Drupal::moduleHandler()->moduleExists('views')) {
       Views::viewsData()->clear();
     }
+
+    // Create actions for changing the moderation state.
+    if ($entity->getTypePlugin()->getPluginId() === 'content_moderation') {
+      content_moderation_save_workflow_actions($entity);
+    }
   }
 
   /**
@@ -359,6 +364,30 @@ class ContentModerationHooks {
     // Clear the views data cache so the extra field is available in views.
     if (\Drupal::moduleHandler()->moduleExists('views')) {
       Views::viewsData()->clear();
+    }
+
+    // Create/update actions for changing the moderation state.
+    if ($entity->getTypePlugin()->getPluginId() === 'content_moderation') {
+      content_moderation_save_workflow_actions($entity);
+    }
+  }
+
+  /**
+   * Implements hook_ENTITY_TYPE_delete().
+   */
+  #[Hook('workflow_delete')]
+  function workflowDelete(WorkflowInterface $entity) {
+    // Delete actions for changing moderation state.
+    $workflow_base_action_id = 'content_moderation_' . $entity->id();
+    $entity_types = $entity->getTypePlugin()->getEntityTypes();
+    foreach ($entity_types as $entity_type_id) {
+      foreach ($entity->getTypePlugin()->getStates() as $state_id => $state) {
+        $action_id = $workflow_base_action_id . $entity_type_id . '_change_to_' . $state_id;
+        $action = \Drupal::entityTypeManager()->getStorage('action')->load($action_id);
+        if ($action) {
+          $action->delete();
+        }
+      }
     }
   }
 
