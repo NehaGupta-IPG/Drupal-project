@@ -20,7 +20,6 @@ use Drupal\workflows\StateInterface;
 use Drupal\content_moderation\StateTransitionValidationInterface;
 use Drupal\workflows\WorkflowInterface;
 use Drupal\workflows\WorkflowTypeInterface;
-use 
 
 /**
  * @coversDefaultClass \Drupal\content_moderation\Plugin\Action\ModerationStateChange
