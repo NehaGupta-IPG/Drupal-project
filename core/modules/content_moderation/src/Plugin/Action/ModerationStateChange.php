@@ -11,6 +11,7 @@ use Drupal\Core\Action\ConfigurableActionBase;
 use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Entity\DependencyTrait;
 use Drupal\Core\Entity\EntityChangedInterface;
+use Drupal\Core\Entity\EntityConstraintViolationList;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
@@ -242,8 +243,15 @@ class ModerationStateChange extends ConfigurableActionBase implements ContainerF
     $revision->setRevisionLogMessage($this->configuration['revision_log_message']);
     $revision->setRevisionCreationTime($revision->getChangedTime());
     $revision->setRevisionUserId($this->currentUser->id());
-    $violations = $revision->validate();
-    if ($violations->count() > 0) {
+
+    if ($revision->isValidationRequired()) {
+      $violations = $revision->validate();
+    }
+    else {
+      $violations = 0;
+    }
+
+    if ($violations instanceof EntityConstraintViolationList && $violations->count() > 0) {
       $this->messenger()->addError($violations[0]->getMessage());
       return;
     }
