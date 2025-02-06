@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\content_moderation\Kernel;
 
+use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\node\Entity\NodeType;
 use Drupal\system\Entity\Action;
 use Drupal\Tests\content_moderation\Traits\ContentModerationTestTrait;
@@ -19,6 +20,7 @@ class ActionConfigSchemaTest extends KernelTestBase {
 
   use SchemaCheckTestTrait;
   use ContentModerationTestTrait;
+  use StringTranslationTrait;
 
   /**
    * {@inheritdoc}
@@ -53,7 +55,7 @@ class ActionConfigSchemaTest extends KernelTestBase {
     $action = Action::create([
       'id' => 'change_moderation_state_to_draft',
       'type' => 'node',
-      'label' => t('Change moderation state to Draft'),
+      'label' => $this->t('Change moderation state to Draft'),
       'configuration' => [
         'workflow' => 'editorial',
         'state' => 'draft',
@@ -66,7 +68,7 @@ class ActionConfigSchemaTest extends KernelTestBase {
     $action = Action::create([
       'id' => 'change_moderation_state_to_published',
       'type' => 'node',
-      'label' => t('Change moderation state to Published'),
+      'label' => $this->t('Change moderation state to Published'),
       'configuration' => [
         'workflow' => 'editorial',
         'state' => 'published',
