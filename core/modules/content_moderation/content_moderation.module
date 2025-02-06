@@ -9,7 +9,7 @@ use Drupal\workflows\WorkflowInterface;
 /**
  * Creates or updates moderation state change actions for a given workflow.
  */
-function content_moderation_save_workflow_actions(WorkflowInterface $workflow) {
+function content_moderation_save_workflow_actions(WorkflowInterface $workflow) : void {
   $workflow_base_action_id = 'content_moderation_' . $workflow->id();
   $entity_types = $workflow->getTypePlugin()->getEntityTypes();
   foreach ($entity_types as $entity_type_id) {
