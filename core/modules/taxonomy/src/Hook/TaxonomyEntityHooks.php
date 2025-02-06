@@ -51,7 +51,7 @@ class TaxonomyEntityHooks {
    * @param \Drupal\node\Entity\Node $node
    *   The node entity.
    */
-  protected function build_node_index($node) {
+  protected function build_node_index($node): void {
     // We maintain a denormalized table of term/node relationships, containing
     // only data for current, published nodes.
     if (!\Drupal::config('taxonomy.settings')->get('maintain_index_table') || !($this->entityTypeManager->getStorage('node') instanceof SqlContentEntityStorage)) {
@@ -98,7 +98,7 @@ class TaxonomyEntityHooks {
    * @param \Drupal\Core\Entity\EntityInterface $node
    *   The node entity.
    */
-  protected function delete_node_index(EntityInterface $node) {
+  protected function delete_node_index(EntityInterface $node): void {
     if (\Drupal::config('taxonomy.settings')->get('maintain_index_table')) {
       \Drupal::database()->delete('taxonomy_index')->condition('nid', $node->id())->execute();
     }
