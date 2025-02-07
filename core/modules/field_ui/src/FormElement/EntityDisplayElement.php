@@ -68,7 +68,6 @@ class EntityDisplayElement extends ListElement {
    * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
    */
   protected function addLabels(array &$parent_build, array $element_names, array $components, string $target_type_id, string $bundle_name): void {
-
     /** @var \Drupal\Core\Field\FieldTypePluginManagerInterface $field_type_manager */
     $field_type_manager = \Drupal::service('plugin.manager.field.field_type');
     /** @var \Drupal\Core\Field\WidgetPluginManager $field_widget_manager */
@@ -88,7 +87,7 @@ class EntityDisplayElement extends ListElement {
         $field_type = $field_type_manager->getDefinition($definition->getType());
 
         $item['#title'] = $definition->getLabel();
-        $item['#description'] = t("Field: %name, type: @type", [
+        $item['#description'] = $this->t("Field: %name, type: @type", [
           '%name' => $component_name,
           '@type' => $field_type['label'],
         ]);
@@ -107,7 +106,7 @@ class EntityDisplayElement extends ListElement {
           // Set formatter type name if available.
           $formatter_options = $field_formatter_manager->getOptions($definition->getType());
           if (isset($formatter_options[$component_type]) && isset($item['settings'])) {
-            $item['settings']['#title'] = t("%label format settings", ['%label' => $formatter_options[$component_type]]);
+            $item['settings']['#title'] = $this->t("%label format settings", ['%label' => $formatter_options[$component_type]]);
           }
         }
         else {
@@ -115,7 +114,7 @@ class EntityDisplayElement extends ListElement {
           // Set widget name if available.
           $widget_options = $field_widget_manager->getOptions($definition->getType());
           if (isset($widget_options[$component_type]) && isset($item['settings'])) {
-            $item['settings']['#title'] = t("%label widget settings", ['%label' => $widget_options[$component_type]]);
+            $item['settings']['#title'] = $this->t("%label widget settings", ['%label' => $widget_options[$component_type]]);
           }
         }
 

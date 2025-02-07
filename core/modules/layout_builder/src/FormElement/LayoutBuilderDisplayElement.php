@@ -11,6 +11,12 @@ use Drupal\layout_builder\Entity\LayoutBuilderEntityViewDisplay;
  * Adds translatable labels to layout_builder elements.
  */
 class LayoutBuilderDisplayElement extends ListElement {
+
+  /**
+   * The elements names data.
+   *
+   * @var array|null
+   */
   public static $data = NULL;
 
   /**
@@ -91,7 +97,6 @@ class LayoutBuilderDisplayElement extends ListElement {
    * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
    */
   protected function addLabels(array &$parent_build, array $element_names): void {
-
     /** @var \Drupal\Core\Field\FieldTypePluginManagerInterface $field_type_manager */
     $field_type_manager = \Drupal::service('plugin.manager.field.field_type');
     /** @var \Drupal\Core\Field\FormatterPluginManager $field_formatter_manager */
@@ -122,7 +127,7 @@ class LayoutBuilderDisplayElement extends ListElement {
 
         $item['#title'] = $definition->getLabel();
         $component['#title'] = $definition->getLabel();
-        $item['#description'] = t("Field: %name, type: @type", [
+        $item['#description'] = $this->t("Field: %name, type: @type", [
           '%name' => $component_name,
           '@type' => $field_type['label'],
         ]);
@@ -140,12 +145,10 @@ class LayoutBuilderDisplayElement extends ListElement {
         // Set formatter type name if available.
         $formatter_options = $field_formatter_manager->getOptions($definition->getType());
         if (isset($formatter_options[$component_type]) && isset($item['settings'])) {
-          $item['settings']['#title'] = t("%label format settings", ['%label' => $formatter_options[$component_type]]);
+          $item['settings']['#title'] = $this->t("%label format settings", ['%label' => $formatter_options[$component_type]]);
         }
-
       }
     }
-
   }
 
   /**
