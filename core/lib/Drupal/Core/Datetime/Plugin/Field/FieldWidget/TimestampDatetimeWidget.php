@@ -134,7 +134,8 @@ class TimestampDatetimeWidget extends WidgetBase {
    *   The list of options.
    */
   public function getSettingOptions(): array {
-    // We don't have option as none because it creat on form submission
+    // We don't have option as none because it creates a new date on form submission
+    // @see TimestampDatetimeWidget::massageFormValues
     $options = [
       static::TIMESTAMP_OPTION_ON_SUBMISSION => $this->t('On form submission'),
       static::TIMESTAMP_OPTION_ON_CREATE => $this->t('On form create'),
