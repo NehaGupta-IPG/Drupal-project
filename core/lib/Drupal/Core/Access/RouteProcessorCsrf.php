@@ -4,8 +4,8 @@ namespace Drupal\Core\Access;
 
 use Drupal\Component\Utility\Crypt;
 use Drupal\Core\Render\BubbleableMetadata;
-use Drupal\Core\Security\TrustedCallbackInterface;
 use Drupal\Core\RouteProcessor\OutboundRouteProcessorInterface;
+use Drupal\Core\Security\TrustedCallbackInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\Route;
 
@@ -56,6 +56,7 @@ class RouteProcessorCsrf implements OutboundRouteProcessorInterface, TrustedCall
         // ensures links with CSRF tokens don't break cacheability.
         $parameters['token'] = $placeholder;
         $bubbleable_metadata->addAttachments(['placeholders' => [$placeholder => $placeholder_render_array]]);
+      }
     }
   }
 
