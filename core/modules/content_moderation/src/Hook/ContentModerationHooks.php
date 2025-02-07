@@ -376,7 +376,7 @@ class ContentModerationHooks {
    * Implements hook_ENTITY_TYPE_delete().
    */
   #[Hook('workflow_delete')]
-  public function workflowDelete(WorkflowInterface $entity) {
+  public function workflowDelete(WorkflowInterface $entity): void {
     // Delete actions for changing moderation state.
     $workflow_base_action_id = 'content_moderation_' . $entity->id();
     $entity_types = $entity->getTypePlugin()->getEntityTypes();
