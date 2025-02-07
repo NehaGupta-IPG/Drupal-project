@@ -6,6 +6,7 @@ namespace Drupal\FunctionalTests\Datetime;
 
 use Drupal\Core\Datetime\DrupalDateTime;
 use Drupal\Core\Datetime\Entity\DateFormat;
+use Drupal\Core\Datetime\Plugin\Field\FieldWidget\TimestampDatetimeWidget;
 use Drupal\Core\Entity\Entity\EntityFormDisplay;
 use Drupal\Core\Entity\Entity\EntityViewDisplay;
 use Drupal\field\Entity\FieldConfig;
@@ -22,10 +23,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 class TimestampTest extends BrowserTestBase {
 
   /**
-   * An array of display options.
-   *
-   * These options are passed to
-   * EntityDisplayRepositoryInterface::getViewDisplay().
+   * An array of display options to pass to EntityDisplayRepositoryInterface::getViewDisplay().
    *
    * @var array
    */
@@ -46,11 +44,11 @@ class TimestampTest extends BrowserTestBase {
   protected $field;
 
   /**
-   * A field name to use in this test class..
+   * A field name to use in this test class.
    *
    * @var string
    */
-  protected $field_name;
+  protected $fieldName;
 
   /**
    * A type to use in this test class.
@@ -64,14 +62,14 @@ class TimestampTest extends BrowserTestBase {
    *
    * @var string
    */
-  protected $widget_type;
+  protected $widgetType;
 
   /**
    * A formatter type to use in this test class.
    *
    * @var string
    */
-  protected $formatter_type;
+  protected $formatterType;
 
   /**
    * A formDisplayOptions to use in this test class.
@@ -106,13 +104,13 @@ class TimestampTest extends BrowserTestBase {
     ]);
 
     $this->drupalLogin($web_user);
-    $this->field_name = 'field_timestamp';
+    $this->fieldName = 'field_timestamp';
     $this->type = 'timestamp';
-    $this->widget_type = 'datetime_timestamp';
-    $this->formatter_type = 'timestamp';
+    $this->widgetType = 'datetime_timestamp';
+    $this->formatterType = 'timestamp';
 
     $this->fieldStorage = FieldStorageConfig::create([
-      'field_name' => $this->field_name,
+      'field_name' => $this->fieldName,
       'entity_type' => 'entity_test',
       'type' => $this->type,
     ]);
@@ -124,19 +122,18 @@ class TimestampTest extends BrowserTestBase {
       'description' => 'Description for timestamp field.',
     ]);
     $this->field->save();
-
     $this->formDisplayOptions = [
-      'type' => $this->widget_type,
+      'type' => $this->widgetType,
       'settings' => [
         'use_current_time' => 0,
       ],
     ];
-    EntityFormDisplay::load('entity_test.entity_test.default')
-      ->setComponent($this->field_name, $this->formDisplayOptions)
-      ->save();
+
+    $entity_form_display = EntityFormDisplay::load('entity_test.entity_test.default');
+    $entity_form_display->setComponent($this->fieldName, $this->formDisplayOptions)->save();
 
     $this->displayOptions = [
-      'type' => $this->formatter_type,
+      'type' => $this->formatterType,
       'label' => 'hidden',
     ];
 
@@ -145,7 +142,7 @@ class TimestampTest extends BrowserTestBase {
       'bundle' => $this->field->getTargetBundle(),
       'mode' => 'full',
       'status' => TRUE,
-    ])->setComponent($this->field_name, $this->displayOptions)
+    ])->setComponent($this->fieldName, $this->displayOptions)
       ->save();
   }
 
@@ -174,7 +171,6 @@ class TimestampTest extends BrowserTestBase {
     $this->assertSession()->fieldValueEquals('field_timestamp[0][value][date]', '');
     $this->assertSession()->fieldExists('field_timestamp[0][value][time]');
     $this->assertSession()->fieldValueEquals('field_timestamp[0][value][time]', '');
-
     $this->submitForm([], 'Save');
 
     // Look for the widget elements and make sure they are still empty.
@@ -211,16 +207,17 @@ class TimestampTest extends BrowserTestBase {
 
     // Test 'use_current_time' settings.
     $this->formDisplayOptions = [
-      'type' => $this->widget_type,
+      'type' => $this->widgetType,
       'settings' => [
-        'use_current_time' => 1,
+        'use_current_time' => TimestampDatetimeWidget::TIMESTAMP_OPTION_ON_SUBMISSION,
       ],
     ];
 
     EntityFormDisplay::load('entity_test.entity_test.default')
-      ->setComponent($this->field_name, $this->formDisplayOptions)
+      ->setComponent($this->fieldName, $this->formDisplayOptions)
       ->save();
 
+    // Set a default value for the field.
     $date = new DrupalDateTime('now', 'UTC');
 
     // Update the timezone to the system default.
@@ -248,6 +245,23 @@ class TimestampTest extends BrowserTestBase {
     $this->assertSession()->fieldValueEquals('field_timestamp[0][value][date]', $date->format($date_format));
     $this->assertSession()->fieldExists('field_timestamp[0][value][time]');
     $this->assertSession()->fieldValueEquals('field_timestamp[0][value][time]', $date->format($time_format));
+
+    // Test 'on_create' behavior.
+//    $this->formDisplayOptions = [
+//      'type' => $this->widgetType,
+//      'settings' => [
+//        'use_current_time' => TimestampDatetimeWidget::TIMESTAMP_OPTION_ON_CREATE,
+//      ],
+//    ];
+//    EntityFormDisplay::load('entity_test.entity_test.default')
+//      ->setComponent($this->fieldName, $this->formDisplayOptions)
+//      ->save();
+//
+//    $this->drupalGet('entity_test/add');
+//    $this->assertSession()->fieldExists('field_timestamp[value][date]');
+//    $date_value_create = $this->getSession()->getPage()->findField('field_timestamp[value][date]')->getValue();
+//    $this->assertNotEmpty($date_value_create);
+
   }
 
 }
