@@ -37,6 +37,14 @@ trait RoutePathGenerationTrait {
   public function generateRoutePath(Route $route, array $parameters): string {
     $path = ltrim($route->getPath(), '/');
 
+    // Exclude parameters declared on the route to be excluded.
+    if ($route->getOption('_csrf_exclude_parameters')) {
+      $exclude_parameters = $route->getOption('_csrf_exclude_parameters');
+      foreach ($exclude_parameters as $exclude_parameter) {
+        unset($parameters[$exclude_parameter]);
+      }
+    }
+
     // Replace path parameters with their corresponding values from the
     // parameters array.
     foreach ($parameters as $param => $value) {

@@ -4,6 +4,7 @@ namespace Drupal\Core\Access;
 
 use Drupal\Core\Routing\Access\AccessInterface as RoutingAccessInterface;
 use Drupal\Core\Routing\RouteMatchInterface;
+use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\HttpFoundation\Request;
 
