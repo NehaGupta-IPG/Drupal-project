@@ -229,7 +229,8 @@ class NodeForm extends ContentEntityForm {
       if ($node->access('view')) {
         $form_state->setRedirect(
           'entity.node.canonical',
-          ['node' => $node->id()]
+          ['node' => $node->id()],
+          ['language' => $node->language()]
         );
       }
       else {
