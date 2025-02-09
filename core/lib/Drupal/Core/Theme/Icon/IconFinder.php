@@ -305,10 +305,14 @@ class IconFinder implements ContainerInjectionInterface, IconFinderInterface {
         $icon_id = self::extractIconIdFromFilename($icon_id, $path_info_filename);
       }
 
+      // Ensure source is relative to the installation for url generation and
+      // replace base_path() used in generateString() method.
+      $source = $this->fileUrlGenerator->generateString(str_replace(sprintf('%s/', $this->appRoot), '', $file_absolute_path));
+
       // Icon ID is used as index to avoid duplicates.
       $result[$icon_id] = [
         'icon_id' => $icon_id,
-        'source' => $this->fileUrlGenerator->generateString(str_replace($this->appRoot, '', $file_absolute_path)),
+        'source' => $source,
         'absolute_path' => $file_absolute_path,
         'group' => self::extractGroupFromPath($file->getPath(), $group_position),
       ];
