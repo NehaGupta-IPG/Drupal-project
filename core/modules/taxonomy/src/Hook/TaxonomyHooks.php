@@ -13,14 +13,6 @@ class TaxonomyHooks {
   use StringTranslationTrait;
 
   /**
-   * Implements hook_theme().
-   */
-  #[Hook('theme')]
-  public function theme() : array {
-    return ['taxonomy_term' => ['render element' => 'elements']];
-  }
-
-  /**
    * Implements hook_local_tasks_alter().
    *
    * @todo Evaluate removing as part of https://www.drupal.org/node/2358923.
