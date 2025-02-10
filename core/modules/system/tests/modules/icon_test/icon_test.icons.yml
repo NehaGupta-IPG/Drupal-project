@@ -48,6 +48,14 @@ test_path:
       title="{{ title }}"
     >
 
+test_path_relative_root:
+  extractor: path
+  config:
+    sources:
+      - /core/misc/druplicon.png
+  template: >-
+    {{ icon_id }}: <img src="{{ source }}" width="32" height="32">
+
 test_svg:
   enabled: true
   label: Test svg

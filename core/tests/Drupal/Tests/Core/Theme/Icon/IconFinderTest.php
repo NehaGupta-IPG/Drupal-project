@@ -18,7 +18,6 @@ use Psr\Log\LoggerInterface;
 class IconFinderTest extends UnitTestCase {
 
   private const TEST_ICONS_PATH = 'core/modules/system/tests/modules/icon_test';
-  private const TEST_RELATIVE_URL = 'foo/bar';
 
   /**
    * The file url generator instance.
@@ -614,7 +613,7 @@ class IconFinderTest extends UnitTestCase {
       ->expects($this->any())
       ->method('generateString')
       ->willReturnCallback(function ($uri) {
-        return self::TEST_RELATIVE_URL . $uri;
+        return base_path() . $uri;
       });
 
     $result = $this->iconFinder->getFilesFromSources(
@@ -630,7 +629,7 @@ class IconFinderTest extends UnitTestCase {
       $group = $expected[$key][2] ?? NULL;
       $expected_result[$icon_id] = [
         'icon_id' => $icon_id,
-        'source' => self::TEST_RELATIVE_URL . '/' . self::TEST_ICONS_PATH . '/' . $filename,
+        'source' => base_path() . self::TEST_ICONS_PATH . '/' . $filename,
         'absolute_path' => DRUPAL_ROOT . '/' . self::TEST_ICONS_PATH . '/' . $filename,
         'group' => $group,
       ];
@@ -849,6 +848,27 @@ class IconFinderTest extends UnitTestCase {
       return;
     }
     $this->assertFalse($this->iconFinder->getFileContents($uri));
+  }
+
+}
+
+// @todo Remove as part of https://www.example.com/node/2529170.
+namespace Drupal\Core\Theme\Icon;
+
+if (!function_exists('base_path')) {
+
+  function base_path() {
+    return '/';
+  }
+
+}
+
+namespace Drupal\Tests\Core\Theme\Icon;
+
+if (!function_exists('base_path')) {
+
+  function base_path() {
+    return '/';
   }
 
 }

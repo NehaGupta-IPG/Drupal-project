@@ -297,7 +297,9 @@ class IconFinder implements ContainerInjectionInterface, IconFinderInterface {
     $has_icon_pattern = \str_contains($path_info_filename, self::ICON_ID_PATTERN);
 
     foreach ($finder as $file) {
+      /** @var SplFileInfo $file */
       $file_absolute_path = $file->getPathName();
+      /** @var \Symfony\Component\Finder\SplFileInfo $file */
       $icon_id = $file->getFilenameWithoutExtension();
 
       // If an {icon_id} pattern is used, extract it to be used.
@@ -305,9 +307,11 @@ class IconFinder implements ContainerInjectionInterface, IconFinderInterface {
         $icon_id = self::extractIconIdFromFilename($icon_id, $path_info_filename);
       }
 
-      // Ensure source is relative to the installation for url generation and
-      // replace base_path() used in generateString() method.
-      $source = $this->fileUrlGenerator->generateString(str_replace(sprintf('%s/', $this->appRoot), '', $file_absolute_path));
+      // Url generation with `generateString` method rely on `base_path()` which
+      // will add a prefix based on $GLOBALS['base_path'], default `/`.
+      // @todo adapt when https://www.drupal.org/project/drupal/issues/2487055
+      $source = str_replace(sprintf('%s%s', $this->appRoot, base_path()), '', $file_absolute_path);
+      $source = $this->fileUrlGenerator->generateString($source);
 
       // Icon ID is used as index to avoid duplicates.
       $result[$icon_id] = [
