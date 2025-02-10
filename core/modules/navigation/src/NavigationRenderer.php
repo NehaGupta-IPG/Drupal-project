@@ -99,6 +99,23 @@ final class NavigationRenderer {
         'max-age' => CacheBackendInterface::CACHE_PERMANENT,
       ],
       '#lazy_builder' => ['navigation.renderer:doBuildNavigation', []],
+      '#lazy_builder_preview' => [
+        [
+          '#type' => 'html_tag',
+          '#tag' => 'aside',
+          '#attributes' => [
+            'class' => ['admin-toolbar'],
+            'id' => 'admin-toolbar',
+          ],
+          'child' => [
+            '#type' => 'container',
+            '#attributes' => [
+              'class' => ['admin-toolbar__displace-placeholder'],
+            ],
+          ],
+        ],
+      ],
+
       '#create_placeholder' => TRUE,
     ];
   }
