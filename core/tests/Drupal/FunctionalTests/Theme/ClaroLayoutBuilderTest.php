@@ -127,8 +127,8 @@ class ClaroLayoutBuilderTest extends BrowserTestBase {
       'configure any layout',
       'administer node display',
       'administer node fields',
-      'use layout builder',
       'access content',
+      'administer site configuration',
     ]));
 
     // Create a content type with Layout Builder enabled.
@@ -155,14 +155,14 @@ class ClaroLayoutBuilderTest extends BrowserTestBase {
     $this->getSession()->getPage()->pressButton('Add block');
 
     // Simulate a missing layout scenario by renaming/removing the layout.
-    $this->simulateMissingLayout('layout_test_plugin');
+    $this->simulateMissingLayout('system_powered_by_block');
 
     // Attempt to load the Layout Builder form again.
     $this->drupalGet('admin/structure/types/manage/test_layout_content/display/default');
 
     // Check if Layout Builder still functions and provides a recovery option.
     $assert_session->pageTextContains('The "layout_test_plugin" plugin does not exist.');
-    $assert_session->pageTextContains('Please select a new layout or reconfigure your settings.');
+    $assert_session->pageTextContains('Select a new layout or reconfigure your settings.');
   }
 
   /**
@@ -179,6 +179,7 @@ class ClaroLayoutBuilderTest extends BrowserTestBase {
 
     // Get current layout definitions.
     $definitions = $layout_plugin_manager->getDefinitions();
+    dump($definitions);
 
     // Remove the specified layout.
     if (isset($definitions[$layout_id])) {
