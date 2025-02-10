@@ -123,7 +123,7 @@ class IconFinderKernelTest extends KernelTestBase {
    *   The list of remote.
    * @param array<string, string> $expected
    *   The expected result.
-   * @param string $relative_path
+   * @param string $relativePath
    *   The relative path to simulate an icon in the module/theme definition.
    *
    * @dataProvider providerGetFilesFromSourcesPath
