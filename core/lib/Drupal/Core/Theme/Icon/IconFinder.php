@@ -307,11 +307,14 @@ class IconFinder implements ContainerInjectionInterface, IconFinderInterface {
         $icon_id = self::extractIconIdFromFilename($icon_id, $path_info_filename);
       }
 
-      // Url generation with `generateString` method rely on `base_path()` which
+      // Source is the url to access the image, based on the absolute path to
+      // handle icons relative to definition or Drupal root.
+      $source = str_replace($this->appRoot, '', $file_absolute_path);
+      // Url generation with `generateString` method rely on `base_path()` that
       // will add a prefix based on $GLOBALS['base_path'], default `/`.
-      // @todo adapt when https://www.drupal.org/project/drupal/issues/2487055
-      $source = str_replace(sprintf('%s%s', $this->appRoot, base_path()), '', $file_absolute_path);
-      $source = $this->fileUrlGenerator->generateString($source);
+      // Remove any left slash to allow to url generation with a custom
+      // base_path.
+      $source = $this->fileUrlGenerator->generateString(ltrim($source, '/'));
 
       // Icon ID is used as index to avoid duplicates.
       $result[$icon_id] = [
