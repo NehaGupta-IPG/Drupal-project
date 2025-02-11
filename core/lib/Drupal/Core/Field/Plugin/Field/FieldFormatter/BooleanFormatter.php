@@ -147,10 +147,13 @@ class BooleanFormatter extends FormatterBase {
     $elements = [];
 
     $formats = $this->getOutputFormats();
+    $format = $this->getSetting('format');
+
+    if ($items->isEmpty()) {
+      return [['#markup' => $formats[$format][1]]];
+    }
 
     foreach ($items as $delta => $item) {
-      $format = $this->getSetting('format');
-
       if ($format == 'custom') {
         $elements[$delta] = ['#markup' => $item->value ? $this->getSetting('format_custom_true') : $this->getSetting('format_custom_false')];
       }
