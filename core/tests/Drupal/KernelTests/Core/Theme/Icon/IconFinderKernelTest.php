@@ -90,7 +90,7 @@ class IconFinderKernelTest extends KernelTestBase {
           'foo' => 'core/modules/system/tests/modules/icon_test/icons/flat/foo.png',
         ],
         'core/modules/system/tests/modules/icon_test',
-      ]
+      ],
     ];
   }
 
@@ -108,7 +108,7 @@ class IconFinderKernelTest extends KernelTestBase {
    */
   public function testGetFilesFromSourcesPath(array $sources, array $expected, string $relativePath): void {
     $base_path_test = ['/', '/foo/', '/foo/bar/'];
-    
+
     foreach ($base_path_test as $base_path) {
       // @todo Remove or adapt as part of https://www.example.com/node/2529170.
       $GLOBALS['base_path'] = $base_path;
@@ -117,7 +117,7 @@ class IconFinderKernelTest extends KernelTestBase {
         $sources,
         $relativePath,
       );
-  
+
       // Prepare result array matching processFoundFiles() to minimize test data.
       $expected_result = [];
       foreach ($expected as $key => $expected_value) {
@@ -128,7 +128,7 @@ class IconFinderKernelTest extends KernelTestBase {
           'group' => NULL,
         ];
       }
-  
+
       $this->assertEquals($result, $expected_result);
     }
   }
