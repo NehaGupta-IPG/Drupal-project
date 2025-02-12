@@ -61,6 +61,14 @@ class IconFinderKernelTest extends KernelTestBase {
   }
 
   /**
+   * {@inheritdoc}
+   */
+  public function tearDown(): void {
+    $GLOBALS['base_path'] = '/';
+    parent::tearDown();
+  }
+
+  /**
    * Test the IconFinder::_construct method.
    */
   public function testConstructor(): void {
