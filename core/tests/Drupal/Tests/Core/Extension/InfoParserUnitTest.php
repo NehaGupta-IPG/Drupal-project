@@ -366,7 +366,7 @@ INFO;
       $info .= "\nlifecycle: $lifecycle\n";
     }
     if (in_array($lifecycle, [ExtensionLifecycle::DEPRECATED, ExtensionLifecycle::OBSOLETE], TRUE)) {
-      $info .= "\nlifecycle_link: http://example.com\n";
+      $info .= "\nlifecycle_link: https://example.com\n";
     }
     vfsStream::setup('modules');
     $filename = "lifecycle-$lifecycle.info.yml";
@@ -499,11 +499,11 @@ INFO;
     return [
       'valid deprecated' => [
         ExtensionLifecycle::DEPRECATED,
-        'http://example.com',
+        'https://example.com',
       ],
       'valid obsolete' => [
         ExtensionLifecycle::OBSOLETE,
-        'http://example.com',
+        'https://example.com',
       ],
       'valid stable' => [
         ExtensionLifecycle::STABLE,

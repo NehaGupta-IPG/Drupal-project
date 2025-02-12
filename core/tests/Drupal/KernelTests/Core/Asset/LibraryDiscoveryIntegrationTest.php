@@ -175,7 +175,7 @@ class LibraryDiscoveryIntegrationTest extends KernelTestBase {
     $this->assertAssetInLibrary('//my-server/my_theme/js/overridden.js', 'core', 'drupal.displace', 'js');
 
     // Assert an absolute URI.
-    $this->assertAssetInLibrary('http://example.com/my_theme/js/announce.js', 'core', 'drupal.announce', 'js');
+    $this->assertAssetInLibrary('https://example.com/my_theme/js/announce.js', 'core', 'drupal.announce', 'js');
   }
 
   /**

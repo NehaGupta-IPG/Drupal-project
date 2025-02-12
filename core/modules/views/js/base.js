@@ -78,7 +78,7 @@
    *   The href without the protocol and domain.
    */
   Drupal.Views.pathPortion = function (href) {
-    // Remove e.g. http://example.com if present.
+    // Remove e.g. https://example.com if present.
     const protocol = window.location.protocol;
     if (href.startsWith(protocol)) {
       // 2 is the length of the '//' that normally follows the protocol.

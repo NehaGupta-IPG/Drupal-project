@@ -35,16 +35,16 @@ class UrlEncodeTest extends MigrateTestCase {
   public static function urlDataProvider() {
     return [
       'A URL with no characters requiring encoding' => [
-        'http://example.com/normal_url.html',
-        'http://example.com/normal_url.html',
+        'https://example.com/normal_url.html',
+        'https://example.com/normal_url.html',
       ],
       'The definitive use case - encoding spaces in URLs' => [
-        'http://example.com/url with spaces.html',
-        'http://example.com/url%20with%20spaces.html',
+        'https://example.com/url with spaces.html',
+        'https://example.com/url%20with%20spaces.html',
       ],
       'Definitive use case 2 - spaces in directories' => [
-        'http://example.com/dir with spaces/foo.html',
-        'http://example.com/dir%20with%20spaces/foo.html',
+        'https://example.com/dir with spaces/foo.html',
+        'https://example.com/dir%20with%20spaces/foo.html',
       ],
       'Local file specs without spaces should not be transformed' => [
         '/tmp/normal.txt',

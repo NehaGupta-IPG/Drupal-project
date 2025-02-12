@@ -2,7 +2,7 @@ example:
   css:
     theme:
       # External URL.
-      'http://example.com/test.css':
+      'https://example.com/test.css':
         type: external
       # Absolute path.
       /tmp/test.css: {}

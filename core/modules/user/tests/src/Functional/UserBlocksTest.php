@@ -124,7 +124,7 @@ class UserBlocksTest extends BrowserTestBase {
     // Check that the user login block is not vulnerable to information
     // disclosure to third party sites.
     $this->drupalLogout();
-    $this->drupalGet('http://example.com/', ['external' => FALSE]);
+    $this->drupalGet('https://example.com/', ['external' => FALSE]);
     $this->submitForm($edit, 'Log in');
     // Check that we remain on the site after login.
     $this->assertSession()->addressEquals($user->toUrl('canonical'));

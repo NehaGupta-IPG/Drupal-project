@@ -88,7 +88,7 @@ class SecurityAdvisoriesFetcherTest extends KernelTestBase implements LoggerInte
     }
     $links = $this->getAdvisories();
     $this->assertCount(1, $links);
-    $this->assertSame('http://example.com', $links[0]->getUrl());
+    $this->assertSame('https://example.com', $links[0]->getUrl());
     $this->assertSame('SA title', $links[0]->getTitle());
     $this->assertCount(1, $this->history);
   }
@@ -511,7 +511,7 @@ class SecurityAdvisoriesFetcherTest extends KernelTestBase implements LoggerInte
     foreach ($feed_items as $feed_item) {
       $feed_item += [
         'title' => 'SA title',
-        'link' => 'http://example.com',
+        'link' => 'https://example.com',
       ];
       $responses[] = new Response(200, [], json_encode([$feed_item]));
     }
@@ -639,7 +639,7 @@ class SecurityAdvisoriesFetcherTest extends KernelTestBase implements LoggerInte
       'project' => 'drupal',
       'insecure' => [\Drupal::VERSION],
       'title' => 'SA title',
-      'link' => 'http://example.com',
+      'link' => 'https://example.com',
     ];
     $this->setTestFeedResponses([
       new Response(500, [], 'HTTPS failed'),
@@ -664,7 +664,7 @@ class SecurityAdvisoriesFetcherTest extends KernelTestBase implements LoggerInte
     $this->assertEquals(200, $second_try['response']->getStatusCode());
 
     $this->assertCount(1, $advisories);
-    $this->assertSame('http://example.com', $advisories[0]->getUrl());
+    $this->assertSame('https://example.com', $advisories[0]->getUrl());
     $this->assertSame('SA title', $advisories[0]->getTitle());
     $this->assertSame(["Server error: `GET https://updates.drupal.org/psa.json` resulted in a `500 Internal Server Error` response:\nHTTPS failed\n"], $this->errorMessages);
   }

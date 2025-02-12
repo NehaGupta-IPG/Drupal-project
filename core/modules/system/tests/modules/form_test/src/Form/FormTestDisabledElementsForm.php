@@ -191,8 +191,8 @@ class FormTestDisabledElementsForm extends FormBase {
     $form['disabled_container']['disabled_container_url'] = [
       '#type' => 'url',
       '#title' => 'url',
-      '#default_value' => 'http://example.com',
-      '#test_hijack_value' => 'http://example.com/foo',
+      '#default_value' => 'https://example.com',
+      '#test_hijack_value' => 'https://example.com/foo',
     ];
 
     // Text format.

@@ -81,7 +81,7 @@ class WorkspaceMenuLinkContentIntegrationTest extends BrowserTestBase {
     $menu_link = reset($menu_links);
 
     $pending_title = 'pending';
-    $pending_link = 'http://example.com';
+    $pending_link = 'https://example.com';
 
     // Change the menu link in 'stage' and check that the updated values are
     // visible in that workspace.

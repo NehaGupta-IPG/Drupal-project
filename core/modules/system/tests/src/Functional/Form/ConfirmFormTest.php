@@ -67,12 +67,12 @@ class ConfirmFormTest extends BrowserTestBase {
     $this->assertSession()->linkByHrefExists(Url::fromRoute('form_test.route8')->toString());
     $this->drupalGet('form-test/confirm-form', ['query' => ['destination' => 'node']]);
     $this->assertSession()->linkByHrefExists(Url::fromUri('internal:/node')->toString());
-    $this->drupalGet('form-test/confirm-form', ['query' => ['destination' => 'http://example.com']]);
+    $this->drupalGet('form-test/confirm-form', ['query' => ['destination' => 'https://example.com']]);
     $this->assertSession()->linkByHrefExists(Url::fromRoute('form_test.route8')->toString());
     $this->drupalGet('form-test/confirm-form', ['query' => ['destination' => '<front>']]);
     $this->assertSession()->linkByHrefExists(Url::fromRoute('<front>')->toString());
     // Other invalid destinations, should fall back to the form default.
-    $this->drupalGet('form-test/confirm-form', ['query' => ['destination' => '/http://example.com']]);
+    $this->drupalGet('form-test/confirm-form', ['query' => ['destination' => '/https://example.com']]);
     $this->assertSession()->linkByHrefExists(Url::fromRoute('form_test.route8')->toString());
   }
 

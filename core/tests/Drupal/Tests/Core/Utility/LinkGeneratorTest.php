@@ -104,7 +104,7 @@ class LinkGeneratorTest extends UnitTestCase {
         // Test that $parameters is passed to the URL generator.
       ['test_route_2', ['value' => 'example'], FALSE, '/test-route-2/example'],
         // Test that the 'absolute' option is passed to the URL generator.
-      ['test_route_3', [], TRUE, 'http://example.com/test-route-3'],
+      ['test_route_3', [], TRUE, 'https://example.com/test-route-3'],
     ];
   }
 

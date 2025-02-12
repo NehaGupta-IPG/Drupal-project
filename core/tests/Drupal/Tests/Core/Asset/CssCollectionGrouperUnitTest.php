@@ -77,7 +77,7 @@ class CssCollectionGrouperUnitTest extends UnitTestCase {
         'weight' => 0.009,
         'media' => 'all',
         'preprocess' => TRUE,
-        'data' => 'http://example.com/external.css',
+        'data' => 'https://example.com/external.css',
         'basename' => 'external.css',
       ],
       'elements.css' => [

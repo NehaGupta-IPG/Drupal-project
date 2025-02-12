@@ -262,7 +262,7 @@ class MediaSourceOEmbedVideoTest extends MediaSourceTestBase {
 
     $assert_session->pageTextContains('It is potentially insecure to display oEmbed content in a frame');
 
-    $this->config('media.settings')->set('iframe_domain', 'http://example.com')->save();
+    $this->config('media.settings')->set('iframe_domain', 'https://example.com')->save();
 
     $this->drupalGet('admin/structure/media/add');
     $page->fillField('label', $media_type_id);

@@ -221,9 +221,9 @@ class FilterKernelTest extends KernelTestBase {
     $this->assertSame($attached_library, $output->getAttachments());
 
     // Ensure the caption filter works for linked images.
-    $input = '<a href="http://example.com/llamas/are/awesome/but/kittens/are/cool/too"><img src="llama.jpg" data-caption="Loquacious llama!" /></a>';
+    $input = '<a href="https://example.com/llamas/are/awesome/but/kittens/are/cool/too"><img src="llama.jpg" data-caption="Loquacious llama!" /></a>';
     $expected = '<figure role="group">
-<a href="http://example.com/llamas/are/awesome/but/kittens/are/cool/too"><img src="llama.jpg"></a>
+<a href="https://example.com/llamas/are/awesome/but/kittens/are/cool/too"><img src="llama.jpg"></a>
 <figcaption>Loquacious llama!</figcaption>
 </figure>
 ';
@@ -394,9 +394,9 @@ class FilterKernelTest extends KernelTestBase {
     $this->assertSame($attached_library, $output->getAttachments());
 
     // Ensure both filters together work for linked images.
-    $input = '<a href="http://example.com/llamas/are/awesome/but/kittens/are/cool/too"><img src="llama.jpg" data-caption="Loquacious llama!" data-align="center" /></a>';
+    $input = '<a href="https://example.com/llamas/are/awesome/but/kittens/are/cool/too"><img src="llama.jpg" data-caption="Loquacious llama!" data-align="center" /></a>';
     $expected = '<figure role="group" class="align-center">
-<a href="http://example.com/llamas/are/awesome/but/kittens/are/cool/too"><img src="llama.jpg"></a>
+<a href="https://example.com/llamas/are/awesome/but/kittens/are/cool/too"><img src="llama.jpg"></a>
 <figcaption>Loquacious llama!</figcaption>
 </figure>
 ';
@@ -721,8 +721,8 @@ class FilterKernelTest extends KernelTestBase {
     // Filter selection/pattern matching.
     $tests = [
       // HTTP URLs.
-      'http://example.com or www.example.com' => [
-        '<a href="http://example.com">http://example.com</a>' => TRUE,
+      'https://example.com or www.example.com' => [
+        '<a href="https://example.com">https://example.com</a>' => TRUE,
         '<a href="http://www.example.com">www.example.com</a>' => TRUE,
       ],
       // MAILTO URLs.
@@ -737,7 +737,7 @@ class FilterKernelTest extends KernelTestBase {
       'http://trailing-slash.com/ or www.trailing-slash.com/
       http://host.com/some/path?query=foo&bar[baz]=beer#fragment or www.host.com/some/path?query=foo&bar[baz]=beer#fragment
       http://twitter.com/#!/example/status/22376963142324226
-      http://example.com/@user/
+      https://example.com/@user/
       ftp://user:pass@ftp.example.com/~home/dir1
       sftp://user@nonstandardport:222/dir
       ssh://192.168.0.100/srv/git/drupal.git' => [
@@ -746,7 +746,7 @@ class FilterKernelTest extends KernelTestBase {
         '<a href="http://host.com/some/path?query=foo&amp;bar[baz]=beer#fragment">http://host.com/some/path?query=foo&amp;bar[baz]=beer#fragment</a>' => TRUE,
         '<a href="http://www.host.com/some/path?query=foo&amp;bar[baz]=beer#fragment">www.host.com/some/path?query=foo&amp;bar[baz]=beer#fragment</a>' => TRUE,
         '<a href="http://twitter.com/#!/example/status/22376963142324226">http://twitter.com/#!/example/status/22376963142324226</a>' => TRUE,
-        '<a href="http://example.com/@user/">http://example.com/@user/</a>' => TRUE,
+        '<a href="https://example.com/@user/">https://example.com/@user/</a>' => TRUE,
         '<a href="ftp://user:pass@ftp.example.com/~home/dir1">ftp://user:pass@ftp.example.com/~home/dir1</a>' => TRUE,
         '<a href="sftp://user@nonstandardport:222/dir">sftp://user@nonstandardport:222/dir</a>' => TRUE,
         '<a href="ssh://192.168.0.100/srv/git/drupal.git">ssh://192.168.0.100/srv/git/drupal.git</a>' => TRUE,
@@ -843,13 +843,13 @@ class FilterKernelTest extends KernelTestBase {
     $tests = [
       '<p xmlns="www.namespace.com" />
       <p xmlns="http://namespace.com">
-      An <a href="http://example.com" title="Read more at www.example.info...">anchor</a>.
+      An <a href="https://example.com" title="Read more at www.example.info...">anchor</a>.
       </p>' => [
         '<p xmlns="www.namespace.com" />' => TRUE,
         '<p xmlns="http://namespace.com">' => TRUE,
         'href="http://www.namespace.com"' => FALSE,
         'href="http://namespace.com"' => FALSE,
-        'An <a href="http://example.com" title="Read more at www.example.info...">anchor</a>.' => TRUE,
+        'An <a href="https://example.com" title="Read more at www.example.info...">anchor</a>.' => TRUE,
       ],
       'Not <a href="foo">www.relative.com</a> or <a href="http://absolute.com">www.absolute.com</a>
       but <strong>http://www.strong.net</strong> or <em>www.emphasis.info</em>' => [
@@ -915,7 +915,7 @@ class FilterKernelTest extends KernelTestBase {
         'href="http://example.net"' => FALSE,
       ],
       '<style>body {
-        background: url(http://example.com/pixel.gif);
+        background: url(https://example.com/pixel.gif);
       }</style>' => [
         'href' => FALSE,
       ],
@@ -931,13 +931,13 @@ class FilterKernelTest extends KernelTestBase {
       ],
       '<dl>
       <dt>www.example.com</dt>
-      <dd>http://example.com</dd>
+      <dd>https://example.com</dd>
       <dd>person@example.com</dd>
       <dt>Check www.example.net</dt>
       <dd>Some text around http://www.example.info by person@example.info?</dd>
       </dl>' => [
         'href="http://www.example.com"' => TRUE,
-        'href="http://example.com"' => TRUE,
+        'href="https://example.com"' => TRUE,
         'href="mailto:person@example.com"' => TRUE,
         'href="http://www.example.net"' => TRUE,
         'href="http://www.example.info"' => TRUE,
@@ -1116,8 +1116,8 @@ class FilterKernelTest extends KernelTestBase {
     $f = Html::normalize('line1<HR>line2');
     $this->assertEquals('line1<hr>line2', $f, 'HTML corrector -- Keep self-closing tags.');
 
-    $f = Html::normalize('<img src="http://example.com/test.jpg">test</img>');
-    $this->assertEquals('<img src="http://example.com/test.jpg">test', $f, 'HTML corrector -- Fix self-closing single tags.');
+    $f = Html::normalize('<img src="https://example.com/test.jpg">test</img>');
+    $this->assertEquals('<img src="https://example.com/test.jpg">test', $f, 'HTML corrector -- Fix self-closing single tags.');
 
     $f = Html::normalize('<br></br>');
     $this->assertEquals('<br><br>', $f, "HTML corrector -- Transform empty tags to a self-closed tag if the tag's content model is EMPTY.");

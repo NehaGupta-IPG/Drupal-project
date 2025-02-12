@@ -52,7 +52,7 @@ class DefaultSummary extends StylePluginBase {
       '#title' => $this->t('Base path'),
       '#default_value' => $this->options['base_path'],
       '#description' => $this->t('Define the base path for links in this summary
-        view, i.e. http://example.com/<strong>your_view_path/archive</strong>.
+        view, i.e. https://example.com/<strong>your_view_path/archive</strong>.
         Do not include beginning and ending forward slash. If this value
         is empty, views will use the first path found as the base path,
         in page displays, or / if no path could be found.'),

@@ -38,7 +38,7 @@ class LanguageDomainsTest extends MigrateProcessTestCase {
 
     // The language_domains plugin use $base_url to fill empty domains.
     global $base_url;
-    $base_url = 'http://example.com';
+    $base_url = 'https://example.com';
   }
 
   /**

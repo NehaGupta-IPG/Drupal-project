@@ -120,7 +120,7 @@ class DbLogTest extends BrowserTestBase {
     // Since referrer and location links vary by how the tests are run, inject
     // fake log data to test these.
     $context = [
-      'request_uri' => 'http://example.com?dblog=1',
+      'request_uri' => 'https://example.com?dblog=1',
       'referer' => 'http://example.org?dblog=2',
       'uid' => 0,
       'channel' => 'testing',

@@ -138,14 +138,14 @@ class StatusTest extends BrowserTestBase {
     $session->pageTextContains('Deprecated modules found: Deprecated module.');
 
     // Check that the deprecated module link was rendered correctly.
-    $this->assertSession()->elementExists('xpath', "//a[contains(@href, 'http://example.com/deprecated')]");
+    $this->assertSession()->elementExists('xpath', "//a[contains(@href, 'https://example.com/deprecated')]");
 
     // Uninstall a deprecated module and confirm the warning is not displayed.
     $module_installer->uninstall(['deprecated_module']);
     $this->drupalGet('admin/reports/status');
     $session->pageTextNotContains('Deprecated modules installed');
     $session->pageTextNotContains('Deprecated modules found: Deprecated module.');
-    $this->assertSession()->elementNotExists('xpath', "//a[contains(@href, 'http://example.com/deprecated')]");
+    $this->assertSession()->elementNotExists('xpath', "//a[contains(@href, 'https://example.com/deprecated')]");
 
     // Make sure there are no warnings about obsolete modules.
     $session->pageTextNotContains('Obsolete extensions installed');
@@ -176,14 +176,14 @@ class StatusTest extends BrowserTestBase {
     $session->pageTextContains('Deprecated themes found: Test deprecated theme.');
 
     // Check that the deprecated theme link was rendered correctly.
-    $this->assertSession()->elementExists('xpath', "//a[contains(@href, 'http://example.com/deprecated_theme')]");
+    $this->assertSession()->elementExists('xpath', "//a[contains(@href, 'https://example.com/deprecated_theme')]");
 
     // Uninstall a deprecated theme and confirm the warning is not displayed.
     $theme_installer->uninstall(['test_deprecated_theme']);
     $this->drupalGet('admin/reports/status');
     $session->pageTextNotContains('Deprecated themes installed');
     $session->pageTextNotContains('Deprecated themes found: Test deprecated theme.');
-    $this->assertSession()->elementNotExists('xpath', "//a[contains(@href, 'http://example.com/deprecated_theme')]");
+    $this->assertSession()->elementNotExists('xpath', "//a[contains(@href, 'https://example.com/deprecated_theme')]");
 
     // Check that the installation profile information is displayed.
     $this->drupalGet('admin/reports/status');

@@ -266,7 +266,7 @@ class ManageFieldsFunctionalTest extends ManageFieldsFunctionalTestBase {
     $this->assertSession()->statusCodeEquals(404);
 
     $options = [
-      'query' => ['destinations' => ['http://example.com']],
+      'query' => ['destinations' => ['https://example.com']],
     ];
     $this->drupalGet('admin/structure/types/manage/article/fields/node.article.body', $options);
     $this->submitForm([], 'Save settings');
@@ -277,7 +277,7 @@ class ManageFieldsFunctionalTest extends ManageFieldsFunctionalTestBase {
     parse_str($url['query'], $query);
     $this->assertSame(['http://example.com'], $query['destinations']);
     $this->assertSession()->statusCodeEquals(200);
-    $this->assertSession()->responseContains('Attempt to update field <em class="placeholder">Body</em> failed: <em class="placeholder">The internal path component &#039;http://example.com&#039; is external. You are not allowed to specify an external URL together with internal:/.</em>.');
+    $this->assertSession()->responseContains('Attempt to update field <em class="placeholder">Body</em> failed: <em class="placeholder">The internal path component &#039;https://example.com&#039; is external. You are not allowed to specify an external URL together with internal:/.</em>.');
   }
 
   /**

@@ -4,4 +4,4 @@ description: 'Support module for testing deprecated themes.'
 version: VERSION
 base theme: false
 lifecycle: deprecated
-lifecycle_link: 'http://example.com/deprecated_theme'
+lifecycle_link: 'https://example.com/deprecated_theme'

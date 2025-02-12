@@ -121,7 +121,7 @@ class CommentValidationTest extends EntityKernelTestBase {
     $this->assertEquals('This value is not a valid email address.', $violations[0]->getMessage());
 
     $comment->set('mail', NULL);
-    $comment->set('homepage', 'http://example.com/' . $this->randomMachineName(237));
+    $comment->set('homepage', 'https://example.com/' . $this->randomMachineName(237));
     $this->assertLengthViolation($comment, 'homepage', 255);
 
     $comment->set('homepage', 'invalid');

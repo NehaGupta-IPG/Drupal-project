@@ -217,7 +217,7 @@ class CredentialForm extends MigrateUpgradeFormBase {
       '#type' => 'textfield',
       '#title' => $this->t('Document root for files'),
       '#default_value' => Settings::get('migrate_file_public_path') ?? '',
-      '#description' => $this->t('To import files from your current Drupal site, enter a local file directory containing your site (e.g. /var/www/docroot), or your site address (for example http://example.com).'),
+      '#description' => $this->t('To import files from your current Drupal site, enter a local file directory containing your site (e.g. /var/www/docroot), or your site address (for example https://example.com).'),
       '#states' => [
         'visible' => [
           ':input[name="version"]' => ['value' => '6'],
@@ -230,7 +230,7 @@ class CredentialForm extends MigrateUpgradeFormBase {
       '#type' => 'textfield',
       '#title' => $this->t('Document root for public files'),
       '#default_value' => Settings::get('migrate_file_public_path') ?? '',
-      '#description' => $this->t('To import public files from your current Drupal site, enter a local file directory containing your site (e.g. /var/www/docroot), or your site address (for example http://example.com).'),
+      '#description' => $this->t('To import public files from your current Drupal site, enter a local file directory containing your site (e.g. /var/www/docroot), or your site address (for example https://example.com).'),
       '#states' => [
         'visible' => [
           ':input[name="version"]' => ['value' => '7'],

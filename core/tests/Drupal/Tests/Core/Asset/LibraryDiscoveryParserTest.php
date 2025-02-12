@@ -323,8 +323,8 @@ class LibraryDiscoveryParserTest extends UnitTestCase {
     $libraries = $this->libraryDiscoveryParser->buildByExtension('external');
     $library = $libraries['example_external'];
 
-    $this->assertEquals('http://example.com/css/example_external.css', $library['css'][0]['data']);
-    $this->assertEquals('http://example.com/example_external.js', $library['js'][0]['data']);
+    $this->assertEquals('https://example.com/css/example_external.css', $library['css'][0]['data']);
+    $this->assertEquals('https://example.com/example_external.js', $library['js'][0]['data']);
     $this->assertEquals('3.14', $library['version']);
   }
 
@@ -479,7 +479,7 @@ class LibraryDiscoveryParserTest extends UnitTestCase {
 
     $this->assertCount(5, $library['css']);
     $this->assertEquals('external', $library['css'][0]['type']);
-    $this->assertEquals('http://example.com/test.css', $library['css'][0]['data']);
+    $this->assertEquals('https://example.com/test.css', $library['css'][0]['data']);
     $this->assertEquals('file', $library['css'][1]['type']);
     $this->assertEquals('tmp/test.css', $library['css'][1]['data']);
     $this->assertEquals('external', $library['css'][2]['type']);

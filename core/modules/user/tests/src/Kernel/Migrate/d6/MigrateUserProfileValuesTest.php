@@ -61,10 +61,10 @@ EOT;
     $this->assertSame('Queen', $user->profile_bands[5]->value);
     $this->assertSame('The White Stripes', $user->profile_bands[6]->value);
     $this->assertSame('1974-06-02', $user->profile_birthdate->value);
-    $this->assertSame('http://example.com/blog', $user->profile_blog->uri);
+    $this->assertSame('https://example.com/blog', $user->profile_blog->uri);
     $this->assertNull($user->profile_blog->title);
     $this->assertSame([], $user->profile_blog->options);
-    $this->assertSame('http://example.com/blog', $user->profile_blog->uri);
+    $this->assertSame('https://example.com/blog', $user->profile_blog->uri);
 
     // Check that the source profile field names that are longer than 32
     // characters have been migrated.

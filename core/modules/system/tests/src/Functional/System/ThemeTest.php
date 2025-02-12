@@ -366,7 +366,7 @@ class ThemeTest extends BrowserTestBase {
     $this->drupalGet('admin/appearance');
     $this->assertSession()->pageTextContains('Experimental test ' . $experimental_version . ' (experimental theme)');
     $this->assertSession()->pageTextContains('Test deprecated theme ' . $deprecated_version . ' (Deprecated)');
-    $this->assertSession()->elementExists('xpath', "//a[contains(@href, 'http://example.com/deprecated_theme')]");
+    $this->assertSession()->elementExists('xpath', "//a[contains(@href, 'https://example.com/deprecated_theme')]");
 
     // Check that the administration theme is used on an administration page.
     $this->drupalGet('admin/config');

@@ -58,7 +58,7 @@ libraries-override:
   # Use an absolute URI.
   core/drupal.announce:
     js:
-      misc/announce.js: http://example.com/my_theme/js/announce.js
+      misc/announce.js: https://example.com/my_theme/js/announce.js
 
 regions:
   content: Content

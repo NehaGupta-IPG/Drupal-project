@@ -256,11 +256,11 @@ class DisplayTest extends ViewTestBase {
 
     // Test more link with absolute URL.
     $view->display_handler->setOption('link_display', 'custom_url');
-    $view->display_handler->setOption('link_url', 'http://example.com');
+    $view->display_handler->setOption('link_url', 'https://example.com');
     $this->executeView($view);
     $output = $view->preview();
     $output = (string) $renderer->renderRoot($output);
-    $this->assertStringContainsString('http://example.com', $output, 'The read more link with href "http://example.com" was found.');
+    $this->assertStringContainsString('https://example.com', $output, 'The read more link with href "https://example.com" was found.');
 
     // Test more link with query parameters in the URL.
     $view->display_handler->setOption('link_display', 'custom_url');

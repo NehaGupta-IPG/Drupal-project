@@ -85,8 +85,8 @@ class LinkCollectionNormalizerTest extends KernelTestBase {
   public function testNormalize(): void {
     $link_context = new ResourceObject(new CacheableMetadata(), new ResourceType('n/a', 'n/a', 'n/a'), 'n/a', NULL, [], new LinkCollection([]));
     $link_collection = (new LinkCollection([]))
-      ->withLink('related', new Link(new CacheableMetadata(), Url::fromUri('http://example.com/post/42'), 'related', ['title' => 'Most viewed']))
-      ->withLink('related', new Link(new CacheableMetadata(), Url::fromUri('http://example.com/post/42'), 'related', ['title' => 'Top rated']))
+      ->withLink('related', new Link(new CacheableMetadata(), Url::fromUri('https://example.com/post/42'), 'related', ['title' => 'Most viewed']))
+      ->withLink('related', new Link(new CacheableMetadata(), Url::fromUri('https://example.com/post/42'), 'related', ['title' => 'Top rated']))
       ->withContext($link_context);
     // Create the SUT.
     $normalized = $this->getNormalizer()->normalize($link_collection)->getNormalization();
@@ -96,13 +96,13 @@ class LinkCollectionNormalizerTest extends KernelTestBase {
     }
     $this->assertSame([
       [
-        'href' => 'http://example.com/post/42',
+        'href' => 'https://example.com/post/42',
         'meta' => [
           'title' => 'Most viewed',
         ],
       ],
       [
-        'href' => 'http://example.com/post/42',
+        'href' => 'https://example.com/post/42',
         'meta' => [
           'title' => 'Top rated',
         ],

@@ -169,7 +169,7 @@ class KernelTestBaseTest extends KernelTestBase {
     // in Kernel tests.
     try {
       /** @var \GuzzleHttp\Psr7\Response $response */
-      $response = $this->container->get('http_client')->head('http://example.com');
+      $response = $this->container->get('http_client')->head('https://example.com');
       self::assertEquals(200, $response->getStatusCode());
     }
     catch (\Throwable $e) {
