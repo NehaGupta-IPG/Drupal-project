@@ -99,7 +99,8 @@ class Query extends QueryBase implements QueryInterface {
             $b = $b[$property] ?? NULL;
           }
         }
-        return ($a <= $b) ? $direction : -$direction;
+        $compare = (is_string($a) && is_string($b)) ? (strcasecmp($a, $b) < 0) : ($a <= $b);
+        return $compare ? $direction : -$direction;
       });
     }
 
