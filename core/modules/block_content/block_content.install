@@ -18,7 +18,7 @@ function block_content_update_last_removed(): int {
 /**
  * Install the owner field for Block Content entities.
  */
-function block_content_update_10301(): void {
+function block_content_update_11000(): void {
   $entityDefinitionUpdateManager = \Drupal::entityDefinitionUpdateManager();
   $entityType = $entityDefinitionUpdateManager->getEntityType('block_content');
 
