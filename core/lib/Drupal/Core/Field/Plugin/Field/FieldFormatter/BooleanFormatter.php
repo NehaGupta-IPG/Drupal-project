@@ -149,20 +149,18 @@ class BooleanFormatter extends FormatterBase {
     $formats = $this->getOutputFormats();
     $format = $this->getSetting('format');
 
-    if ($items->isEmpty()) {
-      return [['#markup' => $formats[$format][1]]];
-    }
-
     foreach ($items as $delta => $item) {
+      $value = !empty($item->value) ? (bool) $item->value : FALSE;
+
       if ($format == 'custom') {
-        $elements[$delta] = ['#markup' => $item->value ? $this->getSetting('format_custom_true') : $this->getSetting('format_custom_false')];
+        $elements[$delta] = ['#markup' => $value ? $this->getSetting('format_custom_true') : $this->getSetting('format_custom_false')];
       }
       else {
-        $elements[$delta] = ['#markup' => $item->value ? $formats[$format][0] : $formats[$format][1]];
+        $elements[$delta] = ['#markup' => $value ? $formats[$format][0] : $formats[$format][1]];
       }
     }
 
-    return $elements;
+    return !empty($elements) ? $elements : [['#markup' => $formats[$format][1]]];
   }
 
 }
