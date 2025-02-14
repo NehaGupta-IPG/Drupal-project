@@ -2315,7 +2315,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
   /**
    * Tests PATCHing an individual resource, plus edge cases to ensure good DX.
    */
-  public function testPatchIndividual(): void {
+  protected function doTestPatchIndividual(): void {
     $prior_revision_id = $this->entity instanceof ContentEntityInterface
       ? (int) $this->entityLoadUnchanged($this->entity->id())->getRevisionId()
       // Config entities do not have revision IDs.
