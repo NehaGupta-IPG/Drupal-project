@@ -289,7 +289,7 @@ class EditorTest extends ConfigEntityResourceTestBase {
   /**
    * {@inheritdoc}
    */
-  public function testPatchIndividual() {
+  public function testPatchIndividual(): void {
     // Ensure ::getModifiedEntityForPatchTesting() can pick an alternative value
     // for the 'format' property.
     // cSpell:disable
@@ -301,13 +301,13 @@ class EditorTest extends ConfigEntityResourceTestBase {
     ])->save();
     // cSpell:enable
 
-    return parent::testPatchIndividual();
+    parent::doTestPatchIndividual();
   }
 
   /**
    * Cannot use `unicorn` because `editor.settings.unicorn` is not validatable.
    */
-  public function testEditorPluginWithNonFullyValidatableSettings() {
+  public function testEditorPluginWithNonFullyValidatableSettings(): void {
     $this->container->get('module_installer')->install(['editor_test']);
 
     $this->setUpAuthorization('POST');

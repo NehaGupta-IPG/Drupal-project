@@ -135,7 +135,7 @@ class DateFormatTest extends ConfigEntityResourceTestBase {
    * @testWith [null, "This value should not be null."]
    *           ["⌚", "This is not a valid date format."]
    */
-  public function testPostValidationErrors(?string $pattern, string $expected_validation_error) {
+  public function testPostValidationErrors(?string $pattern, string $expected_validation_error): void {
     $this->setUpAuthorization('POST');
     $this->config('jsonapi.settings')->set('read_only', FALSE)->save(TRUE);
 
