@@ -472,7 +472,6 @@ abstract class ResourceTestBase extends BrowserTestBase {
       $needs_manual_id = TRUE;
     }
 
-    // @todo Check if this change needs to keep $original->id() . '_' . $key for non-ConfigEntityInterface instances.
     if ($needs_manual_id) {
       $duplicate->set($id_key, $original->id() . $key);
     }
