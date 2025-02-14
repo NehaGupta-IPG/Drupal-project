@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\FunctionalJavascriptTests\Ajax;
 
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
@@ -24,7 +26,7 @@ class LinkTest extends WebDriverTestBase {
   /**
    * Test links that use the 'use-ajax' class.
    */
-  public function testLinks() {
+  public function testLinks(): void {
     // Visit the page with test links.
     $this->drupalGet('ajax-test/links');
 

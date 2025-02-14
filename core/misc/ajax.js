@@ -1368,7 +1368,7 @@
       // that part of the response, to ensure only the desired part of the
       // content is being replaced.
       if (ajax.wrapper !== undefined && ajax.replacePartial) {
-        let $partial = $newContent.find(ajax.wrapper);
+        const $partial = $newContent.find(ajax.wrapper);
         if ($partial.length) {
           $newContent = $partial;
         }

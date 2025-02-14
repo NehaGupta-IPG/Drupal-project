@@ -531,7 +531,7 @@ class AjaxTestController {
   /**
    * Returns a render array of elements and ajax links.
    */
-  public function links() {
+  public function links(): array {
     // Add a wrapper.
     $build['content_wrapper'] = ['#markup' => '<div id="ajax-test-link-content-wrapper" tabindex="-1">Default</div><div id="ajax-test-link-ajax-response-wrapper" tabindex="-1">Default</div>'];
 
