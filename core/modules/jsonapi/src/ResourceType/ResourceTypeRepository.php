@@ -314,13 +314,19 @@ class ResourceTypeRepository implements ResourceTypeRepositoryInterface {
       return TRUE;
     }
 
-    // @todo this is inaccurate — it won't work for e.g. `field.field.*.*.*`. We
-    //   need the inverse of \Drupal\Core\Config\ConfigManager::getEntityTypeIdByName()
-    //   To build that, we would need to expand the `@ConfigEntityType`
-    //   annotation with a "id_parts" key-value pair, which defaults to 1, and
-    //   FieldConfig, FieldStorageConfig, EntityViewMode etc. would specify.
-    $config_schema_type_name = $entity_type->getConfigPrefix() . '.*';
-    $config_schema_type_definition = \Drupal::service('config.typed')->getDefinition($config_schema_type_name);
+    $config_schema_type_definition = FALSE;
+    $config_prefix = $entity_type->getConfigPrefix();
+    $definitions = \Drupal::service('config.typed')->getDefinitions();
+    foreach ($definitions as $name => $definition) {
+      if (str_starts_with($name, $config_prefix . '.*') && str_replace('.*', '', $name) === $config_prefix) {
+        $config_schema_type_definition = $definition;
+        break;
+      }
+    }
+
+    if ($config_schema_type_definition !== FALSE) {
+      return FALSE;
+    }
 
     // Config entities are only mutable if they're fully validatable.
     return array_key_exists('FullyValidatable', $config_schema_type_definition['constraints'] ?? []);
