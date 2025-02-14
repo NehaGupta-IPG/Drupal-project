@@ -123,10 +123,10 @@ abstract class ResourceTestBase extends BrowserTestBase {
    * entity properties that are listed for the ImmutableProperties constraint.
    * This always includes the property that is used as the `id` entity key.
    *
+   * @var string[]
+   *
    * @see \Drupal\Core\Entity\Plugin\Validation\Constraint\ImmutablePropertiesConstraint
    * @see \Drupal\Core\Config\Entity\ConfigEntityType::getConstraints()
-   *
-   * @var string[]
    */
   protected static $patchProtectedFieldNames;
 
