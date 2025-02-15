@@ -78,7 +78,10 @@ class DateFormatTest extends ConfigEntityResourceTestBase {
    * {@inheritdoc}
    */
   protected function getExpectedDocument(): array {
-    $self_url = Url::fromUri('base:/jsonapi/date_format/date_format/' . $this->entity->uuid())->setAbsolute()->toString(TRUE)->getGeneratedUrl();
+    $self_url = Url::fromUri('base:/jsonapi/date_format/date_format/' . $this->entity->uuid())
+      ->setAbsolute()
+      ->toString(TRUE)
+      ->getGeneratedUrl();
     return [
       'jsonapi' => [
         'meta' => [
@@ -165,6 +168,29 @@ class DateFormatTest extends ConfigEntityResourceTestBase {
       'jsonapi' => static::$jsonApiMember,
     ];
     $this->assertResourceResponse(422, $expected_document, $response);
+  }
+
+  public function testPostingExistingId(): void {
+    $this->setUpAuthorization('POST');
+    $this->config('jsonapi.settings')->set('read_only', FALSE)->save(TRUE);
+
+    // Create date_format POST request.
+    $url = Url::fromRoute(sprintf('jsonapi.%s.collection.post', static::$resourceTypeName));
+    $request_options = $this->getAuthenticationRequestOptions();
+    $request_options[RequestOptions::HEADERS]['Accept'] = 'application/vnd.api+json';
+    $request_options[RequestOptions::HEADERS]['Content-Type'] = 'application/vnd.api+json';
+
+    $doc = $this->getPostDocument();
+    $request_options[RequestOptions::BODY] = Json::encode($doc);
+
+    // POST request: 422 when adding relationships to non-existing resources.
+    $response = $this->request('POST', $url, $request_options);
+
+    $this->assertResourceResponse(201, FALSE, $response);
+
+    $response = $this->request('POST', $url, $request_options);
+
+    $this->assertResourceResponse(409, FALSE, $response);
   }
 
 }
