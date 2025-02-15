@@ -1408,8 +1408,9 @@ abstract class ResourceTestBase extends BrowserTestBase {
    * referred to as "resource identifiers."
    */
   public function testRelationships(): void {
+    // @todo Remove this in https://www.drupal.org/i/3423462
     if ($this->entity instanceof ConfigEntityInterface) {
-      $this->markTestSkipped('Configuration entities cannot have relationships.');
+      $this->markTestSkipped('Configuration entities cannot have relationships yet.');
     }
 
     $request_options = [];
@@ -2066,11 +2067,6 @@ abstract class ResourceTestBase extends BrowserTestBase {
    * Tests POSTing an individual resource, plus edge cases to ensure good DX.
    */
   protected function doTestPostIndividual(): void {
-    // @todo Remove this in https://www.drupal.org/node/2300677.
-    if ($this->entity instanceof ConfigEntityInterface) {
-      $this->markTestSkipped('POSTing config entities is not yet supported.');
-    }
-
     // Try with all of the following request bodies.
     $not_parseable_request_body = '!{>}<';
     $parseable_valid_request_body = Json::encode($this->getPostDocument());
@@ -2252,6 +2248,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
     // Recreating the config entity using the same document will result in the
     // same ID, because config entities do not have incrementing integer IDs. So
     // there is no point in testing the same thing again.
+    // @todo This might actually need to be done, we get a 500 here right now.
     if ($this->entity instanceof ConfigEntityInterface) {
       return;
     }
@@ -2721,7 +2718,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
    * Tests DELETEing an individual resource, plus edge cases to ensure good DX.
    */
   protected function doTestDeleteIndividual(): void {
-    // @todo Remove this in https://www.drupal.org/node/2300677.
+    // @todo Remove this in https://www.drupal.org/i/3423459.
     if ($this->entity instanceof ConfigEntityInterface) {
       $this->markTestSkipped('DELETEing config entities is not yet supported.');
     }
