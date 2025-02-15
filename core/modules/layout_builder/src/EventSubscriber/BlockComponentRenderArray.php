@@ -124,7 +124,7 @@ class BlockComponentRenderArray implements EventSubscriberInterface {
       // If this is a multi-value block configured to not display all values,
       // remove those field items from the render array.
       $block_configuration = $block->getConfiguration();
-      if (!$is_content_empty && isset($block_configuration['display_items']) && $block_configuration['display_items'] == 'display_some') {
+      if (!$is_content_empty && isset($content[0]['#items']) && isset($block_configuration['display_items']) && $block_configuration['display_items'] == 'display_some') {
         $total_items = $content[0]['#items']->count();
         $offset = (int) $block_configuration['offset'];
         $items_to_display = (int) $block_configuration['items_to_display'] ?? $total_items - $offset;
