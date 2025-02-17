@@ -140,10 +140,10 @@
  * The REST framework in the REST module has support built in for entities, but
  * it is also an extensible plugin-based system. REST plugins implement
  * interface \Drupal\rest\Plugin\ResourceInterface, and generally extend base
- * class \Drupal\rest\Plugin\ResourceBase. They are annotated with
- * \Drupal\rest\Annotation\RestResource annotation, and must be in plugin
- * namespace subdirectory Plugin\rest\resource. For more information on how to
- * create plugins, see the @link plugin_api Plugin API topic. @endlink
+ * class \Drupal\rest\Plugin\ResourceBase. They are declared in
+ * \Drupal\rest\Attribute\RestResource, and must be in plugin namespace
+ * subdirectory Plugin\rest\resource. For more information on how to create
+ * plugins, see the @link plugin_api Plugin API topic. @endlink
  *
  * If you create a new REST plugin, you will also need to enable it by
  * providing default configuration or configuration import, as outlined in
@@ -345,7 +345,7 @@
  * - For examples, look for classes that implement
  *   \Drupal\Core\Config\Entity\ConfigEntityInterface -- one good example is
  *   the \Drupal\user\Entity\Role entity type.
- * - In the entity type annotation, you will need to define a 'config_prefix'
+ * - In the entity type metadata, you will need to define a 'config_prefix'
  *   string. When Drupal stores a configuration item, it will be given a name
  *   composed of your module name, your chosen config prefix, and the ID of
  *   the individual item, separated by '.'. For example, in the Role entity,
@@ -698,7 +698,7 @@
  *   information.
  * - Entities: Access for various entity operations is designated either with
  *   simple permissions or access control handler classes in the entity
- *   annotation. See the @link entity_api Entity API topic @endlink for more
+ *   metadata. See the @link entity_api Entity API topic @endlink for more
  *   information.
  * - Other code: There is a 'current_user' service, which can be injected into
  *   classes to provide access to the current user account (see the
@@ -948,8 +948,8 @@
  * API provides this abstraction.
  *
  * @section sec_overview Overview
- * Each data type in the Typed Data API is a plugin class (annotation class
- * example: \Drupal\Core\TypedData\Annotation\DataType); these plugins are
+ * Each data type in the Typed Data API is a plugin class (attribute class
+ * example: \Drupal\Core\TypedData\Attribute\DataType); these plugins are
  * managed by the typed_data_manager service (by default
  * \Drupal\Core\TypedData\TypedDataManager). Each data object encapsulates a
  * single piece of data, provides access to the metadata, and provides
@@ -960,7 +960,7 @@
  * the definition class (see \Drupal\Core\TypedData\DataDefinitionInterface).
  * The class used can vary by data type and can be specified in the data type's
  * plugin definition, while the default is set in the $definition_class property
- * of the annotation class. The default class is
+ * of the attribute class. The default class is
  * \Drupal\Core\TypedData\DataDefinition. For data types provided by a plugin
  * deriver, the plugin deriver can set the definition_class property too.
  * The metadata object provides information about the data, such as the data
@@ -1308,6 +1308,11 @@
  *
  * @section sec_overview Overview and terminology
  *
+ * The Drupal plugin system has a set of reusable components that developers
+ * can use, override, and extend in their modules. Most of the plugins use
+ * attributes, which let classes register themselves as plugins and describe
+ * their metadata.
+ *
  * The basic idea of plugins is to allow a particular module or subsystem of
  * Drupal to provide functionality in an extensible, object-oriented way. The
  * controlling module or subsystem defines the basic framework (interface) for
@@ -1383,6 +1388,8 @@
  * \Drupal\Component\Plugin\Discovery\DiscoveryInterface. Most plugin types use
  * one of the following discovery mechanisms:
  * - Annotation: Plugin classes are annotated and placed in a defined namespace
+ *   subdirectory. This method will be deprecated.
+ * - Attribute: Plugin classes are attributes and placed in a defined namespace
  *   subdirectory. Most Drupal Core plugins use this method of discovery.
  * - Hook: Plugin modules need to implement a hook to tell the manager about
  *   their plugins.
@@ -1394,21 +1401,21 @@
  *   plugins of this type (if the list of available plugins is static).
  *
  * It is also possible to define your own custom discovery mechanism or mix
- * methods together. And there are many more details, such as annotation
- * decorators, that apply to some of the discovery methods. See
+ * methods together. And there are many more details, such as decorators, that
+ * apply to some of the discovery methods. See
  * https://www.drupal.org/developing/api/8/plugins for more details.
  *
- * The remainder of this documentation will assume Annotation-based discovery,
+ * The remainder of this documentation will assume Attribute-based discovery,
  * since this is the most common method.
  *
  * @subsection sub_manager Defining a plugin manager class and service
- * To define an annotation-based plugin manager:
+ * To define an attribute-based plugin manager:
  * - Choose a namespace subdirectory for your plugin. For example, search page
  *   plugins go in directory Plugin/Search under the module namespace.
- * - Define an annotation class for your plugin type. This class should extend
- *   \Drupal\Component\Annotation\Plugin, and for most plugin types, it should
- *   contain member variables corresponding to the annotations plugins will
- *   need to provide. All plugins have at least $id: a unique string
+ * - Define an attribute class for your plugin type. This class should extend
+ *   \Drupal\Component\Plugin\Attribute\Plugin, and for most plugin types, it
+ *   should contain member variables corresponding to the metadata plugins will
+ *   need to provide. All plugins have at least "id:", a unique string
  *   identifier.
  * - Define an alter hook for altering the discovered plugin definitions. You
  *   should document the hook in a *.api.php file.
@@ -1417,7 +1424,7 @@
  *   this by extending \Drupal\Core\Plugin\DefaultPluginManager. If you do
  *   extend the default plugin manager, the only method you will probably need
  *   to define is the class constructor, which will need to call the parent
- *   constructor to provide information about the annotation class and plugin
+ *   constructor to provide information about the attribute class and plugin
  *   namespace for discovery, set up the alter hook, and possibly set up
  *   caching. See classes that extend DefaultPluginManager for examples.
  * - Define a service for your plugin manager. See the
@@ -1452,15 +1459,26 @@
  * API topic @endlink for more information about configuration entities.
  *
  * @section sec_create Creating a plugin of an existing type
- * Assuming the plugin type uses annotation-based discovery, in order to create
+ * Assuming the plugin type uses attribute-based discovery, in order to create
  * a plugin of an existing type, you will be creating a class. This class must:
  * - Implement the plugin interface, so that it has the required methods
  *   defined. Usually, you'll want to extend the plugin base class, if one has
  *   been provided.
- * - Have the right annotation in its documentation header. See the
- *   @link annotation Annotation topic @endlink for more information about
- *   annotation.
- * - Be in the right plugin namespace, in order to be discovered.
+ * - Be in the correct plugin namespace, in order to be discovered.
+ *
+ * A class for a new content type should be similar to this example.
+ * @code
+ * namespace Drupal\new_content_type\Entity;
+ *
+ * #[ContentEntityType(
+ *   id: 'new_content_type',
+ *   label: new TranslatableMarkup('New content type'),
+ *   ...
+ *   base_table: "new_content_type"
+ * )]
+ * class NewContentType extends ContentEntityBase {
+ * @endcode
+ *
  * Often, the easiest way to make sure this happens is to find an existing
  * example of a working plugin class of the desired type, and copy it into your
  * module as a starting point.
@@ -1486,9 +1504,6 @@
  * - Call the createInstance() method on the plugin manager to instantiate
  *   individual plugin objects.
  * - Call methods on the plugin objects to perform the desired tasks.
- *
- * @see annotation
- * @}
  */
 
 /**
@@ -1514,10 +1529,8 @@
  *   \Drupal\Core\foo\bar, then it goes in directory
  *   core/lib/Drupal/Core/foo/bar. See https://www.drupal.org/node/2156625 for
  *   more information about PSR-4.
- * - Some classes have annotations added to their documentation headers. See
- *   the @link annotation Annotation topic @endlink for more information.
- * - Standard plugin discovery requires particular namespaces and annotation
- *   for most plugin classes. See the
+ * - Standard plugin discovery requires particular namespaces and an attribute
+ *   class for most plugin classes. See the
  *   @link plugin_api Plugin API topic @endlink for more information.
  * - There are project-wide coding standards for OO code, including naming:
  *   https://www.drupal.org/node/608152
@@ -2083,8 +2096,8 @@
  *
  * Long-running tasks and tasks that could time out, such as retrieving remote
  * data, sending email, and intensive file tasks, should use the queue API
- * instead of executing the tasks directly. To do this, first define one or
- * more queues via a \Drupal\Core\Annotation\QueueWorker plugin. Then, add items
+ * instead of executing the tasks directly. To do this, first define one or more
+ * queues via a \Drupal\Core\Queue\Attribute\QueueWorker plugin. Then, add items
  * that need to be processed to the defined queues.
  *
  * @see queue
@@ -2145,7 +2158,7 @@ function hook_data_type_info_alter(&$data_types) {
  *   An array of cron queue information.
  *
  * @see \Drupal\Core\Queue\QueueWorkerInterface
- * @see \Drupal\Core\Annotation\QueueWorker
+ * @see \Drupal\Core\Queue\Attribute\QueueWorker
  * @see \Drupal\Core\Cron
  *
  * @ingroup queue
@@ -2309,7 +2322,7 @@ function hook_mail($key, &$message, $params): void {
  * @param array $info
  *   The mail backend plugin definitions to be altered.
  *
- * @see \Drupal\Core\Annotation\Mail
+ * @see \Drupal\Core\Mail\Attribute\Mail
  * @see \Drupal\Core\Mail\MailManager
  */
 function hook_mail_backend_info_alter(&$info) {
