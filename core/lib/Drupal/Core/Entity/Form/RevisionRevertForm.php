@@ -227,7 +227,7 @@ class RevisionRevertForm extends ConfirmFormBase implements EntityFormInterface 
       $originalRevisionTimestamp = $revision->getRevisionCreationTime();
       $date = $this->dateFormatter->format($originalRevisionTimestamp);
       $revision
-        ->setRevisionLogMessage($this->t('Copy of the revision from %date.', ['%date' => $date]))
+        ->setRevisionLogMessage($this->t('Copy of the revision from @date.', ['@date' => $date]))
         ->setRevisionCreationTime($time)
         ->setRevisionUserId($this->currentUser()->id());
     }
