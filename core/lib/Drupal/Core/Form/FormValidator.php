@@ -102,7 +102,7 @@ class FormValidator implements FormValidatorInterface {
     // matches the current user's session. This is duplicate to code in
     // FormBuilder::doBuildForm() but left to protect any custom form handling
     // code.
-    if (isset($form['#token'])) {
+    if (isset($form['#token']) && $form['#method'] != 'get') {
       if (!$this->csrfToken->validate($form_state->getValue('form_token'), $form['#token']) || $form_state->hasInvalidToken()) {
         $this->setInvalidTokenError($form_state);
 

@@ -557,9 +557,6 @@ class FormBuilder implements FormBuilderInterface, FormValidatorInterface, FormS
       if (!isset($input['form_id'])) {
         $input['form_id'] = $form_id;
       }
-      if (!isset($input['form_token']) && isset($form['#token'])) {
-        $input['form_token'] = $this->csrfToken->get($form['#token']);
-      }
       $form_state->setUserInput($input);
     }
 
@@ -704,11 +701,9 @@ class FormBuilder implements FormBuilderInterface, FormValidatorInterface, FormS
       $form['#method'] = 'get';
     }
 
-    // GET forms should not use a CSRF token.
+    // GET forms should be prevented from getting a CSRF Token.
     if (isset($form['#method']) && $form['#method'] === 'get') {
-      $form += [
-        '#token' => FALSE,
-      ];
+      unset($form['#token']);
     }
 
     // Generate a new #build_id for this form, if none has been set already.
@@ -949,7 +944,7 @@ class FormBuilder implements FormBuilderInterface, FormValidatorInterface, FormS
       $input = $form_state->getUserInput();
       if ($form_state->isProgrammed() || (!empty($input) && (isset($input['form_id']) && ($input['form_id'] == $form_id)))) {
         $form_state->setProcessInput();
-        if (isset($element['#token'])) {
+        if (isset($element['#token']) && !$form_state->isMethodType('GET')) {
           $input = $form_state->getUserInput();
           if (empty($input['form_token']) || !$this->csrfToken->validate($input['form_token'], $element['#token'])) {
             // Set an early form error to block certain input processing since
