@@ -354,7 +354,7 @@ class RevisionRevertFormTest extends BrowserTestBase {
     /** @var \Drupal\entity_test_revlog\Entity\EntityTestWithRevisionLog $latestRevision */
     $latestRevision = $storage->loadUnchanged($entity->id());
     $this->assertEquals($count + 1, $this->countRevisions($entity->getEntityTypeId()));
-    $this->assertEquals('Copy of the revision from <em class="placeholder">Sun, 11 Jan 2009 - 17:00</em>.', $latestRevision->getRevisionLogMessage());
+    $this->assertEquals('Copy of the revision from Sun, 11 Jan 2009 - 17:00.', $latestRevision->getRevisionLogMessage());
     $this->assertGreaterThan($revisionCreationTime, $latestRevision->getRevisionCreationTime());
     $this->assertEquals($user->id(), $latestRevision->getRevisionUserId());
     $this->assertTrue($latestRevision->isDefaultRevision());
