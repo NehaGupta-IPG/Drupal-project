@@ -70,15 +70,13 @@ class SetInlineBlockDependency implements EventSubscriberInterface {
     protected readonly ?RouteMatchInterface $currentRouteMatch,
   ) {
     if (!$entityRepository instanceof EntityRepositoryInterface) {
-      // @todo Replace link with a link to the change record.
-      @trigger_error('Calling ' . __METHOD__ . ' without passing the entity repository as the first argument is deprecated in drupal:11.0.0 and will be required in drupal:12.0.0. See https://www.drupal.org/node/3047022', E_USER_DEPRECATED);
+      @trigger_error('Calling ' . __METHOD__ . ' without passing the entity repository as the first argument is deprecated in drupal:11.2.0 and will be required in drupal:12.0.0. See https://www.drupal.org/node/3507600', E_USER_DEPRECATED);
       $entityRepository = \Drupal::service('entity.repository');
     }
     $this->entityRepository = $entityRepository;
     $this->sectionStorageManager = $sectionStorageManager;
     if (empty($currentRouteMatch)) {
-      // @todo Replace link with a link to the change record.
-      @trigger_error('Calling ' . __METHOD__ . ' without the $currentRouteMatch argument is deprecated in drupal:11.0.0 and will be required in drupal:12.0.0. See https://www.drupal.org/node/3047022', E_USER_DEPRECATED);
+      @trigger_error('Calling ' . __METHOD__ . ' without the $currentRouteMatch argument is deprecated in drupal:11.2.0 and will be required in drupal:12.0.0. See https://www.drupal.org/node/3507600', E_USER_DEPRECATED);
       $currentRouteMatch = \Drupal::service('current_route_match');
     }
   }
