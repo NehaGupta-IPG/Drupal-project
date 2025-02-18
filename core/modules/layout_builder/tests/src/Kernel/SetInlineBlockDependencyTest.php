@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\layout_builder\Kernel;
 
 use Drupal\Core\Routing\CurrentRouteMatch;
@@ -75,7 +77,7 @@ class SetInlineBlockDependencyTest extends KernelTestBase {
   /**
    * Test inline block dependencies with no route object.
    */
-  public function testInlineBlockDependencyWithNoRouteObject() {
+  public function testInlineBlockDependencyWithNoRouteObject(): void {
     // Create a mock route match service to return a NULL route object.
     $current_route_match = $this->prophesize(CurrentRouteMatch::class);
     $current_route_match->getRouteObject()->willReturn(NULL);
@@ -85,7 +87,7 @@ class SetInlineBlockDependencyTest extends KernelTestBase {
     \Drupal::setContainer($container);
 
     // Create a test entity, block, & account for running access checks.
-    $entity = EntityTestMulRevPub::create();
+    $entity = EntityTestMulRevPub::create(['name' => $this->randomMachineName()]);
     $entity->save();
     $block = $this->addInlineBlockToOverrideLayout($entity);
     $account = $this->createUser([
@@ -109,8 +111,8 @@ class SetInlineBlockDependencyTest extends KernelTestBase {
   /**
    * Test inline block dependencies with a default revision entity host.
    */
-  public function testInlineBlockDependencyDefaultRevision() {
-    $entity = EntityTestMulRevPub::create();
+  public function testInlineBlockDependencyDefaultRevision(): void {
+    $entity = EntityTestMulRevPub::create(['name' => $this->randomMachineName()]);
     $entity->save();
     $block = $this->addInlineBlockToOverrideLayout($entity);
     $account = $this->createUser([
@@ -127,9 +129,9 @@ class SetInlineBlockDependencyTest extends KernelTestBase {
   /**
    * Test inline block dependencies with a non-default revision entity host.
    */
-  public function testInlineBlockDependencyNonDefaultActiveRevision() {
+  public function testInlineBlockDependencyNonDefaultActiveRevision(): void {
     // Create the canonical revision.
-    $entity = EntityTestMulRevPub::create(['moderation_state' => 'published']);
+    $entity = EntityTestMulRevPub::create(['name' => $this->randomMachineName(), 'moderation_state' => 'published']);
     $entity->save();
 
     // Create and add a custom block to a new active revision.
@@ -161,9 +163,9 @@ class SetInlineBlockDependencyTest extends KernelTestBase {
   /**
    * Test the inline block dependency when removed from the active revision.
    */
-  public function testInlineBlockDependencyRemovedInActiveRevision() {
+  public function testInlineBlockDependencyRemovedInActiveRevision(): void {
     // Create the canonical revision with an inline block.
-    $entity = EntityTestMulRevPub::create(['moderation_state' => 'published']);
+    $entity = EntityTestMulRevPub::create(['name' => $this->randomMachineName(), 'moderation_state' => 'published']);
     $entity->save();
     $block = $this->addInlineBlockToOverrideLayout($entity);
 
@@ -196,9 +198,10 @@ class SetInlineBlockDependencyTest extends KernelTestBase {
    * @return \Drupal\block_content\Entity\BlockContent
    *   The loaded block content revision attached to the layout.
    */
-  protected function addInlineBlockToOverrideLayout(EntityTestMulRevPub $entity) {
+  protected function addInlineBlockToOverrideLayout(EntityTestMulRevPub $entity): BlockContent {
     $block = BlockContent::create([
       'type' => 'basic',
+      'info' => $this->randomMachineName(),
       'reusable' => FALSE,
     ]);
     $section_data = new Section('layout_onecol', [], [
