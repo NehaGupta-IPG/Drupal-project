@@ -106,10 +106,13 @@ class ContentTranslationPermissions implements ContainerInjectionInterface {
    * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
    *   The entity type to get the permission for.
    * @param string|null $bundle
-   *   The bundle to get the permission for.
+   *   The bundle to get the permission for, if the entity type has bundle-level
+   *   granularity for content translation permissions. Use NULL if granularity
+   *   is at the entity-type level.
    *
    * @return string|null
-   *   The permission name.
+   *   The permission name. NULL if the entity type permission granularity is
+   *   bundle-level, but no bundle is provided.
    */
   public static function permissionKey(EntityTypeInterface $entity_type, ?string $bundle = NULL): ?string {
     return match ($entity_type->getPermissionGranularity()) {
