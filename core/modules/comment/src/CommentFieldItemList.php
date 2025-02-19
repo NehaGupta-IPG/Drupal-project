@@ -3,6 +3,7 @@
 namespace Drupal\comment;
 
 use Drupal\Core\Access\AccessResult;
+use Drupal\Core\Access\AccessResultInterface;
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Field\FieldItemList;
 use Drupal\Core\Session\AccountInterface;
@@ -122,7 +123,7 @@ class CommentFieldItemList extends FieldItemList {
    *   The access result either as an access result object or a boolean,
    *   depending on $return_as_object
    */
-  protected function lastPublishedCommentAccess(AccountInterface $account, bool $return_as_object) {
+  protected function lastPublishedCommentAccess(AccountInterface $account, bool $return_as_object): bool|AccessResultInterface {
     // Load the last published comment in the thread.
     $last_published_comment_id = $this->first()->getValue()['cid'] ?? NULL;
     if ($last_published_comment_id) {

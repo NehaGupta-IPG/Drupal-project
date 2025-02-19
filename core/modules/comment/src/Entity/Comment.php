@@ -534,7 +534,7 @@ class Comment extends ContentEntityBase implements CommentInterface {
   /**
    * {@inheritdoc}
    */
-  public function access($operation, AccountInterface $account = NULL, $return_as_object = FALSE) {
+  public function access($operation, ?AccountInterface $account = NULL, $return_as_object = FALSE) {
     if ($operation === 'create') {
       // The commented entity and, when replying, the parent comment entity are
       // valuable information when comment entity 'create access' handler makes
