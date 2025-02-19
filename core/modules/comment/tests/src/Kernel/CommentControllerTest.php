@@ -165,7 +165,7 @@ class CommentControllerTest extends KernelTestBase {
    *
    * @see self::testReplyFormAccess()
    */
-  public function providerTestReplyFormAccess(): array {
+  public static function providerTestReplyFormAccess(): array {
     return [
       'commenter' => [
         ['access content', 'access comments', 'post comments'], TRUE,

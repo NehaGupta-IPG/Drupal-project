@@ -1,23 +1,27 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Drupal\Tests\Core\Entity\Access;
 
 use Drupal\Core\Access\AccessResult;
+use Drupal\Core\Entity\EntityAccessControlHandler;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Language\LanguageManager;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\entity_test\EntityTestAccessControlHandler;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\CoversMethod;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 
 /**
  * Tests entity access control handler custom internal static cache ID.
- *
- * @coversDefaultClass \Drupal\Core\Entity\EntityAccessControlHandler
- *
- * @group Entity
  */
+#[CoversClass(EntityAccessControlHandler::class)]
+#[Group('Entity')]
+#[CoversMethod(EntityAccessControlHandler::class, 'buildCreateAccessCid')]
 class EntityCreateAccessCustomStaticCidTest extends TestCase {
 
   /**
@@ -31,10 +35,8 @@ class EntityCreateAccessCustomStaticCidTest extends TestCase {
    *   The static cache ID.
    * @param bool $is_access_allowed
    *   If the access is allowed boolean.
-   *
-   * @covers ::buildCreateAccessCid
-   * @dataProvider providerTestCustomCid
    */
+  #[DataProvider('providerTestCustomCid')]
   public function testCustomCid(int $account_id, array $context, string $cid, bool $is_access_allowed): void {
     $entity_type = $this->getMockBuilder(EntityTypeInterface::class)
       ->disableOriginalConstructor()
@@ -44,7 +46,6 @@ class EntityCreateAccessCustomStaticCidTest extends TestCase {
     // Make \Drupal\Core\Entity\EntityAccessControlHandler::$accessCache
     // publicly accessible for the purpose of this test.
     $access_cache = new \ReflectionProperty($handler, 'accessCache');
-    $access_cache->setAccessible(TRUE);
 
     $account = $this->getMockBuilder(AccountInterface::class)
       ->disableOriginalConstructor()
@@ -75,7 +76,7 @@ class EntityCreateAccessCustomStaticCidTest extends TestCase {
    * @return array[]
    *   A list of test cases.
    */
-  public function providerTestCustomCid(): array {
+  public static function providerTestCustomCid(): array {
     $language_ids = array_keys(LanguageManager::getStandardLanguageList());
     return [
       'one context var' => [
