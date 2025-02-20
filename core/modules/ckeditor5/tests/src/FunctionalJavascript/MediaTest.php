@@ -1025,7 +1025,7 @@ class MediaTest extends MediaTestBase {
   /**
    * Tests inline embedding.
    */
-  public function testInlineMedia() {
+  public function testInlineMedia(): void {
     // Reconfigure the text format to suit our needs.
     /** @var \Drupal\filter\FilterFormatInterface $format */
     $format = FilterFormat::load($this->host->body->format);

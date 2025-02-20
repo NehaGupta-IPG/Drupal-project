@@ -348,8 +348,8 @@ export default class DrupalMediaEditing extends Plugin {
 
               // Preview was ready meaning that a new preview can be loaded.
               // "Change the attribute to loading to prepare for the loading of
-              // the updated preview. Preview is kept intact so that it remains
-              // interactable in the UI until the new preview has been rendered.
+              // the updated preview. Preview is kept intact so that it can be
+              // interacted with in the UI until the new preview has been rendered.
               viewWriter.setAttribute(
                 'data-drupal-media-preview',
                 'loading',

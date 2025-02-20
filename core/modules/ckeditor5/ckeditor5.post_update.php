@@ -26,7 +26,7 @@ function ckeditor5_removed_post_updates(): array {
 /**
  * Creates the ckeditor_inline view mode for media entities.
  */
-function ckeditor5_post_update_create_ckeditor_inline_view_mode() {
+function ckeditor5_post_update_create_ckeditor_inline_view_mode(): void {
   $config_path = \Drupal::service('extension.list.module')->getPath('ckeditor5') . '/config/optional';
   $source = new FileStorage($config_path);
   $entity_type_manager = \Drupal::entityTypeManager();
@@ -44,7 +44,7 @@ function ckeditor5_post_update_create_ckeditor_inline_view_mode() {
 /**
  * Amends the filter format settings to allow the drupal-media-inline tag.
  */
-function ckeditor5_post_update_allow_inline_media_element() {
+function ckeditor5_post_update_allow_inline_media_element(): void {
   $formats = filter_formats();
   foreach ($formats as $format_id => $format) {
     $config = \Drupal::configFactory()->getEditable('filter.format.' . $format_id);
