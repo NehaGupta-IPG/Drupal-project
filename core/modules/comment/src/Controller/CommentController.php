@@ -315,13 +315,17 @@ class CommentController extends ControllerBase {
     // Comment replies require some additional checks.
     if ($pid) {
       $parent_comment = $this->entityTypeManager()->getStorage('comment')->load($pid);
+      if (!$parent_comment instanceof CommentInterface) {
+        return AccessResult::forbidden('Could not load parent comment.');
+      }
+
       $access = $access
         // The parent comment is published.
         ->andIf(AccessResult::allowedIf($parent_comment->isPublished()))
         // And the parent comment host belongs to the entity.
         ->andIf(AccessResult::allowedIf($parent_comment->getCommentedEntityId() === $entity->id()))
         // And the user is allowed to view the parent comment.
-        ->andIf(AccessResult::allowedIf(!$parent_comment->access('view', NULL, TRUE)->isForbidden()));
+        ->andIf($parent_comment->access('view', NULL, TRUE));
     }
 
     return $access;
