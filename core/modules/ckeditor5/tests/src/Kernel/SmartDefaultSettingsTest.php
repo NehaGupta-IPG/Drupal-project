@@ -1169,7 +1169,7 @@ class SmartDefaultSettingsTest extends KernelTestBase {
           ],
           [
             'As part of migrating to CKEditor 5, it was found that the %text_format text format\'s HTML filters includes plugins that support the following tags, but not some of their attributes. To ensure these attributes remain supported, the following were added to the Source Editing plugin\'s <em>Manually editable HTML tags</em>: @missing_attributes. The text format must be saved to make these changes active.',
-            'a:2:{s:12:"%text_format";s:74:"(with Media Embed support, view mode enabled but no view modes configured)";s:19:"@missing_attributes";s:120:"<a hreflang> <blockquote cite> <ul type> <ol type> <h2 id> <h3 id> <h4 id> <h5 id> <h6 id> <drupal-media data-view-mode> <drupal-media-inline data-view-mode>";}',
+            'a:2:{s:12:"%text_format";s:74:"(with Media Embed support, view mode enabled but no view modes configured)";s:19:"@missing_attributes";s:157:"<a hreflang> <blockquote cite> <ul type> <ol type> <h2 id> <h3 id> <h4 id> <h5 id> <h6 id> <drupal-media data-view-mode> <drupal-media-inline data-view-mode>";}',
           ],
         ],
       ],
@@ -1222,7 +1222,7 @@ class SmartDefaultSettingsTest extends KernelTestBase {
           ],
           [
             'As part of migrating to CKEditor 5, it was found that the %text_format text format\'s HTML filters includes plugins that support the following tags, but not some of their attributes. To ensure these attributes remain supported, the following were added to the Source Editing plugin\'s <em>Manually editable HTML tags</em>: @missing_attributes. The text format must be saved to make these changes active.',
-            'a:2:{s:12:"%text_format";s:76:"(with Media Embed support, view mode enabled and two view modes configured )";s:19:"@missing_attributes";s:120:"<a hreflang> <blockquote cite> <ul type> <ol type> <h2 id> <h3 id> <h4 id> <h5 id> <h6 id> <drupal-media data-view-mode> <drupal-media-inline data-view-mode>";}',
+            'a:2:{s:12:"%text_format";s:76:"(with Media Embed support, view mode enabled and two view modes configured )";s:19:"@missing_attributes";s:157:"<a hreflang> <blockquote cite> <ul type> <ol type> <h2 id> <h3 id> <h4 id> <h5 id> <h6 id> <drupal-media data-view-mode> <drupal-media-inline data-view-mode>";}',
           ],
         ],
       ],
