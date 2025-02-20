@@ -113,7 +113,7 @@ class CommentLazyBuilders implements TrustedCallbackInterface {
       'pid' => NULL,
     ];
     $comment = $this->entityTypeManager->getStorage('comment')->create($values);
-    return $this->entityFormBuilder->getForm($comment);
+    return $comment->access('create', $this->currentUser) ? $this->entityFormBuilder->getForm($comment) : [];
   }
 
   /**

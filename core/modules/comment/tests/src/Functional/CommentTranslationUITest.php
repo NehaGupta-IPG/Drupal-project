@@ -51,7 +51,7 @@ class CommentTranslationUITest extends ContentTranslationUITestBase {
     'url.query_args.pagers:0',
     'url.site',
     'user.permissions',
-    'user.roles',
+    'user.roles:authenticated',
   ];
 
   /**
