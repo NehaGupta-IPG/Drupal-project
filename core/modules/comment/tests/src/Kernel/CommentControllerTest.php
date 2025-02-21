@@ -141,6 +141,8 @@ class CommentControllerTest extends KernelTestBase {
 
     // Unpublish the comment.
     $comment->setUnpublished()->save();
+    // Clear the comment access static cache (reply operation).
+    $this->container->get('entity_type.manager')->getAccessControlHandler('comment')->resetCache();
 
     // Check that users cannot reply to an unpublished comment.
     $access_result = $this->controller->replyFormAccess($node, 'comment', $comment->id());
@@ -155,6 +157,10 @@ class CommentControllerTest extends KernelTestBase {
     $access_result = $this->controller->replyFormAccess($node, 'comment', $comment->id());
     $this->assertTrue($access_result->isNeutral());
     $this->assertSame($expected_cache_tags, $access_result->getCacheTags());
+
+    // Check that users cannot reply to a non-existing comment.
+    $access_result = $this->controller->replyFormAccess($node, 'comment', 123456);
+    $this->assertTrue($access_result->isForbidden());
   }
 
   /**

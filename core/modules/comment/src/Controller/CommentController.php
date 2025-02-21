@@ -289,46 +289,30 @@ class CommentController extends ControllerBase {
       throw new NotFoundHttpException();
     }
 
-    $create_operation = 'create';
-    if ($pid) {
-      // Distinguish between a reply and a first-tier comment creation.
-      // @see \Drupal\comment\CommentFieldItemList::access()
-      $create_operation = "reply to {$pid}";
-    }
-
     /** @var \Drupal\comment\CommentFieldItemList $field */
     $field = $entity->{$field_name};
-
-    // Check if the user is able to create comments.
-    $access = $field->access($create_operation, NULL, TRUE);
-    if ($access->isForbidden()) {
-      return $access;
-    }
-
     $status = CommentingStatus::tryFrom((int) $field->status);
-    $access = $access
-      // Commenting is open on this entity.
-      ->andIf(AccessResult::allowedIf($status === CommentingStatus::Open))
-      // And the user has access to the host entity.
-      ->andIf($entity->access('view', NULL, TRUE));
+    // The user must have view access to the host entity.
+    $access = $entity->access('view', NULL, TRUE)
+      // And commenting must be open on this entity.
+      ->andIf(AccessResult::allowedIf($status === CommentingStatus::Open));
 
-    // Comment replies require some additional checks.
     if ($pid) {
+      // If replying, load the parent comment.
       $parent_comment = $this->entityTypeManager()->getStorage('comment')->load($pid);
       if (!$parent_comment instanceof CommentInterface) {
-        return AccessResult::forbidden('Could not load parent comment.');
+        return $access->andIf(AccessResult::forbidden('Cannot reply to a non-existing comment'));
       }
 
-      $access = $access
-        // The parent comment is published.
-        ->andIf(AccessResult::allowedIf($parent_comment->isPublished()))
+      return $access
+        // The user must be able to reply.
+        ->andIf($parent_comment->access('reply', NULL, TRUE))
         // And the parent comment host belongs to the entity.
-        ->andIf(AccessResult::allowedIf($parent_comment->getCommentedEntityId() === $entity->id()))
-        // And the user is allowed to view the parent comment.
-        ->andIf($parent_comment->access('view', NULL, TRUE));
+        ->andIf(AccessResult::allowedIf($parent_comment->getCommentedEntityId() === $entity->id()));
     }
 
-    return $access;
+    // The user must be able to create comments.
+    return $access->andIf($field->access('create', NULL, TRUE));
   }
 
 }

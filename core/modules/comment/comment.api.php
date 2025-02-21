@@ -74,15 +74,6 @@ function hook_comment_links_alter(array &$links, CommentInterface $entity, array
  * Used to check whether the user can post comments. This operation is mainly
  * used to check the access to the comment form or to a page where the form is
  * located, if the field is configured to place the form on a different page.
- * Note that, the operation of replying to an existing comment is
- * 'reply to {comment id}', rather than 'create'.
- *
- * @section reply_to 'reply to {comment id}'
- * Used to check the access to a form that allows to post a reply to an existing
- * comment, with ID {comment id}. This operation is almost the same as 'create'
- * but unlike the later, the operation name contains also the parent comment ID,
- * providing rich context when the access decision is made. Is used typically to
- * check the access of the reply form route.
  *
  * @see \Drupal\comment\Controller\CommentController::replyFormAccess()
  *

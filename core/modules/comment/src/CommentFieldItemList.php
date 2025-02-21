@@ -74,24 +74,12 @@ class CommentFieldItemList extends FieldItemList {
       return $this->lastPublishedCommentAccess($account, $return_as_object);
     }
 
-    $entity_type_manager = \Drupal::entityTypeManager();
-
-    // Replying to an existing comment is also comment creation. Normalize the
-    // operation name after extracting the parent comment ID.
-    if (strpos($operation, 'reply to ') === 0) {
-      $parent_comment_id = (int) substr($operation, 9);
-      $parent_comment = $entity_type_manager->getStorage('comment')->load($parent_comment_id);
-      if (!$parent_comment) {
-        return AccessResult::forbidden('Cannot reply to a non-existing comment');
-      }
-      $operation = 'create';
-    }
     if ($operation === 'create') {
       // In contrast to 'view', this operation is used as the lowest operation
       // by various methods to check only the single 'create' permission on the
       // comment entity.
       $bundle = $this->getSetting('comment_type');
-      $access_control_handler = $entity_type_manager->getAccessControlHandler('comment');
+      $access_control_handler = \Drupal::entityTypeManager()->getAccessControlHandler('comment');
 
       // The commented entity and, when replying, the parent comment are
       // valuable information when comment entity 'create access' handler makes
@@ -99,10 +87,6 @@ class CommentFieldItemList extends FieldItemList {
       $commented_entity = $this->getEntity();
       $cache_metadata = (new CacheableMetadata())->addCacheableDependency($commented_entity);
       $context = ['commented_entity' => $commented_entity];
-      if (isset($parent_comment)) {
-        $cache_metadata->addCacheableDependency($parent_comment);
-        $context += ['parent_comment' => $parent_comment];
-      }
 
       /** @var \Drupal\Core\Access\AccessResult $result */
       $result = $access_control_handler->createAccess($bundle, $account, $context, TRUE);

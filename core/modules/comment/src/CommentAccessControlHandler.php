@@ -29,6 +29,17 @@ class CommentAccessControlHandler extends EntityAccessControlHandler {
         ->addCacheableDependency($entity);
     }
 
+    if ($operation === 'reply') {
+      $context = ['commented_entity' => $entity->getCommentedEntity()];
+      // The user must be able to view the comment.
+      return $this->checkAccess($entity, 'view', $account)
+        // And must be able to create comments.
+        ->andIf($this->createAccess($entity->bundle(), $account, $context, TRUE))
+        // And comment must be published.
+        ->andIf(AccessResult::allowedIf($entity->isPublished()))
+        ->addCacheableDependency($entity);
+    }
+
     if ($comment_admin) {
       $access = AccessResult::allowed()->cachePerPermissions();
       return ($operation != 'view') ? $access : $access->andIf($entity->getCommentedEntity()->access($operation, $account, TRUE));
@@ -163,8 +174,8 @@ class CommentAccessControlHandler extends EntityAccessControlHandler {
    */
   protected function buildCreateAccessCid(array $context, ?string $entity_bundle): string {
     $cid = parent::buildCreateAccessCid($context, $entity_bundle);
+    // Vary the static access cache depending on the commented/host entity.
     $cid .= ':' . (isset($context['commented_entity']) ? $context['commented_entity']->id() : '0');
-    $cid .= ':' . (isset($context['parent_comment']) ? $context['parent_comment']->id() : '0');
     return $cid;
   }
 

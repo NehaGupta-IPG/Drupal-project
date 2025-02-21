@@ -74,18 +74,19 @@ class CommentCreationAccessTest extends KernelTestBase {
     $field = $entity->get('comment');
 
     // Check that the comment create access handler receives the commented
-    // entity as context but no parent comment entity when is called from the
-    // comment entity ::access() method.
+    // entity as context when called from the comment entity ::access() method.
     $comment->access('create');
     $create_access_context = $state->get('comment_test.create_access.context');
     $this->assertSame($entity->id(), $create_access_context['commented_entity']->id());
-    $this->assertArrayNotHasKey('parent_comment', $create_access_context);
+
+    $comment->access('reply');
+    $create_access_context = $state->get('comment_test.create_access.context');
+    $this->assertSame($entity->id(), $create_access_context['commented_entity']->id());
 
     // Check the same for comment field item list ::access() method.
     $field->access('create');
     $create_access_context = $state->get('comment_test.create_access.context');
     $this->assertSame($entity->id(), $create_access_context['commented_entity']->id());
-    $this->assertArrayNotHasKey('parent_comment', $create_access_context);
 
     // Reply to comment.
     $reply = $this->createComment(['pid' => $comment->id()]);
@@ -95,13 +96,6 @@ class CommentCreationAccessTest extends KernelTestBase {
     $reply->access('create');
     $create_access_context = $state->get('comment_test.create_access.context');
     $this->assertSame($entity->id(), $create_access_context['commented_entity']->id());
-    $this->assertSame($comment->id(), $create_access_context['parent_comment']->id());
-
-    // Check the same for comment field item list ::access() method.
-    $field->access("reply to {$comment->id()}");
-    $create_access_context = $state->get('comment_test.create_access.context');
-    $this->assertSame($entity->id(), $create_access_context['commented_entity']->id());
-    $this->assertSame($comment->id(), $create_access_context['parent_comment']->id());
   }
 
 }
