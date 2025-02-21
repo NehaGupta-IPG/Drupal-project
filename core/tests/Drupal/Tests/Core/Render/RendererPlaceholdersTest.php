@@ -211,7 +211,7 @@ class RendererPlaceholdersTest extends RendererTestBase {
     // Case one: render array that has a placeholder that is:
     // - automatically created, but manually triggered (#create_placeholder =
     //   TRUE)
-    // - uncacheable
+    // - uncacheable.
     $element_without_cache_keys = $base_element_a1;
     $expected_placeholder_render_array = $extract_placeholder_render_array($base_element_a1['placeholder']);
     $cases[] = [
