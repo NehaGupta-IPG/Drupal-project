@@ -76,6 +76,8 @@
     <include-pattern>*/Functional/*</include-pattern>
     <include-pattern>*/Unit/*</include-pattern>
     <include-pattern>core/lib/*</include-pattern>
+    <exclude-pattern>core/*/src/Plugin/*</exclude-pattern>
+    <exclude-pattern>*/tests/*</exclude-pattern>
   </rule>
   <rule ref="Drupal.Commenting.FunctionComment.MissingParamType"/>
   <rule ref="Drupal.Commenting.FunctionComment.MissingReturnComment"/>
