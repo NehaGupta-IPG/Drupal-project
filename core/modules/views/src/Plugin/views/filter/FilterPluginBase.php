@@ -921,6 +921,7 @@ abstract class FilterPluginBase extends HandlerBase implements CacheableDependen
     $group_items = $form_state->getValue(['options', 'group_info', 'group_items']);
     uasort($group_items, ['Drupal\Component\Utility\SortArray', 'sortByWeightElement']);
     // Filter out removed items.
+
     // Start from 1 to avoid problems with #default_value in the widget.
     $new_id = 1;
     $new_default = 'All';

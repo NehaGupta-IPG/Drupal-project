@@ -339,9 +339,11 @@ class InOperator extends FilterPluginBase implements FilterOperatorsInterface {
     // was not set, and the key to the checkbox if it is set.
     // Unfortunately, this means that if the key to that checkbox is 0,
     // we are unable to tell if that checkbox was set or not.
+
     // Luckily, the '#value' on the checkboxes form actually contains
     // *only* a list of checkboxes that were set, and we can use that
     // instead.
+
     $form_state->setValue(['options', 'value'], $form['value']['#value']);
   }
 

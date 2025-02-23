@@ -354,17 +354,6 @@ final class SmartDefaultSettings {
     return [$editor, $messages];
   }
 
-  /**
-   * Adds custom HTML tags to the source editing configuration for CKEditor 5.
-   *
-   * @param \Drupal\editor\EditorInterface $editor
-   *   The editor object containing CKEditor 5 settings.
-   * @param \Drupal\ckeditor5\HTMLRestrictions $tags
-   *   An object containing additional HTML tags to be allowed in the source editor.
-   *
-   * @return array
-   *   An array of messages, including a status message if the plugin was enabled.
-   */
   private function addTagsToSourceEditing(EditorInterface $editor, HTMLRestrictions $tags): array {
     $messages = [];
     $settings = $editor->getSettings();

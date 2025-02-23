@@ -227,7 +227,7 @@ class EntityField extends FieldPluginBase implements CacheableDependencyInterfac
         $this->limit_values = TRUE;
       }
 
-      // If "First and last only" is chosen, limit the values.
+      // If "First and last only" is chosen, limit the values
       if (!empty($this->options['delta_first_last'])) {
         $this->limit_values = TRUE;
       }
@@ -687,6 +687,7 @@ class EntityField extends FieldPluginBase implements CacheableDependencyInterfac
     parent::buildGroupByForm($form, $form_state);
     // With "field API" fields, the column target of the grouping function
     // and any additional grouping columns must be specified.
+
     $field_columns = array_keys($this->getFieldDefinition()->getColumns());
     $group_columns = [
       'entity_id' => $this->t('Entity ID'),

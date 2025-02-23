@@ -289,9 +289,6 @@ class ManyToOneHelper {
 
   /**
    * Adds a filter condition to the query based on the handler's options and value.
-   *
-   * @return void
-   *   This method does not return any value. It modifies the query directly.
    */
   public function addFilter() {
     if (empty($this->handler->value)) {

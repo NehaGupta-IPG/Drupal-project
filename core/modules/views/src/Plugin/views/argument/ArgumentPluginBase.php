@@ -34,7 +34,7 @@ use Drupal\views\Views;
 /**
  * Base class for argument (contextual filter) handler plugins.
  *
- * The basic argument works for very simple arguments such as nid and uid.
+ * The basic argument works for very simple arguments such as nid and uid
  *
  * Definition terms for this handler:
  * - name field: The field to use for the name to use in the summary, which is
@@ -511,7 +511,7 @@ abstract class ArgumentPluginBase extends HandlerBase implements CacheableDepend
       $plugin->validateOptionsForm($form['argument_default'][$default_id], $form_state, $option_values['argument_default'][$default_id]);
     }
 
-    // Summary plugin.
+    // Summary plugin
     $summary_id = $option_values['summary']['format'];
     $plugin = $this->getPlugin('style', $summary_id);
     if ($plugin) {
@@ -548,7 +548,7 @@ abstract class ArgumentPluginBase extends HandlerBase implements CacheableDepend
       $option_values['default_argument_options'] = $options;
     }
 
-    // Summary plugin.
+    // Summary plugin
     $summary_id = $option_values['summary']['format'];
     $plugin = $this->getPlugin('style', $summary_id);
     if ($plugin) {
@@ -861,7 +861,7 @@ abstract class ArgumentPluginBase extends HandlerBase implements CacheableDepend
    * Default action: empty.
    *
    * If an argument was expected and was not given, in this case, display
-   * the view's empty text.
+   * the view's empty text
    */
   public function defaultEmpty() {
     // We return with no query; this will force the empty text.
@@ -965,6 +965,7 @@ abstract class ArgumentPluginBase extends HandlerBase implements CacheableDepend
   protected function summaryNameField() {
     // Add the 'name' field. For example, if this is a uid argument, the
     // name field would be 'name' (i.e, the username).
+
     if (isset($this->name_table)) {
       // If the alias is different then we're probably added, not ensured,
       // so look up the join and add it instead.
@@ -999,7 +1000,7 @@ abstract class ArgumentPluginBase extends HandlerBase implements CacheableDepend
    * code that goes into summaryQuery()
    */
   public function summaryBasics($count_field = TRUE) {
-    // Add the number of nodes counter.
+    // Add the number of nodes counter
     $distinct = ($this->view->display_handler->getOption('distinct') && empty($this->query->no_distinct));
 
     $count_alias = $this->query->addField($this->view->storage->get('base_table'), $this->view->storage->get('base_field'), 'num_records', ['count' => TRUE, 'distinct' => $distinct]);
