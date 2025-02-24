@@ -29,3 +29,10 @@ services:
     tags:
       # Must run after the content_length middleware.
       - { name: http_middleware, priority: 150 }
+
+  page_cache_response_policy.big_pipe:
+    class: Drupal\big_pipe\PageCache\ResponsePolicy
+    public: false
+    tags:
+      - { name: page_cache_response_policy }
+
