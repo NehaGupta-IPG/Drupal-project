@@ -35,4 +35,3 @@ services:
     public: false
     tags:
       - { name: page_cache_response_policy }
-

@@ -11,6 +11,7 @@ use Symfony\Component\HttpFoundation\Response;
  * Prevents caching of BigPipe responses.
  */
 class ResponsePolicy implements ResponsePolicyInterface {
+
   /**
    * {@inheritdoc}
    */
@@ -19,4 +20,5 @@ class ResponsePolicy implements ResponsePolicyInterface {
       return static::DENY;
     }
   }
+
 }

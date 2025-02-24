@@ -122,10 +122,6 @@ class BigPipeStrategy implements PlaceholderStrategyInterface {
       return [];
     }
 
-    if (!$this->sessionConfiguration->hasSession($request)) {
-      return [];
-    }
-
     return $this->doProcessPlaceholders($placeholders);
   }
 
@@ -155,7 +151,16 @@ class BigPipeStrategy implements PlaceholderStrategyInterface {
       // @see \Drupal\Core\Form\FormBuilder::renderFormTokenPlaceholder()
       // @see \Drupal\Core\Form\FormBuilder::renderPlaceholderFormAction()
       if (static::placeholderIsAttributeSafe($placeholder)) {
-        $overridden_placeholders[$placeholder] = static::createBigPipeNoJsPlaceholder($placeholder, $placeholder_elements, TRUE);
+        // When there is no session, fall through to the single flush strategy
+        // rather than creating a no-js placeholder, so that pages on which the
+        // only big pipe placeholders would be attribute-safe ones can be served
+        // without big pipe at all, allowing them to be edge cached.
+        if (!$this->sessionConfiguration->hasSession($this->requestStack->getCurrentRequest())) {
+          continue;
+        }
+        else {
+          $overridden_placeholders[$placeholder] = static::createBigPipeNoJsPlaceholder($placeholder, $placeholder_elements, TRUE);
+        }
       }
       else {
         // If the current request/session doesn't have JavaScript, fall back to
