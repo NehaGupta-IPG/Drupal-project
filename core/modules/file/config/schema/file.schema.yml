@@ -166,6 +166,10 @@ field.formatter.settings.file_table:
 field.formatter.settings.file_url_plain:
   type: mapping
   label: 'URL to file format settings'
+  mapping:
+    show_link_as:
+      type: string
+      label: 'Show link as'
 
 field.widget.settings.file_generic:
   type: mapping

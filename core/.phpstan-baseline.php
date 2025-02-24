@@ -18947,6 +18947,12 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/field_ui/src/Form/FieldConfigDeleteForm.php',
 ];
 $ignoreErrors[] = [
+	'message' => '#^Method Drupal\\\\Tests\\\\file\\\\Functional\\\\FileFieldTestBase\\:\\:attachFileField\\(\\) has no return type specified\\.$#',
+	'identifier' => 'missingType.return',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/file/tests/src/Functional/FileFieldTestBase.php',
+];
+$ignoreErrors[] = [
 	// identifier: missingType.return
 	'message' => '#^Method Drupal\\\\field_ui\\\\Form\\\\FieldConfigDeleteForm\\:\\:submitForm\\(\\) has no return type specified\\.$#',
 	'count' => 1,
@@ -19187,6 +19193,12 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/field_ui/tests/src/Functional/FieldUIDeleteTest.php',
 ];
 $ignoreErrors[] = [
+	'message' => '#^Method Drupal\\\\Tests\\\\file\\\\FunctionalJavascript\\\\FileFieldValidateTest\\:\\:attachFileField\\(\\) has no return type specified\\.$#',
+	'identifier' => 'missingType.return',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/file/tests/src/FunctionalJavascript/FileFieldValidateTest.php',
+];
+$ignoreErrors[] = [
 	// identifier: missingType.return
 	'message' => '#^Method Drupal\\\\Tests\\\\field_ui\\\\Functional\\\\FieldUIDeleteTest\\:\\:assertFieldDoesNotExistOnOverview\\(\\) has no return type specified\\.$#',
 	'count' => 1,
@@ -19203,6 +19215,12 @@ $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\field_ui\\\\Functional\\\\FieldUIDeleteTest\\:\\:fieldUIAddExistingField\\(\\) has no return type specified\\.$#',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/field_ui/tests/src/Functional/FieldUIDeleteTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Method Drupal\\\\Tests\\\\file\\\\FunctionalJavascript\\\\FileFieldWidgetTest\\:\\:attachFileField\\(\\) has no return type specified\\.$#',
+	'identifier' => 'missingType.return',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/file/tests/src/FunctionalJavascript/FileFieldWidgetTest.php',
 ];
 $ignoreErrors[] = [
 	// identifier: missingType.return
@@ -19227,6 +19245,12 @@ $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\field_ui\\\\Functional\\\\ManageDisplayTest\\:\\:assertFieldDoesNotExistOnOverview\\(\\) has no return type specified\\.$#',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/field_ui/tests/src/Functional/ManageDisplayTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Method Drupal\\\\Tests\\\\file\\\\FunctionalJavascript\\\\MaximumFileSizeExceededUploadTest\\:\\:attachFileField\\(\\) has no return type specified\\.$#',
+	'identifier' => 'missingType.return',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/file/tests/src/FunctionalJavascript/MaximumFileSizeExceededUploadTest.php',
 ];
 $ignoreErrors[] = [
 	// identifier: missingType.return
@@ -23205,6 +23229,12 @@ $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\language\\\\LanguageNegotiator\\:\\:reset\\(\\) has no return type specified\\.$#',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/language/src/LanguageNegotiator.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Method Drupal\\\\Tests\\\\layout_builder\\\\FunctionalJavascript\\\\InlineBlockPrivateFilesTest\\:\\:attachFileField\\(\\) has no return type specified\\.$#',
+	'identifier' => 'missingType.return',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/layout_builder/tests/src/FunctionalJavascript/InlineBlockPrivateFilesTest.php',
 ];
 $ignoreErrors[] = [
 	// identifier: missingType.return
@@ -51274,6 +51304,12 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/views/tests/modules/views_test_cacheable_metadata_calculation/src/Plugin/views/access/CacheableMetadataCalculationTest.php',
 ];
 $ignoreErrors[] = [
+	'message' => '#^Method Drupal\\\\FunctionalJavascriptTests\\\\Ajax\\\\AjaxMaintenanceModeTest\\:\\:attachFileField\\(\\) has no return type specified\\.$#',
+	'identifier' => 'missingType.return',
+	'count' => 1,
+	'path' => __DIR__ . '/tests/Drupal/FunctionalJavascriptTests/Ajax/AjaxMaintenanceModeTest.php',
+];
+$ignoreErrors[] = [
 	// identifier: missingType.return
 	'message' => '#^Method Drupal\\\\views_test_cacheable_metadata_calculation\\\\Plugin\\\\views\\\\access\\\\CacheableMetadataCalculationTest\\:\\:cacheableMetadataHasBeenAccessed\\(\\) has no return type specified\\.$#',
 	'count' => 1,
@@ -51356,6 +51392,12 @@ $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\views_test_data\\\\Hook\\\\ViewsTestDataViewsExecutionHooks\\:\\:viewsPostExecute\\(\\) has no return type specified\\.$#',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/views/tests/modules/views_test_data/src/Hook/ViewsTestDataViewsExecutionHooks.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Method Drupal\\\\FunctionalJavascriptTests\\\\Tests\\\\DrupalSelenium2DriverTest\\:\\:attachFileField\\(\\) has no return type specified\\.$#',
+	'identifier' => 'missingType.return',
+	'count' => 1,
+	'path' => __DIR__ . '/tests/Drupal/FunctionalJavascriptTests/Tests/DrupalSelenium2DriverTest.php',
 ];
 $ignoreErrors[] = [
 	// identifier: missingType.return
