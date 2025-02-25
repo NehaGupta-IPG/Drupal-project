@@ -46,6 +46,10 @@ class CommentItem extends FieldItemBase implements CommentItemInterface {
   public static function defaultFieldSettings() {
     return [
       'default_mode' => CommentManagerInterface::COMMENT_MODE_THREADED,
+      'thread_limit' => [
+        'depth' => 2,
+        'mode' => CommentItemInterface::THREAD_DEPTH_REPLY_MODE_ALLOW,
+      ],
       'per_page' => 50,
       'form_location' => CommentItemInterface::FORM_BELOW,
       'anonymous' => CommentInterface::ANONYMOUS_MAYNOT_CONTACT,
@@ -114,10 +118,50 @@ class CommentItem extends FieldItemBase implements CommentItemInterface {
       ->createAccess($this->getSetting('comment_type'), $anonymous_user);
 
     $element['default_mode'] = [
-      '#type' => 'checkbox',
-      '#title' => $this->t('Threading'),
+      '#type' => 'radios',
+      '#title' => $this->t('Threading mode'),
+      '#options' => [
+        CommentManagerInterface::COMMENT_MODE_FLAT => $this->t('Flat list'),
+        CommentManagerInterface::COMMENT_MODE_THREADED => $this->t('Threaded (no depth limit)'),
+        CommentManagerInterface::COMMENT_MODE_THREADED_DEPTH_LIMIT => $this->t('Threaded (limited depth)'),
+      ],
       '#default_value' => $settings['default_mode'],
-      '#description' => $this->t('Show comment replies in a threaded list.'),
+      '#description' => $this->t('If the comments are displayed as a flat list or threaded.'),
+    ];
+    $element['thread_limit'] = [
+      '#type' => 'fieldset',
+      '#title' => $this->t('Limited depth settings'),
+      '#states' => [
+        'visible' => [
+          ':input[name="settings[default_mode]"]' => [
+            'value' => CommentManagerInterface::COMMENT_MODE_THREADED_DEPTH_LIMIT,
+          ],
+        ],
+      ],
+    ];
+    $element['thread_limit']['depth'] = [
+      '#type' => 'number',
+      '#title' => $this->t('Thread depth limit'),
+      '#default_value' => $settings['thread_limit']['depth'],
+      '#description' => $this->t('Define comment thread depth.'),
+      // The maximum thread deep cannot be less than 2 as it doesn't makes sense
+      // to have threaded comments with only one level.
+      '#min' => 2,
+    ];
+    $element['thread_limit']['mode'] = [
+      '#type' => 'radios',
+      '#title' => $this->t('Replying to deepest comment'),
+      '#default_value' => $settings['thread_limit']['mode'],
+      '#options' => [
+        CommentItemInterface::THREAD_DEPTH_REPLY_MODE_ALLOW => $this->t('Allowed'),
+        CommentItemInterface::THREAD_DEPTH_REPLY_MODE_DENY => $this->t('Denied'),
+      ],
+      CommentItemInterface::THREAD_DEPTH_REPLY_MODE_ALLOW => [
+        '#description' => $this->t('Users are able to reply to the deepest comment. The reply will be displayed on the same level as the comment that receives the reply.'),
+      ],
+      CommentItemInterface::THREAD_DEPTH_REPLY_MODE_DENY => [
+        '#description' => $this->t('Users cannot reply to the deepest comment.'),
+      ],
     ];
     $element['per_page'] = [
       '#type' => 'number',

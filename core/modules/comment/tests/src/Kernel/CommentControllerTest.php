@@ -132,7 +132,9 @@ class CommentControllerTest extends KernelTestBase {
     $access_result = $this->controller->replyFormAccess($node, 'comment', $comment->id());
     $this->assertEquals($expectation, $access_result->isAllowed());
     // Now the parent comment cache metadata should have been merged.
-    $expected_cache_tags = Cache::mergeTags($node->getCacheTags(), $comment->getCacheTags());
+    $commented_entity = $comment->getCommentedEntity();
+    $field_config = $commented_entity->getFieldDefinition($comment->getFieldName())->getConfig($commented_entity->bundle());
+    $expected_cache_tags = Cache::mergeTags($node->getCacheTags(), $field_config->getCacheTags(), $comment->getCacheTags());
     $this->assertSame($expected_cache_tags, $access_result->getCacheTags());
 
     // Unpublish the comment.
