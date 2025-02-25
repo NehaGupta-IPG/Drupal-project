@@ -2,7 +2,9 @@
 
 namespace Drupal\comment;
 
+use Drupal\comment\Plugin\Field\FieldType\CommentItemInterface;
 use Drupal\Core\Access\AccessResult;
+use Drupal\Core\Access\AccessResultInterface;
 use Drupal\Core\Entity\EntityAccessControlHandler;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Field\FieldDefinitionInterface;
@@ -30,21 +32,26 @@ class CommentAccessControlHandler extends EntityAccessControlHandler {
     }
 
     if ($operation === 'reply') {
-      $context = array_filter(
-        [
-          'commented_entity' => $entity->getCommentedEntity(),
-          'field' => $entity->getFieldName(),
-          'parent' => $entity,
-        ],
-        static fn (mixed $val): bool => $val !== NULL,
-      );
-      // The user must be able to view the comment.
-      return $this->access($entity, 'view', $account, TRUE)
-        // And must be able to create comments.
-        ->andIf($this->createAccess($entity->bundle(), $account, $context, TRUE))
-        // And comment must be published.
-        ->andIf(AccessResult::allowedIf($entity->isPublished()))
-        ->addCacheableDependency($entity);
+      $access = $this->checkReplyThreadAccess($entity)->addCacheableDependency($entity);
+
+      if ($access->isAllowed()) {
+        $context = array_filter(
+          [
+            'commented_entity' => $entity->getCommentedEntity(),
+            'field' => $entity->getFieldName(),
+            'parent' => $entity,
+          ],
+          static fn (mixed $val): bool => $val !== NULL,
+        );
+        return $access
+          // The user must be able to view the comment.
+          ->andIf($this->access($entity, 'view', $account, TRUE))
+          // And must be able to create comments.
+          ->andIf($this->createAccess($entity->bundle(), $account, $context, TRUE))
+          // And comment must be published.
+          ->andIf(AccessResult::allowedIf($entity->isPublished()));
+      }
+      return $access;
     }
 
     if ($comment_admin) {
@@ -81,6 +88,42 @@ class CommentAccessControlHandler extends EntityAccessControlHandler {
    */
   protected function checkCreateAccess(AccountInterface $account, array $context, $entity_bundle = NULL) {
     return AccessResult::allowedIfHasPermission($account, 'post comments');
+  }
+
+  /**
+   * Checks if this comment accepts replies according to field config.
+   */
+  protected function checkReplyThreadAccess(CommentInterface $comment): AccessResultInterface {
+    $access_result = AccessResult::allowed();
+    $commented_entity = $comment->getCommentedEntity();
+    if (!$commented_entity instanceof EntityInterface) {
+      return $access_result;
+    }
+
+    // Forbid if this reply, to a threaded comment, is about to exceed the
+    // maximum thread depth.
+    $field_definition = $commented_entity->getFieldDefinition($comment->getFieldName());
+    \assert($field_definition instanceof FieldDefinitionInterface);
+    $access_result->addCacheableDependency($field_definition->getConfig($commented_entity->bundle()));
+    $field_settings = $field_definition->getSettings();
+
+    // Only check if the depth is limited.
+    if ($field_settings && $field_settings['default_mode'] === CommentManagerInterface::COMMENT_MODE_THREADED_DEPTH_LIMIT) {
+      $thread_limit_settings = $field_settings['thread_limit'];
+      \assert($field_settings['thread_limit']['depth'] >= 2, 'Thread depth limit should be greater than or equal to 2.');
+
+      // Only check if the depth limitation is configured to deny replies.
+      if ($thread_limit_settings['mode'] === CommentItemInterface::THREAD_DEPTH_REPLY_MODE_DENY) {
+        // Prevent replying to the deepest comment.
+        $comment_indent = count(explode('.', $comment->getThread()));
+        $max_indent = $field_settings['thread_limit']['depth'];
+        if ($comment_indent >= $max_indent) {
+          return $access_result->andIf(AccessResult::forbidden('Thread limit hit'));
+        }
+      }
+    }
+
+    return $access_result;
   }
 
   /**
