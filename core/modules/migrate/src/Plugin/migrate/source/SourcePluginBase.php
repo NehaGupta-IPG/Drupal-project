@@ -214,6 +214,12 @@ abstract class SourcePluginBase extends PluginBase implements MigrateSourceInter
    */
   protected $mapRowAdded = FALSE;
 
+
+  /**
+   * Flags whether a row should be saved to the map.
+   */
+  protected bool $saveRowToMap = TRUE;
+
   /**
    * The backend cache.
    *
@@ -296,11 +302,10 @@ abstract class SourcePluginBase extends PluginBase implements MigrateSourceInter
       $result_named_hook = $this->getModuleHandler()->invokeAll('migrate_' . $this->migration->id() . '_prepare_row', [$row, $this, $this->migration]);
       // We will skip if any hook returned FALSE.
       $skip = ($result_hook && in_array(FALSE, $result_hook)) || ($result_named_hook && in_array(FALSE, $result_named_hook));
-      $save_to_map = TRUE;
     }
     catch (MigrateSkipRowException $e) {
       $skip = TRUE;
-      $save_to_map = $e->getSaveToMap();
+      $this->saveRowToMap = $e->getSaveToMap();
       if ($message = trim($e->getMessage())) {
         $this->idMap->saveMessage($row->getSourceIdValues(), $message, MigrationInterface::MESSAGE_INFORMATIONAL);
       }
@@ -310,7 +315,7 @@ abstract class SourcePluginBase extends PluginBase implements MigrateSourceInter
     if ($skip) {
       // Make sure we replace any previous messages for this item with any
       // new ones.
-      if ($save_to_map) {
+      if ($this->saveRowToMap) {
         $this->idMap->saveIdMapping($row, [], MigrateIdMapInterface::STATUS_IGNORED);
         $this->currentRow = NULL;
         $this->currentSourceIds = NULL;
@@ -387,6 +392,7 @@ abstract class SourcePluginBase extends PluginBase implements MigrateSourceInter
   public function next(): void {
     $this->currentSourceIds = NULL;
     $this->currentRow = NULL;
+    $this->saveRowToMap = TRUE;
 
     // In order to find the next row we want to process, we ask the source
     // plugin for the next possible row.
@@ -412,8 +418,11 @@ abstract class SourcePluginBase extends PluginBase implements MigrateSourceInter
 
       // Preparing the row gives source plugins the chance to skip.
       if ($this->prepareRow($row) === FALSE) {
-        $this->idMap->saveIdMapping($row, [], MigrateIdMapInterface::STATUS_IGNORED);
-        $this->idMap->saveMessage($row->getSourceIdValues(), 'Row skipped by source plugin.');
+        // No map row record was saved for skipping the row.
+        if (empty($this->idMap->getRowBySource($row->getSourceIdValues())) && $this->saveRowToMap) {
+          $this->idMap->saveIdMapping($row, [], MigrateIdMapInterface::STATUS_IGNORED);
+          $this->idMap->saveMessage($row->getSourceIdValues(), 'Row skipped by source plugin.');
+        }
         continue;
       }
 
