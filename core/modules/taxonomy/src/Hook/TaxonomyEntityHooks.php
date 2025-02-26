@@ -8,6 +8,7 @@ use Drupal\Core\Hook\Attribute\Hook;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Entity\Sql\SqlContentEntityStorage;
+use Drupal\node\NodeInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\StringTranslation\TranslationInterface;
 use Drupal\Core\Url;
@@ -32,10 +33,10 @@ class TaxonomyEntityHooks {
    * The index lists all terms that are related to a given node entity, and is
    * therefore maintained at the entity level.
    *
-   * @param \Drupal\node\Entity\Node $node
+   * @param \Drupal\node\NodeInterface $node
    *   The node entity.
    */
-  protected function buildNodeIndex($node): void {
+  protected function buildNodeIndex(NodeInterface $node): void {
     // We maintain a denormalized table of term/node relationships, containing
     // only data for current, published nodes.
     if (!\Drupal::config('taxonomy.settings')->get('maintain_index_table') || !($this->entityTypeManager->getStorage('node') instanceof SqlContentEntityStorage)) {
@@ -79,10 +80,10 @@ class TaxonomyEntityHooks {
   /**
    * Deletes taxonomy index entries for a given node.
    *
-   * @param \Drupal\Core\Entity\EntityInterface $node
+   * @param \Drupal\node\NodeInterface $node
    *   The node entity.
    */
-  protected function deleteNodeIndex(EntityInterface $node): void {
+  protected function deleteNodeIndex(NodeInterface $node): void {
     if (\Drupal::config('taxonomy.settings')->get('maintain_index_table')) {
       \Drupal::database()->delete('taxonomy_index')->condition('nid', $node->id())->execute();
     }
