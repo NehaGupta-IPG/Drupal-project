@@ -20,9 +20,9 @@ class TaxonomyEntityHooks {
   use stringTranslationTrait;
 
   public function __construct(
-    protected ConfigFactoryInterface $configFactory, 
-    protected EntityTypeManagerInterface $entityTypeManager, 
-    protected TranslationInterface $string_translation
+    protected ConfigFactoryInterface $configFactory,
+    protected EntityTypeManagerInterface $entityTypeManager,
+    protected TranslationInterface $string_translation,
   ) {
   }
 
