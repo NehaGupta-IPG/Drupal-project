@@ -19,34 +19,11 @@ class TaxonomyEntityHooks {
 
   use stringTranslationTrait;
 
-  /**
-   * A config factory for retrieving required config settings.
-   *
-   * @var \Drupal\Core\Config\ConfigFactoryInterface
-   */
-  protected $configFactory;
-
-  /**
-   * A config factory for retrieving required config settings.
-   *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
-   */
-  protected $entityTypeManager;
-
-  /**
-   * Constructs TaxonomyEntityHooks.
-   *
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $configFactory
-   *   The configuration factory.
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
-   *   The entity type manager.
-   * @param \Drupal\Core\StringTranslation\TranslationInterface $string_translation
-   *   The translation service.
-   */
-  public function __construct(ConfigFactoryInterface $configFactory, EntityTypeManagerInterface $entityTypeManager, TranslationInterface $string_translation) {
-    $this->configFactory = $configFactory;
-    $this->entityTypeManager = $entityTypeManager;
-    $this->stringTranslation = $string_translation;
+  public function __construct(
+    protected ConfigFactoryInterface $configFactory, 
+    protected EntityTypeManagerInterface $entityTypeManager, 
+    protected TranslationInterface $string_translation
+  ) {
   }
 
   /**
@@ -58,7 +35,7 @@ class TaxonomyEntityHooks {
    * @param \Drupal\node\Entity\Node $node
    *   The node entity.
    */
-  protected function build_node_index($node): void {
+  protected function buildNodeIndex($node): void {
     // We maintain a denormalized table of term/node relationships, containing
     // only data for current, published nodes.
     if (!\Drupal::config('taxonomy.settings')->get('maintain_index_table') || !($this->entityTypeManager->getStorage('node') instanceof SqlContentEntityStorage)) {
@@ -105,7 +82,7 @@ class TaxonomyEntityHooks {
    * @param \Drupal\Core\Entity\EntityInterface $node
    *   The node entity.
    */
-  protected function delete_node_index(EntityInterface $node): void {
+  protected function deleteNodeIndex(EntityInterface $node): void {
     if (\Drupal::config('taxonomy.settings')->get('maintain_index_table')) {
       \Drupal::database()->delete('taxonomy_index')->condition('nid', $node->id())->execute();
     }
@@ -157,7 +134,7 @@ class TaxonomyEntityHooks {
   #[Hook('node_insert')]
   public function nodeInsert(EntityInterface $node): void {
     // Add taxonomy index entries for the node.
-    $this->build_node_index($node);
+    $this->buildNodeIndex($node);
   }
 
   /**
@@ -170,8 +147,8 @@ class TaxonomyEntityHooks {
     if (!$node->isDefaultRevision()) {
       return;
     }
-    $this->delete_node_index($node);
-    $this->build_node_index($node);
+    $this->deleteNodeIndex($node);
+    $this->buildNodeIndex($node);
   }
 
   /**
@@ -180,7 +157,7 @@ class TaxonomyEntityHooks {
   #[Hook('node_predelete')]
   public function nodePredelete(EntityInterface $node): void {
     // Clean up the {taxonomy_index} table when nodes are deleted.
-    $this->delete_node_index($node);
+    $this->deleteNodeIndex($node);
   }
 
   /**
