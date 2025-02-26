@@ -8,12 +8,16 @@ use Drupal\Core\Hook\Attribute\Hook;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Entity\Sql\SqlContentEntityStorage;
+use Drupal\Core\StringTranslation\StringTranslationTrait;
+use Drupal\Core\StringTranslation\TranslationInterface;
 use Drupal\Core\Url;
 
 /**
  * Hook implementations for taxonomy.
  */
 class TaxonomyEntityHooks {
+
+  use stringTranslationTrait;
 
   /**
    * A config factory for retrieving required config settings.
@@ -25,7 +29,7 @@ class TaxonomyEntityHooks {
   /**
    * A config factory for retrieving required config settings.
    *
-   * @property \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
+   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
    */
   protected $entityTypeManager;
 
@@ -36,10 +40,13 @@ class TaxonomyEntityHooks {
    *   The configuration factory.
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
    *   The entity type manager.
+   * @param \Drupal\Core\StringTranslation\TranslationInterface $string_translation
+   *   The translation service.
    */
-  public function __construct(ConfigFactoryInterface $configFactory, EntityTypeManagerInterface $entityTypeManager) {
+  public function __construct(ConfigFactoryInterface $configFactory, EntityTypeManagerInterface $entityTypeManager, TranslationInterface $string_translation) {
     $this->configFactory = $configFactory;
     $this->entityTypeManager = $entityTypeManager;
+    $this->stringTranslation = $string_translation;
   }
 
   /**
@@ -112,7 +119,7 @@ class TaxonomyEntityHooks {
     $operations = [];
     if ($term instanceof Term && $term->access('create')) {
       $operations['add-child'] = [
-        'title' => t('Add child'),
+        'title' => $this->t('Add child'),
         'weight' => 10,
         'url' => Url::fromRoute('entity.taxonomy_term.add_form', [
           'taxonomy_vocabulary' => $term->bundle(),
