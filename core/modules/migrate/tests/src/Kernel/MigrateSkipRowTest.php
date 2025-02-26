@@ -58,19 +58,16 @@ class MigrateSkipRowTest extends KernelTestBase {
     // The first row is recorded in the map as ignored.
     $map_row = $id_map_plugin->getRowBySource(['id' => 1]);
     $this->assertEquals(MigrateIdMapInterface::STATUS_IGNORED, $map_row['source_row_status']);
-    // Check that a message has been logged for the first exception.
+    // Check that no message has been logged for the first exception.
     $messages = $id_map_plugin->getMessages(['id' => 1])->fetchAll();
-    $this->assertCount(1, $messages);
-    $message = reset($messages);
-    $this->assertEquals('Row skipped by source plugin.', $message->message);
+    $this->assertEmpty($messages);
 
-    // The second row is recorded in the map as ignored.
+    // The second row is not recorded in the map.
     $map_row = $id_map_plugin->getRowBySource(['id' => 2]);
-    $this->assertEquals(MigrateIdMapInterface::STATUS_IGNORED, $map_row['source_row_status']);
-
+    $this->assertFalse($map_row);
     // Check that the correct message has been logged for the second exception.
     $messages = $id_map_plugin->getMessages(['id' => 2])->fetchAll();
-    $this->assertCount(2, $messages);
+    $this->assertCount(1, $messages);
     $message = reset($messages);
     $this->assertEquals('skip_and_do_not_record message', $message->message);
     $this->assertEquals(MigrationInterface::MESSAGE_INFORMATIONAL, $message->level);
