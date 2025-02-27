@@ -4,6 +4,7 @@ namespace Drupal\taxonomy\Hook;
 
 use Drupal\taxonomy\Entity\Term;
 use Drupal\Core\Config\ConfigFactoryInterface;
+use Drupal\Core\Database\Connection;
 use Drupal\Core\Hook\Attribute\Hook;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
@@ -22,6 +23,7 @@ class TaxonomyEntityHooks {
 
   public function __construct(
     protected ConfigFactoryInterface $configFactory,
+    protected Connection $database,
     protected EntityTypeManagerInterface $entityTypeManager,
     protected TranslationInterface $string_translation,
   ) {
@@ -66,9 +68,8 @@ class TaxonomyEntityHooks {
       }
       // Insert index entries for all the node's terms.
       if (!empty($tid_all)) {
-        $connection = \Drupal::database();
         foreach ($tid_all as $tid) {
-          $connection->merge('taxonomy_index')
+          $this->database->merge('taxonomy_index')
             ->keys(['nid' => $node->id(), 'tid' => $tid, 'status' => $node->isPublished()])
             ->fields(['sticky' => $sticky, 'created' => $node->getCreatedTime()])
             ->execute();
@@ -85,7 +86,7 @@ class TaxonomyEntityHooks {
    */
   protected function deleteNodeIndex(NodeInterface $node): void {
     if (\Drupal::config('taxonomy.settings')->get('maintain_index_table')) {
-      \Drupal::database()->delete('taxonomy_index')->condition('nid', $node->id())->execute();
+      $this->database->delete('taxonomy_index')->condition('nid', $node->id())->execute();
     }
   }
 
@@ -168,7 +169,7 @@ class TaxonomyEntityHooks {
   public function taxonomyTermDelete(Term $term): void {
     if (\Drupal::config('taxonomy.settings')->get('maintain_index_table')) {
       // Clean up the {taxonomy_index} table when terms are deleted.
-      \Drupal::database()->delete('taxonomy_index')->condition('tid', $term->id())->execute();
+      $this->database->delete('taxonomy_index')->condition('tid', $term->id())->execute();
     }
   }
 
