@@ -53,36 +53,16 @@ class Date extends SortPluginBase {
    */
   public function query() {
     $this->ensureMyTable();
-    switch ($this->options['granularity']) {
-      case 'second':
-      default:
-        $this->query->addOrderBy($this->tableAlias, $this->realField, $this->options['order']);
-        return;
-
-      case 'minute':
-        $formula = $this->getDateFormat('YmdHi');
-        break;
-
-      case 'hour':
-        $formula = $this->getDateFormat('YmdH');
-        break;
-
-      case 'day':
-        $formula = $this->getDateFormat('Ymd');
-        break;
-
-      case 'week':
-        $formula = $this->getDateFormat('W');
-        break;
-
-      case 'month':
-        $formula = $this->getDateFormat('Ym');
-        break;
-
-      case 'year':
-        $formula = $this->getDateFormat('Y');
-        break;
-    }
+    $formula = match ($this->options['granularity']) {
+      'minute' => $this->getDateFormat('YmdHi'),
+      'hour' => $this->getDateFormat('YmdH'),
+      'day' => $this->getDateFormat('Ymd'),
+      'week' => $this->getDateFormat('W'),
+      'month' => $this->getDateFormat('Ym'),
+      'year' => $this->getDateFormat('Y'),
+      default => $this->query->addOrderBy($this->tableAlias, $this->realField, $this->options['order']),
+    };
+    return $formula ?? null;
 
     // Add the field.
     $this->query->addOrderBy(NULL, $formula, $this->options['order'], $this->tableAlias . '_' . $this->field . '_' . $this->options['granularity']);
