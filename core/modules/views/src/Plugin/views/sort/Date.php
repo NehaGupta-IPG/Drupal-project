@@ -60,12 +60,15 @@ class Date extends SortPluginBase {
       'week' => $this->getDateFormat('W'),
       'month' => $this->getDateFormat('Ym'),
       'year' => $this->getDateFormat('Y'),
-      default => $this->query->addOrderBy($this->tableAlias, $this->realField, $this->options['order']),
+      default => NULL,
     };
 
     if ($formula) {
       // Add the field.
       $this->query->addOrderBy(NULL, $formula, $this->options['order'], $this->tableAlias . '_' . $this->field . '_' . $this->options['granularity']);
+    }
+    else {
+      $this->query->addOrderBy($this->tableAlias, $this->realField, $this->options['order']);
     }
   }
 
