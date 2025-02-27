@@ -68,4 +68,5 @@ class Date extends SortPluginBase {
       $this->query->addOrderBy(NULL, $formula, $this->options['order'], $this->tableAlias . '_' . $this->field . '_' . $this->options['granularity']);
     }
   }
+  
 }
