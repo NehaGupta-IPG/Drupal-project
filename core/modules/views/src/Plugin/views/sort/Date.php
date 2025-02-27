@@ -62,7 +62,7 @@ class Date extends SortPluginBase {
       'year' => $this->getDateFormat('Y'),
       default => $this->query->addOrderBy($this->tableAlias, $this->realField, $this->options['order']),
     };
-    return $formula ?? null;
+    return $formula ?? NULL;
 
     // Add the field.
     $this->query->addOrderBy(NULL, $formula, $this->options['order'], $this->tableAlias . '_' . $this->field . '_' . $this->options['granularity']);
