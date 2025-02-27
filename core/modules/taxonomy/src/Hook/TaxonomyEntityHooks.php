@@ -11,7 +11,6 @@ use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Entity\Sql\SqlContentEntityStorage;
 use Drupal\node\NodeInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
-use Drupal\Core\StringTranslation\TranslationInterface;
 use Drupal\Core\Url;
 
 /**
@@ -25,7 +24,6 @@ class TaxonomyEntityHooks {
     protected ConfigFactoryInterface $configFactory,
     protected Connection $database,
     protected EntityTypeManagerInterface $entityTypeManager,
-    protected TranslationInterface $string_translation,
   ) {
   }
 

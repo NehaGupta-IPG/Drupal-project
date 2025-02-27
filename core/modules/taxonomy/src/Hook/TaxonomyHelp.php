@@ -6,7 +6,6 @@ use Drupal\Core\Url;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Hook\Attribute\Hook;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
-use Drupal\Core\StringTranslation\TranslationInterface;
 
 /**
  * Implements hook_help().
@@ -15,16 +14,6 @@ use Drupal\Core\StringTranslation\TranslationInterface;
 class TaxonomyHelp {
 
   use StringTranslationTrait;
-
-  /**
-   * Constructs TaxonomyHelp.
-   *
-   * @param \Drupal\Core\StringTranslation\TranslationInterface $string_translation
-   *   The translation service.
-   */
-  public function __construct(TranslationInterface $string_translation) {
-    $this->stringTranslation = $string_translation;
-  }
 
   /**
    * Implements hook_help().
