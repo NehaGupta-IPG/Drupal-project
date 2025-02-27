@@ -19,23 +19,11 @@ class TaxonomyThemeHooks {
    * Implements hook_theme().
    */
   #[Hook('theme')]
-  public function theme() : array {
-    return [
-      'taxonomy_term' => [
-        'render element' => 'elements',
-        'initial preprocess' => static::class . ':preprocessTaxonomyTerm',
-      ],
-    ];
-  }
-
-  /**
-   * Implements hook_theme().
-   */
-  #[Hook('theme')]
   public function theme(): array {
     return [
       'taxonomy_term' => [
         'render element' => 'elements',
+        'initial preprocess' => static::class . ':preprocessTaxonomyTerm',
       ],
     ];
   }
@@ -46,10 +34,13 @@ class TaxonomyThemeHooks {
   #[Hook('theme_suggestions_taxonomy_term')]
   public function themeSuggestionsTaxonomyTerm(array $variables): array {
     $suggestions = [];
+
     /** @var \Drupal\taxonomy\TermInterface $term */
     $term = $variables['elements']['#taxonomy_term'];
+
     $suggestions[] = 'taxonomy_term__' . $term->bundle();
     $suggestions[] = 'taxonomy_term__' . $term->id();
+
     return $suggestions;
   }
 
