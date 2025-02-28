@@ -19,7 +19,7 @@ class MenuLinkContentInternalTest extends MenuLinkContentTest {
   /**
    * {@inheritdoc}
    */
-  protected function setUpAuthorization($method) {
+  protected function setUpAuthorization($method): void {
     $this->grantPermissionsToTestedRole(['administer menu', 'access user profiles']);
   }
 
@@ -43,7 +43,7 @@ class MenuLinkContentInternalTest extends MenuLinkContentTest {
   /**
    * {@inheritdoc}
    */
-  protected function getExpectedDocument() {
+  protected function getExpectedDocument(): array {
     $base_url = Url::fromUri('base:/jsonapi/menu_link_content/menu_link_content/' . $this->entity->uuid())->setAbsolute();
     $self_url = clone $base_url;
     $version_identifier = 'id:' . $this->entity->getRevisionId();
@@ -113,7 +113,7 @@ class MenuLinkContentInternalTest extends MenuLinkContentTest {
   /**
    * {@inheritdoc}
    */
-  public function testRelationships() {
+  public function testRelationships(): void {
     // @see \Drupal\Tests\jsonapi\Functional\ResourceTestBase::doTestRelationshipMutation()
     $this->grantPermissionsToTestedRole(['access user profiles']);
     parent::testRelationships();
@@ -122,7 +122,7 @@ class MenuLinkContentInternalTest extends MenuLinkContentTest {
   /**
    * {@inheritdoc}
    */
-  protected function getExpectedCacheTags(array $sparse_fieldset = NULL) {
+  protected function getExpectedCacheTags(?array $sparse_fieldset = NULL) {
     return [
       'http_response',
       'menu_link_content:1',
