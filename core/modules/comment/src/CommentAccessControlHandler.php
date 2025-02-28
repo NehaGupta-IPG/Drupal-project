@@ -34,7 +34,7 @@ class CommentAccessControlHandler extends EntityAccessControlHandler {
     if ($operation === 'reply') {
       $access = $this->checkReplyThreadAccess($entity)->addCacheableDependency($entity);
 
-      if ($access->isAllowed()) {
+      if (!$access->isForbidden()) {
         $context = array_filter(
           [
             'commented_entity' => $entity->getCommentedEntity(),
@@ -43,13 +43,14 @@ class CommentAccessControlHandler extends EntityAccessControlHandler {
           ],
           static fn (mixed $val): bool => $val !== NULL,
         );
-        return $access
+        $access = $access->orIf(
           // The user must be able to view the comment.
-          ->andIf($this->access($entity, 'view', $account, TRUE))
-          // And must be able to create comments.
-          ->andIf($this->createAccess($entity->bundle(), $account, $context, TRUE))
-          // And comment must be published.
-          ->andIf(AccessResult::allowedIf($entity->isPublished()));
+          $this->access($entity, 'view', $account, TRUE)
+            // And must be able to create comments.
+            ->andIf($this->createAccess($entity->bundle(), $account, $context, TRUE))
+            // And comment must be published.
+            ->andIf(AccessResult::allowedIf($entity->isPublished()))
+        );
       }
       return $access;
     }
@@ -94,7 +95,7 @@ class CommentAccessControlHandler extends EntityAccessControlHandler {
    * Checks if this comment accepts replies according to field config.
    */
   protected function checkReplyThreadAccess(CommentInterface $comment): AccessResultInterface {
-    $access_result = AccessResult::allowed();
+    $access_result = AccessResult::neutral();
     $commented_entity = $comment->getCommentedEntity();
     if (!$commented_entity instanceof EntityInterface) {
       return $access_result;

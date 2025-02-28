@@ -30,7 +30,7 @@ class CommentUpdateTest extends UpdatePathTestBase {
    *
    * @see comment_post_update_add_thread_limit_field_setting()
    */
-  public function testCommentUpdate9100(): void {
+  public function testCommentPostUpdateAddThreadLimit(): void {
     $config_factory = \Drupal::configFactory();
 
     $config = $config_factory->get('field.field.node.article.comment');
