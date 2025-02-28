@@ -47,7 +47,7 @@ class ImageDownloadFileHook {
   /**
    * Implements hook_file_download().
    */
-  public function __invoke($uri): array|int|null {
+  public function __invoke(string $uri): array|int|null {
     $path = StreamWrapperManager::getTarget($uri);
     // Private file access for image style derivatives.
     if (str_starts_with($path, 'styles/')) {
