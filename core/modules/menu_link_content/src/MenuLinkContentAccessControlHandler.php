@@ -77,6 +77,8 @@ class MenuLinkContentAccessControlHandler extends EntityAccessControlHandler imp
             ->cachePerPermissions()
             ->addCacheableDependency($entity);
         }
+        // No if case applied, return neutral access result:
+        return AccessResult::neutral();
 
       case 'update':
         if (!$account->hasPermission('administer menu')) {
