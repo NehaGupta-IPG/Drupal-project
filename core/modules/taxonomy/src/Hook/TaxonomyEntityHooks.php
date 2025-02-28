@@ -4,6 +4,7 @@ namespace Drupal\taxonomy\Hook;
 
 use Drupal\taxonomy\Entity\Term;
 use Drupal\Core\Config\ConfigFactoryInterface;
+use Drupal\Core\Config\ImmutableConfig;
 use Drupal\Core\Database\Connection;
 use Drupal\Core\Hook\Attribute\Hook;
 use Drupal\Core\Entity\EntityInterface;
@@ -20,11 +21,19 @@ class TaxonomyEntityHooks {
 
   use stringTranslationTrait;
 
+  /**
+   * The configuration settings of this module.
+   *
+   * @var \Drupal\Core\Config\ImmutableConfig
+   */
+  protected ImmutableConfig $config;
+
   public function __construct(
-    protected ConfigFactoryInterface $configFactory,
+    configFactoryInterface $config,
     protected Connection $database,
     protected EntityTypeManagerInterface $entityTypeManager,
   ) {
+    $this->config = $config->get('taxonomy.settings');
   }
 
   /**
@@ -39,8 +48,7 @@ class TaxonomyEntityHooks {
   protected function buildNodeIndex(NodeInterface $node): void {
     // We maintain a denormalized table of term/node relationships, containing
     // only data for current, published nodes.
-    $config = $this->configFactory->get('taxonomy.settings');
-    if (!$config->get('maintain_index_table') || !($this->entityTypeManager->getStorage('node') instanceof SqlContentEntityStorage)) {
+    if (!$this->config->get('maintain_index_table') || !($this->entityTypeManager->getStorage('node') instanceof SqlContentEntityStorage)) {
       return;
     }
 
@@ -84,8 +92,7 @@ class TaxonomyEntityHooks {
    *   The node entity.
    */
   protected function deleteNodeIndex(NodeInterface $node): void {
-    $config = $this->configFactory->get('taxonomy.settings');
-    if ($config->get('maintain_index_table')) {
+    if ($this->config->get('maintain_index_table')) {
       $this->database->delete('taxonomy_index')->condition('nid', $node->id())->execute();
     }
   }
@@ -167,8 +174,7 @@ class TaxonomyEntityHooks {
    */
   #[Hook('taxonomy_term_delete')]
   public function taxonomyTermDelete(Term $term): void {
-    $config = $this->configFactory->get('taxonomy.settings');
-    if ($config->get('maintain_index_table')) {
+    if ($this->config->get('maintain_index_table')) {
       // Clean up the {taxonomy_index} table when terms are deleted.
       $this->database->delete('taxonomy_index')->condition('tid', $term->id())->execute();
     }
