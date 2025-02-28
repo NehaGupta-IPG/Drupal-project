@@ -1,0 +1,8 @@
+
+action.configuration.file_image_style_action:
+  type: mapping
+  label: 'Configuration for "File Image Style" action'
+  mapping:
+    image_style:
+      type: string
+      label: 'The image style to be applied to an image file entity.'
