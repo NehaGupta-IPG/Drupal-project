@@ -55,6 +55,7 @@ class DisplayPluginCollection extends DefaultLazyPluginCollection {
    * @return \Drupal\views\Plugin\views\display\DisplayPluginBase
    *   The display plugin.
    */
+  // phpcs:ignore Generic.CodeAnalysis.UselessOverridingMethod
   public function &get($instance_id) {
     return parent::get($instance_id);
   }

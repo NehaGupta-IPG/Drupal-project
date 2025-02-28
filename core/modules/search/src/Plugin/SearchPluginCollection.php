@@ -41,6 +41,7 @@ class SearchPluginCollection extends DefaultSingleLazyPluginCollection {
    * @return \Drupal\search\Plugin\SearchInterface
    *   The search plugin instance associated with the given instance ID.
    */
+  // phpcs:ignore Generic.CodeAnalysis.UselessOverridingMethod
   public function &get($instance_id) {
     return parent::get($instance_id);
   }

@@ -17,6 +17,7 @@ class TestRunnerKernel extends DrupalKernel {
   /**
    * {@inheritdoc}
    */
+  // phpcs:ignore Generic.CodeAnalysis.UselessOverridingMethod
   public static function createFromRequest(Request $request, $class_loader, $environment = 'test_runner', $allow_dumping = TRUE, $app_root = NULL) {
     return parent::createFromRequest($request, $class_loader, $environment, $allow_dumping, $app_root);
   }

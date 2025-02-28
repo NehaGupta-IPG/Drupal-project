@@ -23,6 +23,7 @@ class Email extends StringData implements StringInterface {
    * {@inheritdoc}
    */
   #[JsonSchema(['type' => 'string', 'format' => 'email'])]
+  // phpcs:ignore Generic.CodeAnalysis.UselessOverridingMethod
   public function getCastedValue() {
     return parent::getCastedValue();
   }

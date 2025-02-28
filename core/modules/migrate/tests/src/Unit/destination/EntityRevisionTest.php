@@ -233,6 +233,7 @@ class EntityRevision extends RealEntityRevision {
   /**
    * Allow public access for testing.
    */
+  // phpcs:ignore Generic.CodeAnalysis.UselessOverridingMethod
   public function getEntity(Row $row, array $old_destination_id_values) {
     return parent::getEntity($row, $old_destination_id_values);
   }
@@ -240,6 +241,7 @@ class EntityRevision extends RealEntityRevision {
   /**
    * Allow public access for testing.
    */
+  // phpcs:ignore Generic.CodeAnalysis.UselessOverridingMethod
   public function save(ContentEntityInterface $entity, array $old_destination_id_values = []) {
     return parent::save($entity, $old_destination_id_values);
   }

@@ -204,6 +204,7 @@ class TestMigrateExecutable extends MigrateExecutable {
    * @return \Drupal\migrate\Plugin\MigrateIdMapInterface
    *   The ID map.
    */
+  // phpcs:ignore Generic.CodeAnalysis.UselessOverridingMethod
   public function getIdMap() {
     return parent::getIdMap();
   }

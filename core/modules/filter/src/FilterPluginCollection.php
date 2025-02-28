@@ -23,6 +23,7 @@ class FilterPluginCollection extends DefaultLazyPluginCollection {
    * @return \Drupal\filter\Plugin\FilterInterface
    *   The filter plugin instance.
    */
+  // phpcs:ignore Generic.CodeAnalysis.UselessOverridingMethod
   public function &get($instance_id) {
     return parent::get($instance_id);
   }

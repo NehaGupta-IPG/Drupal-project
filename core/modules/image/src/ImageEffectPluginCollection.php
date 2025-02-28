@@ -15,6 +15,7 @@ class ImageEffectPluginCollection extends DefaultLazyPluginCollection {
    * @return \Drupal\image\ImageEffectInterface
    *   The image effect plugin.
    */
+  // phpcs:ignore Generic.CodeAnalysis.UselessOverridingMethod
   public function &get($instance_id) {
     return parent::get($instance_id);
   }

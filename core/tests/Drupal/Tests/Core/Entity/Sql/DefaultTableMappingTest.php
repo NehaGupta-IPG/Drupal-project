@@ -613,6 +613,8 @@ class DefaultTableMappingTest extends UnitTestCase {
  */
 class TestDefaultTableMapping extends DefaultTableMapping {
 
+  // phpcs:disable Generic.CodeAnalysis.UselessOverridingMethod
+
   /**
    * {@inheritdoc}
    */

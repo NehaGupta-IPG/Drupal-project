@@ -60,6 +60,7 @@ class QueueWorkerManager extends DefaultPluginManager implements QueueWorkerMana
    * @return \Drupal\Core\Queue\QueueWorkerInterface
    *   A fully configured plugin instance.
    */
+  // phpcs:ignore Generic.CodeAnalysis.UselessOverridingMethod
   public function createInstance($plugin_id, array $configuration = []) {
     return parent::createInstance($plugin_id, $configuration);
   }

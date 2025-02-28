@@ -193,6 +193,7 @@ class TestSqlBase extends SqlBase {
   /**
    * {@inheritdoc}
    */
+  // phpcs:ignore Generic.CodeAnalysis.UselessOverridingMethod
   public function mapJoinable() {
     return parent::mapJoinable();
   }

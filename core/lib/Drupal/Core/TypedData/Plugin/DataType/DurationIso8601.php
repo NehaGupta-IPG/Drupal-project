@@ -41,6 +41,7 @@ class DurationIso8601 extends StringData implements DurationInterface {
    * {@inheritdoc}
    */
   #[JsonSchema(['type' => 'string', 'format' => 'duration'])]
+  // phpcs:ignore Generic.CodeAnalysis.UselessOverridingMethod
   public function getCastedValue() {
     return parent::getCastedValue();
   }

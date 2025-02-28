@@ -321,6 +321,7 @@ class DateTimeIso8601NormalizerTestDrupalDateTime extends DrupalDateTime {
   /**
    * Sets the timezone.
    */
+  // phpcs:ignore Generic.CodeAnalysis.UselessOverridingMethod
   public function setTimezone(\DateTimeZone $timezone) {
     parent::setTimezone($timezone);
   }

@@ -91,6 +91,7 @@ class TestPluginBase extends PluginBase {
   /**
    * {@inheritdoc}
    */
+  // phpcs:ignore Generic.CodeAnalysis.UselessOverridingMethod
   public function viewsTokenReplace($text, $tokens) {
     return parent::viewsTokenReplace($text, $tokens);
   }

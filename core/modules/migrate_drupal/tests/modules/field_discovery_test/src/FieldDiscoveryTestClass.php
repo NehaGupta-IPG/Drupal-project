@@ -50,6 +50,8 @@ class FieldDiscoveryTestClass extends FieldDiscovery {
     return parent::getAllFields($core);
   }
 
+  // phpcs:disable Generic.CodeAnalysis.UselessOverridingMethod
+
   /**
    * {@inheritdoc}
    */

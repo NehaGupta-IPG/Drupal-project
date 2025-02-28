@@ -57,6 +57,7 @@ class InstallStorage extends FileStorage {
    *   (optional) The collection to store configuration in. Defaults to the
    *   default collection.
    */
+  // phpcs:ignore Generic.CodeAnalysis.UselessOverridingMethod
   public function __construct($directory = self::CONFIG_INSTALL_DIRECTORY, $collection = StorageInterface::DEFAULT_COLLECTION) {
     parent::__construct($directory, $collection);
   }
