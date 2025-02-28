@@ -621,7 +621,7 @@
       const trigger = states.Trigger.states[this.state];
       if (typeof trigger !== 'function') {
         Object.keys(trigger || {}).forEach((event) => {
-          this.element.off(event);
+          this.element.off(`${event}.drupalStates`);
         });
       }
       // Mark this trigger as not initialized for this element.
@@ -641,7 +641,7 @@
 
       // Attach the event callback.
       this.element.on(
-        event,
+        `${event}.drupalStates`,
         function (e) {
           const value = valueFn.call(this.element, e);
           // Only trigger the event if the value has actually changed.
