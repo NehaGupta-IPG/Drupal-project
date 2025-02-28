@@ -53,6 +53,8 @@ class Date extends SortPluginBase {
    */
   public function query() {
     $this->ensureMyTable();
+
+    // Determine whether to use a formula in the query.
     $formula = match ($this->options['granularity']) {
       'minute' => $this->getDateFormat('YmdHi'),
       'hour' => $this->getDateFormat('YmdH'),
@@ -63,8 +65,8 @@ class Date extends SortPluginBase {
       default => NULL,
     };
 
+    // Add the field.
     if ($formula) {
-      // Add the field.
       $this->query->addOrderBy(NULL, $formula, $this->options['order'], $this->tableAlias . '_' . $this->field . '_' . $this->options['granularity']);
     }
     else {
