@@ -36,7 +36,10 @@ namespace Drupal\Core\StreamWrapper {
   function stat(string $filename): array|false {
     // Simulate that /custom-dir is an existing directory.
     if (preg_match('/^\/custom-dir$/', $filename)) {
-      return \stat(\realpath('public://'));
+      if ($realPath = \realpath('public://')) {
+        return \stat($realPath);
+      }
+      return FALSE;
     }
     return \stat($filename);
   }
