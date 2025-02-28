@@ -25,7 +25,6 @@ class TaxonomyEntityHooks {
     protected Connection $database,
     protected EntityTypeManagerInterface $entityTypeManager,
   ) {
-    $this->config = configFactory->get('taxonomy.settings');
   }
 
   /**
@@ -40,7 +39,8 @@ class TaxonomyEntityHooks {
   protected function buildNodeIndex(NodeInterface $node): void {
     // We maintain a denormalized table of term/node relationships, containing
     // only data for current, published nodes.
-    if (!$this->config->get('maintain_index_table') || !($this->entityTypeManager->getStorage('node') instanceof SqlContentEntityStorage)) {
+    $config = $this->configFactory->get('taxonomy.settings');
+    if (!$config->get('maintain_index_table') || !($this->entityTypeManager->getStorage('node') instanceof SqlContentEntityStorage)) {
       return;
     }
 
@@ -84,7 +84,8 @@ class TaxonomyEntityHooks {
    *   The node entity.
    */
   protected function deleteNodeIndex(NodeInterface $node): void {
-    if ($this->config->get('maintain_index_table')) {
+    $config = $this->configFactory->get('taxonomy.settings');
+    if ($config->get('maintain_index_table')) {
       $this->database->delete('taxonomy_index')->condition('nid', $node->id())->execute();
     }
   }
@@ -166,7 +167,8 @@ class TaxonomyEntityHooks {
    */
   #[Hook('taxonomy_term_delete')]
   public function taxonomyTermDelete(Term $term): void {
-    if ($this->config->get('maintain_index_table')) {
+    $config = $this->configFactory->get('taxonomy.settings');
+    if ($config->get('maintain_index_table')) {
       // Clean up the {taxonomy_index} table when terms are deleted.
       $this->database->delete('taxonomy_index')->condition('tid', $term->id())->execute();
     }
