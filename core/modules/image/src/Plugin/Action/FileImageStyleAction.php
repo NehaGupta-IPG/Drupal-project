@@ -116,12 +116,12 @@ use Psr\Log\LoggerInterface;
     // and if so, change the file name and uri.
     $file_name = $file->getFilename();
     $original_extension = pathinfo($file_name, PATHINFO_EXTENSION);
-    $styled_extenstion = $style->getDerivativeExtension($original_extension);
+    $styled_extension = $style->getDerivativeExtension($original_extension);
     $styled_image_uri = $source_uri;
     $extension_changed = FALSE;
-    if ($styled_extenstion !== $original_extension) {
-      $file_name = str_replace('.' . $original_extension, '.' . $styled_extenstion, $file_name);
-      $styled_image_uri = str_replace('.' . $original_extension, '.' . $styled_extenstion, $source_uri);
+    if ($styled_extension !== $original_extension) {
+      $file_name = str_replace('.' . $original_extension, '.' . $styled_extension, $file_name);
+      $styled_image_uri = str_replace('.' . $original_extension, '.' . $styled_extension, $source_uri);
       $extension_changed = TRUE;
     }
 

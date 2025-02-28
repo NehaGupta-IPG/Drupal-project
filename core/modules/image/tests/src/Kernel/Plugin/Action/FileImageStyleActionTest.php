@@ -81,7 +81,7 @@ class FileImageStyleActionTest extends KernelTestBase {
   }
 
   /**
-   * Tests moving a randomly generated image.
+   * Test File Image Style Action.
    */
   public function testFileImageStyleAction(): void {
     // Create a file for testing.
@@ -89,7 +89,7 @@ class FileImageStyleActionTest extends KernelTestBase {
     $file_original->save();
     $original_image = $this->imageFactory->get($file_original->getFileUri());
 
-    // Create an action with unexisting image style.
+    // Create an action with a not existing image style.
     $action = Action::create([
       'id' => 'file_image_style_action',
       'label' => 'Optimize image',
