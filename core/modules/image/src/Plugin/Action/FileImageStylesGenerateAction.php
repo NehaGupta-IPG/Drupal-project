@@ -26,6 +26,7 @@ use Drupal\Core\StringTranslation\TranslatableMarkup;
   public function defaultConfiguration() {
     return [
       'image_styles' => [],
+      'regenerate' => FALSE,
     ];
   }
 
@@ -42,10 +43,17 @@ use Drupal\Core\StringTranslation\TranslatableMarkup;
     $form['image_styles'] = [
       '#type' => 'checkboxes',
       '#title' => $this->t('Image styles'),
-      '#description' => $this->t('Select the image style to apply to the original image.'),
+      '#description' => $this->t('Select the image styles to generate derivatives for.'),
       '#options' => $options,
       '#default_value' => $this->configuration['image_styles'],
       '#required' => TRUE,
+    ];
+
+    $form['regenerate'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('Regenerate'),
+      '#description' => $this->t('Force regenerate the derivatives, even they already exists. Usually this is needed when the styles effects were changed.'),
+      '#default_value' => $this->configuration['regenerate'],
     ];
 
     return $form;
@@ -56,6 +64,7 @@ use Drupal\Core\StringTranslation\TranslatableMarkup;
    */
   public function submitConfigurationForm(array &$form, FormStateInterface $form_state): void {
     $this->configuration['image_styles'] = $form_state->getValue('image_styles');
+    $this->configuration['regenerate'] = $form_state->getValue('regenerate');
   }
 
   /**
@@ -72,7 +81,7 @@ use Drupal\Core\StringTranslation\TranslatableMarkup;
       // Set up derivative file information.
       $derivative_uri = $style->buildUri($original_uri);
       // Create derivative if necessary.
-      if (!file_exists($derivative_uri)) {
+      if (!file_exists($derivative_uri) || $this->configuration['regenerate']) {
         $style->createDerivative($original_uri, $derivative_uri);
         $new_size = filesize($original_uri);
         $this->logger->info('New image derivative %file_uri with style %style was generated. Original size: %old_size, new size: %new_size.', [

@@ -43,6 +43,11 @@ class FileImageStyleActionTest extends KernelTestBase {
   protected ImageStyle $imageStyle;
 
   /**
+   * The ID of the resize effect.
+   */
+  protected string $resizeEffectId;
+
+  /**
    * {@inheritdoc}
    */
   protected static $modules = [
@@ -89,7 +94,7 @@ class FileImageStyleActionTest extends KernelTestBase {
       ],
       'weight' => 1,
     ];
-    $this->imageStyle->addImageEffect($resize_effect);
+    $this->resizeEffectId = $this->imageStyle->addImageEffect($resize_effect);
     $this->imageStyle->save();
 
     $image_files = $this->drupalGetTestFiles('image');
@@ -123,6 +128,24 @@ class FileImageStyleActionTest extends KernelTestBase {
     $this->assertEquals('image/webp', $derivative_image->getMimeType());
     $this->assertEquals($derivative_image->getHeight(), 1);
 
+    // Update the image style effects.
+    $resize_effect = $this->imageStyle->getEffect($this->resizeEffectId);
+    $this->imageStyle->deleteImageEffect($resize_effect);
+    $resize_effect_config = $resize_effect->getConfiguration();
+    $resize_effect_config['data']['width'] = 2;
+    $resize_effect_config['data']['height'] = 2;
+    $this->imageStyle->addImageEffect($resize_effect_config);
+    $this->imageStyle->save();
+
+    // Regenerate the derivative image.
+    $action->set('configuration', [
+      'image_styles' => ['original_style'],
+      'regenerate' => TRUE,
+    ]);
+    $action->save();
+    $action->execute([$this->image]);
+    $derivative_image = $this->imageFactory->get($derivative_uri);
+    $this->assertEquals($derivative_image->getHeight(), 2);
   }
 
   /**
