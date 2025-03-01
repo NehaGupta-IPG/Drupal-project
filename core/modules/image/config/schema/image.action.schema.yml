@@ -1,6 +1,6 @@
 action.configuration.file_image_styles_generate_action:
   type: mapping
-  label: 'Configuration for "File Image Styles" action'
+  label: 'Configuration for "File Image Styles Generate" action'
   mapping:
     image_styles:
       type: sequence
@@ -11,7 +11,7 @@ action.configuration.file_image_styles_generate_action:
 
 action.configuration.file_original_image_style_action:
   type: mapping
-  label: 'Configuration for "File Oroginal Image Style" action'
+  label: 'Configuration for "File Original Image Style" action'
   mapping:
     image_style:
       type: string
