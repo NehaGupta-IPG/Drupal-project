@@ -6,15 +6,17 @@ namespace Drupal\Tests\image\Kernel\Plugin\Action;
 
 use Drupal\Core\Image\ImageFactory;
 use Drupal\file\Entity\File;
+use Drupal\file\FileInterface;
 use Drupal\image\Entity\ImageStyle;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\system\Entity\Action;
 use Drupal\Tests\TestFileCreationTrait;
 
 /**
- * Tests Content Entity Translate action.
+ * Tests File Image Styles actions.
  *
- * @covers \Drupal\image\Plugin\Action\FileImageStyleAction
+ * @covers \Drupal\image\Plugin\Action\FileImageStylesGenerateAction
+ * @covers \Drupal\image\Plugin\Action\FileOriginalImageStyleAction
  *
  * @group action
  * @group image
@@ -29,6 +31,16 @@ class FileImageStyleActionTest extends KernelTestBase {
    * The image factory service.
    */
   protected ImageFactory $imageFactory;
+
+  /**
+   * An image file path for uploading.
+   */
+  protected FileInterface $image;
+
+  /**
+   * An image style.
+   */
+  protected ImageStyle $imageStyle;
 
   /**
    * {@inheritdoc}
@@ -50,10 +62,11 @@ class FileImageStyleActionTest extends KernelTestBase {
     $this->installEntitySchema('file');
     $this->installEntitySchema('user');
     $this->installSchema('file', ['file_usage']);
+    $this->installEntitySchema('image_style');
 
     $this->imageFactory = $this->container->get('image.factory');
 
-    $original_style = ImageStyle::create([
+    $this->imageStyle = ImageStyle::create([
       'name' => 'original_style',
       'label' => 'Original style',
     ]);
@@ -66,7 +79,7 @@ class FileImageStyleActionTest extends KernelTestBase {
       ],
       'weight' => 0,
     ];
-    $original_style->addImageEffect($convert_effect);
+    $this->imageStyle->addImageEffect($convert_effect);
     $resize_effect = [
       'id' => 'image_scale_and_crop',
       'data' => [
@@ -76,24 +89,53 @@ class FileImageStyleActionTest extends KernelTestBase {
       ],
       'weight' => 1,
     ];
-    $original_style->addImageEffect($resize_effect);
-    $original_style->save();
+    $this->imageStyle->addImageEffect($resize_effect);
+    $this->imageStyle->save();
+
+    $image_files = $this->drupalGetTestFiles('image');
+    $this->image = File::create((array) current($image_files));
+    $this->image->save();
   }
 
   /**
-   * Test File Image Style Action.
+   * Test File Image Styles Generate Action.
+   */
+  public function testFileImageStylesGenerateAction(): void {
+    // Make sure the derivative does not exist, initially.
+    $derivative_uri = $this->imageStyle->buildUri($this->image->getFileUri());
+    $this->assertFalse(file_exists($derivative_uri));
+
+    // Create the File Image Styles Generate Action.
+    $action = Action::create([
+      'id' => 'file_image_styles_generate_action',
+      'label' => 'Optimize image',
+      'plugin' => 'file_image_styles_generate_action',
+      'configuration' => [
+        'image_styles' => ['original_style', 'invalid_style'],
+      ],
+    ]);
+    $action->save();
+    $action->execute([$this->image]);
+    // Make sure the derivative images was generated and the image style effects
+    // were applied.
+    $this->assertTrue(file_exists($derivative_uri));
+    $derivative_image = $this->imageFactory->get($derivative_uri);
+    $this->assertEquals('image/webp', $derivative_image->getMimeType());
+    $this->assertEquals($derivative_image->getHeight(), 1);
+
+  }
+
+  /**
+   * Test File Original Image Style Action.
    */
   public function testFileImageStyleAction(): void {
-    // Create a file for testing.
-    $file_original = File::create((array) current($this->drupalGetTestFiles('image')));
-    $file_original->save();
-    $original_image = $this->imageFactory->get($file_original->getFileUri());
+    $original_image = $this->imageFactory->get($this->image->getFileUri());
 
     // Create an action with a not existing image style.
     $action = Action::create([
-      'id' => 'file_image_style_action',
+      'id' => 'file_original_image_style_action',
       'label' => 'Optimize image',
-      'plugin' => 'file_image_style_action',
+      'plugin' => 'file_original_image_style_action',
       'configuration' => [
         'image_style' => 'invalid_style',
       ],
@@ -101,8 +143,8 @@ class FileImageStyleActionTest extends KernelTestBase {
     $action->save();
 
     // Pick a file for testing.
-    $action->execute([$file_original]);
-    $file_not_styled = File::load($file_original->id());
+    $action->execute([$this->image]);
+    $file_not_styled = File::load($this->image->id());
     $not_styled_image = $this->imageFactory->get($file_not_styled->getFileUri());
     $this->assertEquals($original_image->getFileSize(), $not_styled_image->getFileSize());
     $this->assertEquals($original_image->getMimeType(), $not_styled_image->getMimeType());
@@ -112,16 +154,17 @@ class FileImageStyleActionTest extends KernelTestBase {
     $action->set('configuration', ['image_style' => 'original_style']);
     $action->save();
 
-    $action->execute([$file_original]);
+    $action->execute([$this->image]);
 
     // Test that the original file has been replaced with the styled one.
-    $file_styled = File::load($file_original->id());
+    $file_styled = File::load($this->image->id());
     $styled_image = $this->imageFactory->get($file_styled->getFileUri());
     $this->assertNotEquals($original_image->getFileSize(), $styled_image->getFileSize());
     $this->assertNotEquals($original_image->getMimeType(), $styled_image->getMimeType());
     $this->assertNotEquals($original_image->getHeight(), $styled_image->getHeight());
     $this->assertFalse(file_exists($original_image->getSource()));
     $this->assertTrue(file_exists($styled_image->getSource()));
+    $this->assertEquals($styled_image->getHeight(), 1);
   }
 
 }
