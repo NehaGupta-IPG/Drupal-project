@@ -7,7 +7,9 @@ namespace Drupal\Tests\image\Functional;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\Core\StreamWrapper\StreamWrapperManager;
 use Drupal\Core\Url;
+use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
+use Drupal\file\FileInterface;
 use Drupal\image\Entity\ImageStyle;
 use Drupal\Tests\system\Functional\Cache\AssertPageCacheContextsAndTagsTrait;
 use Drupal\Tests\TestFileCreationTrait;
@@ -568,8 +570,8 @@ class ImageFieldDisplayTest extends ImageFieldTestBase {
     $this->assertEmpty($default_image['uuid'], 'Default image removed from field.');
     // Create an image field that uses the private:// scheme and test that the
     // default image works as expected.
-    $private_field_name = 'field_default_private';
-    $this->createImageField($private_field_name, 'node', 'article', ['uri_scheme' => 'private']);
+    $private_field_name = $this->randomMachineName();
+    $private_field = $this->createImageField($private_field_name, 'node', 'article', ['uri_scheme' => 'private']);
     // Add a default image to the new field.
     $edit = [
       // Get the path of the 'image-test.gif' file.
@@ -585,6 +587,7 @@ class ImageFieldDisplayTest extends ImageFieldTestBase {
     $private_field_storage = FieldStorageConfig::loadByName('node', $private_field_name);
     $default_image = $private_field_storage->getSetting('default_image');
     $file = \Drupal::service('entity.repository')->loadEntityByUuid('file', $default_image['uuid']);
+    $this->assertInstanceOf(FileInterface::class, $file);
 
     $this->assertEquals('private', StreamWrapperManager::getScheme($file->getFileUri()), 'Default image uses private:// scheme.');
     $this->assertTrue($file->isPermanent(), 'The default image status is permanent.');
@@ -609,16 +612,45 @@ class ImageFieldDisplayTest extends ImageFieldTestBase {
     // is present.
     $this->assertSession()->responseContains($default_output);
 
-    // Check that the default image itself can be downloaded; i.e.: not just the
-    // HTML markup.
-    $private_default_image_url = \Drupal::service('file_url_generator')->generateAbsoluteString($file->getFileUri());
-    // Check that a user can download the default image attached to a node field
-    // configured to store data in the private file storage.
+    // Check if the default image set for the field storage can be downloaded;
+    // i.e., not just the HTML markup.
+    $this->container->get('module_installer')->install(['image_field_display_test']);
+    $private_default_image_url = $file->createFileUrl();
     $this->drupalGet($private_default_image_url);
     $this->assertSession()->statusCodeEquals(200);
-    // Now, install a module that denies access to the field; and check that the
+    // Now disable access to the field and check that the
     // same user now receives a 403 Access Denied.
-    \Drupal::service('module_installer')->install(['image_field_display_test_default_private_storage']);
+    $private_field->setThirdPartySetting('image_field_display_test', 'access_denied', TRUE)->save();
+    $this->drupalGet($private_default_image_url);
+    $this->assertSession()->statusCodeEquals(403);
+
+    // Override the default image with the field configuration for
+    // the next access check.
+    $edit = [
+      // Get the path of the 'image-test-transparent-out-of-range.gif' file.
+      'files[settings_default_image_uuid]' => $this->container->get('file_system')->realpath($images[3]->uri),
+      'settings[default_image][alt]' => $alt,
+      'settings[default_image][title]' => $title,
+    ];
+    $this->drupalGet("admin/structure/types/manage/article/fields/node.article.$private_field_name");
+    $this->submitForm($edit, 'Save');
+    // Clear the cache and reload the field configuration
+    // to retrieve the UUID of the default image file.
+    $this->container->get('entity_field.manager')->clearCachedFieldDefinitions();
+    $private_field = FieldConfig::loadByName('node', 'article', $private_field_name);
+    $file_uuid = $private_field->getSetting('default_image')['uuid'];
+    $file = $this->container->get('entity.repository')->loadEntityByUuid('file', $file_uuid);
+    $this->assertInstanceOf(FileInterface::class, $file);
+
+    // Check if the default image overridden by the field configuration
+    // can be downloaded.
+    $private_default_image_url = $file->createFileUrl();
+    $private_field->setThirdPartySetting('image_field_display_test', 'access_denied', FALSE)->save();
+    $this->drupalGet($private_default_image_url);
+    $this->assertSession()->statusCodeEquals(200);
+    // Now disable access to the field and check that the
+    // same user now receives a 403 Access Denied.
+    $private_field->setThirdPartySetting('image_field_display_test', 'access_denied', TRUE)->save();
     $this->drupalGet($private_default_image_url);
     $this->assertSession()->statusCodeEquals(403);
   }

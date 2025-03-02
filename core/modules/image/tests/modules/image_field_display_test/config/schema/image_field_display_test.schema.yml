@@ -1,0 +1,7 @@
+field.field.*.*.*.third_party.image_field_display_test:
+  type: mapping
+  label: 'Image field display test settings'
+  mapping:
+    access_denied:
+      type: boolean
+      label: 'Access denied'
