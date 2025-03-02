@@ -8,7 +8,6 @@ use Drupal\Core\Action\Attribute\Action;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Session\AccountInterface;
-use Drupal\Core\File\FileExists;
 use Drupal\Core\StringTranslation\ByteSizeMarkup;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 
@@ -78,47 +77,36 @@ use Drupal\Core\StringTranslation\TranslatableMarkup;
       return;
     }
 
-    $source_uri = $file->getFileUri();
-
     // Check if style extension is different from the original file extension,
     // and if so, change the file name and uri.
+    $original_uri = $file->getFileUri();
     $file_name = $file->getFilename();
     $original_extension = pathinfo($file_name, PATHINFO_EXTENSION);
-    $styled_extension = $style->getDerivativeExtension($original_extension);
-    $styled_image_uri = $source_uri;
+    $derivative_extension = $style->getDerivativeExtension($original_extension);
+    $derivative_uri = $original_uri;
     $extension_changed = FALSE;
-    if ($styled_extension !== $original_extension) {
-      $file_name = str_replace('.' . $original_extension, '.' . $styled_extension, $file_name);
-      $styled_image_uri = str_replace('.' . $original_extension, '.' . $styled_extension, $source_uri);
+    if ($derivative_extension !== $original_extension) {
+      $file_name = str_replace('.' . $original_extension, '.' . $derivative_extension, $file_name);
+      $derivative_uri = str_replace('.' . $original_extension, '.' . $derivative_extension, $original_uri);
       $extension_changed = TRUE;
     }
 
-    // Create a temporary file to store the styled image.
-    $directory = $this->fileSystem->dirname($source_uri);
-    $destination = $this->fileSystem->createFilename('temp_' . $file_name, $directory);
-
     try {
       // Generate the styled image.
-      $style->createDerivative($source_uri, $destination);
+      $style->createDerivative($original_uri, $derivative_uri);
 
       // Get the file stats before replacement.
-      $original_size = filesize($source_uri);
-
-      // Replace the original file with the styled version.
-      $this->fileSystem->copy($destination, $styled_image_uri, FileExists::Replace);
+      $original_size = filesize($original_uri);
 
       // Update the file metadata.
-      $new_size = filesize($source_uri);
+      $new_size = filesize($derivative_uri);
       if ($extension_changed) {
-        $file->setFileUri($styled_image_uri);
+        $file->setFileUri($derivative_uri);
         $file->setFilename($file_name);
-        $this->fileSystem->delete($source_uri);
+        $this->fileSystem->delete($original_uri);
       }
       $file->setSize($new_size);
       $file->save();
-
-      // Clean up the temporary file.
-      $this->fileSystem->delete($destination);
 
       $this->logger->info('Replaced image %file with style %style. Original size: %old_size, new size: %new_size.', [
         '%file' => $file->getFilename(),
@@ -133,11 +121,6 @@ use Drupal\Core\StringTranslation\TranslatableMarkup;
         '%style' => $style_id,
         '@error' => $e->getMessage(),
       ]);
-
-      // Clean up the temporary file if it exists.
-      if (file_exists($destination)) {
-        $this->fileSystem->delete($destination);
-      }
     }
   }
 
@@ -145,8 +128,12 @@ use Drupal\Core\StringTranslation\TranslatableMarkup;
    * {@inheritdoc}
    */
   public function access($object, ?AccountInterface $account = NULL, $return_as_object = FALSE): bool|AccessResultInterface {
-    // Make sure the image styles are set.
+    // Make sure the action image style is set and real.
     if (empty($this->configuration['image_style'])) {
+      return $return_as_object ? AccessResult::forbidden() : FALSE;
+    }
+    $style = $this->imageStyleStorage->load($this->configuration['image_style']);
+    if (!$style) {
       return $return_as_object ? AccessResult::forbidden() : FALSE;
     }
 

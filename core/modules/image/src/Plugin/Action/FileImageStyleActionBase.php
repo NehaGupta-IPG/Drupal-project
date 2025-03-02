@@ -57,8 +57,8 @@ abstract class FileImageStyleActionBase extends ConfigurableActionBase implement
       return $return_as_object ? AccessResult::forbidden() : FALSE;
     }
 
-    $access = $object->access('create', $account, TRUE)
-      ->andIf($object->access('update', $account, TRUE));
+    $access = $object->access('update', $account, TRUE)
+      ->andIf($object->access('delete', $account, TRUE));
     return $return_as_object ? $access : $access->isAllowed();
   }
 

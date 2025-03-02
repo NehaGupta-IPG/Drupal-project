@@ -154,7 +154,7 @@ class FileImageStyleActionTest extends KernelTestBase {
   public function testFileImageStyleAction(): void {
     $original_image = $this->imageFactory->get($this->image->getFileUri());
 
-    // Create an action with a not existing image style.
+    // Create an action with a non existing image style.
     $action = Action::create([
       'id' => 'file_original_image_style_action',
       'label' => 'Optimize image',
@@ -165,7 +165,7 @@ class FileImageStyleActionTest extends KernelTestBase {
     ]);
     $action->save();
 
-    // Pick a file for testing.
+    // Check that the action does not execute.
     $action->execute([$this->image]);
     $file_not_styled = File::load($this->image->id());
     $not_styled_image = $this->imageFactory->get($file_not_styled->getFileUri());
@@ -176,7 +176,6 @@ class FileImageStyleActionTest extends KernelTestBase {
     // Correct action image style configuration.
     $action->set('configuration', ['image_style' => 'original_style']);
     $action->save();
-
     $action->execute([$this->image]);
 
     // Test that the original file has been replaced with the styled one.
