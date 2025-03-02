@@ -62,6 +62,7 @@ class Date extends SortPluginBase {
       'week' => $this->getDateFormat('W'),
       'month' => $this->getDateFormat('Ym'),
       'year' => $this->getDateFormat('Y'),
+      'seconds' => NULL,
       default => NULL,
     };
 
