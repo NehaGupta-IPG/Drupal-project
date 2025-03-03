@@ -4,10 +4,11 @@
  * https://www.drupal.org/node/3084859
  * @preserve
  */
-/* cspell:ignore wght */
+
 .toolbar-dropdown__item + .toolbar-dropdown__item {
   border-top: 1px solid #d8dfea;
 }
+
 .toolbar-dropdown__link {
   display: block;
   padding-inline: var(--admin-toolbar-space-16) var(--admin-toolbar-space-12);
@@ -20,6 +21,7 @@
   line-height: var(--admin-toolbar-line-height-info-sm);
   font-variation-settings: "wght" 700;
 }
+
 .toolbar-dropdown__link:hover {
   z-index: 20;
   color: var(--admin-toolbar-color-gray-900);
@@ -27,6 +29,7 @@
   outline-offset: var(--toolbar-button-outline-offset);
   background-color: var(--admin-toolbar-color-gray-050);
 }
+
 .toolbar-dropdown__link:focus {
   z-index: 10;
   color: var(--admin-toolbar-color-blue-600);
@@ -34,14 +37,17 @@
   outline-offset: var(--toolbar-button-outline-offset);
   background-color: transparent;
 }
+
 .toolbar-dropdown__link:hover:focus {
   background-color: var(--admin-toolbar-color-gray-050);
 }
+
 .toolbar-dropdown__list {
   margin: 0;
   padding: 0;
   list-style-type: none;
 }
+
 .toolbar-dropdown__menu {
   position: fixed;
   z-index: 1000;
@@ -52,6 +58,7 @@
   background: white;
   box-shadow: 0 14px 30px 0 rgb(0, 0, 0, 0.1);
 }
+
 [data-drupal-dropdown][aria-expanded="true"] + .toolbar-dropdown__menu {
   display: block;
 }

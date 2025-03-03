@@ -4,20 +4,23 @@
  * https://www.drupal.org/node/3084859
  * @preserve
  */
-/* cspell:ignore wght */
+
 /**
  * @file
  * Toolbar block styles.
  */
+
 .toolbar-block {
   display: grid;
   gap: var(--admin-toolbar-space-4);
 }
+
 .admin-toolbar__content .toolbar-block:nth-last-child(n + 2)::after {
   margin-top: var(--admin-toolbar-space-8);
   content: "";
   border-top: 1px solid var(--admin-toolbar-color-gray-200);
 }
+
 .toolbar-block__list {
   display: grid;
   margin: 0;
@@ -27,9 +30,11 @@
   hyphens: auto;
   gap: var(--admin-toolbar-space-4);
 }
+
 .toolbar-block__list-item {
   display: grid;
 }
+
 .toolbar-block__title {
   position: relative;
   margin: 0;
@@ -42,6 +47,7 @@
   line-height: var(--admin-toolbar-line-height-label-xs);
   font-variation-settings: "wght" 500;
 }
+
 html:not([data-admin-toolbar="expanded"]) .toolbar-block__title,
 html[data-admin-toolbar-animating][data-admin-toolbar="expanded"] .toolbar-block__title {
   display: flex;
@@ -53,6 +59,7 @@ html[data-admin-toolbar-animating][data-admin-toolbar="expanded"] .toolbar-block
   block-size: calc(2.5 * var(--admin-toolbar-rem));
   inline-size: calc(2.5 * var(--admin-toolbar-rem));
 }
+
 :is(html:not([data-admin-toolbar="expanded"]) .toolbar-block__title, html[data-admin-toolbar-animating][data-admin-toolbar="expanded"] .toolbar-block__title)::before {
   position: absolute;
   display: block;

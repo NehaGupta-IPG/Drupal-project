@@ -4,11 +4,12 @@
  * https://www.drupal.org/node/3084859
  * @preserve
  */
-/* cspell:ignore csvg cpath wght */
+
 /**
  * @file
  * Toolbar badge styles.
  */
+
 .toolbar-badge {
   padding: var(--admin-toolbar-space-4) var(--admin-toolbar-space-8);
   border-radius: 1rem;
@@ -17,6 +18,7 @@
   line-height: var(--admin-toolbar-line-height-label-sm);
   font-variation-settings: "wght" 700;
 }
+
 .toolbar-badge--success {
   color: var(--admin-toolbar-color-green-600);
   background-color: var(--admin-toolbar-color-green-050);
