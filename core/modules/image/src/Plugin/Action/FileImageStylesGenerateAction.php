@@ -15,7 +15,7 @@ use Drupal\Core\StringTranslation\TranslatableMarkup;
  */
 #[Action(
   id: 'file_image_styles_generate_action',
-  action_label: new TranslatableMarkup('Generate image derivatives for the provided image styles'),
+  label: new TranslatableMarkup('Generate image derivatives for the provided image styles'),
   type: 'file'
 )]
 class FileImageStylesGenerateAction extends FileImageStyleActionBase {

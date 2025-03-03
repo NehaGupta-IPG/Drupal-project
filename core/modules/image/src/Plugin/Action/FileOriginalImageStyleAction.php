@@ -16,7 +16,7 @@ use Drupal\Core\StringTranslation\TranslatableMarkup;
  */
 #[Action(
   id: 'file_original_image_style_action',
-  action_label: new TranslatableMarkup('Replace image file with the provided image style'),
+  label: new TranslatableMarkup('Replace image file with the provided image style'),
   type: 'file'
 )]
 class FileOriginalImageStyleAction extends FileImageStyleActionBase implements ContainerFactoryPluginInterface {
