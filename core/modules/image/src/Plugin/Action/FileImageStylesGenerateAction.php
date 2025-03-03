@@ -18,7 +18,7 @@ use Drupal\Core\StringTranslation\TranslatableMarkup;
   action_label: new TranslatableMarkup('Generate image derivatives for the provided image styles'),
   type: 'file'
 )]
- class FileImageStylesGenerateAction extends FileImageStyleActionBase {
+class FileImageStylesGenerateAction extends FileImageStyleActionBase {
 
   /**
    * {@inheritdoc}
@@ -112,4 +112,4 @@ use Drupal\Core\StringTranslation\TranslatableMarkup;
     return parent::access($object, $account, $return_as_object);
   }
 
- }
+}

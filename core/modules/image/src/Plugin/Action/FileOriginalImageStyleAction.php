@@ -19,7 +19,7 @@ use Drupal\Core\StringTranslation\TranslatableMarkup;
   action_label: new TranslatableMarkup('Replace image file with the provided image style'),
   type: 'file'
 )]
- class FileOriginalImageStyleAction extends FileImageStyleActionBase implements ContainerFactoryPluginInterface {
+class FileOriginalImageStyleAction extends FileImageStyleActionBase implements ContainerFactoryPluginInterface {
 
   /**
    * {@inheritdoc}
@@ -140,4 +140,4 @@ use Drupal\Core\StringTranslation\TranslatableMarkup;
     return parent::access($object, $account, $return_as_object);
   }
 
- }
+}
