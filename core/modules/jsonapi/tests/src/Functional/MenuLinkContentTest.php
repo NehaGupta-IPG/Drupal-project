@@ -114,7 +114,7 @@ class MenuLinkContentTest extends ResourceTestBase {
           'self' => ['href' => $self_url->toString()],
         ],
         'meta' => [
-          'arity' => 0
+          'arity' => 0,
         ],
         'attributes' => [
           'bundle' => 'menu_link_content',

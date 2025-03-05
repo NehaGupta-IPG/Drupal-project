@@ -141,7 +141,7 @@ class WorkspaceTest extends ResourceTestBase {
           'self' => ['href' => $self_url->toString()],
         ],
         'meta' => [
-          'arity' => 0
+          'arity' => 0,
         ],
         'attributes' => [
           'created' => '1973-11-29T21:33:09+00:00',

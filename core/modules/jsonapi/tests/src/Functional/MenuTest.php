@@ -94,7 +94,7 @@ class MenuTest extends ConfigEntityResourceTestBase {
           'self' => ['href' => $self_url],
         ],
         'meta' => [
-          'arity' => 0
+          'arity' => 0,
         ],
         'attributes' => [
           'dependencies' => [],

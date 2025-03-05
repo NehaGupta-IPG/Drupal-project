@@ -125,7 +125,7 @@ class EntityTestTest extends ResourceTestBase {
           'self' => ['href' => $self_url],
         ],
         'meta' => [
-          'arity' => 0
+          'arity' => 0,
         ],
         'attributes' => [
           'created' => (new \DateTime())->setTimestamp((int) $this->entity->get('created')->value)->setTimezone(new \DateTimeZone('UTC'))->format(\DateTime::RFC3339),

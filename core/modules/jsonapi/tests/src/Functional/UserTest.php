@@ -160,7 +160,7 @@ class UserTest extends ResourceTestBase {
           'self' => ['href' => $self_url],
         ],
         'meta' => [
-          'arity' => 0
+          'arity' => 0,
         ],
         'attributes' => [
           'display_name' => 'Llama',
