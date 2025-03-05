@@ -127,6 +127,9 @@ class JsonApiFunctionalTest extends JsonApiFunctionalTestBase {
     $single_output = Json::decode($this->drupalGet('/jsonapi/node/article/' . $uuid . '/field_tags', [
       'query' => ['include' => 'vid'],
     ]));
+    foreach ($single_output['data'] as $arity => $item) {
+      $this->assertEquals($arity, $item['meta']['arity']);
+    }
     $this->assertSession()->statusCodeEquals(200);
     $this->assertEquals('taxonomy_term--tags', $single_output['data'][0]['type']);
     $this->assertArrayNotHasKey('tid', $single_output['data'][0]['attributes']);
