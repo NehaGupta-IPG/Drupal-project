@@ -115,12 +115,12 @@ class MenuForm extends EntityForm {
       '#title' => $this->t('Menu name'),
       '#default_value' => $menu->id(),
       '#maxlength' => MenuStorage::MAX_ID_LENGTH,
-      '#description' => $this->t('A unique name to construct the URL for the menu. It must only contain lowercase letters, numbers and hyphens.'),
+      '#description' => $this->t('A unique name to construct the URL for the menu. It must only contain lowercase letters, numbers, underscores, and hyphens.'),
       '#machine_name' => [
         'exists' => [$this, 'menuNameExists'],
         'source' => ['label'],
-        'replace_pattern' => '[^a-z0-9-]+',
-        'replace' => '-',
+        'replace_pattern' => '[^a-z0-9_-]+',
+        'replace' => '_',
       ],
       // A menu's machine name cannot be changed.
       '#disabled' => !$menu->isNew() || $menu->isLocked(),
