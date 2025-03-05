@@ -54,10 +54,6 @@ class UrlHelper {
           $params[] = $children_query;
         }
       }
-      // If a query parameter value is not set, only append its key.
-      elseif (!isset($value)) {
-        $params[] = $key;
-      }
       else {
         // For better readability of paths in query strings, we decode slashes.
         $params[] = $key . '=' . str_replace('%2F', '/', rawurlencode($value));
