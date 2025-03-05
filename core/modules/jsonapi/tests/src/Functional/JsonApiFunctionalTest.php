@@ -587,6 +587,7 @@ class JsonApiFunctionalTest extends JsonApiFunctionalTestBase {
       'resource_meta_user_has_admin_role' => 'no',
       'resource_meta_user_id' => $this->user->id(),
       'resource_meta_title' => $node->getTitle(),
+      'arity' => 0,
     ];
     $this->assertEquals($expectedMeta, $result['data']['meta']);
     // Test if the cache tags bubbled up.
@@ -596,13 +597,13 @@ class JsonApiFunctionalTest extends JsonApiFunctionalTestBase {
     // Test if the relationship has the correct metadata when loading a
     // resource collection.
     $result = Json::decode($this->drupalGet('jsonapi/node/article'));
-    foreach ($result['data'] as $resource) {
+    foreach ($result['data'] as $i => $resource) {
       if ($resource['id'] === $node->uuid()) {
         $this->assertEquals($expectedMeta, $resource['meta']);
       }
 
       else {
-        $this->assertArrayNotHasKey('meta', $resource);
+        $this->assertEquals(['arity' => $i], $resource['meta']);
       }
 
     }
@@ -623,6 +624,7 @@ class JsonApiFunctionalTest extends JsonApiFunctionalTestBase {
       'resource_meta_user_has_admin_role' => 'yes',
       'resource_meta_user_id' => $this->adminUser->id(),
       'resource_meta_title' => $node->getTitle(),
+      'arity' => 0,
     ];
     $this->assertEquals($expectedMeta, $result['data']['meta']);
     // Test if the cache tags bubbled up.

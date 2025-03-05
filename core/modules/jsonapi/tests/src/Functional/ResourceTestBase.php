@@ -2750,6 +2750,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
           $owner_resource['attributes'][$field_name] = $this->serializer->normalize($owner->get($field_name)[0]->get('value'), 'api_json');
         }
         $owner_resource['links']['self']['href'] = static::getResourceLink($owner_resource);
+        $owner_resource['meta']['arity'] = 0;
         $expected_document['included'] = [$owner_resource];
         $expected_cacheability->addCacheableDependency($owner);
         $expected_cacheability->addCacheableDependency(static::entityAccess($owner, 'view', $this->account));
