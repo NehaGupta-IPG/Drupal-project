@@ -1309,6 +1309,11 @@ abstract class ResourceTestBase extends BrowserTestBase {
       $merged_document['data'] = [];
     }
 
+    // Simulate what DataNormalizer::normalize() does.
+    foreach ($merged_document['data'] as $i => $item) {
+      $merged_document['data'][$i]['meta']['arity'] = $i;
+    }
+
     $cacheability = static::getExpectedCollectionCacheability($this->account, $collection, NULL, $filtered);
     $cacheability->setCacheMaxAge($merged_response->getCacheableMetadata()->getCacheMaxAge());
 

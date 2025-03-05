@@ -785,6 +785,9 @@ class FileUploadTest extends ResourceTestBase {
         'links' => [
           'self' => ['href' => $self_url],
         ],
+        'meta' => [
+          'arity' => 0
+        ],
         'attributes' => [
           'created' => (new \DateTime())->setTimestamp($file->getCreatedTime())->setTimezone(new \DateTimeZone('UTC'))->format(\DateTime::RFC3339),
           'changed' => (new \DateTime())->setTimestamp($file->getChangedTime())->setTimezone(new \DateTimeZone('UTC'))->format(\DateTime::RFC3339),
