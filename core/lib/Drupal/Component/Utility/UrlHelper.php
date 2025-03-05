@@ -45,11 +45,16 @@ class UrlHelper {
     foreach ($query as $key => $value) {
       $key = ($parent ? $parent . rawurlencode('[' . $key . ']') : rawurlencode($key));
 
+      if ($value === NULL) {
+        continue;
+      }
       // Recurse into children.
       if (is_array($value)) {
-        $params[] = static::buildQuery($value, $key);
+        if ($children_query = static::buildQuery($value, $key)) {
+          $params[] = $children_query;
+        }
       }
-      // If a query parameter value is NULL, only append its key.
+      // If a query parameter value is not set, only append its key.
       elseif (!isset($value)) {
         $params[] = $key;
       }
