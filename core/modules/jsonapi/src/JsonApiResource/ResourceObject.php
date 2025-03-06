@@ -74,7 +74,7 @@ class ResourceObject implements CacheableDependencyInterface, ResourceIdentifier
    *
    * @var array
    */
-  protected $meta;
+  protected array $meta;
 
   /**
    * ResourceObject constructor.
