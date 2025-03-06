@@ -52,7 +52,7 @@ class SetInlineBlockDependency implements EventSubscriberInterface {
    * Constructs a new SetInlineBlockDependency object.
    *
    * @param \Drupal\Core\Entity\EntityRepositoryInterface $entityRepository
-   *   The entity repository
+   *   The entity repository.
    * @param \Drupal\Core\Database\Connection $database
    *   The database connection.
    * @param \Drupal\layout_builder\InlineBlockUsageInterface $usage
