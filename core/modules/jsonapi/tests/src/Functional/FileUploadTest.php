@@ -324,6 +324,9 @@ class FileUploadTest extends ResourceTestBase {
         2 => $this->getExpectedDocument(3, 'example_0.txt', TRUE, TRUE)['data'],
       ],
     ];
+    foreach ($expected['data'] as $i => $item) {
+      $expected['data'][$i]['meta']['arity'] = $i;
+    }
     $this->assertResponseData($expected, $response);
 
     // The response document received for the POST request is identical to the
@@ -786,7 +789,7 @@ class FileUploadTest extends ResourceTestBase {
           'self' => ['href' => $self_url],
         ],
         'meta' => [
-          'arity' => $fid - 1,
+          'arity' => 0,
         ],
         'attributes' => [
           'created' => (new \DateTime())->setTimestamp($file->getCreatedTime())->setTimezone(new \DateTimeZone('UTC'))->format(\DateTime::RFC3339),
