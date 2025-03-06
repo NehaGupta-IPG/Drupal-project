@@ -214,6 +214,22 @@ class LocaleStringTest extends KernelTestBase {
   }
 
   /**
+   * Tests that equal source strings are sorted by context.
+   */
+  public function testStringSortContext(): void {
+    $sourceString = $this->randomString();
+    $this->buildSourceString(['source' => $sourceString, 'context' => 'B'])->save();
+    $this->buildSourceString(['source' => $sourceString, 'context' => 'C'])->save();
+    $this->buildSourceString(['source' => $sourceString, 'context' => 'A'])->save();
+
+    $strings = $this->storage->getStrings();
+    $this->assertCount(3, $strings);
+    $this->assertEquals('A', $strings[0]->context);
+    $this->assertEquals('B', $strings[1]->context);
+    $this->assertEquals('C', $strings[2]->context);
+  }
+
+  /**
    * Creates random source string object.
    *
    * @param array $values
