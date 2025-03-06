@@ -3376,6 +3376,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
   protected static function decorateExpectedResponseForIncludedFields(CacheableResourceResponse $expected_response, array $related_responses) {
     $expected_document = $expected_response->getResponseData();
     $expected_cacheability = $expected_response->getCacheableMetadata();
+    $arity = 0;
     foreach ($related_responses as $related_response) {
       $related_document = $related_response->getResponseData();
       $expected_cacheability->addCacheableDependency($related_response->getCacheableMetadata());
@@ -3395,7 +3396,9 @@ abstract class ResourceTestBase extends BrowserTestBase {
           : $related_data;
         foreach ($related_resources as $related_resource) {
           if (empty($expected_document['included']) || !static::collectionHasResourceIdentifier($related_resource, $expected_document['included'])) {
+            $related_resource['meta']['arity'] = $arity;
             $expected_document['included'][] = $related_resource;
+            $arity++;
           }
         }
       }
