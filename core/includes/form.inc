@@ -291,7 +291,7 @@ function template_preprocess_vertical_tabs(&$variables): void {
  *   - element: An associative array containing the properties of the element.
  *     Properties used: #attributes.
  */
-function template_preprocess_button(&$variables) {
+function template_preprocess_button(&$variables): void {
   $element = $variables['element'];
   $variables['children'] = $element['#children'];
 }
