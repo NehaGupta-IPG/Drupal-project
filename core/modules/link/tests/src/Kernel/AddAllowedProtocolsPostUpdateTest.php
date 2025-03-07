@@ -26,6 +26,7 @@ class AddAllowedProtocolsPostUpdateTest extends KernelTestBase {
     'entity_test',
     'link',
     'text',
+    'options',
   ];
 
   /**
