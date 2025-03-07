@@ -17,6 +17,60 @@ use PHPUnit\Framework\TestCase;
 class CryptTest extends TestCase {
 
   /**
+   * Tests the hmac method with invalid parameters.
+   *
+   * @param string $data
+   *   Data to hash.
+   * @param string $key
+   *   Key to use in hashing process.
+   *
+   * @dataProvider providerTestHmacBase64Invalid
+   * @covers ::hmac
+   */
+  public function testHmacInvalid($data, $key): void {
+    $this->expectException('InvalidArgumentException');
+    Crypt::hmac($data, $key);
+  }
+
+  /**
+   * Tests HMAC generation.
+   *
+   * @param string $data
+   *   Data to hash.
+   * @param string $key
+   *   Key to use in hashing process.
+   * @param string $expected_hmac
+   *   Expected result from hashing $data using $key.
+   *
+   * @dataProvider providerTestHmac
+   * @covers ::hmac
+   */
+  public function testHmac($data, $key, $expected_hmac): void {
+    $hmac = Crypt::hmac($data, $key, FALSE);
+    $this->assertEquals($expected_hmac, $hmac, 'The correct hmac was not calculated.');
+    $binary_hmac = Crypt::hmac($data, $key, TRUE);
+    $this->assertEquals($expected_hmac, bin2hex($binary_hmac), 'The correct hmac was not calculated.');
+  }
+
+  /**
+   * Tests hash generation.
+   *
+   * @param string $data
+   *   Data to hash.
+   * @param string $expected_hash
+   *   Expected result from hashing $data.
+   *
+   * @dataProvider providerTestHash
+   * @covers ::hash
+   */
+  public function testHash($data, $expected_hash): void {
+    $hash = Crypt::hash($data, FALSE);
+    $this->assertEquals($expected_hash, $hash, 'The correct hash was not calculated.');
+    $binary_hash = Crypt::hash($data, TRUE);
+    $this->assertEquals($expected_hash, bin2hex($binary_hash), 'The correct hash was not calculated.');
+  }
+
+  /**
    * Tests hash generation.
    *
    * @param string $data
@@ -64,6 +118,44 @@ class CryptTest extends TestCase {
   public function testHmacBase64Invalid($data, $key): void {
     $this->expectException('InvalidArgumentException');
     Crypt::hmacBase64($data, $key);
+  }
+
+  /**
+   * Provides data for self::testHmac().
+   *
+   * @return array
+   *   An array of test cases. Each test case contains:
+   *   - string $data: The input string to hash.
+   *   - string $key: The key to use in the hashing process.
+   *   - string $expected_hmac: The expected HMAC value.
+   */
+  public static function providerTestHmac() {
+    return [
+      [
+        'data' => 'Calculates a sha-256 hmac.',
+        'key' => 'secret-key',
+        // cspell:disable-next-line
+        'expected_hmac' => 'da713ca888cf121cc1bd41b4ee17bfe977fd654c5d404fc9a4507154037dbeaa',
+      ],
+    ];
+  }
+
+  /**
+   * Provides data for self::testHash().
+   *
+   * @return array
+   *   An array of test cases. Each test case contains:
+   *   - string $data: The input string to hash.
+   *   - string $expected_hash: The expected sha-256 value.
+   */
+  public static function providerTestHash() {
+    return [
+      [
+        'data' => 'Calculates a sha-256 hash.',
+        // cspell:disable-next-line
+        'expected_hash' => '64527d9117a7e4ff6ebfbe1d5fb3ac90c2b22b21a7028cdc884664213347cb5e',
+      ],
+    ];
   }
 
   /**
