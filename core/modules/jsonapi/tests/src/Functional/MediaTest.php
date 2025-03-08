@@ -362,7 +362,7 @@ class MediaTest extends ResourceTestBase {
   /**
    * {@inheritdoc}
    */
-  // phpcs:ignore Generic.CodeAnalysis.UselessOverridingMethod
+  // phpcs:ignore Drupal.Commenting.FunctionComment.Missing, Generic.CodeAnalysis.UselessOverridingMethod
   protected function doTestPostIndividual(): void {
     // @todo Mimic \Drupal\Tests\rest\Functional\EntityResource\Media\MediaResourceTestBase::testPost()
     // @todo Later, use https://www.drupal.org/project/drupal/issues/2958554 to upload files rather than the REST module.
