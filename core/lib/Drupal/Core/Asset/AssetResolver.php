@@ -10,6 +10,7 @@ use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Extension\ThemeHandlerInterface;
 use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\Core\Language\LanguageInterface;
+use Drupal\Core\Site\Settings;
 use Drupal\Core\Theme\ThemeManagerInterface;
 
 /**
@@ -348,12 +349,11 @@ class AssetResolver implements AssetResolverInterface {
 
           // Preprocess can only be set if caching is enabled and no
           // attributes other than 'async' or 'defer' are set.
-          //
-          // @see: https://www.drupal.org/project/drupal/issues/1587536
+          $aggregatedJsAttributes = Settings::get('aggregated_js_attributes', ['async', 'defer']);
           $options['preprocess'] = $options['cache'] && (
             empty($options['attributes']) ||
             count(\array_diff_key(
-              $options['attributes'], ['async' => TRUE, 'defer' => TRUE])
+              $options['attributes'], array_combine($aggregatedJsAttributes, $aggregatedJsAttributes))
             ) === 0
           ) ? $options['preprocess'] : FALSE;
 

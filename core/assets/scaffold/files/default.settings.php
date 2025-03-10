@@ -852,6 +852,11 @@ $settings['migrate_node_migrate_type_classic'] = FALSE;
 # $settings['migrate_file_private_path'] = '';
 
 /**
+ * JavaScript libraries with these attributes will be aggregated together.
+ */
+$settings['aggregated_js_attributes'] = ['defer', 'async'];
+
+/**
  * Load local development override configuration, if available.
  *
  * Create a settings.local.php file to override variables on secondary (staging,

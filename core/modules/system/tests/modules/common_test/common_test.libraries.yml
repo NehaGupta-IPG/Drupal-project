@@ -37,6 +37,7 @@ js-aggregated-attributes:
   js:
     deferred.js: { attributes: { defer: true } }
     async.js: { attributes: { async: true } }
+    fetchpriority.js: { attributes: { fetchpriority: 'high' } }
 
 js-header:
   header: true

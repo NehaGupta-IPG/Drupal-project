@@ -176,10 +176,26 @@ class AttachedAssetsTest extends KernelTestBase {
     $includeBase64 = UrlHelper::compressQueryParameter('common_test/js-attributes,common_test/js-aggregated-attributes');
     $expected_3 = '&amp;language=en&amp;theme=core&amp;include=' . $includeBase64 . '" defer></script>';
     $expected_4 = '&amp;language=en&amp;theme=core&amp;include=' . $includeBase64 . '" async></script>';
+    $expected_5 = '<script src="' . $this->fileUrlGenerator->generateString('core/modules/system/tests/modules/common_test/fetchpriority.js') . '?v=1" fetchpriority="high"></script>';
     $this->assertStringContainsString($expected_1, $rendered_js, 'Rendered external JavaScript with correct defer and random attributes.');
     $this->assertStringContainsString($expected_2, $rendered_js, 'Rendered internal JavaScript with correct defer and random attributes.');
-    $this->assertStringContainsString($expected_3, $rendered_js, 'Agregated internal JavaScript with defer attribute.');
-    $this->assertStringContainsString($expected_4, $rendered_js, 'Agregated internal JavaScript with async attribute.');
+    $this->assertStringContainsString($expected_3, $rendered_js, 'Aggregated internal JavaScript with defer attribute.');
+    $this->assertStringContainsString($expected_4, $rendered_js, 'Aggregated internal JavaScript with async attribute.');
+    $this->assertStringContainsString($expected_5, $rendered_js, 'Rendered internal JavaScript with attribute not in aggregated_js_attributes.');
+
+    // Tests with another setting value.
+    $this->setSetting('aggregated_js_attributes', ['fetchpriority']);
+    \Drupal::service('library.discovery')->clearCachedDefinitions();
+    $js = $this->assetResolver->getJsAssets(
+      $assets, TRUE, \Drupal::languageManager()->getCurrentLanguage()
+    )[1];
+    $js_render_array = \Drupal::service('asset.js.collection_renderer')
+      ->render($js);
+    $rendered_js = (string) $this->renderer->renderInIsolation($js_render_array);
+    $this->assertStringContainsString(
+      '&amp;language=en&amp;theme=core&amp;include=' . $includeBase64 . '" fetchpriority="high"></script>',
+      $rendered_js
+    );
   }
 
   /**
