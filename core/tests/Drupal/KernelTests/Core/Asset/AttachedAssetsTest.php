@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\KernelTests\Core\Asset;
 
 use Drupal\Component\Serialization\Json;
+use Drupal\Component\Utility\UrlHelper;
 use Drupal\Core\Asset\AttachedAssets;
 use Drupal\KernelTests\KernelTestBase;
 use PHPUnit\Framework\Attributes\Group;
@@ -164,6 +165,7 @@ class AttachedAssetsTest extends KernelTestBase {
    */
   public function testAggregatedAttributes(): void {
     $build['#attached']['library'][] = 'common_test/js-attributes';
+    $build['#attached']['library'][] = 'common_test/js-aggregated-attributes';
     $assets = AttachedAssets::createFromRenderArray($build);
 
     $js = $this->assetResolver->getJsAssets($assets, TRUE, \Drupal::languageManager()->getCurrentLanguage())[1];
@@ -171,8 +173,13 @@ class AttachedAssetsTest extends KernelTestBase {
     $rendered_js = (string) $this->renderer->renderInIsolation($js_render_array);
     $expected_1 = '<script src="http://example.com/deferred-external.js" foo="bar" defer></script>';
     $expected_2 = '<script src="' . $this->fileUrlGenerator->generateString('core/modules/system/tests/modules/common_test/deferred-internal.js') . '?v=1" defer bar="foo"></script>';
+    $includeBase64 = UrlHelper::compressQueryParameter('common_test/js-attributes,common_test/js-aggregated-attributes');
+    $expected_3 = '&amp;language=en&amp;theme=core&amp;include=' . $includeBase64 . '" defer></script>';
+    $expected_4 = '&amp;language=en&amp;theme=core&amp;include=' . $includeBase64 . '" async></script>';
     $this->assertStringContainsString($expected_1, $rendered_js, 'Rendered external JavaScript with correct defer and random attributes.');
     $this->assertStringContainsString($expected_2, $rendered_js, 'Rendered internal JavaScript with correct defer and random attributes.');
+    $this->assertStringContainsString($expected_3, $rendered_js, 'Agregated internal JavaScript with defer attribute.');
+    $this->assertStringContainsString($expected_4, $rendered_js, 'Agregated internal JavaScript with async attribute.');
   }
 
   /**
