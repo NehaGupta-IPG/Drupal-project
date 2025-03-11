@@ -85,12 +85,6 @@ class UserRegistrationTest extends BrowserTestBase {
       ->set('register', UserInterface::REGISTER_VISITORS)
       ->save();
 
-    $this->drupalGet('user/register');
-    // Verify that the class name exists for password element.
-    // @see field_test_form_user_form_alter().
-    $this->assertSession()->elementExists('css', 'input[name="pass[pass1]"].test-password-class');
-    $this->assertSession()->elementExists('css', 'input[name="pass[pass2]"].test-password-confirm-class');
-
     $edit = [];
     $edit['name'] = $name = $this->randomMachineName();
     $edit['mail'] = $mail = $edit['name'] . '@example.com';

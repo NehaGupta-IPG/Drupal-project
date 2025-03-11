@@ -33,15 +33,6 @@ class FieldTestHooks {
   }
 
   /**
-   * Implements hook_form_FORM_ID_alter() for the user registration form.
-   */
-  #[Hook('form_user_form_alter')]
-  public function formUserFormAlter(&$form, FormStateInterface $form_state) {
-    $form['account']['pass']['#attributes']['class'][] = 'test-password-class';
-    $form['account']['pass']['#pass2_attributes']['class'][] = 'test-password-confirm-class';
-  }
-
-  /**
    * Implements hook_field_widget_single_element_form_alter().
    */
   #[Hook('field_widget_single_element_form_alter')]
