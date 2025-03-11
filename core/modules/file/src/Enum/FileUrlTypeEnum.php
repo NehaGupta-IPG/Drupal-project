@@ -7,14 +7,10 @@ namespace Drupal\file\Enum;
  */
 enum FileUrlTypeEnum: string {
 
-  /**
-   * Display URL as an absolute URL.
-   */
+  // Display URL as an absolute URL.
   case ABSOLUTE_URL = 'absolute';
 
-  /**
-   * Display URL as a relative URL.
-   */
+  // Display URL as a relative URL.
   case RELATIVE_URL = 'relative';
 
 }
