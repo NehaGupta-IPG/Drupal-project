@@ -104,7 +104,7 @@ class TimestampTest extends BrowserTestBase {
     ]);
 
     $this->drupalLogin($web_user);
-    $field_name = 'field_timestamp';
+    $this->fieldName = $field_name = 'field_timestamp';
     $type = 'timestamp';
     $widget_type = 'datetime_timestamp';
     $formatter_type = 'timestamp';
