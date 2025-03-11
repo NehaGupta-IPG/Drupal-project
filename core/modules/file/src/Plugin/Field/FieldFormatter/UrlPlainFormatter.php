@@ -37,29 +37,7 @@ class UrlPlainFormatter extends FileFormatterBase {
    */
   public function settingsForm(array $form, FormStateInterface $form_state): array {
     $form = parent::settingsForm($form, $form_state);
-    $form['show_link_as'] = [
-      '#type' => 'radios',
-      '#title' => $this->t('Show link as'),
-      '#default_value' => $this->getSetting('show_link_as'),
-      '#description' => $this->t('If checked, links will be rendered as absolute URLs.'),
-      '#options' => [
-        FileFormatterBase::ABSOLUTE_URL => $this->t('Absolute URL'),
-        FileFormatterBase::RELATIVE_URL => $this->t('Relative URL'),
-      ],
-    ];
-    $form['absolute_url_suggestion'] = $this->absoluteUrlSuggestion();
-    $form['absolute_url_suggestion']['#states'] = [
-      'visible' => [
-        ':input[name="fields[' . $this->fieldDefinition->getName() . '][settings_edit_form][settings][show_link_as]"]' => ['value' => 'absolute'],
-      ],
-    ];
-    $form['relative_url_suggestion'] = $this->relativeUrlSuggestion();
-    $form['relative_url_suggestion']['#states'] = [
-      'visible' => [
-        ':input[name="fields[' . $this->fieldDefinition->getName() . '][settings_edit_form][settings][show_link_as]"]' => ['value' => 'relative'],
-      ],
-    ];
-
+    $form = $this->showLinkAs($form, $this->fieldDefinition->getName());
     return $form;
   }
 

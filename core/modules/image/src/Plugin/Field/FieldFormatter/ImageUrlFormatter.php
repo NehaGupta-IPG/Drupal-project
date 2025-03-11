@@ -81,7 +81,7 @@ class ImageUrlFormatter extends ImageFormatterBase {
     $this->imageStyleStorage = $entity_type_manager->getStorage('image_style');
     $this->currentUser = $current_user;
     if ($file_url_generator === NULL) {
-      @trigger_error('Calling ' . __METHOD__ . ' without the $file_url_generator argument is deprecated in drupal:10.4.0 and it will be required in drupal:11.1.0. See https://www.drupal.org/node/3410078', E_USER_DEPRECATED);
+      @trigger_error('Calling ' . __METHOD__ . ' without the $file_url_generator argument is deprecated in drupal:11.2.0 and it will be required in drupal:12.0.0. See https://www.drupal.org/node/3410078', E_USER_DEPRECATED);
       $file_url_generator = \Drupal::service('file_url_generator');
     }
     $this->fileUrlGenerator = $file_url_generator;
@@ -121,28 +121,7 @@ class ImageUrlFormatter extends ImageFormatterBase {
   public function settingsForm(array $form, FormStateInterface $form_state) {
     $element = parent::settingsForm($form, $form_state);
 
-    $element['show_link_as'] = [
-      '#type' => 'radios',
-      '#title' => $this->t('Show link as'),
-      '#default_value' => $this->getSetting('show_link_as'),
-      '#description' => $this->t('If checked, links will be rendered as absolute URLs.'),
-      '#options' => [
-        FileFormatterBase::ABSOLUTE_URL => $this->t('Absolute URL'),
-        FileFormatterBase::RELATIVE_URL => $this->t('Relative URL'),
-      ],
-    ];
-    $element['absolute_url_suggestion'] = $this->absoluteUrlSuggestion();
-    $element['absolute_url_suggestion']['#states'] = [
-      'visible' => [
-        ':input[name="fields[' . $this->fieldDefinition->getName() . '][settings_edit_form][settings][show_link_as]"]' => ['value' => 'absolute'],
-      ],
-    ];
-    $element['relative_url_suggestion'] = $this->relativeUrlSuggestion();
-    $element['relative_url_suggestion']['#states'] = [
-      'visible' => [
-        ':input[name="fields[' . $this->fieldDefinition->getName() . '][settings_edit_form][settings][show_link_as]"]' => ['value' => 'relative'],
-      ],
-    ];
+    $element = $this->showLinkAs($element, $this->fieldDefinition->getName());
 
     unset($element['image_link'], $element['image_loading']);
 
