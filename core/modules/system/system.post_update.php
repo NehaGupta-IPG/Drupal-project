@@ -5,6 +5,9 @@
  * Post update functions for System.
  */
 
+use Drupal\Core\Datetime\Plugin\Field\FieldWidget\TimestampDatetimeWidget;
+use Drupal\Core\Field\FieldDefinitionInterface;
+
 /**
  * Implements hook_removed_post_updates().
  */
@@ -90,4 +93,60 @@ function system_post_update_clear_admin_compact_mode_config(): void {
   $config = \Drupal::configFactory()->getEditable('system.site');
   $config->clear('admin_compact_mode');
   $config->save();
+}
+
+/**
+ * Set default use_current_time setting for all datetime timestamp form widgets.
+ */
+function system_post_update_update_datetime_timestamp_field_widget_current_time(): void {
+  $form_modes = \Drupal::service('entity_display.repository')->getAllFormModes();
+  $entity_form_display_storage = \Drupal::entityTypeManager()->getStorage('entity_form_display');
+  $updated_form_ids = [];
+
+  $entity_types = array_keys(\Drupal::entityTypeManager()->getDefinitions());
+  foreach ($entity_types as $entity_type) {
+    $entity_form_modes = array_merge(['default'], array_keys($form_modes[$entity_type] ?? []));
+
+    $bundles = array_keys(\Drupal::service('entity_type.bundle.info')->getBundleInfo($entity_type));
+    foreach ($bundles as $bundle) {
+      // Build list of entity form display IDs,
+      // and then query to determine which ones are valid.
+      foreach ($entity_form_modes as $form_mode) {
+        $candidate_ids[] = $entity_type . '.' . $bundle . '.' . $form_mode;
+      }
+      $results = $entity_form_display_storage->getQuery()
+        ->condition('id', $candidate_ids)
+        ->condition('status', TRUE)
+        ->execute();
+
+      // Iterate through each valid form display ID
+      // and load any that we have not previously updated.
+      foreach ($results as $candidate_id) {
+        if (in_array($candidate_id, $updated_form_ids)) {
+          continue;
+        }
+        $form_display = $entity_form_display_storage->load($candidate_id);
+        $changed = FALSE;
+
+        // Iterate through all widgets and update if we find a datetime timestamp.
+        $widgets = $form_display->get('content');
+        foreach ($widgets as &$widget) {
+          if (
+            ($widget['type'] ?? '') === 'datetime_timestamp' &&
+            empty($widget['settings']['use_current_time'])
+          ) {
+            $widget['settings']['use_current_time'] = TimestampDatetimeWidget::TIMESTAMP_OPTION_ON_SUBMISSION;
+            $changed = TRUE;
+          }
+        }
+
+        // Update form display if we have updated any datetime timestamp widgets.
+        if ($changed) {
+          $form_display->set('content', $widgets);
+          $form_display->save();
+          $updated_form_ids[] = $candidate_id;
+        }
+      }
+    }
+  }
 }
