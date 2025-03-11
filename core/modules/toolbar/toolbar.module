@@ -165,6 +165,6 @@ function toolbar_get_rendered_subtrees() {
  */
 function _toolbar_get_subtrees_hash() {
   [$subtrees, $cacheability] = toolbar_get_rendered_subtrees();
-  $hash = Crypt::hashBase64(serialize($subtrees));
+  $hash = Crypt::hash(serialize($subtrees));
   return [$hash, $cacheability];
 }

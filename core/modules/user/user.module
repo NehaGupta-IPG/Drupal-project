@@ -319,7 +319,7 @@ function user_pass_rehash(UserInterface $account, $timestamp) {
   $data .= ':' . $account->getLastLoginTime();
   $data .= ':' . $account->id();
   $data .= ':' . $account->getEmail();
-  return Crypt::hmacBase64($data, Settings::getHashSalt() . $account->getPassword());
+  return Crypt::hmac($data, Settings::getHashSalt() . $account->getPassword());
 }
 
 /**

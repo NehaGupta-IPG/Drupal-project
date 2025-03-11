@@ -160,8 +160,10 @@ class SiteMaintenanceTest extends BrowserTestBase {
     $this->drupalGet('user/password');
     $this->submitForm($edit, 'Submit');
     $mails = $this->drupalGetMails();
-    $start = strpos($mails[0]['body'], 'user/reset/' . $this->user->id());
-    $path = substr($mails[0]['body'], $start, 66 + strlen($this->user->id()));
+    $user_reset_regex = '/user\/reset\/' . (preg_quote($this->user->id(), '/')) . '\/\d+\/\S+/';
+    $contains_reset_url = (boolean) preg_match($user_reset_regex, $mails[0]['body'], $matches);
+    $this->assertTrue($contains_reset_url, 'Contains the password reset URL');
+    $path = $matches[0];
 
     // Log in with temporary login link.
     $this->drupalGet($path);
