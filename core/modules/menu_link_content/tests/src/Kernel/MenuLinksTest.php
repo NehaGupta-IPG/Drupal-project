@@ -67,10 +67,10 @@ class MenuLinksTest extends KernelTestBase {
     $this->menuLinkManager->deleteLinksInMenu('menu-test');
 
     // Then create a simple link hierarchy:
-    // - parent
-    //   - child-1
-    //     - child-1-1
-    //     - child-1-2
+    // - parent.
+    //   - child-1.
+    //     - child-1-1.
+    //     - child-1-2.
     //   - child-2.
     $base_options = [
       'title' => 'Menu link test',

@@ -81,7 +81,7 @@
   <rule ref="Drupal.Commenting.GenderNeutralComment"/>
   <rule ref="Drupal.Commenting.HookComment"/>
   <rule ref="Drupal.Commenting.InlineComment">
-    <!-- Sniff for: NoSpaceBefore, SpacingBefore, WrongStyle -->
+    <!-- Sniff for: NoSpaceBefore, SpacingBefore, WrongStyle, InvalidEndChar -->
     <exclude name="Drupal.Commenting.InlineComment.DocBlock"/>
     <exclude name="Drupal.Commenting.InlineComment.SpacingAfter"/>
   </rule>

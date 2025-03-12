@@ -102,7 +102,7 @@ abstract class ConfigBase implements RefinableCacheableDependencyInterface {
     }
 
     // The name must not contain any of the following characters:
-    // : ? * < > ' " / \.
+    // ":", "?", "*", "<", ">", "'", """, "/", or "\".
     if (preg_match('/[:?*<>"\'\/\\\\]/', $name)) {
       throw new ConfigNameException("Invalid character in Config object name $name.");
     }
