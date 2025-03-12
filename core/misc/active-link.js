@@ -22,6 +22,7 @@
     attach(context) {
       // Start by finding all potentially active links.
       const path = drupalSettings.path;
+      path.currentQuery = path.currentQuery ?? [];
       const originalSelectors = [
         `[data-drupal-link-system-path="${CSS.escape(path.currentPath)}"]`,
       ];
