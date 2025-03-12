@@ -22,14 +22,9 @@
     attach(context) {
       // Start by finding all potentially active links.
       const path = drupalSettings.path;
-      const queryString = JSON.stringify(path.currentQuery);
-      const querySelector = queryString
-        ? `[data-drupal-link-query="${CSS.escape(queryString)}"]`
-        : ':not([data-drupal-link-query])';
       const originalSelectors = [
         `[data-drupal-link-system-path="${CSS.escape(path.currentPath)}"]`,
       ];
-      let selectors;
 
       // If this is the front page, we have to check for the <front> path as
       // well.
@@ -38,7 +33,7 @@
       }
 
       // Add language filtering.
-      selectors = [].concat(
+      const selectors = [].concat(
         // Links without any hreflang attributes (most of them).
         originalSelectors.map(
           (selector) =>
@@ -59,8 +54,18 @@
       selectors = selectors.map((current) => current + querySelector);
 
       context.querySelectorAll(selectors.join(',')).forEach((activeLink) => {
-        activeLink.classList.add('is-active');
-        activeLink.setAttribute('aria-current', 'page');
+        // Check if the link does not contain query parameters that
+        // don't match the current query.
+        const queryMatch =
+          !activeLink.hasAttribute('data-drupal-link-query') ||
+          !Object.entries(
+            JSON.parse(activeLink.getAttribute('data-drupal-link-query')),
+          ).find(([key, value]) => value !== (path.currentQuery[key] || null));
+
+        if (queryMatch) {
+          activeLink.classList.add('is-active');
+          activeLink.setAttribute('aria-current', 'page');
+        }
       });
     },
     detach(context, settings, trigger) {
