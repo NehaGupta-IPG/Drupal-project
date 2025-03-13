@@ -791,8 +791,10 @@ display:
       contexts:
         - 'languages:language_content'
         - 'languages:language_interface'
-        - url
         - url.query_args
+        - 'url.query_args:filemime'
+        - 'url.query_args:filename'
+        - 'url.query_args:status'
         - user.permissions
       tags: {  }
   page_1:
@@ -828,8 +830,10 @@ display:
       contexts:
         - 'languages:language_content'
         - 'languages:language_interface'
-        - url
         - url.query_args
+        - 'url.query_args:filemime'
+        - 'url.query_args:filename'
+        - 'url.query_args:status'
         - user.permissions
       tags: {  }
   page_2:

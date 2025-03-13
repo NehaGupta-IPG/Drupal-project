@@ -684,8 +684,9 @@ display:
       contexts:
         - 'languages:language_content'
         - 'languages:language_interface'
-        - url
         - url.query_args
+        - 'url.query_args:severity'
+        - 'url.query_args:type'
         - user.permissions
       tags: {  }
   page:
@@ -701,7 +702,8 @@ display:
       contexts:
         - 'languages:language_content'
         - 'languages:language_interface'
-        - url
         - url.query_args
+        - 'url.query_args:severity'
+        - 'url.query_args:type'
         - user.permissions
       tags: {  }

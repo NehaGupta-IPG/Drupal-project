@@ -297,7 +297,7 @@ class StyleSerializerTest extends ViewTestBase {
       'theme',
       'request_format',
       'user.node_grants:view',
-      'url',
+      'url.query_args:title',
     ];
 
     $this->assertSame($expected, $result, 'Querying a view with a starts with exposed filter on the title returns nodes whose title starts with value provided.');

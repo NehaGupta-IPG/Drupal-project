@@ -505,8 +505,9 @@ display:
       contexts:
         - 'languages:language_content'
         - 'languages:language_interface'
-        - url
         - url.query_args
+        - 'url.query_args:info'
+        - 'url.query_args:type'
         - user.permissions
       tags: {  }
   page_1:
@@ -530,7 +531,8 @@ display:
       contexts:
         - 'languages:language_content'
         - 'languages:language_interface'
-        - url
         - url.query_args
+        - 'url.query_args:info'
+        - 'url.query_args:type'
         - user.permissions
       tags: {  }
