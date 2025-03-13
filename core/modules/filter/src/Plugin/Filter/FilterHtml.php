@@ -47,10 +47,10 @@ class FilterHtml extends FilterBase {
   const SUMMARY_DELIMITER = '<!--break-->';
 
   /**
+   * Summary delimiter HTML tag name.
+   *
    * A pseudo HTML tag name that we use internally to temporarily replace the
    * summary delimiter during the filtering process.
-   *
-   * This should not be an official HTML tag name.
    */
   const SUMMARY_DELIMITER_HTML_TAG_NAME = 'drupalsummarydelimiter';
 
@@ -597,7 +597,7 @@ class FilterHtml extends FilterBase {
    * @param array $restrictions
    *   A restrictions array in the format returned by getHtmlRestrictions().
    */
-  private function addSummaryDelimiterToRestrictions(&$restrictions) {
+  private function addSummaryDelimiterToRestrictions(&$restrictions): void {
     // FALSE means that no attributes are allowed.
     $restrictions['allowed'][self::SUMMARY_DELIMITER_HTML_TAG_NAME] = FALSE;
   }

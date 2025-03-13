@@ -17,6 +17,7 @@ drupalisms
 drupallink
 drupalmedia
 drupalorg
+drupalsummarydelimiter
 druplicon
 drush
 fapi

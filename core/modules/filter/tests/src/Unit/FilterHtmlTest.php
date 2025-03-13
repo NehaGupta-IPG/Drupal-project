@@ -61,7 +61,7 @@ class FilterHtmlTest extends UnitTestCase {
    * @param array $expected
    *   The expected output string.
    */
-  public function testProcess($html, $expected) {
+  public function testProcess($html, $expected): void {
     $currentConfiguration = $this->filter->getConfiguration();
     $currentConfiguration['settings']['allowed_html'] = "<p>";
     $this->filter->setConfiguration($currentConfiguration);
@@ -69,7 +69,7 @@ class FilterHtmlTest extends UnitTestCase {
   }
 
   /**
-   * Provides data for testfilterAttributes.
+   * Provides data for testFilterAttributes.
    *
    * @return array
    *   An array of test data.
@@ -140,7 +140,7 @@ class FilterHtmlTest extends UnitTestCase {
    * @return array
    *   An array of test data.
    */
-  public function providerProcess() {
+  public static function providerProcess() {
     return [
       // Preserve <p>.
       ['<p>content</p>', '<p>content</p>'],
