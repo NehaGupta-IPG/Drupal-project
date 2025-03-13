@@ -1764,9 +1764,9 @@ abstract class FilterPluginBase extends HandlerBase implements CacheableDependen
     // input from GET parameters, which are part of the URL. Hence a view with
     // an exposed filter is cacheable per filter value and operator.
     if ($this->isExposed()) {
-      if ($identifier = $this->options['expose']['identifier']) {
+      if ($identifier = $this->options['expose']['identifier'] ?? NULL) {
         $cache_contexts[] = "url.query_args:$identifier";
-        if ($this->options['expose']['use_operator'] == TRUE && $operator = $this->options['expose']['operator_id']) {
+        if ($this->options['expose']['use_operator'] && $operator = $this->options['expose']['operator_id']) {
           $cache_contexts[] = "url.query_args:$operator";
         }
       }

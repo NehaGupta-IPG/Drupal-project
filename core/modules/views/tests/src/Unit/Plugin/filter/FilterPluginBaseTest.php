@@ -64,6 +64,58 @@ class FilterPluginBaseTest extends UnitTestCase {
     ];
   }
 
+  /**
+   * @covers ::getCacheContexts
+   *
+   * @dataProvider getCacheContextsProvider
+   */
+  public function testGetCacheContexts(array $expected_result, array $options): void {
+    $definition = [
+      'title' => 'Get cache contexts Test',
+      'group' => 'Test',
+    ];
+    $filter = new FilterPluginBaseStub([], 'stub', $definition);
+    $filter->options = $options;
+    $this->assertSame($expected_result, $filter->getCacheContexts());
+  }
+
+  /**
+   * The data provider for testGetCacheContexts.
+   *
+   * @return array
+   *   The data set.
+   */
+  public static function getCacheContextsProvider(): array {
+    return [
+      'not-exposed' => [[], ['exposed' => FALSE]],
+      'exposed-no-input' => [['url.query_args'], ['exposed' => TRUE]],
+      'exposed-zero-input' => [
+        ['url.query_args:identifier', 'url.query_args:operator_id'],
+        [
+          'exposed' => TRUE,
+          'is_grouped' => FALSE,
+          'expose' => [
+            'use_operator' => TRUE,
+            'operator_id' => 'operator_id',
+            'identifier' => 'identifier',
+          ],
+        ],
+      ],
+      'exposed-empty-array-input' => [
+        ['url.query_args:identifier', 'url.query_args:operator_id'],
+        [
+          'exposed' => TRUE,
+          'is_grouped' => FALSE,
+          'expose' => [
+            'use_operator' => TRUE,
+            'operator_id' => 'operator_id',
+            'identifier' => 'identifier',
+          ],
+        ],
+      ],
+    ];
+  }
+
 }
 
 /**
