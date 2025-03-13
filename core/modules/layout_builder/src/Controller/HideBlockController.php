@@ -45,16 +45,16 @@ class HideBlockController implements ContainerInjectionInterface {
    *
    * @param \Drupal\layout_builder\SectionStorageInterface $section_storage
    *   The section storage.
-   * @param $delta
+   * @param int $delta
    *   The section delta.
-   * @param $region
+   * @param string $region
    *   The component region.
-   * @param $uuid
+   * @param string $uuid
    *   The component uuid.
    *
    * @return \Drupal\Core\Ajax\AjaxResponse
    */
-  public function build(SectionStorageInterface $section_storage, $delta, $region, $uuid) {
+  public function build(SectionStorageInterface $section_storage, int $delta, $region, $uuid) {
     $section = $section_storage->getSection($delta);
     $component = $section->getComponent($uuid);
 
