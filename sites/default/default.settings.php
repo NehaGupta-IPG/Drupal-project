@@ -854,7 +854,7 @@ $settings['migrate_node_migrate_type_classic'] = FALSE;
 /**
  * JavaScript libraries with these attributes will be aggregated together.
  */
-$settings['aggregated_js_attributes'] = ['defer', 'async'];
+$settings['aggregated_js_attributes'] = ['async', 'defer'];
 
 /**
  * Load local development override configuration, if available.
