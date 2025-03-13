@@ -2,6 +2,7 @@
 
 namespace Drupal\media\Plugin\Field\FieldFormatter;
 
+use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityStorageInterface;
@@ -10,6 +11,7 @@ use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\Core\Url;
 use Drupal\Core\Utility\LinkGeneratorInterface;
 use Drupal\Core\Field\Plugin\Field\FieldType\EntityReferenceItem;
 use Drupal\Core\Render\RendererInterface;
@@ -29,13 +31,6 @@ use Drupal\Core\Field\FieldDefinitionInterface;
   ],
 )]
 class MediaResponsiveThumbnailFormatter extends ResponsiveImageFormatter {
-
-  /**
-   * The renderer service.
-   *
-   * @var \Drupal\Core\Render\RendererInterface
-   */
-  protected $renderer;
 
   /**
    * Constructs a MediaResponsiveThumbnailFormatter object.
@@ -65,15 +60,27 @@ class MediaResponsiveThumbnailFormatter extends ResponsiveImageFormatter {
    * @param \Drupal\Core\Render\RendererInterface $renderer
    *   The renderer service.
    */
-  public function __construct($plugin_id, $plugin_definition, FieldDefinitionInterface $field_definition, array $settings, $label, $view_mode, array $third_party_settings, EntityStorageInterface $responsive_image_style_storage, EntityStorageInterface $image_style_storage, LinkGeneratorInterface $link_generator, AccountInterface $current_user, RendererInterface $renderer) {
+  public function __construct(
+    $plugin_id,
+    $plugin_definition,
+    FieldDefinitionInterface $field_definition,
+    array $settings,
+    $label,
+    $view_mode,
+    array $third_party_settings,
+    EntityStorageInterface $responsive_image_style_storage,
+    EntityStorageInterface $image_style_storage,
+    LinkGeneratorInterface $link_generator,
+    AccountInterface $current_user,
+    protected RendererInterface $renderer,
+  ) {
     parent::__construct($plugin_id, $plugin_definition, $field_definition, $settings, $label, $view_mode, $third_party_settings, $responsive_image_style_storage, $image_style_storage, $link_generator, $current_user);
-    $this->renderer = $renderer;
   }
 
   /**
    * {@inheritdoc}
    */
-  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
+  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition): static {
     return new static(
       $plugin_id,
       $plugin_definition,
@@ -97,14 +104,14 @@ class MediaResponsiveThumbnailFormatter extends ResponsiveImageFormatter {
    * of type \Drupal\file\Plugin\Field\FieldType\FileItem and calls
    * isDisplayed() which is not in FieldItemInterface.
    */
-  protected function needsEntityLoad(EntityReferenceItem $item) {
+  protected function needsEntityLoad(EntityReferenceItem $item): bool {
     return !$item->hasNewEntity();
   }
 
   /**
    * {@inheritdoc}
    */
-  public function settingsForm(array $form, FormStateInterface $form_state) {
+  public function settingsForm(array $form, FormStateInterface $form_state): array {
     $element = parent::settingsForm($form, $form_state);
     $link_types = [
       'content' => $this->t('Content'),
@@ -118,7 +125,7 @@ class MediaResponsiveThumbnailFormatter extends ResponsiveImageFormatter {
   /**
    * {@inheritdoc}
    */
-  public function settingsSummary() {
+  public function settingsSummary(): array {
     $summary = parent::settingsSummary();
 
     // The parent class adds summary text if the image_link setting is
@@ -134,7 +141,7 @@ class MediaResponsiveThumbnailFormatter extends ResponsiveImageFormatter {
   /**
    * {@inheritdoc}
    */
-  public function viewElements(FieldItemListInterface $items, $langcode) {
+  public function viewElements(FieldItemListInterface $items, $langcode): array {
     $elements = [];
     $media_items = $this->getEntitiesToView($items, $langcode);
 
@@ -187,7 +194,7 @@ class MediaResponsiveThumbnailFormatter extends ResponsiveImageFormatter {
   /**
    * {@inheritdoc}
    */
-  public static function isApplicable(FieldDefinitionInterface $field_definition) {
+  public static function isApplicable(FieldDefinitionInterface $field_definition): bool {
     // This formatter is only available for entity types that reference
     // media items.
     return ($field_definition->getFieldStorageDefinition()->getSetting('target_type') == 'media');
@@ -196,7 +203,7 @@ class MediaResponsiveThumbnailFormatter extends ResponsiveImageFormatter {
   /**
    * {@inheritdoc}
    */
-  protected function checkAccess(EntityInterface $entity) {
+  protected function checkAccess(EntityInterface $entity): bool|AccessResult {
     return $entity->access('view', NULL, TRUE)
       ->andIf(parent::checkAccess($entity));
   }
@@ -213,7 +220,7 @@ class MediaResponsiveThumbnailFormatter extends ResponsiveImageFormatter {
    *   The URL object for the media item or null if we don't want to add
    *   a link.
    */
-  protected function getMediaThumbnailUrl(MediaInterface $media, EntityInterface $entity) {
+  protected function getMediaThumbnailUrl(MediaInterface $media, EntityInterface $entity): ?Url {
     $url = NULL;
     $image_link_setting = $this->getSetting('image_link');
     // Check if the formatter involves a link.
