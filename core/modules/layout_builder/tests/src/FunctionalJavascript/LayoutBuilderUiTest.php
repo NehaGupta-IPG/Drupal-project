@@ -343,7 +343,7 @@ class LayoutBuilderUiTest extends WebDriverTestBase {
     $assert_session->assertWaitOnAjaxRequest();
 
     // Test "Hide block" functionality.
-    $this->clickContextualLink('.block-views-blockcontent-recent-block-1', 'Toggle hidden');
+    $this->clickContextualLink('.block-views-blockcontent-recent-block-1', 'Hide/Show block');
     $assert_session->assertWaitOnAjaxRequest();
     $assert_session->pageTextContains('The "Recent content" block is hidden');
     $page->pressButton('Save layout');
@@ -353,7 +353,7 @@ class LayoutBuilderUiTest extends WebDriverTestBase {
 
     // Test "Show block" functionality.
     $this->drupalGet('node/1/layout');
-    $this->clickContextualLink('.block-views-blockcontent-recent-block-1', 'Toggle hidden');
+    $this->clickContextualLink('.block-views-blockcontent-recent-block-1', 'Hide/Show block');
     $assert_session->assertWaitOnAjaxRequest();
     $assert_session->pageTextNotContains('The "Recent content" block is hidden');
     $page->pressButton('Save layout');

@@ -29,7 +29,7 @@ layout_builder_block_remove:
       data-dialog-renderer: off_canvas
 
 layout_builder_block_hide:
-  title: 'Toggle hidden'
+  title: 'Hide/Show block'
   route_name: 'layout_builder.hide_block'
   group: 'layout_builder_block'
   options:
