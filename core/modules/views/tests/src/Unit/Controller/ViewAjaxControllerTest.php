@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\views\Unit\Controller;
 
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Path\CurrentPathStack;
 use Drupal\Core\Path\PathValidatorInterface;
@@ -490,6 +491,8 @@ class ViewAjaxControllerTest extends UnitTestCase {
     $this->assertEquals('.js-view-dom-id-' . $dom_id, $commands[0]['selector']);
 
     $this->assertViewResultCommand($response, 2);
+
+    $this->assertInstanceOf(CacheableMetadata::class, $response->getCacheableMetadata());
   }
 
   /**
