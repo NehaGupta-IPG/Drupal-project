@@ -266,9 +266,10 @@ class EntityViewDisplay extends EntityDisplayBase implements EntityViewDisplayIn
           // The language of the field values to display is already determined
           // in the incoming $entity. The formatter should build its output of
           // those values using:
-          // - the entity language if the entity is translatable,
+          // - the entity language if the entity is translatable and is not the
+          // default translation,
           // - the current "content language" otherwise.
-          if ($entity instanceof TranslatableDataInterface && $entity->isTranslatable()) {
+          if ($entity instanceof TranslatableDataInterface && $entity->isTranslatable() && !$entity->isDefaultTranslation()) {
             $view_langcode = $entity->language()->getId();
           }
           else {
