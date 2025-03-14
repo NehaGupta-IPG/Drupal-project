@@ -1006,7 +1006,7 @@ class FormBuilderTest extends FormTestBase {
   /**
    * @covers ::addAsteriskExplanation
    */
-  function testAddAsteriskExplanation() {
+  public function testAddAsteriskExplanation(): void {
     $form_id = 'test_form_id';
 
     // Tests without a required field.
