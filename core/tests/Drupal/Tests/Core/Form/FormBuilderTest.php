@@ -1018,8 +1018,8 @@ class FormBuilderTest extends FormTestBase {
     $form = $form_id();
     $form['test']['#required'] = TRUE;
     $this->formBuilder->addAsteriskExplanation($form_id, $form);
-    $this->assertEquals('markup', $form['test_form_id_required_fields_note']['#type']);
-    $this->assertEquals(-INF, $form['test_form_id_required_fields_note']['#weight']);
+    $this->assertEquals('container', $form['test_form_id_required_fields_note']['#type']);
+    $this->assertEquals(-1000, $form['test_form_id_required_fields_note']['#weight']);
     $this->assertInstanceOf(TranslatableMarkup::class, $form['test_form_id_required_fields_note']['#markup']);
   }
 

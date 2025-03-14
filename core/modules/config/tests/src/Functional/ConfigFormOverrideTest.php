@@ -70,7 +70,7 @@ class ConfigFormOverrideTest extends BrowserTestBase {
     $this->assertSession()->titleEquals('Basic site settings | ' . $overridden_name);
     $this->assertSession()->elementTextContains('css', 'div[data-drupal-messages]', self::OVERRIDE_TEXT);
     // Ensure the configuration overrides message is at the top of the form.
-    $this->assertSession()->elementExists('css', 'div[data-drupal-messages] + details#edit-site-information');
+    $this->assertSession()->elementExists('css', 'div[data-drupal-messages] + div#edit-system-site-information-settings-required-fields-note');
     $this->assertSession()->elementContains('css', 'div[data-drupal-messages]', '<a href="#edit-site-name" title="\'Site name\' form element">Site name</a>');
     $this->assertSession()->fieldValueEquals("site_name", 'Drupal');
     $this->submitForm([
