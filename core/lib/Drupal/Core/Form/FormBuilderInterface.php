@@ -92,6 +92,21 @@ interface FormBuilderInterface {
   public function buildForm($form_arg, FormStateInterface &$form_state);
 
   /**
+   * Checks the form to see if any of the fields are required.
+   *
+   * If there is a required field it adds a text explaining what the asterisk means.
+   *
+   * @param string $form_id
+   *   The unique string identifying the desired form.
+   * @param array $form
+   *   An associative array containing the structure of the form.
+   *
+   * @return array
+   *   The rendered form.
+   */
+  public function addAsteriskExplanation($form_id, array &$form);
+
+  /**
    * Constructs a new $form from the information in $form_state.
    *
    * This is the key function for making multi-step forms advance from step to

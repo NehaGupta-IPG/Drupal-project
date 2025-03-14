@@ -18,6 +18,7 @@ use Drupal\Core\Render\ElementInfoManagerInterface;
 use Drupal\Core\Security\TrustedCallbackInterface;
 use Drupal\Core\Theme\ThemeManagerInterface;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Symfony\Component\HttpFoundation\FileBag;
 use Symfony\Component\HttpFoundation\InputBag;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -277,6 +278,7 @@ class FormBuilder implements FormBuilderInterface, FormValidatorInterface, FormS
       }
 
       $form = $this->retrieveForm($form_id, $form_state);
+      $this->addAsteriskExplanation($form_id, $form);
       $this->prepareForm($form_id, $form, $form_state);
 
       // self::setCache() removes uncacheable $form_state keys (see properties
@@ -636,6 +638,69 @@ class FormBuilder implements FormBuilderInterface, FormValidatorInterface, FormS
     if (!$form_state->isRebuilding() && $form_state->isCached()) {
       $this->setCache($form['#build_id'], $unprocessed_form, $form_state);
     }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function addAsteriskExplanation($form_id, array &$form) {
+
+    $form_note_identifier = $form_id . '_required_fields_note';
+
+    foreach ($form as $form_key => $form_item) {
+      if (strpos($form_key, '#') === 0) {
+        // We'll skip over the special fields.
+        continue;
+      }
+      else {
+        // Check if type is primitive.
+        if (isset($form_item['#type']) && $this->isComplexElement($form_item['#type'])) {
+          $this->addAsteriskExplanation($form_id, $form_item);
+          if (isset($form_item[$form_note_identifier])) {
+            $form[$form_note_identifier] = $form_item[$form_note_identifier];
+            unset($form_item[$form_note_identifier]);
+            return;
+          }
+        }
+        else {
+          if (isset($form_item['#required']) && (bool) $form_item['#required'] === TRUE) {
+            $form[$form_note_identifier] = [
+              '#type' => 'markup',
+              '#markup' => new TranslatableMarkup('<strong>@strong-markup: </strong><label>@label-markup *.</label>', [
+                '@strong-markup' => new TranslatableMarkup('Note'),
+                '@label-markup' => new TranslatableMarkup('Required fields are marked with an asterisk'),
+              ]),
+              '#weight' => INF,
+            ];
+
+            return;
+          }
+        }
+      }
+    }
+    return [];
+  }
+
+  /**
+   * Checks to see if a specified type is used for grouping elements.
+   *
+   * @param string $type
+   *   String representation of the type.
+   *
+   * @return bool
+   *   Is the type in the array?
+   */
+  public function isComplexElement($type) {
+    return in_array($type, [
+      'actions',
+      'container',
+      'details',
+      'dropbutton',
+      'fieldgroup',
+      'fieldset',
+      'form',
+      'operations',
+    ]);
   }
 
   /**
