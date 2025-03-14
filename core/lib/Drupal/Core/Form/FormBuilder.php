@@ -643,12 +643,12 @@ class FormBuilder implements FormBuilderInterface, FormValidatorInterface, FormS
   /**
    * {@inheritdoc}
    */
-  public function addAsteriskExplanation($form_id, array &$form) {
+  public function addAsteriskExplanation(string $form_id, array &$form): void {
 
     $form_note_identifier = $form_id . '_required_fields_note';
 
     foreach ($form as $form_key => $form_item) {
-      if (strpos($form_key, '#') === 0) {
+      if (str_starts_with($form_key, '#')) {
         // We'll skip over the special fields.
         continue;
       }
@@ -678,7 +678,6 @@ class FormBuilder implements FormBuilderInterface, FormValidatorInterface, FormS
         }
       }
     }
-    return [];
   }
 
   /**

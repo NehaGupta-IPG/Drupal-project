@@ -100,11 +100,8 @@ interface FormBuilderInterface {
    *   The unique string identifying the desired form.
    * @param array $form
    *   An associative array containing the structure of the form.
-   *
-   * @return array
-   *   The rendered form.
    */
-  public function addAsteriskExplanation($form_id, array &$form);
+  public function addAsteriskExplanation(string $form_id, array &$form): void;
 
   /**
    * Constructs a new $form from the information in $form_state.
