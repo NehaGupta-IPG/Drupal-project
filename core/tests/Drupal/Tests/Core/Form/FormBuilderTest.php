@@ -19,6 +19,7 @@ use Drupal\Core\Form\FormState;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Session\AccountProxyInterface;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -1000,6 +1001,26 @@ class FormBuilderTest extends FormTestBase {
       'token:none,authenticated:false,method:get' => [NULL, FALSE, 'get', FALSE],
       'token:test_form_id,authenticated:false,method:get' => ['test_form_id', TRUE, 'get', FALSE],
     ];
+  }
+
+  /**
+   * @covers ::addAsteriskExplanation
+   */
+  function testAddAsteriskExplanation() {
+    $form_id = 'test_form_id';
+
+    // Tests without a required field.
+    $form = $form_id();
+    $this->formBuilder->addAsteriskExplanation($form_id, $form);
+    $this->assertArrayNotHasKey('test_form_id_required_fields_note', $form);
+
+    // Tests with a required field.
+    $form = $form_id();
+    $form['test']['#required'] = TRUE;
+    $this->formBuilder->addAsteriskExplanation($form_id, $form);
+    $this->assertEquals('markup', $form['test_form_id_required_fields_note']['#type']);
+    $this->assertEquals(-INF, $form['test_form_id_required_fields_note']['#weight']);
+    $this->assertInstanceOf(TranslatableMarkup::class, $form['test_form_id_required_fields_note']['#markup']);
   }
 
 }
