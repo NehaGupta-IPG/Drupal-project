@@ -138,25 +138,11 @@ class SetInlineBlockDependency implements EventSubscriberInterface {
     }
     $layout_entity_info = $this->usage->getUsage($block_content->id());
     if (empty($layout_entity_info) || empty($layout_entity_info->layout_entity_type) || empty($layout_entity_info->layout_entity_id)) {
-      // If this is a newly added block it does not have usage information yet.
-      // Attempt to fetch layout_entity from section storage.
-      if ($block_content->isNew()) {
-        $section_storage = $this->currentRouteMatch->getParameter('section_storage');
-        if ($section_storage) {
-          $layout_entity = $section_storage->getContextValue('entity');
-          if ($layout_entity && $this->isLayoutCompatibleEntity($layout_entity)) {
-            return $layout_entity;
-          }
-          elseif ($layout = $section_storage->getContextValue('layout')) {
-            // We're editing a block in a layout template.
-            return $layout;
-          }
-        }
-      }
       // If the block does not have usage information then we cannot set a
       // dependency. It may be used by another module besides layout builder.
       return NULL;
     }
+
     // When updating or deleting an inline block, resolve the inline block
     // dependency via the active revision, since it is the revision that should
     // be loaded for editing purposes.
