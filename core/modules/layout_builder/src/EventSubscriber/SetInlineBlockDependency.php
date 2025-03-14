@@ -166,11 +166,9 @@ class SetInlineBlockDependency implements EventSubscriberInterface {
     else {
       $layout_entity = $this->entityRepository->getCanonical($layout_entity_info->layout_entity_type, $layout_entity_info->layout_entity_id);
     }
-    if ($this->isLayoutCompatibleEntity($layout_entity)) {
-      if ($this->isBlockRevisionUsedInEntity($layout_entity, $block_content)) {
-        // Allow components to be viewed when rendered via AJAX (preview mode).
-        return 'view' === $operation && $this->isAjax() ? new LayoutPreviewAccessAllowed() : $layout_entity;
-      }
+    if ($this->isLayoutCompatibleEntity($layout_entity) && $this->isBlockRevisionUsedInEntity($layout_entity, $block_content)) {
+      // Allow components to be viewed when rendered via AJAX (preview mode).
+      return 'view' === $operation && $this->isAjax() ? new LayoutPreviewAccessAllowed() : $layout_entity;
     }
     return NULL;
   }
