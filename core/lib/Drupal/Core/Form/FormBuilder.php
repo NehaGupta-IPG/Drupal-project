@@ -670,7 +670,7 @@ class FormBuilder implements FormBuilderInterface, FormValidatorInterface, FormS
                 '@strong-markup' => new TranslatableMarkup('Note'),
                 '@label-markup' => new TranslatableMarkup('Required fields are marked with an asterisk'),
               ]),
-              '#weight' => -INF,
+              '#weight' => -1000,
             ];
 
             return;
