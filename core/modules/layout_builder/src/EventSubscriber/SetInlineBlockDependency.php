@@ -10,6 +10,7 @@ use Drupal\Core\Ajax\AjaxHelperTrait;
 use Drupal\Core\Database\Connection;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityRepositoryInterface;
+use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\layout_builder\Access\LayoutPreviewAccessAllowed;
 use Drupal\layout_builder\InlineBlockUsageInterface;
@@ -51,7 +52,7 @@ class SetInlineBlockDependency implements EventSubscriberInterface {
   /**
    * Constructs a new SetInlineBlockDependency object.
    *
-   * @param \Drupal\Core\Entity\EntityRepositoryInterface $entityRepository
+   * @param \Drupal\Core\Entity\EntityRepositoryInterface|\Drupal\Core\Entity\EntityTypeManagerInterface $entityRepository
    *   The entity repository.
    * @param \Drupal\Core\Database\Connection $database
    *   The database connection.
@@ -63,7 +64,7 @@ class SetInlineBlockDependency implements EventSubscriberInterface {
    *   The current route match service.
    */
   public function __construct(
-    mixed $entityRepository,
+    EntityRepositoryInterface|EntityTypeManagerInterface $entityRepository,
     protected readonly Connection $database,
     protected readonly InlineBlockUsageInterface $usage,
     SectionStorageManagerInterface $sectionStorageManager,
@@ -75,10 +76,9 @@ class SetInlineBlockDependency implements EventSubscriberInterface {
     }
     $this->entityRepository = $entityRepository;
     $this->sectionStorageManager = $sectionStorageManager;
-    if (empty($currentRouteMatch)) {
+    if ($currentRouteMatch === NULL) {
       @trigger_error('Calling ' . __METHOD__ . ' without the $currentRouteMatch argument is deprecated in drupal:11.2.0 and will be required in drupal:12.0.0. See https://www.drupal.org/node/3507600', E_USER_DEPRECATED);
-      $currentRouteMatch = \Drupal::service('current_route_match');
-      $this->currentRouteMatch = $currentRouteMatch;
+      $this->currentRouteMatch = \Drupal::service('current_route_match');
     }
   }
 
