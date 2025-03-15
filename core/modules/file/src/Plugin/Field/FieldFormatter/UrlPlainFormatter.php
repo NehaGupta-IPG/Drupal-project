@@ -6,6 +6,7 @@ use Drupal\Core\Field\Attribute\FieldFormatter;
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\file\Enum\FileUrlTypeEnum;
 use Drupal\file\FileInterface;
 use Drupal\file\Trait\UrlSuggestionTrait;
 
@@ -28,7 +29,7 @@ class UrlPlainFormatter extends FileFormatterBase {
    */
   public static function defaultSettings(): array {
     $settings = parent::defaultSettings();
-    $settings['show_link_as'] = FileFormatterBase::RELATIVE_URL;
+    $settings['show_link_as'] = FileUrlTypeEnum::RELATIVE_URL->value;
     return $settings;
   }
 
@@ -45,7 +46,7 @@ class UrlPlainFormatter extends FileFormatterBase {
    * {@inheritdoc}
    */
   public function settingsSummary(): array {
-    $summary[] = ($this->getSetting('show_link_as') === FileFormatterBase::ABSOLUTE_URL) ? $this->t('Absolute URL') : $this->t('Relative URL');
+    $summary[] = (FileUrlTypeEnum::tryFrom($this->getSetting('show_link_as')) === FileUrlTypeEnum::ABSOLUTE_URL) ? $this->t('Absolute URL') : $this->t('Relative URL');
 
     return $summary;
   }
@@ -55,17 +56,18 @@ class UrlPlainFormatter extends FileFormatterBase {
    */
   public function viewElements(FieldItemListInterface $items, $langcode) {
     $elements = [];
+    $absolute_link = FileUrlTypeEnum::tryFrom($this->getSetting('show_link_as')) === FileUrlTypeEnum::ABSOLUTE_URL;
 
     foreach ($this->getEntitiesToView($items, $langcode) as $delta => $file) {
       assert($file instanceof FileInterface);
       $elements[$delta] = [
-        '#markup' => $file->createFileUrl($this->getSetting('show_link_as') === FileFormatterBase::RELATIVE_URL),
+        '#markup' => $file->createFileUrl(!$absolute_link),
         '#cache' => [
           'tags' => $file->getCacheTags(),
         ],
       ];
 
-      if ($this->getSetting('show_link_as') === FileFormatterBase::ABSOLUTE_URL) {
+      if ($absolute_link) {
         $elements[$delta]['#cache']['contexts'] = ['url.site'];
       }
     }

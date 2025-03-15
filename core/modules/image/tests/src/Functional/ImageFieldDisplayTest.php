@@ -8,7 +8,7 @@ use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\Core\StreamWrapper\StreamWrapperManager;
 use Drupal\Core\Url;
 use Drupal\field\Entity\FieldStorageConfig;
-use Drupal\file\Plugin\Field\FieldFormatter\FileFormatterBase;
+use Drupal\file\Enum\FileUrlTypeEnum;
 use Drupal\image\Entity\ImageStyle;
 use Drupal\Tests\system\Functional\Cache\AssertPageCacheContextsAndTagsTrait;
 use Drupal\Tests\TestFileCreationTrait;
@@ -233,7 +233,7 @@ class ImageFieldDisplayTest extends ImageFieldTestBase {
       'type' => 'image_url',
       'settings' => [
         'image_style' => 'thumbnail',
-        'show_link_as' => FileFormatterBase::ABSOLUTE_URL,
+        'show_link_as' => FileUrlTypeEnum::ABSOLUTE_URL->value,
       ],
     ];
     $display = \Drupal::service('entity_display.repository')->getViewDisplay('node', $node->getType(), 'default');
@@ -258,7 +258,7 @@ class ImageFieldDisplayTest extends ImageFieldTestBase {
       'type' => 'image_url',
       'settings' => [
         'image_style' => '',
-        'show_link_as' => FileFormatterBase::RELATIVE_URL,
+        'show_link_as' => FileUrlTypeEnum::RELATIVE_URL->value,
       ],
     ];
     $display = \Drupal::service('entity_display.repository')->getViewDisplay('node', $node->getType());

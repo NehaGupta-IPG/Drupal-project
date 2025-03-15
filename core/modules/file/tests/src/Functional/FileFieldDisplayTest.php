@@ -7,7 +7,7 @@ namespace Drupal\Tests\file\Functional;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\Core\StringTranslation\ByteSizeMarkup;
 use Drupal\file\Entity\File;
-use Drupal\file\Plugin\Field\FieldFormatter\FileFormatterBase;
+use Drupal\file\Enum\FileUrlTypeEnum;
 use Drupal\node\Entity\Node;
 use Drupal\Tests\field_ui\Traits\FieldUiTestTrait;
 use PHPUnit\Framework\Attributes\Group;
@@ -274,7 +274,7 @@ class FileFieldDisplayTest extends FileFieldTestBase {
     $display_options = [
       'type' => 'file_url_plain',
       'settings' => [
-        'show_link_as' => FileFormatterBase::ABSOLUTE_URL,
+        'show_link_as' => FileUrlTypeEnum::ABSOLUTE_URL->value,
       ],
     ];
     $display = \Drupal::service('entity_display.repository')
@@ -297,7 +297,7 @@ class FileFieldDisplayTest extends FileFieldTestBase {
     $display_options = [
       'type' => 'file_url_plain',
       'settings' => [
-        'show_link_as' => FileFormatterBase::RELATIVE_URL,
+        'show_link_as' => FileUrlTypeEnum::RELATIVE_URL->value,
       ],
     ];
     $display = \Drupal::service('entity_display.repository')

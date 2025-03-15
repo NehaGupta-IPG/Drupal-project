@@ -13,7 +13,7 @@ use Drupal\Core\Link;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Url;
-use Drupal\file\Plugin\Field\FieldFormatter\FileFormatterBase;
+use Drupal\file\Enum\FileUrlTypeEnum;
 use Drupal\file\Trait\UrlSuggestionTrait;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -110,7 +110,7 @@ class ImageUrlFormatter extends ImageFormatterBase {
    */
   public static function defaultSettings() {
     return [
-      'show_link_as' => FileFormatterBase::RELATIVE_URL,
+      'show_link_as' => FileUrlTypeEnum::RELATIVE_URL->value,
       'image_style' => '',
     ];
   }
@@ -163,7 +163,7 @@ class ImageUrlFormatter extends ImageFormatterBase {
       $summary[] = $this->t('Original image');
     }
 
-    $summary[] = ($this->getSetting('show_link_as') === FileFormatterBase::ABSOLUTE_URL) ? $this->t('Absolute URL') : $this->t('Relative URL');
+    $summary[] = (FileUrlTypeEnum::tryFrom($this->getSetting('show_link_as')) === FileUrlTypeEnum::ABSOLUTE_URL) ? $this->t('Absolute URL') : $this->t('Relative URL');
 
     return array_merge($summary, parent::settingsSummary());
   }
@@ -180,6 +180,7 @@ class ImageUrlFormatter extends ImageFormatterBase {
       return $elements;
     }
 
+    $absolute_link = FileUrlTypeEnum::tryFrom($this->getSetting('show_link_as')) === FileUrlTypeEnum::ABSOLUTE_URL;
     /** @var \Drupal\image\ImageStyleInterface $image_style */
     $image_style = $this->imageStyleStorage->load($this->getSetting('image_style'));
     /** @var \Drupal\file\FileInterface[] $images */
@@ -191,7 +192,7 @@ class ImageUrlFormatter extends ImageFormatterBase {
       $url = $this->fileUrlGenerator->generateAbsoluteString($image_uri);
 
       // Generate absolute url for the image.
-      if ($this->getSetting('show_link_as') === FileFormatterBase::RELATIVE_URL) {
+      if (!$absolute_link) {
         $url = $this->fileUrlGenerator->generateString($url);
       }
 
@@ -204,7 +205,7 @@ class ImageUrlFormatter extends ImageFormatterBase {
       $elements[$delta] = ['#markup' => $url];
       $cacheability->applyTo($elements[$delta]);
 
-      if ($this->getSetting('show_link_as') === FileFormatterBase::ABSOLUTE_URL) {
+      if ($absolute_link) {
         array_push($elements[$delta]['#cache']['contexts'], 'url.site');
       }
     }

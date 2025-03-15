@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Drupal\file\Trait;
 
 use Drupal\Core\StringTranslation\StringTranslationTrait;
-use Drupal\file\Plugin\Field\FieldFormatter\FileFormatterBase;
+use Drupal\file\Enum\FileUrlTypeEnum;
 
 /**
  * Trait to provide sample items element for URL suggestions.
@@ -31,8 +31,8 @@ trait UrlSuggestionTrait {
       '#title' => $this->t('Show link as'),
       '#default_value' => $this->getSetting('show_link_as'),
       '#options' => [
-        FileFormatterBase::ABSOLUTE_URL => $this->t('Absolute URL'),
-        FileFormatterBase::RELATIVE_URL => $this->t('Relative URL'),
+        FileUrlTypeEnum::ABSOLUTE_URL->value => $this->t('Absolute URL'),
+        FileUrlTypeEnum::RELATIVE_URL->value => $this->t('Relative URL'),
       ],
     ];
     $form['absolute_url_suggestion'] = $this->absoluteUrlSuggestion();

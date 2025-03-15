@@ -13,16 +13,6 @@ use Drupal\Core\Field\Plugin\Field\FieldType\EntityReferenceItem;
 abstract class FileFormatterBase extends EntityReferenceFormatterBase {
 
   /**
-   * Display URL as an absolute URL.
-   */
-  const string ABSOLUTE_URL = 'absolute';
-
-  /**
-   * Display URL as a relative URL.
-   */
-  const string RELATIVE_URL = 'relative';
-
-  /**
    * {@inheritdoc}
    */
   protected function needsEntityLoad(EntityReferenceItem $item) {
