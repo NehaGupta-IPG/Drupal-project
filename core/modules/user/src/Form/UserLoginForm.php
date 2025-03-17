@@ -269,7 +269,11 @@ class UserLoginForm extends FormBase implements WorkspaceSafeFormInterface {
         $form_state->setResponse($response);
       }
       else {
-        $form_state->setErrorByName('name', $this->t('Unrecognized username or password. <a href=":password">Forgot your password?</a>', [':password' => Url::fromRoute('user.pass')->toString()]));
+        $pass_url = Url::fromRoute('user.pass');
+        $unrecognized_msg = $pass_url->access()
+          ? $this->t('Unrecognized username or password. <a href=":password">Forgot your password?</a>', [':password' => $pass_url->toString()])
+          : $this->t('Unrecognized username or password.');
+        $form_state->setErrorByName('name', $unrecognized_msg);
         $accounts = $this->userStorage->loadByProperties(['name' => $form_state->getValue('name')]);
         if (!empty($accounts)) {
           $this->logger('user')->notice('Login attempt failed for %user.', ['%user' => $form_state->getValue('name')]);
