@@ -122,6 +122,13 @@ class ViewsMenuLink extends MenuLinkBase implements ContainerFactoryPluginInterf
   /**
    * {@inheritdoc}
    */
+  public function getAdminDescription() {
+    return $this->loadView()->display_handler->getOption('menu')['admin_description'];
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function isExpanded() {
     return (bool) $this->loadView()->display_handler->getOption('menu')['expanded'];
   }
