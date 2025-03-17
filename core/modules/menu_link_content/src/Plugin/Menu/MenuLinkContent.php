@@ -274,7 +274,7 @@ class MenuLinkContent extends MenuLinkBase implements ContainerFactoryPluginInte
       foreach ($overrides as $key => $value) {
         $entity->{$key}->value = $value;
       }
-      $entity->save();
+        $entity->save();
     }
 
     return $this->pluginDefinition;

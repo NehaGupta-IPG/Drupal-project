@@ -718,7 +718,6 @@ function claro_form_menu_link_content_form_alter(&$form, FormStateInterface $for
     $form['menu_link_display_settings']['expanded'] = $form['expanded'];
     unset($form['expanded']);
   }
-
   if (isset($form['description'])) {
     $form['menu_link_description'] = [
       '#type' => 'details',
@@ -730,6 +729,17 @@ function claro_form_menu_link_content_form_alter(&$form, FormStateInterface $for
       'description' => $form['description'],
     ];
     unset($form['description']);
+  }
+  if (isset($form['admin_description'])) {
+    $form['menu_link_admin_description'] = [
+      '#type' => 'details',
+      '#group' => 'advanced',
+      '#title' => t('Administration'),
+      '#tree' => TRUE,
+      '#accordion' => TRUE,
+      'description' => $form['admin_description'],
+    ];
+    unset($form['admin_description']);
   }
 }
 

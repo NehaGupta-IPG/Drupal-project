@@ -86,7 +86,6 @@ class MenuLinkContentForm extends ContentEntityForm {
     $form['menu_parent']['#title'] = $this->t('Parent link');
     $form['menu_parent']['#description'] = $this->t('The maximum depth for a link and all its children is fixed. Some menu links may not be available as parents if selecting them would exceed this limit.');
     $form['menu_parent']['#attributes']['class'][] = 'menu-title-select';
-
     return $form;
   }
 

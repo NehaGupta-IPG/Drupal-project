@@ -340,8 +340,8 @@ class MenuLinkContent extends EditorialContentEntityBase implements MenuLinkCont
       ]);
 
     $fields['admin_description'] = BaseFieldDefinition::create('string')
-      ->setLabel(t('Admin Description'))
-      ->setDescription(t('Shown when displaying on the admin menu interface.'))
+      ->setLabel(t('Admin description'))
+      ->setDescription(t('Shown when displaying on the administrative interface.'))
       ->setTranslatable(TRUE)
       ->setRevisionable(TRUE)
       ->setSetting('max_length', 255)

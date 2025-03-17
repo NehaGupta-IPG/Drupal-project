@@ -101,6 +101,7 @@ class MenuLinkManager implements MenuLinkManagerInterface {
       $yaml_discovery = new YamlDiscovery('links.menu', $this->moduleHandler->getModuleDirectories());
       $yaml_discovery->addTranslatableProperty('title', 'title_context');
       $yaml_discovery->addTranslatableProperty('description', 'description_context');
+      $yaml_discovery->addTranslatableProperty('admin_description', 'admin_description_context');
       $this->discovery = new ContainerDerivativeDiscoveryDecorator($yaml_discovery);
     }
     return $this->discovery;
@@ -125,7 +126,6 @@ class MenuLinkManager implements MenuLinkManagerInterface {
   public function getDefinitions() {
     // Since this function is called rarely, instantiate the discovery here.
     $definitions = $this->getDiscovery()->getDefinitions();
-
     $this->moduleHandler->alter('menu_links_discovered', $definitions);
 
     foreach ($definitions as $plugin_id => &$definition) {

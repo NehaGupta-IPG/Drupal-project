@@ -1247,7 +1247,14 @@ class MenuTreeStorage implements MenuTreeStorageInterface {
           'serialize' => TRUE,
         ],
         'description' => [
-          'description' => 'The serialized description of this link - used for admin pages and title attribute. May be a TranslatableMarkup.',
+          'description' => 'The serialized description of this link - used for title attribute. May be a TranslatableMarkup.',
+          'type' => 'blob',
+          'size' => 'big',
+          'not null' => FALSE,
+          'serialize' => TRUE,
+        ],
+        'admin_description' => [
+          'description' => 'The serialized admin description of this link - used for admin pages. May be a TranslatableMarkup.',
           'type' => 'blob',
           'size' => 'big',
           'not null' => FALSE,

@@ -64,6 +64,10 @@ class LoginLogoutMenuLink extends MenuLinkDefault {
     }
   }
 
+  public function getAdminDescription() {
+    return $this->t('<q>Log in</q> for anonymous users.');
+  }
+
   /**
    * {@inheritdoc}
    */
