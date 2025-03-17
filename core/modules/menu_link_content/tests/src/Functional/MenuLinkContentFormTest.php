@@ -134,4 +134,16 @@ class MenuLinkContentFormTest extends BrowserTestBase {
     $this->assertSession()->linkExists('Custom Home');
   }
 
+  /**
+   * Tests absolute URL conversion.
+   */
+  public function testReformatInternalLinkIfEnteredAsExternal(): void {
+    $this->drupalGet('admin/structure/menu/manage/admin/add');
+    $this->submitForm([
+      'title[0][value]' => 'Test page',
+      'link[0][uri]' => $this->getAbsoluteUrl('/test'),
+    ], 'Save');
+    $this->assertSession()->fieldValueEquals('link[0][uri]', '/test');
+  }
+
 }
