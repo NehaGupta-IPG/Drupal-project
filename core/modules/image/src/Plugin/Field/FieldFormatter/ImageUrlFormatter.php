@@ -73,18 +73,17 @@ class ImageUrlFormatter extends ImageFormatterBase {
    *   The entity type manager.
    * @param \Drupal\Core\Session\AccountInterface $current_user
    *   The current user.
-   * @param \Drupal\Core\File\FileUrlGeneratorInterface|null $file_url_generator
+   * @param \Drupal\Core\File\FileUrlGeneratorInterface|null $fileUrlGenerator
    *   The file URL generator.
    */
-  public function __construct($plugin_id, $plugin_definition, FieldDefinitionInterface $field_definition, array $settings, $label, $view_mode, array $third_party_settings, EntityTypeManagerInterface $entity_type_manager, AccountInterface $current_user, ?FileUrlGeneratorInterface $file_url_generator = NULL) {
+  public function __construct($plugin_id, $plugin_definition, FieldDefinitionInterface $field_definition, array $settings, $label, $view_mode, array $third_party_settings, EntityTypeManagerInterface $entity_type_manager, AccountInterface $current_user, protected ?FileUrlGeneratorInterface $fileUrlGenerator = NULL) {
     parent::__construct($plugin_id, $plugin_definition, $field_definition, $settings, $label, $view_mode, $third_party_settings);
     $this->imageStyleStorage = $entity_type_manager->getStorage('image_style');
     $this->currentUser = $current_user;
-    if ($file_url_generator === NULL) {
+    if ($fileUrlGenerator === NULL) {
       @trigger_error('Calling ' . __METHOD__ . ' without the $file_url_generator argument is deprecated in drupal:11.2.0 and it will be required in drupal:12.0.0. See https://www.drupal.org/node/3410078', E_USER_DEPRECATED);
-      $file_url_generator = \Drupal::service('file_url_generator');
+      $this->fileUrlGenerator = \Drupal::service('file_url_generator');
     }
-    $this->fileUrlGenerator = $file_url_generator;
   }
 
   /**
