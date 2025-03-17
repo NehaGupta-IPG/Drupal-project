@@ -718,6 +718,7 @@ function claro_form_menu_link_content_form_alter(&$form, FormStateInterface $for
     $form['menu_link_display_settings']['expanded'] = $form['expanded'];
     unset($form['expanded']);
   }
+
   if (isset($form['description'])) {
     $form['menu_link_description'] = [
       '#type' => 'details',
