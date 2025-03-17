@@ -506,7 +506,7 @@ class Url implements TrustedCallbackInterface {
     }
 
     if (!empty($token_string) && $tokens = $token_service->scan($token_string)) {
-      $token_replacement = $token_service->replace($token_string, $token_context, ['clear' => TRUE]);
+      $token_replacement = $token_service->replacePlain($token_string, $token_context, ['clear' => TRUE]);
     }
     if (!empty($token_replacement)) {
       if (UrlHelper::isExternal($token_replacement)) {
