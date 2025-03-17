@@ -9,8 +9,10 @@ use Twig\TwigFilter;
 
 /**
  * Provides non-deprecated spaceless filter.
+ * 
+ * @internal
  */
-class SpacelessBCExtension extends AbstractExtension {
+final class SpacelessBCExtension extends AbstractExtension {
 
   /**
    * {@inheritdoc}
