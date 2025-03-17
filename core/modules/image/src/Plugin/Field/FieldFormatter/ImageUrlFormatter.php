@@ -13,7 +13,7 @@ use Drupal\Core\Link;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Url;
-use Drupal\file\Enum\FileUrlTypeEnum;
+use Drupal\file\FileUrlTypeOptions;
 use Drupal\file\Trait\UrlSuggestionTrait;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -110,7 +110,7 @@ class ImageUrlFormatter extends ImageFormatterBase {
    */
   public static function defaultSettings() {
     return [
-      'show_link_as' => FileUrlTypeEnum::RELATIVE_URL->value,
+      'show_link_as' => FileUrlTypeOptions::Relative->value,
       'image_style' => '',
     ];
   }
@@ -163,7 +163,7 @@ class ImageUrlFormatter extends ImageFormatterBase {
       $summary[] = $this->t('Original image');
     }
 
-    $summary[] = (FileUrlTypeEnum::tryFrom($this->getSetting('show_link_as')) === FileUrlTypeEnum::ABSOLUTE_URL) ? $this->t('Absolute URL') : $this->t('Relative URL');
+    $summary[] = (FileUrlTypeOptions::tryFrom($this->getSetting('show_link_as')) === FileUrlTypeOptions::Absolute) ? $this->t('Absolute URL') : $this->t('Relative URL');
 
     return array_merge($summary, parent::settingsSummary());
   }
@@ -180,7 +180,7 @@ class ImageUrlFormatter extends ImageFormatterBase {
       return $elements;
     }
 
-    $absolute_link = FileUrlTypeEnum::tryFrom($this->getSetting('show_link_as')) === FileUrlTypeEnum::ABSOLUTE_URL;
+    $absolute_link = FileUrlTypeOptions::tryFrom($this->getSetting('show_link_as')) === FileUrlTypeOptions::Absolute;
     /** @var \Drupal\image\ImageStyleInterface $image_style */
     $image_style = $this->imageStyleStorage->load($this->getSetting('image_style'));
     /** @var \Drupal\file\FileInterface[] $images */

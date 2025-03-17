@@ -7,7 +7,7 @@
 
 use Drupal\Core\Entity\Entity\EntityViewDisplay;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
-use Drupal\file\Enum\FileUrlTypeEnum;
+use Drupal\file\FileUrlTypeOptions;
 
 /**
  * Implements hook_removed_post_updates().
@@ -47,7 +47,7 @@ function file_post_update_set_default_absolute_url(array &$sandbox = []): void {
           switch ($settings['type']) {
             case 'file_url_plain':
             case 'image_url':
-              $fields_settings[$field_name]['settings']['show_link_as'] = FileUrlTypeEnum::RELATIVE_URL->value;
+              $fields_settings[$field_name]['settings']['show_link_as'] = FileUrlTypeOptions::Relative->value;
               $changed = TRUE;
               break;
           }

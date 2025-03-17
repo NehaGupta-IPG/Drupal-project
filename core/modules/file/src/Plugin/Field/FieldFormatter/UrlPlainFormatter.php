@@ -6,7 +6,7 @@ use Drupal\Core\Field\Attribute\FieldFormatter;
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
-use Drupal\file\Enum\FileUrlTypeEnum;
+use Drupal\file\FileUrlTypeOptions;
 use Drupal\file\FileInterface;
 use Drupal\file\Trait\UrlSuggestionTrait;
 
@@ -29,7 +29,7 @@ class UrlPlainFormatter extends FileFormatterBase {
    */
   public static function defaultSettings(): array {
     $settings = parent::defaultSettings();
-    $settings['show_link_as'] = FileUrlTypeEnum::RELATIVE_URL->value;
+    $settings['show_link_as'] = FileUrlTypeOptions::Relative->value;
     return $settings;
   }
 
@@ -46,7 +46,7 @@ class UrlPlainFormatter extends FileFormatterBase {
    * {@inheritdoc}
    */
   public function settingsSummary(): array {
-    $summary[] = (FileUrlTypeEnum::tryFrom($this->getSetting('show_link_as')) === FileUrlTypeEnum::ABSOLUTE_URL) ? $this->t('Absolute URL') : $this->t('Relative URL');
+    $summary[] = (FileUrlTypeOptions::tryFrom($this->getSetting('show_link_as')) === FileUrlTypeOptions::Absolute) ? $this->t('Absolute URL') : $this->t('Relative URL');
 
     return $summary;
   }
@@ -56,7 +56,7 @@ class UrlPlainFormatter extends FileFormatterBase {
    */
   public function viewElements(FieldItemListInterface $items, $langcode) {
     $elements = [];
-    $absolute_link = FileUrlTypeEnum::tryFrom($this->getSetting('show_link_as')) === FileUrlTypeEnum::ABSOLUTE_URL;
+    $absolute_link = FileUrlTypeOptions::tryFrom($this->getSetting('show_link_as')) === FileUrlTypeOptions::Absolute;
 
     foreach ($this->getEntitiesToView($items, $langcode) as $delta => $file) {
       assert($file instanceof FileInterface);
