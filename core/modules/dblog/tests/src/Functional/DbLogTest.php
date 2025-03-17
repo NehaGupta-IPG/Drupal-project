@@ -55,6 +55,20 @@ class DbLogTest extends BrowserTestBase {
   protected $webUser;
 
   /**
+   * A user with the 'access site reports' permission.
+   *
+   * @var \Drupal\user\UserInterface|false
+   */
+  protected UserInterface|false $userWithSiteReportsPermissions;
+
+  /**
+   * A user with the 'access dblog reports' permission.
+   *
+   * @var \Drupal\user\UserInterface|false
+   */
+  protected UserInterface|false $userWithDblogsReportPermissions;
+
+  /**
    * {@inheritdoc}
    */
   protected function setUp(): void {
@@ -69,6 +83,15 @@ class DbLogTest extends BrowserTestBase {
       'access help pages',
       'access site reports',
       'administer users',
+    ]);
+    $this->userWithSiteReportsPermissions = $this->drupalCreateUser([
+      'access administration pages',
+      'access site reports',
+    ]);
+    $this->userWithDblogReportsPermissions = $this->drupalCreateUser([
+      'access administration pages',
+      'access site reports',
+      'access dblog reports',
     ]);
     $this->webUser = $this->drupalCreateUser([]);
   }
@@ -176,6 +199,39 @@ class DbLogTest extends BrowserTestBase {
     $backtrace = "//tr//pre[contains(@class, 'backtrace')]";
     $this->assertCount(1, $table->findAll('xpath', $backtrace));
     $this->assertSession()->responseContains('&lt;script&gt;alert(&#039;xss&#039;)&lt;/script&gt;');
+  }
+
+  /**
+   * Tests whether users can access the Recent log messages page.
+   */
+  protected function testAccessDblogReportsPermission(): void {
+    $assert_session = $this->assertSession();
+
+    $this->drupalLogin($this->userWithDblogReportsPermissions);
+
+    // Make sure the user can reach the Recent log messages page.
+    $this->drupalGet('/admin/reports/dblog');
+    $assert_session->statusCodeEquals(200);
+
+    $this->drupalLogout();
+  }
+
+  /**
+   * Tests whether users can see the Reports menu item in the admin menu.
+   */
+  protected function testAccessSiteReportsPermission(): void {
+    $assert_session = $this->assertSession();
+
+    $this->drupalLogin($this->userWithSiteReportsPermissions);
+
+    // Check if the Reports menu item exists.
+    $assert_session->elementExists('xpath', "//a[@id='toolbar-link-system-admin_reports'][@href='/admin/reports']");
+
+    // Make sure the user can't reach the Recent log messages page.
+    $this->drupalGet('/admin/reports/dblog');
+    $assert_session->statusCodeEquals(403);
+
+    $this->drupalLogout();
   }
 
   /**
