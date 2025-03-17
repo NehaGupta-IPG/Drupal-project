@@ -1,9 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\dblog\Functional\Update;
 
+use Drupal\FunctionalTests\Update\UpdatePathTestBase;
 use Drupal\views\Entity\View;
-use Drupal\views\ViewExecutable;
 
 /**
  * Provides tests for the DESCRIBE UPDATE HERE.
@@ -31,7 +33,7 @@ class UpdateWatchdogViewPermissionsTest extends UpdatePathTestBase {
   /**
    * Tests the Watchdog view's permissions before the 112002 update.
    */
-  public function testUpdateHook112002PreUpdate() {
+  public function testUpdateHook112002PreUpdate(): void {
     // Load the Watchdog view.
     $watchdog_view = View::load('watchdog');
 
@@ -47,7 +49,7 @@ class UpdateWatchdogViewPermissionsTest extends UpdatePathTestBase {
   /**
    * Tests the Watchdog view's permissions after the 112002 update.
    */
-  public function testUpdateHook112002PostUpdate() {
+  public function testUpdateHook112002PostUpdate(): void {
     // Run the updates.
     $this->runUpdates();
 

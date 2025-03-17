@@ -57,16 +57,16 @@ class DbLogTest extends BrowserTestBase {
   /**
    * A user with the 'access site reports' permission.
    *
-   * @var \Drupal\user\UserInterface|false
+   * @var \Drupal\user\UserInterface
    */
-  protected UserInterface|false $userWithSiteReportsPermissions;
+  protected $userWithSiteReportsPermissions;
 
   /**
    * A user with the 'access dblog reports' permission.
    *
-   * @var \Drupal\user\UserInterface|false
+   * @var \Drupal\user\UserInterface
    */
-  protected UserInterface|false $userWithDblogsReportPermissions;
+  protected $userWithDblogReportsPermissions;
 
   /**
    * {@inheritdoc}
