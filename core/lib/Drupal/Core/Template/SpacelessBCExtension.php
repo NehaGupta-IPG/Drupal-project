@@ -9,7 +9,7 @@ use Twig\TwigFilter;
 
 /**
  * Provides non-deprecated spaceless filter.
- * 
+ *
  * @internal
  */
 final class SpacelessBCExtension extends AbstractExtension {
