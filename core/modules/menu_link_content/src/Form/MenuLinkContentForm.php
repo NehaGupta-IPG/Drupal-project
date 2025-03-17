@@ -114,8 +114,30 @@ class MenuLinkContentForm extends ContentEntityForm {
     $entity->menu_name->value = $menu_name;
     $entity->enabled->value = (!$form_state->isValueEmpty(['enabled', 'value']));
     $entity->expanded->value = (!$form_state->isValueEmpty(['expanded', 'value']));
+    $entity->link->uri = $this->reformatInternalLinkIfEnteredAsExternal($entity->link->uri);
 
     return $entity;
+  }
+
+  /**
+   * Reformat an internal link if it was entered as an external one.
+   *
+   * @param string $uri
+   *   The URI to possibly reformat.
+   *
+   * @return string
+   *   The possibly reformatted link.
+   */
+  protected function reformatInternalLinkIfEnteredAsExternal($uri) {
+    if (parse_url($uri, PHP_URL_SCHEME) !== 'internal') {
+      $base_url = $this->getRequest()->getSchemeAndHttpHost() . $this->getRequest()->getBasePath();
+      if (strpos($uri, $base_url) === 0) {
+        // The entered base URL matches the current request so we can drop it.
+        $path = substr($uri, strlen($base_url));
+        return 'internal:' . ($path ?: '/');
+      }
+    }
+    return $uri;
   }
 
   /**
