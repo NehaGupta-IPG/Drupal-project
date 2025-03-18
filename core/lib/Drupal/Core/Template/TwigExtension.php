@@ -802,6 +802,18 @@ class TwigExtension extends AbstractExtension {
    *   The element with the given sanitized attribute's value.
    */
   public function setAttribute(array $element, string $name, mixed $value = NULL): array {
+    if (!\is_array($element)) {
+      return $element;
+    }
+    if (\array_is_list($element)) {
+      foreach ($element as $index => $item) {
+        if (!\is_array($item)) {
+          continue;
+        }
+        $element[$index] = $this->setAttribute($item, $name, $value);
+      }
+      return $element;
+    }
     $element['#attributes'] = AttributeHelper::mergeCollections(
       $element['#attributes'] ?? [],
       new Attribute([$name => $value])
@@ -809,7 +821,6 @@ class TwigExtension extends AbstractExtension {
 
     // Make sure element gets rendered again.
     unset($element['#printed']);
-
     return $element;
   }
 
