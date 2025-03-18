@@ -8,7 +8,9 @@ use Drupal\FunctionalTests\Update\UpdatePathTestBase;
 use Drupal\views\Entity\View;
 
 /**
- * Provides tests for the DESCRIBE UPDATE HERE.
+ * Tests the permission update to the Watchdog view in the 112002 update.
+ *
+ * @group dblog
  */
 class UpdateWatchdogViewPermissionsTest extends UpdatePathTestBase {
 
