@@ -245,6 +245,12 @@ class FormValidator implements FormValidatorInterface {
       }
     }
 
+    // The validation of required fields might be suppressed for ajax calls.
+    $request = $this->requestStack->getCurrentRequest();
+    $requires_validation = isset($elements['#required']) && $elements['#required'];
+    // Ensure there is an existing request with enforced validation suppression.
+    $suppress_required_fields_validation = $requires_validation && $request && $request->query->has(FormBuilderInterface::AJAX_FORM_REQUEST) && $request->query->has(FormBuilderInterface::AJAX_SKIP_REQUIRED_VALIDATION);
+
     // Validate the current input.
     if (!isset($elements['#validated']) || !$elements['#validated']) {
       // The following errors are always shown.
@@ -293,7 +299,7 @@ class FormValidator implements FormValidatorInterface {
       // #element_validate handlers changed any properties. If $is_empty_value
       // is defined, then above #required validation code ran, so the other
       // variables are also known to be defined and we can test them again.
-      if (isset($is_empty_value) && ($is_empty_multiple || $is_empty_string || $is_empty_value || $is_empty_null)) {
+      if (!$suppress_required_fields_validation && isset($is_empty_value) && ($is_empty_multiple || $is_empty_string || $is_empty_value || $is_empty_null)) {
         if (isset($elements['#required_error'])) {
           $form_state->setError($elements, $elements['#required_error']);
         }
