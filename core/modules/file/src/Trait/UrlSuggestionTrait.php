@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Drupal\file\Trait;
 
 use Drupal\Core\StringTranslation\StringTranslationTrait;
-use Drupal\file\FileUrlTypeOptions;
+use Drupal\file\FileUrlType;
 
 /**
  * Trait to provide sample items element for URL suggestions.
@@ -31,8 +31,8 @@ trait UrlSuggestionTrait {
       '#title' => $this->t('Show link as'),
       '#default_value' => $this->getSetting('show_link_as'),
       '#options' => [
-        FileUrlTypeOptions::Absolute->value => $this->t('Absolute URL'),
-        FileUrlTypeOptions::Relative->value => $this->t('Relative URL'),
+        FileUrlType::Absolute->value => $this->t('Absolute URL'),
+        FileUrlType::Relative->value => $this->t('Relative URL'),
       ],
     ];
     $form['absolute_url_suggestion'] = $this->absoluteUrlSuggestion();

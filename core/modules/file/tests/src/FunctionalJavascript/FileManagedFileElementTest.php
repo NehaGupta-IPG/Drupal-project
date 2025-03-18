@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\file\FunctionalJavascript;
 
-use Drupal\file\FileUrlTypeOptions;
+use Drupal\file\FileUrlType;
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
 use Drupal\Tests\file\Functional\FileFieldCreationTrait;
 use PHPUnit\Framework\Attributes\Group;
@@ -147,7 +147,7 @@ class FileManagedFileElementTest extends WebDriverTestBase {
     $page->pressButton("{$field_name}_settings_edit");
     $this->assertSession()->waitForElement('css', '.ajax-new-content');
     $edit = [
-      "fields[$field_name][settings_edit_form][settings][show_link_as]" => FileUrlTypeOptions::Absolute->value,
+      "fields[$field_name][settings_edit_form][settings][show_link_as]" => FileUrlType::Absolute->value,
     ];
     foreach ($edit as $name => $value) {
       $page->fillField($name, $value);
