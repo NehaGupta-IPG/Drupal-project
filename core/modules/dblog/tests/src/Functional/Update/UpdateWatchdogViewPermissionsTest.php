@@ -28,7 +28,7 @@ class UpdateWatchdogViewPermissionsTest extends UpdatePathTestBase {
     // is preferred.
     $this->databaseDumpFiles = [
       DRUPAL_ROOT . '/core/modules/system/tests/fixtures/update/drupal-10.3.0.filled.standard.php.gz',
-      __DIR__ . '../../fixtures/112002/dblog-112002-watchdog-permissions-change.php',
+      __DIR__ . '/../../fixtures/112002/dblog-112002-watchdog-permissions-change.php',
     ];
   }
 
