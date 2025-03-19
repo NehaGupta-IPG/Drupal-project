@@ -622,6 +622,8 @@ export default class DrupalImageEditing extends Plugin {
     }
 
     // Conversion.
+    // Intentionally not setting the height, as it causes layout
+    // issues, see https://www.drupal.org/project/drupal/issues/3514147
     conversion
       .for('upcast')
       .add(viewImageToModelImage(editor))
@@ -639,23 +641,6 @@ export default class DrupalImageEditing extends Plugin {
               return `${parseInt(viewElement.getAttribute('width'), 10)}px`;
             }
             return viewElement.getAttribute('width').trim();
-          },
-        },
-      })
-      // The height attribute to resizedHeight conversion.
-      .attributeToAttribute({
-        view: {
-          name: 'img',
-          key: 'height',
-        },
-        model: {
-          key: 'resizedHeight',
-          value: (viewElement) => {
-            // Support resizing using pixels and (the HTML 4.01-only) percentages.
-            if (isNumberString(viewElement.getAttribute('height'))) {
-              return `${parseInt(viewElement.getAttribute('height'), 10)}px`;
-            }
-            return viewElement.getAttribute('height').trim();
           },
         },
       });
