@@ -47,7 +47,10 @@ class ContentTranslationPermissionsTest extends KernelTestBase {
     $this->container->get('content_translation.manager')->setEnabled('entity_test_mul_with_bundle', 'test', TRUE);
     $permissions = $this->container->get('user.permissions')->getPermissions();
     $this->assertEquals(['entity_test'], $permissions['translate entity_test_mul']['dependencies']['module']);
-    $this->assertEquals(['entity_test.entity_test_mul_bundle.test', 'language.content_settings.entity_test_mul_with_bundle.test'], $permissions['translate test entity_test_mul_with_bundle']['dependencies']['config']);
+    $this->assertEquals([
+      'entity_test.entity_test_mul_bundle.test',
+      'language.content_settings.entity_test_mul_with_bundle.test',
+    ], $permissions['translate test entity_test_mul_with_bundle']['dependencies']['config']);
 
     // Ensure bundle permission granularity works for bundles not based on
     // configuration.
