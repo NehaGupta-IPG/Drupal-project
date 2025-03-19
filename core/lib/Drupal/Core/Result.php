@@ -15,18 +15,17 @@ namespace Drupal\Core;
  * Ok or Error state. PHPStan generic annotations can be used to indicate the
  * type of the value contained in the result in the Ok and Error cases.
  *
+ * @section example Example
  * As an example we can write a function that processes user input for a number
  * field and returns a result. The result's value will be an integer on success
  * but an error message on failure. The code for this would be the following:
  * @code
- * /**
- *  * \@param string $maybeInteger
- *  *   User input that might be a valid integer.
- *  *
- *  * \@return \Drupal\Core\Result<int, string>
- *  *   A Result that contains the integer value of the user input on success or
- *  *   an error message for the user in case of error.
- *  * /
+ * // * \@param string $maybeInteger
+ * // *   User input that might be a valid integer.
+ * // *
+ * // * \@return \Drupal\Core\Result<int, string>
+ * // *   A Result that contains the integer value of the user input on success
+ * // *   or an error message for the user in case of error.
  * function convert_to_integer(string $maybeInteger) : Result {
  *   // Check that we're dealing with a numeric type (either integer or float).
  *   if (is_numeric($maybeInteger)) {
@@ -48,8 +47,15 @@ namespace Drupal\Core;
  * );
  * @endcode
  *
+ * @section generics Generics
+ * The below section describes two generics that are used in the implementation
+ * to help type-check the returned value depending on the state. This is used by
+ * IDEs or static analyzers such as PHPStan and Psalm to understand the types.
+ * See https://phpstan.org/writing-php-code/phpdocs-basics#generics
+ *
  * @template OkT
  *   The type of the value contained in the result in case of success.
+ *
  * @template ErrorT
  *   The type of the value contained in the result in case of error.
  */
@@ -73,15 +79,15 @@ final class Result {
   /**
    * Create a result that indicated success.
    *
-   * @template T
-   *
    * @param T $value
    *   The value for the successful result.
    *
    * @return self<T, never>
    *   A result in the success state.
+   *
+   * @template T
    */
-  public static function ok($value) : self {
+  public static function ok($value): self {
     // The indirect assignment and @-var annotation are needed until
     // https://github.com/phpstan/phpstan/issues/6732
     // See https://github.com/phpstan/phpstan/discussions/10667.
@@ -93,15 +99,15 @@ final class Result {
   /**
    * Create a result that indicates an error.
    *
-   * @template T
-   *
    * @param T $value
    *   The value for the error result.
    *
    * @return self<never, T>
    *   A result in the error state.
+   *
+   * @template T
    */
-  public static function error($value) : self {
+  public static function error($value): self {
     // The indirect assignment and @-var annotation are needed until
     // https://github.com/phpstan/phpstan/issues/6732
     // See https://github.com/phpstan/phpstan/discussions/10667.
@@ -119,7 +125,7 @@ final class Result {
    * @phpstan-assert-if-true OkT $this->getValue()
    * @phpstan-assert-if-false ErrorT $this->getValue()
    */
-  public function isOk() : bool {
+  public function isOk(): bool {
     return $this->isOk;
   }
 
@@ -130,9 +136,10 @@ final class Result {
    *   Whether the result is an error.
    *
    * @phpstan-assert-if-true ErrorT $this->getValue()
+   *
    * @phpstan-assert-if-false OkT $this->getValue()
    */
-  public function isError() : bool {
+  public function isError(): bool {
     return !$this->isOk;
   }
 
