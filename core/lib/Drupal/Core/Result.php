@@ -15,15 +15,15 @@ namespace Drupal\Core;
  * Ok or Error state. PHPStan generic annotations can be used to indicate the
  * type of the value contained in the result in the Ok and Error cases.
  *
- * For example, to write a function that processes user input for a number field
- * and returns a result which contains an integer on success but holds an
- * error message on failure you could do the following:
- * ```
+ * As an example we can write a function that processes user input for a number
+ * field and returns a result. The result's value will be an integer on success
+ * but an error message on failure. The code for this would be the following:
+ * @code
  * /**
- *  * @param string $maybeInteger
+ *  * \@param string $maybeInteger
  *  *   User input that might be a valid integer.
  *  *
- *  * @return \Drupal\Core\Result<int, string>
+ *  * \@return \Drupal\Core\Result<int, string>
  *  *   A Result that contains the integer value of the user input on success or
  *  *   an error message for the user in case of error.
  *  * /
@@ -46,7 +46,7 @@ namespace Drupal\Core;
  *   fn ($maybeInteger) => convert_to_integer($maybeInteger),
  *   ["1", "not-an-int", "3.5", "6", "42"]
  * );
- * ```
+ * @endcode
  *
  * @template OkT
  *   The type of the value contained in the result in case of success.
