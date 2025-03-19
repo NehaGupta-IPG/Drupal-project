@@ -91,8 +91,9 @@ interface ContentTranslationMetadataWrapperInterface {
   /**
    * Returns the translation creation timestamp.
    *
-   * @return int
-   *   The UNIX timestamp of when the translation was created.
+   * @return int|null
+   *   The UNIX timestamp of when the translation was created, or NULL if
+   *   unknown.
    */
   public function getCreatedTime();
 

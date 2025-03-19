@@ -280,7 +280,10 @@ class User extends ContentEntityBase implements UserInterface {
    * {@inheritdoc}
    */
   public function getCreatedTime() {
-    return (int) $this->get('created')->value;
+    $value = $this->get('created')->value;
+    // @todo This method should not return NULL according to its documentation
+    // in UserInterface.
+    return isset($value) ? (int) $value : NULL;
   }
 
   /**

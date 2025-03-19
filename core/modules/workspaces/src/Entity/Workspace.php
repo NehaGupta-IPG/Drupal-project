@@ -132,7 +132,10 @@ class Workspace extends ContentEntityBase implements WorkspaceInterface {
    * {@inheritdoc}
    */
   public function getCreatedTime() {
-    return (int) $this->get('created')->value;
+    $value = $this->get('created')->value;
+    // @todo This method should not return NULL according to its documentation
+    // in WorkspaceInterface.
+    return isset($value) ? (int) $value : NULL;
   }
 
   /**

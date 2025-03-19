@@ -232,7 +232,10 @@ class Node extends EditorialContentEntityBase implements NodeInterface {
    * {@inheritdoc}
    */
   public function getCreatedTime() {
-    return (int) $this->get('created')->value;
+    $value = $this->get('created')->value;
+    // @todo This method should not return NULL according to its documentation
+    // in NodeInterface.
+    return isset($value) ? (int) $value : NULL;
   }
 
   /**
