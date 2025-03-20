@@ -15,8 +15,7 @@ class TaxonomyHelpHooks {
 
   use StringTranslationTrait;
 
-  public function __construct(protected ModuleHandlerInterface $moduleHandler) {
-  }
+  public function __construct(protected ModuleHandlerInterface $moduleHandler) {}
 
   /**
    * Implements hook_help().

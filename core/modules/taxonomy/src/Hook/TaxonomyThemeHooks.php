@@ -33,7 +33,11 @@ class TaxonomyThemeHooks {
    */
   #[Hook('theme')]
   public function taxonomyTheme($existing, $type, $theme, $path): array {
-    return ['taxonomy_term' => ['render element' => 'elements']];
+    return [
+      'taxonomy_term' => [
+        'render element' => 'elements',
+      ],
+    ];
   }
 
   /**
