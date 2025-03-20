@@ -141,6 +141,17 @@
         'form:not([method~="GET"])',
         onFormSubmit,
       );
+
+      // Binds a listener to clear stored form values from formSingleSubmit() when
+      // page is loaded from back/forward cache. This allows the form submission
+      // button to be used again instead of remaining disabled.
+      // Checking persisted does not work with jQuery on().
+      window.addEventListener('pageshow', (event) => {
+        if (event.persisted) {
+          $('form:not([method~="GET"])').removeAttr('data-drupal-form-submit-last');
+        }
+      });
+
     },
   };
 
@@ -332,15 +343,4 @@
     debouncedHandleFragmentLinkClickOrHashChange,
   );
 
-  /**
-   * Binds a listener to clear stored form values from formSingleSubmit() when
-   * page is loaded from back/forward cache. This allows the form submission
-   * button to be used again instead of remaining disabled.
-   * Checking persisted does not work with jQuery on().
-   */
-  window.addEventListener('pageshow', (e) => {
-    if (e.persisted) {
-      $('form:not([method~="GET"])').removeAttr('data-drupal-form-submit-last');
-    }
-  });
 })(jQuery, window, Drupal, Drupal.debounce);
