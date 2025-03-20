@@ -22,7 +22,7 @@
  * @event formFragmentLinkClickOrHashChange
  */
 
-(function ($, Drupal, debounce) {
+(function ($, window, Drupal, debounce) {
   /**
    * Retrieves the summary for the first element.
    *
@@ -343,4 +343,4 @@
       $('form:not([method~="GET"])').removeAttr('data-drupal-form-submit-last');
     }
   });
-})(jQuery, Drupal, Drupal.debounce);
+})(jQuery, window, Drupal, Drupal.debounce);
