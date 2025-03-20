@@ -11,7 +11,7 @@ use Drupal\Core\StringTranslation\StringTranslationTrait;
 /**
  * Help hook implementation for taxonomy().
  */
-class TaxonomyHelp {
+class TaxonomyHelpHooks {
 
   use StringTranslationTrait;
 

@@ -6,9 +6,9 @@ use Drupal\Core\Hook\Attribute\Hook;
 use Drupal\node\NodeInterface;
 
 /**
- * Hook implementations for taxonomy.
+ * Menu hook implementations for taxonomy.
  */
-class TaxonomyHooks {
+class TaxonomyMenuHooks {
 
   /**
    * Implements hook_local_tasks_alter().
