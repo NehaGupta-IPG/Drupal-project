@@ -29,6 +29,9 @@ class TaxonomyEntityHooks {
 
   /**
    * Returns the module configuration object.
+   *
+   * @return \Drupal\Core\Config\Config|\Drupal\Core\Config\ImmutableConfig
+   *   The module configuration object.
    */
   protected function getConfig() {
     if ($this->configFactory === NULL) {
