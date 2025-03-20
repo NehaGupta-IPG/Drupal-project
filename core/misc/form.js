@@ -148,10 +148,11 @@
       // Checking persisted does not work with jQuery on().
       window.addEventListener('pageshow', (event) => {
         if (event.persisted) {
-          $('form:not([method~="GET"])').removeAttr('data-drupal-form-submit-last');
+          $('form:not([method~="GET"])').removeAttr(
+            'data-drupal-form-submit-last',
+          );
         }
       });
-
     },
   };
 
@@ -342,5 +343,4 @@
     'a[href*="#"]',
     debouncedHandleFragmentLinkClickOrHashChange,
   );
-
 })(jQuery, window, Drupal, Drupal.debounce);
