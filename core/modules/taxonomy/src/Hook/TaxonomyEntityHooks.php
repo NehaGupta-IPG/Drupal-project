@@ -18,10 +18,10 @@ use Drupal\Core\Url;
  */
 class TaxonomyEntityHooks {
 
-  use stringTranslationTrait;
+  use StringTranslationTrait;
 
   public function __construct(
-    protected configFactoryInterface $config,
+    protected ConfigFactoryInterface $configFactory,
     protected Connection $database,
     protected EntityTypeManagerInterface $entityTypeManager,
   ) {
@@ -29,16 +29,13 @@ class TaxonomyEntityHooks {
 
   /**
    * Returns the module configuration object.
-   *
-   * @return \Drupal\Core\Config\Config|\Drupal\Core\Config\ImmutableConfig
-   *   The module configuration object.
    */
   protected function getConfig() {
-    if ($this->config === NULL) {
+    if ($this->configFactory === NULL) {
       // Get module config.
-      $this->config = $this->config->get('taxonomy.settings');
+      $this->configFactory = $this->configFactory->get('taxonomy.settings');
     }
-    return $this->config;
+    return $this->configFactory;
   }
 
   /**
