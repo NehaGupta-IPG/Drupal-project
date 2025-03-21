@@ -47,7 +47,7 @@ class Message {
 
   /**
    * Retrieves the message text for the current event.
-  */
+   */
   public function getText() {
     if ($this->messageText) {
       return $this->messageText;

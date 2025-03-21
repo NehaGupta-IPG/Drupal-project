@@ -48,6 +48,9 @@ class Rss extends RssPluginBase {
    */
   protected $entityTypeId = 'comment';
 
+  /**
+   * {@inheritdoc}
+   */
   public function preRender($result) {
     $cids = [];
 
