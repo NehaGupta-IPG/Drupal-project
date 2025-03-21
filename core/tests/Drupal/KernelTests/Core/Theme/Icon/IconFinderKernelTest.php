@@ -118,7 +118,7 @@ class IconFinderKernelTest extends KernelTestBase {
     $base_path_test = ['/', '/foo/', '/foo/bar/'];
 
     foreach ($base_path_test as $base_path) {
-      // @todo Remove or adapt as part of https://www.example.com/node/2529170.
+      // @todo Remove or adapt as part of https://www.drupal.org/node/2529170.
       $GLOBALS['base_path'] = $base_path;
 
       $result = $this->iconFinder->getFilesFromSources(

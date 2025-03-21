@@ -852,7 +852,7 @@ class IconFinderTest extends UnitTestCase {
 
 }
 
-// @todo Remove as part of https://www.example.com/node/2529170.
+// @todo Remove as part of https://www.drupal.org/node/2529170.
 namespace Drupal\Core\Theme\Icon;
 
 if (!function_exists('base_path')) {
