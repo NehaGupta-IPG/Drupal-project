@@ -29,7 +29,7 @@ class TaxonomyEntityHooks {
 
   /**
    * Returns the maintain_index_table configuration value.
-   * 
+   *
    * @return bool
    *   Whether or not the index table should be maintained.
    */
