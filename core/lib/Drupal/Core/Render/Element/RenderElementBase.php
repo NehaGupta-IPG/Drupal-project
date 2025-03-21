@@ -433,7 +433,7 @@ abstract class RenderElementBase extends PluginBase implements ElementInterface 
       }
 
       // Set default values for progress' screen reader properties.
-      // The 'announce' property determines if screenreaders should announce
+      // The 'announce' property determines if screen readers should announce
       // progress for this operation.
       // The 'announceDelay' property is how many milliseconds must pass before
       // AJAX progress is announced by a screen reader. This prevents announcing

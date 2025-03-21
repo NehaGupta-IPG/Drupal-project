@@ -925,7 +925,7 @@
 
       // To avoid very fast AJAX operations from being announced, wait for the
       // duration of the announceDelay property (1 second by default) before
-      // announcing progress to screenreaders.
+      // announcing progress to screen readers.
       const delay = this.progress.announceDelay || 1000;
       setTimeout(() => {
         // Note that the disabling of $(this.element) is a pre-existing
