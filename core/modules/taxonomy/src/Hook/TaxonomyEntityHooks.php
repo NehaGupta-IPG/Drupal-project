@@ -28,17 +28,11 @@ class TaxonomyEntityHooks {
   }
 
   /**
-   * Returns the module configuration object.
-   *
-   * @return \Drupal\Core\Config\Config|\Drupal\Core\Config\ImmutableConfig
-   *   The module configuration object.
+   * Returns the maintain_index_table configuration value.
    */
-  protected function getConfig() {
-    if ($this->configFactory === NULL) {
-      // Get module config.
-      $this->configFactory = $this->configFactory->get('taxonomy.settings');
-    }
-    return $this->configFactory;
+  protected function shouldMaintainIndexTable(): boolean {
+    $taxonomy_config = $this->configFactory->get('taxonomy.settings');
+    return $taxonomy_config->get('maintain_index_table');
   }
 
   /**
@@ -53,7 +47,7 @@ class TaxonomyEntityHooks {
   protected function buildNodeIndex(NodeInterface $node): void {
     // We maintain a denormalized table of term/node relationships, containing
     // only data for current, published nodes.
-    if (!$this->getConfig()->get('maintain_index_table') || !($this->entityTypeManager->getStorage('node') instanceof SqlContentEntityStorage)) {
+    if (!$this->shouldMaintainIndexTable() || !($this->entityTypeManager->getStorage('node') instanceof SqlContentEntityStorage)) {
       return;
     }
 
@@ -97,7 +91,7 @@ class TaxonomyEntityHooks {
    *   The node entity.
    */
   protected function deleteNodeIndex(NodeInterface $node): void {
-    if ($this->getConfig()->get('maintain_index_table')) {
+    if ($this->shouldMaintainIndexTable()) {
       $this->database->delete('taxonomy_index')->condition('nid', $node->id())->execute();
     }
   }
@@ -179,7 +173,7 @@ class TaxonomyEntityHooks {
    */
   #[Hook('taxonomy_term_delete')]
   public function taxonomyTermDelete(Term $term): void {
-    if ($this->getConfig()->get('maintain_index_table')) {
+    if ($this->shouldMaintainIndexTable()) {
       // Clean up the {taxonomy_index} table when terms are deleted.
       $this->database->delete('taxonomy_index')->condition('tid', $term->id())->execute();
     }
