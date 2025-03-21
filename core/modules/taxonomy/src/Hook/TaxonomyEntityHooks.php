@@ -30,7 +30,7 @@ class TaxonomyEntityHooks {
   /**
    * Returns the maintain_index_table configuration value.
    */
-  protected function shouldMaintainIndexTable(): boolean {
+  protected function shouldMaintainIndexTable(): bool {
     $taxonomy_config = $this->configFactory->get('taxonomy.settings');
     return $taxonomy_config->get('maintain_index_table');
   }
