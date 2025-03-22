@@ -2,7 +2,6 @@
 
 namespace Drupal\Core\Template;
 
-use Drupal\Component\Render\PlainTextOutput;
 use Drupal\Component\Render\MarkupInterface;
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Serialization\Attribute\JsonSchema;
