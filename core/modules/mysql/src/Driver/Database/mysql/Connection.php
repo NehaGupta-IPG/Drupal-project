@@ -132,9 +132,9 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
     $connection_options['pdo'] += [
       Mysql::ATTR_FOUND_ROWS => TRUE,
     ];
-    // Because MySQL's prepared statements skip the query cache.
+    // Native prepares are more secure.
     $connection_options['pdo'] += [
-      \PDO::ATTR_EMULATE_PREPARES => TRUE,
+      \PDO::ATTR_EMULATE_PREPARES => FALSE,
     ];
     // Limit SQL to a single statement like mysqli.
     $connection_options['pdo'] += [
