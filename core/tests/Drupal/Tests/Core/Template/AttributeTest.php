@@ -564,6 +564,8 @@ class AttributeTest extends UnitTestCase {
    * Provides tests data for testAttributesWithUrls().
    *
    * @return array
+   *   An array of test data each containing an initial attribute
+   *   and an expected attribute array after XSS sanitization.
    */
   public static function providerTestAttributesWithUrls(): array {
     $data = [];

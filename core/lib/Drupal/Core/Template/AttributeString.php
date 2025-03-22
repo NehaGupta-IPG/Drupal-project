@@ -5,6 +5,7 @@ namespace Drupal\Core\Template;
 use Drupal\Component\Render\MarkupInterface;
 use Drupal\Component\Utility\Html;
 use Drupal\Component\Utility\UrlHelper;
+use Drupal\Component\Utility\Xss;
 
 /**
  * A class that represents most standard HTML attributes.
@@ -32,23 +33,7 @@ class AttributeString extends AttributeValueBase {
     if ($this->value instanceof MarkupInterface) {
       return (string) $this->value;
     }
-    elseif (str_starts_with($this->name, 'data-') || in_array($this->name, [
-          'title',
-          'alt',
-          'value',
-          'name',
-          'property',
-          'typeof',
-          'rel',
-          'about',
-          'content',
-          'datatype',
-          'datatype_callback',
-          'datetime',
-          'mailto',
-          'media',
-          'sizes',
-        ])) {
+    elseif (str_starts_with($this->name, 'data-') || in_array($this->name, Xss::getSkipProtocolFilteringAttributes())) {
       return Html::escape((string) $this->value);
     }
     else {

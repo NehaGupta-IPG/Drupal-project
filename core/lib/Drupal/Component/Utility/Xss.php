@@ -109,6 +109,26 @@ class Xss {
   protected static $htmlTags = ['a', 'em', 'strong', 'cite', 'blockquote', 'code', 'ul', 'ol', 'li', 'dl', 'dt', 'dd'];
 
   /**
+   * The list of HTML attributes for which we skip protocol filtering.
+   *
+   * @var string[]
+   */
+  protected static array $skipProtocolFilteringAttributes = [
+    'alt',
+    'aria-label',
+    'class',
+    'datetime',
+    'media',
+    'name',
+    'property',
+    'rel',
+    'sizes',
+    'style',
+    'title',
+    'value',
+  ];
+
+  /**
    * Filters HTML to prevent cross-site-scripting (XSS) vulnerabilities.
    *
    * Based on kses by Ulf Harnhammar, see http://sourceforge.net/projects/kses.
@@ -313,14 +333,7 @@ class Xss {
             // such attributes.
             // @see \Drupal\Component\Utility\UrlHelper::filterBadProtocol()
             // @see https://www.w3.org/TR/html4/index/attributes.html
-            $skip_protocol_filtering = str_starts_with($attribute_name, 'data-') || in_array($attribute_name, [
-              'title',
-              'alt',
-              'rel',
-              'property',
-              'class',
-              'datetime',
-            ], TRUE);
+            $skip_protocol_filtering = str_starts_with($attribute_name, 'data-') || in_array($attribute_name, static::getSkipProtocolFilteringAttributes());
 
             $working = $mode = 1;
             $attributes = preg_replace('/^[-a-zA-Z][-a-zA-Z0-9]*/', '', $attributes);
@@ -440,6 +453,17 @@ class Xss {
    */
   public static function getHtmlTagList() {
     return static::$htmlTags;
+  }
+
+  /**
+   * Gets the list of HTML attributes for which we skip protocol filtering.
+   *
+   * @return string[]
+   *   The list of HTML attributes for which
+   *   we skip dangerous protocol filtering.
+   */
+  public static function getSkipProtocolFilteringAttributes(): array {
+    return static::$skipProtocolFilteringAttributes;
   }
 
 }
