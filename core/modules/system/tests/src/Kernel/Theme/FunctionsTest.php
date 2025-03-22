@@ -10,7 +10,6 @@ use Drupal\Component\Utility\Html;
 use Drupal\Core\Render\Element\Link;
 use Drupal\Core\Render\Markup;
 use Drupal\Core\Session\UserSession;
-use Drupal\Core\Template\AttributeString;
 use Drupal\Core\Url;
 use Drupal\KernelTests\KernelTestBase;
 use PHPUnit\Framework\Attributes\Group;
@@ -524,7 +523,7 @@ class FunctionsTest extends KernelTestBase {
   public function testImage(): void {
     // Test that data URIs work with theme_image().
     $variables = [];
-    $variables['uri'] = new AttributeString('src', Markup::create('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAHElEQVQI12P4//8/w38GIAXDIBKE0DHxgljNBAAO9TXL0Y4OHwAAAABJRU5ErkJggg=='));
+    $variables['uri'] = Markup::create('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAHElEQVQI12P4//8/w38GIAXDIBKE0DHxgljNBAAO9TXL0Y4OHwAAAABJRU5ErkJggg==');
     $variables['alt'] = 'Data URI image of a red dot';
     $expected = '<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAHElEQVQI12P4//8/w38GIAXDIBKE0DHxgljNBAAO9TXL0Y4OHwAAAABJRU5ErkJggg==" alt="Data URI image of a red dot" />' . "\n";
     $this->assertThemeOutput('image', $variables, $expected);
