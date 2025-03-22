@@ -376,10 +376,10 @@ class AttributeTest extends UnitTestCase {
     $data = [];
 
     $string = '"> <script>alert(123)</script>"';
-    $data['safe-object-xss1'] = [['title' => Markup::create($string)], ' title="&quot;&gt; &lt;script&gt;alert(123)&lt;/script&gt;&quot;"'];
+    $data['safe-object-xss1'] = [['title' => Markup::create($string)], ' title="&quot;&gt; alert(123)&quot;"'];
     $data['non-safe-object-xss1'] = [['title' => $string], ' title="' . Html::escape($string) . '"'];
     $string = '&quot;><script>alert(123)</script>';
-    $data['safe-object-xss2'] = [['title' => Markup::create($string)], ' title="&amp;quot;&gt;&lt;script&gt;alert(123)&lt;/script&gt;"'];
+    $data['safe-object-xss2'] = [['title' => Markup::create($string)], ' title="&quot;&gt;alert(123)"'];
     $data['non-safe-object-xss2'] = [['title' => $string], ' title="' . Html::escape($string) . '"'];
 
     // \Twig\Markup objects are generated when using twig defined variables
@@ -616,9 +616,10 @@ class AttributeTest extends UnitTestCase {
       ' href="' . Html::escape($already_escaped) . '"',
     ];
 
+    // Removing dangerous URLs inside CSS is not the role of stripDangerousProtocols().
     $data['xss-in-style'] = [
       ['style' => 'list-style-image: url(javascript:alert(0))'],
-      ' style="alert(0))"',
+      ' style="list-style-image: url(javascript:alert(0))"',
     ];
 
     // Ensure mailto: protocol passes through.

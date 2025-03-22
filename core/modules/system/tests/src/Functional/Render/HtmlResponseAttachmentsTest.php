@@ -119,11 +119,11 @@ class HtmlResponseAttachmentsTest extends BrowserTestBase {
    */
   protected function assertFeed(): void {
     // Discover the DOM element for the feed link.
-    $test_meta = $this->xpath('//head/link[@href="test://url"]');
+    $test_meta = $this->xpath('//head/link[@href="https://example.com/"]');
     $this->assertCount(1, $test_meta, 'Link has URL.');
     // Reconcile the other attributes.
     $test_meta_attributes = [
-      'href' => 'test://url',
+      'href' => 'https://example.com/',
       'rel' => 'alternate',
       'type' => 'application/rss+xml',
       'title' => 'Your RSS feed.',

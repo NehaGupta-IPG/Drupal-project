@@ -67,7 +67,7 @@ class RenderAttachedTestController {
    */
   public function feed() {
     $render = [];
-    $render['#attached']['feed'][] = ['test://url', 'Your RSS feed.'];
+    $render['#attached']['feed'][] = ['https://example.com/', 'Your RSS feed.'];
     return $render;
   }
 

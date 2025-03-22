@@ -141,7 +141,7 @@ class BareHtmlPageRenderer implements BareHtmlPageRendererInterface {
         '#tag' => 'meta',
         '#attributes' => [
           'name' => 'Generator',
-          'content' => 'Drupal ' . $version . ' (https://www.drupal.org)',
+          'content' => Markup::create('Drupal ' . $version . ' (https://www.drupal.org)'),
         ],
       ],
       // Attach default mobile meta tags for responsive design.

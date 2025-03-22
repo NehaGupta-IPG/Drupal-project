@@ -3,6 +3,7 @@
 namespace Drupal\Core\Template;
 
 use Drupal\Component\Render\MarkupInterface;
+use Drupal\Component\Render\PlainTextOutput;
 use Drupal\Component\Utility\Html;
 use Drupal\Component\Utility\UrlHelper;
 use Drupal\Component\Utility\Xss;
@@ -30,7 +31,10 @@ class AttributeString extends AttributeValueBase {
   public function __toString() {
     // Whitelist 'title', 'alt', and all data- attributes.
     // @see Xss::attributes()
-    if ($this->value instanceof MarkupInterface || str_starts_with($this->name, 'data-') || in_array($this->name, Xss::getSkipProtocolFilteringAttributes())) {
+    if ($this->value instanceof MarkupInterface) {
+      return Html::escape(PlainTextOutput::renderFromHtml($this->value));
+    }
+    elseif (str_starts_with($this->name, 'data-') || in_array($this->name, Xss::getSkipProtocolFilteringAttributes())) {
       return Html::escape((string) $this->value);
     }
     else {
