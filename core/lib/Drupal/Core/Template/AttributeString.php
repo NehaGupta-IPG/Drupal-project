@@ -30,10 +30,7 @@ class AttributeString extends AttributeValueBase {
   public function __toString() {
     // Whitelist 'title', 'alt', and all data- attributes.
     // @see Xss::attributes()
-    if ($this->value instanceof MarkupInterface) {
-      return (string) $this->value;
-    }
-    elseif (str_starts_with($this->name, 'data-') || in_array($this->name, Xss::getSkipProtocolFilteringAttributes())) {
+    if ($this->value instanceof MarkupInterface || str_starts_with($this->name, 'data-') || in_array($this->name, Xss::getSkipProtocolFilteringAttributes())) {
       return Html::escape((string) $this->value);
     }
     else {
