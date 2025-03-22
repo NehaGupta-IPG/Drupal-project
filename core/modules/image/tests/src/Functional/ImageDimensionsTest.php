@@ -227,14 +227,19 @@ class ImageDimensionsTest extends BrowserTestBase {
 
     $effect_id = $style->addImageEffect($effect);
     $style->save();
-    $this->assertEquals('<img src="' . $url . '" width="41" height="41" alt="" class="image-style-test" />', $this->getImageTag($variables));
+    $this->assertEquals('<img src="' . $url . '" width="41" height="41" alt="" loading="lazy" />', $this->getImageTag($variables));
     $this->assertFileDoesNotExist($generated_uri);
     $this->drupalGet($this->getAbsoluteUrl($url));
     $this->assertSession()->statusCodeEquals(200);
     $this->assertFileExists($generated_uri);
     $image_file = $image_factory->get($generated_uri);
-    $this->assertEquals(41, $image_file->getWidth());
-    $this->assertEquals(41, $image_file->getHeight());
+    // Different versions of the GD library bundled or linked in PHP provide
+    // slightly different results for the image rotation function, so we can
+    // not do an exact match check here. We tolerate a max difference of two
+    // pixels.
+    // @see https://www.drupal.org/project/drupal/issues/2921123
+    $this->assertLessThanOrEqual(2, abs(41 - $image_file->getWidth()));
+    $this->assertLessThanOrEqual(2, abs(41 - $image_file->getHeight()));
 
     $effect_plugin = $style->getEffect($effect_id);
     $style->deleteImageEffect($effect_plugin);
