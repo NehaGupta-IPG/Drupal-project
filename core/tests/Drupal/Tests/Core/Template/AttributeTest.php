@@ -6,6 +6,7 @@ namespace Drupal\Tests\Core\Template;
 
 use Drupal\Component\Render\MarkupInterface;
 use Drupal\Component\Utility\Html;
+use Drupal\Component\Utility\UrlHelper;
 use Drupal\Core\Render\Markup;
 use Drupal\Core\Template\Attribute;
 use Drupal\Core\Template\AttributeArray;
@@ -547,6 +548,88 @@ class AttributeTest extends UnitTestCase {
     $attributes = new Attribute(['class' => ['example-class']]);
     $this->expectException(\TypeError::class);
     $attributes->merge('not an array');
+  }
+
+  /**
+   * @dataProvider providerTestAttributesWithUrls
+   */
+  public function testAttributesWithUrls($attributes, $expected_output): void {
+    UrlHelper::setAllowedProtocols(['http', 'https', 'mailto']);
+    $attribute = new Attribute($attributes);
+
+    $this->assertEquals($expected_output, $attribute->__toString());
+  }
+
+  /**
+   * Provides tests data for testAttributesWithUrls().
+   *
+   * @return array
+   */
+  public static function providerTestAttributesWithUrls(): array {
+    $data = [];
+    $data['normal-external-url'] = [
+      ['href' => "http://example.com/foo"],
+      ' href="http://example.com/foo"',
+    ];
+    $data['url-with-query-string-fragment'] = [
+      ['href' => "http://example.com/com?foo=bar#baz;&lt"],
+      ' href="http://example.com/com?foo=bar#baz;&amp;lt"',
+    ];
+
+    $data['data-value'] = [
+      ['data-example' => 'http://example.com/foo'],
+      ' data-example="http://example.com/foo"',
+    ];
+    $data['data-xss-value'] = [
+      ['data-example' => "javascript:alert('xss');"],
+      ' data-example="' . Html::escape("javascript:alert('xss');") . '"',
+    ];
+
+    $escaped = Html::escape("alert('xss');");
+    $data['xss-scheme-href'] = [
+      ['href' => "javascript:alert('xss');"],
+      ' href="' . $escaped . '"',
+    ];
+    $data['xss-scheme-src'] = [
+      ['src' => "javascript:alert('xss');"],
+      ' src="' . $escaped . '"',
+    ];
+    $data['xss-scheme-dynsrc'] = [
+      ['dynsrc' => "javascript:alert('xss');"],
+      ' dynsrc="' . $escaped . '"',
+    ];
+    $data['xss-scheme-background'] = [
+      ['background' => "javascript:alert('xss');"],
+      ' background="' . $escaped . '"',
+    ];
+    $data['xss-scheme-src-case'] = [
+      ['src' => "jaVaSCriPt:alert('xss');"],
+      ' src="' . $escaped . '"',
+    ];
+
+    $already_escaped = '&lt;script defer&gt;alert(0)&lt;/script&gt;';
+    $data['xss-already-escaped'] = [
+      ['href' => $already_escaped],
+      ' href="' . Html::escape($already_escaped) . '"',
+    ];
+
+    $data['xss-in-style'] = [
+      ['style' => 'list-style-image: url(javascript:alert(0))'],
+      ' style="alert(0))"',
+    ];
+
+    // Ensure mailto: protocol passes through.
+    $data['mailto'] = [
+      ['href' => 'mailto:me@example.com'],
+      ' href="mailto:me@example.com"',
+    ];
+    // Ensure people don't try to work around escaping quotes.
+    $data['javascript'] = [
+      ['href' => 'javascript:alert(String.fromCharCode(88,83,83))'],
+      ' href="alert(String.fromCharCode(88,83,83))"',
+    ];
+
+    return $data;
   }
 
 }
