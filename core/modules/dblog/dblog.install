@@ -141,7 +141,7 @@ function dblog_update_112001(&$sandbox): void {
  */
 function dblog_update_112002(&$sandbox): void {
   // Load the Watchdog view.
-  $watchdog_view = View::load('watchdog');
+  $watchdog_view = View::load('watchdog')->getExecutable();
 
   if ($watchdog_view instanceof ViewExecutable) {
     // Get the permission used on the default display.
@@ -151,13 +151,15 @@ function dblog_update_112002(&$sandbox): void {
 
     if ($current_perm == 'access site reports') {
       // Set the permission on the default display to 'access dblog reports' if
-      // the permission is currently the old default, 'access site reports'.
-      $watchdog_view->getDisplay('default')->setOption('access', [
-        'type' => 'perm',
-        'options' => [
-          'perm' => 'access dblog reports',
-        ],
-      ]);
+      // the permission is currently the old default ('access site reports').
+      $watchdog_view
+        ->getDisplay('default')
+        ->setOption('access', [
+          'type' => 'perm',
+          'options' => [
+            'perm' => 'access dblog reports',
+          ],
+        ]);
 
       // Save the view.
       $watchdog_view->save();
