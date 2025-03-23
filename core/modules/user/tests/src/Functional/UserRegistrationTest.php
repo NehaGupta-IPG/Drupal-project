@@ -454,15 +454,15 @@ class UserRegistrationTest extends BrowserTestBase {
     $this->assertSession()->pageTextContains('This value contains characters that are not allowed by the current restriction-level.');
 
     // Only Cyrillic characters on a Russian website.
-    $russionLanguage = ConfigurableLanguage::createFromLangcode('ru');
-    $russionLanguage->save();
+    $russianLanguage = ConfigurableLanguage::createFromLangcode('ru');
+    $russianLanguage->save();
     $this->drupalGet('user/register');
     $this->submitForm($edit, 'Create new account');
     $this->assertSession()->pageTextNotContains('This value contains characters that are not allowed by the current restriction-level.');
 
     // Different numbering systems.
-    $russionLanguage = ConfigurableLanguage::createFromLangcode('bn');
-    $russionLanguage->save();
+    $bengaliLanguage = ConfigurableLanguage::createFromLangcode('bn');
+    $bengaliLanguage->save();
     $edit = ['mail' => 'test@example.com', 'name' => '8৪'];
     $this->drupalGet('user/register');
     $this->submitForm($edit, 'Create new account');
