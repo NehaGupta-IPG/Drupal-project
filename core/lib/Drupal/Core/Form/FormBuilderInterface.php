@@ -94,7 +94,8 @@ interface FormBuilderInterface {
   /**
    * Checks the form to see if any of the fields are required.
    *
-   * If there is a required field it adds a text explaining what the asterisk means.
+   * If there is a required field
+   * it adds a text explaining what the asterisk means.
    *
    * @param string $form_id
    *   The unique string identifying the desired form.
