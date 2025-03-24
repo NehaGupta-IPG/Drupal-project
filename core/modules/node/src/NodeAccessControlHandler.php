@@ -92,7 +92,7 @@ class NodeAccessControlHandler extends EntityAccessControlHandler implements Nod
     $account = $this->prepareUser($account);
 
     // You cannot delete an unsaved entity.
-    if ($operation === 'delete' && $entity && $entity->isNew()) {
+    if ($operation === 'delete' && $entity->isNew()) {
       $result = AccessResult::forbidden();
       $result->addCacheableDependency($entity);
       return $return_as_object ? $result : $result->isAllowed();
