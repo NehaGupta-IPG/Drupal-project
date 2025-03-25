@@ -237,7 +237,7 @@ class NodeEditFormTest extends NodeTestBase {
 
     $node = $this->drupalGetNodeByTitle($edit['title[0][value]']);
     $this->drupalGet("node/" . $node->id() . "/edit");
-    $this->assertSession()->pageTextNotContains('Published');
+    $this->assertSession()->elementNotExists('css', '#edit-meta-published');
     $this->assertSession()->pageTextNotContains($this->container->get('date.formatter')->format($node->getChangedTime(), 'short'));
 
     // Check that users with the 'administer nodes' permission can see the meta
@@ -253,7 +253,7 @@ class NodeEditFormTest extends NodeTestBase {
 
     $node = $this->drupalGetNodeByTitle($edit['title[0][value]']);
     $this->drupalGet("node/" . $node->id() . "/edit");
-    $this->assertSession()->pageTextContains('Published');
+    $this->assertSession()->elementExists('css', '#edit-meta-published');
     $this->assertSession()->pageTextContains($this->container->get('date.formatter')->format($node->getChangedTime(), 'short'));
   }
 
