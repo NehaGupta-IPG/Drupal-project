@@ -20,12 +20,10 @@ function block_content_update_last_removed(): int {
  */
 function block_content_update_11000(): void {
   $entityDefinitionUpdateManager = \Drupal::entityDefinitionUpdateManager();
-  $entityType = $entityDefinitionUpdateManager->getEntityType('block_content');
 
   $storage_definition = BaseFieldDefinition::create('entity_reference')
     ->setLabel(new TranslatableMarkup('User ID'))
     ->setSetting('target_type', 'user')
-    ->setTranslatable($entityType->isTranslatable());
-  $entityDefinitionUpdateManager
-    ->installFieldStorageDefinition('uid', 'block_content', 'block_content', $storage_definition);
+    ->setTranslatable(TRUE);
+  $entityDefinitionUpdateManager->installFieldStorageDefinition('uid', 'block_content', 'block_content', $storage_definition);
 }
