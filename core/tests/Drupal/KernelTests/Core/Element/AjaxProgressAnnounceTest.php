@@ -22,7 +22,7 @@ class AjaxProgressAnnounceTest extends KernelTestBase {
   /**
    * Tests default progress settings for screen reader announcements.
    */
-  public function testAjaxProgressAnnounceDefaults() {
+  public function testAjaxProgressAnnounceDefaults(): void {
     $element = [
       '#id' => 'ajax-progress-test',
       '#type' => 'submit',
