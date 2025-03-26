@@ -18,3 +18,4 @@ services:
     arguments: ['@config.factory', '@database', '@entity_type.manager']
     tags:
       - { name: 'node_index'}
+  Drupal\taxonomy\NodeIndex: '@taxonomy.node_index'
