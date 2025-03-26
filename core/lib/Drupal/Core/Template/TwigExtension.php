@@ -776,6 +776,18 @@ class TwigExtension extends AbstractExtension {
    *   The element with the given class(es) in attributes.
    */
   public function addClass(array $element, ...$classes): array {
+    if (!\is_array($element)) {
+      return $element;
+    }
+    if (\array_is_list($element)) {
+      foreach ($element as $index => $item) {
+        if (!\is_array($item)) {
+          continue;
+        }
+        $element[$index] = $this->addClass($item, ...$classes);
+      }
+      return $element;
+    }
     $attributes = new Attribute($element['#attributes'] ?? []);
     $attributes->addClass(...$classes);
     $element['#attributes'] = $attributes->toArray();
