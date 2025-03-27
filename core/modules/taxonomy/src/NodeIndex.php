@@ -16,7 +16,8 @@ class NodeIndex {
   public function __construct(
     protected readonly ConfigFactoryInterface $configFactory,
     protected readonly Connection $database,
-    protected readonly EntityTypeManagerInterface $entityTypeManager) {}
+    protected readonly EntityTypeManagerInterface $entityTypeManager,
+  ) {}
 
   /**
    * Returns the maintain_index_table configuration value.
