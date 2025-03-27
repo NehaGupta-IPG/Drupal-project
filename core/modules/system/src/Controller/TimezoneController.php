@@ -36,7 +36,7 @@ class TimezoneController {
     // Out of bounds check for offset. Offset +/- UTC is typically no
     // smaller/larger than -12/+14.
     if ($offset < -60000 || $offset > 60000) {
-      return new CacheableJsonResponse(FALSE)->addCacheableDependency($cacheable_metadata);
+      return (new CacheableJsonResponse(FALSE))->addCacheableDependency($cacheable_metadata);
     }
 
     if (isset($is_daylight_saving_time)) {
@@ -44,7 +44,7 @@ class TimezoneController {
       $is_daylight_saving_time = min(1, max(-1, intval($is_daylight_saving_time)));
       // Catch if out of boundary.
       if ($original !== $is_daylight_saving_time) {
-        return new CacheableJsonResponse(FALSE)->addCacheableDependency($cacheable_metadata);
+        return (new CacheableJsonResponse(FALSE))->addCacheableDependency($cacheable_metadata);
       }
     }
     else {
@@ -57,7 +57,7 @@ class TimezoneController {
     // interpreted as the empty string.
     $abbreviation = $abbreviation ?: '';
     $timezone = timezone_name_from_abbr($abbreviation, $offset, $is_daylight_saving_time);
-    return new CacheableJsonResponse($timezone)->addCacheableDependency($cacheable_metadata);
+    return (new CacheableJsonResponse($timezone))->addCacheableDependency($cacheable_metadata);
   }
 
 }
