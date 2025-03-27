@@ -3,11 +3,11 @@
 namespace Drupal\Core\Render\Element;
 
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Component\Render\MarkupInterface;
 use Drupal\Core\Render\Component\Exception\InvalidComponentDataException;
 use Drupal\Core\Render\Attribute\FormElement;
 use Drupal\Core\Render\Element;
 use Drupal\Core\Security\DoTrustedCallbackTrait;
-use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Template\Attribute;
 
 /**
@@ -142,7 +142,7 @@ class ComponentElement extends RenderElementBase implements FormElementInterface
           "#plain_text" => (string) $slot_value,
         ];
       }
-      if ($slot_value instanceof TranslatableMarkup) {
+      if ($slot_value instanceof MarkupInterface) {
         $slot_value = [
           "#markup" => $slot_value,
         ];
