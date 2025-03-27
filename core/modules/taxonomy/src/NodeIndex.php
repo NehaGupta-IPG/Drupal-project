@@ -13,42 +13,10 @@ use Drupal\node\NodeInterface;
  */
 class NodeIndex {
 
-  /**
-   * The database connection.
-   *
-   * @var \Drupal\Core\Database\Connection
-   */
-  protected $database;
-
-  /**
-   * The config factory.
-   *
-   * @var \Drupal\Core\Config\ConfigFactoryInterface
-   */
-  protected $configFactory;
-
-  /**
-   * The entity type manager.
-   *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
-   */
-  protected $entityTypeManager;
-
-  /**
-   * Constructs the NodeIndex.
-   *
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
-   *   The config factory.
-   * @param \Drupal\Core\Database\Connection $database
-   *   The database connection.
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
-   *   The entity type manager.
-   */
-  public function __construct(ConfigFactoryInterface $config_factory, Connection $database, EntityTypeManagerInterface $entity_type_manager) {
-    $this->configFactory = $config_factory;
-    $this->database = $database;
-    $this->entityTypeManager = $entity_type_manager;
-  }
+  public function __construct(
+    protected readonly ConfigFactoryInterface $configFactory,
+    protected readonly Connection $database,
+    protected readonly EntityTypeManagerInterface $entityTypeManager) {}
 
   /**
    * Returns the maintain_index_table configuration value.

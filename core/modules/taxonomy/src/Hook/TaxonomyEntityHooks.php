@@ -3,6 +3,7 @@
 namespace Drupal\taxonomy\Hook;
 
 use Drupal\taxonomy\Entity\Term;
+use Drupal\taxonomy\NodeIndex;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Database\Connection;
 use Drupal\Core\Hook\Attribute\Hook;
@@ -22,8 +23,8 @@ class TaxonomyEntityHooks {
     protected ConfigFactoryInterface $configFactory,
     protected Connection $database,
     protected EntityTypeManagerInterface $entityTypeManager,
-  ) {
-  }
+    protected NodeIndex $nodeIndex,
+  ) {}
 
   /**
    * Implements hook_entity_operation().
@@ -71,7 +72,7 @@ class TaxonomyEntityHooks {
   #[Hook('node_insert')]
   public function nodeInsert(EntityInterface $node): void {
     // Add taxonomy index entries for the node.
-    \Drupal::service('taxonomy.node_index')->buildNodeIndex($node);
+    $this->nodeIndex->buildNodeIndex($node);
   }
 
   /**
@@ -84,8 +85,8 @@ class TaxonomyEntityHooks {
     if (!$node->isDefaultRevision()) {
       return;
     }
-    \Drupal::service('taxonomy.node_index')->deleteNodeIndex($node);
-    \Drupal::service('taxonomy.node_index')->buildNodeIndex($node);
+    $this->nodeIndex->deleteNodeIndex($node);
+    $this->nodeIndex->buildNodeIndex($node);
   }
 
   /**
@@ -94,7 +95,7 @@ class TaxonomyEntityHooks {
   #[Hook('node_predelete')]
   public function nodePredelete(EntityInterface $node): void {
     // Clean up the {taxonomy_index} table when nodes are deleted.
-    \Drupal::service('taxonomy.node_index')->deleteNodeIndex($node);
+    $this->nodeIndex->deleteNodeIndex($node);
   }
 
   /**
@@ -102,7 +103,7 @@ class TaxonomyEntityHooks {
    */
   #[Hook('taxonomy_term_delete')]
   public function taxonomyTermDelete(Term $term): void {
-    if (\Drupal::service('taxonomy.node_index')->shouldMaintainIndexTable()) {
+    if ($this->nodeIndex->shouldMaintainIndexTable()) {
       // Clean up the {taxonomy_index} table when terms are deleted.
       $this->database->delete('taxonomy_index')->condition('tid', $term->id())->execute();
     }
