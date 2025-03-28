@@ -35,6 +35,20 @@ class AjaxTestForm extends FormBase {
       '#markup' => '<p>' . $this->t("Ajax Form contents description.") . '</p>',
     ];
 
+    $form['select'] = [
+      '#type' => 'select',
+      '#title' => 'AJAX Select field',
+      '#options' => [
+        'one' => 'One',
+        'two' => 'Two',
+      ],
+      '#id' => 'select-announcement',
+      '#ajax' => [
+        'callback' => '::selectAnnouncementCallback',
+        'event' => 'change',
+      ],
+    ];
+
     $form['actions'] = [
       '#type' => 'actions',
     ];
@@ -79,6 +93,24 @@ class AjaxTestForm extends FormBase {
     $response = new AjaxResponse();
     $response->addCommand(new MessageCommand('Hello world!'));
     return $response;
+  }
+
+  /**
+   * The select announcement callback.
+   *
+   * This callback a five second delay to emulate a slow AJAX call.
+   *
+   * @param array $form
+   *   The form array to remove elements from.
+   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   *   The current state of the form.
+   *
+   * @return \Drupal\Core\Ajax\AjaxResponse
+   *   An AJAX response.
+   */
+  public function selectAnnouncementCallback(array $form, FormStateInterface $form_state) {
+    sleep(5);
+    return $this->helloWorld($form, $form_state);
   }
 
   /**
