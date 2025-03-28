@@ -112,7 +112,7 @@ class FieldItemListTest extends UnitTestCase {
 
     // Tests field item lists where both have same values but different data
     // types.
-    $datasets[] = [TRUE, $field_item_b, $field_item_e];
+    $datasets[] = [FALSE, $field_item_b, $field_item_e];
 
     /** @var \Drupal\Core\Field\FieldItemBase  $field_item_f */
     $field_item_f = new FieldItemTestClass();
