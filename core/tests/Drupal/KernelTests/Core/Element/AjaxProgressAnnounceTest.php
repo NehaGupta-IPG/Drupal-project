@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Drupal\Tests\KernelTest;
+namespace Drupal\KernelTests\Core\Element;
 
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\Core\Render\Element\RenderElementBase;
