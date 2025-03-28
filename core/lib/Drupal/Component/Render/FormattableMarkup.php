@@ -235,7 +235,7 @@ class FormattableMarkup implements MarkupInterface, \Countable {
    *   The properly escaped replacement value.
    */
   protected static function placeholderEscape($value) {
-    return $value instanceof MarkupInterface ? (string) $value : Html::escape($value);
+    return $value instanceof MarkupInterface ? (string) $value : Html::escape($value ?? '');
   }
 
 }
