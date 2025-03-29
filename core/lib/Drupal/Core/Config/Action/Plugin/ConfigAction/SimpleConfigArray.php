@@ -43,7 +43,7 @@ final class SimpleConfigArray implements ConfigActionPluginInterface, ContainerF
    */
   public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition): static {
     return new static(
-      $container->get('config.factory'),
+      $container->get(ConfigFactoryInterface::class),
       $plugin_definition
     );
   }
