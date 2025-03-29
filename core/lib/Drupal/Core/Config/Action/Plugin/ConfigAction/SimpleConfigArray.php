@@ -96,7 +96,7 @@ final class SimpleConfigArray implements ConfigActionPluginInterface, ContainerF
    * Parses the value supplied to ::apply().
    *
    * @param array $value
-   *   An array with a 'property' key and either and addititional named keys to
+   *   An array with a 'property' key and either and additional named keys to
    *   pass to the function.
    * @param string|array $required_arguments
    *   The arguments to validate against.
