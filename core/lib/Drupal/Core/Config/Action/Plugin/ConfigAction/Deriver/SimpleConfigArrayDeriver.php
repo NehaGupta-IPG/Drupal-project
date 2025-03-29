@@ -20,12 +20,15 @@ final class SimpleConfigArrayDeriver extends DeriverBase {
   public function getDerivativeDefinitions($base_plugin_definition): array {
     $this->derivatives['append'] = $base_plugin_definition + [
       'function' => 'array_push',
+      'passed_arguments' => 'values',
     ];
     $this->derivatives['prepend'] = $base_plugin_definition + [
       'function' => 'array_unshift',
+      'passed_arguments' => 'values',
     ];
     $this->derivatives['splice'] = $base_plugin_definition + [
       'function' => 'array_splice',
+      'passed_arguments' => ['offset', 'length', 'replacement'],
     ];
 
     return $this->derivatives;
