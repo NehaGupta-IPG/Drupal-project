@@ -291,6 +291,109 @@ class ConfigActionTest extends KernelTestBase {
   }
 
   /**
+   * @see \Drupal\Core\Config\Action\Plugin\ConfigAction\SimpleConfigArray
+   */
+  public function testSimpleConfigArray(): void {
+    $this->installConfig('config_test');
+    $this->assertSame(['itemA', 'itemB'], $this->config('config_test.system')->get('array'));
+
+    /** @var \Drupal\Core\Config\Action\ConfigActionManager $manager */
+    $manager = $this->container->get('plugin.manager.config_action');
+
+    $manager->applyAction('simpleConfigArray:append', 'config_test.system', [
+      'property' => 'array',
+      'values' => ['itemC', 'itemD'],
+    ]);
+    $this->assertSame(['itemA', 'itemB', 'itemC', 'itemD'], $this->config('config_test.system')->get('array'));
+
+    $manager->applyAction('simpleConfigArray:prepend', 'config_test.system', [
+      'property' => 'array',
+      'values' => ['itemY', 'itemZ'],
+    ]);
+    $this->assertSame(['itemY', 'itemZ', 'itemA', 'itemB', 'itemC', 'itemD'], $this->config('config_test.system')->get('array'));
+
+    $manager->applyAction('simpleConfigArray:splice', 'config_test.system', [
+      'property' => 'array',
+      'offset' => 2,
+      'length' => 2,
+      'replacement' => ['itemA-spliced', 'itemB-spliced'],
+    ]);
+    $this->assertSame(['itemY', 'itemZ', 'itemA-spliced', 'itemB-spliced', 'itemC', 'itemD'], $this->config('config_test.system')->get('array'));
+
+    try {
+      $manager->applyAction('simpleConfigArray:append', 'config_test.system', 'banana');
+      $this->fail('Expected exception not thrown');
+    }
+    catch (ConfigActionException $e) {
+      $this->assertSame('Value must be an array.', $e->getMessage());
+    }
+    try {
+      $manager->applyAction('simpleConfigArray:append', 'config_test.system', [
+        'banana' => 'banana',
+      ]);
+      $this->fail('Expected exception not thrown');
+    }
+    catch (ConfigActionException $e) {
+      $this->assertSame('The property key is required.', $e->getMessage());
+    }
+    try {
+      $manager->applyAction('simpleConfigArray:prepend', 'config_test.system', [
+        'property' => 'array',
+        'banana' => 'banana',
+      ]);
+      $this->fail('Expected exception not thrown');
+    }
+    catch (ConfigActionException $e) {
+      $this->assertSame('The values key is required and must be an array.', $e->getMessage());
+    }
+    try {
+      $manager->applyAction('simpleConfigArray:splice', 'config_test.system', [
+        'property' => 'array',
+        'offset' => 2,
+      ]);
+      $this->fail('Expected exception not thrown');
+    }
+    catch (ConfigActionException $e) {
+      $this->assertSame('The following keys are missing: length, replacement.', $e->getMessage());
+    }
+    try {
+      $manager->applyAction('simpleConfigArray:append', 'config_test.system', [
+        'property' => 'some_property',
+        'values' => ['itemXyz'],
+      ]);
+      $this->fail('Expected exception not thrown');
+    }
+    catch (ConfigActionException $e) {
+      $this->assertSame('The property some_property must be an array.', $e->getMessage());
+    }
+    try {
+      $manager->applyAction('simpleConfigArray:splice', 'config_test.system', [
+        'property' => 'string',
+        'offset' => 2,
+        'length' => 1,
+        'replacement' => ['itemA-spliced'],
+      ]);
+      $this->fail('Expected exception not thrown');
+    }
+    catch (ConfigActionException $e) {
+      $this->assertSame('The property string must be an array.', $e->getMessage());
+    }
+
+    $this->config('config_test.system')->delete();
+    try {
+      $manager->applyAction('simpleConfigArray:prepend', 'config_test.system', [
+        'property' => 'array',
+        'values' => ['item-prepended'],
+      ]);
+      $this->fail('Expected exception not thrown');
+    }
+    catch (ConfigActionException $e) {
+      $this->assertSame('Config config_test.system does not exist so can not be updated.', $e->getMessage());
+    }
+
+  }
+
+  /**
    * @see \Drupal\Core\Config\Action\ConfigActionManager::getShorthandActionIdsForEntityType()
    */
   public function testShorthandActionIds(): void {

@@ -55,7 +55,7 @@ final class SimpleConfigArray implements ConfigActionPluginInterface, ContainerF
     $config = $this->configFactory->getEditable($configName);
 
     if ($config->isNew()) {
-      throw new ConfigActionException(sprintf('Config %s does not exist so can not be updated', $configName));
+      throw new ConfigActionException(sprintf('Config %s does not exist so can not be updated.', $configName));
     }
 
     $this->validateValue($value, $this->pluginDefinition['passed_arguments']);

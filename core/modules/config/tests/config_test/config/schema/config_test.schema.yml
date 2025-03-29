@@ -210,6 +210,15 @@ config_test.system:
     '404':
       type: string
       label: '404'
+    string:
+      type: string
+      label: 'String'
+    array:
+      type: sequence
+      label: 'Array'
+      sequence:
+        type: string
+        label: 'Item'
 
 config_test.new:
   type: config_object
