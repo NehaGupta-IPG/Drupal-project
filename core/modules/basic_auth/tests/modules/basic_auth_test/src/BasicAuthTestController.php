@@ -4,16 +4,47 @@ declare(strict_types=1);
 
 namespace Drupal\basic_auth_test;
 
+use Drupal\Core\Cache\CacheBackendInterface;
+use Drupal\Core\State\StateInterface;
+use Drupal\Core\PageCache\ResponsePolicy\KillSwitch;
+
 /**
  * Provides routes for HTTP Basic Authentication testing.
  */
 class BasicAuthTestController {
 
   /**
+   * The state storage service.
+   *
+   * @var \Drupal\Core\State\StateInterface
+   */
+  private $state;
+
+  /**
+   * The page cache kill switch service.
+   *
+   * @var \Drupal\Core\PageCache\ResponsePolicy\KillSwitch
+   */
+  private $pageCacheKillSwitch;
+
+  /**
+   * Constructs a new BasicAuthTestController object.
+   *
+   * @param \Drupal\Core\State\StateInterface $state
+   *   The state storage service.
+   * @param \Drupal\Core\PageCache\ResponsePolicy\KillSwitch $pageCacheKillSwitch
+   *   The page cache kill switch service.
+   */
+  public function __construct(StateInterface $state, KillSwitch $pageCacheKillSwitch) {
+    $this->state = $state;
+    $this->pageCacheKillSwitch = $pageCacheKillSwitch;
+  }
+
+  /**
    * @see \Drupal\basic_auth\Tests\Authentication\BasicAuthTest::testControllerNotCalledBeforeAuth()
    */
   public function modifyState() {
-    \Drupal::state()->set('basic_auth_test.state.controller_executed', TRUE);
+    $this->state->set('basic_auth_test.state.controller_executed', TRUE);
     return ['#markup' => 'Done'];
   }
 
@@ -22,10 +53,10 @@ class BasicAuthTestController {
    */
   public function readState() {
     // Mark this page as being uncacheable.
-    \Drupal::service('page_cache_kill_switch')->trigger();
+    $this->pageCacheKillSwitch->trigger();
 
     return [
-      '#markup' => \Drupal::state()->get('basic_auth_test.state.controller_executed') ? 'yep' : 'nope',
+      '#markup' => $this->state->get('basic_auth_test.state.controller_executed') ? 'yep' : 'nope',
       '#cache' => [
         'max-age' => 0,
       ],

@@ -1,0 +1,4 @@
+services:
+  basic_auth_test.controller:
+    class: Drupal\basic_auth_test\BasicAuthTestController
+    arguments: ['@state', '@page_cache_kill_switch']
