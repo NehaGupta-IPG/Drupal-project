@@ -24,14 +24,6 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 )]
 final class SimpleConfigArray implements ConfigActionPluginInterface, ContainerFactoryPluginInterface {
 
-  /**
-   * Constructs a SimpleConfigArray object.
-   *
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $configFactory
-   *   The config factory.
-   * @param array $pluginDefinition
-   *   The plugin definition array.
-   */
   public function __construct(
     protected readonly ConfigFactoryInterface $configFactory,
     private readonly array $pluginDefinition,
