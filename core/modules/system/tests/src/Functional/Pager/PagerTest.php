@@ -52,6 +52,7 @@ class PagerTest extends BrowserTestBase {
     }
 
     $this->adminUser = $this->drupalCreateUser([
+      'access dblog reports',
       'access site reports',
       'administer image styles',
     ]);

@@ -200,7 +200,7 @@ final class SmartDefaultSettings {
       }
 
       $help_enabled = $this->moduleHandler->moduleExists('help');
-      $can_access_dblog = ($this->currentUser->hasPermission('access site reports') && $this->moduleHandler->moduleExists('dblog'));
+      $can_access_dblog = ($this->currentUser->hasPermission('access dblog reports') && $this->moduleHandler->moduleExists('dblog'));
 
       if (!empty($plugins_enabled) || !$source_editing_additions->allowsNothing()) {
         $beginning = $help_enabled ?

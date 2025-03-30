@@ -36,7 +36,7 @@
  *     _controller: '\Drupal\dblog\Controller\DbLogController::overview'
  *     _title: 'Recent log messages'
  *   requirements:
- *     _permission: 'access site reports'
+ *     _permission: 'access dblog reports'
  * @endcode
  * Some notes:
  * - The first line is the machine name of the route. Typically, it is prefixed

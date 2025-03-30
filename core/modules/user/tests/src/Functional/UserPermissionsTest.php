@@ -330,7 +330,7 @@ class UserPermissionsTest extends BrowserTestBase {
     $this->addDefaultCommentField('node', 'article', comment_view_mode: 'default');
 
     $this->drupalLogin($this->adminUser);
-    $this->grantPermissions(Role::load($this->rid), ['access site reports', 'administer comment display']);
+    $this->grantPermissions(Role::load($this->rid), ['access dblog reports', 'access site reports', 'administer comment display']);
 
     // Access both the Manage display and permission page, which is not
     // accessible currently.

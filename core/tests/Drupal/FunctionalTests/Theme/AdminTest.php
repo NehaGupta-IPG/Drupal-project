@@ -86,7 +86,7 @@ class AdminTest extends BrowserTestBase {
       $logger->debug($this->randomString());
     }
 
-    $this->drupalLogin($this->drupalCreateUser(['access site reports']));
+    $this->drupalLogin($this->drupalCreateUser(['access dblog reports', 'access site reports']));
 
     $this->drupalGet('admin/reports/dblog', ['query' => ['page' => 1]]);
     $this->assertSession()->statusCodeEquals(200);

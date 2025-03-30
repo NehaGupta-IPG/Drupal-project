@@ -112,6 +112,7 @@ class FilterAdminTest extends BrowserTestBase {
       $basic_html_format->getPermissionName(),
       $restricted_html_format->getPermissionName(),
       $full_html_format->getPermissionName(),
+      'access dblog reports',
       'access site reports',
     ]);
 
