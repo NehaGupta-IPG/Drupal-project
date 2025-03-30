@@ -300,57 +300,37 @@ class ConfigActionTest extends KernelTestBase {
     /** @var \Drupal\Core\Config\Action\ConfigActionManager $manager */
     $manager = $this->container->get('plugin.manager.config_action');
 
-    try {
-      $manager->applyAction('simpleConfigArray:append', 'config_test.system', 'banana');
-      $this->fail('Expected exception not thrown');
-    }
-    catch (ConfigActionException $e) {
-      $this->assertSame('Config config_test.system can not be updated because $value is not an array.', $e->getMessage());
-    }
+    $this->expectException(ConfigActionException::class);
+    $this->expectExceptionMessage('Config config_test.system can not be updated because $value is not an array.');
+    $manager->applyAction('simpleConfigArray:append', 'config_test.system', 'banana');
 
-    try {
-      $manager->applyAction('simpleConfigArray:append', 'config_test.system', [
-        'banana' => 'banana',
-      ]);
-      $this->fail('Expected exception not thrown');
-    }
-    catch (ConfigActionException $e) {
-      $this->assertSame('Config config_test.system can not be updated because the property argument was not passed.', $e->getMessage());
-    }
+    $this->expectException(ConfigActionException::class);
+    $this->expectExceptionMessage('Config config_test.system can not be updated because the property argument was not passed.');
+    $manager->applyAction('simpleConfigArray:append', 'config_test.system', [
+      'banana' => 'banana',
+    ]);
 
-    try {
-      $manager->applyAction('simpleConfigArray:append', 'config_test.system', [
-        'property' => 'some_property',
-        'values' => ['itemA'],
-      ]);
-      $this->fail('Expected exception not thrown');
-    }
-    catch (ConfigActionException $e) {
-      $this->assertSame('Config config_test.system can not be updated because the property some_property is not an array.', $e->getMessage());
-    }
+    $this->expectException(ConfigActionException::class);
+    $this->expectExceptionMessage('Config config_test.system can not be updated because the property some_property is not an array.');
+    $manager->applyAction('simpleConfigArray:append', 'config_test.system', [
+      'property' => 'some_property',
+      'values' => ['itemA'],
+    ]);
 
-    try {
-      $manager->applyAction('simpleConfigArray:append', 'config_test.system', [
-        'property' => 'string',
-        'values' => ['itemA'],
-      ]);
-      $this->fail('Expected exception not thrown');
-    }
-    catch (ConfigActionException $e) {
-      $this->assertSame('Config config_test.system can not be updated because the property string is not an array.', $e->getMessage());
-    }
+    $this->expectException(ConfigActionException::class);
+    $this->expectExceptionMessage('Config config_test.system can not be updated because the property string is not an array.');
+    $manager->applyAction('simpleConfigArray:append', 'config_test.system', [
+      'property' => 'string',
+      'values' => ['itemA'],
+    ]);
 
     $this->config('config_test.system')->delete();
-    try {
-      $manager->applyAction('simpleConfigArray:append', 'config_test.system', [
-        'property' => 'array',
-        'values' => ['item-prepended'],
-      ]);
-      $this->fail('Expected exception not thrown');
-    }
-    catch (ConfigActionException $e) {
-      $this->assertSame('Config config_test.system does not exist so can not be updated.', $e->getMessage());
-    }
+    $this->expectException(ConfigActionException::class);
+    $this->expectExceptionMessage('Config config_test.system does not exist so can not be updated.');
+    $manager->applyAction('simpleConfigArray:append', 'config_test.system', [
+      'property' => 'array',
+      'values' => ['item-prepended'],
+    ]);
   }
 
   /**
@@ -369,27 +349,19 @@ class ConfigActionTest extends KernelTestBase {
     ]);
     $this->assertSame(['itemA', 'itemB', 'itemC', 'itemD'], $this->config('config_test.system')->get('array'));
 
-    try {
-      $manager->applyAction('simpleConfigArray:append', 'config_test.system', [
-        'property' => 'array',
-        'banana' => 'banana',
-      ]);
-      $this->fail('Expected exception not thrown');
-    }
-    catch (ConfigActionException $e) {
-      $this->assertSame('Config config_test.system can not be updated because the values argument is required and must be an array.', $e->getMessage());
-    }
+    $this->expectException(ConfigActionException::class);
+    $this->expectExceptionMessage('Config config_test.system can not be updated because the values argument is required and must be an array.');
+    $manager->applyAction('simpleConfigArray:append', 'config_test.system', [
+      'property' => 'array',
+      'banana' => 'banana',
+    ]);
 
-    try {
-      $manager->applyAction('simpleConfigArray:append', 'config_test.system', [
-        'property' => 'array',
-        'values' => 'banana',
-      ]);
-      $this->fail('Expected exception not thrown');
-    }
-    catch (ConfigActionException $e) {
-      $this->assertSame('Config config_test.system can not be updated because the values argument is required and must be an array.', $e->getMessage());
-    }
+    $this->expectException(ConfigActionException::class);
+    $this->expectExceptionMessage('Config config_test.system can not be updated because the values argument is required and must be an array.');
+    $manager->applyAction('simpleConfigArray:append', 'config_test.system', [
+      'property' => 'array',
+      'values' => 'banana',
+    ]);
   }
 
   /**
@@ -408,27 +380,19 @@ class ConfigActionTest extends KernelTestBase {
     ]);
     $this->assertSame(['itemC', 'itemD', 'itemA', 'itemB'], $this->config('config_test.system')->get('array'));
 
-    try {
-      $manager->applyAction('simpleConfigArray:prepend', 'config_test.system', [
-        'property' => 'array',
-        'banana' => 'banana',
-      ]);
-      $this->fail('Expected exception not thrown');
-    }
-    catch (ConfigActionException $e) {
-      $this->assertSame('Config config_test.system can not be updated because the values argument is required and must be an array.', $e->getMessage());
-    }
+    $this->expectException(ConfigActionException::class);
+    $this->expectExceptionMessage('Config config_test.system can not be updated because the values argument is required and must be an array.');
+    $manager->applyAction('simpleConfigArray:prepend', 'config_test.system', [
+      'property' => 'array',
+      'banana' => 'banana',
+    ]);
 
-    try {
-      $manager->applyAction('simpleConfigArray:prepend', 'config_test.system', [
-        'property' => 'array',
-        'values' => 'banana',
-      ]);
-      $this->fail('Expected exception not thrown');
-    }
-    catch (ConfigActionException $e) {
-      $this->assertSame('Config config_test.system can not be updated because the values argument is required and must be an array.', $e->getMessage());
-    }
+    $this->expectException(ConfigActionException::class);
+    $this->expectExceptionMessage('Config config_test.system can not be updated because the values argument is required and must be an array.');
+    $manager->applyAction('simpleConfigArray:prepend', 'config_test.system', [
+      'property' => 'array',
+      'values' => 'banana',
+    ]);
   }
 
   /**
@@ -449,18 +413,13 @@ class ConfigActionTest extends KernelTestBase {
     ]);
     $this->assertSame(['itemA', 'itemC', 'itemD', 'itemB'], $this->config('config_test.system')->get('array'));
 
-    try {
-      $manager->applyAction('simpleConfigArray:splice', 'config_test.system', [
-        'property' => 'array',
-        'offset' => 1,
-        'length' => 0,
-        'banana' => 'banana',
-      ]);
-      $this->fail('Expected exception not thrown');
-    }
-    catch (ConfigActionException $e) {
-      $this->assertSame('Config config_test.system can not be updated because the following arguments are missing: replacement.', $e->getMessage());
-    }
+    $this->expectException(ConfigActionException::class);
+    $this->expectExceptionMessage('Config config_test.system can not be updated because the following arguments are missing: length, replacement.');
+    $manager->applyAction('simpleConfigArray:splice', 'config_test.system', [
+      'property' => 'array',
+      'offset' => 1,
+      'banana' => 'banana',
+    ]);
   }
 
   /**
