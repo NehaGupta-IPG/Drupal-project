@@ -263,20 +263,38 @@ class FileSystem implements FileSystemInterface {
   public function tempnam($directory, $prefix) {
     $scheme = StreamWrapperManager::getScheme($directory);
 
-    if ($this->streamWrapperManager->isValidScheme($scheme)) {
-      $wrapper = $this->streamWrapperManager->getViaScheme($scheme);
-
-      if ($filename = tempnam($wrapper->getDirectoryPath(), $prefix)) {
-        return $scheme . '://' . basename($filename);
-      }
-      else {
-        return FALSE;
-      }
-    }
-    else {
+    if (!$this->streamWrapperManager->isValidScheme($scheme)) {
       // Handle as a normal tempnam() call.
       return tempnam($directory, $prefix);
     }
+
+    $requested_directory_uri = \Drupal::service('stream_wrapper_manager')->normalizeUri($directory);
+    $requested_directory_path = $this->realpath($requested_directory_uri);
+
+    // NOTE: tempnam() can ignore the requested $directory_path if it doesn't
+    // exist and use the system's temporary directory as fallback.
+    $temp_file_path = tempnam($requested_directory_path, $prefix);
+    if ($temp_file_path === FALSE) {
+      return FALSE;
+    }
+    $temp_file_dirname = $this->dirname($temp_file_path);
+
+    // Return the file if it was created in the requested directory.
+    if ($temp_file_dirname === $requested_directory_path) {
+      $temp_file_uri = $requested_directory_uri . '/' . $this->basename($temp_file_path);
+      return \Drupal::service('stream_wrapper_manager')->normalizeUri($temp_file_uri);
+    }
+
+    // Return the file if the fallback directory is on the requested URI.
+    $tempnam_fallback_dir = sys_get_temp_dir();
+    if ($this->realpath($scheme . '://') === $tempnam_fallback_dir) {
+      $temp_file_uri = $scheme . '://' . $this->basename($temp_file_path);
+      return \Drupal::service('stream_wrapper_manager')->normalizeUri($temp_file_uri);
+    }
+
+    // Otherwise delete the temporary file and return false.
+    $this->unlink($temp_file_path);
+    return FALSE;
   }
 
   /**

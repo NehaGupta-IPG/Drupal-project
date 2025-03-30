@@ -211,7 +211,8 @@ interface FileSystemInterface {
   public function rmdir($uri, $context = NULL);
 
   /**
-   * Creates a file with a unique filename in the specified directory.
+   * Creates a file with a unique filename in the specified directory or in the
+   * system's temporary directory if the specified directory does not exist.
    *
    * PHP's tempnam() does not return a URI like we want. This function will
    * return a URI if given a URI, or it will return a filepath if given a
@@ -221,12 +222,16 @@ interface FileSystemInterface {
    *
    * @param string $directory
    *   The directory where the temporary filename will be created.
+   *   Note: The directory must exist, otherwise PHP's tempnam() will create
+   *   the temporary file in the system's temporary directory.
    * @param string $prefix
    *   The prefix of the generated temporary filename.
    *   Note: Windows uses only the first three characters of prefix.
    *
    * @return string|false
-   *   The new temporary filename, or FALSE on failure.
+   *   The new temporary filename created either in the requested directory, or
+   *   in the stream wrapper root when the requested directory is on the
+   *   temporary stream wrapper and it does not exist, or FALSE on failure.
    *
    * @see tempnam()
    * @see https://www.drupal.org/node/515192
