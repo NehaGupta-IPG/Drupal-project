@@ -4,9 +4,8 @@ declare(strict_types=1);
 
 namespace Drupal\basic_auth_test;
 
-use Drupal\Core\Cache\CacheBackendInterface;
+use Drupal\Core\PageCache\ResponsePolicyInterface;
 use Drupal\Core\State\StateInterface;
-use Drupal\Core\PageCache\ResponsePolicy\KillSwitch;
 
 /**
  * Provides routes for HTTP Basic Authentication testing.
@@ -23,7 +22,7 @@ class BasicAuthTestController {
   /**
    * The page cache kill switch service.
    *
-   * @var \Drupal\Core\PageCache\ResponsePolicy\KillSwitch
+   * @var \Drupal\Core\PageCache\ResponsePolicy\ResponsePolicyInterface
    */
   private $pageCacheKillSwitch;
 
@@ -32,10 +31,10 @@ class BasicAuthTestController {
    *
    * @param \Drupal\Core\State\StateInterface $state
    *   The state storage service.
-   * @param \Drupal\Core\PageCache\ResponsePolicy\KillSwitch $pageCacheKillSwitch
+   * @param \Drupal\Core\PageCache\ResponsePolicy\ResponsePolicyInterface $pageCacheKillSwitch
    *   The page cache kill switch service.
    */
-  public function __construct(StateInterface $state, KillSwitch $pageCacheKillSwitch) {
+  public function __construct(StateInterface $state, ResponsePolicyInterface $pageCacheKillSwitch) {
     $this->state = $state;
     $this->pageCacheKillSwitch = $pageCacheKillSwitch;
   }
