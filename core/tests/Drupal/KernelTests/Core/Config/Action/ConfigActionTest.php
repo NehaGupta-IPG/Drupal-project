@@ -349,7 +349,7 @@ class ConfigActionTest extends KernelTestBase {
     $this->container->get('plugin.manager.config_action')->applyAction(
       "simpleConfigArray:$derivative_id",
       'config_test.system',
-      $value,
+      [$value],
     );
   }
 
