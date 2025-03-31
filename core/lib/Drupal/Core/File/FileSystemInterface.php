@@ -211,8 +211,10 @@ interface FileSystemInterface {
   public function rmdir($uri, $context = NULL);
 
   /**
-   * Creates a file with a unique filename in the specified directory or in the
-   * system's temporary directory if the specified directory does not exist.
+   * Creates a file with a unique filename in the specified directory or temp.
+   *
+   * Use the system's temporary directory if the specified directory does not
+   * exist.
    *
    * PHP's tempnam() does not return a URI like we want. This function will
    * return a URI if given a URI, or it will return a filepath if given a
