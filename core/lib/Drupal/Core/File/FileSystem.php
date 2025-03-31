@@ -268,7 +268,7 @@ class FileSystem implements FileSystemInterface {
       return tempnam($directory, $prefix);
     }
 
-    $requested_directory_uri = \Drupal::service('stream_wrapper_manager')->normalizeUri($directory);
+    $requested_directory_uri = $this->streamWrapperManager->normalizeUri($directory);
     $requested_directory_path = $this->realpath($requested_directory_uri);
 
     // NOTE: tempnam() can ignore the requested $directory_path if it doesn't
@@ -282,14 +282,14 @@ class FileSystem implements FileSystemInterface {
     // Return the file if it was created in the requested directory.
     if ($temp_file_dirname === $requested_directory_path) {
       $temp_file_uri = $requested_directory_uri . '/' . $this->basename($temp_file_path);
-      return \Drupal::service('stream_wrapper_manager')->normalizeUri($temp_file_uri);
+      return $this->streamWrapperManager->normalizeUri($temp_file_uri);
     }
 
     // Return the file if the fallback directory is on the requested URI.
     $tempnam_fallback_dir = sys_get_temp_dir();
     if ($this->realpath($scheme . '://') === $tempnam_fallback_dir) {
       $temp_file_uri = $scheme . '://' . $this->basename($temp_file_path);
-      return \Drupal::service('stream_wrapper_manager')->normalizeUri($temp_file_uri);
+      return $this->streamWrapperManager->normalizeUri($temp_file_uri);
     }
 
     // Otherwise delete the temporary file and return false.
