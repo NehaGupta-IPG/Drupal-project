@@ -318,10 +318,10 @@ class ConfigActionTest extends KernelTestBase {
    */
   public function testSimpleConfigArrayFailsOnNewConfig(string $derivative_id): void {
     $this->expectException(ConfigActionException::class);
-    $this->expectExceptionMessage("Config block.block.fubar cannot be updated because it does not exist.");
+    $this->expectExceptionMessage("Config block.block.anything cannot be updated because it does not exist.");
     $this->container->get('plugin.manager.config_action')->applyAction(
       "simpleConfigArray:$derivative_id",
-      'block.block.fubar',
+      'block.block.anything',
       [],
     );
   }
@@ -361,7 +361,7 @@ class ConfigActionTest extends KernelTestBase {
    *   ["prepend", null]
    *   ["prepend", "nope"]
    */
-  public function testSimpleConfigArrayPrependAndAppendRequireArrayOfValues(string $derivative_id, mixed $values): array {
+  public function testSimpleConfigArrayPrependAndAppendRequireArrayOfValues(string $derivative_id, mixed $values): void {
     $this->installConfig('config_test');
 
     $this->expectException(ConfigActionException::class);
