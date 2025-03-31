@@ -415,6 +415,26 @@ class ConfigActionTest extends KernelTestBase {
   }
 
   /**
+   * @testWith ["append", [{"values": ["one", "three"]}, {"values": ["four", "six"]}], ["itemA", "itemB", "one", "three", "four", "six"]]
+   *   ["prepend", [{"values": ["undo", "redo"]}, {"values": ["bold", "italic"]}], ["bold", "italic", "undo", "redo", "itemA", "itemB"]]
+   *   ["splice", [{"offset": 1, "length": 1, "replacement": ["itemC"]}, {"offset": 2, "length": null, "replacement": ["itemD", "itemE"]}], ["itemA", "itemC", "itemD", "itemE"]]
+   */
+  public function testSimpleConfigArrayMultipleInvocations(string $derivative_id, array $values, array $expected_value): void {
+    $this->installConfig('config_test');
+
+    foreach ($values as &$value) {
+      $value['property'] = 'array';
+    }
+
+    $this->container->get('plugin.manager.config_action')->applyAction(
+      "simpleConfigArray:$derivative_id",
+      'config_test.system',
+      $values,
+    );
+    $this->assertSame($expected_value, $this->config('config_test.system')->get('array'));
+  }
+
+  /**
    * Tests that simpleConfigArray:splice rejects invalid arguments.
    */
   public function testSimpleConfigArraySpliceWithInvalidArgument(): void {
