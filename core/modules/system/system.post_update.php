@@ -106,7 +106,7 @@ function system_post_update_remove_rss_cdata_subscriber(): void {
  *
  * @see \Drupal\system\EventSubscriber\UpdateEmptyAdminTheme
  */
-function system_post_update_set_theme_admin_to_null() {
+function system_post_update_set_theme_admin_to_null(): void {
   \Drupal::configFactory()->getEditable('system.theme')->save();
 }
 
