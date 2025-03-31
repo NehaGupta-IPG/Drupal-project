@@ -9,8 +9,8 @@ use Drupal\Core\Config\Action\ConfigActionException;
 use Drupal\Core\Config\Action\ConfigActionPluginInterface;
 use Drupal\Core\Config\Action\Plugin\ConfigAction\Deriver\SimpleConfigArrayDeriver;
 use Drupal\Core\Config\ConfigFactoryInterface;
+use Drupal\Core\Config\ConfigManagerInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
-use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -19,16 +19,16 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  */
 #[ConfigAction(
   id: 'simpleConfigArray',
-  admin_label: new TranslatableMarkup('Simple Configuration Array Update'),
-  deriver: SimpleConfigArrayDeriver::class
+  deriver: SimpleConfigArrayDeriver::class,
 )]
 final class SimpleConfigArray implements ConfigActionPluginInterface, ContainerFactoryPluginInterface {
 
   public function __construct(
-    protected readonly ConfigFactoryInterface $configFactory,
-    private readonly array $pluginDefinition,
-  ) {
-  }
+    private readonly ConfigFactoryInterface $configFactory,
+    private readonly ConfigManagerInterface $configManager,
+    private readonly string $function,
+    private readonly string $pluginId,
+  ) {}
 
   /**
    * {@inheritdoc}
@@ -36,7 +36,9 @@ final class SimpleConfigArray implements ConfigActionPluginInterface, ContainerF
   public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition): static {
     return new static(
       $container->get(ConfigFactoryInterface::class),
-      $plugin_definition
+      $container->get(ConfigManagerInterface::class),
+      $plugin_definition['function'],
+      $plugin_id,
     );
   }
 
@@ -44,75 +46,44 @@ final class SimpleConfigArray implements ConfigActionPluginInterface, ContainerF
    * {@inheritdoc}
    */
   public function apply(string $configName, mixed $value): void {
+    if ($this->configManager->getEntityTypeIdByName($configName)) {
+      throw new ConfigActionException('The ' . $this->pluginId . ' config action cannot be used on configuration entities.');
+    }
+
     $config = $this->configFactory->getEditable($configName);
-
     if ($config->isNew()) {
-      throw new ConfigActionException(sprintf('Config %s does not exist so can not be updated.', $configName));
+      throw new ConfigActionException("Config $configName cannot be updated because it does not exist.");
     }
 
-    if (!is_array($value)) {
-      throw new ConfigActionException(sprintf('Config %s can not be updated because $value is not an array.', $configName));
+    assert(is_array($value));
+    if (empty($value['property'])) {
+      throw new ConfigActionException('A property path must be passed to the ' . $this->pluginId . ' config action.');
     }
-
-    if (!isset($value['property'])) {
-      throw new ConfigActionException(sprintf('Config %s can not be updated because the property argument was not passed.', $configName));
-    }
-
-    $required_arguments = $this->pluginDefinition['required_arguments'];
-    if (is_string($required_arguments) && (!isset($value[$required_arguments]) || !is_array($value[$required_arguments]))) {
-      throw new ConfigActionException(sprintf('Config %s can not be updated because the %s argument is required and must be an array.', $configName, $required_arguments));
-    }
-
-    if (is_array($required_arguments)) {
-      $missing_arguments = array_diff($required_arguments, array_keys($value));
-      if (!empty($missing_arguments)) {
-        throw new ConfigActionException(sprintf('Config %s can not be updated because the following arguments are missing: %s.', $configName, implode(', ', $missing_arguments)));
-      }
-    }
-
-    [$property_name, $passed_options] = self::parseValue($value, $required_arguments);
-    $property_value = $config->get($property_name);
-
-    if (!is_array($property_value)) {
-      throw new ConfigActionException(sprintf('Config %s can not be updated because the property %s is not an array.', $configName, $property_name));
-    }
-
-    $this->pluginDefinition['function']($property_value, ...$passed_options);
-
-    $config
-      ->set($property_name, $property_value)
-      ->save();
-  }
-
-  /**
-   * Parses the value supplied to ::apply().
-   *
-   * @param array $value
-   *   An array with a 'property' key and either and additional named keys to
-   *   pass to the function.
-   * @param string|array $required_arguments
-   *   The arguments to validate against.
-   *
-   * @return array{string, array}
-   *   An array where the first element is the property name (string) and the
-   *   second element is the values to pass to the function (array).
-   */
-  private static function parseValue(array $value, string|array $required_arguments): array {
     $property_name = $value['property'];
     unset($value['property']);
 
-    if (is_string($required_arguments)) {
-      $passed_options = $value[$required_arguments];
+    // The `array_push()` and `array_unshift()` functions have a similar
+    // signature, and need to be given an array of values.
+    if (in_array($this->function, ['array_push', 'array_unshift'], TRUE)) {
+      if (isset($value['values']) && is_array($value['values'])) {
+        $arguments = $value['values'];
+      }
+      else {
+        throw new ConfigActionException('The ' . $this->pluginId . ' config action requires an array of values.');
+      }
     }
     else {
-      $passed_options = array_filter(
-        $value,
-        fn ($key) => in_array($key, $required_arguments),
-        ARRAY_FILTER_USE_KEY
-      );
+      // Pass everything in $value directly to the function as named arguments.
+      // PHP will validate them on its own.
+      $arguments = $value;
     }
 
-    return [$property_name, $passed_options];
+    $property_value = $config->get($property_name);
+    if (!is_array($property_value)) {
+      throw new ConfigActionException("Config $configName cannot be updated because the property '$property_name' is not an array.");
+    }
+    ($this->function)($property_value, ...$arguments);
+    $config->set($property_name, $property_value)->save();
   }
 
 }

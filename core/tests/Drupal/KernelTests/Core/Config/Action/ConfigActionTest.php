@@ -291,175 +291,147 @@ class ConfigActionTest extends KernelTestBase {
   }
 
   /**
-   * @see \Drupal\Core\Config\Action\Plugin\ConfigAction\SimpleConfigArray
+   * Tests that the simpleConfigArray actions cannot be used on config entities.
+   *
+   * @testWith ["append"]
+   *   ["prepend"]
+   *   ["splice"]
    */
-  public function testSimpleConfigArray(): void {
+  public function testSimpleConfigArrayFailsOnEntities(string $derivative_id): void {
     $this->installConfig('config_test');
-    $this->assertSame(['itemA', 'itemB'], $this->config('config_test.system')->get('array'));
 
-    /** @var \Drupal\Core\Config\Action\ConfigActionManager $manager */
-    $manager = $this->container->get('plugin.manager.config_action');
-
-    try {
-      $manager->applyAction('simpleConfigArray:append', 'config_test.system', 'banana');
-      $this->fail('Expected exception not thrown');
-    }
-    catch (ConfigActionException $e) {
-      $this->assertSame('Config config_test.system can not be updated because $value is not an array.', $e->getMessage());
-    }
-
-    try {
-      $manager->applyAction('simpleConfigArray:append', 'config_test.system', [
-        'banana' => 'banana',
-      ]);
-      $this->fail('Expected exception not thrown');
-    }
-    catch (ConfigActionException $e) {
-      $this->assertSame('Config config_test.system can not be updated because the property argument was not passed.', $e->getMessage());
-    }
-
-    try {
-      $manager->applyAction('simpleConfigArray:append', 'config_test.system', [
-        'property' => 'some_property',
-        'values' => ['itemA'],
-      ]);
-      $this->fail('Expected exception not thrown');
-    }
-    catch (ConfigActionException $e) {
-      $this->assertSame('Config config_test.system can not be updated because the property some_property is not an array.', $e->getMessage());
-    }
-
-    try {
-      $manager->applyAction('simpleConfigArray:append', 'config_test.system', [
-        'property' => 'string',
-        'values' => ['itemA'],
-      ]);
-      $this->fail('Expected exception not thrown');
-    }
-    catch (ConfigActionException $e) {
-      $this->assertSame('Config config_test.system can not be updated because the property string is not an array.', $e->getMessage());
-    }
-
-    $this->config('config_test.system')->delete();
-    try {
-      $manager->applyAction('simpleConfigArray:append', 'config_test.system', [
-        'property' => 'array',
-        'values' => ['item-prepended'],
-      ]);
-      $this->fail('Expected exception not thrown');
-    }
-    catch (ConfigActionException $e) {
-      $this->assertSame('Config config_test.system does not exist so can not be updated.', $e->getMessage());
-    }
+    $this->expectException(ConfigActionException::class);
+    $this->expectExceptionMessage("The simpleConfigArray:$derivative_id config action cannot be used on configuration entities.");
+    $this->container->get('plugin.manager.config_action')->applyAction(
+      "simpleConfigArray:$derivative_id",
+      'config_test.dynamic.dotted.default',
+      [],
+    );
   }
 
   /**
-   * @see \Drupal\Core\Config\Action\Plugin\ConfigAction\SimpleConfigArray
+   * Tests that the simpleConfigArray actions fail on non-existent config.
+   *
+   * @testWith ["append"]
+   *    ["prepend"]
+   *    ["splice"]
    */
-  public function testSimpleConfigArrayAppend(): void {
-    $this->installConfig('config_test');
-    $this->assertSame(['itemA', 'itemB'], $this->config('config_test.system')->get('array'));
-
-    /** @var \Drupal\Core\Config\Action\ConfigActionManager $manager */
-    $manager = $this->container->get('plugin.manager.config_action');
-
-    $manager->applyAction('simpleConfigArray:append', 'config_test.system', [
-      'property' => 'array',
-      'values' => ['itemC', 'itemD'],
-    ]);
-    $this->assertSame(['itemA', 'itemB', 'itemC', 'itemD'], $this->config('config_test.system')->get('array'));
-
-    try {
-      $manager->applyAction('simpleConfigArray:append', 'config_test.system', [
-        'property' => 'array',
-        'banana' => 'banana',
-      ]);
-      $this->fail('Expected exception not thrown');
-    }
-    catch (ConfigActionException $e) {
-      $this->assertSame('Config config_test.system can not be updated because the values argument is required and must be an array.', $e->getMessage());
-    }
-
-    try {
-      $manager->applyAction('simpleConfigArray:append', 'config_test.system', [
-        'property' => 'array',
-        'values' => 'banana',
-      ]);
-      $this->fail('Expected exception not thrown');
-    }
-    catch (ConfigActionException $e) {
-      $this->assertSame('Config config_test.system can not be updated because the values argument is required and must be an array.', $e->getMessage());
-    }
+  public function testSimpleConfigArrayFailsOnNewConfig(string $derivative_id): void {
+    $this->expectException(ConfigActionException::class);
+    $this->expectExceptionMessage("Config block.block.fubar cannot be updated because it does not exist.");
+    $this->container->get('plugin.manager.config_action')->applyAction(
+      "simpleConfigArray:$derivative_id",
+      'block.block.fubar',
+      [],
+    );
   }
 
   /**
-   * @see \Drupal\Core\Config\Action\Plugin\ConfigAction\SimpleConfigArray
+   * Tests that the simpleConfigArray actions require a property path.
+   *
+   * @testWith ["append", null]
+   *   ["append", ""]
+   *   ["prepend", null]
+   *   ["prepend", ""]
+   *   ["splice", null]
+   *   ["splice", ""]
    */
-  public function testSimpleConfigArrayPrepend(): void {
+  public function testSimpleConfigArrayFailsOnEmptyOrMissingPropertyPath(string $derivative_id, ?string $property_path): void {
     $this->installConfig('config_test');
-    $this->assertSame(['itemA', 'itemB'], $this->config('config_test.system')->get('array'));
 
-    /** @var \Drupal\Core\Config\Action\ConfigActionManager $manager */
-    $manager = $this->container->get('plugin.manager.config_action');
-
-    $manager->applyAction('simpleConfigArray:prepend', 'config_test.system', [
-      'property' => 'array',
-      'values' => ['itemC', 'itemD'],
-    ]);
-    $this->assertSame(['itemC', 'itemD', 'itemA', 'itemB'], $this->config('config_test.system')->get('array'));
-
-    try {
-      $manager->applyAction('simpleConfigArray:prepend', 'config_test.system', [
-        'property' => 'array',
-        'banana' => 'banana',
-      ]);
-      $this->fail('Expected exception not thrown');
-    }
-    catch (ConfigActionException $e) {
-      $this->assertSame('Config config_test.system can not be updated because the values argument is required and must be an array.', $e->getMessage());
+    $value = [];
+    if (isset($property_path)) {
+      $value['property'] = $property_path;
     }
 
-    try {
-      $manager->applyAction('simpleConfigArray:prepend', 'config_test.system', [
-        'property' => 'array',
-        'values' => 'banana',
-      ]);
-      $this->fail('Expected exception not thrown');
-    }
-    catch (ConfigActionException $e) {
-      $this->assertSame('Config config_test.system can not be updated because the values argument is required and must be an array.', $e->getMessage());
-    }
+    $this->expectException(ConfigActionException::class);
+    $this->expectExceptionMessage("A property path must be passed to the simpleConfigArray:$derivative_id config action.");
+    $this->container->get('plugin.manager.config_action')->applyAction(
+      "simpleConfigArray:$derivative_id",
+      'config_test.system',
+      $value,
+    );
   }
 
   /**
-   * @see \Drupal\Core\Config\Action\Plugin\ConfigAction\SimpleConfigArray
+   * Tests that simpleConfigArray append and prepend require an array of values.
+   *
+   * @testWith ["append", null]
+   *   ["append", "nope"]
+   *   ["prepend", null]
+   *   ["prepend", "nope"]
    */
-  public function testSimpleConfigArraySplice(): void {
+  public function testSimpleConfigArrayPrependAndAppendRequireArrayOfValues(string $derivative_id, mixed $values): array {
     $this->installConfig('config_test');
-    $this->assertSame(['itemA', 'itemB'], $this->config('config_test.system')->get('array'));
 
-    /** @var \Drupal\Core\Config\Action\ConfigActionManager $manager */
-    $manager = $this->container->get('plugin.manager.config_action');
+    $this->expectException(ConfigActionException::class);
+    $this->expectExceptionMessage("The simpleConfigArray:$derivative_id config action requires an array of values.");
+    $this->container->get('plugin.manager.config_action')->applyAction(
+      "simpleConfigArray:$derivative_id",
+      'config_test.system',
+      [
+        'property' => 'array',
+        'values' => $values,
+      ],
+    );
+  }
 
-    $manager->applyAction('simpleConfigArray:splice', 'config_test.system', [
-      'property' => 'array',
-      'offset' => 1,
-      'length' => 0,
-      'replacement' => ['itemC', 'itemD'],
-    ]);
-    $this->assertSame(['itemA', 'itemC', 'itemD', 'itemB'], $this->config('config_test.system')->get('array'));
+  /**
+   * Tests that the simpleConfigArray actions fail on non-array properties.
+   *
+   * @testWith ["append", {"values": [1, 2, 3]}]
+   *   ["prepend", {"values": [1, 2, 3]}]
+   *   ["splice", {"offset": 0}]
+   */
+  public function testSimpleConfigArrayOnlyWorksOnArrays(string $derivative_id, array $value): void {
+    $this->installConfig('config_test');
 
-    try {
-      $manager->applyAction('simpleConfigArray:splice', 'config_test.system', [
+    $this->expectException(ConfigActionException::class);
+    $this->expectExceptionMessage("Config config_test.system cannot be updated because the property 'string' is not an array.");
+    $this->container->get('plugin.manager.config_action')->applyAction(
+      "simpleConfigArray:$derivative_id",
+      'config_test.system',
+      ['property' => 'string'] + $value,
+    );
+  }
+
+  /**
+   * @testWith ["append", {"values": ["one", "three"]}, ["itemA", "itemB", "one", "three"]]
+   *   ["prepend", {"values": ["undo", "redo"]}, ["undo", "redo", "itemA", "itemB"]]
+   *    ["splice", {"offset": 1, "replacement": ["c", "d"]}, ["itemA", "c", "d"]]
+   *    ["splice", {"offset": 1, "length": 0, "replacement": ["c", "d"]}, ["itemA", "c", "d", "itemB"]]
+   *    ["splice", {"offset": 1, "length": 0}, ["itemA", "itemB"]]
+   *    ["splice", {"offset": 1}, ["itemA"]]
+   */
+  public function testSimpleConfigArray(string $derivative_id, array $value, array $expected_value): void {
+    $this->installConfig('config_test');
+
+    $this->container->get('plugin.manager.config_action')->applyAction(
+      "simpleConfigArray:$derivative_id",
+      'config_test.system',
+      ['property' => 'array'] + $value,
+    );
+    $this->assertSame($expected_value, $this->config('config_test.system')->get('array'));
+  }
+
+  /**
+   * Tests that simpleConfigArray:splice rejects invalid arguments.
+   */
+  public function testSimpleConfigArraySpliceWithInvalidArgument(): void {
+    $this->installConfig('config_test');
+
+    $this->expectException(\Error::class);
+    $this->expectExceptionMessage('Unknown named parameter $yep');
+    $this->container->get('plugin.manager.config_action')->applyAction(
+      "simpleConfigArray:splice",
+      'config_test.system',
+      [
         'property' => 'array',
         'offset' => 1,
-        'banana' => 'banana',
-      ]);
-      $this->fail('Expected exception not thrown');
-    }
-    catch (ConfigActionException $e) {
-      $this->assertSame('Config config_test.system can not be updated because the following arguments are missing: length, replacement.', $e->getMessage());
-    }
+        // This parameter isn't defined by `array_splice()`.
+        'yep' => 'nope',
+      ],
+    );
   }
 
   /**

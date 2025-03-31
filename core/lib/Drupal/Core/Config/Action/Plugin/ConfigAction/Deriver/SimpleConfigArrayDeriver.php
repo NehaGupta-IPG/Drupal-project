@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\Core\Config\Action\Plugin\ConfigAction\Deriver;
 
 use Drupal\Component\Plugin\Derivative\DeriverBase;
+use Drupal\Core\StringTranslation\StringTranslationTrait;
 
 /**
  * Generates derivatives for simpleConfigArray config action.
@@ -14,24 +15,28 @@ use Drupal\Component\Plugin\Derivative\DeriverBase;
  */
 final class SimpleConfigArrayDeriver extends DeriverBase {
 
+  use StringTranslationTrait;
+
   /**
    * {@inheritdoc}
    */
   public function getDerivativeDefinitions($base_plugin_definition): array {
-    $this->derivatives['append'] = $base_plugin_definition + [
+    $this->derivatives['append'] = [
+      'admin_label' => $this->t('Append values to an array in simple config'),
       'function' => 'array_push',
-      'required_arguments' => 'values',
-    ];
-    $this->derivatives['prepend'] = $base_plugin_definition + [
-      'function' => 'array_unshift',
-      'required_arguments' => 'values',
-    ];
-    $this->derivatives['splice'] = $base_plugin_definition + [
-      'function' => 'array_splice',
-      'required_arguments' => ['offset', 'length', 'replacement'],
-    ];
+    ] + $base_plugin_definition;
 
-    return $this->derivatives;
+    $this->derivatives['prepend'] = [
+      'admin_label' => $this->t('Prepend values to an array in simple config'),
+      'function' => 'array_unshift',
+    ] + $base_plugin_definition;
+
+    $this->derivatives['splice'] = [
+      'admin_label' => $this->t('Splice values into an array in simple config'),
+      'function' => 'array_splice',
+    ] + $base_plugin_definition;
+
+    return parent::getDerivativeDefinitions($base_plugin_definition);
   }
 
 }
