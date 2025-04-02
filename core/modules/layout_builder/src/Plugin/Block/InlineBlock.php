@@ -208,7 +208,7 @@ class InlineBlock extends BlockBase implements ContainerFactoryPluginInterface, 
   }
 
   /**
-   * Processes serialized block correctly.
+   * Return the unserialized version of the block_serialized configuration.
    *
    * @return mixed
    *   Result of unserialize() function.
