@@ -43,6 +43,9 @@ class FormattableMarkupTest extends TestCase {
     $this->assertEquals('Can I have a kitten', $text);
     $text = $formattable_string->jsonSerialize();
     $this->assertEquals('Can I have a kitten', $text);
+    $formattable_string = new FormattableMarkup($string, ['@replacement' => NULL]);
+    $text = (string) $formattable_string;
+    $this->assertEquals('Can I have a ', $text);
   }
 
   /**

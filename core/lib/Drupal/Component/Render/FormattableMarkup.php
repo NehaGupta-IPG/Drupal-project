@@ -228,7 +228,7 @@ class FormattableMarkup implements MarkupInterface, \Countable {
   /**
    * Escapes a placeholder replacement value if needed.
    *
-   * @param string|\Drupal\Component\Render\MarkupInterface $value
+   * @param string|\Drupal\Component\Render\MarkupInterface|null $value
    *   A placeholder replacement value.
    *
    * @return string
