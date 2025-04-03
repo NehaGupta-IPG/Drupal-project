@@ -24,8 +24,7 @@ sections:
   description: 'Get an overview of all something.'
   weight: 1
   section: 'users'
-  extended_help: 'Users with this permission can view the page [ABC]. Theyll be able to see [XYZ], [ABC2], and [XYZ2]. So, you should only give this permission to users who need to see [ABC].'
+  extended_help: 'Users with this permission can view the page [ABC]. They will be able to see [XYZ], [ABC2], and [XYZ2]. So, you should only give this permission to users who need to see [ABC].'
 
 permission_callbacks:
   - \Drupal\user_permissions_parser_test\Controller\UserPermissionsParserTestController::getPerms
-

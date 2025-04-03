@@ -75,6 +75,9 @@ abstract class PermissionsParserPluginBase extends PluginBase implements Contain
    * @param array $context
    *   Same as for TranslationInterface::translate().
    *
+   * @return \Drupal\Core\StringTranslation\TranslatableMarkup|array
+   *   An object that, when cast to a string, returns the translated string.
+   *
    * @see \Drupal\Core\StringTranslation\TranslationInterface::translate()
    *   The other parameters and the return value are the same.
    */

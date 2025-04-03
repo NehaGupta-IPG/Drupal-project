@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * The PHPCS rules get confused because this is an enum file.
- */
-
 declare(strict_types=1);
 
 namespace Drupal\user\Permissions;

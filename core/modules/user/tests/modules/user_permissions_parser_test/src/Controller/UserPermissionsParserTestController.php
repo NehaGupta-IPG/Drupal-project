@@ -6,11 +6,9 @@ namespace Drupal\user_permissions_parser_test\Controller;
 
 use Drupal\Core\Controller\ControllerBase;
 use Drupal\Core\Discovery\YamlDiscovery;
-use Drupal\Core\Extension\ModuleHandlerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\user\PermissionHandlerInterface;
 use Drupal\user\Service\PermissionsRepositoryFactoryInterface;
-use Drupal\user\Service\PermissionsRepositoryReturnStyle;
 
 /**
  * Returns responses for Permissions repository routes.
@@ -47,7 +45,12 @@ final class UserPermissionsParserTestController extends ControllerBase {
     ksort($legacyPermissions);
     ksort($newPermissions);
 
-    //echo '<pre>' . json_encode($legacyPermissions, JSON_PRETTY_PRINT) . 'DDDDDDDDDDDDDDDDDDD' . json_encode($newPermissions, JSON_PRETTY_PRINT);
+    /*
+     * Uncomment if you want:
+     * $temp1 = json_encode($legacyPermissions, JSON_PRETTY_PRINT);
+     * $temp2 = json_encode($newPermissions, JSON_PRETTY_PRINT);
+     * echo '<pre>' . $temp1 . 'DDDDDDDDDDDDDDDDDDD' . $temp2;
+     */
 
     $yamlDiscovery = new YamlDiscovery('permissions', $this->moduleHandler()->getModuleDirectories());
 
@@ -56,17 +59,19 @@ final class UserPermissionsParserTestController extends ControllerBase {
     $permissionsRepository = $this->permissionsRepositoryFactory->createPermissionsRepository($list);
 
     $data = $permissionsRepository->getProviderData('user_permissions_parser_test');
-    //$data = $permissionsRepository->getAllPermissions();
+    // Uncomment if you want: $data = $permissionsRepository->getAllPermissions();
+
+    /*
+     * Uncomment if you want:
+     * $build['content'] = [
+     * '#type' => 'item',
+     * '#markup' => 'You could also use this to show something if you want.',
+     * ];
+     * return $build;
+     */
 
     echo '<pre>' . json_encode($data, JSON_PRETTY_PRINT);
     exit;
-
-    $build['content'] = [
-      '#type' => 'item',
-      '#markup' => 'You could also use this to show something if you want.',
-    ];
-
-    return $build;
   }
 
   /**

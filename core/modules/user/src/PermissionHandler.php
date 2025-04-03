@@ -217,14 +217,28 @@ class PermissionHandler implements PermissionHandlerInterface {
     // display name.
     $modules = $this->getModuleNames();
 
-    uasort($all_permissions, function (array $permission_a, array $permission_b) use ($modules) {
-      if ($modules[$permission_a['provider']] == $modules[$permission_b['provider']]) {
-        return $permission_a['title'] <=> $permission_b['title'];
+    uasort($all_permissions, function ($permission_a, $permission_b) use ($modules) {
+      if (is_string($permission_a) && is_string($permission_b)) {
+        return $permission_a <=> $permission_b;
+      }
+
+      $provider_a = $permission_a['provider'] ?? NULL;
+      $provider_b = $permission_b['provider'] ?? NULL;
+      $title_a = $permission_a['title'] ?? NULL;
+      $title_b = $permission_b['title'] ?? NULL;
+
+      if (!$provider_a || !$provider_b || !$title_a || !$title_b) {
+        return 0;
+      }
+
+      if ($modules[$provider_a] == $modules[$provider_b]) {
+        return $title_a <=> $title_b;
       }
       else {
-        return $modules[$permission_a['provider']] <=> $modules[$permission_b['provider']];
+        return $modules[$provider_a] <=> $modules[$provider_b];
       }
     });
+
     return $all_permissions;
   }
 
