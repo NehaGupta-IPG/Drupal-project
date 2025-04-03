@@ -43,6 +43,9 @@ class TaxonomyTermFilterTest extends TaxonomyTestBase {
     $this->vocabulary = $this->createVocabulary();
   }
 
+  /**
+   * Tests taxonomy term filters without a hierarchy.
+   */
   public function testTaxonomyTermOverviewFilterWithoutHierarchy(): void {
 
     // Create terms.
@@ -75,6 +78,9 @@ class TaxonomyTermFilterTest extends TaxonomyTestBase {
 
   }
 
+  /**
+   * Tests taxonomy term filters with a hierarchy.
+   */
   public function testTaxonomyTermOverviewFilterWithHierarchy(): void {
 
     // Create terms.
