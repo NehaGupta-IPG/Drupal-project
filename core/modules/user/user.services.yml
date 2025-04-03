@@ -50,9 +50,27 @@ services:
     arguments: ['@entity_type.manager', '@password']
   Drupal\user\UserAuthenticationInterface: '@user.auth'
   Drupal\user\UserAuthInterface: '@user.auth'
-  user.permissions:
+
+  # The deprecated way to retrieve permissions.
+  user.legacy_permissions:
     class: Drupal\user\PermissionHandler
     arguments: ['@module_handler', '@string_translation', '@callable_resolver', '@extension.list.module']
+
+  # The new way to retrieve permissions.
+  user.permissions:
+    class: Drupal\user\Service\PermissionsRepositoryHandler
+    arguments: ['@module_handler', '@string_translation', '@callable_resolver', '@extension.list.module', '@user_permissions_parser.repository_factory']
+
+  # The service to obtain a PermissionsParser object.
+  user_permissions_parser.repository_factory:
+    class: Drupal\user\Service\PermissionsRepositoryFactory
+    arguments: ['@module_handler', '@plugin.manager.permissions_parser']
+
+  # Internal use, to discover permissions parser plugins.
+  plugin.manager.permissions_parser:
+    class: Drupal\user\PermissionsParserPluginManager
+    parent: default_plugin_manager
+
   Drupal\user\PermissionHandlerInterface: '@user.permissions'
   user.current_user_context:
     class: Drupal\user\ContextProvider\CurrentUserContext

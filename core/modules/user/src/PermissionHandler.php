@@ -178,6 +178,10 @@ class PermissionHandler implements PermissionHandlerInterface {
       }
 
       foreach ($permissions as &$permission) {
+        if (empty($permission['title'])) {
+          continue;
+        }
+
         if (!is_array($permission)) {
           $permission = [
             'title' => $permission,

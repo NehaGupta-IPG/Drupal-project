@@ -1,0 +1,7 @@
+name: 'User permissions parser test'
+type: module
+description: 'Support module for user permissions parser testing.'
+package: Testing
+version: VERSION
+dependencies:
+  - drupal:user

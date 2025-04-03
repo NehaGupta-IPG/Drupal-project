@@ -1,0 +1,7 @@
+user_permissions_parser_test.user_permissions_parser_test:
+  path: 'admin/user_permissions_parser_test'
+  defaults:
+    _title: 'user_permissions_parser_test'
+    _controller: '\Drupal\user_permissions_parser_test\Controller\UserPermissionsParserTestController::testPermissionsParser'
+  requirements:
+    _permission: 'administer users'
