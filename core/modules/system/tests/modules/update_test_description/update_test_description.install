@@ -19,5 +19,6 @@ function update_test_description_update_8001(): void {
  * lazy dog.
  */
 // phpcs:enable
+// phpcs:disable Drupal.Commenting.FunctionComment.Missing
 function update_test_description_update_8002(): void {
 }

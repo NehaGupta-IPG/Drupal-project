@@ -11,6 +11,9 @@ class SomeClass {
 
   const TEST = '\Drupal\module_autoload_test\SomeClass::TEST';
 
+  /**
+   * Provides a method for testing class loading.
+   */
   public function testMethod() {
     return 'Drupal\\module_autoload_test\\SomeClass::testMethod() was invoked.';
   }

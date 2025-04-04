@@ -43,22 +43,37 @@ class TestService {
     $this->kernel = $kernel;
   }
 
+  /**
+   * @Gets the testInjection service.
+   */
   public function getTestInjection(): TestInjectionInterface {
     return $this->testInjection;
   }
 
+  /**
+   * Gets the testInjection service.
+   */
   public function getTestInjection2(): TestInjection2 {
     return $this->testInjection2;
   }
 
+  /**
+   * Gets the testInjection3 service.
+   */
   public function getTestInjection3(): TestInjection3 {
     return $this->testInjection3;
   }
 
+  /**
+   * Gets the database connection.
+   */
   public function getDatabase(): Connection {
     return $this->database;
   }
 
+  /**
+   * Gets the Drupal kernel.
+   */
   public function getKernel(): DrupalKernelInterface {
     return $this->kernel;
   }

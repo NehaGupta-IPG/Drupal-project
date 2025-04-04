@@ -21,6 +21,9 @@ class EnterProfileNode extends Node {
     ]);
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function compile(Compiler $compiler): void {
     $compiler
       ->write(sprintf('$%s = $this->extensions[', $this->getAttribute('var_name')))

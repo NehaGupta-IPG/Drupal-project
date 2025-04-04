@@ -18,6 +18,9 @@ class LeaveProfileNode extends Node {
     parent::__construct([], ['var_name' => $varName]);
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function compile(Compiler $compiler): void {
     $compiler
       ->write("\n")

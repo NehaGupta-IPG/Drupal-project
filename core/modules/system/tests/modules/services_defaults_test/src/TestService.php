@@ -24,10 +24,16 @@ class TestService {
     $this->testInjection2 = $test_injection2;
   }
 
+  /**
+   * Returns the testInjection service.
+   */
   public function getTestInjection() {
     return $this->testInjection;
   }
 
+  /**
+   * Returns the testInjection2 service.
+   */
   public function getTestInjection2() {
     return $this->testInjection2;
   }

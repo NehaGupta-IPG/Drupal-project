@@ -12,6 +12,9 @@ use Drupal\Core\Config\Action\Attribute\ActionMethod;
  */
 class DuplicatePluralizedMethodName extends ConfigTest {
 
+  /**
+   * Proves an empty test method.
+   */
   #[ActionMethod(pluralize: 'testMethod')]
   public function testMethod() {
   }

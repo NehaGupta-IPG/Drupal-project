@@ -27,6 +27,9 @@ class DummyReadOnlyStreamWrapper extends LocalReadOnlyStream {
     return 'Dummy wrapper for testing (readonly).';
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function getDirectoryPath() {
     return \Drupal::getContainer()->getParameter('site.path') . '/files';
   }

@@ -9,6 +9,9 @@ namespace Drupal\menu_link_content_dynamic_route;
  */
 class Routes {
 
+  /**
+   * Gets the menu link dynamic routes.
+   */
   public function dynamic() {
     return \Drupal::state()->get('menu_link_content_dynamic_route.routes', []);
   }

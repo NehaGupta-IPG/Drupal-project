@@ -11,6 +11,9 @@ use Drupal\Core\Render\Markup;
  */
 class TestController {
 
+  /**
+   * Returns markup for testing.
+   */
   public function page() {
     $markup = <<<JS
 <script>

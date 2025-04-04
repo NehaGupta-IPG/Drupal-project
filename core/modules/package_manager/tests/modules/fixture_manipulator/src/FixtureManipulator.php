@@ -378,6 +378,9 @@ class FixtureManipulator {
     $this->committingChanges = FALSE;
   }
 
+  /**
+   * Updates the lock file.
+   */
   public function updateLock(): self {
     $this->runComposerCommand(['update', '--lock']);
     return $this;
@@ -441,6 +444,9 @@ class FixtureManipulator {
     return $this->manipulatorArguments;
   }
 
+  /**
+   * Runs a composer command.
+   */
   protected function runComposerCommand(array $command_options): OutputCallbackInterface {
     $plain_output = new class() implements OutputCallbackInterface {
       /**

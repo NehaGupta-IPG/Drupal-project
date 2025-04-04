@@ -94,6 +94,9 @@ class FieldUiTestHooks {
     ];
   }
 
+  /**
+   * Returns the region to which a row in the display overview belongs.
+   */
   public function regionCallback($row): string {
     return 'content';
   }
