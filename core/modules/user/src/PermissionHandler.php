@@ -177,16 +177,18 @@ class PermissionHandler implements PermissionHandlerInterface {
         unset($permissions['permission_callbacks']);
       }
 
-      foreach ($permissions as &$permission) {
-        if (empty($permission['title'])) {
-          continue;
-        }
-
-        if (!is_array($permission)) {
+      foreach ($permissions as $key => &$permission) {
+        if (is_string($permission)) {
           $permission = [
             'title' => $permission,
           ];
         }
+
+        if (empty($permission['title']) || !is_string($permission['title'])) {
+          unset($permissions[$key]);
+          continue;
+        }
+
         // phpcs:ignore Drupal.Semantics.FunctionT.NotLiteralString
         $permission['title'] = $this->t($permission['title']);
         // phpcs:ignore Drupal.Semantics.FunctionT.NotLiteralString
@@ -217,28 +219,14 @@ class PermissionHandler implements PermissionHandlerInterface {
     // display name.
     $modules = $this->getModuleNames();
 
-    uasort($all_permissions, function ($permission_a, $permission_b) use ($modules) {
-      if (is_string($permission_a) && is_string($permission_b)) {
-        return $permission_a <=> $permission_b;
-      }
-
-      $provider_a = $permission_a['provider'] ?? NULL;
-      $provider_b = $permission_b['provider'] ?? NULL;
-      $title_a = $permission_a['title'] ?? NULL;
-      $title_b = $permission_b['title'] ?? NULL;
-
-      if (!$provider_a || !$provider_b || !$title_a || !$title_b) {
-        return 0;
-      }
-
-      if ($modules[$provider_a] == $modules[$provider_b]) {
-        return $title_a <=> $title_b;
+    uasort($all_permissions, function (array $permission_a, array $permission_b) use ($modules) {
+      if ($modules[$permission_a['provider']] == $modules[$permission_b['provider']]) {
+        return $permission_a['title'] <=> $permission_b['title'];
       }
       else {
-        return $modules[$provider_a] <=> $modules[$provider_b];
+        return $modules[$permission_a['provider']] <=> $modules[$permission_b['provider']];
       }
     });
-
     return $all_permissions;
   }
 
