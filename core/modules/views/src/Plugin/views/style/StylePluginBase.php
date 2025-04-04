@@ -192,6 +192,7 @@ abstract class StylePluginBase extends PluginBase {
    * Returns the usesGroupingLabelElement property.
    *
    * @return bool
+   *  TRUE if this style uses grouping label element, FALSE otherwise.
    */
   public function usesGroupingLabelElement(): bool {
     return $this->usesGroupingLabelElement;
