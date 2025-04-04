@@ -258,7 +258,7 @@ function theme_get_setting($setting_name, $theme = NULL) {
       try {
         $query_string = \Drupal::service('asset.query_string')->get();
       }
-      catch (Exception $e) {
+      catch (Exception) {
         $query_string = '0';
       }
 
