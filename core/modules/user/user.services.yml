@@ -56,15 +56,15 @@ services:
     class: Drupal\user\PermissionHandler
     arguments: ['@module_handler', '@string_translation', '@callable_resolver', '@extension.list.module']
 
-  # The new way to retrieve permissions.
-  user.permissions:
-    class: Drupal\user\Service\PermissionsRepositoryHandler
-    arguments: ['@module_handler', '@string_translation', '@callable_resolver', '@extension.list.module', '@user_permissions_parser.repository_factory']
-
   # The service to obtain a PermissionsParser object.
   user_permissions_parser.repository_factory:
     class: Drupal\user\Service\PermissionsRepositoryFactory
     arguments: ['@module_handler', '@plugin.manager.permissions_parser']
+
+  # The new way to retrieve permissions.
+  user.permissions:
+    class: Drupal\user\Service\PermissionsRepositoryHandler
+    arguments: ['@module_handler', '@string_translation', '@callable_resolver', '@extension.list.module', '@user_permissions_parser.repository_factory']
 
   # Internal use, to discover permissions parser plugins.
   plugin.manager.permissions_parser:
