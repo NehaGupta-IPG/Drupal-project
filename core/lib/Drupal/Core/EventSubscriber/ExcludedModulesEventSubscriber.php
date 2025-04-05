@@ -21,16 +21,22 @@ final class ExcludedModulesEventSubscriber implements EventSubscriberInterface {
   const EXCLUDED_MODULES_KEY = "config_exclude_modules";
 
   /**
+   * The active storage.
+   *
    * @var \Drupal\Core\Config\StorageInterface
    */
   private $activeStorage;
 
   /**
+   * The site settings.
+   *
    * @var \Drupal\Core\Site\Settings
    */
   private $settings;
 
   /**
+   * The configuration manager service.
+   *
    * @var \Drupal\Core\Config\ConfigManagerInterface
    */
   private $manager;

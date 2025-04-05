@@ -9,6 +9,8 @@ use Drupal\Core\Config\Action\Exists;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 
 /**
+ * Deriver for configuration actions.
+ *
  * @internal
  *   This API is experimental.
  */

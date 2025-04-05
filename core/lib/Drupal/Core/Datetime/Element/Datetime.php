@@ -20,6 +20,8 @@ class Datetime extends DateElementBase {
   use DoTrustedCallbackTrait;
 
   /**
+   * The date time service.
+   *
    * @var \DateTimeInterface
    */
   protected static $dateExample;

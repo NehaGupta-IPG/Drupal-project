@@ -26,6 +26,8 @@ class UrlGenerator implements UrlGeneratorInterface {
   protected $provider;
 
   /**
+   * The context of the request.
+   *
    * @var RequestContext
    */
   protected $context;

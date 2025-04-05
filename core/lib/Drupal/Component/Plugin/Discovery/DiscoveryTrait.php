@@ -5,7 +5,9 @@ namespace Drupal\Component\Plugin\Discovery;
 use Drupal\Component\Plugin\Exception\PluginNotFoundException;
 
 /**
- * @see Drupal\Component\Plugin\Discovery\DiscoveryInterface
+ * Provides methods to work with plugin definitions.
+ *
+ * @see \\Drupal\Component\Plugin\Discovery\DiscoveryInterface
  */
 trait DiscoveryTrait {
 

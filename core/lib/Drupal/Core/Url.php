@@ -820,6 +820,8 @@ class Url implements TrustedCallbackInterface {
   }
 
   /**
+   * Gets the access manager service.
+   *
    * @return \Drupal\Core\Access\AccessManagerInterface
    *   The access manager service.
    */

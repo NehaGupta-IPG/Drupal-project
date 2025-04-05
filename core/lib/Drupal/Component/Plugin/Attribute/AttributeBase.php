@@ -31,6 +31,8 @@ abstract class AttributeBase implements AttributeInterface {
   protected array|null $dependencies = NULL;
 
   /**
+   * Constructs the attribute.
+   *
    * @param string $id
    *   The attribute class ID.
    */

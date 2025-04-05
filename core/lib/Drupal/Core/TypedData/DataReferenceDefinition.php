@@ -13,6 +13,8 @@ namespace Drupal\Core\TypedData;
 class DataReferenceDefinition extends DataDefinition implements DataReferenceDefinitionInterface {
 
   /**
+   * The data definition of a reference.
+   *
    * @var \Drupal\Core\TypedData\DataDefinitionInterface
    */
   protected $targetDefinition;

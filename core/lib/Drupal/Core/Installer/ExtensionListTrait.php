@@ -17,7 +17,7 @@ trait ExtensionListTrait {
   protected static $staticAddedPathNames;
 
   /**
-   * @see \Drupal\Core\Extension\ExtensionList::setPathname()
+   * {@inheritdoc}
    */
   public function setPathname($extension_name, $pathname) {
     parent::setPathname($extension_name, $pathname);
@@ -31,7 +31,7 @@ trait ExtensionListTrait {
   }
 
   /**
-   * @see \Drupal\Core\Extension\ExtensionList::getPathname()
+   * {@inheritdoc}
    */
   public function getPathname($extension_name) {
     if (isset($this->addedPathNames[$extension_name])) {

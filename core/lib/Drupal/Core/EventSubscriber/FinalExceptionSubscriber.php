@@ -38,9 +38,11 @@ class FinalExceptionSubscriber implements EventSubscriberInterface {
   use StringTranslationTrait;
 
   /**
-   * @var string
+   * The error level.
    *
    * One of the error level constants defined in bootstrap.inc.
+   *
+   * @var string
    */
   protected $errorLevel;
 

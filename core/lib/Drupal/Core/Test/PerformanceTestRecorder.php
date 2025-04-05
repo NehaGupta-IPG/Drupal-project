@@ -20,6 +20,8 @@ class PerformanceTestRecorder implements EventSubscriberInterface {
   protected ?StateInterface $state;
 
   /**
+   * The event record.
+   *
    * @var array
    */
   protected static $record = [];

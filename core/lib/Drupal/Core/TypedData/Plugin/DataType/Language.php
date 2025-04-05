@@ -28,6 +28,8 @@ class Language extends TypedData {
   protected $id;
 
   /**
+   * The language for this data.
+   *
    * @var \Drupal\Core\Language\Language
    */
   protected $language;

@@ -21,16 +21,22 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 class RecursiveValidator implements ValidatorInterface {
 
   /**
+   * The context factory.
+   *
    * @var \Symfony\Component\Validator\Context\ExecutionContextFactoryInterface
    */
   protected $contextFactory;
 
   /**
+   * The constraint validation factory.
+   *
    * @var \Symfony\Component\Validator\ConstraintValidatorFactoryInterface
    */
   protected $constraintValidatorFactory;
 
   /**
+   * The typed data manager.
+   *
    * @var \Drupal\Core\TypedData\TypedDataManager
    */
   protected $typedDataManager;

@@ -55,6 +55,8 @@ class ChainedFastBackend implements CacheBackendInterface, CacheTagsInvalidatorI
   const LAST_WRITE_TIMESTAMP_PREFIX = 'last_write_timestamp_';
 
   /**
+   * The cache bin.
+   *
    * @var string
    */
   protected $bin;
@@ -283,6 +285,8 @@ class ChainedFastBackend implements CacheBackendInterface, CacheTagsInvalidatorI
   }
 
   /**
+   * Clears the last written timestamp.
+   *
    * @todo Document in https://www.drupal.org/node/2311945.
    */
   public function reset() {

@@ -11,6 +11,8 @@ use Drupal\Core\Extension\ExtensionDiscovery;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 
 /**
+ * Defines the action method attribute.
+ *
  * @internal
  *   This API is experimental.
  */
@@ -18,6 +20,8 @@ use Drupal\Core\StringTranslation\TranslatableMarkup;
 final class ActionMethod {
 
   /**
+   * Constructs an action method attribute.
+   *
    * @param \Drupal\Core\Config\Action\Exists $exists
    *   Determines behavior of action depending on entity existence.
    * @param \Drupal\Core\StringTranslation\TranslatableMarkup|string $adminLabel

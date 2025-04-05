@@ -30,6 +30,8 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 final class RecipeRunner {
 
   /**
+   * Processes a recipe.
+   *
    * @param \Drupal\Core\Recipe\Recipe $recipe
    *   The recipe to apply.
    */
@@ -337,6 +339,8 @@ final class RecipeRunner {
   }
 
   /**
+   * Replaces the placeholders.
+   *
    * @param mixed $data
    *   The data that will have placeholders replaced.
    * @param array<string, mixed> $replace

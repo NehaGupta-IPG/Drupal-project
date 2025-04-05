@@ -54,6 +54,8 @@ class KeyValueFactory implements KeyValueFactoryInterface {
   protected $options;
 
   /**
+   * Constructs the key value factory.
+   *
    * @param \Symfony\Component\DependencyInjection\ContainerInterface $container
    *   The service container.
    * @param array $options

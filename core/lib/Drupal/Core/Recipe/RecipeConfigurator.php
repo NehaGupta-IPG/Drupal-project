@@ -11,6 +11,8 @@ namespace Drupal\Core\Recipe;
 final class RecipeConfigurator {
 
   /**
+   * An ordered list of recipes for a recipe to apply.
+   *
    * @var \Drupal\Core\Recipe\Recipe[]
    */
   public readonly array $recipes;
@@ -23,6 +25,8 @@ final class RecipeConfigurator {
   private static array $cache = [];
 
   /**
+   * Constructs the recipe configurator.
+   *
    * @param string[] $recipes
    *   A list of recipes for a recipe to apply. The recipes will be applied in
    *   the order listed.

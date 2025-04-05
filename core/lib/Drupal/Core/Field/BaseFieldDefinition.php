@@ -41,6 +41,8 @@ class BaseFieldDefinition extends ListDataDefinition implements FieldDefinitionI
   protected $schema;
 
   /**
+   * The indexes for a field type.
+   *
    * @var array
    */
   protected $indexes = [];

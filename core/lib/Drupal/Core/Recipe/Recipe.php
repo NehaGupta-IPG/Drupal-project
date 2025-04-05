@@ -39,6 +39,8 @@ final class Recipe {
   const COMPOSER_PROJECT_TYPE = 'drupal-recipe';
 
   /**
+   * Constructs a recipe.
+   *
    * @param string $name
    *   The human-readable name of the recipe.
    * @param string $description

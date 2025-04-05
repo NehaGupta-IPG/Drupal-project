@@ -15,6 +15,8 @@ use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
+ * Defines the 'set properties' configuration action.
+ *
  * @internal
  *   This API is experimental.
  */

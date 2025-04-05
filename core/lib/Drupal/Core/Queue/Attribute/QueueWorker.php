@@ -38,6 +38,8 @@ use Drupal\Core\StringTranslation\TranslatableMarkup;
 class QueueWorker extends Plugin {
 
   /**
+   * Constructs the queue worker.
+   *
    * @param string $id
    *   The plugin ID.
    * @param \Drupal\Core\StringTranslation\TranslatableMarkup|null $title

@@ -7,6 +7,7 @@ namespace Drupal\Core\Entity;
  */
 interface EntityRepositoryInterface {
 
+  // phpcs:ignore Drupal.Commenting.DocComment.MissingShort
   /**
    * Loads an entity by UUID.
    *
