@@ -75,8 +75,11 @@ class ThemeSettingsTest extends KernelTestBase {
     $theme = $theme_handler->getTheme('stark');
 
     // Tests default behavior.
-    $expected = '/' . $theme->getPath() . '/logo.svg';
-    $this->assertEquals($expected, theme_get_setting('logo.url', 'stark'));
+    $logo_url = theme_get_setting('logo.url', 'stark');
+    $expected_path = '/' . $theme->getPath() . '/logo.svg';
+    $this->setRawContent($logo_url);
+    $this->assertRaw($expected_path, 'Logo URL contains the correct base path.');
+    $this->assertPattern('/\?[0-9]+$/', 'Logo URL contains a cache-busting query parameter.');
 
     $config = $this->config('stark.settings');
     drupal_static_reset('theme_get_setting');
@@ -90,8 +93,12 @@ class ThemeSettingsTest extends KernelTestBase {
     // Tests logo path with scheme.
     /** @var \Drupal\Core\File\FileUrlGeneratorInterface $file_url_generator */
     $file_url_generator = \Drupal::service('file_url_generator');
-    $expected = $file_url_generator->generateString('public://logo_with_scheme.png');
-    $this->assertEquals($expected, theme_get_setting('logo.url', 'stark'));
+    $expected_base = $file_url_generator->generateString('public://logo_with_scheme.png');
+    $expected_base = preg_replace('/\?.*$/', '', $expected_base);
+    $logo_url = theme_get_setting('logo.url', 'stark');
+    $this->setRawContent($logo_url);
+    $this->assertRaw($expected_base, 'Logo URL with scheme contains the correct base path.');
+    $this->assertPattern('/\?[0-9]+$/', 'Logo URL with scheme contains a cache-busting query parameter.');
 
     $values = [
       'default_logo' => FALSE,
@@ -102,8 +109,11 @@ class ThemeSettingsTest extends KernelTestBase {
     drupal_static_reset('theme_get_setting');
 
     // Tests relative path.
-    $expected = '/' . $theme->getPath() . '/logo_relative_path.gif';
-    $this->assertEquals($expected, theme_get_setting('logo.url', 'stark'));
+    $expected_path = '/' . $theme->getPath() . '/logo_relative_path.gif';
+    $logo_url = theme_get_setting('logo.url', 'stark');
+    $this->setRawContent($logo_url);
+    $this->assertRaw($expected_path, 'Relative path logo URL contains the correct base path.');
+    $this->assertPattern('/\?[0-9]+$/', 'Relative path logo URL contains a cache-busting query parameter.');
 
     $theme_installer->install(['test_theme']);
     \Drupal::configFactory()
@@ -115,8 +125,11 @@ class ThemeSettingsTest extends KernelTestBase {
     drupal_static_reset('theme_get_setting');
 
     // Tests logo set in test_theme.info.yml.
-    $expected = '/' . $theme->getPath() . '/images/logo2.svg';
-    $this->assertEquals($expected, theme_get_setting('logo.url', 'test_theme'));
+    $expected_path = '/' . $theme->getPath() . '/images/logo2.svg';
+    $logo_url = theme_get_setting('logo.url', 'test_theme');
+    $this->setRawContent($logo_url);
+    $this->assertRaw($expected_path, 'Info.yml logo URL contains the correct base path.');
+    $this->assertPattern('/\?[0-9]+$/', 'Info.yml logo URL contains a cache-busting query parameter.');
   }
 
 }
