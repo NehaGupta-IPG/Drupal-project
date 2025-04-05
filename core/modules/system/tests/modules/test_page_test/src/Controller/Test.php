@@ -90,6 +90,9 @@ class Test {
     throw new HttpException($code);
   }
 
+  /**
+   * Triggers an error.
+   */
   public function error() {
     trigger_error('foo', E_USER_NOTICE);
     return [

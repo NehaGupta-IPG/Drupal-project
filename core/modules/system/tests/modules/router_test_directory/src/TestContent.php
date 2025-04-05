@@ -46,6 +46,9 @@ class TestContent extends ControllerBase {
     return ['#markup' => $account->getAccountName()];
   }
 
+  /**
+   * Provides example content for testing changing the user account.
+   */
   public function testAccount(UserInterface $user) {
     $current_user_name = $this->currentUser()->getAccountName();
     $this->currentUser()->setAccount($user);

@@ -11,6 +11,9 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class TestController {
 
+  /**
+   * Returns a response with content.
+   */
   public function test(): Response {
     return new Response('test');
   }

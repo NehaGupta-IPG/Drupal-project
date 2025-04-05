@@ -19,6 +19,7 @@ class TestControllers {
 
   const LONG_TEXT = 'This is text long enough to trigger Apache mod_deflate to add a `vary: accept-encoding` header to the response.';
 
+  // phpcs:disable Drupal.Commenting.FunctionComment.Missing
   public function test() {
     return new Response('test');
   }
@@ -68,6 +69,8 @@ class TestControllers {
     return new Response($text);
   }
 
+  // phpcs:enable
+
   /**
    * Tests controller for ExceptionHandlingTest::testBacktraceEscaping().
    *
@@ -79,6 +82,7 @@ class TestControllers {
     $this->throwException('<script>alert(\'xss\')</script>');
   }
 
+  // phpcs:disable Drupal.Commenting.FunctionComment.Missing
   public function test18() {
     return [
       '#cache' => [
@@ -120,6 +124,8 @@ class TestControllers {
     ];
   }
 
+  // phpcs:enable
+
   /**
    * Rejects requests with query keys.
    *
@@ -146,6 +152,9 @@ class TestControllers {
     throw new \Exception($message);
   }
 
+  /**
+   * Removes the exception logger service.
+   */
   protected function removeExceptionLogger() {
     // Remove the exception logger from the event dispatcher. We are going to
     // throw an exception to check if it is properly escaped when rendered as a

@@ -44,7 +44,7 @@ class TestService {
   }
 
   /**
-   * @Gets the testInjection service.
+   * Gets the testInjection service.
    */
   public function getTestInjection(): TestInjectionInterface {
     return $this->testInjection;

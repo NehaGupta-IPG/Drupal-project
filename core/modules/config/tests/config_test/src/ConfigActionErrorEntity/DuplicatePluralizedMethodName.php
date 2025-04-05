@@ -13,7 +13,7 @@ use Drupal\Core\Config\Action\Attribute\ActionMethod;
 class DuplicatePluralizedMethodName extends ConfigTest {
 
   /**
-   * Proves an empty test method.
+   * A test action that tries to pluralize itself.
    */
   #[ActionMethod(pluralize: 'testMethod')]
   public function testMethod() {
