@@ -509,6 +509,7 @@ services:
     class: Drupal\Component\Datetime\Time
     arguments: ['@request_stack']
   Drupal\Component\Datetime\TimeInterface: '@datetime.time'
+  Psr\Clock\ClockInterface: '@datetime.time'
   file_system:
     class: Drupal\Core\File\FileSystem
     arguments: ['@stream_wrapper_manager', '@settings']
