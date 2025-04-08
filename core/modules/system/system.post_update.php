@@ -64,20 +64,12 @@ function system_removed_post_updates(): array {
 }
 
 /**
- * Updates system.date config to NULL for empty country and timezone defaults.
+ * Updates system.date config to NULL for empty country defaults.
  */
-function system_post_update_convert_empty_country_and_timezone_settings_to_null(): void {
+function system_post_update_convert_empty_country_setting_to_null(): void {
   $system_date_settings = \Drupal::configFactory()->getEditable('system.date');
-  $changed = FALSE;
   if ($system_date_settings->get('country.default') === '') {
     $system_date_settings->set('country.default', NULL);
-    $changed = TRUE;
-  }
-  if ($system_date_settings->get('timezone.default') === '') {
-    $system_date_settings->set('timezone.default', NULL);
-    $changed = TRUE;
-  }
-  if ($changed) {
     $system_date_settings->save();
   }
 }
