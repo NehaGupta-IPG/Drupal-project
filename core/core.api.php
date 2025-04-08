@@ -1000,7 +1000,7 @@
  *
  * The base type for most complex data is the
  * \Drupal\Core\TypedData\Plugin\DataType\Map class, which represents an
- * associative array. Map provides its own definition class in the annotation,
+ * associative array. Map provides its own definition class in the attribute,
  * \Drupal\Core\TypedData\MapDataDefinition, and most complex data classes
  * extend this class. The getValue() and setValue() methods on the Map class
  * enforce the data definition and its property structure.
@@ -1051,8 +1051,8 @@
  *   sections above as a starting point.
  * - Make your class into a DataType plugin. To do that, put it in namespace
  *   \Drupal\your_module\Plugin\DataType (where "your_module" is your module's
- *   short name), and add annotation of type
- *   \Drupal\Core\TypedData\Annotation\DataType to the documentation header.
+ *   short name), and add attribute of type
+ *   \Drupal\Core\TypedData\Attribute\DataType.
  *   See the @link plugin_api Plugin API topic @endlink and the
  *   @link annotation Annotations topic @endlink for more information.
  *
@@ -1062,9 +1062,10 @@
  * - In the Field API, data types can be used as the class in the property
  *   definition of the field. See the @link field Field API topic @endlink for
  *   more information.
- * - In configuration schema files, you can use the unique ID ('id' annotation)
- *   from any DataType plugin class as the 'type' value for an entry. See the
- *   @link config_api Configuration API topic @endlink for more information.
+ * - In configuration schema files, you can use the unique ID ('id' attribute
+ *   argument) from any DataType plugin class as the 'type' value for an entry.
+ *   See the @link config_api Configuration API topic @endlink for more
+ *   information.
  * - If you need to create a typed data object in code, first get the
  *   typed_data_manager service from the container or by calling
  *   \Drupal::typedDataManager(). Then pass the plugin ID to
@@ -1468,13 +1469,13 @@
  *
  * A class for a new content type should be similar to this example.
  * @code
- * namespace Drupal\new_content_type\Entity;
+ * namespace Drupal\my_entity_type\Entity;
  *
  * #[ContentEntityType(
- *   id: 'new_content_type',
+ *   id: 'my_entity_type',
  *   label: new TranslatableMarkup('New content type'),
  *   ...
- *   base_table: "new_content_type"
+ *   base_table: "my_entity_type"
  * )]
  * class NewContentType extends ContentEntityBase {
  * @endcode
@@ -2031,14 +2032,16 @@
  * @{
  * Annotations for class discovery and metadata description.
  *
+ * Using annotations for plugin discovery will be deprecated. Use attributes for
+ * @link sub_discovery plugin discovery @endlink.
+ *
  * The Drupal plugin system has a set of reusable components that developers
  * can use, override, and extend in their modules. Most of the plugins use
- * annotations, which let classes register themselves as plugins and describe
- * their metadata. (Annotations can also be used for other purposes, though
- * at the moment, Drupal only uses them for the plugin system.)
+ * attributes, which let classes register themselves as plugins and describe
+ * their metadata.
  *
- * To annotate a class as a plugin, add code similar to the following to the
- * end of the documentation block immediately preceding the class declaration:
+ * To create a class as a plugin, add code similar to the following immediately
+ * preceding the class declaration:
  * @code
  * * @ContentEntityType(
  * *   id = "comment",
@@ -2048,28 +2051,24 @@
  * * )
  * @endcode
  *
- * Note that you must use double quotes; single quotes will not work in
- * annotations.
- *
- * Some annotation types, which extend the "@ PluginID" annotation class, have
- * only a single 'id' key in their annotation. For these, it is possible to use
- * a shorthand annotation. For example:
+ * Some attribute types, which extend the "@ PluginID" attribute class, have
+ * only a single 'id' attribute argument. For these, it is possible to use
+ * a shorthand syntax. For example:
  * @code
- * * @ViewsArea("entity")
+ * #[ViewsArea("entity")]
  * @endcode
  * in place of
  * @code
- * * @ViewsArea(
- * *   id = "entity"
- * *)
+ * #[ViewsArea(
+ *   id: "entity",
+ * )]
  * @endcode
  *
- * The available annotation classes are listed in this topic, and can be
+ * The available attributes classes are listed in this topic, and can be
  * identified when you are looking at the Drupal source code by having
- * "@ Annotation" in their documentation blocks (without the space after @). To
- * find examples of annotation for a particular annotation class, such as
- * EntityType, look for class files that have an @ annotation section using the
- * annotation class.
+ * "#[plugin_type_name]" preceding the class declaration. To find examples of a
+ * for a particular attribute class, such as ContentEntityType, look for class
+ * files that have "#[ContentEntityType(".
  *
  * @see plugin_translatable
  * @see plugin_context
