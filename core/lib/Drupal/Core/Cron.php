@@ -206,7 +206,7 @@ class Cron implements CronInterface {
     $end = $this->time->getCurrentTime() + $lease_time;
     while ($this->time->getCurrentTime() < $end && ($item = $queue->claimItem($lease_time))) {
       try {
-        if ($worker instanceof QueueWorkerNextInterface::class) {
+        if ($worker instanceof QueueWorkerNextInterface) {
           $worker->processDataAndItem($item->data, $item);
         }
         else {
