@@ -4,7 +4,7 @@
  * @file
  * Partial database to create broken config overrides.
  *
- * @see \Drupal\system\Tests\Update\ConfigOverridesUpdateTest
+ * @see \Drupal\Tests\language\Functional\Update\NonDefaultConfigSaveUpdateTest
  */
 
 use Drupal\Core\Database\Database;
