@@ -817,8 +817,8 @@ class SqlContentEntityStorage extends ContentEntityStorageBase implements SqlEnt
         try {
           $transaction->rollBack();
         }
-        catch (TransactionOutOfOrderException $e) {
-          Error::logException(\Drupal::logger($this->entityTypeId), $e);
+        catch (TransactionOutOfOrderException $rollbackException) {
+          Error::logException(\Drupal::logger($this->entityTypeId), $rollbackException);
         }
       }
       Error::logException(\Drupal::logger($this->entityTypeId), $e);
@@ -870,7 +870,12 @@ class SqlContentEntityStorage extends ContentEntityStorageBase implements SqlEnt
     }
     catch (\Exception $e) {
       if (isset($transaction)) {
-        $transaction->rollBack();
+        try {
+          $transaction->rollBack();
+        }
+        catch (TransactionOutOfOrderException $rollbackException) {
+          Error::logException(\Drupal::logger($this->entityTypeId), $rollbackException);
+        }
       }
       Error::logException(\Drupal::logger($this->entityTypeId), $e);
       throw new EntityStorageException($e->getMessage(), $e->getCode(), $e);
