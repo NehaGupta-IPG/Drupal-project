@@ -1178,6 +1178,17 @@ function template_preprocess_html(&$variables): void {
     $placeholder = '<' . $placeholder_name . '-placeholder token="' . $variables['placeholder_token'] . '">';
     $variables['#attached']['html_response_attachment_placeholders'][$type] = $placeholder;
   }
+
+  // An exception might be thrown.
+  try {
+    $variables['is_front'] = $is_front_page;
+  }
+  catch (Exception) {
+    // If the database is not yet available, set default values for these
+    // variables.
+    $variables['is_front'] = FALSE;
+  }
+
 }
 
 /**
