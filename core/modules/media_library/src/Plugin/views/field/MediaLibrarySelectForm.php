@@ -171,6 +171,13 @@ class MediaLibrarySelectForm extends FieldPluginBase {
       $response->addCommand(new MessageCommand($error, '#media-library-messages', ['type' => 'error']));
       return $response;
     }
+    elseif (empty($selected_ids)) {
+      $response = new AjaxResponse();
+      $error = \Drupal::translation()->translate('No items selected.');
+      $response->addCommand(new MessageCommand($error, '#media-library-messages', ['type' => 'error']));
+      $form_state->clearErrors();
+      return $response;
+    }
 
     return \Drupal::service('media_library.opener_resolver')
       ->get($state)
