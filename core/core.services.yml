@@ -1569,6 +1569,9 @@ services:
     calls:
       - [setThemeManager, ['@theme.manager']]
   Drupal\Core\Theme\Registry: '@theme.registry'
+  theme.switcher:
+    class: Drupal\Core\Theme\ThemeSwitcher
+    arguments: ['@theme.manager', '@theme.initialization', '@config.factory']
   authentication:
     class: Drupal\Core\Authentication\AuthenticationManager
     arguments: ['@authentication_collector']
