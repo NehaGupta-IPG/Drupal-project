@@ -16,8 +16,8 @@ use Drupal\filter\FilterFormatInterface;
  * Performs alterations on text editor definitions.
  *
  * @param array $editors
- *   An array of metadata of text editors, as collected by the plugin annotation
- *   discovery mechanism.
+ *   An array of metadata of text editors, as collected by the plugin discovery
+ *   mechanism.
  *
  * @see \Drupal\editor\Plugin\EditorBase
  */

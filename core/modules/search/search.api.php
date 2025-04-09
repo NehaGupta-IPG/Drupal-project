@@ -70,7 +70,7 @@ function hook_search_preprocess($text, $langcode = NULL): string {
  * @param array $definitions
  *   The array of search plugin definitions, keyed by plugin ID.
  *
- * @see \Drupal\search\Annotation\SearchPlugin
+ * @see \Drupal\search\Attribute\Search
  * @see \Drupal\search\SearchPluginManager
  */
 function hook_search_plugin_alter(array &$definitions) {

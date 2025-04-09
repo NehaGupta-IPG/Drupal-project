@@ -93,7 +93,7 @@ function hook_help($route_name, RouteMatchInterface $route_match): string|\Strin
  *   by reference.
  *
  * @see \Drupal\help\HelpSectionPluginInterface
- * @see \Drupal\help\Annotation\HelpSection
+ * @see \Drupal\help\Attribute\HelpSection
  * @see \Drupal\help\HelpSectionManager
  */
 function hook_help_section_info_alter(array &$info) {

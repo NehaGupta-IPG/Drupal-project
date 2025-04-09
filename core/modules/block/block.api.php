@@ -30,10 +30,8 @@ use Drupal\Core\Access\AccessResult;
  * - Usually you will want to extend the \Drupal\Core\Block\BlockBase class,
  *   which provides a common configuration form and utility methods for getting
  *   and setting configuration in the block configuration entity.
- * - Block plugins use the annotations defined by
- *   \Drupal\Core\Block\Annotation\Block. See the
- *   @link annotation Annotations topic @endlink for more information about
- *   annotations.
+ * - Block plugins use attributes defined by
+ *   \Drupal\Core\Block\Attribute\Block.
  *
  * This is an example of a basic block plugin class:
  * @code
@@ -61,8 +59,8 @@ use Drupal\Core\Access\AccessResult;
  * placement. Condition plugins have interface
  * \Drupal\Core\Condition\ConditionInterface, base class
  * \Drupal\Core\Condition\ConditionPluginBase, and go in plugin namespace
- * Plugin\Condition. Again, see the Plugin API and Annotations topics for
- * details of how to create a plugin class and annotate it.
+ * Plugin\Condition. Again, see the Plugin API topic for details of how to
+ * create a plugin class.
  *
  * There are also several block-related hooks, which allow you to affect
  * the content and access permissions for blocks:
@@ -132,10 +130,10 @@ function hook_block_view_alter(array &$build, BlockPluginInterface $block) {
  * In this hook name, BASE_BLOCK_ID refers to the block implementation's plugin
  * id, regardless of whether the plugin supports derivatives. For example, for
  * the \Drupal\system\Plugin\Block\SystemPoweredByBlock block, this would be
- * 'system_powered_by_block' as per that class's annotation. And for the
- * \Drupal\system\Plugin\Block\SystemMenuBlock block, it would be
- * 'system_menu_block' as per that class's annotation, regardless of which menu
- * the derived block is for.
+ * 'system_powered_by_block' as defined by the 'id' attribute of that class. And
+ * for the \Drupal\system\Plugin\Block\SystemMenuBlock block, it would be
+ * 'system_menu_block' as defined by the 'id' attribute of that class,
+ * regardless of which menu the derived block is for.
  *
  * @param array $build
  *   A renderable array of data, as returned from the build() implementation of
@@ -189,10 +187,10 @@ function hook_block_build_alter(array &$build, BlockPluginInterface $block) {
  * In this hook name, BASE_BLOCK_ID refers to the block implementation's plugin
  * id, regardless of whether the plugin supports derivatives. For example, for
  * the \Drupal\system\Plugin\Block\SystemPoweredByBlock block, this would be
- * 'system_powered_by_block' as per that class's annotation. And for the
- * \Drupal\system\Plugin\Block\SystemMenuBlock block, it would be
- * 'system_menu_block' as per that class's annotation, regardless of which menu
- * the derived block is for.
+ * 'system_powered_by_block' as defined by the 'id' attribute of that class. And
+ * for the \Drupal\system\Plugin\Block\SystemMenuBlock block, it would be
+ * 'system_menu_block' as defined by the 'id' attribute of that class regardless
+ * of which menu the derived block is for.
  *
  * @param array $build
  *   A renderable array of data, only containing #cache.

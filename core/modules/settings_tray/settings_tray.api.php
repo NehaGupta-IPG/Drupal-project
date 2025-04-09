@@ -43,34 +43,34 @@
  * only displays what the user will expect to change when editing the block.
  *
  * Each block plugin can specify which form to use in the Settings Tray dialog
- * in its plugin annotation:
+ * in its plugin attributes:
  * @code
- * forms = {
- *   "settings_tray" = "\Drupal\some_module\Form\MyBlockOffCanvasForm",
- * },
+ * 'forms' => [
+ *   "settings_tray" => \Drupal\some_module\Form\MyBlockOffCanvasForm::class,
+ * ],
  * @endcode
  *
  * In some cases, a block's content is not configurable (for example, the title,
  * main content, and help blocks). Such blocks can opt out of providing a
  * settings_tray form:
  * @code
- * forms = {
- *   "settings_tray" = FALSE,
- * },
+ * 'forms' => [
+ *   "settings_tray" => FALSE,
+ * ],
  * @endcode
  *
- * Finally, blocks that do not specify a settings_tray form using the annotation
+ * Finally, blocks that do not specify a settings_tray form using the attribute
  * above will automatically have it set to their plugin class. For example, the
  * "Powered by Drupal" block plugin
  * (\Drupal\system\Plugin\Block\SystemPoweredByBlock) automatically gets this
- * added to its annotation:
+ * added to its attribute:
  * @code
- * forms = {
- *   "settings_tray" = "\Drupal\system\Plugin\Block\SystemPoweredByBlock",
- * },
+ * 'forms' => [
+ *   "settings_tray" => \Drupal\system\Plugin\Block\SystemPoweredByBlock::class,
+ * ],
  * @endcode
  *
- * Therefore, the entire Settings Tray API is just this annotation: it controls
+ * Therefore, the entire Settings Tray API is just this attribute: it controls
  * what the Settings Tray does for a given block.
  *
  * @see settings_tray_block_alter()

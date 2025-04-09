@@ -1053,8 +1053,7 @@
  *   \Drupal\your_module\Plugin\DataType (where "your_module" is your module's
  *   short name), and add attribute of type
  *   \Drupal\Core\TypedData\Attribute\DataType.
- *   See the @link plugin_api Plugin API topic @endlink and the
- *   @link annotation Annotations topic @endlink for more information.
+ *   See the @link plugin_api Plugin API topic @endlink for more information.
  *
  * @section sec_using Using data types
  * The data types of the Typed Data API can be used in several ways, once they
