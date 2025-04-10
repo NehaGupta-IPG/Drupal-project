@@ -407,7 +407,7 @@
 
           // Save a reference to the initialized instance.
           Drupal.CKEditor5Instances.set(id, editor);
-          editor.data.set("<div>"+ editor.getData() + "</div>");
+          editor.data.set('<div>' + editor.getData() + '</div>');
 
           // Set the minimum height of the editable area to correspond with the
           // value of the number of rows. We attach this custom property to
