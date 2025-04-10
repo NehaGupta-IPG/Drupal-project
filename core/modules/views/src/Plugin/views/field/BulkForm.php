@@ -446,6 +446,8 @@ class BulkForm extends FieldPluginBase implements CacheableDependencyInterface, 
           'query' => $this->getDestinationArray(),
         ];
         $route_parameters = $this->routeMatch->getRawParameters()->all();
+        // Prevent a `destination` query parameter to bypass our own redirect.
+        $form_state->setIgnoreDestination();
         $form_state->setRedirect($operation_definition['confirm_form_route_name'], $route_parameters, $options);
       }
       else {
