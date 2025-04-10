@@ -245,7 +245,10 @@ class OEmbed extends MediaSourceBase implements OEmbedInterface {
       $resource = $this->resourceFetcher->fetchResource($resource_url);
     }
     catch (ResourceException $e) {
-      if ($media->access('update')) {
+      if (
+        $media->id() &&
+        $media->access('update')
+      ) {
         $link = Link::createFromRoute($this->t('edit'), 'entity.media.edit_form', ['media' => $media->id()]);
         $this->messenger->addError(Markup::create($e->getMessage() . " Update media entity: " . $link->toString()));
       }
