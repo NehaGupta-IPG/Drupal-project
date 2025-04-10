@@ -57,7 +57,7 @@ class BulkFormTest extends BrowserTestBase {
     $this->assertSession()->pageTextContains('This view is empty.');
 
     $nodes = [];
-    for ($i = 0; $i < 10; $i++) {
+    for ($i = 0; $i < 11; $i++) {
       // Ensure nodes are sorted in the same order they are inserted in the
       // array.
       $timestamp = \Drupal::time()->getRequestTime() - $i;
@@ -224,6 +224,26 @@ class BulkFormTest extends BrowserTestBase {
     $this->assertSession()->elementNotExists('xpath', '//div[contains(@class, "messages--status")]');
     $this->submitForm([], 'Delete');
     $this->assertSession()->pageTextContains('Deleted 1 content item.');
+
+    // Test that the bulk form works even when a destination query parameter is
+    // in the URL.
+    $this->drupalGet('test_bulk_form', ['query' => ['destination' => '/']]);
+    $edit = ['node_bulk_form[0]' => TRUE, 'action' => 'node_delete_action'];
+    $this->submitForm($edit, 'Apply to selected items');
+    // Check that we have not been redirected to the destination.
+    $this->assertSession()->addressNotEquals('/');
+
+    // Remove deleted items from $nodes to prevent deleting them twice at the
+    // end of this test method.
+    unset($nodes[9]);
+
+    // Make sure we don't show an action message while we are still on the
+    // confirmation page.
+    $this->assertSession()->elementNotExists('xpath', '//div[contains(@class, "messages--status")]');
+    $this->submitForm([], 'Delete');
+    $this->assertSession()->pageTextContains('Deleted 1 content item.');
+    // Check if we have now been redirected to the destination.
+    $this->assertSession()->addressEquals('/');
 
     // Test that the bulk form works when multiple nodes are selected
     // but all of the selected nodes are already deleted
