@@ -752,7 +752,9 @@ class SqlContentEntityStorage extends ContentEntityStorageBase implements SqlEnt
     try {
       $transaction = $this->database->startTransaction();
       parent::delete($entities);
-      $transaction->yield();
+      if ($this->database->inTransaction()) {
+        $transaction->yield();
+      }
 
       // Ignore replica server temporarily.
       \Drupal::service('database.replica_kill_switch')->trigger();
