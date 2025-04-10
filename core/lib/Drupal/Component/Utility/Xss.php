@@ -39,6 +39,7 @@ class Xss {
     'col',
     'colgroup',
     'command',
+    'data',
     'dd',
     'del',
     'details',
