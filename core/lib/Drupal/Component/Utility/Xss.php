@@ -31,6 +31,7 @@ class Xss {
     'big',
     'blockquote',
     'br',
+    'button',
     'caption',
     'cite',
     'code',
