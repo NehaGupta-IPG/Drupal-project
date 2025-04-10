@@ -310,7 +310,7 @@ Navigation
 - Pablo López 'plopesc' https://www.drupal.org/u/plopesc
 
 Node
-- ?
+- Adam Bramley 'acbramley' https://www.drupal.org/u/acbramley
 
 Node Access
 - Ken Rickard 'agentrickard' https://www.drupal.org/u/agentrickard
@@ -412,6 +412,7 @@ Theme API
   Single-Directory Components
   - Mateu Aguiló Bosch 'e0ipso' https://www.drupal.org/u/e0ipso
   - Pierre Dureau 'pdureau' https://www.drupal.org/u/pdureau
+  - Jean Valverde 'mogtofu33' https://www.drupal.org/u/mogtofu33
 
 Token
 - ?
