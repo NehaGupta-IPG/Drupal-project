@@ -25,6 +25,7 @@ class Xss {
     'address',
     'article',
     'aside',
+    'audio',
     'b',
     'bdi',
     'bdo',
