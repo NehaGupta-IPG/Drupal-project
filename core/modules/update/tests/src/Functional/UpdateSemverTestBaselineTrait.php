@@ -25,7 +25,7 @@ trait UpdateSemverTestBaselineTrait {
    * - '8.0.2' is an unpublished release.
    * - '8.0.3' is marked as 'Release type' 'Unsupported'.
    */
-  public function testNoUpdatesAvailable() {
+  public function testNoUpdatesAvailable(): void {
     foreach ([0, 1] as $minor_version) {
       foreach ([0, 1] as $patch_version) {
         foreach (['-alpha1', '-beta1', ''] as $extra_version) {
@@ -48,7 +48,7 @@ trait UpdateSemverTestBaselineTrait {
   /**
    * Tests the Update Manager module when one normal update is available.
    */
-  public function testNormalUpdateAvailable() {
+  public function testNormalUpdateAvailable(): void {
     $this->setProjectInstalledVersion('8.0.0');
 
     // Ensure that the update check requires a token.
@@ -109,8 +109,6 @@ trait UpdateSemverTestBaselineTrait {
    *
    * @param string $full_version
    *   The recommended version.
-   *
-   * @return void
    */
   protected function assertNoExtraVersion(string $full_version): void {
     $this->assertUpdateTableTextNotContains('Up to date');
@@ -131,7 +129,7 @@ trait UpdateSemverTestBaselineTrait {
    * - drupal.current.xml and semver_test.current.xml: These declare major
    *   releases supported, 8 and 9.
    */
-  public function testMajorUpdateAvailable() {
+  public function testMajorUpdateAvailable(): void {
     foreach (['9.0.0', '8.0.0-9.0.0'] as $release_history) {
       foreach ([0, 1] as $minor_version) {
         foreach ([0, 1] as $patch_version) {
@@ -175,6 +173,50 @@ trait UpdateSemverTestBaselineTrait {
   }
 
   /**
+   * Tests when the major+1 is supported but not stable.
+   *
+   * This tests when the next major has stable supported releases and the
+   * the major after that has just an alpha and beta release.
+   *
+   * This tests when the latest major has an alpha and beta release.
+   * - drupal-10.0.0-11.0.0 and semver_test.9.0.0-10.0.0: This declares two
+   *   major releases supported and the latest major only has unstable releases.
+   */
+  public function testMajorExtraUpdateAvailable(): void {
+    foreach (['9.0.0-10.0.0'] as $release_history) {
+      foreach ([0, 1] as $minor_version) {
+        foreach ([0, 1] as $patch_version) {
+          foreach (['-alpha1', '-beta1', ''] as $extra_version) {
+            $installed_version = "8.$minor_version.$patch_version$extra_version";
+            $this->setProjectInstalledVersion($installed_version);
+            $this->refreshUpdateStatus([$this->updateProject => $release_history]);
+            $this->standardTests();
+            $this->drupalGet('admin/reports/updates');
+            $this->clickLink('Check manually');
+            $this->checkForMetaRefresh();
+            $this->assertUpdateTableTextNotContains('Security update required!');
+
+            $this->assertUpdateTableElementContains((string) Link::fromTextAndUrl('9.2.2', Url::fromUri("http://example.com/{$this->updateProject}-9-2-2-release"))
+              ->toString());
+            $this->assertUpdateTableElementContains((string) Link::fromTextAndUrl('Release notes', Url::fromUri("http://example.com/{$this->updateProject}-9-2-2-release"))
+              ->toString());
+            $this->assertUpdateTableElementContains((string) Link::fromTextAndUrl('10.0.0-beta1', Url::fromUri("http://example.com/{$this->updateProject}-10-0-0-beta1-release"))
+              ->toString());
+            $this->assertUpdateTableElementContains((string) Link::fromTextAndUrl('Release notes', Url::fromUri("http://example.com/{$this->updateProject}-10-0-0-beta1-release"))
+              ->toString());
+            $this->assertUpdateTableTextNotContains('Latest version:');
+
+            $this->assertUpdateTableTextNotContains('Up to date');
+            $this->assertUpdateTableTextContains('Not supported!');
+            $this->assertVersionUpdateLinks('Recommended version:', '9.2.2');
+            $this->assertUpdateTableElementContains('error.svg');
+          }
+        }
+      }
+    }
+  }
+
+  /**
    * Tests messages when a project release is unpublished.
    *
    * This test confirms that revoked messages are displayed regardless of
@@ -188,7 +230,7 @@ trait UpdateSemverTestBaselineTrait {
    * They both have an '8.0.2' release that is unpublished and an '8.1.0'
    * release that is published and is the expected update.
    */
-  public function testRevokedRelease() {
+  public function testRevokedRelease(): void {
     foreach (['8.1.0', '8.1.0-unsupported'] as $fixture) {
       $this->setProjectInstalledVersion('8.0.2');
       $this->refreshUpdateStatus([$this->updateProject => $fixture]);
@@ -216,7 +258,7 @@ trait UpdateSemverTestBaselineTrait {
    * 'unsupported' and an '8.1.0' release that has the 'Release type' value of
    * 'supported' and is the expected update.
    */
-  public function testUnsupportedRelease() {
+  public function testUnsupportedRelease(): void {
     foreach (['8.1.0', '8.1.0-unsupported'] as $fixture) {
       $this->setProjectInstalledVersion('8.0.3');
       $this->refreshUpdateStatus([$this->updateProject => $fixture]);

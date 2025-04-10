@@ -15,9 +15,7 @@ use Drupal\Tests\BrowserTestBase;
 class PlaceholderMessageTest extends BrowserTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['render_placeholder_message_test'];
 
@@ -29,7 +27,7 @@ class PlaceholderMessageTest extends BrowserTestBase {
   /**
    * Tests rendering of message placeholder.
    */
-  public function testMessagePlaceholder() {
+  public function testMessagePlaceholder(): void {
     $messages_markup = '<div role="contentinfo" aria-label="Status message"';
 
     $test_routes = [

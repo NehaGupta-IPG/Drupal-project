@@ -18,16 +18,14 @@ class UserActionConfigSchemaTest extends KernelTestBase {
   use SchemaCheckTestTrait;
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['system', 'user'];
 
   /**
    * Tests whether the user action config schema are valid.
    */
-  public function testValidUserActionConfigSchema() {
+  public function testValidUserActionConfigSchema(): void {
     $rid = $this->randomMachineName(8);
     Role::create(['id' => $rid, 'label' => $rid])->save();
 

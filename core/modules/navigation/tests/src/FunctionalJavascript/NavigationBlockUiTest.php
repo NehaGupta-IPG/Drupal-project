@@ -32,6 +32,7 @@ class NavigationBlockUiTest extends WebDriverTestBase {
     'block_content',
     'layout_builder',
     'layout_test',
+    'layout_builder_form_block_test',
     'node',
     'field_ui',
     'shortcut',
@@ -59,16 +60,48 @@ class NavigationBlockUiTest extends WebDriverTestBase {
     $this->drupalPlaceBlock('page_title_block', ['id' => 'title']);
     // Create an administrative user.
     $this->adminUser = $this->drupalCreateUser([
-      'administer navigation_block',
+      'configure navigation layout',
       'access administration pages',
       'access navigation',
       'access shortcuts',
-      'configure any layout',
       'access contextual links',
       'administer shortcuts',
       'administer site configuration',
       'access administration pages',
     ]);
+  }
+
+  /**
+   * Tests navigation block admin page exists and functions correctly.
+   */
+  public function testNavigationBlockAdminUiPageNestedForm(): void {
+    $layout_url = '/admin/config/user-interface/navigation-block';
+    $this->drupalLogin($this->adminUser);
+
+    // Edit the layout and add a block that contains a form.
+    $this->drupalGet($layout_url);
+    $this->openAddBlockForm('Layout Builder form block test form api form block');
+    $this->getSession()->getPage()->checkField('settings[label_display]');
+
+    // Save the new block, and ensure it is displayed on the page.
+    $this->getSession()->getPage()->pressButton('Add block');
+    $this->assertSession()->assertWaitOnAjaxRequest();
+    $this->assertSession()->assertNoElementAfterWait('css', '#drupal-off-canvas');
+    $this->assertSession()->addressEquals($layout_url);
+    $this->assertSession()->pageTextContains('Layout Builder form block test form api form block');
+    $this->getSession()->getPage()->pressButton('Save');
+    $unexpected_save_message = 'You have unsaved changes';
+    $expected_save_message = 'Saved navigation blocks';
+    $this->assertSession()->statusMessageNotContains($unexpected_save_message);
+    $this->assertSession()->statusMessageContains($expected_save_message);
+
+    // Try to save the layout again and confirm it can save because there are no
+    // nested form tags.
+    $this->drupalGet($layout_url);
+    $this->getSession()->getPage()->checkField('toggle_content_preview');
+    $this->getSession()->getPage()->pressButton('Save');
+    $this->assertSession()->statusMessageNotContains($unexpected_save_message);
+    $this->assertSession()->statusMessageContains($expected_save_message);
   }
 
   /**
@@ -103,7 +136,7 @@ class NavigationBlockUiTest extends WebDriverTestBase {
 
     // Remove the shortcut block.
     $this->assertSession()->pageTextContains('Shortcuts');
-    $this->clickContextualLink('form .block-navigation-shortcuts', 'Remove block');
+    $this->clickContextualLink('.layout-builder .block-navigation-shortcuts', 'Remove block');
     $this->assertOffCanvasFormAfterWait('layout_builder_remove_block');
     $this->assertSession()->pageTextContains('Are you sure you want to remove the Shortcuts block?');
     $this->assertSession()->pageTextContains('This action cannot be undone.');
@@ -111,7 +144,7 @@ class NavigationBlockUiTest extends WebDriverTestBase {
     $this->assertSession()->assertWaitOnAjaxRequest();
     $this->assertSession()->assertNoElementAfterWait('css', '#drupal-off-canvas');
 
-    $this->assertSession()->elementNotExists('css', 'form .block-navigation-shortcuts');
+    $this->assertSession()->elementNotExists('css', '.layout-builder .block-navigation-shortcuts');
 
     // Add a new block.
     $this->getSession()->getPage()->uncheckField('toggle_content_preview');
@@ -144,7 +177,7 @@ class NavigationBlockUiTest extends WebDriverTestBase {
 
     // Reconfigure a block and ensure that the layout content is updated.
     $this->drupalGet($layout_url);
-    $this->clickContextualLink('form .block-navigation-shortcuts', 'Configure');
+    $this->clickContextualLink('.layout-builder .block-navigation-shortcuts', 'Configure');
     $this->assertOffCanvasFormAfterWait('layout_builder_update_block');
 
     $page->fillField('settings[label]', 'Newer Shortcuts');
@@ -166,7 +199,7 @@ class NavigationBlockUiTest extends WebDriverTestBase {
    * @todo move this from into a trait from
    *   \Drupal\Tests\layout_builder\FunctionalJavascript\LayoutBuilderTest
    */
-  private function openAddBlockForm($block_title) {
+  private function openAddBlockForm($block_title): void {
     $this->assertSession()->linkExists('Add block');
     $this->clickLink('Add block');
     $this->assertSession()->assertWaitOnAjaxRequest();

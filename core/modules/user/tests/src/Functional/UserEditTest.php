@@ -22,13 +22,14 @@ class UserEditTest extends BrowserTestBase {
   /**
    * Tests user edit page.
    */
-  public function testUserEdit() {
+  public function testUserEdit(): void {
     // Test user edit functionality.
     $user1 = $this->drupalCreateUser(['change own username']);
     $user2 = $this->drupalCreateUser([]);
     $this->drupalLogin($user1);
 
-    // Test that error message appears when attempting to use a non-unique user name.
+    // Test that error message appears when attempting to use a non-unique user
+    // name.
     $edit['name'] = $user2->getAccountName();
     $this->drupalGet("user/" . $user1->id() . "/edit");
     $this->submitForm($edit, 'Save');
@@ -36,7 +37,7 @@ class UserEditTest extends BrowserTestBase {
 
     // Check that the default value in user name field
     // is the raw value and not a formatted one.
-    \Drupal::state()->set('user_hooks_test_user_format_name_alter', TRUE);
+    \Drupal::keyValue('user_hooks_test')->set('user_format_name_alter', TRUE);
     \Drupal::service('module_installer')->install(['user_hooks_test']);
     Cache::invalidateTags(['rendered']);
     $this->drupalGet('user/' . $user1->id() . '/edit');
@@ -147,7 +148,7 @@ class UserEditTest extends BrowserTestBase {
    * password that is literally "0" was not possible. This test ensures that
    * this regression can't happen again.
    */
-  public function testUserWith0Password() {
+  public function testUserWith0Password(): void {
     $admin = $this->drupalCreateUser(['administer users']);
     $this->drupalLogin($admin);
     // Create a regular user.
@@ -162,7 +163,7 @@ class UserEditTest extends BrowserTestBase {
   /**
    * Tests editing of a user account without an email address.
    */
-  public function testUserWithoutEmailEdit() {
+  public function testUserWithoutEmailEdit(): void {
     // Test that an admin can edit users without an email address.
     $admin = $this->drupalCreateUser(['administer users']);
     $this->drupalLogin($admin);
@@ -179,7 +180,7 @@ class UserEditTest extends BrowserTestBase {
   /**
    * Tests well known change password route redirects to user edit form.
    */
-  public function testUserWellKnownChangePasswordAuth() {
+  public function testUserWellKnownChangePasswordAuth(): void {
     $account = $this->drupalCreateUser([]);
     $this->drupalLogin($account);
     $this->drupalGet('.well-known/change-password');
@@ -189,7 +190,7 @@ class UserEditTest extends BrowserTestBase {
   /**
    * Tests well known change password route returns 403 to anonymous user.
    */
-  public function testUserWellKnownChangePasswordAnon() {
+  public function testUserWellKnownChangePasswordAnon(): void {
     $this->drupalGet('.well-known/change-password');
     $this->assertSession()->statusCodeEquals(403);
   }
@@ -197,7 +198,7 @@ class UserEditTest extends BrowserTestBase {
   /**
    * Tests that a user is able to change site language.
    */
-  public function testUserChangeSiteLanguage() {
+  public function testUserChangeSiteLanguage(): void {
     // Install these modules here as these aren't needed for other test methods.
     \Drupal::service('module_installer')->install([
       'content_translation',
@@ -250,7 +251,7 @@ class UserEditTest extends BrowserTestBase {
   /**
    * Tests the account form implements entity field access for mail.
    */
-  public function testUserMailFieldAccess() {
+  public function testUserMailFieldAccess(): void {
     \Drupal::state()->set('user_access_test_forbid_mail_edit', TRUE);
     \Drupal::service('module_installer')->install(['user_access_test']);
     $user = $this->drupalCreateUser();

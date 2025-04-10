@@ -29,9 +29,7 @@ class MenuUiNodeTest extends BrowserTestBase {
   protected $editor;
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = [
     'menu_ui',
@@ -77,7 +75,7 @@ class MenuUiNodeTest extends BrowserTestBase {
   /**
    * Tests creating, editing, deleting menu links via node form widget.
    */
-  public function testMenuNodeFormWidget() {
+  public function testMenuNodeFormWidget(): void {
     // Verify that cacheability metadata is bubbled from the menu link tree
     // access checking that is performed when determining the "default parent
     // item" options in menu_ui_form_node_type_form_alter(). The "log out" link
@@ -276,7 +274,8 @@ class MenuUiNodeTest extends BrowserTestBase {
     $child_item->save();
     // Edit the first node.
     $this->drupalGet('node/' . $node->id() . '/edit');
-    // Assert that it is not possible to set the parent of the first node to itself or the second node.
+    // Assert that it is not possible to set the parent of the first node to
+    // itself or the second node.
     $this->assertSession()->optionNotExists('edit-menu-menu-parent', 'tools:' . $item->getPluginId());
     $this->assertSession()->optionNotExists('edit-menu-menu-parent', 'tools:' . $child_item->getPluginId());
     // Assert that disallowed Administration menu is not available in options.
@@ -286,7 +285,7 @@ class MenuUiNodeTest extends BrowserTestBase {
   /**
    * Testing correct loading and saving of menu links via node form widget in a multilingual environment.
    */
-  public function testMultilingualMenuNodeFormWidget() {
+  public function testMultilingualMenuNodeFormWidget(): void {
     // Setup languages.
     $langcodes = ['de'];
     foreach ($langcodes as $langcode) {
@@ -359,14 +358,16 @@ class MenuUiNodeTest extends BrowserTestBase {
     $this->drupalGet('node/' . $node->id(), ['language' => $languages[$langcodes[1]]]);
     $this->assertSession()->linkExists($translated_node_title);
 
-    // Revisit the edit page in original language, check the loaded menu item title and save.
+    // Revisit the edit page in original language, check the loaded menu item
+    // title and save.
     $options = ['language' => $languages[$langcodes[0]]];
     $url = $node->toUrl('edit-form', $options);
     $this->drupalGet($url);
     $this->assertSession()->fieldValueEquals('edit-menu-title', $node_title);
     $this->submitForm([], 'Save (this translation)');
 
-    // Revisit the edit page of the translation and check the loaded menu item title.
+    // Revisit the edit page of the translation and check the loaded menu item
+    // title.
     $options = ['language' => $languages[$langcodes[1]]];
     $url = $node->toUrl('edit-form', $options);
     $this->drupalGet($url);
@@ -376,7 +377,7 @@ class MenuUiNodeTest extends BrowserTestBase {
   /**
    * Tests creating menu links via node form widget for nodes with grants.
    */
-  public function testMenuNodeWithGrantsFormWidget() {
+  public function testMenuNodeWithGrantsFormWidget(): void {
     \Drupal::service('module_installer')->install(['node_access_test']);
     node_access_rebuild();
     $this->assertTrue(\Drupal::moduleHandler()->hasImplementations('node_grants'));

@@ -14,9 +14,7 @@ use Drupal\Tests\BrowserTestBase;
 class FieldHelpTest extends BrowserTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['field', 'help'];
 
@@ -27,6 +25,8 @@ class FieldHelpTest extends BrowserTestBase {
 
   /**
    * The admin user that will be created.
+   *
+   * @var \Drupal\user\Entity\User|false
    */
   protected $adminUser;
 
@@ -46,7 +46,7 @@ class FieldHelpTest extends BrowserTestBase {
   /**
    * Tests the Field module's help page.
    */
-  public function testFieldHelp() {
+  public function testFieldHelp(): void {
     // Log in the admin user.
     $this->drupalLogin($this->adminUser);
 

@@ -24,7 +24,6 @@ use Symfony\Component\Yaml\Yaml;
  * @covers \Drupal\ckeditor5\Plugin\Validation\Constraint\FundamentalCompatibilityConstraintValidator
  * @covers \Drupal\ckeditor5\Plugin\Validation\Constraint\CKEditor5MediaAndFilterSettingsInSyncConstraintValidator
  * @group ckeditor5
- * @group #slow
  */
 class ValidatorsTest extends KernelTestBase {
 
@@ -72,7 +71,7 @@ class ValidatorsTest extends KernelTestBase {
    *   All expected violations for the given CKEditor 5 settings, with property
    *   path as keys and message as values.
    */
-  public function test(array $ckeditor5_settings, array $expected_violations) {
+  public function test(array $ckeditor5_settings, array $expected_violations): void {
     // The data provider is unable to access services, so the test scenario of
     // testing with CKEditor 5's default settings is partially provided here.
     if ($ckeditor5_settings === ['__DEFAULT__']) {
@@ -98,7 +97,6 @@ class ValidatorsTest extends KernelTestBase {
     );
     $violations = $typed_config->validate();
 
-    $actual_violations = self::violationsToArray($violations);
     $this->assertSame($expected_violations, self::violationsToArray($violations));
 
     if (empty($expected_violations)) {
@@ -655,7 +653,7 @@ class ValidatorsTest extends KernelTestBase {
    * @param array $expected_violations
    *   All expected violations for the pair.
    */
-  public function testPair(array $ckeditor5_settings, array $editor_image_upload_settings, array $filters, array $expected_violations) {
+  public function testPair(array $ckeditor5_settings, array $editor_image_upload_settings, array $filters, array $expected_violations): void {
     $text_editor = Editor::create([
       'format' => 'dummy',
       'editor' => 'ckeditor5',

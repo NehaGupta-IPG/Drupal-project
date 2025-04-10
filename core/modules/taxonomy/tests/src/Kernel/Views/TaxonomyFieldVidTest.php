@@ -23,9 +23,7 @@ class TaxonomyFieldVidTest extends ViewsKernelTestBase {
   use UserCreationTrait;
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = [
     'taxonomy',
@@ -83,7 +81,7 @@ class TaxonomyFieldVidTest extends ViewsKernelTestBase {
   /**
    * Tests the field handling for the Vocabulary ID.
    */
-  public function testViewsHandlerVidField() {
+  public function testViewsHandlerVidField(): void {
     /** @var \Drupal\Core\Render\RendererInterface $renderer */
     $renderer = \Drupal::service('renderer');
 

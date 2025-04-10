@@ -23,6 +23,7 @@ global-styling:
       css/components/accordion.css: {}
       css/components/action-link.css: {}
       css/components/content-header.css: {}
+      css/components/ckeditor5.css: {}
       css/components/container-inline.css: {}
       css/components/container-inline.module.css: {}
       css/components/breadcrumb.css: {}
@@ -50,10 +51,6 @@ global-styling:
       css/components/table--file-multiple-widget.css: {}
       css/components/search-admin-settings.css: {}
       css/components/tablesort-indicator.css: {}
-      css/components/system-status-report-general-info.css: {}
-      css/components/system-status-report.css: {}
-      css/components/system-status-report-counters.css: {}
-      css/components/system-status-counter.css: {}
       css/components/tableselect.css: {}
       css/components/tabs.css: {}
     theme:
@@ -219,6 +216,31 @@ form.password-confirm:
     - core/drupal
     - claro/global-styling
 
+
+status.report:
+  version: VERSION
+  css:
+    component:
+      css/components/system-status-report-general-info.css: {}
+      css/components/system-status-report.css: {}
+      css/components/system-status-report-counters.css: {}
+      css/components/system-status-counter.css: {}
+  moved_files:
+    claro/global-styling:
+      deprecation_version: 11.2.0
+      removed_version: 12.0.0
+      deprecation_link: https://www.drupal.org/node/3432346
+      css:
+        component:
+          css/components/system-status-report.css:
+            base: css/components/system-status-report.css
+          css/components/system-status-counter.css:
+            base: css/components/system-status-counter.css
+          css/components/system-status-report-counters.css:
+            base: css/components/system-status-report-counters.css
+          css/components/system-status-report-general-info.css:
+            base: css/components/system-status-report-general-info.css
+
 views:
   css:
     component:
@@ -228,13 +250,6 @@ views_ui:
   css:
     component:
       css/components/views-ui.css: {}
-  moved_files:
-    claro/global-styling:
-      deprecation_version: 10.3.0
-      removed_version: 11.0.0
-      deprecation_link: https://www.drupal.org/node/3432346
-      css:
-        component: 'css/components/views-ui.css'
 
 messages:
   js:

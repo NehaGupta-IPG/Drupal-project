@@ -22,9 +22,7 @@ class OffCanvasDialogTest extends BrowserTestBase {
   protected $defaultTheme = 'stark';
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['ajax_test'];
 
@@ -33,7 +31,7 @@ class OffCanvasDialogTest extends BrowserTestBase {
    *
    * @dataProvider dialogPosition
    */
-  public function testDialog($position) {
+  public function testDialog($position): void {
     // Ensure the elements render without notices or exceptions.
     $this->drupalGet('ajax-test/dialog');
 
@@ -76,6 +74,7 @@ class OffCanvasDialogTest extends BrowserTestBase {
    * The data provider for potential dialog positions.
    *
    * @return array
+   *   An array of dialog positions.
    */
   public static function dialogPosition() {
     return [

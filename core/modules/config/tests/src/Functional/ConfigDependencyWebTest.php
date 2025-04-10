@@ -20,9 +20,7 @@ class ConfigDependencyWebTest extends BrowserTestBase {
   const MAX_ID_LENGTH = ConfigEntityStorage::MAX_ID_LENGTH;
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['config_test'];
 
@@ -36,7 +34,7 @@ class ConfigDependencyWebTest extends BrowserTestBase {
    *
    * @see \Drupal\Core\Config\Entity\ConfigDependencyDeleteFormTrait
    */
-  public function testConfigDependencyDeleteFormTrait() {
+  public function testConfigDependencyDeleteFormTrait(): void {
     $this->drupalLogin($this->drupalCreateUser([
       'administer site configuration',
     ]));

@@ -49,11 +49,10 @@ class SettingsTrayTestBase extends OffCanvasTestBase {
     // When page first loads Edit Mode is not triggered until first contextual
     // link is added.
     $this->assertNotEmpty($this->assertSession()->waitForElementVisible('css', '.dialog-off-canvas-main-canvas.js-settings-tray-edit-mode'));
-    // @todo https://www.drupal.org/project/drupal/issues/3317520 Work why the
-    //   sleep is necessary in.
-    usleep(100000);
 
-    $block = $this->getSession()->getPage()->find('css', $block_selector);
+    $block = $this->assertSession()->waitForElementVisible('css', $block_selector);
+    $this->assertNotEmpty($block);
+
     $block->mouseOver();
     $block->click();
     $this->waitForOffCanvasToOpen();
@@ -125,7 +124,8 @@ class SettingsTrayTestBase extends OffCanvasTestBase {
     $web_assert->elementNotExists('css', '.contextual .trigger.visually-hidden');
     // The toolbar edit button should read "Editing".
     $web_assert->elementContains('css', static::TOOLBAR_EDIT_LINK_SELECTOR, 'Editing');
-    // The main canvas element should have the "js-settings-tray-edit-mode" class.
+    // The main canvas element should have the "js-settings-tray-edit-mode"
+    // class.
     $web_assert->elementExists('css', '.dialog-off-canvas-main-canvas.js-settings-tray-edit-mode');
   }
 
@@ -156,7 +156,7 @@ class SettingsTrayTestBase extends OffCanvasTestBase {
   /**
    * {@inheritdoc}
    */
-  protected static function getTestThemes() {
+  protected static function getTestThemes(): array {
     // Remove 'claro' theme. Settings Tray "Edit Mode" will not work with this
     // theme because it removes all contextual links.
     return array_filter(parent::getTestThemes(), function ($theme) {
@@ -183,7 +183,7 @@ class SettingsTrayTestBase extends OffCanvasTestBase {
    * @return bool
    *   TRUE if the label is visible, FALSE if it is not.
    */
-  protected function isLabelInputVisible() {
+  protected function isLabelInputVisible(): bool {
     return $this->getSession()->getPage()->find('css', static::LABEL_INPUT_SELECTOR)->isVisible();
   }
 

@@ -30,9 +30,9 @@ class MigrateMenuTest extends MigrateDrupal7TestBase {
    *   The menu ID.
    * @param string $language
    *   The menu language.
-   * @param $label
+   * @param string $label
    *   The menu label.
-   * @param $description
+   * @param string $description
    *   The menu description.
    *
    * @internal
@@ -48,7 +48,7 @@ class MigrateMenuTest extends MigrateDrupal7TestBase {
   /**
    * Tests the Drupal 7 menu to Drupal 8 migration.
    */
-  public function testMenu() {
+  public function testMenu(): void {
     $this->assertEntity('main', 'und', 'Main menu', 'The <em>Main</em> menu is used on many sites to show the major sections of the site, often in a top navigation bar.');
     $this->assertEntity('admin', 'und', 'Management', 'The <em>Management</em> menu contains links for administrative tasks.');
     $this->assertEntity('menu-test-menu', 'und', 'Test Menu', 'Test menu description.');

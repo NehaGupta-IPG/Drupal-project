@@ -24,7 +24,7 @@ class SitesDirectoryHardeningTest extends BrowserTestBase {
    *
    * Checks both the current sites directory and settings.php.
    */
-  public function testSitesDirectoryHardening() {
+  public function testSitesDirectoryHardening(): void {
     $site_path = $this->kernel->getSitePath();
     $settings_file = $this->settingsFile($site_path);
 
@@ -45,7 +45,7 @@ class SitesDirectoryHardeningTest extends BrowserTestBase {
   /**
    * Tests writable files remain writable when directory hardening is disabled.
    */
-  public function testSitesDirectoryHardeningConfig() {
+  public function testSitesDirectoryHardeningConfig(): void {
     $site_path = $this->kernel->getSitePath();
     $settings_file = $this->settingsFile($site_path);
 
@@ -101,7 +101,7 @@ class SitesDirectoryHardeningTest extends BrowserTestBase {
    * @param string $site_path
    *   The sites directory path, such as 'sites/default'.
    */
-  protected function makeWritable($site_path) {
+  protected function makeWritable($site_path): void {
     chmod($site_path, 0755);
     chmod($this->settingsFile($site_path), 0644);
   }
@@ -115,7 +115,7 @@ class SitesDirectoryHardeningTest extends BrowserTestBase {
    * @return string
    *   The path to settings.php.
    */
-  protected function settingsFile($site_path) {
+  protected function settingsFile($site_path): string {
     $settings_file = $site_path . '/settings.php';
     return $settings_file;
   }

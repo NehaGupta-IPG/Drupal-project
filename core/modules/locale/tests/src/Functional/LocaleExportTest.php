@@ -17,9 +17,7 @@ use Drupal\Tests\BrowserTestBase;
 class LocaleExportTest extends BrowserTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['locale'];
 
@@ -30,6 +28,8 @@ class LocaleExportTest extends BrowserTestBase {
 
   /**
    * A user able to create languages and export translations.
+   *
+   * @var \Drupal\user\Entity\User|false
    */
   protected $adminUser = NULL;
 
@@ -54,7 +54,7 @@ class LocaleExportTest extends BrowserTestBase {
   /**
    * Tests exportation of translations.
    */
-  public function testExportTranslation() {
+  public function testExportTranslation(): void {
     $file_system = \Drupal::service('file_system');
     // First import some known translations.
     // This will also automatically add the 'fr' language.
@@ -130,7 +130,7 @@ class LocaleExportTest extends BrowserTestBase {
   /**
    * Tests exportation of translation template file.
    */
-  public function testExportTranslationTemplateFile() {
+  public function testExportTranslationTemplateFile(): void {
     // Load an admin page with JavaScript so _drupal_add_library() fires at
     // least once and _locale_parse_js_file() gets to run at least once so that
     // the locales_source table gets populated with something.

@@ -15,9 +15,7 @@ use Drupal\Tests\BrowserTestBase;
 class ResponseGeneratorTest extends BrowserTestBase {
 
   /**
-   * Modules to install.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['serialization', 'rest', 'node', 'basic_auth'];
 
@@ -40,7 +38,7 @@ class ResponseGeneratorTest extends BrowserTestBase {
   /**
    * Tests to see if generator header is added.
    */
-  public function testGeneratorHeaderAdded() {
+  public function testGeneratorHeaderAdded(): void {
 
     $node = $this->drupalCreateNode();
 

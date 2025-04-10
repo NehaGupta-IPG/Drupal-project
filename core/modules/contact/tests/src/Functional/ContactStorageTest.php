@@ -20,9 +20,7 @@ use Drupal\user\RoleInterface;
 class ContactStorageTest extends ContactSitewideTest {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = [
     'block',
@@ -41,7 +39,7 @@ class ContactStorageTest extends ContactSitewideTest {
   /**
    * Tests configuration options and the site-wide contact form.
    */
-  public function testContactStorage() {
+  public function testContactStorage(): void {
     // Create and log in administrative user.
     $admin_user = $this->drupalCreateUser([
       'access site-wide contact form',

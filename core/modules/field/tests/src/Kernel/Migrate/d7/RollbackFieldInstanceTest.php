@@ -17,7 +17,7 @@ class RollbackFieldInstanceTest extends MigrateFieldInstanceTest {
   /**
    * Tests migrating D7 fields to field_storage_config entities, then rolling back.
    */
-  public function testFieldInstances() {
+  public function testFieldInstances(): void {
     // Test that the field instances have migrated (prior to rollback).
     parent::testFieldInstances();
 
@@ -69,7 +69,7 @@ class RollbackFieldInstanceTest extends MigrateFieldInstanceTest {
    * @param string|\Drupal\migrate\Plugin\MigrationInterface $migration
    *   The migration to rollback, or its ID.
    */
-  protected function executeRollback($migration) {
+  protected function executeRollback($migration): void {
     if (is_string($migration)) {
       $this->migration = $this->getMigration($migration);
     }

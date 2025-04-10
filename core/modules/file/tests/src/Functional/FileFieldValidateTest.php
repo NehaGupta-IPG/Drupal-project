@@ -27,7 +27,7 @@ class FileFieldValidateTest extends FileFieldTestBase {
   /**
    * Tests the required property on file fields.
    */
-  public function testRequired() {
+  public function testRequired(): void {
     $node_storage = $this->container->get('entity_type.manager')->getStorage('node');
     $type_name = 'article';
     $field_name = $this->randomMachineName();
@@ -47,7 +47,6 @@ class FileFieldValidateTest extends FileFieldTestBase {
     $nid = $this->uploadNodeFile($test_file, $field_name, $type_name);
     $this->assertNotFalse($nid, "uploadNodeFile({$test_file->getFileUri()}, $field_name, $type_name) succeeded");
 
-    $node_storage->resetCache([$nid]);
     $node = $node_storage->load($nid);
 
     $node_file = File::load($node->{$field_name}->target_id);
@@ -67,7 +66,6 @@ class FileFieldValidateTest extends FileFieldTestBase {
 
     // Create a new node with the uploaded file into the multivalue field.
     $nid = $this->uploadNodeFile($test_file, $field_name, $type_name);
-    $node_storage->resetCache([$nid]);
     $node = $node_storage->load($nid);
     $node_file = File::load($node->{$field_name}->target_id);
     $this->assertFileExists($node_file->getFileUri());
@@ -77,7 +75,7 @@ class FileFieldValidateTest extends FileFieldTestBase {
   /**
    * Tests the max file size validator.
    */
-  public function testFileMaxSize() {
+  public function testFileMaxSize(): void {
     $node_storage = $this->container->get('entity_type.manager')->getStorage('node');
     $type_name = 'article';
     $field_name = $this->randomMachineName();
@@ -101,7 +99,6 @@ class FileFieldValidateTest extends FileFieldTestBase {
 
       // Create a new node with the small file, which should pass.
       $nid = $this->uploadNodeFile($small_file, $field_name, $type_name);
-      $node_storage->resetCache([$nid]);
       $node = $node_storage->load($nid);
       $node_file = File::load($node->{$field_name}->target_id);
       $this->assertFileExists($node_file->getFileUri());
@@ -119,7 +116,6 @@ class FileFieldValidateTest extends FileFieldTestBase {
 
     // Upload the big file successfully.
     $nid = $this->uploadNodeFile($large_file, $field_name, $type_name);
-    $node_storage->resetCache([$nid]);
     $node = $node_storage->load($nid);
     $node_file = File::load($node->{$field_name}->target_id);
     $this->assertFileExists($node_file->getFileUri());
@@ -129,7 +125,7 @@ class FileFieldValidateTest extends FileFieldTestBase {
   /**
    * Tests file extension checking.
    */
-  public function testFileExtension() {
+  public function testFileExtension(): void {
     $node_storage = $this->container->get('entity_type.manager')->getStorage('node');
     $type_name = 'article';
     $field_name = $this->randomMachineName();
@@ -143,7 +139,6 @@ class FileFieldValidateTest extends FileFieldTestBase {
 
     // Check that the file can be uploaded with no extension checking.
     $nid = $this->uploadNodeFile($test_file, $field_name, $type_name);
-    $node_storage->resetCache([$nid]);
     $node = $node_storage->load($nid);
     $node_file = File::load($node->{$field_name}->target_id);
     $this->assertFileExists($node_file->getFileUri());
@@ -161,7 +156,6 @@ class FileFieldValidateTest extends FileFieldTestBase {
 
     // Check that the file can be uploaded with extension checking.
     $nid = $this->uploadNodeFile($test_file, $field_name, $type_name);
-    $node_storage->resetCache([$nid]);
     $node = $node_storage->load($nid);
     $node_file = File::load($node->{$field_name}->target_id);
     $this->assertFileExists($node_file->getFileUri());
@@ -171,7 +165,7 @@ class FileFieldValidateTest extends FileFieldTestBase {
   /**
    * Checks that a file can always be removed if it does not pass validation.
    */
-  public function testFileRemoval() {
+  public function testFileRemoval(): void {
     $node_storage = $this->container->get('entity_type.manager')->getStorage('node');
     $type_name = 'article';
     $field_name = 'file_test';
@@ -184,7 +178,6 @@ class FileFieldValidateTest extends FileFieldTestBase {
 
     // Check that the file can be uploaded with no extension checking.
     $nid = $this->uploadNodeFile($test_file, $field_name, $type_name);
-    $node_storage->resetCache([$nid]);
     $node = $node_storage->load($nid);
     $node_file = File::load($node->{$field_name}->target_id);
     $this->assertFileExists($node_file->getFileUri());

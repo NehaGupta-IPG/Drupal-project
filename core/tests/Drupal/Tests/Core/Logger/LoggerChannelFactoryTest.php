@@ -20,7 +20,7 @@ class LoggerChannelFactoryTest extends UnitTestCase {
    *
    * @covers ::get
    */
-  public function testGet() {
+  public function testGet(): void {
     $factory = new LoggerChannelFactory(
       $this->createMock(RequestStack::class),
       $this->createMock(AccountInterface::class),
@@ -33,6 +33,9 @@ class LoggerChannelFactoryTest extends UnitTestCase {
 
 }
 
+/**
+ * Call to test a logger channel class with no constructor.
+ */
 class LoggerChannelWithoutConstructor extends LoggerChannelFactory {
 
   public function __construct() {}

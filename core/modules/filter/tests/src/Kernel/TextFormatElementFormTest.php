@@ -26,9 +26,7 @@ class TextFormatElementFormTest extends KernelTestBase implements FormInterface 
   protected $testUser;
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = [
     'system',
@@ -119,7 +117,7 @@ class TextFormatElementFormTest extends KernelTestBase implements FormInterface 
   /**
    * Tests that values are returned.
    */
-  public function testTextFormatElement() {
+  public function testTextFormatElement(): void {
     /** @var \Drupal\Core\Form\FormBuilder $form_builder */
     $form_builder = $this->container->get('form_builder');
     $form = $form_builder->getForm($this);

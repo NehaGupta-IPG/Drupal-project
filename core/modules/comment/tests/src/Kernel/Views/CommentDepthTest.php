@@ -18,9 +18,7 @@ use Drupal\views\Views;
 class CommentDepthTest extends CommentViewsKernelTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['entity_test'];
 
@@ -43,7 +41,7 @@ class CommentDepthTest extends CommentViewsKernelTestBase {
   /**
    * Test the comment depth.
    */
-  public function testCommentDepth() {
+  public function testCommentDepth(): void {
     $this->enableModules(['field']);
     $this->installConfig(['field']);
 

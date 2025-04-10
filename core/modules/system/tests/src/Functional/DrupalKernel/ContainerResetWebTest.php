@@ -26,6 +26,9 @@ class ContainerResetWebTest extends BrowserTestBase {
    */
   protected $defaultTheme = 'stark';
 
+  /**
+   * {@inheritdoc}
+   */
   protected function setUp(): void {
     parent::setUp();
     ConfigurableLanguage::createFromLangcode('es')->save();
@@ -49,7 +52,7 @@ class ContainerResetWebTest extends BrowserTestBase {
   /**
    * Sets a different deployment identifier.
    */
-  public function testContainerRebuild() {
+  public function testContainerRebuild(): void {
     $this->drupalLogin($this->drupalCreateUser());
 
     $this->drupalGet('container_rebuild_test/container_reset');

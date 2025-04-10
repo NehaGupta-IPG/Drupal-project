@@ -15,9 +15,7 @@ use Drupal\views\Views;
 class RssTest extends TaxonomyTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['node', 'field_ui', 'views'];
 
@@ -61,7 +59,7 @@ class RssTest extends TaxonomyTestBase {
       ],
       'auto_create' => TRUE,
     ];
-    $this->createEntityReferenceField('node', 'article', $this->fieldName, NULL, 'taxonomy_term', 'default', $handler_settings, FieldStorageDefinitionInterface::CARDINALITY_UNLIMITED);
+    $this->createEntityReferenceField('node', 'article', $this->fieldName, '', 'taxonomy_term', 'default', $handler_settings, FieldStorageDefinitionInterface::CARDINALITY_UNLIMITED);
 
     /** @var \Drupal\Core\Entity\EntityDisplayRepositoryInterface $display_repository */
     $display_repository = \Drupal::service('entity_display.repository');
@@ -83,7 +81,7 @@ class RssTest extends TaxonomyTestBase {
    *
    * Create a node and assert that taxonomy terms appear in rss.xml.
    */
-  public function testTaxonomyRss() {
+  public function testTaxonomyRss(): void {
     // Create two taxonomy terms.
     $term1 = $this->createTerm($this->vocabulary);
 

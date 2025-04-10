@@ -2,9 +2,10 @@
 
 namespace Drupal\block_content\Plugin\migrate\source\d7;
 
+use Drupal\migrate\Attribute\MigrateSource;
 use Drupal\migrate\Row;
 use Drupal\migrate_drupal\Plugin\migrate\source\DrupalSqlBase;
-use Drupal\content_translation\Plugin\migrate\source\I18nQueryTrait;
+use Drupal\migrate_drupal\Plugin\migrate\source\I18nQueryTrait;
 
 /**
  * Drupal 7 i18n content block translations source from database.
@@ -13,12 +14,11 @@ use Drupal\content_translation\Plugin\migrate\source\I18nQueryTrait;
  *
  * @see \Drupal\migrate\Plugin\migrate\source\SqlBase
  * @see \Drupal\migrate\Plugin\migrate\source\SourcePluginBase
- *
- * @MigrateSource(
- *   id = "d7_block_custom_translation",
- *   source_module = "i18n_block"
- * )
  */
+#[MigrateSource(
+  id: 'd7_block_custom_translation',
+  source_module: 'i18n_block',
+)]
 class BlockCustomTranslation extends DrupalSqlBase {
 
   use I18nQueryTrait;

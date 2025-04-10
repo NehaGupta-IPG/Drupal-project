@@ -5,7 +5,7 @@ namespace Drupal\Core\Session;
 /**
  * An implementation of the user account interface for the global user.
  *
- * @todo: Change all properties to protected.
+ * @todo Change all properties to protected.
  */
 #[\AllowDynamicProperties]
 class UserSession implements AccountInterface {
@@ -45,7 +45,7 @@ class UserSession implements AccountInterface {
    *
    * @var string
    */
-  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName
+  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
   protected $preferred_langcode;
 
   /**
@@ -53,7 +53,7 @@ class UserSession implements AccountInterface {
    *
    * @var string
    */
-  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName
+  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
   protected $preferred_admin_langcode;
 
   /**

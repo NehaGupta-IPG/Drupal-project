@@ -12,9 +12,7 @@ namespace Drupal\Tests\path\Functional;
 class PathNodeFormTest extends PathTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['node', 'path'];
 
@@ -40,7 +38,7 @@ class PathNodeFormTest extends PathTestBase {
   /**
    * Tests the node form ui.
    */
-  public function testNodeForm() {
+  public function testNodeForm(): void {
     $assert_session = $this->assertSession();
 
     $this->drupalGet('node/add/page');

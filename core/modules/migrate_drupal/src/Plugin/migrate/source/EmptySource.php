@@ -4,6 +4,7 @@ namespace Drupal\migrate_drupal\Plugin\migrate\source;
 
 use Drupal\Component\Plugin\DependentPluginInterface;
 use Drupal\Core\Entity\DependencyTrait;
+use Drupal\migrate\Attribute\MigrateSource;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\migrate\Plugin\MigrationInterface;
 use Drupal\migrate\Plugin\migrate\source\EmptySource as BaseEmptySource;
@@ -18,12 +19,11 @@ use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
  *
  * @see \Drupal\migrate\Plugin\migrate\source\EmptySource
  * @see \Drupal\migrate\Plugin\migrate\source\SourcePluginBase
- *
- * @MigrateSource(
- *   id = "md_empty",
- *   source_module = "system",
- * )
  */
+#[MigrateSource(
+  id: 'md_empty',
+  source_module: 'system',
+)]
 class EmptySource extends BaseEmptySource implements ContainerFactoryPluginInterface, DependentPluginInterface {
 
   use DependencyTrait;
@@ -46,7 +46,7 @@ class EmptySource extends BaseEmptySource implements ContainerFactoryPluginInter
   /**
    * {@inheritdoc}
    */
-  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition, MigrationInterface $migration = NULL) {
+  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition, ?MigrationInterface $migration = NULL) {
     return new static(
       $configuration,
       $plugin_id,

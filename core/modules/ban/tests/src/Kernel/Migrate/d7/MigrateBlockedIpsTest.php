@@ -17,9 +17,7 @@ class MigrateBlockedIpsTest extends MigrateDrupal7TestBase {
   use SchemaCheckTestTrait;
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['ban'];
 
@@ -34,7 +32,7 @@ class MigrateBlockedIpsTest extends MigrateDrupal7TestBase {
   /**
    * Tests migration of blocked IPs.
    */
-  public function testBlockedIps() {
+  public function testBlockedIps(): void {
     $this->startCollectingMessages();
     $this->executeMigration('d7_blocked_ips');
     $this->assertEmpty($this->migrateMessages);

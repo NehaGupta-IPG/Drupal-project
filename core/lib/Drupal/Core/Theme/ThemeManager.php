@@ -7,6 +7,7 @@ use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Routing\StackedRouteMatchInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Template\Attribute;
+use Drupal\Core\Template\AttributeHelper;
 
 /**
  * Provides the default implementation of a theme manager.
@@ -56,6 +57,13 @@ class ThemeManager implements ThemeManagerInterface {
   protected $root;
 
   /**
+   * Default variables.
+   *
+   * @var array|null
+   */
+  protected ?array $defaultVariables = NULL;
+
+  /**
    * Constructs a new ThemeManager object.
    *
    * @param string $root
@@ -90,7 +98,7 @@ class ThemeManager implements ThemeManagerInterface {
   /**
    * {@inheritdoc}
    */
-  public function getActiveTheme(RouteMatchInterface $route_match = NULL) {
+  public function getActiveTheme(?RouteMatchInterface $route_match = NULL) {
     if (!isset($this->activeTheme)) {
       $this->initTheme($route_match);
     }
@@ -109,6 +117,7 @@ class ThemeManager implements ThemeManagerInterface {
    */
   public function resetActiveTheme() {
     $this->activeTheme = NULL;
+    $this->defaultVariables = NULL;
     return $this;
   }
 
@@ -130,13 +139,6 @@ class ThemeManager implements ThemeManagerInterface {
     static $default_attributes;
 
     $active_theme = $this->getActiveTheme();
-
-    // If called before all modules are loaded, we do not necessarily have a
-    // full theme registry to work with, and therefore cannot process the theme
-    // request properly. See also \Drupal\Core\Theme\Registry::get().
-    if (!$this->moduleHandler->isLoaded() && !defined('MAINTENANCE_MODE')) {
-      throw new \Exception('The theme implementations may not be rendered until all modules are loaded.');
-    }
 
     $theme_registry = $this->themeRegistry->getRuntime();
 
@@ -255,6 +257,23 @@ class ThemeManager implements ThemeManagerInterface {
         $theme_hook_suggestion = $hook;
       }
     }
+
+    // Set default variables before preprocess hooks.
+    $variables += $this->getDefaultTemplateVariables();
+
+    // When theming a render element, merge its #attributes into
+    // $variables['attributes'].
+    if (isset($info['render element'])) {
+      $key = $info['render element'];
+      if (isset($variables[$key]['#attributes'])) {
+        $variables['attributes'] = AttributeHelper::mergeCollections($variables['attributes'], $variables[$key]['#attributes']);
+      }
+    }
+
+    // Invoke preprocess hooks.
+    // By default $info['preprocess functions'] should always be set, but it's
+    // good to check it if default Registry service implementation is
+    // overridden. See \Drupal\Core\Theme\Registry.
     if (isset($info['preprocess functions'])) {
       foreach ($info['preprocess functions'] as $preprocessor_function) {
         if (is_callable($preprocessor_function)) {
@@ -300,21 +319,6 @@ class ThemeManager implements ThemeManagerInterface {
       }
     }
 
-    // In some cases, a template implementation may not have had
-    // template_preprocess() run (for example, if the default implementation
-    // is a function, but a template overrides that default implementation).
-    // In these cases, a template should still be able to expect to have
-    // access to the variables provided by template_preprocess(), so we add
-    // them here if they don't already exist. We don't want the overhead of
-    // running template_preprocess() twice, so we use the 'directory' variable
-    // to determine if it has already run, which while not completely
-    // intuitive, is reasonably safe, and allows us to save on the overhead of
-    // adding some new variable to track that.
-    if (!isset($variables['directory'])) {
-      $default_template_variables = [];
-      template_preprocess($default_template_variables, $hook, $info);
-      $variables += $default_template_variables;
-    }
     if (!isset($default_attributes)) {
       $default_attributes = new Attribute();
     }
@@ -402,9 +406,10 @@ class ThemeManager implements ThemeManagerInterface {
    * @param \Drupal\Core\Routing\RouteMatchInterface $route_match
    *   The current route match.
    */
-  protected function initTheme(RouteMatchInterface $route_match = NULL) {
-    // Determine the active theme for the theme negotiator service. This includes
-    // the default theme as well as really specific ones like the ajax base theme.
+  protected function initTheme(?RouteMatchInterface $route_match = NULL) {
+    // Determine the active theme for the theme negotiator service. This
+    // includes the default theme as well as really specific ones like the ajax
+    // base theme.
     if (!$route_match) {
       $route_match = \Drupal::routeMatch();
     }
@@ -424,13 +429,13 @@ class ThemeManager implements ThemeManagerInterface {
     // Most of the time, $type is passed as a string, so for performance,
     // normalize it to that. When passed as an array, usually the first item in
     // the array is a generic type, and additional items in the array are more
-    // specific variants of it, as in the case of array('form', 'form_FORM_ID').
+    // specific variants of it, as in the case of ['form', 'form_FORM_ID'].
     if (is_array($type)) {
       $extra_types = $type;
       $type = array_shift($extra_types);
       // Allow if statements in this function to use the faster isset() rather
-      // than !empty() both when $type is passed as a string, or as an array with
-      // one item.
+      // than !empty() both when $type is passed as a string, or as an array
+      // with one item.
       if (empty($extra_types)) {
         unset($extra_types);
       }
@@ -465,6 +470,41 @@ class ThemeManager implements ThemeManagerInterface {
   public function alter($type, &$data, &$context1 = NULL, &$context2 = NULL) {
     $theme = $this->getActiveTheme();
     $this->alterForTheme($theme, $type, $data, $context1, $context2);
+  }
+
+  /**
+   * Returns default template variables.
+   *
+   * These are set for every template before template preprocessing hooks.
+   *
+   * See the @link themeable Default theme implementations topic @endlink for
+   * details.
+   *
+   * @return array
+   *   An array of default template variables.
+   *
+   * @internal
+   */
+  public function getDefaultTemplateVariables(): array {
+    if (!isset($this->defaultVariables)) {
+      // Variables that don't depend on a database connection.
+      $this->defaultVariables = [
+        'attributes' => [],
+        'title_attributes' => [],
+        'content_attributes' => [],
+        'title_prefix' => [],
+        'title_suffix' => [],
+        'db_is_active' => !defined('MAINTENANCE_MODE'),
+        'is_admin' => FALSE,
+        'logged_in' => FALSE,
+      ];
+
+      // Give modules a chance to alter default template variables.
+      $this->moduleHandler->alter('template_preprocess_default_variables', $this->defaultVariables);
+      // Tell all templates where they are located.
+      $this->defaultVariables['directory'] = $this->getActiveTheme()->getPath();
+    }
+    return $this->defaultVariables;
   }
 
 }

@@ -21,9 +21,7 @@ class ContentTranslationViewsUITest extends UITestBase {
   public static $testViews = ['test_view'];
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['content_translation'];
 
@@ -35,7 +33,7 @@ class ContentTranslationViewsUITest extends UITestBase {
   /**
    * Tests the views UI.
    */
-  public function testViewsUI() {
+  public function testViewsUI(): void {
     $this->drupalGet('admin/structure/views/view/test_view/edit');
     $this->assertSession()->titleEquals('Test view (Views test data) | Drupal');
   }

@@ -41,7 +41,7 @@ class UserRegistrationResource extends ResourceBase {
    * @param array $configuration
    *   A configuration array containing information about the plugin instance.
    * @param string $plugin_id
-   *   The plugin_id for the plugin instance.
+   *   The plugin ID for the plugin instance.
    * @param mixed $plugin_definition
    *   The plugin implementation definition.
    * @param array $serializer_formats
@@ -96,7 +96,7 @@ class UserRegistrationResource extends ResourceBase {
    * @throws \Symfony\Component\HttpKernel\Exception\BadRequestHttpException
    * @throws \Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException
    */
-  public function post(UserInterface $account = NULL) {
+  public function post(?UserInterface $account = NULL) {
     $this->ensureAccountCanRegister($account);
 
     // Only activate new users if visitors are allowed to register.
@@ -131,7 +131,7 @@ class UserRegistrationResource extends ResourceBase {
    * @param \Drupal\user\UserInterface $account
    *   The user account to register.
    */
-  protected function ensureAccountCanRegister(UserInterface $account = NULL) {
+  protected function ensureAccountCanRegister(?UserInterface $account = NULL) {
     if ($account === NULL) {
       throw new BadRequestHttpException('No user account data for registration received.');
     }

@@ -15,9 +15,7 @@ use Drupal\Tests\BrowserTestBase;
 class UserLanguageCreationTest extends BrowserTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['user', 'language'];
 
@@ -29,7 +27,7 @@ class UserLanguageCreationTest extends BrowserTestBase {
   /**
    * Functional test for language handling during user creation.
    */
-  public function testLocalUserCreation() {
+  public function testLocalUserCreation(): void {
     // User to add and remove language and create new users.
     $admin_user = $this->drupalCreateUser([
       'administer languages',

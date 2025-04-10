@@ -12,6 +12,7 @@ use Drupal\Core\Database\Query\Merge;
 use Drupal\Core\Database\Query\Select;
 use Drupal\Core\Database\Query\Truncate;
 use Drupal\Core\Database\Query\Update;
+use Drupal\Core\Database\Statement\FetchAs;
 use Drupal\Core\Database\Transaction\TransactionManagerInterface;
 use Drupal\Core\Pager\PagerManagerInterface;
 
@@ -250,11 +251,10 @@ abstract class Connection {
    * A given query can be customized with a number of option flags in an
    * associative array:
    * - fetch: This element controls how rows from a result set will be
-   *   returned. Legal values include \PDO::FETCH_ASSOC, \PDO::FETCH_BOTH,
-   *   \PDO::FETCH_OBJ, \PDO::FETCH_NUM, or a string representing the name of a
-   *   class. If a string is specified, each record will be fetched into a new
-   *   object of that class. The behavior of all other values is defined by PDO.
-   *   See http://php.net/manual/pdostatement.fetch.php
+   *   returned. Legal values include one of the enumeration cases of FetchAs or
+   *   a string representing the name of a class. If a string is specified, each
+   *   record will be fetched into a new object of that class. The behavior of
+   *   all other values is described in the FetchAs enum.
    * - allow_delimiter_in_query: By default, queries which have the ; delimiter
    *   any place in them will cause an exception. This reduces the chance of SQL
    *   injection attacks that terminate the original query and add one or more
@@ -277,7 +277,7 @@ abstract class Connection {
    */
   protected function defaultOptions() {
     return [
-      'fetch' => \PDO::FETCH_OBJ,
+      'fetch' => FetchAs::Object,
       'allow_delimiter_in_query' => FALSE,
       'allow_square_brackets' => FALSE,
       'pdo' => [],
@@ -325,7 +325,8 @@ abstract class Connection {
   /**
    * Returns the prefix of the tables.
    *
-   * @return string $prefix
+   * @return string
+   *   The table prefix.
    */
   public function getPrefix(): string {
     return $this->prefix;
@@ -395,6 +396,7 @@ abstract class Connection {
    *   The name of the table in question.
    *
    * @return string
+   *   The fully qualified table name.
    */
   public function getFullQualifiedTableName($table) {
     $options = $this->getConnectionOptions();
@@ -430,6 +432,9 @@ abstract class Connection {
    */
   public function prepareStatement(string $query, array $options, bool $allow_row_count = FALSE): StatementInterface {
     assert(!isset($options['return']), 'Passing "return" option to prepareStatement() has no effect. See https://www.drupal.org/node/3185520');
+    if (isset($options['fetch']) && is_int($options['fetch'])) {
+      @trigger_error("Passing the 'fetch' key as an integer to \$options in prepareStatement() is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Use a case of \Drupal\Core\Database\FetchAs enum instead. See https://www.drupal.org/node/3488338", E_USER_DEPRECATED);
+    }
 
     try {
       $query = $this->preprocessStatement($query, $options);
@@ -593,7 +598,7 @@ abstract class Connection {
    * @code
    * \Drupal::database()->update('example')
    *  ->condition('id', $id)
-   *  ->fields(array('field2' => 10))
+   *  ->fields(['field2' => 10])
    *  ->comment('Exploit * / DROP TABLE node; --')
    *  ->execute()
    * @endcode
@@ -648,6 +653,9 @@ abstract class Connection {
     assert(is_string($query), 'The \'$query\' argument to ' . __METHOD__ . '() must be a string');
     assert(!isset($options['return']), 'Passing "return" option to query() has no effect. See https://www.drupal.org/node/3185520');
     assert(!isset($options['target']), 'Passing "target" option to query() has no effect. See https://www.drupal.org/node/2993033');
+    if (isset($options['fetch']) && is_int($options['fetch'])) {
+      @trigger_error("Passing the 'fetch' key as an integer to \$options in query() is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Use a case of \Drupal\Core\Database\FetchAs enum instead. See https://www.drupal.org/node/3488338", E_USER_DEPRECATED);
+    }
 
     // Use default values if not already set.
     $options += $this->defaultOptions();
@@ -781,7 +789,7 @@ abstract class Connection {
    *   for query_alter hook implementations.
    * @param string $alias
    *   (optional) The alias of the base table of this query.
-   * @param $options
+   * @param array $options
    *   An array of options on the query.
    *
    * @return \Drupal\Core\Database\Query\SelectInterface
@@ -1064,7 +1072,7 @@ abstract class Connection {
    * @code
    * $result = $injected_connection->query(
    *   'SELECT * FROM person WHERE name LIKE :pattern',
-   *   array(':pattern' => $injected_connection->escapeLike($prefix) . '%')
+   *   [':pattern' => $injected_connection->escapeLike($prefix) . '%']
    * );
    * @endcode
    *
@@ -1110,6 +1118,7 @@ abstract class Connection {
    * @throws \LogicException
    *   If the transaction manager is undefined or unavailable.
    */
+  // phpcs:ignore Drupal.Commenting.FunctionComment.InvalidNoReturn, Drupal.Commenting.FunctionComment.Missing
   protected function driverTransactionManager(): TransactionManagerInterface {
     throw new \LogicException('The database driver has no TransactionManager implementation');
   }
@@ -1185,6 +1194,7 @@ abstract class Connection {
    * override this method.
    *
    * @return string
+   *   The version of the database server.
    */
   public function version() {
     return $this->connection->getAttribute(\PDO::ATTR_SERVER_VERSION);
@@ -1197,6 +1207,7 @@ abstract class Connection {
    * override this method.
    *
    * @return string
+   *   The version of the database client.
    */
   public function clientVersion() {
     return $this->connection->getAttribute(\PDO::ATTR_CLIENT_VERSION);
@@ -1219,6 +1230,7 @@ abstract class Connection {
    * Returns the name of the database engine accessed by this driver.
    *
    * @return string
+   *   The database engine name.
    */
   abstract public function databaseType();
 
@@ -1274,7 +1286,7 @@ abstract class Connection {
    * Extracts the SQLSTATE error from a PDOException.
    *
    * @param \Exception $e
-   *   The exception
+   *   The exception.
    *
    * @return string
    *   The five character error code.
@@ -1322,7 +1334,7 @@ abstract class Connection {
   public static function createConnectionOptionsFromUrl($url, $root) {
     $url_components = parse_url($url);
     if (!isset($url_components['scheme'], $url_components['host'], $url_components['path'])) {
-      throw new \InvalidArgumentException('Minimum requirement: driver://host/database');
+      throw new \InvalidArgumentException("The database connection URL '$url' is invalid. The minimum requirement is: 'driver://host/database'");
     }
 
     $url_components += [
@@ -1457,7 +1469,7 @@ abstract class Connection {
     try {
       return (bool) $this->query('SELECT JSON_TYPE(\'1\')');
     }
-    catch (\Exception $e) {
+    catch (\Exception) {
       return FALSE;
     }
   }
@@ -1607,8 +1619,8 @@ abstract class Connection {
    *   The debug backtrace.
    */
   protected function getDebugBacktrace(): array {
-    // @todo: allow a backtrace including all arguments as an option.
-    // See https://www.drupal.org/project/drupal/issues/3401906
+    // @todo Allow a backtrace including all arguments as an option.
+    //   https://www.drupal.org/project/drupal/issues/3401906
     return debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
   }
 

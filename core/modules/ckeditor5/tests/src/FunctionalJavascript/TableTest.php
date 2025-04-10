@@ -9,7 +9,7 @@ use Drupal\editor\Entity\Editor;
 use Drupal\filter\Entity\FilterFormat;
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
 use Drupal\Tests\ckeditor5\Traits\CKEditor5TestTrait;
-use Symfony\Component\Validator\ConstraintViolation;
+use Symfony\Component\Validator\ConstraintViolationInterface;
 
 /**
  * For testing the table plugin.
@@ -97,7 +97,7 @@ class TableTest extends WebDriverTestBase {
       ],
     ])->save();
     $this->assertSame([], array_map(
-      function (ConstraintViolation $v) {
+      function (ConstraintViolationInterface $v) {
         return (string) $v->getMessage();
       },
       iterator_to_array(CKEditor5::validatePair(
@@ -126,7 +126,7 @@ class TableTest extends WebDriverTestBase {
   /**
    * Confirms tables convert to the expected markup.
    */
-  public function testTableConversion() {
+  public function testTableConversion(): void {
     $assert_session = $this->assertSession();
     $page = $this->getSession()->getPage();
 
@@ -153,7 +153,7 @@ class TableTest extends WebDriverTestBase {
   /**
    * Tests creating a table with caption in the UI.
    */
-  public function testTableCaptionUi() {
+  public function testTableCaptionUi(): void {
     $assert_session = $this->assertSession();
     $page = $this->getSession()->getPage();
 

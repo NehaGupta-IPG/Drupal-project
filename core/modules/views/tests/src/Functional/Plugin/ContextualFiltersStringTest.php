@@ -14,9 +14,7 @@ use Drupal\Tests\views\Functional\ViewTestBase;
 class ContextualFiltersStringTest extends ViewTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = [
     'views_ui',
@@ -71,7 +69,7 @@ class ContextualFiltersStringTest extends ViewTestBase {
   /**
    * Tests contextual filter for the user roles.
    */
-  public function testUserRoleContextualFilter() {
+  public function testUserRoleContextualFilter(): void {
     $this->drupalGet('admin/structure/views/view/test_user_role_contextual_filter');
     $edit = [
       'view_args' => $this->role1,

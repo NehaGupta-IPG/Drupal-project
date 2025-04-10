@@ -11,7 +11,6 @@ use Drupal\menu_link_content\Entity\MenuLinkContent;
  * Tests the Olivero theme.
  *
  * @group olivero
- * @group #slow
  */
 class OliveroTest extends BrowserTestBase {
 
@@ -39,7 +38,7 @@ class OliveroTest extends BrowserTestBase {
    *
    * @see olivero.libraries.yml
    */
-  public function testBaseLibraryAvailable() {
+  public function testBaseLibraryAvailable(): void {
     $this->drupalGet('');
     $this->assertSession()->statusCodeEquals(200);
     $this->assertSession()->responseContains('olivero/css/base/base.css');
@@ -49,7 +48,7 @@ class OliveroTest extends BrowserTestBase {
   /**
    * Test Olivero's configuration schema.
    */
-  public function testConfigSchema() {
+  public function testConfigSchema(): void {
     // Required configuration.
     $this->drupalGet('');
     $this->assertSession()->statusCodeEquals(200);
@@ -74,7 +73,7 @@ class OliveroTest extends BrowserTestBase {
    *
    * @see olivero.libraries.yml
    */
-  public function testPreprocessBlock() {
+  public function testPreprocessBlock(): void {
     $this->drupalGet('');
     $this->assertSession()->statusCodeEquals(200);
 
@@ -122,7 +121,7 @@ class OliveroTest extends BrowserTestBase {
   /**
    * Tests that the Olivero theme can be uninstalled.
    */
-  public function testIsUninstallable() {
+  public function testIsUninstallable(): void {
     $this->drupalLogin($this->drupalCreateUser([
       'access administration pages',
       'administer themes',

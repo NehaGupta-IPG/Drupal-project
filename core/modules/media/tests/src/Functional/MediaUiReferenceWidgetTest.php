@@ -22,9 +22,7 @@ class MediaUiReferenceWidgetTest extends MediaFunctionalTestBase {
   use FieldUiTestTrait;
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = [
     'block',
@@ -115,7 +113,7 @@ class MediaUiReferenceWidgetTest extends MediaFunctionalTestBase {
    *
    * @dataProvider providerTestMediaReferenceWidget
    */
-  public function testMediaReferenceWidget($cardinality, array $media_type_create_access, $list_access, $widget_id = 'entity_reference_autocomplete') {
+  public function testMediaReferenceWidget($cardinality, array $media_type_create_access, $list_access, $widget_id = 'entity_reference_autocomplete'): void {
     $assert_session = $this->assertSession();
 
     // Create two content types.

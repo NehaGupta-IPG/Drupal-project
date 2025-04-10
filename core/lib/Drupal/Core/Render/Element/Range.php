@@ -18,10 +18,10 @@ use Drupal\Core\Render\Element;
  *
  * Usage example:
  * @code
- * $form['quantity'] = array(
+ * $form['quantity'] = [
  *   '#type' => 'range',
  *   '#title' => $this->t('Quantity'),
- * );
+ * ];
  * @endcode
  *
  * @see \Drupal\Core\Render\Element\Number
@@ -34,12 +34,11 @@ class Range extends Number {
    */
   public function getInfo() {
     $info = parent::getInfo();
-    $class = static::class;
     return [
       '#min' => 0,
       '#max' => 100,
       '#pre_render' => [
-        [$class, 'preRenderRange'],
+        [static::class, 'preRenderRange'],
       ],
       '#theme' => 'input__range',
     ] + $info;

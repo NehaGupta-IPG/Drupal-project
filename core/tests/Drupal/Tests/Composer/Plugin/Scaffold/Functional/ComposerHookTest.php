@@ -23,6 +23,7 @@ use Drupal\Tests\Composer\Plugin\Scaffold\Fixtures;
  * information.
  *
  * @group Scaffold
+ * @group #slow
  */
 class ComposerHookTest extends BuildTestBase {
 
@@ -77,7 +78,7 @@ class ComposerHookTest extends BuildTestBase {
   /**
    * Tests to see if scaffold operation runs at the correct times.
    */
-  public function testComposerHooks() {
+  public function testComposerHooks(): void {
     $topLevelProjectDir = 'composer-hooks-fixture';
     $sut = $this->fixturesDir . '/' . $topLevelProjectDir;
     // First test: run composer install. This is the same as composer update
@@ -126,7 +127,7 @@ class ComposerHookTest extends BuildTestBase {
   /**
    * Tests to see if scaffold messages are omitted when running scaffold twice.
    */
-  public function testScaffoldMessagesDoNotPrintTwice() {
+  public function testScaffoldMessagesDoNotPrintTwice(): void {
     $topLevelProjectDir = 'drupal-drupal';
     $sut = $this->fixturesDir . '/' . $topLevelProjectDir;
     // First test: run composer install. This is the same as composer update

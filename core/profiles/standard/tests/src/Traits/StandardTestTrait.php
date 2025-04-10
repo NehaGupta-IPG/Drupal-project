@@ -37,7 +37,7 @@ trait StandardTestTrait {
   /**
    * Tests Standard installation profile or recipe.
    */
-  public function testStandard() {
+  public function testStandard(): void {
     $this->drupalGet('');
     $this->assertSession()->pageTextContains('Powered by Drupal');
     $this->assertSession()->pageTextContains('Congratulations and welcome to the Drupal community.');
@@ -203,7 +203,7 @@ trait StandardTestTrait {
     $this->drupalGet($url);
     // Verify that site-wide contact page cannot be cached by Dynamic Page
     // Cache.
-    $this->assertSession()->responseHeaderEquals(DynamicPageCacheSubscriber::HEADER, 'UNCACHEABLE');
+    $this->assertSession()->responseHeaderEquals(DynamicPageCacheSubscriber::HEADER, 'UNCACHEABLE (poor cacheability)');
 
     $url = Url::fromRoute('<front>');
     $this->drupalGet($url);
@@ -254,7 +254,6 @@ trait StandardTestTrait {
     $role->save();
     $this->adminUser->addRole($role->id())->save();
     $assert_session = $this->assertSession();
-    $page = $this->getSession()->getPage();
     /** @var \Drupal\media\Entity\MediaType $media_type */
     foreach (MediaType::loadMultiple() as $media_type) {
       $media_type_machine_name = $media_type->id();

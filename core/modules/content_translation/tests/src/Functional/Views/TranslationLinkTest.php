@@ -25,9 +25,7 @@ class TranslationLinkTest extends ContentTranslationTestBase {
   public static $testViews = ['test_entity_translations_link'];
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['content_translation_test_views'];
 
@@ -71,7 +69,7 @@ class TranslationLinkTest extends ContentTranslationTestBase {
   /**
    * Tests the content translation overview link field handler.
    */
-  public function testTranslationLink() {
+  public function testTranslationLink(): void {
     $this->drupalGet('test-entity-translations-link');
     $this->assertSession()->linkByHrefExists('user/1/translations');
     $this->assertSession()->linkByHrefNotExists('user/2/translations', 'The translations link is not present when content_translation_translate_access() is FALSE.');
