@@ -219,7 +219,7 @@ class UrlTest extends UnitTestCase {
   public function testFromRoutedPathWithNolinkRoute(): void {
     $url = Url::fromUri('<nolink>');
     $this->assertTrue($url->isRouted());
-    $this->assertSame('<none>', $url->getRouteName());
+    $this->assertSame('<nolink>', $url->getRouteName());
     $this->assertEmpty($url->getRouteParameters());
     $this->assertFalse($url->isExternal());
   }
