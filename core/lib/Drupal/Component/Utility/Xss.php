@@ -92,6 +92,7 @@ class Xss {
     'table',
     'tbody',
     'td',
+    'template',
     'tfoot',
     'th',
     'thead',
