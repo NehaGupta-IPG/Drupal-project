@@ -1122,8 +1122,11 @@ class TransactionYieldTest extends DatabaseTestBase {
     $this->assertRowAbsent('rtcRollback');
     $this->assertRowPresent('row');
 
-    // Yield and destruct the transaction.
-    $transaction->yield();
+    // Yield and destruct the transaction. Non-transactional DDL database
+    // will have committed already, so we skip yielding in that case.
+    if ($this->connection->inTransaction()) {
+      $transaction->yield();
+    }
     unset($transaction);
 
     // The post-transaction callback should now have inserted a 'rtcCommit'
