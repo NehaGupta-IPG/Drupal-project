@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\KernelTests\Core\Render\Element;
 
 use Drupal\Core\Form\FormState;
@@ -20,7 +22,7 @@ class DeprecatedElementTest extends KernelTestBase {
   /**
    * Tests that render elements can trigger deprecations in their constructor.
    */
-  public function testBuildInfo() {
+  public function testBuildInfo(): void {
     $info_manager = $this->container->get('plugin.manager.element_info');
     $element_names = [
       'deprecated',

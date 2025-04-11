@@ -2,12 +2,10 @@
 
 namespace Drupal\Core\State;
 
-use Drupal\Core\Asset\AssetQueryString;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Cache\CacheCollector;
 use Drupal\Core\KeyValueStore\KeyValueFactoryInterface;
 use Drupal\Core\Lock\LockBackendInterface;
-use Drupal\Core\Site\Settings;
 
 /**
  * Provides the state system using a key value store.
@@ -23,12 +21,7 @@ class State extends CacheCollector implements StateInterface {
    *
    * @var array
    */
-  private static array $deprecatedState = [
-    'system.css_js_query_string' => [
-      'replacement' => AssetQueryString::STATE_KEY,
-      'message' => 'The \'system.css_js_query_string\' state is deprecated in drupal:10.2.0. Use \Drupal\Core\Asset\AssetQueryStringInterface::get() and ::reset() instead. See https://www.drupal.org/node/3358337.',
-    ],
-  ];
+  private static array $deprecatedState = [];
 
   /**
    * The key value store to use.
@@ -47,23 +40,9 @@ class State extends CacheCollector implements StateInterface {
    * @param \Drupal\Core\Lock\LockBackendInterface $lock
    *   The lock backend.
    */
-  public function __construct(KeyValueFactoryInterface $key_value_factory, CacheBackendInterface $cache = NULL, LockBackendInterface $lock = NULL) {
-    if (!$cache) {
-      @trigger_error('Calling  ' . __METHOD__ . '() without the $cache argument is deprecated in drupal:10.3.0 and is required in drupal:11.0.0. See https://www.drupal.org/node/3177901', E_USER_DEPRECATED);
-      $cache = \Drupal::cache('bootstrap');
-    }
-    if (!$lock) {
-      @trigger_error('Calling  ' . __METHOD__ . '() without the $lock argument is deprecated in drupal:10.3.0 and is required in drupal:11.0.0. See https://www.drupal.org/node/3177901', E_USER_DEPRECATED);
-      $lock = \Drupal::service('lock');
-    }
+  public function __construct(KeyValueFactoryInterface $key_value_factory, CacheBackendInterface $cache, LockBackendInterface $lock) {
     parent::__construct('state', $cache, $lock);
     $this->keyValueStore = $key_value_factory->get('state');
-
-    // For backward compatibility, allow to opt-out of state caching, if cache
-    // is not explicitly enabled, flag the cache as already loaded.
-    if (Settings::get('state_cache') !== TRUE) {
-      $this->cacheLoaded = TRUE;
-    }
   }
 
   /**
@@ -112,8 +91,15 @@ class State extends CacheCollector implements StateInterface {
       $key = self::$deprecatedState[$key]['replacement'];
     }
     $this->keyValueStore->set($key, $value);
+    // If another request had a cache miss before this request, and also hasn't
+    // written to cache yet, then it may already have read this value from the
+    // database and could write that value to the cache to the end of the
+    // request. To avoid this race condition, write to the cache immediately
+    // after calling parent::set(). This allows the race condition detection in
+    // CacheCollector::set() to work.
     parent::set($key, $value);
     $this->persist($key);
+    static::updateCache();
   }
 
   /**
@@ -150,30 +136,6 @@ class State extends CacheCollector implements StateInterface {
    */
   public function resetCache() {
     $this->clear();
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  protected function updateCache($lock = TRUE) {
-    // For backward compatibility, allow to opt-out of state caching, if cache
-    // is not explicitly enabled, there is no need to update it.
-    if (Settings::get('state_cache') !== TRUE) {
-      return;
-    }
-    parent::updateCache($lock);
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  protected function invalidateCache() {
-    // For backward compatibility, allow to opt-out of state caching, if cache
-    // is not explicitly enabled, there is no need to invalidate it.
-    if (Settings::get('state_cache') !== TRUE) {
-      return;
-    }
-    parent::invalidateCache();
   }
 
 }

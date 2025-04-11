@@ -32,7 +32,7 @@ class SecurityFileUploadEventSubscriberTest extends UnitTestCase {
    *
    * @covers ::sanitizeName
    */
-  public function testSanitizeName(string $filename, string $allowed_extensions, string $expected_filename, string $expected_filename_with_insecure_uploads = NULL) {
+  public function testSanitizeName(string $filename, string $allowed_extensions, string $expected_filename, ?string $expected_filename_with_insecure_uploads = NULL): void {
     // Configure insecure uploads to be renamed.
     $config_factory = $this->getConfigFactoryStub([
       'system.file' => [
@@ -106,7 +106,7 @@ class SecurityFileUploadEventSubscriberTest extends UnitTestCase {
    *
    * @covers ::sanitizeName
    */
-  public function testSanitizeNameNoMunge(string $filename, string $allowed_extensions) {
+  public function testSanitizeNameNoMunge(string $filename, string $allowed_extensions): void {
     $config_factory = $this->getConfigFactoryStub([
       'system.file' => [
         'allow_insecure_uploads' => FALSE,
@@ -147,9 +147,18 @@ class SecurityFileUploadEventSubscriberTest extends UnitTestCase {
       // The following filename would be rejected by 'FileExtension' constraint
       // and therefore remains unchanged.
       '.php is not munged when it would be rejected' => ['foo.php.php', 'jpg'],
-      '.php is not munged when it would be rejected and filename contains null byte character' => ['foo.' . chr(0) . 'php.php', 'jpg'],
-      'extension less files are not munged when they would be rejected' => ['foo', 'jpg'],
-      'dot files are not munged when they would be rejected' => ['.htaccess', 'jpg png'],
+      '.php is not munged when it would be rejected and filename contains null byte character' => [
+        'foo.' . chr(0) . 'php.php',
+        'jpg',
+      ],
+      'extension less files are not munged when they would be rejected' => [
+        'foo',
+        'jpg',
+      ],
+      'dot files are not munged when they would be rejected' => [
+        '.htaccess',
+        'jpg png',
+      ],
     ];
   }
 

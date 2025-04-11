@@ -77,7 +77,7 @@ class MigrateExecutableMemoryExceededTest extends MigrateTestCase {
    * @param int|null $memory_limit
    *   (optional) The memory limit. Defaults to NULL.
    */
-  protected function runMemoryExceededTest($message, $memory_exceeded, $memory_usage_first = NULL, $memory_usage_second = NULL, $memory_limit = NULL) {
+  protected function runMemoryExceededTest($message, $memory_exceeded, $memory_usage_first = NULL, $memory_usage_second = NULL, $memory_limit = NULL): void {
     $this->executable->setMemoryLimit($memory_limit ?: $this->memoryLimit);
     $this->executable->setMemoryUsage($memory_usage_first ?: $this->memoryLimit, $memory_usage_second ?: $this->memoryLimit);
     $this->executable->setMemoryThreshold(0.85);
@@ -98,7 +98,7 @@ class MigrateExecutableMemoryExceededTest extends MigrateTestCase {
   /**
    * Tests memoryExceeded method when a new batch is needed.
    */
-  public function testMemoryExceededNewBatch() {
+  public function testMemoryExceededNewBatch(): void {
     // First case try reset and then start new batch.
     $this->runMemoryExceededTest('starting new batch', TRUE);
   }
@@ -106,14 +106,14 @@ class MigrateExecutableMemoryExceededTest extends MigrateTestCase {
   /**
    * Tests memoryExceeded method when enough is cleared.
    */
-  public function testMemoryExceededClearedEnough() {
+  public function testMemoryExceededClearedEnough(): void {
     $this->runMemoryExceededTest('reclaimed enough', FALSE, $this->memoryLimit, $this->memoryLimit * 0.75);
   }
 
   /**
    * Tests memoryExceeded when memory usage is not exceeded.
    */
-  public function testMemoryNotExceeded() {
+  public function testMemoryNotExceeded(): void {
     $this->runMemoryExceededTest('', FALSE, floor($this->memoryLimit * 0.85) - 1);
   }
 

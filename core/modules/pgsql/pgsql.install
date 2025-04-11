@@ -6,12 +6,11 @@
  */
 
 use Drupal\Core\Database\Database;
-use Drupal\pgsql\Update10101;
 
 /**
  * Implements hook_requirements().
  */
-function pgsql_requirements() {
+function pgsql_requirements(): array {
   $requirements = [];
   // Test with PostgreSQL databases for the status of the pg_trgm extension.
   if (Database::isActiveConnection()) {
@@ -43,8 +42,8 @@ function pgsql_requirements() {
 }
 
 /**
- * Update sequences' owner created from serial columns in PostgreSQL.
+ * Implements hook_update_last_removed().
  */
-function pgsql_update_10101(&$sandbox) {
-  \Drupal::classResolver(Update10101::class)->update($sandbox);
+function pgsql_update_last_removed(): int {
+  return 10101;
 }

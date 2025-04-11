@@ -124,10 +124,10 @@ class UserRolesAccessPolicyTest extends UnitTestCase {
    * @return array
    *   A list of test scenarios.
    */
-  public function calculatePermissionsProvider(): array {
+  public static function calculatePermissionsProvider(): array {
     $cases['no-roles'] = [
       'roles' => [],
-      'has-admin' => FALSE,
+      'expect_admin_rights' => FALSE,
     ];
     $cases['some-roles'] = [
       'roles' => [
@@ -140,7 +140,7 @@ class UserRolesAccessPolicyTest extends UnitTestCase {
           'is_admin' => FALSE,
         ],
       ],
-      'has-admin' => FALSE,
+      'expect_admin_rights' => FALSE,
     ];
     $cases['admin-role'] = [
       'roles' => [
@@ -153,7 +153,7 @@ class UserRolesAccessPolicyTest extends UnitTestCase {
           'is_admin' => TRUE,
         ],
       ],
-      'has-admin' => TRUE,
+      'expect_admin_rights' => TRUE,
     ];
     return $cases;
   }

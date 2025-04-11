@@ -4,6 +4,7 @@ namespace Drupal\Core\Config;
 
 use Drupal\Component\Datetime\Time;
 use Drupal\Component\Datetime\TimeInterface;
+use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Cache\MemoryBackend;
 use Drupal\Core\Cache\NullBackend;
 use Drupal\Core\Config\Entity\ConfigDependencyManager;
@@ -85,7 +86,7 @@ class StorageComparer implements StorageComparerInterface {
    *
    * @var \Drupal\Core\Cache\CacheBackendInterface
    */
-  protected $targetCacheStorage;
+  protected CacheBackendInterface $targetCacheStorage;
 
   /**
    * Indicates whether the target storage should be wrapped in a cache.
@@ -220,7 +221,7 @@ class StorageComparer implements StorageComparerInterface {
    *   (optional) Array to sort that can be used to sort the changelist. This
    *   array must contain all the items that are in the change list.
    */
-  protected function addChangeList($collection, $op, array $changes, array $sort_order = NULL) {
+  protected function addChangeList($collection, $op, array $changes, ?array $sort_order = NULL) {
     // Only add changes that aren't already listed.
     $changes = array_diff($changes, $this->changelist[$collection][$op]);
     $this->changelist[$collection][$op] = array_merge($this->changelist[$collection][$op], $changes);

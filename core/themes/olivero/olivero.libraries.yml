@@ -37,6 +37,7 @@ global-styling:
       css/components/header-sticky-toggle.css: {}
       css/components/hero.css: {}
       css/components/links.css: {}
+      css/components/layout-field.css: {}
       css/components/messages.css: {}
       css/components/navigation/nav-button-mobile.css: {}
       css/components/node.css: {}
@@ -47,7 +48,6 @@ global-styling:
       css/components/pager.css: {}
       css/components/table.css: {}
       css/components/text-content.css: {}
-      css/components/tabledrag.css: {}
       css/components/wide-content.css: {}
 
   js:
@@ -58,12 +58,6 @@ global-styling:
     - core/once
     - core/tabbable
     - olivero/navigation-base
-
-book:
-  version: VERSION
-  css:
-    theme:
-      css/components/book.css: {}
 
 cke-dialog:
   version: VERSION
@@ -145,12 +139,6 @@ filter.theme:
   css:
     component:
       css/theme/filter.theme.css: {}
-
-forum:
-  version: VERSION
-  css:
-    component:
-      css/components/forum.css: {}
 
 layout_builder_fourcol_section:
   version: VERSION
@@ -289,6 +277,12 @@ tabs:
       css/components/tabs.css: {}
   js:
     js/tabs.js: {}
+
+tabledrag:
+  version: VERSION
+  css:
+    component:
+      css/components/tabledrag.css: {}
 
 tags:
   version: VERSION

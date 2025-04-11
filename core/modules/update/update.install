@@ -5,6 +5,7 @@
  * Install, update, and uninstall functions for the Update Manager module.
  */
 
+use Drupal\Core\Hook\Attribute\StopProceduralHookScan;
 use Drupal\Core\Link;
 use Drupal\Core\Url;
 use Drupal\update\ProjectSecurityData;
@@ -32,7 +33,7 @@ use Drupal\update\UpdateManagerInterface;
  * @see _update_cron_notify()
  * @see \Drupal\update\UpdateManagerInterface
  */
-function update_requirements($phase) {
+function update_requirements($phase): array {
   $requirements = [];
   if ($phase == 'runtime') {
     if ($available = update_get_available(FALSE)) {
@@ -73,7 +74,8 @@ function update_requirements($phase) {
 /**
  * Implements hook_install().
  */
-function update_install() {
+#[StopProceduralHookScan]
+function update_install(): void {
   $queue = \Drupal::queue('update_fetch_tasks', TRUE);
   $queue->createQueue();
 }
@@ -81,7 +83,7 @@ function update_install() {
 /**
  * Implements hook_uninstall().
  */
-function update_uninstall() {
+function update_uninstall(): void {
   \Drupal::state()->delete('update.last_check');
   \Drupal::state()->delete('update.last_email_notification');
 
@@ -95,10 +97,10 @@ function update_uninstall() {
  * This is shared for both core and contrib to generate the right elements in
  * the array for hook_requirements().
  *
- * @param $project
+ * @param array $project
  *   Array of information about the project we're testing as returned by
  *   update_calculate_project_data().
- * @param $type
+ * @param string $type
  *   What kind of project this is ('core' or 'contrib').
  *
  * @return array
@@ -108,7 +110,7 @@ function update_uninstall() {
  * @see update_requirements()
  * @see update_calculate_project_data()
  */
-function _update_requirement_check($project, $type) {
+function _update_requirement_check($project, $type): array {
   $requirement = [];
   if ($type == 'core') {
     $requirement['title'] = t('Drupal core update status');
@@ -125,12 +127,7 @@ function _update_requirement_check($project, $type) {
     // strings together in a single paragraph.
     $requirement['description'][] = ['#markup' => _update_message_text($type, $status)];
     if (!in_array($status, [UpdateFetcherInterface::UNKNOWN, UpdateFetcherInterface::NOT_CHECKED, UpdateFetcherInterface::NOT_FETCHED, UpdateFetcherInterface::FETCH_PENDING])) {
-      if (_update_manager_access()) {
-        $requirement['description'][] = ['#prefix' => ' ', '#markup' => t('See the <a href=":available_updates">available updates</a> page for more information and to update your software.', [':available_updates' => Url::fromRoute('update.report_update')->toString()])];
-      }
-      else {
-        $requirement['description'][] = ['#prefix' => ' ', '#markup' => t('See the <a href=":available_updates">available updates</a> page for more information.', [':available_updates' => Url::fromRoute('update.status')->toString()])];
-      }
+      $requirement['description'][] = ['#prefix' => ' ', '#markup' => t('See the <a href=":available_updates">available updates</a> page for more information.', [':available_updates' => Url::fromRoute('update.status')->toString()])];
     }
   }
   switch ($status) {
@@ -155,7 +152,7 @@ function _update_requirement_check($project, $type) {
     case UpdateFetcherInterface::NOT_CHECKED:
     case UpdateFetcherInterface::NOT_FETCHED:
     case UpdateFetcherInterface::FETCH_PENDING:
-      $requirement_label = isset($project['reason']) ? $project['reason'] : t('Can not determine status');
+      $requirement_label = $project['reason'] ?? t('Can not determine status');
       $requirement['severity'] = REQUIREMENT_WARNING;
       break;
 
@@ -165,13 +162,13 @@ function _update_requirement_check($project, $type) {
   if ($status != UpdateManagerInterface::CURRENT && $type == 'core' && isset($project['recommended'])) {
     $requirement_label .= ' ' . t('(version @version available)', ['@version' => $project['recommended']]);
   }
-  $requirement['value'] = Link::fromTextAndUrl($requirement_label, Url::fromRoute(_update_manager_access() ? 'update.report_update' : 'update.status'))->toString();
+  $requirement['value'] = Link::fromTextAndUrl($requirement_label, Url::fromRoute('update.status'))->toString();
   return $requirement;
 }
 
 /**
  * Implements hook_update_last_removed().
  */
-function update_update_last_removed() {
+function update_update_last_removed(): int {
   return 8001;
 }

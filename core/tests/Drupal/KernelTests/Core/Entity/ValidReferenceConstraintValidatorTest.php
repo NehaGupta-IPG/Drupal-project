@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\KernelTests\Core\Entity;
 
 use Drupal\Core\Field\BaseFieldDefinition;
@@ -52,7 +54,7 @@ class ValidReferenceConstraintValidatorTest extends EntityKernelTestBase {
   /**
    * Tests the ValidReferenceConstraintValidator.
    */
-  public function testValidation() {
+  public function testValidation(): void {
     // Create a test entity to be referenced.
     $entity = $this->createUser();
     // By default entity references already have the ValidReference constraint.
@@ -83,7 +85,7 @@ class ValidReferenceConstraintValidatorTest extends EntityKernelTestBase {
   /**
    * Tests the validation of pre-existing items in an entity reference field.
    */
-  public function testPreExistingItemsValidation() {
+  public function testPreExistingItemsValidation(): void {
     // Create two types of users, with and without access to bypass content
     // access.
     /** @var \Drupal\user\RoleInterface $role_with_access */
@@ -195,8 +197,8 @@ class ValidReferenceConstraintValidatorTest extends EntityKernelTestBase {
     $violations = $referencing_entity->field_test->validate();
     $this->assertCount(0, $violations);
 
-    // Remove one of the referenceable bundles and check that a pre-existing node
-    // of that bundle can not be referenced anymore.
+    // Remove one of the referenceable bundles and check that a pre-existing
+    // node of that bundle can not be referenced anymore.
     $field = FieldConfig::loadByName('entity_test', 'entity_test', 'field_test');
     $field->setSetting('handler_settings', ['target_bundles' => ['article']]);
     $field->save();

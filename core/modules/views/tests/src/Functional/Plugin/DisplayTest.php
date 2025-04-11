@@ -14,7 +14,6 @@ use Drupal\views_test_data\Plugin\views\display\DisplayTest as DisplayTestPlugin
  * Tests the basic display plugin.
  *
  * @group views
- * @group #slow
  */
 class DisplayTest extends ViewTestBase {
 
@@ -26,9 +25,7 @@ class DisplayTest extends ViewTestBase {
   public static $testViews = ['test_filter_groups', 'test_get_attach_displays', 'test_view', 'test_display_more', 'test_display_invalid', 'test_display_empty', 'test_exposed_relationship_admin_ui', 'test_simple_argument'];
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['views_ui', 'node', 'block'];
 
@@ -71,7 +68,7 @@ class DisplayTest extends ViewTestBase {
    *
    * @see \Drupal\views_test_data\Plugin\views\display\DisplayTest
    */
-  public function testDisplayPlugin() {
+  public function testDisplayPlugin(): void {
     /** @var \Drupal\Core\Render\RendererInterface $renderer */
     $renderer = $this->container->get('renderer');
     $view = Views::getView('test_view');
@@ -167,11 +164,11 @@ class DisplayTest extends ViewTestBase {
   /**
    * Tests the overriding of filter_groups.
    */
-  public function testFilterGroupsOverriding() {
+  public function testFilterGroupsOverriding(): void {
     $view = Views::getView('test_filter_groups');
     $view->initDisplay();
 
-    // mark is as overridden, yes FALSE, means overridden.
+    // Mark is as overridden, yes FALSE, means overridden.
     $view->displayHandlers->get('page')->setOverride('filter_groups', FALSE);
     $this->assertFalse($view->displayHandlers->get('page')->isDefaulted('filter_groups'), "Make sure that 'filter_groups' is marked as overridden.");
     $this->assertFalse($view->displayHandlers->get('page')->isDefaulted('filters'), "Make sure that 'filters'' is marked as overridden.");
@@ -180,7 +177,7 @@ class DisplayTest extends ViewTestBase {
   /**
    * Tests the getAttachedDisplays method.
    */
-  public function testGetAttachedDisplays() {
+  public function testGetAttachedDisplays(): void {
     $view = Views::getView('test_get_attach_displays');
 
     // Both the feed_1 and the feed_2 display are attached to the page display.
@@ -192,15 +189,16 @@ class DisplayTest extends ViewTestBase {
   }
 
   /**
-   * Tests the readmore validation.
+   * Tests the 'read more' validation.
    */
-  public function testReadMoreNoDisplay() {
+  public function testReadMoreNoDisplay(): void {
     $view = Views::getView('test_display_more');
     // Confirm that the view validates when there is a page display.
     $errors = $view->validate();
     $this->assertEmpty($errors, 'More link validation has no errors.');
 
-    // Confirm that the view does not validate when the page display is disabled.
+    // Confirm that the view does not validate when the page display is
+    // disabled.
     $view->setDisplay('page_1');
     $view->display_handler->setOption('enabled', FALSE);
     $view->setDisplay('default');
@@ -208,7 +206,8 @@ class DisplayTest extends ViewTestBase {
     $this->assertNotEmpty($errors, 'More link validation has some errors.');
     $this->assertEquals('Display "Default" uses a "more" link but there are no displays it can link to. You need to specify a custom URL.', $errors['default'][0], 'More link validation has the right error.');
 
-    // Confirm that the view does not validate when the page display does not exist.
+    // Confirm that the view does not validate when the page display does not
+    // exist.
     $view = Views::getView('test_view');
     $view->setDisplay('default');
     $view->display_handler->setOption('use_more', 1);
@@ -218,9 +217,9 @@ class DisplayTest extends ViewTestBase {
   }
 
   /**
-   * Tests the readmore with custom URL.
+   * Tests the 'read more' with custom URL.
    */
-  public function testReadMoreCustomURL() {
+  public function testReadMoreCustomURL(): void {
     /** @var \Drupal\Core\Render\RendererInterface $renderer */
     $renderer = $this->container->get('renderer');
 
@@ -303,6 +302,14 @@ class DisplayTest extends ViewTestBase {
     $output = (string) $renderer->renderRoot($output);
     $this->assertStringContainsString('/node/22?date=22&amp;foo=bar', $output, 'The read more link with href "/node/22?date=22&foo=bar" was found.');
 
+    // Test more link with array arguments in path.
+    $view->display_handler->setOption('link_url', 'node/{{ raw_arguments.age }}?date[{{ raw_arguments.age }}]={{ raw_arguments.age }}&foo=bar');
+    $view->setArguments([22]);
+    $this->executeView($view);
+    $output = $view->preview();
+    $output = (string) $renderer->renderRoot($output);
+    $this->assertStringContainsString('/node/22?date%5B22%5D=22&amp;foo=bar', $output, 'The read more link with href "/node/22?date[22]=22&foo=bar" was found.');
+
     // Test more link with arguments in fragment.
     $view->display_handler->setOption('link_url', 'node?date={{ raw_arguments.age }}&foo=bar#{{ raw_arguments.age }}');
     $view->setArguments([22]);
@@ -315,7 +322,7 @@ class DisplayTest extends ViewTestBase {
   /**
    * Tests invalid display plugins.
    */
-  public function testInvalidDisplayPlugins() {
+  public function testInvalidDisplayPlugins(): void {
     $this->drupalGet('test_display_invalid');
     $this->assertSession()->statusCodeEquals(200);
 
@@ -364,7 +371,7 @@ class DisplayTest extends ViewTestBase {
   /**
    * Tests display validation when a required relationship is missing.
    */
-  public function testMissingRelationship() {
+  public function testMissingRelationship(): void {
     $view = Views::getView('test_exposed_relationship_admin_ui');
 
     // Remove the relationship that is not used by other handlers.
@@ -389,7 +396,7 @@ class DisplayTest extends ViewTestBase {
   /**
    * Tests the outputIsEmpty method on the display.
    */
-  public function testOutputIsEmpty() {
+  public function testOutputIsEmpty(): void {
     $view = Views::getView('test_display_empty');
     $this->executeView($view);
     $this->assertNotEmpty($view->result);
@@ -432,7 +439,7 @@ class DisplayTest extends ViewTestBase {
   /**
    * Tests translation rendering settings based on entity translatability.
    */
-  public function testTranslationSetting() {
+  public function testTranslationSetting(): void {
     \Drupal::service('module_installer')->install(['file']);
 
     // By default there should be no language settings.
@@ -458,7 +465,7 @@ class DisplayTest extends ViewTestBase {
    *   Whether the node based view should be expected to support translation
    *   settings.
    */
-  protected function checkTranslationSetting($expected_node_translatability = FALSE) {
+  protected function checkTranslationSetting($expected_node_translatability = FALSE): void {
     $not_supported_text = 'The view is not based on a translatable entity type or the site is not multilingual.';
     $supported_text = 'All content that supports translations will be displayed in the selected language.';
 

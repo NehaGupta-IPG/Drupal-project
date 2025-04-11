@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\node\Kernel;
 
 use Drupal\KernelTests\Core\Entity\EntityKernelTestBase;
@@ -69,7 +71,7 @@ class NodeViewBuilderTest extends EntityKernelTestBase {
    * @covers ::renderLinks
    * @covers ::buildLinks
    */
-  public function testPendingRevisionLinks() {
+  public function testPendingRevisionLinks(): void {
     $account = User::create([
       'name' => $this->randomString(),
     ]);

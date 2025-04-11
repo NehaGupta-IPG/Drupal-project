@@ -15,9 +15,7 @@ use Drupal\Tests\BrowserTestBase;
 class ConfigTranslationUiThemeTest extends BrowserTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = [
     'config_translation',
@@ -67,7 +65,7 @@ class ConfigTranslationUiThemeTest extends BrowserTestBase {
   /**
    * Tests that theme provided *.config_translation.yml files are found.
    */
-  public function testThemeDiscovery() {
+  public function testThemeDiscovery(): void {
     // Install the test theme and rebuild routes.
     $theme = 'config_translation_test_theme';
 

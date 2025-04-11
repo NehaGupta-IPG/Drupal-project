@@ -13,6 +13,7 @@ use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
  * BigPipe regression tests.
  *
  * @group big_pipe
+ * @group #slow
  */
 class BigPipeRegressionTest extends WebDriverTestBase {
 
@@ -45,7 +46,7 @@ class BigPipeRegressionTest extends WebDriverTestBase {
    *
    * @see https://www.drupal.org/node/2678662
    */
-  public function testMultipleClosingBodies_2678662() {
+  public function testMultipleClosingBodies_2678662(): void {
     $this->assertTrue($this->container->get('module_installer')->install(['render_placeholder_message_test'], TRUE), 'Installed modules.');
 
     $this->drupalLogin($this->drupalCreateUser());
@@ -78,7 +79,7 @@ JS;
    *
    * @see https://www.drupal.org/node/2712935
    */
-  public function testMessages_2712935() {
+  public function testMessages_2712935(): void {
     $this->assertTrue($this->container->get('module_installer')->install(['render_placeholder_message_test'], TRUE), 'Installed modules.');
 
     $this->drupalLogin($this->drupalCreateUser());
@@ -114,12 +115,21 @@ JS;
   }
 
   /**
+   * Tests edge cases with placeholder HTML.
+   */
+  public function testPlaceholderHtmlEdgeCases(): void {
+    $this->drupalLogin($this->drupalCreateUser());
+    $this->doTestPlaceholderInParagraph_2802923();
+    $this->doTestBigPipeLargeContent();
+    $this->doTestMultipleReplacements();
+  }
+
+  /**
    * Ensure default BigPipe placeholder HTML cannot split paragraphs.
    *
    * @see https://www.drupal.org/node/2802923
    */
-  public function testPlaceholderInParagraph_2802923() {
-    $this->drupalLogin($this->drupalCreateUser());
+  protected function doTestPlaceholderInParagraph_2802923(): void {
     $this->drupalGet(Url::fromRoute('big_pipe_regression_test.2802923'));
 
     $this->assertJsCondition('document.querySelectorAll(\'p\').length === 1');
@@ -131,9 +141,7 @@ JS;
    * Repeat loading of same page for two times, after second time the page is
    * cached and the bug consistently reproducible.
    */
-  public function testBigPipeLargeContent() {
-    $user = $this->drupalCreateUser();
-    $this->drupalLogin($user);
+  public function doTestBigPipeLargeContent(): void {
     $assert_session = $this->assertSession();
 
     $this->drupalGet(Url::fromRoute('big_pipe_test_large_content'));
@@ -159,7 +167,7 @@ JS;
    *
    * @see https://www.drupal.org/node/3390178
    */
-  public function testMultipleReplacements(): void {
+  protected function doTestMultipleReplacements(): void {
     $user = $this->drupalCreateUser();
     $this->drupalLogin($user);
 

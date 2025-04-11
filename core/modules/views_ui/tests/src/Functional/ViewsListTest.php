@@ -15,9 +15,7 @@ use Drupal\views\Views;
 class ViewsListTest extends UITestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['block', 'views_ui'];
 
@@ -48,7 +46,7 @@ class ViewsListTest extends UITestBase {
   /**
    * Tests that the views list does not use a pager.
    */
-  public function testViewsListLimit() {
+  public function testViewsListLimit(): void {
     // Check if we can access the main views admin page.
     $this->drupalGet('admin/structure/views');
     $this->assertSession()->statusCodeEquals(200);

@@ -7,7 +7,7 @@ namespace Drupal\Tests\datetime_range\Functional;
 use Drupal\Core\Datetime\DrupalDateTime;
 use Drupal\Core\Datetime\Entity\DateFormat;
 use Drupal\datetime\Plugin\Field\FieldType\DateTimeItemInterface;
-use Drupal\datetime_range\DateTimeRangeConstantsInterface;
+use Drupal\datetime_range\DateTimeRangeDisplayOptions;
 use Drupal\datetime_range\Plugin\Field\FieldType\DateRangeItem;
 use Drupal\entity_test\Entity\EntityTest;
 use Drupal\field\Entity\FieldConfig;
@@ -19,14 +19,11 @@ use Drupal\Tests\datetime\Functional\DateTestBase;
  * Tests Daterange field functionality.
  *
  * @group datetime
- * @group #slow
  */
 class DateRangeFieldTest extends DateTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['datetime_range'];
 
@@ -43,20 +40,20 @@ class DateRangeFieldTest extends DateTestBase {
   protected $defaultSettings = [
     'timezone_override' => '',
     'separator' => '-',
-    'from_to' => DateTimeRangeConstantsInterface::BOTH,
+    'from_to' => DateTimeRangeDisplayOptions::Both->value,
   ];
 
   /**
    * {@inheritdoc}
    */
-  protected function getTestFieldType() {
+  protected function getTestFieldType(): string {
     return 'daterange';
   }
 
   /**
    * Tests date field functionality.
    */
-  public function testDateRangeField() {
+  public function testDateRangeField(): void {
     $field_name = $this->fieldStorage->getName();
     $field_label = $this->field->label();
 
@@ -261,7 +258,7 @@ class DateRangeFieldTest extends DateTestBase {
   /**
    * Tests date and time field.
    */
-  public function testDatetimeRangeField() {
+  public function testDatetimeRangeField(): void {
     $field_name = $this->fieldStorage->getName();
     $field_label = $this->field->label();
 
@@ -439,7 +436,7 @@ class DateRangeFieldTest extends DateTestBase {
   /**
    * Tests all-day field.
    */
-  public function testAlldayRangeField() {
+  public function testAlldayRangeField(): void {
     $field_name = $this->fieldStorage->getName();
     $field_label = $this->field->label();
 
@@ -615,7 +612,7 @@ class DateRangeFieldTest extends DateTestBase {
   /**
    * Tests Date Range List Widget functionality.
    */
-  public function testDatelistWidget() {
+  public function testDatelistWidget(): void {
     $field_name = $this->fieldStorage->getName();
     $field_label = $this->field->label();
 
@@ -972,7 +969,7 @@ class DateRangeFieldTest extends DateTestBase {
   /**
    * Tests default value functionality.
    */
-  public function testDefaultValue() {
+  public function testDefaultValue(): void {
     // Create a test content type.
     $this->drupalCreateContentType(['type' => 'date_content']);
 
@@ -1162,7 +1159,7 @@ class DateRangeFieldTest extends DateTestBase {
   /**
    * Tests that invalid values are caught and marked as invalid.
    */
-  public function testInvalidField() {
+  public function testInvalidField(): void {
     // Change the field to a datetime field.
     $this->fieldStorage->setSetting('datetime_type', DateRangeItem::DATETIME_TYPE_DATETIME);
     $this->fieldStorage->save();
@@ -1375,7 +1372,7 @@ class DateRangeFieldTest extends DateTestBase {
   /**
    * Tests that 'Date' field storage setting form is disabled if field has data.
    */
-  public function testDateStorageSettings() {
+  public function testDateStorageSettings(): void {
     // Create a test content type.
     $this->drupalCreateContentType(['type' => 'date_content']);
 
@@ -1417,14 +1414,24 @@ class DateRangeFieldTest extends DateTestBase {
 
   /**
    * Tests displaying dates with the 'from_to' setting.
-   *
-   * @dataProvider fromToSettingDataProvider
    */
-  public function testFromToSetting(array $expected, string $datetime_type, string $field_formatter_type, array $display_settings = []): void {
-    $field_name = $this->fieldStorage->getName();
-
+  public function testFromSetting(): void {
     // Create a test content type.
     $this->drupalCreateContentType(['type' => 'date_content']);
+    foreach (static::fromToSettingDataProvider() as $data) {
+      $expected = $data['expected'];
+      $datetime_type = $data['datetime_type'];
+      $field_formatter_type = $data['field_formatter_type'];
+      $display_settings = $data[0] ?? [];
+      $this->doTestFromToSetting($expected, $datetime_type, $field_formatter_type, $display_settings);
+    }
+  }
+
+  /**
+   * Performs the test of the 'from_to' setting for given test data.
+   */
+  public function doTestFromToSetting(array $expected, string $datetime_type, string $field_formatter_type, array $display_settings = []): void {
+    $field_name = $this->fieldStorage->getName();
 
     // Ensure the field to a datetime field.
     $this->fieldStorage->setSetting('datetime_type', $datetime_type);
@@ -1452,10 +1459,10 @@ class DateRangeFieldTest extends DateTestBase {
     }
 
     $this->drupalGet('entity_test/add');
-    $this->submitForm($edit, t('Save'));
+    $this->submitForm($edit, 'Save');
     preg_match('|entity_test/manage/(\d+)|', $this->getUrl(), $match);
     $id = $match[1];
-    $this->assertSession()->pageTextContains(t('entity_test @id has been created.', ['@id' => $id]));
+    $this->assertSession()->pageTextContains(sprintf('entity_test %d has been created.', $id));
 
     // Now set display options.
     $this->displayOptions = [
@@ -1486,7 +1493,7 @@ class DateRangeFieldTest extends DateTestBase {
   }
 
   /**
-   * The data provider for testing the 'from_to' setting.
+   * Provides data for testing the 'from_to' setting.
    *
    * @return array
    *   An array of date settings to test the behavior of the 'from_to' setting.
@@ -1495,44 +1502,44 @@ class DateRangeFieldTest extends DateTestBase {
     $datetime_types = [
       DateRangeItem::DATETIME_TYPE_DATE => [
         'daterange_default' => [
-          DateTimeRangeConstantsInterface::START_DATE => '12/31/2012',
-          DateTimeRangeConstantsInterface::END_DATE => '06/06/2013',
+          DateTimeRangeDisplayOptions::StartDate->value => '31 Dec 2012',
+          DateTimeRangeDisplayOptions::EndDate->value => '6 Jun 2013',
         ],
         'daterange_plain' => [
-          DateTimeRangeConstantsInterface::START_DATE => '2012-12-31',
-          DateTimeRangeConstantsInterface::END_DATE => '2013-06-06',
+          DateTimeRangeDisplayOptions::StartDate->value => '2012-12-31',
+          DateTimeRangeDisplayOptions::EndDate->value => '2013-06-06',
         ],
         'daterange_custom' => [
-          DateTimeRangeConstantsInterface::START_DATE => '2012-12-31',
-          DateTimeRangeConstantsInterface::END_DATE => '2013-06-06',
+          DateTimeRangeDisplayOptions::StartDate->value => '2012-12-31',
+          DateTimeRangeDisplayOptions::EndDate->value => '2013-06-06',
         ],
       ],
       DateRangeItem::DATETIME_TYPE_DATETIME => [
         'daterange_default' => [
-          DateTimeRangeConstantsInterface::START_DATE => '12/31/2012 - 00:00',
-          DateTimeRangeConstantsInterface::END_DATE => '06/06/2013 - 00:00',
+          DateTimeRangeDisplayOptions::StartDate->value => '31 Dec 2012 - 00:00',
+          DateTimeRangeDisplayOptions::EndDate->value => '6 Jun 2013 - 00:00',
         ],
         'daterange_plain' => [
-          DateTimeRangeConstantsInterface::START_DATE => '2012-12-31T00:00:00',
-          DateTimeRangeConstantsInterface::END_DATE => '2013-06-06T00:00:00',
+          DateTimeRangeDisplayOptions::StartDate->value => '2012-12-31T00:00:00',
+          DateTimeRangeDisplayOptions::EndDate->value => '2013-06-06T00:00:00',
         ],
         'daterange_custom' => [
-          DateTimeRangeConstantsInterface::START_DATE => '2012-12-31T00:00:00',
-          DateTimeRangeConstantsInterface::END_DATE => '2013-06-06T00:00:00',
+          DateTimeRangeDisplayOptions::StartDate->value => '2012-12-31T00:00:00',
+          DateTimeRangeDisplayOptions::EndDate->value => '2013-06-06T00:00:00',
         ],
       ],
       DateRangeItem::DATETIME_TYPE_ALLDAY => [
         'daterange_default' => [
-          DateTimeRangeConstantsInterface::START_DATE => '12/31/2012',
-          DateTimeRangeConstantsInterface::END_DATE => '06/06/2013',
+          DateTimeRangeDisplayOptions::StartDate->value => '31 Dec 2012',
+          DateTimeRangeDisplayOptions::EndDate->value => '6 Jun 2013',
         ],
         'daterange_plain' => [
-          DateTimeRangeConstantsInterface::START_DATE => '2012-12-31',
-          DateTimeRangeConstantsInterface::END_DATE => '2013-06-06',
+          DateTimeRangeDisplayOptions::StartDate->value => '2012-12-31',
+          DateTimeRangeDisplayOptions::EndDate->value => '2013-06-06',
         ],
         'daterange_custom' => [
-          DateTimeRangeConstantsInterface::START_DATE => '2012-12-31',
-          DateTimeRangeConstantsInterface::END_DATE => '2013-06-06',
+          DateTimeRangeDisplayOptions::StartDate->value => '2012-12-31',
+          DateTimeRangeDisplayOptions::EndDate->value => '2013-06-06',
         ],
       ],
     ];
@@ -1544,9 +1551,9 @@ class DateRangeFieldTest extends DateTestBase {
         // Both start and end date.
         $return[$datetime_type . '-' . $field_formatter_type . '-both'] = [
           'expected' => [
-            $dates[DateTimeRangeConstantsInterface::START_DATE] => TRUE,
+            $dates[DateTimeRangeDisplayOptions::StartDate->value] => TRUE,
             $separator => TRUE,
-            $dates[DateTimeRangeConstantsInterface::END_DATE] => TRUE,
+            $dates[DateTimeRangeDisplayOptions::EndDate->value] => TRUE,
           ],
           'datetime_type' => $datetime_type,
           'field_formatter_type' => $field_formatter_type,
@@ -1555,25 +1562,25 @@ class DateRangeFieldTest extends DateTestBase {
         // Only start date.
         $return[$datetime_type . '-' . $field_formatter_type . '-start_date'] = [
           'expected' => [
-            $dates[DateTimeRangeConstantsInterface::START_DATE] => TRUE,
+            $dates[DateTimeRangeDisplayOptions::StartDate->value] => TRUE,
             $separator => FALSE,
-            $dates[DateTimeRangeConstantsInterface::END_DATE] => FALSE,
+            $dates[DateTimeRangeDisplayOptions::EndDate->value] => FALSE,
           ],
           'datetime_type' => $datetime_type,
           'field_formatter_type' => $field_formatter_type,
-          ['from_to' => DateTimeRangeConstantsInterface::START_DATE],
+          ['from_to' => DateTimeRangeDisplayOptions::StartDate->value],
         ];
 
         // Only end date.
         $return[$datetime_type . '-' . $field_formatter_type . '-end_date'] = [
           'expected' => [
-            $dates[DateTimeRangeConstantsInterface::START_DATE] => FALSE,
+            $dates[DateTimeRangeDisplayOptions::StartDate->value] => FALSE,
             $separator => FALSE,
-            $dates[DateTimeRangeConstantsInterface::END_DATE] => TRUE,
+            $dates[DateTimeRangeDisplayOptions::EndDate->value] => TRUE,
           ],
           'datetime_type' => $datetime_type,
           'field_formatter_type' => $field_formatter_type,
-          ['from_to' => DateTimeRangeConstantsInterface::END_DATE],
+          ['from_to' => DateTimeRangeDisplayOptions::EndDate->value],
         ];
       }
     }

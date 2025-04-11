@@ -17,9 +17,7 @@ use Drupal\Tests\field\Functional\FieldTestBase;
 class OptionsFieldUITest extends FieldTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = [
     'node',
@@ -91,7 +89,7 @@ class OptionsFieldUITest extends FieldTestBase {
   /**
    * Options (integer) : test 'allowed values' input.
    */
-  public function testOptionsAllowedValuesInteger() {
+  public function testOptionsAllowedValuesInteger(): void {
     $this->fieldName = 'field_options_integer';
     $this->createOptionsField('list_integer');
     $page = $this->getSession()->getPage();
@@ -163,7 +161,7 @@ class OptionsFieldUITest extends FieldTestBase {
   /**
    * Options (float) : test 'allowed values' input.
    */
-  public function testOptionsAllowedValuesFloat() {
+  public function testOptionsAllowedValuesFloat(): void {
     $this->fieldName = 'field_options_float';
     $this->createOptionsField('list_float');
     $page = $this->getSession()->getPage();
@@ -252,7 +250,7 @@ class OptionsFieldUITest extends FieldTestBase {
   /**
    * Options (text) : test 'allowed values' input.
    */
-  public function testOptionsAllowedValuesText() {
+  public function testOptionsAllowedValuesText(): void {
     $this->fieldName = 'field_options_text';
     $this->createOptionsField('list_string');
     $page = $this->getSession()->getPage();
@@ -336,7 +334,7 @@ class OptionsFieldUITest extends FieldTestBase {
    * @param string $type
    *   One of 'list_integer', 'list_float' or 'list_string'.
    */
-  protected function createOptionsField($type) {
+  protected function createOptionsField($type): void {
     // Create a field.
     FieldStorageConfig::create([
       'field_name' => $this->fieldName,
@@ -393,7 +391,7 @@ class OptionsFieldUITest extends FieldTestBase {
   /**
    * Tests normal and key formatter display on node display.
    */
-  public function testNodeDisplay() {
+  public function testNodeDisplay(): void {
     $this->fieldName = $this->randomMachineName();
     $this->createOptionsField('list_integer');
     $node = $this->drupalCreateNode(['type' => $this->type]);
@@ -445,7 +443,7 @@ class OptionsFieldUITest extends FieldTestBase {
   /**
    * Confirms the allowed value list is a required field.
    */
-  public function testRequiredPropertyForAllowedValuesList() {
+  public function testRequiredPropertyForAllowedValuesList(): void {
     $field_types = [
       'list_float',
       'list_string',

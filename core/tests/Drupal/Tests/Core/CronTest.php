@@ -167,7 +167,7 @@ class CronTest extends UnitTestCase {
   /**
    * Resets the testing state.
    */
-  protected function resetTestingState() {
+  protected function resetTestingState(): void {
     $this->queue->deleteQueue();
     $this->state->set('cron_test.message_logged', FALSE);
     $this->state->set('cron_test.requeue_count', NULL);
@@ -192,7 +192,7 @@ class CronTest extends UnitTestCase {
    * @covers ::processQueues
    * @dataProvider processQueuesTestData
    */
-  public function testProcessQueues($item, $message_logged_assertion, $count_post_run) {
+  public function testProcessQueues($item, $message_logged_assertion, $count_post_run): void {
     $this->resetTestingState();
     $this->queue->createItem($item);
     $this->assertFalse($this->state->get('cron_test.message_logged'));
@@ -205,7 +205,7 @@ class CronTest extends UnitTestCase {
   /**
    * Verify that RequeueException causes an item to be processed multiple times.
    */
-  public function testRequeueException() {
+  public function testRequeueException(): void {
     $this->resetTestingState();
     $this->queue->createItem('RequeueException');
     $this->cron->run();

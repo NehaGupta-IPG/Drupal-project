@@ -6,6 +6,7 @@ use Drupal\Component\Plugin\PluginManagerInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\StringTranslation\TranslationInterface;
 use Drupal\filter\Plugin\FilterInterface;
+use Drupal\migrate\Attribute\MigrateProcess;
 use Drupal\migrate\MigrateExecutableInterface;
 use Drupal\migrate\Plugin\migrate\process\StaticMap;
 use Drupal\migrate\Plugin\MigrationInterface;
@@ -19,10 +20,9 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 // cspell:ignore shortcode spamspan typogrify wordfilter xbbcode
 
 /**
- * @MigrateProcessPlugin(
- *   id = "filter_id"
- * )
+ * Determines the filter ID.
  */
+#[MigrateProcess('filter_id')]
 class FilterID extends StaticMap implements ContainerFactoryPluginInterface {
 
   /**
@@ -46,7 +46,7 @@ class FilterID extends StaticMap implements ContainerFactoryPluginInterface {
    * @param \Drupal\Core\StringTranslation\TranslationInterface $translator
    *   (optional) The string translation service.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, PluginManagerInterface $filter_manager, TranslationInterface $translator = NULL) {
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, PluginManagerInterface $filter_manager, ?TranslationInterface $translator = NULL) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
     $this->filterManager = $filter_manager;
     $this->stringTranslation = $translator;

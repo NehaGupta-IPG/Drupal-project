@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\KernelTests\Core\TempStore;
 
 use Drupal\Core\KeyValueStore\KeyValueExpirableFactory;
@@ -20,7 +22,7 @@ class TempStoreDatabaseTest extends KernelTestBase {
   /**
    * Tests the SharedTempStore API.
    */
-  public function testSharedTempStore() {
+  public function testSharedTempStore(): void {
     // Create testing objects.
     $objects = [];
     for ($i = 0; $i <= 3; $i++) {

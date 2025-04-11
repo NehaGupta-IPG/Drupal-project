@@ -41,31 +41,6 @@ class UpdateMiscTest extends UpdateTestBase {
   }
 
   /**
-   * Ensures that the local actions appear.
-   */
-  public function testLocalActions(): void {
-    $admin_user = $this->drupalCreateUser([
-      'administer site configuration',
-      'administer modules',
-      'administer software updates',
-      'administer themes',
-    ]);
-    $this->drupalLogin($admin_user);
-
-    $this->drupalGet('admin/modules');
-    $this->clickLink('Add new module');
-    $this->assertSession()->addressEquals('admin/modules/install');
-
-    $this->drupalGet('admin/appearance');
-    $this->clickLink('Add new theme');
-    $this->assertSession()->addressEquals('admin/theme/install');
-
-    $this->drupalGet('admin/reports/updates');
-    $this->clickLink('Add new module or theme');
-    $this->assertSession()->addressEquals('admin/reports/updates/install');
-  }
-
-  /**
    * Checks that clearing the disk cache works.
    */
   public function testClearDiskCache(): void {
@@ -137,7 +112,7 @@ class UpdateMiscTest extends UpdateTestBase {
         ->toString())
       ->save();
     $this->config('update_test.settings')
-      ->set('xml_map', ['drupal' => '0.0'])
+      ->set('xml_map', ['drupal' => '8.0.0'])
       ->save();
 
     $this->drupalGet('admin/reports/updates');
@@ -163,7 +138,7 @@ class UpdateMiscTest extends UpdateTestBase {
       ->set('fetch.url', Url::fromRoute('update_test.update_test')->setAbsolute()->toString())
       ->save();
     $this->config('update_test.settings')
-      ->set('xml_map', ['drupal' => '0.1'])
+      ->set('xml_map', ['drupal' => '8.0.1'])
       ->save();
 
     $this->drupalGet('admin/reports/updates');
@@ -199,7 +174,7 @@ class UpdateMiscTest extends UpdateTestBase {
     $this->config('update.settings')
       ->set('fetch.url', Url::fromRoute('update_test.update_test')->setAbsolute()->toString())
       ->save();
-    $this->mockReleaseHistory(['drupal' => 'sec.0.2']);
+    $this->mockReleaseHistory(['drupal' => 'sec.8.0.2']);
 
     $this->drupalGet('admin/reports/updates');
     $this->clickLink('Check manually');
@@ -232,7 +207,7 @@ class UpdateMiscTest extends UpdateTestBase {
     $this->config('update.settings')
       ->set('fetch.url', Url::fromRoute('update_test.update_test')->setAbsolute()->toString())
       ->save();
-    $this->mockReleaseHistory(['drupal' => '0.0']);
+    $this->mockReleaseHistory(['drupal' => '8.0.0']);
 
     $this->cronRun();
     $this->drupalGet('admin/modules');

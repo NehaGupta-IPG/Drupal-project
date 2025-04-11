@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\node\Kernel;
 
 /**
@@ -12,7 +14,7 @@ class NodeAccessTest extends NodeAccessTestBase {
   /**
    * Runs basic tests for node_access function.
    */
-  public function testNodeAccess() {
+  public function testNodeAccess(): void {
     // Ensures user without 'access content' permission can do nothing.
     $web_user1 = $this->drupalCreateUser([
       'create page content',
@@ -116,7 +118,7 @@ class NodeAccessTest extends NodeAccessTestBase {
   /**
    * Tests operations not supported by node grants.
    */
-  public function testUnsupportedOperation() {
+  public function testUnsupportedOperation(): void {
     $this->enableModules(['node_access_test_empty']);
     $web_user = $this->drupalCreateUser(['access content']);
     $node = $this->drupalCreateNode();
@@ -152,6 +154,21 @@ class NodeAccessTest extends NodeAccessTestBase {
     $query->addTag('node_access');
 
     $this->assertEquals(4, $query->countQuery()->execute()->fetchField());
+  }
+
+  /**
+   * Tests that multiple calls to node_access_rebuild only result in one batch.
+   */
+  public function testDuplicateBatchRebuild(): void {
+    $this->enableModules(['node_access_test']);
+    $batch = batch_get();
+    $this->assertEmpty($batch);
+    node_access_rebuild(TRUE);
+    $batch = batch_get();
+    $this->assertCount(1, $batch['sets']);
+    node_access_rebuild(TRUE);
+    $batch = batch_get();
+    $this->assertCount(1, $batch['sets']);
   }
 
 }

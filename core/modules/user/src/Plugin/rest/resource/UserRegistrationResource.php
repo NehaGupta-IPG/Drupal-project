@@ -3,6 +3,7 @@
 namespace Drupal\user\Plugin\rest\resource;
 
 use Drupal\Core\Config\ImmutableConfig;
+use Drupal\Core\Password\PasswordGeneratorInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\rest\Attribute\RestResource;
@@ -35,41 +36,36 @@ class UserRegistrationResource extends ResourceBase {
   use EntityResourceAccessTrait;
 
   /**
-   * User settings config instance.
-   *
-   * @var \Drupal\Core\Config\ImmutableConfig
-   */
-  protected $userSettings;
-
-  /**
-   * The current user.
-   *
-   * @var \Drupal\Core\Session\AccountInterface
-   */
-  protected $currentUser;
-
-  /**
    * Constructs a new UserRegistrationResource instance.
    *
    * @param array $configuration
    *   A configuration array containing information about the plugin instance.
    * @param string $plugin_id
-   *   The plugin_id for the plugin instance.
+   *   The plugin ID for the plugin instance.
    * @param mixed $plugin_definition
    *   The plugin implementation definition.
    * @param array $serializer_formats
    *   The available serialization formats.
    * @param \Psr\Log\LoggerInterface $logger
    *   A logger instance.
-   * @param \Drupal\Core\Config\ImmutableConfig $user_settings
+   * @param \Drupal\Core\Config\ImmutableConfig $userSettings
    *   A user settings config instance.
-   * @param \Drupal\Core\Session\AccountInterface $current_user
+   * @param \Drupal\Core\Session\AccountInterface $currentUser
    *   The current user.
+   * @param \Drupal\Core\Password\PasswordGeneratorInterface $passwordGenerator
+   *   The password generator.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, array $serializer_formats, LoggerInterface $logger, ImmutableConfig $user_settings, AccountInterface $current_user) {
+  public function __construct(
+    array $configuration,
+    $plugin_id,
+    $plugin_definition,
+    array $serializer_formats,
+    LoggerInterface $logger,
+    protected ImmutableConfig $userSettings,
+    protected AccountInterface $currentUser,
+    protected PasswordGeneratorInterface $passwordGenerator,
+  ) {
     parent::__construct($configuration, $plugin_id, $plugin_definition, $serializer_formats, $logger);
-    $this->userSettings = $user_settings;
-    $this->currentUser = $current_user;
   }
 
   /**
@@ -83,7 +79,8 @@ class UserRegistrationResource extends ResourceBase {
       $container->getParameter('serializer.formats'),
       $container->get('logger.factory')->get('rest'),
       $container->get('config.factory')->get('user.settings'),
-      $container->get('current_user')
+      $container->get('current_user'),
+      $container->get('password_generator')
     );
   }
 
@@ -99,16 +96,20 @@ class UserRegistrationResource extends ResourceBase {
    * @throws \Symfony\Component\HttpKernel\Exception\BadRequestHttpException
    * @throws \Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException
    */
-  public function post(UserInterface $account = NULL) {
+  public function post(?UserInterface $account = NULL) {
     $this->ensureAccountCanRegister($account);
 
-    // Only activate new users if visitors are allowed to register and no email
-    // verification required.
-    if ($this->userSettings->get('register') == UserInterface::REGISTER_VISITORS && !$this->userSettings->get('verify_mail')) {
+    // Only activate new users if visitors are allowed to register.
+    if ($this->userSettings->get('register') == UserInterface::REGISTER_VISITORS) {
       $account->activate();
     }
     else {
       $account->block();
+    }
+
+    // Generate password if email verification required.
+    if ($this->userSettings->get('verify_mail')) {
+      $account->setPassword($this->passwordGenerator->generate());
     }
 
     $this->checkEditFieldAccess($account);
@@ -130,7 +131,7 @@ class UserRegistrationResource extends ResourceBase {
    * @param \Drupal\user\UserInterface $account
    *   The user account to register.
    */
-  protected function ensureAccountCanRegister(UserInterface $account = NULL) {
+  protected function ensureAccountCanRegister(?UserInterface $account = NULL) {
     if ($account === NULL) {
       throw new BadRequestHttpException('No user account data for registration received.');
     }

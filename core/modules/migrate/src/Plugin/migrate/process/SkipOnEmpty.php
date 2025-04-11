@@ -2,6 +2,7 @@
 
 namespace Drupal\migrate\Plugin\migrate\process;
 
+use Drupal\migrate\Attribute\MigrateProcess;
 use Drupal\migrate\ProcessPluginBase;
 use Drupal\migrate\MigrateExecutableInterface;
 use Drupal\migrate\Row;
@@ -19,7 +20,7 @@ use Drupal\migrate\MigrateSkipRowException;
  * - method: (optional) What to do if the input value is empty. Possible values:
  *   - row: Skips the entire row when an empty value is encountered.
  *   - process: Prevents further processing of the input property when the value
- *     is empty.
+ *     is empty and sets the value to NULL.
  * - message: (optional) A message to be logged in the {migrate_message_*} table
  *   for this row. Messages are only logged for the 'row' method. If not set,
  *   nothing is logged in the message table.
@@ -73,11 +74,8 @@ use Drupal\migrate\MigrateSkipRowException;
  * source.
  *
  * @see \Drupal\migrate\Plugin\MigrateProcessInterface
- *
- * @MigrateProcessPlugin(
- *   id = "skip_on_empty"
- * )
  */
+#[MigrateProcess('skip_on_empty')]
 class SkipOnEmpty extends ProcessPluginBase {
 
   /**

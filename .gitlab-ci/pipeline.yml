@@ -1,4 +1,4 @@
-# cspell:ignore drupaltestbot drupaltestbotpw
+# cspell:ignore drupaltestbot drupaltestbotpw Dwebdriver logfile XVFB
 
 stages:
   - 🗜️ Test
@@ -47,14 +47,14 @@ default:
 .with-composer: &with-composer
   needs:
     - pipeline: $PARENT_PIPELINE_ID
-      job: '📦️ Composer'
+      job: '🧹 PHP Coding standards (PHPCS)'
 
 .with-composer-and-yarn: &with-composer-and-yarn
   needs:
     - pipeline: $PARENT_PIPELINE_ID
-      job: '📦️ Composer'
+      job: '🧹 PHP Coding standards (PHPCS)'
     - pipeline: $PARENT_PIPELINE_ID
-      job: '📦️ Yarn'
+      job: '📔 Spell-checking'
 
 variables:
   FF_NETWORK_PER_BUILD: 1
@@ -67,7 +67,8 @@ variables:
   POSTGRES_DB: drupaltestbot
   POSTGRES_USER: drupaltestbot
   POSTGRES_PASSWORD: drupaltestbotpw
-  MINK_DRIVER_ARGS_WEBDRIVER: '["chrome", {"browserName":"chrome","goog:chromeOptions":{"args":["--disable-dev-shm-usage","--disable-gpu","--headless","--dns-prefetch-disable"]}}, "http://localhost:9515"]'
+  MINK_DRIVER_ARGS_WEBDRIVER: '["chrome", {"browserName":"chrome", "goog:chromeOptions":{"w3c": true, "args":["--no-sandbox","--ignore-certificate-errors", "--allow-insecure-localhost", "--headless", "--dns-prefetch-disable"]}}, "http://selenium:4444"]'
+  MINK_DRIVER_ARGS_WEBDRIVER_CHROMEDRIVER_NON_W3C: '["chrome", {"browserName":"chrome","goog:chromeOptions":{"args":["--disable-dev-shm-usage","--disable-gpu","--headless","--dns-prefetch-disable"]}}, "http://localhost:9515"]'
   CI_PARALLEL_NODE_INDEX: $CI_NODE_INDEX
   CI_PARALLEL_NODE_TOTAL: $CI_NODE_TOTAL
 
@@ -85,10 +86,22 @@ variables:
     - "--whitelisted-ips="
     - "--allowed-origins=*"
 
+.with-selenium-chrome: &with-selenium-chrome
+  name: selenium/standalone-chrome:127.0
+  alias: selenium
+  variables:
+    JAVA_OPTS: "-Dwebdriver.chrome.logfile=/builds/chromedriver.log"
+    SE_NODE_OVERRIDE_MAX_SESSIONS: "true"
+    SE_NODE_MAX_SESSIONS: "16"
+    SE_SESSION_RETRY_INTERVAL: "1"
+    SE_SESSION_REQUEST_TIMEOUT: "60"
+    SE_START_XVFB: "true"
+    SE_START_VNC: "false"
+
 .run-tests: &run-tests
   script:
     # Need to pass this along directly.
-    - sudo MINK_DRIVER_ARGS_WEBDRIVER="$MINK_DRIVER_ARGS_WEBDRIVER" -u www-data php ./core/scripts/run-tests.sh --color --keep-results --types "$TESTSUITE" --concurrency "$CONCURRENCY" --repeat "1" --sqlite "./sites/default/files/tests.sqlite" --dburl $SIMPLETEST_DB --url $SIMPLETEST_BASE_URL --verbose --non-html --all --ci-parallel-node-index $CI_PARALLEL_NODE_INDEX --ci-parallel-node-total $CI_PARALLEL_NODE_TOTAL
+    - sudo -u www-data -E -H php ./core/scripts/run-tests.sh --color --keep-results --types "$TESTSUITE" --concurrency "$CONCURRENCY" --repeat "1" --sqlite "./sites/default/files/tests.sqlite" --dburl $SIMPLETEST_DB --url $SIMPLETEST_BASE_URL --verbose --non-html --all --ci-parallel-node-index $CI_PARALLEL_NODE_INDEX --ci-parallel-node-total $CI_PARALLEL_NODE_TOTAL
 
 .run-repeat-class-test: &run-repeat-class-test
   script:
@@ -100,7 +113,7 @@ variables:
         echo '   "Key" to "REPEAT_TEST_CLASS" and "Value" to "Drupal\Tests\ckeditor5\FunctionalJavascript\MediaLinkabilityTest"';
         exit 1;
       else
-        sudo MINK_DRIVER_ARGS_WEBDRIVER="$MINK_DRIVER_ARGS_WEBDRIVER" -u www-data php ./core/scripts/run-tests.sh --color --keep-results --concurrency "$CONCURRENCY" --repeat "100" --sqlite "./sites/default/files/tests.sqlite" --dburl $SIMPLETEST_DB --url $SIMPLETEST_BASE_URL --verbose --non-html --class $REPEAT_TEST_CLASS
+        sudo -u www-data -E -H php ./core/scripts/run-tests.sh --color --keep-results --concurrency "$CONCURRENCY" --repeat "100" --sqlite "./sites/default/files/tests.sqlite" --dburl $SIMPLETEST_DB --url $SIMPLETEST_BASE_URL --verbose --non-html --class $REPEAT_TEST_CLASS
       fi
 
 ################
@@ -119,67 +132,61 @@ variables:
   allow_failure: true
   services:
     - <<: *with-database
-    - <<: *with-chrome
+    - <<: *with-selenium-chrome
   script:
     - $CI_PROJECT_DIR/.gitlab-ci/scripts/test-only.sh
 
 '🖱️️️ PHPUnit Functional Javascript':
   <<: [ *with-composer, *run-tests, *default-job-settings ]
-  parallel: 2
-  variables:
-    TESTSUITE: PHPUnit-FunctionalJavascript
-    CONCURRENCY: 15
-    KUBERNETES_CPU_REQUEST: "24"
-  services:
-    - <<: *with-database
-    - <<: *with-chrome
-  after_script:
-    - sed -i "s#$CI_PROJECT_DIR/##" ./sites/default/files/simpletest/phpunit-*.xml || true
-    - cp /builds/chromedriver.log ./
-
-'🌐️️ PHPUnit Functional':
-  <<: [ *with-composer, *run-tests, *default-job-settings ]
-  parallel: 7
-  variables:
-    TESTSUITE: PHPUnit-Functional
-    KUBERNETES_CPU_REQUEST: "24"
-  services:
-    - <<: *with-database
-
-'⚙️️ PHPUnit Kernel':
-  <<: [ *with-composer, *run-tests, *default-job-settings ]
   parallel: 3
   variables:
-    TESTSUITE: PHPUnit-Kernel
+    TESTSUITE: PHPUnit-FunctionalJavascript
+    CONCURRENCY: 5
     KUBERNETES_CPU_REQUEST: "16"
   services:
     - <<: *with-database
+    - <<: *with-selenium-chrome
+  after_script:
+    - echo $MINK_DRIVER_ARGS_WEBDRIVER
+    - sed -i "s#$CI_PROJECT_DIR/##" ./sites/default/files/simpletest/phpunit-*.xml || true
+    - cp /builds/chromedriver.log ./
 
 '👷️️️ PHPUnit Build':
   <<: [ *with-composer, *run-tests, *default-job-settings ]
   variables:
     TESTSUITE: PHPUnit-Build
-    KUBERNETES_CPU_REQUEST: "2"
+    KUBERNETES_CPU_REQUEST: "8"
+    CONCURRENCY: "5"
   services:
     - <<: *with-database
 
-'⚡️ PHPUnit Unit':
+'🌐️️ PHPUnit Functional':
   <<: [ *with-composer, *run-tests, *default-job-settings ]
-  services:
-    # There are some unit tests that need a database.
-    # @todo Remove after https://www.drupal.org/project/drupal/issues/3386217
-    - <<: *with-database
+  parallel: 8
   variables:
-    TESTSUITE: PHPUnit-Unit
+    TESTSUITE: PHPUnit-Functional
+    CONCURRENCY: "5"
     KUBERNETES_CPU_REQUEST: "16"
+  services:
+    - <<: *with-database
+
+'⚙️️ PHPUnit Kernel':
+  <<: [ *with-composer, *run-tests, *default-job-settings ]
+  parallel: 5
+  variables:
+    TESTSUITE: PHPUnit-Kernel
+    KUBERNETES_CPU_REQUEST: "8"
+    CONCURRENCY: 12
+  services:
+    - <<: *with-database
 
 '🦉️️️ Nightwatch':
   <<: [ *with-composer-and-yarn, *default-job-settings ]
   variables:
-    KUBERNETES_CPU_REQUEST: "24"
+    KUBERNETES_CPU_REQUEST: "16"
   services:
     - <<: *with-database
-    - <<: *with-chrome
+    - <<: *with-selenium-chrome
   script:
     - export DRUPAL_TEST_DB_URL=$SIMPLETEST_DB
     - cp ./core/.env.example ./core/.env
@@ -189,15 +196,16 @@ variables:
     - echo "DRUPAL_TEST_BASE_URL='http://localhost/subdirectory'" >> ./core/.env
     - echo "DRUPAL_TEST_CHROMEDRIVER_AUTOSTART=false" >> ./core/.env
     - echo "DRUPAL_TEST_DB_URL='${DRUPAL_TEST_DB_URL}'" >> ./core/.env
-    - echo "DRUPAL_TEST_WEBDRIVER_HOSTNAME='localhost'" >> ./core/.env
+    - echo "DRUPAL_TEST_WEBDRIVER_HOSTNAME='selenium'" >> ./core/.env
     - echo "DRUPAL_TEST_WEBDRIVER_CHROME_ARGS='--disable-dev-shm-usage --disable-gpu --headless --dns-prefetch-disable'" >> ./core/.env
-    - echo "DRUPAL_TEST_WEBDRIVER_PORT='9515'" >> ./core/.env
+    - echo "DRUPAL_TEST_WEBDRIVER_W3C=true" >> ./core/.env
+    - echo "DRUPAL_TEST_WEBDRIVER_PORT='4444'" >> ./core/.env
     - echo "DRUPAL_NIGHTWATCH_OUTPUT='"../nightwatch_output"'" >> ./core/.env
     - echo "COLUMNS=1000" >> ./core/.env
     - chown -R www-data:www-data ./sites /var/www
     - cd core
     - corepack enable
-    - sudo -u www-data yarn run test:nightwatch --workers=4
+    - sudo -u www-data -E -H yarn run test:nightwatch --workers=3
   after_script:
     - cp /builds/chromedriver.log ./
   artifacts:
@@ -209,6 +217,25 @@ variables:
       - ./nightwatch_output
       - '*.log'
 
+'🖱️️️ PHPUnit Functional Javascript (non W3C legacy)':
+  <<: [ *with-composer, *default-job-settings ]
+  parallel: 1
+  variables:
+    TESTSUITE: PHPUnit-FunctionalJavascript
+    CONCURRENCY: 6
+    KUBERNETES_CPU_REQUEST: "16"
+    MINK_DRIVER_ARGS_WEBDRIVER: $MINK_DRIVER_ARGS_WEBDRIVER_CHROMEDRIVER_NON_W3C
+  services:
+    - <<: *with-database
+    - <<: *with-chrome
+  script:
+    # Run a small subset of tests to prove non W3C testing still works.
+    - sudo -u www-data -E -H php ./core/scripts/run-tests.sh --color --keep-results --types "$TESTSUITE" --concurrency "$CONCURRENCY" --repeat "1" --sqlite "./sites/default/files/tests.sqlite" --dburl $SIMPLETEST_DB --url $SIMPLETEST_BASE_URL --verbose --non-html javascript
+
+  after_script:
+    - sed -i "s#$CI_PROJECT_DIR/##" ./sites/default/files/simpletest/phpunit-*.xml || true
+    - cp /builds/chromedriver.log ./
+
 '🔁 Repeat Class Test':
   <<: [ *with-composer, *run-repeat-class-test, *default-job-settings ]
   when: manual
@@ -219,9 +246,11 @@ variables:
     - <<: *with-database
 
 '🚲 Performance tests':
-  <<: [ *with-composer, *default-job-settings ]
+  <<: [ *default-job-settings ]
   rules:
     - if: $PERFORMANCE_TEST == "1"
+    - when: manual
+      allow_failure: true
   variables:
     KUBERNETES_CPU_REQUEST: "24"
     MINK_DRIVER_ARGS_WEBDRIVER: '["chrome", {"browserName":"chrome","goog:chromeOptions":{"args":["--disable-dev-shm-usage","--disable-gpu","--headless","--no-sandbox"]}}, "http://chrome:9515"]'
@@ -237,8 +266,9 @@ variables:
       [[ $_TARGET_DB == mysql* ]] && export SIMPLETEST_DB=mysql://$MYSQL_USER:$MYSQL_PASSWORD@database/$MYSQL_DATABASE?module=mysql
       [[ $_TARGET_DB == mariadb* ]] && export SIMPLETEST_DB=mysql://$MYSQL_USER:$MYSQL_PASSWORD@database/$MYSQL_DATABASE?module=mysql
       [[ $_TARGET_DB == pgsql* ]] && export SIMPLETEST_DB=pgsql://$POSTGRES_USER:$POSTGRES_PASSWORD@database/$POSTGRES_DB?module=pgsql
+    - composer install --optimize-autoloader
     - export OTEL_COLLECTOR="$OTEL_COLLECTOR"
     - mkdir -p ./sites/simpletest ./sites/default/files ./build/logs/junit /var/www/.composer
     - chown -R www-data:www-data ./sites ./build/logs/junit ./vendor /var/www/
     - sudo -u www-data git config --global --add safe.directory $CI_PROJECT_DIR
-    - sudo SIMPLETEST_BASE_URL="http://$HOSTNAME/subdirectory" SIMPLETEST_DB="$SIMPLETEST_DB" MINK_DRIVER_ARGS_WEBDRIVER="$MINK_DRIVER_ARGS_WEBDRIVER" OTEL_COLLECTOR="$OTEL_COLLECTOR" -u www-data ./vendor/bin/phpunit --verbose -c core --group OpenTelemetry --log-junit=./sites/default/files/simpletest/phpunit-performance.xml
+    - sudo SIMPLETEST_BASE_URL="http://$HOSTNAME/subdirectory" -u www-data -E -H ./vendor/bin/phpunit -c core --group OpenTelemetry --log-junit=./sites/default/files/simpletest/phpunit-performance.xml

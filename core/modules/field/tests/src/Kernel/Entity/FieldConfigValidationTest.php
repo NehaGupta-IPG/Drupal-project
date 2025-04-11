@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\field\Kernel\Entity;
 
 use Drupal\entity_test\Entity\EntityTestBundle;
@@ -12,7 +14,6 @@ use Drupal\Tests\node\Traits\ContentTypeCreationTrait;
  * Tests validation of field_config entities.
  *
  * @group field
- * @group #slow
  */
 class FieldConfigValidationTest extends ConfigEntityValidationTestBase {
 
@@ -29,6 +30,7 @@ class FieldConfigValidationTest extends ConfigEntityValidationTestBase {
   protected function setUp(): void {
     parent::setUp();
 
+    $this->installEntitySchema('node');
     $this->installConfig('node');
     $this->createContentType(['type' => 'one']);
     $this->createContentType(['type' => 'another']);
@@ -69,6 +71,7 @@ class FieldConfigValidationTest extends ConfigEntityValidationTestBase {
    * Tests validation of a field_config's default value.
    */
   public function testMultilineTextFieldDefaultValue(): void {
+    $this->installEntitySchema('user');
     // First, create a field storage for which a complex default value exists.
     $this->enableModules(['text']);
     $text_field_storage_config = FieldStorageConfig::create([

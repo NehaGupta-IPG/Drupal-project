@@ -21,6 +21,15 @@ class WorkspacesServiceProvider extends ServiceProviderBase {
     $renderer_config['required_cache_contexts'][] = 'workspace';
     $container->setParameter('renderer.config', $renderer_config);
 
+    // Decorate the 'path_alias.manager' service.
+    if ($container->hasDefinition('path_alias.manager')) {
+      $container->register('workspaces.path_alias.manager', WorkspacesAliasManager::class)
+        ->setPublic(FALSE)
+        ->setDecoratedService('path_alias.manager', NULL, 50)
+        ->addArgument(new Reference('workspaces.path_alias.manager.inner'))
+        ->addArgument(new Reference('workspaces.manager'));
+    }
+
     // Replace the class of the 'path_alias.repository' service.
     if ($container->hasDefinition('path_alias.repository')) {
       $definition = $container->getDefinition('path_alias.repository');
@@ -29,6 +38,14 @@ class WorkspacesServiceProvider extends ServiceProviderBase {
           ->setClass(WorkspacesAliasRepository::class)
           ->addMethodCall('setWorkspacesManager', [new Reference('workspaces.manager')]);
       }
+    }
+
+    // Ensure that Layout Builder's tempstore is workspace-aware.
+    if ($container->hasDefinition('layout_builder.tempstore_repository')) {
+      $definition = $container->getDefinition('layout_builder.tempstore_repository');
+      $definition
+        ->setClass(WorkspacesLayoutTempstoreRepository::class)
+        ->addMethodCall('setWorkspacesManager', [new Reference('workspaces.manager')]);
     }
 
     // Ensure that there's no active workspace while running database updates by

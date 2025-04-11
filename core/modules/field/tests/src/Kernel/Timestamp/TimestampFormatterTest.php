@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\field\Kernel\Timestamp;
 
 use Drupal\Component\Render\FormattableMarkup;
@@ -105,7 +107,7 @@ class TimestampFormatterTest extends KernelTestBase {
   /**
    * Tests TimestampFormatter.
    */
-  public function testTimestampFormatter() {
+  public function testTimestampFormatter(): void {
     $data = [];
 
     // Test standard formats.
@@ -143,7 +145,7 @@ class TimestampFormatterTest extends KernelTestBase {
   /**
    * Tests TimestampAgoFormatter.
    */
-  public function testTimestampAgoFormatter() {
+  public function testTimestampAgoFormatter(): void {
     $data = [];
 
     foreach ([1, 2, 3, 4, 5, 6, 7] as $granularity) {

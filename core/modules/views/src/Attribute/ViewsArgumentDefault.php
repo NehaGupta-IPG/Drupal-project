@@ -23,7 +23,7 @@ class ViewsArgumentDefault extends Plugin {
    * @param string $id
    *   The plugin ID.
    * @param \Drupal\Core\StringTranslation\TranslatableMarkup|null $title
-   *   The plugin title used in the views UI
+   *   The plugin title used in the views UI.
    * @param \Drupal\Core\StringTranslation\TranslatableMarkup|null $short_title
    *   (optional) The short title used in the views UI.
    * @param bool $no_ui
@@ -37,7 +37,7 @@ class ViewsArgumentDefault extends Plugin {
     public readonly ?TranslatableMarkup $title = NULL,
     public readonly ?TranslatableMarkup $short_title = NULL,
     public readonly bool $no_ui = FALSE,
-    public readonly ?string $deriver = NULL
+    public readonly ?string $deriver = NULL,
   ) {}
 
 }
