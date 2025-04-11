@@ -556,21 +556,3 @@ function template_preprocess_system_security_advisories_fetch_error_message(arra
   @trigger_error(__FUNCTION__ . '() is deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. Initial template_preprocess functions are registered directly in hook_theme(). See https://www.drupal.org/node/3504125', E_USER_DEPRECATED);
   \Drupal::service(SystemAdminThemePreprocess::class)->preprocessSystemSecurityAdvisoriesFetchErrorMessage($variables);
 }
-
-/**
- * Implements hook_entity_view_mode_presave().
- *
- * Transforms empty description into null.
- *
- * @deprecated in drupal:10.4.0 and is removed from drupal:12.0.0. Use NULL
- *  instead.
- *
- * @see https://www.drupal.org/node/3452614
- * @see system_post_update_convert_empty_string_entity_view_modes_to_null()
- */
-function system_entity_view_mode_presave(EntityInterface $entity): void {
-  if ($entity->get('description') !== NULL && trim($entity->get('description')) === '') {
-    @trigger_error("Setting description to an empty string is deprecated in drupal:10.4.0 and it must be null in drupal:12.0.0. See https://www.drupal.org/node/3452614", E_USER_DEPRECATED);
-    $entity->set('description', NULL);
-  }
-}
