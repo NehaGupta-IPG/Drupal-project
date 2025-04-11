@@ -60,12 +60,12 @@ class EntityReverse extends RelationshipPluginBase {
    */
   public function query() {
     $this->ensureMyTable();
+    $id = !empty($this->definition['join_id']) ? $this->definition['join_id'] : 'standard';
     if ($this->definition['field table'] !== $this->definition['base']) {
       // First, relate our base table to the current base table to the
       // field, using the base table's id field to the field's column.
       $views_data = Views::viewsData()->get($this->table);
       $left_field = $views_data['table']['base']['field'];
-      $id = !empty($this->definition['join_id']) ? $this->definition['join_id'] : 'standard';
 
       $first = [
         'left_table' => $this->tableAlias,
