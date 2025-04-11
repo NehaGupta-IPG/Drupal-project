@@ -1,5 +1,5 @@
 name: Navigation
-description: Provides an administrative navigation experience.
+description: Provides an administrative navigation experience, including a sidebar to display links provided by modules and a top bar to provide contextual actions.
 package: Core (Experimental)
 lifecycle: experimental
 version: VERSION
