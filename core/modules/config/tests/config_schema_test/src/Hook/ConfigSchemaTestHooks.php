@@ -26,7 +26,7 @@ class ConfigSchemaTestHooks {
     if (isset($definitions['config_schema_test.hook'])) {
       $definitions['config_schema_test.hook']['additional_metadata'] = 'new schema info';
     }
-    // @see \Drupal\KernelTests\Core\TypedData\ValidKeysConstraintValidatorTest
+    // @see \Drupal\KernelTests\Core\TypedData\ValidMappingKeysConstraintValidatorTest
     if (\Drupal::state()->get('config_schema_test_block_fully_validatable')) {
       $definitions['block.block.*']['constraints']['FullyValidatable'] = NULL;
     }

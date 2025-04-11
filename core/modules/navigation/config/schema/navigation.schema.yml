@@ -49,9 +49,9 @@ navigation.settings:
                 Range:
                   min: 0
           constraints:
-            ValidKeys: '<infer>'
+            ValidMappingKeys: '<infer>'
       constraints:
-        ValidKeys: '<infer>'
+        ValidMappingKeys: '<infer>'
 
 navigation.block_layout:
   type: config_object

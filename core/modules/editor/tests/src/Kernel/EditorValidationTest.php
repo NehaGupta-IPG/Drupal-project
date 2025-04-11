@@ -174,7 +174,7 @@ class EditorValidationTest extends ConfigEntityValidationTestBase {
     $this->assertValidationErrors([]);
 
     // Specify all required keys … but now disable image uploads again. This
-    // should trigger a validation error from the ValidKeys constraint.
+    // should trigger a validation error from the  constraint.
     $this->entity->setImageUploadSettings([
       'status' => FALSE,
       'scheme' => 'public',

@@ -30,7 +30,7 @@ final class LangcodeRequiredIfTranslatableValuesConstraintValidator extends Cons
       ));
     }
 
-    assert(in_array('langcode', $mapping->getValidKeys(), TRUE));
+    assert(in_array('langcode', $mapping->getValidMappingKeys(), TRUE));
 
     $is_translatable = $mapping->hasTranslatableElements();
 
