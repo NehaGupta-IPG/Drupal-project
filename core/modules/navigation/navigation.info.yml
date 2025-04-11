@@ -1,5 +1,5 @@
 name: Navigation
-description: New administration navigation
+description: Provides an administrative navigation experience.
 package: Core (Experimental)
 lifecycle: experimental
 version: VERSION
