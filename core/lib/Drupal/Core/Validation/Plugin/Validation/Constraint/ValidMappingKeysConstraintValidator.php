@@ -45,7 +45,7 @@ class ValidMappingKeysConstraintValidator extends ConstraintValidator {
     $resolved_type = $mapping->getDataDefinition()->getDataType();
 
     $valid_keys = $constraint->getAllowedKeys($this->context);
-    $dynamically_valid_keys = $mapping->getDynamicallyValidMappingKeys();
+    $dynamically_valid_keys = $mapping->getDynamicallyValidKeys();
     $all_dynamically_valid_keys = array_merge(...array_values($dynamically_valid_keys));
 
     // Statically valid: keys that are valid for all possible types matching the
