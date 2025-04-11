@@ -11,14 +11,14 @@ use Drupal\KernelTests\KernelTestBase;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 
 /**
- * Tests the  validation constraint.
+ * Tests the ValidMappingKeys validation constraint.
  *
  * @group Validation
  *
- * @covers \Drupal\Core\Validation\Plugin\Validation\Constraint\Constraint
- * @covers \Drupal\Core\Validation\Plugin\Validation\Constraint\ConstraintValidator
+ * @covers \Drupal\Core\Validation\Plugin\Validation\Constraint\ValidMappingKeysConstraint
+ * @covers \Drupal\Core\Validation\Plugin\Validation\Constraint\ValidMappingKeysConstraintValidator
  */
-class ConstraintValidatorTest extends KernelTestBase {
+class ValidMappingKeysConstraintValidatorTest extends KernelTestBase {
 
   /**
    * The typed config under test.
@@ -223,12 +223,12 @@ class ConstraintValidatorTest extends KernelTestBase {
   }
 
   /**
-   * Tests the  constraint validator.
+   * Tests the ValidMappingKeys constraint validator.
    */
   public function testValidation(): void {
     // Create a data definition that specifies certain allowed keys.
     $definition = MapDataDefinition::create('mapping')
-      ->addConstraint('', ['north', 'south', 'west']);
+      ->addConstraint('ValidMappingKeys', ['north', 'south', 'west']);
     $definition['mapping'] = [
       'north' => ['type' => 'string', 'requiredKey' => FALSE],
       'east' => ['type' => 'string', 'requiredKey' => FALSE],
@@ -289,7 +289,7 @@ class ConstraintValidatorTest extends KernelTestBase {
     // words, all keys are required unless they individually
     // specify otherwise.
     // First test without changing the value: no error should occur because all
-    // keys passed to the  constraint have a value.
+    // keys passed to the ValidMappingKeys constraint have a value.
     unset($definition['mapping']['south']['requiredKey']);
     unset($definition['mapping']['east']['requiredKey']);
     $violations = $typed_config->create(clone $definition, $value)->validate();
@@ -298,7 +298,7 @@ class ConstraintValidatorTest extends KernelTestBase {
     // If in the mapping definition some keys that do NOT have
     // `requiredKey: false` set, then they MUST be set.
     // First test without changing the value: no error should occur because all
-    // keys passed to the  constraint have a value.
+    // keys passed to the ValidMappingKeys constraint have a value.
     unset($definition['mapping']['south']['requiredKey']);
     unset($definition['mapping']['east']['requiredKey']);
     $violations = $typed_config->create(clone $definition, $value)->validate();
@@ -326,7 +326,7 @@ class ConstraintValidatorTest extends KernelTestBase {
     $config = $this->container->get('config.typed')
       ->get('system.site');
     $config->getDataDefinition()
-      ->addConstraint('', '<infer>');
+      ->addConstraint('ValidMappingKeys', '<infer>');
 
     $data = $config->getValue();
     $data['invalid-key'] = "There's a snake in my boots.";
@@ -335,7 +335,7 @@ class ConstraintValidatorTest extends KernelTestBase {
     $this->assertCount(1, $violations);
     $this->assertSame("'invalid-key' is not a supported key.", (string) $violations->get(0)->getMessage());
 
-    // Ensure that  will freak out if the option is not exactly
+    // Ensure that ValidMappingKeys will freak out if the option is not exactly
     // `<infer>`.
     $config->getDataDefinition()
       ->addConstraint('', 'infer');
@@ -344,7 +344,7 @@ class ConstraintValidatorTest extends KernelTestBase {
   }
 
   /**
-   * Tests  constraint validator detecting optional keys.
+   * Tests ValidMappingKeys constraint validator detecting optional keys.
    */
   public function testMarkedAsOptional(): void {
     \Drupal::state()->set('config_schema_test_block_fully_validatable', TRUE);

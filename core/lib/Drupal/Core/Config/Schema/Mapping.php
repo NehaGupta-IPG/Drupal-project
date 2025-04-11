@@ -58,7 +58,7 @@ class Mapping extends ArrayElement {
    * @return string[]
    *   A list of keys allowed in this mapping.
    */
-  public function getValidMappingKeys(): array {
+  public function getValidKeys(): array {
     $all_keys = $this->getDefinedKeys();
     return array_keys($all_keys);
   }
@@ -123,7 +123,7 @@ class Mapping extends ArrayElement {
    * @see \Drupal\Core\Config\TypedConfigManager::resolveExpression()
    * @see https://www.drupal.org/files/ConfigSchemaCheatSheet2.0.pdf
    */
-  public function getDynamicallyValidMappingKeys(): array {
+  public function getDynamicallyValidKeys(): array {
     $parent_data_def = $this->getParent()?->getDataDefinition();
     if ($parent_data_def === NULL) {
       return [];
