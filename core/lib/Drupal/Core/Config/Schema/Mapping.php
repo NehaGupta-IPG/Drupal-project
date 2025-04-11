@@ -58,7 +58,7 @@ class Mapping extends ArrayElement {
    * @return string[]
    *   A list of keys allowed in this mapping.
    */
-  public function getValidKeys(): array {
+  public function getValidMappingKeys(): array {
     $all_keys = $this->getDefinedKeys();
     return array_keys($all_keys);
   }
