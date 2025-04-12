@@ -13,3 +13,17 @@ function olivero_removed_post_updates(): array {
     'olivero_post_update_add_olivero_primary_color' => '11.0.0',
   ];
 }
+
+/**
+ * Remove shortcut settings if shortcut module is not installed.
+ */
+function olivero_post_update_remove_shortcut_settings_if_not_installed() {
+  $module_handler = \Drupal::moduleHandler();
+  if ($module_handler->moduleExists('shortcut')) {
+    // No config to update.
+    return;
+  }
+  \Drupal::configFactory()->getEditable('olivero.settings')
+    ->clear('third_party_settings.shortcut')
+    ->save();
+}
