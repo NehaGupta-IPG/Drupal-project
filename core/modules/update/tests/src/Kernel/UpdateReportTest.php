@@ -117,7 +117,7 @@ class UpdateReportTest extends KernelTestBase {
     $this->assertArrayNotHasKey('dblog', $variables['error_message']['items']['#items']);
 
     // Now, try as an admin that can access dblog.
-    $this->setUpCurrentUser([], ['access content', 'access site reports']);
+    $this->setUpCurrentUser([], ['access content', 'access dblog reports', 'access site reports']);
 
     $this->render($build);
     $this->assertRaw('Failed to fetch available update data:<ul><li>See <a href="https://www.drupal.org/node/3170647">PHP OpenSSL requirements</a> in the Drupal.org handbook for possible reasons this could happen and what you can do to resolve them.</li><li>Check');
