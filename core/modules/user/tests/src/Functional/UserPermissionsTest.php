@@ -225,7 +225,7 @@ class UserPermissionsTest extends BrowserTestBase {
     // to 'access site reports'.
     $this->drupalGet('admin/people/permissions');
     $next_row = $this->getNodeElementsByXpath('//tr[@data-drupal-selector=\'edit-permissions-access-content\']/following-sibling::tr[1]');
-    $this->assertEquals('edit-permissions-access-site-reports', $next_row[0]->getAttribute('data-drupal-selector'));
+    $this->assertEquals('edit-permissions-access-dblog-reports', $next_row[0]->getAttribute('data-drupal-selector'));
 
     // When Node is installed the 'access content' permission is listed next to
     // to 'view own unpublished content'.
