@@ -17,7 +17,7 @@ function olivero_removed_post_updates(): array {
 /**
  * Remove shortcut settings if shortcut module is not installed.
  */
-function olivero_post_update_remove_shortcut_settings_if_not_installed() {
+function olivero_post_update_remove_shortcut_settings_if_not_installed(): void {
   $module_handler = \Drupal::moduleHandler();
   if ($module_handler->moduleExists('shortcut')) {
     // No config to update.

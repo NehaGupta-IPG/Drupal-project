@@ -22,7 +22,7 @@ class OliveroPostUpdateTest extends UpdatePathTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function setDatabaseDumpFiles() {
+  protected function setDatabaseDumpFiles(): void {
     $this->databaseDumpFiles = [
       __DIR__ . '/../../../../../../modules/system/tests/fixtures/update/drupal-10.3.0.bare.standard.php.gz',
     ];
@@ -31,7 +31,7 @@ class OliveroPostUpdateTest extends UpdatePathTestBase {
   /**
    * Tests update olivero third party settings without shortcut installed.
    */
-  public function testOliveroThirdPartySettingsWithoutShortcut() {
+  public function testOliveroThirdPartySettingsWithoutShortcut(): void {
     $config = $this->config('olivero.settings');
     $this->assertNotEmpty($config->get('third_party_settings'));
 
@@ -60,7 +60,7 @@ class OliveroPostUpdateTest extends UpdatePathTestBase {
   /**
    * Tests update olivero third party settings with shortcut installed.
    */
-  public function testOliveroThirdPartySettingsWithShortcut() {
+  public function testOliveroThirdPartySettingsWithShortcut(): void {
     $config = $this->config('olivero.settings');
     $this->assertNotEmpty($config->get('third_party_settings'));
 
