@@ -54,7 +54,7 @@ class OliveroPostUpdateTest extends UpdatePathTestBase {
     $this->runUpdates();
 
     $config = $this->config('olivero.settings');
-    $this->assertEmpty($config->get('third_party_settings'));
+    $this->assertNull($config->get('third_party_settings'));
   }
 
   /**

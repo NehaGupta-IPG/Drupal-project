@@ -23,7 +23,13 @@ function olivero_post_update_remove_shortcut_settings_if_not_installed(): void {
     // No config to update.
     return;
   }
-  \Drupal::configFactory()->getEditable('olivero.settings')
-    ->clear('third_party_settings.shortcut')
+  $settings = \Drupal::configFactory()->getEditable('olivero.settings');
+
+  $settings->clear('third_party_settings.shortcut')
     ->save();
+
+  if (empty($settings->get('third_party_settings'))) {
+    $settings->clear('third_party_settings')
+      ->save();
+  }
 }
