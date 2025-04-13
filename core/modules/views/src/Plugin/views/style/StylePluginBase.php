@@ -508,9 +508,40 @@ abstract class StylePluginBase extends PluginBase {
       // Render as a record set.
       else {
         if ($this->usesRowPlugin()) {
+          $fibers = [];
           foreach ($set['rows'] as $index => $row) {
-            $this->view->row_index = $index;
-            $set['rows'][$index] = $this->view->rowPlugin->render($row);
+            $fibers[$index] = new \Fiber(function () use ($row, $index) {
+              $this->view->row_index = $index;
+              return $this->view->rowPlugin->render($row);
+            });
+          }
+          $iterations = 0;
+          while (count($fibers) > 0) {
+            foreach ($fibers as $key => $fiber) {
+              if (!$fiber->isStarted()) {
+                $fiber->start();
+              }
+              elseif ($fiber->isSuspended()) {
+                $fiber->resume();
+              }
+              // If the Fiber hasn't terminated by this point, move onto the
+              // next placeholder, we'll resume this Fiber again when we get
+              // back here.
+              if (!$fiber->isTerminated()) {
+                // If we've gone through the placeholders once already, and
+                // they're still not finished, then start to allow code higher
+                // up the stack to get on with something else.
+                if ($iterations) {
+                  $fiber = \Fiber::getCurrent();
+                  if ($fiber !== NULL) {
+                    $fiber->suspend();
+                  }
+                }
+                continue;
+              }
+              $set['rows'][$key] = $fiber->getReturn();
+              unset($fibers[$key]);
+            }
           }
         }
 
