@@ -16,7 +16,7 @@ display:
           id: name
           table: views_test_data
           field: name
-          plugin_id: string
+          plugin_id: field
           element_label_type: h2
       style:
         type: table
@@ -55,7 +55,7 @@ display:
           id: name
           table: views_test_data
           field: name
-          plugin_id: string
+          plugin_id: text
           element_label_type: 'script>alert("XSS")</script'
       display_extenders: {  }
     display_plugin: page
