@@ -222,6 +222,11 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
    * \Drupal\KernelTests\KernelTestBase to register itself as service provider.
    *
    * @var array
+   *
+   * @deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Use services
+   * tagged with the service_provider tag instead.
+   *
+   * @see https://www.drupal.org/project/drupal/issues/2910814
    */
   protected $serviceProviderClasses;
 
@@ -617,11 +622,13 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
       'app' => [],
       'site' => [],
     ];
+    // @phpstan-ignore property.deprecated
     $this->serviceProviderClasses = [
       'app' => [],
       'site' => [],
     ];
     $this->serviceYamls['app']['core'] = 'core/core.services.yml';
+    // @phpstan-ignore property.deprecated
     $this->serviceProviderClasses['app']['core'] = 'Drupal\Core\CoreServiceProvider';
 
     // Retrieve enabled modules and register their namespaces.
@@ -652,7 +659,8 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
       $name = "{$camelized}ServiceProvider";
       $class = "Drupal\\{$module}\\{$name}";
       if (class_exists($class)) {
-        $this->serviceProviderClasses['app'][$module] = $class;
+        // @phpstan-ignore property.deprecated
+        $this->serviceProviderClasses['app'][$class] = $class;
       }
       $filename = dirname($filename) . "/$module.services.yml";
       if (is_file($filename)) {
@@ -664,6 +672,7 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
     if (!empty($GLOBALS['conf']['container_service_providers'])) {
       foreach ($GLOBALS['conf']['container_service_providers'] as $class) {
         if ((is_string($class) && class_exists($class)) || (is_object($class) && ($class instanceof ServiceProviderInterface || $class instanceof ServiceModifierInterface))) {
+          // @phpstan-ignore property.deprecated
           $this->serviceProviderClasses['site'][] = $class;
         }
       }
@@ -1308,6 +1317,8 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
     }
 
     $this->initializeServiceProviders();
+    // @phpstan-ignore property.deprecated
+    unset($this->serviceProviderClasses['app']['core']);
     $container = $this->getContainerBuilder();
     $container->set('kernel', $this);
     $container->setParameter('container.modules', $this->getModulesParameter());
@@ -1364,11 +1375,36 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
     foreach ($this->serviceYamls['app'] as $filename) {
       $yaml_loader->load($filename);
     }
+    // This variable is for BC only.
+    $alters = [];
+    foreach ($container->findTaggedServiceIds('service_provider') as $id => $info) {
+      $provider = $container->get($id);
+      $class = get_class($provider);
+      // Start of BC layer.
+      unset($this->serviceProviders['app'][$class]);
+      // End of BC layer.
+      if ($provider instanceof ServiceProviderInterface) {
+        $provider->register($container);
+      }
+      if ($provider instanceof ServiceModifierInterface) {
+        // $this->serviceProviders['app'][$class] = $provider; once BC is
+        // removed.
+        $alters[$class] = $provider;
+      }
+    }
     foreach ($this->serviceProviders['app'] as $provider) {
       if ($provider instanceof ServiceProviderInterface) {
         $provider->register($container);
       }
     }
+
+    foreach ($this->serviceProviders['app'] as $class => $provider) {
+      if ($class === get_class($provider)) {
+        @trigger_error("Magic naming for $class is deprecated in drupal:11.2.0 and removed in drupal:12.0.0. Service providers are now tagged services with the service_provider tag. See https://www.drupal.org/node/2974194", E_USER_DEPRECATED);
+      }
+    }
+    $this->serviceProviders['app'] += $alters;
+
     // Register site-specific service overrides.
     foreach ($this->serviceYamls['site'] as $filename) {
       $yaml_loader->load($filename);
@@ -1411,6 +1447,7 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
       'app' => [],
       'site' => [],
     ];
+    // @phpstan-ignore property.deprecated
     foreach ($this->serviceProviderClasses as $origin => $classes) {
       foreach ($classes as $name => $class) {
         if (!is_object($class)) {

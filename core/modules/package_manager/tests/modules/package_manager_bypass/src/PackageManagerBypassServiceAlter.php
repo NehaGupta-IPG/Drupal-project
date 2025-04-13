@@ -17,7 +17,7 @@ use Symfony\Component\DependencyInjection\Reference;
  *
  * @internal
  */
-final class PackageManagerBypassServiceProvider extends ServiceProviderBase {
+final class PackageManagerBypassServiceAlter extends ServiceProviderBase {
 
   /**
    * {@inheritdoc}

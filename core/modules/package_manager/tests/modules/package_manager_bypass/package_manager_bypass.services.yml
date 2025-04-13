@@ -5,3 +5,7 @@ services:
     decorates: 'PhpTuf\ComposerStager\API\Core\BeginnerInterface'
   Drupal\package_manager_bypass\LoggingCommitter:
     decorates: 'PhpTuf\ComposerStager\API\Core\CommitterInterface'
+  package_manager_bypass.service_provider:
+    class: Drupal\package_manager_bypass\PackageManagerBypassServiceAlter
+    tags:
+      - { name: service_provider }

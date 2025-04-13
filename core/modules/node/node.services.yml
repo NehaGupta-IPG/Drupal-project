@@ -40,3 +40,7 @@ services:
     arguments: ['@current_route_match']
     tags:
       - { name: 'context_provider' }
+  node.service_provider:
+    class: Drupal\node\NodeServiceRegister
+    tags:
+      - { name: service_provider }

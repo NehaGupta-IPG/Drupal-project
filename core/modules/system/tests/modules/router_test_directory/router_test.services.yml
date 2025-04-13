@@ -1,0 +1,5 @@
+services:
+  router_test.service_provider:
+    class: Drupal\router_test\RouterTestServiceRegister
+    tags:
+      - { name: service_provider }

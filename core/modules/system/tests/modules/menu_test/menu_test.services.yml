@@ -9,3 +9,7 @@ services:
     arguments: ['@request_stack']
     tags:
       - { name: access_check, applies_to: _menu_test_session_access }
+  menu_test.service_provider:
+    class: Drupal\menu_test\MenuTestServiceAlter
+    tags:
+      - { name: service_provider }

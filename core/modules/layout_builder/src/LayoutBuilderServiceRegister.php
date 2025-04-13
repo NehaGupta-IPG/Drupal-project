@@ -21,12 +21,12 @@ use Symfony\Component\DependencyInjection\Reference;
  *
  * @see \Drupal\layout_builder\EventSubscriber\SetInlineBlockDependency
  */
-class LayoutBuilderServiceProvider implements ServiceProviderInterface {
+class LayoutBuilderServiceRegister implements ServiceProviderInterface {
 
   /**
    * {@inheritdoc}
    */
-  public function register(ContainerBuilder $container) {
+  public function register(ContainerBuilder $container): void {
     $modules = $container->getParameter('container.modules');
     if (isset($modules['block_content'])) {
       $definition = new Definition(SetInlineBlockDependency::class);

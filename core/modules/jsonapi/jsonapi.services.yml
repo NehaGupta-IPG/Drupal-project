@@ -251,3 +251,11 @@ services:
       - '@jsonapi.version_negotiator'
     tags:
       - { name: route_enhancer }
+  jsonapi.service_register:
+    class: Drupal\jsonapi\JsonapiServiceRegister
+    tags:
+      - { name: service_provider }
+  jsonapi.service_alter:
+    class: Drupal\jsonapi\JsonapiServiceAlter
+    tags:
+      - { name: service_provider }

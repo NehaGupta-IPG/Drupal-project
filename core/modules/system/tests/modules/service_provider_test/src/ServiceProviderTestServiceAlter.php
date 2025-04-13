@@ -11,12 +11,12 @@ use Drupal\Core\Site\Settings;
 /**
  * Service provider for service provider testing module.
  */
-class ServiceProviderTestServiceProvider implements ServiceModifierInterface {
+class ServiceProviderTestServiceAlter implements ServiceModifierInterface {
 
   /**
    * {@inheritdoc}
    */
-  public function alter(ContainerBuilder $container) {
+  public function alter(ContainerBuilder $container): void {
     if ($container->has('file.usage')) {
       // Override the class used for the file.usage service.
       $definition = $container->getDefinition('file.usage');

@@ -29,3 +29,11 @@ services:
     tags:
       - { name: paramconverter }
     lazy: true
+  language.service_register:
+    class: Drupal\language\LanguageServiceRegister
+    tags:
+      - { name: service_provider }
+  language.service_alter:
+    class: Drupal\language\LanguageServiceAlter
+    tags:
+      - { name: service_provider }

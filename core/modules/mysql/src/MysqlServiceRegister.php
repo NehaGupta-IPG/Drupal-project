@@ -9,7 +9,7 @@ use Drupal\mysql\Plugin\views\query\MysqlCastSql;
 /**
  * Registers the 'mysql.views.cast_sql' service when views is installed.
  */
-class MysqlServiceProvider extends ServiceProviderBase {
+class MysqlServiceRegister extends ServiceProviderBase {
 
   /**
    * {@inheritdoc}

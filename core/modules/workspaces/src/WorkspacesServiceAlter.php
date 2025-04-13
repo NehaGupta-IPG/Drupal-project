@@ -10,12 +10,12 @@ use Symfony\Component\DependencyInjection\Reference;
 /**
  * Defines a service provider for the Workspaces module.
  */
-class WorkspacesServiceProvider extends ServiceProviderBase {
+class WorkspacesServiceAlter extends ServiceProviderBase {
 
   /**
    * {@inheritdoc}
    */
-  public function alter(ContainerBuilder $container) {
+  public function alter(ContainerBuilder $container): void {
     // Add the 'workspace' cache context as required.
     $renderer_config = $container->getParameter('renderer.config');
     $renderer_config['required_cache_contexts'][] = 'workspace';

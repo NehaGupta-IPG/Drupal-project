@@ -11,12 +11,12 @@ use Symfony\Component\DependencyInjection\Reference;
 /**
  * Registers services in the container.
  */
-class NodeServiceProvider implements ServiceProviderInterface {
+class NodeServiceRegister implements ServiceProviderInterface {
 
   /**
    * {@inheritdoc}
    */
-  public function register(ContainerBuilder $container) {
+  public function register(ContainerBuilder $container): void {
     // Register the node.node_translation_migrate service in the container if
     // the migrate and language modules are enabled.
     $modules = $container->getParameter('container.modules');

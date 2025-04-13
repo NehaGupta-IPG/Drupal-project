@@ -1,2 +1,8 @@
 parameters:
   inline_form_errors.hooks_converted: true
+
+services:
+  inline_form_errors.service_provider:
+    class: Drupal\inline_form_errors\InlineFormErrorsServiceAlter
+    tags:
+      - { name: service_provider }

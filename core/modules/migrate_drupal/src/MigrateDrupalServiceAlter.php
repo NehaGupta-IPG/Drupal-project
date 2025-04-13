@@ -9,12 +9,12 @@ use Symfony\Component\DependencyInjection\Reference;
 /**
  * Alters container services.
  */
-class MigrateDrupalServiceProvider extends ServiceProviderBase {
+class MigrateDrupalServiceAlter extends ServiceProviderBase {
 
   /**
    * {@inheritdoc}
    */
-  public function alter(ContainerBuilder $container) {
+  public function alter(ContainerBuilder $container): void {
     parent::alter($container);
 
     $container->getDefinition('plugin.manager.migration')

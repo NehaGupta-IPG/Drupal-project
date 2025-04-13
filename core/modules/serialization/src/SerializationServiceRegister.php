@@ -8,12 +8,12 @@ use Drupal\Core\DependencyInjection\ServiceProviderInterface;
 /**
  * Serialization dependency injection container.
  */
-class SerializationServiceProvider implements ServiceProviderInterface {
+class SerializationServiceRegister implements ServiceProviderInterface {
 
   /**
    * {@inheritdoc}
    */
-  public function register(ContainerBuilder $container) {
+  public function register(ContainerBuilder $container): void {
     // Add a compiler pass for adding Normalizers and Encoders to Serializer.
     $container->addCompilerPass(new RegisterSerializationClassesCompilerPass());
     // Add a compiler pass for adding concrete Resolvers to chain Resolver.

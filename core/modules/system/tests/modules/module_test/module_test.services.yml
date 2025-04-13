@@ -5,3 +5,7 @@ services:
     arguments: ['@state', '@?logger.dblog']
     tags:
       - { name: plugin_manager_cache_clear }
+  module_test.service_provider:
+    class: Drupal\module_test\ModuleTestServiceRegister
+    tags:
+      - { name: service_provider }

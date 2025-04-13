@@ -10,7 +10,7 @@ use Drupal\Core\DependencyInjection\ServiceProviderInterface;
 /**
  * Module test service provider.
  */
-class ModuleTestServiceProvider implements ServiceProviderInterface {
+class ModuleTestServiceRegister implements ServiceProviderInterface {
 
   /**
    * {@inheritdoc}

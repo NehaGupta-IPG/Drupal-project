@@ -1,0 +1,5 @@
+services:
+  container_rebuild_test.service_provider:
+    class: Drupal\container_rebuild_test\ContainerRebuildTestServiceAlter
+    tags:
+      - { name: service_provider }

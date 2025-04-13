@@ -102,3 +102,7 @@ services:
     public: false
     arguments: ['@.inner', '@workspaces.manager', '@workspaces.information', '@typed_data_manager']
   Drupal\workspaces\Controller\WorkspacesHtmlEntityFormController: '@workspaces.controller.entity_form'
+  workspaces.service_provider:
+    class: Drupal\workspaces\WorkspacesServiceAlter
+    tags:
+      - { name: service_provider }

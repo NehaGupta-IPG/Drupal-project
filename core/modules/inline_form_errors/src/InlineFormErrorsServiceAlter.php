@@ -9,12 +9,12 @@ use Symfony\Component\DependencyInjection\Reference;
 /**
  * Overrides the form_error_handler service to enable inline form errors.
  */
-class InlineFormErrorsServiceProvider extends ServiceProviderBase {
+class InlineFormErrorsServiceAlter extends ServiceProviderBase {
 
   /**
    * {@inheritdoc}
    */
-  public function alter(ContainerBuilder $container) {
+  public function alter(ContainerBuilder $container): void {
     $container->getDefinition('form_error_handler')
       ->setClass(FormErrorHandler::class)
       ->setArguments([

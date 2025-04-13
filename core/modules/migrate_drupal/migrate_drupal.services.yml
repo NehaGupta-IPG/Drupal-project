@@ -28,3 +28,7 @@ services:
     class: Drupal\migrate_drupal\MigrationState
     arguments: ['@plugin.manager.migrate.field', '@module_handler', '@messenger', '@string_translation']
   Drupal\migrate_drupal\MigrationState: '@migrate_drupal.migration_state'
+  migrate_drupal.service_provider:
+    class: Drupal\migrate_drupal\MigrateDrupalServiceAlter
+    tags:
+      - { name: service_provider }

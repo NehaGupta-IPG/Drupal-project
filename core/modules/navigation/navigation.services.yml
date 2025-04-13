@@ -45,3 +45,7 @@ services:
     class: Drupal\navigation\TopBarItemManager
     parent: default_plugin_manager
   Drupal\navigation\TopBarItemManagerInterface: '@plugin.manager.top_bar_item'
+  navigation.service_provider:
+    class: Drupal\navigation\NavigationServiceRegister
+    tags:
+      - { name: service_provider }

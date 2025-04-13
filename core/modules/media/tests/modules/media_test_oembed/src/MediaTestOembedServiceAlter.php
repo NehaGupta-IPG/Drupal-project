@@ -10,12 +10,12 @@ use Drupal\Core\DependencyInjection\ServiceProviderBase;
 /**
  * Replaces oEmbed-related media services with testing versions.
  */
-class MediaTestOembedServiceProvider extends ServiceProviderBase {
+class MediaTestOembedServiceAlter extends ServiceProviderBase {
 
   /**
    * {@inheritdoc}
    */
-  public function alter(ContainerBuilder $container) {
+  public function alter(ContainerBuilder $container): void {
     parent::alter($container);
 
     $container->getDefinition('media.oembed.provider_repository')

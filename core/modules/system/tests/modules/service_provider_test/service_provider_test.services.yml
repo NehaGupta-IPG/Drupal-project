@@ -31,3 +31,7 @@ services:
     parent: service_provider_test_class
     tags:
       - { name: needs_destruction, priority: -50 }
+  service_provider_test.service_provider:
+    class: Drupal\service_provider_test\ServiceProviderTestServiceAlter
+    tags:
+      - { name: service_provider }

@@ -10,12 +10,12 @@ use Drupal\Core\DependencyInjection\ServiceModifierInterface;
 /**
  * The service provider for testing container rebuilds.
  */
-class ContainerRebuildTestServiceProvider implements ServiceModifierInterface {
+class ContainerRebuildTestServiceAlter implements ServiceModifierInterface {
 
   /**
    * {@inheritdoc}
    */
-  public function alter(ContainerBuilder $container) {
+  public function alter(ContainerBuilder $container): void {
     $count = $container->get('state')->get('container_rebuild_test.count', 0);
     $container->get('state')->set('container_rebuild_test.count', ++$count);
   }

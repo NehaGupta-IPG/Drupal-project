@@ -1,0 +1,5 @@
+services:
+  media_test_oembed.service_provider:
+    class: Drupal\media_test_oembed\MediaTestOembedServiceAlter
+    tags:
+      - { name: service_provider }

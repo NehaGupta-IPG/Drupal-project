@@ -13,7 +13,7 @@ use Symfony\Component\DependencyInjection\Reference;
  *
  * @internal
  */
-final class NavigationServiceProvider implements ServiceProviderInterface {
+final class NavigationServiceRegister implements ServiceProviderInterface {
 
   /**
    * {@inheritdoc}

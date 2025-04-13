@@ -28,7 +28,7 @@ class UpdateKernel extends DrupalKernel {
    */
   public function discoverServiceProviders() {
     parent::discoverServiceProviders();
-
+    // @phpstan-ignore property.deprecated
     $this->serviceProviderClasses['app']['update_kernel'] = 'Drupal\Core\Update\UpdateServiceProvider';
   }
 
