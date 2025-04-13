@@ -20,19 +20,19 @@ display:
           field: test_example
           id: test_example
           table: views
-          plugin_id: test_example
+          plugin_id: text
       footer:
         test_example:
           field: test_example
           id: test_example
           table: views
-          plugin_id: test_example
+          plugin_id: text
       empty:
         test_example:
           field: test_example
           id: test_example
           table: views
-          plugin_id: test_example
+          plugin_id: text
     display_plugin: default
     display_title: Default
     id: default
