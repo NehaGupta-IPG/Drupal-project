@@ -572,6 +572,8 @@ class ViewExecutableTest extends ViewsKernelTestBase {
     $expected = [
       '{{ arguments.uid }}' => $account->label(),
       '{{ raw_arguments.uid }}' => (string) $account->id(),
+      '{{ arguments.keys }}' => '1',
+      '{{ raw_arguments.keys }}' => '1',
     ];
     $this->assertEquals($expected, $view->build_info['substitutions']);
   }
