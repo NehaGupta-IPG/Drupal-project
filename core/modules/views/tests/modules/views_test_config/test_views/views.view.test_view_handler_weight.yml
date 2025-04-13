@@ -38,8 +38,8 @@ display:
         options:
           offset: 0
         type: none
-        id:
       sorts:
+        id:
           field: id
           id: id
           order: ASC
