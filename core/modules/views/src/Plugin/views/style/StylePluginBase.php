@@ -708,65 +708,100 @@ abstract class StylePluginBase extends PluginBase {
       // If all fields have a field::access FALSE there might be no fields, so
       // there is no reason to execute this code.
       if (!empty($field_ids)) {
-        $renderer = $this->getRenderer();
         /** @var \Drupal\views\Plugin\views\cache\CachePluginBase $cache_plugin */
         $cache_plugin = $this->view->display_handler->getPlugin('cache');
         $max_age = $cache_plugin->getCacheMaxAge();
 
         /** @var \Drupal\views\ResultRow $row */
+        $fibers = [];
+        $iterations = 0;
         foreach ($result as $index => $row) {
-          $this->view->row_index = $index;
-
-          $data = [
-            '#pre_render' => [[$this, 'elementPreRenderRow']],
-            '#row' => $row,
-            '#cache' => [
-              'tags' => $cache_plugin->getRowCacheTags($row),
-              'max-age' => $max_age,
-            ],
-          ];
-          $renderer->addCacheableDependency($data, $this->view->storage);
-          // Views may be rendered both inside and outside a render context:
-          // - HTML views are rendered inside a render context: then we want to
-          //   use ::render(), so that attachments and cacheability are bubbled.
-          // - non-HTML views are rendered outside a render context: then we
-          //   want to use ::renderInIsolation(), so that no bubbling happens.
-          if ($renderer->hasRenderContext()) {
-            $renderer->render($data);
-          }
-          else {
-            $renderer->renderInIsolation($data);
-          }
-
-          // Extract field output from the render array and post process it.
-          $fields = $this->view->field;
-          $rendered_fields = &$this->rendered_fields[$index];
-          $post_render_tokens = [];
-          foreach ($field_ids as $id) {
-            $rendered_fields[$id] = $data[$id]['#markup'];
-            $tokens = $fields[$id]->postRender($row, $rendered_fields[$id]);
-            if ($tokens) {
-              $post_render_tokens += $tokens;
+          $fibers[$index] = new \Fiber(fn() => $this->renderFieldRow($index, $row, $render_tokens_field_id, $cache_plugin, $max_age, $field_ids));
+        }
+        while (\count($fibers) > 0) {
+          foreach ($fibers as $key => $fiber) {
+            if (!$fiber->isStarted()) {
+              $fiber->start();
             }
-          }
-
-          // Populate row tokens.
-          $this->rowTokens[$index] = $this->view->field[$render_tokens_field_id]->getRenderTokens([]);
-
-          // Replace post-render tokens.
-          if ($post_render_tokens) {
-            $placeholders = array_keys($post_render_tokens);
-            $values = array_values($post_render_tokens);
-            foreach ($this->rendered_fields[$index] as &$rendered_field) {
-              // Placeholders and rendered fields have been processed by the
-              // render system and are therefore safe.
-              $rendered_field = ViewsRenderPipelineMarkup::create(str_replace($placeholders, $values, $rendered_field));
+            elseif ($fiber->isSuspended()) {
+              $fiber->resume();
             }
+            // If the Fiber hasn't terminated by this point, move onto the next
+            // placeholder, we'll resume this Fiber again when we get back here.
+            if (!$fiber->isTerminated()) {
+              // If we've gone through the placeholders once already, and
+              // they're still not finished, then start to allow code higher up
+              // the stack to get on with something else.
+              if ($iterations) {
+                $fiber = \Fiber::getCurrent();
+                if ($fiber !== NULL) {
+                  $fiber->suspend();
+                }
+              }
+              continue;
+            }
+            unset($fibers[$key]);
           }
         }
+        $iterations++;
       }
+    }
 
-      unset($this->view->row_index);
+    unset($this->view->row_index);
+  }
+
+  /**
+   * Render an individual field row.
+   */
+  protected function renderFieldRow($index, $row, $render_tokens_field_id, $cache_plugin, $max_age, $field_ids): void {
+    $renderer = $this->getRenderer();
+    $this->view->row_index = $index;
+
+    $data = [
+      '#pre_render' => [[$this, 'elementPreRenderRow']],
+      '#row' => $row,
+      '#cache' => [
+        'tags' => $cache_plugin->getRowCacheTags($row),
+        'max-age' => $max_age,
+      ],
+    ];
+    $renderer->addCacheableDependency($data, $this->view->storage);
+    // Views may be rendered both inside and outside a render context:
+    // - HTML views are rendered inside a render context: then we want to
+    //   use ::render(), so that attachments and cacheability are bubbled.
+    // - non-HTML views are rendered outside a render context: then we
+    //   want to use ::renderInIsolation(), so that no bubbling happens.
+    if ($renderer->hasRenderContext()) {
+      $renderer->render($data);
+    }
+    else {
+      $renderer->renderInIsolation($data);
+    }
+
+    // Extract field output from the render array and post process it.
+    $fields = $this->view->field;
+    $rendered_fields = &$this->rendered_fields[$index];
+    $post_render_tokens = [];
+    foreach ($field_ids as $id) {
+      $rendered_fields[$id] = $data[$id]['#markup'];
+      $tokens = $fields[$id]->postRender($row, $rendered_fields[$id]);
+      if ($tokens) {
+        $post_render_tokens += $tokens;
+      }
+    }
+
+    // Populate row tokens.
+    $this->rowTokens[$index] = $this->view->field[$render_tokens_field_id]->getRenderTokens([]);
+
+    // Replace post-render tokens.
+    if ($post_render_tokens) {
+      $placeholders = array_keys($post_render_tokens);
+      $values = array_values($post_render_tokens);
+      foreach ($this->rendered_fields[$index] as &$rendered_field) {
+        // Placeholders and rendered fields have been processed by the
+        // render system and are therefore safe.
+        $rendered_field = ViewsRenderPipelineMarkup::create(str_replace($placeholders, $values, $rendered_field));
+      }
     }
   }
 
