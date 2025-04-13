@@ -30,6 +30,15 @@ abstract class ViewTestBase extends BrowserTestBase {
   protected static $modules = ['views', 'views_test_config'];
 
   /**
+   * {@inheritdoc}
+   */
+  protected static $configSchemaCheckerExclusions = [
+    // This view is intentionally broken.
+    // @see Drupal\Tests\views_ui\Functional\HandlerTest::testBrokenHandlers()
+    'views.view.test_view_broken',
+  ];
+
+  /**
    * Sets up the test.
    *
    * @param bool $import_test_views
