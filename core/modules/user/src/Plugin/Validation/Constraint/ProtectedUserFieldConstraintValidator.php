@@ -28,7 +28,7 @@ class ProtectedUserFieldConstraintValidator extends ConstraintValidator implemen
   public function __construct(
     protected UserStorageInterface $userStorage,
     protected AccountProxyInterface $currentUser,
-    protected UserAuthInterface $userAuth
+    protected UserAuthInterface $userAuth,
   ) {}
 
   /**
