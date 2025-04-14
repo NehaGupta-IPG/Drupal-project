@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\layout_builder\Kernel;
 
 use Drupal\layout_builder\Section;
@@ -23,7 +25,7 @@ class SectionListTraitTest extends SectionListTestBase {
   /**
    * @covers ::addBlankSection
    */
-  public function testAddBlankSection() {
+  public function testAddBlankSection(): void {
     $this->expectException(\Exception::class);
     $this->expectExceptionMessage('A blank section must only be added to an empty list');
     $this->sectionList->addBlankSection();
@@ -31,6 +33,9 @@ class SectionListTraitTest extends SectionListTestBase {
 
 }
 
+/**
+ * Test item list class for layout section fields.
+ */
 class TestSectionList implements SectionListInterface {
 
   use SectionListTrait {
@@ -58,7 +63,7 @@ class TestSectionList implements SectionListInterface {
   /**
    * {@inheritdoc}
    */
-  protected function setSections(array $sections) {
+  protected function setSections(array $sections): array {
     $this->sections = array_values($sections);
     return $sections;
   }

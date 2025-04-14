@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\ckeditor5\FunctionalJavascript;
 
 use Drupal\ckeditor5\Plugin\Editor\CKEditor5;
@@ -7,7 +9,7 @@ use Drupal\editor\Entity\Editor;
 use Drupal\filter\Entity\FilterFormat;
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
 use Drupal\Tests\ckeditor5\Traits\CKEditor5TestTrait;
-use Symfony\Component\Validator\ConstraintViolation;
+use Symfony\Component\Validator\ConstraintViolationInterface;
 
 /**
  * Tests emphasis in CKEditor 5.
@@ -70,6 +72,9 @@ class EmphasisTest extends WebDriverTestBase {
     Editor::create([
       'editor' => 'ckeditor5',
       'format' => 'test_format',
+      'image_upload' => [
+        'status' => FALSE,
+      ],
       'settings' => [
         'toolbar' => [
           'items' => [
@@ -85,7 +90,7 @@ class EmphasisTest extends WebDriverTestBase {
       ],
     ])->save();
     $this->assertSame([], array_map(
-      function (ConstraintViolation $v) {
+      function (ConstraintViolationInterface $v) {
         return (string) $v->getMessage();
       },
       iterator_to_array(CKEditor5::validatePair(
@@ -115,7 +120,7 @@ class EmphasisTest extends WebDriverTestBase {
   /**
    * Ensures that CKEditor italic model is converted to em.
    */
-  public function testEmphasis() {
+  public function testEmphasis(): void {
     $page = $this->getSession()->getPage();
     $assert_session = $this->assertSession();
 
@@ -137,7 +142,7 @@ class EmphasisTest extends WebDriverTestBase {
   /**
    * Tests that arbitrary attributes are allowed via GHS.
    */
-  public function testEmphasisArbitraryHtml() {
+  public function testEmphasisArbitraryHtml(): void {
     $assert_session = $this->assertSession();
     $editor = Editor::load('test_format');
     $settings = $editor->getSettings();

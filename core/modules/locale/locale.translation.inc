@@ -2,9 +2,9 @@
 
 /**
  * @file
- * Common API for interface translation.
  */
 
+use Drupal\Core\Hook\Attribute\StopProceduralHookScan;
 use Drupal\Core\StreamWrapper\StreamWrapperManager;
 
 /**
@@ -54,6 +54,7 @@ const LOCALE_TRANSLATION_SOURCE_COMPARE_GT = 1;
  *
  * @see locale_translation_build_projects()
  */
+#[StopProceduralHookScan]
 function locale_translation_get_projects(array $project_names = []) {
   $projects = &drupal_static(__FUNCTION__, []);
 
@@ -84,7 +85,7 @@ function locale_translation_get_projects(array $project_names = []) {
 /**
  * Clears the projects cache.
  */
-function locale_translation_clear_cache_projects() {
+function locale_translation_clear_cache_projects(): void {
   drupal_static_reset('locale_translation_get_projects');
 }
 
@@ -101,10 +102,10 @@ function locale_translation_clear_cache_projects() {
  *
  * @see locale_translation_source_build()
  */
-function locale_translation_load_sources(array $projects = NULL, array $langcodes = NULL) {
+function locale_translation_load_sources(?array $projects = NULL, ?array $langcodes = NULL): array {
   $sources = [];
-  $projects = $projects ? $projects : array_keys(locale_translation_get_projects());
-  $langcodes = $langcodes ? $langcodes : array_keys(locale_translatable_language_list());
+  $projects = $projects ?: array_keys(locale_translation_get_projects());
+  $langcodes = $langcodes ?: array_keys(locale_translatable_language_list());
 
   // Load source data from locale_translation_status cache.
   $status = locale_translation_get_status();
@@ -131,10 +132,10 @@ function locale_translation_load_sources(array $projects = NULL, array $langcode
  *
  * @see locale_translation_source_build()
  */
-function locale_translation_build_sources(array $projects = [], array $langcodes = []) {
+function locale_translation_build_sources(array $projects = [], array $langcodes = []): array {
   $sources = [];
   $projects = locale_translation_get_projects($projects);
-  $langcodes = $langcodes ? $langcodes : array_keys(locale_translatable_language_list());
+  $langcodes = $langcodes ?: array_keys(locale_translatable_language_list());
 
   foreach ($projects as $project) {
     foreach ($langcodes as $langcode) {
@@ -242,7 +243,7 @@ function locale_translation_source_build($project, $langcode, $filename = NULL) 
   $source->timestamp = 0;
   $source->last_checked = 0;
 
-  $filename = $filename ? $filename : \Drupal::config('locale.settings')->get('translation.default_filename');
+  $filename = $filename ?: \Drupal::config('locale.settings')->get('translation.default_filename');
 
   // If the server_pattern contains a remote file path we will check for a
   // remote file. The local version of this file will only be checked if a
@@ -326,7 +327,7 @@ function locale_translation_build_server_pattern($project, $template) {
 /**
  * Populate a queue with project to check for translation updates.
  */
-function locale_cron_fill_queue() {
+function locale_cron_fill_queue(): void {
   $updates = [];
   $config = \Drupal::config('locale.settings');
 

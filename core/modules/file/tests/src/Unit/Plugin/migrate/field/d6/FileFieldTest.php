@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\file\Unit\Plugin\migrate\field\d6;
 
 use Drupal\migrate\Plugin\MigrationInterface;
@@ -17,11 +19,15 @@ use Prophecy\Argument;
 class FileFieldTest extends UnitTestCase {
 
   /**
+   * The migrate field plugin.
+   *
    * @var \Drupal\migrate_drupal\Plugin\MigrateFieldInterface
    */
   protected $plugin;
 
   /**
+   * The migration.
+   *
    * @var \Drupal\migrate\Plugin\MigrationInterface
    */
   protected $migration;
@@ -50,7 +56,7 @@ class FileFieldTest extends UnitTestCase {
   /**
    * @covers ::defineValueProcessPipeline
    */
-  public function testDefineValueProcessPipeline($method = 'defineValueProcessPipeline') {
+  public function testDefineValueProcessPipeline($method = 'defineValueProcessPipeline'): void {
     $this->plugin->$method($this->migration, 'field_name', []);
 
     $expected = [
@@ -63,7 +69,7 @@ class FileFieldTest extends UnitTestCase {
   /**
    * Data provider for testGetFieldType().
    */
-  public function getFieldTypeProvider() {
+  public static function getFieldTypeProvider() {
     return [
       ['image', 'imagefield_widget'],
       ['file', 'filefield_widget'],
@@ -75,7 +81,7 @@ class FileFieldTest extends UnitTestCase {
    * @covers ::getFieldType
    * @dataProvider getFieldTypeProvider
    */
-  public function testGetFieldType($expected_type, $widget_type, array $settings = []) {
+  public function testGetFieldType($expected_type, $widget_type, array $settings = []): void {
     $row = new Row();
     $row->setSourceProperty('widget_type', $widget_type);
     $row->setSourceProperty('global_settings', $settings);

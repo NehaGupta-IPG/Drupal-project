@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\Core\Test;
 
 use Drupal\Core\Test\PhpUnitTestRunner;
@@ -21,7 +23,7 @@ class PhpUnitTestRunnerTest extends UnitTestCase {
    *
    * @covers ::execute
    */
-  public function testRunTestsError() {
+  public function testRunTestsError(): void {
     $test_id = 23;
     $log_path = 'test_log_path';
 
@@ -51,7 +53,7 @@ class PhpUnitTestRunnerTest extends UnitTestCase {
     $runner->expects($this->once())
       ->method('runCommand')
       ->willReturnCallback(
-        function ($unescaped_test_classnames, $phpunit_file, &$status) {
+        function (string $test_class_name, string $log_junit_file_path, int &$status): string {
           $status = TestStatus::EXCEPTION;
           return ' ';
         }
@@ -61,7 +63,7 @@ class PhpUnitTestRunnerTest extends UnitTestCase {
     // to some value we don't expect back.
     $status = -1;
     $test_run = TestRun::createNew($storage);
-    $results = $runner->execute($test_run, ['SomeTest'], $status);
+    $results = $runner->execute($test_run, 'SomeTest', $status);
 
     // Make sure our status code made the round trip.
     $this->assertEquals(TestStatus::EXCEPTION, $status);
@@ -84,7 +86,7 @@ class PhpUnitTestRunnerTest extends UnitTestCase {
   /**
    * @covers ::phpUnitCommand
    */
-  public function testPhpUnitCommand() {
+  public function testPhpUnitCommand(): void {
     $runner = new PhpUnitTestRunner($this->root, sys_get_temp_dir());
     $this->assertMatchesRegularExpression('/phpunit/', $runner->phpUnitCommand());
   }
@@ -92,12 +94,12 @@ class PhpUnitTestRunnerTest extends UnitTestCase {
   /**
    * @covers ::xmlLogFilePath
    */
-  public function testXmlLogFilePath() {
+  public function testXmlLogFilePath(): void {
     $runner = new PhpUnitTestRunner($this->root, sys_get_temp_dir());
     $this->assertStringEndsWith('phpunit-23.xml', $runner->xmlLogFilePath(23));
   }
 
-  public function providerTestSummarizeResults() {
+  public static function providerTestSummarizeResults() {
     return [
       [
         [
@@ -142,7 +144,7 @@ class PhpUnitTestRunnerTest extends UnitTestCase {
    * @dataProvider providerTestSummarizeResults
    * @covers ::summarizeResults
    */
-  public function testSummarizeResults($results, $has_status) {
+  public function testSummarizeResults($results, $has_status): void {
     $runner = new PhpUnitTestRunner($this->root, sys_get_temp_dir());
     $summary = $runner->summarizeResults($results);
 

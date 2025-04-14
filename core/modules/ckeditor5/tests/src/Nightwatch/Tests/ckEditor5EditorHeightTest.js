@@ -1,13 +1,16 @@
+// cspell:ignore sourceediting
+
 module.exports = {
   '@tags': ['core', 'ckeditor5'],
   before(browser) {
     browser
-      .drupalInstall({ installProfile: 'minimal' })
+      .drupalInstall({ installProfile: 'testing' })
       .drupalInstallModule('ckeditor5', true)
-      .drupalInstallModule('field_ui');
+      .drupalInstallModule('field_ui')
+      .drupalInstallModule('node', true);
 
     // Set fixed (desktop-ish) size to ensure a maximum viewport.
-    browser.resizeWindow(1920, 1080);
+    browser.window.resize(1920, 1080);
   },
   after(browser) {
     browser.drupalUninstall();
@@ -28,7 +31,10 @@ module.exports = {
           '[data-drupal-selector="edit-editor-settings-toolbar"]',
         )
         .click('.ckeditor5-toolbar-button-sourceEditing') // Select the Source Editing button.
-        .keys(browser.Keys.DOWN) // Hit the down arrow key to move it to the toolbar.
+        // Hit the down arrow key to move it to the toolbar.
+        .perform(function () {
+          return this.actions().sendKeys(browser.Keys.ARROW_DOWN);
+        })
         // Wait for new source editing vertical tab to be present before continuing.
         .waitForElementVisible(
           '[href*=edit-editor-settings-plugins-ckeditor5-sourceediting]',

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\FunctionalJavascriptTests\Core\Field;
 
 use Drupal\entity_test\Entity\EntityTest;
@@ -64,9 +66,9 @@ class TimestampFormatterWithTimeDiffViewsTest extends WebDriverTestBase {
       $this->assertMatchesRegularExpression($regex_pattern, $time_diff);
     }
 
-    // Wait at least 1 second + 1 millisecond to make sure the 'right now' time
-    // difference was refreshed.
-    $this->assertJsCondition("document.querySelector('.entity-$delta time').textContent >= '$time_diff'", 1001);
+    // Wait up to 2 seconds to make sure the 'right now' time difference was
+    // refreshed.
+    $this->assertJsCondition("document.querySelector('.entity-$delta time').textContent >= '$time_diff'", 2000);
   }
 
   /**

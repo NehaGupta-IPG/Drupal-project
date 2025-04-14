@@ -39,8 +39,10 @@ settings:
         - heading5
         - heading6
     ckeditor5_list:
-      reversed: false
-      startIndex: false
+      properties:
+        reversed: false
+        startIndex: false
+      multiBlock: true
     ckeditor5_sourceEditing:
       allowed_tags: {  }
     media_media:
@@ -49,7 +51,7 @@ image_upload:
   status: true
   scheme: public
   directory: inline-images
-  max_size: ''
+  max_size: null
   max_dimensions:
     width: null
     height: null

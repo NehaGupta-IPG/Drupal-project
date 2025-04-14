@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\media\FunctionalJavascript;
 
 use Drupal\views\Views;
@@ -22,7 +24,7 @@ class MediaViewsWizardTest extends MediaJavascriptTestBase {
   /**
    * Tests adding a view of media.
    */
-  public function testMediaWizard() {
+  public function testMediaWizard(): void {
     $session = $this->getSession();
     $page = $session->getPage();
     $assert_session = $this->assertSession();
@@ -58,7 +60,7 @@ class MediaViewsWizardTest extends MediaJavascriptTestBase {
   /**
    * Tests adding a view of media revisions.
    */
-  public function testMediaRevisionWizard() {
+  public function testMediaRevisionWizard(): void {
     $session = $this->getSession();
     $page = $session->getPage();
     $assert_session = $this->assertSession();

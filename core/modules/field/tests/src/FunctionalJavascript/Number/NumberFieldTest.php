@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\field\FunctionalJavascript\Number;
 
 use Drupal\field\Entity\FieldConfig;
@@ -44,7 +46,7 @@ class NumberFieldTest extends WebDriverTestBase {
   /**
    * Tests default formatter behavior.
    */
-  public function testNumberFormatter() {
+  public function testNumberFormatter(): void {
     $type = $this->randomMachineName();
     $float_field = $this->randomMachineName();
     $integer_field = $this->randomMachineName();

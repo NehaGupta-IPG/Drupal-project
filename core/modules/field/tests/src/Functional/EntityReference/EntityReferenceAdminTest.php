@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\field\Functional\EntityReference;
 
 use Behat\Mink\Element\NodeElement;
@@ -77,7 +79,7 @@ class EntityReferenceAdminTest extends BrowserTestBase {
   /**
    * Tests the Entity Reference Admin UI.
    */
-  public function testFieldAdminHandler() {
+  public function testFieldAdminHandler(): void {
     $bundle_path = 'admin/structure/types/manage/' . $this->type;
     // Create a new view and display it as an entity reference.
     $edit = [
@@ -131,7 +133,7 @@ class EntityReferenceAdminTest extends BrowserTestBase {
       'required' => FALSE,
       'settings[handler_settings][view][view_and_display]' => 'node_test_view:entity_reference_1',
     ];
-    $this->submitForm($edit, 'Save settings');
+    $this->submitForm($edit, 'Save');
     $this->assertSession()->statusMessageContains("Saved Test Entity Reference Field configuration.", MessengerInterface::TYPE_STATUS);
     $this->assertFieldExistsOnOverview('Test Entity Reference Field');
 
@@ -209,6 +211,21 @@ class EntityReferenceAdminTest extends BrowserTestBase {
       'field_storage[subform][cardinality]' => -1,
     ];
     $this->submitForm($edit, 'Update settings');
+
+    // Assert that the target bundle handler setting is initially set.
+    $this->assertSession()->checkboxChecked('settings[handler_settings][target_bundles][tags]');
+    // Change the handler to 'views'.
+    $this->submitForm([
+      'settings[handler]' => 'views',
+    ], 'Change handler');
+    $this->assertSession()->fieldValueEquals('settings[handler]', 'views');
+    // Change handler back to 'default'.
+    $this->submitForm([
+      'settings[handler]' => 'default:taxonomy_term',
+    ], 'Change handler');
+    // Assert that changing the handler resets the handler settings.
+    $this->assertSession()->checkboxNotChecked('settings[handler_settings][target_bundles][tags]');
+
     $term_name = $this->randomString();
     $result = \Drupal::entityQuery('taxonomy_term')
       ->condition('name', $term_name)
@@ -217,6 +234,7 @@ class EntityReferenceAdminTest extends BrowserTestBase {
       ->execute();
     $this->assertCount(0, $result, "No taxonomy terms exist with the name '$term_name'.");
     $edit = [
+      'settings[handler_settings][target_bundles][tags]' => TRUE,
       // This must be set before new entities will be auto-created.
       'settings[handler_settings][auto_create]' => 1,
     ];
@@ -242,7 +260,7 @@ class EntityReferenceAdminTest extends BrowserTestBase {
   /**
    * Tests the formatters for the Entity References.
    */
-  public function testAvailableFormatters() {
+  public function testAvailableFormatters(): void {
     // Create a new vocabulary.
     Vocabulary::create(['vid' => 'tags', 'name' => 'tags'])->save();
 
@@ -303,7 +321,7 @@ class EntityReferenceAdminTest extends BrowserTestBase {
    * The tested entity reference field has multiple target bundles and is set
    * to auto-create the target entity.
    */
-  public function testMultipleTargetBundles() {
+  public function testMultipleTargetBundles(): void {
     /** @var \Drupal\taxonomy\Entity\Vocabulary[] $vocabularies */
     $vocabularies = [];
     for ($i = 0; $i < 2; $i++) {
@@ -366,7 +384,7 @@ class EntityReferenceAdminTest extends BrowserTestBase {
    * Creates a new Entity Reference fields with a given target type.
    *
    * @param string $target_type
-   *   The name of the target type
+   *   The name of the target type.
    * @param string[] $bundles
    *   A list of bundle IDs. Defaults to [].
    *

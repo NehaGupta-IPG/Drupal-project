@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\mysql\Functional;
 
 use Drupal\Core\Database\Database;
@@ -29,16 +31,16 @@ class RequirementsTest extends BrowserTestBase {
     parent::setUp();
 
     // The isolation_level option is only available for MySQL.
-    $connectionInfo = Database::getConnectionInfo();
-    if ($connectionInfo['default']['driver'] !== 'mysql') {
-      $this->markTestSkipped("This test does not support the {$connectionInfo['default']['driver']} database driver.");
+    $connection = Database::getConnection();
+    if ($connection->driver() !== 'mysql') {
+      $this->markTestSkipped("This test does not support the {$connection->driver()} database driver.");
     }
   }
 
   /**
    * Test the isolation level warning message on status page.
    */
-  public function testIsolationLevelWarningNotDisplaying() {
+  public function testIsolationLevelWarningNotDisplaying(): void {
     $admin_user = $this->drupalCreateUser([
       'administer site configuration',
       'access site reports',
@@ -110,7 +112,7 @@ class RequirementsTest extends BrowserTestBase {
    * @param string $isolation_level
    *   The isolation level.
    */
-  private function writeIsolationLevelSettings(string $isolation_level) {
+  private function writeIsolationLevelSettings(string $isolation_level): void {
     $settings['databases']['default']['default']['init_commands'] = (object) [
       'value' => [
         'isolation_level' => "SET SESSION TRANSACTION ISOLATION LEVEL {$isolation_level}",

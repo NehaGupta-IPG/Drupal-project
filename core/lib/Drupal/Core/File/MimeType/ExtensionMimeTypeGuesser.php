@@ -17,6 +17,7 @@ class ExtensionMimeTypeGuesser implements MimeTypeGuesserInterface {
    *   Array of mimetypes correlated to the extensions that relate to them.
    */
   protected $defaultMapping = [
+    // cspell:disable
     'mimetypes' => [
       0 => 'application/andrew-inset',
       1 => 'application/atom',
@@ -152,6 +153,8 @@ class ExtensionMimeTypeGuesser implements MimeTypeGuesserInterface {
       129 => 'application/x-iphone',
       130 => 'application/x-iso9660-image',
       131 => 'application/x-java-jnlp-file',
+      // Per RFC 9239, text/javascript is preferred over application/javascript.
+      // @see https://www.rfc-editor.org/rfc/rfc9239
       132 => 'text/javascript',
       133 => 'application/x-jmol',
       134 => 'application/x-kchart',
@@ -281,6 +284,7 @@ class ExtensionMimeTypeGuesser implements MimeTypeGuesserInterface {
       251 => 'chemical/x-vmd',
       252 => 'chemical/x-xtel',
       253 => 'chemical/x-xyz',
+      362 => 'image/avif',
       254 => 'image/gif',
       255 => 'image/ief',
       256 => 'image/jpeg',
@@ -864,7 +868,9 @@ class ExtensionMimeTypeGuesser implements MimeTypeGuesserInterface {
       'mjs' => 132,
       'aac' => 360,
       'json' => 361,
+      'avif' => 362,
     ],
+    // cspell:enable
   ];
 
   /**
@@ -905,22 +911,20 @@ class ExtensionMimeTypeGuesser implements MimeTypeGuesserInterface {
     $extension = '';
     $file_parts = explode('.', \Drupal::service('file_system')->basename($path));
 
-    // Remove the first part: a full filename should not match an extension.
-    array_shift($file_parts);
-
-    // Iterate over the file parts, trying to find a match.
-    // For my.awesome.image.jpeg, we try:
-    // - jpeg
-    // - image.jpeg, and
-    // - awesome.image.jpeg
-    while ($additional_part = array_pop($file_parts)) {
-      $extension = strtolower($additional_part . ($extension ? '.' . $extension : ''));
+    // Remove the first part: a full filename should not match an extension,
+    // then iterate over the file parts, trying to find a match.
+    // For 'my.awesome.image.jpeg', we try: 'awesome.image.jpeg', then
+    // 'image.jpeg', then 'jpeg'.
+    // We explicitly check for NULL because that indicates that the array is
+    // empty.
+    while (array_shift($file_parts) !== NULL) {
+      $extension = strtolower(implode('.', $file_parts));
       if (isset($this->mapping['extensions'][$extension])) {
         return $this->mapping['mimetypes'][$this->mapping['extensions'][$extension]];
       }
     }
 
-    return 'application/octet-stream';
+    return NULL;
   }
 
   /**
@@ -929,7 +933,7 @@ class ExtensionMimeTypeGuesser implements MimeTypeGuesserInterface {
    * @param array|null $mapping
    *   Passing a NULL mapping will cause guess() to use self::$defaultMapping.
    */
-  public function setMapping(array $mapping = NULL) {
+  public function setMapping(?array $mapping = NULL) {
     $this->mapping = $mapping;
   }
 

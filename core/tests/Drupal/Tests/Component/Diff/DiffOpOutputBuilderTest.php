@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\Component\Diff;
 
 use Drupal\Component\Diff\DiffOpOutputBuilder;
@@ -24,7 +26,7 @@ class DiffOpOutputBuilderTest extends TestCase {
    *   - An array of strings to change from.
    *   - An array of strings to change to.
    */
-  public function provideTestDiff(): array {
+  public static function provideTestDiff(): array {
     return [
       'empty' => [[], [], []],
       'add' => [[new DiffOpAdd(['a'])], [], ['a']],

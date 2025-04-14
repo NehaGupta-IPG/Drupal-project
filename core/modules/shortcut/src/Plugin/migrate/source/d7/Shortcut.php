@@ -2,7 +2,10 @@
 
 namespace Drupal\shortcut\Plugin\migrate\source\d7;
 
+use Drupal\migrate\Attribute\MigrateSource;
 use Drupal\migrate_drupal\Plugin\migrate\source\DrupalSqlBase;
+
+// cspell:ignore mlid
 
 /**
  * Drupal 7 shortcut links source from database.
@@ -11,12 +14,11 @@ use Drupal\migrate_drupal\Plugin\migrate\source\DrupalSqlBase;
  *
  * @see \Drupal\migrate\Plugin\migrate\source\SqlBase
  * @see \Drupal\migrate\Plugin\migrate\source\SourcePluginBase
- *
- * @MigrateSource(
- *   id = "d7_shortcut",
- *   source_module = "shortcut"
- * )
  */
+#[MigrateSource(
+  id: 'd7_shortcut',
+  source_module: 'shortcut',
+)]
 class Shortcut extends DrupalSqlBase {
 
   /**

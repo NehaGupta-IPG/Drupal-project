@@ -2,9 +2,10 @@
 
 namespace Drupal\field\Plugin\migrate\source\d7;
 
+use Drupal\migrate\Attribute\MigrateSource;
 use Drupal\migrate_drupal\Plugin\migrate\source\DrupalSqlBase;
 
-// cspell:ignore objectid objectindex
+// cspell:ignore objectid objectindex plid textgroup
 
 /**
  * Drupal 7 i18n field label and description source from database.
@@ -13,12 +14,11 @@ use Drupal\migrate_drupal\Plugin\migrate\source\DrupalSqlBase;
  *
  * @see \Drupal\migrate\Plugin\migrate\source\SqlBase
  * @see \Drupal\migrate\Plugin\migrate\source\SourcePluginBase
- *
- * @MigrateSource(
- *   id = "d7_field_instance_label_description_translation",
- *   source_module = "i18n_field"
- * )
  */
+#[MigrateSource(
+  id: 'd7_field_instance_label_description_translation',
+  source_module: 'i18n_field',
+)]
 class FieldLabelDescriptionTranslation extends DrupalSqlBase {
 
   /**

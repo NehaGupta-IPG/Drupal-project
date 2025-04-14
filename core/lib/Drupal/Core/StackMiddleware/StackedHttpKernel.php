@@ -54,7 +54,7 @@ class StackedHttpKernel implements HttpKernelInterface, TerminableInterface {
   /**
    * {@inheritdoc}
    */
-  public function terminate(Request $request, Response $response) {
+  public function terminate(Request $request, Response $response): void {
     $previous = NULL;
     foreach ($this->middlewares as $kernel) {
       // If the previous kernel was terminable we can assume this middleware

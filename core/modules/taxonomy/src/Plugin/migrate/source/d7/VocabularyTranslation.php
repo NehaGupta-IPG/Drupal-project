@@ -2,7 +2,9 @@
 
 namespace Drupal\taxonomy\Plugin\migrate\source\d7;
 
-// cspell:ignore objectid objectindex
+use Drupal\migrate\Attribute\MigrateSource;
+
+// cspell:ignore objectid objectindex plid textgroup
 
 /**
  * Drupal 7 i18n vocabulary translations source from database.
@@ -11,12 +13,11 @@ namespace Drupal\taxonomy\Plugin\migrate\source\d7;
  *
  * @see \Drupal\migrate\Plugin\migrate\source\SqlBase
  * @see \Drupal\migrate\Plugin\migrate\source\SourcePluginBase
- *
- * @MigrateSource(
- *   id = "d7_taxonomy_vocabulary_translation",
- *   source_module = "i18n_taxonomy"
- * )
  */
+#[MigrateSource(
+  id: 'd7_taxonomy_vocabulary_translation',
+  source_module: 'i18n_taxonomy',
+)]
 class VocabularyTranslation extends Vocabulary {
 
   /**

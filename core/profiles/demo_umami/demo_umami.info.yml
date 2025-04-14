@@ -29,7 +29,6 @@ install:
   - dynamic_page_cache
   - taxonomy
   - dblog
-  - sdc
   - search
   - shortcut
   - toolbar
@@ -45,6 +44,7 @@ install:
   - locale
   - config_translation
   - content_translation
+  - announcements_feed
 themes:
   - claro
   - umami

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\Component\Render;
 
 use Drupal\Component\Render\HtmlEscapedText;
@@ -21,7 +23,7 @@ class HtmlEscapedTextTest extends TestCase {
    *
    * @dataProvider providerToString
    */
-  public function testToString($text, $expected, $message) {
+  public function testToString($text, $expected, $message): void {
     $escapable_string = new HtmlEscapedText($text);
     $this->assertEquals($expected, (string) $escapable_string, $message);
     $this->assertEquals($expected, $escapable_string->jsonSerialize());
@@ -58,7 +60,7 @@ class HtmlEscapedTextTest extends TestCase {
   /**
    * @covers ::count
    */
-  public function testCount() {
+  public function testCount(): void {
     $string = 'Can I have a <em>kitten</em>';
     $escapable_string = new HtmlEscapedText($string);
     $this->assertEquals(strlen($string), $escapable_string->count());

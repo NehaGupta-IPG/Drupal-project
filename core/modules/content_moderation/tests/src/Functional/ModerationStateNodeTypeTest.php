@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\content_moderation\Functional;
 
 /**
@@ -20,7 +22,7 @@ class ModerationStateNodeTypeTest extends ModerationStateTestBase {
    * @covers \Drupal\content_moderation\EntityTypeInfo::formAlter
    * @covers \Drupal\content_moderation\Entity\Handler\NodeModerationHandler::enforceRevisionsBundleFormAlter
    */
-  public function testNotModerated() {
+  public function testNotModerated(): void {
     $this->drupalLogin($this->adminUser);
     $this->createContentTypeFromUi('Not moderated', 'not_moderated');
     $this->assertSession()->pageTextContains('The content type Not moderated has been added.');
@@ -39,7 +41,7 @@ class ModerationStateNodeTypeTest extends ModerationStateTestBase {
    * @covers \Drupal\content_moderation\EntityTypeInfo::formAlter
    * @covers \Drupal\content_moderation\Entity\Handler\NodeModerationHandler::enforceRevisionsBundleFormAlter
    */
-  public function testEnablingOnExistingContent() {
+  public function testEnablingOnExistingContent(): void {
     $editor_permissions = [
       'administer workflows',
       'access administration pages',
@@ -105,7 +107,7 @@ class ModerationStateNodeTypeTest extends ModerationStateTestBase {
   /**
    * @covers \Drupal\content_moderation\Entity\Handler\NodeModerationHandler::enforceRevisionsBundleFormAlter
    */
-  public function testEnforceRevisionsEntityFormAlter() {
+  public function testEnforceRevisionsEntityFormAlter(): void {
     $this->drupalLogin($this->adminUser);
     $this->createContentTypeFromUi('Moderated', 'moderated');
 

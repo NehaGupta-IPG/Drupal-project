@@ -166,9 +166,10 @@ class ConfigManager implements ConfigManagerInterface {
     if (!isset($target_name)) {
       $target_name = $source_name;
     }
-    // The output should show configuration object differences formatted as YAML.
-    // But the configuration is not necessarily stored in files. Therefore, they
-    // need to be read and parsed, and lastly, dumped into YAML strings.
+    // The output should show configuration object differences formatted as
+    // YAML. But the configuration is not necessarily stored in files.
+    // Therefore, they need to be read and parsed, and lastly, dumped into YAML
+    // strings.
     $source_data = explode("\n", Yaml::encode($source_storage->read($source_name)));
     $target_data = explode("\n", Yaml::encode($target_storage->read($target_name)));
 
@@ -220,7 +221,17 @@ class ConfigManager implements ConfigManagerInterface {
     // Remove any matching configuration from collections.
     foreach ($this->activeStorage->getAllCollectionNames() as $collection) {
       $collection_storage = $this->activeStorage->createCollection($collection);
-      $collection_storage->deleteAll($name . '.');
+      $overrider = $this->getConfigCollectionInfo()->getOverrideService($collection);
+      foreach ($collection_storage->listAll($name . '.') as $config_name) {
+        if ($overrider) {
+          $config = $overrider->createConfigObject($config_name, $collection);
+        }
+        else {
+          $config = new Config($config_name, $collection_storage, $this->eventDispatcher, $this->typedConfigManager);
+        }
+        $config->initWithData($collection_storage->read($config_name));
+        $config->delete();
+      }
     }
 
     $schema_dir = $this->extensionPathResolver->getPath($type, $name) . '/' . InstallStorage::CONFIG_SCHEMA_DIRECTORY;
@@ -256,7 +267,7 @@ class ConfigManager implements ConfigManagerInterface {
   /**
    * {@inheritdoc}
    */
-  public function findConfigEntityDependencies($type, array $names, ConfigDependencyManager $dependency_manager = NULL) {
+  public function findConfigEntityDependencies($type, array $names, ?ConfigDependencyManager $dependency_manager = NULL) {
     if (!$dependency_manager) {
       $dependency_manager = $this->getConfigDependencyManager();
     }
@@ -270,7 +281,7 @@ class ConfigManager implements ConfigManagerInterface {
   /**
    * {@inheritdoc}
    */
-  public function findConfigEntityDependenciesAsEntities($type, array $names, ConfigDependencyManager $dependency_manager = NULL) {
+  public function findConfigEntityDependenciesAsEntities($type, array $names, ?ConfigDependencyManager $dependency_manager = NULL) {
     $dependencies = $this->findConfigEntityDependencies($type, $names, $dependency_manager);
     $entities = [];
     $definitions = $this->entityTypeManager->getDefinitions();
@@ -391,7 +402,7 @@ class ConfigManager implements ConfigManagerInterface {
   public function getConfigCollectionInfo() {
     if (!isset($this->configCollectionInfo)) {
       $this->configCollectionInfo = new ConfigCollectionInfo();
-      $this->eventDispatcher->dispatch($this->configCollectionInfo, ConfigEvents::COLLECTION_INFO);
+      $this->eventDispatcher->dispatch($this->configCollectionInfo, ConfigCollectionEvents::COLLECTION_INFO);
     }
     return $this->configCollectionInfo;
   }

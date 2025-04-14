@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\ckeditor5\FunctionalJavascript;
 
 // cspell:ignore sourceediting
@@ -8,7 +10,7 @@ use Drupal\ckeditor5\Plugin\Editor\CKEditor5;
 use Drupal\editor\Entity\Editor;
 use Drupal\filter\Entity\FilterFormat;
 use Drupal\Tests\ckeditor5\Traits\CKEditor5TestTrait;
-use Symfony\Component\Validator\ConstraintViolation;
+use Symfony\Component\Validator\ConstraintViolationInterface;
 
 /**
  * @coversDefaultClass \Drupal\ckeditor5\Plugin\CKEditor5Plugin\Style
@@ -22,14 +24,13 @@ class StyleTest extends CKEditor5TestBase {
   /**
    * @covers \Drupal\ckeditor5\Plugin\CKEditor5Plugin\Style::buildConfigurationForm
    */
-  public function testStyleSettingsForm() {
+  public function testStyleSettingsForm(): void {
     $this->drupalLogin($this->drupalCreateUser(['administer filters']));
 
     $page = $this->getSession()->getPage();
     $assert_session = $this->assertSession();
 
     $this->createNewTextFormat($page, $assert_session);
-    $assert_session->assertWaitOnAjaxRequest();
 
     // The Style plugin settings form should not be present.
     $assert_session->elementNotExists('css', '[data-drupal-selector="edit-editor-settings-plugins-ckeditor5-style"]');
@@ -108,8 +109,8 @@ JS;
 
     // The CKEditor 5 module should refuse to allow styles on non-HTML5 tags.
     $assert_session->waitForElement('css', '[role=alert][data-drupal-message-type="error"]:contains("A style can only be specified for an HTML 5 tag. <drupal-media> is not an HTML5 tag.")');
-    // The vertical tab for "Style" settings should not be marked up as the cause
-    // of the error, but only the "Styles" text area in the vertical tab.
+    // The vertical tab for "Style" settings should not be marked up as the
+    // cause of the error, but only the "Styles" text area in the vertical tab.
     $assert_session->elementNotExists('css', '.vertical-tabs__pane[data-ckeditor5-plugin-id="ckeditor5_style"][aria-invalid="true"]');
     $assert_session->elementExists('css', '.vertical-tabs__pane[data-ckeditor5-plugin-id="ckeditor5_style"] textarea[data-drupal-selector="edit-editor-settings-plugins-ckeditor5-style-styles"][aria-invalid="true"]');
 
@@ -150,7 +151,7 @@ JS;
   /**
    * Tests Style functionality: setting a class, expected style choices.
    */
-  public function testStyleFunctionality() {
+  public function testStyleFunctionality(): void {
     FilterFormat::create([
       'format' => 'test_format',
       'name' => 'Test format',
@@ -186,8 +187,11 @@ JS;
             ],
           ],
           'ckeditor5_list' => [
-            'reversed' => FALSE,
-            'startIndex' => FALSE,
+            'properties' => [
+              'reversed' => FALSE,
+              'startIndex' => FALSE,
+            ],
+            'multiBlock' => TRUE,
           ],
           'ckeditor5_sourceEditing' => [
             'allowed_tags' => [
@@ -241,7 +245,7 @@ JS;
       ],
     ])->save();
     $this->assertSame([], array_map(
-      function (ConstraintViolation $v) {
+      function (ConstraintViolationInterface $v) {
         return (string) $v->getMessage();
       },
       iterator_to_array(CKEditor5::validatePair(

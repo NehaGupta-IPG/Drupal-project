@@ -1,11 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\help\Unit;
 
 use Drupal\Core\Cache\Cache;
 use Drupal\help\HelpTopicTwig;
+use Drupal\Tests\Core\Template\StubTwigTemplate;
 use Drupal\Tests\UnitTestCase;
-use Twig\Template;
 use Twig\TemplateWrapper;
 
 /**
@@ -57,7 +59,7 @@ class HelpTopicTwigTest extends UnitTestCase {
    * @covers ::getBody
    * @covers ::getLabel
    */
-  public function testText() {
+  public function testText(): void {
     $this->assertEquals($this->helpTopic->getBody(),
       ['#markup' => self::PLUGIN_INFORMATION['body']]);
     $this->assertEquals($this->helpTopic->getLabel(),
@@ -69,7 +71,7 @@ class HelpTopicTwigTest extends UnitTestCase {
    * @covers ::isTopLevel
    * @covers ::getRelated
    */
-  public function testDefinition() {
+  public function testDefinition(): void {
     $this->assertEquals($this->helpTopic->getProvider(),
       self::PLUGIN_INFORMATION['provider']);
     $this->assertEquals($this->helpTopic->isTopLevel(),
@@ -83,7 +85,7 @@ class HelpTopicTwigTest extends UnitTestCase {
    * @covers ::getCacheTags
    * @covers ::getCacheMaxAge
    */
-  public function testCacheInfo() {
+  public function testCacheInfo(): void {
     $this->assertEquals([], $this->helpTopic->getCacheContexts());
     $this->assertEquals(['core.extension'], $this->helpTopic->getCacheTags());
     $this->assertEquals(Cache::PERMANENT, $this->helpTopic->getCacheMaxAge());
@@ -98,7 +100,12 @@ class HelpTopicTwigTest extends UnitTestCase {
       ->disableOriginalConstructor()
       ->getMock();
 
-    $template = $this->getMockForAbstractClass(Template::class, [$twig], '', TRUE, TRUE, TRUE, ['render']);
+    $template = $this
+      ->getMockBuilder(StubTwigTemplate::class)
+      ->onlyMethods(['render'])
+      ->setConstructorArgs([$twig])
+      ->getMock();
+
     $template
       ->method('render')
       ->willReturn(self::PLUGIN_INFORMATION['body']);

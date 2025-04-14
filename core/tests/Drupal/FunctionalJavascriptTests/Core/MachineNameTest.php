@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\FunctionalJavascriptTests\Core;
 
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
@@ -44,7 +46,7 @@ class MachineNameTest extends WebDriverTestBase {
    * Makes sure that the machine name field automatically provides a valid
    * machine name and that the manual editing mode functions.
    */
-  public function testMachineName() {
+  public function testMachineName(): void {
     // Visit the machine name test page which contains two machine name fields.
     $this->drupalGet('form-test/machine-name');
 

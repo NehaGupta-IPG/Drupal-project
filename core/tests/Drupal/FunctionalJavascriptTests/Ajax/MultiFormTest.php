@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\FunctionalJavascriptTests\Ajax;
 
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
@@ -56,7 +58,7 @@ class MultiFormTest extends WebDriverTestBase {
   /**
    * Tests that pages with the 'node_page_form' included twice work correctly.
    */
-  public function testMultiForm() {
+  public function testMultiForm(): void {
     // HTML IDs for elements within the field are potentially modified with
     // each Ajax submission, but these variables are stable and help target the
     // desired elements.
@@ -72,9 +74,6 @@ class MultiFormTest extends WebDriverTestBase {
     // of field items and "add more" button for the multi-valued field within
     // each form.
     $this->drupalGet('form-test/two-instances-of-same-form');
-
-    // Wait for javascript on the page to prepare the form attributes.
-    $this->assertSession()->assertWaitOnAjaxRequest();
 
     $session = $this->getSession();
     $page = $session->getPage();
@@ -92,7 +91,7 @@ class MultiFormTest extends WebDriverTestBase {
 
     for ($i = 0; $i < 2; $i++) {
       $forms = $page->findAll('xpath', $form_xpath);
-      foreach ($forms as $offset => $form) {
+      foreach ($forms as $form) {
         $button = $form->findButton('Add another item');
         $this->assertNotNull($button, 'Add Another Item button exists');
         $button->press();

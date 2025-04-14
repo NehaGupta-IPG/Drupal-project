@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\FunctionalTests\Installer;
 
 use Drupal\Core\Database\Database;
@@ -23,6 +25,7 @@ class InstallerNonDefaultDatabaseDriverTest extends InstallerTestBase {
 
   /**
    * The name of the test database driver in use.
+   *
    * @var string
    */
   protected $testDriverName;
@@ -30,16 +33,17 @@ class InstallerNonDefaultDatabaseDriverTest extends InstallerTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function setUpSettings() {
+  protected function setUpSettings(): void {
     $driver = Database::getConnection()->driver();
     if (!in_array($driver, ['mysql', 'pgsql'])) {
       $this->markTestSkipped("This test does not support the {$driver} database driver.");
     }
     $driverNamespace = Database::getConnection()->getConnectionOptions()['namespace'];
-    $this->testDriverName = 'Drivertest' . ucfirst($driver);
+    $this->testDriverName = 'DriverTest' . ucfirst($driver);
     $testDriverNamespace = "Drupal\\driver_test\\Driver\\Database\\{$this->testDriverName}";
 
-    // Assert that we are using the database drivers from the driver_test module.
+    // Assert that we are using the database drivers from the driver_test
+    // module.
     $this->assertSession()->elementTextEquals('xpath', '//label[@for="edit-driver-drupaldriver-testdriverdatabasedrivertestmysql"]', 'MySQL by the driver_test module');
     $this->assertSession()->elementTextEquals('xpath', '//label[@for="edit-driver-drupaldriver-testdriverdatabasedrivertestpgsql"]', 'PostgreSQL by the driver_test module');
 
@@ -55,7 +59,7 @@ class InstallerNonDefaultDatabaseDriverTest extends InstallerTestBase {
   /**
    * Confirms that the installation succeeded.
    */
-  public function testInstalled() {
+  public function testInstalled(): void {
     $this->assertSession()->addressEquals('user/1');
     $this->assertSession()->statusCodeEquals(200);
 

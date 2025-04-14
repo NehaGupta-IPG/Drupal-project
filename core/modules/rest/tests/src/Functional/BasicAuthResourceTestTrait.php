@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\rest\Functional;
 
 use Drupal\Core\Url;
@@ -20,7 +22,7 @@ trait BasicAuthResourceTestTrait {
   /**
    * {@inheritdoc}
    */
-  protected function getAuthenticationRequestOptions($method) {
+  protected function getAuthenticationRequestOptions($method): array {
     return [
       'headers' => [
         'Authorization' => 'Basic ' . base64_encode($this->account->name->value . ':' . $this->account->passRaw),

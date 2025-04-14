@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\contextual\FunctionalJavascript;
 
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
@@ -8,6 +10,7 @@ use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
  * Tests edit mode.
  *
  * @group contextual
+ * @group #slow
  */
 class EditModeTest extends WebDriverTestBase {
 
@@ -65,7 +68,7 @@ class EditModeTest extends WebDriverTestBase {
   /**
    * Tests enabling and disabling edit mode.
    */
-  public function testEditModeEnableDisable() {
+  public function testEditModeEnableDisable(): void {
     $web_assert = $this->assertSession();
     $page = $this->getSession()->getPage();
     // Get the page twice to ensure edit mode remains enabled after a new page
@@ -76,7 +79,9 @@ class EditModeTest extends WebDriverTestBase {
 
       // After the page loaded we need to additionally wait until the settings
       // tray Ajax activity is done.
-      $web_assert->assertWaitOnAjaxRequest();
+      if ($page_get_count === 0) {
+        $web_assert->assertWaitOnAjaxRequest();
+      }
 
       if ($page_get_count == 0) {
         $unrestricted_tab_count = $this->getTabbableElementsCount();
@@ -114,7 +119,7 @@ class EditModeTest extends WebDriverTestBase {
   /**
    * Presses the toolbar edit mode.
    */
-  protected function pressToolbarEditButton() {
+  protected function pressToolbarEditButton(): void {
     $edit_button = $this->getSession()->getPage()->find('css', '#toolbar-bar div.contextual-toolbar-tab button');
     $edit_button->press();
   }
@@ -154,7 +159,7 @@ class EditModeTest extends WebDriverTestBase {
    * @return int
    *   The number of tabbable elements.
    */
-  protected function getTabbableElementsCount() {
+  protected function getTabbableElementsCount(): int {
     // Mark all tabbable elements.
     $this->getSession()->executeScript("jQuery(window.tabbable.tabbable(document.body)).attr('data-marked', '');");
     // Count all marked elements.

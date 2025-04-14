@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\config_translation\Unit;
 
 use Drupal\config_translation\ConfigMapperManager;
@@ -70,7 +72,7 @@ class ConfigMapperManagerTest extends UnitTestCase {
    *
    * @dataProvider providerTestHasTranslatable
    */
-  public function testHasTranslatable(TypedDataInterface $element, $expected) {
+  public function testHasTranslatable(TypedDataInterface $element, $expected): void {
     $this->typedConfigManager
       ->expects($this->once())
       ->method('get')

@@ -24,7 +24,7 @@
       /**
        * Create a summary for checkboxes in the provided context.
        *
-       * @param {HTMLDocument|HTMLElement} context
+       * @param {Document|HTMLElement} context
        *   A context where one would find checkboxes to summarize.
        *
        * @return {string}
@@ -78,10 +78,7 @@
   Drupal.behaviors.blockDrag = {
     attach(context, settings) {
       // tableDrag is required and we should be on the blocks admin page.
-      if (
-        typeof Drupal.tableDrag === 'undefined' ||
-        typeof Drupal.tableDrag.blocks === 'undefined'
-      ) {
+      if (typeof Drupal?.tableDrag?.blocks === 'undefined') {
         return;
       }
 

@@ -1,9 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\media\Kernel;
 
 use Drupal\entity_test\Entity\EntityTestBundle;
-use Drupal\Tests\field\Traits\EntityReferenceTestTrait;
+use Drupal\Tests\field\Traits\EntityReferenceFieldCreationTrait;
 
 /**
  * @coversDefaultClass \Drupal\media\Plugin\Field\FieldFormatter\MediaThumbnailFormatter
@@ -11,12 +13,10 @@ use Drupal\Tests\field\Traits\EntityReferenceTestTrait;
  */
 class MediaThumbnailFormatterTest extends MediaKernelTestBase {
 
-  use EntityReferenceTestTrait;
+  use EntityReferenceFieldCreationTrait;
 
   /**
-   * Modules to install.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = [
     'entity_test',
@@ -48,6 +48,7 @@ class MediaThumbnailFormatterTest extends MediaKernelTestBase {
    */
   protected function setUp(): void {
     parent::setUp();
+    $this->installEntitySchema('entity_test_with_bundle');
     // Create an entity bundle that has a media reference field.
     $entity_test_bundle = EntityTestBundle::create([
       'id' => $this->testEntityBundleId,
@@ -90,8 +91,9 @@ class MediaThumbnailFormatterTest extends MediaKernelTestBase {
    * Data provider for testSettingsSummary().
    *
    * @return array[]
+   *   An array of test data.
    */
-  public function providerTestSettingsSummary(): array {
+  public static function providerTestSettingsSummary(): array {
     return [
       'link to content' => [
         [

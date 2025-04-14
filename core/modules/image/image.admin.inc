@@ -2,7 +2,6 @@
 
 /**
  * @file
- * Administration pages for image settings.
  */
 
 use Drupal\Core\Render\Element;
@@ -16,7 +15,7 @@ use Drupal\Core\Render\Element;
  *   An associative array containing:
  *   - style: \Drupal\image\ImageStyleInterface image style being previewed.
  */
-function template_preprocess_image_style_preview(&$variables) {
+function template_preprocess_image_style_preview(&$variables): void {
 
   /** @var \Drupal\Core\File\FileUrlGeneratorInterface $file_url_generator */
   $file_url_generator = \Drupal::service('file_url_generator');
@@ -58,6 +57,11 @@ function template_preprocess_image_style_preview(&$variables) {
     $style->createDerivative($original_path, $preview_file);
   }
   $preview_image = $image_factory->get($preview_file);
+
+  // Generate an itok.
+  $defaultScheme = \Drupal::config('system.file')->get('default_scheme');
+  $variables['itok'] = $style->getPathToken($defaultScheme . '://' . $original_path);
+
   $variables['derivative'] = [
     'url' => $file_url_generator->generateString($preview_file),
     'width' => $preview_image->getWidth(),
@@ -76,7 +80,10 @@ function template_preprocess_image_style_preview(&$variables) {
   $variables['original']['rendered'] = [
     '#theme' => 'image',
     '#uri' => $original_path,
-    '#alt' => t('Sample original image'),
+    '#alt' => t('Source image: @width pixels wide, @height pixels high', [
+      '@width' => $variables['original']['width'],
+      '@height' => $variables['original']['height'],
+    ]),
     '#title' => '',
     '#attributes' => [
       'width' => $variables['original']['width'],
@@ -89,8 +96,11 @@ function template_preprocess_image_style_preview(&$variables) {
   // to prevent caching of images on the client side.
   $variables['derivative']['rendered'] = [
     '#theme' => 'image',
-    '#uri' => $variables['derivative']['url'] . '?cache_bypass=' . $variables['cache_bypass'],
-    '#alt' => t('Sample modified image'),
+    '#uri' => $variables['derivative']['url'] . '?cache_bypass=' . $variables['cache_bypass'] . '&itok=' . $variables['itok'],
+    '#alt' => t('Derivative image: @width pixels wide, @height pixels high', [
+      '@width' => $variables['derivative']['width'],
+      '@height' => $variables['derivative']['height'],
+    ]),
     '#title' => '',
     '#attributes' => [
       'width' => $variables['derivative']['width'],
@@ -110,7 +120,7 @@ function template_preprocess_image_style_preview(&$variables) {
  *   An associative array containing:
  *   - element: An associative array containing the image.
  */
-function template_preprocess_image_anchor(&$variables) {
+function template_preprocess_image_anchor(&$variables): void {
   $element = $variables['element'];
 
   $rows = [];

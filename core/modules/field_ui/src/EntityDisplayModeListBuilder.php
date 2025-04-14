@@ -129,6 +129,9 @@ class EntityDisplayModeListBuilder extends ConfigEntityListBuilder {
         '#type' => 'table',
         '#header' => $this->buildHeader(),
         '#rows' => [],
+        '#attributes' => [
+          'class' => ['display-mode-table'],
+        ],
       ];
       foreach ($entities as $entity) {
         if ($row = $this->buildRow($entity)) {
@@ -158,6 +161,7 @@ class EntityDisplayModeListBuilder extends ConfigEntityListBuilder {
           '#attached' => [
             'library' => [
               'core/drupal.dialog.ajax',
+              'field_ui/drupal.field_ui_table',
             ],
           ],
         ],
@@ -171,7 +175,7 @@ class EntityDisplayModeListBuilder extends ConfigEntityListBuilder {
   /**
    * Filters entities based on their view builder handlers.
    *
-   * @param $entity_type
+   * @param string $entity_type
    *   The entity type of the entity that needs to be validated.
    *
    * @return bool

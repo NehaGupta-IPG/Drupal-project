@@ -1,18 +1,41 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\render_placeholder_message_test;
 
+use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
+use Drupal\Core\Render\RendererInterface;
 use Drupal\Core\Security\TrustedCallbackInterface;
 use Drupal\Core\Render\RenderContext;
-use Symfony\Component\DependencyInjection\ContainerAwareInterface;
-use Symfony\Component\DependencyInjection\ContainerAwareTrait;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
-class RenderPlaceholderMessageTestController implements ContainerAwareInterface, TrustedCallbackInterface {
+/**
+ * Provides a controller for testing render placeholders and message ordering.
+ */
+class RenderPlaceholderMessageTestController implements TrustedCallbackInterface, ContainerInjectionInterface {
 
-  use ContainerAwareTrait;
+  /**
+   * Constructs a new RenderPlaceholderMessageTestController object.
+   *
+   * @param \Drupal\Core\Render\RendererInterface $renderer
+   *   The renderer service.
+   */
+  public function __construct(protected RendererInterface $renderer) {
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function create(ContainerInterface $container) {
+    return new static(
+      $container->get('renderer'),
+    );
+  }
 
   /**
    * @return array
+   *   A renderable array with the messages placeholder rendered first.
    */
   public function messagesPlaceholderFirst() {
     return $this->build([
@@ -26,6 +49,7 @@ class RenderPlaceholderMessageTestController implements ContainerAwareInterface,
 
   /**
    * @return array
+   *   A renderable array with the messages placeholder rendered in the middle.
    */
   public function messagesPlaceholderMiddle() {
     return $this->build([
@@ -39,6 +63,7 @@ class RenderPlaceholderMessageTestController implements ContainerAwareInterface,
 
   /**
    * @return array
+   *   A renderable array with the messages placeholder rendered last.
    */
   public function messagesPlaceholderLast() {
     return $this->build([
@@ -52,6 +77,7 @@ class RenderPlaceholderMessageTestController implements ContainerAwareInterface,
 
   /**
    * @return array
+   *   A renderable array containing only messages.
    */
   public function queuedMessages() {
     return ['#type' => 'status_messages'];
@@ -59,21 +85,27 @@ class RenderPlaceholderMessageTestController implements ContainerAwareInterface,
 
   /**
    * @return array
+   *   A renderable array containing only placeholders.
    */
   protected function build(array $placeholder_order) {
     $build = [];
     $build['messages'] = ['#type' => 'status_messages'];
     $build['p1'] = [
-      '#lazy_builder' => ['\Drupal\render_placeholder_message_test\RenderPlaceholderMessageTestController::setAndLogMessage', ['P1']],
+      '#lazy_builder' => [
+        '\Drupal\render_placeholder_message_test\RenderPlaceholderMessageTestController::setAndLogMessage',
+        ['P1'],
+      ],
       '#create_placeholder' => TRUE,
     ];
     $build['p2'] = [
-      '#lazy_builder' => ['\Drupal\render_placeholder_message_test\RenderPlaceholderMessageTestController::setAndLogMessage', ['P2']],
+      '#lazy_builder' => [
+        '\Drupal\render_placeholder_message_test\RenderPlaceholderMessageTestController::setAndLogMessage',
+        ['P2'],
+      ],
       '#create_placeholder' => TRUE,
     ];
 
-    /** @var \Drupal\Core\Render\RendererInterface $renderer */
-    $renderer = $this->container->get('renderer');
+    $renderer = $this->renderer;
     $renderer->executeInRenderContext(new RenderContext(), function () use (&$build, $renderer) {
       return $renderer->render($build, FALSE);
     });
@@ -88,7 +120,9 @@ class RenderPlaceholderMessageTestController implements ContainerAwareInterface,
   }
 
   /**
-   * #lazy_builder callback; sets and prints a message.
+   * Render API callback: Sets and prints a message.
+   *
+   * This function is assigned as a #lazy_builder callback.
    *
    * @param string $message
    *   The message to send.

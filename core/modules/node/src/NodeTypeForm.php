@@ -204,6 +204,23 @@ class NodeTypeForm extends BundleEntityFormBase {
   /**
    * {@inheritdoc}
    */
+  public function buildEntity(array $form, FormStateInterface $form_state) {
+    /** @var \Drupal\node\NodeTypeInterface $entity */
+    $entity = parent::buildEntity($form, $form_state);
+
+    // The description and help text cannot be empty strings.
+    if (trim($form_state->getValue('description')) === '') {
+      $entity->set('description', NULL);
+    }
+    if (trim($form_state->getValue('help')) === '') {
+      $entity->set('help', NULL);
+    }
+    return $entity;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function save(array $form, FormStateInterface $form_state) {
     $type = $this->entity;
     $type->setNewRevision($form_state->getValue(['options', 'revision']));
@@ -218,7 +235,9 @@ class NodeTypeForm extends BundleEntityFormBase {
       $this->messenger()->addStatus($this->t('The content type %name has been updated.', $t_args));
     }
     elseif ($status == SAVED_NEW) {
-      node_add_body_field($type);
+      if (\Drupal::installProfile() === 'testing') {
+        node_add_body_field($type);
+      }
       $this->messenger()->addStatus($this->t('The content type %name has been added.', $t_args));
       $context = array_merge($t_args, ['link' => $type->toLink($this->t('View'), 'collection')->toString()]);
       $this->logger('node')->notice('Added content type %name.', $context);
