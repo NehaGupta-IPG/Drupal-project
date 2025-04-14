@@ -430,6 +430,7 @@ class User extends ContentEntityBase implements UserInterface {
    * {@inheritdoc}
    */
   public function checkExistingPassword(UserInterface $account_unchanged) {
+    @trigger_error(__FUNCTION__ . '() is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. The correct method is to use UserAuthenticationInterface instead. See https://www.drupal.org/project/drupal/issues/2503113', E_USER_DEPRECATED);
     $existing = $this->get('pass')->existing;
     return $existing !== NULL && strlen($existing) > 0 &&
       \Drupal::service('password')->check(trim($existing), $account_unchanged->getPassword());

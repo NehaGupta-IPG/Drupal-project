@@ -224,6 +224,8 @@ interface UserInterface extends ContentEntityInterface, EntityChangedInterface, 
    * @return bool
    *   TRUE if the correct existing password was provided.
    *
+   * @deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. The correct
+   *   method is to use UserAuthenticationInterface instead.
    * @see UserInterface::setExistingPassword()
    */
   public function checkExistingPassword(UserInterface $account_unchanged);

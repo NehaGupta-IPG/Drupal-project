@@ -85,4 +85,12 @@ class UserAuthentication implements UserAuthInterface, UserAuthenticationInterfa
     return FALSE;
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function checkExistingPassword(UserInterface $account_unchanged) {
+    $existing = $account_unchanged->get('pass')->existing;
+    return $existing !== NULL && strlen($existing) > 0 &&
+      \Drupal::service('password')->check(trim($existing), $account_unchanged->getPassword());
+  }
 }

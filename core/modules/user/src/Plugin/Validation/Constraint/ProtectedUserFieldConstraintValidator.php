@@ -85,7 +85,7 @@ class ProtectedUserFieldConstraintValidator extends ConstraintValidator implemen
         // Compare the values of the field this is being validated on.
         $changed = $items->getValue() != $account_unchanged->get($field->getName())->getValue();
       }
-      if ($changed && (!$account->checkExistingPassword($account_unchanged))) {
+      if ($changed && (!\Drupal::service('user.auth')->checkExistingPassword($account_unchanged))) {
         $this->context->addViolation($constraint->message, ['%name' => $field->getLabel()]);
       }
     }

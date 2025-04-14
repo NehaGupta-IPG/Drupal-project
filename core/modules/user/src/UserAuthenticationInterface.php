@@ -34,4 +34,18 @@ interface UserAuthenticationInterface {
    */
   public function authenticateAccount(UserInterface $account, #[\SensitiveParameter] string $password): bool;
 
+
+  /**
+   * Checks the existing password if set.
+   *
+   * @param \Drupal\user\UserInterface $account_unchanged
+   *   The unchanged user entity to compare against.
+   *
+   * @return bool
+   *   TRUE if the correct existing password was provided.
+   *
+   * @see UserInterface::setExistingPassword()
+   */
+  public function checkExistingPassword(UserInterface $account_unchanged);
+
 }
