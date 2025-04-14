@@ -16,41 +16,20 @@ use Symfony\Component\Validator\ConstraintValidator;
 class ProtectedUserFieldConstraintValidator extends ConstraintValidator implements ContainerInjectionInterface {
 
   /**
-   * User storage handler.
-   *
-   * @var \Drupal\user\UserStorageInterface
-   */
-  protected $userStorage;
-
-  /**
-   * The current user.
-   *
-   * @var \Drupal\Core\Session\AccountProxyInterface
-   */
-  protected $currentUser;
-
-  /**
-   * The user auth service.
-   *
-   * @var \Drupal\user\UserAuthInterface
-   */
-  protected $userAuth;
-
-  /**
    * Constructs the object.
    *
-   * @param \Drupal\user\UserStorageInterface $user_storage
+   * @param \Drupal\user\UserStorageInterface $userStorage
    *   The user storage handler.
-   * @param \Drupal\Core\Session\AccountProxyInterface $current_user
+   * @param \Drupal\Core\Session\AccountProxyInterface $currentUser
    *   The current user.
-   * @param \Drupal\user\UserAuthInterface $user_auth
+   * @param \Drupal\user\UserAuthInterface $userAuth
    *   The user authentication service.
    */
-  public function __construct(UserStorageInterface $user_storage, AccountProxyInterface $current_user, UserAuthInterface $user_auth) {
-    $this->userStorage = $user_storage;
-    $this->currentUser = $current_user;
-    $this->userAuth = $user_auth;
-  }
+  public function __construct(
+    protected UserStorageInterface $userStorage,
+    protected AccountProxyInterface $currentUser,
+    protected UserAuthInterface $userAuth
+  ) {}
 
   /**
    * {@inheritdoc}
