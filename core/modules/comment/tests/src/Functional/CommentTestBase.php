@@ -264,19 +264,6 @@ abstract class CommentTestBase extends BrowserTestBase {
    *   Defaults to 'comment'.
    */
   protected function setCommentPreview($mode, $field_name = 'comment') {
-    switch ($mode) {
-      case DRUPAL_DISABLED:
-        $mode_text = 'disabled';
-        break;
-
-      case DRUPAL_OPTIONAL:
-        $mode_text = 'optional';
-        break;
-
-      case DRUPAL_REQUIRED:
-        $mode_text = 'required';
-        break;
-    }
     $this->setCommentSettings('preview', $mode, NULL, $field_name);
   }
 
