@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\comment\Functional;
 
-use Drupal\comment\CommentManagerInterface;
+use Drupal\comment\CommentMode;
 
 /**
  * Tests comments with node access.
@@ -56,7 +56,7 @@ class CommentNodeAccessTest extends CommentTestBase {
     $this->setCommentPreview(DRUPAL_DISABLED);
     $this->setCommentForm(TRUE);
     $this->setCommentSubject(TRUE);
-    $this->setCommentSettings('default_mode', CommentManagerInterface::COMMENT_MODE_THREADED, 'Comment paging changed.');
+    $this->setCommentSettings('default_mode', CommentMode::Threaded->value, 'Comment paging changed.');
 
     // Post comment.
     $this->drupalLogin($this->webUser);

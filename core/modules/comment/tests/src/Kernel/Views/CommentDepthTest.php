@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\comment\Kernel\Views;
 
-use Drupal\comment\CommentManagerInterface;
+use Drupal\comment\CommentMode;
 use Drupal\entity_test\Entity\EntityTest;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
@@ -59,7 +59,7 @@ class CommentDepthTest extends CommentViewsKernelTestBase {
       'entity_type' => 'entity_test',
       'bundle' => 'entity_test',
       'settings' => [
-        'default_mode' => CommentManagerInterface::COMMENT_MODE_THREADED,
+        'default_mode' => CommentMode::Threaded->value,
       ],
     ]);
     $field_comment->save();

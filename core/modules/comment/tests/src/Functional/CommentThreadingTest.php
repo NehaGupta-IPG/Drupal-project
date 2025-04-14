@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\comment\Functional;
 
-use Drupal\comment\CommentManagerInterface;
+use Drupal\comment\CommentMode;
 
 /**
  * Tests to make sure the comment number increments properly.
@@ -25,7 +25,7 @@ class CommentThreadingTest extends CommentTestBase {
     // Set comments to have a subject with preview disabled.
     $this->setCommentPreview(DRUPAL_DISABLED);
     $this->setCommentForm(FALSE);
-    $this->setCommentSettings('default_mode', CommentManagerInterface::         COMMENT_MODE_THREADED, 'Comment paging changed.');
+    $this->setCommentSettings('default_mode', CommentMode::Threaded->value, 'Comment paging changed.');
 
     // Create a node.
     $this->drupalLogin($this->adminUser);
@@ -51,7 +51,7 @@ class CommentThreadingTest extends CommentTestBase {
     $this->setCommentPreview(DRUPAL_DISABLED);
     $this->setCommentForm(TRUE);
     $this->setCommentSubject(TRUE);
-    $this->setCommentSettings('default_mode', CommentManagerInterface::COMMENT_MODE_THREADED, 'Comment paging changed.');
+    $this->setCommentSettings('default_mode', CommentMode::Threaded->value, 'Comment paging changed.');
 
     // Create a node.
     $this->drupalLogin($this->webUser);

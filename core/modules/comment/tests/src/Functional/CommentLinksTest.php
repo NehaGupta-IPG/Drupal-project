@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\comment\Functional;
 
+use Drupal\comment\CommentMode;
 use Drupal\comment\CommentStatus;
 use Drupal\comment\Plugin\Field\FieldType\CommentItemInterface;
 use Drupal\Core\Language\LanguageInterface;
-use Drupal\comment\CommentManagerInterface;
 use Drupal\user\RoleInterface;
 use Drupal\comment\Entity\Comment;
 
@@ -75,11 +75,11 @@ class CommentLinksTest extends CommentTestBase {
 
     // Tests that reply link is not visible when threading is disabled.
     $this->drupalLogin($this->webUser);
-    $this->setCommentSettings('default_mode', CommentManagerInterface::COMMENT_MODE_FLAT, 'Comment paging changed.');
+    $this->setCommentSettings('default_mode', CommentMode::Flat->value, 'Comment paging changed.');
     $this->drupalGet('node/' . $this->node->id());
     $this->assertSession()->linkNotExists('Reply');
     // Tests that reply link is visible when threading is enabled.
-    $this->setCommentSettings('default_mode', CommentManagerInterface::COMMENT_MODE_THREADED, 'Comment paging changed.');
+    $this->setCommentSettings('default_mode', CommentMode::Threaded->value, 'Comment paging changed.');
     $this->drupalGet('node/' . $this->node->id());
     $this->assertSession()->linkExists('Reply');
 

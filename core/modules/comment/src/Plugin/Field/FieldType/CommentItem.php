@@ -4,7 +4,7 @@ namespace Drupal\comment\Plugin\Field\FieldType;
 
 use Drupal\comment\AnonymousContact;
 use Drupal\comment\CommentFieldItemList;
-use Drupal\comment\CommentManagerInterface;
+use Drupal\comment\CommentMode;
 use Drupal\comment\Entity\CommentType;
 use Drupal\Core\Field\Attribute\FieldType;
 use Drupal\Core\Field\FieldDefinitionInterface;
@@ -44,7 +44,7 @@ class CommentItem extends FieldItemBase implements CommentItemInterface {
    */
   public static function defaultFieldSettings() {
     return [
-      'default_mode' => CommentManagerInterface::COMMENT_MODE_THREADED,
+      'default_mode' => CommentMode::Threaded->value,
       'per_page' => 50,
       'form_location' => CommentItemInterface::FORM_BELOW,
       'anonymous' => AnonymousContact::Forbidden->value,

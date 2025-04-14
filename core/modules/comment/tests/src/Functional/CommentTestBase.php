@@ -335,6 +335,8 @@ abstract class CommentTestBase extends BrowserTestBase {
    * @param string $field_name
    *   (optional) Field name through which the comment should be posted.
    *   Defaults to 'comment'.
+   *
+   * @todo allow passing enums to $value depending on $name.
    */
   protected function setCommentSettings($name, $value, $message, $field_name = 'comment') {
     $field = FieldConfig::loadByName('node', 'article', $field_name);

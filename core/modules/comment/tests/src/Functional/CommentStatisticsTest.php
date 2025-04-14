@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Drupal\Tests\comment\Functional;
 
 use Drupal\comment\AnonymousContact;
-use Drupal\comment\CommentManagerInterface;
+use Drupal\comment\CommentMode;
 use Drupal\comment\Entity\Comment;
 
 /**
@@ -59,7 +59,7 @@ class CommentStatisticsTest extends CommentTestBase {
     $this->setCommentPreview(DRUPAL_DISABLED);
     $this->setCommentForm(TRUE);
     $this->setCommentSubject(FALSE);
-    $this->setCommentSettings('default_mode', CommentManagerInterface::COMMENT_MODE_THREADED, 'Comment paging changed.');
+    $this->setCommentSettings('default_mode', CommentMode::Threaded->value, 'Comment paging changed.');
 
     // Checks the initial values of node comment statistics with no comment.
     $node = $node_storage->load($this->node->id());

@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\comment\Functional;
 
+use Drupal\comment\CommentMode;
 use Drupal\Core\Url;
-use Drupal\comment\CommentManagerInterface;
 use Drupal\comment\Plugin\Field\FieldType\CommentItemInterface;
 use Drupal\comment\Entity\Comment;
 use Drupal\Core\Entity\Entity\EntityViewDisplay;
@@ -40,7 +40,7 @@ class CommentInterfaceTest extends CommentTestBase {
     $this->setCommentPreview(DRUPAL_DISABLED);
     $this->setCommentForm(TRUE);
     $this->setCommentSubject(FALSE);
-    $this->setCommentSettings('default_mode', CommentManagerInterface::COMMENT_MODE_THREADED, 'Comment paging changed.');
+    $this->setCommentSettings('default_mode', CommentMode::Threaded->value, 'Comment paging changed.');
   }
 
   /**

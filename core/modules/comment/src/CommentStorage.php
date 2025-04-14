@@ -120,7 +120,7 @@ class CommentStorage extends SqlContentEntityStorage implements CommentStorageIn
       $query->condition('c1.status', CommentStatus::Published->value);
     }
 
-    if ($comment_mode == CommentManagerInterface::COMMENT_MODE_FLAT) {
+    if ($comment_mode == CommentMode::Flat->value) {
       // For rendering flat comments, cid is used for ordering comments due to
       // unpredictable behavior with timestamp, so we make the same assumption
       // here.
@@ -153,7 +153,7 @@ class CommentStorage extends SqlContentEntityStorage implements CommentStorageIn
       // Only one page of comments.
       $count = 0;
     }
-    elseif ($field->getSetting('default_mode') == CommentManagerInterface::COMMENT_MODE_FLAT) {
+    elseif ($field->getSetting('default_mode') == CommentMode::Flat->value) {
       // Flat comments.
       $count = $total_comments - $new_comments;
     }
@@ -316,7 +316,7 @@ class CommentStorage extends SqlContentEntityStorage implements CommentStorageIn
         $count_query->condition('c.status', CommentStatus::Published->value);
       }
     }
-    if ($mode == CommentManagerInterface::COMMENT_MODE_FLAT) {
+    if ($mode == CommentMode::Flat->value) {
       $query->orderBy('c.cid', 'ASC');
     }
     else {
