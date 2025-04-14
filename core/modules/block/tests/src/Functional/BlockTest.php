@@ -224,7 +224,8 @@ class BlockTest extends BlockTestBase {
     $block['theme'] = $this->config('system.theme')->get('default');
     $block['region'] = 'header';
 
-    // Set block title to confirm that interface works and override any custom titles.
+    // Set block title to confirm that interface works and override any custom
+    // titles.
     $this->drupalGet('admin/structure/block/add/' . $block['id'] . '/' . $block['theme']);
     $this->submitForm([
       'settings[label]' => $block['settings[label]'],
@@ -576,7 +577,7 @@ class BlockTest extends BlockTestBase {
     $this->drupalGet('<front>');
     $this->assertSession()->pageTextNotContains('Hello test world');
 
-    \Drupal::state()->set('test_block_access', TRUE);
+    \Drupal::keyValue('block_test')->set('access', TRUE);
     $this->drupalGet('<front>');
     $this->assertSession()->pageTextContains('Hello test world');
   }

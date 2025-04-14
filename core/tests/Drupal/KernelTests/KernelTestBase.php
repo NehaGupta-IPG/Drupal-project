@@ -26,9 +26,10 @@ use Drupal\Tests\PhpUnitCompatibilityTrait;
 use Drupal\Tests\TestRequirementsTrait;
 use Drupal\TestTools\Comparator\MarkupInterfaceComparator;
 use Drupal\TestTools\Extension\DeprecationBridge\ExpectDeprecationTrait;
+use Drupal\TestTools\Extension\Dump\DebugDump;
 use Drupal\TestTools\Extension\SchemaInspector;
-use Drupal\TestTools\TestVarDumper;
 use PHPUnit\Framework\Attributes\After;
+use PHPUnit\Framework\Attributes\BeforeClass;
 use PHPUnit\Framework\Exception;
 use PHPUnit\Framework\TestCase;
 use Prophecy\PhpUnit\ProphecyTrait;
@@ -84,11 +85,11 @@ use Symfony\Component\VarDumper\VarDumper;
  * Using Symfony's dump() function in Kernel tests will produce output on the
  * command line, whether the call to dump() is in test code or site code.
  *
- * @see \Drupal\Tests\KernelTestBase::$modules
- * @see \Drupal\Tests\KernelTestBase::enableModules()
- * @see \Drupal\Tests\KernelTestBase::installConfig()
- * @see \Drupal\Tests\KernelTestBase::installEntitySchema()
- * @see \Drupal\Tests\KernelTestBase::installSchema()
+ * @see \Drupal\KernelTests\KernelTestBase::$modules
+ * @see \Drupal\KernelTests\KernelTestBase::enableModules()
+ * @see \Drupal\KernelTests\KernelTestBase::installConfig()
+ * @see \Drupal\KernelTests\KernelTestBase::installEntitySchema()
+ * @see \Drupal\KernelTests\KernelTestBase::installSchema()
  * @see \Drupal\Tests\BrowserTestBase
  *
  * @ingroup testing
@@ -106,37 +107,11 @@ abstract class KernelTestBase extends TestCase implements ServiceProviderInterfa
 
   /**
    * {@inheritdoc}
-   *
-   * Back up and restore static class properties that may be changed by tests.
-   *
-   * @see self::runTestInSeparateProcess
-   */
-  protected $backupStaticAttributes = TRUE;
-
-  /**
-   * {@inheritdoc}
    */
   public function __construct(string $name) {
     parent::__construct($name);
     $this->setRunTestInSeparateProcess(TRUE);
   }
-
-  /**
-   * {@inheritdoc}
-   *
-   * Contains a few static class properties for performance.
-   */
-  protected $backupStaticAttributesBlacklist = [
-    // Ignore static discovery/parser caches to speed up tests.
-    'Drupal\Component\Discovery\YamlDiscovery' => ['parsedFiles'],
-    'Drupal\Core\DependencyInjection\YamlFileLoader' => ['yaml'],
-    'Drupal\Core\Extension\ExtensionDiscovery' => ['files'],
-    'Drupal\Core\Extension\InfoParser' => ['parsedInfos'],
-    // Drupal::$container cannot be serialized.
-    'Drupal' => ['container'],
-    // Settings cannot be serialized.
-    'Drupal\Core\Site\Settings' => ['instance'],
-  ];
 
   /**
    * @var \Composer\Autoload\Classloader
@@ -167,8 +142,8 @@ abstract class KernelTestBase extends TestCase implements ServiceProviderInterfa
    *
    * @var array
    *
-   * @see \Drupal\Tests\KernelTestBase::enableModules()
-   * @see \Drupal\Tests\KernelTestBase::bootKernel()
+   * @see \Drupal\KernelTests\KernelTestBase::enableModules()
+   * @see \Drupal\KernelTests\KernelTestBase::bootKernel()
    */
   protected static $modules = [];
 
@@ -235,11 +210,13 @@ abstract class KernelTestBase extends TestCase implements ServiceProviderInterfa
   protected bool $usesSuperUserAccessPolicy;
 
   /**
-   * {@inheritdoc}
+   * Registers the dumper CLI handler when the DebugDump extension is enabled.
    */
-  public static function setUpBeforeClass(): void {
-    parent::setUpBeforeClass();
-    VarDumper::setHandler(TestVarDumper::class . '::cliHandler');
+  #[BeforeClass]
+  public static function setDebugDumpHandler(): void {
+    if (DebugDump::isEnabled()) {
+      VarDumper::setHandler(DebugDump::class . '::cliHandler');
+    }
   }
 
   /**
@@ -322,6 +299,7 @@ abstract class KernelTestBase extends TestCase implements ServiceProviderInterfa
 
   /**
    * @return string
+   *   The database prefix string used to isolate test database tables.
    */
   public function getDatabasePrefix() {
     return $this->databasePrefix;
@@ -511,7 +489,7 @@ abstract class KernelTestBase extends TestCase implements ServiceProviderInterfa
    * @throws \PHPUnit\Framework\Exception
    *   If a module is not available.
    *
-   * @see \Drupal\Tests\KernelTestBase::enableModules()
+   * @see \Drupal\KernelTests\KernelTestBase::enableModules()
    * @see \Drupal\Core\Extension\ModuleHandler::add()
    */
   private function getExtensionsForModules(array $modules): array {
@@ -537,7 +515,7 @@ abstract class KernelTestBase extends TestCase implements ServiceProviderInterfa
    * @param \Drupal\Core\DependencyInjection\ContainerBuilder $container
    *   The service container to enhance.
    *
-   * @see \Drupal\Tests\KernelTestBase::bootKernel()
+   * @see \Drupal\KernelTests\KernelTestBase::bootKernel()
    */
   public function register(ContainerBuilder $container) {
     // Keep the container object around for tests.
@@ -696,6 +674,15 @@ abstract class KernelTestBase extends TestCase implements ServiceProviderInterfa
       }
     }
 
+    // If the test used the regular file system, remove any files created.
+    if (!str_starts_with($this->siteDirectory, 'vfs://')) {
+      // Delete test site directory.
+      $callback = function (string $path) {
+        @chmod($path, 0700);
+      };
+      \Drupal::service('file_system')->deleteRecursive($this->siteDirectory, $callback);
+    }
+
     // Free up memory: Own properties.
     $this->classLoader = NULL;
     $this->vfsRoot = NULL;
@@ -852,20 +839,21 @@ abstract class KernelTestBase extends TestCase implements ServiceProviderInterfa
     // the event dispatcher which can prevent modules from registering events.
     $active_storage = $this->container->get('config.storage');
     $extension_config = $active_storage->read('core.extension');
+    $extensions = $module_handler->getModuleList();
 
     foreach ($modules as $module) {
       if ($module_handler->moduleExists($module)) {
         continue;
       }
-      $module_handler->addModule($module, $module_list[$module]->getPath());
+      $extensions[$module] = $module_list[$module];
       // Maintain the list of enabled modules in configuration.
       $extension_config['module'][$module] = 0;
     }
     $active_storage->write('core.extension', $extension_config);
 
     // Update the kernel to make their services available.
-    $extensions = $module_handler->getModuleList();
     $this->container->get('kernel')->updateModules($extensions, $extensions);
+    $this->container = $this->container->get('kernel')->getContainer();
 
     // Ensure isLoaded() is TRUE in order to make
     // \Drupal\Core\Theme\ThemeManagerInterface::render() work.
@@ -997,6 +985,7 @@ abstract class KernelTestBase extends TestCase implements ServiceProviderInterfa
    *   The fully-qualified class name of this test.
    *
    * @return array
+   *   An array of modules to install.
    */
   private static function getModulesToEnable($class) {
     $modules = [];

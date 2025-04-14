@@ -7,6 +7,9 @@ use Drupal\Component\Serialization\ObjectAwareSerializationInterface;
 use Drupal\Core\Database\Connection;
 use Drupal\Core\Site\Settings;
 
+/**
+ * Defines a default cache backend factory.
+ */
 class DatabaseBackendFactory implements CacheFactoryInterface {
 
   /**
@@ -27,7 +30,7 @@ class DatabaseBackendFactory implements CacheFactoryInterface {
    * Constructs the DatabaseBackendFactory object.
    *
    * @param \Drupal\Core\Database\Connection $connection
-   *   Database connection
+   *   Database connection.
    * @param \Drupal\Core\Cache\CacheTagsChecksumInterface $checksum_provider
    *   The cache tags checksum provider.
    * @param \Drupal\Core\Site\Settings $settings

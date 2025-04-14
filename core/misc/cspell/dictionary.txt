@@ -11,7 +11,6 @@ ajaxing
 allwords
 alphadecimal
 ampm
-anyall
 archiver
 archivers
 arrowrefresh
@@ -31,9 +30,9 @@ autoloaders
 autoloading
 autop
 autoplace
-autoplay
 autoreply
 autosubmit
+avif
 backlink
 bakeware
 barchart
@@ -122,7 +121,6 @@ csslintrc
 csstools
 cweagans
 datelist
-daterange
 datestamp
 datetimeiso
 dburl
@@ -186,7 +184,6 @@ favstar
 fcgi
 fdiv
 fieldapi
-fieldblock
 fieldgroup
 fieldgroups
 fieldnames
@@ -208,7 +205,6 @@ français
 fraîche
 frontpage
 fudgy
-fulldate
 fulltext
 gabilondo
 gids
@@ -216,8 +212,6 @@ gloop
 greeking
 gripsmall
 groupable
-groupby
-groupwise
 guzzlehttp
 hande
 hateoas
@@ -234,6 +228,7 @@ icann
 iconwrap
 idekey
 iframeupload
+imageavif
 imagecache
 indexname
 inglés
@@ -246,7 +241,6 @@ introspectable
 invalidators
 invokable
 isam
-itok
 javascripts
 jessebeach
 jqueryui
@@ -372,6 +366,7 @@ pickable
 pingback
 placeholdered
 placeholdering
+playsinline
 plusthick
 porterstemmer
 postcondition
@@ -386,11 +381,12 @@ prepopulate
 prepopulates
 prepopulating
 prepopulation
-prerender
 prerendered
 presave
-pretransaction
 preuninstall
+prewarmable
+prewarmer
+prewarmers
 prophesize
 protossl
 pseudotag
@@ -445,7 +441,6 @@ shorterthan
 shortlink
 singlebyte
 sirbrillig
-sitename
 sitewide
 slatkin
 smacss
@@ -518,6 +513,7 @@ tablesorts
 tabset
 tabwidth
 tbachert
+tenderwolf
 testbot
 testlogger
 textareas
@@ -562,7 +558,6 @@ unindexed
 uninstallations
 unminified
 unmoderated
-unpromote
 unpublishing
 unrouted
 unsanitized
@@ -571,7 +566,6 @@ unserialized
 unserializes
 unserializing
 unsets
-unsticky
 untabbable
 upcasted
 upcasting
@@ -583,6 +577,7 @@ userinfo
 versionable
 vfsstream
 viewports
+warmable
 wcag
 webcal
 webflo

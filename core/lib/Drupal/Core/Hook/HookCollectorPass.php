@@ -134,7 +134,8 @@ class HookCollectorPass implements CompilerPassInterface {
    * @internal
    *   This method is only used by ModuleHandler.
    *
-   * * @todo Pass only $container when ModuleHandler->add is removed https://www.drupal.org/project/drupal/issues/3481778
+   * @todo Pass only $container when ModuleHandler->add is removed
+   *   https://www.drupal.org/project/drupal/issues/3481778
    */
   public static function collectAllHookImplementations(array $module_filenames, ?ContainerBuilder $container = NULL): static {
     $modules = array_map(fn ($x) => preg_quote($x, '/'), array_keys($module_filenames));
@@ -155,14 +156,14 @@ class HookCollectorPass implements CompilerPassInterface {
   /**
    * Collects procedural and Attribute hook implementations.
    *
-   * @param $dir
+   * @param string $dir
    *   The directory in which the module resides.
-   * @param $module
+   * @param string $module
    *   The name of the module.
-   * @param $module_preg
+   * @param string $module_preg
    *   A regular expression matching every module, longer module names are
    *   matched first.
-   * @param $skip_procedural
+   * @param bool $skip_procedural
    *   Skip the procedural check for the current module.
    */
   protected function collectModuleHookImplementations($dir, $module, $module_preg, bool $skip_procedural): void {
@@ -261,7 +262,8 @@ class HookCollectorPass implements CompilerPassInterface {
    *   The class.
    *
    * @return \Drupal\Core\Hook\Attribute\Hook[]
-   *   An array of Hook attributes on this class. The $method property is guaranteed to be set.
+   *   An array of Hook attributes on this class. The $method property is
+   *   guaranteed to be set.
    */
   protected static function getHookAttributesInClass(string $class): array {
     $reflection_class = new \ReflectionClass($class);
@@ -298,9 +300,9 @@ class HookCollectorPass implements CompilerPassInterface {
    *
    * @param \Drupal\Core\Hook\Attribute\Hook $hook
    *   A hook attribute.
-   * @param $class
+   * @param string $class
    *   The class in which said attribute resides in.
-   * @param $module
+   * @param string $module
    *   The module in which the class resides in.
    */
   protected function addFromAttribute(Hook $hook, $class, $module): void {
@@ -373,8 +375,8 @@ class HookCollectorPass implements CompilerPassInterface {
       'schema',
       'uninstall',
       'update_last_removed',
-      'hook_install_tasks',
-      'hook_install_tasks_alter',
+      'install_tasks',
+      'install_tasks_alter',
     ];
 
     if (in_array($hook->hook, $staticDenyHooks) || preg_match('/^(post_update_|preprocess_|update_\d+$)/', $hook->hook)) {

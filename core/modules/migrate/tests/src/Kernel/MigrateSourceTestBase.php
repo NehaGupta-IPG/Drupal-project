@@ -82,6 +82,7 @@ abstract class MigrateSourceTestBase extends KernelTestBase {
    * Determines the plugin to be tested by reading the class @covers annotation.
    *
    * @return string
+   *   The fully qualified class name of the plugin to be tested.
    */
   protected function getPluginClass() {
     $covers = $this->getTestClassCovers();
@@ -205,5 +206,13 @@ abstract class MigrateSourceTestBase extends KernelTestBase {
       }
     }
   }
+
+  /**
+   * Provides source data for ::testSource.
+   *
+   * @return iterable
+   *   The source data.
+   */
+  abstract public static function providerSource();
 
 }

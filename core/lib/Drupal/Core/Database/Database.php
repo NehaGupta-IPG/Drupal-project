@@ -47,14 +47,15 @@ abstract class Database {
   /**
    * An array of active query log objects.
    *
+   * @var array
    * Every connection has one and only one logger object for all targets and
    * logging keys.
    *
-   * array(
-   *   '$db_key' => DatabaseLog object.
-   * );
-   *
-   * @var array
+   * @code
+   *   [
+   *     '$db_key' => DatabaseLog object.
+   *   ]
+   * @endcode
    */
   protected static $logs = [];
 
@@ -475,9 +476,10 @@ abstract class Database {
   /**
    * Instructs the system to temporarily ignore a given key/target.
    *
-   * At times we need to temporarily disable replica queries. To do so, call this
-   * method with the database key and the target to disable. That database key
-   * will then always fall back to 'default' for that key, even if it's defined.
+   * At times we need to temporarily disable replica queries. To do so, call
+   * this method with the database key and the target to disable. That database
+   * key will then always fall back to 'default' for that key, even if it's
+   * defined.
    *
    * @param string $key
    *   The database connection key.

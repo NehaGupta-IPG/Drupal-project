@@ -1,4 +1,4 @@
-# cspell:ignore cobertura drupaltestbot drupaltestbotpw Dwebdriver logfile testdox XVFB
+# cspell:ignore drupaltestbot drupaltestbotpw Dwebdriver logfile XVFB
 
 stages:
   - 🗜️ Test
@@ -94,8 +94,8 @@ variables:
     SE_NODE_OVERRIDE_MAX_SESSIONS: "true"
     SE_NODE_MAX_SESSIONS: "16"
     SE_SESSION_RETRY_INTERVAL: "1"
-    SE_SESSION_REQUEST_TIMEOUT: "10"
-    SE_START_XVFB: "false"
+    SE_SESSION_REQUEST_TIMEOUT: "60"
+    SE_START_XVFB: "true"
     SE_START_VNC: "false"
 
 .run-tests: &run-tests
@@ -132,7 +132,7 @@ variables:
   allow_failure: true
   services:
     - <<: *with-database
-    - <<: *with-chrome
+    - <<: *with-selenium-chrome
   script:
     - $CI_PROJECT_DIR/.gitlab-ci/scripts/test-only.sh
 
@@ -151,24 +151,14 @@ variables:
     - sed -i "s#$CI_PROJECT_DIR/##" ./sites/default/files/simpletest/phpunit-*.xml || true
     - cp /builds/chromedriver.log ./
 
-'🖱️️️ PHPUnit Functional Javascript (non W3C legacy)':
-  <<: [ *with-composer, *default-job-settings ]
-  parallel: 1
+'👷️️️ PHPUnit Build':
+  <<: [ *with-composer, *run-tests, *default-job-settings ]
   variables:
-    TESTSUITE: PHPUnit-FunctionalJavascript
-    CONCURRENCY: 6
-    KUBERNETES_CPU_REQUEST: "16"
-    MINK_DRIVER_ARGS_WEBDRIVER: $MINK_DRIVER_ARGS_WEBDRIVER_CHROMEDRIVER_NON_W3C
+    TESTSUITE: PHPUnit-Build
+    KUBERNETES_CPU_REQUEST: "8"
+    CONCURRENCY: "5"
   services:
     - <<: *with-database
-    - <<: *with-chrome
-  script:
-    # Run a small subset of tests to prove non W3C testing still works.
-    - sudo -u www-data -E -H php ./core/scripts/run-tests.sh --color --keep-results --types "$TESTSUITE" --concurrency "$CONCURRENCY" --repeat "1" --sqlite "./sites/default/files/tests.sqlite" --dburl $SIMPLETEST_DB --url $SIMPLETEST_BASE_URL --verbose --non-html javascript
-
-  after_script:
-    - sed -i "s#$CI_PROJECT_DIR/##" ./sites/default/files/simpletest/phpunit-*.xml || true
-    - cp /builds/chromedriver.log ./
 
 '🌐️️ PHPUnit Functional':
   <<: [ *with-composer, *run-tests, *default-job-settings ]
@@ -189,51 +179,6 @@ variables:
     CONCURRENCY: 12
   services:
     - <<: *with-database
-
-'👷️️️ PHPUnit Build':
-  <<: [ *with-composer, *run-tests, *default-job-settings ]
-  variables:
-    TESTSUITE: PHPUnit-Build
-    KUBERNETES_CPU_REQUEST: "8"
-    CONCURRENCY: "5"
-  services:
-    - <<: *with-database
-
-'⚡️ PHPUnit Unit':
-  <<: [ *with-composer, *run-tests, *default-job-settings ]
-  variables:
-    TESTSUITE: PHPUnit-Unit
-    KUBERNETES_CPU_REQUEST: "1"
-    CONCURRENCY: 6
-
-'✅️ PHPStan Tests':
-  <<: [ *default-job-settings ]
-  variables:
-    KUBERNETES_CPU_REQUEST: "2"
-  # Run if PHPStan files have changed, or manually.
-  rules:
-    - if: $CI_PIPELINE_SOURCE == "parent_pipeline" && $PERFORMANCE_TEST != "1"
-      changes:
-        - core/tests/PHPStan/*
-        - composer/Metapackage/PinnedDevDependencies/composer.json
-    - when: manual
-      allow_failure: true
-  # Default job settings runs a script that expects vendor to exist.
-  before_script: []
-  script:
-    - docker-php-ext-enable pcov
-    - cd core/tests/PHPStan
-    - composer install
-    - vendor/bin/phpunit tests --testdox --coverage-text --colors=never --coverage-cobertura=coverage.cobertura.xml --log-junit junit.xml
-  # Default job settings runs a script that junit files in a specific location..
-  after_script: []
-  artifacts:
-    when: always
-    reports:
-      junit: core/tests/PHPStan/junit.xml
-      coverage_report:
-        coverage_format: cobertura
-        path: core/tests/PHPStan/coverage.cobertura.xml
 
 '🦉️️️ Nightwatch':
   <<: [ *with-composer-and-yarn, *default-job-settings ]
@@ -271,6 +216,25 @@ variables:
     paths:
       - ./nightwatch_output
       - '*.log'
+
+'🖱️️️ PHPUnit Functional Javascript (non W3C legacy)':
+  <<: [ *with-composer, *default-job-settings ]
+  parallel: 1
+  variables:
+    TESTSUITE: PHPUnit-FunctionalJavascript
+    CONCURRENCY: 6
+    KUBERNETES_CPU_REQUEST: "16"
+    MINK_DRIVER_ARGS_WEBDRIVER: $MINK_DRIVER_ARGS_WEBDRIVER_CHROMEDRIVER_NON_W3C
+  services:
+    - <<: *with-database
+    - <<: *with-chrome
+  script:
+    # Run a small subset of tests to prove non W3C testing still works.
+    - sudo -u www-data -E -H php ./core/scripts/run-tests.sh --color --keep-results --types "$TESTSUITE" --concurrency "$CONCURRENCY" --repeat "1" --sqlite "./sites/default/files/tests.sqlite" --dburl $SIMPLETEST_DB --url $SIMPLETEST_BASE_URL --verbose --non-html javascript
+
+  after_script:
+    - sed -i "s#$CI_PROJECT_DIR/##" ./sites/default/files/simpletest/phpunit-*.xml || true
+    - cp /builds/chromedriver.log ./
 
 '🔁 Repeat Class Test':
   <<: [ *with-composer, *run-repeat-class-test, *default-job-settings ]

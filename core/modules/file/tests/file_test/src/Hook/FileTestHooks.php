@@ -21,11 +21,11 @@ class FileTestHooks {
    * Implements hook_ENTITY_TYPE_load() for file entities.
    */
   #[Hook('file_load')]
-  public function fileLoad($files) {
+  public function fileLoad($files): void {
     foreach ($files as $file) {
       FileTestHelper::logCall('load', [$file->id()]);
-      // Assign a value on the object so that we can test that the $file is passed
-      // by reference.
+      // Assign a value on the object so that we can test that the $file is
+      // passed by reference.
       $file->file_test['loaded'] = TRUE;
     }
   }
@@ -34,11 +34,11 @@ class FileTestHooks {
    * Implements hook_file_download().
    */
   #[Hook('file_download')]
-  public function fileDownload($uri) {
+  public function fileDownload($uri): array|int|null {
     if (\Drupal::state()->get('file_test.allow_all', FALSE)) {
       $files = \Drupal::entityTypeManager()->getStorage('file')->loadByProperties(['uri' => $uri]);
       $file = reset($files);
-      return file_get_content_headers($file);
+      return $file->getDownloadHeaders();
     }
     FileTestHelper::logCall('download', [$uri]);
     return $this->getReturn('download');
@@ -48,7 +48,7 @@ class FileTestHooks {
    * Implements hook_ENTITY_TYPE_insert() for file entities.
    */
   #[Hook('file_insert')]
-  public function fileInsert(File $file) {
+  public function fileInsert(File $file): void {
     FileTestHelper::logCall('insert', [$file->id()]);
   }
 
@@ -56,7 +56,7 @@ class FileTestHooks {
    * Implements hook_ENTITY_TYPE_update() for file entities.
    */
   #[Hook('file_update')]
-  public function fileUpdate(File $file) {
+  public function fileUpdate(File $file): void {
     FileTestHelper::logCall('update', [$file->id()]);
   }
 
@@ -80,7 +80,7 @@ class FileTestHooks {
    * Implements hook_ENTITY_TYPE_predelete() for file entities.
    */
   #[Hook('file_predelete')]
-  public function filePredelete(File $file) {
+  public function filePredelete(File $file): void {
     FileTestHelper::logCall('delete', [$file->id()]);
   }
 
@@ -115,8 +115,8 @@ class FileTestHooks {
         }
         // Clean up Windows paths.
         $path = str_replace('\\', '/', $path);
-        // Serve files with one of the CDN extensions from CDN 1, all others from
-        // CDN 2.
+        // Serve files with one of the CDN extensions from CDN 1, all others
+        // from CDN 2.
         $pathinfo = pathinfo($path);
         if (array_key_exists('extension', $pathinfo) && in_array($pathinfo['extension'], $cdn_extensions)) {
           $uri = FileTestCdn::First->value . '/' . $path;
@@ -146,8 +146,8 @@ class FileTestHooks {
       }
     }
     elseif ($alter_mode == 'protocol-relative') {
-      // Only serve shipped files and public created files with protocol-relative
-      // URLs.
+      // Only serve shipped files and public created files with
+      // protocol-relative URLs.
       $scheme = $stream_wrapper_manager::getScheme($uri);
       if (!$scheme || $scheme == 'public') {
         // Shipped files.
@@ -205,14 +205,14 @@ class FileTestHooks {
    * @param string $op
    *   One of the hook_file_[validate,download] operations.
    *
-   * @return mixed
+   * @return array|int|null
    *   Value set by Drupal\file_test\FileTestHelper::setReturn().
    *
    * @see \Drupal\file_test\FileTestHelper::setReturn()
    * @see Drupal\file_test\FileTestHelper::reset()
    */
-  public function getReturn($op): mixed {
-    $return = \Drupal::state()->get('file_test.return', [$op => NULL]);
+  public function getReturn($op): array|int|null {
+    $return = \Drupal::keyValue('file_test')->get('return', [$op => NULL]);
     return $return[$op];
   }
 

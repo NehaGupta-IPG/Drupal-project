@@ -45,15 +45,15 @@ class LayoutBuilderTestHooks {
    * Implements hook_entity_extra_field_info().
    */
   #[Hook('entity_extra_field_info')]
-  public function entityExtraFieldInfo() {
+  public function entityExtraFieldInfo(): array {
     $extra['node']['bundle_with_section_field']['display']['layout_builder_test'] = [
-      'label' => t('Extra label'),
-      'description' => t('Extra description'),
+      'label' => 'Extra label',
+      'description' => 'Extra description',
       'weight' => 0,
     ];
     $extra['node']['bundle_with_section_field']['display']['layout_builder_test_2'] = [
-      'label' => t('Extra Field 2'),
-      'description' => t('Extra Field 2 description'),
+      'label' => 'Extra Field 2',
+      'description' => 'Extra Field 2 description',
       'weight' => 0,
       'visible' => FALSE,
     ];
@@ -106,7 +106,7 @@ class LayoutBuilderTestHooks {
    * Implements hook_entity_form_display_alter().
    */
   #[Hook('entity_form_display_alter', module: 'layout_builder')]
-  public function layoutBuilderEntityFormDisplayAlter(EntityFormDisplayInterface $form_display, array $context) {
+  public function layoutBuilderEntityFormDisplayAlter(EntityFormDisplayInterface $form_display, array $context): void {
     if ($context['form_mode'] === 'layout_builder') {
       $form_display->setComponent('status', ['type' => 'boolean_checkbox', 'settings' => ['display_label' => TRUE]]);
     }

@@ -461,6 +461,7 @@ class BigPipeTest extends BrowserTestBase {
 
   /**
    * @return \Drupal\big_pipe_test\BigPipePlaceholderTestCase[]
+   *   An array of test cases.
    */
   protected function getTestCases($has_session = TRUE) {
     return BigPipePlaceholderTestCases::cases($this->container, $this->rootUser);
@@ -553,6 +554,31 @@ class BigPipeTest extends BrowserTestBase {
 
     // Check that the <meta> refresh is absent, only one redirect ever happens.
     $this->assertSession()->responseNotContains('<noscript><meta http-equiv="Refresh" content="0; URL=');
+  }
+
+  /**
+   * Tests that response contains cacheability debug comments.
+   */
+  public function testDebugCacheability(): void {
+    $this->drupalLogin($this->rootUser);
+    $this->assertSessionCookieExists('1');
+    $this->assertBigPipeNoJsCookieExists('0');
+
+    // With debug_cacheability_headers enabled.
+    $this->drupalGet(Url::fromRoute('<front>'));
+    $this->assertBigPipeResponseHeadersPresent();
+    $this->assertSession()->responseContains('<!-- big_pipe cache tags:  -->');
+    $this->assertSession()
+      ->responseContains('<!-- big_pipe cache contexts: languages:language_interface theme user.permissions -->');
+
+    // With debug_cacheability_headers disabled.
+    $this->setContainerParameter('http.response.debug_cacheability_headers', FALSE);
+    $this->rebuildContainer();
+    $this->resetAll();
+    $this->drupalGet(Url::fromRoute('<front>'));
+    $this->assertSession()->responseNotContains('<!-- big_pipe cache tags:');
+    $this->assertSession()
+      ->responseNotContains('<!-- big_pipe cache contexts:');
   }
 
 }

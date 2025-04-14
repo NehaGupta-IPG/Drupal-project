@@ -38,6 +38,8 @@ class HtmlTag extends RenderElementBase {
   /**
    * Void elements do not contain values or closing tags.
    *
+   * @var string[]
+   *
    * @see https://www.w3.org/TR/html5/syntax.html#syntax-start-tag
    * @see https://www.w3.org/TR/html5/syntax.html#void-elements
    */
@@ -51,10 +53,9 @@ class HtmlTag extends RenderElementBase {
    * {@inheritdoc}
    */
   public function getInfo() {
-    $class = static::class;
     return [
       '#pre_render' => [
-        [$class, 'preRenderHtmlTag'],
+        [static::class, 'preRenderHtmlTag'],
       ],
       '#attributes' => [],
       '#value' => NULL,

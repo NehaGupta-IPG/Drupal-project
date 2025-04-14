@@ -869,6 +869,11 @@ class LibraryDiscoveryParserTest extends UnitTestCase {
  */
 class TestLibraryDiscoveryParser extends LibraryDiscoveryParser {
 
+  /**
+   * The valid URIs.
+   *
+   * @var array
+   */
   protected $validUris;
 
   protected function fileValidUri($source) {

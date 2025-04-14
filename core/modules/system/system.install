@@ -63,7 +63,7 @@ const DRUPAL_CORE_REMOVED_THEME_LIST = [
 /**
  * Implements hook_requirements().
  */
-function system_requirements($phase) {
+function system_requirements($phase): array {
   global $install_state;
 
   // Get the current default PHP requirements for this version of Drupal.
@@ -94,10 +94,10 @@ function system_requirements($phase) {
       $info = $module_extension_list->getExtensionInfo($profile);
       $requirements['install_profile'] = [
         'title' => t('Installation profile'),
-        'value' => t('%profile_name (%profile-%version)', [
+        'value' => t('%profile_name (%profile%version)', [
           '%profile_name' => $info['name'],
           '%profile' => $profile,
-          '%version' => $info['version'],
+          '%version' => !empty($info['version']) ? '-' . $info['version'] : '',
         ]),
         'severity' => REQUIREMENT_INFO,
         'weight' => -9,
@@ -574,7 +574,7 @@ function system_requirements($phase) {
       'title' => t('Database support for JSON'),
       'severity' => REQUIREMENT_OK,
       'value' => t('Available'),
-      'description' => t('Is required in Drupal 10.0.'),
+      'description' => t('Drupal requires databases that support JSON storage.'),
     ];
 
     if (!Database::getConnection()->hasJson()) {
@@ -870,7 +870,8 @@ function system_requirements($phase) {
       else {
         $error = t('The directory %directory is not writable.', ['%directory' => $directory]);
       }
-      // The files directory requirement check is done only during install and runtime.
+      // The files directory requirement check is done only during install and
+      // runtime.
       if ($phase == 'runtime') {
         $description = t('You may need to set the correct directory at the <a href=":admin-file-system">file system settings page</a> or change the current directory\'s permissions so that it is writable.', [':admin-file-system' => Url::fromRoute('system.file_system_settings')->toString()]);
       }
@@ -992,7 +993,8 @@ function system_requirements($phase) {
     $requirements['update access']['title'] = t('Access to update.php');
   }
 
-  // Display an error if a newly introduced dependency in a module is not resolved.
+  // Display an error if a newly introduced dependency in a module is not
+  // resolved.
   if ($phase === 'update' || $phase === 'runtime') {
     $create_extension_incompatibility_list = function (array $extension_names, PluralTranslatableMarkup $description, PluralTranslatableMarkup $title, TranslatableMarkup|string $message = '', TranslatableMarkup|string $additional_description = '') {
       if ($message === '') {
@@ -1759,4 +1761,25 @@ function system_update_11102(): TranslatableMarkup|null {
     return $equivalent_update->toSkipMessage();
   }
   return NULL;
+}
+
+/**
+ * Add the [alias] field to the {router} table.
+ */
+function system_update_11201(): void {
+  $schema = \Drupal::database()->schema();
+
+  if ($schema->tableExists('router') && !$schema->fieldExists('router', 'alias')) {
+    $spec = [
+      'fields' => [
+        'alias' => [
+          'description' => 'The alias of the route, if applicable.',
+          'type' => 'varchar_ascii',
+          'length' => 255,
+        ],
+      ],
+    ];
+    $schema->addField('router', 'alias', $spec['fields']['alias']);
+    $schema->addIndex('router', 'alias', ['alias'], $spec);
+  }
 }

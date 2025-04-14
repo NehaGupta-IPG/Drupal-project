@@ -30,12 +30,16 @@ class ViewsLocalTaskTest extends UnitTestCase {
   protected $state;
 
   /**
+   * The views storage.
+   *
    * @var \Drupal\Core\Entity\EntityStorageInterface|\PHPUnit\Framework\MockObject\MockObject
    */
   protected $viewStorage;
 
   /**
    * The base definition for the test plugin.
+   *
+   * @var array
    */
   protected $baseDefinition = [
     'class' => '\Drupal\views\Plugin\Menu\LocalTask\ViewsLocalTask',
@@ -388,6 +392,8 @@ class TestViewsLocalTask extends ViewsLocalTask {
 
   /**
    * The view result.
+   *
+   * @var array
    */
   protected $result;
 

@@ -1251,7 +1251,8 @@
  *   https://www.drupal.org/docs/theming-drupal
  * - Modules: Modules add to or alter the behavior and functionality of Drupal,
  *   by using one or more of the methods listed below. For more information
- *   about creating modules, see https://www.drupal.org/docs/creating-custom-modules
+ *   about creating modules, see
+ *   https://www.drupal.org/docs/creating-custom-modules
  * - Installation profiles: Installation profiles can be used to
  *   create distributions, which are complete specific-purpose packages of
  *   Drupal including additional modules, themes, and data. For more
@@ -1632,13 +1633,13 @@
  * - On a method, use the attribute with the hook name:
  *   @code
  *   #[Hook('user_cancel')]
- *   public method userCancel(...)
+ *   public function userCancel(...) {}
  *   @endcode
  * - On a class, specify the method name as well as the hook name:
  *   @code
  *   #[Hook('user_cancel', method: 'userCancel')]
  *   class Hooks {
- *     method userCancel(...) {}
+ *     public function userCancel(...) {}
  *   }
  *   @endcode
  * - On a class with an __invoke method, which is taken to be the hook
@@ -1646,7 +1647,7 @@
  *   @code
  *   #[Hook('user_cancel')]
  *   class Hooks {
- *     method __invoke(...) {}
+ *     public function __invoke(...) {}
  *   }
  *   @endcode
  *
@@ -2052,7 +2053,7 @@ function hook_queue_info_alter(&$queues) {
 }
 
 /**
- * Alter the information provided in \Drupal\Core\Condition\ConditionManager::getDefinitions().
+ * Alter the information provided in ConditionManager::getDefinitions().
  *
  * @param array $definitions
  *   The array of condition definitions.
@@ -2613,9 +2614,8 @@ function hook_validation_constraint_alter(array &$definitions) {
  * Making the expensive service lazy means that the class is only dependent on
  * the proxy service, and not on all the dependencies of the lazy service.
  *
- * To define a service as lazy, add @code lazy: true @endcode to the service
- * definition, and use the @code core/scripts/generate-proxy.sh @endcode script
- * to generate the proxy class.
+ * To define a service as lazy, add "lazy: true" to the service definition, and
+ * use the "core/scripts/generate-proxy.sh" script to generate the proxy class.
  *
  * @see core/scripts/generate-proxy.sh
  */

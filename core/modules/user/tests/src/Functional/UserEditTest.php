@@ -28,7 +28,8 @@ class UserEditTest extends BrowserTestBase {
     $user2 = $this->drupalCreateUser([]);
     $this->drupalLogin($user1);
 
-    // Test that error message appears when attempting to use a non-unique user name.
+    // Test that error message appears when attempting to use a non-unique user
+    // name.
     $edit['name'] = $user2->getAccountName();
     $this->drupalGet("user/" . $user1->id() . "/edit");
     $this->submitForm($edit, 'Save');
@@ -36,7 +37,7 @@ class UserEditTest extends BrowserTestBase {
 
     // Check that the default value in user name field
     // is the raw value and not a formatted one.
-    \Drupal::state()->set('user_hooks_test_user_format_name_alter', TRUE);
+    \Drupal::keyValue('user_hooks_test')->set('user_format_name_alter', TRUE);
     \Drupal::service('module_installer')->install(['user_hooks_test']);
     Cache::invalidateTags(['rendered']);
     $this->drupalGet('user/' . $user1->id() . '/edit');

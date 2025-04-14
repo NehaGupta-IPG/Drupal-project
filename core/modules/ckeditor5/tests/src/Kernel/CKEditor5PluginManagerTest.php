@@ -173,10 +173,10 @@ YAML,
     // static file cache in \Drupal\Core\Extension\ExtensionDiscovery. There is
     // no work-around that allows using both the files on disk and some in vfs.
     // To make matters worse, decorating a service within the test only is not
-    // an option either, because \Drupal\ckeditor5\Plugin\CKEditor5PluginDefinition
-    // is a pure value object, so it uses the global container. Therefore the
-    // only work-around possible is to manipulate the config schema definition
-    // cache.
+    // an option either, because
+    // \Drupal\ckeditor5\Plugin\CKEditor5PluginDefinition is a pure value
+    // object, so it uses the global container. Therefore the only work-around
+    // possible is to manipulate the config schema definition cache.
     // @todo Remove this in https://www.drupal.org/project/drupal/issues/2961541.
     if (isset($additional_files['config']['schema']["$module_name.schema.yml"])) {
       $cache = \Drupal::service('cache.discovery')
@@ -1216,7 +1216,10 @@ PHP,
     $settings['toolbar']['items'][] = 'insertTable';
     $editor->setSettings($settings);
     $plugin_ids = array_keys($this->manager->getEnabledDefinitions($editor));
-    $expected_plugins = array_merge($expected_plugins, ['ckeditor5_table', 'ckeditor5_plugin_conditions_test_plugins_condition']);
+    $expected_plugins = array_merge($expected_plugins, [
+      'ckeditor5_table',
+      'ckeditor5_plugin_conditions_test_plugins_condition',
+    ]);
     sort($expected_plugins);
     $this->assertSame(array_values($expected_plugins), $plugin_ids);
     $expected_libraries = array_merge($default_libraries, [

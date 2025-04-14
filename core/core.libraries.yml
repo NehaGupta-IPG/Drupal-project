@@ -589,6 +589,21 @@ drupal.entity-form:
   dependencies:
     - core/drupal.form
 
+drupal.fieldgroup:
+  version: VERSION
+  css:
+    component:
+      misc/components/fieldgroup.module.css: { weight: -10 }
+  moved_files:
+    system/base:
+      deprecation_version: 11.2.0
+      removed_version: 12.0.0
+      deprecation_link: https://www.drupal.org/node/3432346
+      css:
+        component:
+          css/components/fieldgroup.module.css:
+            base: core/misc/components/fieldgroup.module.css
+
 drupal.form:
   version: VERSION
   js:
@@ -632,6 +647,21 @@ drupal.progress:
     - core/jquery
     - core/drupalSettings
 
+drupal.textarea-resize:
+  version: VERSION
+  css:
+    component:
+      misc/components/resize.module.css: { weight: -10 }
+  moved_files:
+    system/base:
+      deprecation_version: 11.2.0
+      removed_version: 12.0.0
+      deprecation_link: https://www.drupal.org/node/3432346
+      css:
+        component:
+          css/components/resize.module.css:
+            component: misc/components/resize.module.css
+
 drupal.states:
   version: VERSION
   js:
@@ -672,8 +702,8 @@ drupal.tabledrag.ajax:
   js:
     misc/tabledrag-ajax.js: { }
   dependencies:
-    - core/ajax
-    - core/tabledrag
+    - core/drupal.ajax
+    - core/drupal.tabledrag
 
 drupal.tableheader:
   version: VERSION
@@ -756,7 +786,12 @@ jquery:
     url: https://raw.githubusercontent.com/jquery/jquery/4.0.0-beta.2/LICENSE.txt
     gpl-compatible: true
   js:
-    assets/vendor/jquery/jquery.min.js: { minified: true, weight: -20 }
+    # jquery.min.js is explicitly set to preprocess: false to prevent its
+    # inclusion in JavaScript aggregates. This prevents it being duplicated
+    # across different aggregates which can include different combinations of
+    # libraries that depend on jQuery, so that it is only downloaded once per
+    # browser instead of potentially multiple times from different pages.
+    assets/vendor/jquery/jquery.min.js: { preprocess: false, minified: true, weight: -20 }
 
 internal.jquery.form:
   # Internal library. Do not depend on it outside core nor add new core usage.

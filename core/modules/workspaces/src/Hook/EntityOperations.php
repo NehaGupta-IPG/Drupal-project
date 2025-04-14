@@ -8,6 +8,7 @@ use Drupal\Core\Entity\EntityFormInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityPublishedInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
+use Drupal\Core\Entity\Query\QueryInterface;
 use Drupal\Core\Entity\RevisionableInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Hook\Attribute\Hook;
@@ -20,6 +21,11 @@ use Drupal\workspaces\WorkspaceRepositoryInterface;
  * Defines a class for reacting to entity runtime hooks.
  */
 class EntityOperations {
+
+  /**
+   * A list of entity UUIDs that were created as published in a workspace.
+   */
+  protected array $initialPublished = [];
 
   public function __construct(
     protected EntityTypeManagerInterface $entityTypeManager,
@@ -113,11 +119,9 @@ class EntityOperations {
     // - An unpublished default revision in the default ('live') workspace.
     // - A published pending revision in the current workspace.
     if ($entity->isNew() && $entity->isPublished()) {
-      // Keep track of the publishing status in a dynamic property for
-      // ::entityInsert(), then unpublish the default revision.
-      // @todo Remove this dynamic property once we have an API for associating
-      //   temporary data with an entity: https://www.drupal.org/node/2896474.
-      $entity->_initialPublished = TRUE;
+      // Keep track of the initially published entities for ::entityInsert(),
+      // then unpublish the default revision.
+      $this->initialPublished[$entity->uuid()] = TRUE;
       $entity->setUnpublished();
     }
   }
@@ -147,7 +151,7 @@ class EntityOperations {
     // does not 'leak' into the live site. This differs from edits to existing
     // entities where there is already a valid default revision for the live
     // workspace.
-    if (isset($entity->_initialPublished)) {
+    if (isset($this->initialPublished[$entity->uuid()])) {
       // Ensure that the default revision of an entity saved in a workspace is
       // unpublished.
       if ($entity->isPublished()) {
@@ -249,6 +253,32 @@ class EntityOperations {
   public function entityRevisionDelete(EntityInterface $entity): void {
     if ($this->workspaceInfo->isEntityTypeSupported($entity->getEntityType())) {
       $this->workspaceAssociation->deleteAssociations(NULL, $entity->getEntityTypeId(), [$entity->id()], [$entity->getRevisionId()]);
+    }
+  }
+
+  /**
+   * Implements hook_entity_query_tag__TAG_alter() for 'latest_translated_affected_revision'.
+   */
+  #[Hook('entity_query_tag__latest_translated_affected_revision_alter')]
+  public function entityQueryTagLatestTranslatedAffectedRevisionAlter(QueryInterface $query): void {
+    $entity_type = $this->entityTypeManager->getDefinition($query->getEntityTypeId());
+    if (!$this->workspaceInfo->isEntityTypeSupported($entity_type) || !$this->workspaceManager->hasActiveWorkspace()) {
+      return;
+    }
+
+    $active_workspace = $this->workspaceManager->getActiveWorkspace();
+    $tracked_entities = $this->workspaceAssociation->getTrackedEntities($active_workspace->id());
+
+    if (!isset($tracked_entities[$entity_type->id()])) {
+      return;
+    }
+
+    if ($revision_id = array_search($query->getMetaData('entity_id'), $tracked_entities[$entity_type->id()])) {
+      $query->condition($entity_type->getKey('revision'), $revision_id, '<=');
+      $conditions = $query->orConditionGroup();
+      $conditions->condition($entity_type->getRevisionMetadataKey('workspace'), $active_workspace->id());
+      $conditions->condition($entity_type->getRevisionMetadataKey('revision_default'), TRUE);
+      $query->condition($conditions);
     }
   }
 

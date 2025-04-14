@@ -14,7 +14,6 @@ class StatusReport extends RenderElementBase {
    * {@inheritdoc}
    */
   public function getInfo() {
-    $class = static::class;
     return [
       '#theme' => 'status_report_grouped',
       '#priorities' => [
@@ -24,13 +23,15 @@ class StatusReport extends RenderElementBase {
         'ok',
       ],
       '#pre_render' => [
-        [$class, 'preRenderGroupRequirements'],
+        [static::class, 'preRenderGroupRequirements'],
       ],
     ];
   }
 
   /**
-   * #pre_render callback to group requirements.
+   * Render API callback: Groups requirements.
+   *
+   * This function is assigned as a #pre_render callback.
    */
   public static function preRenderGroupRequirements($element) {
     $severities = static::getSeverities();

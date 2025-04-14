@@ -528,9 +528,9 @@ class Registry implements DestructableInterface {
     if ($result) {
       foreach ($result as $hook => $info) {
         // When a theme or engine overrides a module's theme function
-        // $result[$hook] will only contain key/value pairs for information being
-        // overridden.  Pull the rest of the information from what was defined by
-        // an earlier hook.
+        // $result[$hook] will only contain key/value pairs for information
+        // being overridden.  Pull the rest of the information from what was
+        // defined by an earlier hook.
 
         // Fill in the type and path of the module, theme, or engine that
         // implements this theme function.
@@ -591,8 +591,12 @@ class Registry implements DestructableInterface {
           $info['preprocess functions'] = [];
           $prefixes = [];
           if ($type == 'module') {
-            // Default variable preprocessor prefix.
-            $prefixes[] = 'template';
+            // Add template_preprocess_HOOK function, if no initial preprocess
+            // callback is defined.
+            if (empty($info['initial preprocess']) && function_exists('template_preprocess_' . $hook)) {
+              // @todo trigger deprecation in https://www.drupal.org/project/drupal/issues/3513595.
+              $info['preprocess functions'][] = 'template_preprocess_' . $hook;
+            }
             // Add all modules so they can intervene with their own variable
             // preprocessors. This allows them to provide variable preprocessors
             // even if they are not the owner of the current hook.
@@ -720,8 +724,8 @@ class Registry implements DestructableInterface {
     if (isset($cache[$source_hook_name]) && (!isset($cache[$source_hook_name]['incomplete preprocess functions']) || !isset($cache[$destination_hook_name]['incomplete preprocess functions']))) {
       $cache[$destination_hook_name] = $parent_hook + $cache[$source_hook_name];
       if (isset($parent_hook['preprocess functions'])) {
-        $diff = array_diff($parent_hook['preprocess functions'], $cache[$source_hook_name]['preprocess functions']);
-        $cache[$destination_hook_name]['preprocess functions'] = array_merge($cache[$source_hook_name]['preprocess functions'], $diff);
+        $diff = array_diff($parent_hook['preprocess functions'], $cache[$source_hook_name]['preprocess functions'] ?? []);
+        $cache[$destination_hook_name]['preprocess functions'] = array_merge($cache[$source_hook_name]['preprocess functions'] ?? [], $diff);
       }
       // If a base hook isn't set, this is the actual base hook.
       if (!isset($cache[$source_hook_name]['base hook'])) {

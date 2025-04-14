@@ -169,7 +169,8 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
   public function __destruct() {
     if ($this->tableDropped && !empty($this->attachedDatabases)) {
       foreach ($this->attachedDatabases as $prefix) {
-        // Check if the database is now empty, ignore the internal SQLite tables.
+        // Check if the database is now empty, ignore the internal SQLite
+        // tables.
         try {
           $count = $this->query('SELECT COUNT(*) FROM ' . $prefix . '.sqlite_master WHERE type = :type AND name NOT LIKE :pattern', [':type' => 'table', ':pattern' => 'sqlite_%'])->fetchField();
 
@@ -246,7 +247,8 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
    * SQLite compatibility implementation for the LEAST() SQL function.
    */
   public static function sqlFunctionLeast() {
-    // Remove all NULL, FALSE and empty strings values but leaves 0 (zero) values.
+    // Remove all NULL, FALSE and empty strings values but leaves 0 (zero)
+    // values.
     $values = FilterArray::removeEmptyStrings(func_get_args());
 
     return count($values) < 1 ? NULL : min($values);
@@ -412,6 +414,9 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
    */
   public function prepareStatement(string $query, array $options, bool $allow_row_count = FALSE): StatementInterface {
     assert(!isset($options['return']), 'Passing "return" option to prepareStatement() has no effect. See https://www.drupal.org/node/3185520');
+    if (isset($options['fetch']) && is_int($options['fetch'])) {
+      @trigger_error("Passing the 'fetch' key as an integer to \$options in prepareStatement() is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Use a case of \Drupal\Core\Database\FetchAs enum instead. See https://www.drupal.org/node/3488338", E_USER_DEPRECATED);
+    }
 
     try {
       $query = $this->preprocessStatement($query, $options);
@@ -445,12 +450,7 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
     if ($url_components['path'][0] === '/') {
       $url_components['path'] = substr($url_components['path'], 1);
     }
-    if ($url_components['path'][0] === '/' || $url_components['path'] === ':memory:') {
-      $database['database'] = $url_components['path'];
-    }
-    else {
-      $database['database'] = $root . '/' . $url_components['path'];
-    }
+    $database['database'] = $url_components['path'];
 
     // User credentials and system port are irrelevant for SQLite.
     unset(
