@@ -9,6 +9,7 @@ use Drupal\views\Plugin\views\display\DisplayPluginBase;
 use Drupal\views\Plugin\views\PluginBase;
 use Drupal\views\Plugin\views\wizard\WizardInterface;
 use Drupal\views\Render\ViewsRenderPipelineMarkup;
+use Drupal\views\ResultRow;
 use Drupal\views\ViewExecutable;
 
 /**
@@ -700,23 +701,16 @@ abstract class StylePluginBase extends PluginBase {
       $this->view->row_index = 0;
       $field_ids = array_keys($this->view->field);
 
-      // Only tokens relating to field handlers preceding the one we invoke
-      // ::getRenderTokens() on are returned, so here we need to pick the last
-      // available field handler.
-      $render_tokens_field_id = end($field_ids);
-
       // If all fields have a field::access FALSE there might be no fields, so
       // there is no reason to execute this code.
       if (!empty($field_ids)) {
         /** @var \Drupal\views\Plugin\views\cache\CachePluginBase $cache_plugin */
-        $cache_plugin = $this->view->display_handler->getPlugin('cache');
-        $max_age = $cache_plugin->getCacheMaxAge();
 
         /** @var \Drupal\views\ResultRow $row */
         $fibers = [];
         $iterations = 0;
         foreach ($result as $index => $row) {
-          $fibers[$index] = new \Fiber(fn() => $this->renderFieldRow($index, $row, $render_tokens_field_id, $cache_plugin, $max_age, $field_ids));
+          $fibers[$index] = new \Fiber(fn() => $this->renderFieldRow($index, $row, $field_ids));
         }
         while (\count($fibers) > 0) {
           foreach ($fibers as $key => $fiber) {
@@ -752,8 +746,22 @@ abstract class StylePluginBase extends PluginBase {
 
   /**
    * Render an individual field row.
+   *
+   * @param int $index
+   *   The index of this row within the result.
+   * @param Drupal\views\ResultRow $row
+   *   The row to be rendered.
+   * @param array $field_ids
+   *   The field IDs present in this row.
    */
-  protected function renderFieldRow($index, $row, $render_tokens_field_id, $cache_plugin, $max_age, $field_ids): void {
+  protected function renderFieldRow(int $index, ResultRow $row, array $field_ids): void {
+    // Only tokens relating to field handlers preceding the one we invoke
+    // ::getRenderTokens() on are returned, so here we need to pick the last
+    // available field handler.
+    $render_tokens_field_id = end($field_ids);
+
+    $cache_plugin = $this->view->display_handler->getPlugin('cache');
+    $max_age = $cache_plugin->getCacheMaxAge();
     $renderer = $this->getRenderer();
     $this->view->row_index = $index;
 
