@@ -4,6 +4,7 @@ namespace Drupal\comment\Entity;
 
 use Drupal\comment\CommentAccessControlHandler;
 use Drupal\comment\CommentForm;
+use Drupal\comment\CommentStatus;
 use Drupal\comment\CommentStorage;
 use Drupal\comment\CommentStorageSchema;
 use Drupal\comment\CommentTranslationHandler;
@@ -550,7 +551,8 @@ class Comment extends ContentEntityBase implements CommentInterface {
    *   TRUE if the comment should be published, FALSE otherwise.
    */
   public static function getDefaultStatus() {
-    return \Drupal::currentUser()->hasPermission('skip comment approval') ? CommentInterface::PUBLISHED : CommentInterface::NOT_PUBLISHED;
+    // @todo deprecate this function as it's not use anyway in core.
+    return \Drupal::currentUser()->hasPermission('skip comment approval') ? CommentStatus::Published->value : CommentStatus::NotPublished->value;
   }
 
   /**

@@ -14,11 +14,21 @@ interface CommentInterface extends ContentEntityInterface, EntityChangedInterfac
 
   /**
    * Comment is awaiting approval.
+   *
+   * @deprecated in drupal:11.2.0 and is removed from drupal:12.0.0.
+   *   Use \Drupal\comment\CommentStatus::NotPublished instead.
+   *
+   * @see https://www.drupal.org/project/drupal/issues/3518993
    */
   const NOT_PUBLISHED = 0;
 
   /**
    * Comment is published.
+   *
+   * @deprecated in drupal:11.2.0 and is removed from drupal:12.0.0.
+   * Use \Drupal\comment\CommentStatus::Published instead.
+   *
+   * @see https://www.drupal.org/project/drupal/issues/3518993
    */
   const PUBLISHED = 1;
 

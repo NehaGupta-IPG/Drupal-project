@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\comment\Functional;
 
-use Drupal\comment\CommentInterface;
 use Drupal\comment\CommentManagerInterface;
+use Drupal\comment\CommentStatus;
 use Drupal\comment\Entity\Comment;
 use Drupal\comment\Tests\CommentTestTrait;
 use Drupal\Core\Entity\EntityInterface;
@@ -94,7 +94,7 @@ class CommentCacheTagsTest extends EntityWithUriCacheTagsTestBase {
       'entity_id' => $this->entityTestCamelid->id(),
       'entity_type' => 'entity_test',
       'field_name' => 'comment',
-      'status' => CommentInterface::PUBLISHED,
+      'status' => CommentStatus::Published->value,
     ]);
     $comment->save();
 
@@ -127,7 +127,7 @@ class CommentCacheTagsTest extends EntityWithUriCacheTagsTestBase {
       'entity_id' => $this->entityTestHippopotamidae->id(),
       'entity_type' => 'entity_test',
       'field_name' => 'comment',
-      'status' => CommentInterface::PUBLISHED,
+      'status' => CommentStatus::Published->value,
     ]);
     $hippo_comment->save();
 

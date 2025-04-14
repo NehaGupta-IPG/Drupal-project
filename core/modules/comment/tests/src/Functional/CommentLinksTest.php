@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\comment\Functional;
 
+use Drupal\comment\CommentStatus;
 use Drupal\comment\Plugin\Field\FieldType\CommentItemInterface;
 use Drupal\Core\Language\LanguageInterface;
-use Drupal\comment\CommentInterface;
 use Drupal\comment\CommentManagerInterface;
 use Drupal\user\RoleInterface;
 use Drupal\comment\Entity\Comment;
@@ -64,7 +64,7 @@ class CommentLinksTest extends CommentTestBase {
       'field_name' => 'comment',
       'pid' => 0,
       'uid' => 0,
-      'status' => CommentInterface::PUBLISHED,
+      'status' => CommentStatus::Published->value,
       'subject' => $this->randomMachineName(),
       'hostname' => '127.0.0.1',
       'langcode' => LanguageInterface::LANGCODE_NOT_SPECIFIED,

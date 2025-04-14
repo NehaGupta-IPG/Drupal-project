@@ -146,7 +146,7 @@ class CommentForm extends ContentEntityForm {
       if (!$comment->getOwnerId()) {
         $author = $comment->getAuthorName();
       }
-      $status = $comment->isPublished() ? CommentInterface::PUBLISHED : CommentInterface::NOT_PUBLISHED;
+      $status = CommentStatus::fromComment($comment);
       if (empty($comment_preview)) {
         $form['#title'] = $this->t('Edit comment %title', [
           '%title' => $comment->getSubject(),
@@ -154,7 +154,7 @@ class CommentForm extends ContentEntityForm {
       }
     }
     else {
-      $status = ($this->currentUser->hasPermission('skip comment approval') ? CommentInterface::PUBLISHED : CommentInterface::NOT_PUBLISHED);
+      $status = ($this->currentUser->hasPermission('skip comment approval') ? CommentStatus::Published : CommentStatus::NotPublished);
     }
 
     $date = '';
@@ -234,11 +234,8 @@ class CommentForm extends ContentEntityForm {
     $form['author']['status'] = [
       '#type' => 'radios',
       '#title' => $this->t('Status'),
-      '#default_value' => $status,
-      '#options' => [
-        CommentInterface::PUBLISHED => $this->t('Published'),
-        CommentInterface::NOT_PUBLISHED => $this->t('Not published'),
-      ],
+      '#default_value' => $status->value,
+      '#options' => CommentStatus::asOptions(),
       '#access' => $is_admin,
     ];
 

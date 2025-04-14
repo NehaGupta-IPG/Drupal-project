@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\user\Functional;
 
-use Drupal\comment\CommentInterface;
+use Drupal\comment\CommentStatus;
 use Drupal\comment\Entity\Comment;
 use Drupal\comment\Tests\CommentTestTrait;
 use Drupal\language\Entity\ConfigurableLanguage;
@@ -236,7 +236,7 @@ class UserCancelTest extends BrowserTestBase {
       'entity_id' => $node->id(),
       'entity_type' => 'node',
       'field_name' => 'comment',
-      'status' => CommentInterface::PUBLISHED,
+      'status' => CommentStatus::Published->value,
       'uid' => $account->id(),
     ]);
     $comment->save();
@@ -341,7 +341,7 @@ class UserCancelTest extends BrowserTestBase {
       'entity_id' => $node->id(),
       'entity_type' => 'node',
       'field_name' => 'comment',
-      'status' => CommentInterface::PUBLISHED,
+      'status' => CommentStatus::Published->value,
       'uid' => $account->id(),
     ]);
     $comment->save();
@@ -679,13 +679,13 @@ class UserCancelTest extends BrowserTestBase {
       'entity_id' => $node->id(),
       'entity_type' => 'node',
       'field_name' => 'comment',
-      'status' => CommentInterface::PUBLISHED,
+      'status' => CommentStatus::Published->value,
       'uid' => $account->id(),
     ]);
     $comment->save();
     $comment->addTranslation('ur', [
       'subject' => 'ur ' . $comment->label(),
-      'status' => CommentInterface::PUBLISHED,
+      'status' => CommentStatus::Published->value,
     ])->save();
 
     // Attempt to cancel account.

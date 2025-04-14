@@ -2,8 +2,8 @@
 
 namespace Drupal\comment\Plugin\views\field;
 
+use Drupal\comment\CommentStatus;
 use Drupal\Core\Database\Connection;
-use Drupal\comment\CommentInterface;
 use Drupal\Core\Entity\EntityFieldManagerInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Form\FormStateInterface;
@@ -158,7 +158,7 @@ class NodeNewComments extends NumericField {
       $result = $this->database->query("SELECT [n].[nid], COUNT([c].[cid]) AS [num_comments] FROM {node} [n] INNER JOIN {comment_field_data} [c] ON [n].[nid] = [c].[entity_id] AND [c].[entity_type] = 'node' AND [c].[default_langcode] = 1
         LEFT JOIN {history} [h] ON [h].[nid] = [n].[nid] AND [h].[uid] = :h_uid WHERE [n].[nid] IN ( :nids[] )
         AND [c].[changed] > GREATEST(COALESCE([h].[timestamp], :timestamp1), :timestamp2) AND [c].[status] = :status GROUP BY [n].[nid]", [
-          ':status' => CommentInterface::PUBLISHED,
+          ':status' => CommentStatus::Published->value,
           ':h_uid' => $user->id(),
           ':nids[]' => $nids,
           ':timestamp1' => HISTORY_READ_LIMIT,

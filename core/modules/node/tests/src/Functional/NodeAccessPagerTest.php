@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\node\Functional;
 
-use Drupal\comment\CommentInterface;
+use Drupal\comment\CommentStatus;
 use Drupal\comment\Tests\CommentTestTrait;
 use Drupal\comment\Entity\Comment;
 use Drupal\Tests\BrowserTestBase;
@@ -69,7 +69,7 @@ class NodeAccessPagerTest extends BrowserTestBase {
         'comment_body' => [
           ['value' => $this->randomMachineName()],
         ],
-        'status' => CommentInterface::PUBLISHED,
+        'status' => CommentStatus::Published->value,
       ]);
       $comment->save();
     }

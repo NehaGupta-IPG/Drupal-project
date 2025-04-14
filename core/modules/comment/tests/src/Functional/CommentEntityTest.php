@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\comment\Functional;
 
+use Drupal\comment\CommentStatus;
 use Drupal\comment\Entity\CommentType;
 use Drupal\comment\Plugin\Field\FieldType\CommentItemInterface;
 use Drupal\Core\Language\LanguageInterface;
-use Drupal\comment\CommentInterface;
 use Drupal\comment\Entity\Comment;
 use Drupal\Tests\taxonomy\Traits\TaxonomyTestTrait;
 
@@ -90,7 +90,7 @@ class CommentEntityTest extends CommentTestBase {
       'entity_type' => 'taxonomy_term',
       'field_name' => 'field_comment',
       'uid' => $this->webUser->id(),
-      'status' => CommentInterface::PUBLISHED,
+      'status' => CommentStatus::Published->value,
       'subject' => $this->randomMachineName(),
       'language' => LanguageInterface::LANGCODE_NOT_SPECIFIED,
       'comment_body' => [LanguageInterface::LANGCODE_NOT_SPECIFIED => [$this->randomMachineName()]],

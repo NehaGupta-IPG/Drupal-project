@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\comment\Kernel;
 
+use Drupal\comment\CommentStatus;
 use Drupal\comment\Tests\CommentTestTrait;
 use Drupal\Core\Cache\Cache;
-use Drupal\comment\CommentInterface;
 use Drupal\KernelTests\Core\Entity\EntityKernelTestBase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\Session;
@@ -108,7 +108,7 @@ class CommentDefaultFormatterCacheTagsTest extends EntityKernelTestBase {
       'entity_type' => 'entity_test',
       'field_name' => 'comment',
       'comment_type' => 'comment',
-      'status' => CommentInterface::PUBLISHED,
+      'status' => CommentStatus::Published->value,
       'uid' => $user->id(),
     ]);
     $comment->save();
