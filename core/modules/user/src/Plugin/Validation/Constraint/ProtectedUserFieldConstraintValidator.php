@@ -32,7 +32,7 @@ class ProtectedUserFieldConstraintValidator extends ConstraintValidator implemen
   /**
    * The user auth service.
    *
-   * @var \Drupal\User\UserAuthInterface
+   * @var \Drupal\user\UserAuthInterface
    */
   protected $userAuth;
 
