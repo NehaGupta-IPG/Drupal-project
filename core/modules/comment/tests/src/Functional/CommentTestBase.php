@@ -334,9 +334,9 @@ abstract class CommentTestBase extends BrowserTestBase {
    *   (optional) Field name through which the comment should be posted.
    *   Defaults to 'comment'.
    */
-  protected function setCommentSettings($name, $value, $message, $field_name = 'comment') {
-    if ($message != NULL) {
-      @trigger_error('Accessing the $message property is deprecated in drupal:11.1.0 and is removed from drupal:12.0.0. There is no replacement. See https://www.drupal.org/node/3479310', E_USER_DEPRECATED);
+  protected function setCommentSettings($name, $value, $message = NULL, $field_name = 'comment') {
+    if ($message !== NULL) {
+      @trigger_error('Accessing the $message property is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. There is no replacement. See https://www.drupal.org/node/3479310', E_USER_DEPRECATED);
     }
     $field = FieldConfig::loadByName('node', 'article', $field_name);
     $field->setSetting($name, $value);
