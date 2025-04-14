@@ -127,17 +127,15 @@ class UrlHelper {
    *   An array containing query parameters.
    */
   public static function filterQueryParameters(array $query, array $exclude = [], $parent = '') {
-    // If $exclude is empty, there is nothing to filter.
-    if (empty($exclude)) {
-      return $query;
-    }
-    elseif (!$parent) {
-      $exclude = array_flip($exclude);
+    if ($parent === '') {
+      $exclude[] = 'ajax_form';
+      $exclude[] = '_wrapper_format';
+      $exclude = array_flip(array_unique($exclude));
     }
 
     $params = [];
     foreach ($query as $key => $value) {
-      $string_key = ($parent ? $parent . '[' . $key . ']' : $key);
+      $string_key = ($parent === '' ? $key : $parent . '[' . $key . ']');
       if (isset($exclude[$string_key])) {
         continue;
       }
