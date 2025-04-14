@@ -8,10 +8,12 @@ use Drupal\Component\FileCache\ApcuFileCacheBackend;
 use Drupal\Component\FileCache\FileCache;
 use Drupal\Component\FileCache\FileCacheFactory;
 use Drupal\Core\Config\Development\ConfigSchemaChecker;
+use Drupal\Core\Config\Entity\ConfigEntityTypeInterface;
 use Drupal\Core\Database\Database;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\DependencyInjection\ServiceProviderInterface;
 use Drupal\Core\DrupalKernel;
+use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Entity\Sql\SqlEntityStorageInterface;
 use Drupal\Core\Extension\ExtensionDiscovery;
 use Drupal\Core\KeyValueStore\KeyValueMemoryFactory;
@@ -780,16 +782,13 @@ abstract class KernelTestBase extends TestCase implements ServiceProviderInterfa
    *
    * @param string $entity_type_id
    *   The ID of the entity type.
-   *
-   * @deprecated in drupal:10.1.0 and is removed from drupal:12.0.0. There is no
-   *    replacement.
-   *
-   * @see https://www.drupal.org/project/drupal/issues/3343518
    */
   protected function installEntitySchema($entity_type_id) {
-    @trigger_error(__FUNCTION__ . '() is deprecated in drupal:10.1.0 and is removed from drupal:12.0.0. There is no replacement. See https://www.drupal.org/project/drupal/issues/3343518', E_USER_DEPRECATED);
     $entity_type_manager = \Drupal::entityTypeManager();
     $entity_type = $entity_type_manager->getDefinition($entity_type_id);
+    if ($entity_type instanceof ConfigEntityTypeInterface) {
+      @trigger_error(__FUNCTION__ . '() is deprecated in drupal:10.1.0 and is removed from drupal:12.0.0. There is no replacement. See https://www.drupal.org/project/drupal/issues/3343518', E_USER_DEPRECATED);
+    }
     \Drupal::service('entity_type.listener')->onEntityTypeCreate($entity_type);
 
     // For test runs, the most common storage backend is a SQL database. For
