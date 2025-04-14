@@ -42,8 +42,6 @@ class CommentBlockTest extends CommentTestBase {
 
   /**
    * Tests the recent comments block.
-   *
-   * @group legacy
    */
   public function testRecentCommentBlock(): void {
     $this->drupalLogin($this->adminUser);
@@ -88,7 +86,6 @@ class CommentBlockTest extends CommentTestBase {
 
     // Test that links to comments work when comments are across pages.
     $this->setCommentsPerPage(1);
-    $this->expectDeprecation('Accessing the $message property is deprecated in drupal:11.1.0 and is removed from drupal:12.0.0. There is no replacement. See https://www.drupal.org/node/3479310');
 
     for ($i = 0; $i < 10; $i++) {
       $this->clickLink($comments[$i]->getSubject());

@@ -34,8 +34,6 @@ class CommentAdminTest extends CommentTestBase {
 
   /**
    * Tests comment approval functionality through admin/content/comment.
-   *
-   * @group legacy
    */
   public function testApprovalAdminInterface(): void {
     // Set anonymous comments to require approval.
@@ -47,7 +45,6 @@ class CommentAdminTest extends CommentTestBase {
     $this->drupalLogin($this->adminUser);
     // Ensure that doesn't require contact info.
     $this->setCommentAnonymous(CommentInterface::ANONYMOUS_MAYNOT_CONTACT);
-    $this->expectDeprecation('Accessing the $message property is deprecated in drupal:11.1.0 and is removed from drupal:12.0.0. There is no replacement. See https://www.drupal.org/node/3479310');
 
     // Test that the comments page loads correctly when there are no comments
     $this->drupalGet('admin/content/comment');
@@ -130,8 +127,6 @@ class CommentAdminTest extends CommentTestBase {
 
   /**
    * Tests comment approval functionality through the node interface.
-   *
-   * @group legacy
    */
   public function testApprovalNodeInterface(): void {
     // Set anonymous comments to require approval.
@@ -142,7 +137,6 @@ class CommentAdminTest extends CommentTestBase {
     ]);
     // Ensure that doesn't require contact info.
     $this->setCommentAnonymous(CommentInterface::ANONYMOUS_MAYNOT_CONTACT);
-    $this->expectDeprecation('Accessing the $message property is deprecated in drupal:11.1.0 and is removed from drupal:12.0.0. There is no replacement. See https://www.drupal.org/node/3479310');
 
     // Post anonymous comment without contact info.
     $subject = $this->randomMachineName();
@@ -208,8 +202,6 @@ class CommentAdminTest extends CommentTestBase {
 
   /**
    * Tests editing a comment as an admin.
-   *
-   * @group legacy
    */
   public function testEditComment(): void {
     // Enable anonymous user comments.
@@ -229,7 +221,6 @@ class CommentAdminTest extends CommentTestBase {
     // Post anonymous comment.
     // Ensure that we need email id before posting comment.
     $this->setCommentAnonymous(CommentInterface::ANONYMOUS_MUST_CONTACT);
-    $this->expectDeprecation('Accessing the $message property is deprecated in drupal:11.1.0 and is removed from drupal:12.0.0. There is no replacement. See https://www.drupal.org/node/3479310');
 
     // Post comment with contact info (required).
     $author_name = $this->randomMachineName();
@@ -252,8 +243,6 @@ class CommentAdminTest extends CommentTestBase {
 
   /**
    * Tests commented translation deletion admin view.
-   *
-   * @group legacy
    */
   public function testCommentedTranslationDeletion(): void {
     \Drupal::service('module_installer')->install([
@@ -267,8 +256,6 @@ class CommentAdminTest extends CommentTestBase {
     $this->rebuildContainer();
     // Ensure that doesn't require contact info.
     $this->setCommentAnonymous(CommentInterface::ANONYMOUS_MAYNOT_CONTACT);
-    $this->expectDeprecation('Accessing the $message property is deprecated in drupal:11.1.0 and is removed from drupal:12.0.0. There is no replacement. See https://www.drupal.org/node/3479310');
-
     $this->drupalLogin($this->webUser);
     $count_query = \Drupal::entityTypeManager()
       ->getStorage('comment')
