@@ -303,6 +303,8 @@ abstract class CommentTestBase extends BrowserTestBase {
    *   - 0: No contact information allowed.
    *   - 1: Contact information allowed but not required.
    *   - 2: Contact information required.
+   *
+   * @todo deprecate int param and use AnonymousContact enum instead.
    */
   protected function setCommentAnonymous($level) {
     $this->setCommentSettings('anonymous', $level, new FormattableMarkup('Anonymous commenting set to level @level.', ['@level' => $level]));

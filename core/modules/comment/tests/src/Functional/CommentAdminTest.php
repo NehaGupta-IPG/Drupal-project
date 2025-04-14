@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\comment\Functional;
 
-use Drupal\comment\CommentInterface;
+use Drupal\comment\AnonymousContact;
 use Drupal\Component\Render\FormattableMarkup;
 use Drupal\Component\Utility\Html;
 use Drupal\language\Entity\ConfigurableLanguage;
@@ -44,7 +44,7 @@ class CommentAdminTest extends CommentTestBase {
     ]);
     $this->drupalLogin($this->adminUser);
     // Ensure that doesn't require contact info.
-    $this->setCommentAnonymous(CommentInterface::ANONYMOUS_MAYNOT_CONTACT);
+    $this->setCommentAnonymous(AnonymousContact::Forbidden->value);
 
     // Test that the comments page loads correctly when there are no comments
     $this->drupalGet('admin/content/comment');
@@ -136,7 +136,7 @@ class CommentAdminTest extends CommentTestBase {
       'skip comment approval' => FALSE,
     ]);
     // Ensure that doesn't require contact info.
-    $this->setCommentAnonymous(CommentInterface::ANONYMOUS_MAYNOT_CONTACT);
+    $this->setCommentAnonymous(AnonymousContact::Forbidden->value);
 
     // Post anonymous comment without contact info.
     $subject = $this->randomMachineName();
@@ -220,7 +220,7 @@ class CommentAdminTest extends CommentTestBase {
 
     // Post anonymous comment.
     // Ensure that we need email id before posting comment.
-    $this->setCommentAnonymous(CommentInterface::ANONYMOUS_MUST_CONTACT);
+    $this->setCommentAnonymous(AnonymousContact::Required->value);
 
     // Post comment with contact info (required).
     $author_name = $this->randomMachineName();
@@ -255,7 +255,7 @@ class CommentAdminTest extends CommentTestBase {
     // Rebuild the container to update the default language container variable.
     $this->rebuildContainer();
     // Ensure that doesn't require contact info.
-    $this->setCommentAnonymous(CommentInterface::ANONYMOUS_MAYNOT_CONTACT);
+    $this->setCommentAnonymous(AnonymousContact::Forbidden->value);
     $this->drupalLogin($this->webUser);
     $count_query = \Drupal::entityTypeManager()
       ->getStorage('comment')
