@@ -93,4 +93,5 @@ class UserAuthentication implements UserAuthInterface, UserAuthenticationInterfa
     return $existing !== NULL && strlen($existing) > 0 &&
       \Drupal::service('password')->check(trim($existing), $account_unchanged->getPassword());
   }
+
 }

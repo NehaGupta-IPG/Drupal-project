@@ -34,7 +34,6 @@ interface UserAuthenticationInterface {
    */
   public function authenticateAccount(UserInterface $account, #[\SensitiveParameter] string $password): bool;
 
-
   /**
    * Checks the existing password if set.
    *
