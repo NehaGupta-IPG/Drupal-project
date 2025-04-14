@@ -3167,6 +3167,9 @@ class SqlContentEntityStorageSchema implements DynamicallyFieldableEntityStorage
       elseif ($info['type'] === 'float') {
         return (float) $value;
       }
+      elseif ($info['type'] === 'bool') {
+        return (bool) $value;
+      }
       return (string) $value;
     }
 

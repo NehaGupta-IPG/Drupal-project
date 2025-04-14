@@ -1760,6 +1760,17 @@ class SqlContentEntityStorage extends ContentEntityStorageBase implements SqlEnt
           $fields[$this->revisionKey] = (int) $current_revision_id;
         }
 
+        // Remove changes to fields in the base table, when the entity update
+        // is not adding a new revision.
+        if (!$is_default_revision && $this->entityType->isRevisionable()) {
+          $table_mapping = $this->getTableMapping();
+          foreach ($table_mapping->getFieldNames($this->baseTable) as $field_name) {
+            if (!in_array($field_name, [$this->idKey, $this->revisionKey, $this->uuidKey], TRUE)) {
+              unset($fields[$field_name]);
+            }
+          }
+        }
+
         $query->fields($fields);
         $query->execute();
 
