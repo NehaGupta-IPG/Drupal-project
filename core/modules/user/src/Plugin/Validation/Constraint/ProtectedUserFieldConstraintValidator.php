@@ -30,7 +30,7 @@ class ProtectedUserFieldConstraintValidator extends ConstraintValidator implemen
   protected $currentUser;
 
   /**
-   * The current user.
+   * The user auth service.
    *
    * @var \Drupal\User\UserAuthInterface
    */
@@ -43,8 +43,8 @@ class ProtectedUserFieldConstraintValidator extends ConstraintValidator implemen
    *   The user storage handler.
    * @param \Drupal\Core\Session\AccountProxyInterface $current_user
    *   The current user.
-   * @param \Drupal\User\UserAuthInterface $userAuth
-   *   The user auth service.
+   * @param \Drupal\user\UserAuthInterface $user_auth
+   *   The user authentication service.
    */
   public function __construct(UserStorageInterface $user_storage, AccountProxyInterface $current_user, UserAuthInterface $user_auth) {
     $this->userStorage = $user_storage;
