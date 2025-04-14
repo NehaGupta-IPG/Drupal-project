@@ -20,12 +20,10 @@ class ProtectedUserFieldConstraintValidatorTest extends UnitTestCase {
    * {@inheritdoc}
    */
   protected function createValidator() {
-    // Setup mocks that don't need to change.
     $unchanged_field = $this->createMock('Drupal\Core\Field\FieldItemListInterface');
     $unchanged_field->expects($this->any())
       ->method('getValue')
       ->willReturn('unchanged-value');
-
     $unchanged_account = $this->createMock('Drupal\user\UserInterface');
     $unchanged_account->expects($this->any())
       ->method('get')
@@ -38,7 +36,8 @@ class ProtectedUserFieldConstraintValidatorTest extends UnitTestCase {
     $current_user->expects($this->any())
       ->method('id')
       ->willReturn('current-user');
-    return new ProtectedUserFieldConstraintValidator($user_storage, $current_user);
+    $user_auth = $this->createMock('Drupal\user\UserAuthInterface');
+    return new ProtectedUserFieldConstraintValidator($user_storage, $current_user, $user_auth);
   }
 
   /**

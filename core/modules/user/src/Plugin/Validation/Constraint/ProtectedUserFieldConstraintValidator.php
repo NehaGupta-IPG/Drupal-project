@@ -44,7 +44,7 @@ class ProtectedUserFieldConstraintValidator extends ConstraintValidator implemen
    * @param \Drupal\Core\Session\AccountProxyInterface $current_user
    *   The current user.
    * @param \Drupal\User\UserAuthInterface $userAuth
-   *    The current user.
+   *   The user auth service.
    */
   public function __construct(UserStorageInterface $user_storage, AccountProxyInterface $current_user, UserAuthInterface $user_auth) {
     $this->userStorage = $user_storage;
