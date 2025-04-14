@@ -13,7 +13,6 @@ use Drupal\Core\Database\Database;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\DependencyInjection\ServiceProviderInterface;
 use Drupal\Core\DrupalKernel;
-use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Entity\Sql\SqlEntityStorageInterface;
 use Drupal\Core\Extension\ExtensionDiscovery;
 use Drupal\Core\KeyValueStore\KeyValueMemoryFactory;
