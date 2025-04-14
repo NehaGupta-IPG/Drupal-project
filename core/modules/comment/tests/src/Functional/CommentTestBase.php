@@ -278,7 +278,7 @@ abstract class CommentTestBase extends BrowserTestBase {
    *   Defaults to 'comment'.
    */
   protected function setCommentForm($enabled, $field_name = 'comment') {
-    $this->setCommentSettings('form_location', ($enabled ? CommentItemInterface::FORM_BELOW : CommentItemInterface::FORM_SEPARATE_PAGE), 'Comment controls ' . ($enabled ? 'enabled' : 'disabled') . '.', $field_name);
+    $this->setCommentSettings('form_location', ($enabled ? CommentItemInterface::FORM_BELOW : CommentItemInterface::FORM_SEPARATE_PAGE), NULL, $field_name);
   }
 
   /**
