@@ -71,7 +71,6 @@ class State extends CacheCollector implements StateInterface {
     // On a cache miss, load all records from the key value store to avoid
     // individual lookups.
     if ($this->allRecords === NULL) {
-      $initial_lookup = TRUE;
       $this->allRecords = $this->keyValueStore->getAll() ?? [];
       $value = $this->allRecords[$key] ?? NULL;
     }
