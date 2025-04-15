@@ -53,7 +53,6 @@ class MediaLibraryAccessTest extends KernelTestBase {
     $this->installEntitySchema('file');
     $this->installSchema('file', 'file_usage');
     $this->installEntitySchema('entity_test_with_bundle');
-    $this->installEntitySchema('filter_format');
     $this->installEntitySchema('media');
     $this->installConfig([
       'field',

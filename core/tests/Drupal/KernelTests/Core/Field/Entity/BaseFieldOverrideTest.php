@@ -30,7 +30,6 @@ class BaseFieldOverrideTest extends KernelTestBase {
    */
   protected function setUp(): void {
     parent::setUp();
-    $this->installEntitySchema('base_field_override');
   }
 
   /**

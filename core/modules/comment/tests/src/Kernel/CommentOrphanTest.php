@@ -29,7 +29,6 @@ class CommentOrphanTest extends EntityKernelTestBase {
   protected function setUp(): void {
     parent::setUp();
     $this->installConfig(['user']);
-    $this->installEntitySchema('date_format');
     $this->installEntitySchema('comment');
     $this->installSchema('comment', ['comment_entity_statistics']);
   }

@@ -63,7 +63,6 @@ class EntityReferenceRelationshipTest extends ViewsKernelTestBase {
     parent::setUp();
 
     $this->installEntitySchema('user');
-    $this->installEntitySchema('user_role');
     $this->installEntitySchema('entity_test');
     $this->installEntitySchema('entity_test_mul');
     $this->installEntitySchema('entity_test_mul_changed');

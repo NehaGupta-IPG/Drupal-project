@@ -41,7 +41,6 @@ class EntityUrlLanguageTest extends LanguageTestBase {
     parent::setUp();
 
     $this->installEntitySchema('entity_test');
-    $this->installEntitySchema('configurable_language');
 
     // In order to reflect the changes for a multilingual site in the container
     // we have to rebuild it.
