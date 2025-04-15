@@ -31,6 +31,11 @@ class State extends CacheCollector implements StateInterface {
   protected $keyValueStore;
 
   /**
+   * All of the key/value state records.
+   */
+  protected array $allRecords = [];
+
+  /**
    * Constructs a State object.
    *
    * @param \Drupal\Core\KeyValueStore\KeyValueFactoryInterface $key_value_factory
@@ -63,7 +68,10 @@ class State extends CacheCollector implements StateInterface {
    * {@inheritdoc}
    */
   protected function resolveCacheMiss($key) {
-    $value = $this->keyValueStore->get($key);
+    if (empty($this->allRecords)) {
+      $this->allRecords = $this->keyValueStore->getAll();
+    }
+    $value = $this->allRecords[$key] ?? NULL;
     $this->storage[$key] = $value;
     $this->persist($key);
     return $value;
@@ -91,6 +99,7 @@ class State extends CacheCollector implements StateInterface {
       $key = self::$deprecatedState[$key]['replacement'];
     }
     $this->keyValueStore->set($key, $value);
+    unset($this->allRecords[$key]);
     // If another request had a cache miss before this request, and also hasn't
     // written to cache yet, then it may already have read this value from the
     // database and could write that value to the cache to the end of the
@@ -108,6 +117,7 @@ class State extends CacheCollector implements StateInterface {
   public function setMultiple(array $data) {
     $this->keyValueStore->setMultiple($data);
     foreach ($data as $key => $value) {
+      unset($this->allRecords[$key]);
       parent::set($key, $value);
       $this->persist($key);
     }
