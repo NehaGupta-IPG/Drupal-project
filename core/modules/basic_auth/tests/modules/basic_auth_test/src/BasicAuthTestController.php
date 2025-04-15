@@ -13,20 +13,6 @@ use Drupal\Core\State\StateInterface;
 class BasicAuthTestController {
 
   /**
-   * The state storage service.
-   *
-   * @var \Drupal\Core\State\StateInterface
-   */
-  private $state;
-
-  /**
-   * The page cache kill switch service.
-   *
-   * @var \Drupal\Core\PageCache\ResponsePolicy\ResponsePolicyInterface
-   */
-  private $pageCacheKillSwitch;
-
-  /**
    * Constructs a new BasicAuthTestController object.
    *
    * @param \Drupal\Core\State\StateInterface $state
@@ -34,10 +20,10 @@ class BasicAuthTestController {
    * @param \Drupal\Core\PageCache\ResponsePolicy\ResponsePolicyInterface $pageCacheKillSwitch
    *   The page cache kill switch service.
    */
-  public function __construct(StateInterface $state, ResponsePolicyInterface $pageCacheKillSwitch) {
-    $this->state = $state;
-    $this->pageCacheKillSwitch = $pageCacheKillSwitch;
-  }
+  public function __construct(
+    private StateInterface $state,
+    private ResponsePolicyInterface $pageCacheKillSwitch
+  ) {}
 
   /**
    * @see \Drupal\basic_auth\Tests\Authentication\BasicAuthTest::testControllerNotCalledBeforeAuth()
