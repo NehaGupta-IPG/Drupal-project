@@ -55,7 +55,7 @@ class JsonApiRegressionTest extends JsonApiFunctionalTestBase {
     // Set up data model.
     $this->assertTrue($this->container->get('module_installer')->install(['comment'], TRUE), 'Installed modules.');
     $this->addDefaultCommentField('node', 'article');
-    $this->addDefaultCommentField('taxonomy_term', 'tags', 'comment', CommentingStatus::Open->value, 'test_comment_type');
+    $this->addDefaultCommentField('taxonomy_term', 'tags', 'comment', CommentingStatus::Open, 'test_comment_type');
     $this->drupalCreateContentType(['type' => 'page']);
     $this->createEntityReferenceField(
       'node',

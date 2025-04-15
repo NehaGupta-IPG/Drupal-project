@@ -59,7 +59,7 @@ class CommentFieldsTest extends CommentTestBase {
     $this->assertTrue(isset($field), "The comment_body field is present for comments on type $type_name");
 
     // Test adding a field that defaults to CommentingStatus::Closed.
-    $this->addDefaultCommentField('node', 'test_node_type', 'who_likes_ponies', CommentingStatus::Closed->value, 'who_likes_ponies');
+    $this->addDefaultCommentField('node', 'test_node_type', 'who_likes_ponies', CommentingStatus::Closed, 'who_likes_ponies');
     $field = FieldConfig::load('node.test_node_type.who_likes_ponies');
     $this->assertEquals(CommentingStatus::Closed->value, $field->getDefaultValueLiteral()[0]['status']);
   }

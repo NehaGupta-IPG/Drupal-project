@@ -156,7 +156,7 @@ class EntityCrudHookTest extends EntityKernelTestBase {
       'type' => 'article',
       'name' => 'Article',
     ])->save();
-    $this->addDefaultCommentField('node', 'article', 'comment', CommentingStatus::Open->value);
+    $this->addDefaultCommentField('node', 'article', 'comment', CommentingStatus::Open);
 
     $node = Node::create([
       'uid' => $account->id(),

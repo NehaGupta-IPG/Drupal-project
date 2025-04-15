@@ -52,7 +52,7 @@ class ContentTranslationSettingsTest extends BrowserTestBase {
     // bundles.
     $this->drupalCreateContentType(['type' => 'article']);
     $this->drupalCreateContentType(['type' => 'page']);
-    $this->addDefaultCommentField('node', 'article', 'comment_article', CommentingStatus::Open->value, 'comment_article');
+    $this->addDefaultCommentField('node', 'article', 'comment_article', CommentingStatus::Open, 'comment_article');
     $this->addDefaultCommentField('node', 'page', 'comment_page');
 
     $admin_user = $this->drupalCreateUser([

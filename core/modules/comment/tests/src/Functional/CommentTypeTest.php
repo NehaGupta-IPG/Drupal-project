@@ -159,7 +159,7 @@ class CommentTypeTest extends CommentTestBase {
     // Create a comment type programmatically.
     $type = $this->createCommentType('foo');
     $this->drupalCreateContentType(['type' => 'page']);
-    $this->addDefaultCommentField('node', 'page', 'foo', CommentingStatus::Open->value, 'foo');
+    $this->addDefaultCommentField('node', 'page', 'foo', CommentingStatus::Open, 'foo');
     $field_storage = FieldStorageConfig::loadByName('node', 'foo');
 
     $this->drupalLogin($this->adminUser);

@@ -81,7 +81,7 @@ class CommentTranslationUITest extends ContentTranslationUITestBase {
     parent::setupBundle();
     $this->drupalCreateContentType(['type' => 'article', 'name' => 'article']);
     // Add a comment field to the article content type.
-    $this->addDefaultCommentField('node', 'article', 'comment_article', CommentingStatus::Open->value, 'comment_article');
+    $this->addDefaultCommentField('node', 'article', 'comment_article', CommentingStatus::Open, 'comment_article');
     // Create a page content type.
     $this->drupalCreateContentType(['type' => 'page', 'name' => 'page']);
     // Add a comment field to the page content type - this one won't be

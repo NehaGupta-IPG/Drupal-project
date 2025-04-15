@@ -116,7 +116,7 @@ class EntityFilteringThemeTest extends BrowserTestBase {
 
     $this->createContentType(['type' => 'article']);
     // Add a comment field.
-    $this->addDefaultCommentField('node', 'article', 'comment', CommentingStatus::Open->value);
+    $this->addDefaultCommentField('node', 'article', 'comment', CommentingStatus::Open);
     // Create a test node tagged with the test term.
     $this->node = $this->drupalCreateNode([
       'title' => $this->xssLabel,
