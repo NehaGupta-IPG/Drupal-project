@@ -2,8 +2,6 @@
 
 namespace Drupal\Core\Queue;
 
-use Drupal\Component\Plugin\PluginInspectionInterface;
-
 /**
  * Defines an updated interface for a QueueWorker plugin.
  *
@@ -14,16 +12,17 @@ use Drupal\Component\Plugin\PluginInspectionInterface;
  *
  * @ingroup queue
  */
-interface QueueWorkerNextInterface extends PluginInspectionInterface {
+interface QueueWorkerWithMetadataInterface extends QueueWorkerInterface {
 
   /**
-   * Works on a single queue item.
+   * Works on a data and metadata from a single queue item.
    *
    * @param mixed $data
    *   The data that was passed to
    *   \Drupal\Core\Queue\QueueInterface::createItem() when the item was queued.
-   * @param object $item
-   *   Full queue item including created time and claimed count.
+   * @param null|object $metadata
+   *   The queue item metadata including the created time and claimed count.
+   *   The worker must still work correctly if this is NULL.
    *
    * @throws \Drupal\Core\Queue\RequeueException
    *   Processing is not yet finished. This will allow another process to claim
@@ -45,6 +44,6 @@ interface QueueWorkerNextInterface extends PluginInspectionInterface {
    *
    * @see \Drupal\Core\Cron::processQueues()
    */
-  public function processDataAndItem($data, object $item);
+  public function processItemAndMetadata($data, ?object $metadata): void;
 
 }

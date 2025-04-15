@@ -13,7 +13,7 @@ use Drupal\Core\Queue\QueueFactory;
 use Drupal\Core\Queue\QueueInterface;
 use Drupal\Core\Queue\QueueWorkerInterface;
 use Drupal\Core\Queue\QueueWorkerManagerInterface;
-use Drupal\Core\Queue\QueueWorkerNextInterface;
+use Drupal\Core\Queue\QueueWorkerWithMetadataInterface;
 use Drupal\Core\Queue\RequeueException;
 use Drupal\Core\Queue\SuspendQueueException;
 use Drupal\Core\Session\AccountSwitcherInterface;
@@ -206,8 +206,8 @@ class Cron implements CronInterface {
     $end = $this->time->getCurrentTime() + $lease_time;
     while ($this->time->getCurrentTime() < $end && ($item = $queue->claimItem($lease_time))) {
       try {
-        if ($worker instanceof QueueWorkerNextInterface) {
-          $worker->processDataAndItem($item->data, $item);
+        if ($worker instanceof QueueWorkerWithMetadataInterface) {
+          $worker->processItemAndMetadata($item->data, $item);
         }
         else {
           $worker->processItem($item->data);
