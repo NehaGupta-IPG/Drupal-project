@@ -707,7 +707,7 @@ function file_get_file_references(FileInterface $file, ?FieldDefinitionInterface
           foreach ($entity->getTranslationLanguages() as $langcode => $language) {
             foreach ($entity->getTranslation($langcode)->get($field_name) as $item) {
               if ($file->id() == $item->{$field_column}) {
-                $references[$file->id()][$age][$field_name][$entity_type_id][$entity->id()] = $entity;
+                $references[$file->id()][$age][$field_name][$entity_type_id][$bundle][$entity->id()] = $entity;
                 break;
               }
             }
@@ -719,19 +719,31 @@ function file_get_file_references(FileInterface $file, ?FieldDefinitionInterface
   $return = $references[$file->id()][$age];
   // Filter the static cache down to the requested entries. The usual static
   // cache is very small so this will be very fast.
+  /** @var \Drupal\Core\Entity\EntityFieldManagerInterface $entity_field_manager */
   $entity_field_manager = \Drupal::service('entity_field.manager');
   if ($field || $field_type) {
     foreach ($return as $field_name => $data) {
       foreach (array_keys($data) as $entity_type_id) {
-        $field_storage_definitions = $entity_field_manager->getFieldStorageDefinitions($entity_type_id);
-        $current_field = $field_storage_definitions[$field_name];
-        if (($field_type && $current_field->getType() != $field_type) || ($field && $field->uuid() != $current_field->uuid())) {
-          unset($return[$field_name][$entity_type_id]);
+        foreach (array_keys($data[$entity_type_id]) as $bundle) {
+          $field_storage_definitions = $entity_field_manager->getFieldDefinitions($entity_type_id, $bundle);
+          $current_field = $field_storage_definitions[$field_name];
+          if (($field_type && $current_field->getType() != $field_type) || ($field && $field->uuid() != $current_field->uuid())) {
+            unset($return[$field_name][$entity_type_id][$bundle]);
+          }
         }
       }
     }
   }
-  return $return;
+
+  // For BC reasons, reshape the array and drop the entity bundle array key.
+  return array_reduce(array_keys($return), static function (\ArrayObject $carry, string $field_name) use ($return): \ArrayObject {
+    foreach ($return[$field_name] as $entity_type => $entity_type_data) {
+      foreach ($entity_type_data as $bundle_data) {
+        $carry[$field_name][$entity_type] = $bundle_data;
+      }
+    }
+    return $carry;
+  }, new \ArrayObject())->getArrayCopy();
 }
 
 /**
