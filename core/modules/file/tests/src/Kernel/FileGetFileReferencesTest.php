@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\file\Kernel;
 
 use Drupal\field\Entity\FieldConfig;
@@ -8,28 +10,37 @@ use Drupal\node\Entity\Node;
 use Drupal\node\Entity\NodeType;
 
 /**
- * Tests file usage functions.
+ * Tests file_get_file_references() behaviors.
  *
  * @group file
  */
-class GetFileReferencesTest extends FileManagedUnitTestBase {
+class FileGetFileReferencesTest extends FileManagedUnitTestBase {
 
   /**
-   * Tests file usage with translated entities.
+   * {@inheritdoc}
    */
-  public function testFileReferenceFilterByField() {
-    $this->enableModules(['node']);
+  protected static $modules = ['node'];
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function setUp() : void {
+    parent::setUp();
     $this->installEntitySchema('node');
     $this->installSchema('node', ['node_access']);
+  }
 
-    NodeType::create(['type' => 'page'])->save();
-    // Create a file field attached to 'page' node-type.
-    $field_stroage = FieldStorageConfig::create([
+  /**
+   * Tests filtering by field.
+   */
+  public function testFileReferenceFilterByField(): void {
+    NodeType::create(['type' => 'page', 'name' => 'page'])->save();
+    $field_storage = FieldStorageConfig::create([
       'type' => 'file',
       'entity_type' => 'node',
       'field_name' => 'field_file',
     ]);
-    $field_stroage->save();
+    $field_storage->save();
     $field_config = FieldConfig::create([
       'entity_type' => 'node',
       'bundle' => 'page',
@@ -38,19 +49,16 @@ class GetFileReferencesTest extends FileManagedUnitTestBase {
     ]);
     $field_config->save();
 
-    // Create a node, attach a file.
     $node = Node::create(['type' => 'page', 'title' => 'Page']);
     $node
       ->set('field_file', $file = $this->createFile())
       ->save();
 
-
     $references = file_get_file_references($file);
     $this->assertArrayHasKey($node->id(), $references['field_file']['node']);
 
     $references = file_get_file_references($file, $field_config);
-    $this->assertArrayHasKey($node->id(), $references['field_file']['node']);
-
+    $this->assertArrayHasKey($node->id(), $references['field_file']['node'] ?? []);
   }
 
 }
