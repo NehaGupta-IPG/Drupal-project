@@ -7,6 +7,7 @@ use Drupal\comment\CommentFieldItemList;
 use Drupal\comment\CommentMode;
 use Drupal\comment\CommentingStatus;
 use Drupal\comment\Entity\CommentType;
+use Drupal\comment\FormLocation;
 use Drupal\Core\Field\Attribute\FieldType;
 use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Field\FieldItemBase;
@@ -47,7 +48,7 @@ class CommentItem extends FieldItemBase implements CommentItemInterface {
     return [
       'default_mode' => CommentMode::Threaded->value,
       'per_page' => 50,
-      'form_location' => CommentItemInterface::FORM_BELOW,
+      'form_location' => FormLocation::Below->value,
       'anonymous' => AnonymousContact::Forbidden->value,
       'preview' => DRUPAL_OPTIONAL,
     ] + parent::defaultFieldSettings();
