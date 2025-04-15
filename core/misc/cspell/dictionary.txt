@@ -384,6 +384,9 @@ prepopulation
 prerendered
 presave
 preuninstall
+prewarmable
+prewarmer
+prewarmers
 prophesize
 protossl
 pseudotag
@@ -510,6 +513,7 @@ tablesorts
 tabset
 tabwidth
 tbachert
+tenderwolf
 testbot
 testlogger
 textareas
@@ -573,6 +577,7 @@ userinfo
 versionable
 vfsstream
 viewports
+warmable
 wcag
 webcal
 webflo

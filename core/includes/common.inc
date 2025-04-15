@@ -84,17 +84,19 @@ const CSS_BASE = -200;
 const CSS_LAYOUT = -100;
 
 /**
- * The default weight for CSS rules that style design components (and their associated states and themes.)
+ * The default weight for CSS rules that style design components.
+ *
+ * This applies to the associated states and themes of the component.
  */
 const CSS_COMPONENT = 0;
 
 /**
- * The default weight for CSS rules that style states and are not included with components.
+ * The default weight for rules that style states not included with components.
  */
 const CSS_STATE = 100;
 
 /**
- * The default weight for CSS rules that style themes and are not included with components.
+ * The default weight for rules that style themes not included with components.
  */
 const CSS_THEME = 200;
 
@@ -255,7 +257,7 @@ function base_path() {
  *
  * @see MenuForm::BuildOverviewForm()
  */
-function drupal_attach_tabledrag(&$element, array $options) {
+function drupal_attach_tabledrag(&$element, array $options): void {
   // Add default values to elements.
   $options = $options + [
     'subgroup' => NULL,
@@ -342,7 +344,10 @@ function show(&$element) {
 }
 
 /**
- * Rebuilds the container, flushes all persistent caches, resets all variables, and rebuilds all data structures.
+ * Re-initializes the entire system.
+ *
+ * To re-initialize the system, the container is rebuilt, all persistent caches
+ * are flushed, all variables are reset and all data structures are rebuilt.
  *
  * At times, it is necessary to re-initialize the entire system to account for
  * changed or new code. This function:
@@ -406,7 +411,7 @@ function show(&$element) {
  * @todo Add a global lock to ensure that caches are not primed in concurrent
  *   requests.
  */
-function drupal_flush_all_caches($kernel = NULL) {
+function drupal_flush_all_caches($kernel = NULL): void {
   // This is executed based on old/previously known information if $kernel is
   // not passed in, which is sufficient, since new extensions cannot have any
   // primed caches yet.
