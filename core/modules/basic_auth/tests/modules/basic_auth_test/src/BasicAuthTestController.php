@@ -22,7 +22,7 @@ class BasicAuthTestController {
    */
   public function __construct(
     private StateInterface $state,
-    private ResponsePolicyInterface $pageCacheKillSwitch
+    private ResponsePolicyInterface $pageCacheKillSwitch,
   ) {}
 
   /**
