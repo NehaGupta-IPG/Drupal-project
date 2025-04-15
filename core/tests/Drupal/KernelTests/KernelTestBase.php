@@ -19,6 +19,7 @@ use Drupal\Core\Language\Language;
 use Drupal\Core\Site\Settings;
 use Drupal\Core\Test\EventSubscriber\FieldStorageCreateCheckSubscriber;
 use Drupal\Core\Test\TestDatabase;
+use Drupal\Tests\AutowirePropertyTrait;
 use Drupal\Tests\ConfigTestTrait;
 use Drupal\Tests\ExtensionListTestTrait;
 use Drupal\Tests\RandomGeneratorTrait;
@@ -104,6 +105,7 @@ abstract class KernelTestBase extends TestCase implements ServiceProviderInterfa
   use PhpUnitCompatibilityTrait;
   use ProphecyTrait;
   use ExpectDeprecationTrait;
+  use AutowirePropertyTrait;
 
   /**
    * {@inheritdoc}
@@ -233,6 +235,7 @@ abstract class KernelTestBase extends TestCase implements ServiceProviderInterfa
     $this->initFileCache();
     $this->bootEnvironment();
     $this->bootKernel();
+    $this->autowireProperties();
   }
 
   /**

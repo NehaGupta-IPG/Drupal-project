@@ -78,6 +78,7 @@ abstract class BrowserTestBase extends TestCase {
   use PhpUnitCompatibilityTrait;
   use ExpectDeprecationTrait;
   use ExtensionListTestTrait;
+  use AutowirePropertyTrait;
 
   /**
    * Time limit in seconds for the test.
@@ -360,6 +361,8 @@ abstract class BrowserTestBase extends TestCase {
     // Set up the browser test output file.
     $this->initBrowserOutputFile();
 
+    // Autowire properties.
+    $this->autowireProperties();
   }
 
   /**

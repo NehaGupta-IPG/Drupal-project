@@ -10,6 +10,8 @@ use Drupal\Core\Database\Database;
 use Drupal\Core\File\Exception\FileException;
 use Drupal\Core\File\FileExists;
 use Drupal\Core\File\FileSystemInterface;
+use Drupal\Core\File\HtaccessWriterInterface;
+use Drupal\Tests\AutowireProperty;
 use Drupal\system\Hook\SystemHooks;
 
 /**
@@ -20,11 +22,28 @@ use Drupal\system\Hook\SystemHooks;
 class DirectoryTest extends FileTestBase {
 
   /**
+   * Site path.
+   */
+  #[AutowireProperty(param: 'site.path')]
+  protected string $sitePath;
+
+  /**
+   * File system service.
+   */
+  #[AutowireProperty]
+  protected FileSystemInterface $fileSystem;
+
+  /**
+   * Htaccess writer service.
+   */
+  #[AutowireProperty]
+  protected HtaccessWriterInterface $htaccessWriter;
+
+  /**
    * Tests local directory handling functions.
    */
   public function testFileCheckLocalDirectoryHandling(): void {
-    $site_path = $this->container->getParameter('site.path');
-    $directory = $site_path . '/files';
+    $directory = $this->sitePath . '/files';
 
     // Check a new recursively created local directory for correct file system
     // permissions.
@@ -39,9 +58,7 @@ class DirectoryTest extends FileTestBase {
     // Create the directories.
     $parent_path = $directory . DIRECTORY_SEPARATOR . $parent;
     $child_path = $parent_path . DIRECTORY_SEPARATOR . $child;
-    /** @var \Drupal\Core\File\FileSystemInterface $file_system */
-    $file_system = \Drupal::service('file_system');
-    $this->assertTrue($file_system->mkdir($child_path, 0775, TRUE), 'No error reported when creating new local directories.');
+    $this->assertTrue($this->fileSystem->mkdir($child_path, 0775, TRUE), 'No error reported when creating new local directories.');
 
     // Ensure new directories also exist.
     $this->assertDirectoryExists($parent_path);
@@ -55,8 +72,8 @@ class DirectoryTest extends FileTestBase {
     $this->assertDirectoryPermissions($directory, $old_mode);
 
     // Check creating a directory using an absolute path.
-    $absolute_path = $file_system->realpath($directory) . DIRECTORY_SEPARATOR . $this->randomMachineName() . DIRECTORY_SEPARATOR . $this->randomMachineName();
-    $this->assertTrue($file_system->mkdir($absolute_path, 0775, TRUE), 'No error reported when creating new absolute directories.');
+    $absolute_path = $this->fileSystem->realpath($directory) . DIRECTORY_SEPARATOR . $this->randomMachineName() . DIRECTORY_SEPARATOR . $this->randomMachineName();
+    $this->assertTrue($this->fileSystem->mkdir($absolute_path, 0775, TRUE), 'No error reported when creating new absolute directories.');
     $this->assertDirectoryPermissions($absolute_path, 0775);
   }
 
@@ -70,16 +87,13 @@ class DirectoryTest extends FileTestBase {
     $this->assertDirectoryDoesNotExist($directory);
 
     // Non-existent directory.
-    /** @var \Drupal\Core\File\FileSystemInterface $file_system */
-    $file_system = \Drupal::service('file_system');
-    $this->assertFalse($file_system->prepareDirectory($directory, 0), 'Error reported for non-existing directory.');
+    $this->assertFalse($this->fileSystem->prepareDirectory($directory, 0), 'Error reported for non-existing directory.');
 
     // Make a directory.
-    $this->assertTrue($file_system->prepareDirectory($directory, FileSystemInterface::CREATE_DIRECTORY), 'No error reported when creating a new directory.');
+    $this->assertTrue($this->fileSystem->prepareDirectory($directory, FileSystemInterface::CREATE_DIRECTORY), 'No error reported when creating a new directory.');
 
     // Make sure directory actually exists.
     $this->assertDirectoryExists($directory);
-    $file_system = \Drupal::service('file_system');
     if (!str_starts_with(PHP_OS, 'WIN')) {
       // PHP on Windows doesn't support any kind of useful read-only mode for
       // directories. When executing a chmod() on a directory, PHP only sets the
@@ -87,25 +101,25 @@ class DirectoryTest extends FileTestBase {
       // in the directory on any recent version of Windows.
 
       // Make directory read only.
-      @$file_system->chmod($directory, 0444);
-      $this->assertFalse($file_system->prepareDirectory($directory, 0), 'Error reported for a non-writable directory.');
+      @$this->fileSystem->chmod($directory, 0444);
+      $this->assertFalse($this->fileSystem->prepareDirectory($directory, 0), 'Error reported for a non-writable directory.');
 
       // Test directory permission modification.
       $this->setSetting('file_chmod_directory', 0777);
-      $this->assertTrue($file_system->prepareDirectory($directory, FileSystemInterface::MODIFY_PERMISSIONS), 'No error reported when making directory writable.');
+      $this->assertTrue($this->fileSystem->prepareDirectory($directory, FileSystemInterface::MODIFY_PERMISSIONS), 'No error reported when making directory writable.');
     }
 
     // Test that the directory has the correct permissions.
     $this->assertDirectoryPermissions($directory, 0777, 'file_chmod_directory setting is respected.');
 
     // Remove .htaccess file to then test that it gets re-created.
-    @$file_system->unlink($default_scheme . '://.htaccess');
+    @$this->fileSystem->unlink($default_scheme . '://.htaccess');
     $this->assertFileDoesNotExist($default_scheme . '://.htaccess');
-    $this->container->get('file.htaccess_writer')->ensure();
+    $this->htaccessWriter->ensure();
     $this->assertFileExists($default_scheme . '://.htaccess');
 
     // Remove .htaccess file again to test that it is re-created by a cron run.
-    @$file_system->unlink($default_scheme . '://.htaccess');
+    @$this->fileSystem->unlink($default_scheme . '://.htaccess');
     $this->assertFileDoesNotExist($default_scheme . '://.htaccess');
     $systemCron = new SystemHooks();
     $systemCron->cron();
@@ -125,16 +139,14 @@ class DirectoryTest extends FileTestBase {
     $basename = 'xyz.txt';
     $directory = 'core/misc';
     $original = $directory . '/' . $basename;
-    /** @var \Drupal\Core\File\FileSystemInterface $file_system */
-    $file_system = \Drupal::service('file_system');
-    $path = $file_system->createFilename($basename, $directory);
+    $path = $this->fileSystem->createFilename($basename, $directory);
     $this->assertEquals($original, $path, "New filepath $path equals $original.");
 
     // Then we test against a file that already exists within that directory.
     $basename = 'druplicon.png';
     $original = $directory . '/' . $basename;
     $expected = $directory . '/druplicon_0.png';
-    $path = $file_system->createFilename($basename, $directory);
+    $path = $this->fileSystem->createFilename($basename, $directory);
     $this->assertEquals($expected, $path, "Creating a new filepath from $path equals $original (expected $expected).");
 
     // @todo Finally we copy a file into a directory several times, to ensure a properly iterating filename suffix.
@@ -157,34 +169,32 @@ class DirectoryTest extends FileTestBase {
   public function testFileDestination(): void {
     // First test for non-existent file.
     $destination = 'core/misc/xyz.txt';
-    /** @var \Drupal\Core\File\FileSystemInterface $file_system */
-    $file_system = \Drupal::service('file_system');
-    $path = $file_system->getDestinationFilename($destination, FileExists::Replace);
+    $path = $this->fileSystem->getDestinationFilename($destination, FileExists::Replace);
     $this->assertEquals($destination, $path, 'Non-existing filepath destination is correct with FileExists::Replace.');
-    $path = $file_system->getDestinationFilename($destination, FileExists::Rename);
+    $path = $this->fileSystem->getDestinationFilename($destination, FileExists::Rename);
     $this->assertEquals($destination, $path, 'Non-existing filepath destination is correct with FileExists::Rename.');
-    $path = $file_system->getDestinationFilename($destination, FileExists::Error);
+    $path = $this->fileSystem->getDestinationFilename($destination, FileExists::Error);
     $this->assertEquals($destination, $path, 'Non-existing filepath destination is correct with FileExists::Error.');
 
     $destination = 'core/misc/druplicon.png';
-    $path = $file_system->getDestinationFilename($destination, FileExists::Replace);
+    $path = $this->fileSystem->getDestinationFilename($destination, FileExists::Replace);
     $this->assertEquals($destination, $path, 'Existing filepath destination remains the same with FileExists::Replace.');
-    $path = $file_system->getDestinationFilename($destination, FileExists::Rename);
+    $path = $this->fileSystem->getDestinationFilename($destination, FileExists::Rename);
     $this->assertNotEquals($destination, $path, 'A new filepath destination is created when filepath destination already exists with FileExists::Rename.');
-    $path = $file_system->getDestinationFilename($destination, FileExists::Error);
+    $path = $this->fileSystem->getDestinationFilename($destination, FileExists::Error);
     $this->assertFalse($path, 'An error is returned when filepath destination already exists with FileExists::Error.');
 
     // Invalid UTF-8 causes an exception.
     $this->expectException(FileException::class);
     $this->expectExceptionMessage("Invalid filename 'a\xFFtest\x80€.txt'");
-    $file_system->getDestinationFilename("core/misc/a\xFFtest\x80€.txt", FileExists::Replace);
+    $this->fileSystem->getDestinationFilename("core/misc/a\xFFtest\x80€.txt", FileExists::Replace);
   }
 
   /**
    * Ensure that the getTempDirectory() method always returns a value.
    */
   public function testFileDirectoryTemp(): void {
-    $tmp_directory = \Drupal::service('file_system')->getTempDirectory();
+    $tmp_directory = $this->fileSystem->getTempDirectory();
     $this->assertNotEmpty($tmp_directory);
     $this->assertEquals($tmp_directory, FileSystem::getOsTemporaryDirectory());
   }
@@ -193,13 +203,10 @@ class DirectoryTest extends FileTestBase {
    * Tests directory creation.
    */
   public function testDirectoryCreation(): void {
-    /** @var \Drupal\Core\File\FileSystemInterface $file_system */
-    $file_system = $this->container->get('file_system');
-
     // mkdir() recursion should work with or without a trailing slash.
     $dir = $this->siteDirectory . '/files';
-    $this->assertTrue($file_system->mkdir($dir . '/foo/bar', 0775, TRUE));
-    $this->assertTrue($file_system->mkdir($dir . '/foo/baz/', 0775, TRUE));
+    $this->assertTrue($this->fileSystem->mkdir($dir . '/foo/bar', 0775, TRUE));
+    $this->assertTrue($this->fileSystem->mkdir($dir . '/foo/baz/', 0775, TRUE));
   }
 
   /**
@@ -217,8 +224,6 @@ class DirectoryTest extends FileTestBase {
       $directories[] = 'public://a/b/c/d/e/f/g/h/' . $i;
     }
 
-    $file_system = $this->container->get('file_system');
-
     $time_to_start = microtime(TRUE) + 0.1;
     // This loop creates a new fork to create each directory.
     foreach ($directories as $directory) {
@@ -230,7 +235,7 @@ class DirectoryTest extends FileTestBase {
         // Sleep so that all the forks start preparing the directory at the same
         // time.
         usleep((int) (($time_to_start - microtime(TRUE)) * 1000000));
-        $file_system->prepareDirectory($directory, FileSystemInterface::CREATE_DIRECTORY);
+        $this->fileSystem->prepareDirectory($directory, FileSystemInterface::CREATE_DIRECTORY);
         exit();
       }
     }

@@ -5,10 +5,16 @@ declare(strict_types=1);
 namespace Drupal\Tests\views\Kernel\EventSubscriber;
 
 use Drupal\Core\Entity\ContentEntityTypeInterface;
+use Drupal\Core\Entity\EntityDefinitionUpdateManagerInterface;
 use Drupal\Core\Entity\EntityTypeEvent;
 use Drupal\Core\Entity\EntityTypeEvents;
+use Drupal\Core\Entity\EntityTypeManagerInterface;
+use Drupal\Core\State\StateInterface;
+use Drupal\Tests\AutowireProperty;
 use Drupal\Tests\system\Functional\Entity\Traits\EntityDefinitionTestTrait;
 use Drupal\Tests\views\Kernel\ViewsKernelTestBase;
+use Drupal\views\EventSubscriber\ViewsEntitySchemaSubscriber;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 /**
  * Tests \Drupal\views\EventSubscriber\ViewsEntitySchemaSubscriber.
@@ -22,10 +28,9 @@ class ViewsEntitySchemaSubscriberIntegrationTest extends ViewsKernelTestBase {
 
   /**
    * The entity definition update manager.
-   *
-   * @var \Drupal\Core\Entity\EntityDefinitionUpdateManagerInterface
    */
-  protected $entityDefinitionUpdateManager;
+  #[AutowireProperty]
+  protected EntityDefinitionUpdateManagerInterface $entityDefinitionUpdateManager;
 
   /**
    * {@inheritdoc}
@@ -51,43 +56,33 @@ class ViewsEntitySchemaSubscriberIntegrationTest extends ViewsKernelTestBase {
 
   /**
    * The event dispatcher.
-   *
-   * @var \Symfony\Contracts\EventDispatcher\EventDispatcherInterface
    */
-  protected $eventDispatcher;
+  #[AutowireProperty]
+  protected EventDispatcherInterface $eventDispatcher;
 
   /**
    * The tested event subscriber of views.
-   *
-   * @var \Drupal\views\EventSubscriber\ViewsEntitySchemaSubscriber
    */
-  protected $eventSubscriber;
+  #[AutowireProperty(service: 'views.entity_schema_subscriber')]
+  protected ViewsEntitySchemaSubscriber $eventSubscriber;
 
   /**
    * The entity type manager service.
-   *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
    */
-  protected $entityTypeManager;
+  #[AutowireProperty]
+  protected EntityTypeManagerInterface $entityTypeManager;
 
   /**
    * The state service.
-   *
-   * @var \Drupal\Core\State\StateInterface
    */
-  protected $state;
+  #[AutowireProperty]
+  protected StateInterface $state;
 
   /**
    * {@inheritdoc}
    */
   protected function setUp($import_test_views = TRUE): void {
     parent::setUp();
-
-    $this->eventDispatcher = $this->container->get('event_dispatcher');
-    $this->eventSubscriber = $this->container->get('views.entity_schema_subscriber');
-    $this->entityDefinitionUpdateManager = $this->container->get('entity.definition_update_manager');
-    $this->entityTypeManager = $this->container->get('entity_type.manager');
-    $this->state = $this->container->get('state');
 
     // Install every entity type's schema that wasn't installed in the parent
     // method.

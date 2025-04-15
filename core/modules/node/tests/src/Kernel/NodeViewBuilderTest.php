@@ -4,9 +4,13 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\node\Kernel;
 
+use Drupal\Core\Entity\EntityViewBuilderInterface;
+use Drupal\Core\Render\RendererInterface;
 use Drupal\KernelTests\Core\Entity\EntityKernelTestBase;
 use Drupal\node\Entity\Node;
 use Drupal\node\Entity\NodeType;
+use Drupal\node\NodeStorageInterface;
+use Drupal\Tests\AutowireProperty;
 use Drupal\user\Entity\User;
 
 /**
@@ -25,34 +29,27 @@ class NodeViewBuilderTest extends EntityKernelTestBase {
 
   /**
    * The node storage.
-   *
-   * @var \Drupal\node\NodeStorageInterface
    */
-  protected $storage;
+  #[AutowireProperty(expression: "service('entity_type.manager').getStorage('node')")]
+  protected NodeStorageInterface $storage;
 
   /**
    * The node view builder.
-   *
-   * @var \Drupal\Core\Entity\EntityViewBuilderInterface
    */
-  protected $viewBuilder;
+  #[AutowireProperty(expression: "service('entity_type.manager').getViewBuilder('node')")]
+  protected EntityViewBuilderInterface $viewBuilder;
 
   /**
    * The renderer.
-   *
-   * @var \Drupal\Core\Render\RendererInterface
    */
-  protected $renderer;
+  #[AutowireProperty]
+  protected RendererInterface $renderer;
 
   /**
    * {@inheritdoc}
    */
   protected function setUp(): void {
     parent::setUp();
-
-    $this->storage = $this->entityTypeManager->getStorage('node');
-    $this->viewBuilder = $this->entityTypeManager->getViewBuilder('node');
-    $this->renderer = $this->container->get('renderer');
 
     $type = NodeType::create([
       'type' => 'article',

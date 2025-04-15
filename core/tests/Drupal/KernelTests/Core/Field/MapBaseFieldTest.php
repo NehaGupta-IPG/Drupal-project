@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace Drupal\KernelTests\Core\Field;
 
+use Drupal\Core\Entity\EntityDefinitionUpdateManagerInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\entity_test_update\Entity\EntityTestUpdate;
 use Drupal\KernelTests\Core\Entity\EntityKernelTestBase;
+use Drupal\Tests\AutowireProperty;
 
 /**
  * Tests map base fields.
@@ -17,10 +19,9 @@ class MapBaseFieldTest extends EntityKernelTestBase {
 
   /**
    * The entity definition update manager.
-   *
-   * @var \Drupal\Core\Entity\EntityDefinitionUpdateManagerInterface
    */
-  protected $entityDefinitionUpdateManager;
+  #[AutowireProperty]
+  protected EntityDefinitionUpdateManagerInterface $entityDefinitionUpdateManager;
 
   /**
    * {@inheritdoc}
@@ -32,8 +33,6 @@ class MapBaseFieldTest extends EntityKernelTestBase {
    */
   protected function setUp(): void {
     parent::setUp();
-
-    $this->entityDefinitionUpdateManager = $this->container->get('entity.definition_update_manager');
 
     // Install every entity type's schema that wasn't installed in the parent
     // method.

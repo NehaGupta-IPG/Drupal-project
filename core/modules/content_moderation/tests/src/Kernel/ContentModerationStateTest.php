@@ -6,15 +6,18 @@ namespace Drupal\Tests\content_moderation\Kernel;
 
 use Drupal\content_moderation\Entity\ContentModerationState;
 use Drupal\Core\Entity\EntityDefinitionUpdateManagerInterface;
+use Drupal\Core\Entity\EntityFieldManagerInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityPublishedInterface;
 use Drupal\Core\Entity\EntityStorageException;
+use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\State\StateInterface;
 use Drupal\entity_test\EntityTestHelper;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\node\Entity\Node;
+use Drupal\Tests\AutowireProperty;
 use Drupal\Tests\content_moderation\Traits\ContentModerationTestTrait;
 use Drupal\Tests\node\Traits\ContentTypeCreationTrait;
 use Drupal\Tests\system\Functional\Entity\Traits\EntityDefinitionTestTrait;
@@ -57,23 +60,30 @@ class ContentModerationStateTest extends KernelTestBase {
   ];
 
   /**
-   * @var \Drupal\Core\Entity\EntityTypeManager
+   * The entity type manager.
    */
-  protected $entityTypeManager;
+  #[AutowireProperty]
+  protected EntityTypeManagerInterface $entityTypeManager;
 
   /**
    * The state object.
    *
-   * @var \Drupal\Core\State\StateInterface
+   * This property is used in EntityDefinitionTestTrait, can not be autowired.
    */
   protected StateInterface $state;
 
   /**
    * The entity definition update manager.
    *
-   * @var \Drupal\Core\Entity\EntityDefinitionUpdateManagerInterface
+   * This property is used in EntityDefinitionTestTrait, can not be autowired.
    */
   protected EntityDefinitionUpdateManagerInterface $entityDefinitionUpdateManager;
+
+  /**
+   * The entity field manager.
+   */
+  #[AutowireProperty]
+  protected EntityFieldManagerInterface $entityFieldManager;
 
   /**
    * The ID of the revisionable entity type used in the tests.
@@ -105,8 +115,6 @@ class ContentModerationStateTest extends KernelTestBase {
 
     // Add the French language.
     ConfigurableLanguage::createFromLangcode('fr')->save();
-
-    $this->entityTypeManager = $this->container->get('entity_type.manager');
   }
 
   /**
@@ -612,7 +620,7 @@ class ContentModerationStateTest extends KernelTestBase {
     \Drupal::state()->set($this->revEntityTypeId . '.entity_type', $entity_type);
 
     // Update the entity type in order to remove the 'langcode' field.
-    \Drupal::entityDefinitionUpdateManager()->updateFieldableEntityType($entity_type, \Drupal::service('entity_field.manager')->getFieldStorageDefinitions($entity_type->id()));
+    \Drupal::entityDefinitionUpdateManager()->updateFieldableEntityType($entity_type, $this->entityFieldManager->getFieldStorageDefinitions($entity_type->id()));
 
     $workflow = $this->createEditorialWorkflow();
     $this->addEntityTypeAndBundleToWorkflow($workflow, $this->revEntityTypeId, $this->revEntityTypeId);
@@ -837,7 +845,7 @@ class ContentModerationStateTest extends KernelTestBase {
    */
   protected function reloadEntity(EntityInterface $entity, $revision_id = FALSE): EntityInterface {
     /** @var \Drupal\Core\Entity\RevisionableStorageInterface $storage */
-    $storage = \Drupal::entityTypeManager()->getStorage($entity->getEntityTypeId());
+    $storage = $this->entityTypeManager->getStorage($entity->getEntityTypeId());
     $storage->resetCache([$entity->id()]);
     if ($revision_id) {
       return $storage->loadRevision($revision_id);
