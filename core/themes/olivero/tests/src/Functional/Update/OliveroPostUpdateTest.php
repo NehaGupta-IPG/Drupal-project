@@ -69,6 +69,14 @@ class OliveroPostUpdateTest extends UpdatePathTestBase {
 
     $config = $this->config('olivero.settings');
     $this->assertNotEmpty($config->get('third_party_settings'));
+    $this->assertEquals(['shortcut' => ['module_link' => TRUE]], $config->get('third_party_settings'));
+
+    /** @var \Drupal\Core\Config\TypedConfigManagerInterface $typedConfigManager */
+    $typedConfigManager = \Drupal::getContainer()->get('config.typed');
+
+    $typedConfig = $typedConfigManager->get('olivero.settings');
+    $errors = $typedConfig->validate();
+    $this->assertEquals(0, $errors->count());
   }
 
 }
