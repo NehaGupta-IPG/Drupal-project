@@ -68,10 +68,23 @@ class State extends CacheCollector implements StateInterface {
    * {@inheritdoc}
    */
   protected function resolveCacheMiss($key) {
+    // On a cache miss, load all records from the key value store to avoid
+    // individual lookups.
     if ($this->allRecords === NULL) {
+      $initial_lookup = TRUE;
       $this->allRecords = $this->keyValueStore->getAll() ?? [];
+      $value = $this->allRecords[$key] ?? NULL;
     }
-    $value = $this->allRecords[$key] ?? NULL;
+    else {
+      // If there is no record, it could be created at any time, so
+      // look it up individually.
+      if (isset($this->allRecords[$key])) {
+        $value = $this->allRecords[$key];
+      }
+      else {
+        $value = $this->keyValueStore->get($key);
+      }
+    }
     $this->storage[$key] = $value;
     $this->persist($key);
     return $value;
@@ -99,7 +112,7 @@ class State extends CacheCollector implements StateInterface {
       $key = self::$deprecatedState[$key]['replacement'];
     }
     $this->keyValueStore->set($key, $value);
-    unset($this->allRecords[$key]);
+    $this->allRecords[$key] = $value;
     // If another request had a cache miss before this request, and also hasn't
     // written to cache yet, then it may already have read this value from the
     // database and could write that value to the cache to the end of the
@@ -117,7 +130,7 @@ class State extends CacheCollector implements StateInterface {
   public function setMultiple(array $data) {
     $this->keyValueStore->setMultiple($data);
     foreach ($data as $key => $value) {
-      unset($this->allRecords[$key]);
+      $this->allRecords[$key] = $value;
       parent::set($key, $value);
       $this->persist($key);
     }
@@ -127,6 +140,7 @@ class State extends CacheCollector implements StateInterface {
    * {@inheritdoc}
    */
   public function delete($key) {
+    unset($this->allRecords[$key]);
     $this->keyValueStore->delete($key);
     parent::delete($key);
   }
@@ -137,6 +151,7 @@ class State extends CacheCollector implements StateInterface {
   public function deleteMultiple(array $keys) {
     $this->keyValueStore->deleteMultiple($keys);
     foreach ($keys as $key) {
+      unset($this->allRecords[$key]);
       parent::delete($key);
     }
   }
