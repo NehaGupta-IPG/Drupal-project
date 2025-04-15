@@ -5,10 +5,10 @@ declare(strict_types=1);
 namespace Drupal\KernelTests\Core\Entity;
 
 use Drupal\Component\Plugin\Exception\PluginNotFoundException;
-use Drupal\Core\Config\Entity\ConfigEntityTypeInterface;
 use Drupal\Core\Database\Database;
 use Drupal\Core\Database\IntegrityConstraintViolationException;
 use Drupal\Core\Entity\ContentEntityType;
+use Drupal\Core\Entity\ContentEntityTypeInterface;
 use Drupal\Core\Entity\EntityStorageException;
 use Drupal\Core\Entity\EntityTypeEvents;
 use Drupal\Core\Entity\Exception\FieldStorageDefinitionUpdateForbiddenException;
@@ -72,7 +72,7 @@ class EntityDefinitionUpdateTest extends EntityKernelTestBase {
     // Install every entity type's schema that wasn't installed in the parent
     // method.
     foreach (array_diff_key($this->entityTypeManager->getDefinitions(), array_flip(['user', 'entity_test'])) as $entity_type_id => $entity_type) {
-      if (!$entity_type instanceof ConfigEntityTypeInterface) {
+      if ($entity_type instanceof ContentEntityTypeInterface) {
         $this->installEntitySchema($entity_type_id);
       }
     }
