@@ -143,7 +143,7 @@ class CommentValidationTest extends EntityKernelTestBase {
     $comment->set('thread', NULL);
 
     // Force anonymous users to enter contact details.
-    $field->setSetting('anonymous', AnonymousContact::Forbidden->value);
+    $field->setSetting('anonymous', AnonymousContact::Required->value);
     $field->save();
     // Reset the node entity.
     \Drupal::entityTypeManager()->getStorage('node')->resetCache([$node->id()]);
