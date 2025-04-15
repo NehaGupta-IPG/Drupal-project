@@ -33,7 +33,7 @@ class State extends CacheCollector implements StateInterface {
   /**
    * All of the key/value state records.
    */
-  protected array $allRecords = [];
+  protected ?array $allRecords = NULL;
 
   /**
    * Constructs a State object.
@@ -68,8 +68,8 @@ class State extends CacheCollector implements StateInterface {
    * {@inheritdoc}
    */
   protected function resolveCacheMiss($key) {
-    if (empty($this->allRecords)) {
-      $this->allRecords = $this->keyValueStore->getAll();
+    if ($this->allRecords === NULL) {
+      $this->allRecords = $this->keyValueStore->getAll() ?? [];
     }
     $value = $this->allRecords[$key] ?? NULL;
     $this->storage[$key] = $value;
