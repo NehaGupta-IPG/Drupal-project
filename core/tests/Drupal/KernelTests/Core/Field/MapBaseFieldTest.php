@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\KernelTests\Core\Field;
 
+use Drupal\Core\Config\Entity\ConfigEntityTypeInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\entity_test_update\Entity\EntityTestUpdate;
 use Drupal\KernelTests\Core\Entity\EntityKernelTestBase;
@@ -37,8 +38,10 @@ class MapBaseFieldTest extends EntityKernelTestBase {
 
     // Install every entity type's schema that wasn't installed in the parent
     // method.
-    foreach (array_diff_key($this->entityTypeManager->getDefinitions(), array_flip(['user'])) as $entity_type_id => $entity_type) {
-      $this->installEntitySchema($entity_type_id);
+    foreach (array_diff_key($this->entityTypeManager->getDefinitions(), array_flip(['user', 'entity_test'])) as $entity_type_id => $entity_type) {
+      if (!$entity_type instanceof ConfigEntityTypeInterface) {
+        $this->installEntitySchema($entity_type_id);
+      }
     }
   }
 
