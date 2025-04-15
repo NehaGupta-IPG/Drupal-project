@@ -2,6 +2,7 @@
 
 namespace Drupal\views\Plugin\views\style;
 
+use Drupal\Core\Render\Markup;
 use Drupal\Component\Utility\Html;
 use Drupal\Component\Utility\Xss;
 use Drupal\Core\Form\FormStateInterface;
@@ -518,7 +519,7 @@ abstract class StylePluginBase extends PluginBase {
       }
 
       $single_output['#grouping_level'] = $level;
-      $single_output['#title'] = $set['group'];
+      $single_output['#title'] = Markup::create($set['group']);
       $output[] = $single_output;
     }
     unset($this->view->row_index);
