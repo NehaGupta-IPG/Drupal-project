@@ -19,7 +19,7 @@ abstract class QueueWorkerBase extends PluginBase implements QueueWorkerWithMeta
   /**
    * {@inheritdoc}
    */
-  public function processItemAndMetadata($data, object $metadata): void {
+  public function processItemAndMetadata($data, ?object $metadata): void {
     // By default, we can ignore the extra metadata.
     $this->processItem($data);
   }
