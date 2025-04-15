@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\comment\Unit;
 
+use Drupal\comment\CommentingStatus;
 use Drupal\comment\CommentLinkBuilder;
 use Drupal\comment\Plugin\Field\FieldType\CommentItemInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
@@ -167,7 +168,7 @@ class CommentLinkBuilderTest extends UnitTestCase {
     $cases = [];
     // No links should be created if the entity doesn't have the field.
     $cases[] = [
-      [FALSE, CommentItemInterface::OPEN, CommentItemInterface::FORM_BELOW, 1],
+      [FALSE, CommentingStatus::Open->value, CommentItemInterface::FORM_BELOW, 1],
       ['view_mode' => 'teaser'],
       TRUE,
       TRUE,
@@ -178,7 +179,7 @@ class CommentLinkBuilderTest extends UnitTestCase {
     foreach (['search_result', 'search_index', 'print'] as $view_mode) {
       // Nothing should be output in these view modes.
       $cases[] = [
-        [TRUE, CommentItemInterface::OPEN, CommentItemInterface::FORM_BELOW, 1],
+        [TRUE, CommentingStatus::Open->value, CommentItemInterface::FORM_BELOW, 1],
         ['view_mode' => $view_mode],
         TRUE,
         TRUE,
@@ -195,11 +196,7 @@ class CommentLinkBuilderTest extends UnitTestCase {
       'history_exists' => [FALSE, TRUE],
       'has_post_comments'   => [0, 1],
       'form_location'            => [CommentItemInterface::FORM_BELOW, CommentItemInterface::FORM_SEPARATE_PAGE],
-      'comments'        => [
-        CommentItemInterface::OPEN,
-        CommentItemInterface::CLOSED,
-        CommentItemInterface::HIDDEN,
-      ],
+      'comments' => array_column(CommentingStatus::cases(), 'value'),
       'view_mode' => [
         'teaser', 'rss', 'full',
       ],
@@ -227,7 +224,7 @@ class CommentLinkBuilderTest extends UnitTestCase {
       // All view modes other than RSS.
       if ($combination['view_mode'] != 'rss') {
         // Where commenting is open.
-        if ($combination['comments'] == CommentItemInterface::OPEN) {
+        if ($combination['comments'] == CommentingStatus::Open->value) {
           // And the user has post-comments permission.
           if ($combination['has_post_comments']) {
             // If the view mode is teaser, or the user can access comments and

@@ -5,7 +5,7 @@
  */
 
 use Drupal\comment\CommentInterface;
-use Drupal\comment\Plugin\Field\FieldType\CommentItemInterface;
+use Drupal\comment\CommentingStatus;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Render\Element;
 use Drupal\Core\Link;
@@ -98,7 +98,7 @@ function comment_preview(CommentInterface $comment, FormStateInterface $form_sta
     // the commented entity is rendered, it excludes the comment field output.
     $field_name = $comment->getFieldName();
     $entity = clone $entity;
-    $entity->$field_name->status = CommentItemInterface::HIDDEN;
+    $entity->$field_name->status = CommentingStatus::Hidden->value;
     $build = \Drupal::entityTypeManager()
       ->getViewBuilder($entity->getEntityTypeId())
       ->view($entity, 'full');

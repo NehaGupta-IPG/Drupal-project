@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\jsonapi\Functional;
 
+use Drupal\comment\CommentingStatus;
 use Drupal\entity_test\EntityTestHelper;
 use Drupal\jsonapi\JsonApiSpec;
 use Drupal\comment\Entity\Comment;
 use Drupal\comment\Entity\CommentType;
-use Drupal\comment\Plugin\Field\FieldType\CommentItemInterface;
 use Drupal\comment\Tests\CommentTestTrait;
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Cache\Cache;
@@ -118,7 +118,7 @@ class CommentTest extends ResourceTestBase {
     $this->commentedEntity = EntityTest::create([
       'name' => 'Camelids',
       'type' => 'bar',
-      'comment' => CommentItemInterface::OPEN,
+      'comment' => CommentingStatus::Open->value,
     ]);
     $this->commentedEntity->save();
 

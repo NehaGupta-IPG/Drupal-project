@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Drupal\KernelTests\Core\Entity;
 
+use Drupal\comment\CommentingStatus;
 use Drupal\comment\Entity\Comment;
-use Drupal\comment\Plugin\Field\FieldType\CommentItemInterface;
 use Drupal\comment\Tests\CommentTestTrait;
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\block\Entity\Block;
@@ -156,7 +156,7 @@ class EntityCrudHookTest extends EntityKernelTestBase {
       'type' => 'article',
       'name' => 'Article',
     ])->save();
-    $this->addDefaultCommentField('node', 'article', 'comment', CommentItemInterface::OPEN);
+    $this->addDefaultCommentField('node', 'article', 'comment', CommentingStatus::Open->value);
 
     $node = Node::create([
       'uid' => $account->id(),

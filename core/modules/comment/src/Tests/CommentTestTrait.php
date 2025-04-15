@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Drupal\comment\Tests;
 
+use Drupal\comment\CommentingStatus;
 use Drupal\Component\Utility\Unicode;
-use Drupal\comment\Plugin\Field\FieldType\CommentItemInterface;
 
 /**
  * Provides common functionality for the Comment test classes.
@@ -34,8 +34,10 @@ trait CommentTestTrait {
    * @param string $comment_view_mode
    *   (optional) The comment view mode to be used in comment field formatter.
    *   Defaults to 'full'.
+   *
+   * @todo remove int param for $default_value and use enum instead.
    */
-  protected function addDefaultCommentField($entity_type, $bundle, $field_name = 'comment', $default_value = CommentItemInterface::OPEN, $comment_type_id = 'comment', $comment_view_mode = 'full') {
+  protected function addDefaultCommentField($entity_type, $bundle, $field_name = 'comment', $default_value = CommentingStatus::Open->value, $comment_type_id = 'comment', $comment_view_mode = 'full') {
     $entity_type_manager = \Drupal::entityTypeManager();
     $entity_display_repository = \Drupal::service('entity_display.repository');
     /** @var \Drupal\Core\Entity\EntityFieldManagerInterface $entity_field_manager */

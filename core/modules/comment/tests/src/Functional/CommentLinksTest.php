@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\comment\Functional;
 
+use Drupal\comment\CommentingStatus;
 use Drupal\comment\CommentMode;
 use Drupal\comment\CommentStatus;
 use Drupal\comment\Plugin\Field\FieldType\CommentItemInterface;
@@ -85,7 +86,7 @@ class CommentLinksTest extends CommentTestBase {
 
     // Change comment settings.
     $this->setCommentSettings('form_location', CommentItemInterface::FORM_BELOW, 'Set comment form location');
-    $this->node->comment = CommentItemInterface::OPEN;
+    $this->node->comment = CommentingStatus::Open->value;
     $this->node->save();
 
     // Change user permissions.

@@ -5,6 +5,7 @@ namespace Drupal\comment\Plugin\Field\FieldType;
 use Drupal\comment\AnonymousContact;
 use Drupal\comment\CommentFieldItemList;
 use Drupal\comment\CommentMode;
+use Drupal\comment\CommentingStatus;
 use Drupal\comment\Entity\CommentType;
 use Drupal\Core\Field\Attribute\FieldType;
 use Drupal\Core\Field\FieldDefinitionInterface;
@@ -198,11 +199,7 @@ class CommentItem extends FieldItemBase implements CommentItemInterface {
    * {@inheritdoc}
    */
   public static function generateSampleValue(FieldDefinitionInterface $field_definition) {
-    $statuses = [
-      CommentItemInterface::HIDDEN,
-      CommentItemInterface::CLOSED,
-      CommentItemInterface::OPEN,
-    ];
+    $statuses = array_column(CommentingStatus::cases(), 'value');
     return [
       'status' => $statuses[mt_rand(0, count($statuses) - 1)],
     ];
