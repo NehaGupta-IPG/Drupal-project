@@ -806,10 +806,6 @@ trait FunctionalTestSetupTrait {
     $this->kernel->boot()->preHandle($request);
     $this->container = $this->kernel->getContainer();
 
-    // The value comes with the dump from previous installation.
-    \Drupal::configFactory()->getEditable('system.file')
-      ->set('path.temporary', $this->tempFilesDirectory)
-      ->save();
     \Drupal::service('file_system')->prepareDirectory($this->tempFilesDirectory, FileSystemInterface::MODIFY_PERMISSIONS | FileSystemInterface::CREATE_DIRECTORY);
 
     // Manually create the private directory.
