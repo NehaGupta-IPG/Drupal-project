@@ -49,7 +49,7 @@ class WorkspaceListBuilder extends EntityListBuilder {
    *
    * @var \Drupal\Core\Session\AccountInterface
    */
-  protected $current_user;
+  protected $currentUser;
 
   /**
    * Constructs a new EntityListBuilder object.
@@ -72,7 +72,7 @@ class WorkspaceListBuilder extends EntityListBuilder {
     $this->workspaceManager = $workspace_manager;
     $this->workspaceRepository = $workspace_repository;
     $this->renderer = $renderer;
-    $this->current_user = $account;
+    $this->currentUser = $account;
   }
 
   /**
@@ -169,7 +169,7 @@ class WorkspaceListBuilder extends EntityListBuilder {
     }
 
     if (!$entity->hasParent()) {
-      if ($this->current_user->hasPermission('publish to live workspace')) {
+      if ($this->currentUser->hasPermission('publish to live workspace')) {
         $operations['publish'] = [
           'title' => $this->t('Publish content'),
           // The 'Publish' operation should be the default one for the currently
@@ -183,7 +183,7 @@ class WorkspaceListBuilder extends EntityListBuilder {
       }
     }
     else {
-      if ($this->current_user->hasPermission('edit any workspace')) {
+      if ($this->currentUser->hasPermission('edit any workspace')) {
         /** @var \Drupal\workspaces\WorkspaceInterface $parent */
         $parent = $entity->parent->entity;
         $operations['merge'] = [
@@ -327,7 +327,7 @@ class WorkspaceListBuilder extends EntityListBuilder {
         ],
       ];
       if (!$active_workspace->hasParent()) {
-        if ($this->current_user->hasPermission('publish to live workspace')) {
+        if ($this->currentUser->hasPermission('publish to live workspace')) {
           $build['active_workspace']['actions']['publish'] = [
             '#type' => 'link',
             '#title' => $this->t('Publish content'),
@@ -342,7 +342,7 @@ class WorkspaceListBuilder extends EntityListBuilder {
         }
       }
       else {
-        if ($this->current_user->hasPermission('edit any workspace')) {
+        if ($this->currentUser->hasPermission('edit any workspace')) {
           $build['active_workspace']['actions']['merge'] = [
             '#type' => 'link',
             '#title' => $this->t('Merge content'),
