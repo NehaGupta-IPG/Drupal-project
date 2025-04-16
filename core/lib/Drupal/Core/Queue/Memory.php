@@ -47,6 +47,7 @@ class Memory implements QueueInterface {
     $item->data = $data;
     $item->created = \Drupal::time()->getCurrentTime();
     $item->expire = 0;
+    $item->claimed_count = 0;
     $this->queue[$item->item_id] = $item;
     return $item->item_id;
   }
@@ -65,6 +66,7 @@ class Memory implements QueueInterface {
     foreach ($this->queue as $key => $item) {
       if ($item->expire == 0) {
         $item->expire = \Drupal::time()->getCurrentTime() + $lease_time;
+        $item->claimed_count += 1;
         $this->queue[$key] = $item;
         return $item;
       }
