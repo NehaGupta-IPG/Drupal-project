@@ -83,10 +83,23 @@ class EntityAccess implements ContainerInjectionInterface {
    * @see hook_entity_access()
    */
   public function entityOperationAccess(EntityInterface $entity, $operation, AccountInterface $account) {
+    if ($operation === 'view') {
+      return AccessResult::neutral();
+    }
+ 
+    $entity_supported = $this->workspaceInfo->isEntitySupported($entity);
+    $live_workspace = !$this->workspaceManager->hasActiveWorkspace();
+
+    // Supported entity types on the Live workspace
+    // requires the 'publish to live workspace' permission.
+    if ($entity_supported && $live_workspace && !$account->hasPermission('publish to live workspace')) {
+        return AccessResult::forbidden();
+    }
+
     // Workspaces themselves are handled by their own access handler and we
     // should not try to do any access checks for entity types that can not
     // belong to a workspace.
-    if (!$this->workspaceInfo->isEntitySupported($entity) || !$this->workspaceManager->hasActiveWorkspace()) {
+    if (!$entity_supported || $live_workspace) {
       return AccessResult::neutral();
     }
 
@@ -119,11 +132,20 @@ class EntityAccess implements ContainerInjectionInterface {
    * @see hook_entity_create_access()
    */
   public function entityCreateAccess(AccountInterface $account, array $context, $entity_bundle) {
+    $entity_type = $this->entityTypeManager->getDefinition($context['entity_type_id']);
+    $entity_type_supported = $this->workspaceInfo->isEntityTypeSupported($entity_type);
+    $live_workspace = !$this->workspaceManager->hasActiveWorkspace();
+
+    // Supported entity types on the Live workspace
+    // requires the 'publish to live workspace' permission.
+    if ($entity_type_supported && $live_workspace && !$account->hasPermission('publish to live workspace')) {
+        return AccessResult::forbidden();
+    }
+
     // Workspaces themselves are handled by their own access handler and we
     // should not try to do any access checks for entity types that can not
     // belong to a workspace.
-    $entity_type = $this->entityTypeManager->getDefinition($context['entity_type_id']);
-    if (!$this->workspaceInfo->isEntityTypeSupported($entity_type) || !$this->workspaceManager->hasActiveWorkspace()) {
+    if (!$entity_type_supported || $live_workspace) {
       return AccessResult::neutral();
     }
 
