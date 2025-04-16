@@ -4,10 +4,12 @@ declare(strict_types=1);
 
 namespace Drupal\workspaces\Hook;
 
+use Drupal\Component\Datetime\TimeInterface;
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Cache\CacheTagsInvalidatorInterface;
 use Drupal\Core\Entity\EntityDefinitionUpdateManagerInterface;
 use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Hook\Attribute\Hook;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
@@ -26,6 +28,8 @@ class WorkspacesHooks {
     protected WorkspaceInformationInterface $workspaceInfo,
     protected EntityDefinitionUpdateManagerInterface $entityDefinitionUpdateManager,
     protected CacheTagsInvalidatorInterface $cacheTagsInvalidator,
+    protected EntityTypeManagerInterface $entityTypeManager,
+    protected TimeInterface $time,
   ) {}
 
   /**
@@ -84,6 +88,22 @@ class WorkspacesHooks {
    */
   #[Hook('cron')]
   public function cron(): void {
+    // Delete temporary workspaces so their data can be purged.
+    // @todo Should this be done by CM instead, even though the concept of
+    //   "temporary" is exposed by Workspaces? i.e. the workspace provider needs
+    //   to take care of its own managed workspaces.
+    $storage = $this->entityTypeManager->getStorage('workspace');
+    $result = $storage->getQuery()
+      ->accessCheck(FALSE)
+      ->condition('temporary', TRUE)
+      // @todo Is 10 days enough for cleaning up unsaved entities? Make it
+      //   configurable?
+      ->condition('created', $this->time->getRequestTime() - 864000, '<')
+      ->execute();
+    if ($result && ($workspaces = $storage->loadMultiple($result))) {
+      $storage->delete($workspaces);
+    }
+
     $this->workspaceManager->purgeDeletedWorkspacesBatch();
   }
 

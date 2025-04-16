@@ -49,4 +49,11 @@ class QueryParameterWorkspaceNegotiator extends SessionWorkspaceNegotiator {
     return substr(Crypt::hmacBase64($workspace_id, Settings::getHashSalt()), 0, 8);
   }
 
+  public function getQueryOptions(string $workspace_id): array {
+    return [
+      'workspace' => $workspace_id,
+      'token' => $this->getQueryToken($workspace_id),
+    ];
+  }
+
 }

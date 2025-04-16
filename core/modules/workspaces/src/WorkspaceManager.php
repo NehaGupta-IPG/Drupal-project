@@ -9,7 +9,10 @@ use Drupal\Core\Session\AccountProxyInterface;
 use Drupal\Core\Site\Settings;
 use Drupal\Core\State\StateInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
+use Drupal\workspaces\Provider\WorkspaceProviderInterface;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
+use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
@@ -26,8 +29,22 @@ class WorkspaceManager implements WorkspaceManagerInterface {
    */
   protected $activeWorkspace;
 
-  public function __construct(protected RequestStack $requestStack, protected EntityTypeManagerInterface $entityTypeManager, protected MemoryCacheInterface $entityMemoryCache, protected AccountProxyInterface $currentUser, protected StateInterface $state, protected LoggerInterface $logger, protected ClassResolverInterface $classResolver, protected WorkspaceAssociationInterface $workspaceAssociation, protected WorkspaceInformationInterface $workspaceInfo, protected array $negotiatorIds = []) {
-  }
+  public function __construct(
+    protected RequestStack $requestStack,
+    protected EntityTypeManagerInterface $entityTypeManager,
+    protected MemoryCacheInterface $entityMemoryCache,
+    protected AccountProxyInterface $currentUser,
+    protected StateInterface $state,
+    #[Autowire(service: 'logger.channel.workspaces')]
+    protected LoggerInterface $logger,
+    protected ClassResolverInterface $classResolver,
+    protected WorkspaceAssociationInterface $workspaceAssociation,
+    protected WorkspaceInformationInterface $workspaceInfo,
+    #[AutowireIterator(tag: 'workspace_provider', indexAttribute: 'id')]
+    protected iterable $providers = [],
+    #[AutowireIterator(tag: 'workspace_negotiator')]
+    protected iterable $negotiators = [],
+  ) {}
 
   /**
    * {@inheritdoc}
@@ -43,10 +60,8 @@ class WorkspaceManager implements WorkspaceManagerInterface {
     if (!isset($this->activeWorkspace)) {
       $request = $this->requestStack->getCurrentRequest();
 
-      foreach ($this->negotiatorIds as $negotiator_id) {
-        /** @var \Drupal\workspaces\Negotiator\WorkspaceIdNegotiatorInterface $negotiator */
-        $negotiator = $this->classResolver->getInstanceFromDefinition($negotiator_id);
-
+      /** @var \Drupal\workspaces\Negotiator\WorkspaceIdNegotiatorInterface $negotiator */
+      foreach ($this->negotiators as $negotiator) {
         if ($negotiator->applies($request)) {
           if ($workspace_id = $negotiator->getActiveWorkspaceId($request)) {
             /** @var \Drupal\workspaces\WorkspaceInterface $negotiated_workspace */
@@ -58,7 +73,9 @@ class WorkspaceManager implements WorkspaceManagerInterface {
           // By default, 'view' access is checked when a workspace is activated,
           // but it should also be checked when retrieving the currently active
           // workspace.
-          if (isset($negotiated_workspace) && $negotiated_workspace->access('view')) {
+          // @todo Is the access model ok for managed workspaces? Can they
+          //   always be set as active regardless of user permissions?
+          if (isset($negotiated_workspace) && ($negotiated_workspace->isManaged() || $negotiated_workspace->access('view'))) {
             // Notify the negotiator that its workspace has been selected.
             $negotiator->setActiveWorkspace($negotiated_workspace);
 
@@ -84,8 +101,7 @@ class WorkspaceManager implements WorkspaceManagerInterface {
 
     // Set the workspace on the proper negotiator.
     $request = $this->requestStack->getCurrentRequest();
-    foreach ($this->negotiatorIds as $negotiator_id) {
-      $negotiator = $this->classResolver->getInstanceFromDefinition($negotiator_id);
+    foreach ($this->negotiators as $negotiator) {
       if ($negotiator->applies($request)) {
         $negotiator->setActiveWorkspace($workspace);
         break;
@@ -102,8 +118,7 @@ class WorkspaceManager implements WorkspaceManagerInterface {
     $this->doSwitchWorkspace(NULL);
 
     // Unset the active workspace on all negotiators.
-    foreach ($this->negotiatorIds as $negotiator_id) {
-      $negotiator = $this->classResolver->getInstanceFromDefinition($negotiator_id);
+    foreach ($this->negotiators as $negotiator) {
       $negotiator->unsetActiveWorkspace();
     }
 
@@ -123,7 +138,11 @@ class WorkspaceManager implements WorkspaceManagerInterface {
   protected function doSwitchWorkspace($workspace) {
     // If the current user doesn't have access to view the workspace, they
     // shouldn't be allowed to switch to it, except in CLI processes.
-    if ($workspace && PHP_SAPI !== 'cli' && !$workspace->access('view')) {
+    // @todo Should 'view' access be allowed by the workspace provider somehow?
+    //   This most likely means we need workspace providers to be more than a
+    //   string in the database, probably tagged services? Lots of implications
+    //   here.
+    if ($workspace && PHP_SAPI !== 'cli' && !$workspace->isManaged() && !$workspace->access('view')) {
       $this->logger->error('Denied access to view workspace %workspace_label for user %uid', [
         '%workspace_label' => $workspace->label(),
         '%uid' => $this->currentUser->id(),
@@ -146,6 +165,12 @@ class WorkspaceManager implements WorkspaceManagerInterface {
     if (\Drupal::hasService('path_alias.manager')) {
       \Drupal::service('path_alias.manager')->cacheClear();
     }
+  }
+
+  public function clearActiveWorkspace(): static {
+    unset($this->activeWorkspace);
+
+    return $this;
   }
 
   /**
@@ -251,6 +276,19 @@ class WorkspaceManager implements WorkspaceManagerInterface {
       // Delete any possible leftover association entries.
       $this->workspaceAssociation->deleteAssociations($workspace_id);
     }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getProvider(WorkspaceInterface $workspace): WorkspaceProviderInterface {
+    $providers = iterator_to_array($this->providers);
+    $id = $workspace->get('provider')->value;
+    if (!isset($providers[$id])) {
+      throw new \DomainException("Workspace provider '$id' not found.");
+    }
+
+    return $providers[$id];
   }
 
 }

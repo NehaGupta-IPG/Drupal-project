@@ -16,10 +16,12 @@ use Drupal\workspaces\Entity\Handler\IgnoredWorkspaceHandler;
 use Drupal\workspaces\Form\WorkspaceActivateForm;
 use Drupal\workspaces\Form\WorkspaceDeleteForm;
 use Drupal\workspaces\Form\WorkspaceForm;
+use Drupal\workspaces\Provider\WorkspaceProviderInterface;
 use Drupal\workspaces\WorkspaceAccessControlHandler;
 use Drupal\workspaces\WorkspaceInterface;
 use Drupal\workspaces\WorkspaceListBuilder;
 use Drupal\workspaces\WorkspaceViewBuilder;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * The workspace entity class.
@@ -93,7 +95,7 @@ class Workspace extends ContentEntityBase implements WorkspaceInterface {
       ->setRequired(TRUE)
       ->addConstraint('UniqueField')
       ->addConstraint('DeletedWorkspace')
-      ->addPropertyConstraints('value', ['Regex' => ['pattern' => '/^[a-z0-9_]+$/']]);
+      ->addPropertyConstraints('value', ['Regex' => ['pattern' => '/^[a-z0-9_.]+$/']]);
 
     $fields['label'] = BaseFieldDefinition::create('string')
       ->setLabel(new TranslatableMarkup('Workspace name'))
@@ -121,6 +123,32 @@ class Workspace extends ContentEntityBase implements WorkspaceInterface {
         'type' => 'options_select',
         'weight' => 10,
       ]);
+
+    $fields['provider'] = BaseFieldDefinition::create('string')
+      ->setLabel(new TranslatableMarkup('Provider'))
+      ->setDescription(new TranslatableMarkup('The workspace provider.'))
+      ->setSetting('max_length', 128)
+      ->setRequired(TRUE)
+      ->setReadOnly(TRUE)
+      ->setDefaultValue('default')
+      ->setDisplayConfigurable('form', FALSE)
+      ->setDisplayConfigurable('view', FALSE);
+
+    // @todo Still needed? Maybe we could assume that a workspace is "managed"
+    //   if $provider != 'default'.
+    $fields['managed'] = BaseFieldDefinition::create('boolean')
+      ->setLabel(new TranslatableMarkup('Managed'))
+      ->setDescription(new TranslatableMarkup('Whether the workspace can only be managed in code.'))
+      ->setDefaultValue(FALSE)
+      ->setDisplayConfigurable('form', FALSE)
+      ->setDisplayConfigurable('view', FALSE);
+
+    $fields['temporary'] = BaseFieldDefinition::create('boolean')
+      ->setLabel(new TranslatableMarkup('Temporary'))
+      ->setDescription(new TranslatableMarkup('Whether the workspace can be purged automatically.'))
+      ->setDefaultValue(FALSE)
+      ->setDisplayConfigurable('form', FALSE)
+      ->setDisplayConfigurable('view', FALSE);
 
     $fields['changed'] = BaseFieldDefinition::create('changed')
       ->setLabel(new TranslatableMarkup('Changed'))
@@ -160,6 +188,52 @@ class Workspace extends ContentEntityBase implements WorkspaceInterface {
    */
   public function hasParent() {
     return !$this->get('parent')->isEmpty();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function isManaged(): bool {
+    return (bool) $this->get('managed')->value;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setManaged(): static {
+    $this->set('managed', TRUE);
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setUnmanaged(): static {
+    $this->set('managed', FALSE);
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function isTemporary(): bool {
+    return (bool) $this->get('temporary')->value;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setTemporary(): static {
+    $this->set('temporary', TRUE);
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setPermanent(): static {
+    $this->set('temporary', FALSE);
+    return $this;
   }
 
   /**

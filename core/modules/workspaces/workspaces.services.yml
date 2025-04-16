@@ -3,9 +3,7 @@ services:
     autoconfigure: true
   workspaces.manager:
     class: Drupal\workspaces\WorkspaceManager
-    arguments: ['@request_stack', '@entity_type.manager', '@entity.memory_cache', '@current_user', '@state', '@logger.channel.workspaces', '@class_resolver', '@workspaces.association', '@workspaces.information']
-    tags:
-      - { name: service_id_collector, tag: workspace_negotiator }
+    autowire: true
   Drupal\workspaces\WorkspaceManagerInterface: '@workspaces.manager'
   workspaces.information:
     class: Drupal\workspaces\WorkspaceInformation
@@ -26,6 +24,12 @@ services:
     arguments: ['@entity_type.manager', '@cache.default']
   Drupal\workspaces\WorkspaceRepositoryInterface: '@workspaces.repository'
 
+  workspaces.provider.default:
+    class: Drupal\workspaces\Provider\DefaultWorkspaceProvider
+    autowire: true
+    tags:
+      - { name: workspace_provider, id: default }
+
   workspaces.negotiator.session:
     class: Drupal\workspaces\Negotiator\SessionWorkspaceNegotiator
     arguments: ['@current_user', '@session', '@entity_type.manager']
@@ -36,6 +40,10 @@ services:
     parent: workspaces.negotiator.session
     tags:
       - { name: workspace_negotiator, priority: 100 }
+  workspaces.negotiator.static:
+    class: Drupal\workspaces\Negotiator\StaticWorkspaceNegotiator
+    tags:
+      - { name: workspace_negotiator, priority: 200 }
 
   access_check.workspaces.active_workspace:
     class: Drupal\workspaces\Access\ActiveWorkspaceCheck
@@ -88,11 +96,11 @@ services:
     tags:
       - { name: backend_overridable }
 
-  workspaces.controller.entity_form:
-    # Decorate the entity form controller to handle entity operations inside a
-    # workspace.
-    decorates: controller.entity_form
-    class: Drupal\workspaces\Controller\WorkspacesHtmlEntityFormController
-    public: false
-    arguments: ['@.inner', '@workspaces.manager', '@workspaces.information', '@typed_data_manager']
-  Drupal\workspaces\Controller\WorkspacesHtmlEntityFormController: '@workspaces.controller.entity_form'
+#  workspaces.controller.entity_form:
+#    # Decorate the entity form controller to handle entity operations inside a
+#    # workspace.
+#    decorates: controller.entity_form
+#    class: Drupal\workspaces\Controller\WorkspacesHtmlEntityFormController
+#    public: false
+#    arguments: ['@.inner', '@workspaces.manager', '@workspaces.information', '@typed_data_manager']
+#  Drupal\workspaces\Controller\WorkspacesHtmlEntityFormController: '@workspaces.controller.entity_form'

@@ -6,12 +6,12 @@ namespace Drupal\workspaces\Hook;
 
 use Drupal\Core\Entity\EntityFormInterface;
 use Drupal\Core\Entity\EntityInterface;
-use Drupal\Core\Entity\EntityPublishedInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Entity\Query\QueryInterface;
 use Drupal\Core\Entity\RevisionableInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Hook\Attribute\Hook;
+use Drupal\Core\Render\Element;
 use Drupal\workspaces\WorkspaceAssociationInterface;
 use Drupal\workspaces\WorkspaceInformationInterface;
 use Drupal\workspaces\WorkspaceManagerInterface;
@@ -21,11 +21,6 @@ use Drupal\workspaces\WorkspaceRepositoryInterface;
  * Defines a class for reacting to entity runtime hooks.
  */
 class EntityOperations {
-
-  /**
-   * A list of entity UUIDs that were created as published in a workspace.
-   */
-  protected array $initialPublished = [];
 
   public function __construct(
     protected EntityTypeManagerInterface $entityTypeManager,
@@ -74,55 +69,8 @@ class EntityOperations {
    */
   #[Hook('entity_presave')]
   public function entityPresave(EntityInterface $entity): void {
-    if ($this->shouldSkipOperations($entity)) {
-      return;
-    }
-
-    // Disallow any change to an unsupported entity when we are not in the
-    // default workspace.
-    if (!$this->workspaceInfo->isEntitySupported($entity)) {
-      throw new \RuntimeException(sprintf('The "%s" entity type can only be saved in the default workspace.', $entity->getEntityTypeId()));
-    }
-
-    /** @var \Drupal\Core\Entity\ContentEntityInterface|\Drupal\Core\Entity\EntityPublishedInterface $entity */
-    if (!$entity->isNew() && !$entity->isSyncing()) {
-      // Force a new revision if the entity is not replicating.
-      $entity->setNewRevision(TRUE);
-
-      // All entities in the non-default workspace are pending revisions,
-      // regardless of their publishing status. This means that when creating
-      // a published pending revision in a non-default workspace it will also be
-      // a published pending revision in the default workspace, however, it will
-      // become the default revision only when it is replicated to the default
-      // workspace.
-      $entity->isDefaultRevision(FALSE);
-    }
-
-    // In ::entityFormEntityBuild() we mark the entity as a non-default revision
-    // so that validation constraints can rely on $entity->isDefaultRevision()
-    // always returning FALSE when an entity form is submitted in a workspace.
-    // However, after validation has run, we need to revert that flag so the
-    // first revision of a new entity is correctly seen by the system as the
-    // default revision.
-    if ($entity->isNew()) {
-      $entity->isDefaultRevision(TRUE);
-    }
-
-    // Track the workspaces in which the new revision was saved.
-    if (!$entity->isSyncing()) {
-      $field_name = $entity->getEntityType()->getRevisionMetadataKey('workspace');
-      $entity->{$field_name}->target_id = $this->workspaceManager->getActiveWorkspace()->id();
-    }
-
-    // When a new published entity is inserted in a non-default workspace, we
-    // actually want two revisions to be saved:
-    // - An unpublished default revision in the default ('live') workspace.
-    // - A published pending revision in the current workspace.
-    if ($entity->isNew() && $entity->isPublished()) {
-      // Keep track of the initially published entities for ::entityInsert(),
-      // then unpublish the default revision.
-      $this->initialPublished[$entity->uuid()] = TRUE;
-      $entity->setUnpublished();
+    if ($active_workspace = $this->workspaceManager->getActiveWorkspace()) {
+      $this->workspaceManager->getProvider($active_workspace)->entityPresave($entity);
     }
   }
 
@@ -136,31 +84,8 @@ class EntityOperations {
       $this->workspaceRepository->resetCache();
     }
 
-    if ($this->shouldSkipOperations($entity) || !$this->workspaceInfo->isEntitySupported($entity)) {
-      return;
-    }
-
-    assert($entity instanceof RevisionableInterface && $entity instanceof EntityPublishedInterface);
-    $this->workspaceAssociation->trackEntity($entity, $this->workspaceManager->getActiveWorkspace());
-
-    // When a published entity is created in a workspace, it should remain
-    // published only in that workspace, and unpublished in the live workspace.
-    // It is first saved as unpublished for the default revision, then
-    // immediately a second revision is created which is published and attached
-    // to the workspace. This ensures that the initial version of the entity
-    // does not 'leak' into the live site. This differs from edits to existing
-    // entities where there is already a valid default revision for the live
-    // workspace.
-    if (isset($this->initialPublished[$entity->uuid()])) {
-      // Ensure that the default revision of an entity saved in a workspace is
-      // unpublished.
-      if ($entity->isPublished()) {
-        throw new \RuntimeException('The default revision of an entity created in a workspace cannot be published.');
-      }
-
-      $entity->setPublished();
-      $entity->isDefaultRevision(FALSE);
-      $entity->save();
+    if ($active_workspace = $this->workspaceManager->getActiveWorkspace()) {
+      $this->workspaceManager->getProvider($active_workspace)->entityInsert($entity);
     }
   }
 
@@ -173,14 +98,8 @@ class EntityOperations {
       $this->workspaceRepository->resetCache();
     }
 
-    if ($this->shouldSkipOperations($entity) || !$this->workspaceInfo->isEntitySupported($entity)) {
-      return;
-    }
-
-    // Only track new revisions.
-    /** @var \Drupal\Core\Entity\RevisionableInterface $entity */
-    if ($entity->getLoadedRevisionId() != $entity->getRevisionId()) {
-      $this->workspaceAssociation->trackEntity($entity, $this->workspaceManager->getActiveWorkspace());
+    if ($active_workspace = $this->workspaceManager->getActiveWorkspace()) {
+      $this->workspaceManager->getProvider($active_workspace)->entityUpdate($entity);
     }
   }
 
@@ -223,16 +142,8 @@ class EntityOperations {
       $this->workspaceRepository->resetCache();
     }
 
-    if ($this->shouldSkipOperations($entity)) {
-      return;
-    }
-
-    // Prevent the entity from being deleted if the entity type does not have
-    // support for workspaces, or if the entity has a published default
-    // revision.
-    $active_workspace = $this->workspaceManager->getActiveWorkspace();
-    if (!$this->workspaceInfo->isEntitySupported($entity) || !$this->workspaceInfo->isEntityDeletable($entity, $active_workspace)) {
-      throw new \RuntimeException("This {$entity->getEntityType()->getSingularLabel()} can only be deleted in the Live workspace.");
+    if ($active_workspace = $this->workspaceManager->getActiveWorkspace()) {
+      $this->workspaceManager->getProvider($active_workspace)->entityPredelete($entity);
     }
   }
 
@@ -308,13 +219,18 @@ class EntityOperations {
       return;
     }
 
-    // Add an entity builder to the form which marks the edited entity object as
-    // a pending revision. This is needed so validation constraints like
-    // \Drupal\path\Plugin\Validation\Constraint\PathAliasConstraintValidator
-    // know in advance (before hook_entity_presave()) that the new revision will
-    // be a pending one.
-    if ($this->workspaceManager->hasActiveWorkspace()) {
+    if ($active_workspace = $this->workspaceManager->getActiveWorkspace()) {
+      // Add an entity builder to the form which marks the edited entity object as
+      // a pending revision. This is needed so validation constraints like
+      // \Drupal\path\Plugin\Validation\Constraint\PathAliasConstraintValidator
+      // know in advance (before hook_entity_presave()) that the new revision will
+      // be a pending one.
       $form['#entity_builders'][] = [static::class, 'entityFormEntityBuild'];
+
+      // Ensure that the active workspace set by a non-persistent workspace
+      // negotiator is persisted across AJAX requests.
+      $url_query_options = \Drupal::service('workspaces.negotiator.query_parameter')->getQueryOptions($active_workspace->id());
+      $this->persistNegotiatedWorkspace($form, $url_query_options);
     }
   }
 
@@ -329,6 +245,31 @@ class EntityOperations {
     // Set the non-default revision flag so that validation constraints are also
     // aware that a pending revision is about to be created.
     $entity->isDefaultRevision(FALSE);
+  }
+
+  /**
+   * Ensures that the negotiated workspace is used during AJAX interactions.
+   *
+   * @param array &$element
+   *   An associative array containing the structure of the form.
+   * @param array $url_query_options
+   *   An array of URL query options used by the query parameter workspace
+   *   negotiator.
+   */
+  protected function persistNegotiatedWorkspace(array &$element, array $url_query_options): void {
+    // Recurse through all children if needed.
+    foreach (Element::children($element) as $key) {
+      if (isset($element[$key]) && $element[$key]) {
+        $this->persistNegotiatedWorkspace($element[$key], $url_query_options);
+      }
+    }
+
+    if (isset($element['#ajax']) && !isset($element['#ajax']['options']['query']['workspace'])) {
+      $element['#ajax']['options']['query'] = array_merge_recursive(
+        $url_query_options,
+        $element['#ajax']['options']['query'] ?? [],
+      );
+    }
   }
 
   /**

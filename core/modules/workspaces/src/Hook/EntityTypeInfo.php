@@ -80,12 +80,6 @@ class EntityTypeInfo {
       // "alter" phase.
       $entity_type->addConstraint('EntityWorkspaceConflict');
       $entity_type->setRevisionMetadataKey('workspace', 'workspace');
-
-      // Non-default workspaces display the active revision on the canonical
-      // route of an entity, so the latest version route is no longer needed.
-      $link_templates = $entity_type->get('links');
-      unset($link_templates['latest-version']);
-      $entity_type->set('links', $link_templates);
     }
   }
 
