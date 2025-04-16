@@ -59,59 +59,99 @@ class EntityReferenceLabelFormatter extends EntityReferenceFormatterBase {
    */
   public function viewElements(FieldItemListInterface $items, $langcode) {
     $elements = [];
-    $output_as_link = $this->getSetting('link');
+
+    $fibers = [];
 
     foreach ($this->getEntitiesToView($items, $langcode) as $delta => $entity) {
-      $elements[$delta] = ['#entity' => $entity];
-      $label = $entity->label();
-      $cacheability = CacheableMetadata::createFromObject($entity);
-      // If the link is to be displayed and the entity has a uri, display a
-      // link.
-      if ($output_as_link && !$entity->isNew()) {
-        try {
-          $uri = $entity->toUrl();
-        }
-        catch (UndefinedLinkTemplateException) {
-          // This exception is thrown by
-          // \Drupal\Core\Entity\EntityInterface::toUrl() and it means that the
-          // entity type doesn't have a link template nor a valid
-          // "uri_callback", so don't bother trying to output a link for the
-          // rest of the referenced entities.
-          $elements[$delta]['#plain_text'] = $label;
-          $cacheability->applyTo($elements[$delta]);
-          continue;
-        }
+      $attributes = $items[$delta]->_attributes ?? NULL;
+      // Unset field item attributes since they will be included in the
+      // formatter output and shouldn't be rendered in the field template.
+      unset($items[$delta]->_attributes);
 
-        $uri_access = $uri->access(return_as_object: TRUE);
-        $cacheability->addCacheableDependency($uri_access);
-        if ($uri_access->isAllowed()) {
-          $elements[$delta] += [
-            '#type' => 'link',
-            '#title' => $label,
-            '#url' => $uri,
-            '#options' => $uri->getOptions(),
-          ];
+      $fibers[$delta] = new \Fiber(function() use ($entity, $attributes) {
+        return $this->buildEntityElement($entity, $attributes);
+      });
+    }
 
-          if (!empty($items[$delta]->_attributes)) {
-            $elements[$delta]['#options'] += ['attributes' => []];
-            $elements[$delta]['#options']['attributes'] += $items[$delta]->_attributes;
-            // Unset field item attributes since they have been included in the
-            // formatter output and shouldn't be rendered in the field template.
-            unset($items[$delta]->_attributes);
-          }
-        }
-        else {
-          $elements[$delta]['#plain_text'] = $label;
-        }
-      }
-      else {
-        $elements[$delta]['#plain_text'] = $label;
-      }
-
-      $cacheability->applyTo($elements[$delta]);
+	  $iterations = 0;
+		while (count($fibers) > 0) {
+			foreach ($fibers as $key => $fiber) {
+				if (!$fiber->isStarted()) {
+					$fiber->start();
+				}
+				elseif ($fiber->isSuspended()) {
+					$fiber->resume();
+				}
+				// If the Fiber hasn't terminated by this point, move onto the
+				// next placeholder, we'll resume this Fiber again when we get
+				// back here.
+				if (!$fiber->isTerminated()) {
+					// If we've gone through the placeholders once already, and
+					// they're still not finished, then start to allow code higher
+					// up the stack to get on with something else.
+					if ($iterations) {
+						$fiber = \Fiber::getCurrent();
+						if ($fiber !== NULL) {
+							$fiber->suspend();
+						}
+					}
+					continue;
+				}
+				$elements[$key] = $fiber->getReturn();
+				unset($fibers[$key]);
+			}
     }
 
     return $elements;
+  }
+
+  /**
+   * Build the render array for a specific entity.
+   */
+  protected function buildEntityElement(EntityInterface $entity): array {
+    $output_as_link = $this->getSetting('link');
+    $build = ['#entity' => $entity];
+    $label = $entity->label();
+    $cacheability = CacheableMetadata::createFromObject($entity);
+    // If the link is to be displayed and the entity has a uri, display a
+    // link.
+    if ($output_as_link && !$entity->isNew()) {
+      try {
+        $uri = $entity->toUrl();
+      }
+      catch (UndefinedLinkTemplateException) {
+        // This exception is thrown by
+        // \Drupal\Core\Entity\EntityInterface::toUrl() and it means that the
+        // entity type doesn't have a link template nor a valid
+        // "uri_callback", so don't bother trying to output a link for the
+        // rest of the referenced entities.
+        $build['#plain_text'] = $label;
+        $cacheability->applyTo($build);
+        return $build;
+      }
+
+      $uri_access = $uri->access(return_as_object: TRUE);
+      $cacheability->addCacheableDependency($uri_access);
+      if ($uri_access->isAllowed()) {
+        $build += [
+          '#type' => 'link',
+          '#title' => $label,
+          '#url' => $uri,
+          '#options' => $uri->getOptions(),
+        ];
+
+      }
+      else {
+        $build['#plain_text'] = $label;
+      }
+    }
+    else {
+      $build['#plain_text'] = $label;
+    }
+
+    $cacheability->applyTo($build);
+
+    return $build;
   }
 
   /**
