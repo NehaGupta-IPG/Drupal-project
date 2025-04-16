@@ -18,10 +18,26 @@ trait DeprecatedServicePropertyTrait {
     }
 
     if (isset($this->deprecatedProperties[$name])) {
-      $service_name = $this->deprecatedProperties[$name];
-      $class_name = static::class;
+      if (is_string($this->deprecatedProperties[$name])) {
+        $service_name = $this->deprecatedProperties[$name];
+        $class_name = static::class;
+        $next_major_version = intval(ceil((float) \Drupal::VERSION)) . '.0.0';
+        $message = "The property $name ($service_name service) is deprecated in $class_name and will be removed before Drupal $next_major_version.";
+      }
+      elseif (
+        is_array($this->deprecatedProperties[$name]) &&
+        isset($this->deprecatedProperties[$name]['service']) &&
+        isset($this->deprecatedProperties[$name]['message'])
+      ) {
+        $service_name = $this->deprecatedProperties[$name]['service'];
+        $message = $this->deprecatedProperties[$name]['message'];
+      }
+      else {
+        throw new \LogicException('The deprecatedProperties property must a string or an array to use this trait.');
+      }
+
       // phpcs:ignore Drupal.Semantics.FunctionTriggerError
-      @trigger_error("The property $name ($service_name service) is deprecated in $class_name and will be removed before Drupal 11.0.0.", E_USER_DEPRECATED);
+      @trigger_error($message, E_USER_DEPRECATED);
       return \Drupal::service($service_name);
     }
 
