@@ -18,15 +18,11 @@ class EntityTypeExistsConstraint extends SymfonyConstraint {
 
   /**
    * The required interface that the entity type must implement.
-   *
-   * @var string
    */
   public string $requiredInterface;
 
   /**
    * The error message if validation fails.
-   *
-   * @var string
    */
   public string $message = "The '@entity_type_id' entity type does not exist.";
 

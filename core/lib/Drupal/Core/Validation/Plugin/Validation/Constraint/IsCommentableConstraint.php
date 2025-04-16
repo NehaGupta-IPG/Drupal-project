@@ -18,15 +18,11 @@ class IsCommentableConstraint extends SymfonyConstraint {
 
   /**
    * The error message if validation fails.
-   *
-   * @var string
    */
   public string $message = "The '@entity_type_id' entity is not commentable";
 
   /**
    * The error message if the value is not a string.
-   *
-   * @var string
    */
   public string $valueIsNoStringMessage = 'The value is not a string, cannot validate if entity is commentable.';
 
