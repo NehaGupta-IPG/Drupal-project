@@ -32,7 +32,7 @@ entity.workspace.publish_form:
         type: entity:workspace
   requirements:
     _access: 'FALSE'
-    _permission: 'administer workspaces'
+    _permission: 'publish to live workspace'
 
 entity.workspace.merge_form:
   path: '/admin/config/workflow/workspaces/manage/{source_workspace}/{target_workspace}/merge'
@@ -48,7 +48,7 @@ entity.workspace.merge_form:
         type: entity:workspace
   requirements:
     _access: 'FALSE'
-    _permission: 'administer workspaces'
+    _permission: 'edit any workspace'
 
 workspaces.switch_to_live:
   path: '/admin/config/workflow/workspaces/switch-to-live'
