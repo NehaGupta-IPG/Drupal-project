@@ -199,6 +199,7 @@ display:
       header: {  }
       footer: {  }
       display_extenders: {  }
+      link_display: page_1
     cache_metadata:
       max-age: -1
       contexts:
