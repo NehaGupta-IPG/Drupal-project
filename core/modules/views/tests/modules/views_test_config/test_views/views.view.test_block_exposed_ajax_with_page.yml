@@ -50,6 +50,7 @@ display:
         type: 'entity:node'
       display_extenders: {  }
       use_ajax: true
+      link_display: page_1
     display_plugin: default
     display_title: Default
     id: default
