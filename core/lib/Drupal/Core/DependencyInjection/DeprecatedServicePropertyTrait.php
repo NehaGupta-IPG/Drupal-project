@@ -33,7 +33,7 @@ trait DeprecatedServicePropertyTrait {
         $message = $this->deprecatedProperties[$name]['message'];
       }
       else {
-        throw new \LogicException('The deprecatedProperties property must a string or an array to use this trait.');
+        throw new \LogicException('The deprecatedProperties property must a string or an array with service and message keys to use this trait.');
       }
 
       // phpcs:ignore Drupal.Semantics.FunctionTriggerError
