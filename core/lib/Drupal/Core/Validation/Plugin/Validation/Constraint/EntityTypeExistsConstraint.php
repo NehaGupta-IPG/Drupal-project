@@ -19,7 +19,7 @@ class EntityTypeExistsConstraint extends SymfonyConstraint {
   /**
    * The required interface that the entity type must implement.
    */
-  public string $requiredInterface;
+  public ?string $requiredInterface;
 
   /**
    * The error message if validation fails.
@@ -39,12 +39,5 @@ class EntityTypeExistsConstraint extends SymfonyConstraint {
    * @var string
    */
   public string $valueIsNoStringMessage = 'The value is not a string, cannot validate if entity type exists.';
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getDefaultOption(): ?string {
-    return 'requiredInterface';
-  }
 
 }

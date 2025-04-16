@@ -41,7 +41,8 @@ comment.type.*:
       label: 'Target Entity Type ID'
       constraints:
         NotNull: []
-        EntityTypeExists: '\Drupal\Core\Entity\FieldableEntityInterface'
+        EntityTypeExists:
+          interface: '\Drupal\Core\Entity\FieldableEntityInterface'
         IsCommentable: []
     description:
       type: text
