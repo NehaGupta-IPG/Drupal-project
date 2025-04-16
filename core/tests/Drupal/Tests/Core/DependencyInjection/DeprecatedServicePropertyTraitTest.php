@@ -10,7 +10,8 @@ use Drupal\Tests\Core\DependencyInjection\Fixture\DeprecatedServicePropertyCusto
 use Drupal\Tests\UnitTestCase;
 
 /**
- * Tests \Drupal\Core\DependencyInjection\DeprecatedServicePropertyTrait.
+ * @coversDefaultClass \Drupal\Core\DependencyInjection\DeprecatedServicePropertyTrait
+ * @group DependencyInjection
  */
 class DeprecatedServicePropertyTraitTest extends UnitTestCase {
 
@@ -61,6 +62,7 @@ class DeprecatedServicePropertyTraitTest extends UnitTestCase {
       ];
     };
 
+    $this->expectException(\LogicException::class);
     $this->expectExceptionMessage('The deprecatedProperties property must a string or an array with service and message keys to use this trait.');
     $this->assertInstanceOf(static::class, $class->foo);
   }
