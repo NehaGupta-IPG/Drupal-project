@@ -6,7 +6,9 @@ namespace Drupal\Tests\views\Functional\Plugin;
 
 use Drupal\Component\Utility\Html;
 use Drupal\Core\Cache\Cache;
+use Drupal\Core\Url;
 use Drupal\entity_test\Entity\EntityTest;
+use Drupal\node\Entity\Node;
 use Drupal\Tests\system\Functional\Cache\AssertPageCacheContextsAndTagsTrait;
 use Drupal\Tests\views\Functional\ViewTestBase;
 use Drupal\views\Entity\View;
@@ -580,7 +582,8 @@ class ExposedFormTest extends ViewTestBase {
     $exposedForm = $this->getSession()->getPage()->find('css', '.views-exposed-form form');
     $this->assertEquals('/node/1', $exposedForm->getAttribute('action'));
     $this->submitForm(['type' => 'article'], 'Apply');
-    $this->assertSession()->addressEquals('node/1');
+    $node = Node::load(1);
+    $this->assertSession()->addressEquals($node->toUrl()->setAbsolute()->toString());
 
     // When link_display is set, the form action should be for that display.
     $view = Views::getView('test_exposed_block');
@@ -591,7 +594,7 @@ class ExposedFormTest extends ViewTestBase {
     $this->drupalGet('/node/1');
     $this->assertEquals('/test_exposed_block', $exposedForm->getAttribute('action'));
     $this->submitForm(['type' => 'article'], 'Apply');
-    $this->assertSession()->addressEquals('test_exposed_block');
+    $this->assertSession()->addressEquals(Url::fromUri('base:/test_exposed_block')->setAbsolute()->toString());
   }
 
 }
