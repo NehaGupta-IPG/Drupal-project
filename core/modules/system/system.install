@@ -1802,7 +1802,7 @@ function system_update_11201(): void {
 /**
  * Add the [claimed_count] field to the {queue} table.
  */
-function system_update_11202() {
+function system_update_11202(): void {
   $schema = \Drupal::database()->schema();
   if ($schema->tableExists('queue') && !$schema->fieldExists('queue', 'claimed_count')) {
     $spec = [
@@ -1812,6 +1812,5 @@ function system_update_11202() {
       'description' => 'The number of times this item has been claimed.',
     ];
     $schema->addField('queue', 'claimed_count', $spec);
-    return "Added the the [claimed_count] field to the {queue} table.";
   }
 }
