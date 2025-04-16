@@ -13,7 +13,7 @@ class MockTime implements TimeInterface {
    * @param float $requestTime
    *   The request time that should be returned.
    * @param float $currentTime
-   *   The current time that should be returned,
+   *   The current time that should be returned.
    */
   public function __construct(protected float $requestTime = 0, protected float $currentTime = 0) {}
 

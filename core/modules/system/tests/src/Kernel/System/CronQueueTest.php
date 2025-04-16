@@ -85,6 +85,8 @@ class CronQueueTest extends KernelTestBase {
     $memory = new Memory('cron_queue_test_memory_delay_exception');
     $queue_factory->get('cron_queue_test_database_delay_exception', Argument::cetera())->willReturn($database);
     $queue_factory->get('cron_queue_test_memory_delay_exception', Argument::cetera())->willReturn($memory);
+    $memory_count = new Memory(CronQueueTestClaimCountQueue::BASE_PLUGIN_ID . ':memory');
+    $queue_factory->get(CronQueueTestClaimCountQueue::BASE_PLUGIN_ID . ':memory', Argument::cetera())->willReturn($memory_count);
     $queue_factory->get(Argument::any(), Argument::cetera())->will(function ($args) use ($realQueueFactory) {
       return $realQueueFactory->get($args[0], $args[1] ?? FALSE);
     });
@@ -271,11 +273,26 @@ class CronQueueTest extends KernelTestBase {
   }
 
   /**
+   * Data provider
+   *
+   * @return array[]
+   *   Back end test cases.
+   */
+  public static function queueBackendData(): array {
+    return [
+      ['database'],
+      ['memory'],
+    ];
+  }
+
+  /**
    * Tests claimed count works during cron.
+   *
+   * @dataProvider queueBackendData
    *
    * @see \Drupal\cron_queue_test\Plugin\QueueWorker\CronQueueTestClaimCountQueue
    */
-  public function testClaimedCount(): void {
+  public function testClaimedCount(string $backend): void {
     $this->logger->log(
       RfcLogLevel::ERROR,
       Argument::cetera()
@@ -287,7 +304,8 @@ class CronQueueTest extends KernelTestBase {
       Argument::cetera()
     )->shouldBeCalled();
 
-    $queue = \Drupal::queue(CronQueueTestClaimCountQueue::PLUGIN_ID);
+    $plugin_id = CronQueueTestClaimCountQueue::BASE_PLUGIN_ID . ':' . $backend;
+    $queue = \Drupal::queue($plugin_id);
     $queue->createItem('process');
     $queue->createItem('process');
     $queue->createItem('fail');
@@ -297,22 +315,21 @@ class CronQueueTest extends KernelTestBase {
     $this->cron->run();
 
     $this->assertEquals(1, $queue->numberOfItems(), 'Fail item left on queue.');
+    $this->assertEquals(1, \Drupal::state()->get($plugin_id));
     // Move time forward to get item re-claimed.
     $this->moveTimeForward(10);
     $this->cron->run();
     $this->assertEquals(1, $queue->numberOfItems(), 'Fail item left on queue.');
+    $this->assertEquals(2, \Drupal::state()->get($plugin_id));
 
     $this->moveTimeForward(10);
     $this->cron->run();
     $this->assertEquals(1, $queue->numberOfItems(), 'Fail item left on queue.');
+    $this->assertEquals(3, \Drupal::state()->get($plugin_id));
 
     $this->moveTimeForward(10);
     $this->cron->run();
     $this->assertEquals(0, $queue->numberOfItems(), 'Fail item removed from queue.');
-  }
-
-  public function testMemoryClaimedCount() {
-    $memory_queue =  new Memory(CronQueueTestClaimCountQueue::PLUGIN_ID);
   }
 
   /**

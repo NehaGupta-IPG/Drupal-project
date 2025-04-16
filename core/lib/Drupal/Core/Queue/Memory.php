@@ -11,7 +11,7 @@ namespace Drupal\Core\Queue;
  *
  * @ingroup queue
  */
-class Memory implements QueueInterface {
+class Memory implements QueueInterface, QueueGarbageCollectionInterface {
 
   /**
    * The queue data.
@@ -105,6 +105,19 @@ class Memory implements QueueInterface {
   public function deleteQueue() {
     $this->queue = [];
     $this->idSequence = 0;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function garbageCollection() {
+    // For tests only, since a memory queue will always start empty on cron.
+    $time = \Drupal::time()->getCurrentTime();
+    foreach ($this->queue as $item) {
+      if ($item->expire != 0 && $item->expire < $time) {
+        $item->expire = 0;
+      }
+    }
   }
 
 }

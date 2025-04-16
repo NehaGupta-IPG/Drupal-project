@@ -9,21 +9,23 @@ use Drupal\Core\Queue\Attribute\QueueWorker;
 use Drupal\Core\Queue\DelayedRequeueException;
 use Drupal\Core\Queue\QueueWorkerWithMetadataInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\cron_queue_test\Plugin\Derivative\CronQueueBackendTestDeriver;
 
 /**
  * A queue worker for testing queue claimed count.
  */
 #[QueueWorker(
-  id: self::PLUGIN_ID,
+  id: self::BASE_PLUGIN_ID,
   title: new TranslatableMarkup('Test queue count claimed'),
-  cron: ['time' => 2]
+  cron: ['time' => 2],
+  deriver: CronQueueBackendTestDeriver::class
 )]
 class CronQueueTestClaimCountQueue extends PluginBase implements QueueWorkerWithMetadataInterface {
 
   /**
    * The plugin ID.
    */
-  public const PLUGIN_ID = 'cron_queue_test_claim_count';
+  public const BASE_PLUGIN_ID = 'cron_queue_test_claim_count';
 
   /**
    * {@inheritdoc}
@@ -40,11 +42,12 @@ class CronQueueTestClaimCountQueue extends PluginBase implements QueueWorkerWith
     if ($data === 'process') {
       return;
     }
+    $state = \Drupal::state();
+    $state->set($this->getPluginId(), $claimed_count);
     if ($claimed_count <= 2) {
       throw new DelayedRequeueException(5, "count = $claimed_count");
     }
     if ($claimed_count == 3) {
-      //echo "FFF $claimed_count\n";
       throw new \Exception("count = $claimed_count");
     }
     // Claimed too many times, remove from queue.
