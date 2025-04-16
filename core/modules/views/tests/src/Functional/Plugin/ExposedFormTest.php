@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\Tests\views\Functional\Plugin;
 
 use Drupal\Component\Utility\Html;
+use Drupal\Core\Cache\Cache;
 use Drupal\entity_test\Entity\EntityTest;
 use Drupal\Tests\system\Functional\Cache\AssertPageCacheContextsAndTagsTrait;
 use Drupal\Tests\views\Functional\ViewTestBase;
@@ -567,6 +568,30 @@ class ExposedFormTest extends ViewTestBase {
     // Reload the page and ensure the filter is selected.
     $this->drupalGet('test_remember_selected');
     $this->assertTrue($this->assertSession()->optionExists('type', 'page')->isSelected());
+  }
+
+  /**
+   * Tests the block exposed form's #action attribute.
+   */
+  public function testBlockFormAction(): void {
+    $this->drupalPlaceBlock('views_exposed_filter_block:test_exposed_block-block_1');
+    // The views exposed form's action should be the current page.
+    $this->drupalGet('/node/1');
+    $exposedForm = $this->getSession()->getPage()->find('css', '.views-exposed-form form');
+    $this->assertEquals('/node/1', $exposedForm->getAttribute('action'));
+    $this->submitForm(['type' => 'article'], 'Apply');
+    $this->assertSession()->addressEquals('node/1');
+
+    // When link_display is set, the form action should be for that display.
+    $view = Views::getView('test_exposed_block');
+    $view->setDisplay('block_1');
+    $view->display_handler->setOption('link_display', 'page_1');
+    $view->save();
+    Cache::invalidateTags(['rendered']);
+    $this->drupalGet('/node/1');
+    $this->assertEquals('/test_exposed_block', $exposedForm->getAttribute('action'));
+    $this->submitForm(['type' => 'article'], 'Apply');
+    $this->assertSession()->addressEquals('test_exposed_block');
   }
 
 }
