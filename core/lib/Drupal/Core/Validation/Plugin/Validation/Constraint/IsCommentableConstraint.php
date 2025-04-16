@@ -11,7 +11,7 @@ use Symfony\Component\Validator\Constraint as SymfonyConstraint;
  */
 #[Constraint(
   id: 'IsCommentable',
-  label: new TranslatableMarkup('IsCommentable', [], ['context' => 'Validation']),
+  label: new TranslatableMarkup('Is commentable', [], ['context' => 'Validation']),
   type: FALSE
 )]
 class IsCommentableConstraint extends SymfonyConstraint {
