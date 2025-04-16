@@ -34,7 +34,8 @@ class QueueClaimedCountUpdateTest extends UpdatePathTestBase {
     $queue->createItem('test');
     $this->runUpdates();
     $this->assertTrue($connection->schema()->fieldExists('queue', 'claimed_count'));
-    $query = $connection->select('queue', 'q')->addField('q', 'claimed_count');
+    $query = $connection->select('queue', 'q');
+    $query->addField('q', 'claimed_count');
     $this->assertEquals(0, $query->execute()->fetchField());
     // Make sure the queue table is created with new column if missing.
     $connection->schema()->dropTable('queue');
