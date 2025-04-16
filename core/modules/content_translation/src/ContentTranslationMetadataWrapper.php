@@ -79,7 +79,9 @@ class ContentTranslationMetadataWrapper implements ContentTranslationMetadataWra
    */
   public function setAuthor(UserInterface $account) {
     $field_name = $this->translation->hasField('content_translation_uid') ? 'content_translation_uid' : 'uid';
-    $this->setFieldOnlyIfTranslatable($field_name, $account->id());
+    if ($this->translation->hasField($field_name)) {
+      $this->setFieldOnlyIfTranslatable($field_name, $account->id());
+    }
     return $this;
   }
 
