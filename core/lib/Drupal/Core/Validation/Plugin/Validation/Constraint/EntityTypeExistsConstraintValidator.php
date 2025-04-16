@@ -55,12 +55,12 @@ class EntityTypeExistsConstraintValidator extends ConstraintValidator implements
         '@entity_type_id' => $value,
       ]);
     }
-    if ($constraint->requiredInterface !== '') {
+    if ($constraint->interface !== '') {
       $entity_type = $entity_types[$value];
-      if (!$entity_type->entityClassImplements($constraint->requiredInterface)) {
+      if (!$entity_type->entityClassImplements($constraint->interface)) {
         $this->context->addViolation($constraint->interfaceMissingMessage, [
           '@entity_type_id' => $value,
-          '@interface' => $constraint->requiredInterface,
+          '@interface' => $constraint->interface,
         ]);
       }
     }
