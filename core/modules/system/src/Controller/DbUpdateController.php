@@ -144,10 +144,10 @@ class DbUpdateController extends ControllerBase {
    *
    * @param string $op
    *   The update operation to perform. Can be any of the below:
-   *    - info
-   *    - selection
-   *    - run
-   *    - results
+   *    - "info".
+   *    - "selection".
+   *    - "run".
+   *    - "results".
    * @param \Symfony\Component\HttpFoundation\Request $request
    *   The current request object.
    *
@@ -708,6 +708,12 @@ class DbUpdateController extends ControllerBase {
       $links['admin-pages'] = [
         'title' => $this->t('Administration pages'),
         'url' => Url::fromRoute('system.admin')->setOption('base_url', $base_url),
+      ];
+    }
+    if ($this->account->hasPermission('administer site configuration')) {
+      $links['status-report'] = [
+        'title' => $this->t('Status report'),
+        'url' => Url::fromRoute('system.status')->setOption('base_url', $base_url),
       ];
     }
     return $links;

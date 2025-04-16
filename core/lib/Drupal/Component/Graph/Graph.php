@@ -9,6 +9,8 @@ class Graph {
 
   /**
    * Holds the directed acyclic graph.
+   *
+   * @var array
    */
   protected $graph;
 
@@ -99,7 +101,8 @@ class Graph {
    * @see \Drupal\Component\Graph\Graph::searchAndSort()
    */
   protected function depthFirstSearch(&$state, $start, &$component = NULL) {
-    // Assign new component for each new vertex, i.e. when not called recursively.
+    // Assign new component for each new vertex, i.e. when not called
+    // recursively.
     if (!isset($component)) {
       $component = $start;
     }

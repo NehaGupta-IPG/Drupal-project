@@ -276,7 +276,14 @@ class Renderer implements RendererInterface {
 
     // Try to fetch the prerendered element from cache, replace any placeholders
     // and return the final markup.
-    if (isset($elements['#cache']['keys'])) {
+    //
+    // If the element was set to create a placeholder, we do not try to load it
+    // from the cache, as \Drupal\Core\Render\Placeholder\CachedStrategy has an
+    // optimization to load them all in one go, rather than individually here.
+    // If the current request method is not cacheable, no placeholders are
+    // generated, in that case, it's still better to fetch render cached
+    // elements individually instead of fully building them again.
+    if (isset($elements['#cache']['keys']) && (empty($elements['#create_placeholder']) || !$this->requestStack->getCurrentRequest()->isMethodCacheable())) {
       $cached_element = $this->renderCache->get($elements);
       if ($cached_element !== FALSE) {
         $elements = $cached_element;
@@ -314,11 +321,7 @@ class Renderer implements RendererInterface {
       '#create_placeholder' => TRUE,
     ]);
 
-    // If the default values for this element have not been loaded yet, populate
-    // them.
-    if (isset($elements['#type']) && empty($elements['#defaults_loaded'])) {
-      $elements += $this->elementInfo->getInfo($elements['#type']);
-    }
+    $this->loadElementDefaults($elements);
 
     // First validate the usage of #lazy_builder; both of the next if-statements
     // use it if available.
@@ -367,6 +370,9 @@ class Renderer implements RendererInterface {
       // Throw an exception if #lazy_builder callback does not return an array;
       // provide helpful details for troubleshooting.
       assert(is_array($new_elements), "#lazy_builder callbacks must return a valid renderable array, got " . gettype($new_elements) . " from " . Variable::callableToString($elements['#lazy_builder'][0]));
+
+      // The lazy builder could have set a #type, load its defaults.
+      $this->loadElementDefaults($new_elements);
 
       // Retain the original cacheability metadata, plus cache keys.
       CacheableMetadata::createFromRenderArray($elements)
@@ -600,6 +606,18 @@ class Renderer implements RendererInterface {
   }
 
   /**
+   * Loads an element's default values based on its type.
+   *
+   * @param array $element
+   *   The render array representing the element.
+   */
+  protected function loadElementDefaults(array &$element): void {
+    if (isset($element['#type']) && empty($element['#defaults_loaded'])) {
+      $element += $this->elementInfo->getInfo($element['#type']);
+    }
+  }
+
+  /**
    * Returns the current render context.
    *
    * @return \Drupal\Core\Render\RenderContext|null
@@ -607,6 +625,11 @@ class Renderer implements RendererInterface {
    */
   protected function getCurrentRenderContext() {
     $request = $this->requestStack->getCurrentRequest();
+
+    if (is_null($request)) {
+      return NULL;
+    }
+
     return static::$contextCollection[$request] ?? NULL;
   }
 

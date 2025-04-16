@@ -89,18 +89,11 @@ __EOF__
    * @covers ::getHookAttributesInClass
    */
   public function testGetHookAttributesInClass(): void {
-    /** @phpstan-ignore-next-line */
+    // @phpstan-ignore-next-line
     $getHookAttributesInClass = fn ($class) => $this->getHookAttributesInClass($class);
     $p = new HookCollectorPass();
     $getHookAttributesInClass = $getHookAttributesInClass->bindTo($p, $p);
-    $x = new class {
 
-      #[Hook('install')]
-      function foo(): void {}
-
-    };
-    $this->expectException(\LogicException::class);
-    $hooks = $getHookAttributesInClass(get_class($x));
     $x = new class {
 
       #[Hook('foo')]
@@ -111,6 +104,16 @@ __EOF__
     $hook = reset($hooks);
     $this->assertInstanceOf(Hook::class, $hook);
     $this->assertSame('foo', $hook->hook);
+
+    $x = new class {
+
+      #[Hook('install')]
+      function foo(): void {}
+
+    };
+    $this->expectException(\LogicException::class);
+    // This will throw exception, and stop code execution.
+    $getHookAttributesInClass(get_class($x));
   }
 
 }

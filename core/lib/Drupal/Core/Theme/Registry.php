@@ -528,9 +528,9 @@ class Registry implements DestructableInterface {
     if ($result) {
       foreach ($result as $hook => $info) {
         // When a theme or engine overrides a module's theme function
-        // $result[$hook] will only contain key/value pairs for information being
-        // overridden.  Pull the rest of the information from what was defined by
-        // an earlier hook.
+        // $result[$hook] will only contain key/value pairs for information
+        // being overridden.  Pull the rest of the information from what was
+        // defined by an earlier hook.
 
         // Fill in the type and path of the module, theme, or engine that
         // implements this theme function.
@@ -591,8 +591,10 @@ class Registry implements DestructableInterface {
           $info['preprocess functions'] = [];
           $prefixes = [];
           if ($type == 'module') {
-            // Add template_preprocess_HOOK functions.
-            if (function_exists('template_preprocess_' . $hook)) {
+            // Add template_preprocess_HOOK function, if no initial preprocess
+            // callback is defined.
+            if (empty($info['initial preprocess']) && function_exists('template_preprocess_' . $hook)) {
+              // @todo trigger deprecation in https://www.drupal.org/project/drupal/issues/3513595.
               $info['preprocess functions'][] = 'template_preprocess_' . $hook;
             }
             // Add all modules so they can intervene with their own variable

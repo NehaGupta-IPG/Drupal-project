@@ -57,16 +57,22 @@ abstract class ArgumentPluginBase extends HandlerBase implements CacheableDepend
 
   /**
    * The validator to use.
+   *
+   * @var string|null
    */
   public $validator = NULL;
 
   /**
    * The name of the argument.
+   *
+   * @var string|null
    */
   public $argument = NULL;
 
   /**
    * The value for the argument.
+   *
+   * @var mixed
    */
   public $value = NULL;
 
@@ -415,8 +421,8 @@ abstract class ArgumentPluginBase extends HandlerBase implements CacheableDepend
               '#prefix' => '<div id="edit-options-validate-options-' . $sanitized_id . '-wrapper">',
               '#suffix' => '</div>',
               '#type' => 'item',
-              // Even if the plugin has no options add the key to the form_state.
-              // trick it into checking input to make #process run.
+              // Even if the plugin has no options add the key to the
+              // form_state. trick it into checking input to make #process run.
               '#input' => TRUE,
               '#states' => [
                 'visible' => [
@@ -537,7 +543,8 @@ abstract class ArgumentPluginBase extends HandlerBase implements CacheableDepend
     if ($plugin) {
       $options = &$option_values['argument_default'][$default_id];
       $plugin->submitOptionsForm($form['argument_default'][$default_id], $form_state, $options);
-      // Copy the now submitted options to their final resting place so they get saved.
+      // Copy the now submitted options to their final resting place so they get
+      // saved.
       $option_values['default_argument_options'] = $options;
     }
 
@@ -547,7 +554,8 @@ abstract class ArgumentPluginBase extends HandlerBase implements CacheableDepend
     if ($plugin) {
       $options = &$option_values['summary']['options'][$summary_id];
       $plugin->submitOptionsForm($form['summary']['options'][$summary_id], $form_state, $options);
-      // Copy the now submitted options to their final resting place so they get saved.
+      // Copy the now submitted options to their final resting place so they get
+      // saved.
       $option_values['summary_options'] = $options;
     }
 
@@ -568,7 +576,8 @@ abstract class ArgumentPluginBase extends HandlerBase implements CacheableDepend
     if ($plugin) {
       $options = &$option_values['validate']['options'][$sanitized_id];
       $plugin->submitOptionsForm($form['validate']['options'][$sanitized_id], $form_state, $options);
-      // Copy the now submitted options to their final resting place so they get saved.
+      // Copy the now submitted options to their final resting place so they get
+      // saved.
       $option_values['validate_options'] = $options;
     }
 
@@ -1209,7 +1218,8 @@ abstract class ArgumentPluginBase extends HandlerBase implements CacheableDepend
       $plugin->init($this->view, $this->displayHandler, $options);
 
       if ($type !== 'style') {
-        // It's an argument_default/argument_validate plugin, so set the argument.
+        // It's an argument_default/argument_validate plugin, so set the
+        // argument.
         $plugin->setArgument($this);
       }
       return $plugin;

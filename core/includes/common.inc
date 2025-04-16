@@ -84,17 +84,19 @@ const CSS_BASE = -200;
 const CSS_LAYOUT = -100;
 
 /**
- * The default weight for CSS rules that style design components (and their associated states and themes.)
+ * The default weight for CSS rules that style design components.
+ *
+ * This applies to the associated states and themes of the component.
  */
 const CSS_COMPONENT = 0;
 
 /**
- * The default weight for CSS rules that style states and are not included with components.
+ * The default weight for rules that style states not included with components.
  */
 const CSS_STATE = 100;
 
 /**
- * The default weight for CSS rules that style themes and are not included with components.
+ * The default weight for rules that style themes not included with components.
  */
 const CSS_THEME = 200;
 
@@ -255,7 +257,7 @@ function base_path() {
  *
  * @see MenuForm::BuildOverviewForm()
  */
-function drupal_attach_tabledrag(&$element, array $options) {
+function drupal_attach_tabledrag(&$element, array $options): void {
   // Add default values to elements.
   $options = $options + [
     'subgroup' => NULL,
@@ -342,7 +344,10 @@ function show(&$element) {
 }
 
 /**
- * Rebuilds the container, flushes all persistent caches, resets all variables, and rebuilds all data structures.
+ * Re-initializes the entire system.
+ *
+ * To re-initialize the system, the container is rebuilt, all persistent caches
+ * are flushed, all variables are reset and all data structures are rebuilt.
  *
  * At times, it is necessary to re-initialize the entire system to account for
  * changed or new code. This function:
@@ -406,7 +411,7 @@ function show(&$element) {
  * @todo Add a global lock to ensure that caches are not primed in concurrent
  *   requests.
  */
-function drupal_flush_all_caches($kernel = NULL) {
+function drupal_flush_all_caches($kernel = NULL): void {
   // This is executed based on old/previously known information if $kernel is
   // not passed in, which is sufficient, since new extensions cannot have any
   // primed caches yet.
@@ -483,10 +488,12 @@ function drupal_flush_all_caches($kernel = NULL) {
  * @see hook_updater_info_alter()
  */
 function drupal_get_updaters() {
+  @trigger_error(__METHOD__ . '() is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. There is no replacement. Use composer to manage the code for your site. See https://www.drupal.org/node/3512364', E_USER_DEPRECATED);
+
   $updaters = &drupal_static(__FUNCTION__);
   if (!isset($updaters)) {
-    $updaters = \Drupal::moduleHandler()->invokeAll('updater_info');
-    \Drupal::moduleHandler()->alter('updater_info', $updaters);
+    $updaters = \Drupal::moduleHandler()->invokeAllDeprecated('There is no replacement. Use composer to manage the code for your site. See https://www.drupal.org/node/3512364', 'updater_info');
+    \Drupal::moduleHandler()->alterDeprecated('There is no replacement. Use composer to manage the code for your site. See https://www.drupal.org/node/3512364', 'updater_info', $updaters);
     uasort($updaters, [SortArray::class, 'sortByWeightElement']);
   }
   return $updaters;
@@ -503,10 +510,12 @@ function drupal_get_updaters() {
  * @see hook_filetransfer_info_alter()
  */
 function drupal_get_filetransfer_info() {
+  @trigger_error(__METHOD__ . '() is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. There is no replacement. Use composer to manage the code for your site. See https://www.drupal.org/node/3512364', E_USER_DEPRECATED);
+
   $info = &drupal_static(__FUNCTION__);
   if (!isset($info)) {
-    $info = \Drupal::moduleHandler()->invokeAll('filetransfer_info');
-    \Drupal::moduleHandler()->alter('filetransfer_info', $info);
+    $info = \Drupal::moduleHandler()->invokeAllDeprecated('There is no replacement. Use composer to manage the code for your site. See https://www.drupal.org/node/3512364', 'filetransfer_info');
+    \Drupal::moduleHandler()->alterDeprecated('There is no replacement. Use composer to manage the code for your site. See https://www.drupal.org/node/3512364', 'filetransfer_info', $info);
     uasort($info, [SortArray::class, 'sortByWeightElement']);
   }
   return $info;

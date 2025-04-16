@@ -45,7 +45,7 @@ function ckeditor5_module_implements_alter(&$implementations, $hook): void {
 /**
  * Form submission handler for filter format forms.
  */
-function ckeditor5_filter_format_edit_form_submit(array $form, FormStateInterface $form_state) {
+function ckeditor5_filter_format_edit_form_submit(array $form, FormStateInterface $form_state): void {
   $limit_allowed_html_tags = isset($form['filters']['settings']['filter_html']['allowed_html']);
   $manually_editable_tags = $form_state->getValue(['editor', 'settings', 'plugins', 'ckeditor5_sourceEditing', 'allowed_tags']);
   $styles = $form_state->getValue(['editor', 'settings', 'plugins', 'ckeditor5_style', 'styles']);
@@ -101,7 +101,8 @@ function _update_ckeditor5_html_filter(array $form, FormStateInterface $form_sta
   }
 
   if ($form_state->get('ckeditor5_is_active')) {
-    // Delete all existing validation messages, replace them with the current set.
+    // Delete all existing validation messages, replace them with the current
+    // set.
     $response->addCommand(new RemoveCommand('#ckeditor5-realtime-validation-messages-container > *'));
     $messages = \Drupal::messenger()->deleteAll();
     foreach ($messages as $type => $messages_by_type) {
@@ -139,7 +140,7 @@ function _update_ckeditor5_html_filter(array $form, FormStateInterface $form_sta
   $response->addCommand(new InvokeCommand('[data-drupal-selector="edit-editor-editor"]', $ckeditor5_selected_but_errors ? 'addClass' : 'removeClass', ['error']));
   $response->addCommand(new InvokeCommand('[data-drupal-selector="edit-editor-editor"]', $ckeditor5_selected_but_errors ? 'attr' : 'removeAttr', ['data-error-switching-to-ckeditor5', TRUE]));
 
-  /**
+  /*
    * Recursively find #attach items in the form and add as attachments to the
    * AJAX response.
    *
