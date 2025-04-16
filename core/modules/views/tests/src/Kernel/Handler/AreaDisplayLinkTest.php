@@ -53,7 +53,8 @@ class AreaDisplayLinkTest extends ViewsKernelTestBase {
     $page_1->setOption('path', 'page_1');
     $page_2 = $view->newDisplay('page', 'Page 2', 'page_2');
     $page_2->setOption('path', 'page_2');
-    $view->newDisplay('block', 'Block 1', 'block_1');
+    $blockDisplay = $view->newDisplay('block', 'Block 1', 'block_1');
+    $blockDisplay->setOption('link_display', 'page_1');
 
     // Add default filter criteria, sort criteria, pager settings and contextual
     // filters.
