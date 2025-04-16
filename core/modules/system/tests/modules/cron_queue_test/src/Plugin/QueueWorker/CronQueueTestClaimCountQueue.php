@@ -30,7 +30,7 @@ class CronQueueTestClaimCountQueue extends PluginBase implements QueueWorkerWith
   /**
    * {@inheritdoc}
    */
-  public function processItem($data) {
+  public function processItem($data): void {
     $this->processItemAndMetadata($data, NULL);
   }
 

@@ -273,7 +273,7 @@ class CronQueueTest extends KernelTestBase {
   }
 
   /**
-   * Data provider
+   * Data provider.
    *
    * @return array[]
    *   Back end test cases.
