@@ -32,6 +32,9 @@ class MediaSourceAudioVideoTest extends MediaSourceTestBase {
     $type_name = 'audio_type';
     $field_name = 'field_media_' . $source_id;
     $this->doTestCreateMediaType($type_name, $source_id);
+    // @todo This line can be removed when the entity field manager's cache
+    //   is automatically reset when a field is created.
+    $this->container->get('entity_field.manager')->clearCachedFieldDefinitions();
 
     // Check that the source field was created with the correct settings.
     $storage = FieldStorageConfig::load("media.$field_name");
@@ -81,6 +84,9 @@ class MediaSourceAudioVideoTest extends MediaSourceTestBase {
     $type_name = 'video_type';
     $field_name = 'field_media_' . $source_id;
     $this->doTestCreateMediaType($type_name, $source_id);
+    // @todo This line can be removed when the entity field manager's cache
+    //   is automatically reset when a field is created.
+    $this->container->get('entity_field.manager')->clearCachedFieldDefinitions();
 
     // Check that the source field was created with the correct settings.
     $storage = FieldStorageConfig::load("media.$field_name");

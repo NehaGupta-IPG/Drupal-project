@@ -469,15 +469,20 @@ abstract class ConfigEntityValidationTestBase extends KernelTestBase {
    *   (optional) The values to set for the immutable properties, keyed by name.
    *   This should be used if the immutable properties can only accept certain
    *   values, e.g. valid plugin IDs.
+   * @param string[]|null $additional_expected_validation_errors_when_modified
+   *   Some immutable config entity properties have additional validation
+   *   constraints that cause additional messages to appear. Keys must be
+   *   config entity properties, values must be arrays as expected by
+   *   ::assertValidationErrors().
    */
-  public function testImmutableProperties(array $valid_values = []): void {
+  public function testImmutableProperties(array $valid_values = [], ?array $additional_expected_validation_errors_when_modified = NULL): void {
     $constraints = $this->entity->getEntityType()->getConstraints();
     $this->assertNotEmpty($constraints['ImmutableProperties'], 'All config entities should have at least one immutable ID property.');
 
     foreach ($constraints['ImmutableProperties'] as $property_name) {
       $original_value = $this->entity->get($property_name);
       $this->entity->set($property_name, $valid_values[$property_name] ?? $this->randomMachineName());
-      $this->assertValidationErrors([
+      $this->assertValidationErrors(($additional_expected_validation_errors_when_modified[$property_name] ?? []) + [
         '' => "The '$property_name' property cannot be changed.",
       ]);
       $this->entity->set($property_name, $original_value);

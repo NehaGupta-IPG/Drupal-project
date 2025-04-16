@@ -17,16 +17,35 @@ field.settings:
 field.storage.*.*:
   type: config_entity
   label: 'Field'
+  constraints:
+    FullyValidatable: ~
+    UniqueFieldCombination: [entity_type, field_name]
   mapping:
     id:
       type: string
       label: 'ID'
+      constraints:
+        StringParts:
+          separator: .
+          parts:
+            - '%parent.entity_type'
+            - '%parent.field_name'
     field_name:
       type: string
       label: 'Field name'
+
+      constraints:
+        NotBlank: {}
+        Length:
+          # @see \Drupal\field\Entity\FieldStorageConfig::NAME_MAX_LENGTH
+          max: 32
     entity_type:
       type: string
       label: 'Entity type'
+      constraints:
+        PluginExists:
+          manager: entity_type.manager
+          interface: '\Drupal\Core\Entity\FieldableEntityInterface'
     type:
       type: string
       label: 'Type'
@@ -39,18 +58,26 @@ field.storage.*.*:
     module:
       type: string
       label: 'Module'
+      constraints:
+        ExtensionExists: 'module'
     locked:
       type: boolean
       label: 'Locked'
     cardinality:
       type: integer
       label: 'Maximum number of values users can enter'
+      constraints:
+        NoEntitiesExistYetWithHigherCardinality:
+          entityType: '%parent.entity_type'
+          fieldName: '%parent.field_name'
     translatable:
       type: boolean
       label: 'Translatable'
     indexes:
       type: sequence
       label: 'Indexes'
+      # @todo Constraints — but shockingly this A) uses `type: ignore`, B) has
+      # no validation logic in core? Fix in https://www.drupal.org/i/3512962.
       sequence:
         type: sequence
         label: 'Indexes'
@@ -67,3 +94,17 @@ field.storage.*.*:
 field.field.*.*.*:
   type: field_config_base
   label: 'Field'
+  mapping:
+    # Extend `field_config_base:field_type` with a FieldConfig entity-specific
+    # constraint. (This does not apply to BaseFieldOverride entities.)
+    field_type:
+      constraints:
+        MatchesOtherConfigValue:
+          # This field_storage_config entity must exist. This is already guaranteed.
+          # @see \Drupal\field\Entity\FieldConfig
+          # @see \Drupal\Core\Config\Plugin\Validation\Constraint\RequiredConfigDependenciesConstraint
+          prefix: field.storage.
+          id: ['%parent.entity_type', '%parent.field_name']
+          propertyPath: type
+  constraints:
+    FullyValidatable: ~

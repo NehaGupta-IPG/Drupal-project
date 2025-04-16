@@ -48,8 +48,13 @@ class ExtensionExistsConstraintValidatorTest extends KernelTestBase {
     $data = $typed_data->create($definition, 'core');
     $this->assertCount(0, $data->validate());
 
-    // NULL should not trigger a validation error: a value may be nullable.
-    $data->setValue(NULL);
+    // Special case: the `core` module — this is not a real module but is the
+    // official module-like extension that provides many plugins.
+    $data = $typed_data->create($definition, 'core');
+    $this->assertCount(0, $data->validate());
+    // Special case: `NULL` — validation constraints should be compatible with
+    // optional values.
+    $data = $typed_data->create($definition, NULL);
     $this->assertCount(0, $data->validate());
 
     $definition->setConstraints(['ExtensionExists' => 'theme']);

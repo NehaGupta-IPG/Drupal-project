@@ -62,7 +62,7 @@ class ActionValidationTest extends ConfigEntityValidationTestBase {
   /**
    * {@inheritdoc}
    */
-  public function testImmutableProperties(array $valid_values = []): void {
+  public function testImmutableProperties(array $valid_values = [], ?array $additional_expected_validation_errors_when_modified = NULL): void {
     $valid_values['id'] = 'test_changed';
     parent::testImmutableProperties($valid_values);
   }

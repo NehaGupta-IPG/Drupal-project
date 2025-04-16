@@ -36,7 +36,7 @@ class MediaTypeValidationTest extends ConfigEntityValidationTestBase {
   /**
    * {@inheritdoc}
    */
-  public function testImmutableProperties(array $valid_values = []): void {
+  public function testImmutableProperties(array $valid_values = [], ?array $additional_expected_validation_errors_when_modified = NULL): void {
     // If we don't clear the previous settings here, we will get unrelated
     // validation errors (in addition to the one we're expecting), because the
     // settings from the *old* source won't match the config schema for the

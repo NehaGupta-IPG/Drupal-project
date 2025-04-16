@@ -79,7 +79,7 @@ abstract class FieldConfigResourceTestBase extends ConfigEntityResourceTestBase 
           'text',
         ],
       ],
-      'description' => '',
+      'description' => NULL,
       'entity_type' => 'node',
       'field_name' => 'field_llama',
       'field_type' => 'text',

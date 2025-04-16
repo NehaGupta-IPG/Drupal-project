@@ -70,7 +70,7 @@ class ContentLanguageSettingsValidationTest extends ConfigEntityValidationTestBa
   /**
    * {@inheritdoc}
    */
-  public function testImmutableProperties(array $valid_values = []): void {
+  public function testImmutableProperties(array $valid_values = [], ?array $additional_expected_validation_errors_when_modified = NULL): void {
     parent::testImmutableProperties([
       'target_entity_type_id' => 'entity_test_with_bundle',
       'target_bundle' => 'bravo',

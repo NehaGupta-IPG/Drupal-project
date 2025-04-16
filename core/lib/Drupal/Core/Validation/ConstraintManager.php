@@ -14,6 +14,7 @@ use Symfony\Component\Validator\Constraints\Callback;
 use Symfony\Component\Validator\Constraints\Choice;
 use Symfony\Component\Validator\Constraints\Image;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Type;
 
 /**
  * Constraint plugin manager.
@@ -120,6 +121,11 @@ class ConstraintManager extends DefaultPluginManager {
     $this->getDiscovery()->setDefinition('Image', [
       'label' => new TranslatableMarkup('Image'),
       'class' => Image::class,
+      'type' => ['string'],
+    ]);
+    $this->getDiscovery()->setDefinition('Type', [
+      'label' => new TranslatableMarkup('Type'),
+      'class' => Type::class,
       'type' => ['string'],
     ]);
   }

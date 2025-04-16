@@ -36,6 +36,7 @@ use Drupal\Core\Field\FieldException;
       'field_name',
       'field_type',
     ],
+    'IsBaseField' => [],
   ],
   config_export: [
     'id',

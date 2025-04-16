@@ -69,7 +69,7 @@ abstract class BaseFieldOverrideResourceTestBase extends ConfigEntityResourceTes
           'node.type.camelids',
         ],
       ],
-      'description' => '',
+      'description' => NULL,
       'entity_type' => 'node',
       'field_name' => 'promote',
       'field_type' => 'boolean',
