@@ -9,6 +9,7 @@ use Drupal\Core\File\FileSystemInterface;
 use Drupal\Core\File\FileUrlGeneratorInterface;
 use Drupal\Core\Site\Settings;
 use Drupal\Core\StreamWrapper\PublicStream;
+use Drupal\TestTools\Random;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Symfony\Component\HttpFoundation\Request;
@@ -165,12 +166,12 @@ class StreamWrapperTest extends FileTestBase {
     ];
     $data[] = [
       function () {
-        fopen('translations://' . \Drupal::service('random')->name(), 'w');
+        fopen('translations://' . Random::machineName(), 'w');
       },
     ];
     $data[] = [
       function () {
-        mkdir('translations://' . \Drupal::service('random')->name());
+        mkdir('translations://' . Random::machineName());
       },
     ];
     $data[] = [
