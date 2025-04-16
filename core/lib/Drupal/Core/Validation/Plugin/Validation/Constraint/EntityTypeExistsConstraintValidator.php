@@ -31,11 +31,12 @@ class EntityTypeExistsConstraintValidator extends ConstraintValidator implements
   /**
    * {@inheritdoc}
    */
-  public static function create(ContainerInterface $container) {
+  public static function create(ContainerInterface $container): static {
     return new static(
       $container->get('entity_type.manager')
     );
   }
+
   /**
    * {@inheritdoc}
    */
@@ -54,7 +55,7 @@ class EntityTypeExistsConstraintValidator extends ConstraintValidator implements
         '@entity_type_id' => $value,
       ]);
     }
-    if (!empty($constraint->requiredInterface)) {
+    if ($constraint->requiredInterface !== '') {
       $entity_type = $entity_types[$value];
       if (!$entity_type->entityClassImplements($constraint->requiredInterface)) {
         $this->context->addViolation($constraint->interfaceMissingMessage, [
