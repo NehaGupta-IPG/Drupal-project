@@ -110,7 +110,7 @@ class Memory implements QueueInterface, QueueGarbageCollectionInterface {
   /**
    * {@inheritdoc}
    */
-  public function garbageCollection() {
+  public function garbageCollection(): void {
     // For tests only, since a memory queue will always start empty on cron.
     $time = \Drupal::time()->getCurrentTime();
     foreach ($this->queue as $item) {
