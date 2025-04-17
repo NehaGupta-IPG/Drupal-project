@@ -32,4 +32,17 @@ class CountryManagerTest extends KernelTestBase {
     self::assertSame('Elbonia', $countries['EB']);
   }
 
+  /**
+   * Tests sorting of countries.
+   */
+  public function testCountryManagerLocalizedSort(): void {
+    $countryManager = $this->container->get('country_manager');
+
+    $countryList = $countryManager->getLocalizedList('en');
+    $countryIds = array_keys($countryList);
+    // cSpell:disable-next-line
+    // Fails if Zimbabwe is in front of Ã…land Islands, wrong alphabetical order.
+    $this->assertLessThan(array_search('ZW', $countryIds), array_search('AX', $countryIds));
+  }
+
 }
