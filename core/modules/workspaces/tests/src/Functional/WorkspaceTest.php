@@ -345,6 +345,7 @@ class WorkspaceTest extends BrowserTestBase {
     $permissions = [
       'administer workspaces',
       'create test content',
+      'publish to live workspace',
     ];
     $this->drupalLogin($this->drupalCreateUser($permissions));
 
