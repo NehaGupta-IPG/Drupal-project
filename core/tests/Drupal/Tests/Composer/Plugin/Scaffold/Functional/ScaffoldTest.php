@@ -277,6 +277,16 @@ class ScaffoldTest extends TestCase {
 include __DIR__ . "/settings-custom-additions.php";',
           'NOTICE Creating a new file at [web-root]/sites/default/settings.php. Examine the contents and ensure that it came out correctly.',
         ],
+      ],
+      [
+        [
+          'drupal-drupal-append-empty',
+          FALSE,
+          'robots.txt',
+          '# Test version of robots.txt from drupal/core.
+',
+          'Append to [web-root]/robots.txt from assets/append-empty-to-robots.txt',
+        ],
       ]
     );
   }
