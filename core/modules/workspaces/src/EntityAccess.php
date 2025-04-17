@@ -86,14 +86,14 @@ class EntityAccess implements ContainerInjectionInterface {
     if ($operation === 'view') {
       return AccessResult::neutral();
     }
- 
+
     $entity_supported = $this->workspaceInfo->isEntitySupported($entity);
     $live_workspace = !$this->workspaceManager->hasActiveWorkspace();
 
     // Supported entity types on the Live workspace
     // requires the 'publish to live workspace' permission.
     if ($entity_supported && $live_workspace && !$account->hasPermission('publish to live workspace')) {
-        return AccessResult::forbidden();
+      return AccessResult::forbidden();
     }
 
     // Workspaces themselves are handled by their own access handler and we
@@ -139,7 +139,7 @@ class EntityAccess implements ContainerInjectionInterface {
     // Supported entity types on the Live workspace
     // requires the 'publish to live workspace' permission.
     if ($entity_type_supported && $live_workspace && !$account->hasPermission('publish to live workspace')) {
-        return AccessResult::forbidden();
+      return AccessResult::forbidden();
     }
 
     // Workspaces themselves are handled by their own access handler and we
