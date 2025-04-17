@@ -78,7 +78,7 @@ const FILE_NOT_EXECUTABLE = 128;
 /**
  * Loads .install files for installed modules to initialize the update system.
  */
-function drupal_load_updates() {
+function drupal_load_updates(): void {
   /** @var \Drupal\Core\Extension\ModuleExtensionList $extension_list_module */
   $extension_list_module = \Drupal::service('extension.list.module');
   foreach (\Drupal::service('update.update_hook_registry')->getAllInstalledVersions() as $module => $schema_version) {
@@ -153,7 +153,7 @@ function drupal_install_profile_distribution_version() {
  * @todo https://www.drupal.org/i/3005959 Rework this method as it is not only
  *   about profiles.
  */
-function drupal_verify_profile($install_state) {
+function drupal_verify_profile($install_state): array {
   $profile = $install_state['parameters']['profile'];
   if ($profile === FALSE) {
     return [];
@@ -207,7 +207,7 @@ function drupal_verify_profile($install_state) {
  *   An array of information about the current installation state. This is used
  *   to set the default language.
  */
-function drupal_install_system($install_state) {
+function drupal_install_system($install_state): void {
   // Remove the service provider of the early installer.
   unset($GLOBALS['conf']['container_service_providers']['InstallerServiceProvider']);
   // Add the normal installer service provider.
@@ -507,7 +507,7 @@ function drupal_install_fix_file($file, $mask, $message = TRUE) {
  * @param string $path
  *   An installer path.
  */
-function install_goto($path) {
+function install_goto($path): void {
   global $base_url;
   $headers = [
     // Not a permanent redirect.
@@ -592,7 +592,7 @@ function drupal_requirements_url($severity) {
  * @return array
  *   Array of the installation profile's requirements.
  */
-function drupal_check_profile($profile) {
+function drupal_check_profile($profile): array {
   $info = install_profile_info($profile);
   // Collect requirement testing results.
   $requirements = [];

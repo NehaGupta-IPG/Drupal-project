@@ -49,12 +49,6 @@
   <rule ref="Drupal.Classes.UseGlobalClass"/>
   <rule ref="Drupal.Classes.UseLeadingBackslash"/>
   <rule ref="Drupal.Commenting.ClassComment"/>
-  <rule ref="Drupal.Commenting.ClassComment.Missing">
-    <include-pattern>*/Functional/*</include-pattern>
-    <include-pattern>*/tests/modules/*</include-pattern>
-    <include-pattern>./core/tests/Drupal/Tests/Core/*</include-pattern>
-    <include-pattern>./core/modules/*</include-pattern>
-  </rule>
   <rule ref="Drupal.Commenting.DataTypeNamespace"/>
   <rule ref="Drupal.Commenting.Deprecated"/>
   <rule ref="Drupal.Commenting.DocComment">
@@ -63,7 +57,9 @@
       SpacingAfter, LongNotCapital, ShortFullStop, TagGroupSpacing, Empty,
       TagsNotGrouped, ParamGroup -->
     <exclude name="Drupal.Commenting.DocComment.LongFullStop"/>
-    <exclude name="Drupal.Commenting.DocComment.MissingShort"/>
+  </rule>
+  <rule  ref="Drupal.Commenting.DocComment.MissingShort">
+    <include-pattern>core/*/Unit/*</include-pattern>
   </rule>
   <rule ref="Drupal.Commenting.DocCommentAlignment"/>
   <rule ref="Drupal.Commenting.DocCommentLongArraySyntax"/>
@@ -71,29 +67,16 @@
   <rule ref="Drupal.Commenting.FileComment"/>
   <rule ref="Drupal.Commenting.FunctionComment"/>
   <rule ref="Drupal.Commenting.FunctionComment.Missing">
-    <include-pattern>core/modules/*/Plugin/views/argument/*</include-pattern>
-    <include-pattern>core/modules/*/Plugin/views/filter/*</include-pattern>
-    <include-pattern>core/modules/*/Plugin/views/access/*</include-pattern>
-    <include-pattern>core/modules/*/Plugin/views/cache/*</include-pattern>
-    <include-pattern>core/modules/*/Plugin/views/query/*</include-pattern>
-    <include-pattern>core/modules/*/Plugin/views/sort/*</include-pattern>
-    <include-pattern>core/modules/*/Plugin/views/display/*</include-pattern>
-    <include-pattern>core/modules/*/Plugin/views/exposed_form/*</include-pattern>
-    <include-pattern>core/modules/*/Plugin/views/field/*</include-pattern>
-    <include-pattern>core/modules/*/Plugin/views/pager/*</include-pattern>
-    <include-pattern>core/modules/*/Plugin/views/style/*</include-pattern>
+    <include-pattern>core/*/src/Plugin/*</include-pattern>
     <include-pattern>*/Database/*</include-pattern>
     <include-pattern>*/FunctionalJavascript/*</include-pattern>
     <include-pattern>*/Kernel/*</include-pattern>
+    <include-pattern>*/KernelTests/*</include-pattern>
     <include-pattern>*/Functional/*</include-pattern>
+    <include-pattern>*/Unit/*</include-pattern>
   </rule>
   <rule ref="Drupal.Commenting.FunctionComment.MissingParamType"/>
-  <rule ref="Drupal.Commenting.FunctionComment.MissingReturnComment">
-    <include-pattern>core/lib/Drupal/Core/*</include-pattern>
-    <include-pattern>core/lib/Drupal/Component/*</include-pattern>
-    <include-pattern>core/tests/*</include-pattern>
-    <include-pattern>core/*/tests/*</include-pattern>
-  </rule>
+  <rule ref="Drupal.Commenting.FunctionComment.MissingReturnComment"/>
   <rule ref="Drupal.Commenting.GenderNeutralComment"/>
   <rule ref="Drupal.Commenting.HookComment"/>
   <rule ref="Drupal.Commenting.InlineComment">

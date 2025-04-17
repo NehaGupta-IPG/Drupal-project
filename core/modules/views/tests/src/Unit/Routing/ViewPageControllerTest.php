@@ -206,7 +206,10 @@ namespace Drupal\views\Routing;
 
 if (!function_exists('views_add_contextual_links')) {
 
-  function views_add_contextual_links(&$render_element, $location, $display_id, ?array $view_element = NULL) {
+  /**
+   * Define method views_add_contextual_links for this test.
+   */
+  function views_add_contextual_links(&$render_element, $location, $display_id, ?array $view_element = NULL): void {
   }
 
 }
