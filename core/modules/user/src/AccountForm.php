@@ -121,6 +121,7 @@ abstract class AccountForm extends ContentEntityForm implements TrustedCallbackI
       ],
       '#default_value' => (!$register ? $account->getAccountName() : ''),
       '#access' => $account->name->access('edit'),
+      '#weight' => -6,
     ];
 
     // Display password field only for existing users or when user is allowed to
