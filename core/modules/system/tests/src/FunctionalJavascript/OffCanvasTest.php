@@ -159,7 +159,6 @@ class OffCanvasTest extends OffCanvasTestBase {
    * @internal
    */
   protected function assertOffCanvasDialog(int $link_index, string $position): void {
-    $page = $this->getSession()->getPage();
     $web_assert = $this->assertSession();
     $link_text = "Open $position panel $link_index";
 

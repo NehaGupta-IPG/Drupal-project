@@ -155,7 +155,7 @@ abstract class OffCanvasTestBase extends WebDriverTestBase {
    * @see \Drupal\Tests\UiHelperTrait\clickLink()
    * @see https://www.drupal.org/project/drupal/issues/3032275
    */
-  protected function _safeClick($label, $index = 0) {
+  protected function _safeClick($label, $index = 0): void {
     /** @var \WebDriver\Exception\UnknownError $not_clickable_exception */
     $not_clickable_exception = NULL;
     $result = $this->getSession()->getPage()->waitFor(10, function () use ($label, $index, &$not_clickable_exception) {
