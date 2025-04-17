@@ -379,7 +379,16 @@ abstract class ExposedFormPluginBase extends PluginBase implements CacheableDepe
       $this->view->exposed_data = [];
     }
 
-    $form_state->setRedirect('<current>');
+    $preserveQuery = [];
+    if (!empty($this->options['preserve_url_query_parameters'])) {
+      $query = \Drupal::request()->query->all();
+      foreach ($this->options['preserve_url_query_parameters'] as $name) {
+        if (isset($query[$name])) {
+          $preserveQuery[$name] = $query[$name];
+        }
+      }
+    }
+    $form_state->setRedirect('<current>', [], ['query' => $preserveQuery]);
     $form_state->setValues([]);
   }
 
