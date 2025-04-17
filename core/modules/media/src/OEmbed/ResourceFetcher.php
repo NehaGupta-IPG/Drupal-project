@@ -117,6 +117,11 @@ class ResourceFetcher implements ResourceFetcherInterface {
 
     if ($high_resolution_thumbnail_url) {
       $data['thumbnail_url'] = $high_resolution_thumbnail_url;
+      $size = getimagesize($data['thumbnail_url']);
+      if ($size && count($size) > 1) {
+        $data['thumbnail_width'] = $size[0];
+        $data['thumbnail_height'] = $size[1];
+      }
     }
   }
 
