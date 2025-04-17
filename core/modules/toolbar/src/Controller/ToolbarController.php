@@ -31,10 +31,13 @@ class ToolbarController extends ControllerBase implements TrustedCallbackInterfa
   /**
    * Returns an AJAX response to render the toolbar subtrees.
    *
+   * @param string $hash
+   *   The hash of the toolbar subtrees to validate.
+   *
    * @return \Drupal\Core\Ajax\AjaxResponse
    *   The AJAX response containing the rendered toolbar subtrees.
    */
-  public function subtreesAjax($hash) {
+  public function subtreesAjax(string $hash) {
     [$subtrees] = toolbar_get_rendered_subtrees();
     $expected_hash = _toolbar_get_subtrees_hash()[0];
     $response = new AjaxResponse();
