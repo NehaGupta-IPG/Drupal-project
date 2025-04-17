@@ -111,7 +111,7 @@ class ErrorTestController extends ControllerBase {
   /**
    * Trigger a deprecation warning.
    */
-  public function triggerDeprecation() {
+  public function triggerDeprecation(): array {
     // This will generate a deprecation message. Use to check logging.
     // phpcs:ignore Drupal.Semantics.FunctionTriggerError
     trigger_error("Foo is deprecated.", E_USER_DEPRECATED);

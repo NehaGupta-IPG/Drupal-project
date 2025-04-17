@@ -185,10 +185,6 @@ system.logging:
             - 'some'
             - 'all'
             - 'verbose'
-    deprecations:
-      type: string
-      label: 'Deprecations to display (all, contrib & custom, custom only)'
-    deprecation_level:
     log_deprecations:
       type: boolean
       label: 'Should deprecations be logged'

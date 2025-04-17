@@ -27,6 +27,11 @@ class ErrorHandlerTest extends BrowserTestBase {
 
   /**
    * Tests the error handler.
+   *
+   * Since this tests the logging of deprecation messages, it is in the 'legacy'
+   * group.
+   *
+   * @group legacy
    */
   public function testErrorHandler(): void {
     $config = $this->config('system.logging');
@@ -121,6 +126,8 @@ class ErrorHandlerTest extends BrowserTestBase {
       'deprecations_ignored_file_patterns' => '/vendor/',
     ];
     $this->submitForm($edits, 'Save configuration');
+    $this->resetAll();
+
     // There should now be one logged message.
     $this->drupalGet('error-test/trigger-deprecation');
     $this->assertLogCount('1');
@@ -130,9 +137,11 @@ class ErrorHandlerTest extends BrowserTestBase {
     $edits = [
       'log_deprecations' => TRUE,
       'deprecations_ignored_file_patterns' => '/vendor/',
-      'ignored_deprecations' => 'This is a deprecation message',
+      'ignored_deprecations' => 'Foo is deprecated.',
     ];
     $this->submitForm($edits, 'Save configuration');
+    $this->resetAll();
+
     // The message should not be logged again. The count remains at 1.
     $this->drupalGet('error-test/trigger-deprecation');
     $this->assertLogCount('1');

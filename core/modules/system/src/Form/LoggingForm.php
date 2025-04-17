@@ -41,9 +41,9 @@ class LoggingForm extends ConfigFormBase {
 
     $form['log_deprecations'] = [
       '#type' => 'checkbox',
-      '#title' => $this->t('Enable logging of deprecation messages'),
+      '#title' => $this->t('Log deprecation messages'),
       '#config_target' => 'system.logging:log_deprecations',
-      '#description' => $this->t('It is recommended that sites running on production environments do not log any deprecations.'),
+      '#description' => $this->t('It is recommended that sites running on production environments do not log deprecations.'),
     ];
 
     $form['deprecations_ignored_file_patterns'] = [
