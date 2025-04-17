@@ -171,28 +171,44 @@ class ResourceFetcher implements ResourceFetcherInterface {
    *   The URL for the high resolution thumbnail.
    */
   protected function getVimeoHighResolutionThumbnailUrl(array $data): ?string {
-    if (empty($data['video_id'])) {
-      return NULL;
-    }
-
-    $vimeo_url = 'https://vimeo.com/api/v2/video/' . $data['video_id'] . '.xml';
-    try {
-      $response = $this->httpClient->request('GET', $vimeo_url, [
-        RequestOptions::TIMEOUT => 5,
-        RequestOptions::HTTP_ERRORS => FALSE,
-      ]);
-      $content = (string) $response->getBody();
-      $parsed_data = $this->parseResourceXml($content, $vimeo_url);
-      if ($parsed_data &&
+    if (!empty($data['video_id'])) {
+      $vimeo_url = 'https://vimeo.com/api/v2/video/' . $data['video_id'] . '.xml';
+      try {
+        $response = $this->httpClient->request('GET', $vimeo_url, [
+          RequestOptions::TIMEOUT => 5,
+          RequestOptions::HTTP_ERRORS => FALSE,
+        ]);
+        $content = (string) $response->getBody();
+        $parsed_data = $this->parseResourceXml($content, $vimeo_url);
+        if ($parsed_data &&
           !empty($parsed_data['video']['thumbnail_large']) &&
           is_string($parsed_data['video']['thumbnail_large'])) {
-        return (string) $parsed_data['video']['thumbnail_large'];
+          return (string) $parsed_data['video']['thumbnail_large'];
+        }
+      }
+      catch (\Throwable $e) {
+        // Any error use the default thumbnail.
       }
     }
-    catch (\Throwable $e) {
-      // Any error use the default thumbnail.
-    }
 
+    // The video might've been private, so not available via the API.  But can
+    // we extract a higher quality URL from the thumbnail URL.
+    if (!empty($data['thumbnail_url'])) {
+      $vimeo_url = preg_replace('/(.*)(_\d+(x\d+)?)/m', '$1', $data['thumbnail_url']);
+      try {
+        $response = $this->httpClient->request('GET', $vimeo_url, [
+          RequestOptions::TIMEOUT => 5,
+          RequestOptions::HTTP_ERRORS => FALSE,
+        ]);
+        $statusCode = $response->getStatusCode();
+        if ($statusCode >= 200 && $statusCode < 300) {
+          return $vimeo_url;
+        }
+      }
+      catch (\Throwable $e) {
+        // Any error use the default thumbnail.
+      }
+    }
     return NULL;
   }
 
