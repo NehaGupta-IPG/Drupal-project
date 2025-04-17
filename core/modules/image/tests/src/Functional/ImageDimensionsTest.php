@@ -237,7 +237,6 @@ class ImageDimensionsTest extends BrowserTestBase {
     // slightly different results for the image rotation function, so we can
     // not do an exact match check here. We tolerate a max difference of two
     // pixels.
-    // @see https://www.drupal.org/project/drupal/issues/2921123
     $this->assertLessThanOrEqual(2, abs(41 - $image_file->getWidth()));
     $this->assertLessThanOrEqual(2, abs(41 - $image_file->getHeight()));
 
