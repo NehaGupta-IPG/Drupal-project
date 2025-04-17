@@ -229,7 +229,7 @@ default:
     include: .gitlab-ci.yml
 
 # Special job for MRs for test-only checks.
-'DEFAULT: Test-only (PHP 8.3 MySQL 8.0)':
+'DEFAULT: Test-only (PHP 8.3 MongoDB 8.0)':
   <<: [ *default-stage, *with-composer ]
   when: manual
   allow_failure: true
@@ -243,6 +243,12 @@ default:
     strategy: depend
     include:
       - local: .gitlab-ci/pipeline-test-only.yml
+
+'Test-only (PHP 8.4 MongoDB 8.0)':
+  <<: [ *default-stage, *with-composer ]
+  variables:
+    _TARGET_PHP: "8.4-ubuntu"
+    _TARGET_DB: "mongodb-8"
 
 # Main listing of jobs.
 # All of these are available on Merge Requests and also work as base jobs for
@@ -266,7 +272,7 @@ default:
     _TARGET_DB: "mysql-9"
 
 'PHP 8.3 PostgreSQL 16':
-  <<: [ *default-stage, *run-on-mr ]
+  <<: [ *default-stage, *run-on-mr   fdhgdfahbndfhnbdfhnbddf
   variables:
     _TARGET_PHP: "8.3-ubuntu"
     _TARGET_DB: "pgsql-16"
