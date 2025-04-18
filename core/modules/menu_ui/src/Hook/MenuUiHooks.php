@@ -224,8 +224,8 @@ class MenuUiHooks {
     ];
     $form['menu']['link']['link_enabled'] = [
       '#type' => 'checkbox',
-      '#title' => t('Enabled'),
-      '#description' => t('A flag for whether the link should be enabled in menus or hidden.'),
+      '#title' => $this->t('Enabled'),
+      '#description' => $this->t('A flag for whether the link should be enabled in menus or hidden.'),
       '#default_value' => $defaults['enabled'] ?? TRUE,
     ];
 
@@ -296,7 +296,7 @@ class MenuUiHooks {
     $options_cacheability->applyTo($form['menu']['menu_parent']);
     $form['menu']['link_enabled'] = [
       '#type' => 'checkbox',
-      '#title' => t('Enable menu link (default)'),
+      '#title' => $this->t('Enable menu link (default)'),
       '#default_value' => $type->getThirdPartySetting('menu_ui', 'link_enabled', TRUE),
     ];
     $form['#validate'][] = 'menu_ui_form_node_type_form_validate';

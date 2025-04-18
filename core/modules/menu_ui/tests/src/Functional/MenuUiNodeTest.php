@@ -75,8 +75,8 @@ class MenuUiNodeTest extends BrowserTestBase {
   /**
    * Test correct configuring of default enabling link setting by content type.
    */
-  public function testContentTypeLinkEnableConfiguration() {
-    // Check that unconfigured content type defaults to enabled links.
+  public function testContentTypeLinkEnableConfiguration(): void {
+    // Check that the non-configured content type defaults to enabled links.
     $this->drupalGet('node/add/page');
     $this->assertSession()->checkboxChecked('menu[link_enabled]');
 
