@@ -61,8 +61,8 @@ interface ConfigurableLanguageManagerInterface extends LanguageManagerInterface 
   /**
    * Gets a language config override object.
    *
-   * If none exist for the requested $langcode,
-   * a new config override object is instantiated.
+   * If no config exist for the requested $langcode, a new config override
+   * object is instantiated.
    *
    * @param string $langcode
    *   The language code for the override.
