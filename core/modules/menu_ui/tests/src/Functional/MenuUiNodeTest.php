@@ -87,7 +87,7 @@ class MenuUiNodeTest extends BrowserTestBase {
       'link_enabled' => FALSE,
     ];
     $this->drupalGet('admin/structure/types/manage/page');
-    $this->submitForm($edit, 'Save content type');
+    $this->submitForm($edit, 'Save');
     $this->assertSession()->pageTextContains('The content type Basic page has been updated.');
     $this->drupalGet('node/add/page');
     $this->assertSession()->checkboxNotChecked('menu[link_enabled]');
@@ -95,7 +95,7 @@ class MenuUiNodeTest extends BrowserTestBase {
     // Configure menu links to be enabled.
     $edit['link_enabled'] = TRUE;
     $this->drupalGet('admin/structure/types/manage/page');
-    $this->submitForm($edit, 'Save content type');
+    $this->submitForm($edit, 'Save');
     $this->assertSession()->pageTextContains('The content type Basic page has been updated.');
     $this->drupalGet('node/add/page');
     $this->assertSession()->checkboxChecked('menu[link_enabled]');
