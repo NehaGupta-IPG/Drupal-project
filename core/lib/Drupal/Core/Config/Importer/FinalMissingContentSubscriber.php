@@ -2,7 +2,7 @@
 
 namespace Drupal\Core\Config\Importer;
 
-use Drupal\Core\Config\ConfigEvents;
+use Drupal\Core\Config\ConfigImporterEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
@@ -33,7 +33,7 @@ class FinalMissingContentSubscriber implements EventSubscriberInterface {
   public static function getSubscribedEvents(): array {
     // This should always be the final event as it will mark all content
     // dependencies as resolved.
-    $events[ConfigEvents::IMPORT_MISSING_CONTENT][] = ['onMissingContent', -1024];
+    $events[ConfigImporterEvents::IMPORT_MISSING_CONTENT][] = ['onMissingContent', -1024];
     return $events;
   }
 

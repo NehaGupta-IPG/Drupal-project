@@ -7,6 +7,7 @@ namespace Drupal\config_import_test;
 use Drupal\Core\Config\ConfigCrudEvent;
 use Drupal\Core\Config\ConfigEvents;
 use Drupal\Core\Config\ConfigImporterEvent;
+use Drupal\Core\Config\ConfigImporterEvents;
 use Drupal\Core\Config\Importer\MissingContentEvent;
 use Drupal\Core\State\StateInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -138,8 +139,8 @@ class EventSubscriber implements EventSubscriberInterface {
   public static function getSubscribedEvents(): array {
     $events[ConfigEvents::SAVE][] = ['onConfigSave', 40];
     $events[ConfigEvents::DELETE][] = ['onConfigDelete', 40];
-    $events[ConfigEvents::IMPORT_VALIDATE] = ['onConfigImporterValidate'];
-    $events[ConfigEvents::IMPORT_MISSING_CONTENT] = [['onConfigImporterMissingContentOne'], ['onConfigImporterMissingContentTwo', -100]];
+    $events[ConfigImporterEvents::IMPORT_VALIDATE] = ['onConfigImporterValidate'];
+    $events[ConfigImporterEvents::IMPORT_MISSING_CONTENT] = [['onConfigImporterMissingContentOne'], ['onConfigImporterMissingContentTwo', -100]];
     return $events;
   }
 

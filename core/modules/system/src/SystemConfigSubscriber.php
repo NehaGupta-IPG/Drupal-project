@@ -5,6 +5,7 @@ namespace Drupal\system;
 use Drupal\Core\Config\ConfigCrudEvent;
 use Drupal\Core\Config\ConfigEvents;
 use Drupal\Core\Config\ConfigImporterEvent;
+use Drupal\Core\Config\ConfigImporterEvents;
 use Drupal\Core\Routing\RouteBuilderInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -88,8 +89,8 @@ class SystemConfigSubscriber implements EventSubscriberInterface {
     $events[ConfigEvents::SAVE][] = ['onConfigSave', 0];
     // The empty check has a high priority so that it can stop propagation if
     // there is no configuration to import.
-    $events[ConfigEvents::IMPORT_VALIDATE][] = ['onConfigImporterValidateNotEmpty', 512];
-    $events[ConfigEvents::IMPORT_VALIDATE][] = ['onConfigImporterValidateSiteUUID', 256];
+    $events[ConfigImporterEvents::IMPORT_VALIDATE][] = ['onConfigImporterValidateNotEmpty', 512];
+    $events[ConfigImporterEvents::IMPORT_VALIDATE][] = ['onConfigImporterValidateSiteUUID', 256];
     return $events;
   }
 

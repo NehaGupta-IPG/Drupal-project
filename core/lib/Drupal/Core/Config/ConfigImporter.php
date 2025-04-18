@@ -27,11 +27,11 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
  *
  * The ConfigImporter has an identifier which is used to construct event names.
  * The events fired during an import are:
- * - ConfigEvents::IMPORT_VALIDATE: Events listening can throw a
+ * - ConfigImporterEvents::IMPORT_VALIDATE: Events listening can throw a
  *   \Drupal\Core\Config\ConfigImporterException to prevent an import from
  *   occurring.
  *   @see \Drupal\Core\EventSubscriber\ConfigImportSubscriber
- * - ConfigEvents::IMPORT: Events listening can react to a successful import.
+ * - ConfigImporterEvents::IMPORT: Events listening can react to a successful import.
  *   @see \Drupal\Core\EventSubscriber\ConfigSnapshotSubscriber
  *
  * @see \Drupal\Core\Config\ConfigImporterEvent
@@ -719,7 +719,7 @@ class ConfigImporter {
     if (!empty($missing_content)) {
       $event = new MissingContentEvent($missing_content);
       // Fire an event to allow listeners to create the missing content.
-      $this->eventDispatcher->dispatch($event, ConfigEvents::IMPORT_MISSING_CONTENT);
+      $this->eventDispatcher->dispatch($event, ConfigImporterEvents::IMPORT_MISSING_CONTENT);
       $sandbox['missing_content']['data'] = $event->getMissingContent();
     }
     $current_count = count($sandbox['missing_content']['data']);
@@ -739,7 +739,7 @@ class ConfigImporter {
    *   The batch context.
    */
   protected function finish(&$context) {
-    $this->eventDispatcher->dispatch(new ConfigImporterEvent($this), ConfigEvents::IMPORT);
+    $this->eventDispatcher->dispatch(new ConfigImporterEvent($this), ConfigImporterEvents::IMPORT);
     // The import is now complete.
     $this->lock->release(static::LOCK_NAME);
     $this->reset();
@@ -841,7 +841,7 @@ class ConfigImporter {
           ]));
         }
       }
-      $this->eventDispatcher->dispatch(new ConfigImporterEvent($this), ConfigEvents::IMPORT_VALIDATE);
+      $this->eventDispatcher->dispatch(new ConfigImporterEvent($this), ConfigImporterEvents::IMPORT_VALIDATE);
       if (count($this->getErrors())) {
         $errors = array_merge(['There were errors validating the config synchronization.'], $this->getErrors());
         throw new ConfigImporterException(implode(PHP_EOL, $errors));

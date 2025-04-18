@@ -2,7 +2,7 @@
 
 namespace Drupal\Core\EventSubscriber;
 
-use Drupal\Core\Config\ConfigEvents;
+use Drupal\Core\Config\ConfigImporterEvents;
 use Drupal\Core\Config\ConfigManagerInterface;
 use Drupal\Core\Config\StorageInterface;
 use Drupal\Core\Config\ConfigImporterEvent;
@@ -67,7 +67,7 @@ class ConfigSnapshotSubscriber implements EventSubscriberInterface {
    *   An array of event listener definitions.
    */
   public static function getSubscribedEvents(): array {
-    $events[ConfigEvents::IMPORT][] = ['onConfigImporterImport', 40];
+    $events[ConfigImporterEvents::IMPORT][] = ['onConfigImporterImport', 40];
     return $events;
   }
 
