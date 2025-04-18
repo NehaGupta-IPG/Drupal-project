@@ -60,6 +60,29 @@ interface ConfigMapperInterface {
   public function getBasePath();
 
   /**
+   * Returns route name for the base configuration edit form route.
+   *
+   * @return string
+   *   Route name for the mapper.
+   */
+  public function getBaseEditRouteName();
+
+  /**
+   * Returns the route parameters for the base configuration edit form route.
+   *
+   * @return array
+   */
+   public function getBaseEditRouteParameters();
+
+  /**
+   * Returns the route object for the base configuration edit form route.
+   *
+   * @return \Symfony\Component\Routing\Route
+   *   The route object for the translation page.
+   */
+  public function getBaseEditRoute();
+
+  /**
    * Returns route name for the translation overview route.
    *
    * @return string
@@ -116,7 +139,7 @@ interface ConfigMapperInterface {
   public function getAddRoute();
 
   /**
-   * Returns route name for the translation edit form route.
+   * Returns route name for the translation edit route.
    *
    * @return string
    *   Route name for the mapper.
@@ -124,15 +147,15 @@ interface ConfigMapperInterface {
   public function getEditRouteName();
 
   /**
-   * Returns the route parameters for the translation edit form route.
+   * Returns the route parameters for the translation edit route.
    *
    * @return array
-   *   An array of route parameters for the translation edit form route.
+   *   An array of route parameters for the translation edit route.
    */
   public function getEditRouteParameters();
 
   /**
-   * Returns the route object for a translation edit form route.
+   * Returns the route object for a translation edit route.
    *
    * @return \Symfony\Component\Routing\Route
    *   The route object for the translation page.

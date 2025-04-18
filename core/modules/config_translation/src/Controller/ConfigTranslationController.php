@@ -207,7 +207,7 @@ class ConfigTranslationController extends ControllerBase {
 
         // Check access for the path/route for editing, so we can decide to
         // include a link to edit or not.
-        $edit_access = $this->accessManager->checkNamedRoute($mapper->getBaseRouteName(), $route_match->getRawParameters()->all(), $this->account, TRUE);
+        $edit_access = $this->accessManager->checkNamedRoute($mapper->getBaseEditRouteName(), $route_match->getRawParameters()->all(), $this->account, TRUE);
         $cacheable_metadata->addCacheableDependency($edit_access);
 
         // Build list of operations.
@@ -215,7 +215,7 @@ class ConfigTranslationController extends ControllerBase {
         if ($edit_access->isAllowed()) {
           $operations['edit'] = [
             'title' => $this->t('Edit'),
-            'url' => Url::fromRoute($mapper->getBaseRouteName(), $mapper->getBaseRouteParameters(), ['query' => ['destination' => $mapper->getOverviewPath()]]),
+            'url' => Url::fromRoute($mapper->getBaseEditRouteName(), $mapper->getBaseRouteParameters(), ['query' => ['destination' => $mapper->getOverviewPath()]]),
           ];
         }
       }

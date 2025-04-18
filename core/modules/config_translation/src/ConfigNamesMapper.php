@@ -211,6 +211,27 @@ class ConfigNamesMapper extends PluginBase implements ConfigMapperInterface, Con
   }
 
   /**
+   * {@inheritdoc}
+   */
+  public function getBaseEditRouteName() {
+    return $this->getBaseRouteName();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getBaseEditRouteParameters() {
+    return $this->getBaseRouteParameters();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getBaseEditRoute() {
+    return $this->getBaseRoute();
+  }
+
+  /**
    * Allows to process all config translation routes.
    *
    * @param \Symfony\Component\Routing\Route $route
