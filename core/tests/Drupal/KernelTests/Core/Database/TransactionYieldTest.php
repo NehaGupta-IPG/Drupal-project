@@ -474,19 +474,14 @@ class TransactionYieldTest extends DatabaseTestBase {
    * transactions and those that do not.
    */
   public function testCommittedTransaction(): void {
-    try {
-      // Create two nested transactions. The changes should be committed.
-      $this->transactionOuterLayer('A');
+    // Create two nested transactions. The changes should be committed.
+    $this->transactionOuterLayer('A');
 
-      // Because we committed, both of the inserted rows should be present.
-      $saved_age = $this->connection->query('SELECT [age] FROM {test} WHERE [name] = :name', [':name' => 'DavidA'])->fetchField();
-      $this->assertSame('24', $saved_age, 'Can retrieve DavidA row after commit.');
-      $saved_age = $this->connection->query('SELECT [age] FROM {test} WHERE [name] = :name', [':name' => 'DanielA'])->fetchField();
-      $this->assertSame('19', $saved_age, 'Can retrieve DanielA row after commit.');
-    }
-    catch (\Exception $e) {
-      $this->fail($e->getMessage());
-    }
+    // Because we committed, both of the inserted rows should be present.
+    $saved_age = $this->connection->query('SELECT [age] FROM {test} WHERE [name] = :name', [':name' => 'DavidA'])->fetchField();
+    $this->assertSame('24', $saved_age, 'Can retrieve DavidA row after commit.');
+    $saved_age = $this->connection->query('SELECT [age] FROM {test} WHERE [name] = :name', [':name' => 'DanielA'])->fetchField();
+    $this->assertSame('19', $saved_age, 'Can retrieve DanielA row after commit.');
   }
 
   /**
