@@ -179,6 +179,15 @@ weight:
       max: 2147483647
     FullyValidatable: ~
 
+# A file URI, which could be a path or an URI
+file_uri:
+  type: string
+  label: 'File URI'
+  constraints:
+    FileUri: []
+    FullyValidatable: ~
+
+
 # Complex extended data types:
 
 # Root of a configuration object.

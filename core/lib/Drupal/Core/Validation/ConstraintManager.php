@@ -13,6 +13,7 @@ use Symfony\Component\Validator\Constraints\Blank;
 use Symfony\Component\Validator\Constraints\Callback;
 use Symfony\Component\Validator\Constraints\Choice;
 use Symfony\Component\Validator\Constraints\IdenticalTo;
+use Symfony\Component\Validator\Constraints\File;
 use Symfony\Component\Validator\Constraints\Image;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
@@ -121,6 +122,11 @@ class ConstraintManager extends DefaultPluginManager {
     $this->getDiscovery()->setDefinition('Image', [
       'label' => new TranslatableMarkup('Image'),
       'class' => Image::class,
+      'type' => ['string'],
+    ]);
+    $this->getDiscovery()->setDefinition('File', [
+      'label' => new TranslatableMarkup('File'),
+      'class' => File::class,
       'type' => ['string'],
     ]);
     $this->getDiscovery()->setDefinition('IdenticalTo', [
