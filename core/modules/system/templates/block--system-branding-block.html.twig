@@ -8,7 +8,8 @@
  * enabled in the block configuration.
  *
  * Available variables:
- * - site_logo: Logo for site as defined in Appearance or theme settings.
+ * - logo: Logo for site as defined in Appearance or theme settings.
+ * - site_logo: (deprecated) Logo URI for site as defined in Appearance or theme settings.
  * - site_name: Name for site as defined in Site information settings.
  * - site_slogan: Slogan for site as defined in Site information settings.
  *
@@ -16,9 +17,9 @@
  */
 #}
 {% block content %}
-  {% if site_logo %}
+  {% if logo %}
     <a href="{{ path('<front>') }}" rel="home">
-      <img src="{{ site_logo }}" alt="{{ 'Home'|t }}" fetchpriority="high" />
+     {{ logo }}
     </a>
   {% endif %}
   {% if site_name %}

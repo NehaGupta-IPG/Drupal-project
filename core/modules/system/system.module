@@ -314,8 +314,13 @@ function system_preprocess_block(&$variables): void {
     case 'system_branding_block':
       $variables['site_logo'] = '';
       if ($variables['content']['site_logo']['#access'] && $variables['content']['site_logo']['#uri']) {
+        // @todo: deprecate the site_logo variable.
         $variables['site_logo'] = $variables['content']['site_logo']['#uri'];
+        $variables['logo'] = $variables['content']['site_logo'];
       }
+      $variables['deprecations'] = [
+        'site_logo' => "'site_logo' is deprecated in drupal:10.3.0 and is removed from drupal:12.0.0. Use the 'logo' variable which include the rendered img tag instead. See https://www.drupal.org/node/3436978",
+      ];
       $variables['site_name'] = '';
       if ($variables['content']['site_name']['#access'] && $variables['content']['site_name']['#markup']) {
         $variables['site_name'] = $variables['content']['site_name']['#markup'];
