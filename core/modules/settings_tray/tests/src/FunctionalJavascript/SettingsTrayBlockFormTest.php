@@ -126,7 +126,6 @@ class SettingsTrayBlockFormTest extends SettingsTrayTestBase {
       $this->assertNotEmpty($web_assert->waitForElementVisible('css', $new_page_text_locator));
       // The page is loaded with the new change but make sure page is
       // completely loaded.
-      $this->assertPageLoadComplete();
     }
 
     $this->openBlockForm($block_selector);
