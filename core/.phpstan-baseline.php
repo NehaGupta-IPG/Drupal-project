@@ -36740,12 +36740,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/system/tests/src/FunctionalJavascript/OffCanvasTestBase.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\system\\\\FunctionalJavascript\\\\OffCanvasTestBase\\:\\:assertPageLoadComplete\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/system/tests/src/FunctionalJavascript/OffCanvasTestBase.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\system\\\\FunctionalJavascript\\\\OffCanvasTestBase\\:\\:enableTheme\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
