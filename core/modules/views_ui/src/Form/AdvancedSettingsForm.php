@@ -5,7 +5,6 @@ namespace Drupal\views_ui\Form;
 use Drupal\Core\Form\ConfigFormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
-use Drupal\views\Views;
 use Symfony\Component\Routing\Attribute\Route;
 
 /**

@@ -203,9 +203,12 @@ class Views {
   /**
    * Gets enabled display extenders.
    *
-   * @deprecated Removed, use getDisplayExtenders() instead.
+   * @deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. Use Views::getDisplayExtenders() instead.
+   * @see https://www.drupal.org/node/3387596
    */
   public static function getEnabledDisplayExtenders() {
+    @trigger_error("Views::getEnabledDisplayExtenders() is deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. Use Views::getDisplayExtenders() instead. See https://www.drupal.org/node/3387596", E_USER_DEPRECATED);
+
     return self::getDisplayExtenders();
   }
 
