@@ -509,6 +509,7 @@ abstract class FieldPluginBase extends HandlerBase implements FieldHandlerInterf
         'trim_whitespace' => ['default' => FALSE],
         'alt' => ['default' => ''],
         'rel' => ['default' => ''],
+        'aria_label' => ['default' => ''],
         'link_class' => ['default' => ''],
         'prefix' => ['default' => ''],
         'suffix' => ['default' => ''],
@@ -887,6 +888,17 @@ abstract class FieldPluginBase extends HandlerBase implements FieldHandlerInterf
         '#type' => 'textfield',
         '#default_value' => $this->options['alter']['rel'],
         '#description' => $this->t('Include Rel attribute for use in lightbox2 or other javascript utility.'),
+        '#states' => [
+          'visible' => [
+            ':input[name="options[alter][make_link]"]' => ['checked' => TRUE],
+          ],
+        ],
+      ];
+      $form['alter']['aria_label'] = [
+        '#title' => $this->t('Aria label Text'),
+        '#type' => 'textfield',
+        '#default_value' => $this->options['alter']['aria_label'],
+        '#description' => $this->t('Include Aria label attribute.'),
         '#states' => [
           'visible' => [
             ':input[name="options[alter][make_link]"]' => ['checked' => TRUE],
@@ -1577,6 +1589,10 @@ abstract class FieldPluginBase extends HandlerBase implements FieldHandlerInterf
 
     if (!empty($alter['rel']) && $rel = $this->viewsTokenReplace($alter['rel'], $tokens)) {
       $options['attributes']['rel'] = $rel;
+    }
+
+    if (!empty($alter['aria_label']) && $aria_label = $this->viewsTokenReplace($alter['aria_label'], $tokens)) {
+      $options['attributes']['aria-label'] = $aria_label;
     }
 
     $target = trim($this->viewsTokenReplace($alter['target'], $tokens));

@@ -87,3 +87,15 @@ function views_post_update_table_css_class(?array &$sandbox = NULL): void {
     return $view_config_updater->needsTableCssClassUpdate($view);
   });
 }
+
+/**
+ * Add ARIA labels to views for better accessibility..
+ */
+function views_post_update_add_aria_label(?array &$sandbox = NULL): void {
+  /** @var \Drupal\views\ViewsConfigUpdater $view_config_updater */
+  $view_config_updater = \Drupal::classResolver(ViewsConfigUpdater::class);
+  $view_config_updater->setDeprecationsEnabled(FALSE);
+  \Drupal::classResolver(ConfigEntityUpdater::class)->update($sandbox, 'view', function (ViewEntityInterface $view) use ($view_config_updater): bool {
+    return $view_config_updater->needsAriaLabelUpdate($view);
+  });
+}

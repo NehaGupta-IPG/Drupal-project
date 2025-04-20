@@ -11,6 +11,7 @@ use Drupal\views\Entity\View;
  * Tests the upgrade path for converting numeric arguments to entity_target_id.
  *
  * @group Update
+ * @group legacy
  *
  * @see views_post_update_views_data_argument_plugin_id()
  */

@@ -521,7 +521,7 @@ class FieldWebTest extends ViewTestBase {
   }
 
   /**
-   * Tests trimming/read-more/ellipses.
+   * Tests trimming/read-more/ellipses and aria-label rendering.
    */
   public function testTextRendering(): void {
     /** @var \Drupal\Core\Render\RendererInterface $renderer */
@@ -681,6 +681,21 @@ class FieldWebTest extends ViewTestBase {
       return $name_field->advancedRender($row);
     });
     $this->assertNotSubString($output, '…', 'No ellipsis should appear if the output is not trimmed');
+
+    // Tests for the aria-label attribute rendering.
+    $name_field->options['alter'] = [
+      'make_link' => TRUE,
+      'path' => 'test-path',
+      'aria_label' => 'Test aria label',
+      'external' => FALSE,
+      'alt' => '',
+      'link_class' => '',
+      'target' => '',
+    ];
+    $output = (string) $renderer->executeInRenderContext(new RenderContext(), function () use ($name_field, $row) {
+      return $name_field->advancedRender($row);
+    });
+    $this->assertSubString($output, 'aria-label="Test aria label"', 'Aria label attribute should be present.');
   }
 
 }

@@ -532,6 +532,9 @@ views_field:
         rel:
           type: string
           label: 'Rel Text'
+        aria_label:
+          type: string
+          label: 'Aria label Text'
         link_class:
           type: string
           label: 'Link class'

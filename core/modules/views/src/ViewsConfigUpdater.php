@@ -349,4 +349,38 @@ class ViewsConfigUpdater implements ContainerInjectionInterface {
     return $changed;
   }
 
+  /**
+   * Checks if 'aria_label' setting of a field handler needs to be updated.
+   *
+   * @param \Drupal\views\ViewEntityInterface $view
+   *   The view entity.
+   *
+   * @return bool
+   *   TRUE if the view has any fields that need 'aria_label' updates.
+   */
+  public function needsAriaLabelUpdate(ViewEntityInterface $view): bool {
+    return $this->processDisplayHandlers($view, FALSE, function (&$handler, $handler_type) {
+      return $this->processAriaLabelUpdate($handler, $handler_type);
+    });
+  }
+
+  /**
+   * Processes fields and adds an empty 'aria_label' if not set.
+   *
+   * @param array $handler
+   *   A display handler.
+   * @param string $handler_type
+   *   The handler type.
+   *
+   * @return bool
+   *   Whether the handler was updated.
+   */
+  public function processAriaLabelUpdate(array &$handler, string $handler_type): bool {
+    if ($handler_type === 'field' && isset($handler['alter']) && !isset($handler['alter']['aria_label'])) {
+      $handler['alter']['aria_label'] = '';
+      return TRUE;
+    }
+    return FALSE;
+  }
+
 }
