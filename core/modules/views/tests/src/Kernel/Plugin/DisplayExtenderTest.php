@@ -28,6 +28,8 @@ class DisplayExtenderTest extends ViewsKernelTestBase {
 
   /**
    * Tests display extenders.
+   *
+   * @todo Rewrite as the setting was removed.
    */
   public function testDisplayExtenders(): void {
     $this->config('views.settings')->set('display_extenders', ['display_extender_test'])->save();
@@ -49,6 +51,8 @@ class DisplayExtenderTest extends ViewsKernelTestBase {
 
   /**
    * Tests display extenders validation.
+   *
+   * @todo Rewrite as the setting was removed.
    */
   public function testDisplayExtendersValidate(): void {
     $this->config('views.settings')->set('display_extenders', ['display_extender_test_3'])->save();

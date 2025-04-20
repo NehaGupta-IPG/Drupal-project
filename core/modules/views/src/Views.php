@@ -149,7 +149,7 @@ class Views {
    * Fetches a list of plugin names for a given type.
    *
    * @param string $type
-   *   Either 'display', 'style' or 'row'.
+   *   Either 'display', 'display_extender', 'style' or 'row'.
    * @param string $key
    *   For style plugins, this is an optional type to restrict to. May be
    *   'normal', 'summary', 'feed' or others based on the needs of the display.
@@ -202,11 +202,20 @@ class Views {
 
   /**
    * Gets enabled display extenders.
+   *
+   * @deprecated Removed, use getDisplayExtenders() instead.
    */
   public static function getEnabledDisplayExtenders() {
-    $enabled = array_filter((array) \Drupal::config('views.settings')->get('display_extenders'));
+    return self::getDisplayExtenders();
+  }
 
-    return array_combine($enabled, $enabled);
+  /**
+   * Get a list of all display extenders.
+   */
+  public static function getDisplayExtenders(): array {
+    $plugins = array_keys(self::fetchPluginNames('display_extender'));
+
+    return array_combine($plugins, $plugins);
   }
 
   /**

@@ -29,6 +29,8 @@ class DisplayExtenderUITest extends UITestBase {
 
   /**
    * Tests the display extender UI.
+   *
+   * @todo Rewrite as the setting was removed.
    */
   public function testDisplayExtenderUI(): void {
     $this->config('views.settings')->set('display_extenders', ['display_extender_test'])->save();

@@ -166,7 +166,7 @@ abstract class DisplayPluginBase extends PluginBase implements DisplayPluginInte
     // Load extenders as soon as possible.
     $display['display_options'] += ['display_extenders' => []];
     $this->extenders = [];
-    if ($extenders = Views::getEnabledDisplayExtenders()) {
+    if ($extenders = Views::getDisplayExtenders()) {
       $manager = \Drupal::service('plugin.manager.views.display_extender');
       $display_extender_options = $display['display_options']['display_extenders'];
       foreach ($extenders as $extender) {
