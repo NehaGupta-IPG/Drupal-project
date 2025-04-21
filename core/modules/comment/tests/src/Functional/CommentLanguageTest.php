@@ -163,7 +163,6 @@ class CommentLanguageTest extends BrowserTestBase {
       }
     }
 
-    $this->drupalGet('admin/content/comment');
     $comment_links = $this->xpath('//td[contains(@class, "views-field-subject")]//a');
 
     foreach ($comment_links as $link) {
