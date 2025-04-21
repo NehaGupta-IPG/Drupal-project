@@ -496,7 +496,7 @@
             "dist": {
                 "type": "path",
                 "url": "core",
-                "reference": "7e8f42a2a16fa8db35c42d6ba0c7bcc9b3508588"
+                "reference": "a363fee61e442bab264e69dd3a8a8f83ce00746a"
             },
             "require": {
                 "asm89/stack-cors": "^2.3",
@@ -639,7 +639,12 @@
                     "lib/Drupal/Component/Datetime/Time.php"
                 ],
                 "files": [
-                    "includes/bootstrap.inc"
+                    "includes/bootstrap.inc",
+                    "includes/common.inc",
+                    "includes/module.inc",
+                    "includes/theme.inc",
+                    "includes/form.inc",
+                    "includes/errors.inc"
                 ]
             },
             "scripts": {
