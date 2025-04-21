@@ -564,7 +564,7 @@ class ModuleInstaller implements ModuleInstallerInterface {
         }
       }
 
-      // Allow modules to react prior to the uninstall of a module.
+      // Allow modules to react prior to uninstalling a module.
       $this->moduleHandler->invokeAll('module_preuninstall', [$module, $sync_status]);
 
       // Uninstall the module.
