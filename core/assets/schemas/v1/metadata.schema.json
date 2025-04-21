@@ -188,12 +188,7 @@
       ]
     },
     "props": {
-      "additionalProperties": false,
-      "allOf": [
-        {
-          "$ref": "http://json-schema.org/draft-04/schema#"
-        }
-      ]
+      "$ref": "http://json-schema.org/draft-04/schema#"
     },
     "slots": {
       "$ref": "#/$defs/slotDefinition"
