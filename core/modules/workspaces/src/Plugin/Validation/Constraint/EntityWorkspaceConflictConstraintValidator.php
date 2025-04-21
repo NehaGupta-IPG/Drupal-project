@@ -6,7 +6,6 @@ use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\workspaces\WorkspaceAssociationInterface;
 use Drupal\workspaces\WorkspaceManagerInterface;
-use Drupal\workspaces\WorkspaceRepositoryInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
@@ -22,7 +21,6 @@ class EntityWorkspaceConflictConstraintValidator extends ConstraintValidator imp
     protected readonly EntityTypeManagerInterface $entityTypeManager,
     protected readonly WorkspaceManagerInterface $workspaceManager,
     protected readonly WorkspaceAssociationInterface $workspaceAssociation,
-    protected readonly WorkspaceRepositoryInterface $workspaceRepository,
   ) {}
 
   /**
@@ -33,25 +31,22 @@ class EntityWorkspaceConflictConstraintValidator extends ConstraintValidator imp
       $container->get('entity_type.manager'),
       $container->get('workspaces.manager'),
       $container->get('workspaces.association'),
-      $container->get('workspaces.repository')
     );
   }
 
   /**
    * {@inheritdoc}
    */
-  public function validate($entity, Constraint $constraint) {
+  public function validate($entity, Constraint $constraint): void {
     /** @var \Drupal\Core\Entity\EntityInterface $entity */
     if (isset($entity) && !$entity->isNew()) {
       $active_workspace = $this->workspaceManager->getActiveWorkspace();
 
       // If the entity is tracked in a workspace, it can only be edited in
       // that workspace or one of its descendants.
-      if ($tracking_workspace_ids = $this->workspaceAssociation->getEntityTrackingWorkspaceIds($entity)) {
-        $first_tracking_workspace_id = reset($tracking_workspace_ids);
-        $descendants_and_self = $this->workspaceRepository->getDescendantsAndSelf($first_tracking_workspace_id);
-
-        if (!$active_workspace || !in_array($active_workspace->id(), $descendants_and_self, TRUE)) {
+      if ($tracking_workspace_ids = $this->workspaceAssociation->getEntityTrackingWorkspaceIds($entity, TRUE)) {
+        if (!$active_workspace || !in_array($active_workspace->id(), $tracking_workspace_ids, TRUE)) {
+          $first_tracking_workspace_id = reset($tracking_workspace_ids);
           $workspace = $this->entityTypeManager->getStorage('workspace')
             ->load($first_tracking_workspace_id);
 

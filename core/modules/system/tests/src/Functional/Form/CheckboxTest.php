@@ -16,9 +16,7 @@ use Drupal\Tests\BrowserTestBase;
 class CheckboxTest extends BrowserTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['form_test'];
 
@@ -27,7 +25,10 @@ class CheckboxTest extends BrowserTestBase {
    */
   protected $defaultTheme = 'stark';
 
-  public function testFormCheckbox() {
+  /**
+   * Tests various checkbox configurations in the form API.
+   */
+  public function testFormCheckbox(): void {
     // Ensure that the checked state is determined and rendered correctly for
     // tricky combinations of default and return values.
     foreach ([FALSE, NULL, TRUE, 0, '0', '', 1, '1', 'foobar', '1foobar'] as $default_value) {

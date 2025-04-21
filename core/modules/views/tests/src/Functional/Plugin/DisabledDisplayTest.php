@@ -22,9 +22,7 @@ class DisabledDisplayTest extends ViewTestBase {
   public static $testViews = ['test_disabled_display'];
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['block', 'node', 'views'];
 
@@ -56,7 +54,7 @@ class DisabledDisplayTest extends ViewTestBase {
    * the .enabled property disappear from the schema both the load and save
    * calls will start failing.
    */
-  public function testDisabledDisplays() {
+  public function testDisabledDisplays(): void {
     // The displays defined in this view.
     $display_ids = ['attachment_1', 'block_1', 'embed_1', 'feed_1', 'page_2'];
 

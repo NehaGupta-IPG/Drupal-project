@@ -10,7 +10,6 @@ use Composer\Package\PackageInterface;
 use Composer\Package\RootPackageInterface;
 use Drupal\Composer\Plugin\VendorHardening\Config;
 use Drupal\Composer\Plugin\VendorHardening\VendorHardeningPlugin;
-use Drupal\Tests\Traits\PhpUnitWarnings;
 use org\bovigo\vfs\vfsStream;
 use PHPUnit\Framework\TestCase;
 use Prophecy\PhpUnit\ProphecyTrait;
@@ -21,7 +20,6 @@ use Prophecy\PhpUnit\ProphecyTrait;
  */
 class VendorHardeningPluginTest extends TestCase {
 
-  use PhpUnitWarnings;
   use ProphecyTrait;
 
   /**
@@ -44,7 +42,7 @@ class VendorHardeningPluginTest extends TestCase {
   /**
    * @covers ::cleanPackage
    */
-  public function testCleanPackage() {
+  public function testCleanPackage(): void {
 
     $config = $this->getMockBuilder(Config::class)
       ->disableOriginalConstructor()
@@ -80,7 +78,7 @@ class VendorHardeningPluginTest extends TestCase {
   /**
    * @covers ::cleanPathsForPackage
    */
-  public function testCleanPathsForPackage() {
+  public function testCleanPathsForPackage(): void {
     $plugin = $this->getMockBuilder(VendorHardeningPlugin::class)
       ->onlyMethods(['getInstallPathForPackage'])
       ->getMock();
@@ -108,7 +106,7 @@ class VendorHardeningPluginTest extends TestCase {
   /**
    * @covers ::cleanAllPackages
    */
-  public function testCleanAllPackages() {
+  public function testCleanAllPackages(): void {
     $config = $this->getMockBuilder(Config::class)
       ->disableOriginalConstructor()
       ->getMock();
@@ -148,7 +146,7 @@ class VendorHardeningPluginTest extends TestCase {
   /**
    * @covers ::writeAccessRestrictionFiles
    */
-  public function testWriteAccessRestrictionFiles() {
+  public function testWriteAccessRestrictionFiles(): void {
     $dir = vfsStream::url('vendor');
 
     // Set up mocks so that writeAccessRestrictionFiles() can eventually use
@@ -166,12 +164,10 @@ class VendorHardeningPluginTest extends TestCase {
     $this->assertDirectoryExists($dir);
 
     $this->assertFileDoesNotExist($dir . '/.htaccess');
-    $this->assertFileDoesNotExist($dir . '/web.config');
 
     $plugin->writeAccessRestrictionFiles($dir);
 
     $this->assertFileExists($dir . '/.htaccess');
-    $this->assertFileExists($dir . '/web.config');
   }
 
   public static function providerFindBinOverlap() {
@@ -223,7 +219,7 @@ class VendorHardeningPluginTest extends TestCase {
    * @covers ::findBinOverlap
    * @dataProvider providerFindBinOverlap
    */
-  public function testFindBinOverlap($expected, $binaries, $clean_paths) {
+  public function testFindBinOverlap($expected, $binaries, $clean_paths): void {
     $plugin = $this->getMockBuilder(VendorHardeningPlugin::class)
       ->disableOriginalConstructor()
       ->getMock();

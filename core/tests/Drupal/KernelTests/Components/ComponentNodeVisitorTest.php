@@ -1,8 +1,8 @@
 <?php
 
-namespace Drupal\KernelTests\Components;
+declare(strict_types=1);
 
-use Drupal\Tests\Core\Theme\Component\ComponentKernelTestBase;
+namespace Drupal\KernelTests\Components;
 
 /**
  * Tests the node visitor.

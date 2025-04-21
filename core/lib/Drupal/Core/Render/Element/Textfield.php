@@ -5,7 +5,6 @@ namespace Drupal\Core\Render\Element;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Render\Attribute\FormElement;
 use Drupal\Core\Render\Element;
-use Drupal\Core\Render\Element\FormElement as FormElementBase;
 
 /**
  * Provides a one-line text field form element.
@@ -20,8 +19,9 @@ use Drupal\Core\Render\Element\FormElement as FormElementBase;
  * - #pattern: A string for the native HTML5 pattern attribute.
  *
  * Usage example:
+ *
  * @code
- * $form['title'] = array(
+ * $form['title'] = [
  *   '#type' => 'textfield',
  *   '#title' => $this->t('Subject'),
  *   '#default_value' => $node->title,
@@ -29,18 +29,11 @@ use Drupal\Core\Render\Element\FormElement as FormElementBase;
  *   '#maxlength' => 128,
  *   '#pattern' => 'some-prefix-[a-z]+',
  *   '#required' => TRUE,
- * );
+ * ];
  * @endcode
  *
- * @see \Drupal\Core\Render\Element\Color
- * @see \Drupal\Core\Render\Element\Email
- * @see \Drupal\Core\Render\Element\MachineName
- * @see \Drupal\Core\Render\Element\Number
- * @see \Drupal\Core\Render\Element\Password
- * @see \Drupal\Core\Render\Element\PasswordConfirm
- * @see \Drupal\Core\Render\Element\Range
- * @see \Drupal\Core\Render\Element\Tel
- * @see \Drupal\Core\Render\Element\Url
+ * @see \Drupal\Core\Render\Element
+ * @see \Drupal\Core\Render\Element\Textarea
  */
 #[FormElement('textfield')]
 class Textfield extends FormElementBase {
@@ -49,21 +42,20 @@ class Textfield extends FormElementBase {
    * {@inheritdoc}
    */
   public function getInfo() {
-    $class = static::class;
     return [
       '#input' => TRUE,
       '#size' => 60,
       '#maxlength' => 128,
       '#autocomplete_route_name' => FALSE,
       '#process' => [
-        [$class, 'processAutocomplete'],
-        [$class, 'processAjaxForm'],
-        [$class, 'processPattern'],
-        [$class, 'processGroup'],
+        [static::class, 'processAutocomplete'],
+        [static::class, 'processAjaxForm'],
+        [static::class, 'processPattern'],
+        [static::class, 'processGroup'],
       ],
       '#pre_render' => [
-        [$class, 'preRenderTextfield'],
-        [$class, 'preRenderGroup'],
+        [static::class, 'preRenderTextfield'],
+        [static::class, 'preRenderGroup'],
       ],
       '#theme' => 'input__textfield',
       '#theme_wrappers' => ['form_element'],

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\filter\Kernel\Plugin\migrate\process;
 
 use Drupal\filter\Plugin\migrate\process\FilterID;
@@ -54,7 +56,7 @@ class FilterIdTest extends KernelTestBase {
    *
    * @covers ::transform
    */
-  public function testTransform($value, $expected_value, $invalid_id = NULL, $stop_pipeline = FALSE) {
+  public function testTransform($value, $expected_value, $invalid_id = NULL, $stop_pipeline = FALSE): void {
     $configuration = [
       'bypass' => TRUE,
       'map' => [

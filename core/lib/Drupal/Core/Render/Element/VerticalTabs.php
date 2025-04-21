@@ -5,7 +5,6 @@ namespace Drupal\Core\Render\Element;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Render\Attribute\FormElement;
 use Drupal\Core\Render\Element;
-use Drupal\Core\Render\Element\RenderElement as RenderElementBase;
 
 /**
  * Provides a render element for vertical tabs in a form.
@@ -19,32 +18,32 @@ use Drupal\Core\Render\Element\RenderElement as RenderElementBase;
  *
  * Usage example:
  * @code
- * $form['information'] = array(
+ * $form['information'] = [
  *   '#type' => 'vertical_tabs',
  *   '#default_tab' => 'edit-publication',
- * );
+ * ];
  *
- * $form['author'] = array(
+ * $form['author'] = [
  *   '#type' => 'details',
  *   '#title' => $this->t('Author'),
  *   '#group' => 'information',
- * );
+ * ];
  *
- * $form['author']['name'] = array(
+ * $form['author']['name'] = [
  *   '#type' => 'textfield',
  *   '#title' => $this->t('Name'),
- * );
+ * ];
  *
- * $form['publication'] = array(
+ * $form['publication'] = [
  *   '#type' => 'details',
  *   '#title' => $this->t('Publication'),
  *   '#group' => 'information',
- * );
+ * ];
  *
- * $form['publication']['publisher'] = array(
+ * $form['publication']['publisher'] = [
  *   '#type' => 'textfield',
  *   '#title' => $this->t('Publisher'),
- * );
+ * ];
  * @endcode
  */
 #[FormElement('vertical_tabs')]
@@ -54,14 +53,13 @@ class VerticalTabs extends RenderElementBase {
    * {@inheritdoc}
    */
   public function getInfo() {
-    $class = static::class;
     return [
       '#default_tab' => '',
       '#process' => [
-        [$class, 'processVerticalTabs'],
+        [static::class, 'processVerticalTabs'],
       ],
       '#pre_render' => [
-        [$class, 'preRenderVerticalTabs'],
+        [static::class, 'preRenderVerticalTabs'],
       ],
       '#theme_wrappers' => ['vertical_tabs', 'form_element'],
     ];

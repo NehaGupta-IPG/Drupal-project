@@ -18,9 +18,7 @@ use Drupal\Tests\BrowserTestBase;
 class LanguageLocaleListTest extends BrowserTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['language', 'locale'];
 
@@ -46,7 +44,7 @@ class LanguageLocaleListTest extends BrowserTestBase {
   /**
    * Tests adding, editing, and deleting languages.
    */
-  public function testLanguageLocaleList() {
+  public function testLanguageLocaleList(): void {
     // User to add and remove language.
     $admin_user = $this->drupalCreateUser([
       'administer languages',

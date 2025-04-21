@@ -17,7 +17,6 @@ use Drupal\views\Views;
  * Tests the serializer style plugin.
  *
  * @group rest
- * @group #slow
  * @see \Drupal\rest\Plugin\views\display\RestExport
  * @see \Drupal\rest\Plugin\views\style\Serializer
  * @see \Drupal\rest\Plugin\views\row\DataEntityRow
@@ -28,9 +27,7 @@ class StyleSerializerTest extends ViewTestBase {
   use AssertPageCacheContextsAndTagsTrait;
 
   /**
-   * Modules to install.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = [
     'views_ui',
@@ -56,7 +53,9 @@ class StyleSerializerTest extends ViewTestBase {
   public static $testViews = ['test_serializer_display_field', 'test_serializer_display_entity', 'test_serializer_display_entity_translated', 'test_serializer_node_display_field', 'test_serializer_node_exposed_filter', 'test_serializer_shared_path'];
 
   /**
-   * A user with administrative privileges to look at test entity and configure views.
+   * A user with permissions to look at test entity and configure views.
+   *
+   * @var \Drupal\user\Entity\User|false
    */
   protected $adminUser;
 
@@ -87,7 +86,7 @@ class StyleSerializerTest extends ViewTestBase {
   /**
    * Checks that the auth options restricts access to a REST views display.
    */
-  public function testRestViewsAuthentication() {
+  public function testRestViewsAuthentication(): void {
     // Assume the view is hidden behind a permission.
     $this->drupalGet('test/serialize/auth_with_perm', ['query' => ['_format' => 'json']]);
     $this->assertSession()->statusCodeEquals(401);
@@ -112,13 +111,13 @@ class StyleSerializerTest extends ViewTestBase {
     // Ensure that any changes to variables in the other thread are picked up.
     $this->refreshVariables();
 
-    $this->assertSession()->statusCodeEquals(200);
+    $this->assertEquals(200, $response->getStatusCode());
   }
 
   /**
    * Verifies REST export views work on the same path as a page display.
    */
-  public function testSharedPagePath() {
+  public function testSharedPagePath(): void {
     // Test with no format as well as html explicitly.
     $this->drupalGet('test/serialize/shared');
     $this->assertSession()->statusCodeEquals(200);
@@ -140,7 +139,7 @@ class StyleSerializerTest extends ViewTestBase {
   /**
    * Verifies site maintenance mode functionality.
    */
-  public function testSiteMaintenance() {
+  public function testSiteMaintenance(): void {
     $view = Views::getView('test_serializer_display_field');
     $view->initDisplay();
     $this->executeView($view);
@@ -159,7 +158,7 @@ class StyleSerializerTest extends ViewTestBase {
    * @param string $format
    *   The new request format.
    */
-  protected function addRequestWithFormat($format) {
+  protected function addRequestWithFormat($format): void {
     $request = \Drupal::request();
     $request = clone $request;
     $request->setRequestFormat($format);
@@ -170,7 +169,7 @@ class StyleSerializerTest extends ViewTestBase {
   /**
    * Tests the "Grouped rows" functionality.
    */
-  public function testGroupRows() {
+  public function testGroupRows(): void {
     $this->drupalCreateContentType(['type' => 'page']);
     // Create a text field with cardinality set to unlimited.
     $field_name = 'field_group_rows';
@@ -235,7 +234,7 @@ class StyleSerializerTest extends ViewTestBase {
    * parameter. This is set to filter nodes by those whose title starts with
    * the value provided.
    */
-  public function testRestViewExposedFilter() {
+  public function testRestViewExposedFilter(): void {
     $this->drupalCreateContentType(['type' => 'page']);
     $node0 = $this->drupalCreateNode(['title' => 'Node 1']);
     $node1 = $this->drupalCreateNode(['title' => 'Node 11']);
@@ -291,7 +290,7 @@ class StyleSerializerTest extends ViewTestBase {
   /**
    * Tests multilingual entity rows.
    */
-  public function testMulEntityRows() {
+  public function testMulEntityRows(): void {
     // Create some languages.
     ConfigurableLanguage::createFromLangcode('l1')->save();
     ConfigurableLanguage::createFromLangcode('l2')->save();

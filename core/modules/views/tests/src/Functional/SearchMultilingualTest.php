@@ -19,9 +19,7 @@ class SearchMultilingualTest extends ViewTestBase {
   use LanguageTestTrait;
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = [
     'node',
@@ -45,7 +43,7 @@ class SearchMultilingualTest extends ViewTestBase {
   /**
    * Tests search with multilingual nodes.
    */
-  public function testMultilingualSearchFilter() {
+  public function testMultilingualSearchFilter(): void {
     // Add Spanish language programmatically.
     static::createLanguageFromLangcode('es');
 

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\Component\Diff\Engine;
 
+// cspell:ignore HWLDFWordAccumulator
+
 use Drupal\Component\Diff\Engine\HWLDFWordAccumulator;
 use PHPUnit\Framework\TestCase;
 
@@ -25,7 +27,7 @@ class HWLDFWordAccumulatorTest extends TestCase {
    *
    * @see Drupal\Component\Diff\Engine\HWLDFWordAccumulator::NBSP
    */
-  public function testGetLinesEmpty() {
+  public function testGetLinesEmpty(): void {
     $acc = new HWLDFWordAccumulator();
     $this->assertEquals(['&#160;'], $acc->getLines());
   }
@@ -48,7 +50,7 @@ class HWLDFWordAccumulatorTest extends TestCase {
    * @covers ::addWords
    * @dataProvider provideAddWords
    */
-  public function testAddWords($expected, $words, $tag) {
+  public function testAddWords($expected, $words, $tag): void {
     $acc = new HWLDFWordAccumulator();
     $acc->addWords($words, $tag);
     $this->assertEquals($expected, $acc->getLines());

@@ -14,9 +14,7 @@ use Drupal\Tests\BrowserTestBase;
 class LanguagePathMonolingualTest extends BrowserTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['block', 'language', 'path'];
 
@@ -75,7 +73,7 @@ class LanguagePathMonolingualTest extends BrowserTestBase {
   /**
    * Verifies that links do not have language prefixes in them.
    */
-  public function testPageLinks() {
+  public function testPageLinks(): void {
     // Navigate to 'admin/config' path.
     $this->drupalGet('admin/config');
 

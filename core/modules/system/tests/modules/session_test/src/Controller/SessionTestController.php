@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\session_test\Controller;
 
 use Drupal\Core\Controller\ControllerBase;
@@ -70,7 +72,10 @@ class SessionTestController extends ControllerBase {
    *   A notification message with session ID.
    */
   public function getIdFromCookie(Request $request) {
-    return ['#markup' => 'session_id:' . $request->cookies->get(session_name()) . "\n", '#cache' => ['contexts' => ['cookies:' . session_name()]]];
+    return [
+      '#markup' => 'session_id:' . $request->cookies->get(session_name()) . "\n",
+      '#cache' => ['contexts' => ['cookies:' . session_name()]],
+    ];
   }
 
   /**
@@ -111,10 +116,10 @@ class SessionTestController extends ControllerBase {
    */
   public function setMessage() {
     $this->messenger()->addStatus($this->t('This is a dummy message.'));
-    return new Response($this->t('A message was set.'));
-    // Do not return anything, so the current request does not result in a themed
-    // page with messages. The message will be displayed in the following request
-    // instead.
+    return new Response((string) $this->t('A message was set.'));
+    // Do not return anything, so the current request does not result in a
+    // themed page with messages. The message will be displayed in the following
+    // request instead.
   }
 
   /**
@@ -157,6 +162,43 @@ class SessionTestController extends ControllerBase {
     else {
       $_SESSION['trace-handler']++;
     }
+    $request->getSession()->save();
+
+    // Collect traces and return them in JSON format.
+    $trace = \Drupal::service('session_test.session_handler_proxy_trace')->getArrayCopy();
+
+    return new JsonResponse($trace);
+  }
+
+  /**
+   * Returns an updated trace recorded by test proxy session handlers as JSON.
+   *
+   * The session data is rewritten without modification to invoke
+   * `\SessionUpdateTimestampHandlerInterface::updateTimestamp`.
+   *
+   * Expects that there is an existing stacked session handler trace as recorded
+   * by `traceHandler()`.
+   *
+   * @param \Symfony\Component\HttpFoundation\Request $request
+   *   The incoming request.
+   *
+   * @return \Symfony\Component\HttpFoundation\JsonResponse
+   *   The response.
+   *
+   * @throws \AssertionError
+   */
+  public function traceHandlerRewriteUnmodified(Request $request) {
+    // Assert that there is an existing session with stacked handler trace data.
+    assert(
+      is_int($_SESSION['trace-handler']) && $_SESSION['trace-handler'] > 0,
+      'Existing stacked session handler trace not found'
+    );
+
+    // Save unmodified session data.
+    assert(
+      ini_get('session.lazy_write'),
+      'session.lazy_write must be enabled to invoke updateTimestamp()'
+    );
     $request->getSession()->save();
 
     // Collect traces and return them in JSON format.
@@ -240,8 +282,8 @@ class SessionTestController extends ControllerBase {
     /** @var \Drupal\session_test\Session\TestSessionBag */
     $bag = $request->getSession()->getBag(TestSessionBag::BAG_NAME);
     return new Response(empty($bag->hasFlag())
-      ? $this->t('Flag is absent from session bag')
-      : $this->t('Flag is present in session bag')
+      ? (string) $this->t('Flag is absent from session bag')
+      : (string) $this->t('Flag is present in session bag')
     );
   }
 

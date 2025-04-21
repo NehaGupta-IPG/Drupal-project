@@ -4,7 +4,6 @@ namespace Drupal\Core\Render\Element;
 
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Render\Attribute\FormElement;
-use Drupal\Core\Render\Element\FormElement as FormElementBase;
 
 /**
  * Provides a form element for input of a weight.
@@ -18,12 +17,12 @@ use Drupal\Core\Render\Element\FormElement as FormElementBase;
  *
  * Usage example:
  * @code
- * $form['weight'] = array(
+ * $form['weight'] = [
  *   '#type' => 'weight',
  *   '#title' => $this->t('Weight'),
  *   '#default_value' => $edit['weight'],
  *   '#delta' => 10,
- * );
+ * ];
  * @endcode
  */
 #[FormElement('weight')]
@@ -33,14 +32,13 @@ class Weight extends FormElementBase {
    * {@inheritdoc}
    */
   public function getInfo() {
-    $class = static::class;
     return [
       '#input' => TRUE,
       '#delta' => 10,
       '#default_value' => 0,
       '#process' => [
-        [$class, 'processWeight'],
-        [$class, 'processAjaxForm'],
+        [static::class, 'processWeight'],
+        [static::class, 'processAjaxForm'],
       ],
     ];
   }

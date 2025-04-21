@@ -6,7 +6,7 @@ use Drupal\Component\Utility\Crypt;
 use Drupal\Core\Site\Settings;
 use Drupal\Core\Template\Attribute;
 use Drupal\Core\Render\Attribute\RenderElement;
-use Drupal\Core\Render\Element\RenderElement as RenderElementBase;
+use Drupal\Core\Render\Element\RenderElementBase;
 use Drupal\Component\Render\FormattableMarkup;
 
 /**
@@ -19,10 +19,9 @@ class ContextualLinksPlaceholder extends RenderElementBase {
    * {@inheritdoc}
    */
   public function getInfo() {
-    $class = static::class;
     return [
       '#pre_render' => [
-        [$class, 'preRenderPlaceholder'],
+        [static::class, 'preRenderPlaceholder'],
       ],
       '#id' => NULL,
     ];

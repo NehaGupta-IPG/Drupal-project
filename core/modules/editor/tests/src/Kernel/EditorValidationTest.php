@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\editor\Kernel;
 
 use Drupal\ckeditor5\Plugin\CKEditor5Plugin\Heading;
@@ -45,6 +47,9 @@ class EditorValidationTest extends ConfigEntityValidationTestBase {
     $this->entity = Editor::create([
       'format' => $format->id(),
       'editor' => 'ckeditor5',
+      'image_upload' => [
+        'status' => FALSE,
+      ],
       'settings' => [
         // @see \Drupal\ckeditor5\Plugin\Editor\CKEditor5::getDefaultSettings()
         'toolbar' => [
@@ -126,7 +131,9 @@ class EditorValidationTest extends ConfigEntityValidationTestBase {
   }
 
   /**
-   * `image_upload.status = TRUE` must cause additional keys to be required.
+   * Test validation when dynamically changing image upload settings.
+   *
+   * Additional keys are required when image_upload.status is TRUE.
    */
   public function testImageUploadSettingsAreDynamicallyRequired(): void {
     // When image uploads are disabled, no other key-value pairs are needed.

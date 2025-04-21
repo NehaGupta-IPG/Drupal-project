@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\node\Kernel;
 
 use Drupal\KernelTests\Core\Config\ConfigEntityValidationTestBase;
@@ -9,6 +11,7 @@ use Drupal\Tests\node\Traits\ContentTypeCreationTrait;
  * Tests validation of node_type entities.
  *
  * @group node
+ * @group #slow
  */
 class NodeTypeValidationTest extends ConfigEntityValidationTestBase {
 
@@ -32,6 +35,7 @@ class NodeTypeValidationTest extends ConfigEntityValidationTestBase {
    */
   protected function setUp(): void {
     parent::setUp();
+    $this->installEntitySchema('node');
     $this->installConfig('node');
     $this->entity = $this->createContentType();
   }

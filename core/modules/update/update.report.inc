@@ -2,9 +2,9 @@
 
 /**
  * @file
- * Code required only when rendering the available updates report.
  */
 
+use Drupal\Core\Hook\Attribute\StopProceduralHookScan;
 use Drupal\Core\Template\Attribute;
 use Drupal\Core\Url;
 use Drupal\update\ProjectRelease;
@@ -20,7 +20,8 @@ use Drupal\update\UpdateManagerInterface;
  *   An associative array containing:
  *   - data: An array of data about each project's status.
  */
-function template_preprocess_update_report(&$variables) {
+#[StopProceduralHookScan]
+function template_preprocess_update_report(&$variables): void {
   $data = isset($variables['data']) && is_array($variables['data']) ? $variables['data'] : [];
 
   $last = \Drupal::state()->get('update.last_check', 0);
@@ -113,7 +114,7 @@ function template_preprocess_update_report(&$variables) {
  *   An associative array containing:
  *   - version: An array of information about the release version.
  */
-function template_preprocess_update_version(array &$variables) {
+function template_preprocess_update_version(array &$variables): void {
   $release = ProjectRelease::createFromArray($variables['version']);
   if (!$release->getCoreCompatibilityMessage()) {
     return;
@@ -143,7 +144,7 @@ function template_preprocess_update_version(array &$variables) {
  *   An associative array containing:
  *   - project: An array of information about the project.
  */
-function template_preprocess_update_project_status(&$variables) {
+function template_preprocess_update_project_status(&$variables): void {
   // Storing by reference because we are sorting the project values.
   $project = &$variables['project'];
 

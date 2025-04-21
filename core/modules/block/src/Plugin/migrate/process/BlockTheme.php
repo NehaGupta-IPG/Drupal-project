@@ -3,6 +3,7 @@
 namespace Drupal\block\Plugin\migrate\process;
 
 use Drupal\Core\Config\Config;
+use Drupal\migrate\Attribute\MigrateProcess;
 use Drupal\migrate\MigrateExecutableInterface;
 use Drupal\migrate\ProcessPluginBase;
 use Drupal\migrate\Row;
@@ -10,10 +11,9 @@ use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
- * @MigrateProcessPlugin(
- *   id = "block_theme"
- * )
+ * Determines the theme to use for a block.
  */
+#[MigrateProcess('block_theme')]
 class BlockTheme extends ProcessPluginBase implements ContainerFactoryPluginInterface {
 
   /**

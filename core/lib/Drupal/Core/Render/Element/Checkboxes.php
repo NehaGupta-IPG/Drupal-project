@@ -4,7 +4,6 @@ namespace Drupal\Core\Render\Element;
 
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Render\Attribute\FormElement;
-use Drupal\Core\Render\Element\FormElement as FormElementBase;
 
 /**
  * Provides a form element for a set of checkboxes.
@@ -17,12 +16,12 @@ use Drupal\Core\Render\Element\FormElement as FormElementBase;
  *
  * Usage example:
  * @code
- * $form['favorites']['colors'] = array(
+ * $form['favorites']['colors'] = [
  *   '#type' => 'checkboxes',
- *   '#options' => array('blue' => $this->t('Blue'), 'red' => $this->t('Red')),
+ *   '#options' => ['blue' => $this->t('Blue'), 'red' => $this->t('Red')],
  *   '#title' => $this->t('Which colors do you like?'),
  *   ...
- * );
+ * ];
  * @endcode
  *
  * Element properties may be set on single option items as follows.
@@ -43,14 +42,13 @@ class Checkboxes extends FormElementBase {
    * {@inheritdoc}
    */
   public function getInfo() {
-    $class = static::class;
     return [
       '#input' => TRUE,
       '#process' => [
-        [$class, 'processCheckboxes'],
+        [static::class, 'processCheckboxes'],
       ],
       '#pre_render' => [
-        [$class, 'preRenderCompositeFormElement'],
+        [static::class, 'preRenderCompositeFormElement'],
       ],
       '#theme_wrappers' => ['checkboxes'],
     ];

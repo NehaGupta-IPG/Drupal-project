@@ -3,7 +3,7 @@
 namespace Drupal\toolbar\Element;
 
 use Drupal\Core\Render\Attribute\RenderElement;
-use Drupal\Core\Render\Element\RenderElement as RenderElementBase;
+use Drupal\Core\Render\Element\RenderElementBase;
 use Drupal\Core\Url;
 
 /**
@@ -18,10 +18,9 @@ class ToolbarItem extends RenderElementBase {
    * {@inheritdoc}
    */
   public function getInfo() {
-    $class = static::class;
     return [
       '#pre_render' => [
-        [$class, 'preRenderToolbarItem'],
+        [static::class, 'preRenderToolbarItem'],
       ],
       'tab' => [
         '#type' => 'link',

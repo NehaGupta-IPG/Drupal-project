@@ -25,6 +25,14 @@ class MigrateControllerTest extends BrowserTestBase {
 
   /**
    * {@inheritdoc}
+   *
+   * @todo Remove and fix test to not rely on super user.
+   * @see https://www.drupal.org/project/drupal/issues/3437620
+   */
+  protected bool $usesSuperUserAccessPolicy = TRUE;
+
+  /**
+   * {@inheritdoc}
    */
   protected $defaultTheme = 'stark';
 
@@ -45,7 +53,7 @@ class MigrateControllerTest extends BrowserTestBase {
   /**
    * Tests the upgrade report with the view enabled, disabled and uninstalled.
    */
-  public function testUpgradeReport() {
+  public function testUpgradeReport(): void {
     $session = $this->assertSession();
 
     $this->assertTrue(View::load('watchdog')->status(), 'Watchdog view is enabled');

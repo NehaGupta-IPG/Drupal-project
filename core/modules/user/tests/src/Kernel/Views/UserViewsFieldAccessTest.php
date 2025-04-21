@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\user\Kernel\Views;
 
 use Drupal\language\Entity\ConfigurableLanguage;
@@ -27,7 +29,10 @@ class UserViewsFieldAccessTest extends FieldFieldAccessTestBase {
     $this->installEntitySchema('user');
   }
 
-  public function testUserFields() {
+  /**
+   * Tests the user fields.
+   */
+  public function testUserFields(): void {
     ConfigurableLanguage::createFromLangcode('es')->save();
     ConfigurableLanguage::createFromLangcode('fr')->save();
 

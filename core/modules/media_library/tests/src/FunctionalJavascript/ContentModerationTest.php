@@ -180,12 +180,7 @@ class ContentModerationTest extends WebDriverTestBase {
   /**
    * Tests the media library widget only shows published media.
    */
-  public function testAdministrationPage() {
-    // User 1 should be able to see all media items.
-    $this->drupalLogin($this->rootUser);
-    $this->drupalGet('admin/content/media');
-    $this->assertAllMedia();
-
+  public function testAdministrationPage(): void {
     // The media admin user should be able to see all media items.
     $this->drupalLogin($this->userAdmin);
     $this->drupalGet('admin/content/media');
@@ -217,11 +212,6 @@ class ContentModerationTest extends WebDriverTestBase {
       $media->save();
     }
 
-    // User 1 should still be able to see all media items.
-    $this->drupalLogin($this->rootUser);
-    $this->drupalGet('admin/content/media');
-    $this->assertAllMedia();
-
     // The media admin user should still be able to see all media items.
     $this->drupalLogin($this->userAdmin);
     $this->drupalGet('admin/content/media');
@@ -250,15 +240,10 @@ class ContentModerationTest extends WebDriverTestBase {
   /**
    * Tests the media library widget only shows published media.
    */
-  public function testWidget() {
+  public function testWidget(): void {
     $assert_session = $this->assertSession();
 
     // All users should only be able to see published media items.
-    $this->drupalLogin($this->rootUser);
-    $this->drupalGet('node/add/article');
-    $assert_session->elementExists('css', '.js-media-library-open-button[name^="field_media"]')->click();
-    $assert_session->assertWaitOnAjaxRequest();
-    $this->assertOnlyPublishedMedia();
     $this->drupalLogin($this->userAdmin);
     $this->drupalGet('node/add/article');
     $assert_session->elementExists('css', '.js-media-library-open-button[name^="field_media"]')->click();
@@ -287,11 +272,6 @@ class ContentModerationTest extends WebDriverTestBase {
       $media->save();
     }
 
-    $this->drupalLogin($this->rootUser);
-    $this->drupalGet('node/add/article');
-    $assert_session->elementExists('css', '.js-media-library-open-button[name^="field_media"]')->click();
-    $assert_session->assertWaitOnAjaxRequest();
-    $this->assertOnlyPublishedMedia();
     $this->drupalLogin($this->userAdmin);
     $this->drupalGet('node/add/article');
     $assert_session->elementExists('css', '.js-media-library-open-button[name^="field_media"]')->click();

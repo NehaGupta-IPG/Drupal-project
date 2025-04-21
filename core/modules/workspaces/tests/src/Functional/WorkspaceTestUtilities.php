@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\workspaces\Functional;
 
+use Drupal\Core\Entity\EntityInterface;
 use Drupal\Tests\block\Traits\BlockCreationTrait;
+use Drupal\workspaces\Entity\Handler\IgnoredWorkspaceHandler;
 use Drupal\workspaces\Entity\Workspace;
 use Drupal\workspaces\WorkspaceInterface;
 
@@ -17,6 +19,11 @@ trait WorkspaceTestUtilities {
 
   use BlockCreationTrait;
 
+  /**
+   * Signifies that the switcher block is configured.
+   *
+   * @var bool
+   */
   protected $switcherBlockConfigured = FALSE;
 
   /**
@@ -33,7 +40,7 @@ trait WorkspaceTestUtilities {
    * @return \Drupal\Core\Entity\EntityInterface
    *   The entity.
    */
-  protected function getOneEntityByLabel($type, $label) {
+  protected function getOneEntityByLabel($type, $label): EntityInterface {
     /** @var \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager */
     $entity_type_manager = \Drupal::service('entity_type.manager');
     $property = $entity_type_manager->getDefinition($type)->getKey('label');
@@ -200,6 +207,19 @@ trait WorkspaceTestUtilities {
     $this->assertSession()->statusCodeEquals(200);
     $page = $session->getPage();
     return $page->hasContent($label);
+  }
+
+  /**
+   * Marks an entity type as ignored in a workspace.
+   *
+   * @param string $entity_type_id
+   *   The entity type ID.
+   */
+  protected function ignoreEntityType(string $entity_type_id): void {
+    $entity_type = clone \Drupal::entityTypeManager()->getDefinition($entity_type_id);
+    $entity_type->setHandlerClass('workspace', IgnoredWorkspaceHandler::class);
+    \Drupal::state()->set("$entity_type_id.entity_type", $entity_type);
+    \Drupal::entityTypeManager()->clearCachedDefinitions();
   }
 
 }

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\views\Kernel\Handler;
 
 use Drupal\entity_test\Entity\EntityTest;
@@ -28,7 +30,10 @@ class EntityTestViewsFieldAccessTest extends FieldFieldAccessTestBase {
     ConfigurableLanguage::create(['id' => 'es', 'title' => 'Spanish title', 'label' => 'Spanish label'])->save();
   }
 
-  public function testEntityTestFields() {
+  /**
+   * Tests field access permissions for the 'entity_test' entity in Views.
+   */
+  public function testEntityTestFields(): void {
     $entity_test = EntityTest::create([
       'name' => 'test entity name',
     ]);

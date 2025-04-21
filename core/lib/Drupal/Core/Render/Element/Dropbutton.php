@@ -3,7 +3,6 @@
 namespace Drupal\Core\Render\Element;
 
 use Drupal\Core\Render\Attribute\RenderElement;
-use Drupal\Core\Render\Element\RenderElement as RenderElementBase;
 
 /**
  * Provides a render element for a set of links rendered as a drop-down button.
@@ -25,20 +24,20 @@ use Drupal\Core\Render\Element\RenderElement as RenderElementBase;
  *
  * Usage Example:
  * @code
- * $form['actions']['extra_actions'] = array(
+ * $form['actions']['extra_actions'] = [
  *   '#type' => 'dropbutton',
  *   '#dropbutton_type' => 'small',
- *   '#links' => array(
- *     'simple_form' => array(
+ *   '#links' => [
+ *     'simple_form' => [
  *       'title' => $this->t('Simple Form'),
  *       'url' => Url::fromRoute('fapi_example.simple_form'),
- *     ),
- *     'demo' => array(
+ *     ],
+ *     'demo' => [
  *       'title' => $this->t('Build Demo'),
  *       'url' => Url::fromRoute('fapi_example.build_demo'),
- *     ),
- *   ),
- * );
+ *     ],
+ *   ],
+ * ];
  * @endcode
  *
  * @see \Drupal\Core\Render\Element\Operations
@@ -50,10 +49,9 @@ class Dropbutton extends RenderElementBase {
    * {@inheritdoc}
    */
   public function getInfo() {
-    $class = static::class;
     return [
       '#pre_render' => [
-        [$class, 'preRenderDropbutton'],
+        [static::class, 'preRenderDropbutton'],
       ],
       '#theme' => 'links__dropbutton',
     ];

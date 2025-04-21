@@ -34,7 +34,7 @@ class PageEditTest extends BlockContentTestBase {
   /**
    * Checks block edit functionality.
    */
-  public function testPageEdit() {
+  public function testPageEdit(): void {
     $this->drupalLogin($this->adminUser);
 
     $title_key = 'info[0][value]';
@@ -75,7 +75,6 @@ class PageEditTest extends BlockContentTestBase {
     $this->submitForm($edit, 'Save');
 
     // Ensure that the block revision has been created.
-    \Drupal::entityTypeManager()->getStorage('block_content')->resetCache([$block->id()]);
     $revised_block = BlockContent::load($block->id());
     $this->assertNotSame($block->getRevisionId(), $revised_block->getRevisionId(), 'A new revision has been created.');
 
