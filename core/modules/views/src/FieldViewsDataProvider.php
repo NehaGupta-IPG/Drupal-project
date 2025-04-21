@@ -327,33 +327,11 @@ class FieldViewsDataProvider {
     // Expose data for each field property individually.
     foreach ($field_columns as $column => $attributes) {
       $allow_sort = TRUE;
-
-      // Identify likely filters and arguments for each column based on field type.
-      switch ($attributes['type']) {
-        case 'int':
-        case 'mediumint':
-        case 'tinyint':
-        case 'bigint':
-        case 'serial':
-        case 'numeric':
-        case 'float':
-          $filter = 'numeric';
-          $argument = 'numeric';
-          $sort = 'standard';
-          if ($field_storage->getType() == 'boolean') {
-            $filter = 'boolean';
-          }
-          break;
-
-        case 'blob':
-          // It does not make sense to sort by blob.
-          $allow_sort = FALSE;
-        default:
-          $filter = 'string';
-          $argument = 'string';
-          $sort = 'standard';
-          break;
+      if ($attributes['type'] == 'blob') {
+        $allow_sort = FALSE;
       }
+
+      [$filter, $argument, $sort] = $this->getHandlers($attributes['type'], $field_storage->getType());
 
       if (count($field_columns) == 1 || $column == 'value') {
         $title = $this->t('@label (@name)', ['@label' => $label, '@name' => $field_name]);
@@ -518,6 +496,47 @@ class FieldViewsDataProvider {
       $result = $storage instanceof SqlContentEntityStorage ? $storage : FALSE;
     }
     return $result;
+  }
+
+  /**
+   * Gets the default handlers for a field's data column.
+   *
+   * @param string $column_type
+   *   The type of data stored in the field's database table column.
+   * @param string $field_type
+   *   The ID of the field's type plugin.
+   *
+   * @return string[]
+   *   An array containing the IDs of Views handlers in the following order:
+   *   filter, argument, sort.
+   */
+  public function getHandlers(string $column_type, string $field_type): array {
+    switch ($column_type) {
+      case 'int':
+      case 'mediumint':
+      case 'tinyint':
+      case 'bigint':
+      case 'serial':
+      case 'numeric':
+      case 'float':
+        $filter = 'numeric';
+        $argument = 'numeric';
+        $sort = 'standard';
+        if ($field_type == 'boolean') {
+          $filter = 'boolean';
+        }
+        elseif ($field_type == 'timestamp') {
+          $filter = 'date';
+        }
+        break;
+
+      default:
+        $filter = 'string';
+        $argument = 'string';
+        $sort = 'standard';
+        break;
+    }
+    return [$filter, $argument, $sort];
   }
 
 }
