@@ -9,14 +9,12 @@
  */
 
 use Drupal\Core\DrupalKernel;
-use Symfony\Component\HttpFoundation\Request;
+use Drupal\Core\Runtime\DrupalRuntime;
 
-$autoloader = require_once 'autoload.php';
+// @todo Replace once https://github.com/symfony/symfony/issues/60249 is fixed.
+$_ENV['APP_RUNTIME'] ??= DrupalRuntime::class;
+require_once 'autoload_runtime.php';
 
-$kernel = new DrupalKernel('prod', $autoloader);
-
-$request = Request::createFromGlobals();
-$response = $kernel->handle($request);
-$response->send();
-
-$kernel->terminate($request, $response);
+return static function () {
+  return new DrupalKernel('prod', require 'autoload.php');
+};
