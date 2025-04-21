@@ -14,6 +14,7 @@ use Drupal\Core\Utility\UnroutedUrlAssemblerInterface;
 use Drupal\Core\Routing\RouteObjectInterface;
 use Symfony\Component\HttpFoundation\Request;
 
+
 // cspell:ignore abempty
 
 /**
@@ -103,6 +104,7 @@ class Url implements TrustedCallbackInterface {
    * @var string
    */
   protected $internalPath;
+
 
   /**
    * Constructs a new Url object.
@@ -888,6 +890,47 @@ class Url implements TrustedCallbackInterface {
    */
   public static function trustedCallbacks() {
     return [];
+  }
+
+  /**
+   * Sets the destination of the link.
+   *
+   * @param string $path
+   *   The internal path to set as the destination.
+   *
+   * @return array
+   *   Array of query parameters.
+   *
+   * @throws \InvalidArgumentException
+   *   If the path is not a string or is an external URL.
+   */
+  public function setDestination(string $path): array {
+    if (!is_string($path)) {
+      throw new \InvalidArgumentException('The path must be a string.');
+    }
+    // Check if path is external.
+    if (UrlHelper::isExternal($path)) {
+      throw new \InvalidArgumentException('The destination path must be an internal path.');
+    }
+    $this->mergeOptions(['query' => ['destination' => $path]]);
+  }
+
+  /**
+   * Sets the destination of the link to the current path or destination.
+   *
+   * @return array
+   *   Array of query parameters.
+   *
+   * @throws \InvalidArgumentException
+   *   If the current destination is not a valid internal path.
+   */
+  public function setDestinationToCurrent(): array {
+    $current_destination = \Drupal::destination()->get();
+    // Validate the current destination is an internal path
+    if (UrlHelper::isExternal($current_destination)) {
+      throw new \InvalidArgumentException('The current destination must be an internal path.');
+    }
+    $this->setDestination($current_destination);
   }
 
 }
