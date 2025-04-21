@@ -465,8 +465,8 @@ striptags
 strs
 styleguide
 stylelint
-stylelintrc
 stylelintcache
+stylelintrc
 stylescombo
 subarrays
 subchild
