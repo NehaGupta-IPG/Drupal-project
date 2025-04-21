@@ -49,7 +49,7 @@ class TestSiteOliveroInstallTestScript implements TestSetupInterface {
   public function setup() {
 
     $process = $this->generateThemeFromStarterkit();
-    $result = $process->run();
+    $process->run();
 
     // Install required module for the Olivero front page.
     $module_installer = \Drupal::service('module_installer');

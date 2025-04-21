@@ -6,6 +6,9 @@ use Drupal\Core\Theme\StarterKitInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Finder\Finder;
 
+/**
+ * Interacts with theme generation.
+ */
 final class StarterKit implements StarterKitInterface {
 
   /**
@@ -13,7 +16,7 @@ final class StarterKit implements StarterKitInterface {
    *
    * @var array
    */
-  private static $scripts_to_keep = [
+  private static $scriptsToKeep = [
     'build:css',
     'watch:css',
   ];
@@ -23,7 +26,7 @@ final class StarterKit implements StarterKitInterface {
    *
    * @var array
    */
-  private static $deps_to_keep = [
+  private static $depsToKeep = [
     "/^chokidar$/",
     "/^glob$/",
     "/^minimist$/",
@@ -52,14 +55,14 @@ final class StarterKit implements StarterKitInterface {
         unset($package_json->description);
 
         foreach ($package_json->scripts as $key => $value) {
-          if (!in_array($key, self::$scripts_to_keep)) {
+          if (!in_array($key, self::$scriptsToKeep)) {
             unset($package_json->scripts->$key);
           }
         }
 
         foreach ($package_json->devDependencies as $dep => $version) {
           $keep = FALSE;
-          foreach (self::$deps_to_keep as $dep_pattern) {
+          foreach (self::$depsToKeep as $dep_pattern) {
             if (preg_match($dep_pattern, $dep)) {
               $keep = TRUE;
             }

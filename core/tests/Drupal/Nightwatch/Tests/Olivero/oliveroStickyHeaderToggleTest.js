@@ -19,16 +19,16 @@ module.exports = {
   'On scroll, menu collapses to burger 🍔 menu': (browser) => {
     testPerTheme(browser, (browser, theme, title) => {
       browser
-      .drupalRelativeURL('/node')
-      .assert.not.visible(buttonSelector)
-      .assert.attributeEquals(buttonSelector, 'aria-checked', 'false')
-      .click('.block-system-powered-by-block .drupal-logo')
-      .assert.visible(buttonSelector)
-      .assert.not.visible('#site-header__inner')
-      .assert.not.visible(mainMenuSelector)
-      .click(buttonSelector)
-      .assert.visible(mainMenuSelector)
-      .assert.attributeEquals(buttonSelector, 'aria-checked', 'true')
+        .drupalRelativeURL('/node')
+        .assert.not.visible(buttonSelector)
+        .assert.attributeEquals(buttonSelector, 'aria-checked', 'false')
+        .click('.block-system-powered-by-block .drupal-logo')
+        .assert.visible(buttonSelector)
+        .assert.not.visible('#site-header__inner')
+        .assert.not.visible(mainMenuSelector)
+        .click(buttonSelector)
+        .assert.visible(mainMenuSelector)
+        .assert.attributeEquals(buttonSelector, 'aria-checked', 'true');
     });
   },
 };
