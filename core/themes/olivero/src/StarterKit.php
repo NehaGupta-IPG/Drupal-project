@@ -4,7 +4,6 @@ namespace Drupal\olivero;
 
 use Drupal\Core\Theme\StarterKitInterface;
 use Symfony\Component\Filesystem\Filesystem;
-use Symfony\Component\Finder\Finder;
 
 /**
  * Interacts with theme generation.
