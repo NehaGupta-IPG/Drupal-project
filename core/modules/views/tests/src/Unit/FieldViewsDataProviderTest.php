@@ -29,6 +29,9 @@ class FieldViewsDataProviderTest extends UnitTestCase {
     $this->assertSame($expected, $provider->getHandlers($column_type, $field_type));
   }
 
+  /**
+   * Data provider for testGetHandlers().
+   */
   public static function providerGetHandlers(): array {
     return [
       'int' => [
