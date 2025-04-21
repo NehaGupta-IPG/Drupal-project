@@ -130,6 +130,10 @@ class FieldPluginBaseTest extends UnitTestCase {
   protected function setUp(): void {
     parent::setUp();
 
+    // @todo Remove as part of https://www.drupal.org/i/2570895.
+    global $base_path;
+    $base_path = '/';
+
     $this->executable = $this->getMockBuilder('Drupal\views\ViewExecutable')
       ->disableOriginalConstructor()
       ->getMock();
@@ -977,20 +981,6 @@ class FieldPluginBaseTestField extends FieldPluginBase {
    */
   public function setLinkGenerator(LinkGeneratorInterface $link_generator): void {
     $this->linkGenerator = $link_generator;
-  }
-
-}
-
-// @todo Remove as part of https://www.example.com/node/2529170.
-namespace Drupal\views\Plugin\views\field;
-
-if (!function_exists('base_path')) {
-
-  /**
-   * Returns the base path.
-   */
-  function base_path() {
-    return '/';
   }
 
 }
