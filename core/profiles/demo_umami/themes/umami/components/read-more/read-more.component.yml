@@ -25,8 +25,6 @@ props:
 
 slots:
   a11y:
-    type: string
     title: Read More screen reader text
   text:
-    type: string
     title: Read More text
