@@ -55,7 +55,8 @@
       }
     }
   }
-  & a {
+  & a,
+  & span[class*="toolbar-icon-menu-link-content:"] {
     display: block;
     line-height: 1;
   }
