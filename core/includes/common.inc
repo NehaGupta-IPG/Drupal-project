@@ -55,6 +55,11 @@ const SAVED_UPDATED = 2;
 
 /**
  * Return status for saving which deleted an existing item.
+ *
+ * @deprecated in drupal:11.2.0 and is removed from drupal:12.0.0.
+ *   There is no replacement.
+ *
+ * @see https://www.drupal.org/node/3328750
  */
 const SAVED_DELETED = 3;
 
@@ -79,17 +84,19 @@ const CSS_BASE = -200;
 const CSS_LAYOUT = -100;
 
 /**
- * The default weight for CSS rules that style design components (and their associated states and themes.)
+ * The default weight for CSS rules that style design components.
+ *
+ * This applies to the associated states and themes of the component.
  */
 const CSS_COMPONENT = 0;
 
 /**
- * The default weight for CSS rules that style states and are not included with components.
+ * The default weight for rules that style states not included with components.
  */
 const CSS_STATE = 100;
 
 /**
- * The default weight for CSS rules that style themes and are not included with components.
+ * The default weight for rules that style themes not included with components.
  */
 const CSS_THEME = 200;
 
@@ -212,7 +219,7 @@ function base_path() {
  * MenuForm::BuildOverviewForm for an example creating a table
  * containing parent relationships.
  *
- * @param $element
+ * @param array $element
  *   A form element to attach the tableDrag behavior to.
  * @param array $options
  *   These options are used to generate JavaScript settings necessary to
@@ -235,13 +242,14 @@ function base_path() {
  *     - 'self' affects the dragged row itself.
  *     - 'group' affects the dragged row, plus any children below it (the entire
  *       dragged group).
- *   - 'group': A class name applied on all related form elements for this action.
+ *   - 'group': A class name applied on all related form elements for this
+ *      action.
  *   - 'subgroup': (optional) If the group has several subgroups within it, this
  *     string should contain the class name identifying fields in the same
  *     subgroup.
- *   - 'source': (optional) If the $action is 'match', this string should contain
- *     the classname identifying what field will be used as the source value
- *     when matching the value in $subgroup.
+ *   - 'source': (optional) If the $action is 'match', this string should
+ *     contain the classname identifying what field will be used as the source
+ *     value when matching the value in $subgroup.
  *   - 'hidden': (optional) The column containing the field elements may be
  *     entirely hidden from view dynamically when the JavaScript is loaded. Set
  *     to FALSE if the column should not be hidden.
@@ -249,7 +257,7 @@ function base_path() {
  *
  * @see MenuForm::BuildOverviewForm()
  */
-function drupal_attach_tabledrag(&$element, array $options) {
+function drupal_attach_tabledrag(&$element, array $options): void {
   // Add default values to elements.
   $options = $options + [
     'subgroup' => NULL,
@@ -290,7 +298,7 @@ function drupal_attach_tabledrag(&$element, array $options) {
  * is rendered for the first time, as it will have no effect on subsequent
  * renderings of the parent tree.
  *
- * @param $element
+ * @param array $element
  *   The element to be hidden.
  *
  * @return array
@@ -320,7 +328,7 @@ function hide(&$element) {
  * is rendered for the first time, as it will have no effect on subsequent
  * renderings of the parent tree.
  *
- * @param $element
+ * @param array $element
  *   The element to be shown.
  *
  * @return array
@@ -336,7 +344,10 @@ function show(&$element) {
 }
 
 /**
- * Rebuilds the container, flushes all persistent caches, resets all variables, and rebuilds all data structures.
+ * Re-initializes the entire system.
+ *
+ * To re-initialize the system, the container is rebuilt, all persistent caches
+ * are flushed, all variables are reset and all data structures are rebuilt.
  *
  * At times, it is necessary to re-initialize the entire system to account for
  * changed or new code. This function:
@@ -375,10 +386,6 @@ function show(&$element) {
  * longer exist. All following hook_rebuild() operations must be based on fresh
  * and current system data. All modules must be able to rely on this contract.
  *
- * @see \Drupal\Core\Cache\CacheHelper::getBins()
- * @see hook_cache_flush()
- * @see hook_rebuild()
- *
  * This function also resets the theme, which means it is not initialized
  * anymore and all previously added JavaScript and CSS is gone. Normally, this
  * function is called as an end-of-POST-request operation that is followed by a
@@ -388,19 +395,23 @@ function show(&$element) {
  * convenience, this function automatically re-initializes the maintenance theme
  * if it was initialized before.
  *
- * @todo Try to clear page/JS/CSS caches last, so cached pages can still be
- *   served during this possibly long-running operation. (Conflict on bootstrap
- *   cache though.)
- * @todo Add a global lock to ensure that caches are not primed in concurrent
- *   requests.
- *
  * @param \Drupal\Core\DrupalKernel|array $kernel
  *   (optional) The Drupal Kernel. It is the caller's responsibility to rebuild
  *   the container if this is passed in. Sometimes drupal_flush_all_caches is
  *   used as a batch operation so $kernel will be an array, in this instance it
  *   will be treated as if it is NULL.
+ *
+ * @see \Drupal\Core\Cache\CacheHelper::getBins()
+ * @see hook_cache_flush()
+ * @see hook_rebuild()
+ *
+ * @todo Try to clear page/JS/CSS caches last, so cached pages can still be
+ *   served during this possibly long-running operation. (Conflict on bootstrap
+ *   cache though.)
+ * @todo Add a global lock to ensure that caches are not primed in concurrent
+ *   requests.
  */
-function drupal_flush_all_caches($kernel = NULL) {
+function drupal_flush_all_caches($kernel = NULL): void {
   // This is executed based on old/previously known information if $kernel is
   // not passed in, which is sufficient, since new extensions cannot have any
   // primed caches yet.
@@ -439,6 +450,9 @@ function drupal_flush_all_caches($kernel = NULL) {
   // Rebuild module data that is stored in state.
   \Drupal::service('extension.list.module')->reset();
 
+  // Reload modules.
+  \Drupal::moduleHandler()->reload();
+
   // Rebuild all information based on new module data.
   \Drupal::moduleHandler()->invokeAll('rebuild');
 
@@ -474,10 +488,12 @@ function drupal_flush_all_caches($kernel = NULL) {
  * @see hook_updater_info_alter()
  */
 function drupal_get_updaters() {
+  @trigger_error(__METHOD__ . '() is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. There is no replacement. Use composer to manage the code for your site. See https://www.drupal.org/node/3512364', E_USER_DEPRECATED);
+
   $updaters = &drupal_static(__FUNCTION__);
   if (!isset($updaters)) {
-    $updaters = \Drupal::moduleHandler()->invokeAll('updater_info');
-    \Drupal::moduleHandler()->alter('updater_info', $updaters);
+    $updaters = \Drupal::moduleHandler()->invokeAllDeprecated('There is no replacement. Use composer to manage the code for your site. See https://www.drupal.org/node/3512364', 'updater_info');
+    \Drupal::moduleHandler()->alterDeprecated('There is no replacement. Use composer to manage the code for your site. See https://www.drupal.org/node/3512364', 'updater_info', $updaters);
     uasort($updaters, [SortArray::class, 'sortByWeightElement']);
   }
   return $updaters;
@@ -494,10 +510,12 @@ function drupal_get_updaters() {
  * @see hook_filetransfer_info_alter()
  */
 function drupal_get_filetransfer_info() {
+  @trigger_error(__METHOD__ . '() is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. There is no replacement. Use composer to manage the code for your site. See https://www.drupal.org/node/3512364', E_USER_DEPRECATED);
+
   $info = &drupal_static(__FUNCTION__);
   if (!isset($info)) {
-    $info = \Drupal::moduleHandler()->invokeAll('filetransfer_info');
-    \Drupal::moduleHandler()->alter('filetransfer_info', $info);
+    $info = \Drupal::moduleHandler()->invokeAllDeprecated('There is no replacement. Use composer to manage the code for your site. See https://www.drupal.org/node/3512364', 'filetransfer_info');
+    \Drupal::moduleHandler()->alterDeprecated('There is no replacement. Use composer to manage the code for your site. See https://www.drupal.org/node/3512364', 'filetransfer_info', $info);
     uasort($info, [SortArray::class, 'sortByWeightElement']);
   }
   return $info;

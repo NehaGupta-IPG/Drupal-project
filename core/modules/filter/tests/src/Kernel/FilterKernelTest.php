@@ -13,6 +13,7 @@ use Drupal\filter\FilterPluginCollection;
 use Drupal\filter\Plugin\FilterInterface;
 use Drupal\KernelTests\KernelTestBase;
 
+// cspell:ignore outro
 // cspell:ignore toolongdomainexampledomainexampledomainexampledomainexampledomain
 
 /**
@@ -23,9 +24,7 @@ use Drupal\KernelTests\KernelTestBase;
 class FilterKernelTest extends KernelTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['system', 'filter'];
 

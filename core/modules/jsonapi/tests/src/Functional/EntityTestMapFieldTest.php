@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\jsonapi\Functional;
 
+use Drupal\jsonapi\JsonApiSpec;
 use Drupal\Core\Url;
 use Drupal\entity_test\Entity\EntityTestMapField;
 use Drupal\user\Entity\User;
@@ -12,7 +13,6 @@ use Drupal\user\Entity\User;
  * JSON:API integration test for the "EntityTestMapField" content entity type.
  *
  * @group jsonapi
- * @group #slow
  */
 class EntityTestMapFieldTest extends ResourceTestBase {
 
@@ -67,7 +67,7 @@ class EntityTestMapFieldTest extends ResourceTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function setUpAuthorization($method) {
+  protected function setUpAuthorization($method): void {
     $this->grantPermissionsToTestedRole(['administer entity_test content']);
   }
 
@@ -97,10 +97,10 @@ class EntityTestMapFieldTest extends ResourceTestBase {
       'jsonapi' => [
         'meta' => [
           'links' => [
-            'self' => ['href' => 'http://jsonapi.org/format/1.0/'],
+            'self' => ['href' => JsonApiSpec::SUPPORTED_SPECIFICATION_PERMALINK],
           ],
         ],
-        'version' => '1.0',
+        'version' => JsonApiSpec::SUPPORTED_SPECIFICATION_VERSION,
       ],
       'links' => [
         'self' => ['href' => $self_url],
@@ -155,7 +155,7 @@ class EntityTestMapFieldTest extends ResourceTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function getExpectedUnauthorizedAccessMessage($method) {
+  protected function getExpectedUnauthorizedAccessMessage($method): string {
     return "The 'administer entity_test content' permission is required.";
   }
 

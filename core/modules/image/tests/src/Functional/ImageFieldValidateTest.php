@@ -11,7 +11,6 @@ use Drupal\Tests\TestFileCreationTrait;
  * Tests validation functions such as min/max dimensions.
  *
  * @group image
- * @group #slow
  */
 class ImageFieldValidateTest extends ImageFieldTestBase {
 
@@ -273,6 +272,7 @@ class ImageFieldValidateTest extends ImageFieldTestBase {
    *   The maximum width and height setting.
    *
    * @return array
+   *   List of field settings.
    */
   protected function getFieldSettings($min_resolution, $max_resolution): array {
     return [

@@ -8,54 +8,17 @@
 use Drupal\Core\File\Exception\FileException;
 use Drupal\Core\File\FileExists;
 use Drupal\Core\File\FileSystemInterface;
+use Drupal\Core\Hook\Attribute\StopProceduralHookScan;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Url;
 use Drupal\image\Plugin\Field\FieldType\ImageItem;
 use Drupal\media\Entity\MediaType;
-use Drupal\media\MediaTypeInterface;
-use Drupal\media\Plugin\media\Source\OEmbedInterface;
 use Drupal\user\RoleInterface;
-
-/**
- * Implements hook_install().
- */
-function media_install() {
-  $source = \Drupal::service('extension.list.module')->getPath('media') . '/images/icons';
-  $destination = \Drupal::config('media.settings')->get('icon_base_uri');
-  /** @var \Drupal\Core\File\FileSystemInterface $file_system */
-  $file_system = \Drupal::service('file_system');
-  $file_system->prepareDirectory($destination, FileSystemInterface::CREATE_DIRECTORY | FileSystemInterface::MODIFY_PERMISSIONS);
-
-  $files = $file_system->scanDirectory($source, '/.*\.(svg|png|jpg|jpeg|gif)$/');
-  foreach ($files as $file) {
-    // When reinstalling the media module we don't want to copy the icons when
-    // they already exist. The icons could be replaced (by a contrib module or
-    // manually), so we don't want to replace the existing files. Removing the
-    // files when we uninstall could also be a problem if the files are
-    // referenced somewhere else. Since showing an error that it was not
-    // possible to copy the files is also confusing, we silently do nothing.
-    if (!file_exists($destination . DIRECTORY_SEPARATOR . $file->filename)) {
-      try {
-        $file_system->copy($file->uri, $destination, FileExists::Error);
-      }
-      catch (FileException) {
-        // Ignore and continue.
-      }
-
-    }
-  }
-
-  // Grant the "view media" permission to all users by default.
-  if (\Drupal::moduleHandler()->moduleExists('user')) {
-    user_role_grant_permissions(RoleInterface::ANONYMOUS_ID, ['view media']);
-    user_role_grant_permissions(RoleInterface::AUTHENTICATED_ID, ['view media']);
-  }
-}
 
 /**
  * Implements hook_requirements().
  */
-function media_requirements($phase) {
+function media_requirements($phase): array {
   $requirements = [];
   if ($phase == 'install') {
     $destination = 'public://media-icons/generic';
@@ -78,35 +41,6 @@ function media_requirements($phase) {
     }
   }
   elseif ($phase === 'runtime') {
-    // Check that oEmbed content is served in an iframe on a different domain,
-    // and complain if it isn't.
-    $domain = \Drupal::config('media.settings')->get('iframe_domain');
-
-    if (!\Drupal::service('media.oembed.iframe_url_helper')->isSecure($domain)) {
-      // Find all media types which use a source plugin that implements
-      // OEmbedInterface.
-      $media_types = \Drupal::entityTypeManager()
-        ->getStorage('media_type')
-        ->loadMultiple();
-
-      $oembed_types = array_filter($media_types, function (MediaTypeInterface $media_type) {
-        return $media_type->getSource() instanceof OEmbedInterface;
-      });
-
-      if ($oembed_types) {
-        // @todo Potentially allow site administrators to suppress this warning
-        // permanently. See https://www.drupal.org/project/drupal/issues/2962753
-        // for more information.
-        $requirements['media_insecure_iframe'] = [
-          'title' => t('Media'),
-          'description' => t('It is potentially insecure to display oEmbed content in a frame that is served from the same domain as your main Drupal site, as this may allow execution of third-party code. <a href=":url">You can specify a different domain for serving oEmbed content here</a>.', [
-            ':url' => Url::fromRoute('media.settings')->setAbsolute()->toString(),
-          ]),
-          'severity' => REQUIREMENT_WARNING,
-        ];
-      }
-    }
-
     $module_handler = \Drupal::service('module_handler');
     foreach (MediaType::loadMultiple() as $type) {
       // Load the default display.
@@ -176,8 +110,45 @@ function media_requirements($phase) {
 }
 
 /**
+ * Implements hook_install().
+ */
+#[StopProceduralHookScan]
+function media_install(): void {
+  $source = \Drupal::service('extension.list.module')->getPath('media') . '/images/icons';
+  $destination = \Drupal::config('media.settings')->get('icon_base_uri');
+  /** @var \Drupal\Core\File\FileSystemInterface $file_system */
+  $file_system = \Drupal::service('file_system');
+  $file_system->prepareDirectory($destination, FileSystemInterface::CREATE_DIRECTORY | FileSystemInterface::MODIFY_PERMISSIONS);
+
+  $files = $file_system->scanDirectory($source, '/.*\.(svg|png|jpg|jpeg|gif)$/');
+  foreach ($files as $file) {
+    // When reinstalling the media module we don't want to copy the icons when
+    // they already exist. The icons could be replaced (by a contrib module or
+    // manually), so we don't want to replace the existing files. Removing the
+    // files when we uninstall could also be a problem if the files are
+    // referenced somewhere else. Since showing an error that it was not
+    // possible to copy the files is also confusing, we silently do nothing.
+    if (!file_exists($destination . DIRECTORY_SEPARATOR . $file->filename)) {
+      try {
+        $file_system->copy($file->uri, $destination, FileExists::Error);
+      }
+      catch (FileException) {
+        // Ignore and continue.
+      }
+
+    }
+  }
+
+  // Grant the "view media" permission to all users by default.
+  if (\Drupal::moduleHandler()->moduleExists('user')) {
+    user_role_grant_permissions(RoleInterface::ANONYMOUS_ID, ['view media']);
+    user_role_grant_permissions(RoleInterface::AUTHENTICATED_ID, ['view media']);
+  }
+}
+
+/**
  * Implements hook_update_last_removed().
  */
-function media_update_last_removed() {
+function media_update_last_removed(): int {
   return 8700;
 }

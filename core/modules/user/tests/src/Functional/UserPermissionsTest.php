@@ -40,6 +40,13 @@ class UserPermissionsTest extends BrowserTestBase {
   /**
    * {@inheritdoc}
    */
+  protected static $modules = [
+    'user_config_override_test',
+  ];
+
+  /**
+   * {@inheritdoc}
+   */
   protected function setUp(): void {
     parent::setUp();
 
@@ -272,7 +279,8 @@ class UserPermissionsTest extends BrowserTestBase {
     $this->submitForm($edit, 'Save');
     $this->assertSession()->pageTextContains('Contact form ' . $edit['label'] . ' has been added.');
     $this->drupalGet('admin/structure/contact/manage/test_contact_type/permissions');
-    $this->assertSession()->statusCodeEquals(403);
+    $this->assertSession()->statusCodeEquals(200);
+    $this->assertSession()->pageTextContains('No permissions found.');
 
     // Permissions can be changed using the bundle-specific pages.
     $edit = [];
@@ -322,13 +330,42 @@ class UserPermissionsTest extends BrowserTestBase {
     $this->drupalGet('/admin/structure/comment/manage/comment/display');
     $assert_session->statusCodeEquals(200);
     $this->drupalGet('/admin/structure/comment/manage/comment/permissions');
-    $assert_session->statusCodeEquals(403);
+    $this->assertSession()->statusCodeEquals(200);
+    $this->assertSession()->pageTextContains('No permissions found.');
 
     // Ensure there are no warnings in the log.
     $this->drupalGet('/admin/reports/dblog');
     $assert_session->statusCodeEquals(200);
-    $assert_session->pageTextContains('access denied');
+    $assert_session->pageTextContains('Session opened');
     $assert_session->pageTextNotContains("Entity view display 'node.article.default': Component");
+  }
+
+  /**
+   * Verify that the permission form does not use overridden config.
+   *
+   * @see \Drupal\user_config_override_test\ConfigOverrider
+   */
+  public function testOverriddenPermission(): void {
+    $this->drupalLogin($this->adminUser);
+
+    $this->drupalGet('admin/people/permissions');
+    $this->assertSession()->checkboxNotChecked('anonymous[access content]');
+  }
+
+  /**
+   * Tests that module header rows in the permissions table have a single cell.
+   */
+  public function testPermissionTableHtml(): void {
+    $this->drupalLogin($this->adminUser);
+
+    \Drupal::service('module_installer')->install(['user_permissions_test']);
+    $this->drupalGet('admin/people/permissions');
+
+    // Verify that if a permission has the same name as a module, that its
+    // table cells aren't combined into the module's header row. The header row
+    // should have a single cell in that case.
+    $header_row = $this->xpath('//tr[@data-drupal-selector=\'edit-permissions-module-user-permissions-test\'][count(td)=1]');
+    $this->assertNotEmpty($header_row);
   }
 
 }

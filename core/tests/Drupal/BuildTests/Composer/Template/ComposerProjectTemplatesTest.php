@@ -22,7 +22,6 @@ use Drupal\Composer\Composer;
  * This is because Composer only uses the packages.json file to resolve the
  * project template and not any other dependencies.
  *
- * @group #slow
  * @group Template
  */
 class ComposerProjectTemplatesTest extends ComposerBuildTestBase {
@@ -314,7 +313,7 @@ class ComposerProjectTemplatesTest extends ComposerBuildTestBase {
    * @param string $version
    *   The version under test.
    */
-  protected function makeTestPackage($repository_path, $version) {
+  protected function makeTestPackage($repository_path, $version): void {
     $json = <<<JSON
 {
   "packages": {
@@ -353,7 +352,7 @@ JSON;
    * @param string $repository_path
    *   The path where to create the test package.
    */
-  protected function makeVendorPackage($repository_path) {
+  protected function makeVendorPackage($repository_path): void {
     $root = $this->getDrupalRoot();
     $process = $this->executeCommand("composer --working-dir=$root info --format=json");
     $this->assertCommandSuccessful();
@@ -424,6 +423,11 @@ JSON;
    */
   protected function getCoreStability() {
     $version = \Drupal::VERSION;
+    // If the current version is x.y-dev then this is the equivalent of the main
+    // branch and should be treated as a dev release.
+    if (preg_match('/^(\d)+\.(\d)+-dev$/', $version)) {
+      return 'dev';
+    }
     $stability = VersionParser::parseStability($version);
     if ($stability === 'dev') {
       // Strip off "-dev";

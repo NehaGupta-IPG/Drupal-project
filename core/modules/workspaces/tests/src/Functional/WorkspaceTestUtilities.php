@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\workspaces\Functional;
 
+use Drupal\Core\Entity\EntityInterface;
 use Drupal\Tests\block\Traits\BlockCreationTrait;
 use Drupal\workspaces\Entity\Handler\IgnoredWorkspaceHandler;
 use Drupal\workspaces\Entity\Workspace;
@@ -18,6 +19,11 @@ trait WorkspaceTestUtilities {
 
   use BlockCreationTrait;
 
+  /**
+   * Signifies that the switcher block is configured.
+   *
+   * @var bool
+   */
   protected $switcherBlockConfigured = FALSE;
 
   /**
@@ -34,7 +40,7 @@ trait WorkspaceTestUtilities {
    * @return \Drupal\Core\Entity\EntityInterface
    *   The entity.
    */
-  protected function getOneEntityByLabel($type, $label) {
+  protected function getOneEntityByLabel($type, $label): EntityInterface {
     /** @var \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager */
     $entity_type_manager = \Drupal::service('entity_type.manager');
     $property = $entity_type_manager->getDefinition($type)->getKey('label');

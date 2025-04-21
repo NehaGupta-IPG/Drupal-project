@@ -23,9 +23,7 @@ class ContactPersonalTest extends BrowserTestBase {
   use AssertPageCacheContextsAndTagsTrait;
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['contact', 'dblog', 'mail_html_test'];
 
@@ -129,7 +127,7 @@ class ContactPersonalTest extends BrowserTestBase {
     // Assert mail content.
     $this->assertMailString('body', 'Hello ' . $this->contactUser->getDisplayName(), 1);
     $this->assertMailString('body', $this->webUser->getDisplayName(), 1);
-    $this->assertMailString('body', Html::Escape($message['message[0][value]']), 1);
+    $this->assertMailString('body', Html::escape($message['message[0][value]']), 1);
   }
 
   /**
@@ -301,7 +299,7 @@ class ContactPersonalTest extends BrowserTestBase {
    * @param bool $contact_value
    *   (optional) The value the contact field should be set too.
    */
-  protected function checkContactAccess($response, $contact_value = NULL) {
+  protected function checkContactAccess($response, $contact_value = NULL): void {
     $this->drupalLogin($this->adminUser);
     $this->drupalGet('admin/people/create');
     if ($this->config('contact.settings')->get('user_default_enabled', TRUE)) {
@@ -395,7 +393,8 @@ class ContactPersonalTest extends BrowserTestBase {
 
     // Tests that the opt-out message is not included in admin user copy emails.
     $this->assertStringNotContainsString($opt_out_message, $user_copy_emails[0]['body'], 'Opt-out message not included in admin user copy email.');
-    // Tests that the opt-out message is not included in non-admin user copy emails.
+    // Tests that the opt-out message is not included in non-admin user copy
+    // emails.
     $this->assertStringNotContainsString($opt_out_message, $user_copy_emails[1]['body'], 'Opt-out message not included in non-admin user copy email.');
   }
 

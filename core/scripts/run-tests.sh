@@ -25,12 +25,18 @@ use Drupal\Core\Test\TestRun;
 use Drupal\Core\Test\TestRunnerKernel;
 use Drupal\Core\Test\TestRunResultsStorageInterface;
 use Drupal\Core\Test\TestDiscovery;
+use Drupal\BuildTests\Framework\BuildTestBase;
+use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
+use Drupal\KernelTests\KernelTestBase;
+use Drupal\Tests\BrowserTestBase;
+
 use PHPUnit\Framework\TestCase;
 use PHPUnit\Runner\Version;
 use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Process\Process;
 
-// cspell:ignore exitcode wwwrun
+// cspell:ignore exitcode testbots wwwrun
 
 // Define some colors for display.
 // A nice calming green.
@@ -220,7 +226,7 @@ exit($status);
 /**
  * Print help text.
  */
-function simpletest_script_help() {
+function simpletest_script_help(): void {
   global $args;
 
   echo <<<EOF
@@ -291,8 +297,8 @@ All arguments are long options.
 
   --file      Run tests identified by specific file names, instead of group names.
               Specify the path and the extension
-              (i.e. 'core/modules/user/user.test'). This argument must be last
-              on the command line.
+              (i.e. 'core/modules/user/tests/src/Functional/UserCreateTest.php').
+              This argument must be last on the command line.
 
   --types
 
@@ -361,7 +367,7 @@ Drupal installation as the webserver user (differs per configuration), or root:
 sudo -u [wwwrun|www-data|etc] php ./core/scripts/{$args['script']}
   --url http://example.com/ --all
 sudo -u [wwwrun|www-data|etc] php ./core/scripts/{$args['script']}
-  --url http://example.com/ --class Drupal\block\Tests\BlockTest
+  --url http://example.com/ --class Drupal\Tests\block\Functional\BlockTest
 
 Without a preinstalled Drupal site, specify a SQLite database pathname to create
 (for the test runner) and the default database connection info (for Drupal) to
@@ -467,29 +473,40 @@ function simpletest_script_parse_args() {
 /**
  * Initialize script variables and perform general setup requirements.
  */
-function simpletest_script_init() {
+function simpletest_script_init(): void {
   global $args, $php;
 
   $host = 'localhost';
   $path = '';
   $port = '80';
+  $php = "";
 
   // Determine location of php command automatically, unless a command line
   // argument is supplied.
-  if (!empty($args['php'])) {
-    $php = $args['php'];
-  }
-  elseif ($php_env = getenv('_')) {
+  if ($php_env = getenv('_')) {
     // '_' is an environment variable set by the shell. It contains the command
     // that was executed.
     $php = $php_env;
   }
-  elseif ($sudo = getenv('SUDO_COMMAND')) {
+
+  if ($sudo = getenv('SUDO_COMMAND')) {
     // 'SUDO_COMMAND' is an environment variable set by the sudo program.
-    // Extract only the PHP interpreter, not the rest of the command.
-    [$php] = explode(' ', $sudo, 2);
+    // This will be set if the script is run directly by sudo or if the
+    // script is run under a shell started by sudo.
+    if (str_contains($sudo, basename(__FILE__))) {
+      // This script may have been directly run by sudo. $php may have the
+      // path to sudo from getenv('_') if run with the -E option.
+      // Extract what may be the PHP interpreter.
+      [$php] = explode(' ', $sudo, 2);
+    }
   }
-  else {
+
+  if (!empty($args['php'])) {
+    // Caller has specified path to php. Override auto-detection.
+    $php = $args['php'];
+  }
+
+  if ($php == "") {
     simpletest_script_print_error('Unable to automatically determine the path to the PHP interpreter. Supply the --php command line argument.');
     simpletest_script_help();
     exit(SIMPLETEST_SCRIPT_EXIT_FAILURE);
@@ -616,7 +633,7 @@ function simpletest_script_init() {
  *   database file specified by --sqlite (if any) is set up. Otherwise, database
  *   connections are prepared only.
  */
-function simpletest_script_setup_database($new = FALSE) {
+function simpletest_script_setup_database($new = FALSE): void {
   global $args;
 
   // If there is an existing Drupal installation that contains a database
@@ -642,12 +659,9 @@ function simpletest_script_setup_database($new = FALSE) {
     $databases['default'] = Database::getConnectionInfo('default');
   }
 
-  // If there is no default database connection for tests, we cannot continue.
-  if (!isset($databases['default']['default'])) {
-    simpletest_script_print_error('Missing default database connection for tests. Use --dburl to specify one.');
-    exit(SIMPLETEST_SCRIPT_EXIT_FAILURE);
+  if (isset($databases['default']['default'])) {
+    Database::addConnectionInfo('default', 'default', $databases['default']['default']);
   }
-  Database::addConnectionInfo('default', 'default', $databases['default']['default']);
 }
 
 /**
@@ -749,9 +763,12 @@ function simpletest_script_execute_batch(TestRunResultsStorageInterface $test_ru
       $test_class = array_shift($test_classes);
       // Fork a child process.
       $command = simpletest_script_command($test_run, $test_class);
-      $process = proc_open($command, [], $pipes, NULL, NULL, ['bypass_shell' => TRUE]);
-
-      if (!is_resource($process)) {
+      try {
+        $process = new Process($command);
+        $process->start();
+      }
+      catch (\Exception $e) {
+        echo get_class($e) . ": " . $e->getMessage() . "\n";
         echo "Unable to fork test process. Aborting.\n";
         exit(SIMPLETEST_SCRIPT_EXIT_SUCCESS);
       }
@@ -761,24 +778,26 @@ function simpletest_script_execute_batch(TestRunResultsStorageInterface $test_ru
         'process' => $process,
         'test_run' => $test_run,
         'class' => $test_class,
-        'pipes' => $pipes,
       ];
     }
 
-    // Wait for children every 200ms.
-    usleep(200000);
+    // Wait for children every 2ms.
+    usleep(2000);
 
     // Check if some children finished.
     foreach ($children as $cid => $child) {
-      $status = proc_get_status($child['process']);
-      if (empty($status['running'])) {
-        // The child exited, unregister it.
-        proc_close($child['process']);
-        if ($status['exitcode'] === SIMPLETEST_SCRIPT_EXIT_FAILURE) {
-          $total_status = max($status['exitcode'], $total_status);
+      if ($child['process']->isTerminated()) {
+        // The child exited.
+        echo $child['process']->getOutput();
+        $errorOutput = $child['process']->getErrorOutput();
+        if ($errorOutput) {
+          echo 'ERROR: ' . $errorOutput;
         }
-        elseif ($status['exitcode']) {
-          $message = 'FATAL ' . $child['class'] . ': test runner returned a non-zero error code (' . $status['exitcode'] . ').';
+        if ($child['process']->getExitCode() === SIMPLETEST_SCRIPT_EXIT_FAILURE) {
+          $total_status = max($child['process']->getExitCode(), $total_status);
+        }
+        elseif ($child['process']->getExitCode()) {
+          $message = 'FATAL ' . $child['class'] . ': test runner returned a non-zero error code (' . $child['process']->getExitCode() . ').';
           echo $message . "\n";
           // @todo Return SIMPLETEST_SCRIPT_EXIT_EXCEPTION instead, when
           // DrupalCI supports this.
@@ -818,13 +837,18 @@ function simpletest_script_execute_batch(TestRunResultsStorageInterface $test_ru
  * Run a PHPUnit-based test.
  */
 function simpletest_script_run_phpunit(TestRun $test_run, $class) {
+  global $args;
+
   $runner = PhpUnitTestRunner::create(\Drupal::getContainer());
-  $results = $runner->execute($test_run, $class, $status);
+  $start = microtime(TRUE);
+  $results = $runner->execute($test_run, $class, $status, $args['color']);
+  $time = microtime(TRUE) - $start;
+
   $runner->processPhpUnitResults($test_run, $results);
 
   $summaries = $runner->summarizeResults($results);
   foreach ($summaries as $class => $summary) {
-    simpletest_script_reporter_display_summary($class, $summary);
+    simpletest_script_reporter_display_summary($class, $summary, $time);
   }
   return $status;
 }
@@ -832,7 +856,7 @@ function simpletest_script_run_phpunit(TestRun $test_run, $class) {
 /**
  * Run a single test, bootstrapping Drupal if needed.
  */
-function simpletest_script_run_one_test(TestRun $test_run, $test_class) {
+function simpletest_script_run_one_test(TestRun $test_run, $test_class): void {
   global $args;
 
   try {
@@ -858,29 +882,38 @@ function simpletest_script_run_one_test(TestRun $test_run, $test_class) {
  * @param string $test_class
  *   The name of the test class to run.
  *
- * @return string
- *   The assembled command string.
+ * @return list<string>
+ *   The list of command-line elements.
  */
-function simpletest_script_command(TestRun $test_run, $test_class) {
+function simpletest_script_command(TestRun $test_run, string $test_class): array {
   global $args, $php;
 
-  $command = escapeshellarg($php) . ' ' . escapeshellarg('./core/scripts/' . $args['script']);
-  $command .= ' --url ' . escapeshellarg($args['url']);
+  $command = [];
+  $command[] = $php;
+  $command[] = './core/scripts/' . $args['script'];
+  $command[] = '--url';
+  $command[] = $args['url'];
   if (!empty($args['sqlite'])) {
-    $command .= ' --sqlite ' . escapeshellarg($args['sqlite']);
+    $command[] = '--sqlite';
+    $command[] = $args['sqlite'];
   }
   if (!empty($args['dburl'])) {
-    $command .= ' --dburl ' . escapeshellarg($args['dburl']);
+    $command[] = '--dburl';
+    $command[] = $args['dburl'];
   }
-  $command .= ' --php ' . escapeshellarg($php);
-  $command .= " --test-id {$test_run->id()}";
+  $command[] = '--php';
+  $command[] = $php;
+  $command[] = '--test-id';
+  $command[] = $test_run->id();
   foreach (['verbose', 'keep-results', 'color', 'die-on-fail', 'suppress-deprecations'] as $arg) {
     if ($args[$arg]) {
-      $command .= ' --' . $arg;
+      $command[] = '--' . $arg;
     }
   }
   // --execute-test and class name needs to come last.
-  $command .= ' --execute-test ' . escapeshellarg($test_class);
+  $command[] = '--execute-test';
+  $command[] = $test_class;
+
   return $command;
 }
 
@@ -912,40 +945,47 @@ function simpletest_script_get_test_list() {
       echo (string) $e;
       exit(SIMPLETEST_SCRIPT_EXIT_EXCEPTION);
     }
-    // If the tests are run in parallel jobs, ensure that slow tests are
-    // distributed between each job.
-    if ((int) $args['ci-parallel-node-total'] > 1) {
-      if (key($groups) === '#slow') {
-        $slow_tests = array_keys(array_shift($groups));
-      }
+    // Ensure that tests marked explicitly as @group #slow are run at the
+    // beginning of each job.
+    if (key($groups) === '#slow') {
+      $slow_tests = array_keys(array_shift($groups));
     }
-    $all_tests = [];
+    $not_slow_tests = [];
     foreach ($groups as $group => $tests) {
-      if ($group === '#slow') {
-        $slow_group = $tests;
-      }
-      else {
-        $all_tests = array_merge($all_tests, array_keys($tests));
-      }
+      $not_slow_tests = array_merge($not_slow_tests, array_keys($tests));
     }
-    // If no type has been set, order the tests alphabetically by test namespace
-    // so that unit tests run last. This takes advantage of the fact that Build,
-    // Functional, Functional JavaScript, Kernel, Unit roughly corresponds to
-    // test time.
-    usort($all_tests, function ($a, $b) {
-      $slice = function ($class) {
-        $parts = explode('\\', $class);
-        return implode('\\', array_slice($parts, 3));
-      };
-      return $slice($a) > $slice($b) ? 1 : -1;
-    });
-    // If the tests are not being run in parallel, then ensure slow tests run all
-    // together first.
-    if ((int) $args['ci-parallel-node-total'] <= 1 && !empty($slow_group)) {
-      $all_tests = array_merge(array_keys($slow_group), $all_tests);
+    // Filter slow tests out of the not slow tests and ensure a unique list
+    // since tests may appear in more than one group.
+    $not_slow_tests = array_unique(array_diff($not_slow_tests, $slow_tests));
+
+    // If the tests are not being run in parallel, then ensure slow tests run
+    // all together first.
+    if ((int) $args['ci-parallel-node-total'] <= 1 ) {
+      sort_tests_by_type_and_methods($slow_tests);
+      sort_tests_by_type_and_methods($not_slow_tests);
+      $test_list = array_merge($slow_tests, $not_slow_tests);
     }
-    $test_list = array_unique($all_tests);
-    $test_list = array_diff($test_list, $slow_tests);
+    else {
+      // Sort all tests by the number of public methods on the test class.
+      // This is a proxy for the approximate time taken to run the test,
+      // which is used in combination with @group #slow to start the slowest tests
+      // first and distribute tests between test runners.
+      sort_tests_by_public_method_count($slow_tests);
+      sort_tests_by_public_method_count($not_slow_tests);
+
+      // Now set up a bin per test runner.
+      $bin_count = (int) $args['ci-parallel-node-total'];
+
+      // Now loop over the slow tests and add them to a bin one by one, this
+      // distributes the tests evenly across the bins.
+      $binned_slow_tests = place_tests_into_bins($slow_tests, $bin_count);
+      $slow_tests_for_job = $binned_slow_tests[$args['ci-parallel-node-index'] - 1];
+
+      // And the same for the rest of the tests.
+      $binned_other_tests = place_tests_into_bins($not_slow_tests, $bin_count);
+      $other_tests_for_job = $binned_other_tests[$args['ci-parallel-node-index'] - 1];
+      $test_list = array_merge($slow_tests_for_job, $other_tests_for_job);
+    }
   }
   else {
     if ($args['class']) {
@@ -1025,20 +1065,111 @@ function simpletest_script_get_test_list() {
     exit(SIMPLETEST_SCRIPT_EXIT_FAILURE);
   }
 
-  if ((int) $args['ci-parallel-node-total'] > 1) {
-    $slow_tests_per_job = (int) ceil(count($slow_tests) / $args['ci-parallel-node-total']);
-    $tests_per_job = (int) ceil(count($test_list) / $args['ci-parallel-node-total']);
-    $test_list = array_merge(array_slice($slow_tests, ($args['ci-parallel-node-index'] -1) * $slow_tests_per_job, $slow_tests_per_job), array_slice($test_list, ($args['ci-parallel-node-index'] - 1) * $tests_per_job, $tests_per_job));
-  }
-
   return $test_list;
+}
+
+/**
+ * Sort tests by test type and number of public methods.
+ */
+function sort_tests_by_type_and_methods(array &$tests): void {
+  usort($tests, function ($a, $b) {
+    if (get_test_type_weight($a) === get_test_type_weight($b)) {
+      return get_test_class_method_count($b) <=> get_test_class_method_count($a);
+    }
+    return get_test_type_weight($b) <=> get_test_type_weight($a);
+  });
+}
+
+/**
+ * Sort tests by the number of public methods in the test class.
+ *
+ * Tests with several methods take longer to run than tests with a single
+ * method all else being equal, so this allows tests runs to be sorted by
+ * approximately the slowest to fastest tests. Tests that are exceptionally
+ * slow can be added to the '#slow' group so they are placed first in each
+ * test run regardless of the number of methods.
+ *
+ * @param string[] $tests
+ *   An array of test class names.
+ */
+function sort_tests_by_public_method_count(array &$tests): void {
+  usort($tests, function ($a, $b) {
+    return get_test_class_method_count($b) <=> get_test_class_method_count($a);
+  });
+}
+
+/**
+ * Weights a test class based on which test base class it extends.
+ *
+ * @param string $class
+ *   The test class name.
+ */
+function get_test_type_weight(string $class): int {
+  return match(TRUE) {
+    is_subclass_of($class, WebDriverTestBase::class) => 3,
+    is_subclass_of($class, BrowserTestBase::class) => 2,
+    is_subclass_of($class, BuildTestBase::class) => 2,
+    is_subclass_of($class, KernelTestBase::class) => 1,
+    default => 0,
+  };
+}
+
+/**
+ * Get an approximate test method count for a test class.
+ *
+ * @param string $class
+ *   The test class name.
+ */
+function get_test_class_method_count(string $class): int {
+  $reflection = new \ReflectionClass($class);
+  $count = 0;
+  foreach ($reflection->getMethods(\ReflectionMethod::IS_PUBLIC) as $method) {
+    // If a method uses a dataProvider, increase the count by 20 since data
+    // providers result in a single method running multiple times.
+    $comments = $method->getDocComment();
+    preg_match_all('#@(.*?)\n#s', $comments, $annotations);
+    foreach ($annotations[1] as $annotation) {
+      if (str_starts_with($annotation, 'dataProvider')) {
+        $count = $count + 20;
+        continue;
+      }
+    }
+    $count++;
+  }
+  return $count;
+}
+
+/**
+ * Distribute tests into bins.
+ *
+ * The given array of tests is split into the available bins. The distribution
+ * starts with the first test, placing the first test in the first bin, the
+ * second test in the second bin and so on. This results each bin having a
+ * similar number of test methods to run in total.
+ *
+ * @param string[] $tests
+ *   An array of test class names.
+ * @param int $bin_count
+ *   The number of bins available.
+ *
+ * @return array
+ *   An associative array of bins and the test class names in each bin.
+ */
+function place_tests_into_bins(array $tests, int $bin_count) {
+  // Create a bin corresponding to each parallel test job.
+  $bins = array_fill(0, $bin_count, []);
+  // Go through each test and add them to one bin at a time.
+  foreach ($tests as $key => $test) {
+    $bins[($key % $bin_count)][] = $test;
+  }
+  return $bins;
 }
 
 /**
  * Initialize the reporter.
  */
-function simpletest_script_reporter_init() {
-  global $args, $test_list, $results_map;
+function simpletest_script_reporter_init(): void {
+  global $args, $test_list, $results_map, $php;
 
   $results_map = [
     'pass' => 'Pass',
@@ -1048,6 +1179,7 @@ function simpletest_script_reporter_init() {
 
   echo "\n";
   echo "Drupal test run\n";
+  echo "Using PHP Binary: $php\n";
   echo "---------------\n";
   echo "\n";
 
@@ -1080,14 +1212,17 @@ function simpletest_script_reporter_init() {
  *   The test class name that was run.
  * @param array $results
  *   The assertion results using #pass, #fail, #exception, #debug array keys.
+ * @param int|null $duration
+ *   The time taken for the test to complete.
  */
-function simpletest_script_reporter_display_summary($class, $results) {
+function simpletest_script_reporter_display_summary($class, $results, $duration = NULL): void {
   // Output all test results vertically aligned.
   // Cut off the class name after 60 chars, and pad each group with 3 digits
   // by default (more than 999 assertions are rare).
-  $output = vsprintf('%-60.60s %10s %9s %14s %12s', [
+  $output = vsprintf('%-60.60s %10s %5s %9s %14s %12s', [
     $class,
     $results['#pass'] . ' passes',
+    isset($duration) ? ceil($duration) . 's' : '',
     !$results['#fail'] ? '' : $results['#fail'] . ' fails',
     !$results['#exception'] ? '' : $results['#exception'] . ' exceptions',
     !$results['#debug'] ? '' : $results['#debug'] . ' messages',
@@ -1100,7 +1235,7 @@ function simpletest_script_reporter_display_summary($class, $results) {
 /**
  * Display jUnit XML test results.
  */
-function simpletest_script_reporter_write_xml_results(TestRunResultsStorageInterface $test_run_results_storage) {
+function simpletest_script_reporter_write_xml_results(TestRunResultsStorageInterface $test_run_results_storage): void {
   global $args, $test_ids, $results_map;
 
   try {
@@ -1125,7 +1260,7 @@ function simpletest_script_reporter_write_xml_results(TestRunResultsStorageInter
         }
         $test_class = $result->test_class;
         if (!isset($xml_files[$test_class])) {
-          $doc = new DomDocument('1.0');
+          $doc = new DOMDocument('1.0', 'utf-8');
           $root = $doc->createElement('testsuite');
           $root = $doc->appendChild($root);
           $xml_files[$test_class] = ['doc' => $doc, 'suite' => $root];
@@ -1183,7 +1318,7 @@ function simpletest_script_reporter_write_xml_results(TestRunResultsStorageInter
 /**
  * Stop the test timer.
  */
-function simpletest_script_reporter_timer_stop() {
+function simpletest_script_reporter_timer_stop(): void {
   echo "\n";
   $end = Timer::stop('run-tests');
   echo "Test run duration: " . \Drupal::service('date.formatter')->formatInterval((int) ($end['time'] / 1000));
@@ -1193,7 +1328,7 @@ function simpletest_script_reporter_timer_stop() {
 /**
  * Display test results.
  */
-function simpletest_script_reporter_display_results(TestRunResultsStorageInterface $test_run_results_storage) {
+function simpletest_script_reporter_display_results(TestRunResultsStorageInterface $test_run_results_storage): void {
   global $args, $test_ids, $results_map;
 
   if ($args['verbose']) {
@@ -1233,7 +1368,7 @@ function simpletest_script_reporter_display_results(TestRunResultsStorageInterfa
  * @param object $result
  *   The result object to format.
  */
-function simpletest_script_format_result($result) {
+function simpletest_script_format_result($result): void {
   global $args, $results_map, $color;
 
   $summary = sprintf("%-9.9s %-10.10s %-17.17s %4.4s %-35.35s\n",
@@ -1245,7 +1380,7 @@ function simpletest_script_format_result($result) {
   if ($args['non-html']) {
     $message = Html::decodeEntities($message);
   }
-  $lines = explode("\n", wordwrap($message), 76);
+  $lines = explode("\n", $message);
   foreach ($lines as $line) {
     echo "    $line\n";
   }
@@ -1260,7 +1395,7 @@ function simpletest_script_format_result($result) {
  * @param string $message
  *   The message to print.
  */
-function simpletest_script_print_error($message) {
+function simpletest_script_print_error($message): void {
   simpletest_script_print("  ERROR: $message\n", SIMPLETEST_SCRIPT_COLOR_FAIL);
 }
 
@@ -1272,7 +1407,7 @@ function simpletest_script_print_error($message) {
  * @param int $color_code
  *   The color code to use for coloring.
  */
-function simpletest_script_print($message, $color_code) {
+function simpletest_script_print($message, $color_code): void {
   global $args;
   if ($args['color']) {
     echo "\033[" . $color_code . "m" . $message . "\033[0m";
@@ -1325,7 +1460,7 @@ function simpletest_script_color_code($status) {
  *
  * @see http://php.net/manual/function.levenshtein.php
  */
-function simpletest_script_print_alternatives($string, $array, $degree = 4) {
+function simpletest_script_print_alternatives($string, $array, $degree = 4): void {
   $alternatives = [];
   foreach ($array as $item) {
     $lev = levenshtein($string, $item);

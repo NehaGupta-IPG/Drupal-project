@@ -9,7 +9,6 @@ use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\Template\Attribute;
 use Drupal\Core\Theme\ComponentPluginManager;
 use Drupal\Core\Render\Component\Exception\InvalidComponentDataException;
-use Drupal\Tests\Core\Theme\Component\ComponentKernelTestBase;
 
 /**
  * Tests the correct rendering of components.
@@ -110,8 +109,8 @@ class ComponentRenderTest extends ComponentKernelTestBase {
       '#type' => 'component',
       '#component' => 'sdc_test:my-banner',
       '#props' => [
-        'heading' => $this->t('I am a banner'),
-        'ctaText' => $this->t('Click me'),
+        'heading' => 'I am a banner',
+        'ctaText' => 'Click me',
         'ctaHref' => 'https://www.example.org',
         'ctaTarget' => '',
       ],
@@ -119,7 +118,7 @@ class ComponentRenderTest extends ComponentKernelTestBase {
         'banner_body' => [
           '#type' => 'html_tag',
           '#tag' => 'p',
-          '#value' => $this->t('This is the contents of the banner body.'),
+          '#value' => 'This is the contents of the banner body.',
         ],
       ],
     ];
@@ -262,19 +261,19 @@ class ComponentRenderTest extends ComponentKernelTestBase {
       '#type' => 'component',
       '#component' => 'sdc_test:my-banner',
       '#props' => [
-        'heading' => $this->t('I am a banner'),
-        'ctaText' => $this->t('Click me'),
+        'heading' => 'I am a banner',
+        'ctaText' => 'Click me',
         'ctaHref' => 'https://www.example.org',
         'ctaTarget' => '',
       ],
       '#propsAlter' => [
-        fn ($props) => [...$props, 'heading' => $this->t('I am another banner')],
+        fn ($props) => [...$props, 'heading' => 'I am another banner'],
       ],
       '#slots' => [
         'banner_body' => [
           '#type' => 'html_tag',
           '#tag' => 'p',
-          '#value' => $this->t('This is the contents of the banner body.'),
+          '#value' => 'This is the contents of the banner body.',
         ],
       ],
       '#slotsAlter' => [
@@ -301,8 +300,8 @@ class ComponentRenderTest extends ComponentKernelTestBase {
         '#type' => 'component',
         '#component' => 'sdc_test:my-banner',
         '#props' => [
-          'heading' => $this->t('I am a banner'),
-          'ctaText' => $this->t('Click me'),
+          'heading' => 'I am a banner',
+          'ctaText' => 'Click me',
           'ctaHref' => 'https://www.example.org',
           'ctaTarget' => '',
         ],
@@ -323,8 +322,8 @@ class ComponentRenderTest extends ComponentKernelTestBase {
       '#type' => 'component',
       '#component' => 'sdc_test:my-banner',
       '#props' => [
-        'heading' => $this->t('I am a banner'),
-        'ctaText' => $this->t('Click me'),
+        'heading' => 'I am a banner',
+        'ctaText' => 'Click me',
         'ctaHref' => 'https://www.example.org',
         'ctaTarget' => '',
       ],

@@ -469,10 +469,10 @@ use Drupal\Core\Database\Query\SelectInterface;
 /**
  * Perform alterations to a structured query.
  *
- * Structured (aka dynamic) queries that have tags associated may be altered by any module
- * before the query is executed.
+ * Structured (aka dynamic) queries that have tags associated may be altered by
+ * any module before the query is executed.
  *
- * @param $query
+ * @param Drupal\Core\Database\Query\AlterableInterface $query
  *   A Query object describing the composite parts of a SQL query.
  *
  * @see hook_query_TAG_alter()
@@ -497,7 +497,7 @@ function hook_query_alter(Drupal\Core\Database\Query\AlterableInterface $query) 
  * - ENTITY_TYPE . '_access': For queries of entities that will be displayed in
  *   a listing (e.g., from Views) and therefore require access control.
  *
- * @param $query
+ * @param Drupal\Core\Database\Query\AlterableInterface $query
  *   A Query object describing the composite parts of a SQL query.
  *
  * @see hook_query_alter()
@@ -549,6 +549,8 @@ function hook_query_TAG_alter(Drupal\Core\Database\Query\AlterableInterface $que
 /**
  * Define the current version of the database schema.
  *
+ * Only procedural implementations are supported for this hook.
+ *
  * A Drupal schema definition is an array structure representing one or more
  * tables and their related keys and indexes. A schema is defined by
  * hook_schema() which must live in your module's .install file.
@@ -575,7 +577,7 @@ function hook_query_TAG_alter(Drupal\Core\Database\Query\AlterableInterface $que
  *
  * @ingroup schemaapi
  */
-function hook_schema() {
+function hook_schema(): array {
   $schema['users_data'] = [
     'description' => 'Stores module data as key/value pairs per user.',
     'fields' => [

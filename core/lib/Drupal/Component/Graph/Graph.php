@@ -9,13 +9,15 @@ class Graph {
 
   /**
    * Holds the directed acyclic graph.
+   *
+   * @var array
    */
   protected $graph;
 
   /**
    * Instantiates the depth first search object.
    *
-   * @param $graph
+   * @param array $graph
    *   A three dimensional associated array, with the first keys being the names
    *   of the vertices, these can be strings or numbers. The second key is
    *   'edges' and the third one are again vertices, each such key representing
@@ -50,8 +52,8 @@ class Graph {
    *     this vertex.
    *   - 'reverse_paths': Contains a list of vertices that has a path from them
    *     to this vertex.
-   *   - 'weight': If there is a path from a vertex to another then the weight of
-   *     the latter is higher.
+   *   - 'weight': If there is a path from a vertex to another then the weight
+   *      of the latter is higher.
    *   - 'component': Vertices in the same component have the same component
    *     identifier.
    */
@@ -87,19 +89,20 @@ class Graph {
   /**
    * Performs a depth-first search on a graph.
    *
-   * @param $state
+   * @param array $state
    *   An associative array. The key 'last_visit_order' stores a list of the
    *   vertices visited. The key components stores list of vertices belonging
    *   to the same the component.
-   * @param $start
+   * @param string|int $start
    *   An arbitrary vertex where we started traversing the graph.
-   * @param $component
+   * @param string|int|null $component
    *   The component of the last vertex.
    *
    * @see \Drupal\Component\Graph\Graph::searchAndSort()
    */
   protected function depthFirstSearch(&$state, $start, &$component = NULL) {
-    // Assign new component for each new vertex, i.e. when not called recursively.
+    // Assign new component for each new vertex, i.e. when not called
+    // recursively.
     if (!isset($component)) {
       $component = $start;
     }

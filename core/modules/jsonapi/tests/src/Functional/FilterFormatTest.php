@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\jsonapi\Functional;
 
+use Drupal\jsonapi\JsonApiSpec;
 use Drupal\Core\Url;
 use Drupal\filter\Entity\FilterFormat;
 
@@ -11,7 +12,6 @@ use Drupal\filter\Entity\FilterFormat;
  * JSON:API integration test for the "FilterFormat" config entity type.
  *
  * @group jsonapi
- * @group #slow
  */
 class FilterFormatTest extends ConfigEntityResourceTestBase {
 
@@ -45,7 +45,7 @@ class FilterFormatTest extends ConfigEntityResourceTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function setUpAuthorization($method) {
+  protected function setUpAuthorization($method): void {
     $this->grantPermissionsToTestedRole(['administer filters']);
   }
 
@@ -79,10 +79,10 @@ class FilterFormatTest extends ConfigEntityResourceTestBase {
       'jsonapi' => [
         'meta' => [
           'links' => [
-            'self' => ['href' => 'http://jsonapi.org/format/1.0/'],
+            'self' => ['href' => JsonApiSpec::SUPPORTED_SPECIFICATION_PERMALINK],
           ],
         ],
-        'version' => '1.0',
+        'version' => JsonApiSpec::SUPPORTED_SPECIFICATION_VERSION,
       ],
       'links' => [
         'self' => ['href' => $self_url],

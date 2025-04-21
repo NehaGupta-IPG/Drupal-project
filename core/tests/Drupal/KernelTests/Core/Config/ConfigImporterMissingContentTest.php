@@ -7,8 +7,6 @@ namespace Drupal\KernelTests\Core\Config;
 use Drupal\block_content\Entity\BlockContent;
 use Drupal\block_content\Entity\BlockContentType;
 use Drupal\Component\Plugin\PluginBase;
-use Drupal\Component\Render\FormattableMarkup;
-use Drupal\Component\Render\PlainTextOutput;
 use Drupal\Core\Block\Plugin\Block\Broken;
 use Drupal\Core\Config\ConfigImporter;
 use Drupal\Core\Config\StorageComparer;
@@ -43,9 +41,7 @@ class ConfigImporterMissingContentTest extends KernelTestBase implements LoggerI
   protected $configImporter;
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = [
     'system',
@@ -58,7 +54,7 @@ class ConfigImporterMissingContentTest extends KernelTestBase implements LoggerI
   /**
    * {@inheritdoc}
    */
-  public function register(ContainerBuilder $container) {
+  public function register(ContainerBuilder $container): void {
     parent::register($container);
     $container->register('logger.ConfigImporterMissingContentTest', __CLASS__)->addTag('logger');
     $container->set('logger.ConfigImporterMissingContentTest', $this);
@@ -197,7 +193,8 @@ class ConfigImporterMissingContentTest extends KernelTestBase implements LoggerI
    * {@inheritdoc}
    */
   public function log($level, $message, array $context = []): void {
-    $this->logMessages[] = PlainTextOutput::renderFromHtml(new FormattableMarkup($message, $context));
+    $message_placeholders = \Drupal::service('logger.log_message_parser')->parseMessagePlaceholders($message, $context);
+    $this->logMessages[] = empty($message_placeholders) ? $message : strtr($message, $message_placeholders);
   }
 
 }

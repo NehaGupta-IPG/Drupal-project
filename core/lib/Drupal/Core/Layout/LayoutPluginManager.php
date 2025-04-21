@@ -149,6 +149,7 @@ class LayoutPluginManager extends DefaultPluginManager implements LayoutPluginMa
     $regions = array_map(function ($region) {
       if (!$region['label'] instanceof TranslatableMarkup) {
         // Region labels from YAML discovery needs translation.
+        // phpcs:ignore Drupal.Semantics.FunctionT.NotLiteralString
         $region['label'] = new TranslatableMarkup($region['label'], [], ['context' => 'layout_region']);
       }
       return $region;
@@ -196,6 +197,7 @@ class LayoutPluginManager extends DefaultPluginManager implements LayoutPluginMa
    *
    * @return \Drupal\Core\Layout\LayoutDefinition[]
    */
+  // phpcs:ignore Drupal.Commenting.FunctionComment.MissingReturnComment
   public function getSortedDefinitions(?array $definitions = NULL, $label_key = 'label') {
     // Sort the plugins first by category, then by label.
     $definitions = $definitions ?? $this->getDefinitions();
@@ -213,6 +215,7 @@ class LayoutPluginManager extends DefaultPluginManager implements LayoutPluginMa
    *
    * @return \Drupal\Core\Layout\LayoutDefinition[][]
    */
+  // phpcs:ignore Drupal.Commenting.FunctionComment.MissingReturnComment
   public function getGroupedDefinitions(?array $definitions = NULL, $label_key = 'label') {
     $definitions = $this->getSortedDefinitions($definitions ?? $this->getDefinitions(), $label_key);
     $grouped_definitions = [];

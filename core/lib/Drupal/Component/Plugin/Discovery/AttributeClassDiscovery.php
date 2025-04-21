@@ -71,7 +71,8 @@ class AttributeClassDiscovery implements DiscoveryInterface {
             if ($fileinfo->getExtension() === 'php') {
               if ($cached = $this->fileCache->get($fileinfo->getPathName())) {
                 if (isset($cached['id'])) {
-                  // Explicitly unserialize this to create a new object instance.
+                  // Explicitly unserialize this to create a new object
+                  // instance.
                   $definitions[$cached['id']] = unserialize($cached['content']);
                 }
                 continue;
@@ -166,6 +167,7 @@ class AttributeClassDiscovery implements DiscoveryInterface {
    * Gets an array of PSR-4 namespaces to search for plugin classes.
    *
    * @return string[][]
+   *   An array of namespaces to search.
    */
   protected function getPluginNamespaces(): array {
     return $this->pluginNamespaces;

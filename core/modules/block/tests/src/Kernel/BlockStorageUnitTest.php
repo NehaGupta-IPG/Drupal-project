@@ -19,9 +19,7 @@ use Drupal\block\Entity\Block;
 class BlockStorageUnitTest extends KernelTestBase {
 
   /**
-   * Modules to install.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['block', 'block_test', 'system'];
 
@@ -58,7 +56,7 @@ class BlockStorageUnitTest extends KernelTestBase {
   /**
    * Tests the creation of blocks.
    */
-  protected function createTests() {
+  protected function createTests(): void {
     // Attempt to create a block without a plugin.
     try {
       $entity = $this->controller->create([]);
@@ -113,7 +111,7 @@ class BlockStorageUnitTest extends KernelTestBase {
   /**
    * Tests the loading of blocks.
    */
-  protected function loadTests() {
+  protected function loadTests(): void {
     $entity = $this->controller->load('test_block');
 
     $this->assertInstanceOf(Block::class, $entity);
@@ -128,7 +126,7 @@ class BlockStorageUnitTest extends KernelTestBase {
   /**
    * Tests the deleting of blocks.
    */
-  protected function deleteTests() {
+  protected function deleteTests(): void {
     $entity = $this->controller->load('test_block');
 
     // Ensure that the storage isn't currently empty.

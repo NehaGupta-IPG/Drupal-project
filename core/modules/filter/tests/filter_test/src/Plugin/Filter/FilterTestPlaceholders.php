@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\filter_test\Plugin\Filter;
 
 use Drupal\Core\StringTranslation\TranslatableMarkup;
@@ -33,7 +35,9 @@ class FilterTestPlaceholders extends FilterBase implements TrustedCallbackInterf
   }
 
   /**
-   * #lazy_builder callback; builds a render array containing the dynamic thing.
+   * Render API callback: Builds a render array containing the dynamic thing.
+   *
+   * This function is assigned as a #lazy_builder callback.
    *
    * @param string $thing
    *   A "thing" string.
@@ -48,7 +52,9 @@ class FilterTestPlaceholders extends FilterBase implements TrustedCallbackInterf
   }
 
   /**
-   * #lazy_builder callback; builds a render array.
+   * Render API callback: Builds a render array.
+   *
+   * This function is assigned as a #lazy_builder callback.
    *
    * @return array
    *   A renderable array.

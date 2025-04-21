@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\node\Kernel\Migrate\d7;
 
+use Drupal\Core\Database\Statement\FetchAs;
 use Drupal\migrate\MigrateExecutable;
 use Drupal\migrate_drupal\NodeMigrateType;
 use Drupal\node\Entity\Node;
@@ -112,14 +113,14 @@ class MigrateNodeCompleteTest extends MigrateDrupal7TestBase {
       ->orderBy('vid')
       ->orderBy('langcode')
       ->execute()
-      ->fetchAll(\PDO::FETCH_ASSOC));
+      ->fetchAll(FetchAs::Associative));
     $this->assertEquals($this->expectedNodeFieldDataTable(), $db->select('node_field_data', 'nr')
       ->fields('nr')
       ->orderBy('nid')
       ->orderBy('vid')
       ->orderBy('langcode')
       ->execute()
-      ->fetchAll(\PDO::FETCH_ASSOC));
+      ->fetchAll(FetchAs::Associative));
 
     // Load and test each revision.
     $data = $this->expectedRevisionEntityData()[0];
@@ -1006,7 +1007,7 @@ class MigrateNodeCompleteTest extends MigrateDrupal7TestBase {
    */
   protected function expectedRevisionEntityData(): array {
     return [
-      $revision_data = [
+      [
         // Node 1, revision 1, en.
         0 =>
           [

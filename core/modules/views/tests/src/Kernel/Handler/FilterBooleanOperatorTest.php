@@ -16,9 +16,7 @@ use Drupal\views\Views;
 class FilterBooleanOperatorTest extends ViewsKernelTestBase {
 
   /**
-   * The modules to enable for this test.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['system'];
 
@@ -249,6 +247,7 @@ class FilterBooleanOperatorTest extends ViewsKernelTestBase {
    * Provides grouped exposed filter configuration.
    *
    * @return array
+   *   An array of grouped exposed filter configuration.
    */
   protected function getGroupedExposedFilters(): array {
     $filters = [
