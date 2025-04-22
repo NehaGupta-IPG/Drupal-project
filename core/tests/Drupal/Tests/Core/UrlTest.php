@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\Core;
 
+use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
 use Drupal\Component\Utility\UrlHelper;
 use Drupal\Core\Access\AccessManagerInterface;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
@@ -843,15 +844,15 @@ class UrlTest extends UnitTestCase {
    */
   public function testSetDestination(): void {
     $url = Url::fromRoute('test_route');
-    
+
     // Test with valid internal path.
     $url->setDestination('node/1');
     $this->assertEquals(['destination' => 'node/1'], $url->getOption('query'));
-    
+
     // Test with empty path.
     $url->setDestination('');
     $this->assertEquals(['destination' => ''], $url->getOption('query'));
-    
+
     // Test with invalid external path.
     $this->expectException(\InvalidArgumentException::class);
     $url->setDestination('http://example.com');
@@ -869,10 +870,10 @@ class UrlTest extends UnitTestCase {
       ->method('get')
       ->willReturn('/test-path');
     $this->container->set('redirect.destination', $destination);
-    
+
     $url = Url::fromRoute('test_route');
     $url->setDestinationToCurrent();
-    
+
     $this->assertEquals(['destination' => '/test-path'], $url->getOption('query'));
   }
 
@@ -888,10 +889,10 @@ class UrlTest extends UnitTestCase {
       ->method('get')
       ->willReturn('/test-path?param=value');
     $this->container->set('redirect.destination', $destination);
-    
+
     $url = Url::fromRoute('test_route');
     $url->setDestinationToCurrent();
-    
+
     $this->assertEquals(['destination' => '/test-path?param=value'], $url->getOption('query'));
   }
 
@@ -909,9 +910,9 @@ class UrlTest extends UnitTestCase {
     $container->set('path.validator', $this->pathValidator);
     $container->set('request_stack', $this->requestStack);
     \Drupal::setContainer($container);
-    
+
     $url = Url::fromRoute('test_route');
-    $this->expectException(\Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException::class);
+    $this->expectException(ServiceNotFoundException::class);
     $url->setDestinationToCurrent();
   }
 
