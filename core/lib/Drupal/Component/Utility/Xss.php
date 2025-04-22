@@ -285,6 +285,22 @@ class Xss {
     $skip = FALSE;
     $skip_protocol_filtering = FALSE;
 
+    // Allow other modules to alter how attribute filtering is handled.
+    $attribute_data = [
+      'attributes' => $attributes,
+      'skip_protocol_filtering' => [
+        'title',
+        'alt',
+        'rel',
+        'property',
+        'class',
+        'datetime',
+      ],
+      'strip_attribute_names' => ['style'],
+      'max_attribute_length' => 96,
+    ];
+    \Drupal::moduleHandler()->alter('xss_attributes', $attribute_data);
+
     while (strlen($attributes) != 0) {
       // Was the last operation successful?
       $working = 0;
@@ -295,12 +311,12 @@ class Xss {
           if (preg_match('/^([-a-zA-Z][-a-zA-Z0-9]*)/', $attributes, $match)) {
             $attribute_name = strtolower($match[1]);
             $skip = (
-              $attribute_name == 'style' ||
+              in_array($attribute_name, $attribute_data['strip_attribute_names']) ||
               str_starts_with($attribute_name, 'on') ||
               str_starts_with($attribute_name, '-') ||
               // Ignore long attributes to avoid unnecessary processing
               // overhead.
-              strlen($attribute_name) > 96
+              strlen($attribute_name) > $attribute_data['max_attribute_length']
             );
 
             // Values for attributes of type URI should be filtered for
@@ -311,14 +327,7 @@ class Xss {
             // such attributes.
             // @see \Drupal\Component\Utility\UrlHelper::filterBadProtocol()
             // @see https://www.w3.org/TR/html4/index/attributes.html
-            $skip_protocol_filtering = str_starts_with($attribute_name, 'data-') || in_array($attribute_name, [
-              'title',
-              'alt',
-              'rel',
-              'property',
-              'class',
-              'datetime',
-            ]);
+            $skip_protocol_filtering = str_starts_with($attribute_name, 'data-') || in_array($attribute_name, $attribute_data['skip_protocol_filtering']);
 
             $working = $mode = 1;
             $attributes = preg_replace('/^[-a-zA-Z][-a-zA-Z0-9]*/', '', $attributes);
@@ -354,6 +363,10 @@ class Xss {
             $value = $skip_protocol_filtering ? $match[1] : UrlHelper::filterBadProtocol($match[1]);
 
             if (!$skip) {
+              if (!empty($attribute_data['value_filter_function'])
+                && is_callable($attribute_data['value_filter_function'])) {
+                $value = $attribute_data['value_filter_function']($attribute_name, $value);
+              }
               $attributes_array[] = "$attribute_name=\"$value\"";
             }
             $attributes = preg_replace('/^"[^"]*"(\s+|$)/', '', $attributes);
@@ -364,6 +377,10 @@ class Xss {
             $value = $skip_protocol_filtering ? $match[1] : UrlHelper::filterBadProtocol($match[1]);
 
             if (!$skip) {
+              if (!empty($attribute_data['value_filter_function'])
+                && is_callable($attribute_data['value_filter_function'])) {
+                $value = $attribute_data['value_filter_function']($attribute_name, $value);
+              }
               $attributes_array[] = "$attribute_name='$value'";
             }
             $attributes = preg_replace("/^'[^']*'(\s+|$)/", '', $attributes);
