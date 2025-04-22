@@ -43,7 +43,7 @@ class LanguageNegotiationUrlTest extends UnitTestCase {
   protected function setUp(): void {
     parent::setUp();
 
-    // @todo Remove as part of https://www.drupal.org/i/2570895.
+    // @todo Remove as part of https://www.drupal.org/i/2529170.
     global $base_path;
     $base_path = '/';
 

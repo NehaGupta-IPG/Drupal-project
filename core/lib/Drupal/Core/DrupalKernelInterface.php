@@ -149,7 +149,7 @@ interface DrupalKernelInterface extends HttpKernelInterface {
    *
    * @deprecated in drupal:11.2.0 and is removed from drupal:12.0.0.
    * There is no direct replacement.
-   * @see https://www.drupal.org/project/drupal/issues/3520300
+   * @see https://www.drupal.org/node/3520496
    */
   public function loadLegacyIncludes();
 
