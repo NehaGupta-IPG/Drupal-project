@@ -58,7 +58,6 @@ class CssCollectionRenderer implements AssetCollectionRendererInterface {
             $$version_query_string = (!empty($css_asset['version']) && $css_asset['version'] !== -1)
             ? 'v=' . $css_asset['version']
             : $query_string;
-        
             $query_string_separator = str_contains($css_asset['data'], '?') ? '&' : '?';
             $element['#attributes']['href'] .= $query_string_separator . $version_query_string;
           }
