@@ -160,7 +160,7 @@ class LanguageNegotiationUrl extends LanguageNegotiationMethodBase implements In
         }
 
         // Ask for an absolute URL with our modified base URL.
-        $options['absolute'] = TRUE;
+        $options['absolute'] = $options['absolute'] ?? TRUE;
         $options['base_url'] = $url_scheme . '://' . $config['domains'][$options['language']->getId()];
 
         // In case either the original base URL or the HTTP host contains a
