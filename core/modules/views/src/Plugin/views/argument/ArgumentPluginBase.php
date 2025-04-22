@@ -1336,9 +1336,11 @@ abstract class ArgumentPluginBase extends HandlerBase implements CacheableDepend
    *
    * @param bool $force_int
    *   Enforce that values should be numeric.
+   * @param bool $preserve_spaces
+   *   Enforces that the spaces in the values need to preserve or not.
    */
-  protected function unpackArgumentValue($force_int = FALSE) {
-    $break = static::breakString($this->argument, $force_int);
+  protected function unpackArgumentValue($force_int = FALSE, $preserve_spaces = FALSE) {
+    $break = static::breakString($this->argument, $force_int, $preserve_spaces);
     $this->value = $break->value;
     $this->operator = $break->operator;
   }

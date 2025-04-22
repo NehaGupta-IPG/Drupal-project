@@ -16,6 +16,7 @@ use Drupal\views\Render\ViewsRenderPipelineMarkup;
 use Drupal\views\ViewExecutable;
 use Drupal\views\Views;
 use Drupal\views\ViewsData;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 /**
  * Base class for Views handler plugins.
@@ -840,20 +841,24 @@ abstract class HandlerBase extends PluginBase implements ViewsHandlerInterface {
   /**
    * {@inheritdoc}
    */
-  public static function breakString($str, $force_int = FALSE) {
+  public static function breakString($str, $force_int = FALSE, $preserve_spaces = FALSE) {
     $operator = NULL;
     $value = [];
 
     // Determine if the string has 'or' operators (plus signs) or 'and'
     // operators (commas) and split the string accordingly.
-    if (preg_match('/^([\w0-9-_\.]+[+ ]+)+[\w0-9-_\.]+$/u', $str)) {
+    if (preg_match('/^([\w\W]+[+ ]+)+[\w\W]+$/u', $str) && preg_match('/^[^,]+$/u', $str)) {
       // The '+' character in a query string may be parsed as ' '.
       $operator = 'or';
-      $value = preg_split('/[+ ]/', $str);
+      $value = $preserve_spaces ? explode('+', $str) : preg_split('/[+ ]/', $str);
     }
-    elseif (preg_match('/^([\w0-9-_\.]+[, ]+)*[\w0-9-_\.]+$/u', $str)) {
+    elseif (preg_match('/^([\w\W]+[, ]+)*[\w\W]+$/u', $str) && preg_match('/^[^+]+$/u', $str)) {
       $operator = 'and';
       $value = explode(',', $str);
+    }
+    else {
+      // The '+' and ',' characters were detected together.
+      throw new BadRequestHttpException('Both \'+\' and \',\' characters cannot be in the query string');
     }
 
     // Filter any empty matches (Like from '++' in a string) and reset the
