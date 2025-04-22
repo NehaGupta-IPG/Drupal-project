@@ -288,14 +288,6 @@ class ThemePreprocess {
         'name' => $site_config->get('name'),
       ];
     }
-    // @todo Remove once views is not bypassing the view subscriber anymore.
-    //   @see https://www.drupal.org/node/2068471
-    elseif ($is_front_page) {
-      $head_title = [
-        'title' => $this->t('Home'),
-        'name' => $site_config->get('name'),
-      ];
-    }
     else {
       $head_title = ['name' => $site_config->get('name')];
       if ($site_config->get('slogan')) {
