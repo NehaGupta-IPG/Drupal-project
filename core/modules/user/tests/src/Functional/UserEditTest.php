@@ -283,6 +283,7 @@ class UserEditTest extends BrowserTestBase {
     $this->assertSession()->fieldEnabled('edit-status-0');
     $this->assertSession()->fieldEnabled('edit-status-1');
   }
+
   /**
    * Tests the account form roles viewing/editing behavior.
    */
@@ -331,4 +332,5 @@ class UserEditTest extends BrowserTestBase {
     $this->assertSession()->fieldExists(sprintf('roles[%s]', $roleWithViewOwnAccountDetailsPermission));
     $this->assertSession()->fieldEnabled(sprintf('roles[%s]', $roleWithViewOwnAccountDetailsPermission));
   }
+
 }
