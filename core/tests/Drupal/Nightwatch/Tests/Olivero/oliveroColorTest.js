@@ -37,28 +37,18 @@ module.exports = {
           'core/tests/Drupal/TestSite/TestSiteOliveroInstallTestScript.php',
         installProfile: 'minimal',
       })
-      // Create user that can search.
       .drupalCreateUser({
         name: 'user',
         password: '123',
         permissions: ['administer themes', 'view the administration theme'],
       })
-      .drupalLogin({ name: 'user', password: '123' });
   },
   after(browser) {
     browser.drupalUninstall();
   },
   'Olivero Settings - color schemes update individual values': (browser) => {
-    testPerTheme(browser, (browser, theme, title) => {
-      console.log('THEME: ', theme);
-      console.log('TITLE: ', title);
-
+    testPerTheme(browser, { name: 'user', password: '123' }, (browser, theme, title) => {
       browser
-        // Adding 👇 gets the test to work, which I've left here for example, but
-        // clearly it will be better to figure out why the login in the before
-        // each is not active. The credentials still work, so the setup is
-        // happening. Something is putting this in a different session?
-        .drupalLogin({ name: 'user', password: '123' })
         .drupalRelativeURL(`/admin/appearance/settings/${theme}`)
         .waitForElementVisible(selectors.schemePicker)
         .click(`${selectors.schemePicker} option[value="firehouse"]`)
@@ -109,8 +99,9 @@ module.exports = {
     });
   },
   'Olivero Settings - color inputs stay synchronized': (browser) => {
-    testPerTheme(browser, (browser, theme, title) => {
+    testPerTheme(browser, { name: 'user', password: '123' }, (browser, theme, title) => {
       browser
+        .drupalLogin({ name: 'user', password: '123' })
         .drupalRelativeURL(`/admin/appearance/settings/${theme}`)
         .waitForElementVisible(selectors.primaryColor.text)
         .waitForElementVisible(selectors.primaryColor.color)
@@ -123,8 +114,9 @@ module.exports = {
     });
   },
   'Olivero Settings - color selections impact olivero theme': (browser) => {
-    testPerTheme(browser, (browser, theme, title) => {
+    testPerTheme(browser, { name: 'user', password: '123' }, (browser, theme, title) => {
       browser
+        .drupalLogin({ name: 'user', password: '123' })
         .drupalRelativeURL(`/admin/appearance/settings/${theme}`)
         .waitForElementVisible(selectors.primaryColor.color)
         .updateValue(selectors.primaryColor.text, '#ff0000') // hsl(0, 100%, 50%)
@@ -136,6 +128,7 @@ module.exports = {
         .to.have.css('backgroundColor', 'rgb(255, 0, 0)');
 
       browser
+        .drupalLogin({ name: 'user', password: '123' })
         .drupalRelativeURL(`/admin/appearance/settings/${theme}`)
         .waitForElementVisible(selectors.primaryColor.color)
         .updateValue(selectors.primaryColor.text, '#7a4587') // hsl(0, 100%, 50%)

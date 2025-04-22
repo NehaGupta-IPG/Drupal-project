@@ -1,10 +1,10 @@
 const { testPerTheme } = require('../../globals');
 
 const preloadFontPaths = [
-  'core/themes/olivero/fonts/metropolis/Metropolis-Regular.woff2',
-  'core/themes/olivero/fonts/metropolis/Metropolis-SemiBold.woff2',
-  'core/themes/olivero/fonts/metropolis/Metropolis-Bold.woff2',
-  'core/themes/olivero/fonts/lora/lora-v14-latin-regular.woff2',
+  'metropolis/Metropolis-Regular.woff2',
+  'metropolis/Metropolis-SemiBold.woff2',
+  'metropolis/Metropolis-Bold.woff2',
+  'lora/lora-v14-latin-regular.woff2',
 ];
 
 module.exports = {
@@ -20,25 +20,24 @@ module.exports = {
     browser.drupalUninstall();
   },
   'Verify font loading': (browser) => {
-    testPerTheme(browser, (browser, theme, title) => {
+    testPerTheme(browser, null, (browser, theme, title) => {
       browser
         .drupalRelativeURL('/')
         .waitForElementVisible('body')
         // Check that <link rel="preload"> tags properly reference font.
         .execute(
           // eslint-disable-next-line func-names, prefer-arrow-callback, no-shadow
-          function (preloadFontPaths) {
-            const basePath = drupalSettings.path.baseUrl;
+          function (preloadFontPaths, theme) {
             let selectorsExist = true;
             preloadFontPaths.forEach((path) => {
-              if (!document.head.querySelector(`[href="${basePath + path}"]`)) {
+              if (!document.head.querySelector(`[href$="${theme}/fonts/${path}"]`)) {
                 selectorsExist = false;
               }
             });
 
             return selectorsExist;
           },
-          [preloadFontPaths],
+          [preloadFontPaths, theme],
           (result) => {
             browser.assert.ok(
               result.value,

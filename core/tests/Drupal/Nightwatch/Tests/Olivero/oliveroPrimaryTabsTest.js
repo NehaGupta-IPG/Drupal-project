@@ -19,14 +19,13 @@ module.exports = {
         password: '123',
         permissions: ['administer nodes'],
       })
-      .drupalLogin({ name: 'user', password: '123' });
     browser.window.setSize(1600, 800);
   },
   after(browser) {
     browser.drupalUninstall();
   },
   'Verify desktop primary tab display': (browser) => {
-    testPerTheme(browser, (browser, theme, title) => {
+    testPerTheme(browser, {name: 'user', password: '123'}, (browser, theme, title) => {
       browser
         .drupalRelativeURL('/node/1')
         .waitForElementVisible(primaryTabsWrapper)
@@ -36,7 +35,7 @@ module.exports = {
     });
   },
   'Verify mobile tab display and click functionality': (browser) => {
-    testPerTheme(browser, (browser, theme, title) => {
+    testPerTheme(browser, {name: 'user', password: '123'}, (browser, theme, title) => {
       browser
         .setWindowSize(699, 800)
         .drupalRelativeURL('/node/1')

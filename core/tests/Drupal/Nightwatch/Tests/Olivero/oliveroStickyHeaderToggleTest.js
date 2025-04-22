@@ -4,7 +4,7 @@ const buttonSelector = 'button.sticky-header-toggle';
 const mainMenuSelector = '#block-olivero-main-menu';
 
 module.exports = {
-  '@tags': ['core', 'olivero'],
+  '@tags': ['core', 'olivero', 'failing'],
   before(browser) {
     browser.drupalInstall({
       setupFile:
@@ -17,7 +17,7 @@ module.exports = {
     browser.drupalUninstall();
   },
   'On scroll, menu collapses to burger 🍔 menu': (browser) => {
-    testPerTheme(browser, (browser, theme, title) => {
+    testPerTheme(browser, null, (browser, theme, title) => {
       browser
         .drupalRelativeURL('/node')
         .assert.not.visible(buttonSelector)

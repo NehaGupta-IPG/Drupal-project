@@ -58,7 +58,7 @@ module.exports = {
     browser.drupalUninstall();
   },
   'Verify mobile menu and submenu functionality': (browser) => {
-    testPerTheme(browser, (browser, theme, title) => {
+    testPerTheme(browser, null, (browser, theme, title) => {
       browser
         .drupalRelativeURL('/')
         .assert.not.visible(headerNavSelector)
@@ -96,7 +96,7 @@ module.exports = {
     });
   },
   'Verify mobile menu focus trap': (browser) => {
-    testPerTheme(browser, (browser, theme, title) => {
+    testPerTheme(browser, null, (browser, theme, title) => {
       browser.drupalRelativeURL('/').click(mobileNavButtonSelector);
       focusTrapCheck(
         browser,
@@ -112,7 +112,7 @@ module.exports = {
     });
   },
   'Verify parent <button> focus on ESC in narrow navigation': (browser) => {
-    testPerTheme(browser, (browser, theme, title) => {
+    testPerTheme(browser, null, (browser, theme, title) => {
       browser
         // Verify functionality on regular link's button.
         .drupalRelativeURL('/node')
@@ -188,7 +188,7 @@ module.exports = {
     });
   },
   'Verify clicks on hashes close mobile menu': (browser) => {
-    testPerTheme(browser, (browser, theme, title) => {
+    testPerTheme(browser, null, (browser, theme, title) => {
       browser
         .drupalRelativeURL('/node')
         .waitForElementVisible('body')
@@ -199,12 +199,14 @@ module.exports = {
     });
   },
   'Verify mobile menu works when Big Pipe when authenticated': (browser) => {
-    browser.drupalInstallModule('big_pipe').drupalLoginAsAdmin(() => {
-      browser
-        .drupalRelativeURL('/')
-        .assert.not.visible(headerNavSelector)
-        .click(mobileNavButtonSelector)
-        .waitForElementVisible(headerNavSelector);
+    testPerTheme(browser, null, (browser, theme, title) => {
+      browser.drupalInstallModule('big_pipe', false, () => {
+        browser
+          .drupalRelativeURL('/')
+          .assert.not.visible(headerNavSelector)
+          .click(mobileNavButtonSelector)
+          .waitForElementVisible(headerNavSelector);
+      });
     });
   },
 };

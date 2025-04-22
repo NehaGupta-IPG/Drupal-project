@@ -85,7 +85,7 @@ module.exports = {
     browser.drupalUninstall();
   },
   'Confirm that title attribute exists if set to display': (browser) => {
-    testPerTheme(browser, (browser, theme, title) => {
+    testPerTheme(browser, null, (browser, theme, title) => {
       browser
         .setWindowSize(1400, 800)
         .drupalRelativeURL('/form_test/form-labels')
@@ -98,7 +98,7 @@ module.exports = {
     });
   },
   'Check form element classes by type': (browser) => {
-    testPerTheme(browser, (browser, theme, title) => {
+    testPerTheme(browser, null, (browser, theme, title) => {
       browser.drupalRelativeURL('/form_test/form-labels');
       inputTypes.forEach((inputType) => {
         browser.assert.hasClass(inputType.selector, [

@@ -42,7 +42,7 @@ module.exports = {
     browser.drupalUninstall();
   },
   'Verify no console errors': (browser) => {
-    testPerTheme(browser, (browser, theme, title) => {
+    testPerTheme(browser, null, (browser, theme, title) => {
       browser
         .drupalRelativeURL('/')
         .waitForElementVisible('body')

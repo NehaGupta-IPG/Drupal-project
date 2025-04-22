@@ -18,13 +18,12 @@ module.exports = {
         password: '123',
         permissions: ['access site-wide contact form'],
       })
-      .drupalLogin({ name: 'user', password: '123' });
   },
   after(browser) {
     browser.drupalUninstall();
   },
   'correct classes added to table and header': (browser) => {
-    testPerTheme(browser, (browser, theme, title) => {
+    testPerTheme(browser, {name: 'user', password: '123'}, (browser, theme, title) => {
       browser
         .setWindowSize(1400, 800)
         .drupalRelativeURL('/contact/olivero_test_contact_form')

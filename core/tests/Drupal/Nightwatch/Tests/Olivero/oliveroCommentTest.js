@@ -21,13 +21,12 @@ module.exports = {
           'skip comment approval',
         ],
       })
-      .drupalLogin({ name: 'user', password: '123' });
   },
   after(browser) {
     browser.drupalUninstall();
   },
   'Article without comments should not display count': (browser) => {
-    testPerTheme(browser, (browser, theme, title) => {
+    testPerTheme(browser, { name: 'user', password: '123' }, (browser, theme, title) => {
       browser
         .drupalRelativeURL('/node/1')
         .assert.textContains('body', 'Article without comments')
@@ -35,7 +34,7 @@ module.exports = {
     });
   },
   'Article with comments should display count': (browser) => {
-    testPerTheme(browser, (browser, theme, title) => {
+    testPerTheme(browser, { name: 'user', password: '123' }, (browser, theme, title) => {
       browser
         .drupalRelativeURL('/node/2')
         .assert.textContains('body', 'Article with comments')

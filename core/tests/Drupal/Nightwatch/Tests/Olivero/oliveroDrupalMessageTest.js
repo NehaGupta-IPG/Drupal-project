@@ -1,6 +1,6 @@
 const { testPerTheme } = require('../../globals');
 
-const mainContent = '#block-olivero-content';
+const mainContent = 'main';
 const mainMessagesContainer = '[data-drupal-messages] > .messages__wrapper';
 const secondaryMessagesContainer = '[data-drupal-messages-other]';
 
@@ -36,7 +36,7 @@ module.exports = {
     browser.drupalUninstall();
   },
   'Verify default placement of javascript-created messages': (browser) => {
-    testPerTheme(browser, (browser, theme, title) => {
+    testPerTheme(browser, null, (browser, theme, title) => {
       browser
         .drupalRelativeURL('/js_message_test_link_with_system_messages')
         .waitForElementVisible(mainContent)
@@ -71,7 +71,7 @@ module.exports = {
     });
   },
   'Verify customized placement of javascript-created messages': (browser) => {
-    testPerTheme(browser, (browser, theme, title) => {
+    testPerTheme(browser, null, (browser, theme, title) => {
       browser
         .drupalRelativeURL('/js_message_test_link_with_system_messages')
         .waitForElementVisible(mainContent)

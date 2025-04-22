@@ -22,14 +22,13 @@ module.exports = {
         name: 'user',
         password: '123',
         permissions: ['search content', 'use advanced search'],
-      })
-      .drupalLogin({ name: 'user', password: '123' });
+      });
   },
   after(browser) {
     browser.drupalUninstall();
   },
   'search wide form is accessible and altered': (browser) => {
-    testPerTheme(browser, (browser, theme, title) => {
+    testPerTheme(browser, {name: 'user', password: '123'}, (browser, theme, title) => {
       browser
         .setWindowSize(1400, 800)
         .drupalRelativeURL('/')
@@ -56,7 +55,7 @@ module.exports = {
     });
   },
   'Test focus management': (browser) => {
-    testPerTheme(browser, (browser, theme, title) => {
+    testPerTheme(browser, {name: 'user', password: '123'}, (browser, theme, title) => {
       browser
         .drupalRelativeURL('/')
         .waitForElementVisible(searchButtonSelector)
@@ -98,7 +97,7 @@ module.exports = {
     });
   },
   'search narrow form is accessible': (browser) => {
-    testPerTheme(browser, (browser, theme, title) => {
+    testPerTheme(browser, {name: 'user', password: '123'}, (browser, theme, title) => {
       browser
         .setWindowSize(1000, 800)
         .drupalRelativeURL('/')
@@ -108,7 +107,7 @@ module.exports = {
     });
   },
   'submit button styled as primary on forms with <= 2 actions': (browser) => {
-    testPerTheme(browser, (browser, theme, title) => {
+    testPerTheme(browser, {name: 'user', password: '123'}, (browser, theme, title) => {
       browser
         .setWindowSize(1400, 800)
         .drupalRelativeURL('/form-test/object-controller-builder')
@@ -118,7 +117,7 @@ module.exports = {
     });
   },
   'search page is altered': (browser) => {
-    testPerTheme(browser, (browser, theme, title) => {
+    testPerTheme(browser, {name: 'user', password: '123'}, (browser, theme, title) => {
       browser
         .setWindowSize(1400, 800)
         .drupalRelativeURL('/search')

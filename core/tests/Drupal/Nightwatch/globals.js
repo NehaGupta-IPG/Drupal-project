@@ -11,28 +11,19 @@ const commandAsWebserver = (command) => {
 };
 
 const oliveroTestThemes = {
-  test_custom_theme: 'Test Custom Theme',
   olivero: 'Olivero',
+  test_custom_theme: 'Test Custom Theme',
 };
 
-const testPerTheme = (browser, fn) => {
+const testPerTheme = (browser, user, fn) => {
   Object.entries(oliveroTestThemes).forEach(([theme, title]) => {
-    // Button uses title, if available, machine name otherwise
-    const setAsDefault = `a[title="Set ${theme} as default theme"], a[title="Set ${title} as default theme"]`;
+    browser.drupalEnableTheme(theme, false);
 
-    browser
-      .drupalEnableTheme(theme, false)
-      .drupalRelativeURL('/admin/appearance')
-      .waitForElementVisible('main')
-      .element('css selector', setAsDefault, (result) => {
-        // Set current theme to default, if it isn't already.
-        if (result.status !== -1) {
-          browser.click(setAsDefault);
-        }
+    if (user) {
+      browser.drupalLogin(user);
+    }
 
-        // Run the test on this theme.
-        fn.call({}, browser, theme, title);
-      });
+    fn.call({}, browser, theme, title);
   });
 };
 

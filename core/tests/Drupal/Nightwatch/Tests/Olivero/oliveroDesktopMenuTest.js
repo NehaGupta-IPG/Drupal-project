@@ -13,24 +13,24 @@ module.exports = {
           'core/tests/Drupal/TestSite/TestSiteOliveroInstallTestScript.php',
         installProfile: 'minimal',
       })
-      // Login and change max-nesting depth so we can verify that menu levels
-      // greater than 2 do not break the site.
-      .drupalLoginAsAdmin(() => {
-        browser
-          .drupalRelativeURL('/admin/structure/block/manage/olivero_main_menu')
-          .waitForElementVisible('[data-drupal-selector="edit-settings-depth"]')
-          .setValue('[data-drupal-selector="edit-settings-depth"]', 'Unlimited')
-          .click('[data-drupal-selector="edit-actions-submit"]')
-          .waitForElementVisible('body');
-      });
     browser.window.setSize(1600, 800);
   },
   after(browser) {
     browser.drupalUninstall();
   },
   'Verify Olivero desktop menu click functionality': (browser) => {
-    testPerTheme(browser, (browser, theme, title) => {
+    testPerTheme(browser, null, (browser, theme, title) => {
       browser
+        // Login and change max-nesting depth so we can verify that menu levels
+        // greater than 2 do not break the site.
+        .drupalLoginAsAdmin(() => {
+          browser
+            .drupalRelativeURL(`/admin/structure/block/manage/${theme}_main_menu`)
+            .waitForElementVisible('[data-drupal-selector="edit-settings-depth"]')
+            .setValue('[data-drupal-selector="edit-settings-depth"]', 'Unlimited')
+            .click('[data-drupal-selector="edit-actions-submit"]')
+            .waitForElementVisible('body');
+        })
         .drupalRelativeURL('/node')
         .waitForElementVisible(headerNavSelector)
         .assert.not.visible(`#${linkSubMenuId}`)
@@ -67,7 +67,7 @@ module.exports = {
     });
   },
   'Verify Olivero desktop menu hover functionality': (browser) => {
-    testPerTheme(browser, (browser, theme, title) => {
+    testPerTheme(browser, null, (browser, theme, title) => {
       browser
         .drupalRelativeURL('/node')
         .waitForElementVisible(headerNavSelector)
@@ -91,7 +91,7 @@ module.exports = {
     });
   },
   'Verify desktop menu converts to mobile if it gets too long': (browser) => {
-    testPerTheme(browser, (browser, theme, title) => {
+    testPerTheme(browser, null, (browser, theme, title) => {
       browser
         .drupalRelativeURL('/node')
         .waitForElementVisible('body')
