@@ -13,6 +13,8 @@ use Drupal\workspaces\WorkspaceInterface;
 use Drupal\workspaces\WorkspaceOperationFactory;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
+// cspell:ignore differring
+
 /**
  * Provides the workspace publishing form.
  */
@@ -72,7 +74,7 @@ class WorkspacePublishForm extends ConfirmFormBase implements ContainerInjection
   /**
    * {@inheritdoc}
    */
-  public function buildForm(array $form, FormStateInterface $form_state, WorkspaceInterface $workspace = NULL) {
+  public function buildForm(array $form, FormStateInterface $form_state, ?WorkspaceInterface $workspace = NULL) {
     $this->workspace = $workspace;
 
     $form = parent::buildForm($form, $form_state);

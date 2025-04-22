@@ -91,7 +91,7 @@ class UpdateRegistry implements EventSubscriberInterface {
    * Gets all available update functions.
    *
    * @return callable[]
-   *   A list of update functions.
+   *   An alphabetical list of available update functions.
    */
   protected function getAvailableUpdateFunctions() {
     $regexp = '/^(?<extension>.+)_' . $this->updateType . '_(?<name>.+)$/';
@@ -123,7 +123,7 @@ class UpdateRegistry implements EventSubscriberInterface {
    * Find all update functions that haven't been executed.
    *
    * @return callable[]
-   *   A list of update functions.
+   *   An alphabetical list of update functions that have not been executed.
    */
   public function getPendingUpdateFunctions() {
     // We need a) the list of active extensions (we get that from the config
@@ -249,7 +249,7 @@ class UpdateRegistry implements EventSubscriberInterface {
    *   (optional) Limits the extension update files loaded to the provided
    *   extension.
    */
-  protected function scanExtensionsAndLoadUpdateFiles(string $extension = NULL) {
+  protected function scanExtensionsAndLoadUpdateFiles(?string $extension = NULL) {
     if ($extension !== NULL && isset(self::$loadedFiles[$this->root][$this->sitePath][$extension][$this->updateType])) {
       // We've already checked for this file and, if it exists, loaded it.
       return;
@@ -287,6 +287,7 @@ class UpdateRegistry implements EventSubscriberInterface {
 
   /**
    * @return bool
+   *   TRUE if themes are to be updated, FALSE otherwise.
    */
   protected function includeThemes(): bool {
     return $this->updateType === 'post_update';

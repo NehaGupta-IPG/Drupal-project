@@ -52,35 +52,7 @@ final class InputStreamUploadedFile implements UploadedFileInterface {
   /**
    * {@inheritdoc}
    */
-  public function supportsMoveUploadedFile(): bool {
-    return FALSE;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public function getPathname(): string {
-    throw new \BadMethodCallException(__METHOD__ . ' not implemented');
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function isValid(): bool {
-    throw new \BadMethodCallException(__METHOD__ . ' not implemented');
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getErrorMessage(): string {
-    throw new \BadMethodCallException(__METHOD__ . ' not implemented');
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getError(): int {
     throw new \BadMethodCallException(__METHOD__ . ' not implemented');
   }
 

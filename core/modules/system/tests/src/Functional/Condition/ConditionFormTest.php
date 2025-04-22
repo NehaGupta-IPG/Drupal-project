@@ -18,6 +18,9 @@ use Drupal\Tests\BrowserTestBase;
  */
 class ConditionFormTest extends BrowserTestBase {
 
+  /**
+   * {@inheritdoc}
+   */
   protected static $modules = ['node', 'condition_test'];
 
   /**
@@ -28,7 +31,7 @@ class ConditionFormTest extends BrowserTestBase {
   /**
    * Submit the condition_node_type_test_form to test condition forms.
    */
-  public function testConfigForm() {
+  public function testConfigForm(): void {
     $this->drupalCreateContentType(['type' => 'page', 'name' => 'Page']);
     $this->drupalCreateContentType(['type' => 'article', 'name' => 'Article']);
 

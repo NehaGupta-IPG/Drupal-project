@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\update\Functional;
 
+use Behat\Mink\Element\NodeElement;
 use Drupal\Core\Url;
 use Drupal\Tests\BrowserTestBase;
 
@@ -64,10 +65,10 @@ abstract class UpdateTestBase extends BrowserTestBase {
   /**
    * Refreshes the update status based on the desired available update scenario.
    *
-   * @param $xml_map
+   * @param array $xml_map
    *   Array that maps project names to availability scenarios to fetch. The key
    *   '#all' is used if a project-specific mapping is not defined.
-   * @param $url
+   * @param string $url
    *   (optional) A string containing the URL to fetch update data from.
    *   Defaults to 'update-test'.
    *
@@ -215,7 +216,7 @@ abstract class UpdateTestBase extends BrowserTestBase {
    *   (optional) The expected label for the newer version. For example
    *   'Recommended version:' or 'Also available:'.
    */
-  protected function confirmUnsupportedStatus(string $unsupported_version, string $newer_version = NULL, string $new_version_label = NULL) {
+  protected function confirmUnsupportedStatus(string $unsupported_version, ?string $newer_version = NULL, ?string $new_version_label = NULL) {
     $this->drupalGet('admin/reports/updates');
     $this->clickLink('Check manually');
     $this->checkForMetaRefresh();
@@ -294,7 +295,7 @@ abstract class UpdateTestBase extends BrowserTestBase {
    * @return \Behat\Mink\Element\NodeElement
    *   The update element.
    */
-  protected function findUpdateElementByLabel($label, int $index = 0) {
+  protected function findUpdateElementByLabel($label, int $index = 0): NodeElement {
     $update_elements = $this->getSession()->getPage()
       ->findAll('css', $this->updateTableLocator . " .project-update__version:contains(\"$label\")");
     $this->assertGreaterThanOrEqual($index, count($update_elements));

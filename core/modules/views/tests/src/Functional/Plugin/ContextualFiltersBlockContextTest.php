@@ -19,9 +19,7 @@ class ContextualFiltersBlockContextTest extends ViewTestBase {
   use AssertPageCacheContextsAndTagsTrait;
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = [
     'block',
@@ -87,7 +85,7 @@ class ContextualFiltersBlockContextTest extends ViewTestBase {
   /**
    * Tests exposed context.
    */
-  public function testBlockContext() {
+  public function testBlockContext(): void {
     $this->drupalLogin($this->drupalCreateUser([
       'administer views',
       'administer blocks',

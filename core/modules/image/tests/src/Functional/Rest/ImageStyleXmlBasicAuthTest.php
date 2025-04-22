@@ -40,12 +40,4 @@ class ImageStyleXmlBasicAuthTest extends ImageStyleResourceTestBase {
    */
   protected static $auth = 'basic_auth';
 
-  /**
-   * {@inheritdoc}
-   */
-  public function testGet() {
-    // @todo Remove this method override in https://www.drupal.org/node/2905655
-    $this->markTestSkipped();
-  }
-
 }

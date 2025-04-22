@@ -33,7 +33,7 @@ final class NavigationShortcutsBlock extends BlockBase implements ContainerFacto
    * @param array $configuration
    *   A configuration array containing information about the plugin instance.
    * @param string $plugin_id
-   *   The plugin_id for the plugin instance.
+   *   The plugin ID for the plugin instance.
    * @param mixed $plugin_definition
    *   The plugin implementation definition.
    * @param \Drupal\Core\Extension\ModuleHandlerInterface $moduleHandler
@@ -59,12 +59,6 @@ final class NavigationShortcutsBlock extends BlockBase implements ContainerFacto
    * {@inheritdoc}
    */
   protected function blockAccess(AccountInterface $account): AccessResultInterface {
-    // This navigation block requires shortcut module. Once the plugin is moved
-    // to the module, this should not be necessary.
-    if (!$this->moduleHandler->moduleExists('shortcut')) {
-      return AccessResult::forbidden();
-    }
-
     return AccessResult::allowedIfHasPermission($account, 'access shortcuts');
   }
 
@@ -72,6 +66,11 @@ final class NavigationShortcutsBlock extends BlockBase implements ContainerFacto
    * {@inheritdoc}
    */
   public function build(): array {
+    // This navigation block requires shortcut module. Once the plugin is moved
+    // to the module, this should not be necessary.
+    if (!$this->moduleHandler->moduleExists('shortcut')) {
+      return [];
+    }
     return [
       'shortcuts' => [
         // @phpstan-ignore-next-line
@@ -82,7 +81,20 @@ final class NavigationShortcutsBlock extends BlockBase implements ContainerFacto
           'contexts' => ['user'],
         ],
         '#lazy_builder_preview' => [
-          '#markup' => '<a href="#" class="toolbar-tray-lazy-placeholder-link">&nbsp;</a>',
+          [
+            '#theme' => 'navigation_menu',
+            '#menu_name' => 'shortcuts',
+            '#title' => $this->configuration['label'],
+            '#items' => [
+              [
+                'title' => $this->configuration['label'],
+                'class' => 'shortcuts',
+                'icon' => [
+                  'icon_id' => 'shortcuts',
+                ],
+              ],
+            ],
+          ],
         ],
       ],
     ];

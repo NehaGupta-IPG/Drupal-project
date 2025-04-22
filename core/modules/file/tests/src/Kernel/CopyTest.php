@@ -40,7 +40,7 @@ class CopyTest extends FileManagedUnitTestBase {
    *
    * @covers ::copy
    */
-  public function testNormal() {
+  public function testNormal(): void {
     $contents = $this->randomMachineName(10);
     $source = $this->createFile(NULL, $contents);
     $desired_uri = 'public://' . $this->randomMachineName();
@@ -71,7 +71,7 @@ class CopyTest extends FileManagedUnitTestBase {
    *
    * @covers ::copy
    */
-  public function testExistingRename() {
+  public function testExistingRename(): void {
     // Setup a file to overwrite.
     $contents = $this->randomMachineName(10);
     $source = $this->createFile(NULL, $contents);
@@ -113,7 +113,7 @@ class CopyTest extends FileManagedUnitTestBase {
    *
    * @covers ::copy
    */
-  public function testExistingReplace() {
+  public function testExistingReplace(): void {
     // Setup a file to overwrite.
     $contents = $this->randomMachineName(10);
     $source = $this->createFile(NULL, $contents);
@@ -153,7 +153,7 @@ class CopyTest extends FileManagedUnitTestBase {
    *
    * @covers ::copy
    */
-  public function testExistingError() {
+  public function testExistingError(): void {
     $contents = $this->randomMachineName(10);
     $source = $this->createFile();
     $target = $this->createFile(NULL, $contents);
@@ -162,12 +162,11 @@ class CopyTest extends FileManagedUnitTestBase {
     // Clone the object so we don't have to worry about the function changing
     // our reference copy.
     try {
-      $result = $this->fileRepository->copy(clone $source, $target->getFileUri(), FileExists::Error);
+      $this->fileRepository->copy(clone $source, $target->getFileUri(), FileExists::Error);
       $this->fail('expected FileExistsException');
     }
     // FileExistsException is a subclass of FileException.
     catch (FileExistsException $e) {
-      // expected exception.
       $this->assertStringContainsString("could not be copied because a file by that name already exists in the destination directory", $e->getMessage());
     }
     // Check the contents were not changed.
@@ -185,7 +184,7 @@ class CopyTest extends FileManagedUnitTestBase {
    *
    * @covers ::copy
    */
-  public function testInvalidStreamWrapper() {
+  public function testInvalidStreamWrapper(): void {
     $this->expectException(InvalidStreamWrapperException::class);
     $this->expectExceptionMessage('Invalid stream wrapper: foo://');
     $source = $this->createFile();
@@ -197,7 +196,7 @@ class CopyTest extends FileManagedUnitTestBase {
    *
    * @covers ::copy
    */
-  public function testEntityStorageException() {
+  public function testEntityStorageException(): void {
     /** @var \Drupal\Core\Entity\EntityTypeManager $entityTypeManager */
     $entityTypeManager = $this->prophesize(EntityTypeManager::class);
     $entityTypeManager->getStorage('file')

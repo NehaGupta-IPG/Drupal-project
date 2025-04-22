@@ -88,7 +88,7 @@ class PermissionHandlerTest extends UnitTestCase {
    * @covers ::buildPermissionsYaml
    * @covers ::moduleProvidesPermissions
    */
-  public function testBuildPermissionsYaml() {
+  public function testBuildPermissionsYaml(): void {
     vfsStreamWrapper::register();
     $root = new vfsStreamDirectory('modules');
     vfsStreamWrapper::setRoot($root);
@@ -153,7 +153,7 @@ EOF
    * @covers ::buildPermissionsYaml
    * @covers ::sortPermissions
    */
-  public function testBuildPermissionsSortPerModule() {
+  public function testBuildPermissionsSortPerModule(): void {
     vfsStreamWrapper::register();
     $root = new vfsStreamDirectory('modules');
     vfsStreamWrapper::setRoot($root);
@@ -209,7 +209,7 @@ EOF
    * @covers ::getPermissions
    * @covers ::buildPermissionsYaml
    */
-  public function testBuildPermissionsYamlCallback() {
+  public function testBuildPermissionsYamlCallback(): void {
     vfsStreamWrapper::register();
     $root = new vfsStreamDirectory('modules');
     vfsStreamWrapper::setRoot($root);
@@ -253,10 +253,22 @@ EOF
     $this->callableResolver->expects($this->exactly(4))
       ->method('getCallableFromDefinition')
       ->willReturnMap([
-        ['Drupal\\user\\Tests\\TestPermissionCallbacks::singleDescription', [new TestPermissionCallbacks(), 'singleDescription']],
-        ['Drupal\\user\\Tests\\TestPermissionCallbacks::titleDescription', [new TestPermissionCallbacks(), 'titleDescription']],
-        ['Drupal\\user\\Tests\\TestPermissionCallbacks::titleProvider', [new TestPermissionCallbacks(), 'titleProvider']],
-        ['Drupal\\user\\Tests\\TestPermissionCallbacks::titleDescriptionRestrictAccess', [new TestPermissionCallbacks(), 'titleDescriptionRestrictAccess']],
+        [
+          'Drupal\\user\\Tests\\TestPermissionCallbacks::singleDescription',
+          [new TestPermissionCallbacks(), 'singleDescription'],
+        ],
+        [
+          'Drupal\\user\\Tests\\TestPermissionCallbacks::titleDescription',
+          [new TestPermissionCallbacks(), 'titleDescription'],
+        ],
+        [
+          'Drupal\\user\\Tests\\TestPermissionCallbacks::titleProvider',
+          [new TestPermissionCallbacks(), 'titleProvider'],
+        ],
+        [
+          'Drupal\\user\\Tests\\TestPermissionCallbacks::titleDescriptionRestrictAccess',
+          [new TestPermissionCallbacks(), 'titleDescriptionRestrictAccess'],
+        ],
       ]);
 
     $module_extension_list = $this->createMock(ModuleExtensionList::class);
@@ -270,7 +282,7 @@ EOF
   /**
    * Tests a YAML file containing both static permissions and a callback.
    */
-  public function testPermissionsYamlStaticAndCallback() {
+  public function testPermissionsYamlStaticAndCallback(): void {
     vfsStreamWrapper::register();
     $root = new vfsStreamDirectory('modules');
     vfsStreamWrapper::setRoot($root);
@@ -323,7 +335,7 @@ EOF
    * Checks that the permissions are like expected.
    *
    * @param array $actual_permissions
-   *   The actual permissions
+   *   The actual permissions.
    *
    * @internal
    */
@@ -341,14 +353,23 @@ EOF
 
 }
 
+/**
+ * Provider for testing permissions callbacks.
+ */
 class TestPermissionCallbacks {
 
+  /**
+   * Callback that returns a single description.
+   */
   public function singleDescription() {
     return [
       'access_module_a' => 'single_description',
     ];
   }
 
+  /**
+   * Callback that returns the title and description.
+   */
   public function titleDescription() {
     return [
       'access module b' => [
@@ -358,6 +379,9 @@ class TestPermissionCallbacks {
     ];
   }
 
+  /**
+   * Callback that returns restricted access.
+   */
   public function titleDescriptionRestrictAccess() {
     return [
       'access_module_c' => [
@@ -368,6 +392,9 @@ class TestPermissionCallbacks {
     ];
   }
 
+  /**
+   * Callback that returns the title.
+   */
   public function titleProvider() {
     return [
       'access module a via module b' => [
@@ -388,6 +415,7 @@ class TestTranslationManager implements TranslationInterface {
    * {@inheritdoc}
    */
   public function translate($string, array $args = [], array $options = []) {
+    // phpcs:ignore Drupal.Semantics.FunctionT.NotLiteralString
     return new TranslatableMarkup($string, $args, $options, $this);
   }
 

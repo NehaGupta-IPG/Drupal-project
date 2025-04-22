@@ -19,6 +19,9 @@ use Drupal\views\Attribute\ViewsPager;
 )]
 class Some extends PagerPluginBase {
 
+  /**
+   * {@inheritdoc}
+   */
   public function summaryTitle() {
     $summary_text = '';
     if ($this->options['items_per_page'] == 0) {
@@ -40,6 +43,9 @@ class Some extends PagerPluginBase {
     return $summary_text;
   }
 
+  /**
+   * {@inheritdoc}
+   */
   protected function defineOptions() {
     $options = parent::defineOptions();
     $options['items_per_page'] = ['default' => 10];
@@ -71,14 +77,23 @@ class Some extends PagerPluginBase {
     ];
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function usePager() {
     return FALSE;
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function useCountQuery() {
     return FALSE;
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function query() {
     $this->view->query->setLimit($this->options['items_per_page']);
     $this->view->query->setOffset($this->options['offset']);

@@ -17,6 +17,7 @@ use Drupal\Core\Layout\LayoutDefinition;
 use Drupal\Core\Layout\LayoutInterface;
 use Drupal\Core\Layout\LayoutPluginManager;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\Core\Theme\ThemeManagerInterface;
 use Drupal\Tests\UnitTestCase;
 use org\bovigo\vfs\vfsStream;
 use Prophecy\Argument;
@@ -44,6 +45,13 @@ class LayoutPluginManagerTest extends UnitTestCase {
   protected $themeHandler;
 
   /**
+   * The theme manager.
+   *
+   * @var \Drupal\Core\Theme\ThemeManagerInterface
+   */
+  protected $themeManager;
+
+  /**
    * Cache backend instance.
    *
    * @var \Drupal\Core\Cache\CacheBackendInterface
@@ -67,6 +75,8 @@ class LayoutPluginManagerTest extends UnitTestCase {
 
     $container = new ContainerBuilder();
     $container->set('string_translation', $this->getStringTranslationStub());
+    $this->themeManager = $this->prophesize(ThemeManagerInterface::class);
+    $container->set('theme.manager', $this->themeManager->reveal());
     \Drupal::setContainer($container);
 
     $this->moduleHandler = $this->prophesize(ModuleHandlerInterface::class);
@@ -104,7 +114,7 @@ class LayoutPluginManagerTest extends UnitTestCase {
    * @covers ::getDefinitions
    * @covers ::providerExists
    */
-  public function testGetDefinitions() {
+  public function testGetDefinitions(): void {
     $expected = [
       'module_a_provided_layout',
       'theme_a_provided_layout',
@@ -121,7 +131,7 @@ class LayoutPluginManagerTest extends UnitTestCase {
    * @covers ::getDefinition
    * @covers ::processDefinition
    */
-  public function testGetDefinition() {
+  public function testGetDefinition(): void {
     $layout_definition = $this->layoutPluginManager->getDefinition('theme_a_provided_layout');
     $this->assertSame('theme_a_provided_layout', $layout_definition->id());
     $this->assertSame('2 column layout', (string) $layout_definition->getLabel());
@@ -243,7 +253,7 @@ class LayoutPluginManagerTest extends UnitTestCase {
   /**
    * @covers ::processDefinition
    */
-  public function testProcessDefinition() {
+  public function testProcessDefinition(): void {
     $this->moduleHandler->alter('layout', Argument::type('array'))->shouldNotBeCalled();
     $this->expectException(InvalidPluginDefinitionException::class);
     $this->expectExceptionMessage('The "module_a_derived_layout:array_based" layout definition must extend ' . LayoutDefinition::class);
@@ -265,7 +275,7 @@ EOS;
   /**
    * @covers ::getThemeImplementations
    */
-  public function testGetThemeImplementations() {
+  public function testGetThemeImplementations(): void {
     $core_path = '/core/lib/Drupal/Core';
     $expected = [
       'layout' => [
@@ -297,7 +307,7 @@ EOS;
   /**
    * @covers ::getCategories
    */
-  public function testGetCategories() {
+  public function testGetCategories(): void {
     $expected = [
       'Columns: 1',
       'Columns: 2',
@@ -309,7 +319,7 @@ EOS;
   /**
    * @covers ::getSortedDefinitions
    */
-  public function testGetSortedDefinitions() {
+  public function testGetSortedDefinitions(): void {
     // Sorted by category first, then label.
     $expected = [
       'module_a_provided_layout',
@@ -326,7 +336,7 @@ EOS;
   /**
    * @covers ::getGroupedDefinitions
    */
-  public function testGetGroupedDefinitions() {
+  public function testGetGroupedDefinitions(): void {
     $category_expected = [
       'Columns: 1' => [
         'module_a_provided_layout',
@@ -348,9 +358,31 @@ EOS;
   }
 
   /**
+   * Test that modules and themes can alter the list of layouts.
+   *
+   * @covers ::getLayoutOptions
+   */
+  public function testGetLayoutOptions(): void {
+    $this->moduleHandler->alter(
+      ['plugin_filter_layout', 'plugin_filter_layout__layout'],
+      Argument::type('array'),
+      [],
+      'layout',
+    )->shouldBeCalled();
+    $this->themeManager->alter(
+      ['plugin_filter_layout', 'plugin_filter_layout__layout'],
+      Argument::type('array'),
+      [],
+      'layout',
+    )->shouldBeCalled();
+
+    $this->layoutPluginManager->getLayoutOptions();
+  }
+
+  /**
    * Sets up the filesystem with YAML files and annotated plugins.
    */
-  protected function setUpFilesystem() {
+  protected function setUpFilesystem(): void {
     $module_a_provided_layout = <<<'EOS'
 module_a_provided_layout:
   label: 1 column layout

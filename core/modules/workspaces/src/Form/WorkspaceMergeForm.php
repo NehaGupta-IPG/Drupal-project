@@ -12,6 +12,8 @@ use Drupal\workspaces\WorkspaceInterface;
 use Drupal\workspaces\WorkspaceOperationFactory;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
+// cspell:ignore differring
+
 /**
  * Provides a form that merges the contents for a workspace into another one.
  */
@@ -78,7 +80,7 @@ class WorkspaceMergeForm extends ConfirmFormBase implements ContainerInjectionIn
   /**
    * {@inheritdoc}
    */
-  public function buildForm(array $form, FormStateInterface $form_state, WorkspaceInterface $source_workspace = NULL, WorkspaceInterface $target_workspace = NULL) {
+  public function buildForm(array $form, FormStateInterface $form_state, ?WorkspaceInterface $source_workspace = NULL, ?WorkspaceInterface $target_workspace = NULL) {
     $this->sourceWorkspace = $source_workspace;
     $this->targetWorkspace = $target_workspace;
 

@@ -87,7 +87,7 @@ class FilterDateTest extends DateTimeHandlerTestBase {
   /**
    * Tests offsets with date-only fields.
    */
-  public function testDateOffsets() {
+  public function testDateOffsets(): void {
     $view = Views::getView('test_filter_datetime');
     $field = static::$fieldName . '_value';
 
@@ -171,7 +171,7 @@ class FilterDateTest extends DateTimeHandlerTestBase {
   /**
    * Tests date filter with date-only fields.
    */
-  public function testDateIs() {
+  public function testDateIs(): void {
     $view = Views::getView('test_filter_datetime');
     $field = static::$fieldName . '_value';
 
@@ -222,7 +222,7 @@ class FilterDateTest extends DateTimeHandlerTestBase {
    * @param array $dates
    *   An array of DATETIME_DATE_STORAGE_FORMAT date values.
    */
-  protected function updateNodesDateFieldsValues(array $dates) {
+  protected function updateNodesDateFieldsValues(array $dates): void {
     foreach ($dates as $index => $date) {
       $this->nodes[$index]->{static::$fieldName}->value = $date;
       $this->nodes[$index]->save();

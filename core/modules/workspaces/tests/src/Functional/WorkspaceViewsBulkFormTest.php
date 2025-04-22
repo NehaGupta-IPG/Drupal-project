@@ -20,7 +20,7 @@ class WorkspaceViewsBulkFormTest extends BulkFormTest {
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['block', 'workspaces', 'workspaces_test'];
+  protected static $modules = ['block', 'workspaces', 'workspaces_ui', 'workspaces_test'];
 
   /**
    * {@inheritdoc}
@@ -44,7 +44,10 @@ class WorkspaceViewsBulkFormTest extends BulkFormTest {
     $this->switchToWorkspace($stage);
   }
 
-  public function testBulkForm() {
+  /**
+   * Tests the Workspaces view bulk form integration.
+   */
+  public function testBulkForm(): void {
     // Ignore entity types that are not being tested, in order to fully re-use
     // the parent test method.
     $this->ignoreEntityType('view');

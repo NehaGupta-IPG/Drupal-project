@@ -19,9 +19,7 @@ class NodeTitleTest extends NodeTestBase {
   use AssertBreadcrumbTrait;
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['comment', 'views', 'block'];
 
@@ -58,7 +56,7 @@ class NodeTitleTest extends NodeTestBase {
   /**
    * Creates one node and tests if the node title has the correct value.
    */
-  public function testNodeTitle() {
+  public function testNodeTitle(): void {
     // Create "Basic page" content with title.
     // Add the node to the frontpage so we can test if teaser links are
     // clickable.

@@ -142,8 +142,8 @@ class DefaultPluginManager extends PluginManagerBase implements PluginManagerInt
    * @param string|null $plugin_definition_attribute_name
    *   (optional) The name of the attribute that contains the plugin definition.
    * @param string|array|null $plugin_definition_annotation_name
-   *   (optional) The name of the annotation that contains the plugin definition.
-   *   Defaults to 'Drupal\Component\Annotation\Plugin'.
+   *   (optional) The name of the annotation that contains the plugin
+   *   definition. Defaults to 'Drupal\Component\Annotation\Plugin'.
    * @param string[] $additional_annotation_namespaces
    *   (optional) Additional namespaces to scan for annotation definitions.
    *
@@ -151,7 +151,7 @@ class DefaultPluginManager extends PluginManagerBase implements PluginManagerInt
    * 'Drupal\Component\Plugin\Attribute\Plugin' once annotations are no longer
    * supported.
    */
-  public function __construct($subdir, \Traversable $namespaces, ModuleHandlerInterface $module_handler, $plugin_interface = NULL, ?string $plugin_definition_attribute_name = NULL, string|array $plugin_definition_annotation_name = NULL, array $additional_annotation_namespaces = []) {
+  public function __construct($subdir, \Traversable $namespaces, ModuleHandlerInterface $module_handler, $plugin_interface = NULL, ?string $plugin_definition_attribute_name = NULL, string|array|null $plugin_definition_annotation_name = NULL, array $additional_annotation_namespaces = []) {
     $this->subdir = $subdir;
     $this->namespaces = $namespaces;
     $this->moduleHandler = $module_handler;
@@ -355,7 +355,7 @@ class DefaultPluginManager extends PluginManagerBase implements PluginManagerInt
    *
    * @param mixed $plugin_definition
    *   The plugin definition. Usually either an array or an instance of
-   *   \Drupal\Component\Plugin\Definition\PluginDefinitionInterface
+   *   \Drupal\Component\Plugin\Definition\PluginDefinitionInterface.
    *
    * @return string|null
    *   The provider string, if it exists. NULL otherwise.
@@ -378,7 +378,7 @@ class DefaultPluginManager extends PluginManagerBase implements PluginManagerInt
   /**
    * Invokes the hook to alter the definitions if the alter hook is set.
    *
-   * @param $definitions
+   * @param array $definitions
    *   The discovered plugin definitions.
    */
   protected function alterDefinitions(&$definitions) {

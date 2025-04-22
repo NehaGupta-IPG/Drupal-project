@@ -6,7 +6,6 @@ namespace Drupal\Tests\filter\Kernel\Plugin\migrate\process;
 
 use Drupal\filter\Plugin\migrate\process\FilterSettings;
 use Drupal\migrate\MigrateExecutableInterface;
-use Drupal\migrate\Plugin\MigrationInterface;
 use Drupal\migrate\Row;
 use Drupal\Tests\migrate\Unit\MigrateTestCase;
 
@@ -24,8 +23,7 @@ class FilterSettingsTest extends MigrateTestCase {
    * @dataProvider dataProvider
    * @covers ::transform
    */
-  public function testTransform($value, $destination_id, $expected_value) {
-    $migration = $this->createMock(MigrationInterface::class);
+  public function testTransform($value, $destination_id, $expected_value): void {
     $plugin = new FilterSettings([], 'filter_settings', []);
 
     $executable = $this->createMock(MigrateExecutableInterface::class);
@@ -45,6 +43,7 @@ class FilterSettingsTest extends MigrateTestCase {
    * The test data provider.
    *
    * @return array
+   *   An array of test data.
    */
   public static function dataProvider() {
     return [

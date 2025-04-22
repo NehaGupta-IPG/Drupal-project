@@ -125,7 +125,7 @@ class BlockContentAccessHandlerTest extends KernelTestBase {
    *   assert parent will not be called.
    * @param string $expected_access
    *   The expected access for the user and block content. Valid values are
-   *   class names of classes implementing AccessResultInterface
+   *   class names of classes implementing AccessResultInterface.
    * @param string|null $expected_access_message
    *   The expected access message.
    *
@@ -136,7 +136,7 @@ class BlockContentAccessHandlerTest extends KernelTestBase {
    * @phpstan-param class-string<\Drupal\Core\Access\AccessResultInterface>|null $parent_access
    * @phpstan-param class-string<\Drupal\Core\Access\AccessResultInterface> $expected_access
    */
-  public function testAccess(string $operation, bool $published, bool $reusable, array $permissions, bool $isLatest, ?string $parent_access, string $expected_access, ?string $expected_access_message = NULL) {
+  public function testAccess(string $operation, bool $published, bool $reusable, array $permissions, bool $isLatest, ?string $parent_access, string $expected_access, ?string $expected_access_message = NULL): void {
     /** @var \Drupal\Core\Entity\RevisionableStorageInterface $entityStorage */
     $entityStorage = \Drupal::entityTypeManager()->getStorage('block_content');
 
@@ -162,8 +162,7 @@ class BlockContentAccessHandlerTest extends KernelTestBase {
       }
       $this->role->save();
     }
-    $user->addRole($this->role->id());
-    $user->save();
+    $user->addRole($this->role->id())->save();
 
     if ($parent_access !== NULL) {
       $parent_entity = $this->prophesize(AccessibleInterface::class);

@@ -20,7 +20,6 @@ use GuzzleHttp\RequestOptions;
  * JSON:API regression tests.
  *
  * @group jsonapi
- * @group #slow
  *
  * @internal
  */
@@ -45,10 +44,10 @@ class JsonApiFilterRegressionTest extends JsonApiFunctionalTestBase {
    *
    * @see https://www.drupal.org/project/drupal/issues/2953207
    */
-  public function testBundleSpecificTargetEntityTypeFromIssue2953207() {
+  public function testBundleSpecificTargetEntityTypeFromIssue2953207(): void {
     // Set up data model.
     $this->assertTrue($this->container->get('module_installer')->install(['comment'], TRUE), 'Installed modules.');
-    $this->addDefaultCommentField('taxonomy_term', 'tags', 'comment', CommentItemInterface::OPEN, 'tcomment');
+    $this->addDefaultCommentField('taxonomy_term', 'tags', 'comment', CommentItemInterface::OPEN, 'test_comment_type');
     $this->rebuildAll();
 
     // Create data.
@@ -67,7 +66,7 @@ class JsonApiFilterRegressionTest extends JsonApiFunctionalTestBase {
     $user = $this->drupalCreateUser([
       'access comments',
     ]);
-    $response = $this->request('GET', Url::fromUri('internal:/jsonapi/comment/tcomment?include=entity_id&filter[entity_id.name]=foobar'), [
+    $response = $this->request('GET', Url::fromUri('internal:/jsonapi/comment/test_comment_type?include=entity_id&filter[entity_id.name]=foobar'), [
       RequestOptions::AUTH => [
         $user->getAccountName(),
         $user->pass_raw,
@@ -81,7 +80,7 @@ class JsonApiFilterRegressionTest extends JsonApiFunctionalTestBase {
    *
    * @see https://www.drupal.org/project/drupal/issues/3015759
    */
-  public function testFilterByIdFromIssue3015759() {
+  public function testFilterByIdFromIssue3015759(): void {
     // Set up data model.
     $this->assertTrue($this->container->get('module_installer')->install(['shortcut'], TRUE), 'Installed modules.');
     $this->rebuildAll();
@@ -121,7 +120,7 @@ class JsonApiFilterRegressionTest extends JsonApiFunctionalTestBase {
    *
    * @see https://www.drupal.org/project/jsonapi/issues/3025372
    */
-  public function testEmptyRelationshipFilteringFromIssue3025372() {
+  public function testEmptyRelationshipFilteringFromIssue3025372(): void {
     // Set up data model.
     $this->drupalCreateContentType(['type' => 'folder']);
     $this->createEntityReferenceField(
@@ -181,7 +180,7 @@ class JsonApiFilterRegressionTest extends JsonApiFunctionalTestBase {
    *
    * @see https://www.drupal.org/project/drupal/issues/3036593
    */
-  public function testFilteringEntitiesByEntityReferenceTargetId() {
+  public function testFilteringEntitiesByEntityReferenceTargetId(): void {
     // Create two config entities to be the config targets of an entity
     // reference. In this case, the `roles` field.
     $role_llamalovers = $this->drupalCreateRole([], 'llamalovers', 'Llama Lovers');
@@ -191,8 +190,8 @@ class JsonApiFilterRegressionTest extends JsonApiFunctionalTestBase {
     for ($i = 0; $i < 3; $i++) {
       // Create 3 users, one with the first role and two with the second role.
       $users[$i] = $this->drupalCreateUser();
-      $users[$i]->addRole($i === 0 ? $role_llamalovers : $role_catcuddlers);
-      $users[$i]->save();
+      $users[$i]->addRole($i === 0 ? $role_llamalovers : $role_catcuddlers)
+        ->save();
       // For each user, create a node that is owned by that user. The node's
       // `uid` field will be used to test filtering by a content entity ID.
       Node::create([

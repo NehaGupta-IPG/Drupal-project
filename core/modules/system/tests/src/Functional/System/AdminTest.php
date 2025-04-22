@@ -29,9 +29,7 @@ class AdminTest extends BrowserTestBase {
   protected $webUser;
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['locale', 'menu_test'];
 
@@ -61,7 +59,7 @@ class AdminTest extends BrowserTestBase {
   /**
    * Tests output on administrative listing pages.
    */
-  public function testAdminPages() {
+  public function testAdminPages(): void {
     // Go to Administration.
     $this->drupalGet('admin');
 
@@ -134,11 +132,13 @@ class AdminTest extends BrowserTestBase {
    * Returns all top level menu links.
    *
    * @return \Drupal\Core\Menu\MenuLinkTreeElement[]
+   *   The top level menu links.
    */
   protected function getTopLevelMenuLinks() {
     $menu_tree = \Drupal::menuTree();
 
-    // The system.admin link is normally the parent of all top-level admin links.
+    // The system.admin link is normally the parent of all top-level admin
+    // links.
     $parameters = new MenuTreeParameters();
     $parameters->setRoot('system.admin')->excludeRoot()->setTopLevelOnly()->onlyEnabledLinks();
     $tree = $menu_tree->load(NULL, $parameters);
@@ -152,7 +152,7 @@ class AdminTest extends BrowserTestBase {
   /**
    * Tests compact mode.
    */
-  public function testCompactMode() {
+  public function testCompactMode(): void {
     $session = $this->getSession();
 
     // The front page defaults to 'user/login', which redirects to 'user/{user}'

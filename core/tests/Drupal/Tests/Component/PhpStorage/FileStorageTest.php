@@ -6,9 +6,8 @@ namespace Drupal\Tests\Component\PhpStorage;
 
 use Drupal\Component\PhpStorage\FileStorage;
 use Drupal\Component\Utility\Random;
-use Drupal\Tests\Traits\PhpUnitWarnings;
+use Drupal\TestTools\Extension\DeprecationBridge\ExpectDeprecationTrait;
 use org\bovigo\vfs\vfsStreamDirectory;
-use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 
 /**
  * @coversDefaultClass \Drupal\Component\PhpStorage\FileStorage
@@ -17,7 +16,7 @@ use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
  */
 class FileStorageTest extends PhpStorageTestBase {
 
-  use PhpUnitWarnings, ExpectDeprecationTrait;
+  use ExpectDeprecationTrait;
 
   /**
    * Standard test settings to pass to storage instances.
@@ -46,7 +45,7 @@ class FileStorageTest extends PhpStorageTestBase {
    * @covers ::exists
    * @covers ::delete
    */
-  public function testCRUD() {
+  public function testCRUD(): void {
     $php = new FileStorage($this->standardSettings);
     $this->assertCRUD($php);
   }
@@ -54,7 +53,7 @@ class FileStorageTest extends PhpStorageTestBase {
   /**
    * @covers ::deleteAll
    */
-  public function testDeleteAll() {
+  public function testDeleteAll(): void {
     // Random generator.
     $random_generator = new Random();
 
@@ -89,7 +88,7 @@ class FileStorageTest extends PhpStorageTestBase {
   /**
    * @covers ::createDirectory
    */
-  public function testCreateDirectoryFailWarning() {
+  public function testCreateDirectoryFailWarning(): void {
     $directory = new vfsStreamDirectory('permissionDenied', 0200);
     $storage = new FileStorage([
       'directory' => $directory->url(),

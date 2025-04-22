@@ -33,14 +33,14 @@ class UpdatePathTestJavaScriptTest extends BrowserTestBase {
    *
    * @see ::doPreUpdateTests
    */
-  public function testJavaScriptLoading() {
+  public function testJavaScriptLoading(): void {
     $this->runUpdates();
   }
 
   /**
    * {@inheritdoc}
    */
-  protected function doSelectionTest() {
+  protected function doSelectionTest(): void {
     // Ensure that at least one JS script has drupalSettings in there.
     $scripts = $this->xpath('//script');
     $found = FALSE;

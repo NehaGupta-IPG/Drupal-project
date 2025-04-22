@@ -37,7 +37,7 @@ class BackendCompilerPassTest extends UnitTestCase {
    *
    * @covers ::process
    */
-  public function testProcess() {
+  public function testProcess(): void {
     // Add a container with no set default_backend.
     $prefix = __NAMESPACE__ . '\\ServiceClass';
     $service = (new Definition($prefix . 'Default'))->addTag('backend_overridable');
@@ -71,27 +71,27 @@ class BackendCompilerPassTest extends UnitTestCase {
     $this->backendPass->process($container);
     $this->assertEquals($prefix . 'Default', get_class($container->get('service')));
 
-    // Set the mysql and the DrivertestMysql service, now the DrivertestMysql
+    // Set the mysql and the DriverTestMysql service, now the DriverTestMysql
     // service, as it is the driver override, should be used.
-    $container = $this->getDrivertestMysqlContainer($service);
+    $container = $this->getDriverTestMysqlContainer($service);
     $container->setDefinition('mysql.service', new Definition(__NAMESPACE__ . '\\ServiceClassMysql'));
-    $container->setDefinition('DrivertestMysql.service', new Definition(__NAMESPACE__ . '\\ServiceClassDrivertestMysql'));
+    $container->setDefinition('DriverTestMysql.service', new Definition(__NAMESPACE__ . '\\ServiceClassDriverTestMysql'));
     $this->backendPass->process($container);
-    $this->assertEquals($prefix . 'DrivertestMysql', get_class($container->get('service')));
+    $this->assertEquals($prefix . 'DriverTestMysql', get_class($container->get('service')));
 
     // Set the mysql service, now the mysql service, as it is the database_type
     // override, should be used.
-    $container = $this->getDrivertestMysqlContainer($service);
+    $container = $this->getDriverTestMysqlContainer($service);
     $container->setDefinition('mysql.service', new Definition(__NAMESPACE__ . '\\ServiceClassMysql'));
     $this->backendPass->process($container);
     $this->assertEquals($prefix . 'Mysql', get_class($container->get('service')));
 
-    // Set the DrivertestMysql service, now the DrivertestMysql service, as it
+    // Set the DriverTestMysql service, now the DriverTestMysql service, as it
     // is the driver override, should be used.
-    $container = $this->getDrivertestMysqlContainer($service);
-    $container->setDefinition('DrivertestMysql.service', new Definition(__NAMESPACE__ . '\\ServiceClassDrivertestMysql'));
+    $container = $this->getDriverTestMysqlContainer($service);
+    $container->setDefinition('DriverTestMysql.service', new Definition(__NAMESPACE__ . '\\ServiceClassDriverTestMysql'));
     $this->backendPass->process($container);
-    $this->assertEquals($prefix . 'DrivertestMysql', get_class($container->get('service')));
+    $this->assertEquals($prefix . 'DriverTestMysql', get_class($container->get('service')));
   }
 
   /**
@@ -100,10 +100,11 @@ class BackendCompilerPassTest extends UnitTestCase {
    * This is necessary because the container clone does not clone the parameter
    * bag so the setParameter() call effects the parent container as well.
    *
-   * @param $service
+   * @param \Symfony\Component\DependencyInjection\Definition $service
    *   The service definition.
    *
    * @return \Symfony\Component\DependencyInjection\ContainerBuilder
+   *   The container with a sqlite database service in it.
    */
   protected function getSqliteContainer($service) {
     $container = new ContainerBuilder();
@@ -120,10 +121,11 @@ class BackendCompilerPassTest extends UnitTestCase {
    * This is necessary because the container clone does not clone the parameter
    * bag so the setParameter() call effects the parent container as well.
    *
-   * @param $service
+   * @param \Symfony\Component\DependencyInjection\Definition $service
    *   The service definition.
    *
    * @return \Symfony\Component\DependencyInjection\ContainerBuilder
+   *   The container with a mysql database service in it.
    */
   protected function getMysqlContainer($service) {
     $container = new ContainerBuilder();
@@ -133,37 +135,53 @@ class BackendCompilerPassTest extends UnitTestCase {
   }
 
   /**
-   * Creates a container with a DrivertestMysql database mock definition in it.
+   * Creates a container with a DriverTestMysql database mock definition in it.
    *
    * This is necessary because the container clone does not clone the parameter
    * bag so the setParameter() call effects the parent container as well.
    *
-   * @param $service
+   * @param \Symfony\Component\DependencyInjection\Definition $service
    *   The service definition.
    *
    * @return \Symfony\Component\DependencyInjection\ContainerBuilder
+   *   The container with a DriverTestMysql database service in it.
    */
-  protected function getDrivertestMysqlContainer($service) {
+  protected function getDriverTestMysqlContainer($service) {
     $container = new ContainerBuilder();
     $container->setDefinition('service', $service);
-    $mock = $this->getMockBuilder('Drupal\driver_test\Driver\Database\DrivertestMysql\Connection')->onlyMethods([])->disableOriginalConstructor()->getMock();
+    $mock = $this->getMockBuilder('Drupal\driver_test\Driver\Database\DriverTestMysql\Connection')->onlyMethods([])->disableOriginalConstructor()->getMock();
     $container->set('database', $mock);
     return $container;
   }
 
 }
 
+/**
+ * A class used for testing the backend compiler passes.
+ */
 class ServiceClassDefault {
 }
 
+/**
+ * A class used for testing the backend compiler passes.
+ */
 class ServiceClassMysql extends ServiceClassDefault {
 }
 
+/**
+ * A class used for testing the backend compiler passes.
+ */
 class ServiceClassMariaDb extends ServiceClassMysql {
 }
 
+/**
+ * A class used for testing the backend compiler passes.
+ */
 class ServiceClassSqlite extends ServiceClassDefault {
 }
 
-class ServiceClassDrivertestMysql extends ServiceClassDefault {
+/**
+ * A class used for testing the backend compiler passes.
+ */
+class ServiceClassDriverTestMysql extends ServiceClassDefault {
 }

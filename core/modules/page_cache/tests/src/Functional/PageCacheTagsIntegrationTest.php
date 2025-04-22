@@ -34,8 +34,7 @@ class PageCacheTagsIntegrationTest extends BrowserTestBase {
   protected $defaultTheme = 'olivero';
 
   /**
-   * Modules to enable.
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = [
     'big_pipe',
@@ -62,7 +61,7 @@ class PageCacheTagsIntegrationTest extends BrowserTestBase {
   /**
    * Tests that cache tags are properly bubbled up to the page level.
    */
-  public function testPageCacheTags() {
+  public function testPageCacheTags(): void {
     $config = $this->config('language.types');
     $config->set('configurable', [LanguageInterface::TYPE_INTERFACE, LanguageInterface::TYPE_CONTENT]);
     $config->set('negotiation.language_content.enabled', [

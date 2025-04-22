@@ -14,9 +14,7 @@ use Drupal\Tests\BrowserTestBase;
 class FieldUIIndentationTest extends BrowserTestBase {
 
   /**
-   * Modules to install.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['node', 'field_ui', 'field_ui_test'];
 
@@ -44,7 +42,10 @@ class FieldUIIndentationTest extends BrowserTestBase {
 
   }
 
-  public function testIndentation() {
+  /**
+   * Tests that the indentation classes are present in the content type display settings.
+   */
+  public function testIndentation(): void {
     $this->drupalGet('admin/structure/types/manage/page/display');
     $this->assertSession()->responseContains('js-indentation indentation');
   }

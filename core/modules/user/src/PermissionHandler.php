@@ -122,8 +122,8 @@ class PermissionHandler implements PermissionHandlerInterface {
    * {@inheritdoc}
    */
   public function moduleProvidesPermissions($module_name) {
-    // @TODO Static cache this information, see
-    // https://www.drupal.org/node/2339487
+    // @todo Static cache this information.
+    //   https://www.drupal.org/node/2339487
     $permissions = $this->getPermissions();
 
     foreach ($permissions as $permission) {
@@ -183,7 +183,9 @@ class PermissionHandler implements PermissionHandlerInterface {
             'title' => $permission,
           ];
         }
+        // phpcs:ignore Drupal.Semantics.FunctionT.NotLiteralString
         $permission['title'] = $this->t($permission['title']);
+        // phpcs:ignore Drupal.Semantics.FunctionT.NotLiteralString
         $permission['description'] = isset($permission['description']) ? $this->t($permission['description']) : NULL;
         $permission['provider'] = !empty($permission['provider']) ? $permission['provider'] : $provider;
       }

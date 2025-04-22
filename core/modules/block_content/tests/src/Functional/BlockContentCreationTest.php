@@ -8,6 +8,8 @@ use Drupal\block_content\BlockContentInterface;
 use Drupal\block_content\Entity\BlockContent;
 use Drupal\Core\Database\Database;
 
+// cspell:ignore testblock
+
 /**
  * Create a block and test saving it.
  *
@@ -16,7 +18,7 @@ use Drupal\Core\Database\Database;
 class BlockContentCreationTest extends BlockContentTestBase {
 
   /**
-   * Modules to enable.
+   * Modules to install.
    *
    * Enable dummy module that implements hook_block_insert() for exceptions and
    * field_ui to edit display settings.
@@ -53,7 +55,7 @@ class BlockContentCreationTest extends BlockContentTestBase {
   /**
    * Creates a "Basic block" block and verifies its consistency in the database.
    */
-  public function testBlockContentCreation() {
+  public function testBlockContentCreation(): void {
     $this->drupalLogin($this->adminUser);
 
     // Create a block.
@@ -72,12 +74,19 @@ class BlockContentCreationTest extends BlockContentTestBase {
     // Check that the block exists in the database.
     $block = $this->getBlockByLabel($edit['info[0][value]']);
     $this->assertNotEmpty($block, 'Content Block found in database.');
+
+    // Ensure a user with just the create permission can access the page.
+    $this->drupalLogin($this->drupalCreateUser([
+      'create basic block content',
+    ]));
+    $this->drupalGet('block/add/basic');
+    $this->assertSession()->statusCodeEquals(200);
   }
 
   /**
    * Creates a "Basic page" block with multiple view modes.
    */
-  public function testBlockContentCreationMultipleViewModes() {
+  public function testBlockContentCreationMultipleViewModes(): void {
     // Add a new view mode and verify if it is selected as expected.
     $this->drupalLogin($this->drupalCreateUser(['administer display modes']));
     $this->drupalGet('admin/structure/display-modes/view/add/block_content');
@@ -140,7 +149,7 @@ class BlockContentCreationTest extends BlockContentTestBase {
   /**
    * Tests the redirect workflow of creating a block_content and block.
    */
-  public function testBlockContentFormSubmitHandlers() {
+  public function testBlockContentFormSubmitHandlers(): void {
     $this->drupalLogin($this->adminUser);
 
     // Create a block and place in block layout.
@@ -193,7 +202,7 @@ class BlockContentCreationTest extends BlockContentTestBase {
    * Creates a content block from defaults and ensures that the 'basic block'
    * type is being used.
    */
-  public function testDefaultBlockContentCreation() {
+  public function testDefaultBlockContentCreation(): void {
     $edit = [];
     $edit['info[0][value]'] = $this->randomMachineName(8);
     $edit['body[0][value]'] = $this->randomMachineName(16);
@@ -212,13 +221,13 @@ class BlockContentCreationTest extends BlockContentTestBase {
   /**
    * Verifies that a transaction rolls back the failed creation.
    */
-  public function testFailedBlockCreation() {
+  public function testFailedBlockCreation(): void {
     // Create a block.
     try {
       $this->createBlockContent('fail_creation');
       $this->fail('Expected exception has not been thrown.');
     }
-    catch (\Exception $e) {
+    catch (\Exception) {
       // Expected exception; just continue testing.
     }
 
@@ -236,7 +245,7 @@ class BlockContentCreationTest extends BlockContentTestBase {
   /**
    * Tests deleting a block.
    */
-  public function testBlockDelete() {
+  public function testBlockDelete(): void {
     // Create a block.
     $edit = [];
     $edit['info[0][value]'] = $this->randomMachineName(8);
@@ -299,7 +308,7 @@ class BlockContentCreationTest extends BlockContentTestBase {
   /**
    * Tests placed content blocks create a dependency in the block placement.
    */
-  public function testConfigDependencies() {
+  public function testConfigDependencies(): void {
     $block = $this->createBlockContent();
     // Place the block.
     $block_placement_id = mb_strtolower($block->label());

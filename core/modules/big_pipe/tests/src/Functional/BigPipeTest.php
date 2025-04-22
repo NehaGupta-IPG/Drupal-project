@@ -30,9 +30,7 @@ use Drupal\Tests\BrowserTestBase;
 class BigPipeTest extends BrowserTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['big_pipe', 'big_pipe_test', 'dblog'];
 
@@ -64,7 +62,7 @@ class BigPipeTest extends BrowserTestBase {
    *
    * @see setUp()
    */
-  protected function performMetaRefresh() {
+  protected function performMetaRefresh(): void {
     $this->maximumMetaRefreshCount = 1;
     $this->checkForMetaRefresh();
     $this->maximumMetaRefreshCount = 0;
@@ -78,7 +76,7 @@ class BigPipeTest extends BrowserTestBase {
    * - big_pipe_page_attachments()
    * - \Drupal\big_pipe\Controller\BigPipeController
    */
-  public function testNoJsDetection() {
+  public function testNoJsDetection(): void {
     $no_js_to_js_markup = '<script>document.cookie = "' . BigPipeStrategy::NOJS_COOKIE . '=1; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT"</script>';
 
     // 1. No session (anonymous).
@@ -142,7 +140,7 @@ class BigPipeTest extends BrowserTestBase {
    *
    * @see \Drupal\big_pipe_test\BigPipePlaceholderTestCases
    */
-  public function testBigPipe() {
+  public function testBigPipe(): void {
     // Simulate production.
     $this->config('system.logging')->set('error_level', ERROR_REPORTING_HIDE)->save();
 
@@ -197,9 +195,9 @@ class BigPipeTest extends BrowserTestBase {
     // database drivers the ability to insert their own limit and offset
     // functionality.
     $records = $connection->select('watchdog', 'w')->fields('w')->orderBy('wid', 'DESC')->range(0, 2)->execute()->fetchAll();
-    $this->assertEquals(RfcLogLevel::ERROR, $records[0]->severity);
+    $this->assertEquals(RfcLogLevel::WARNING, $records[0]->severity);
     $this->assertStringContainsString('Oh noes!', (string) unserialize($records[0]->variables)['@message']);
-    $this->assertEquals(RfcLogLevel::ERROR, $records[1]->severity);
+    $this->assertEquals(RfcLogLevel::WARNING, $records[1]->severity);
     $this->assertStringContainsString('You are not allowed to say llamas are not cool!', (string) unserialize($records[1]->variables)['@message']);
 
     // Verify that 4xx responses work fine. (4xx responses are handled by
@@ -219,6 +217,16 @@ class BigPipeTest extends BrowserTestBase {
     $this->assertSession()->responseNotContains('</body>');
     // The exception is expected. Do not interpret it as a test failure.
     unlink($this->root . '/' . $this->siteDirectory . '/error.log');
+
+    // Tests the enforced redirect response exception handles redirecting to
+    // a trusted redirect.
+    $this->drupalGet(Url::fromRoute('big_pipe_test_trusted_redirect'));
+    $this->assertSession()->responseContains('application/vnd.drupal-ajax');
+    $this->assertSession()->responseContains('[{"command":"redirect","url":"\/big_pipe_test"}]');
+
+    // Test that it rejects an untrusted redirect.
+    $this->drupalGet(Url::fromRoute('big_pipe_test_untrusted_redirect'));
+    $this->assertSession()->responseContains('Redirects to external URLs are not allowed by default');
   }
 
   /**
@@ -231,7 +239,7 @@ class BigPipeTest extends BrowserTestBase {
    *
    * @see \Drupal\big_pipe_test\BigPipePlaceholderTestCases
    */
-  public function testBigPipeNoJs() {
+  public function testBigPipeNoJs(): void {
     // Simulate production.
     $this->config('system.logging')->set('error_level', ERROR_REPORTING_HIDE)->save();
 
@@ -294,7 +302,7 @@ class BigPipeTest extends BrowserTestBase {
   /**
    * Tests BigPipe with a multi-occurrence placeholder.
    */
-  public function testBigPipeMultiOccurrencePlaceholders() {
+  public function testBigPipeMultiOccurrencePlaceholders(): void {
     $this->drupalLogin($this->rootUser);
     $this->assertSessionCookieExists('1');
     $this->assertBigPipeNoJsCookieExists('0');
@@ -430,7 +438,7 @@ class BigPipeTest extends BrowserTestBase {
   /**
    * Ensures CSRF tokens can be generated for the current user's session.
    */
-  protected function setCsrfTokenSeedInTestEnvironment() {
+  protected function setCsrfTokenSeedInTestEnvironment(): void {
     // Retrieve the CSRF token from the child site from its serialized session
     // record in the database.
     $session_data = $this->container->get('session_handler.write_safe')->read($this->getSession()->getCookie($this->getSessionName()));
@@ -453,6 +461,7 @@ class BigPipeTest extends BrowserTestBase {
 
   /**
    * @return \Drupal\big_pipe_test\BigPipePlaceholderTestCase[]
+   *   An array of test cases.
    */
   protected function getTestCases($has_session = TRUE) {
     return BigPipePlaceholderTestCases::cases($this->container, $this->rootUser);
@@ -467,7 +476,7 @@ class BigPipeTest extends BrowserTestBase {
    * @internal
    */
   protected function assertSetsEqual(array $a, array $b): void {
-    $result = count($a) == count($b) && !array_diff_assoc($a, $b);
+    count($a) == count($b) && !array_diff_assoc($a, $b);
   }
 
   /**
@@ -545,6 +554,31 @@ class BigPipeTest extends BrowserTestBase {
 
     // Check that the <meta> refresh is absent, only one redirect ever happens.
     $this->assertSession()->responseNotContains('<noscript><meta http-equiv="Refresh" content="0; URL=');
+  }
+
+  /**
+   * Tests that response contains cacheability debug comments.
+   */
+  public function testDebugCacheability(): void {
+    $this->drupalLogin($this->rootUser);
+    $this->assertSessionCookieExists('1');
+    $this->assertBigPipeNoJsCookieExists('0');
+
+    // With debug_cacheability_headers enabled.
+    $this->drupalGet(Url::fromRoute('<front>'));
+    $this->assertBigPipeResponseHeadersPresent();
+    $this->assertSession()->responseContains('<!-- big_pipe cache tags:  -->');
+    $this->assertSession()
+      ->responseContains('<!-- big_pipe cache contexts: languages:language_interface theme user.permissions -->');
+
+    // With debug_cacheability_headers disabled.
+    $this->setContainerParameter('http.response.debug_cacheability_headers', FALSE);
+    $this->rebuildContainer();
+    $this->resetAll();
+    $this->drupalGet(Url::fromRoute('<front>'));
+    $this->assertSession()->responseNotContains('<!-- big_pipe cache tags:');
+    $this->assertSession()
+      ->responseNotContains('<!-- big_pipe cache contexts:');
   }
 
 }
