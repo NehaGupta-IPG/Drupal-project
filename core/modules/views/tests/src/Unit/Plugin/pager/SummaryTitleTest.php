@@ -15,6 +15,7 @@ use Drupal\views\ViewExecutable;
 
 /**
  * Tests summaryTitle() functions in pager plugins.
+ *
  * @group views
  */
 class SummaryTitleTest extends UnitTestCase {
