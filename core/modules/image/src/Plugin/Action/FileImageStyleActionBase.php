@@ -14,7 +14,7 @@ use Drupal\image\ImageStyleStorageInterface;
 use Psr\Log\LoggerInterface;
 
 /**
- * Base class for entity-based actions.
+ * Base class for file image styles actions.
  */
 abstract class FileImageStyleActionBase extends ConfigurableActionBase implements ContainerFactoryPluginInterface {
 
