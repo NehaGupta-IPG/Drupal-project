@@ -23,7 +23,7 @@ class FileImageStylesGenerateAction extends FileImageStyleActionBase {
   /**
    * {@inheritdoc}
    */
-  public function defaultConfiguration() {
+  public function defaultConfiguration(): array {
     return [
       'image_styles' => [],
       'regenerate' => FALSE,
