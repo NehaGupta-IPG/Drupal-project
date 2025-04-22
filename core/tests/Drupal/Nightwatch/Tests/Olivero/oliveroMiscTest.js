@@ -30,7 +30,9 @@ module.exports = {
           function (preloadFontPaths, theme) {
             let selectorsExist = true;
             preloadFontPaths.forEach((path) => {
-              if (!document.head.querySelector(`[href$="${theme}/fonts/${path}"]`)) {
+              if (
+                !document.head.querySelector(`[href$="${theme}/fonts/${path}"]`)
+              ) {
                 selectorsExist = false;
               }
             });

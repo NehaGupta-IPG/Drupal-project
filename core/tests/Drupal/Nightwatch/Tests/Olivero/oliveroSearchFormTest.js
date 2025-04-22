@@ -28,113 +28,145 @@ module.exports = {
     browser.drupalUninstall();
   },
   'search wide form is accessible and altered': (browser) => {
-    testPerTheme(browser, {name: 'user', password: '123'}, (browser, theme, title) => {
-      browser
-        .setWindowSize(1400, 800)
-        .drupalRelativeURL('/')
-        .waitForElementVisible(searchButtonSelector)
-        .assert.attributeEquals(searchButtonSelector, 'aria-expanded', 'false')
-        .click(searchButtonSelector)
-        .waitForElementVisible(searchWideInputSelector)
-        .assert.attributeEquals(searchButtonSelector, 'aria-expanded', 'true')
-        .assert.attributeContains(
-          searchWideInputSelector,
-          'placeholder',
-          'Search by keyword or phrase.',
-        )
-        .assert.attributeContains(
-          searchWideInputSelector,
-          'title',
-          'Enter the terms you wish to search for.',
-        )
-        .assert.elementPresent('button.search-form__submit')
-        // Assert wide search form closes when element moves to body.
-        .click('body')
-        .waitForElementNotVisible(searchWideSelector)
-        .assert.attributeEquals(searchButtonSelector, 'aria-expanded', 'false');
-    });
+    testPerTheme(
+      browser,
+      { name: 'user', password: '123' },
+      (browser, theme, title) => {
+        browser
+          .setWindowSize(1400, 800)
+          .drupalRelativeURL('/')
+          .waitForElementVisible(searchButtonSelector)
+          .assert.attributeEquals(
+            searchButtonSelector,
+            'aria-expanded',
+            'false',
+          )
+          .click(searchButtonSelector)
+          .waitForElementVisible(searchWideInputSelector)
+          .assert.attributeEquals(searchButtonSelector, 'aria-expanded', 'true')
+          .assert.attributeContains(
+            searchWideInputSelector,
+            'placeholder',
+            'Search by keyword or phrase.',
+          )
+          .assert.attributeContains(
+            searchWideInputSelector,
+            'title',
+            'Enter the terms you wish to search for.',
+          )
+          .assert.elementPresent('button.search-form__submit')
+          // Assert wide search form closes when element moves to body.
+          .click('body')
+          .waitForElementNotVisible(searchWideSelector)
+          .assert.attributeEquals(
+            searchButtonSelector,
+            'aria-expanded',
+            'false',
+          );
+      },
+    );
   },
   'Test focus management': (browser) => {
-    testPerTheme(browser, {name: 'user', password: '123'}, (browser, theme, title) => {
-      browser
-        .drupalRelativeURL('/')
-        .waitForElementVisible(searchButtonSelector)
-        .click(searchButtonSelector)
-        .waitForElementVisible(searchWideInputSelector)
-        .pause(400) // Wait for transitionend event to fire.
-        // Assert that focus is moved to wide search text input.
-        .execute(
-          // eslint-disable-next-line func-names, prefer-arrow-callback, no-shadow
-          function (searchWideInputSelector) {
-            return document.activeElement.matches(searchWideInputSelector);
-          },
-          [searchWideInputSelector],
-          (result) => {
-            browser.assert.ok(
-              result.value,
-              'Assert that focus moves to wide search form on open.',
-            );
-          },
-        )
-        // Assert that search form is still visible when focus is on disclosure button.
-        .perform(function () {
-          return this.actions()
-            .keyDown(browser.Keys.SHIFT)
-            .sendKeys(browser.Keys.TAB);
-        })
-        .pause(50)
-        .isVisible(searchWideSelector)
-        // Assert that search form is NOT visible when focus moves back to menu item.
-        .perform(function () {
-          return this.actions().sendKeys(browser.Keys.TAB);
-        })
-        .pause(50)
-        .waitForElementNotVisible(searchWideSelector)
-        // Release SHIFT key.
-        .perform(function () {
-          return this.actions().keyUp(browser.Keys.SHIFT);
-        });
-    });
+    testPerTheme(
+      browser,
+      { name: 'user', password: '123' },
+      (browser, theme, title) => {
+        browser
+          .drupalRelativeURL('/')
+          .waitForElementVisible(searchButtonSelector)
+          .click(searchButtonSelector)
+          .waitForElementVisible(searchWideInputSelector)
+          .pause(400) // Wait for transitionend event to fire.
+          // Assert that focus is moved to wide search text input.
+          .execute(
+            // eslint-disable-next-line func-names, prefer-arrow-callback, no-shadow
+            function (searchWideInputSelector) {
+              return document.activeElement.matches(searchWideInputSelector);
+            },
+            [searchWideInputSelector],
+            (result) => {
+              browser.assert.ok(
+                result.value,
+                'Assert that focus moves to wide search form on open.',
+              );
+            },
+          )
+          // Assert that search form is still visible when focus is on disclosure button.
+          .perform(function () {
+            return this.actions()
+              .keyDown(browser.Keys.SHIFT)
+              .sendKeys(browser.Keys.TAB);
+          })
+          .pause(50)
+          .isVisible(searchWideSelector)
+          // Assert that search form is NOT visible when focus moves back to menu item.
+          .perform(function () {
+            return this.actions().sendKeys(browser.Keys.TAB);
+          })
+          .pause(50)
+          .waitForElementNotVisible(searchWideSelector)
+          // Release SHIFT key.
+          .perform(function () {
+            return this.actions().keyUp(browser.Keys.SHIFT);
+          });
+      },
+    );
   },
   'search narrow form is accessible': (browser) => {
-    testPerTheme(browser, {name: 'user', password: '123'}, (browser, theme, title) => {
-      browser
-        .setWindowSize(1000, 800)
-        .drupalRelativeURL('/')
-        .click(mobileNavButtonSelector)
-        .waitForElementVisible(headerNavSelector)
-        .waitForElementVisible(`${searchNarrowSelector} ${searchFormSelector}`);
-    });
+    testPerTheme(
+      browser,
+      { name: 'user', password: '123' },
+      (browser, theme, title) => {
+        browser
+          .setWindowSize(1000, 800)
+          .drupalRelativeURL('/')
+          .click(mobileNavButtonSelector)
+          .waitForElementVisible(headerNavSelector)
+          .waitForElementVisible(
+            `${searchNarrowSelector} ${searchFormSelector}`,
+          );
+      },
+    );
   },
   'submit button styled as primary on forms with <= 2 actions': (browser) => {
-    testPerTheme(browser, {name: 'user', password: '123'}, (browser, theme, title) => {
-      browser
-        .setWindowSize(1400, 800)
-        .drupalRelativeURL('/form-test/object-controller-builder')
-        .assert.elementPresent(
-          '#edit-actions input[type=submit].button--primary',
-        );
-    });
+    testPerTheme(
+      browser,
+      { name: 'user', password: '123' },
+      (browser, theme, title) => {
+        browser
+          .setWindowSize(1400, 800)
+          .drupalRelativeURL('/form-test/object-controller-builder')
+          .assert.elementPresent(
+            '#edit-actions input[type=submit].button--primary',
+          );
+      },
+    );
   },
   'search page is altered': (browser) => {
-    testPerTheme(browser, {name: 'user', password: '123'}, (browser, theme, title) => {
-      browser
-        .setWindowSize(1400, 800)
-        .drupalRelativeURL('/search')
-        .assert.attributeContains(
-          '.search-form input[name=keys]',
-          'placeholder',
-          'Search by keyword or phrase.',
-        )
-        .assert.attributeContains(
-          '.search-form input[name=keys]',
-          'title',
-          'Enter the terms you wish to search for.',
-        )
-        .assert.elementPresent('#edit-basic input[type=submit].button--primary')
-        .assert.elementPresent(
-          '#edit-advanced input[type=submit].button--primary',
-        );
-    });
+    testPerTheme(
+      browser,
+      { name: 'user', password: '123' },
+      (browser, theme, title) => {
+        browser
+          .setWindowSize(1400, 800)
+          .drupalRelativeURL('/search')
+          .assert.attributeContains(
+            '.search-form input[name=keys]',
+            'placeholder',
+            'Search by keyword or phrase.',
+          )
+          .assert.attributeContains(
+            '.search-form input[name=keys]',
+            'title',
+            'Enter the terms you wish to search for.',
+          )
+          .assert.elementPresent(
+            '#edit-basic input[type=submit].button--primary',
+          )
+          .assert.elementPresent(
+            '#edit-advanced input[type=submit].button--primary',
+          );
+      },
+    );
   },
 };

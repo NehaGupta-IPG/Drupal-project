@@ -7,12 +7,11 @@ const buttonSubMenuId = 'primary-menu-item-12';
 module.exports = {
   '@tags': ['core', 'olivero'],
   before(browser) {
-    browser
-      .drupalInstall({
-        setupFile:
-          'core/tests/Drupal/TestSite/TestSiteOliveroInstallTestScript.php',
-        installProfile: 'minimal',
-      })
+    browser.drupalInstall({
+      setupFile:
+        'core/tests/Drupal/TestSite/TestSiteOliveroInstallTestScript.php',
+      installProfile: 'minimal',
+    });
     browser.window.setSize(1600, 800);
   },
   after(browser) {
@@ -25,9 +24,16 @@ module.exports = {
         // greater than 2 do not break the site.
         .drupalLoginAsAdmin(() => {
           browser
-            .drupalRelativeURL(`/admin/structure/block/manage/${theme}_main_menu`)
-            .waitForElementVisible('[data-drupal-selector="edit-settings-depth"]')
-            .setValue('[data-drupal-selector="edit-settings-depth"]', 'Unlimited')
+            .drupalRelativeURL(
+              `/admin/structure/block/manage/${theme}_main_menu`,
+            )
+            .waitForElementVisible(
+              '[data-drupal-selector="edit-settings-depth"]',
+            )
+            .setValue(
+              '[data-drupal-selector="edit-settings-depth"]',
+              'Unlimited',
+            )
             .click('[data-drupal-selector="edit-actions-submit"]')
             .waitForElementVisible('body');
         })

@@ -17,28 +17,32 @@ module.exports = {
         name: 'user',
         password: '123',
         permissions: ['access site-wide contact form'],
-      })
+      });
   },
   after(browser) {
     browser.drupalUninstall();
   },
   'correct classes added to table and header': (browser) => {
-    testPerTheme(browser, {name: 'user', password: '123'}, (browser, theme, title) => {
-      browser
-        .setWindowSize(1400, 800)
-        .drupalRelativeURL('/contact/olivero_test_contact_form')
-        .waitForElementVisible(tableSelector, 1000)
-        .assert.hasClass(tableSelector, [
-          'tabledrag-disabled',
-          'js-tabledrag-disabled',
-        ])
-        .assert.hasClass(tableHeaderSelector, 'is-disabled')
-        .assert.hasClass(headerSelector, [
-          'form-item__label',
-          'form-item__label--multiple-value-form',
-          'js-form-required',
-          'form-required',
-        ]);
-    });
+    testPerTheme(
+      browser,
+      { name: 'user', password: '123' },
+      (browser, theme, title) => {
+        browser
+          .setWindowSize(1400, 800)
+          .drupalRelativeURL('/contact/olivero_test_contact_form')
+          .waitForElementVisible(tableSelector, 1000)
+          .assert.hasClass(tableSelector, [
+            'tabledrag-disabled',
+            'js-tabledrag-disabled',
+          ])
+          .assert.hasClass(tableHeaderSelector, 'is-disabled')
+          .assert.hasClass(headerSelector, [
+            'form-item__label',
+            'form-item__label--multiple-value-form',
+            'js-form-required',
+            'form-required',
+          ]);
+      },
+    );
   },
 };
