@@ -28,6 +28,12 @@ class TestSiteOliveroInstallTestScript implements TestSetupInterface {
     $phpBinaryFinder = new PhpExecutableFinder();
     $phpBinaryPath = $phpBinaryFinder->find();
 
+    /**
+     * @var \Drupal\Core\DrupalKernelInterface
+     */
+    $kernel = \Drupal::service('kernel');
+    $sitePath = $kernel->getSitePath();
+
     $install_command = [
       $phpBinaryPath,
       'core/scripts/drupal',
@@ -36,6 +42,7 @@ class TestSiteOliveroInstallTestScript implements TestSetupInterface {
       '--name=Test custom starterkit theme',
       '--description=Custom theme generated from a starterkit theme',
       '--starterkit=olivero',
+      '--path=' . $sitePath . '/themes',
     ];
     $process = new Process($install_command, NULL);
     $process->setTimeout(60);
