@@ -69,24 +69,22 @@ class Full extends SqlBase {
    * {@inheritdoc}
    */
   public function summaryTitle() {
-    $summary_text = '';
     if ($this->options['items_per_page'] == 0) {
       if (!empty($this->options['offset'])) {
-        $summary_text = $this->t('All items except first @skip', ['@skip' => $this->options['offset']]);
+        return $this->t('All items except first @skip', ['@skip' => $this->options['offset']]);
       }
       else {
-        $summary_text = $this->t('All items');
+        return $this->t('All items');
       }
     }
     else {
-      if (empty($this->options['offset'])) {
-        $summary_text = $this->formatPlural($this->options['items_per_page'], '@count item', '@count items', ['@count' => $this->options['items_per_page']]);
+      if (!empty($this->options['offset'])) {
+        return $this->formatPlural($this->options['items_per_page'], '@count item, skip @skip', '@count items, skip @skip', ['@count' => $this->options['items_per_page'], '@skip' => $this->options['offset']]);
       }
       else {
-        $summary_text = $this->formatPlural($this->options['items_per_page'], '@count item, skip @skip', '@count items, skip @skip', ['@count' => $this->options['items_per_page'], '@skip' => $this->options['offset']]);
+        return $this->formatPlural($this->options['items_per_page'], '@count item', '@count items', ['@count' => $this->options['items_per_page']]);
       }
     }
-    return $summary_text;
   }
 
   /**
