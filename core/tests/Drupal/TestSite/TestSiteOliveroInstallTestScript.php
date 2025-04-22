@@ -67,7 +67,6 @@ class TestSiteOliveroInstallTestScript implements TestSetupInterface {
     $theme_installer = \Drupal::service('theme_installer');
     assert($theme_installer instanceof ThemeInstallerInterface);
     $theme_installer->install(['olivero'], TRUE);
-    $theme_installer->install(['test_custom_theme'], TRUE);
     $system_theme_config = \Drupal::configFactory()->getEditable('system.theme');
     $system_theme_config->set('default', 'olivero')->save();
 
