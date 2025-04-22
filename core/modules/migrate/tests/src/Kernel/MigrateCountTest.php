@@ -55,10 +55,19 @@ class MigrateCountTest extends MigrateTestBase {
   /**
    * Tests map message deletion.
    *
+   * @param array $test_data_row
+   *   A test data row array to be added to migration source data rows.
+   * @param array $expected_results
+   *   An associative array of expected migration results .
+   *   - source_plugin_count: How many source records were used by migration.
+   *   - imported_count: How many rows were imported on migration.
+   *   - processed_count: How many rows were processed on migration.
+   *   - all_rows_processed: TRUE if this migration is complete otherwise FALSE..
+   *
    * @dataProvider providerTestNext
    */
-  public function testNext($row_1, $expected): void {
-    $this->definition['source']['data_rows'][1] = $row_1;
+  public function testNext($test_data_row, $expected_results): void {
+    $this->definition['source']['data_rows'][] = $test_data_row;
 
     // Create the migration an execute.
     /** @var \Drupal\migrate\Plugin\MigrationInterface $migration */
@@ -68,10 +77,10 @@ class MigrateCountTest extends MigrateTestBase {
 
     $id_map = $migration->getIdMap();
 
-    $this->assertCount($expected['source_plugin_count'], $migration->getSourcePlugin());
-    $this->assertSame($expected['imported_count'], $id_map->importedCount());
-    $this->assertSame($expected['processed_count'], $id_map->processedCount());
-    $this->assertSame($expected['all_rows_processed'], $migration->allRowsProcessed());
+    $this->assertCount($expected_results['source_plugin_count'], $migration->getSourcePlugin());
+    $this->assertSame($expected_results['imported_count'], $id_map->importedCount());
+    $this->assertSame($expected_results['processed_count'], $id_map->processedCount());
+    $this->assertSame($expected_results['all_rows_processed'], $migration->allRowsProcessed());
   }
 
   /**
@@ -80,12 +89,12 @@ class MigrateCountTest extends MigrateTestBase {
   public static function providerTestNext(): array {
     return [
       'both rows successful' => [
-        'row_1' => [
+        'test_data_row' => [
           'id' => '2',
           'name' => 'tags',
           'data' => [3, 4],
         ],
-        'expected' => [
+        'expected_results' => [
           'source_plugin_count' => 2,
           'imported_count' => 2,
           'processed_count' => 2,
@@ -93,12 +102,12 @@ class MigrateCountTest extends MigrateTestBase {
         ],
       ],
       'throw skip in flatten' => [
-        'row_1' => [
+        'test_data_row' => [
           'id' => '2',
           'name' => 'tags',
           'data' => 'string',
         ],
-        'expected' => [
+        'expected_results' => [
           'source_plugin_count' => 2,
           'imported_count' => 1,
           'processed_count' => 2,
@@ -106,12 +115,12 @@ class MigrateCountTest extends MigrateTestBase {
         ],
       ],
       'prepare row false' => [
-        'row_1' => [
+        'test_data_row' => [
           'id' => '2',
           'name' => 'tags',
           'data' => 'false',
         ],
-        'expected' => [
+        'expected_results' => [
           'source_plugin_count' => 2,
           'imported_count' => 1,
           'processed_count' => 2,
