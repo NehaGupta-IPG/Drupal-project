@@ -24,7 +24,7 @@ class FileOriginalImageStyleAction extends FileImageStyleActionBase implements C
   /**
    * {@inheritdoc}
    */
-  public function defaultConfiguration() {
+  public function defaultConfiguration(): array {
     return [
       'image_style' => '',
     ];
