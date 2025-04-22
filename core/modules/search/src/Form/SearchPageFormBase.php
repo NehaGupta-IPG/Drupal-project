@@ -5,6 +5,7 @@ namespace Drupal\search\Form;
 use Drupal\Core\Entity\EntityForm;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Plugin\PluginFormInterface;
+use Drupal\Core\Routing\RouteBuilderInterface;
 use Drupal\search\SearchPageRepositoryInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -35,13 +36,23 @@ abstract class SearchPageFormBase extends EntityForm {
   protected $searchPageRepository;
 
   /**
+   * The router builder.
+   *
+   * @var \Drupal\Core\Routing\RouteBuilderInterface
+   */
+  protected $routerBuilder;
+
+  /**
    * Constructs a new search form.
    *
    * @param \Drupal\search\SearchPageRepositoryInterface $search_page_repository
    *   The search page repository.
+   * @param \Drupal\Core\Routing\RouteBuilderInterface $router_builder
+   *   The router builder.
    */
-  public function __construct(SearchPageRepositoryInterface $search_page_repository) {
+  public function __construct(SearchPageRepositoryInterface $search_page_repository, RouteBuilderInterface $router_builder) {
     $this->searchPageRepository = $search_page_repository;
+    $this->routerBuilder = $router_builder;
   }
 
   /**
@@ -49,7 +60,8 @@ abstract class SearchPageFormBase extends EntityForm {
    */
   public static function create(ContainerInterface $container) {
     return new static(
-      $container->get('search.search_page_repository')
+      $container->get('search.search_page_repository'),
+      $container->get('router.builder')
     );
   }
 
@@ -162,7 +174,8 @@ abstract class SearchPageFormBase extends EntityForm {
    */
   public function save(array $form, FormStateInterface $form_state) {
     $this->entity->save();
-
+    // Rebuild routes to ensure the new search page route is available immediately.
+    $this->routerBuilder->rebuildIfNeeded();
     $form_state->setRedirectUrl($this->entity->toUrl('collection'));
   }
 
