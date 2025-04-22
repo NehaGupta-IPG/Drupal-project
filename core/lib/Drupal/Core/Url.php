@@ -14,7 +14,6 @@ use Drupal\Core\Utility\UnroutedUrlAssemblerInterface;
 use Drupal\Core\Routing\RouteObjectInterface;
 use Symfony\Component\HttpFoundation\Request;
 
-
 // cspell:ignore abempty
 
 /**
@@ -104,7 +103,6 @@ class Url implements TrustedCallbackInterface {
    * @var string
    */
   protected $internalPath;
-
 
   /**
    * Constructs a new Url object.
@@ -898,13 +896,13 @@ class Url implements TrustedCallbackInterface {
    * @param string $path
    *   The internal path to set as the destination.
    *
-   * @return array
-   *   Array of query parameters.
+   * @return void
+   *   Does not return anything.
    *
    * @throws \InvalidArgumentException
    *   If the path is not a string or is an external URL.
    */
-  public function setDestination(string $path): array {
+  public function setDestination(string $path): void {
     if (!is_string($path)) {
       throw new \InvalidArgumentException('The path must be a string.');
     }
@@ -918,13 +916,13 @@ class Url implements TrustedCallbackInterface {
   /**
    * Sets the destination of the link to the current path or destination.
    *
-   * @return array
-   *   Array of query parameters.
+   * @return void
+   *   Does not return anything.
    *
    * @throws \InvalidArgumentException
    *   If the current destination is not a valid internal path.
    */
-  public function setDestinationToCurrent(): array {
+  public function setDestinationToCurrent(): void {
     $current_destination = \Drupal::destination()->get();
     // Validate the current destination is an internal path
     if (UrlHelper::isExternal($current_destination)) {
