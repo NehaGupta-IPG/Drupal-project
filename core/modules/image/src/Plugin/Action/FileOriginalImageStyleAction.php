@@ -33,7 +33,7 @@ class FileOriginalImageStyleAction extends FileImageStyleActionBase implements C
   /**
    * {@inheritdoc}
    */
-  public function buildConfigurationForm(array $form, FormStateInterface $form_state) {
+  public function buildConfigurationForm(array $form, FormStateInterface $form_state): array {
     $styles = $this->imageStyleStorage->loadMultiple();
     $options = [];
     foreach ($styles as $style) {
