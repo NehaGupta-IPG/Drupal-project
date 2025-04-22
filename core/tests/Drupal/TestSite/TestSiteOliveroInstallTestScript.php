@@ -33,10 +33,9 @@ class TestSiteOliveroInstallTestScript implements TestSetupInterface {
       'core/scripts/drupal',
       'generate-theme',
       'test_custom_theme',
-      '--name="Test custom starterkit theme"',
-      '--description="Custom theme generated from a starterkit theme"',
-      '--starterkit',
-      'olivero',
+      '--name=Test custom starterkit theme',
+      '--description=Custom theme generated from a starterkit theme',
+      '--starterkit=olivero',
     ];
     $process = new Process($install_command, NULL);
     $process->setTimeout(60);
