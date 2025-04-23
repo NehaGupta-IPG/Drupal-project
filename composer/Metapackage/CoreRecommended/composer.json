@@ -20,7 +20,7 @@
         "guzzlehttp/psr7": "~2.7.0",
         "masterminds/html5": "~2.9.0",
         "mck89/peast": "~v1.16.3",
-        "mongodb/mongodb": "~2.0.0",
+        "mongodb/mongodb": "~1.17.1|~2.0.0",
         "pear/archive_tar": "~1.5.0",
         "pear/console_getopt": "~v1.4.3",
         "pear/pear-core-minimal": "~v1.10.16",
