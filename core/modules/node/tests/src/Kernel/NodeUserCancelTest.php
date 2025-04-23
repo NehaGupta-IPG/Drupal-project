@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\node\Kernel;
 
 use Drupal\KernelTests\KernelTestBase;
@@ -32,7 +34,7 @@ class NodeUserCancelTest extends KernelTestBase {
   /**
    * Confirm that the author has been assigned to the anonymous user.
    */
-  public function testCancelReassignToAnonymous() {
+  public function testCancelReassignToAnonymous(): void {
     /** @var \Drupal\node\NodeStorageInterface $nodeStorage */
     $nodeStorage = \Drupal::entityTypeManager()->getStorage('node');
 
