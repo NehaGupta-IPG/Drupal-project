@@ -103,7 +103,7 @@ class FormHelperTest extends UnitTestCase {
    */
   public static function providerElements(): array {
     return [
-      [
+      'date' => [
         [
           '#type' => 'date',
           '#states' => [
@@ -114,7 +114,7 @@ class FormHelperTest extends UnitTestCase {
         ],
         '#attributes',
       ],
-      [
+      'empty item' => [
         [
           '#type' => 'item',
           '#states' => [
@@ -127,7 +127,7 @@ class FormHelperTest extends UnitTestCase {
         ],
         '#wrapper_attributes',
       ],
-      [
+      'item with markup' => [
         [
           '#type' => 'item',
           '#states' => [
@@ -137,6 +137,27 @@ class FormHelperTest extends UnitTestCase {
           ],
           '#markup' => 'a non empty string value',
           '#input' => TRUE,
+        ],
+        '#wrapper_attributes',
+      ],
+      'container' => [
+        [
+          '#type' => 'container',
+          '#states' => [
+            'visible' => [
+              ':input[name="foo"]' => ['value' => 'bar'],
+            ],
+          ],
+          [
+            '#type' => 'item',
+            '#states' => [
+              'visible' => [
+                ':input[name="foo"]' => ['value' => 'bar'],
+              ],
+            ],
+            '#markup' => 'a non empty string value',
+            '#input' => TRUE,
+          ]
         ],
         '#wrapper_attributes',
       ],
