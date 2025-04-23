@@ -55,7 +55,7 @@ class ResponseStatusTest extends KernelTestBase {
    *
    * @dataProvider providerTestConditions
    */
-  public function testConditions(array $status_codes, bool $negate, int $response_code, bool $expected_execute) {
+  public function testConditions(array $status_codes, bool $negate, int $response_code, bool $expected_execute): void {
     if ($response_code === Response::HTTP_OK) {
       $request = Request::create('/my/valid/page');
     }
@@ -77,7 +77,7 @@ class ResponseStatusTest extends KernelTestBase {
   /**
    * Provides test data for testConditions.
    */
-  public function providerTestConditions() {
+  public static function providerTestConditions() {
     // Default values with 200 response code.
     yield [
       'status_codes' => [],

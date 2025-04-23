@@ -166,9 +166,10 @@ class ConfigManager implements ConfigManagerInterface {
     if (!isset($target_name)) {
       $target_name = $source_name;
     }
-    // The output should show configuration object differences formatted as YAML.
-    // But the configuration is not necessarily stored in files. Therefore, they
-    // need to be read and parsed, and lastly, dumped into YAML strings.
+    // The output should show configuration object differences formatted as
+    // YAML. But the configuration is not necessarily stored in files.
+    // Therefore, they need to be read and parsed, and lastly, dumped into YAML
+    // strings.
     $source_data = explode("\n", Yaml::encode($source_storage->read($source_name)));
     $target_data = explode("\n", Yaml::encode($target_storage->read($target_name)));
 
@@ -266,7 +267,7 @@ class ConfigManager implements ConfigManagerInterface {
   /**
    * {@inheritdoc}
    */
-  public function findConfigEntityDependencies($type, array $names, ConfigDependencyManager $dependency_manager = NULL) {
+  public function findConfigEntityDependencies($type, array $names, ?ConfigDependencyManager $dependency_manager = NULL) {
     if (!$dependency_manager) {
       $dependency_manager = $this->getConfigDependencyManager();
     }
@@ -280,7 +281,7 @@ class ConfigManager implements ConfigManagerInterface {
   /**
    * {@inheritdoc}
    */
-  public function findConfigEntityDependenciesAsEntities($type, array $names, ConfigDependencyManager $dependency_manager = NULL) {
+  public function findConfigEntityDependenciesAsEntities($type, array $names, ?ConfigDependencyManager $dependency_manager = NULL) {
     $dependencies = $this->findConfigEntityDependencies($type, $names, $dependency_manager);
     $entities = [];
     $definitions = $this->entityTypeManager->getDefinitions();

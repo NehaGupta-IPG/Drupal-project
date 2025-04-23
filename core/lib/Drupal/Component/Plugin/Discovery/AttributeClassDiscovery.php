@@ -31,7 +31,7 @@ class AttributeClassDiscovery implements DiscoveryInterface {
    */
   public function __construct(
     protected readonly array $pluginNamespaces = [],
-    protected readonly string $pluginDefinitionAttributeName = Plugin::class
+    protected readonly string $pluginDefinitionAttributeName = Plugin::class,
   ) {
     $file_cache_suffix = str_replace('\\', '_', $this->pluginDefinitionAttributeName);
     $this->fileCache = FileCacheFactory::get('attribute_discovery:' . $this->getFileCacheSuffix($file_cache_suffix));
@@ -71,7 +71,8 @@ class AttributeClassDiscovery implements DiscoveryInterface {
             if ($fileinfo->getExtension() === 'php') {
               if ($cached = $this->fileCache->get($fileinfo->getPathName())) {
                 if (isset($cached['id'])) {
-                  // Explicitly unserialize this to create a new object instance.
+                  // Explicitly unserialize this to create a new object
+                  // instance.
                   $definitions[$cached['id']] = unserialize($cached['content']);
                 }
                 continue;
@@ -80,17 +81,30 @@ class AttributeClassDiscovery implements DiscoveryInterface {
               $sub_path = $iterator->getSubIterator()->getSubPath();
               $sub_path = $sub_path ? str_replace(DIRECTORY_SEPARATOR, '\\', $sub_path) . '\\' : '';
               $class = $namespace . '\\' . $sub_path . $fileinfo->getBasename('.php');
-
-              ['id' => $id, 'content' => $content] = $this->parseClass($class, $fileinfo);
-
-              if ($id) {
-                $definitions[$id] = $content;
-                // Explicitly serialize this to create a new object instance.
-                $this->fileCache->set($fileinfo->getPathName(), ['id' => $id, 'content' => serialize($content)]);
+              try {
+                ['id' => $id, 'content' => $content] = $this->parseClass($class, $fileinfo);
+                if ($id) {
+                  $definitions[$id] = $content;
+                  // Explicitly serialize this to create a new object instance.
+                  $this->fileCache->set($fileinfo->getPathName(), ['id' => $id, 'content' => serialize($content)]);
+                }
+                else {
+                  // Store a NULL object, so that the file is not parsed again.
+                  $this->fileCache->set($fileinfo->getPathName(), [NULL]);
+                }
               }
-              else {
-                // Store a NULL object, so the file is not reparsed again.
-                $this->fileCache->set($fileinfo->getPathName(), [NULL]);
+              // Plugins may rely on Attribute classes defined by modules that
+              // are not installed. In such a case, a 'class not found' error
+              // may be thrown from reflection. However, this is an unavoidable
+              // situation with optional dependencies and plugins. Therefore,
+              // silently skip over this class and avoid writing to the cache,
+              // so that it is scanned each time. This ensures that the plugin
+              // definition will be found if the module it requires is
+              // enabled.
+              catch (\Error $e) {
+                if (!preg_match('/(Class|Interface) .* not found$/', $e->getMessage())) {
+                  throw $e;
+                }
               }
             }
           }
@@ -118,6 +132,7 @@ class AttributeClassDiscovery implements DiscoveryInterface {
    *   'content' is the plugin definition.
    *
    * @throws \ReflectionException
+   * @throws \Error
    */
   protected function parseClass(string $class, \SplFileInfo $fileinfo): array {
     // @todo Consider performance improvements over using reflection.
@@ -152,6 +167,7 @@ class AttributeClassDiscovery implements DiscoveryInterface {
    * Gets an array of PSR-4 namespaces to search for plugin classes.
    *
    * @return string[][]
+   *   An array of namespaces to search.
    */
   protected function getPluginNamespaces(): array {
     return $this->pluginNamespaces;

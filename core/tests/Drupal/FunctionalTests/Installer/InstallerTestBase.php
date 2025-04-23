@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\FunctionalTests\Installer;
 
 use Drupal\Core\DrupalKernel;
@@ -53,9 +55,9 @@ abstract class InstallerTestBase extends BrowserTestBase {
   /**
    * Additional parameters to use for installer screens.
    *
-   * @see FunctionalTestSetupTrait::installParameters()
-   *
    * @var array
+   *
+   * @see FunctionalTestSetupTrait::installParameters()
    */
   protected $parameters = [];
 

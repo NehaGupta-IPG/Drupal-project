@@ -66,15 +66,19 @@ class NodeGrantDatabaseStorage implements NodeGrantDatabaseStorageInterface {
 
     // If no module implements the hook or the node does not have an id there is
     // no point in querying the database for access grants.
-    if (!$this->moduleHandler->hasImplementations('node_grants') || !$node->id()) {
+    if (!$this->moduleHandler->hasImplementations('node_grants') || $node->isNew()) {
       // Return the equivalent of the default grant, defined by
       // self::writeDefault().
       if ($operation === 'view') {
-        return AccessResult::allowedIf($node->isPublished());
+        $result = AccessResult::allowedIf($node->isPublished());
+        if (!$node->isNew()) {
+          $result->addCacheableDependency($node);
+        }
+
+        return $result;
       }
-      else {
-        return AccessResult::neutral();
-      }
+
+      return AccessResult::neutral();
     }
 
     // Check the database for potential access grants.
@@ -82,10 +86,16 @@ class NodeGrantDatabaseStorage implements NodeGrantDatabaseStorageInterface {
     $query->addExpression('1');
     // Only interested for granting in the current operation.
     $query->condition('grant_' . $operation, 1, '>=');
-    // Check for grants for this node and the correct langcode.
+    // Check for grants for this node and the correct langcode. New translations
+    // do not yet have a langcode and must check the fallback node record.
     $nids = $query->andConditionGroup()
-      ->condition('nid', $node->id())
-      ->condition('langcode', $node->language()->getId());
+      ->condition('nid', $node->id());
+    if (!$node->isNewTranslation()) {
+      $nids->condition('langcode', $node->language()->getId());
+    }
+    else {
+      $nids->condition('fallback', 1);
+    }
     // If the node is published, also take the default grant into account. The
     // default is saved with a node ID of 0.
     $status = $node->isPublished();

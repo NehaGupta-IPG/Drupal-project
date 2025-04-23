@@ -1,8 +1,9 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\system\Functional\Module;
 
-use Drupal\Component\Render\FormattableMarkup;
 use Drupal\Core\Config\InstallStorage;
 use Drupal\Core\Database\Database;
 use Drupal\Core\Config\FileStorage;
@@ -16,12 +17,15 @@ use Drupal\TestTools\Extension\SchemaInspector;
 abstract class ModuleTestBase extends BrowserTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['system_test'];
 
+  /**
+   * The test user.
+   *
+   * @var \Drupal\Core\Session\AccountInterface
+   */
   protected $adminUser;
 
   /**
@@ -40,7 +44,7 @@ abstract class ModuleTestBase extends BrowserTestBase {
   /**
    * Assert that all tables defined in a module's hook_schema() exist.
    *
-   * @param $module
+   * @param string $module
    *   The name of the module.
    */
   public function assertModuleTablesExist($module) {
@@ -58,7 +62,7 @@ abstract class ModuleTestBase extends BrowserTestBase {
   /**
    * Assert that none of the tables defined in a module's hook_schema() exist.
    *
-   * @param $module
+   * @param string $module
    *   The name of the module.
    */
   public function assertModuleTablesDoNotExist($module) {
@@ -128,42 +132,42 @@ abstract class ModuleTestBase extends BrowserTestBase {
   /**
    * Assert the list of modules are enabled or disabled.
    *
-   * @param $modules
+   * @param array $modules
    *   Module list to check.
-   * @param $enabled
+   * @param bool $enabled
    *   Expected module state.
    */
   public function assertModules(array $modules, $enabled) {
     $this->rebuildContainer();
     foreach ($modules as $module) {
       if ($enabled) {
-        $message = 'Module "@module" is enabled.';
+        $message = 'Module "%s" is enabled.';
       }
       else {
-        $message = 'Module "@module" is not enabled.';
+        $message = 'Module "%s" is not enabled.';
       }
-      $this->assertEquals($enabled, $this->container->get('module_handler')->moduleExists($module), new FormattableMarkup($message, ['@module' => $module]));
+      $this->assertEquals($enabled, $this->container->get('module_handler')->moduleExists($module), sprintf($message, $module));
     }
   }
 
   /**
    * Verify a log entry was entered for a module's status change.
    *
-   * @param $type
+   * @param string $type
    *   The category to which this message belongs.
-   * @param $message
+   * @param string $message
    *   The message to store in the log. Keep $message translatable
    *   by not concatenating dynamic values into it! Variables in the
    *   message should be added by using placeholder strings alongside
    *   the variables argument to declare the value of the placeholders.
    *   See t() for documentation on how $message and $variables interact.
-   * @param $variables
+   * @param array $variables
    *   Array of variables to replace in the message on display or
    *   NULL if message is already translated or not possible to
    *   translate.
-   * @param $severity
+   * @param int $severity
    *   The severity of the message, as per RFC 3164.
-   * @param $link
+   * @param string $link
    *   A link to associate with the message.
    */
   public function assertLogMessage($type, $message, $variables = [], $severity = RfcLogLevel::NOTICE, $link = '') {

@@ -53,12 +53,12 @@ class ScaffoldUpgradeTest extends TestCase {
   /**
    * Tests upgrading the Composer Scaffold plugin.
    */
-  public function testScaffoldUpgrade() {
+  public function testScaffoldUpgrade(): void {
     $composerVersionLine = exec('composer --version');
     if (str_contains($composerVersionLine, 'Composer version 2')) {
       $this->markTestSkipped('We cannot run the scaffold upgrade test with Composer 2 until we have a stable version of drupal/core-composer-scaffold to start from that we can install with Composer 2.x.');
     }
-    $this->fixturesDir = $this->fixtures->tmpDir($this->getName());
+    $this->fixturesDir = $this->fixtures->tmpDir($this->name());
     $replacements = ['SYMLINK' => 'false', 'PROJECT_ROOT' => $this->fixtures->projectRoot()];
     $this->fixtures->cloneFixtureProjects($this->fixturesDir, $replacements);
     $topLevelProjectDir = 'drupal-drupal';
@@ -114,7 +114,7 @@ class ScaffoldUpgradeTest extends TestCase {
    * @return string
    *   Path to temporary git repository.
    */
-  protected function createTmpRepo($source, $destParent, $version) {
+  protected function createTmpRepo($source, $destParent, $version): string {
     $target = $destParent . '/' . basename($source);
     $filesystem = new Filesystem();
     $filesystem->copy($source, $target);

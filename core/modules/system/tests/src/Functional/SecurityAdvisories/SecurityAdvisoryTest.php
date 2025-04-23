@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\system\Functional\SecurityAdvisories;
 
 use Drupal\advisory_feed_test\AdvisoryTestClientMiddleware;
@@ -116,7 +118,7 @@ class SecurityAdvisoryTest extends BrowserTestBase {
   public function testPsa(): void {
     $assert = $this->assertSession();
     // Setup test PSA endpoint.
-    AdvisoryTestClientMiddleware::setTestEndpoint($this->workingEndpointMixed);
+    AdvisoryTestClientMiddleware::setTestEndpoint($this->workingEndpointMixed, TRUE);
     $mixed_advisory_links = [
       'Critical Release - SA-2019-02-19',
       'Critical Release - PSA-Really Old',
@@ -219,7 +221,8 @@ class SecurityAdvisoryTest extends BrowserTestBase {
    * @param string[] $expected_link_texts
    *   The expected links' text.
    * @param int $error_or_warning
-   *   Whether the links are a warning or an error. Should be one of the REQUIREMENT_* constants.
+   *   Whether the links are a warning or an error. Should be one of the
+   *   REQUIREMENT_* constants.
    *
    * @internal
    */
@@ -245,7 +248,8 @@ class SecurityAdvisoryTest extends BrowserTestBase {
    * @param string[] $expected_link_texts
    *   The expected links' text.
    * @param int $error_or_warning
-   *   Whether the links are a warning or an error. Should be one of the REQUIREMENT_* constants.
+   *   Whether the links are a warning or an error. Should be one of the
+   *   REQUIREMENT_* constants.
    *
    * @internal
    */

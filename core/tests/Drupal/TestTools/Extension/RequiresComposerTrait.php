@@ -1,7 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\TestTools\Extension;
 
+use PHPUnit\Framework\Attributes\BeforeClass;
 use Symfony\Component\Process\ExecutableFinder;
 
 /**
@@ -9,9 +12,7 @@ use Symfony\Component\Process\ExecutableFinder;
  */
 trait RequiresComposerTrait {
 
-  /**
-   * @beforeClass
-   */
+  #[BeforeClass]
   public static function requiresComposer(): void {
     if (!((new ExecutableFinder())->find('composer'))) {
       static::markTestSkipped('This test requires the Composer executable to be accessible.');

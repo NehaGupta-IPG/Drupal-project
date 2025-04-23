@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\KernelTests\Core\Form;
 
 use Drupal\Core\Form\FormInterface;
@@ -68,7 +70,7 @@ class ExternalFormUrlTest extends KernelTestBase implements FormInterface {
   /**
    * Tests form behavior.
    */
-  public function testActionUrlBehavior() {
+  public function testActionUrlBehavior(): void {
     // Create a new request which has a request uri with multiple leading
     // slashes and make it the master request.
     $request_stack = \Drupal::service('request_stack');

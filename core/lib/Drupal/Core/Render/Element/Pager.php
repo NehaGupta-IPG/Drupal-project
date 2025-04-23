@@ -2,6 +2,8 @@
 
 namespace Drupal\Core\Render\Element;
 
+use Drupal\Core\Render\Attribute\RenderElement;
+
 /**
  * Provides a render element for a pager.
  *
@@ -28,10 +30,9 @@ namespace Drupal\Core\Render\Element;
  *   '#type' => 'pager',
  * ];
  * @endcode
- *
- * @RenderElement("pager")
  */
-class Pager extends RenderElement {
+#[RenderElement('pager')]
+class Pager extends RenderElementBase {
 
   /**
    * {@inheritdoc}
@@ -61,13 +62,15 @@ class Pager extends RenderElement {
   }
 
   /**
-   * #pre_render callback to associate the appropriate cache context.
+   * Render API callback: Associates the appropriate cache context.
    *
+   * This function is assigned as a #pre_render callback.
    *
    * @param array $pager
    *   A renderable array of #type => pager.
    *
    * @return array
+   *   The render array with cache contexts added.
    */
   public static function preRenderPager(array $pager) {
     // Note: the default pager theme process function

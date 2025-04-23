@@ -9,7 +9,7 @@ use Drupal\editor\Entity\Editor;
 use Drupal\filter\Entity\FilterFormat;
 use Drupal\Tests\ckeditor5\Traits\CKEditor5TestTrait;
 use Drupal\user\RoleInterface;
-use Symfony\Component\Validator\ConstraintViolation;
+use Symfony\Component\Validator\ConstraintViolationInterface;
 
 /**
  * Tests for CKEditor 5 to ensure correct focus management in dialogs.
@@ -33,7 +33,7 @@ class CKEditor5DialogTest extends CKEditor5TestBase {
   /**
    * Tests if CKEditor 5 tooltips can be interacted with in dialogs.
    */
-  public function testCKEditor5FocusInTooltipsInDialog() {
+  public function testCKEditor5FocusInTooltipsInDialog(): void {
     FilterFormat::create([
       'format' => 'test_format',
       'name' => 'CKEditor 5 with link',
@@ -42,6 +42,9 @@ class CKEditor5DialogTest extends CKEditor5TestBase {
     Editor::create([
       'format' => 'test_format',
       'editor' => 'ckeditor5',
+      'image_upload' => [
+        'status' => FALSE,
+      ],
       'settings' => [
         'toolbar' => [
           'items' => ['link'],
@@ -50,7 +53,7 @@ class CKEditor5DialogTest extends CKEditor5TestBase {
     ])->save();
 
     $this->assertSame([], array_map(
-      function (ConstraintViolation $v) {
+      function (ConstraintViolationInterface $v) {
         return (string) $v->getMessage();
       },
       iterator_to_array(CKEditor5::validatePair(

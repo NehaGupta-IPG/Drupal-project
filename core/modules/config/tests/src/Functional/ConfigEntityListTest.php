@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\config\Functional;
 
 use Drupal\Component\Serialization\Json;
@@ -18,9 +20,7 @@ class ConfigEntityListTest extends BrowserTestBase {
   use RedirectDestinationTrait;
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['block', 'config_test'];
 
@@ -43,7 +43,7 @@ class ConfigEntityListTest extends BrowserTestBase {
   /**
    * Tests entity list builder methods.
    */
-  public function testList() {
+  public function testList(): void {
     $controller = \Drupal::entityTypeManager()->getListBuilder('config_test');
 
     // Test getStorage() method.
@@ -214,7 +214,7 @@ class ConfigEntityListTest extends BrowserTestBase {
   /**
    * Tests the listing UI.
    */
-  public function testListUI() {
+  public function testListUI(): void {
     // Log in as an administrative user to access the full menu trail.
     $this->drupalLogin($this->drupalCreateUser([
       'access administration pages',
@@ -312,7 +312,7 @@ class ConfigEntityListTest extends BrowserTestBase {
   /**
    * Tests paging.
    */
-  public function testPager() {
+  public function testPager(): void {
     $this->drupalLogin($this->drupalCreateUser([
       'administer site configuration',
     ]));
@@ -322,7 +322,7 @@ class ConfigEntityListTest extends BrowserTestBase {
     // Create 51 test entities.
     for ($i = 1; $i < 52; $i++) {
       $storage->create([
-        'id' => str_pad($i, 2, '0', STR_PAD_LEFT),
+        'id' => str_pad((string) $i, 2, '0', STR_PAD_LEFT),
         'label' => 'Test config entity ' . $i,
         'weight' => $i,
         'protected_property' => $i,
