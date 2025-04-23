@@ -173,16 +173,6 @@ class FileFieldDisplayTest extends FileFieldTestBase {
     ];
     $this->drupalGet('admin/structure/types/add');
     $this->submitForm($edit, 'Save and manage fields');
-    $field_label = $this->randomString();
-    $this->drupalGet('/admin/structure/types/manage/' . $type_name . '/fields/add-field');
-    $this->submitForm(['new_storage_type' => 'file_upload'], 'Continue');
-    $edit = [
-      'label' => $field_label,
-      'group_field_options_wrapper' => $field_type,
-    ];
-    $this->submitForm($edit, 'Continue');
-    // Ensure the description field is selected on the field instance settings
-    // form. That's what this test is all about.
     $field_edit = [
       'settings[description_field]' => TRUE,
     ];
