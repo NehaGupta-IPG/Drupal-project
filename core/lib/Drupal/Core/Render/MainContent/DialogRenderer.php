@@ -2,7 +2,6 @@
 
 namespace Drupal\Core\Render\MainContent;
 
-use Drupal\Component\Utility\Html;
 use Drupal\Core\Ajax\AjaxResponse;
 use Drupal\Core\Ajax\OpenDialogCommand;
 use Drupal\Core\Controller\TitleResolverInterface;
