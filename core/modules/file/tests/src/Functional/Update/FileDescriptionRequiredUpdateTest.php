@@ -17,7 +17,7 @@ class FileDescriptionRequiredUpdateTest extends UpdatePathTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function setDatabaseDumpFiles() {
+  protected function setDatabaseDumpFiles(): void {
     $this->databaseDumpFiles = [
       // Using the 'filled' fixture as 'base' contains no file fields.
       __DIR__ . '/../../../../../system/tests/fixtures/update/drupal-10.3.0.filled.standard.php.gz',
@@ -29,7 +29,7 @@ class FileDescriptionRequiredUpdateTest extends UpdatePathTestBase {
    *
    * @see file_post_update_description_required()
    */
-  public function testFilePostUpdateDescriptionRequired() {
+  public function testFilePostUpdateDescriptionRequired(): void {
     // Check that before running updates the file field setting is not present.
     $field_config = $this->config('field.field.node.test_content_type.field_test_9');
     $this->assertArrayNotHasKey('description_field_required', $field_config->get('settings'));
