@@ -298,9 +298,8 @@ class ExposedFormTest extends ViewTestBase {
     $this->assertSession()->elementNotExists('xpath', $xpath);
 
     // Test there is only one views exposed form on the page.
-    $xpath = '//form[@id="' . $this->getExpectedExposedFormId($view) . '"]';
+    $xpath = '//form[@class="views-exposed-form"]';
     $this->assertSession()->elementsCount('xpath', $xpath, 1);
-    $element = $this->assertSession()->elementExists('xpath', $xpath);
 
     // Test that the correct option is selected after form submission.
     $this->assertCacheContext('url');
@@ -311,6 +310,7 @@ class ExposedFormTest extends ViewTestBase {
       'page' => ['page'],
     ];
     foreach ($arguments as $argument => $bundles) {
+      $element = $this->assertSession()->elementExists('xpath', $xpath);
       $element->find('css', 'select')->selectOption($argument);
       $element->findButton('Apply')->click();
       $this->assertCacheContext('url');
