@@ -12,6 +12,7 @@ use Drupal\Core\Url;
 use Drupal\system\Theme\SystemAdminThemePreprocess;
 use Drupal\system\Hook\SystemThemeHooks;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 
 /**
  * Disabled option on forms and settings.
