@@ -10,6 +10,8 @@ use Drupal\Core\Config\NullStorage;
 use Drupal\Core\Config\StorageInterface;
 
 /**
+ * Configurator for handling configuration during recipe installation.
+ *
  * @internal
  *   This API is experimental.
  */
@@ -26,6 +28,8 @@ final class ConfigConfigurator {
   private readonly bool|array $strict;
 
   /**
+   * Constructs a ConfigConfigurator object.
+   *
    * @param array $config
    *   Config options for a recipe.
    * @param string $recipe_directory

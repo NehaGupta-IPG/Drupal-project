@@ -7,6 +7,8 @@ namespace Drupal\Core\Recipe;
 use Symfony\Component\Validator\ConstraintViolationList;
 
 /**
+ * Exception class for handling errors related to recipe files.
+ *
  * @internal
  *   This API is experimental.
  */

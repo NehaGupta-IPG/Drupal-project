@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Drupal\Core\Recipe;
 
 /**
+ * Configurator for handling and applying recipes.
+ *
  * @internal
  *   This API is experimental.
  */

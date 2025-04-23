@@ -31,6 +31,8 @@ use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Component\Validator\Validation;
 
 /**
+ * Represents a Drupal recipe used for site configuration and installation.
+ *
  * @internal
  *   This API is experimental.
  */

@@ -10,6 +10,8 @@ use Drupal\Core\Extension\ModuleExtensionList;
 use Drupal\Core\Extension\ThemeExtensionList;
 
 /**
+ * Configurator for installing extensions in a recipe.
+ *
  * @internal
  *   This API is experimental.
  */
@@ -36,6 +38,8 @@ final class InstallConfigurator {
   public readonly array $themes;
 
   /**
+   * Constructs an InstallConfigurator to determine required modules and themes.
+   *
    * @param string[] $extensions
    *   A list of extensions for a recipe to install.
    * @param \Drupal\Core\Extension\ModuleExtensionList $module_list
