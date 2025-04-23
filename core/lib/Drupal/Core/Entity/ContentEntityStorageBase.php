@@ -763,7 +763,8 @@ abstract class ContentEntityStorageBase extends EntityStorageBase implements Con
     $no_longer_default = !$entity->isDefaultRevision();
     $original_same_as_current = $entity->getOriginal()?->getRevisionId() == $entity->getLoadedRevisionId();
     $not_new_revision = !$entity->isNewRevision();
-    if ($previously_default_revision && $no_longer_default && $original_same_as_current && $not_new_revision) {
+    $is_syncing = $entity->isSyncing();
+    if (!$is_syncing && $previously_default_revision && $no_longer_default && $original_same_as_current && $not_new_revision) {
       throw new EntityStorageException("An existing default revision of the '{$this->entityTypeId}' entity type can not be changed to a non-default revision.");
     }
 
