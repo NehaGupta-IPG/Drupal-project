@@ -44,7 +44,9 @@ class TestSiteOliveroInstallTestScript implements TestSetupInterface {
       '--starterkit=olivero',
       '--path=' . $sitePath . '/themes',
     ];
-    $process = new Process($install_command, NULL);
+    $process = new Process($install_command, NULL, [
+      'HTTP_USER_AGENT' => 'Drupal command line',
+    ]);
     $process->setTimeout(60);
     return $process;
   }
