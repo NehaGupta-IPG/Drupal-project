@@ -678,8 +678,8 @@ function node_user_cancel($edit, UserInterface $account, $method) {
 
     case 'user_cancel_reassign':
       // Anonymize all of the nodes for this old account.
-      /** @var \Drupal\node\NodeStorageInterface $nodeStorage */
       \Drupal::moduleHandler()->loadInclude('node', 'inc', 'node.admin');
+      /** @var \Drupal\node\NodeStorageInterface $nodeStorage */
       $nodeStorage = \Drupal::entityTypeManager()->getStorage('node');
       // Reassign node ownership.
       // Since the translation revision creates a new record for each

@@ -39,7 +39,7 @@ interface NodeStorageInterface extends ContentEntityStorageInterface {
    * @param \Drupal\Core\Session\AccountInterface $account
    *   The user entity.
    *
-   * @return int[]
+   * @return array<string, int[]>
    *   Node revision IDs (in ascending order).
    */
   public function userRevisionIdsGroupedByLanguage(AccountInterface $account);
