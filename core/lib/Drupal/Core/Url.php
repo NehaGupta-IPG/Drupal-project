@@ -896,10 +896,12 @@ class Url implements TrustedCallbackInterface {
    */
   public function openInRenderer($renderer, array $options = []) {
     $main_content_renders = \Drupal::getContainer()->getParameter('main_content_renderers');
-    $renderer_key = "drupal_$renderer";
+    $renderer_key = ($renderer === 'off_canvas' || $renderer === 'off_canvas_top') ? "drupal_dialog.$renderer" : "drupal_$renderer";
+
     if (!isset($main_content_renders[$renderer_key])) {
       return $this;
     }
+
     $renderer = \Drupal::service($main_content_renders[$renderer_key]);
     if ($renderer instanceof LinkableMainContentRendererInterface) {
       $renderer->openUrlInRenderer($this, $options);

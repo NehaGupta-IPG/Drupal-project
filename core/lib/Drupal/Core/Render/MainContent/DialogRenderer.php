@@ -130,7 +130,7 @@ class DialogRenderer implements LinkableMainContentRendererInterface {
   /**
    * {@inheritdoc}
    */
-  public function openUrlInRenderer(Url $url, $options = []) {
+  public function openUrlInRenderer(Url $url, $options = []): void {
     $options = $url->getOptions();
     $options['attributes']['class'][] = 'use-ajax';
     $options['attributes']['data-dialog-type'] = 'dialog';

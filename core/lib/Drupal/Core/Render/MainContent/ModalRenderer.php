@@ -40,7 +40,7 @@ class ModalRenderer extends DialogRenderer implements LinkableMainContentRendere
   /**
    * {@inheritdoc}
    */
-  public function openUrlInRenderer(Url $url, $options = []) {
+  public function openUrlInRenderer(Url $url, $options = []): void {
     parent::openUrlInRenderer($url, $options);
     $options = $url->getOptions();
     $options['attributes']['data-dialog-type'] = 'modal';

@@ -173,7 +173,6 @@ class Link implements RenderableInterface {
       '#type' => 'link',
       '#title' => $this->text,
       '#url' => $this->url,
-      '#options' => $this->options,
     ];
   }
 

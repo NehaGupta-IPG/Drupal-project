@@ -73,11 +73,12 @@ class OffCanvasRenderer extends DialogRenderer implements LinkableMainContentRen
   /**
    * {@inheritdoc}
    */
-  public function openUrlInRenderer(Url $url, $options = []) {
+  public function openUrlInRenderer(Url $url, $options = []): void {
     parent::openUrlInRenderer($url, $options);
-    $options = $url->getOptions();
-    $options['attributes']['data-dialog-renderer'] = 'off_canvas';
-    $url->setOptions($options);
+    $url_options = $url->getOptions();
+    $url_options['attributes']['data-dialog-renderer'] = (isset($options['position']) && $options['position'] === 'top') ? 'off_canvas_' . $options['position'] : 'off_canvas';
+    $url_options['attributes']['data-dialog-type'] = 'dialog';
+    $url->setOptions($url_options);
   }
 
 }
