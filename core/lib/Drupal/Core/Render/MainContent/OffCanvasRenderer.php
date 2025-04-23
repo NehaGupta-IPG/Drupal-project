@@ -7,6 +7,7 @@ use Drupal\Core\Controller\TitleResolverInterface;
 use Drupal\Core\Render\RendererInterface;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Ajax\OpenOffCanvasDialogCommand;
+use Drupal\Core\Url;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
@@ -14,7 +15,7 @@ use Symfony\Component\HttpFoundation\Request;
  *
  * @internal
  */
-class OffCanvasRenderer extends DialogRenderer {
+class OffCanvasRenderer extends DialogRenderer implements LinkableMainContentRendererInterface {
 
   /**
    * The renderer.
@@ -67,6 +68,16 @@ class OffCanvasRenderer extends DialogRenderer {
     $options = $request->request->all('dialogOptions');
     $response->addCommand(new OpenOffCanvasDialogCommand($title, $content, $options, NULL, $this->position));
     return $response;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function openUrlInRenderer(Url $url, $options = []) {
+    parent::openUrlInRenderer($url, $options);
+    $options = $url->getOptions();
+    $options['attributes']['data-dialog-renderer'] = 'off_canvas';
+    $url->setOptions($options);
   }
 
 }

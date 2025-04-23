@@ -8,12 +8,13 @@ use Drupal\Core\Ajax\OpenDialogCommand;
 use Drupal\Core\Controller\TitleResolverInterface;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Render\RendererInterface;
+use Drupal\Core\Url;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
  * Default main content renderer for dialog requests.
  */
-class DialogRenderer implements MainContentRendererInterface {
+class DialogRenderer implements LinkableMainContentRendererInterface {
 
   /**
    * The title resolver.
@@ -80,21 +81,9 @@ class DialogRenderer implements MainContentRendererInterface {
    *   The target selector.
    */
   protected function determineTargetSelector(array &$options, RouteMatchInterface $route_match) {
-    // Generate the target wrapper for the dialog.
-    if (isset($options['target'])) {
-      // If the target was nominated in the incoming options, use that.
-      $target = $options['target'];
-      // Ensure the target includes the #.
-      if (!str_starts_with($target, '#')) {
-        $target = '#' . $target;
-      }
-      // This shouldn't be passed on to jQuery.ui.dialog.
-      unset($options['target']);
-    }
-    else {
-      // Generate a target based on the route id.
-      $route_name = $route_match->getRouteName();
-      $target = '#' . Html::getUniqueId("drupal-dialog-$route_name");
+    $target = $options['target'] ?? NULL;
+    if (!empty($target)) {
+      return $target;
     }
     return $target;
   }
@@ -137,6 +126,17 @@ class DialogRenderer implements MainContentRendererInterface {
       $title = $this->renderer->renderInIsolation($title);
     }
     return $title;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function openUrlInRenderer(Url $url, $options = []) {
+    $options = $url->getOptions();
+    $options['attributes']['class'][] = 'use-ajax';
+    $options['attributes']['data-dialog-type'] = 'dialog';
+    $options['attributes']['data-dialog-options'] = json_encode($options);
+    $url->setOptions($options);
   }
 
 }

@@ -5,12 +5,13 @@ namespace Drupal\Core\Render\MainContent;
 use Drupal\Core\Ajax\AjaxResponse;
 use Drupal\Core\Ajax\OpenModalDialogCommand;
 use Drupal\Core\Routing\RouteMatchInterface;
+use Drupal\Core\Url;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
  * Default main content renderer for modal dialog requests.
  */
-class ModalRenderer extends DialogRenderer {
+class ModalRenderer extends DialogRenderer implements LinkableMainContentRendererInterface {
 
   /**
    * {@inheritdoc}
@@ -34,6 +35,16 @@ class ModalRenderer extends DialogRenderer {
 
     $response->addCommand(new OpenModalDialogCommand($title, $content, $options));
     return $response;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function openUrlInRenderer(Url $url, $options = []) {
+    parent::openUrlInRenderer($url, $options);
+    $options = $url->getOptions();
+    $options['attributes']['data-dialog-type'] = 'modal';
+    $url->setOptions($options);
   }
 
 }
