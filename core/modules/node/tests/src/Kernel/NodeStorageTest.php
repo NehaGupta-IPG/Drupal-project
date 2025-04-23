@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\Tests\node\Kernel;
 
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\node\Entity\Node;
 use Drupal\node\Entity\NodeType;
 use Drupal\user\Entity\User;
@@ -20,7 +21,14 @@ class NodeStorageTest extends KernelTestBase {
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['node', 'user', 'system', 'field'];
+  protected static $modules = [
+    'node',
+    'user',
+    'system',
+    'field',
+    'language',
+    'content_translation',
+  ];
 
   /**
    * An unsaved node for testing.
@@ -45,9 +53,12 @@ class NodeStorageTest extends KernelTestBase {
     ]);
     $nodeType->save();
     $this->testNode = Node::create([
-      'title' => 'test node',
+      'title' => 'test node en',
       'type' => $nodeType->id(),
+      'language' => 'en',
     ]);
+
+    ConfigurableLanguage::createFromLangcode('es')->save();
   }
 
   /**
@@ -69,6 +80,44 @@ class NodeStorageTest extends KernelTestBase {
   }
 
   /**
+   * Test getting revisions where a user is set as author but grouped by lang.
+   *
+   * @covers ::userRevisionIdsGroupedByLanguage
+   */
+  public function testUserRevisionIdsGroupedByLanguage(): void {
+    $user1 = User::create(['name' => 'test user 1']);
+    $user1->save();
+
+    $node = $this->testNode;
+    $node
+      ->setSyncing(TRUE)
+      ->setOwner($user1)
+      ->setRevisionUser($user1)
+      ->save();
+    $firstRevisionId = $node->getRevisionId();
+
+    // Create another revision owned by another user.
+    $user2 = User::create(['name' => 'test user 2']);
+    $user2->save();
+    $node->setSyncing(FALSE);
+    $node->setNewRevision();
+    $node->setRevisionUser($user2);
+    $node->addTranslation('es', ['title' => 'test node es', 'uid' => $user2->id()]);
+    $node->save();
+    $secondRevisionId = $node->getRevisionId();
+
+    $this->assertNotEquals($firstRevisionId, $secondRevisionId);
+
+    /** @var \Drupal\node\NodeStorageInterface $nodeStorage */
+    $nodeStorage = \Drupal::entityTypeManager()->getStorage('node');
+
+    $revisionIds = $nodeStorage->userRevisionIdsGroupedByLanguage($user1);
+    $this->assertEquals(['en' => [$firstRevisionId, $secondRevisionId]], $revisionIds);
+    $revisionIds = $nodeStorage->userRevisionIdsGroupedByLanguage($user2);
+    $this->assertEquals(['es' => [$secondRevisionId]], $revisionIds);
+  }
+
+  /**
    * Test getting revisions created by a user.
    *
    * @covers ::userRevisionIdsByRevisionAuthor
@@ -79,6 +128,7 @@ class NodeStorageTest extends KernelTestBase {
 
     $node = $this->testNode;
     $node
+      ->setSyncing(TRUE)
       ->setOwner($user1)
       ->setRevisionUser($user1)
       ->save();
@@ -87,6 +137,7 @@ class NodeStorageTest extends KernelTestBase {
     // Create another revision owned by another user.
     $user2 = User::create(['name' => 'test user 2']);
     $user2->save();
+    $node->setSyncing(FALSE);
     $node->setNewRevision();
     $node->setRevisionUser($user2);
     $node->save();
