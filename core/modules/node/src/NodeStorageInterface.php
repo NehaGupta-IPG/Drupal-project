@@ -34,6 +34,17 @@ interface NodeStorageInterface extends ContentEntityStorageInterface {
   public function userRevisionIds(AccountInterface $account);
 
   /**
+   * Gets a list of revision IDs grouped by language for a specific author.
+   *
+   * @param \Drupal\Core\Session\AccountInterface $account
+   *   The user entity.
+   *
+   * @return int[]
+   *   Node revision IDs (in ascending order).
+   */
+  public function userRevisionIdsGroupedByLanguage(AccountInterface $account);
+
+  /**
    * Gets a list of revision IDs having a given user as revision author.
    *
    * @param \Drupal\Core\Session\AccountInterface $account

@@ -681,20 +681,13 @@ function node_user_cancel($edit, UserInterface $account, $method) {
       /** @var \Drupal\node\NodeStorageInterface $nodeStorage */
       \Drupal::moduleHandler()->loadInclude('node', 'inc', 'node.admin');
       $nodeStorage = \Drupal::entityTypeManager()->getStorage('node');
-      $query = \Drupal::database()->select('node_field_revision', 'n');
-      $query->fields('n', ['langcode']);
-      $query->addExpression('GROUP_CONCAT(vid)', 'revisions');
-      $query->condition('uid', $account->id());
-      $query->groupBy('langcode');
-      $result = $query->execute();
-      $result->setFetchMode(\PDO::FETCH_ASSOC);
-      $revision_list = [];
-      foreach ($result->fetchAll() as $value) {
-        $revision_list[$value['langcode']] = explode(',', $value['revisions']);
-      }
-
-      foreach ($revision_list as $langcode => $revisions) {
-        node_mass_update($revisions, ['uid' => 0], $langcode, TRUE, TRUE, TRUE);
+      // Reassign node ownership.
+      // Since the translation revision creates a new record for each
+      // language, we need to reassign the ownership in the context of
+      // certain language, to not override author for other ones.
+      $revision_id_by_language = $nodeStorage->userRevisionIdsGroupedByLanguage($account);
+      foreach ($revision_id_by_language as $language => $revision_id) {
+        node_mass_update($revision_id, ['uid' => 0], $language, TRUE, TRUE, TRUE);
       }
 
       // Reassign revision authors.
