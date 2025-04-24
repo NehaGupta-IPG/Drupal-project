@@ -27,6 +27,11 @@ class ContentTranslationManager implements ContentTranslationManagerInterface, B
   protected $entityTypeManager;
 
   /**
+   * Static cache of content language settings.
+   */
+  protected array $settingsCache = [];
+
+  /**
    * Constructs a ContentTranslationManageAccessCheck object.
    *
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
@@ -138,10 +143,14 @@ class ContentTranslationManager implements ContentTranslationManagerInterface, B
     if ($entity_type_id == NULL || $bundle == NULL) {
       return NULL;
     }
+    if (isset($this->settingsCache[$entity_type_id][$bundle])) {
+      return $this->settingsCache[$entity_type_id][$bundle];
+    }
     $config = $this->entityTypeManager->getStorage('language_content_settings')->load($entity_type_id . '.' . $bundle);
     if ($config == NULL) {
       $config = $this->entityTypeManager->getStorage('language_content_settings')->create(['target_entity_type_id' => $entity_type_id, 'target_bundle' => $bundle]);
     }
+    $this->settingsCache[$entity_type_id][$bundle] = $config;
     return $config;
   }
 
