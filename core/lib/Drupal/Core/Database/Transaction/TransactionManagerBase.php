@@ -357,7 +357,7 @@ abstract class TransactionManagerBase implements TransactionManagerInterface {
     // underlying database transaction, so we do not trigger the error in such
     // circumstance.
     if (!$this->exceptionThrown) {
-      throw new \Exception('Database commit by letting a Transaction object go out of scope is deprecated in drupal:10.3.0 and is removed from drupal:11.0.0. Commit explicitly via Transaction::commitOrRelease() instead. See https://www.drupal.org/node/7654123');
+      @trigger_error('Database commit by letting a Transaction object go out of scope is deprecated in drupal:10.3.0 and is removed from drupal:11.0.0. Commit explicitly via Transaction::commitOrRelease() instead. See https://www.drupal.org/node/7654123', E_USER_DEPRECATED);
     }
 
     // Commit the transaction.
