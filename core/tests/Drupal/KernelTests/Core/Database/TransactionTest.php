@@ -1118,7 +1118,7 @@ class TransactionTest extends DatabaseTestBase {
     $this->assertRowPresent('row');
 
     // Commit and destruct the transaction. Non-transactional DDL database
-    // will have committed already, so we skip yielding in that case.
+    // will have committed already, so we skip commit in that case.
     if ($this->connection->inTransaction()) {
       $transaction->commitOrRelease();
     }
