@@ -143,6 +143,19 @@ abstract class EntityStorageBase extends EntityHandlerBase implements EntityStor
   }
 
   /**
+   * Builds the cache ID for a not found entity ID.
+   *
+   * @param int|string $id
+   *   Entity ID for which the cache ID should be built.
+   *
+   * @return string
+   *   Cache ID that can be passed to the cache backend.
+   */
+  protected function buildNotFoundCacheId(int|string $id): string {
+    return "not_found:{$this->entityTypeId}:$id";
+  }
+
+  /**
    * {@inheritdoc}
    */
   public function loadUnchanged($id) {
@@ -188,6 +201,28 @@ abstract class EntityStorageBase extends EntityHandlerBase implements EntityStor
   }
 
   /**
+   * Gets not found entities from the static cache.
+   *
+   * @param array $ids
+   *   If not empty, return not found entities that match these IDs.
+   *
+   * @return \Drupal\Core\Entity\EntityInterface[]
+   *   Array of entities from the entity cache, keyed by entity ID.
+   */
+  protected function getNotFoundFromStaticCache(array $ids): array {
+    $not_found = [];
+    // Load any available entities from the internal cache.
+    if ($this->entityType->isStaticallyCacheable()) {
+      foreach ($ids as $id) {
+        if ($this->memoryCache->get($this->buildNotFoundCacheId($id))) {
+          $not_found[] = $id;
+        }
+      }
+    }
+    return $not_found;
+  }
+
+  /**
    * Stores entities in the static entity cache.
    *
    * @param \Drupal\Core\Entity\EntityInterface[] $entities
@@ -197,6 +232,20 @@ abstract class EntityStorageBase extends EntityHandlerBase implements EntityStor
     if ($this->entityType->isStaticallyCacheable()) {
       foreach ($entities as $entity) {
         $this->memoryCache->set($this->buildCacheId($entity->id()), $entity, MemoryCacheInterface::CACHE_PERMANENT, [$this->memoryCacheTag]);
+      }
+    }
+  }
+
+  /**
+   * Stores not found entity IDs in the static entity cache.
+   *
+   * @param array $ids
+   *   Entity IDs to store in the cache.
+   */
+  protected function setNotFoundStaticCache(array $ids): void {
+    if ($this->entityType->isStaticallyCacheable()) {
+      foreach ($ids as $id) {
+        $this->memoryCache->set($this->buildNotFoundCacheId($id), TRUE, MemoryCacheInterface::CACHE_PERMANENT, [$this->memoryCacheTag]);
       }
     }
   }
@@ -285,6 +334,13 @@ abstract class EntityStorageBase extends EntityHandlerBase implements EntityStor
       $ids = array_keys(array_diff_key($flipped_ids, $entities));
     }
 
+    if ($ids) {
+      $not_found_ids = $this->getNotFoundFromStaticCache($ids);
+      if ($not_found_ids) {
+        $ids = array_diff($ids, $not_found_ids);
+      }
+    }
+
     // Try to gather any remaining entities from a 'preload' method. This method
     // can invoke a hook to be used by modules that need, for example, to swap
     // the default revision of an entity with a different one. Even though the
@@ -327,8 +383,12 @@ abstract class EntityStorageBase extends EntityHandlerBase implements EntityStor
     // Ensure that the returned array is ordered the same as the original
     // $ids array if this was passed in and remove any invalid IDs.
     if ($flipped_ids) {
+      $original_flipped_ids = $flipped_ids;
       // Remove any invalid IDs from the array and preserve the order passed in.
       $flipped_ids = array_intersect_key($flipped_ids, $entities);
+
+      $not_found_ids = array_diff_key($original_flipped_ids, $flipped_ids);
+      $this->setNotFoundStaticCache(array_keys($not_found_ids));
       $entities = array_replace($flipped_ids, $entities);
     }
 
