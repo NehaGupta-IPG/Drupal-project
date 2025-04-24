@@ -150,9 +150,10 @@ class Endpoint {
    */
   public function matchUrl($url) {
     foreach ($this->getSchemes() as $scheme) {
-      // Convert scheme into a valid regular expression.
-      $regexp = str_replace(['.', '*', '?'], ['\.', '.*', '\?'], $scheme);
-      if (preg_match("|^$regexp$|", $url)) {
+      // Convert scheme into a valid regular expression while supporting the
+      // wildcard character.
+      $regexp = str_replace(['   '], ['.*'], preg_quote(str_replace(['*'], ['   '], $scheme), '#'));
+      if (preg_match("#^$regexp$#", $url)) {
         return TRUE;
       }
     }

@@ -38,4 +38,33 @@ class EndpointTest extends UnitTestCase {
     $this->assertTrue($endpoint->matchUrl('https://foo.example.com/Video/bar'));
   }
 
+  /**
+   * @covers ::matchUrl
+   *
+   * @dataProvider providerMatchUrlSpecialCharacters
+   */
+  public function testMatchUrlWithSpecialCharacters(string $endpointScheme, string $matchUrl, bool $match): void {
+    $endpoint = new Endpoint(
+      'https://www.example.com/oembed',
+      $this->createMock('\Drupal\media\OEmbed\Provider'),
+      [$endpointScheme],
+    );
+    if ($match) {
+      $this->assertTrue($endpoint->matchUrl($matchUrl));
+    }
+    else {
+      $this->assertFalse($endpoint->matchUrl($matchUrl));
+    }
+  }
+
+  /**
+   * Data provider for testMatchUrlWithSpecialCharacters.
+   */
+  public static function providerMatchUrlSpecialCharacters(): array {
+    return [
+      ['https://(m|www).example.com/video/*', 'https://m.example.com/video/bar', FALSE],
+      ['http://*.deviantart.com/*#/d*', 'http://foo.deviantart.com/bar#/dbaz', TRUE],
+    ];
+  }
+
 }
