@@ -16,7 +16,7 @@ use Drupal\Core\Database\TransactionOutOfOrderException;
 // cspell:ignore Tinky Winky Dipsy
 
 /**
- * Tests the transactions, using the explicit Transaction::yield() method.
+ * Tests the transactions, using the explicit ::commitOrRelease method.
  *
  * We test nesting by having two transaction layers, an outer and inner. The
  * outer layer encapsulates the inner layer. Our transaction nesting abstraction
@@ -42,7 +42,7 @@ use Drupal\Core\Database\TransactionOutOfOrderException;
  *
  * @group Database
  */
-class TransactionYieldTest extends DatabaseTestBase {
+class TransactionTest extends DatabaseTestBase {
 
   /**
    * Keeps track of the post-transaction callback action executed.
@@ -56,7 +56,7 @@ class TransactionYieldTest extends DatabaseTestBase {
     parent::setUp();
 
     // Set the transaction manager to trigger warnings when appropriate.
-    $this->connection->transactionManager()->triggerWarningWhenYieldingOnVoidTransaction = TRUE;
+    $this->connection->transactionManager()->triggerWarningWhenUnpilingOnVoidTransaction = TRUE;
   }
 
   /**
@@ -140,7 +140,7 @@ class TransactionYieldTest extends DatabaseTestBase {
 
     $this->assertTrue($this->connection->inTransaction(), 'In transaction after calling nested transaction.');
 
-    $txn->yield();
+    $txn->commitOrRelease();
   }
 
   /**
@@ -173,7 +173,7 @@ class TransactionYieldTest extends DatabaseTestBase {
 
     $this->assertTrue($this->connection->inTransaction(), 'In transaction inside nested transaction.');
 
-    $txn->yield();
+    $txn->commitOrRelease();
   }
 
   /**
@@ -245,8 +245,8 @@ class TransactionYieldTest extends DatabaseTestBase {
     // Insert a row.
     $this->insertRow('Syd');
 
-    // Yield root. Corresponds to 'COMMIT' on the database.
-    $transaction->yield();
+    // Commit root.
+    $transaction->commitOrRelease();
     $this->assertRowPresent('David');
     $this->assertRowAbsent('Roger');
     $this->assertRowPresent('Syd');
@@ -272,9 +272,9 @@ class TransactionYieldTest extends DatabaseTestBase {
     // Insert a row.
     $this->insertRow('Syd');
 
-    // Try yielding savepoint. Should fail since it was released already.
+    // Try releasing savepoint. Should fail since it was released already.
     try {
-      $savepoint->yield();
+      $savepoint->commitOrRelease();
       $this->fail('Expected TransactionOutOfOrderException was not thrown');
     }
     catch (\Exception $e) {
@@ -287,8 +287,8 @@ class TransactionYieldTest extends DatabaseTestBase {
     $this->assertTrue($this->connection->inTransaction());
     $this->assertSame(1, $this->connection->transactionManager()->stackDepth());
 
-    // Yield root. Corresponds to 'COMMIT' on the database.
-    $transaction->yield();
+    // Commit root.
+    $transaction->commitOrRelease();
     $this->assertRowPresent('David');
     $this->assertRowAbsent('Roger');
     $this->assertRowPresent('Syd');
@@ -303,9 +303,8 @@ class TransactionYieldTest extends DatabaseTestBase {
     $transaction = $this->createRootTransaction();
     $savepoint = $this->createFirstSavepointTransaction();
 
-    // Yield savepoint. It should get released too. Corresponds to 'RELEASE
-    // savepoint_1' on the database.
-    $savepoint->yield();
+    // Release savepoint. Corresponds to 'RELEASE savepoint_1' on the database.
+    $savepoint->commitOrRelease();
     $this->assertRowPresent('David');
     $this->assertRowPresent('Roger');
     $this->assertTrue($this->connection->inTransaction());
@@ -329,8 +328,8 @@ class TransactionYieldTest extends DatabaseTestBase {
     $this->assertTrue($this->connection->inTransaction());
     $this->assertSame(1, $this->connection->transactionManager()->stackDepth());
 
-    // Yield root. Corresponds to 'COMMIT' on the database.
-    $transaction->yield();
+    // Commit root.
+    $transaction->commitOrRelease();
     $this->assertRowPresent('David');
     $this->assertRowPresent('Roger');
     $this->assertRowPresent('Syd');
@@ -425,7 +424,7 @@ class TransactionYieldTest extends DatabaseTestBase {
     $this->assertRowPresent('David');
     $this->assertRowPresent('Roger');
     if ($this->connection->supportsTransactionalDDL()) {
-      $savepoint->yield();
+      $savepoint->commitOrRelease();
       $this->assertTrue($this->connection->inTransaction());
       $this->assertSame(1, $this->connection->transactionManager()->stackDepth());
     }
@@ -434,10 +433,10 @@ class TransactionYieldTest extends DatabaseTestBase {
         throw new \ErrorException($errstr);
       });
       try {
-        $savepoint->yield();
+        $savepoint->commitOrRelease();
       }
       catch (\ErrorException $e) {
-        $this->assertSame('Transaction::yield() was not processed because a prior execution of a DDL statement already committed the transaction.', $e->getMessage());
+        $this->assertSame('Transaction::commitOrRelease() was not processed because a prior execution of a DDL statement already committed the transaction.', $e->getMessage());
       }
       finally {
         restore_error_handler();
@@ -446,17 +445,17 @@ class TransactionYieldTest extends DatabaseTestBase {
     }
 
     if ($this->connection->supportsTransactionalDDL()) {
-      $transaction->yield();
+      $transaction->commitOrRelease();
     }
     else {
       set_error_handler(static function (int $errno, string $errstr): bool {
         throw new \ErrorException($errstr);
       });
       try {
-        $transaction->yield();
+        $transaction->commitOrRelease();
       }
       catch (\ErrorException $e) {
-        $this->assertSame('Transaction::yield() was not processed because a prior execution of a DDL statement already committed the transaction.', $e->getMessage());
+        $this->assertSame('Transaction::commitOrRelease() was not processed because a prior execution of a DDL statement already committed the transaction.', $e->getMessage());
       }
       finally {
         restore_error_handler();
@@ -493,17 +492,17 @@ class TransactionYieldTest extends DatabaseTestBase {
     $this->insertRow('row');
     $this->executeDDLStatement();
     if ($this->connection->supportsTransactionalDDL()) {
-      $transaction->yield();
+      $transaction->commitOrRelease();
     }
     else {
       set_error_handler(static function (int $errno, string $errstr): bool {
         throw new \ErrorException($errstr);
       });
       try {
-        $transaction->yield();
+        $transaction->commitOrRelease();
       }
       catch (\ErrorException $e) {
-        $this->assertSame('Transaction::yield() was not processed because a prior execution of a DDL statement already committed the transaction.', $e->getMessage());
+        $this->assertSame('Transaction::commitOrRelease() was not processed because a prior execution of a DDL statement already committed the transaction.', $e->getMessage());
       }
       finally {
         restore_error_handler();
@@ -517,17 +516,17 @@ class TransactionYieldTest extends DatabaseTestBase {
     $this->executeDDLStatement();
     $this->insertRow('row');
     if ($this->connection->supportsTransactionalDDL()) {
-      $transaction->yield();
+      $transaction->commitOrRelease();
     }
     else {
       set_error_handler(static function (int $errno, string $errstr): bool {
         throw new \ErrorException($errstr);
       });
       try {
-        $transaction->yield();
+        $transaction->commitOrRelease();
       }
       catch (\ErrorException $e) {
-        $this->assertSame('Transaction::yield() was not processed because a prior execution of a DDL statement already committed the transaction.', $e->getMessage());
+        $this->assertSame('Transaction::commitOrRelease() was not processed because a prior execution of a DDL statement already committed the transaction.', $e->getMessage());
       }
       finally {
         restore_error_handler();
@@ -541,17 +540,17 @@ class TransactionYieldTest extends DatabaseTestBase {
     $transaction2 = $this->createFirstSavepointTransaction('', FALSE);
     $this->executeDDLStatement();
     if ($this->connection->supportsTransactionalDDL()) {
-      $transaction2->yield();
+      $transaction2->commitOrRelease();
     }
     else {
       set_error_handler(static function (int $errno, string $errstr): bool {
         throw new \ErrorException($errstr);
       });
       try {
-        $transaction2->yield();
+        $transaction2->commitOrRelease();
       }
       catch (\ErrorException $e) {
-        $this->assertSame('Transaction::yield() was not processed because a prior execution of a DDL statement already committed the transaction.', $e->getMessage());
+        $this->assertSame('Transaction::commitOrRelease() was not processed because a prior execution of a DDL statement already committed the transaction.', $e->getMessage());
       }
       finally {
         restore_error_handler();
@@ -559,13 +558,14 @@ class TransactionYieldTest extends DatabaseTestBase {
     }
     $transaction3 = $this->connection->startTransaction();
     $this->insertRow('row');
-    $transaction3->yield();
+    $transaction3->commitOrRelease();
+
     if ($this->connection->supportsTransactionalDDL()) {
-      $transaction->yield();
+      $transaction->commitOrRelease();
     }
     else {
       try {
-        $transaction->yield();
+        $transaction->commitOrRelease();
         $this->fail('TransactionOutOfOrderException was expected, but did not throw.');
       }
       catch (TransactionOutOfOrderException) {
@@ -581,17 +581,17 @@ class TransactionYieldTest extends DatabaseTestBase {
     $transaction2 = $this->createFirstSavepointTransaction('', FALSE);
     $this->executeDDLStatement();
     if ($this->connection->supportsTransactionalDDL()) {
-      $transaction2->yield();
+      $transaction2->commitOrRelease();
     }
     else {
       set_error_handler(static function (int $errno, string $errstr): bool {
         throw new \ErrorException($errstr);
       });
       try {
-        $transaction2->yield();
+        $transaction2->commitOrRelease();
       }
       catch (\ErrorException $e) {
-        $this->assertSame('Transaction::yield() was not processed because a prior execution of a DDL statement already committed the transaction.', $e->getMessage());
+        $this->assertSame('Transaction::commitOrRelease() was not processed because a prior execution of a DDL statement already committed the transaction.', $e->getMessage());
       }
       finally {
         restore_error_handler();
@@ -601,11 +601,11 @@ class TransactionYieldTest extends DatabaseTestBase {
     $this->insertRow('row');
     $transaction3->rollBack();
     if ($this->connection->supportsTransactionalDDL()) {
-      $transaction->yield();
+      $transaction->commitOrRelease();
     }
     else {
       try {
-        $transaction->yield();
+        $transaction->commitOrRelease();
         $this->fail('TransactionOutOfOrderException was expected, but did not throw.');
       }
       catch (TransactionOutOfOrderException) {
@@ -631,10 +631,10 @@ class TransactionYieldTest extends DatabaseTestBase {
       $transaction = $this->createRootTransaction('', FALSE);
       $transaction2 = $this->createFirstSavepointTransaction('', FALSE);
       $this->executeDDLStatement();
-      $transaction2->yield();
+      $transaction2->commitOrRelease();
       $transaction3 = $this->connection->startTransaction();
       $this->insertRow('row');
-      $transaction3->yield();
+      $transaction3->commitOrRelease();
       $this->assertRowPresent('row');
       $transaction->rollBack();
       $this->assertRowAbsent('row');
@@ -677,7 +677,7 @@ class TransactionYieldTest extends DatabaseTestBase {
     }
 
     try {
-      $transaction->yield();
+      $transaction->commitOrRelease();
       $this->fail('TransactionOutOfOrderException was expected, but did not throw.');
     }
     catch (TransactionOutOfOrderException) {
@@ -771,10 +771,10 @@ class TransactionYieldTest extends DatabaseTestBase {
     $transaction2 = $this->createFirstSavepointTransaction('', FALSE);
     $this->insertRow('inner');
     // Pop the inner transaction.
-    $transaction2->yield();
+    $transaction2->commitOrRelease();
     $this->assertTrue($this->connection->inTransaction(), 'Still in a transaction after popping the inner transaction');
     // Pop the outer transaction.
-    $transaction->yield();
+    $transaction->commitOrRelease();
     $this->assertFalse($this->connection->inTransaction(), 'Transaction closed after popping the outer transaction');
     $this->assertRowPresent('outer');
     $this->assertRowPresent('inner');
@@ -790,7 +790,7 @@ class TransactionYieldTest extends DatabaseTestBase {
     $this->assertTrue($this->connection->inTransaction(), 'Still in a transaction after popping the outer transaction');
     // Pop the outer transaction, it should commit.
     $this->insertRow('outer-after-inner-rollback');
-    $transaction->yield();
+    $transaction->commitOrRelease();
     $this->assertFalse($this->connection->inTransaction(), 'Transaction closed after popping the inner transaction');
     $this->assertRowPresent('outer');
     $this->assertRowAbsent('inner');
@@ -910,17 +910,17 @@ class TransactionYieldTest extends DatabaseTestBase {
 
     // Commit the transaction.
     if ($this->connection->supportsTransactionalDDL()) {
-      $transaction->yield();
+      $transaction->commitOrRelease();
     }
     else {
       set_error_handler(static function (int $errno, string $errstr): bool {
         throw new \ErrorException($errstr);
       });
       try {
-        $transaction->yield();
+        $transaction->commitOrRelease();
       }
       catch (\ErrorException $e) {
-        $this->assertSame('Transaction::yield() was not processed because a prior execution of a DDL statement already committed the transaction.', $e->getMessage());
+        $this->assertSame('Transaction::commitOrRelease() was not processed because a prior execution of a DDL statement already committed the transaction.', $e->getMessage());
       }
       finally {
         restore_error_handler();
@@ -955,18 +955,18 @@ class TransactionYieldTest extends DatabaseTestBase {
 
     $this->insertRow('row');
 
-    // Yield a savepoint transaction. Corresponds to 'RELEASE SAVEPOINT
+    // Release savepoint transaction. Corresponds to 'RELEASE SAVEPOINT
     // savepoint_2' on the database.
-    $savepoint2->yield();
+    $savepoint2->commitOrRelease();
     // Since we have committed an intermediate savepoint Transaction object,
     // the savepoints created later have been dropped by the database already.
     $this->assertSame(2, $this->connection->transactionManager()->stackDepth());
     $this->assertRowPresent('row');
 
-    // Yield the remaining Transaction objects. The client transaction is
+    // Commit the remaining Transaction objects. The client transaction is
     // eventually committed.
-    $savepoint1->yield();
-    $transaction->yield();
+    $savepoint1->commitOrRelease();
+    $transaction->commitOrRelease();
     $this->assertFalse($this->connection->inTransaction());
     $this->assertRowPresent('row');
   }
@@ -986,20 +986,20 @@ class TransactionYieldTest extends DatabaseTestBase {
 
     $this->insertRow('row');
 
-    // Yield the root transaction. Corresponds to 'COMMIT' on the database.
-    $transaction->yield();
+    // Commit the root transaction.
+    $transaction->commitOrRelease();
     // Since we have committed the outer (root) Transaction object, the inner
     // (savepoint) ones have been dropped by the database already, and we are
     // no longer in an active transaction state.
     $this->assertSame(0, $this->connection->transactionManager()->stackDepth());
     $this->assertFalse($this->connection->inTransaction());
     $this->assertRowPresent('row');
-    // Trying to yield the inner (savepoint) Transaction object, throws an
+    // Trying to release the inner (savepoint) Transaction object, throws an
     // exception since it was dropped by the database already, and removed from
     // our transaction stack.
     $this->expectException(TransactionOutOfOrderException::class);
     $this->expectExceptionMessageMatches("/^Error attempting commit of .*\\\\savepoint_2\\. Active stack: .* empty/");
-    $savepoint2->yield();
+    $savepoint2->commitOrRelease();
   }
 
   /**
@@ -1054,7 +1054,7 @@ class TransactionYieldTest extends DatabaseTestBase {
 
     // Callbacks are processed only when destructing the transaction.
     // Executing a commit is not sufficient by itself.
-    $transaction->yield();
+    $transaction->commitOrRelease();
     $this->assertNull($this->postTransactionCallbackAction);
     $this->assertRowPresent('row');
     $this->assertRowAbsent('rtcCommit');

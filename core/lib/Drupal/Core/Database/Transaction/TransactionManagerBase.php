@@ -102,14 +102,14 @@ abstract class TransactionManagerBase implements TransactionManagerInterface {
   private ClientConnectionTransactionState $connectionTransactionState;
 
   /**
-   * Whether to trigger warnings when yielding a void transaction.
+   * Whether to trigger warnings when unpiling a void transaction.
    *
    * Normally FALSE, is set to TRUE by specific tests checking the internal
    * state of the transaction stack.
    *
    * @internal
    */
-  public bool $triggerWarningWhenYieldingOnVoidTransaction = FALSE;
+  public bool $triggerWarningWhenUnpilingOnVoidTransaction = FALSE;
 
   /**
    * Constructor.
@@ -317,9 +317,9 @@ abstract class TransactionManagerBase implements TransactionManagerInterface {
   public function purge(string $name, string $id): void {
     // If this is a 'root' transaction, and it is voided (that is, no longer in
     // the stack), then the transaction on the database is no longer active. An
-    // action such as a yield, a rollback, or a DDL statement, was executed
-    // that terminated the database transaction. So, we can process the post
-    // transaction callbacks.
+    // action such as a commit, a release savepoint, a rollback, or a DDL
+    // statement, was executed that terminated the database transaction. So, we
+    // can process the post transaction callbacks.
     if (!isset($this->stack()[$id]) && isset($this->voidedItems[$id]) && $this->rootId === $id) {
       $this->processPostTransactionCallbacks();
       $this->rootId = NULL;
@@ -354,8 +354,8 @@ abstract class TransactionManagerBase implements TransactionManagerInterface {
     // If the transaction was voided, we cannot unpile. Skip but trigger a user
     // warning if requested.
     if ($this->getConnectionTransactionState() === ClientConnectionTransactionState::Voided) {
-      if ($this->triggerWarningWhenYieldingOnVoidTransaction) {
-        trigger_error('Transaction::yield() was not processed because a prior execution of a DDL statement already committed the transaction.', E_USER_WARNING);
+      if ($this->triggerWarningWhenUnpilingOnVoidTransaction) {
+        trigger_error('Transaction::commitOrRelease() was not processed because a prior execution of a DDL statement already committed the transaction.', E_USER_WARNING);
       }
       return;
     }

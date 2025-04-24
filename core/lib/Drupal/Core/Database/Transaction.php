@@ -46,13 +46,13 @@ class Transaction {
   }
 
   /**
-   * Yields the transaction to the parent level.
+   * Returns the transaction to the parent nesting level.
    *
    * Depending on the state of the transaction stack, this leads to a COMMIT
    * operation (for a root item), or to a RELEASE SAVEPOINT operation (for a
    * savepoint item) executed on the database.
    */
-  public function yield(): void {
+  public function commitOrRelease(): void {
     $this->connection->transactionManager()->unpile($this->name, $this->id);
   }
 
