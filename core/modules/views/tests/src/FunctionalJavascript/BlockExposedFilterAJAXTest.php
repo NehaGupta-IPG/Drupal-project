@@ -105,7 +105,7 @@ class BlockExposedFilterAJAXTest extends WebDriverTestBase {
   /**
    * Tests if exposed forms work with multiple instances of the same view.
    */
-  public function testMultipleExposedFormsForTheSameView() {
+  public function testMultipleExposedFormsForTheSameView(): void {
     $this->drupalPlaceBlock('views_exposed_filter_block:test_block_exposed_ajax_with_page-page_2', [
       'region' => 'content',
       'weight' => -10,
