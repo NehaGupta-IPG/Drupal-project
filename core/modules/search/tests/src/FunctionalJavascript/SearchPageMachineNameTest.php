@@ -30,9 +30,9 @@ class SearchPageMachineNameTest extends WebDriverTestBase {
    * updated when the label field changes. The machine name should be automatically
    * generated from the label, but currently it is not.
    *
-   * @see https://www.drupal.org/project/drupal/issues/XXXXX
+   * @see https://www.drupal.org/project/drupal/issues/3520941#comment-16084573
    */
-  public function testMachineNameNotUpdated() {
+  public function testMachineNameNotUpdated(): void {
     // Log in as admin.
     $this->drupalLogin($this->drupalCreateUser([
       'search content',
