@@ -26,7 +26,7 @@ class SearchPageTest extends BrowserTestBase {
   /**
    * Tests creating a new search page and verifying it works.
    */
-  public function testSearchPageCreation() {
+  public function testSearchPageCreation(): void {
     // Log in as admin.
     $this->drupalLogin($this->drupalCreateUser([
       'search content',
