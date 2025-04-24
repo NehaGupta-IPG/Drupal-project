@@ -107,13 +107,17 @@ class BlockExposedFilterAJAXTest extends WebDriverTestBase {
    */
   public function testMultipleExposedFormsForTheSameView() {
     $this->drupalPlaceBlock('views_exposed_filter_block:test_block_exposed_ajax_with_page-page_2', [
-      'region' => 'content', 'weight' => -10, 'id' => 'page-exposed-form'
+      'region' => 'content',
+      'weight' => -10,
+      'id' => 'page-exposed-form',
     ]);
     $this->drupalPlaceBlock('views_block:test_block_exposed_ajax_with_page-block_1', [
-      'id' => 'block-one-exposed-form', 'weight' => 50
+      'id' => 'block-one-exposed-form',
+      'weight' => 50,
     ]);
     $this->drupalPlaceBlock('views_block:test_block_exposed_ajax_with_page-block_1', [
-      'id' => 'block-two-exposed-form', 'weight' => 100
+      'id' => 'block-two-exposed-form',
+      'weight' => 100,
     ]);
 
     $assert_session = $this->assertSession();
