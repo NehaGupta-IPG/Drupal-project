@@ -375,15 +375,27 @@ default:
     # Output a copy in junit.
     - php vendor/bin/phpstan -vvv analyze --configuration=./core/phpstan.neon.dist --error-format=gitlab > $CI_PROJECT_DIR/phpstan-quality-report.json || EXIT_CODE=$?
     - php vendor/bin/phpstan -vvv analyze --configuration=./core/phpstan.neon.dist --no-progress --error-format=junit > $CI_PROJECT_DIR/phpstan-junit.xml || true
+    # When the PHPStan scan fails, output a human readable copy of the errors,
+    # and regenerate a full baseline.
+    # In order to regenerate a baseline artifact that can be copied and pasted
+    # to a MR branch, we first need to void the current baseline file, then
+    # run PHPStan with the --generate-baseline option, and finally edit the
+    # generated file to convert absolute paths into relative ones.
     - |
       if [ -n "$EXIT_CODE" ]; then
         # Output a copy in plain text for human logs.
         php vendor/bin/phpstan analyze --configuration=./core/phpstan.neon.dist --no-progress || true
         # Generate a new baseline.
         echo "Generating an PHPStan baseline file (available as job artifact)."
+        cp $CI_PROJECT_DIR/.gitlab-ci/scripts/.empty-phpstan-baseline.php ./core/.phpstan-baseline.php
         php vendor/bin/phpstan analyze --configuration=./core/phpstan.neon.dist --no-progress --generate-baseline=$CI_PROJECT_DIR/core/.phpstan-baseline.php || true
+        sed -i "s/ '\\/\\/build\\/core/ '/g" $CI_PROJECT_DIR/core/.phpstan-baseline.php
+        sed -i "s/ '\\/\\/build/ '\\/../g" $CI_PROJECT_DIR/core/.phpstan-baseline.php
+        php $CI_PROJECT_DIR/.gitlab-ci/scripts/phpstan-baseline-statistics.php
         exit $EXIT_CODE
       fi
+    # Generate baseline statistics.
+    - php $CI_PROJECT_DIR/.gitlab-ci/scripts/phpstan-baseline-statistics.php
 
   artifacts:
     # Only store the baseline if the job fails.
@@ -391,8 +403,9 @@ default:
     reports:
       codequality: phpstan-quality-report.json
       junit: phpstan-junit.xml
+      metrics: phpstan-metrics.txt
     paths:
-      - core/.phpstan-baseline.php
+      - $CI_PROJECT_DIR/core/.phpstan-baseline.php
 
 '🧹 PHP Coding standards (PHPCS)':
   <<: [ *default-job-settings-lint ]

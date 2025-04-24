@@ -102,7 +102,7 @@ class SimpletestTestRunResultsStorage implements TestRunResultsStorageInterface 
     $count = $this->connection->delete('simpletest_test_id')
       ->condition('test_id', $test_run->id())
       ->execute();
-    $transaction->yield();
+    $transaction->commitOrRelease();
     return $count;
   }
 
@@ -173,7 +173,7 @@ class SimpletestTestRunResultsStorage implements TestRunResultsStorageInterface 
     $transaction = $this->connection->startTransaction('delete_simpletest');
     $this->connection->delete('simpletest')->execute();
     $count = $this->connection->delete('simpletest_test_id')->execute();
-    $transaction->yield();
+    $transaction->commitOrRelease();
     return $count;
   }
 
