@@ -29,31 +29,17 @@ abstract class SearchPageFormBase extends EntityForm {
   protected $plugin;
 
   /**
-   * The search page repository.
-   *
-   * @var \Drupal\search\SearchPageRepositoryInterface
-   */
-  protected $searchPageRepository;
-
-  /**
-   * The router builder.
-   *
-   * @var \Drupal\Core\Routing\RouteBuilderInterface
-   */
-  protected $routerBuilder;
-
-  /**
    * Constructs a new search form.
    *
-   * @param \Drupal\search\SearchPageRepositoryInterface $search_page_repository
+   * @param \Drupal\search\SearchPageRepositoryInterface $searchPageRepository
    *   The search page repository.
-   * @param \Drupal\Core\Routing\RouteBuilderInterface $router_builder
+   * @param \Drupal\Core\Routing\RouteBuilderInterface $routerBuilder
    *   The router builder.
    */
-  public function __construct(SearchPageRepositoryInterface $search_page_repository, RouteBuilderInterface $router_builder) {
-    $this->searchPageRepository = $search_page_repository;
-    $this->routerBuilder = $router_builder;
-  }
+  public function __construct(
+    protected SearchPageRepositoryInterface $searchPageRepository,
+    protected RouteBuilderInterface $routerBuilder,
+  ) {}
 
   /**
    * {@inheritdoc}
