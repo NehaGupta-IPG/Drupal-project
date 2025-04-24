@@ -76,8 +76,9 @@ abstract class SearchPageFormBase extends EntityForm {
       '#type' => 'textfield',
       '#title' => $this->t('Label'),
       '#description' => $this->t('The label for this search page.'),
-      '#default_value' => $this->entity->label(),
+      '#default_value' => !$this->entity->isNew() ? $this->entity->label() : '',
       '#maxlength' => '255',
+      '#required' => TRUE,
     ];
 
     $form['id'] = [
