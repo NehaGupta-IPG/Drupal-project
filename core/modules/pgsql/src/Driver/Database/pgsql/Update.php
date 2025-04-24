@@ -77,7 +77,7 @@ class Update extends QueryUpdate {
     try {
       $stmt->execute(NULL, $this->queryOptions);
       if (isset($savepoint)) {
-        $savepoint->yield();
+        $savepoint->commitOrRelease();
       }
       return $stmt->rowCount();
     }

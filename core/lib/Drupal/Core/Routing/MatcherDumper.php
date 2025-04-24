@@ -161,7 +161,7 @@ class MatcherDumper implements MatcherDumperInterface {
         $insert->execute();
       }
 
-      $transaction->yield();
+      $transaction->commitOrRelease();
     }
     catch (\Exception $e) {
       if (isset($transaction)) {

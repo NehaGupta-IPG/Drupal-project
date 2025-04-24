@@ -753,7 +753,7 @@ class SqlContentEntityStorage extends ContentEntityStorageBase implements SqlEnt
       $transaction = $this->database->startTransaction();
       parent::delete($entities);
       if ($this->database->inTransaction()) {
-        $transaction->yield();
+        $transaction->commitOrRelease();
       }
 
       // Ignore replica server temporarily.
@@ -812,7 +812,7 @@ class SqlContentEntityStorage extends ContentEntityStorageBase implements SqlEnt
       $transaction = $this->database->startTransaction();
       $return = parent::save($entity);
       if ($this->database->inTransaction()) {
-        $transaction->yield();
+        $transaction->commitOrRelease();
       }
 
       // Ignore replica server temporarily.
@@ -871,7 +871,7 @@ class SqlContentEntityStorage extends ContentEntityStorageBase implements SqlEnt
       $this->saveToDedicatedTables($entity, FALSE, []);
 
       if ($this->database->inTransaction()) {
-        $transaction->yield();
+        $transaction->commitOrRelease();
       }
 
       // Ignore replica server temporarily.

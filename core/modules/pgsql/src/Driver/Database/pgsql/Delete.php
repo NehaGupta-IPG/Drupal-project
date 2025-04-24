@@ -19,7 +19,7 @@ class Delete extends QueryDelete {
     try {
       $result = parent::execute();
       if (isset($savepoint)) {
-        $savepoint->yield();
+        $savepoint->commitOrRelease();
       }
       return $result;
     }

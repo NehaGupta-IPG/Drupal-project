@@ -103,7 +103,7 @@ class WorkspaceAssociation implements WorkspaceAssociationInterface, EventSubscr
         $insert_query->execute();
       }
 
-      $transaction->yield();
+      $transaction->commitOrRelease();
     }
     catch (\Exception $e) {
       if (isset($transaction)) {

@@ -180,7 +180,7 @@ EOD;
         throw $e;
       }
       if (isset($savepoint)) {
-        $savepoint->yield();
+        $savepoint->commitOrRelease();
       }
 
       // If the table information does not yet exist in the PostgreSQL
@@ -287,7 +287,7 @@ EOD;
     }
 
     if (isset($savepoint)) {
-      $savepoint->yield();
+      $savepoint->commitOrRelease();
     }
 
     $field_information = $checks->fetchCol();

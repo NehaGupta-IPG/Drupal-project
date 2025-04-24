@@ -156,7 +156,7 @@ class Select extends QuerySelect {
       throw $e;
     }
     if (isset($savepoint)) {
-      $savepoint->yield();
+      $savepoint->commitOrRelease();
     }
 
     return $result;
