@@ -72,7 +72,7 @@ class BooleanFormatter extends FormatterBase {
             'Field settings (@on_label / @off_label)',
             [
               '@on_label' => $format[0],
-              '@off_label' => $format[1]
+              '@off_label' => $format[1],
             ]
           );
         }
@@ -81,7 +81,7 @@ class BooleanFormatter extends FormatterBase {
             '@on_label / @off_label',
             [
               '@on_label' => $format[0],
-              '@off_label' => $format[1]
+              '@off_label' => $format[1],
             ]
           );
         }
