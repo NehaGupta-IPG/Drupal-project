@@ -95,9 +95,20 @@ class OpenTelemetryFrontPagePerformanceTest extends PerformanceTestBase {
     $this->clearCaches();
     // Now visit a different page to warm non-route-specific caches.
     $this->drupalGet('user/login');
-    $this->collectPerformanceData(function () {
+    $performance_data = $this->collectPerformanceData(function () {
       $this->drupalGet('<front>');
     }, 'umamiFrontPageCoolCache');
+    $this->assertSame(104, $performance_data->getQueryCount());
+    $this->assertSame(289, $performance_data->getCacheGetCount());
+    $this->assertSame(90, $performance_data->getCacheSetCount());
+    $this->assertSame(0, $performance_data->getCacheDeleteCount());
+    $this->assertSame(83, $performance_data->getCacheTagChecksumCount());
+    $this->assertSame(91, $performance_data->getCacheTagIsValidCount());
+    $this->assertSame(0, $performance_data->getCacheTagInvalidationCount());
+    $this->assertSame(1, $performance_data->getScriptCount());
+    $this->assertLessThan(7100, $performance_data->getScriptBytes());
+    $this->assertSame(2, $performance_data->getStylesheetCount());
+    $this->assertLessThan(40250, $performance_data->getStylesheetBytes());
   }
 
   /**
