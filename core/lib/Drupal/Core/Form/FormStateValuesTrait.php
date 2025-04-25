@@ -27,6 +27,30 @@ trait FormStateValuesTrait {
     if (!$exists) {
       $value = $default;
     }
+
+    if (method_exists($this, 'get') &&
+        ($deprecated_keys = $this->get('deprecated_keys') ?? []) &&
+        (is_array($deprecated_keys))) {
+      $deprecated = FALSE;
+      // Deprecated keys are stored as arrays, so convert single string key to
+      // array for comparison.
+      $key = is_array($key) ? $key : [$key];
+      foreach ($deprecated_keys as $deprecated_key) {
+        // This will check whether the array values of $key start with the same
+        // values as the deprecated key. For example, if the key is
+        // ['a', 'b', 'c'], and the deprecated key is ['a', 'b'], then
+        // ['a', 'b', 'c'] is deprecated as well because its parent in the array
+        // is deprecated.
+        if (array_intersect_assoc($deprecated_key['key'], $key) === $deprecated_key['key']) {
+          $deprecated = TRUE;
+          break;
+        }
+      }
+      if ($deprecated) {
+        // @phpcs:ignore
+        @trigger_error(sprintf('The form element with key [%s] in class %s is deprecated in %s and is removed from %s. For any subclass that extends the class and expects a value for this key, the element should be added into that subclass\'s buildForm(). See %s', implode(', ', $key), $deprecated_key['class'], $deprecated_key['deprecation_version'], $deprecated_key['removed_version'], $deprecated_key['change_record']), E_USER_DEPRECATED);
+      }
+    }
     return $value;
   }
 

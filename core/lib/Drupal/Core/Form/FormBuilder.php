@@ -1074,6 +1074,29 @@ class FormBuilder implements FormBuilderInterface, FormValidatorInterface, FormS
       $element['#processed'] = TRUE;
     }
 
+    // Add the element #parents to deprecated keys in form state storage, so
+    // they can be checked whether to trigger deprecation warnings.
+    // @see Drupal\Core\Form\FormStateValuesTrait::getValue()
+    if (isset($element['#deprecated'])) {
+      $element_deprecated = FALSE;
+      $deprecated_keys = $form_state->get('deprecated_keys') ?? [];
+      foreach ($deprecated_keys as $deprecated_key) {
+        if ($element['#parents'] === $deprecated_key) {
+          $element_deprecated = TRUE;
+          break;
+        }
+      }
+      if (!$element_deprecated) {
+        $deprecate_keys[] = ['key' => $element['#parents']] + $element['#deprecated'] + [
+          'class' => '',
+          'deprecation_version' => '',
+          'removed_version' => '',
+          'change_record' => '',
+        ];
+        $form_state->set('deprecated_keys', $deprecate_keys);
+      }
+    }
+
     // We start off assuming all form elements are in the correct order.
     $element['#sorted'] = TRUE;
 

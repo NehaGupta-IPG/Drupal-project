@@ -37,6 +37,18 @@ use Drupal\Core\Url;
  * - #array_parents: (string[], read-only) Array of names of all the element's
  *   parents (including itself) in the render array. See also #parents, #tree.
  * - #default_value: Default value for the element. See also #value.
+ * - #deprecated (array{"class": class-string, "deprecation_version": string,
+ *   "removed_version": string, "change_record": string}, internal)
+ *   Array of string values used to designate that the form element is
+ *   deprecated. A call to $form_state->getValue($key), where $key is the form
+ *   array key for the element, will trigger a deprecation error. Note that
+ *   using $form_state->getValues() and accessing the key from the returned
+ *   array will not trigger the deprecation. This property should have the
+ *   following keys:
+ *   - class: The form object class
+ *   - deprecation version: The version when the form element was deprecated
+ *   - removed_version: The version when the form element will be removed
+ *   - change_record: URL of change record documenting the deprecation.
  * - #description: (string) Help or description text for the element. In an
  *   ideal user interface, the #title should be enough to describe the element,
  *   so most elements should not have a description; if you do need one, make
