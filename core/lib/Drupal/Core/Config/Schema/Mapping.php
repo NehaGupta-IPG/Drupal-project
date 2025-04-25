@@ -199,6 +199,30 @@ class Mapping extends ArrayElement {
   }
 
   /**
+   * Returns all possible types for the type with the given name.
+   *
+   * @param string $name
+   *   Configuration name or key.
+   *
+   * @return string[]
+   *   All possible types for a given type. For example,
+   *   `core_date_format_pattern.[%parent.locked]` will return:
+   *   - `core_date_format_pattern.0`
+   *   - `core_date_format_pattern.1`
+   *   If a fallback name is available, that will be returned too. In this
+   *   example, that would be `core_date_format_pattern.*`.
+   *
+   * @deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Use
+   *    \Drupal\Core\Config\TypedConfigManager::getPossibleTypes instead.
+   *
+   * @see https://www.drupal.org/node/3521257
+   */
+  protected function getPossibleTypes(string $name): array {
+    @trigger_error(__METHOD__ . 'is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Use \Drupal\Core\Config\TypedConfigManager::getPossibleTypes instead. See https://www.drupal.org/node/3521257', E_USER_DEPRECATED);
+    return $this->typedDataManager->getPossibleTypes($name);
+  }
+
+  /**
    * Gets all optional keys in this mapping.
    *
    * @return string[]
