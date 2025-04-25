@@ -24,7 +24,7 @@ class LanguageConfigUpdater {
    * @param bool $enabled
    *   Whether deprecations should be enabled.
    */
-  public function setDeprecationsEnabled(bool $enabled) {
+  public function setDeprecationsEnabled(bool $enabled): void {
     $this->deprecationsEnabled = $enabled;
   }
 
