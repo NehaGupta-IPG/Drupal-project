@@ -1,4 +1,4 @@
-# cspell:ignore cobertura drupaltestbot drupaltestbotpw Dwebdriver logfile testdox XVFB
+# cspell:ignore drupaltestbot drupaltestbotpw Dwebdriver logfile XVFB
 
 stages:
   - 🗜️ Test
@@ -77,7 +77,7 @@ variables:
   alias: database
 
 .with-chrome: &with-chrome
-  name: $_CONFIG_DOCKERHUB_ROOT/chromedriver:production
+  name: $_CONFIG_DOCKERHUB_ROOT/webdriver-chromedriver:production
   alias: chrome
   entrypoint:
     - chromedriver
@@ -113,7 +113,7 @@ variables:
         echo '   "Key" to "REPEAT_TEST_CLASS" and "Value" to "Drupal\Tests\ckeditor5\FunctionalJavascript\MediaLinkabilityTest"';
         exit 1;
       else
-        sudo -u www-data -E -H php ./core/scripts/run-tests.sh --color --keep-results --concurrency "$CONCURRENCY" --repeat "100" --sqlite "./sites/default/files/tests.sqlite" --dburl $SIMPLETEST_DB --url $SIMPLETEST_BASE_URL --verbose --non-html --class $REPEAT_TEST_CLASS
+        sudo -u www-data -E -H php ./core/scripts/run-tests.sh --color --keep-results --concurrency "$CONCURRENCY" --repeat "$REPEAT_COUNT" --sqlite "./sites/default/files/tests.sqlite" --dburl $SIMPLETEST_DB --url $SIMPLETEST_BASE_URL --verbose --non-html --class $REPEAT_TEST_CLASS
       fi
 
 ################
@@ -180,42 +180,6 @@ variables:
   services:
     - <<: *with-database
 
-'⚡️ PHPUnit Unit':
-  <<: [ *with-composer, *run-tests, *default-job-settings ]
-  variables:
-    TESTSUITE: PHPUnit-Unit
-    KUBERNETES_CPU_REQUEST: "1"
-    CONCURRENCY: 6
-
-'✅️ PHPStan Tests':
-  <<: [ *default-job-settings ]
-  variables:
-    KUBERNETES_CPU_REQUEST: "2"
-  # Run if PHPStan files have changed, or manually.
-  rules:
-    - if: $CI_PIPELINE_SOURCE == "parent_pipeline" && $PERFORMANCE_TEST != "1"
-      changes:
-        - core/tests/PHPStan/*
-        - composer/Metapackage/PinnedDevDependencies/composer.json
-    - when: manual
-      allow_failure: true
-  # Default job settings runs a script that expects vendor to exist.
-  before_script: []
-  script:
-    - docker-php-ext-enable pcov
-    - cd core/tests/PHPStan
-    - composer install
-    - vendor/bin/phpunit tests --testdox --coverage-text --colors=never --coverage-cobertura=coverage.cobertura.xml --log-junit junit.xml
-  # Default job settings runs a script that junit files in a specific location..
-  after_script: []
-  artifacts:
-    when: always
-    reports:
-      junit: core/tests/PHPStan/junit.xml
-      coverage_report:
-        coverage_format: cobertura
-        path: core/tests/PHPStan/coverage.cobertura.xml
-
 '🦉️️️ Nightwatch':
   <<: [ *with-composer-and-yarn, *default-job-settings ]
   variables:
@@ -278,8 +242,10 @@ variables:
   allow_failure: true
   variables:
     REPEAT_TEST_CLASS: 'Drupal\Tests\Change\Me'
+    REPEAT_COUNT: 100
   services:
     - <<: *with-database
+    - <<: *with-selenium-chrome
 
 '🚲 Performance tests':
   <<: [ *default-job-settings ]
