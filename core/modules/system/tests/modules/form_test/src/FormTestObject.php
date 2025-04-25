@@ -44,21 +44,6 @@ class FormTestObject extends ConfigFormBase {
       '#attributes' => ['id' => 'red-strawberry-hidden-field'],
     ];
 
-    $form['pear_container'] = [
-      '#type' => 'container',
-      '#deprecated' => [
-        'class' => self::class,
-        'deprecation_version' => 'drupal:11.2.0',
-        'removed_version' => 'drupal:12.0.0',
-        'change_record' => 'https://www.drupal.org/project/drupal/issues/3519300',
-      ],
-      '#tree' => TRUE,
-    ];
-    $form['pear_container']['pear'] = [
-      '#type' => 'hidden',
-      '#value' => 1,
-    ];
-
     $form['actions']['#type'] = 'actions';
     $form['actions']['submit'] = [
       '#type' => 'submit',
@@ -85,8 +70,6 @@ class FormTestObject extends ConfigFormBase {
     $this->config('form_test.object')
       ->set('bananas', $form_state->getValue('bananas'))
       ->save();
-    $form_state->getValue('pear_container');
-    $form_state->getValue(['pear_container', 'pear']);
   }
 
 }
