@@ -156,7 +156,7 @@ class BooleanFormatter extends FormatterBase {
     }
 
     foreach ($items as $delta => $item) {
-      $value = !empty($item->value) ? (bool) $item->value : FALSE;
+      $value = (bool) $item->value;
 
       if ($format == 'custom') {
         $elements[$delta] = ['#markup' => $value ? $this->getSetting('format_custom_true') : $this->getSetting('format_custom_false')];
