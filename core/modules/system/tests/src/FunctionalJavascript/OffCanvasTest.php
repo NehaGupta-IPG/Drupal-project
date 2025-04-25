@@ -64,7 +64,7 @@ class OffCanvasTest extends OffCanvasTestBase {
 
         $style = $page->find('css', '.ui-dialog-off-canvas')->getAttribute('style');
         $this->assertStringContainsString('width: 555px;', $style, 'Dialog width respected.');
-        $page->clickLink("Open side panel 1");
+        $this->_safeClick("Open side panel 1");
         $this->waitForOffCanvasToOpen();
         $style = $page->find('css', '.ui-dialog-off-canvas')->getAttribute('style');
         $this->assertStringNotContainsString('width: 555px;', $style, 'Dialog width reset to default.');
@@ -92,24 +92,24 @@ class OffCanvasTest extends OffCanvasTestBase {
     // Ensure an off-canvas link opened from inside the off-canvas dialog will
     // work.
     $this->drupalGet('/off-canvas-test-links');
-    $page->clickLink('Display more links!');
+    $this->_safeClick('Display more links!');
     $this->waitForOffCanvasToOpen();
     $web_assert->linkExists('Off_canvas link!');
     // Click off-canvas link inside off-canvas dialog
-    $page->clickLink('Off_canvas link!');
+    $this->_safeClick('Off_canvas link!');
     $this->waitForOffCanvasToOpen();
     $web_assert->elementTextContains('css', '.ui-dialog[aria-describedby="drupal-off-canvas"]', 'Thing 2 says hello');
 
     // Ensure an off-canvas link opened from inside the off-canvas dialog will
     // work after another dialog has been opened.
     $this->drupalGet('/off-canvas-test-links');
-    $page->clickLink("Open side panel 1");
+    $this->_safeClick("Open side panel 1");
     $this->waitForOffCanvasToOpen();
-    $page->clickLink('Display more links!');
+    $this->_safeClick('Display more links!');
     $this->waitForOffCanvasToOpen();
     $web_assert->linkExists('Off_canvas link!');
     // Click off-canvas link inside off-canvas dialog
-    $page->clickLink('Off_canvas link!');
+    $this->_safeClick('Off_canvas link!');
     $this->waitForOffCanvasToOpen();
     $web_assert->elementTextContains('css', '.ui-dialog[aria-describedby="drupal-off-canvas"]', 'Thing 2 says hello');
   }
@@ -131,7 +131,7 @@ class OffCanvasTest extends OffCanvasTestBase {
       $this->getSession()->resizeWindow($narrow_width_breakpoint + $offset, $height);
       $this->drupalGet('/off-canvas-test-links');
       $this->assertFalse($page->find('css', '.dialog-off-canvas-main-canvas')->hasAttribute('style'), 'Body not padded on wide page load.');
-      $page->clickLink("Open side panel 1");
+      $this->_safeClick("Open side panel 1");
       $this->waitForOffCanvasToOpen();
       // Check that the main canvas is padded when page is not narrow width and
       // tray is open.
@@ -144,7 +144,7 @@ class OffCanvasTest extends OffCanvasTestBase {
       $this->getSession()->resizeWindow($narrow_width_breakpoint - $offset, $height);
       $this->drupalGet('/off-canvas-test-links');
       $this->assertFalse($page->find('css', '.dialog-off-canvas-main-canvas')->hasAttribute('style'), 'Body not padded on narrow page load.');
-      $page->clickLink("Open side panel 1");
+      $this->_safeClick("Open side panel 1");
       $this->waitForOffCanvasToOpen();
       $this->assertFalse($page->find('css', '.dialog-off-canvas-main-canvas')->hasAttribute('style'), 'Body not padded on narrow page with tray open.');
     }
@@ -159,12 +159,11 @@ class OffCanvasTest extends OffCanvasTestBase {
    * @internal
    */
   protected function assertOffCanvasDialog(int $link_index, string $position): void {
-    $page = $this->getSession()->getPage();
     $web_assert = $this->assertSession();
     $link_text = "Open $position panel $link_index";
 
     // Click the first test like that should open the page.
-    $page->clickLink($link_text);
+    $this->_safeClick($link_text);
     if ($this->lastDialogClass) {
       $web_assert->assertNoElementAfterWait('css', '.' . $this->lastDialogClass);
     }
