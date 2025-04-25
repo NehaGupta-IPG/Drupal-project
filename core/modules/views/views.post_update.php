@@ -12,7 +12,7 @@ use Drupal\views\ViewsConfigUpdater;
 /**
  * Implements hook_removed_post_updates().
  */
-function views_removed_post_updates() {
+function views_removed_post_updates(): array {
   return [
     'views_post_update_update_cacheability_metadata' => '9.0.0',
     'views_post_update_cleanup_duplicate_views_data' => '9.0.0',
@@ -62,5 +62,28 @@ function views_post_update_views_data_argument_plugin_id(?array &$sandbox = NULL
   $view_config_updater->setDeprecationsEnabled(FALSE);
   \Drupal::classResolver(ConfigEntityUpdater::class)->update($sandbox, 'view', function (ViewEntityInterface $view) use ($view_config_updater): bool {
     return $view_config_updater->needsEntityArgumentUpdate($view);
+  });
+}
+
+/**
+ * Clean-up empty remember_roles display settings for views filters.
+ */
+function views_post_update_update_remember_role_empty(?array &$sandbox = NULL): void {
+  /** @var \Drupal\views\ViewsConfigUpdater $view_config_updater */
+  $view_config_updater = \Drupal::classResolver(ViewsConfigUpdater::class);
+  $view_config_updater->setDeprecationsEnabled(FALSE);
+  \Drupal::classResolver(ConfigEntityUpdater::class)->update($sandbox, 'view', function (ViewEntityInterface $view) use ($view_config_updater): bool {
+    return $view_config_updater->needsRememberRolesUpdate($view);
+  });
+}
+
+/**
+ * Adds a default table CSS class.
+ */
+function views_post_update_table_css_class(?array &$sandbox = NULL): void {
+  /** @var \Drupal\views\ViewsConfigUpdater $view_config_updater */
+  $view_config_updater = \Drupal::classResolver(ViewsConfigUpdater::class);
+  \Drupal::classResolver(ConfigEntityUpdater::class)->update($sandbox, 'view', function (ViewEntityInterface $view) use ($view_config_updater): bool {
+    return $view_config_updater->needsTableCssClassUpdate($view);
   });
 }

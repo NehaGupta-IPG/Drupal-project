@@ -23,9 +23,7 @@ class DateFormatAccessControlHandlerTest extends KernelTestBase {
   }
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = [
     'system',
@@ -51,9 +49,9 @@ class DateFormatAccessControlHandlerTest extends KernelTestBase {
   /**
    * @covers ::checkAccess
    * @covers ::checkCreateAccess
-   * @dataProvider testAccessProvider
+   * @dataProvider providerTestAccess
    */
-  public function testAccess($permissions, $which_entity, $view_label_access_result, $view_access_result, $update_access_result, $delete_access_result, $create_access_result) {
+  public function testAccess($permissions, $which_entity, $view_label_access_result, $view_access_result, $update_access_result, $delete_access_result, $create_access_result): void {
 
     $user = $this->drupalCreateUser($permissions);
 
@@ -72,7 +70,13 @@ class DateFormatAccessControlHandlerTest extends KernelTestBase {
     static::assertEquals($create_access_result, $this->accessControlHandler->createAccess(NULL, $user, [], TRUE));
   }
 
-  public static function testAccessProvider() {
+  /**
+   * Provides test cases for access control based on user permissions and entity lock status.
+   *
+   * @return array
+   *   An array of test cases.
+   */
+  public static function providerTestAccess(): array {
     $c = new ContainerBuilder();
     $cache_contexts_manager = (new Prophet())->prophesize(CacheContextsManager::class);
     $cache_contexts_manager->assertValidTokens()->willReturn(TRUE);
@@ -81,7 +85,7 @@ class DateFormatAccessControlHandlerTest extends KernelTestBase {
     \Drupal::setContainer($c);
 
     return [
-      'permissionless + unlocked' => [
+      'No permission + unlocked' => [
         [],
         'unlocked',
         AccessResult::allowed(),
@@ -90,7 +94,7 @@ class DateFormatAccessControlHandlerTest extends KernelTestBase {
         AccessResult::neutral()->addCacheContexts(['user.permissions'])->setReason("The 'administer site configuration' permission is required.")->addCacheTags(['rendered']),
         AccessResult::neutral()->addCacheContexts(['user.permissions'])->setReason("The 'administer site configuration' permission is required."),
       ],
-      'permissionless + locked' => [
+      'no permission + locked' => [
         [],
         'locked',
         AccessResult::allowed(),

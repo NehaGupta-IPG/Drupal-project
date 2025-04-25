@@ -20,9 +20,9 @@ class FieldMissingTypeTest extends EntityKernelTestBase {
   /**
    * Set to FALSE because we are hacking a field storage to use a fake type.
    *
-   * @see \Drupal\Core\Config\Development\ConfigSchemaChecker
-   *
    * @var bool
+   *
+   * @see \Drupal\Core\Config\Development\ConfigSchemaChecker
    */
   protected $strictConfigSchema = FALSE;
 
@@ -41,7 +41,6 @@ class FieldMissingTypeTest extends EntityKernelTestBase {
     $this->installEntitySchema($entity_type_id);
     $this->fieldName = $this->randomMachineName();
 
-    /** @var \Drupal\field\Entity\FieldStorageConfig $field_storage */
     FieldStorageConfig::create([
       'field_name' => $this->fieldName,
       'type' => 'text',
@@ -62,7 +61,7 @@ class FieldMissingTypeTest extends EntityKernelTestBase {
    *
    * @see \Drupal\field\FieldStorageConfigStorage::mapFromStorageRecords()
    */
-  public function testFieldStorageMissingType() {
+  public function testFieldStorageMissingType(): void {
     $this->expectException(PluginNotFoundException::class);
     $this->expectExceptionMessage("Unable to determine class for field type 'foo_field_storage' found in the 'field.storage.entity_test_mulrev.{$this->fieldName}' configuration");
     $entity = EntityTestMulRev::create([
@@ -82,7 +81,7 @@ class FieldMissingTypeTest extends EntityKernelTestBase {
    *
    * @see \Drupal\field\FieldConfigStorageBase::mapFromStorageRecords()
    */
-  public function testFieldMissingType() {
+  public function testFieldMissingType(): void {
     $this->expectException(PluginNotFoundException::class);
     $this->expectExceptionMessage("Unable to determine class for field type 'foo_field' found in the 'field.field.entity_test_mulrev.entity_test_mulrev.{$this->fieldName}' configuration");
     $entity = EntityTestMulRev::create([

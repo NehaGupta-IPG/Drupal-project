@@ -18,9 +18,7 @@ use Drupal\Tests\BrowserTestBase;
 class EntityTypeWithoutLanguageFormTest extends BrowserTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = [
     'language',
@@ -48,7 +46,7 @@ class EntityTypeWithoutLanguageFormTest extends BrowserTestBase {
   /**
    * Tests configuration options with an entity without language definition.
    */
-  public function testEmptyLangcode() {
+  public function testEmptyLangcode(): void {
     // Assert that we can not enable language select from
     // content language settings page.
     $this->drupalGet('admin/config/regional/content-language');

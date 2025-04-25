@@ -16,12 +16,15 @@ use Drupal\KernelTests\KernelTestBase;
  */
 class LinkGenerationTest extends KernelTestBase {
 
+  /**
+   * {@inheritdoc}
+   */
   protected static $modules = ['link_generation_test'];
 
   /**
    * Tests how hook_link_alter() can affect escaping of the link text.
    */
-  public function testHookLinkAlter() {
+  public function testHookLinkAlter(): void {
     $url = Url::fromUri('http://example.com');
     $renderer = \Drupal::service('renderer');
 

@@ -6,6 +6,8 @@ namespace Drupal\Tests\config\Functional;
 
 use Drupal\Tests\BrowserTestBase;
 
+// cspell:ignore loquesea
+
 /**
  * Tests language-negotiation overrides are not on language-negotiation form.
  *
@@ -27,7 +29,7 @@ class LanguageNegotiationFormOverrideTest extends BrowserTestBase {
   /**
    * Tests that overrides do not affect language-negotiation form values.
    */
-  public function testFormWithOverride() {
+  public function testFormWithOverride(): void {
     $this->drupalLogin($this->drupalCreateUser([
       'access administration pages',
       'administer site configuration',

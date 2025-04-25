@@ -62,7 +62,7 @@ class DenyPrivateImageStyleDownloadTest extends UnitTestCase {
    * @dataProvider providerPrivateImageStyleDownloadPolicy
    * @covers ::check
    */
-  public function testPrivateImageStyleDownloadPolicy($expected_result, $route_name) {
+  public function testPrivateImageStyleDownloadPolicy($expected_result, $route_name): void {
     $this->routeMatch->expects($this->once())
       ->method('getRouteName')
       ->willReturn($route_name);
@@ -84,7 +84,7 @@ class DenyPrivateImageStyleDownloadTest extends UnitTestCase {
       [NULL, NULL],
       [NULL, FALSE],
       [NULL, TRUE],
-      [NULL, new \StdClass()],
+      [NULL, new \stdClass()],
       [NULL, [1, 2, 3]],
     ];
   }

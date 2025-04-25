@@ -1,4 +1,9 @@
+parameters:
+  settings_tray.hooks_converted: true
+
 services:
+  _defaults:
+    autoconfigure: true
   access_check.settings_tray.block.has_overrides:
     class: Drupal\settings_tray\Access\BlockHasOverridesAccessCheck
     tags:

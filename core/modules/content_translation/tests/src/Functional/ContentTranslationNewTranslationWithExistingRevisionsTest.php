@@ -27,14 +27,6 @@ class ContentTranslationNewTranslationWithExistingRevisionsTest extends ContentT
 
   /**
    * {@inheritdoc}
-   *
-   * @todo Remove and fix test to not rely on super user.
-   * @see https://www.drupal.org/project/drupal/issues/3437620
-   */
-  protected bool $usesSuperUserAccessPolicy = TRUE;
-
-  /**
-   * {@inheritdoc}
    */
   protected $defaultTheme = 'stark';
 
@@ -50,7 +42,7 @@ class ContentTranslationNewTranslationWithExistingRevisionsTest extends ContentT
   /**
    * Tests a translation with a draft is not deleted.
    */
-  public function testDraftTranslationIsNotDeleted() {
+  public function testDraftTranslationIsNotDeleted(): void {
     $this->drupalLogin($this->translator);
 
     // Create a test node.
@@ -116,7 +108,7 @@ class ContentTranslationNewTranslationWithExistingRevisionsTest extends ContentT
   /**
    * Test translation delete hooks are not invoked.
    */
-  public function testCreatingNewDraftDoesNotInvokeDeleteHook() {
+  public function testCreatingNewDraftDoesNotInvokeDeleteHook(): void {
     $this->drupalLogin($this->translator);
 
     // Create a test node.

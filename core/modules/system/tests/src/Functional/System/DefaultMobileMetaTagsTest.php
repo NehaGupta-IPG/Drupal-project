@@ -38,9 +38,9 @@ class DefaultMobileMetaTagsTest extends BrowserTestBase {
   /**
    * Verifies that the default mobile meta tags are added.
    */
-  public function testDefaultMetaTagsExist() {
+  public function testDefaultMetaTagsExist(): void {
     $this->drupalGet('');
-    foreach ($this->defaultMetaTags as $name => $metatag) {
+    foreach ($this->defaultMetaTags as $metatag) {
       $this->assertSession()->responseContains($metatag);
     }
   }
@@ -48,10 +48,10 @@ class DefaultMobileMetaTagsTest extends BrowserTestBase {
   /**
    * Verifies that the default mobile meta tags can be removed.
    */
-  public function testRemovingDefaultMetaTags() {
+  public function testRemovingDefaultMetaTags(): void {
     \Drupal::service('module_installer')->install(['system_module_test']);
     $this->drupalGet('');
-    foreach ($this->defaultMetaTags as $name => $metatag) {
+    foreach ($this->defaultMetaTags as $metatag) {
       $this->assertSession()->responseNotContains($metatag);
     }
   }

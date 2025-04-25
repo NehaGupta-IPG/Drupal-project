@@ -26,9 +26,7 @@ class ContentTranslationMetadataFieldsTest extends ContentTranslationTestBase {
   protected $bundle = 'article';
 
   /**
-   * Modules to install.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['language', 'content_translation', 'node'];
 
@@ -40,7 +38,7 @@ class ContentTranslationMetadataFieldsTest extends ContentTranslationTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function setupBundle() {
+  protected function setupBundle(): void {
     parent::setupBundle();
     $this->createContentType(['type' => $this->bundle]);
   }
@@ -56,7 +54,7 @@ class ContentTranslationMetadataFieldsTest extends ContentTranslationTestBase {
   /**
    * Tests skipping setting non translatable metadata fields.
    */
-  public function testSkipUntranslatable() {
+  public function testSkipUntranslatable(): void {
     $this->drupalLogin($this->translator);
     $fields = \Drupal::service('entity_field.manager')->getFieldDefinitions($this->entityTypeId, $this->bundle);
 
@@ -112,7 +110,7 @@ class ContentTranslationMetadataFieldsTest extends ContentTranslationTestBase {
   /**
    * Tests setting translatable metadata fields.
    */
-  public function testSetTranslatable() {
+  public function testSetTranslatable(): void {
     $this->drupalLogin($this->translator);
     $fields = \Drupal::service('entity_field.manager')->getFieldDefinitions($this->entityTypeId, $this->bundle);
 

@@ -11,7 +11,6 @@ use Drupal\workspaces\Entity\Workspace;
  * Tests permission controls on workspaces.
  *
  * @group workspaces
- * @group #slow
  */
 class WorkspacePermissionsTest extends BrowserTestBase {
 
@@ -20,7 +19,7 @@ class WorkspacePermissionsTest extends BrowserTestBase {
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['workspaces'];
+  protected static $modules = ['workspaces', 'workspaces_ui'];
 
   /**
    * {@inheritdoc}
@@ -30,7 +29,7 @@ class WorkspacePermissionsTest extends BrowserTestBase {
   /**
    * Verifies that a user can create but not edit a workspace.
    */
-  public function testCreateWorkspace() {
+  public function testCreateWorkspace(): void {
     $editor = $this->drupalCreateUser([
       'access administration pages',
       'administer site configuration',
@@ -56,7 +55,7 @@ class WorkspacePermissionsTest extends BrowserTestBase {
   /**
    * Verifies that a user can create and edit only their own workspace.
    */
-  public function testEditOwnWorkspace() {
+  public function testEditOwnWorkspace(): void {
     $permissions = [
       'access administration pages',
       'administer site configuration',
@@ -99,7 +98,7 @@ class WorkspacePermissionsTest extends BrowserTestBase {
   /**
    * Verifies that a user can edit any workspace.
    */
-  public function testEditAnyWorkspace() {
+  public function testEditAnyWorkspace(): void {
     $permissions = [
       'access administration pages',
       'administer site configuration',
@@ -142,7 +141,7 @@ class WorkspacePermissionsTest extends BrowserTestBase {
   /**
    * Verifies that a user can create and delete only their own workspace.
    */
-  public function testDeleteOwnWorkspace() {
+  public function testDeleteOwnWorkspace(): void {
     $permissions = [
       'access administration pages',
       'administer site configuration',
@@ -176,7 +175,7 @@ class WorkspacePermissionsTest extends BrowserTestBase {
   /**
    * Verifies that a user can delete any workspace.
    */
-  public function testDeleteAnyWorkspace() {
+  public function testDeleteAnyWorkspace(): void {
     $permissions = [
       'access administration pages',
       'administer site configuration',

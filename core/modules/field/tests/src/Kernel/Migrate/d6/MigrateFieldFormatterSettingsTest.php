@@ -47,7 +47,7 @@ class MigrateFieldFormatterSettingsTest extends MigrateDrupal6TestBase {
   /**
    * Tests that migrated entity display settings can be loaded using D8 API's.
    */
-  public function testEntityDisplaySettings() {
+  public function testEntityDisplaySettings(): void {
     // Run tests.
     $field_name = "field_test";
     $expected = [
@@ -208,7 +208,12 @@ class MigrateFieldFormatterSettingsTest extends MigrateDrupal6TestBase {
     $component = $display->getComponent('field_test_datetime');
     $this->assertSame($expected, $component);
     // Test that our Id map has the correct data.
-    $this->assertSame([['node', 'story', 'teaser', 'field_test']], $this->getMigration('d6_field_formatter_settings')->getIdMap()->lookupDestinationIds(['story', 'teaser', 'node', 'field_test']));
+    $this->assertSame(
+      [['node', 'story', 'teaser', 'field_test']],
+      $this->getMigration('d6_field_formatter_settings')
+        ->getIdMap()
+        ->lookupDestinationIds(['story', 'teaser', 'node', 'field_test'])
+    );
 
     // Test hidden field.
     $this->assertComponentNotExists('node.test_planet.teaser', 'field_test_text_single_checkbox');

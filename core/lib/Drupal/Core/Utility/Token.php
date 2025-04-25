@@ -45,7 +45,7 @@ use Drupal\Core\Render\RendererInterface;
  *
  * // [date:...] tokens use the current date automatically.
  * $token_service = \Drupal::token();
- * $data = array('node' => $node, 'user' => $user);
+ * $data = ['node' => $node, 'user' => $user];
  * $result = $token_service->replace($text, $data);
  * return $result
  * @endcode
@@ -144,9 +144,9 @@ class Token {
    * @param array $data
    *   (optional) An array of keyed objects. For simple replacement scenarios
    *   'node', 'user', and others are common keys, with an accompanying node or
-   *   user object being the value. Some token types, like 'site', do not require
-   *   any explicit information from $data and can be replaced even if it is
-   *   empty.
+   *   user object being the value. Some token types, like 'site', do not
+   *   require any explicit information from $data and can be replaced even if
+   *   it is empty.
    * @param array $options
    *   (optional) A keyed array of settings and flags to control the token
    *   replacement process. Supported options are:
@@ -376,13 +376,13 @@ class Token {
    * Used to extract a group of 'chained' tokens (such as [node:author:name])
    * from the full list of tokens found in text. For example:
    * @code
-   *   $data = array(
+   *   $data = [
    *     'author:name' => '[node:author:name]',
    *     'title'       => '[node:title]',
    *     'created'     => '[node:created]',
-   *   );
+   *   ];
    *   $results = Token::findWithPrefix($data, 'author');
-   *   $results == array('name' => '[node:author:name]');
+   *   $results == ['name' => '[node:author:name]'];
    * @endcode
    *
    * @param array $tokens
@@ -390,8 +390,8 @@ class Token {
    * @param string $prefix
    *   A textual string to be matched at the beginning of the token.
    * @param string $delimiter
-   *   (optional) A string containing the character that separates the prefix from
-   *   the rest of the token. Defaults to ':'.
+   *   (optional) A string containing the character that separates the prefix
+   *   from the rest of the token. Defaults to ':'.
    *
    * @return array
    *   An associative array of discovered tokens, with the prefix and delimiter

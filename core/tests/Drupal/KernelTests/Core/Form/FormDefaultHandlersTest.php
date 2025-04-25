@@ -36,7 +36,7 @@ class FormDefaultHandlersTest extends KernelTestBase implements FormInterface {
   /**
    * {@inheritdoc}
    */
-  public function customValidateForm(array &$form, FormStateInterface $form_state) {
+  public function customValidateForm(array &$form, FormStateInterface $form_state): void {
     $test_handlers = $form_state->get('test_handlers');
     $test_handlers['validate'][] = __FUNCTION__;
     $form_state->set('test_handlers', $test_handlers);
@@ -45,7 +45,7 @@ class FormDefaultHandlersTest extends KernelTestBase implements FormInterface {
   /**
    * {@inheritdoc}
    */
-  public function validateForm(array &$form, FormStateInterface $form_state) {
+  public function validateForm(array &$form, FormStateInterface $form_state): void {
     $test_handlers = $form_state->get('test_handlers');
     $test_handlers['validate'][] = __FUNCTION__;
     $form_state->set('test_handlers', $test_handlers);
@@ -54,7 +54,7 @@ class FormDefaultHandlersTest extends KernelTestBase implements FormInterface {
   /**
    * {@inheritdoc}
    */
-  public function customSubmitForm(array &$form, FormStateInterface $form_state) {
+  public function customSubmitForm(array &$form, FormStateInterface $form_state): void {
     $test_handlers = $form_state->get('test_handlers');
     $test_handlers['submit'][] = __FUNCTION__;
     $form_state->set('test_handlers', $test_handlers);
@@ -63,7 +63,7 @@ class FormDefaultHandlersTest extends KernelTestBase implements FormInterface {
   /**
    * {@inheritdoc}
    */
-  public function submitForm(array &$form, FormStateInterface $form_state) {
+  public function submitForm(array &$form, FormStateInterface $form_state): void {
     $test_handlers = $form_state->get('test_handlers');
     $test_handlers['submit'][] = __FUNCTION__;
     $form_state->set('test_handlers', $test_handlers);
@@ -72,7 +72,7 @@ class FormDefaultHandlersTest extends KernelTestBase implements FormInterface {
   /**
    * Tests that default handlers are added even if custom are specified.
    */
-  public function testDefaultAndCustomHandlers() {
+  public function testDefaultAndCustomHandlers(): void {
     $form_state = new FormState();
     $form_builder = $this->container->get('form_builder');
     $form_builder->submitForm($this, $form_state);

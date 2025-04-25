@@ -75,12 +75,12 @@ class TermTranslationViewsTest extends TaxonomyTestBase {
    * Taxonomy term: Term ID & Content: Has taxonomy term ID (with depth)
    * contextual filters are enabled for two separate view modes.
    */
-  public function testTermsTranslationWithContextualFilter() {
+  public function testTermsTranslationWithContextualFilter(): void {
     $this->drupalLogin($this->rootUser);
 
     foreach ($this->terms as $term) {
-      // Test with "Content: Has taxonomy term ID (with depth)" contextual filter.
-      // Generate base language url and send request.
+      // Test with "Content: Has taxonomy term ID (with depth)" contextual
+      // filter. Generate base language url and send request.
       $url = Url::fromRoute('view.taxonomy_translated_term_name_test.page_1', ['arg_0' => $term->id()])->toString();
       $this->drupalGet($url);
       $this->assertSession()->pageTextContains($term->label());
@@ -106,7 +106,7 @@ class TermTranslationViewsTest extends TaxonomyTestBase {
   /**
    * Setup translated terms in a hierarchy.
    */
-  protected function setUpTerms() {
+  protected function setUpTerms(): void {
     $parent_vid = 0;
     foreach ($this->termTranslationMap as $name => $translation) {
 

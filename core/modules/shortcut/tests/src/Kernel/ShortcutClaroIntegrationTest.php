@@ -13,12 +13,15 @@ use Drupal\KernelTests\KernelTestBase;
  */
 class ShortcutClaroIntegrationTest extends KernelTestBase {
 
+  /**
+   * {@inheritdoc}
+   */
   protected static $modules = ['system'];
 
   /**
    * Tests shortcut_install() and shortcut_uninstall().
    */
-  public function testInstallUninstall() {
+  public function testInstallUninstall(): void {
     // Install claro.
     \Drupal::service('theme_installer')->install(['claro']);
     $this->assertNull($this->config('claro.settings')->get('third_party_settings.shortcut'), 'There are no shortcut settings in claro.settings.');

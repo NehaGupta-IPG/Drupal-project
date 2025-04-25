@@ -20,6 +20,7 @@ use Drupal\Tests\rest\Functional\EntityResource\ConfigEntityResourceTestBase;
  * Additionally, every entity type must have the correct parent test class.
  *
  * @group rest
+ * @group #slow
  */
 class EntityResourceRestTestCoverageTest extends KernelTestBase {
 
@@ -67,7 +68,7 @@ class EntityResourceRestTestCoverageTest extends KernelTestBase {
   /**
    * Tests that all core content/config entity types have REST test coverage.
    */
-  public function testEntityTypeRestTestCoverage() {
+  public function testEntityTypeRestTestCoverage(): void {
     $tests = [
       // Test coverage for formats provided by the 'serialization' module.
       'serialization' => [

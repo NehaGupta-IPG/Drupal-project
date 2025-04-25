@@ -16,9 +16,7 @@ use Drupal\Tests\BrowserTestBase;
 class UserBlocksTest extends BrowserTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['block', 'views'];
 
@@ -49,7 +47,7 @@ class UserBlocksTest extends BrowserTestBase {
   /**
    * Tests that user login block is hidden from user/login.
    */
-  public function testUserLoginBlockVisibility() {
+  public function testUserLoginBlockVisibility(): void {
     // Array keyed list where key being the URL address and value being expected
     // visibility as boolean type.
     $paths = [
@@ -72,7 +70,7 @@ class UserBlocksTest extends BrowserTestBase {
   /**
    * Tests the user login block.
    */
-  public function testUserLoginBlock() {
+  public function testUserLoginBlock(): void {
     // Create a user with some permission that anonymous users lack.
     $user = $this->drupalCreateUser(['administer permissions']);
 

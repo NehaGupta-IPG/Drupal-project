@@ -16,9 +16,7 @@ use Drupal\node\Entity\Node;
 class EntityUpdateTest extends EntityKernelTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['editor', 'editor_test', 'node'];
 
@@ -46,7 +44,7 @@ class EntityUpdateTest extends EntityKernelTestBase {
    *
    * @see editor_test_entity_update()
    */
-  public function testEntityUpdate() {
+  public function testEntityUpdate(): void {
     // Create a node.
     $node = Node::create([
       'type' => 'page',

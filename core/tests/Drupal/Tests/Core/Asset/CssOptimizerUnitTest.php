@@ -142,8 +142,8 @@ class CssOptimizerUnitTest extends UnitTestCase {
           'weight' => 0.013,
           'media' => 'all',
           'preprocess' => TRUE,
-          'data' => $path . 'charset_sameline.css',
-          'basename' => 'charset_sameline.css',
+          'data' => $path . 'charset_same_line.css',
+          'basename' => 'charset_same_line.css',
         ],
         file_get_contents($absolute_path . 'charset.css.optimized.css'),
       ],
@@ -239,7 +239,7 @@ class CssOptimizerUnitTest extends UnitTestCase {
    *
    * @dataProvider providerTestOptimize
    */
-  public function testOptimize($css_asset, $expected) {
+  public function testOptimize($css_asset, $expected): void {
     global $base_path;
     $original_base_path = $base_path;
     $base_path = '/';
@@ -252,7 +252,7 @@ class CssOptimizerUnitTest extends UnitTestCase {
   /**
    * Tests a file CSS asset with preprocessing disabled.
    */
-  public function testTypeFilePreprocessingDisabled() {
+  public function testTypeFilePreprocessingDisabled(): void {
     $this->expectException('Exception');
     $this->expectExceptionMessage('Only file CSS assets with preprocessing enabled can be optimized.');
 
@@ -272,7 +272,7 @@ class CssOptimizerUnitTest extends UnitTestCase {
   /**
    * Tests a CSS asset with 'type' => 'external'.
    */
-  public function testTypeExternal() {
+  public function testTypeExternal(): void {
     $this->expectException('Exception');
     $this->expectExceptionMessage('Only file CSS assets can be optimized.');
 

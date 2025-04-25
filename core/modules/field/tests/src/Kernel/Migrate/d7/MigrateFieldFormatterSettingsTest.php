@@ -15,6 +15,9 @@ use Drupal\Tests\migrate_drupal\Kernel\d7\MigrateDrupal7TestBase;
  */
 class MigrateFieldFormatterSettingsTest extends MigrateDrupal7TestBase {
 
+  /**
+   * {@inheritdoc}
+   */
   protected static $modules = [
     'comment',
     'datetime',
@@ -95,7 +98,7 @@ class MigrateFieldFormatterSettingsTest extends MigrateDrupal7TestBase {
   /**
    * Tests migration of D7 field formatter settings.
    */
-  public function testMigration() {
+  public function testMigration(): void {
     $this->assertEntity('comment.comment_node_article.default');
     $this->assertComponent('comment.comment_node_article.default', 'comment_body', 'text_default', 'hidden', 0);
 

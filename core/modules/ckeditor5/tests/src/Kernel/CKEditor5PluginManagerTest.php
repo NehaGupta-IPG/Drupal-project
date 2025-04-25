@@ -28,7 +28,6 @@ use Symfony\Component\Yaml\Yaml;
  * Tests different ways of enabling CKEditor 5 plugins.
  *
  * @group ckeditor5
- * @group #slow
  * @internal
  */
 class CKEditor5PluginManagerTest extends KernelTestBase {
@@ -94,7 +93,7 @@ class CKEditor5PluginManagerTest extends KernelTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function enableModules(array $modules) {
+  protected function enableModules(array $modules): void {
     parent::enableModules($modules);
     // Ensure the CKEditor 5 plugin manager instance on the test reflects the
     // status after the module is installed.
@@ -174,10 +173,10 @@ YAML,
     // static file cache in \Drupal\Core\Extension\ExtensionDiscovery. There is
     // no work-around that allows using both the files on disk and some in vfs.
     // To make matters worse, decorating a service within the test only is not
-    // an option either, because \Drupal\ckeditor5\Plugin\CKEditor5PluginDefinition
-    // is a pure value object, so it uses the global container. Therefore the
-    // only work-around possible is to manipulate the config schema definition
-    // cache.
+    // an option either, because
+    // \Drupal\ckeditor5\Plugin\CKEditor5PluginDefinition is a pure value
+    // object, so it uses the global container. Therefore the only work-around
+    // possible is to manipulate the config schema definition cache.
     // @todo Remove this in https://www.drupal.org/project/drupal/issues/2961541.
     if (isset($additional_files['config']['schema']["$module_name.schema.yml"])) {
       $cache = \Drupal::service('cache.discovery')
@@ -203,7 +202,9 @@ YAML,
       $this->expectExceptionMessage($expected_message);
     }
     $container = $this->mockModuleInVfs('ckeditor5_invalid_plugin', $yaml, $additional_files);
-    $container->get('plugin.manager.ckeditor5.plugin')->getDefinitions();
+    $pluginManager = $container->get('plugin.manager.ckeditor5.plugin');
+    $this->assertNotNull($pluginManager);
+    $this->assertIsArray($pluginManager->getDefinitions());
   }
 
   /**
@@ -1119,7 +1120,7 @@ PHP,
   /**
    * Tests the enabling of plugins.
    */
-  public function testEnabledPlugins() {
+  public function testEnabledPlugins(): void {
     $editor = Editor::load('basic_html');
 
     // Case 1: no extra CKEditor 5 plugins.
@@ -1215,7 +1216,10 @@ PHP,
     $settings['toolbar']['items'][] = 'insertTable';
     $editor->setSettings($settings);
     $plugin_ids = array_keys($this->manager->getEnabledDefinitions($editor));
-    $expected_plugins = array_merge($expected_plugins, ['ckeditor5_table', 'ckeditor5_plugin_conditions_test_plugins_condition']);
+    $expected_plugins = array_merge($expected_plugins, [
+      'ckeditor5_table',
+      'ckeditor5_plugin_conditions_test_plugins_condition',
+    ]);
     sort($expected_plugins);
     $this->assertSame(array_values($expected_plugins), $plugin_ids);
     $expected_libraries = array_merge($default_libraries, [
@@ -1290,7 +1294,7 @@ PHP,
    * @covers \Drupal\ckeditor5\Plugin\CKEditor5PluginManager::getProvidedElements
    * @dataProvider providerTestProvidedElements
    */
-  public function testProvidedElements(array $plugins, array $text_editor_settings, array $expected_elements, string $expected_readable_string) {
+  public function testProvidedElements(array $plugins, array $text_editor_settings, array $expected_elements, string $expected_readable_string): void {
     $this->enableModules(['ckeditor5_plugin_elements_test']);
 
     $text_editor = Editor::create([
@@ -1540,7 +1544,7 @@ PHP,
    *
    * @dataProvider providerTestPluginSupportingElement
    */
-  public function testPluginSupportingElement(string $tag, ?string $expected_plugin_id) {
+  public function testPluginSupportingElement(string $tag, ?string $expected_plugin_id): void {
     $this->enableModules(['ckeditor5_definition_supporting_element']);
     $plugin_id = $this->manager->findPluginSupportingElement($tag);
     $this->assertSame($expected_plugin_id, $plugin_id);

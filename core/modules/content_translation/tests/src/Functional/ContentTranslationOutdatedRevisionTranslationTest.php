@@ -16,14 +16,6 @@ class ContentTranslationOutdatedRevisionTranslationTest extends ContentTranslati
 
   /**
    * {@inheritdoc}
-   *
-   * @todo Remove and fix test to not rely on super user.
-   * @see https://www.drupal.org/project/drupal/issues/3437620
-   */
-  protected bool $usesSuperUserAccessPolicy = TRUE;
-
-  /**
-   * {@inheritdoc}
    */
   protected $defaultTheme = 'stark';
 
@@ -39,7 +31,7 @@ class ContentTranslationOutdatedRevisionTranslationTest extends ContentTranslati
   /**
    * Tests that outdated revision translations work correctly.
    */
-  public function testFlagAsOutdatedHidden() {
+  public function testFlagAsOutdatedHidden(): void {
     // Create a test node.
     $values = [
       'title' => 'Test 1.1 EN',

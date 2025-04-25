@@ -27,7 +27,10 @@ class HandlerFieldRoleTest extends UserTestBase {
    */
   protected $defaultTheme = 'stark';
 
-  public function testRole() {
+  /**
+   * Tests the rendering of user roles in a Views field handler.
+   */
+  public function testRole(): void {
     // Create a couple of roles for the view.
     $role_name_a = 'a' . $this->randomMachineName(8);
     $this->drupalCreateRole(['access content'], $role_name_a, '<em>' . $role_name_a . '</em>', 9);

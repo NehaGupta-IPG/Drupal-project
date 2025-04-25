@@ -9,6 +9,7 @@ use Drupal\Component\FileCache\FileCacheFactory;
 use Drupal\Component\Serialization\Exception\InvalidDataTypeException;
 use Drupal\Core\Serialization\Yaml;
 use Symfony\Component\DependencyInjection\Alias;
+use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
 use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -297,12 +298,12 @@ class YamlFileLoader
             if (is_string($service['factory'])) {
                 if (str_contains($service['factory'], ':') && !str_contains($service['factory'], '::')) {
                     $parts = explode(':', $service['factory']);
-                    $definition->setFactory(array($this->resolveServices('@'.$parts[0]), $parts[1]));
+                    $definition->setFactory([$this->resolveServices('@'.$parts[0]), $parts[1]]);
                 } else {
                     $definition->setFactory($service['factory']);
                 }
             } else {
-                $definition->setFactory(array($this->resolveServices($service['factory'][0]), $service['factory'][1]));
+                $definition->setFactory([$this->resolveServices($service['factory'][0]), $service['factory'][1]]);
             }
         }
 
@@ -334,7 +335,7 @@ class YamlFileLoader
             if (is_string($service['configurator'])) {
                 $definition->setConfigurator($service['configurator']);
             } else {
-                $definition->setConfigurator(array($this->resolveServices($service['configurator'][0]), $service['configurator'][1]));
+                $definition->setConfigurator([$this->resolveServices($service['configurator'][0]), $service['configurator'][1]]);
             }
         }
 
@@ -346,10 +347,10 @@ class YamlFileLoader
             foreach ($service['calls'] as $call) {
                 if (isset($call['method'])) {
                     $method = $call['method'];
-                    $args = isset($call['arguments']) ? $this->resolveServices($call['arguments']) : array();
+                    $args = isset($call['arguments']) ? $this->resolveServices($call['arguments']) : [];
                 } else {
                     $method = $call[0];
-                    $args = isset($call[1]) ? $this->resolveServices($call[1]) : array();
+                    $args = isset($call[1]) ? $this->resolveServices($call[1]) : [];
                 }
 
                 $definition->addMethodCall($method, $args);
@@ -389,10 +390,32 @@ class YamlFileLoader
             $definition->addTag($name, $tag);
         }
 
-        if (isset($service['decorates'])) {
+        if (null !== $decorates = $service['decorates'] ?? null) {
+            if ('' !== $decorates && '@' === $decorates[0]) {
+                throw new InvalidArgumentException(\sprintf('The value of the "decorates" option for the "%s" service must be the id of the service without the "@" prefix (replace "%s" with "%s").', $id, $service['decorates'], substr($decorates, 1)));
+            }
+
+            $decorationOnInvalid = \array_key_exists('decoration_on_invalid', $service) ? $service['decoration_on_invalid'] : 'exception';
+            if ('exception' === $decorationOnInvalid) {
+                $invalidBehavior = ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE;
+            }
+            elseif ('ignore' === $decorationOnInvalid) {
+                $invalidBehavior = ContainerInterface::IGNORE_ON_INVALID_REFERENCE;
+            }
+            elseif (null === $decorationOnInvalid) {
+                $invalidBehavior = ContainerInterface::NULL_ON_INVALID_REFERENCE;
+            }
+            elseif ('null' === $decorationOnInvalid) {
+                throw new InvalidArgumentException(\sprintf('Invalid value "%s" for attribute "decoration_on_invalid" on service "%s". Did you mean null (without quotes) in "%s"?', $decorationOnInvalid, $id, $file));
+            }
+            else {
+                throw new InvalidArgumentException(\sprintf('Invalid value "%s" for attribute "decoration_on_invalid" on service "%s". Did you mean "exception", "ignore" or null in "%s"?', $decorationOnInvalid, $id, $file));
+            }
+
             $renameId = $service['decoration_inner_name'] ?? null;
             $priority = $service['decoration_priority'] ?? 0;
-            $definition->setDecoratedService($service['decorates'], $renameId, $priority);
+
+            $definition->setDecoratedService($decorates, $renameId, $priority, $invalidBehavior);
         }
 
         if (isset($service['autowire'])) {
@@ -453,7 +476,7 @@ class YamlFileLoader
             throw new InvalidArgumentException(sprintf('The service file "%s" is not valid. It should contain an array. Check your YAML syntax.', $file));
         }
 
-        if ($invalid_keys = array_keys(array_diff_key($content, array('parameters' => 1, 'services' => 1)))) {
+        if ($invalid_keys = array_keys(array_diff_key($content, ['parameters' => 1, 'services' => 1]))) {
             throw new InvalidArgumentException(sprintf('The service file "%s" is not valid: it contains invalid root key(s) "%s". Services have to be added under "services" and Parameters under "parameters".', $file, implode('", "', $invalid_keys)));
         }
 
@@ -492,9 +515,14 @@ class YamlFileLoader
 
               return $argument;
             }
+
+            if ($value->getTag() === 'service_closure') {
+                return new ServiceClosureArgument($this->resolveServices($argument));
+            }
+
         }
         if (is_array($value)) {
-            $value = array_map(array($this, 'resolveServices'), $value);
+            $value = array_map([$this, 'resolveServices'], $value);
         } elseif (is_string($value) && str_starts_with($value, '@=')) {
             // Not supported.
             //return new Expression(substr($value, 2));

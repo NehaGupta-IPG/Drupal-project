@@ -63,7 +63,7 @@ class TitleResolverTest extends UnitTestCase {
    *
    * @see \Drupal\Core\Controller\TitleResolver::getTitle()
    */
-  public function testStaticTitle() {
+  public function testStaticTitle(): void {
     $request = new Request();
     $route = new Route('/test-route', ['_title' => 'static title']);
     $this->assertEquals(new TranslatableMarkup('static title', [], [], $this->translationManager), $this->titleResolver->getTitle($request, $route));
@@ -74,7 +74,7 @@ class TitleResolverTest extends UnitTestCase {
    *
    * @see \Drupal\Core\Controller\TitleResolver::getTitle()
    */
-  public function testStaticTitleZero() {
+  public function testStaticTitleZero(): void {
     $request = new Request();
     $route = new Route('/test-route', ['_title' => '0', '_title_context' => '0']);
     $this->assertEquals(new TranslatableMarkup('0', [], ['context' => '0'], $this->translationManager), $this->titleResolver->getTitle($request, $route));
@@ -85,7 +85,7 @@ class TitleResolverTest extends UnitTestCase {
    *
    * @see \Drupal\Core\Controller\TitleResolver::getTitle()
    */
-  public function testStaticTitleWithContext() {
+  public function testStaticTitleWithContext(): void {
     $request = new Request();
     $route = new Route('/test-route', ['_title' => 'static title', '_title_context' => 'context']);
     $this->assertEquals(new TranslatableMarkup('static title', [], ['context' => 'context'], $this->translationManager), $this->titleResolver->getTitle($request, $route));
@@ -96,7 +96,7 @@ class TitleResolverTest extends UnitTestCase {
    *
    * @see \Drupal\Core\Controller\TitleResolver::getTitle()
    */
-  public function testStaticTitleWithParameter() {
+  public function testStaticTitleWithParameter(): void {
     $raw_variables = new InputBag(['test' => 'value', 'test2' => 'value2']);
     $request = new Request();
     $request->attributes->set('_raw_variables', $raw_variables);
@@ -109,11 +109,57 @@ class TitleResolverTest extends UnitTestCase {
   }
 
   /**
+   * Tests a static title with and without overridden default arguments.
+   *
+   * @see \Drupal\Core\Controller\TitleResolver::getTitle()
+   */
+  public function testStaticTitleWithArguments(): void {
+    // Set up the request with optional override variables.
+    $request = new Request();
+    $raw_variables = new InputBag(['test' => 'override value']);
+
+    // Array of cases.
+    $cases = [
+      // Case 1: No override, uses default arguments.
+      [
+        'route_args' => ['_title' => 'static title @test', '_title_arguments' => ['@test' => 'value', '@test2' => 'value2']],
+        'expected' => new TranslatableMarkup('static title @test', ['@test' => 'value', '@test2' => 'value2'], [], $this->translationManager),
+        'override' => FALSE,
+      ],
+      [
+        'route_args' => ['_title' => 'static title %test', '_title_arguments' => ['%test' => 'value', '%test2' => 'value2']],
+        'expected' => new TranslatableMarkup('static title %test', ['%test' => 'value', '%test2' => 'value2'], [], $this->translationManager),
+        'override' => FALSE,
+      ],
+      // Case 2: Override arguments.
+      [
+        'route_args' => ['_title' => 'static title @test @test2', '_title_arguments' => ['@test' => 'value', '@test2' => 'value2']],
+        'expected' => new TranslatableMarkup('static title @test @test2', ['@test' => 'override value', '%test' => 'override value', '@test2' => 'value2'], [], $this->translationManager),
+        'override' => TRUE,
+      ],
+      [
+        'route_args' => ['_title' => 'static title %test %test2', '_title_arguments' => ['%test' => 'value', '%test2' => 'value2']],
+        'expected' => new TranslatableMarkup('static title %test %test2', ['@test' => 'override value', '%test' => 'override value', '%test2' => 'value2'], [], $this->translationManager),
+        'override' => TRUE,
+      ],
+    ];
+
+    foreach ($cases as $case) {
+      // Adjust the request based on whether we expect overrides.
+      if ($case['override']) {
+        $request->attributes->set('_raw_variables', $raw_variables);
+      }
+      $route = new Route('/test-route', $case['route_args']);
+      $this->assertEquals($case['expected'], $this->titleResolver->getTitle($request, $route));
+    }
+  }
+
+  /**
    * Tests a static title with a non-scalar value parameter.
    *
    * @see \Drupal\Core\Controller\TitleResolver::getTitle()
    */
-  public function testStaticTitleWithNullAndArrayValueParameter() {
+  public function testStaticTitleWithNullAndArrayValueParameter(): void {
     $raw_variables = new InputBag(['test1' => NULL, 'test2' => ['foo' => 'bar'], 'test3' => 'value']);
     $request = new Request();
     $request->attributes->set('_raw_variables', $raw_variables);
@@ -134,7 +180,7 @@ class TitleResolverTest extends UnitTestCase {
    *
    * @see \Drupal\Core\Controller\TitleResolver::getTitle()
    */
-  public function testDynamicTitle() {
+  public function testDynamicTitle(): void {
     $request = new Request();
     $route = new Route('/test-route', ['_title' => 'static title', '_title_callback' => 'Drupal\Tests\Core\Controller\TitleCallback::example']);
 

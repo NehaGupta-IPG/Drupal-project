@@ -23,9 +23,7 @@ class ContactPersonalTest extends BrowserTestBase {
   use AssertPageCacheContextsAndTagsTrait;
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['contact', 'dblog', 'mail_html_test'];
 
@@ -81,7 +79,7 @@ class ContactPersonalTest extends BrowserTestBase {
   /**
    * Tests that mails for contact messages are correctly sent.
    */
-  public function testSendPersonalContactMessage() {
+  public function testSendPersonalContactMessage(): void {
     // Ensure that the web user's email needs escaping.
     $mail = $this->webUser->getAccountName() . '&escaped@example.com';
     $this->webUser->setEmail($mail)->save();
@@ -129,13 +127,13 @@ class ContactPersonalTest extends BrowserTestBase {
     // Assert mail content.
     $this->assertMailString('body', 'Hello ' . $this->contactUser->getDisplayName(), 1);
     $this->assertMailString('body', $this->webUser->getDisplayName(), 1);
-    $this->assertMailString('body', Html::Escape($message['message[0][value]']), 1);
+    $this->assertMailString('body', Html::escape($message['message[0][value]']), 1);
   }
 
   /**
    * Tests access to the personal contact form.
    */
-  public function testPersonalContactAccess() {
+  public function testPersonalContactAccess(): void {
     // Test allowed access to admin user's contact form.
     $this->drupalLogin($this->webUser);
     $this->drupalGet('user/' . $this->adminUser->id() . '/contact');
@@ -256,7 +254,7 @@ class ContactPersonalTest extends BrowserTestBase {
   /**
    * Tests the personal contact form flood protection.
    */
-  public function testPersonalContactFlood() {
+  public function testPersonalContactFlood(): void {
     $flood_limit = 3;
     $this->config('contact.settings')->set('flood.limit', $flood_limit)->save();
 
@@ -283,7 +281,7 @@ class ContactPersonalTest extends BrowserTestBase {
   /**
    * Tests the personal contact form based access when an admin adds users.
    */
-  public function testAdminContact() {
+  public function testAdminContact(): void {
     user_role_grant_permissions(RoleInterface::ANONYMOUS_ID, ['access user contact forms']);
     $this->checkContactAccess(200);
     $this->checkContactAccess(403, FALSE);
@@ -301,7 +299,7 @@ class ContactPersonalTest extends BrowserTestBase {
    * @param bool $contact_value
    *   (optional) The value the contact field should be set too.
    */
-  protected function checkContactAccess($response, $contact_value = NULL) {
+  protected function checkContactAccess($response, $contact_value = NULL): void {
     $this->drupalLogin($this->adminUser);
     $this->drupalGet('admin/people/create');
     if ($this->config('contact.settings')->get('user_default_enabled', TRUE)) {
@@ -345,7 +343,7 @@ class ContactPersonalTest extends BrowserTestBase {
    * @return array
    *   An array with the form fields being used.
    */
-  protected function submitPersonalContact(AccountInterface $account, array $message = [], bool $user_copy = FALSE) {
+  protected function submitPersonalContact(AccountInterface $account, array $message = [], bool $user_copy = FALSE): array {
     $message += [
       'subject[0][value]' => $this->randomMachineName(16) . '< " =+ >',
       'message[0][value]' => $this->randomMachineName(64) . '< " =+ >',
@@ -395,7 +393,8 @@ class ContactPersonalTest extends BrowserTestBase {
 
     // Tests that the opt-out message is not included in admin user copy emails.
     $this->assertStringNotContainsString($opt_out_message, $user_copy_emails[0]['body'], 'Opt-out message not included in admin user copy email.');
-    // Tests that the opt-out message is not included in non-admin user copy emails.
+    // Tests that the opt-out message is not included in non-admin user copy
+    // emails.
     $this->assertStringNotContainsString($opt_out_message, $user_copy_emails[1]['body'], 'Opt-out message not included in non-admin user copy email.');
   }
 

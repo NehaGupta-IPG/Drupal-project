@@ -7,8 +7,8 @@
  * build step.
  */
 
-const path = require('path');
-const { copyFile, writeFile, readFile, chmod, mkdir } = require('fs').promises;
+const path = require('node:path');
+const { copyFile, writeFile, readFile, chmod, mkdir } = require('node:fs').promises;
 const ckeditor5Files = require('./assets/ckeditor5Files');
 const jQueryUIProcess = require('./assets/process/jqueryui');
 const mapProcess = require('./assets/process/map');
@@ -183,6 +183,15 @@ const assetsFolder = `${coreFolder}/assets/vendor`;
         'ui/widgets/menu.js',
         'ui/widgets/mouse.js',
         'ui/widgets/resizable.js',
+      ],
+    },
+    {
+      pack: '@floating-ui/dom',
+      folder: 'floating-ui',
+      library: 'internal.floating-ui',
+      files: [
+        { from: '../core/dist/floating-ui.core.umd.min.js', to: 'floating-ui.core.umd.min.js' },
+        { from: 'dist/floating-ui.dom.umd.min.js', to: 'floating-ui.dom.umd.min.js' },
       ],
     },
     // CKEditor 5 builds the list of files dynamically based on what exists

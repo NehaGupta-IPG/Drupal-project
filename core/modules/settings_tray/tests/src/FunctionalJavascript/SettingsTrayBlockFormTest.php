@@ -11,7 +11,6 @@ use Drupal\user\Entity\Role;
 /**
  * Testing opening and saving block forms in the off-canvas dialog.
  *
- * @group #slow
  * @group settings_tray
  */
 class SettingsTrayBlockFormTest extends SettingsTrayTestBase {
@@ -50,7 +49,7 @@ class SettingsTrayBlockFormTest extends SettingsTrayTestBase {
   /**
    * Tests opening off-canvas dialog by click blocks and elements in the blocks.
    */
-  public function testBlocks() {
+  public function testBlocks(): void {
     foreach ($this->getBlockTests() as $test) {
       call_user_func_array([$this, 'doTestBlocks'], array_values($test));
     }
@@ -59,7 +58,7 @@ class SettingsTrayBlockFormTest extends SettingsTrayTestBase {
   /**
    * Tests opening off-canvas dialog by click blocks and elements in the blocks.
    */
-  protected function doTestBlocks($theme, $block_plugin, $new_page_text, $element_selector, $label_selector, $button_text, $toolbar_item, $permissions) {
+  protected function doTestBlocks($theme, $block_plugin, $new_page_text, $element_selector, $label_selector, $button_text, $toolbar_item, $permissions): void {
     if ($permissions) {
       $this->grantPermissions(Role::load(Role::AUTHENTICATED_ID), $permissions);
     }
@@ -231,7 +230,7 @@ class SettingsTrayBlockFormTest extends SettingsTrayTestBase {
   /**
    * Tests enabling and disabling Edit Mode.
    */
-  public function testEditModeEnableDisable() {
+  public function testEditModeEnableDisable(): void {
     $this->markTestSkipped("Skipped due to frequent random test failures. See https://www.drupal.org/project/drupal/issues/3317520");
     foreach (static::getTestThemes() as $theme) {
       $this->enableTheme($theme);
@@ -267,7 +266,7 @@ class SettingsTrayBlockFormTest extends SettingsTrayTestBase {
   /**
    * Tests that validation errors appear in the off-canvas dialog.
    */
-  public function testValidationMessages() {
+  public function testValidationMessages(): void {
     $page = $this->getSession()->getPage();
     $web_assert = $this->assertSession();
     foreach (static::getTestThemes() as $theme) {

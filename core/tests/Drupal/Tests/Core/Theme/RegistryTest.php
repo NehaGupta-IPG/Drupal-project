@@ -9,6 +9,7 @@ use Drupal\Core\Theme\ActiveTheme;
 use Drupal\Core\Theme\Registry;
 use Drupal\Tests\UnitTestCase;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
+use Drupal\theme_test\Hook\ThemeTestHooks;
 
 /**
  * @coversDefaultClass \Drupal\Core\Theme\Registry
@@ -123,7 +124,7 @@ class RegistryTest extends UnitTestCase {
   /**
    * Tests getting the theme registry defined by a module.
    */
-  public function testGetRegistryForModule() {
+  public function testGetRegistryForModule(): void {
     $test_theme = new ActiveTheme([
       'name' => 'test_theme',
       'path' => 'core/modules/system/tests/themes/test_theme/test_theme.info.yml',
@@ -155,6 +156,11 @@ class RegistryTest extends UnitTestCase {
     // Include the module and theme files so that hook_theme can be called.
     include_once $this->root . '/core/modules/system/tests/modules/theme_test/theme_test.module';
     include_once $this->root . '/core/tests/fixtures/test_stable/test_stable.theme';
+    $themeTestTheme = new ThemeTestHooks();
+    $this->moduleHandler->expects($this->atLeastOnce())
+      ->method('invoke')
+      ->with('theme_test', 'theme')
+      ->willReturn($themeTestTheme->theme(NULL, NULL, NULL, NULL));
     $this->moduleHandler->expects($this->atLeastOnce())
       ->method('invokeAllWith')
       ->with('theme')
@@ -205,7 +211,7 @@ class RegistryTest extends UnitTestCase {
    * @param array $expected
    *   The expected results.
    */
-  public function testPostProcessExtension($defined_functions, $hooks, $expected) {
+  public function testPostProcessExtension($defined_functions, $hooks, $expected): void {
     static::$functions['user'] = $defined_functions;
 
     $theme = $this->prophesize(ActiveTheme::class);
