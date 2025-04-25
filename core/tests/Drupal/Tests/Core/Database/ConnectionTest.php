@@ -14,6 +14,7 @@ use Drupal\Tests\Core\Database\Stub\StubPDO;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\IgnoreDeprecations;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 /**
  * Tests the Connection class.
@@ -913,7 +914,7 @@ class ConnectionTest extends UnitTestCase {
   public function testSupportedLegacyFetchModes(int $mode): void {
     $this->expectDeprecation("Passing the \$mode argument as an integer to setFetchMode() is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Use a case of \Drupal\Core\Database\FetchAs enum instead. See https://www.drupal.org/node/3488338");
     $mockPdo = $this->createMock(StubPDO::class);
-    $mockConnection = new StubConnection($mockPdo, []);
+    $mockConnection = new StubConnection($mockPdo, [], ['"', '"'], $this->createMock(EventDispatcherInterface::class));
     $statement = new StatementPrefetchIterator($mockPdo, $mockConnection, '');
     $this->assertInstanceOf(StatementPrefetchIterator::class, $statement);
     $statement->setFetchMode($mode);

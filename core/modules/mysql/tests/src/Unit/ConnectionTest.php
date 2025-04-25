@@ -7,6 +7,7 @@ namespace Drupal\Tests\mysql\Unit;
 use Drupal\mysql\Driver\Database\mysql\Connection;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\MockObject\MockObject;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 /**
  * Tests MySQL database connections.
@@ -29,7 +30,7 @@ class ConnectionTest extends UnitTestCase {
   protected function setUp(): void {
     parent::setUp();
     $this->connection = $this->getMockBuilder(Connection::class)
-      ->setConstructorArgs([$this->createMock(\PDO::class), []])
+      ->setConstructorArgs([$this->createMock(\PDO::class), [], $this->createMock(EventDispatcherInterface::class)])
       ->onlyMethods(['getServerVersion'])
       ->getMock();
   }
