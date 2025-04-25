@@ -24,15 +24,15 @@ class SearchPageMachineNameTest extends WebDriverTestBase {
   protected $defaultTheme = 'stark';
 
   /**
-   * Tests that machine name field is not automatically updated with label.
+   * Tests that machine name field automatically updated with label.
    *
-   * This test verifies a bug where the machine name field is not automatically
+   * This test verifies that the machine name field is automatically
    * updated when the label field changes. The machine name should be automatically
-   * generated from the label, but currently it is not.
+   * generated from the label.
    *
    * @see https://www.drupal.org/project/drupal/issues/3520941#comment-16084573
    */
-  public function testMachineNameNotUpdated(): void {
+  public function testMachineNameUpdated(): void {
     // Log in as admin.
     $this->drupalLogin($this->drupalCreateUser([
       'search content',
@@ -59,9 +59,8 @@ class SearchPageMachineNameTest extends WebDriverTestBase {
     // Get the machine name field value.
     $machine_name = $this->getSession()->getPage()->findField('Machine-readable name')->getValue();
 
-    // Assert that the machine name is not automatically updated.
-    // This is currently a bug - the machine name should be 'test_page' but it's not.
-    $this->assertNotEquals('test_page', $machine_name, 'Machine name should be automatically updated to "test_page" when label is "Test page", but it is not. This is a bug.');
+    // Assert that the machine name matches the expected value.
+    $this->assertEquals('test_page', $machine_name, 'Machine name should be automatically updated to match the label value.');
   }
 
 }
