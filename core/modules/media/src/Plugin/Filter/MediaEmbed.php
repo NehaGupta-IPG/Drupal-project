@@ -162,15 +162,19 @@ class MediaEmbed extends FilterBase implements ContainerFactoryPluginInterface, 
    *   The form state.
    */
   public static function validateOptions(array &$element, FormStateInterface $form_state) {
-    // Check if bundles in media type exist.
-    $bundles = \Drupal::service('entity_type.bundle.info')->getBundleInfo('media');
-    if (empty($bundles)) {
-      $filter_title = \Drupal::service('plugin.manager.filter')
-        ->getDefinition('media_embed')['title']->render();
-      $form_state->setError($element, t('No media types are defined. <a href=":url">Add media types</a> before configuring the @filter filter.', [
-        ':url' => Url::fromRoute('entity.media_type.collection')->toString(),
-        '@filter' => $filter_title,
-      ]));
+    $filters = $form_state->getValue('filters');
+    $is_enabled = isset($filters['media_embed']) ? $filters['media_embed']['status'] : NULL;
+    if ($is_enabled) {
+      // Check if bundles in media type exist.
+      $bundles = \Drupal::service('entity_type.bundle.info')->getBundleInfo('media');
+      if (empty($bundles)) {
+        $filter_title = \Drupal::service('plugin.manager.filter')
+          ->getDefinition('media_embed')['title']->render();
+        $form_state->setError($element, t('No media types are defined. <a href=":url">Add media types</a> before configuring the @filter filter.', [
+          ':url' => Url::fromRoute('entity.media_type.collection')->toString(),
+          '@filter' => $filter_title,
+        ]));
+      }
     }
     // Filters the #value property so only selected values appear in the
     // config.
