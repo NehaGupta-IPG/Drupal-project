@@ -8,7 +8,6 @@
 use Drupal\Core\Link;
 use Drupal\Core\StringTranslation\PluralTranslatableMarkup;
 use Drupal\Core\Url;
-use Drupal\Core\Database\Database;
 use Drupal\user\RoleInterface;
 
 /**
@@ -230,18 +229,6 @@ function node_install(): void {
     user_role_grant_permissions(RoleInterface::ANONYMOUS_ID, ['access content']);
     user_role_grant_permissions(RoleInterface::AUTHENTICATED_ID, ['access content']);
   }
-
-  // Populate the node access table.
-  Database::getConnection()->insert('node_access')
-    ->fields([
-      'nid' => 0,
-      'gid' => 0,
-      'realm' => 'all',
-      'grant_view' => 1,
-      'grant_update' => 0,
-      'grant_delete' => 0,
-    ])
-    ->execute();
 }
 
 /**
