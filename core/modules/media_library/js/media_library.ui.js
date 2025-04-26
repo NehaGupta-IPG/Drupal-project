@@ -390,6 +390,11 @@
         if (!$buttonPane.length) {
           return;
         }
+
+        if ($('.js-media-library-selected-count', $buttonPane).length) {
+          return;
+        }
+
         $buttonPane.append(Drupal.theme('mediaLibrarySelectionCount'));
         updateSelectionCount(settings.media_library.selection_remaining);
       });
