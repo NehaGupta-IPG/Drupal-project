@@ -39,8 +39,8 @@ class FileUriConstraintValidator extends ConstraintValidator {
     // Since no scheme is involved we assume its a real file.
     if ($scheme === FALSE) {
       // @see FileUrlGenerator
-
-      $basePath = '/var/www'; // @todo get the base path from a helper somewhere.
+      // @todo get the base path from a helper somewhere.
+      $basePath = '/var/www';
       $value = $basePath . '/' . $value;
 
       $constraint = $this->constraintManager->create('File', []);
