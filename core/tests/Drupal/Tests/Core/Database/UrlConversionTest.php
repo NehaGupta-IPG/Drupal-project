@@ -31,6 +31,17 @@ class UrlConversionTest extends UnitTestCase {
    * @dataProvider providerConvertDbUrlToConnectionInfo
    */
   public function testDbUrlToConnectionConversion($url, $database_array, $include_test_drivers): void {
+
+    // Revert autoloading core database drivers to simulate running this method
+    // during install (e. g. via drush) without all existing modules autoloaded
+    // already. Without this reversion, the additional autoloader isn't tested
+    // correctly.
+    // @see core/tests/bootstrap.php
+    $loader = $GLOBALS['loader'];
+    $loader->setPsr4('Drupal\\mysql\\', []);
+    $loader->setPsr4('Drupal\\pgsql\\', []);
+    $loader->setPsr4('Drupal\\sqlite\\', []);
+
     $result = Database::convertDbUrlToConnectionInfo($url, $this->root, $include_test_drivers);
     $this->assertEquals($database_array, $result);
   }

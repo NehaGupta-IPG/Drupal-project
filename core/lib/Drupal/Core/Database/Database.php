@@ -544,9 +544,6 @@ abstract class Database {
     $additional_class_loader->addPsr4($driverNamespace . '\\', $driver->getPath());
     $additional_class_loader->register();
     $connection_class = $driverNamespace . '\\Connection';
-    if (!class_exists($connection_class)) {
-      throw new \InvalidArgumentException("Can not convert '$url' to a database connection, class '$connection_class' does not exist");
-    }
 
     // When the database driver is extending another database driver, then
     // add autoload info for the parent database driver as well.
@@ -558,6 +555,10 @@ abstract class Database {
     }
 
     $additional_class_loader->register(TRUE);
+
+    if (!class_exists($connection_class)) {
+      throw new \InvalidArgumentException("Can not convert '$url' to a database connection, class '$connection_class' does not exist");
+    }
 
     $options = $connection_class::createConnectionOptionsFromUrl($url, $root);
 
