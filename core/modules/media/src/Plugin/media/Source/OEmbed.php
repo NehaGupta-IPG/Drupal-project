@@ -243,7 +243,8 @@ class OEmbed extends MediaSourceBase implements OEmbedInterface {
       $resource = $this->resourceFetcher->fetchResource($resource_url);
     }
     catch (ResourceException $e) {
-      $this->messenger->addError($e->getMessage());
+      $this->logger->error($e->getMessage() . ' Resource URL: %resource_url | Media ID: %media_id',
+        ['%resource_url' => $resource_url, '%media_id' => $media->id()]);
       return NULL;
     }
 
