@@ -7,7 +7,7 @@ namespace Drupal\file\Plugin\Validation\Constraint;
 use Drupal\Core\DependencyInjection\AutowireTrait;
 use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
 use Drupal\Core\StreamWrapper\StreamWrapperManagerInterface;
-use Drupal\Core\Validation\ConstraintManager;
+use Drupal\Core\TypedData\TypedDataManagerInterface;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
@@ -24,7 +24,7 @@ class FileUriConstraintValidator extends ConstraintValidator implements Containe
 
   public function __construct(
     protected readonly StreamWrapperManagerInterface $streamWrapperManager,
-    protected readonly ConstraintManager $constraintManager,
+    protected readonly TypedDataManagerInterface $typedDataManager,
   ) {}
 
   /**
@@ -44,7 +44,7 @@ class FileUriConstraintValidator extends ConstraintValidator implements Containe
       $basePath = '/var/www';
       $value = $basePath . '/' . $value;
 
-      $constraint = $this->constraintManager->create('File', []);
+      $constraint = $this->typedDataManager->getValidationConstraintManager()->create('File', []);
 
       $this->context->getValidator()
         ->validate($value, $constraint);
