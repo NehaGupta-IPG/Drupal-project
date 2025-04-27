@@ -1,4 +1,17 @@
-<?php
++  /**
++   * {@inheritdoc}
++   */
++  public static function processGroup(&$element, FormStateInterface $form_state, &$complete_form) {
++    return $element;
++  }
++
++  /**
++   * {@inheritdoc}
++   */
++  public static function preRenderGroup($element) {
++    return $element;
++  }
++<?php
 
 namespace Drupal\Core\Render\Element;
 
@@ -136,6 +149,20 @@ class VerticalTabs extends RenderElementBase {
     // settings forms.
     $form_state->addCleanValueKey($name . '__active_tab');
 
+    return $element;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function processGroup(&$element, FormStateInterface $form_state, &$complete_form) {
+    return $element;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function preRenderGroup($element) {
     return $element;
   }
 

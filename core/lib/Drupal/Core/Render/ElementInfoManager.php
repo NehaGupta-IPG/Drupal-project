@@ -114,6 +114,7 @@ class ElementInfoManager extends DefaultPluginManager implements ElementInfoMana
       }
     });
     foreach ($this->getDefinitions() as $element_type => $definition) {
+      $class = $definition['class'];
       $element = $this->createInstance($element_type);
       $element_info = $element->getInfo();
 
@@ -122,8 +123,21 @@ class ElementInfoManager extends DefaultPluginManager implements ElementInfoMana
       // element's own getInfo() already declared one.
       if ($element instanceof FormElementInterface) {
         $element_info['#input'] = TRUE;
-        $element_info['#value_callback'] ??= [$definition['class'], 'valueCallback'];
+        $element_info['#value_callback'] ??= [$class, 'valueCallback'];
       }
+      // Add the processGroup #process callback, unless already set.
+      $process = $element_info['#process'] ?? [];
+      if (!in_array('processGroup', array_column($process, 1))) {
+        $process[] = [$class, 'processGroup'];
+      }
+      $element_info['#process'] = $process;
+
+      // Add the preRenderGroup #pre_render callback, unless already set.
+      $pre_render = $element_info['#pre_render'] ?? [];
+      if (!in_array('preRenderGroup', array_column($pre_render, 1))) {
+        $pre_render[] = [$class, 'preRenderGroup'];
+      }
+      $element_info['#pre_render'] = $pre_render;
       $info[$element_type] = $element_info;
     }
     restore_error_handler();

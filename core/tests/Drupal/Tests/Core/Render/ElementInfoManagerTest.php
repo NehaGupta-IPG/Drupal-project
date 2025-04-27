@@ -88,6 +88,8 @@ class ElementInfoManagerTest extends UnitTestCase {
         '#type' => 'page',
         '#theme' => 'page',
         '#defaults_loaded' => TRUE,
+        '#process' => [['TestElementPlugin', 'processGroup']],
+        '#pre_render' => [['TestElementPlugin', 'preRenderGroup']],
       ],
     ];
 
@@ -99,6 +101,8 @@ class ElementInfoManagerTest extends UnitTestCase {
         '#input' => TRUE,
         '#value_callback' => ['TestElementPlugin', 'valueCallback'],
         '#defaults_loaded' => TRUE,
+        '#process' => [['TestElementPlugin', 'processGroup']],
+        '#pre_render' => [['TestElementPlugin', 'preRenderGroup']],
       ],
     ];
     return $data;

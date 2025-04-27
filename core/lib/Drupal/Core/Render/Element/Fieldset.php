@@ -32,11 +32,7 @@ class Fieldset extends RenderElementBase {
   public function getInfo() {
     return [
       '#process' => [
-        [static::class, 'processGroup'],
-        [static::class, 'processAjaxForm'],
-      ],
-      '#pre_render' => [
-        [static::class, 'preRenderGroup'],
+        [$class, 'processAjaxForm'],
       ],
       '#value' => NULL,
       '#theme_wrappers' => ['fieldset'],

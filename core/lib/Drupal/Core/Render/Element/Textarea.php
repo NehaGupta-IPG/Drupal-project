@@ -39,12 +39,7 @@ class Textarea extends FormElementBase {
       '#rows' => 5,
       '#resizable' => 'vertical',
       '#process' => [
-        [static::class, 'processAjaxForm'],
-        [static::class, 'processGroup'],
-      ],
-      '#pre_render' => [
-        [static::class, 'preRenderGroup'],
-        [static::class, 'preRenderAttachments'],
+        [$class, 'processAjaxForm'],
       ],
       '#theme' => 'textarea',
       '#theme_wrappers' => ['form_element'],
