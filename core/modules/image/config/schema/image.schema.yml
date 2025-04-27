@@ -96,7 +96,7 @@ image.settings:
     FullyValidatable: ~
   mapping:
     preview_image:
-      type: string
+      type: file_uri
       label: 'Preview image'
       constraints:
         NotBlank: []
