@@ -186,7 +186,7 @@
         } else {
           localStorage.setItem(
             'Drupal.toolbar.activeTabID',
-            JSON.stringify('')
+            JSON.stringify(''),
           );
         }
         // Update the model.
