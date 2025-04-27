@@ -184,7 +184,10 @@
         if (locked) {
           localStorage.setItem('Drupal.toolbar.trayVerticalLocked', 'true');
         } else {
-          localStorage.setItem('Drupal.toolbar.activeTabID', JSON.stringify(''));
+          localStorage.setItem(
+            'Drupal.toolbar.activeTabID',
+            JSON.stringify('')
+          );
         }
         // Update the model.
         this.model.set(
