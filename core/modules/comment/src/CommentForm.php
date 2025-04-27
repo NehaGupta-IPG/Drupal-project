@@ -154,7 +154,7 @@ class CommentForm extends ContentEntityForm {
       }
     }
     else {
-      $status = ($this->currentUser->hasPermission('skip comment approval') ? CommentInterface::PUBLISHED : CommentInterface::NOT_PUBLISHED);
+      $status = ($this->currentUser->hasPermission('skip comment approval ' . $comment->bundle()) ? CommentInterface::PUBLISHED : CommentInterface::NOT_PUBLISHED);
     }
 
     $date = '';
@@ -377,7 +377,7 @@ class CommentForm extends ContentEntityForm {
     $uri = $entity->toUrl();
     $logger = $this->logger('comment');
 
-    if ($this->currentUser->hasPermission('post comments') && ($this->currentUser->hasPermission('administer comments') || $entity->{$field_name}->status == CommentItemInterface::OPEN)) {
+    if ($this->currentUser->hasPermission('post comments ' . $comment->bundle()) && ($this->currentUser->hasPermission('administer comments') || $entity->{$field_name}->status == CommentItemInterface::OPEN)) {
       $comment->save();
       $form_state->setValue('cid', $comment->id());
 

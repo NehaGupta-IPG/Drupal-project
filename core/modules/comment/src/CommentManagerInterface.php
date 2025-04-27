@@ -76,4 +76,17 @@ interface CommentManagerInterface {
    */
   public function getCountNewComments(EntityInterface $entity, $field_name = NULL, $timestamp = 0);
 
+  /**
+   * Check is comments indexing available for requested entity field.
+   *
+   * @param \Drupal\Core\Entity\EntityInterface $entity
+   *   Entity object to check.
+   * @param string $field_name
+   *   Field machine name.
+   *
+   * @return bool
+   *   Result of check.
+   */
+  public function isIndexingAvailable(EntityInterface $entity, $field_name);
+
 }

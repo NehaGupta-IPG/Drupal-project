@@ -132,7 +132,7 @@ class CommentItem extends FieldItemBase implements CommentItemInterface {
         CommentInterface::ANONYMOUS_MAY_CONTACT => $this->t('Anonymous posters may leave their contact information'),
         CommentInterface::ANONYMOUS_MUST_CONTACT => $this->t('Anonymous posters must leave their contact information'),
       ],
-      '#access' => $anonymous_user->hasPermission('post comments'),
+      '#access' => $anonymous_user->hasPermission('post comments ' . $this->getSetting('comment_type')),
     ];
     $element['form_location'] = [
       '#type' => 'checkbox',

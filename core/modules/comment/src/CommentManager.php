@@ -75,6 +75,13 @@ class CommentManager implements CommentManagerInterface {
   protected $currentUser;
 
   /**
+   * Comment types indexing permissions.
+   *
+   * @var array
+   */
+  protected $typesIndexPermissions = [];
+
+  /**
    * Construct the CommentManager object.
    *
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
@@ -157,7 +164,7 @@ class CommentManager implements CommentManagerInterface {
       $this->authenticatedCanPostComments = $this->entityTypeManager
         ->getStorage('user_role')
         ->load(RoleInterface::AUTHENTICATED_ID)
-        ->hasPermission('post comments');
+        ->hasPermission('post comments ' . $entity->{$field_name}->getSetting('comment_type'));
     }
 
     if ($this->authenticatedCanPostComments) {
@@ -235,6 +242,40 @@ class CommentManager implements CommentManagerInterface {
       return $query->count()->execute();
     }
     return FALSE;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function isIndexingAvailable(EntityInterface $entity, $field_name) {
+    $comment_type = $entity->{$field_name}->getSetting('comment_type');
+
+    if (array_key_exists($comment_type, $this->typesIndexPermissions)) {
+      return $this->typesIndexPermissions[$comment_type];
+    }
+
+    // Do not index in the following three cases:
+    // 1. 'Authenticated user' can search content but can't access comments.
+    // 2. 'Anonymous user' can search content but can't access comments.
+    // 3. Any role can search content but can't access comments and access
+    // comments is not granted by the 'authenticated user' role. In this case
+    // all users might have both permissions from various roles but it is also
+    // possible to set up a user to have only search content and so a user
+    // edit could change the security situation so it is not safe to index the
+    // comments.
+    $this->typesIndexPermissions[$comment_type] = TRUE;
+    $roles = $this->entityTypeManager->getStorage('user_role')->loadMultiple();
+    $authenticated_can_access = $roles[RoleInterface::AUTHENTICATED_ID]->hasPermission('access comments ' . $comment_type);
+    foreach ($roles as $rid => $role) {
+      if ($role->hasPermission('search content') && !$role->hasPermission('access comments ' . $comment_type)) {
+        if ($rid == RoleInterface::AUTHENTICATED_ID || $rid == RoleInterface::ANONYMOUS_ID || !$authenticated_can_access) {
+          $this->typesIndexPermissions[$comment_type] = FALSE;
+          break;
+        }
+      }
+    }
+
+    return $this->typesIndexPermissions[$comment_type];
   }
 
 }

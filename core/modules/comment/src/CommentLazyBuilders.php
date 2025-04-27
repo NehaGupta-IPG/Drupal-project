@@ -177,37 +177,43 @@ class CommentLazyBuilders implements TrustedCallbackInterface {
     $status = $commented_entity->get($entity->getFieldName())->status;
 
     if ($status == CommentItemInterface::OPEN) {
-      if ($entity->access('delete')) {
+      $delete_url = $entity->toUrl('delete-form');
+      if ($delete_url->access()) {
         $links['comment-delete'] = [
           'title' => $this->t('Delete'),
-          'url' => $entity->toUrl('delete-form'),
+          'url' => $delete_url,
         ];
       }
 
-      if ($entity->access('update')) {
+      $update_url = $entity->toUrl('edit-form');
+      if ($update_url->access()) {
         $links['comment-edit'] = [
           'title' => $this->t('Edit'),
-          'url' => $entity->toUrl('edit-form'),
+          'url' => $update_url,
         ];
       }
       $field_definition = $commented_entity->getFieldDefinition($entity->getFieldName());
+
+      $create_url = Url::fromRoute('comment.reply', [
+        'entity_type' => $entity->getCommentedEntityTypeId(),
+        'entity' => $entity->getCommentedEntityId(),
+        'field_name' => $entity->getFieldName(),
+        'pid' => $entity->id(),
+      ]);
       if ($entity->isPublished()
-        && $entity->access('create')
+        && $create_url->access()
         && $field_definition->getSetting('default_mode') === CommentManagerInterface::COMMENT_MODE_THREADED) {
         $links['comment-reply'] = [
           'title' => $this->t('Reply'),
-          'url' => Url::fromRoute('comment.reply', [
-            'entity_type' => $entity->getCommentedEntityTypeId(),
-            'entity' => $entity->getCommentedEntityId(),
-            'field_name' => $entity->getFieldName(),
-            'pid' => $entity->id(),
-          ]),
+          'url' => $create_url,
         ];
       }
-      if (!$entity->isPublished() && $entity->access('approve')) {
+
+      $approve_url = Url::fromRoute('comment.approve', ['comment' => $entity->id()]);
+      if (!$entity->isPublished() && $approve_url->access()) {
         $links['comment-approve'] = [
           'title' => $this->t('Approve'),
-          'url' => Url::fromRoute('comment.approve', ['comment' => $entity->id()]),
+          'url' => $approve_url,
         ];
       }
       if (empty($links) && $this->currentUser->isAnonymous()) {

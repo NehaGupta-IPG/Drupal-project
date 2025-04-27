@@ -101,7 +101,7 @@ class CommentLinkBuilder implements CommentLinkBuilderInterface {
           // Teaser view: display the number of comments that have been posted,
           // or a link to add new comments if the user has permission, the
           // entity is open to new comments, and there currently are none.
-          if ($this->currentUser->hasPermission('access comments')) {
+          if ($this->currentUser->hasPermission('access comments ' . $field_definition->getSetting('comment_type'))) {
             if (!empty($entity->get($field_name)->comment_count)) {
               $links['comment-comments'] = [
                 'title' => $this->formatPlural($entity->get($field_name)->comment_count, '1 comment', '@count comments'),
@@ -125,8 +125,13 @@ class CommentLinkBuilder implements CommentLinkBuilderInterface {
           }
           // Provide a link to new comment form.
           if ($commenting_status == CommentItemInterface::OPEN) {
+            $comment_form_url = Url::fromRoute('comment.reply', [
+              'entity_type' => $entity->getEntityTypeId(),
+              'entity' => $entity->id(),
+              'field_name' => $field_name,
+            ]);
             $comment_form_location = $field_definition->getSetting('form_location');
-            if ($this->currentUser->hasPermission('post comments')) {
+            if ($comment_form_url->access()) {
               $links['comment-add'] = [
                 'title' => $this->t('Add new comment'),
                 'language' => $entity->language(),
@@ -134,11 +139,7 @@ class CommentLinkBuilder implements CommentLinkBuilderInterface {
                 'fragment' => 'comment-form',
               ];
               if ($comment_form_location == CommentItemInterface::FORM_SEPARATE_PAGE) {
-                $links['comment-add']['url'] = Url::fromRoute('comment.reply', [
-                  'entity_type' => $entity->getEntityTypeId(),
-                  'entity' => $entity->id(),
-                  'field_name' => $field_name,
-                ]);
+                $links['comment-add']['url'] = $comment_form_url;
               }
               else {
                 $links['comment-add'] += ['url' => $entity->toUrl()];
@@ -157,21 +158,22 @@ class CommentLinkBuilder implements CommentLinkBuilderInterface {
           // comments.
           if ($commenting_status == CommentItemInterface::OPEN) {
             $comment_form_location = $field_definition->getSetting('form_location');
-            if ($this->currentUser->hasPermission('post comments')) {
+            $comment_form_url = Url::fromRoute('comment.reply', [
+              'entity_type' => $entity->getEntityTypeId(),
+              'entity' => $entity->id(),
+              'field_name' => $field_name,
+            ]);
+            if ($comment_form_url->access()) {
               // Show the "post comment" link if the form is on another page, or
               // if there are existing comments that the link will skip past.
-              if ($comment_form_location == CommentItemInterface::FORM_SEPARATE_PAGE || (!empty($entity->get($field_name)->comment_count) && $this->currentUser->hasPermission('access comments'))) {
+              if ($comment_form_location == CommentItemInterface::FORM_SEPARATE_PAGE || (!empty($entity->get($field_name)->comment_count) && $this->currentUser->hasPermission('access comments ' . $field_definition->getSetting('comment_type')))) {
                 $links['comment-add'] = [
                   'title' => $this->t('Add new comment'),
                   'attributes' => ['title' => $this->t('Share your thoughts and opinions.')],
                   'fragment' => 'comment-form',
                 ];
                 if ($comment_form_location == CommentItemInterface::FORM_SEPARATE_PAGE) {
-                  $links['comment-add']['url'] = Url::fromRoute('comment.reply', [
-                    'entity_type' => $entity->getEntityTypeId(),
-                    'entity' => $entity->id(),
-                    'field_name' => $field_name,
-                  ]);
+                  $links['comment-add']['url'] = $comment_form_url;
                 }
                 else {
                   $links['comment-add']['url'] = $entity->toUrl();

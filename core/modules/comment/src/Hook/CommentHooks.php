@@ -305,44 +305,23 @@ class CommentHooks {
    */
   #[Hook('node_update_index')]
   public function nodeUpdateIndex(EntityInterface $node): string {
-    $index_comments =& drupal_static('comment_node_update_index');
-    if ($index_comments === NULL) {
-      // Do not index in the following three cases:
-      // 1. 'Authenticated user' can search content but can't access comments.
-      // 2. 'Anonymous user' can search content but can't access comments.
-      // 3. Any role can search content but can't access comments and access
-      // comments is not granted by the 'authenticated user' role. In this case
-      // all users might have both permissions from various roles but it is also
-      // possible to set up a user to have only search content and so a user
-      // edit could change the security situation so it is not safe to index the
-      // comments.
-      $index_comments = TRUE;
-      $roles = \Drupal::entityTypeManager()->getStorage('user_role')->loadMultiple();
-      $authenticated_can_access = $roles[RoleInterface::AUTHENTICATED_ID]->hasPermission('access comments');
-      foreach ($roles as $rid => $role) {
-        if ($role->hasPermission('search content') && !$role->hasPermission('access comments')) {
-          if ($rid == RoleInterface::AUTHENTICATED_ID || $rid == RoleInterface::ANONYMOUS_ID || !$authenticated_can_access) {
-            $index_comments = FALSE;
-            break;
-          }
-        }
-      }
-    }
     $build = [];
-    if ($index_comments) {
-      foreach (\Drupal::service('comment.manager')->getFields('node') as $field_name => $info) {
-        // Skip fields that entity does not have.
-        if (!$node->hasField($field_name)) {
-          continue;
-        }
-        $field_definition = $node->getFieldDefinition($field_name);
-        $mode = $field_definition->getSetting('default_mode');
-        $comments_per_page = $field_definition->getSetting('per_page');
-        if ($node->get($field_name)->status) {
-          $comments = \Drupal::entityTypeManager()->getStorage('comment')->loadThread($node, $field_name, $mode, $comments_per_page);
-          if ($comments) {
-            $build[] = \Drupal::entityTypeManager()->getViewBuilder('comment')->viewMultiple($comments);
-          }
+    $manager = \Drupal::service('comment.manager');
+    foreach ($manager->getFields('node') as $field_name => $info) {
+      // Skip fields that entity does not have.
+      if (!$node->hasField($field_name)) {
+        continue;
+      }
+      if (!$manager->isIndexingAvailable($node, $field_name)) {
+        continue;
+      }
+      $field_definition = $node->getFieldDefinition($field_name);
+      $mode = $field_definition->getSetting('default_mode');
+      $comments_per_page = $field_definition->getSetting('per_page');
+      if ($node->get($field_name)->status) {
+        $comments = \Drupal::entityTypeManager()->getStorage('comment')->loadThread($node, $field_name, $mode, $comments_per_page);
+        if ($comments) {
+          $build[] = \Drupal::entityTypeManager()->getViewBuilder('comment')->viewMultiple($comments);
         }
       }
     }
@@ -377,7 +356,7 @@ class CommentHooks {
       }
       // Do not make a string if comments are hidden.
       $status = $node->get($field_name)->status;
-      if (\Drupal::currentUser()->hasPermission('access comments') && $status != CommentItemInterface::HIDDEN) {
+      if (\Drupal::currentUser()->hasPermission('access comments ' . $node->{$field_name}->getSetting('comment_type')) && $status != CommentItemInterface::HIDDEN) {
         if ($status == CommentItemInterface::OPEN) {
           // At least one comment field is open.
           $open = TRUE;

@@ -161,7 +161,7 @@ class CommentDefaultFormatter extends FormatterBase {
       // $entity->get($field_name)->comment_count, but unpublished comments
       // should display if the user is an administrator.
       $elements['#cache']['contexts'][] = 'user.permissions';
-      if ($this->currentUser->hasPermission('access comments') || $this->currentUser->hasPermission('administer comments')) {
+      if ($this->currentUser->hasPermission('access comments ' . $this->getFieldSetting('comment_type')) || $this->currentUser->hasPermission('administer comments')) {
         $output['comments'] = [];
 
         if ($entity->get($field_name)->comment_count || $this->currentUser->hasPermission('administer comments')) {
@@ -190,7 +190,7 @@ class CommentDefaultFormatter extends FormatterBase {
       if ($status == CommentItemInterface::OPEN && $comment_settings['form_location'] == CommentItemInterface::FORM_BELOW && $this->viewMode != 'print') {
         // Only show the add comment form if the user has permission.
         $elements['#cache']['contexts'][] = 'user.roles';
-        if ($this->currentUser->hasPermission('post comments')) {
+        if ($this->currentUser->hasPermission('post comments ' . $this->getFieldSetting('comment_type'))) {
           $output['comment_form'] = [
             '#lazy_builder' => [
               'comment.lazy_builders:renderForm',
