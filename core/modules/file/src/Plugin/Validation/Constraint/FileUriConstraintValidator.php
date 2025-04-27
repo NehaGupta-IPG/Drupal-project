@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\file\Plugin\Validation\Constraint;
 
 use Drupal\Core\DependencyInjection\AutowireTrait;
+use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
 use Drupal\Core\StreamWrapper\StreamWrapperManagerInterface;
 use Drupal\Core\Validation\ConstraintManager;
 use Symfony\Component\Validator\Constraint;
@@ -17,7 +18,7 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
  * Validates if the file URI is valid. Then validated if the file exists in the
  * file system.
  */
-class FileUriConstraintValidator extends ConstraintValidator {
+class FileUriConstraintValidator extends ConstraintValidator implements ContainerInjectionInterface {
 
   use AutowireTrait;
 
