@@ -109,14 +109,14 @@ class BlockExposedFilterAJAXTest extends WebDriverTestBase {
     $this->drupalPlaceBlock('views_exposed_filter_block:test_block_exposed_ajax_with_page-page_2', [
       'region' => 'content',
       'weight' => -10,
-      'id' => 'page-exposed-form',
+      'id' => 'page_exposed_form',
     ]);
     $this->drupalPlaceBlock('views_block:test_block_exposed_ajax_with_page-block_1', [
-      'id' => 'block-one-exposed-form',
+      'id' => 'block_one_exposed_form',
       'weight' => 50,
     ]);
     $this->drupalPlaceBlock('views_block:test_block_exposed_ajax_with_page-block_1', [
-      'id' => 'block-two-exposed-form',
+      'id' => 'block_two_exposed_form',
       'weight' => 100,
     ]);
 
