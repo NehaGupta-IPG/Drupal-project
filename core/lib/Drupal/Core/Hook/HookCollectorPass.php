@@ -359,14 +359,15 @@ class HookCollectorPass implements CompilerPassInterface {
   }
 
   /**
-   * Checks for hooks which can't be supported in classes.
+   * Determines if a hook must be implemented procedurally.
    *
-   * @param \Drupal\Core\Hook\Attribute\Hook $hook
-   *   The hook to check.
-   * @param string $class
-   *   The class the hook is implemented on.
+   * @param string $hook_name
+   *   The short hook name to check, without the 'hook_' prefix.
+   *
+   * @return bool
+   *   TRUE if the hook must be implemented procedurally, FALSE otherwise.
    */
-  public static function checkForProceduralOnlyHooks(Hook $hook, string $class): void {
+  public static function isProceduralOnlyHook(string $hook_name): bool {
     $staticDenyHooks = [
       'hook_info',
       'install',
@@ -379,7 +380,22 @@ class HookCollectorPass implements CompilerPassInterface {
       'install_tasks_alter',
     ];
 
-    if (in_array($hook->hook, $staticDenyHooks) || preg_match('/^(post_update_|preprocess_|update_\d+$)/', $hook->hook)) {
+    return in_array($hook_name, $staticDenyHooks) || preg_match('/^(post_update_|preprocess_|update_\d+$)/', $hook_name);
+  }
+
+  /**
+   * Checks for hooks which can't be supported in classes.
+   *
+   * @param \Drupal\Core\Hook\Attribute\Hook $hook
+   *   The hook to check.
+   * @param string $class
+   *   The class the hook is implemented on.
+   *
+   * @throws \LogicException
+   *   Thrown when the hook must be implemented procedurally.
+   */
+  public static function checkForProceduralOnlyHooks(Hook $hook, string $class): void {
+    if (self::isProceduralOnlyHook($hook->hook)) {
       throw new \LogicException("The hook $hook->hook on class $class does not support attributes and must remain procedural.");
     }
   }
