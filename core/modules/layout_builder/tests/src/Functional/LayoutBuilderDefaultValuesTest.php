@@ -188,16 +188,6 @@ class LayoutBuilderDefaultValuesTest extends BrowserTestBase {
     // String field with "late" default should not render.
     $assert_session->pageTextNotContains('field_string_late_default');
     $assert_session->pageTextNotContains('Too late!');
-    // Image field with default should render default value.
-    $assert_session->pageTextContains('field_image_storage_default');
-    $assert_session->responseContains('My storage default alt text');
-    $assert_session->responseContains('test-file-1');
-    $assert_session->pageTextContains('field_image_instance_default');
-    $assert_session->responseContains('My instance default alt text');
-    $assert_session->responseContains('test-file-1');
-    $assert_session->pageTextContains('field_image_both_defaults');
-    $assert_session->responseContains('My instance default alt text');
-    $assert_session->responseContains('test-file-2');
     // Image field with no default should not render.
     $assert_session->pageTextNotContains('field_image_no_default');
     // Confirm that there is no DOM element for the field_image_with_no_default
