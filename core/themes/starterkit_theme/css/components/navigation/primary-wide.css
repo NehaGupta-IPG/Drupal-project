@@ -1,0 +1,114 @@
+/**
+ * @file
+ * Styling for the primary menu at wide widths.
+ */
+
+@media (min-width: 1000px) {
+  .primary-nav__mobile-button,
+  .primary-nav-overlay {
+    display: none; /* Hide the mobile button and overlay. */
+  }
+
+  /* All menu <ul> elements. */
+  .primary-nav__menu {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  /* Top level <ul> menu element. */
+  .primary-nav__menu--level-1 {
+    display: flex;
+  }
+
+  /* Second level <ul> menu element. */
+  .primary-nav__menu--level-2 {
+    position: absolute;
+    z-index: 1;
+    top: 100%;
+    visibility: hidden;
+    width: max-content;
+    max-width: 15rem;
+    padding: var(--padding-y) 0;
+    transition: visibility 0.2s, opacity 0.2s;
+    opacity: 0;
+    border: solid 1px currentColor;
+    background-color: white;
+    inset-inline-start: 0;
+  }
+
+  .primary-nav__menu--level-2.is-active-menu-parent,
+  html:not(.js) .primary-nav__menu-item--level-1:is(:hover, :focus-within) .primary-nav__menu--level-2 {
+    visibility: visible;
+    opacity: 1;
+  }
+
+  /* Menu item <li>. */
+  .primary-nav__menu-item {
+    --padding-x: 1rem;
+    --padding-y: 0.5rem;
+
+    display: flex;
+  }
+
+  .primary-nav__menu-item--has-children {
+    position: relative; /* Anchor child menus. */
+  }
+
+  /* Link component (can be <a>, <button>, or <span>). */
+  .primary-nav__menu-link {
+    display: block;
+    padding: var(--padding-y) var(--padding-x);
+  }
+
+  /* <button> element that is generated when top-level <a> link components have submenus. */
+  .primary-nav__button-toggle {
+    display: flex;
+    align-items: center;
+    align-self: stretch;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    appearance: none;
+    margin-inline: calc(-1 * var(--padding-x)) var(--padding-x);
+  }
+
+  /* Menu links that are <button> elements. */
+  .primary-nav__menu-link--button {
+    display: flex;
+    align-items: center;
+    appearance: none;
+    border: 0;
+    background: transparent;
+  }
+
+  .primary-nav__menu-link--button.primary-nav__menu-link--has-children {
+    padding-inline-end: calc(var(--padding-x) / 2);
+  }
+
+  /* Chevron icon. */
+  .primary-nav__button-icon {
+    margin-inline-start: calc(var(--padding-x) / 2);
+  }
+
+  .primary-nav__button-icon {
+    --icon-size: 8px;
+
+    position: relative;
+    display: block;
+    width: var(--icon-size);
+    height: var(--icon-size);
+    margin-inline: calc(var(--padding-x) / 2);
+  }
+
+  /* Down chevron icon. */
+  .primary-nav__button-icon::after {
+    display: block;
+    width: 100%;
+    height: 100%;
+    content: "";
+    transform: translateY(-25%) rotate(-45deg);
+    border-bottom: solid 2px currentColor;
+    border-left: solid 2px currentColor;
+  }
+}

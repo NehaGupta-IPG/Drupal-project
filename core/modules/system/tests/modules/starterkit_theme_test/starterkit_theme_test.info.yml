@@ -1,0 +1,7 @@
+name: 'Starterkit Theme tests'
+type: module
+description: 'Support module for testing the Starterkit_theme theme.'
+package: Testing
+version: VERSION
+dependencies:
+  - drupal:path
