@@ -191,7 +191,7 @@ class FieldBlockTest extends EntityKernelTestBase {
       FALSE,
     ];
     $data['empty, with default'] = [
-      TRUE,
+      FALSE,
       TRUE,
       TRUE,
     ];
