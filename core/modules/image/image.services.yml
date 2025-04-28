@@ -15,3 +15,8 @@ services:
     public: false
     tags:
       - { name: page_cache_response_policy }
+  twig.extension.image_extension:
+    class: Drupal\image\Twig\Extension\ImageExtension
+    arguments: ['@entity_type.manager', '@file_url_generator']
+    tags:
+      - { name: twig.extension }
