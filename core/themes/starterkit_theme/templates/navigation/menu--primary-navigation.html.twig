@@ -1,0 +1,111 @@
+{#
+/**
+ * @file
+ * Starterkit's theme implementation for the menus in the main_menu region.
+ *
+ * Available variables:
+ * - menu_name: The machine name of the menu.
+ * - items: A nested list of menu items. Each menu item contains:
+ *   - attributes: HTML attributes for the menu item.
+ *   - below: The menu item child items.
+ *   - title: The menu link title.
+ *   - url: The menu link url, instance of \Drupal\Core\Url
+ *   - localized_options: Menu link localized options.
+ *   - is_expanded: TRUE if the link has visible children within the current
+ *     menu tree.
+ *   - is_collapsed: TRUE if the link has children within the current menu tree
+ *     that are not currently visible.
+ *   - in_active_trail: TRUE if the link is in the active trail.
+ *
+ * @ingroup themeable
+ */
+#}
+{{ attach_library('starterkit_theme/primary-nav') }}
+{% import _self as menus %}
+
+{#
+  We call a macro which calls itself to render the full tree.
+  @see https://twig.symfony.com/doc/3.x/tags/macro.html
+#}
+{% set attributes = attributes.addClass('menu') %}
+{{ menus.menu_links(items, attributes, 0, 'primary-nav-item-') }}
+
+{% macro menu_links(items, attributes, menu_level, aria_id) %}
+  {% set main_nav_level = 'primary-nav__menu--level-' ~ (menu_level + 1) %}
+  {% set drupal_selector_main_nav_level = menu_level <= 1 ? 'primary-nav-menu--level-' ~ (menu_level + 1) : false %}
+  {% set is_top_level_menu = menu_level == 0 %}
+  {% import _self as menus %}
+  {% if items %}
+
+    <ul {{ attributes.addClass('primary-nav__menu', main_nav_level).setAttribute('data-drupal-selector', drupal_selector_main_nav_level) }}>
+      {% set attributes = attributes.removeClass(main_nav_level) %}
+      {% for item in items %}
+
+        {% if item.url.isRouted and item.url.routeName == '<nolink>' %}
+          {% set menu_item_type = 'nolink' %}
+        {% elseif item.url.isRouted and item.url.routeName == '<button>' %}
+          {% set menu_item_type = 'button' %}
+        {% else %}
+          {% set menu_item_type = 'link' %}
+        {% endif %}
+
+        {% set item_classes = [
+            'primary-nav__menu-item',
+            'primary-nav__menu-item--' ~ menu_item_type,
+            'primary-nav__menu-item--level-' ~ (menu_level + 1),
+            item.in_active_trail ? 'primary-nav__menu-item--active-trail',
+            item.below ? 'primary-nav__menu-item--has-children',
+          ]
+        %}
+
+        {% set link_classes = [
+            'primary-nav__menu-link',
+            'primary-nav__menu-link--' ~ menu_item_type,
+            'primary-nav__menu-link--level-' ~ (menu_level + 1),
+            item.in_active_trail ? 'primary-nav__menu-link--active-trail',
+            item.below ? 'primary-nav__menu-link--has-children',
+          ]
+        %}
+
+        <li{{ item.attributes.addClass(item_classes).setAttribute('data-drupal-selector', is_top_level_menu and item.below ? 'primary-nav-menu-item-has-children': false) }}>
+          {% set aria_id = (aria_id ~ loop.index )|clean_id %}
+          {% set is_parent_button = is_top_level_menu and item.below and menu_item_type == 'button' %}
+          {% set link_title %}
+            {{ item.title }}
+            {% if is_parent_button %}
+              <span class="primary-nav__button-icon"></span>
+            {% endif %}
+          {% endset %}
+
+          {{ link(link_title, item.url, {
+            'class': link_classes,
+            'data-drupal-selector': is_top_level_menu and item.below ? 'primary-nav-menu-link-has-children' : false,
+            'aria-controls': is_parent_button ? aria_id : false,
+            'aria-expanded': is_parent_button ? 'false' : false,
+            })
+          }}
+
+          {% if item.below %}
+            {# If this is a lop level <a> element that has a submenu, insert a <button> element to toggle the submenu. #}
+            {% if is_top_level_menu and menu_item_type != 'button' %}
+              {% set toggle_button_attributes = create_attribute({
+                'class': 'primary-nav__button-toggle',
+                'data-drupal-selector': 'primary-nav-submenu-toggle-button',
+                'aria-controls': aria_id,
+                'aria-expanded': 'false',
+              }) %}
+
+              <button{{ toggle_button_attributes }}>
+                <span class="primary-nav__button-icon"></span>
+                <span class="visually-hidden">{{ '@title sub-navigation'|t({'@title': item.title}) }}</span>
+              </button>
+            {% endif %}
+
+            {% set attributes = attributes.setAttribute('id', aria_id) %}
+            {{ menus.menu_links(item.below, attributes, menu_level + 1, aria_id) }}
+          {% endif %}
+        </li>
+      {% endfor %}
+    </ul>
+  {% endif %}
+{% endmacro %}

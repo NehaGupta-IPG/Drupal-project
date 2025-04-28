@@ -1,0 +1,168 @@
+/**
+ * @file
+ * Styling for the main menu at narrow widths.
+ */
+
+@media (max-width: 1000px) {
+  /* Region wrapper <div>. This is the element that shows/hides on narrow screens. */
+  .region-primary-navigation {
+    position: absolute;
+    z-index: 1;
+    visibility: hidden;
+    width: 100%;
+    max-width: 500px;
+    height: 100%;
+    transition: transform 0.2s, visibility 0.2s;
+    border-inline-start: solid 1px black;
+    background: #eee;
+    inset-block-start: var(--drupal-displace-offset-top, 0);
+    inset-inline-start: 100%;
+  }
+
+  .region-primary-navigation.is-expanded {
+    visibility: visible;
+    transform: translateX(-100%);
+  }
+
+  [dir="rtl"] .region-primary-navigation.is-expanded {
+    transform: translateX(100%);
+  }
+
+  .region-primary-navigation__scrollable {
+    --mobile-nav-button-space: 60px; /* Make space for the button that opens/closes the mobile navigation. */
+
+    overflow: auto;
+    height: calc(100% - var(--mobile-nav-button-space)); /* Necessary for proper scrolling if viewport is short. */
+    margin-top: var(--mobile-nav-button-space);
+    padding: 1rem;
+  }
+
+  /* <nav> element. */
+  .primary-nav {
+    padding-inline: 0;
+  }
+
+  /* <ul> menu elements. */
+  .primary-nav__menu {
+    margin: 0;
+    padding: 0;
+  }
+
+  /* Top level <ul> menu element. */
+  .primary-nav__menu--level-1 {
+    margin-block: 2rem;
+  }
+
+  /* Second level <ul> menu element. */
+  .primary-nav__menu--level-2 {
+    display: none;
+    flex-basis: 100%;
+    padding-block: 10px;
+    padding-inline-start: 20px;
+  }
+
+  .primary-nav__menu--level-2.is-active-menu-parent {
+    display: block;
+  }
+
+  /* Menu item <li>. */
+  .primary-nav__menu-item {
+    display: flex;
+  }
+
+  .primary-nav__menu-item--level-1 {
+    font-size: 1.5rem;
+  }
+
+  .primary-nav__menu-item--has-children {
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  /* Link element (can be <a>, <button>, or <span>). */
+  .primary-nav__menu-link {
+    flex-grow: 1;
+    padding: 0.5rem 1rem;
+  }
+
+  /* <button> element that is generated when <a> link elements have submenus. */
+  .primary-nav__button-toggle {
+    align-self: stretch;
+    padding: 0;
+    appearance: none;
+    border: 0;
+    background: transparent;
+  }
+
+  /* This is the toggle icon that appears within both parent <button> elements, and
+     <button> elements that get generated next to parent <a> links. */
+  .primary-nav__button-icon {
+    --icon-size: 20px;
+    --icon-line-width: 3px;
+
+    position: relative; /* Anchor icon. */
+    display: block;
+    width: var(--icon-size);
+    height: var(--icon-size);
+    margin-inline: 20px;
+  }
+
+  .primary-nav__button-icon::before,
+  .primary-nav__button-icon::after {
+    position: absolute;
+    width: 100%;
+    height: 0;
+    content: "";
+    border-top: solid var(--icon-line-width) currentColor;
+    inset-block-start: calc(50% - var(--icon-line-width) / 2);
+    inset-inline-start: 0;
+  }
+
+  .primary-nav__button-icon::after {
+    transition: opacity 0.2s;
+    transform: rotate(90deg);
+  }
+
+  /* Turn the plus icon into a minus when parent button is expanded. */
+  :is(.primary-nav__button-toggle, .primary-nav__menu-link--button)[aria-expanded="true"] .primary-nav__button-icon::after {
+    opacity: 0;
+  }
+
+  /* Menu links that are <button> elements. */
+  .primary-nav__menu-link--button {
+    display: flex;
+    align-items: center;
+    text-align: start;
+    border: 0;
+    background: transparent;
+    appearance: none;
+  }
+
+  .primary-nav__menu-link--button.primary-nav__menu-link--has-children {
+    justify-content: space-between;
+    padding-inline-end: 0; /* Align icon properly. */
+  }
+
+  .primary-nav-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    visibility: hidden;
+    width: 100%;
+    height: 100%;
+    opacity: 0.3;
+    color: black;
+    background-color: currentColor; /* Automatically adapts when in forced-colors mode. */
+  }
+
+  body.is-active-mobile-menu {
+    position: fixed;
+    width: calc(100% - var(--drupal-displace-offset-left, 0px) - var(--drupal-displace-offset-right, 0px));
+    height: 100%;
+  }
+
+  body.is-active-mobile-menu .primary-nav-overlay {
+    visibility: visible;
+  }
+}
