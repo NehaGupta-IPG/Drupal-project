@@ -94,10 +94,10 @@ function system_requirements($phase): array {
       $info = $module_extension_list->getExtensionInfo($profile);
       $requirements['install_profile'] = [
         'title' => t('Installation profile'),
-        'value' => t('%profile_name (%profile-%version)', [
+        'value' => t('%profile_name (%profile%version)', [
           '%profile_name' => $info['name'],
           '%profile' => $profile,
-          '%version' => $info['version'],
+          '%version' => !empty($info['version']) ? '-' . $info['version'] : '',
         ]),
         'severity' => REQUIREMENT_INFO,
         'weight' => -9,
@@ -1300,7 +1300,7 @@ function system_requirements($phase): array {
       $requirements['update status'] = [
         'value' => t('Not enabled'),
         'severity' => REQUIREMENT_WARNING,
-        'description' => t('Update notifications are not enabled. It is <strong>highly recommended</strong> that you install the Update Manager module from the <a href=":module">module administration page</a> in order to stay up-to-date on new releases. For more information, <a href=":update">Update status handbook page</a>.', [
+        'description' => t('Update notifications are not enabled. It is <strong>highly recommended</strong> that you install the Update Status module from the <a href=":module">module administration page</a> in order to stay up-to-date on new releases. For more information, <a href=":update">Update status handbook page</a>.', [
           ':update' => 'https://www.drupal.org/documentation/modules/update',
           ':module' => Url::fromRoute('system.modules_list')->toString(),
         ]),

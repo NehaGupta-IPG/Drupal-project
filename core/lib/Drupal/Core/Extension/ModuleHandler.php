@@ -166,6 +166,7 @@ class ModuleHandler implements ModuleHandlerInterface {
    * {@inheritdoc}
    */
   public function addModule($name, $path) {
+    @trigger_error(__METHOD__ . '() is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. There is no direct replacement. See https://www.drupal.org/node/3491200', E_USER_DEPRECATED);
     $this->add('module', $name, $path);
   }
 
@@ -173,6 +174,7 @@ class ModuleHandler implements ModuleHandlerInterface {
    * {@inheritdoc}
    */
   public function addProfile($name, $path) {
+    @trigger_error(__METHOD__ . '() is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. There is no direct replacement. See https://www.drupal.org/node/3491200', E_USER_DEPRECATED);
     $this->add('profile', $name, $path);
   }
 
@@ -185,6 +187,10 @@ class ModuleHandler implements ModuleHandlerInterface {
    *   The module name; e.g., 'node'.
    * @param string $path
    *   The module path; e.g., 'core/modules/node'.
+   *
+   * @deprecated in drupal:11.2.0 and is removed from drupal:12.0.0.
+   * There is no direct replacement.
+   * @see https://www.drupal.org/node/3491200
    */
   protected function add($type, $name, $path) {
     $pathname = "$path/$name.info.yml";
@@ -196,8 +202,10 @@ class ModuleHandler implements ModuleHandlerInterface {
     // A module freshly added will not be registered on the container yet.
     // ProceduralCall service does not yet know about it.
     // Note in HookCollectorPass:
+    // phpcs:ignore Drupal.Files.LineLength
     // - $container->register(ProceduralCall::class, ProceduralCall::class)->addArgument($collector->includes);
-    // Load all includes so the legacy section of invoke can handle hooks in includes.
+    // Load all includes so the legacy section of invoke can handle hooks in
+    // includes.
     $hook_collector->loadAllIncludes();
     // Register procedural implementations.
     foreach ($hook_collector->getImplementations() as $hook => $moduleImplements) {

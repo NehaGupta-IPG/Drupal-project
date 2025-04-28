@@ -596,7 +596,7 @@ function claro_preprocess_links(&$variables): void {
  * @return array
  *   The link renderable converted to action link.
  */
-function _claro_convert_link_to_action_link(array $link, $icon_name = NULL, $size = 'default', $variant = 'default') {
+function _claro_convert_link_to_action_link(array $link, $icon_name = NULL, $size = 'default', $variant = 'default'): array {
   // Early opt-out if we cannot do anything.
   if (empty($link['#type']) || $link['#type'] !== 'link' || empty($link['#url'])) {
     return $link;
@@ -1113,11 +1113,6 @@ function claro_preprocess_field_multiple_value_form(&$variables): void {
         }
       }
     }
-
-    // Make add-more button smaller.
-    if (!empty($variables['button'])) {
-      $variables['button']['#attributes']['class'][] = 'button--small';
-    }
   }
 }
 
@@ -1413,7 +1408,7 @@ function claro_preprocess_image_widget(&$variables): void {
  *   The renderable array of image and file widgets, with 'element' and 'data'
  *   keys.
  */
-function _claro_preprocess_file_and_image_widget(array &$variables) {
+function _claro_preprocess_file_and_image_widget(array &$variables): void {
   $element = $variables['element'];
   $main_item_keys = [
     'upload',

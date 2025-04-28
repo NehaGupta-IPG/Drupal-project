@@ -78,6 +78,9 @@ interface StatementInterface extends \Traversable {
    *   - for \PDO::FETCH_CLASS, the name of the class to create.
    *   - for \PDO::FETCH_INTO, the object to add the data to.
    *   constructor.
+   *
+   * @return bool
+   *   TRUE if successful, FALSE if not.
    */
   public function setFetchMode($mode, $a1 = NULL, $a2 = []);
 
@@ -151,7 +154,8 @@ interface StatementInterface extends \Traversable {
    * @param int|null $column_index
    *   If $mode is FetchAs::Column, the index of the column to fetch.
    * @param array $constructor_arguments
-   *   If $mode is FetchAs::ClassObject, the arguments to pass to the constructor.
+   *   If $mode is FetchAs::ClassObject, the arguments to pass to the
+   *   constructor.
    *
    * @return array
    *   An array of results.
