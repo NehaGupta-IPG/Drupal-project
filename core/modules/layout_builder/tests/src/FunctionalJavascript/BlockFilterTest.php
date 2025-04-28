@@ -93,9 +93,9 @@ class BlockFilterTest extends WebDriverTestBase {
     $fewer_blocks_message = ' blocks are available in the modified list';
     $this->assertAnnounceContains($fewer_blocks_message);
     $visible_rows = $this->filterVisibleElements($blocks);
-    $this->assertCount(3, $visible_rows);
+    $this->assertCount(2, $visible_rows);
     $visible_categories = $this->filterVisibleElements($categories);
-    $this->assertCount(3, $visible_categories);
+    $this->assertCount(2, $visible_categories);
 
     // Test Drupal.announce() message when multiple matches are present.
     $expected_message = count($visible_rows) . $fewer_blocks_message;
