@@ -5,12 +5,12 @@ declare(strict_types=1);
 namespace Drupal\Tests\file\Functional;
 
 use Drupal\Core\Entity\EntityInterface;
-use Drupal\entity_test\EntityTestHelper;
 use Drupal\Core\Url;
+use Drupal\entity_test\Entity\EntityTestConstraints;
+use Drupal\entity_test\EntityTestHelper;
+use Drupal\file\Entity\File;
 use Drupal\KernelTests\AssertContentTrait;
 use Drupal\node\Entity\Node;
-use Drupal\file\Entity\File;
-use Drupal\entity_test\Entity\EntityTestConstraints;
 use Drupal\user\Entity\Role;
 
 /**
@@ -187,7 +187,7 @@ class FileListingTest extends FileFieldTestBase {
       ],
     ]));
     $this->assertLinkByHref('admin/content/files');
-    $this->clickLink(t('Cancel'));
+    $this->clickLink('Cancel');
     $this->assertSession()->addressEquals('admin/content/files');
     $this->submitForm($edit, 'Apply to selected items');
     $this->assertText('Are you sure you want to delete these items?');

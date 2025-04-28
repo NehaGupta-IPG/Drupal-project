@@ -2,6 +2,7 @@
 
 namespace Drupal\file\Plugin\Action;
 
+use Drupal\Core\Access\AccessResultInterface;
 use Drupal\Core\Action\ActionBase;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Session\AccountInterface;
@@ -71,21 +72,21 @@ class DeleteFile extends ActionBase implements ContainerFactoryPluginInterface {
   /**
    * {@inheritdoc}
    */
-  public function executeMultiple(array $entities) {
+  public function executeMultiple(array $entities): void {
     $this->tempStoreFactory->get('file_multiple_delete_confirm')->set($this->currentUser->id(), $entities);
   }
 
   /**
    * {@inheritdoc}
    */
-  public function execute($object = NULL) {
+  public function execute($object = NULL): void {
     $this->executeMultiple([$object]);
   }
 
   /**
    * {@inheritdoc}
    */
-  public function access($object, AccountInterface $account = NULL, $return_as_object = FALSE) {
+  public function access($object, ?AccountInterface $account = NULL, $return_as_object = FALSE): bool|AccessResultInterface {
     /** @var \Drupal\file\FileInterface $object */
     return $object->access('delete', $account, $return_as_object);
   }
