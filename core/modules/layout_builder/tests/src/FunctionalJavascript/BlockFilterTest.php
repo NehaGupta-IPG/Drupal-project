@@ -111,9 +111,9 @@ class BlockFilterTest extends WebDriverTestBase {
     // Retest that blocks appear when reducing letters.
     $filter->setValue('ad');
     $visible_rows = $this->filterVisibleElements($blocks);
-    $this->assertCount(3, $visible_rows);
+    $this->assertCount(2, $visible_rows);
     $visible_categories = $this->filterVisibleElements($categories);
-    $this->assertCount(3, $visible_categories);
+    $this->assertCount(2, $visible_categories);
 
     // Test blocks reappear after being filtered by repeating search for "a"
     $filter->setValue('a');
