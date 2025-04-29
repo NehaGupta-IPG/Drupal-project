@@ -9,6 +9,7 @@ use Drupal\Core\Menu\MenuLinkInterface;
 use Drupal\Core\Breadcrumb\Breadcrumb;
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
+use Drupal\menu_ui\EntityDeleteMenuDescendants;
 use Drupal\system\MenuInterface;
 use Drupal\system\Entity\Menu;
 use Drupal\Core\Form\FormStateInterface;
@@ -331,6 +332,16 @@ class MenuUiHooks {
       }
     }
     return $operations;
+  }
+
+  /**
+   * Implements hook_form_alter().
+   */
+  #[Hook('form_alter')]
+  public function formAlter(array &$form, FormStateInterface $form_state, string $form_id): void {
+    /** @var \Drupal\menu_ui\EntityDeleteMenuDescendants $entityDeleteMenuDescendants */
+    $entityDeleteMenuDescendants = \Drupal::service(EntityDeleteMenuDescendants::class);
+    $entityDeleteMenuDescendants->formAlter($form, $form_state, $form_id);
   }
 
 }
