@@ -1,17 +1,4 @@
-+  /**
-+   * {@inheritdoc}
-+   */
-+  public static function processGroup(&$element, FormStateInterface $form_state, &$complete_form) {
-+    return $element;
-+  }
-+
-+  /**
-+   * {@inheritdoc}
-+   */
-+  public static function preRenderGroup($element) {
-+    return $element;
-+  }
-+<?php
+<?php
 
 namespace Drupal\Core\Render\Element;
 
