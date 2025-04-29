@@ -2,8 +2,6 @@
 
 namespace Drupal\content_translation\Plugin\migrate\source;
 
-@trigger_error('The ' . __NAMESPACE__ . '\I18nQueryTrait is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Use \Drupal\migrate_drupal\Plugin\migrate\source\I18nQueryTrait instead. See https://www.drupal.org/node/3439256', E_USER_DEPRECATED);
-
 use Drupal\migrate\Plugin\MigrateIdMapInterface;
 use Drupal\migrate\MigrateException;
 use Drupal\migrate\Row;
@@ -56,6 +54,8 @@ trait I18nQueryTrait {
    * @throws \Drupal\migrate\MigrateException
    */
   protected function getPropertyNotInRowTranslation(Row $row, $property_not_in_row, $object_id_name, MigrateIdMapInterface $id_map) {
+    @trigger_error(__TRAIT__ . ' is deprecated in drupal:11.2.0 and will be removed from drupal:12.0.0. Use \Drupal\migrate_drupal\Plugin\migrate\source\I18nQueryTrait instead. See https://www.drupal.org/node/3439256', E_USER_DEPRECATED);
+
     $language = $row->getSourceProperty('language');
     if (!$language) {
       throw new MigrateException('No language found.');

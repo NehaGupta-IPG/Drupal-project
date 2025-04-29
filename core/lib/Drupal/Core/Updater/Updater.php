@@ -55,6 +55,7 @@ abstract class Updater {
    *   Drupal site is installed).
    */
   public function __construct($source, $root) {
+    @trigger_error('The ' . __NAMESPACE__ . '\Updater class is deprecated in drupal:11.2.0 and will be removed in drupal:12.0.0. Use Composer to manage your code instead. See https://www.drupal.org/node/3512364', E_USER_DEPRECATED);
     $this->source = $source;
     $this->root = $root;
     $this->name = self::getProjectName($source);
