@@ -293,7 +293,7 @@ class EntityApiTest extends EntityKernelTestBase {
     $entity = $storage->create(['name' => 'no_preloading']);
     $entity->save();
     \Drupal::state()->set('preloaded_entities', [$entity]);
-    static::assertEquals([1 => $entity], $storage->loadMultiple());
+    $this->assertEquals([$entity->id() => $entity], $storage->loadMultiple());
   }
 
 }
