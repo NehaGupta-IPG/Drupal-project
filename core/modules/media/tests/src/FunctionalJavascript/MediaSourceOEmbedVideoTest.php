@@ -211,7 +211,7 @@ class MediaSourceOEmbedVideoTest extends MediaSourceTestBase {
       ->execute()
       ->fetchObject();
     $message = (string) DbLogController::create($this->container)->formatMessage($row);
-    $this->assertStringContainsString('resulted in a `404 Not Found` response', $message);
+    $this->assertStringContainsString('Could not retrieve the oEmbed resource', $message);
 
     // Test anonymous access to media via iframe.
     $this->drupalLogout();

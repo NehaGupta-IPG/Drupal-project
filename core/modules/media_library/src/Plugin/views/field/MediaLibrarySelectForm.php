@@ -16,6 +16,8 @@ use Drupal\views\Plugin\views\field\FieldPluginBase;
 use Drupal\views\Render\ViewsRenderPipelineMarkup;
 use Drupal\views\ResultRow;
 use Symfony\Component\HttpFoundation\Request;
+use GuzzleHttp\Exception\RequestException;
+use GuzzleHttp\RequestOptions;
 
 /**
  * Defines a field that outputs a checkbox and form for selecting media.

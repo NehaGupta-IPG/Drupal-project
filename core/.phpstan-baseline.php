@@ -24622,12 +24622,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/media_library/src/Plugin/views/field/MediaLibrarySelectForm.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\media_library\\\\Plugin\\\\views\\\\field\\\\MediaLibrarySelectForm\\:\\:viewsFormValidate\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/media_library/src/Plugin/views/field/MediaLibrarySelectForm.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\media_library\\\\Routing\\\\RouteSubscriber\\:\\:alterRoutes\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
