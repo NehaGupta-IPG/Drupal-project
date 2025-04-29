@@ -74,7 +74,7 @@ class FileDeleteMultiple extends ConfirmFormBase {
   /**
    * {@inheritdoc}
    */
-  public static function create(ContainerInterface $container) {
+  public static function create(ContainerInterface $container): static {
     return new static(
       $container->get('tempstore.private'),
       $container->get('entity_type.manager'),
@@ -143,7 +143,7 @@ class FileDeleteMultiple extends ConfirmFormBase {
   /**
    * {@inheritdoc}
    */
-  public function submitForm(array &$form, FormStateInterface $form_state) {
+  public function submitForm(array &$form, FormStateInterface $form_state): void {
     if ($form_state->getValue('confirm') && !empty($this->files)) {
       $this->fileStorage->delete($this->files);
       $this->tempStoreFactory->get('file_multiple_delete_confirm')
