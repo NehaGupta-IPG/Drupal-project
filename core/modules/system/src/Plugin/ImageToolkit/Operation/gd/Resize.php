@@ -36,8 +36,8 @@ class Resize extends GDImageToolkitOperationBase {
    */
   protected function validateArguments(array $arguments) {
     // Assure integers for all arguments.
-    $arguments['width'] = (int) round($arguments['width']);
-    $arguments['height'] = (int) round($arguments['height']);
+    $arguments['width'] = round((int) $arguments['width']);
+    $arguments['height'] = round((int) $arguments['height']);
 
     // Fail when width or height are 0 or negative.
     if ($arguments['width'] <= 0) {
