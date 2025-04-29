@@ -30,4 +30,4 @@ services:
     tags:
       - { name: paramconverter }
     lazy: true
-  Drupal\language\LanguageConfigUpdater: ~
+  Drupal\language\EntityViewDisplayConfigUpdater: ~

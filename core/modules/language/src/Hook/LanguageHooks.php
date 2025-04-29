@@ -5,7 +5,7 @@ namespace Drupal\language\Hook;
 use Drupal\Core\Access\AccessResultInterface;
 use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
-use Drupal\language\LanguageConfigUpdater;
+use Drupal\language\EntityViewDisplayConfigUpdater;
 use Drupal\language\Plugin\LanguageNegotiation\LanguageNegotiationUrlFallback;
 use Drupal\language\Plugin\LanguageNegotiation\LanguageNegotiationUrl;
 use Drupal\language\Plugin\LanguageNegotiation\LanguageNegotiationUI;
@@ -32,11 +32,8 @@ class LanguageHooks {
 
   use StringTranslationTrait;
 
-  /**
-   * Constructs LanguageHooks object.
-   */
   public function __construct(
-    private readonly LanguageConfigUpdater $languageConfigUpdater,
+    private readonly EntityViewDisplayConfigUpdater $languageConfigUpdater,
   ) {}
 
   /**

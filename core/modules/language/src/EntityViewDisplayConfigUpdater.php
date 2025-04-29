@@ -9,7 +9,7 @@ use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
 /**
  * Config updater service to update configuration entities.
  */
-class LanguageConfigUpdater {
+class EntityViewDisplayConfigUpdater {
 
   /**
    * Flag determining whether deprecations should be triggered.

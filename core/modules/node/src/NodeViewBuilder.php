@@ -45,6 +45,17 @@ class NodeViewBuilder extends EntityViewBuilder implements TrustedCallbackInterf
           ],
         ];
       }
+
+      // Add Language field text element to node render array.
+      if ($display->getComponent('langcode')) {
+        $build[$id]['langcode'] = [
+          '#type' => 'item',
+          '#title' => $this->t('Language'),
+          '#markup' => $entity->language()->getName(),
+          '#prefix' => '<div id="field-language-display">',
+          '#suffix' => '</div>',
+        ];
+      }
     }
   }
 
