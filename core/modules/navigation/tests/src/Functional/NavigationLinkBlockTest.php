@@ -4,11 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\navigation\Functional;
 
-use Drupal\Core\Cache\CacheableMetadata;
-use Drupal\Core\Plugin\Context\Context;
-use Drupal\Core\Plugin\Context\ContextDefinition;
 use Drupal\Core\Url;
-use Drupal\layout_builder\SectionComponent;
 use Drupal\Tests\system\Functional\Cache\PageCacheTagsTestBase;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -207,27 +203,31 @@ class NavigationLinkBlockTest extends PageCacheTagsTestBase {
    *   The link icon CSS class.
    */
   protected function appendNavigationLinkBlock(string $label, string $link_title, string $link_uri, string $link_icon): void {
-    $section_storage_manager = \Drupal::service('plugin.manager.layout_builder.section_storage');
-    $cacheability = new CacheableMetadata();
-    $contexts = [
-      'navigation' => new Context(ContextDefinition::create('string'), 'navigation'),
+    $config = $this->config('navigation.block_layout');
+
+    $sections = $config->get('sections') ?? [];
+
+    $uuid = \Drupal::service('uuid')->generate();
+
+    $sections[0]['components'][$uuid] = [
+      'uuid' => $uuid,
+      'region' => 'content',
+      'configuration' => [
+        'id' => 'navigation_link',
+        'label' => $label,
+        'label_display' => 'visible',
+        'provider' => 'navigation',
+        'context_mapping' => [],
+        'title' => $link_title,
+        'uri' => $link_uri,
+        'icon_class' => $link_icon,
+      ],
+      'weight' => count($sections[0]['components'] ?? []),
+      'additional' => [],
     ];
-    /** @var \Drupal\layout_builder\SectionListInterface $section_list */
-    $section_list = $section_storage_manager->findByContext($contexts, $cacheability);
-    $section = $section_list->getSection(0);
 
-    $section->appendComponent(new SectionComponent(\Drupal::service('uuid')->generate(), 'content', [
-      'id' => 'navigation_link',
-      'label' => $label,
-      'label_display' => 'visible',
-      'provider' => 'navigation',
-      'context_mapping' => [],
-      'title' => $link_title,
-      'uri' => $link_uri,
-      'icon_class' => $link_icon,
-    ]));
-
-    $section_list->save();
+    $config->set('sections', $sections);
+    $config->save();
   }
 
 }

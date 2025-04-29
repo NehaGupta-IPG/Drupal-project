@@ -18,7 +18,7 @@ class NavigationSafeBlockDefinitionTest extends BrowserTestBase {
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['navigation', 'navigation_test', 'block'];
+  protected static $modules = ['navigation', 'navigation_test', 'block', 'layout_builder'];
 
   /**
    * {@inheritdoc}
@@ -50,6 +50,8 @@ class NavigationSafeBlockDefinitionTest extends BrowserTestBase {
 
   /**
    * Tests logic to include blocks in Navigation Layout UI.
+   *
+   * @todo Fixme/Remove?
    */
   public function testNavigationSafeBlockDefinition(): void {
     // Confirm that default blocks are available.

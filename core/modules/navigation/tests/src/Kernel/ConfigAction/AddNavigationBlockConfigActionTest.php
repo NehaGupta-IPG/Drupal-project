@@ -5,8 +5,6 @@ declare(strict_types=1);
 namespace Drupal\Tests\navigation\Kernel\ConfigAction;
 
 use Drupal\Core\Config\Action\ConfigActionException;
-use Drupal\Core\Plugin\Context\Context;
-use Drupal\Core\Plugin\Context\ContextDefinition;
 use Drupal\FunctionalTests\Core\Recipe\RecipeTestTrait;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\navigation\Plugin\ConfigAction\AddNavigationBlock;
@@ -31,7 +29,6 @@ class AddNavigationBlockConfigActionTest extends KernelTestBase {
    */
   protected static $modules = [
     'navigation',
-    'layout_builder',
     'layout_discovery',
     'system',
   ];
@@ -52,13 +49,10 @@ class AddNavigationBlockConfigActionTest extends KernelTestBase {
   #[TestWith([2, 2])]
   #[TestWith([6, 2])]
   public function testAddBlockToNavigation($delta, int $computed_delta): void {
-    // Load the navigation section storage.
-    $navigation_storage = \Drupal::service('plugin.manager.layout_builder.section_storage')->load('navigation', [
-      'navigation' => new Context(new ContextDefinition('string'), 'navigation'),
-    ]);
-    $section = $navigation_storage->getSection(0);
-    $components = $section->getComponentsByRegion('content');
-    $this->assertCount(2, $components);
+    $config = \Drupal::config('navigation.block_layout');
+    $sections = $config->get('sections') ?? [];
+    $components = array_filter($sections[0]['components'], fn ($component) => $component['region'] === 'content');
+    $this->assertCount(3, $components);
     $data = [
       'delta' => $delta,
       'configuration' => [
@@ -77,15 +71,13 @@ class AddNavigationBlockConfigActionTest extends KernelTestBase {
     $manager->applyAction('addNavigationBlock', 'navigation.block_layout', $data);
 
     // Load the config after the execution.
-    $navigation_storage = \Drupal::service('plugin.manager.layout_builder.section_storage')->load('navigation', [
-      'navigation' => new Context(new ContextDefinition('string'), 'navigation'),
-    ]);
-    $section = $navigation_storage->getSection(0);
-    $components = $section->getComponentsByRegion('content');
-    $this->assertCount(3, $components);
+    $config = \Drupal::config('navigation.block_layout');
+    $sections = $config->get('sections') ?? [];
+    $components = array_filter($sections[0]['components'], fn ($component) => $component['region'] === 'content');
+    $this->assertCount(4, $components);
     $component = array_values($components)[$computed_delta];
-    $this->assertSame('content', $component->getRegion());
-    $this->assertEquals($data['configuration'], $component->get('configuration'));
+    $this->assertSame('content', $component['region']);
+    $this->assertEquals($data['configuration'], $component['configuration']);
   }
 
   /**

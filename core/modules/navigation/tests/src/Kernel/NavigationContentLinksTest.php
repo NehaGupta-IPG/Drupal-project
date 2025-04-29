@@ -28,7 +28,7 @@ class NavigationContentLinksTest extends KernelTestBase {
     'node',
     'file',
     'media',
-    'layout_builder',
+    'layout_discovery',
     'system',
     'views',
     'field',

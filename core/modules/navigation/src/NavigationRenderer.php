@@ -5,22 +5,21 @@ namespace Drupal\navigation;
 use Drupal\big_pipe\Render\Placeholder\BigPipeStrategy;
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Component\Utility\SortArray;
+use Drupal\Core\Block\BlockManagerInterface;
 use Drupal\Core\Block\BlockPluginInterface;
-use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Cache\CacheBackendInterface;
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Extension\ModuleExtensionList;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\File\FileUrlGeneratorInterface;
 use Drupal\Core\Image\ImageFactory;
+use Drupal\Core\Layout\LayoutPluginManagerInterface;
 use Drupal\Core\Menu\LocalTaskManagerInterface;
-use Drupal\Core\Plugin\Context\Context;
-use Drupal\Core\Plugin\Context\ContextDefinition;
 use Drupal\Core\Render\Element;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Security\Attribute\TrustedCallback;
 use Drupal\Core\Session\AccountInterface;
-use Drupal\layout_builder\SectionStorage\SectionStorageManagerInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
@@ -62,7 +61,8 @@ final class NavigationRenderer {
     private LocalTaskManagerInterface $localTaskManager,
     private ImageFactory $imageFactory,
     private FileUrlGeneratorInterface $fileUrlGenerator,
-    private SectionStorageManagerInterface $sectionStorageManager,
+    private LayoutPluginManagerInterface $layoutPluginManager,
+    private BlockManagerInterface $blockManager,
     private RequestStack $requestStack,
     private ModuleExtensionList $moduleExtensionList,
     private AccountInterface $currentUser,
@@ -99,15 +99,20 @@ final class NavigationRenderer {
     $logo_provider = $logo_settings->get('logo.provider');
 
     $cacheability = new CacheableMetadata();
-    $contexts = [
-      'navigation' => new Context(ContextDefinition::create('string'), 'navigation'),
-    ];
-    $storage = $this->sectionStorageManager->findByContext($contexts, $cacheability);
 
-    if ($storage) {
-      foreach ($storage->getSections() as $delta => $section) {
-        $build[$delta] = $section->toRenderArray([]);
+    $sections = $this->configFactory->get('navigation.block_layout')->get('sections') ?: [];
+
+    foreach ($sections as $delta => $section) {
+      $layout = $this->layoutPluginManager->createInstance($section['layout_id'], $section['layout_settings'] ?? []);
+
+      $regions = [];
+      foreach ($section['components'] as $component) {
+        $regions[$component['region']][$component['uuid']] = $this->buildNavigationComponent($component, $cacheability);
       }
+
+      $build[$delta] = $layout->build($regions);
+      // @todo Obsolete?
+      $build[$delta]['#cache']['contexts'] = ['user.permissions', 'theme', 'languages:language_interface'];
     }
     // The render array is built based on decisions made by SectionStorage
     // plugins and therefore it needs to depend on the accumulated
@@ -135,6 +140,60 @@ final class NavigationRenderer {
         }
       }
     }
+    return $build;
+  }
+
+  /**
+   * Build a navigation layout component.
+   */
+  protected function buildNavigationComponent(array $component, CacheableMetadata $cacheability_metadata): array {
+    $block = $this->blockManager->createInstance($component['configuration']['id'], $component['configuration']);
+    assert($block instanceof BlockPluginInterface);
+
+    $build = [];
+
+    $cacheability_metadata->addCacheableDependency($block);
+    $access = $block->access($this->currentUser, TRUE);
+    $cacheability_metadata->addCacheableDependency($access);
+
+    if (!$access->isAllowed()) {
+      return $build;
+    }
+
+    $content = $block->build();
+
+    if (Element::isEmpty($content)) {
+      return $build;
+    }
+
+    $build = [
+      // @todo Move this to BlockBase in https://www.drupal.org/node/2931040.
+      '#theme' => 'block',
+      '#configuration' => $block->getConfiguration(),
+      '#plugin_id' => $block->getPluginId(),
+      '#base_plugin_id' => $block->getBaseId(),
+      '#derivative_plugin_id' => $block->getDerivativeId(),
+      '#in_preview' => FALSE,
+      '#weight' => $component['weight'],
+    ];
+
+    // Place the $content returned by the block plugin into a 'content' child
+    // element, as a way to allow the plugin to have complete control of its
+    // properties and rendering (for instance, its own #theme) without
+    // conflicting with the properties used above, or alternate ones used by
+    // alternate block rendering approaches in contributed modules. However,
+    // the use of a child element is an implementation detail of this
+    // particular block rendering approach. Semantically, the content returned
+    // by the block plugin, and in particular, attributes and contextual links
+    // are information that belong to the entire block. Therefore, we must
+    // move these properties from $content and merge them into the top-level
+    // element.
+    if (isset($content['#attributes'])) {
+      $build['#attributes'] = $content['#attributes'];
+      unset($content['#attributes']);
+    }
+    $build['content'] = $content;
+
     return $build;
   }
 

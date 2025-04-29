@@ -202,7 +202,7 @@ INFO;
     $edit['modules[navigation][enable]'] = 'navigation';
     $this->drupalGet('admin/modules');
     $this->submitForm($edit, 'Install');
-    $this->assertSession()->pageTextContains('You must install the following modules to install Navigation:BlockFileFieldLayout BuilderLayout DiscoveryContextual Links');
+    $this->assertSession()->pageTextContains('You must install the following modules to install Navigation:BlockFileFieldLayout Discovery');
   }
 
 }

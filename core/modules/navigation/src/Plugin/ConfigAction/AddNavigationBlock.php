@@ -8,13 +8,9 @@ use Drupal\Component\Uuid\UuidInterface;
 use Drupal\Core\Config\Action\Attribute\ConfigAction;
 use Drupal\Core\Config\Action\ConfigActionException;
 use Drupal\Core\Config\Action\ConfigActionPluginInterface;
+use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
-use Drupal\Core\Plugin\Context\Context;
-use Drupal\Core\Plugin\Context\ContextDefinition;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
-use Drupal\layout_builder\SectionComponent;
-use Drupal\layout_builder\SectionStorage\SectionStorageManagerInterface;
-use Drupal\layout_builder\SectionStorageInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -28,7 +24,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 final class AddNavigationBlock implements ConfigActionPluginInterface, ContainerFactoryPluginInterface {
 
   public function __construct(
-    protected readonly SectionStorageManagerInterface $sectionStorageManager,
+    protected readonly ConfigFactoryInterface $configFactory,
     protected readonly UuidInterface $uuidGenerator,
   ) {
   }
@@ -38,7 +34,7 @@ final class AddNavigationBlock implements ConfigActionPluginInterface, Container
    */
   public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition): static {
     return new static(
-      $container->get(SectionStorageManagerInterface::class),
+      $container->get(ConfigFactoryInterface::class),
       $container->get(UuidInterface::class),
     );
   }
@@ -50,36 +46,64 @@ final class AddNavigationBlock implements ConfigActionPluginInterface, Container
     if ($configName !== 'navigation.block_layout') {
       throw new ConfigActionException('addNavigationBlock can only be executed for the navigation.block_layout config.');
     }
-    // Load the navigation section storage.
-    $navigation_storage = $this->sectionStorageManager->load('navigation', [
-      'navigation' => new Context(new ContextDefinition('string'), 'navigation'),
-    ]);
-    if (!$navigation_storage instanceof SectionStorageInterface) {
-      throw new ConfigActionException('Unable to load Navigation Layout storage.');
+
+    $config = $this->configFactory->getEditable('navigation.block_layout');
+
+    $sections = $config->get('sections') ?? [
+      0 => [
+        'components' => [],
+      ],
+    ];
+
+    // Either find the right weight/delta or adjust existing weights.
+    $append = FALSE;
+    $max_delta = 0;
+    foreach ($sections[0]['components'] as $component) {
+      if ($component['region'] === 'content') {
+        if ($max_delta < $component['weight']) {
+          $max_delta = $component['weight'];
+        }
+      }
     }
 
-    $section = $navigation_storage->getSection(0);
+    // If the delta is either not set or is above the max delta, switch
+    // into append mode and set the delta to the max + 1.
+    if (!isset($value['delta']) || $value['delta'] > $max_delta) {
+      $append = TRUE;
+      $value['delta'] = $max_delta + 1;
+    }
+
+    $uuid = $this->uuidGenerator->generate();
+
     // Create the component from the recipe values.
-    $delta = $value['delta'] ?? 0;
-    // Weight is set to 0 because it is irrelevant now. It will be adjusted to
-    // its final value in insertComponent() or appendComponent().
-    $component = [
-      'uuid' => $this->uuidGenerator->generate(),
-      'region' => $section->getDefaultRegion(),
-      'weight' => 0,
+    $component_to_add = [
+      'uuid' => $uuid,
+      'region' => 'content',
       'configuration' => $value['configuration'] ?? [],
+      'weight' => $value['delta'],
       'additional' => $value['additional'] ?? [],
     ];
 
-    // Insert the new component in Navigation.
-    $new_component = SectionComponent::fromArray($component);
-    try {
-      $section->insertComponent($delta, $new_component);
+    $new_components = [];
+    foreach ($sections[0]['components'] as $key => $component) {
+      if ($component['region'] === 'content') {
+        if (!$append && $component['weight'] === $value['delta']) {
+          $new_components[$uuid] = $component_to_add;
+        }
+        if ($component['weight'] >= $value['delta']) {
+          $component['weight']++;
+        }
+      }
+
+      $new_components[$key] = $component;
+
+      if ($append && ($component['weight'] + 1) === $value['delta']) {
+        $new_components[$uuid] = $component_to_add;
+      }
     }
-    catch (\OutOfBoundsException) {
-      $section->appendComponent($new_component);
-    }
-    $navigation_storage->save();
+
+    $config->set('sections.0.components', $new_components);
+    $config->save();
   }
 
 }

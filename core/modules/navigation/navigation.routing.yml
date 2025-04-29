@@ -5,3 +5,20 @@ navigation.settings:
     _form: 'Drupal\navigation\Form\SettingsForm'
   requirements:
     _permission: 'administer site configuration'
+
+# The layout builder route is hardcoded so it works as a fallback without
+# layout_builder being enabled.
+navigation.layout:
+  path: '/admin/config/user-interface/navigation-block'
+  defaults:
+    _title: 'Navigation layout'
+    _form: 'Drupal\navigation\Form\LayoutForm'
+    section_storage_type: navigation
+    section_storage: ~
+  requirements:
+    _permission: 'configure navigation layout'
+  options:
+    _layout_builder: true
+    parameters:
+      section_storage:
+        layout_builder_tempstore: true

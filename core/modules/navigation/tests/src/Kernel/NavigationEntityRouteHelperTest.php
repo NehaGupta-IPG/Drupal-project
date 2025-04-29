@@ -24,7 +24,7 @@ class NavigationEntityRouteHelperTest extends KernelTestBase {
   protected static $modules = [
     'system',
     'navigation',
-    'layout_builder',
+    'layout_discovery',
     'user',
   ];
 
