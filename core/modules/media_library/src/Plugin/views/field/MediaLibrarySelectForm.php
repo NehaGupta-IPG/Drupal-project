@@ -162,7 +162,7 @@ class MediaLibrarySelectForm extends FieldPluginBase implements WorkspaceSafeFor
     $state = MediaLibraryState::fromRequest($request);
     $httpClient = \Drupal::httpClient();
     $response = new AjaxResponse();
-  
+
     if (empty($selected_ids)) {
       $error_message = t('No items selected.');
       $response->addCommand(new MessageCommand($error_message, '#media-library-add-form-wrapper', ['type' => 'error']));
@@ -189,7 +189,7 @@ class MediaLibrarySelectForm extends FieldPluginBase implements WorkspaceSafeFor
               return $response;
             }
           }
-          catch (RequestException $e) {
+          catch (RequestException) {
             $error_message = t('This media item has an invalid URL.');
             $response->addCommand(new MessageCommand($error_message, '#media-library-add-form-wrapper', ['type' => 'error']));
             return $response;
@@ -220,7 +220,6 @@ class MediaLibrarySelectForm extends FieldPluginBase implements WorkspaceSafeFor
       ->getSelectionResponse($state, $selected_ids)
       ->addCommand(new CloseDialogCommand());
   }
-
 
   /**
    * {@inheritdoc}
