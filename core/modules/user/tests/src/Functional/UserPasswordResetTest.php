@@ -297,7 +297,7 @@ class UserPasswordResetTest extends BrowserTestBase {
     $edit['choose_account'] = Crypt::hashBase64(Settings::getHashSalt() . $user_with_email->id());
     $this->drupalGet(NULL);
     $this->submitForm($edit, 'Submit');
-    $this->assertSession()->pageTextContains('Further instructions have been sent to your e-mail address.');
+    $this->assertSession()->pageTextContains('Further instructions have been sent to your email address.');
 
     // Make sure that right user was sent a reset email.
     $this->assertEquals(count($this->drupalGetMails([
@@ -320,7 +320,7 @@ class UserPasswordResetTest extends BrowserTestBase {
     $this->drupalGet(NULL);
     $this->submitForm([], 'Submit');
     // Make sure the user with the matching username was sent an email.
-    $this->assertSession()->pageTextContains('Further instructions have been sent to your e-mail address.');
+    $this->assertSession()->pageTextContains('Further instructions have been sent to your email address.');
     $this->assertEquals(count($this->drupalGetMails(
       [
         'key' => 'password_reset',

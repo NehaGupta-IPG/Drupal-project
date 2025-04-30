@@ -168,7 +168,7 @@ class UserPasswordForm extends FormBase implements WorkspaceSafeFormInterface {
         '#type' => 'radios',
         '#title' => $this->t('Choose account'),
         '#required' => TRUE,
-        '#prefix' => "<p>" . $this->t("There is a username conflict with the email address @email. Please select which account password to reset.", ['@email' => $form_state->getStorage()['name']]) . "</p>",
+        '#prefix' => "<p>" . $this->t("There is a username conflict with the email address @email. Select which account password to reset.", ['@email' => $form_state->getStorage()['name']]) . "</p>",
         '#options' => $options,
         '#default_value' => Crypt::hashBase64(Settings::getHashSalt() . reset($accounts)->id()),
       ];
@@ -231,7 +231,7 @@ class UserPasswordForm extends FormBase implements WorkspaceSafeFormInterface {
         $form_state->setValue('accounts', $accounts);
       }
       else {
-        $form_state->setErrorByName('name', $this->t('Sorry, %name is not recognized as a username or an e-mail address.', ['%name' => $name]));
+        $form_state->setErrorByName('name', $this->t('Sorry, %name is not recognized as a username or an email address.', ['%name' => $name]));
       }
     }
     elseif ($form_state->getValue('step') == 2) {
@@ -284,7 +284,7 @@ class UserPasswordForm extends FormBase implements WorkspaceSafeFormInterface {
         %name' => $account->name,
           '%email' => $account->mail,
         ]);
-        $this->messenger($this->t('Further instructions have been sent to your e-mail address.'));
+        $this->messenger($this->t('Further instructions have been sent to your email address.'));
       }
 
       $form_state->setRedirectUrl(Url::fromRoute('user.page'));
