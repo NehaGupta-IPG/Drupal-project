@@ -15,7 +15,7 @@ use Drupal\Tests\BrowserTestBase;
  *
  * @group menu_ui
  *
- * @coversDefaultClass \Drupal\menu_ui\EntityDeleteMenuDescendants
+ * @coversDefaultClass \Drupal\menu_ui\Hook\MenuUiEntityDeleteFormHooks
  */
 final class MenuUiEntityDeleteMenuDescendantsTest extends BrowserTestBase {
 
