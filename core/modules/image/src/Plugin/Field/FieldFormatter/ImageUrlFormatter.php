@@ -184,15 +184,15 @@ class ImageUrlFormatter extends ImageFormatterBase {
     $image_style = $this->imageStyleStorage->load($this->getSetting('image_style'));
     /** @var \Drupal\file\FileInterface[] $images */
     foreach ($images as $delta => $image) {
-      $image_uri = $image->getFileUri();
-      if ($image_style) {
-        $image_uri = $this->fileUrlGenerator->transformRelative($image_style->buildUri($image_uri));
-      }
-      $url = $this->fileUrlGenerator->generateAbsoluteString($image_uri);
 
-      // Generate absolute url for the image.
-      if (!$absolute_link) {
-        $url = $this->fileUrlGenerator->generateString($url);
+      $image_uri = $image->getFileUri();
+
+      if ($image_style) {
+        $image_url = $image_style->buildUrl($image_uri);
+        $url = $absolute_link ? $image_url : $this->fileUrlGenerator->transformRelative($image_url);
+      }
+      else {
+        $url = $absolute_link ? $this->fileUrlGenerator->generateAbsoluteString($image_uri) : $this->fileUrlGenerator->generateString($image_uri);
       }
 
       // Add cacheability metadata from the image and image style.
