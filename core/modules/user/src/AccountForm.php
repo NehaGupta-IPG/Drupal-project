@@ -36,11 +36,15 @@ abstract class AccountForm extends ContentEntityForm implements TrustedCallbackI
 
   /**
    * The database connection.
+   *
+   * @var \Drupal\Core\Database\Connection
    */
   protected Connection $database;
 
   /**
    * The entity type manager.
+   *
+   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
    */
   protected EntityTypeManagerInterface $entityTypeManager;
 
