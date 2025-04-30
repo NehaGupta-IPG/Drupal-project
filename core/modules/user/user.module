@@ -4,8 +4,6 @@
  * @file
  */
 
-use Drupal\Component\Assertion\Inspector;
-use Drupal\Component\Render\PlainTextOutput;
 use Drupal\Component\Utility\Crypt;
 use Drupal\Component\Utility\Unicode;
 use Drupal\Core\Access\AccessibleInterface;
@@ -16,10 +14,7 @@ use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Session\AnonymousUserSession;
 use Drupal\Core\Site\Settings;
 use Drupal\Core\Url;
-use Drupal\system\Entity\Action;
-use Drupal\user\Entity\Role;
 use Drupal\user\Entity\User;
-use Drupal\user\RoleInterface;
 use Drupal\user\UserInterface;
 
 /**
@@ -544,57 +539,6 @@ function user_mail_tokens(array &$replacements, array $data, array $options): vo
     $replacements['[user:one-time-login-url]'] = user_pass_reset_url($data['user'], $options);
     $replacements['[user:cancel-url]'] = user_cancel_url($data['user'], $options);
   }
-}
-
-/**
- * Retrieves the names of roles matching specified conditions.
- *
- * @param bool $membersonly
- *   (optional) Set this to TRUE to exclude the 'anonymous' role. Defaults to
- *   FALSE.
- * @param string|null $permission
- *   (optional) A string containing a permission. If set, only roles
- *    containing that permission are returned. Defaults to NULL, which
- *    returns all roles.
- *
- * @return array
- *   An associative array with the role id as the key and the role name as
- *   value.
- */
-function user_role_names($membersonly = FALSE, $permission = NULL) {
-  return array_map(function ($item) {
-    return $item->label();
-  }, user_roles($membersonly, $permission));
-}
-
-/**
- * Retrieve an array of roles matching specified conditions.
- *
- * @param bool $membersonly
- *   (optional) Set this to TRUE to exclude the 'anonymous' role. Defaults to
- *   FALSE.
- * @param string|null $permission
- *   (optional) A string containing a permission. If set, only roles
- *   containing that permission are returned. Defaults to NULL, which
- *   returns all roles.
- *
- * @return \Drupal\user\RoleInterface[]
- *   An associative array with the role id as the key and the role object as
- *   value.
- */
-function user_roles($membersonly = FALSE, $permission = NULL) {
-  $roles = Role::loadMultiple();
-  if ($membersonly) {
-    unset($roles[RoleInterface::ANONYMOUS_ID]);
-  }
-
-  if (!empty($permission)) {
-    $roles = array_filter($roles, function ($role) use ($permission) {
-      return $role->hasPermission($permission);
-    });
-  }
-
-  return $roles;
 }
 
 /**

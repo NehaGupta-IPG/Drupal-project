@@ -9,6 +9,8 @@ use Drupal\Tests\BrowserTestBase;
 
 /**
  * Tests user edit page.
+ *
+ * @group user
  */
 class UserEditTest extends BrowserTestBase {
 
