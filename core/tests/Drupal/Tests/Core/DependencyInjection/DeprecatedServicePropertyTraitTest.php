@@ -63,7 +63,7 @@ class DeprecatedServicePropertyTraitTest extends UnitTestCase {
     };
 
     $this->expectException(\LogicException::class);
-    $this->expectExceptionMessage('The deprecatedProperties property must a string or an array with service and message keys to use this trait.');
+    $this->expectExceptionMessage('The deprecatedProperties property must be a string or an array with service and message keys to use this trait.');
     $this->assertInstanceOf(static::class, $class->foo);
   }
 
