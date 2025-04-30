@@ -5,6 +5,7 @@ namespace Drupal\Component\Serialization;
 use Drupal\Component\Serialization\Exception\InvalidDataTypeException;
 use Symfony\Component\Yaml\Dumper;
 use Symfony\Component\Yaml\Parser;
+use Symfony\Component\Yaml\Tag\TaggedValue;
 use Symfony\Component\Yaml\Yaml as SymfonyYaml;
 
 /**
@@ -49,6 +50,42 @@ class Yaml implements SerializationInterface {
    */
   public static function getFileExtension() {
     return 'yml';
+  }
+
+  /**
+   * Parses custom YAML tags and convert values to primitive types.
+   *
+   * Tag objects will be replaced by their raw value or, if a callback
+   * exists for that tag it will be used.
+   *
+   * @param mixed $data
+   *   Parsed yaml data
+   * @param callable[] $tall_callbacks
+   *   Optional callbacks for tag value, indexed by tag.
+   *
+   * @return mixed
+   *   Parsed data with parsed tag values.
+   */
+  public static function decodeTags($data, $tag_callbacks = []) {
+    if (is_array($data)) {
+      foreach ($data as $key => $value) {
+        if (is_object($value) && $value instanceof TaggedValue) {
+          if (isset($tag_callbacks[$value->getTag()])) {
+            $data[$key] = call_user_func($tag_callbacks[$value->getTag()], $value->getValue());
+          }
+          else {
+            $data[$key] = $value->getValue();
+          }
+        }
+        elseif (is_array($value)) {
+          $data[$key] = static::decodeTags($value, $tag_callbacks);
+        }
+      }
+      return $data;
+    }
+    else {
+      return $data;
+    }
   }
 
 }

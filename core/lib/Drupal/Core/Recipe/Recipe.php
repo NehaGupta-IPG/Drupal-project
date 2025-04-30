@@ -11,6 +11,7 @@ use Drupal\Core\Extension\ModuleExtensionList;
 use Drupal\Core\Extension\ThemeExtensionList;
 use Drupal\Component\Serialization\Yaml;
 use Drupal\Core\Render\Element;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\TypedData\PrimitiveInterface;
 use Drupal\Core\Validation\Plugin\Validation\Constraint\RegexConstraint;
 use Symfony\Component\Validator\Constraints\All;
@@ -315,12 +316,24 @@ final class Recipe {
       ]),
     ]);
 
+    // Parse YAML file and clean up tags for validation.
     $recipe_data = Yaml::decode($recipe_contents);
+    $clean_data = Yaml::decodeTags($recipe_data);
+
     /** @var \Symfony\Component\Validator\ConstraintViolationList $violations */
-    $violations = Validation::createValidator()->validate($recipe_data, $constraints);
+    $violations = Validation::createValidator()->validate($clean_data, $constraints);
     if (count($violations) > 0) {
       throw RecipeFileException::fromViolationList($file, $violations);
     }
+
+    // Replace 'translate' tags with proper translations.
+    $custom_tags = [
+      'translate' => function($value) use ($file) {
+        return (string) new TranslatableMarkup($value);
+      }
+    ];
+    $recipe_data = Yaml::decodeTags($recipe_data, $custom_tags);
+
     $recipe_data += [
       'description' => '',
       'type' => '',
@@ -329,6 +342,7 @@ final class Recipe {
       'config' => [],
       'content' => [],
     ];
+
     return $recipe_data;
   }
 
