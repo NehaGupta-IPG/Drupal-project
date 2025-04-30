@@ -305,14 +305,14 @@ class UserEditTest extends BrowserTestBase {
     $this->drupalLogin($user_with_email);
     $this->drupalGet("user/" . $user_with_email->id() . "/edit");
     $this->submitForm([], 'Save');
-    $this->assertSession()->pageTextContains($this->t("The changes have been saved."), "The user does not need to change their username if it matches another user's email address.");
+    $this->assertSession()->pageTextContains("The changes have been saved.");
     $this->drupalLogout();
 
     // Test that the second user can save their account with no errors.
     $this->drupalLogin($user_with_name);
     $this->drupalGet("user/" . $user_with_name->id() . "/edit");
     $this->submitForm([], 'Save');
-    $this->assertSession()->pageTextContains($this->t("The changes have been saved."), "The user does not need to change their email address if it matches another user's username.");
+    $this->assertSession()->pageTextContains("The changes have been saved.");
   }
 
 }

@@ -416,7 +416,7 @@ class UserPasswordResetTest extends BrowserTestBase {
   /**
    * Retrieves password reset email and extracts the login link.
    */
-  public function getResetUrl(): string {
+  public function getResetUrl() {
     // Assume the most recent email.
     $_emails = $this->drupalGetMails();
     $email = end($_emails);
