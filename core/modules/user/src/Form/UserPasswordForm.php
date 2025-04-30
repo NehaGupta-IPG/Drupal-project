@@ -16,7 +16,6 @@ use Drupal\user\UserNameValidator;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\Component\Utility\Crypt;
 use Drupal\Core\Site\Settings;
-use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\Url;
 
 /**
@@ -248,7 +247,6 @@ class UserPasswordForm extends FormBase implements WorkspaceSafeFormInterface {
    * {@inheritdoc}
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {
-    $language_interface = $this->languageManager->getCurrentLanguage(LanguageInterface::TYPE_INTERFACE);
 
     if ($form_state->getValue('step') == 1) {
       $accounts = $form_state->getValue('accounts');

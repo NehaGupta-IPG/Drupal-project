@@ -42,13 +42,6 @@ abstract class AccountForm extends ContentEntityForm implements TrustedCallbackI
   protected Connection $database;
 
   /**
-   * The entity type manager.
-   *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
-   */
-  protected EntityTypeManagerInterface $entityTypeManager;
-
-  /**
    * Constructs a new EntityForm object.
    *
    * @param \Drupal\Core\Entity\EntityRepositoryInterface $entity_repository
@@ -61,14 +54,11 @@ abstract class AccountForm extends ContentEntityForm implements TrustedCallbackI
    *   The time service.
    * @param \Drupal\Core\Database\Connection $database
    *   The database connection.
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
-   *   The entity type manager.
    */
-  public function __construct(EntityRepositoryInterface $entity_repository, LanguageManagerInterface $language_manager, ?EntityTypeBundleInfoInterface $entity_type_bundle_info = NULL, ?TimeInterface $time = NULL, ?Connection $database = NULL, ?EntityTypeManagerInterface $entity_type_manager = NULL) {
+  public function __construct(EntityRepositoryInterface $entity_repository, LanguageManagerInterface $language_manager, ?EntityTypeBundleInfoInterface $entity_type_bundle_info = NULL, ?TimeInterface $time = NULL, ?Connection $database = NULL) {
     parent::__construct($entity_repository, $entity_type_bundle_info, $time);
     $this->languageManager = $language_manager;
     $this->database = $database;
-    $this->entityTypeManager = $entity_type_manager;
   }
 
   /**
@@ -80,8 +70,7 @@ abstract class AccountForm extends ContentEntityForm implements TrustedCallbackI
       $container->get('language_manager'),
       $container->get('entity_type.bundle.info'),
       $container->get('datetime.time'),
-      $container->get('database'),
-      $container->get('entity_type.manager')
+      $container->get('database')
     );
   }
 
