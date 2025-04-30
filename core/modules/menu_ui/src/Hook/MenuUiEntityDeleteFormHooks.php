@@ -1,14 +1,13 @@
 <?php
 
-declare(strict_types=1);
-
-namespace Drupal\menu_ui;
+namespace Drupal\menu_ui\Hook;
 
 use Drupal\Core\Entity\ContentEntityFormInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityRepositoryInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Hook\Attribute\Hook;
 use Drupal\Core\Menu\MenuLinkTreeInterface;
 use Drupal\Core\Menu\MenuTreeParameters;
 use Drupal\Core\Messenger\MessengerInterface;
@@ -19,20 +18,21 @@ use Drupal\Core\Url;
 use Drupal\menu_link_content\MenuLinkContentInterface;
 
 /**
- * Warns the user about menu item changes after an entity is deleted.
- *
- * @internal
+ * Implements hook_form_alter() for entity delete forms.
  */
-final class EntityDeleteMenuDescendants {
+class MenuUiEntityDeleteFormHooks {
 
   use StringTranslationTrait;
 
   /**
-   * Constructs a new EntityDeleteMenuDescendants.
+   * Constructs a new MenuUiHooks object.
+   *
+   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
+   *   The entity type manager.
    */
   public function __construct(
+    protected EntityTypeManagerInterface $entityTypeManager,
     private readonly MenuLinkTreeInterface $menuLinkTree,
-    private readonly EntityTypeManagerInterface $entityTypeManager,
     private readonly EntityRepositoryInterface $entityRepository,
     private readonly MessengerInterface $messenger,
     private readonly RendererInterface $renderer,
@@ -44,7 +44,8 @@ final class EntityDeleteMenuDescendants {
   /**
    * Implements hook_form_alter().
    */
-  public function formAlter(&$form, FormStateInterface $form_state, $form_id): void {
+  #[Hook('form_alter')]
+  public function formAlter(array &$form, FormStateInterface $form_state, string $form_id): void {
     $formObject = $form_state->getFormObject();
     if (!$formObject instanceof ContentEntityFormInterface || $formObject->getOperation() !== 'delete') {
       return;
@@ -90,6 +91,9 @@ final class EntityDeleteMenuDescendants {
     );
   }
 
+  /**
+   * Callback for the submit handler.
+   */
   public function submitCallback(array $form, FormStateInterface $form_state): void {
     $entity = $form_state->getFormObject()->getEntity();
     $tree = $this->getDescendantTree($entity);
@@ -127,7 +131,7 @@ final class EntityDeleteMenuDescendants {
    * @return \Drupal\Core\Menu\MenuLinkTreeElement[]
    *   The descendant menu link tree.
    */
-  private function getDescendantTree(EntityInterface $entity): array {
+  protected function getDescendantTree(EntityInterface $entity): array {
     if ($entity instanceof MenuLinkContentInterface) {
       // Deleting a menu link content entity directly.
       $menuLink = $entity;
