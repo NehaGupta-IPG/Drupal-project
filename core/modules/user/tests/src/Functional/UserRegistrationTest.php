@@ -431,7 +431,7 @@ class UserRegistrationTest extends BrowserTestBase {
    * existing user's email address, or when the email address matches an
    * existing user's username.
    */
-  public function testRegistrationConflicts() {
+  public function testRegistrationConflicts(): void {
     $user_settings = $this->config('user.settings');
     // Don't require email validation for new accounts.
     $user_settings->set('verify_mail', FALSE)->save();
@@ -467,19 +467,6 @@ class UserRegistrationTest extends BrowserTestBase {
     $this->drupalGet('user/register');
     $this->submitForm($edit, 'Create new account');
     $this->assertSession()->pageTextContains($this->t('The email address @email is already registered.', ['@email' => $edit['mail']]), "A user cannot be created when their email address matches an existing username.");
-  }
-
-  /**
-   * Shadow t() system call.
-   *
-   * @param string $string
-   *   A string containing the English text to translate.
-   *
-   * @return string
-   *   A string containing the translate text.
-   */
-  public function t($string) {
-    return $string;
   }
 
 }

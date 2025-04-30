@@ -263,7 +263,7 @@ class UserPasswordResetTest extends BrowserTestBase {
   /**
    * Attempts to reset a password when an email address matches two accounts.
    */
-  public function testUserPasswordResetDuplicateUsers() {
+  public function testUserPasswordResetDuplicateUsers(): void {
     $user_settings = $this->config('user.settings');
 
     // Don't require email validation for new accounts.
@@ -762,19 +762,6 @@ class UserPasswordResetTest extends BrowserTestBase {
     $this->drupalGet('user/password');
     $field = $this->getSession()->getPage()->findField('name');
     $this->assertEquals('username', $field->getAttribute('autocomplete'));
-  }
-
-  /**
-   * Shadow t() system call.
-   *
-   * @param string $string
-   *   A string containing the English text to translate.
-   *
-   * @return string
-   *   A string containing the translate text.
-   */
-  public function t($string) {
-    return $string;
   }
 
 }

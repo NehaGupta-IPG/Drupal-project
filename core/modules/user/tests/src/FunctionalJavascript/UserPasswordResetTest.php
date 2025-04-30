@@ -196,17 +196,4 @@ class UserPasswordResetTest extends WebDriverTestBase {
       ])), 1, 'The other user was not sent a password reset mail when logged in.');
   }
 
-  /**
-   * Shadow t() system call.
-   *
-   * @param string $string
-   *   A string containing the English text to translate.
-   *
-   * @return string
-   *   A string containing the translate text.
-   */
-  public function t($string) {
-    return $string;
-  }
-
 }

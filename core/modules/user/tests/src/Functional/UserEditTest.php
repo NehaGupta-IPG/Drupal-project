@@ -313,17 +313,4 @@ class UserEditTest extends BrowserTestBase {
     $this->assertSession()->pageTextContains($this->t("The changes have been saved."), "The user does not need to change their email address if it matches another user's username.");
   }
 
-  /**
-   * Shadow t() system call.
-   *
-   * @param string $string
-   *   A string containing the English text to translate.
-   *
-   * @return string
-   *   A string containing the translate text.
-   */
-  public function t($string) {
-    return $string;
-  }
-
 }

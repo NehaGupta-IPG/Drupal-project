@@ -22,7 +22,6 @@ use Drupal\user\Entity\User;
 use Drupal\user\RoleInterface;
 use Drupal\user\UserInterface;
 
-
 /**
  * Returns whether this site supports the default user picture feature.
  *
@@ -521,32 +520,6 @@ function user_cancel_methods(): array {
 }
 
 /**
- * Implements hook_mail().
- */
-function user_mail($key, &$message, $params) {
-  $token_service = \Drupal::token();
-  $language_manager = \Drupal::languageManager();
-  $langcode = $message['langcode'];
-  $variables = ['user' => $params['account']];
-
-  $language = $language_manager->getLanguage($langcode);
-  $original_language = $language_manager->getConfigOverrideLanguage();
-  $language_manager->setConfigOverrideLanguage($language);
-  $mail_config = \Drupal::config('user.mail');
-
-  $token_options = [
-    'langcode' => $langcode,
-    'callback' => 'user_mail_tokens',
-    'clear' => TRUE,
-  ];
-  $message['subject'] .= PlainTextOutput::renderFromHtml($token_service->replace($mail_config->get($key . '.subject'), $variables, $token_options));
-  $message['body'][] = $token_service->replace($mail_config->get($key . '.body'), $variables, $token_options);
-
-  $language_manager->setConfigOverrideLanguage($original_language);
-
-}
-
-/**
  * Token callback to add unsafe tokens for user mails.
  *
  * This function is used by \Drupal\Core\Utility\Token::replace() to set up
@@ -592,71 +565,6 @@ function user_role_names($membersonly = FALSE, $permission = NULL) {
   return array_map(function ($item) {
     return $item->label();
   }, user_roles($membersonly, $permission));
-}
-
-/**
- * Implements hook_ENTITY_TYPE_insert() for user_role entities.
- */
-function user_user_role_insert(RoleInterface $role) {
-  // Ignore the authenticated and anonymous roles or the role is being synced.
-  if (in_array($role->id(), [
-    RoleInterface::AUTHENTICATED_ID, RoleInterface::ANONYMOUS_ID,
-  ]) || $role->isSyncing()) {
-    return;
-  }
-
-  assert(Inspector::assertStringable($role->label()), 'Role label is expected to be a string.');
-
-  $add_id = 'user_add_role_action.' . $role->id();
-  if (!Action::load($add_id)) {
-    $action = Action::create([
-      'id' => $add_id,
-      'type' => 'user',
-      'label' => t('Add the @label role to the selected user(s)', ['@label' => $role->label()]),
-      'configuration' => [
-        'rid' => $role->id(),
-      ],
-      'plugin' => 'user_add_role_action',
-    ]);
-    $action->trustData()->save();
-  }
-  $remove_id = 'user_remove_role_action.' . $role->id();
-  if (!Action::load($remove_id)) {
-    $action = Action::create([
-      'id' => $remove_id,
-      'type' => 'user',
-      'label' => t('Remove the @label role from the selected user(s)', ['@label' => $role->label()]),
-      'configuration' => [
-        'rid' => $role->id(),
-      ],
-      'plugin' => 'user_remove_role_action',
-    ]);
-    $action->trustData()->save();
-  }
-}
-
-/**
- * Implements hook_ENTITY_TYPE_delete() for user_role entities.
- */
-function user_user_role_delete(RoleInterface $role) {
-  // Delete role references for all users.
-  $user_storage = \Drupal::entityTypeManager()->getStorage('user');
-  $user_storage->deleteRoleReferences([$role->id()]);
-
-  // Ignore the authenticated and anonymous roles or the role is being synced.
-  if (in_array($role->id(), [
-    RoleInterface::AUTHENTICATED_ID, RoleInterface::ANONYMOUS_ID,
-  ]) || $role->isSyncing()) {
-    return;
-  }
-
-  $actions = Action::loadMultiple([
-    'user_add_role_action.' . $role->id(),
-    'user_remove_role_action.' . $role->id(),
-  ]);
-  foreach ($actions as $action) {
-    $action->delete();
-  }
 }
 
 /**
