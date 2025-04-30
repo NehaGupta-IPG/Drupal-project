@@ -329,7 +329,7 @@ class FileUploadForm extends AddFormBase {
     // Create a file item to get the upload location.
     $item = $this->createFileItem($media_type);
     $upload_location = $item->getUploadLocation();
-    if (!$this->fileSystem->prepareDirectory($upload_location, FileSystemInterface::CREATE_DIRECTORY)) {
+    if (!$this->fileSystem->prepareDirectory($upload_location, FileSystemInterface::CREATE_DIRECTORY || FileSystemInterface::MODIFY_PERMISSIONS)) {
       throw new FileWriteException("The destination directory '$upload_location' is not writable");
     }
     $file = $this->fileRepository->move($file, $upload_location);

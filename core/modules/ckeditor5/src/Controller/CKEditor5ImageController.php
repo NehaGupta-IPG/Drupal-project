@@ -95,7 +95,7 @@ class CKEditor5ImageController extends ControllerBase {
     $destination = $settings['scheme'] . '://' . $settings['directory'];
 
     // Check the destination file path is writable.
-    if (!$this->fileSystem->prepareDirectory($destination, FileSystemInterface::CREATE_DIRECTORY)) {
+    if (!$this->fileSystem->prepareDirectory($destination, FileSystemInterface::CREATE_DIRECTORY || FileSystemInterface::MODIFY_PERMISSIONS)) {
       throw new HttpException(500, 'Destination file path is not writable');
     }
 
