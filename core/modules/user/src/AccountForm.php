@@ -20,7 +20,6 @@ use Drupal\user\Plugin\LanguageNegotiation\LanguageNegotiationUserAdmin;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\Core\Database\Query\Condition;
 use Drupal\Core\Database\Connection;
-use Drupal\Core\Entity\EntityTypeManagerInterface;
 
 /**
  * Form controller for the user account forms.
