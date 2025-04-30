@@ -452,7 +452,7 @@ class UserRegistrationTest extends BrowserTestBase {
     // existing email.
     $this->drupalGet('user/register');
     $this->submitForm($edit, 'Create new account');
-    $this->assertSession()->pageTextContains($this->t('The name @name is already taken.', ['@name' => $edit['name']]), "A user cannot be created when their username matches an existing user's email address.");
+    $this->assertSession()->pageTextContains('The name @name is already taken.', ['@name' => $edit['name']], "A user cannot be created when their username matches an existing user's email address.");
 
     // Change the username to an email address.
     $duplicate_user->name = $name = $this->randomMachineName() . '@example.com';
@@ -466,7 +466,7 @@ class UserRegistrationTest extends BrowserTestBase {
     // username.
     $this->drupalGet('user/register');
     $this->submitForm($edit, 'Create new account');
-    $this->assertSession()->pageTextContains($this->t('The email address @email is already registered.', ['@email' => $edit['mail']]), "A user cannot be created when their email address matches an existing username.");
+    $this->assertSession()->pageTextContains('The email address @email is already registered.', ['@email' => $edit['mail']], "A user cannot be created when their email address matches an existing username.");
   }
 
 }

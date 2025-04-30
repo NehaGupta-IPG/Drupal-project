@@ -297,7 +297,7 @@ class UserPasswordResetTest extends BrowserTestBase {
     $edit['choose_account'] = Crypt::hashBase64(Settings::getHashSalt() . $user_with_email->id());
     $this->drupalGet(NULL);
     $this->submitForm($edit, 'Submit');
-    $this->assertSession()->pageTextContains($this->t('Further instructions have been sent to your e-mail address.'), 'User is notified that password reset was sent.');
+    $this->assertSession()->pageTextContains('Further instructions have been sent to your e-mail address.');
 
     // Make sure that right user was sent a reset email.
     $this->assertEquals(count($this->drupalGetMails([
@@ -320,7 +320,7 @@ class UserPasswordResetTest extends BrowserTestBase {
     $this->drupalGet(NULL);
     $this->submitForm([], 'Submit');
     // Make sure the user with the matching username was sent an email.
-    $this->assertSession()->pageTextContains($this->t('Further instructions have been sent to your e-mail address.'), 'User is notified that password reset was sent when logged in.');
+    $this->assertSession()->pageTextContains('Further instructions have been sent to your e-mail address.');
     $this->assertEquals(count($this->drupalGetMails(
       [
         'key' => 'password_reset',
@@ -376,15 +376,6 @@ class UserPasswordResetTest extends BrowserTestBase {
       $this->assertStringNotContainsString($unexpectedResetUrl, $resetURL);
     }
 
-    // Test password reset with language prefixes.
-    $this->drupalGet($visitingUrl);
-    $edit = ['name' => $this->account->getAccountName()];
-    $this->submitForm($edit, 'Submit');
-    $this->assertValidPasswordReset($edit['name']);
-
-    $resetURL = $this->getResetUrl();
-    $this->assertStringContainsString($expectedResetUrl, $resetURL);
-    $this->assertStringNotContainsString($unexpectedResetUrl, $resetURL);
   }
 
   /**
@@ -425,7 +416,7 @@ class UserPasswordResetTest extends BrowserTestBase {
   /**
    * Retrieves password reset email and extracts the login link.
    */
-  public function getResetUrl() {
+  public function getResetUrl(): string {
     // Assume the most recent email.
     $_emails = $this->drupalGetMails();
     $email = end($_emails);

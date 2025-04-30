@@ -115,7 +115,7 @@ class UserPasswordResetTest extends WebDriverTestBase {
   /**
    * Retrieves password reset email and extracts the login link.
    */
-  public function getResetUrl() {
+  public function getResetUrl(): string {
     // Assume the most recent email.
     $_emails = $this->drupalGetMails();
     $email = end($_emails);
@@ -158,7 +158,7 @@ class UserPasswordResetTest extends WebDriverTestBase {
     $edit = [];
     $edit['choose_account'] = Crypt::hashBase64(Settings::getHashSalt() . $user_with_email->id());
     $this->submitForm($edit, 'Submit');
-    $this->assertSession()->pageTextContains($this->t('Further instructions have been sent to your e-mail address.'), 'User is notified that password reset was sent.');
+    $this->assertSession()->pageTextContains('Further instructions have been sent to your e-mail address.');
 
     // Make sure that right user was sent a reset email.
     $this->assertEquals(count($this->drupalGetMails([
@@ -180,7 +180,7 @@ class UserPasswordResetTest extends WebDriverTestBase {
     $this->assertSession()->fieldNotExists('name');
     $this->submitForm([], 'Submit');
     // Make sure the user with the matching username was sent an email.
-    $this->assertSession()->pageTextContains($this->t('Further instructions have been sent to your e-mail address.'), 'User is notified that password reset was sent when logged in.');
+    $this->assertSession()->pageTextContains('Further instructions have been sent to your e-mail address.');
     $this->assertEquals(count($this->drupalGetMails(
       [
         'key' => 'password_reset',
