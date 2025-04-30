@@ -244,18 +244,14 @@ class StringArgument extends ArgumentPluginBase {
       }
     }
 
-    if (count($this->value) > 1) {
-      // Multiple values with 'OR' operator.
-      if ($this->operator == 'or') {
-        if (!empty($this->definition['many to one'])) {
-          if (!empty($this->options['glossary'])) {
-            $this->helper->formula = TRUE;
-          }
-          $this->helper->ensureMyTable();
-          $this->helper->addFilter();
-          return;
-        }
+    if (!empty($this->definition['many to one'])) {
+      if (!empty($this->options['glossary'])) {
+        $this->helper->formula = TRUE;
       }
+      $this->operator = 'or';
+      $this->helper->ensureMyTable();
+      $this->helper->addFilter();
+      return;
     }
 
     // Single value or multiple values with 'AND' operator.

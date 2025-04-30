@@ -856,7 +856,7 @@ abstract class HandlerBase extends PluginBase implements ViewsHandlerInterface {
       $operator = 'and';
       $value = explode(',', $str);
     }
-    else {
+    elseif (preg_match('/^.*[,].*[+].*|.*[+].*[,].*$/u', $str)) {
       // The '+' and ',' characters were detected together.
       throw new BadRequestHttpException('Both \'+\' and \',\' characters cannot be in the query string');
     }

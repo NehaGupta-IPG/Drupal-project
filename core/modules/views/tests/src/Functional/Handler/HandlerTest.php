@@ -173,6 +173,8 @@ class HandlerTest extends ViewTestBase {
     $handlerBase = HandlerBase::breakString("$s1 $n2+$n3");
     $this->assertEquals([$s1, $n2, $n3], $handlerBase->value);
     $this->assertEquals('or', $handlerBase->operator);
+    $handlerBase = HandlerBase::breakString("$s1 $n2+$n3", FALSE, TRUE);
+    $this->assertEquals(["$s1 $n2", $n3], $handlerBase->value);
 
     $handlerBase = HandlerBase::breakString("$s1+$n2+$n3");
     $this->assertEquals([$s1, $n2, $n3], $handlerBase->value);
