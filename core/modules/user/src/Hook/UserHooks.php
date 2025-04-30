@@ -54,7 +54,7 @@ class UserHooks {
         $output .= '<dt>' . $this->t('Managing account settings') . '</dt>';
         $output .= '<dd>' . $this->t('The <a href=":accounts">Account settings page</a> allows you to manage settings for the displayed name of the Anonymous user role, personal contact forms, user registration settings, and account cancellation settings. On this page you can also manage settings for account personalization, and adapt the text for the email messages that users receive when they register or request a password recovery. You may also set which role is automatically assigned new permissions whenever a module is installed (the Administrator role).', [':accounts' => Url::fromRoute('entity.user.admin_form')->toString()]) . '</dd>';
         $output .= '<dt>' . $this->t('Managing user account fields') . '</dt>';
-        $output .= '<dd>' . $this->t('Because User accounts are an entity type, you can extend them by adding fields through the Manage fields tab on the <a href=":accounts">Account settings page</a>. By adding fields for e.g., a picture, a biography, or address, you can a create a custom profile for the users of the website. For background information on entities and fields, see the <a href=":field_help">Field module help page</a>.', [
+        $output .= '<dd>' . $this->t('Because User accounts are an entity type, you can extend them by adding fields through the Manage fields tab on the <a href=":accounts">Account settings page</a>. By adding fields for e.g., a picture, a biography, or address, you can a create a custom profile for the users of the website. For background information on entities and fields, see the <a href=":field_help">Field module help page</a>', [
           ':field_help' => \Drupal::moduleHandler()->moduleExists('field') ? Url::fromRoute('help.page', [
             'name' => 'field',
           ])->toString() : '#',
@@ -67,7 +67,7 @@ class UserHooks {
         return '<p>' . $this->t("This web page allows administrators to register new users. Users' email addresses and usernames must be unique.") . '</p>';
 
       case 'user.admin_permissions':
-        return '<p>' . $this->t('Permissions let you control what users can do and see on your site. You can define a specific set of permissions for each role. (See the <a href=":role">Roles</a> page to create a role.) Any permissions granted to the Authenticated user role will be given to any user who is logged in to your site. On the <a href=":settings">Role settings</a> page, you can make any role into an Administrator role for the site, meaning that role will be granted all permissions. You should be careful to ensure that only trusted users are given this access and level of control of your site.', [
+        return '<p>' . $this->t('Permissions let you control what users can do and see on your site. You can define a specific set of permissions for each role. (See the <a href=":role">Roles</a> page to create a role.) Any permissions granted to the Authenticated user role will be given to any user who is logged in to your site. From the <a href=":settings">Account settings</a> page, you can make any role into an Administrator role for the site, meaning that role will be granted all new permissions automatically. You should be careful to ensure that only trusted users are given this access and level of control of your site.', [
           ':role' => Url::fromRoute('entity.user_role.collection')->toString(),
           ':settings' => Url::fromRoute('user.role.settings')->toString(),
         ]) . '</p>';

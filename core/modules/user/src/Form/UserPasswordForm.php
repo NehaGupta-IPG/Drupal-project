@@ -14,6 +14,10 @@ use Drupal\user\UserInterface;
 use Drupal\user\UserStorageInterface;
 use Drupal\user\UserNameValidator;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Drupal\Component\Utility\Crypt;
+use Drupal\Core\Site\Settings;
+use Drupal\Core\Language\LanguageInterface;
+use Drupal\Core\Url;
 
 /**
  * Provides a user password reset form.
@@ -108,41 +112,87 @@ class UserPasswordForm extends FormBase implements WorkspaceSafeFormInterface {
    * {@inheritdoc}
    */
   public function buildForm(array $form, FormStateInterface $form_state) {
-    $form['name'] = [
-      '#type' => 'textfield',
-      '#title' => $this->t('Username or email address'),
-      '#size' => 60,
-      '#maxlength' => max(UserInterface::USERNAME_MAX_LENGTH, Email::EMAIL_MAX_LENGTH),
-      '#required' => TRUE,
-      '#attributes' => [
-        'autocorrect' => 'off',
-        'autocapitalize' => 'off',
-        'spellcheck' => 'false',
-        'autofocus' => 'autofocus',
-        'autocomplete' => 'username',
-      ],
-    ];
-    // Allow logged in users to request this also.
-    $user = $this->currentUser();
-    if ($user->isAuthenticated()) {
-      $form['name']['#type'] = 'value';
-      $form['name']['#value'] = $user->getEmail();
-      $form['mail'] = [
-        '#prefix' => '<p>',
-        '#markup' => $this->t('Password reset instructions will be mailed to %email. You must log out to use the password reset link in the email.', ['%email' => $user->getEmail()]),
-        '#suffix' => '</p>',
+    // When a user requests a password reset we check for username and email
+    // conflicts using a multistep form.
+    $step_value = $form_state->getValue('step');
+    if (empty($step_value)) {
+      $form['step'] = [
+        '#type' => 'hidden',
+        '#value' => 1,
       ];
+      $form_state->setValue('step', 1);
     }
-    else {
-      $form['mail'] = [
-        '#prefix' => '<p>',
-        '#markup' => $this->t('Password reset instructions will be sent to your registered email address.'),
-        '#suffix' => '</p>',
+    if ($form_state->getValue('step') == 1) {
+      $form['name'] = [
+        '#type' => 'textfield',
+        '#title' => $this->t('Username or email address'),
+        '#size' => 60,
+        '#maxlength' => max(UserInterface::USERNAME_MAX_LENGTH,
+          Email::EMAIL_MAX_LENGTH),
+        '#required' => TRUE,
+        '#attributes' => [
+          'autocorrect' => 'off',
+          'autocapitalize' => 'off',
+          'spellcheck' => 'false',
+          'autofocus' => 'autofocus',
+        ],
       ];
+      // Allow logged in users to request this also.
+      $user = $this->currentUser();
+      if ($user->isAuthenticated()) {
+        $form['name']['#type'] = 'value';
+        $form['name']['#value'] = $user->getEmail();
+        $form['mail'] = [
+          '#prefix' => '<p>',
+          '#markup' => $this->t('Password reset instructions will be mailed to %email. You must log out to use the password reset link in the e-mail.', ['%email' => $user->getEmail()]),
+          '#suffix' => '</p>',
+        ];
+      }
       $form['name']['#default_value'] = $this->getRequest()->query->get('name');
     }
+    else {
+      // Where there is a conflict between the
+      // username and email address for two users
+      // we supply both accounts as an option for
+      // the password reset.
+      $accounts = $form_state->getStorage()['accounts'];
+      $options = [];
+      foreach ($accounts as $account) {
+        $label = $this->t('The account with the username: @name', ['@name' => $account->getUsername()]);
+        if ($account->getEmail() === $form_state->getStorage()['name']) {
+          $label = $this->t('The account with the email address: @email', ['@email' => $account->getEmail()]);
+        }
+        $options[Crypt::hashBase64(Settings::getHashSalt() . $account->id())] = $label;
+      }
+      $form['choose_account'] = [
+        '#type' => 'radios',
+        '#title' => $this->t('Choose account'),
+        '#required' => TRUE,
+        '#prefix' => "<p>" . $this->t("There is a username conflict with the email address @email. Please select which account password to reset.", ['@email' => $form_state->getStorage()['name']]) . "</p>",
+        '#options' => $options,
+        '#default_value' => Crypt::hashBase64(Settings::getHashSalt() . reset($accounts)->id()),
+      ];
+
+      $form['step'] = [
+        '#type' => 'hidden',
+        '#value' => 2,
+      ];
+    }
     $form['actions'] = ['#type' => 'actions'];
-    $form['actions']['submit'] = ['#type' => 'submit', '#value' => $this->t('Submit')];
+    if ($form_state->getValue('step') == 2) {
+      $form['actions']['cancel'] = [
+        '#type' => 'submit',
+        '#value' => $this->t('Cancel'),
+        '#name' => 'cancel',
+        '#limit_validation_errors' => [],
+        '#weight' => 5,
+      ];
+    }
+    $form['actions']['submit'] = [
+      '#type' => 'submit',
+      '#value' => $this->t('Submit'),
+      '#name' => 'submit',
+    ];
     $form['#cache']['contexts'][] = 'url.query_args';
 
     return $form;
@@ -152,40 +202,45 @@ class UserPasswordForm extends FormBase implements WorkspaceSafeFormInterface {
    * {@inheritdoc}
    */
   public function validateForm(array &$form, FormStateInterface $form_state) {
-    $flood_config = $this->configFactory->get('user.flood');
-    if (!$this->flood->isAllowed('user.password_request_ip', $flood_config->get('ip_limit'), $flood_config->get('ip_window'))) {
-      $form_state->setErrorByName('name', $this->t('Too many password recovery requests from your IP address. It is temporarily blocked. Try again later or contact the site administrator.'));
-      return;
-    }
-    $this->flood->register('user.password_request_ip', $flood_config->get('ip_window'));
-    // First, see if the input is possibly valid as a username.
-    $name = trim($form_state->getValue('name'));
-    $violations = $this->userNameValidator->validateName($name);
-    // Usernames have a maximum length shorter than email addresses. Only print
-    // this error if the input is not valid as a username or email address.
-    if ($violations->count() > 0 && !$this->emailValidator->isValid($name)) {
-      $form_state->setErrorByName('name', $this->t("The username or email address is invalid."));
-      return;
-    }
-
-    // Try to load by email.
-    $users = $this->userStorage->loadByProperties(['mail' => $name]);
-    if (empty($users)) {
-      // No success, try to load by name.
-      $users = $this->userStorage->loadByProperties(['name' => $name]);
-    }
-    $account = reset($users);
-    // Blocked accounts cannot request a new password.
-    if ($account && $account->id() && $account->isActive()) {
-      // Register flood events based on the uid only, so they apply for any
-      // IP address. This allows them to be cleared on successful reset (from
-      // any IP).
-      $identifier = $account->id();
-      if (!$this->flood->isAllowed('user.password_request_user', $flood_config->get('user_limit'), $flood_config->get('user_window'), $identifier)) {
-        return;
+    if ($form_state->getValue('step') == 1) {
+      $name = trim($form_state->getValue('name'));
+      $accounts = [];
+      // Try to load by email.
+      $users = $this->userStorage->loadByProperties(['mail' => $name]);
+      $account_by_email = reset($users);
+      if ($account_by_email) {
+        $accounts[Crypt::hashBase64(Settings::getHashSalt() . $account_by_email->id())] = $account_by_email;
       }
-      $this->flood->register('user.password_request_user', $flood_config->get('user_window'), $identifier);
-      $form_state->setValueForElement(['#parents' => ['account']], $account);
+      // Also try to load by user name, but only when the user is not logged in.
+      $user = $this->currentUser();
+      if ($user->id() == 0) {
+        $users = $this->userStorage->loadByProperties(['name' => $name]);
+        $account_by_name = reset($users);
+        if ($account_by_name) {
+          $accounts[Crypt::hashBase64(Settings::getHashSalt() . $account_by_name->id())] = $account_by_name;
+        }
+      }
+      if (!empty($accounts)) {
+        if (count($accounts) == 1) {
+          $account = reset($accounts);
+          // Blocked accounts cannot request a new password.
+          if (!$account->isActive()) {
+            $form_state->setErrorByName('name', $this->t('%name is blocked or has not been activated yet.', ['%name' => $account->getUsername()]));
+          }
+        }
+        $form_state->setValue('accounts', $accounts);
+      }
+      else {
+        $form_state->setErrorByName('name', $this->t('Sorry, %name is not recognized as a username or an e-mail address.', ['%name' => $name]));
+      }
+    }
+    elseif ($form_state->getValue('step') == 2) {
+      $chosen_account = $form_state->getValue('choose_account');
+      $account = $form_state->getStorage()['accounts'][$chosen_account];
+      // Blocked accounts cannot request a new password.
+      if (!$account->isActive()) {
+        $form_state->setErrorByName('choose_account', $this->t('%name is blocked or has not been activated yet.', ['%name' => $account->getUsername()]));
+      }
     }
   }
 
@@ -193,32 +248,47 @@ class UserPasswordForm extends FormBase implements WorkspaceSafeFormInterface {
    * {@inheritdoc}
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {
-    $account = $form_state->getValue('account');
-    if ($account) {
-      // Mail one time login URL and instructions using current language.
-      $mail = _user_mail_notify('password_reset', $account);
-      if (!empty($mail)) {
-        $this->logger('user')
-          ->info('Password reset instructions mailed to %name at %email.', [
-            '%name' => $account->getAccountName(),
-            '%email' => $account->getEmail(),
-          ]);
+    $language_interface = $this->languageManager->getCurrentLanguage(LanguageInterface::TYPE_INTERFACE);
+
+    if ($form_state->getValue('step') == 1) {
+      $accounts = $form_state->getValue('accounts');
+      if (count($accounts) > 1) {
+        $form_state->setValue('step', 2);
+        $form_state->setStorage([
+          'name' => $form_state->getValue('name'),
+          'accounts' => $accounts,
+        ]);
+        $form_state->setRebuild();
+      }
+
+      else {
+        $account = reset($accounts);
       }
     }
-    else {
-      $this->logger('user')
-        ->info('Password reset form was submitted with an unknown or inactive account: %name.', [
-          '%name' => $form_state->getValue('name'),
-        ]);
-    }
-    // Make sure the status text is displayed even if no email was sent. This
-    // message is deliberately the same as the success message for privacy.
-    $this->messenger()
-      ->addStatus($this->t('If %identifier is a valid account, an email will be sent with instructions to reset your password.', [
-        '%identifier' => $form_state->getValue('name'),
-      ]));
 
-    $form_state->setRedirect('<front>');
+    else {
+      if ($form_state->getTriggeringElement()['#name'] == 'submit') {
+        $chosen_account = $form_state->getValue('choose_account');
+        $account = $form_state->getStorage()['accounts'][$chosen_account];
+      }
+      else {
+        $form_state->setRedirectUrl(Url::fromRoute('user.pass'));
+      }
+    }
+    if (isset($account)) {
+      // Mail one-time login URL and instructions using current language.
+      $mail = _user_mail_notify('password_reset', $account, $language_interface->getId());
+      if (!empty($mail)) {
+        $this->logger('user')->notice('Password reset instructions mailed to %name at %email.', [
+          '
+        %name' => $account->name,
+          '%email' => $account->mail,
+        ]);
+        $this->messenger($this->t('Further instructions have been sent to your e-mail address.'));
+      }
+
+      $form_state->setRedirectUrl(Url::fromRoute('user.page'));
+    }
   }
 
 }

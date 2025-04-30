@@ -32,6 +32,7 @@ class UserRegistrationTest extends BrowserTestBase {
    * Tests user registration with email verification enabled.
    */
   public function testRegistrationWithEmailVerification(): void {
+
     $config = $this->config('user.settings');
     // Require email verification.
     $config->set('verify_mail', TRUE)->save();
@@ -77,6 +78,7 @@ class UserRegistrationTest extends BrowserTestBase {
    * Tests user registration without email verification.
    */
   public function testRegistrationWithoutEmailVerification(): void {
+
     $config = $this->config('user.settings');
     // Don't require email verification and allow registration by site visitors
     // without administrator approval.
@@ -152,6 +154,7 @@ class UserRegistrationTest extends BrowserTestBase {
    * Tests user registration with email duplicates.
    */
   public function testRegistrationEmailDuplicates(): void {
+
     // Don't require email verification and allow registration by site visitors
     // without administrator approval.
     $this->config('user.settings')
@@ -254,6 +257,7 @@ class UserRegistrationTest extends BrowserTestBase {
    * Tests user registration with default values.
    */
   public function testRegistrationDefaultValues(): void {
+
     // Don't require email verification and allow registration by site visitors
     // without administrator approval.
     $config_user_settings = $this->config('user.settings')
@@ -418,6 +422,64 @@ class UserRegistrationTest extends BrowserTestBase {
     $this->assertSession()->responseHeaderContains('X-Drupal-Cache-Tags', 'config:field.field.user.user.test_user_field');
     $this->assertSession()->responseHeaderContains('X-Drupal-Cache-Tags', 'config:field.storage.user.test_user_field');
     $this->assertSession()->responseHeaderContains('X-Drupal-Cache-Tags', 'config:user.settings');
+  }
+
+  /**
+   * New account creation test.
+   *
+   * Ensure that a new account cannot be created when the username matches an
+   * existing user's email address, or when the email address matches an
+   * existing user's username.
+   */
+  public function testRegistrationConflicts() {
+    $user_settings = $this->config('user.settings');
+    // Don't require email validation for new accounts.
+    $user_settings->set('verify_mail', FALSE)->save();
+
+    // Don't require admin approval for new accounts.
+    $user_settings->set('register', UserInterface::REGISTER_VISITORS)->save();
+
+    // Set up a user to check for duplicates.
+    $duplicate_user = $this->drupalCreateUser();
+
+    $edit = [];
+    $edit['name'] = $duplicate_user->getEmail();
+    $edit['mail'] = $this->randomMachineName() . '@example.com';
+    $edit['pass[pass1]'] = $password = $this->randomMachineName();
+    $edit['pass[pass2]'] = $password;
+
+    // Attempt to create a new account using a username that matches an
+    // existing email.
+    $this->drupalGet('user/register');
+    $this->submitForm($edit, 'Create new account');
+    $this->assertSession()->pageTextContains($this->t('The name @name is already taken.', ['@name' => $edit['name']]), "A user cannot be created when their username matches an existing user's email address.");
+
+    // Change the username to an email address.
+    $duplicate_user->name = $name = $this->randomMachineName() . '@example.com';
+    $duplicate_user->save();
+
+    $edit = [];
+    $edit['name'] = $this->randomMachineName();
+    $edit['mail'] = $name;
+
+    // Attempt to create a new account using an email that matches an existing
+    // username.
+    $this->drupalGet('user/register');
+    $this->submitForm($edit, 'Create new account');
+    $this->assertSession()->pageTextContains($this->t('The email address @email is already registered.', ['@email' => $edit['mail']]), "A user cannot be created when their email address matches an existing username.");
+  }
+
+  /**
+   * Shadow t() system call.
+   *
+   * @param string $string
+   *   A string containing the English text to translate.
+   *
+   * @return string
+   *   A string containing the translate text.
+   */
+  public function t($string) {
+    return $string;
   }
 
 }

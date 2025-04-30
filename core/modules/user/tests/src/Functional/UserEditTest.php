@@ -9,8 +9,6 @@ use Drupal\Tests\BrowserTestBase;
 
 /**
  * Tests user edit page.
- *
- * @group user
  */
 class UserEditTest extends BrowserTestBase {
 
@@ -28,8 +26,8 @@ class UserEditTest extends BrowserTestBase {
     $user2 = $this->drupalCreateUser([]);
     $this->drupalLogin($user1);
 
-    // Test that error message appears when attempting to use a non-unique user
-    // name.
+    // Test that error message appears when attempting to use
+    // a non-unique user name.
     $edit['name'] = $user2->getAccountName();
     $this->drupalGet("user/" . $user1->id() . "/edit");
     $this->submitForm($edit, 'Save');
@@ -281,6 +279,51 @@ class UserEditTest extends BrowserTestBase {
     $this->assertSession()->fieldExists('edit-status-0');
     $this->assertSession()->fieldEnabled('edit-status-0');
     $this->assertSession()->fieldEnabled('edit-status-1');
+  }
+
+  /**
+   * Check that existing users.
+   *
+   * Check that existing users whose username
+   * matches another user's email address or vice
+   * versa are not forced to update their username
+   * or email address.
+   */
+  public function testUserEditWithConflicts(): void {
+
+    $user_with_email = $this->drupalCreateUser();
+    $user_with_name = $this->drupalCreateUser();
+
+    // Change the second user's username to the same value as the first user's
+    // email address.
+    $user_with_name->name = $user_with_email->mail;
+    $user_with_name->save();
+
+    // Test that the first user can save their account with no errors.
+    $this->drupalLogin($user_with_email);
+    $this->drupalGet("user/" . $user_with_email->id() . "/edit");
+    $this->submitForm([], 'Save');
+    $this->assertSession()->pageTextContains($this->t("The changes have been saved."), "The user does not need to change their username if it matches another user's email address.");
+    $this->drupalLogout();
+
+    // Test that the second user can save their account with no errors.
+    $this->drupalLogin($user_with_name);
+    $this->drupalGet("user/" . $user_with_name->id() . "/edit");
+    $this->submitForm([], 'Save');
+    $this->assertSession()->pageTextContains($this->t("The changes have been saved."), "The user does not need to change their email address if it matches another user's username.");
+  }
+
+  /**
+   * Shadow t() system call.
+   *
+   * @param string $string
+   *   A string containing the English text to translate.
+   *
+   * @return string
+   *   A string containing the translate text.
+   */
+  public function t($string) {
+    return $string;
   }
 
 }

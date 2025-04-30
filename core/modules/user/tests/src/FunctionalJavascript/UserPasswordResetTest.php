@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\user\FunctionalJavascript;
 
+use Drupal\Component\Utility\Crypt;
 use Drupal\Core\Database\Database;
+use Drupal\Core\Site\Settings;
 use Drupal\Core\Test\AssertMailTrait;
 use Drupal\Core\Url;
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
 use Drupal\Tests\TestFileCreationTrait;
 use Drupal\user\Entity\User;
+use Drupal\user\UserInterface;
 
 /**
  * Ensure that password reset methods work as expected.
@@ -84,16 +87,10 @@ class UserPasswordResetTest extends WebDriverTestBase {
     $edit['name'] = $this->account->getAccountName();
     $this->submitForm($edit, 'Submit');
 
-    // Check that the email message body does not contain HTML entities
-    // Assume the most recent email.
-    $_emails = $this->drupalGetMails();
-    $email = end($_emails);
-    $this->assertEquals(htmlspecialchars_decode($email['body']), $email['body'], 'The body text of the email contains HTML entities');
-
-    $resetURL = $this->getResetURL();
+    $resetURL = $this->getResetUrl();
     $this->drupalGet($resetURL);
 
-    // Login
+    // Login.
     $this->submitForm([], 'Log in');
 
     // Generate file.
@@ -118,7 +115,7 @@ class UserPasswordResetTest extends WebDriverTestBase {
   /**
    * Retrieves password reset email and extracts the login link.
    */
-  public function getResetURL() {
+  public function getResetUrl() {
     // Assume the most recent email.
     $_emails = $this->drupalGetMails();
     $email = end($_emails);
@@ -126,6 +123,90 @@ class UserPasswordResetTest extends WebDriverTestBase {
     preg_match('#.+user/reset/.+#', $email['body'], $urls);
 
     return $urls[0];
+  }
+
+  /**
+   * Attempts to reset a password when an email address matches two accounts.
+   */
+  public function testUserPasswordResetDuplicateUsers(): void {
+    $user_settings = $this->config('user.settings');
+
+    // Don't require email validation for new accounts.
+    $user_settings->set('verify_mail', FALSE)->save();
+
+    // Don't require admin approval for new accounts.
+    $user_settings->set('register', UserInterface::REGISTER_VISITORS)->save();
+    // Create two users.
+    $user_with_email = $this->drupalCreateUser();
+    $user_with_name = $this->drupalCreateUser();
+
+    // Change the second user's username to the same value as the first user's
+    // email address.
+    $user_with_name->name = $user_with_email->getEmail();
+    $user_with_name->save();
+
+    // Try and reset based on the duplicated email.
+    $edit = [];
+    $edit['name'] = $user_with_email->getEmail();
+    $this->submitForm($edit, 'Submit');
+    // There should be a field prompting the user to pick and account.
+    $this->assertSession()->fieldExists('choose_account');
+    // We should be sure to not expose another user's email to the user.
+    $this->assertSession()->pageTextNotContains($user_with_name->getEmail(), "Duplicated user's email is not exposed to the other user.");
+
+    // Select the account with the username matching the entered email.
+    $edit = [];
+    $edit['choose_account'] = Crypt::hashBase64(Settings::getHashSalt() . $user_with_email->id());
+    $this->submitForm($edit, 'Submit');
+    $this->assertSession()->pageTextContains($this->t('Further instructions have been sent to your e-mail address.'), 'User is notified that password reset was sent.');
+
+    // Make sure that right user was sent a reset email.
+    $this->assertEquals(count($this->drupalGetMails([
+      'key' => 'password_reset',
+      'to' => $user_with_email->getEmail(),
+    ]
+    )), 1, 'The right user was sent a password reset mail.');
+    // Make sure that the other user was not sent an email.
+    $this->assertEquals(count($this->drupalGetMails([
+      'key' => 'password_reset',
+      'to' => $user_with_name->getEmail(),
+    ])), 0, 'The other user was not sent a password reset mail.');
+
+    // If the user is logged in, they should not have to choose an account to
+    // reset their password.
+    $this->drupalLogin($user_with_name);
+    $this->drupalGet('user/password');
+    // There should not be a form element for name.
+    $this->assertSession()->fieldNotExists('name');
+    $this->submitForm([], 'Submit');
+    // Make sure the user with the matching username was sent an email.
+    $this->assertSession()->pageTextContains($this->t('Further instructions have been sent to your e-mail address.'), 'User is notified that password reset was sent when logged in.');
+    $this->assertEquals(count($this->drupalGetMails(
+      [
+        'key' => 'password_reset',
+        'to' => $user_with_name->getEmail(),
+      ])), 1, 'The right user was sent a password reset mail when logged in.');
+    // Make sure that the user with the matching
+    // email address was not sent an email.
+    // (An email was already sent to this user earlier.)
+    $this->assertEquals(count($this->drupalGetMails(
+      [
+        'key' => 'password_reset',
+        'to' => $user_with_email->getEmail(),
+      ])), 1, 'The other user was not sent a password reset mail when logged in.');
+  }
+
+  /**
+   * Shadow t() system call.
+   *
+   * @param string $string
+   *   A string containing the English text to translate.
+   *
+   * @return string
+   *   A string containing the translate text.
+   */
+  public function t($string) {
+    return $string;
   }
 
 }

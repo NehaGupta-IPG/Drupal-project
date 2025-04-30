@@ -15,10 +15,12 @@ use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\Core\Security\TrustedCallbackInterface;
 use Drupal\Core\Url;
 use Drupal\language\ConfigurableLanguageManagerInterface;
-use Drupal\user\Entity\Role;
 use Drupal\user\Plugin\LanguageNegotiation\LanguageNegotiationUser;
 use Drupal\user\Plugin\LanguageNegotiation\LanguageNegotiationUserAdmin;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Drupal\Core\Database\Query\Condition;
+use Drupal\Core\Database\Connection;
+use Drupal\Core\Entity\EntityTypeManagerInterface;
 
 /**
  * Form controller for the user account forms.
@@ -33,6 +35,16 @@ abstract class AccountForm extends ContentEntityForm implements TrustedCallbackI
   protected $languageManager;
 
   /**
+   * The database connection.
+   */
+  protected Connection $database;
+
+  /**
+   * The entity type manager.
+   */
+  protected EntityTypeManagerInterface $entityTypeManager;
+
+  /**
    * Constructs a new EntityForm object.
    *
    * @param \Drupal\Core\Entity\EntityRepositoryInterface $entity_repository
@@ -43,10 +55,16 @@ abstract class AccountForm extends ContentEntityForm implements TrustedCallbackI
    *   The entity type bundle service.
    * @param \Drupal\Component\Datetime\TimeInterface $time
    *   The time service.
+   * @param \Drupal\Core\Database\Connection $database
+   *   The database connection.
+   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   *   The entity type manager.
    */
-  public function __construct(EntityRepositoryInterface $entity_repository, LanguageManagerInterface $language_manager, ?EntityTypeBundleInfoInterface $entity_type_bundle_info = NULL, ?TimeInterface $time = NULL) {
+  public function __construct(EntityRepositoryInterface $entity_repository, LanguageManagerInterface $language_manager, ?EntityTypeBundleInfoInterface $entity_type_bundle_info = NULL, ?TimeInterface $time = NULL, ?Connection $database = NULL, ?EntityTypeManagerInterface $entity_type_manager = NULL) {
     parent::__construct($entity_repository, $entity_type_bundle_info, $time);
     $this->languageManager = $language_manager;
+    $this->database = $database;
+    $this->entityTypeManager = $entity_type_manager;
   }
 
   /**
@@ -57,7 +75,9 @@ abstract class AccountForm extends ContentEntityForm implements TrustedCallbackI
       $container->get('entity.repository'),
       $container->get('language_manager'),
       $container->get('entity_type.bundle.info'),
-      $container->get('datetime.time')
+      $container->get('datetime.time'),
+      $container->get('database'),
+      $container->get('entity_type.manager')
     );
   }
 
@@ -68,10 +88,10 @@ abstract class AccountForm extends ContentEntityForm implements TrustedCallbackI
     /** @var \Drupal\user\UserInterface $account */
     $account = $this->entity;
     $user = $this->currentUser();
-    $config = \Drupal::config('user.settings');
+    $config = $this->config('user.settings');
     $form['#cache']['tags'] = $config->getCacheTags();
 
-    $language_interface = \Drupal::languageManager()->getCurrentLanguage();
+    $language_interface = $this->languageManager->getCurrentLanguage();
 
     // Check for new account.
     $register = $account->isNew();
@@ -105,8 +125,8 @@ abstract class AccountForm extends ContentEntityForm implements TrustedCallbackI
       '#access' => $account->mail->access('edit'),
     ];
 
-    // Only show name field on registration form or user can change own
-    // username.
+    // Only show name field on registration form or user can
+    // change own username.
     $form['account']['name'] = [
       '#type' => 'textfield',
       '#title' => $this->t('Username'),
@@ -204,7 +224,7 @@ abstract class AccountForm extends ContentEntityForm implements TrustedCallbackI
       '#access' => $account->status->access('edit') && $user->id() !== $account->id(),
     ];
 
-    $roles = Role::loadMultiple();
+    $roles = $this->entityTypeManager->getStorage('user_role')->loadMultiple();
     unset($roles[RoleInterface::ANONYMOUS_ID]);
     $roles = array_map(fn(RoleInterface $role) => Html::escape($role->label()), $roles);
 
@@ -256,7 +276,11 @@ abstract class AccountForm extends ContentEntityForm implements TrustedCallbackI
       // This is used to explain that user preferred language and entity
       // language are synchronized. It can be removed if a different behavior is
       // desired.
-      '#pre_render' => ['user_langcode' => [$this, 'alterPreferredLangcodeDescription']],
+      '#pre_render' => [
+        'user_langcode' => [
+          $this, 'alterPreferredLangcodeDescription',
+        ],
+      ],
     ];
 
     // Only show the account setting for Administration pages language to users
@@ -288,7 +312,7 @@ abstract class AccountForm extends ContentEntityForm implements TrustedCallbackI
       $form['#entity_builders']['sync_user_langcode'] = '::syncUserLangcode';
     }
 
-    $system_date_config = \Drupal::config('system.date');
+    $system_date_config = $this->config('system.date');
     $form['timezone'] = [
       '#type' => 'details',
       '#title' => $this->t('Locale settings'),
@@ -366,7 +390,6 @@ abstract class AccountForm extends ContentEntityForm implements TrustedCallbackI
     //   set on the field, which throws an exception as the list requires
     //   numeric keys. Allow to override this per field. As this function is
     //   called twice, we have to prevent it from getting the array keys twice.
-
     if (is_string(key($form_state->getValue('roles')))) {
       $form_state->setValue('roles', array_keys(array_filter($form_state->getValue('roles'))));
     }
@@ -442,6 +465,89 @@ abstract class AccountForm extends ContentEntityForm implements TrustedCallbackI
     // If there's a session set to the users id, remove the password reset tag
     // since a new password was saved.
     $this->getRequest()->getSession()->remove('pass_reset_' . $user->id());
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function validateForm(array &$form, FormStateInterface $form_state) {
+    parent::validateForm($form, $form_state);
+    /** @var \Drupal\user\UserInterface $account */
+    $account = $this->entity;
+    $name = $form_state->getValue('name');
+    $mail = $form_state->getValue('mail');
+    $database = $this->database;
+
+    // For new registrations, make sure the username does not conflict with
+    // an existing user's email address.
+    if (!empty($name)) {
+      $name_taken = FALSE;
+
+      // For existing users whose username matches another user's email address
+      // are not forced to update their username.
+      if ($account->isAuthenticated()) {
+        $name_taken = (bool) $this->database->select('users_field_data', 'ufd')
+          ->condition('ufd.name', $database->escapeLike($name), 'LIKE')
+          ->condition('ufd.uid', $account->id(), '<>')
+          ->range(0, 1)
+          ->countQuery()
+          ->execute()
+          ->fetchField();
+      }
+      else {
+        $name_taken = (bool) $this->database->select('users_field_data', 'ufd')
+          ->condition(
+            $condition = (new Condition('OR'))
+              ->condition('ufd.name', $database->escapeLike($name), 'LIKE')
+              ->condition('ufd.mail', $database->escapeLike($name), 'LIKE')
+          )
+          ->condition('ufd.status', 1)
+          ->range(0, 1)
+          ->countQuery()
+          ->execute()
+          ->fetchField();
+      }
+
+      if ($name_taken) {
+        $form_state->setErrorByName('name', $this->t('The name @name is already taken.', ['@name' => $name]));
+      }
+    }
+
+    // For new registrations, make sure the email address does not conflict
+    // with an existing user's username.
+    if (!empty($mail)) {
+      $mail_taken = FALSE;
+
+      // For existing users whose email matches another user's username are not
+      // forced to update their email address.
+      if ($account->isAuthenticated()) {
+        $mail_taken = (bool) $this->database->select('users_field_data', 'ufd')
+          ->condition('ufd.mail', $database->escapeLike($mail), 'LIKE')
+          ->condition('ufd.uid', $account->id(), '<>')
+          ->range(0, 1)
+          ->countQuery()
+          ->execute()
+          ->fetchField();
+      }
+      else {
+        $mail_taken = (bool) $this->database->select('users_field_data', 'ufd')
+          ->condition(
+            $condition = (new Condition('OR'))
+              ->condition('ufd.mail', $database->escapeLike($mail), 'LIKE')
+              ->condition('ufd.name', $database->escapeLike($mail), 'LIKE')
+          )
+          ->condition('ufd.status', 1)
+          ->range(0, 1)
+          ->countQuery()
+          ->execute()
+          ->fetchField();
+      }
+
+      if ($mail_taken) {
+        $form_state->setErrorByName('mail', $this->t('The email address @email is already registered.', ['@email' => $mail]));
+      }
+    }
+    return NULL;
   }
 
 }
