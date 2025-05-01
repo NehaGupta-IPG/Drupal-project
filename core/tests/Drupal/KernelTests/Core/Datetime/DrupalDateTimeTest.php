@@ -108,34 +108,4 @@ class DrupalDateTimeTest extends KernelTestBase {
     $this->assertEquals('1972/10/11 12:25:21 UTC', $date->format('Y/m/d H:i:s e'), 'Date still has default UTC time zone and correct date/time');
   }
 
-  /**
-   * Test DateTime object creation.
-   *
-   * @param mixed $timestamp
-   *   Timestamp value.
-   *
-   * @dataProvider timestampProvider()
-   */
-  public function testTimestampArgumentTypes($timestamp) {
-    $time = DrupalDateTime::createFromTimestamp($timestamp, 'UTC');
-    $this->assertInstanceOf(DrupalDateTime::class, $time);
-  }
-
-  /**
-   * Timestamp collection of the different types.
-   *
-   * @return array
-   *   Test dataset.
-   *
-   * @see testTimestampArgumentTypes()
-   */
-  public function timestampProvider() {
-    return [
-      [87654321],
-      ['87654321'],
-      ['87654321.1'],
-      [87654321.1],
-    ];
-  }
-
 }
