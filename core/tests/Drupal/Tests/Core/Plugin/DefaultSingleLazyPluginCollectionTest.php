@@ -18,7 +18,7 @@ class DefaultSingleLazyPluginCollectionTest extends LazyPluginCollectionTestBase
   /**
    * {@inheritdoc}
    */
-  protected function setupPluginCollection(?InvocationOrder $create_count = NULL) {
+  protected function setupPluginCollection(?InvocationOrder $create_count = NULL): void {
     $definitions = $this->getPluginDefinitions();
     $this->pluginInstances['apple'] = new ConfigurablePlugin(['id' => 'apple', 'key' => 'value'], 'apple', $definitions['apple']);
     $this->pluginInstances['banana'] = new ConfigurablePlugin(['id' => 'banana', 'key' => 'other_value'], 'banana', $definitions['banana']);
@@ -95,6 +95,9 @@ class DefaultSingleLazyPluginCollectionTest extends LazyPluginCollectionTestBase
 
 }
 
+/**
+ * Stub configurable plugin class for testing.
+ */
 class ConfigurablePlugin extends PluginBase implements ConfigurableInterface {
 
   public function __construct(array $configuration, $plugin_id, $plugin_definition) {
@@ -111,7 +114,7 @@ class ConfigurablePlugin extends PluginBase implements ConfigurableInterface {
     return $this->configuration;
   }
 
-  public function setConfiguration(array $configuration) {
+  public function setConfiguration(array $configuration): void {
     $this->configuration = $configuration;
   }
 

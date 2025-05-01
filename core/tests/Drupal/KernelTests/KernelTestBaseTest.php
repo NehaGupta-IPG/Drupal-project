@@ -6,10 +6,10 @@ namespace Drupal\KernelTests;
 
 use Drupal\Component\FileCache\FileCacheFactory;
 use Drupal\Core\Database\Database;
-use Drupal\Tests\StreamCapturer;
-use Drupal\user\Entity\Role;
+use Drupal\TestTools\Extension\Dump\DebugDump;
 use org\bovigo\vfs\vfsStream;
 use org\bovigo\vfs\visitor\vfsStreamStructureVisitor;
+use PHPUnit\Framework\Attributes\DoesNotPerformAssertions;
 use Psr\Http\Client\ClientExceptionInterface;
 
 /**
@@ -18,7 +18,6 @@ use Psr\Http\Client\ClientExceptionInterface;
  * @group PHPUnit
  * @group Test
  * @group KernelTests
- * @group #slow
  */
 class KernelTestBaseTest extends KernelTestBase {
 
@@ -256,6 +255,13 @@ class KernelTestBaseTest extends KernelTestBase {
   }
 
   /**
+   * Tests that ::tearDown() does not perform assertions.
+   */
+  #[DoesNotPerformAssertions]
+  public function testTearDown(): void {
+  }
+
+  /**
    * {@inheritdoc}
    */
   protected function tearDown(): void {
@@ -266,18 +272,20 @@ class KernelTestBaseTest extends KernelTestBase {
     // the tables.
     $connection = Database::getConnection();
     if ($connection->databaseType() === 'sqlite') {
-      $result = $connection->query("SELECT name FROM " . $this->databasePrefix .
+      $tables = $connection->query("SELECT name FROM " . $this->databasePrefix .
         ".sqlite_master WHERE type = :type AND name LIKE :table_name AND name NOT LIKE :pattern", [
           ':type' => 'table',
           ':table_name' => '%',
           ':pattern' => 'sqlite_%',
         ]
       )->fetchAllKeyed(0, 0);
-      $this->assertEmpty($result, 'All test tables have been removed.');
     }
     else {
       $tables = $connection->schema()->findTables($this->databasePrefix . '%');
-      $this->assertEmpty($tables, 'All test tables have been removed.');
+    }
+
+    if (!empty($tables)) {
+      throw new \RuntimeException("Not all test tables were removed");
     }
   }
 
@@ -296,20 +304,19 @@ class KernelTestBaseTest extends KernelTestBase {
    * Tests the dump() function provided by the var-dumper Symfony component.
    */
   public function testVarDump(): void {
-    // Append the stream capturer to the STDERR stream, so that we can test the
-    // dump() output and also prevent it from actually outputting in this
-    // particular test.
-    stream_filter_register("capture", StreamCapturer::class);
-    stream_filter_append(STDERR, "capture");
-
     // Dump some variables.
-    $this->enableModules(['system', 'user']);
-    $role = Role::create(['id' => 'test_role', 'label' => 'Test role']);
-    dump($role);
-    dump($role->id());
+    $object = (object) [
+      'Aldebaran' => 'Betelgeuse',
+    ];
+    dump($object);
+    dump('Alpheratz');
 
-    $this->assertStringContainsString('Drupal\user\Entity\Role', StreamCapturer::$cache);
-    $this->assertStringContainsString('test_role', StreamCapturer::$cache);
+    $dumpString = json_encode(DebugDump::getDumps());
+
+    $this->assertStringContainsString('KernelTestBaseTest::testVarDump', $dumpString);
+    $this->assertStringContainsString('Aldebaran', $dumpString);
+    $this->assertStringContainsString('Betelgeuse', $dumpString);
+    $this->assertStringContainsString('Alpheratz', $dumpString);
   }
 
   /**

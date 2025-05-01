@@ -57,7 +57,7 @@ class ConfigSync extends FormBase {
    * @param \Drupal\Core\Render\RendererInterface $renderer
    *   The renderer.
    * @param \Drupal\Core\Extension\ModuleExtensionList $moduleExtensionList
-   *   The module extension list
+   *   The module extension list.
    * @param \Drupal\Core\Config\ImportStorageTransformer $importTransformer
    *   The import transformer service.
    * @param \Drupal\Core\Extension\ThemeExtensionList $themeExtensionList
@@ -293,7 +293,7 @@ class ConfigSync extends FormBase {
 
         batch_set($batch_builder->toArray());
       }
-      catch (ConfigImporterException $e) {
+      catch (ConfigImporterException) {
         // There are validation errors.
         $this->messenger()->addError($this->t('The configuration cannot be imported because it failed validation for the following reasons:'));
         foreach ($config_importer->getErrors() as $message) {
