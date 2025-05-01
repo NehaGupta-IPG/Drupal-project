@@ -1,11 +1,6 @@
 langcode: en
 status: true
 dependencies:
-  config:
-    - system.action.media_delete_action
-    - system.action.media_publish_action
-    - system.action.media_save_action
-    - system.action.media_unpublish_action
   module:
     - media
     - user
