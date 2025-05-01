@@ -43,6 +43,7 @@
         "symfony/finder": "~v7.2.0",
         "symfony/http-foundation": "~v7.2.0",
         "symfony/http-kernel": "~v7.2.0",
+        "symfony/polyfill-intl-icu": "^1.30",
         "symfony/mailer": "~v7.2.0",
         "symfony/mime": "~v7.2.0",
         "symfony/polyfill-ctype": "~v1.31.0",

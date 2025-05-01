@@ -71,6 +71,21 @@ function locale_requirements($phase): array {
         ];
       }
     }
+    if (!extension_loaded('intl')) {
+      $requirements['locale_intl'] = [
+        'title' => t('Internationalization library'),
+        'value' => t('PHP intl extension not installed'),
+        'severity' => REQUIREMENT_WARNING,
+        'description' => t('It is recommended to install the <a href="https://www.php.net/manual/en/book.intl.php" target="_blank">PHP intl extension</a> for localized sorting support.'),
+      ];
+    }
+    else {
+      $requirements['locale_intl'] = [
+        'title' => t('Internationalization library'),
+        'value' => t('PHP intl extension installed'),
+        'severity' => REQUIREMENT_OK,
+      ];
+    }
   }
   return $requirements;
 }
