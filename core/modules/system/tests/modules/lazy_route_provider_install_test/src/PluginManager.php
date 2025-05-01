@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\lazy_route_provider_install_test;
 
 use Drupal\Component\Annotation\PluginID;
@@ -9,6 +11,9 @@ use Drupal\Core\Plugin\DefaultPluginManager;
 use Drupal\Core\Routing\UrlGeneratorInterface;
 use Drupal\Core\Url;
 
+/**
+ * Plugin manager for testing the lazy route provider during module install.
+ */
 class PluginManager extends DefaultPluginManager {
 
   /**

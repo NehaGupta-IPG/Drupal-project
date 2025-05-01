@@ -38,10 +38,10 @@ class SessionManager extends NativeSessionStorage implements SessionManagerInter
   /**
    * The write safe session handler.
    *
+   * @var \Drupal\Core\Session\WriteSafeSessionHandlerInterface
+   *
    * @todo This reference should be removed once all database queries
    *   are removed from the session manager class.
-   *
-   * @var \Drupal\Core\Session\WriteSafeSessionHandlerInterface
    */
   protected $writeSafeHandler;
 
@@ -249,6 +249,7 @@ class SessionManager extends NativeSessionStorage implements SessionManagerInter
    * Command line clients do not support cookies nor sessions.
    *
    * @return bool
+   *   TRUE if the current PHP process runs on CLI, otherwise FALSE>
    */
   protected function isCli() {
     return PHP_SAPI === 'cli';

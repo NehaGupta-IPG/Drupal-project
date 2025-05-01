@@ -16,9 +16,9 @@ use Drupal\Core\Field\FieldException;
 use Drupal\Core\Field\FieldStorageDefinitionEvents;
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\entity_test\EntityTestHelper;
 use Drupal\entity_test\FieldStorageDefinition;
 use Drupal\entity_test_update\Entity\EntityTestUpdate;
-use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\Tests\system\Functional\Entity\Traits\EntityDefinitionTestTrait;
 
 /**
@@ -55,9 +55,7 @@ class EntityDefinitionUpdateTest extends EntityKernelTestBase {
   protected $database;
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['entity_test_update', 'language'];
 
@@ -119,13 +117,14 @@ class EntityDefinitionUpdateTest extends EntityKernelTestBase {
     // reports that an update is needed.
     $this->updateEntityTypeToRevisionable();
     $this->assertTrue($this->entityDefinitionUpdateManager->needsUpdates(), 'EntityDefinitionUpdateManager reports that updates are needed.');
+    $entity_type = $this->entityTypeManager->getDefinition('entity_test_update')->getLabel();
     $expected = [
       'entity_test_update' => [
-        t('The %entity_type entity type needs to be updated.', ['%entity_type' => $this->entityTypeManager->getDefinition('entity_test_update')->getLabel()]),
+        "The $entity_type entity type needs to be updated.",
         // The revision key is now defined, so the revision field needs to be
         // created.
-        t('The %field_name field needs to be installed.', ['%field_name' => 'Revision ID']),
-        t('The %field_name field needs to be installed.', ['%field_name' => 'Default revision']),
+        'The Revision ID field needs to be installed.',
+        'The Default revision field needs to be installed.',
       ],
     ];
     $this->assertEquals($expected, $this->entityDefinitionUpdateManager->getChangeSummary(), 'EntityDefinitionUpdateManager reports the expected change summary.');
@@ -146,7 +145,7 @@ class EntityDefinitionUpdateTest extends EntityKernelTestBase {
       $this->entityDefinitionUpdateManager->updateEntityType($entity_type);
       $this->fail('EntityStorageException thrown when trying to apply an update that requires shared table schema changes.');
     }
-    catch (EntityStorageException $e) {
+    catch (EntityStorageException) {
       // Expected exception; just continue testing.
     }
   }
@@ -504,7 +503,7 @@ class EntityDefinitionUpdateTest extends EntityKernelTestBase {
         ->execute();
       $this->fail($message);
     }
-    catch (IntegrityConstraintViolationException $e) {
+    catch (IntegrityConstraintViolationException) {
       // Now provide a value for the 'not null' column. This is expected to
       // succeed.
       $values['new_bundle_field_shape'] = $this->randomString();
@@ -512,228 +511,6 @@ class EntityDefinitionUpdateTest extends EntityKernelTestBase {
         ->fields($values)
         ->execute();
     }
-  }
-
-  /**
-   * Tests deleting a base field when it has existing data.
-   *
-   * @dataProvider baseFieldDeleteWithExistingDataTestCases
-   */
-  public function testBaseFieldDeleteWithExistingData($entity_type_id, $create_entity_revision, $base_field_revisionable, $create_entity_translation): void {
-    // Enable an additional language.
-    ConfigurableLanguage::createFromLangcode('ro')->save();
-
-    /** @var \Drupal\Core\Entity\Sql\SqlEntityStorageInterface $storage */
-    $storage = $this->entityTypeManager->getStorage($entity_type_id);
-    $schema_handler = $this->database->schema();
-
-    // Create an entity without the base field, to ensure NULL values are not
-    // added to the dedicated table storage to be purged.
-    /** @var \Drupal\Core\Entity\ContentEntityInterface $entity */
-    $entity = $storage->create();
-    $entity->save();
-
-    // Add the base field and run the update.
-    $this->addBaseField('string', $entity_type_id, $base_field_revisionable, TRUE, $create_entity_translation);
-    $this->applyEntityUpdates();
-
-    /** @var \Drupal\Core\Entity\Sql\DefaultTableMapping $table_mapping */
-    $table_mapping = $storage->getTableMapping();
-    $storage_definition = \Drupal::service('entity.last_installed_schema.repository')->getLastInstalledFieldStorageDefinitions($entity_type_id)['new_base_field'];
-
-    // Save an entity with the base field populated.
-    $entity = $storage->create(['new_base_field' => 'foo']);
-    $entity->save();
-
-    if ($create_entity_translation) {
-      $translation = $entity->addTranslation('ro', ['new_base_field' => 'foo-ro']);
-      $translation->save();
-    }
-
-    if ($create_entity_revision) {
-      $entity->setNewRevision(TRUE);
-      $entity->isDefaultRevision(FALSE);
-      $entity->new_base_field = 'bar';
-      $entity->save();
-
-      if ($create_entity_translation) {
-        $translation = $entity->getTranslation('ro');
-        $translation->new_base_field = 'bar-ro';
-        $translation->save();
-      }
-    }
-
-    // Remove the base field and apply updates.
-    $this->removeBaseField($entity_type_id);
-    $this->applyEntityUpdates();
-
-    // Check that the base field's column is deleted.
-    $this->assertFalse($schema_handler->fieldExists($entity_type_id, 'new_base_field'), 'Column deleted from shared table for new_base_field.');
-
-    // Check that a dedicated 'deleted' table was created for the deleted base
-    // field.
-    $dedicated_deleted_table_name = $table_mapping->getDedicatedDataTableName($storage_definition, TRUE);
-    $this->assertTrue($schema_handler->tableExists($dedicated_deleted_table_name), 'A dedicated table was created for the deleted new_base_field.');
-
-    $expected[] = [
-      'bundle' => $entity->bundle(),
-      'deleted' => '1',
-      'entity_id' => '2',
-      'revision_id' => '2',
-      'langcode' => 'en',
-      'delta' => '0',
-      'new_base_field_value' => 'foo',
-    ];
-
-    if ($create_entity_translation) {
-      $expected[] = [
-        'bundle' => $entity->bundle(),
-        'deleted' => '1',
-        'entity_id' => '2',
-        'revision_id' => '2',
-        'langcode' => 'ro',
-        'delta' => '0',
-        'new_base_field_value' => 'foo-ro',
-      ];
-    }
-
-    // Check that the deleted field's data is preserved in the dedicated
-    // 'deleted' table.
-    $result = $this->database->select($dedicated_deleted_table_name, 't')
-      ->fields('t')
-      ->orderBy('revision_id', 'ASC')
-      ->orderBy('langcode', 'ASC')
-      ->execute()
-      ->fetchAll(\PDO::FETCH_ASSOC);
-    $this->assertSameSize($expected, $result);
-
-    // Use assertEquals and not assertSame here to prevent that a different
-    // sequence of the columns in the table will affect the check.
-    $this->assertEquals($expected, $result);
-
-    if ($create_entity_revision) {
-      $dedicated_deleted_revision_table_name = $table_mapping->getDedicatedRevisionTableName($storage_definition, TRUE);
-      $this->assertTrue($schema_handler->tableExists($dedicated_deleted_revision_table_name), 'A dedicated revision table was created for the deleted new_base_field.');
-
-      if ($base_field_revisionable) {
-        $expected[] = [
-          'bundle' => $entity->bundle(),
-          'deleted' => '1',
-          'entity_id' => '2',
-          'revision_id' => '3',
-          'langcode' => 'en',
-          'delta' => '0',
-          'new_base_field_value' => 'bar',
-        ];
-
-        if ($create_entity_translation) {
-          $expected[] = [
-            'bundle' => $entity->bundle(),
-            'deleted' => '1',
-            'entity_id' => '2',
-            'revision_id' => '3',
-            'langcode' => 'ro',
-            'delta' => '0',
-            'new_base_field_value' => 'bar-ro',
-          ];
-        }
-      }
-
-      $result = $this->database->select($dedicated_deleted_revision_table_name, 't')
-        ->fields('t')
-        ->orderBy('revision_id', 'ASC')
-        ->orderBy('langcode', 'ASC')
-        ->execute()
-        ->fetchAll(\PDO::FETCH_ASSOC);
-      $this->assertSameSize($expected, $result);
-
-      // Use assertEquals and not assertSame here to prevent that a different
-      // sequence of the columns in the table will affect the check.
-      $this->assertEquals($expected, $result);
-    }
-
-    // Check that the field storage definition is marked for purging.
-    $deleted_storage_definitions = \Drupal::service('entity_field.deleted_fields_repository')->getFieldStorageDefinitions();
-    $this->assertArrayHasKey($storage_definition->getUniqueStorageIdentifier(), $deleted_storage_definitions, 'The base field is marked for purging.');
-
-    // Purge field data, and check that the storage definition has been
-    // completely removed once the data is purged.
-    field_purge_batch(10);
-    $deleted_storage_definitions = \Drupal::service('entity_field.deleted_fields_repository')->getFieldStorageDefinitions();
-    $this->assertEmpty($deleted_storage_definitions, 'The base field has been deleted.');
-    $this->assertFalse($schema_handler->tableExists($dedicated_deleted_table_name), 'A dedicated field table was deleted after new_base_field was purged.');
-
-    if (isset($dedicated_deleted_revision_table_name)) {
-      $this->assertFalse($schema_handler->tableExists($dedicated_deleted_revision_table_name), 'A dedicated field revision table was deleted after new_base_field was purged.');
-    }
-  }
-
-  /**
-   * Test cases for ::testBaseFieldDeleteWithExistingData.
-   */
-  public static function baseFieldDeleteWithExistingDataTestCases() {
-    return [
-      'Non-revisionable, non-translatable entity type' => [
-        'entity_test_update',
-        FALSE,
-        FALSE,
-        FALSE,
-      ],
-      'Non-revisionable, non-translatable custom data table' => [
-        'entity_test_mul',
-        FALSE,
-        FALSE,
-        FALSE,
-      ],
-      'Non-revisionable, non-translatable entity type, revisionable base field' => [
-        'entity_test_update',
-        FALSE,
-        TRUE,
-        FALSE,
-      ],
-      'Non-revisionable, non-translatable custom data table, revisionable base field' => [
-        'entity_test_mul',
-        FALSE,
-        TRUE,
-        FALSE,
-      ],
-      'Revisionable, translatable entity type, non revisionable and non-translatable base field' => [
-        'entity_test_mulrev',
-        TRUE,
-        FALSE,
-        FALSE,
-      ],
-      'Revisionable, translatable entity type, revisionable and non-translatable base field' => [
-        'entity_test_mulrev',
-        TRUE,
-        TRUE,
-        FALSE,
-      ],
-      'Revisionable and non-translatable entity type, revisionable and non-translatable base field' => [
-        'entity_test_rev',
-        TRUE,
-        TRUE,
-        FALSE,
-      ],
-      'Revisionable and non-translatable entity type, non-revisionable and non-translatable base field' => [
-        'entity_test_rev',
-        TRUE,
-        FALSE,
-        FALSE,
-      ],
-      'Revisionable and translatable entity type, non-revisionable and translatable base field' => [
-        'entity_test_mulrev',
-        TRUE,
-        FALSE,
-        TRUE,
-      ],
-      'Revisionable and translatable entity type, revisionable and translatable base field' => [
-        'entity_test_mulrev',
-        TRUE,
-        TRUE,
-        TRUE,
-      ],
-    ];
   }
 
   /**
@@ -757,7 +534,7 @@ class EntityDefinitionUpdateTest extends EntityKernelTestBase {
     $this->assertTrue($schema_handler->tableExists($dedicated_table_name), 'The bundle field uses a dedicated table.');
 
     // Save an entity with the bundle field populated.
-    entity_test_create_bundle('custom');
+    EntityTestHelper::createBundle('custom');
     $entity = $storage->create(['type' => 'test_bundle', 'new_bundle_field' => 'foo']);
     $entity->save();
 
@@ -829,7 +606,7 @@ class EntityDefinitionUpdateTest extends EntityKernelTestBase {
       $this->applyEntityUpdates();
       $this->fail('FieldStorageDefinitionUpdateForbiddenException thrown when trying to update a field schema that has data.');
     }
-    catch (FieldStorageDefinitionUpdateForbiddenException $e) {
+    catch (FieldStorageDefinitionUpdateForbiddenException) {
       // Expected exception; just continue testing.
     }
   }
@@ -843,7 +620,7 @@ class EntityDefinitionUpdateTest extends EntityKernelTestBase {
     $this->applyEntityUpdates();
 
     // Save an entity with the bundle field populated.
-    entity_test_create_bundle('custom');
+    EntityTestHelper::createBundle('custom');
     $this->entityTypeManager->getStorage('entity_test_update')->create(['type' => 'test_bundle', 'new_bundle_field' => 'foo'])->save();
 
     // Change the field's field type and apply updates. It's expected to
@@ -853,7 +630,7 @@ class EntityDefinitionUpdateTest extends EntityKernelTestBase {
       $this->applyEntityUpdates();
       $this->fail('FieldStorageDefinitionUpdateForbiddenException thrown when trying to update a field schema that has data.');
     }
-    catch (FieldStorageDefinitionUpdateForbiddenException $e) {
+    catch (FieldStorageDefinitionUpdateForbiddenException) {
       // Expected exception; just continue testing.
     }
   }
@@ -885,9 +662,10 @@ class EntityDefinitionUpdateTest extends EntityKernelTestBase {
     // update to the entity type.
     $this->addEntityIndex();
     $this->assertTrue($this->entityDefinitionUpdateManager->needsUpdates(), 'EntityDefinitionUpdateManager reports that updates are needed.');
+    $entity_type = $this->entityTypeManager->getDefinition('entity_test_update')->getLabel();
     $expected = [
       'entity_test_update' => [
-        t('The %entity_type entity type needs to be updated.', ['%entity_type' => $this->entityTypeManager->getDefinition('entity_test_update')->getLabel()]),
+        "The $entity_type entity type needs to be updated.",
       ],
     ];
     $this->assertEquals($expected, $this->entityDefinitionUpdateManager->getChangeSummary(), 'EntityDefinitionUpdateManager reports the expected change summary.');
@@ -902,9 +680,10 @@ class EntityDefinitionUpdateTest extends EntityKernelTestBase {
     // update to the entity type.
     $this->removeEntityIndex();
     $this->assertTrue($this->entityDefinitionUpdateManager->needsUpdates(), 'EntityDefinitionUpdateManager reports that updates are needed.');
+    $entity_type = $this->entityTypeManager->getDefinition('entity_test_update')->getLabel();
     $expected = [
       'entity_test_update' => [
-        t('The %entity_type entity type needs to be updated.', ['%entity_type' => $this->entityTypeManager->getDefinition('entity_test_update')->getLabel()]),
+        "The $entity_type entity type needs to be updated.",
       ],
     ];
     $this->assertEquals($expected, $this->entityDefinitionUpdateManager->getChangeSummary(), 'EntityDefinitionUpdateManager reports the expected change summary.');
@@ -1038,7 +817,7 @@ class EntityDefinitionUpdateTest extends EntityKernelTestBase {
       $this->entityDefinitionUpdateManager->installEntityType(new ContentEntityType(['id' => 'foo']));
       $this->fail($message);
     }
-    catch (PluginNotFoundException $e) {
+    catch (PluginNotFoundException) {
       // Expected exception; just continue testing.
     }
 
@@ -1046,12 +825,12 @@ class EntityDefinitionUpdateTest extends EntityKernelTestBase {
     $message = 'A field cannot be installed on a non-existing entity type';
     try {
       $storage_definition = BaseFieldDefinition::create('string')
-        ->setLabel(t('A new revisionable base field'))
+        ->setLabel('A new revisionable base field')
         ->setRevisionable(TRUE);
       $this->entityDefinitionUpdateManager->installFieldStorageDefinition('bar', 'foo', 'entity_test', $storage_definition);
       $this->fail($message);
     }
-    catch (PluginNotFoundException $e) {
+    catch (PluginNotFoundException) {
       // Expected exception; just continue testing.
     }
 
@@ -1063,7 +842,7 @@ class EntityDefinitionUpdateTest extends EntityKernelTestBase {
     // Create a new base field.
     $this->addRevisionableBaseField();
     $storage_definition = BaseFieldDefinition::create('string')
-      ->setLabel(t('A new revisionable base field'))
+      ->setLabel('A new revisionable base field')
       ->setRevisionable(TRUE);
     $this->assertFalse($db_schema->fieldExists('entity_test_update', 'new_base_field'), "New field 'new_base_field' does not exist before applying the update.");
     $this->entityDefinitionUpdateManager->installFieldStorageDefinition('new_base_field', 'entity_test_update', 'entity_test', $storage_definition);
@@ -1078,7 +857,7 @@ class EntityDefinitionUpdateTest extends EntityKernelTestBase {
     $storage_definition = BaseFieldDefinition::create('text')
       ->setName('new_base_field')
       ->setTargetEntityTypeId('entity_test_update')
-      ->setLabel(t('A new revisionable base field'))
+      ->setLabel('A new revisionable base field')
       ->setRevisionable(TRUE);
     $this->entityDefinitionUpdateManager->updateFieldStorageDefinition($storage_definition);
     $this->assertFalse($db_schema->fieldExists('entity_test_update', 'new_base_field'), "Previous schema for 'new_base_field' no longer exists.");
@@ -1180,7 +959,7 @@ class EntityDefinitionUpdateTest extends EntityKernelTestBase {
       $this->applyEntityUpdates();
       $this->fail($message);
     }
-    catch (EntityStorageException $e) {
+    catch (EntityStorageException) {
       // Expected exception; just continue testing.
     }
 
@@ -1196,7 +975,7 @@ class EntityDefinitionUpdateTest extends EntityKernelTestBase {
       $entity->save();
       $this->fail($message);
     }
-    catch (EntityStorageException $e) {
+    catch (EntityStorageException) {
       // Expected exception; just continue testing.
     }
   }
@@ -1222,14 +1001,13 @@ class EntityDefinitionUpdateTest extends EntityKernelTestBase {
     $db_schema = $this->database->schema();
 
     // Create two entities before adding the base field.
-    /** @var \Drupal\entity_test\Entity\EntityTestUpdate $entity */
     $storage->create()->save();
     $storage->create()->save();
 
     // Add a base field with an initial value.
     $this->addBaseField();
     $storage_definition = BaseFieldDefinition::create('string')
-      ->setLabel(t('A new base field'))
+      ->setLabel('A new base field')
       ->setInitialValue('test value');
 
     $this->assertFalse($db_schema->fieldExists('entity_test_update', 'new_base_field'), "New field 'new_base_field' does not exist before applying the update.");
@@ -1244,82 +1022,6 @@ class EntityDefinitionUpdateTest extends EntityKernelTestBase {
   }
 
   /**
-   * Tests adding a base field with initial values inherited from another field.
-   *
-   * @dataProvider initialValueFromFieldTestCases
-   */
-  public function testInitialValueFromField($default_initial_value, $expected_value): void {
-    $storage = \Drupal::entityTypeManager()->getStorage('entity_test_update');
-    $db_schema = $this->database->schema();
-
-    // Create two entities before adding the base field.
-    /** @var \Drupal\entity_test_update\Entity\EntityTestUpdate $entity */
-    $storage->create([
-      'name' => 'First entity',
-      'test_single_property' => 'test existing value',
-    ])->save();
-
-    // The second entity does not have any value for the 'test_single_property'
-    // field, allowing us to test the 'default_value' parameter of
-    // \Drupal\Core\Field\BaseFieldDefinition::setInitialValueFromField().
-    $storage->create([
-      'name' => 'Second entity',
-    ])->save();
-
-    // Add a base field with an initial value inherited from another field.
-    $definitions['new_base_field'] = BaseFieldDefinition::create('string')
-      ->setName('new_base_field')
-      ->setLabel('A new base field')
-      ->setInitialValueFromField('name');
-    $definitions['another_base_field'] = BaseFieldDefinition::create('string')
-      ->setName('another_base_field')
-      ->setLabel('Another base field')
-      ->setInitialValueFromField('test_single_property', $default_initial_value);
-
-    $this->state->set('entity_test_update.additional_base_field_definitions', $definitions);
-
-    $this->assertFalse($db_schema->fieldExists('entity_test_update', 'new_base_field'), "New field 'new_base_field' does not exist before applying the update.");
-    $this->assertFalse($db_schema->fieldExists('entity_test_update', 'another_base_field'), "New field 'another_base_field' does not exist before applying the update.");
-    $this->entityDefinitionUpdateManager->installFieldStorageDefinition('new_base_field', 'entity_test_update', 'entity_test', $definitions['new_base_field']);
-    $this->entityDefinitionUpdateManager->installFieldStorageDefinition('another_base_field', 'entity_test_update', 'entity_test', $definitions['another_base_field']);
-    $this->assertTrue($db_schema->fieldExists('entity_test_update', 'new_base_field'), "New field 'new_base_field' has been created on the 'entity_test_update' table.");
-    $this->assertTrue($db_schema->fieldExists('entity_test_update', 'another_base_field'), "New field 'another_base_field' has been created on the 'entity_test_update' table.");
-
-    // Check that the initial values have been applied.
-    $storage = \Drupal::entityTypeManager()->getStorage('entity_test_update');
-    $entities = $storage->loadMultiple();
-    $this->assertEquals('First entity', $entities[1]->get('new_base_field')->value);
-    $this->assertEquals('Second entity', $entities[2]->get('new_base_field')->value);
-
-    $this->assertEquals('test existing value', $entities[1]->get('another_base_field')->value);
-    $this->assertEquals($expected_value, $entities[2]->get('another_base_field')->value);
-  }
-
-  /**
-   * Test cases for ::testInitialValueFromField.
-   */
-  public static function initialValueFromFieldTestCases() {
-    return [
-      'literal value' => [
-        'test initial value',
-        'test initial value',
-      ],
-      'indexed array' => [
-        ['value' => 'test initial value'],
-        'test initial value',
-      ],
-      'empty array' => [
-        [],
-        NULL,
-      ],
-      'null' => [
-        NULL,
-        NULL,
-      ],
-    ];
-  }
-
-  /**
    * Tests the error handling when using initial values from another field.
    */
   public function testInitialValueFromFieldErrorHandling(): void {
@@ -1328,7 +1030,7 @@ class EntityDefinitionUpdateTest extends EntityKernelTestBase {
     try {
       $this->addBaseField();
       $storage_definition = BaseFieldDefinition::create('string')
-        ->setLabel(t('A new base field'))
+        ->setLabel('A new base field')
         ->setInitialValueFromField('field_that_does_not_exist');
       $this->entityDefinitionUpdateManager->installFieldStorageDefinition('new_base_field', 'entity_test_update', 'entity_test', $storage_definition);
       $this->fail('Using a non-existent field as initial value does not work.');
@@ -1340,7 +1042,7 @@ class EntityDefinitionUpdateTest extends EntityKernelTestBase {
     try {
       $this->addBaseField();
       $storage_definition = BaseFieldDefinition::create('integer')
-        ->setLabel(t('A new base field'))
+        ->setLabel('A new base field')
         ->setInitialValueFromField('name');
       $this->entityDefinitionUpdateManager->installFieldStorageDefinition('new_base_field', 'entity_test_update', 'entity_test', $storage_definition);
       $this->fail('Using a field of a different type as initial value does not work.');
@@ -1353,7 +1055,7 @@ class EntityDefinitionUpdateTest extends EntityKernelTestBase {
       // Add a base field that will not be stored in the shared tables.
       $initial_field = BaseFieldDefinition::create('string')
         ->setName('initial_field')
-        ->setLabel(t('An initial field'))
+        ->setLabel('An initial field')
         ->setCardinality(2);
       $this->state->set('entity_test_update.additional_base_field_definitions', ['initial_field' => $initial_field]);
       $this->entityDefinitionUpdateManager->installFieldStorageDefinition('initial_field', 'entity_test_update', 'entity_test', $initial_field);
@@ -1362,7 +1064,7 @@ class EntityDefinitionUpdateTest extends EntityKernelTestBase {
       // as the source of its initial values.
       $new_base_field = BaseFieldDefinition::create('string')
         ->setName('new_base_field')
-        ->setLabel(t('A new base field'))
+        ->setLabel('A new base field')
         ->setInitialValueFromField('initial_field');
       $this->state->set('entity_test_update.additional_base_field_definitions', ['initial_field' => $initial_field, 'new_base_field' => $new_base_field]);
       $this->entityDefinitionUpdateManager->installFieldStorageDefinition('new_base_field', 'entity_test_update', 'entity_test', $new_base_field);

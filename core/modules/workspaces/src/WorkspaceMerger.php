@@ -4,8 +4,11 @@ namespace Drupal\workspaces;
 
 use Drupal\Core\Database\Connection;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
+use Drupal\Core\Site\Settings;
 use Drupal\Core\Utility\Error;
 use Psr\Log\LoggerInterface;
+
+// cspell:ignore differring
 
 /**
  * Default implementation of the workspace merger.
@@ -31,6 +34,10 @@ class WorkspaceMerger implements WorkspaceMergerInterface {
 
     try {
       $transaction = $this->database->startTransaction();
+      $max_execution_time = ini_get('max_execution_time');
+      $step_size = Settings::get('entity_update_batch_size', 50);
+      $counter = 0;
+
       foreach ($this->getDifferringRevisionIdsOnSource() as $entity_type_id => $revision_difference) {
         $entity_type = $this->entityTypeManager->getDefinition($entity_type_id);
         $revisions_on_source = $this->entityTypeManager->getStorage($entity_type_id)
@@ -38,9 +45,9 @@ class WorkspaceMerger implements WorkspaceMergerInterface {
 
         /** @var \Drupal\Core\Entity\ContentEntityInterface $revision */
         foreach ($revisions_on_source as $revision) {
-          // Track all the differing revisions from the source workspace in
-          // the context of the target workspace. This will automatically
-          // update all the descendants of the target workspace as well.
+          // Track all the different revisions from the source workspace in the
+          // context of the target workspace. This will automatically update all
+          // the descendants of the target workspace as well.
           $this->workspaceAssociation->trackEntity($revision, $this->targetWorkspace);
 
           // Set the workspace in which the revision was merged.
@@ -48,6 +55,14 @@ class WorkspaceMerger implements WorkspaceMergerInterface {
           $revision->{$field_name}->target_id = $this->targetWorkspace->id();
           $revision->setSyncing(TRUE);
           $revision->save();
+          $counter++;
+
+          // Extend the execution time in order to allow processing workspaces
+          // that contain a large number of items.
+          if ((int) ($counter / $step_size) >= 1) {
+            set_time_limit($max_execution_time);
+            $counter = 0;
+          }
         }
       }
     }

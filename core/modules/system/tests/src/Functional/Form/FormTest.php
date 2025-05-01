@@ -20,14 +20,11 @@ use Behat\Mink\Element\NodeElement;
  * Tests various form element validation mechanisms.
  *
  * @group Form
- * @group #slow
  */
 class FormTest extends BrowserTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['filter', 'form_test', 'file', 'datetime'];
 
@@ -159,7 +156,8 @@ class FormTest extends BrowserTestBase {
         }
       }
     }
-    // Clear the expected form error messages so they don't appear as exceptions.
+    // Clear the expected form error messages so they don't appear as
+    // exceptions.
     \Drupal::messenger()->deleteAll();
   }
 
@@ -592,7 +590,7 @@ class FormTest extends BrowserTestBase {
    * @param string[] $order
    *   Expected order of its options.
    */
-  protected function validateSelectSorting($select, array $order) {
+  protected function validateSelectSorting($select, array $order): void {
     $option_map_function = function (NodeElement $node) {
       return ($node->getTagName() === 'optgroup') ?
         $node->getAttribute('label') : $node->getValue();
@@ -755,7 +753,8 @@ class FormTest extends BrowserTestBase {
     }
 
     // Submit the form with no input, as the browser does for disabled elements,
-    // and fetch the $form_state->getValues() that is passed to the submit handler.
+    // and fetch the $form_state->getValues() that is passed to the submit
+    // handler.
     $this->drupalGet('form-test/disabled-elements');
     $this->submitForm([], 'Submit');
     $returned_values['normal'] = Json::decode($this->getSession()->getPage()->getContent());

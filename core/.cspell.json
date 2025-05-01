@@ -24,7 +24,9 @@
       "modules/system/tests/logo.svgz",
       "node_modules/*",
       "profiles/demo_umami/modules/demo_umami_content/default_content/languages/es/**/*",
+      "tests/fixtures/config_install/*",
       "tests/fixtures/files/*",
+      "tests/fixtures/phpunit_*.xml",
       "tests/Drupal/Tests/Component/Annotation/Doctrine/**",
       "tests/PHPStan/vendor/**",
       "themes/olivero/fonts/**",
@@ -69,7 +71,8 @@
       "hte",
       "ist",
       "please",
-      "queuing"
+      "queuing",
+      "writeable"
     ],
     "overrides": [
       {

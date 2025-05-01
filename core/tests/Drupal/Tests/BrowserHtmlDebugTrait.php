@@ -73,7 +73,7 @@ trait BrowserHtmlDebugTrait {
    * @return string
    *   The formatted HTML string.
    */
-  protected function formatHtmlOutputHeaders(array $headers) {
+  protected function formatHtmlOutputHeaders(array $headers): string {
     $flattened_headers = array_map(function ($header) {
       if (is_array($header)) {
         return implode(';', array_map('trim', $header));
@@ -125,7 +125,8 @@ trait BrowserHtmlDebugTrait {
    * Creates the directory to store browser output.
    */
   protected function initBrowserOutputFile() {
-    $this->htmlOutputEnabled = HtmlOutputLogger::isEnabled();
+    $browserOutputFile = getenv('BROWSERTEST_OUTPUT_FILE');
+    $this->htmlOutputEnabled = $browserOutputFile !== FALSE;
     $this->htmlOutputBaseUrl = getenv('BROWSERTEST_OUTPUT_BASE_URL') ?: $GLOBALS['base_url'];
     if ($this->htmlOutputEnabled) {
       $this->htmlOutputClassName = str_replace("\\", "_", static::class);
