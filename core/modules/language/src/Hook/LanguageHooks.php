@@ -374,7 +374,9 @@ class LanguageHooks {
    */
   #[Hook('entity_view_display_presave')]
   public function entityViewDisplayPresave(EntityViewDisplayInterface $entityViewDisplay): void {
-    $this->languageConfigUpdater->updateEntityViewDisplay($entityViewDisplay);
+    if ($entityViewDisplay->isSyncing()) {
+      $this->languageConfigUpdater->updateEntityViewDisplay($entityViewDisplay);
+    }
   }
 
 }

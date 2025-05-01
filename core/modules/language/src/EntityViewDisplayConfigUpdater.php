@@ -44,9 +44,6 @@ class EntityViewDisplayConfigUpdater {
     if ($entityViewDisplay->getComponent('langcode') === NULL) {
       return FALSE;
     }
-    if ($entityViewDisplay->getComponent('langcode')['settings'] !== []) {
-      return FALSE;
-    }
     $langcode['label'] = 'above';
     // Set to show it as plain text.
     $langcode['settings'] = [
