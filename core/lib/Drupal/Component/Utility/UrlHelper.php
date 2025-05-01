@@ -212,12 +212,13 @@ class UrlHelper {
       if (isset($parts[1])) {
         parse_str($parts[1], $options['query']);
 
-        // Since parse_str() does not distinguish between '?key' and '?key=',
+        // parse_str() does not distinguish between '?key' and '?key=',
         // feeding the url '/?key' through ::parse() and ::buildQuery()
         // incorrectly appends a '=' to the end. Replacing empty string values
-        // with NULL should solve that problem.
+        // with NULL solves that problem.
         foreach ($options['query'] as $key => &$value) {
-          if ($value === '' && strpos($parts[1], $key . '=') === FALSE) {
+          $escaped_key = preg_quote($key, '/');
+          if ($value === '' && preg_match('/(^|&)' . $escaped_key . '=(&|$)/', $parts[1]) === 0) {
             $value = NULL;
           }
         }
