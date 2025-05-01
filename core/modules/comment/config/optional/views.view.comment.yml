@@ -1,6 +1,9 @@
 langcode: en
 status: true
 dependencies:
+  config:
+    - system.action.comment_delete_action
+    - system.action.comment_unpublish_action
   module:
     - comment
     - user
