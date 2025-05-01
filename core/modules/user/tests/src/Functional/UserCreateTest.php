@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\user\Functional;
 
 use Drupal\Core\Test\AssertMailTrait;
@@ -19,9 +21,7 @@ class UserCreateTest extends BrowserTestBase {
   }
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['image'];
 
@@ -33,7 +33,7 @@ class UserCreateTest extends BrowserTestBase {
   /**
    * Tests user creation and display from the administration interface.
    */
-  public function testUserAdd() {
+  public function testUserAdd(): void {
     $user = $this->drupalCreateUser(['administer users']);
     $this->drupalLogin($user);
 

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\comment\Functional\Views;
 
 use Drupal\comment\CommentInterface;
@@ -18,9 +20,7 @@ class DefaultViewRecentCommentsTest extends ViewTestBase {
   use CommentTestTrait;
 
   /**
-   * Modules to install.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['node', 'comment', 'block'];
 
@@ -116,7 +116,7 @@ class DefaultViewRecentCommentsTest extends ViewTestBase {
   /**
    * Tests the block defined by the comments_recent view.
    */
-  public function testBlockDisplay() {
+  public function testBlockDisplay(): void {
     $user = $this->drupalCreateUser(['access comments']);
     $this->drupalLogin($user);
 

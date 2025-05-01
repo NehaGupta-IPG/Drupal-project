@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\views\Functional;
 
 use Drupal\Tests\BrowserTestBase;
@@ -17,9 +19,7 @@ class BulkFormTest extends BrowserTestBase {
   use NodeCreationTrait;
 
   /**
-   * Modules to install.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['node', 'action_bulk_test'];
 
@@ -29,9 +29,26 @@ class BulkFormTest extends BrowserTestBase {
   protected $defaultTheme = 'stark';
 
   /**
+   * {@inheritdoc}
+   */
+  protected function setUp(): void {
+    parent::setUp();
+
+    // Log in as a user with 'administer nodes' permission to have access to the
+    // bulk operation.
+    $this->drupalCreateContentType(['type' => 'page']);
+    $admin_user = $this->drupalCreateUser([
+      'administer nodes',
+      'edit any page content',
+      'delete any page content',
+    ]);
+    $this->drupalLogin($admin_user);
+  }
+
+  /**
    * Tests the bulk form.
    */
-  public function testBulkForm() {
+  public function testBulkForm(): void {
     $node_storage = $this->container->get('entity_type.manager')->getStorage('node');
 
     // First, test an empty bulk form with the default style plugin to make sure
@@ -66,16 +83,6 @@ class BulkFormTest extends BrowserTestBase {
       $edit["node_bulk_form[$i]"] = TRUE;
     }
 
-    // Log in as a user with 'administer nodes' permission to have access to the
-    // bulk operation.
-    $this->drupalCreateContentType(['type' => 'page']);
-    $admin_user = $this->drupalCreateUser([
-      'administer nodes',
-      'edit any page content',
-      'delete any page content',
-    ]);
-    $this->drupalLogin($admin_user);
-
     $this->drupalGet('test_bulk_form');
 
     // Set all nodes to sticky and check that.
@@ -99,12 +106,10 @@ class BulkFormTest extends BrowserTestBase {
     $this->assertSession()->pageTextContains('Unpublish content was applied to 1 item.');
 
     // Load the node again.
-    $node_storage->resetCache([$node->id()]);
     $node = $node_storage->load($node->id());
     $this->assertFalse($node->isPublished(), 'A single node has been unpublished.');
 
     // The second node should still be published.
-    $node_storage->resetCache([$nodes[1]->id()]);
     $node = $node_storage->load($nodes[1]->id());
     $this->assertTrue($node->isPublished(), 'An unchecked node is still published.');
 
@@ -160,6 +165,11 @@ class BulkFormTest extends BrowserTestBase {
     $edit = [];
     for ($i = 0; $i < 5; $i++) {
       $edit["node_bulk_form[$i]"] = TRUE;
+
+      // $nodes[0] was unpublished above, so the bulk form displays only
+      // $nodes[1] - $nodes[9]. Remove deleted items from $nodes to prevent
+      // deleting them twice at the end of this test method.
+      unset($nodes[$i + 1]);
     }
     $edit += ['action' => 'node_delete_action'];
     $this->submitForm($edit, 'Apply to selected items');
@@ -183,6 +193,11 @@ class BulkFormTest extends BrowserTestBase {
       'action' => 'node_delete_action',
     ];
     $this->submitForm($edit, 'Apply to selected items');
+
+    // Remove deleted items from $nodes to prevent deleting them twice at the
+    // end of this test method.
+    unset($nodes[6]);
+
     // Make sure we just return to the bulk view with no warnings.
     $this->assertSession()->addressEquals('test_bulk_form');
     $this->assertSession()->elementNotExists('xpath', '//div[contains(@class, "messages--status")]');
@@ -199,6 +214,11 @@ class BulkFormTest extends BrowserTestBase {
       'action' => 'node_delete_action',
     ];
     $this->submitForm($edit, 'Apply to selected items');
+
+    // Remove deleted items from $nodes to prevent deleting them twice at the
+    // end of this test method.
+    unset($nodes[7], $nodes[8]);
+
     // Make sure we don't show an action message while we are still on the
     // confirmation page.
     $this->assertSession()->elementNotExists('xpath', '//div[contains(@class, "messages--status")]');
@@ -210,7 +230,7 @@ class BulkFormTest extends BrowserTestBase {
     // by another user before the loaded bulk form was submitted.
     $this->drupalGet('test_bulk_form');
     // Call the node delete action.
-    foreach ($nodes as $key => $node) {
+    foreach ($nodes as $node) {
       $node->delete();
     }
     $edit = [

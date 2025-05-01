@@ -63,9 +63,6 @@ class AttributeDiscoveryWithAnnotations extends AttributeClassDiscovery {
   public function getDefinitions() {
     // Clear the annotation loaders of any previous annotation classes.
     AnnotationRegistry::reset();
-    // Register the namespaces of classes that can be used for annotations.
-    // @phpstan-ignore-next-line
-    AnnotationRegistry::registerLoader('class_exists');
 
     $definitions = parent::getDefinitions();
 
@@ -78,6 +75,12 @@ class AttributeDiscoveryWithAnnotations extends AttributeClassDiscovery {
    * {@inheritdoc}
    */
   protected function parseClass(string $class, \SplFileInfo $fileinfo): array {
+    // Parse using attributes first.
+    $definition = parent::parseClass($class, $fileinfo);
+    if (isset($definition['id'])) {
+      return $definition;
+    }
+
     // The filename is already known, so there is no need to find the
     // file. However, StaticReflectionParser needs a finder, so use a
     // mock version.
@@ -93,13 +96,6 @@ class AttributeDiscoveryWithAnnotations extends AttributeClassDiscovery {
       return ['id' => $annotation->getId(), 'content' => $annotation->get()];
     }
 
-    // Annotations use static reflection and are able to analyze a class that
-    // extends classes or uses traits that do not exist. Attribute discovery
-    // will trigger a fatal error with such classes, so only call it if the
-    // class has a class attribute.
-    if ($reflection_class->hasClassAttribute($this->pluginDefinitionAttributeName)) {
-      return parent::parseClass($class, $fileinfo);
-    }
     return ['id' => NULL, 'content' => NULL];
   }
 
@@ -117,7 +113,7 @@ class AttributeDiscoveryWithAnnotations extends AttributeClassDiscovery {
    * @see \Drupal\Component\Annotation\Plugin\Discovery\AnnotatedClassDiscovery::prepareAnnotationDefinition()
    * @see \Drupal\Core\Plugin\Discovery\AnnotatedClassDiscovery::prepareAnnotationDefinition()
    */
-  private function prepareAnnotationDefinition(AnnotationInterface $annotation, string $class): void {
+  protected function prepareAnnotationDefinition(AnnotationInterface $annotation, string $class): void {
     $annotation->setClass($class);
     if (!$annotation->getProvider()) {
       $annotation->setProvider($this->getProviderFromNamespace($class));
@@ -136,7 +132,7 @@ class AttributeDiscoveryWithAnnotations extends AttributeClassDiscovery {
    * @see \Drupal\Component\Annotation\Plugin\Discovery\AnnotatedClassDiscovery::getAnnotationReader()
    * @see \Drupal\Core\Plugin\Discovery\AnnotatedClassDiscovery::getAnnotationReader()
    */
-  private function getAnnotationReader() : SimpleAnnotationReader {
+  protected function getAnnotationReader() : SimpleAnnotationReader {
     if (!isset($this->annotationReader)) {
       $this->annotationReader = new SimpleAnnotationReader();
 

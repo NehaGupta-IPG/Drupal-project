@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\node\Functional\Views\Wizard;
 
 use Drupal\Tests\views\Functional\Wizard\WizardTestBase;
@@ -21,7 +23,7 @@ class NodeRevisionWizardTest extends WizardTestBase {
   /**
    * Tests creating a node revision view.
    */
-  public function testViewAdd() {
+  public function testViewAdd(): void {
     $this->drupalCreateContentType(['type' => 'article']);
     // Create two nodes with two revision.
     $node_storage = \Drupal::entityTypeManager()->getStorage('node');

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\views\Functional\Plugin;
 
 use Drupal\Tests\views\Functional\ViewTestBase;
@@ -21,9 +23,7 @@ class MiniPagerTest extends ViewTestBase {
   public static $testViews = ['test_mini_pager'];
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['node'];
 
@@ -55,7 +55,7 @@ class MiniPagerTest extends ViewTestBase {
   /**
    * Tests the rendering of mini pagers.
    */
-  public function testMiniPagerRender() {
+  public function testMiniPagerRender(): void {
     // On first page, current page and next page link appear, previous page link
     // does not.
     $this->drupalGet('test_mini_pager');
@@ -149,7 +149,7 @@ class MiniPagerTest extends ViewTestBase {
   /**
    * Tests changing the heading level.
    */
-  public function testPagerHeadingLevel() {
+  public function testPagerHeadingLevel(): void {
     // Set "Pager Heading" to h3 and check that it is correct.
     $view = Views::getView('test_mini_pager');
     $view->setDisplay();
@@ -163,8 +163,7 @@ class MiniPagerTest extends ViewTestBase {
     $view->display_handler->setOption('pager', $pager);
     $view->save();
 
-    // Stark is handled below.
-    // Stable9 will be addressed in https://www.drupal.org/project/drupal/issues/3333418
+    // Stark and Stable9 are handled below.
     $themes = ['olivero', 'claro', 'starterkit_theme'];
     $this->container->get('theme_installer')->install($themes);
 
@@ -174,11 +173,15 @@ class MiniPagerTest extends ViewTestBase {
       $this->assertEquals('h3', $this->assertSession()->elementExists('css', ".pager .visually-hidden")->getTagName());
     }
 
-    // The core views template uses a different class structure than core themes.
-    $this->container->get('theme_installer')->install(['stark']);
-    $this->config('system.theme')->set('default', 'stark')->save();
-    $this->drupalGet('test_mini_pager');
-    $this->assertEquals('h3', $this->assertSession()->elementExists('css', "#pagination-heading")->getTagName());
+    // The core views template and Stable9 use a different class structure than
+    // other core themes.
+    $themes = ['stark', 'stable9'];
+    $this->container->get('theme_installer')->install($themes);
+    foreach ($themes as $theme) {
+      $this->config('system.theme')->set('default', $theme)->save();
+      $this->drupalGet('test_mini_pager');
+      $this->assertEquals('h3', $this->assertSession()->elementExists('css', "#pagination-heading")->getTagName());
+    }
   }
 
 }

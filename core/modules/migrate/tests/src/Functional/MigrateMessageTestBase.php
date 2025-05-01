@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\migrate\Functional;
 
 use Drupal\Tests\BrowserTestBase;
@@ -37,6 +39,8 @@ class MigrateMessageTestBase extends BrowserTestBase {
 
   /**
    * Migration IDs.
+   *
+   * @var string[]
    */
   protected $migrationIds = ['custom_test'];
 

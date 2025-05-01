@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\field\Kernel\Entity;
 
 use Drupal\field\Entity\FieldStorageConfig;
@@ -9,7 +11,6 @@ use Drupal\KernelTests\Core\Config\ConfigEntityValidationTestBase;
  * Tests validation of field_storage_config entities.
  *
  * @group field
- * @group #slow
  */
 class FieldStorageConfigValidationTest extends ConfigEntityValidationTestBase {
 

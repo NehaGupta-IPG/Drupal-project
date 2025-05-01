@@ -1,8 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\block\Kernel\Migrate\d6;
 
 use Drupal\Tests\migrate_drupal\Kernel\d6\MigrateDrupal6TestBase;
+use Drupal\block\Hook\BlockHooks;
 
 /**
  * Tests migration of i18n block translations.
@@ -15,7 +18,6 @@ class MigrateBlockContentTranslationTest extends MigrateDrupal6TestBase {
    * {@inheritdoc}
    */
   protected static $modules = [
-    'book',
     'block',
     'comment',
     'views',
@@ -48,13 +50,14 @@ class MigrateBlockContentTranslationTest extends MigrateDrupal6TestBase {
       'd6_block',
       'd6_block_translation',
     ]);
-    block_rebuild();
+    $blockRebuild = new BlockHooks();
+    $blockRebuild->rebuild();
   }
 
   /**
    * Tests the migration of block title translation.
    */
-  public function testBlockContentTranslation() {
+  public function testBlockContentTranslation(): void {
     /** @var \Drupal\language\ConfigurableLanguageManagerInterface $language_manager */
     $language_manager = $this->container->get('language_manager');
 

@@ -15,7 +15,7 @@ use Drupal\views\Plugin\views\PluginBase;
  * and setting up the pager.
  *
  * Pager plugins extend \Drupal\views\Plugin\views\pager\PagerPluginBase. They
- * must be annotated with \Drupal\views\Annotation\ViewsPager annotation,
+ * must be attributed with \Drupal\views\Annotation\ViewsPager attribute,
  * and they must be in namespace directory Plugin\views\pager.
  *
  * @ingroup views_plugins
@@ -27,8 +27,16 @@ use Drupal\views\Plugin\views\PluginBase;
  */
 abstract class PagerPluginBase extends PluginBase {
 
+  /**
+   * The current page.
+   */
+  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
   public $current_page = NULL;
 
+  /**
+   * The total number of lines.
+   */
+  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
   public $total_items = 0;
 
   /**
@@ -113,7 +121,7 @@ abstract class PagerPluginBase extends PluginBase {
   /**
    * Set the current page.
    *
-   * @param $number
+   * @param mixed $number
    *   If provided, the page number will be set to this. If NOT provided,
    *   the page number will be set from the global page array.
    */
@@ -228,7 +236,7 @@ abstract class PagerPluginBase extends PluginBase {
    *
    * Called during the view render process.
    *
-   * @param $input
+   * @param array $input
    *   Any extra GET parameters that should be retained, such as exposed
    *   input.
    */
@@ -244,20 +252,38 @@ abstract class PagerPluginBase extends PluginBase {
       && $this->total_items > (intval($this->current_page) + 1) * $this->getItemsPerPage();
   }
 
+  /**
+   * Allows the exposed form to be altered.
+   */
   public function exposedFormAlter(&$form, FormStateInterface $form_state) {}
 
+  /**
+   * Allows the exposed form to be validated.
+   */
   public function exposedFormValidate(&$form, FormStateInterface $form_state) {}
 
+  /**
+   * Handles submission of the exposed form.
+   */
   public function exposedFormSubmit(&$form, FormStateInterface $form_state, &$exclude) {}
 
+  /**
+   * Indicates whether this pager uses exposed filters.
+   */
   public function usesExposed() {
     return FALSE;
   }
 
+  /**
+   * Returns whether the items per page is exposed.
+   */
   protected function itemsPerPageExposed() {
     return FALSE;
   }
 
+  /**
+   * Returns whether the offset is exposed.
+   */
   protected function isOffsetExposed() {
     return FALSE;
   }

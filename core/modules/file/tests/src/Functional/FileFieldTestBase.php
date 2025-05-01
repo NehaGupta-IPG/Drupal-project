@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\file\Functional;
 
 use Drupal\Component\Render\FormattableMarkup;
@@ -102,7 +104,7 @@ abstract class FileFieldTestBase extends BrowserTestBase {
    *   The File to be uploaded.
    * @param string $field_name
    *   The name of the field on which the files should be saved.
-   * @param $nid_or_type
+   * @param int|string $nid_or_type
    *   A numeric node id to upload files to an existing node, or a string
    *   indicating the desired bundle for a new node.
    * @param bool $new_revision
@@ -124,7 +126,7 @@ abstract class FileFieldTestBase extends BrowserTestBase {
    *   The files to be uploaded.
    * @param string $field_name
    *   The name of the field on which the files should be saved.
-   * @param $nid_or_type
+   * @param int|string $nid_or_type
    *   A numeric node id to upload files to an existing node, or a string
    *   indicating the desired bundle for a new node.
    * @param bool $new_revision
@@ -144,7 +146,6 @@ abstract class FileFieldTestBase extends BrowserTestBase {
     $node_storage = $this->container->get('entity_type.manager')->getStorage('node');
     if (is_numeric($nid_or_type)) {
       $nid = $nid_or_type;
-      $node_storage->resetCache([$nid]);
       $node = $node_storage->load($nid);
     }
     else {
@@ -155,7 +156,6 @@ abstract class FileFieldTestBase extends BrowserTestBase {
       // Save at least one revision to better simulate a real site.
       $node->setNewRevision();
       $node->save();
-      $node_storage->resetCache([$nid]);
       $node = $node_storage->load($nid);
       $this->assertNotEquals($nid, $node->getRevisionId(), 'Node revision exists.');
     }

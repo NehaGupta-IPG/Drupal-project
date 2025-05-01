@@ -2,6 +2,7 @@
 
 namespace Drupal\migrate\Plugin\migrate\process;
 
+use Drupal\migrate\Attribute\MigrateProcess;
 use Drupal\migrate\MigrateException;
 use Drupal\migrate\MigrateSkipRowException;
 use Drupal\migrate\ProcessPluginBase;
@@ -166,12 +167,11 @@ use Drupal\migrate\Row;
  * @see \Drupal\migrate\Plugin\migrate\process\MigrationLookup
  * @see \Drupal\migrate\Plugin\migrate\process\StaticMap
  * @see \Drupal\migrate\Plugin\MigrateProcessInterface
- *
- * @MigrateProcessPlugin(
- *   id = "sub_process",
- *   handle_multiples = TRUE
- * )
  */
+#[MigrateProcess(
+  id: "sub_process",
+  handle_multiples: TRUE,
+)]
 class SubProcess extends ProcessPluginBase {
 
   /**
@@ -180,7 +180,7 @@ class SubProcess extends ProcessPluginBase {
    * @param array $configuration
    *   A configuration array containing information about the plugin instance.
    * @param string $plugin_id
-   *   The plugin_id for the plugin instance.
+   *   The plugin ID for the plugin instance.
    * @param mixed $plugin_definition
    *   The plugin implementation definition.
    */
@@ -203,7 +203,7 @@ class SubProcess extends ProcessPluginBase {
       $source[$key] = $row->getSource();
     }
 
-    if (is_array($value) || $value instanceof \Traversable) {
+    if (is_iterable($value)) {
       foreach ($value as $key => $new_value) {
         if (!is_array($new_value)) {
           throw new MigrateException(sprintf("Input array should hold elements of type array, instead element was of type '%s'", gettype($new_value)));
@@ -212,7 +212,7 @@ class SubProcess extends ProcessPluginBase {
         try {
           $migrate_executable->processRow($new_row, $this->configuration['process']);
         }
-        catch (MigrateSkipRowException $e) {
+        catch (MigrateSkipRowException) {
           continue;
         }
         $destination = $new_row->getDestination();

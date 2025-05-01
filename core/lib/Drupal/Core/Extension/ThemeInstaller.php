@@ -102,8 +102,10 @@ class ThemeInstaller implements ThemeInstallerInterface {
    *   The module extension list.
    * @param \Drupal\Core\Theme\Registry|null $themeRegistry
    *   The theme registry.
+   * @param \Drupal\Core\Extension\ThemeExtensionList|null $themeExtensionList
+   *   The theme extension list.
    */
-  public function __construct(ThemeHandlerInterface $theme_handler, ConfigFactoryInterface $config_factory, ConfigInstallerInterface $config_installer, ModuleHandlerInterface $module_handler, ConfigManagerInterface $config_manager, AssetCollectionOptimizerInterface $css_collection_optimizer, RouteBuilderInterface $route_builder, LoggerInterface $logger, StateInterface $state, ModuleExtensionList $module_extension_list, protected ?Registry $themeRegistry = NULL) {
+  public function __construct(ThemeHandlerInterface $theme_handler, ConfigFactoryInterface $config_factory, ConfigInstallerInterface $config_installer, ModuleHandlerInterface $module_handler, ConfigManagerInterface $config_manager, AssetCollectionOptimizerInterface $css_collection_optimizer, RouteBuilderInterface $route_builder, LoggerInterface $logger, StateInterface $state, ModuleExtensionList $module_extension_list, protected Registry $themeRegistry, protected ThemeExtensionList $themeExtensionList) {
     $this->themeHandler = $theme_handler;
     $this->configFactory = $config_factory;
     $this->configInstaller = $config_installer;
@@ -114,10 +116,6 @@ class ThemeInstaller implements ThemeInstallerInterface {
     $this->logger = $logger;
     $this->state = $state;
     $this->moduleExtensionList = $module_extension_list;
-    if ($this->themeRegistry === NULL) {
-      @trigger_error('Calling ' . __METHOD__ . '() without the $themeRegistry argument is deprecated in drupal:10.1.0 and will be required in drupal:11.0.0. See https://www.drupal.org/node/3350906', E_USER_DEPRECATED);
-      $this->themeRegistry = \Drupal::service('theme.registry');
-    }
   }
 
   /**
@@ -126,7 +124,7 @@ class ThemeInstaller implements ThemeInstallerInterface {
   public function install(array $theme_list, $install_dependencies = TRUE) {
     $extension_config = $this->configFactory->getEditable('core.extension');
 
-    $theme_data = $this->themeHandler->rebuildThemeData();
+    $theme_data = $this->themeExtensionList->reset()->getList();
     $installed_themes = $extension_config->get('theme') ?: [];
     $installed_modules = $extension_config->get('module') ?: [];
 

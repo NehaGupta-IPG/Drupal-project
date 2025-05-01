@@ -8,22 +8,23 @@ use Drupal\Core\Entity\EntityTypeBundleInfoInterface;
 use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Menu\MenuParentFormSelectorInterface;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\views\Attribute\ViewsWizard;
 use Drupal\views\Plugin\views\wizard\WizardPluginBase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
- * @todo: replace numbers with constants.
+ * @todo Replace numbers with constants.
  */
 
 /**
  * Tests creating node views with the wizard.
- *
- * @ViewsWizard(
- *   id = "node",
- *   base_table = "node_field_data",
- *   title = @Translation("Content")
- * )
  */
+#[ViewsWizard(
+  id: 'node',
+  base_table: 'node_field_data',
+  title: new TranslatableMarkup('Content')
+)]
 class Node extends WizardPluginBase {
 
   /**
@@ -276,17 +277,13 @@ class Node extends WizardPluginBase {
     $tag_fields = [];
     foreach ($bundles as $bundle) {
       $display = $this->entityDisplayRepository->getFormDisplay($this->entityTypeId, $bundle);
-      $taxonomy_fields = array_filter($this->entityFieldManager->getFieldDefinitions($this->entityTypeId, $bundle), function (FieldDefinitionInterface $field_definition) {
-        return $field_definition->getType() == 'entity_reference' && $field_definition->getSetting('target_type') == 'taxonomy_term';
-      });
-      foreach ($taxonomy_fields as $field_name => $field) {
-        $widget = $display->getComponent($field_name);
-        // We define "tag-like" taxonomy fields as ones that use the
-        // "Autocomplete (Tags style)" widget.
-        if (!empty($widget) && $widget['type'] == 'entity_reference_autocomplete_tags') {
-          $tag_fields[$field_name] = $field;
+      $tag_fields += array_filter($this->entityFieldManager->getFieldDefinitions($this->entityTypeId, $bundle), function (FieldDefinitionInterface $field_definition) use ($display) {
+        if ($field_definition->getType() == 'entity_reference' && $field_definition->getSetting('target_type') == 'taxonomy_term') {
+          $widget = $display->getComponent($field_definition->getName());
+          return isset($widget['type']) && $widget['type'] == 'entity_reference_autocomplete_tags';
         }
-      }
+        return FALSE;
+      });
     }
     if (!empty($tag_fields)) {
       // If there is more than one "tag-like" taxonomy field available to

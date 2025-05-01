@@ -38,7 +38,7 @@ class ReverseProxyMiddlewareTest extends UnitTestCase {
   /**
    * Tests that subscriber does not act when reverse proxy is not set.
    */
-  public function testNoProxy() {
+  public function testNoProxy(): void {
     $settings = new Settings([]);
     $this->assertEquals(0, $settings->get('reverse_proxy'));
 
@@ -59,7 +59,7 @@ class ReverseProxyMiddlewareTest extends UnitTestCase {
    *
    * @dataProvider reverseProxyEnabledProvider
    */
-  public function testReverseProxyEnabled($provided_settings, $expected_trusted_header_set) {
+  public function testReverseProxyEnabled($provided_settings, $expected_trusted_header_set): void {
     // Enable reverse proxy and add test values.
     $settings = new Settings(['reverse_proxy' => 1] + $provided_settings);
     $this->trustedHeadersAreSet($settings, $expected_trusted_header_set);
@@ -103,7 +103,7 @@ class ReverseProxyMiddlewareTest extends UnitTestCase {
    *   The expected bit value returned by
    *   \Symfony\Component\HttpFoundation\Request::getTrustedHeaderSet()
    */
-  protected function trustedHeadersAreSet(Settings $settings, $expected_trusted_header_set) {
+  protected function trustedHeadersAreSet(Settings $settings, $expected_trusted_header_set): void {
     $middleware = new ReverseProxyMiddleware($this->mockHttpKernel, $settings);
     $request = new Request();
 

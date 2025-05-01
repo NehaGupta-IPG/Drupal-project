@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\media\Functional;
 
 use Drupal\Tests\BrowserTestBase;
@@ -32,7 +34,7 @@ class MediaInstallTest extends BrowserTestBase {
   /**
    * Tests reinstalling after being uninstalled.
    */
-  public function testReinstallAfterUninstall() {
+  public function testReinstallAfterUninstall(): void {
     $page = $this->getSession()->getPage();
     $assert_session = $this->assertSession();
 

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\node\Functional\Views;
 
 /**
@@ -24,7 +26,7 @@ class NodeIntegrationTest extends NodeTestBase {
   /**
    * Tests basic node view with a node type argument.
    */
-  public function testNodeViewTypeArgument() {
+  public function testNodeViewTypeArgument(): void {
     // Create two content types with three nodes each.
     $types = [];
     $all_nids = [];

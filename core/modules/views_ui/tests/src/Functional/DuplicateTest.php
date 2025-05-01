@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\views_ui\Functional;
 
 use Drupal\language\Entity\ConfigurableLanguage;
@@ -33,7 +35,7 @@ class DuplicateTest extends UITestBase {
   /**
    * Checks if duplicated view exists and has correct label.
    */
-  public function testDuplicateView() {
+  public function testDuplicateView(): void {
     $language_manager = $this->container->get('language_manager');
     ConfigurableLanguage::createFromLangcode('nl')->save();
 

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\views_ui\Functional;
 
 use Drupal\Component\Utility\Unicode;
@@ -23,7 +25,7 @@ class WizardTest extends WizardTestBase {
   /**
    * Tests filling in the wizard with really long strings.
    */
-  public function testWizardFieldLength() {
+  public function testWizardFieldLength(): void {
     $view = [];
     $view['label'] = $this->randomMachineName(256);
     $view['id'] = $this->randomMachineName(129);

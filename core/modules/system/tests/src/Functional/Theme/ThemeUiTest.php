@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\system\Functional\Theme;
 
 use Drupal\Tests\BrowserTestBase;
@@ -45,7 +47,7 @@ class ThemeUiTest extends BrowserTestBase {
   /**
    * Tests permissions for enabling themes depending on disabled modules.
    */
-  public function testModulePermissions() {
+  public function testModulePermissions(): void {
     // Log in as a user without permission to enable modules.
     $this->drupalLogin($this->drupalCreateUser([
       'administer themes',
@@ -74,9 +76,9 @@ class ThemeUiTest extends BrowserTestBase {
    * @param string $theme_name
    *   The name of the theme being tested.
    * @param string[] $first_modules
-   *   Machine names of first modules to enable.
+   *   Machine names of first modules to install.
    * @param string[] $second_modules
-   *   Machine names of second modules to enable.
+   *   Machine names of second modules to install.
    * @param string[] $required_by_messages
    *   Expected messages when attempting to uninstall $module_names.
    * @param string $base_theme_to_uninstall
@@ -86,7 +88,7 @@ class ThemeUiTest extends BrowserTestBase {
    *
    * @dataProvider providerTestThemeInstallWithModuleDependencies
    */
-  public function testThemeInstallWithModuleDependencies($theme_name, array $first_modules, array $second_modules, array $required_by_messages, $base_theme_to_uninstall, array $base_theme_module_names) {
+  public function testThemeInstallWithModuleDependencies($theme_name, array $first_modules, array $second_modules, array $required_by_messages, $base_theme_to_uninstall, array $base_theme_module_names): void {
     $assert_session = $this->assertSession();
     $page = $this->getSession()->getPage();
     $all_dependent_modules = array_merge($first_modules, $second_modules);
@@ -169,7 +171,7 @@ class ThemeUiTest extends BrowserTestBase {
    * @param string[] $module_names
    *   An array of module machine names.
    */
-  protected function uninstallModules(array $module_names) {
+  protected function uninstallModules(array $module_names): void {
     $assert_session = $this->assertSession();
     $this->drupalGet('admin/modules/uninstall');
     foreach ($module_names as $attribute) {
@@ -198,7 +200,7 @@ class ThemeUiTest extends BrowserTestBase {
    * @param string $theme_name
    *   The theme name.
    */
-  protected function uninstallTheme($theme_name) {
+  protected function uninstallTheme($theme_name): void {
     $this->drupalGet('admin/appearance');
     $this->clickLink("Uninstall $theme_name theme");
     $this->assertSession()->pageTextContains("The $theme_name theme has been uninstalled.");
@@ -295,7 +297,7 @@ class ThemeUiTest extends BrowserTestBase {
     $requires_list_items = $theme_container->findAll('css', '.theme-info__requires li');
     $this->assertSameSize($expected_requires_list_items, $requires_list_items);
 
-    foreach ($requires_list_items as $key => $item) {
+    foreach ($requires_list_items as $item) {
       $this->assertContains($item->getText(), $expected_requires_list_items);
     }
 
@@ -308,7 +310,7 @@ class ThemeUiTest extends BrowserTestBase {
   /**
    * Tests installing a theme with missing module dependencies.
    */
-  public function testInstallModuleWithMissingDependencies() {
+  public function testInstallModuleWithMissingDependencies(): void {
     $this->drupalGet('admin/appearance');
     $theme_container = $this->getSession()->getPage()->find('css', 'h3:contains("Test Theme Depending on Nonexisting Module")')->getParent();
     $this->assertStringContainsString('Requires: test_module_non_existing (missing)', $theme_container->getText());
@@ -318,7 +320,7 @@ class ThemeUiTest extends BrowserTestBase {
   /**
    * Tests installing a theme with incompatible module dependencies.
    */
-  public function testInstallModuleWithIncompatibleDependencies() {
+  public function testInstallModuleWithIncompatibleDependencies(): void {
     $this->container->get('module_installer')->install(['test_module_compatible_constraint', 'test_module_incompatible_constraint']);
     $this->drupalGet('admin/appearance');
     $theme_container = $this->getSession()->getPage()->find('css', 'h3:contains("Test Theme Depending on Version Constrained Modules")')->getParent();
@@ -329,7 +331,7 @@ class ThemeUiTest extends BrowserTestBase {
   /**
    * Tests that incompatible themes message is shown.
    */
-  public function testInstalledIncompatibleTheme() {
+  public function testInstalledIncompatibleTheme(): void {
     $page = $this->getSession()->getPage();
     $assert_session = $this->assertSession();
     $incompatible_themes_message = 'There are errors with some installed themes. Visit the status report page for more information.';

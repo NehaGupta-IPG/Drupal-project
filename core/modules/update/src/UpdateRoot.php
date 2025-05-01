@@ -61,6 +61,7 @@ class UpdateRoot {
    * specific subdirectories of this root path.
    *
    * @return string
+   *   The root path for project installation or update.
    */
   public function __toString(): string {
     // Return the $updateRoot when it is set.
@@ -78,7 +79,7 @@ class UpdateRoot {
     // the Update Manager to be tested) and also ensures that new project files
     // added there won't be visible to the parent site and will be properly
     // cleaned up once the test finishes running. This is done here (rather
-    // than having the tests enable a module which overrides the update root
+    // than having the tests install a module which overrides the update root
     // factory service) to ensure that the parent site is automatically kept
     // clean without relying on test authors to take any explicit steps. See
     // also \Drupal\update\Tests\Functional\UpdateTestBase::setUp().

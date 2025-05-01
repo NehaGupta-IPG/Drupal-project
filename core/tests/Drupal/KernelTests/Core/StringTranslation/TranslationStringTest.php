@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\KernelTests\Core\StringTranslation;
 
 use Drupal\Core\Site\Settings;
@@ -14,9 +16,7 @@ use Drupal\language\Entity\ConfigurableLanguage;
 class TranslationStringTest extends KernelTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = [
     'language',
@@ -33,7 +33,7 @@ class TranslationStringTest extends KernelTestBase {
   /**
    * Tests that TranslatableMarkup objects can be compared.
    */
-  public function testComparison() {
+  public function testComparison(): void {
     $this->rebootAndPrepareSettings();
     $a = \Drupal::service('string_translation')->translate('Example @number', ['@number' => 42], ['langcode' => 'de']);
 
@@ -54,7 +54,7 @@ class TranslationStringTest extends KernelTestBase {
   /**
    * Reboots the kernel to set custom translations in Settings.
    */
-  protected function rebootAndPrepareSettings() {
+  protected function rebootAndPrepareSettings(): void {
     // Reboot the container so that different services are injected and the new
     // settings are picked.
     $kernel = $this->container->get('kernel');

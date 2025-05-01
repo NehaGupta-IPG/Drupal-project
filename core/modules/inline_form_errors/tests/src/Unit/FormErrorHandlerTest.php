@@ -119,7 +119,7 @@ class FormErrorHandlerTest extends UnitTestCase {
    * @covers ::displayErrorMessages
    * @covers ::setElementErrorsFromFormState
    */
-  public function testErrorMessagesInline() {
+  public function testErrorMessagesInline(): void {
     $messages = [
       'no title given',
       'element is invisible',
@@ -137,7 +137,7 @@ class FormErrorHandlerTest extends UnitTestCase {
       );
 
     $this->renderer->expects($this->once())
-      ->method('renderPlain')
+      ->method('renderInIsolation')
       ->willReturnCallback(function ($render_array) {
         $links = [];
         foreach ($render_array[1]['#items'] as $item) {
@@ -169,7 +169,7 @@ class FormErrorHandlerTest extends UnitTestCase {
   /**
    * Tests that opting out of Inline Form Errors works.
    */
-  public function testErrorMessagesNotInline() {
+  public function testErrorMessagesNotInline(): void {
     // Asserts all messages are summarized.
     $messages = [
       'invalid',
@@ -192,7 +192,7 @@ class FormErrorHandlerTest extends UnitTestCase {
       );
 
     $this->renderer->expects($this->never())
-      ->method('renderPlain');
+      ->method('renderInIsolation');
 
     $this->testForm['#disable_inline_form_errors'] = TRUE;
 

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\media_library\Functional;
 
 use Drupal\Core\Entity\Entity\EntityFormDisplay;
@@ -53,7 +55,7 @@ class MediaLibraryDisplayModeTest extends BrowserTestBase {
   /**
    * Tests that the Media Library can automatically configure display modes.
    */
-  public function testDisplayModes() {
+  public function testDisplayModes(): void {
     $this->createMediaType('file', [
       'id' => 'type_one',
     ]);

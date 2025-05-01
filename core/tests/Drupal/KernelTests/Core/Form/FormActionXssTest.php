@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\KernelTests\Core\Form;
 
 use Drupal\Core\Form\FormInterface;
@@ -70,7 +72,7 @@ class FormActionXssTest extends KernelTestBase implements FormInterface {
   /**
    * Tests form action attribute for XSS.
    */
-  public function testFormActionXss() {
+  public function testFormActionXss(): void {
     // Create a new request with a uri which attempts XSS.
     $request_stack = \Drupal::service('request_stack');
     /** @var \Symfony\Component\HttpFoundation\RequestStack $original_request */

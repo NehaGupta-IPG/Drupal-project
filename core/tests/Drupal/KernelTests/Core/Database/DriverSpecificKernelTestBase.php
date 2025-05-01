@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\KernelTests\Core\Database;
 
 use Drupal\Core\Database\Connection;
@@ -29,6 +31,7 @@ abstract class DriverSpecificKernelTestBase extends KernelTestBase {
     // is not the one the test requires, skip before test database
     // initialization so to save cycles.
     $this->root = static::getDrupalRoot();
+    chdir($this->root);
     $connectionInfo = $this->getDatabaseConnectionInfo();
     $test_class_parts = explode('\\', get_class($this));
     $expected_provider = $test_class_parts[2] ?? '';

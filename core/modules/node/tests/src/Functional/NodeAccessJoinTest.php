@@ -1,10 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\node\Functional;
 
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\node\Entity\NodeType;
+use Drupal\Tests\node\Traits\NodeAccessTrait;
 use Drupal\user\UserInterface;
 use Drupal\views\Tests\ViewTestData;
 
@@ -14,6 +17,8 @@ use Drupal\views\Tests\ViewTestData;
  * @group views
  */
 class NodeAccessJoinTest extends NodeTestBase {
+
+  use NodeAccessTrait;
 
   /**
    * {@inheritdoc}
@@ -73,7 +78,7 @@ class NodeAccessJoinTest extends NodeTestBase {
   protected function setUp(): void {
     parent::setUp();
 
-    node_access_test_add_field(NodeType::load('article'));
+    $this->addPrivateField(NodeType::load('article'));
 
     $field_storage = FieldStorageConfig::create([
       'field_name' => 'related_article',

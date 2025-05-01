@@ -6,7 +6,7 @@ use Drupal\Component\Datetime\TimeInterface;
 use Drupal\Core\Batch\BatchBuilder;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Extension\Exception\UnknownExtensionException;
-use Drupal\Core\Extension\ModuleHandlerInterface;
+use Drupal\Core\Extension\ModuleExtensionList;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\State\StateInterface;
 use Drupal\Core\TempStore\PrivateTempStoreFactory;
@@ -49,13 +49,6 @@ class ReviewForm extends MigrateUpgradeFormBase {
   protected $migrationState;
 
   /**
-   * Module handler.
-   *
-   * @var \Drupal\Core\Extension\ModuleHandlerInterface
-   */
-  protected $moduleHandler;
-
-  /**
    * Source system data set in buildForm().
    *
    * @var array
@@ -75,9 +68,9 @@ class ReviewForm extends MigrateUpgradeFormBase {
    *   Migration state service.
    * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
    *   The config factory service.
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
-   *   The module handler service.
-   * @param \Drupal\Component\Datetime\TimeInterface|null $time
+   * @param \Drupal\Core\Extension\ModuleExtensionList $moduleExtensionList
+   *   The module extension list.
+   * @param \Drupal\Component\Datetime\TimeInterface $time
    *   The time service.
    */
   public function __construct(
@@ -86,16 +79,11 @@ class ReviewForm extends MigrateUpgradeFormBase {
     PrivateTempStoreFactory $tempstore_private,
     MigrationState $migrationState,
     ConfigFactoryInterface $config_factory,
-    ModuleHandlerInterface $module_handler,
-    protected ?TimeInterface $time = NULL,
+    protected ModuleExtensionList $moduleExtensionList,
+    protected TimeInterface $time,
   ) {
     parent::__construct($config_factory, $migration_plugin_manager, $state, $tempstore_private);
     $this->migrationState = $migrationState;
-    $this->moduleHandler = $module_handler;
-    if ($this->time === NULL) {
-      @trigger_error('Calling ' . __METHOD__ . ' without the $time argument is deprecated in drupal:10.3.0 and it will be required in drupal:11.0.0. See https://www.drupal.org/node/3112298', E_USER_DEPRECATED);
-      $this->time = \Drupal::service('datetime.time');
-    }
   }
 
   /**
@@ -108,7 +96,7 @@ class ReviewForm extends MigrateUpgradeFormBase {
       $container->get('tempstore.private'),
       $container->get('migrate_drupal.migration_state'),
       $container->get('config.factory'),
-      $container->get('module_handler'),
+      $container->get('extension.list.module'),
       $container->get('datetime.time'),
     );
   }
@@ -150,7 +138,7 @@ class ReviewForm extends MigrateUpgradeFormBase {
       '#open' => TRUE,
       '#title' => $this->t('Modules that will not be upgraded'),
       '#summary_attributes' => ['id' => ['error']],
-      '#description' => $this->t("The new site is missing modules corresponding to the old site's modules. Unless they are installed prior to the upgrade, configuration and/or content needed by them will not be available on your new site. <a href=':review'>Read the checklist</a> to help decide what to do.", [':review' => 'https://www.drupal.org/docs/8/upgrade/upgrade-using-web-browser#pre-upgrade-analysis']),
+      '#description' => $this->t('The new site is missing modules corresponding to the old site\'s modules. Unless they are installed prior to the upgrade, configuration and/or content needed by them will not be available on your new site. <a href=":review">Read the checklist</a> to help decide what to do.', [':review' => 'https://www.drupal.org/docs/upgrading-drupal/upgrading-from-drupal-6-or-drupal-7/upgrade-using-web-browser#pre-upgrade-analysis']),
       '#weight' => 2,
     ];
     $missing_module_list['module_list'] = [
@@ -311,9 +299,9 @@ class ReviewForm extends MigrateUpgradeFormBase {
           }
           else {
             try {
-              $destination_module_names[] = $this->moduleHandler->getName($destination_module);
+              $destination_module_names[] = $this->moduleExtensionList->getName($destination_module);
             }
-            catch (UnknownExtensionException $e) {
+            catch (UnknownExtensionException) {
               $destination_module_names[] = $destination_module;
             }
           }

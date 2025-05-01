@@ -35,7 +35,7 @@ class UserLocalTasksTest extends LocalTaskIntegrationTestBase {
    *
    * @dataProvider getUserAdminRoutes
    */
-  public function testUserAdminLocalTasks($route, $expected) {
+  public function testUserAdminLocalTasks($route, $expected): void {
     $this->assertLocalTasks($route, $expected);
   }
 
@@ -44,9 +44,39 @@ class UserLocalTasksTest extends LocalTaskIntegrationTestBase {
    */
   public static function getUserAdminRoutes() {
     return [
-      ['entity.user.collection', [['entity.user.collection', 'user.admin_permissions', 'entity.user_role.collection', 'user.role.settings']]],
-      ['user.admin_permissions', [['entity.user.collection', 'user.admin_permissions', 'entity.user_role.collection', 'user.role.settings']]],
-      ['entity.user_role.collection', [['entity.user.collection', 'user.admin_permissions', 'entity.user_role.collection', 'user.role.settings']]],
+      [
+        'entity.user.collection',
+        [
+          [
+            'entity.user.collection',
+            'user.admin_permissions',
+            'entity.user_role.collection',
+            'user.role.settings',
+          ],
+        ],
+      ],
+      [
+        'user.admin_permissions',
+        [
+          [
+            'entity.user.collection',
+            'user.admin_permissions',
+            'entity.user_role.collection',
+            'user.role.settings',
+          ],
+        ],
+      ],
+      [
+        'entity.user_role.collection',
+        [
+          [
+            'entity.user.collection',
+            'user.admin_permissions',
+            'entity.user_role.collection',
+            'user.role.settings',
+          ],
+        ],
+      ],
       ['entity.user.admin_form', [['user.account_settings_tab']]],
     ];
   }
@@ -56,7 +86,7 @@ class UserLocalTasksTest extends LocalTaskIntegrationTestBase {
    *
    * @dataProvider getUserLoginRoutes
    */
-  public function testUserLoginLocalTasks($route) {
+  public function testUserLoginLocalTasks($route): void {
     $tasks = [
       0 => ['user.register', 'user.pass', 'user.login'],
     ];
@@ -79,7 +109,7 @@ class UserLocalTasksTest extends LocalTaskIntegrationTestBase {
    *
    * @dataProvider getUserPageRoutes
    */
-  public function testUserPageLocalTasks($route, $subtask = []) {
+  public function testUserPageLocalTasks($route, $subtask = []): void {
     $tasks = [
       0 => ['entity.user.canonical', 'entity.user.edit_form'],
     ];

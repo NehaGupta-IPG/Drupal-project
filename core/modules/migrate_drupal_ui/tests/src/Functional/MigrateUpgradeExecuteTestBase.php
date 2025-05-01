@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\migrate_drupal_ui\Functional;
 
 use Drupal\Core\Entity\ContentEntityStorageInterface;
@@ -51,7 +53,6 @@ abstract class MigrateUpgradeExecuteTestBase extends MigrateUpgradeTestBase {
   protected function tearDown(): void {
     if ($this->outputLogs) {
       $this->outputLogs($this->migratedAdminUserName);
-      $this->assertLogError();
     }
     parent::tearDown();
   }

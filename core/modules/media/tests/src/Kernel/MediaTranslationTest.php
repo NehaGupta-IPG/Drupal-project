@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\media\Kernel;
 
 use Drupal\language\Entity\ConfigurableLanguage;
@@ -13,9 +15,7 @@ use Drupal\content_translation\ContentTranslationHandler;
 class MediaTranslationTest extends MediaKernelTestBase {
 
   /**
-   * Modules to install.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['language' , 'content_translation'];
 
@@ -50,7 +50,7 @@ class MediaTranslationTest extends MediaKernelTestBase {
   /**
    * Tests translatable fields storage/retrieval.
    */
-  public function testTranslatableFieldSaveLoad() {
+  public function testTranslatableFieldSaveLoad(): void {
     /** @var \Drupal\Core\Entity\EntityTypeInterface $entity_type */
     $entity_type = $this->container->get('entity_type.manager')->getDefinition('media');
     $this->assertTrue($entity_type->isTranslatable(), 'Media is translatable.');

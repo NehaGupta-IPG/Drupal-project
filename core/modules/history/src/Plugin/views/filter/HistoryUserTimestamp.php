@@ -5,6 +5,7 @@ namespace Drupal\history\Plugin\views\filter;
 use Drupal\Component\Datetime\TimeInterface;
 use Drupal\Core\Cache\UncacheableDependencyTrait;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\views\Attribute\ViewsFilter;
 use Drupal\views\Plugin\views\filter\FilterPluginBase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -15,9 +16,8 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  * table is history.
  *
  * @ingroup views_filter_handlers
- *
- * @ViewsFilter("history_user_timestamp")
  */
+#[ViewsFilter("history_user_timestamp")]
 class HistoryUserTimestamp extends FilterPluginBase {
 
   use UncacheableDependencyTrait;
@@ -25,6 +25,7 @@ class HistoryUserTimestamp extends FilterPluginBase {
   /**
    * {@inheritdoc}
    */
+  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
   public $no_operator = TRUE;
 
   /**
@@ -33,18 +34,14 @@ class HistoryUserTimestamp extends FilterPluginBase {
    * @param array $configuration
    *   A configuration array containing information about the plugin instance.
    * @param string $plugin_id
-   *   The plugin_id for the plugin instance.
+   *   The plugin ID for the plugin instance.
    * @param mixed $plugin_definition
    *   The plugin implementation definition.
-   * @param \Drupal\Component\Datetime\TimeInterface|null $time
+   * @param \Drupal\Component\Datetime\TimeInterface $time
    *   The time service.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, protected ?TimeInterface $time = NULL) {
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, protected TimeInterface $time) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
-    if (!$time) {
-      @trigger_error('Calling ' . __METHOD__ . ' without the $time argument is deprecated in drupal:10.3.0 and it will be required in drupal:11.0.0. See https://www.drupal.org/node/3395991', E_USER_DEPRECATED);
-      $this->time = \Drupal::service('datetime.time');
-    }
   }
 
   /**

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\config\Functional;
 
 use Drupal\Tests\BrowserTestBase;
@@ -46,7 +48,7 @@ class TransformedConfigExportImportUITest extends BrowserTestBase {
   /**
    * Tests a simple site export import case.
    */
-  public function testTransformedExportImport() {
+  public function testTransformedExportImport(): void {
     // After installation there is no snapshot but a new site name.
     $this->drupalGet('admin/config/development/configuration');
     $this->assertSession()->pageTextNotContains('Warning message');

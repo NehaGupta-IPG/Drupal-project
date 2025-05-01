@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\views\Functional\Wizard;
 
 /**
@@ -26,7 +28,7 @@ class ItemsPerPageTest extends WizardTestBase {
   /**
    * Tests the number of items per page.
    */
-  public function testItemsPerPage() {
+  public function testItemsPerPage(): void {
     $this->drupalCreateContentType(['type' => 'article']);
 
     // Create articles, each with a different creation time so that we can do a
