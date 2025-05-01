@@ -216,8 +216,6 @@ function template_preprocess_fieldset(&$variables): void {
 
   if (!empty($element['#description'])) {
     $description_id = $element['#attributes']['id'] . '--description';
-    // Add the description's id to the fieldset aria attributes.
-    $variables['attributes']['aria-describedby'] = $description_id;
     $description_attributes['id'] = $description_id;
     $variables['description_display'] = $element['#description_display'];
     if ($element['#description_display'] === 'invisible') {
@@ -226,6 +224,9 @@ function template_preprocess_fieldset(&$variables): void {
     $description_attributes['data-drupal-field-elements'] = 'description';
     $variables['description']['attributes'] = new Attribute($description_attributes);
     $variables['description']['content'] = $element['#description'];
+
+    // Add the description's id to the fieldset aria attributes.
+    $variables['attributes']['aria-describedby'] = $description_id;
   }
 
   // Suppress error messages.
