@@ -990,4 +990,39 @@ class EntityFieldTest extends EntityKernelTestBase {
     $storage->save($entity);
   }
 
+  /**
+   * Tests behavior when passing an invalid field name to $entity->get().
+   *
+   * @param bool|null $throw_exception
+   *   Value to be passed to $throw_exception parameter of get().
+   *
+   * @dataProvider providerEntityGetInvalidFieldName
+   */
+  public function testEntityGetInvalidFieldName(?bool $throw_exception): void {
+    $entity = $this->createTestEntity('entity_test');
+
+    if (is_null($throw_exception) || $throw_exception) {
+      $this->expectException(\InvalidArgumentException::class);
+      $this->expectExceptionMessage('Field field_does_not_exist is unknown.');
+    }
+
+    if (is_null($throw_exception)) {
+      $value = $entity->get('field_does_not_exist')?->value;
+    }
+    else {
+      $value = $entity->get('field_does_not_exist', $throw_exception)?->value;
+    }
+    $this->assertNull($value);
+  }
+
+  /**
+   * Data provider for testEntityGetInvalidFieldName().
+   */
+  public static function providerEntityGetInvalidFieldName(): array {
+    return [
+      'default' => [NULL],
+      'pass true' => [TRUE],
+      'pass false' => [FALSE],
+    ];
+  }
 }
