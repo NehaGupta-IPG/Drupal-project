@@ -592,9 +592,25 @@ abstract class ContentEntityBase extends EntityBase implements \IteratorAggregat
   /**
    * {@inheritdoc}
    */
-  public function get($field_name) {
+  public function get(/* string */$field_name /* , bool $throw_exception = TRUE */) {
+    $arguments = func_get_args();
+    if (!isset($arguments[1])) {
+      $throw_exception = TRUE;
+      @trigger_error('Throwing an exception when calling __METHOD__ on an invalid field name without the setting the second "$throw_exception" parameter is deprecated in 11.2.0. __METHOD__ will return NULL in drupal:12.0.0 unless $throw_exception is explicitly set to TRUE. See https://www.drupal.org/node/3522223', E_USER_DEPRECATED);
+    }
+    else {
+      $throw_exception = (bool) $arguments[1];
+    }
     if (!isset($this->fields[$field_name][$this->activeLangcode])) {
-      return $this->getTranslatedField($field_name, $this->activeLangcode);
+      try {
+        return $this->getTranslatedField($field_name, $this->activeLangcode);
+      }
+      catch (\InvalidArgumentException $e) {
+        if ($throw_exception) {
+          throw $e;
+        }
+        return NULL;
+      }
     }
     return $this->fields[$field_name][$this->activeLangcode];
   }
@@ -614,7 +630,7 @@ abstract class ContentEntityBase extends EntityBase implements \IteratorAggregat
     if (!isset($this->fields[$name][$langcode])) {
       $definition = $this->getFieldDefinition($name);
       if (!$definition) {
-        return NULL;
+        throw new \InvalidArgumentException("Field $name is unknown.");
       }
       // Non-translatable fields are always stored with
       // LanguageInterface::LANGCODE_DEFAULT as key.
