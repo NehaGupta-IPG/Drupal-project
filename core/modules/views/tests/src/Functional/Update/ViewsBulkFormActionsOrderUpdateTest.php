@@ -12,7 +12,7 @@ use Drupal\FunctionalTests\Update\UpdatePathTestBase;
  * @group views
  * @group legacy
  */
-class ViewsBulkFormActionsOrderUpdate extends UpdatePathTestBase {
+class ViewsBulkFormActionsOrderUpdateTest extends UpdatePathTestBase {
 
   /**
    * {@inheritdoc}
