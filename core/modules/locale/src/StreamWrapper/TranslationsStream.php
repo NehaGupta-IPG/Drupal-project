@@ -43,4 +43,15 @@ class TranslationsStream extends PrivateStream {
     return \Drupal::config('locale.settings')->get('translation.path');
   }
 
+  /**
+   * Implements Drupal\Core\StreamWrapper\StreamWrapperInterface::getExternalUrl().
+   *
+   * @throws \LogicException
+   *   PO files URL should not be public.
+   */
+  public function getExternalUrl() {
+    @trigger_error(__METHOD__ . '() is deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. There is no replacement. See https://www.drupal.org/node/3378735', E_USER_DEPRECATED);
+    throw new \LogicException('PO files URL should not be public.');
+  }
+
 }
