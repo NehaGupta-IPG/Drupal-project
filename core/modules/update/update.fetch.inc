@@ -4,7 +4,7 @@
  * @file
  */
 
-use Drupal\Core\Hook\Attribute\StopProceduralHookScan;
+use Drupal\Core\Hook\Attribute\ProceduralHookScanStop;
 use Drupal\update\UpdateManagerInterface;
 
 /**
@@ -16,8 +16,8 @@ use Drupal\update\UpdateManagerInterface;
  *
  * @see update_requirements()
  */
-#[StopProceduralHookScan]
-function _update_cron_notify() {
+#[ProceduralHookScanStop]
+function _update_cron_notify(): void {
   $update_config = \Drupal::config('update.settings');
   \Drupal::moduleHandler()->loadInclude('update', 'install');
   $status = update_requirements('runtime');
