@@ -2,11 +2,6 @@ uuid: df5e499a-cf5b-423d-872d-40ac51bbfa8c
 langcode: en
 status: true
 dependencies:
-  config:
-    - system.action.media_delete_action
-    - system.action.media_publish_action
-    - system.action.media_save_action
-    - system.action.media_unpublish_action
   module:
     - node
     - user
