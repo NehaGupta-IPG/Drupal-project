@@ -409,6 +409,34 @@ class LocaleImportFunctionalTest extends BrowserTestBase {
   }
 
   /**
+   * Tests imported PO files are listed on file views.
+   */
+  public function testPoFileImportAndFileListing(): void {
+    $this->container
+      ->get('module_installer')
+      ->install(['system', 'user', 'file', 'views']);
+
+    $this->drupalLogin($this->drupalCreateUser([
+      'access administration pages',
+      'access files overview',
+      'administer languages',
+      'translate interface',
+    ]));
+
+    // Import a dummy PO file.
+    $filename = $this->importPoFile($this->getPoFile(), [
+      'langcode' => 'fr',
+    ]);
+
+    // Ensure that an exception is not thrown on the admin file view as a result
+    // of the restrictions on .po files.
+    // @see \Drupal\locale\StreamWrapper\TranslationsStream::getExternalUrl()
+    $this->drupalGet('admin/content/files');
+    $this->assertSession()->statusCodeEquals(200);
+    $this->assertSession()->pageTextContains($filename);
+  }
+
+  /**
    * Helper function: import a standalone .po file in a given language.
    *
    * @param string $contents
@@ -417,8 +445,11 @@ class LocaleImportFunctionalTest extends BrowserTestBase {
    *   (optional) Additional options to pass to the translation import form.
    * @param array $encodings
    *   (optional) The encoding of the file.
+   *
+   * @return string
+   *   The name of the uploaded file.
    */
-  public function importPoFile($contents, array $options = [], array $encodings = []): void {
+  public function importPoFile($contents, array $options = [], array $encodings = []): string {
     $file_system = \Drupal::service('file_system');
     $name = $file_system->tempnam('temporary://', "po_") . '.po';
     foreach ($encodings as $encoding) {
@@ -429,6 +460,7 @@ class LocaleImportFunctionalTest extends BrowserTestBase {
     $this->drupalGet('admin/config/regional/translate/import');
     $this->submitForm($options, 'Import');
     $file_system->unlink($name);
+    return str_replace('temporary://', '', $name);
   }
 
   /**
