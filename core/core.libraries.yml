@@ -589,6 +589,21 @@ drupal.entity-form:
   dependencies:
     - core/drupal.form
 
+drupal.fieldgroup:
+  version: VERSION
+  css:
+    component:
+      misc/components/fieldgroup.module.css: { weight: -10 }
+  moved_files:
+    system/base:
+      deprecation_version: 11.2.0
+      removed_version: 12.0.0
+      deprecation_link: https://www.drupal.org/node/3432346
+      css:
+        component:
+          css/components/fieldgroup.module.css:
+            base: core/misc/components/fieldgroup.module.css
+
 drupal.form:
   version: VERSION
   js:
@@ -631,6 +646,21 @@ drupal.progress:
     - core/drupal
     - core/jquery
     - core/drupalSettings
+
+drupal.textarea-resize:
+  version: VERSION
+  css:
+    component:
+      misc/components/resize.module.css: { weight: -10 }
+  moved_files:
+    system/base:
+      deprecation_version: 11.2.0
+      removed_version: 12.0.0
+      deprecation_link: https://www.drupal.org/node/3432346
+      css:
+        component:
+          css/components/resize.module.css:
+            component: misc/components/resize.module.css
 
 drupal.states:
   version: VERSION
@@ -700,6 +730,21 @@ drupal.tableselect:
     - core/jquery
     - core/once
 
+drupal.tablesort:
+  version: VERSION
+  css:
+    component:
+      misc/components/tablesort.module.css: { weight: -10 }
+  moved_files:
+    system/base:
+      deprecation_version: 11.2.0
+      removed_version: 12.0.0
+      deprecation_link: https://www.drupal.org/node/3432346
+      css:
+        component:
+          css/components/tablesort.module.css:
+            base: misc/components/tablesort.module.css
+
 drupal.time-diff:
   version: VERSION
   js:
@@ -736,6 +781,27 @@ drupal.vertical-tabs:
     - core/drupal
     - core/drupalSettings
     - core/drupal.form
+htmx:
+  remote: https://github.com/bigskysoftware/htmx
+  version: "2.0.4"
+  license:
+    name: Zero-Clause BSD
+    url:  https://raw.githubusercontent.com/bigskysoftware/htmx/refs/tags/v2.0.4/LICENSE
+    gpl-compatible: true
+  js:
+    assets/vendor/htmx/htmx.min.js: { minified: true }
+
+htmx.debug:
+  remote: https://github.com/bigskysoftware/htmx-extensions
+  version: "2.0.1"
+  license:
+    name: Zero-Clause BSD
+    url: https://raw.githubusercontent.com/bigskysoftware/htmx-extensions/refs/heads/main/src/debug/LICENSE
+    gpl-compatible: true
+  js:
+    assets/vendor/htmx/debug.js: {}
+  dependencies:
+    - core/htmx
 
 internal.floating-ui:
   remote: https://github.com/floating-ui/floating-ui
@@ -756,7 +822,12 @@ jquery:
     url: https://raw.githubusercontent.com/jquery/jquery/4.0.0-beta.2/LICENSE.txt
     gpl-compatible: true
   js:
-    assets/vendor/jquery/jquery.min.js: { minified: true, weight: -20 }
+    # jquery.min.js is explicitly set to preprocess: false to prevent its
+    # inclusion in JavaScript aggregates. This prevents it being duplicated
+    # across different aggregates which can include different combinations of
+    # libraries that depend on jQuery, so that it is only downloaded once per
+    # browser instead of potentially multiple times from different pages.
+    assets/vendor/jquery/jquery.min.js: { preprocess: false, minified: true, weight: -20 }
 
 internal.jquery.form:
   # Internal library. Do not depend on it outside core nor add new core usage.

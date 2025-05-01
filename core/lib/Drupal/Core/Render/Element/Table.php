@@ -151,7 +151,8 @@ class Table extends FormElementBase {
    * {@inheritdoc}
    */
   public static function valueCallback(&$element, $input, FormStateInterface $form_state) {
-    // If #multiple is FALSE, the regular default value of radio buttons is used.
+    // If #multiple is FALSE, the regular default value of radio buttons is
+    // used.
     if (!empty($element['#tableselect']) && !empty($element['#multiple'])) {
       // Contrary to #type 'checkboxes', the default value of checkboxes in a
       // table is built from the array keys (instead of array values) of the
@@ -169,7 +170,9 @@ class Table extends FormElementBase {
   }
 
   /**
-   * #process callback for #type 'table' to add tableselect support.
+   * Render API callback: Adds tableselect support to #type 'table'.
+   *
+   * This function is assigned as a #process callback.
    *
    * @param array $element
    *   An associative array containing the properties and children of the
@@ -261,8 +264,9 @@ class Table extends FormElementBase {
           $row['select'] += [
             '#type' => $element['#multiple'] ? 'checkbox' : 'radio',
             '#id' => HtmlUtility::getUniqueId('edit-' . implode('-', $element_parents)),
-            // @todo If rows happen to use numeric indexes instead of string keys,
-            //   this results in a first row with $key === 0, which is always FALSE.
+            // @todo If rows happen to use numeric indexes instead of string
+            //   keys, this results in a first row with $key === 0, which is
+            //   always FALSE.
             '#return_value' => $key,
             '#attributes' => $element['#attributes'],
             '#wrapper_attributes' => [
@@ -295,7 +299,9 @@ class Table extends FormElementBase {
   }
 
   /**
-   * #element_validate callback for #type 'table'.
+   * Render API callback: Validates the #type 'table'.
+   *
+   * This function is assigned as a #element_validate callback.
    *
    * @param array $element
    *   An associative array containing the properties and children of the
@@ -323,7 +329,9 @@ class Table extends FormElementBase {
   }
 
   /**
-   * #pre_render callback to transform children of an element of #type 'table'.
+   * Render API callback: Transform children of an element of #type 'table'.
+   *
+   * This function is assigned as a #pre_render callback.
    *
    * This function converts sub-elements of an element of #type 'table' to be
    * suitable for table.html.twig:
@@ -333,6 +341,7 @@ class Table extends FormElementBase {
    *   corresponding first-level table row.
    *
    * Simple example usage:
+   *
    * @code
    * $form['table'] = [
    *   '#type' => 'table',
@@ -376,7 +385,8 @@ class Table extends FormElementBase {
    * @endcode
    *
    * @param array $element
-   *   A structured array containing two sub-levels of elements. Properties used:
+   *   A structured array containing two sub-levels of elements. Properties
+   *   used:
    *   - #tabledrag: The value is a list of $options arrays that are passed to
    *     drupal_attach_tabledrag(). The HTML ID of the table is added to each
    *     $options array.
@@ -422,9 +432,10 @@ class Table extends FormElementBase {
       $element['#attached']['library'][] = 'core/drupal.tableheader';
       $element['#attributes']['class'][] = 'sticky-header';
     }
-    // If the table has headers and it should react responsively to columns hidden
-    // with the classes represented by the constants RESPONSIVE_PRIORITY_MEDIUM
-    // and RESPONSIVE_PRIORITY_LOW, add the tableresponsive behaviors.
+    // If the table has headers and it should react responsively to columns
+    // hidden with the classes represented by the constants
+    // RESPONSIVE_PRIORITY_MEDIUM and RESPONSIVE_PRIORITY_LOW, add the
+    // tableresponsive behaviors.
     if (count($element['#header']) && $element['#responsive']) {
       $element['#attached']['library'][] = 'core/drupal.tableresponsive';
       // Add 'responsive-enabled' class to the table to identify it for JS.

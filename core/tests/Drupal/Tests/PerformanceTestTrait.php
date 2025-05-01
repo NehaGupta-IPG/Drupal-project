@@ -132,26 +132,41 @@ trait PerformanceTestTrait {
       $cache_tag_is_valid_count = 0;
       $cache_tag_invalidation_count = 0;
       $cache_tag_checksum_count = 0;
+      $cache_tag_lookup_query_args = [];
       foreach ($performance_test_data['database_events'] as $event) {
+        $normalized_query = static::normalizeQuery($event->queryString, $this->databasePrefix);
+
         // Don't log queries from the database cache backend because they're
         // logged separately as cache operations.
         if (!static::isDatabaseCache($event)) {
-          // Make the query easier to read and log it.
-          static::logQuery(
-            $performance_data,
-            str_replace([$this->databasePrefix, "\r\n", "\r", "\n"], ['', ' ', ' ', ' '], $event->queryString),
-            $event->args
-          );
+          static::logQuery($performance_data, $normalized_query, $event->args);
+        }
+        // Keep track of cache tag lookup queries.
+        elseif (str_starts_with($normalized_query, 'SELECT "tag", "invalidations" FROM "cachetags"')) {
+          $cache_tag_lookup_query_args[] = array_values($event->args);
         }
       }
+      $cache_operations = [];
       foreach ($performance_test_data['cache_operations'] as $operation) {
         if (in_array($operation['operation'], ['get', 'getMultiple'], TRUE)) {
+          if (!isset($cache_operations['get'][$operation['bin']])) {
+            $cache_operations['get'][$operation['bin']] = [];
+          }
+          $cache_operations['get'][$operation['bin']][] = $operation['cids'];
           $cache_get_count++;
         }
         elseif (in_array($operation['operation'], ['set', 'setMultiple'], TRUE)) {
+          if (!isset($cache_operations['get'][$operation['bin']])) {
+            $cache_operations['set'][$operation['bin']] = [];
+          }
+          $cache_operations['set'][$operation['bin']][] = $operation['cids'];
           $cache_set_count++;
         }
         elseif (in_array($operation['operation'], ['delete', 'deleteMultiple'], TRUE)) {
+          if (!isset($cache_operations['delete'][$operation['bin']])) {
+            $cache_operations['delete'][$operation['bin']] = [];
+          }
+          $cache_operations['delete'][$operation['bin']][] = $operation['cids'];
           $cache_delete_count++;
         }
       }
@@ -168,6 +183,8 @@ trait PerformanceTestTrait {
       $performance_data->setCacheTagChecksumCount($cache_tag_checksum_count);
       $performance_data->setCacheTagIsValidCount($cache_tag_is_valid_count);
       $performance_data->setCacheTagInvalidationCount($cache_tag_invalidation_count);
+      $performance_data->setCacheOperations($cache_operations);
+      $performance_data->setCacheTagGroupedLookups($cache_tag_lookup_query_args);
     }
 
     return $performance_data;
@@ -282,7 +299,8 @@ trait PerformanceTestTrait {
    * @todo https://www.drupal.org/project/drupal/issues/3379757
    *
    * @param string|null $service_name
-   *   An optional human readable identifier so that traces can be grouped together.
+   *   An optional human readable identifier so that traces can be grouped
+   *   together.
    *
    * @return \Drupal\Tests\PerformanceData
    *   An instance of the performance data value object.
@@ -594,6 +612,7 @@ trait PerformanceTestTrait {
    *   The message to display.
    *
    * @return void
+   *   No return value.
    *
    * @throws \PHPUnit\Framework\ExpectationFailedException
    */
@@ -635,6 +654,7 @@ trait PerformanceTestTrait {
    *   An instance of the performance data value object.
    *
    * @return void
+   *   No return value.
    */
   protected function assertMetrics(
     array $expected,
@@ -646,14 +666,18 @@ trait PerformanceTestTrait {
       'ScriptBytes',
       'StylesheetBytes',
     ];
+    $values = [];
     foreach ($expected as $name => $metric) {
       if (in_array($name, $assertRange)) {
         $this->assertCountBetween($metric - 500, $metric + 500, $performance_data->{"get$name"}(), "Asserting $name");
+        unset($expected[$name]);
       }
       else {
-        $this->assertSame($metric, $performance_data->{"get$name"}(), "Asserting $name");
+        $values[$name] = $performance_data->{"get$name"}();
       }
     }
+    $this->assertSame($expected, $values);
+
   }
 
   /**
@@ -675,10 +699,24 @@ trait PerformanceTestTrait {
       'CacheGetCount' => $performance_data->getCacheGetCount(),
       'CacheSetCount' => $performance_data->getCacheSetCount(),
       'CacheDeleteCount' => $performance_data->getCacheDeleteCount(),
-      'CacheTagChecksumCount' => $performance_data->getCacheTagChecksumCount(),
-      'CacheTagIsValidCount' => $performance_data->getCacheTagIsValidCount(),
+      'CacheTagLookupQueryCount' => $performance_data->getCacheTagLookupQueryCount(),
       'CacheTagInvalidationCount' => $performance_data->getCacheTagInvalidationCount(),
     ];
+  }
+
+  /**
+   * Normalizes a query by removing the database prefix and newlines.
+   *
+   * @param string $query_string
+   *   The query string to normalize.
+   * @param string $database_prefix
+   *   The database prefix to remove from the query.
+   *
+   * @return string
+   *   The normalized query string.
+   */
+  protected static function normalizeQuery(string $query_string, string $database_prefix): string {
+    return str_replace([$database_prefix, "\r\n", "\r", "\n"], ['', ' ', ' ', ' '], $query_string);
   }
 
 }

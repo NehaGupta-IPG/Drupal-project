@@ -8,9 +8,14 @@ use Drupal\Core\Entity\EntityFormInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityPublishedInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
+use Drupal\Core\Entity\Query\QueryInterface;
 use Drupal\Core\Entity\RevisionableInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Hook\Attribute\Hook;
+use Drupal\Core\Hook\Attribute\ReorderHook;
+use Drupal\Core\Hook\Order\Order;
+use Drupal\Core\Hook\Order\OrderBefore;
+use Drupal\content_moderation\Hook\ContentModerationHooks;
 use Drupal\workspaces\WorkspaceAssociationInterface;
 use Drupal\workspaces\WorkspaceInformationInterface;
 use Drupal\workspaces\WorkspaceManagerInterface;
@@ -71,7 +76,12 @@ class EntityOperations {
   /**
    * Implements hook_entity_presave().
    */
-  #[Hook('entity_presave')]
+  #[Hook('entity_presave', order: Order::First)]
+  #[ReorderHook('entity_presave',
+    class: ContentModerationHooks::class,
+    method: 'entityPresave',
+    order: new OrderBefore(['workspaces'])
+  )]
   public function entityPresave(EntityInterface $entity): void {
     if ($this->shouldSkipOperations($entity)) {
       return;
@@ -128,7 +138,7 @@ class EntityOperations {
   /**
    * Implements hook_entity_insert().
    */
-  #[Hook('entity_insert')]
+  #[Hook('entity_insert', order: Order::Last)]
   public function entityInsert(EntityInterface $entity): void {
     if ($entity->getEntityTypeId() === 'workspace') {
       $this->workspaceAssociation->workspaceInsert($entity);
@@ -252,6 +262,32 @@ class EntityOperations {
   public function entityRevisionDelete(EntityInterface $entity): void {
     if ($this->workspaceInfo->isEntityTypeSupported($entity->getEntityType())) {
       $this->workspaceAssociation->deleteAssociations(NULL, $entity->getEntityTypeId(), [$entity->id()], [$entity->getRevisionId()]);
+    }
+  }
+
+  /**
+   * Implements hook_entity_query_tag__TAG_alter() for 'latest_translated_affected_revision'.
+   */
+  #[Hook('entity_query_tag__latest_translated_affected_revision_alter')]
+  public function entityQueryTagLatestTranslatedAffectedRevisionAlter(QueryInterface $query): void {
+    $entity_type = $this->entityTypeManager->getDefinition($query->getEntityTypeId());
+    if (!$this->workspaceInfo->isEntityTypeSupported($entity_type) || !$this->workspaceManager->hasActiveWorkspace()) {
+      return;
+    }
+
+    $active_workspace = $this->workspaceManager->getActiveWorkspace();
+    $tracked_entities = $this->workspaceAssociation->getTrackedEntities($active_workspace->id());
+
+    if (!isset($tracked_entities[$entity_type->id()])) {
+      return;
+    }
+
+    if ($revision_id = array_search($query->getMetaData('entity_id'), $tracked_entities[$entity_type->id()])) {
+      $query->condition($entity_type->getKey('revision'), $revision_id, '<=');
+      $conditions = $query->orConditionGroup();
+      $conditions->condition($entity_type->getRevisionMetadataKey('workspace'), $active_workspace->id());
+      $conditions->condition($entity_type->getRevisionMetadataKey('revision_default'), TRUE);
+      $query->condition($conditions);
     }
   }
 

@@ -4,10 +4,11 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\package_manager\Kernel;
 
+use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\Url;
 use Drupal\fixture_manipulator\ActiveFixtureManipulator;
 use Drupal\package_manager\Event\PreCreateEvent;
-use Drupal\package_manager\Exception\StageEventException;
+use Drupal\package_manager\Exception\SandboxEventException;
 use Drupal\package_manager\ValidationResult;
 
 /**
@@ -17,6 +18,8 @@ use Drupal\package_manager\ValidationResult;
  * @internal
  */
 class ComposerPatchesValidatorTest extends PackageManagerKernelTestBase {
+
+  use StringTranslationTrait;
 
   const ABSENT = 0;
   const CONFIG_ALLOWED_PLUGIN = 1;
@@ -239,7 +242,7 @@ class ComposerPatchesValidatorTest extends PackageManagerKernelTestBase {
 
     $stage = $this->createStage();
     $stage->create();
-    $stage_dir = $stage->getStageDirectory();
+    $stage_dir = $stage->getSandboxDirectory();
     $stage->require(['drupal/core:9.8.1']);
 
     try {
@@ -247,7 +250,7 @@ class ComposerPatchesValidatorTest extends PackageManagerKernelTestBase {
       // If we didn't get an exception, ensure we didn't expect any errors.
       $this->assertSame([], $expected_results);
     }
-    catch (StageEventException $e) {
+    catch (SandboxEventException $e) {
       $this->assertNotEmpty($expected_results);
       $this->assertValidationResultsEqual($expected_results, $e->event->getResults(), NULL, $stage_dir);
     }
@@ -283,7 +286,12 @@ class ComposerPatchesValidatorTest extends PackageManagerKernelTestBase {
             ->toString();
           // Reformat the provided results so that they all have the link to the
           // online documentation appended to them.
-          $messages[$message_index] = t('@message See <a href=":url">the help page</a> for information on how to resolve the problem.', ['@message' => $message, ':url' => $url]);
+          $messages[$message_index] = $this->t(
+            '@message See <a href=":url">the help page</a> for information on how to resolve the problem.',
+            [
+              '@message' => $message,
+              ':url' => $url,
+            ]);
         }
       }
       $expected_results[$result_index] = ValidationResult::createError($messages, $result->summary);

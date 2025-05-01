@@ -61,6 +61,8 @@ class KeyValueEntityStorageTest extends UnitTestCase {
   protected $languageManager;
 
   /**
+   * The entity storage.
+   *
    * @var \Drupal\Core\Entity\KeyValueStore\KeyValueEntityStorage
    */
   protected $entityStorage;
@@ -97,10 +99,10 @@ class KeyValueEntityStorageTest extends UnitTestCase {
   /**
    * Prepares the key value entity storage.
    *
-   * @covers ::__construct
-   *
    * @param string $uuid_key
    *   (optional) The entity key used for the UUID. Defaults to 'uuid'.
+   *
+   * @covers ::__construct
    */
   protected function setUpKeyValueEntityStorage($uuid_key = 'uuid'): void {
     $this->entityType->expects($this->atLeastOnce())
@@ -206,6 +208,7 @@ class KeyValueEntityStorageTest extends UnitTestCase {
    * @covers ::doCreate
    *
    * @return \Drupal\Core\Entity\EntityInterface
+   *   The newly created entity instance with the specified ID and generated UUID.
    */
   public function testCreate() {
     $entity = $this->getMockEntity(EntityBaseTest::class, [], ['toArray']);
@@ -239,6 +242,7 @@ class KeyValueEntityStorageTest extends UnitTestCase {
    *   The entity.
    *
    * @return \Drupal\Core\Entity\EntityInterface
+   *   The saved entity instance after insertion.
    *
    * @depends testCreate
    */
@@ -282,6 +286,7 @@ class KeyValueEntityStorageTest extends UnitTestCase {
    *   The entity.
    *
    * @return \Drupal\Core\Entity\EntityInterface
+   *   The updated entity instance after saving.
    *
    * @depends testSaveInsert
    */
@@ -614,6 +619,7 @@ class KeyValueEntityStorageTest extends UnitTestCase {
    *   (optional) The methods to mock.
    *
    * @return \Drupal\Core\Entity\EntityInterface&\PHPUnit\Framework\MockObject\MockObject
+   *   A mock entity instance with the specified methods mocked.
    */
   protected function getMockEntity(string $class = EntityBaseTest::class, array $arguments = [], array $methods = []): EntityInterface&MockObject {
     // Ensure the entity is passed at least an array of values and an entity
@@ -632,11 +638,45 @@ class KeyValueEntityStorageTest extends UnitTestCase {
 
 }
 
+/**
+ * A simple entity class for testing key value entity storage.
+ */
 class EntityBaseTest extends EntityBase {
+
+  /**
+   * The entity ID.
+   *
+   * @var string
+   */
   public $id;
+
+  /**
+   * The language code for the entity.
+   *
+   * @var string
+   */
   public $langcode;
+
+  /**
+   * The entity UUID.
+   *
+   * @var string
+   */
   public $uuid;
+
+  /**
+   * The entity label.
+   *
+   * @var string
+   */
   public $label;
+
+  /**
+   * The original, or NULL if the entity cannot be loaded.
+   *
+   * @var string
+   */
+  public $original;
 
 }
 

@@ -6,6 +6,7 @@ use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\jsonapi\Routing\Routes;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Hook\Attribute\Hook;
@@ -15,28 +16,30 @@ use Drupal\Core\Hook\Attribute\Hook;
  */
 class JsonapiHooks {
 
+  use StringTranslationTrait;
+
   /**
    * Implements hook_help().
    */
   #[Hook('help')]
-  public function help($route_name, RouteMatchInterface $route_match) {
+  public function help($route_name, RouteMatchInterface $route_match): ?string {
     switch ($route_name) {
       case 'help.page.jsonapi':
-        $output = '<h2>' . t('About') . '</h2>';
-        $output .= '<p>' . t('The JSON:API module is a fully compliant implementation of the <a href=":spec">JSON:API Specification</a>. By following shared conventions, you can increase productivity, take advantage of generalized tooling, and focus on what matters: your application. Clients built around JSON:API are able to take advantage of features like efficient response caching, which can sometimes eliminate network requests entirely. For more information, see the <a href=":docs">online documentation for the JSON:API module</a>.', [
+        $output = '<h2>' . $this->t('About') . '</h2>';
+        $output .= '<p>' . $this->t('The JSON:API module is a fully compliant implementation of the <a href=":spec">JSON:API Specification</a>. By following shared conventions, you can increase productivity, take advantage of generalized tooling, and focus on what matters: your application. Clients built around JSON:API are able to take advantage of features like efficient response caching, which can sometimes eliminate network requests entirely. For more information, see the <a href=":docs">online documentation for the JSON:API module</a>.', [
           ':spec' => 'https://jsonapi.org',
           ':docs' => 'https://www.drupal.org/docs/8/modules/json-api',
         ]) . '</p>';
         $output .= '<dl>';
-        $output .= '<dt>' . t('General') . '</dt>';
-        $output .= '<dd>' . t('JSON:API is a particular implementation of REST that provides conventions for resource relationships, collections, filters, pagination, and sorting. These conventions help developers build clients faster and encourages reuse of code.') . '</dd>';
-        $output .= '<dd>' . t('The <a href=":jsonapi-docs">JSON:API</a> and <a href=":rest-docs">RESTful Web Services</a> modules serve similar purposes. <a href=":comparison">Read the comparison of the RESTFul Web Services and JSON:API modules</a> to determine the best choice for your site.', [
+        $output .= '<dt>' . $this->t('General') . '</dt>';
+        $output .= '<dd>' . $this->t('JSON:API is a particular implementation of REST that provides conventions for resource relationships, collections, filters, pagination, and sorting. These conventions help developers build clients faster and encourages reuse of code.') . '</dd>';
+        $output .= '<dd>' . $this->t('The <a href=":jsonapi-docs">JSON:API</a> and <a href=":rest-docs">RESTful Web Services</a> modules serve similar purposes. <a href=":comparison">Read the comparison of the RESTFul Web Services and JSON:API modules</a> to determine the best choice for your site.', [
           ':jsonapi-docs' => 'https://www.drupal.org/docs/8/modules/json-api',
           ':rest-docs' => 'https://www.drupal.org/docs/8/core/modules/rest',
           ':comparison' => 'https://www.drupal.org/docs/8/modules/jsonapi/jsonapi-vs-cores-rest-module',
         ]) . '</dd>';
-        $output .= '<dd>' . t('Some multilingual features currently do not work well with JSON:API. See the <a href=":jsonapi-docs">JSON:API multilingual support documentation</a> for more information on the current status of multilingual support.', [':jsonapi-docs' => 'https://www.drupal.org/docs/8/modules/jsonapi/translations']) . '</dd>';
-        $output .= '<dd>' . t('Revision support is currently read-only and only for the "Content" and "Media" entity types in JSON:API. See the <a href=":jsonapi-docs">JSON:API revision support documentation</a> for more information on the current status of revision support.', [':jsonapi-docs' => 'https://www.drupal.org/docs/8/modules/jsonapi/revisions']) . '</dd>';
+        $output .= '<dd>' . $this->t('Some multilingual features currently do not work well with JSON:API. See the <a href=":jsonapi-docs">JSON:API multilingual support documentation</a> for more information on the current status of multilingual support.', [':jsonapi-docs' => 'https://www.drupal.org/docs/8/modules/jsonapi/translations']) . '</dd>';
+        $output .= '<dd>' . $this->t('Revision support is currently read-only and only for the "Content" and "Media" entity types in JSON:API. See the <a href=":jsonapi-docs">JSON:API revision support documentation</a> for more information on the current status of revision support.', [':jsonapi-docs' => 'https://www.drupal.org/docs/8/modules/jsonapi/revisions']) . '</dd>';
         $output .= '</dl>';
         return $output;
     }
@@ -50,7 +53,7 @@ class JsonapiHooks {
   public function modulesInstalled($modules): void {
     $potential_conflicts = ['content_translation', 'config_translation', 'language'];
     if (!empty(array_intersect($modules, $potential_conflicts))) {
-      \Drupal::messenger()->addWarning(t('Some multilingual features currently do not work well with JSON:API. See the <a href=":jsonapi-docs">JSON:API multilingual support documentation</a> for more information on the current status of multilingual support.', [':jsonapi-docs' => 'https://www.drupal.org/docs/8/modules/jsonapi/translations']));
+      \Drupal::messenger()->addWarning($this->t('Some multilingual features currently do not work well with JSON:API. See the <a href=":jsonapi-docs">JSON:API multilingual support documentation</a> for more information on the current status of multilingual support.', [':jsonapi-docs' => 'https://www.drupal.org/docs/8/modules/jsonapi/translations']));
     }
   }
 
@@ -58,7 +61,7 @@ class JsonapiHooks {
    * Implements hook_entity_bundle_create().
    */
   #[Hook('entity_bundle_create')]
-  public function entityBundleCreate() {
+  public function entityBundleCreate(): void {
     Routes::rebuild();
   }
 
@@ -66,7 +69,7 @@ class JsonapiHooks {
    * Implements hook_entity_bundle_delete().
    */
   #[Hook('entity_bundle_delete')]
-  public function entityBundleDelete() {
+  public function entityBundleDelete(): void {
     Routes::rebuild();
   }
 
@@ -74,7 +77,7 @@ class JsonapiHooks {
    * Implements hook_entity_create().
    */
   #[Hook('entity_create')]
-  public function entityCreate(EntityInterface $entity) {
+  public function entityCreate(EntityInterface $entity): void {
     if (in_array($entity->getEntityTypeId(), ['field_storage_config', 'field_config'])) {
       // @todo Only do this when relationship fields are updated, not just any field.
       Routes::rebuild();
@@ -85,7 +88,7 @@ class JsonapiHooks {
    * Implements hook_entity_delete().
    */
   #[Hook('entity_delete')]
-  public function entityDelete(EntityInterface $entity) {
+  public function entityDelete(EntityInterface $entity): void {
     if (in_array($entity->getEntityTypeId(), ['field_storage_config', 'field_config'])) {
       // @todo Only do this when relationship fields are updated, not just any field.
       Routes::rebuild();
@@ -99,8 +102,8 @@ class JsonapiHooks {
   public function jsonapiEntityFilterAccess(EntityTypeInterface $entity_type, AccountInterface $account): array {
     // All core entity types and most or all contrib entity types allow users
     // with the entity type's administrative permission to view all of the
-    // entities, so enable similarly permissive filtering to those users as well.
-    // A contrib module may override this decision by returning
+    // entities, so enable similarly permissive filtering to those users as
+    // well. A contrib module may override this decision by returning
     // AccessResult::forbidden() from its implementation of this hook.
     if ($admin_permission = $entity_type->getAdminPermission()) {
       return [
@@ -190,8 +193,8 @@ class JsonapiHooks {
         JSONAPI_FILTER_AMONG_ALL => $forbidden,
         JSONAPI_FILTER_AMONG_OWN => $forbidden,
         JSONAPI_FILTER_AMONG_PUBLISHED => $forbidden,
-            // For legacy reasons, the Node entity type has a "status" key, so forbid
-            // this subset as well, even though it has no semantic meaning.
+        // For legacy reasons, the Node entity type has a "status" key, so
+        // forbid this subset as well, even though it has no semantic meaning.
         JSONAPI_FILTER_AMONG_ENABLED => $forbidden,
       ];
     }
@@ -200,10 +203,10 @@ class JsonapiHooks {
       JSONAPI_FILTER_AMONG_OWN => AccessResult::allowedIfHasPermission($account, 'view own unpublished content'),
           // @see \Drupal\node\NodeGrantDatabaseStorage::access()
           // Note that:
-          // - This is just for the default grant. Other node access conditions are
-          //   added via the 'node_access' query tag.
-          // - Permissions were checked earlier in this function, so we must vary the
-          //   cache by them.
+          // - This is just for the default grant. Other node access conditions
+          //   are added via the 'node_access' query tag.
+          // - Permissions were checked earlier in this function, so we must
+          //   vary the cache by them.
       JSONAPI_FILTER_AMONG_PUBLISHED => AccessResult::allowed()->cachePerPermissions(),
     ];
   }
