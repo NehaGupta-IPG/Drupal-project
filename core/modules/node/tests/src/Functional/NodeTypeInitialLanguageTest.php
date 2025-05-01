@@ -114,15 +114,10 @@ class NodeTypeInitialLanguageTest extends NodeTestBase {
    */
   public function testLanguageFieldVisibility(): void {
     // Creates a node to test Language field visibility feature.
-    $edit = [
-      'title[0][value]' => $this->randomMachineName(8),
-      'body[0][value]' => $this->randomMachineName(16),
-    ];
-    $this->drupalGet('node/add/article');
-    $this->submitForm($edit, 'Save');
-    $node = $this->drupalGetNodeByTitle($edit['title[0][value]']);
-    $this->assertNotEmpty($node, 'Node found in database.');
-
+    $node = $this->drupalCreateNode([
+      'title' => $this->randomMachineName(16),
+      'type' => 'article',
+    ]);
     // Loads node page and check if Language field is hidden by default.
     $this->drupalGet($node->toUrl());
     $this->assertSession()->pageTextNotContains('English');
