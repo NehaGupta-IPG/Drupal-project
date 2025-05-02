@@ -19,7 +19,7 @@ const { commandAsWebserver } = require('../globals');
  *   The 'browser' object.
  */
 exports.command = function drupalInstall(
-  { setupFile = '', installProfile = 'nightwatch_testing', langcode = '' } = {},
+  { setupFile = '', installProfile = 'nightwatch_testing', langcode = '', uniqueApcuNamespace = false } = {},
   callback,
 ) {
   const self = this;
@@ -30,6 +30,7 @@ exports.command = function drupalInstall(
   try {
     setupFile = setupFile ? `--setup-file "${setupFile}"` : '';
     installProfile = `--install-profile "${installProfile}"`;
+    uniqueApcuNamespace = uniqueApcuNamespace ? '--unique-apcu-namespace' : '';
     const langcodeOption = langcode ? `--langcode "${langcode}"` : '';
     const dbOption =
       process.env.DRUPAL_TEST_DB_URL.length > 0
@@ -37,7 +38,7 @@ exports.command = function drupalInstall(
         : '';
     const install = execSync(
       commandAsWebserver(
-        `php ./scripts/test-site.php install ${setupFile} ${installProfile} ${langcodeOption} --base-url ${process.env.DRUPAL_TEST_BASE_URL} ${dbOption} --json`,
+        `php ./scripts/test-site.php install ${setupFile} ${installProfile} ${langcodeOption} --base-url ${process.env.DRUPAL_TEST_BASE_URL} ${dbOption} ${uniqueApcuNamespace} --json`,
       ),
     );
     const installData = JSON.parse(install.toString());
