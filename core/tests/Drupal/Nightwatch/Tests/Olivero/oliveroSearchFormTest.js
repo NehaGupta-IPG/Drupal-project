@@ -16,6 +16,7 @@ module.exports = {
         setupFile:
           'core/tests/Drupal/TestSite/TestSiteOliveroInstallTestScript.php',
         installProfile: 'minimal',
+        uniqueApcuNamespace: true,
       })
       // Create user that can search.
       .drupalCreateUser({

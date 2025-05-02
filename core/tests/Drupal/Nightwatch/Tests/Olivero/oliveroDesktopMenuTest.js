@@ -11,6 +11,7 @@ module.exports = {
       setupFile:
         'core/tests/Drupal/TestSite/TestSiteOliveroInstallTestScript.php',
       installProfile: 'minimal',
+      uniqueApcuNamespace: true,
     });
     browser.window.setSize(1600, 800);
   },

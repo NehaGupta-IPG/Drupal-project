@@ -79,6 +79,7 @@ module.exports = {
       setupFile:
         'core/tests/Drupal/TestSite/TestSiteOliveroInstallTestScript.php',
       installProfile: 'minimal',
+      uniqueApcuNamespace: true,
     });
   },
   after(browser) {
