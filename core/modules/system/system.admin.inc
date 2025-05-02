@@ -343,7 +343,7 @@ function template_preprocess_system_themes_page(&$variables): void {
         }
         else {
           $modules_url = (string) Url::fromRoute('system.modules_list')->toString();
-          $current_theme['incompatible'] = t('This theme requires the listed modules to operate correctly. They must first be installed via the <a href=":modules_url">Extend page</a>.', [
+          $current_theme['incompatible'] = t('This theme requires the listed modules to operate correctly. They must first be installed via the <a href=":modules_url">Extensions page</a>.', [
             ':modules_url' => $modules_url,
           ]);
         }
