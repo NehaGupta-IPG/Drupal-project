@@ -111,7 +111,7 @@ class RebuildTest extends WebDriverTestBase {
       'title[0][value]' => $this->randomString(),
     ];
     $this->submitForm($edit, 'Save');
-    $this->assertSession()->pageTextContains('This value should not be null.');
+    $this->assertSession()->pageTextContains('Test file field is required.');
 
     // Ensure that the form contains two items in the multi-valued field, so we
     // know we're testing a form that was correctly retrieved from cache.
