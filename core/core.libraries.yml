@@ -415,7 +415,7 @@ loadjs:
     url: https://raw.githubusercontent.com/muicss/loadjs/4.3.0/LICENSE.txt
     gpl-compatible: true
   js:
-    assets/vendor/loadjs/loadjs.min.js: { minified: true }
+    assets/vendor/loadjs/loadjs.min.js: { minified: true, preprocess: false }
 
 # Common files for libraries that still rely on jQuery UI components.
 # @todo Remove when no longer required by drupal.autocomplete and drupal.dialog.
