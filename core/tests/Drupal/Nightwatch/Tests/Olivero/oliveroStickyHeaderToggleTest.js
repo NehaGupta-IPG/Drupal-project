@@ -1,7 +1,7 @@
 const { testPerTheme } = require('../../globals');
 
 const buttonSelector = 'button.sticky-header-toggle';
-const mainMenuSelector = '#block-olivero-main-menu';
+const mainMenuSelector = 'nav.menu--main';
 
 module.exports = {
   '@tags': ['core', 'olivero', 'failing'],
