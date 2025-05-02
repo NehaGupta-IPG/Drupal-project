@@ -1085,7 +1085,7 @@ abstract class Connection {
    * Returns the transaction manager.
    *
    * @return \Drupal\Core\Database\Transaction\TransactionManagerInterface
-   *   The transaction manager, or FALSE if not available.
+   *   The transaction manager.
    *
    * @throws \LogicException
    *   If the transaction manager is undefined or unavailable.
