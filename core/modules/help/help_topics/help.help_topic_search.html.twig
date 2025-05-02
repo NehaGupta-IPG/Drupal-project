@@ -8,7 +8,7 @@ related:
 ---
 {% set extensions_link_text %}{% trans %}Extensions{% endtrans %}{% endset %}
 {% set help_link_text %}{% trans %}Help{% endtrans %}{% endset %}
-{% set extensions_link = render_var(help_route_link(extensions, 'system.modules_list')) %}
+{% set extensions_link = render_var(help_route_link(extensions_link_text, 'system.modules_list')) %}
 {% set help_link = render_var(help_route_link(help_link_text, 'help.main')) %}
 {% set cache_topic = render_var(help_topic_link('system.cache')) %}
 {% set cron_topic = render_var(help_topic_link('core.cron')) %}
