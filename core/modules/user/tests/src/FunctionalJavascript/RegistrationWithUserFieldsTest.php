@@ -96,7 +96,7 @@ class RegistrationWithUserFieldsTest extends WebDriverTestBase {
     $this->page->fillField('edit-mail', $name . '@example.com');
 
     $this->page->pressButton('edit-submit');
-    $this->webAssert->pageTextContains($field->label() . ' field is required.');
+    $this->webAssert->pageTextContains('This value should not be null.');
 
     // Invalid input.
     $this->page->fillField('edit-test-user-field-0-value', '-1');
