@@ -729,19 +729,7 @@ abstract class KernelTestBase extends TestCase implements ServiceProviderInterfa
         throw new \LogicException("$module module is not installed.");
       }
       try {
-        // In order to be able to validate configuration schema after
-        // installation, treat this method as if running in the installer.
-        $previous_state = $GLOBALS['install_state'] ?? NULL;
-        global $install_state;
-        $install_state = [];
-
         $this->container->get('config.installer')->installDefaultConfig('module', $module);
-
-        // Remove the installing state again.
-        unset($GLOBALS['install_state']);
-        if (isset($previous_state)) {
-          $GLOBALS['install_state'] = $previous_state;
-        }
       }
       catch (\Exception $e) {
         throw new \Exception(sprintf('Exception when installing config for module %s, message was: %s', $module, $e->getMessage()), 0, $e);
