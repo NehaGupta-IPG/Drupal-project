@@ -455,8 +455,7 @@ abstract class WidgetBase extends PluginSettingsBase implements WidgetInterface,
   protected function formSingleElement(FieldItemListInterface $items, $delta, array $element, array &$form, FormStateInterface $form_state) {
     $element += [
       '#field_parents' => $form['#parents'],
-      // Only the first widget should be required.
-      '#required' => $delta == 0 && $this->fieldDefinition->isRequired(),
+      '#required' => FALSE,
       '#delta' => $delta,
       '#weight' => $delta,
     ];
