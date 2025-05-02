@@ -16,7 +16,7 @@ use Symfony\Component\Process\PhpExecutableFinder;
  *
  * @see \Drupal\KernelTests\Scripts\TestSiteApplicationTest
  */
-class TestSiteOliveroInstallTestScript implements TestSetupInterface {
+class TestSiteOliveroInstallTestScript implements TestSetupInterface, TestPreinstallInterface {
 
   /**
    * Generates PHP process to generate a theme from core's starterkit theme.
@@ -24,15 +24,9 @@ class TestSiteOliveroInstallTestScript implements TestSetupInterface {
    * @return \Symfony\Component\Process\Process
    *   The PHP process
    */
-  private function generateThemeFromStarterkit() : Process {
+  private function generateThemeFromStarterkit(string $site_directory) : Process {
     $phpBinaryFinder = new PhpExecutableFinder();
     $phpBinaryPath = $phpBinaryFinder->find();
-
-    /**
-     * @var \Drupal\Core\DrupalKernelInterface
-     */
-    $kernel = \Drupal::service('kernel');
-    $sitePath = $kernel->getSitePath();
 
     $install_command = [
       $phpBinaryPath,
@@ -42,7 +36,7 @@ class TestSiteOliveroInstallTestScript implements TestSetupInterface {
       '--name=Test custom starterkit theme',
       '--description=Custom theme generated from a starterkit theme',
       '--starterkit=olivero',
-      '--path=' . $sitePath . '/themes',
+      '--path=' . $site_directory . '/themes',
     ];
     $process = new Process($install_command, NULL, [
       'HTTP_USER_AGENT' => 'Drupal command line',
@@ -55,9 +49,6 @@ class TestSiteOliveroInstallTestScript implements TestSetupInterface {
    * {@inheritdoc}
    */
   public function setup() {
-
-    $process = $this->generateThemeFromStarterkit();
-    $process->run();
 
     // Install required module for the Olivero front page.
     $module_installer = \Drupal::service('module_installer');
@@ -106,6 +97,14 @@ class TestSiteOliveroInstallTestScript implements TestSetupInterface {
 
     $comment2 = Comment::create($values);
     $comment2->save();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function preinstall($db_prefix, $site_directory) {
+    $process = $this->generateThemeFromStarterkit($site_directory);
+    $process->mustRun();
   }
 
 }
