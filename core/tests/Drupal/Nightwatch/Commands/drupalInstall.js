@@ -19,7 +19,12 @@ const { commandAsWebserver } = require('../globals');
  *   The 'browser' object.
  */
 exports.command = function drupalInstall(
-  { setupFile = '', installProfile = 'nightwatch_testing', langcode = '', uniqueApcuNamespace = false } = {},
+  {
+    setupFile = '',
+    installProfile = 'nightwatch_testing',
+    langcode = '',
+    uniqueApcuNamespace = false,
+  } = {},
   callback,
 ) {
   const self = this;
