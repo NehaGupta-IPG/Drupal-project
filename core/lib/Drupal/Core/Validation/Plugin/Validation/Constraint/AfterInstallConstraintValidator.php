@@ -2,7 +2,9 @@
 
 namespace Drupal\Core\Validation\Plugin\Validation\Constraint;
 
+use Drupal\Component\FileSystem\FileSystem as DrupalFilesystem;
 use Drupal\Core\Installer\InstallerKernel;
+use phpDocumentor\Reflection\Types\Static_;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Constraints\Sequentially;
 use Symfony\Component\Validator\Constraints\SequentiallyValidator;
@@ -23,8 +25,8 @@ class AfterInstallConstraintValidator extends SequentiallyValidator {
       throw new UnexpectedTypeException($constraint, Sequentially::class);
     }
 
-    // During the installer this does not need to be validated.
-    if (InstallerKernel::installationAttempted()) {
+    // During the installer or testing this does not need to be validated.
+    if (InstallerKernel::installationAttempted() || self::insideTest()) {
       return;
     }
 
@@ -44,6 +46,22 @@ class AfterInstallConstraintValidator extends SequentiallyValidator {
         break;
       }
     }
+  }
+
+  /**
+   * Whether this validator is running inside a test.
+   *
+   * @return bool
+   *   TRUE if the validator is running in a test. FALSE otherwise.
+   */
+  private static function insideTest(): bool {
+    // @see \Drupal\Core\CoreServiceProvider::registerTest()
+    $in_functional_test = drupal_valid_test_ua();
+    // @see \Drupal\Core\DependencyInjection\DependencySerializationTrait::__wakeup()
+    $in_kernel_test = isset($GLOBALS['__PHPUNIT_BOOTSTRAP']);
+    // @see \Drupal\BuildTests\Framework\BuildTestBase::setUp()
+    $in_build_test = str_contains(__FILE__, DrupalFilesystem::getOsTemporaryDirectory() . '/build_workspace_');
+    return $in_functional_test || $in_kernel_test || $in_build_test;
   }
 
 }
