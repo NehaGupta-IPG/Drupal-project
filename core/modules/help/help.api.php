@@ -46,9 +46,9 @@ use Drupal\Core\Url;
  * The page-specific help information provided by this hook appears in the
  * Help block (provided by the core Help module), if the block is displayed on
  * that page. The module overview help information is displayed by the Help
- * module. It can be accessed from the page at /admin/help or from the Extend
- * page. If a module implements hook_help() the help system expects module
- * overview help to be provided.
+ * module. It can be accessed from the page at /admin/help or from the
+ * Extensions page. If a module implements hook_help() the help system expects
+ * module overview help to be provided.
  *
  * For detailed usage examples of:
  * - Module overview help, see content_translation_help(). Module overview
