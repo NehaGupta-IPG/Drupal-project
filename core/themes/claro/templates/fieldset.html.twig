@@ -26,6 +26,7 @@
  * @see claro_preprocess_fieldset()
  */
 #}
+{% set is_required = required or has_required_children %}
 {%
   set classes = [
     'fieldset',
@@ -46,8 +47,8 @@
   set legend_span_classes = [
     'fieldset__label',
     attributes.hasClass('fieldgroup') ? 'fieldset__label--group',
-    required ? 'js-form-required',
-    required ? 'form-required',
+    is_required ? 'js-form-required',
+    is_required ? 'form-required',
   ]
 %}
 {%
@@ -63,7 +64,6 @@
    'fieldset__description',
   ]
 %}
-
 <fieldset{{ attributes.addClass(classes) }}>
   {# Always wrap fieldset legends in a <span> for CSS positioning. #}
   {% if legend.title %}

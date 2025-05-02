@@ -200,6 +200,7 @@ function template_preprocess_fieldset(&$variables): void {
   $variables['title_display'] = $element['#title_display'] ?? NULL;
   $variables['children'] = $element['#children'];
   $variables['required'] = !empty($element['#required']) ? $element['#required'] : NULL;
+  $variables['has_required_children'] = !empty($element["#has_required_children"]) ? $element["#has_required_children"] : FALSE;
 
   if (isset($element['#title']) && $element['#title'] !== '') {
     $variables['legend']['title'] = ['#markup' => $element['#title']];
