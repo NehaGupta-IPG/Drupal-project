@@ -4,7 +4,6 @@ namespace Drupal\Core\Validation\Plugin\Validation\Constraint;
 
 use Drupal\Component\FileSystem\FileSystem as DrupalFilesystem;
 use Drupal\Core\Installer\InstallerKernel;
-use phpDocumentor\Reflection\Types\Static_;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Constraints\Sequentially;
 use Symfony\Component\Validator\Constraints\SequentiallyValidator;
