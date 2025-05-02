@@ -80,6 +80,7 @@ tr .form-item,
   line-height: inherit;
 }
 
+.form-item:has(input[required]) > legend .fieldset__label::after,
 .form-item__label.form-required::after,
 .fieldset__label.form-required::after {
   display: inline-block;

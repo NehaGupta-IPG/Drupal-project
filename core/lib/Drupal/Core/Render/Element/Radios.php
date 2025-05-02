@@ -129,6 +129,8 @@ class Radios extends FormElementBase {
    */
   public static function preRenderRadiosFormElement(array $element): array {
     $element['#attributes']['role'] = 'radiogroup';
+    // Remove the required attribute from the fieldset wrapper.
+    $element['#required'] = FALSE;
     return $element;
   }
 

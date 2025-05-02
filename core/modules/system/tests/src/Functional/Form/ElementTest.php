@@ -127,14 +127,15 @@ class ElementTest extends BrowserTestBase {
   public function testRadiosRequired(): void {
     // Verify that there is require attributes.
     $this->drupalGet('form-test/radios-required');
-    $elements = $this->xpath('//fieldset[@id="edit-radios-required--wrapper" and @aria-required="true"]');
-    $this->assertCount(1, $elements);
-    $elements = $this->xpath('//fieldset[@id="edit-radios-required--wrapper" and @role="radiogroup"]');
-    $this->assertCount(1, $elements);
-    $elements = $this->xpath('//input[@id="edit-radios-required-0" and @required="required"]');
-    $this->assertCount(1, $elements);
-    $elements = $this->xpath('//input[@id="edit-radios-required-0" and @aria-required="true"]');
-    $this->assertCount(0, $elements);
+    $fieldset = $this->assertSession()->elementExists('css', 'fieldset#edit-radios-example-0--wrapper');
+    // Required and aria-required attributes are not set on the fieldset.
+    $this->assertEmpty($fieldset->getAttribute('aria-required'));
+    $this->assertEmpty($fieldset->getAttribute('required'));
+    $this->assertSession()->elementExists('css', 'fieldset#edit-radios-example-0--wrapper #edit-radios-example-0-0[required]');
+    $this->assertSession()->elementExists('css', 'fieldset#edit-radios-example-0--wrapper #edit-radios-example-0-1[required]');
+    $this->assertSession()->elementExists('css', 'fieldset#edit-radios-example-0--wrapper #edit-radios-example-0-2[required]');
+    $this->assertSession()->elementExists('css', 'fieldset#edit-radios-example-1--wrapper #edit-radios-example-1-0[required]');
+    $this->assertSession()->elementNotExists('css', 'fieldset#edit-radios-example-2--wrapper #edit-radios-example-2-0[required]');
   }
 
   /**
