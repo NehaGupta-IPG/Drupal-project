@@ -730,6 +730,21 @@ drupal.tableselect:
     - core/jquery
     - core/once
 
+drupal.tablesort:
+  version: VERSION
+  css:
+    component:
+      misc/components/tablesort.module.css: { weight: -10 }
+  moved_files:
+    system/base:
+      deprecation_version: 11.2.0
+      removed_version: 12.0.0
+      deprecation_link: https://www.drupal.org/node/3432346
+      css:
+        component:
+          css/components/tablesort.module.css:
+            base: misc/components/tablesort.module.css
+
 drupal.time-diff:
   version: VERSION
   js:
@@ -766,6 +781,27 @@ drupal.vertical-tabs:
     - core/drupal
     - core/drupalSettings
     - core/drupal.form
+htmx:
+  remote: https://github.com/bigskysoftware/htmx
+  version: "2.0.4"
+  license:
+    name: Zero-Clause BSD
+    url:  https://raw.githubusercontent.com/bigskysoftware/htmx/refs/tags/v2.0.4/LICENSE
+    gpl-compatible: true
+  js:
+    assets/vendor/htmx/htmx.min.js: { minified: true }
+
+htmx.debug:
+  remote: https://github.com/bigskysoftware/htmx-extensions
+  version: "2.0.1"
+  license:
+    name: Zero-Clause BSD
+    url: https://raw.githubusercontent.com/bigskysoftware/htmx-extensions/refs/heads/main/src/debug/LICENSE
+    gpl-compatible: true
+  js:
+    assets/vendor/htmx/debug.js: {}
+  dependencies:
+    - core/htmx
 
 internal.floating-ui:
   remote: https://github.com/floating-ui/floating-ui

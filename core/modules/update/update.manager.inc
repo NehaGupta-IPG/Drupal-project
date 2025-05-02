@@ -7,7 +7,7 @@
 use Drupal\Core\File\Exception\FileException;
 use Drupal\Core\File\Exception\InvalidStreamWrapperException;
 use Drupal\Core\File\FileExists;
-use Drupal\Core\Hook\Attribute\StopProceduralHookScan;
+use Drupal\Core\Hook\Attribute\ProceduralHookScanStop;
 use Psr\Http\Client\ClientExceptionInterface;
 
 /**
@@ -24,7 +24,7 @@ use Psr\Http\Client\ClientExceptionInterface;
  *   workflow, or FALSE if we've hit a fatal configuration and must halt the
  *   workflow.
  */
-#[StopProceduralHookScan]
+#[ProceduralHookScanStop]
 function _update_manager_check_backends(&$form, $operation) {
   @trigger_error(__METHOD__ . '() is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. There is no replacement. Use composer to manage the code for your site. See https://www.drupal.org/node/3512364', E_USER_DEPRECATED);
 
@@ -211,7 +211,7 @@ function update_manager_file_get($url) {
  *
  * @see update_manager_download_page()
  */
-function update_manager_batch_project_get($project, $url, &$context) {
+function update_manager_batch_project_get($project, $url, &$context): void {
   @trigger_error(__METHOD__ . '() is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. There is no replacement. Use composer to manage the code for your site. See https://www.drupal.org/node/3512364', E_USER_DEPRECATED);
 
   // This is here to show the user that we are in the process of downloading.

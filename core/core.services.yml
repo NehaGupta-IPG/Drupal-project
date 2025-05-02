@@ -1123,6 +1123,7 @@ services:
   pgsql.entity.query.sql:
     class: Drupal\Core\Entity\Query\Sql\pgsql\QueryFactory
     arguments: ['@database']
+    deprecated: The "%service_id%" service is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Install the pgsql module to replace this service. See https://www.drupal.org/node/3488580
   entity.query.null:
     class: Drupal\Core\Entity\Query\Null\QueryFactory
   entity.query.keyvalue:
@@ -1553,7 +1554,7 @@ services:
   Drupal\Core\Datetime\DateFormatterInterface: '@date.formatter'
   theme.manager:
     class: Drupal\Core\Theme\ThemeManager
-    arguments: ['%app.root%', '@theme.negotiator', '@theme.initialization', '@module_handler']
+    arguments: ['%app.root%', '@theme.negotiator', '@theme.initialization', '@module_handler', '@callable_resolver']
     calls:
       - [setThemeRegistry, ['@theme.registry']]
   Drupal\Core\Theme\ThemeManagerInterface: '@theme.manager'
@@ -1563,12 +1564,18 @@ services:
   Drupal\Core\Theme\ThemeInitializationInterface: '@theme.initialization'
   theme.registry:
     class: Drupal\Core\Theme\Registry
-    arguments: ['%app.root%', '@cache.default', '@lock', '@module_handler', '@theme_handler', '@theme.initialization', '@cache.bootstrap', '@extension.list.module', '@kernel']
+    arguments: ['%app.root%', '@cache.default', '@lock', '@module_handler', '@theme_handler', '@theme.initialization', '@cache.bootstrap', '@extension.list.module', '@kernel', ~, '%preprocess_for_suggestions%']
     tags:
       - { name: needs_destruction }
     calls:
       - [setThemeManager, ['@theme.manager']]
   Drupal\Core\Theme\Registry: '@theme.registry'
+  Drupal\Core\Theme\ThemePreprocess:
+    class: Drupal\Core\Theme\ThemePreprocess
+    autowire: true
+  Drupal\Core\Datetime\DatePreprocess:
+    class: Drupal\Core\Datetime\DatePreprocess
+    autowire: true
   authentication:
     class: Drupal\Core\Authentication\AuthenticationManager
     arguments: ['@authentication_collector']
@@ -1798,10 +1805,17 @@ services:
     lazy: true
   file.mime_type.guesser.extension:
     class: Drupal\Core\File\MimeType\ExtensionMimeTypeGuesser
-    arguments: ['@module_handler']
+    arguments: ['@Drupal\Core\File\MimeType\MimeTypeMapInterface', '@file_system']
     tags:
       - { name: mime_type_guesser }
     lazy: true
+  Drupal\Core\File\MimeType\MimeTypeMapFactory:
+    autowire: true
+    public: false
+  Drupal\Core\File\MimeType\MimeTypeMapInterface:
+    factory: ['@Drupal\Core\File\MimeType\MimeTypeMapFactory', create]
+  Drupal\Core\File\EventSubscriber\LegacyMimeTypeMapLoadedSubscriber:
+    autowire: true
   # Currently needs to be public as it is called by
   # \Drupal\Core\Render\Element\StatusMessages.
   # @todo Consider making this service private again after

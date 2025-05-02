@@ -2,6 +2,7 @@
 
 namespace Drupal\system\Hook;
 
+use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\StreamWrapper\StreamWrapperManager;
 use Drupal\Core\StreamWrapper\LocalStream;
 use Drupal\Core\Site\Settings;
@@ -121,9 +122,9 @@ class SystemHooks {
       case 'system.modules_list':
         $output = '<p>' . $this->t('Add <a href=":modules">contributed modules</a> to extend your site\'s functionality.', [':modules' => 'https://www.drupal.org/project/modules']) . '</p>';
         if (!\Drupal::moduleHandler()->moduleExists('update')) {
-          $output .= '<p>' . $this->t('Regularly review available updates and update as required to maintain a secure and current site. Always run the <a href=":update-php">update script</a> each time a module is updated. Install the <a href=":update-manager">Update Manager module</a> to update modules and themes.', [
+          $output .= '<p>' . $this->t('Regularly review available updates and update as required to maintain a secure and current site. Always run the <a href=":update-php">update script</a> each time a module is updated. Install the <a href=":update-status">Update Status module</a> to see a report of available releases for Drupal Core and contributed modules and themes.', [
             ':update-php' => Url::fromRoute('system.db_update')->toString(),
-            ':update-manager' => Url::fromRoute('system.modules_list', [], [
+            ':update-status' => Url::fromRoute('system.modules_list', [], [
               'fragment' => 'module-update',
             ])->toString(),
           ]) . '</p>';
@@ -531,6 +532,19 @@ class SystemHooks {
     if (!class_exists(\ZipArchive::class)) {
       // PHP Zip extension is missing.
       unset($info['Zip']);
+    }
+  }
+
+  /**
+   * Implements hook_entity_form_mode_presave().
+   *
+   * Transforms empty description into null.
+   */
+  #[Hook('hook_entity_form_mode_presave')]
+  public function systemEntityFormModePresave(EntityInterface $entity): void {
+    if ($entity->get('description') !== NULL && trim($entity->get('description')) === '') {
+      @trigger_error("Setting description to an empty string is deprecated in drupal:11.2.0 and it must be null in drupal:12.0.0. See https://www.drupal.org/node/3452144", E_USER_DEPRECATED);
+      $entity->set('description', NULL);
     }
   }
 
