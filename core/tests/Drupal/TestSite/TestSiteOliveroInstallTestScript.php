@@ -103,7 +103,7 @@ class TestSiteOliveroInstallTestScript implements TestSetupInterface, TestPreins
   /**
    * {@inheritdoc}
    */
-  public function preinstall($db_prefix, $site_directory) {
+  public function preinstall($db_prefix, $site_directory): void {
     $process = $this->generateThemeFromStarterkit($site_directory);
     $process->mustRun();
   }
