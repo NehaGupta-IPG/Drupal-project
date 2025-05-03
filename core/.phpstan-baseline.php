@@ -52850,48 +52850,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/tests/Drupal/TestSite/Commands/TestSiteInstallCommand.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\TestSite\\\\TestPreinstallInterface\\:\\:preinstall\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/TestSite/TestPreinstallInterface.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\TestSite\\\\TestSetupInterface\\:\\:setup\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/TestSite/TestSetupInterface.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\TestSite\\\\TestSiteClaroInstallTestScript\\:\\:setup\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/TestSite/TestSiteClaroInstallTestScript.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\TestSite\\\\TestSiteInstallTestScript\\:\\:setup\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/TestSite/TestSiteInstallTestScript.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\TestSite\\\\TestSiteMultilingualInstallTestScript\\:\\:preinstall\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/TestSite/TestSiteMultilingualInstallTestScript.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\TestSite\\\\TestSiteMultilingualInstallTestScript\\:\\:setup\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/TestSite/TestSiteMultilingualInstallTestScript.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\TestSite\\\\TestSiteOliveroInstallTestScript\\:\\:setup\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/TestSite/TestSiteOliveroInstallTestScript.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Call to deprecated method getConfig\\(\\) of class GuzzleHttp\\\\Client\\:
 Client\\:\\:getConfig will be removed in guzzlehttp/guzzle\\:8\\.0\\.$#',
 	'identifier' => 'method.deprecated',

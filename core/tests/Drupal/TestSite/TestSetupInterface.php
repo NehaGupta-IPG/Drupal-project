@@ -24,6 +24,6 @@ interface TestSetupInterface {
    *
    * @see \Drupal\TestSite\TestSiteInstallTestScript
    */
-  public function setup();
+  public function setup(): void;
 
 }
