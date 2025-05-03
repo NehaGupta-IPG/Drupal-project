@@ -64,7 +64,6 @@ services:
     arguments: ['@config.factory']
   Drupal\system\EventSubscriber\UpdateEmptyAdminTheme:
     autowire: true
-    public: false
   logger.channel.system:
     parent: logger.channel_base
     arguments: ['system']
