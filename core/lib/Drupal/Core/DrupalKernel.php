@@ -932,8 +932,11 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
     // not forcing a rebuild, then try and load the container from the cache.
     if ($this->moduleList === NULL && !$this->containerNeedsRebuild) {
       // Add to classloader before call to getCachedContainerDefinition.
-      $this->classLoaderAddMultiplePsr4($this->getCachedContainerDiscovery()->getContainerNamespaces());
-      $class_loader_populated = TRUE;
+      $containerDiscovery = $this->getCachedContainerDiscovery();
+      if ($containerDiscovery !== NULL) {
+        $this->classLoaderAddMultiplePsr4($this->getCachedContainerDiscovery()->getContainerNamespaces());
+        $class_loader_populated = TRUE;
+      }
 
       $container_definition = $this->getCachedContainerDefinition();
     }
