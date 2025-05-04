@@ -125,7 +125,7 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
   /**
    * Holds the container instance.
    *
-   * @var \Drupal\Component\DependencyInjection\ContainerInterface|NULL
+   * @var \Drupal\Component\DependencyInjection\ContainerInterface|null
    */
   protected $container;
 
@@ -153,7 +153,7 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
   /**
    * Holds the list of enabled modules.
    *
-   * @var array|NULL
+   * @var array|null
    *   An associative array whose keys are module names and whose values are
    *   ignored.
    */
