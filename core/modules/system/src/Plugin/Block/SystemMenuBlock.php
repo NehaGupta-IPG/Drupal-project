@@ -10,6 +10,7 @@ use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\Core\Menu\MenuActiveTrailInterface;
 use Drupal\Core\Menu\MenuLinkTreeInterface;
 use Drupal\Core\Menu\MenuTreeParameters;
+use Drupal\Core\Menu\OnlyShowTranslatedMenuLinksInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\system\Form\SystemMenuOffCanvasForm;
@@ -28,7 +29,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
     'settings_tray' => SystemMenuOffCanvasForm::class,
   ]
 )]
-class SystemMenuBlock extends BlockBase implements ContainerFactoryPluginInterface {
+class SystemMenuBlock extends BlockBase implements ContainerFactoryPluginInterface, OnlyShowTranslatedMenuLinksInterface {
 
   /**
    * The menu link tree service.
@@ -223,6 +224,7 @@ class SystemMenuBlock extends BlockBase implements ContainerFactoryPluginInterfa
       'level' => 1,
       'depth' => NULL,
       'expand_all_items' => FALSE,
+      'hide_untranslated_menu_links' => FALSE,
     ];
   }
 
@@ -258,6 +260,13 @@ class SystemMenuBlock extends BlockBase implements ContainerFactoryPluginInterfa
    */
   public function createPlaceholder(): bool {
     return TRUE;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function hideUntranslated(): bool {
+    return $this->configuration['hide_untranslated_menu_links'];
   }
 
 }

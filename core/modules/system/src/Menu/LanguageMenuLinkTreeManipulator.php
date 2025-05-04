@@ -10,7 +10,7 @@ use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\Menu\InaccessibleMenuLink;
 use Drupal\Core\Menu\MenuLinkTranslationInterface;
 use Drupal\Core\Menu\MenuLinkTreeContextualManipulatorInterface;
-use Drupal\system\Plugin\Block\SystemMenuBlock;
+use Drupal\Core\Menu\OnlyShowTranslatedMenuLinksInterface;
 
 /**
  * Provides a menu link language manipulator.
@@ -63,16 +63,10 @@ class LanguageMenuLinkTreeManipulator implements MenuLinkTreeContextualManipulat
    * {@inheritdoc}
    */
   public function applies(array $tree, mixed $context): bool {
-    if (!($context instanceof SystemMenuBlock)) {
-      return FALSE;
+    if ($context instanceof OnlyShowTranslatedMenuLinksInterface) {
+      return $context->hideUntranslated();
     }
-
-    $configuration = $context->getConfiguration();
-    if (!isset($configuration['hide_untranslated_menu_links']) || $configuration['hide_untranslated_menu_links'] !== TRUE) {
-      return FALSE;
-    }
-
-    return TRUE;
+    return FALSE;
   }
 
   /**
