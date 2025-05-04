@@ -163,9 +163,9 @@
  *   documentation here.
  *
  * @section Menu Link Tree Manipulators
- *  When rendering menu link trees, the menu links are transformed into an actual
- *  link tree that is ready for output. There are two categories of menu link
- *  tree manipulators involved in this process:
+ *  When rendering menu link trees, the menu links are transformed into an
+ *  actual link tree that is ready for output. There are two categories of
+ *  menu link tree manipulators involved in this process:
  *
  *  Explicit Manipulators: These are deliberately added during rendering of the
  *  menu link tree. For example, access checking is commonly done using an
