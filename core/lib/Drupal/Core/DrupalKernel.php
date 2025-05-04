@@ -125,7 +125,7 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
   /**
    * Holds the container instance.
    *
-   * @var \Drupal\Component\DependencyInjection\ContainerInterface|null
+   * @var \Drupal\Component\DependencyInjection\ContainerInterface|NULL
    */
   protected $container;
 
@@ -153,7 +153,7 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
   /**
    * Holds the list of enabled modules.
    *
-   * @var array|null
+   * @var array|NULL
    *   An associative array whose keys are module names and whose values are
    *   ignored.
    */
@@ -923,7 +923,7 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
       $all_messages = $this->container->get('messenger')->all();
     }
 
-    /** @var ContainerDefinition|null $container_definition */
+    /** @var ContainerDefinition|NULL $container_definition */
     $container_definition = NULL;
     $class_loader_populated = FALSE;
 
