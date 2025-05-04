@@ -20,6 +20,8 @@ use Prophecy\Argument;
 /**
  * @coversDefaultClass \Drupal\Component\DependencyInjection\Container
  * @group DependencyInjection
+ *
+ * @phpstan-import-type ContainerDefinition from \Drupal\Component\DependencyInjection\Dumper\OptimizedPhpArrayDumper
  */
 class ContainerTest extends TestCase {
   use ExpectDeprecationTrait;
@@ -734,7 +736,7 @@ class ContainerTest extends TestCase {
   /**
    * Gets a mock container definition.
    *
-   * @return array
+   * @return ContainerDefinition
    *   Associated array with parameters and services.
    */
   protected function getMockContainerDefinition(): array {

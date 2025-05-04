@@ -13,6 +13,7 @@ use Drupal\Core\Config\BootstrapConfigStorageFactory;
 use Drupal\Core\Config\NullStorage;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Component\DependencyInjection\ReverseContainer;
+use Drupal\Core\DependencyInjection\ContainerDiscovery;
 use Drupal\Core\DependencyInjection\ServiceModifierInterface;
 use Drupal\Core\DependencyInjection\ServiceProviderInterface;
 use Drupal\Core\DependencyInjection\YamlFileLoader;
@@ -49,6 +50,8 @@ use Symfony\Component\HttpKernel\TerminableInterface;
  * own service provider, i.e. a class implementing
  * Drupal\Core\DependencyInjection\ServiceProvider, to register services to the
  * container, or modify existing services.
+ *
+ * @phpstan-import-type ContainerDefinition from \Drupal\Component\DependencyInjection\Dumper\OptimizedPhpArrayDumper
  */
 class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
   use InstallerRedirectTrait;
@@ -60,7 +63,7 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
    * dump to the human-readable PHP array format to debug the container
    * definition in an easier way.
    *
-   * @var string
+   * @var class-string<\Symfony\Component\DependencyInjection\Dumper\Dumper>
    */
   protected $phpArrayDumperClass = '\Drupal\Component\DependencyInjection\Dumper\OptimizedPhpArrayDumper';
 
@@ -122,7 +125,7 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
   /**
    * Holds the container instance.
    *
-   * @var \Drupal\Component\DependencyInjection\ContainerInterface
+   * @var \Drupal\Component\DependencyInjection\ContainerInterface|null
    */
   protected $container;
 
@@ -150,7 +153,7 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
   /**
    * Holds the list of enabled modules.
    *
-   * @var array
+   * @var array|null
    *   An associative array whose keys are module names and whose values are
    *   ignored.
    */
@@ -547,16 +550,20 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
   }
 
   /**
+   * Get metadata relevant to discovery and autoloading.
+   */
+  private function getCachedContainerDiscovery(): ?ContainerDiscovery {
+    $cache = $this->bootstrapContainer->get('cache.container')->get($this->getContainerDiscoveryCacheKey());
+    return $cache !== FALSE ? $cache->data : NULL;
+  }
+
+  /**
    * {@inheritdoc}
    */
   public function getCachedContainerDefinition() {
+    /** @var \stdClass{data: ContainerDefinition}|NULL $cache */
     $cache = $this->bootstrapContainer->get('cache.container')->get($this->getContainerCacheKey());
-
-    if ($cache) {
-      return $cache->data;
-    }
-
-    return NULL;
+    return $cache !== FALSE ? $cache->data : NULL;
   }
 
   /**
@@ -830,6 +837,20 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
   }
 
   /**
+   * Gets the cache key used for container discovery.
+   */
+  protected function getContainerDiscoveryCacheKey(): string {
+    return sprintf(
+      'service_container_discovery:%s:%s:%s:%s:%s',
+      $this->environment,
+      \Drupal::VERSION,
+      Settings::get('deployment_identifier'),
+      PHP_OS,
+      serialize(Settings::get('container_yamls')),
+    );
+  }
+
+  /**
    * Returns the container cache key based on the environment.
    *
    * The 'environment' consists of:
@@ -845,15 +866,14 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
    *   The cache key used for the service container.
    */
   protected function getContainerCacheKey() {
-    $parts = [
-      'service_container',
+    return sprintf(
+      'service_container:%s:%s:%s:%s:%s',
       $this->environment,
       \Drupal::VERSION,
       Settings::get('deployment_identifier'),
       PHP_OS,
       serialize(Settings::get('container_yamls')),
-    ];
-    return implode(':', $parts);
+    );
   }
 
   /**
@@ -903,15 +923,23 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
       $all_messages = $this->container->get('messenger')->all();
     }
 
+    /** @var ContainerDefinition|null $container_definition */
+    $container_definition = NULL;
+    $class_loader_populated = FALSE;
+
     // If the module list hasn't already been set in updateModules and we are
     // not forcing a rebuild, then try and load the container from the cache.
-    if (empty($this->moduleList) && !$this->containerNeedsRebuild) {
+    if ($this->moduleList === NULL && !$this->containerNeedsRebuild) {
+      // Add to classloader before call to getCachedContainerDefinition.
+      $this->classLoaderAddMultiplePsr4($this->getCachedContainerDiscovery()->getContainerNamespaces());
+      $class_loader_populated = TRUE;
+
       $container_definition = $this->getCachedContainerDefinition();
     }
 
     // If there is no cached container definition, build a new container from
     // scratch.
-    if (!isset($container_definition)) {
+    if ($container_definition === NULL) {
       $container = $this->compileContainer();
 
       // Only dump the container if dumping is allowed. This is useful for
@@ -927,13 +955,17 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
     $this->containerNeedsRebuild = FALSE;
 
     // Only create a new class if we have a container definition.
-    if (isset($container_definition)) {
+    if ($container_definition !== NULL) {
       // Drupal provides two dynamic parameters to access specific paths that
       // are determined from the request.
       $container_definition['parameters']['app.root'] = $this->getAppRoot();
       $container_definition['parameters']['site.path'] = $this->getSitePath();
       $class = Settings::get('container_base_class', '\Drupal\Core\DependencyInjection\Container');
       $container = new $class($container_definition);
+    }
+
+    if (!$class_loader_populated) {
+      $this->classLoaderAddMultiplePsr4($container->getParameter('container.namespaces'));
     }
 
     $this->attachSynthetic($container);
@@ -1276,15 +1308,11 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
    *   The container object with the kernel and the class loader added.
    */
   protected function attachSynthetic(ContainerInterface $container) {
-    $persist = [];
-    if (isset($this->container)) {
-      $persist = $this->getServicesToPersist($this->container);
-    }
-    $this->persistServices($container, $persist);
+    $persist = $this->container !== NULL
+      ? $this->getServicesToPersist($this->container)
+      : [];
 
-    // All namespaces must be registered before we attempt to use any service
-    // from the container.
-    $this->classLoaderAddMultiplePsr4($container->getParameter('container.namespaces'));
+    $this->persistServices($container, $persist);
 
     $container->set('kernel', $this);
 
@@ -1436,25 +1464,25 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
   /**
    * Stores the container definition in a cache.
    *
-   * @param array $container_definition
+   * @param ContainerDefinition $container_definition
    *   The container definition to cache.
    *
    * @return bool
    *   TRUE if the container was successfully cached.
    */
   protected function cacheDrupalContainer(array $container_definition) {
-    $saved = TRUE;
     try {
+      $this->bootstrapContainer->get('cache.container')->set($this->getContainerDiscoveryCacheKey(), ContainerDiscovery::fromContainerDefinition($container_definition));
       $this->bootstrapContainer->get('cache.container')->set($this->getContainerCacheKey(), $container_definition);
     }
     catch (\Exception) {
       // There is no way to get from the Cache API if the cache set was
       // successful or not, hence an Exception is caught and the caller informed
       // about the error condition.
-      $saved = FALSE;
+      return FALSE;
     }
 
-    return $saved;
+    return TRUE;
   }
 
   /**
@@ -1546,6 +1574,9 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
 
   /**
    * Registers a list of namespaces with PSR-4 directories for class loading.
+   *
+   * All namespaces must be registered before we attempt to use any service
+   * from the container.
    *
    * @param array $namespaces
    *   Array where each key is a namespace like 'Drupal\system', and each value
