@@ -26,10 +26,8 @@ final class ContainerDiscovery {
    *   @endcode
    */
   private function __construct(
-    private array $containerNamespaces
-  )
-  {
-  }
+    private array $containerNamespaces,
+  ) {}
 
   /**
    * Get container namespaces.
