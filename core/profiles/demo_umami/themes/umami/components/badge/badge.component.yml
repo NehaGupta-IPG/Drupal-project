@@ -29,6 +29,8 @@ props:
         - difficulty
 slots:
   label:
+    type: string
     description: Label text
   text:
+    type: string
     description: Text

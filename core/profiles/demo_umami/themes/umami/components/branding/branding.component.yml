@@ -32,6 +32,6 @@ props:
 
 slots:
   site_name:
-    title: Site name
+    type: string
   site_slogan:
-    title: Site slogan
+    type: string

@@ -8,7 +8,6 @@
       "patternProperties": {
         "^[a-zA-Z0-9_-]+$": {
           "type": "object",
-          "additionalProperties": false,
           "properties": {
             "title": {
               "type": "string",

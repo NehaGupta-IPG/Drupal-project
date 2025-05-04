@@ -23,4 +23,5 @@ props:
         - success
 slots:
   label:
+    type: string
     description: Label text
