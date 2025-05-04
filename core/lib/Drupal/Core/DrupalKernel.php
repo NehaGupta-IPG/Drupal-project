@@ -925,6 +925,7 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
 
     /** @var ContainerDefinition|NULL $container_definition */
     $container_definition = NULL;
+    $container = NULL;
     $class_loader_populated = FALSE;
 
     // If the module list hasn't already been set in updateModules and we are
@@ -966,6 +967,11 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
 
     if (!$class_loader_populated) {
       $this->classLoaderAddMultiplePsr4($container->getParameter('container.namespaces'));
+    }
+
+    if ($container === NULL) {
+      // Not having a $container here is a failure state.
+      throw new \RuntimeException('Failed to build the service container.');
     }
 
     $this->attachSynthetic($container);
