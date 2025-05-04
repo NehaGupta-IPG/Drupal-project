@@ -23,6 +23,8 @@ use Symfony\Component\ExpressionLanguage\Expression;
 /**
  * @coversDefaultClass \Drupal\Component\DependencyInjection\Dumper\OptimizedPhpArrayDumper
  * @group DependencyInjection
+ *
+ * @phpstan-import-type ContainerDefinition from \Drupal\Component\DependencyInjection\Dumper\OptimizedPhpArrayDumper
  */
 class OptimizedPhpArrayDumperTest extends TestCase {
 
@@ -39,7 +41,7 @@ class OptimizedPhpArrayDumperTest extends TestCase {
   /**
    * The definition for the container to build in tests.
    *
-   * @var array
+   * @var ContainerDefinition
    */
   protected $containerDefinition;
 
@@ -75,14 +77,13 @@ class OptimizedPhpArrayDumperTest extends TestCase {
     $this->containerBuilder->getDefinitions()->willReturn([]);
     $this->containerBuilder->isCompiled()->willReturn(TRUE);
 
-    $definition = [];
-    $definition['aliases'] = [];
-    $definition['parameters'] = [];
-    $definition['services'] = [];
-    $definition['frozen'] = TRUE;
-    $definition['machine_format'] = $this->machineFormat;
-
-    $this->containerDefinition = $definition;
+    $this->containerDefinition = [
+      'aliases' => [],
+      'parameters' => [],
+      'services' => [],
+      'frozen' => TRUE,
+      'machine_format' => $this->machineFormat,
+    ];
 
     // Create the dumper.
     $this->dumper = new $this->dumperClass($this->containerBuilder->reveal());

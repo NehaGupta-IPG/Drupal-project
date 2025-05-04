@@ -43,6 +43,8 @@ use Symfony\Contracts\Service\ResetInterface;
  *   contrib.
  *
  * @ingroup container
+ *
+ * @phpstan-import-type ContainerDefinition from \Drupal\Component\DependencyInjection\Dumper\OptimizedPhpArrayDumper
  */
 class Container implements ContainerInterface, ResetInterface {
 
@@ -100,8 +102,8 @@ class Container implements ContainerInterface, ResetInterface {
   /**
    * Constructs a new Container instance.
    *
-   * @param array $container_definition
-   *   An array containing the following keys:
+   * @param ContainerDefinition|array{} $container_definition
+   *   An empty array, or an array with the following keys:
    *   - aliases: The aliases of the container.
    *   - parameters: The parameters of the container.
    *   - services: The service definitions of the container.

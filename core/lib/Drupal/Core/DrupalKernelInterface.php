@@ -11,6 +11,8 @@ use Symfony\Component\HttpFoundation\Request;
  *
  * This interface extends Symfony's KernelInterface and adds methods for
  * responding to modules being enabled or disabled during its lifetime.
+ *
+ * @phpstan-import-type ContainerDefinition from \Drupal\Component\DependencyInjection\Dumper\OptimizedPhpArrayDumper
  */
 interface DrupalKernelInterface extends HttpKernelInterface {
 
@@ -68,7 +70,7 @@ interface DrupalKernelInterface extends HttpKernelInterface {
    *
    * This also allows inspecting a built container for debugging purposes.
    *
-   * @return array|null
+   * @return ContainerDefinition|null
    *   The cached container definition or NULL if not found in cache.
    */
   public function getCachedContainerDefinition();
