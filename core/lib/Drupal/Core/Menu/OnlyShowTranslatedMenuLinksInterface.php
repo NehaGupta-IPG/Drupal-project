@@ -11,7 +11,7 @@ interface OnlyShowTranslatedMenuLinksInterface {
    * Determines if a menu tree should hide translated items.
    *
    * @return bool
-   *   TRUE if menu tree should filter out non-straslated items, FALSE if not.
+   *   TRUE if menu tree should filter out non-translated items, FALSE if not.
    */
   public function hideUntranslated(): bool;
 
