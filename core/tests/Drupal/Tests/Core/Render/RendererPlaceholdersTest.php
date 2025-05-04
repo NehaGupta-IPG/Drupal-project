@@ -62,6 +62,7 @@ class RendererPlaceholdersTest extends RendererTestBase {
    *   https://www.drupal.org/node/2559847
    *
    * @return array
+   *   An array of test cases.
    */
   public static function providerPlaceholders(): array {
     $args = [static::randomContextValue()];
@@ -203,7 +204,8 @@ class RendererPlaceholdersTest extends RendererTestBase {
     $cases = [];
 
     // Case one: render array that has a placeholder that is:
-    // - automatically created, but manually triggered (#create_placeholder = TRUE)
+    // - automatically created, but manually triggered (#create_placeholder =
+    //   TRUE)
     // - uncacheable
     $element_without_cache_keys = $base_element_a1;
     $expected_placeholder_render_array = $extract_placeholder_render_array($base_element_a1['placeholder']);
@@ -218,7 +220,8 @@ class RendererPlaceholdersTest extends RendererTestBase {
     ];
 
     // Case two: render array that has a placeholder that is:
-    // - automatically created, but manually triggered (#create_placeholder = TRUE)
+    // - automatically created, but manually triggered (#create_placeholder =
+    //   TRUE)
     // - cacheable
     $element_with_cache_keys = $base_element_a1;
     $element_with_cache_keys['placeholder']['#cache']['keys'] = $keys;
@@ -1149,7 +1152,10 @@ HTML;
   }
 
   /**
+   * Sets up the theme manager for the <details>-tag.
+   *
    * @return \Drupal\Core\Theme\ThemeManagerInterface|\PHPUnit\Framework\MockObject\Builder\InvocationMocker
+   *   The mocked theme manager.
    */
   protected function setupThemeManagerForDetails() {
     return $this->themeManager->expects($this->any())
@@ -1177,7 +1183,9 @@ EOS;
 class RecursivePlaceholdersTest implements TrustedCallbackInterface {
 
   /**
-   * #lazy_builder callback; bubbles another placeholder.
+   * Render API callback: Bubbles another placeholder.
+   *
+   * This function is assigned as a #lazy_builder callback.
    *
    * @param string $animal
    *   An animal.
@@ -1203,6 +1211,9 @@ class RecursivePlaceholdersTest implements TrustedCallbackInterface {
 
 }
 
+/**
+ * Class for testing the placeholdering render cache.
+ */
 class TestPlaceholderingRenderCache extends PlaceholderingRenderCache {
 
   /**

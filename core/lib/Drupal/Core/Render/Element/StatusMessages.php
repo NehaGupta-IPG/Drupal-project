@@ -38,7 +38,9 @@ class StatusMessages extends RenderElementBase {
   }
 
   /**
-   * #pre_render callback to generate a placeholder.
+   * Render API callback: Generates a placeholder.
+   *
+   * This function is assigned as a #lazy_builder callback.
    *
    * @param array $element
    *   A renderable array.
@@ -69,16 +71,18 @@ class StatusMessages extends RenderElementBase {
   }
 
   /**
-   * #lazy_builder callback; replaces placeholder with messages.
+   * Render API callback: Replaces placeholder with messages.
+   *
+   * This function is assigned as a #lazy_builder callback.
    *
    * @param string|null $type
    *   Limit the messages returned by type. Defaults to NULL, meaning all types.
    *   Passed on to \Drupal\Core\Messenger\Messenger::deleteByType(). These
    *   values are supported:
-   *   - NULL
-   *   - 'status'
-   *   - 'warning'
-   *   - 'error'
+   *   - NULL.
+   *   - 'status'.
+   *   - 'warning'.
+   *   - 'error'.
    *
    * @return array
    *   A renderable array containing the messages.

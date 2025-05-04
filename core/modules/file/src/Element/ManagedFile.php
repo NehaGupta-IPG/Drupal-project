@@ -159,7 +159,7 @@ class ManagedFile extends FormElementBase {
   }
 
   /**
-   * #ajax callback for managed_file upload forms.
+   * The #ajax callback for managed_file upload forms.
    *
    * This ajax callback takes care of the following things:
    *   - Ensures that broken requests due to too big files are caught.
@@ -465,6 +465,7 @@ class ManagedFile extends FormElementBase {
    * Wraps the file usage service.
    *
    * @return \Drupal\file\FileUsage\FileUsageInterface
+   *   The file usage service.
    */
   protected static function fileUsage() {
     return \Drupal::service('file.usage');

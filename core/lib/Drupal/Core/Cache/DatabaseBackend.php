@@ -30,7 +30,7 @@ class DatabaseBackend implements CacheBackendInterface {
   const DEFAULT_MAX_ROWS = 5000;
 
   /**
-   * -1 means infinite allows numbers of rows for the cache backend.
+   * Indicates that an infinite number of rows is allowed for the cache backend.
    */
   const MAXIMUM_NONE = -1;
 
@@ -128,10 +128,22 @@ class DatabaseBackend implements CacheBackendInterface {
     // ::select() is a much smaller proportion of the request.
     $result = [];
     try {
-      $result = $this->connection->query('SELECT [cid], [data], [created], [expire], [serialized], [tags], [checksum] FROM {' . $this->connection->escapeTable($this->bin) . '} WHERE [cid] IN ( :cids[] ) ORDER BY [cid]', [':cids[]' => array_keys($cid_mapping)]);
+      $result = $this->connection->query('SELECT [cid], [data], [created], [expire], [serialized], [tags], [checksum] FROM {' . $this->connection->escapeTable($this->bin) . '} WHERE [cid] IN ( :cids[] ) ORDER BY [cid]', [':cids[]' => array_keys($cid_mapping)])->fetchAll();
     }
     catch (\Exception) {
       // Nothing to do.
+    }
+    // Before checking the validity of each item individually, register the
+    // cache tags for all returned cache items for preloading, this allows the
+    // cache tag service to optimize cache tag lookups.
+    if ($this->checksumProvider instanceof CacheTagsChecksumPreloadInterface) {
+      $tags_for_preload = [];
+      foreach ($result as $item) {
+        if ($item->tags) {
+          $tags_for_preload[] = explode(' ', $item->tags);
+        }
+      }
+      $this->checksumProvider->registerCacheTagsForPreload(array_merge(...$tags_for_preload));
     }
     $cache = [];
     foreach ($result as $item) {
@@ -375,6 +387,7 @@ class DatabaseBackend implements CacheBackendInterface {
    * {@inheritdoc}
    */
   public function invalidateAll() {
+    @trigger_error("CacheBackendInterface::invalidateAll() is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Use CacheBackendInterface::deleteAll() or cache tag invalidation instead. See https://www.drupal.org/node/3500622", E_USER_DEPRECATED);
     try {
       $this->connection->update($this->bin)
         ->fields(['expire' => $this->time->getRequestTime() - 1])

@@ -67,10 +67,10 @@
  * during the same request.
  *
  * One example of the simplest connection array is shown below. To use the
- * sample settings, copy and uncomment the code below between the @code and
- * @endcode lines and paste it after the $databases declaration. You will need
- * to replace the database username and password and possibly the host and port
- * with the appropriate credentials for your database system.
+ * sample settings, copy and uncomment the code below and paste it after the
+ * $databases declaration. You will need to replace the database username and
+ * password and possibly the host and port with the appropriate credentials for
+ * your database system.
  *
  * The next section describes how to customize the $databases array for more
  * specific needs.
@@ -312,7 +312,7 @@ $settings['hash_salt'] = '';
 $settings['update_free_access'] = FALSE;
 
 /**
- * Fallback to HTTP for Update Manager and for fetching security advisories.
+ * Fallback to HTTP for Update Status and for fetching security advisories.
  *
  * If your site fails to connect to updates.drupal.org over HTTPS (either when
  * fetching data on available updates, or when fetching the feed of critical

@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace Drupal\file\Hook;
 
+use Drupal\Core\Entity\EntityFieldManagerInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Hook\Attribute\Hook;
+use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\field\FieldStorageConfigInterface;
 use Drupal\views\FieldViewsDataProvider;
 
@@ -14,8 +16,11 @@ use Drupal\views\FieldViewsDataProvider;
  */
 class FileViewsHooks {
 
+  use StringTranslationTrait;
+
   public function __construct(
     protected readonly EntityTypeManagerInterface $entityTypeManager,
+    protected readonly EntityFieldManagerInterface $entityFieldManager,
     protected readonly ?FieldViewsDataProvider $fieldViewsDataProvider,
   ) {}
 
@@ -37,7 +42,7 @@ class FileViewsHooks {
         'base' => 'file_managed',
         'entity type' => 'file',
         'base field' => 'fid',
-        'label' => t('file from @field_name', [
+        'label' => $this->t('file from @field_name', [
           '@field_name' => $field_storage->getName(),
         ]),
       ];
@@ -58,17 +63,17 @@ class FileViewsHooks {
     $pseudo_field_name = 'reverse_' . $field_name . '_' . $entity_type_id;
     /** @var \Drupal\Core\Entity\Sql\DefaultTableMapping $table_mapping */
     $table_mapping = $this->entityTypeManager->getStorage($entity_type_id)->getTableMapping();
-    [$label] = views_entity_field_label($entity_type_id, $field_name);
+    [$label] = $this->entityFieldManager->getFieldLabels($entity_type_id, $field_name);
     $data['file_managed'][$pseudo_field_name]['relationship'] = [
-      'title' => t('@entity using @field', [
+      'title' => $this->t('@entity using @field', [
         '@entity' => $entity_type->getLabel(),
         '@field' => $label,
       ]),
-      'label' => t('@field_name', [
+      'label' => $this->t('@field_name', [
         '@field_name' => $field_name,
       ]),
       'group' => $entity_type->getLabel(),
-      'help' => t('Relate each @entity with a @field set to the file.', [
+      'help' => $this->t('Relate each @entity with a @field set to the file.', [
         '@entity' => $entity_type->getLabel(),
         '@field' => $label,
       ]),

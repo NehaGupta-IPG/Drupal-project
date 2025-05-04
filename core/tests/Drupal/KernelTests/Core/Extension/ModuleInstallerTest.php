@@ -174,13 +174,12 @@ class ModuleInstallerTest extends KernelTestBase implements LoggerInterface {
   /**
    * Tests container rebuilding due to the container_rebuild_required info key.
    *
-   * @covers ::install
-   *
    * @param array $modules
    *   The modules to install.
    * @param int $count
    *   The number of times the container should have been rebuilt.
    *
+   * @covers ::install
    * @dataProvider containerRebuildRequiredProvider
    */
   public function testContainerRebuildRequired(array $modules, int $count): void {
@@ -261,6 +260,21 @@ class ModuleInstallerTest extends KernelTestBase implements LoggerInterface {
     $this->assertTrue(\Drupal::moduleHandler()->moduleExists('workspaces'));
     $this->assertTrue(\Drupal::moduleHandler()->moduleExists('taxonomy'));
     $this->assertArrayHasKey('workspace', \Drupal::service('entity_field.manager')->getBaseFieldDefinitions('taxonomy_term'));
+  }
+
+  /**
+   * Tests that entity storage tables are installed before simple config.
+   *
+   * When multiple modules are installed together in one batch, entity storage
+   * for entity types in all the modules should exist before simple config from
+   * any module is installed.
+   */
+  public function testEntityStorageInstalledBeforeSimpleConfig(): void {
+    \Drupal::service('module_installer')->install(['node', 'module_installer_config_subscriber']);
+    // The module_installer_config_subscriber module has an config save event
+    // subscriber for its own simple config. When that config is saved during
+    // module installed, it checks that the node storage table exists.
+    $this->assertNotTrue(\Drupal::keyValue('module_installer_config_subscriber')->get('node_tables_missing'));
   }
 
   /**
