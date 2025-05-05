@@ -4,9 +4,11 @@
   "$defs": {
     "slotDefinition": {
       "type": "object",
+      "additionalProperties": false,
       "patternProperties": {
         "^[a-zA-Z0-9_-]+$": {
           "type": "object",
+          "additionalProperties": false,
           "properties": {
             "title": {
               "type": "string",
@@ -15,6 +17,10 @@
             "description": {
               "type": "string",
               "title": "Description"
+            },
+            "required": {
+              "type": "boolean",
+              "title": "Required"
             },
             "examples": {
               "type": "array",
