@@ -18,6 +18,10 @@
               "type": "string",
               "title": "Description"
             },
+            "required": {
+              "type": "boolean",
+              "title": "Required"
+            },
             "examples": {
               "type": "array",
               "items": {
