@@ -40,6 +40,8 @@ class WizardTest extends WizardTestBase {
 
   /**
    * Tests adding a view of comments.
+   *
+   * @group legacy
    */
   public function testCommentWizard(): void {
     $view = [];
@@ -98,6 +100,7 @@ class WizardTest extends WizardTestBase {
     // Check for the default fields.
     $this->assertEquals('comment_field_data', $view->field['subject']->table);
     $this->assertEquals('subject', $view->field['subject']->field);
+    $this->expectDeprecation('Drupal\Component\Utility\Environment::setTimeLimit() is deprecated in drupal:11.1.0 and is removed from drupal:12.0.0. There is no replacement. See https://www.drupal.org/node/3483359');
   }
 
 }

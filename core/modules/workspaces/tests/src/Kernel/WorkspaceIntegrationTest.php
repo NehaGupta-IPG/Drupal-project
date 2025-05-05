@@ -1149,11 +1149,14 @@ class WorkspaceIntegrationTest extends KernelTestBase {
    * The node_access_test module makes anonymous nodes unviewable,
    * so enable it and test getDifferringRevisionIdsOnTarget() with an anonymous
    * node.
+   *
+   * @group legacy
    */
   public function testNodeAccessDifferringRevisionIdsOnTarget(): void {
     $this->initializeWorkspacesModule();
     \Drupal::service('module_installer')->install(['node_access_test']);
     node_access_rebuild();
+    $this->expectDeprecation('Drupal\Component\Utility\Environment::setTimeLimit() is deprecated in drupal:11.1.0 and is removed from drupal:12.0.0. There is no replacement. See https://www.drupal.org/node/3483359');
 
     // Edit node 1 in 'stage'.
     $this->switchToWorkspace('stage');

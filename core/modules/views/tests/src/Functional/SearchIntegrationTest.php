@@ -34,6 +34,8 @@ class SearchIntegrationTest extends ViewTestBase {
 
   /**
    * Tests search integration.
+   *
+   * @group legacy
    */
   public function testSearchIntegration(): void {
     // Create a content type.
@@ -136,6 +138,7 @@ class SearchIntegrationTest extends ViewTestBase {
     $results = $this->xpath($xpath);
     $this->assertEquals("Testing one one one", $results[0]->getText());
     $this->assertEquals("Testing one two two two", $results[1]->getText());
+    $this->expectDeprecation('Drupal\Component\Utility\Environment::setTimeLimit() is deprecated in drupal:11.1.0 and is removed from drupal:12.0.0. There is no replacement. See https://www.drupal.org/node/3483359');
   }
 
   /**

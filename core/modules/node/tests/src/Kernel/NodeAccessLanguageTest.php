@@ -46,6 +46,8 @@ class NodeAccessLanguageTest extends NodeAccessTestBase {
 
   /**
    * Tests node access with multiple node languages and no private nodes.
+   *
+   * @group legacy
    */
   public function testNodeAccess(): void {
     $web_user = $this->drupalCreateUser(['access content']);
@@ -112,10 +114,13 @@ class NodeAccessLanguageTest extends NodeAccessTestBase {
 
     // Tests that Catalan is accessible on a node with a Catalan version.
     $this->assertNodeAccess($expected_node_access, $node_public_ca->getTranslation('ca'), $web_user);
+    $this->expectDeprecation('Drupal\Component\Utility\Environment::setTimeLimit() is deprecated in drupal:11.1.0 and is removed from drupal:12.0.0. There is no replacement. See https://www.drupal.org/node/3483359');
   }
 
   /**
    * Tests node access with multiple node languages and private nodes.
+   *
+   * @group legacy
    */
   public function testNodeAccessPrivate(): void {
     $web_user = $this->drupalCreateUser(['access content']);
@@ -178,10 +183,13 @@ class NodeAccessLanguageTest extends NodeAccessTestBase {
     // private nodes.
     $this->assertNodeAccess($expected_node_access, $node_private_ca, $private_ca_user);
     $this->assertNodeAccess($expected_node_access, $node_private_ca->getTranslation('ca'), $private_ca_user);
+    $this->expectDeprecation('Drupal\Component\Utility\Environment::setTimeLimit() is deprecated in drupal:11.1.0 and is removed from drupal:12.0.0. There is no replacement. See https://www.drupal.org/node/3483359');
   }
 
   /**
    * Tests select queries with a 'node_access' tag and langcode metadata.
+   *
+   * @group legacy
    */
   public function testNodeAccessQueryTag(): void {
     // Create a normal authenticated user.
@@ -261,6 +269,7 @@ class NodeAccessLanguageTest extends NodeAccessTestBase {
     // All nodes are returned because node access tag is not invoked when the
     // user is user 1.
     $this->assertCount(3, $nids, 'Query returns all three nodes.');
+    $this->expectDeprecation('Drupal\Component\Utility\Environment::setTimeLimit() is deprecated in drupal:11.1.0 and is removed from drupal:12.0.0. There is no replacement. See https://www.drupal.org/node/3483359');
   }
 
 }

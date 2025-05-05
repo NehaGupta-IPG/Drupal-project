@@ -195,6 +195,8 @@ class UsageTest extends FileManagedUnitTestBase {
 
   /**
    * Ensure that temporary files are removed by default.
+   *
+   * @group legacy
    */
   public function testTempFileCleanupDefault(): void {
     [$temp_old, $temp_new, $perm_old, $perm_new] = $this->createTempFiles();
@@ -205,10 +207,13 @@ class UsageTest extends FileManagedUnitTestBase {
     $this->assertFileExists($temp_new->getFileUri());
     $this->assertFileExists($perm_old->getFileUri());
     $this->assertFileExists($perm_new->getFileUri());
+    $this->expectDeprecation('Drupal\Component\Utility\Environment::setTimeLimit() is deprecated in drupal:11.1.0 and is removed from drupal:12.0.0. There is no replacement. See https://www.drupal.org/node/3483359');
   }
 
   /**
    * Ensure that temporary files are kept as configured.
+   *
+   * @group legacy
    */
   public function testTempFileNoCleanup(): void {
     [$temp_old, $temp_new, $perm_old, $perm_new] = $this->createTempFiles();
@@ -224,10 +229,13 @@ class UsageTest extends FileManagedUnitTestBase {
     $this->assertFileExists($temp_new->getFileUri());
     $this->assertFileExists($perm_old->getFileUri());
     $this->assertFileExists($perm_new->getFileUri());
+    $this->expectDeprecation('Drupal\Component\Utility\Environment::setTimeLimit() is deprecated in drupal:11.1.0 and is removed from drupal:12.0.0. There is no replacement. See https://www.drupal.org/node/3483359');
   }
 
   /**
    * Ensure that temporary files are kept as configured.
+   *
+   * @group legacy
    */
   public function testTempFileCustomCleanup(): void {
     [$temp_old, $temp_new, $perm_old, $perm_new] = $this->createTempFiles();
@@ -243,6 +251,7 @@ class UsageTest extends FileManagedUnitTestBase {
     $this->assertFileExists($temp_new->getFileUri());
     $this->assertFileExists($perm_old->getFileUri());
     $this->assertFileExists($perm_new->getFileUri());
+    $this->expectDeprecation('Drupal\Component\Utility\Environment::setTimeLimit() is deprecated in drupal:11.1.0 and is removed from drupal:12.0.0. There is no replacement. See https://www.drupal.org/node/3483359');
   }
 
   /**

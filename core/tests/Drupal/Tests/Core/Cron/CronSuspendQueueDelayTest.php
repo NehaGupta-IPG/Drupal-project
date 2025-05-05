@@ -122,6 +122,8 @@ final class CronSuspendQueueDelayTest extends UnitTestCase {
    *    - item throws SuspendQueueException with 3.0 delay.
    *  - test_worker_a:
    *    - no items remaining, quits.
+   *
+   * @group legacy
    */
   public function testSuspendQueue(): void {
     [
@@ -205,7 +207,7 @@ final class CronSuspendQueueDelayTest extends UnitTestCase {
     $time->expects($this->any())
       ->method('getCurrentTime')
       ->willReturn(60);
-
+    $this->expectDeprecation('Drupal\Component\Utility\Environment::setTimeLimit() is deprecated in drupal:11.1.0 and is removed from drupal:12.0.0. There is no replacement. See https://www.drupal.org/node/3483359');
     $cron->run();
   }
 
@@ -224,6 +226,8 @@ final class CronSuspendQueueDelayTest extends UnitTestCase {
    *   Whether to expect cron to sleep and re-process the queue.
    *
    * @dataProvider providerSuspendQueueThreshold
+   *
+   * @group legacy
    */
   public function testSuspendQueueThreshold(float $threshold, float $suspendQueueDelay, bool $expectQueueDelay): void {
     $this->cronConstructorArguments['queue_config'] = [
@@ -275,7 +279,7 @@ final class CronSuspendQueueDelayTest extends UnitTestCase {
       ->willReturnOnConsecutiveCalls(
         $this->throwException(new SuspendQueueException('', 0, NULL, $suspendQueueDelay)),
       );
-
+    $this->expectDeprecation('Drupal\Component\Utility\Environment::setTimeLimit() is deprecated in drupal:11.1.0 and is removed from drupal:12.0.0. There is no replacement. See https://www.drupal.org/node/3483359');
     $cron->run();
   }
 
@@ -304,6 +308,8 @@ final class CronSuspendQueueDelayTest extends UnitTestCase {
    * Tests queues are executed in order.
    *
    * If multiple queues are delayed, they must execute in order of time.
+   *
+   * @group legacy
    */
   public function testSuspendQueueOrder(): void {
     [
@@ -441,7 +447,7 @@ final class CronSuspendQueueDelayTest extends UnitTestCase {
         $currentTime += array_shift($delays);
         return array_shift($delays) === $delay;
       }));
-
+    $this->expectDeprecation('Drupal\Component\Utility\Environment::setTimeLimit() is deprecated in drupal:11.1.0 and is removed from drupal:12.0.0. There is no replacement. See https://www.drupal.org/node/3483359');
     $cron->run();
   }
 

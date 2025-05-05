@@ -191,6 +191,8 @@ class CronTest extends UnitTestCase {
    *
    * @covers ::processQueues
    * @dataProvider processQueuesTestData
+   *
+   * @group legacy
    */
   public function testProcessQueues($item, $message_logged_assertion, $count_post_run): void {
     $this->resetTestingState();
@@ -200,10 +202,13 @@ class CronTest extends UnitTestCase {
     $this->cron->run();
     $this->{$message_logged_assertion}($this->state->get('cron_test.message_logged'));
     $this->assertEquals($count_post_run, $this->queue->numberOfItems());
+    $this->expectDeprecation('Drupal\Component\Utility\Environment::setTimeLimit() is deprecated in drupal:11.1.0 and is removed from drupal:12.0.0. There is no replacement. See https://www.drupal.org/node/3483359');
   }
 
   /**
    * Verify that RequeueException causes an item to be processed multiple times.
+   *
+   * @group legacy
    */
   public function testRequeueException(): void {
     $this->resetTestingState();
@@ -216,6 +221,7 @@ class CronTest extends UnitTestCase {
     $this->assertIsInt($actual_requeue_count);
     // Ensure that the actual requeue count matches the expected value.
     $this->assertEquals(self::REQUEUE_COUNT, $actual_requeue_count);
+    $this->expectDeprecation('Drupal\Component\Utility\Environment::setTimeLimit() is deprecated in drupal:11.1.0 and is removed from drupal:12.0.0. There is no replacement. See https://www.drupal.org/node/3483359');
   }
 
 }

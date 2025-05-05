@@ -128,6 +128,8 @@ class DisplayEntityReferenceTest extends ViewTestBase {
 
   /**
    * Tests the entity reference display plugin.
+   *
+   * @group legacy
    */
   public function testEntityReferenceDisplay(): void {
     // Test that the 'title' settings are not shown.
@@ -292,6 +294,7 @@ class DisplayEntityReferenceTest extends ViewTestBase {
     $view->setDisplay('entity_reference_1');
     $this->executeView($view);
     $this->assertCount(13, $view->result, 'Search returned thirteen rows');
+    $this->expectDeprecation('Drupal\Component\Utility\Environment::setTimeLimit() is deprecated in drupal:11.1.0 and is removed from drupal:12.0.0. There is no replacement. See https://www.drupal.org/node/3483359');
   }
 
 }

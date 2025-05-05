@@ -95,6 +95,8 @@ class CronQueueTest extends KernelTestBase {
 
   /**
    * Tests that DelayedRequeueException behaves as expected when running cron.
+   *
+   * @group legacy
    */
   public function testDelayException(): void {
     $database = $this->container->get('queue')->get('cron_queue_test_database_delay_exception');
@@ -135,10 +137,13 @@ class CronQueueTest extends KernelTestBase {
     $property = (new \ReflectionClass($memory))->getProperty('queue');
     $memory_queue_internal = $property->getValue($memory);
     $this->assertEquals($this->currentTime + $memory_lease_time, reset($memory_queue_internal)->expire);
+    $this->expectDeprecation('Drupal\Component\Utility\Environment::setTimeLimit() is deprecated in drupal:11.1.0 and is removed from drupal:12.0.0. There is no replacement. See https://www.drupal.org/node/3483359');
   }
 
   /**
    * Tests that leases are expiring correctly, also within the same request.
+   *
+   * @group legacy
    */
   public function testLeaseTime(): void {
     $queue = $this->container->get('queue')->get('cron_queue_test_lease_time');
@@ -165,12 +170,15 @@ class CronQueueTest extends KernelTestBase {
     // lease.
     $this->cron->run();
     static::assertEquals(2, \Drupal::state()->get('cron_queue_test_lease_time'));
+    $this->expectDeprecation('Drupal\Component\Utility\Environment::setTimeLimit() is deprecated in drupal:11.1.0 and is removed from drupal:12.0.0. There is no replacement. See https://www.drupal.org/node/3483359');
   }
 
   /**
    * Tests that non-queue exceptions thrown by workers are handled properly.
    *
    * @see \Drupal\cron_queue_test\Plugin\QueueWorker\CronQueueTestException
+   *
+   * @group legacy
    */
   public function testUncaughtExceptions(): void {
     $this->logger->log(
@@ -215,6 +223,7 @@ class CronQueueTest extends KernelTestBase {
     $this->cron->run();
     $this->assertEquals(2, \Drupal::state()->get('cron_queue_test_exception'));
     $this->assertEquals(0, $queue->numberOfItems(), 'Item was processed and removed from the queue.');
+    $this->expectDeprecation('Drupal\Component\Utility\Environment::setTimeLimit() is deprecated in drupal:11.1.0 and is removed from drupal:12.0.0. There is no replacement. See https://www.drupal.org/node/3483359');
   }
 
   /**
@@ -222,6 +231,8 @@ class CronQueueTest extends KernelTestBase {
    *
    * @see \Drupal\cron_queue_test\Plugin\QueueWorker\CronQueueTestSuspendQueue
    * @covers \Drupal\Core\Queue\SuspendQueueException
+   *
+   * @group legacy
    */
   public function testSuspendQueueException(): void {
     $this->logger->log(
@@ -259,6 +270,7 @@ class CronQueueTest extends KernelTestBase {
     $this->assertEquals('suspend', $item->data, 'Suspending item remains in the queue.');
     $item = $queue->claimItem();
     $this->assertEquals('ignored', $item->data, 'Item beyond the suspending item remains in the queue.');
+    $this->expectDeprecation('Drupal\Component\Utility\Environment::setTimeLimit() is deprecated in drupal:11.1.0 and is removed from drupal:12.0.0. There is no replacement. See https://www.drupal.org/node/3483359');
   }
 
   /**
@@ -266,6 +278,8 @@ class CronQueueTest extends KernelTestBase {
    *
    * @see \Drupal\cron_queue_test\Plugin\QueueWorker\CronQueueTestRequeueException
    * @covers \Drupal\Core\Queue\RequeueException
+   *
+   * @group legacy
    */
   public function testRequeueException(): void {
     // Test the requeueing functionality.
@@ -275,6 +289,7 @@ class CronQueueTest extends KernelTestBase {
 
     $this->assertEquals(2, \Drupal::state()->get('cron_queue_test_requeue_exception'));
     $this->assertEquals(0, $queue->numberOfItems());
+    $this->expectDeprecation('Drupal\Component\Utility\Environment::setTimeLimit() is deprecated in drupal:11.1.0 and is removed from drupal:12.0.0. There is no replacement. See https://www.drupal.org/node/3483359');
   }
 
   /**
@@ -327,6 +342,8 @@ class CronQueueTest extends KernelTestBase {
 
   /**
    * Tests that cron queues from derivers work.
+   *
+   * @group legacy
    */
   public function testQueueWorkerDeriver(): void {
     $this->assertEquals(0, \Drupal::state()->get(CronQueueTestDeriverQueue::PLUGIN_ID, 0));
@@ -336,6 +353,7 @@ class CronQueueTest extends KernelTestBase {
     $this->cron->run();
 
     $this->assertEquals(1, \Drupal::state()->get(CronQueueTestDeriverQueue::PLUGIN_ID));
+    $this->expectDeprecation('Drupal\Component\Utility\Environment::setTimeLimit() is deprecated in drupal:11.1.0 and is removed from drupal:12.0.0. There is no replacement. See https://www.drupal.org/node/3483359');
   }
 
   /**

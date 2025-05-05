@@ -31,6 +31,8 @@ class DeleteTest extends FileManagedUnitTestBase {
 
   /**
    * Tries deleting a file that is in use.
+   *
+   * @group legacy
    */
   public function testInUse(): void {
     // This test expects unused managed files to be marked as a temporary file
@@ -78,10 +80,13 @@ class DeleteTest extends FileManagedUnitTestBase {
     $this->assertFileHooksCalled(['delete']);
     $this->assertFileDoesNotExist($file->getFileUri());
     $this->assertNull(File::load($file->id()), 'File was removed from the database.');
+    $this->expectDeprecation('Drupal\Component\Utility\Environment::setTimeLimit() is deprecated in drupal:11.1.0 and is removed from drupal:12.0.0. There is no replacement. See https://www.drupal.org/node/3483359');
   }
 
   /**
    * Tries to run cron deletion on file deleted from the file-system.
+   *
+   * @group legacy
    */
   public function testCronDeleteNonExistingTemporary(): void {
     $file = $this->createFile();
@@ -102,6 +107,7 @@ class DeleteTest extends FileManagedUnitTestBase {
     \Drupal::service('cron')->run();
 
     $this->assertNull(File::load($file->id()), 'File was removed from the database.');
+    $this->expectDeprecation('Drupal\Component\Utility\Environment::setTimeLimit() is deprecated in drupal:11.1.0 and is removed from drupal:12.0.0. There is no replacement. See https://www.drupal.org/node/3483359');
   }
 
 }

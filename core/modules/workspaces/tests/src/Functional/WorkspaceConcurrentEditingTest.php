@@ -27,6 +27,8 @@ class WorkspaceConcurrentEditingTest extends BrowserTestBase {
 
   /**
    * Tests editing a node in multiple workspaces.
+   *
+   * @group legacy
    */
   public function testConcurrentEditing(): void {
     // Create a test node.
@@ -98,6 +100,7 @@ class WorkspaceConcurrentEditingTest extends BrowserTestBase {
     $this->drupalGet('/node/' . $test_node->id() . '/edit');
     $page = $this->getSession()->getPage();
     $this->assertTrue($page->hasField('title[0][value]'));
+    $this->expectDeprecation('Drupal\Component\Utility\Environment::setTimeLimit() is deprecated in drupal:11.1.0 and is removed from drupal:12.0.0. There is no replacement. See https://www.drupal.org/node/3483359');
   }
 
 }

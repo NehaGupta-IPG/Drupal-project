@@ -34,6 +34,8 @@ class DbLogTest extends KernelTestBase {
 
   /**
    * Tests that cron correctly applies the database log row limit.
+   *
+   * @group legacy
    */
   public function testDbLogCron(): void {
     $row_limit = 100;
@@ -60,6 +62,7 @@ class DbLogTest extends KernelTestBase {
     $this->config('system.cron')->set('logging', FALSE)->save();
     $cron_count = $this->runCron();
     $this->assertEquals(1, $cron_count, "Cron added $cron_count of 1 new log entries");
+    $this->expectDeprecation('Drupal\Component\Utility\Environment::setTimeLimit() is deprecated in drupal:11.1.0 and is removed from drupal:12.0.0. There is no replacement. See https://www.drupal.org/node/3483359');
   }
 
   /**

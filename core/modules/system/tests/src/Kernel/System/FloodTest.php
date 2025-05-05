@@ -23,6 +23,8 @@ class FloodTest extends KernelTestBase {
 
   /**
    * Tests flood control mechanism clean-up.
+   *
+   * @group legacy
    */
   public function testCleanUp(): void {
     $threshold = 1;
@@ -47,6 +49,7 @@ class FloodTest extends KernelTestBase {
     // Run cron and verify event is still not allowed.
     $cron->run();
     $this->assertFalse($flood->isAllowed($name, $threshold));
+    $this->expectDeprecation('Drupal\Component\Utility\Environment::setTimeLimit() is deprecated in drupal:11.1.0 and is removed from drupal:12.0.0. There is no replacement. See https://www.drupal.org/node/3483359');
   }
 
   /**

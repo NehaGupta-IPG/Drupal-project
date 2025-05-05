@@ -82,6 +82,8 @@ class WorkspaceCRUDTest extends KernelTestBase {
 
   /**
    * Tests the deletion of workspaces.
+   *
+   * @group legacy
    */
   public function testDeletingWorkspaces(): void {
     $admin = $this->createUser([
@@ -204,6 +206,7 @@ class WorkspaceCRUDTest extends KernelTestBase {
 
     // Check that the deleted workspace is no longer active.
     $this->assertFalse($this->workspaceManager->hasActiveWorkspace());
+    $this->expectDeprecation('Drupal\Component\Utility\Environment::setTimeLimit() is deprecated in drupal:11.1.0 and is removed from drupal:12.0.0. There is no replacement. See https://www.drupal.org/node/3483359');
   }
 
   /**

@@ -204,6 +204,8 @@ class NodeAccessLanguageAwareCombinationTest extends NodeAccessTestBase {
 
   /**
    * Tests node access and node access queries with multiple node languages.
+   *
+   * @group legacy
    */
   public function testNodeAccessLanguageAwareCombination(): void {
 
@@ -342,6 +344,7 @@ class NodeAccessLanguageAwareCombinationTest extends NodeAccessTestBase {
     // Even though there is no German translation, all nodes are returned
     // because node access filtering does not occur when the user is user 1.
     $this->assertCount(10, $nids, 'Query returns all nodes.');
+    $this->expectDeprecation('Drupal\Component\Utility\Environment::setTimeLimit() is deprecated in drupal:11.1.0 and is removed from drupal:12.0.0. There is no replacement. See https://www.drupal.org/node/3483359');
   }
 
 }

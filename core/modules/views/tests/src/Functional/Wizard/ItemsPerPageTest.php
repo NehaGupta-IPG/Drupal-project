@@ -27,6 +27,8 @@ class ItemsPerPageTest extends WizardTestBase {
 
   /**
    * Tests the number of items per page.
+   *
+   * @group legacy
    */
   public function testItemsPerPage(): void {
     $this->drupalCreateContentType(['type' => 'article']);
@@ -124,6 +126,7 @@ class ItemsPerPageTest extends WizardTestBase {
     $pos3 = strpos($content, $node3->label());
     $this->assertGreaterThan($pos5, $pos4);
     $this->assertGreaterThan($pos4, $pos3);
+    $this->expectDeprecation('Drupal\Component\Utility\Environment::setTimeLimit() is deprecated in drupal:11.1.0 and is removed from drupal:12.0.0. There is no replacement. See https://www.drupal.org/node/3483359');
   }
 
 }
