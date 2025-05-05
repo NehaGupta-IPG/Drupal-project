@@ -128,7 +128,7 @@ class MenuLinkContentForm extends ContentEntityForm {
    * @return string
    *   The possibly reformatted link.
    */
-  protected function reformatInternalLinkIfEnteredAsExternal($uri) {
+  protected function reformatInternalLinkIfEnteredAsExternal(string $uri): string {
     if (parse_url($uri, PHP_URL_SCHEME) !== 'internal') {
       $base_url = $this->getRequest()->getSchemeAndHttpHost() . $this->getRequest()->getBasePath();
       if (strpos($uri, $base_url) === 0) {
