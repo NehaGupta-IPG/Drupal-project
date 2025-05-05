@@ -704,7 +704,37 @@ JS;
     ));
     $this->drupalCreateNode([
       'title' => 'My test content',
+      'body' => '',
     ]);
+
+    // Test onchange event correctly fired for each change.
+    $this->drupalGet('node/1/edit');
+    $page = $this->getSession()->getPage();
+    $this->waitForEditor();
+    $editor = $page->find('css', '.ck-content');
+    // The script to log the changes in ckeditor on the page.
+    $this->getSession()->executeScript(<<<JS
+      const changeHistoryInput = document.createElement('input');
+      changeHistoryInput.id = 'changeHistory';
+      document.body.append(changeHistoryInput);
+      const changeHistory = [];
+      Drupal.editors.ckeditor5.onChange(
+        document.getElementById('edit-body-0-value'),
+        () => {
+          const ckInstance = Drupal.CKEditor5Instances.values().next().value;
+          changeHistory.push(ckInstance.getData());
+          changeHistoryInput.value = JSON.stringify(changeHistory);
+        }
+      );
+JS);
+    // Set value is actually a sequence of input to the fields.
+    // So "change" results in 6 inputs.
+    $editor->setValue('change');
+    $history = $page->findById('changeHistory')->getValue();
+    $this->assertSame(
+      ['<p>c</p>', '<p>ch</p>', '<p>cha</p>', '<p>chan</p>', '<p>chang</p>', '<p>change</p>'],
+      json_decode($history, TRUE),
+    );
 
     // Test that entered text is saved.
     $this->drupalGet('node/1/edit');
