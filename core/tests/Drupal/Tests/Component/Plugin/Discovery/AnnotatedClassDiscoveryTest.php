@@ -12,6 +12,7 @@ use org\bovigo\vfs\vfsStreamWrapper;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -20,6 +21,7 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(AnnotatedClassDiscovery::class)]
 #[Group('Annotation')]
 #[Group('Plugin')]
+#[IgnoreDeprecations]
 class AnnotatedClassDiscoveryTest extends TestCase {
 
   /**

@@ -9,6 +9,7 @@ use Drupal\Component\Annotation\Plugin\Discovery\AnnotatedClassDiscovery;
 use Drupal\Component\FileCache\FileCacheFactory;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use PHPUnit\Framework\TestCase;
 
@@ -18,6 +19,7 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(AnnotatedClassDiscovery::class)]
 #[Group('Annotation')]
 #[RunTestsInSeparateProcesses]
+#[IgnoreDeprecations]
 class AnnotatedClassDiscoveryTest extends TestCase {
 
   /**
