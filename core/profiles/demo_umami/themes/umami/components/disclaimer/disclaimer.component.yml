@@ -22,10 +22,10 @@ props:
 
 slots:
   disclaimer:
-    type: string
+    title: Disclaimer text
     description: Disclaimer text
   copyright:
-    type: string
+    title: Copyright text of Disclaimer
     description: Copyright text of Disclaimer
     examples:
       - Terms & Conditions
