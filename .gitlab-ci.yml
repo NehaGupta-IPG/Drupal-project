@@ -56,7 +56,7 @@ workflow:
 ################
 
 variables:
-  _CONFIG_DOCKERHUB_ROOT: "drupalci"
+  _CONFIG_DOCKERHUB_ROOT: "registry.gitlab.com/drupal-infrastructure/drupalci/drupalci-environments"
   CACHE_TARGET: "${CI_MERGE_REQUEST_TARGET_BRANCH_NAME}${CI_COMMIT_BRANCH}"
   CORE_GITLAB_PROJECT_ID: 59858
   # Let composer know what self.version means.
@@ -121,6 +121,29 @@ default:
       junit: ./sites/default/files/simpletest/phpunit-*.xml
     paths:
       - ./sites/default/files/simpletest/phpunit-*.xml
+
+.default-component-unit-test-job-settings: &default-component-unit-test-job-settings
+  stage: 🪄 Lint
+  before_script:
+    - composer validate
+    - composer install --optimize-autoloader
+    - docker-php-ext-enable pcov
+  script:
+    - vendor/bin/phpunit -c core/tests/Drupal/Tests/Component --testsuite unit-component --colors=always --testdox --coverage-text=component-coverage-report.txt --coverage-cobertura=component-coverage-cobertura.xml --log-junit junit.xml --fail-on-deprecation --fail-on-phpunit-deprecation
+    # Process the coverage text report to produce an OpenMetrics report.
+    - php .gitlab-ci/scripts/component-coverage-metrics.php
+  artifacts:
+    when: always
+    expire_in: 6 mos
+    reports:
+      junit: junit.xml
+      metrics: component-coverage-metrics.txt
+      coverage_report:
+        coverage_format: cobertura
+        path: component-coverage-cobertura.xml
+    paths:
+      - junit.xml
+      - component-coverage*
 
 .prepare-lint-directory: &prepare-lint-directory
   # PHPStan and yarn linting use absolute paths to determine cache validity. Because GitLab CI
@@ -258,7 +281,7 @@ default:
     _TARGET_PHP: "8.3-ubuntu"
     _TARGET_DB: "mysql-8.4"
 
-'PHP 8.4 MySQL 9.2':
+'PHP 8.4 MySQL 9.3':
   <<: [ *default-stage, *run-on-mr ]
   variables:
     _TARGET_PHP: "8.4-ubuntu"
@@ -375,15 +398,27 @@ default:
     # Output a copy in junit.
     - php vendor/bin/phpstan -vvv analyze --configuration=./core/phpstan.neon.dist --error-format=gitlab > $CI_PROJECT_DIR/phpstan-quality-report.json || EXIT_CODE=$?
     - php vendor/bin/phpstan -vvv analyze --configuration=./core/phpstan.neon.dist --no-progress --error-format=junit > $CI_PROJECT_DIR/phpstan-junit.xml || true
+    # When the PHPStan scan fails, output a human readable copy of the errors,
+    # and regenerate a full baseline.
+    # In order to regenerate a baseline artifact that can be copied and pasted
+    # to a MR branch, we first need to void the current baseline file, then
+    # run PHPStan with the --generate-baseline option, and finally edit the
+    # generated file to convert absolute paths into relative ones.
     - |
       if [ -n "$EXIT_CODE" ]; then
         # Output a copy in plain text for human logs.
         php vendor/bin/phpstan analyze --configuration=./core/phpstan.neon.dist --no-progress || true
         # Generate a new baseline.
         echo "Generating an PHPStan baseline file (available as job artifact)."
+        cp $CI_PROJECT_DIR/.gitlab-ci/scripts/.empty-phpstan-baseline.php ./core/.phpstan-baseline.php
         php vendor/bin/phpstan analyze --configuration=./core/phpstan.neon.dist --no-progress --generate-baseline=$CI_PROJECT_DIR/core/.phpstan-baseline.php || true
+        sed -i "s/ '\\/\\/build\\/core/ '/g" $CI_PROJECT_DIR/core/.phpstan-baseline.php
+        sed -i "s/ '\\/\\/build/ '\\/../g" $CI_PROJECT_DIR/core/.phpstan-baseline.php
+        php $CI_PROJECT_DIR/.gitlab-ci/scripts/phpstan-baseline-statistics.php
         exit $EXIT_CODE
       fi
+    # Generate baseline statistics.
+    - php $CI_PROJECT_DIR/.gitlab-ci/scripts/phpstan-baseline-statistics.php
 
   artifacts:
     # Only store the baseline if the job fails.
@@ -391,8 +426,9 @@ default:
     reports:
       codequality: phpstan-quality-report.json
       junit: phpstan-junit.xml
+      metrics: phpstan-metrics.txt
     paths:
-      - core/.phpstan-baseline.php
+      - $CI_PROJECT_DIR/core/.phpstan-baseline.php
 
 '🧹 PHP Coding standards (PHPCS)':
   <<: [ *default-job-settings-lint ]
@@ -496,6 +532,25 @@ default:
     TESTSUITE: PHPUnit-Unit
     KUBERNETES_CPU_REQUEST: "8"
     CONCURRENCY: 24
+    _TARGET_PHP: "8.5-ubuntu"
+
+'⚡️ Component unit tests on PHP 8.3':
+  <<: [ *default-job-settings-lint, *default-component-unit-test-job-settings ]
+  variables:
+    KUBERNETES_CPU_REQUEST: "2"
+    _TARGET_PHP: "8.3-ubuntu"
+
+'⚡️ Component unit tests on PHP 8.4':
+  <<: [ *default-job-settings-lint, *default-component-unit-test-job-settings ]
+  variables:
+    KUBERNETES_CPU_REQUEST: "2"
+    _TARGET_PHP: "8.4-ubuntu"
+
+'⚡️ Component unit tests on PHP 8.5':
+  <<: [ *default-job-settings-lint, *default-component-unit-test-job-settings ]
+  allow_failure: true
+  variables:
+    KUBERNETES_CPU_REQUEST: "2"
     _TARGET_PHP: "8.5-ubuntu"
 
 '✅️ PHPStan rules tests':
