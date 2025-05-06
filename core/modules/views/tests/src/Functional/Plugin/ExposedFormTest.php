@@ -287,10 +287,10 @@ class ExposedFormTest extends ViewTestBase {
     $this->assertSession()->pageTextMatchesCount(1, '/' . $view->getTitle() . '/');
 
     // Test there is an exposed form in a block.
-    $this->assertSession()->elementsCount('xpath', '//div[@id="' . Html::getUniqueId('block-' . $block->id()) . '"]/form/@id', 1);
+    $this->assertSession()->elementsCount('xpath', '//div[@id="' . Html::getUniqueId('block-' . $block->id()) . '"]//form/@id', 1);
 
     // Test there is not an exposed form in the view page content area.
-    $xpath = $this->assertSession()->buildXPathQuery('//div[@class="view-content"]/form/@id', [
+    $xpath = $this->assertSession()->buildXPathQuery('//div[@class="view-content"]//form/@id', [
       ':id' => Html::getUniqueId('block-' . $block->id()),
     ]);
     $this->assertSession()->elementNotExists('xpath', $xpath);

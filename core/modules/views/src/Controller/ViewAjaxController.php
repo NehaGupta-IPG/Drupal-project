@@ -218,6 +218,32 @@ class ViewAjaxController implements ContainerInjectionInterface {
           $response->setAttachments($preview['#attached']);
         }
 
+        // Ensure exposed filters in blocks are updated during AJAX requests.
+        // When a view has its exposed filters placed in a block (rather
+        // than inline with the view), we need to replace those blocks during
+        // AJAX updates to maintain consistency.
+        if ($view->display_handler->usesExposedFormInBlock()) {
+          $exposed_form_block_render_array = $view->display_handler->viewExposedFormBlocks();
+          $exposed_form_css_class = $exposed_form_block_render_array['#attributes']['data-drupal-exposed-form-wrapper-class'];
+
+          // When an exposed form is placed in a block, the block element
+          // inherits certain attributes from the form during the initial page
+          // render. We need to remove these attributes from our replacement
+          // content to prevent duplication and UI issues.
+          // The BlockViewBuilder has already applied these attributes to the
+          // block container in the DOM, so we don't need to include them again
+          // in our replacement content.
+          // @see \Drupal\block\BlockViewBuilder::preRender()
+          foreach (['#attributes', '#contextual_links'] as $property) {
+            if (isset($exposed_form_block_render_array[$property])) {
+              unset($exposed_form_block_render_array[$property]);
+            }
+          }
+          // The render element must be rendered before the form ID is accessed.
+          $exposed_form = $this->renderer->render($exposed_form_block_render_array);
+          $response->addCommand(new ReplaceCommand('.' . $exposed_form_css_class, $exposed_form));
+        }
+
         return $response;
       }
       else {

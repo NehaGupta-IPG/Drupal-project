@@ -137,7 +137,11 @@ class ViewsExposedForm extends FormBase implements WorkspaceSafeFormInterface {
 
     $form['#action'] = $form_action;
     $form['#theme'] = $view->buildThemeFunctions('views_exposed_form');
-    $form['#id'] = Html::cleanCssIdentifier('views_exposed_form-' . $view->storage->id() . '-' . $display['id']);
+    $clean_form_id = Html::cleanCssIdentifier('views_exposed_form-' . $view->storage->id() . '-' . $display['id']);
+    $form['#id'] = $clean_form_id;
+    $form['#attributes']['data-drupal-exposed-form-wrapper-class'] = 'views-exposed-form-wrapper-' . $clean_form_id;
+    $form['#prefix'] = "<div class=\"views-exposed-form-wrapper {$form['#attributes']['data-drupal-exposed-form-wrapper-class']}\">";
+    $form['#suffix'] = '</div>';
     // Labels are built too late for inline form errors to work, resulting
     // in duplicated messages.
     $form['#disable_inline_form_errors'] = TRUE;
