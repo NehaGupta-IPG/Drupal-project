@@ -62,14 +62,24 @@ final class ContentEntityDenormalizer extends EntityDenormalizerBase {
       }
 
       if (!isset($field_map[$internal_name]) || !in_array($resource_type->getBundle(), $field_map[$internal_name]['bundles'], TRUE)) {
-        throw new UnprocessableEntityHttpException(sprintf(
-          'The attribute %s does not exist on the %s resource type.',
-          $internal_name,
-          $resource_type->getTypeName()
-        ));
+        // If the field is not found in the field map, it could still be present
+        // as a bundle field, because of a core bug.
+        // Fall back to the full field definitions in this case.
+        // See https://www.drupal.org/project/drupal/issues/3045509
+        if (!isset($field_definitions)) {
+          // Lazily load this only once.
+          $field_definitions = $this->fieldManager->getFieldDefinitions($resource_type->getEntityTypeId(), $resource_type->getBundle());
+        }
+        if (!isset($field_definitions[$internal_name])) {
+          throw new UnprocessableEntityHttpException(sprintf(
+            'The attribute %s does not exist on the %s resource type.',
+            $internal_name,
+            $resource_type->getTypeName()
+          ));
+        }
       }
 
-      $field_type = $field_map[$internal_name]['type'];
+      $field_type = $field_map[$internal_name]['type'] ?? $field_definitions[$internal_name]->getType();
       $field_class = $this->pluginManager->getDefinition($field_type)['list_class'];
 
       $field_denormalization_context = array_merge($context, [
