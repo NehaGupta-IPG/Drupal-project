@@ -185,17 +185,17 @@ class FieldBlockTest extends EntityKernelTestBase {
       TRUE,
       FALSE,
     ];
-    $data['empty, show on empty false'] = [
+    $data['empty, hide when empty'] = [
       FALSE,
       TRUE,
       FALSE,
-      ['show_on_empty' => FALSE],
+      ['show_when_empty' => FALSE],
     ];
-    $data['empty, show on empty true'] = [
+    $data['empty, show when empty'] = [
       TRUE,
       TRUE,
       FALSE,
-      ['show_on_empty' => TRUE],
+      ['show_when_empty' => TRUE],
     ];
     $data['populated'] = [
       TRUE,
