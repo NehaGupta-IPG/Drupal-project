@@ -10,7 +10,9 @@ use Drupal\Core\Block\BlockManagerInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\views\Attribute\ViewsDisplay;
+use Drupal\views\Event\PreBuildBlockEvent;
 use Drupal\views\Plugin\Block\ViewsBlock;
+use Drupal\views\ViewsEvents;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -55,6 +57,13 @@ class Block extends DisplayPluginBase {
   protected $blockManager;
 
   /**
+   * The event dispatcher.
+   *
+   * @var \Symfony\Component\EventDispatcher\EventDispatcherInterface
+   */
+  protected $eventDispatcher;
+
+  /**
    * Constructs a new Block instance.
    *
    * @param array $configuration
@@ -67,12 +76,15 @@ class Block extends DisplayPluginBase {
    *   The entity type manager.
    * @param \Drupal\Core\Block\BlockManagerInterface $block_manager
    *   The block manager.
+   * @param \Symfony\Component\EventDispatcher\EventDispatcherInterface $event_dispatcher
+   *   The event dispatcher service.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, EntityTypeManagerInterface $entity_type_manager, BlockManagerInterface $block_manager) {
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, EntityTypeManagerInterface $entity_type_manager, BlockManagerInterface $block_manager, $event_dispatcher = NULL) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
 
     $this->entityTypeManager = $entity_type_manager;
     $this->blockManager = $block_manager;
+    $this->eventDispatcher = $event_dispatcher ?: \Drupal::service('event_dispatcher');
   }
 
   /**
@@ -84,7 +96,8 @@ class Block extends DisplayPluginBase {
       $plugin_id,
       $plugin_definition,
       $container->get('entity_type.manager'),
-      $container->get('plugin.manager.block')
+      $container->get('plugin.manager.block'),
+      $container->get('event_dispatcher')
     );
   }
 
@@ -365,10 +378,8 @@ class Block extends DisplayPluginBase {
    *   The block plugin for views displays.
    */
   public function preBlockBuild(ViewsBlock $block) {
-    $config = $block->getConfiguration();
-    if ($config['items_per_page'] !== 'none') {
-      $this->view->setItemsPerPage($config['items_per_page']);
-    }
+    $event = new PreBuildBlockEvent($block, $this);
+    $this->eventDispatcher->dispatch($event, ViewsEvents::DISPLAY_BLOCK_PRE_BUILD_BLOCK);
   }
 
   /**
