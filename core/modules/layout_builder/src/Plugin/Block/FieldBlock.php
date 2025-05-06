@@ -349,7 +349,6 @@ class FieldBlock extends BlockBase implements ContextAwarePluginInterface, Conta
   public function blockSubmit($form, FormStateInterface $form_state) {
     $this->configuration['show_when_empty'] = $form_state->getValue('show_when_empty');
     $this->configuration['formatter'] = $form_state->getValue('formatter');
-
   }
 
   /**
