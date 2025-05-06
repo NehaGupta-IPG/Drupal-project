@@ -18,7 +18,7 @@ class CurrentThemeConditionTest extends KernelTestBase {
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['system', 'theme_test'];
+  protected static $modules = ['system', 'theme_test', 'twig_theme_test'];
 
   /**
    * Tests the current theme condition.
@@ -29,21 +29,29 @@ class CurrentThemeConditionTest extends KernelTestBase {
     $manager = \Drupal::service('plugin.manager.condition');
     /** @var \Drupal\Core\Condition\ConditionInterface $condition */
     $condition = $manager->createInstance('current_theme');
-    $condition->setConfiguration(['theme' => 'test_theme']);
-    /** @var \Drupal\Core\Condition\ConditionInterface $condition_any */
-    $condition_any = $manager->createInstance('current_theme');
-    $condition_any->setConfiguration(['theme' => '']);
+    $condition->setConfiguration(['themes' => ['test_theme']]);
     /** @var \Drupal\Core\Condition\ConditionInterface $condition_negated */
     $condition_negated = $manager->createInstance('current_theme');
-    $condition_negated->setConfiguration(['theme' => 'test_theme', 'negate' => TRUE]);
+    $condition_negated->setConfiguration(['themes' => ['test_theme'], 'negate' => TRUE]);
+    /** @var \Drupal\Core\Condition\ConditionInterface $condition_multiple */
+    $condition_multiple = $manager->createInstance('current_theme');
+    $condition_multiple->setConfiguration(['themes' => ['test_theme', 'twig_theme_test']]);
+    /** @var \Drupal\Core\Condition\ConditionInterface $condition_multiple_negated */
+    $condition_multiple_negated = $manager->createInstance('current_theme');
+    $condition_multiple_negated->setConfiguration(['themes' => ['test_theme', 'twig_theme_test'], 'negate' => TRUE]);
+    /** @var \Drupal\Core\Condition\ConditionInterface $condition_any */
+    $condition_any = $manager->createInstance('current_theme');
+    $condition_any->setConfiguration(['themes' => []]);
     /** @var \Drupal\Core\Condition\ConditionInterface $condition_any_negated */
     $condition_any_negated = $manager->createInstance('current_theme');
-    $condition_any_negated->setConfiguration(['theme' => '', 'negate' => TRUE]);
+    $condition_any_negated->setConfiguration(['themes' => [], 'negate' => TRUE]);
 
-    $this->assertEquals(new FormattableMarkup('The current theme is @theme.', ['@theme' => 'test_theme']), $condition->summary());
-    $this->assertEquals(new FormattableMarkup('The current theme is one of the enabled themes.', ['@theme' => '']), $condition_any->summary());
-    $this->assertEquals(new FormattableMarkup('The current theme is not @theme.', ['@theme' => 'test_theme']), $condition_negated->summary());
-    $this->assertEquals(new FormattableMarkup('The current theme is not one of the enabled themes.', ['@theme' => '']), $condition_any_negated->summary());
+    $this->assertEquals('The current theme is one of the enabled themes.', $condition->summary());
+    $this->assertEquals('The current theme is not one of the enabled themes.', $condition_negated->summary());
+    $this->assertEquals('The current theme is one of the enabled themes.', $condition_multiple->summary());
+    $this->assertEquals('The current theme is not one of the enabled themes.', $condition_multiple_negated->summary());
+    $this->assertEquals('The current theme is one of the enabled themes.', $condition_any->summary());
+    $this->assertEquals('The current theme is not one of the enabled themes.', $condition_any_negated->summary());
 
     // The expected theme has not been set up yet.
     $this->assertFalse($condition->execute());
@@ -55,6 +63,40 @@ class CurrentThemeConditionTest extends KernelTestBase {
 
     $this->assertTrue($condition->execute());
     $this->assertFalse($condition_negated->execute());
+
+    // The multiple condition should also apply:
+    $this->assertTrue($condition_multiple->execute());
+    $this->assertFalse($condition_multiple_negated->execute());
+
+    // Also when setting the other expected theme:
+    $this->config('system.theme')->set('default', 'twig_theme_test')->save();
+    \Drupal::theme()->resetActiveTheme();
+
+    $this->assertTrue($condition_multiple->execute());
+    $this->assertFalse($condition_multiple_negated->execute());
+
+    // If we set another theme, the condition should not apply:
+    $this->config('system.theme')->set('default', 'stark')->save();
+    \Drupal::theme()->resetActiveTheme();
+
+    $this->assertFalse($condition_multiple->execute());
+    $this->assertTrue($condition_multiple_negated->execute());
+
+    // The any condition should always apply no matter the theme:
+    $this->assertTrue($condition_any->execute());
+    $this->assertFalse($condition_any_negated->execute());
+
+    $this->config('system.theme')->set('default', 'test_theme')->save();
+    \Drupal::theme()->resetActiveTheme();
+
+    $this->assertTrue($condition_any->execute());
+    $this->assertFalse($condition_any_negated->execute());
+
+    $this->config('system.theme')->set('default', 'twig_theme_test')->save();
+    \Drupal::theme()->resetActiveTheme();
+
+    $this->assertTrue($condition_any->execute());
+    $this->assertFalse($condition_any_negated->execute());
   }
 
 }
