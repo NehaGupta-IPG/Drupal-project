@@ -43,6 +43,9 @@ trait AutoloaderTrait {
     }
   }
 
+  /**
+   * The module extension list service.
+   */
   private static function moduleExtensionList(): ModuleExtensionList {
     return \Drupal::service('extension.list.module');
   }
