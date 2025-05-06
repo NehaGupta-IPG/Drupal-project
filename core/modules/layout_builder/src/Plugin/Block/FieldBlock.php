@@ -276,7 +276,7 @@ class FieldBlock extends BlockBase implements ContextAwarePluginInterface, Conta
     $form['show_when_empty'] = [
       '#type' => 'checkbox',
       '#title' => $this->t('Show block when field is empty'),
-      '#description' => $this->t("By default, this block will not be shown if the field is empty. If unsure, leave this unchecked.<br>Check this box if you'd like the block to display even if the field is empty, usually because you're using a module to add some alternate content when the field is empty."),
+      '#description' => $this->t("Normally it's only desirable to enable this option when using a module to add some alternate content when the field is empty."),
       '#default_value' => $config['show_when_empty'],
     ];
 
