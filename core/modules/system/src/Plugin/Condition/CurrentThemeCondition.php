@@ -69,6 +69,7 @@ class CurrentThemeCondition extends ConditionPluginBase implements ContainerFact
       '#title' => $this->t('Themes'),
       '#default_value' => $this->configuration['themes'],
       '#options' => $this->getAllAvailableThemeOptions(),
+      '#description' => $this->t('Select the themes this condition should evaluate TRUE on. If nothing is checked "Negate the condition" will be ignored and this condition always evaluates to TRUE.'),
     ];
     return parent::buildConfigurationForm($form, $form_state);
   }
@@ -112,6 +113,10 @@ class CurrentThemeCondition extends ConditionPluginBase implements ContainerFact
    */
   protected function currentThemeAllowed() {
     $configuredThemes = $this->configuration['themes'];
+    // If no themes are configured, the condition always evaluates to TRUE.
+    if (empty($configuredThemes)) {
+      return TRUE;
+    }
     $allThemes = $this->getAllAvailableThemeOptions();
 
     $allowedThemes = $this->isNegated() ? array_diff_key($allThemes, $configuredThemes) : array_intersect_key($allThemes, $configuredThemes);
