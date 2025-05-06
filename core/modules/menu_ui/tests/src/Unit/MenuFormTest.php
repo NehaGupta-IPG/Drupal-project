@@ -5,8 +5,7 @@ declare(strict_types=1);
 namespace Drupal\Tests\menu_ui\Unit;
 
 use Drupal\Core\Form\FormState;
-use Drupal\menu_ui\Form\MenuForm;
-use Drupal\menu_ui\Form\MenuLinkEditForm;
+use Drupal\menu_ui\MenuForm;
 use Drupal\system\MenuInterface;
 use Drupal\Tests\UnitTestCase;
 
@@ -26,7 +25,7 @@ class MenuFormTest extends UnitTestCase {
   /**
    * The MenuForm under test.
    *
-   * @var \Drupal\menu_ui\Form\MenuForm|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\menu_ui\MenuForm|\PHPUnit\Framework\MockObject\MockObject
    */
   protected $form;
 
@@ -46,7 +45,7 @@ class MenuFormTest extends UnitTestCase {
     $this->menu->expects($this->any())->method('language')->willReturn((object) ['getId' => fn() => 'en']);
 
     // Partial mock of MenuForm to stub translation and dependent methods.
-    $this->form = $this->getMockBuilder(MenuLinkEditForm::class)
+    $this->form = $this->getMockBuilder(MenuForm::class)
       ->disableOriginalConstructor()
       ->onlyMethods(['t', 'menuNameExists', 'buildOverviewForm'])
       ->getMock();
