@@ -15,12 +15,13 @@
  *
  * Available variables:
  * - children: Contains the child elements of the page.
+ * - attributes: Add attributes with hook_preprocess_off_canvas_page_wrapper().
  *
  * @ingroup themeable
  */
 #}
 {% if children %}
-  <div class="page-wrapper dialog-off-canvas-main-canvas" data-off-canvas-main-canvas>
+  <div{{ attributes }} class="page-wrapper dialog-off-canvas-main-canvas" data-off-canvas-main-canvas>
     {{ children }}
   </div>
 {% endif %}

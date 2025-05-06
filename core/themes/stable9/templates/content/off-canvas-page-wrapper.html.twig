@@ -15,10 +15,11 @@
  *
  * Available variables:
  * - children: Contains the child elements of the page.
+ * - attributes: Add attributes with hook_preprocess_off_canvas_page_wrapper().
  */
 #}
 {% if children %}
-  <div class="dialog-off-canvas-main-canvas" data-off-canvas-main-canvas>
+  <div{{ attributes }} class="dialog-off-canvas-main-canvas" data-off-canvas-main-canvas>
     {{ children }}
   </div>
 {% endif %}
