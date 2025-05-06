@@ -41,7 +41,7 @@ class MenuFormUnderscoreTest extends BrowserTestBase {
 
     // Create and log in an admin user with menu permissions.
     $this->adminUser = $this->drupalCreateUser([
-      'administer menus',
+      'administer menu',
     ]);
     $this->drupalLogin($this->adminUser);
   }
