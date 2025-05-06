@@ -66,7 +66,7 @@ class CurrentThemeCondition extends ConditionPluginBase implements ContainerFact
   public function buildConfigurationForm(array $form, FormStateInterface $form_state) {
     $form['themes'] = [
       '#type' => 'checkboxes',
-      '#title' => $this->t('Theme'),
+      '#title' => $this->t('Themes'),
       '#default_value' => $this->configuration['themes'],
       '#options' => $this->getAllAvailableThemeOptions(),
     ];
