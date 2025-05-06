@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\KernelTests;
 
-use Composer\Autoload\Classloader;
+use Composer\Autoload\ClassLoader;
 use Drupal\Core\Extension\ModuleExtensionList;
 
 /**
@@ -21,13 +21,13 @@ trait AutoloaderTrait {
    * uninstalled modules. This method removes the PSR-4 namespace for the list
    * of modules passed in after confirming they are all uninstalled.
    *
-   * @param \Composer\Autoload\Classloader $classLoader
+   * @param \Composer\Autoload\ClassLoader $classLoader
    *   The class loader.
    * @param string[] $modules
    *   List of machine names of modules that are uninstalled and whose PSR-4
    *   namespaces should be removed from the class loader.
    */
-  protected static function disablePsr4ForUninstalledModules(Classloader $classLoader, array $modules): void {
+  protected static function disablePsr4ForUninstalledModules(ClassLoader $classLoader, array $modules): void {
     $availableModules = static::moduleExtensionList()->getAllAvailableInfo();
     $installedModules = static::moduleExtensionList()->getAllInstalledInfo();
     $prefixes = $classLoader->getPrefixesPsr4();

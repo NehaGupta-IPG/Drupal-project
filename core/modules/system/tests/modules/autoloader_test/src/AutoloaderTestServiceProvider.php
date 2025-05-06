@@ -15,7 +15,7 @@ final class AutoloaderTestServiceProvider implements ServiceModifierInterface {
   /**
    * {@inheritdoc}
    */
-  public function alter(ContainerBuilder $container) {
+  public function alter(ContainerBuilder $container): void {
     $container->setParameter('service_provider_test.class', [new AutoloaderTestClass()]);
     $container->setParameter('service_provider_test.enum', [AutoloaderTestEnum::Test]);
   }
