@@ -57,21 +57,18 @@ class CurrentThemeCondition extends ConditionPluginBase implements ContainerFact
    * {@inheritdoc}
    */
   public function defaultConfiguration() {
-    return ['theme' => ''] + parent::defaultConfiguration();
+    return ['themes' => []] + parent::defaultConfiguration();
   }
 
   /**
    * {@inheritdoc}
    */
   public function buildConfigurationForm(array $form, FormStateInterface $form_state) {
-    $form['theme'] = [
-      '#type' => 'select',
+    $form['themes'] = [
+      '#type' => 'checkboxes',
       '#title' => $this->t('Theme'),
-      '#default_value' => $this->configuration['theme'],
-      '#options' => array_map(function ($theme_info) {
-        return $theme_info->info['name'];
-      }, $this->themeHandler->listInfo()),
-      '#empty_option' => $this->t('- Any -'),
+      '#default_value' => $this->configuration['themes'],
+      '#options' => $this->getAllAvailableThemeOptions(),
     ];
     return parent::buildConfigurationForm($form, $form_state);
   }
@@ -80,7 +77,7 @@ class CurrentThemeCondition extends ConditionPluginBase implements ContainerFact
    * {@inheritdoc}
    */
   public function submitConfigurationForm(array &$form, FormStateInterface $form_state) {
-    $this->configuration['theme'] = $form_state->getValue('theme');
+    $this->configuration['themes'] = $form_state->getValue('themes');
     parent::submitConfigurationForm($form, $form_state);
   }
 
@@ -88,29 +85,14 @@ class CurrentThemeCondition extends ConditionPluginBase implements ContainerFact
    * {@inheritdoc}
    */
   public function evaluate() {
-    if (!$this->configuration['theme']) {
-      return TRUE;
-    }
-
-    return $this->themeManager->getActiveTheme()->getName() == $this->configuration['theme'];
+    return $this->currentThemeAllowed();
   }
 
   /**
    * {@inheritdoc}
    */
   public function summary() {
-    $theme = $this->configuration['theme'];
-
-    if ($theme) {
-      $summary = $this->isNegated() ?
-        $this->t('The current theme is not @theme.', ['@theme' => $theme]) : $this->t('The current theme is @theme.', ['@theme' => $theme]);
-    }
-    else {
-      $summary = $this->isNegated() ?
-        $this->t('The current theme is not one of the enabled themes.') : $this->t('The current theme is one of the enabled themes.');
-    }
-
-    return $summary;
+    return $this->currentThemeAllowed() ? $this->t('The current theme is one of the enabled themes.') : $this->t('The current theme is not one of the enabled themes.');
   }
 
   /**
@@ -120,6 +102,33 @@ class CurrentThemeCondition extends ConditionPluginBase implements ContainerFact
     $contexts = parent::getCacheContexts();
     $contexts[] = 'theme';
     return $contexts;
+  }
+
+  /**
+   * Checks if the current theme is allowed.
+   *
+   * @return bool
+   *   TRUE if the current theme is allowed, FALSE otherwise.
+   */
+  protected function currentThemeAllowed() {
+    $configuredThemes = $this->configuration['themes'];
+    $allThemes = $this->getAllAvailableThemeOptions();
+
+    $allowedThemes = $this->isNegated() ? array_diff_key($allThemes, $configuredThemes) : array_intersect_key($allThemes, $configuredThemes);
+    return in_array($this->themeManager->getActiveTheme()->getName(), $allowedThemes);
+  }
+
+  /**
+   * Retrieves a list of all available themes.
+   *
+   * @return array
+   *   An associative array of themes, where the keys are the theme
+   *   machine names and the values are the displayed theme names.
+   */
+  protected function getAllAvailableThemeOptions() {
+    return array_map(function ($theme_info) {
+      return $theme_info->info['name'];
+    }, $this->themeHandler->listInfo());
   }
 
 }

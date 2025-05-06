@@ -512,6 +512,9 @@ system.feature_flags:
 condition.plugin.current_theme:
   type: condition.plugin
   mapping:
-    theme:
-      type: string
-      label: Theme
+    themes:
+      type: sequence
+      label: Themes
+      sequence:
+        type: string
+        label: Theme
