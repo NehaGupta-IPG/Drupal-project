@@ -93,7 +93,7 @@ class RegistryTest extends UnitTestCase {
    *
    * @var \Drupal\Core\File\FileSystemInterface|\PHPUnit\Framework\MockObject\MockObject
    */
-  protected FileSystemInterface|MockObject $fileSystem;
+  protected $fileSystem;
 
   /**
    * The list of functions that get_defined_functions() should provide.
