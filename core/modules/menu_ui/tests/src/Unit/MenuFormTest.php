@@ -42,7 +42,12 @@ class MenuFormTest extends UnitTestCase {
     $this->menu->expects($this->any())->method('isNew')->willReturn(TRUE);
     $this->menu->expects($this->any())->method('isLocked')->willReturn(FALSE);
     $this->menu->expects($this->any())->method('getDescription')->willReturn('Test description');
-    $this->menu->expects($this->any())->method('language')->willReturn((object) ['getId' => fn() => 'en']);
+    // Mock the language object returned by $menu->language().
+    $language = $this->getMockBuilder(\stdClass::class)
+      ->addMethods(['getId'])
+      ->getMock();
+    $language->method('getId')->willReturn('en');
+    $this->menu->expects($this->any())->method('language')->willReturn($language);
 
     // Partial mock of MenuForm to stub translation and dependent methods.
     $this->form = $this->getMockBuilder(MenuForm::class)
