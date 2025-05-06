@@ -11,7 +11,7 @@ use Drupal\system\MenuInterface;
 use Drupal\Tests\UnitTestCase;
 
 /**
- * @coversDefaultClass \Drupal\menu_ui\Form\MenuForm
+ * @coversDefaultClass \Drupal\menu_ui\MenuForm
  * @group menu_ui
  */
 class MenuFormTest extends UnitTestCase {
