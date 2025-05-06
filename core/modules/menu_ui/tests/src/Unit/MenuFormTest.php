@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\Tests\menu_ui\Unit;
 
 use Drupal\Core\Form\FormState;
+use Drupal\Core\Language\LanguageInterface;
 use Drupal\menu_ui\MenuForm;
 use Drupal\system\MenuInterface;
 use Drupal\Tests\UnitTestCase;
@@ -43,11 +44,9 @@ class MenuFormTest extends UnitTestCase {
     $this->menu->expects($this->any())->method('isLocked')->willReturn(FALSE);
     $this->menu->expects($this->any())->method('getDescription')->willReturn('Test description');
     // Mock the language object returned by $menu->language().
-    $language = $this->getMockBuilder(\stdClass::class)
-      ->addMethods(['getId'])
-      ->getMock();
+    $language = $this->createMock(LanguageInterface::class);
     $language->method('getId')->willReturn('en');
-    $this->menu->expects($this->any())->method('language')->willReturn($language);
+    $this->menu->method('language')->willReturn($language);
 
     // Partial mock of MenuForm to stub translation and dependent methods.
     $this->form = $this->getMockBuilder(MenuForm::class)
