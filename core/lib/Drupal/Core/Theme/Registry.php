@@ -204,10 +204,10 @@ class Registry implements DestructableInterface {
    *   The module list.
    * @param \Symfony\Component\HttpKernel\HttpKernelInterface $kernel
    *   The kernel.
-   * @param \Drupal\Core\File\FileSystemInterface $fileSystem
-   *   The file system service.
    * @param string $theme_name
    *   (optional) The name of the theme for which to construct the registry.
+   * @param \Drupal\Core\File\FileSystemInterface $fileSystem
+   *   The file system service.
    * @param array<string, true> $preprocess_for_suggestions
    *   (optional) Grouped preprocess functions from modules.
    */
