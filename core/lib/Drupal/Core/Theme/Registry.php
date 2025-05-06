@@ -319,8 +319,10 @@ class Registry implements DestructableInterface {
    * Gets the theme registry cache.
    *
    * @return array|null
-   *   Returns existing cache entry or null if no cache entry exists in theme
-   *   registry cache.
+   *   The complete theme registry data array for the active theme for this
+   *   registry.
+   *
+   * @see Registry::$registry
    */
   protected function cacheGet(): ?array {
     $theme_name = $this->theme->getName();
@@ -916,11 +918,7 @@ class Registry implements DestructableInterface {
   /**
    * Gets all user functions grouped by the word before the first underscore.
    *
-<<<<<<< ours
-   * @param string[] $prefixes
-=======
    * @param array $prefixes
->>>>>>> theirs
    *   An array of function prefixes by which the list can be limited.
    *
    * @return array

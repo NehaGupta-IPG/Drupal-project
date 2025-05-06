@@ -246,9 +246,14 @@ function theme_settings_convert_to_config(array $theme_settings, Config $config)
  *
  * @param array $variables
  *   An associative array possibly containing:
- *   - attributes['timestamp']:
- *   - timestamp:
- *   - text:.
+ *   - "attributes['timestamp']:".
+ *   - "timestamp:".
+ *   - "text:".
+ *
+ * @deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Initial
+ *  template_preprocess functions are registered directly in hook_theme().
+ *
+ * @see https://www.drupal.org/node/3504125
  */
 function template_preprocess_time(&$variables): void {
   @trigger_error(__FUNCTION__ . '() is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Initial template_preprocess functions are registered directly in hook_theme(). See https://www.drupal.org/node/3504125', E_USER_DEPRECATED);
@@ -394,7 +399,9 @@ function template_preprocess_links(&$variables): void {
  *   - attributes: Associative array of attributes to be placed in the img tag.
  *   - srcset: Array of multiple URIs and sizes/multipliers.
  *   - sizes: The sizes attribute for viewport-based selection of images.
- *     - http://www.whatwg.org/specs/web-apps/current-work/multipage/embedded-content.html#introduction-3:viewport-based-selection-2.
+ *     phpcs:ignore
+ *     - http://www.whatwg.org/specs/web-apps/current-work/multipage/embedded-content.html#introduction-3:viewport-based-selection-2
+
  */
 function template_preprocess_image(&$variables): void {
   /** @var \Drupal\Core\File\FileUrlGeneratorInterface $file_url_generator */
