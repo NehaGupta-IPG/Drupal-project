@@ -401,7 +401,6 @@ function template_preprocess_links(&$variables): void {
  *   - sizes: The sizes attribute for viewport-based selection of images.
  *     phpcs:ignore
  *     - http://www.whatwg.org/specs/web-apps/current-work/multipage/embedded-content.html#introduction-3:viewport-based-selection-2
-
  */
 function template_preprocess_image(&$variables): void {
   /** @var \Drupal\Core\File\FileUrlGeneratorInterface $file_url_generator */
