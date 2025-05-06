@@ -36,6 +36,7 @@ avif
 backlink
 bakeware
 barchart
+basetheme
 beatle
 bebebe
 beforeclose
@@ -252,6 +253,8 @@ keypresses
 kinberg
 kolkata
 lamoids
+languageswitcher
+legacyfind
 libc
 lified
 lightninggreen

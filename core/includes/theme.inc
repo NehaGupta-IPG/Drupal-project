@@ -11,16 +11,21 @@
 use Drupal\Core\Datetime\DatePreprocess;
 use Drupal\Core\Theme\ThemePreprocess;
 use Drupal\Core\Url;
+use Drupal\Component\Serialization\Json;
+use Drupal\Component\Utility\Crypt;
 use Drupal\Component\Utility\Html;
 use Drupal\Core\Config\Config;
 use Drupal\Core\Config\StorageException;
+use Drupal\Core\Installer\InstallerKernel;
+use Drupal\Core\Render\Element;
+use Drupal\Core\Render\Markup;
 use Drupal\Core\Template\Attribute;
 use Drupal\Core\Template\AttributeHelper;
 use Drupal\Core\Theme\ThemeCommonElements;
 use Drupal\Core\Theme\ThemeSettings;
 use Drupal\Core\Render\Element;
+use Drupal\Core\Url;
 use Drupal\Core\Utility\TableSort;
-use Drupal\Core\Installer\InstallerKernel;
 
 /**
  * @defgroup content_flags Content markers
@@ -89,102 +94,15 @@ function _system_default_theme_features() {
  *   The extension that these templates will have.
  * @param string $path
  *   The path to search.
+ *
+ * @deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Use
+ *   theme.registry service findThemeTemplates() method instead.
+ *
+ * @see https://www.drupal.org/node/3351736
  */
-function drupal_find_theme_templates($cache, $extension, $path): array {
-  $implementations = [];
-
-  // Collect paths to all sub-themes grouped by base themes. These will be
-  // used for filtering. This allows base themes to have sub-themes in its
-  // folder hierarchy without affecting the base themes template discovery.
-  $theme_paths = [];
-  foreach (\Drupal::service('theme_handler')->listInfo() as $theme_info) {
-    if (!empty($theme_info->base_theme)) {
-      $theme_paths[$theme_info->base_theme][$theme_info->getName()] = $theme_info->getPath();
-    }
-  }
-  foreach ($theme_paths as $base_theme => $subthemes) {
-    foreach ($subthemes as $subtheme => $subtheme_path) {
-      if (isset($theme_paths[$subtheme])) {
-        $theme_paths[$base_theme] = array_merge($theme_paths[$base_theme], $theme_paths[$subtheme]);
-      }
-    }
-  }
-  $theme = \Drupal::theme()->getActiveTheme()->getName();
-  $subtheme_paths = $theme_paths[$theme] ?? [];
-
-  // Escape the periods in the extension.
-  $regex = '/' . str_replace('.', '\.', $extension) . '$/';
-  // Get a listing of all template files in the path to search.
-  $files = [];
-  if (is_dir($path)) {
-    $files = \Drupal::service('file_system')->scanDirectory($path, $regex, ['key' => 'filename']);
-  }
-
-  // Find templates that implement registered theme hooks and include that in
-  // what is returned so that the registry knows that the theme has this
-  // implementation.
-  foreach ($files as $template => $file) {
-    // Ignore sub-theme templates for the current theme.
-    if (!str_starts_with($file->uri, str_replace($subtheme_paths, '', $file->uri))) {
-      continue;
-    }
-    // Remove the extension from the filename.
-    $template = str_replace($extension, '', $template);
-    // Transform - in filenames to _ to match function naming scheme
-    // for the purposes of searching.
-    $hook = strtr($template, '-', '_');
-    if (isset($cache[$hook])) {
-      $implementations[$hook] = [
-        'template' => $template,
-        'path' => dirname($file->uri),
-      ];
-    }
-
-    // Match templates based on the 'template' filename.
-    foreach ($cache as $hook => $info) {
-      if (isset($info['template'])) {
-        if ($template === $info['template']) {
-          $implementations[$hook] = [
-            'template' => $template,
-            'path' => dirname($file->uri),
-          ];
-        }
-      }
-    }
-  }
-
-  // Find templates that implement possible "suggestion" variants of registered
-  // theme hooks and add those as new registered theme hooks. See
-  // hook_theme_suggestions_alter() for more information about suggestions and
-  // the use of 'pattern' and 'base hook'.
-  $patterns = array_keys($files);
-  foreach ($cache as $hook => $info) {
-    $pattern = $info['pattern'] ?? ($hook . '__');
-    if (!isset($info['base hook']) && !empty($pattern)) {
-      // Transform _ in pattern to - to match file naming scheme
-      // for the purposes of searching.
-      $pattern = strtr($pattern, '_', '-');
-
-      $matches = preg_grep('/^' . $pattern . '/', $patterns);
-      if ($matches) {
-        foreach ($matches as $match) {
-          $file = $match;
-          // Remove the extension from the filename.
-          $file = str_replace($extension, '', $file);
-          // Put the underscores back in for the hook name and register this
-          // pattern.
-          $arg_name = isset($info['variables']) ? 'variables' : 'render element';
-          $implementations[strtr($file, '-', '_')] = [
-            'template' => $file,
-            'path' => dirname($files[$match]->uri),
-            $arg_name => $info[$arg_name],
-            'base hook' => $hook,
-          ];
-        }
-      }
-    }
-  }
-  return $implementations;
+function drupal_find_theme_templates($cache, $extension, $path) {
+  @trigger_error(__FUNCTION__ . '() is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Use theme.registry service findThemeTemplates() method instead. See https://www.drupal.org/node/3351736', E_USER_DEPRECATED);
+  return \Drupal::service('theme.registry')->findThemeTemplates($cache, $extension, $path);
 }
 
 /**
@@ -328,14 +246,9 @@ function theme_settings_convert_to_config(array $theme_settings, Config $config)
  *
  * @param array $variables
  *   An associative array possibly containing:
- *   - "attributes['timestamp']:".
- *   - "timestamp:".
- *   - "text:".
- *
- * @deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Initial
- *  template_preprocess functions are registered directly in hook_theme().
- *
- * @see https://www.drupal.org/node/3504125
+ *   - attributes['timestamp']:
+ *   - timestamp:
+ *   - text:.
  */
 function template_preprocess_time(&$variables): void {
   @trigger_error(__FUNCTION__ . '() is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Initial template_preprocess functions are registered directly in hook_theme(). See https://www.drupal.org/node/3504125', E_USER_DEPRECATED);
@@ -481,8 +394,7 @@ function template_preprocess_links(&$variables): void {
  *   - attributes: Associative array of attributes to be placed in the img tag.
  *   - srcset: Array of multiple URIs and sizes/multipliers.
  *   - sizes: The sizes attribute for viewport-based selection of images.
- *     phpcs:ignore
- *     - http://www.whatwg.org/specs/web-apps/current-work/multipage/embedded-content.html#introduction-3:viewport-based-selection-2
+ *     - http://www.whatwg.org/specs/web-apps/current-work/multipage/embedded-content.html#introduction-3:viewport-based-selection-2.
  */
 function template_preprocess_image(&$variables): void {
   /** @var \Drupal\Core\File\FileUrlGeneratorInterface $file_url_generator */
@@ -624,7 +536,7 @@ function template_preprocess_table(&$variables): void {
   // Format the table columns:
   if (!empty($variables['colgroups'])) {
     foreach ($variables['colgroups'] as &$colgroup) {
-      // Check if we're dealing with a simple or complex column
+      // Check if we're dealing with a simple or complex column.
       if (isset($colgroup['data'])) {
         $cols = $colgroup['data'];
         unset($colgroup['data']);
@@ -720,7 +632,7 @@ function template_preprocess_table(&$variables): void {
         $cells = $row;
         $row_attributes = [];
 
-        // Check if we're dealing with a simple or complex row
+        // Check if we're dealing with a simple or complex row.
         if (isset($row['data'])) {
           $cells = $row['data'];
           $variables['no_striping'] = $row['no_striping'] ?? FALSE;
@@ -1011,15 +923,14 @@ function theme_get_suggestions($args, $base, $delimiter = '__'): array {
   // page__node
   // page__node__%
   // page__node__1
-  // page__node__edit
-
+  // page__node__edit.
   $suggestions = [];
   $prefix = $base;
   foreach ($args as $arg) {
     // Remove slashes or null per SA-CORE-2009-003 and change - (hyphen) to _
     // (underscore).
     //
-    // When we discover templates in @see drupal_find_theme_templates,
+    // When we discover templates in @see \\Drupal\Core\Theme\Registry::findThemeTemplates(),
     // hyphens (-) are converted to underscores (_) before the theme hook
     // is registered. We do this because the hyphens used for delimiters
     // in hook suggestions cannot be used in the function names of the
@@ -1385,7 +1296,6 @@ function template_preprocess_pager(&$variables): void {
   // The last is the last page listed by this pager piece (re quantity).
   $pager_last = $pager_current + $quantity - $pager_middle;
   // End of marker calculations.
-
   // Prepare for generation loop.
   $i = $pager_first;
   if ($pager_last > $pager_max) {
@@ -1399,7 +1309,6 @@ function template_preprocess_pager(&$variables): void {
     $i = 1;
   }
   // End of generation loop preparation.
-
   // Create the "first" and "previous" links if we are not on the first page.
   if ($current_page > 0) {
     $items['first'] = [];

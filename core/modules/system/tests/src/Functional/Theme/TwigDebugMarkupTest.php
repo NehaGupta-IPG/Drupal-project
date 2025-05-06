@@ -40,11 +40,11 @@ class TwigDebugMarkupTest extends BrowserTestBase {
     $this->setContainerParameter('twig.config', $parameters);
     $this->rebuildContainer();
     $this->resetAll();
-
-    $cache = $this->container->get('theme.registry')->get();
+    $registry = $this->container->get('theme.registry');
+    $cache = $registry->get();
     // Create array of Twig templates.
-    $templates = drupal_find_theme_templates($cache, $extension, $this->getThemePath('test_theme'));
-    $templates += drupal_find_theme_templates($cache, $extension, $this->getModulePath('node'));
+    $templates = $registry->findThemeTemplates($cache, $extension, $this->getThemePath('test_theme'));
+    $templates += $registry->findThemeTemplates($cache, $extension, $this->getModulePath('node'));
 
     // Create a node and test different features of the debug markup.
     $node = $this->drupalCreateNode();

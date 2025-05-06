@@ -9,6 +9,7 @@ use Drupal\Core\DestructableInterface;
 use Drupal\Core\Extension\ModuleExtensionList;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Extension\ThemeHandlerInterface;
+use Drupal\Core\File\FileSystemInterface;
 use Drupal\Core\Lock\LockBackendInterface;
 use Drupal\Core\Update\UpdateKernel;
 use Drupal\Core\Utility\ThemeRegistry;
@@ -203,12 +204,14 @@ class Registry implements DestructableInterface {
    *   The module list.
    * @param \Symfony\Component\HttpKernel\HttpKernelInterface $kernel
    *   The kernel.
+   * @param \Drupal\Core\File\FileSystemInterface $fileSystem
+   *   The file system service.
    * @param string $theme_name
    *   (optional) The name of the theme for which to construct the registry.
    * @param array<string, true> $preprocess_for_suggestions
    *   (optional) Grouped preprocess functions from modules.
    */
-  public function __construct($root, CacheBackendInterface $cache, LockBackendInterface $lock, ModuleHandlerInterface $module_handler, ThemeHandlerInterface $theme_handler, ThemeInitializationInterface $theme_initialization, CacheBackendInterface $runtime_cache, ModuleExtensionList $module_list, protected HttpKernelInterface $kernel, $theme_name = NULL, array $preprocess_for_suggestions = []) {
+  public function __construct($root, CacheBackendInterface $cache, LockBackendInterface $lock, ModuleHandlerInterface $module_handler, ThemeHandlerInterface $theme_handler, ThemeInitializationInterface $theme_initialization, CacheBackendInterface $runtime_cache, ModuleExtensionList $module_list, protected HttpKernelInterface $kernel, $theme_name = NULL, protected ?FileSystemInterface $fileSystem = NULL, array $preprocess_for_suggestions = []) {
     $this->root = $root;
     $this->cache = $cache;
     $this->lock = $lock;
@@ -219,6 +222,11 @@ class Registry implements DestructableInterface {
     $this->moduleList = $module_list;
     $this->themeName = $theme_name;
     $this->preprocessForSuggestions = $preprocess_for_suggestions;
+    if (!$fileSystem instanceof FileSystemInterface) {
+      @trigger_error('Calling ' . __METHOD__ . ' without the $fileSystem argument is deprecated in drupal:11.2.0 and will be required in drupal:12.0.0. See https://www.drupal.org/node/3490392', E_USER_DEPRECATED);
+      $this->fileSystem = \Drupal::service('file_system');
+    }
+
   }
 
   /**
@@ -311,10 +319,8 @@ class Registry implements DestructableInterface {
    * Gets the theme registry cache.
    *
    * @return array|null
-   *   The complete theme registry data array for the active theme for this
-   *   registry.
-   *
-   * @see Registry::$registry
+   *   Returns existing cache entry or null if no cache entry exists in theme
+   *   registry cache.
    */
   protected function cacheGet(): ?array {
     $theme_name = $this->theme->getName();
@@ -387,7 +393,7 @@ class Registry implements DestructableInterface {
    * - Base theme engines
    * - Base themes
    * - Theme engine
-   * - Theme
+   * - Theme.
    *
    * All theme hook definitions are essentially just collated and merged in the
    * above order. However, various extension-specific default values and
@@ -560,9 +566,8 @@ class Registry implements DestructableInterface {
       foreach ($result as $hook => $info) {
         // When a theme or engine overrides a module's theme function
         // $result[$hook] will only contain key/value pairs for information
-        // being overridden.  Pull the rest of the information from what was
+        // being overridden. Pull the rest of the information from what was
         // defined by an earlier hook.
-
         // Fill in the type and path of the module, theme, or engine that
         // implements this theme function.
         $result[$hook]['type'] = $type;
@@ -850,7 +855,7 @@ class Registry implements DestructableInterface {
       }
       // The 'base hook' is only applied to derivative hooks already registered
       // from a pattern. This is typically set from
-      // drupal_find_theme_templates().
+      // \Drupal\Core\Theme\Registry::findThemeTemplates().
       if (isset($info['incomplete preprocess functions'])) {
         $this->completeSuggestion($hook, $cache);
         unset($cache[$hook]['incomplete preprocess functions']);
@@ -911,13 +916,17 @@ class Registry implements DestructableInterface {
   /**
    * Gets all user functions grouped by the word before the first underscore.
    *
+<<<<<<< ours
    * @param string[] $prefixes
+=======
+   * @param array $prefixes
+>>>>>>> theirs
    *   An array of function prefixes by which the list can be limited.
    *
    * @return array
    *   Functions grouped by the first prefix.
    */
-  public function getPrefixGroupedUserFunctions($prefixes = []) {
+  public function getPrefixGroupedUserFunctions(array $prefixes = []) {
     $functions = get_defined_functions();
 
     // If a list of prefixes is supplied, trim down the list to those items
@@ -941,59 +950,112 @@ class Registry implements DestructableInterface {
   }
 
   /**
-   * Adds $prefix_preprocess functions to every hook.
+   * Allows themes and/or theme engines to easily discover overridden templates.
    *
    * @param array $cache
-   *   The theme registry, as documented in
-   *   \Drupal\Core\Theme\Registry::processExtension().
-   * @param array $fixed_preprocess_functions
-   *   A list of preprocess functions.
-   * @param array $old_cache
-   *   An already processed theme registry.
+   *   The existing cache of theme hooks to test against.
+   * @param string $extension
+   *   The extension that these templates will have.
+   * @param string $path
+   *   The path to search.
+   *
+   * @return array|null
+   *   The Theme Templates found in the given path of the extension.
    */
-  protected function addFixedPreprocessFunctions(array &$cache, array $fixed_preprocess_functions, array $old_cache = []): void {
-    foreach (array_keys(array_diff_key($cache, $old_cache)) as $hook) {
-      if ($hook == static::PREPROCESS_INVOKES) {
-        continue;
-      }
-      if (!isset($cache[$hook]['preprocess functions'])) {
-        $cache[$hook]['preprocess functions'] = $fixed_preprocess_functions;
-      }
-      else {
-        $offset = 0;
-        while (isset($cache[$hook]['preprocess functions'][$offset]) && is_string($cache[$hook]['preprocess functions'][$offset]) && str_starts_with($cache[$hook]['preprocess functions'][$offset], 'template_')) {
-          $offset++;
-        }
-        array_splice($cache[$hook]['preprocess functions'], $offset, 0, $fixed_preprocess_functions);
+  public function findThemeTemplates(array $cache, string $extension, string $path) {
+    $implementations = $files = [];
+
+    // Collect paths to all sub-themes grouped by base themes. These will be
+    // used for filtering. This allows base themes to have sub-themes in its
+    // folder hierarchy without affecting the base themes template discovery.
+    $theme_paths = [];
+    foreach ($this->themeHandler->listInfo() as $theme_info) {
+      if (!empty($theme_info->base_theme)) {
+        $theme_paths[$theme_info->base_theme][$theme_info->getName()] = $theme_info->getPath();
       }
     }
-  }
+    foreach ($theme_paths as $basetheme => $subthemes) {
+      foreach ($subthemes as $subtheme) {
+        if (isset($theme_paths[$subtheme])) {
+          $theme_paths[$basetheme] = array_merge($theme_paths[$basetheme], $theme_paths[$subtheme]);
+        }
+      }
+    }
+    $theme = $this->themeManager->getActiveTheme()->getName();
+    $subtheme_paths = $theme_paths[$theme] ?? [];
 
-  /**
-   * Collect module implementations of a single hook.
-   *
-   * @param array $cache
-   *   The preprocess hook.
-   * @param string $hook
-   *   The theme registry, as documented in
-   *   \Drupal\Core\Theme\Registry::processExtension().
-   *
-   * @return array
-   *   A list of preprocess functions.
-   */
-  protected function collectModulePreprocess(array &$cache, string $hook): array {
-    $preprocess_functions = [];
-    // This is used so we can collect all preprocess functions in modules but
-    // prevent them from being executed. Registry needs to cache preprocess
-    // functions so we only want to gather the ones that exist, but we do not
-    // want to execute them. Callable is not used so that preprocess
-    // implementations are not executed.
-    $this->moduleHandler->invokeAllWith($hook, function (callable $callable, string $module) use ($hook, &$cache, &$preprocess_functions) {
-      $function = $module . '_' . $hook;
-      $cache[static::PREPROCESS_INVOKES][$function] = ['module' => $module, 'hook' => $hook];
-      $preprocess_functions[] = $function;
-    });
-    return $preprocess_functions;
+    // Escape the periods in the extension.
+    $regex = '/' . str_replace('.', '\.', $extension) . '$/';
+    // Get a listing of all template files in the path to search.
+    if (is_dir($path)) {
+      $files = $this->fileSystem->scanDirectory($path, $regex, ['key' => 'filename']);
+    }
+
+    // Find templates that implement registered theme hooks and include that in
+    // what is returned so that the registry knows that the theme has this
+    // implementation.
+    foreach ($files as $template => $file) {
+      // Ignore sub-theme templates for the current theme.
+      if (strpos($file->uri, str_replace($subtheme_paths, '', $file->uri)) !== 0) {
+        continue;
+      }
+      // Remove the extension from the filename.
+      $template = str_replace($extension, '', $template);
+      // Transform - in filenames to _ to match function naming scheme
+      // for the purposes of searching.
+      $hook = strtr($template, '-', '_');
+      if (isset($cache[$hook])) {
+        $implementations[$hook] = [
+          'template' => $template,
+          'path' => dirname($file->uri),
+        ];
+      }
+
+      // Match templates based on the 'template' filename.
+      foreach ($cache as $hook => $info) {
+        if (isset($info['template'])) {
+          if ($template === $info['template']) {
+            $implementations[$hook] = [
+              'template' => $template,
+              'path' => dirname($file->uri),
+            ];
+          }
+        }
+      }
+    }
+
+    // Find templates that implement possible "suggestion" variants of
+    // registered theme hooks and add those as new registered theme hooks. See
+    // hook_theme_suggestions_alter() for more information about suggestions and
+    // the use of 'pattern' and 'base hook'.
+    $patterns = array_keys($files);
+    foreach ($cache as $hook => $info) {
+      $pattern = $info['pattern'] ?? ($hook . '__');
+      if (!isset($info['base hook']) && !empty($pattern)) {
+        // Transform _ in pattern to - to match file naming scheme
+        // for the purposes of searching.
+        $pattern = strtr($pattern, '_', '-');
+
+        $matches = preg_grep('/^' . $pattern . '/', $patterns);
+        if ($matches) {
+          foreach ($matches as $match) {
+            $file = $match;
+            // Remove the extension from the filename.
+            $file = str_replace($extension, '', $file);
+            // Put the underscores back in for the hook name and register this
+            // pattern.
+            $arg_name = isset($info['variables']) ? 'variables' : 'render element';
+            $implementations[strtr($file, '-', '_')] = [
+              'template' => $file,
+              'path' => dirname($files[$match]->uri),
+              $arg_name => $info[$arg_name],
+              'base hook' => $hook,
+            ];
+          }
+        }
+      }
+    }
+    return $implementations;
   }
 
 }
