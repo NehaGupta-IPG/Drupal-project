@@ -33,6 +33,16 @@ use Drupal\views\Plugin\views\PluginBase;
 abstract class DisplayExtenderPluginBase extends PluginBase {
 
   /**
+   * Determines whether the display extender applies to the display.
+   *
+   * @param array $display_options
+   *   The display options.
+   */
+  public function applies(array $display_options): bool {
+    return TRUE;
+  }
+
+  /**
    * Provide a form to edit options for this plugin.
    */
   public function defineOptionsAlter(&$options) {}

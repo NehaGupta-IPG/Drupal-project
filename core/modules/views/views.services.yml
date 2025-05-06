@@ -107,3 +107,8 @@ services:
     tags:
       - { name: backend_overridable }
   Drupal\views\Plugin\views\query\CastSqlInterface: '@views.cast_sql'
+
+
+  views.display_extender.uninstall_validator:
+    class: Drupal\views\DisplayExtenderUninstallValidator
+    arguments: ['@plugin.manager.views.display_extender', '@entity_type.manager']

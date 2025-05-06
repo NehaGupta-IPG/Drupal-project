@@ -378,4 +378,25 @@ class ViewsHooks {
     $config_updater->updateAll($view);
   }
 
+  /**
+   * Implements hook_modules_uninstalled().
+   */
+  #[Hook('hook_modules_uninstalled')]
+  public function modulesUninstalled(array $modules, bool $is_syncing): void {
+    if ($is_syncing) {
+      return;
+    }
+    $config = \Drupal::configFactory()->getEditable('views.settings');
+    /** @var array $display_extenders */
+    $display_extenders = $config->get('display_extenders') ?: [];
+    foreach ($modules as $module) {
+      $key = array_search($module, $display_extenders, TRUE);
+      if ($key !== FALSE) {
+        unset($display_extenders[$key]);
+      }
+    }
+    $config->set('display_extenders', $display_extenders);
+    $config->save();
+  }
+
 }
