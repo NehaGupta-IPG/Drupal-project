@@ -5,9 +5,13 @@ declare(strict_types=1);
 namespace Drupal\KernelTests\Core\DrupalKernel;
 
 use Composer\Autoload\ClassLoader;
+use Drupal\autoloader_test\AutoloaderTestClass;
+use Drupal\autoloader_test\AutoloaderTestEnum;
+use Drupal\autoloader_test\AutoloaderTestServiceProvider;
 use Drupal\Core\DrupalKernel;
 use Drupal\Core\DrupalKernelInterface;
 use Drupal\Core\Utility\Error;
+use Drupal\KernelTests\AutoloaderTrait;
 use Drupal\KernelTests\KernelTestBase;
 use org\bovigo\vfs\vfsStream;
 use Prophecy\Argument;
@@ -22,6 +26,8 @@ use Symfony\Component\HttpFoundation\Request;
  * @coversDefaultClass \Drupal\Core\DrupalKernel
  */
 class DrupalKernelTest extends KernelTestBase {
+
+  use AutoloaderTrait;
 
   /**
    * {@inheritdoc}
@@ -323,6 +329,34 @@ class DrupalKernelTest extends KernelTestBase {
     $this->getTestKernel($request);
     // Kernel environment locale should be UTF-8.
     $this->assertSame($utf8_string, escapeshellcmd($utf8_string));
+  }
+
+  /**
+   * Test container with parameter references to modules.
+   *
+   * Tests references to objects or enums defined by modules are unserialized
+   * since the classloader is already populated before the cached container
+   * is unserialized.
+   *
+   * @see \Drupal\Core\DrupalKernel::getCachedContainerDiscovery
+   * @see \Drupal\Core\DrupalKernel::cacheDrupalContainer
+   * @see \Drupal\Core\DependencyInjection\ContainerDiscovery
+   * @see \Drupal\service_provider_test\ServiceProviderTestServiceProvider::alter
+   */
+  public function testCachedReferencesToExtensions(): void {
+    parent::bootKernel();
+
+    // Ensure items are removed from autoloader.
+    // We test the service provider since if the test enum/object is used, PHP
+    // will cache it, so the disabling process won't take effect.
+    $this->assertTrue(class_exists(AutoloaderTestServiceProvider::class));
+    static::disablePsr4ForUninstalledModules($this->classLoader, ['autoloader_test']);
+    $this->assertFalse(class_exists(AutoloaderTestEnum::class));
+    $this->assertFalse(class_exists(AutoloaderTestClass::class));
+
+    \Drupal::service('module_installer')->install(['service_provider_test', 'autoloader_test']);
+    $this->assertTrue(class_exists(AutoloaderTestEnum::class));
+    $this->assertTrue(class_exists(AutoloaderTestClass::class));
   }
 
 }
