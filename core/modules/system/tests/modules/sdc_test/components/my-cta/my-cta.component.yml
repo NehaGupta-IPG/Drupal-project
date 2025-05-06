@@ -26,3 +26,13 @@ props:
     attributes:
       type: Drupal\Core\Template\Attribute
       name: Attributes
+variants:
+  primary:
+    title: Primary
+    description: My primary variant
+  secondary:
+    title: Secondary
+    description: My secondary variant
+  tertiary:
+    title: Tertiary
+    description: My tertiary variant
