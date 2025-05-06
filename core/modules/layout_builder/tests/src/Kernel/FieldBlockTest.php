@@ -154,7 +154,7 @@ class FieldBlockTest extends EntityKernelTestBase {
    * @covers ::build
    * @dataProvider providerTestBlockAccessEntityAllowedFieldHasValue
    */
-  public function testBlockAccessEntityAllowedFieldHasValue($expected, $is_empty, $default_value, $show_when_empty = FALSE): void {
+  public function testBlockAccessEntityAllowedFieldHasValue($expected, $is_empty, $default_value, $show_when_empty): void {
     $entity = $this->prophesize(FieldableEntityInterface::class);
     $block = $this->getTestBlock($entity, ['show_when_empty' => $show_when_empty]);
 
@@ -183,21 +183,6 @@ class FieldBlockTest extends EntityKernelTestBase {
    */
   public static function providerTestBlockAccessEntityAllowedFieldHasValue() {
     $data = [];
-    $data['empty'] = [
-      FALSE,
-      TRUE,
-      FALSE,
-    ];
-    $data['populated'] = [
-      TRUE,
-      FALSE,
-      FALSE,
-    ];
-    $data['empty, with default'] = [
-      TRUE,
-      TRUE,
-      TRUE,
-    ];
     $data['empty, hide when empty'] = [
       FALSE,
       TRUE,
@@ -210,6 +195,19 @@ class FieldBlockTest extends EntityKernelTestBase {
       FALSE,
       TRUE,
     ];
+    $data['populated'] = [
+      TRUE,
+      FALSE,
+      FALSE,
+      FALSE,
+    ];
+    $data['empty, with default'] = [
+      TRUE,
+      TRUE,
+      TRUE,
+      FALSE,
+    ];
+
     return $data;
   }
 
