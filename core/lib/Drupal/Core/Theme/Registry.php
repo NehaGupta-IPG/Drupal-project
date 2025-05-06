@@ -960,7 +960,7 @@ class Registry implements DestructableInterface {
    * @return array|null
    *   The Theme Templates found in the given path of the extension.
    */
-  public function findThemeTemplates(array $cache, string $extension, string $path) {
+  public function findThemeTemplates(array $cache, string $extension, string $path): ?array {
     $implementations = $files = [];
 
     // Collect paths to all sub-themes grouped by base themes. These will be

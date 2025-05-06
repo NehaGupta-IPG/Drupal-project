@@ -95,7 +95,7 @@ function _system_default_theme_features() {
  *
  * @see https://www.drupal.org/node/3351736
  */
-function drupal_find_theme_templates($cache, $extension, $path) {
+function drupal_find_theme_templates($cache, $extension, $path): ?array {
   @trigger_error(__FUNCTION__ . '() is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Use theme.registry service findThemeTemplates() method instead. See https://www.drupal.org/node/3351736', E_USER_DEPRECATED);
   return \Drupal::service('theme.registry')->findThemeTemplates($cache, $extension, $path);
 }
