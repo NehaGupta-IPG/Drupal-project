@@ -10,20 +10,15 @@
 
 use Drupal\Core\Datetime\DatePreprocess;
 use Drupal\Core\Theme\ThemePreprocess;
-use Drupal\Core\Url;
-use Drupal\Component\Serialization\Json;
-use Drupal\Component\Utility\Crypt;
 use Drupal\Component\Utility\Html;
 use Drupal\Core\Config\Config;
 use Drupal\Core\Config\StorageException;
 use Drupal\Core\Installer\InstallerKernel;
 use Drupal\Core\Render\Element;
-use Drupal\Core\Render\Markup;
 use Drupal\Core\Template\Attribute;
 use Drupal\Core\Template\AttributeHelper;
 use Drupal\Core\Theme\ThemeCommonElements;
 use Drupal\Core\Theme\ThemeSettings;
-use Drupal\Core\Render\Element;
 use Drupal\Core\Url;
 use Drupal\Core\Utility\TableSort;
 
@@ -936,7 +931,8 @@ function theme_get_suggestions($args, $base, $delimiter = '__'): array {
     // Remove slashes or null per SA-CORE-2009-003 and change - (hyphen) to _
     // (underscore).
     //
-    // When we discover templates in @see \\Drupal\Core\Theme\Registry::findThemeTemplates(),
+    // When we discover templates in
+    // @see \\Drupal\Core\Theme\Registry::findThemeTemplates(),
     // hyphens (-) are converted to underscores (_) before the theme hook
     // is registered. We do this because the hyphens used for delimiters
     // in hook suggestions cannot be used in the function names of the
