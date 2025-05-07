@@ -51,7 +51,8 @@ class LayoutBuilderTest extends WebDriverTestBase {
    *
    * @var string
    *
-   * @todo Remove in https://www.drupal.org/project/drupal/issues/2909782.
+   * Legacy workaround for now-closed core issue #2909782.
+   * Originally tracked at: https://www.drupal.org/project/drupal/issues/2909782
    */
   private $pageReloadMarker;
 
@@ -405,7 +406,8 @@ class LayoutBuilderTest extends WebDriverTestBase {
   /**
    * {@inheritdoc}
    *
-   * @todo Remove this in https://www.drupal.org/project/drupal/issues/2918718.
+   * @todo Remove this once the related core issue is resolved.
+   *   See: https://www.drupal.org/project/drupal/issues/2918718 (Status: Needs work)
    */
   protected function clickContextualLink($selector, $link_locator, $force_visible = TRUE): void {
     /** @var \Drupal\FunctionalJavascriptTests\JSWebAssert $assert_session */
@@ -501,7 +503,8 @@ class LayoutBuilderTest extends WebDriverTestBase {
   /**
    * Marks the page to assist determining if the page has been reloaded.
    *
-   * @todo Remove in https://www.drupal.org/project/drupal/issues/2909782.
+   * Legacy workaround for now-closed core issue #2909782.
+   * Originally tracked at: https://www.drupal.org/project/drupal/issues/2909782
    */
   private function markCurrentPage(): void {
     $this->pageReloadMarker = $this->randomMachineName();
@@ -511,7 +514,8 @@ class LayoutBuilderTest extends WebDriverTestBase {
   /**
    * Asserts that the page has not been reloaded.
    *
-   * @todo Remove in https://www.drupal.org/project/drupal/issues/2909782.
+   * Legacy workaround for now-closed core issue #2909782.
+   * Originally tracked at: https://www.drupal.org/project/drupal/issues/2909782
    */
   private function assertPageNotReloaded(): void {
     $this->assertSession()->pageTextContains($this->pageReloadMarker);
