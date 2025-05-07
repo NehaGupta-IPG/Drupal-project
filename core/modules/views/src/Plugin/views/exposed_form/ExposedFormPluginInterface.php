@@ -65,7 +65,7 @@ interface ExposedFormPluginInterface extends ViewsPluginInterface {
    *
    * @see \Drupal\views\Plugin\views\exposed_form\ExposedFormPluginBase::renderExposedForm()
    */
-  public const string DATA_ATTRIBUTE_EXPOSED_FORM_IDENTIFIER = 'data-drupal-exposed-form-identifier';
+  public const DATA_ATTRIBUTE_EXPOSED_FORM_IDENTIFIER = 'data-drupal-exposed-form-identifier';
 
   /**
    * Renders the exposed form.
