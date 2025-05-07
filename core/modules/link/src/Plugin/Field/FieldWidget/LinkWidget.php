@@ -78,7 +78,7 @@ class LinkWidget extends WidgetBase {
       // Show the 'entity:' URI as the entity autocomplete would.
       // @todo Support entity types other than 'node'. Will be fixed in
       //   https://www.drupal.org/node/2423093.
-      if ($entity_type == 'node' && $entity = \Drupal::entityTypeManager()->getStorage($entity_type)->load($entity_id)) {
+      if (in_array($entity_type, ['node', 'taxonomy_term']) && $entity = \Drupal::entityTypeManager()->getStorage($entity_type)->load($entity_id)) {
         $displayable_string = EntityAutocomplete::getEntityLabels([$entity]);
       }
     }
@@ -120,13 +120,13 @@ class LinkWidget extends WidgetBase {
       $uri = 'entity:node/' . $entity_id;
       $node = Node::load($entity_id);
       // On layout builder pages, the langcode is not passed.
-      if (is_null($langcode) && str_contains(\Drupal::routeMatch()->getRouteName(), 'layout_builder') ) {
+      if (is_null($langcode) && str_contains(\Drupal::routeMatch()->getRouteName(), 'layout_builder')) {
         $langcode = \Drupal::languageManager()->getCurrentLanguage()->getId();
       }
       if ($node && isset($langcode) && $node->isTranslatable() && $node->hasTranslation($langcode)) {
         $node = $node->getTranslation($langcode);
       }
-      if (!$node || (!str_contains($string, $node->label()) && Term::load($entity_id) !== null)) {
+      if (!$node || (!str_contains($string, $node->label()) && Term::load($entity_id) !== NULL)) {
         $uri = 'entity:taxonomy_term/' . $entity_id;
       }
     }
