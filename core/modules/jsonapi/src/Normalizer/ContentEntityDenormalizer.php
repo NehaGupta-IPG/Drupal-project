@@ -36,6 +36,7 @@ final class ContentEntityDenormalizer extends EntityDenormalizerBase {
     $data_internal = [];
 
     $field_map = $this->fieldManager->getFieldMap()[$resource_type->getEntityTypeId()];
+    $field_definitions = NULL;
 
     $entity_type_id = $resource_type->getEntityTypeId();
     $entity_type_definition = $this->entityTypeManager->getDefinition($entity_type_id);
