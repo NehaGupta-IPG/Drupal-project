@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Drupal\FunctionalTests\DrupalKernel;
 
 use Drupal\Core\Cache\DatabaseBackend;
-use Drupal\Core\DrupalKernel;
 use Drupal\Core\Extension\ModuleInstallerInterface;
 use Drupal\Core\Url;
 use Drupal\Tests\BrowserTestBase;
@@ -81,4 +80,5 @@ final class DrupalKernelTest extends BrowserTestBase {
     $this->assertSession()->responseContains('Enum:Drupal\autoloader_test\AutoloaderTestEnum');
     $this->assertSession()->responseContains('Class:Drupal\autoloader_test\AutoloaderTestClass');
   }
+
 }

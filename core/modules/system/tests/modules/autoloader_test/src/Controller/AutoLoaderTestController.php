@@ -44,6 +44,4 @@ final class AutoLoaderTestController extends ControllerBase implements Container
     return $build;
   }
 
-
 }
-
