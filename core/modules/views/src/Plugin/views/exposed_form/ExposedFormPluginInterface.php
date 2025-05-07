@@ -42,6 +42,32 @@ use Drupal\views\Plugin\views\ViewsPluginInterface;
 interface ExposedFormPluginInterface extends ViewsPluginInterface {
 
   /**
+   * Identifies all instances of this exposed form on a page.
+   *
+   * Plugin implementations must add this data attribute to the form render
+   * array with a unique value that identifies each exposed form instance.
+   * This attribute enables JavaScript behaviors to target specific exposed
+   * forms when multiple instances appear on the same page.
+   *
+   * The recommended format for the identifier value combines the plugin ID,
+   * view ID, and display ID to ensure uniqueness.
+   *
+   * @code
+   * $form['#attributes'][self::DATA_ATTRIBUTE_EXPOSED_FORM_IDENTIFIER] = Html::cleanCssIdentifier(
+   *   implode('-', [
+   *     'views_exposed_form',
+   *     $this->getPluginId(),
+   *     $this->view->storage->id(),
+   *     $this->view->display_handler->display['id']
+   *   ])
+   * );
+   * @endcode
+   *
+   * @see \Drupal\views\Plugin\views\exposed_form\ExposedFormPluginBase::renderExposedForm()
+   */
+  public const string DATA_ATTRIBUTE_EXPOSED_FORM_IDENTIFIER = 'data-drupal-exposed-form-identifier';
+
+  /**
    * Renders the exposed form.
    *
    * This method iterates over each handler configured to expose widgets

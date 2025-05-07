@@ -2,6 +2,7 @@
 
 namespace Drupal\views\Plugin\views\exposed_form;
 
+use Drupal\Component\Utility\Html;
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Cache\CacheableDependencyInterface;
 use Drupal\Core\Form\FormState;
@@ -138,6 +139,8 @@ abstract class ExposedFormPluginBase extends PluginBase implements CacheableDepe
     if (!empty($errors)) {
       $this->view->build_info['abort'] = TRUE;
     }
+
+    $form['#attributes'][self::DATA_ATTRIBUTE_EXPOSED_FORM_IDENTIFIER] = Html::cleanCssIdentifier(implode('-', ['views_exposed_form', $this->getPluginId(), $this->view->storage->id(), $this->view->display_handler->display['id']]));
 
     if (!$this->view->display_handler->displaysExposed() || (!$block && $this->view->display_handler->getOption('exposed_block'))) {
       return [];
