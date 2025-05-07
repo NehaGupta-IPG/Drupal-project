@@ -243,7 +243,6 @@ class ViewAjaxController implements ContainerInjectionInterface {
                 unset($exposed_form_block_render_array[$property]);
               }
             }
-            // The render element must be rendered before the form ID is accessed.
             $exposed_form = $this->renderer->render($exposed_form_block_render_array);
             $response->addCommand(new ReplaceCommand('[' . $exposed_form_plugin::DATA_ATTRIBUTE_EXPOSED_FORM_IDENTIFIER . '=' . $exposed_form_data_attribute_value . '] form', $exposed_form));
           }
