@@ -1,0 +1,27 @@
+system.menu.custom_menu_test:
+  type: config_entity
+  label: 'Custom test menu'
+  mapping:
+    id:
+      type: string
+      label: 'Menu ID'
+    label:
+      type: label
+      label: 'Title'
+    description:
+      type: text
+      label: 'Description'
+    locked:
+      type: boolean
+      label: 'Locked'
+    dependencies:
+      type: sequence
+      label: 'Dependencies'
+      sequence:
+        type: string
+    uuid:
+      type: string
+      label: 'UUID'
+    status:
+      type: boolean
+      label: 'Status'

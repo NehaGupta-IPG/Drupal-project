@@ -18,7 +18,7 @@ class MenuFormUnderscoreTest extends BrowserTestBase {
    */
   protected static $modules = [
     'menu_ui',
-    'system',
+    'menu_ui_test',
   ];
 
   /**
@@ -51,6 +51,7 @@ class MenuFormUnderscoreTest extends BrowserTestBase {
    */
   public function testMenuMachineNameWithUnderscore(): void {
     $this->drupalGet('admin/structure/menu/add');
+    $this->assertSession()->statusCodeEquals(200);
 
     // Fill and submit the form.
     $edit = [
@@ -62,6 +63,9 @@ class MenuFormUnderscoreTest extends BrowserTestBase {
 
     // Check for confirmation message.
     $this->assertSession()->pageTextContains('Menu My Custom Menu has been added.');
+
+    $this->drupalGet('admin/structure/menu/manage/custom_menu_test');
+    $this->assertSession()->statusCodeEquals(200);
 
     // Verify the menu exists.
     $menu_storage = \Drupal::entityTypeManager()->getStorage('menu');
