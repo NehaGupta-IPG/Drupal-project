@@ -44,9 +44,9 @@ class FormAlter extends Hook {
    */
   public function __construct(
     string $form_id = '',
-    public string $method = '',
-    public ?string $module = NULL,
-    public ?OrderInterface $order = NULL,
+    string $method = '',
+    ?string $module = NULL,
+    ?OrderInterface $order = NULL,
   ) {
     parent::__construct($form_id, $method, $module, $order);
   }
