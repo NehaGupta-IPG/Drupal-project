@@ -4,4 +4,4 @@ description: 'Support module for Menu UI functional tests.'
 core_version_requirement: ^10 || ^11
 package: Testing
 dependencies:
-  - menu_ui
+  - drupal:menu_ui
