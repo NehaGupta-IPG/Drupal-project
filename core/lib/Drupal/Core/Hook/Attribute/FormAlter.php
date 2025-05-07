@@ -15,16 +15,6 @@ use Drupal\Core\Hook\Order\OrderInterface;
 class FormAlter extends Hook {
 
   /**
-   * {@inheritdoc}
-   */
-  public const string PREFIX = 'form';
-
-  /**
-   * {@inheritdoc}
-   */
-  public const string SUFFIX = 'alter';
-
-  /**
    * Constructs a FormAlter attribute object.
    *
    * @param string $form_id
@@ -48,7 +38,8 @@ class FormAlter extends Hook {
     ?string $module = NULL,
     ?OrderInterface $order = NULL,
   ) {
-    parent::__construct($form_id, $method, $module, $order);
+    $hook = ($form_id === NULL) ? 'form_alter' : 'form_' . $form_id . '_alter';
+    parent::__construct($hook, $method, $module, $order);
   }
 
 }
