@@ -17,9 +17,8 @@ class FormAlter extends Hook {
   /**
    * Constructs a FormAlter attribute object.
    *
-   * @param string $form_id
-   *   (optional) The ID of the form that this implementation alters.
-   *   If this is left blank then `form_alter` is the hook that is registered.
+   * @param string|null $form_id
+   *   (optional) The ID of the target form, or NULL to target all forms.
    * @param string $method
    *   (optional) The method name. If this attribute is on a method, this
    *   parameter is not required. If this attribute is on a class and this
@@ -33,7 +32,7 @@ class FormAlter extends Hook {
    *   (optional) Set the order of the implementation.
    */
   public function __construct(
-    string $form_id = '',
+    ?string $form_id = NULL,
     string $method = '',
     ?string $module = NULL,
     ?OrderInterface $order = NULL,
