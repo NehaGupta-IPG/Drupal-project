@@ -1,0 +1,4 @@
+name: Autoloader test
+type: module
+description: 'A module for testing the autoloader and autoloading.'
+version: VERSION

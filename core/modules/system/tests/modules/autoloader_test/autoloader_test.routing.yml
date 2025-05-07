@@ -1,0 +1,6 @@
+autoloader_test.parameters:
+  path: '/autoloader-test/parameters'
+  defaults:
+    _controller: '\Drupal\autoloader_test\Controller\AutoLoaderTestController'
+  requirements:
+    _access: 'TRUE'
