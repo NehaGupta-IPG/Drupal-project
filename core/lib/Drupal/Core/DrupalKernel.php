@@ -563,11 +563,7 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
    * {@inheritdoc}
    */
   public function loadLegacyIncludes() {
-    require_once $this->root . '/core/includes/common.inc';
-    require_once $this->root . '/core/includes/module.inc';
-    require_once $this->root . '/core/includes/theme.inc';
-    require_once $this->root . '/core/includes/form.inc';
-    require_once $this->root . '/core/includes/errors.inc';
+    @trigger_error('DrupalKernel::loadLegacyIncludes() is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. There is no direct replacement. See https://www.drupal.org/node/3520496', E_USER_DEPRECATED);
   }
 
   /**
@@ -585,8 +581,6 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
     if (!$request->hasSession()) {
       $this->initializeEphemeralSession($request);
     }
-
-    $this->loadLegacyIncludes();
 
     // Load all enabled modules.
     $this->container->get('module_handler')->loadAll();

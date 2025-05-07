@@ -43,6 +43,10 @@ class LanguageNegotiationUrlTest extends UnitTestCase {
   protected function setUp(): void {
     parent::setUp();
 
+    // @todo Remove as part of https://www.drupal.org/i/2529170.
+    global $base_path;
+    $base_path = '/';
+
     // Set up some languages to be used by the language-based path processor.
     $language_de = $this->createMock('\Drupal\Core\Language\LanguageInterface');
     $language_de->expects($this->any())
@@ -381,20 +385,6 @@ class LanguageNegotiationUrlTest extends UnitTestCase {
     $method->processOutbound('foo', $options, $request);
     $this->assertTrue($options['absolute']);
 
-  }
-
-}
-
-// @todo Remove as part of https://www.drupal.org/node/2481833.
-namespace Drupal\language\Plugin\LanguageNegotiation;
-
-if (!function_exists('base_path')) {
-
-  /**
-   * Returns the base path.
-   */
-  function base_path() {
-    return '/';
   }
 
 }

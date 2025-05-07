@@ -146,6 +146,10 @@ interface DrupalKernelInterface extends HttpKernelInterface {
 
   /**
    * Helper method that loads legacy Drupal include files.
+   *
+   * @deprecated in drupal:11.2.0 and is removed from drupal:12.0.0.
+   * There is no direct replacement.
+   * @see https://www.drupal.org/node/3520496
    */
   public function loadLegacyIncludes();
 

@@ -113,7 +113,12 @@
             "lib/Drupal/Component/Datetime/Time.php"
         ],
         "files": [
-            "includes/bootstrap.inc"
+            "includes/bootstrap.inc",
+            "includes/common.inc",
+            "includes/module.inc",
+            "includes/theme.inc",
+            "includes/form.inc",
+            "includes/errors.inc"
         ]
     },
     "config": {
