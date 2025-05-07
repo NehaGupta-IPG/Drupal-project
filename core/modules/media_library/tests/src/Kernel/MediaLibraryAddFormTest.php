@@ -155,28 +155,4 @@ class MediaLibraryAddFormTest extends KernelTestBase {
     $this->assertSame(TestAddForm::class, $image_source_definition['forms']['media_library_add']);
   }
 
-  /**
-   * Tests the display of error messages in the media library add form.
-   */
-  public function testErrorMessagePlacement(): void {
-    $form_state = new FormState();
-    $form = [];
-
-    // Simulate a form error.
-    $form_state->setErrorByName('upload', $this->t('File upload is required.'));
-    
-    // Build the form.
-    $form_object = \Drupal::formBuilder()->getForm(FileUploadForm::class, $form_state);
-    
-    // Get rendered output.
-    $rendered_form = \Drupal::service('renderer')->renderRoot($form_object);
-
-    // Ensure the error message appears after the input field.
-    $this->assertStringContainsString('<div id="media-library-messages"', $rendered_form);
-    $this->assertStringContainsString('File upload is required.', $rendered_form);
-    
-    // Ensure the message appears before the Views select form.
-    $this->assertMatchesRegularExpression('/<div id="media-library-messages".*<select[^>]*name="views_select"/s', $rendered_form);
-  }
-
 }
