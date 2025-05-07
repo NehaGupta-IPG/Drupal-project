@@ -93,7 +93,7 @@
     <include-pattern>core/lib/*</include-pattern>
     <include-pattern>core/modules/system/tests/modules/HookOrder/*</include-pattern>
     <include-pattern>core/modules/*/tests</include-pattern>
-  </rule>
+   </rule>
   <rule ref="Drupal.Commenting.FunctionComment.MissingParamType"/>
   <rule ref="Drupal.Commenting.FunctionComment.MissingReturnComment"/>
   <rule ref="Drupal.Commenting.GenderNeutralComment"/>

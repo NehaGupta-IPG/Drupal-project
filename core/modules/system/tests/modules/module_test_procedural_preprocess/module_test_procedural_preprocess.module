@@ -24,14 +24,21 @@ function module_test_procedural_preprocess_theme(): array {
   ];
 }
 
+// phpcs:ignore Drupal.Commenting.FunctionComment.Missing
 function template_preprocess_test($arg): mixed {
   return $arg;
 }
 
+/**
+ * Allows testing that procedural preprocess hooks execute.
+ */
 function module_test_procedural_preprocess_preprocess($arg): mixed {
   return $arg;
 }
 
+/**
+ * Allows testing that procedural preprocess hooks execute.
+ */
 function module_test_procedural_preprocess_preprocess_test($arg): mixed {
   return $arg;
 }
