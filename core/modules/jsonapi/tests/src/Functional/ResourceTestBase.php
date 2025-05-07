@@ -922,11 +922,12 @@ abstract class ResourceTestBase extends BrowserTestBase {
   }
 
   /**
+   * Tests that view protected fields are not present in the document.
+   * 
    * @param array $document
    *   A JSON:API document.
-   * @return void
    */
-  public function doTestDocumentViewProtectedFields(array $document) {
+  protected function doTestDocumentViewProtectedFields(array $document) {
     $view_protected_internal_field_names = array_keys(static::$viewProtectedFieldNames);
     if (count($view_protected_internal_field_names) > 0) {
       if (isset($document['data']['attributes'])) {
