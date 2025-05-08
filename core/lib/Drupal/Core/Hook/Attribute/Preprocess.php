@@ -7,7 +7,7 @@ namespace Drupal\Core\Hook\Attribute;
 use Drupal\Core\Hook\Order\OrderInterface;
 
 /**
- * Attribute for defining a class method as a preprocess function.
+ * Attribute to register a class method as a theme preprocess function.
  */
 #[\Attribute(\Attribute::TARGET_CLASS | \Attribute::TARGET_METHOD | \Attribute::IS_REPEATABLE)]
 class Preprocess extends Hook {
