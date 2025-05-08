@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\node\Functional;
 
+use Drupal\node\Entity\Node;
 use Drupal\node\NodeInterface;
 use Drupal\user\Entity\User;
 
@@ -265,6 +266,55 @@ class NodeEditFormTest extends NodeTestBase {
     $this->drupalLogin($this->adminUser);
     $this->drupalGet('node/add/page');
     $this->assertSession()->statusCodeEquals(200);
+  }
+
+  /**
+   * Tests the node status checkbox.
+   */
+  public function testNodeStatus(): void {
+    // Check that regular users (i.e. without the 'administer nodes' permission)
+    // see a disabled status checkbox.
+    $this->drupalLogin($this->webUser);
+    $this->drupalGet('node/add/page');
+    $this->assertStatusCheckbox(FALSE);
+
+    // Check edit form.
+    $node = Node::create([
+      'type' => 'page',
+      'title' => $this->randomMachineName(8),
+      'body' => $this->randomMachineName(16),
+      'uid' => $this->webUser->id(),
+    ]);
+    $node->save();
+    $this->drupalGet($node->toUrl('edit-form'));
+    $this->assertStatusCheckbox(FALSE);
+
+    // Check that users with the 'administer nodes' permission see an enabled
+    // checkbox
+    $this->drupalLogin($this->adminUser);
+    $this->drupalGet('node/add/page');
+    $this->assertStatusCheckbox();
+
+    $this->drupalGet($node->toUrl('edit-form'));
+    $this->assertStatusCheckbox();
+  }
+
+  /**
+   * Assert the state of the status checkbox on the node form.
+   *
+   * @param bool $enabled
+   *   Whether the status checkbox should be enabled or not.
+   */
+  protected function assertStatusCheckbox(bool $enabled = TRUE): void {
+    $checkbox = $this->assertSession()->fieldExists('status[value]');
+    $this->assertNotNull($checkbox);
+    if ($enabled) {
+      $this->assertFalse($checkbox->hasAttribute('disabled'));
+    }
+    else {
+      $this->assertEquals('disabled', $checkbox->getAttribute('disabled'));
+      $this->assertSession()->pageTextContains('You can not change the published status.');
+    }
   }
 
   /**
