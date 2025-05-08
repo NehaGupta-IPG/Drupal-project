@@ -69,7 +69,7 @@ class CurrentThemeCondition extends ConditionPluginBase implements ContainerFact
       '#title' => $this->t('Themes'),
       '#default_value' => $this->configuration['themes'],
       '#options' => $this->getAllAvailableThemeOptions(),
-      '#description' => $this->t('Select the themes this condition should evaluate TRUE on. If nothing is checked "Negate the condition" will be ignored and this condition always evaluates to TRUE.'),
+      '#description' => $this->t('Select the themes this condition should evaluate TRUE on.'),
     ];
     return parent::buildConfigurationForm($form, $form_state);
   }
@@ -93,7 +93,9 @@ class CurrentThemeCondition extends ConditionPluginBase implements ContainerFact
    * {@inheritdoc}
    */
   public function summary() {
-    return $this->currentThemeAllowed() ? $this->t('The current theme is one of the enabled themes.') : $this->t('The current theme is not one of the enabled themes.');
+    return $this->currentThemeAllowed() && !$this->isNegated()
+      ? $this->t('The current theme is one of the enabled themes.')
+      : $this->t('The current theme is not one of the enabled themes.');
   }
 
   /**
@@ -112,14 +114,16 @@ class CurrentThemeCondition extends ConditionPluginBase implements ContainerFact
    *   TRUE if the current theme is allowed, FALSE otherwise.
    */
   protected function currentThemeAllowed() {
+    $this->execute();
     $configuredThemes = $this->configuration['themes'];
     // If no themes are configured, the condition always evaluates to TRUE.
     if (empty($configuredThemes)) {
       return TRUE;
     }
-    $allThemes = $this->getAllAvailableThemeOptions();
-
-    $allowedThemes = $this->isNegated() ? array_diff_key($allThemes, $configuredThemes) : array_intersect_key($allThemes, $configuredThemes);
+    // We want to have the machine names as values, get the keys only:
+    $allThemes = array_keys($this->getAllAvailableThemeOptions());
+    // Return whether the current theme is in the currently allowed themes:
+    $allowedThemes = array_intersect($allThemes, $configuredThemes);
     return in_array($this->themeManager->getActiveTheme()->getName(), $allowedThemes);
   }
 
