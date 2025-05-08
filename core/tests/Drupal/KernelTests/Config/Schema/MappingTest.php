@@ -441,7 +441,7 @@ class MappingTest extends KernelTestBase {
           'id',
           'negate',
           'context_mapping',
-          'theme',
+          'themes',
         ],
       ],
     ];
@@ -477,7 +477,7 @@ class MappingTest extends KernelTestBase {
           'status_codes',
         ],
         'condition.plugin.current_theme' => [
-          'theme',
+          'themes',
         ],
       ],
     ];
