@@ -12,7 +12,7 @@ use Drupal\Core\Hook\Order\OrderInterface;
  * @see hook_preprocess()
  * @see hook_preprocess_HOOK()
  */
-#[\Attribute(\Attribute::TARGET_CLASS | \Attribute::TARGET_METHOD | \Attribute::IS_REPEATABLE)]
+#[\Attribute(\Attribute::TARGET_METHOD | \Attribute::IS_REPEATABLE)]
 class Preprocess extends Hook {
 
   /**
@@ -21,11 +21,6 @@ class Preprocess extends Hook {
    * @param string|null $theme_hook
    *   (optional) Name of a theme hook, or NULL for a generic preprocess that
    *   applies to all theme hooks.
-   * @param string $method
-   *   (optional) The method name. If this attribute is on a method, this
-   *   parameter is not required. If this attribute is on a class and this
-   *   parameter is omitted, the class must have an __invoke() method, which is
-   *   taken as the hook implementation.
    * @param string|null $module
    *   (optional) The module this implementation is for. This allows one module
    *   to implement a hook on behalf of another module. Defaults to the module
@@ -35,12 +30,11 @@ class Preprocess extends Hook {
    */
   public function __construct(
     ?string $theme_hook = NULL,
-    string $method = '',
     ?string $module = NULL,
     ?OrderInterface $order = NULL,
   ) {
     $hook = ($theme_hook === NULL) ? 'preprocess' : 'preprocess_' . $theme_hook;
-    parent::__construct($hook, $method, $module, $order);
+    parent::__construct($hook, '', $module, $order);
   }
 
 }
