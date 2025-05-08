@@ -152,7 +152,9 @@ class Date extends NumericFilter {
 
     // Don't filter if value(s) are empty.
     $operators = $this->operators();
-    if (!empty($this->options['expose']['use_operator']) && !empty($this->options['expose']['operator_id'])) {
+    if (!empty($this->options['expose']['use_operator'])
+      && !empty($this->options['expose']['operator_id'])
+      && !empty($input[$this->options['expose']['operator_id']])) {
       $operator = $input[$this->options['expose']['operator_id']];
     }
     else {
