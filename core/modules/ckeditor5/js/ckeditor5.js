@@ -322,7 +322,6 @@
       // Additional styles that need to be explicity added in addition to the
       // prefixed versions of existing css in `existingCss`.
       const addedCss = [
-        `${prefix} .ck.ck-content {display:block;min-height:5rem;}`,
         `${prefix} .ck.ck-content * {display:revert;background:revert;color:initial;padding:revert;}`,
         `${prefix} .ck.ck-content li {display:list-item}`,
         `${prefix} .ck.ck-content ol li {list-style-type: decimal}`,
@@ -650,7 +649,7 @@
   );
 
   // Respond to new dialogs that are opened by CKEditor, closing the AJAX loader.
-  $(window).on('dialog:beforecreate', () => {
+  window.addEventListener('dialog:beforecreate', () => {
     const dialogLoading = document.querySelector('.ckeditor5-dialog-loading');
 
     if (dialogLoading) {
@@ -673,7 +672,7 @@
   });
 
   // Respond to dialogs that are closed, removing the current save handler.
-  $(window).on('dialog:afterclose', () => {
+  window.addEventListener('dialog:afterclose', () => {
     if (Drupal.ckeditor5.saveCallback) {
       Drupal.ckeditor5.saveCallback = null;
     }

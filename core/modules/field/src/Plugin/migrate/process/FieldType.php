@@ -12,6 +12,9 @@ use Drupal\migrate\Row;
 use Drupal\migrate_drupal\Plugin\MigrateFieldPluginManagerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
+/**
+ * Determines the field type for a field.
+ */
 #[MigrateProcess('field_type')]
 class FieldType extends StaticMap implements ContainerFactoryPluginInterface {
 
@@ -43,7 +46,7 @@ class FieldType extends StaticMap implements ContainerFactoryPluginInterface {
    * @param \Drupal\migrate\Plugin\MigrationInterface $migration
    *   The migration being run.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, MigrateFieldPluginManagerInterface $field_plugin_manager, MigrationInterface $migration = NULL) {
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, MigrateFieldPluginManagerInterface $field_plugin_manager, ?MigrationInterface $migration = NULL) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
     $this->fieldPluginManager = $field_plugin_manager;
     $this->migration = $migration;
@@ -52,7 +55,7 @@ class FieldType extends StaticMap implements ContainerFactoryPluginInterface {
   /**
    * {@inheritdoc}
    */
-  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition, MigrationInterface $migration = NULL) {
+  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition, ?MigrationInterface $migration = NULL) {
     return new static(
       $configuration,
       $plugin_id,
@@ -71,7 +74,7 @@ class FieldType extends StaticMap implements ContainerFactoryPluginInterface {
       $plugin_id = $this->fieldPluginManager->getPluginIdFromFieldType($field_type, [], $this->migration);
       return $this->fieldPluginManager->createInstance($plugin_id, [], $this->migration)->getFieldType($row);
     }
-    catch (PluginNotFoundException $e) {
+    catch (PluginNotFoundException) {
       return parent::transform($value, $migrate_executable, $row, $destination_property);
     }
   }

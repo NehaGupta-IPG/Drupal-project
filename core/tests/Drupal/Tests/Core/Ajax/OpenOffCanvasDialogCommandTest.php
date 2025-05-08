@@ -18,7 +18,7 @@ class OpenOffCanvasDialogCommandTest extends UnitTestCase {
    *
    * @dataProvider dialogPosition
    */
-  public function testRender($position) {
+  public function testRender($position): void {
     $command = new OpenOffCanvasDialogCommand('Title', '<p>Text!</p>', ['url' => 'example'], NULL, $position);
 
     $expected = [
@@ -51,6 +51,7 @@ class OpenOffCanvasDialogCommandTest extends UnitTestCase {
    * The data provider for potential dialog positions.
    *
    * @return array
+   *   An array of dialog positions.
    */
   public static function dialogPosition() {
     return [

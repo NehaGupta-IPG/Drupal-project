@@ -22,9 +22,7 @@ use Drupal\user\Entity\Role;
 class FileItemTest extends FieldKernelTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['file'];
 
@@ -82,7 +80,7 @@ class FileItemTest extends FieldKernelTestBase {
   /**
    * Tests using entity fields of the file field type.
    */
-  public function testFileItem() {
+  public function testFileItem(): void {
     // Check that the selection handler was automatically assigned to
     // 'default:file'.
     $field_definition = FieldConfig::load('entity_test.entity_test.file_test');

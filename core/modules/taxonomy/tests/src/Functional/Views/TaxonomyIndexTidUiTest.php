@@ -15,7 +15,6 @@ use Drupal\views\Entity\View;
  * Tests the taxonomy index filter handler UI.
  *
  * @group taxonomy
- * @group #slow
  * @see \Drupal\taxonomy\Plugin\views\field\TaxonomyIndexTid
  */
 class TaxonomyIndexTidUiTest extends UITestBase {
@@ -39,9 +38,7 @@ class TaxonomyIndexTidUiTest extends UITestBase {
   protected $defaultTheme = 'stark';
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = [
     'node',
@@ -115,7 +112,7 @@ class TaxonomyIndexTidUiTest extends UITestBase {
   /**
    * Tests the filter UI.
    */
-  public function testFilterUI() {
+  public function testFilterUI(): void {
     $this->drupalGet('admin/structure/views/nojs/handler/test_filter_taxonomy_index_tid/default/filter/tid');
 
     $result = $this->assertSession()->selectExists('edit-options-value')->findAll('css', 'option');
@@ -162,12 +159,12 @@ class TaxonomyIndexTidUiTest extends UITestBase {
   /**
    * Tests exposed taxonomy filters.
    */
-  public function testExposedFilter() {
+  public function testExposedFilter(): void {
     $node_type = $this->drupalCreateContentType(['type' => 'page']);
 
     // Create the tag field itself.
     $field_name = 'taxonomy_tags';
-    $this->createEntityReferenceField('node', $node_type->id(), $field_name, NULL, 'taxonomy_term');
+    $this->createEntityReferenceField('node', $node_type->id(), $field_name, '', 'taxonomy_term');
 
     // Create 4 nodes: 1 without a term, 2 with the same term, and 1 with a
     // different term.
@@ -293,11 +290,11 @@ class TaxonomyIndexTidUiTest extends UITestBase {
   /**
    * Tests exposed grouped taxonomy filters.
    */
-  public function testExposedGroupedFilter() {
+  public function testExposedGroupedFilter(): void {
     // Create a content type with a taxonomy field.
     $this->drupalCreateContentType(['type' => 'article']);
     $field_name = 'field_views_testing_tags';
-    $this->createEntityReferenceField('node', 'article', $field_name, NULL, 'taxonomy_term');
+    $this->createEntityReferenceField('node', 'article', $field_name, '', 'taxonomy_term');
 
     $nodes = [];
     for ($i = 0; $i < 3; $i++) {
@@ -337,7 +334,7 @@ class TaxonomyIndexTidUiTest extends UITestBase {
   /**
    * Tests that an exposed taxonomy filter doesn't show unpublished terms.
    */
-  public function testExposedUnpublishedFilterOptions() {
+  public function testExposedUnpublishedFilterOptions(): void {
     $this->terms[1][0]->setUnpublished()->save();
     // Expose the filter.
     $this->drupalGet('admin/structure/views/nojs/handler/test_filter_taxonomy_index_tid/default/filter/tid');
@@ -376,16 +373,16 @@ class TaxonomyIndexTidUiTest extends UITestBase {
   /**
    * Tests using the TaxonomyIndexTid in a filter group.
    */
-  public function testFilterGrouping() {
+  public function testFilterGrouping(): void {
     $node_type = $this->drupalCreateContentType(['type' => 'page']);
 
     // Create the tag field itself.
     $field_name = 'taxonomy_tags';
-    $this->createEntityReferenceField('node', $node_type->id(), $field_name, NULL, 'taxonomy_term');
+    $this->createEntityReferenceField('node', $node_type->id(), $field_name, '', 'taxonomy_term');
 
     // Create the other tag field itself.
     $field_name2 = 'taxonomy_other_tags';
-    $this->createEntityReferenceField('node', $node_type->id(), $field_name2, NULL, 'taxonomy_term');
+    $this->createEntityReferenceField('node', $node_type->id(), $field_name2, '', 'taxonomy_term');
 
     // Create 5 nodes: 1 node without any tagging, 2 nodes tagged with 1 term,
     // 1 node with 2 tagged terms and 1 with other tags term.

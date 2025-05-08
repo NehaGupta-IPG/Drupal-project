@@ -23,7 +23,7 @@ class EditorFilterIntegrationTest extends KernelTestBase {
   /**
    * Tests text format removal or disabling.
    */
-  public function testTextFormatIntegration() {
+  public function testTextFormatIntegration(): void {
     // Create an arbitrary text format.
     $format = FilterFormat::create([
       'format' => $this->randomMachineName(),
@@ -32,7 +32,13 @@ class EditorFilterIntegrationTest extends KernelTestBase {
     $format->save();
 
     // Create a paired editor.
-    Editor::create(['format' => $format->id(), 'editor' => 'unicorn'])->save();
+    Editor::create([
+      'format' => $format->id(),
+      'editor' => 'unicorn',
+      'image_upload' => [
+        'status' => FALSE,
+      ],
+    ])->save();
 
     // Disable the text format.
     $format->disable()->save();

@@ -21,9 +21,7 @@ class ModerationStateWidgetTest extends KernelTestBase {
   use ContentModerationTestTrait;
 
   /**
-   * Modules to install.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = [
     'system',
@@ -60,7 +58,7 @@ class ModerationStateWidgetTest extends KernelTestBase {
   /**
    * Tests the widget does not impact a non-moderated entity.
    */
-  public function testWidgetNonModeratedEntity() {
+  public function testWidgetNonModeratedEntity(): void {
     // Create an unmoderated entity and build a form display which will include
     // the ModerationStateWidget plugin, in a hidden state.
     $entity = Node::create([
@@ -85,7 +83,7 @@ class ModerationStateWidgetTest extends KernelTestBase {
   /**
    * @covers ::isApplicable
    */
-  public function testIsApplicable() {
+  public function testIsApplicable(): void {
     // The moderation_state field definition should be applicable to our widget.
     $fields = $this->container->get('entity_field.manager')->getFieldDefinitions('node', 'test_type');
     $this->assertTrue(ModerationStateWidget::isApplicable($fields['moderation_state']));

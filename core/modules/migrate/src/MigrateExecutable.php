@@ -85,9 +85,9 @@ class MigrateExecutable implements MigrateExecutableInterface {
   /**
    * Migration message service.
    *
-   * @todo https://www.drupal.org/node/2822663 Make this protected.
-   *
    * @var \Drupal\migrate\MigrateMessageInterface
+   *
+   * @todo https://www.drupal.org/node/2822663 Make this protected.
    */
   public $message;
 
@@ -101,7 +101,7 @@ class MigrateExecutable implements MigrateExecutableInterface {
    * @param \Symfony\Contracts\EventDispatcher\EventDispatcherInterface $event_dispatcher
    *   (optional) The event dispatcher.
    */
-  public function __construct(MigrationInterface $migration, MigrateMessageInterface $message = NULL, EventDispatcherInterface $event_dispatcher = NULL) {
+  public function __construct(MigrationInterface $migration, ?MigrateMessageInterface $message = NULL, ?EventDispatcherInterface $event_dispatcher = NULL) {
     $this->migration = $migration;
     $this->message = $message ?: new MigrateMessage();
     $this->getIdMap()->setMessage($this->message);
@@ -135,6 +135,7 @@ class MigrateExecutable implements MigrateExecutableInterface {
    * Gets the event dispatcher.
    *
    * @return \Symfony\Contracts\EventDispatcher\EventDispatcherInterface
+   *   The event dispatcher service.
    */
   protected function getEventDispatcher() {
     if (!$this->eventDispatcher) {
@@ -152,6 +153,7 @@ class MigrateExecutable implements MigrateExecutableInterface {
       $this->message->display($this->t('Migration @id is busy with another operation: @status',
         [
           '@id' => $this->migration->id(),
+          // phpcs:ignore Drupal.Semantics.FunctionT.NotLiteralString
           '@status' => $this->t($this->migration->getStatusLabel()),
         ]), 'error');
       return MigrationInterface::RESULT_FAILED;
@@ -315,6 +317,7 @@ class MigrateExecutable implements MigrateExecutableInterface {
   public function rollback() {
     // Only begin the rollback operation if the migration is currently idle.
     if ($this->migration->getStatus() !== MigrationInterface::STATUS_IDLE) {
+      // phpcs:ignore Drupal.Semantics.FunctionT.NotLiteralString
       $this->message->display($this->t('Migration @id is busy with another operation: @status', ['@id' => $this->migration->id(), '@status' => $this->t($this->migration->getStatusLabel())]), 'error');
       return MigrationInterface::RESULT_FAILED;
     }
@@ -322,8 +325,8 @@ class MigrateExecutable implements MigrateExecutableInterface {
     // Announce that rollback is about to happen.
     $this->getEventDispatcher()->dispatch(new MigrateRollbackEvent($this->migration), MigrateEvents::PRE_ROLLBACK);
 
-    // Optimistically assume things are going to work out; if not, $return will be
-    // updated to some other status.
+    // Optimistically assume things are going to work out; if not, $return will
+    // be updated to some other status.
     $return = MigrationInterface::RESULT_COMPLETED;
 
     $this->migration->setStatus(MigrationInterface::STATUS_ROLLING_BACK);
@@ -387,7 +390,7 @@ class MigrateExecutable implements MigrateExecutableInterface {
   /**
    * {@inheritdoc}
    */
-  public function processRow(Row $row, array $process = NULL, $value = NULL) {
+  public function processRow(Row $row, ?array $process = NULL, $value = NULL) {
     foreach ($this->migration->getProcessPlugins($process) as $destination => $plugins) {
       $this->processPipeline($row, $destination, $plugins, $value);
     }
@@ -452,7 +455,7 @@ class MigrateExecutable implements MigrateExecutableInterface {
         try {
           $value = $plugin->transform($value, $this, $row, $destination);
         }
-        catch (MigrateSkipProcessException $e) {
+        catch (MigrateSkipProcessException) {
           $value = NULL;
           break;
         }
@@ -553,8 +556,8 @@ class MigrateExecutable implements MigrateExecutableInterface {
       );
       $usage = $this->attemptMemoryReclaim();
       $pct_memory = $usage / $this->memoryLimit;
-      // Use a lower threshold - we don't want to be in a situation where we keep
-      // coming back here and trimming a tiny amount
+      // Use a lower threshold - we don't want to be in a situation where we
+      // keep coming back here and trimming a tiny amount
       if ($pct_memory > (0.90 * $threshold)) {
         $this->message->display(
           $this->t(
@@ -609,10 +612,7 @@ class MigrateExecutable implements MigrateExecutableInterface {
     // plenty of memory to continue.
     drupal_static_reset();
 
-    // Entity storage can blow up with caches, so clear it out.
-    \Drupal::service('entity.memory_cache')->deleteAll();
-
-    // @TODO: explore resetting the container.
+    // @todo Explore resetting the container.
 
     // Run garbage collector to further reduce memory.
     gc_collect_cycles();

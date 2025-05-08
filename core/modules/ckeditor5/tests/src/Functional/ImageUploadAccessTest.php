@@ -18,7 +18,7 @@ class ImageUploadAccessTest extends ImageUploadTest {
   /**
    * Test access to the CKEditor 5 image upload controller.
    */
-  public function testCkeditor5ImageUploadRoute() {
+  public function testCkeditor5ImageUploadRoute(): void {
     $this->createBasicFormat();
     $url = $this->getUploadUrl();
     $test_image = file_get_contents(current($this->getTestFiles('image'))->uri);
@@ -37,10 +37,10 @@ class ImageUploadAccessTest extends ImageUploadTest {
       'status' => TRUE,
       'scheme' => 'public',
       'directory' => 'inline-images',
-      'max_size' => '',
+      'max_size' => NULL,
       'max_dimensions' => [
-        'width' => 0,
-        'height' => 0,
+        'width' => NULL,
+        'height' => NULL,
       ],
     ])->save();
     $response = $this->uploadRequest($url, $test_image, 'test.jpg');

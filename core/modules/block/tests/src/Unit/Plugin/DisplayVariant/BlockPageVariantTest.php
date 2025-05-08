@@ -66,6 +66,9 @@ class BlockPageVariantTest extends UnitTestCase {
     return new BlockPageVariant($configuration, 'test', $definition, $this->blockRepository, $this->blockViewBuilder, ['config:block_list']);
   }
 
+  /**
+   * Provides data to testBuild().
+   */
   public static function providerBuild() {
     $blocks_config = [
       'block1' => [
@@ -201,7 +204,7 @@ class BlockPageVariantTest extends UnitTestCase {
    *
    * @dataProvider providerBuild
    */
-  public function testBuild(array $blocks_config, $visible_block_count, array $expected_render_array) {
+  public function testBuild(array $blocks_config, $visible_block_count, array $expected_render_array): void {
     $display_variant = $this->setUpDisplayVariant();
     $display_variant->setMainContent(['#markup' => 'Hello kittens!']);
 
@@ -236,7 +239,7 @@ class BlockPageVariantTest extends UnitTestCase {
    *
    * @covers ::build
    */
-  public function testBuildWithoutMainContent() {
+  public function testBuildWithoutMainContent(): void {
     $display_variant = $this->setUpDisplayVariant();
     $this->blockRepository->expects($this->once())
       ->method('getVisibleBlocksPerRegion')

@@ -4,6 +4,7 @@ namespace Drupal\layout_builder\Form;
 
 use Drupal\Core\Form\ConfirmFormBase;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Form\WorkspaceDynamicSafeFormInterface;
 use Drupal\Core\Messenger\MessengerInterface;
 use Drupal\layout_builder\LayoutTempstoreRepositoryInterface;
 use Drupal\layout_builder\OverridesSectionStorageInterface;
@@ -16,7 +17,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  * @internal
  *   Form classes are internal.
  */
-class RevertOverridesForm extends ConfirmFormBase {
+class RevertOverridesForm extends ConfirmFormBase implements WorkspaceDynamicSafeFormInterface {
 
   use WorkspaceSafeFormTrait;
 
@@ -95,13 +96,12 @@ class RevertOverridesForm extends ConfirmFormBase {
   /**
    * {@inheritdoc}
    */
-  public function buildForm(array $form, FormStateInterface $form_state, SectionStorageInterface $section_storage = NULL) {
+  public function buildForm(array $form, FormStateInterface $form_state, ?SectionStorageInterface $section_storage = NULL) {
     if (!$section_storage instanceof OverridesSectionStorageInterface) {
       throw new \InvalidArgumentException(sprintf('The section storage with type "%s" and ID "%s" does not provide overrides', $section_storage->getStorageType(), $section_storage->getStorageId()));
     }
 
     $this->sectionStorage = $section_storage;
-    $this->markWorkspaceSafe($form_state);
     // Mark this as an administrative page for JavaScript ("Back to site" link).
     $form['#attached']['drupalSettings']['path']['currentPathIsAdmin'] = TRUE;
     return parent::buildForm($form, $form_state);

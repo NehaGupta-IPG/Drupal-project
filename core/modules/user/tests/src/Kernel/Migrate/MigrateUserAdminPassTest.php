@@ -22,9 +22,7 @@ class MigrateUserAdminPassTest extends MigrateTestBase {
   protected $originalPasswords = [];
 
   /**
-   * Modules to enable.
-   *
-   * @var string[]
+   * {@inheritdoc}
    */
   protected static $modules = ['user'];
 
@@ -58,7 +56,7 @@ class MigrateUserAdminPassTest extends MigrateTestBase {
   /**
    * Tests preserving the admin user's password.
    */
-  public function testAdminPasswordPreserved() {
+  public function testAdminPasswordPreserved(): void {
     $user_data_rows = [
       [
         'id' => '1',

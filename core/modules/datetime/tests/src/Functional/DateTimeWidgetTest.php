@@ -29,14 +29,14 @@ class DateTimeWidgetTest extends DateTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function getTestFieldType() {
+  protected function getTestFieldType(): string {
     return 'datetime';
   }
 
   /**
    * Test default value functionality.
    */
-  public function testDateOnlyDefaultValue() {
+  public function testDateOnlyDefaultValue(): void {
     // Create a test content type.
     $this->drupalCreateContentType(['type' => 'date_only_content']);
 

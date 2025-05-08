@@ -27,7 +27,7 @@ final class ComponentsTwigExtension extends AbstractExtension {
    */
   public function __construct(
     protected ComponentPluginManager $pluginManager,
-    protected ComponentValidator $componentValidator
+    protected ComponentValidator $componentValidator,
   ) {}
 
   /**
@@ -78,6 +78,9 @@ final class ComponentsTwigExtension extends AbstractExtension {
   protected function mergeAdditionalRenderContext(Component $component, array $context): array {
     $context['componentMetadata'] = $component->metadata->normalize();
     $component_attributes = ['data-component-id' => $component->getPluginId()];
+    if (!empty($context['variant'])) {
+      $component_attributes['data-component-variant'] = $context['variant'];
+    }
     if (!isset($context['attributes'])) {
       $context['attributes'] = new Attribute($component_attributes);
     }

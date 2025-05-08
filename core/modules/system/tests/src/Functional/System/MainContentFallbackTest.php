@@ -14,9 +14,7 @@ use Drupal\Tests\BrowserTestBase;
 class MainContentFallbackTest extends BrowserTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['block', 'system_test'];
 
@@ -25,7 +23,18 @@ class MainContentFallbackTest extends BrowserTestBase {
    */
   protected $defaultTheme = 'stark';
 
+  /**
+   * The administrator user for the test.
+   *
+   * @var \Drupal\Core\Session\AccountInterface
+   */
   protected $adminUser;
+
+  /**
+   * The web user for the test.
+   *
+   * @var \Drupal\Core\Session\AccountInterface
+   */
   protected $webUser;
 
   /**
@@ -49,7 +58,7 @@ class MainContentFallbackTest extends BrowserTestBase {
   /**
    * Tests availability of main content: Drupal falls back to SimplePageVariant.
    */
-  public function testMainContentFallback() {
+  public function testMainContentFallback(): void {
     $edit = [];
     // Uninstall the block module.
     $edit['uninstall[block]'] = 'block';

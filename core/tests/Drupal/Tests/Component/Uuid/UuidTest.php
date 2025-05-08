@@ -23,7 +23,7 @@ class UuidTest extends TestCase {
    *
    * @dataProvider providerUuidInstances
    */
-  public function testGenerateUuid(UuidInterface $instance) {
+  public function testGenerateUuid(UuidInterface $instance): void {
     $this->assertTrue(Uuid::isValid($instance->generate()), sprintf('UUID generation for %s works.', get_class($instance)));
   }
 
@@ -32,7 +32,7 @@ class UuidTest extends TestCase {
    *
    * @dataProvider providerUuidInstances
    */
-  public function testUuidIsUnique(UuidInterface $instance) {
+  public function testUuidIsUnique(UuidInterface $instance): void {
     $this->assertNotEquals($instance->generate(), $instance->generate(), sprintf('Same UUID was not generated twice with %s.', get_class($instance)));
   }
 
@@ -40,6 +40,7 @@ class UuidTest extends TestCase {
    * Data provider for UUID instance tests.
    *
    * @return array
+   *   An array of UUID generator instances.
    */
   public static function providerUuidInstances() {
 
@@ -71,7 +72,7 @@ class UuidTest extends TestCase {
    *
    * @dataProvider providerTestValidation
    */
-  public function testValidation($uuid, $is_valid, $message) {
+  public function testValidation($uuid, $is_valid, $message): void {
     $this->assertSame($is_valid, Uuid::isValid($uuid), $message);
   }
 

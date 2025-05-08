@@ -108,7 +108,7 @@ class MediaLibraryUiBuilder {
    * @return array
    *   The render array for the media library.
    */
-  public function buildUi(MediaLibraryState $state = NULL) {
+  public function buildUi(?MediaLibraryState $state = NULL) {
     if (!$state) {
       $state = MediaLibraryState::fromRequest($this->request);
     }
@@ -176,7 +176,7 @@ class MediaLibraryUiBuilder {
    * @return \Drupal\Core\Access\AccessResult
    *   The access result.
    */
-  public function checkAccess(AccountInterface $account, MediaLibraryState $state = NULL) {
+  public function checkAccess(AccountInterface $account, ?MediaLibraryState $state = NULL) {
     if (!$state) {
       try {
         $state = MediaLibraryState::fromRequest($this->request);
@@ -248,13 +248,9 @@ class MediaLibraryUiBuilder {
       $link_state->set('media_library_content', 1);
 
       $title = $allowed_type->label();
-      $display_title = [
-        '#markup' => $this->t('<span class="visually-hidden">Show </span>@title<span class="visually-hidden"> media</span>', ['@title' => $title]),
-      ];
+      $display_title = $this->t('<span class="visually-hidden">Show </span>@title<span class="visually-hidden"> media</span>', ['@title' => $title]);
       if ($allowed_type_id === $selected_type_id) {
-        $display_title = [
-          '#markup' => $this->t('<span class="visually-hidden">Show </span>@title<span class="visually-hidden"> media</span><span class="active-tab visually-hidden"> (selected)</span>', ['@title' => $title]),
-        ];
+        $display_title = $this->t('<span class="visually-hidden">Show </span>@title<span class="visually-hidden"> media</span><span class="active-tab visually-hidden"> (selected)</span>', ['@title' => $title]);
       }
 
       $menu['#links']['media-library-menu-' . $allowed_type_id] = [

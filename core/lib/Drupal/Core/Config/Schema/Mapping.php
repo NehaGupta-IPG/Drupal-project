@@ -25,7 +25,7 @@ class Mapping extends ArrayElement {
   /**
    * {@inheritdoc}
    */
-  public function __construct(DataDefinitionInterface $definition, $name = NULL, TypedDataInterface $parent = NULL) {
+  public function __construct(DataDefinitionInterface $definition, $name = NULL, ?TypedDataInterface $parent = NULL) {
     assert($definition instanceof MapDataDefinition);
     // Validate basic structure.
     foreach ($definition['mapping'] as $key => $key_definition) {
@@ -166,7 +166,8 @@ class Mapping extends ArrayElement {
     $all_type_definitions = $typed_data_manager->getDefinitions();
     $possible_type_definitions = array_intersect_key($all_type_definitions, array_fill_keys($possible_types, TRUE));
     // TRICKY: \Drupal\Core\Config\TypedConfigManager::getDefinition() does the
-    // necessary resolving, but TypedConfigManager::getDefinitions() does not! 🤷‍♂️
+    // necessary resolving, but TypedConfigManager::getDefinitions() does not!
+    // 🤷‍♂️
     // @see \Drupal\Core\Config\TypedConfigManager::getDefinitionWithReplacements()
     // @see ::getValidKeys()
     $valid_keys_per_type = [];
@@ -220,8 +221,6 @@ class Mapping extends ArrayElement {
    *
    * @param \Drupal\Core\TypedData\MapDataDefinition $definition
    *   The config schema definition for a `type: mapping`.
-   *
-   * @return void
    *
    * @throws \LogicException
    *   Thrown when `requiredKey: true` is specified.

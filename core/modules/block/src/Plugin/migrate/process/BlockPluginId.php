@@ -12,6 +12,9 @@ use Drupal\migrate\ProcessPluginBase;
 use Drupal\migrate\Row;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
+/**
+ * Determines the block plugin ID.
+ */
 #[MigrateProcess('block_plugin_id')]
 class BlockPluginId extends ProcessPluginBase implements ContainerFactoryPluginInterface {
 
@@ -53,7 +56,7 @@ class BlockPluginId extends ProcessPluginBase implements ContainerFactoryPluginI
   /**
    * {@inheritdoc}
    */
-  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition, MigrationInterface $migration = NULL) {
+  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition, ?MigrationInterface $migration = NULL) {
     $entity_type_manager = $container->get('entity_type.manager');
     return new static(
       $configuration,

@@ -11,7 +11,6 @@ use Drupal\Tests\layout_builder\Traits\EnableLayoutBuilderTrait;
  * Tests the Layout Builder UI with view modes.
  *
  * @group layout_builder
- * @group #slow
  */
 class LayoutBuilderViewModeTest extends LayoutBuilderTestBase {
 
@@ -20,7 +19,7 @@ class LayoutBuilderViewModeTest extends LayoutBuilderTestBase {
   /**
    * Tests that a non-default view mode works as expected.
    */
-  public function testNonDefaultViewMode() {
+  public function testNonDefaultViewMode(): void {
     $assert_session = $this->assertSession();
     $page = $this->getSession()->getPage();
 
@@ -77,7 +76,7 @@ class LayoutBuilderViewModeTest extends LayoutBuilderTestBase {
    *
    * @see \Drupal\layout_builder\Plugin\SectionStorage\OverridesSectionStorage::getDefaultSectionStorage()
    */
-  public function testLayoutBuilderUiFullViewMode() {
+  public function testLayoutBuilderUiFullViewMode(): void {
     $assert_session = $this->assertSession();
     $page = $this->getSession()->getPage();
 
@@ -253,7 +252,7 @@ class LayoutBuilderViewModeTest extends LayoutBuilderTestBase {
   /**
    * Ensures that one bundle doesn't interfere with another bundle.
    */
-  public function testFullViewModeMultipleBundles() {
+  public function testFullViewModeMultipleBundles(): void {
     $assert_session = $this->assertSession();
     $page = $this->getSession()->getPage();
 

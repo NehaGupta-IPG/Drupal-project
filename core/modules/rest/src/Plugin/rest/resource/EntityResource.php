@@ -75,11 +75,11 @@ class EntityResource extends ResourceBase implements DependentPluginInterface {
    * @param array $configuration
    *   A configuration array containing information about the plugin instance.
    * @param string $plugin_id
-   *   The plugin_id for the plugin instance.
+   *   The plugin ID for the plugin instance.
    * @param mixed $plugin_definition
    *   The plugin implementation definition.
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
-   *   The entity type manager
+   *   The entity type manager.
    * @param array $serializer_formats
    *   The available serialization formats.
    * @param \Psr\Log\LoggerInterface $logger
@@ -159,7 +159,7 @@ class EntityResource extends ResourceBase implements DependentPluginInterface {
    *
    * @throws \Symfony\Component\HttpKernel\Exception\HttpException
    */
-  public function post(EntityInterface $entity = NULL) {
+  public function post(?EntityInterface $entity = NULL) {
     if ($entity == NULL) {
       throw new BadRequestHttpException('No entity content received.');
     }
@@ -216,7 +216,7 @@ class EntityResource extends ResourceBase implements DependentPluginInterface {
    *
    * @throws \Symfony\Component\HttpKernel\Exception\HttpException
    */
-  public function patch(EntityInterface $original_entity, EntityInterface $entity = NULL) {
+  public function patch(EntityInterface $original_entity, ?EntityInterface $entity = NULL) {
     if ($entity == NULL) {
       throw new BadRequestHttpException('No entity content received.');
     }

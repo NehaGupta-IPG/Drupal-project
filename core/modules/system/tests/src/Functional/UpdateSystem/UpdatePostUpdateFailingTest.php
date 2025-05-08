@@ -52,7 +52,7 @@ class UpdatePostUpdateFailingTest extends BrowserTestBase {
   /**
    * Tests hook_post_update_NAME().
    */
-  public function testPostUpdate() {
+  public function testPostUpdate(): void {
     // There are expected to be failed updates.
     $this->checkFailedUpdates = FALSE;
 
@@ -68,7 +68,7 @@ class UpdatePostUpdateFailingTest extends BrowserTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function doSelectionTest() {
+  protected function doSelectionTest(): void {
     // First update, should not be run since this module's update hooks fail.
     $this->assertSession()->responseContains('8001 - This update will fail.');
     $this->assertSession()->responseContains('8002 - A further update');
