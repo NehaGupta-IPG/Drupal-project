@@ -1005,7 +1005,7 @@ abstract class FilterPluginBase extends HandlerBase implements CacheableDependen
       $form[$value] = [
         '#title' => $this->options['group_info']['label'],
         '#type' => $this->options['group_info']['widget'],
-        '#default_value' => $this->group_info,
+        '#default_value' => $this->options['group_info']['default_group'],
         '#options' => $groups,
       ];
       if (!empty($this->options['group_info']['multiple'])) {
@@ -1020,7 +1020,7 @@ abstract class FilterPluginBase extends HandlerBase implements CacheableDependen
         unset($form[$value]['#default_value']);
         $user_input = $form_state->getUserInput();
         if (empty($user_input[$value])) {
-          $user_input[$value] = $this->group_info;
+          $user_input[$value] = array_filter($this->options['group_info']['default_group_multiple']);
           $form_state->setUserInput($user_input);
         }
       }
