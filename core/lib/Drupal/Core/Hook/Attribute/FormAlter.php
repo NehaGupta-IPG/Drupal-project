@@ -9,7 +9,9 @@ use Drupal\Core\Hook\Order\OrderInterface;
 /**
  * Hook attribute for FormAlter.
  *
- * @see hook_form_alter().
+ * @see hook_form_alter()
+ * @see hook_form_BASE_FORM_ID_alter()
+ * @see hook_form_FORM_ID_alter()
  */
 #[\Attribute(\Attribute::TARGET_CLASS | \Attribute::TARGET_METHOD | \Attribute::IS_REPEATABLE)]
 class FormAlter extends Hook {

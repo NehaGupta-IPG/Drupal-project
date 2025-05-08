@@ -8,6 +8,9 @@ use Drupal\Core\Hook\Order\OrderInterface;
 
 /**
  * Attribute to register a class method as a theme preprocess function.
+ *
+ * @see hook_preprocess()
+ * @see hook_preprocess_HOOK()
  */
 #[\Attribute(\Attribute::TARGET_CLASS | \Attribute::TARGET_METHOD | \Attribute::IS_REPEATABLE)]
 class Preprocess extends Hook {
