@@ -150,7 +150,7 @@ class Date extends NumericFilter {
     if ($operators[$operator]['values'] == 1) {
       // When the operator is either <, <=, =, !=, >=, > or regular_expression
       // the input contains only one value.
-      if (isset($this->value['value']) && $this->value['value'] == '') {
+      if (isset($this->value['value']) && $this->value['value'] === '') {
         return FALSE;
       }
     }
