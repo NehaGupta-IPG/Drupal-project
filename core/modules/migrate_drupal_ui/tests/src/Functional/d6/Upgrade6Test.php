@@ -106,7 +106,7 @@ class Upgrade6Test extends MigrateUpgradeExecuteTestBase {
       'user_role' => 7,
       'menu_link_content' => 10,
       'view' => 14,
-      'date_format' => 12,
+      'date_format' => 15,
       'entity_form_display' => 29,
       'entity_form_mode' => 1,
       'entity_view_display' => 55,

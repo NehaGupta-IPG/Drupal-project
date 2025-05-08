@@ -109,7 +109,7 @@ class Upgrade7Test extends MigrateUpgradeExecuteTestBase {
       'user_role' => 4,
       'menu_link_content' => 12,
       'view' => 14,
-      'date_format' => 12,
+      'date_format' => 15,
       'entity_form_display' => 23,
       'entity_form_mode' => 1,
       'entity_view_display' => 33,

@@ -29,6 +29,7 @@ use Drupal\Core\Url;
 use Drupal\Core\Utility\Error;
 use Psr\Http\Client\ClientExceptionInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Yaml\Yaml;
 
 // cspell:ignore quickedit
 
@@ -1797,4 +1798,44 @@ function system_update_11201(): void {
     $schema->addField('router', 'alias', $spec['fields']['alias']);
     $schema->addIndex('router', 'alias', ['alias'], $spec);
   }
+}
+
+/**
+ * Add date formats without time.
+ *
+ * @see https://www.drupal.org/project/drupal/issues/3498980
+ */
+function system_update_11202(): string {
+  $message = NULL;
+  // Only update date formats if System is enabled.
+  if (\Drupal::moduleHandler()->moduleExists('system')) {
+    $config_factory = \Drupal::configFactory();
+    $config = $config_factory->getEditable('core.date_format.short_date_only');
+    if (empty($config->get('pattern'))) {
+      $config_path = \Drupal::service('extension.list.module')->getPath('system') . '/config/install/core.date_format.short_date_only.yml';
+      $data = Yaml::parseFile($config_path);
+      \Drupal::configFactory()->getEditable('core.date_format.short_date_only')->setData($data)->save(TRUE);
+      $message .= "Date format Short date (date only) was created.\n";
+    }
+    $config = $config_factory->getEditable('core.date_format.medium_date_only');
+    if (empty($config->get('pattern'))) {
+      $config_path = \Drupal::service('extension.list.module')->getPath('system') . '/config/install/core.date_format.medium_date_only.yml';
+      $data = Yaml::parseFile($config_path);
+      \Drupal::configFactory()->getEditable('core.date_format.medium_date_only')->setData($data)->save(TRUE);
+      $message .= "Date format Medium date (date only) was created.\n";
+    }
+    $config = $config_factory->getEditable('core.date_format.long_date_only');
+    if (empty($config->get('pattern'))) {
+      $config_path = \Drupal::service('extension.list.module')->getPath('system') . '/config/install/core.date_format.long_date_only.yml';
+      $data = Yaml::parseFile($config_path);
+      \Drupal::configFactory()->getEditable('core.date_format.long_date_only')->setData($data)->save(TRUE);
+      $message .= "Date format Long date (date only) was created.\n";
+    }
+    $config = $config_factory->getEditable('core.date_format.olivero_medium');
+    if (!empty($config->get('pattern'))) {
+      \Drupal::service('config.factory')->getEditable('core.date_format.olivero_medium')->delete();
+      $message .= 'Olivero Medium date format was deleted.';
+    }
+  }
+  return $message;
 }
