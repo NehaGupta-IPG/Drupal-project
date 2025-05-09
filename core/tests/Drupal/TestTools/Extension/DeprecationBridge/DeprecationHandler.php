@@ -151,7 +151,7 @@ final class DeprecationHandler implements Extension {
    */
   public static function dumpStatistics(): void {
     echo "\n\n";
-    rsort(self::$deprecationIgnorePatternsStatistics, \SORT_NUMERIC);
+    arsort(self::$deprecationIgnorePatternsStatistics, \SORT_NUMERIC);
     var_export(self::$deprecationIgnorePatternsStatistics);
     echo "\n\n";
   }
