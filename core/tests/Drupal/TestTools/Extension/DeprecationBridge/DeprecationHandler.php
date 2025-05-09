@@ -35,7 +35,7 @@ final class DeprecationHandler implements Extension {
   private static array $deprecationIgnorePatterns = [];
 
   /**
-   * A list of deprecation messages that should be ignored if detected.
+   * Usage statistics of ignored patterns.
    *
    * @var array<string,non-negative-int>
    */
@@ -151,7 +151,9 @@ final class DeprecationHandler implements Extension {
    * Dump statistics after test runner end.
    */
   public static function dumpStatistics(): void {
+    echo "\n\n";
     var_export(self::$deprecationIgnorePatternsStatistics);
+    echo "\n\n";
   }
 
   /**
