@@ -63,6 +63,7 @@ class UserPasswordResetTest extends BrowserTestBase {
     $account = $this->drupalCreateUser();
     $this->account = User::load($account->id());
     $this->account->passRaw = $account->passRaw;
+    $this->drupalLogout();
 
     // Set the last login time that is used to generate the one-time link so
     // that it is definitely over a second ago.
