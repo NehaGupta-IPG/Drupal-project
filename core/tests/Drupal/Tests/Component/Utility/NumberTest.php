@@ -48,14 +48,14 @@ class NumberTest extends TestCase {
    *
    * @dataProvider providerNormalize
    */
-  public function testNormalize($number, $expected) {
+  public function testNormalize($number, $expected): void {
     $this->assertEquals($expected, Number::normalize($number));
   }
 
   /**
    * Provides data to self::testNormalize().
    */
-  public static function providerNormalize() {
+  public static function providerNormalize(): array {
     return [
       ['', ''],
       [0, 0],
@@ -80,14 +80,14 @@ class NumberTest extends TestCase {
    * @param int|float|string $number
    *   The number to test the count on.
    */
-  public function testCountSignificantDecimals($expected, $number) {
+  public function testCountSignificantDecimals($expected, $number): void {
     $this->assertEquals($expected, Number::countSignificantDecimals($number));
   }
 
   /**
    * Provides data to self::testCountSignificantDecimals().
    */
-  public static function provideCountSignificantDecimals() {
+  public static function provideCountSignificantDecimals(): array {
     return [
       [0, 0],
       [0, '0'],
