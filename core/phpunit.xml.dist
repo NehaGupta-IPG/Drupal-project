@@ -58,6 +58,9 @@
     <env name="MINK_DRIVER_ARGS_WEBDRIVER" value=""/>
   </php>
   <extensions>
+    <!-- Deprecation handler. -->
+    <bootstrap class="Drupal\TestTools\Extension\DeprecationBridge\DeprecationHandler">
+    </bootstrap>
     <!-- Functional tests HTML output logging. -->
     <bootstrap class="Drupal\TestTools\Extension\HtmlLogging\HtmlOutputLogger">
       <!-- The directory where the browser output will be stored. If a relative

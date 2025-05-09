@@ -4,7 +4,12 @@ declare(strict_types=1);
 
 namespace Drupal\TestTools\Extension\DeprecationBridge;
 
+use PHPUnit\Event\TestRunner\Finished as TestRunnerFinished;
 use PHPUnit\Framework\TestCase;
+use PHPUnit\Runner\Extension\Extension;
+use PHPUnit\Runner\Extension\Facade;
+use PHPUnit\Runner\Extension\ParameterCollection;
+use PHPUnit\TextUI\Configuration\Configuration;
 
 /**
  * Drupal's PHPUnit extension to manage code deprecation.
@@ -15,7 +20,7 @@ use PHPUnit\Framework\TestCase;
  *
  * @internal
  */
-final class DeprecationHandler {
+final class DeprecationHandler implements Extension {
 
   /**
    * Indicates if the extension is enabled.
@@ -28,6 +33,13 @@ final class DeprecationHandler {
    * @var list<string>
    */
   private static array $deprecationIgnorePatterns = [];
+
+  /**
+   * A list of deprecation messages that should be ignored if detected.
+   *
+   * @var array<string,non-negative-int>
+   */
+  private static array $deprecationIgnorePatternsStatistics = [];
 
   /**
    * A list of expected deprecation messages.
@@ -44,10 +56,14 @@ final class DeprecationHandler {
   private static array $collectedDeprecations = [];
 
   /**
-   * This class should not be instantiated.
+   * {@inheritdoc}
    */
-  private function __construct() {
-    throw new \LogicException(__CLASS__ . ' should not be instantiated');
+  public function bootstrap(
+    Configuration $configuration,
+    Facade $facade,
+    ParameterCollection $parameters,
+  ): void {
+    $facade->registerSubscriber(new TestRunnerFinishedSubscriber($this));
   }
 
   /**
@@ -118,6 +134,7 @@ final class DeprecationHandler {
           if ((trim($pattern)[0] ?? '#') !== '#') {
             preg_match($pattern, '');
             self::$deprecationIgnorePatterns[] = $pattern;
+            self::$deprecationIgnorePatternsStatistics[$pattern] = 0;
           }
         }
       }
@@ -128,6 +145,13 @@ final class DeprecationHandler {
 
     // Mark the extension as enabled.
     self::$enabled = TRUE;
+  }
+
+  /**
+   * Dump statistics after test runner end.
+   */
+  public static function dumpStatistics(): void {
+    var_export(self::$deprecationIgnorePatternsStatistics);
   }
 
   /**
@@ -217,11 +241,17 @@ final class DeprecationHandler {
     if (!self::$deprecationIgnorePatterns) {
       return FALSE;
     }
-    $result = @preg_filter(self::$deprecationIgnorePatterns, '$0', $deprecationMessage);
-    if (preg_last_error() !== \PREG_NO_ERROR) {
-      throw new \RuntimeException(preg_last_error_msg());
+    foreach (self::$deprecationIgnorePatterns as $pattern) {
+      $result = @preg_filter($pattern, '$0', $deprecationMessage);
+      if (preg_last_error() !== \PREG_NO_ERROR) {
+        throw new \RuntimeException(preg_last_error_msg());
+      }
+      if ((bool) $result) {
+        self::$deprecationIgnorePatternsStatistics[$pattern]++;
+        return TRUE;
+      }
     }
-    return (bool) $result;
+    return FALSE;
   }
 
   /**
