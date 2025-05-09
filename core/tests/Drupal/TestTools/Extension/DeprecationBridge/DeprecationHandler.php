@@ -9,6 +9,7 @@ use PHPUnit\Runner\Extension\Extension;
 use PHPUnit\Runner\Extension\Facade;
 use PHPUnit\Runner\Extension\ParameterCollection;
 use PHPUnit\TextUI\Configuration\Configuration;
+use PHPUnit\Util\Filesystem;
 
 /**
  * Drupal's PHPUnit extension to manage code deprecation.
@@ -55,6 +56,11 @@ final class DeprecationHandler implements Extension {
   private static array $collectedDeprecations = [];
 
   /**
+   * Directory for files produced by the extension.
+   */
+  private static string $outputDirectory;
+
+  /**
    * {@inheritdoc}
    */
   public function bootstrap(
@@ -62,6 +68,15 @@ final class DeprecationHandler implements Extension {
     Facade $facade,
     ParameterCollection $parameters,
   ): void {
+    $directory = $parameters->get('outputDirectory');
+    Filesystem::createDirectory($directory);
+    $realDirectory = realpath($directory);
+    if ($realDirectory === FALSE || !is_dir($realDirectory) || !is_writable($realDirectory)) {
+      print "Test artifacts directory {$directory} is not a writable directory.\n\n";
+      return;
+    }
+    self::$outputDirectory = $realDirectory;
+
     $facade->registerSubscriber(new TestRunnerFinishedSubscriber());
   }
 
@@ -150,10 +165,8 @@ final class DeprecationHandler implements Extension {
    * Dump statistics after test runner end.
    */
   public static function dumpStatistics(): void {
-    echo "\n\n";
     arsort(self::$deprecationIgnorePatternsStatistics, \SORT_NUMERIC);
-    var_export(self::$deprecationIgnorePatternsStatistics);
-    echo "\n\n";
+    file_put_contents(self::$outputDirectory . \DIRECTORY_SEPARATOR . 'deprecation-ignore-stats.json', json_encode(self::$deprecationIgnorePatternsStatistics));
   }
 
   /**
