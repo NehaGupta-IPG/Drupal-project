@@ -665,12 +665,8 @@ class MenuTreeStorage implements MenuTreeStorageInterface {
     $query->fields($this->table, $this->definitionFields());
     $or_group = $query->orConditionGroup();
     foreach ($routes as $route) {
-      if (!isset($route['route_name'])) {
-        continue;
-      }
-
       $and_group = $query->andConditionGroup()
-        ->condition('route_name', $route['route_name']);
+        ->condition('route_name', $route['route_name'] ?? '');
 
       if (isset($route['route_parameters'])) {
         // Sort the route parameters so that the query string will be the same.
