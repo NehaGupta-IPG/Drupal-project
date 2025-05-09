@@ -17,7 +17,7 @@ use Drupal\Core\Site\Settings;
  * operations, but this can be overridden by setting a "maintenance_theme" key
  * in the $settings variable in settings.php.
  */
-function _drupal_maintenance_theme() {
+function _drupal_maintenance_theme(): void {
   // If the theme is already set, assume the others are set too, and do nothing.
   if (\Drupal::theme()->hasActiveTheme()) {
     return;
@@ -108,8 +108,14 @@ function _drupal_maintenance_theme() {
  * @param array $variables
  *   An associative array containing:
  *   - messages: An array of result messages.
+ *
+ * @deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. There is no
+ *   replacement. Use composer to manage the code for your site.
+ *
+ * @see https://www.drupal.org/node/3522119
  */
 function template_preprocess_authorize_report(&$variables): void {
+  @trigger_error(__FUNCTION__ . '() is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. There is no replacement. Use composer to manage the code for your site. See https://www.drupal.org/node/3522119', E_USER_DEPRECATED);
   $messages = [];
   if (!empty($variables['messages'])) {
     foreach ($variables['messages'] as $heading => $logs) {
