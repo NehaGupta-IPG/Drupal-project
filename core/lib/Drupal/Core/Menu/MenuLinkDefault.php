@@ -8,6 +8,9 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Provides a default implementation for menu link plugins.
+ *
+ * @extends \Drupal\Core\Menu\MenuLinkBase<PluginDefinition>
+ * @phpstan-import-type PluginDefinition from \Drupal\Core\Menu\MenuLinkManagerInterface
  */
 class MenuLinkDefault extends MenuLinkBase implements ContainerFactoryPluginInterface {
 
