@@ -9,11 +9,15 @@ use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Plugin\Discovery\ContainerDerivativeDiscoveryDecorator;
 use Drupal\Core\Plugin\Discovery\YamlDiscovery;
 use Drupal\Core\Plugin\Factory\ContainerFactory;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 
 /**
  * Manages discovery, instantiation, and tree building of menu link plugins.
  *
  * This manager finds plugins that are rendered as menu links.
+ *
+ * @phpstan-import-type PluginDefinition from \Drupal\Core\Menu\MenuLinkManagerInterface
+ * @phpstan-import-type PluginDefinitionPartial from \Drupal\Core\Menu\MenuLinkManagerInterface
  */
 class MenuLinkManager implements MenuLinkManagerInterface {
 
@@ -77,10 +81,12 @@ class MenuLinkManager implements MenuLinkManagerInterface {
    * additional processing logic, the logic can be added by replacing or
    * extending this method.
    *
-   * @param array $definition
+   * @param PluginDefinitionPartial $definition
    *   The definition to be processed and modified by reference.
    * @param string $plugin_id
    *   The ID of the plugin this definition is being used for.
+   *
+   * @param-out PluginDefinition $definition
    */
   protected function processDefinition(array &$definition, $plugin_id) {
     $definition = NestedArray::mergeDeep($this->defaults, $definition);
@@ -121,9 +127,12 @@ class MenuLinkManager implements MenuLinkManagerInterface {
 
   /**
    * {@inheritdoc}
+   *
+   * @phpstan-return array<string, PluginDefinition>
    */
   public function getDefinitions() {
     // Since this function is called rarely, instantiate the discovery here.
+    /** @var PluginDefinitionPartial[] $definitions */
     $definitions = $this->getDiscovery()->getDefinitions();
 
     $this->moduleHandler->alter('menu_links_discovered', $definitions);
@@ -138,7 +147,7 @@ class MenuLinkManager implements MenuLinkManagerInterface {
     // @todo Address what to do with an invalid plugin.
     //   https://www.drupal.org/node/2302623
     foreach ($definitions as $plugin_id => $plugin_definition) {
-      if (!empty($plugin_definition['provider']) && !$this->moduleHandler->moduleExists($plugin_definition['provider'])) {
+      if ($plugin_definition['provider'] !== '' && !$this->moduleHandler->moduleExists($plugin_definition['provider'])) {
         unset($definitions[$plugin_id]);
       }
     }
@@ -162,10 +171,12 @@ class MenuLinkManager implements MenuLinkManagerInterface {
 
   /**
    * {@inheritdoc}
+   *
+   * @return ($exception_on_invalid is true ? PluginDefinition : PluginDefinition|false)
    */
   public function getDefinition($plugin_id, $exception_on_invalid = TRUE) {
     $definition = $this->treeStorage->load($plugin_id);
-    if (empty($definition) && $exception_on_invalid) {
+    if (FALSE === $definition && $exception_on_invalid) {
       throw new PluginNotFoundException($plugin_id);
     }
     return $definition;
@@ -175,7 +186,7 @@ class MenuLinkManager implements MenuLinkManagerInterface {
    * {@inheritdoc}
    */
   public function hasDefinition($plugin_id) {
-    return (bool) $this->getDefinition($plugin_id, FALSE);
+    return $this->getDefinition($plugin_id, FALSE) !== FALSE;
   }
 
   /**
@@ -203,6 +214,8 @@ class MenuLinkManager implements MenuLinkManagerInterface {
     if (isset($options['id'])) {
       return $this->createInstance($options['id']);
     }
+
+    return FALSE;
   }
 
   /**
@@ -251,7 +264,7 @@ class MenuLinkManager implements MenuLinkManagerInterface {
   public function removeDefinition($id, $persist = TRUE) {
     $definition = $this->treeStorage->load($id);
     // It's possible the definition has already been deleted, or doesn't exist.
-    if ($definition) {
+    if ($definition !== FALSE) {
       $instance = $this->createInstance($id);
       $this->deleteInstance($instance, $persist);
     }
@@ -275,20 +288,14 @@ class MenuLinkManager implements MenuLinkManagerInterface {
    * {@inheritdoc}
    */
   public function getParentIds($id) {
-    if ($this->getDefinition($id, FALSE)) {
-      return $this->treeStorage->getRootPathIds($id);
-    }
-    return NULL;
+    return $this->hasDefinition($id) ? $this->treeStorage->getRootPathIds($id) : NULL;
   }
 
   /**
    * {@inheritdoc}
    */
   public function getChildIds($id) {
-    if ($this->getDefinition($id, FALSE)) {
-      return $this->treeStorage->getAllChildIds($id);
-    }
-    return NULL;
+    return $this->hasDefinition($id) ? $this->treeStorage->getAllChildIds($id) : NULL;
   }
 
   /**

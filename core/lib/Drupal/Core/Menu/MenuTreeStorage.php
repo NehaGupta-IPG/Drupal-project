@@ -229,8 +229,8 @@ class MenuTreeStorage implements MenuTreeStorageInterface {
   /**
    * {@inheritdoc}
    */
-  public function save(array $link) {
-    $affected_menus = $this->doSave($link);
+  public function save(array $definition) {
+    $affected_menus = $this->doSave($definition);
     $this->resetDefinitions();
     $cache_tags = Cache::buildTags('config:system.menu', $affected_menus, '.');
     $this->cacheTagsInvalidator->invalidateTags($cache_tags);

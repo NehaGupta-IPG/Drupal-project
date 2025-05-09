@@ -241,7 +241,7 @@ class MenuLinkContent extends EditorialContentEntityBase implements MenuLinkCont
     // call chain. Because of this the $update flag is ignored and only the
     // existence of the definition (equals to being in the tree storage) is
     // checked.
-    if ($menu_link_manager->getDefinition($this->getPluginId(), FALSE)) {
+    if ($menu_link_manager->hasDefinition($this->getPluginId())) {
       // When the entity is saved via a plugin instance, we should not call
       // the menu tree manager to update the definition a second time.
       if (!$this->insidePlugin) {
