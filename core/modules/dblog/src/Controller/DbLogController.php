@@ -299,7 +299,54 @@ class DbLogController extends ControllerBase {
       ],
     ];
 
+    // Get previous and next IDs efficiently.
+    $prev_id = $this->getAdjacentEventId($event_id, 'prev');
+    $next_id = $this->getAdjacentEventId($event_id, 'next');
+
+    // Build navigation if either exists.
+    if ($prev_id || $next_id) {
+      $build['navigation'] = [
+        '#type' => 'container',
+        '#attributes' => ['class' => ['dblog-nav']],
+      ];
+
+      foreach (['prev' => $prev_id, 'next' => $next_id] as $key => $id) {
+        if ($id) {
+          $build['navigation'][$key] = [
+            '#type' => 'link',
+            '#title' => $key === 'prev' ? $this->t('← Previous') : $this->t('Next →'),
+            '#url' => Url::fromRoute('dblog.event', ['event_id' => $id]),
+            '#attributes' => ['class' => ['button']],
+          ];
+        }
+      }
+    }
+
     return $build;
+  }
+
+  /**
+   * Gets the adjacent event ID (previous or next) relative to the given ID.
+   *
+   * @param int $current_id
+   *   The current event ID.
+   * @param string $direction
+   *   Either 'prev' or 'next'.
+   *
+   * @return int|null
+   *   The adjacent event ID or NULL if not found.
+   */
+  protected function getAdjacentEventId(int $current_id, string $direction): ?int {
+    $operator = $direction === 'next' ? '<' : '>';
+    $order = $direction === 'next' ? 'DESC' : 'ASC';
+
+    $query = $this->database->select('watchdog', 'w')
+      ->fields('w')
+      ->condition('wid', $current_id, $operator)
+      ->orderBy('wid', $order)
+      ->range(0, 1);
+
+    return $query->execute()->fetchField() ?: NULL;
   }
 
   /**

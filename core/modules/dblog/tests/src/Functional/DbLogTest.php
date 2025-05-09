@@ -928,4 +928,110 @@ class DbLogTest extends BrowserTestBase {
     $this->assertSession()->responseContains('<pre class="backtrace">');
   }
 
+  /**
+   * Tests pagination functionality on the individual log event pages.
+   */
+  public function testLogEventDetailPagination(): void {
+    // Log in the admin user.
+    $this->drupalLogin($this->adminUser);
+
+    // Post in order to clear the database table.
+    $this->clearLogsEntries();
+    $this->submitForm([], 'Confirm');
+
+    // Generate multiple log entries, 3 log events (Entry #0, #1, #2).
+    $this->generateLogEntries(3, ['timestamp' => \Drupal::time()->getRequestTime(), 'channel' => 'php']);
+
+    // Fetch the ID of the first log event in descending order (most recent).
+    $query = \Drupal::database()->select('watchdog', 'w');
+    $query->fields('w', ['wid']);
+    $query->orderBy('w.wid', 'DESC'); // Ensuring logs are ordered by descending wid.
+    $wid = $query->execute()->fetchField();
+
+    // Navigate to the first event page.
+    $this->drupalGet('admin/reports/dblog/event/' . $wid);
+    // Verify we're on the first event page.
+    $this->assertSession()->pageTextContains('Dblog test log message Entry #2');
+
+    // Move to the previous log ID (next pagination).
+    $wid -= 1;
+    // Verify the presence of the "Next" pagination link (next log).
+    $this->assertSession()->linkByHrefExists('admin/reports/dblog/event/' . $wid);
+    // Verify there is no "Current" pagination link for the next ID.
+    $this->assertSession()->linkByHrefNotExists('admin/reports/dblog/event/' . ($wid - 1));
+    // Verify the "Previous" link does not exist for the first log entry.
+    $this->assertSession()->linkByHrefNotExists('admin/reports/dblog/event/' . ($wid - 2));
+
+    // Click on the "Next" link using the drupalGet method again after navigating the page.
+    $this->drupalGet('admin/reports/dblog/event/' . $wid);
+
+    // Verify we're on the next event page.
+    $this->assertSession()->pageTextContains('Dblog test log message Entry #1');
+
+    // Check "Previous" pagination availability after navigating.
+    $wid += 1;
+    $this->assertSession()->linkByHrefExists('admin/reports/dblog/event/' . $wid);
+    $this->assertSession()->linkByHrefNotExists('admin/reports/dblog/event/' . ($wid + 1));
+
+    // Click on the "Previous" link using the drupalGet method to navigate back.
+    $this->drupalGet('admin/reports/dblog/event/' . $wid);
+
+    // Verify we're back on the first event page.
+    $this->assertSession()->pageTextContains('Dblog test log message Entry #2');
+
+    // Edge case for pagination with one log entry
+    $this->clearLogsEntries(); // Clear previous logs.
+    $this->submitForm([], 'Confirm');
+    $this->generateLogEntries(1, ['timestamp' => \Drupal::time()->getRequestTime(), 'channel' => 'php']);
+
+    // Fetch single log entry
+    $query = \Drupal::database()->select('watchdog', 'w');
+    $query->fields('w', ['wid']);
+    $query->orderBy('w.wid', 'DESC');
+    $wid = $query->execute()->fetchField();
+
+    // Ensure no "Previous" or "Next" pagination links when only one log entry is available.
+    $this->drupalGet('admin/reports/dblog/event/' . $wid);
+    $this->assertSession()->linkByHrefNotExists('admin/reports/dblog/event/' . ($wid - 1)); // No previous log
+    $this->assertSession()->linkByHrefNotExists('admin/reports/dblog/event/' . ($wid + 1)); // No next log
+
+    // Edge case for no logs.
+    $this->clearLogsEntries(); // Clear all logs.
+    $this->submitForm([], 'Confirm');
+
+    // Ensure no "Next" or "Previous" links when no logs exist.
+    $this->drupalGet('admin/reports/dblog/event/0');
+    $this->assertSession()->linkByHrefNotExists('admin/reports/dblog/event/1'); // No logs at all.
+    $this->assertSession()->linkByHrefNotExists('admin/reports/dblog/event/-1'); // Invalid log ID.
+
+    // Edge case for log deletion after navigating.
+    // Generate logs for testing.
+    $this->clearLogsEntries();
+    $this->generateLogEntries(3, ['timestamp' => \Drupal::time()->getRequestTime(), 'channel' => 'php']);
+
+    // Fetch log IDs again after generation.
+    $query = \Drupal::database()->select('watchdog', 'w');
+    $query->fields('w', ['wid']);
+    $query->orderBy('w.wid', 'DESC');
+    $wid = $query->execute()->fetchField();
+
+    // Navigate to the first log page.
+    $this->drupalGet('admin/reports/dblog/event/' . $wid);
+    $this->assertSession()->pageTextContains('Dblog test log message Entry #2');
+
+    // Delete the most recent log entry directly in the database.
+    $query = \Drupal::database()->delete('watchdog');
+    $query->condition('wid', $wid);
+    $query->execute();
+
+    // Verify the system no longer shows the deleted log and doesn't break the pagination.
+    $this->drupalGet('admin/reports/dblog/event/' . $wid);
+    $this->assertSession()->statusCodeEquals(404); // Should return 404 if the log is deleted.
+
+    // Ensure pagination works correctly after deletion.
+    $wid -= 1;
+    $this->drupalGet('admin/reports/dblog/event/' . $wid);
+    $this->assertSession()->pageTextContains('Dblog test log message Entry #1'); // Should be on the next available log.
+  }
+
 }
