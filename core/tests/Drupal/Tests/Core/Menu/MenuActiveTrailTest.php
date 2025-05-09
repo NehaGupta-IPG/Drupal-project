@@ -165,8 +165,8 @@ class MenuActiveTrailTest extends UnitTestCase {
     $this->requestStack->push($request);
     if ($links !== FALSE) {
       $this->menuLinkManager->expects($this->exactly(2))
-        ->method('loadLinksByRoute')
-        ->with('baby_llama')
+        ->method('loadLinksByRoutes')
+        ->with([['baby_llama', []]])
         ->willReturn($links);
     }
     // Test with menu name.
@@ -198,13 +198,9 @@ class MenuActiveTrailTest extends UnitTestCase {
     // Make 'link_1' route to have no links and the '<front>' route to have a link.
     $home_link = MenuLinkMock::create(['id' => 'home_link', 'route_name' => 'home_link', 'title' => 'Home', 'parent' => NULL]);
     $this->menuLinkManager
-      ->method('loadLinksByRoute')
-      ->willReturnCallback(function ($route_name) use ($home_link) {
-        return match ($route_name) {
-          'link_1' => [],
-          '<front>' => [$home_link],
-        };
-      });
+      ->method('loadLinksByRoutes')
+      ->with([['link_1', []], ['<front>', []]])
+      ->willReturn([$home_link]);
 
     // Test.
     $this->assertSame($home_link, $this->menuActiveTrail->getActiveLink());
@@ -225,8 +221,8 @@ class MenuActiveTrailTest extends UnitTestCase {
       // We expect exactly two calls, one for the first call, and one after the
       // cache clearing below.
       $this->menuLinkManager->expects($this->exactly(3))
-        ->method('loadLinksByRoute')
-        ->with('baby_llama')
+        ->method('loadLinksByRoutes')
+        ->with([['baby_llama', []]])
         ->willReturn($links);
       if ($expected_link !== NULL) {
         $this->menuLinkManager->expects($this->exactly(3))
@@ -270,12 +266,13 @@ class MenuActiveTrailTest extends UnitTestCase {
     /** @var \Symfony\Component\Routing\Route $route */
     $route = $request->attributes->get(RouteObjectInterface::ROUTE_OBJECT);
     $route->setPath('/test/{b}/{a}');
-    $request->attributes->get('_raw_variables')->add(['b' => 1, 'a' => 0]);
+    $route_parameters = ['b' => 1, 'a' => 0];
+    $request->attributes->get('_raw_variables')->add($route_parameters);
     $this->requestStack->push($request);
 
     $this->menuLinkManager->expects($this->any())
-      ->method('loadLinksByRoute')
-      ->with('baby_llama')
+      ->method('loadLinksByRoutes')
+      ->with([['baby_llama', $route_parameters]])
       ->willReturn($data[1]);
 
     $expected_link = $data[3];

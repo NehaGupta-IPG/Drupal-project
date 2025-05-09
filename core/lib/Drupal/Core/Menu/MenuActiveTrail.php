@@ -161,7 +161,6 @@ class MenuActiveTrail extends CacheCollector implements MenuActiveTrailInterface
     // https://www.drupal.org/project/drupal/issues/3523497
     if ($this->pathMatcher->isFrontPage()) {
       $routes[] = ['<front>', []];
-      $links = array_merge($links, $this->menuLinkManager->loadLinksByRoute('<front>', [], $menu_name));
     }
 
     if ($routes) {
