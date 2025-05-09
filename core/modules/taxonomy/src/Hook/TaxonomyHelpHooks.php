@@ -9,7 +9,7 @@ use Drupal\Core\Hook\Attribute\Hook;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 
 /**
- * Help hook implementation for taxonomy().
+ * Help hook implementation for the Taxonomy module.
  */
 class TaxonomyHelpHooks {
 
@@ -21,7 +21,7 @@ class TaxonomyHelpHooks {
    * Implements hook_help().
    */
   #[Hook('help')]
-  public function help($route_name, RouteMatchInterface $route_match): string {
+  public function help(string $route_name, RouteMatchInterface $route_match): string {
     switch ($route_name) {
       case 'help.page.taxonomy':
         $field_ui_url = $this->moduleHandler->moduleExists('field_ui') ? Url::fromRoute('help.page', ['name' => 'field_ui'])->toString() : '#';

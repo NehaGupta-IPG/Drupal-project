@@ -5,7 +5,7 @@ namespace Drupal\taxonomy\Hook;
 use Drupal\Core\Hook\Attribute\Hook;
 
 /**
- * Implements hook_theme().
+ * Implements theme hook implementations for the Taxonomy module.
  */
 class TaxonomyThemeHooks {
 
