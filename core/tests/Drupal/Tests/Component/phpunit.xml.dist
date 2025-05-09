@@ -28,6 +28,11 @@
     -->
     <!-- <env name="SYMFONY_DEPRECATIONS_HELPER" value="ignoreFile=.deprecation-ignore.txt"/> -->
   </php>
+  <extensions>
+    <!-- Deprecation handler. -->
+    <bootstrap class="Drupal\TestTools\Extension\DeprecationBridge\DeprecationHandler">
+    </bootstrap>
+  </extensions>
   <testsuites>
     <testsuite name="unit-component">
       <directory>.</directory>
