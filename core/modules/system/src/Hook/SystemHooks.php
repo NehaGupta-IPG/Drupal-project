@@ -452,8 +452,7 @@ class SystemHooks {
     $admin_context = \Drupal::service('router.admin_context');
     if ($admin_context->isAdminRoute() && \Drupal::currentUser()->hasPermission('administer site configuration')) {
       $route_match = \Drupal::routeMatch();
-      $route_name = $route_match->getRouteName();
-      if ($route_name !== 'system.status' && \Drupal::config('system.advisories')->get('enabled')) {
+      if (!$route_match->isRouteName('system.status') && \Drupal::config('system.advisories')->get('enabled')) {
         /** @var \Drupal\system\SecurityAdvisories\SecurityAdvisoriesFetcher $fetcher */
         $fetcher = \Drupal::service('system.sa_fetcher');
         $advisories = $fetcher->getSecurityAdvisories(FALSE);

@@ -58,10 +58,11 @@ class LayoutBuilderAccessCheck implements AccessInterface {
     // opts out.
     // Check if inline block access should be disabled.
     if ($operation === 'add_block' && !($section_storage->getPluginDefinition()->get('allow_inline_blocks') ?? TRUE)) {
-      $route_name = $this->route_match->getRouteName();
       $is_inline_block = str_starts_with((string) $this->route_match->getParameter('plugin_id'), 'inline_block:');
 
-      if ($route_name === 'layout_builder.choose_inline_block' || ($route_name === 'layout_builder.add_block' && $is_inline_block)) {
+      if ($this->route_match->isRouteName('layout_builder.choose_inline_block')
+        || ($this->route_match->isRouteName('layout_builder.add_block') && $is_inline_block))
+      {
         $access = $access->andIf(AccessResult::forbidden());
       }
     }

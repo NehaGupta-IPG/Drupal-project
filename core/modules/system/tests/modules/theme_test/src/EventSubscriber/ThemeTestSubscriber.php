@@ -81,12 +81,7 @@ class ThemeTestSubscriber implements EventSubscriberInterface {
    * Ensures that the theme registry was not initialized.
    */
   public function onView(RequestEvent $event) {
-    $current_route = $this->currentRouteMatch->getRouteName();
-    $entity_autocomplete_route = [
-      'system.entity_autocomplete',
-    ];
-
-    if (in_array($current_route, $entity_autocomplete_route)) {
+    if ($this->currentRouteMatch->isRouteName('system.entity_autocomplete')) {
       if ($this->container->initialized('theme.registry')) {
         throw new \Exception('registry initialized');
       }
