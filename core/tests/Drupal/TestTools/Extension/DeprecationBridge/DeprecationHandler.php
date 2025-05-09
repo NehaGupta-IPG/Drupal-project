@@ -62,7 +62,7 @@ final class DeprecationHandler implements Extension {
     Facade $facade,
     ParameterCollection $parameters,
   ): void {
-    $facade->registerSubscriber(new TestRunnerFinishedSubscriber($this));
+    $facade->registerSubscriber(new TestRunnerFinishedSubscriber());
   }
 
   /**
@@ -151,6 +151,7 @@ final class DeprecationHandler implements Extension {
    */
   public static function dumpStatistics(): void {
     echo "\n\n";
+    rsort(self::$deprecationIgnorePatternsStatistics, \SORT_NUMERIC);
     var_export(self::$deprecationIgnorePatternsStatistics);
     echo "\n\n";
   }
