@@ -12,20 +12,10 @@ use Drupal\Core\Theme\ThemeManagerInterface;
  */
 class MailThemeManager implements MailThemeManagerInterface {
 
-  /**
-   * Constructs a new mail theme manager.
-   *
-   * @param \Drupal\Core\MailTheme\MailThemeNegotiatorInterface $themeNegotiator
-   *   The mail theme negotiator.
-   * @param \Drupal\Core\Theme\ThemeManagerInterface $themeManager
-   *   The theme manager.
-   * @param \Drupal\Core\Theme\ThemeInitializationInterface $themeInitialization
-   *   The theme initialization service.
-   */
   public function __construct(
-    protected MailThemeNegotiatorInterface $themeNegotiator,
-    protected ThemeManagerInterface $themeManager,
-    protected ThemeInitializationInterface $themeInitialization,
+    protected readonly MailThemeNegotiatorInterface $themeNegotiator,
+    protected readonly ThemeManagerInterface $themeManager,
+    protected readonly ThemeInitializationInterface $themeInitialization,
   ) {
   }
 

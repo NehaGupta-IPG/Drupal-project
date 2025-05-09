@@ -1484,12 +1484,12 @@ services:
     class: Drupal\Core\Mail\MailManager
     arguments: ['@container.namespaces', '@cache.discovery', '@module_handler', '@config.factory', '@logger.factory', '@string_translation', '@renderer', '@Drupal\Core\MailTheme\MailThemeManagerInterface']
   Drupal\Core\Mail\MailManagerInterface: '@plugin.manager.mail'
-  Drupal\Core\MailTheme\MailThemeManager:
+  Drupal\Core\MailTheme\MailThemeManagerInterface: 
+    class: 'Drupal\Core\MailTheme\MailThemeManager'
     autowire: true
-  Drupal\Core\MailTheme\MailThemeManagerInterface: '@Drupal\Core\MailTheme\MailThemeManager'
-  Drupal\Core\MailTheme\MailThemeNegotiator:
+  Drupal\Core\MailTheme\MailThemeNegotiatorInterface:
+    class: 'Drupal\Core\MailTheme\MailThemeNegotiator'
     autowire: true
-  Drupal\Core\MailTheme\MailThemeNegotiatorInterface: '@Drupal\Core\MailTheme\MailThemeNegotiator'
   Drupal\Core\MailTheme\DefaultNegotiator:
     autowire: true
     tags:

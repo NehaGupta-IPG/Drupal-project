@@ -11,12 +11,6 @@ use Drupal\Core\Config\ConfigFactoryInterface;
  */
 class DefaultNegotiator implements MailThemeNegotiatorInterface {
 
-  /**
-   * Constructs a DefaultNegotiator object.
-   *
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $configFactory
-   *   The config factory.
-   */
   public function __construct(protected ConfigFactoryInterface $configFactory) {
   }
 
