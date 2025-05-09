@@ -330,12 +330,13 @@
       // Loop through the dependee selectors.
       Object.keys(this.values).forEach((selector) => {
         const dependeeStates = this.dependees[selector];
+        const $selector = $(selector);
         Object.keys(dependeeStates).forEach((i) => {
           // Retrieve the stored handler reference to ensure we only remove
           // the event associated with this Dependent.
           const handler = this.values[selector][`${dependeeStates[i]}_handler`];
           if (handler) {
-            $(selector).off(`state:${dependeeStates[i]}`, handler);
+            $selector.off(`state:${dependeeStates[i]}`, handler);
             delete this.values[selector][`${dependeeStates[i]}_handler`];
           }
         });
