@@ -33,7 +33,7 @@ class NumberTest extends TestCase {
    *   Expected return value from Number::validStep().
    */
   #[DataProvider('providerTestValidStep')]
-  public function testValidStep(float|int $value, float|int $step, bool $expected): void {
+  public function testValidStep(int|float|string $value, int|float|string $step, bool $expected): void {
     $return = Number::validStep($value, $step);
     $this->assertEquals($expected, $return);
   }
@@ -48,7 +48,7 @@ class NumberTest extends TestCase {
    *
    * @dataProvider providerNormalize
    */
-  public function testNormalize($number, $expected): void {
+  public function testNormalize(int|float|string $number, int|float|string $expected): void {
     $this->assertEquals($expected, Number::normalize($number));
   }
 
@@ -77,10 +77,10 @@ class NumberTest extends TestCase {
    *
    * @param int $expected
    *   The expected number of significant decimals.
-   * @param int|float|string $number
+   * @param int|float|string|bool $number
    *   The number to test the count on.
    */
-  public function testCountSignificantDecimals($expected, $number): void {
+  public function testCountSignificantDecimals(int $expected, int|float|string|bool $number): void {
     $this->assertEquals($expected, Number::countSignificantDecimals($number));
   }
 
@@ -144,7 +144,7 @@ class NumberTest extends TestCase {
    *   Expected return value from Number::validStep().
    */
   #[DataProvider('providerTestValidStepOffset')]
-  public function testValidStepOffset(float|int $value, float|int $step, int|float $offset, bool $expected): void {
+  public function testValidStepOffset(int|float|string $value, int|float|string $step, float $offset, bool $expected): void {
     $return = Number::validStep($value, $step, $offset);
     $this->assertEquals($expected, $return);
   }
