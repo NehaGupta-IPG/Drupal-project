@@ -1808,9 +1808,18 @@ function system_update_11201(): void {
 function system_update_11209(): string {
   $message = NULL;
   $date_formats = [
-    'long_date_only' => ['label' => t('Long date (date only)'), 'pattern' =>  t('l, j F Y', [], ['context' => 'PHP date format'])],
-    'medium_date_only' => ['label' => t('medium date (date only)'), 'pattern' =>  t('D, j M Y', [], ['context' => 'PHP date format'])],
-    'short_date_only' => ['label' => t('short date (date only)'), 'pattern' =>  t('j M Y', [], ['context' => 'PHP date format'])],
+    'long_date_only' => [
+      'label' => t('Long date (date only)'),
+      'pattern' => t('l, j F Y', [], ['context' => 'PHP date format']),
+    ],
+    'medium_date_only' => [
+      'label' => t('medium date (date only)'),
+      'pattern' => t('D, j M Y', [], ['context' => 'PHP date format']),
+    ],
+    'short_date_only' => [
+      'label' => t('short date (date only)'),
+      'pattern' => t('j M Y', [], ['context' => 'PHP date format']),
+    ],
   ];
   foreach ($date_formats as $id => $date_format_info) {
     if (!DateFormat::load($id)) {
