@@ -176,5 +176,9 @@ class TaxonomyEntityHooks {
       $this->database->delete('taxonomy_index')->condition('tid', $term->id())->execute();
     }
   }
-
+  
+  // phpcs:ignore Drupal.Commenting.InlineComment.DocBlock
+  /**
+   * @} End of "defgroup taxonomy_index".
+   */
 }
