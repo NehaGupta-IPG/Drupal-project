@@ -24,7 +24,7 @@ class CurrentThemeConditionTest extends KernelTestBase {
    * Tests the current theme condition.
    */
   public function testCurrentTheme(): void {
-    \Drupal::service('theme_installer')->install(['test_theme', 'stark', 'olivero']);
+    \Drupal::service('theme_installer')->install(['test_theme', 'test_base_theme', 'test_subtheme']);
 
     $manager = \Drupal::service('plugin.manager.condition');
     /** @var \Drupal\Core\Condition\ConditionInterface $condition */
@@ -35,10 +35,10 @@ class CurrentThemeConditionTest extends KernelTestBase {
     $condition_negated->setConfiguration(['themes' => ['test_theme'], 'negate' => TRUE]);
     /** @var \Drupal\Core\Condition\ConditionInterface $condition_multiple */
     $condition_multiple = $manager->createInstance('current_theme');
-    $condition_multiple->setConfiguration(['themes' => ['test_theme', 'olivero']]);
+    $condition_multiple->setConfiguration(['themes' => ['test_theme', 'test_subtheme']]);
     /** @var \Drupal\Core\Condition\ConditionInterface $condition_multiple_negated */
     $condition_multiple_negated = $manager->createInstance('current_theme');
-    $condition_multiple_negated->setConfiguration(['themes' => ['test_theme', 'olivero'], 'negate' => TRUE]);
+    $condition_multiple_negated->setConfiguration(['themes' => ['test_theme', 'test_subtheme'], 'negate' => TRUE]);
     /** @var \Drupal\Core\Condition\ConditionInterface $condition_any */
     $condition_any = $manager->createInstance('current_theme');
     $condition_any->setConfiguration(['themes' => []]);
@@ -69,14 +69,14 @@ class CurrentThemeConditionTest extends KernelTestBase {
     $this->assertFalse($condition_multiple_negated->execute());
 
     // Also when setting the other expected theme:
-    $this->config('system.theme')->set('default', 'olivero')->save();
+    $this->config('system.theme')->set('default', 'test_subtheme')->save();
     \Drupal::theme()->resetActiveTheme();
 
     $this->assertTrue($condition_multiple->execute());
     $this->assertFalse($condition_multiple_negated->execute());
 
     // If we set another theme, the condition should not apply:
-    $this->config('system.theme')->set('default', 'stark')->save();
+    $this->config('system.theme')->set('default', 'test_base_theme')->save();
     \Drupal::theme()->resetActiveTheme();
 
     $this->assertFalse($condition_multiple->execute());
@@ -92,7 +92,7 @@ class CurrentThemeConditionTest extends KernelTestBase {
     $this->assertTrue($condition_any->execute());
     $this->assertFalse($condition_any_negated->execute());
 
-    $this->config('system.theme')->set('default', 'olivero')->save();
+    $this->config('system.theme')->set('default', 'test_subtheme')->save();
     \Drupal::theme()->resetActiveTheme();
 
     $this->assertTrue($condition_any->execute());
