@@ -9,7 +9,6 @@ use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Plugin\Discovery\ContainerDerivativeDiscoveryDecorator;
 use Drupal\Core\Plugin\Discovery\YamlDiscovery;
 use Drupal\Core\Plugin\Factory\ContainerFactory;
-use Drupal\Core\StringTranslation\TranslatableMarkup;
 
 /**
  * Manages discovery, instantiation, and tree building of menu link plugins.
@@ -173,6 +172,8 @@ class MenuLinkManager implements MenuLinkManagerInterface {
    * {@inheritdoc}
    *
    * @return ($exception_on_invalid is true ? PluginDefinition : PluginDefinition|false)
+   *   A plugin exception, or FALSE or an exception if a plugin does not exist
+   *   with the given ID.
    */
   public function getDefinition($plugin_id, $exception_on_invalid = TRUE) {
     $definition = $this->treeStorage->load($plugin_id);

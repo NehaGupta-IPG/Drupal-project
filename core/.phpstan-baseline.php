@@ -8842,12 +8842,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/lib/Drupal/Core/Menu/MenuLinkManager.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Core\\\\Menu\\\\MenuLinkManager\\:\\:getInstance\\(\\) should return object\\|false but return statement is missing\\.$#',
-	'identifier' => 'return.missing',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/Menu/MenuLinkManager.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Core\\\\Menu\\\\MenuLinkManager\\:\\:menuNameInUse\\(\\) should return bool but return statement is missing\\.$#',
 	'identifier' => 'return.missing',
 	'count' => 1,
