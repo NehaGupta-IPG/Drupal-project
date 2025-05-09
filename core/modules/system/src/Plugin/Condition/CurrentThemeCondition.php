@@ -67,7 +67,10 @@ class CurrentThemeCondition extends ConditionPluginBase implements ContainerFact
     $form['themes'] = [
       '#type' => 'checkboxes',
       '#title' => $this->t('Themes'),
-      '#default_value' => $this->configuration['themes'],
+      // @todo $this->configuration['theme'] won't be supported in Drupal 12.0.0.
+      // remove it:
+      // @see https://www.drupal.org/node/3523553
+      '#default_value' => isset($this->configuration['theme']) ? [$this->configuration['theme']] : $this->configuration['themes'],
       '#options' => $this->getAllAvailableThemeOptions(),
       '#description' => $this->t('Select the themes this condition should evaluate TRUE on.'),
     ];
@@ -79,6 +82,10 @@ class CurrentThemeCondition extends ConditionPluginBase implements ContainerFact
    */
   public function submitConfigurationForm(array &$form, FormStateInterface $form_state) {
     $this->configuration['themes'] = $form_state->getValue('themes');
+    // @todo $this->configuration['theme'] won't be supported in Drupal 12.0.0.
+    // remove it:
+    // @see https://www.drupal.org/node/3523553
+    unset($this->configuration['theme']);
     parent::submitConfigurationForm($form, $form_state);
   }
 
