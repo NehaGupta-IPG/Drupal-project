@@ -61,8 +61,8 @@ class LayoutBuilderAccessCheck implements AccessInterface {
       $is_inline_block = str_starts_with((string) $this->route_match->getParameter('plugin_id'), 'inline_block:');
 
       if ($this->route_match->isRouteName('layout_builder.choose_inline_block')
-        || ($this->route_match->isRouteName('layout_builder.add_block') && $is_inline_block))
-      {
+        || ($this->route_match->isRouteName('layout_builder.add_block') && $is_inline_block)
+      ) {
         $access = $access->andIf(AccessResult::forbidden());
       }
     }
