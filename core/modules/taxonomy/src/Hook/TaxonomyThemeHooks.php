@@ -7,7 +7,7 @@ use Drupal\Core\Render\Element;
 use Drupal\Core\Routing\RouteMatchInterface;
 
 /**
- * Implements hook_theme().
+ * Implements theme hook implementations for the Taxonomy module.
  */
 class TaxonomyThemeHooks {
 

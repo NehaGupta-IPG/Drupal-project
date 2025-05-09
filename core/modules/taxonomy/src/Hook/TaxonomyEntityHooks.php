@@ -14,7 +14,7 @@ use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\Url;
 
 /**
- * Hook implementations for taxonomy.
+ * Entity hook implementations for taxonomy.
  */
 class TaxonomyEntityHooks {
 
@@ -30,9 +30,7 @@ class TaxonomyEntityHooks {
    * Returns the maintain_index_table configuration value.
    */
   protected function shouldMaintainIndexTable(): bool {
-    $taxonomy_config = $this->configFactory->get('taxonomy.settings');
-    $maintain_index_table = $taxonomy_config->get('maintain_index_table');
-    return (bool) $maintain_index_table;
+    return (bool) $this->configFactory->get('taxonomy.settings')->get('maintain_index_table');
   }
 
   /**
