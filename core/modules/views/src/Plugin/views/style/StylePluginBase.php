@@ -371,7 +371,7 @@ abstract class StylePluginBase extends PluginBase {
       $form['uses_fields'] = [
         '#type' => 'checkbox',
         '#title' => $this->t('Force using fields'),
-        '#description' => $this->t('If neither the row nor the style plugin supports fields, this field allows to enable them, so you can for example use groupby.'),
+        '#description' => $this->t('If neither the row nor the style plugin supports fields, this field allows to enable them, so you can for example use group by.'),
         '#default_value' => $this->options['uses_fields'],
       ];
     }
@@ -657,7 +657,7 @@ abstract class StylePluginBase extends PluginBase {
    * Renders all of the fields for a given style and store them on the object.
    *
    * @param array $result
-   *   The result array from $view->result
+   *   The result array from $view->result.
    */
   protected function renderFields(array $result) {
     if (!$this->usesFields()) {
@@ -760,10 +760,12 @@ abstract class StylePluginBase extends PluginBase {
   }
 
   /**
-   * #pre_render callback for view row field rendering.
+   * Render API callback: Performs view row field rendering.
+   *
+   * This function is assigned as a #pre_render callback.
    *
    * @param array $data
-   *   The element to #pre_render
+   *   The element to #pre_render.
    *
    * @return array
    *   The processed element.

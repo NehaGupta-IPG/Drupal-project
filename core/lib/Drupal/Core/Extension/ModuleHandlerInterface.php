@@ -82,6 +82,10 @@ interface ModuleHandlerInterface {
    *   The module name; e.g., 'node'.
    * @param string $path
    *   The module path; e.g., 'core/modules/node'.
+   *
+   * @deprecated in drupal:11.2.0 and is removed from drupal:12.0.0.
+   * There is no direct replacement.
+   * @see https://www.drupal.org/node/3491200
    */
   public function addModule($name, $path);
 
@@ -92,6 +96,10 @@ interface ModuleHandlerInterface {
    *   The profile name; e.g., 'standard'.
    * @param string $path
    *   The profile path; e.g., 'core/profiles/standard'.
+   *
+   * @deprecated in drupal:11.2.0 and is removed from drupal:12.0.0.
+   * There is no direct replacement.
+   * @see https://www.drupal.org/node/3491200
    */
   public function addProfile($name, $path);
 
@@ -217,7 +225,7 @@ interface ModuleHandlerInterface {
    *
    * @param string $hook
    *   The name of the hook to invoke.
-   * @param callable $callback
+   * @param callable(callable, string): mixed $callback
    *   A callable that invokes a hook implementation. Such that
    *   $callback is callable(callable, string): mixed.
    *   Arguments:

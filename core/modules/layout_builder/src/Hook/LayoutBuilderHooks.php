@@ -26,6 +26,7 @@ use Drupal\layout_builder\Entity\LayoutBuilderEntityViewDisplay;
 use Drupal\Core\Url;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Hook\Attribute\Hook;
+use Drupal\Core\Hook\Order\Order;
 
 /**
  * Hook implementations for layout_builder.
@@ -38,7 +39,7 @@ class LayoutBuilderHooks {
    * Implements hook_help().
    */
   #[Hook('help')]
-  public function help($route_name, RouteMatchInterface $route_match) {
+  public function help($route_name, RouteMatchInterface $route_match): ?string {
     // Add help text to the Layout Builder UI.
     if ($route_match->getRouteObject()->getOption('_layout_builder')) {
       $output = '<p>' . $this->t('This layout builder tool allows you to configure the layout of the main content area.') . '</p>';
@@ -82,6 +83,7 @@ class LayoutBuilderHooks {
         $output .= '</dl>';
         return $output;
     }
+    return NULL;
   }
 
   /**
@@ -150,7 +152,7 @@ class LayoutBuilderHooks {
    * @see \Drupal\layout_builder\Plugin\Block\ExtraFieldBlock::build()
    * @see layout_builder_module_implements_alter()
    */
-  #[Hook('entity_view_alter')]
+  #[Hook('entity_view_alter', order: Order::Last)]
   public function entityViewAlter(array &$build, EntityInterface $entity, EntityViewDisplayInterface $display): void {
     // Only replace extra fields when Layout Builder has been used to alter the
     // build. See \Drupal\layout_builder\Entity\LayoutBuilderEntityViewDisplay::buildMultiple().

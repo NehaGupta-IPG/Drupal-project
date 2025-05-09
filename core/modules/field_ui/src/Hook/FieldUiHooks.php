@@ -25,7 +25,7 @@ class FieldUiHooks {
    * Implements hook_help().
    */
   #[Hook('help')]
-  public function help($route_name, RouteMatchInterface $route_match) {
+  public function help($route_name, RouteMatchInterface $route_match): ?string {
     switch ($route_name) {
       case 'help.page.field_ui':
         $output = '';
@@ -68,6 +68,7 @@ class FieldUiHooks {
       case 'entity.field_storage_config.collection':
         return '<p>' . $this->t('This list shows all fields currently in use for easy reference.') . '</p>';
     }
+    return NULL;
   }
 
   /**
@@ -237,8 +238,8 @@ class FieldUiHooks {
   #[Hook('form_field_ui_field_storage_add_form_alter')]
   public function formFieldUiFieldStorageAddFormAlter(array &$form) : void {
     $optgroup = (string) $this->t('Reference');
-    // Move the "Entity reference" option to the end of the list and rename it to
-    // "Other".
+    // Move the "Entity reference" option to the end of the list and rename it
+    // to "Other".
     unset($form['add']['new_storage_type']['#options'][$optgroup]['entity_reference']);
     $form['add']['new_storage_type']['#options'][$optgroup]['entity_reference'] = $this->t('Other…');
   }
@@ -248,7 +249,7 @@ class FieldUiHooks {
    *
    * Adds a button 'Save and manage fields' to forms.
    *
-   * @see \Drupal\node\NodeTypeForm
+   * @see \Drupal\node\Form\NodeTypeForm
    * @see \Drupal\comment\CommentTypeForm
    * @see \Drupal\media\MediaTypeForm
    * @see \Drupal\block_content\BlockContentTypeForm

@@ -26,7 +26,7 @@ class MediaHooks {
    * Implements hook_help().
    */
   #[Hook('help')]
-  public function help($route_name, RouteMatchInterface $route_match) {
+  public function help($route_name, RouteMatchInterface $route_match): ?string {
     switch ($route_name) {
       case 'help.page.media':
         $output = '<h2>' . $this->t('About') . '</h2>';
@@ -71,6 +71,7 @@ class MediaHooks {
         $output .= '<p>' . $this->t('Use <em>Media</em> reference fields for most files, images, audio, videos, and remote media. Use <em>File</em> or <em>Image</em> reference fields when creating your own media types, or for legacy files and images created before installing the Media module.') . '</p>';
         return $output;
     }
+    return NULL;
   }
 
   /**
@@ -153,8 +154,8 @@ class MediaHooks {
       ]);
     }
     $field_types = ['file_upload', 'field_ui:entity_reference:media'];
-    if (in_array($form_state->getValue('new_storage_type'), $field_types)) {
-      $form['group_field_options_wrapper']['description_wrapper'] = ['#type' => 'item', '#markup' => $description_text];
+    if (in_array($form_state->getStorage()['field_type'], $field_types)) {
+      $form['field_options_wrapper']['description_wrapper'] = ['#type' => 'item', '#markup' => $description_text];
     }
   }
 

@@ -2,6 +2,7 @@
 
 namespace Drupal\views\Hook;
 
+use Drupal\block\BlockInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\views\ViewsConfigUpdater;
 use Drupal\views\ViewEntityInterface;
@@ -27,7 +28,7 @@ class ViewsHooks {
    * Implements hook_help().
    */
   #[Hook('help')]
-  public function help($route_name, RouteMatchInterface $route_match) {
+  public function help($route_name, RouteMatchInterface $route_match): ?string {
     switch ($route_name) {
       case 'help.page.views':
         $output = '';
@@ -54,6 +55,7 @@ class ViewsHooks {
         $output .= '</dl>';
         return $output;
     }
+    return NULL;
   }
 
   /**
@@ -375,6 +377,21 @@ class ViewsHooks {
     /** @var \Drupal\views\ViewsConfigUpdater $config_updater */
     $config_updater = \Drupal::classResolver(ViewsConfigUpdater::class);
     $config_updater->updateAll($view);
+  }
+
+  /**
+   * Implements hook_ENTITY_TYPE_presave() for blocks.
+   */
+  #[Hook('block_presave')]
+  public function blockPresave(BlockInterface $block): void {
+    if (str_starts_with($block->getPluginId(), 'views_block:')) {
+      $settings = $block->get('settings');
+      if (isset($settings['items_per_page']) && $settings['items_per_page'] === 'none') {
+        @trigger_error('Saving a views block with "none" items per page is deprecated in drupal:11.2.0 and removed in drupal:12.0.0. To use the items per page defined by the view, use NULL. See https://www.drupal.org/node/3522240', E_USER_DEPRECATED);
+        $settings['items_per_page'] = NULL;
+        $block->set('settings', $settings);
+      }
+    }
   }
 
 }

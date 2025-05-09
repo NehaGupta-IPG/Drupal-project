@@ -532,8 +532,9 @@ function hook_views_data_alter(array &$data) {
  * When collecting the views data, views_views_data() invokes this hook for each
  * field storage definition, on the module that provides the field storage
  * definition. If the return value is empty, the result of
- * FieldViewsDataProvider::defaultFieldImplementation() is used instead. Then the result is altered
- * by invoking hook_field_views_data_alter() on all modules.
+ * FieldViewsDataProvider::defaultFieldImplementation() is used instead. Then
+ * the result is altered by invoking hook_field_views_data_alter() on all
+ * modules.
  *
  * If no hook implementation exists, hook_views_data() falls back to
  * FieldViewsDataProvider::defaultFieldImplementation().
@@ -843,7 +844,7 @@ function hook_views_post_execute(ViewExecutable $view) {
  *
  * @see \Drupal\views\ViewExecutable
  */
-function hook_views_pre_render(ViewExecutable $view) {
+function hook_views_pre_render(ViewExecutable $view): void {
   // Scramble the order of the rows shown on this result page.
   // Note that this could be done earlier, but not later in the view execution
   // process.
@@ -881,7 +882,7 @@ function hook_views_pre_render(ViewExecutable $view) {
  *
  * @see \Drupal\views\ViewExecutable
  */
-function hook_views_post_render(ViewExecutable $view, array &$output, CachePluginBase $cache) {
+function hook_views_post_render(ViewExecutable $view, array &$output, CachePluginBase $cache): void {
   // When using full pager, disable any time-based caching if there are fewer
   // than 10 results.
   if ($view->pager instanceof Full && $cache instanceof Time && count($view->result) < 10) {

@@ -549,11 +549,15 @@ class RendererBubblingTest extends RendererTestBase {
 
 }
 
-
+/**
+ * Test class with implemented trusted callbacks.
+ */
 class BubblingTest implements TrustedCallbackInterface {
 
   /**
-   * #pre_render callback for testBubblingWithPrerender().
+   * Render API callback:Used for testing testBubblingWithPrerender().
+   *
+   * This function is assigned as an #pre_render callback.
    */
   public static function bubblingPreRender($elements) {
     $elements += [
@@ -592,7 +596,9 @@ class BubblingTest implements TrustedCallbackInterface {
   }
 
   /**
-   * #pre_render callback for testBubblingWithPrerender().
+   * Render API callback: Used for testing testBubblingWithPrerender().
+   *
+   * This function is assigned as an #pre_render callback in
    */
   public static function bubblingNestedPreRenderUncached($elements) {
     \Drupal::state()->set('bubbling_nested_pre_render_uncached', TRUE);
@@ -601,7 +607,9 @@ class BubblingTest implements TrustedCallbackInterface {
   }
 
   /**
-   * #pre_render callback for testBubblingWithPrerender().
+   * Render API callback: Used for testing testBubblingWithPrerender().
+   *
+   * This function is assigned as an #pre_render callback in
    */
   public static function bubblingNestedPreRenderCached($elements) {
     \Drupal::state()->set('bubbling_nested_pre_render_cached', TRUE);
@@ -609,7 +617,9 @@ class BubblingTest implements TrustedCallbackInterface {
   }
 
   /**
-   * #lazy_builder callback for testBubblingWithPrerender().
+   * Render API callback: Used for testing testBubblingWithPrerender().
+   *
+   * This function is assigned as an #lazy_builder callback in
    */
   public static function bubblingPlaceholder($foo, $baz) {
     return [
@@ -618,7 +628,9 @@ class BubblingTest implements TrustedCallbackInterface {
   }
 
   /**
-   * #pre_render callback for testOverWriteCacheKeys().
+   * Render API callback: Used for testing testOverWriteCacheKeys().
+   *
+   * This function is assigned as an #pre_render callback in
    */
   public static function bubblingCacheOverwritePrerender($elements) {
     // Overwrite the #cache entry with new data.

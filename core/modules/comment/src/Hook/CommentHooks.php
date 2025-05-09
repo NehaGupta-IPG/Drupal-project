@@ -7,7 +7,6 @@ use Drupal\Core\Entity\Entity\EntityViewMode;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\user\UserInterface;
 use Drupal\user\RoleInterface;
-use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Entity\FieldableEntityInterface;
 use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
 use Drupal\Core\Entity\EntityInterface;
@@ -31,7 +30,7 @@ class CommentHooks {
    * Implements hook_help().
    */
   #[Hook('help')]
-  public function help($route_name, RouteMatchInterface $route_match) {
+  public function help($route_name, RouteMatchInterface $route_match): ?string {
     switch ($route_name) {
       case 'help.page.comment':
         $output = '<h2>' . $this->t('About') . '</h2>';
@@ -68,6 +67,7 @@ class CommentHooks {
         $output = '<p>' . $this->t('This page provides a list of all comment types on the site and allows you to manage the fields, form and display settings for each.') . '</p>';
         return $output;
     }
+    return NULL;
   }
 
   /**
@@ -223,45 +223,12 @@ class CommentHooks {
   }
 
   /**
-   * Implements hook_form_FORM_ID_alter() for field_ui_field_storage_add_form.
-   */
-  #[Hook('form_field_ui_field_storage_add_form_alter')]
-  public function formFieldUiFieldStorageAddFormAlter(&$form, FormStateInterface $form_state) : void {
-    $route_match = \Drupal::routeMatch();
-    if ($form_state->get('entity_type_id') == 'comment' && $route_match->getParameter('commented_entity_type')) {
-      $form['#title'] = \Drupal::service('comment.manager')->getFieldUIPageTitle($route_match->getParameter('commented_entity_type'), $route_match->getParameter('field_name'));
-    }
-  }
-
-  /**
    * Implements hook_field_info_entity_type_ui_definitions_alter().
    */
   #[Hook('field_info_entity_type_ui_definitions_alter')]
   public function fieldInfoEntityTypeUiDefinitionsAlter(array &$ui_definitions, string $entity_type_id): void {
     if (!_comment_entity_uses_integer_id($entity_type_id)) {
       unset($ui_definitions['comment']);
-    }
-  }
-
-  /**
-   * Implements hook_form_FORM_ID_alter().
-   */
-  #[Hook('form_field_ui_form_display_overview_form_alter')]
-  public function formFieldUiFormDisplayOverviewFormAlter(&$form, FormStateInterface $form_state) : void {
-    $route_match = \Drupal::routeMatch();
-    if ($form['#entity_type'] == 'comment' && $route_match->getParameter('commented_entity_type')) {
-      $form['#title'] = \Drupal::service('comment.manager')->getFieldUIPageTitle($route_match->getParameter('commented_entity_type'), $route_match->getParameter('field_name'));
-    }
-  }
-
-  /**
-   * Implements hook_form_FORM_ID_alter().
-   */
-  #[Hook('form_field_ui_display_overview_form_alter')]
-  public function formFieldUiDisplayOverviewFormAlter(&$form, FormStateInterface $form_state) : void {
-    $route_match = \Drupal::routeMatch();
-    if ($form['#entity_type'] == 'comment' && $route_match->getParameter('commented_entity_type')) {
-      $form['#title'] = \Drupal::service('comment.manager')->getFieldUIPageTitle($route_match->getParameter('commented_entity_type'), $route_match->getParameter('field_name'));
     }
   }
 
@@ -337,7 +304,7 @@ class CommentHooks {
    * Implements hook_node_update_index().
    */
   #[Hook('node_update_index')]
-  public function nodeUpdateIndex(EntityInterface $node) {
+  public function nodeUpdateIndex(EntityInterface $node): string {
     $index_comments =& drupal_static('comment_node_update_index');
     if ($index_comments === NULL) {
       // Do not index in the following three cases:

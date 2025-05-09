@@ -17,6 +17,7 @@ use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\Url;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Hook\Attribute\Hook;
+use Drupal\Core\Hook\Order\Order;
 
 /**
  * Hook implementations for content_translation.
@@ -29,7 +30,7 @@ class ContentTranslationHooks {
    * Implements hook_help().
    */
   #[Hook('help')]
-  public function help($route_name, RouteMatchInterface $route_match) {
+  public function help($route_name, RouteMatchInterface $route_match): ?string {
     switch ($route_name) {
       case 'help.page.content_translation':
         $output = '';
@@ -79,6 +80,7 @@ class ContentTranslationHooks {
         }
         return $output;
     }
+    return NULL;
   }
 
   /**
@@ -138,7 +140,7 @@ class ContentTranslationHooks {
    *
    * @see \Drupal\Core\Entity\Annotation\EntityType
    */
-  #[Hook('entity_type_alter')]
+  #[Hook('entity_type_alter', order: Order::Last)]
   public function entityTypeAlter(array &$entity_types) : void {
     // Provide defaults for translation info.
     /** @var \Drupal\Core\Entity\EntityTypeInterface[] $entity_types */
@@ -220,7 +222,7 @@ class ContentTranslationHooks {
   /**
    * Implements hook_entity_bundle_info_alter().
    */
-  #[Hook('entity_bundle_info_alter')]
+  #[Hook('entity_bundle_info_alter', order: Order::First)]
   public function entityBundleInfoAlter(&$bundles): void {
     /** @var \Drupal\content_translation\ContentTranslationManagerInterface $content_translation_manager */
     $content_translation_manager = \Drupal::service('content_translation.manager');

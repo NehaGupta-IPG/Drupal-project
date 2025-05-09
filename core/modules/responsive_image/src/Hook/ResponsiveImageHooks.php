@@ -18,7 +18,7 @@ class ResponsiveImageHooks {
    * Implements hook_help().
    */
   #[Hook('help')]
-  public function help($route_name, RouteMatchInterface $route_match) {
+  public function help($route_name, RouteMatchInterface $route_match): ?string {
     switch ($route_name) {
       case 'help.page.responsive_image':
         $output = '';
@@ -68,6 +68,7 @@ class ResponsiveImageHooks {
       case 'entity.responsive_image_style.collection':
         return '<p>' . $this->t('A responsive image style associates an image style with each breakpoint defined by your theme.') . '</p>';
     }
+    return NULL;
   }
 
   /**
@@ -94,18 +95,6 @@ class ResponsiveImageHooks {
         ],
       ],
     ];
-  }
-
-  /**
-   * Implements hook_library_info_alter().
-   *
-   * Load responsive_image.js whenever ajax is added.
-   */
-  #[Hook('library_info_alter')]
-  public function libraryInfoAlter(array &$libraries, $module): void {
-    if ($module === 'core' && isset($libraries['drupal.ajax'])) {
-      $libraries['drupal.ajax']['dependencies'][] = 'responsive_image/ajax';
-    }
   }
 
 }

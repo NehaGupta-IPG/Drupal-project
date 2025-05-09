@@ -16,6 +16,9 @@ use Drupal\Core\Block\BlockPluginInterface;
 use Drupal\Core\Url;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Hook\Attribute\Hook;
+use Drupal\menu_link_content\Entity\MenuLinkContent;
+use Drupal\Core\Access\AccessResultInterface;
+use Drupal\Core\Entity\EntityTypeManagerInterface;
 
 /**
  * Hook implementations for menu_ui.
@@ -25,10 +28,20 @@ class MenuUiHooks {
   use StringTranslationTrait;
 
   /**
+   * Constructs a new MenuUiHooks object.
+   *
+   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
+   *   The entity type manager.
+   */
+  public function __construct(
+    protected EntityTypeManagerInterface $entityTypeManager,
+  ) {}
+
+  /**
    * Implements hook_help().
    */
   #[Hook('help')]
-  public function help($route_name, RouteMatchInterface $route_match) {
+  public function help($route_name, RouteMatchInterface $route_match): ?string {
     switch ($route_name) {
       case 'help.page.menu_ui':
         $output = '';
@@ -60,6 +73,7 @@ class MenuUiHooks {
     elseif ($route_name == 'entity.menu.collection' && \Drupal::moduleHandler()->moduleExists('block') && \Drupal::currentUser()->hasPermission('administer blocks')) {
       return '<p>' . $this->t('Each menu has a corresponding block that is managed on the <a href=":blocks">Block layout page</a>.', [':blocks' => Url::fromRoute('block.admin_display')->toString()]) . '</p>';
     }
+    return NULL;
   }
 
   /**
@@ -86,7 +100,29 @@ class MenuUiHooks {
   }
 
   /**
-   * Implements hook_form_BASE_FORM_ID_alter() for \Drupal\node\NodeForm.
+   * Check if user is allowed to use the menu link subform.
+   *
+   * @param array $defaults
+   *   An array that contains default values for the menu link form.
+   *
+   * @see menu_ui_get_menu_link_defaults()
+   */
+  protected function getMenuLinkContentAccess(array $defaults): AccessResultInterface {
+    if (!empty($defaults['entity_id'])) {
+      $entity = MenuLinkContent::load($defaults['entity_id']);
+
+      // The form can be used to edit or delete the menu link.
+      return $entity->access('update', NULL, TRUE)->andIf($entity->access('delete', NULL, TRUE));
+    }
+    else {
+      // If the node has no corresponding menu link, users needs to permission
+      // to create one.
+      return $this->entityTypeManager->getAccessControlHandler('menu_link_content')->createAccess(NULL, NULL, [], TRUE);
+    }
+  }
+
+  /**
+   * Implements hook_form_BASE_FORM_ID_alter() for \Drupal\node\Form\NodeForm.
    *
    * Adds menu item fields to the node form.
    *
@@ -127,7 +163,7 @@ class MenuUiHooks {
     $form['menu'] = [
       '#type' => 'details',
       '#title' => $this->t('Menu settings'),
-      '#access' => \Drupal::currentUser()->hasPermission('administer menu'),
+      '#access' => $this->getMenuLinkContentAccess($defaults),
       '#open' => (bool) $defaults['id'],
       '#group' => 'advanced',
       '#attached' => [
@@ -196,7 +232,7 @@ class MenuUiHooks {
   }
 
   /**
-   * Implements hook_form_FORM_ID_alter() for \Drupal\node\NodeTypeForm.
+   * Implements hook_form_FORM_ID_alter() for \Drupal\node\Form\NodeTypeForm.
    *
    * Adds menu options to the node type form.
    *

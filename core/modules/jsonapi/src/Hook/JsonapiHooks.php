@@ -22,7 +22,7 @@ class JsonapiHooks {
    * Implements hook_help().
    */
   #[Hook('help')]
-  public function help($route_name, RouteMatchInterface $route_match) {
+  public function help($route_name, RouteMatchInterface $route_match): ?string {
     switch ($route_name) {
       case 'help.page.jsonapi':
         $output = '<h2>' . $this->t('About') . '</h2>';
@@ -218,7 +218,7 @@ class JsonapiHooks {
   public function jsonapiShortcutFilterAccess(EntityTypeInterface $entity_type, AccountInterface $account): array {
     // @see \Drupal\shortcut\ShortcutAccessControlHandler::checkAccess()
     // \Drupal\jsonapi\Access\TemporaryQueryGuard adds the condition for
-    // (shortcut_set = $shortcut_set_storage->getDisplayedToUser($current_user)),
+    // "shortcut_set = $shortcut_set_storage->getDisplayedToUser($current_user)"
     // so this does not have to.
     return [
       JSONAPI_FILTER_AMONG_ALL => AccessResult::allowedIfHasPermission($account, 'administer shortcuts')->orIf(AccessResult::allowedIfHasPermissions($account, [
