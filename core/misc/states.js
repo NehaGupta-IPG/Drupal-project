@@ -349,7 +349,7 @@
       });
       // Remove the drupal once id to ensure states get reprocessed for this
       // dependent.
-      $(once.remove('states', $(this.element)));
+      once.remove('states', this.element);
     },
 
     /**
