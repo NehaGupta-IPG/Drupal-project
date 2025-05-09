@@ -102,45 +102,36 @@
       // Check if any previously missing dependees are now present in the DOM.
       // This may occur when elements added via ajax.
       // Keep track of any empty states.processedDependees keys to clean up.
-      const keysToDelete = [];
-      Object.keys(states.processedDependees).forEach((selector) => {
-        if (states.processedDependees[selector].length === 0) {
-          keysToDelete.push(selector);
-          return;
-        }
-        if (!states.processedDependees[selector][0].inDOM) {
-          const element = $(selector);
-          if (element.length > 0) {
-            // The previously missing dependee is now present. Remove all
-            // existing events to ensure associated states are re-processed.
-            states.processedDependees[selector].forEach((obj) => {
-              obj.dependent.destroy();
-            });
-          }
-          if (states.processedDependees[selector].length === 0) {
-            keysToDelete.push(selector);
-          }
+      Object.entries(states.processedDependees).forEach(([selector, dependees]) => {
+        // The previously missing dependee is now present.
+        if (dependees.length && !dependees[0].inDOM && $(selector).length > 0) {
+          // Remove all existing events to ensure associated states are
+          // re-processed.
+          dependees.forEach(({ dependent }) => {
+            dependent.destroy();
+          });
         }
       });
       // Cleanup empty states.processedDependees selectors.
-      keysToDelete.forEach((key) => {
-        delete states.processedDependees[key];
+      Object.keys(states.processedDependees).forEach((selector) => {
+        if (states.processedDependees[selector].length === 0) {
+          delete states.processedDependees[selector];
+        }
       });
+
       // Uses once to avoid duplicates if attach is called multiple times.
-      const elements = once('states', '[data-drupal-states]', context);
-      const il = elements.length;
-      for (let i = 0; i < il; i++) {
+      once('states', '[data-drupal-states]', context).forEach((element) => {
         const config = JSON.parse(
-          elements[i].getAttribute('data-drupal-states'),
+          element.getAttribute('data-drupal-states'),
         );
         Object.keys(config || {}).forEach((state) => {
           new states.Dependent({
-            element: $(elements[i]),
+            element: $(element),
             state: states.State.sanitize(state),
             constraints: config[state],
           });
         });
-      }
+      });
 
       // Execute all postponed functions now.
       states.postponed.forEach((func) => {
@@ -308,7 +299,6 @@
         const trigger = new states.Trigger({
           selector,
           state,
-          dependent: this,
         });
         this.triggers.push(trigger);
       });
@@ -578,14 +568,15 @@
     if (this.state in states.Trigger.states) {
       this.element = $(this.selector);
 
+      const initializedElements = once.filter(`states-trigger:${this.state.name}`, this.element);
+
       // If the trigger has already been initialized, check there is a postponed
       // function to trigger its state. If there isn't one, destroy the trigger
       // and re-initialize to ensure all states are applied when a target
       // element is loaded. This will also ensure duplicate events are not
       // added.
-      if (this.element.data(`trigger:${this.state}`)) {
-        const key = `${this.selector}|${this.state.name}`;
-        if (states.postponed.has(key)) {
+      if (initializedElements.length) {
+        if (states.postponed.has(`${this.selector}|${this.state.name}`)) {
           return;
         }
         this.destroy();
@@ -611,7 +602,7 @@
       }
 
       // Mark this trigger as initialized for this element.
-      this.element.data(`trigger:${this.state}`, true);
+      once(`states-trigger:${this.state}`, this.element);
     },
 
     /**
@@ -626,7 +617,7 @@
         });
       }
       // Mark this trigger as not initialized for this element.
-      this.element.data(`trigger:${this.state}`, false);
+      once.remove(`states-trigger:${this.state.name}`, this.element);
     },
 
     /**
