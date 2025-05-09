@@ -118,7 +118,6 @@ class CredentialForm extends MigrateUpgradeFormBase {
       ? ['migrate', $migrate_source_connection]
       : ['migrate'];
     $default_options = array_intersect($preferred_connections, $available_connections);
-    $source_connection_visible = !empty($options);
     $form['source_connection'] = [
       '#type' => 'select',
       '#title' => $this->t('Source connection'),
@@ -126,7 +125,7 @@ class CredentialForm extends MigrateUpgradeFormBase {
       '#default_value' => array_pop($default_options),
       '#empty_option' => $this->t('- User defined -'),
       '#description' => $this->t('Choose one of the keys from the $databases array or else select "User defined" and enter database credentials.'),
-      '#access' => $source_connection_visible,
+      '#access' => !empty($options),
     ];
 
     $form['database'] = [
@@ -134,30 +133,26 @@ class CredentialForm extends MigrateUpgradeFormBase {
       '#title' => $this->t('Source database'),
       '#description' => $this->t('Provide credentials for the database of the Drupal site you want to upgrade.'),
       '#open' => TRUE,
-    ];
-    if ($source_connection_visible) {
-      $form['database']['#states'] = [
-        'visible' => [
-          ':input[name=source_connection]' => ['value' => ''],
+      '#states' => [
+        '!visible' => [
+          ':input[name=source_connection]' => ['empty' => FALSE],
         ],
-      ];
-    }
+      ],
+    ];
 
     $form['database']['driver'] = [
       '#type' => 'radios',
       '#title' => $this->t('Database type'),
       '#required' => TRUE,
       '#default_value' => $default_driver,
+      '#states' => [
+        '!required' => [
+          ':input[name=source_connection]' => ['empty' => FALSE],
+        ],
+      ],
     ];
     if (count($drivers) == 1) {
       $form['database']['driver']['#disabled'] = TRUE;
-    }
-    if ($source_connection_visible) {
-      $form['database']['driver']['#states'] = [
-        'visible' => [
-          ':input[name=source_connection]' => ['value' => ''],
-        ],
-      ];
     }
 
     // Add driver-specific configuration options.
@@ -176,42 +171,27 @@ class CredentialForm extends MigrateUpgradeFormBase {
         'required' => [
           ':input[name=driver]' => ['value' => $key],
         ],
+        '!required' => [
+          ':input[name=source_connection]' => ['empty' => FALSE],
+        ],
       ];
-      if ($source_connection_visible) {
-        $form['database']['settings'][$key]['database']['#states'] = [
-          'required' => [
-            ':input[name=source_connection]' => ['value' => ''],
-            ':input[name=driver]' => ['value' => $key],
-          ],
-        ];
-      }
       if (!str_ends_with($key, '\\sqlite')) {
         $form['database']['settings'][$key]['username']['#states'] = [
           'required' => [
             ':input[name=driver]' => ['value' => $key],
           ],
+          '!required' => [
+            ':input[name=source_connection]' => ['empty' => FALSE],
+          ],
         ];
-        if ($source_connection_visible) {
-          $form['database']['settings'][$key]['username']['#states'] = [
-            'required' => [
-              ':input[name=source_connection]' => ['value' => ''],
-              ':input[name=driver]' => ['value' => $key],
-            ],
-          ];
-        }
         $form['database']['settings'][$key]['password']['#states'] = [
           'required' => [
             ':input[name=driver]' => ['value' => $key],
           ],
+          '!required' => [
+            ':input[name=source_connection]' => ['empty' => FALSE],
+          ],
         ];
-        if ($source_connection_visible) {
-          $form['database']['settings'][$key]['password']['#states'] = [
-            'required' => [
-              ':input[name=source_connection]' => ['value' => ''],
-              ':input[name=driver]' => ['value' => $key],
-            ],
-          ];
-        }
       }
 
       $form['database']['settings'][$key]['#prefix'] = '<h2 class="js-hide">' . $this->t('@driver_name settings', ['@driver_name' => $driver->name()]) . '</h2>';
