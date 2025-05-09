@@ -51,13 +51,8 @@ class UserPasswordResetTest extends WebDriverTestBase {
 
     // Create a user.
     $account = $this->drupalCreateUser(['access content']);
-
-    // Activate user by logging in.
-    $this->drupalLogin($account);
-
     $this->account = User::load($account->id());
     $this->account->pass_raw = $account->pass_raw;
-    $this->drupalLogout();
 
     // Set the last login time that is used to generate the one-time link so
     // that it is definitely over a second ago.
