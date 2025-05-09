@@ -60,7 +60,7 @@ interface MenuLinkManagerInterface extends PluginManagerInterface {
   public function removeDefinition($id, $persist = TRUE);
 
   /**
-   * Loads multiple plugin instances based on route.
+   * Loads multiple plugin instances based on a route name.
    *
    * @param string $route_name
    *   The route name.
@@ -73,6 +73,21 @@ interface MenuLinkManagerInterface extends PluginManagerInterface {
    *   An array of instances keyed by plugin ID.
    */
   public function loadLinksByRoute($route_name, array $route_parameters = [], $menu_name = NULL);
+
+  /**
+   * Loads multiple plugin instances based on route names.
+   *
+   * @param array $routes
+   *   An array of arrays. Each sub-array should contain the following keys:
+   *     - route_name: A route name string.
+   *     - route_parameters (optional): An array of route parameters.
+   * @param string $menu_name
+   *   (optional) Restricts the found links to just those in the named menu.
+   *
+   * @return \Drupal\Core\Menu\MenuLinkInterface[]
+   *   An array of instances keyed by plugin ID.
+   */
+  public function loadLinksByRoutes(array $routes, $menu_name = NULL);
 
   /**
    * Adds a new menu link definition to the menu tree storage.

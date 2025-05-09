@@ -74,7 +74,7 @@ interface MenuTreeStorageInterface {
   public function loadByProperties(array $properties);
 
   /**
-   * Loads multiple plugin definitions from the storage based on route.
+   * Loads multiple plugin definitions from the storage based on a route name.
    *
    * @param string $route_name
    *   The route name.
@@ -87,6 +87,21 @@ interface MenuTreeStorageInterface {
    *   An array of menu link definitions keyed by ID and ordered by depth.
    */
   public function loadByRoute($route_name, array $route_parameters = [], $menu_name = NULL);
+
+  /**
+   * Loads multiple plugin definitions from the storage based on route names.
+   *
+   * @param array $routes
+   *   An array of arrays. Each sub-array should contain the following keys:
+   *     - route_name: A route name string.
+   *     - route_parameters (optional): An array of route parameters.
+   * @param string $menu_name
+   *   (optional) Restricts the found links to just those in the named menu.
+   *
+   * @return array
+   *   An array of menu link definitions keyed by ID and ordered by depth.
+   */
+  public function loadByRoutes(array $routes, $menu_name = NULL);
 
   /**
    * Saves a plugin definition to the storage.

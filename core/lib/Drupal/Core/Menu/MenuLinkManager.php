@@ -295,8 +295,15 @@ class MenuLinkManager implements MenuLinkManagerInterface {
    * {@inheritdoc}
    */
   public function loadLinksByRoute($route_name, array $route_parameters = [], $menu_name = NULL) {
+    return $this->loadLinksByRoutes([$route_name], $route_parameters, $menu_name);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function loadLinksByRoutes(array $routes, $menu_name = NULL) {
     $instances = [];
-    $loaded = $this->treeStorage->loadByRoute($route_name, $route_parameters, $menu_name);
+    $loaded = $this->treeStorage->loadByRoutes($routes, $menu_name);
     foreach ($loaded as $plugin_id => $definition) {
       $instances[$plugin_id] = $this->createInstance($plugin_id);
     }

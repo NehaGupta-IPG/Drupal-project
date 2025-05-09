@@ -654,17 +654,35 @@ class MenuTreeStorage implements MenuTreeStorageInterface {
    * {@inheritdoc}
    */
   public function loadByRoute($route_name, array $route_parameters = [], $menu_name = NULL) {
-    // Sort the route parameters so that the query string will be the same.
-    asort($route_parameters);
-    // Since this will be urlencoded, it's safe to store and match against a
-    // text field.
-    // @todo Standardize an efficient way to load by route name and parameters
-    //   in place of system path. https://www.drupal.org/node/2302139
-    $param_key = $route_parameters ? UrlHelper::buildQuery($route_parameters) : '';
+    return $this->loadByRoutes([$route_name, $route_parameters], $menu_name);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function loadByRoutes(array $routes, $menu_name = NULL) {
     $query = $this->connection->select($this->table, NULL, $this->options);
     $query->fields($this->table, $this->definitionFields());
-    $query->condition('route_name', $route_name);
-    $query->condition('route_param_key', $param_key);
+    $or_group = $query->orConditionGroup();
+    foreach ($routes as $route) {
+      $and_group = $query->andConditionGroup()
+        ->condition('route_name', $route['route_name']);
+
+      if (isset($route['route_parameters'])) {
+        // Sort the route parameters so that the query string will be the same.
+        $route_parameters = $route['route_parameters'];
+        asort($route_parameters);
+        // Since this will be urlencoded, it's safe to store and match against a
+        // text field.
+        // @todo Standardize an efficient way to load by route name and
+        //   parameters in place of system path.
+        //   https://www.drupal.org/node/2302139
+        $param_key = $route_parameters ? UrlHelper::buildQuery($route_parameters) : '';
+        $and_group->condition('route_param_key', $param_key);
+      }
+      $or_group->condition($and_group);
+    }
+    $query->condition($or_group);
     if ($menu_name) {
       $query->condition('menu_name', $menu_name);
     }
