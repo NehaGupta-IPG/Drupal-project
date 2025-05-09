@@ -945,7 +945,8 @@ class DbLogTest extends BrowserTestBase {
     // Fetch the ID of the first log event in descending order (most recent).
     $query = \Drupal::database()->select('watchdog', 'w');
     $query->fields('w', ['wid']);
-    $query->orderBy('w.wid', 'DESC'); // Ensuring logs are ordered by descending wid.
+    // Ensuring logs are ordered by descending wid.
+    $query->orderBy('w.wid', 'DESC');
     $wid = $query->execute()->fetchField();
 
     // Navigate to the first event page.
@@ -980,7 +981,8 @@ class DbLogTest extends BrowserTestBase {
     $this->assertSession()->pageTextContains('Dblog test log message Entry #2');
 
     // Edge case for pagination with one log entry
-    $this->clearLogsEntries(); // Clear previous logs.
+    // Clear previous logs.
+    $this->clearLogsEntries();
     $this->submitForm([], 'Confirm');
     $this->generateLogEntries(1, ['timestamp' => \Drupal::time()->getRequestTime(), 'channel' => 'php']);
 
@@ -992,17 +994,22 @@ class DbLogTest extends BrowserTestBase {
 
     // Ensure no "Previous" or "Next" pagination links when only one log entry is available.
     $this->drupalGet('admin/reports/dblog/event/' . $wid);
-    $this->assertSession()->linkByHrefNotExists('admin/reports/dblog/event/' . ($wid - 1)); // No previous log
-    $this->assertSession()->linkByHrefNotExists('admin/reports/dblog/event/' . ($wid + 1)); // No next log
+    // No previous log
+    $this->assertSession()->linkByHrefNotExists('admin/reports/dblog/event/' . ($wid - 1));
+    // No next log
+    $this->assertSession()->linkByHrefNotExists('admin/reports/dblog/event/' . ($wid + 1));
 
     // Edge case for no logs.
-    $this->clearLogsEntries(); // Clear all logs.
+    // Clear all logs.
+    $this->clearLogsEntries();
     $this->submitForm([], 'Confirm');
 
     // Ensure no "Next" or "Previous" links when no logs exist.
     $this->drupalGet('admin/reports/dblog/event/0');
-    $this->assertSession()->linkByHrefNotExists('admin/reports/dblog/event/1'); // No logs at all.
-    $this->assertSession()->linkByHrefNotExists('admin/reports/dblog/event/-1'); // Invalid log ID.
+    // No logs at all.
+    $this->assertSession()->linkByHrefNotExists('admin/reports/dblog/event/1');
+    // Invalid log ID.
+    $this->assertSession()->linkByHrefNotExists('admin/reports/dblog/event/-1');
 
     // Edge case for log deletion after navigating.
     // Generate logs for testing.
@@ -1026,12 +1033,14 @@ class DbLogTest extends BrowserTestBase {
 
     // Verify the system no longer shows the deleted log and doesn't break the pagination.
     $this->drupalGet('admin/reports/dblog/event/' . $wid);
-    $this->assertSession()->statusCodeEquals(404); // Should return 404 if the log is deleted.
+    // Should return 404 if the log is deleted.
+    $this->assertSession()->statusCodeEquals(404);
 
     // Ensure pagination works correctly after deletion.
     $wid -= 1;
     $this->drupalGet('admin/reports/dblog/event/' . $wid);
-    $this->assertSession()->pageTextContains('Dblog test log message Entry #1'); // Should be on the next available log.
+    // Should be on the next available log.
+    $this->assertSession()->pageTextContains('Dblog test log message Entry #1');
   }
 
 }
