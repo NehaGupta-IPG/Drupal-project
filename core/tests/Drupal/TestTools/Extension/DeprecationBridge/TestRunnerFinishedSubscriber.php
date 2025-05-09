@@ -14,6 +14,10 @@ use PHPUnit\Event\TestRunner\FinishedSubscriber;
  */
 final class TestRunnerFinishedSubscriber implements FinishedSubscriber {
 
+  public function __construct(
+  ) {
+  }
+
   public function notify(Finished $event): void {
     DeprecationHandler::dumpStatistics();
   }
