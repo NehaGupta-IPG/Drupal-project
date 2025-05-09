@@ -665,6 +665,10 @@ class MenuTreeStorage implements MenuTreeStorageInterface {
     $query->fields($this->table, $this->definitionFields());
     $or_group = $query->orConditionGroup();
     foreach ($routes as $route) {
+      if (!isset($route['route_name'])) {
+        continue;
+      }
+
       $and_group = $query->andConditionGroup()
         ->condition('route_name', $route['route_name']);
 
@@ -682,7 +686,9 @@ class MenuTreeStorage implements MenuTreeStorageInterface {
       }
       $or_group->condition($and_group);
     }
-    $query->condition($or_group);
+    if ($or_group->count() > 0) {
+      $query->condition($or_group);
+    }
     if ($menu_name) {
       $query->condition('menu_name', $menu_name);
     }
