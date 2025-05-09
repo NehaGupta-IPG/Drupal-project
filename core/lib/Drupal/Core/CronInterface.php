@@ -14,7 +14,7 @@ interface CronInterface {
    *
    * This method performs several tasks:
    * - Ensures that the execution continues even if the request is cancelled.
-   * - Switches the current user to an anonymous to ensure permissions.
+   * - Switches the current user to the anonymous user to ensure access checks are bypassed for system tasks.
    * - Attempts to acquire a cron lock to prevent parallel executions.
    * - With the lock acquired, invokes handlers, runs queues, and sets timestamp.
    * - Restores the original user session after the cron run.
