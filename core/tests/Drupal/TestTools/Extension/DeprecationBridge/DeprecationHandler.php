@@ -164,7 +164,22 @@ final class DeprecationHandler implements Extension {
    * Dump statistics after test runner end.
    */
   public static function dumpStatistics(): void {
-    file_put_contents(self::$outputDirectory . \DIRECTORY_SEPARATOR . 'deprecation-ignore-stats.json', json_encode(self::$deprecationIgnorePatternsStatistics));
+    $test_run_id = getenv('DRUPAL_TEST_RUN_ID');
+
+    if (!empty($test_run_id)) {
+      $dumpFileName = "deprecation-ignore-stats-{$test_run_id}.json";
+    }
+    else {
+      $dumpFileName = "deprecation-ignore-stats.json";
+    }
+
+    echo self::$outputDirectory . \DIRECTORY_SEPARATOR . $dumpFileName;
+    if (!empty(self::$deprecationIgnorePatternsStatistics)) {
+      file_put_contents(
+        self::$outputDirectory . \DIRECTORY_SEPARATOR . $dumpFileName,
+        json_encode(self::$deprecationIgnorePatternsStatistics),
+      );
+    }
   }
 
   /**

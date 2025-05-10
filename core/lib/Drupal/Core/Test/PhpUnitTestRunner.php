@@ -118,6 +118,7 @@ class PhpUnitTestRunner implements ContainerInjectionInterface {
    * @internal
    */
   protected function runCommand(
+    string $test_run_id,
     string $test_class_name,
     string $log_junit_file_path,
     ?int &$status = NULL,
@@ -126,7 +127,10 @@ class PhpUnitTestRunner implements ContainerInjectionInterface {
     bool $colors = FALSE,
   ): void {
     global $base_url;
-    $process_environment_variables = [];
+
+    $process_environment_variables = [
+      'DRUPAL_TEST_RUN_ID' => $test_run_id,
+    ];
 
     // Setup an environment variable containing the database connection if
     // available, so that non-unit tests can connect to the database.
@@ -214,7 +218,7 @@ class PhpUnitTestRunner implements ContainerInjectionInterface {
     $output = [];
     $error = [];
     $start = microtime(TRUE);
-    $this->runCommand($test_class_name, $log_junit_file_path, $status, $output, $error, $colors);
+    $this->runCommand($test_run->id(), $test_class_name, $log_junit_file_path, $status, $output, $error, $colors);
     $time = microtime(TRUE) - $start;
 
     if (file_exists($log_junit_file_path)) {

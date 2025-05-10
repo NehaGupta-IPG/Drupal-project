@@ -123,7 +123,7 @@ default:
     reports:
       junit: ./sites/default/files/simpletest/phpunit-*.xml
     paths:
-      - test-artifacts/deprecation-handler
+      - core/test-artifacts/deprecation-handler
       - ./sites/default/files/simpletest/phpunit-*.xml
 
 .default-component-unit-test-job-settings: &default-component-unit-test-job-settings
