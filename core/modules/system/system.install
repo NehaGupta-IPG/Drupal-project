@@ -12,7 +12,6 @@ use Drupal\Component\Utility\Environment;
 use Drupal\Component\Utility\OpCodeCache;
 use Drupal\Component\Utility\Unicode;
 use Drupal\Core\Database\Database;
-use Drupal\Core\Datetime\Entity\DateFormat;
 use Drupal\Core\DrupalKernel;
 use Drupal\Core\Extension\ExtensionLifecycle;
 use Drupal\Core\File\FileSystemInterface;
@@ -1798,41 +1797,4 @@ function system_update_11201(): void {
     $schema->addField('router', 'alias', $spec['fields']['alias']);
     $schema->addIndex('router', 'alias', ['alias'], $spec);
   }
-}
-
-/**
- * Add date-only date formats.
- *
- * @see https://www.drupal.org/project/drupal/issues/3498980
- */
-function system_update_11209(): string {
-  $message = NULL;
-  $date_formats = [
-    'long_date_only' => [
-      'label' => t('Long date (date only)'),
-      'pattern' => t('l, j F Y', [], ['context' => 'PHP date format']),
-    ],
-    'medium_date_only' => [
-      'label' => t('medium date (date only)'),
-      'pattern' => t('D, j M Y', [], ['context' => 'PHP date format']),
-    ],
-    'short_date_only' => [
-      'label' => t('short date (date only)'),
-      'pattern' => t('j M Y', [], ['context' => 'PHP date format']),
-    ],
-  ];
-  foreach ($date_formats as $id => $date_format_info) {
-    if (!DateFormat::load($id)) {
-      $date_format = DateFormat::create([
-        'id' => $id,
-        'locked' => FALSE,
-        'status' => TRUE,
-        'pattern' => $date_format_info['pattern'],
-        'label' => $date_format_info['label'],
-      ]);
-      $message .= "Date format " . $date_format_info['label'] . " was created.\n";
-      $date_format->save();
-    }
-  }
-  return $message;
 }
