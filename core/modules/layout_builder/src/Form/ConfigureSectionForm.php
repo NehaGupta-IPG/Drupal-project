@@ -275,4 +275,34 @@ class ConfigureSectionForm extends FormBase implements WorkspaceDynamicSafeFormI
     return $this->section;
   }
 
+  /**
+   * Retrieves field delta.
+   *
+   * @return int
+   *   Field delta.
+   */
+  public function getDelta(): int {
+    return $this->delta;
+  }
+
+  /**
+   * Retrieves plugin ID.
+   *
+   * @return string
+   *   The plugin ID
+   */
+  public function getPluginId(): string {
+    return $this->pluginId;
+  }
+
+  /**
+   * Returns whether or not the current operation is creating or updating.
+   *
+   * @return bool
+   *   TRUE if updating existing entity, FALSE otherwise.
+   */
+  public function isUpdate(): bool {
+    return $this->isUpdate;
+  }
+
 }
