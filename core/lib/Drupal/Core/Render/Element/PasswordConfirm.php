@@ -70,7 +70,7 @@ class PasswordConfirm extends FormElementBase {
   public static function processPasswordConfirm(&$element, FormStateInterface $form_state, &$complete_form) {
     $element['pass1'] = [
       '#type' => 'password',
-      '#title' => t('Password'),
+      '#title' => t('New Password'),
       '#value' => empty($element['#value']) ? NULL : $element['#value']['pass1'],
       '#required' => $element['#required'],
       '#attributes' => [
@@ -81,7 +81,7 @@ class PasswordConfirm extends FormElementBase {
     ];
     $element['pass2'] = [
       '#type' => 'password',
-      '#title' => t('Confirm password'),
+      '#title' => t('Confirm New password'),
       '#value' => empty($element['#value']) ? NULL : $element['#value']['pass2'],
       '#required' => $element['#required'],
       '#attributes' => [
