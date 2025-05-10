@@ -37,7 +37,7 @@ final class DeprecationHandler implements Extension {
   /**
    * Usage statistics of ignored patterns.
    *
-   * @var array<string,array<string,non-negative-int>>
+   * @var array<string,array{pattern: string, message: string, php_version: string, database?: string}>
    */
   private static array $deprecationIgnorePatternsStatistics = [];
 
@@ -277,7 +277,17 @@ final class DeprecationHandler implements Extension {
       }
       if ((bool) $result) {
         $testName = $testCase ? $testCase->valueObjectForEvents()->id() : '#not-in-test';
-        self::$deprecationIgnorePatternsStatistics[$testName][$pattern] = isset(self::$deprecationIgnorePatternsStatistics[$testName][$pattern]) ? self::$deprecationIgnorePatternsStatistics[$testName][$pattern] + 1 : 1;
+        preg_match('/^\d+\.\d+/', \PHP_VERSION, $matches);
+        $tmp = [
+          'pattern' => $pattern,
+          'message' => $deprecationMessage,
+          'php_version' => $matches[0],
+        ];
+        $databaseInfo = getenv('_TARGET_DB');
+        if (!empty($databaseInfo)) {
+          $tmp['database'] = $databaseInfo;
+        }
+        self::$deprecationIgnorePatternsStatistics[$testName][] = $tmp;
         return TRUE;
       }
     }
