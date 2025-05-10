@@ -2,6 +2,6 @@ langcode: en
 status: true
 dependencies: {  }
 id: medium_date_only
-label: 'Medium date (date only)'
+label: 'Default Medium date (date only)'
 locked: false
 pattern: 'D, j M Y'

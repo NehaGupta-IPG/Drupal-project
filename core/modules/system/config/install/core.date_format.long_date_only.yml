@@ -2,6 +2,6 @@ langcode: en
 status: true
 dependencies: {  }
 id: long_date_only
-label: 'Long date (date only)'
+label: 'Default Long date (date only)'
 locked: false
 pattern: 'l, j F Y'

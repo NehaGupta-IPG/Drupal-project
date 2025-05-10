@@ -2,6 +2,6 @@ langcode: en
 status: true
 dependencies: {  }
 id: short_date_only
-label: 'Short date (date only)'
+label: 'Default Short date (date only)'
 locked: false
 pattern: 'j M Y'
