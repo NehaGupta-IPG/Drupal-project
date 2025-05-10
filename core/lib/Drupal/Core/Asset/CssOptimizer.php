@@ -189,6 +189,13 @@ class CssOptimizer implements AssetOptimizerInterface {
     // well.
     $file = $this->loadFile($filename, NULL, FALSE);
 
+    // Get CSS layer if it exists.
+    $layer = isset($matches[2]) ? str_replace(['layer(', ')'], '', $matches[2]) : FALSE;
+
+    if ($layer) {
+      $file = "@layer $layer { $file }";
+    }
+
     // Determine the file's directory.
     $directory = dirname($filename);
     // If the file is in the current directory, make sure '.' doesn't appear in
@@ -262,7 +269,7 @@ class CssOptimizer implements AssetOptimizerInterface {
     // This happens recursively but omits external files and local files
     // with supports- or media-query qualifiers, as those are conditionally
     // loaded depending on the user agent.
-    $contents = preg_replace_callback('/@import\s*(?:url\(\s*)?[\'"]?(?![a-z]+:)(?!\/\/)([^\'"\()]+)[\'"]?\s*\)?\s*;/', [$this, 'loadNestedFile'], $contents);
+    $contents = preg_replace_callback('/@import\s*(?:url\(\s*)?[\'"]?(?![a-z]+:)(?!\/\/)([^\'"\()]+)[\'"]?\s*\)?\s*(layer\([a-z]+\))?\s*;/', [$this, 'loadNestedFile'], $contents);
 
     return $contents;
   }
