@@ -47,7 +47,7 @@ final class BootstrapErrorHandler {
    * @param int $errorLine
    *   The line number the error was raised at.
    * @param \PHPUnit\Framework\TestCase|null $testCase
-   *   The test case being executed, or NULL if error occured outside of a
+   *   The test case being executed, or NULL if error occurred outside of a
    *   test.
    *
    * @return bool
