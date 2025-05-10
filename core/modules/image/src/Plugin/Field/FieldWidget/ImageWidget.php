@@ -34,13 +34,6 @@ class ImageWidget extends FileWidget {
   protected $imageFactory;
 
   /**
-   * The entity repository.
-   *
-   * @var \Drupal\Core\Entity\EntityRepositoryInterface
-   */
-  protected $entityRepository;
-
-  /**
    * Constructs an ImageWidget object.
    *
    * @param string $plugin_id
