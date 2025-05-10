@@ -98,6 +98,8 @@ class PhpUnitTestRunner implements ContainerInjectionInterface {
   /**
    * Executes the PHPUnit command.
    *
+   * @param string $test_run_id
+   *   The test run id.
    * @param string $test_class_name
    *   A fully qualified test class name.
    * @param string $log_junit_file_path

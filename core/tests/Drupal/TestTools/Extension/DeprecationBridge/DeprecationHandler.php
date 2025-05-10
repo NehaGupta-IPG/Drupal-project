@@ -173,7 +173,6 @@ final class DeprecationHandler implements Extension {
       $dumpFileName = "deprecation-ignore-stats.json";
     }
 
-    echo self::$outputDirectory . \DIRECTORY_SEPARATOR . $dumpFileName;
     if (!empty(self::$deprecationIgnorePatternsStatistics)) {
       file_put_contents(
         self::$outputDirectory . \DIRECTORY_SEPARATOR . $dumpFileName,
@@ -262,6 +261,8 @@ final class DeprecationHandler implements Extension {
    * Deprecations that match the patterns included in the ignore file should
    * be ignored.
    *
+   * @param \PHPUnit\Framework\TestCase|null $testCase
+   *   The test case being executed.
    * @param string $deprecationMessage
    *   The actual deprecation message triggered via trigger_error().
    */
