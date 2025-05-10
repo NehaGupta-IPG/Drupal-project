@@ -31,7 +31,7 @@
   <extensions>
     <!-- Deprecation handler. -->
     <bootstrap class="Drupal\TestTools\Extension\DeprecationBridge\DeprecationHandler">
-      <parameter name="outputDirectory" value="sites/test-artifacts/deprecation-handler"/>
+      <parameter name="outputDirectory" value="test-artifacts/deprecation-handler"/>
     </bootstrap>
   </extensions>
   <testsuites>

@@ -6,6 +6,7 @@ namespace Drupal\TestTools\ErrorHandler;
 
 use Drupal\TestTools\Extension\DeprecationBridge\DeprecationHandler;
 use PHPUnit\Event\Code\NoTestCaseObjectOnCallStackException;
+use PHPUnit\Framework\TestCase;
 use PHPUnit\Runner\ErrorHandler as PhpUnitErrorHandler;
 
 /**
@@ -50,7 +51,13 @@ final class BootstrapErrorHandler {
    *   TRUE to stop error handling, FALSE to let the normal error handler
    *   continue.
    */
-  public function __invoke(int $errorNumber, string $errorString, string $errorFile, int $errorLine): bool {
+  public function __invoke(
+    int $errorNumber,
+    string $errorString,
+    string $errorFile,
+    int $errorLine,
+    ?TestCase $testCase = NULL,
+  ): bool {
     if (!DeprecationHandler::isEnabled()) {
       throw new \RuntimeException(__METHOD__ . '() must not be called if the deprecation handler is not enabled.');
     }
@@ -63,7 +70,7 @@ final class BootstrapErrorHandler {
 
     // If the deprecation handled is one of those in the ignore list, we keep
     // running.
-    if ((E_USER_DEPRECATED === $errorNumber || E_DEPRECATED === $errorNumber) && DeprecationHandler::isIgnoredDeprecation($errorString)) {
+    if ((E_USER_DEPRECATED === $errorNumber || E_DEPRECATED === $errorNumber) && DeprecationHandler::isIgnoredDeprecation($testCase, $errorString)) {
       return TRUE;
     }
 

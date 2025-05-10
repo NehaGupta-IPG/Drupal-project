@@ -37,7 +37,7 @@ final class DeprecationHandler implements Extension {
   /**
    * Usage statistics of ignored patterns.
    *
-   * @var array<string,non-negative-int>
+   * @var array<string,array<string,non-negative-int>>
    */
   private static array $deprecationIgnorePatternsStatistics = [];
 
@@ -148,7 +148,6 @@ final class DeprecationHandler implements Extension {
           if ((trim($pattern)[0] ?? '#') !== '#') {
             preg_match($pattern, '');
             self::$deprecationIgnorePatterns[] = $pattern;
-            self::$deprecationIgnorePatternsStatistics[$pattern] = 0;
           }
         }
       }
@@ -165,7 +164,6 @@ final class DeprecationHandler implements Extension {
    * Dump statistics after test runner end.
    */
   public static function dumpStatistics(): void {
-    arsort(self::$deprecationIgnorePatternsStatistics, \SORT_NUMERIC);
     file_put_contents(self::$outputDirectory . \DIRECTORY_SEPARATOR . 'deprecation-ignore-stats.json', json_encode(self::$deprecationIgnorePatternsStatistics));
   }
 
@@ -252,7 +250,7 @@ final class DeprecationHandler implements Extension {
    * @param string $deprecationMessage
    *   The actual deprecation message triggered via trigger_error().
    */
-  public static function isIgnoredDeprecation(string $deprecationMessage): bool {
+  public static function isIgnoredDeprecation(?TestCase $testCase, string $deprecationMessage): bool {
     if (!self::$deprecationIgnorePatterns) {
       return FALSE;
     }
@@ -262,7 +260,8 @@ final class DeprecationHandler implements Extension {
         throw new \RuntimeException(preg_last_error_msg());
       }
       if ((bool) $result) {
-        self::$deprecationIgnorePatternsStatistics[$pattern]++;
+        $testName = $testCase ? $testCase->valueObjectForEvents()->id() : '#not-in-test';
+        self::$deprecationIgnorePatternsStatistics[$testName][$pattern] = isset(self::$deprecationIgnorePatternsStatistics[$testName][$pattern]) ? self::$deprecationIgnorePatternsStatistics[$testName][$pattern] + 1 : 1;
         return TRUE;
       }
     }

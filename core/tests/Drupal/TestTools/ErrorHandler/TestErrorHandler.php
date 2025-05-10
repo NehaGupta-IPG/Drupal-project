@@ -68,7 +68,7 @@ final class TestErrorHandler {
     // In all other cases (errors, warnings, deprecations in normal tests), we
     // fall back to the parent error handler, which is the one that was
     // registered in the test runner bootstrap (BootstrapErrorHandler).
-    call_user_func($this->parentHandler, $errorNumber, $errorString, $errorFile, $errorLine);
+    call_user_func($this->parentHandler, $errorNumber, $errorString, $errorFile, $errorLine, $this->testCase);
     return TRUE;
   }
 
