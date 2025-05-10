@@ -16,6 +16,7 @@ use Drupal\Component\Utility\Html;
 use Drupal\Component\Utility\Timer;
 use Drupal\Core\Composer\Composer;
 use Drupal\Core\Database\Database;
+use Drupal\Core\File\FileSystemInterface;
 use Drupal\Core\Test\EnvironmentCleaner;
 use Drupal\Core\Test\PhpUnitTestRunner;
 use Drupal\Core\Test\SimpletestTestRunResultsStorage;
@@ -202,6 +203,25 @@ TestDatabase::releaseAllTestLocks();
 
 // Display results before database is cleared.
 simpletest_script_reporter_display_results($test_run_results_storage);
+
+// CONSOLIDATE.
+$files = \Drupal::service(FileSystemInterface::class)->scanDirectory(
+  \Drupal::root() . \DIRECTORY_SEPARATOR . 'core' . \DIRECTORY_SEPARATOR . 'test-artifacts' . \DIRECTORY_SEPARATOR . 'deprecation-handler',
+  '/^deprecation-ignore-stats.*\.json$/',
+);
+
+$tmp = [];
+foreach ($files as $file) {
+  $contents = json_decode(file_get_contents($file->uri));
+  foreach ($contents as $testCase => $stats) {
+    $tmp[$testCase] = array_merge($tmp[$testCase] ?? [], $stats);
+  }
+}
+
+$outputDirectory = \Drupal::root() . \DIRECTORY_SEPARATOR . 'test-artifacts' . \DIRECTORY_SEPARATOR . 'deprecation-handler';
+\Drupal::service(FileSystemInterface::class)->prepareDirectory($outputDirectory, FileSystemInterface::CREATE_DIRECTORY);
+file_put_contents($outputDirectory . \DIRECTORY_SEPARATOR . "deprecation-ignore-stats.json", json_encode($tmp));
+// \Drupal::service(FileSystemInterface::class)->deleteRecursive(\Drupal::root() . \DIRECTORY_SEPARATOR . 'core' . \DIRECTORY_SEPARATOR . 'test-artifacts');
 
 if ($args['xml']) {
   simpletest_script_reporter_write_xml_results($test_run_results_storage);

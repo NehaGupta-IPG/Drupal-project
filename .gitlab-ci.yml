@@ -123,6 +123,7 @@ default:
     reports:
       junit: ./sites/default/files/simpletest/phpunit-*.xml
     paths:
+      - test-artifacts
       - core/test-artifacts/deprecation-handler
       - ./sites/default/files/simpletest/phpunit-*.xml
 
@@ -152,7 +153,7 @@ default:
     paths:
       - junit.xml
       - component-coverage*
-      - test-artifacts/deprecation-handler
+      - test-artifacts
 
 .prepare-lint-directory: &prepare-lint-directory
   # PHPStan and yarn linting use absolute paths to determine cache validity. Because GitLab CI

@@ -35,6 +35,7 @@ default:
     reports:
       junit: ./sites/default/files/simpletest/phpunit-*.xml
     paths:
+      - test-artifacts
       - core/test-artifacts/deprecation-handler
       - ./sites/default/files/simpletest/phpunit-*.xml
       - ./sites/simpletest/browser_output
