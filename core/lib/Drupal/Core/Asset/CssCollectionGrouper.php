@@ -32,6 +32,7 @@ class CssCollectionGrouper implements AssetCollectionGrouperInterface {
     // When creating a new group, we pre-increment $i, so by initializing it to
     // -1, the first group will have index 0.
     $i = -1;
+    $group_map = [];
     foreach ($css_assets as $item) {
 
       // If the item can be grouped with other items, set $group_keys to an
@@ -52,13 +53,23 @@ class CssCollectionGrouper implements AssetCollectionGrouperInterface {
           // together items that share the same 'group' value. The CSS optimizer
           // adds inline 'media' statements for everything except 'print', so
           // only vary groups based on that.
-          $group_keys = $item['preprocess'] ? [$item['type'], $item['group'], $item['media'] === 'print'] : FALSE;
+          $group_keys = $item['preprocess'] ? [$item['type'], $item['group'], $item['media']] : FALSE;
           break;
 
         case 'external':
           // Do not group external items.
           $group_keys = FALSE;
           break;
+      }
+
+      $group_exists = array_search($group_keys, $group_map);
+
+      if ($group_exists) {
+        $i = $group_exists;
+        $current_group_keys = $group_map[$i];
+      }
+      else {
+        $i = array_key_last($group_map) ?? -1;
       }
 
       // If the group keys don't match the most recent group we're working with,
@@ -70,12 +81,10 @@ class CssCollectionGrouper implements AssetCollectionGrouperInterface {
         // properties are unique to the item and should not be carried over to
         // the group.
         $groups[$i] = $item;
-        if ($item['media'] !== 'print') {
-          $groups[$i]['media'] = 'all';
-        }
         unset($groups[$i]['data'], $groups[$i]['weight'], $groups[$i]['basename']);
         $groups[$i]['items'] = [];
         $current_group_keys = $group_keys ? $group_keys : NULL;
+        $group_map[$i] = $group_keys;
       }
 
       // Add the item to the current group.
