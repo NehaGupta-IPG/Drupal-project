@@ -35,13 +35,6 @@ final class DeprecationHandler implements Extension {
   private static array $deprecationIgnorePatterns = [];
 
   /**
-   * Usage statistics of ignored patterns.
-   *
-   * @var array<string,array{pattern: string, message: string, php_version: string, database?: string}>
-   */
-  private static array $deprecationIgnorePatternsStatistics = [];
-
-  /**
    * A list of expected deprecation messages.
    *
    * @var list<string>
@@ -76,6 +69,7 @@ final class DeprecationHandler implements Extension {
       return;
     }
     self::$outputDirectory = $realDirectory;
+    putenv("DRUPAL_TEST_ARTIFACTS_DIRECTORY={$realDirectory}");
 
     $facade->registerSubscriber(new TestRunnerFinishedSubscriber());
   }
@@ -164,21 +158,46 @@ final class DeprecationHandler implements Extension {
    * Dump statistics after test runner end.
    */
   public static function dumpStatistics(): void {
+    $outputDirectory = getenv('DRUPAL_TEST_ARTIFACTS_DIRECTORY');
     $test_run_id = getenv('DRUPAL_TEST_RUN_ID');
-
     if (!empty($test_run_id)) {
       $dumpFileName = "deprecation-ignore-stats-{$test_run_id}.json";
     }
     else {
       $dumpFileName = "deprecation-ignore-stats.json";
     }
-
-    if (!empty(self::$deprecationIgnorePatternsStatistics)) {
-      file_put_contents(
-        self::$outputDirectory . \DIRECTORY_SEPARATOR . $dumpFileName,
-        json_encode(self::$deprecationIgnorePatternsStatistics),
-      );
+    $content = @file_get_contents($outputDirectory . \DIRECTORY_SEPARATOR . $dumpFileName);
+    if (empty($content)) {
+      return;
     }
+    $encodedStats = explode("\n", $content);
+    $stats = [];
+    foreach ($encodedStats as $encodedStat) {
+      $stats[] = (array) json_decode(base64_decode($encodedStat));
+    }
+    file_put_contents(
+      self::$outputDirectory . \DIRECTORY_SEPARATOR . $dumpFileName,
+      json_encode($stats),
+    );
+  }
+
+  /**
+   * Dump statistics after test runner end.
+   */
+  private static function writeStatisticEntry(array $info): void {
+    $outputDirectory = getenv('DRUPAL_TEST_ARTIFACTS_DIRECTORY');
+    $test_run_id = getenv('DRUPAL_TEST_RUN_ID');
+    if (!empty($test_run_id)) {
+      $dumpFileName = "deprecation-ignore-stats-{$test_run_id}.json";
+    }
+    else {
+      $dumpFileName = "deprecation-ignore-stats.json";
+    }
+    file_put_contents(
+      $outputDirectory . \DIRECTORY_SEPARATOR . $dumpFileName,
+      base64_encode(json_encode($info)) . "\n",
+      \FILE_APPEND,
+    );
   }
 
   /**
@@ -278,16 +297,17 @@ final class DeprecationHandler implements Extension {
       if ((bool) $result) {
         $testName = $testCase ? $testCase->valueObjectForEvents()->id() : '#not-in-test';
         preg_match('/^\d+\.\d+/', \PHP_VERSION, $matches);
-        $tmp = [
+        $stat = [
+          'test' => $testName,
           'pattern' => $pattern,
           'message' => $deprecationMessage,
           'php_version' => $matches[0],
         ];
         $databaseInfo = getenv('_TARGET_DB');
         if (!empty($databaseInfo)) {
-          $tmp['database'] = $databaseInfo;
+          $stat['database'] = $databaseInfo;
         }
-        self::$deprecationIgnorePatternsStatistics[$testName][] = $tmp;
+        self::writeStatisticEntry($stat);
         return TRUE;
       }
     }

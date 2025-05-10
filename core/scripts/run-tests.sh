@@ -213,9 +213,7 @@ $files = \Drupal::service(FileSystemInterface::class)->scanDirectory(
 $tmp = [];
 foreach ($files as $file) {
   $contents = json_decode(file_get_contents($file->uri));
-  foreach ($contents as $testCase => $stats) {
-    $tmp[$testCase] = array_merge($tmp[$testCase] ?? [], $stats);
-  }
+  $tmp = array_merge($tmp, $contents);
 }
 
 $outputDirectory = \Drupal::root() . \DIRECTORY_SEPARATOR . 'test-artifacts' . \DIRECTORY_SEPARATOR . 'deprecation-handler';
