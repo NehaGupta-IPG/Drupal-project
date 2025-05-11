@@ -126,8 +126,6 @@ class MenuLinkManager implements MenuLinkManagerInterface {
 
   /**
    * {@inheritdoc}
-   *
-   * @phpstan-return array<string, PluginDefinition>
    */
   public function getDefinitions() {
     // Since this function is called rarely, instantiate the discovery here.
@@ -170,10 +168,6 @@ class MenuLinkManager implements MenuLinkManagerInterface {
 
   /**
    * {@inheritdoc}
-   *
-   * @return ($exception_on_invalid is true ? PluginDefinition : PluginDefinition|false)
-   *   A plugin exception, or FALSE or an exception if a plugin does not exist
-   *   with the given ID.
    */
   public function getDefinition($plugin_id, $exception_on_invalid = TRUE) {
     $definition = $this->treeStorage->load($plugin_id);

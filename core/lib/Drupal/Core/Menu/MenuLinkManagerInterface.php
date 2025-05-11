@@ -56,6 +56,9 @@ use Drupal\Component\Plugin\PluginManagerInterface;
  *     url?: \Drupal\Core\Url|null,
  *     weight?: int|null,
  *   }
+ *
+ * @method array<string, PluginDefinition> getDefinitions()
+ * @method ($exception_on_invalid is true ? PluginDefinition : PluginDefinition|false) getDefinition($plugin_id, $exception_on_invalid = TRUE)
  */
 interface MenuLinkManagerInterface extends PluginManagerInterface {
 
@@ -139,7 +142,7 @@ interface MenuLinkManagerInterface extends PluginManagerInterface {
    *
    * @param string $id
    *   The menu link plugin ID.
-   * @param array $new_definition_values
+   * @param PluginDefinitionPartial $new_definition_values
    *   The new values for the link definition. This will usually be just a
    *   subset of the plugin definition.
    * @param bool $persist
