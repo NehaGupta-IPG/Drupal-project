@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\node;
+namespace Drupal\node\Form;
 
 use Drupal\Component\Datetime\TimeInterface;
 use Drupal\Core\Datetime\DateFormatterInterface;
@@ -163,7 +163,7 @@ class NodeForm extends ContentEntityForm {
     $form['meta']['author'] = [
       '#type' => 'item',
       '#title' => $this->t('Author'),
-      '#markup' => $node->getOwner()->getAccountName(),
+      '#markup' => $node->getOwner()?->getAccountName(),
       '#wrapper_attributes' => ['class' => ['entity-meta__author']],
     ];
 
