@@ -703,4 +703,4 @@ default:
   script:
     - find test-artifacts
     - find core/test-artifacts/deprecation-handler
-    - cat test-artifacts/env.txt
+    - cat test-artifacts/deprecation-handler/env.txt
