@@ -204,24 +204,46 @@ TestDatabase::releaseAllTestLocks();
 // Display results before database is cleared.
 simpletest_script_reporter_display_results($test_run_results_storage);
 
-// CONSOLIDATE.
-$files = \Drupal::service(FileSystemInterface::class)->scanDirectory(
-  \Drupal::root() . \DIRECTORY_SEPARATOR . 'core' . \DIRECTORY_SEPARATOR . 'test-artifacts' . \DIRECTORY_SEPARATOR . 'deprecation-handler',
-  '/^deprecation-ignore-stats.*\.json$/',
-);
+// CONSOLIDATE. --------------------
 
-$tmp = [];
-foreach ($files as $file) {
-  $contents = json_decode(file_get_contents($file->uri));
-  foreach ($contents as $key => $count) {
-    $tmp[$key] = isset($tmp[$key]) ? $tmp[$key] + $count : $count;
+try {
+  $files = \Drupal::service(FileSystemInterface::class)->scanDirectory(
+    \Drupal::root() . \DIRECTORY_SEPARATOR . 'core' . \DIRECTORY_SEPARATOR . 'test-artifacts' . \DIRECTORY_SEPARATOR . 'deprecation-handler',
+    '/^deprecation-ignore-stats.*\.json$/',
+  );
+
+  $tmp = [];
+  foreach ($files as $file) {
+    $contents = json_decode(file_get_contents($file->uri));
+    foreach ($contents as $key => $count) {
+      $tmp[$key] = isset($tmp[$key]) ? $tmp[$key] + $count : $count;
+    }
   }
+
+  $outputDirectory = \Drupal::root() . \DIRECTORY_SEPARATOR . 'test-artifacts' . \DIRECTORY_SEPARATOR . 'deprecation-handler';
+  \Drupal::service(FileSystemInterface::class)->prepareDirectory($outputDirectory, FileSystemInterface::CREATE_DIRECTORY);
+  file_put_contents($outputDirectory . \DIRECTORY_SEPARATOR . "deprecation-ignore-stats.json", json_encode($tmp));
+  // \Drupal::service(FileSystemInterface::class)->deleteRecursive(\Drupal::root() . \DIRECTORY_SEPARATOR . 'core' . \DIRECTORY_SEPARATOR . 'test-artifacts');
+
+
+  echo "\n\nDeprecation ignore stats\n";
+  echo "    Usage# Line\n";
+  echo "----------------------------------\n";
+  foreach (file(\Drupal::root() . \DIRECTORY_SEPARATOR . 'core' . \DIRECTORY_SEPARATOR . '.deprecation-ignore.txt') as $line => $pattern) {
+    if ((trim($pattern)[0] ?? '#') !== '#') {
+      echo sprintf("%10d %s\n", $tmp[$pattern] ?? 0, trim_with_ellipsis(rtrim($pattern, "\n"), 80, \STR_PAD_RIGHT));
+    }
+    else {
+      echo sprintf("           %s\n", trim_with_ellipsis(rtrim($pattern, "\n"), 80, \STR_PAD_RIGHT));
+    }
+  }
+  echo "----------------------------------\n";
+}
+catch (\Exception) {
+  // Do nothing.
 }
 
-$outputDirectory = \Drupal::root() . \DIRECTORY_SEPARATOR . 'test-artifacts' . \DIRECTORY_SEPARATOR . 'deprecation-handler';
-\Drupal::service(FileSystemInterface::class)->prepareDirectory($outputDirectory, FileSystemInterface::CREATE_DIRECTORY);
-file_put_contents($outputDirectory . \DIRECTORY_SEPARATOR . "deprecation-ignore-stats.json", json_encode($tmp));
-// \Drupal::service(FileSystemInterface::class)->deleteRecursive(\Drupal::root() . \DIRECTORY_SEPARATOR . 'core' . \DIRECTORY_SEPARATOR . 'test-artifacts');
+// CONSOLIDATE. --------------------
 
 if ($args['xml']) {
   simpletest_script_reporter_write_xml_results($test_run_results_storage);
