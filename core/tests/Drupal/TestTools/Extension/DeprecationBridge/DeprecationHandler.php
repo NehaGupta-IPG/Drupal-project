@@ -12,6 +12,8 @@ use PHPUnit\Runner\Extension\ParameterCollection;
 use PHPUnit\TextUI\Configuration\Configuration;
 use PHPUnit\Util\Filesystem;
 
+// cspell:ignore depsta
+
 /**
  * Drupal's PHPUnit extension to manage code deprecation.
  *
@@ -203,7 +205,8 @@ final class DeprecationHandler implements Extension {
     $configEnv = getenv('_DRUPAL_DEPRECATION_HANDLER_CONFIG');
 
     if (empty($artifactEnv) || empty($configEnv)) {
-      throw new \RuntimeException("Missing configuration.");
+      // If no config available, we cannot record the stats.
+      return;
     }
 
     $artifact = (array) json_decode($artifactEnv);
