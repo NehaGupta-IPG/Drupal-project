@@ -116,6 +116,10 @@ class BlockPageVariant extends VariantBase implements PageVariantInterface, Cont
    * {@inheritdoc}
    */
   public function setTitle($title) {
+    if (!$title instanceof \Stringable && !$title instanceof TranslatableMarkup && !is_string($title)) {
+      throw new \InvalidArgumentException('Title is a ' . \gettype($title));
+    }
+
     $this->title = $title;
     return $this;
   }
