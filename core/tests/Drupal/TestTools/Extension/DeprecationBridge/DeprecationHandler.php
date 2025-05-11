@@ -185,7 +185,7 @@ final class DeprecationHandler implements Extension {
     foreach ($encodedStats as $encodedStat) {
       $tmp = (array) json_decode(base64_decode($encodedStat));
       if (!empty($tmp)) {
-        $stats[] = $tmp;
+        $stats[$tmp['pattern']] = isset($stats[$tmp['pattern']]) ? $stats[$tmp['pattern']] + 1 : 1;
       }
     }
 
