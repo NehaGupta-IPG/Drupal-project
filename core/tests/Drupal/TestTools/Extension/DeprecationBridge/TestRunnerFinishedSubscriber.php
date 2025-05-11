@@ -18,7 +18,7 @@ final class TestRunnerFinishedSubscriber implements FinishedSubscriber {
   }
 
   public function notify(Finished $event): void {
-    DeprecationHandler::dumpStatistics();
+    DeprecationHandler::processStatisticsArtifact();
   }
 
 }

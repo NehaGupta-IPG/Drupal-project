@@ -29,9 +29,12 @@
     <!-- <env name="SYMFONY_DEPRECATIONS_HELPER" value="ignoreFile=.deprecation-ignore.txt"/> -->
   </php>
   <extensions>
+    <!-- Artifacts handler. -->
+    <bootstrap class="Drupal\TestTools\Extension\Artifact\ArtifactHandler">
+      <parameter name="directory" value="test-artifacts"/>
+    </bootstrap>
     <!-- Deprecation handler. -->
     <bootstrap class="Drupal\TestTools\Extension\DeprecationBridge\DeprecationHandler">
-      <parameter name="outputDirectory" value="test-artifacts/deprecation-handler"/>
     </bootstrap>
   </extensions>
   <testsuites>

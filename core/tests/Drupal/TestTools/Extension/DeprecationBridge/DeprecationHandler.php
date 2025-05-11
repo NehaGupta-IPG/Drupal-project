@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\TestTools\Extension\DeprecationBridge;
 
+use Drupal\TestTools\Extension\Artifact\ArtifactHandler;
 use PHPUnit\Framework\TestCase;
 use PHPUnit\Runner\Extension\Extension;
 use PHPUnit\Runner\Extension\Facade;
@@ -61,16 +62,6 @@ final class DeprecationHandler implements Extension {
     Facade $facade,
     ParameterCollection $parameters,
   ): void {
-    $directory = $parameters->get('outputDirectory');
-    Filesystem::createDirectory($directory);
-    $realDirectory = realpath($directory);
-    if ($realDirectory === FALSE || !is_dir($realDirectory) || !is_writable($realDirectory)) {
-      print "Test artifacts directory {$directory} is not a writable directory.\n\n";
-      return;
-    }
-    self::$outputDirectory = $realDirectory;
-    putenv("DRUPAL_TEST_ARTIFACTS_DIRECTORY={$realDirectory}");
-
     $facade->registerSubscriber(new TestRunnerFinishedSubscriber());
   }
 
@@ -157,8 +148,8 @@ final class DeprecationHandler implements Extension {
   /**
    * Dump statistics after test runner end.
    */
-  public static function dumpStatistics(): void {
-    $outputDirectory = getenv('DRUPAL_TEST_ARTIFACTS_DIRECTORY');
+  public static function processStatisticsArtifact(): void {
+    $outputDirectory = ArtifactHandler::directory() . \DIRECTORY_SEPARATOR . 'deprecation-handler';
     $test_run_id = getenv('DRUPAL_TEST_RUN_ID');
     if (!empty($test_run_id)) {
       $dumpFileName = "deprecation-ignore-stats-{$test_run_id}.json";
@@ -173,19 +164,42 @@ final class DeprecationHandler implements Extension {
     $encodedStats = explode("\n", $content);
     $stats = [];
     foreach ($encodedStats as $encodedStat) {
-      $stats[] = (array) json_decode(base64_decode($encodedStat));
+      $tmp = (array) json_decode(base64_decode($encodedStat));
+      if (!empty($tmp)) {
+        $stats[] = $tmp;
+      }
     }
     file_put_contents(
-      self::$outputDirectory . \DIRECTORY_SEPARATOR . $dumpFileName,
+      $outputDirectory . \DIRECTORY_SEPARATOR . $dumpFileName,
       json_encode($stats),
     );
   }
 
   /**
-   * Dump statistics after test runner end.
+   * Write a statistic entry.
    */
-  private static function writeStatisticEntry(array $info): void {
-    $outputDirectory = getenv('DRUPAL_TEST_ARTIFACTS_DIRECTORY');
+  private static function writeStatisticEntry(string $testName, string $ignorePattern, string $triggeringMessage): void {
+    $configEnv = getenv('_DRUPAL_TEST_ARTIFACT_CONFIG');
+
+    if (empty($configEnv)) {
+      throw new \RuntimeException("No artifacts configuration available.");
+    }
+
+    $config = (array) json_decode($configEnv);
+
+    $stat = [
+      'test' => $testName,
+      'pattern' => $ignorePattern,
+      'message' => $triggeringMessage,
+      'php_version' => $config['php_version'],
+    ];
+    if ($config['database_version']) {
+      $stat['database'] = $config['database_version'];
+    }
+
+    $outputDirectory = $config['directory'] . \DIRECTORY_SEPARATOR . 'deprecation-handler';
+    Filesystem::createDirectory($outputDirectory);
+
     $test_run_id = getenv('DRUPAL_TEST_RUN_ID');
     if (!empty($test_run_id)) {
       $dumpFileName = "deprecation-ignore-stats-{$test_run_id}.json";
@@ -195,7 +209,7 @@ final class DeprecationHandler implements Extension {
     }
     file_put_contents(
       $outputDirectory . \DIRECTORY_SEPARATOR . $dumpFileName,
-      base64_encode(json_encode($info)) . "\n",
+      base64_encode(json_encode($stat)) . "\n",
       \FILE_APPEND,
     );
   }
@@ -296,18 +310,7 @@ final class DeprecationHandler implements Extension {
       }
       if ((bool) $result) {
         $testName = $testCase ? $testCase->valueObjectForEvents()->id() : '#not-in-test';
-        preg_match('/^\d+\.\d+/', \PHP_VERSION, $matches);
-        $stat = [
-          'test' => $testName,
-          'pattern' => $pattern,
-          'message' => $deprecationMessage,
-          'php_version' => $matches[0],
-        ];
-        $databaseInfo = getenv('_TARGET_DB');
-        if (!empty($databaseInfo)) {
-          $stat['database'] = $databaseInfo;
-        }
-        self::writeStatisticEntry($stat);
+        self::writeStatisticEntry($testName, $pattern, $deprecationMessage);
         return TRUE;
       }
     }
