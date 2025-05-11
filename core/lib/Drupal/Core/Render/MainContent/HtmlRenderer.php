@@ -204,7 +204,7 @@ class HtmlRenderer implements MainContentRendererInterface {
   protected function prepare(array $main_content, Request $request, RouteMatchInterface $route_match) {
     // Determine the title: use the title provided by the main content if any,
     // otherwise get it from the routing information.
-    $get_title = function (array $main_content) use ($request, $route_match) {
+    $get_title = function (array $main_content) use ($request, $route_match): array|string|\Stringable {
       return $main_content['#title'] ?? $this->titleResolver->getTitle($request, $route_match->getRouteObject());
     };
 
