@@ -125,7 +125,7 @@ abstract class ContentEntityStorageBase extends EntityStorageBase implements Con
         throw new EntityStorageException('Missing bundle for entity type ' . $this->entityTypeId);
       }
       $bundles = $this->entityTypeBundleInfo->getBundleInfo($this->entityTypeId);
-      if (!in_array($values[$this->bundleKey], array_keys($bundles))) {
+      if (!isset($bundles[$bundle])) {
         throw new EntityStorageException('The bundle ' . $values[$this->bundleKey] . ' is not a valid ' . $this->entityTypeId . ' type');
       }
     }
