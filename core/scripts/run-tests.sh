@@ -223,21 +223,27 @@ try {
   $outputDirectory = \Drupal::root() . \DIRECTORY_SEPARATOR . 'test-artifacts' . \DIRECTORY_SEPARATOR . 'deprecation-handler';
   \Drupal::service(FileSystemInterface::class)->prepareDirectory($outputDirectory, FileSystemInterface::CREATE_DIRECTORY);
   file_put_contents($outputDirectory . \DIRECTORY_SEPARATOR . "deprecation-ignore-stats.json", json_encode($tmp));
-  // \Drupal::service(FileSystemInterface::class)->deleteRecursive(\Drupal::root() . \DIRECTORY_SEPARATOR . 'core' . \DIRECTORY_SEPARATOR . 'test-artifacts');
 
+  $env = sprintf("CI_PIPELINE_ID=%s\n", getenv('CI_PIPELINE_ID'));
+  $env .= sprintf("CI_PIPELINE_NAME=%s\n", getenv('CI_PIPELINE_NAME'));
+  $env .= sprintf("CI_JOB_STAGE=%s\n", getenv('CI_JOB_STAGE'));
+  $env .= sprintf("CI_JOB_ID=%s\n", getenv('CI_JOB_ID'));
+  $env .= sprintf("CI_JOB_NAME=%s\n", getenv('CI_JOB_NAME'));
+  file_put_contents($outputDirectory . \DIRECTORY_SEPARATOR . "env.txt", $env);
 
   echo "\n\nDeprecation ignore stats\n";
-  echo "    Usage# Line\n";
-  echo "----------------------------------\n";
+  echo "-----------+------------------------\n";
+  echo "    Skips# | Line\n";
+  echo "-----------+------------------------\n";
   foreach (file(\Drupal::root() . \DIRECTORY_SEPARATOR . 'core' . \DIRECTORY_SEPARATOR . '.deprecation-ignore.txt') as $line => $pattern) {
     if ((trim($pattern)[0] ?? '#') !== '#') {
-      echo sprintf("%10d %s\n", $tmp[$pattern] ?? 0, trim_with_ellipsis(rtrim($pattern, "\n"), 80, \STR_PAD_RIGHT));
+      echo sprintf("%10d | %s\n", $tmp[$pattern] ?? 0, trim_with_ellipsis(rtrim($pattern, "\n"), 80, \STR_PAD_RIGHT));
     }
     else {
-      echo sprintf("           %s\n", trim_with_ellipsis(rtrim($pattern, "\n"), 80, \STR_PAD_RIGHT));
+      echo sprintf("           | %s\n", trim_with_ellipsis(rtrim($pattern, "\n"), 80, \STR_PAD_RIGHT));
     }
   }
-  echo "----------------------------------\n";
+  echo "-----------+------------------------\n";
 }
 catch (\Exception) {
   // Do nothing.

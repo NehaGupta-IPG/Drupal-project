@@ -101,18 +101,13 @@ default:
 .dump-variables: &dump-variables
   - |
     printf "CI_PIPELINE_SOURCE          = %s\n" $CI_PIPELINE_SOURCE &&
-    printf "CI_DEFAULT_BRANCH           = %s\n" $CI_DEFAULT_BRANCH &&
-    printf "CI_COMMIT_BRANCH            = %s\n" $CI_COMMIT_BRANCH &&
-    printf "CI_COMMIT_TAG               = %s\n" $CI_COMMIT_TAG &&
-    printf "CI_COMMIT_TITLE             = %s\n" "$CI_COMMIT_TITLE" &&
-    printf "CI_MERGE_REQUEST_IID        = %s\n" $CI_MERGE_REQUEST_IID &&
-    printf "CI_MERGE_REQUEST_TITLE      = %s\n" "$CI_MERGE_REQUEST_TITLE" &&
-    printf "CI_PROJECT_DIR              = %s\n" $CI_PROJECT_DIR &&
-    printf "CI_PROJECT_PATH             = %s\n" $CI_PROJECT_PATH &&
-    printf "CI_PROJECT_NAMESPACE        = %s\n" $CI_PROJECT_NAMESPACE &&
+    printf "CI_PIPELINE_ID              = %s\n" $CI_PIPELINE_ID &&
+    printf "CI_PIPELINE_NAME            = %s\n" "$CI_PIPELINE_NAME" &&
     printf "CI_JOB_STAGE                = %s\n" "$CI_JOB_STAGE" &&
+    printf "CI_JOB_ID                   = %s\n" $CI_JOB_ID &&
     printf "CI_JOB_NAME                 = %s\n" "$CI_JOB_NAME" &&
-    printf "CI_JOB_ID                   = %s\n" $CI_JOB_ID
+    printf "CI_PROJECT_DIR              = %s\n" $CI_PROJECT_DIR &&
+    printf "CI_DEFAULT_BRANCH           = %s\n" $CI_DEFAULT_BRANCH
 
 .with-composer: &with-composer
   needs:
@@ -708,3 +703,4 @@ default:
   script:
     - find test-artifacts
     - find core/test-artifacts/deprecation-handler
+    - cat test-artifacts/env.txt
