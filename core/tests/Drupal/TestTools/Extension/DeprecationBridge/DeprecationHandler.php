@@ -52,7 +52,12 @@ final class DeprecationHandler implements Extension {
   /**
    * Directory for files produced by the extension.
    */
-  private static string $outputDirectory;
+  private static string $statisticsArtifactDirectory;
+
+  /**
+   * The path to the statistics staging file.
+   */
+  private static string $statisticsStagingFilePath;
 
   /**
    * {@inheritdoc}
@@ -62,6 +67,16 @@ final class DeprecationHandler implements Extension {
     Facade $facade,
     ParameterCollection $parameters,
   ): void {
+    // Determine staging file path.
+    self::$statisticsStagingFilePath = tempnam(sys_get_temp_dir(), 'depsta');
+
+    // Set an environment variable with the configuration, so that isolated
+    // tests can access it.
+    $config = json_encode([
+      'stagingFilePath' => self::$statisticsStagingFilePath,
+    ]);
+    putenv('_DRUPAL_DEPRECATION_HANDLER_CONFIG=' . $config);
+
     $facade->registerSubscriber(new TestRunnerFinishedSubscriber());
   }
 
@@ -149,7 +164,14 @@ final class DeprecationHandler implements Extension {
    * Dump statistics after test runner end.
    */
   public static function processStatisticsArtifact(): void {
-    $outputDirectory = ArtifactHandler::directory() . \DIRECTORY_SEPARATOR . 'deprecation-handler';
+    $content = @file_get_contents(self::$statisticsStagingFilePath);
+    if (empty($content)) {
+      return;
+    }
+
+    $statisticsArtifactDirectory = ArtifactHandler::directory() . \DIRECTORY_SEPARATOR . 'deprecation-handler';
+    Filesystem::createDirectory($statisticsArtifactDirectory);
+
     $test_run_id = getenv('DRUPAL_TEST_RUN_ID');
     if (!empty($test_run_id)) {
       $dumpFileName = "deprecation-ignore-stats-{$test_run_id}.json";
@@ -157,10 +179,7 @@ final class DeprecationHandler implements Extension {
     else {
       $dumpFileName = "deprecation-ignore-stats.json";
     }
-    $content = @file_get_contents($outputDirectory . \DIRECTORY_SEPARATOR . $dumpFileName);
-    if (empty($content)) {
-      return;
-    }
+
     $encodedStats = explode("\n", $content);
     $stats = [];
     foreach ($encodedStats as $encodedStat) {
@@ -169,8 +188,9 @@ final class DeprecationHandler implements Extension {
         $stats[] = $tmp;
       }
     }
+
     file_put_contents(
-      $outputDirectory . \DIRECTORY_SEPARATOR . $dumpFileName,
+      $statisticsArtifactDirectory . \DIRECTORY_SEPARATOR . $dumpFileName,
       json_encode($stats),
     );
   }
@@ -179,36 +199,28 @@ final class DeprecationHandler implements Extension {
    * Write a statistic entry.
    */
   private static function writeStatisticEntry(string $testName, string $ignorePattern, string $triggeringMessage): void {
-    $configEnv = getenv('_DRUPAL_TEST_ARTIFACT_CONFIG');
+    $artifactEnv = getenv('_DRUPAL_TEST_ARTIFACT_CONFIG');
+    $configEnv = getenv('_DRUPAL_DEPRECATION_HANDLER_CONFIG');
 
-    if (empty($configEnv)) {
-      throw new \RuntimeException("No artifacts configuration available.");
+    if (empty($artifactEnv) || empty($configEnv)) {
+      throw new \RuntimeException("Missing configuration.");
     }
 
+    $artifact = (array) json_decode($artifactEnv);
     $config = (array) json_decode($configEnv);
 
     $stat = [
       'test' => $testName,
       'pattern' => $ignorePattern,
       'message' => $triggeringMessage,
-      'php_version' => $config['php_version'],
+      'php_version' => $artifact['php_version'],
     ];
-    if ($config['database_version']) {
-      $stat['database'] = $config['database_version'];
+    if ($artifact['database_version']) {
+      $stat['database'] = $artifact['database_version'];
     }
 
-    $outputDirectory = $config['directory'] . \DIRECTORY_SEPARATOR . 'deprecation-handler';
-    Filesystem::createDirectory($outputDirectory);
-
-    $test_run_id = getenv('DRUPAL_TEST_RUN_ID');
-    if (!empty($test_run_id)) {
-      $dumpFileName = "deprecation-ignore-stats-{$test_run_id}.json";
-    }
-    else {
-      $dumpFileName = "deprecation-ignore-stats.json";
-    }
     file_put_contents(
-      $outputDirectory . \DIRECTORY_SEPARATOR . $dumpFileName,
+      $config['stagingFilePath'],
       base64_encode(json_encode($stat)) . "\n",
       \FILE_APPEND,
     );
