@@ -111,6 +111,12 @@ final class ConsoleInputCollector implements InputCollectorInterface {
     if (isset($arguments['default']) && !is_string($arguments['default']) && $method === 'ask') {
       $arguments['default'] = (string) $arguments['default'];
     }
+
+    // Run localization before calling final method.
+    $arguments = array_map(function ($value) {
+      return is_object($value) && $value instanceof \Stringable ? (string)$value : $value;
+    }, $arguments);
+
     return $this->io->$method(...$arguments);
   }
 
