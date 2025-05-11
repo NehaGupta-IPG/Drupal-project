@@ -19,6 +19,46 @@ use Drupal\Component\Plugin\PluginManagerInterface;
  * MenuLinkManagerInterface::removeDefinition() when they add or remove links,
  * and MenuLinkManagerInterface::updateDefinition() to update links they have
  * already defined.
+ *
+ * @phpstan-type PluginDefinition array{
+ *    class: class-string<\Drupal\Core\Menu\MenuLinkInterface>,
+ *    description: \Drupal\Core\StringTranslation\TranslatableMarkup|string,
+ *    enabled: 0|1,
+ *    expanded: 0|1,
+ *    form_class: class-string<\Drupal\Core\Menu\Form\MenuLinkFormInterface>,
+ *    id: string,
+ *    menu_name: string,
+ *    metadata: array<string, mixed>,
+ *    options: array<string, mixed>,
+ *    parent: string,
+ *    provider: string,
+ *    route_name: string,
+ *    route_parameters: array<string, mixed>,
+ *    title: \Drupal\Core\StringTranslation\TranslatableMarkup|string,
+ *    url: \Drupal\Core\Url|null,
+ *    weight: int|null,
+ *  }
+ * @phpstan-type PluginDefinitionPartial array{
+ *     class?: class-string<\Drupal\Core\Menu\MenuLinkInterface>,
+ *     description?: \Drupal\Core\StringTranslation\TranslatableMarkup|string,
+ *     enabled?: 0|1,
+ *     expanded?: 0|1,
+ *     form_class?: class-string<\Drupal\Core\Menu\Form\MenuLinkFormInterface>,
+ *     id?: string,
+ *     menu_name?: string,
+ *     metadata?: array<string, mixed>,
+ *     options?: array<string, mixed>,
+ *     parent?: string,
+ *     provider?: string,
+ *     route_name?: string,
+ *     route_parameters?: array<string, mixed>,
+ *     title?: \Drupal\Core\StringTranslation\TranslatableMarkup|string,
+ *     url?: \Drupal\Core\Url|null,
+ *     weight?: int|null,
+ *   }
+ *
+ * @method array<string, PluginDefinition> getDefinitions()
+ * @method ($exception_on_invalid is true ? PluginDefinition : PluginDefinition|false) getDefinition($plugin_id, $exception_on_invalid = TRUE)
  */
 interface MenuLinkManagerInterface extends PluginManagerInterface {
 
@@ -82,7 +122,7 @@ interface MenuLinkManagerInterface extends PluginManagerInterface {
    *
    * @param string $id
    *   The plugin ID for the new menu link definition that is being added.
-   * @param array $definition
+   * @param PluginDefinitionPartial[] $definition
    *   The values of the link definition.
    *
    * @return \Drupal\Core\Menu\MenuLinkInterface
@@ -102,7 +142,7 @@ interface MenuLinkManagerInterface extends PluginManagerInterface {
    *
    * @param string $id
    *   The menu link plugin ID.
-   * @param array $new_definition_values
+   * @param PluginDefinitionPartial $new_definition_values
    *   The new values for the link definition. This will usually be just a
    *   subset of the plugin definition.
    * @param bool $persist
