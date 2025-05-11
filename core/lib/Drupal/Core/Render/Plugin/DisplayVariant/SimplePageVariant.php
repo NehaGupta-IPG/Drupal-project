@@ -26,7 +26,7 @@ class SimplePageVariant extends VariantBase implements PageVariantInterface {
   /**
    * The page title: a string (plain title) or a render array (formatted title).
    *
-   * @var string|array
+   * @var string|array|\Stringable
    */
   protected $title = '';
 

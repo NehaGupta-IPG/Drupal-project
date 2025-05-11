@@ -204,7 +204,7 @@ class HtmlRenderer implements MainContentRendererInterface {
   protected function prepare(array $main_content, Request $request, RouteMatchInterface $route_match) {
     // Determine the title: use the title provided by the main content if any,
     // otherwise get it from the routing information.
-    $get_title = function (array $main_content) use ($request, $route_match) {
+    $get_title = function (array $main_content) use ($request, $route_match): array|string|\Stringable|null {
       return $main_content['#title'] ?? $this->titleResolver->getTitle($request, $route_match->getRouteObject());
     };
 
@@ -246,8 +246,6 @@ class HtmlRenderer implements MainContentRendererInterface {
         ];
       }
 
-      $title = $get_title($main_content);
-
       // Instantiate the page display, and give it the main content.
       $page_display = $this->displayVariantManager->createInstance($variant_id, $variant_configuration);
       if (!$page_display instanceof PageVariantInterface) {
@@ -255,8 +253,13 @@ class HtmlRenderer implements MainContentRendererInterface {
       }
       $page_display
         ->setMainContent($main_content)
-        ->setTitle($title)
         ->addCacheableDependency($event);
+
+      $title = $get_title($main_content);
+      if ($title !== NULL) {
+        $page_display->setTitle($title);
+      }
+
       // Some display variants need to be passed an array of contexts with
       // values because they can't get all their contexts globally. For example,
       // in Page Manager, you can create a Page which has a specific static
