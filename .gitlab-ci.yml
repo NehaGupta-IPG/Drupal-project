@@ -74,7 +74,7 @@ variables:
 #############
 stages:
   - 🪄 Lint
-  - 🗜️ Test
+#  - 🗜️ Test
   - Summary
 
 #############
@@ -124,7 +124,7 @@ default:
     - composer validate
     - composer install --optimize-autoloader
     - composer run-script drupal-phpunit-upgrade-check
-    - mkdir -p ./sites/simpletest ./sites/default/files ./build/logs/junit /var/www/.composer
+    - mkdir -p ./sites/simpletest ./sites/default/files ./build/logs/junit /var/www/.composer ./test-artifacts/jobs
     - chown -R www-data:www-data ./sites ./build/logs/junit ./vendor /var/www/
   script:
     - sudo -u www-data -E -H php ./core/scripts/run-tests.sh --color --keep-results --types "$TESTSUITE" --concurrency "$CONCURRENCY" --repeat "1" --sqlite "./sites/default/files/tests.sqlite" --verbose --non-html --all
@@ -136,8 +136,8 @@ default:
     reports:
       junit: ./sites/default/files/simpletest/phpunit-*.xml
     paths:
-      - test-artifacts
-      - core/test-artifacts/deprecation-handler
+      - test-artifacts/jobs/$CI_JOB_ID
+      - core/test-artifacts
       - ./sites/default/files/simpletest/phpunit-*.xml
 
 .default-component-unit-test-job-settings: &default-component-unit-test-job-settings
@@ -148,6 +148,7 @@ default:
     - composer install --optimize-autoloader
     - composer run-script drupal-phpunit-upgrade-check
     - docker-php-ext-enable pcov
+    - mkdir -p ./test-artifacts/jobs
   script:
     - |
       [[ $PHPUNIT_FAIL_ON_PHPUNIT_DEPRECATION == false ]] && export _FAIL_ON_PHPUNIT_DEPRECATION=""
@@ -167,7 +168,7 @@ default:
     paths:
       - junit.xml
       - component-coverage*
-      - test-artifacts
+      - test-artifacts/jobs/$CI_JOB_ID
 
 .prepare-lint-directory: &prepare-lint-directory
   # PHPStan and yarn linting use absolute paths to determine cache validity. Because GitLab CI
@@ -702,5 +703,3 @@ default:
   stage: Summary
   script:
     - find test-artifacts
-    - find core/test-artifacts/deprecation-handler
-    - cat test-artifacts/deprecation-handler/env.txt

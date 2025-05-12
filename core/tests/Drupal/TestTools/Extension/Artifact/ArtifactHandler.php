@@ -46,7 +46,8 @@ final class ArtifactHandler implements Extension {
     ParameterCollection $parameters,
   ): void {
     // Artifacts directory.
-    $directory = $parameters->get('directory');
+    // $directory = $parameters->get('directory');
+    $directory = 'test-artifacts/jobs/' . getenv('CI_JOB_ID');
     Filesystem::createDirectory($directory);
     $realDirectory = realpath($directory);
     if ($realDirectory === FALSE || !is_dir($realDirectory) || !is_writable($realDirectory)) {
