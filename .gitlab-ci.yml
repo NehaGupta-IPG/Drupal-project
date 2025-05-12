@@ -592,14 +592,11 @@ default:
         - composer/Metapackage/PinnedDevDependencies/composer.json
     - when: manual
       allow_failure: true
-      
   script:
     - docker-php-ext-enable pcov
     - cd core/tests/PHPStan
     - composer install
     - vendor/bin/phpunit tests --testdox --coverage-text --colors=always --coverage-cobertura=coverage.cobertura.xml --log-junit junit.xml
-    - find test-artifacts
-    - php .gitlab-ci/scripts/statistics-consolidator.php
   artifacts:
     when: always
     reports:
