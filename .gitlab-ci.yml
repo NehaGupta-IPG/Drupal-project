@@ -125,7 +125,7 @@ default:
     - composer install --optimize-autoloader
     - composer run-script drupal-phpunit-upgrade-check
     - mkdir -p ./sites/simpletest ./sites/default/files ./build/logs/junit /var/www/.composer ./test-artifacts/jobs
-    - chown -R www-data:www-data ./sites ./build/logs/junit ./vendor /var/www/
+    - chown -R www-data:www-data ./sites ./build/logs/junit ./vendor /var/www/ ./test-artifacts
   script:
     - sudo -u www-data -E -H php ./core/scripts/run-tests.sh --color --keep-results --types "$TESTSUITE" --concurrency "$CONCURRENCY" --repeat "1" --sqlite "./sites/default/files/tests.sqlite" --verbose --non-html --all
   after_script:
