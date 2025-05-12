@@ -21,15 +21,6 @@ default:
     name: $_CONFIG_DOCKERHUB_ROOT/php-$_TARGET_PHP-apache:production
   before_script:
     - |
-      printf "CI_PIPELINE_SOURCE          = %s\n" $CI_PIPELINE_SOURCE &&
-      printf "CI_PIPELINE_ID              = %s\n" $CI_PIPELINE_ID &&
-      printf "CI_PIPELINE_NAME            = %s\n" "$CI_PIPELINE_NAME" &&
-      printf "CI_JOB_STAGE                = %s\n" "$CI_JOB_STAGE" &&
-      printf "CI_JOB_ID                   = %s\n" $CI_JOB_ID &&
-      printf "CI_JOB_NAME                 = %s\n" "$CI_JOB_NAME" &&
-      printf "CI_PROJECT_DIR              = %s\n" $CI_PROJECT_DIR &&
-      printf "CI_DEFAULT_BRANCH           = %s\n" $CI_DEFAULT_BRANCH
-    - |
       [[ $_TARGET_DB == sqlite* ]] && export SIMPLETEST_DB=sqlite://localhost/$CI_PROJECT_DIR/sites/default/files/db.sqlite?module=sqlite
       [[ $_TARGET_DB == mysql* ]] && export SIMPLETEST_DB=mysql://$MYSQL_USER:$MYSQL_PASSWORD@database/$MYSQL_DATABASE?module=mysql
       [[ $_TARGET_DB == mariadb* ]] && export SIMPLETEST_DB=mysql://$MYSQL_USER:$MYSQL_PASSWORD@database/$MYSQL_DATABASE?module=mysql
@@ -44,7 +35,7 @@ default:
     reports:
       junit: ./sites/default/files/simpletest/phpunit-*.xml
     paths:
-      - test-artifacts
+      - test-artifacts/jobs/$CI_JOB_ID
       - core/test-artifacts/deprecation-handler
       - ./sites/default/files/simpletest/phpunit-*.xml
       - ./sites/simpletest/browser_output
