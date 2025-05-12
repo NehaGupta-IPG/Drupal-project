@@ -2,7 +2,6 @@
 
 stages:
   - 🗜️ Test
-  - Summary
 
 #############
 # Templates #
@@ -133,7 +132,7 @@ variables:
 ################
 
 'Summary':
-  stage: 🗜️ Test
+  <<: [ *default-job-settings ]
   script:
     - find test-artifacts
     - php .gitlab-ci/scripts/statistics-consolidator.php
