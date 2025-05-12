@@ -214,7 +214,7 @@ simpletest_script_reporter_display_results($test_run_results_storage);
 
   $tmp = [];
   foreach ($files as $file) {
-    $contents = json_decode(file_get_contents($file->uri));
+    $contents = (array) json_decode(file_get_contents($file->uri));
 dump($contents);
     foreach ($contents['skips'] as $key => $count) {
       $tmp[$key] = isset($tmp[$key]) ? $tmp[$key] + $count : $count;
