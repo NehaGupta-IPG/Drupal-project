@@ -133,7 +133,7 @@ variables:
 ################
 
 'Summary':
-  stage: Summary
+  stage: 🗜️ Test
   script:
     - find test-artifacts
     - php .gitlab-ci/scripts/statistics-consolidator.php
