@@ -243,13 +243,13 @@ class SystemMenuBlockTest extends KernelTestBase {
 
     // All the different block instances we're going to test.
     $blocks = [
-      'all' => $place_block(1, 0),
+      'all' => $place_block(1, NULL),
       'level_1_only' => $place_block(1, 1),
       'level_2_only' => $place_block(2, 1),
       'level_3_only' => $place_block(3, 1),
-      'level_1_and_beyond' => $place_block(1, 0),
-      'level_2_and_beyond' => $place_block(2, 0),
-      'level_3_and_beyond' => $place_block(3, 0),
+      'level_1_and_beyond' => $place_block(1, NULL),
+      'level_2_and_beyond' => $place_block(2, NULL),
+      'level_3_and_beyond' => $place_block(3, NULL),
     ];
 
     // Scenario 1: test all block instances when there's no active trail.
@@ -341,12 +341,19 @@ class SystemMenuBlockTest extends KernelTestBase {
    * @dataProvider configExpandedTestCases
    */
   public function testConfigExpanded($active_route, $menu_block_level, $expected_items): void {
+    // Replace the path.matcher service so it always returns FALSE when
+    // checking whether a route is the front page. Otherwise, the default
+    // service throws an exception when checking routes because all of these
+    // are mocked.
+    $service_definition = $this->container->getDefinition('path.matcher');
+    $service_definition->setClass(StubPathMatcher::class);
+
     $block = $this->blockManager->createInstance('system_menu_block:' . $this->menu->id(), [
       'region' => 'footer',
       'id' => 'machine_name',
       'theme' => 'stark',
       'level' => $menu_block_level,
-      'depth' => 0,
+      'depth' => NULL,
       'expand_all_items' => TRUE,
     ]);
 
