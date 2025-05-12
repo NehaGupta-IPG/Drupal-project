@@ -294,6 +294,7 @@ default:
   stage: Summary
   script:
     - find test-artifacts
+    - php .gitlab-ci/scripts/statistics-consolidator.php
   artifacts:
     when: always
     expire_in: 6 mos
