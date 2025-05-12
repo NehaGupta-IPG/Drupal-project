@@ -493,7 +493,11 @@
         },
         {
             "name": "drupal/core",
+<<<<<<< HEAD
             "version": "11.x-dev",
+=======
+            "version": "11.2.0-alpha1",
+>>>>>>> 9dc765e8bb7 (Drupal 11.2.0-alpha1)
             "dist": {
                 "type": "path",
                 "url": "core",
@@ -706,7 +710,11 @@
         },
         {
             "name": "drupal/core-project-message",
+<<<<<<< HEAD
             "version": "11.x-dev",
+=======
+            "version": "11.2.0-alpha1",
+>>>>>>> 9dc765e8bb7 (Drupal 11.2.0-alpha1)
             "dist": {
                 "type": "path",
                 "url": "composer/Plugin/ProjectMessage",
@@ -739,7 +747,11 @@
         },
         {
             "name": "drupal/core-recipe-unpack",
+<<<<<<< HEAD
             "version": "11.x-dev",
+=======
+            "version": "11.2.0-alpha1",
+>>>>>>> 9dc765e8bb7 (Drupal 11.2.0-alpha1)
             "dist": {
                 "type": "path",
                 "url": "composer/Plugin/RecipeUnpack",
@@ -775,7 +787,11 @@
         },
         {
             "name": "drupal/core-vendor-hardening",
+<<<<<<< HEAD
             "version": "11.x-dev",
+=======
+            "version": "11.2.0-alpha1",
+>>>>>>> 9dc765e8bb7 (Drupal 11.2.0-alpha1)
             "dist": {
                 "type": "path",
                 "url": "composer/Plugin/VendorHardening",
@@ -10289,10 +10305,19 @@
     "aliases": [],
     "minimum-stability": "dev",
     "stability-flags": {
+<<<<<<< HEAD
         "drupal/core": 20,
         "drupal/core-project-message": 20,
         "drupal/core-recipe-unpack": 20,
         "drupal/core-vendor-hardening": 20
+=======
+        "symfony/browser-kit": 10,
+        "symfony/css-selector": 10,
+        "symfony/dom-crawler": 10,
+        "symfony/error-handler": 10,
+        "symfony/lock": 10,
+        "symfony/var-dumper": 10
+>>>>>>> 9dc765e8bb7 (Drupal 11.2.0-alpha1)
     },
     "prefer-stable": true,
     "prefer-lowest": false,
