@@ -48,6 +48,14 @@ function layout_builder_post_update_initialize_field_block_shown_when_empty(?arr
         foreach ($section->getComponents() as $component) {
           if (str_starts_with($component->getPluginId(), 'field_block:')) {
             $configuration = $component->get('configuration');
+
+            if (isset($configuration['hide_for_empty'])) {
+              $configuration['show_when_empty'] = !$configuration['hide_for_empty'];
+              unset($configuration['hide_for_empty']);
+              $component->setConfiguration($configuration);
+              $update = TRUE;
+            }
+
             if (!isset($configuration['show_when_empty'])) {
               $configuration['show_when_empty'] = FALSE;
               $component->setConfiguration($configuration);
