@@ -213,6 +213,7 @@ simpletest_script_reporter_display_results($test_run_results_storage);
   );
 
   $tmp = [];
+  $metadata = NULL;
   foreach ($files as $file) {
     $contents = json_decode(file_get_contents($file->uri), TRUE);
     $metadata = $contents['metadata'];
@@ -230,10 +231,10 @@ simpletest_script_reporter_display_results($test_run_results_storage);
     'skips' => $tmp,
   ]));
 
-  echo "\n\nDeprecation ignore stats\n";
-  echo "-----------+------------------------\n";
+  echo "\n\nDeprecation skips statistics\n";
+  echo "-----------+----------------------------------------------------------------------\n";
   echo "    Skips# | Line\n";
-  echo "-----------+------------------------\n";
+  echo "-----------+----------------------------------------------------------------------\n";
   foreach (file(\Drupal::root() . \DIRECTORY_SEPARATOR . 'core' . \DIRECTORY_SEPARATOR . '.deprecation-ignore.txt') as $line => $pattern) {
     if ((trim($pattern)[0] ?? '#') !== '#') {
       echo sprintf("%10d | %s\n", $tmp[$pattern] ?? 0, trim_with_ellipsis(rtrim($pattern, "\n"), 80, \STR_PAD_RIGHT));
@@ -242,7 +243,7 @@ simpletest_script_reporter_display_results($test_run_results_storage);
       echo sprintf("           | %s\n", trim_with_ellipsis(rtrim($pattern, "\n"), 80, \STR_PAD_RIGHT));
     }
   }
-  echo "-----------+------------------------\n";
+  echo "-----------+----------------------------------------------------------------------\n";
 #}
 #catch (\Exception) {
 #  // Do nothing.

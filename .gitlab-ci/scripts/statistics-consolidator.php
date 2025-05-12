@@ -36,8 +36,7 @@ $files = $finder->files()->in(__DIR__ . '/../../test-artifacts')->name('deprecat
 $tmp = [];
 foreach ($files as $file) {
   $contents = json_decode($file->getContents(), TRUE);
-dump($contents);
-  $metadata = $contents['metadata'];
+  dump($contents);
   foreach ($contents['skips'] as $key => $count) {
     $tmp[$key] = isset($tmp[$key]) ? $tmp[$key] + $count : $count;
   }
