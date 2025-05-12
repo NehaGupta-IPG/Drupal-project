@@ -185,26 +185,20 @@ class DbLogController extends ControllerBase {
         $prev_id = $previous[$dblog->wid] ?? NULL;
         $next_id = $next[$dblog->wid] ?? NULL;
 
-        // Create the link with previous and next parameters
-        $link_url = Url::fromRoute('dblog.event', [
-          'event_id' => $dblog->wid,
-        ], [
-          'query' => array_filter([
-            'prev' => $prev_id,
-            'next' => $next_id,
-          ]),
-        ]);
-
         // The link generator will escape any unsafe HTML entities in the final
         // text.
-        $message = Link::fromTextAndUrl($log_text, $link_url, [
+        $message = Link::fromTextAndUrl($log_text, new Url('dblog.event', ['event_id' => $dblog->wid], [
           'attributes' => [
             // Provide a title for the link for useful hover hints. The
             // Attribute object will escape any unsafe HTML entities in the
             // final text.
             'title' => $title,
           ],
-        ])->toString();
+          'query' => array_filter([
+            'prev' => $prev_id,
+            'next' => $next_id,
+          ]),
+        ]))->toString();
       }
       $username = [
         '#theme' => 'username',
