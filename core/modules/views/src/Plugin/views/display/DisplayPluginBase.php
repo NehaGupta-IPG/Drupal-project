@@ -968,7 +968,10 @@ abstract class DisplayPluginBase extends PluginBase implements DisplayPluginInte
     $this->dependencies = parent::calculateDependencies();
     // Collect all the dependencies of handlers and plugins. Only calculate
     // their dependencies if they are configured by this display.
-    $plugins = array_merge($this->getAllHandlers(TRUE), $this->getAllPlugins(TRUE));
+    $extenders = array_filter($this->extenders, function ($plugin) {
+      return $plugin->isEnabled();
+    });
+    $plugins = array_merge($this->getAllHandlers(TRUE), $this->getAllPlugins(TRUE), $extenders);
     array_walk($plugins, [$this, 'calculatePluginDependencies']);
 
     return $this->dependencies;
@@ -2042,12 +2045,12 @@ abstract class DisplayPluginBase extends PluginBase implements DisplayPluginInte
         break;
     }
 
-    $extender_options = $this->getOption('display_extenders');
+    $extender_options = [];
     foreach ($this->extenders as $extender) {
       $extender->submitOptionsForm($form, $form_state);
-
-      $plugin_id = $extender->getPluginId();
-      $extender_options[$plugin_id] = $extender->options;
+      if ($extender->isEnabled()) {
+        $extender_options[$extender->getPluginId()] = $extender->options;
+      }
     }
     $this->setOption('display_extenders', $extender_options);
   }
@@ -2377,6 +2380,12 @@ abstract class DisplayPluginBase extends PluginBase implements DisplayPluginInte
     foreach (Views::getPluginTypes('plugin') as $plugin_type) {
       $plugin = $this->getPlugin($plugin_type);
       if ($plugin instanceof CacheableDependencyInterface) {
+        $cache_metadata = $cache_metadata->merge(CacheableMetadata::createFromObject($plugin));
+      }
+    }
+    // Add cacheability for display extenders.
+    foreach ($this->extenders as $plugin) {
+      if ($plugin instanceof CacheableDependencyInterface && $plugin->isEnabled()) {
         $cache_metadata = $cache_metadata->merge(CacheableMetadata::createFromObject($plugin));
       }
     }
