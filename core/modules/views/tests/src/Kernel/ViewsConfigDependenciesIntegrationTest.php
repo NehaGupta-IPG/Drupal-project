@@ -176,6 +176,10 @@ class ViewsConfigDependenciesIntegrationTest extends ViewsKernelTestBase {
     $this->enableModules(['views_test_display_extender']);
     $this->config('views.settings')->set('display_extenders', ['views_test_display_extender_display_extender_test'])->save();
     $view = View::load('test_view');
+    $display =& $view->getDisplay('default');
+    $display['display_options']['display_extenders']['views_test_display_extender_display_extender_test'] = [
+      'test_extender_test_option' => 'override',
+    ];
     $view->save();
 
     self::assertContains('views_test_display_extender', $view->getDependencies()['module'] ?? []);
