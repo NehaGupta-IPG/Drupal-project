@@ -79,9 +79,9 @@ class NumberTest extends TestCase {
       [-100, 100 / 7, TRUE],
 
       // Valid and very small float steps.
-      [1936.5, 3e-8, TRUE],
-      [1000.12345, 1e-10, TRUE],
-      [3.9999999999999, 1e-13, TRUE],
+      [1936.5, 3.0E-7, TRUE],
+      [1000.12345, 1.0E-10, TRUE],
+      [3.9999999999999, 1.0E-13, TRUE],
 
       // Invalid integer steps.
       [100, 30, FALSE],
@@ -94,7 +94,7 @@ class NumberTest extends TestCase {
       [1000, -10.0, FALSE],
 
       // Step mismatches very close to being valid.
-      [70 + 9e-7, 10 + 9e-7, FALSE],
+      [70 + 9.0E-7, 10 + 9.0E-7, FALSE],
 
       // These floats are valid, but might fail due to precision (rounding)
       // errors that are inherent to floating point numbers.
