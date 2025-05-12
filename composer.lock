@@ -494,10 +494,14 @@
         {
             "name": "drupal/core",
 <<<<<<< HEAD
+<<<<<<< HEAD
             "version": "11.x-dev",
 =======
             "version": "11.2.0-alpha1",
 >>>>>>> 9dc765e8bb7 (Drupal 11.2.0-alpha1)
+=======
+            "version": "11.2.x-dev",
+>>>>>>> d17509c251f (Back to dev.)
             "dist": {
                 "type": "path",
                 "url": "core",
@@ -711,10 +715,14 @@
         {
             "name": "drupal/core-project-message",
 <<<<<<< HEAD
+<<<<<<< HEAD
             "version": "11.x-dev",
 =======
             "version": "11.2.0-alpha1",
 >>>>>>> 9dc765e8bb7 (Drupal 11.2.0-alpha1)
+=======
+            "version": "11.2.x-dev",
+>>>>>>> d17509c251f (Back to dev.)
             "dist": {
                 "type": "path",
                 "url": "composer/Plugin/ProjectMessage",
@@ -748,10 +756,14 @@
         {
             "name": "drupal/core-recipe-unpack",
 <<<<<<< HEAD
+<<<<<<< HEAD
             "version": "11.x-dev",
 =======
             "version": "11.2.0-alpha1",
 >>>>>>> 9dc765e8bb7 (Drupal 11.2.0-alpha1)
+=======
+            "version": "11.2.x-dev",
+>>>>>>> d17509c251f (Back to dev.)
             "dist": {
                 "type": "path",
                 "url": "composer/Plugin/RecipeUnpack",
@@ -788,10 +800,14 @@
         {
             "name": "drupal/core-vendor-hardening",
 <<<<<<< HEAD
+<<<<<<< HEAD
             "version": "11.x-dev",
 =======
             "version": "11.2.0-alpha1",
 >>>>>>> 9dc765e8bb7 (Drupal 11.2.0-alpha1)
+=======
+            "version": "11.2.x-dev",
+>>>>>>> d17509c251f (Back to dev.)
             "dist": {
                 "type": "path",
                 "url": "composer/Plugin/VendorHardening",
@@ -10306,11 +10322,18 @@
     "minimum-stability": "dev",
     "stability-flags": {
 <<<<<<< HEAD
+<<<<<<< HEAD
         "drupal/core": 20,
         "drupal/core-project-message": 20,
         "drupal/core-recipe-unpack": 20,
         "drupal/core-vendor-hardening": 20
 =======
+=======
+        "drupal/core": 20,
+        "drupal/core-project-message": 20,
+        "drupal/core-recipe-unpack": 20,
+        "drupal/core-vendor-hardening": 20,
+>>>>>>> d17509c251f (Back to dev.)
         "symfony/browser-kit": 10,
         "symfony/css-selector": 10,
         "symfony/dom-crawler": 10,
