@@ -1,0 +1,2 @@
+views.display_extender.views_test_display_extender_display_extender_test:
+  type: views.display_extender.display_extender_test
