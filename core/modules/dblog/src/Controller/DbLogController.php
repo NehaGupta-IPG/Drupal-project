@@ -161,21 +161,50 @@ class DbLogController extends ControllerBase {
       ->orderByHeader($header)
       ->execute();
 
+    // Prepare previous and next ID mappings
+    $entries = $previous = $next = [];
+    $previous_wid = NULL;
+
     foreach ($result as $dblog) {
+      $entries[] = $dblog;
+      if (isset($previous_wid)) {
+        $next[$previous_wid] = $dblog->wid;
+        $previous[$dblog->wid] = $previous_wid;
+      }
+      $previous_wid = $dblog->wid;
+    }
+
+    // Iterate through entries and generate rows
+    foreach ($entries as $dblog) {
       $message = $this->formatMessage($dblog);
       if ($message && isset($dblog->wid)) {
         $title = Unicode::truncate(Html::decodeEntities(strip_tags($message)), 256, TRUE, TRUE);
         $log_text = Unicode::truncate($title, 56, TRUE, TRUE);
+
+        // Get the previous and next IDs
+        $prev_id = $previous[$dblog->wid] ?? NULL;
+        $next_id = $next[$dblog->wid] ?? NULL;
+
+        // Create the link with previous and next parameters
+        $link_url = Url::fromRoute('dblog.event', [
+          'event_id' => $dblog->wid,
+        ], [
+          'query' => array_filter([
+            'prev' => $prev_id,
+            'next' => $next_id,
+          ]),
+        ]);
+
         // The link generator will escape any unsafe HTML entities in the final
         // text.
-        $message = Link::fromTextAndUrl($log_text, new Url('dblog.event', ['event_id' => $dblog->wid], [
+        $message = Link::fromTextAndUrl($log_text, $link_url, [
           'attributes' => [
             // Provide a title for the link for useful hover hints. The
             // Attribute object will escape any unsafe HTML entities in the
             // final text.
             'title' => $title,
           ],
-        ]))->toString();
+        ])->toString();
       }
       $username = [
         '#theme' => 'username',
@@ -218,6 +247,8 @@ class DbLogController extends ControllerBase {
    *
    * @param int $event_id
    *   Unique ID of the database log message.
+   * @param \Symfony\Component\HttpFoundation\Request $request
+   *   The request.
    *
    * @return array
    *   If the ID is located in the Database Logging table, a build array in the
@@ -226,7 +257,7 @@ class DbLogController extends ControllerBase {
    * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
    *   If no event found for the given ID.
    */
-  public function eventDetails($event_id) {
+  public function eventDetails($event_id, Request $request) {
     $query = $this->database->select('watchdog', 'w')
       ->fields('w')
       ->condition('w.wid', $event_id);
@@ -300,8 +331,8 @@ class DbLogController extends ControllerBase {
     ];
 
     // Get previous and next IDs efficiently.
-    $prev_id = $this->getAdjacentEventId($event_id, 'prev');
-    $next_id = $this->getAdjacentEventId($event_id, 'next');
+    $prev_id = $request->query->get('prev') ?? $this->getAdjacentEventId($event_id, 'prev');
+    $next_id = $request->query->get('next') ?? $this->getAdjacentEventId($event_id, 'next');
 
     // Build navigation if either exists.
     if ($prev_id || $next_id) {
@@ -314,7 +345,7 @@ class DbLogController extends ControllerBase {
         if ($id) {
           $build['navigation'][$key] = [
             '#type' => 'link',
-            '#title' => $key === 'prev' ? $this->t('← Previous') : $this->t('Next →'),
+            '#title' => $key === 'prev' ? $this->t('Previous') : $this->t('Next'),
             '#url' => Url::fromRoute('dblog.event', ['event_id' => $id]),
             '#attributes' => ['class' => ['button']],
           ];
