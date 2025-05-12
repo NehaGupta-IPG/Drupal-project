@@ -571,3 +571,8 @@ default:
   stage: Summary
   script:
     - find test-artifacts
+  artifacts:
+    when: always
+    expire_in: 6 mos
+    paths:
+      - test-artifacts
