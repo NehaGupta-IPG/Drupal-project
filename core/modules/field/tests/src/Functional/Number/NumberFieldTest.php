@@ -50,11 +50,13 @@ class NumberFieldTest extends BrowserTestBase {
   public function testNumberDecimalField(): void {
     // Create a field with settings to validate.
     $field_name = $this->randomMachineName();
+    // Having precision = 10 and scale = 4 means 6 numbers before the decimal
+    // point and 4 after.
     FieldStorageConfig::create([
       'field_name' => $field_name,
       'entity_type' => 'entity_test',
       'type' => 'decimal',
-      'settings' => ['precision' => 8, 'scale' => 4],
+      'settings' => ['precision' => 10, 'scale' => 4],
     ])->save();
     FieldConfig::create([
       'field_name' => $field_name,
