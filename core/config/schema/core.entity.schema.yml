@@ -456,11 +456,11 @@ field.formatter.settings.entity_reference_label:
 block.settings.field_block:*:*:*:
   type: block_settings
   mapping:
+    formatter:
+      type: field_formatter
     show_when_empty:
       type: boolean
       label: 'Show when empty'
-    formatter:
-      type: field_formatter
 
 block.settings.extra_field_block:*:*:*:
   type: block_settings
