@@ -137,6 +137,7 @@ variables:
   rules:
     - if: $CI_PIPELINE_SOURCE == "parent_pipeline" && $PERFORMANCE_TEST != "1"
   needs:
+    - job: '⚙️️ PHPUnit Kernel'
     - pipeline: $PARENT_PIPELINE_ID
       job: '🧹 PHP Coding standards (PHPCS)'
   script:
