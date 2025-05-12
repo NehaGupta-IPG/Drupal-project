@@ -700,10 +700,6 @@ default:
 
 'Summary':
   stage: Summary
-  before_script:
-    - composer validate
-    - composer install --optimize-autoloader
-    - composer run-script drupal-phpunit-upgrade-check
   script:
     - find test-artifacts
     - php .gitlab-ci/scripts/statistics-consolidator.php

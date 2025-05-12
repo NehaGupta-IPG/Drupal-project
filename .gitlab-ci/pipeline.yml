@@ -2,6 +2,7 @@
 
 stages:
   - 🗜️ Test
+  - Summary
 
 #############
 # Templates #
@@ -280,3 +281,14 @@ variables:
     - chown -R www-data:www-data ./sites ./build/logs/junit ./vendor /var/www/
     - sudo -u www-data git config --global --add safe.directory $CI_PROJECT_DIR
     - sudo SIMPLETEST_BASE_URL="http://$HOSTNAME/subdirectory" -u www-data -E -H ./vendor/bin/phpunit -c core --group OpenTelemetry --log-junit=./sites/default/files/simpletest/phpunit-performance.xml
+
+'Summary':
+  stage: Summary
+  script:
+    - find test-artifacts
+    - php .gitlab-ci/scripts/statistics-consolidator.php
+  artifacts:
+    when: always
+    expire_in: 6 mos
+    paths:
+      - test-artifacts
