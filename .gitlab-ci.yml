@@ -137,7 +137,6 @@ default:
       junit: ./sites/default/files/simpletest/phpunit-*.xml
     paths:
       - test-artifacts/jobs/$CI_JOB_ID
-      - core/test-artifacts
       - ./sites/default/files/simpletest/phpunit-*.xml
 
 .default-component-unit-test-job-settings: &default-component-unit-test-job-settings

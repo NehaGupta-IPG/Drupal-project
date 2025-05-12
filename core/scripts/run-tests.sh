@@ -215,7 +215,8 @@ simpletest_script_reporter_display_results($test_run_results_storage);
   $tmp = [];
   foreach ($files as $file) {
     $contents = json_decode(file_get_contents($file->uri));
-    foreach ($contents as $key => $count) {
+    $metadata = $contents['metadata'];
+    foreach ($contents['skips'] as $key => $count) {
       $tmp[$key] = isset($tmp[$key]) ? $tmp[$key] + $count : $count;
     }
   }
@@ -224,14 +225,17 @@ simpletest_script_reporter_display_results($test_run_results_storage);
   dump(\Drupal::service(FileSystemInterface::class)->prepareDirectory($outputDirectory, FileSystemInterface::CREATE_DIRECTORY));
 
   $outputFile = $outputDirectory . \DIRECTORY_SEPARATOR . "deprecation-ignore-stats.json";
-  file_put_contents($outputFile, json_encode($tmp));
+  file_put_contents($outputFile, json_encode([
+    'metadata' => $metadata,
+    'skips' => $tmp,
+  ]));
 
-  $env = sprintf("CI_PIPELINE_ID=%s\n", getenv('CI_PIPELINE_ID'));
-  $env .= sprintf("CI_PIPELINE_NAME=%s\n", getenv('CI_PIPELINE_NAME'));
-  $env .= sprintf("CI_JOB_STAGE=%s\n", getenv('CI_JOB_STAGE'));
-  $env .= sprintf("CI_JOB_ID=%s\n", getenv('CI_JOB_ID'));
-  $env .= sprintf("CI_JOB_NAME=%s\n", getenv('CI_JOB_NAME'));
-  file_put_contents($outputDirectory . \DIRECTORY_SEPARATOR . "env.txt", $env);
+#  $env = sprintf("CI_PIPELINE_ID=%s\n", getenv('CI_PIPELINE_ID'));
+#  $env .= sprintf("CI_PIPELINE_NAME=%s\n", getenv('CI_PIPELINE_NAME'));
+#  $env .= sprintf("CI_JOB_STAGE=%s\n", getenv('CI_JOB_STAGE'));
+#  $env .= sprintf("CI_JOB_ID=%s\n", getenv('CI_JOB_ID'));
+#  $env .= sprintf("CI_JOB_NAME=%s\n", getenv('CI_JOB_NAME'));
+#  file_put_contents($outputDirectory . \DIRECTORY_SEPARATOR . "env.txt", $env);
 
   echo "\n\nDeprecation ignore stats\n";
   echo "-----------+------------------------\n";

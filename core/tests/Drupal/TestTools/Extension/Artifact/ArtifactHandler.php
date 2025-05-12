@@ -91,4 +91,31 @@ final class ArtifactHandler implements Extension {
     return self::$databaseVersion;
   }
 
+  public static function metadata(): array {
+    $tmp = [];
+    if ($env = getenv('CI_PIPELINE_ID')) {
+      $tmp['CI_PIPELINE_ID'] = $env;
+    }
+    if ($env = getenv('CI_PIPELINE_NAME')) {
+      $tmp['CI_PIPELINE_NAME'] = $env;
+    }
+    if ($env = getenv('CI_JOB_ID')) {
+      $tmp['CI_JOB_ID'] = $env;
+    }
+    if ($env = getenv('CI_JOB_STAGE')) {
+      $tmp['CI_JOB_STAGE'] = $env;
+    }
+    if ($env = getenv('CI_JOB_NAME')) {
+      $tmp['CI_JOB_NAME'] = $env;
+    }
+    $tmp['php_version'] = self::phpVersion();
+    if (self::databaseDriver()) {
+      $tmp['database_driver'] = self::databaseDriver();
+    }
+    if (self::databaseVersion()) {
+      $tmp['database_version'] = self::databaseVersion();
+    }
+    return $tmp;
+  }
+
 }

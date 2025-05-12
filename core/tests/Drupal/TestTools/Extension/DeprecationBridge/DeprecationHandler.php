@@ -183,11 +183,14 @@ final class DeprecationHandler implements Extension {
     }
 
     $encodedStats = explode("\n", $content);
-    $stats = [];
+    $stats = [
+      'metadata' => ArtifactHandler::metadata(),
+      'skips' => [],
+    ];
     foreach ($encodedStats as $encodedStat) {
       $tmp = (array) json_decode(base64_decode($encodedStat));
       if (!empty($tmp)) {
-        $stats[$tmp['pattern']] = isset($stats[$tmp['pattern']]) ? $stats[$tmp['pattern']] + 1 : 1;
+        $stats['skips'][$tmp['pattern']] = isset($stats['skips'][$tmp['pattern']]) ? $stats['skips'][$tmp['pattern']] + 1 : 1;
       }
     }
 
