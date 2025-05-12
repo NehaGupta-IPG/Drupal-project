@@ -8,6 +8,21 @@
 
 use Symfony\Component\Finder\Finder;
  
+function trim_with_ellipsis(string $input, int $length, int $side): string {
+    if (strlen($input) < $length) {
+        return str_pad($input, $length, ' ', STR_PAD_RIGHT);
+    }
+    elseif (strlen($input) > $length) {
+        return match($side) {
+          STR_PAD_RIGHT => substr($input, 0, $length - 3) . '...',
+          default => '...' . substr($input, -$length + 3),
+        };
+    }
+    return $input;
+}
+  
+// -----------------------------------------------------------------
+
 if (PHP_SAPI !== 'cli') {
   return;
 }
@@ -44,3 +59,4 @@ foreach (file(__DIR__ . '/../../core' . \DIRECTORY_SEPARATOR . '.deprecation-ign
   }
 }
 echo "-----------+----------------------------------------------------------------------\n";
+
