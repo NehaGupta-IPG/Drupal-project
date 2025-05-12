@@ -206,9 +206,9 @@ simpletest_script_reporter_display_results($test_run_results_storage);
 
 // CONSOLIDATE. --------------------
 
-try {
+#try {
   $files = \Drupal::service(FileSystemInterface::class)->scanDirectory(
-    \Drupal::root() . \DIRECTORY_SEPARATOR . 'core\test-artifacts\jobs' . \DIRECTORY_SEPARATOR . getenv('CI_JOB_ID') . \DIRECTORY_SEPARATOR . 'deprecation-handler',
+    \Drupal::root() . \DIRECTORY_SEPARATOR . 'core/test-artifacts/jobs' . \DIRECTORY_SEPARATOR . getenv('CI_JOB_ID') . \DIRECTORY_SEPARATOR . 'deprecation-handler',
     '/^deprecation-ignore-stats.*\.json$/',
   );
 dump($files);
@@ -248,9 +248,9 @@ dump($tmp);
   }
   echo "-----------+------------------------\n";
 }
-catch (\Exception) {
-  // Do nothing.
-}
+#catch (\Exception) {
+#  // Do nothing.
+#}
 
 // CONSOLIDATE. --------------------
 
