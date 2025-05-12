@@ -4,6 +4,7 @@ namespace Drupal\media;
 
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\Sql\SqlContentEntityStorage;
+use Drupal\Core\Entity\EntityStorageException;
 
 /**
  * Defines the storage handler class for media.
@@ -27,6 +28,22 @@ class MediaStorage extends SqlContentEntityStorage {
       $media->prepareSave();
     }
     return parent::save($media);
+  }
+
+  /**
+   * {@inheritdoc}
+   *
+   * @throws \Drupal\Core\Entity\EntityStorageException
+   *   In case of failures at the configuration storage level.
+   */
+  protected function doCreate(array $values) {
+    if ($this->bundleKey) {
+      $bundles = $this->entityTypeBundleInfo->getBundleInfo('media');
+      if (!in_array($values[$this->bundleKey], array_keys($bundles))) {
+        throw new EntityStorageException('The bundle ' . $values[$this->bundleKey] . ' is not a valid Media type');
+      }
+    }
+    return parent::doCreate($values);
   }
 
 }
