@@ -478,7 +478,7 @@ function system_requirements($phase): array {
         '%exception_message' => $e->getMessage(),
       ];
       if ($open_basedir_blocks_urandom) {
-        $requirements['php_random_bytes']['description'] = t('Drupal is unable to generate highly randomized numbers, which means certain security features like password reset URLs are not as secure as they should be. Instead, only a slow, less-secure fallback generator is available. The most likely cause is that open_basedir restrictions are in effect and /dev/urandom is not on the whitelist. See the <a href=":drupal-php">system requirements</a> page for more information. %exception_message', $args);
+        $requirements['php_random_bytes']['description'] = t('Drupal is unable to generate highly randomized numbers, which means certain security features like password reset URLs are not as secure as they should be. Instead, only a slow, less-secure fallback generator is available. The most likely cause is that open_basedir restrictions are in effect and /dev/urandom is not on the allowed list. See the <a href=":drupal-php">system requirements</a> page for more information. %exception_message', $args);
       }
       else {
         $requirements['php_random_bytes']['description'] = t('Drupal is unable to generate highly randomized numbers, which means certain security features like password reset URLs are not as secure as they should be. Instead, only a slow, less-secure fallback generator is available. See the <a href=":drupal-php">system requirements</a> page for more information. %exception_message', $args);
@@ -1300,7 +1300,7 @@ function system_requirements($phase): array {
       $requirements['update status'] = [
         'value' => t('Not enabled'),
         'severity' => REQUIREMENT_WARNING,
-        'description' => t('Update notifications are not enabled. It is <strong>highly recommended</strong> that you install the Update Manager module from the <a href=":module">module administration page</a> in order to stay up-to-date on new releases. For more information, <a href=":update">Update status handbook page</a>.', [
+        'description' => t('Update notifications are not enabled. It is <strong>highly recommended</strong> that you install the Update Status module from the <a href=":module">module administration page</a> in order to stay up-to-date on new releases. For more information, <a href=":update">Update status handbook page</a>.', [
           ':update' => 'https://www.drupal.org/documentation/modules/update',
           ':module' => Url::fromRoute('system.modules_list')->toString(),
         ]),
@@ -1667,6 +1667,21 @@ function system_schema(): array {
  */
 function system_update_last_removed(): int {
   return 10201;
+}
+
+/**
+ * Add a [time] column to the {simpletest} table, if existing.
+ */
+function system_update_11200(): void {
+  $schema = \Drupal::database()->schema();
+  if ($schema->tableExists('simpletest') && !$schema->fieldExists('simpletest', 'time')) {
+    $schema->addField('simpletest', 'time', [
+      'type' => 'float',
+      'not null' => TRUE,
+      'default' => 0,
+      'description' => 'Time elapsed for the execution of the test.',
+    ]);
+  }
 }
 
 /**

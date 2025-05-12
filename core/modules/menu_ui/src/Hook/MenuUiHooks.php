@@ -115,13 +115,14 @@ class MenuUiHooks {
       return $entity->access('update', NULL, TRUE)->andIf($entity->access('delete', NULL, TRUE));
     }
     else {
-      // If the node has no corresponding menu link, users needs to permission to create one.
+      // If the node has no corresponding menu link, users needs to permission
+      // to create one.
       return $this->entityTypeManager->getAccessControlHandler('menu_link_content')->createAccess(NULL, NULL, [], TRUE);
     }
   }
 
   /**
-   * Implements hook_form_BASE_FORM_ID_alter() for \Drupal\node\NodeForm.
+   * Implements hook_form_BASE_FORM_ID_alter() for \Drupal\node\Form\NodeForm.
    *
    * Adds menu item fields to the node form.
    *
@@ -231,7 +232,7 @@ class MenuUiHooks {
   }
 
   /**
-   * Implements hook_form_FORM_ID_alter() for \Drupal\node\NodeTypeForm.
+   * Implements hook_form_FORM_ID_alter() for \Drupal\node\Form\NodeTypeForm.
    *
    * Adds menu options to the node type form.
    *
