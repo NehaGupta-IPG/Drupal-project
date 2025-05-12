@@ -216,7 +216,8 @@ simpletest_script_reporter_display_results($test_run_results_storage);
   foreach ($files as $file) {
     $contents = (array) json_decode(file_get_contents($file->uri));
 dump($contents);
-    foreach ($contents['skips'] as $key => $count) {
+    $metadata = (array) $contents['metadata'];
+    foreach ((array) $contents['skips'] as $key => $count) {
       $tmp[$key] = isset($tmp[$key]) ? $tmp[$key] + $count : $count;
     }
   }
@@ -229,13 +230,6 @@ dump($contents);
     'metadata' => $metadata,
     'skips' => $tmp,
   ]));
-
-#  $env = sprintf("CI_PIPELINE_ID=%s\n", getenv('CI_PIPELINE_ID'));
-#  $env .= sprintf("CI_PIPELINE_NAME=%s\n", getenv('CI_PIPELINE_NAME'));
-#  $env .= sprintf("CI_JOB_STAGE=%s\n", getenv('CI_JOB_STAGE'));
-#  $env .= sprintf("CI_JOB_ID=%s\n", getenv('CI_JOB_ID'));
-#  $env .= sprintf("CI_JOB_NAME=%s\n", getenv('CI_JOB_NAME'));
-#  file_put_contents($outputDirectory . \DIRECTORY_SEPARATOR . "env.txt", $env);
 
   echo "\n\nDeprecation ignore stats\n";
   echo "-----------+------------------------\n";
