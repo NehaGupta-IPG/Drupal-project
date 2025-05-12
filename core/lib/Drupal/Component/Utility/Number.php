@@ -27,7 +27,7 @@ class Number {
    * @return string
    *   The normalized numeric string.
    */
-  private static function normalize($number): string {
+  private static function normalize(int|float|string $number): string {
     if (is_float($number)) {
       // If the float has less significant decimals than the number we can
       // guarantee, convert it to a string directly.
@@ -59,7 +59,7 @@ class Number {
    *   @code Number::countSignificantDecimals('100.12345678901234567890') @endcode
    *   returns 20.
    */
-  private static function countSignificantDecimals($number): int {
+  private static function countSignificantDecimals(int|float|string $number): int {
     $number = is_numeric($number) ? static::normalize($number) : 0;
 
     // If no decimal separator is encountered, there are 0 significant
