@@ -82,8 +82,11 @@ abstract class DisplayExtenderPluginBase extends PluginBase {
    * default options (i.e. is always on), or the configuration is non-default.
    *
    * Complex display extenders should override this method for best results.
+   *
+   * @return bool
+   *   TRUE if it is enabled, FALSE otherwise.
    */
-  public function isEnabled() {
+  public function isEnabled(): bool {
     $defaults = [];
     $this->setOptionDefaults($defaults, $this->defineOptions());
     if (empty($defaults)) {
