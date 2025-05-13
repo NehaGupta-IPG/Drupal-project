@@ -580,7 +580,7 @@ class FilterHtml extends FilterBase {
    *   The HTML text string with all occurrences of the summary delimiter pseudo
    *   HTML tag replaced by the original summary delimiter HTML comment.
    */
-  private function unprotectSummaryDelimiter($text) {
+  private function unprotectSummaryDelimiter(string $text): string {
     $summary_delimiter = self::SUMMARY_DELIMITER;
     $summary_delimiter_html_tag = $this->getSummaryDelimiterHtmlTag();
 
