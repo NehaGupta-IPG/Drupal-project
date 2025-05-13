@@ -157,7 +157,7 @@ class FormHelperTest extends UnitTestCase {
             ],
             '#markup' => 'a non empty string value',
             '#input' => TRUE,
-          ]
+          ],
         ],
         '#wrapper_attributes',
       ],
