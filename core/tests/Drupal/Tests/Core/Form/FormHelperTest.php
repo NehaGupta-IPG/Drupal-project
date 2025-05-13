@@ -114,7 +114,33 @@ class FormHelperTest extends UnitTestCase {
         ],
         '#attributes',
       ],
+      'container' => [
+        [
+          '#type' => 'container',
+          '#states' => [
+            'visible' => [
+              ':input[name="foo"]' => ['value' => 'bar'],
+            ],
+          ],
+          [
+            '#type' => 'textfield',
+          ],
+        ],
+        '#attributes',
+      ],
       'empty item' => [
+        [
+          '#type' => 'item',
+          '#states' => [
+            'visible' => [
+              ':input[name="foo"]' => ['value' => 'bar'],
+            ],
+          ],
+          '#markup' => '',
+        ],
+        '#wrapper_attributes',
+      ],
+      'empty item with input' => [
         [
           '#type' => 'item',
           '#states' => [
@@ -136,23 +162,32 @@ class FormHelperTest extends UnitTestCase {
             ],
           ],
           '#markup' => 'a non empty string value',
-          '#input' => TRUE,
         ],
         '#wrapper_attributes',
       ],
-      'container' => [
+      'item with markup and input' => [
         [
-          '#type' => 'container',
+          '#type' => 'item',
           '#states' => [
             'visible' => [
               ':input[name="foo"]' => ['value' => 'bar'],
             ],
           ],
-          [
-            '#type' => 'textfield',
+          '#markup' => 'a non empty string value',
+          '#input' => TRUE,
+        ],
+        '#wrapper_attributes',
+      ],
+      'password_confirm' => [
+        [
+          '#type' => 'password_confirm',
+          '#states' => [
+            'visible' => [
+              ':input[name="foo"]' => ['value' => 'bar'],
+            ],
           ],
         ],
-        '#attributes',
+        '#wrapper_attributes',
       ],
     ];
   }
