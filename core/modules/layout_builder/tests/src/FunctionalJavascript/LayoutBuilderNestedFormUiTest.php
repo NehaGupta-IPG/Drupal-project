@@ -149,7 +149,7 @@ class LayoutBuilderNestedFormUiTest extends WebDriverTestBase {
     $this->clickLink($label);
     $assert_session->waitForElementVisible('named', ['button', 'Add block']);
     $page->pressButton('Add block');
-    $assert_session->assertWaitOnAjaxRequest();
+    $assert_session->assertExpectedAjaxRequest();
     $assert_session->pageTextContains($label);
     $assert_session->addressEquals($path . '/layout');
 

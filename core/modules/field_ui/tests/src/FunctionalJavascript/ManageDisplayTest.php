@@ -372,7 +372,7 @@ class ManageDisplayTest extends WebDriverTestBase {
 
     $field_third_party_test->setValue('foo');
     $page->findButton('Update')->click();
-    $assert_session->assertWaitOnAjaxRequest();
+    $assert_session->assertExpectedAjaxRequest();
 
     $button_save->click();
     $this->drupalGet($manage_display);
@@ -410,7 +410,7 @@ class ManageDisplayTest extends WebDriverTestBase {
     ]);
 
     $field_test_drag_handle->dragTo($target);
-    $assert_session->assertWaitOnAjaxRequest();
+    $assert_session->assertExpectedAjaxRequest();
     $button_save->click();
 
     // Validate the changed display settings on the server.

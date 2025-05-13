@@ -558,7 +558,7 @@ class InlineBlockTest extends InlineBlockTestBase {
     $this->drupalGet($layout_default_path);
     // Add a basic block with the body field set.
     $page->clickLink('Add block');
-    $assert_session->assertWaitOnAjaxRequest();
+    $assert_session->assertExpectedAjaxRequest();
     // Confirm that with no block content types the link does not appear.
     $assert_session->linkNotExists('Create content block');
 
@@ -567,12 +567,12 @@ class InlineBlockTest extends InlineBlockTestBase {
     $this->drupalGet($layout_default_path);
     // Add a basic block with the body field set.
     $page->clickLink('Add block');
-    $assert_session->assertWaitOnAjaxRequest();
+    $assert_session->assertExpectedAjaxRequest();
     // Confirm with only 1 type the "Create content block" link goes directly t
     // block add form.
     $assert_session->linkNotExists('Basic block');
     $this->clickLink('Create content block');
-    $assert_session->assertWaitOnAjaxRequest();
+    $assert_session->assertExpectedAjaxRequest();
     $assert_session->fieldExists('Title');
 
     $this->createBlockContentType('advanced', 'Advanced block');
@@ -582,25 +582,25 @@ class InlineBlockTest extends InlineBlockTestBase {
     $page->clickLink('Add block');
     // Confirm that, when more than 1 type exists, "Create content block" shows
     // a list of block types.
-    $assert_session->assertWaitOnAjaxRequest();
+    $assert_session->assertExpectedAjaxRequest();
     $assert_session->linkNotExists('Basic block');
     $assert_session->linkNotExists('Advanced block');
     $this->clickLink('Create content block');
-    $assert_session->assertWaitOnAjaxRequest();
+    $assert_session->assertExpectedAjaxRequest();
     $assert_session->fieldNotExists('Title');
     $assert_session->linkExists('Basic block');
     $assert_session->linkExists('Advanced block');
 
     $this->clickLink('Advanced block');
-    $assert_session->assertWaitOnAjaxRequest();
+    $assert_session->assertExpectedAjaxRequest();
     $assert_session->fieldExists('Title');
 
     // Confirm that Create Content block opt out logic works for Navigation.
     $this->drupalGet('/admin/config/user-interface/navigation-block');
     $this->getSession()->getPage()->pressButton('Enable edit mode');
-    $this->assertSession()->assertWaitOnAjaxRequest();
+    $this->assertSession()->assertExpectedAjaxRequest();
     $page->clickLink('Add block');
-    $assert_session->assertWaitOnAjaxRequest();
+    $assert_session->assertExpectedAjaxRequest();
     $assert_session->pageTextContains('Choose a block');
     $assert_session->linkNotExists('Create content block');
 
@@ -672,7 +672,7 @@ class InlineBlockTest extends InlineBlockTestBase {
       $this->drupalLogin($this->drupalCreateUser($permissions));
       $this->drupalGet(static::FIELD_UI_PREFIX . '/display/default/layout');
       $this->clickContextualLink(static::INLINE_BLOCK_LOCATOR, 'Configure');
-      $assert_session->assertWaitOnAjaxRequest();
+      $assert_session->assertExpectedAjaxRequest();
       if ($expected) {
         $assert_session->fieldExists('settings[block_form][body][0][value]');
       }

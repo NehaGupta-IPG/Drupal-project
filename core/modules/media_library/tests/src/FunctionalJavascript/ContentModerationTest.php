@@ -247,22 +247,22 @@ class ContentModerationTest extends WebDriverTestBase {
     $this->drupalLogin($this->userAdmin);
     $this->drupalGet('node/add/article');
     $assert_session->elementExists('css', '.js-media-library-open-button[name^="field_media"]')->click();
-    $assert_session->assertWaitOnAjaxRequest();
+    $assert_session->assertExpectedAjaxRequest();
     $this->assertOnlyPublishedMedia();
     $this->drupalLogin($this->userViewer);
     $this->drupalGet('node/add/article');
     $assert_session->elementExists('css', '.js-media-library-open-button[name^="field_media"]')->click();
-    $assert_session->assertWaitOnAjaxRequest();
+    $assert_session->assertExpectedAjaxRequest();
     $this->assertOnlyPublishedMedia();
     $this->drupalLogin($this->userViewOwnUnpublished);
     $this->drupalGet('node/add/article');
     $assert_session->elementExists('css', '.js-media-library-open-button[name^="field_media"]')->click();
-    $assert_session->assertWaitOnAjaxRequest();
+    $assert_session->assertExpectedAjaxRequest();
     $this->assertOnlyPublishedMedia();
     $this->drupalLogin($this->userViewAnyUnpublished);
     $this->drupalGet('node/add/article');
     $assert_session->elementExists('css', '.js-media-library-open-button[name^="field_media"]')->click();
-    $assert_session->assertWaitOnAjaxRequest();
+    $assert_session->assertExpectedAjaxRequest();
     $this->assertOnlyPublishedMedia();
 
     // After we change the owner to the user with 'view own unpublished media'
@@ -275,22 +275,22 @@ class ContentModerationTest extends WebDriverTestBase {
     $this->drupalLogin($this->userAdmin);
     $this->drupalGet('node/add/article');
     $assert_session->elementExists('css', '.js-media-library-open-button[name^="field_media"]')->click();
-    $assert_session->assertWaitOnAjaxRequest();
+    $assert_session->assertExpectedAjaxRequest();
     $this->assertOnlyPublishedMedia();
     $this->drupalLogin($this->userViewer);
     $this->drupalGet('node/add/article');
     $assert_session->elementExists('css', '.js-media-library-open-button[name^="field_media"]')->click();
-    $assert_session->assertWaitOnAjaxRequest();
+    $assert_session->assertExpectedAjaxRequest();
     $this->assertOnlyPublishedMedia();
     $this->drupalLogin($this->userViewOwnUnpublished);
     $this->drupalGet('node/add/article');
     $assert_session->elementExists('css', '.js-media-library-open-button[name^="field_media"]')->click();
-    $assert_session->assertWaitOnAjaxRequest();
+    $assert_session->assertExpectedAjaxRequest();
     $this->assertOnlyPublishedMedia();
     $this->drupalLogin($this->userViewAnyUnpublished);
     $this->drupalGet('node/add/article');
     $assert_session->elementExists('css', '.js-media-library-open-button[name^="field_media"]')->click();
-    $assert_session->assertWaitOnAjaxRequest();
+    $assert_session->assertExpectedAjaxRequest();
     $this->assertOnlyPublishedMedia();
   }
 

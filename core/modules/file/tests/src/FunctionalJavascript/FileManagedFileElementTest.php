@@ -85,7 +85,7 @@ class FileManagedFileElementTest extends WebDriverTestBase {
             $this->getSession()->getPage()->checkField($selected_checkbox);
           }
           $this->getSession()->getPage()->pressButton($remove_button_title);
-          $this->assertSession()->assertWaitOnAjaxRequest();
+          $this->assertSession()->assertExpectedAjaxRequest();
           $this->submitForm([], 'Save');
           $this->assertSession()->pageTextContains('The file ids are .');
 
@@ -99,7 +99,7 @@ class FileManagedFileElementTest extends WebDriverTestBase {
             $this->getSession()->getPage()->checkField($selected_checkbox);
           }
           $this->getSession()->getPage()->pressButton($remove_button_title);
-          $this->assertSession()->assertWaitOnAjaxRequest();
+          $this->assertSession()->assertExpectedAjaxRequest();
 
           $this->submitForm([], 'Save');
           $this->assertSession()->pageTextContains('The file ids are .');

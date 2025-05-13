@@ -108,7 +108,7 @@ class EntityDisplayTest extends WebDriverTestBase {
     $disabled_region_row = $this->getSession()->getPage()->find('css', '.region-hidden-title');
 
     $extra_field_row->find('css', '.handle')->dragTo($disabled_region_row);
-    $this->assertSession()->assertWaitOnAjaxRequest();
+    $this->assertSession()->assertExpectedAjaxRequest();
     $this->assertSession()
       ->waitForElement('css', "[name='form_build_id']:not([value='$id'])");
 

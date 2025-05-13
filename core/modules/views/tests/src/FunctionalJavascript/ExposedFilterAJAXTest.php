@@ -98,7 +98,7 @@ class ExposedFilterAJAXTest extends WebDriverTestBase {
 
     // Search for "Page One".
     $this->submitForm(['title' => 'Page One'], 'Filter');
-    $this->assertSession()->assertWaitOnAjaxRequest();
+    $this->assertSession()->assertExpectedAjaxRequest();
 
     // Verify that only the "Page One" Node is present.
     $html = $session->getPage()->getHtml();
@@ -107,7 +107,7 @@ class ExposedFilterAJAXTest extends WebDriverTestBase {
 
     // Search for "Page Two".
     $this->submitForm(['title' => 'Page Two'], 'Filter');
-    $this->assertSession()->assertWaitOnAjaxRequest();
+    $this->assertSession()->assertExpectedAjaxRequest();
 
     // Verify that only the "Page Two" Node is present.
     $html = $session->getPage()->getHtml();
@@ -174,7 +174,7 @@ class ExposedFilterAJAXTest extends WebDriverTestBase {
     // Search for "Page One".
     $session->getPage()->fillField('title', 'Page One');
     $assert->elementExists('css', '.ui-dialog-buttonpane')->pressButton('Filter');
-    $this->assertSession()->assertWaitOnAjaxRequest();
+    $this->assertSession()->assertExpectedAjaxRequest();
 
     // Verify that only the "Page One" Node is present.
     $html = $session->getPage()->getHtml();
@@ -194,7 +194,7 @@ class ExposedFilterAJAXTest extends WebDriverTestBase {
     // Search for "Page One".
     $session->getPage()->fillField('title', 'Page One');
     $assert->elementExists('css', '.ui-dialog-buttonpane')->pressButton('Filter');
-    $this->assertSession()->assertWaitOnAjaxRequest();
+    $this->assertSession()->assertExpectedAjaxRequest();
 
     // Verify that only the "Page One" Node is present.
     $html = $session->getPage()->getHtml();
@@ -231,7 +231,7 @@ class ExposedFilterAJAXTest extends WebDriverTestBase {
 
     // Search for "Page One".
     $this->submitForm(['title' => 'Page One'], 'Filter');
-    $this->assertSession()->assertWaitOnAjaxRequest();
+    $this->assertSession()->assertExpectedAjaxRequest();
 
     // Verify that only the "Page One" Node is present.
     $html = $session->getPage()->getHtml();

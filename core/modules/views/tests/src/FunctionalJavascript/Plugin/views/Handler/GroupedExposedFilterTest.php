@@ -84,7 +84,7 @@ class GroupedExposedFilterTest extends WebDriverTestBase {
 
     // Open the dialog for the grouped filter.
     $page->clickLink('Content: Authored on (grouped)');
-    $web_assert->assertWaitOnAjaxRequest();
+    $web_assert->assertExpectedAjaxRequest();
 
     // Test that the 'min' field is shown and that it contains the right value.
     $between_from = $page->findField('options[group_info][group_items][1][value][min]');
@@ -121,11 +121,11 @@ class GroupedExposedFilterTest extends WebDriverTestBase {
     $apply_button = $page->find('css', '.views-ui-dialog button.button--primary');
     $this->assertNotEmpty($apply_button);
     $apply_button->press();
-    $web_assert->assertWaitOnAjaxRequest();
+    $web_assert->assertExpectedAjaxRequest();
 
     // Open the dialog for the grouped filter.
     $page->clickLink('Content: Authored on (grouped)');
-    $web_assert->assertWaitOnAjaxRequest();
+    $web_assert->assertExpectedAjaxRequest();
 
     // Test that the 'min' field is shown and that it contains the right value.
     $between_from = $page->findField('options[group_info][group_items][1][value][min]');

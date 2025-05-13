@@ -106,7 +106,7 @@ class ClaroEntityDisplayTest extends EntityDisplayTest {
     $disabled_region_row = $this->getSession()->getPage()->find('css', '.region-hidden-title');
 
     $extra_field_row->find('css', '.js-tabledrag-handle')->dragTo($disabled_region_row);
-    $this->assertSession()->assertWaitOnAjaxRequest();
+    $this->assertSession()->assertExpectedAjaxRequest();
     $this->assertSession()
       ->waitForElement('css', "[name='form_build_id']:not([value='$id'])");
 

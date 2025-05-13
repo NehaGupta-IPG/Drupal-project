@@ -82,9 +82,9 @@ class WidgetOEmbedTest extends MediaLibraryTestBase {
     $page->fillField('Add Type Five via URL', $youtube_url);
     $assert_session->pageTextContains('Allowed providers: YouTube, Vimeo.');
     $page->pressButton('Add');
-    // assertWaitOnAjaxRequest() required for input "id" attributes to
+    // assertExpectedAjaxRequest() required for input "id" attributes to
     // consistently match their label's "for" attribute.
-    $assert_session->assertWaitOnAjaxRequest();
+    $assert_session->assertExpectedAjaxRequest();
     $this->waitForText('The media item has been created but has not yet been saved.');
     // There is no other selected media and this is not the advanced ui.
     // Assert that the Additional selected media element does not appear.
@@ -121,18 +121,18 @@ class WidgetOEmbedTest extends MediaLibraryTestBase {
     // Assert we can only add supported URLs.
     $page->fillField('Add Type Five via URL', 'https://www.youtube.com/');
     $page->pressButton('Add');
-    // assertWaitOnAjaxRequest() required for input "id" attributes to
+    // assertExpectedAjaxRequest() required for input "id" attributes to
     // consistently match their label's "for" attribute.
-    $assert_session->assertWaitOnAjaxRequest();
+    $assert_session->assertExpectedAjaxRequest();
     $this->waitForText('No matching provider found.');
     // Assert we can not add a video ID that doesn't exist. We need to use a
     // video ID that will not be filtered by the regex, because otherwise the
     // message 'No matching provider found.' will be returned.
     $page->fillField('Add Type Five via URL', 'https://www.youtube.com/watch?v=PWjcqE3QKBg1');
     $page->pressButton('Add');
-    // assertWaitOnAjaxRequest() required for input "id" attributes to
+    // assertExpectedAjaxRequest() required for input "id" attributes to
     // consistently match their label's "for" attribute.
-    $assert_session->assertWaitOnAjaxRequest();
+    $assert_session->assertExpectedAjaxRequest();
     $this->waitForText('Could not retrieve the oEmbed resource.');
 
     // Select a media item to check if the selection is persisted when adding
@@ -146,9 +146,9 @@ class WidgetOEmbedTest extends MediaLibraryTestBase {
     // Assert we can add a oEmbed video with a custom name.
     $page->fillField('Add Type Five via URL', $youtube_url);
     $page->pressButton('Add');
-    // assertWaitOnAjaxRequest() required for input "id" attributes to
+    // assertExpectedAjaxRequest() required for input "id" attributes to
     // consistently match their label's "for" attribute.
-    $assert_session->assertWaitOnAjaxRequest();
+    $assert_session->assertExpectedAjaxRequest();
     $this->waitForText('The media item has been created but has not yet been saved.');
     $page->fillField('Name', 'Custom video title');
     // The non-advanced ui should not show the Additional selected media.
@@ -205,9 +205,9 @@ class WidgetOEmbedTest extends MediaLibraryTestBase {
     $assert_session->hiddenFieldValueEquals('current_selection', $selected_item_id);
     $page->fillField('Add Type Five via URL', $youtube_url);
     $page->pressButton('Add');
-    // assertWaitOnAjaxRequest() required for input "id" attributes to
+    // assertExpectedAjaxRequest() required for input "id" attributes to
     // consistently match their label's "for" attribute.
-    $assert_session->assertWaitOnAjaxRequest();
+    $assert_session->assertExpectedAjaxRequest();
     $this->waitForText('The media item has been created but has not yet been saved');
     $page->fillField('Name', 'Another video');
     $this->pressSaveButton();
@@ -271,9 +271,9 @@ class WidgetOEmbedTest extends MediaLibraryTestBase {
     $page->fillField('Add Type Five via URL', $youtube_url);
     $assert_session->pageTextContains('Allowed providers: YouTube, Vimeo.');
     $page->pressButton('Add');
-    // assertWaitOnAjaxRequest() required for input "id" attributes to
+    // assertExpectedAjaxRequest() required for input "id" attributes to
     // consistently match their label's "for" attribute.
-    $assert_session->assertWaitOnAjaxRequest();
+    $assert_session->assertExpectedAjaxRequest();
     $this->waitForText('The media item has been created but has not yet been saved.');
     // Assert that Additional selected media does not appear.
     $assert_session->pageTextNotContains('Additional selected media');
@@ -309,18 +309,18 @@ class WidgetOEmbedTest extends MediaLibraryTestBase {
     // Assert we can only add supported URLs.
     $page->fillField('Add Type Five via URL', 'https://www.youtube.com/');
     $page->pressButton('Add');
-    // assertWaitOnAjaxRequest() required for input "id" attributes to
+    // assertExpectedAjaxRequest() required for input "id" attributes to
     // consistently match their label's "for" attribute.
-    $assert_session->assertWaitOnAjaxRequest();
+    $assert_session->assertExpectedAjaxRequest();
     $this->waitForText('No matching provider found.');
     // Assert we can not add a video ID that doesn't exist. We need to use a
     // video ID that will not be filtered by the regex, because otherwise the
     // message 'No matching provider found.' will be returned.
     $page->fillField('Add Type Five via URL', 'https://www.youtube.com/watch?v=PWjcqE3QKBg1');
     $page->pressButton('Add');
-    // assertWaitOnAjaxRequest() required for input "id" attributes to
+    // assertExpectedAjaxRequest() required for input "id" attributes to
     // consistently match their label's "for" attribute.
-    $assert_session->assertWaitOnAjaxRequest();
+    $assert_session->assertExpectedAjaxRequest();
     $this->waitForText('Could not retrieve the oEmbed resource.');
 
     // Select a media item to check if the selection is persisted when adding
@@ -334,9 +334,9 @@ class WidgetOEmbedTest extends MediaLibraryTestBase {
     // Assert we can add a oEmbed video with a custom name.
     $page->fillField('Add Type Five via URL', $youtube_url);
     $page->pressButton('Add');
-    // assertWaitOnAjaxRequest() required for input "id" attributes to
+    // assertExpectedAjaxRequest() required for input "id" attributes to
     // consistently match their label's "for" attribute.
-    $assert_session->assertWaitOnAjaxRequest();
+    $assert_session->assertExpectedAjaxRequest();
     $this->waitForText('The media item has been created but has not yet been saved.');
     // The advanced ui should show the Additional selected media.
     $assert_session->pageTextContains('Additional selected media');
@@ -396,9 +396,9 @@ class WidgetOEmbedTest extends MediaLibraryTestBase {
     $assert_session->hiddenFieldValueEquals('current_selection', $selected_item_id);
     $page->fillField('Add Type Five via URL', $youtube_url);
     $page->pressButton('Add');
-    // assertWaitOnAjaxRequest() required for input "id" attributes to
+    // assertExpectedAjaxRequest() required for input "id" attributes to
     // consistently match their label's "for" attribute.
-    $assert_session->assertWaitOnAjaxRequest();
+    $assert_session->assertExpectedAjaxRequest();
     $this->waitForText('The media item has been created but has not yet been saved');
     $page->fillField('Name', 'Another video');
     $selection_area = $this->getSelectionArea();

@@ -50,7 +50,7 @@ class FrameworkTest extends WebDriverTestBase {
 
     // Submit the AJAX request without triggering files getting added.
     $page->pressButton('Submit');
-    $assert->assertWaitOnAjaxRequest();
+    $assert->assertExpectedAjaxRequest();
     $new_settings = $this->getDrupalSettings();
     $new_libraries = explode(',', $new_settings['ajaxPageState']['libraries']);
 
@@ -62,7 +62,7 @@ class FrameworkTest extends WebDriverTestBase {
     // Submit the AJAX request and trigger adding files.
     $page->checkField('add_files');
     $page->pressButton('Submit');
-    $assert->assertWaitOnAjaxRequest();
+    $assert->assertExpectedAjaxRequest();
     $new_settings = $this->getDrupalSettings();
     $new_libraries = explode(',', $new_settings['ajaxPageState']['libraries']);
 
@@ -93,7 +93,7 @@ class FrameworkTest extends WebDriverTestBase {
 
     $old_settings = $this->getDrupalSettings();
     $page->pressButton('Submit');
-    $assert->assertWaitOnAjaxRequest();
+    $assert->assertExpectedAjaxRequest();
     $new_settings = $this->getDrupalSettings();
     $this->assertEquals($old_settings['path']['currentPath'], $new_settings['path']['currentPath']);
   }

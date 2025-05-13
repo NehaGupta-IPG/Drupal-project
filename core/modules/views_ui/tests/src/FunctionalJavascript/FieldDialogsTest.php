@@ -85,7 +85,7 @@ class FieldDialogsTest extends WebDriverTestBase {
     $add_link = $page->findById('views-rearrange-field');
     $this->assertTrue($add_link->isVisible(), 'And/Or Rearrange button found.');
     $add_link->click();
-    $assert_session->assertWaitOnAjaxRequest();
+    $assert_session->assertExpectedAjaxRequest();
   }
 
 }

@@ -253,9 +253,9 @@ class WidgetUploadTest extends MediaLibraryTestBase {
     $this->assertTrue($assert_session->fieldExists('Add files')->hasAttribute('multiple'));
     $png_uri_5 = $file_system->copy($png_image->uri, 'public://');
     $this->addMediaFileToField('Add files', $this->container->get('file_system')->realpath($png_uri_5));
-    // assertWaitOnAjaxRequest() required for input "id" attributes to
+    // assertExpectedAjaxRequest() required for input "id" attributes to
     // consistently match their label's "for" attribute.
-    $assert_session->assertWaitOnAjaxRequest();
+    $assert_session->assertExpectedAjaxRequest();
     $page->fillField('Alternative text', $this->randomString());
     $this->pressSaveButton();
     $page->uncheckField('media_library_select_form[2]');

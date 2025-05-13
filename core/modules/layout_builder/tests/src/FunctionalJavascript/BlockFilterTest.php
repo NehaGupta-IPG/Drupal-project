@@ -62,7 +62,7 @@ class BlockFilterTest extends WebDriverTestBase {
     $this->drupalGet('node/1/layout');
     $assert_session->linkExists('Add block');
     $this->clickLink('Add block');
-    $assert_session->assertWaitOnAjaxRequest();
+    $assert_session->assertExpectedAjaxRequest();
 
     // Get all blocks, for assertions later.
     $blocks = $page->findAll('css', '.js-layout-builder-categories li');

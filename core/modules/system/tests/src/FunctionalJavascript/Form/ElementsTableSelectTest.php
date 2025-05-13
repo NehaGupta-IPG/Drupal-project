@@ -35,7 +35,7 @@ class ElementsTableSelectTest extends WebDriverTestBase {
       $row = 'row' . $i;
       $page->hasUncheckedField($row);
       $page->checkField($row);
-      $this->assertSession()->assertWaitOnAjaxRequest();
+      $this->assertSession()->assertExpectedAjaxRequest();
       // Check current row and previous rows are checked.
       for ($j = 1; $j <= $i; $j++) {
         $other_row = 'row' . $j;
@@ -49,7 +49,7 @@ class ElementsTableSelectTest extends WebDriverTestBase {
       $row = 'input[value="row' . $i . '"]';
       $page->hasUncheckedField($row);
       $this->click($row);
-      $this->assertSession()->assertWaitOnAjaxRequest();
+      $this->assertSession()->assertExpectedAjaxRequest();
       $page->hasCheckedField($row);
       // Check other rows are not checked
       for ($j = 1; $j <= 3; $j++) {

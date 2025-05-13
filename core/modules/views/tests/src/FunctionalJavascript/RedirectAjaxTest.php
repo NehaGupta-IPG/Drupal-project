@@ -60,12 +60,12 @@ class RedirectAjaxTest extends WebDriverTestBase {
     $this->assertSession()->pageTextContains('Tiny paws and playful mews, kittens bring joy in every hue');
 
     $this->submitForm(['title' => 'Kittens'], 'Filter');
-    $this->assertSession()->assertWaitOnAjaxRequest();
+    $this->assertSession()->assertExpectedAjaxRequest();
 
     $this->assertSession()->pageTextContains('Tiny paws and playful mews, kittens bring joy in every hue');
     $this->getSession()->getPage()->find('css', '.dropbutton-toggle button')->click();
     $this->clickLink('Delete');
-    $this->assertSession()->assertWaitOnAjaxRequest();
+    $this->assertSession()->assertExpectedAjaxRequest();
 
     $this->assertEquals('Are you sure you want to delete the content item Tiny paws and playful mews, kittens bring joy in every hue?', $this->assertSession()->waitForElement('css', '.ui-dialog-title')->getText());
     $this->getSession()->getPage()->find('css', '.ui-dialog-buttonset')->pressButton('Delete');

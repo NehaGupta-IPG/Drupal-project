@@ -69,13 +69,13 @@ class AdminAjaxTest extends WebDriverTestBase {
     $page = $this->getSession()->getPage();
     foreach (['name[views.nothing]', 'name[views.dropbutton]'] as $field) {
       $page->find('css', '#views-add-field')->click();
-      $this->assertSession()->assertWaitOnAjaxRequest();
+      $this->assertSession()->assertExpectedAjaxRequest();
       $page->checkField($field);
       $page->find('css', '.ui-dialog-buttonset')->pressButton('Add and configure fields');
-      $this->assertSession()->assertWaitOnAjaxRequest();
+      $this->assertSession()->assertExpectedAjaxRequest();
       $this->assertJsCondition('document.documentElement.style.overflow === "hidden"');
       $page->find('css', '.ui-dialog-buttonset')->pressButton('Apply');
-      $this->assertSession()->assertWaitOnAjaxRequest();
+      $this->assertSession()->assertExpectedAjaxRequest();
 
       // Check overflow.
       $this->assertJsCondition('document.documentElement.style.overflow !== "hidden"');

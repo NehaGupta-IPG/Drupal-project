@@ -43,7 +43,7 @@ class AjaxFileManagedMultipleTest extends WebDriverTestBase {
     foreach (array_slice($this->drupalGetTestFiles('image'), 0, 2) as $image) {
       $paths[] = $image->filename;
       $page->attachFileToField('files[nested_file][]', $file_system->realpath($image->uri));
-      $this->assertSession()->assertWaitOnAjaxRequest();
+      $this->assertSession()->assertExpectedAjaxRequest();
     }
 
     // Save entire form.

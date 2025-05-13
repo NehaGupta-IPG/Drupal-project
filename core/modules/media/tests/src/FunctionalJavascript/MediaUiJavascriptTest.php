@@ -189,7 +189,7 @@ class MediaUiJavascriptTest extends MediaJavascriptTestBase {
 
     // Tests media type delete form.
     $page->clickLink('Delete');
-    $assert_session->assertWaitOnAjaxRequest();
+    $assert_session->assertExpectedAjaxRequest();
     $this->assertNotEmpty($assert_session->waitForElementVisible('css', '#drupal-modal'));
     $assert_session->addressEquals('admin/structure/media/manage/' . $this->testMediaType->id());
     $this->click('.ui-dialog button:contains("Delete")');
@@ -204,7 +204,7 @@ class MediaUiJavascriptTest extends MediaJavascriptTestBase {
     $media->save();
     $this->drupalGet('admin/structure/media/manage/' . $media_type2->id());
     $page->clickLink('Delete');
-    $assert_session->assertWaitOnAjaxRequest();
+    $assert_session->assertExpectedAjaxRequest();
     $this->assertNotEmpty($assert_session->waitForElementVisible('css', '#drupal-modal'));
     $assert_session->addressEquals('admin/structure/media/manage/' . $media_type2->id());
     $assert_session->elementNotExists('css', '.ui-dialog button:contains("Delete")');

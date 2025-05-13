@@ -96,7 +96,7 @@ class FieldLayoutTest extends WebDriverTestBase {
     // Switch the layout to two columns.
     $this->click('#edit-field-layouts');
     $this->getSession()->getPage()->selectFieldOption('field_layout', 'layout_twocol');
-    $this->assertSession()->assertWaitOnAjaxRequest();
+    $this->assertSession()->assertExpectedAjaxRequest();
     $this->submitForm([], 'Save');
 
     // The field is moved to the default region for the new layout.
@@ -118,7 +118,7 @@ class FieldLayoutTest extends WebDriverTestBase {
     $field_test_text_row = $this->getSession()->getPage()->find('css', '#field-test-text');
     $second_region_row = $this->getSession()->getPage()->find('css', '.region-second-message');
     $field_test_text_row->find('css', '.handle')->dragTo($second_region_row);
-    $this->assertSession()->assertWaitOnAjaxRequest();
+    $this->assertSession()->assertExpectedAjaxRequest();
     $this->assertSession()->waitForElement('css', "[name='form_build_id']:not([value='$id'])");
     $this->submitForm([], 'Save');
     $this->assertSession()->pageTextContains('Your settings have been saved.');
@@ -161,7 +161,7 @@ class FieldLayoutTest extends WebDriverTestBase {
     // Switch the layout to two columns.
     $this->click('#edit-field-layouts');
     $this->getSession()->getPage()->selectFieldOption('field_layout', 'layout_twocol');
-    $this->assertSession()->assertWaitOnAjaxRequest();
+    $this->assertSession()->assertExpectedAjaxRequest();
     $this->submitForm([], 'Save');
 
     $this->assertSession()->pageTextContains('Your settings have been saved.');
@@ -184,7 +184,7 @@ class FieldLayoutTest extends WebDriverTestBase {
     $field_test_text_row = $this->getSession()->getPage()->find('css', '#field-test-text');
     $first_region_row = $this->getSession()->getPage()->find('css', '.region-first-message');
     $field_test_text_row->find('css', '.handle')->dragTo($first_region_row);
-    $this->assertSession()->assertWaitOnAjaxRequest();
+    $this->assertSession()->assertExpectedAjaxRequest();
     $this->assertFalse($this->assertSession()->optionExists('fields[field_test_text][region]', 'hidden')->isSelected());
     $this->assertSession()->waitForElement('css', "[name='form_build_id']:not([value='$id'])");
     $this->submitForm([], 'Save');
@@ -262,7 +262,7 @@ class FieldLayoutTest extends WebDriverTestBase {
     // Add the test field to the content region.
     $this->drupalGet('entity_test/structure/entity_test/display');
     $page->find('css', '#field-test-text .handle')->dragTo($page->find('css', '.region-content-message'));
-    $assert_session->assertWaitOnAjaxRequest();
+    $assert_session->assertExpectedAjaxRequest();
     $page->pressButton('Save');
     $assert_session->fieldValueEquals('fields[field_test_text][region]', 'content');
     $assert_session->fieldValueEquals('fields[field_test_text][type]', 'text_default');
@@ -270,15 +270,15 @@ class FieldLayoutTest extends WebDriverTestBase {
     // Switch the layout to two columns.
     $this->click('#edit-field-layouts');
     $page->selectFieldOption('field_layout', 'layout_twocol');
-    $assert_session->assertWaitOnAjaxRequest();
+    $assert_session->assertExpectedAjaxRequest();
     $page->pressButton('Save');
     $assert_session->fieldValueEquals('fields[field_test_text][region]', 'first');
 
     // Change the formatter and move to another region.
     $page->selectFieldOption('fields[field_test_text][type]', 'text_trimmed');
-    $assert_session->assertWaitOnAjaxRequest();
+    $assert_session->assertExpectedAjaxRequest();
     $page->find('css', '#field-test-text .handle')->dragTo($page->find('css', '.region-second-message'));
-    $assert_session->assertWaitOnAjaxRequest();
+    $assert_session->assertExpectedAjaxRequest();
     $page->pressButton('Save');
 
     // Assert that both the formatter and region change are persisted.

@@ -107,7 +107,7 @@ class ContentPreviewToggleTest extends WebDriverTestBase {
     $assert_session->elementExists('css', $body_block . " div");
 
     $this->sortableAfter($links_block, $body_block, $region_content);
-    $assert_session->assertWaitOnAjaxRequest();
+    $assert_session->assertExpectedAjaxRequest();
 
     // Check that the drag-triggered rebuild did not trigger content preview.
     $assert_session->pageTextNotContains($content_preview_body_text);
@@ -135,7 +135,7 @@ class ContentPreviewToggleTest extends WebDriverTestBase {
 
     $this->clickContextualLink('.block-field-blocknodebundle-for-this-particular-testbody', 'Configure');
     $this->waitForOffCanvasArea();
-    $this->assertSession()->assertWaitOnAjaxRequest();
+    $this->assertSession()->assertExpectedAjaxRequest();
     $this->assertNotEmpty($this->assertSession()->waitForButton('Close'));
     $page->pressButton('Close');
     $assert_session->assertNoElementAfterWait('css', '#drupal-off-canvas');

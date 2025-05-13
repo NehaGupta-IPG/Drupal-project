@@ -110,7 +110,7 @@ class FilterEntityReferenceTest extends WebDriverTestBase {
     // Test the exposed filter options show up correctly.
     $assert->waitForField('options[expose_button][checkbox][checkbox]');
     $page->findField('options[expose_button][checkbox][checkbox]')->click();
-    $this->assertSession()->assertWaitOnAjaxRequest();
+    $this->assertSession()->assertExpectedAjaxRequest();
     $this->assertTrue($page->hasCheckedField('options[expose_button][checkbox][checkbox]'));
 
     // Check the exposed filters multiple option.
@@ -141,7 +141,7 @@ class FilterEntityReferenceTest extends WebDriverTestBase {
     $page->selectFieldOption('options[reference_views][view][view_and_display]', 'test_entity_reference:entity_reference');
     $page->find('xpath', "//*[contains(text(), 'Apply')]")
       ->press();
-    $assert->assertWaitOnAjaxRequest();
+    $assert->assertExpectedAjaxRequest();
 
     // The Views Reference filter has a title Filter to a single result, so
     // ensure only that result is available as an option.
@@ -211,7 +211,7 @@ class FilterEntityReferenceTest extends WebDriverTestBase {
     // Test the exposed filter options show up correctly.
     $assert->waitForField('options[expose_button][checkbox][checkbox]');
     $page->findField('options[expose_button][checkbox][checkbox]')->click();
-    $this->assertSession()->assertWaitOnAjaxRequest();
+    $this->assertSession()->assertExpectedAjaxRequest();
     $this->assertTrue($page->hasCheckedField('options[expose_button][checkbox][checkbox]'));
 
     // Check the exposed filters multiple option.
@@ -242,7 +242,7 @@ class FilterEntityReferenceTest extends WebDriverTestBase {
     $page->selectFieldOption('options[widget]', 'autocomplete');
     $this->assertSame('autocomplete', $page->findField('options[widget]')->getValue());
     $page->find('css', '.ui-dialog .ui-dialog-buttonpane')->pressButton('Apply');
-    $this->assertSession()->assertWaitOnAjaxRequest();
+    $this->assertSession()->assertExpectedAjaxRequest();
 
     // Check that it is now an autocomplete input.
     $assert->waitForField('field_test_config_target_id');

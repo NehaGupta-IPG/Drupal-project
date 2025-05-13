@@ -34,7 +34,7 @@ class JSWebAssert extends WebAssert {
    *   When the request is not completed. If left blank, a default message will
    *   be displayed.
    */
-  public function assertWaitOnAjaxRequest($timeout = 10000, $message = 'Unable to complete AJAX request.'): void {
+  public function assertExpectedAjaxRequest($timeout = 10000, $message = 'Unable to complete AJAX request.'): void {
     $this->assertExpectedAjaxRequest(NULL, $timeout, $message);
   }
 
@@ -92,7 +92,7 @@ JS;
 })()
 JS);
 
-    // First invocation of ::assertWaitOnAjaxRequest() on this page: initialize.
+    // First invocation of ::assertExpectedAjaxRequest() on this page: initialize.
     static $current_page_hash;
     static $current_page_ajax_response_count;
     if ($current_page_hash !== $page_hash) {

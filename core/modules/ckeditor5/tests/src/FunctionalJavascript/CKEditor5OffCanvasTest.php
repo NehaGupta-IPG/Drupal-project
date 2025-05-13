@@ -36,7 +36,7 @@ class CKEditor5OffCanvasTest extends CKEditor5TestBase {
     // that includes CKEditor.
     $page->clickLink('Add Node');
     $assert_session->waitForElementVisible('css', '#drupal-off-canvas-wrapper');
-    $assert_session->assertWaitOnAjaxRequest();
+    $assert_session->assertExpectedAjaxRequest();
 
     $styles = $assert_session->elementExists('css', 'style#ckeditor5-off-canvas-reset');
     $this->assertStringContainsString('#drupal-off-canvas-wrapper [data-drupal-ck-style-fence]', $styles->getHtml());

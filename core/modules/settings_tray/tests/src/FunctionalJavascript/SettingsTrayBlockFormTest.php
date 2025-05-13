@@ -279,7 +279,7 @@ class SettingsTrayBlockFormTest extends SettingsTrayTestBase {
       $this->enableEditMode();
       $this->openBlockForm($this->getBlockSelector($block));
       $page->pressButton('Save Block with validation error');
-      $web_assert->assertWaitOnAjaxRequest();
+      $web_assert->assertExpectedAjaxRequest();
       // The settings_tray_test_validation test plugin form always has a
       // validation error.
       $web_assert->elementContains('css', '#drupal-off-canvas', 'Sorry system error. Save again');

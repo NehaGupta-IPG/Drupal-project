@@ -38,7 +38,7 @@ class DialogPositionTest extends WebDriverTestBase {
     $placeBlockLink = $page->findLink('Place block');
     $this->assertTrue($placeBlockLink->isVisible(), 'Place block button exists.');
     $placeBlockLink->click();
-    $assert_session->assertWaitOnAjaxRequest();
+    $assert_session->assertExpectedAjaxRequest();
     $dialog = $page->find('css', '.ui-dialog');
     $this->assertTrue($dialog->isVisible(), 'Dialog is opened after clicking the Place block button.');
 

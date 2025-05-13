@@ -80,7 +80,7 @@ class InlineBlockPrivateFilesTest extends InlineBlockTestBase {
     $this->drupalGet('node/1/layout');
     // @todo Occasionally SQLite has database locks here. Waiting seems to
     //   resolve it. https://www.drupal.org/project/drupal/issues/3055983
-    $assert_session->assertWaitOnAjaxRequest();
+    $assert_session->assertExpectedAjaxRequest();
     $file = $this->createPrivateFile('drupal.txt');
 
     $file_real_path = $this->fileSystem->realpath($file->getFileUri());
@@ -174,7 +174,7 @@ class InlineBlockPrivateFilesTest extends InlineBlockTestBase {
     $page = $this->getSession()->getPage();
     $this->clickContextualLink(static::INLINE_BLOCK_LOCATOR, 'Configure');
     $assert_session->waitForElement('css', "#drupal-off-canvas input[value='Remove']");
-    $assert_session->assertWaitOnAjaxRequest();
+    $assert_session->assertExpectedAjaxRequest();
     $page->find('css', '#drupal-off-canvas')->pressButton('Remove');
     $this->attachFileToBlockForm($file);
     $page->pressButton('Update');
@@ -193,10 +193,10 @@ class InlineBlockPrivateFilesTest extends InlineBlockTestBase {
     $assert_session = $this->assertSession();
     $page = $this->getSession()->getPage();
     $page->clickLink('Add block');
-    $assert_session->assertWaitOnAjaxRequest();
+    $assert_session->assertExpectedAjaxRequest();
     $this->assertNotEmpty($assert_session->waitForLink('Create content block'));
     $this->clickLink('Create content block');
-    $assert_session->assertWaitOnAjaxRequest();
+    $assert_session->assertExpectedAjaxRequest();
     $assert_session->fieldValueEquals('Title', '');
     $page->findField('Title')->setValue($title);
     $this->attachFileToBlockForm($file);
@@ -273,7 +273,7 @@ class InlineBlockPrivateFilesTest extends InlineBlockTestBase {
     $page = $this->getSession()->getPage();
     $this->assertSession()->waitForElementVisible('named', ['field', 'files[settings_block_form_field_file_0]']);
     $page->attachFileToField("files[settings_block_form_field_file_0]", $this->fileSystem->realpath($file->getFileUri()));
-    $assert_session->assertWaitOnAjaxRequest();
+    $assert_session->assertExpectedAjaxRequest();
     $this->assertNotEmpty($assert_session->waitForLink($file->label()));
   }
 

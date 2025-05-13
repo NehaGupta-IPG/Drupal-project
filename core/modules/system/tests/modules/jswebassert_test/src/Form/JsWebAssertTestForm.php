@@ -86,7 +86,7 @@ class JsWebAssertTestForm extends FormBase {
       ],
     ];
 
-    // Button to test the assertWaitOnAjaxRequest() assertion.
+    // Button to test the assertExpectedAjaxRequest() assertion.
     $form['test_wait_for_element_visible'] = [
       '#type' => 'submit',
       '#value' => $this->t('Test waitForElementVisible'),
@@ -101,7 +101,7 @@ class JsWebAssertTestForm extends FormBase {
       ],
     ];
 
-    // Button to test the assertWaitOnAjaxRequest() assertion.
+    // Button to test the assertExpectedAjaxRequest() assertion.
     $form['test_assert_wait_on_ajax_request'] = [
       '#type' => 'submit',
       '#value' => $this->t('Test assertWaitOnAjaxRequest'),

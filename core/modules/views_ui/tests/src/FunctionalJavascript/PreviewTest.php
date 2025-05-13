@@ -263,7 +263,7 @@ class PreviewTest extends WebDriverTestBase {
   protected function getPreviewAJAX($view_name, $panel_id, $row_count): void {
     $this->drupalGet('admin/structure/views/view/' . $view_name . '/edit/' . $panel_id);
     $this->getSession()->getPage()->pressButton('Update preview');
-    $this->assertSession()->assertWaitOnAjaxRequest();
+    $this->assertSession()->assertExpectedAjaxRequest();
     $this->assertPreviewAJAX($row_count);
   }
 
@@ -277,7 +277,7 @@ class PreviewTest extends WebDriverTestBase {
    */
   protected function clickPreviewLinkAJAX(NodeElement $element, $row_count): void {
     $element->click();
-    $this->assertSession()->assertWaitOnAjaxRequest();
+    $this->assertSession()->assertExpectedAjaxRequest();
     $this->assertPreviewAJAX($row_count);
   }
 

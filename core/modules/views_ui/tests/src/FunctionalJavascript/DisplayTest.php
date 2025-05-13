@@ -127,7 +127,7 @@ class DisplayTest extends WebDriverTestBase {
     // placeholder for editing just the view.
     $this->drupalGet('test-display');
     $page = $this->getSession()->getPage();
-    $this->assertSession()->assertWaitOnAjaxRequest();
+    $this->assertSession()->assertExpectedAjaxRequest();
 
     $selector = '.views-element-container';
     $this->toggleContextualTriggerVisibility($selector);

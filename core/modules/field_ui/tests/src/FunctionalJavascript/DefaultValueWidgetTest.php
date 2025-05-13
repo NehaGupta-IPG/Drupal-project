@@ -67,10 +67,10 @@ class DefaultValueWidgetTest extends WebDriverTestBase {
     $this->fieldUIAddNewFieldJS('admin/structure/types/manage/test_content', $field_name, $field_name, 'entity_reference', FALSE);
     $page = $this->getSession()->getPage();
     $page->findField('field_storage[subform][settings][target_type]')->selectOption('taxonomy_term');
-    $this->assertSession()->assertWaitOnAjaxRequest();
+    $this->assertSession()->assertExpectedAjaxRequest();
 
     $page->findField('settings[handler_settings][target_bundles][' . $vocab_1->id() . ']')->check();
-    $this->assertSession()->assertWaitOnAjaxRequest();
+    $this->assertSession()->assertExpectedAjaxRequest();
     $page->findField('set_default_value')->check();
 
     $default_value_field = $page->findField('default_value_input[field_' . $field_name . '][0][target_id]');

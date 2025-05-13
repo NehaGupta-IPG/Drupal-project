@@ -40,11 +40,11 @@ class BlockAddTest extends WebDriverTestBase {
     $assert_session = $this->assertSession();
     // Pick a theme with a region that does not exist in another theme.
     $assert_session->selectExists('Theme')->selectOption('claro');
-    $assert_session->assertWaitOnAjaxRequest();
+    $assert_session->assertExpectedAjaxRequest();
     $assert_session->selectExists('Region')->selectOption('pre_content');
     // Switch to a theme that doesn't contain the region selected above.
     $assert_session->selectExists('Theme')->selectOption('stark');
-    $assert_session->assertWaitOnAjaxRequest();
+    $assert_session->assertExpectedAjaxRequest();
     $assert_session->pageTextNotContains('The submitted value Pre-content in the Region element is not allowed.');
     $assert_session->optionExists('Region', '- Select -');
     // Check that the summary line is not present in the title.

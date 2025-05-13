@@ -124,7 +124,7 @@ abstract class OffCanvasTestBase extends WebDriverTestBase {
    *   (Optional) Timeout in milliseconds, defaults to 10000.
    */
   protected function assertElementVisibleAfterWait($selector, $locator, $timeout = 10000) {
-    $this->assertSession()->assertWaitOnAjaxRequest();
+    $this->assertSession()->assertExpectedAjaxRequest();
     $this->assertNotEmpty($this->assertSession()->waitForElementVisible($selector, $locator, $timeout));
   }
 

@@ -99,7 +99,7 @@ class JSWebAssertTest extends WebDriverTestBase {
     $result = $page->findField('test_assert_wait_on_ajax_input');
     $this->assertEmpty($result);
     $test_wait_on_ajax->click();
-    $assert_session->assertWaitOnAjaxRequest();
+    $assert_session->assertExpectedAjaxRequest();
     $result = $page->findField('test_assert_wait_on_ajax_input');
     $this->assertNotEmpty($result);
     $this->assertInstanceOf(NodeElement::class, $result);

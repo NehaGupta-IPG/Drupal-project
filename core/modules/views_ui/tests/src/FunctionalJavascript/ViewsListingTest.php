@@ -107,7 +107,7 @@ class ViewsListingTest extends WebDriverTestBase {
     $this->assertTrue($disable_button->isVisible());
     $disable_button->click();
 
-    $session->assertWaitOnAjaxRequest();
+    $session->assertExpectedAjaxRequest();
 
     $enabled_rows = $page->findAll('css', 'tr.views-ui-list-enabled');
     $enabled_rows = $this->filterVisibleElements($enabled_rows);
@@ -125,7 +125,7 @@ class ViewsListingTest extends WebDriverTestBase {
 
     // Enable the view again and ensure we have the focus on the edit button.
     $this->getSession()->evaluateScript('jQuery(document.activeElement).click()');
-    $session->assertWaitOnAjaxRequest();
+    $session->assertExpectedAjaxRequest();
 
     $this->assertTrue($this->getSession()->evaluateScript("jQuery(document.activeElement).text() === 'Edit'"));
     $this->assertEquals($view_description, $this->getSession()->evaluateScript("jQuery(document.activeElement).parents('tr').find('.views-ui-view-name strong').text()"));

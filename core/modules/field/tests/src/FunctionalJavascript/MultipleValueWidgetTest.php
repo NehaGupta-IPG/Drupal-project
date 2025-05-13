@@ -134,7 +134,7 @@ class MultipleValueWidgetTest extends WebDriverTestBase {
 
     // Test removing items/values.
     $field_0_remove_button->click();
-    $this->assertSession()->assertWaitOnAjaxRequest();
+    $this->assertSession()->assertExpectedAjaxRequest();
     // Test the updated widget.
     // First item is the initial second item.
     $this->assertEquals('2', $field_0->getValue(), 'Value for the first item has changed.');
@@ -146,7 +146,7 @@ class MultipleValueWidgetTest extends WebDriverTestBase {
     // We can also remove empty items.
     $field_2_remove_button = $page->findButton('field_unlimited_2_remove_button');
     $field_2_remove_button->click();
-    $this->assertSession()->assertWaitOnAjaxRequest();
+    $this->assertSession()->assertExpectedAjaxRequest();
     $element = $page->findField('field_unlimited[2][value]');
     $this->assertEmpty($element, 'Empty field also removed.');
 
@@ -156,16 +156,16 @@ class MultipleValueWidgetTest extends WebDriverTestBase {
     // Test removing items/values on saved entities resets to initial value.
     $this->submitForm([], 'Save');
     $field_2_remove_button->click();
-    $this->assertSession()->assertWaitOnAjaxRequest();
+    $this->assertSession()->assertExpectedAjaxRequest();
     $field_1_remove_button->click();
-    $this->assertSession()->assertWaitOnAjaxRequest();
+    $this->assertSession()->assertExpectedAjaxRequest();
     $field_0_remove_button->click();
-    $this->assertSession()->assertWaitOnAjaxRequest();
+    $this->assertSession()->assertExpectedAjaxRequest();
     $add_more_button->click();
-    $this->assertSession()->assertWaitOnAjaxRequest();
+    $this->assertSession()->assertExpectedAjaxRequest();
     $this->assertSame('', $field_0->getValue());
     $add_more_button->click();
-    $this->assertSession()->assertWaitOnAjaxRequest();
+    $this->assertSession()->assertExpectedAjaxRequest();
     $this->assertSame('', $field_1->getValue());
   }
 

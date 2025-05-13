@@ -61,7 +61,7 @@ class BulkOperationsTest extends WebDriverTestBase {
     $this->assertSession()->pageTextContains($node_1->getTitle());
     $this->assertSession()->pageTextContains($node_2->getTitle());
     $this->submitForm(['title' => 'The first node'], 'Filter');
-    $this->assertSession()->assertWaitOnAjaxRequest();
+    $this->assertSession()->assertExpectedAjaxRequest();
     $this->assertSession()->pageTextContains($node_1->getTitle());
     $this->assertSession()->pageTextNotContains($node_2->getTitle());
 

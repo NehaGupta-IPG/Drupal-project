@@ -79,7 +79,7 @@ class ClickSortingAJAXTest extends WebDriverTestBase {
 
     // Now sort by title and check if the order changed.
     $page->clickLink('Title');
-    $session_assert->assertWaitOnAjaxRequest();
+    $session_assert->assertExpectedAjaxRequest();
     $rows = $page->findAll('css', 'tbody tr');
     $this->assertCount(2, $rows);
     $this->assertStringContainsString('Page A', $rows[0]->getHtml());

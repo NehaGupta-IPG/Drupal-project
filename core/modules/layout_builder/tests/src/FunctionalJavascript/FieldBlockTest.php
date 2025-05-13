@@ -77,7 +77,7 @@ class FieldBlockTest extends WebDriverTestBase {
 
     $this->drupalGet('admin/structure/block');
     $this->clickLink('Place block');
-    $assert_session->assertWaitOnAjaxRequest();
+    $assert_session->assertExpectedAjaxRequest();
 
     // Ensure that focus is on the first focusable element on modal.
     $this->assertJsCondition('document.activeElement === document.getElementsByClassName("block-filter-text")[0]');
@@ -100,7 +100,7 @@ class FieldBlockTest extends WebDriverTestBase {
 
     // Change the formatter.
     $page->selectFieldOption('settings[formatter][type]', 'datetime_time_ago');
-    $assert_session->assertWaitOnAjaxRequest();
+    $assert_session->assertExpectedAjaxRequest();
     // Changing the formatter removes the old settings and introduces new ones.
     $assert_session->fieldNotExists('settings[formatter][settings][format_type]');
     $assert_session->fieldExists('settings[formatter][settings][granularity]');
@@ -110,7 +110,7 @@ class FieldBlockTest extends WebDriverTestBase {
     // Configure the block and change the formatter again.
     $this->clickLink('Configure');
     $page->selectFieldOption('settings[formatter][type]', 'datetime_default');
-    $assert_session->assertWaitOnAjaxRequest();
+    $assert_session->assertExpectedAjaxRequest();
     $assert_session->fieldValueEquals('settings[formatter][settings][format_type]', 'medium');
     $page->selectFieldOption('settings[formatter][settings][format_type]', 'long');
 

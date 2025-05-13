@@ -71,11 +71,11 @@ class FieldUiIntegrationTest extends MediaLibraryTestBase {
 
     $this->drupalGet('/admin/structure/types/manage/article/fields/add-field');
     $this->clickLink('Media');
-    $this->assertSession()->assertWaitOnAjaxRequest();
+    $this->assertSession()->assertExpectedAjaxRequest();
     $page->fillField('label', 'Shatner');
     $this->waitForText('field_shatner');
     $this->assertSession()->elementExists('xpath', '//button[text()="Continue"]')->press();
-    $this->assertSession()->assertWaitOnAjaxRequest();
+    $this->assertSession()->assertExpectedAjaxRequest();
     $assert_session->pageTextNotContains('Undefined index: target_bundles');
     $this->waitForFieldExists('Type One')->check();
     $this->assertElementExistsAfterWait('css', '[name="settings[handler_settings][target_bundles][type_one]"][checked="checked"]');

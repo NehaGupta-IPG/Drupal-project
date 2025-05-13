@@ -113,13 +113,13 @@ class CKEditor5AllowedTagsTest extends CKEditor5TestBase {
 
     // Switch the text format to CKEditor 5.
     $page->selectFieldOption('editor[editor]', 'ckeditor5');
-    $assert_session->assertWaitOnAjaxRequest();
+    $assert_session->assertExpectedAjaxRequest();
 
     // Enable the image toolbar item. This does NOT enable image uploads: it
     // triggers the image upload settings form to become visible, to allow the
     // image upload status to be checked.
     $this->triggerKeyUp('.ckeditor5-toolbar-item-drupalInsertImage', 'ArrowDown');
-    $assert_session->assertWaitOnAjaxRequest();
+    $assert_session->assertExpectedAjaxRequest();
 
     // Assert that image uploads are still enabled.
     $this->assertTrue($page->hasCheckedField('Enable image uploads'));
@@ -150,7 +150,7 @@ class CKEditor5AllowedTagsTest extends CKEditor5TestBase {
     $this->assertHtmlEsqueFieldValueEquals('filters[filter_html][settings][allowed_html]', $this->defaultElementsWhenUpdatingNotCkeditor5);
 
     $page->selectFieldOption('editor[editor]', 'ckeditor5');
-    $assert_session->assertWaitOnAjaxRequest();
+    $assert_session->assertExpectedAjaxRequest();
     $assert_session->pageTextContains('The <br>, <p> tags were added because they are required by CKEditor 5');
     $this->assertHtmlEsqueFieldValueEquals('filters[filter_html][settings][allowed_html]', $this->defaultElementsAfterUpdatingToCkeditor5);
 
@@ -179,7 +179,7 @@ class CKEditor5AllowedTagsTest extends CKEditor5TestBase {
 
     $this->assertNotEmpty($assert_session->waitForElement('css', '.ckeditor5-toolbar-item-drupalInsertImage'));
     $this->triggerKeyUp('.ckeditor5-toolbar-item-drupalInsertImage', 'ArrowDown');
-    $assert_session->assertWaitOnAjaxRequest();
+    $assert_session->assertExpectedAjaxRequest();
 
     // The image upload settings form should now be present.
     $assert_session->elementExists('css', '[data-drupal-selector="edit-editor-settings-plugins-ckeditor5-image"]');
@@ -193,7 +193,7 @@ class CKEditor5AllowedTagsTest extends CKEditor5TestBase {
     $assert_session->waitForText('Enable image uploads');
     $this->assertTrue($page->hasUncheckedField('editor[settings][plugins][ckeditor5_image][status]'));
     $page->checkField('editor[settings][plugins][ckeditor5_image][status]');
-    $assert_session->assertWaitOnAjaxRequest();
+    $assert_session->assertExpectedAjaxRequest();
 
     // Enabling image uploads adds <img> with several attributes to allowed
     // tags.
@@ -203,14 +203,14 @@ class CKEditor5AllowedTagsTest extends CKEditor5TestBase {
     // <img>.
     $this->assertTrue($page->hasUncheckedField('filters[filter_caption][status]'));
     $page->checkField('filters[filter_caption][status]');
-    $assert_session->assertWaitOnAjaxRequest();
+    $assert_session->assertExpectedAjaxRequest();
     $this->assertEquals($this->allowedElements . ' <img src alt height width data-entity-uuid data-entity-type data-caption>', $allowed_html_field->getValue());
 
     // Also enabling the alignment filter will add the data-align attribute to
     // <img>.
     $this->assertTrue($page->hasUncheckedField('filters[filter_align][status]'));
     $page->checkField('filters[filter_align][status]');
-    $assert_session->assertWaitOnAjaxRequest();
+    $assert_session->assertExpectedAjaxRequest();
     $this->assertEquals($this->allowedElements . ' <img src alt height width data-entity-uuid data-entity-type data-caption data-align>', $allowed_html_field->getValue());
 
     // Disable image upload.
@@ -218,14 +218,14 @@ class CKEditor5AllowedTagsTest extends CKEditor5TestBase {
     $assert_session->waitForText('Enable image uploads');
     $this->assertTrue($page->hasCheckedField('editor[settings][plugins][ckeditor5_image][status]'));
     $page->uncheckField('editor[settings][plugins][ckeditor5_image][status]');
-    $assert_session->assertWaitOnAjaxRequest();
+    $assert_session->assertExpectedAjaxRequest();
 
     // The image insert is still allowed when image uploads are disabled.
     $this->assertEquals($this->allowedElements . ' <img src alt height width data-caption data-align>', $allowed_html_field->getValue());
 
     $this->assertNotEmpty($assert_session->waitForElement('css', '.ckeditor5-toolbar-item-drupalInsertImage'));
     $this->triggerKeyUp('.ckeditor5-toolbar-item-drupalInsertImage', 'ArrowUp');
-    $assert_session->assertWaitOnAjaxRequest();
+    $assert_session->assertExpectedAjaxRequest();
 
     // Confirm <img> is no longer an allowed tag, once image insert is disabled.
     $this->assertEquals($this->allowedElements, $allowed_html_field->getValue());
@@ -260,7 +260,7 @@ class CKEditor5AllowedTagsTest extends CKEditor5TestBase {
     // Add the block quote plugin to the CKEditor 5 toolbar.
     $this->assertNotEmpty($assert_session->waitForElement('css', '.ckeditor5-toolbar-item-blockQuote'));
     $this->triggerKeyUp('.ckeditor5-toolbar-item-blockQuote', 'ArrowDown');
-    $assert_session->assertWaitOnAjaxRequest();
+    $assert_session->assertExpectedAjaxRequest();
 
     $allowed_with_blockquote = $this->allowedElements . ' <blockquote>';
     $assert_session->fieldExists('filters[filter_html][settings][allowed_html]');
@@ -285,7 +285,7 @@ class CKEditor5AllowedTagsTest extends CKEditor5TestBase {
     // Add the source editing plugin to the CKEditor 5 toolbar.
     $this->assertNotEmpty($assert_session->waitForElement('css', '.ckeditor5-toolbar-available .ckeditor5-toolbar-item-sourceEditing'));
     $this->triggerKeyUp('.ckeditor5-toolbar-item-sourceEditing', 'ArrowDown');
-    $assert_session->assertWaitOnAjaxRequest();
+    $assert_session->assertExpectedAjaxRequest();
 
     // Updating Source Editing's editable tags should automatically update
     // filter_html to include those additional tags.
@@ -294,7 +294,7 @@ class CKEditor5AllowedTagsTest extends CKEditor5TestBase {
     $assert_session->waitForText('Manually editable HTML tags');
     $source_edit_tags_field = $assert_session->fieldExists('editor[settings][plugins][ckeditor5_sourceEditing][allowed_tags]');
     $source_edit_tags_field->setValue('<aside>');
-    $assert_session->assertWaitOnAjaxRequest();
+    $assert_session->assertExpectedAjaxRequest();
 
     $this->assertHtmlEsqueFieldValueEquals('filters[filter_html][settings][allowed_html]', '<br> <p> <h2> <h3> <h4> <h5> <h6> <aside> <strong> <em> <blockquote>');
     $allowed_html_field = $assert_session->fieldExists('filters[filter_html][settings][allowed_html]');
@@ -324,7 +324,7 @@ class CKEditor5AllowedTagsTest extends CKEditor5TestBase {
     $assert_session->pageTextContains('Manually editable HTML tags');
     $source_edit_tags_field = $assert_session->fieldExists('editor[settings][plugins][ckeditor5_sourceEditing][allowed_tags]');
     $source_edit_tags_field->setValue('<aside>');
-    $assert_session->assertWaitOnAjaxRequest();
+    $assert_session->assertExpectedAjaxRequest();
     $page->pressButton('Save configuration');
     $assert_session->pageTextContains('The text format ckeditor5 has been updated');
     $assert_session->pageTextNotContains('The following tag(s) are already supported by enabled plugins and should not be added to the Source Editing "Manually editable HTML tags" field: Bold (<strong>)');
@@ -438,7 +438,7 @@ class CKEditor5AllowedTagsTest extends CKEditor5TestBase {
     $this->drupalGet('admin/config/content/formats/manage/full_html');
     $page->checkField('roles[authenticated]');
     $page->selectFieldOption('editor[editor]', 'ckeditor5');
-    $assert_session->assertWaitOnAjaxRequest();
+    $assert_session->assertExpectedAjaxRequest();
     $page->pressButton('Save configuration');
     $this->assertTrue($assert_session->waitForText('The text format Full HTML has been updated.'));
 
@@ -467,7 +467,7 @@ class CKEditor5AllowedTagsTest extends CKEditor5TestBase {
     $this->drupalGet('admin/config/content/formats/manage/full_html');
     $this->assertNotEmpty($assert_session->waitForElement('css', '.ckeditor5-toolbar-item-link'));
     $this->triggerKeyUp('.ckeditor5-toolbar-item-link', 'ArrowDown');
-    $assert_session->assertWaitOnAjaxRequest();
+    $assert_session->assertExpectedAjaxRequest();
     $page->pressButton('Save configuration');
 
     $this->drupalGet('node/1/edit');
@@ -479,10 +479,10 @@ class CKEditor5AllowedTagsTest extends CKEditor5TestBase {
     $this->drupalGet('admin/config/content/formats/manage/basic_html');
     $page->checkField('roles[authenticated]');
     $page->selectFieldOption('editor[editor]', 'ckeditor5');
-    $assert_session->assertWaitOnAjaxRequest();
+    $assert_session->assertExpectedAjaxRequest();
     $this->assertNotEmpty($assert_session->waitForElement('css', '.ckeditor5-toolbar-available .ckeditor5-toolbar-item-underline'));
     $this->triggerKeyUp('.ckeditor5-toolbar-item-underline', 'ArrowDown');
-    $assert_session->assertWaitOnAjaxRequest();
+    $assert_session->assertExpectedAjaxRequest();
     $page->pressButton('Save configuration');
     $this->assertTrue($assert_session->waitForText('The text format Basic HTML has been updated.'));
 
@@ -491,7 +491,7 @@ class CKEditor5AllowedTagsTest extends CKEditor5TestBase {
     $page->selectFieldOption('body[0][format]', 'basic_html');
     $this->assertNotEmpty($assert_session->waitForText('Change text format?'));
     $page->pressButton('Continue');
-    $assert_session->assertWaitOnAjaxRequest();
+    $assert_session->assertExpectedAjaxRequest();
     $page->pressButton('Save');
 
     // The `style` and foo` attributes should have been removed, as should the
