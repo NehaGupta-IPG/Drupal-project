@@ -594,13 +594,7 @@ abstract class ContentEntityBase extends EntityBase implements \IteratorAggregat
    */
   public function get(/* string */$field_name /* , bool $throw_exception = TRUE */) {
     $arguments = func_get_args();
-    if (!isset($arguments[1])) {
-      $throw_exception = TRUE;
-      @trigger_error('Throwing an exception when calling ' . __METHOD__ . ' on an invalid field name without the setting the second "$throw_exception" parameter is deprecated in drupal:11.3.0 and will return NULL unless $throw_exception is explicitly set to TRUE in drupal:12.0.0. See https://www.drupal.org/node/3522223', E_USER_DEPRECATED);
-    }
-    else {
-      $throw_exception = (bool) $arguments[1];
-    }
+    $throw_exception = !isset($arguments[1]) || (bool) $arguments[1];
     if (!isset($this->fields[$field_name][$this->activeLangcode])) {
       try {
         return $this->getTranslatedField($field_name, $this->activeLangcode);
