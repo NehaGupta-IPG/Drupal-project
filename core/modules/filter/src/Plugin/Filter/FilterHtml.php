@@ -604,7 +604,7 @@ class FilterHtml extends FilterBase {
    * @return string
    *   Returns summary delimiter pseudo HTML tag.
    */
-  private function getSummaryDelimiterHtmlTag() {
+  private function getSummaryDelimiterHtmlTag(): string {
     return '<' . self::SUMMARY_DELIMITER_HTML_TAG_NAME . '>';
   }
 
