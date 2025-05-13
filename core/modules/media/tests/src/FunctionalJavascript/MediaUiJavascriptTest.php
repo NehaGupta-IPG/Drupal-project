@@ -175,6 +175,9 @@ class MediaUiJavascriptTest extends MediaJavascriptTestBase {
     $this->assertFalse($loaded_media_type->getStatus());
     $this->assertSame($loaded_media_type->getFieldMap(), ['attribute_1' => 'name']);
 
+    // The bundle definition cache must be cleared so the MediaStorage will
+    // know it is a valid type.
+    \Drupal::service('entity_type.bundle.info')->clearCachedBundles();
     // We need to clear the statically cached field definitions to account for
     // fields that have been created by API calls in this test, since they exist
     // in a separate memory space from the web server.
