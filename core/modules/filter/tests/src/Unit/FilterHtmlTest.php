@@ -140,7 +140,7 @@ class FilterHtmlTest extends UnitTestCase {
    * @return array
    *   An array of test data.
    */
-  public static function providerProcess() {
+  public static function providerProcess(): array {
     return [
       // Preserve <p>.
       ['<p>content</p>', '<p>content</p>'],
