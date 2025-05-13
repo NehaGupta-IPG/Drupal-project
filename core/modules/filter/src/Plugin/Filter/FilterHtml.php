@@ -593,7 +593,7 @@ class FilterHtml extends FilterBase {
    * @param array $restrictions
    *   A restrictions array in the format returned by getHtmlRestrictions().
    */
-  private function addSummaryDelimiterToRestrictions(&$restrictions): void {
+  private function addSummaryDelimiterToRestrictions(array &$restrictions): void {
     // FALSE means that no attributes are allowed.
     $restrictions['allowed'][self::SUMMARY_DELIMITER_HTML_TAG_NAME] = FALSE;
   }
