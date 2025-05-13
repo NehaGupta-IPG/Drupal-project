@@ -104,9 +104,9 @@ class ImageDownloadFileHook {
         if (isset($private_default_images[$uri])) {
           foreach ($private_default_images[$uri] as $field_definition) {
             $access_control_handler = $this->entityTypeManager->getAccessControlHandler($field_definition->getTargetEntityTypeId());
-            // As long as the user has view access to at least one of the fields,
-            // that uses this image as a default, we can exit this foreach loop,
-            // and grant access.
+            // As long as the user has view access to at least one of the
+            // fields, that uses this image as a default, we can exit this
+            // foreach loop, and grant access.
             if ($access_control_handler->fieldAccess('view', $field_definition)) {
               return [
                 // Send headers describing the image's size, and MIME-type.
