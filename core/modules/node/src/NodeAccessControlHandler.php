@@ -240,7 +240,6 @@ class NodeAccessControlHandler extends EntityAccessControlHandler implements Nod
     if ($this->moduleHandler->hasImplementations('node_grants')) {
       $cacheability->addCacheContexts(['user.node_grants:view']);
     }
-
     if ($account->id() != $node->getOwnerId()) {
       return NULL;
     }

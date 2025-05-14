@@ -580,7 +580,7 @@ EOD;
       // exceed the 63 chars limit of PostgreSQL, we need to take care of that.
       // cSpell:disable-next-line
       // Example (drupal_Gk7Su_T1jcBHVuvSPeP22_I3Ni4GrVEgTYlIYnBJkro_idx).
-      if (str_contains($index->indexname, 'drupal_')) {
+      if (str_starts_with($index->indexname, 'drupal_')) {
         preg_match('/^drupal_(.*)_' . preg_quote($index_type, NULL) . '/', $index->indexname, $matches);
         $index_name = $matches[1];
       }
@@ -1072,7 +1072,8 @@ EOD;
   /**
    * Calculates a base-64 encoded PostgreSQL-safe sha-256 hash.
    *
-   * The hash is modified to according to  @link https://www.postgresql.org/docs/current/sql-syntax-lexical.html PostgreSQL Lexical Structure@endlink.
+   * The hash is modified to according to PostgreSQL Lexical Structure. See
+   * https://www.postgresql.org/docs/current/sql-syntax-lexical.html.
    *
    * @param string $data
    *   String to be hashed.
