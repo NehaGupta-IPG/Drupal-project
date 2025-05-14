@@ -28,7 +28,7 @@ use Drupal\Component\Utility\Xss;
  *
  * A node access module may implement as many realms as necessary to define the
  * access privileges for the nodes properly. See the
- * @link node_access, Node Access topic for more information @endlink. The node
+ * @link node_access Node Access topic for more information @endlink. The node
  * access system makes no distinction between published and unpublished nodes.
  * It is the module's responsibility to provide appropriate realms to limit
  * access to unpublished content.
