@@ -213,9 +213,8 @@ class BigPipeTest extends BrowserTestBase {
     // The 'edge_case__html_exception' case throws an exception.
     $this->assertSession()->pageTextContains('The website encountered an unexpected error. Try again later');
     $this->assertSession()->pageTextContains('You are not allowed to say llamas are not cool!');
-    // Check that stop signal and closing body tag are absent.
+    // Check that stop signal is absent.
     $this->assertSession()->responseNotContains(BigPipe::STOP_SIGNAL);
-    $this->assertSession()->responseNotContains('</body>');
     // The exception is expected. Do not interpret it as a test failure.
     unlink($this->root . '/' . $this->siteDirectory . '/error.log');
 
@@ -295,7 +294,6 @@ class BigPipeTest extends BrowserTestBase {
     // The 'edge_case__html_exception' case throws an exception.
     $this->assertSession()->pageTextContains('The website encountered an unexpected error. Try again later');
     $this->assertSession()->pageTextContains('You are not allowed to say llamas are not cool!');
-    $this->assertSession()->responseNotContains('</body>');
     // The exception is expected. Do not interpret it as a test failure.
     unlink($this->root . '/' . $this->siteDirectory . '/error.log');
   }

@@ -634,6 +634,11 @@ $settings['update_free_access'] = FALSE;
  * The template file should also be copied into the theme. It is located inside
  * 'core/modules/system/templates/maintenance-page.html.twig'.
  *
+ * This applies also when the database is inactive due to an error
+ * or when a fatal error is thrown.
+ * The template file should also be copied into the theme. It is located at
+ * 'core/modules/system/templates/maintenance-page--offline.html.twig'.
+ *
  * Note: This setting does not apply to installation and update pages.
  */
 # $settings['maintenance_theme'] = 'claro';
