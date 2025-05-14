@@ -9,6 +9,7 @@ use Drupal\Core\Template\Attribute;
 use Drupal\Core\Theme\Component\ComponentValidator;
 use Drupal\Core\Render\Component\Exception\InvalidComponentException;
 use Drupal\Core\Plugin\Component;
+use JsonSchema\ConstraintError;
 use JsonSchema\Constraints\Factory;
 use JsonSchema\Constraints\FormatConstraint;
 use JsonSchema\Entity\JsonPointer;
@@ -123,6 +124,19 @@ class ComponentValidatorTest extends TestCase {
       ],
     ];
     yield 'invalid slot (type)' => [$cta_with_invalid_slot_type];
+
+    $cta_with_invalid_slot_name = $valid_cta;
+    $cta_with_invalid_slot_name['slots'] = [
+      'valid_slot' => [
+        'title' => 'Valid slot',
+        'description' => 'Valid slot description',
+      ],
+      'invalid slot' => [
+        'title' => 'Invalid slot',
+        'description' => 'Slot name cannot have spaces',
+      ],
+    ];
+    yield 'invalid slot (name with spaces)' => [$cta_with_invalid_slot_name];
 
     $cta_with_invalid_variant_title_type = $valid_cta;
     $cta_with_invalid_variant_title_type['variants'] = [
@@ -346,7 +360,13 @@ class UrlHelperFormatConstraint extends FormatConstraint {
     }
     if ($schema->format === 'uri') {
       if (\is_string($element) && !UrlHelper::isValid($element)) {
-        $this->addError($path, 'Invalid URL format', 'format', ['format' => $schema->format]);
+        if (class_exists(ConstraintError::class)) {
+          $this->addError(ConstraintError::FORMAT_URL(), $path, ['format' => $schema->format]);
+        }
+        else {
+          // @todo Remove when we no longer support justinrainbow/json-schema v5.
+          $this->addError($path, 'Invalid URL format', 'format', ['format' => $schema->format]);
+        }
       }
       return;
     }
