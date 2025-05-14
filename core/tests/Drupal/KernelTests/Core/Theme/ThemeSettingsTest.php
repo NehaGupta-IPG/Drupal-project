@@ -123,7 +123,7 @@ class ThemeSettingsTest extends KernelTestBase {
   /**
    * Tests default favicon configuration can be overridden.
    */
-  public function testFaviconConfig() {
+  public function testFaviconConfig(): void {
     /** @var \Drupal\Core\Extension\ThemeInstallerInterface $theme_installer */
     $theme_installer = $this->container->get('theme_installer');
     $theme_installer->install(['olivero']);
