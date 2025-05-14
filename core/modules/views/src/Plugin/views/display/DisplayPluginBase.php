@@ -463,6 +463,9 @@ abstract class DisplayPluginBase extends PluginBase implements DisplayPluginInte
     }
   }
 
+  /**
+   * {@inheritdoc}
+   */
   protected function defineOptions() {
     $options = [
       'defaults' => [
@@ -918,6 +921,7 @@ abstract class DisplayPluginBase extends PluginBase implements DisplayPluginInte
    *   Whether to include only overridden handlers.
    *
    * @return \Drupal\views\Plugin\views\ViewsHandlerInterface[]
+   *   An array of handlers used by the display.
    */
   protected function getAllHandlers($only_overrides = FALSE) {
     $handler_types = Views::getHandlerTypes();
@@ -939,6 +943,7 @@ abstract class DisplayPluginBase extends PluginBase implements DisplayPluginInte
    *   Whether to include only overridden plugins.
    *
    * @return \Drupal\views\Plugin\views\ViewsPluginInterface[]
+   *   An array of plugins used by the display.
    */
   protected function getAllPlugins($only_overrides = FALSE) {
     $plugins = [];
@@ -1351,7 +1356,7 @@ abstract class DisplayPluginBase extends PluginBase implements DisplayPluginInte
 
     $options['exposed_form'] = [
       'category' => 'exposed',
-      'title' => $this->t('Exposed form style'),
+      'title' => $this->t('Exposed Form'),
       'value' => $exposed_form_plugin->pluginTitle(),
       'setting' => $exposed_form_str,
       'desc' => $this->t('Select the kind of exposed filter to use.'),
@@ -1695,7 +1700,7 @@ abstract class DisplayPluginBase extends PluginBase implements DisplayPluginInte
         break;
 
       case 'row':
-        $form['#title'] .= $this->t('How should each row in this view be styled');
+        $form['#title'] .= $this->t('How should each row in this view be output');
         $row_plugin_instance = $this->getPlugin('row');
         $form['row'] = [
           '#prefix' => '<div class="clearfix">',
@@ -2025,8 +2030,8 @@ abstract class DisplayPluginBase extends PluginBase implements DisplayPluginInte
       case 'pager_options':
       case 'row_options':
       case 'style_options':
-        // Submit plugin options. Every section with "_options" in it, belongs to
-        // a plugin type, like "style_options".
+        // Submit plugin options. Every section with "_options" in it, belongs
+        // to a plugin type, like "style_options".
         $plugin_type = str_replace('_options', '', $section);
         if ($plugin = $this->getPlugin($plugin_type)) {
           $plugin_options = $this->getOption($plugin_type);
@@ -2276,7 +2281,8 @@ abstract class DisplayPluginBase extends PluginBase implements DisplayPluginInte
       $element['#attachment_after'] = $view->attachment_after;
     }
 
-    // If form fields were found in the view, reformat the view output as a form.
+    // If form fields were found in the view, reformat the view output as a
+    // form.
     if ($view->hasFormElements()) {
       // Only render row output if there are rows. Otherwise, render the empty
       // region.

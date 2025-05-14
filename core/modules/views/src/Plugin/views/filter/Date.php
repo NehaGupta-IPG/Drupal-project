@@ -202,6 +202,12 @@ class Date extends NumericFilter {
     $a = intval(strtotime($this->value['min'], $request_time));
     $b = intval(strtotime($this->value['max'], $request_time));
 
+    if ($this->value['type'] == 'offset') {
+      // Keep sign.
+      $a = '***CURRENT_TIME***' . sprintf('%+d', $a);
+      // Keep sign.
+      $b = '***CURRENT_TIME***' . sprintf('%+d', $b);
+    }
     // This is safe because we are manually scrubbing the values. It is
     // necessary to do it this way because $a and $b are formulas when using an
     // offset.
@@ -215,10 +221,12 @@ class Date extends NumericFilter {
   protected function opSimple($field) {
     $request_time = $this->time->getRequestTime();
     $value = intval(strtotime($this->value['value'], $request_time));
-
-    // This is safe because we are manually scrubbing the value. It is
-    // necessary to do it this way because $value is a formula when using an
-    // offset.
+    if (!empty($this->value['type']) && $this->value['type'] == 'offset') {
+      // Keep sign.
+      $value = '***CURRENT_TIME***' . sprintf('%+d', $value);
+    }
+    // This is safe because we are manually scrubbing the value. It is necessary
+    // to do it this way because $value is a formula when using an offset.
     $this->query->addWhereExpression($this->options['group'], "$field $this->operator $value");
   }
 

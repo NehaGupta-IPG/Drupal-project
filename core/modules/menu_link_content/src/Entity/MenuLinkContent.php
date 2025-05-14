@@ -8,6 +8,8 @@ use Drupal\Core\Entity\EditorialContentEntityBase;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
+use Drupal\Core\Url;
+use Drupal\link\AttributeXss;
 use Drupal\link\LinkItemInterface;
 use Drupal\menu_link_content\Form\MenuLinkContentDeleteForm;
 use Drupal\menu_link_content\Form\MenuLinkContentForm;
@@ -99,7 +101,12 @@ class MenuLinkContent extends EditorialContentEntityBase implements MenuLinkCont
    * {@inheritdoc}
    */
   public function getUrlObject() {
-    return $this->link->first()->getUrl();
+    $url = $this->link->first()->getUrl();
+    assert($url instanceof Url);
+    if ($attributes = $url->getOption('attributes')) {
+      $url->setOption('attributes', AttributeXss::sanitizeAttributes($attributes));
+    }
+    return $url;
   }
 
   /**
@@ -293,7 +300,6 @@ class MenuLinkContent extends EditorialContentEntityBase implements MenuLinkCont
 
     $fields['title'] = BaseFieldDefinition::create('string')
       ->setLabel(t('Menu link title'))
-      ->setDescription(t('The text to be used for this link in the menu.'))
       ->setRequired(TRUE)
       ->setTranslatable(TRUE)
       ->setRevisionable(TRUE)
@@ -333,7 +339,6 @@ class MenuLinkContent extends EditorialContentEntityBase implements MenuLinkCont
 
     $fields['link'] = BaseFieldDefinition::create('link')
       ->setLabel(t('Link'))
-      ->setDescription(t('The location this menu link points to.'))
       ->setRevisionable(TRUE)
       ->setRequired(TRUE)
       ->setSettings([

@@ -173,10 +173,10 @@ YAML,
     // static file cache in \Drupal\Core\Extension\ExtensionDiscovery. There is
     // no work-around that allows using both the files on disk and some in vfs.
     // To make matters worse, decorating a service within the test only is not
-    // an option either, because \Drupal\ckeditor5\Plugin\CKEditor5PluginDefinition
-    // is a pure value object, so it uses the global container. Therefore the
-    // only work-around possible is to manipulate the config schema definition
-    // cache.
+    // an option either, because
+    // \Drupal\ckeditor5\Plugin\CKEditor5PluginDefinition is a pure value
+    // object, so it uses the global container. Therefore the only work-around
+    // possible is to manipulate the config schema definition cache.
     // @todo Remove this in https://www.drupal.org/project/drupal/issues/2961541.
     if (isset($additional_files['config']['schema']["$module_name.schema.yml"])) {
       $cache = \Drupal::service('cache.discovery')
@@ -1216,7 +1216,10 @@ PHP,
     $settings['toolbar']['items'][] = 'insertTable';
     $editor->setSettings($settings);
     $plugin_ids = array_keys($this->manager->getEnabledDefinitions($editor));
-    $expected_plugins = array_merge($expected_plugins, ['ckeditor5_table', 'ckeditor5_plugin_conditions_test_plugins_condition']);
+    $expected_plugins = array_merge($expected_plugins, [
+      'ckeditor5_table',
+      'ckeditor5_plugin_conditions_test_plugins_condition',
+    ]);
     sort($expected_plugins);
     $this->assertSame(array_values($expected_plugins), $plugin_ids);
     $expected_libraries = array_merge($default_libraries, [
@@ -1618,14 +1621,19 @@ PHP,
   /**
    * @covers \Drupal\ckeditor5\Plugin\CKEditor5PluginManager::getDiscovery
    * @dataProvider providerTestDerivedPluginDefinitions
+   * @group legacy
    */
-  public function testDerivedPluginDefinitions(string $yaml, ?string $expected_exception = NULL, ?string $expected_message = NULL, array $additional_files = [], ?array $expected_derived_plugin_definitions = NULL): void {
+  public function testDerivedPluginDefinitions(string $yaml, ?string $expected_exception = NULL, ?string $expected_message = NULL, array $additional_files = [], ?array $expected_derived_plugin_definitions = NULL, ?string $expected_deprecation_message = NULL): void {
     if ($expected_exception) {
       $this->expectException($expected_exception);
     }
     if ($expected_message) {
       $this->expectExceptionMessage($expected_message);
     }
+    if ($expected_deprecation_message) {
+      $this->expectDeprecation($expected_deprecation_message);
+    }
+
     $container = $this->mockModuleInVfs('ckeditor5_derived_plugin', $yaml, $additional_files);
 
     $actual_definitions = $container->get('plugin.manager.ckeditor5.plugin')->getDefinitions();
@@ -1903,6 +1911,7 @@ PHP,
           ] + $drupal_aspects_defaults,
         ]),
       ],
+      'Using @CKEditor5Plugin annotation for plugin with ID ckeditor5_derived_plugin_foo is deprecated and is removed from drupal:13.0.0. Use a Drupal\ckeditor5\Attribute\CKEditor5Plugin attribute instead. See https://www.drupal.org/node/3395575',
     ];
 
     yield 'VALID: minimal base plugin definition, maximal deriver' => [

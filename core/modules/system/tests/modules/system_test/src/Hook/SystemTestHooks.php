@@ -7,24 +7,28 @@ namespace Drupal\system_test\Hook;
 use Drupal\Core\Extension\Extension;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Hook\Attribute\Hook;
+use Drupal\Core\StringTranslation\StringTranslationTrait;
 
 /**
  * Hook implementations for system_test.
  */
 class SystemTestHooks {
 
+  use StringTranslationTrait;
+
   /**
    * Implements hook_help().
    */
   #[Hook('help')]
-  public function help($route_name, RouteMatchInterface $route_match) {
+  public function help($route_name, RouteMatchInterface $route_match): ?string {
     switch ($route_name) {
       case 'help.page.system_test':
         $output = '';
-        $output .= '<h2>' . t('Test Help Page') . '</h2>';
-        $output .= '<p>' . t('This is a test help page for the system_test module for the purpose of testing if the "Help" link displays properly.') . '</p>';
+        $output .= '<h2>' . $this->t('Test Help Page') . '</h2>';
+        $output .= '<p>' . $this->t('This is a test help page for the system_test module for the purpose of testing if the "Help" link displays properly.') . '</p>';
         return $output;
     }
+    return NULL;
   }
 
   /**
@@ -34,7 +38,7 @@ class SystemTestHooks {
   public function modulesInstalled($modules): void {
     if (\Drupal::state()->get('system_test.verbose_module_hooks')) {
       foreach ($modules as $module) {
-        \Drupal::messenger()->addStatus(t('hook_modules_installed fired for @module', ['@module' => $module]));
+        \Drupal::messenger()->addStatus($this->t('hook_modules_installed fired for @module', ['@module' => $module]));
       }
     }
   }
@@ -46,14 +50,14 @@ class SystemTestHooks {
   public function modulesUninstalled($modules, $is_syncing): void {
     if (\Drupal::state()->get('system_test.verbose_module_hooks')) {
       foreach ($modules as $module) {
-        \Drupal::messenger()->addStatus(t('hook_modules_uninstalled fired for @module', ['@module' => $module]));
+        \Drupal::messenger()->addStatus($this->t('hook_modules_uninstalled fired for @module', ['@module' => $module]));
       }
     }
     // Save the config.installer isSyncing() value to state to check that it is
     // correctly set when installing module during config import.
     \Drupal::state()->set('system_test_modules_uninstalled_config_installer_syncing', \Drupal::service('config.installer')->isSyncing());
-    // Save the $is_syncing parameter value to state to check that it is correctly
-    // set when installing module during config import.
+    // Save the $is_syncing parameter value to state to check that it is
+    // correctly set when installing module during config import.
     \Drupal::state()->set('system_test_modules_uninstalled_syncing_param', $is_syncing);
   }
 
@@ -104,7 +108,7 @@ class SystemTestHooks {
     // \Drupal::service('path.matcher')->isFrontPage().
     $frontpage = \Drupal::state()->get('system_test.front_page_output', 0);
     if ($frontpage && \Drupal::service('path.matcher')->isFrontPage()) {
-      \Drupal::messenger()->addStatus(t('On front page.'));
+      \Drupal::messenger()->addStatus($this->t('On front page.'));
     }
   }
 
@@ -112,10 +116,10 @@ class SystemTestHooks {
    * Implements hook_filetransfer_info().
    */
   #[Hook('filetransfer_info')]
-  public function filetransferInfo() {
+  public function filetransferInfo(): array {
     return [
       'system_test' => [
-        'title' => t('System Test FileTransfer'),
+        'title' => $this->t('System Test FileTransfer'),
         'class' => 'Drupal\system_test\MockFileTransfer',
         'weight' => -10,
       ],
@@ -132,8 +136,8 @@ class SystemTestHooks {
     // Save the config.installer isSyncing() value to state to check that it is
     // correctly set when installing module during config import.
     \Drupal::state()->set('system_test_preinstall_module_config_installer_syncing', \Drupal::service('config.installer')->isSyncing());
-    // Save the $is_syncing parameter value to state to check that it is correctly
-    // set when installing module during config import.
+    // Save the $is_syncing parameter value to state to check that it is
+    // correctly set when installing module during config import.
     \Drupal::state()->set('system_test_preinstall_module_syncing_param', $is_syncing);
   }
 
@@ -146,8 +150,8 @@ class SystemTestHooks {
     // Save the config.installer isSyncing() value to state to check that it is
     // correctly set when uninstalling module during config import.
     \Drupal::state()->set('system_test_preuninstall_module_config_installer_syncing', \Drupal::service('config.installer')->isSyncing());
-    // Save the $is_syncing parameter value to state to check that it is correctly
-    // set when installing module during config import.
+    // Save the $is_syncing parameter value to state to check that it is
+    // correctly set when installing module during config import.
     \Drupal::state()->set('system_test_preuninstall_module_syncing_param', $is_syncing);
   }
 

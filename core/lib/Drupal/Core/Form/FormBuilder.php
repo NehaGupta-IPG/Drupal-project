@@ -729,6 +729,11 @@ class FormBuilder implements FormBuilderInterface, FormValidatorInterface, FormS
       // submitted form value appears literally, regardless of custom #tree
       // and #parents being set elsewhere.
       '#parents' => ['form_build_id'],
+      // Certain browsers such as Firefox retain form input data after reload.
+      // This can result in the form being in a strange state if the page is
+      // reloaded after an AJAX request. Setting the form build ID field's
+      // autocomplete off prevents the input from being retained.
+      '#attributes' => ['autocomplete' => 'off'],
     ];
 
     // Add a token, based on either #token or form_id, to any form displayed to
@@ -1002,7 +1007,11 @@ class FormBuilder implements FormBuilderInterface, FormValidatorInterface, FormS
     if (isset($element['#process']) && !$element['#processed']) {
       foreach ($element['#process'] as $callback) {
         $complete_form = &$form_state->getCompleteForm();
-        $element = call_user_func_array($form_state->prepareCallback($callback), [&$element, &$form_state, &$complete_form]);
+        $element = call_user_func_array($form_state->prepareCallback($callback), [
+          &$element,
+          &$form_state,
+          &$complete_form,
+        ]);
       }
       $element['#processed'] = TRUE;
     }
@@ -1185,8 +1194,8 @@ class FormBuilder implements FormBuilderInterface, FormValidatorInterface, FormS
     // of how the element is themed or whether JavaScript is used to change the
     // control's attributes. However, it's good UI to let the user know that
     // input is not wanted for the control. HTML supports two attributes for:
-    // this: https://www.w3.org/TR/html401/interact/forms.html#h-17.12. If a form
-    // wants to start a control off with one of these attributes for UI
+    // this: https://www.w3.org/TR/html401/interact/forms.html#h-17.12. If a
+    // form wants to start a control off with one of these attributes for UI
     // purposes, only, but still allow input to be processed if it's submitted,
     // it can set the desired attribute in #attributes directly rather than
     // using #disabled. However, developers should think carefully about the
@@ -1329,7 +1338,7 @@ class FormBuilder implements FormBuilderInterface, FormValidatorInterface, FormS
    * element. If the name alone doesn't identify the element uniquely, the input
    * key '_triggering_element_value' may also be set to require a match on
    * element value. An example where this is needed is if there are several
-   * // buttons all named 'op', and only differing in their value.
+   * // buttons all named 'op', and only different in their value.
    */
   protected function elementTriggeredScriptedSubmission($element, FormStateInterface &$form_state) {
     $input = $form_state->getUserInput();

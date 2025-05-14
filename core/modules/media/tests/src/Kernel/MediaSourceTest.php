@@ -122,8 +122,10 @@ class MediaSourceTest extends MediaKernelTestBase {
 
     // Change the default name attribute and see if it is used to set the name.
     $name = 'Old Major';
-    \Drupal::state()->set('media_source_test_attributes', ['alternative_name' => ['title' => 'Alternative name', 'value' => $name]]);
-    \Drupal::state()->set('media_source_test_definition', ['default_name_metadata_attribute' => 'alternative_name']);
+    \Drupal::state()
+      ->set('media_source_test_attributes', ['alternative_name' => ['title' => 'Alternative name', 'value' => $name]]);
+    \Drupal::state()
+      ->set('media_source_test_definition', ['default_name_metadata_attribute' => 'alternative_name']);
     /** @var \Drupal\media\MediaInterface $media */
     $media = Media::create(['bundle' => $this->testMediaType->id()]);
     $media_source = $media->getSource();
@@ -515,6 +517,43 @@ class MediaSourceTest extends MediaKernelTestBase {
     $this->assertTrue($field->isRequired(), 'Field is not required.');
     $this->assertEquals('Test source with constraints', $field->label(), 'Incorrect label is used.');
     $this->assertSame('test_constraints_type', $field->getTargetBundle(), 'Field is not targeting correct bundle.');
+
+    // Test a source with a long machine name.
+    $type = MediaType::create([
+      'id' => 'test_type_fail',
+      'label' => 'Test type - Fail',
+      'source' => 'test_source_with_a_really_long_name',
+    ]);
+    $type->save();
+
+    /** @var \Drupal\field\Entity\FieldConfig $field */
+    $field = $type->getSource()->createSourceField($type);
+    /** @var \Drupal\field\Entity\FieldStorageConfig $field_storage */
+    $field_storage = $field->getFieldStorageDefinition();
+    $field_storage->save();
+    // Field configuration depends on the field storage, which must be saved first.
+    $field->save();
+
+    // Test long field name is truncated.
+    $this->assertSame('field_media_test_source_with_a_r', $field_storage->getName(), 'Incorrect field name is used.');
+
+    $type = MediaType::create([
+      'id' => 'test_type_fail_2',
+      'label' => 'Test type - Fail 2',
+      'source' => 'test_source_with_a_really_long_name',
+    ]);
+    $type->save();
+
+    /** @var \Drupal\field\Entity\FieldConfig $field */
+    $field = $type->getSource()->createSourceField($type);
+    /** @var \Drupal\field\Entity\FieldStorageConfig $field_storage */
+    $field_storage = $field->getFieldStorageDefinition();
+    $field_storage->save();
+    // Field configuration depends on the field storage, which must be saved first.
+    $field->save();
+
+    // Test long field name is truncated.
+    $this->assertSame('field_media_test_source_with_a_1', $field_storage->getName(), 'Incorrect field name is used.');
 
     // Test that new source fields respect the configured field prefix, no
     // prefix at all if that's what's configured.

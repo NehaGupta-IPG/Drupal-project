@@ -104,11 +104,11 @@ class DriverSpecificTransactionTestBase extends DriverSpecificDatabaseTestBase {
    * transaction (which was already committed when the inner transaction
    * started).
    *
-   * @param $suffix
+   * @param string $suffix
    *   Suffix to add to field values to differentiate tests.
-   * @param $rollback
+   * @param bool $rollback
    *   Whether or not to try rolling back the transaction when we're done.
-   * @param $ddl_statement
+   * @param bool $ddl_statement
    *   Whether to execute a DDL statement during the inner transaction.
    */
   protected function transactionOuterLayer($suffix, $rollback = FALSE, $ddl_statement = FALSE) {
@@ -145,11 +145,11 @@ class DriverSpecificTransactionTestBase extends DriverSpecificDatabaseTestBase {
    * This "inner layer" transaction is either used alone or nested inside of the
    * "outer layer" transaction.
    *
-   * @param $suffix
+   * @param string $suffix
    *   Suffix to add to field values to differentiate tests.
-   * @param $rollback
+   * @param bool $rollback
    *   Whether or not to try rolling back the transaction when we're done.
-   * @param $ddl_statement
+   * @param bool $ddl_statement
    *   Whether to execute a DDL statement during the transaction.
    */
   protected function transactionInnerLayer($suffix, $rollback = FALSE, $ddl_statement = FALSE) {
@@ -432,9 +432,6 @@ class DriverSpecificTransactionTestBase extends DriverSpecificDatabaseTestBase {
 
   /**
    * Tests rollback after a DDL statement when no transactional DDL supported.
-   *
-   * @todo In drupal:12.0.0, rollBack will throw a
-   *   TransactionOutOfOrderException. Adjust the test accordingly.
    */
   public function testRollbackAfterDdlStatementForNonTransactionalDdlDatabase(): void {
     if ($this->connection->supportsTransactionalDDL()) {
@@ -919,9 +916,6 @@ class DriverSpecificTransactionTestBase extends DriverSpecificDatabaseTestBase {
    * transaction including DDL statements is not possible, since a commit
    * happened already. We cannot decide what should be the status of the
    * callback, an exception is thrown.
-   *
-   * @todo In drupal:12.0.0, rollBack will throw a
-   *   TransactionOutOfOrderException. Adjust the test accordingly.
    */
   public function testRootTransactionEndCallbackFailureUponDdlAndRollbackForNonTransactionalDdlDatabase(): void {
     if ($this->connection->supportsTransactionalDDL()) {

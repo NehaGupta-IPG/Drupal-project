@@ -7,10 +7,10 @@ internal.backbone:
   #  - https://www.drupal.org/project/drupal/issues/3204011
   #  - https://www.drupal.org/project/drupal/issues/3204015
   remote: https://github.com/jashkenas/backbone
-  version: "1.6.0"
+  version: "1.6.1"
   license:
     name: MIT
-    url: https://raw.githubusercontent.com/jashkenas/backbone/1.6.0/LICENSE
+    url: https://raw.githubusercontent.com/jashkenas/backbone/1.6.1/LICENSE
     gpl-compatible: true
   js:
     assets/vendor/backbone/backbone-min.js: { weight: -19, minified: true }
@@ -589,6 +589,21 @@ drupal.entity-form:
   dependencies:
     - core/drupal.form
 
+drupal.fieldgroup:
+  version: VERSION
+  css:
+    component:
+      misc/components/fieldgroup.module.css: { weight: -10 }
+  moved_files:
+    system/base:
+      deprecation_version: 11.2.0
+      removed_version: 12.0.0
+      deprecation_link: https://www.drupal.org/node/3432346
+      css:
+        component:
+          css/components/fieldgroup.module.css:
+            base: core/misc/components/fieldgroup.module.css
+
 drupal.form:
   version: VERSION
   js:
@@ -632,6 +647,21 @@ drupal.progress:
     - core/jquery
     - core/drupalSettings
 
+drupal.textarea-resize:
+  version: VERSION
+  css:
+    component:
+      misc/components/resize.module.css: { weight: -10 }
+  moved_files:
+    system/base:
+      deprecation_version: 11.2.0
+      removed_version: 12.0.0
+      deprecation_link: https://www.drupal.org/node/3432346
+      css:
+        component:
+          css/components/resize.module.css:
+            component: misc/components/resize.module.css
+
 drupal.states:
   version: VERSION
   js:
@@ -672,8 +702,8 @@ drupal.tabledrag.ajax:
   js:
     misc/tabledrag-ajax.js: { }
   dependencies:
-    - core/ajax
-    - core/tabledrag
+    - core/drupal.ajax
+    - core/drupal.tabledrag
 
 drupal.tableheader:
   version: VERSION
@@ -699,6 +729,21 @@ drupal.tableselect:
     - core/drupal.checkbox
     - core/jquery
     - core/once
+
+drupal.tablesort:
+  version: VERSION
+  css:
+    component:
+      misc/components/tablesort.module.css: { weight: -10 }
+  moved_files:
+    system/base:
+      deprecation_version: 11.2.0
+      removed_version: 12.0.0
+      deprecation_link: https://www.drupal.org/node/3432346
+      css:
+        component:
+          css/components/tablesort.module.css:
+            base: misc/components/tablesort.module.css
 
 drupal.time-diff:
   version: VERSION
@@ -736,13 +781,22 @@ drupal.vertical-tabs:
     - core/drupal
     - core/drupalSettings
     - core/drupal.form
+htmx:
+  remote: https://github.com/bigskysoftware/htmx
+  version: "2.0.4"
+  license:
+    name: Zero-Clause BSD
+    url:  https://raw.githubusercontent.com/bigskysoftware/htmx/refs/tags/v2.0.4/LICENSE
+    gpl-compatible: true
+  js:
+    assets/vendor/htmx/htmx.min.js: { minified: true }
 
 internal.floating-ui:
   remote: https://github.com/floating-ui/floating-ui
-  version: "1.6.12"
+  version: "1.7.0"
   license:
     name: MIT
-    url: https://github.com/floating-ui/floating-ui/blob/@floating-ui/dom@1.6.12/LICENSE
+    url: https://github.com/floating-ui/floating-ui/blob/@floating-ui/dom@1.7.0/LICENSE
     gpl-compatible: true
   js:
     assets/vendor/floating-ui/floating-ui.core.umd.min.js: { minified: true }
@@ -756,7 +810,12 @@ jquery:
     url: https://raw.githubusercontent.com/jquery/jquery/4.0.0-beta.2/LICENSE.txt
     gpl-compatible: true
   js:
-    assets/vendor/jquery/jquery.min.js: { minified: true, weight: -20 }
+    # jquery.min.js is explicitly set to preprocess: false to prevent its
+    # inclusion in JavaScript aggregates. This prevents it being duplicated
+    # across different aggregates which can include different combinations of
+    # libraries that depend on jQuery, so that it is only downloaded once per
+    # browser instead of potentially multiple times from different pages.
+    assets/vendor/jquery/jquery.min.js: { preprocess: false, minified: true, weight: -20 }
 
 internal.jquery.form:
   # Internal library. Do not depend on it outside core nor add new core usage.

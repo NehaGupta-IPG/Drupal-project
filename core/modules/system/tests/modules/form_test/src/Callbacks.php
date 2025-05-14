@@ -5,11 +5,14 @@ declare(strict_types=1);
 namespace Drupal\form_test;
 
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\StringTranslation\StringTranslationTrait;
 
 /**
  * Simple class for testing methods as Form API callbacks.
  */
 class Callbacks {
+
+  use StringTranslationTrait;
 
   /**
    * Form element validation handler for 'name' in form_test_validate_form().
@@ -32,7 +35,8 @@ class Callbacks {
       $triggered = TRUE;
     }
     elseif ($form_state->has('form_test_name')) {
-      // To simplify this test, just take over the element's value into $form_state.
+      // To simplify this test, just take over the element's value into
+      // $form_state.
       $form_state->setValueForElement($element, $form_state->get('form_test_name'));
 
       $triggered = TRUE;
@@ -40,7 +44,11 @@ class Callbacks {
 
     if ($triggered) {
       // Output the element's value from $form_state.
-      \Drupal::messenger()->addStatus(t('@label value: @value', ['@label' => $element['#title'], '@value' => $form_state->getValue('name')]));
+      \Drupal::messenger()
+        ->addStatus($this->t('@label value: @value', [
+          '@label' => $element['#title'],
+          '@value' => $form_state->getValue('name'),
+        ]));
 
       // Trigger a form validation error to see our changes.
       $form_state->setErrorByName('');

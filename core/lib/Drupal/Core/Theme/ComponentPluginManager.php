@@ -84,10 +84,11 @@ class ComponentPluginManager extends DefaultPluginManager implements Categorizin
     $this->moduleHandler = $module_handler;
     $this->factory = new ContainerFactory($this);
     $this->setCacheBackend($cacheBackend, 'component_plugins');
-    // Note that we are intentionally skipping $this->alterInfo('component_info');
-    // We want to ensure that everything related to a component is in the
-    // single directory. If the alteration of a component is necessary,
-    // component replacement is the preferred tool for that.
+    // Note that we are intentionally skipping
+    // $this->alterInfo('component_info'); We want to ensure that everything
+    // related to a component is in the single directory. If the alteration of a
+    // component is necessary, component replacement is the preferred tool for
+    // that.
   }
 
   /**
@@ -305,6 +306,20 @@ class ComponentPluginManager extends DefaultPluginManager implements Categorizin
     if (!empty($validation_errors)) {
       throw new IncompatibleComponentSchema(implode("\n", $validation_errors));
     }
+
+    // Sort the definitions by module weight during discovery so that it can be
+    // cached. Components provided by themes are sorted at runtime in
+    // \Drupal\Core\Theme\ComponentNegotiator::maybeNegotiateByTheme() as their
+    // order can vary based on the active theme.
+    $module_list = $this->getModuleExtensionList()->getList();
+    $sort_by_module_weight_and_name = static function (array $definition_a, array $definition_b) use ($module_list) {
+      $a_weight = $module_list[$definition_a['provider']]?->weight ?? -999;
+      $b_weight = $module_list[$definition_b['provider']]?->weight ?? -999;
+      return $a_weight !== $b_weight
+        ? $a_weight <=> $b_weight
+        : $definition_a['provider'] <=> $definition_b['provider'];
+    };
+    uasort($definitions, $sort_by_module_weight_and_name);
   }
 
   /**
@@ -488,6 +503,8 @@ class ComponentPluginManager extends DefaultPluginManager implements Categorizin
     $path_from_root = str_starts_with($path, $this->appRoot)
       ? substr($path, strlen($this->appRoot) + 1)
       : $path;
+    // Make sure this works seamlessly in every OS.
+    $path_from_root = str_replace(DIRECTORY_SEPARATOR, '/', $path_from_root);
     // The library owner is in <root>/core, so we need to go one level up to
     // find the app root.
     return '../' . $path_from_root;
