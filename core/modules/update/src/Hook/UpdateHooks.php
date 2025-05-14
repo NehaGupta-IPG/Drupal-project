@@ -24,14 +24,14 @@ class UpdateHooks {
       case 'help.page.update':
         $output = '';
         $output .= '<h2>' . $this->t('About') . '</h2>';
-        $output .= '<p>' . $this->t('The Update Manager module periodically checks for new versions of your site\'s software (including contributed modules and themes), and alerts administrators to available updates. The Update Manager system is also used by some other modules to manage updates and downloads; for example, the Interface Translation module uses the Update Manager to download translations from the localization server. Note that whenever the Update Manager system is used, anonymous usage statistics are sent to Drupal.org. If desired, you may uninstall the Update Manager module from the <a href=":modules">Extend page</a>; if you do so, functionality that depends on the Update Manager system will not work. For more information, see the <a href=":update">online documentation for the Update Manager module</a>.', [
+        $output .= '<p>' . $this->t('The Update Status module periodically checks for new versions of your site\'s software (including contributed modules and themes), and alerts administrators to available updates. The Update Status system is also used by some other modules to manage updates and downloads; for example, the Interface Translation module uses the Update Status to download translations from the localization server. Note that whenever the Update Status system is used, anonymous usage statistics are sent to Drupal.org. If desired, you may uninstall the Update Status module from the <a href=":modules">Extend page</a>; if you do so, functionality that depends on the Update Status system will not work. For more information, see the <a href=":update">online documentation for the Update Status module</a>.', [
           ':update' => 'https://www.drupal.org/documentation/modules/update',
           ':modules' => Url::fromRoute('system.modules_list')->toString(),
         ]) . '</p>';
         $output .= '<h2>' . $this->t('Uses') . '</h2>';
         $output .= '<dl>';
         $output .= '<dt>' . $this->t('Checking for available updates') . '</dt>';
-        $output .= '<dd>' . $this->t('The <a href=":update-report">Available updates report</a> displays core, contributed modules, and themes for which there are new releases available for download. On the report page, you can also check manually for updates. You can configure the frequency of update checks, which are performed during cron runs, and whether notifications are sent on the <a href=":update-settings">Update Manager settings page</a>.', [
+        $output .= '<dd>' . $this->t('The <a href=":update-report">Available updates report</a> displays core, contributed modules, and themes for which there are new releases available for download. On the report page, you can also check manually for updates. You can configure the frequency of update checks, which are performed during cron runs, and whether notifications are sent on the <a href=":update-settings">Update Status settings page</a>.', [
           ':update-report' => Url::fromRoute('update.status')->toString(),
           ':update-settings' => Url::fromRoute('update.settings')->toString(),
         ]) . '</dd>';
@@ -77,8 +77,15 @@ class UpdateHooks {
           $verbose = TRUE;
           break;
       }
+      // This loadInclude() is to ensure that the install API is available.
+      // Since we're loading an include of type 'install', this will also
+      // include core/includes/install.inc for us, which is where the
+      // REQUIREMENTS* constants are currently defined.
+      // @todo Remove this once those constants live in a better place.
+      // @see https://www.drupal.org/project/drupal/issues/2909480
+      // @see https://www.drupal.org/project/drupal/issues/3410938
       \Drupal::moduleHandler()->loadInclude('update', 'install');
-      $status = update_requirements('runtime');
+      $status = \Drupal::moduleHandler()->invoke('update', 'runtime_requirements');
       foreach (['core', 'contrib'] as $report_type) {
         $type = 'update_' . $report_type;
         // hook_requirements() supports render arrays therefore we need to
@@ -178,8 +185,6 @@ class UpdateHooks {
       \Drupal::moduleHandler()->loadInclude('update', 'inc', 'update.fetch');
       _update_cron_notify();
     }
-    // Clear garbage from disk.
-    update_clear_update_disk_cache();
   }
 
   /**
@@ -190,7 +195,7 @@ class UpdateHooks {
    */
   #[Hook('themes_installed')]
   public function themesInstalled($themes): void {
-    // Clear all update module data.
+    // Clear all Update Status module data.
     update_storage_clear();
   }
 
@@ -202,7 +207,7 @@ class UpdateHooks {
    */
   #[Hook('themes_uninstalled')]
   public function themesUninstalled($themes): void {
-    // Clear all update module data.
+    // Clear all Update Status module data.
     update_storage_clear();
   }
 
@@ -214,7 +219,7 @@ class UpdateHooks {
    */
   #[Hook('modules_installed')]
   public function modulesInstalled($modules): void {
-    // Clear all update module data.
+    // Clear all Update Status module data.
     update_storage_clear();
   }
 
@@ -226,7 +231,7 @@ class UpdateHooks {
    */
   #[Hook('modules_uninstalled')]
   public function modulesUninstalled($modules): void {
-    // Clear all update module data.
+    // Clear all Update Status module data.
     update_storage_clear();
   }
 
