@@ -8,6 +8,7 @@
  * customized by user themes.
  */
 
+use Drupal\Core\Datetime\DatePreprocess;
 use Drupal\Core\Theme\ThemePreprocess;
 use Drupal\Core\Url;
 use Drupal\Component\Utility\Html;
@@ -338,7 +339,7 @@ function theme_settings_convert_to_config(array $theme_settings, Config $config)
  */
 function template_preprocess_time(&$variables): void {
   @trigger_error(__FUNCTION__ . '() is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Initial template_preprocess functions are registered directly in hook_theme(). See https://www.drupal.org/node/3504125', E_USER_DEPRECATED);
-  \Drupal::service(ThemePreprocess::class)->preprocessTime($variables);
+  \Drupal::service(DatePreprocess::class)->preprocessTime($variables);
 }
 
 /**
@@ -363,7 +364,7 @@ function template_preprocess_time(&$variables): void {
  */
 function template_preprocess_datetime_form(&$variables): void {
   @trigger_error(__FUNCTION__ . '() is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Initial template_preprocess functions are registered directly in hook_theme(). See https://www.drupal.org/node/3504125', E_USER_DEPRECATED);
-  \Drupal::service(ThemePreprocess::class)->preprocessDatetimeForm($variables);
+  \Drupal::service(DatePreprocess::class)->preprocessDatetimeForm($variables);
 }
 
 /**
@@ -383,7 +384,7 @@ function template_preprocess_datetime_form(&$variables): void {
  */
 function template_preprocess_datetime_wrapper(&$variables): void {
   @trigger_error(__FUNCTION__ . '() is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Initial template_preprocess functions are registered directly in hook_theme(). See https://www.drupal.org/node/3504125', E_USER_DEPRECATED);
-  \Drupal::service(ThemePreprocess::class)->preprocessDatetimeWrapper($variables);
+  \Drupal::service(DatePreprocess::class)->preprocessDatetimeWrapper($variables);
 }
 
 /**
@@ -1044,6 +1045,15 @@ function theme_get_suggestions($args, $base, $delimiter = '__'): array {
   }
 
   return $suggestions;
+}
+
+/**
+ * Prepares variables for tablesort indicators.
+ *
+ * Default template: tablesort-indicator.html.twig.
+ */
+function template_preprocess_tablesort_indicator(&$variables): void {
+  $variables['#attached']['library'][] = 'core/drupal.tablesort';
 }
 
 /**
