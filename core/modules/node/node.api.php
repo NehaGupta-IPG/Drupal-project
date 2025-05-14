@@ -26,11 +26,22 @@ use Drupal\Component\Utility\Xss;
  * Grant IDs can be arbitrarily defined by a node access module using a list of
  * integer IDs associated with users.
  *
- * A node access module may implement as many realms as necessary to properly
- * define the access privileges for the nodes. Note that the system makes no
- * distinction between published and unpublished nodes. It is the module's
- * responsibility to provide appropriate realms to limit access to unpublished
- * content.
+ * A node access module may implement as many realms as necessary to define the
+ * access privileges for the nodes properly. See the
+ * @link node_access, Node Access topic for more information @endlink. The node
+ * access system makes no distinction between published and unpublished nodes.
+ * It is the module's responsibility to provide appropriate realms to limit
+ * access to unpublished content.
+ *
+ * All node access modules are queried using hook_node_grants() to assemble a
+ * list of "grant IDs" for the user. This list is compared against the node
+ * access table. If any row contains the node ID in question (or 0, which stands
+ * for "all nodes"), one of the grant IDs returned, and a value of TRUE for the
+ * operation in question, then access is granted. Note that this table is a list
+ * of grants; any matching row is sufficient to grant access to the node.
+ * In cases where users are able to view their own unpublished node, the
+ * permission 'view own unpublished content' has been set for that user and node
+ * access checks will stop there and hook_node_grants() will not be called.
  *
  * Node access records are stored in the {node_access} table and define which
  * grants are required to access a node. There is a special case for the view
