@@ -412,8 +412,8 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
    *   "mimic_implicit_commit" is used.
    *
    * @deprecated in drupal:10.3.0 and is removed from drupal:11.0.0. Use
-   *   TransactionManager to start a transaction then call ::commitOrRelease() or
-   *   ::rollback() on it.
+   *   TransactionManager to start a transaction then call ::commitOrRelease()
+   *   or ::rollback() on it.
    *
    * @see https://www.drupal.org/node/7654123
    */
