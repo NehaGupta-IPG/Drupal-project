@@ -208,6 +208,10 @@ function _contextual_id_to_links($id) {
   $contextual_links = [];
   $contexts = explode('|', $id);
   foreach ($contexts as $context) {
+    $contextParamCount = substr_count($context, ':') + 1;
+    if ($contextParamCount !== 3) {
+      trigger_error("Malformed _contextual_id_to_links($id) context string given. 3 context parameters expected separated by colon (\":\"), but {$contextParamCount} given in \"{$id}\"", E_USER_WARNING);
+    }
     [$group, $route_parameters_raw, $metadata_raw] = explode(':', $context);
     parse_str($route_parameters_raw, $route_parameters);
     $metadata = [];
