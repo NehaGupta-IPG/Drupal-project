@@ -1,0 +1,9 @@
+services:
+  custom_image_normalizer.image_field_normalizer:
+    class: Drupal\custom_image_normalizer\Normalizer\ImageFieldNormalizer
+    arguments:
+      - '@entity_type.manager'
+      - '@image.factory'
+      - '@file_url_generator'
+    tags:
+      - { name: normalizer, priority: 100 }
