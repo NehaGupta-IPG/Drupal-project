@@ -15,6 +15,7 @@ use Drupal\Core\TypedData\TypedDataManagerInterface;
 use Drupal\Tests\Core\Entity\ContentEntityBaseMockableClass;
 use Drupal\Tests\UnitTestCase;
 use Drupal\Core\Language\Language;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\MockObject\MockObject;
 
 /**
@@ -302,8 +303,10 @@ class EntityAdapterUnitTest extends UnitTestCase {
   /**
    * @covers ::get
    */
+  #[IgnoreDeprecations]
   public function testGetInvalidField(): void {
     $this->expectException(\InvalidArgumentException::class);
+    $this->expectDeprecation('Throwing an exception when calling Drupal\Core\Entity\ContentEntityBase::get on an invalid field name without the setting the second "$throw_exception" parameter is deprecated in drupal:11.2.0 and will return NULL unless $throw_exception is explicitly set to TRUE in drupal:13.0.0. See https://www.drupal.org/node/3522223');
     $this->entityAdapter->get('invalid');
   }
 
