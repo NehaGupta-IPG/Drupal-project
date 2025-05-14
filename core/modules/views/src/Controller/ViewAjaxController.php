@@ -235,8 +235,8 @@ class ViewAjaxController implements ContainerInjectionInterface {
             // render. We need to remove these attributes from our replacement
             // content to prevent duplication and UI issues.
             // The BlockViewBuilder has already applied these attributes to the
-            // block container in the DOM, so we don't need to include them again
-            // in our replacement content.
+            // block container in the DOM, so we don't need to include them
+            // again in our replacement content.
             // @see \Drupal\block\BlockViewBuilder::preRender()
             foreach (['#attributes', '#contextual_links'] as $property) {
               if (isset($exposed_form_block_render_array[$property])) {
