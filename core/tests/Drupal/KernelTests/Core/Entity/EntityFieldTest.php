@@ -997,6 +997,8 @@ class EntityFieldTest extends EntityKernelTestBase {
    *   Value to be passed to $throw_exception parameter of get().
    *
    * @dataProvider providerEntityGetInvalidFieldName
+   *
+   * @group legacy
    */
   public function testEntityGetInvalidFieldName(?bool $throw_exception): void {
     $entity = $this->createTestEntity('entity_test');
@@ -1007,6 +1009,7 @@ class EntityFieldTest extends EntityKernelTestBase {
     }
 
     if (is_null($throw_exception)) {
+      $this->expectDeprecation('Throwing an exception when calling Drupal\Core\Entity\ContentEntityBase::get on an invalid field name without the setting the second "$throw_exception" parameter is deprecated in drupal:11.2.0 and will return NULL unless $throw_exception is explicitly set to TRUE in drupal:13.0.0. See https://www.drupal.org/node/3522223');
       $value = $entity->get('field_does_not_exist')?->value;
     }
     else {

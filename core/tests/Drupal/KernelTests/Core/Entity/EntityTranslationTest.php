@@ -13,6 +13,7 @@ use Drupal\entity_test\EntityTestTypesFilter;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\language\Entity\ConfigurableLanguage;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 
 /**
  * Tests entity translation functionality.
@@ -307,7 +308,9 @@ class EntityTranslationTest extends EntityLanguageTestBase {
   /**
    * Tests the Entity Translation API behavior.
    */
+  #[IgnoreDeprecations]
   public function testEntityTranslationAPI(): void {
+    $this->expectDeprecation('Throwing an exception when calling Drupal\Core\Entity\ContentEntityBase::get on an invalid field name without the setting the second "$throw_exception" parameter is deprecated in drupal:11.2.0 and will return NULL unless $throw_exception is explicitly set to TRUE in drupal:13.0.0. See https://www.drupal.org/node/3522223');
     // Test all entity variations with data table support.
     foreach (EntityTestHelper::getEntityTypes(EntityTestTypesFilter::Multilingual) as $entity_type) {
       $this->doTestEntityTranslationAPI($entity_type);
