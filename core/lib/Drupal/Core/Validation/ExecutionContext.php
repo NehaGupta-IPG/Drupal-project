@@ -111,7 +111,11 @@ class ExecutionContext implements ExecutionContextInterface {
   /**
    * {@inheritdoc}
    */
-  public function addViolation(string $message, array $params = []): void {
+  public function addViolation(string|null $message, array $params = []): void {
+    if ($message === NULL) {
+      // Optionally provide a default message or handle null case.
+      $message = 'An error occurred.';
+    }
     $this->violations->add(new ConstraintViolation($this->translator->trans($message, $params, $this->translationDomain), $message, $params, $this->root, $this->propertyPath, $this->value, NULL, NULL, $this->constraint));
   }
 
