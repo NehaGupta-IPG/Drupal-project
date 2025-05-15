@@ -45,6 +45,11 @@ class HookCollectorPassTest extends KernelTestBase {
           'userFormatNameAlter' => 'user_hooks_test',
         ],
       ],
+      'user_mail_language_alter' => [
+        'Drupal\user_hooks_test\Hook\UserHooksTest' => [
+          'userMailLanguageAlter' => 'user_hooks_test',
+        ],
+      ],
     ];
 
     $this->assertSame($implementations, $container->getParameter('hook_implementations_map'));
