@@ -232,3 +232,24 @@ function menu_ui_preprocess_block(&$variables): void {
     $variables['attributes']['role'] = 'navigation';
   }
 }
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ */
+function menu_ui_form_alter(&$form, \Drupal\Core\Form\FormStateInterface $form_state) {
+
+  if (isset($form['links']['links']['#type']) && $form['links']['links']['#type'] === 'table') {
+    foreach ($form['links']['links'] as $key => &$element) {
+      // Skip table properties like #type, #header, etc.
+      if (strpos($key, '#') === 0 || !is_array($element)) {
+        continue;
+      }
+      // Target only Views-generated menu links.
+      if (str_starts_with($key, 'menu_plugin_id:views_view:')) {
+        if (isset($element['operations']['#links']['delete'])) {
+          unset($element['operations']['#links']['delete']);
+        }
+      }
+    }
+  }
+}
