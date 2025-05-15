@@ -260,13 +260,13 @@ class ViewExecutableTest extends UnitTestCase {
       ->method('getPath')
       ->willReturn('test-path/%/%');
 
-    $route = new Route('/test-path/{arg_0}/{arg_1}');
+    $route = new Route('/test-path');
     $this->routeProvider->expects($this->any())
       ->method('getRouteByName')
       ->with('views.test.page_1')
       ->willReturn($route);
 
-    $this->assertEquals(Url::fromRoute('views.test.page_1', ['arg_0' => '*', 'arg_1' => '*']), $this->executable->getUrl());
+    $this->assertEquals(Url::fromRoute('views.test.page_1'), $this->executable->getUrl());
   }
 
   /**
