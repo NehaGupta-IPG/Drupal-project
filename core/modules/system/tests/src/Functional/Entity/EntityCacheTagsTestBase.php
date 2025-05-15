@@ -9,6 +9,7 @@ use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\EventSubscriber\MainContentViewSubscriber;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
+use Drupal\Core\Form\FormOptionsHelper;
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\Url;
 use Drupal\entity_test\EntityTestHelper;
@@ -245,7 +246,7 @@ abstract class EntityCacheTagsTestBase extends PageCacheTagsTestBase {
           'target_bundles' => [
             $referenced_entity->bundle() => $referenced_entity->bundle(),
           ],
-          'sort' => ['field' => '_none'],
+          'sort' => ['field' => FormOptionsHelper::OPTIONS_EMPTY_OPTION],
           'auto_create' => FALSE,
         ],
       ],

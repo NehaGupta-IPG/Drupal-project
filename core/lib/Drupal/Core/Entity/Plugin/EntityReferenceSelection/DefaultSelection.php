@@ -16,6 +16,7 @@ use Drupal\Core\Entity\FieldableEntityInterface;
 use Drupal\Core\Entity\Plugin\Derivative\DefaultSelectionDeriver;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Field\Plugin\Field\FieldType\EntityReferenceItem;
+use Drupal\Core\Form\FormOptionsHelper;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Session\AccountInterface;
@@ -153,7 +154,7 @@ class DefaultSelection extends SelectionPluginBase implements ContainerFactoryPl
       // as otherwise the field would suddenly allow all bundles.
       'target_bundles' => NULL,
       'sort' => [
-        'field' => '_none',
+        'field' => FormOptionsHelper::OPTIONS_EMPTY_OPTION,
         'direction' => 'ASC',
       ],
       'auto_create' => FALSE,
@@ -255,7 +256,7 @@ class DefaultSelection extends SelectionPluginBase implements ContainerFactoryPl
         // to avoid code duplication.
         // @see \Drupal\Core\Field\Plugin\Field\FieldType\EntityReferenceItem::fieldSettingsAjaxProcess()
         '#ajax' => TRUE,
-        '#empty_value' => '_none',
+        '#empty_value' => FormOptionsHelper::OPTIONS_EMPTY_OPTION,
         '#sort_options' => TRUE,
         '#limit_validation_errors' => [],
         '#default_value' => $configuration['sort']['field'],
@@ -286,7 +287,7 @@ class DefaultSelection extends SelectionPluginBase implements ContainerFactoryPl
         '#states' => [
           'visible' => [
             ':input[name="settings[handler_settings][sort][field]"]' => [
-              '!value' => '_none',
+              '!value' => FormOptionsHelper::OPTIONS_EMPTY_OPTION,
             ],
           ],
         ],
@@ -503,7 +504,7 @@ class DefaultSelection extends SelectionPluginBase implements ContainerFactoryPl
     $query->addMetaData('entity_reference_selection_handler', $this);
 
     // Add the sort option.
-    if ($configuration['sort']['field'] !== '_none') {
+    if ($configuration['sort']['field'] !== FormOptionsHelper::OPTIONS_EMPTY_OPTION) {
       $query->sort($configuration['sort']['field'], $configuration['sort']['direction']);
     }
 

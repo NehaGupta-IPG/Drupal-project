@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\Tests\workspaces\Functional;
 
 use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Form\FormOptionsHelper;
 use Drupal\Tests\block\Traits\BlockCreationTrait;
 use Drupal\workspaces\Entity\Handler\IgnoredWorkspaceHandler;
 use Drupal\workspaces\Entity\Workspace;
@@ -61,12 +62,12 @@ trait WorkspaceTestUtilities {
    * @param string $id
    *   The ID of the workspace to create.
    * @param string $parent
-   *   (optional) The ID of the parent workspace. Defaults to '_none'.
+   *   (optional) The ID of the parent workspace. Defaults to FormOptionsHelper::OPTIONS_EMPTY_OPTION.
    *
    * @return \Drupal\workspaces\WorkspaceInterface
    *   The workspace that was just created.
    */
-  protected function createAndActivateWorkspaceThroughUi(string $label, string $id, string $parent = '_none'): WorkspaceInterface {
+  protected function createAndActivateWorkspaceThroughUi(string $label, string $id, string $parent = FormOptionsHelper::OPTIONS_EMPTY_OPTION): WorkspaceInterface {
     $this->drupalGet('/admin/config/workflow/workspaces/add');
     $this->submitForm([
       'id' => $id,
@@ -87,12 +88,12 @@ trait WorkspaceTestUtilities {
    * @param string $id
    *   The ID of the workspace to create.
    * @param string $parent
-   *   (optional) The ID of the parent workspace. Defaults to '_none'.
+   *   (optional) The ID of the parent workspace. Defaults to FormOptionsHelper::OPTIONS_EMPTY_OPTION.
    *
    * @return \Drupal\workspaces\WorkspaceInterface
    *   The workspace that was just created.
    */
-  protected function createWorkspaceThroughUi($label, $id, $parent = '_none') {
+  protected function createWorkspaceThroughUi($label, $id, $parent = FormOptionsHelper::OPTIONS_EMPTY_OPTION) {
     $this->drupalGet('/admin/config/workflow/workspaces/add');
     $this->submitForm([
       'id' => $id,

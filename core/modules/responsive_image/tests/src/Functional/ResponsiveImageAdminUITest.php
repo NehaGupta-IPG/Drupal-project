@@ -4,8 +4,9 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\responsive_image\Functional;
 
-use Drupal\responsive_image\ResponsiveImageStyleInterface;
+use Drupal\Core\Form\FormOptionsHelper;
 use Drupal\Tests\BrowserTestBase;
+use Drupal\responsive_image\ResponsiveImageStyleInterface;
 
 // cspell:ignore modulenarrow
 
@@ -134,7 +135,7 @@ class ResponsiveImageAdminUITest extends BrowserTestBase {
     // Check the mapping for multipliers 1x and 2x for the mobile breakpoint.
     $this->assertSession()->fieldValueEquals('keyed_styles[responsive_image_test_module.mobile][1x][image_style]', 'thumbnail');
     $this->assertSession()->fieldValueEquals('keyed_styles[responsive_image_test_module.mobile][1x][image_mapping_type]', 'image_style');
-    $this->assertSession()->fieldValueEquals('keyed_styles[responsive_image_test_module.mobile][2x][image_mapping_type]', '_none');
+    $this->assertSession()->fieldValueEquals('keyed_styles[responsive_image_test_module.mobile][2x][image_mapping_type]', FormOptionsHelper::OPTIONS_EMPTY_OPTION);
 
     // Check the mapping for multipliers 1x and 2x for the narrow breakpoint.
     $this->assertSession()->fieldValueEquals('keyed_styles[responsive_image_test_module.narrow][1x][image_mapping_type]', 'sizes');
@@ -142,12 +143,12 @@ class ResponsiveImageAdminUITest extends BrowserTestBase {
     $this->assertSession()->checkboxChecked('edit-keyed-styles-responsive-image-test-modulenarrow-1x-sizes-image-styles-large');
     $this->assertSession()->checkboxChecked('edit-keyed-styles-responsive-image-test-modulenarrow-1x-sizes-image-styles-medium');
     $this->assertSession()->checkboxNotChecked('edit-keyed-styles-responsive-image-test-modulenarrow-1x-sizes-image-styles-thumbnail');
-    $this->assertSession()->fieldValueEquals('keyed_styles[responsive_image_test_module.narrow][2x][image_mapping_type]', '_none');
+    $this->assertSession()->fieldValueEquals('keyed_styles[responsive_image_test_module.narrow][2x][image_mapping_type]', FormOptionsHelper::OPTIONS_EMPTY_OPTION);
 
     // Check the mapping for multipliers 1x and 2x for the wide breakpoint.
     $this->assertSession()->fieldValueEquals('keyed_styles[responsive_image_test_module.wide][1x][image_style]', 'large');
     $this->assertSession()->fieldValueEquals('keyed_styles[responsive_image_test_module.wide][1x][image_mapping_type]', 'image_style');
-    $this->assertSession()->fieldValueEquals('keyed_styles[responsive_image_test_module.wide][2x][image_mapping_type]', '_none');
+    $this->assertSession()->fieldValueEquals('keyed_styles[responsive_image_test_module.wide][2x][image_mapping_type]', FormOptionsHelper::OPTIONS_EMPTY_OPTION);
 
     // Delete the style.
     $this->drupalGet('admin/config/media/responsive-image-style/style_one/delete');

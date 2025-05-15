@@ -4,11 +4,12 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\field\Functional\EntityReference;
 
+use Drupal\Core\Form\FormOptionsHelper;
+use Drupal\Tests\BrowserTestBase;
 use Drupal\Tests\SchemaCheckTestTrait;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\node\Entity\Node;
-use Drupal\Tests\BrowserTestBase;
 
 /**
  * Tests entity reference field default values storage in CMI.
@@ -79,7 +80,7 @@ class EntityReferenceFieldDefaultValueTest extends BrowserTestBase {
         'handler' => 'default',
         'handler_settings' => [
           'target_bundles' => ['referenced_content'],
-          'sort' => ['field' => '_none'],
+          'sort' => ['field' => FormOptionsHelper::OPTIONS_EMPTY_OPTION],
         ],
       ],
     ]);
@@ -144,7 +145,7 @@ class EntityReferenceFieldDefaultValueTest extends BrowserTestBase {
       'settings' => [
         'handler' => 'default',
         'handler_settings' => [
-          'sort' => ['field' => '_none'],
+          'sort' => ['field' => FormOptionsHelper::OPTIONS_EMPTY_OPTION],
         ],
       ],
     ]);

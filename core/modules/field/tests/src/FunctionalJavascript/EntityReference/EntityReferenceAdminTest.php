@@ -6,6 +6,7 @@ namespace Drupal\Tests\field\FunctionalJavascript\EntityReference;
 
 use Behat\Mink\Element\NodeElement;
 use Drupal\Component\Render\FormattableMarkup;
+use Drupal\Core\Form\FormOptionsHelper;
 use Drupal\Core\Url;
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
 use Drupal\Tests\field_ui\Traits\FieldUiJSTestTrait;
@@ -162,7 +163,7 @@ class EntityReferenceAdminTest extends WebDriverTestBase {
     reset($bundles);
 
     // Initially, no bundles are selected so no sort options are available.
-    $this->assertFieldSelectOptions('settings[handler_settings][sort][field]', ['_none']);
+    $this->assertFieldSelectOptions('settings[handler_settings][sort][field]', [FormOptionsHelper::OPTIONS_EMPTY_OPTION]);
 
     // Select this bundle so that standard sort options are available.
     $page->findField('settings[handler_settings][target_bundles][' . $this->type . ']')->setValue($this->type);
@@ -202,7 +203,7 @@ class EntityReferenceAdminTest extends WebDriverTestBase {
 
     // Test the sort settings.
     // Option 0: no sort.
-    $this->assertSession()->fieldValueEquals('settings[handler_settings][sort][field]', '_none');
+    $this->assertSession()->fieldValueEquals('settings[handler_settings][sort][field]', FormOptionsHelper::OPTIONS_EMPTY_OPTION);
     $sort_direction = $page->findField('settings[handler_settings][sort][direction]');
     $this->assertFalse($sort_direction->isVisible());
     // Option 1: sort by field.
@@ -224,7 +225,7 @@ class EntityReferenceAdminTest extends WebDriverTestBase {
     $this->assertTrue($sorted, 'The "sort by" options are sorted.');
 
     // Set back to no sort.
-    $sort_by->setValue('_none');
+    $sort_by->setValue(FormOptionsHelper::OPTIONS_EMPTY_OPTION);
     $assert_session->assertWaitOnAjaxRequest();
     $this->assertFalse($sort_direction->isVisible());
 
@@ -253,7 +254,7 @@ class EntityReferenceAdminTest extends WebDriverTestBase {
     $page->findField('settings[handler_settings][target_bundles][' . $this->targetType . ']')->uncheck();
     $assert_session->assertWaitOnAjaxRequest();
     $this->assertFalse($sort_by->isVisible(), 'The "sort by" options are hidden yet again.');
-    $this->assertFieldSelectOptions('settings[handler_settings][sort][field]', ['_none']);
+    $this->assertFieldSelectOptions('settings[handler_settings][sort][field]', [FormOptionsHelper::OPTIONS_EMPTY_OPTION]);
 
     // Third step: confirm.
     $page->findField('settings[handler_settings][target_bundles][' . $this->targetType . ']')->setValue($this->targetType);
@@ -297,8 +298,8 @@ class EntityReferenceAdminTest extends WebDriverTestBase {
     $target_type_input = $assert_session->fieldExists('field_storage[subform][settings][target_type]');
     $target_type_input->setValue('user');
     $assert_session->assertWaitOnAjaxRequest();
-    $this->assertSession()->fieldValueEquals('settings[handler_settings][filter][type]', '_none');
-    $this->assertSession()->fieldValueEquals('settings[handler_settings][sort][field]', '_none');
+    $this->assertSession()->fieldValueEquals('settings[handler_settings][filter][type]', FormOptionsHelper::OPTIONS_EMPTY_OPTION);
+    $this->assertSession()->fieldValueEquals('settings[handler_settings][sort][field]', FormOptionsHelper::OPTIONS_EMPTY_OPTION);
     $assert_session->optionNotExists('settings[handler_settings][sort][field]', 'nid');
     $assert_session->optionExists('settings[handler_settings][sort][field]', 'uid');
 

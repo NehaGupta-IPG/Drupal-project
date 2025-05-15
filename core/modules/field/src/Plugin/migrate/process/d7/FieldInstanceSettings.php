@@ -2,6 +2,7 @@
 
 namespace Drupal\field\Plugin\migrate\process\d7;
 
+use Drupal\Core\Form\FormOptionsHelper;
 use Drupal\migrate\Attribute\MigrateProcess;
 use Drupal\migrate\MigrateExecutableInterface;
 use Drupal\migrate\ProcessPluginBase;
@@ -29,7 +30,7 @@ class FieldInstanceSettings extends ProcessPluginBase {
     // Get taxonomy term reference handler settings from allowed values.
     if ($row->getSourceProperty('type') == 'taxonomy_term_reference') {
       $instance_settings['handler_settings']['sort'] = [
-        'field' => '_none',
+        'field' => FormOptionsHelper::OPTIONS_EMPTY_OPTION,
       ];
       $allowed_values = $row->get('@allowed_values');
       foreach ($allowed_values as $allowed_value) {
@@ -45,7 +46,7 @@ class FieldInstanceSettings extends ProcessPluginBase {
       $instance_settings['handler'] = 'default:' . $field_settings['target_type'];
       // Transform the sort settings to D8 structure.
       $sort = [
-        'field' => '_none',
+        'field' => FormOptionsHelper::OPTIONS_EMPTY_OPTION,
         'direction' => 'ASC',
       ];
       if (!empty(array_filter($field_settings['handler_settings']['sort']))) {
@@ -74,7 +75,7 @@ class FieldInstanceSettings extends ProcessPluginBase {
 
       $instance_settings['handler_settings'] = [
         'sort' => [
-          'field' => '_none',
+          'field' => FormOptionsHelper::OPTIONS_EMPTY_OPTION,
           'direction' => 'ASC',
         ],
         'target_bundles' => array_filter($field_data['settings']['referenceable_types'] ?? []),
@@ -87,10 +88,10 @@ class FieldInstanceSettings extends ProcessPluginBase {
       $instance_settings['handler_settings'] = [
         'include_anonymous' => TRUE,
         'filter' => [
-          'type' => '_none',
+          'type' => FormOptionsHelper::OPTIONS_EMPTY_OPTION,
         ],
         'sort' => [
-          'field' => '_none',
+          'field' => FormOptionsHelper::OPTIONS_EMPTY_OPTION,
           'direction' => 'ASC',
         ],
         'auto_create' => FALSE,

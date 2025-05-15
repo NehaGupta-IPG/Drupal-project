@@ -2,10 +2,11 @@
 
 namespace Drupal\responsive_image;
 
+use Drupal\Core\Entity\EntityForm;
+use Drupal\Core\Form\FormOptionsHelper;
+use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Url;
 use Drupal\breakpoint\BreakpointManagerInterface;
-use Drupal\Core\Entity\EntityForm;
-use Drupal\Core\Form\FormStateInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -139,9 +140,9 @@ class ResponsiveImageStyleForm extends EntityForm {
           '#options' => [
             'sizes' => $this->t('Select multiple image styles and use the sizes attribute.'),
             'image_style' => $this->t('Select a single image style.'),
-            '_none' => $this->t('Do not use this breakpoint.'),
+            FormOptionsHelper::OPTIONS_EMPTY_OPTION => $this->t('Do not use this breakpoint.'),
           ],
-          '#default_value' => $image_style_mapping['image_mapping_type'] ?? '_none',
+          '#default_value' => $image_style_mapping['image_mapping_type'] ?? FormOptionsHelper::OPTIONS_EMPTY_OPTION,
           '#description' => $description,
         ];
         $form['keyed_styles'][$breakpoint_id][$multiplier]['image_style'] = [
@@ -187,7 +188,7 @@ class ResponsiveImageStyleForm extends EntityForm {
         ];
 
         // Expand the details if "do not use this breakpoint" was not selected.
-        if ($form['keyed_styles'][$breakpoint_id][$multiplier]['image_mapping_type']['#default_value'] != '_none') {
+        if ($form['keyed_styles'][$breakpoint_id][$multiplier]['image_mapping_type']['#default_value'] != FormOptionsHelper::OPTIONS_EMPTY_OPTION) {
           $form['keyed_styles'][$breakpoint_id][$multiplier]['#open'] = TRUE;
         }
       }

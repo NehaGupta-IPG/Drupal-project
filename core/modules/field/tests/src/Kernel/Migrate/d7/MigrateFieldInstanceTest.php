@@ -4,9 +4,10 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\field\Kernel\Migrate\d7;
 
+use Drupal\Core\Form\FormOptionsHelper;
+use Drupal\Tests\migrate_drupal\Kernel\d7\MigrateDrupal7TestBase;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\FieldConfigInterface;
-use Drupal\Tests\migrate_drupal\Kernel\d7\MigrateDrupal7TestBase;
 
 /**
  * Migrates Drupal 7 field instances.
@@ -187,7 +188,7 @@ class MigrateFieldInstanceTest extends MigrateDrupal7TestBase {
     $this->assertEntity('node.article.field_user_reference', 'User Reference', 'entity_reference', FALSE, TRUE);
     $expected_handler_settings = [
       'sort' => [
-        'field' => '_none',
+        'field' => FormOptionsHelper::OPTIONS_EMPTY_OPTION,
         'direction' => 'ASC',
       ],
       'auto_create' => FALSE,

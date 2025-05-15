@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\options\Functional;
 
+use Drupal\Core\Form\FormOptionsHelper;
+
 /**
  * Tests an options select with a dynamic allowed values function.
  *
@@ -36,7 +38,7 @@ class OptionsSelectDynamicValuesTest extends OptionsDynamicValuesTestBase {
     $this->assertCount(count($this->test) + 1, $options);
     foreach ($options as $option) {
       $value = $option->getValue();
-      if ($value != '_none') {
+      if ($value != FormOptionsHelper::OPTIONS_EMPTY_OPTION) {
         $this->assertContains($value, $this->test);
       }
     }

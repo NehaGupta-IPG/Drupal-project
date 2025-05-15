@@ -6,6 +6,7 @@ use Drupal\Core\Entity\EntityForm;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Entity\FieldableEntityInterface;
+use Drupal\Core\Form\FormOptionsHelper;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\language\Entity\ContentLanguageSettings;
 use Psr\Log\LoggerInterface;
@@ -121,7 +122,7 @@ class CommentTypeForm extends EntityForm {
         '#default_value' => $comment_type->getTargetEntityTypeId(),
         '#title' => $this->t('Target entity type'),
         '#required' => TRUE,
-        '#empty_value' => '_none',
+        '#empty_value' => FormOptionsHelper::OPTIONS_EMPTY_OPTION,
         '#options' => $options,
         '#description' => $this->t('The target entity type can not be changed after the comment type has been created.'),
       ];

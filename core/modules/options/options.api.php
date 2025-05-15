@@ -7,6 +7,7 @@
 
 use Drupal\Core\Entity\FieldableEntityInterface;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
+use Drupal\Core\Form\FormOptionsHelper;
 
 /**
  * Alters the list of options to be displayed for a field.
@@ -33,7 +34,7 @@ function hook_options_list_alter(array &$options, array $context) {
   // Check if this is the field we want to change.
   if ($context['fieldDefinition']->getName() == 'field_option') {
     // Change the label of the empty option.
-    $options['_none'] = t('== Empty ==');
+    $options[FormOptionsHelper::OPTIONS_EMPTY_OPTION] = t('== Empty ==');
   }
 }
 

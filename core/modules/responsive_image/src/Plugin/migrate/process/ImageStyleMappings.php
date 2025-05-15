@@ -2,6 +2,7 @@
 
 namespace Drupal\responsive_image\Plugin\migrate\process;
 
+use Drupal\Core\Form\FormOptionsHelper;
 use Drupal\migrate\Attribute\MigrateProcess;
 use Drupal\migrate\MigrateException;
 use Drupal\migrate\MigrateExecutableInterface;
@@ -31,7 +32,7 @@ class ImageStyleMappings extends ProcessPluginBase {
       // identifier after the last period.
       preg_match('/\.([a-z0-9_]+)$/', $mapping_id, $matches);
       foreach ($mapping as $multiplier => $multiplier_settings) {
-        if ($multiplier_settings['mapping_type'] == '_none') {
+        if ($multiplier_settings['mapping_type'] == FormOptionsHelper::OPTIONS_EMPTY_OPTION) {
           continue;
         }
         $image_style = [

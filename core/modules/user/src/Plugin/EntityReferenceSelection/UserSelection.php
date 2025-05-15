@@ -11,6 +11,7 @@ use Drupal\Core\Entity\EntityTypeBundleInfoInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Entity\Plugin\EntityReferenceSelection\DefaultSelection;
 use Drupal\Core\Extension\ModuleHandlerInterface;
+use Drupal\Core\Form\FormOptionsHelper;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
@@ -91,7 +92,7 @@ class UserSelection extends DefaultSelection {
   public function defaultConfiguration() {
     return [
       'filter' => [
-        'type' => '_none',
+        'type' => FormOptionsHelper::OPTIONS_EMPTY_OPTION,
         'role' => NULL,
       ],
       'include_anonymous' => TRUE,
@@ -115,7 +116,7 @@ class UserSelection extends DefaultSelection {
       '#type' => 'select',
       '#title' => $this->t('Filter by'),
       '#options' => [
-        '_none' => $this->t('- None -'),
+        FormOptionsHelper::OPTIONS_EMPTY_OPTION => $this->t('- None -'),
         'role' => $this->t('User role'),
       ],
       // Use a form process callback to build #ajax property properly and also

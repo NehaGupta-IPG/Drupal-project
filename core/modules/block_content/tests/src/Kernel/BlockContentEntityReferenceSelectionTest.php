@@ -4,10 +4,11 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\block_content\Kernel;
 
+use Drupal\Core\Form\FormOptionsHelper;
+use Drupal\KernelTests\KernelTestBase;
 use Drupal\block_content\Entity\BlockContent;
 use Drupal\block_content\Entity\BlockContentType;
 use Drupal\block_content_test\Plugin\EntityReferenceSelection\TestSelection;
-use Drupal\KernelTests\KernelTestBase;
 
 /**
  * Tests EntityReference selection handlers don't return non-reusable blocks.
@@ -97,7 +98,7 @@ class BlockContentEntityReferenceSelectionTest extends KernelTestBase {
     $configuration = [
       'target_type' => 'block_content',
       'target_bundles' => ['spiffy' => 'spiffy'],
-      'sort' => ['field' => '_none'],
+      'sort' => ['field' => FormOptionsHelper::OPTIONS_EMPTY_OPTION],
     ];
     $this->selectionHandler = new TestSelection($configuration, '', '', $this->container->get('entity_type.manager'), $this->container->get('module_handler'), \Drupal::currentUser(), \Drupal::service('entity_field.manager'), \Drupal::service('entity_type.bundle.info'), \Drupal::service('entity.repository'));
 

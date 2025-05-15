@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\form_test\Form;
 
 use Drupal\Core\Form\FormBase;
+use Drupal\Core\Form\FormOptionsHelper;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Url;
 
@@ -112,7 +113,7 @@ class JavascriptStatesForm extends FormBase {
         'value2' => 'Value 2',
         'value3' => 'Value 3',
       ],
-      '#empty_value' => '_none',
+      '#empty_value' => FormOptionsHelper::OPTIONS_EMPTY_OPTION,
       '#empty_option' => '- None -',
     ];
     $form['number_trigger'] = [

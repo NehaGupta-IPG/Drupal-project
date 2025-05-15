@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\Tests\views_ui\Traits;
 
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
+use Drupal\Core\Form\FormOptionsHelper;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\node\NodeTypeInterface;
@@ -125,7 +126,7 @@ trait FilterEntityReferenceTrait {
       'settings' => [
         'handler' => 'default',
         'handler_settings' => [
-          'sort' => ['field' => '_none'],
+          'sort' => ['field' => FormOptionsHelper::OPTIONS_EMPTY_OPTION],
         ],
       ],
     ]);

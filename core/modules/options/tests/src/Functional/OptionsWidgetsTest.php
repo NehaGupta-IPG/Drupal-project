@@ -4,10 +4,11 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\options\Functional;
 
+use Drupal\Core\Form\FormOptionsHelper;
+use Drupal\Tests\field\Functional\FieldTestBase;
 use Drupal\entity_test\Entity\EntityTest;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
-use Drupal\Tests\field\Functional\FieldTestBase;
 
 /**
  * Tests the Options widgets.
@@ -166,7 +167,7 @@ class OptionsWidgetsTest extends FieldTestBase {
     $this->assertSession()->checkboxNotChecked('edit-card-1-2');
 
     // Unselect option.
-    $edit = ['card_1' => '_none'];
+    $edit = ['card_1' => FormOptionsHelper::OPTIONS_EMPTY_OPTION];
     $this->submitForm($edit, 'Save');
     $this->assertFieldValues($entity_init, 'card_1', []);
 
@@ -298,18 +299,18 @@ class OptionsWidgetsTest extends FieldTestBase {
     // Display form.
     $this->drupalGet('entity_test/manage/' . $entity->id() . '/edit');
     // A required field without any value has a "none" option.
-    $option = $this->assertSession()->optionExists('edit-card-1', '_none');
+    $option = $this->assertSession()->optionExists('edit-card-1', FormOptionsHelper::OPTIONS_EMPTY_OPTION);
     $this->assertSame('- Select a value -', $option->getText());
 
     // With no field data, nothing is selected.
-    $this->assertTrue($this->assertSession()->optionExists('card_1', '_none')->isSelected());
+    $this->assertTrue($this->assertSession()->optionExists('card_1', FormOptionsHelper::OPTIONS_EMPTY_OPTION)->isSelected());
     $this->assertFalse($this->assertSession()->optionExists('card_1', 0)->isSelected());
     $this->assertFalse($this->assertSession()->optionExists('card_1', 1)->isSelected());
     $this->assertFalse($this->assertSession()->optionExists('card_1', 2)->isSelected());
     $this->assertSession()->responseContains('Some dangerous &amp; unescaped markup');
 
     // Submit form: select invalid 'none' option.
-    $edit = ['card_1' => '_none'];
+    $edit = ['card_1' => FormOptionsHelper::OPTIONS_EMPTY_OPTION];
     $this->submitForm($edit, 'Save');
     $this->assertSession()->pageTextContains("{$field->getName()} field is required.");
 
@@ -321,7 +322,7 @@ class OptionsWidgetsTest extends FieldTestBase {
     // Display form: check that the right options are selected.
     $this->drupalGet('entity_test/manage/' . $entity->id() . '/edit');
     // A required field with a value has no 'none' option.
-    $this->assertSession()->optionNotExists('edit-card-1', '_none');
+    $this->assertSession()->optionNotExists('edit-card-1', FormOptionsHelper::OPTIONS_EMPTY_OPTION);
     $this->assertTrue($this->assertSession()->optionExists('card_1', 0)->isSelected());
     $this->assertFalse($this->assertSession()->optionExists('card_1', 1)->isSelected());
     $this->assertFalse($this->assertSession()->optionExists('card_1', 2)->isSelected());
@@ -333,10 +334,10 @@ class OptionsWidgetsTest extends FieldTestBase {
     // Display form.
     $this->drupalGet('entity_test/manage/' . $entity->id() . '/edit');
     // A non-required field has a 'none' option.
-    $option = $this->assertSession()->optionExists('edit-card-1', '_none');
+    $option = $this->assertSession()->optionExists('edit-card-1', FormOptionsHelper::OPTIONS_EMPTY_OPTION);
     $this->assertSame('- None -', $option->getText());
     // Submit form: Unselect the option.
-    $edit = ['card_1' => '_none'];
+    $edit = ['card_1' => FormOptionsHelper::OPTIONS_EMPTY_OPTION];
     $this->drupalGet('entity_test/manage/' . $entity->id() . '/edit');
     $this->submitForm($edit, 'Save');
     $this->assertFieldValues($entity_init, 'card_1', []);
@@ -368,7 +369,7 @@ class OptionsWidgetsTest extends FieldTestBase {
     $this->assertFalse($this->assertSession()->optionExists('card_1', 2)->isSelected());
 
     // Submit form: Unselect the option.
-    $edit = ['card_1' => '_none'];
+    $edit = ['card_1' => FormOptionsHelper::OPTIONS_EMPTY_OPTION];
     $this->drupalGet('entity_test/manage/' . $entity->id() . '/edit');
     $this->submitForm($edit, 'Save');
     $this->assertFieldValues($entity_init, 'card_1', []);
@@ -403,11 +404,11 @@ class OptionsWidgetsTest extends FieldTestBase {
 
     $this->drupalGet('entity_test/manage/' . $entity->id() . '/edit');
     // A required field without any value has a "none" option.
-    $option = $this->assertSession()->optionExists('edit-card-1', '_none');
+    $option = $this->assertSession()->optionExists('edit-card-1', FormOptionsHelper::OPTIONS_EMPTY_OPTION);
     $this->assertSame('- Select a value -', $option->getText());
 
     // Submit form: select invalid 'none' option.
-    $edit = ['card_1' => '_none'];
+    $edit = ['card_1' => FormOptionsHelper::OPTIONS_EMPTY_OPTION];
     $this->submitForm($edit, 'Save');
     $this->assertSession()->responseContains('This is custom message for required field.');
   }
@@ -439,7 +440,7 @@ class OptionsWidgetsTest extends FieldTestBase {
 
     // Display form: with no field data, nothing is selected.
     $this->drupalGet('entity_test/manage/' . $entity->id() . '/edit');
-    $this->assertTrue($this->assertSession()->optionExists('card_2', '_none')->isSelected());
+    $this->assertTrue($this->assertSession()->optionExists('card_2', FormOptionsHelper::OPTIONS_EMPTY_OPTION)->isSelected());
     $this->assertFalse($this->assertSession()->optionExists('card_2', 0)->isSelected());
     $this->assertFalse($this->assertSession()->optionExists('card_2', 1)->isSelected());
     $this->assertFalse($this->assertSession()->optionExists('card_2', 2)->isSelected());
@@ -481,13 +482,13 @@ class OptionsWidgetsTest extends FieldTestBase {
 
     // Check that the 'none' option has no effect if actual options are selected
     // as well.
-    $edit = ['card_2[]' => ['_none' => '_none', 0 => 0]];
+    $edit = ['card_2[]' => [FormOptionsHelper::OPTIONS_EMPTY_OPTION => FormOptionsHelper::OPTIONS_EMPTY_OPTION, 0 => 0]];
     $this->drupalGet('entity_test/manage/' . $entity->id() . '/edit');
     $this->submitForm($edit, 'Save');
     $this->assertFieldValues($entity_init, 'card_2', [0]);
 
     // Check that selecting the 'none' option empties the field.
-    $edit = ['card_2[]' => ['_none' => '_none']];
+    $edit = ['card_2[]' => [FormOptionsHelper::OPTIONS_EMPTY_OPTION => FormOptionsHelper::OPTIONS_EMPTY_OPTION]];
     $this->drupalGet('entity_test/manage/' . $entity->id() . '/edit');
     $this->submitForm($edit, 'Save');
     $this->assertFieldValues($entity_init, 'card_2', []);
@@ -531,7 +532,7 @@ class OptionsWidgetsTest extends FieldTestBase {
     $this->assertFalse($this->assertSession()->optionExists('card_2', 2)->isSelected());
 
     // Submit form: Unselect the option.
-    $edit = ['card_2[]' => ['_none' => '_none']];
+    $edit = ['card_2[]' => [FormOptionsHelper::OPTIONS_EMPTY_OPTION => FormOptionsHelper::OPTIONS_EMPTY_OPTION]];
     $this->drupalGet('entity_test/manage/' . $entity->id() . '/edit');
     $this->submitForm($edit, 'Save');
     $this->assertFieldValues($entity_init, 'card_2', []);
@@ -630,7 +631,7 @@ class OptionsWidgetsTest extends FieldTestBase {
     // Display form: check that _none options are present and has label.
     $this->drupalGet('entity_test/manage/' . $entity->id() . '/edit');
     // A required field without any value has a "none" option.
-    $option = $this->assertSession()->optionExists('edit-card-1', '_none');
+    $option = $this->assertSession()->optionExists('edit-card-1', FormOptionsHelper::OPTIONS_EMPTY_OPTION);
     $this->assertSame('- None -', $option->getText());
   }
 

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\responsive_image\Kernel\Plugin\migrate\source\d7;
 
+use Drupal\Core\Form\FormOptionsHelper;
 use Drupal\Tests\migrate\Kernel\MigrateSqlSourceTestBase;
 
 /**
@@ -64,7 +65,7 @@ class ResponsiveImageStylesTest extends MigrateSqlSourceTestBase {
                 ],
               'multiplier_3' =>
                 [
-                  'mapping_type' => '_none',
+                  'mapping_type' => FormOptionsHelper::OPTIONS_EMPTY_OPTION,
                 ],
             ],
           'breakpoints.theme.my_theme_id.computer_two' =>

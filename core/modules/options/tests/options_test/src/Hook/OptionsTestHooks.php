@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\options_test\Hook;
 
+use Drupal\Core\Form\FormOptionsHelper;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Hook\Attribute\Hook;
 
@@ -29,7 +30,7 @@ class OptionsTestHooks {
   public function optionsListAlter(array &$options, array $context): void {
     if ($context['fieldDefinition']->getName() === 'card_4' && $context['widget']->getPluginId() === 'options_select') {
       // Rename _none option.
-      $options['_none'] = '- Select something -';
+      $options[FormOptionsHelper::OPTIONS_EMPTY_OPTION] = '- Select something -';
     }
     if ($context['fieldDefinition']->getName() === 'card_4' && $context['entity']->bundle() === 'entity_test') {
       // Remove 0 option.
