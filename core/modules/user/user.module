@@ -656,7 +656,10 @@ function _user_mail_notify($op, AccountInterface $account) {
     if (empty($site_mail)) {
       $site_mail = ini_get('sendmail_from');
     }
-    $mail = \Drupal::service('plugin.manager.mail')->mail('user', $op, $account->getEmail(), $account->getPreferredLangcode(), $params, $site_mail);
+    $preferred_langcode = $account->getPreferredLangcode();
+    // Allow modules to alter the user mail notification language.
+    \Drupal::modulehandler()->alter('user_mail_language', $account, $preferred_langcode);
+    $mail = \Drupal::service('plugin.manager.mail')->mail('user', $op, $account->getEmail(), $preferred_langcode, $params, $site_mail);
     if ($op == 'register_pending_approval') {
       // If a user registered requiring admin approval, notify the admin, too.
       // We use the site default language for this.

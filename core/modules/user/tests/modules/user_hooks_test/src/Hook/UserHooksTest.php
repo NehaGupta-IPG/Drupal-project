@@ -33,4 +33,19 @@ class UserHooksTest {
     }
   }
 
+  /**
+   * Alters the mail language.
+   *
+   * @param \Drupal\Core\Session\AccountInterface $account
+   *   The account of a user used in email.
+   * @param string $language
+   *   The language code used for user mail.
+   */
+  #[Hook('user_mail_language_alter')]
+  public function userMailLanguageAlter(AccountInterface $account, string &$language): void {
+    if (\Drupal::state()->get('user_hooks_test_user_mail_language_alter', TRUE)) {
+      $language = 'fr';
+    }
+  }
+
 }

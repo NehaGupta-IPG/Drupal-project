@@ -177,5 +177,17 @@ function hook_user_logout(AccountInterface $account): void {
 }
 
 /**
+ * Alter the mail notification language for user.
+ *
+ * @param \Drupal\Core\Session\AccountInterface $account
+ *   The user object on which the operation was just performed.
+ * @param string $language
+ *   Mail notify language for the user.
+ */
+function hook_user_mail_language_alter(AccountInterface $account, string &$language): void {
+  $language = $account->getPreferredLangcode();
+}
+
+/**
  * @} End of "addtogroup hooks".
  */
