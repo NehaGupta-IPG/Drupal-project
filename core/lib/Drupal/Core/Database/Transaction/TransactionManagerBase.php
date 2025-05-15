@@ -385,6 +385,10 @@ abstract class TransactionManagerBase implements TransactionManagerInterface {
       return;
     }
 
+    if ($this->getConnectionTransactionState() === ClientConnectionTransactionState::Committed && $this->stackDepth() === 0) {
+      return;
+    }
+
     // If there is no $id to commit, or if $id does not correspond to the one
     // in the stack for that $name, the commit is out of order.
     if (!isset($this->stack()[$id]) || $this->stack()[$id]->name !== $name) {
