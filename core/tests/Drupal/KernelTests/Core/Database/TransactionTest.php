@@ -1118,10 +1118,9 @@ class TransactionTest extends DatabaseTestBase {
     $this->assertRowPresent('row');
 
     // Commit and destruct the transaction. Non-transactional DDL database
-    // will have committed already, so we skip commit in that case.
-    if ($this->connection->inTransaction()) {
-      $transaction->commitOrRelease();
-    }
+    // will have committed already, so the explicit commit would be a no-op in
+    // that case.
+    $transaction->commitOrRelease();
     unset($transaction);
 
     // The post-transaction callback should now have inserted a 'rtcCommit'

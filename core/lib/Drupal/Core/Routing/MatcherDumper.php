@@ -92,7 +92,6 @@ class MatcherDumper implements MatcherDumperInterface {
     // states due to random failures.
     try {
       $transaction = $this->connection->startTransaction();
-
       // We don't use truncate, because it is not guaranteed to be transaction
       // safe.
       try {
