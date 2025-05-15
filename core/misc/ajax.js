@@ -904,7 +904,10 @@
     // interaction while the Ajax request is in progress. ajax.ajaxing prevents
     // the element from triggering a new request, but does not prevent the user
     // from changing its value.
-    if (!this.element.classList && !this.element.classList.contains('js-prevent-disable')) {
+    if (
+      !this.element.classList ||
+      !this.element.classList.contains('js-prevent-disable')
+    ) {
       $(this.element).prop('disabled', true);
     }
 
