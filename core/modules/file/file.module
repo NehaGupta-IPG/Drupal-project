@@ -427,11 +427,14 @@ function template_preprocess_file_managed_file(&$variables): void {
  *   - icon_directory: (optional) A path to a directory of icons to be used for
  *     files. Defaults to the value of the "icon.directory" variable.
  *   - description: A description to be displayed instead of the filename.
- *   - attributes: An associative array of attributes to be placed in the a tag.
+ *   - attributes: An associative array of attributes to be placed in the
+ *     wrapper element.
+ *   - link_options: An associative array of URL options to include in the link.
  */
 function template_preprocess_file_link(&$variables): void {
   $file = $variables['file'];
   $options = [];
+  $options = $variables['link_options'];
 
   /** @var \Drupal\Core\File\FileUrlGeneratorInterface $file_url_generator */
   $file_url_generator = \Drupal::service('file_url_generator');

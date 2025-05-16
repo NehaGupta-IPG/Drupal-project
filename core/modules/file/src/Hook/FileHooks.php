@@ -85,6 +85,7 @@ class FileHooks {
           'file' => NULL,
           'description' => NULL,
           'attributes' => [],
+          'link_options' => [],
         ],
       ],
       'file_managed_file' => [
