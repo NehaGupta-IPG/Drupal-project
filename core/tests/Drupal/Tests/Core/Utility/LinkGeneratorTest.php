@@ -17,6 +17,8 @@ use Drupal\Core\Url;
 use Drupal\Core\Utility\LinkGenerator;
 use Drupal\Tests\UnitTestCase;
 
+// cspell:ignore комацу
+
 /**
  * @coversDefaultClass \Drupal\Core\Utility\LinkGenerator
  * @group Utility
