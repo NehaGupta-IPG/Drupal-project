@@ -268,8 +268,7 @@ class FilterHtml extends FilterBase {
     $parser = new class($scanner, $events) extends Tokenizer {
 
       /**
-       * phpcs:ignore Drupal.Commenting.FunctionComment.Missing
-       * @phpstan-ignore-next-line
+       * Set the text mode for the character data reader.
        */
       public function setTextMode($textMode, $untilTag = NULL) {
         // Do nothing, we never enter text mode.
