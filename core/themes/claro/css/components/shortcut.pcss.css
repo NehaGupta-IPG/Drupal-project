@@ -48,19 +48,33 @@
   vertical-align: -0.0625rem;
   background: transparent url(../../images/shortcut/favstar.svg) left top / calc(var(--shortcut-icon-size) * 4) var(--shortcut-icon-size) no-repeat;
 
+  @media (forced-colors: active) {
+    background: linktext;
+    mask-image: url(../../images/shortcut/favstar.svg);
+  }
+
   @nest .shortcut-action--add:hover &, .shortcut-action--add:focus & {
     background-position: calc(-1 * var(--shortcut-icon-size)) top;
+    mask-position: calc(-1 * var(--shortcut-icon-size)) top;
   }
 
   @nest .shortcut-action--remove & {
     background-position: calc(-2 * var(--shortcut-icon-size)) top;
+    mask-position: calc(-2 * var(--shortcut-icon-size)) top;
   }
 
   @nest .shortcut-action--remove:focus &, .shortcut-action--remove:hover & {
     background-position: calc(-3 * var(--shortcut-icon-size)) top;
+    mask-position: calc(-3 * var(--shortcut-icon-size)) top;
   }
 
   @nest [dir="rtl"] & {
     background-image: url(../../images/shortcut/favstar-rtl.svg);
+
+    @media (forced-colors: active) {
+      /* Remove background-image so that `linktext` is not hidden. */
+      background-image: none;
+      mask-image: url(../../images/shortcut/favstar-rtl.svg);
+    }
   }
 }
