@@ -108,7 +108,7 @@ class Result extends AreaPluginBase {
   /**
    * Calculate the replacement tokens.
    */
-  protected function calculateTotalAndReplacements() {
+  protected function calculateTotalAndReplacements(): void {
     // Calculate the page totals.
     $current_page = (int) $this->view->getCurrentPage() + 1;
     $per_page = (int) $this->view->getItemsPerPage();

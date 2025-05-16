@@ -23,7 +23,7 @@ class AreaResultPluralTest extends ViewsKernelTestBase {
   /**
    * Tests that the singular text is displayed.
    */
-  public function testResult() {
+  public function testResult(): void {
     $view = Views::getView('test_area_result_plural');
     $view->setDisplay('default');
     $this->executeView($view);
@@ -36,7 +36,7 @@ class AreaResultPluralTest extends ViewsKernelTestBase {
   /**
    * Tests that the plural text is displayed.
    */
-  public function testResultEmpty() {
+  public function testResultEmpty(): void {
     $view = Views::getView('test_area_result_plural');
 
     // Test that the area is displayed if we have checked the empty checkbox.
