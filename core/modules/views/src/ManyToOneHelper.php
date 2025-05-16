@@ -288,7 +288,7 @@ class ManyToOneHelper {
   }
 
   /**
-   * Adds a filter condition to the query based on the handler's options and value.
+   * Adds a condition to the query based on the handler's options and value.
    */
   public function addFilter() {
     if (empty($this->handler->value)) {
