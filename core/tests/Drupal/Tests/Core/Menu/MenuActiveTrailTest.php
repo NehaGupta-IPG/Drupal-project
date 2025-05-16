@@ -166,7 +166,9 @@ class MenuActiveTrailTest extends UnitTestCase {
     if ($links !== FALSE) {
       $this->menuLinkManager->expects($this->exactly(2))
         ->method('loadLinksByRoutes')
-        ->with([['baby_llama', []]])
+        ->with([
+          ['route_name' => 'baby_llama', 'route_parameters' => []],
+        ])
         ->willReturn($links);
     }
     // Test with menu name.
@@ -199,7 +201,10 @@ class MenuActiveTrailTest extends UnitTestCase {
     $home_link = MenuLinkMock::create(['id' => 'home_link', 'route_name' => 'home_link', 'title' => 'Home', 'parent' => NULL]);
     $this->menuLinkManager
       ->method('loadLinksByRoutes')
-      ->with([['link_1', []], ['<front>', []]])
+      ->with([
+        ['route_name' => 'link_1', 'route_parameters' => []],
+        ['route_name' => '<front>', 'route_parameters' => []],
+      ])
       ->willReturn([$home_link]);
 
     // Test.
@@ -222,7 +227,9 @@ class MenuActiveTrailTest extends UnitTestCase {
       // cache clearing below.
       $this->menuLinkManager->expects($this->exactly(3))
         ->method('loadLinksByRoutes')
-        ->with([['baby_llama', []]])
+        ->with([
+          ['route_name' => 'baby_llama', 'route_parameters' => []],
+        ])
         ->willReturn($links);
       if ($expected_link !== NULL) {
         $this->menuLinkManager->expects($this->exactly(3))
@@ -272,7 +279,9 @@ class MenuActiveTrailTest extends UnitTestCase {
 
     $this->menuLinkManager->expects($this->any())
       ->method('loadLinksByRoutes')
-      ->with([['baby_llama', $route_parameters]])
+      ->with([
+        ['route_name' => 'baby_llama', 'route_parameters' => $route_parameters],
+      ])
       ->willReturn($data[1]);
 
     $expected_link = $data[3];

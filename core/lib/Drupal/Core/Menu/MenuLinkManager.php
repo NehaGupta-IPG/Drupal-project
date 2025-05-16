@@ -295,7 +295,9 @@ class MenuLinkManager implements MenuLinkManagerInterface {
    * {@inheritdoc}
    */
   public function loadLinksByRoute($route_name, array $route_parameters = [], $menu_name = NULL) {
-    return $this->loadLinksByRoutes([[$route_name, $route_parameters]], $menu_name);
+    return $this->loadLinksByRoutes([
+      ['route_name' => $route_name, 'route_parameters' => $route_parameters],
+    ], $menu_name);
   }
 
   /**
