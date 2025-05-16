@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\node\Kernel\Migrate\d7;
 
-use Drupal\comment\Plugin\Field\FieldType\CommentItemInterface;
+use Drupal\comment\CommentingStatus;
 use Drupal\taxonomy\Entity\Term;
 use Drupal\Tests\file\Kernel\Migrate\d7\FileMigrationSetupTrait;
 use Drupal\Tests\migrate_drupal\Kernel\d7\MigrateDrupal7TestBase;
@@ -187,7 +187,7 @@ class MigrateNodeTest extends MigrateDrupal7TestBase {
     // Test that an email field is migrated.
     $this->assertEquals('default@example.com', $node->field_email->value);
     $this->assertEquals('another@example.com', $node->field_email[1]->value);
-    $this->assertEquals(CommentItemInterface::OPEN, $node->comment_node_test_content_type->status);
+    $this->assertEquals(CommentingStatus::Open->value, $node->comment_node_test_content_type->status);
     $this->assertEquals('3.1416', $node->field_float_list[0]->value);
 
     $node = Node::load(2);
@@ -196,7 +196,7 @@ class MigrateNodeTest extends MigrateDrupal7TestBase {
     $this->assertEquals('The thing about Deep Space 9', $node->label());
     $this->assertEquals('internal:/', $node->field_link->uri);
     $this->assertEquals('Home', $node->field_link->title);
-    $this->assertEquals(CommentItemInterface::OPEN, $node->comment_node_article->status);
+    $this->assertEquals(CommentingStatus::Open->value, $node->comment_node_article->status);
     $term_ref = $node->get('field_vocab_localize')->target_id;
     $this->assertSame('20', $term_ref);
     $this->assertSame('DS9', Term::load($term_ref)->getName());
@@ -214,7 +214,7 @@ class MigrateNodeTest extends MigrateDrupal7TestBase {
     $this->assertEquals("is - ...is that it's the absolute best show ever. Trust me, I would know.", $translation->body->value);
     $this->assertEquals('is - The thing about Deep Space 9', $translation->label());
     $this->assertEquals('internal:/', $translation->field_link->uri);
-    $this->assertEquals(CommentItemInterface::OPEN, $translation->comment_node_article->status);
+    $this->assertEquals(CommentingStatus::Open->value, $translation->comment_node_article->status);
     $this->assertEquals('Home', $translation->field_link->title);
     $term_ref = $translation->get('field_vocab_localize')->target_id;
     $this->assertSame('20', $term_ref);
@@ -237,16 +237,16 @@ class MigrateNodeTest extends MigrateDrupal7TestBase {
     // Test that content_translation_source for a source other than English.
     $node = Node::load(4);
     $this->assertEquals('is', $manager->getTranslationMetadata($node->getTranslation('en'))->getSource());
-    $this->assertEquals(CommentItemInterface::CLOSED, $node->comment_node_article->status);
+    $this->assertEquals(CommentingStatus::Closed->value, $node->comment_node_article->status);
 
     $translation = $node->getTranslation('en');
-    $this->assertEquals(CommentItemInterface::CLOSED, $translation->comment_node_article->status);
+    $this->assertEquals(CommentingStatus::Closed->value, $translation->comment_node_article->status);
 
     $node = Node::load(6);
-    $this->assertEquals(CommentItemInterface::CLOSED, $node->comment_forum->status);
+    $this->assertEquals(CommentingStatus::Closed->value, $node->comment_forum->status);
 
     $node = Node::load(7);
-    $this->assertEquals(CommentItemInterface::OPEN, $node->comment_forum->status);
+    $this->assertEquals(CommentingStatus::Open->value, $node->comment_forum->status);
 
     // Test synchronized field.
     $value = 'Kai Opaka';

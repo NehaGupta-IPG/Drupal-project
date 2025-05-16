@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\system\Kernel\Entity\EntityReferenceSelection;
 
+use Drupal\comment\CommentStatus;
 use Drupal\comment\Tests\CommentTestTrait;
 use Drupal\Component\Utility\Html;
 use Drupal\Core\Language\LanguageInterface;
-use Drupal\comment\CommentInterface;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\media\Entity\Media;
 use Drupal\node\Entity\Node;
@@ -444,7 +444,7 @@ class EntityReferenceSelectionAccessTest extends KernelTestBase {
         'uid' => 1,
         'cid' => NULL,
         'pid' => 0,
-        'status' => CommentInterface::PUBLISHED,
+        'status' => CommentStatus::Published->value,
         'subject' => 'Comment Published <&>',
         'language' => LanguageInterface::LANGCODE_NOT_SPECIFIED,
       ],
@@ -455,7 +455,7 @@ class EntityReferenceSelectionAccessTest extends KernelTestBase {
         'uid' => 1,
         'cid' => NULL,
         'pid' => 0,
-        'status' => CommentInterface::NOT_PUBLISHED,
+        'status' => CommentStatus::NotPublished->value,
         'subject' => 'Comment Unpublished <&>',
         'language' => LanguageInterface::LANGCODE_NOT_SPECIFIED,
       ],
@@ -466,7 +466,7 @@ class EntityReferenceSelectionAccessTest extends KernelTestBase {
         'uid' => 1,
         'cid' => NULL,
         'pid' => 0,
-        'status' => CommentInterface::NOT_PUBLISHED,
+        'status' => CommentStatus::NotPublished->value,
         'subject' => 'Comment Published on Unpublished node <&>',
         'language' => LanguageInterface::LANGCODE_NOT_SPECIFIED,
       ],

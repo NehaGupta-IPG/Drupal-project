@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\comment\Functional;
 
+use Drupal\comment\CommentingStatus;
+use Drupal\comment\CommentMode;
 use Drupal\Core\Url;
-use Drupal\comment\CommentManagerInterface;
-use Drupal\comment\Plugin\Field\FieldType\CommentItemInterface;
 use Drupal\comment\Entity\Comment;
 use Drupal\Core\Entity\Entity\EntityViewDisplay;
 use Drupal\Core\Entity\Entity\EntityViewMode;
@@ -40,7 +40,7 @@ class CommentInterfaceTest extends CommentTestBase {
     $this->setCommentPreview(DRUPAL_DISABLED);
     $this->setCommentForm(TRUE);
     $this->setCommentSubject(FALSE);
-    $this->setCommentSettings('default_mode', CommentManagerInterface::COMMENT_MODE_THREADED, 'Comment paging changed.');
+    $this->setCommentSettings('default_mode', CommentMode::Threaded->value, 'Comment paging changed.');
   }
 
   /**
@@ -175,21 +175,21 @@ class CommentInterfaceTest extends CommentTestBase {
     $this->assertSession()->statusCodeEquals(403);
 
     // Attempt to post to node with comments disabled.
-    $this->node = $this->drupalCreateNode(['type' => 'article', 'promote' => 1, 'comment' => [['status' => CommentItemInterface::HIDDEN]]]);
+    $this->node = $this->drupalCreateNode(['type' => 'article', 'promote' => 1, 'comment' => [['status' => CommentingStatus::Hidden->value]]]);
     $this->assertNotNull($this->node, 'Article node created.');
     $this->drupalGet('comment/reply/node/' . $this->node->id() . '/comment');
     $this->assertSession()->statusCodeEquals(403);
     $this->assertSession()->fieldNotExists('edit-comment');
 
     // Attempt to post to node with read-only comments.
-    $this->node = $this->drupalCreateNode(['type' => 'article', 'promote' => 1, 'comment' => [['status' => CommentItemInterface::CLOSED]]]);
+    $this->node = $this->drupalCreateNode(['type' => 'article', 'promote' => 1, 'comment' => [['status' => CommentingStatus::Closed->value]]]);
     $this->assertNotNull($this->node, 'Article node created.');
     $this->drupalGet('comment/reply/node/' . $this->node->id() . '/comment');
     $this->assertSession()->statusCodeEquals(403);
     $this->assertSession()->fieldNotExists('edit-comment');
 
     // Attempt to post to node with comments enabled (check field names etc).
-    $this->node = $this->drupalCreateNode(['type' => 'article', 'promote' => 1, 'comment' => [['status' => CommentItemInterface::OPEN]]]);
+    $this->node = $this->drupalCreateNode(['type' => 'article', 'promote' => 1, 'comment' => [['status' => CommentingStatus::Open->value]]]);
     $this->assertNotNull($this->node, 'Article node created.');
     $this->drupalGet('comment/reply/node/' . $this->node->id() . '/comment');
     $this->assertSession()->pageTextNotContains('This discussion is closed');

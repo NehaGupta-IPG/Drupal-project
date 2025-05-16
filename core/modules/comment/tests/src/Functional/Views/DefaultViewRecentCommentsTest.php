@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\comment\Functional\Views;
 
-use Drupal\comment\CommentInterface;
+use Drupal\comment\CommentStatus;
 use Drupal\comment\Entity\Comment;
 use Drupal\comment\Tests\CommentTestTrait;
 use Drupal\views\Views;
@@ -88,7 +88,7 @@ class DefaultViewRecentCommentsTest extends ViewTestBase {
     for ($i = 0; $i < $this->defaultDisplayResults; $i++) {
       /** @var \Drupal\comment\CommentInterface $comment */
       $comment = Comment::create([
-        'status' => CommentInterface::PUBLISHED,
+        'status' => CommentStatus::Published->value,
         'field_name' => 'comment',
         'entity_type' => 'node',
         'entity_id' => $this->node->id(),

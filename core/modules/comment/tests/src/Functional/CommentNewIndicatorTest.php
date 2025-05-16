@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\comment\Functional;
 
+use Drupal\comment\CommentStatus;
 use Drupal\Component\Serialization\Json;
 use Drupal\Core\Language\LanguageInterface;
-use Drupal\comment\CommentInterface;
 use Drupal\Core\Url;
 use Drupal\comment\Entity\Comment;
 use Psr\Http\Message\ResponseInterface;
@@ -81,7 +81,7 @@ class CommentNewIndicatorTest extends CommentTestBase {
       'field_name' => 'comment',
       'pid' => 0,
       'uid' => $this->loggedInUser->id(),
-      'status' => CommentInterface::PUBLISHED,
+      'status' => CommentStatus::Published->value,
       'subject' => $this->randomMachineName(),
       'hostname' => '127.0.0.1',
       'langcode' => LanguageInterface::LANGCODE_NOT_SPECIFIED,

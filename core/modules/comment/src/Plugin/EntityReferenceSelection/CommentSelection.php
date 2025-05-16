@@ -2,6 +2,7 @@
 
 namespace Drupal\comment\Plugin\EntityReferenceSelection;
 
+use Drupal\comment\CommentStatus;
 use Drupal\Component\Utility\Html;
 use Drupal\Core\Database\Query\SelectInterface;
 use Drupal\Core\Entity\Attribute\EntityReferenceSelection;
@@ -31,7 +32,7 @@ class CommentSelection extends DefaultSelection {
     // core requires us to also know about the concept of 'published' and
     // 'unpublished'.
     if (!$this->currentUser->hasPermission('administer comments')) {
-      $query->condition('status', CommentInterface::PUBLISHED);
+      $query->condition('status', CommentStatus::Published->value);
     }
     return $query;
   }

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\views\Functional;
 
-use Drupal\comment\CommentInterface;
+use Drupal\comment\CommentStatus;
 use Drupal\comment\Tests\CommentTestTrait;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\Core\Language\LanguageInterface;
@@ -110,7 +110,7 @@ class DefaultViewsTest extends ViewTestBase {
 
       $comment = [
         'uid' => $user->id(),
-        'status' => CommentInterface::PUBLISHED,
+        'status' => CommentStatus::Published->value,
         'entity_id' => $node->id(),
         'entity_type' => 'node',
         'field_name' => 'comment',
@@ -119,7 +119,7 @@ class DefaultViewsTest extends ViewTestBase {
 
       $unpublished_comment = [
         'uid' => $user->id(),
-        'status' => CommentInterface::NOT_PUBLISHED,
+        'status' => CommentStatus::NotPublished->value,
         'entity_id' => $node->id(),
         'entity_type' => 'node',
         'field_name' => 'comment',

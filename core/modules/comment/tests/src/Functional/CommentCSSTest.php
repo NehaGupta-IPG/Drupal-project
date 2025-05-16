@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\comment\Functional;
 
+use Drupal\comment\CommentStatus;
 use Drupal\Core\Language\LanguageInterface;
-use Drupal\comment\CommentInterface;
 use Drupal\user\RoleInterface;
 use Drupal\comment\Entity\Comment;
 use Drupal\Tests\Traits\Core\GeneratePermutationsTrait;
@@ -47,7 +47,7 @@ class CommentCSSTest extends CommentTestBase {
     $parameters = [
       'node_uid' => [0, $this->webUser->id()],
       'comment_uid' => [0, $this->webUser->id(), $this->adminUser->id()],
-      'comment_status' => [CommentInterface::PUBLISHED, CommentInterface::NOT_PUBLISHED],
+      'comment_status' => CommentStatus::cases(),
       'user' => ['anonymous', 'authenticated', 'admin'],
     ];
     $permutations = $this->generatePermutations($parameters);
@@ -63,7 +63,7 @@ class CommentCSSTest extends CommentTestBase {
         'entity_type' => 'node',
         'field_name' => 'comment',
         'uid' => $case['comment_uid'],
-        'status' => $case['comment_status'],
+        'status' => $case['comment_status']->value,
         'subject' => $this->randomMachineName(),
         'language' => LanguageInterface::LANGCODE_NOT_SPECIFIED,
         'comment_body' => [LanguageInterface::LANGCODE_NOT_SPECIFIED => [$this->randomMachineName()]],
@@ -98,7 +98,7 @@ class CommentCSSTest extends CommentTestBase {
       $this->assertSession()->elementsCount('xpath', '//*[@data-history-node-id="' . $node->id() . '"]', 1);
 
       // Verify classes if the comment is visible for the current user.
-      if ($case['comment_status'] == CommentInterface::PUBLISHED || $case['user'] == 'admin') {
+      if ($case['comment_status'] == CommentStatus::Published || $case['user'] == 'admin') {
         // Verify the by-anonymous class.
         $comments = '//*[contains(@class, "comment") and contains(@class, "by-anonymous")]';
         if ($case['comment_uid'] == 0) {
@@ -127,7 +127,7 @@ class CommentCSSTest extends CommentTestBase {
 
       // Verify the unpublished class.
       $comments = '//*[contains(@class, "comment") and contains(@class, "unpublished")]';
-      if ($case['comment_status'] == CommentInterface::NOT_PUBLISHED && $case['user'] == 'admin') {
+      if ($case['comment_status'] == CommentStatus::NotPublished && $case['user'] == 'admin') {
         $this->assertSession()->elementsCount('xpath', $comments, 1);
       }
       else {
@@ -138,7 +138,7 @@ class CommentCSSTest extends CommentTestBase {
       // drupal.comment-new-indicator library to add a "new" indicator to each
       // comment that was created or changed after the last time the current
       // user read the corresponding node.
-      if ($case['comment_status'] == CommentInterface::PUBLISHED || $case['user'] == 'admin') {
+      if ($case['comment_status'] == CommentStatus::Published || $case['user'] == 'admin') {
         $this->assertSession()->elementsCount('xpath', '//*[contains(@class, "comment")]/*[@data-comment-timestamp="' . $comment->getChangedTime() . '"]', 1);
         $expectedJS = ($case['user'] !== 'anonymous');
         $this->assertSame($expectedJS, isset($settings['ajaxPageState']['libraries']) && in_array('comment/drupal.comment-new-indicator', explode(',', $settings['ajaxPageState']['libraries'])), 'drupal.comment-new-indicator library is present.');

@@ -2,7 +2,7 @@
 
 namespace Drupal\comment\Form;
 
-use Drupal\comment\CommentInterface;
+use Drupal\comment\CommentStatus;
 use Drupal\Component\Utility\Unicode;
 use Drupal\Core\Datetime\DateFormatterInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
@@ -137,7 +137,7 @@ class CommentAdminOverview extends FormBase {
     ];
 
     // Load the comments that need to be displayed.
-    $status = ($type == 'approval') ? CommentInterface::NOT_PUBLISHED : CommentInterface::PUBLISHED;
+    $status = ($type == 'approval') ? CommentStatus::NotPublished : CommentStatus::Published;
     $header = [
       'subject' => [
         'data' => $this->t('Subject'),
@@ -162,7 +162,7 @@ class CommentAdminOverview extends FormBase {
     ];
     $cids = $this->commentStorage->getQuery()
       ->accessCheck(TRUE)
-      ->condition('status', $status)
+      ->condition('status', $status->value)
       ->tableSort($header)
       ->pager(50)
       ->execute();

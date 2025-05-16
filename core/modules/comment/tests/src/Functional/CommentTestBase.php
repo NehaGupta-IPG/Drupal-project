@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\comment\Functional;
 
+use Drupal\comment\FormLocation;
 use Drupal\Component\Render\FormattableMarkup;
 use Drupal\comment\Entity\CommentType;
 use Drupal\comment\Entity\Comment;
 use Drupal\comment\CommentInterface;
 use Drupal\comment\Tests\CommentTestTrait;
 use Drupal\field\Entity\FieldConfig;
-use Drupal\comment\Plugin\Field\FieldType\CommentItemInterface;
 use Drupal\node\Entity\NodeType;
 use Drupal\Tests\BrowserTestBase;
 
@@ -292,7 +292,7 @@ abstract class CommentTestBase extends BrowserTestBase {
    *   Defaults to 'comment'.
    */
   protected function setCommentForm($enabled, $field_name = 'comment') {
-    $this->setCommentSettings('form_location', ($enabled ? CommentItemInterface::FORM_BELOW : CommentItemInterface::FORM_SEPARATE_PAGE), 'Comment controls ' . ($enabled ? 'enabled' : 'disabled') . '.', $field_name);
+    $this->setCommentSettings('form_location', ($enabled ? FormLocation::Below->value : FormLocation::SeparatePage->value), 'Comment controls ' . ($enabled ? 'enabled' : 'disabled') . '.', $field_name);
   }
 
   /**
@@ -303,6 +303,8 @@ abstract class CommentTestBase extends BrowserTestBase {
    *   - 0: No contact information allowed.
    *   - 1: Contact information allowed but not required.
    *   - 2: Contact information required.
+   *
+   * @todo deprecate int param and use AnonymousContact enum instead.
    */
   protected function setCommentAnonymous($level) {
     $this->setCommentSettings('anonymous', $level, new FormattableMarkup('Anonymous commenting set to level @level.', ['@level' => $level]));
@@ -333,6 +335,8 @@ abstract class CommentTestBase extends BrowserTestBase {
    * @param string $field_name
    *   (optional) Field name through which the comment should be posted.
    *   Defaults to 'comment'.
+   *
+   * @todo allow passing enums to $value depending on $name.
    */
   protected function setCommentSettings($name, $value, $message, $field_name = 'comment') {
     $field = FieldConfig::loadByName('node', 'article', $field_name);

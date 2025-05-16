@@ -2,7 +2,6 @@
 
 namespace Drupal\comment;
 
-use Drupal\comment\Plugin\Field\FieldType\CommentItemInterface;
 use Drupal\Component\Datetime\TimeInterface;
 use Drupal\Component\Utility\Html;
 use Drupal\Component\Utility\Unicode;
@@ -117,7 +116,7 @@ class CommentForm extends ContentEntityForm {
     $form['#id'] = Html::getUniqueId('comment_form');
     $form['#theme'] = ['comment_form__' . $entity->getEntityTypeId() . '__' . $entity->bundle() . '__' . $field_name, 'comment_form'];
 
-    $anonymous_contact = $field_definition->getSetting('anonymous');
+    $anonymous_contact = AnonymousContact::tryFrom($field_definition->getSetting('anonymous'));
     $is_admin = $comment->id() && $this->currentUser->hasPermission('administer comments');
 
     // If not replying to a comment, use our dedicated page callback for new
@@ -146,7 +145,7 @@ class CommentForm extends ContentEntityForm {
       if (!$comment->getOwnerId()) {
         $author = $comment->getAuthorName();
       }
-      $status = $comment->isPublished() ? CommentInterface::PUBLISHED : CommentInterface::NOT_PUBLISHED;
+      $status = CommentStatus::fromComment($comment);
       if (empty($comment_preview)) {
         $form['#title'] = $this->t('Edit comment %title', [
           '%title' => $comment->getSubject(),
@@ -154,7 +153,7 @@ class CommentForm extends ContentEntityForm {
       }
     }
     else {
-      $status = ($this->currentUser->hasPermission('skip comment approval') ? CommentInterface::PUBLISHED : CommentInterface::NOT_PUBLISHED);
+      $status = ($this->currentUser->hasPermission('skip comment approval') ? CommentStatus::Published : CommentStatus::NotPublished);
     }
 
     $date = '';
@@ -185,7 +184,7 @@ class CommentForm extends ContentEntityForm {
       '#type' => 'textfield',
       '#title' => $is_admin ? $this->t('Name for @anonymous', ['@anonymous' => $config->get('anonymous')]) : $this->t('Your name'),
       '#default_value' => $author,
-      '#required' => ($this->currentUser->isAnonymous() && $anonymous_contact == CommentInterface::ANONYMOUS_MUST_CONTACT),
+      '#required' => ($this->currentUser->isAnonymous() && $anonymous_contact == AnonymousContact::Required),
       '#maxlength' => 60,
       '#access' => $this->currentUser->isAnonymous() || $is_admin,
       '#size' => 30,
@@ -206,11 +205,11 @@ class CommentForm extends ContentEntityForm {
       '#type' => 'email',
       '#title' => $this->t('Email'),
       '#default_value' => $comment->getAuthorEmail(),
-      '#required' => ($this->currentUser->isAnonymous() && $anonymous_contact == CommentInterface::ANONYMOUS_MUST_CONTACT),
+      '#required' => ($this->currentUser->isAnonymous() && $anonymous_contact == AnonymousContact::Required),
       '#maxlength' => 64,
       '#size' => 30,
       '#description' => $this->t('The content of this field is kept private and will not be shown publicly.'),
-      '#access' => ($comment->getOwner()->isAnonymous() && $is_admin) || ($this->currentUser->isAnonymous() && $anonymous_contact != CommentInterface::ANONYMOUS_MAYNOT_CONTACT),
+      '#access' => ($comment->getOwner()->isAnonymous() && $is_admin) || ($this->currentUser->isAnonymous() && $anonymous_contact != AnonymousContact::Forbidden),
     ];
 
     $form['author']['homepage'] = [
@@ -219,7 +218,7 @@ class CommentForm extends ContentEntityForm {
       '#default_value' => $comment->getHomepage(),
       '#maxlength' => 255,
       '#size' => 30,
-      '#access' => $is_admin || ($this->currentUser->isAnonymous() && $anonymous_contact != CommentInterface::ANONYMOUS_MAYNOT_CONTACT),
+      '#access' => $is_admin || ($this->currentUser->isAnonymous() && $anonymous_contact != AnonymousContact::Forbidden),
     ];
 
     // Add administrative comment publishing options.
@@ -234,11 +233,8 @@ class CommentForm extends ContentEntityForm {
     $form['author']['status'] = [
       '#type' => 'radios',
       '#title' => $this->t('Status'),
-      '#default_value' => $status,
-      '#options' => [
-        CommentInterface::PUBLISHED => $this->t('Published'),
-        CommentInterface::NOT_PUBLISHED => $this->t('Not published'),
-      ],
+      '#default_value' => $status->value,
+      '#options' => CommentStatus::asOptions(),
       '#access' => $is_admin,
     ];
 
@@ -377,7 +373,7 @@ class CommentForm extends ContentEntityForm {
     $uri = $entity->toUrl();
     $logger = $this->logger('comment');
 
-    if ($this->currentUser->hasPermission('post comments') && ($this->currentUser->hasPermission('administer comments') || $entity->{$field_name}->status == CommentItemInterface::OPEN)) {
+    if ($this->currentUser->hasPermission('post comments') && ($this->currentUser->hasPermission('administer comments') || $entity->{$field_name}->status == CommentingStatus::Open->value)) {
       $comment->save();
       $form_state->setValue('cid', $comment->id());
 

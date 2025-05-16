@@ -84,7 +84,7 @@ class CommentViewBuilder extends EntityViewBuilder {
     $build['#comment_threaded'] =
       is_null($commented_entity)
       || $commented_entity->getFieldDefinition($entity->getFieldName())
-        ->getSetting('default_mode') === CommentManagerInterface::COMMENT_MODE_THREADED;
+        ->getSetting('default_mode') === CommentMode::Threaded->value;
     // If threading is enabled, don't render cache individual comments, but do
     // keep the cacheability metadata, so it can bubble up.
     if ($build['#comment_threaded']) {

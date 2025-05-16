@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\comment\Functional;
 
-use Drupal\comment\CommentInterface;
-use Drupal\comment\CommentManagerInterface;
+use Drupal\comment\CommentMode;
+use Drupal\comment\CommentStatus;
 use Drupal\comment\Entity\Comment;
 use Drupal\comment\Tests\CommentTestTrait;
 use Drupal\Core\Entity\EntityInterface;
@@ -74,7 +74,7 @@ class CommentCacheTagsTest extends EntityWithUriCacheTagsTestBase {
 
     // Display comments in a flat list; threaded comments are not render cached.
     $field = FieldConfig::loadByName('entity_test', 'bar', 'comment');
-    $field->setSetting('default_mode', CommentManagerInterface::COMMENT_MODE_FLAT);
+    $field->setSetting('default_mode', CommentMode::Flat->value);
     $field->save();
 
     // Create a "Camelids" test entity that the comment will be assigned to.
@@ -94,7 +94,7 @@ class CommentCacheTagsTest extends EntityWithUriCacheTagsTestBase {
       'entity_id' => $this->entityTestCamelid->id(),
       'entity_type' => 'entity_test',
       'field_name' => 'comment',
-      'status' => CommentInterface::PUBLISHED,
+      'status' => CommentStatus::Published->value,
     ]);
     $comment->save();
 
@@ -127,7 +127,7 @@ class CommentCacheTagsTest extends EntityWithUriCacheTagsTestBase {
       'entity_id' => $this->entityTestHippopotamidae->id(),
       'entity_type' => 'entity_test',
       'field_name' => 'comment',
-      'status' => CommentInterface::PUBLISHED,
+      'status' => CommentStatus::Published->value,
     ]);
     $hippo_comment->save();
 

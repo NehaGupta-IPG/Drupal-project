@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\comment\Kernel\Views;
 
-use Drupal\comment\CommentManagerInterface;
+use Drupal\comment\CommentMode;
 use Drupal\Core\Session\AnonymousUserSession;
 use Drupal\Core\Link;
 use Drupal\Core\Url;
@@ -127,7 +127,7 @@ class CommentLinksTest extends CommentViewsKernelTestBase {
       'entity_type' => 'entity_test',
       'bundle' => 'entity_test',
       'settings' => [
-        'default_mode' => CommentManagerInterface::COMMENT_MODE_THREADED,
+        'default_mode' => CommentMode::Threaded->value,
       ],
     ]);
     $field_comment->save();

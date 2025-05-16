@@ -2,10 +2,12 @@
 
 namespace Drupal\comment\Plugin\Field\FieldType;
 
+use Drupal\comment\AnonymousContact;
 use Drupal\comment\CommentFieldItemList;
-use Drupal\comment\CommentInterface;
-use Drupal\comment\CommentManagerInterface;
+use Drupal\comment\CommentMode;
+use Drupal\comment\CommentingStatus;
 use Drupal\comment\Entity\CommentType;
+use Drupal\comment\FormLocation;
 use Drupal\Core\Field\Attribute\FieldType;
 use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Field\FieldItemBase;
@@ -44,10 +46,10 @@ class CommentItem extends FieldItemBase implements CommentItemInterface {
    */
   public static function defaultFieldSettings() {
     return [
-      'default_mode' => CommentManagerInterface::COMMENT_MODE_THREADED,
+      'default_mode' => CommentMode::Threaded->value,
       'per_page' => 50,
-      'form_location' => CommentItemInterface::FORM_BELOW,
-      'anonymous' => CommentInterface::ANONYMOUS_MAYNOT_CONTACT,
+      'form_location' => FormLocation::Below->value,
+      'anonymous' => AnonymousContact::Forbidden->value,
       'preview' => DRUPAL_OPTIONAL,
     ] + parent::defaultFieldSettings();
   }
@@ -127,11 +129,7 @@ class CommentItem extends FieldItemBase implements CommentItemInterface {
       '#type' => 'select',
       '#title' => $this->t('Anonymous commenting'),
       '#default_value' => $settings['anonymous'],
-      '#options' => [
-        CommentInterface::ANONYMOUS_MAYNOT_CONTACT => $this->t('Anonymous posters may not enter their contact information'),
-        CommentInterface::ANONYMOUS_MAY_CONTACT => $this->t('Anonymous posters may leave their contact information'),
-        CommentInterface::ANONYMOUS_MUST_CONTACT => $this->t('Anonymous posters must leave their contact information'),
-      ],
+      '#options' => AnonymousContact::asOptions(),
       '#access' => $anonymous_user->hasPermission('post comments'),
     ];
     $element['form_location'] = [
@@ -202,11 +200,7 @@ class CommentItem extends FieldItemBase implements CommentItemInterface {
    * {@inheritdoc}
    */
   public static function generateSampleValue(FieldDefinitionInterface $field_definition) {
-    $statuses = [
-      CommentItemInterface::HIDDEN,
-      CommentItemInterface::CLOSED,
-      CommentItemInterface::OPEN,
-    ];
+    $statuses = array_column(CommentingStatus::cases(), 'value');
     return [
       'status' => $statuses[mt_rand(0, count($statuses) - 1)],
     ];

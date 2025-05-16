@@ -11,11 +11,21 @@ interface CommentManagerInterface {
 
   /**
    * Comments are displayed in a flat list - expanded.
+   *
+   * @deprecated in drupal:11.2.0 and is removed from drupal:12.0.0.
+   * Use \Drupal\comment\CommentMode::Flat instead.
+   *
+   * @see https://www.drupal.org/project/drupal/issues/3518993
    */
   const COMMENT_MODE_FLAT = 0;
 
   /**
    * Comments are displayed as a threaded list - expanded.
+   *
+   * @deprecated in drupal:11.2.0 and is removed from drupal:12.0.0.
+   * Use \Drupal\comment\CommentMode::Threaded instead.
+   *
+   * @see https://www.drupal.org/project/drupal/issues/3518993
    */
   const COMMENT_MODE_THREADED = 1;
 

@@ -14,26 +14,51 @@ interface CommentInterface extends ContentEntityInterface, EntityChangedInterfac
 
   /**
    * Comment is awaiting approval.
+   *
+   * @deprecated in drupal:11.2.0 and is removed from drupal:12.0.0.
+   *   Use \Drupal\comment\CommentStatus::NotPublished instead.
+   *
+   * @see https://www.drupal.org/project/drupal/issues/3518993
    */
   const NOT_PUBLISHED = 0;
 
   /**
    * Comment is published.
+   *
+   * @deprecated in drupal:11.2.0 and is removed from drupal:12.0.0.
+   * Use \Drupal\comment\CommentStatus::Published instead.
+   *
+   * @see https://www.drupal.org/project/drupal/issues/3518993
    */
   const PUBLISHED = 1;
 
   /**
    * Anonymous posters cannot enter their contact information.
-   */
+   *
+   * @deprecated in drupal:11.2.0 and is removed from drupal:12.0.0.
+   *   Use \Drupal\comment\AnonymousContact::Forbidden instead.
+   *
+   * @see https://www.drupal.org/project/drupal/issues/3518993
+ */
   const ANONYMOUS_MAYNOT_CONTACT = 0;
 
   /**
    * Anonymous posters may leave their contact information.
+   *
+   * @deprecated in drupal:11.2.0 and is removed from drupal:12.0.0.
+   *   Use \Drupal\comment\AnonymousContact::Allowed instead.
+   *
+   * @see https://www.drupal.org/project/drupal/issues/3518993
    */
   const ANONYMOUS_MAY_CONTACT = 1;
 
   /**
    * Anonymous posters are required to leave their contact information.
+   *
+   * @deprecated in drupal:11.2.0 and is removed from drupal:12.0.0.
+   *   Use \Drupal\comment\AnonymousContact::Required instead.
+   *
+   * @see https://www.drupal.org/project/drupal/issues/3518993
    */
   const ANONYMOUS_MUST_CONTACT = 2;
 

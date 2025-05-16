@@ -4,10 +4,11 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\comment\Functional;
 
-use Drupal\comment\Plugin\Field\FieldType\CommentItemInterface;
+use Drupal\comment\CommentingStatus;
+use Drupal\comment\CommentMode;
+use Drupal\comment\CommentStatus;
+use Drupal\comment\FormLocation;
 use Drupal\Core\Language\LanguageInterface;
-use Drupal\comment\CommentInterface;
-use Drupal\comment\CommentManagerInterface;
 use Drupal\user\RoleInterface;
 use Drupal\comment\Entity\Comment;
 
@@ -64,7 +65,7 @@ class CommentLinksTest extends CommentTestBase {
       'field_name' => 'comment',
       'pid' => 0,
       'uid' => 0,
-      'status' => CommentInterface::PUBLISHED,
+      'status' => CommentStatus::Published->value,
       'subject' => $this->randomMachineName(),
       'hostname' => '127.0.0.1',
       'langcode' => LanguageInterface::LANGCODE_NOT_SPECIFIED,
@@ -75,17 +76,17 @@ class CommentLinksTest extends CommentTestBase {
 
     // Tests that reply link is not visible when threading is disabled.
     $this->drupalLogin($this->webUser);
-    $this->setCommentSettings('default_mode', CommentManagerInterface::COMMENT_MODE_FLAT, 'Comment paging changed.');
+    $this->setCommentSettings('default_mode', CommentMode::Flat->value, 'Comment paging changed.');
     $this->drupalGet('node/' . $this->node->id());
     $this->assertSession()->linkNotExists('Reply');
     // Tests that reply link is visible when threading is enabled.
-    $this->setCommentSettings('default_mode', CommentManagerInterface::COMMENT_MODE_THREADED, 'Comment paging changed.');
+    $this->setCommentSettings('default_mode', CommentMode::Threaded->value, 'Comment paging changed.');
     $this->drupalGet('node/' . $this->node->id());
     $this->assertSession()->linkExists('Reply');
 
     // Change comment settings.
-    $this->setCommentSettings('form_location', CommentItemInterface::FORM_BELOW, 'Set comment form location');
-    $this->node->comment = CommentItemInterface::OPEN;
+    $this->setCommentSettings('form_location', FormLocation::Below->value, 'Set comment form location');
+    $this->node->comment = CommentingStatus::Open->value;
     $this->node->save();
 
     // Change user permissions.
