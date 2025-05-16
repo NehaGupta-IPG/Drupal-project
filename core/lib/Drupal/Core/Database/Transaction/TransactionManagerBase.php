@@ -385,7 +385,9 @@ abstract class TransactionManagerBase implements TransactionManagerInterface {
       return;
     }
 
-    if ($this->getConnectionTransactionState() === ClientConnectionTransactionState::Committed && $this->stackDepth() === 0) {
+    // If the client transaction was already committed, there's no longer
+    // anything to do on an explicit commit/savepoint release.
+    if ($this->getConnectionTransactionState() === ClientConnectionTransactionState::Committed) {
       return;
     }
 

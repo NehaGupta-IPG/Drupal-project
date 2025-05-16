@@ -5,9 +5,6 @@ namespace Drupal\Core\Database;
 /**
  * A wrapper class for creating and managing database transactions.
  *
- * To begin a transaction, simply start it. When the object goes out of scope
- * and is destroyed it will automatically commit.
- *
  * In the vast majority of cases, you should not instantiate this class
  * directly. Instead, call ->startTransaction(), from the appropriate connection
  * object.
