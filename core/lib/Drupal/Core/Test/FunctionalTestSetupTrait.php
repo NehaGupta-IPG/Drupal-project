@@ -167,6 +167,17 @@ trait FunctionalTestSetupTrait {
         'tags' => [['name' => 'event_subscriber']],
       ];
     }
+    // Register test middleware.
+    $services['services']['testing.http_client.middleware'] = [
+      'class' => 'Drupal\Core\Test\HttpClientMiddleware\TestHttpClientMiddleware',
+      'tags' => [['name' => 'http_client_middleware']],
+    ];
+    $services['services']['testing.http_middleware.wait_terminate_middleware'] = [
+      'class' => 'Drupal\Core\Test\StackMiddleware\TestWaitTerminateMiddleware',
+      'arguments' => ['@lock', '%drupal.test_wait_terminate%'],
+      'tags' => [['name' => 'http_middleware', 'priority' => -1024]],
+    ];
+    $services['parameters']['drupal.test_wait_terminate'] = FALSE;
     file_put_contents($directory . '/services.yml', $yaml->dump($services));
     // Since Drupal is bootstrapped already, install_begin_request() will not
     // bootstrap again. Hence, we have to reload the newly written custom
@@ -598,7 +609,8 @@ trait FunctionalTestSetupTrait {
    * Sets up the base URL based upon the environment variable.
    *
    * @throws \Exception
-   *   Thrown when no SIMPLETEST_BASE_URL environment variable is provided or uses an invalid scheme.
+   *   Thrown when no SIMPLETEST_BASE_URL environment variable is provided or
+   *   uses an invalid scheme.
    */
   protected function setupBaseUrl() {
     global $base_url;
@@ -671,7 +683,6 @@ trait FunctionalTestSetupTrait {
     $this->publicFilesDirectory = $this->siteDirectory . '/files';
     $this->privateFilesDirectory = $this->siteDirectory . '/private';
     $this->tempFilesDirectory = $this->siteDirectory . '/temp';
-    $this->translationFilesDirectory = $this->siteDirectory . '/translations';
 
     // Ensure the configImporter is refreshed for each test.
     $this->configImporter = NULL;

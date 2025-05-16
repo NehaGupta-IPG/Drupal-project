@@ -383,7 +383,7 @@ class FormState implements FormStateInterface {
   protected $has_file_element;
 
   /**
-   * Contains references to details elements to render them within vertical tabs.
+   * The references to details elements to render them within vertical tabs.
    *
    * This property is uncacheable.
    *
@@ -660,6 +660,8 @@ class FormState implements FormStateInterface {
    * have side-effects, such as persisting $form_state changes.
    *
    * @return bool
+   *   TRUE if the request method is considered a safe HTTP method. Otherwise
+   *   FALSE.
    *
    * @see \Symfony\Component\HttpFoundation\Request::isMethodSafe()
    * @see https://www.w3.org/Protocols/rfc2616/rfc2616-sec9.html#sec9.1.1
@@ -1269,17 +1271,17 @@ class FormState implements FormStateInterface {
       // We iterate over the #parents of this button and move a reference to
       // each parent in self::getValues(). For example, if #parents is:
       // @code
-      //   array('foo', 'bar', 'baz')
+      //   ['foo', 'bar', 'baz']
       // @endcode
       // Then the corresponding self::getValues() part will look like this:
       // @code
-      // array(
-      //   'foo' => array(
-      //     'bar' => array(
+      // [
+      //   'foo' => [
+      //     'bar' => [
       //       'baz' => 'button_value',
-      //     ),
-      //   ),
-      // )
+      //     ],
+      //   ],
+      // ]
       // @endcode
       // We start by (re)moving 'baz' to $last_parent, so we are able unset it
       // at the end of the iteration. Initially, $values will contain a

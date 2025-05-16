@@ -17,7 +17,7 @@ use Drupal\Core\Logger\RfcLogLevel;
  *   - where: The filter condition.
  *   - options: Array of options for the select list for the filter.
  */
-function dblog_filters() {
+function dblog_filters(): array {
   $filters = [];
 
   foreach (_dblog_get_message_types() as $type) {
@@ -28,14 +28,14 @@ function dblog_filters() {
   if (!empty($types)) {
     $filters['type'] = [
       'title' => t('Type'),
-      'where' => "w.type = ?",
+      'field' => 'w.type',
       'options' => $types,
     ];
   }
 
   $filters['severity'] = [
     'title' => t('Severity'),
-    'where' => 'w.severity = ?',
+    'field' => 'w.severity',
     'options' => RfcLogLevel::getLevels(),
   ];
 

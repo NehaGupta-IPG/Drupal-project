@@ -49,7 +49,7 @@ class CommonTestHooks {
    * Implements hook_TYPE_alter().
    *
    * This is to verify that
-   * \Drupal::moduleHandler()->alter(array(TYPE1, TYPE2), ...) allows
+   * \Drupal::moduleHandler()->alter([TYPE1, TYPE2], ...) allows
    * hook_module_implements_alter() to affect the order in which module
    * implementations are executed.
    */
@@ -108,8 +108,8 @@ class CommonTestHooks {
   /**
    * Implements hook_cron().
    *
-   * System module should handle if a module does not catch an exception and keep
-   * cron going.
+   * System module should handle if a module does not catch an exception and
+   * keep cron going.
    *
    * @see common_test_cron_helper()
    */
@@ -149,8 +149,8 @@ class CommonTestHooks {
    */
   #[Hook('page_attachments_alter')]
   public function pageAttachmentsAlter(array &$page): void {
-    // Remove a library that was added in common_test_page_attachments(), to test
-    // that this hook can do what it claims to do.
+    // Remove a library that was added in common_test_page_attachments(), to
+    // test that this hook can do what it claims to do.
     if (isset($page['#attached']['library']) && ($index = array_search('core/bar', $page['#attached']['library'])) && $index !== FALSE) {
       unset($page['#attached']['library'][$index]);
     }

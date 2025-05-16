@@ -393,6 +393,12 @@ abstract class EntityBase implements EntityInterface {
     if ($entity_type->hasKey('uuid')) {
       $duplicate->{$entity_type->getKey('uuid')} = $this->uuidGenerator()->generate();
     }
+
+    // Modules might need to add or change the data initially held by the new
+    // entity object, for instance to fill-in default values.
+    \Drupal::moduleHandler()->invokeAll($this->getEntityTypeId() . '_duplicate', [$duplicate, $this]);
+    \Drupal::moduleHandler()->invokeAll('entity_duplicate', [$duplicate, $this]);
+
     return $duplicate;
   }
 
@@ -411,7 +417,7 @@ abstract class EntityBase implements EntityInterface {
     if ($this->getEntityType()->getBundleOf()) {
       // Throw an exception if the bundle ID is longer than 32 characters.
       if (mb_strlen($this->id()) > EntityTypeInterface::BUNDLE_MAX_LENGTH) {
-        throw new ConfigEntityIdLengthException("Attempt to create a bundle with an ID longer than " . EntityTypeInterface::BUNDLE_MAX_LENGTH . " characters: $this->id().");
+        throw new ConfigEntityIdLengthException("Attempt to create a bundle with an ID longer than " . EntityTypeInterface::BUNDLE_MAX_LENGTH . " characters: " . $this->id() . ".");
       }
     }
   }
@@ -477,7 +483,10 @@ abstract class EntityBase implements EntityInterface {
   protected function getListCacheTagsToInvalidate() {
     $tags = $this->getEntityType()->getListCacheTags();
     if ($this->getEntityType()->hasKey('bundle')) {
-      $tags[] = $this->getEntityTypeId() . '_list:' . $this->bundle();
+      $tags = Cache::mergeTags(
+        $tags,
+        $this->getEntityType()->getBundleListCacheTags($this->bundle())
+      );
     }
     return $tags;
   }
@@ -717,6 +726,29 @@ abstract class EntityBase implements EntityInterface {
       return;
     }
     $this->$name = $value;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function __isset($name) {
+    if ($name == 'original') {
+      @trigger_error("Checking for the original property is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Use \Drupal\Core\Entity\EntityInterface::getOriginal() instead. See https://www.drupal.org/node/3295826", E_USER_DEPRECATED);
+      return $this->getOriginal();
+    }
+    return isset($this->$name);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function __unset($name) {
+    if ($name == 'original') {
+      @trigger_error("Unsetting the original property is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Use \Drupal\Core\Entity\EntityInterface::setOriginal() instead. See https://www.drupal.org/node/3295826", E_USER_DEPRECATED);
+      $this->setOriginal(NULL);
+      return;
+    }
+    unset($this->$name);
   }
 
 }

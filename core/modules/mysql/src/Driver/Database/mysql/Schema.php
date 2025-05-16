@@ -67,12 +67,12 @@ class Schema extends DatabaseSchema {
   }
 
   /**
-   * Build a condition to match a table name against a standard information_schema.
+   * Builds a condition to match a table name with the information schema.
    *
-   * MySQL uses databases like schemas rather than catalogs so when we build
-   * a condition to query the information_schema.tables, we set the default
-   * database as the schema unless specified otherwise, and exclude table_catalog
-   * from the condition criteria.
+   * MySQL uses databases like schemas rather than catalogs so when we build a
+   * condition to query the information_schema.tables, we set the default
+   * database as the schema unless specified otherwise, and exclude
+   * table_catalog from the condition criteria.
    */
   protected function buildTableNameCondition($table_name, $operator = '=', $add_prefix = TRUE) {
     $table_info = $this->getPrefixInfo($table_name, $add_prefix);
@@ -133,7 +133,7 @@ class Schema extends DatabaseSchema {
   }
 
   /**
-   * Create an SQL string for a field to be used in table creation or alteration.
+   * Creates an SQL string for a field used in table creation or alteration.
    *
    * @param string $name
    *   Name of the field.
@@ -199,7 +199,7 @@ class Schema extends DatabaseSchema {
   /**
    * Set database-engine specific properties for a field.
    *
-   * @param $field
+   * @param array $field
    *   A field description array, as specified in the schema documentation.
    */
   protected function processField($field) {
@@ -271,6 +271,9 @@ class Schema extends DatabaseSchema {
     return $map;
   }
 
+  /**
+   * Creates the keys for an SQL table.
+   */
   protected function createKeysSql($spec) {
     $keys = [];
 
@@ -355,6 +358,9 @@ class Schema extends DatabaseSchema {
     }
   }
 
+  /**
+   * Creates an SQL key for the given fields.
+   */
   protected function createKeySql($fields) {
     $return = [];
     foreach ($fields as $field) {

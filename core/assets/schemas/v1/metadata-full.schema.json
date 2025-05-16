@@ -4,8 +4,9 @@
   "$defs": {
     "slotDefinition": {
       "type": "object",
+      "additionalProperties": false,
       "patternProperties": {
-        "^[a-zA-Z0-9_-]$": {
+        "^[a-zA-Z0-9_-]+$": {
           "type": "object",
           "properties": {
             "title": {
@@ -21,6 +22,26 @@
               "items": {
                 "type": "string"
               }
+            }
+          }
+        }
+      }
+    },
+    "variantDefinition": {
+      "type": "object",
+      "additionalProperties": false,
+      "patternProperties": {
+        "^[a-zA-Z0-9_-]+$": {
+          "type": "object",
+          "required": ["title"],
+          "properties": {
+            "title": {
+              "type": "string",
+              "title": "Title"
+            },
+            "description": {
+              "type": "string",
+              "title": "Description"
             }
           }
         }
@@ -143,6 +164,9 @@
     },
     "slots": {
       "$ref": "metadata.schema.json#/$defs/slotDefinition"
+    },
+    "variants": {
+      "$ref": "metadata.schema.json#/$defs/variantDefinition"
     },
     "template": {
       "type": "string",

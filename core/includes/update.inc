@@ -19,7 +19,7 @@ use Drupal\Core\Update\EquivalentUpdate;
  * @return array
  *   A requirements info array.
  */
-function update_system_schema_requirements() {
+function update_system_schema_requirements(): array {
   $requirements = [];
 
   $system_schema = \Drupal::service('update.update_hook_registry')->getInstalledVersion('system');
@@ -52,8 +52,12 @@ function update_check_requirements() {
   _update_fix_missing_schema();
 
   // Check requirements of all loaded modules.
-  $requirements = \Drupal::moduleHandler()->invokeAll('requirements', ['update']);
+  $requirements = array_merge(
+    \Drupal::moduleHandler()->invokeAll('requirements', ['update']),
+    \Drupal::moduleHandler()->invokeAll('update_requirements')
+  );
   \Drupal::moduleHandler()->alter('requirements', $requirements);
+  \Drupal::moduleHandler()->alter('update_requirements', $requirements);
   $requirements += update_system_schema_requirements();
   return $requirements;
 }
@@ -69,7 +73,7 @@ function update_check_requirements() {
  * @todo remove in a major version after
  * https://www.drupal.org/project/drupal/issues/3130037 has been fixed.
  */
-function _update_fix_missing_schema() {
+function _update_fix_missing_schema(): void {
   /** @var \Drupal\Core\Update\UpdateHookRegistry $update_registry */
   $update_registry = \Drupal::service('update.update_hook_registry');
   $versions = $update_registry->getAllInstalledVersions();
@@ -145,20 +149,20 @@ function _update_fix_missing_schema() {
  * and set the #finished property to the percentage completed that it is, as a
  * fraction of 1.
  *
- * @param $module
+ * @param string $module
  *   The module whose update will be run.
- * @param $number
+ * @param string $number
  *   The update number to run.
- * @param $dependency_map
+ * @param array $dependency_map
  *   An array whose keys are the names of all update functions that will be
  *   performed during this batch process, and whose values are arrays of other
  *   update functions that each one depends on.
- * @param $context
+ * @param array $context
  *   The batch context array.
  *
  * @see update_resolve_dependencies()
  */
-function update_do_one($module, $number, $dependency_map, &$context) {
+function update_do_one($module, $number, $dependency_map, &$context): void {
   $function = $module . '_update_' . $number;
 
   // If this update was aborted in a previous step, or has a dependency that
@@ -227,7 +231,7 @@ function update_do_one($module, $number, $dependency_map, &$context) {
  * @param array $context
  *   The batch context array.
  */
-function update_invoke_post_update($function, &$context) {
+function update_invoke_post_update($function, &$context): void {
   $ret = [];
 
   // If this update was aborted in a previous step, or has a dependency that was
@@ -300,7 +304,7 @@ function update_invoke_post_update($function, &$context) {
  *       the update number and the description from source code comment for
  *       each update function. This array is keyed by the update number.
  */
-function update_get_update_list() {
+function update_get_update_list(): array {
   // Make sure that the system module is first in the list of updates.
   $ret = ['system' => []];
 
@@ -398,7 +402,7 @@ function update_get_update_list() {
  * dependency chain for each update, as provided by the depth-first search
  * algorithm in Drupal\Component\Graph\Graph::searchAndSort().
  *
- * @param $starting_updates
+ * @param array $starting_updates
  *   An array whose keys contain the names of modules with updates to be run
  *   and whose values contain the number of the first requested update for that
  *   module.
@@ -465,7 +469,7 @@ function update_resolve_dependencies($starting_updates) {
 /**
  * Returns an organized list of update functions for a set of modules.
  *
- * @param $starting_updates
+ * @param array $starting_updates
  *   An array whose keys contain the names of modules and whose values contain
  *   the number of the first requested update for that module.
  *
@@ -478,7 +482,7 @@ function update_resolve_dependencies($starting_updates) {
  *
  * @see update_resolve_dependencies()
  */
-function update_get_update_function_list($starting_updates) {
+function update_get_update_function_list($starting_updates): array {
   // Go through each module and find all updates that we need (including the
   // first update that was requested and any updates that run after it).
   $update_functions = [];
@@ -523,7 +527,7 @@ function update_get_update_function_list($starting_updates) {
  * modules which implement hook_update_dependencies(), and builds them into the
  * graph as well.
  *
- * @param $update_functions
+ * @param array $update_functions
  *   An organized array of update functions, in the format returned by
  *   update_get_update_function_list().
  *
@@ -544,7 +548,7 @@ function update_get_update_function_list($starting_updates) {
  * @see \Drupal\Component\Graph\Graph::searchAndSort()
  * @see update_resolve_dependencies()
  */
-function update_build_dependency_graph($update_functions) {
+function update_build_dependency_graph($update_functions): array {
   // Initialize an array that will define a directed graph representing the
   // dependencies between update functions.
   $graph = [];
@@ -586,11 +590,11 @@ function update_build_dependency_graph($update_functions) {
 /**
  * Determines if a module update is missing or unavailable.
  *
- * @param $module
+ * @param string $module
  *   The name of the module.
- * @param $number
+ * @param int $number
  *   The number of the update within that module.
- * @param $update_functions
+ * @param array $update_functions
  *   An organized array of update functions, in the format returned by
  *   update_get_update_function_list(). This should represent all module
  *   updates that are requested to run at the time this function is called.
@@ -606,9 +610,9 @@ function update_is_missing($module, $number, $update_functions) {
 /**
  * Determines if a module update has already been performed.
  *
- * @param $module
+ * @param string $module
  *   The name of the module.
- * @param $number
+ * @param int $number
  *   The number of the update within that module.
  *
  * @return bool
@@ -634,7 +638,7 @@ function update_already_performed($module, $number) {
  * @see \Drupal\Core\Extension\ModuleHandlerInterface::invokeAll()
  * @see hook_update_dependencies()
  */
-function update_retrieve_dependencies() {
+function update_retrieve_dependencies(): array {
   $return = [];
   /** @var \Drupal\Core\Extension\ModuleExtensionList */
   $extension_list = \Drupal::service('extension.list.module');

@@ -17,19 +17,20 @@ class StatusReportPage extends RenderElementBase {
    * {@inheritdoc}
    */
   public function getInfo() {
-    $class = static::class;
     return [
       '#theme' => 'status_report_page',
       '#pre_render' => [
-        [$class, 'preRenderCounters'],
-        [$class, 'preRenderGeneralInfo'],
-        [$class, 'preRenderRequirements'],
+        [static::class, 'preRenderCounters'],
+        [static::class, 'preRenderGeneralInfo'],
+        [static::class, 'preRenderRequirements'],
       ],
     ];
   }
 
   /**
-   * #pre_render callback to get general info out of requirements.
+   * Render API callback: Gets general info out of requirements.
+   *
+   * This function is assigned as a #pre_render callback.
    */
   public static function preRenderGeneralInfo($element) {
     $element['#general_info'] = [
@@ -71,7 +72,7 @@ class StatusReportPage extends RenderElementBase {
   }
 
   /**
-   * #pre_render callback to create counter elements.
+   * The #pre_render callback to create counter elements.
    */
   public static function preRenderCounters($element) {
     // Count number of items with different severity for summary.
@@ -127,12 +128,19 @@ class StatusReportPage extends RenderElementBase {
   }
 
   /**
-   * #pre_render callback to create status report requirements.
+   * Render API callback: Create status report requirements.
+   *
+   * This function is assigned as a #pre_render callback.
    */
   public static function preRenderRequirements($element) {
     $element['#requirements'] = [
       '#type' => 'status_report',
       '#requirements' => $element['#requirements'],
+      '#attached' => [
+        'library' => [
+          'system/status.report',
+        ],
+      ],
     ];
 
     return $element;
