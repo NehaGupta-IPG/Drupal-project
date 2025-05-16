@@ -119,7 +119,7 @@ class OpenTelemetryFrontPagePerformanceTest extends PerformanceTestBase {
     }, 'umamiFrontPageCoolCache');
 
     $expected = [
-      'QueryCount' => 112,
+      'QueryCount' => 109,
       'CacheGetCount' => 239,
       'CacheSetCount' => 93,
       'CacheDeleteCount' => 0,
