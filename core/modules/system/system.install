@@ -307,7 +307,7 @@ function system_requirements($phase): array {
 
   // Check if the PHP version is below what Drupal supports.
   if (version_compare($phpversion, $minimum_supported_php) < 0) {
-    $requirements['php']['description'] = t('Your PHP installation is too old. Drupal requires at least PHP %version. It is recommended to upgrade to PHP version %recommended or higher for the best ongoing support. See <a href="http://php.net/supported-versions.php">PHP\'s version support documentation</a> and the <a href=":php_requirements">Drupal PHP requirements</a> page for more information.',
+    $requirements['php']['description'] = t('Your PHP installation is too old. Drupal requires at least PHP %version. Upgrade to a PHP version higher than %recommended for the best ongoing support. See the <a href=":php_requirements">Drupal PHP requirements</a> page and <a href="https://www.php.net/supported-versions.php">PHP\'s version support documentation</a> for more information.',
       [
         '%version' => $minimum_supported_php,
         '%recommended' => \Drupal::RECOMMENDED_PHP,
@@ -330,7 +330,7 @@ function system_requirements($phase): array {
   // inform users of what's recommended, allowing them to take action before it
   // becomes urgent.
   elseif ($phase === 'runtime' && version_compare($phpversion, \Drupal::RECOMMENDED_PHP) < 0) {
-    $requirements['php']['description'] = t('It is recommended to upgrade to PHP version %recommended or higher for the best ongoing support.  See <a href="http://php.net/supported-versions.php">PHP\'s version support documentation</a> and the <a href=":php_requirements">Drupal PHP requirements</a> page for more information.', ['%recommended' => \Drupal::RECOMMENDED_PHP, ':php_requirements' => 'https://www.drupal.org/docs/system-requirements/php-requirements']);
+    $requirements['php']['description'] = t('It is recommended to upgrade to PHP version %recommended or higher for the best ongoing support. See the <a href=":php_requirements">Drupal PHP requirements</a> page and <a href="https://www.php.net/supported-versions.php">PHP\'s version support documentation</a> for more information.', ['%recommended' => \Drupal::RECOMMENDED_PHP, ':php_requirements' => 'https://www.drupal.org/docs/system-requirements/php-requirements']);
     $requirements['php']['severity'] = REQUIREMENT_INFO;
   }
 
