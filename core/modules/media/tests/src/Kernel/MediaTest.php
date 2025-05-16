@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\media\Kernel;
 
+use Drupal\Core\Entity\EntityStorageException;
 use Drupal\media\Entity\Media;
 
 /**
@@ -44,6 +45,21 @@ class MediaTest extends MediaKernelTestBase {
     $name = "create {$this->testMediaType->id()} media";
     $this->assertArrayHasKey($name, $permissions);
     $this->assertSame(['config' => [$this->testMediaType->getConfigDependencyName()]], $permissions[$name]['dependencies']);
+  }
+
+  /**
+   * @covers \Drupal\media\MediaStorage::doCreate
+   */
+  public function testCreateInvalidType(): void {
+    // Test that EntityStorage::create() throws an exception when called with an
+    // invalid bundle.
+    $this->expectException(EntityStorageException::class);
+    $storage = \Drupal::entityTypeManager()->getStorage('media');
+    $bundle = $this->randomMachineName();
+    $storage->create([
+      'bundle' => $bundle,
+      'name' => $bundle,
+    ]);
   }
 
 }
