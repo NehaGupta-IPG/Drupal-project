@@ -533,9 +533,9 @@ class LinkGeneratorTest extends UnitTestCase {
       ],
     ], $result);
 
-    // Render a link with route parameters and a query parameter.
+    // Render a link with route parameters and a non-ASCII query parameter.
     $url = new Url('test_route_4', ['object' => '1'], [
-      'query' => ['value' => 'example_1'],
+      'query' => ['value' => 'комацу'],
       'set_active_class' => TRUE,
     ]);
     $url->setUrlGenerator($this->urlGenerator);
@@ -543,7 +543,7 @@ class LinkGeneratorTest extends UnitTestCase {
     $this->assertLink([
       'attributes' => [
         'data-drupal-link-system-path' => 'test-route-4/1',
-        'data-drupal-link-query' => '{"value":"example_1"}',
+        'data-drupal-link-query' => '{"value":"комацу"}',
       ],
     ], $result);
   }
