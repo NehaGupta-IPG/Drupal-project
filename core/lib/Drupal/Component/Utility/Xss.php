@@ -262,7 +262,7 @@ class Xss {
     $xhtml_slash = $count ? ' /' : '';
 
     // Clean up attributes.
-    $attr2 = implode(' ', $class::attributes($attributes));
+    $attr2 = implode(' ', $class::attributes($attributes, $elem));
     $attr2 = preg_replace('/[<>]/', '', $attr2);
     $attr2 = strlen($attr2) ? ' ' . $attr2 : '';
 
@@ -274,11 +274,13 @@ class Xss {
    *
    * @param string $attributes
    *   The html attribute to process.
+   * @param string $elem
+   *   The html element to process.
    *
    * @return array
    *   Cleaned up version of the HTML attributes.
    */
-  protected static function attributes($attributes) {
+  protected static function attributes($attributes, string $elem) {
     $attributes_array = [];
     $mode = 0;
     $attribute_name = '';
@@ -298,6 +300,8 @@ class Xss {
               in_array($attribute_name, ['style', 'srcdoc']) ||
               str_starts_with($attribute_name, 'on') ||
               str_starts_with($attribute_name, '-') ||
+              // Attributes that can be used for DOM clobbering.
+              (in_array($elem, ['a', 'img']) && in_array($attribute_name, ['id', 'name'])) ||
               // Ignore long attributes to avoid unnecessary processing
               // overhead.
               strlen($attribute_name) > 96

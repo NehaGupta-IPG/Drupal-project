@@ -568,6 +568,18 @@ class XssTest extends TestCase {
         'Time with datetime attribute',
         ['time'],
       ],
+      [
+        '<a id="settings"></a><a id="settings" name="url" href="https://example.com/"></a>',
+        '<a></a><a href="https://example.com/"></a>',
+        'Link with id and name attributes',
+        ['a'],
+      ],
+      [
+        '<img name="foo" src="https://example.com/foo.jpg">',
+        '<img src="https://example.com/foo.jpg">',
+        'Img with name attribute',
+        ['img'],
+      ],
     ];
   }
 
