@@ -5,6 +5,7 @@ namespace Drupal\views\Plugin\views\area;
 use Drupal\Component\Gettext\PoItem;
 use Drupal\Component\Utility\Xss;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\views\Attribute\ViewsArea;
 use Drupal\views\Plugin\views\style\DefaultSummary;
 use Drupal\Core\StringTranslation\PluralTranslatableMarkup;
 
@@ -12,9 +13,8 @@ use Drupal\Core\StringTranslation\PluralTranslatableMarkup;
  * Views area handler to display result summary handling plural.
  *
  * @ingroup views_area_handlers
- *
- * @ViewsArea("result_plural")
  */
+#[ViewsArea("result_plural")]
 class ResultPlural extends Result {
 
   /**
