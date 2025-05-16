@@ -252,6 +252,9 @@ class MediaUiFunctionalTest extends MediaFunctionalTestBase {
 
     // Create a media type and media item.
     $media_type = $this->createMediaType('test');
+    // The bundle definition cache must be cleared so the MediaStorage will know
+    // it is a valid type.
+    $this->container->get('entity_type.bundle.info')->clearCachedBundles();
     $media = $media_storage->create([
       'bundle' => $media_type->id(),
       'name' => 'Unnamed',
