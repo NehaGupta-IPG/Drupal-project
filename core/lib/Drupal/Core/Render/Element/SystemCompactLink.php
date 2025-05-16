@@ -83,6 +83,7 @@ class SystemCompactLink extends Link {
 
     return $element;
   }
+
   public static function createInstance($pre_render, $theme_wrappers, $type, $defaults_loaded, ?ElementInfoManager $elementInfoManager = NULL) {
     if (!$elementInfoManager) {
       $elementInfoManager = \Drupal::service('element_info');
@@ -94,7 +95,7 @@ class SystemCompactLink extends Link {
     $instance->defaults_loaded = $defaults_loaded;
     return $instance;
   }
-  
+
   /**
    * {@inheritdoc}
    */

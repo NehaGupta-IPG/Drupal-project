@@ -146,6 +146,7 @@ class StatusReportPage extends RenderElementBase {
 
     return $element;
   }
+
   public static function createInstance($theme, $pre_render, $type, $defaults_loaded, ?ElementInfoManager $elementInfoManager = NULL) {
     if (!$elementInfoManager) {
       $elementInfoManager = \Drupal::service('element_info');
@@ -157,7 +158,7 @@ class StatusReportPage extends RenderElementBase {
     $instance->defaults_loaded = $defaults_loaded;
     return $instance;
   }
-  
+
   /**
    * {@inheritdoc}
    */

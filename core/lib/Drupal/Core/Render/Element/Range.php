@@ -30,21 +30,22 @@ use Drupal\Core\Render\ElementInfoManager;
 #[FormElement('range')]
 class Range extends Number {
 
-  
+
   /**
    * @var mixed Automatically converted property
    */
   public $min;
-  
+
   /**
    * @var mixed Automatically converted property
    */
   public $max;
-  
+
   /**
    * @var mixed Automatically converted property
    */
   public $step;
+
   /**
    * {@inheritdoc}
    */
@@ -95,6 +96,7 @@ class Range extends Number {
       return $element['#min'] + $offset;
     }
   }
+
   public static function createInstance($min, $max, $pre_render, $theme, $input, $step, $process, $element_validate, $theme_wrappers, $value_callback, $type, $defaults_loaded, ?ElementInfoManager $elementInfoManager = NULL) {
     if (!$elementInfoManager) {
       $elementInfoManager = \Drupal::service('element_info');
@@ -114,7 +116,7 @@ class Range extends Number {
     $instance->defaults_loaded = $defaults_loaded;
     return $instance;
   }
-  
+
   /**
    * {@inheritdoc}
    */

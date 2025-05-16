@@ -15,11 +15,12 @@ use Drupal\Core\Render\ElementInfoManager;
 #[RenderElement('contextual_links')]
 class ContextualLinks extends RenderElementBase {
 
-  
+
   /**
    * @var mixed Automatically converted property
    */
   public $links;
+
   /**
    * {@inheritdoc}
    */
@@ -122,6 +123,7 @@ class ContextualLinks extends RenderElementBase {
   protected static function moduleHandler() {
     return \Drupal::moduleHandler();
   }
+
   public static function createInstance($pre_render, $theme, $links, $attributes, $attached, $type, $defaults_loaded, ?ElementInfoManager $elementInfoManager = NULL) {
     if (!$elementInfoManager) {
       $elementInfoManager = \Drupal::service('element_info');
@@ -136,7 +138,7 @@ class ContextualLinks extends RenderElementBase {
     $instance->defaults_loaded = $defaults_loaded;
     return $instance;
   }
-  
+
   /**
    * {@inheritdoc}
    */

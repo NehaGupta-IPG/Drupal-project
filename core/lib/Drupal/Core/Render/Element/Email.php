@@ -6,8 +6,6 @@ use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Render\Attribute\FormElement;
 use Drupal\Core\Render\Element;
 use Drupal\Core\Render\ElementInfoManager;
-use Drupal\Core\Render\Element\ProcessAutocompleteTrait;
-use Drupal\Core\Render\Element\ProcessPatternTrait;
 
 /**
  * Provides a form input element for entering an email address.
@@ -33,12 +31,12 @@ class Email extends FormElementBase {
 
   use ProcessPatternTrait;
   use ProcessAutocompleteTrait;
-  
+
   /**
    * @var mixed Automatically converted property
    */
   public $size;
-  
+
   /**
    * @var mixed Automatically converted property
    */
@@ -113,6 +111,7 @@ class Email extends FormElementBase {
     static::setAttributes($element, ['form-email']);
     return $element;
   }
+
   public static function createInstance($input, $size, $maxlength, $autocomplete_route_name, $process, $element_validate, $pre_render, $theme, $theme_wrappers, $value_callback, $type, $defaults_loaded, ?ElementInfoManager $elementInfoManager = NULL) {
     if (!$elementInfoManager) {
       $elementInfoManager = \Drupal::service('element_info');
@@ -132,7 +131,7 @@ class Email extends FormElementBase {
     $instance->defaults_loaded = $defaults_loaded;
     return $instance;
   }
-  
+
   /**
    * {@inheritdoc}
    */

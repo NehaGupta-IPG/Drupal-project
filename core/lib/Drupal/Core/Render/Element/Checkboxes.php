@@ -38,7 +38,6 @@ use Drupal\Core\Render\ElementInfoManager;
 class Checkboxes extends FormElementBase {
 
   use CompositeFormElementTrait;
-  
 
   /**
    * {@inheritdoc}
@@ -182,6 +181,7 @@ class Checkboxes extends FormElementBase {
   public static function detectEmptyCheckboxes(array $input) {
     return empty(static::getCheckedCheckboxes($input));
   }
+
   public static function createInstance($input, $process, $pre_render, $theme_wrappers, $value_callback, $type, $defaults_loaded, ?ElementInfoManager $elementInfoManager = NULL) {
     if (!$elementInfoManager) {
       $elementInfoManager = \Drupal::service('element_info');
@@ -196,7 +196,7 @@ class Checkboxes extends FormElementBase {
     $instance->defaults_loaded = $defaults_loaded;
     return $instance;
   }
-  
+
   /**
    * {@inheritdoc}
    */

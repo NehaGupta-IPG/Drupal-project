@@ -123,6 +123,7 @@ class PasswordConfirm extends FormElementBase {
 
     return $element;
   }
+
   public static function createInstance($input, $markup, $process, $theme_wrappers, $value_callback, $type, $defaults_loaded, ?ElementInfoManager $elementInfoManager = NULL) {
     if (!$elementInfoManager) {
       $elementInfoManager = \Drupal::service('element_info');
@@ -137,7 +138,7 @@ class PasswordConfirm extends FormElementBase {
     $instance->defaults_loaded = $defaults_loaded;
     return $instance;
   }
-  
+
   /**
    * {@inheritdoc}
    */

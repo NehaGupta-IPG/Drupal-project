@@ -27,16 +27,17 @@ use Drupal\Core\Render\ElementInfoManager;
 #[RenderElement('inline_template')]
 class InlineTemplate extends RenderElementBase {
 
-  
+
   /**
    * @var mixed Automatically converted property
    */
   public $template;
-  
+
   /**
    * @var mixed Automatically converted property
    */
   public $context;
+
   /**
    * {@inheritdoc}
    */
@@ -66,6 +67,7 @@ class InlineTemplate extends RenderElementBase {
     $element['#markup'] = $markup;
     return $element;
   }
+
   public static function createInstance($pre_render, $template, $context, $type, $defaults_loaded, ?ElementInfoManager $elementInfoManager = NULL) {
     if (!$elementInfoManager) {
       $elementInfoManager = \Drupal::service('element_info');
@@ -78,7 +80,7 @@ class InlineTemplate extends RenderElementBase {
     $instance->defaults_loaded = $defaults_loaded;
     return $instance;
   }
-  
+
   /**
    * {@inheritdoc}
    */

@@ -50,11 +50,12 @@ use Drupal\Core\Render\ElementInfoManager;
 #[FormElement('vertical_tabs')]
 class VerticalTabs extends RenderElementBase {
 
-  
+
   /**
    * @var mixed Automatically converted property
    */
   public $default_tab;
+
   /**
    * {@inheritdoc}
    */
@@ -144,6 +145,7 @@ class VerticalTabs extends RenderElementBase {
 
     return $element;
   }
+
   public static function createInstance($default_tab, $process, $pre_render, $theme_wrappers, $type, $defaults_loaded, ?ElementInfoManager $elementInfoManager = NULL) {
     if (!$elementInfoManager) {
       $elementInfoManager = \Drupal::service('element_info');
@@ -157,7 +159,7 @@ class VerticalTabs extends RenderElementBase {
     $instance->defaults_loaded = $defaults_loaded;
     return $instance;
   }
-  
+
   /**
    * {@inheritdoc}
    */

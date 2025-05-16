@@ -18,26 +18,27 @@ use Drupal\Core\Render\ElementInfoManager;
 #[RenderElement('processed_text')]
 class ProcessedText extends RenderElementBase {
 
-  
+
   /**
    * @var mixed Automatically converted property
    */
   public $text;
-  
+
   /**
    * @var mixed Automatically converted property
    */
   public $format;
-  
+
   /**
    * @var mixed Automatically converted property
    */
   public $filter_types_to_skip;
-  
+
   /**
    * @var mixed Automatically converted property
    */
   public $langcode;
+
   /**
    * {@inheritdoc}
    */
@@ -183,6 +184,7 @@ class ProcessedText extends RenderElementBase {
   protected static function configFactory() {
     return \Drupal::configFactory();
   }
+
   public static function createInstance($text, $format, $filter_types_to_skip, $langcode, $pre_render, $type, $defaults_loaded, ?ElementInfoManager $elementInfoManager = NULL) {
     if (!$elementInfoManager) {
       $elementInfoManager = \Drupal::service('element_info');
@@ -197,7 +199,7 @@ class ProcessedText extends RenderElementBase {
     $instance->defaults_loaded = $defaults_loaded;
     return $instance;
   }
-  
+
   /**
    * {@inheritdoc}
    */

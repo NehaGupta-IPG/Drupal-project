@@ -5,7 +5,6 @@ namespace Drupal\Core\Render\Element;
 use Drupal\Core\Render\Attribute\FormElement;
 use Drupal\Core\Render\Element;
 use Drupal\Core\Render\ElementInfoManager;
-use Drupal\Core\Render\Element\ProcessAutocompleteTrait;
 
 /**
  * Provides an HTML5 input element with type of "search".
@@ -24,16 +23,17 @@ use Drupal\Core\Render\Element\ProcessAutocompleteTrait;
 class Search extends FormElementBase {
 
   use ProcessAutocompleteTrait;
-  
+
   /**
    * @var mixed Automatically converted property
    */
   public $size;
-  
+
   /**
    * @var mixed Automatically converted property
    */
   public $maxlength;
+
   /**
    * {@inheritdoc}
    */
@@ -73,6 +73,7 @@ class Search extends FormElementBase {
 
     return $element;
   }
+
   public static function createInstance($input, $size, $maxlength, $autocomplete_route_name, $process, $pre_render, $theme, $theme_wrappers, $value_callback, $type, $defaults_loaded, ?ElementInfoManager $elementInfoManager = NULL) {
     if (!$elementInfoManager) {
       $elementInfoManager = \Drupal::service('element_info');
@@ -91,7 +92,7 @@ class Search extends FormElementBase {
     $instance->defaults_loaded = $defaults_loaded;
     return $instance;
   }
-  
+
   /**
    * {@inheritdoc}
    */

@@ -82,6 +82,7 @@ class Dropbutton extends RenderElementBase {
 
     return $element;
   }
+
   public static function createInstance($pre_render, $theme, $type, $defaults_loaded, ?ElementInfoManager $elementInfoManager = NULL) {
     if (!$elementInfoManager) {
       $elementInfoManager = \Drupal::service('element_info');
@@ -93,7 +94,7 @@ class Dropbutton extends RenderElementBase {
     $instance->defaults_loaded = $defaults_loaded;
     return $instance;
   }
-  
+
   /**
    * {@inheritdoc}
    */

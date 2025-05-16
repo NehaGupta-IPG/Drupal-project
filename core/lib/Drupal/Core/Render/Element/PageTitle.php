@@ -24,6 +24,7 @@ class PageTitle extends RenderElementBase {
       '#title' => NULL,
     ];
   }
+
   public static function createInstance($theme, $title, $type, $defaults_loaded, ?ElementInfoManager $elementInfoManager = NULL) {
     if (!$elementInfoManager) {
       $elementInfoManager = \Drupal::service('element_info');
@@ -35,7 +36,7 @@ class PageTitle extends RenderElementBase {
     $instance->defaults_loaded = $defaults_loaded;
     return $instance;
   }
-  
+
   /**
    * {@inheritdoc}
    */

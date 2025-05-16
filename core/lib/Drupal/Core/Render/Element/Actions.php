@@ -116,6 +116,7 @@ class Actions extends Container {
     //   fancy sorting/injection algorithm here.
     return $dropbuttons + $element;
   }
+
   public static function createInstance($process, $weight, $theme_wrappers, $type, $defaults_loaded, ?ElementInfoManager $elementInfoManager = NULL) {
     if (!$elementInfoManager) {
       $elementInfoManager = \Drupal::service('element_info');
@@ -128,7 +129,7 @@ class Actions extends Container {
     $instance->defaults_loaded = $defaults_loaded;
     return $instance;
   }
-  
+
   /**
    * {@inheritdoc}
    */

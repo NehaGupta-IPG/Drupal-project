@@ -29,11 +29,12 @@ use Drupal\Core\Render\ElementInfoManager;
 #[FormElement('weight')]
 class Weight extends FormElementBase {
 
-  
+
   /**
    * @var mixed Automatically converted property
    */
   public $delta;
+
   /**
    * {@inheritdoc}
    */
@@ -78,6 +79,7 @@ class Weight extends FormElementBase {
 
     return $element;
   }
+
   public static function createInstance($input, $delta, $default_value, $process, $value_callback, $type, $defaults_loaded, ?ElementInfoManager $elementInfoManager = NULL) {
     if (!$elementInfoManager) {
       $elementInfoManager = \Drupal::service('element_info');
@@ -92,7 +94,7 @@ class Weight extends FormElementBase {
     $instance->defaults_loaded = $defaults_loaded;
     return $instance;
   }
-  
+
   /**
    * {@inheritdoc}
    */

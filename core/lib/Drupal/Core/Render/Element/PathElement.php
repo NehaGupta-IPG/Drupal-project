@@ -5,8 +5,6 @@ namespace Drupal\Core\Render\Element;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Render\Attribute\FormElement;
 use Drupal\Core\Render\ElementInfoManager;
-use Drupal\Core\Render\Element\ProcessAutocompleteTrait;
-use Drupal\Core\Render\Element\ProcessPatternTrait;
 
 /**
  * Provides a matched path render element.
@@ -20,22 +18,22 @@ class PathElement extends Textfield {
 
   use ProcessPatternTrait;
   use ProcessAutocompleteTrait;
-  
+
   /**
    * @var mixed Automatically converted property
    */
   public $size;
-  
+
   /**
    * @var mixed Automatically converted property
    */
   public $maxlength;
-  
+
   /**
    * @var mixed Automatically converted property
    */
   public $validate_path;
-  
+
   /**
    * @var mixed Automatically converted property
    */
@@ -113,6 +111,7 @@ class PathElement extends Textfield {
       ]));
     }
   }
+
   public static function createInstance($input, $size, $maxlength, $autocomplete_route_name, $process, $pre_render, $theme, $theme_wrappers, $validate_path, $convert_path, $element_validate, $value_callback, $type, $defaults_loaded, ?ElementInfoManager $elementInfoManager = NULL) {
     if (!$elementInfoManager) {
       $elementInfoManager = \Drupal::service('element_info');
@@ -134,7 +133,7 @@ class PathElement extends Textfield {
     $instance->defaults_loaded = $defaults_loaded;
     return $instance;
   }
-  
+
   /**
    * {@inheritdoc}
    */

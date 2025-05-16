@@ -112,51 +112,52 @@ use Drupal\Core\Render\ElementInfoManager;
 #[FormElement('table')]
 class Table extends FormElementBase {
 
-  
+
   /**
    * @var mixed Automatically converted property
    */
   public $header;
-  
+
   /**
    * @var mixed Automatically converted property
    */
   public $rows;
-  
+
   /**
    * @var mixed Automatically converted property
    */
   public $empty;
-  
+
   /**
    * @var mixed Automatically converted property
    */
   public $tableselect;
-  
+
   /**
    * @var mixed Automatically converted property
    */
   public $sticky;
-  
+
   /**
    * @var mixed Automatically converted property
    */
   public $responsive;
-  
+
   /**
    * @var mixed Automatically converted property
    */
   public $multiple;
-  
+
   /**
    * @var mixed Automatically converted property
    */
   public $js_select;
-  
+
   /**
    * @var mixed Automatically converted property
    */
   public $tabledrag;
+
   /**
    * {@inheritdoc}
    */
@@ -500,6 +501,7 @@ class Table extends FormElementBase {
 
     return $element;
   }
+
   public static function createInstance($header, $rows, $empty, $input, $tree, $tableselect, $sticky, $responsive, $multiple, $js_select, $process, $element_validate, $tabledrag, $pre_render, $theme, $value_callback, $type, $defaults_loaded, ?ElementInfoManager $elementInfoManager = NULL) {
     if (!$elementInfoManager) {
       $elementInfoManager = \Drupal::service('element_info');
@@ -525,7 +527,7 @@ class Table extends FormElementBase {
     $instance->defaults_loaded = $defaults_loaded;
     return $instance;
   }
-  
+
   /**
    * {@inheritdoc}
    */

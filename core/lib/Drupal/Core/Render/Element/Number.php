@@ -33,11 +33,12 @@ use Drupal\Core\Render\ElementInfoManager;
 #[FormElement('number')]
 class Number extends FormElementBase {
 
-  
+
   /**
    * @var mixed Automatically converted property
    */
   public $step;
+
   /**
    * {@inheritdoc}
    */
@@ -123,6 +124,7 @@ class Number extends FormElementBase {
 
     return $element;
   }
+
   public static function createInstance($input, $step, $process, $element_validate, $pre_render, $theme, $theme_wrappers, $value_callback, $type, $defaults_loaded, ?ElementInfoManager $elementInfoManager = NULL) {
     if (!$elementInfoManager) {
       $elementInfoManager = \Drupal::service('element_info');
@@ -140,7 +142,7 @@ class Number extends FormElementBase {
     $instance->defaults_loaded = $defaults_loaded;
     return $instance;
   }
-  
+
   /**
    * {@inheritdoc}
    */

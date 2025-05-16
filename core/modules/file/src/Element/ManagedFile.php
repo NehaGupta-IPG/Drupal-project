@@ -25,46 +25,47 @@ use Drupal\Core\Render\ElementInfoManager;
 #[FormElement('managed_file')]
 class ManagedFile extends FormElementBase {
 
-  
+
   /**
    * @var mixed Automatically converted property
    */
   public $progress_indicator;
-  
+
   /**
    * @var mixed Automatically converted property
    */
   public $progress_message;
-  
+
   /**
    * @var mixed Automatically converted property
    */
   public $upload_validators;
-  
+
   /**
    * @var mixed Automatically converted property
    */
   public $upload_location;
-  
+
   /**
    * @var mixed Automatically converted property
    */
   public $size;
-  
+
   /**
    * @var mixed Automatically converted property
    */
   public $multiple;
-  
+
   /**
    * @var mixed Automatically converted property
    */
   public $extended;
-  
+
   /**
    * @var mixed Automatically converted property
    */
   public $accept;
+
   /**
    * {@inheritdoc}
    */
@@ -511,6 +512,7 @@ class ManagedFile extends FormElementBase {
   protected static function fileUsage() {
     return \Drupal::service('file.usage');
   }
+
   public static function createInstance($input, $process, $element_validate, $pre_render, $theme, $theme_wrappers, $progress_indicator, $progress_message, $upload_validators, $upload_location, $size, $multiple, $extended, $attached, $accept, $value_callback, $type, $defaults_loaded, ?ElementInfoManager $elementInfoManager = NULL) {
     if (!$elementInfoManager) {
       $elementInfoManager = \Drupal::service('element_info');
@@ -536,7 +538,7 @@ class ManagedFile extends FormElementBase {
     $instance->defaults_loaded = $defaults_loaded;
     return $instance;
   }
-  
+
   /**
    * {@inheritdoc}
    */

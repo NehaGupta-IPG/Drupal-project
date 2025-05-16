@@ -37,11 +37,12 @@ use Drupal\Core\Render\ElementInfoManager;
 #[FormElement('date')]
 class Date extends FormElementBase {
 
-  
+
   /**
    * @var mixed Automatically converted property
    */
   public $date_date_format;
+
   /**
    * {@inheritdoc}
    */
@@ -85,6 +86,7 @@ class Date extends FormElementBase {
 
     return $element;
   }
+
   public static function createInstance($input, $theme, $process, $pre_render, $theme_wrappers, $attributes, $date_date_format, $value_callback, $type, $defaults_loaded, ?ElementInfoManager $elementInfoManager = NULL) {
     if (!$elementInfoManager) {
       $elementInfoManager = \Drupal::service('element_info');
@@ -102,7 +104,7 @@ class Date extends FormElementBase {
     $instance->defaults_loaded = $defaults_loaded;
     return $instance;
   }
-  
+
   /**
    * {@inheritdoc}
    */

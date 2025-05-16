@@ -35,36 +35,37 @@ use Drupal\Core\Render\ElementInfoManager;
 #[RenderElement('pager')]
 class Pager extends RenderElementBase {
 
-  
+
   /**
    * @var mixed Automatically converted property
    */
   public $element;
-  
+
   /**
    * @var mixed Automatically converted property
    */
   public $pagination_heading_level;
-  
+
   /**
    * @var mixed Automatically converted property
    */
   public $parameters;
-  
+
   /**
    * @var mixed Automatically converted property
    */
   public $quantity;
-  
+
   /**
    * @var mixed Automatically converted property
    */
   public $tags;
-  
+
   /**
    * @var mixed Automatically converted property
    */
   public $route_name;
+
   /**
    * {@inheritdoc}
    */
@@ -114,6 +115,7 @@ class Pager extends RenderElementBase {
     $pager['#cache']['contexts'][] = 'url.query_args.pagers:' . $pager['#element'];
     return $pager;
   }
+
   public static function createInstance($pre_render, $theme, $element, $pagination_heading_level, $parameters, $quantity, $tags, $route_name, $type, $defaults_loaded, ?ElementInfoManager $elementInfoManager = NULL) {
     if (!$elementInfoManager) {
       $elementInfoManager = \Drupal::service('element_info');
@@ -131,7 +133,7 @@ class Pager extends RenderElementBase {
     $instance->defaults_loaded = $defaults_loaded;
     return $instance;
   }
-  
+
   /**
    * {@inheritdoc}
    */

@@ -25,6 +25,7 @@ class Operations extends Dropbutton {
       '#theme' => 'links__dropbutton__operations',
     ] + parent::getInfo();
   }
+
   public static function createInstance($theme, $pre_render, $type, $defaults_loaded, ?ElementInfoManager $elementInfoManager = NULL) {
     if (!$elementInfoManager) {
       $elementInfoManager = \Drupal::service('element_info');
@@ -36,7 +37,7 @@ class Operations extends Dropbutton {
     $instance->defaults_loaded = $defaults_loaded;
     return $instance;
   }
-  
+
   /**
    * {@inheritdoc}
    */

@@ -46,11 +46,12 @@ use Drupal\Core\Render\ElementInfoManager;
 #[RenderElement('container')]
 class Container extends RenderElementBase {
 
-  
+
   /**
    * @var mixed Automatically converted property
    */
   public $optional;
+
   /**
    * {@inheritdoc}
    */
@@ -108,6 +109,7 @@ class Container extends RenderElementBase {
     }
     return $element;
   }
+
   public static function createInstance($optional, $process, $pre_render, $theme_wrappers, $type, $defaults_loaded, ?ElementInfoManager $elementInfoManager = NULL) {
     if (!$elementInfoManager) {
       $elementInfoManager = \Drupal::service('element_info');
@@ -121,7 +123,7 @@ class Container extends RenderElementBase {
     $instance->defaults_loaded = $defaults_loaded;
     return $instance;
   }
-  
+
   /**
    * {@inheritdoc}
    */

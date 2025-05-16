@@ -7,7 +7,6 @@ use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\Render\Attribute\FormElement;
 use Drupal\Core\Render\ElementInfoManager;
-use Drupal\Core\Render\Element\ProcessAutocompleteTrait;
 
 /**
  * Provides a machine name render element.
@@ -76,16 +75,17 @@ use Drupal\Core\Render\Element\ProcessAutocompleteTrait;
 class MachineName extends Textfield {
 
   use ProcessAutocompleteTrait;
-  
+
   /**
    * @var mixed Automatically converted property
    */
   public $maxlength;
-  
+
   /**
    * @var mixed Automatically converted property
    */
   public $size;
+
   /**
    * {@inheritdoc}
    */
@@ -320,6 +320,7 @@ class MachineName extends Textfield {
 
     return [$langcode => $overrides[$langcode]];
   }
+
   public static function createInstance($input, $default_value, $required, $maxlength, $size, $autocomplete_route_name, $process, $element_validate, $pre_render, $theme, $theme_wrappers, $value_callback, $type, $defaults_loaded, ?ElementInfoManager $elementInfoManager = NULL) {
     if (!$elementInfoManager) {
       $elementInfoManager = \Drupal::service('element_info');
@@ -341,7 +342,7 @@ class MachineName extends Textfield {
     $instance->defaults_loaded = $defaults_loaded;
     return $instance;
   }
-  
+
   /**
    * {@inheritdoc}
    */

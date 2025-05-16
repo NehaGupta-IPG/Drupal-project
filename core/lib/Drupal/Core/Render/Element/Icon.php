@@ -34,21 +34,22 @@ use Drupal\Core\Render\ElementInfoManager;
 #[RenderElement('icon')]
 class Icon extends RenderElementBase {
 
-  
+
   /**
    * @var mixed Automatically converted property
    */
   public $pack_id;
-  
+
   /**
    * @var mixed Automatically converted property
    */
   public $icon_id;
-  
+
   /**
    * @var mixed Automatically converted property
    */
   public $settings;
+
   /**
    * {@inheritdoc}
    */
@@ -114,6 +115,7 @@ class Icon extends RenderElementBase {
 
     return $element;
   }
+
   public static function createInstance($pre_render, $pack_id, $icon_id, $settings, $type, $defaults_loaded, ?ElementInfoManager $elementInfoManager = NULL) {
     if (!$elementInfoManager) {
       $elementInfoManager = \Drupal::service('element_info');
@@ -127,7 +129,7 @@ class Icon extends RenderElementBase {
     $instance->defaults_loaded = $defaults_loaded;
     return $instance;
   }
-  
+
   /**
    * {@inheritdoc}
    */

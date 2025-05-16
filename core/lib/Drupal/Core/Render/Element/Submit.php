@@ -30,21 +30,22 @@ use Drupal\Core\Render\ElementInfoManager;
 #[FormElement('submit')]
 class Submit extends Button {
 
-  
+
   /**
    * @var mixed Automatically converted property
    */
   public $executes_submit_callback;
-  
+
   /**
    * @var mixed Automatically converted property
    */
   public $submit_button;
-  
+
   /**
    * @var mixed Automatically converted property
    */
   public $limit_validation_errors;
+
   /**
    * {@inheritdoc}
    */
@@ -53,6 +54,7 @@ class Submit extends Button {
       '#executes_submit_callback' => TRUE,
     ] + parent::getInfo();
   }
+
   public static function createInstance($executes_submit_callback, $input, $name, $is_button, $submit_button, $limit_validation_errors, $process, $pre_render, $theme_wrappers, $value_callback, $type, $defaults_loaded, ?ElementInfoManager $elementInfoManager = NULL) {
     if (!$elementInfoManager) {
       $elementInfoManager = \Drupal::service('element_info');
@@ -72,7 +74,7 @@ class Submit extends Button {
     $instance->defaults_loaded = $defaults_loaded;
     return $instance;
   }
-  
+
   /**
    * {@inheritdoc}
    */

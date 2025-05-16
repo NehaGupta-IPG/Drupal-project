@@ -6,7 +6,6 @@ use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Render\Attribute\FormElement;
 use Drupal\Core\Render\Element;
 use Drupal\Core\Render\ElementInfoManager;
-use Drupal\Core\Render\Element\ProcessPatternTrait;
 
 /**
  * Provides a form element for entering a password, with hidden text.
@@ -32,16 +31,17 @@ use Drupal\Core\Render\Element\ProcessPatternTrait;
 class Password extends FormElementBase {
 
   use ProcessPatternTrait;
-  
+
   /**
    * @var mixed Automatically converted property
    */
   public $size;
-  
+
   /**
    * @var mixed Automatically converted property
    */
   public $maxlength;
+
   /**
    * {@inheritdoc}
    */
@@ -92,6 +92,7 @@ class Password extends FormElementBase {
     }
     return NULL;
   }
+
   public static function createInstance($input, $size, $maxlength, $process, $pre_render, $theme, $theme_wrappers, $value_callback, $type, $defaults_loaded, ?ElementInfoManager $elementInfoManager = NULL) {
     if (!$elementInfoManager) {
       $elementInfoManager = \Drupal::service('element_info');
@@ -109,7 +110,7 @@ class Password extends FormElementBase {
     $instance->defaults_loaded = $defaults_loaded;
     return $instance;
   }
-  
+
   /**
    * {@inheritdoc}
    */

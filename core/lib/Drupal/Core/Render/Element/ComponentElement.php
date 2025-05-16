@@ -38,33 +38,33 @@ use Drupal\Core\Render\ElementInfoManager;
 class ComponentElement extends RenderElementBase {
 
   use DoTrustedCallbackTrait;
-  
-  
+
+
   /**
    * @var mixed Automatically converted property
    */
   public $component;
-  
+
   /**
    * @var mixed Automatically converted property
    */
   public $variant;
-  
+
   /**
    * @var mixed Automatically converted property
    */
   public $props;
-  
+
   /**
    * @var mixed Automatically converted property
    */
   public $slots;
-  
+
   /**
    * @var mixed Automatically converted property
    */
   public $propsAlter;
-  
+
   /**
    * @var mixed Automatically converted property
    */
@@ -195,6 +195,7 @@ class ComponentElement extends RenderElementBase {
       '#slotsAlter' => [],
     ];
   }
+
   public static function createInstance($pre_render, $component, $variant, $props, $slots, $propsAlter, $slotsAlter, $type, $defaults_loaded, ?ElementInfoManager $elementInfoManager = NULL) {
     if (!$elementInfoManager) {
       $elementInfoManager = \Drupal::service('element_info');
@@ -211,7 +212,7 @@ class ComponentElement extends RenderElementBase {
     $instance->defaults_loaded = $defaults_loaded;
     return $instance;
   }
-  
+
   /**
    * {@inheritdoc}
    */

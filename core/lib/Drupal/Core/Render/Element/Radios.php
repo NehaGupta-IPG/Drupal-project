@@ -38,7 +38,6 @@ use Drupal\Core\Render\ElementInfoManager;
 class Radios extends FormElementBase {
 
   use CompositeFormElementTrait;
-  
 
   /**
    * {@inheritdoc}
@@ -122,6 +121,7 @@ class Radios extends FormElementBase {
       return $value;
     }
   }
+
   public static function createInstance($input, $process, $theme_wrappers, $pre_render, $value_callback, $type, $defaults_loaded, ?ElementInfoManager $elementInfoManager = NULL) {
     if (!$elementInfoManager) {
       $elementInfoManager = \Drupal::service('element_info');
@@ -136,7 +136,7 @@ class Radios extends FormElementBase {
     $instance->defaults_loaded = $defaults_loaded;
     return $instance;
   }
-  
+
   /**
    * {@inheritdoc}
    */

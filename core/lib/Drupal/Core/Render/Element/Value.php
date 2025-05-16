@@ -31,6 +31,7 @@ class Value extends FormElementBase {
       '#input' => TRUE,
     ];
   }
+
   public static function createInstance($input, $value_callback, $type, $defaults_loaded, ?ElementInfoManager $elementInfoManager = NULL) {
     if (!$elementInfoManager) {
       $elementInfoManager = \Drupal::service('element_info');
@@ -42,7 +43,7 @@ class Value extends FormElementBase {
     $instance->defaults_loaded = $defaults_loaded;
     return $instance;
   }
-  
+
   /**
    * {@inheritdoc}
    */

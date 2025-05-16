@@ -24,16 +24,17 @@ use Drupal\Core\Render\ElementInfoManager;
 #[FormElement('file')]
 class File extends FormElementBase {
 
-  
+
   /**
    * @var mixed Automatically converted property
    */
   public $multiple;
-  
+
   /**
    * @var mixed Automatically converted property
    */
   public $size;
+
   /**
    * {@inheritdoc}
    */
@@ -107,6 +108,7 @@ class File extends FormElementBase {
     }
     return NULL;
   }
+
   public static function createInstance($input, $multiple, $process, $size, $pre_render, $theme, $theme_wrappers, $value_callback, $type, $defaults_loaded, ?ElementInfoManager $elementInfoManager = NULL) {
     if (!$elementInfoManager) {
       $elementInfoManager = \Drupal::service('element_info');
@@ -124,7 +126,7 @@ class File extends FormElementBase {
     $instance->defaults_loaded = $defaults_loaded;
     return $instance;
   }
-  
+
   /**
    * {@inheritdoc}
    */

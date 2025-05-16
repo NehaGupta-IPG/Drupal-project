@@ -30,21 +30,22 @@ use Drupal\Core\Render\ElementInfoManager;
 #[FormElement('textarea')]
 class Textarea extends FormElementBase {
 
-  
+
   /**
    * @var mixed Automatically converted property
    */
   public $cols;
-  
+
   /**
    * @var mixed Automatically converted property
    */
   public $rows;
-  
+
   /**
    * @var mixed Automatically converted property
    */
   public $resizable;
+
   /**
    * {@inheritdoc}
    */
@@ -86,6 +87,7 @@ class Textarea extends FormElementBase {
     }
     return NULL;
   }
+
   public static function createInstance($input, $cols, $rows, $resizable, $process, $pre_render, $theme, $theme_wrappers, $value_callback, $type, $defaults_loaded, ?ElementInfoManager $elementInfoManager = NULL) {
     if (!$elementInfoManager) {
       $elementInfoManager = \Drupal::service('element_info');
@@ -104,7 +106,7 @@ class Textarea extends FormElementBase {
     $instance->defaults_loaded = $defaults_loaded;
     return $instance;
   }
-  
+
   /**
    * {@inheritdoc}
    */

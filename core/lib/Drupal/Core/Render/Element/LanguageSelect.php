@@ -27,6 +27,7 @@ class LanguageSelect extends FormElementBase {
       '#default_value' => LanguageInterface::LANGCODE_NOT_SPECIFIED,
     ];
   }
+
   public static function createInstance($input, $default_value, $value_callback, $type, $defaults_loaded, ?ElementInfoManager $elementInfoManager = NULL) {
     if (!$elementInfoManager) {
       $elementInfoManager = \Drupal::service('element_info');
@@ -39,7 +40,7 @@ class LanguageSelect extends FormElementBase {
     $instance->defaults_loaded = $defaults_loaded;
     return $instance;
   }
-  
+
   /**
    * {@inheritdoc}
    */

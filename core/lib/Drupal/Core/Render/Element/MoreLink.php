@@ -38,6 +38,7 @@ class MoreLink extends Link {
       ],
     ] + $info;
   }
+
   public static function createInstance($title, $theme_wrappers, $pre_render, $type, $defaults_loaded, ?ElementInfoManager $elementInfoManager = NULL) {
     if (!$elementInfoManager) {
       $elementInfoManager = \Drupal::service('element_info');
@@ -50,7 +51,7 @@ class MoreLink extends Link {
     $instance->defaults_loaded = $defaults_loaded;
     return $instance;
   }
-  
+
   /**
    * {@inheritdoc}
    */

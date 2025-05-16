@@ -19,6 +19,7 @@ class Html extends RenderElementBase {
       '#theme' => 'html',
     ];
   }
+
   public static function createInstance($theme, $type, $defaults_loaded, ?ElementInfoManager $elementInfoManager = NULL) {
     if (!$elementInfoManager) {
       $elementInfoManager = \Drupal::service('element_info');
@@ -29,7 +30,7 @@ class Html extends RenderElementBase {
     $instance->defaults_loaded = $defaults_loaded;
     return $instance;
   }
-  
+
   /**
    * {@inheritdoc}
    */

@@ -39,16 +39,17 @@ use Drupal\Core\Render\ElementInfoManager;
 #[RenderElement('details')]
 class Details extends RenderElementBase {
 
-  
+
   /**
    * @var mixed Automatically converted property
    */
   public $open;
-  
+
   /**
    * @var mixed Automatically converted property
    */
   public $summary_attributes;
+
   /**
    * {@inheritdoc}
    */
@@ -104,6 +105,7 @@ class Details extends RenderElementBase {
 
     return $element;
   }
+
   public static function createInstance($open, $summary_attributes, $value, $process, $pre_render, $theme_wrappers, $type, $defaults_loaded, ?ElementInfoManager $elementInfoManager = NULL) {
     if (!$elementInfoManager) {
       $elementInfoManager = \Drupal::service('element_info');
@@ -119,7 +121,7 @@ class Details extends RenderElementBase {
     $instance->defaults_loaded = $defaults_loaded;
     return $instance;
   }
-  
+
   /**
    * {@inheritdoc}
    */

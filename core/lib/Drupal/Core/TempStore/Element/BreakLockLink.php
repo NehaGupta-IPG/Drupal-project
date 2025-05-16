@@ -133,6 +133,7 @@ class BreakLockLink extends RenderElementBase implements ContainerFactoryPluginI
     }
     return $element;
   }
+
   public static function createInstance($pre_render, $type, $defaults_loaded, ?ElementInfoManager $elementInfoManager = NULL) {
     if (!$elementInfoManager) {
       $elementInfoManager = \Drupal::service('element_info');
@@ -143,7 +144,7 @@ class BreakLockLink extends RenderElementBase implements ContainerFactoryPluginI
     $instance->defaults_loaded = $defaults_loaded;
     return $instance;
   }
-  
+
   /**
    * {@inheritdoc}
    */

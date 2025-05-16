@@ -72,51 +72,52 @@ class EntityAutocomplete extends Textfield {
 
   use ProcessPatternTrait;
   use ProcessAutocompleteTrait;
-  
+
   /**
    * @var mixed Automatically converted property
    */
   public $size;
-  
+
   /**
    * @var mixed Automatically converted property
    */
   public $maxlength;
-  
+
   /**
    * @var mixed Automatically converted property
    */
   public $target_type;
-  
+
   /**
    * @var mixed Automatically converted property
    */
   public $selection_handler;
-  
+
   /**
    * @var mixed Automatically converted property
    */
   public $selection_settings;
-  
+
   /**
    * @var mixed Automatically converted property
    */
   public $tags;
-  
+
   /**
    * @var mixed Automatically converted property
    */
   public $autocreate;
-  
+
   /**
    * @var mixed Automatically converted property
    */
   public $validate_reference;
-  
+
   /**
    * @var mixed Automatically converted property
    */
   public $process_default_value;
+
   /**
    * {@inheritdoc}
    */
@@ -471,6 +472,7 @@ class EntityAutocomplete extends Textfield {
 
     return $match;
   }
+
   public static function createInstance($input, $size, $maxlength, $autocomplete_route_name, $process, $pre_render, $theme, $theme_wrappers, $target_type, $selection_handler, $selection_settings, $tags, $autocreate, $validate_reference, $process_default_value, $element_validate, $value_callback, $type, $defaults_loaded, ?ElementInfoManager $elementInfoManager = NULL) {
     if (!$elementInfoManager) {
       $elementInfoManager = \Drupal::service('element_info');
@@ -497,7 +499,7 @@ class EntityAutocomplete extends Textfield {
     $instance->defaults_loaded = $defaults_loaded;
     return $instance;
   }
-  
+
   /**
    * {@inheritdoc}
    */

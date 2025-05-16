@@ -36,11 +36,12 @@ use Drupal\Core\Render\ElementInfoManager;
 #[RenderElement('text_format')]
 class TextFormat extends RenderElementBase {
 
-  
+
   /**
    * @var mixed Automatically converted property
    */
   public $base_type;
+
   /**
    * {@inheritdoc}
    */
@@ -315,6 +316,7 @@ class TextFormat extends RenderElementBase {
   protected static function elementInfo() {
     return \Drupal::service('element_info');
   }
+
   public static function createInstance($process, $base_type, $theme_wrappers, $type, $pre_render, $defaults_loaded, ?ElementInfoManager $elementInfoManager = NULL) {
     if (!$elementInfoManager) {
       $elementInfoManager = \Drupal::service('element_info');
@@ -328,7 +330,7 @@ class TextFormat extends RenderElementBase {
     $instance->defaults_loaded = $defaults_loaded;
     return $instance;
   }
-  
+
   /**
    * {@inheritdoc}
    */

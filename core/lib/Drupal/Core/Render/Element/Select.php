@@ -87,26 +87,27 @@ use Drupal\Core\Render\ElementInfoManager;
 #[FormElement('select')]
 class Select extends FormElementBase {
 
-  
+
   /**
    * @var mixed Automatically converted property
    */
   public $multiple;
-  
+
   /**
    * @var mixed Automatically converted property
    */
   public $sort_options;
-  
+
   /**
    * @var mixed Automatically converted property
    */
   public $sort_start;
-  
+
   /**
    * @var mixed Automatically converted property
    */
   public $options;
+
   /**
    * {@inheritdoc}
    */
@@ -223,6 +224,7 @@ class Select extends FormElementBase {
     static::setAttributes($element, ['form-select']);
     return $element;
   }
+
   public static function createInstance($input, $multiple, $sort_options, $sort_start, $process, $pre_render, $theme, $theme_wrappers, $options, $value_callback, $type, $defaults_loaded, ?ElementInfoManager $elementInfoManager = NULL) {
     if (!$elementInfoManager) {
       $elementInfoManager = \Drupal::service('element_info');
@@ -242,7 +244,7 @@ class Select extends FormElementBase {
     $instance->defaults_loaded = $defaults_loaded;
     return $instance;
   }
-  
+
   /**
    * {@inheritdoc}
    */

@@ -13,31 +13,32 @@ use Drupal\Core\Render\ElementInfoManager;
 #[FormElement('image_button')]
 class ImageButton extends Submit {
 
-  
+
   /**
    * @var mixed Automatically converted property
    */
   public $return_value;
-  
+
   /**
    * @var mixed Automatically converted property
    */
   public $src;
-  
+
   /**
    * @var mixed Automatically converted property
    */
   public $executes_submit_callback;
-  
+
   /**
    * @var mixed Automatically converted property
    */
   public $submit_button;
-  
+
   /**
    * @var mixed Automatically converted property
    */
   public $limit_validation_errors;
+
   /**
    * {@inheritdoc}
    */
@@ -115,6 +116,7 @@ class ImageButton extends Submit {
 
     return $element;
   }
+
   public static function createInstance($return_value, $has_garbage_value, $src, $theme_wrappers, $executes_submit_callback, $input, $name, $is_button, $submit_button, $limit_validation_errors, $process, $pre_render, $value_callback, $type, $defaults_loaded, ?ElementInfoManager $elementInfoManager = NULL) {
     if (!$elementInfoManager) {
       $elementInfoManager = \Drupal::service('element_info');
@@ -137,7 +139,7 @@ class ImageButton extends Submit {
     $instance->defaults_loaded = $defaults_loaded;
     return $instance;
   }
-  
+
   /**
    * {@inheritdoc}
    */

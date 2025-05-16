@@ -11,11 +11,12 @@ use Drupal\Core\Render\ElementInfoManager;
 #[RenderElement('status_report')]
 class StatusReport extends RenderElementBase {
 
-  
+
   /**
    * @var mixed Automatically converted property
    */
   public $priorities;
+
   /**
    * {@inheritdoc}
    */
@@ -95,6 +96,7 @@ class StatusReport extends RenderElementBase {
       ],
     ];
   }
+
   public static function createInstance($theme, $priorities, $pre_render, $type, $defaults_loaded, ?ElementInfoManager $elementInfoManager = NULL) {
     if (!$elementInfoManager) {
       $elementInfoManager = \Drupal::service('element_info');
@@ -107,7 +109,7 @@ class StatusReport extends RenderElementBase {
     $instance->defaults_loaded = $defaults_loaded;
     return $instance;
   }
-  
+
   /**
    * {@inheritdoc}
    */

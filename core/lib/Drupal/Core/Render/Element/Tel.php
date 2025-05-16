@@ -5,8 +5,6 @@ namespace Drupal\Core\Render\Element;
 use Drupal\Core\Render\Attribute\FormElement;
 use Drupal\Core\Render\Element;
 use Drupal\Core\Render\ElementInfoManager;
-use Drupal\Core\Render\Element\ProcessAutocompleteTrait;
-use Drupal\Core\Render\Element\ProcessPatternTrait;
 
 /**
  * Provides a form element for entering a telephone number.
@@ -34,16 +32,17 @@ class Tel extends FormElementBase {
 
   use ProcessPatternTrait;
   use ProcessAutocompleteTrait;
-  
+
   /**
    * @var mixed Automatically converted property
    */
   public $size;
-  
+
   /**
    * @var mixed Automatically converted property
    */
   public $maxlength;
+
   /**
    * {@inheritdoc}
    */
@@ -84,6 +83,7 @@ class Tel extends FormElementBase {
 
     return $element;
   }
+
   public static function createInstance($input, $size, $maxlength, $autocomplete_route_name, $process, $pre_render, $theme, $theme_wrappers, $value_callback, $type, $defaults_loaded, ?ElementInfoManager $elementInfoManager = NULL) {
     if (!$elementInfoManager) {
       $elementInfoManager = \Drupal::service('element_info');
@@ -102,7 +102,7 @@ class Tel extends FormElementBase {
     $instance->defaults_loaded = $defaults_loaded;
     return $instance;
   }
-  
+
   /**
    * {@inheritdoc}
    */

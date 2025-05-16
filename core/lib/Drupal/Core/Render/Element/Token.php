@@ -41,6 +41,7 @@ class Token extends Hidden {
     }
     return NULL;
   }
+
   public static function createInstance($input, $pre_render, $theme, $value_callback, $type, $defaults_loaded, ?ElementInfoManager $elementInfoManager = NULL) {
     if (!$elementInfoManager) {
       $elementInfoManager = \Drupal::service('element_info');
@@ -54,7 +55,7 @@ class Token extends Hidden {
     $instance->defaults_loaded = $defaults_loaded;
     return $instance;
   }
-  
+
   /**
    * {@inheritdoc}
    */

@@ -14,21 +14,22 @@ use Drupal\Core\Render\ElementInfoManager;
 #[RenderElement('view')]
 class View extends RenderElementBase {
 
-  
+
   /**
    * @var mixed Automatically converted property
    */
   public $display_id;
-  
+
   /**
    * @var mixed Automatically converted property
    */
   public $arguments;
-  
+
   /**
    * @var mixed Automatically converted property
    */
   public $embed;
+
   /**
    * {@inheritdoc}
    */
@@ -116,6 +117,7 @@ class View extends RenderElementBase {
 
     return $element;
   }
+
   public static function createInstance($pre_render, $name, $display_id, $arguments, $embed, $cache, $type, $defaults_loaded, ?ElementInfoManager $elementInfoManager = NULL) {
     if (!$elementInfoManager) {
       $elementInfoManager = \Drupal::service('element_info');
@@ -131,7 +133,7 @@ class View extends RenderElementBase {
     $instance->defaults_loaded = $defaults_loaded;
     return $instance;
   }
-  
+
   /**
    * {@inheritdoc}
    */

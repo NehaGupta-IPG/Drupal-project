@@ -55,36 +55,37 @@ use Drupal\Core\Render\ElementInfoManager;
 #[FormElement('tableselect')]
 class Tableselect extends Table {
 
-  
+
   /**
    * @var mixed Automatically converted property
    */
   public $js_select;
-  
+
   /**
    * @var mixed Automatically converted property
    */
   public $multiple;
-  
+
   /**
    * @var mixed Automatically converted property
    */
   public $responsive;
-  
+
   /**
    * @var mixed Automatically converted property
    */
   public $sticky;
-  
+
   /**
    * @var mixed Automatically converted property
    */
   public $options;
-  
+
   /**
    * @var mixed Automatically converted property
    */
   public $empty;
+
   /**
    * {@inheritdoc}
    */
@@ -321,6 +322,7 @@ class Tableselect extends Table {
     }
     return $element;
   }
+
   public static function createInstance($input, $js_select, $multiple, $responsive, $sticky, $pre_render, $process, $options, $empty, $theme, $value_callback, $type, $defaults_loaded, ?ElementInfoManager $elementInfoManager = NULL) {
     if (!$elementInfoManager) {
       $elementInfoManager = \Drupal::service('element_info');
@@ -341,7 +343,7 @@ class Tableselect extends Table {
     $instance->defaults_loaded = $defaults_loaded;
     return $instance;
   }
-  
+
   /**
    * {@inheritdoc}
    */

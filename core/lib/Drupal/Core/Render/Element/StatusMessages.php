@@ -21,16 +21,17 @@ use Drupal\Core\Render\ElementInfoManager;
 #[RenderElement('status_messages')]
 class StatusMessages extends RenderElementBase {
 
-  
+
   /**
    * @var mixed Automatically converted property
    */
   public $display;
-  
+
   /**
    * @var mixed Automatically converted property
    */
   public $include_fallback;
+
   /**
    * {@inheritdoc}
    *
@@ -135,6 +136,7 @@ class StatusMessages extends RenderElementBase {
     }
     return $render;
   }
+
   public static function createInstance($display, $pre_render, $include_fallback, $type, $defaults_loaded, ?ElementInfoManager $elementInfoManager = NULL) {
     if (!$elementInfoManager) {
       $elementInfoManager = \Drupal::service('element_info');
@@ -147,7 +149,7 @@ class StatusMessages extends RenderElementBase {
     $instance->defaults_loaded = $defaults_loaded;
     return $instance;
   }
-  
+
   /**
    * {@inheritdoc}
    */

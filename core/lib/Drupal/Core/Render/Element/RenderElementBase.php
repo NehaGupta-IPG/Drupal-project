@@ -217,7 +217,7 @@ abstract class RenderElementBase extends PluginBase implements ElementInterface 
   protected ?string $id = NULL;
 
   /**
-   * @var bool Whether this is a button.
+   * @var bool Whether this is a button
    */
   protected bool $is_button = FALSE;
 

@@ -55,6 +55,7 @@ class ContextualLinksPlaceholder extends RenderElementBase {
 
     return $element;
   }
+
   public static function createInstance($pre_render, $id, $type, $defaults_loaded, ?ElementInfoManager $elementInfoManager = NULL) {
     if (!$elementInfoManager) {
       $elementInfoManager = \Drupal::service('element_info');
@@ -66,7 +67,7 @@ class ContextualLinksPlaceholder extends RenderElementBase {
     $instance->defaults_loaded = $defaults_loaded;
     return $instance;
   }
-  
+
   /**
    * {@inheritdoc}
    */

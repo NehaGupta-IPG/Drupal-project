@@ -181,9 +181,9 @@ class ElementInfoManager extends DefaultPluginManager implements ElementInfoMana
    * Creates an element plugin instance from a render element array.
    *
    * @param array $element
-   *   A render element
+   *   A render element.
    *
-   * @return ElementInterface
+   * @return \Drupal\Core\Render\Element\ElementInterface
    *   An element plugin instance.
    */
   public function fromRenderArray(array $element): ElementInterface {

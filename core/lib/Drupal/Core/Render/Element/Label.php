@@ -23,6 +23,7 @@ class Label extends RenderElementBase {
       '#theme' => 'form_element_label',
     ];
   }
+
   public static function createInstance($theme, $type, $defaults_loaded, ?ElementInfoManager $elementInfoManager = NULL) {
     if (!$elementInfoManager) {
       $elementInfoManager = \Drupal::service('element_info');
@@ -33,7 +34,7 @@ class Label extends RenderElementBase {
     $instance->defaults_loaded = $defaults_loaded;
     return $instance;
   }
-  
+
   /**
    * {@inheritdoc}
    */

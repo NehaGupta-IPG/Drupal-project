@@ -11,11 +11,12 @@ use Drupal\Core\Render\ElementInfoManager;
 #[RenderElement('form')]
 class Form extends RenderElementBase {
 
-  
+
   /**
    * @var mixed Automatically converted property
    */
   public $method;
+
   /**
    * {@inheritdoc}
    */
@@ -25,6 +26,7 @@ class Form extends RenderElementBase {
       '#theme_wrappers' => ['form'],
     ];
   }
+
   public static function createInstance($method, $theme_wrappers, $type, $defaults_loaded, ?ElementInfoManager $elementInfoManager = NULL) {
     if (!$elementInfoManager) {
       $elementInfoManager = \Drupal::service('element_info');
@@ -36,7 +38,7 @@ class Form extends RenderElementBase {
     $instance->defaults_loaded = $defaults_loaded;
     return $instance;
   }
-  
+
   /**
    * {@inheritdoc}
    */

@@ -14,11 +14,12 @@ use Drupal\Core\Render\ElementInfoManager;
 #[RenderElement('toolbar')]
 class Toolbar extends RenderElementBase {
 
-  
+
   /**
    * @var mixed Automatically converted property
    */
   public $bar;
+
   /**
    * {@inheritdoc}
    */
@@ -116,6 +117,7 @@ class Toolbar extends RenderElementBase {
   protected static function moduleHandler() {
     return \Drupal::moduleHandler();
   }
+
   public static function createInstance($pre_render, $theme, $attached, $attributes, $bar, $type, $defaults_loaded, ?ElementInfoManager $elementInfoManager = NULL) {
     if (!$elementInfoManager) {
       $elementInfoManager = \Drupal::service('element_info');
@@ -130,7 +132,7 @@ class Toolbar extends RenderElementBase {
     $instance->defaults_loaded = $defaults_loaded;
     return $instance;
   }
-  
+
   /**
    * {@inheritdoc}
    */

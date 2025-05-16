@@ -14,56 +14,57 @@ use Drupal\Core\Render\ElementInfoManager;
 #[RenderElement('field_ui_table')]
 class FieldUiTable extends Table {
 
-  
+
   /**
    * @var mixed Automatically converted property
    */
   public $header;
-  
+
   /**
    * @var mixed Automatically converted property
    */
   public $rows;
-  
+
   /**
    * @var mixed Automatically converted property
    */
   public $empty;
-  
+
   /**
    * @var mixed Automatically converted property
    */
   public $tableselect;
-  
+
   /**
    * @var mixed Automatically converted property
    */
   public $sticky;
-  
+
   /**
    * @var mixed Automatically converted property
    */
   public $responsive;
-  
+
   /**
    * @var mixed Automatically converted property
    */
   public $multiple;
-  
+
   /**
    * @var mixed Automatically converted property
    */
   public $js_select;
-  
+
   /**
    * @var mixed Automatically converted property
    */
   public $tabledrag;
-  
+
   /**
    * @var mixed Automatically converted property
    */
   public $regions;
+
   /**
    * {@inheritdoc}
    */
@@ -289,6 +290,7 @@ class FieldUiTable extends Table {
 
     return $array;
   }
+
   public static function createInstance($header, $rows, $empty, $input, $tree, $tableselect, $sticky, $responsive, $multiple, $js_select, $process, $element_validate, $tabledrag, $pre_render, $theme, $regions, $value_callback, $type, $defaults_loaded, ?ElementInfoManager $elementInfoManager = NULL) {
     if (!$elementInfoManager) {
       $elementInfoManager = \Drupal::service('element_info');
@@ -315,7 +317,7 @@ class FieldUiTable extends Table {
     $instance->defaults_loaded = $defaults_loaded;
     return $instance;
   }
-  
+
   /**
    * {@inheritdoc}
    */
