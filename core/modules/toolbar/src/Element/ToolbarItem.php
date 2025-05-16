@@ -5,6 +5,7 @@ namespace Drupal\toolbar\Element;
 use Drupal\Core\Render\Attribute\RenderElement;
 use Drupal\Core\Render\Element\RenderElementBase;
 use Drupal\Core\Url;
+use Drupal\Core\Render\ElementInfoManager;
 
 /**
  * Provides a toolbar item that is wrapped in markup for common styling.
@@ -14,6 +15,11 @@ use Drupal\Core\Url;
 #[RenderElement('toolbar_item')]
 class ToolbarItem extends RenderElementBase {
 
+  
+  /**
+   * @var mixed Automatically converted property
+   */
+  public $ab;
   /**
    * {@inheritdoc}
    */
@@ -80,6 +86,29 @@ class ToolbarItem extends RenderElementBase {
     $element['tab']['#attributes']['class'][] = 'toolbar-item';
 
     return $element;
+  }
+  public static function createInstance($pre_render, $ab, $type, $defaults_loaded, ?ElementInfoManager $elementInfoManager = NULL) {
+    if (!$elementInfoManager) {
+      $elementInfoManager = \Drupal::service('element_info');
+    }
+    $instance = $elementInfoManager->createInstance('toolbar_item');
+    $instance->pre_render = $pre_render;
+    $instance->ab = $ab;
+    $instance->type = $type;
+    $instance->defaults_loaded = $defaults_loaded;
+    return $instance;
+  }
+  
+  /**
+   * {@inheritdoc}
+   */
+  public function toRenderArray() {
+    return [
+      '#pre_render' => $this->pre_render,
+      '#ab' => $this->ab,
+      '#type' => $this->type,
+      '#defaults_loaded' => $this->defaults_loaded,
+    ];
   }
 
 }

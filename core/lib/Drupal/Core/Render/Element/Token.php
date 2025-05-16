@@ -4,6 +4,7 @@ namespace Drupal\Core\Render\Element;
 
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Render\Attribute\FormElement;
+use Drupal\Core\Render\ElementInfoManager;
 
 /**
  * Stores token data in a hidden form field.
@@ -39,6 +40,33 @@ class Token extends Hidden {
       return is_scalar($input) ? (string) $input : '';
     }
     return NULL;
+  }
+  public static function createInstance($input, $pre_render, $theme, $value_callback, $type, $defaults_loaded, ?ElementInfoManager $elementInfoManager = NULL) {
+    if (!$elementInfoManager) {
+      $elementInfoManager = \Drupal::service('element_info');
+    }
+    $instance = $elementInfoManager->createInstance('token');
+    $instance->input = $input;
+    $instance->pre_render = $pre_render;
+    $instance->theme = $theme;
+    $instance->value_callback = $value_callback;
+    $instance->type = $type;
+    $instance->defaults_loaded = $defaults_loaded;
+    return $instance;
+  }
+  
+  /**
+   * {@inheritdoc}
+   */
+  public function toRenderArray() {
+    return [
+      '#input' => $this->input,
+      '#pre_render' => $this->pre_render,
+      '#theme' => $this->theme,
+      '#value_callback' => $this->value_callback,
+      '#type' => $this->type,
+      '#defaults_loaded' => $this->defaults_loaded,
+    ];
   }
 
 }

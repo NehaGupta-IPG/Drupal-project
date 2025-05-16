@@ -97,6 +97,124 @@ use Drupal\Core\Url;
 abstract class FormElementBase extends RenderElementBase implements FormElementInterface {
 
   /**
+   * Array of callables or function names, which are called after the element
+   * is built.
+   */
+  protected array $after_build = [];
+
+  /**
+   * Array of names of all the element's parents (including itself) in the
+   * form array.
+   *
+   * @see $parents
+   * @see $tree
+   */
+  protected array $array_parents = [];
+
+  /**
+   * Default value for the element. See also #value.
+   */
+  protected mixed $default_value = NULL;
+
+  /**
+   * Help or description text for the element.
+   */
+  protected ?string $description = NULL;
+
+  /**
+   * If TRUE, the element is shown but does not accept user input.
+   */
+  protected bool $disabled = FALSE;
+
+  /**
+   * Array of callables or function names, which are called to validate the
+   * input.
+   */
+  protected array $element_validate = [];
+
+  /**
+   * A list of errors.
+   */
+  protected array $errors = [];
+
+  /**
+   * Prefix to display before the HTML input element.
+   */
+  protected ?string $field_prefix = NULL;
+
+  /**
+   * Suffix to display after the HTML input element.
+   */
+  protected ?string $field_suffix = NULL;
+
+  /**
+   * Internal only. Set to TRUE to indicate that the #value property of an
+   * element should not be used or processed.
+   */
+  protected bool $has_garbage_value = FALSE;
+
+  /**
+   * Whether or not the element accepts input.
+   */
+  protected bool $input = FALSE;
+
+  /**
+   * Array of callables or function names, which are called during form building.
+   */
+  protected array $process = [];
+
+  /**
+   * Set to TRUE when the element is processed.
+   */
+  protected bool $processed = FALSE;
+
+  /**
+   * Whether or not input is required on the element.
+   */
+  protected bool $required = FALSE;
+
+  /**
+   * Information about JavaScript states.
+   *
+   * @see \Drupal\Core\Form\FormHelper::processStates()
+   */
+  protected array $states = [];
+
+  /**
+   * Title of the form element.
+   */
+  protected ?string $title = NULL;
+
+  /**
+   * Where and how to display the #title.
+   */
+  protected ?TitleDisplay $title_display = NULL;
+
+  /**
+   * TRUE if the values of this element and its children should be hierarchical in $form_state.
+   */
+  protected bool $tree = FALSE;
+
+  /**
+   * Whether this element is validated.
+   */
+  protected bool $validated = FALSE;
+
+  /**
+   * A value that cannot be edited by the user.
+   */
+  protected mixed $value = NULL;
+
+  /**
+   * Callable or function name, which is called to transform the raw user input to the element's value.
+   *
+   * The callback received $element, $input, $form_state arguments.
+   *
+   * @var callable
+   */
+  protected mixed $value_callback;
+
+  /**
    * {@inheritdoc}
    */
   public static function valueCallback(&$element, $input, FormStateInterface $form_state) {
@@ -223,5 +341,24 @@ abstract class FormElementBase extends RenderElementBase implements FormElementI
 
     return $element;
   }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function setAttributes(&$element, $class = []): void {
+    parent::setAttributes($element, $class);
+    // This function is invoked from form element theme functions, but the
+    // rendered form element may not necessarily have been processed by
+    // \Drupal::formBuilder()->doBuildForm().
+    if (!empty($element['#required'])) {
+      $element['#attributes']['class'][] = 'required';
+      $element['#attributes']['required'] = 'required';
+    }
+    if (isset($element['#parents']) && isset($element['#errors']) && !empty($element['#validated'])) {
+      $element['#attributes']['class'][] = 'error';
+      $element['#attributes']['aria-invalid'] = 'true';
+    }
+  }
+
 
 }

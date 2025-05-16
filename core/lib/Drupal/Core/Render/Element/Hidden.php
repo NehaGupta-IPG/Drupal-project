@@ -4,6 +4,7 @@ namespace Drupal\Core\Render\Element;
 
 use Drupal\Core\Render\Attribute\FormElement;
 use Drupal\Core\Render\Element;
+use Drupal\Core\Render\ElementInfoManager;
 
 /**
  * Provides a form element for an HTML 'hidden' input element.
@@ -57,6 +58,35 @@ class Hidden extends FormElementBase {
     Element::setAttributes($element, ['name', 'value']);
 
     return $element;
+  }
+  public static function createInstance($input, $process, $pre_render, $theme, $value_callback, $type, $defaults_loaded, ?ElementInfoManager $elementInfoManager = NULL) {
+    if (!$elementInfoManager) {
+      $elementInfoManager = \Drupal::service('element_info');
+    }
+    $instance = $elementInfoManager->createInstance('hidden');
+    $instance->input = $input;
+    $instance->process = $process;
+    $instance->pre_render = $pre_render;
+    $instance->theme = $theme;
+    $instance->value_callback = $value_callback;
+    $instance->type = $type;
+    $instance->defaults_loaded = $defaults_loaded;
+    return $instance;
+  }
+  
+  /**
+   * {@inheritdoc}
+   */
+  public function toRenderArray() {
+    return [
+      '#input' => $this->input,
+      '#process' => $this->process,
+      '#pre_render' => $this->pre_render,
+      '#theme' => $this->theme,
+      '#value_callback' => $this->value_callback,
+      '#type' => $this->type,
+      '#defaults_loaded' => $this->defaults_loaded,
+    ];
   }
 
 }

@@ -8,6 +8,7 @@ use Drupal\Core\Render\Attribute\RenderElement;
 use Drupal\Core\Render\Markup;
 use Drupal\Component\Utility\Xss;
 use Drupal\Core\Template\Attribute;
+use Drupal\Core\Render\ElementInfoManager;
 
 /**
  * Provides a render element for any HTML tag, with properties and value.
@@ -118,6 +119,31 @@ class HtmlTag extends RenderElementBase {
     $element['#prefix'] = Markup::create($prefix);
     $element['#suffix'] = Markup::create($suffix);
     return $element;
+  }
+  public static function createInstance($pre_render, $attributes, $value, $type, $defaults_loaded, ?ElementInfoManager $elementInfoManager = NULL) {
+    if (!$elementInfoManager) {
+      $elementInfoManager = \Drupal::service('element_info');
+    }
+    $instance = $elementInfoManager->createInstance('html_tag');
+    $instance->pre_render = $pre_render;
+    $instance->attributes = $attributes;
+    $instance->value = $value;
+    $instance->type = $type;
+    $instance->defaults_loaded = $defaults_loaded;
+    return $instance;
+  }
+  
+  /**
+   * {@inheritdoc}
+   */
+  public function toRenderArray() {
+    return [
+      '#pre_render' => $this->pre_render,
+      '#attributes' => $this->attributes,
+      '#value' => $this->value,
+      '#type' => $this->type,
+      '#defaults_loaded' => $this->defaults_loaded,
+    ];
   }
 
 }

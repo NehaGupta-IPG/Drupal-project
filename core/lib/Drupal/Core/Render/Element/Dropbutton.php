@@ -3,6 +3,7 @@
 namespace Drupal\Core\Render\Element;
 
 use Drupal\Core\Render\Attribute\RenderElement;
+use Drupal\Core\Render\ElementInfoManager;
 
 /**
  * Provides a render element for a set of links rendered as a drop-down button.
@@ -80,6 +81,29 @@ class Dropbutton extends RenderElementBase {
     }
 
     return $element;
+  }
+  public static function createInstance($pre_render, $theme, $type, $defaults_loaded, ?ElementInfoManager $elementInfoManager = NULL) {
+    if (!$elementInfoManager) {
+      $elementInfoManager = \Drupal::service('element_info');
+    }
+    $instance = $elementInfoManager->createInstance('dropbutton');
+    $instance->pre_render = $pre_render;
+    $instance->theme = $theme;
+    $instance->type = $type;
+    $instance->defaults_loaded = $defaults_loaded;
+    return $instance;
+  }
+  
+  /**
+   * {@inheritdoc}
+   */
+  public function toRenderArray() {
+    return [
+      '#pre_render' => $this->pre_render,
+      '#theme' => $this->theme,
+      '#type' => $this->type,
+      '#defaults_loaded' => $this->defaults_loaded,
+    ];
   }
 
 }

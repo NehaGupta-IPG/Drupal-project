@@ -177,4 +177,30 @@ class ElementInfoManager extends DefaultPluginManager implements ElementInfoMana
     return 'element_info_build:' . $theme_name;
   }
 
+  /**
+   * Creates an element plugin instance from a render element array.
+   *
+   * @param array $element
+   *   A render element
+   *
+   * @return ElementInterface
+   *   An element plugin instance.
+   */
+  public function fromRenderArray(array $element): ElementInterface {
+    if (!isset($element['#type'])) {
+      throw new \LogicException('The element passed to ElementInfoManager::fromRenderArray must have a #type.');
+    }
+    $args = [];
+    foreach ($element as $key => $value) {
+      if ($key[0] === '#') {
+        $args[substr($key, 1)] = $value;
+      }
+      else {
+        $children[$key] = $value;
+      }
+    }
+    $definition = $this->getDefinition($element['#type']);
+    return [$definition['class'], 'createInstance'](... $args);
+  }
+
 }

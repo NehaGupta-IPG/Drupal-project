@@ -5,6 +5,7 @@ namespace Drupal\Core\Render\Element;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Render\Attribute\FormElement;
 use Drupal\Core\Render\Element;
+use Drupal\Core\Render\ElementInfoManager;
 
 /**
  * Provides an action button form element.
@@ -39,6 +40,21 @@ use Drupal\Core\Render\Element;
 #[FormElement('button')]
 class Button extends FormElementBase {
 
+  
+  /**
+   * @var mixed Automatically converted property
+   */
+  public $submit_button;
+  
+  /**
+   * @var mixed Automatically converted property
+   */
+  public $executes_submit_callback;
+  
+  /**
+   * @var mixed Automatically converted property
+   */
+  public $limit_validation_errors;
   /**
    * {@inheritdoc}
    */
@@ -108,6 +124,45 @@ class Button extends FormElementBase {
     }
 
     return $element;
+  }
+  public static function createInstance($input, $name, $is_button, $submit_button, $executes_submit_callback, $limit_validation_errors, $process, $pre_render, $theme_wrappers, $value_callback, $type, $defaults_loaded, ?ElementInfoManager $elementInfoManager = NULL) {
+    if (!$elementInfoManager) {
+      $elementInfoManager = \Drupal::service('element_info');
+    }
+    $instance = $elementInfoManager->createInstance('button');
+    $instance->input = $input;
+    $instance->name = $name;
+    $instance->is_button = $is_button;
+    $instance->submit_button = $submit_button;
+    $instance->executes_submit_callback = $executes_submit_callback;
+    $instance->limit_validation_errors = $limit_validation_errors;
+    $instance->process = $process;
+    $instance->pre_render = $pre_render;
+    $instance->theme_wrappers = $theme_wrappers;
+    $instance->value_callback = $value_callback;
+    $instance->type = $type;
+    $instance->defaults_loaded = $defaults_loaded;
+    return $instance;
+  }
+  
+  /**
+   * {@inheritdoc}
+   */
+  public function toRenderArray() {
+    return [
+      '#input' => $this->input,
+      '#name' => $this->name,
+      '#is_button' => $this->is_button,
+      '#submit_button' => $this->submit_button,
+      '#executes_submit_callback' => $this->executes_submit_callback,
+      '#limit_validation_errors' => $this->limit_validation_errors,
+      '#process' => $this->process,
+      '#pre_render' => $this->pre_render,
+      '#theme_wrappers' => $this->theme_wrappers,
+      '#value_callback' => $this->value_callback,
+      '#type' => $this->type,
+      '#defaults_loaded' => $this->defaults_loaded,
+    ];
   }
 
 }

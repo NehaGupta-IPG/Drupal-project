@@ -5,6 +5,7 @@ namespace Drupal\Core\Render\Element;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Render\Attribute\FormElement;
 use Drupal\Core\Render\Element;
+use Drupal\Core\Render\ElementInfoManager;
 
 /**
  * Provides a form element for a drop-down menu or scrolling selection box.
@@ -86,6 +87,26 @@ use Drupal\Core\Render\Element;
 #[FormElement('select')]
 class Select extends FormElementBase {
 
+  
+  /**
+   * @var mixed Automatically converted property
+   */
+  public $multiple;
+  
+  /**
+   * @var mixed Automatically converted property
+   */
+  public $sort_options;
+  
+  /**
+   * @var mixed Automatically converted property
+   */
+  public $sort_start;
+  
+  /**
+   * @var mixed Automatically converted property
+   */
+  public $options;
   /**
    * {@inheritdoc}
    */
@@ -201,6 +222,45 @@ class Select extends FormElementBase {
     Element::setAttributes($element, ['id', 'name', 'size']);
     static::setAttributes($element, ['form-select']);
     return $element;
+  }
+  public static function createInstance($input, $multiple, $sort_options, $sort_start, $process, $pre_render, $theme, $theme_wrappers, $options, $value_callback, $type, $defaults_loaded, ?ElementInfoManager $elementInfoManager = NULL) {
+    if (!$elementInfoManager) {
+      $elementInfoManager = \Drupal::service('element_info');
+    }
+    $instance = $elementInfoManager->createInstance('select');
+    $instance->input = $input;
+    $instance->multiple = $multiple;
+    $instance->sort_options = $sort_options;
+    $instance->sort_start = $sort_start;
+    $instance->process = $process;
+    $instance->pre_render = $pre_render;
+    $instance->theme = $theme;
+    $instance->theme_wrappers = $theme_wrappers;
+    $instance->options = $options;
+    $instance->value_callback = $value_callback;
+    $instance->type = $type;
+    $instance->defaults_loaded = $defaults_loaded;
+    return $instance;
+  }
+  
+  /**
+   * {@inheritdoc}
+   */
+  public function toRenderArray() {
+    return [
+      '#input' => $this->input,
+      '#multiple' => $this->multiple,
+      '#sort_options' => $this->sort_options,
+      '#sort_start' => $this->sort_start,
+      '#process' => $this->process,
+      '#pre_render' => $this->pre_render,
+      '#theme' => $this->theme,
+      '#theme_wrappers' => $this->theme_wrappers,
+      '#options' => $this->options,
+      '#value_callback' => $this->value_callback,
+      '#type' => $this->type,
+      '#defaults_loaded' => $this->defaults_loaded,
+    ];
   }
 
 }

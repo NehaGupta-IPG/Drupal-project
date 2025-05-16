@@ -4,6 +4,7 @@ namespace Drupal\Core\Render\Element;
 
 use Drupal\Core\Render\Attribute\FormElement;
 use Drupal\Core\Render\Element;
+use Drupal\Core\Render\ElementInfoManager;
 
 /**
  * Provides a form element for a single radio button.
@@ -70,6 +71,41 @@ class Radio extends FormElementBase {
     static::setAttributes($element, ['form-radio']);
 
     return $element;
+  }
+  public static function createInstance($input, $default_value, $process, $pre_render, $theme, $theme_wrappers, $title_display, $value_callback, $type, $defaults_loaded, ?ElementInfoManager $elementInfoManager = NULL) {
+    if (!$elementInfoManager) {
+      $elementInfoManager = \Drupal::service('element_info');
+    }
+    $instance = $elementInfoManager->createInstance('radio');
+    $instance->input = $input;
+    $instance->default_value = $default_value;
+    $instance->process = $process;
+    $instance->pre_render = $pre_render;
+    $instance->theme = $theme;
+    $instance->theme_wrappers = $theme_wrappers;
+    $instance->title_display = $title_display;
+    $instance->value_callback = $value_callback;
+    $instance->type = $type;
+    $instance->defaults_loaded = $defaults_loaded;
+    return $instance;
+  }
+  
+  /**
+   * {@inheritdoc}
+   */
+  public function toRenderArray() {
+    return [
+      '#input' => $this->input,
+      '#default_value' => $this->default_value,
+      '#process' => $this->process,
+      '#pre_render' => $this->pre_render,
+      '#theme' => $this->theme,
+      '#theme_wrappers' => $this->theme_wrappers,
+      '#title_display' => $this->title_display,
+      '#value_callback' => $this->value_callback,
+      '#type' => $this->type,
+      '#defaults_loaded' => $this->defaults_loaded,
+    ];
   }
 
 }

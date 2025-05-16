@@ -3,6 +3,7 @@
 namespace Drupal\Core\Render\Element;
 
 use Drupal\Core\Render\Attribute\RenderElement;
+use Drupal\Core\Render\ElementInfoManager;
 
 /**
  * Provides a render element where the user supplies an in-line Twig template.
@@ -26,6 +27,16 @@ use Drupal\Core\Render\Attribute\RenderElement;
 #[RenderElement('inline_template')]
 class InlineTemplate extends RenderElementBase {
 
+  
+  /**
+   * @var mixed Automatically converted property
+   */
+  public $template;
+  
+  /**
+   * @var mixed Automatically converted property
+   */
+  public $context;
   /**
    * {@inheritdoc}
    */
@@ -54,6 +65,31 @@ class InlineTemplate extends RenderElementBase {
     $markup = $environment->renderInline($element['#template'], $element['#context']);
     $element['#markup'] = $markup;
     return $element;
+  }
+  public static function createInstance($pre_render, $template, $context, $type, $defaults_loaded, ?ElementInfoManager $elementInfoManager = NULL) {
+    if (!$elementInfoManager) {
+      $elementInfoManager = \Drupal::service('element_info');
+    }
+    $instance = $elementInfoManager->createInstance('inline_template');
+    $instance->pre_render = $pre_render;
+    $instance->template = $template;
+    $instance->context = $context;
+    $instance->type = $type;
+    $instance->defaults_loaded = $defaults_loaded;
+    return $instance;
+  }
+  
+  /**
+   * {@inheritdoc}
+   */
+  public function toRenderArray() {
+    return [
+      '#pre_render' => $this->pre_render,
+      '#template' => $this->template,
+      '#context' => $this->context,
+      '#type' => $this->type,
+      '#defaults_loaded' => $this->defaults_loaded,
+    ];
   }
 
 }

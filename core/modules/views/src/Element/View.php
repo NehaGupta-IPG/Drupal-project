@@ -6,6 +6,7 @@ use Drupal\Core\Render\Attribute\RenderElement;
 use Drupal\Core\Render\Element\RenderElementBase;
 use Drupal\views\Exception\ViewRenderElementException;
 use Drupal\views\Views;
+use Drupal\Core\Render\ElementInfoManager;
 
 /**
  * Provides a render element to display a view.
@@ -13,6 +14,21 @@ use Drupal\views\Views;
 #[RenderElement('view')]
 class View extends RenderElementBase {
 
+  
+  /**
+   * @var mixed Automatically converted property
+   */
+  public $display_id;
+  
+  /**
+   * @var mixed Automatically converted property
+   */
+  public $arguments;
+  
+  /**
+   * @var mixed Automatically converted property
+   */
+  public $embed;
   /**
    * {@inheritdoc}
    */
@@ -99,6 +115,37 @@ class View extends RenderElementBase {
     }
 
     return $element;
+  }
+  public static function createInstance($pre_render, $name, $display_id, $arguments, $embed, $cache, $type, $defaults_loaded, ?ElementInfoManager $elementInfoManager = NULL) {
+    if (!$elementInfoManager) {
+      $elementInfoManager = \Drupal::service('element_info');
+    }
+    $instance = $elementInfoManager->createInstance('view');
+    $instance->pre_render = $pre_render;
+    $instance->name = $name;
+    $instance->display_id = $display_id;
+    $instance->arguments = $arguments;
+    $instance->embed = $embed;
+    $instance->cache = $cache;
+    $instance->type = $type;
+    $instance->defaults_loaded = $defaults_loaded;
+    return $instance;
+  }
+  
+  /**
+   * {@inheritdoc}
+   */
+  public function toRenderArray() {
+    return [
+      '#pre_render' => $this->pre_render,
+      '#name' => $this->name,
+      '#display_id' => $this->display_id,
+      '#arguments' => $this->arguments,
+      '#embed' => $this->embed,
+      '#cache' => $this->cache,
+      '#type' => $this->type,
+      '#defaults_loaded' => $this->defaults_loaded,
+    ];
   }
 
 }

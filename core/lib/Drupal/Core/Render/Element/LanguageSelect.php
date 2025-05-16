@@ -4,6 +4,7 @@ namespace Drupal\Core\Render\Element;
 
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\Render\Attribute\FormElement;
+use Drupal\Core\Render\ElementInfoManager;
 
 /**
  * Provides a form element for selecting a language.
@@ -24,6 +25,31 @@ class LanguageSelect extends FormElementBase {
     return [
       '#input' => TRUE,
       '#default_value' => LanguageInterface::LANGCODE_NOT_SPECIFIED,
+    ];
+  }
+  public static function createInstance($input, $default_value, $value_callback, $type, $defaults_loaded, ?ElementInfoManager $elementInfoManager = NULL) {
+    if (!$elementInfoManager) {
+      $elementInfoManager = \Drupal::service('element_info');
+    }
+    $instance = $elementInfoManager->createInstance('language_select');
+    $instance->input = $input;
+    $instance->default_value = $default_value;
+    $instance->value_callback = $value_callback;
+    $instance->type = $type;
+    $instance->defaults_loaded = $defaults_loaded;
+    return $instance;
+  }
+  
+  /**
+   * {@inheritdoc}
+   */
+  public function toRenderArray() {
+    return [
+      '#input' => $this->input,
+      '#default_value' => $this->default_value,
+      '#value_callback' => $this->value_callback,
+      '#type' => $this->type,
+      '#defaults_loaded' => $this->defaults_loaded,
     ];
   }
 

@@ -5,6 +5,7 @@ namespace Drupal\Core\Render\Element;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Render\Attribute\FormElement;
 use Drupal\Core\Render\Element;
+use Drupal\Core\Render\ElementInfoManager;
 
 /**
  * Provides a form element for a submit button with an image.
@@ -12,6 +13,31 @@ use Drupal\Core\Render\Element;
 #[FormElement('image_button')]
 class ImageButton extends Submit {
 
+  
+  /**
+   * @var mixed Automatically converted property
+   */
+  public $return_value;
+  
+  /**
+   * @var mixed Automatically converted property
+   */
+  public $src;
+  
+  /**
+   * @var mixed Automatically converted property
+   */
+  public $executes_submit_callback;
+  
+  /**
+   * @var mixed Automatically converted property
+   */
+  public $submit_button;
+  
+  /**
+   * @var mixed Automatically converted property
+   */
+  public $limit_validation_errors;
   /**
    * {@inheritdoc}
    */
@@ -88,6 +114,51 @@ class ImageButton extends Submit {
     }
 
     return $element;
+  }
+  public static function createInstance($return_value, $has_garbage_value, $src, $theme_wrappers, $executes_submit_callback, $input, $name, $is_button, $submit_button, $limit_validation_errors, $process, $pre_render, $value_callback, $type, $defaults_loaded, ?ElementInfoManager $elementInfoManager = NULL) {
+    if (!$elementInfoManager) {
+      $elementInfoManager = \Drupal::service('element_info');
+    }
+    $instance = $elementInfoManager->createInstance('image_button');
+    $instance->return_value = $return_value;
+    $instance->has_garbage_value = $has_garbage_value;
+    $instance->src = $src;
+    $instance->theme_wrappers = $theme_wrappers;
+    $instance->executes_submit_callback = $executes_submit_callback;
+    $instance->input = $input;
+    $instance->name = $name;
+    $instance->is_button = $is_button;
+    $instance->submit_button = $submit_button;
+    $instance->limit_validation_errors = $limit_validation_errors;
+    $instance->process = $process;
+    $instance->pre_render = $pre_render;
+    $instance->value_callback = $value_callback;
+    $instance->type = $type;
+    $instance->defaults_loaded = $defaults_loaded;
+    return $instance;
+  }
+  
+  /**
+   * {@inheritdoc}
+   */
+  public function toRenderArray() {
+    return [
+      '#return_value' => $this->return_value,
+      '#has_garbage_value' => $this->has_garbage_value,
+      '#src' => $this->src,
+      '#theme_wrappers' => $this->theme_wrappers,
+      '#executes_submit_callback' => $this->executes_submit_callback,
+      '#input' => $this->input,
+      '#name' => $this->name,
+      '#is_button' => $this->is_button,
+      '#submit_button' => $this->submit_button,
+      '#limit_validation_errors' => $this->limit_validation_errors,
+      '#process' => $this->process,
+      '#pre_render' => $this->pre_render,
+      '#value_callback' => $this->value_callback,
+      '#type' => $this->type,
+      '#defaults_loaded' => $this->defaults_loaded,
+    ];
   }
 
 }

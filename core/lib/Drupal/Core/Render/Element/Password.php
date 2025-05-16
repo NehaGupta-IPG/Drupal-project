@@ -5,6 +5,8 @@ namespace Drupal\Core\Render\Element;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Render\Attribute\FormElement;
 use Drupal\Core\Render\Element;
+use Drupal\Core\Render\ElementInfoManager;
+use Drupal\Core\Render\Element\ProcessPatternTrait;
 
 /**
  * Provides a form element for entering a password, with hidden text.
@@ -29,6 +31,17 @@ use Drupal\Core\Render\Element;
 #[FormElement('password')]
 class Password extends FormElementBase {
 
+  use ProcessPatternTrait;
+  
+  /**
+   * @var mixed Automatically converted property
+   */
+  public $size;
+  
+  /**
+   * @var mixed Automatically converted property
+   */
+  public $maxlength;
   /**
    * {@inheritdoc}
    */
@@ -78,6 +91,41 @@ class Password extends FormElementBase {
       return is_scalar($input) ? (string) $input : '';
     }
     return NULL;
+  }
+  public static function createInstance($input, $size, $maxlength, $process, $pre_render, $theme, $theme_wrappers, $value_callback, $type, $defaults_loaded, ?ElementInfoManager $elementInfoManager = NULL) {
+    if (!$elementInfoManager) {
+      $elementInfoManager = \Drupal::service('element_info');
+    }
+    $instance = $elementInfoManager->createInstance('password');
+    $instance->input = $input;
+    $instance->size = $size;
+    $instance->maxlength = $maxlength;
+    $instance->process = $process;
+    $instance->pre_render = $pre_render;
+    $instance->theme = $theme;
+    $instance->theme_wrappers = $theme_wrappers;
+    $instance->value_callback = $value_callback;
+    $instance->type = $type;
+    $instance->defaults_loaded = $defaults_loaded;
+    return $instance;
+  }
+  
+  /**
+   * {@inheritdoc}
+   */
+  public function toRenderArray() {
+    return [
+      '#input' => $this->input,
+      '#size' => $this->size,
+      '#maxlength' => $this->maxlength,
+      '#process' => $this->process,
+      '#pre_render' => $this->pre_render,
+      '#theme' => $this->theme,
+      '#theme_wrappers' => $this->theme_wrappers,
+      '#value_callback' => $this->value_callback,
+      '#type' => $this->type,
+      '#defaults_loaded' => $this->defaults_loaded,
+    ];
   }
 
 }

@@ -7,6 +7,7 @@ use Drupal\Component\Utility\SortArray;
 use Drupal\Core\Render\Attribute\RenderElement;
 use Drupal\Core\Render\Element\RenderElementBase;
 use Drupal\Core\Url;
+use Drupal\Core\Render\ElementInfoManager;
 
 /**
  * Provides a contextual_links element.
@@ -14,6 +15,11 @@ use Drupal\Core\Url;
 #[RenderElement('contextual_links')]
 class ContextualLinks extends RenderElementBase {
 
+  
+  /**
+   * @var mixed Automatically converted property
+   */
+  public $links;
   /**
    * {@inheritdoc}
    */
@@ -115,6 +121,35 @@ class ContextualLinks extends RenderElementBase {
    */
   protected static function moduleHandler() {
     return \Drupal::moduleHandler();
+  }
+  public static function createInstance($pre_render, $theme, $links, $attributes, $attached, $type, $defaults_loaded, ?ElementInfoManager $elementInfoManager = NULL) {
+    if (!$elementInfoManager) {
+      $elementInfoManager = \Drupal::service('element_info');
+    }
+    $instance = $elementInfoManager->createInstance('contextual_links');
+    $instance->pre_render = $pre_render;
+    $instance->theme = $theme;
+    $instance->links = $links;
+    $instance->attributes = $attributes;
+    $instance->attached = $attached;
+    $instance->type = $type;
+    $instance->defaults_loaded = $defaults_loaded;
+    return $instance;
+  }
+  
+  /**
+   * {@inheritdoc}
+   */
+  public function toRenderArray() {
+    return [
+      '#pre_render' => $this->pre_render,
+      '#theme' => $this->theme,
+      '#links' => $this->links,
+      '#attributes' => $this->attributes,
+      '#attached' => $this->attached,
+      '#type' => $this->type,
+      '#defaults_loaded' => $this->defaults_loaded,
+    ];
   }
 
 }

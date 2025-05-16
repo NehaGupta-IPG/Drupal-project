@@ -6,6 +6,7 @@ use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Render\Attribute\RenderElement;
 use Drupal\Core\Render\BubbleableMetadata;
 use Drupal\Core\Render\Element;
+use Drupal\Core\Render\ElementInfoManager;
 
 /**
  * Provides a wrapper element to group one or more buttons in a form.
@@ -114,6 +115,31 @@ class Actions extends Container {
     // @todo For now, all dropbuttons appear first. Consider to invent a more
     //   fancy sorting/injection algorithm here.
     return $dropbuttons + $element;
+  }
+  public static function createInstance($process, $weight, $theme_wrappers, $type, $defaults_loaded, ?ElementInfoManager $elementInfoManager = NULL) {
+    if (!$elementInfoManager) {
+      $elementInfoManager = \Drupal::service('element_info');
+    }
+    $instance = $elementInfoManager->createInstance('actions');
+    $instance->process = $process;
+    $instance->weight = $weight;
+    $instance->theme_wrappers = $theme_wrappers;
+    $instance->type = $type;
+    $instance->defaults_loaded = $defaults_loaded;
+    return $instance;
+  }
+  
+  /**
+   * {@inheritdoc}
+   */
+  public function toRenderArray() {
+    return [
+      '#process' => $this->process,
+      '#weight' => $this->weight,
+      '#theme_wrappers' => $this->theme_wrappers,
+      '#type' => $this->type,
+      '#defaults_loaded' => $this->defaults_loaded,
+    ];
   }
 
 }

@@ -6,6 +6,7 @@ use Drupal\Component\Utility\Html as HtmlUtility;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Render\Attribute\RenderElement;
 use Drupal\Core\Render\Element;
+use Drupal\Core\Render\ElementInfoManager;
 
 /**
  * Provides a render element that wraps child elements in a container.
@@ -45,6 +46,11 @@ use Drupal\Core\Render\Element;
 #[RenderElement('container')]
 class Container extends RenderElementBase {
 
+  
+  /**
+   * @var mixed Automatically converted property
+   */
+  public $optional;
   /**
    * {@inheritdoc}
    */
@@ -101,6 +107,33 @@ class Container extends RenderElementBase {
       $element['#printed'] = TRUE;
     }
     return $element;
+  }
+  public static function createInstance($optional, $process, $pre_render, $theme_wrappers, $type, $defaults_loaded, ?ElementInfoManager $elementInfoManager = NULL) {
+    if (!$elementInfoManager) {
+      $elementInfoManager = \Drupal::service('element_info');
+    }
+    $instance = $elementInfoManager->createInstance('container');
+    $instance->optional = $optional;
+    $instance->process = $process;
+    $instance->pre_render = $pre_render;
+    $instance->theme_wrappers = $theme_wrappers;
+    $instance->type = $type;
+    $instance->defaults_loaded = $defaults_loaded;
+    return $instance;
+  }
+  
+  /**
+   * {@inheritdoc}
+   */
+  public function toRenderArray() {
+    return [
+      '#optional' => $this->optional,
+      '#process' => $this->process,
+      '#pre_render' => $this->pre_render,
+      '#theme_wrappers' => $this->theme_wrappers,
+      '#type' => $this->type,
+      '#defaults_loaded' => $this->defaults_loaded,
+    ];
   }
 
 }

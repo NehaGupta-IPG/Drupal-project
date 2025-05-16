@@ -6,6 +6,7 @@ use Drupal\Component\Utility\Html;
 use Drupal\Core\Render\Attribute\RenderElement;
 use Drupal\Core\Render\Element\RenderElementBase;
 use Drupal\Core\Render\Element;
+use Drupal\Core\Render\ElementInfoManager;
 
 /**
  * Provides a render element for the default Drupal toolbar.
@@ -13,6 +14,11 @@ use Drupal\Core\Render\Element;
 #[RenderElement('toolbar')]
 class Toolbar extends RenderElementBase {
 
+  
+  /**
+   * @var mixed Automatically converted property
+   */
+  public $bar;
   /**
    * {@inheritdoc}
    */
@@ -109,6 +115,35 @@ class Toolbar extends RenderElementBase {
    */
   protected static function moduleHandler() {
     return \Drupal::moduleHandler();
+  }
+  public static function createInstance($pre_render, $theme, $attached, $attributes, $bar, $type, $defaults_loaded, ?ElementInfoManager $elementInfoManager = NULL) {
+    if (!$elementInfoManager) {
+      $elementInfoManager = \Drupal::service('element_info');
+    }
+    $instance = $elementInfoManager->createInstance('toolbar');
+    $instance->pre_render = $pre_render;
+    $instance->theme = $theme;
+    $instance->attached = $attached;
+    $instance->attributes = $attributes;
+    $instance->bar = $bar;
+    $instance->type = $type;
+    $instance->defaults_loaded = $defaults_loaded;
+    return $instance;
+  }
+  
+  /**
+   * {@inheritdoc}
+   */
+  public function toRenderArray() {
+    return [
+      '#pre_render' => $this->pre_render,
+      '#theme' => $this->theme,
+      '#attached' => $this->attached,
+      '#attributes' => $this->attributes,
+      '#bar' => $this->bar,
+      '#type' => $this->type,
+      '#defaults_loaded' => $this->defaults_loaded,
+    ];
   }
 
 }

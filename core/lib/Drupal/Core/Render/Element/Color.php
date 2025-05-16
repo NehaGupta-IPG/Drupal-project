@@ -6,6 +6,7 @@ use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Render\Attribute\FormElement;
 use Drupal\Core\Render\Element;
 use Drupal\Component\Utility\Color as ColorUtility;
+use Drupal\Core\Render\ElementInfoManager;
 
 /**
  * Provides a form element for choosing a color.
@@ -83,6 +84,39 @@ class Color extends FormElementBase {
     static::setAttributes($element, ['form-color']);
 
     return $element;
+  }
+  public static function createInstance($input, $process, $element_validate, $pre_render, $theme, $theme_wrappers, $value_callback, $type, $defaults_loaded, ?ElementInfoManager $elementInfoManager = NULL) {
+    if (!$elementInfoManager) {
+      $elementInfoManager = \Drupal::service('element_info');
+    }
+    $instance = $elementInfoManager->createInstance('color');
+    $instance->input = $input;
+    $instance->process = $process;
+    $instance->element_validate = $element_validate;
+    $instance->pre_render = $pre_render;
+    $instance->theme = $theme;
+    $instance->theme_wrappers = $theme_wrappers;
+    $instance->value_callback = $value_callback;
+    $instance->type = $type;
+    $instance->defaults_loaded = $defaults_loaded;
+    return $instance;
+  }
+  
+  /**
+   * {@inheritdoc}
+   */
+  public function toRenderArray() {
+    return [
+      '#input' => $this->input,
+      '#process' => $this->process,
+      '#element_validate' => $this->element_validate,
+      '#pre_render' => $this->pre_render,
+      '#theme' => $this->theme,
+      '#theme_wrappers' => $this->theme_wrappers,
+      '#value_callback' => $this->value_callback,
+      '#type' => $this->type,
+      '#defaults_loaded' => $this->defaults_loaded,
+    ];
   }
 
 }

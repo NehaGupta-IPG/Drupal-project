@@ -5,6 +5,7 @@ namespace Drupal\Core\Render\Element;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Render\Attribute\FormElement;
 use Drupal\Core\Render\Element;
+use Drupal\Core\Render\ElementInfoManager;
 
 /**
  * Provides a slider for input of a number within a specific range.
@@ -29,6 +30,21 @@ use Drupal\Core\Render\Element;
 #[FormElement('range')]
 class Range extends Number {
 
+  
+  /**
+   * @var mixed Automatically converted property
+   */
+  public $min;
+  
+  /**
+   * @var mixed Automatically converted property
+   */
+  public $max;
+  
+  /**
+   * @var mixed Automatically converted property
+   */
+  public $step;
   /**
    * {@inheritdoc}
    */
@@ -78,6 +94,45 @@ class Range extends Number {
 
       return $element['#min'] + $offset;
     }
+  }
+  public static function createInstance($min, $max, $pre_render, $theme, $input, $step, $process, $element_validate, $theme_wrappers, $value_callback, $type, $defaults_loaded, ?ElementInfoManager $elementInfoManager = NULL) {
+    if (!$elementInfoManager) {
+      $elementInfoManager = \Drupal::service('element_info');
+    }
+    $instance = $elementInfoManager->createInstance('range');
+    $instance->min = $min;
+    $instance->max = $max;
+    $instance->pre_render = $pre_render;
+    $instance->theme = $theme;
+    $instance->input = $input;
+    $instance->step = $step;
+    $instance->process = $process;
+    $instance->element_validate = $element_validate;
+    $instance->theme_wrappers = $theme_wrappers;
+    $instance->value_callback = $value_callback;
+    $instance->type = $type;
+    $instance->defaults_loaded = $defaults_loaded;
+    return $instance;
+  }
+  
+  /**
+   * {@inheritdoc}
+   */
+  public function toRenderArray() {
+    return [
+      '#min' => $this->min,
+      '#max' => $this->max,
+      '#pre_render' => $this->pre_render,
+      '#theme' => $this->theme,
+      '#input' => $this->input,
+      '#step' => $this->step,
+      '#process' => $this->process,
+      '#element_validate' => $this->element_validate,
+      '#theme_wrappers' => $this->theme_wrappers,
+      '#value_callback' => $this->value_callback,
+      '#type' => $this->type,
+      '#defaults_loaded' => $this->defaults_loaded,
+    ];
   }
 
 }

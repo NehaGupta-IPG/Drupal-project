@@ -3,6 +3,7 @@
 namespace Drupal\Core\Render\Element;
 
 use Drupal\Core\Render\Attribute\RenderElement;
+use Drupal\Core\Render\ElementInfoManager;
 
 /**
  * Provides a link render element for a "more" link, like those used in blocks.
@@ -36,6 +37,31 @@ class MoreLink extends Link {
         ],
       ],
     ] + $info;
+  }
+  public static function createInstance($title, $theme_wrappers, $pre_render, $type, $defaults_loaded, ?ElementInfoManager $elementInfoManager = NULL) {
+    if (!$elementInfoManager) {
+      $elementInfoManager = \Drupal::service('element_info');
+    }
+    $instance = $elementInfoManager->createInstance('more_link');
+    $instance->title = $title;
+    $instance->theme_wrappers = $theme_wrappers;
+    $instance->pre_render = $pre_render;
+    $instance->type = $type;
+    $instance->defaults_loaded = $defaults_loaded;
+    return $instance;
+  }
+  
+  /**
+   * {@inheritdoc}
+   */
+  public function toRenderArray() {
+    return [
+      '#title' => $this->title,
+      '#theme_wrappers' => $this->theme_wrappers,
+      '#pre_render' => $this->pre_render,
+      '#type' => $this->type,
+      '#defaults_loaded' => $this->defaults_loaded,
+    ];
   }
 
 }

@@ -4,6 +4,7 @@ namespace Drupal\Core\Render\Element;
 
 use Drupal\Core\Render\Attribute\FormElement;
 use Drupal\Core\Render\Element;
+use Drupal\Core\Render\ElementInfoManager;
 
 /**
  * Provides a form element for date or time selection.
@@ -36,6 +37,11 @@ use Drupal\Core\Render\Element;
 #[FormElement('date')]
 class Date extends FormElementBase {
 
+  
+  /**
+   * @var mixed Automatically converted property
+   */
+  public $date_date_format;
   /**
    * {@inheritdoc}
    */
@@ -78,6 +84,41 @@ class Date extends FormElementBase {
     static::setAttributes($element, ['form-' . $element['#attributes']['type']]);
 
     return $element;
+  }
+  public static function createInstance($input, $theme, $process, $pre_render, $theme_wrappers, $attributes, $date_date_format, $value_callback, $type, $defaults_loaded, ?ElementInfoManager $elementInfoManager = NULL) {
+    if (!$elementInfoManager) {
+      $elementInfoManager = \Drupal::service('element_info');
+    }
+    $instance = $elementInfoManager->createInstance('date');
+    $instance->input = $input;
+    $instance->theme = $theme;
+    $instance->process = $process;
+    $instance->pre_render = $pre_render;
+    $instance->theme_wrappers = $theme_wrappers;
+    $instance->attributes = $attributes;
+    $instance->date_date_format = $date_date_format;
+    $instance->value_callback = $value_callback;
+    $instance->type = $type;
+    $instance->defaults_loaded = $defaults_loaded;
+    return $instance;
+  }
+  
+  /**
+   * {@inheritdoc}
+   */
+  public function toRenderArray() {
+    return [
+      '#input' => $this->input,
+      '#theme' => $this->theme,
+      '#process' => $this->process,
+      '#pre_render' => $this->pre_render,
+      '#theme_wrappers' => $this->theme_wrappers,
+      '#attributes' => $this->attributes,
+      '#date_date_format' => $this->date_date_format,
+      '#value_callback' => $this->value_callback,
+      '#type' => $this->type,
+      '#defaults_loaded' => $this->defaults_loaded,
+    ];
   }
 
 }

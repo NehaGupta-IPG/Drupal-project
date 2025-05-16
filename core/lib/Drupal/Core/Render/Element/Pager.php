@@ -3,6 +3,7 @@
 namespace Drupal\Core\Render\Element;
 
 use Drupal\Core\Render\Attribute\RenderElement;
+use Drupal\Core\Render\ElementInfoManager;
 
 /**
  * Provides a render element for a pager.
@@ -34,6 +35,36 @@ use Drupal\Core\Render\Attribute\RenderElement;
 #[RenderElement('pager')]
 class Pager extends RenderElementBase {
 
+  
+  /**
+   * @var mixed Automatically converted property
+   */
+  public $element;
+  
+  /**
+   * @var mixed Automatically converted property
+   */
+  public $pagination_heading_level;
+  
+  /**
+   * @var mixed Automatically converted property
+   */
+  public $parameters;
+  
+  /**
+   * @var mixed Automatically converted property
+   */
+  public $quantity;
+  
+  /**
+   * @var mixed Automatically converted property
+   */
+  public $tags;
+  
+  /**
+   * @var mixed Automatically converted property
+   */
+  public $route_name;
   /**
    * {@inheritdoc}
    */
@@ -82,6 +113,41 @@ class Pager extends RenderElementBase {
     // In other themes, however, that may not be the case.
     $pager['#cache']['contexts'][] = 'url.query_args.pagers:' . $pager['#element'];
     return $pager;
+  }
+  public static function createInstance($pre_render, $theme, $element, $pagination_heading_level, $parameters, $quantity, $tags, $route_name, $type, $defaults_loaded, ?ElementInfoManager $elementInfoManager = NULL) {
+    if (!$elementInfoManager) {
+      $elementInfoManager = \Drupal::service('element_info');
+    }
+    $instance = $elementInfoManager->createInstance('pager');
+    $instance->pre_render = $pre_render;
+    $instance->theme = $theme;
+    $instance->element = $element;
+    $instance->pagination_heading_level = $pagination_heading_level;
+    $instance->parameters = $parameters;
+    $instance->quantity = $quantity;
+    $instance->tags = $tags;
+    $instance->route_name = $route_name;
+    $instance->type = $type;
+    $instance->defaults_loaded = $defaults_loaded;
+    return $instance;
+  }
+  
+  /**
+   * {@inheritdoc}
+   */
+  public function toRenderArray() {
+    return [
+      '#pre_render' => $this->pre_render,
+      '#theme' => $this->theme,
+      '#element' => $this->element,
+      '#pagination_heading_level' => $this->pagination_heading_level,
+      '#parameters' => $this->parameters,
+      '#quantity' => $this->quantity,
+      '#tags' => $this->tags,
+      '#route_name' => $this->route_name,
+      '#type' => $this->type,
+      '#defaults_loaded' => $this->defaults_loaded,
+    ];
   }
 
 }

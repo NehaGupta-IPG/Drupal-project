@@ -10,6 +10,7 @@ use Drupal\Core\Datetime\Entity\DateFormat;
 use Drupal\Core\Render\Attribute\FormElement;
 use Drupal\Core\Security\DoTrustedCallbackTrait;
 use Drupal\Core\Security\StaticTrustedCallbackHelper;
+use Drupal\Core\Render\ElementInfoManager;
 
 /**
  * Provides a datetime element.
@@ -18,6 +19,47 @@ use Drupal\Core\Security\StaticTrustedCallbackHelper;
 class Datetime extends DateElementBase {
 
   use DoTrustedCallbackTrait;
+  
+  
+  /**
+   * @var mixed Automatically converted property
+   */
+  public $date_date_format;
+  
+  /**
+   * @var mixed Automatically converted property
+   */
+  public $date_date_element;
+  
+  /**
+   * @var mixed Automatically converted property
+   */
+  public $date_date_callbacks;
+  
+  /**
+   * @var mixed Automatically converted property
+   */
+  public $date_time_format;
+  
+  /**
+   * @var mixed Automatically converted property
+   */
+  public $date_time_element;
+  
+  /**
+   * @var mixed Automatically converted property
+   */
+  public $date_time_callbacks;
+  
+  /**
+   * @var mixed Automatically converted property
+   */
+  public $date_year_range;
+  
+  /**
+   * @var mixed Automatically converted property
+   */
+  public $date_increment;
 
   /**
    * @var \DateTimeInterface
@@ -448,6 +490,55 @@ class Datetime extends DateElementBase {
       default:
         return $element['#date_time_format'];
     }
+  }
+  public static function createInstance($input, $element_validate, $process, $pre_render, $theme, $theme_wrappers, $date_date_format, $date_date_element, $date_date_callbacks, $date_time_format, $date_time_element, $date_time_callbacks, $date_year_range, $date_increment, $value_callback, $type, $defaults_loaded, ?ElementInfoManager $elementInfoManager = NULL) {
+    if (!$elementInfoManager) {
+      $elementInfoManager = \Drupal::service('element_info');
+    }
+    $instance = $elementInfoManager->createInstance('datetime');
+    $instance->input = $input;
+    $instance->element_validate = $element_validate;
+    $instance->process = $process;
+    $instance->pre_render = $pre_render;
+    $instance->theme = $theme;
+    $instance->theme_wrappers = $theme_wrappers;
+    $instance->date_date_format = $date_date_format;
+    $instance->date_date_element = $date_date_element;
+    $instance->date_date_callbacks = $date_date_callbacks;
+    $instance->date_time_format = $date_time_format;
+    $instance->date_time_element = $date_time_element;
+    $instance->date_time_callbacks = $date_time_callbacks;
+    $instance->date_year_range = $date_year_range;
+    $instance->date_increment = $date_increment;
+    $instance->value_callback = $value_callback;
+    $instance->type = $type;
+    $instance->defaults_loaded = $defaults_loaded;
+    return $instance;
+  }
+  
+  /**
+   * {@inheritdoc}
+   */
+  public function toRenderArray() {
+    return [
+      '#input' => $this->input,
+      '#element_validate' => $this->element_validate,
+      '#process' => $this->process,
+      '#pre_render' => $this->pre_render,
+      '#theme' => $this->theme,
+      '#theme_wrappers' => $this->theme_wrappers,
+      '#date_date_format' => $this->date_date_format,
+      '#date_date_element' => $this->date_date_element,
+      '#date_date_callbacks' => $this->date_date_callbacks,
+      '#date_time_format' => $this->date_time_format,
+      '#date_time_element' => $this->date_time_element,
+      '#date_time_callbacks' => $this->date_time_callbacks,
+      '#date_year_range' => $this->date_year_range,
+      '#date_increment' => $this->date_increment,
+      '#value_callback' => $this->value_callback,
+      '#type' => $this->type,
+      '#defaults_loaded' => $this->defaults_loaded,
+    ];
   }
 
 }

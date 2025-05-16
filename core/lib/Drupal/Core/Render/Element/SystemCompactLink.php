@@ -6,6 +6,7 @@ use Drupal\Core\Link as BaseLink;
 use Drupal\Core\Render\Attribute\RenderElement;
 use Drupal\Core\Url as BaseUrl;
 use Drupal\Component\Utility\NestedArray;
+use Drupal\Core\Render\ElementInfoManager;
 
 /**
  * Provides a link to show or hide help text on administration pages.
@@ -81,6 +82,29 @@ class SystemCompactLink extends Link {
     $element['#markup'] = BaseLink::fromTextAndUrl($element['#title'], $element['#url']->setOptions($options))->toString();
 
     return $element;
+  }
+  public static function createInstance($pre_render, $theme_wrappers, $type, $defaults_loaded, ?ElementInfoManager $elementInfoManager = NULL) {
+    if (!$elementInfoManager) {
+      $elementInfoManager = \Drupal::service('element_info');
+    }
+    $instance = $elementInfoManager->createInstance('system_compact_link');
+    $instance->pre_render = $pre_render;
+    $instance->theme_wrappers = $theme_wrappers;
+    $instance->type = $type;
+    $instance->defaults_loaded = $defaults_loaded;
+    return $instance;
+  }
+  
+  /**
+   * {@inheritdoc}
+   */
+  public function toRenderArray() {
+    return [
+      '#pre_render' => $this->pre_render,
+      '#theme_wrappers' => $this->theme_wrappers,
+      '#type' => $this->type,
+      '#defaults_loaded' => $this->defaults_loaded,
+    ];
   }
 
 }

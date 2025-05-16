@@ -3,6 +3,7 @@
 namespace Drupal\Core\Render\Element;
 
 use Drupal\Core\Render\Attribute\RenderElement;
+use Drupal\Core\Render\ElementInfoManager;
 
 /**
  * Creates status report page element.
@@ -10,6 +11,11 @@ use Drupal\Core\Render\Attribute\RenderElement;
 #[RenderElement('status_report')]
 class StatusReport extends RenderElementBase {
 
+  
+  /**
+   * @var mixed Automatically converted property
+   */
+  public $priorities;
   /**
    * {@inheritdoc}
    */
@@ -87,6 +93,31 @@ class StatusReport extends RenderElementBase {
         'title' => t('Errors found'),
         'status' => 'error',
       ],
+    ];
+  }
+  public static function createInstance($theme, $priorities, $pre_render, $type, $defaults_loaded, ?ElementInfoManager $elementInfoManager = NULL) {
+    if (!$elementInfoManager) {
+      $elementInfoManager = \Drupal::service('element_info');
+    }
+    $instance = $elementInfoManager->createInstance('status_report');
+    $instance->theme = $theme;
+    $instance->priorities = $priorities;
+    $instance->pre_render = $pre_render;
+    $instance->type = $type;
+    $instance->defaults_loaded = $defaults_loaded;
+    return $instance;
+  }
+  
+  /**
+   * {@inheritdoc}
+   */
+  public function toRenderArray() {
+    return [
+      '#theme' => $this->theme,
+      '#priorities' => $this->priorities,
+      '#pre_render' => $this->pre_render,
+      '#type' => $this->type,
+      '#defaults_loaded' => $this->defaults_loaded,
     ];
   }
 

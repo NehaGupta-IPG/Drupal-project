@@ -10,6 +10,7 @@ use Drupal\Core\Render\Element\RenderElementBase;
 use Drupal\filter\Entity\FilterFormat;
 use Drupal\filter\Plugin\FilterInterface;
 use Drupal\filter\Render\FilteredMarkup;
+use Drupal\Core\Render\ElementInfoManager;
 
 /**
  * Provides a processed text render element.
@@ -17,6 +18,26 @@ use Drupal\filter\Render\FilteredMarkup;
 #[RenderElement('processed_text')]
 class ProcessedText extends RenderElementBase {
 
+  
+  /**
+   * @var mixed Automatically converted property
+   */
+  public $text;
+  
+  /**
+   * @var mixed Automatically converted property
+   */
+  public $format;
+  
+  /**
+   * @var mixed Automatically converted property
+   */
+  public $filter_types_to_skip;
+  
+  /**
+   * @var mixed Automatically converted property
+   */
+  public $langcode;
   /**
    * {@inheritdoc}
    */
@@ -161,6 +182,35 @@ class ProcessedText extends RenderElementBase {
    */
   protected static function configFactory() {
     return \Drupal::configFactory();
+  }
+  public static function createInstance($text, $format, $filter_types_to_skip, $langcode, $pre_render, $type, $defaults_loaded, ?ElementInfoManager $elementInfoManager = NULL) {
+    if (!$elementInfoManager) {
+      $elementInfoManager = \Drupal::service('element_info');
+    }
+    $instance = $elementInfoManager->createInstance('processed_text');
+    $instance->text = $text;
+    $instance->format = $format;
+    $instance->filter_types_to_skip = $filter_types_to_skip;
+    $instance->langcode = $langcode;
+    $instance->pre_render = $pre_render;
+    $instance->type = $type;
+    $instance->defaults_loaded = $defaults_loaded;
+    return $instance;
+  }
+  
+  /**
+   * {@inheritdoc}
+   */
+  public function toRenderArray() {
+    return [
+      '#text' => $this->text,
+      '#format' => $this->format,
+      '#filter_types_to_skip' => $this->filter_types_to_skip,
+      '#langcode' => $this->langcode,
+      '#pre_render' => $this->pre_render,
+      '#type' => $this->type,
+      '#defaults_loaded' => $this->defaults_loaded,
+    ];
   }
 
 }

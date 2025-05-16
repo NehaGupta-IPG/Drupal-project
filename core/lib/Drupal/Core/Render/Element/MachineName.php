@@ -6,6 +6,8 @@ use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\Render\Attribute\FormElement;
+use Drupal\Core\Render\ElementInfoManager;
+use Drupal\Core\Render\Element\ProcessAutocompleteTrait;
 
 /**
  * Provides a machine name render element.
@@ -73,6 +75,17 @@ use Drupal\Core\Render\Attribute\FormElement;
 #[FormElement('machine_name')]
 class MachineName extends Textfield {
 
+  use ProcessAutocompleteTrait;
+  
+  /**
+   * @var mixed Automatically converted property
+   */
+  public $maxlength;
+  
+  /**
+   * @var mixed Automatically converted property
+   */
+  public $size;
   /**
    * {@inheritdoc}
    */
@@ -306,6 +319,49 @@ class MachineName extends Textfield {
     \Drupal::moduleHandler()->alter('transliteration_overrides', $overrides[$langcode], $langcode);
 
     return [$langcode => $overrides[$langcode]];
+  }
+  public static function createInstance($input, $default_value, $required, $maxlength, $size, $autocomplete_route_name, $process, $element_validate, $pre_render, $theme, $theme_wrappers, $value_callback, $type, $defaults_loaded, ?ElementInfoManager $elementInfoManager = NULL) {
+    if (!$elementInfoManager) {
+      $elementInfoManager = \Drupal::service('element_info');
+    }
+    $instance = $elementInfoManager->createInstance('machine_name');
+    $instance->input = $input;
+    $instance->default_value = $default_value;
+    $instance->required = $required;
+    $instance->maxlength = $maxlength;
+    $instance->size = $size;
+    $instance->autocomplete_route_name = $autocomplete_route_name;
+    $instance->process = $process;
+    $instance->element_validate = $element_validate;
+    $instance->pre_render = $pre_render;
+    $instance->theme = $theme;
+    $instance->theme_wrappers = $theme_wrappers;
+    $instance->value_callback = $value_callback;
+    $instance->type = $type;
+    $instance->defaults_loaded = $defaults_loaded;
+    return $instance;
+  }
+  
+  /**
+   * {@inheritdoc}
+   */
+  public function toRenderArray() {
+    return [
+      '#input' => $this->input,
+      '#default_value' => $this->default_value,
+      '#required' => $this->required,
+      '#maxlength' => $this->maxlength,
+      '#size' => $this->size,
+      '#autocomplete_route_name' => $this->autocomplete_route_name,
+      '#process' => $this->process,
+      '#element_validate' => $this->element_validate,
+      '#pre_render' => $this->pre_render,
+      '#theme' => $this->theme,
+      '#theme_wrappers' => $this->theme_wrappers,
+      '#value_callback' => $this->value_callback,
+      '#type' => $this->type,
+      '#defaults_loaded' => $this->defaults_loaded,
+    ];
   }
 
 }

@@ -6,6 +6,9 @@ use Drupal\Component\Utility\UrlHelper;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Render\Attribute\FormElement;
 use Drupal\Core\Render\Element;
+use Drupal\Core\Render\ElementInfoManager;
+use Drupal\Core\Render\Element\ProcessAutocompleteTrait;
+use Drupal\Core\Render\Element\ProcessPatternTrait;
 
 /**
  * Provides a form element for input of a URL.
@@ -31,6 +34,18 @@ use Drupal\Core\Render\Element;
 #[FormElement('url')]
 class Url extends FormElementBase {
 
+  use ProcessPatternTrait;
+  use ProcessAutocompleteTrait;
+  
+  /**
+   * @var mixed Automatically converted property
+   */
+  public $size;
+  
+  /**
+   * @var mixed Automatically converted property
+   */
+  public $maxlength;
   /**
    * {@inheritdoc}
    */
@@ -88,6 +103,45 @@ class Url extends FormElementBase {
     static::setAttributes($element, ['form-url']);
 
     return $element;
+  }
+  public static function createInstance($input, $size, $maxlength, $autocomplete_route_name, $process, $element_validate, $pre_render, $theme, $theme_wrappers, $value_callback, $type, $defaults_loaded, ?ElementInfoManager $elementInfoManager = NULL) {
+    if (!$elementInfoManager) {
+      $elementInfoManager = \Drupal::service('element_info');
+    }
+    $instance = $elementInfoManager->createInstance('url');
+    $instance->input = $input;
+    $instance->size = $size;
+    $instance->maxlength = $maxlength;
+    $instance->autocomplete_route_name = $autocomplete_route_name;
+    $instance->process = $process;
+    $instance->element_validate = $element_validate;
+    $instance->pre_render = $pre_render;
+    $instance->theme = $theme;
+    $instance->theme_wrappers = $theme_wrappers;
+    $instance->value_callback = $value_callback;
+    $instance->type = $type;
+    $instance->defaults_loaded = $defaults_loaded;
+    return $instance;
+  }
+  
+  /**
+   * {@inheritdoc}
+   */
+  public function toRenderArray() {
+    return [
+      '#input' => $this->input,
+      '#size' => $this->size,
+      '#maxlength' => $this->maxlength,
+      '#autocomplete_route_name' => $this->autocomplete_route_name,
+      '#process' => $this->process,
+      '#element_validate' => $this->element_validate,
+      '#pre_render' => $this->pre_render,
+      '#theme' => $this->theme,
+      '#theme_wrappers' => $this->theme_wrappers,
+      '#value_callback' => $this->value_callback,
+      '#type' => $this->type,
+      '#defaults_loaded' => $this->defaults_loaded,
+    ];
   }
 
 }

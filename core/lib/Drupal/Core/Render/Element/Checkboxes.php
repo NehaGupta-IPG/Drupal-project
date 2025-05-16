@@ -4,6 +4,7 @@ namespace Drupal\Core\Render\Element;
 
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Render\Attribute\FormElement;
+use Drupal\Core\Render\ElementInfoManager;
 
 /**
  * Provides a form element for a set of checkboxes.
@@ -37,6 +38,7 @@ use Drupal\Core\Render\Attribute\FormElement;
 class Checkboxes extends FormElementBase {
 
   use CompositeFormElementTrait;
+  
 
   /**
    * {@inheritdoc}
@@ -179,6 +181,35 @@ class Checkboxes extends FormElementBase {
    */
   public static function detectEmptyCheckboxes(array $input) {
     return empty(static::getCheckedCheckboxes($input));
+  }
+  public static function createInstance($input, $process, $pre_render, $theme_wrappers, $value_callback, $type, $defaults_loaded, ?ElementInfoManager $elementInfoManager = NULL) {
+    if (!$elementInfoManager) {
+      $elementInfoManager = \Drupal::service('element_info');
+    }
+    $instance = $elementInfoManager->createInstance('checkboxes');
+    $instance->input = $input;
+    $instance->process = $process;
+    $instance->pre_render = $pre_render;
+    $instance->theme_wrappers = $theme_wrappers;
+    $instance->value_callback = $value_callback;
+    $instance->type = $type;
+    $instance->defaults_loaded = $defaults_loaded;
+    return $instance;
+  }
+  
+  /**
+   * {@inheritdoc}
+   */
+  public function toRenderArray() {
+    return [
+      '#input' => $this->input,
+      '#process' => $this->process,
+      '#pre_render' => $this->pre_render,
+      '#theme_wrappers' => $this->theme_wrappers,
+      '#value_callback' => $this->value_callback,
+      '#type' => $this->type,
+      '#defaults_loaded' => $this->defaults_loaded,
+    ];
   }
 
 }

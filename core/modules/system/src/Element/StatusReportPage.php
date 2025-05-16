@@ -6,6 +6,7 @@ use Drupal\Core\Render\Attribute\RenderElement;
 use Drupal\Core\Render\Element\RenderElementBase;
 use Drupal\Core\Render\Element\StatusReport;
 use Drupal\Core\StringTranslation\PluralTranslatableMarkup;
+use Drupal\Core\Render\ElementInfoManager;
 
 /**
  * Creates status report page element.
@@ -144,6 +145,29 @@ class StatusReportPage extends RenderElementBase {
     ];
 
     return $element;
+  }
+  public static function createInstance($theme, $pre_render, $type, $defaults_loaded, ?ElementInfoManager $elementInfoManager = NULL) {
+    if (!$elementInfoManager) {
+      $elementInfoManager = \Drupal::service('element_info');
+    }
+    $instance = $elementInfoManager->createInstance('status_report_page');
+    $instance->theme = $theme;
+    $instance->pre_render = $pre_render;
+    $instance->type = $type;
+    $instance->defaults_loaded = $defaults_loaded;
+    return $instance;
+  }
+  
+  /**
+   * {@inheritdoc}
+   */
+  public function toRenderArray() {
+    return [
+      '#theme' => $this->theme,
+      '#pre_render' => $this->pre_render,
+      '#type' => $this->type,
+      '#defaults_loaded' => $this->defaults_loaded,
+    ];
   }
 
 }

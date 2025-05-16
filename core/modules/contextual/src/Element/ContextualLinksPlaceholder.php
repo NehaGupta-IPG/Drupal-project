@@ -8,6 +8,7 @@ use Drupal\Core\Template\Attribute;
 use Drupal\Core\Render\Attribute\RenderElement;
 use Drupal\Core\Render\Element\RenderElementBase;
 use Drupal\Component\Render\FormattableMarkup;
+use Drupal\Core\Render\ElementInfoManager;
 
 /**
  * Provides a contextual_links_placeholder element.
@@ -53,6 +54,29 @@ class ContextualLinksPlaceholder extends RenderElementBase {
     $element['#markup'] = new FormattableMarkup('<div@attributes></div>', ['@attributes' => $attribute]);
 
     return $element;
+  }
+  public static function createInstance($pre_render, $id, $type, $defaults_loaded, ?ElementInfoManager $elementInfoManager = NULL) {
+    if (!$elementInfoManager) {
+      $elementInfoManager = \Drupal::service('element_info');
+    }
+    $instance = $elementInfoManager->createInstance('contextual_links_placeholder');
+    $instance->pre_render = $pre_render;
+    $instance->id = $id;
+    $instance->type = $type;
+    $instance->defaults_loaded = $defaults_loaded;
+    return $instance;
+  }
+  
+  /**
+   * {@inheritdoc}
+   */
+  public function toRenderArray() {
+    return [
+      '#pre_render' => $this->pre_render,
+      '#id' => $this->id,
+      '#type' => $this->type,
+      '#defaults_loaded' => $this->defaults_loaded,
+    ];
   }
 
 }

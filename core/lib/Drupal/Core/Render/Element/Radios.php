@@ -5,6 +5,7 @@ namespace Drupal\Core\Render\Element;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Render\Attribute\FormElement;
 use Drupal\Component\Utility\Html as HtmlUtility;
+use Drupal\Core\Render\ElementInfoManager;
 
 /**
  * Provides a form element for a set of radio buttons.
@@ -37,6 +38,7 @@ use Drupal\Component\Utility\Html as HtmlUtility;
 class Radios extends FormElementBase {
 
   use CompositeFormElementTrait;
+  
 
   /**
    * {@inheritdoc}
@@ -119,6 +121,35 @@ class Radios extends FormElementBase {
       }
       return $value;
     }
+  }
+  public static function createInstance($input, $process, $theme_wrappers, $pre_render, $value_callback, $type, $defaults_loaded, ?ElementInfoManager $elementInfoManager = NULL) {
+    if (!$elementInfoManager) {
+      $elementInfoManager = \Drupal::service('element_info');
+    }
+    $instance = $elementInfoManager->createInstance('radios');
+    $instance->input = $input;
+    $instance->process = $process;
+    $instance->theme_wrappers = $theme_wrappers;
+    $instance->pre_render = $pre_render;
+    $instance->value_callback = $value_callback;
+    $instance->type = $type;
+    $instance->defaults_loaded = $defaults_loaded;
+    return $instance;
+  }
+  
+  /**
+   * {@inheritdoc}
+   */
+  public function toRenderArray() {
+    return [
+      '#input' => $this->input,
+      '#process' => $this->process,
+      '#theme_wrappers' => $this->theme_wrappers,
+      '#pre_render' => $this->pre_render,
+      '#value_callback' => $this->value_callback,
+      '#type' => $this->type,
+      '#defaults_loaded' => $this->defaults_loaded,
+    ];
   }
 
 }

@@ -6,6 +6,7 @@ use Drupal\Component\Utility\Html;
 use Drupal\Core\Render\Attribute\RenderElement;
 use Drupal\Core\Render\Element;
 use Drupal\Core\Render\Element\Table;
+use Drupal\Core\Render\ElementInfoManager;
 
 /**
  * Provides a field_ui table element.
@@ -13,6 +14,56 @@ use Drupal\Core\Render\Element\Table;
 #[RenderElement('field_ui_table')]
 class FieldUiTable extends Table {
 
+  
+  /**
+   * @var mixed Automatically converted property
+   */
+  public $header;
+  
+  /**
+   * @var mixed Automatically converted property
+   */
+  public $rows;
+  
+  /**
+   * @var mixed Automatically converted property
+   */
+  public $empty;
+  
+  /**
+   * @var mixed Automatically converted property
+   */
+  public $tableselect;
+  
+  /**
+   * @var mixed Automatically converted property
+   */
+  public $sticky;
+  
+  /**
+   * @var mixed Automatically converted property
+   */
+  public $responsive;
+  
+  /**
+   * @var mixed Automatically converted property
+   */
+  public $multiple;
+  
+  /**
+   * @var mixed Automatically converted property
+   */
+  public $js_select;
+  
+  /**
+   * @var mixed Automatically converted property
+   */
+  public $tabledrag;
+  
+  /**
+   * @var mixed Automatically converted property
+   */
+  public $regions;
   /**
    * {@inheritdoc}
    */
@@ -237,6 +288,59 @@ class FieldUiTable extends Table {
     }
 
     return $array;
+  }
+  public static function createInstance($header, $rows, $empty, $input, $tree, $tableselect, $sticky, $responsive, $multiple, $js_select, $process, $element_validate, $tabledrag, $pre_render, $theme, $regions, $value_callback, $type, $defaults_loaded, ?ElementInfoManager $elementInfoManager = NULL) {
+    if (!$elementInfoManager) {
+      $elementInfoManager = \Drupal::service('element_info');
+    }
+    $instance = $elementInfoManager->createInstance('field_ui_table');
+    $instance->header = $header;
+    $instance->rows = $rows;
+    $instance->empty = $empty;
+    $instance->input = $input;
+    $instance->tree = $tree;
+    $instance->tableselect = $tableselect;
+    $instance->sticky = $sticky;
+    $instance->responsive = $responsive;
+    $instance->multiple = $multiple;
+    $instance->js_select = $js_select;
+    $instance->process = $process;
+    $instance->element_validate = $element_validate;
+    $instance->tabledrag = $tabledrag;
+    $instance->pre_render = $pre_render;
+    $instance->theme = $theme;
+    $instance->regions = $regions;
+    $instance->value_callback = $value_callback;
+    $instance->type = $type;
+    $instance->defaults_loaded = $defaults_loaded;
+    return $instance;
+  }
+  
+  /**
+   * {@inheritdoc}
+   */
+  public function toRenderArray() {
+    return [
+      '#header' => $this->header,
+      '#rows' => $this->rows,
+      '#empty' => $this->empty,
+      '#input' => $this->input,
+      '#tree' => $this->tree,
+      '#tableselect' => $this->tableselect,
+      '#sticky' => $this->sticky,
+      '#responsive' => $this->responsive,
+      '#multiple' => $this->multiple,
+      '#js_select' => $this->js_select,
+      '#process' => $this->process,
+      '#element_validate' => $this->element_validate,
+      '#tabledrag' => $this->tabledrag,
+      '#pre_render' => $this->pre_render,
+      '#theme' => $this->theme,
+      '#regions' => $this->regions,
+      '#value_callback' => $this->value_callback,
+      '#type' => $this->type,
+      '#defaults_loaded' => $this->defaults_loaded,
+    ];
   }
 
 }

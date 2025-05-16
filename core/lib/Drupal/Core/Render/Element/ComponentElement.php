@@ -6,6 +6,7 @@ use Drupal\Core\Render\Attribute\RenderElement;
 use Drupal\Core\Render\Component\Exception\InvalidComponentDataException;
 use Drupal\Core\Render\Element;
 use Drupal\Core\Security\DoTrustedCallbackTrait;
+use Drupal\Core\Render\ElementInfoManager;
 
 /**
  * Provides a Single-Directory Component render element.
@@ -37,6 +38,37 @@ use Drupal\Core\Security\DoTrustedCallbackTrait;
 class ComponentElement extends RenderElementBase {
 
   use DoTrustedCallbackTrait;
+  
+  
+  /**
+   * @var mixed Automatically converted property
+   */
+  public $component;
+  
+  /**
+   * @var mixed Automatically converted property
+   */
+  public $variant;
+  
+  /**
+   * @var mixed Automatically converted property
+   */
+  public $props;
+  
+  /**
+   * @var mixed Automatically converted property
+   */
+  public $slots;
+  
+  /**
+   * @var mixed Automatically converted property
+   */
+  public $propsAlter;
+  
+  /**
+   * @var mixed Automatically converted property
+   */
+  public $slotsAlter;
 
   /**
    * Expands a component into an inline template with an attachment.
@@ -161,6 +193,39 @@ class ComponentElement extends RenderElementBase {
       '#slots' => [],
       '#propsAlter' => [],
       '#slotsAlter' => [],
+    ];
+  }
+  public static function createInstance($pre_render, $component, $variant, $props, $slots, $propsAlter, $slotsAlter, $type, $defaults_loaded, ?ElementInfoManager $elementInfoManager = NULL) {
+    if (!$elementInfoManager) {
+      $elementInfoManager = \Drupal::service('element_info');
+    }
+    $instance = $elementInfoManager->createInstance('component');
+    $instance->pre_render = $pre_render;
+    $instance->component = $component;
+    $instance->variant = $variant;
+    $instance->props = $props;
+    $instance->slots = $slots;
+    $instance->propsAlter = $propsAlter;
+    $instance->slotsAlter = $slotsAlter;
+    $instance->type = $type;
+    $instance->defaults_loaded = $defaults_loaded;
+    return $instance;
+  }
+  
+  /**
+   * {@inheritdoc}
+   */
+  public function toRenderArray() {
+    return [
+      '#pre_render' => $this->pre_render,
+      '#component' => $this->component,
+      '#variant' => $this->variant,
+      '#props' => $this->props,
+      '#slots' => $this->slots,
+      '#propsAlter' => $this->propsAlter,
+      '#slotsAlter' => $this->slotsAlter,
+      '#type' => $this->type,
+      '#defaults_loaded' => $this->defaults_loaded,
     ];
   }
 

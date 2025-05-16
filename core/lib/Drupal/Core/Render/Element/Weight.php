@@ -4,6 +4,7 @@ namespace Drupal\Core\Render\Element;
 
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Render\Attribute\FormElement;
+use Drupal\Core\Render\ElementInfoManager;
 
 /**
  * Provides a form element for input of a weight.
@@ -28,6 +29,11 @@ use Drupal\Core\Render\Attribute\FormElement;
 #[FormElement('weight')]
 class Weight extends FormElementBase {
 
+  
+  /**
+   * @var mixed Automatically converted property
+   */
+  public $delta;
   /**
    * {@inheritdoc}
    */
@@ -71,6 +77,35 @@ class Weight extends FormElementBase {
     }
 
     return $element;
+  }
+  public static function createInstance($input, $delta, $default_value, $process, $value_callback, $type, $defaults_loaded, ?ElementInfoManager $elementInfoManager = NULL) {
+    if (!$elementInfoManager) {
+      $elementInfoManager = \Drupal::service('element_info');
+    }
+    $instance = $elementInfoManager->createInstance('weight');
+    $instance->input = $input;
+    $instance->delta = $delta;
+    $instance->default_value = $default_value;
+    $instance->process = $process;
+    $instance->value_callback = $value_callback;
+    $instance->type = $type;
+    $instance->defaults_loaded = $defaults_loaded;
+    return $instance;
+  }
+  
+  /**
+   * {@inheritdoc}
+   */
+  public function toRenderArray() {
+    return [
+      '#input' => $this->input,
+      '#delta' => $this->delta,
+      '#default_value' => $this->default_value,
+      '#process' => $this->process,
+      '#value_callback' => $this->value_callback,
+      '#type' => $this->type,
+      '#defaults_loaded' => $this->defaults_loaded,
+    ];
   }
 
 }

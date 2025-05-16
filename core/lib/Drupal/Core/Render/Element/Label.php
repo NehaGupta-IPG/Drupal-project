@@ -3,6 +3,7 @@
 namespace Drupal\Core\Render\Element;
 
 use Drupal\Core\Render\Attribute\RenderElement;
+use Drupal\Core\Render\ElementInfoManager;
 
 /**
  * Provides a render element for displaying the label for a form element.
@@ -20,6 +21,27 @@ class Label extends RenderElementBase {
   public function getInfo() {
     return [
       '#theme' => 'form_element_label',
+    ];
+  }
+  public static function createInstance($theme, $type, $defaults_loaded, ?ElementInfoManager $elementInfoManager = NULL) {
+    if (!$elementInfoManager) {
+      $elementInfoManager = \Drupal::service('element_info');
+    }
+    $instance = $elementInfoManager->createInstance('label');
+    $instance->theme = $theme;
+    $instance->type = $type;
+    $instance->defaults_loaded = $defaults_loaded;
+    return $instance;
+  }
+  
+  /**
+   * {@inheritdoc}
+   */
+  public function toRenderArray() {
+    return [
+      '#theme' => $this->theme,
+      '#type' => $this->type,
+      '#defaults_loaded' => $this->defaults_loaded,
     ];
   }
 

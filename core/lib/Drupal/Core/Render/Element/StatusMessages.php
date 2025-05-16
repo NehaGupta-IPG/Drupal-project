@@ -4,6 +4,7 @@ namespace Drupal\Core\Render\Element;
 
 use Drupal\Core\Render\Attribute\RenderElement;
 use Drupal\big_pipe\Render\Placeholder\BigPipeStrategy;
+use Drupal\Core\Render\ElementInfoManager;
 
 /**
  * Provides a messages element.
@@ -20,6 +21,16 @@ use Drupal\big_pipe\Render\Placeholder\BigPipeStrategy;
 #[RenderElement('status_messages')]
 class StatusMessages extends RenderElementBase {
 
+  
+  /**
+   * @var mixed Automatically converted property
+   */
+  public $display;
+  
+  /**
+   * @var mixed Automatically converted property
+   */
+  public $include_fallback;
   /**
    * {@inheritdoc}
    *
@@ -123,6 +134,31 @@ class StatusMessages extends RenderElementBase {
       ];
     }
     return $render;
+  }
+  public static function createInstance($display, $pre_render, $include_fallback, $type, $defaults_loaded, ?ElementInfoManager $elementInfoManager = NULL) {
+    if (!$elementInfoManager) {
+      $elementInfoManager = \Drupal::service('element_info');
+    }
+    $instance = $elementInfoManager->createInstance('status_messages');
+    $instance->display = $display;
+    $instance->pre_render = $pre_render;
+    $instance->include_fallback = $include_fallback;
+    $instance->type = $type;
+    $instance->defaults_loaded = $defaults_loaded;
+    return $instance;
+  }
+  
+  /**
+   * {@inheritdoc}
+   */
+  public function toRenderArray() {
+    return [
+      '#display' => $this->display,
+      '#pre_render' => $this->pre_render,
+      '#include_fallback' => $this->include_fallback,
+      '#type' => $this->type,
+      '#defaults_loaded' => $this->defaults_loaded,
+    ];
   }
 
 }

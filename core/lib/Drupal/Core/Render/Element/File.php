@@ -5,6 +5,7 @@ namespace Drupal\Core\Render\Element;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Render\Attribute\FormElement;
 use Drupal\Core\Render\Element;
+use Drupal\Core\Render\ElementInfoManager;
 
 /**
  * Provides a form element for uploading a file.
@@ -23,6 +24,16 @@ use Drupal\Core\Render\Element;
 #[FormElement('file')]
 class File extends FormElementBase {
 
+  
+  /**
+   * @var mixed Automatically converted property
+   */
+  public $multiple;
+  
+  /**
+   * @var mixed Automatically converted property
+   */
+  public $size;
   /**
    * {@inheritdoc}
    */
@@ -95,6 +106,41 @@ class File extends FormElementBase {
       return (array) $uploaded_file;
     }
     return NULL;
+  }
+  public static function createInstance($input, $multiple, $process, $size, $pre_render, $theme, $theme_wrappers, $value_callback, $type, $defaults_loaded, ?ElementInfoManager $elementInfoManager = NULL) {
+    if (!$elementInfoManager) {
+      $elementInfoManager = \Drupal::service('element_info');
+    }
+    $instance = $elementInfoManager->createInstance('file');
+    $instance->input = $input;
+    $instance->multiple = $multiple;
+    $instance->process = $process;
+    $instance->size = $size;
+    $instance->pre_render = $pre_render;
+    $instance->theme = $theme;
+    $instance->theme_wrappers = $theme_wrappers;
+    $instance->value_callback = $value_callback;
+    $instance->type = $type;
+    $instance->defaults_loaded = $defaults_loaded;
+    return $instance;
+  }
+  
+  /**
+   * {@inheritdoc}
+   */
+  public function toRenderArray() {
+    return [
+      '#input' => $this->input,
+      '#multiple' => $this->multiple,
+      '#process' => $this->process,
+      '#size' => $this->size,
+      '#pre_render' => $this->pre_render,
+      '#theme' => $this->theme,
+      '#theme_wrappers' => $this->theme_wrappers,
+      '#value_callback' => $this->value_callback,
+      '#type' => $this->type,
+      '#defaults_loaded' => $this->defaults_loaded,
+    ];
   }
 
 }

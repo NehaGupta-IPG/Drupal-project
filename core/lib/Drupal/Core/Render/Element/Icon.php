@@ -7,6 +7,7 @@ namespace Drupal\Core\Render\Element;
 use Drupal\Core\Render\Attribute\RenderElement;
 use Drupal\Core\Template\Attribute;
 use Drupal\Core\Theme\Icon\IconDefinition;
+use Drupal\Core\Render\ElementInfoManager;
 
 /**
  * Provides a render element to display an icon.
@@ -33,6 +34,21 @@ use Drupal\Core\Theme\Icon\IconDefinition;
 #[RenderElement('icon')]
 class Icon extends RenderElementBase {
 
+  
+  /**
+   * @var mixed Automatically converted property
+   */
+  public $pack_id;
+  
+  /**
+   * @var mixed Automatically converted property
+   */
+  public $icon_id;
+  
+  /**
+   * @var mixed Automatically converted property
+   */
+  public $settings;
   /**
    * {@inheritdoc}
    */
@@ -97,6 +113,33 @@ class Icon extends RenderElementBase {
     }
 
     return $element;
+  }
+  public static function createInstance($pre_render, $pack_id, $icon_id, $settings, $type, $defaults_loaded, ?ElementInfoManager $elementInfoManager = NULL) {
+    if (!$elementInfoManager) {
+      $elementInfoManager = \Drupal::service('element_info');
+    }
+    $instance = $elementInfoManager->createInstance('icon');
+    $instance->pre_render = $pre_render;
+    $instance->pack_id = $pack_id;
+    $instance->icon_id = $icon_id;
+    $instance->settings = $settings;
+    $instance->type = $type;
+    $instance->defaults_loaded = $defaults_loaded;
+    return $instance;
+  }
+  
+  /**
+   * {@inheritdoc}
+   */
+  public function toRenderArray() {
+    return [
+      '#pre_render' => $this->pre_render,
+      '#pack_id' => $this->pack_id,
+      '#icon_id' => $this->icon_id,
+      '#settings' => $this->settings,
+      '#type' => $this->type,
+      '#defaults_loaded' => $this->defaults_loaded,
+    ];
   }
 
 }

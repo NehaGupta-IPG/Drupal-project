@@ -4,6 +4,7 @@ namespace Drupal\Core\Render\Element;
 
 use Drupal\Core\Render\Attribute\RenderElement;
 use Drupal\Core\Render\Element;
+use Drupal\Core\Render\ElementInfoManager;
 
 /**
  * Provides a render element for a details element, similar to a fieldset.
@@ -38,6 +39,16 @@ use Drupal\Core\Render\Element;
 #[RenderElement('details')]
 class Details extends RenderElementBase {
 
+  
+  /**
+   * @var mixed Automatically converted property
+   */
+  public $open;
+  
+  /**
+   * @var mixed Automatically converted property
+   */
+  public $summary_attributes;
   /**
    * {@inheritdoc}
    */
@@ -92,6 +103,37 @@ class Details extends RenderElementBase {
     }
 
     return $element;
+  }
+  public static function createInstance($open, $summary_attributes, $value, $process, $pre_render, $theme_wrappers, $type, $defaults_loaded, ?ElementInfoManager $elementInfoManager = NULL) {
+    if (!$elementInfoManager) {
+      $elementInfoManager = \Drupal::service('element_info');
+    }
+    $instance = $elementInfoManager->createInstance('details');
+    $instance->open = $open;
+    $instance->summary_attributes = $summary_attributes;
+    $instance->value = $value;
+    $instance->process = $process;
+    $instance->pre_render = $pre_render;
+    $instance->theme_wrappers = $theme_wrappers;
+    $instance->type = $type;
+    $instance->defaults_loaded = $defaults_loaded;
+    return $instance;
+  }
+  
+  /**
+   * {@inheritdoc}
+   */
+  public function toRenderArray() {
+    return [
+      '#open' => $this->open,
+      '#summary_attributes' => $this->summary_attributes,
+      '#value' => $this->value,
+      '#process' => $this->process,
+      '#pre_render' => $this->pre_render,
+      '#theme_wrappers' => $this->theme_wrappers,
+      '#type' => $this->type,
+      '#defaults_loaded' => $this->defaults_loaded,
+    ];
   }
 
 }

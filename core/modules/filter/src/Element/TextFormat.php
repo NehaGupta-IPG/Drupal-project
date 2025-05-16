@@ -7,6 +7,7 @@ use Drupal\Core\Render\Attribute\RenderElement;
 use Drupal\Core\Render\Element\RenderElementBase;
 use Drupal\Core\Render\Element;
 use Drupal\Core\Url;
+use Drupal\Core\Render\ElementInfoManager;
 
 /**
  * Provides a text format render element.
@@ -35,6 +36,11 @@ use Drupal\Core\Url;
 #[RenderElement('text_format')]
 class TextFormat extends RenderElementBase {
 
+  
+  /**
+   * @var mixed Automatically converted property
+   */
+  public $base_type;
   /**
    * {@inheritdoc}
    */
@@ -308,6 +314,33 @@ class TextFormat extends RenderElementBase {
    */
   protected static function elementInfo() {
     return \Drupal::service('element_info');
+  }
+  public static function createInstance($process, $base_type, $theme_wrappers, $type, $pre_render, $defaults_loaded, ?ElementInfoManager $elementInfoManager = NULL) {
+    if (!$elementInfoManager) {
+      $elementInfoManager = \Drupal::service('element_info');
+    }
+    $instance = $elementInfoManager->createInstance('text_format');
+    $instance->process = $process;
+    $instance->base_type = $base_type;
+    $instance->theme_wrappers = $theme_wrappers;
+    $instance->type = $type;
+    $instance->pre_render = $pre_render;
+    $instance->defaults_loaded = $defaults_loaded;
+    return $instance;
+  }
+  
+  /**
+   * {@inheritdoc}
+   */
+  public function toRenderArray() {
+    return [
+      '#process' => $this->process,
+      '#base_type' => $this->base_type,
+      '#theme_wrappers' => $this->theme_wrappers,
+      '#type' => $this->type,
+      '#pre_render' => $this->pre_render,
+      '#defaults_loaded' => $this->defaults_loaded,
+    ];
   }
 
 }

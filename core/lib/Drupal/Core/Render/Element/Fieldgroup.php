@@ -3,6 +3,7 @@
 namespace Drupal\Core\Render\Element;
 
 use Drupal\Core\Render\Attribute\RenderElement;
+use Drupal\Core\Render\ElementInfoManager;
 
 /**
  * Provides a render element for a group of form elements.
@@ -45,6 +46,35 @@ class Fieldgroup extends Fieldset {
   public static function preRenderAttachments($element): array {
     $element['#attached']['library'][] = 'core/drupal.fieldgroup';
     return $element;
+  }
+  public static function createInstance($process, $pre_render, $value, $theme_wrappers, $attributes, $type, $defaults_loaded, ?ElementInfoManager $elementInfoManager = NULL) {
+    if (!$elementInfoManager) {
+      $elementInfoManager = \Drupal::service('element_info');
+    }
+    $instance = $elementInfoManager->createInstance('fieldgroup');
+    $instance->process = $process;
+    $instance->pre_render = $pre_render;
+    $instance->value = $value;
+    $instance->theme_wrappers = $theme_wrappers;
+    $instance->attributes = $attributes;
+    $instance->type = $type;
+    $instance->defaults_loaded = $defaults_loaded;
+    return $instance;
+  }
+  
+  /**
+   * {@inheritdoc}
+   */
+  public function toRenderArray() {
+    return [
+      '#process' => $this->process,
+      '#pre_render' => $this->pre_render,
+      '#value' => $this->value,
+      '#theme_wrappers' => $this->theme_wrappers,
+      '#attributes' => $this->attributes,
+      '#type' => $this->type,
+      '#defaults_loaded' => $this->defaults_loaded,
+    ];
   }
 
 }

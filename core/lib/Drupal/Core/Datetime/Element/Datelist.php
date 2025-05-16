@@ -11,6 +11,7 @@ use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Render\Attribute\FormElement;
 use Drupal\Core\Security\DoTrustedCallbackTrait;
 use Drupal\Core\Security\StaticTrustedCallbackHelper;
+use Drupal\Core\Render\ElementInfoManager;
 
 /**
  * Provides a datelist element.
@@ -19,6 +20,32 @@ use Drupal\Core\Security\StaticTrustedCallbackHelper;
 class Datelist extends DateElementBase {
 
   use DoTrustedCallbackTrait;
+  
+  
+  /**
+   * @var mixed Automatically converted property
+   */
+  public $date_part_order;
+  
+  /**
+   * @var mixed Automatically converted property
+   */
+  public $date_year_range;
+  
+  /**
+   * @var mixed Automatically converted property
+   */
+  public $date_increment;
+  
+  /**
+   * @var mixed Automatically converted property
+   */
+  public $date_date_callbacks;
+  
+  /**
+   * @var mixed Automatically converted property
+   */
+  public $date_timezone;
 
   /**
    * {@inheritdoc}
@@ -389,6 +416,47 @@ class Datelist extends DateElementBase {
       }
     }
     return $date;
+  }
+  public static function createInstance($input, $element_validate, $process, $theme, $theme_wrappers, $date_part_order, $date_year_range, $date_increment, $date_date_callbacks, $date_timezone, $value_callback, $type, $defaults_loaded, ?ElementInfoManager $elementInfoManager = NULL) {
+    if (!$elementInfoManager) {
+      $elementInfoManager = \Drupal::service('element_info');
+    }
+    $instance = $elementInfoManager->createInstance('datelist');
+    $instance->input = $input;
+    $instance->element_validate = $element_validate;
+    $instance->process = $process;
+    $instance->theme = $theme;
+    $instance->theme_wrappers = $theme_wrappers;
+    $instance->date_part_order = $date_part_order;
+    $instance->date_year_range = $date_year_range;
+    $instance->date_increment = $date_increment;
+    $instance->date_date_callbacks = $date_date_callbacks;
+    $instance->date_timezone = $date_timezone;
+    $instance->value_callback = $value_callback;
+    $instance->type = $type;
+    $instance->defaults_loaded = $defaults_loaded;
+    return $instance;
+  }
+  
+  /**
+   * {@inheritdoc}
+   */
+  public function toRenderArray() {
+    return [
+      '#input' => $this->input,
+      '#element_validate' => $this->element_validate,
+      '#process' => $this->process,
+      '#theme' => $this->theme,
+      '#theme_wrappers' => $this->theme_wrappers,
+      '#date_part_order' => $this->date_part_order,
+      '#date_year_range' => $this->date_year_range,
+      '#date_increment' => $this->date_increment,
+      '#date_date_callbacks' => $this->date_date_callbacks,
+      '#date_timezone' => $this->date_timezone,
+      '#value_callback' => $this->value_callback,
+      '#type' => $this->type,
+      '#defaults_loaded' => $this->defaults_loaded,
+    ];
   }
 
 }

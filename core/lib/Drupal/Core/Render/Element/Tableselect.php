@@ -7,6 +7,7 @@ use Drupal\Core\Render\Attribute\FormElement;
 use Drupal\Core\Render\Element;
 use Drupal\Component\Utility\Html as HtmlUtility;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\Core\Render\ElementInfoManager;
 
 /**
  * Provides a form element for a table with radios or checkboxes in left column.
@@ -54,6 +55,36 @@ use Drupal\Core\StringTranslation\TranslatableMarkup;
 #[FormElement('tableselect')]
 class Tableselect extends Table {
 
+  
+  /**
+   * @var mixed Automatically converted property
+   */
+  public $js_select;
+  
+  /**
+   * @var mixed Automatically converted property
+   */
+  public $multiple;
+  
+  /**
+   * @var mixed Automatically converted property
+   */
+  public $responsive;
+  
+  /**
+   * @var mixed Automatically converted property
+   */
+  public $sticky;
+  
+  /**
+   * @var mixed Automatically converted property
+   */
+  public $options;
+  
+  /**
+   * @var mixed Automatically converted property
+   */
+  public $empty;
   /**
    * {@inheritdoc}
    */
@@ -289,6 +320,47 @@ class Tableselect extends Table {
       $element['#value'] = [];
     }
     return $element;
+  }
+  public static function createInstance($input, $js_select, $multiple, $responsive, $sticky, $pre_render, $process, $options, $empty, $theme, $value_callback, $type, $defaults_loaded, ?ElementInfoManager $elementInfoManager = NULL) {
+    if (!$elementInfoManager) {
+      $elementInfoManager = \Drupal::service('element_info');
+    }
+    $instance = $elementInfoManager->createInstance('tableselect');
+    $instance->input = $input;
+    $instance->js_select = $js_select;
+    $instance->multiple = $multiple;
+    $instance->responsive = $responsive;
+    $instance->sticky = $sticky;
+    $instance->pre_render = $pre_render;
+    $instance->process = $process;
+    $instance->options = $options;
+    $instance->empty = $empty;
+    $instance->theme = $theme;
+    $instance->value_callback = $value_callback;
+    $instance->type = $type;
+    $instance->defaults_loaded = $defaults_loaded;
+    return $instance;
+  }
+  
+  /**
+   * {@inheritdoc}
+   */
+  public function toRenderArray() {
+    return [
+      '#input' => $this->input,
+      '#js_select' => $this->js_select,
+      '#multiple' => $this->multiple,
+      '#responsive' => $this->responsive,
+      '#sticky' => $this->sticky,
+      '#pre_render' => $this->pre_render,
+      '#process' => $this->process,
+      '#options' => $this->options,
+      '#empty' => $this->empty,
+      '#theme' => $this->theme,
+      '#value_callback' => $this->value_callback,
+      '#type' => $this->type,
+      '#defaults_loaded' => $this->defaults_loaded,
+    ];
   }
 
 }

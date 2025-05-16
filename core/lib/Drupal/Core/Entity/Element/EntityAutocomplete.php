@@ -11,6 +11,9 @@ use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Render\Attribute\FormElement;
 use Drupal\Core\Render\Element\Textfield;
 use Drupal\Core\Site\Settings;
+use Drupal\Core\Render\ElementInfoManager;
+use Drupal\Core\Render\Element\ProcessAutocompleteTrait;
+use Drupal\Core\Render\Element\ProcessPatternTrait;
 
 /**
  * Provides an entity autocomplete form element.
@@ -67,6 +70,53 @@ use Drupal\Core\Site\Settings;
 #[FormElement('entity_autocomplete')]
 class EntityAutocomplete extends Textfield {
 
+  use ProcessPatternTrait;
+  use ProcessAutocompleteTrait;
+  
+  /**
+   * @var mixed Automatically converted property
+   */
+  public $size;
+  
+  /**
+   * @var mixed Automatically converted property
+   */
+  public $maxlength;
+  
+  /**
+   * @var mixed Automatically converted property
+   */
+  public $target_type;
+  
+  /**
+   * @var mixed Automatically converted property
+   */
+  public $selection_handler;
+  
+  /**
+   * @var mixed Automatically converted property
+   */
+  public $selection_settings;
+  
+  /**
+   * @var mixed Automatically converted property
+   */
+  public $tags;
+  
+  /**
+   * @var mixed Automatically converted property
+   */
+  public $autocreate;
+  
+  /**
+   * @var mixed Automatically converted property
+   */
+  public $validate_reference;
+  
+  /**
+   * @var mixed Automatically converted property
+   */
+  public $process_default_value;
   /**
    * {@inheritdoc}
    */
@@ -420,6 +470,59 @@ class EntityAutocomplete extends Textfield {
     }
 
     return $match;
+  }
+  public static function createInstance($input, $size, $maxlength, $autocomplete_route_name, $process, $pre_render, $theme, $theme_wrappers, $target_type, $selection_handler, $selection_settings, $tags, $autocreate, $validate_reference, $process_default_value, $element_validate, $value_callback, $type, $defaults_loaded, ?ElementInfoManager $elementInfoManager = NULL) {
+    if (!$elementInfoManager) {
+      $elementInfoManager = \Drupal::service('element_info');
+    }
+    $instance = $elementInfoManager->createInstance('entity_autocomplete');
+    $instance->input = $input;
+    $instance->size = $size;
+    $instance->maxlength = $maxlength;
+    $instance->autocomplete_route_name = $autocomplete_route_name;
+    $instance->process = $process;
+    $instance->pre_render = $pre_render;
+    $instance->theme = $theme;
+    $instance->theme_wrappers = $theme_wrappers;
+    $instance->target_type = $target_type;
+    $instance->selection_handler = $selection_handler;
+    $instance->selection_settings = $selection_settings;
+    $instance->tags = $tags;
+    $instance->autocreate = $autocreate;
+    $instance->validate_reference = $validate_reference;
+    $instance->process_default_value = $process_default_value;
+    $instance->element_validate = $element_validate;
+    $instance->value_callback = $value_callback;
+    $instance->type = $type;
+    $instance->defaults_loaded = $defaults_loaded;
+    return $instance;
+  }
+  
+  /**
+   * {@inheritdoc}
+   */
+  public function toRenderArray() {
+    return [
+      '#input' => $this->input,
+      '#size' => $this->size,
+      '#maxlength' => $this->maxlength,
+      '#autocomplete_route_name' => $this->autocomplete_route_name,
+      '#process' => $this->process,
+      '#pre_render' => $this->pre_render,
+      '#theme' => $this->theme,
+      '#theme_wrappers' => $this->theme_wrappers,
+      '#target_type' => $this->target_type,
+      '#selection_handler' => $this->selection_handler,
+      '#selection_settings' => $this->selection_settings,
+      '#tags' => $this->tags,
+      '#autocreate' => $this->autocreate,
+      '#validate_reference' => $this->validate_reference,
+      '#process_default_value' => $this->process_default_value,
+      '#element_validate' => $this->element_validate,
+      '#value_callback' => $this->value_callback,
+      '#type' => $this->type,
+      '#defaults_loaded' => $this->defaults_loaded,
+    ];
   }
 
 }

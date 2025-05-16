@@ -15,6 +15,7 @@ use Drupal\Core\Site\Settings;
 use Drupal\Core\Url;
 use Drupal\file\Entity\File;
 use Symfony\Component\HttpFoundation\Request;
+use Drupal\Core\Render\ElementInfoManager;
 
 // cspell:ignore filefield
 
@@ -24,6 +25,46 @@ use Symfony\Component\HttpFoundation\Request;
 #[FormElement('managed_file')]
 class ManagedFile extends FormElementBase {
 
+  
+  /**
+   * @var mixed Automatically converted property
+   */
+  public $progress_indicator;
+  
+  /**
+   * @var mixed Automatically converted property
+   */
+  public $progress_message;
+  
+  /**
+   * @var mixed Automatically converted property
+   */
+  public $upload_validators;
+  
+  /**
+   * @var mixed Automatically converted property
+   */
+  public $upload_location;
+  
+  /**
+   * @var mixed Automatically converted property
+   */
+  public $size;
+  
+  /**
+   * @var mixed Automatically converted property
+   */
+  public $multiple;
+  
+  /**
+   * @var mixed Automatically converted property
+   */
+  public $extended;
+  
+  /**
+   * @var mixed Automatically converted property
+   */
+  public $accept;
   /**
    * {@inheritdoc}
    */
@@ -469,6 +510,57 @@ class ManagedFile extends FormElementBase {
    */
   protected static function fileUsage() {
     return \Drupal::service('file.usage');
+  }
+  public static function createInstance($input, $process, $element_validate, $pre_render, $theme, $theme_wrappers, $progress_indicator, $progress_message, $upload_validators, $upload_location, $size, $multiple, $extended, $attached, $accept, $value_callback, $type, $defaults_loaded, ?ElementInfoManager $elementInfoManager = NULL) {
+    if (!$elementInfoManager) {
+      $elementInfoManager = \Drupal::service('element_info');
+    }
+    $instance = $elementInfoManager->createInstance('managed_file');
+    $instance->input = $input;
+    $instance->process = $process;
+    $instance->element_validate = $element_validate;
+    $instance->pre_render = $pre_render;
+    $instance->theme = $theme;
+    $instance->theme_wrappers = $theme_wrappers;
+    $instance->progress_indicator = $progress_indicator;
+    $instance->progress_message = $progress_message;
+    $instance->upload_validators = $upload_validators;
+    $instance->upload_location = $upload_location;
+    $instance->size = $size;
+    $instance->multiple = $multiple;
+    $instance->extended = $extended;
+    $instance->attached = $attached;
+    $instance->accept = $accept;
+    $instance->value_callback = $value_callback;
+    $instance->type = $type;
+    $instance->defaults_loaded = $defaults_loaded;
+    return $instance;
+  }
+  
+  /**
+   * {@inheritdoc}
+   */
+  public function toRenderArray() {
+    return [
+      '#input' => $this->input,
+      '#process' => $this->process,
+      '#element_validate' => $this->element_validate,
+      '#pre_render' => $this->pre_render,
+      '#theme' => $this->theme,
+      '#theme_wrappers' => $this->theme_wrappers,
+      '#progress_indicator' => $this->progress_indicator,
+      '#progress_message' => $this->progress_message,
+      '#upload_validators' => $this->upload_validators,
+      '#upload_location' => $this->upload_location,
+      '#size' => $this->size,
+      '#multiple' => $this->multiple,
+      '#extended' => $this->extended,
+      '#attached' => $this->attached,
+      '#accept' => $this->accept,
+      '#value_callback' => $this->value_callback,
+      '#type' => $this->type,
+      '#defaults_loaded' => $this->defaults_loaded,
+    ];
   }
 
 }
