@@ -10,6 +10,20 @@ namespace Drupal\Core\Entity;
 interface EntityPublishedInterface extends EntityInterface {
 
   /**
+   * The entity is published.
+   *
+   * @var int
+   */
+  public const PUBLISHED = 1;
+
+  /**
+   * The entity is not published.
+   *
+   * @var int
+   */
+  public const NOT_PUBLISHED = 0;
+
+  /**
    * Returns whether or not the entity is published.
    *
    * @return bool

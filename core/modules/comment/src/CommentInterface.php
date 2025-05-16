@@ -13,16 +13,6 @@ use Drupal\Core\Entity\EntityChangedInterface;
 interface CommentInterface extends ContentEntityInterface, EntityChangedInterface, EntityOwnerInterface, EntityPublishedInterface {
 
   /**
-   * Comment is awaiting approval.
-   */
-  const NOT_PUBLISHED = 0;
-
-  /**
-   * Comment is published.
-   */
-  const PUBLISHED = 1;
-
-  /**
    * Anonymous posters cannot enter their contact information.
    */
   const ANONYMOUS_MAYNOT_CONTACT = 0;

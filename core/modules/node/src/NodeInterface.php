@@ -13,15 +13,6 @@ use Drupal\Core\Entity\ContentEntityInterface;
  */
 interface NodeInterface extends ContentEntityInterface, EntityChangedInterface, EntityOwnerInterface, RevisionLogInterface, EntityPublishedInterface {
 
-  /**
-   * Denotes that the node is not published.
-   */
-  const NOT_PUBLISHED = 0;
-
-  /**
-   * Denotes that the node is published.
-   */
-  const PUBLISHED = 1;
 
   /**
    * Denotes that the node is not promoted to the front page.
