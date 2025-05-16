@@ -1,0 +1,82 @@
+langcode: en
+status: true
+dependencies: {  }
+id: test_area_result_plural
+label: ''
+module: views
+description: ''
+tag: ''
+base_table: views_test_data
+base_field: nid
+display:
+  default:
+    display_options:
+      defaults:
+        fields: false
+        pager: false
+        sorts: false
+      fields:
+        id:
+          field: id
+          id: id
+          relationship: none
+          table: views_test_data
+          plugin_id: numeric
+      pager:
+        options:
+          offset: 0
+        type: none
+      sorts:
+        id:
+          field: id
+          id: id
+          order: ASC
+          relationship: none
+          table: views_test_data
+          plugin_id: numeric
+      empty:
+        title:
+          field: title
+          id: title
+          table: views
+          plugin_id: title
+          title: test_title_empty
+      header:
+        result_plural:
+          id: result_plural
+          table: views
+          field: result_plural
+          relationship: none
+          group_type: group
+          admin_label: ''
+          empty: true
+          content: "SINGULAR start: @start | end: @end | total: @total | total formatted: @format_total | label: @label | per page: @per_page | current page: @current_page | current record count: @current_record_count | page count: @page_count"
+          content_plural: 'PLURAL start: @start | end: @end | total: @total | total formatted: @format_total | label: @label | per page: @per_page | current page: @current_page | current record count: @current_record_count | page count: @page_count'
+          plural_count_token: '@start'
+          plugin_id: result_plural
+    display_plugin: default
+    display_title: Master
+    id: default
+    position: 0
+  page_1:
+    display_options:
+      path: test-area-result-plural
+      defaults:
+        header: false
+      header:
+        result_plural:
+          id: result_plural
+          table: views
+          field: result_plural
+          relationship: none
+          group_type: group
+          admin_label: ''
+          empty: false
+          content: "SINGULAR start: @start | end: @end | total: @total | total formatted: @format_total | label: @label | per page: @per_page | current page: @current_page | current record count: @current_record_count | page count: @page_count"
+          content_plural: 'PLURAL start: @start | end: @end | total: @total | total formatted: @format_total | label: @label | per page: @per_page | current page: @current_page | current record count: @current_record_count | page count: @page_count'
+          plural_count_token: '@start'
+          plugin_id: result_plural
+    display_plugin: page
+    display_title: 'Page 1'
+    id: page_1
+    position: 1

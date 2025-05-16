@@ -51,6 +51,17 @@ views.area.result:
       type: text
       label: 'The shown text of the result summary area'
 
+views.area.result_plural:
+  type: views.area.result
+  label: 'Result plural'
+  mapping:
+    content_plural:
+      type: text
+      label: 'Text to use for the plural form'
+    plural_count_token:
+      type: text
+      label: 'Plural count token'
+
 views.area.title:
   type: views_area
   label: 'Title'
