@@ -449,6 +449,7 @@ abstract class Database {
     }
     if (isset($target) && isset(self::$connections[$key][$target])) {
       if (self::$connections[$key][$target] instanceof Connection) {
+        // @phpstan-ignore method.deprecated
         self::$connections[$key][$target]->commitAll();
       }
       unset(self::$connections[$key][$target]);
@@ -456,6 +457,7 @@ abstract class Database {
     elseif (isset(self::$connections[$key])) {
       foreach (self::$connections[$key] as $connection) {
         if ($connection instanceof Connection) {
+          // @phpstan-ignore method.deprecated
           $connection->commitAll();
         }
       }
