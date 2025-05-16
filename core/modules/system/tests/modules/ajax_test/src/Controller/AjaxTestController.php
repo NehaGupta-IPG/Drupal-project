@@ -9,6 +9,7 @@ use Drupal\Core\Ajax\AjaxResponse;
 use Drupal\Core\Ajax\AlertCommand;
 use Drupal\Core\Ajax\CloseDialogCommand;
 use Drupal\Core\Ajax\HtmlCommand;
+use Drupal\Core\Render\Markup;
 use Drupal\Core\Url;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -401,11 +402,11 @@ class AjaxTestController {
           'ajax_test/global_events',
         ],
       ],
-      '#markup' => implode('', [
+      '#markup' => Markup::create(implode('', [
         '<div id="test_global_events_log"></div>',
         '<a id="test_global_events_drupal_ajax_link" class="use-ajax" href="' . Url::fromRoute('ajax_test.global_events_clear_log')->toString() . '">Drupal Ajax</a>',
         '<div id="test_global_events_log2"></div>',
-      ]),
+      ])),
     ];
   }
 
