@@ -89,8 +89,8 @@ class ViewsViewsHooks {
       ],
     ];
     $data['views']['result_plural'] = [
-      'title' => t('Result summary (plural)'),
-      'help' => t('Shows result summary, for example the items per page, with support for having singular and plural text depending on the number of results.'),
+      'title' => $this->t('Result summary (plural)'),
+      'help' => $this->t('Shows result summary, for example the items per page, with support for having singular and plural text depending on the number of results.'),
       'area' => [
         'id' => 'result_plural',
       ],
