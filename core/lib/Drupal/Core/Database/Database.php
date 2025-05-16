@@ -448,9 +448,17 @@ abstract class Database {
       $key = self::$activeKey;
     }
     if (isset($target) && isset(self::$connections[$key][$target])) {
+      if (self::$connections[$key][$target] instanceof Connection) {
+        self::$connections[$key][$target]->commitAll();
+      }
       unset(self::$connections[$key][$target]);
     }
     elseif (isset(self::$connections[$key])) {
+      foreach (self::$connections[$key] as $connection) {
+        if ($connection instanceof Connection) {
+          $connection->commitAll();
+        }
+      }
       unset(self::$connections[$key]);
     }
 
@@ -625,7 +633,8 @@ abstract class Database {
    * @see https://www.drupal.org/node/3524461
    */
   public static function commitAllOnShutdown(bool $shutdown = FALSE): void {
-    @trigger_error(__METHOD__ . '() is deprecated in drupal:11.3.0 and is removed from drupal:13.0.0. There is no replacement. See https://www.drupal.org/node/3524461', E_USER_DEPRECATED);
+    // Only soft deprecation (no @trigger_error) to avoid thousands of
+    // occurrences per test run. PHPStan reports usage errors anyway.
     static $registered = FALSE;
 
     if ($shutdown) {

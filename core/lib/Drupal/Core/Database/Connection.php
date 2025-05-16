@@ -230,7 +230,8 @@ abstract class Connection {
    * @see https://www.drupal.org/node/3524461
    */
   public function commitAll() {
-    @trigger_error(__METHOD__ . '() is deprecated in drupal:11.3.0 and is removed from drupal:13.0.0. There is no replacement. See https://www.drupal.org/node/3524461', E_USER_DEPRECATED);
+    // Only soft deprecation (no @trigger_error) to avoid thousands of
+    // occurrences per test run. PHPStan reports usage errors anyway.
     $manager = $this->transactionManager();
     if ($manager->inTransaction() && method_exists($manager, 'commitAll')) {
       $this->transactionManager()->commitAll();

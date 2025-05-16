@@ -180,7 +180,11 @@ abstract class TransactionManagerBase implements TransactionManagerInterface {
    * @see https://www.drupal.org/node/3524461
    */
   public function commitAll(): void {
-    @trigger_error(__METHOD__ . '() is deprecated in drupal:11.3.0 and is removed from drupal:13.0.0. There is no replacement. See https://www.drupal.org/node/3524461', E_USER_DEPRECATED);
+    // Only soft deprecation (no @trigger_error) to avoid thousands of
+    // occurrences per test run. PHPStan reports usage errors anyway.
+    if ($this->stackDepth() !== 0) {
+      @trigger_error('Committing transactions via ' . __METHOD__ . '() is deprecated in drupal:11.3.0 and is removed from drupal:13.0.0. There is no replacement. See https://www.drupal.org/node/3524461', E_USER_DEPRECATED);
+    }
     foreach (array_reverse($this->stack()) as $id => $item) {
       $this->unpile($item->name, $id);
     }
