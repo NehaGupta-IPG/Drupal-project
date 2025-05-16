@@ -173,7 +173,13 @@ class ViewAjaxController implements ContainerInjectionInterface {
           $response->setAttachments($preview['#attached']);
         }
 
-        $response->addCacheableDependency(CacheableMetadata::createFromRenderArray($preview));
+        // Invalidate the response when the view changes.
+        $cacheableMetadata = $response->getCacheableMetadata();
+        $cacheableMetadata->addCacheTags($view->getCacheTags());
+        $cacheableMetadata->addCacheableDependency(CacheableMetadata::createFromRenderArray($view->element));
+
+        // This controller uses various query arguments.
+        $cacheableMetadata->addCacheContexts(['url.query_args']);
 
         return $response;
       }

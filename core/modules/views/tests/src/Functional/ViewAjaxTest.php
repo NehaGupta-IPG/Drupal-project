@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\Tests\views\Functional;
 
 use Drupal\Core\EventSubscriber\MainContentViewSubscriber;
+use Drupal\Tests\node\Functional\Views\NodeTestBase;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -13,14 +14,14 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  */
 #[Group('views')]
 #[RunTestsInSeparateProcesses]
-class ViewAjaxTest extends ViewTestBase {
+class ViewAjaxTest extends NodeTestBase {
 
   /**
    * Views used by this test.
    *
    * @var array
    */
-  public static $testViews = ['test_ajax_view', 'test_view'];
+  public static $testViews = ['test_ajax_view', 'test_view', 'test_content_ajax'];
 
   /**
    * {@inheritdoc}
@@ -78,7 +79,6 @@ class ViewAjaxTest extends ViewTestBase {
         'view_display_id' => 'page_1',
       ],
     ]);
-
     $this->assertSession()->statusCodeEquals(200);
     $this->assertSession()
       ->responseHeaderEquals('X-Drupal-Cache-Tags', 'config:user.role.anonymous config:views.view.test_ajax_view http_response');
@@ -86,6 +86,22 @@ class ViewAjaxTest extends ViewTestBase {
       ->responseHeaderEquals('X-Drupal-Cache-Contexts', 'languages:language_interface route theme url.query_args user.permissions');
     $this->assertSession()
       ->responseHeaderEquals('X-Drupal-Cache-Max-Age', '-1 (Permanent)');
+
+    $admin_user = $this->drupalCreateUser(['access content overview']);
+    $this->drupalLogin($admin_user);
+    $this->drupalGet('views/ajax', [
+      'query' => [
+        'view_name' => 'test_content_ajax',
+        'view_display_id' => 'page_1',
+      ],
+    ]);
+    $this->assertSession()->statusCodeEquals(200);
+    $this->assertSession()
+      ->responseHeaderEquals('X-Drupal-Cache-Tags', 'CACHE_MISS_IF_UNCACHEABLE_HTTP_METHOD:form config:views.view.test_content_ajax http_response node_list user_list');
+    $this->assertSession()
+      ->responseHeaderEquals('X-Drupal-Cache-Contexts', 'languages:language_content languages:language_interface session theme url user');
+    $this->assertSession()
+      ->responseHeaderEquals('X-Drupal-Cache-Max-Age', '0 (Uncacheable)');
   }
 
 }

@@ -493,6 +493,7 @@ class ViewAjaxControllerTest extends UnitTestCase {
     $this->assertViewResultCommand($response, 2);
 
     $this->assertInstanceOf(CacheableMetadata::class, $response->getCacheableMetadata());
+    $this->assertSame(['custom_cache_tag'], $response->getCacheableMetadata()->getCacheTags());
   }
 
   /**
@@ -534,6 +535,9 @@ class ViewAjaxControllerTest extends UnitTestCase {
           ],
         ],
       ]);
+    $executable->expects($this->any())
+      ->method('getCacheTags')
+      ->willReturn(['custom_cache_tag']);
 
     $this->executableFactory->expects($this->once())
       ->method('get')
