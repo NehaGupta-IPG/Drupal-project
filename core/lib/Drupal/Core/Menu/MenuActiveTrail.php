@@ -151,7 +151,10 @@ class MenuActiveTrail extends CacheCollector implements MenuActiveTrailInterface
     // it a feature that a relevant menu tree may be displayed.
     if ($route_name) {
       $route_parameters = $this->routeMatch->getRawParameters()->all();
-      $routes[] = [$route_name, $route_parameters];
+      $routes[] = [
+        'route_name' => $route_name,
+        'route_parameters' => $route_parameters,
+      ];
     }
 
     // If the request is for the site's front page, then menu links containing
@@ -160,7 +163,7 @@ class MenuActiveTrail extends CacheCollector implements MenuActiveTrailInterface
     // @todo Combine the two calls to loadLinksByRoute() in
     // https://www.drupal.org/project/drupal/issues/3523497
     if ($this->pathMatcher->isFrontPage()) {
-      $routes[] = ['<front>', []];
+      $routes[] = ['route_name' => '<front>', 'route_parameters' => []];
     }
 
     if ($routes) {
