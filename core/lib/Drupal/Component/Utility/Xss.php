@@ -165,7 +165,7 @@ class Xss {
       return $class::split($matches[1], $allowed_html_tags, $class);
     };
     // Strip any tags that are not in the list of allowed html tags.
-    $string = preg_replace_callback('%
+    return preg_replace_callback('%
       (
       <(?=[^a-zA-Z!/])  # a lone <
       |                 # or
@@ -175,8 +175,6 @@ class Xss {
       |                 # or
       >                 # just a >
       )%x', $splitter, $string);
-
-    return static::filterXssDataAttributes($string);
   }
 
   /**
@@ -272,6 +270,23 @@ class Xss {
   }
 
   /**
+   * Applies a very permissive XSS/HTML filter to an attribute value.
+   *
+   * @param string $value
+   *   Attribute value.
+   *
+   * @return string
+   *   Sanitized attribute value
+   */
+  protected static function filterAttributeValue(string $value): string {
+    // The attribute contain an HTML-encoded value, so we need to
+    // decode the value, apply XSS filtering and then re-save as encoded
+    // value.
+    $value = Html::decodeEntities($value);
+    return Html::escape(Xss::filterAdmin($value));
+  }
+
+  /**
    * Processes a string of HTML attributes.
    *
    * @param string $attributes
@@ -353,7 +368,7 @@ class Xss {
           $working = 1;
           // Attribute value, a URL after href= for instance.
           if (preg_match('/^"([^"]*)"(\s+|$)/', $attributes, $match)) {
-            $value = $skip_protocol_filtering ? $match[1] : UrlHelper::filterBadProtocol($match[1]);
+            $value = $skip_protocol_filtering ? self::filterAttributeValue($match[1]) : UrlHelper::filterBadProtocol($match[1]);
 
             if (!$skip) {
               $attributes_array[] = "$attribute_name=\"$value\"";
@@ -363,7 +378,7 @@ class Xss {
           }
 
           if (preg_match("/^'([^']*)'(\s+|$)/", $attributes, $match)) {
-            $value = $skip_protocol_filtering ? $match[1] : UrlHelper::filterBadProtocol($match[1]);
+            $value = $skip_protocol_filtering ? self::filterAttributeValue($match[1]) : UrlHelper::filterBadProtocol($match[1]);
 
             if (!$skip) {
               $attributes_array[] = "$attribute_name='$value'";
@@ -373,7 +388,7 @@ class Xss {
           }
 
           if (preg_match("%^([^\s\"']+)(\s+|$)%", $attributes, $match)) {
-            $value = $skip_protocol_filtering ? $match[1] : UrlHelper::filterBadProtocol($match[1]);
+            $value = $skip_protocol_filtering ? self::filterAttributeValue($match[1]) : UrlHelper::filterBadProtocol($match[1]);
 
             if (!$skip) {
               $attributes_array[] = "$attribute_name=\"$value\"";
@@ -440,33 +455,6 @@ class Xss {
    */
   public static function getHtmlTagList() {
     return static::$htmlTags;
-  }
-
-  /**
-   * Applies a very permissive XSS/HTML filter to data-attributes.
-   *
-   * @param string $html
-   *   The string to apply the data-attributes filtering to.
-   *
-   * @return string
-   *   The filtered string.
-   */
-  protected static function filterXssDataAttributes($html) {
-    if (stristr($html, 'data-') !== FALSE) {
-      $dom = Html::load($html);
-      $xpath = new \DOMXPath($dom);
-      foreach ($xpath->query('//@*[starts-with(name(.), "data-")]') as $node) {
-        // The data-attributes contain an HTML-encoded value, so we need to
-        // decode the value, apply XSS filtering and then re-save as encoded
-        // value. There is no need to explicitly decode $node->value, since the
-        // DOMAttr::value getter returns the decoded value.
-        $value = Xss::filterAdmin($node->value);
-        $node->value = Html::escape($value);
-      }
-      $html = Html::serialize($dom);
-    }
-
-    return $html;
   }
 
 }
