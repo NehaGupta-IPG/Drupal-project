@@ -162,6 +162,7 @@ class ViewAjaxControllerTest extends UnitTestCase {
     $container->set('renderer', $this->renderer);
     $container->set('path.validator', $this->pathValidator);
     $container->set('unrouted_url_assembler', $unroutedUrlAssembler);
+    $container->set('cache_contexts_manager', $this->createMock('\Drupal\Core\Cache\Context\CacheContextsManager'));
     \Drupal::setContainer($container);
     // Not initialized in Unit tests.
     $GLOBALS['base_path'] = '/';
