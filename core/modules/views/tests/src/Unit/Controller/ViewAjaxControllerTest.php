@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\Tests\views\Unit\Controller;
 
 use Drupal\Core\Cache\CacheableMetadata;
+use Drupal\Core\Cache\Context\CacheContextsManager;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Path\CurrentPathStack;
 use Drupal\Core\Path\PathValidatorInterface;
@@ -138,6 +139,12 @@ class ViewAjaxControllerTest extends UnitTestCase {
 
     $this->viewAjaxController = new ViewAjaxController($this->viewStorage, $this->executableFactory, $this->renderer, $this->currentPath, $this->redirectDestination, $this->pathValidator);
 
+    $cacheContextsManager = $this->createMock(CacheContextsManager::class);
+    $cacheContextsManager->expects($this->any())
+      ->method('assertValidTokens')
+      ->with(['url.query_args'])
+      ->willReturn(TRUE);
+
     $element_info_manager = $this->createStub(ElementInfoManagerInterface::class);
     $element_info_manager
       ->method('getInfo')
@@ -162,7 +169,7 @@ class ViewAjaxControllerTest extends UnitTestCase {
     $container->set('renderer', $this->renderer);
     $container->set('path.validator', $this->pathValidator);
     $container->set('unrouted_url_assembler', $unroutedUrlAssembler);
-    $container->set('cache_contexts_manager', $this->createMock('\Drupal\Core\Cache\Context\CacheContextsManager'));
+    $container->set('cache_contexts_manager', $cacheContextsManager);
     \Drupal::setContainer($container);
     // Not initialized in Unit tests.
     $GLOBALS['base_path'] = '/';
