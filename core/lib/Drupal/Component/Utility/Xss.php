@@ -165,7 +165,7 @@ class Xss {
       return $class::split($matches[1], $allowed_html_tags, $class);
     };
     // Strip any tags that are not in the list of allowed html tags.
-    return preg_replace_callback('%
+    $string = preg_replace_callback('%
       (
       <(?=[^a-zA-Z!/])  # a lone <
       |                 # or
@@ -175,6 +175,8 @@ class Xss {
       |                 # or
       >                 # just a >
       )%x', $splitter, $string);
+
+    return static::filterXssDataAttributes($string);
   }
 
   /**
@@ -438,6 +440,33 @@ class Xss {
    */
   public static function getHtmlTagList() {
     return static::$htmlTags;
+  }
+
+  /**
+   * Applies a very permissive XSS/HTML filter to data-attributes.
+   *
+   * @param string $html
+   *   The string to apply the data-attributes filtering to.
+   *
+   * @return string
+   *   The filtered string.
+   */
+  protected static function filterXssDataAttributes($html) {
+    if (stristr($html, 'data-') !== FALSE) {
+      $dom = Html::load($html);
+      $xpath = new \DOMXPath($dom);
+      foreach ($xpath->query('//@*[starts-with(name(.), "data-")]') as $node) {
+        // The data-attributes contain an HTML-encoded value, so we need to
+        // decode the value, apply XSS filtering and then re-save as encoded
+        // value. There is no need to explicitly decode $node->value, since the
+        // DOMAttr::value getter returns the decoded value.
+        $value = Xss::filterAdmin($node->value);
+        $node->value = Html::escape($value);
+      }
+      $html = Html::serialize($dom);
+    }
+
+    return $html;
   }
 
 }

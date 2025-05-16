@@ -569,6 +569,12 @@ class XssTest extends TestCase {
         'Time with datetime attribute',
         ['time'],
       ],
+      [
+        '<a data-title="&lt;img src=x onerror=alert()&gt;" href="https://example.com">Click me</a>',
+        '<a data-title="&lt;img src=&quot;x&quot;&gt;" href="https://example.com">Click me</a>',
+        'HTML in data attribute',
+        ['a'],
+      ],
     ];
   }
 
