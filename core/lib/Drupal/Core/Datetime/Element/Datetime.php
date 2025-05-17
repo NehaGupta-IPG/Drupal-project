@@ -33,7 +33,7 @@ class Datetime extends DateElementBase {
   public $date_date_element;
 
   /**
-   * @var mixed Automatically converted property
+   * @var array Automatically converted property
    */
   // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
   public $date_date_callbacks;
@@ -51,7 +51,7 @@ class Datetime extends DateElementBase {
   public $date_time_element;
 
   /**
-   * @var mixed Automatically converted property
+   * @var array Automatically converted property
    */
   // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
   public $date_time_callbacks;

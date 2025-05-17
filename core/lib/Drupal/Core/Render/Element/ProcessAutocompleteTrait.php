@@ -3,7 +3,7 @@
 namespace Drupal\Core\Render\Element;
 
 /**
- *
+ * Process autocomplete trait.
  */
 trait ProcessAutocompleteTrait {
 

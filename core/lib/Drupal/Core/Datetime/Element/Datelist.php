@@ -40,7 +40,7 @@ class Datelist extends DateElementBase {
   public $date_increment;
 
   /**
-   * @var mixed Automatically converted property
+   * @var array Automatically converted property
    */
   // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
   public $date_date_callbacks;
