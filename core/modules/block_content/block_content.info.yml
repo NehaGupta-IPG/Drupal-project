@@ -4,7 +4,6 @@ description: 'Allows the creation of content blocks and block types.'
 package: Core
 version: VERSION
 dependencies:
-  - drupal:block
   - drupal:text
   - drupal:user
 configure: entity.block_content.collection

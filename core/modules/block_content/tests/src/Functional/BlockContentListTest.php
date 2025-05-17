@@ -32,23 +32,21 @@ class BlockContentListTest extends BlockContentTestBase {
   protected $baseUser2;
 
   /**
-   * Permissions to grant admin user.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected $permissions = [
-    'administer blocks',
     'access block library',
     'create basic block content',
     'edit any basic block content',
     'delete any basic block content',
-    'translate configuration',
   ];
 
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['block', 'block_content', 'config_translation'];
+  protected static $modules = [
+    'navigation_variant_test',
+  ];
 
   /**
    * {@inheritdoc}
@@ -67,22 +65,6 @@ class BlockContentListTest extends BlockContentTestBase {
       'edit any basic block content',
       'delete any basic block content',
     ]);
-  }
-
-  /**
-   * Tests the region value when a new block is saved.
-   */
-  public function testBlockRegionPlacement(): void {
-    $this->drupalLogin($this->drupalCreateUser($this->permissions));
-    $this->drupalGet("admin/structure/block/library/stark", ['query' => ['region' => 'content']]);
-
-    $this->clickLink('Add content block');
-    $this->assertSession()->statusCodeEquals(200);
-    $edit = [
-      'info[0][value]' => 'foo',
-    ];
-    $this->submitForm($edit, 'Save');
-    $this->assertSession()->fieldValueEquals('region', 'content');
   }
 
   /**

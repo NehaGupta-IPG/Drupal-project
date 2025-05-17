@@ -33,7 +33,6 @@ abstract class BlockContentTestBase extends BrowserTestBase {
    * @var array
    */
   protected $permissions = [
-    'administer blocks',
     'access block library',
     'administer block types',
     'administer block content',
@@ -42,7 +41,7 @@ abstract class BlockContentTestBase extends BrowserTestBase {
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['block', 'block_content'];
+  protected static $modules = ['block_content'];
 
   /**
    * Whether or not to auto-create the basic block type during setup.
@@ -61,7 +60,6 @@ abstract class BlockContentTestBase extends BrowserTestBase {
     }
 
     $this->adminUser = $this->drupalCreateUser($this->permissions);
-    $this->drupalPlaceBlock('local_actions_block');
   }
 
   /**

@@ -179,7 +179,9 @@ class BlockViewBuilder extends EntityViewBuilder implements TrustedCallbackInter
    *   the block itself.
    */
   public static function preRender($build) {
-    $content = $build['#block']->getPlugin()->build();
+    /** @var \Drupal\block\BlockInterface $block */
+    $block = $build['#block'];
+    $content = $block->getPlugin()->build();
     // Remove the block entity from the render array, to ensure that blocks
     // can be rendered without the block config entity.
     unset($build['#block']);

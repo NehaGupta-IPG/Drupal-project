@@ -19,6 +19,13 @@ class LocalActionTest extends BlockContentTestBase {
   /**
    * {@inheritdoc}
    */
+  protected static $modules = [
+    'navigation_variant_test',
+  ];
+
+  /**
+   * {@inheritdoc}
+   */
   protected function setUp(): void {
     parent::setUp();
 

@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Drupal\Tests\block_content\Functional;
 
 /**
- * Tests views contextual links on block content.
+ * Tests contextual links for Block Content when Block configs are rendered.
  *
  * @group block_content
  */
@@ -15,6 +15,7 @@ class BlockContentContextualLinksTest extends BlockContentTestBase {
    * {@inheritdoc}
    */
   protected static $modules = [
+    'block',
     'contextual',
   ];
 
@@ -32,7 +33,6 @@ class BlockContentContextualLinksTest extends BlockContentTestBase {
     $block = $this->placeBlock('block_content:' . $block_content->uuid());
 
     $user = $this->drupalCreateUser([
-      'administer blocks',
       'access contextual links',
     ]);
     $this->drupalLogin($user);

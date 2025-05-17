@@ -10,15 +10,10 @@ use Drupal\Core\Form\FormStateInterface;
  * Form handler for the content block edit forms.
  *
  * @internal
+ * @property \Drupal\block_content\BlockContentInterface $entity
+ * @method \Drupal\block_content\BlockContentInterface getEntity()
  */
 class BlockContentForm extends ContentEntityForm {
-
-  /**
-   * The block content entity.
-   *
-   * @var \Drupal\block_content\BlockContentInterface
-   */
-  protected $entity;
 
   /**
    * {@inheritdoc}
@@ -48,39 +43,7 @@ class BlockContentForm extends ContentEntityForm {
       $element['submit']['#value'] = $this->t('Save and configure');
     }
 
-    if ($this->currentUser()->hasPermission('administer blocks') && !$this->getRequest()->query->has('theme') && $this->entity->isNew()) {
-      $element['configure_block'] = [
-        '#type' => 'submit',
-        '#value' => $this->t('Save and configure'),
-        '#weight' => 20,
-        '#submit' => array_merge($element['submit']['#submit'], ['::configureBlock']),
-      ];
-    }
-
     return $element;
-  }
-
-  /**
-   * Form submission handler for the 'configureBlock' action.
-   *
-   * @param array $form
-   *   An associative array containing the structure of the form.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
-   *   The current state of the form.
-   */
-  public function configureBlock(array $form, FormStateInterface $form_state): void {
-    $block = $this->entity;
-    if (!$theme = $block->getTheme()) {
-      $theme = $this->config('system.theme')->get('default');
-    }
-    $form_state->setRedirect(
-      'block.admin_add',
-      [
-        'plugin_id' => 'block_content:' . $block->uuid(),
-        'theme' => $theme,
-      ]
-    );
-    $form_state->setIgnoreDestination();
   }
 
   /**
@@ -108,20 +71,7 @@ class BlockContentForm extends ContentEntityForm {
     if ($block->id()) {
       $form_state->setValue('id', $block->id());
       $form_state->set('id', $block->id());
-      $theme = $block->getTheme();
-      if ($insert && $theme) {
-        $form_state->setRedirect(
-          'block.admin_add',
-          [
-            'plugin_id' => 'block_content:' . $block->uuid(),
-            'theme' => $theme,
-            'region' => $this->getRequest()->query->getString('region'),
-          ]
-        );
-      }
-      else {
-        $form_state->setRedirectUrl($block->toUrl('collection'));
-      }
+      $form_state->setRedirectUrl($block->toUrl('collection'));
     }
     else {
       // In the unlikely case something went wrong on save, the block will be

@@ -31,7 +31,6 @@ class BlockContentRevisionRevertTest extends BlockContentTestBase {
   protected function setUp(): void {
     parent::setUp();
     $this->drupalLogin($this->adminUser);
-    $this->drupalPlaceBlock('page_title_block');
   }
 
   /**

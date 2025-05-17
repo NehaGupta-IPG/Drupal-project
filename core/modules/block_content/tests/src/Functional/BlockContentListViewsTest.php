@@ -35,7 +35,6 @@ class BlockContentListViewsTest extends BlockContentTestBase {
    * @var array
    */
   protected $permissions = [
-    'administer blocks',
     'access block library',
     'create basic block content',
     'edit any basic block content',
@@ -47,9 +46,9 @@ class BlockContentListViewsTest extends BlockContentTestBase {
    * {@inheritdoc}
    */
   protected static $modules = [
-    'block',
     'block_content',
     'config_translation',
+    'navigation_variant_test',
     'views',
   ];
 

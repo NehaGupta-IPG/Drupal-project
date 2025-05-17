@@ -7,8 +7,8 @@ namespace Drupal\Tests\block_content\Kernel;
 use Drupal\block\Entity\Block;
 use Drupal\block_content\Entity\BlockContent;
 use Drupal\block_content\Entity\BlockContentType;
+use Drupal\block_content\Hook\BlockContentBlockHooks;
 use Drupal\KernelTests\KernelTestBase;
-use Drupal\block_content\Hook\BlockContentHooks;
 
 /**
  * Tests the block_content_theme_suggestions_block() function.
@@ -58,7 +58,9 @@ class BlockTemplateSuggestionsTest extends KernelTestBase {
   }
 
   /**
-   * Tests template suggestions from block_content_theme_suggestions_block().
+   * Tests template suggestions from \Drupal\block_content\Hook\BlockContentBlockHooks::themeSuggestionsBlockAlter().
+   *
+   * @covers \Drupal\block_content\Hook\BlockContentBlockHooks::themeSuggestionsBlockAlter
    */
   public function testBlockThemeHookSuggestions(): void {
     // Create a block using a block_content plugin.
@@ -73,8 +75,8 @@ class BlockTemplateSuggestionsTest extends KernelTestBase {
     $variables['elements']['content']['#view_mode'] = 'full';
     $suggestions = [];
     $suggestions[] = 'block__block_content__' . $block->uuid();
-    $blockTemplateSuggestionsAlter = new BlockContentHooks();
-    $blockTemplateSuggestionsAlter->themeSuggestionsBlockAlter($suggestions, $variables);
+    $hooks = \Drupal::service(BlockContentBlockHooks::class);
+    $hooks->themeSuggestionsBlockAlter($suggestions, $variables);
 
     $this->assertSame([
       'block__block_content__' . $block->uuid(),
