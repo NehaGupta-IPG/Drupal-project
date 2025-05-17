@@ -227,6 +227,7 @@ abstract class RenderElementBase extends PluginBase implements ElementInterface 
   /**
    * @var bool Whether this is a button
    */
+  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
   protected bool $is_button = FALSE;
 
   /**
@@ -246,8 +247,9 @@ abstract class RenderElementBase extends PluginBase implements ElementInterface 
   protected ?string $name = NULL;
 
   /**
-   * Array of names of the element's parents for purposes of getting values
-   * out of $form_state.
+   * Array of names of the element's parents.
+   *
+   * This is used to get values out of $form_state.
    *
    * This is only used by ::preRenderGroup() and is only for elements inside
    * forms.
@@ -260,6 +262,7 @@ abstract class RenderElementBase extends PluginBase implements ElementInterface 
   /**
    * Alternative to markup where all HTML is escaped.
    */
+  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
   protected ?string $plain_text = NULL;
 
   /**
@@ -326,6 +329,9 @@ abstract class RenderElementBase extends PluginBase implements ElementInterface 
    */
   protected float $weight = 0;
 
+  /**
+   * The storage.
+   */
   protected array $storage = [];
 
   /**

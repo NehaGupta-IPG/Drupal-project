@@ -97,15 +97,15 @@ use Drupal\Core\Url;
 abstract class FormElementBase extends RenderElementBase implements FormElementInterface {
 
   /**
-   * Array of callables or function names, which are called after the element
-   * is built.
+   * Array of callables or function names.
+   *
+   * These are called after the element is built.
    */
   // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
   protected array $after_build = [];
 
   /**
-   * Array of names of all the element's parents (including itself) in the
-   * form array.
+   * Array of names of all the element's parents (including itself).
    *
    * @see $parents
    * @see $tree
@@ -130,8 +130,7 @@ abstract class FormElementBase extends RenderElementBase implements FormElementI
   protected bool $disabled = FALSE;
 
   /**
-   * Array of callables or function names, which are called to validate the
-   * input.
+   * Array of callables or function names to validate the input.
    */
   // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
   protected array $element_validate = [];
@@ -154,8 +153,10 @@ abstract class FormElementBase extends RenderElementBase implements FormElementI
   protected ?string $field_suffix = NULL;
 
   /**
-   * Internal only. Set to TRUE to indicate that the #value property of an
-   * element should not be used or processed.
+   * Internal only.
+   *
+   * Set to TRUE to indicate that the #value property of an element should not
+   * be used or processed.
    */
   // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
   protected bool $has_garbage_value = FALSE;
@@ -166,7 +167,7 @@ abstract class FormElementBase extends RenderElementBase implements FormElementI
   protected bool $input = FALSE;
 
   /**
-   * Array of callables or function names, which are called during form building.
+   * Array of callables or function names, called during form building.
    */
   protected array $process = [];
 
@@ -199,7 +200,7 @@ abstract class FormElementBase extends RenderElementBase implements FormElementI
   protected ?TitleDisplay $title_display = NULL;
 
   /**
-   * TRUE if the values of this element and its children should be hierarchical in $form_state.
+   * Whether values of this element and its children should be hierarchical.
    */
   protected bool $tree = FALSE;
 
@@ -214,7 +215,7 @@ abstract class FormElementBase extends RenderElementBase implements FormElementI
   protected mixed $value = NULL;
 
   /**
-   * Callable or function name, which is called to transform the raw user input to the element's value.
+   * Callable to transform the raw user input to the element's value.
    *
    * The callback received $element, $input, $form_state arguments.
    *
