@@ -1313,6 +1313,7 @@ class TransactionTest extends DatabaseTestBase {
     $this->connection->commitAll();
     $this->assertRowPresent('David');
     $this->assertRowPresent('Roger');
+    unset($transaction, $savepoint);
   }
 
 }
