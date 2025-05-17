@@ -32,6 +32,7 @@ class ProcessedText extends RenderElementBase {
   /**
    * @var mixed Automatically converted property
    */
+  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
   public $filter_types_to_skip;
 
   /**

@@ -38,11 +38,13 @@ class Icon extends RenderElementBase {
   /**
    * @var mixed Automatically converted property
    */
+  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
   public $pack_id;
 
   /**
    * @var mixed Automatically converted property
    */
+  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
   public $icon_id;
 
   /**

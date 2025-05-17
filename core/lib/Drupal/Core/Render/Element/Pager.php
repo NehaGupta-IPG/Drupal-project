@@ -44,6 +44,7 @@ class Pager extends RenderElementBase {
   /**
    * @var mixed Automatically converted property
    */
+  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
   public $pagination_heading_level;
 
   /**
@@ -64,6 +65,7 @@ class Pager extends RenderElementBase {
   /**
    * @var mixed Automatically converted property
    */
+  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
   public $route_name;
 
   /**

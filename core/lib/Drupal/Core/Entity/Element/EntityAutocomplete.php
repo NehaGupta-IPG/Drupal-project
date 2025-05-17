@@ -86,16 +86,19 @@ class EntityAutocomplete extends Textfield {
   /**
    * @var mixed Automatically converted property
    */
+  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
   public $target_type;
 
   /**
    * @var mixed Automatically converted property
    */
+  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
   public $selection_handler;
 
   /**
    * @var mixed Automatically converted property
    */
+  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
   public $selection_settings;
 
   /**
@@ -111,11 +114,13 @@ class EntityAutocomplete extends Textfield {
   /**
    * @var mixed Automatically converted property
    */
+  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
   public $validate_reference;
 
   /**
    * @var mixed Automatically converted property
    */
+  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
   public $process_default_value;
 
   /**

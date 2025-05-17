@@ -25,26 +25,31 @@ class Datelist extends DateElementBase {
   /**
    * @var mixed Automatically converted property
    */
+  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
   public $date_part_order;
 
   /**
    * @var mixed Automatically converted property
    */
+  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
   public $date_year_range;
 
   /**
    * @var mixed Automatically converted property
    */
+  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
   public $date_increment;
 
   /**
    * @var mixed Automatically converted property
    */
+  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
   public $date_date_callbacks;
 
   /**
    * @var mixed Automatically converted property
    */
+  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
   public $date_timezone;
 
   /**

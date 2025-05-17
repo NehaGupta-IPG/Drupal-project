@@ -48,6 +48,7 @@ class Details extends RenderElementBase {
   /**
    * @var mixed Automatically converted property
    */
+  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
   public $summary_attributes;
 
   /**
