@@ -68,13 +68,21 @@ class RegisterForm extends AccountForm {
    * {@inheritdoc}
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {
+    $config = $this->config('user.settings');
     $admin = $form_state->getValue('administer_users');
 
-    if (!\Drupal::config('user.settings')->get('verify_mail') || $admin) {
+    if (!$config->get('verify_mail') || ($config->get('verify_mail') && $config->get('register_password_set')) || $admin) {
       $pass = $form_state->getValue('pass');
     }
     else {
       $pass = \Drupal::service('password_generator')->generate();
+    }
+
+    // If we are not an admin and we try to register and password_register
+    // is set, make sure the status is set to disabled before we save
+    // the newly created account.
+    if ($config->get('verify_mail') && $config->get('register_password_set') && !$form_state->getValue('uid') && !$admin) {
+      $form_state->setValue('status', 0);
     }
 
     // Remove unneeded values.
@@ -90,6 +98,7 @@ class RegisterForm extends AccountForm {
    * {@inheritdoc}
    */
   public function save(array $form, FormStateInterface $form_state) {
+    $config = $this->config('user.settings');
     $account = $this->entity;
     $pass = $account->getPassword();
     $admin = $form_state->getValue('administer_users');
@@ -111,8 +120,20 @@ class RegisterForm extends AccountForm {
     if ($admin && !$notify) {
       $this->messenger()->addStatus($this->t('Created a new user account for <a href=":url">%name</a>. No email has been sent.', [':url' => $account->toUrl()->toString(), '%name' => $account->getAccountName()]));
     }
+    // Email verification enabled, but users set a password during registration.
+    elseif (!$admin && $config->get('register') === UserInterface::REGISTER_VISITORS && $config->get('register_password_set') && $config->get('verify_mail') && !$account->isActive()) {
+      _user_mail_notify('register_password_set', $account);
+      $this->messenger()->addStatus($this->t('A welcome message with further instructions has been sent to your email address.'));
+      $form_state->setRedirect('<front>');
+    }
+    // Email verification enabled.
+    elseif (!$admin && $config->get('register') === UserInterface::REGISTER_VISITORS && $config->get('register_password_set') && !$account->isActive()) {
+      _user_mail_notify('register_pending_approval', $account);
+      $this->messenger()->addStatus($this->t('A welcome message with further instructions has been sent to your email address.'));
+      $form_state->setRedirect('<front>');
+    }
     // No email verification required; log in user immediately.
-    elseif (!$admin && !\Drupal::config('user.settings')->get('verify_mail') && $account->isActive()) {
+    elseif (!$admin && !$config->get('verify_mail') && $account->isActive()) {
       _user_mail_notify('register_no_approval_required', $account);
       user_login_finalize($account);
       $this->messenger()->addStatus($this->t('Registration successful. You are now logged in.'));

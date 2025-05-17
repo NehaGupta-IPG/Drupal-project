@@ -207,10 +207,42 @@ class UserController extends ControllerBase {
 
     /** @var \Drupal\user\UserInterface $user */
     $user = $this->userStorage->load($uid);
-    if ($user === NULL || !$user->isActive()) {
+    if ($user === NULL || (!$user->isActive() && $user->getLastLoginTime())) {
       // Blocked or invalid user ID, so deny access. The parameters will be in
       // the watchdog's URL for the administrator to check.
       throw new AccessDeniedHttpException();
+    }
+    if ($user === NULL || (!$user->isActive() && $user->getLastLoginTime())) {
+      // Blocked or invalid user ID, so deny access. The parameters will be in
+      // the watchdog's URL for the administrator to check.
+      throw new AccessDeniedHttpException();
+    }
+
+    // Activate the user if it is blocked and has never logged in.
+    if (!$user->isActive() && !$user->getLastLoginTime() && hash_equals($hash, user_pass_rehash($user, $timestamp))) {
+      // Convert timestamp to date for logs.
+      $current = \Drupal::time()->getRequestTime();
+      $date = $this->dateFormatter->format($timestamp);
+      $this->logger->notice('User %name used one-time login link at time %timestamp.', [
+        '%name' => $user->getDisplayName(),
+        '%timestamp' => $date,
+      ]);
+      // Activate the user and update the access and login time to $current.
+      $user->activate()
+        ->setLastAccessTime($current)
+        ->setLastLoginTime($current)
+        ->save();
+
+      // user_login_finalize() also updates the login timestamp of the
+      // user, which invalidates further use of the one-time login link.
+      user_login_finalize($user);
+
+      // Display default welcome message.
+      $this->messenger()
+        ->addStatus($this->t('You have just used your one-time login link. Your account is now active and you are authenticated.'));
+
+      // By default redirect to the user profile page.
+      return $this->redirect('entity.user.canonical', ['user' => $user->id()]);
     }
 
     // Time out, in seconds, until login URL expires.

@@ -149,6 +149,15 @@ class User extends ContentEntityBase implements UserInterface {
       if ($this->status->value != $this->original->status->value) {
         // The user's status is changing; conditionally send notification email.
         $op = $this->status->value == 1 ? 'status_activated' : 'status_blocked';
+
+        // Send the password_set activation e-mail to the user
+        // if we are called from the user_register_form and
+        // password_register is set to enabled.
+        if (\Drupal::config('user.settings')->get('register_password_set') && !$this->original->status->value && $this->status->value) {
+          $op = 'register_password_set_activation';
+        }
+
+        // Notify the user.
         _user_mail_notify($op, $this);
       }
     }

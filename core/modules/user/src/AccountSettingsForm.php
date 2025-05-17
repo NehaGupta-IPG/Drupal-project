@@ -138,6 +138,22 @@ class AccountSettingsForm extends ConfigFormBase {
       '#config_target' => 'user.settings:verify_mail',
       '#description' => $this->t('New users will be required to validate their email address prior to logging into the site, and will be assigned a system-generated password. With this setting disabled, users will be logged in immediately upon registering, and may select their own passwords during registration.'),
     ];
+    $form['registration_cancellation']['register_password_set'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('Require people to choose a password during registration.'),
+      '#description' => $this->t('If <em>Require e-mail verification</em> is disabled, this setting is automatically enabled.'),
+      '#default_value' => $config->get('register_password_set'),
+      '#states' => [
+        // Disable this option if email_verification is unchecked.
+        'disabled' => [
+          'input[name="user_email_verification"]' => ['checked' => FALSE],
+        ],
+        // Enable this option if email_verification is checked.
+        'enabled' => [
+          'input[name="user_email_verification"]' => ['checked' => TRUE],
+        ],
+      ],
+    ];
     $form['registration_cancellation']['user_password_strength'] = [
       '#type' => 'checkbox',
       '#title' => $this->t('Enable password strength indicator'),
@@ -257,6 +273,46 @@ class AccountSettingsForm extends ConfigFormBase {
       '#type' => 'textarea',
       '#title' => $this->t('Body'),
       '#config_target' => 'user.mail:register_no_approval_required.body',
+      '#rows' => 15,
+    ];
+
+    $form['email_password_set_activation'] = [
+      '#type' => 'details',
+      '#title' => $this->t('Welcome (password set at registration)'),
+      '#collapsed' => TRUE,
+      '#description' => $this->t('Edit the welcome e-mail messages sent to new members upon registering, when no administrator approval is required and password has already been set.') . ' ' . $email_token_help,
+      '#group' => 'email',
+    ];
+    $form['email_password_set_activation']['user_mail_register_password_set_activation_subject'] = [
+      '#type' => 'textfield',
+      '#title' => $this->t('Subject'),
+      '#default_value' => $config->get('register_password_set_activation.subject'),
+      '#maxlength' => 180,
+    ];
+    $form['email_password_set_activation']['user_mail_register_password_set_activation_body'] = [
+      '#type' => 'textarea',
+      '#title' => $this->t('Body'),
+      '#default_value' => $config->get('register_password_set_activation.body'),
+      '#rows' => 15,
+    ];
+
+    $form['email_password_set'] = [
+      '#type' => 'details',
+      '#title' => $this->t('Account activation (password set at registration)'),
+      '#collapsed' => TRUE,
+      '#description' => $this->t('Edit the activation e-mail messages sent to new members upon registering, when no administrator approval is required and password has already been set during registration.') . ' ' . $email_token_help,
+      '#group' => 'email',
+    ];
+    $form['email_password_set']['user_mail_register_password_set_subject'] = [
+      '#type' => 'textfield',
+      '#title' => $this->t('Subject'),
+      '#default_value' => $config->get('register_password_set.subject'),
+      '#maxlength' => 180,
+    ];
+    $form['email_password_set']['user_mail_register_password_set_body'] = [
+      '#type' => 'textarea',
+      '#title' => $this->t('Body'),
+      '#default_value' => $config->get('register_password_set.body'),
       '#rows' => 15,
     ];
 

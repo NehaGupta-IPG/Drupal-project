@@ -6,6 +6,7 @@ namespace Drupal\Tests\user\Functional;
 
 use Drupal\Core\Entity\Entity\EntityFormDisplay;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
+use Drupal\Core\Test\AssertMailTrait;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\Tests\BrowserTestBase;
@@ -19,6 +20,8 @@ use Drupal\user\UserInterface;
  */
 class UserRegistrationTest extends BrowserTestBase {
 
+  use AssertMailTrait;
+
   /**
    * {@inheritdoc}
    */
@@ -29,6 +32,9 @@ class UserRegistrationTest extends BrowserTestBase {
    */
   protected $defaultTheme = 'stark';
 
+  /**
+   * Tests registration form with email verification.
+   */
   public function testRegistrationWithEmailVerification(): void {
     $config = $this->config('user.settings');
     // Require email verification.
@@ -42,12 +48,13 @@ class UserRegistrationTest extends BrowserTestBase {
 
     // Allow registration by site visitors without administrator approval.
     $config->set('register', UserInterface::REGISTER_VISITORS)->save();
+    $this->drupalGet('user/register');
+    $this->assertSession()->statusCodeEquals(200);
     $edit = [];
     $edit['name'] = $name = $this->randomMachineName();
     $edit['mail'] = $mail = $edit['name'] . '@example.com';
-    $this->drupalGet('user/register');
     $this->submitForm($edit, 'Create new account');
-    $this->assertSession()->pageTextContains('A welcome message with further instructions has been sent to your email address.');
+    $this->assertSession()->responseContains('A welcome message with further instructions has been sent to your email address.');
 
     /** @var EntityStorageInterface $storage */
     $storage = $this->container->get('entity_type.manager')->getStorage('user');
@@ -60,10 +67,11 @@ class UserRegistrationTest extends BrowserTestBase {
 
     // Allow registration by site visitors, but require administrator approval.
     $config->set('register', UserInterface::REGISTER_VISITORS_ADMINISTRATIVE_APPROVAL)->save();
+    $this->drupalGet('user/register');
+    $this->assertSession()->statusCodeEquals(200);
     $edit = [];
     $edit['name'] = $name = $this->randomMachineName();
     $edit['mail'] = $mail = $edit['name'] . '@example.com';
-    $this->drupalGet('user/register');
     $this->submitForm($edit, 'Create new account');
     $this->container->get('entity_type.manager')->getStorage('user')->resetCache();
     $accounts = $storage->loadByProperties(['name' => $name, 'mail' => $mail]);
@@ -71,6 +79,9 @@ class UserRegistrationTest extends BrowserTestBase {
     $this->assertFalse($new_user->isActive(), 'New account is blocked until approved by an administrator.');
   }
 
+  /**
+   * Tests registration form without email verification.
+   */
   public function testRegistrationWithoutEmailVerification(): void {
     $config = $this->config('user.settings');
     // Don't require email verification and allow registration by site visitors
@@ -85,42 +96,46 @@ class UserRegistrationTest extends BrowserTestBase {
     $edit['mail'] = $mail = $edit['name'] . '@example.com';
 
     // Try entering a mismatching password.
+    $this->drupalGet('user/register');
+    $this->assertSession()->statusCodeEquals(200);
     $edit['pass[pass1]'] = '99999.0';
     $edit['pass[pass2]'] = '99999';
-    $this->drupalGet('user/register');
     $this->submitForm($edit, 'Create new account');
-    $this->assertSession()->pageTextContains('The specified passwords do not match.');
+    $this->assertSession()->responseContains('The specified passwords do not match.');
 
     // Enter a correct password.
     $edit['pass[pass1]'] = $new_pass = $this->randomMachineName();
     $edit['pass[pass2]'] = $new_pass;
     $this->drupalGet('user/register');
+    $this->assertSession()->statusCodeEquals(200);
     $this->submitForm($edit, 'Create new account');
     $this->container->get('entity_type.manager')->getStorage('user')->resetCache();
     $accounts = $this->container->get('entity_type.manager')->getStorage('user')
       ->loadByProperties(['name' => $name, 'mail' => $mail]);
     $new_user = reset($accounts);
     $this->assertNotNull($new_user, 'New account successfully created with matching passwords.');
-    $this->assertSession()->pageTextContains('Registration successful. You are now logged in.');
+    $this->assertSession()->responseContains('Registration successful. You are now logged in.');
     $this->drupalLogout();
 
     // Allow registration by site visitors, but require administrator approval.
     $config->set('register', UserInterface::REGISTER_VISITORS_ADMINISTRATIVE_APPROVAL)->save();
+    $this->drupalGet('user/register');
+    $this->assertSession()->statusCodeEquals(200);
     $edit = [];
     $edit['name'] = $name = $this->randomMachineName();
     $edit['mail'] = $mail = $edit['name'] . '@example.com';
     $edit['pass[pass1]'] = $pass = $this->randomMachineName();
     $edit['pass[pass2]'] = $pass;
-    $this->drupalGet('user/register');
     $this->submitForm($edit, 'Create new account');
-    $this->assertSession()->pageTextContains('Thank you for applying for an account. Your account is currently pending approval by the site administrator.');
+    $this->assertSession()->responseContains('Thank you for applying for an account. Your account is currently pending approval by the site administrator.');
 
     // Try to log in before administrator approval.
+    $this->drupalGet('user/login');
+    $this->assertSession()->statusCodeEquals(200);
     $auth = [
       'name' => $name,
       'pass' => $pass,
     ];
-    $this->drupalGet('user/login');
     $this->submitForm($auth, 'Log in');
     $this->assertSession()->pageTextContains('The username ' . $name . ' has not been activated or is blocked.');
 
@@ -139,10 +154,87 @@ class UserRegistrationTest extends BrowserTestBase {
 
     // Log in after administrator approval.
     $this->drupalGet('user/login');
+    $this->assertSession()->statusCodeEquals(200);
     $this->submitForm($auth, 'Log in');
-    $this->assertSession()->pageTextContains('Member for');
+    $this->assertSession()->responseContains('Member for');
   }
 
+  /**
+   * Tests registration form with password set.
+   */
+  public function testRegistrationWithPasswordSet(): void {
+    // Require e-mail verification, but let users choose a password during
+    // registration and allow registration by site visitors without
+    // administrator approval.
+    $this->config('user.settings')
+      ->set('verify_mail', TRUE)
+      ->set('register', UserInterface::REGISTER_VISITORS)
+      ->set('register_password_set', TRUE)
+      ->set('notify.register_pending_approval', TRUE)
+      ->save();
+
+    $edit = [];
+    $edit['name'] = $name = $this->randomMachineName();
+    $edit['mail'] = $mail = $edit['name'] . '@example.com';
+    $edit['pass[pass1]'] = $new_pass = $this->randomMachineName();
+    $edit['pass[pass2]'] = $new_pass;
+
+    // Create a new user.
+    $this->drupalGet('user/register');
+    $this->assertSession()->statusCodeEquals(200);
+    $this->submitForm($edit, 'Create new account');
+    $this->assertSession()
+      ->responseContains('A welcome message with further instructions has been sent to your email address.');
+
+    // Make sure the user is still blocked.
+    $this->container->get('entity_type.manager')
+      ->getStorage('user')
+      ->resetCache();
+    $accounts = $this->container->get('entity_type.manager')
+      ->getStorage('user')
+      ->loadByProperties([
+        'name' => $name,
+        'mail' => $mail,
+      ]);
+    $new_user = reset($accounts);
+    $this->assertEmpty($new_user->status->value, 'New account is blocked until approved via e-mail confirmation.');
+
+    // Try to login before activating the account via e-mail.
+    $edit2 = [];
+    $edit2['name'] = $name;
+    $edit2['pass'] = $new_pass;
+    $this->drupalGet('user/login');
+    $this->assertSession()->statusCodeEquals(200);
+    $this->submitForm($edit2, 'Log in');
+    $this->assertSession()
+      ->pageTextContains('The username ' . $name . ' has not been activated or is blocked.');
+
+    // Try to activate the user.
+    $new_user->activate();
+    $new_user->save();
+    $edit = [
+      'name' => $new_user->getAccountName(),
+    ];
+    $this->drupalGet('user/password');
+    $this->submitForm($edit, 'Submit');
+    $_emails = $this->getMails();
+    $start = strpos($_emails[2]['body'], 'user/reset/' . $new_user->id());
+    $path = substr($_emails[2]['body'], $start, 66 + strlen($new_user->id()));
+
+    // Log in with temporary login link.
+    $this->drupalGet($path);
+    $this->submitForm([], 'Log in');
+
+    // Change the password.
+    $password = \Drupal::service('password_generator')->generate();
+    $edit = ['pass[pass1]' => $password, 'pass[pass2]' => $password];
+    $this->submitForm($edit, 'Save');
+    $this->assertSession()->pageTextContains('The changes have been saved.');
+  }
+
+  /**
+   * Tests default registration form for email duplicates.
+   */
   public function testRegistrationEmailDuplicates(): void {
     // Don't require email verification and allow registration by site visitors
     // without administrator approval.
@@ -160,6 +252,7 @@ class UserRegistrationTest extends BrowserTestBase {
 
     // Attempt to create a new account using an existing email address.
     $this->drupalGet('user/register');
+    $this->assertSession()->statusCodeEquals(200);
     $this->submitForm($edit, 'Create new account');
     $this->assertSession()->pageTextContains('The email address ' . $duplicate_user->getEmail() . ' is already taken.');
 
@@ -167,6 +260,7 @@ class UserRegistrationTest extends BrowserTestBase {
     $edit['mail'] = '   ' . $duplicate_user->getEmail() . '   ';
 
     $this->drupalGet('user/register');
+    $this->assertSession()->statusCodeEquals(200);
     $this->submitForm($edit, 'Create new account');
     $this->assertSession()->pageTextContains('The email address ' . $duplicate_user->getEmail() . ' is already taken.');
   }
@@ -221,6 +315,7 @@ class UserRegistrationTest extends BrowserTestBase {
 
     // Create one account.
     $this->drupalGet('user/register');
+    $this->assertSession()->statusCodeEquals(200);
     $this->submitForm($edit, 'Create new account');
     $this->assertSession()->statusCodeEquals(200);
 
@@ -235,12 +330,16 @@ class UserRegistrationTest extends BrowserTestBase {
     $edit['pass[pass2]'] = $edit['pass[pass1]'] = $this->randomMachineName();
 
     $this->drupalGet('user/register');
+    $this->assertSession()->statusCodeEquals(200);
     $this->submitForm($edit, 'Create new account');
     $this->assertSession()->statusCodeEquals(200);
 
     $this->assertNotEmpty($user_storage->loadByProperties(['name' => $edit['name']]));
   }
 
+  /**
+   * Tests default registration form values.
+   */
   public function testRegistrationDefaultValues(): void {
     // Don't require email verification and allow registration by site visitors
     // without administrator approval.
@@ -292,11 +391,13 @@ class UserRegistrationTest extends BrowserTestBase {
 
     $edit = ['mail' => 'test@example.com', 'name' => $account->getAccountName()];
     $this->drupalGet('user/register');
+    $this->assertSession()->statusCodeEquals(200);
     $this->submitForm($edit, 'Create new account');
     $this->assertSession()->pageTextContains("The username {$account->getAccountName()} is already taken.");
 
     $edit = ['mail' => $account->getEmail(), 'name' => $this->randomString()];
     $this->drupalGet('user/register');
+    $this->assertSession()->statusCodeEquals(200);
     $this->submitForm($edit, 'Create new account');
     $this->assertSession()->pageTextContains("The email address {$account->getEmail()} is already taken.");
   }
@@ -332,7 +433,7 @@ class UserRegistrationTest extends BrowserTestBase {
 
     // Check that the field does not appear on the registration form.
     $this->drupalGet('user/register');
-    $this->assertSession()->pageTextNotContains($field->label());
+    $this->assertSession()->responseNotContains($field->label());
     $this->assertSession()->responseHeaderContains('X-Drupal-Cache-Tags', 'config:core.entity_form_display.user.user.register');
     $this->assertSession()->responseHeaderContains('X-Drupal-Cache-Tags', 'config:user.settings');
 
@@ -349,11 +450,13 @@ class UserRegistrationTest extends BrowserTestBase {
     $edit = [];
     $edit['name'] = $name = $this->randomMachineName();
     $edit['mail'] = $mail = $edit['name'] . '@example.com';
+
     // Missing input in required field.
     $edit['test_user_field[0][value]'] = '';
     $this->submitForm($edit, 'Create new account');
     $this->assertRegistrationFormCacheTagsWithUserFields();
-    $this->assertSession()->pageTextContains("{$field->label()} field is required.");
+    $this->assertSession()->responseContains("{$field->label()} field is required.");
+
     // Invalid input.
     $edit['test_user_field[0][value]'] = '-1';
     $this->submitForm($edit, 'Create new account');
@@ -364,6 +467,7 @@ class UserRegistrationTest extends BrowserTestBase {
     $value = rand(1, 255);
     $edit['test_user_field[0][value]'] = $value;
     $this->submitForm($edit, 'Create new account');
+
     // Check user fields.
     $accounts = $this->container->get('entity_type.manager')->getStorage('user')
       ->loadByProperties(['name' => $name, 'mail' => $mail]);
@@ -375,12 +479,14 @@ class UserRegistrationTest extends BrowserTestBase {
     $field_storage->save();
     $this->drupalGet('user/register');
     $this->assertRegistrationFormCacheTagsWithUserFields();
+
     // Add two inputs.
     $value = rand(1, 255);
     $edit = [];
     $edit['test_user_field[0][value]'] = $value;
     $this->submitForm($edit, 'Add another item');
     $this->submitForm($edit, 'Add another item');
+
     // Submit with three values.
     $edit['test_user_field[1][value]'] = $value + 1;
     $edit['test_user_field[2][value]'] = $value + 2;

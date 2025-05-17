@@ -480,6 +480,37 @@ function user_pass_reset_url($account, $options = []) {
 }
 
 /**
+ * Generates a unique URL for a user to log in and validate their account.
+ *
+ * @param \Drupal\user\UserInterface $account
+ *   An object containing the user account.
+ * @param array $options
+ *   (optional) A keyed array of settings. Supported options are:
+ *   - langcode: A language code to be used when generating locale-sensitive
+ *    URLs. If langcode is NULL the users preferred language is used.
+ *
+ * @return string
+ *   A unique URL that provides a one-time log in for the user, from which
+ *   they can activate their account.
+ */
+function user_validate_url(UserInterface $account, array $options = []): string {
+  $timestamp = \Drupal::time()->getRequestTime();
+  $langcode = $options['langcode'] ?? $account->getPreferredLangcode();
+  return Url::fromRoute(
+    'user.reset.login',
+    [
+      'uid' => $account->id(),
+      'timestamp' => $timestamp,
+      'hash' => user_pass_rehash($account, $timestamp),
+    ],
+    [
+      'absolute' => TRUE,
+      'language' => \Drupal::languageManager()->getLanguage($langcode),
+    ]
+  )->toString();
+}
+
+/**
  * Generates a URL to confirm an account cancellation request.
  *
  * @param \Drupal\user\UserInterface $account
@@ -761,6 +792,7 @@ function user_mail_tokens(&$replacements, $data, $options) {
   if (isset($data['user'])) {
     $replacements['[user:one-time-login-url]'] = user_pass_reset_url($data['user'], $options);
     $replacements['[user:cancel-url]'] = user_cancel_url($data['user'], $options);
+    $replacements['[user:one-time-login-validate-url]'] = user_validate_url($data['user'], $options);
   }
 }
 
@@ -919,6 +951,7 @@ function user_role_revoke_permissions($rid, array $permissions = []) {
  *     self-registers.
  *   - 'register_pending_approval': Welcome message, user pending admin
  *     approval.
+ *   - 'register_password_set_activation': Activation message, password set.
  *   - 'password_reset': Password recovery request.
  *   - 'status_activated': Account activated.
  *   - 'status_blocked': Account blocked.

@@ -10,6 +10,9 @@ user.settings:
     verify_mail:
       type: boolean
       label: 'Require email verification when a visitor creates an account'
+    register_password_set:
+      type: boolean
+      label: 'Require people to choose a password during registration.'
     notify:
       type: mapping
       label: 'Notify user'
@@ -38,6 +41,9 @@ user.settings:
         register_pending_approval:
           type: boolean
           label: 'Welcome (awaiting approval)'
+        register_password_set:
+          type: boolean
+          label: 'Require people to choose a password during registration.'
     register:
       type: string
       label: 'Who can register accounts?'
@@ -67,6 +73,12 @@ user.mail:
     register_no_approval_required:
       type: mail
       label: 'Registration confirmation (No approval required)'
+    register_password_set:
+      type: mail
+      label: 'Registration with password confirmation (No approval required)'
+    register_password_set_activation:
+      type: mail
+      label: 'Registration with password activation'
     register_pending_approval:
       type: mail
       label: 'Registration confirmation (Pending approval)'
