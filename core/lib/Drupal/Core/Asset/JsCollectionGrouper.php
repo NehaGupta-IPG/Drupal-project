@@ -25,6 +25,15 @@ class JsCollectionGrouper implements AssetCollectionGrouperInterface {
     // item, we can determine if it can be put into the current group, or if a
     // new group needs to be made for it.
     $current_group_keys = NULL;
+
+    // If a group encapsulates one or more libraries, e.g. all relevant files
+    // from each library are contained in the group, instead of across groups
+    // due to weight etc. it is possible to generate an aggregate based purely
+    // on the libraries represented in the group rather than the full context of
+    // the request. In order to do this, we need to keep track of whether
+    // libraries span multiple groups or not.
+    $first_seen_libraries = [];
+
     $index = -1;
     foreach ($js_assets as $item) {
       switch ($item['type']) {
@@ -33,6 +42,9 @@ class JsCollectionGrouper implements AssetCollectionGrouperInterface {
           // Help ensure maximum reuse of aggregate files by only grouping
           // together items that share the same 'group' value.
           $group_keys = $item['preprocess'] ? [$item['type'], $item['group']] : FALSE;
+          if ($item['unique_js_aggregate']) {
+            $group_keys[] = $item['library'];
+          }
           break;
 
         case 'external':
@@ -49,9 +61,25 @@ class JsCollectionGrouper implements AssetCollectionGrouperInterface {
         // being placed into it. The item's 'data' and 'weight' properties are
         // unique to the item and should not be carried over to the group.
         $groups[$index] = $item;
-        unset($groups[$index]['data'], $groups[$index]['weight']);
+        unset($groups[$index]['data'], $groups[$index]['weight'], $groups[$index]['library']);
         $groups[$index]['items'] = [];
         $current_group_keys = $group_keys ?: NULL;
+      }
+      $seen_index = $first_seen_libraries[$item['library']] ?? NULL;
+
+      // The first time a library is seen, add it to the list of libraries for
+      // the group and record the index.
+      if ($seen_index === NULL) {
+        $first_seen_libraries[$item['library']] = $index;
+        $groups[$index]['libraries'][] = $item['library'];
+      }
+
+      // If a library has been seen in a previous index, this means that index
+      // does not contain all of the assets for that library, so unset the
+      // libraries key from that group.
+      if ($seen_index && $seen_index !== $index) {
+        unset($groups[$seen_index]['libraries']);
+        unset($groups[$index]['libraries']);
       }
 
       // Add the item to the current group.

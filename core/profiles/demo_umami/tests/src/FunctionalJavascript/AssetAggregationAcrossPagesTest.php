@@ -70,10 +70,38 @@ class AssetAggregationAcrossPagesTest extends PerformanceTestBase {
       $this->doRequests();
     }, 'umamiFrontAndRecipePagesEditor');
     $expected = [
-      'ScriptCount' => 8,
-      'ScriptBytes' => 397256,
+      'ScriptCount' => 6,
+      'ScriptBytes' => 330250,
       'StylesheetCount' => 9,
       'StylesheetBytes' => 186500,
+    ];
+    $this->assertMetrics($expected, $performance_data);
+  }
+
+  /**
+   * Checks the node/add page asset requests as an author.
+   */
+  public function testNodeAddPagesAuthor(): void {
+    $user = $this->createUser();
+    $user->addRole('author');
+    $user->save();
+    $this->drupalLogin($user);
+    $this->drupalGet('<front>');
+    // Give additional time for the request and all assets to be returned
+    // before making the next request.
+    sleep(2);
+    $performance_data = $this->collectPerformanceData(function () {
+      $this->drupalGet('node/add/article');
+      sleep(2);
+      $this->drupalGet('node/add/recipe');
+      sleep(2);
+      $this->drupalGet('node/add/page');
+    }, 'umamiNodeAddEditor');
+    $expected = [
+      'ScriptCount' => 9,
+      'ScriptBytes' => 1397000,
+      'StylesheetCount' => 6,
+      'StylesheetBytes' => 683600,
     ];
     $this->assertMetrics($expected, $performance_data);
   }

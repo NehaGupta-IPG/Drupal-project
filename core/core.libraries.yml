@@ -18,6 +18,7 @@ internal.backbone:
     - core/internal.underscore
 
 ckeditor5:
+  unique_aggregate: true
   remote: https://github.com/ckeditor/ckeditor5
   version: "47.3.0"
   license:
@@ -30,7 +31,7 @@ ckeditor5:
     # (if it exists). The files loaded after this one will include CKEditor 5
     # translations, enabled plugins, and the rest of the JavaScript needed on
     # the page.
-    assets/vendor/ckeditor5/ckeditor5-dll/ckeditor5-dll.js: { preprocess: false, minified: true }
+    assets/vendor/ckeditor5/ckeditor5-dll/ckeditor5-dll.js: { minified: true }
   dependencies:
     - core/ckeditor5.translations
 
@@ -420,6 +421,7 @@ loadjs:
 # Common files for libraries that still rely on jQuery UI components.
 # @todo Remove when no longer required by drupal.autocomplete and drupal.dialog.
 internal.jquery_ui:
+  unique_aggregate: true
   version: VERSION
   js:
     # All weights are based on the requirements defined within each file.
@@ -812,6 +814,7 @@ drupal.timezone:
     - core/drupal
 
 drupal.touchevents-test:
+  unique_aggregate: true
   header: true
   version: VERSION
   js:

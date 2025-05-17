@@ -5,6 +5,7 @@ namespace Drupal\system\Controller;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
+use Drupal\Component\Utility\UrlHelper;
 use Drupal\Core\Asset\AttachedAssetsInterface;
 use Drupal\Core\Asset\AssetGroupSetHashTrait;
 
@@ -44,13 +45,23 @@ class JsAssetController extends AssetControllerBase {
   /**
    * {@inheritdoc}
    */
-  protected function getGroups(AttachedAssetsInterface $attached_assets, Request $request): array {
+  protected function getGroups(AttachedAssetsInterface $attached_assets, Request $request, $with_dependencies = TRUE): array {
     // The header and footer scripts are two distinct sets of asset groups. The
     // $group_key is not sufficient to find the group, we also need to locate it
     // within either the header or footer set.
-    $language = $this->languageManager()->getLanguage($request->get('language'));
+    $language = $this->languageManager()->getLanguage($request->query->get('language'));
+
+    if ($request->query->has('libraries')) {
+      // If we're creating an aggregate for a single library, we don't need the
+      // dependencies because those will be handled by different aggregates, so
+      // get a list of dependencies, then set them as already loaded.
+      $with_dependencies = $this->libraryDependencyResolver->getLibrariesWithDependencies($attached_assets->getLibraries());
+      $already_loaded = array_diff($with_dependencies, explode(',', UrlHelper::uncompressQueryParameter($request->query->get('libraries'))));
+      $attached_assets->setAlreadyLoadedLibraries($already_loaded);
+    }
+
     [$js_assets_header, $js_assets_footer] = $this->assetResolver->getJsAssets($attached_assets, FALSE, $language);
-    $scope = $request->get('scope');
+    $scope = $request->query->get('scope');
     if (!isset($scope)) {
       throw new BadRequestHttpException('The URL must have a scope query argument.');
     }

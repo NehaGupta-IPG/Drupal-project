@@ -362,6 +362,9 @@ class AssetResolver implements AssetResolverInterface {
           // order.
           $options['weight'] += count($javascript) / 30000;
 
+          $options['library'] = $library;
+          $options['unique_js_aggregate'] = $definition['unique_js_aggregate'] ?? FALSE;
+
           // Local and external files must keep their name as the associative
           // key so the same JavaScript file is not added twice.
           $javascript[$options['data']] = $options;
@@ -373,7 +376,7 @@ class AssetResolver implements AssetResolverInterface {
       $this->themeManager->alter('js', $javascript, $assets, $language);
 
       // Sort JavaScript assets, so that they appear in the correct order.
-      uasort($javascript, [static::class, 'sort']);
+      uasort($javascript, [static::class, 'sortWeight']);
 
       // Prepare the return value: filter JavaScript assets per scope.
       $js_assets_header = [];
@@ -448,6 +451,32 @@ class AssetResolver implements AssetResolverInterface {
       $js_assets_header,
       $js_assets_footer,
     ];
+  }
+
+  /**
+   * Sorts JavaScript resources.
+   *
+   * Callback for uasort().
+   *
+   * @param array $a
+   *   First item for comparison. The compared items should be associative
+   *   arrays of member items.
+   * @param array $b
+   *   Second item for comparison.
+   *
+   * @return int
+   *   The comparison result for uasort().
+   */
+  public static function sortWeight(array $a, array $b) {
+    if ($a['weight'] < $b['weight']) {
+      return -1;
+    }
+    elseif ($a['weight'] > $b['weight']) {
+      return 1;
+    }
+    else {
+      return 0;
+    }
   }
 
   /**
