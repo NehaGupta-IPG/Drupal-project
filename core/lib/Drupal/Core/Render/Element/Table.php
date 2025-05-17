@@ -502,7 +502,51 @@ class Table extends FormElementBase {
     return $element;
   }
 
-  public static function createInstance($header, $rows, $empty, $input, $tree, $tableselect, $sticky, $responsive, $multiple, $js_select, $process, $element_validate, $tabledrag, $pre_render, $theme, $value_callback, $type, $defaults_loaded, ?ElementInfoManager $elementInfoManager = NULL) {
+  /**
+   * Create a table element.
+   *
+   * @param mixed $header
+   *   Automatically converted param.
+   * @param mixed $rows
+   *   Automatically converted param.
+   * @param mixed $empty
+   *   Automatically converted param.
+   * @param mixed $input
+   *   Automatically converted param.
+   * @param mixed $tree
+   *   Automatically converted param.
+   * @param mixed $tableselect
+   *   Automatically converted param.
+   * @param mixed $sticky
+   *   Automatically converted param.
+   * @param mixed $responsive
+   *   Automatically converted param.
+   * @param mixed $multiple
+   *   Automatically converted param.
+   * @param mixed $js_select
+   *   Automatically converted param.
+   * @param mixed $process
+   *   Automatically converted param.
+   * @param mixed $element_validate
+   *   Automatically converted param.
+   * @param mixed $tabledrag
+   *   Automatically converted param.
+   * @param mixed $pre_render
+   *   Automatically converted param.
+   * @param mixed $theme
+   *   Automatically converted param.
+   * @param mixed $value_callback
+   *   Automatically converted param.
+   * @param mixed $type
+   *   Automatically converted param.
+   * @param mixed $defaults_loaded
+   *   Automatically converted param.
+   * @param ?\Drupal\Core\Render\ElementInfoManager $elementInfoManager
+   *   The element info manager.
+   *
+   * @return static
+   */
+  public static function createInstance($header, $rows, $empty, $input, $tree, $tableselect, $sticky, $responsive, $multiple, $js_select, $process, $element_validate, $tabledrag, $pre_render, $theme, $value_callback, $type, $defaults_loaded, ?ElementInfoManager $elementInfoManager = NULL) : static {
     $instance = ($elementInfoManager ?? \Drupal::service('element_info'))->createInstance('table');
     $instance->header = $header;
     $instance->rows = $rows;

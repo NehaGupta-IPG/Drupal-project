@@ -26,7 +26,23 @@ class Operations extends Dropbutton {
     ] + parent::getInfo();
   }
 
-  public static function createInstance($theme, $pre_render, $type, $defaults_loaded, ?ElementInfoManager $elementInfoManager = NULL) {
+  /**
+   * Create an operations element.
+   *
+   * @param mixed $theme
+   *   Automatically converted param.
+   * @param mixed $pre_render
+   *   Automatically converted param.
+   * @param mixed $type
+   *   Automatically converted param.
+   * @param mixed $defaults_loaded
+   *   Automatically converted param.
+   * @param ?\Drupal\Core\Render\ElementInfoManager $elementInfoManager
+   *   The element info manager.
+   *
+   * @return static
+   */
+  public static function createInstance($theme, $pre_render, $type, $defaults_loaded, ?ElementInfoManager $elementInfoManager = NULL) : static {
     $instance = ($elementInfoManager ?? \Drupal::service('element_info'))->createInstance('operations');
     $instance->theme = $theme;
     $instance->pre_render = $pre_render;

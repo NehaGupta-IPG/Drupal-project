@@ -196,7 +196,33 @@ class ComponentElement extends RenderElementBase {
     ];
   }
 
-  public static function createInstance($pre_render, $component, $variant, $props, $slots, $propsAlter, $slotsAlter, $type, $defaults_loaded, ?ElementInfoManager $elementInfoManager = NULL) {
+  /**
+   * Create a component element.
+   *
+   * @param mixed $pre_render
+   *   Automatically converted param.
+   * @param mixed $component
+   *   Automatically converted param.
+   * @param mixed $variant
+   *   Automatically converted param.
+   * @param mixed $props
+   *   Automatically converted param.
+   * @param mixed $slots
+   *   Automatically converted param.
+   * @param mixed $propsAlter
+   *   Automatically converted param.
+   * @param mixed $slotsAlter
+   *   Automatically converted param.
+   * @param mixed $type
+   *   Automatically converted param.
+   * @param mixed $defaults_loaded
+   *   Automatically converted param.
+   * @param ?\Drupal\Core\Render\ElementInfoManager $elementInfoManager
+   *   The element info manager.
+   *
+   * @return static
+   */
+  public static function createInstance($pre_render, $component, $variant, $props, $slots, $propsAlter, $slotsAlter, $type, $defaults_loaded, ?ElementInfoManager $elementInfoManager = NULL) : static {
     $instance = ($elementInfoManager ?? \Drupal::service('element_info'))->createInstance('component');
     $instance->pre_render = $pre_render;
     $instance->component = $component;

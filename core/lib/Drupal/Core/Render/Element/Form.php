@@ -27,7 +27,23 @@ class Form extends RenderElementBase {
     ];
   }
 
-  public static function createInstance($method, $theme_wrappers, $type, $defaults_loaded, ?ElementInfoManager $elementInfoManager = NULL) {
+  /**
+   * Create a form element.
+   *
+   * @param mixed $method
+   *   Automatically converted param.
+   * @param mixed $theme_wrappers
+   *   Automatically converted param.
+   * @param mixed $type
+   *   Automatically converted param.
+   * @param mixed $defaults_loaded
+   *   Automatically converted param.
+   * @param ?\Drupal\Core\Render\ElementInfoManager $elementInfoManager
+   *   The element info manager.
+   *
+   * @return static
+   */
+  public static function createInstance($method, $theme_wrappers, $type, $defaults_loaded, ?ElementInfoManager $elementInfoManager = NULL) : static {
     $instance = ($elementInfoManager ?? \Drupal::service('element_info'))->createInstance('form');
     $instance->method = $method;
     $instance->theme_wrappers = $theme_wrappers;

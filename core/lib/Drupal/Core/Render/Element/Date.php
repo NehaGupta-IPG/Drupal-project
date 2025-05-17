@@ -87,7 +87,35 @@ class Date extends FormElementBase {
     return $element;
   }
 
-  public static function createInstance($input, $theme, $process, $pre_render, $theme_wrappers, $attributes, $date_date_format, $value_callback, $type, $defaults_loaded, ?ElementInfoManager $elementInfoManager = NULL) {
+  /**
+   * Create a date element.
+   *
+   * @param mixed $input
+   *   Automatically converted param.
+   * @param mixed $theme
+   *   Automatically converted param.
+   * @param mixed $process
+   *   Automatically converted param.
+   * @param mixed $pre_render
+   *   Automatically converted param.
+   * @param mixed $theme_wrappers
+   *   Automatically converted param.
+   * @param mixed $attributes
+   *   Automatically converted param.
+   * @param mixed $date_date_format
+   *   Automatically converted param.
+   * @param mixed $value_callback
+   *   Automatically converted param.
+   * @param mixed $type
+   *   Automatically converted param.
+   * @param mixed $defaults_loaded
+   *   Automatically converted param.
+   * @param ?\Drupal\Core\Render\ElementInfoManager $elementInfoManager
+   *   The element info manager.
+   *
+   * @return static
+   */
+  public static function createInstance($input, $theme, $process, $pre_render, $theme_wrappers, $attributes, $date_date_format, $value_callback, $type, $defaults_loaded, ?ElementInfoManager $elementInfoManager = NULL) : static {
     $instance = ($elementInfoManager ?? \Drupal::service('element_info'))->createInstance('date');
     $instance->input = $input;
     $instance->theme = $theme;

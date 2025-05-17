@@ -68,7 +68,25 @@ class InlineTemplate extends RenderElementBase {
     return $element;
   }
 
-  public static function createInstance($pre_render, $template, $context, $type, $defaults_loaded, ?ElementInfoManager $elementInfoManager = NULL) {
+  /**
+   * Create an inline_template element.
+   *
+   * @param mixed $pre_render
+   *   Automatically converted param.
+   * @param mixed $template
+   *   Automatically converted param.
+   * @param mixed $context
+   *   Automatically converted param.
+   * @param mixed $type
+   *   Automatically converted param.
+   * @param mixed $defaults_loaded
+   *   Automatically converted param.
+   * @param ?\Drupal\Core\Render\ElementInfoManager $elementInfoManager
+   *   The element info manager.
+   *
+   * @return static
+   */
+  public static function createInstance($pre_render, $template, $context, $type, $defaults_loaded, ?ElementInfoManager $elementInfoManager = NULL) : static {
     $instance = ($elementInfoManager ?? \Drupal::service('element_info'))->createInstance('inline_template');
     $instance->pre_render = $pre_render;
     $instance->template = $template;

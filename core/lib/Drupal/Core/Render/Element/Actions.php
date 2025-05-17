@@ -117,7 +117,25 @@ class Actions extends Container {
     return $dropbuttons + $element;
   }
 
-  public static function createInstance($process, $weight, $theme_wrappers, $type, $defaults_loaded, ?ElementInfoManager $elementInfoManager = NULL) {
+  /**
+   * Create an actions element.
+   *
+   * @param mixed $process
+   *   Automatically converted param.
+   * @param mixed $weight
+   *   Automatically converted param.
+   * @param mixed $theme_wrappers
+   *   Automatically converted param.
+   * @param mixed $type
+   *   Automatically converted param.
+   * @param mixed $defaults_loaded
+   *   Automatically converted param.
+   * @param ?\Drupal\Core\Render\ElementInfoManager $elementInfoManager
+   *   The element info manager.
+   *
+   * @return static
+   */
+  public static function createInstance($process, $weight, $theme_wrappers, $type, $defaults_loaded, ?ElementInfoManager $elementInfoManager = NULL) : static {
     $instance = ($elementInfoManager ?? \Drupal::service('element_info'))->createInstance('actions');
     $instance->process = $process;
     $instance->weight = $weight;

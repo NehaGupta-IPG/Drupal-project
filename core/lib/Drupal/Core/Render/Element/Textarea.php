@@ -88,7 +88,37 @@ class Textarea extends FormElementBase {
     return NULL;
   }
 
-  public static function createInstance($input, $cols, $rows, $resizable, $process, $pre_render, $theme, $theme_wrappers, $value_callback, $type, $defaults_loaded, ?ElementInfoManager $elementInfoManager = NULL) {
+  /**
+   * Create a textarea element.
+   *
+   * @param mixed $input
+   *   Automatically converted param.
+   * @param mixed $cols
+   *   Automatically converted param.
+   * @param mixed $rows
+   *   Automatically converted param.
+   * @param mixed $resizable
+   *   Automatically converted param.
+   * @param mixed $process
+   *   Automatically converted param.
+   * @param mixed $pre_render
+   *   Automatically converted param.
+   * @param mixed $theme
+   *   Automatically converted param.
+   * @param mixed $theme_wrappers
+   *   Automatically converted param.
+   * @param mixed $value_callback
+   *   Automatically converted param.
+   * @param mixed $type
+   *   Automatically converted param.
+   * @param mixed $defaults_loaded
+   *   Automatically converted param.
+   * @param ?\Drupal\Core\Render\ElementInfoManager $elementInfoManager
+   *   The element info manager.
+   *
+   * @return static
+   */
+  public static function createInstance($input, $cols, $rows, $resizable, $process, $pre_render, $theme, $theme_wrappers, $value_callback, $type, $defaults_loaded, ?ElementInfoManager $elementInfoManager = NULL) : static {
     $instance = ($elementInfoManager ?? \Drupal::service('element_info'))->createInstance('textarea');
     $instance->input = $input;
     $instance->cols = $cols;

@@ -182,7 +182,29 @@ class Checkboxes extends FormElementBase {
     return empty(static::getCheckedCheckboxes($input));
   }
 
-  public static function createInstance($input, $process, $pre_render, $theme_wrappers, $value_callback, $type, $defaults_loaded, ?ElementInfoManager $elementInfoManager = NULL) {
+  /**
+   * Create a checkboxes element.
+   *
+   * @param mixed $input
+   *   Automatically converted param.
+   * @param mixed $process
+   *   Automatically converted param.
+   * @param mixed $pre_render
+   *   Automatically converted param.
+   * @param mixed $theme_wrappers
+   *   Automatically converted param.
+   * @param mixed $value_callback
+   *   Automatically converted param.
+   * @param mixed $type
+   *   Automatically converted param.
+   * @param mixed $defaults_loaded
+   *   Automatically converted param.
+   * @param ?\Drupal\Core\Render\ElementInfoManager $elementInfoManager
+   *   The element info manager.
+   *
+   * @return static
+   */
+  public static function createInstance($input, $process, $pre_render, $theme_wrappers, $value_callback, $type, $defaults_loaded, ?ElementInfoManager $elementInfoManager = NULL) : static {
     $instance = ($elementInfoManager ?? \Drupal::service('element_info'))->createInstance('checkboxes');
     $instance->input = $input;
     $instance->process = $process;

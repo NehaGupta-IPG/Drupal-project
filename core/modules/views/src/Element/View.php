@@ -118,7 +118,31 @@ class View extends RenderElementBase {
     return $element;
   }
 
-  public static function createInstance($pre_render, $name, $display_id, $arguments, $embed, $cache, $type, $defaults_loaded, ?ElementInfoManager $elementInfoManager = NULL) {
+  /**
+   * Create a view element.
+   *
+   * @param mixed $pre_render
+   *   Automatically converted param.
+   * @param mixed $name
+   *   Automatically converted param.
+   * @param mixed $display_id
+   *   Automatically converted param.
+   * @param mixed $arguments
+   *   Automatically converted param.
+   * @param mixed $embed
+   *   Automatically converted param.
+   * @param mixed $cache
+   *   Automatically converted param.
+   * @param mixed $type
+   *   Automatically converted param.
+   * @param mixed $defaults_loaded
+   *   Automatically converted param.
+   * @param ?\Drupal\Core\Render\ElementInfoManager $elementInfoManager
+   *   The element info manager.
+   *
+   * @return static
+   */
+  public static function createInstance($pre_render, $name, $display_id, $arguments, $embed, $cache, $type, $defaults_loaded, ?ElementInfoManager $elementInfoManager = NULL) : static {
     $instance = ($elementInfoManager ?? \Drupal::service('element_info'))->createInstance('view');
     $instance->pre_render = $pre_render;
     $instance->name = $name;

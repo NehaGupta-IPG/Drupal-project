@@ -97,7 +97,39 @@ class Range extends Number {
     }
   }
 
-  public static function createInstance($min, $max, $pre_render, $theme, $input, $step, $process, $element_validate, $theme_wrappers, $value_callback, $type, $defaults_loaded, ?ElementInfoManager $elementInfoManager = NULL) {
+  /**
+   * Create a range element.
+   *
+   * @param mixed $min
+   *   Automatically converted param.
+   * @param mixed $max
+   *   Automatically converted param.
+   * @param mixed $pre_render
+   *   Automatically converted param.
+   * @param mixed $theme
+   *   Automatically converted param.
+   * @param mixed $input
+   *   Automatically converted param.
+   * @param mixed $step
+   *   Automatically converted param.
+   * @param mixed $process
+   *   Automatically converted param.
+   * @param mixed $element_validate
+   *   Automatically converted param.
+   * @param mixed $theme_wrappers
+   *   Automatically converted param.
+   * @param mixed $value_callback
+   *   Automatically converted param.
+   * @param mixed $type
+   *   Automatically converted param.
+   * @param mixed $defaults_loaded
+   *   Automatically converted param.
+   * @param ?\Drupal\Core\Render\ElementInfoManager $elementInfoManager
+   *   The element info manager.
+   *
+   * @return static
+   */
+  public static function createInstance($min, $max, $pre_render, $theme, $input, $step, $process, $element_validate, $theme_wrappers, $value_callback, $type, $defaults_loaded, ?ElementInfoManager $elementInfoManager = NULL) : static {
     $instance = ($elementInfoManager ?? \Drupal::service('element_info'))->createInstance('range');
     $instance->min = $min;
     $instance->max = $max;

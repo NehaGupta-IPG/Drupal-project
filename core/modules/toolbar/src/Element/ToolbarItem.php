@@ -89,7 +89,23 @@ class ToolbarItem extends RenderElementBase {
     return $element;
   }
 
-  public static function createInstance($pre_render, $ab, $type, $defaults_loaded, ?ElementInfoManager $elementInfoManager = NULL) {
+  /**
+   * Create a toolbar_item element.
+   *
+   * @param mixed $pre_render
+   *   Automatically converted param.
+   * @param mixed $ab
+   *   Automatically converted param.
+   * @param mixed $type
+   *   Automatically converted param.
+   * @param mixed $defaults_loaded
+   *   Automatically converted param.
+   * @param ?\Drupal\Core\Render\ElementInfoManager $elementInfoManager
+   *   The element info manager.
+   *
+   * @return static
+   */
+  public static function createInstance($pre_render, $ab, $type, $defaults_loaded, ?ElementInfoManager $elementInfoManager = NULL) : static {
     $instance = ($elementInfoManager ?? \Drupal::service('element_info'))->createInstance('toolbar_item');
     $instance->pre_render = $pre_render;
     $instance->ab = $ab;

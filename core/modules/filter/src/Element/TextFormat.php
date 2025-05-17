@@ -317,7 +317,27 @@ class TextFormat extends RenderElementBase {
     return \Drupal::service('element_info');
   }
 
-  public static function createInstance($process, $base_type, $theme_wrappers, $type, $pre_render, $defaults_loaded, ?ElementInfoManager $elementInfoManager = NULL) {
+  /**
+   * Create a text_format element.
+   *
+   * @param mixed $process
+   *   Automatically converted param.
+   * @param mixed $base_type
+   *   Automatically converted param.
+   * @param mixed $theme_wrappers
+   *   Automatically converted param.
+   * @param mixed $type
+   *   Automatically converted param.
+   * @param mixed $pre_render
+   *   Automatically converted param.
+   * @param mixed $defaults_loaded
+   *   Automatically converted param.
+   * @param ?\Drupal\Core\Render\ElementInfoManager $elementInfoManager
+   *   The element info manager.
+   *
+   * @return static
+   */
+  public static function createInstance($process, $base_type, $theme_wrappers, $type, $pre_render, $defaults_loaded, ?ElementInfoManager $elementInfoManager = NULL) : static {
     $instance = ($elementInfoManager ?? \Drupal::service('element_info'))->createInstance('text_format');
     $instance->process = $process;
     $instance->base_type = $base_type;

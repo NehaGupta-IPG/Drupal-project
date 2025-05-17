@@ -116,7 +116,35 @@ class Pager extends RenderElementBase {
     return $pager;
   }
 
-  public static function createInstance($pre_render, $theme, $element, $pagination_heading_level, $parameters, $quantity, $tags, $route_name, $type, $defaults_loaded, ?ElementInfoManager $elementInfoManager = NULL) {
+  /**
+   * Create a pager element.
+   *
+   * @param mixed $pre_render
+   *   Automatically converted param.
+   * @param mixed $theme
+   *   Automatically converted param.
+   * @param mixed $element
+   *   Automatically converted param.
+   * @param mixed $pagination_heading_level
+   *   Automatically converted param.
+   * @param mixed $parameters
+   *   Automatically converted param.
+   * @param mixed $quantity
+   *   Automatically converted param.
+   * @param mixed $tags
+   *   Automatically converted param.
+   * @param mixed $route_name
+   *   Automatically converted param.
+   * @param mixed $type
+   *   Automatically converted param.
+   * @param mixed $defaults_loaded
+   *   Automatically converted param.
+   * @param ?\Drupal\Core\Render\ElementInfoManager $elementInfoManager
+   *   The element info manager.
+   *
+   * @return static
+   */
+  public static function createInstance($pre_render, $theme, $element, $pagination_heading_level, $parameters, $quantity, $tags, $route_name, $type, $defaults_loaded, ?ElementInfoManager $elementInfoManager = NULL) : static {
     $instance = ($elementInfoManager ?? \Drupal::service('element_info'))->createInstance('pager');
     $instance->pre_render = $pre_render;
     $instance->theme = $theme;

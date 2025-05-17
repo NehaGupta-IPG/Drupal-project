@@ -56,7 +56,23 @@ class ContextualLinksPlaceholder extends RenderElementBase {
     return $element;
   }
 
-  public static function createInstance($pre_render, $id, $type, $defaults_loaded, ?ElementInfoManager $elementInfoManager = NULL) {
+  /**
+   * Create a contextual_links_placeholder element.
+   *
+   * @param mixed $pre_render
+   *   Automatically converted param.
+   * @param mixed $id
+   *   Automatically converted param.
+   * @param mixed $type
+   *   Automatically converted param.
+   * @param mixed $defaults_loaded
+   *   Automatically converted param.
+   * @param ?\Drupal\Core\Render\ElementInfoManager $elementInfoManager
+   *   The element info manager.
+   *
+   * @return static
+   */
+  public static function createInstance($pre_render, $id, $type, $defaults_loaded, ?ElementInfoManager $elementInfoManager = NULL) : static {
     $instance = ($elementInfoManager ?? \Drupal::service('element_info'))->createInstance('contextual_links_placeholder');
     $instance->pre_render = $pre_render;
     $instance->id = $id;

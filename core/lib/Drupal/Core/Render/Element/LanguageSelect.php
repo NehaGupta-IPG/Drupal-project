@@ -28,7 +28,25 @@ class LanguageSelect extends FormElementBase {
     ];
   }
 
-  public static function createInstance($input, $default_value, $value_callback, $type, $defaults_loaded, ?ElementInfoManager $elementInfoManager = NULL) {
+  /**
+   * Create a language_select element.
+   *
+   * @param mixed $input
+   *   Automatically converted param.
+   * @param mixed $default_value
+   *   Automatically converted param.
+   * @param mixed $value_callback
+   *   Automatically converted param.
+   * @param mixed $type
+   *   Automatically converted param.
+   * @param mixed $defaults_loaded
+   *   Automatically converted param.
+   * @param ?\Drupal\Core\Render\ElementInfoManager $elementInfoManager
+   *   The element info manager.
+   *
+   * @return static
+   */
+  public static function createInstance($input, $default_value, $value_callback, $type, $defaults_loaded, ?ElementInfoManager $elementInfoManager = NULL) : static {
     $instance = ($elementInfoManager ?? \Drupal::service('element_info'))->createInstance('language_select');
     $instance->input = $input;
     $instance->default_value = $default_value;

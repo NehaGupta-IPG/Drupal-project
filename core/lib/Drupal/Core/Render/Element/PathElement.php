@@ -112,7 +112,43 @@ class PathElement extends Textfield {
     }
   }
 
-  public static function createInstance($input, $size, $maxlength, $autocomplete_route_name, $process, $pre_render, $theme, $theme_wrappers, $validate_path, $convert_path, $element_validate, $value_callback, $type, $defaults_loaded, ?ElementInfoManager $elementInfoManager = NULL) {
+  /**
+   * Create a path element.
+   *
+   * @param mixed $input
+   *   Automatically converted param.
+   * @param mixed $size
+   *   Automatically converted param.
+   * @param mixed $maxlength
+   *   Automatically converted param.
+   * @param mixed $autocomplete_route_name
+   *   Automatically converted param.
+   * @param mixed $process
+   *   Automatically converted param.
+   * @param mixed $pre_render
+   *   Automatically converted param.
+   * @param mixed $theme
+   *   Automatically converted param.
+   * @param mixed $theme_wrappers
+   *   Automatically converted param.
+   * @param mixed $validate_path
+   *   Automatically converted param.
+   * @param mixed $convert_path
+   *   Automatically converted param.
+   * @param mixed $element_validate
+   *   Automatically converted param.
+   * @param mixed $value_callback
+   *   Automatically converted param.
+   * @param mixed $type
+   *   Automatically converted param.
+   * @param mixed $defaults_loaded
+   *   Automatically converted param.
+   * @param ?\Drupal\Core\Render\ElementInfoManager $elementInfoManager
+   *   The element info manager.
+   *
+   * @return static
+   */
+  public static function createInstance($input, $size, $maxlength, $autocomplete_route_name, $process, $pre_render, $theme, $theme_wrappers, $validate_path, $convert_path, $element_validate, $value_callback, $type, $defaults_loaded, ?ElementInfoManager $elementInfoManager = NULL) : static {
     $instance = ($elementInfoManager ?? \Drupal::service('element_info'))->createInstance('path');
     $instance->input = $input;
     $instance->size = $size;

@@ -492,7 +492,49 @@ class Datetime extends DateElementBase {
     }
   }
 
-  public static function createInstance($input, $element_validate, $process, $pre_render, $theme, $theme_wrappers, $date_date_format, $date_date_element, $date_date_callbacks, $date_time_format, $date_time_element, $date_time_callbacks, $date_year_range, $date_increment, $value_callback, $type, $defaults_loaded, ?ElementInfoManager $elementInfoManager = NULL) {
+  /**
+   * Create a datetime element.
+   *
+   * @param mixed $input
+   *   Automatically converted param.
+   * @param mixed $element_validate
+   *   Automatically converted param.
+   * @param mixed $process
+   *   Automatically converted param.
+   * @param mixed $pre_render
+   *   Automatically converted param.
+   * @param mixed $theme
+   *   Automatically converted param.
+   * @param mixed $theme_wrappers
+   *   Automatically converted param.
+   * @param mixed $date_date_format
+   *   Automatically converted param.
+   * @param mixed $date_date_element
+   *   Automatically converted param.
+   * @param mixed $date_date_callbacks
+   *   Automatically converted param.
+   * @param mixed $date_time_format
+   *   Automatically converted param.
+   * @param mixed $date_time_element
+   *   Automatically converted param.
+   * @param mixed $date_time_callbacks
+   *   Automatically converted param.
+   * @param mixed $date_year_range
+   *   Automatically converted param.
+   * @param mixed $date_increment
+   *   Automatically converted param.
+   * @param mixed $value_callback
+   *   Automatically converted param.
+   * @param mixed $type
+   *   Automatically converted param.
+   * @param mixed $defaults_loaded
+   *   Automatically converted param.
+   * @param ?\Drupal\Core\Render\ElementInfoManager $elementInfoManager
+   *   The element info manager.
+   *
+   * @return static
+   */
+  public static function createInstance($input, $element_validate, $process, $pre_render, $theme, $theme_wrappers, $date_date_format, $date_date_element, $date_date_callbacks, $date_time_format, $date_time_element, $date_time_callbacks, $date_year_range, $date_increment, $value_callback, $type, $defaults_loaded, ?ElementInfoManager $elementInfoManager = NULL) : static {
     $instance = ($elementInfoManager ?? \Drupal::service('element_info'))->createInstance('datetime');
     $instance->input = $input;
     $instance->element_validate = $element_validate;

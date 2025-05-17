@@ -137,7 +137,25 @@ class StatusMessages extends RenderElementBase {
     return $render;
   }
 
-  public static function createInstance($display, $pre_render, $include_fallback, $type, $defaults_loaded, ?ElementInfoManager $elementInfoManager = NULL) {
+  /**
+   * Create a status_messages element.
+   *
+   * @param mixed $display
+   *   Automatically converted param.
+   * @param mixed $pre_render
+   *   Automatically converted param.
+   * @param mixed $include_fallback
+   *   Automatically converted param.
+   * @param mixed $type
+   *   Automatically converted param.
+   * @param mixed $defaults_loaded
+   *   Automatically converted param.
+   * @param ?\Drupal\Core\Render\ElementInfoManager $elementInfoManager
+   *   The element info manager.
+   *
+   * @return static
+   */
+  public static function createInstance($display, $pre_render, $include_fallback, $type, $defaults_loaded, ?ElementInfoManager $elementInfoManager = NULL) : static {
     $instance = ($elementInfoManager ?? \Drupal::service('element_info'))->createInstance('status_messages');
     $instance->display = $display;
     $instance->pre_render = $pre_render;

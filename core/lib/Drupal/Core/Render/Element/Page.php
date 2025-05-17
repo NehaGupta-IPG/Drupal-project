@@ -23,7 +23,25 @@ class Page extends RenderElementBase {
     ];
   }
 
-  public static function createInstance($theme, $title, $type, $theme_wrappers, $defaults_loaded, ?ElementInfoManager $elementInfoManager = NULL) {
+  /**
+   * Create a page element.
+   *
+   * @param mixed $theme
+   *   Automatically converted param.
+   * @param mixed $title
+   *   Automatically converted param.
+   * @param mixed $type
+   *   Automatically converted param.
+   * @param mixed $theme_wrappers
+   *   Automatically converted param.
+   * @param mixed $defaults_loaded
+   *   Automatically converted param.
+   * @param ?\Drupal\Core\Render\ElementInfoManager $elementInfoManager
+   *   The element info manager.
+   *
+   * @return static
+   */
+  public static function createInstance($theme, $title, $type, $theme_wrappers, $defaults_loaded, ?ElementInfoManager $elementInfoManager = NULL) : static {
     $instance = ($elementInfoManager ?? \Drupal::service('element_info'))->createInstance('page');
     $instance->theme = $theme;
     $instance->title = $title;

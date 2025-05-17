@@ -323,7 +323,41 @@ class Tableselect extends Table {
     return $element;
   }
 
-  public static function createInstance($input, $js_select, $multiple, $responsive, $sticky, $pre_render, $process, $options, $empty, $theme, $value_callback, $type, $defaults_loaded, ?ElementInfoManager $elementInfoManager = NULL) {
+  /**
+   * Create a tableselect element.
+   *
+   * @param mixed $input
+   *   Automatically converted param.
+   * @param mixed $js_select
+   *   Automatically converted param.
+   * @param mixed $multiple
+   *   Automatically converted param.
+   * @param mixed $responsive
+   *   Automatically converted param.
+   * @param mixed $sticky
+   *   Automatically converted param.
+   * @param mixed $pre_render
+   *   Automatically converted param.
+   * @param mixed $process
+   *   Automatically converted param.
+   * @param mixed $options
+   *   Automatically converted param.
+   * @param mixed $empty
+   *   Automatically converted param.
+   * @param mixed $theme
+   *   Automatically converted param.
+   * @param mixed $value_callback
+   *   Automatically converted param.
+   * @param mixed $type
+   *   Automatically converted param.
+   * @param mixed $defaults_loaded
+   *   Automatically converted param.
+   * @param ?\Drupal\Core\Render\ElementInfoManager $elementInfoManager
+   *   The element info manager.
+   *
+   * @return static
+   */
+  public static function createInstance($input, $js_select, $multiple, $responsive, $sticky, $pre_render, $process, $options, $empty, $theme, $value_callback, $type, $defaults_loaded, ?ElementInfoManager $elementInfoManager = NULL) : static {
     $instance = ($elementInfoManager ?? \Drupal::service('element_info'))->createInstance('tableselect');
     $instance->input = $input;
     $instance->js_select = $js_select;

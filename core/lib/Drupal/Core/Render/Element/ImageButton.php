@@ -117,7 +117,45 @@ class ImageButton extends Submit {
     return $element;
   }
 
-  public static function createInstance($return_value, $has_garbage_value, $src, $theme_wrappers, $executes_submit_callback, $input, $name, $is_button, $submit_button, $limit_validation_errors, $process, $pre_render, $value_callback, $type, $defaults_loaded, ?ElementInfoManager $elementInfoManager = NULL) {
+  /**
+   * Create an image_button element.
+   *
+   * @param mixed $return_value
+   *   Automatically converted param.
+   * @param mixed $has_garbage_value
+   *   Automatically converted param.
+   * @param mixed $src
+   *   Automatically converted param.
+   * @param mixed $theme_wrappers
+   *   Automatically converted param.
+   * @param mixed $executes_submit_callback
+   *   Automatically converted param.
+   * @param mixed $input
+   *   Automatically converted param.
+   * @param mixed $name
+   *   Automatically converted param.
+   * @param mixed $is_button
+   *   Automatically converted param.
+   * @param mixed $submit_button
+   *   Automatically converted param.
+   * @param mixed $limit_validation_errors
+   *   Automatically converted param.
+   * @param mixed $process
+   *   Automatically converted param.
+   * @param mixed $pre_render
+   *   Automatically converted param.
+   * @param mixed $value_callback
+   *   Automatically converted param.
+   * @param mixed $type
+   *   Automatically converted param.
+   * @param mixed $defaults_loaded
+   *   Automatically converted param.
+   * @param ?\Drupal\Core\Render\ElementInfoManager $elementInfoManager
+   *   The element info manager.
+   *
+   * @return static
+   */
+  public static function createInstance($return_value, $has_garbage_value, $src, $theme_wrappers, $executes_submit_callback, $input, $name, $is_button, $submit_button, $limit_validation_errors, $process, $pre_render, $value_callback, $type, $defaults_loaded, ?ElementInfoManager $elementInfoManager = NULL) : static {
     $instance = ($elementInfoManager ?? \Drupal::service('element_info'))->createInstance('image_button');
     $instance->return_value = $return_value;
     $instance->has_garbage_value = $has_garbage_value;
