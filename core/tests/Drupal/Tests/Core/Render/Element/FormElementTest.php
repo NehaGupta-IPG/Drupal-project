@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\Core\Render\Element;
 
-use Drupal\Core\Render\Element\RenderElementBase;
+use Drupal\Core\Render\Element\FormElementBase;
 use Drupal\Tests\UnitTestCase;
 
 /**
@@ -19,7 +19,7 @@ class FormElementTest extends UnitTestCase {
    * @dataProvider providerTestSetAttributes
    */
   public function testSetAttributes(array $element, array $class, array $expected): void {
-    RenderElementBase::setAttributes($element, $class);
+    FormElementBase::setAttributes($element, $class);
     $this->assertSame($expected, $element);
   }
 
