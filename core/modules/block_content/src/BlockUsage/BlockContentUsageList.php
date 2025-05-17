@@ -36,6 +36,10 @@ final class BlockContentUsageList implements \Countable, \IteratorAggregate {
    *   A block content entity.
    * @param (callable(): \Drupal\Core\Entity\EntityStorageInterface) $lazyBlockStorage
    *   A callable that returns Block config storage.
+   *
+   * @internal
+   *   This method is designed to be invoked exclusively by
+   *   BlockContentBlockUsageInterface::getUsage().
    */
   public static function fromBlockContent(BlockContentInterface $blockContent, callable $lazyBlockStorage): static {
     return new static(

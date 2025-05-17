@@ -12,7 +12,7 @@ use Drupal\Core\Url;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
- * Provides hooks for block implementing with block content module.
+ * Provides hooks for block integrating with block content module.
  */
 class BlockBlockContentHooks {
 
