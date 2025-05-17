@@ -132,7 +132,7 @@ class Xss {
   ];
 
   /**
-   * The default list of Unsafe attributes that must be sanitized by filter().
+   * The default list of unsafe attributes that must be sanitized by filter().
    *
    * @var array
    *
@@ -475,7 +475,7 @@ class Xss {
   }
 
   /**
-   * Strips bad protocols from attribute values.
+   * Strips dangerous protocols from attribute values.
    *
    * @param string $name
    *   The attribute name.
@@ -483,7 +483,7 @@ class Xss {
    *   The attribute value.
    *
    * @return string
-   *   The attribute value, stripped of any bad protocols.
+   *   The attribute value, stripped of any dangerous protocols.
    */
   protected static function filterProtocol(string $name, string $value): string {
     // If the attribute is a safe attribute check that it doesn't contain a
