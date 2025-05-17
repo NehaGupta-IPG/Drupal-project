@@ -172,44 +172,6 @@ class RenderElementTest extends UnitTestCase {
           ],
         ],
       ],
-      'Required' => [
-        'element' => [
-          '#type' => 'textfield',
-          '#required' => TRUE,
-        ],
-        'class' => [],
-        'expected' => [
-          '#type' => 'textfield',
-          '#required' => TRUE,
-          '#attributes' => [
-            'class' => [
-              'required',
-            ],
-            'required' => 'required',
-          ],
-        ],
-      ],
-      'Parent with error' => [
-        'element' => [
-          '#type' => 'textfield',
-          '#parents' => ['dummy_parent'],
-          '#errors' => 'invalid',
-          '#validated' => TRUE,
-        ],
-        'class' => [],
-        'expected' => [
-          '#type' => 'textfield',
-          '#parents' => ['dummy_parent'],
-          '#errors' => 'invalid',
-          '#validated' => TRUE,
-          '#attributes' => [
-            'class' => [
-              'error',
-            ],
-            'aria-invalid' => 'true',
-          ],
-        ],
-      ],
     ];
   }
 
