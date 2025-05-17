@@ -100,6 +100,7 @@ abstract class FormElementBase extends RenderElementBase implements FormElementI
    * Array of callables or function names, which are called after the element
    * is built.
    */
+  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
   protected array $after_build = [];
 
   /**
@@ -109,11 +110,13 @@ abstract class FormElementBase extends RenderElementBase implements FormElementI
    * @see $parents
    * @see $tree
    */
+  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
   protected array $array_parents = [];
 
   /**
    * Default value for the element. See also #value.
    */
+  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
   protected mixed $default_value = NULL;
 
   /**
@@ -130,6 +133,7 @@ abstract class FormElementBase extends RenderElementBase implements FormElementI
    * Array of callables or function names, which are called to validate the
    * input.
    */
+  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
   protected array $element_validate = [];
 
   /**
@@ -140,17 +144,20 @@ abstract class FormElementBase extends RenderElementBase implements FormElementI
   /**
    * Prefix to display before the HTML input element.
    */
+  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
   protected ?string $field_prefix = NULL;
 
   /**
    * Suffix to display after the HTML input element.
    */
+  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
   protected ?string $field_suffix = NULL;
 
   /**
    * Internal only. Set to TRUE to indicate that the #value property of an
    * element should not be used or processed.
    */
+  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
   protected bool $has_garbage_value = FALSE;
 
   /**
@@ -188,6 +195,7 @@ abstract class FormElementBase extends RenderElementBase implements FormElementI
   /**
    * Where and how to display the #title.
    */
+  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
   protected ?TitleDisplay $title_display = NULL;
 
   /**
@@ -212,6 +220,7 @@ abstract class FormElementBase extends RenderElementBase implements FormElementI
    *
    * @var callable
    */
+  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
   protected mixed $value_callback;
 
   /**
