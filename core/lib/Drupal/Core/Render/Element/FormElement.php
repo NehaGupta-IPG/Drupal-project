@@ -25,7 +25,7 @@ abstract class FormElement extends FormElementBase {
   /**
    * {@inheritdoc}
    */
-  public static function setAttributes(&$element, $class = []) {
+  public static function setAttributes(&$element, $class = []): void {
     @trigger_error('\Drupal\Core\Render\Element\FormElement::setAttributes() is deprecated in drupal:10.3.0 and is removed from drupal:12.0.0. Use \Drupal\Core\Render\Element\FormElementBase::setAttributes() instead. See https://www.drupal.org/node/3436275', E_USER_DEPRECATED);
     parent::setAttributes($element, $class);
   }
