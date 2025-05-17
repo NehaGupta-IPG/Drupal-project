@@ -614,6 +614,13 @@ drupal.form:
     - core/drupal.debounce
     - core/once
 
+drupal.form-label:
+  version: VERSION
+  js:
+    misc/form-label.js: {}
+  dependencies:
+    - core/drupal
+
 drupal.machine-name:
   version: VERSION
   js:

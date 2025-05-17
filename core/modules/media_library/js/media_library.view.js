@@ -39,7 +39,12 @@
             Drupal.announce(announcement);
           },
         );
-        const $label = $('<label class="media-library-select-all"></label>');
+        const $label = $(
+          Drupal.theme('formLabel', {
+            label: Drupal.t('Select all media'),
+            properties: { className: 'media-library-select-all' },
+          }),
+        );
         $label[0].textContent = Drupal.t('Select all media');
         $label.prepend($checkbox);
         $view.find('.js-media-library-item').first().before($label);

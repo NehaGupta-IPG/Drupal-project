@@ -13,6 +13,7 @@ view:
   dependencies:
     - core/drupal.announce
     - core/drupal.checkbox
+    - core/drupal.form-label
     - media_library/click_to_select
 
 widget:
