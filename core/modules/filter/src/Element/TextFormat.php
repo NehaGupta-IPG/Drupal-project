@@ -7,7 +7,6 @@ use Drupal\Core\Render\Attribute\RenderElement;
 use Drupal\Core\Render\Element\RenderElementBase;
 use Drupal\Core\Render\Element;
 use Drupal\Core\Url;
-use Drupal\Core\Render\ElementInfoManager;
 
 /**
  * Provides a text format render element.
@@ -316,37 +315,6 @@ class TextFormat extends RenderElementBase {
    */
   protected static function elementInfo() {
     return \Drupal::service('element_info');
-  }
-
-  /**
-   * Create a text_format element.
-   *
-   * @param mixed $process
-   *   Automatically converted param.
-   * @param mixed $base_type
-   *   Automatically converted param.
-   * @param mixed $theme_wrappers
-   *   Automatically converted param.
-   * @param mixed $type
-   *   Automatically converted param.
-   * @param mixed $pre_render
-   *   Automatically converted param.
-   * @param mixed $defaults_loaded
-   *   Automatically converted param.
-   * @param ?\Drupal\Core\Render\ElementInfoManager $elementInfoManager
-   *   The element info manager.
-   *
-   * @return static
-   */
-  public static function createInstance($process, $base_type, $theme_wrappers, $type, $pre_render, $defaults_loaded, ?ElementInfoManager $elementInfoManager = NULL) : static {
-    $instance = ($elementInfoManager ?? \Drupal::service('element_info'))->createInstance('text_format');
-    $instance->process = $process;
-    $instance->base_type = $base_type;
-    $instance->theme_wrappers = $theme_wrappers;
-    $instance->type = $type;
-    $instance->pre_render = $pre_render;
-    $instance->defaults_loaded = $defaults_loaded;
-    return $instance;
   }
 
   /**

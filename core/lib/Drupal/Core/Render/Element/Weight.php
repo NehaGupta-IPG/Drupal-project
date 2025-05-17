@@ -4,7 +4,6 @@ namespace Drupal\Core\Render\Element;
 
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Render\Attribute\FormElement;
-use Drupal\Core\Render\ElementInfoManager;
 
 /**
  * Provides a form element for input of a weight.
@@ -78,40 +77,6 @@ class Weight extends FormElementBase {
     }
 
     return $element;
-  }
-
-  /**
-   * Create a weight element.
-   *
-   * @param mixed $input
-   *   Automatically converted param.
-   * @param mixed $delta
-   *   Automatically converted param.
-   * @param mixed $default_value
-   *   Automatically converted param.
-   * @param mixed $process
-   *   Automatically converted param.
-   * @param mixed $value_callback
-   *   Automatically converted param.
-   * @param mixed $type
-   *   Automatically converted param.
-   * @param mixed $defaults_loaded
-   *   Automatically converted param.
-   * @param ?\Drupal\Core\Render\ElementInfoManager $elementInfoManager
-   *   The element info manager.
-   *
-   * @return static
-   */
-  public static function createInstance($input, $delta, $default_value, $process, $value_callback, $type, $defaults_loaded, ?ElementInfoManager $elementInfoManager = NULL) : static {
-    $instance = ($elementInfoManager ?? \Drupal::service('element_info'))->createInstance('weight');
-    $instance->input = $input;
-    $instance->delta = $delta;
-    $instance->default_value = $default_value;
-    $instance->process = $process;
-    $instance->value_callback = $value_callback;
-    $instance->type = $type;
-    $instance->defaults_loaded = $defaults_loaded;
-    return $instance;
   }
 
   /**

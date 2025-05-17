@@ -3,7 +3,6 @@
 namespace Drupal\Core\Render\Element;
 
 use Drupal\Core\Render\Attribute\FormElement;
-use Drupal\Core\Render\ElementInfoManager;
 
 /**
  * Provides a form element for storage of internal information.
@@ -30,31 +29,6 @@ class Value extends FormElementBase {
     return [
       '#input' => TRUE,
     ];
-  }
-
-  /**
-   * Create a value element.
-   *
-   * @param mixed $input
-   *   Automatically converted param.
-   * @param mixed $value_callback
-   *   Automatically converted param.
-   * @param mixed $type
-   *   Automatically converted param.
-   * @param mixed $defaults_loaded
-   *   Automatically converted param.
-   * @param ?\Drupal\Core\Render\ElementInfoManager $elementInfoManager
-   *   The element info manager.
-   *
-   * @return static
-   */
-  public static function createInstance($input, $value_callback, $type, $defaults_loaded, ?ElementInfoManager $elementInfoManager = NULL) : static {
-    $instance = ($elementInfoManager ?? \Drupal::service('element_info'))->createInstance('value');
-    $instance->input = $input;
-    $instance->value_callback = $value_callback;
-    $instance->type = $type;
-    $instance->defaults_loaded = $defaults_loaded;
-    return $instance;
   }
 
   /**

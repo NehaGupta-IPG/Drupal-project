@@ -11,7 +11,6 @@ use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Render\Attribute\FormElement;
 use Drupal\Core\Render\Element\Textfield;
 use Drupal\Core\Site\Settings;
-use Drupal\Core\Render\ElementInfoManager;
 use Drupal\Core\Render\Element\ProcessAutocompleteTrait;
 use Drupal\Core\Render\Element\ProcessPatternTrait;
 
@@ -476,76 +475,6 @@ class EntityAutocomplete extends Textfield {
     }
 
     return $match;
-  }
-
-  /**
-   * Create an entity_autocomplete element.
-   *
-   * @param mixed $input
-   *   Automatically converted param.
-   * @param mixed $size
-   *   Automatically converted param.
-   * @param mixed $maxlength
-   *   Automatically converted param.
-   * @param mixed $autocomplete_route_name
-   *   Automatically converted param.
-   * @param mixed $process
-   *   Automatically converted param.
-   * @param mixed $pre_render
-   *   Automatically converted param.
-   * @param mixed $theme
-   *   Automatically converted param.
-   * @param mixed $theme_wrappers
-   *   Automatically converted param.
-   * @param mixed $target_type
-   *   Automatically converted param.
-   * @param mixed $selection_handler
-   *   Automatically converted param.
-   * @param mixed $selection_settings
-   *   Automatically converted param.
-   * @param mixed $tags
-   *   Automatically converted param.
-   * @param mixed $autocreate
-   *   Automatically converted param.
-   * @param mixed $validate_reference
-   *   Automatically converted param.
-   * @param mixed $process_default_value
-   *   Automatically converted param.
-   * @param mixed $element_validate
-   *   Automatically converted param.
-   * @param mixed $value_callback
-   *   Automatically converted param.
-   * @param mixed $type
-   *   Automatically converted param.
-   * @param mixed $defaults_loaded
-   *   Automatically converted param.
-   * @param ?\Drupal\Core\Render\ElementInfoManager $elementInfoManager
-   *   The element info manager.
-   *
-   * @return static
-   */
-  public static function createInstance($input, $size, $maxlength, $autocomplete_route_name, $process, $pre_render, $theme, $theme_wrappers, $target_type, $selection_handler, $selection_settings, $tags, $autocreate, $validate_reference, $process_default_value, $element_validate, $value_callback, $type, $defaults_loaded, ?ElementInfoManager $elementInfoManager = NULL) : static {
-    $instance = ($elementInfoManager ?? \Drupal::service('element_info'))->createInstance('entity_autocomplete');
-    $instance->input = $input;
-    $instance->size = $size;
-    $instance->maxlength = $maxlength;
-    $instance->autocomplete_route_name = $autocomplete_route_name;
-    $instance->process = $process;
-    $instance->pre_render = $pre_render;
-    $instance->theme = $theme;
-    $instance->theme_wrappers = $theme_wrappers;
-    $instance->target_type = $target_type;
-    $instance->selection_handler = $selection_handler;
-    $instance->selection_settings = $selection_settings;
-    $instance->tags = $tags;
-    $instance->autocreate = $autocreate;
-    $instance->validate_reference = $validate_reference;
-    $instance->process_default_value = $process_default_value;
-    $instance->element_validate = $element_validate;
-    $instance->value_callback = $value_callback;
-    $instance->type = $type;
-    $instance->defaults_loaded = $defaults_loaded;
-    return $instance;
   }
 
   /**

@@ -6,7 +6,6 @@ use Drupal\Core\Render\Attribute\RenderElement;
 use Drupal\Core\Render\Component\Exception\InvalidComponentDataException;
 use Drupal\Core\Render\Element;
 use Drupal\Core\Security\DoTrustedCallbackTrait;
-use Drupal\Core\Render\ElementInfoManager;
 
 /**
  * Provides a Single-Directory Component render element.
@@ -194,46 +193,6 @@ class ComponentElement extends RenderElementBase {
       '#propsAlter' => [],
       '#slotsAlter' => [],
     ];
-  }
-
-  /**
-   * Create a component element.
-   *
-   * @param mixed $pre_render
-   *   Automatically converted param.
-   * @param mixed $component
-   *   Automatically converted param.
-   * @param mixed $variant
-   *   Automatically converted param.
-   * @param mixed $props
-   *   Automatically converted param.
-   * @param mixed $slots
-   *   Automatically converted param.
-   * @param mixed $propsAlter
-   *   Automatically converted param.
-   * @param mixed $slotsAlter
-   *   Automatically converted param.
-   * @param mixed $type
-   *   Automatically converted param.
-   * @param mixed $defaults_loaded
-   *   Automatically converted param.
-   * @param ?\Drupal\Core\Render\ElementInfoManager $elementInfoManager
-   *   The element info manager.
-   *
-   * @return static
-   */
-  public static function createInstance($pre_render, $component, $variant, $props, $slots, $propsAlter, $slotsAlter, $type, $defaults_loaded, ?ElementInfoManager $elementInfoManager = NULL) : static {
-    $instance = ($elementInfoManager ?? \Drupal::service('element_info'))->createInstance('component');
-    $instance->pre_render = $pre_render;
-    $instance->component = $component;
-    $instance->variant = $variant;
-    $instance->props = $props;
-    $instance->slots = $slots;
-    $instance->propsAlter = $propsAlter;
-    $instance->slotsAlter = $slotsAlter;
-    $instance->type = $type;
-    $instance->defaults_loaded = $defaults_loaded;
-    return $instance;
   }
 
   /**

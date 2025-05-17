@@ -5,7 +5,6 @@ namespace Drupal\Core\Render\Element;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Render\Attribute\FormElement;
 use Drupal\Core\Render\Element;
-use Drupal\Core\Render\ElementInfoManager;
 
 /**
  * Provides a form element for entering a password, with hidden text.
@@ -91,49 +90,6 @@ class Password extends FormElementBase {
       return is_scalar($input) ? (string) $input : '';
     }
     return NULL;
-  }
-
-  /**
-   * Create a password element.
-   *
-   * @param mixed $input
-   *   Automatically converted param.
-   * @param mixed $size
-   *   Automatically converted param.
-   * @param mixed $maxlength
-   *   Automatically converted param.
-   * @param mixed $process
-   *   Automatically converted param.
-   * @param mixed $pre_render
-   *   Automatically converted param.
-   * @param mixed $theme
-   *   Automatically converted param.
-   * @param mixed $theme_wrappers
-   *   Automatically converted param.
-   * @param mixed $value_callback
-   *   Automatically converted param.
-   * @param mixed $type
-   *   Automatically converted param.
-   * @param mixed $defaults_loaded
-   *   Automatically converted param.
-   * @param ?\Drupal\Core\Render\ElementInfoManager $elementInfoManager
-   *   The element info manager.
-   *
-   * @return static
-   */
-  public static function createInstance($input, $size, $maxlength, $process, $pre_render, $theme, $theme_wrappers, $value_callback, $type, $defaults_loaded, ?ElementInfoManager $elementInfoManager = NULL) : static {
-    $instance = ($elementInfoManager ?? \Drupal::service('element_info'))->createInstance('password');
-    $instance->input = $input;
-    $instance->size = $size;
-    $instance->maxlength = $maxlength;
-    $instance->process = $process;
-    $instance->pre_render = $pre_render;
-    $instance->theme = $theme;
-    $instance->theme_wrappers = $theme_wrappers;
-    $instance->value_callback = $value_callback;
-    $instance->type = $type;
-    $instance->defaults_loaded = $defaults_loaded;
-    return $instance;
   }
 
   /**

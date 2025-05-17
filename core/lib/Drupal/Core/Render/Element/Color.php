@@ -6,7 +6,6 @@ use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Render\Attribute\FormElement;
 use Drupal\Core\Render\Element;
 use Drupal\Component\Utility\Color as ColorUtility;
-use Drupal\Core\Render\ElementInfoManager;
 
 /**
  * Provides a form element for choosing a color.
@@ -84,46 +83,6 @@ class Color extends FormElementBase {
     static::setAttributes($element, ['form-color']);
 
     return $element;
-  }
-
-  /**
-   * Create a color element.
-   *
-   * @param mixed $input
-   *   Automatically converted param.
-   * @param mixed $process
-   *   Automatically converted param.
-   * @param mixed $element_validate
-   *   Automatically converted param.
-   * @param mixed $pre_render
-   *   Automatically converted param.
-   * @param mixed $theme
-   *   Automatically converted param.
-   * @param mixed $theme_wrappers
-   *   Automatically converted param.
-   * @param mixed $value_callback
-   *   Automatically converted param.
-   * @param mixed $type
-   *   Automatically converted param.
-   * @param mixed $defaults_loaded
-   *   Automatically converted param.
-   * @param ?\Drupal\Core\Render\ElementInfoManager $elementInfoManager
-   *   The element info manager.
-   *
-   * @return static
-   */
-  public static function createInstance($input, $process, $element_validate, $pre_render, $theme, $theme_wrappers, $value_callback, $type, $defaults_loaded, ?ElementInfoManager $elementInfoManager = NULL) : static {
-    $instance = ($elementInfoManager ?? \Drupal::service('element_info'))->createInstance('color');
-    $instance->input = $input;
-    $instance->process = $process;
-    $instance->element_validate = $element_validate;
-    $instance->pre_render = $pre_render;
-    $instance->theme = $theme;
-    $instance->theme_wrappers = $theme_wrappers;
-    $instance->value_callback = $value_callback;
-    $instance->type = $type;
-    $instance->defaults_loaded = $defaults_loaded;
-    return $instance;
   }
 
   /**

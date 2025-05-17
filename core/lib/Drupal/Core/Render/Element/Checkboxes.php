@@ -4,7 +4,6 @@ namespace Drupal\Core\Render\Element;
 
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Render\Attribute\FormElement;
-use Drupal\Core\Render\ElementInfoManager;
 
 /**
  * Provides a form element for a set of checkboxes.
@@ -180,40 +179,6 @@ class Checkboxes extends FormElementBase {
    */
   public static function detectEmptyCheckboxes(array $input) {
     return empty(static::getCheckedCheckboxes($input));
-  }
-
-  /**
-   * Create a checkboxes element.
-   *
-   * @param mixed $input
-   *   Automatically converted param.
-   * @param mixed $process
-   *   Automatically converted param.
-   * @param mixed $pre_render
-   *   Automatically converted param.
-   * @param mixed $theme_wrappers
-   *   Automatically converted param.
-   * @param mixed $value_callback
-   *   Automatically converted param.
-   * @param mixed $type
-   *   Automatically converted param.
-   * @param mixed $defaults_loaded
-   *   Automatically converted param.
-   * @param ?\Drupal\Core\Render\ElementInfoManager $elementInfoManager
-   *   The element info manager.
-   *
-   * @return static
-   */
-  public static function createInstance($input, $process, $pre_render, $theme_wrappers, $value_callback, $type, $defaults_loaded, ?ElementInfoManager $elementInfoManager = NULL) : static {
-    $instance = ($elementInfoManager ?? \Drupal::service('element_info'))->createInstance('checkboxes');
-    $instance->input = $input;
-    $instance->process = $process;
-    $instance->pre_render = $pre_render;
-    $instance->theme_wrappers = $theme_wrappers;
-    $instance->value_callback = $value_callback;
-    $instance->type = $type;
-    $instance->defaults_loaded = $defaults_loaded;
-    return $instance;
   }
 
   /**

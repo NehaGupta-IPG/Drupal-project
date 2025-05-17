@@ -10,7 +10,6 @@ use Drupal\Core\Render\Element\RenderElementBase;
 use Drupal\filter\Entity\FilterFormat;
 use Drupal\filter\Plugin\FilterInterface;
 use Drupal\filter\Render\FilteredMarkup;
-use Drupal\Core\Render\ElementInfoManager;
 
 /**
  * Provides a processed text render element.
@@ -184,40 +183,6 @@ class ProcessedText extends RenderElementBase {
    */
   protected static function configFactory() {
     return \Drupal::configFactory();
-  }
-
-  /**
-   * Create a processed_text element.
-   *
-   * @param mixed $text
-   *   Automatically converted param.
-   * @param mixed $format
-   *   Automatically converted param.
-   * @param mixed $filter_types_to_skip
-   *   Automatically converted param.
-   * @param mixed $langcode
-   *   Automatically converted param.
-   * @param mixed $pre_render
-   *   Automatically converted param.
-   * @param mixed $type
-   *   Automatically converted param.
-   * @param mixed $defaults_loaded
-   *   Automatically converted param.
-   * @param ?\Drupal\Core\Render\ElementInfoManager $elementInfoManager
-   *   The element info manager.
-   *
-   * @return static
-   */
-  public static function createInstance($text, $format, $filter_types_to_skip, $langcode, $pre_render, $type, $defaults_loaded, ?ElementInfoManager $elementInfoManager = NULL) : static {
-    $instance = ($elementInfoManager ?? \Drupal::service('element_info'))->createInstance('processed_text');
-    $instance->text = $text;
-    $instance->format = $format;
-    $instance->filter_types_to_skip = $filter_types_to_skip;
-    $instance->langcode = $langcode;
-    $instance->pre_render = $pre_render;
-    $instance->type = $type;
-    $instance->defaults_loaded = $defaults_loaded;
-    return $instance;
   }
 
   /**

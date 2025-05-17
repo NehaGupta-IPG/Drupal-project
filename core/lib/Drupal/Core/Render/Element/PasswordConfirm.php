@@ -4,7 +4,6 @@ namespace Drupal\Core\Render\Element;
 
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Render\Attribute\FormElement;
-use Drupal\Core\Render\ElementInfoManager;
 
 /**
  * Provides a form element for double-input of passwords.
@@ -122,40 +121,6 @@ class PasswordConfirm extends FormElementBase {
     $form_state->setValueForElement($element, $pass1);
 
     return $element;
-  }
-
-  /**
-   * Create a password_confirm element.
-   *
-   * @param mixed $input
-   *   Automatically converted param.
-   * @param mixed $markup
-   *   Automatically converted param.
-   * @param mixed $process
-   *   Automatically converted param.
-   * @param mixed $theme_wrappers
-   *   Automatically converted param.
-   * @param mixed $value_callback
-   *   Automatically converted param.
-   * @param mixed $type
-   *   Automatically converted param.
-   * @param mixed $defaults_loaded
-   *   Automatically converted param.
-   * @param ?\Drupal\Core\Render\ElementInfoManager $elementInfoManager
-   *   The element info manager.
-   *
-   * @return static
-   */
-  public static function createInstance($input, $markup, $process, $theme_wrappers, $value_callback, $type, $defaults_loaded, ?ElementInfoManager $elementInfoManager = NULL) : static {
-    $instance = ($elementInfoManager ?? \Drupal::service('element_info'))->createInstance('password_confirm');
-    $instance->input = $input;
-    $instance->markup = $markup;
-    $instance->process = $process;
-    $instance->theme_wrappers = $theme_wrappers;
-    $instance->value_callback = $value_callback;
-    $instance->type = $type;
-    $instance->defaults_loaded = $defaults_loaded;
-    return $instance;
   }
 
   /**

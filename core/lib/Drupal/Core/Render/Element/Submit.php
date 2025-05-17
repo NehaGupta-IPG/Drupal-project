@@ -3,7 +3,6 @@
 namespace Drupal\Core\Render\Element;
 
 use Drupal\Core\Render\Attribute\FormElement;
-use Drupal\Core\Render\ElementInfoManager;
 
 /**
  * Provides a form submit button.
@@ -56,55 +55,6 @@ class Submit extends Button {
     return [
       '#executes_submit_callback' => TRUE,
     ] + parent::getInfo();
-  }
-
-  /**
-   * Create a submit element.
-   *
-   * @param mixed $executes_submit_callback
-   *   Automatically converted param.
-   * @param mixed $input
-   *   Automatically converted param.
-   * @param mixed $name
-   *   Automatically converted param.
-   * @param mixed $is_button
-   *   Automatically converted param.
-   * @param mixed $submit_button
-   *   Automatically converted param.
-   * @param mixed $limit_validation_errors
-   *   Automatically converted param.
-   * @param mixed $process
-   *   Automatically converted param.
-   * @param mixed $pre_render
-   *   Automatically converted param.
-   * @param mixed $theme_wrappers
-   *   Automatically converted param.
-   * @param mixed $value_callback
-   *   Automatically converted param.
-   * @param mixed $type
-   *   Automatically converted param.
-   * @param mixed $defaults_loaded
-   *   Automatically converted param.
-   * @param ?\Drupal\Core\Render\ElementInfoManager $elementInfoManager
-   *   The element info manager.
-   *
-   * @return static
-   */
-  public static function createInstance($executes_submit_callback, $input, $name, $is_button, $submit_button, $limit_validation_errors, $process, $pre_render, $theme_wrappers, $value_callback, $type, $defaults_loaded, ?ElementInfoManager $elementInfoManager = NULL) : static {
-    $instance = ($elementInfoManager ?? \Drupal::service('element_info'))->createInstance('submit');
-    $instance->executes_submit_callback = $executes_submit_callback;
-    $instance->input = $input;
-    $instance->name = $name;
-    $instance->is_button = $is_button;
-    $instance->submit_button = $submit_button;
-    $instance->limit_validation_errors = $limit_validation_errors;
-    $instance->process = $process;
-    $instance->pre_render = $pre_render;
-    $instance->theme_wrappers = $theme_wrappers;
-    $instance->value_callback = $value_callback;
-    $instance->type = $type;
-    $instance->defaults_loaded = $defaults_loaded;
-    return $instance;
   }
 
   /**

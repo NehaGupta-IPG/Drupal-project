@@ -3,7 +3,6 @@
 namespace Drupal\Core\Render\Element;
 
 use Drupal\Core\Render\Attribute\RenderElement;
-use Drupal\Core\Render\ElementInfoManager;
 
 /**
  * Provides a render element for a pager.
@@ -116,49 +115,6 @@ class Pager extends RenderElementBase {
     // In other themes, however, that may not be the case.
     $pager['#cache']['contexts'][] = 'url.query_args.pagers:' . $pager['#element'];
     return $pager;
-  }
-
-  /**
-   * Create a pager element.
-   *
-   * @param mixed $pre_render
-   *   Automatically converted param.
-   * @param mixed $theme
-   *   Automatically converted param.
-   * @param mixed $element
-   *   Automatically converted param.
-   * @param mixed $pagination_heading_level
-   *   Automatically converted param.
-   * @param mixed $parameters
-   *   Automatically converted param.
-   * @param mixed $quantity
-   *   Automatically converted param.
-   * @param mixed $tags
-   *   Automatically converted param.
-   * @param mixed $route_name
-   *   Automatically converted param.
-   * @param mixed $type
-   *   Automatically converted param.
-   * @param mixed $defaults_loaded
-   *   Automatically converted param.
-   * @param ?\Drupal\Core\Render\ElementInfoManager $elementInfoManager
-   *   The element info manager.
-   *
-   * @return static
-   */
-  public static function createInstance($pre_render, $theme, $element, $pagination_heading_level, $parameters, $quantity, $tags, $route_name, $type, $defaults_loaded, ?ElementInfoManager $elementInfoManager = NULL) : static {
-    $instance = ($elementInfoManager ?? \Drupal::service('element_info'))->createInstance('pager');
-    $instance->pre_render = $pre_render;
-    $instance->theme = $theme;
-    $instance->element = $element;
-    $instance->pagination_heading_level = $pagination_heading_level;
-    $instance->parameters = $parameters;
-    $instance->quantity = $quantity;
-    $instance->tags = $tags;
-    $instance->route_name = $route_name;
-    $instance->type = $type;
-    $instance->defaults_loaded = $defaults_loaded;
-    return $instance;
   }
 
   /**

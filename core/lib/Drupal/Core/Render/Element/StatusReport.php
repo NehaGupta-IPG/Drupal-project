@@ -3,7 +3,6 @@
 namespace Drupal\Core\Render\Element;
 
 use Drupal\Core\Render\Attribute\RenderElement;
-use Drupal\Core\Render\ElementInfoManager;
 
 /**
  * Creates status report page element.
@@ -95,34 +94,6 @@ class StatusReport extends RenderElementBase {
         'status' => 'error',
       ],
     ];
-  }
-
-  /**
-   * Create a status_report element.
-   *
-   * @param mixed $theme
-   *   Automatically converted param.
-   * @param mixed $priorities
-   *   Automatically converted param.
-   * @param mixed $pre_render
-   *   Automatically converted param.
-   * @param mixed $type
-   *   Automatically converted param.
-   * @param mixed $defaults_loaded
-   *   Automatically converted param.
-   * @param ?\Drupal\Core\Render\ElementInfoManager $elementInfoManager
-   *   The element info manager.
-   *
-   * @return static
-   */
-  public static function createInstance($theme, $priorities, $pre_render, $type, $defaults_loaded, ?ElementInfoManager $elementInfoManager = NULL) : static {
-    $instance = ($elementInfoManager ?? \Drupal::service('element_info'))->createInstance('status_report');
-    $instance->theme = $theme;
-    $instance->priorities = $priorities;
-    $instance->pre_render = $pre_render;
-    $instance->type = $type;
-    $instance->defaults_loaded = $defaults_loaded;
-    return $instance;
   }
 
   /**

@@ -5,7 +5,6 @@ namespace Drupal\Core\Render\Element;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Render\Attribute\FormElement;
 use Drupal\Core\Render\Element;
-use Drupal\Core\Render\ElementInfoManager;
 
 /**
  * Provides a one-line text field form element.
@@ -108,52 +107,6 @@ class Textfield extends FormElementBase {
     static::setAttributes($element, ['form-text']);
 
     return $element;
-  }
-
-  /**
-   * Create a textfield element.
-   *
-   * @param mixed $input
-   *   Automatically converted param.
-   * @param mixed $size
-   *   Automatically converted param.
-   * @param mixed $maxlength
-   *   Automatically converted param.
-   * @param mixed $autocomplete_route_name
-   *   Automatically converted param.
-   * @param mixed $process
-   *   Automatically converted param.
-   * @param mixed $pre_render
-   *   Automatically converted param.
-   * @param mixed $theme
-   *   Automatically converted param.
-   * @param mixed $theme_wrappers
-   *   Automatically converted param.
-   * @param mixed $value_callback
-   *   Automatically converted param.
-   * @param mixed $type
-   *   Automatically converted param.
-   * @param mixed $defaults_loaded
-   *   Automatically converted param.
-   * @param ?\Drupal\Core\Render\ElementInfoManager $elementInfoManager
-   *   The element info manager.
-   *
-   * @return static
-   */
-  public static function createInstance($input, $size, $maxlength, $autocomplete_route_name, $process, $pre_render, $theme, $theme_wrappers, $value_callback, $type, $defaults_loaded, ?ElementInfoManager $elementInfoManager = NULL) : static {
-    $instance = ($elementInfoManager ?? \Drupal::service('element_info'))->createInstance('textfield');
-    $instance->input = $input;
-    $instance->size = $size;
-    $instance->maxlength = $maxlength;
-    $instance->autocomplete_route_name = $autocomplete_route_name;
-    $instance->process = $process;
-    $instance->pre_render = $pre_render;
-    $instance->theme = $theme;
-    $instance->theme_wrappers = $theme_wrappers;
-    $instance->value_callback = $value_callback;
-    $instance->type = $type;
-    $instance->defaults_loaded = $defaults_loaded;
-    return $instance;
   }
 
   /**

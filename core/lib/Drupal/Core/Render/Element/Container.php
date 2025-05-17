@@ -6,7 +6,6 @@ use Drupal\Component\Utility\Html as HtmlUtility;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Render\Attribute\RenderElement;
 use Drupal\Core\Render\Element;
-use Drupal\Core\Render\ElementInfoManager;
 
 /**
  * Provides a render element that wraps child elements in a container.
@@ -108,37 +107,6 @@ class Container extends RenderElementBase {
       $element['#printed'] = TRUE;
     }
     return $element;
-  }
-
-  /**
-   * Create a container element.
-   *
-   * @param mixed $optional
-   *   Automatically converted param.
-   * @param mixed $process
-   *   Automatically converted param.
-   * @param mixed $pre_render
-   *   Automatically converted param.
-   * @param mixed $theme_wrappers
-   *   Automatically converted param.
-   * @param mixed $type
-   *   Automatically converted param.
-   * @param mixed $defaults_loaded
-   *   Automatically converted param.
-   * @param ?\Drupal\Core\Render\ElementInfoManager $elementInfoManager
-   *   The element info manager.
-   *
-   * @return static
-   */
-  public static function createInstance($optional, $process, $pre_render, $theme_wrappers, $type, $defaults_loaded, ?ElementInfoManager $elementInfoManager = NULL) : static {
-    $instance = ($elementInfoManager ?? \Drupal::service('element_info'))->createInstance('container');
-    $instance->optional = $optional;
-    $instance->process = $process;
-    $instance->pre_render = $pre_render;
-    $instance->theme_wrappers = $theme_wrappers;
-    $instance->type = $type;
-    $instance->defaults_loaded = $defaults_loaded;
-    return $instance;
   }
 
   /**

@@ -7,7 +7,6 @@ use Drupal\Component\Utility\SortArray;
 use Drupal\Core\Render\Attribute\RenderElement;
 use Drupal\Core\Render\Element\RenderElementBase;
 use Drupal\Core\Url;
-use Drupal\Core\Render\ElementInfoManager;
 
 /**
  * Provides a contextual_links element.
@@ -122,40 +121,6 @@ class ContextualLinks extends RenderElementBase {
    */
   protected static function moduleHandler() {
     return \Drupal::moduleHandler();
-  }
-
-  /**
-   * Create a contextual_links element.
-   *
-   * @param mixed $pre_render
-   *   Automatically converted param.
-   * @param mixed $theme
-   *   Automatically converted param.
-   * @param mixed $links
-   *   Automatically converted param.
-   * @param mixed $attributes
-   *   Automatically converted param.
-   * @param mixed $attached
-   *   Automatically converted param.
-   * @param mixed $type
-   *   Automatically converted param.
-   * @param mixed $defaults_loaded
-   *   Automatically converted param.
-   * @param ?\Drupal\Core\Render\ElementInfoManager $elementInfoManager
-   *   The element info manager.
-   *
-   * @return static
-   */
-  public static function createInstance($pre_render, $theme, $links, $attributes, $attached, $type, $defaults_loaded, ?ElementInfoManager $elementInfoManager = NULL) : static {
-    $instance = ($elementInfoManager ?? \Drupal::service('element_info'))->createInstance('contextual_links');
-    $instance->pre_render = $pre_render;
-    $instance->theme = $theme;
-    $instance->links = $links;
-    $instance->attributes = $attributes;
-    $instance->attached = $attached;
-    $instance->type = $type;
-    $instance->defaults_loaded = $defaults_loaded;
-    return $instance;
   }
 
   /**

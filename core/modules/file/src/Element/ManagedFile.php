@@ -15,7 +15,6 @@ use Drupal\Core\Site\Settings;
 use Drupal\Core\Url;
 use Drupal\file\Entity\File;
 use Symfony\Component\HttpFoundation\Request;
-use Drupal\Core\Render\ElementInfoManager;
 
 // cspell:ignore filefield
 
@@ -515,73 +514,6 @@ class ManagedFile extends FormElementBase {
    */
   protected static function fileUsage() {
     return \Drupal::service('file.usage');
-  }
-
-  /**
-   * Create a managed_file element.
-   *
-   * @param mixed $input
-   *   Automatically converted param.
-   * @param mixed $process
-   *   Automatically converted param.
-   * @param mixed $element_validate
-   *   Automatically converted param.
-   * @param mixed $pre_render
-   *   Automatically converted param.
-   * @param mixed $theme
-   *   Automatically converted param.
-   * @param mixed $theme_wrappers
-   *   Automatically converted param.
-   * @param mixed $progress_indicator
-   *   Automatically converted param.
-   * @param mixed $progress_message
-   *   Automatically converted param.
-   * @param mixed $upload_validators
-   *   Automatically converted param.
-   * @param mixed $upload_location
-   *   Automatically converted param.
-   * @param mixed $size
-   *   Automatically converted param.
-   * @param mixed $multiple
-   *   Automatically converted param.
-   * @param mixed $extended
-   *   Automatically converted param.
-   * @param mixed $attached
-   *   Automatically converted param.
-   * @param mixed $accept
-   *   Automatically converted param.
-   * @param mixed $value_callback
-   *   Automatically converted param.
-   * @param mixed $type
-   *   Automatically converted param.
-   * @param mixed $defaults_loaded
-   *   Automatically converted param.
-   * @param ?\Drupal\Core\Render\ElementInfoManager $elementInfoManager
-   *   The element info manager.
-   *
-   * @return static
-   */
-  public static function createInstance($input, $process, $element_validate, $pre_render, $theme, $theme_wrappers, $progress_indicator, $progress_message, $upload_validators, $upload_location, $size, $multiple, $extended, $attached, $accept, $value_callback, $type, $defaults_loaded, ?ElementInfoManager $elementInfoManager = NULL) : static {
-    $instance = ($elementInfoManager ?? \Drupal::service('element_info'))->createInstance('managed_file');
-    $instance->input = $input;
-    $instance->process = $process;
-    $instance->element_validate = $element_validate;
-    $instance->pre_render = $pre_render;
-    $instance->theme = $theme;
-    $instance->theme_wrappers = $theme_wrappers;
-    $instance->progress_indicator = $progress_indicator;
-    $instance->progress_message = $progress_message;
-    $instance->upload_validators = $upload_validators;
-    $instance->upload_location = $upload_location;
-    $instance->size = $size;
-    $instance->multiple = $multiple;
-    $instance->extended = $extended;
-    $instance->attached = $attached;
-    $instance->accept = $accept;
-    $instance->value_callback = $value_callback;
-    $instance->type = $type;
-    $instance->defaults_loaded = $defaults_loaded;
-    return $instance;
   }
 
   /**

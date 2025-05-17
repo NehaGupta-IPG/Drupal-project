@@ -9,7 +9,6 @@ use Drupal\Core\Render\Attribute\RenderElement;
 use Drupal\Core\Render\Element\RenderElementBase;
 use Drupal\Core\Render\RendererInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Drupal\Core\Render\ElementInfoManager;
 
 /**
  * Provides a link to break a tempstore lock.
@@ -132,28 +131,6 @@ class BreakLockLink extends RenderElementBase implements ContainerFactoryPluginI
       ]);
     }
     return $element;
-  }
-
-  /**
-   * Create a break_lock_link element.
-   *
-   * @param mixed $pre_render
-   *   Automatically converted param.
-   * @param mixed $type
-   *   Automatically converted param.
-   * @param mixed $defaults_loaded
-   *   Automatically converted param.
-   * @param ?\Drupal\Core\Render\ElementInfoManager $elementInfoManager
-   *   The element info manager.
-   *
-   * @return static
-   */
-  public static function createInstance($pre_render, $type, $defaults_loaded, ?ElementInfoManager $elementInfoManager = NULL) : static {
-    $instance = ($elementInfoManager ?? \Drupal::service('element_info'))->createInstance('break_lock_link');
-    $instance->pre_render = $pre_render;
-    $instance->type = $type;
-    $instance->defaults_loaded = $defaults_loaded;
-    return $instance;
   }
 
   /**

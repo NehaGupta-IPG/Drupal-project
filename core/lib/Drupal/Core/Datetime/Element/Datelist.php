@@ -11,7 +11,6 @@ use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Render\Attribute\FormElement;
 use Drupal\Core\Security\DoTrustedCallbackTrait;
 use Drupal\Core\Security\StaticTrustedCallbackHelper;
-use Drupal\Core\Render\ElementInfoManager;
 
 /**
  * Provides a datelist element.
@@ -421,58 +420,6 @@ class Datelist extends DateElementBase {
       }
     }
     return $date;
-  }
-
-  /**
-   * Create a datelist element.
-   *
-   * @param mixed $input
-   *   Automatically converted param.
-   * @param mixed $element_validate
-   *   Automatically converted param.
-   * @param mixed $process
-   *   Automatically converted param.
-   * @param mixed $theme
-   *   Automatically converted param.
-   * @param mixed $theme_wrappers
-   *   Automatically converted param.
-   * @param mixed $date_part_order
-   *   Automatically converted param.
-   * @param mixed $date_year_range
-   *   Automatically converted param.
-   * @param mixed $date_increment
-   *   Automatically converted param.
-   * @param mixed $date_date_callbacks
-   *   Automatically converted param.
-   * @param mixed $date_timezone
-   *   Automatically converted param.
-   * @param mixed $value_callback
-   *   Automatically converted param.
-   * @param mixed $type
-   *   Automatically converted param.
-   * @param mixed $defaults_loaded
-   *   Automatically converted param.
-   * @param ?\Drupal\Core\Render\ElementInfoManager $elementInfoManager
-   *   The element info manager.
-   *
-   * @return static
-   */
-  public static function createInstance($input, $element_validate, $process, $theme, $theme_wrappers, $date_part_order, $date_year_range, $date_increment, $date_date_callbacks, $date_timezone, $value_callback, $type, $defaults_loaded, ?ElementInfoManager $elementInfoManager = NULL) : static {
-    $instance = ($elementInfoManager ?? \Drupal::service('element_info'))->createInstance('datelist');
-    $instance->input = $input;
-    $instance->element_validate = $element_validate;
-    $instance->process = $process;
-    $instance->theme = $theme;
-    $instance->theme_wrappers = $theme_wrappers;
-    $instance->date_part_order = $date_part_order;
-    $instance->date_year_range = $date_year_range;
-    $instance->date_increment = $date_increment;
-    $instance->date_date_callbacks = $date_date_callbacks;
-    $instance->date_timezone = $date_timezone;
-    $instance->value_callback = $value_callback;
-    $instance->type = $type;
-    $instance->defaults_loaded = $defaults_loaded;
-    return $instance;
   }
 
   /**

@@ -6,7 +6,6 @@ use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Render\Attribute\FormElement;
 use Drupal\Core\Render\Element;
 use Drupal\Component\Utility\Html as HtmlUtility;
-use Drupal\Core\Render\ElementInfoManager;
 
 /**
  * Provides a render element for a table.
@@ -501,73 +500,6 @@ class Table extends FormElementBase {
     }
 
     return $element;
-  }
-
-  /**
-   * Create a table element.
-   *
-   * @param mixed $header
-   *   Automatically converted param.
-   * @param mixed $rows
-   *   Automatically converted param.
-   * @param mixed $empty
-   *   Automatically converted param.
-   * @param mixed $input
-   *   Automatically converted param.
-   * @param mixed $tree
-   *   Automatically converted param.
-   * @param mixed $tableselect
-   *   Automatically converted param.
-   * @param mixed $sticky
-   *   Automatically converted param.
-   * @param mixed $responsive
-   *   Automatically converted param.
-   * @param mixed $multiple
-   *   Automatically converted param.
-   * @param mixed $js_select
-   *   Automatically converted param.
-   * @param mixed $process
-   *   Automatically converted param.
-   * @param mixed $element_validate
-   *   Automatically converted param.
-   * @param mixed $tabledrag
-   *   Automatically converted param.
-   * @param mixed $pre_render
-   *   Automatically converted param.
-   * @param mixed $theme
-   *   Automatically converted param.
-   * @param mixed $value_callback
-   *   Automatically converted param.
-   * @param mixed $type
-   *   Automatically converted param.
-   * @param mixed $defaults_loaded
-   *   Automatically converted param.
-   * @param ?\Drupal\Core\Render\ElementInfoManager $elementInfoManager
-   *   The element info manager.
-   *
-   * @return static
-   */
-  public static function createInstance($header, $rows, $empty, $input, $tree, $tableselect, $sticky, $responsive, $multiple, $js_select, $process, $element_validate, $tabledrag, $pre_render, $theme, $value_callback, $type, $defaults_loaded, ?ElementInfoManager $elementInfoManager = NULL) : static {
-    $instance = ($elementInfoManager ?? \Drupal::service('element_info'))->createInstance('table');
-    $instance->header = $header;
-    $instance->rows = $rows;
-    $instance->empty = $empty;
-    $instance->input = $input;
-    $instance->tree = $tree;
-    $instance->tableselect = $tableselect;
-    $instance->sticky = $sticky;
-    $instance->responsive = $responsive;
-    $instance->multiple = $multiple;
-    $instance->js_select = $js_select;
-    $instance->process = $process;
-    $instance->element_validate = $element_validate;
-    $instance->tabledrag = $tabledrag;
-    $instance->pre_render = $pre_render;
-    $instance->theme = $theme;
-    $instance->value_callback = $value_callback;
-    $instance->type = $type;
-    $instance->defaults_loaded = $defaults_loaded;
-    return $instance;
   }
 
   /**

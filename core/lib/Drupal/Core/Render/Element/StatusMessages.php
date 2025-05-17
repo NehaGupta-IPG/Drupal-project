@@ -4,7 +4,6 @@ namespace Drupal\Core\Render\Element;
 
 use Drupal\Core\Render\Attribute\RenderElement;
 use Drupal\big_pipe\Render\Placeholder\BigPipeStrategy;
-use Drupal\Core\Render\ElementInfoManager;
 
 /**
  * Provides a messages element.
@@ -136,34 +135,6 @@ class StatusMessages extends RenderElementBase {
       ];
     }
     return $render;
-  }
-
-  /**
-   * Create a status_messages element.
-   *
-   * @param mixed $display
-   *   Automatically converted param.
-   * @param mixed $pre_render
-   *   Automatically converted param.
-   * @param mixed $include_fallback
-   *   Automatically converted param.
-   * @param mixed $type
-   *   Automatically converted param.
-   * @param mixed $defaults_loaded
-   *   Automatically converted param.
-   * @param ?\Drupal\Core\Render\ElementInfoManager $elementInfoManager
-   *   The element info manager.
-   *
-   * @return static
-   */
-  public static function createInstance($display, $pre_render, $include_fallback, $type, $defaults_loaded, ?ElementInfoManager $elementInfoManager = NULL) : static {
-    $instance = ($elementInfoManager ?? \Drupal::service('element_info'))->createInstance('status_messages');
-    $instance->display = $display;
-    $instance->pre_render = $pre_render;
-    $instance->include_fallback = $include_fallback;
-    $instance->type = $type;
-    $instance->defaults_loaded = $defaults_loaded;
-    return $instance;
   }
 
   /**

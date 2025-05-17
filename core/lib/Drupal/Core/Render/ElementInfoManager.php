@@ -190,17 +190,16 @@ class ElementInfoManager extends DefaultPluginManager implements ElementInfoMana
     if (!isset($element['#type'])) {
       throw new \LogicException('The element passed to ElementInfoManager::fromRenderArray must have a #type.');
     }
-    $args = ['elementInfoManager' => $this];
+    $instance = $this->createInstance($element['#type']);
     foreach ($element as $key => $value) {
       if ($key[0] === '#') {
-        $args[substr($key, 1)] = $value;
+        $instance->{substr($key, 1)} = $value;
       }
       else {
         $children[$key] = $value;
       }
     }
-    $definition = $this->getDefinition($element['#type']);
-    return [$definition['class'], 'createInstance'](... $args);
+    return $instance;
   }
 
 }

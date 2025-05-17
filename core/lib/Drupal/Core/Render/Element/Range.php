@@ -5,7 +5,6 @@ namespace Drupal\Core\Render\Element;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Render\Attribute\FormElement;
 use Drupal\Core\Render\Element;
-use Drupal\Core\Render\ElementInfoManager;
 
 /**
  * Provides a slider for input of a number within a specific range.
@@ -95,55 +94,6 @@ class Range extends Number {
 
       return $element['#min'] + $offset;
     }
-  }
-
-  /**
-   * Create a range element.
-   *
-   * @param mixed $min
-   *   Automatically converted param.
-   * @param mixed $max
-   *   Automatically converted param.
-   * @param mixed $pre_render
-   *   Automatically converted param.
-   * @param mixed $theme
-   *   Automatically converted param.
-   * @param mixed $input
-   *   Automatically converted param.
-   * @param mixed $step
-   *   Automatically converted param.
-   * @param mixed $process
-   *   Automatically converted param.
-   * @param mixed $element_validate
-   *   Automatically converted param.
-   * @param mixed $theme_wrappers
-   *   Automatically converted param.
-   * @param mixed $value_callback
-   *   Automatically converted param.
-   * @param mixed $type
-   *   Automatically converted param.
-   * @param mixed $defaults_loaded
-   *   Automatically converted param.
-   * @param ?\Drupal\Core\Render\ElementInfoManager $elementInfoManager
-   *   The element info manager.
-   *
-   * @return static
-   */
-  public static function createInstance($min, $max, $pre_render, $theme, $input, $step, $process, $element_validate, $theme_wrappers, $value_callback, $type, $defaults_loaded, ?ElementInfoManager $elementInfoManager = NULL) : static {
-    $instance = ($elementInfoManager ?? \Drupal::service('element_info'))->createInstance('range');
-    $instance->min = $min;
-    $instance->max = $max;
-    $instance->pre_render = $pre_render;
-    $instance->theme = $theme;
-    $instance->input = $input;
-    $instance->step = $step;
-    $instance->process = $process;
-    $instance->element_validate = $element_validate;
-    $instance->theme_wrappers = $theme_wrappers;
-    $instance->value_callback = $value_callback;
-    $instance->type = $type;
-    $instance->defaults_loaded = $defaults_loaded;
-    return $instance;
   }
 
   /**
