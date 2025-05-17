@@ -78,7 +78,7 @@ class Fieldset extends RenderElementBase {
   /**
    * {@inheritdoc}
    */
-  public function toRenderArray() {
+  public function toRenderArray() : array {
     return [
       '#process' => $this->process,
       '#pre_render' => $this->pre_render,

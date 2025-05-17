@@ -45,7 +45,7 @@ class Html extends RenderElementBase {
   /**
    * {@inheritdoc}
    */
-  public function toRenderArray() {
+  public function toRenderArray() : array {
     return [
       '#theme' => $this->theme,
       '#type' => $this->type,

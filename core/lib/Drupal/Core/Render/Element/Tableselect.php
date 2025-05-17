@@ -379,7 +379,7 @@ class Tableselect extends Table {
   /**
    * {@inheritdoc}
    */
-  public function toRenderArray() {
+  public function toRenderArray() : array {
     return [
       '#input' => $this->input,
       '#js_select' => $this->js_select,

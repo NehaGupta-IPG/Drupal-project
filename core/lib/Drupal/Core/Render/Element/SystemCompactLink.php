@@ -112,7 +112,7 @@ class SystemCompactLink extends Link {
   /**
    * {@inheritdoc}
    */
-  public function toRenderArray() {
+  public function toRenderArray() : array {
     return [
       '#pre_render' => $this->pre_render,
       '#theme_wrappers' => $this->theme_wrappers,

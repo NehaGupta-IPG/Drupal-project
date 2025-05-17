@@ -55,7 +55,7 @@ class Form extends RenderElementBase {
   /**
    * {@inheritdoc}
    */
-  public function toRenderArray() {
+  public function toRenderArray() : array {
     return [
       '#method' => $this->method,
       '#theme_wrappers' => $this->theme_wrappers,

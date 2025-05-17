@@ -65,7 +65,7 @@ class Item extends FormElementBase {
   /**
    * {@inheritdoc}
    */
-  public function toRenderArray() {
+  public function toRenderArray() : array {
     return [
       '#input' => $this->input,
       '#markup' => $this->markup,

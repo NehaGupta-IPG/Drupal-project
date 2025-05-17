@@ -379,7 +379,7 @@ class MachineName extends Textfield {
   /**
    * {@inheritdoc}
    */
-  public function toRenderArray() {
+  public function toRenderArray() : array {
     return [
       '#input' => $this->input,
       '#default_value' => $this->default_value,

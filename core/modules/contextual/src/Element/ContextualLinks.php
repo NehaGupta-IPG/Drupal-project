@@ -161,7 +161,7 @@ class ContextualLinks extends RenderElementBase {
   /**
    * {@inheritdoc}
    */
-  public function toRenderArray() {
+  public function toRenderArray() : array {
     return [
       '#pre_render' => $this->pre_render,
       '#theme' => $this->theme,

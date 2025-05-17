@@ -181,7 +181,7 @@ class VerticalTabs extends RenderElementBase {
   /**
    * {@inheritdoc}
    */
-  public function toRenderArray() {
+  public function toRenderArray() : array {
     return [
       '#default_tab' => $this->default_tab,
       '#process' => $this->process,

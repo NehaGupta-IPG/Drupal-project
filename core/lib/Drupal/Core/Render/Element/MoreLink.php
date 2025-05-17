@@ -70,7 +70,7 @@ class MoreLink extends Link {
   /**
    * {@inheritdoc}
    */
-  public function toRenderArray() {
+  public function toRenderArray() : array {
     return [
       '#title' => $this->title,
       '#theme_wrappers' => $this->theme_wrappers,

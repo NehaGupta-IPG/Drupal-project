@@ -53,7 +53,7 @@ class PageTitle extends RenderElementBase {
   /**
    * {@inheritdoc}
    */
-  public function toRenderArray() {
+  public function toRenderArray() : array {
     return [
       '#theme' => $this->theme,
       '#title' => $this->title,

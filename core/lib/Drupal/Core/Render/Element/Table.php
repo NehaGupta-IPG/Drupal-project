@@ -573,7 +573,7 @@ class Table extends FormElementBase {
   /**
    * {@inheritdoc}
    */
-  public function toRenderArray() {
+  public function toRenderArray() : array {
     return [
       '#header' => $this->header,
       '#rows' => $this->rows,

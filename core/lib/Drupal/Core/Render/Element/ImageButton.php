@@ -182,7 +182,7 @@ class ImageButton extends Submit {
   /**
    * {@inheritdoc}
    */
-  public function toRenderArray() {
+  public function toRenderArray() : array {
     return [
       '#return_value' => $this->return_value,
       '#has_garbage_value' => $this->has_garbage_value,

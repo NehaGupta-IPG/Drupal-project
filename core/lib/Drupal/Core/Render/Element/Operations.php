@@ -54,7 +54,7 @@ class Operations extends Dropbutton {
   /**
    * {@inheritdoc}
    */
-  public function toRenderArray() {
+  public function toRenderArray() : array {
     return [
       '#theme' => $this->theme,
       '#pre_render' => $this->pre_render,

@@ -149,7 +149,7 @@ class Range extends Number {
   /**
    * {@inheritdoc}
    */
-  public function toRenderArray() {
+  public function toRenderArray() : array {
     return [
       '#min' => $this->min,
       '#max' => $this->max,

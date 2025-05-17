@@ -147,7 +147,7 @@ class Details extends RenderElementBase {
   /**
    * {@inheritdoc}
    */
-  public function toRenderArray() {
+  public function toRenderArray() : array {
     return [
       '#open' => $this->open,
       '#summary_attributes' => $this->summary_attributes,

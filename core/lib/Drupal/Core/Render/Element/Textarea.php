@@ -137,7 +137,7 @@ class Textarea extends FormElementBase {
   /**
    * {@inheritdoc}
    */
-  public function toRenderArray() {
+  public function toRenderArray() : array {
     return [
       '#input' => $this->input,
       '#cols' => $this->cols,

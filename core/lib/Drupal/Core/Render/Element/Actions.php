@@ -148,7 +148,7 @@ class Actions extends Container {
   /**
    * {@inheritdoc}
    */
-  public function toRenderArray() {
+  public function toRenderArray() : array {
     return [
       '#process' => $this->process,
       '#weight' => $this->weight,

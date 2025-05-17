@@ -76,7 +76,7 @@ class Token extends Hidden {
   /**
    * {@inheritdoc}
    */
-  public function toRenderArray() {
+  public function toRenderArray() : array {
     return [
       '#input' => $this->input,
       '#pre_render' => $this->pre_render,

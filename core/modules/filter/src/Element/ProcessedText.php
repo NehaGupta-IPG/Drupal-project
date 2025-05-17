@@ -223,7 +223,7 @@ class ProcessedText extends RenderElementBase {
   /**
    * {@inheritdoc}
    */
-  public function toRenderArray() {
+  public function toRenderArray() : array {
     return [
       '#text' => $this->text,
       '#format' => $this->format,

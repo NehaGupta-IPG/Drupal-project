@@ -128,7 +128,7 @@ class StatusReport extends RenderElementBase {
   /**
    * {@inheritdoc}
    */
-  public function toRenderArray() {
+  public function toRenderArray() : array {
     return [
       '#theme' => $this->theme,
       '#priorities' => $this->priorities,

@@ -169,7 +169,7 @@ class StatusMessages extends RenderElementBase {
   /**
    * {@inheritdoc}
    */
-  public function toRenderArray() {
+  public function toRenderArray() : array {
     return [
       '#display' => $this->display,
       '#pre_render' => $this->pre_render,

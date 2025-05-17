@@ -338,7 +338,7 @@ class FieldUiTable extends Table {
    *
    * @return static
    */
-  public static function createInstance($header, $rows, $empty, $input, $tree, $tableselect, $sticky, $responsive, $multiple, $js_select, $process, $element_validate, $tabledrag, $pre_render, $theme, $regions, $value_callback, $type, $defaults_loaded = NULL, ?ElementInfoManager $elementInfoManager = NULL) : static {
+  public static function createInstance($header, $rows, $empty, $input, $tree, $tableselect, $sticky, $responsive, $multiple, $js_select, $process, $element_validate, $tabledrag, $pre_render, $theme, $regions, $value_callback, $type, $defaults_loaded, ?ElementInfoManager $elementInfoManager = NULL) : static {
     $instance = ($elementInfoManager ?? \Drupal::service('element_info'))->createInstance('field_ui_table');
     $instance->header = $header;
     $instance->rows = $rows;
@@ -365,7 +365,7 @@ class FieldUiTable extends Table {
   /**
    * {@inheritdoc}
    */
-  public function toRenderArray() {
+  public function toRenderArray() : array {
     return [
       '#header' => $this->header,
       '#rows' => $this->rows,

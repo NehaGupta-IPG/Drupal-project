@@ -230,7 +230,7 @@ class Link extends RenderElementBase {
   /**
    * {@inheritdoc}
    */
-  public function toRenderArray() {
+  public function toRenderArray() : array {
     return [
       '#pre_render' => $this->pre_render,
       '#type' => $this->type,

@@ -110,7 +110,7 @@ class Submit extends Button {
   /**
    * {@inheritdoc}
    */
-  public function toRenderArray() {
+  public function toRenderArray() : array {
     return [
       '#executes_submit_callback' => $this->executes_submit_callback,
       '#input' => $this->input,

@@ -184,7 +184,7 @@ class Checkbox extends FormElementBase {
   /**
    * {@inheritdoc}
    */
-  public function toRenderArray() {
+  public function toRenderArray() : array {
     return [
       '#input' => $this->input,
       '#return_value' => $this->return_value,

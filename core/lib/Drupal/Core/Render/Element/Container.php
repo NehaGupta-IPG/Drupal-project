@@ -144,7 +144,7 @@ class Container extends RenderElementBase {
   /**
    * {@inheritdoc}
    */
-  public function toRenderArray() {
+  public function toRenderArray() : array {
     return [
       '#optional' => $this->optional,
       '#process' => $this->process,
