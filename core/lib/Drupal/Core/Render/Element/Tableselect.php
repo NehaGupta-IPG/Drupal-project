@@ -56,33 +56,45 @@ class Tableselect extends Table {
 
 
   /**
-   * @var mixed Automatically converted property
+   * Automatically converted property.
+   *
+   * @var mixed
    */
   // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
   public $js_select;
 
   /**
-   * @var mixed Automatically converted property
+   * Automatically converted property.
+   *
+   * @var mixed
    */
   public $multiple;
 
   /**
-   * @var mixed Automatically converted property
+   * Automatically converted property.
+   *
+   * @var mixed
    */
   public $responsive;
 
   /**
-   * @var mixed Automatically converted property
+   * Automatically converted property.
+   *
+   * @var mixed
    */
   public $sticky;
 
   /**
-   * @var mixed Automatically converted property
+   * Automatically converted property.
+   *
+   * @var mixed
    */
   public $options;
 
   /**
-   * @var mixed Automatically converted property
+   * Automatically converted property.
+   *
+   * @var mixed
    */
   public $empty;
 

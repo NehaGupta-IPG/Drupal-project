@@ -19,23 +19,31 @@ class ProcessedText extends RenderElementBase {
 
 
   /**
-   * @var mixed Automatically converted property
+   * Automatically converted property.
+   *
+   * @var mixed
    */
   public $text;
 
   /**
-   * @var mixed Automatically converted property
+   * Automatically converted property.
+   *
+   * @var mixed
    */
   public $format;
 
   /**
-   * @var mixed Automatically converted property
+   * Automatically converted property.
+   *
+   * @var mixed
    */
   // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
   public $filter_types_to_skip;
 
   /**
-   * @var mixed Automatically converted property
+   * Automatically converted property.
+   *
+   * @var mixed
    */
   public $langcode;
 

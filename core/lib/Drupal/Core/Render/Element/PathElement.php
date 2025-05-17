@@ -19,23 +19,31 @@ class PathElement extends Textfield {
   use ProcessAutocompleteTrait;
 
   /**
-   * @var mixed Automatically converted property
+   * Automatically converted property.
+   *
+   * @var mixed
    */
   public $size;
 
   /**
-   * @var mixed Automatically converted property
+   * Automatically converted property.
+   *
+   * @var mixed
    */
   public $maxlength;
 
   /**
-   * @var mixed Automatically converted property
+   * Automatically converted property.
+   *
+   * @var mixed
    */
   // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
   public $validate_path;
 
   /**
-   * @var mixed Automatically converted property
+   * Automatically converted property.
+   *
+   * @var mixed
    */
   // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
   public $convert_path;

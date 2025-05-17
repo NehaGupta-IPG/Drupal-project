@@ -15,18 +15,24 @@ class View extends RenderElementBase {
 
 
   /**
-   * @var mixed Automatically converted property
+   * Automatically converted property.
+   *
+   * @var mixed
    */
   // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
   public $display_id;
 
   /**
-   * @var mixed Automatically converted property
+   * Automatically converted property.
+   *
+   * @var mixed
    */
   public $arguments;
 
   /**
-   * @var mixed Automatically converted property
+   * Automatically converted property.
+   *
+   * @var mixed
    */
   public $embed;
 

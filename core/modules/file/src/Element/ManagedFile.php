@@ -26,46 +26,62 @@ class ManagedFile extends FormElementBase {
 
 
   /**
-   * @var mixed Automatically converted property
+   * Automatically converted property.
+   *
+   * @var mixed
    */
   // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
   public $progress_indicator;
 
   /**
-   * @var mixed Automatically converted property
+   * Automatically converted property.
+   *
+   * @var mixed
    */
   // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
   public $progress_message;
 
   /**
-   * @var mixed Automatically converted property
+   * Automatically converted property.
+   *
+   * @var mixed
    */
   // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
   public $upload_validators;
 
   /**
-   * @var mixed Automatically converted property
+   * Automatically converted property.
+   *
+   * @var mixed
    */
   // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
   public $upload_location;
 
   /**
-   * @var mixed Automatically converted property
+   * Automatically converted property.
+   *
+   * @var mixed
    */
   public $size;
 
   /**
-   * @var mixed Automatically converted property
+   * Automatically converted property.
+   *
+   * @var mixed
    */
   public $multiple;
 
   /**
-   * @var mixed Automatically converted property
+   * Automatically converted property.
+   *
+   * @var mixed
    */
   public $extended;
 
   /**
-   * @var mixed Automatically converted property
+   * Automatically converted property.
+   *
+   * @var mixed
    */
   public $accept;
 

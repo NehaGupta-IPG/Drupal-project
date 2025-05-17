@@ -12,6 +12,7 @@ trait ProcessAutocompleteTrait {
    *
    * @var string
    */
+  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
   protected string $autocomplete_route_name = '';
 
   /**
@@ -19,6 +20,7 @@ trait ProcessAutocompleteTrait {
    *
    * @var array
    */
+  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
   protected array $autocomplete_route_parameters = [];
 
   /**
@@ -26,6 +28,7 @@ trait ProcessAutocompleteTrait {
    *
    * @var array
    */
+  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
   protected array $autocomplete_query_parameters = [];
 
 }

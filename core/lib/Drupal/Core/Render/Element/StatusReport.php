@@ -12,7 +12,9 @@ class StatusReport extends RenderElementBase {
 
 
   /**
-   * @var mixed Automatically converted property
+   * Automatically converted property.
+   *
+   * @var mixed
    */
   public $priorities;
 

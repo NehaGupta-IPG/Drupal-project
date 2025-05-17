@@ -33,12 +33,16 @@ class Tel extends FormElementBase {
   use ProcessAutocompleteTrait;
 
   /**
-   * @var mixed Automatically converted property
+   * Automatically converted property.
+   *
+   * @var mixed
    */
   public $size;
 
   /**
-   * @var mixed Automatically converted property
+   * Automatically converted property.
+   *
+   * @var mixed
    */
   public $maxlength;
 
