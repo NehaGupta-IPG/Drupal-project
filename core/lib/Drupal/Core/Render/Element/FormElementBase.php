@@ -167,11 +167,6 @@ abstract class FormElementBase extends RenderElementBase implements FormElementI
   protected bool $input = FALSE;
 
   /**
-   * Array of callables or function names, called during form building.
-   */
-  protected array $process = [];
-
-  /**
    * Set to TRUE when the element is processed.
    */
   protected bool $processed = FALSE;

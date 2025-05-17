@@ -40,6 +40,7 @@ class Datetime extends DateElementBase {
    * Automatically converted property.
    *
    * @var array
+   * @phpstan-var array<int, callable>
    */
   // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
   public $date_date_callbacks;
@@ -64,6 +65,7 @@ class Datetime extends DateElementBase {
    * Automatically converted property.
    *
    * @var array
+   * @phpstan-var array<int, callable>
    */
   // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
   public $date_time_callbacks;

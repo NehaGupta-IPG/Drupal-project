@@ -278,6 +278,11 @@ abstract class RenderElementBase extends PluginBase implements ElementInterface 
   protected array $pre_render = [];
 
   /**
+   * Array of callables or function names, called during form building.
+   */
+  protected array $process = [];
+
+  /**
    * TRUE if this element and its children have already been rendered.
    */
   protected bool $printed = FALSE;
