@@ -27,10 +27,7 @@ class Operations extends Dropbutton {
   }
 
   public static function createInstance($theme, $pre_render, $type, $defaults_loaded, ?ElementInfoManager $elementInfoManager = NULL) {
-    if (!$elementInfoManager) {
-      $elementInfoManager = \Drupal::service('element_info');
-    }
-    $instance = $elementInfoManager->createInstance('operations');
+    $instance = ($elementInfoManager ?? \Drupal::service('element_info'))->createInstance('operations');
     $instance->theme = $theme;
     $instance->pre_render = $pre_render;
     $instance->type = $type;

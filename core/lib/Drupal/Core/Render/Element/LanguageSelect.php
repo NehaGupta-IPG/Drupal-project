@@ -29,10 +29,7 @@ class LanguageSelect extends FormElementBase {
   }
 
   public static function createInstance($input, $default_value, $value_callback, $type, $defaults_loaded, ?ElementInfoManager $elementInfoManager = NULL) {
-    if (!$elementInfoManager) {
-      $elementInfoManager = \Drupal::service('element_info');
-    }
-    $instance = $elementInfoManager->createInstance('language_select');
+    $instance = ($elementInfoManager ?? \Drupal::service('element_info'))->createInstance('language_select');
     $instance->input = $input;
     $instance->default_value = $default_value;
     $instance->value_callback = $value_callback;

@@ -324,10 +324,7 @@ class Tableselect extends Table {
   }
 
   public static function createInstance($input, $js_select, $multiple, $responsive, $sticky, $pre_render, $process, $options, $empty, $theme, $value_callback, $type, $defaults_loaded, ?ElementInfoManager $elementInfoManager = NULL) {
-    if (!$elementInfoManager) {
-      $elementInfoManager = \Drupal::service('element_info');
-    }
-    $instance = $elementInfoManager->createInstance('tableselect');
+    $instance = ($elementInfoManager ?? \Drupal::service('element_info'))->createInstance('tableselect');
     $instance->input = $input;
     $instance->js_select = $js_select;
     $instance->multiple = $multiple;

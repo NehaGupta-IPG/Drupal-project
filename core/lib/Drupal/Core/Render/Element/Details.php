@@ -107,10 +107,7 @@ class Details extends RenderElementBase {
   }
 
   public static function createInstance($open, $summary_attributes, $value, $process, $pre_render, $theme_wrappers, $type, $defaults_loaded, ?ElementInfoManager $elementInfoManager = NULL) {
-    if (!$elementInfoManager) {
-      $elementInfoManager = \Drupal::service('element_info');
-    }
-    $instance = $elementInfoManager->createInstance('details');
+    $instance = ($elementInfoManager ?? \Drupal::service('element_info'))->createInstance('details');
     $instance->open = $open;
     $instance->summary_attributes = $summary_attributes;
     $instance->value = $value;

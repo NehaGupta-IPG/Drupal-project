@@ -113,10 +113,7 @@ class PathElement extends Textfield {
   }
 
   public static function createInstance($input, $size, $maxlength, $autocomplete_route_name, $process, $pre_render, $theme, $theme_wrappers, $validate_path, $convert_path, $element_validate, $value_callback, $type, $defaults_loaded, ?ElementInfoManager $elementInfoManager = NULL) {
-    if (!$elementInfoManager) {
-      $elementInfoManager = \Drupal::service('element_info');
-    }
-    $instance = $elementInfoManager->createInstance('path');
+    $instance = ($elementInfoManager ?? \Drupal::service('element_info'))->createInstance('path');
     $instance->input = $input;
     $instance->size = $size;
     $instance->maxlength = $maxlength;

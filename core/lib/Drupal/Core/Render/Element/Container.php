@@ -111,10 +111,7 @@ class Container extends RenderElementBase {
   }
 
   public static function createInstance($optional, $process, $pre_render, $theme_wrappers, $type, $defaults_loaded, ?ElementInfoManager $elementInfoManager = NULL) {
-    if (!$elementInfoManager) {
-      $elementInfoManager = \Drupal::service('element_info');
-    }
-    $instance = $elementInfoManager->createInstance('container');
+    $instance = ($elementInfoManager ?? \Drupal::service('element_info'))->createInstance('container');
     $instance->optional = $optional;
     $instance->process = $process;
     $instance->pre_render = $pre_render;

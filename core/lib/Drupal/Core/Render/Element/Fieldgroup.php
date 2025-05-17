@@ -49,10 +49,7 @@ class Fieldgroup extends Fieldset {
   }
 
   public static function createInstance($process, $pre_render, $value, $theme_wrappers, $attributes, $type, $defaults_loaded, ?ElementInfoManager $elementInfoManager = NULL) {
-    if (!$elementInfoManager) {
-      $elementInfoManager = \Drupal::service('element_info');
-    }
-    $instance = $elementInfoManager->createInstance('fieldgroup');
+    $instance = ($elementInfoManager ?? \Drupal::service('element_info'))->createInstance('fieldgroup');
     $instance->process = $process;
     $instance->pre_render = $pre_render;
     $instance->value = $value;

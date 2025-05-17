@@ -123,10 +123,7 @@ class Radios extends FormElementBase {
   }
 
   public static function createInstance($input, $process, $theme_wrappers, $pre_render, $value_callback, $type, $defaults_loaded, ?ElementInfoManager $elementInfoManager = NULL) {
-    if (!$elementInfoManager) {
-      $elementInfoManager = \Drupal::service('element_info');
-    }
-    $instance = $elementInfoManager->createInstance('radios');
+    $instance = ($elementInfoManager ?? \Drupal::service('element_info'))->createInstance('radios');
     $instance->input = $input;
     $instance->process = $process;
     $instance->theme_wrappers = $theme_wrappers;

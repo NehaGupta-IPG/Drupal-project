@@ -56,10 +56,7 @@ class Submit extends Button {
   }
 
   public static function createInstance($executes_submit_callback, $input, $name, $is_button, $submit_button, $limit_validation_errors, $process, $pre_render, $theme_wrappers, $value_callback, $type, $defaults_loaded, ?ElementInfoManager $elementInfoManager = NULL) {
-    if (!$elementInfoManager) {
-      $elementInfoManager = \Drupal::service('element_info');
-    }
-    $instance = $elementInfoManager->createInstance('submit');
+    $instance = ($elementInfoManager ?? \Drupal::service('element_info'))->createInstance('submit');
     $instance->executes_submit_callback = $executes_submit_callback;
     $instance->input = $input;
     $instance->name = $name;

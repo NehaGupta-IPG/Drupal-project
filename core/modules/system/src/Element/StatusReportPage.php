@@ -148,10 +148,7 @@ class StatusReportPage extends RenderElementBase {
   }
 
   public static function createInstance($theme, $pre_render, $type, $defaults_loaded, ?ElementInfoManager $elementInfoManager = NULL) {
-    if (!$elementInfoManager) {
-      $elementInfoManager = \Drupal::service('element_info');
-    }
-    $instance = $elementInfoManager->createInstance('status_report_page');
+    $instance = ($elementInfoManager ?? \Drupal::service('element_info'))->createInstance('status_report_page');
     $instance->theme = $theme;
     $instance->pre_render = $pre_render;
     $instance->type = $type;

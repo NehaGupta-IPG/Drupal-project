@@ -119,10 +119,7 @@ class View extends RenderElementBase {
   }
 
   public static function createInstance($pre_render, $name, $display_id, $arguments, $embed, $cache, $type, $defaults_loaded, ?ElementInfoManager $elementInfoManager = NULL) {
-    if (!$elementInfoManager) {
-      $elementInfoManager = \Drupal::service('element_info');
-    }
-    $instance = $elementInfoManager->createInstance('view');
+    $instance = ($elementInfoManager ?? \Drupal::service('element_info'))->createInstance('view');
     $instance->pre_render = $pre_render;
     $instance->name = $name;
     $instance->display_id = $display_id;

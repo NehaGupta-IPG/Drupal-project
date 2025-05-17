@@ -75,10 +75,7 @@ class Search extends FormElementBase {
   }
 
   public static function createInstance($input, $size, $maxlength, $autocomplete_route_name, $process, $pre_render, $theme, $theme_wrappers, $value_callback, $type, $defaults_loaded, ?ElementInfoManager $elementInfoManager = NULL) {
-    if (!$elementInfoManager) {
-      $elementInfoManager = \Drupal::service('element_info');
-    }
-    $instance = $elementInfoManager->createInstance('search');
+    $instance = ($elementInfoManager ?? \Drupal::service('element_info'))->createInstance('search');
     $instance->input = $input;
     $instance->size = $size;
     $instance->maxlength = $maxlength;

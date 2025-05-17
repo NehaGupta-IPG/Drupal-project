@@ -84,10 +84,7 @@ class Dropbutton extends RenderElementBase {
   }
 
   public static function createInstance($pre_render, $theme, $type, $defaults_loaded, ?ElementInfoManager $elementInfoManager = NULL) {
-    if (!$elementInfoManager) {
-      $elementInfoManager = \Drupal::service('element_info');
-    }
-    $instance = $elementInfoManager->createInstance('dropbutton');
+    $instance = ($elementInfoManager ?? \Drupal::service('element_info'))->createInstance('dropbutton');
     $instance->pre_render = $pre_render;
     $instance->theme = $theme;
     $instance->type = $type;

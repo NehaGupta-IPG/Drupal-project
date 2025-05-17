@@ -135,10 +135,7 @@ class BreakLockLink extends RenderElementBase implements ContainerFactoryPluginI
   }
 
   public static function createInstance($pre_render, $type, $defaults_loaded, ?ElementInfoManager $elementInfoManager = NULL) {
-    if (!$elementInfoManager) {
-      $elementInfoManager = \Drupal::service('element_info');
-    }
-    $instance = $elementInfoManager->createInstance('break_lock_link');
+    $instance = ($elementInfoManager ?? \Drupal::service('element_info'))->createInstance('break_lock_link');
     $instance->pre_render = $pre_render;
     $instance->type = $type;
     $instance->defaults_loaded = $defaults_loaded;

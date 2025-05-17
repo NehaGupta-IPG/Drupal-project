@@ -117,10 +117,7 @@ class Icon extends RenderElementBase {
   }
 
   public static function createInstance($pre_render, $pack_id, $icon_id, $settings, $type, $defaults_loaded, ?ElementInfoManager $elementInfoManager = NULL) {
-    if (!$elementInfoManager) {
-      $elementInfoManager = \Drupal::service('element_info');
-    }
-    $instance = $elementInfoManager->createInstance('icon');
+    $instance = ($elementInfoManager ?? \Drupal::service('element_info'))->createInstance('icon');
     $instance->pre_render = $pre_render;
     $instance->pack_id = $pack_id;
     $instance->icon_id = $icon_id;

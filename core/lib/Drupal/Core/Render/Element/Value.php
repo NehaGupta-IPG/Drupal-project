@@ -33,10 +33,7 @@ class Value extends FormElementBase {
   }
 
   public static function createInstance($input, $value_callback, $type, $defaults_loaded, ?ElementInfoManager $elementInfoManager = NULL) {
-    if (!$elementInfoManager) {
-      $elementInfoManager = \Drupal::service('element_info');
-    }
-    $instance = $elementInfoManager->createInstance('value');
+    $instance = ($elementInfoManager ?? \Drupal::service('element_info'))->createInstance('value');
     $instance->input = $input;
     $instance->value_callback = $value_callback;
     $instance->type = $type;

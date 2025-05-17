@@ -69,10 +69,7 @@ class InlineTemplate extends RenderElementBase {
   }
 
   public static function createInstance($pre_render, $template, $context, $type, $defaults_loaded, ?ElementInfoManager $elementInfoManager = NULL) {
-    if (!$elementInfoManager) {
-      $elementInfoManager = \Drupal::service('element_info');
-    }
-    $instance = $elementInfoManager->createInstance('inline_template');
+    $instance = ($elementInfoManager ?? \Drupal::service('element_info'))->createInstance('inline_template');
     $instance->pre_render = $pre_render;
     $instance->template = $template;
     $instance->context = $context;

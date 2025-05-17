@@ -28,10 +28,7 @@ class Form extends RenderElementBase {
   }
 
   public static function createInstance($method, $theme_wrappers, $type, $defaults_loaded, ?ElementInfoManager $elementInfoManager = NULL) {
-    if (!$elementInfoManager) {
-      $elementInfoManager = \Drupal::service('element_info');
-    }
-    $instance = $elementInfoManager->createInstance('form');
+    $instance = ($elementInfoManager ?? \Drupal::service('element_info'))->createInstance('form');
     $instance->method = $method;
     $instance->theme_wrappers = $theme_wrappers;
     $instance->type = $type;

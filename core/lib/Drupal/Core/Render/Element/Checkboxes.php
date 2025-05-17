@@ -183,10 +183,7 @@ class Checkboxes extends FormElementBase {
   }
 
   public static function createInstance($input, $process, $pre_render, $theme_wrappers, $value_callback, $type, $defaults_loaded, ?ElementInfoManager $elementInfoManager = NULL) {
-    if (!$elementInfoManager) {
-      $elementInfoManager = \Drupal::service('element_info');
-    }
-    $instance = $elementInfoManager->createInstance('checkboxes');
+    $instance = ($elementInfoManager ?? \Drupal::service('element_info'))->createInstance('checkboxes');
     $instance->input = $input;
     $instance->process = $process;
     $instance->pre_render = $pre_render;

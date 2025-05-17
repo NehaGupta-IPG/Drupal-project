@@ -98,10 +98,7 @@ class StatusReport extends RenderElementBase {
   }
 
   public static function createInstance($theme, $priorities, $pre_render, $type, $defaults_loaded, ?ElementInfoManager $elementInfoManager = NULL) {
-    if (!$elementInfoManager) {
-      $elementInfoManager = \Drupal::service('element_info');
-    }
-    $instance = $elementInfoManager->createInstance('status_report');
+    $instance = ($elementInfoManager ?? \Drupal::service('element_info'))->createInstance('status_report');
     $instance->theme = $theme;
     $instance->priorities = $priorities;
     $instance->pre_render = $pre_render;

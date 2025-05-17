@@ -94,10 +94,7 @@ class Password extends FormElementBase {
   }
 
   public static function createInstance($input, $size, $maxlength, $process, $pre_render, $theme, $theme_wrappers, $value_callback, $type, $defaults_loaded, ?ElementInfoManager $elementInfoManager = NULL) {
-    if (!$elementInfoManager) {
-      $elementInfoManager = \Drupal::service('element_info');
-    }
-    $instance = $elementInfoManager->createInstance('password');
+    $instance = ($elementInfoManager ?? \Drupal::service('element_info'))->createInstance('password');
     $instance->input = $input;
     $instance->size = $size;
     $instance->maxlength = $maxlength;

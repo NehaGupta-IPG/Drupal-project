@@ -125,10 +125,7 @@ class ContextualLinks extends RenderElementBase {
   }
 
   public static function createInstance($pre_render, $theme, $links, $attributes, $attached, $type, $defaults_loaded, ?ElementInfoManager $elementInfoManager = NULL) {
-    if (!$elementInfoManager) {
-      $elementInfoManager = \Drupal::service('element_info');
-    }
-    $instance = $elementInfoManager->createInstance('contextual_links');
+    $instance = ($elementInfoManager ?? \Drupal::service('element_info'))->createInstance('contextual_links');
     $instance->pre_render = $pre_render;
     $instance->theme = $theme;
     $instance->links = $links;

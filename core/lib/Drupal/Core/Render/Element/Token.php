@@ -43,10 +43,7 @@ class Token extends Hidden {
   }
 
   public static function createInstance($input, $pre_render, $theme, $value_callback, $type, $defaults_loaded, ?ElementInfoManager $elementInfoManager = NULL) {
-    if (!$elementInfoManager) {
-      $elementInfoManager = \Drupal::service('element_info');
-    }
-    $instance = $elementInfoManager->createInstance('token');
+    $instance = ($elementInfoManager ?? \Drupal::service('element_info'))->createInstance('token');
     $instance->input = $input;
     $instance->pre_render = $pre_render;
     $instance->theme = $theme;

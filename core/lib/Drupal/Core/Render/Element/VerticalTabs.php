@@ -147,10 +147,7 @@ class VerticalTabs extends RenderElementBase {
   }
 
   public static function createInstance($default_tab, $process, $pre_render, $theme_wrappers, $type, $defaults_loaded, ?ElementInfoManager $elementInfoManager = NULL) {
-    if (!$elementInfoManager) {
-      $elementInfoManager = \Drupal::service('element_info');
-    }
-    $instance = $elementInfoManager->createInstance('vertical_tabs');
+    $instance = ($elementInfoManager ?? \Drupal::service('element_info'))->createInstance('vertical_tabs');
     $instance->default_tab = $default_tab;
     $instance->process = $process;
     $instance->pre_render = $pre_render;

@@ -90,10 +90,7 @@ class ToolbarItem extends RenderElementBase {
   }
 
   public static function createInstance($pre_render, $ab, $type, $defaults_loaded, ?ElementInfoManager $elementInfoManager = NULL) {
-    if (!$elementInfoManager) {
-      $elementInfoManager = \Drupal::service('element_info');
-    }
-    $instance = $elementInfoManager->createInstance('toolbar_item');
+    $instance = ($elementInfoManager ?? \Drupal::service('element_info'))->createInstance('toolbar_item');
     $instance->pre_render = $pre_render;
     $instance->ab = $ab;
     $instance->type = $type;

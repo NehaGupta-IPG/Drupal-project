@@ -122,10 +122,7 @@ class HtmlTag extends RenderElementBase {
   }
 
   public static function createInstance($pre_render, $attributes, $value, $type, $defaults_loaded, ?ElementInfoManager $elementInfoManager = NULL) {
-    if (!$elementInfoManager) {
-      $elementInfoManager = \Drupal::service('element_info');
-    }
-    $instance = $elementInfoManager->createInstance('html_tag');
+    $instance = ($elementInfoManager ?? \Drupal::service('element_info'))->createInstance('html_tag');
     $instance->pre_render = $pre_render;
     $instance->attributes = $attributes;
     $instance->value = $value;

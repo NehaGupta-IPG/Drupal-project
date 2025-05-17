@@ -45,10 +45,7 @@ class Fieldset extends RenderElementBase {
   }
 
   public static function createInstance($process, $pre_render, $value, $theme_wrappers, $type, $defaults_loaded, ?ElementInfoManager $elementInfoManager = NULL) {
-    if (!$elementInfoManager) {
-      $elementInfoManager = \Drupal::service('element_info');
-    }
-    $instance = $elementInfoManager->createInstance('fieldset');
+    $instance = ($elementInfoManager ?? \Drupal::service('element_info'))->createInstance('fieldset');
     $instance->process = $process;
     $instance->pre_render = $pre_render;
     $instance->value = $value;

@@ -138,10 +138,7 @@ class StatusMessages extends RenderElementBase {
   }
 
   public static function createInstance($display, $pre_render, $include_fallback, $type, $defaults_loaded, ?ElementInfoManager $elementInfoManager = NULL) {
-    if (!$elementInfoManager) {
-      $elementInfoManager = \Drupal::service('element_info');
-    }
-    $instance = $elementInfoManager->createInstance('status_messages');
+    $instance = ($elementInfoManager ?? \Drupal::service('element_info'))->createInstance('status_messages');
     $instance->display = $display;
     $instance->pre_render = $pre_render;
     $instance->include_fallback = $include_fallback;

@@ -118,10 +118,7 @@ class ImageButton extends Submit {
   }
 
   public static function createInstance($return_value, $has_garbage_value, $src, $theme_wrappers, $executes_submit_callback, $input, $name, $is_button, $submit_button, $limit_validation_errors, $process, $pre_render, $value_callback, $type, $defaults_loaded, ?ElementInfoManager $elementInfoManager = NULL) {
-    if (!$elementInfoManager) {
-      $elementInfoManager = \Drupal::service('element_info');
-    }
-    $instance = $elementInfoManager->createInstance('image_button');
+    $instance = ($elementInfoManager ?? \Drupal::service('element_info'))->createInstance('image_button');
     $instance->return_value = $return_value;
     $instance->has_garbage_value = $has_garbage_value;
     $instance->src = $src;

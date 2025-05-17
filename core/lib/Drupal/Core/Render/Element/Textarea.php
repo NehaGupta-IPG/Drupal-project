@@ -89,10 +89,7 @@ class Textarea extends FormElementBase {
   }
 
   public static function createInstance($input, $cols, $rows, $resizable, $process, $pre_render, $theme, $theme_wrappers, $value_callback, $type, $defaults_loaded, ?ElementInfoManager $elementInfoManager = NULL) {
-    if (!$elementInfoManager) {
-      $elementInfoManager = \Drupal::service('element_info');
-    }
-    $instance = $elementInfoManager->createInstance('textarea');
+    $instance = ($elementInfoManager ?? \Drupal::service('element_info'))->createInstance('textarea');
     $instance->input = $input;
     $instance->cols = $cols;
     $instance->rows = $rows;

@@ -118,10 +118,7 @@ class Actions extends Container {
   }
 
   public static function createInstance($process, $weight, $theme_wrappers, $type, $defaults_loaded, ?ElementInfoManager $elementInfoManager = NULL) {
-    if (!$elementInfoManager) {
-      $elementInfoManager = \Drupal::service('element_info');
-    }
-    $instance = $elementInfoManager->createInstance('actions');
+    $instance = ($elementInfoManager ?? \Drupal::service('element_info'))->createInstance('actions');
     $instance->process = $process;
     $instance->weight = $weight;
     $instance->theme_wrappers = $theme_wrappers;

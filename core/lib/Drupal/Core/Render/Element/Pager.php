@@ -117,10 +117,7 @@ class Pager extends RenderElementBase {
   }
 
   public static function createInstance($pre_render, $theme, $element, $pagination_heading_level, $parameters, $quantity, $tags, $route_name, $type, $defaults_loaded, ?ElementInfoManager $elementInfoManager = NULL) {
-    if (!$elementInfoManager) {
-      $elementInfoManager = \Drupal::service('element_info');
-    }
-    $instance = $elementInfoManager->createInstance('pager');
+    $instance = ($elementInfoManager ?? \Drupal::service('element_info'))->createInstance('pager');
     $instance->pre_render = $pre_render;
     $instance->theme = $theme;
     $instance->element = $element;

@@ -322,10 +322,7 @@ class MachineName extends Textfield {
   }
 
   public static function createInstance($input, $default_value, $required, $maxlength, $size, $autocomplete_route_name, $process, $element_validate, $pre_render, $theme, $theme_wrappers, $value_callback, $type, $defaults_loaded, ?ElementInfoManager $elementInfoManager = NULL) {
-    if (!$elementInfoManager) {
-      $elementInfoManager = \Drupal::service('element_info');
-    }
-    $instance = $elementInfoManager->createInstance('machine_name');
+    $instance = ($elementInfoManager ?? \Drupal::service('element_info'))->createInstance('machine_name');
     $instance->input = $input;
     $instance->default_value = $default_value;
     $instance->required = $required;

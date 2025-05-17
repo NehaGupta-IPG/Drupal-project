@@ -85,10 +85,7 @@ class SystemCompactLink extends Link {
   }
 
   public static function createInstance($pre_render, $theme_wrappers, $type, $defaults_loaded, ?ElementInfoManager $elementInfoManager = NULL) {
-    if (!$elementInfoManager) {
-      $elementInfoManager = \Drupal::service('element_info');
-    }
-    $instance = $elementInfoManager->createInstance('system_compact_link');
+    $instance = ($elementInfoManager ?? \Drupal::service('element_info'))->createInstance('system_compact_link');
     $instance->pre_render = $pre_render;
     $instance->theme_wrappers = $theme_wrappers;
     $instance->type = $type;

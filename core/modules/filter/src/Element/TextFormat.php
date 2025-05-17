@@ -318,10 +318,7 @@ class TextFormat extends RenderElementBase {
   }
 
   public static function createInstance($process, $base_type, $theme_wrappers, $type, $pre_render, $defaults_loaded, ?ElementInfoManager $elementInfoManager = NULL) {
-    if (!$elementInfoManager) {
-      $elementInfoManager = \Drupal::service('element_info');
-    }
-    $instance = $elementInfoManager->createInstance('text_format');
+    $instance = ($elementInfoManager ?? \Drupal::service('element_info'))->createInstance('text_format');
     $instance->process = $process;
     $instance->base_type = $base_type;
     $instance->theme_wrappers = $theme_wrappers;

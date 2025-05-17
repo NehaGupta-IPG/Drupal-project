@@ -186,10 +186,7 @@ class ProcessedText extends RenderElementBase {
   }
 
   public static function createInstance($text, $format, $filter_types_to_skip, $langcode, $pre_render, $type, $defaults_loaded, ?ElementInfoManager $elementInfoManager = NULL) {
-    if (!$elementInfoManager) {
-      $elementInfoManager = \Drupal::service('element_info');
-    }
-    $instance = $elementInfoManager->createInstance('processed_text');
+    $instance = ($elementInfoManager ?? \Drupal::service('element_info'))->createInstance('processed_text');
     $instance->text = $text;
     $instance->format = $format;
     $instance->filter_types_to_skip = $filter_types_to_skip;

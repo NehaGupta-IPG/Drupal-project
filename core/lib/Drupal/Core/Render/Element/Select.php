@@ -226,10 +226,7 @@ class Select extends FormElementBase {
   }
 
   public static function createInstance($input, $multiple, $sort_options, $sort_start, $process, $pre_render, $theme, $theme_wrappers, $options, $value_callback, $type, $defaults_loaded, ?ElementInfoManager $elementInfoManager = NULL) {
-    if (!$elementInfoManager) {
-      $elementInfoManager = \Drupal::service('element_info');
-    }
-    $instance = $elementInfoManager->createInstance('select');
+    $instance = ($elementInfoManager ?? \Drupal::service('element_info'))->createInstance('select');
     $instance->input = $input;
     $instance->multiple = $multiple;
     $instance->sort_options = $sort_options;

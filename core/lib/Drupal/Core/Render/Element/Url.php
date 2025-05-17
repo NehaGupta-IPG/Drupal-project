@@ -105,10 +105,7 @@ class Url extends FormElementBase {
   }
 
   public static function createInstance($input, $size, $maxlength, $autocomplete_route_name, $process, $element_validate, $pre_render, $theme, $theme_wrappers, $value_callback, $type, $defaults_loaded, ?ElementInfoManager $elementInfoManager = NULL) {
-    if (!$elementInfoManager) {
-      $elementInfoManager = \Drupal::service('element_info');
-    }
-    $instance = $elementInfoManager->createInstance('url');
+    $instance = ($elementInfoManager ?? \Drupal::service('element_info'))->createInstance('url');
     $instance->input = $input;
     $instance->size = $size;
     $instance->maxlength = $maxlength;

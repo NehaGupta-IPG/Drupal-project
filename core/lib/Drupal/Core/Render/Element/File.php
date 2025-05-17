@@ -110,10 +110,7 @@ class File extends FormElementBase {
   }
 
   public static function createInstance($input, $multiple, $process, $size, $pre_render, $theme, $theme_wrappers, $value_callback, $type, $defaults_loaded, ?ElementInfoManager $elementInfoManager = NULL) {
-    if (!$elementInfoManager) {
-      $elementInfoManager = \Drupal::service('element_info');
-    }
-    $instance = $elementInfoManager->createInstance('file');
+    $instance = ($elementInfoManager ?? \Drupal::service('element_info'))->createInstance('file');
     $instance->input = $input;
     $instance->multiple = $multiple;
     $instance->process = $process;

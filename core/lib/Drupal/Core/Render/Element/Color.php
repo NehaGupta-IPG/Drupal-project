@@ -87,10 +87,7 @@ class Color extends FormElementBase {
   }
 
   public static function createInstance($input, $process, $element_validate, $pre_render, $theme, $theme_wrappers, $value_callback, $type, $defaults_loaded, ?ElementInfoManager $elementInfoManager = NULL) {
-    if (!$elementInfoManager) {
-      $elementInfoManager = \Drupal::service('element_info');
-    }
-    $instance = $elementInfoManager->createInstance('color');
+    $instance = ($elementInfoManager ?? \Drupal::service('element_info'))->createInstance('color');
     $instance->input = $input;
     $instance->process = $process;
     $instance->element_validate = $element_validate;

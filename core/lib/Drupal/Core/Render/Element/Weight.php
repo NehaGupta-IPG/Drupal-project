@@ -81,10 +81,7 @@ class Weight extends FormElementBase {
   }
 
   public static function createInstance($input, $delta, $default_value, $process, $value_callback, $type, $defaults_loaded, ?ElementInfoManager $elementInfoManager = NULL) {
-    if (!$elementInfoManager) {
-      $elementInfoManager = \Drupal::service('element_info');
-    }
-    $instance = $elementInfoManager->createInstance('weight');
+    $instance = ($elementInfoManager ?? \Drupal::service('element_info'))->createInstance('weight');
     $instance->input = $input;
     $instance->delta = $delta;
     $instance->default_value = $default_value;

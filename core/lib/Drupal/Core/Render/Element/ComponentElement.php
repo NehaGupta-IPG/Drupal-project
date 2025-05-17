@@ -197,10 +197,7 @@ class ComponentElement extends RenderElementBase {
   }
 
   public static function createInstance($pre_render, $component, $variant, $props, $slots, $propsAlter, $slotsAlter, $type, $defaults_loaded, ?ElementInfoManager $elementInfoManager = NULL) {
-    if (!$elementInfoManager) {
-      $elementInfoManager = \Drupal::service('element_info');
-    }
-    $instance = $elementInfoManager->createInstance('component');
+    $instance = ($elementInfoManager ?? \Drupal::service('element_info'))->createInstance('component');
     $instance->pre_render = $pre_render;
     $instance->component = $component;
     $instance->variant = $variant;

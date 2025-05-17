@@ -24,10 +24,7 @@ class Page extends RenderElementBase {
   }
 
   public static function createInstance($theme, $title, $type, $theme_wrappers, $defaults_loaded, ?ElementInfoManager $elementInfoManager = NULL) {
-    if (!$elementInfoManager) {
-      $elementInfoManager = \Drupal::service('element_info');
-    }
-    $instance = $elementInfoManager->createInstance('page');
+    $instance = ($elementInfoManager ?? \Drupal::service('element_info'))->createInstance('page');
     $instance->theme = $theme;
     $instance->title = $title;
     $instance->type = $type;

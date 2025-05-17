@@ -128,10 +128,7 @@ class Button extends FormElementBase {
   }
 
   public static function createInstance($input, $name, $is_button, $submit_button, $executes_submit_callback, $limit_validation_errors, $process, $pre_render, $theme_wrappers, $value_callback, $type, $defaults_loaded, ?ElementInfoManager $elementInfoManager = NULL) {
-    if (!$elementInfoManager) {
-      $elementInfoManager = \Drupal::service('element_info');
-    }
-    $instance = $elementInfoManager->createInstance('button');
+    $instance = ($elementInfoManager ?? \Drupal::service('element_info'))->createInstance('button');
     $instance->input = $input;
     $instance->name = $name;
     $instance->is_button = $is_button;

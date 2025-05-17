@@ -419,10 +419,7 @@ class Datelist extends DateElementBase {
   }
 
   public static function createInstance($input, $element_validate, $process, $theme, $theme_wrappers, $date_part_order, $date_year_range, $date_increment, $date_date_callbacks, $date_timezone, $value_callback, $type, $defaults_loaded, ?ElementInfoManager $elementInfoManager = NULL) {
-    if (!$elementInfoManager) {
-      $elementInfoManager = \Drupal::service('element_info');
-    }
-    $instance = $elementInfoManager->createInstance('datelist');
+    $instance = ($elementInfoManager ?? \Drupal::service('element_info'))->createInstance('datelist');
     $instance->input = $input;
     $instance->element_validate = $element_validate;
     $instance->process = $process;

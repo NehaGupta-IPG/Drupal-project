@@ -474,10 +474,7 @@ class EntityAutocomplete extends Textfield {
   }
 
   public static function createInstance($input, $size, $maxlength, $autocomplete_route_name, $process, $pre_render, $theme, $theme_wrappers, $target_type, $selection_handler, $selection_settings, $tags, $autocreate, $validate_reference, $process_default_value, $element_validate, $value_callback, $type, $defaults_loaded, ?ElementInfoManager $elementInfoManager = NULL) {
-    if (!$elementInfoManager) {
-      $elementInfoManager = \Drupal::service('element_info');
-    }
-    $instance = $elementInfoManager->createInstance('entity_autocomplete');
+    $instance = ($elementInfoManager ?? \Drupal::service('element_info'))->createInstance('entity_autocomplete');
     $instance->input = $input;
     $instance->size = $size;
     $instance->maxlength = $maxlength;

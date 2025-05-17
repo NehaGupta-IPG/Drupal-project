@@ -98,10 +98,7 @@ class Range extends Number {
   }
 
   public static function createInstance($min, $max, $pre_render, $theme, $input, $step, $process, $element_validate, $theme_wrappers, $value_callback, $type, $defaults_loaded, ?ElementInfoManager $elementInfoManager = NULL) {
-    if (!$elementInfoManager) {
-      $elementInfoManager = \Drupal::service('element_info');
-    }
-    $instance = $elementInfoManager->createInstance('range');
+    $instance = ($elementInfoManager ?? \Drupal::service('element_info'))->createInstance('range');
     $instance->min = $min;
     $instance->max = $max;
     $instance->pre_render = $pre_render;

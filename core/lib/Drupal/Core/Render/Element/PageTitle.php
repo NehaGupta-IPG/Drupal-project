@@ -26,10 +26,7 @@ class PageTitle extends RenderElementBase {
   }
 
   public static function createInstance($theme, $title, $type, $defaults_loaded, ?ElementInfoManager $elementInfoManager = NULL) {
-    if (!$elementInfoManager) {
-      $elementInfoManager = \Drupal::service('element_info');
-    }
-    $instance = $elementInfoManager->createInstance('page_title');
+    $instance = ($elementInfoManager ?? \Drupal::service('element_info'))->createInstance('page_title');
     $instance->theme = $theme;
     $instance->title = $title;
     $instance->type = $type;

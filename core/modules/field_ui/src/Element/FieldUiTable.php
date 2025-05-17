@@ -292,10 +292,7 @@ class FieldUiTable extends Table {
   }
 
   public static function createInstance($header, $rows, $empty, $input, $tree, $tableselect, $sticky, $responsive, $multiple, $js_select, $process, $element_validate, $tabledrag, $pre_render, $theme, $regions, $value_callback, $type, $defaults_loaded = NULL, ?ElementInfoManager $elementInfoManager = NULL) {
-    if (!$elementInfoManager) {
-      $elementInfoManager = \Drupal::service('element_info');
-    }
-    $instance = $elementInfoManager->createInstance('field_ui_table');
+    $instance = ($elementInfoManager ?? \Drupal::service('element_info'))->createInstance('field_ui_table');
     $instance->header = $header;
     $instance->rows = $rows;
     $instance->empty = $empty;

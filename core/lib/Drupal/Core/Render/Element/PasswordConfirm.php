@@ -125,10 +125,7 @@ class PasswordConfirm extends FormElementBase {
   }
 
   public static function createInstance($input, $markup, $process, $theme_wrappers, $value_callback, $type, $defaults_loaded, ?ElementInfoManager $elementInfoManager = NULL) {
-    if (!$elementInfoManager) {
-      $elementInfoManager = \Drupal::service('element_info');
-    }
-    $instance = $elementInfoManager->createInstance('password_confirm');
+    $instance = ($elementInfoManager ?? \Drupal::service('element_info'))->createInstance('password_confirm');
     $instance->input = $input;
     $instance->markup = $markup;
     $instance->process = $process;

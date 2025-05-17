@@ -21,10 +21,7 @@ class Html extends RenderElementBase {
   }
 
   public static function createInstance($theme, $type, $defaults_loaded, ?ElementInfoManager $elementInfoManager = NULL) {
-    if (!$elementInfoManager) {
-      $elementInfoManager = \Drupal::service('element_info');
-    }
-    $instance = $elementInfoManager->createInstance('html');
+    $instance = ($elementInfoManager ?? \Drupal::service('element_info'))->createInstance('html');
     $instance->theme = $theme;
     $instance->type = $type;
     $instance->defaults_loaded = $defaults_loaded;

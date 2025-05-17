@@ -503,10 +503,7 @@ class Table extends FormElementBase {
   }
 
   public static function createInstance($header, $rows, $empty, $input, $tree, $tableselect, $sticky, $responsive, $multiple, $js_select, $process, $element_validate, $tabledrag, $pre_render, $theme, $value_callback, $type, $defaults_loaded, ?ElementInfoManager $elementInfoManager = NULL) {
-    if (!$elementInfoManager) {
-      $elementInfoManager = \Drupal::service('element_info');
-    }
-    $instance = $elementInfoManager->createInstance('table');
+    $instance = ($elementInfoManager ?? \Drupal::service('element_info'))->createInstance('table');
     $instance->header = $header;
     $instance->rows = $rows;
     $instance->empty = $empty;

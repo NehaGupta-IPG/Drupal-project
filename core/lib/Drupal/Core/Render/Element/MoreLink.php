@@ -40,10 +40,7 @@ class MoreLink extends Link {
   }
 
   public static function createInstance($title, $theme_wrappers, $pre_render, $type, $defaults_loaded, ?ElementInfoManager $elementInfoManager = NULL) {
-    if (!$elementInfoManager) {
-      $elementInfoManager = \Drupal::service('element_info');
-    }
-    $instance = $elementInfoManager->createInstance('more_link');
+    $instance = ($elementInfoManager ?? \Drupal::service('element_info'))->createInstance('more_link');
     $instance->title = $title;
     $instance->theme_wrappers = $theme_wrappers;
     $instance->pre_render = $pre_render;

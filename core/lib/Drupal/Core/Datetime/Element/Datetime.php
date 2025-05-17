@@ -493,10 +493,7 @@ class Datetime extends DateElementBase {
   }
 
   public static function createInstance($input, $element_validate, $process, $pre_render, $theme, $theme_wrappers, $date_date_format, $date_date_element, $date_date_callbacks, $date_time_format, $date_time_element, $date_time_callbacks, $date_year_range, $date_increment, $value_callback, $type, $defaults_loaded, ?ElementInfoManager $elementInfoManager = NULL) {
-    if (!$elementInfoManager) {
-      $elementInfoManager = \Drupal::service('element_info');
-    }
-    $instance = $elementInfoManager->createInstance('datetime');
+    $instance = ($elementInfoManager ?? \Drupal::service('element_info'))->createInstance('datetime');
     $instance->input = $input;
     $instance->element_validate = $element_validate;
     $instance->process = $process;

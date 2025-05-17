@@ -61,10 +61,7 @@ class Hidden extends FormElementBase {
   }
 
   public static function createInstance($input, $process, $pre_render, $theme, $value_callback, $type, $defaults_loaded, ?ElementInfoManager $elementInfoManager = NULL) {
-    if (!$elementInfoManager) {
-      $elementInfoManager = \Drupal::service('element_info');
-    }
-    $instance = $elementInfoManager->createInstance('hidden');
+    $instance = ($elementInfoManager ?? \Drupal::service('element_info'))->createInstance('hidden');
     $instance->input = $input;
     $instance->process = $process;
     $instance->pre_render = $pre_render;

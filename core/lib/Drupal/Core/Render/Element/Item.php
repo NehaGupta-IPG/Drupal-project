@@ -32,10 +32,7 @@ class Item extends FormElementBase {
   }
 
   public static function createInstance($input, $markup, $theme_wrappers, $value_callback, $type, $defaults_loaded, ?ElementInfoManager $elementInfoManager = NULL) {
-    if (!$elementInfoManager) {
-      $elementInfoManager = \Drupal::service('element_info');
-    }
-    $instance = $elementInfoManager->createInstance('item');
+    $instance = ($elementInfoManager ?? \Drupal::service('element_info'))->createInstance('item');
     $instance->input = $input;
     $instance->markup = $markup;
     $instance->theme_wrappers = $theme_wrappers;
