@@ -14,7 +14,7 @@ class InvalidArgumentException extends \InvalidArgumentException implements Exce
 
   /**
    * Enum representation of the error code.
-   * 
+   *
    * @var \Drupal\Core\Exception\ExceptionCodeInterface|null
    */
   protected ?ExceptionCodeInterface $enumCode = NULL;
