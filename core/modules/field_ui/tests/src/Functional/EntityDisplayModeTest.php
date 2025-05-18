@@ -19,7 +19,7 @@ class EntityDisplayModeTest extends BrowserTestBase {
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['block', 'entity_test', 'field_ui', 'node'];
+  protected static $modules = ['entity_test', 'field_ui', 'node'];
 
   /**
    * {@inheritdoc}
@@ -37,9 +37,6 @@ class EntityDisplayModeTest extends BrowserTestBase {
       'type' => 'article',
       'name' => 'Article',
     ]);
-
-    $this->drupalPlaceBlock('local_actions_block');
-    $this->drupalPlaceBlock('page_title_block');
   }
 
   /**

@@ -32,7 +32,7 @@ final class NavigationVariant extends VariantBase implements PageVariantInterfac
   /**
    * The page title: a string (plain title) or a render array (formatted title).
    */
-  protected string|MarkupInterface|array $title = '';
+  protected string|MarkupInterface|array|null $title = '';
 
   /**
    * Constructs a new NavigationVariant.
