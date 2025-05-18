@@ -31,7 +31,7 @@ class ThemeTest extends BrowserTestBase {
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['node', 'block', 'file'];
+  protected static $modules = ['node', 'navigation_variant_test', 'file'];
 
   /**
    * {@inheritdoc}

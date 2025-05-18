@@ -26,7 +26,7 @@ class MenuUiContentTranslationTest extends BrowserTestBase {
    * {@inheritdoc}
    */
   protected static $modules = [
-    'block',
+    'navigation_variant_test',
     'language',
     'content_translation',
     'menu_ui',

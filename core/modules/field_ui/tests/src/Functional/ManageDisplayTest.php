@@ -34,7 +34,7 @@ class ManageDisplayTest extends BrowserTestBase {
     'search',
     'field_test',
     'field_third_party_test',
-    'block',
+    'navigation_variant_test',
   ];
 
   /**

@@ -22,7 +22,7 @@ class ConfigTranslationOverviewTest extends BrowserTestBase {
    * {@inheritdoc}
    */
   protected static $modules = [
-    'block',
+    'navigation_variant_test',
     'config_test',
     'config_translation',
     'config_translation_test',

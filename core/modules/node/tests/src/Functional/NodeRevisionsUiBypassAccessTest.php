@@ -32,7 +32,7 @@ class NodeRevisionsUiBypassAccessTest extends NodeTestBase {
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['block'];
+  protected static $modules = ['navigation_variant_test'];
 
   /**
    * {@inheritdoc}

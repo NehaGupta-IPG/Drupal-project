@@ -18,7 +18,7 @@ class FieldUIRouteTest extends BrowserTestBase {
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['block', 'entity_test', 'field_ui'];
+  protected static $modules = ['navigation_variant_test', 'entity_test', 'field_ui'];
 
   /**
    * {@inheritdoc}

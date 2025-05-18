@@ -20,7 +20,7 @@ class SearchConfigSettingsFormTest extends BrowserTestBase {
    * {@inheritdoc}
    */
   protected static $modules = [
-    'block',
+    'navigation_variant_test',
     'dblog',
     'node',
     'search',

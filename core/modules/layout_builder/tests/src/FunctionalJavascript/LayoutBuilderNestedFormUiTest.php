@@ -26,7 +26,7 @@ class LayoutBuilderNestedFormUiTest extends WebDriverTestBase {
    * {@inheritdoc}
    */
   protected static $modules = [
-    'block',
+    'navigation_variant_test',
     'field_ui',
     'node',
     'layout_builder',

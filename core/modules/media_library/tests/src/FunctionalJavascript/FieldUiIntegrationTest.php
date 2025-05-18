@@ -21,7 +21,7 @@ class FieldUiIntegrationTest extends MediaLibraryTestBase {
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['field_ui', 'block'];
+  protected static $modules = ['field_ui', 'navigation_variant_test'];
 
   /**
    * {@inheritdoc}

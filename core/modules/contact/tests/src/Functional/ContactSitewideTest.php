@@ -33,7 +33,7 @@ class ContactSitewideTest extends BrowserTestBase {
     'contact',
     'field_ui',
     'contact_test',
-    'block',
+    'navigation_variant_test',
     'error_service_test',
     'dblog',
   ];

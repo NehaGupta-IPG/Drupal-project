@@ -27,7 +27,7 @@ class ManageFieldsTest extends WebDriverTestBase {
     'node',
     'field_ui',
     'field_test',
-    'block',
+    'navigation_variant_test',
     'options',
   ];
 

@@ -30,7 +30,7 @@ class ManageFieldsFunctionalTestBase extends BrowserTestBase {
     'field_test',
     'taxonomy',
     'image',
-    'block',
+    'navigation_variant_test',
     'node_access_test',
   ];
 

@@ -15,7 +15,7 @@ class NodeAccessCacheRedirectWarningTest extends NodeTestBase {
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['block', 'node_access_test_empty'];
+  protected static $modules = ['navigation_variant_test', 'node_access_test_empty'];
 
   /**
    * {@inheritdoc}

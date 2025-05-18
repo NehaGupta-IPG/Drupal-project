@@ -43,7 +43,7 @@ class NodeEditFormTest extends NodeTestBase {
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['block', 'node', 'datetime'];
+  protected static $modules = ['navigation_variant_test', 'node', 'datetime'];
 
   /**
    * {@inheritdoc}

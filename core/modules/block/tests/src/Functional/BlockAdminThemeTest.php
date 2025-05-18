@@ -73,6 +73,9 @@ class BlockAdminThemeTest extends BrowserTestBase {
       'region' => 'header',
     ];
 
+    // Place a block.
+    $block = $this->drupalPlaceBlock('local_tasks_block', $settings);
+
     // Open admin page.
     $this->drupalGet('admin');
 

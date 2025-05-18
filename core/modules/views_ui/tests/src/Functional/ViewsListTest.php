@@ -17,7 +17,7 @@ class ViewsListTest extends UITestBase {
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['block', 'views_ui'];
+  protected static $modules = ['navigation_variant_test', 'views_ui'];
 
   /**
    * {@inheritdoc}

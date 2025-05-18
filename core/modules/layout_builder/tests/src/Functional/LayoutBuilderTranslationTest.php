@@ -23,7 +23,7 @@ class LayoutBuilderTranslationTest extends ContentTranslationTestBase {
     'contextual',
     'entity_test',
     'layout_builder',
-    'block',
+    'navigation_variant_test',
   ];
 
   /**

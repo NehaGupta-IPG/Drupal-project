@@ -33,7 +33,7 @@ abstract class InlineBlockTestBase extends WebDriverTestBase {
   protected static $modules = [
     'block_content',
     'layout_builder',
-    'block',
+    'navigation_variant_test',
     'node',
     'contextual',
   ];

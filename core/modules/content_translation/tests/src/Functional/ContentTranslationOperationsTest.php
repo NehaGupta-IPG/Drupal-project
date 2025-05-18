@@ -44,7 +44,7 @@ class ContentTranslationOperationsTest extends NodeTestBase {
     'content_translation',
     'node',
     'views',
-    'block',
+    'navigation_variant_test',
   ];
 
   /**

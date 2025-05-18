@@ -17,7 +17,7 @@ class SearchPageTextTest extends BrowserTestBase {
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['block', 'node', 'search'];
+  protected static $modules = ['navigation_variant_test', 'node', 'search'];
 
   /**
    * {@inheritdoc}

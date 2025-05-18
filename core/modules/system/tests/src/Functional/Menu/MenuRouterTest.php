@@ -18,7 +18,7 @@ class MenuRouterTest extends BrowserTestBase {
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['block', 'menu_test', 'test_page_test'];
+  protected static $modules = ['navigation_variant_test', 'menu_test', 'test_page_test'];
 
   /**
    * {@inheritdoc}

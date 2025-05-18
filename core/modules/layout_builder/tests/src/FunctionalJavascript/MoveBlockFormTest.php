@@ -25,7 +25,7 @@ class MoveBlockFormTest extends WebDriverTestBase {
    */
   protected static $modules = [
     'layout_builder',
-    'block',
+    'navigation_variant_test',
     'node',
     'contextual',
   ];

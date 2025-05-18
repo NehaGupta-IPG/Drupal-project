@@ -19,7 +19,7 @@ class LayoutBuilderLocalTaskTest extends BrowserTestBase {
    */
   protected static $modules = [
     'layout_builder',
-    'block',
+    'navigation_variant_test',
     'node',
   ];
 

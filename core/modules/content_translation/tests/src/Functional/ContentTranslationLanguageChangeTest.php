@@ -30,7 +30,7 @@ class ContentTranslationLanguageChangeTest extends NodeTestBase {
     'content_translation',
     'content_translation_test',
     'node',
-    'block',
+    'navigation_variant_test',
     'field_ui',
     'image',
   ];

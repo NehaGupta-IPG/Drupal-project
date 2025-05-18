@@ -27,7 +27,7 @@ class FieldUIDeleteTest extends BrowserTestBase {
     'node',
     'field_ui',
     'field_test',
-    'block',
+    'navigation_variant_test',
     'field_test_views',
   ];
 

@@ -20,7 +20,7 @@ class MediaUiJavascriptTest extends MediaJavascriptTestBase {
    * {@inheritdoc}
    */
   protected static $modules = [
-    'block',
+    'navigation_variant_test',
     'media_test_source',
   ];
 

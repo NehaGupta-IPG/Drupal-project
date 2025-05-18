@@ -28,7 +28,7 @@ class RouteCachingLanguageTest extends BrowserTestBase {
     'node',
     'content_translation',
     'link',
-    'block',
+    'navigation_variant_test',
   ];
 
   /**

@@ -17,7 +17,7 @@ class LayoutBuilderToolbarTest extends WebDriverTestBase {
    * {@inheritdoc}
    */
   protected static $modules = [
-    'block',
+    'navigation_variant_test',
     'node',
     'field_ui',
     'layout_builder',

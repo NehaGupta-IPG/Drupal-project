@@ -20,7 +20,7 @@ class EntityUuidIdTest extends BrowserTestBase {
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['block', 'content_translation', 'entity_test'];
+  protected static $modules = ['navigation_variant_test', 'content_translation', 'entity_test'];
 
   /**
    * {@inheritdoc}

@@ -25,7 +25,7 @@ class NodeTypeTranslationTest extends BrowserTestBase {
    * {@inheritdoc}
    */
   protected static $modules = [
-    'block',
+    'navigation_variant_test',
     'config_translation',
     'field_ui',
     'node',
