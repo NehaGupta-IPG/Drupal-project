@@ -5,6 +5,7 @@
  * Install, update and uninstall functions for the system module.
  */
 
+use GuzzleHttp\Exception\ClientException;
 use Drupal\Component\FileSecurity\FileSecurity;
 use Drupal\Component\FileSystem\FileSystem as FileSystemComponent;
 use Drupal\Component\Utility\Bytes;
@@ -729,19 +730,31 @@ function system_requirements($phase): array {
     $fileSystem->saveData('', $filename, FileExists::Replace);
     $url = $fileUrlGenerator->generateAbsoluteString($filename);
 
-    // Try to fetch the svg-file, so we can verify the presence of csp-header.
-    $response = \Drupal::httpClient()->head($url, ['headers' => ['Accept' => 'text/plain']]);
-    if (!$response->hasHeader('Content-Security-Policy')) {
+    try {
+      // Try to fetch the svg-file, so we can verify the presence of csp-header.
+      $response = \Drupal::httpClient()
+        ->head($url, ['headers' => ['Accept' => 'text/plain']]);
+      if (!$response->hasHeader('Content-Security-Policy')) {
+        $requirements['svg_csp_protection'] = [
+          'title' => new TranslatableMarkup('SVG Content-Security-Policy'),
+          'value' => t('Header missing'),
+          'severity' => REQUIREMENT_WARNING,
+          'description' => t('SVG-files can contain embedded scripts, which can pose a security risk. To avoid this, SVG-files should be served with a Content-Security-Policy header that blocks execution of inline scripts. See <a href=":url">:url</a> for more information.', [':url' => 'https://www.drupal.org/node/3493998']),
+        ];
+      }
+
+      // Remove the temporary svg-file.
+      $fileSystem->delete($filename);
+    }
+    catch (ClientException $exception) {
       $requirements['svg_csp_protection'] = [
         'title' => new TranslatableMarkup('SVG Content-Security-Policy'),
-        'value' => t('Header missing'),
-        'severity' => REQUIREMENT_WARNING,
-        'description' => t('SVG-files can contain embedded scripts, which can pose a security risk. To avoid this, SVG-files should be served with a Content-Security-Policy header that blocks execution of inline scripts. See <a href=":url">:url</a> for more information.', [':url' => 'https://www.drupal.org/node/3493998']),
+        'value' => t('Error while checking'),
+        'severity' => REQUIREMENT_ERROR,
+        'description' => t('Could not check SVG Content-Security-Policy: @error', ['@error' => $exception->getMessage()]),
       ];
+      Error::logException(\Drupal::logger('system'), $exception, 'Could not check SVG Content-Security-Policy.');
     }
-
-    // Remove the temporary svg-file.
-    $fileSystem->delete($filename);
   }
 
   // Report cron status.
