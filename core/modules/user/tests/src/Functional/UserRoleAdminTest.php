@@ -41,7 +41,6 @@ class UserRoleAdminTest extends BrowserTestBase {
       'administer permissions',
       'administer users',
     ]);
-    $this->drupalPlaceBlock('local_tasks_block', ['id' => 'test_role_admin_test_local_tasks_block']);
   }
 
   /**

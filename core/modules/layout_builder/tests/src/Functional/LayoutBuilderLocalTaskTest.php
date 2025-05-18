@@ -29,15 +29,6 @@ class LayoutBuilderLocalTaskTest extends BrowserTestBase {
   protected $defaultTheme = 'stark';
 
   /**
-   * {@inheritdoc}
-   */
-  protected function setUp(): void {
-    parent::setUp();
-
-    $this->drupalPlaceBlock('local_tasks_block');
-  }
-
-  /**
    * Tests the cacheability of local tasks with Layout Builder module installed.
    */
   public function testLocalTaskLayoutBuilderInstalledCacheability(): void {

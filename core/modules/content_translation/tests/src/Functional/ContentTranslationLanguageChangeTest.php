@@ -49,7 +49,6 @@ class ContentTranslationLanguageChangeTest extends NodeTestBase {
     foreach ($langcodes as $langcode) {
       static::createLanguageFromLangcode($langcode);
     }
-    $this->drupalPlaceBlock('local_tasks_block');
     $user = $this->drupalCreateUser([
       'administer site configuration',
       'administer nodes',

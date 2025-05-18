@@ -26,15 +26,6 @@ class MenuAccessTest extends BrowserTestBase {
   protected $defaultTheme = 'stark';
 
   /**
-   * {@inheritdoc}
-   */
-  protected function setUp(): void {
-    parent::setUp();
-
-    $this->drupalPlaceBlock('local_tasks_block');
-  }
-
-  /**
    * Tests menu link for route with access check.
    *
    * @see \Drupal\menu_test\Access\AccessCheck::access()

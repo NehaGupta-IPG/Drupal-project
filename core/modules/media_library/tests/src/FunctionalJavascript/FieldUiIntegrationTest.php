@@ -33,7 +33,6 @@ class FieldUiIntegrationTest extends MediaLibraryTestBase {
    */
   protected function setUp(): void {
     parent::setUp();
-    $this->drupalPlaceBlock('local_tasks_block');
 
     // Create a user who can add media fields.
     $user = $this->drupalCreateUser([

@@ -186,9 +186,6 @@ class NodeTypeTranslationTest extends BrowserTestBase {
     $name = $this->randomString();
     $this->drupalCreateContentType(['type' => $type, 'name' => $name]);
 
-    // Set tabs.
-    $this->drupalPlaceBlock('local_tasks_block', ['primary' => TRUE]);
-
     // Change default language.
     $this->drupalGet('admin/config/regional/language');
     $this->submitForm(['site_default_language' => 'es'], 'Save configuration');

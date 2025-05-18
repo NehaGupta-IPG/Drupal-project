@@ -41,7 +41,6 @@ class DisplayPageWebTest extends ViewTestBase {
     parent::setUp($import_test_views, $modules);
 
     $this->enableViewsTestModule();
-    $this->drupalPlaceBlock('local_tasks_block');
   }
 
   /**

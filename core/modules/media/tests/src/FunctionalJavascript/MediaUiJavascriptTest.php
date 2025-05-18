@@ -42,7 +42,6 @@ class MediaUiJavascriptTest extends MediaJavascriptTestBase {
   protected function setUp(): void {
     parent::setUp();
     $this->drupalPlaceBlock('local_actions_block');
-    $this->drupalPlaceBlock('local_tasks_block');
   }
 
   /**

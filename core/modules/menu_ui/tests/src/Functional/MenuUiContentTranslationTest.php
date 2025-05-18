@@ -41,7 +41,6 @@ class MenuUiContentTranslationTest extends BrowserTestBase {
 
     // Place menu block and local tasks block.
     $this->drupalPlaceBlock('system_menu_block:main');
-    $this->drupalPlaceBlock('local_tasks_block');
 
     // Create a 'page' content type.
     $this->drupalCreateContentType([

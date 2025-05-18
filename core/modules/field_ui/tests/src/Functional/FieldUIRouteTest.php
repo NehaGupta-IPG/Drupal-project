@@ -26,15 +26,6 @@ class FieldUIRouteTest extends BrowserTestBase {
   protected $defaultTheme = 'stark';
 
   /**
-   * {@inheritdoc}
-   */
-  protected function setUp(): void {
-    parent::setUp();
-
-    $this->drupalPlaceBlock('local_tasks_block');
-  }
-
-  /**
    * Ensures that entity types with bundles do not break following entity types.
    */
   public function testFieldUIRoutes(): void {

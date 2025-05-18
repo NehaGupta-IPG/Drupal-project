@@ -57,8 +57,6 @@ class TranslatedViewTest extends UITestBase {
       'translate interface',
     ];
 
-    $this->drupalPlaceBlock('local_tasks_block', ['id' => 'test_role_admin_test_local_tasks_block']);
-
     // Create and log in user.
     $this->adminUser = $this->drupalCreateUser($permissions);
     $this->drupalLogin($this->adminUser);

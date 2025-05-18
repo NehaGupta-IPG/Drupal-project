@@ -36,8 +36,6 @@ class LayoutBuilderToolbarTest extends WebDriverTestBase {
   protected function setUp(): void {
     parent::setUp();
 
-    $this->drupalPlaceBlock('local_tasks_block');
-
     // Create a content type.
     $this->createContentType([
       'type' => 'bundle_with_section_field',

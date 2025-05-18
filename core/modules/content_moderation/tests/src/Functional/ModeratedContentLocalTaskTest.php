@@ -40,8 +40,6 @@ class ModeratedContentLocalTaskTest extends BrowserTestBase {
   protected function setUp(): void {
     parent::setUp();
 
-    $this->drupalPlaceBlock('local_tasks_block');
-
     $this->adminUser = $this->drupalCreateUser([
       'access administration pages',
       'access content overview',

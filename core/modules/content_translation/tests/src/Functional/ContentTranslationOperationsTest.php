@@ -127,7 +127,6 @@ class ContentTranslationOperationsTest extends NodeTestBase {
         'administer languages' => TRUE,
       ]
     );
-    $this->drupalPlaceBlock('local_tasks_block');
     $this->drupalLogin($this->baseUser2);
     $this->drupalGet('node/' . $node->id());
     $this->assertSession()->linkByHrefExists('node/' . $node->id() . '/translations');

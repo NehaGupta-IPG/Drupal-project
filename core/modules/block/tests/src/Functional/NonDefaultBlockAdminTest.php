@@ -24,15 +24,6 @@ class NonDefaultBlockAdminTest extends BrowserTestBase {
   protected $defaultTheme = 'stark';
 
   /**
-   * {@inheritdoc}
-   */
-  protected function setUp(): void {
-    parent::setUp();
-
-    $this->drupalPlaceBlock('local_tasks_block');
-  }
-
-  /**
    * Tests non-default theme admin.
    */
   public function testNonDefaultBlockAdmin(): void {

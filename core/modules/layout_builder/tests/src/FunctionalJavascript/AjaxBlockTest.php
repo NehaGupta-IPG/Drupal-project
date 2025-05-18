@@ -21,7 +21,6 @@ class AjaxBlockTest extends WebDriverTestBase {
    * {@inheritdoc}
    */
   protected static $modules = [
-    'block',
     'node',
     'datetime',
     'layout_builder',
@@ -40,10 +39,6 @@ class AjaxBlockTest extends WebDriverTestBase {
    */
   protected function setUp(): void {
     parent::setUp();
-
-    // @todo The Layout Builder UI relies on local tasks; fix in
-    //   https://www.drupal.org/project/drupal/issues/2917777.
-    $this->drupalPlaceBlock('local_tasks_block');
 
     $this->drupalLogin($this->drupalCreateUser([
       'configure any layout',

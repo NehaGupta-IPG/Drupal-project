@@ -46,8 +46,6 @@ class LayoutBuilderNestedFormUiTest extends WebDriverTestBase {
   protected function setUp(): void {
     parent::setUp();
 
-    $this->drupalPlaceBlock('local_tasks_block');
-
     // Create a separate node to add a form block to, respectively.
     // - Block with form api form will be added to first node layout.
     // - Block with inline template with <form> tag added to second node layout.

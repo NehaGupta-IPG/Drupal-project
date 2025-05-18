@@ -41,7 +41,6 @@ class MediaUiReferenceWidgetTest extends MediaFunctionalTestBase {
   protected function setUp(): void {
     parent::setUp();
     $this->drupalPlaceBlock('local_actions_block');
-    $this->drupalPlaceBlock('local_tasks_block');
   }
 
   /**

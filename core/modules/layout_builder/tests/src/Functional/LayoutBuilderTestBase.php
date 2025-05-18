@@ -41,8 +41,6 @@ class LayoutBuilderTestBase extends BrowserTestBase {
   protected function setUp(): void {
     parent::setUp();
 
-    $this->drupalPlaceBlock('local_tasks_block');
-
     // Create two nodes.
     $this->createContentType([
       'type' => 'bundle_with_section_field',

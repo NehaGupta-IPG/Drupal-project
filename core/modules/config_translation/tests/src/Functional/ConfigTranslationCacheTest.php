@@ -113,7 +113,6 @@ class ConfigTranslationCacheTest extends BrowserTestBase {
     foreach ($this->langcodes as $langcode) {
       ConfigurableLanguage::createFromLangcode($langcode)->save();
     }
-    $this->drupalPlaceBlock('local_tasks_block');
     $this->drupalPlaceBlock('page_title_block');
   }
 

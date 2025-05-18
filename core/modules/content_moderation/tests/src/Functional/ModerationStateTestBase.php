@@ -78,7 +78,6 @@ abstract class ModerationStateTestBase extends BrowserTestBase {
     parent::setUp();
     $this->workflow = $this->createEditorialWorkflow();
     $this->adminUser = $this->drupalCreateUser($this->permissions);
-    $this->drupalPlaceBlock('local_tasks_block', ['id' => 'tabs_block']);
     $this->drupalPlaceBlock('page_title_block');
     $this->drupalPlaceBlock('local_actions_block', ['id' => 'actions_block']);
   }

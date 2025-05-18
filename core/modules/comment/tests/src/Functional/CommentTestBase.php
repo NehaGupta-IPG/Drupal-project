@@ -96,7 +96,6 @@ abstract class CommentTestBase extends BrowserTestBase {
 
     // Create a test node authored by the web user.
     $this->node = $this->drupalCreateNode(['type' => 'article', 'promote' => 1, 'uid' => $this->webUser->id()]);
-    $this->drupalPlaceBlock('local_tasks_block');
   }
 
   /**

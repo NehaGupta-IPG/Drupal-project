@@ -43,7 +43,6 @@ class MediaOverviewTest extends MediaLibraryTestBase {
       ],
     ]);
 
-    $this->drupalPlaceBlock('local_tasks_block');
     $this->drupalPlaceBlock('local_actions_block');
 
     $user = $this->drupalCreateUser([

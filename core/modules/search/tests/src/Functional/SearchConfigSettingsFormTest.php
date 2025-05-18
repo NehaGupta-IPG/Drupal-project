@@ -82,7 +82,6 @@ class SearchConfigSettingsFormTest extends BrowserTestBase {
 
     // Enable the search block.
     $this->drupalPlaceBlock('search_form_block');
-    $this->drupalPlaceBlock('local_tasks_block', ['id' => 'local_tasks']);
     $this->drupalPlaceBlock('page_title_block');
   }
 

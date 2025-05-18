@@ -115,7 +115,6 @@ class FilterFormatAccessTest extends BrowserTestBase {
       $this->secondAllowedFormat->getPermissionName(),
       $this->disallowedFormat->getPermissionName(),
     ]);
-    $this->drupalPlaceBlock('local_tasks_block');
   }
 
   /**

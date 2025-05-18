@@ -36,7 +36,6 @@ class EntityUuidIdTest extends BrowserTestBase {
     $this->createLanguageFromLangcode('af');
     $this->enableContentTranslation('entity_test_uuid_id', 'entity_test_uuid_id');
     $this->drupalPlaceBlock('page_title_block');
-    $this->drupalPlaceBlock('local_tasks_block');
   }
 
   /**

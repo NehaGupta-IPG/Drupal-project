@@ -204,7 +204,6 @@ class NodeRevisionsUiTest extends NodeTestBase {
    * @covers \Drupal\node\Hook\NodeHooks1::localTasksAlter
    */
   public function testNodeDuplicateRevisionsTab(): void {
-    $this->drupalPlaceBlock('local_tasks_block');
     $this->drupalLogin($this->editor);
 
     $node = $this->drupalCreateNode();
