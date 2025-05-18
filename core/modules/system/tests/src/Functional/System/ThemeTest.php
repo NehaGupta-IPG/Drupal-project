@@ -31,7 +31,7 @@ class ThemeTest extends BrowserTestBase {
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['node', 'navigation_variant_test', 'file'];
+  protected static $modules = ['node', 'block', 'file'];
 
   /**
    * {@inheritdoc}
@@ -66,6 +66,7 @@ class ThemeTest extends BrowserTestBase {
     ]);
     $this->drupalLogin($this->adminUser);
     $this->node = $this->drupalCreateNode();
+    $this->drupalPlaceBlock('local_tasks_block');
   }
 
   /**
@@ -223,6 +224,7 @@ class ThemeTest extends BrowserTestBase {
     $this->container->get('theme_installer')->install(['olivero']);
 
     // Ensure only valid themes are listed in the local tasks.
+    $this->drupalPlaceBlock('local_tasks_block', ['region' => 'header']);
     $this->drupalGet('admin/appearance/settings');
     $theme_handler = \Drupal::service('theme_handler');
     $this->assertSession()->linkExists($theme_handler->getName('starterkit_theme'));
@@ -232,6 +234,7 @@ class ThemeTest extends BrowserTestBase {
     // If a hidden theme is an admin theme it should be viewable.
     \Drupal::configFactory()->getEditable('system.theme')->set('admin', 'stable9')->save();
     \Drupal::service('router.builder')->rebuildIfNeeded();
+    $this->drupalPlaceBlock('local_tasks_block', ['region' => 'header', 'theme' => 'stable9']);
     $this->drupalGet('admin/appearance/settings');
     $this->assertSession()->linkExists($theme_handler->getName('stable9'));
     $this->drupalGet('admin/appearance/settings/stable9');
@@ -433,6 +436,7 @@ class ThemeTest extends BrowserTestBase {
     // First, install Stark and set it as the default theme programmatically.
     $theme_installer->install(['stark']);
     $this->config('system.theme')->set('default', 'stark')->save();
+    $this->drupalPlaceBlock('local_tasks_block');
 
     // Install Olivero and set it as the default theme.
     $theme_installer->install(['olivero']);

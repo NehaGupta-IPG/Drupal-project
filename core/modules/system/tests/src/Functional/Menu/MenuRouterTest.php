@@ -18,7 +18,7 @@ class MenuRouterTest extends BrowserTestBase {
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['navigation_variant_test', 'menu_test', 'test_page_test'];
+  protected static $modules = ['block', 'menu_test', 'test_page_test'];
 
   /**
    * {@inheritdoc}
@@ -38,15 +38,14 @@ class MenuRouterTest extends BrowserTestBase {
   protected function setUp(): void {
     // Enable dummy module that implements hook_menu.
     parent::setUp();
-
-    $this->drupalPlaceBlock('system_menu_block:tools');
-    $this->drupalPlaceBlock('page_title_block');
   }
 
   /**
    * Tests menu integration.
    */
   public function testMenuIntegration(): void {
+    $this->drupalPlaceBlock('system_menu_block:tools');
+    $this->drupalPlaceBlock('local_tasks_block');
     $this->doTestTitleMenuCallback();
     $this->doTestMenuOptionalPlaceholders();
     $this->doTestMenuHierarchy();

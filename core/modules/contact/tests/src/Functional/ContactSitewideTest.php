@@ -44,16 +44,6 @@ class ContactSitewideTest extends BrowserTestBase {
   protected $defaultTheme = 'stark';
 
   /**
-   * {@inheritdoc}
-   */
-  protected function setUp(): void {
-    parent::setUp();
-    $this->drupalPlaceBlock('system_breadcrumb_block');
-    $this->drupalPlaceBlock('local_actions_block');
-    $this->drupalPlaceBlock('page_title_block');
-  }
-
-  /**
    * Tests configuration options and the site-wide contact form.
    */
   public function testSiteWideContact(): void {

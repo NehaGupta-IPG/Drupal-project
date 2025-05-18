@@ -30,14 +30,6 @@ class MediaUiFunctionalTest extends MediaFunctionalTestBase {
   protected $defaultTheme = 'stark';
 
   /**
-   * {@inheritdoc}
-   */
-  protected function setUp(): void {
-    parent::setUp();
-    $this->drupalPlaceBlock('local_actions_block');
-  }
-
-  /**
    * Tests the media actions (add/edit/delete).
    */
   public function testMediaWithOnlyOneMediaType(): void {

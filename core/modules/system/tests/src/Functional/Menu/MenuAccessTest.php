@@ -18,7 +18,7 @@ class MenuAccessTest extends BrowserTestBase {
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['navigation_variant_test', 'filter', 'toolbar', 'menu_ui'];
+  protected static $modules = ['block', 'filter', 'toolbar', 'menu_ui'];
 
   /**
    * {@inheritdoc}

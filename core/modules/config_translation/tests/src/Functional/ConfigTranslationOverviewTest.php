@@ -76,7 +76,6 @@ class ConfigTranslationOverviewTest extends BrowserTestBase {
       ConfigurableLanguage::createFromLangcode($langcode)->save();
     }
     $this->localeStorage = $this->container->get('locale.storage');
-    $this->drupalPlaceBlock('page_title_block');
   }
 
   /**

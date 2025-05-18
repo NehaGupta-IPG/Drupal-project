@@ -37,7 +37,6 @@ class ViewsListTest extends UITestBase {
   protected function setUp($import_test_views = TRUE, $modules = []): void {
     parent::setUp($import_test_views, $modules);
 
-    $this->drupalPlaceBlock('local_actions_block');
     $this->adminUser = $this->drupalCreateUser(['administer views']);
     $this->drupalLogin($this->adminUser);
   }

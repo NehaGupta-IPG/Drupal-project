@@ -26,7 +26,7 @@ class MenuUiContentTranslationTest extends BrowserTestBase {
    * {@inheritdoc}
    */
   protected static $modules = [
-    'navigation_variant_test',
+    'block',
     'language',
     'content_translation',
     'menu_ui',
@@ -41,6 +41,7 @@ class MenuUiContentTranslationTest extends BrowserTestBase {
 
     // Place menu block and local tasks block.
     $this->drupalPlaceBlock('system_menu_block:main');
+    $this->drupalPlaceBlock('local_tasks_block');
 
     // Create a 'page' content type.
     $this->drupalCreateContentType([

@@ -43,8 +43,6 @@ class MediaOverviewTest extends MediaLibraryTestBase {
       ],
     ]);
 
-    $this->drupalPlaceBlock('local_actions_block');
-
     $user = $this->drupalCreateUser([
       'access media overview',
       'create media',

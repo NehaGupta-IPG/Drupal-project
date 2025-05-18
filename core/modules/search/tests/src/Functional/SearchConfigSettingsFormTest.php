@@ -20,7 +20,7 @@ class SearchConfigSettingsFormTest extends BrowserTestBase {
    * {@inheritdoc}
    */
   protected static $modules = [
-    'navigation_variant_test',
+    'block',
     'dblog',
     'node',
     'search',
@@ -79,10 +79,6 @@ class SearchConfigSettingsFormTest extends BrowserTestBase {
     $this->submitForm($edit, 'Save');
 
     $this->container->get('plugin.manager.search')->createInstance('node_search')->updateIndex();
-
-    // Enable the search block.
-    $this->drupalPlaceBlock('search_form_block');
-    $this->drupalPlaceBlock('page_title_block');
   }
 
   /**
@@ -164,6 +160,9 @@ class SearchConfigSettingsFormTest extends BrowserTestBase {
    * Verifies that you can disable individual search plugins.
    */
   public function testSearchModuleDisabling(): void {
+    $this->drupalPlaceBlock('search_form_block');
+    $this->drupalPlaceBlock('local_tasks_block', ['id' => 'local_tasks']);
+
     // Array of search plugins to test: 'keys' are the keywords to search for,
     // and 'text' is the text to assert is on the results page.
     $plugin_info = [
@@ -253,6 +252,8 @@ class SearchConfigSettingsFormTest extends BrowserTestBase {
    * Tests the ordering of search pages on a clean install.
    */
   public function testDefaultSearchPageOrdering(): void {
+    $this->drupalPlaceBlock('local_tasks_block', ['id' => 'local_tasks']);
+
     $this->drupalGet('search');
     $elements = $this->xpath('//div[@id="block-local-tasks"]//a');
     $this->assertSame(Url::fromRoute('search.view_node_search')->toString(), $elements[0]->getAttribute('href'));
@@ -264,6 +265,8 @@ class SearchConfigSettingsFormTest extends BrowserTestBase {
    * Tests multiple search pages of the same type.
    */
   public function testMultipleSearchPages(): void {
+    $this->drupalPlaceBlock('local_tasks_block', ['id' => 'local_tasks']);
+
     $this->assertDefaultSearch('node_search', 'The default page is set to the installer default.');
     $search_storage = \Drupal::entityTypeManager()->getStorage('search_page');
     $entities = $search_storage->loadMultiple();

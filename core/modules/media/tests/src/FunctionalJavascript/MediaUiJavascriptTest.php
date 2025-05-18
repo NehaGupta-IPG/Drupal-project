@@ -37,14 +37,6 @@ class MediaUiJavascriptTest extends MediaJavascriptTestBase {
   protected $testMediaType;
 
   /**
-   * {@inheritdoc}
-   */
-  protected function setUp(): void {
-    parent::setUp();
-    $this->drupalPlaceBlock('local_actions_block');
-  }
-
-  /**
    * Tests a media type administration.
    */
   public function testMediaTypes(): void {

@@ -45,7 +45,6 @@ class SearchPageTextTest extends BrowserTestBase {
       'access user profiles',
       'use advanced search',
     ]);
-    $this->drupalPlaceBlock('page_title_block');
   }
 
   /**

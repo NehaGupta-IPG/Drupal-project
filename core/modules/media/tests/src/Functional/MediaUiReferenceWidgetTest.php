@@ -36,14 +36,6 @@ class MediaUiReferenceWidgetTest extends MediaFunctionalTestBase {
   protected $defaultTheme = 'stark';
 
   /**
-   * {@inheritdoc}
-   */
-  protected function setUp(): void {
-    parent::setUp();
-    $this->drupalPlaceBlock('local_actions_block');
-  }
-
-  /**
    * Data provider for testMediaReferenceWidget().
    *
    * @return array[]

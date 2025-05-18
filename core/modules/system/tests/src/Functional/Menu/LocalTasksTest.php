@@ -23,7 +23,7 @@ class LocalTasksTest extends BrowserTestBase {
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['navigation_variant_test', 'menu_test', 'entity_test', 'node'];
+  protected static $modules = ['block', 'menu_test', 'entity_test', 'node'];
 
   /**
    * {@inheritdoc}
