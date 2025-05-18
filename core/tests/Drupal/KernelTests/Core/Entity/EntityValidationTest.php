@@ -1,8 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\KernelTests\Core\Entity;
 
+use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\Plugin\Validation\Constraint\CompositeConstraintBase;
+use Drupal\entity_test\EntityTestHelper;
 use Drupal\language\Entity\ConfigurableLanguage;
 
 /**
@@ -13,9 +17,7 @@ use Drupal\language\Entity\ConfigurableLanguage;
 class EntityValidationTest extends EntityKernelTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['filter', 'text', 'language'];
 
@@ -73,7 +75,7 @@ class EntityValidationTest extends EntityKernelTestBase {
    * @return \Drupal\Core\Entity\EntityInterface
    *   The created test entity.
    */
-  protected function createTestEntity($entity_type) {
+  protected function createTestEntity($entity_type): EntityInterface {
     $this->entityName = $this->randomMachineName();
     $this->entityUser = $this->createUser();
 
@@ -97,16 +99,12 @@ class EntityValidationTest extends EntityKernelTestBase {
   /**
    * Tests validating test entity types.
    */
-  public function testValidation() {
+  public function testValidation(): void {
     // Ensure that the constraint manager is marked as cached cleared.
 
     // Use the protected property on the cache_clearer first to check whether
     // the constraint manager is added there.
-
-    // Ensure that the proxy class is initialized, which has the necessary
-    // method calls attached.
-    \Drupal::service('plugin.cache_clearer');
-    $plugin_cache_clearer = \Drupal::service('drupal.proxy_original_service.plugin.cache_clearer');
+    $plugin_cache_clearer = \Drupal::service('plugin.cache_clearer');
     $get_cached_discoveries = function () {
       return $this->cachedDiscoveries;
     };
@@ -119,7 +117,7 @@ class EntityValidationTest extends EntityKernelTestBase {
     $this->assertContains('Drupal\Core\Validation\ConstraintManager', $cached_discovery_classes);
 
     // All entity variations have to have the same results.
-    foreach (entity_test_entity_types() as $entity_type) {
+    foreach (EntityTestHelper::getEntityTypes() as $entity_type) {
       $this->checkValidation($entity_type);
     }
   }
@@ -130,7 +128,7 @@ class EntityValidationTest extends EntityKernelTestBase {
    * @param string $entity_type
    *   The entity type to run the tests with.
    */
-  protected function checkValidation($entity_type) {
+  protected function checkValidation($entity_type): void {
     $entity = $this->createTestEntity($entity_type);
     $violations = $entity->validate();
     $this->assertEquals(0, $violations->count(), 'Validation passes.');
@@ -140,13 +138,13 @@ class EntityValidationTest extends EntityKernelTestBase {
     $test_entity->id->value = -1;
     $violations = $test_entity->validate();
     $this->assertEquals(1, $violations->count(), 'Validation failed.');
-    $this->assertEquals(t('%name: The integer must be larger or equal to %min.', ['%name' => 'ID', '%min' => 0]), $violations[0]->getMessage());
+    $this->assertEquals('ID: The integer must be larger or equal to 0.', $violations[0]->getMessage());
 
     $test_entity = clone $entity;
     $test_entity->uuid->value = $this->randomString(129);
     $violations = $test_entity->validate();
     $this->assertEquals(1, $violations->count(), 'Validation failed.');
-    $this->assertEquals(t('%name: may not be longer than @max characters.', ['%name' => 'UUID', '@max' => 128]), $violations[0]->getMessage());
+    $this->assertEquals('UUID: may not be longer than 128 characters.', $violations[0]->getMessage());
 
     $test_entity = clone $entity;
     $langcode_key = $this->entityTypeManager->getDefinition($entity_type)->getKey('langcode');
@@ -154,7 +152,7 @@ class EntityValidationTest extends EntityKernelTestBase {
     $violations = $test_entity->validate();
     // This should fail on AllowedValues and Length constraints.
     $this->assertEquals(2, $violations->count(), 'Validation failed.');
-    $this->assertEquals(t('This value is too long. It should have %limit characters or less.', ['%limit' => '12']), $violations[0]->getMessage());
+    $this->assertEquals('This value is too long. It should have 12 characters or less.', $violations[0]->getMessage());
     $this->assertEquals('The value you selected is not a valid choice.', $violations[1]->getMessage());
 
     $test_entity = clone $entity;
@@ -167,7 +165,7 @@ class EntityValidationTest extends EntityKernelTestBase {
     $test_entity->name->value = $this->randomString(65);
     $violations = $test_entity->validate();
     $this->assertEquals(1, $violations->count(), 'Validation failed.');
-    $this->assertEquals(t('%name: may not be longer than @max characters.', ['%name' => 'Name', '@max' => 64]), $violations[0]->getMessage());
+    $this->assertEquals('Name: may not be longer than 64 characters.', $violations[0]->getMessage());
 
     // Make sure the information provided by a violation is correct.
     $violation = $violations[0];
@@ -179,7 +177,7 @@ class EntityValidationTest extends EntityKernelTestBase {
     $test_entity->set('user_id', 9999);
     $violations = $test_entity->validate();
     $this->assertEquals(1, $violations->count(), 'Validation failed.');
-    $this->assertEquals(t('The referenced entity (%type: %id) does not exist.', ['%type' => 'user', '%id' => 9999]), $violations[0]->getMessage());
+    $this->assertEquals('The referenced entity (user: 9999) does not exist.', $violations[0]->getMessage());
 
     $test_entity = clone $entity;
     $test_entity->field_test_text->format = $this->randomString(33);
@@ -197,7 +195,7 @@ class EntityValidationTest extends EntityKernelTestBase {
   /**
    * Tests composite constraints.
    */
-  public function testCompositeConstraintValidation() {
+  public function testCompositeConstraintValidation(): void {
     $entity = $this->createTestEntity('entity_test_composite_constraint');
     $violations = $entity->validate();
     $this->assertEquals(0, $violations->count());
@@ -220,7 +218,7 @@ class EntityValidationTest extends EntityKernelTestBase {
   /**
    * Tests the EntityChangedConstraintValidator with multiple translations.
    */
-  public function testEntityChangedConstraintOnConcurrentMultilingualEditing() {
+  public function testEntityChangedConstraintOnConcurrentMultilingualEditing(): void {
     $this->installEntitySchema('entity_test_mulrev_changed');
     $storage = \Drupal::entityTypeManager()
       ->getStorage('entity_test_mulrev_changed');

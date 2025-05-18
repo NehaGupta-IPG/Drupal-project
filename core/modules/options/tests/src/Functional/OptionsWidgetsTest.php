@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\options\Functional;
 
 use Drupal\entity_test\Entity\EntityTest;
@@ -15,9 +17,7 @@ use Drupal\Tests\field\Functional\FieldTestBase;
 class OptionsWidgetsTest extends FieldTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = [
     'node',
@@ -124,7 +124,7 @@ class OptionsWidgetsTest extends FieldTestBase {
   /**
    * Tests the 'options_buttons' widget (single select).
    */
-  public function testRadioButtons() {
+  public function testRadioButtons(): void {
     // Create an instance of the 'single value' field.
     $field = FieldConfig::create([
       'field_storage' => $this->card1,
@@ -182,7 +182,7 @@ class OptionsWidgetsTest extends FieldTestBase {
   /**
    * Tests the 'options_buttons' widget (multiple select).
    */
-  public function testCheckBoxes() {
+  public function testCheckBoxes(): void {
     // Create an instance of the 'multiple values' field.
     $field = FieldConfig::create([
       'field_storage' => $this->card2,
@@ -272,7 +272,7 @@ class OptionsWidgetsTest extends FieldTestBase {
   /**
    * Tests the 'options_select' widget (single select).
    */
-  public function testSelectListSingle() {
+  public function testSelectListSingle(): void {
     // Create an instance of the 'single value' field.
     $field = FieldConfig::create([
       'field_storage' => $this->card1,
@@ -344,7 +344,7 @@ class OptionsWidgetsTest extends FieldTestBase {
     // Test optgroups.
 
     $this->card1->setSetting('allowed_values', []);
-    $this->card1->setSetting('allowed_values_function', 'options_test_allowed_values_callback');
+    $this->card1->setSetting('allowed_values_function', '\Drupal\options_test\OptionsAllowedValues::simpleValues');
     $this->card1->save();
 
     // Display form: with no field data, nothing is selected
@@ -377,7 +377,7 @@ class OptionsWidgetsTest extends FieldTestBase {
   /**
    * Tests the '#required_error' attribute for the select list.
    */
-  public function testSelectListRequiredErrorAttribute() {
+  public function testSelectListRequiredErrorAttribute(): void {
     // Enable form alter hook.
     \Drupal::state()->set('options_test.form_alter_enable', TRUE);
     // Create an instance of the 'single value' field.
@@ -409,13 +409,13 @@ class OptionsWidgetsTest extends FieldTestBase {
     // Submit form: select invalid 'none' option.
     $edit = ['card_1' => '_none'];
     $this->submitForm($edit, 'Save');
-    $this->assertSession()->responseContains(t('This is custom message for required field.'));
+    $this->assertSession()->responseContains('This is custom message for required field.');
   }
 
   /**
    * Tests the 'options_select' widget (multiple select).
    */
-  public function testSelectListMultiple() {
+  public function testSelectListMultiple(): void {
     // Create an instance of the 'multiple values' field.
     $field = FieldConfig::create([
       'field_storage' => $this->card2,
@@ -505,7 +505,7 @@ class OptionsWidgetsTest extends FieldTestBase {
 
     // Use a callback function defining optgroups.
     $this->card2->setSetting('allowed_values', []);
-    $this->card2->setSetting('allowed_values_function', 'options_test_allowed_values_callback');
+    $this->card2->setSetting('allowed_values_function', '\Drupal\options_test\OptionsAllowedValues::simpleValues');
     $this->card2->save();
     $field->setRequired(FALSE);
     $field->save();
@@ -540,7 +540,7 @@ class OptionsWidgetsTest extends FieldTestBase {
   /**
    * Tests the 'options_select' widget (float values).
    */
-  public function testSelectListFloat() {
+  public function testSelectListFloat(): void {
 
     // Create an instance of the 'float value' field.
     $field = FieldConfig::create([
@@ -587,7 +587,7 @@ class OptionsWidgetsTest extends FieldTestBase {
   /**
    * Tests the 'options_select' and 'options_button' widget for empty value.
    */
-  public function testEmptyValue() {
+  public function testEmptyValue(): void {
     // Create an instance of the 'single value' field.
     $field = FieldConfig::create([
       'field_storage' => $this->card1,
@@ -639,7 +639,7 @@ class OptionsWidgetsTest extends FieldTestBase {
    *
    * @see options_test_options_list_alter()
    */
-  public function testOptionsListAlter() {
+  public function testOptionsListAlter(): void {
     $field1 = FieldConfig::create([
       'field_storage' => $this->card1,
       'bundle' => 'entity_test',
@@ -692,7 +692,7 @@ class OptionsWidgetsTest extends FieldTestBase {
     $xpath = '//select[@id=:id]//option[@value="_none" and text()=:label]';
     $xpath_args = [':id' => 'edit-card-1', ':label' => '- None -'];
     $this->assertSession()->elementExists('xpath', $this->assertSession()->buildXPathQuery($xpath, $xpath_args));
-    $xpath_args = [':id' => 'edit-card-4', ':label' => '- Please select something -'];
+    $xpath_args = [':id' => 'edit-card-4', ':label' => '- Select something -'];
     $this->assertSession()->elementExists('xpath', $this->assertSession()->buildXPathQuery($xpath, $xpath_args));
 
     // Display form: check that options are displayed correctly.

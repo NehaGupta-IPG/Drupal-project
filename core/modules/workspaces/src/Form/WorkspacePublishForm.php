@@ -6,17 +6,19 @@ use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Form\ConfirmFormBase;
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\Core\Routing\RedirectDestinationInterface;
+use Drupal\Core\Form\WorkspaceSafeFormInterface;
 use Drupal\Core\Url;
 use Drupal\workspaces\WorkspaceAccessException;
 use Drupal\workspaces\WorkspaceInterface;
 use Drupal\workspaces\WorkspaceOperationFactory;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
+// cspell:ignore differring
+
 /**
  * Provides the workspace publishing form.
  */
-class WorkspacePublishForm extends ConfirmFormBase implements WorkspaceFormInterface, ContainerInjectionInterface {
+class WorkspacePublishForm extends ConfirmFormBase implements ContainerInjectionInterface, WorkspaceSafeFormInterface {
 
   /**
    * The workspace that will be published.
@@ -46,16 +48,10 @@ class WorkspacePublishForm extends ConfirmFormBase implements WorkspaceFormInter
    *   The workspace operation factory service.
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager.
-   * @param \Drupal\Core\Routing\RedirectDestinationInterface|null $redirectDestination
-   *   The redirect destination service.
    */
-  public function __construct(WorkspaceOperationFactory $workspace_operation_factory, EntityTypeManagerInterface $entity_type_manager, ?RedirectDestinationInterface $redirectDestination = NULL) {
+  public function __construct(WorkspaceOperationFactory $workspace_operation_factory, EntityTypeManagerInterface $entity_type_manager) {
     $this->workspaceOperationFactory = $workspace_operation_factory;
     $this->entityTypeManager = $entity_type_manager;
-    if ($redirectDestination === NULL) {
-      $this->redirectDestination = \Drupal::service('redirect.destination');
-      @trigger_error('Calling' . __METHOD__ . '() without the $redirectDestination argument is deprecated in drupal:10.1.0 and is required in drupal:11.0.0. See https://www.drupal.org/node/3343983', E_USER_DEPRECATED);
-    }
   }
 
   /**
@@ -64,8 +60,7 @@ class WorkspacePublishForm extends ConfirmFormBase implements WorkspaceFormInter
   public static function create(ContainerInterface $container) {
     return new static(
       $container->get('workspaces.operation_factory'),
-      $container->get('entity_type.manager'),
-      $container->get('redirect.destination')
+      $container->get('entity_type.manager')
     );
   }
 
@@ -79,7 +74,7 @@ class WorkspacePublishForm extends ConfirmFormBase implements WorkspaceFormInter
   /**
    * {@inheritdoc}
    */
-  public function buildForm(array $form, FormStateInterface $form_state, WorkspaceInterface $workspace = NULL) {
+  public function buildForm(array $form, FormStateInterface $form_state, ?WorkspaceInterface $workspace = NULL) {
     $this->workspace = $workspace;
 
     $form = parent::buildForm($form, $form_state);
@@ -141,7 +136,7 @@ class WorkspacePublishForm extends ConfirmFormBase implements WorkspaceFormInter
    * {@inheritdoc}
    */
   public function getCancelUrl() {
-    return Url::fromRoute('entity.workspace.collection', [], ['query' => $this->redirectDestination->getAsArray()]);
+    return Url::fromRoute('entity.workspace.collection', [], ['query' => $this->getDestinationArray()]);
   }
 
   /**
@@ -159,6 +154,7 @@ class WorkspacePublishForm extends ConfirmFormBase implements WorkspaceFormInter
     }
     catch (\Exception $e) {
       $this->messenger()->addMessage($this->t('Publication failed. All errors have been logged.'), 'error');
+      $this->getLogger('workspaces')->error($e->getMessage());
     }
   }
 

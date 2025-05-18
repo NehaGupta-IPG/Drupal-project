@@ -1,10 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\layout_builder\Functional;
 
 use Drupal\Core\Url;
 use Drupal\Tests\BrowserTestBase;
-use Drupal\Tests\field\Traits\EntityReferenceTestTrait;
+use Drupal\Tests\field\Traits\EntityReferenceFieldCreationTrait;
 use Drupal\Tests\node\Traits\ContentTypeCreationTrait;
 use Drupal\Tests\node\Traits\NodeCreationTrait;
 
@@ -16,7 +18,7 @@ use Drupal\Tests\node\Traits\NodeCreationTrait;
 class LayoutBuilderFieldBlockEntityReferenceCacheTagsTest extends BrowserTestBase {
 
   use ContentTypeCreationTrait;
-  use EntityReferenceTestTrait;
+  use EntityReferenceFieldCreationTrait;
   use NodeCreationTrait;
 
   /**
@@ -70,7 +72,7 @@ class LayoutBuilderFieldBlockEntityReferenceCacheTagsTest extends BrowserTestBas
   /**
    * Tests cache tags on field block for entity reference field.
    */
-  public function testEntityReferenceFieldBlockCaching() {
+  public function testEntityReferenceFieldBlockCaching(): void {
     $assert_session = $this->assertSession();
 
     // Create two nodes, one of the referenced content type and one of the
@@ -125,7 +127,7 @@ class LayoutBuilderFieldBlockEntityReferenceCacheTagsTest extends BrowserTestBas
    *   This tests whether all expected tags are in the page cache tags, not that
    *   expected tags and page cache tags are identical.
    */
-  protected function verifyPageCacheContainsTags(Url $url, $hit_or_miss, $tags = FALSE) {
+  protected function verifyPageCacheContainsTags(Url $url, $hit_or_miss, $tags = FALSE): void {
     $this->drupalGet($url);
     $this->assertSession()->responseHeaderEquals('X-Drupal-Cache', $hit_or_miss);
 

@@ -35,9 +35,9 @@ This plugin can also clean up packages that were installed outside of the
 vendor directory, using composer/installers. This allows users to configure the
 plugin to clean up, for instance, Drupal extensions and Drupal core.
 
-2) The plugin also adds .htaccess and web.config files to the root of the
-project's vendor directory. These files will perform due diligence to keep the
-web server from serving files from within the vendor directory.
+2) The plugin also adds .htaccess file to the root of the
+project's vendor directory. The file will perform due diligence to keep the
+web server from serving file from within the vendor directory.
 
 How do I set it up?
 -------------------
@@ -50,7 +50,7 @@ When you install or update, this plugin will look through each package and
 remove directories it knows about.
 
 You can see the list of default package cleanups for this plugin in Config.php.
-If you discover that this list needs updating, please file an issue about it:
+If you discover that this list needs updating, file an issue about it:
 https://www.drupal.org/project/issues/drupal
 
 In addition to the default list of packages, you can configure the plugin using

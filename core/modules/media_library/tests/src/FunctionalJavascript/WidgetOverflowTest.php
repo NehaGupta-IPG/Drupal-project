@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\media_library\FunctionalJavascript;
 
 use Drupal\Tests\TestFileCreationTrait;
@@ -8,6 +10,7 @@ use Drupal\Tests\TestFileCreationTrait;
  * Tests that uploads in the 'media_library_widget' works as expected.
  *
  * @group media_library
+ * @group #slow
  *
  * @todo This test will occasionally fail with SQLite until
  *   https://www.drupal.org/node/3066447 is addressed.
@@ -103,7 +106,6 @@ class WidgetOverflowTest extends MediaLibraryTestBase {
     }
 
     $assert_session = $this->assertSession();
-    $page = $this->getSession()->getPage();
     $this->drupalGet('node/add/basic_page');
     // Upload 5 files into a media field that only allows 2.
     $this->openMediaLibraryForField('field_twin_media');
@@ -116,11 +118,11 @@ class WidgetOverflowTest extends MediaLibraryTestBase {
     else {
       $this->pressSaveButton();
     }
-    $this->waitForElementTextContains('.messages--warning', 'There are currently 5 items selected. The maximum number of items for the field is 2. Please remove 3 items from the selection.');
+    $this->waitForElementTextContains('.messages--warning', 'There are currently 5 items selected. The maximum number of items for the field is 2. Remove 3 items from the selection.');
     // If the user tries to insert the selected items anyway, they should get
     // an error.
     $this->pressInsertSelected(NULL, FALSE);
-    $this->waitForElementTextContains('.messages--error', 'There are currently 5 items selected. The maximum number of items for the field is 2. Please remove 3 items from the selection.');
+    $this->waitForElementTextContains('.messages--error', 'There are currently 5 items selected. The maximum number of items for the field is 2. Remove 3 items from the selection.');
     $assert_session->elementNotExists('css', '.messages--warning');
     // Once the extra items are deselected, all should be well.
     $this->deselectMediaItem(2);
@@ -172,7 +174,7 @@ class WidgetOverflowTest extends MediaLibraryTestBase {
    * @return array[]
    *   Sets of arguments to pass to the test method.
    */
-  public function providerWidgetOverflow(): array {
+  public static function providerWidgetOverflow(): array {
     return [
       'Save' => [NULL],
       'Save and insert' => ['insert'],

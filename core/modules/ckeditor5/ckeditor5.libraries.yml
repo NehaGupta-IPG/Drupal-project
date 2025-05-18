@@ -99,6 +99,14 @@ internal.drupal.ckeditor5.filter.admin:
     - core/once
     - core/drupal.ajax
     - core/drupalSettings
+    - core/drupal.vertical-tabs
+
+internal.drupal.ckeditor5.table:
+  css:
+    theme:
+      css/table.css: { }
+  dependencies:
+    - core/ckeditor5.table
 
 internal.admin:
   js:
@@ -179,6 +187,11 @@ internal.admin.drupalmedia:
   css:
     theme:
       css/drupalmedia.admin.css: { }
+
+internal.admin.showBlocks:
+  css:
+    theme:
+      css/show-blocks.admin.css: { }
 
 internal.admin.sourceEditing:
   css:

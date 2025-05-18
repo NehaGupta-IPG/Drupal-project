@@ -37,13 +37,13 @@ class Error {
   /**
    * Decodes an exception and retrieves the correct caller.
    *
-   * @param \Exception|\Throwable $exception
+   * @param \Throwable $exception
    *   The exception object that was thrown.
    *
    * @return array
    *   An error in the format expected by _drupal_log_error().
    */
-  public static function decodeException($exception) {
+  public static function decodeException(\Throwable $exception): array {
     $message = $exception->getMessage();
 
     $backtrace = $exception->getTrace();
@@ -204,6 +204,18 @@ class Error {
     }
 
     return $return;
+  }
+
+  /**
+   * Returns the current PHP error handler as a callable.
+   *
+   * @return callable|null
+   *   The current error handler as a callable, or NULL if none is set.
+   */
+  public static function currentErrorHandler(): ?callable {
+    $currentHandler = set_error_handler('var_dump');
+    restore_error_handler();
+    return $currentHandler;
   }
 
 }

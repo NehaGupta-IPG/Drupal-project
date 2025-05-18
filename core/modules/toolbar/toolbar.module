@@ -2,163 +2,14 @@
 
 /**
  * @file
- * Administration toolbar for quick access to top level administration items.
  */
 
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Render\Element;
-use Drupal\Core\Render\Markup;
 use Drupal\Core\Render\RenderContext;
-use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Template\Attribute;
 use Drupal\Component\Utility\Crypt;
-use Drupal\Core\Url;
 use Drupal\toolbar\Controller\ToolbarController;
-
-/**
- * Implements hook_help().
- */
-function toolbar_help($route_name, RouteMatchInterface $route_match) {
-  switch ($route_name) {
-    case 'help.page.toolbar':
-      $output = '<h3>' . t('About') . '</h3>';
-      $output .= '<p>' . t('The Toolbar module provides a toolbar for site administrators, which displays tabs and trays provided by the Toolbar module itself and other modules. For more information, see the <a href=":toolbar_docs">online documentation for the Toolbar module</a>.', [':toolbar_docs' => 'https://www.drupal.org/documentation/modules/toolbar']) . '</p>';
-      $output .= '<h4>' . t('Terminology') . '</h4>';
-      $output .= '<dl>';
-      $output .= '<dt>' . t('Tabs') . '</dt>';
-      $output .= '<dd>' . t('Tabs are buttons, displayed in a bar across the top of the screen. Some tabs execute an action (such as starting Edit mode), while other tabs toggle which tray is open.') . '</dd>';
-      $output .= '<dt>' . t('Trays') . '</dt>';
-      $output .= '<dd>' . t('Trays are usually lists of links, which can be hierarchical like a menu. If a tray has been toggled open, it is displayed either vertically or horizontally below the tab bar, depending on the browser width. Only one tray may be open at a time. If you click another tab, that tray will replace the tray being displayed. In wide browser widths, the user has the ability to toggle from vertical to horizontal, using a link at the bottom or right of the tray. Hierarchical menus only have open/close behavior in vertical mode; if you display a tray containing a hierarchical menu horizontally, only the top-level links will be available.') . '</dd>';
-      $output .= '</dl>';
-      return $output;
-  }
-}
-
-/**
- * Implements hook_theme().
- */
-function toolbar_theme($existing, $type, $theme, $path) {
-  $items['toolbar'] = [
-    'render element' => 'element',
-  ];
-  $items['menu__toolbar'] = [
-    'base hook' => 'menu',
-    'variables' => ['menu_name' => NULL, 'items' => [], 'attributes' => []],
-  ];
-
-  return $items;
-}
-
-/**
- * Implements hook_page_attachments().
- */
-function toolbar_page_attachments(array &$page) {
-  // This JavaScript code provides temporary styles while the toolbar loads, so
-  // it better visually resembles the appearance it will have once fully loaded.
-  // @todo investigate potential alternatives to this approach in
-  //   https://www.drupal.org/i/3355381
-  $anti_flicker_js = <<<JS
-(function() {
-  const toolbarState = sessionStorage.getItem('Drupal.toolbar.toolbarState')
-    ? JSON.parse(sessionStorage.getItem('Drupal.toolbar.toolbarState'))
-    : false;
-  // These are classes that toolbar typically adds to <body>, but this code
-  // executes before the first paint, when <body> is not yet present. The
-  // classes are added to <html> so styling immediately reflects the current
-  // toolbar state. The classes are removed after the toolbar completes
-  // initialization.
-  const classesToAdd = ['toolbar-loading', 'toolbar-anti-flicker'];
-  if (toolbarState) {
-    const {
-      orientation,
-      hasActiveTab,
-      isFixed,
-      activeTray,
-      activeTabId,
-      isOriented,
-      userButtonMinWidth
-    } = toolbarState;
-
-    classesToAdd.push(
-      orientation ? `toolbar-` + orientation + `` : 'toolbar-horizontal',
-    );
-    if (hasActiveTab !== false) {
-      classesToAdd.push('toolbar-tray-open');
-    }
-    if (isFixed) {
-      classesToAdd.push('toolbar-fixed');
-    }
-    if (isOriented) {
-      classesToAdd.push('toolbar-oriented');
-    }
-
-    if (activeTray) {
-      // These styles are added so the active tab/tray styles are present
-      // immediately instead of "flickering" on as the toolbar initializes. In
-      // instances where a tray is lazy loaded, these styles facilitate the
-      // lazy loaded tray appearing gracefully and without reflow.
-      const styleContent = `
-      .toolbar-loading #` + activeTabId + ` {
-        background-image: linear-gradient(rgba(255, 255, 255, 0.25) 20%, transparent 200%);
-      }
-      .toolbar-loading #` + activeTabId + `-tray {
-        display: block; box-shadow: -1px 0 5px 2px rgb(0 0 0 / 33%);
-        border-right: 1px solid #aaa; background-color: #f5f5f5;
-        z-index: 0;
-      }
-      .toolbar-loading.toolbar-vertical.toolbar-tray-open #` + activeTabId + `-tray {
-        width: 15rem; height: 100vh;
-      }
-     .toolbar-loading.toolbar-horizontal :not(#` + activeTray + `) > .toolbar-lining {opacity: 0}`;
-
-      const style = document.createElement('style');
-      style.textContent = styleContent;
-      style.setAttribute('data-toolbar-anti-flicker-loading', true);
-      document.querySelector('head').appendChild(style);
-
-      if (userButtonMinWidth) {
-        const userButtonStyle = document.createElement('style');
-        userButtonStyle.textContent = `#toolbar-item-user {min-width: ` + userButtonMinWidth +`px;}`
-        document.querySelector('head').appendChild(userButtonStyle);
-      }
-    }
-  }
-  document.querySelector('html').classList.add(...classesToAdd);
-})();
-JS;
-
-  // The anti flicker javascript is added as an inline tag so it is executed
-  // as early as possible. This enables it to add classes that prevent
-  // flickering before the first paint.
-  $page['#attached']['html_head'][] = [
-    [
-      '#tag' => 'script',
-      '#attributes' => [
-        'type' => 'text/javascript',
-        'data-toolbar-anti-flicker-loading' => TRUE,
-      ],
-      // Process through Markup to prevent character escaping.
-      '#value' => Markup::create($anti_flicker_js),
-    ],
-    'anti_flicker_js',
-  ];
-}
-
-/**
- * Implements hook_page_top().
- *
- * Add admin toolbar to the top of the page automatically.
- */
-function toolbar_page_top(array &$page_top) {
-  $page_top['toolbar'] = [
-    '#type' => 'toolbar',
-    '#access' => \Drupal::currentUser()->hasPermission('access toolbar'),
-    '#cache' => [
-      'keys' => ['toolbar'],
-      'contexts' => ['user.permissions'],
-    ],
-  ];
-}
 
 /**
  * Prepares variables for administration toolbar templates.
@@ -170,7 +21,7 @@ function toolbar_page_top(array &$page_top) {
  *   - element: An associative array containing the properties and children of
  *     the tray. Properties used: #children, #attributes and #bar.
  */
-function template_preprocess_toolbar(&$variables) {
+function template_preprocess_toolbar(&$variables): void {
   $element = $variables['element'];
 
   // Prepare the toolbar attributes.
@@ -229,81 +80,6 @@ function template_preprocess_toolbar(&$variables) {
 }
 
 /**
- * Implements hook_toolbar().
- */
-function toolbar_toolbar() {
-  // The 'Home' tab is a simple link, with no corresponding tray.
-  $items['home'] = [
-    '#type' => 'toolbar_item',
-    'tab' => [
-      '#type' => 'link',
-      '#title' => t('Back to site'),
-      '#url' => Url::fromRoute('<front>'),
-      '#attributes' => [
-        'title' => t('Return to site content'),
-        'class' => ['toolbar-icon', 'toolbar-icon-escape-admin'],
-        'data-toolbar-escape-admin' => TRUE,
-      ],
-    ],
-    '#wrapper_attributes' => [
-      'class' => ['home-toolbar-tab'],
-    ],
-    '#attached' => [
-      'library' => [
-        'toolbar/toolbar.escapeAdmin',
-      ],
-    ],
-    '#weight' => -20,
-  ];
-
-  // To conserve bandwidth, we only include the top-level links in the HTML.
-  // The subtrees are fetched through a JSONP script that is generated at the
-  // toolbar_subtrees route. We provide the JavaScript requesting that JSONP
-  // script here with the hash parameter that is needed for that route.
-  // @see toolbar_subtrees_jsonp()
-  [$hash, $hash_cacheability] = _toolbar_get_subtrees_hash();
-  $subtrees_attached['drupalSettings']['toolbar'] = [
-    'subtreesHash' => $hash,
-  ];
-
-  // The administration element has a link that is themed to correspond to
-  // a toolbar tray. The tray contains the full administrative menu of the site.
-  $items['administration'] = [
-    '#type' => 'toolbar_item',
-    'tab' => [
-      '#type' => 'link',
-      '#title' => t('Manage'),
-      '#url' => Url::fromRoute('system.admin'),
-      '#attributes' => [
-        'title' => t('Admin menu'),
-        'class' => ['toolbar-icon', 'toolbar-icon-menu'],
-        // A data attribute that indicates to the client to defer loading of
-        // the admin menu subtrees until this tab is activated. Admin menu
-        // subtrees will not render to the DOM if this attribute is removed.
-        // The value of the attribute is intentionally left blank. Only the
-        // presence of the attribute is necessary.
-        'data-drupal-subtrees' => '',
-      ],
-    ],
-    'tray' => [
-      '#heading' => t('Administration menu'),
-      '#attached' => $subtrees_attached,
-      'toolbar_administration' => [
-        '#pre_render' => [[ToolbarController::class, 'preRenderAdministrationTray']],
-        '#type' => 'container',
-        '#attributes' => [
-          'class' => ['toolbar-menu-administration'],
-        ],
-      ],
-    ],
-    '#weight' => -15,
-  ];
-  $hash_cacheability->applyTo($items['administration']);
-
-  return $items;
-}
-
-/**
  * Adds toolbar-specific attributes to the menu link tree.
  *
  * @param \Drupal\Core\Menu\MenuLinkTreeElement[] $tree
@@ -344,7 +120,7 @@ function toolbar_menu_navigation_links(array $tree) {
 /**
  * Implements hook_preprocess_HOOK() for HTML document templates.
  */
-function toolbar_preprocess_html(&$variables) {
+function toolbar_preprocess_html(&$variables): void {
   if (!\Drupal::currentUser()->hasPermission('access toolbar')) {
     return;
   }

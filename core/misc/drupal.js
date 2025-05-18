@@ -71,7 +71,7 @@ window.Drupal = { behaviors: {}, locale: {} };
    *
    * @callback Drupal~behaviorAttach
    *
-   * @param {HTMLDocument|HTMLElement} context
+   * @param {Document|HTMLElement} context
    *   An element to detach behaviors from.
    * @param {?object} settings
    *   An object containing settings for the current context. It is rarely used.
@@ -84,7 +84,7 @@ window.Drupal = { behaviors: {}, locale: {} };
    *
    * @callback Drupal~behaviorDetach
    *
-   * @param {HTMLDocument|HTMLElement} context
+   * @param {Document|HTMLElement} context
    *   An element to attach behaviors to.
    * @param {object} settings
    *   An object containing settings for the current context.
@@ -143,7 +143,7 @@ window.Drupal = { behaviors: {}, locale: {} };
    *   }
    * };
    *
-   * @param {HTMLDocument|HTMLElement} [context=document]
+   * @param {Document|HTMLElement} [context=document]
    *   An element to attach behaviors to.
    * @param {object} [settings=drupalSettings]
    *   An object containing settings for the current context. If none is given,
@@ -183,7 +183,7 @@ window.Drupal = { behaviors: {}, locale: {} };
    * implementation, i.e. `once.remove('behaviorName', selector, context)`,
    * to ensure the behavior is detached only from previously processed elements.
    *
-   * @param {HTMLDocument|HTMLElement} [context=document]
+   * @param {Document|HTMLElement} [context=document]
    *   An element to detach behaviors from.
    * @param {object} [settings=drupalSettings]
    *   An object containing settings for the current context. If none given,
@@ -370,12 +370,7 @@ window.Drupal = { behaviors: {}, locale: {} };
     options.context = options.context || '';
 
     // Fetch the localized version of the string.
-    if (
-      typeof drupalTranslations !== 'undefined' &&
-      drupalTranslations.strings &&
-      drupalTranslations.strings[options.context] &&
-      drupalTranslations.strings[options.context][str]
-    ) {
+    if (drupalTranslations?.strings?.[options.context]?.[str]) {
       str = drupalTranslations.strings[options.context][str];
     }
 
@@ -448,7 +443,7 @@ window.Drupal = { behaviors: {}, locale: {} };
 
     // Consider URLs that match this site's base URL but use HTTPS instead of HTTP
     // as local as well.
-    if (protocol === 'http:' && absoluteUrl.indexOf('https:') === 0) {
+    if (protocol === 'http:' && absoluteUrl.startsWith('https:')) {
       protocol = 'https:';
     }
     let baseUrl = `${protocol}//${
@@ -469,7 +464,7 @@ window.Drupal = { behaviors: {}, locale: {} };
 
     // The given URL matches the site's base URL, or has a path under the site's
     // base URL.
-    return absoluteUrl === baseUrl || absoluteUrl.indexOf(`${baseUrl}/`) === 0;
+    return absoluteUrl === baseUrl || absoluteUrl.startsWith(`${baseUrl}/`);
   };
 
   /**
@@ -486,13 +481,13 @@ window.Drupal = { behaviors: {}, locale: {} };
    * @param {number} count
    *   The item count to display.
    * @param {string} singular
-   *   The string for the singular case. Please make sure it is clear this is
-   *   singular, to ease translation (e.g. use "1 new comment" instead of "1
-   *   new"). Do not use @count in the singular string.
+   *   The string for the singular case. Make sure it is clear this is singular,
+   *   to ease translation (e.g. use "1 new comment" instead of "1 new"). Do not
+   *   use @count in the singular string.
    * @param {string} plural
-   *   The string for the plural case. Please make sure it is clear this is
-   *   plural, to ease translation. Use @count in place of the item count, as in
-   *   "@count new comments".
+   *   The string for the plural case. Make sure it is clear this is plural, to
+   *   ease translation. Use @count in place of the item count, as in "@count
+   *   new comments".
    * @param {object} [args]
    *   An object of replacements pairs to make after translation. Incidences
    *   of any key in this array are replaced with the corresponding value.
@@ -518,10 +513,7 @@ window.Drupal = { behaviors: {}, locale: {} };
     let index = 0;
 
     // Determine the index of the plural form.
-    if (
-      typeof drupalTranslations !== 'undefined' &&
-      drupalTranslations.pluralFormula
-    ) {
+    if (drupalTranslations?.pluralFormula) {
       index =
         count in drupalTranslations.pluralFormula
           ? drupalTranslations.pluralFormula[count]
@@ -562,11 +554,7 @@ window.Drupal = { behaviors: {}, locale: {} };
    * @see https://www.drupal.org/core/deprecation#javascript
    */
   Drupal.deprecationError = ({ message }) => {
-    if (
-      drupalSettings.suppressDeprecationErrors === false &&
-      typeof console !== 'undefined' &&
-      console.warn
-    ) {
+    if (drupalSettings.suppressDeprecationErrors === false && console?.warn) {
       console.warn(`[Deprecation] ${message}`);
     }
   };
@@ -628,9 +616,13 @@ window.Drupal = { behaviors: {}, locale: {} };
    *   but also a complex object.
    */
   Drupal.theme = function (func, ...args) {
-    if (func in Drupal.theme) {
+    if (typeof Drupal.theme?.[func] === 'function') {
       return Drupal.theme[func](...args);
     }
+
+    Drupal.throwError(
+      new TypeError(`Drupal.theme.${func} must be function type.`),
+    );
   };
 
   /**

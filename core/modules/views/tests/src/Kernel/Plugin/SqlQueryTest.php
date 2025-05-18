@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\views\Kernel\Plugin;
 
 use Drupal\Core\Database\Database;
@@ -27,7 +29,10 @@ class SqlQueryTest extends ViewsKernelTestBase {
   protected function viewsData() {
     $data = parent::viewsData();
     $data['views_test_data']['table']['base']['access query tag'] = 'test_tag';
-    $data['views_test_data']['table']['base']['query metadata'] = ['key1' => 'test_metadata', 'key2' => 'test_metadata2'];
+    $data['views_test_data']['table']['base']['query metadata'] = [
+      'key1' => 'test_metadata',
+      'key2' => 'test_metadata2',
+    ];
 
     return $data;
   }
@@ -35,7 +40,7 @@ class SqlQueryTest extends ViewsKernelTestBase {
   /**
    * Tests adding some metadata/tags to the views query.
    */
-  public function testExecuteMetadata() {
+  public function testExecuteMetadata(): void {
     $view = Views::getView('test_view');
     $view->setDisplay();
 
@@ -83,13 +88,13 @@ class SqlQueryTest extends ViewsKernelTestBase {
   /**
    * Tests the method \Drupal\views\Plugin\views\query\Sql::getConnection().
    *
-   * @covers \Drupal\views\Plugin\views\query\Sql::getConnection
-   *
    * This needs to be a kernel test because the tested method uses the method
    * \Drupal\Core\Database\Database::getConnection() which is a 'final' method
    * and therefore cannot be mocked.
+   *
+   * @covers \Drupal\views\Plugin\views\query\Sql::getConnection
    */
-  public function testGetConnection() {
+  public function testGetConnection(): void {
     $view = Views::getView('test_view');
     $view->setDisplay();
 
@@ -97,8 +102,8 @@ class SqlQueryTest extends ViewsKernelTestBase {
     // getConnection() supports.
     $connection_info = Database::getConnectionInfo('default');
     Database::addConnectionInfo('default', 'replica', $connection_info['default']);
-    Database::addConnectionInfo('corefake', 'default', $connection_info['default']);
-    Database::addConnectionInfo('corefake', 'replica', $connection_info['default']);
+    Database::addConnectionInfo('core_fake', 'default', $connection_info['default']);
+    Database::addConnectionInfo('core_fake', 'replica', $connection_info['default']);
 
     // Test the database connection with no special options set.
     $this->assertSame('default', $view->getQuery()->getConnection()->getKey());
@@ -111,20 +116,20 @@ class SqlQueryTest extends ViewsKernelTestBase {
 
     // Test the database connection with the view 'base_database' set.
     $view->getQuery()->options['replica'] = FALSE;
-    $view->base_database = 'corefake';
-    $this->assertSame('corefake', $view->getQuery()->getConnection()->getKey());
+    $view->base_database = 'core_fake';
+    $this->assertSame('core_fake', $view->getQuery()->getConnection()->getKey());
     $this->assertSame('default', $view->getQuery()->getConnection()->getTarget());
 
     // Test the database connection with the view 'base_database' set and the
     // option 'replica' set to TRUE.
     $view->getQuery()->options['replica'] = TRUE;
-    $this->assertSame('corefake', $view->getQuery()->getConnection()->getKey());
+    $this->assertSame('core_fake', $view->getQuery()->getConnection()->getKey());
     $this->assertSame('replica', $view->getQuery()->getConnection()->getTarget());
 
     // Clean up the created database connections.
     Database::closeConnection('replica', 'default');
-    Database::closeConnection('default', 'corefake');
-    Database::closeConnection('replica', 'corefake');
+    Database::closeConnection('default', 'core_fake');
+    Database::closeConnection('replica', 'core_fake');
   }
 
 }

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\migrate\Kernel\Plugin\source;
 
 use Drupal\migrate\Plugin\migrate\source\SourcePluginBase;
@@ -33,9 +35,9 @@ class MigrationSourceCacheTest extends MigrateTestBase {
   }
 
   /**
-   * Tests that counts for the same plugin_id are not crossed.
+   * Tests that counts for the same plugin ID are not crossed.
    */
-  public function testCacheCountsNotContaminated() {
+  public function testCacheCountsNotContaminated(): void {
     $migration_1_definition = [
       'source' => [
         'plugin' => 'cacheable_embedded_data',
@@ -83,14 +85,13 @@ class MigrationSourceCacheTest extends MigrateTestBase {
 
     // Verify the cache keys are different.
     $cache_key_property = new \ReflectionProperty(SourcePluginBase::class, 'cacheKey');
-    $cache_key_property->setAccessible(TRUE);
     $this->assertNotEquals($cache_key_property->getValue($migration_1_source), $cache_key_property->getValue($migration_2_source));
   }
 
   /**
    * Test that values are pulled from the cache when appropriate.
    */
-  public function testCacheCountsUsed() {
+  public function testCacheCountsUsed(): void {
     $migration_definition = [
       'source' => [
         'plugin' => 'cacheable_embedded_data',
@@ -112,7 +113,6 @@ class MigrationSourceCacheTest extends MigrateTestBase {
 
     // Pollute the cache.
     $cache_key_property = new \ReflectionProperty($migration_source, 'cacheKey');
-    $cache_key_property->setAccessible(TRUE);
     $cache_key = $cache_key_property->getValue($migration_source);
     \Drupal::cache('migrate')->set($cache_key, 7);
     $this->assertCount(7, $migration_source);

@@ -1,9 +1,6 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\Tests\Core\Mail\MailManagerTest.
- */
+declare(strict_types=1);
 
 namespace Drupal\Tests\Core\Mail;
 
@@ -114,11 +111,19 @@ class MailManagerTest extends UnitTestCase {
   /**
    * Sets up the mail manager for testing.
    */
-  protected function setUpMailManager($interface = []) {
+  protected function setUpMailManager($interface = []): void {
     // Use the provided config for system.mail.interface settings.
     $this->configFactory = $this->getConfigFactoryStub([
       'system.mail' => [
         'interface' => $interface,
+        'mailer_dsn' => [
+          'scheme' => 'null',
+          'host' => 'null',
+          'user' => NULL,
+          'password' => NULL,
+          'port' => NULL,
+          'options' => [],
+        ],
       ],
       'system.site' => [
         'mail' => 'test@example.com',
@@ -149,10 +154,10 @@ class MailManagerTest extends UnitTestCase {
    *
    * @covers ::getInstance
    */
-  public function testGetInstance() {
+  public function testGetInstance(): void {
     $interface = [
       'default' => 'php_mail',
-      'example_testkey' => 'test_mail_collector',
+      'example_test_key' => 'test_mail_collector',
     ];
     $this->setUpMailManager($interface);
 
@@ -162,7 +167,7 @@ class MailManagerTest extends UnitTestCase {
     $this->assertInstanceOf('Drupal\Core\Mail\Plugin\Mail\PhpMail', $instance);
 
     // Test that a matching message_id returns the specified plugin instance.
-    $options = ['module' => 'example', 'key' => 'testkey'];
+    $options = ['module' => 'example', 'key' => 'test_key'];
     $instance = $this->mailManager->getInstance($options);
     $this->assertInstanceOf('Drupal\Core\Mail\Plugin\Mail\TestMailCollector', $instance);
   }
@@ -172,10 +177,10 @@ class MailManagerTest extends UnitTestCase {
    *
    * @covers ::mail
    */
-  public function testMailInRenderContext() {
+  public function testMailInRenderContext(): void {
     $interface = [
       'default' => 'php_mail',
-      'example_testkey' => 'test_mail_collector',
+      'example_test_key' => 'test_mail_collector',
     ];
     $this->setUpMailManager($interface);
 
@@ -201,7 +206,7 @@ class TestMailManager extends MailManager {
    * @param \Drupal\Component\Plugin\Discovery\DiscoveryInterface $discovery
    *   The discovery object.
    */
-  public function setDiscovery(DiscoveryInterface $discovery) {
+  public function setDiscovery(DiscoveryInterface $discovery): void {
     $this->discovery = $discovery;
   }
 

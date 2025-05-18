@@ -10,9 +10,9 @@ use Twig\Cache\CacheInterface;
 /**
  * Provides an alternate cache storage for Twig using PhpStorage.
  *
- * This class is designed to work on setups with multiple webheads using a local
- * filesystem for the twig cache. When generating the cache key, a hash value
- * depending on the enabled extensions is included. This prevents stale
+ * This class is designed to work on setups with multiple web heads using a
+ * local filesystem for the twig cache. When generating the cache key, a hash
+ * value depending on the enabled extensions is included. This prevents stale
  * templates from being reused when twig extensions are enabled or disabled.
  *
  * @see \Drupal\Core\DependencyInjection\Compiler\TwigExtensionPass
@@ -62,6 +62,7 @@ class TwigPhpStorageCache implements CacheInterface {
    * Gets the PHP code storage object to use for the compiled Twig files.
    *
    * @return \Drupal\Component\PhpStorage\PhpStorageInterface
+   *   The PhpStorage object used for storing the templates.
    */
   protected function storage() {
     if (!isset($this->storage)) {
@@ -112,7 +113,7 @@ class TwigPhpStorageCache implements CacheInterface {
     $this->storage()->save($key, $content);
     // Save the last mtime.
     $cid = 'twig:' . $key;
-    $this->cache->set($cid, REQUEST_TIME);
+    $this->cache->set($cid, \Drupal::time()->getRequestTime());
   }
 
   /**

@@ -3,6 +3,7 @@
 namespace Drupal\user\Form;
 
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Form\WorkspaceSafeFormInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Url;
@@ -14,7 +15,7 @@ use Drupal\Core\Url;
  *
  * @internal
  */
-class UserPasswordResetForm extends FormBase {
+class UserPasswordResetForm extends FormBase implements WorkspaceSafeFormInterface {
 
   /**
    * {@inheritdoc}
@@ -39,7 +40,7 @@ class UserPasswordResetForm extends FormBase {
    * @param string $hash
    *   Login link hash.
    */
-  public function buildForm(array $form, FormStateInterface $form_state, AccountInterface $user = NULL, $expiration_date = NULL, $timestamp = NULL, $hash = NULL) {
+  public function buildForm(array $form, FormStateInterface $form_state, ?AccountInterface $user = NULL, $expiration_date = NULL, $timestamp = NULL, $hash = NULL) {
     // @todo Remove if clause / else block in Drupal 11.0.0. (We are allowed to
     //   assume variables are populated, even though we're disallowed from
     //   making them mandatory in this method definition.)

@@ -21,7 +21,7 @@ class SecurityFileUploadEventSubscriber implements EventSubscriberInterface {
    *   The config factory.
    */
   public function __construct(
-    protected ConfigFactoryInterface $configFactory
+    protected ConfigFactoryInterface $configFactory,
   ) {}
 
   /**
@@ -83,9 +83,9 @@ class SecurityFileUploadEventSubscriber implements EventSubscriberInterface {
 
     if (!$insecure_uploads && in_array(strtolower($final_extension), FileSystemInterface::INSECURE_EXTENSIONS, TRUE)) {
       if (empty($extensions) || in_array('txt', $extensions, TRUE)) {
-        // Add .txt to potentially executable files prior to munging to help prevent
-        // exploits. This results in a filenames like filename.php being changed to
-        // filename.php.txt prior to munging.
+        // Add .txt to potentially executable files prior to munging to help
+        // prevent exploits. This results in a filenames like filename.php being
+        // changed to filename.php.txt prior to munging.
         $filename_parts[] = $final_extension;
         $final_extension = 'txt';
       }
@@ -102,7 +102,7 @@ class SecurityFileUploadEventSubscriber implements EventSubscriberInterface {
 
     // Munge the filename to protect against possible malicious extension hiding
     // within an unknown file type (i.e. filename.html.foo). This was introduced
-    // as part of SA-2006-006 to fix Apache's risky fallback behaviour.
+    // as part of SA-2006-006 to fix Apache's risky fallback behavior.
 
     // Loop through the middle parts of the name and add an underscore to the
     // end of each section that could be a file extension but isn't in the

@@ -2,18 +2,18 @@
 
 namespace Drupal\Core\Render\Element;
 
+use Drupal\Core\Render\Attribute\RenderElement;
+
 /**
  * Creates status report page element.
- *
- * @RenderElement("status_report")
  */
-class StatusReport extends RenderElement {
+#[RenderElement('status_report')]
+class StatusReport extends RenderElementBase {
 
   /**
    * {@inheritdoc}
    */
   public function getInfo() {
-    $class = static::class;
     return [
       '#theme' => 'status_report_grouped',
       '#priorities' => [
@@ -23,13 +23,15 @@ class StatusReport extends RenderElement {
         'ok',
       ],
       '#pre_render' => [
-        [$class, 'preRenderGroupRequirements'],
+        [static::class, 'preRenderGroupRequirements'],
       ],
     ];
   }
 
   /**
-   * #pre_render callback to group requirements.
+   * Render API callback: Groups requirements.
+   *
+   * This function is assigned as a #pre_render callback.
    */
   public static function preRenderGroupRequirements($element) {
     $severities = static::getSeverities();
@@ -64,6 +66,8 @@ class StatusReport extends RenderElement {
    * Gets the severities.
    *
    * @return array
+   *   An associative array of the requirements severities. The keys are the
+   *   requirement constants defined in install.inc.
    */
   public static function getSeverities() {
     return [

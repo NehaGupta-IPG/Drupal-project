@@ -10,6 +10,10 @@
  * Node specific styles.
  */
 
+.node__author {
+  display: inline-flex;
+}
+
 .node__meta {
   display: flex;
   align-items: center;
@@ -39,7 +43,9 @@
 
 .node__title a {
   padding-block-end: 0.1875rem;
-  transition: background-size 0.2s, color 0.2s;
+  transition:
+    background-size 0.2s,
+    color 0.2s;
   -webkit-text-decoration: none;
   text-decoration: none;
   color: var(--color-text-neutral-loud);

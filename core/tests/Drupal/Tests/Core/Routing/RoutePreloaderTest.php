@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\Core\Routing;
 
 use Drupal\Core\Routing\RoutePreloader;
@@ -37,13 +39,6 @@ class RoutePreloaderTest extends UnitTestCase {
   protected $preloader;
 
   /**
-   * The mocked cache.
-   *
-   * @var \Drupal\Core\Cache\CacheBackendInterface|\PHPUnit\Framework\MockObject\MockObject
-   */
-  protected $cache;
-
-  /**
    * {@inheritdoc}
    */
   protected function setUp(): void {
@@ -51,14 +46,13 @@ class RoutePreloaderTest extends UnitTestCase {
 
     $this->routeProvider = $this->createMock('Drupal\Core\Routing\PreloadableRouteProviderInterface');
     $this->state = $this->createMock('\Drupal\Core\State\StateInterface');
-    $this->cache = $this->createMock('Drupal\Core\Cache\CacheBackendInterface');
-    $this->preloader = new RoutePreloader($this->routeProvider, $this->state, $this->cache);
+    $this->preloader = new RoutePreloader($this->routeProvider, $this->state);
   }
 
   /**
    * Tests onAlterRoutes with just admin routes.
    */
-  public function testOnAlterRoutesWithAdminRoutes() {
+  public function testOnAlterRoutesWithAdminRoutes(): void {
     $event = $this->getMockBuilder('Drupal\Core\Routing\RouteBuildEvent')
       ->disableOriginalConstructor()
       ->getMock();
@@ -79,7 +73,7 @@ class RoutePreloaderTest extends UnitTestCase {
   /**
    * Tests onAlterRoutes with "admin" appearing in the path.
    */
-  public function testOnAlterRoutesWithAdminPathNoAdminRoute() {
+  public function testOnAlterRoutesWithAdminPathNoAdminRoute(): void {
     $event = $this->getMockBuilder('Drupal\Core\Routing\RouteBuildEvent')
       ->disableOriginalConstructor()
       ->getMock();
@@ -102,7 +96,7 @@ class RoutePreloaderTest extends UnitTestCase {
   /**
    * Tests onAlterRoutes with admin routes and non admin routes.
    */
-  public function testOnAlterRoutesWithNonAdminRoutes() {
+  public function testOnAlterRoutesWithNonAdminRoutes(): void {
     $event = $this->getMockBuilder('Drupal\Core\Routing\RouteBuildEvent')
       ->disableOriginalConstructor()
       ->getMock();
@@ -140,7 +134,7 @@ class RoutePreloaderTest extends UnitTestCase {
   /**
    * Tests onRequest on a non html request.
    */
-  public function testOnRequestNonHtml() {
+  public function testOnRequestNonHtml(): void {
     $event = $this->getMockBuilder('\Symfony\Component\HttpKernel\Event\KernelEvent')
       ->disableOriginalConstructor()
       ->getMock();
@@ -161,7 +155,7 @@ class RoutePreloaderTest extends UnitTestCase {
   /**
    * Tests onRequest on a html request.
    */
-  public function testOnRequestOnHtml() {
+  public function testOnRequestOnHtml(): void {
     $event = $this->getMockBuilder('\Symfony\Component\HttpKernel\Event\KernelEvent')
       ->disableOriginalConstructor()
       ->getMock();

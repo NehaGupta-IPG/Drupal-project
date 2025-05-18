@@ -5,7 +5,6 @@ namespace Drupal\views;
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Cache\CacheBackendInterface;
-use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Language\LanguageManagerInterface;
 
@@ -60,13 +59,6 @@ class ViewsData {
   protected $fullyLoaded = FALSE;
 
   /**
-   * Whether or not to skip data caching and rebuild data each time.
-   *
-   * @var bool
-   */
-  protected $skipCache = FALSE;
-
-  /**
    * The current language code.
    *
    * @var string
@@ -92,20 +84,16 @@ class ViewsData {
    *
    * @param \Drupal\Core\Cache\CacheBackendInterface $cache_backend
    *   The cache backend to use.
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $config
-   *   The configuration factory object to use.
    * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
    *   The module handler class to use for invoking hooks.
    * @param \Drupal\Core\Language\LanguageManagerInterface $language_manager
    *   The language manager.
    */
-  public function __construct(CacheBackendInterface $cache_backend, ConfigFactoryInterface $config, ModuleHandlerInterface $module_handler, LanguageManagerInterface $language_manager) {
+  public function __construct(CacheBackendInterface $cache_backend, ModuleHandlerInterface $module_handler, LanguageManagerInterface $language_manager) {
     $this->cacheBackend = $cache_backend;
     $this->moduleHandler = $module_handler;
     $this->languageManager = $language_manager;
-
     $this->langcode = $this->languageManager->getCurrentLanguage()->getId();
-    $this->skipCache = $config->get('views.settings')->get('skip_cache');
   }
 
   /**
@@ -180,14 +168,9 @@ class ViewsData {
    *   The cache ID to return.
    *
    * @return mixed
-   *   The cached data, if any. This will immediately return FALSE if the
-   *   $skipCache property is TRUE.
+   *   The cached data.
    */
   protected function cacheGet($cid) {
-    if ($this->skipCache) {
-      return FALSE;
-    }
-
     return $this->cacheBackend->get($this->prepareCid($cid));
   }
 

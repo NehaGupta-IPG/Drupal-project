@@ -55,7 +55,7 @@ class MigrationPluginManager extends DefaultPluginManager implements MigrationPl
   public function __construct(ModuleHandlerInterface $module_handler, CacheBackendInterface $cache_backend, LanguageManagerInterface $language_manager) {
     $this->factory = new ContainerFactory($this, $this->pluginInterface);
     $this->alterInfo('migration_plugins');
-    $this->setCacheBackend($cache_backend, 'migration_plugins', ['migration_plugins']);
+    $this->setCacheBackend($cache_backend, 'migration_plugins');
     $this->moduleHandler = $module_handler;
   }
 
@@ -121,7 +121,7 @@ class MigrationPluginManager extends DefaultPluginManager implements MigrationPl
     // @todo Remove loop when the ability to call ::getMigrationDependencies()
     //   without expanding plugins is removed.
     foreach ($instances as $migration) {
-      $migration->set('migration_dependencies', $migration->getMigrationDependencies(TRUE));
+      $migration->set('migration_dependencies', $migration->getMigrationDependencies());
     }
 
     // Sort the migrations based on their dependencies.
@@ -145,7 +145,7 @@ class MigrationPluginManager extends DefaultPluginManager implements MigrationPl
     $plugin_ids = [];
     $all_ids = array_keys($this->getDefinitions());
     foreach ($migration_ids as $id) {
-      $plugin_ids += preg_grep('/^' . preg_quote($id, '/') . PluginBase::DERIVATIVE_SEPARATOR . '/', $all_ids);
+      $plugin_ids = array_merge($plugin_ids, preg_grep('/^' . preg_quote($id, '/') . PluginBase::DERIVATIVE_SEPARATOR . '/', $all_ids));
       if ($this->hasDefinition($id)) {
         $plugin_ids[] = $id;
       }
@@ -169,7 +169,7 @@ class MigrationPluginManager extends DefaultPluginManager implements MigrationPl
       $id = $migration->id();
       $requirements[$id] = [];
       $dependency_graph[$id]['edges'] = [];
-      $migration_dependencies = $migration->getMigrationDependencies(TRUE);
+      $migration_dependencies = $migration->getMigrationDependencies();
 
       if (isset($migration_dependencies['required'])) {
         foreach ($migration_dependencies['required'] as $dependency) {

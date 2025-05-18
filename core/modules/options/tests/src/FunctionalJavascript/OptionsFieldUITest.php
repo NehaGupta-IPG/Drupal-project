@@ -1,17 +1,23 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\options\FunctionalJavascript;
 
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
+use Drupal\Tests\field_ui\Traits\FieldUiJSTestTrait;
 
 /**
  * Tests the Options field UI functionality.
  *
  * @group options
+ * @group #slow
  */
 class OptionsFieldUITest extends WebDriverTestBase {
+
+  use FieldUiJSTestTrait;
 
   /**
    * {@inheritdoc}
@@ -20,6 +26,7 @@ class OptionsFieldUITest extends WebDriverTestBase {
     'node',
     'options',
     'field_ui',
+    'block',
   ];
 
   /**
@@ -60,6 +67,7 @@ class OptionsFieldUITest extends WebDriverTestBase {
    */
   protected function setUp(): void {
     parent::setUp();
+    $this->drupalPlaceBlock('local_actions_block');
 
     // Create test user.
     $admin_user = $this->drupalCreateUser([
@@ -75,102 +83,49 @@ class OptionsFieldUITest extends WebDriverTestBase {
   }
 
   /**
-   * Tests option types allowed values.
-   *
-   * @dataProvider providerTestOptionsAllowedValues
+   * Tests that the allowed options are available to the default value widget.
    */
-  public function testOptionsAllowedValues($option_type, $options, $is_string_option) {
-    $this->fieldName = 'field_options_text';
-    $this->createOptionsField($option_type);
+  public function testDefaultValueOptions(): void {
     $page = $this->getSession()->getPage();
+    $assert_session = $this->assertSession();
+    $bundle_path = 'admin/structure/types/manage/' . $this->type;
+    // Create a field of type list:string.
+    $this->fieldUIAddNewFieldJS($bundle_path, 'test_string_list', 'Test string list', 'list_string', FALSE);
+    $page->findField('field_storage[subform][settings][allowed_values][table][0][item][label]')->setValue('first');
+    $assert_session->assertWaitOnAjaxRequest();
+    $page->findField('set_default_value')->setValue(TRUE);
+    // Assert that the option added in the subform is available to the default
+    // value field.
+    $this->assertSession()->waitForElement('css', '[name="default_value_input[field_test_int_list]"] option:contains("first")');
+    $page->pressButton('Add another item');
+    $assert_session->waitForField('field_storage[subform][settings][allowed_values][table][1][item][label]');
+    $field_input = $page->find('css', '[name="field_storage[subform][settings][allowed_values][table][1][item][label]"]');
+    $field_input->setValue('second');
+    $this->assertNotNull($assert_session->waitForElement('css', '[name="default_value_input[field_test_string_list]"] option:contains("second")'));
+    $assert_session->optionExists('default_value_input[field_test_string_list]', 'second');
+    $page->selectFieldOption('default_value_input[field_test_string_list]', 'second');
+    $page->find('css', '.ui-dialog-buttonset button:contains("Save")')->press();
+    $this->assertTrue($assert_session->waitForText('Saved Test string list configuration.'));
 
-    $this->drupalGet($this->adminPath);
-
-    $i = 0;
-    foreach ($options as $option_key => $option_label) {
-      $page->fillField("settings[allowed_values][table][$i][item][label]", $option_label);
-      // Add keys if not string option list.
-      if (!$is_string_option) {
-        $page->fillField("settings[allowed_values][table][$i][item][key]", $option_key);
-      }
-      $page->pressButton('Add another item');
-      $i++;
-      $this->assertSession()->waitForElementVisible('css', "[name='settings[allowed_values][table][$i][item][label]']");
-    }
-    $page->pressButton('Save field settings');
-
-    // Test the order of the option list on node form.
-    $this->drupalGet($this->nodeFormPath);
-    $this->assertNodeFormOrder(['- None -', 'First', 'Second', 'Third']);
-
-    // Test the order of the option list on admin path.
-    $this->drupalGet($this->adminPath);
-    $this->assertOrder(['First', 'Second', 'Third', ''], $is_string_option);
-    $drag_handle = $page->find('css', '[data-drupal-selector="edit-settings-allowed-values-table-0"] .tabledrag-handle');
-    $target = $page->find('css', '[data-drupal-selector="edit-settings-allowed-values-table-2"]');
-
-    // Change the order the items appear.
-    $drag_handle->dragTo($target);
-    $this->assertOrder(['Second', 'Third', 'First', ''], $is_string_option);
-    $page->pressButton('Save field settings');
-
-    $this->drupalGet($this->nodeFormPath);
-    $this->assertNodeFormOrder(['- None -', 'Second', 'Third', 'First']);
-
-    $this->drupalGet($this->adminPath);
-
-    // Confirm the change in order was saved.
-    $this->assertOrder(['Second', 'Third', 'First', ''], $is_string_option);
-
-    // Delete an item.
-    $page->pressButton('remove_row_button__1');
+    // Create a field of type list:integer.
+    $this->fieldUIAddNewFieldJS($bundle_path, 'test_int_list', 'Test int list', 'list_integer', FALSE);
+    $page->findField('field_storage[subform][settings][allowed_values][table][0][item][label]')->setValue('first');
+    $assert_session->assertWaitOnAjaxRequest();
+    $page->findField('set_default_value')->setValue(TRUE);
+    $page->selectFieldOption('default_value_input[field_test_int_list]', 'first');
+    // Assert that no validation is performed.
+    $assert_session->statusMessageNotContains('Value field is required.');
+    $field_input = $page->find('css', '[name="field_storage[subform][settings][allowed_values][table][0][item][key]"]');
+    $field_input->setValue(1);
     $this->assertSession()->assertWaitOnAjaxRequest();
-    $this->assertOrder(['Second', 'First', ''], $is_string_option);
-    $page->pressButton('Save field settings');
-
-    $this->drupalGet($this->nodeFormPath);
-    $this->assertNodeFormOrder(['- None -', 'Second', 'First']);
-
-    $this->drupalGet($this->adminPath);
-
-    // Confirm the item removal was saved.
-    $this->assertOrder(['Second', 'First', ''], $is_string_option);
-  }
-
-  /**
-   * Asserts the order of provided option list on admin path.
-   *
-   * @param array $expected
-   *   Expected order.
-   * @param bool $is_string_option
-   *   Whether the request is for string option list.
-   */
-  protected function assertOrder($expected, $is_string_option) {
-    $page = $this->getSession()->getPage();
-    if ($is_string_option) {
-      $inputs = $page->findAll('css', '.draggable .form-text.machine-name-source');
-    }
-    else {
-      $inputs = $page->findAll('css', '.draggable .form-text');
-    }
-    foreach ($expected as $step => $expected_input_value) {
-      $value = $inputs[$step]->getValue();
-      $this->assertSame($expected_input_value, $value, "Item $step should be $expected_input_value, but got $value");
-    }
-  }
-
-  /**
-   * Asserts the order of provided option list on node form.
-   *
-   * @param array $expected
-   *   Expected order.
-   */
-  protected function assertNodeFormOrder($expected) {
-    $elements = $this->assertSession()->selectExists('field_options_text')->findAll('css', 'option');
-    $elements = array_map(function ($element) {
-      return $element->getText();
-    }, $elements);
-    $this->assertSame($expected, $elements);
+    $page->checkField('set_default_value');
+    $this->assertSession()->waitForElement('css', '[name="default_value_input[field_test_int_list]"] option:contains("first")');
+    // Assert that the option added in the subform is available to the default
+    // value field.
+    $this->assertSession()->optionExists('default_value_input[field_test_int_list]', 'first');
+    $page->selectFieldOption('default_value_input[field_test_int_list]', 'first');
+    $page->find('css', '.ui-dialog-buttonset button:contains("Save")')->press();
+    $this->assertTrue($this->assertSession()->waitForText('Saved Test int list configuration.'));
   }
 
   /**
@@ -179,7 +134,7 @@ class OptionsFieldUITest extends WebDriverTestBase {
    * @param string $type
    *   One of 'list_integer', 'list_float' or 'list_string'.
    */
-  protected function createOptionsField($type) {
+  protected function createOptionsField($type): void {
     // Create a field.
     FieldStorageConfig::create([
       'field_name' => $this->fieldName,
@@ -197,36 +152,51 @@ class OptionsFieldUITest extends WebDriverTestBase {
       ->setComponent($this->fieldName)
       ->save();
 
-    $this->adminPath = 'admin/structure/types/manage/' . $this->type . '/fields/node.' . $this->type . '.' . $this->fieldName . '/storage';
+    $this->adminPath = 'admin/structure/types/manage/' . $this->type . '/fields/node.' . $this->type . '.' . $this->fieldName;
   }
 
   /**
-   * Data provider for testOptionsAllowedValues().
-   *
-   * @return array
-   *   Array of arrays with the following elements:
-   *   - Option type.
-   *   - Array of option type values.
-   *   - Whether option type is string type or not.
+   * Tests `list_string` machine name with special characters.
    */
-  public function providerTestOptionsAllowedValues() {
-    return [
-      'List integer' => [
-        'list_integer',
-        [1 => 'First', 2 => 'Second', 3 => 'Third'],
-        FALSE,
-      ],
-      'List float' => [
-        'list_float',
-        ['0.1' => 'First', '0.2' => 'Second', '0.3' => 'Third'],
-        FALSE,
-      ],
-      'List string' => [
-        'list_string',
-        ['first' => 'First', 'second' => 'Second', 'third' => 'Third'],
-        TRUE,
-      ],
-    ];
+  public function testMachineNameSpecialCharacters(): void {
+    $this->fieldName = 'field_options_text';
+    $this->createOptionsField('list_string');
+    $this->drupalGet($this->adminPath);
+
+    $label_element_name = "field_storage[subform][settings][allowed_values][table][0][item][label]";
+    $this->getSession()->getPage()->fillField($label_element_name, 'Hello world');
+    $this->assertSession()->assertWaitOnAjaxRequest();
+    $this->exposeOptionMachineName(1);
+
+    $key_element_name = "field_storage[subform][settings][allowed_values][table][0][item][key]";
+
+    // Ensure that the machine name was generated correctly.
+    $this->assertSession()->fieldValueEquals($key_element_name, 'hello_world');
+
+    // Ensure that the machine name can be overridden with a value that includes
+    // special characters.
+    $this->getSession()->getPage()->fillField($key_element_name, '.hello #world');
+    $this->assertSession()->assertWaitOnAjaxRequest();
+    $this->getSession()->getPage()->pressButton('Save settings');
+    $this->assertSession()->statusMessageContains("Saved {$this->fieldName} configuration.");
+
+    // Ensure that the machine name was saved correctly.
+    $allowed_values = FieldStorageConfig::loadByName('node', $this->fieldName)
+      ->getSetting('allowed_values');
+    $this->assertSame(['.hello #world'], array_keys($allowed_values));
+  }
+
+  /**
+   * Exposes the machine name input for a row.
+   *
+   * @param int $row
+   *   The row number.
+   */
+  private function exposeOptionMachineName(int $row): void {
+    $index = $row - 1;
+    $rows = $this->getSession()->getPage()->findAll('css', '#allowed-values-order tr.draggable');
+    $this->assertSession()->buttonExists('Edit', $rows[$index])->click();
+    $this->assertSession()->waitForElementVisible('css', "[name='field_storage[subform][settings][allowed_values][table][$index][item][key]']");
   }
 
 }

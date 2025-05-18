@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\content_moderation\Kernel;
 
 use Drupal\Core\Cache\CacheBackendInterface;
@@ -49,7 +51,7 @@ class ContentModerationAccessTest extends KernelTestBase {
     // Add a moderated node type.
     $node_type = NodeType::create([
       'type' => 'page',
-      'label' => 'Page',
+      'name' => 'Page',
     ]);
     $node_type->save();
     $workflow = $this->createEditorialWorkflow();
@@ -60,7 +62,7 @@ class ContentModerationAccessTest extends KernelTestBase {
   /**
    * Tests access cacheability.
    */
-  public function testAccessCacheability() {
+  public function testAccessCacheability(): void {
     $node = $this->createNode(['type' => 'page']);
 
     /** @var \Drupal\user\RoleInterface $authenticated */

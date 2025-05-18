@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\responsive_image\Functional;
 
 use Drupal\image\Entity\ImageStyle;
@@ -42,9 +44,7 @@ class ResponsiveImageFieldDisplayTest extends ImageFieldTestBase {
   protected $fileUrlGenerator;
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = [
     'field_ui',
@@ -87,7 +87,7 @@ class ResponsiveImageFieldDisplayTest extends ImageFieldTestBase {
   /**
    * Tests responsive image formatters on node display for public files.
    */
-  public function testResponsiveImageFieldFormattersPublic() {
+  public function testResponsiveImageFieldFormattersPublic(): void {
     $this->addTestImageStyleMappings();
     $this->doTestResponsiveImageFieldFormatters('public');
   }
@@ -95,7 +95,7 @@ class ResponsiveImageFieldDisplayTest extends ImageFieldTestBase {
   /**
    * Tests responsive image formatters on node display for private files.
    */
-  public function testResponsiveImageFieldFormattersPrivate() {
+  public function testResponsiveImageFieldFormattersPrivate(): void {
     $this->addTestImageStyleMappings();
     // Remove access content permission from anonymous users.
     user_role_change_permissions(RoleInterface::ANONYMOUS_ID, ['access content' => FALSE]);
@@ -105,7 +105,7 @@ class ResponsiveImageFieldDisplayTest extends ImageFieldTestBase {
   /**
    * Tests responsive image formatters when image style is empty.
    */
-  public function testResponsiveImageFieldFormattersEmptyStyle() {
+  public function testResponsiveImageFieldFormattersEmptyStyle(): void {
     $this->addTestImageStyleMappings(TRUE);
     $this->doTestResponsiveImageFieldFormatters('public', TRUE);
   }
@@ -116,7 +116,7 @@ class ResponsiveImageFieldDisplayTest extends ImageFieldTestBase {
    * @param bool $empty_styles
    *   If true, the image style mappings will get empty image styles.
    */
-  protected function addTestImageStyleMappings($empty_styles = FALSE) {
+  protected function addTestImageStyleMappings($empty_styles = FALSE): void {
     if ($empty_styles) {
       $this->responsiveImgStyle
         ->addImageStyleMapping('responsive_image_test_module.mobile', '1x', [
@@ -185,12 +185,12 @@ class ResponsiveImageFieldDisplayTest extends ImageFieldTestBase {
    *   If true, use an empty string for image style names.
    *   Defaults to false.
    */
-  protected function doTestResponsiveImageFieldFormatters($scheme, $empty_styles = FALSE) {
+  protected function doTestResponsiveImageFieldFormatters($scheme, $empty_styles = FALSE): void {
     /** @var \Drupal\Core\Render\RendererInterface $renderer */
     $renderer = $this->container->get('renderer');
     $node_storage = $this->container->get('entity_type.manager')->getStorage('node');
-    $field_name = mb_strtolower($this->randomMachineName());
-    $this->createImageField($field_name, 'article', ['uri_scheme' => $scheme]);
+    $field_name = $this->randomMachineName();
+    $this->createImageField($field_name, 'node', 'article', ['uri_scheme' => $scheme]);
     // Create a new node with an image attached. Make sure we use a large image
     // so the scale effects of the image styles always have an effect.
     $test_image = current($this->getTestFiles('image', 39325));
@@ -199,7 +199,6 @@ class ResponsiveImageFieldDisplayTest extends ImageFieldTestBase {
     $alt = $this->randomMachineName();
 
     $nid = $this->uploadNodeImage($test_image, $field_name, 'article', $alt);
-    $node_storage->resetCache([$nid]);
     $node = $node_storage->load($nid);
 
     // Test that the default formatter is being used.
@@ -212,7 +211,7 @@ class ResponsiveImageFieldDisplayTest extends ImageFieldTestBase {
       '#alt' => $alt,
       '#attributes' => ['loading' => 'lazy'],
     ];
-    $default_output = str_replace("\n", '', $renderer->renderRoot($image));
+    $default_output = str_replace("\n", '', (string) $renderer->renderRoot($image));
     $this->assertSession()->responseContains($default_output);
 
     // Test field not being configured. This should not cause a fatal error.
@@ -329,7 +328,7 @@ class ResponsiveImageFieldDisplayTest extends ImageFieldTestBase {
     if (!$empty_styles) {
       $this->assertSession()->responseHeaderContains('X-Drupal-Cache-Tags', 'config:image.style.medium');
       $this->assertSession()->responseHeaderContains('X-Drupal-Cache-Tags', 'config:image.style.thumbnail');
-      $this->assertSession()->responseContains('type="image/png"');
+      $this->assertSession()->responseContains('type="image/webp"');
     }
     $this->assertSession()->responseHeaderContains('X-Drupal-Cache-Tags', 'config:image.style.large');
 
@@ -340,7 +339,7 @@ class ResponsiveImageFieldDisplayTest extends ImageFieldTestBase {
     // The image.html.twig template has a newline after the <img> tag but
     // responsive-image.html.twig doesn't have one after the fallback image, so
     // we remove it here.
-    $default_output = trim($renderer->renderRoot($fallback_image));
+    $default_output = trim((string) $renderer->renderRoot($fallback_image));
     $this->assertSession()->responseContains($default_output);
 
     if ($scheme == 'private') {
@@ -355,7 +354,7 @@ class ResponsiveImageFieldDisplayTest extends ImageFieldTestBase {
   /**
    * Tests responsive image formatters on node display linked to the file.
    */
-  public function testResponsiveImageFieldFormattersLinkToFile() {
+  public function testResponsiveImageFieldFormattersLinkToFile(): void {
     $this->addTestImageStyleMappings();
     $this->assertResponsiveImageFieldFormattersLink('file');
   }
@@ -363,7 +362,7 @@ class ResponsiveImageFieldDisplayTest extends ImageFieldTestBase {
   /**
    * Tests responsive image formatters on node display linked to the node.
    */
-  public function testResponsiveImageFieldFormattersLinkToNode() {
+  public function testResponsiveImageFieldFormattersLinkToNode(): void {
     $this->addTestImageStyleMappings();
     $this->assertResponsiveImageFieldFormattersLink('content');
   }
@@ -371,7 +370,7 @@ class ResponsiveImageFieldDisplayTest extends ImageFieldTestBase {
   /**
    * Tests responsive image formatter on node display with an empty media query.
    */
-  public function testResponsiveImageFieldFormattersEmptyMediaQuery() {
+  public function testResponsiveImageFieldFormattersEmptyMediaQuery(): void {
     $this->responsiveImgStyle
       // Test the output of an empty media query.
       ->addImageStyleMapping('responsive_image_test_module.empty', '1x', [
@@ -385,12 +384,11 @@ class ResponsiveImageFieldDisplayTest extends ImageFieldTestBase {
       ])
       ->save();
     $node_storage = $this->container->get('entity_type.manager')->getStorage('node');
-    $field_name = mb_strtolower($this->randomMachineName());
-    $this->createImageField($field_name, 'article', ['uri_scheme' => 'public']);
+    $field_name = $this->randomMachineName();
+    $this->createImageField($field_name, 'node', 'article', ['uri_scheme' => 'public']);
     // Create a new node with an image attached.
     $test_image = current($this->getTestFiles('image'));
     $nid = $this->uploadNodeImage($test_image, $field_name, 'article', $this->randomMachineName());
-    $node_storage->resetCache([$nid]);
 
     // Use the responsive image formatter linked to file formatter.
     $display_options = [
@@ -421,12 +419,13 @@ class ResponsiveImageFieldDisplayTest extends ImageFieldTestBase {
   /**
    * Tests responsive image formatter on node display with one and two sources.
    */
-  public function testResponsiveImageFieldFormattersMultipleSources() {
+  public function testResponsiveImageFieldFormattersMultipleSources(): void {
     // Setup known image style sizes so the test can assert on known sizes.
     $large_style = ImageStyle::load('large');
     assert($large_style instanceof ImageStyleInterface);
     $large_style->addImageEffect([
       'id' => 'image_resize',
+      'weight' => 0,
       'data' => [
         'width' => '480',
         'height' => '480',
@@ -437,6 +436,7 @@ class ResponsiveImageFieldDisplayTest extends ImageFieldTestBase {
     assert($medium_style instanceof ImageStyleInterface);
     $medium_style->addImageEffect([
       'id' => 'image_resize',
+      'weight' => 0,
       'data' => [
         'width' => '220',
         'height' => '220',
@@ -460,12 +460,11 @@ class ResponsiveImageFieldDisplayTest extends ImageFieldTestBase {
       ])
       ->save();
     $node_storage = $this->container->get('entity_type.manager')->getStorage('node');
-    $field_name = mb_strtolower($this->randomMachineName());
-    $this->createImageField($field_name, 'article', ['uri_scheme' => 'public']);
+    $field_name = $this->randomMachineName();
+    $this->createImageField($field_name, 'node', 'article', ['uri_scheme' => 'public']);
     // Create a new node with an image attached.
     $test_image = current($this->getTestFiles('image'));
     $nid = $this->uploadNodeImage($test_image, $field_name, 'article', $this->randomMachineName());
-    $node_storage->resetCache([$nid]);
 
     // Use the responsive image formatter linked to file formatter.
     $display_options = [
@@ -493,7 +492,7 @@ class ResponsiveImageFieldDisplayTest extends ImageFieldTestBase {
     $image_uri = File::load($node->{$field_name}->target_id)->getFileUri();
     $medium_transform_url = $this->fileUrlGenerator->transformRelative($medium_style->buildUrl($image_uri));
     $large_transform_url = $this->fileUrlGenerator->transformRelative($large_style->buildUrl($image_uri));
-    $this->assertSession()->responseMatches('/<img loading="eager" srcset="' . \preg_quote($medium_transform_url, '/') . ' 1x, ' . \preg_quote($large_transform_url, '/') . ' 1.5x, ' . \preg_quote($large_transform_url, '/') . ' 2x" width="220" height="220" src="' . \preg_quote($large_transform_url, '/') . '" alt="\w+" \/>/');
+    $this->assertSession()->responseMatches('/<img loading="eager" srcset="' . \preg_quote($medium_transform_url, '/') . ' 1x, ' . \preg_quote($large_transform_url, '/') . ' 1.5x, ' . \preg_quote($large_transform_url, '/') . ' 2x" width="480" height="480" src="' . \preg_quote($large_transform_url, '/') . '" alt="\w+" \/>/');
 
     $this->responsiveImgStyle
       // Test the output of an empty media query.
@@ -505,7 +504,7 @@ class ResponsiveImageFieldDisplayTest extends ImageFieldTestBase {
 
     // Assert the picture tag has source tags that include dimensions.
     $this->drupalGet('node/' . $nid);
-    $this->assertSession()->responseMatches('/<picture>\s+<source srcset="' . \preg_quote($large_transform_url, '/') . ' 1x" media="\(min-width: 851px\)" type="image\/png" width="480" height="480"\/>\s+<source srcset="' . \preg_quote($medium_transform_url, '/') . ' 1x, ' . \preg_quote($large_transform_url, '/') . ' 1.5x, ' . \preg_quote($large_transform_url, '/') . ' 2x" type="image\/png" width="220" height="220"\/>\s+<img loading="eager" src="' . \preg_quote($large_transform_url, '/') . '" width="480" height="480" alt="\w+" \/>\s+<\/picture>/');
+    $this->assertSession()->responseMatches('/<picture>\s+<source srcset="' . \preg_quote($large_transform_url, '/') . ' 1x" media="\(min-width: 851px\)" type="image\/webp" width="480" height="480"\/>\s+<source srcset="' . \preg_quote($medium_transform_url, '/') . ' 1x, ' . \preg_quote($large_transform_url, '/') . ' 1.5x, ' . \preg_quote($large_transform_url, '/') . ' 2x" type="image\/webp" width="220" height="220"\/>\s+<img loading="eager" width="480" height="480" src="' . \preg_quote($large_transform_url, '/') . '" alt="\w+" \/>\s+<\/picture>/');
   }
 
   /**
@@ -515,9 +514,9 @@ class ResponsiveImageFieldDisplayTest extends ImageFieldTestBase {
    *   The link type to test. Either 'file' or 'content'.
    */
   private function assertResponsiveImageFieldFormattersLink(string $link_type): void {
-    $field_name = mb_strtolower($this->randomMachineName());
+    $field_name = $this->randomMachineName();
     $field_settings = ['alt_field_required' => 0];
-    $this->createImageField($field_name, 'article', ['uri_scheme' => 'public'], $field_settings);
+    $this->createImageField($field_name, 'node', 'article', ['uri_scheme' => 'public'], $field_settings);
     // Create a new node with an image attached.
     $test_image = current($this->getTestFiles('image'));
 

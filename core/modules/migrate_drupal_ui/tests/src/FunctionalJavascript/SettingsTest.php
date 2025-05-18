@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\migrate_drupal_ui\FunctionalJavascript;
 
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
@@ -56,7 +58,7 @@ class SettingsTest extends WebDriverTestBase {
    *
    * @dataProvider providerTestCredentialForm
    */
-  public function testCredentialForm($source_connection, $version, array $manual, array $databases, $expected_source_connection) {
+  public function testCredentialForm($source_connection, $version, array $manual, array $databases, $expected_source_connection): void {
     // Write settings.
     $migrate_file_public_path = '/var/www/drupal7/sites/default/files';
     $migrate_file_private_path = '/var/www/drupal7/sites/default/files/private';
@@ -139,7 +141,7 @@ class SettingsTest extends WebDriverTestBase {
   /**
    * Data provider for testCredentialForm.
    */
-  public function providerTestCredentialForm() {
+  public static function providerTestCredentialForm() {
     return [
       'no values in settings.php' => [
         'source_connection' => "",

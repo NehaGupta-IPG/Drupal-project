@@ -1,11 +1,13 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Drupal\Tests\ckeditor5\FunctionalJavascript;
 
 use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\Tests\media\Traits\MediaTypeCreationTrait;
+
+// cspell:ignore drupalmediatoolbar
 
 /**
  * Tests for CKEditor 5 plugins using Drupal's translation system.
@@ -46,9 +48,9 @@ class JSTranslationTest extends CKEditor5TestBase {
     $this->createNewTextFormat($page, $assert_session);
     $this->assertNotEmpty($assert_session->waitForElement('css', '.ckeditor5-toolbar-item-drupalMedia'));
     $this->click('#edit-filters-media-embed-status');
-    $assert_session->assertWaitOnAjaxRequest();
+    $assert_session->assertExpectedAjaxRequest(2);
     $this->triggerKeyUp('.ckeditor5-toolbar-item-drupalMedia', 'ArrowDown');
-    $assert_session->assertWaitOnAjaxRequest();
+    $assert_session->assertExpectedAjaxRequest(3);
     $this->saveNewTextFormat($page, $assert_session);
 
     $langcode = 'fr';

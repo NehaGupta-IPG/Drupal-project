@@ -18,7 +18,86 @@ class Xss {
    *
    * @see \Drupal\Component\Utility\Xss::filterAdmin()
    */
-  protected static $adminTags = ['a', 'abbr', 'acronym', 'address', 'article', 'aside', 'b', 'bdi', 'bdo', 'big', 'blockquote', 'br', 'caption', 'cite', 'code', 'col', 'colgroup', 'command', 'dd', 'del', 'details', 'dfn', 'div', 'dl', 'dt', 'em', 'figcaption', 'figure', 'footer', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'header', 'hgroup', 'hr', 'i', 'img', 'ins', 'kbd', 'li', 'mark', 'menu', 'meter', 'nav', 'ol', 'output', 'p', 'pre', 'progress', 'q', 'rp', 'rt', 'ruby', 's', 'samp', 'section', 'small', 'span', 'strong', 'sub', 'summary', 'sup', 'table', 'tbody', 'td', 'tfoot', 'th', 'thead', 'time', 'tr', 'tt', 'u', 'ul', 'var', 'wbr'];
+  protected static $adminTags = [
+    'a',
+    'abbr',
+    'acronym',
+    'address',
+    'article',
+    'aside',
+    'b',
+    'bdi',
+    'bdo',
+    'big',
+    'blockquote',
+    'br',
+    'caption',
+    'cite',
+    'code',
+    'col',
+    'colgroup',
+    'command',
+    'dd',
+    'del',
+    'details',
+    'dfn',
+    'div',
+    'dl',
+    'dt',
+    'em',
+    'figcaption',
+    'figure',
+    'footer',
+    'h1',
+    'h2',
+    'h3',
+    'h4',
+    'h5',
+    'h6',
+    'header',
+    'hgroup',
+    'hr',
+    'i',
+    'img',
+    'ins',
+    'kbd',
+    'li',
+    'mark',
+    'menu',
+    'meter',
+    'nav',
+    'ol',
+    'output',
+    'p',
+    'pre',
+    'progress',
+    'q',
+    'rp',
+    'rt',
+    'ruby',
+    's',
+    'samp',
+    'section',
+    'small',
+    'span',
+    'strong',
+    'sub',
+    'summary',
+    'sup',
+    'table',
+    'tbody',
+    'td',
+    'tfoot',
+    'th',
+    'thead',
+    'time',
+    'tr',
+    'tt',
+    'u',
+    'ul',
+    'var',
+    'wbr',
+  ];
 
   /**
    * The default list of HTML tags allowed by filter().
@@ -45,8 +124,8 @@ class Xss {
    * @param string $string
    *   The string with raw HTML in it. It will be stripped of everything that
    *   can cause an XSS attack.
-   * @param string[] $html_tags
-   *   An array of HTML tags.
+   * @param string[]|null $allowed_html_tags
+   *   An array of allowed HTML tags.
    *
    * @return string
    *   An XSS safe version of $string, or an empty string if $string is not
@@ -56,9 +135,9 @@ class Xss {
    *
    * @ingroup sanitization
    */
-  public static function filter($string, array $html_tags = NULL) {
-    if (is_null($html_tags)) {
-      $html_tags = static::$htmlTags;
+  public static function filter($string, ?array $allowed_html_tags = NULL) {
+    if (is_null($allowed_html_tags)) {
+      $allowed_html_tags = static::$htmlTags;
     }
     // Only operate on valid UTF-8 strings. This is necessary to prevent cross
     // site scripting issues on Internet Explorer 6.
@@ -79,11 +158,11 @@ class Xss {
     $string = preg_replace('/&amp;#[Xx]0*((?:[0-9A-Fa-f]{2})+;)/', '&#x\1', $string);
     // Named entities.
     $string = preg_replace('/&amp;([A-Za-z][A-Za-z0-9]*;)/', '&\1', $string);
-    $html_tags = array_flip($html_tags);
+    $allowed_html_tags = array_flip($allowed_html_tags);
     // Late static binding does not work inside anonymous functions.
     $class = static::class;
-    $splitter = function ($matches) use ($html_tags, $class) {
-      return $class::split($matches[1], $html_tags, $class);
+    $splitter = function ($matches) use ($allowed_html_tags, $class) {
+      return $class::split($matches[1], $allowed_html_tags, $class);
     };
     // Strip any tags that are not in the list of allowed html tags.
     return preg_replace_callback('%
@@ -141,7 +220,7 @@ class Xss {
    *   version of the HTML element.
    */
   protected static function split($string, array $html_tags, $class) {
-    if (substr($string, 0, 1) != '<') {
+    if (!str_starts_with($string, '<')) {
       // We matched a lone ">" character.
       return '&gt;';
     }
@@ -196,7 +275,7 @@ class Xss {
    * @param string $attributes
    *   The html attribute to process.
    *
-   * @return string
+   * @return array
    *   Cleaned up version of the HTML attributes.
    */
   protected static function attributes($attributes) {
@@ -216,9 +295,9 @@ class Xss {
           if (preg_match('/^([-a-zA-Z][-a-zA-Z0-9]*)/', $attributes, $match)) {
             $attribute_name = strtolower($match[1]);
             $skip = (
-              $attribute_name == 'style' ||
-              substr($attribute_name, 0, 2) == 'on' ||
-              substr($attribute_name, 0, 1) == '-' ||
+              in_array($attribute_name, ['style', 'srcdoc']) ||
+              str_starts_with($attribute_name, 'on') ||
+              str_starts_with($attribute_name, '-') ||
               // Ignore long attributes to avoid unnecessary processing
               // overhead.
               strlen($attribute_name) > 96
@@ -231,8 +310,8 @@ class Xss {
             // to be mangled. We prevent this by skipping protocol filtering on
             // such attributes.
             // @see \Drupal\Component\Utility\UrlHelper::filterBadProtocol()
-            // @see http://www.w3.org/TR/html4/index/attributes.html
-            $skip_protocol_filtering = substr($attribute_name, 0, 5) === 'data-' || in_array($attribute_name, [
+            // @see https://www.w3.org/TR/html4/index/attributes.html
+            $skip_protocol_filtering = str_starts_with($attribute_name, 'data-') || in_array($attribute_name, [
               'title',
               'alt',
               'rel',

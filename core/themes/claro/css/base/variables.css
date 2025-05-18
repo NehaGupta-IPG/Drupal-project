@@ -138,7 +138,7 @@
   --input--error-color: var(--color-maximumred);
   --input--error-border-color: var(--color-maximumred);
   --input--disabled-color: rgba(84, 85, 96, 0.6); /* Davy's gray with 0.6 opacity. */
-  --input--disabled-fg-color: var(--color-gray-600);
+  --input--disabled-fg-color: var(--color-gray-800);
   --input--disabled-bg-color: #f2f2f3; /* Light gray with 0.3 opacity on white bg. */
   --input--disabled-border-color: #bababf; /* Old silver with 0.5 opacity on white bg. */
   --input--disabled-border-opacity: 0.5;
@@ -162,7 +162,6 @@
   /*
    * Details.
    */
-  --details-bg-color: rgba(243, 244, 249, 0.4);
   --details-border-color: var(--color-gray-100);
   --details-summary-shadow-color: var(--color-focus);
   --details-summary-focus-border-size: var(--focus-border-size);
@@ -238,10 +237,6 @@
   --progress-track-border-color: var(--color-gray-500);
   --progress-track-bg-color: var(--color-gray-200);
   /**
-   * Tabledrag icon size.
-   */
-  --tabledrag-handle-icon-size: calc(17rem / 16); /* 17px */
-  /**
    * Ajax progress.
    */
   --ajax-progress-margin-horizontal: var(--space-s);
@@ -250,8 +245,17 @@
    */
   --breadcrumb-height: 1.25rem;
   /**
-    * Vertical Tabs.
-    */
+   * Layout.
+   */
+  --layout-region-edit-width: min(60rem, 100%);
+  --layout-region-edit-extended-width: min(68rem, 100%);
+  /**
+   * Vertical Tabs.
+   *
+   * These are shared between the vertical tabs and media library.
+   * @see ../components/vertical-tabs.pcss.css
+   * @see ../theme/media-library.pcss.css
+   */
   --vertical-tabs-margin-vertical: var(--space-s);
   --vertical-tabs-border-radius: var(--details-accordion-border-size-radius);
   --vertical-tabs-shadow: var(--details-box-shadow);

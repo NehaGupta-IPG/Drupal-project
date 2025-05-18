@@ -15,8 +15,7 @@ module.exports = {
   before(browser) {
     browser
       .drupalInstall()
-      .drupalInstallModule('breakpoint')
-      .drupalInstallModule('toolbar')
+      .drupalInstallModule('toolbar', true)
       .drupalCreateUser({
         name: 'user',
         password: '123',
@@ -99,23 +98,23 @@ module.exports = {
       'is-active toolbar-tray-vertical',
     );
     browser.waitForElementPresent(
-      '#toolbar-item-administration-tray li:nth-child(4) button',
+      '#toolbar-item-administration-tray li:nth-child(2) button',
     );
     browser.assert.not.hasClass(
-      '#toolbar-item-administration-tray li:nth-child(4)',
+      '#toolbar-item-administration-tray li:nth-child(2)',
       'open',
     );
     browser.assert.not.hasClass(
-      '#toolbar-item-administration-tray li:nth-child(4) button',
+      '#toolbar-item-administration-tray li:nth-child(2) button',
       'open',
     );
-    browser.click('#toolbar-item-administration-tray li:nth-child(4) button');
+    browser.click('#toolbar-item-administration-tray li:nth-child(2) button');
     browser.assert.hasClass(
-      '#toolbar-item-administration-tray li:nth-child(4)',
+      '#toolbar-item-administration-tray li:nth-child(2)',
       'open',
     );
     browser.assert.hasClass(
-      '#toolbar-item-administration-tray li:nth-child(4) button',
+      '#toolbar-item-administration-tray li:nth-child(2) button',
       'open',
     );
     browser.expect
@@ -158,7 +157,7 @@ module.exports = {
       'is-active toolbar-tray-horizontal',
     );
     browser.assert.hasClass('#toolbar-administration', 'toolbar-oriented');
-    browser.setWindowSize(263, 900);
+    browser.window.setSize(263, 900);
     browser.assert.hasClass(
       itemAdministrationTray,
       'is-active toolbar-tray-vertical',
@@ -166,10 +165,10 @@ module.exports = {
     browser.assert.not.hasClass(itemAdministration, 'toolbar-oriented');
   },
   'Standard width toolbar breakpoint': (browser) => {
-    browser.setWindowSize(1000, 900);
+    browser.window.setSize(1000, 900);
     browser.waitForElementPresent(adminOrientationButton);
     browser.assert.hasClass('body', 'toolbar-fixed');
-    browser.setWindowSize(609, 900);
+    browser.window.setSize(609, 900);
     browser.assert.hasClass(
       itemAdministrationTray,
       'is-active toolbar-tray-vertical',
@@ -178,7 +177,7 @@ module.exports = {
   },
   'Wide toolbar breakpoint': (browser) => {
     browser.waitForElementPresent(adminOrientationButton);
-    browser.setWindowSize(975, 900);
+    browser.window.setSize(975, 900);
     browser.assert.hasClass(
       itemAdministrationTray,
       'is-active toolbar-tray-vertical',
@@ -313,11 +312,11 @@ module.exports = {
     );
   },
   'Locked toolbar vertical wide viewport': (browser) => {
-    browser.setWindowSize(1000, 900);
+    browser.window.setSize(1000, 900);
     browser.waitForElementPresent(adminOrientationButton);
     // eslint-disable-next-line no-unused-expressions
     browser.expect.element(adminOrientationButton).to.be.visible;
-    browser.setWindowSize(975, 900);
+    browser.window.setSize(975, 900);
     browser.assert.hasClass(
       itemAdministrationTray,
       'is-active toolbar-tray-vertical',

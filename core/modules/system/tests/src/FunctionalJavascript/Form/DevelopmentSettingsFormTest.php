@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\system\FunctionalJavascript\Form;
 
 use Drupal\Core\Cache\NullBackend;
@@ -84,6 +86,7 @@ class DevelopmentSettingsFormTest extends WebDriverTestBase {
    * Test data for Twig development mode.
    *
    * @return array[]
+   *   An array of test data.
    */
   public static function twigDevelopmentData(): array {
     return [

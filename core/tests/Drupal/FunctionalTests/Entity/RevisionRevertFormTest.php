@@ -1,10 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\FunctionalTests\Entity;
 
 use Drupal\Component\Render\FormattableMarkup;
 use Drupal\Core\Entity\RevisionLogInterface;
 use Drupal\entity_test\Entity\EntityTestRev;
+use Drupal\entity_test\Entity\EntityTestRevPub;
 use Drupal\entity_test_revlog\Entity\EntityTestWithRevisionLog;
 use Drupal\Tests\BrowserTestBase;
 
@@ -12,6 +15,7 @@ use Drupal\Tests\BrowserTestBase;
  * Tests reverting a revision with revision revert form.
  *
  * @group Entity
+ * @group #slow
  * @coversDefaultClass \Drupal\Core\Entity\Form\RevisionRevertForm
  */
 class RevisionRevertFormTest extends BrowserTestBase {
@@ -40,17 +44,28 @@ class RevisionRevertFormTest extends BrowserTestBase {
   }
 
   /**
+   * Test form revision revert.
+   */
+  public function testFormRevisionRevert(): void {
+    foreach (self::providerPageTitle() as $page_title) {
+      $this->testPageTitle($page_title[0], $page_title[1]);
+    }
+    $this->testAccessRevertLatestDefault();
+    $this->testAccessRevertLatestForwardRevision();
+    $this->testAccessRevertNonLatest();
+    $this->testPrepareRevision();
+  }
+
+  /**
    * Tests title by whether entity supports revision creation dates.
    *
    * @param string $entityTypeId
    *   The entity type to test.
    * @param string $expectedQuestion
    *   The expected question/page title.
-   *
-   * @covers ::getQuestion
-   * @dataProvider providerPageTitle
    */
-  public function testPageTitle(string $entityTypeId, string $expectedQuestion): void {
+  protected function testPageTitle(string $entityTypeId, string $expectedQuestion): void {
+    /** @var \Drupal\Core\Entity\RevisionableStorageInterface $storage */
     $storage = \Drupal::entityTypeManager()->getStorage($entityTypeId);
 
     $entity = $storage->create([
@@ -83,19 +98,19 @@ class RevisionRevertFormTest extends BrowserTestBase {
   /**
    * Data provider for testPageTitle.
    */
-  public function providerPageTitle(): array {
+  protected static function providerPageTitle(): array {
     return [
       ['entity_test_rev', 'Are you sure you want to revert the revision?'],
-      ['entity_test_revlog', 'Are you sure you want to revert to the revision from Sun, 01/11/2009 - 16:00?'],
+      ['entity_test_revlog', 'Are you sure you want to revert to the revision from Sun, 11 Jan 2009 - 16:00?'],
     ];
   }
 
   /**
-   * Test cannot revert latest revision.
+   * Test cannot revert latest default revision.
    *
    * @covers \Drupal\Core\Entity\EntityAccessControlHandler::checkAccess
    */
-  public function testAccessRevertLatest(): void {
+  protected function testAccessRevertLatestDefault(): void {
     /** @var \Drupal\entity_test\Entity\EntityTestRev $entity */
     $entity = EntityTestRev::create();
     $entity->setName('revert');
@@ -106,6 +121,31 @@ class RevisionRevertFormTest extends BrowserTestBase {
 
     $this->drupalGet($entity->toUrl('revision-revert-form'));
     $this->assertSession()->statusCodeEquals(403);
+    $this->assertFalse($entity->access('revert', $this->rootUser, FALSE));
+  }
+
+  /**
+   * Ensures that forward revisions can be reverted.
+   *
+   * @covers \Drupal\Core\Entity\EntityAccessControlHandler::checkAccess
+   */
+  protected function testAccessRevertLatestForwardRevision(): void {
+    /** @var \Drupal\entity_test\Entity\EntityTestRev $entity */
+    $entity = EntityTestRevPub::create();
+    $entity->setName('revert');
+    $entity->isDefaultRevision(TRUE);
+    $entity->setPublished();
+    $entity->setNewRevision();
+    $entity->save();
+
+    $entity->isDefaultRevision(FALSE);
+    $entity->setUnpublished();
+    $entity->setNewRevision();
+    $entity->save();
+
+    $this->drupalGet($entity->toUrl('revision-revert-form'));
+    $this->assertSession()->statusCodeEquals(200);
+    $this->assertTrue($entity->access('revert', $this->rootUser, FALSE));
   }
 
   /**
@@ -113,7 +153,7 @@ class RevisionRevertFormTest extends BrowserTestBase {
    *
    * @covers \Drupal\Core\Entity\EntityAccessControlHandler::checkAccess
    */
-  public function testAccessRevertNonLatest(): void {
+  protected function testAccessRevertNonLatest(): void {
     /** @var \Drupal\entity_test\Entity\EntityTestRev $entity */
     $entity = EntityTestRev::create();
     $entity->setName('revert');
@@ -124,10 +164,12 @@ class RevisionRevertFormTest extends BrowserTestBase {
     $entity->save();
 
     // Reload the entity.
-    $revision = \Drupal::entityTypeManager()->getStorage('entity_test_rev')
-      ->loadRevision($revisionId);
+    /** @var \Drupal\Core\Entity\RevisionableStorageInterface $storage */
+    $storage = \Drupal::entityTypeManager()->getStorage('entity_test_rev');
+    $revision = $storage->loadRevision($revisionId);
     $this->drupalGet($revision->toUrl('revision-revert-form'));
     $this->assertSession()->statusCodeEquals(200);
+    $this->assertTrue($revision->access('revert', $this->rootUser, FALSE));
   }
 
   /**
@@ -154,6 +196,7 @@ class RevisionRevertFormTest extends BrowserTestBase {
     if (count($permissions) > 0) {
       $this->drupalLogin($this->createUser($permissions));
     }
+    /** @var \Drupal\Core\Entity\RevisionableStorageInterface $storage */
     $storage = \Drupal::entityTypeManager()->getStorage($entityTypeId);
 
     $entity = $storage->create([
@@ -196,7 +239,7 @@ class RevisionRevertFormTest extends BrowserTestBase {
   /**
    * Data provider for testSubmitForm.
    */
-  public function providerSubmitForm(): array {
+  public static function providerSubmitForm(): array {
     $data = [];
 
     $data['not supporting revision log, no version history access'] = [
@@ -222,7 +265,7 @@ class RevisionRevertFormTest extends BrowserTestBase {
       'entity_test_revlog',
       'view, revert',
       'entity_test_revlog: reverted <em class="placeholder">view, revert</em> revision <em class="placeholder">1</em>.',
-      'Test entity - revisions log view, revert has been reverted to the revision from Sun, 01/11/2009 - 16:00.',
+      'Test entity - revisions log view, revert has been reverted to the revision from Sun, 11 Jan 2009 - 16:00.',
       '/entity_test_revlog/manage/1',
     ];
 
@@ -231,7 +274,7 @@ class RevisionRevertFormTest extends BrowserTestBase {
       'entity_test_revlog',
       'view, view all revisions, revert',
       'entity_test_revlog: reverted <em class="placeholder">view, view all revisions, revert</em> revision <em class="placeholder">1</em>.',
-      'Test entity - revisions log view, view all revisions, revert has been reverted to the revision from Sun, 01/11/2009 - 16:00.',
+      'Test entity - revisions log view, view all revisions, revert has been reverted to the revision from Sun, 11 Jan 2009 - 16:00.',
       '/entity_test_revlog/1/revisions',
     ];
 
@@ -243,7 +286,7 @@ class RevisionRevertFormTest extends BrowserTestBase {
    *
    * @covers ::prepareRevision
    */
-  public function testPrepareRevision(): void {
+  protected function testPrepareRevision(): void {
     $user = $this->createUser();
     $this->drupalLogin($user);
 
@@ -276,6 +319,7 @@ class RevisionRevertFormTest extends BrowserTestBase {
     $count = $this->countRevisions($entity->getEntityTypeId());
 
     // Load the revision to be copied.
+    /** @var \Drupal\Core\Entity\RevisionableStorageInterface $storage */
     $storage = \Drupal::entityTypeManager()->getStorage($entity->getEntityTypeId());
     /** @var \Drupal\entity_test_revlog\Entity\EntityTestWithRevisionLog $targetRevision */
     $targetRevision = $storage->loadRevision($targetRevertRevisionId);
@@ -287,7 +331,7 @@ class RevisionRevertFormTest extends BrowserTestBase {
     /** @var \Drupal\entity_test_revlog\Entity\EntityTestWithRevisionLog $latestRevision */
     $latestRevision = $storage->loadUnchanged($entity->id());
     $this->assertEquals($count + 1, $this->countRevisions($entity->getEntityTypeId()));
-    $this->assertEquals('Copy of the revision from <em class="placeholder">Sun, 01/11/2009 - 17:00</em>.', $latestRevision->getRevisionLogMessage());
+    $this->assertEquals('Copy of the revision from <em class="placeholder">Sun, 11 Jan 2009 - 17:00</em>.', $latestRevision->getRevisionLogMessage());
     $this->assertGreaterThan($revisionCreationTime, $latestRevision->getRevisionCreationTime());
     $this->assertEquals($user->id(), $latestRevision->getRevisionUserId());
     $this->assertTrue($latestRevision->isDefaultRevision());
@@ -303,7 +347,11 @@ class RevisionRevertFormTest extends BrowserTestBase {
    *   Watchdog entries.
    */
   protected function getLogs(string $channel): array {
-    $logs = \Drupal::database()->query("SELECT * FROM {watchdog} WHERE type = :type", [':type' => $channel])->fetchAll();
+    $logs = \Drupal::database()->select('watchdog')
+      ->fields('watchdog')
+      ->condition('type', $channel)
+      ->execute()
+      ->fetchAll();
     return array_map(function (object $log) {
       return (string) new FormattableMarkup($log->message, unserialize($log->variables));
     }, $logs);

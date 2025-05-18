@@ -2,6 +2,8 @@
 
 namespace Drupal\Core\Render;
 
+// cspell:ignore turbolinks
+
 use Drupal\Core\Asset\AssetCollectionRendererInterface;
 use Drupal\Core\Asset\AssetResolverInterface;
 use Drupal\Core\Asset\AttachedAssets;
@@ -23,20 +25,13 @@ use Symfony\Component\HttpFoundation\RequestStack;
  * Drupal\Core\Render\HtmlResponse object. Then use its getContent(),
  * getStatusCode(), and/or the headers property to access the result.
  *
- * @see template_preprocess_html()
+ * @see \Drupal\Core\Theme\ThemePreprocess::preprocessHtml()
  * @see \Drupal\Core\Render\AttachmentsResponseProcessorInterface
  * @see \Drupal\Core\Render\BareHtmlPageRenderer
  * @see \Drupal\Core\Render\HtmlResponse
  * @see \Drupal\Core\Render\MainContent\HtmlRenderer
  */
 class HtmlResponseAttachmentsProcessor implements AttachmentsResponseProcessorInterface {
-
-  /**
-   * The asset resolver service.
-   *
-   * @var \Drupal\Core\Asset\AssetResolverInterface
-   */
-  protected $assetResolver;
 
   /**
    * A config object for the system performance configuration.
@@ -46,72 +41,36 @@ class HtmlResponseAttachmentsProcessor implements AttachmentsResponseProcessorIn
   protected $config;
 
   /**
-   * The CSS asset collection renderer service.
-   *
-   * @var \Drupal\Core\Asset\AssetCollectionRendererInterface
-   */
-  protected $cssCollectionRenderer;
-
-  /**
-   * The JS asset collection renderer service.
-   *
-   * @var \Drupal\Core\Asset\AssetCollectionRendererInterface
-   */
-  protected $jsCollectionRenderer;
-
-  /**
-   * The request stack.
-   *
-   * @var \Symfony\Component\HttpFoundation\RequestStack
-   */
-  protected $requestStack;
-
-  /**
-   * The renderer.
-   *
-   * @var \Drupal\Core\Render\RendererInterface
-   */
-  protected $renderer;
-
-  /**
-   * The module handler service.
-   *
-   * @var \Drupal\Core\Extension\ModuleHandlerInterface
-   */
-  protected $moduleHandler;
-
-  /**
    * Constructs a HtmlResponseAttachmentsProcessor object.
    *
-   * @param \Drupal\Core\Asset\AssetResolverInterface $asset_resolver
+   * @param \Drupal\Core\Asset\AssetResolverInterface $assetResolver
    *   An asset resolver.
    * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
    *   A config factory for retrieving required config objects.
-   * @param \Drupal\Core\Asset\AssetCollectionRendererInterface $css_collection_renderer
+   * @param \Drupal\Core\Asset\AssetCollectionRendererInterface $cssCollectionRenderer
    *   The CSS asset collection renderer.
-   * @param \Drupal\Core\Asset\AssetCollectionRendererInterface $js_collection_renderer
+   * @param \Drupal\Core\Asset\AssetCollectionRendererInterface $jsCollectionRenderer
    *   The JS asset collection renderer.
-   * @param \Symfony\Component\HttpFoundation\RequestStack $request_stack
+   * @param \Symfony\Component\HttpFoundation\RequestStack $requestStack
    *   The request stack.
    * @param \Drupal\Core\Render\RendererInterface $renderer
    *   The renderer.
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
+   * @param \Drupal\Core\Extension\ModuleHandlerInterface $moduleHandler
    *   The module handler service.
-   * @param \Drupal\Core\Language\LanguageManagerInterface|null $languageManager
+   * @param \Drupal\Core\Language\LanguageManagerInterface $languageManager
    *   The language manager.
    */
-  public function __construct(AssetResolverInterface $asset_resolver, ConfigFactoryInterface $config_factory, AssetCollectionRendererInterface $css_collection_renderer, AssetCollectionRendererInterface $js_collection_renderer, RequestStack $request_stack, RendererInterface $renderer, ModuleHandlerInterface $module_handler, protected ?LanguageManagerInterface $languageManager = NULL) {
-    $this->assetResolver = $asset_resolver;
+  public function __construct(
+    protected AssetResolverInterface $assetResolver,
+    ConfigFactoryInterface $config_factory,
+    protected AssetCollectionRendererInterface $cssCollectionRenderer,
+    protected AssetCollectionRendererInterface $jsCollectionRenderer,
+    protected RequestStack $requestStack,
+    protected RendererInterface $renderer,
+    protected ModuleHandlerInterface $moduleHandler,
+    protected LanguageManagerInterface $languageManager,
+  ) {
     $this->config = $config_factory->get('system.performance');
-    $this->cssCollectionRenderer = $css_collection_renderer;
-    $this->jsCollectionRenderer = $js_collection_renderer;
-    $this->requestStack = $request_stack;
-    $this->renderer = $renderer;
-    $this->moduleHandler = $module_handler;
-    if (!isset($languageManager)) {
-      @trigger_error('Calling ' . __METHOD__ . '() without the $languageManager argument is deprecated in drupal:10.1.0 and will be required in drupal:11.0.0', E_USER_DEPRECATED);
-      $this->languageManager = \Drupal::languageManager();
-    }
   }
 
   /**
@@ -143,7 +102,16 @@ class HtmlResponseAttachmentsProcessor implements AttachmentsResponseProcessorIn
     // Send a message back if the render array has unsupported #attached types.
     $unsupported_types = array_diff(
       array_keys($attached),
-      ['html_head', 'feed', 'html_head_link', 'http_header', 'library', 'html_response_attachment_placeholders', 'placeholders', 'drupalSettings']
+      [
+        'html_head',
+        'feed',
+        'html_head_link',
+        'http_header',
+        'library',
+        'html_response_attachment_placeholders',
+        'placeholders',
+        'drupalSettings',
+      ]
     );
     if (!empty($unsupported_types)) {
       throw new \LogicException(sprintf('You are not allowed to use %s in #attached.', implode(', ', $unsupported_types)));
@@ -182,9 +150,9 @@ class HtmlResponseAttachmentsProcessor implements AttachmentsResponseProcessorIn
           );
           unset($attached['feed']);
         }
-        // 'html_head_link' is a special case of 'html_head' which can be present
-        // as a head element, but also as a Link: HTTP header depending on
-        // settings in the render array. Processing it can add to both the
+        // 'html_head_link' is a special case of 'html_head' which can be
+        // present as a head element, but also as a Link: HTTP header depending
+        // on settings in the render array. Processing it can add to both the
         // 'html_head' and 'http_header' keys of '#attached', so we must address
         // it before 'html_head'.
         if (!empty($attached['html_head_link'])) {
@@ -311,17 +279,19 @@ class HtmlResponseAttachmentsProcessor implements AttachmentsResponseProcessorIn
   protected function processAssetLibraries(AttachedAssetsInterface $assets, array $placeholders) {
     $variables = [];
 
+    $maintenance_mode = defined('MAINTENANCE_MODE') || \Drupal::state()->get('system.maintenance_mode');
+
     // Print styles - if present.
     if (isset($placeholders['styles'])) {
       // Optimize CSS if necessary, but only during normal site operation.
-      $optimize_css = !defined('MAINTENANCE_MODE') && $this->config->get('css.preprocess');
+      $optimize_css = !$maintenance_mode && $this->config->get('css.preprocess');
       $variables['styles'] = $this->cssCollectionRenderer->render($this->assetResolver->getCssAssets($assets, $optimize_css, $this->languageManager->getCurrentLanguage()));
     }
 
     // Print scripts - if any are present.
     if (isset($placeholders['scripts']) || isset($placeholders['scripts_bottom'])) {
       // Optimize JS if necessary, but only during normal site operation.
-      $optimize_js = !defined('MAINTENANCE_MODE') && !\Drupal::state()->get('system.maintenance_mode') && $this->config->get('js.preprocess');
+      $optimize_js = !$maintenance_mode && $this->config->get('js.preprocess');
       [$js_assets_header, $js_assets_footer] = $this->assetResolver->getJsAssets($assets, $optimize_js, $this->languageManager->getCurrentLanguage());
       $variables['scripts'] = $this->jsCollectionRenderer->render($js_assets_header);
       $variables['scripts_bottom'] = $this->jsCollectionRenderer->render($js_assets_footer);
@@ -349,7 +319,7 @@ class HtmlResponseAttachmentsProcessor implements AttachmentsResponseProcessorIn
     $content = $response->getContent();
     foreach ($placeholders as $type => $placeholder) {
       if (isset($variables[$type])) {
-        $content = str_replace($placeholder, $this->renderer->renderPlain($variables[$type]), $content);
+        $content = str_replace($placeholder, $this->renderer->renderInIsolation($variables[$type]), $content);
       }
     }
     $response->setContent($content);
@@ -367,7 +337,7 @@ class HtmlResponseAttachmentsProcessor implements AttachmentsResponseProcessorIn
    *   - The header value.
    *   - (optional) Whether to replace a current value with the new one, or add
    *     it to the others. If the value is not replaced, it will be appended,
-   *     resulting in a header like this: 'Header: value1,value2'
+   *     resulting in a header like this: 'Header: value1,value2'.
    */
   protected function setHeaders(HtmlResponse $response, array $headers) {
     foreach ($headers as $values) {

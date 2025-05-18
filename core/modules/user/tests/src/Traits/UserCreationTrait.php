@@ -1,8 +1,9 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\user\Traits;
 
-use Drupal\Component\Render\FormattableMarkup;
 use Drupal\Core\Database\DatabaseExceptionWrapper;
 use Drupal\Core\Entity\EntityStorageException;
 use Drupal\Core\Session\AccountInterface;
@@ -10,6 +11,7 @@ use Drupal\KernelTests\KernelTestBase;
 use Drupal\user\Entity\Role;
 use Drupal\user\Entity\User;
 use Drupal\user\RoleInterface;
+use Drupal\user\UserInterface;
 
 /**
  * Provides test methods for user creation and authentication.
@@ -44,7 +46,7 @@ trait UserCreationTrait {
    * @throws \Drupal\Core\Entity\EntityStorageException
    *   If the user could not be saved.
    */
-  protected function setUpCurrentUser(array $values = [], array $permissions = [], $admin = FALSE) {
+  protected function setUpCurrentUser(array $values = [], array $permissions = [], $admin = FALSE): UserInterface {
     $values += [
       'name' => $this->randomMachineName(),
     ];
@@ -123,7 +125,7 @@ trait UserCreationTrait {
    * @param \Drupal\Core\Session\AccountInterface $account
    *   The user account object.
    */
-  protected function setCurrentUser(AccountInterface $account) {
+  protected function setCurrentUser(AccountInterface $account): void {
     \Drupal::currentUser()->setAccount($account);
   }
 
@@ -148,7 +150,7 @@ trait UserCreationTrait {
    * @throws \Drupal\Core\Entity\EntityStorageException
    *   If the user creation fails.
    */
-  protected function createUser(array $permissions = [], $name = NULL, $admin = FALSE, array $values = []) {
+  protected function createUser(array $permissions = [], $name = NULL, $admin = FALSE, array $values = []): UserInterface|false {
     // Create a role with the given permission set, if any.
     $rid = FALSE;
     if ($permissions) {
@@ -183,7 +185,7 @@ trait UserCreationTrait {
     $account->save();
 
     $valid_user = $account->id() !== NULL;
-    $this->assertTrue($valid_user, new FormattableMarkup('User created with name %name and pass %pass', ['%name' => $edit['name'], '%pass' => $edit['pass']]));
+    $this->assertTrue($valid_user, "User created with name {$edit['name']} and pass {$edit['pass']}");
     if (!$valid_user) {
       return FALSE;
     }
@@ -206,10 +208,10 @@ trait UserCreationTrait {
    *   (optional) The weight for the role. Defaults to NULL which sets the
    *   weight to maximum + 1.
    *
-   * @return string
+   * @return string|false
    *   Role ID of newly created role, or FALSE if role creation failed.
    */
-  protected function createAdminRole($rid = NULL, $name = NULL, $weight = NULL) {
+  protected function createAdminRole($rid = NULL, $name = NULL, $weight = NULL): string|false {
     $rid = $this->createRole([], $rid, $name, $weight);
     if ($rid) {
       /** @var \Drupal\user\RoleInterface $role */
@@ -233,13 +235,13 @@ trait UserCreationTrait {
    *   (optional) The weight for the role. Defaults to NULL which sets the
    *   weight to maximum + 1.
    *
-   * @return string
+   * @return string|false
    *   Role ID of newly created role, or FALSE if role creation failed.
    */
-  protected function createRole(array $permissions, $rid = NULL, $name = NULL, $weight = NULL) {
+  protected function createRole(array $permissions, $rid = NULL, $name = NULL, $weight = NULL): string|false {
     // Generate a random, lowercase machine name if none was passed.
     if (!isset($rid)) {
-      $rid = strtolower($this->randomMachineName(8));
+      $rid = $this->randomMachineName(8);
     }
     // Generate a random label.
     if (!isset($name)) {
@@ -249,9 +251,7 @@ trait UserCreationTrait {
     }
 
     // Check the all the permissions strings are valid.
-    if (!$this->checkPermissions($permissions)) {
-      return FALSE;
-    }
+    $this->checkPermissions($permissions);
 
     // Create new role.
     $role = Role::create([
@@ -263,7 +263,7 @@ trait UserCreationTrait {
     }
     $result = $role->save();
 
-    $this->assertSame(SAVED_NEW, $result, new FormattableMarkup('Created role ID @rid with name @name.', ['@name' => var_export($role->label(), TRUE), '@rid' => var_export($role->id(), TRUE)]));
+    $this->assertSame(SAVED_NEW, $result, "Created role ID {$role->id()} with name {$role->label()}.");
 
     if ($result === SAVED_NEW) {
       // Grant the specified permissions to the role, if any.
@@ -287,18 +287,16 @@ trait UserCreationTrait {
    *   The permission names to check.
    *
    * @return bool
-   *   TRUE if the permissions are valid, FALSE otherwise.
+   *   TRUE if the permissions are valid.
    */
-  protected function checkPermissions(array $permissions) {
+  protected function checkPermissions(array $permissions): bool {
     $available = array_keys(\Drupal::service('user.permissions')->getPermissions());
-    $valid = TRUE;
     foreach ($permissions as $permission) {
       if (!in_array($permission, $available)) {
-        $this->fail(new FormattableMarkup('Invalid permission %permission.', ['%permission' => $permission]));
-        $valid = FALSE;
+        $this->fail("Invalid permission $permission.");
       }
     }
-    return $valid;
+    return TRUE;
   }
 
   /**
@@ -309,7 +307,7 @@ trait UserCreationTrait {
    * @param array $permissions
    *   (optional) A list of permission names to grant.
    */
-  protected function grantPermissions(RoleInterface $role, array $permissions) {
+  protected function grantPermissions(RoleInterface $role, array $permissions): void {
     foreach ($permissions as $permission) {
       $role->grantPermission($permission);
     }

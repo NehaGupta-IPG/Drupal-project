@@ -1,7 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\ajax_test\Controller;
 
+use Drupal\Component\Serialization\Json;
 use Drupal\Core\Ajax\AjaxResponse;
 use Drupal\Core\Ajax\AlertCommand;
 use Drupal\Core\Ajax\CloseDialogCommand;
@@ -417,6 +420,79 @@ class AjaxTestController {
         ],
       ],
     ];
+  }
+
+  /**
+   * Provides an Ajax link used with different HTTP methods.
+   *
+   * @return array
+   *   The AJAX link.
+   */
+  public function httpMethods(): array {
+    return [
+      '#type' => 'link',
+      '#title' => 'Link',
+      '#url' => Url::fromRoute('ajax_test.http_methods.dialog'),
+      '#attributes' => [
+        'class' => ['use-ajax'],
+        'data-dialog-type' => 'modal',
+        'data-dialog-options' => Json::encode(['width' => 800]),
+        // Use this state var to change the HTTP method in tests.
+        // @see \Drupal\FunctionalJavascriptTests\Ajax\DialogTest::testHttpMethod()
+        'data-ajax-http-method' => \Drupal::state()->get('ajax_test.http_method', 'POST'),
+      ],
+      '#attached' => [
+        'library' => [
+          'core/drupal.dialog.ajax',
+        ],
+      ],
+    ];
+  }
+
+  /**
+   * Provides a modal dialog to test links with different HTTP methods.
+   *
+   * @return array
+   *   The render array.
+   */
+  public function httpMethodsDialog(): array {
+    return ['#markup' => 'Modal dialog contents'];
+  }
+
+  /**
+   * Provides an Ajax link that open in dialog.
+   *
+   * @return array
+   *   The AJAX link.
+   */
+  public function linkPageDialog(): array {
+    return [
+      '#type' => 'link',
+      '#title' => 'Modal link',
+      '#url' => Url::fromRoute('ajax_test.link_page.dialog_contents'),
+      '#attributes' => [
+        'class' => [
+          'use-ajax',
+        ],
+        'data-dialog-type' => 'dialog',
+      ],
+      '#attached' => [
+        'library' => [
+          'core/drupal.dialog.ajax',
+        ],
+      ],
+    ];
+  }
+
+  /**
+   * Provides a title to the page.
+   *
+   * @return string
+   *   The page title.
+   */
+  public function linkPageDialogTitle(): string {
+    $title = 'Dialog link page title';
+    return $title;
   }
 
 }

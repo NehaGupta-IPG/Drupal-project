@@ -36,7 +36,8 @@ class DatabaseDriver extends Extension {
     string $root,
     protected Extension $module,
     protected string $driverName,
-    protected array $discoveredModules) {
+    protected array $discoveredModules,
+  ) {
     $this->root = $root;
     $this->type = 'database_driver';
   }
@@ -90,7 +91,12 @@ class DatabaseDriver extends Extension {
    */
   public function load() {
     if (!isset($this->classLoader)) {
-      $this->classLoader = \Drupal::service('class_loader');
+      if (\Drupal::hasContainer() && \Drupal::hasService('class_loader')) {
+        $this->classLoader = \Drupal::service('class_loader');
+      }
+      else {
+        $this->classLoader = require DRUPAL_ROOT . '/autoload.php';
+      }
       $this->classLoader->addPsr4($this->getNamespace() . '\\', $this->getPath());
       foreach (($this->getAutoloadInfo()['dependencies'] ?? []) as $dependency) {
         $this->classLoader->addPsr4($dependency['namespace'] . '\\', $dependency['autoload']);
@@ -207,7 +213,7 @@ class DatabaseDriver extends Extension {
   private function getModuleInfo(): void {
     if (!isset($this->info)) {
       $infoParser = new InfoParser($this->root);
-      $this->info = $infoParser->parse($this->root . DIRECTORY_SEPARATOR . $this->getModule()->getPathname());
+      $this->info = $infoParser->parse($this->getModule()->getPathname());
     }
   }
 

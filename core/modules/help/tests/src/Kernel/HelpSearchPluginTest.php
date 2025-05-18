@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\help\Kernel;
 
 use Drupal\Core\Access\AccessibleInterface;
@@ -11,7 +13,7 @@ use Drupal\search\Plugin\SearchIndexingInterface;
  *
  * @group help
  *
- * @see \Drupal\help_topics\Plugin\Search\HelpSearch
+ * @see \Drupal\help\Plugin\Search\HelpSearch
  */
 class HelpSearchPluginTest extends KernelTestBase {
 
@@ -23,10 +25,10 @@ class HelpSearchPluginTest extends KernelTestBase {
   /**
    * Tests search plugin annotation and interfaces.
    */
-  public function testAnnotation() {
+  public function testAnnotation(): void {
     /** @var \Drupal\search\SearchPluginManager $manager */
     $manager = \Drupal::service('plugin.manager.search');
-    /** @var \Drupal\help_topics\Plugin\Search\HelpSearch $plugin */
+    /** @var \Drupal\help\Plugin\Search\HelpSearch $plugin */
     $plugin = $manager->createInstance('help_search');
     $this->assertInstanceOf(AccessibleInterface::class, $plugin);
     $this->assertInstanceOf(SearchIndexingInterface::class, $plugin);

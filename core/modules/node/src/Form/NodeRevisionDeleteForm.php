@@ -2,7 +2,6 @@
 
 namespace Drupal\node\Form;
 
-use Drupal\Core\Database\Connection;
 use Drupal\Core\Access\AccessManagerInterface;
 use Drupal\Core\Datetime\DateFormatterInterface;
 use Drupal\Core\Entity\EntityStorageInterface;
@@ -68,21 +67,16 @@ class NodeRevisionDeleteForm extends ConfirmFormBase {
    *   The node storage.
    * @param \Drupal\Core\Entity\EntityStorageInterface $node_type_storage
    *   The node type storage.
-   * @param \Drupal\Core\Access\AccessManagerInterface|\Drupal\Core\Database\Connection $access_manager
+   * @param \Drupal\Core\Access\AccessManagerInterface $access_manager
    *   The access manager.
    * @param \Drupal\Core\Datetime\DateFormatterInterface $date_formatter
    *   The date formatter service.
    */
-  public function __construct(EntityStorageInterface $node_storage, EntityStorageInterface $node_type_storage, AccessManagerInterface|Connection $access_manager, DateFormatterInterface $date_formatter) {
+  public function __construct(EntityStorageInterface $node_storage, EntityStorageInterface $node_type_storage, AccessManagerInterface $access_manager, DateFormatterInterface $date_formatter) {
     $this->nodeStorage = $node_storage;
     $this->nodeTypeStorage = $node_type_storage;
     $this->accessManager = $access_manager;
     $this->dateFormatter = $date_formatter;
-    if ($access_manager instanceof Connection) {
-      $this->connection = $access_manager;
-      $this->accessManager = func_get_arg(3);
-      @trigger_error('Calling ' . __CLASS__ . '::_construct() with the $connection argument is deprecated in drupal:10.1.0 and is removed from drupal:11.0.0. See https://www.drupal.org/node/3343754', E_USER_DEPRECATED);
-    }
   }
 
   /**
@@ -131,7 +125,7 @@ class NodeRevisionDeleteForm extends ConfirmFormBase {
   /**
    * {@inheritdoc}
    */
-  public function buildForm(array $form, FormStateInterface $form_state, NodeInterface $node_revision = NULL) {
+  public function buildForm(array $form, FormStateInterface $form_state, ?NodeInterface $node_revision = NULL) {
     $this->revision = $node_revision;
     $form = parent::buildForm($form, $form_state);
 
@@ -142,7 +136,9 @@ class NodeRevisionDeleteForm extends ConfirmFormBase {
    * {@inheritdoc}
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {
-    $this->nodeStorage->deleteRevision($this->revision->getRevisionId());
+    /** @var \Drupal\Core\Entity\RevisionableStorageInterface $storage */
+    $storage = $this->nodeStorage;
+    $storage->deleteRevision($this->revision->getRevisionId());
 
     $this->logger('content')->info('@type: deleted %title revision %revision.', ['@type' => $this->revision->bundle(), '%title' => $this->revision->label(), '%revision' => $this->revision->getRevisionId()]);
     $node_type = $this->nodeTypeStorage->load($this->revision->bundle())->label();
