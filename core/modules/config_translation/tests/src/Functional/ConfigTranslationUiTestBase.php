@@ -53,7 +53,6 @@ abstract class ConfigTranslationUiTestBase extends BrowserTestBase {
    * {@inheritdoc}
    */
   protected static $modules = [
-    'navigation_variant_test',
     'config_translation',
     'config_translation_test',
     'contact',

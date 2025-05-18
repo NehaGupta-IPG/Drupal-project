@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\Tests\config_translation\Functional;
 
 use Drupal\Component\Utility\Html;
+use Drupal\Core\Extension\ModuleInstallerInterface;
 use Drupal\Core\Language\Language;
 use Drupal\entity_test\EntityTestHelper;
 use Drupal\field\Entity\FieldConfig;
@@ -24,6 +25,9 @@ class ConfigTranslationUiModulesTest extends ConfigTranslationUiTestBase {
    * Tests the contact form translation.
    */
   public function testContactConfigEntityTranslation(): void {
+    \Drupal::service(ModuleInstallerInterface::class)->install([
+      'navigation_variant_test',
+    ]);
     $this->drupalLogin($this->adminUser);
 
     $this->drupalGet('admin/structure/contact');

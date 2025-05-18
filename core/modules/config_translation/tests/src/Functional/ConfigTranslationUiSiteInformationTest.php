@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\Tests\config_translation\Functional;
 
 // cspell:ignore libellé
+use Drupal\Core\Extension\ModuleInstallerInterface;
 
 /**
  * Translate site information to various languages.
@@ -17,6 +18,11 @@ class ConfigTranslationUiSiteInformationTest extends ConfigTranslationUiTestBase
    * Tests the site information translation interface.
    */
   public function testSiteInformationTranslationUi(): void {
+    \Drupal::service(ModuleInstallerInterface::class)->install([
+      'block',
+    ]);
+    $this->drupalPlaceBlock('page_title_block');
+    $this->drupalPlaceBlock('local_tasks_block');
     $this->drupalLogin($this->adminUser);
 
     $site_name = 'Name of the site for testing configuration translation';

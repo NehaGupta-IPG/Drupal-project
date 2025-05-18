@@ -51,8 +51,6 @@ class RouteCachingLanguageTest extends BrowserTestBase {
 
     $this->createContentType(['type' => 'page']);
 
-    $this->drupalPlaceBlock('page_title_block');
-
     $permissions = [
       'access administration pages',
       'administer content translation',

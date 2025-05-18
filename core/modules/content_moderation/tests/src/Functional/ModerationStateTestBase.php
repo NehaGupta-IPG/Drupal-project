@@ -64,7 +64,6 @@ abstract class ModerationStateTestBase extends BrowserTestBase {
    */
   protected static $modules = [
     'content_moderation',
-    'navigation_variant_test',
     'block_content',
     'node',
     'entity_test',

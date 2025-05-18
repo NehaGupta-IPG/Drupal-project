@@ -20,6 +20,7 @@ class TranslatedViewTest extends UITestBase {
    */
   protected static $modules = [
     'config_translation',
+    'navigation_variant_test',
     'views_ui',
   ];
 

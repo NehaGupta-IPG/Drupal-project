@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\config_translation\Functional;
 
+use Drupal\Core\Extension\ModuleInstallerInterface;
 use Drupal\Core\Language\Language;
 use Drupal\Core\Language\LanguageInterface;
 
@@ -25,6 +26,9 @@ class ConfigTranslationUiTest extends ConfigTranslationUiTestBase {
    * the translations are saved for all configuration names properly.
    */
   public function testAccountSettingsConfigurationTranslation(): void {
+    \Drupal::service(ModuleInstallerInterface::class)->install([
+      'navigation_variant_test',
+    ]);
     $this->drupalLogin($this->adminUser);
 
     $this->drupalGet('admin/config/people/accounts');

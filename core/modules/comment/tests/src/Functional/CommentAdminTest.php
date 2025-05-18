@@ -7,6 +7,7 @@ namespace Drupal\Tests\comment\Functional;
 use Drupal\comment\CommentInterface;
 use Drupal\Component\Render\FormattableMarkup;
 use Drupal\Component\Utility\Html;
+use Drupal\Core\Extension\ModuleInstallerInterface;
 use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\user\RoleInterface;
 use Drupal\comment\Entity\Comment;
@@ -24,18 +25,13 @@ class CommentAdminTest extends CommentTestBase {
   protected $defaultTheme = 'stark';
 
   /**
-   * {@inheritdoc}
-   */
-  protected function setUp(): void {
-    parent::setUp();
-
-    $this->drupalPlaceBlock('page_title_block');
-  }
-
-  /**
    * Tests comment approval functionality through admin/content/comment.
    */
   public function testApprovalAdminInterface(): void {
+    \Drupal::service(ModuleInstallerInterface::class)->install([
+      'navigation_variant_test',
+    ]);
+
     // Set anonymous comments to require approval.
     user_role_change_permissions(RoleInterface::ANONYMOUS_ID, [
       'access comments' => TRUE,

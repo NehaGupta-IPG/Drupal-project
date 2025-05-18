@@ -25,7 +25,6 @@ abstract class CommentTestBase extends BrowserTestBase {
    * {@inheritdoc}
    */
   protected static $modules = [
-    'navigation_variant_test',
     'comment',
     'node',
     'history',

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\comment\Functional;
 
+use Drupal\Core\Extension\ModuleInstallerInterface;
 use Drupal\user\RoleInterface;
 
 /**
@@ -44,6 +45,9 @@ class CommentBlockTest extends CommentTestBase {
    * Tests the recent comments block.
    */
   public function testRecentCommentBlock(): void {
+    \Drupal::service(ModuleInstallerInterface::class)->install([
+      'block',
+    ]);
     $this->drupalLogin($this->adminUser);
     $this->drupalPlaceBlock('views_block:comments_recent-block_1');
 

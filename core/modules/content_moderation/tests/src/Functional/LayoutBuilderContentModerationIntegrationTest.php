@@ -28,6 +28,7 @@ class LayoutBuilderContentModerationIntegrationTest extends BrowserTestBase {
     'content_moderation',
     'menu_ui',
     'block_content',
+    'navigation_variant_test',
   ];
 
   /**
