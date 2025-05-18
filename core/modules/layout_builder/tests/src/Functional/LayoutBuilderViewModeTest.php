@@ -20,6 +20,7 @@ class LayoutBuilderViewModeTest extends LayoutBuilderTestBase {
    * Tests that a non-default view mode works as expected.
    */
   public function testNonDefaultViewMode(): void {
+    $this->drupalPlaceBlock('local_tasks_block');
     $assert_session = $this->assertSession();
     $page = $this->getSession()->getPage();
 

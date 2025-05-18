@@ -70,8 +70,7 @@ class UserRoleAdminTest extends BrowserTestBase {
 
     // Verify permissions local task can be accessed when editing a role.
     $this->drupalGet("admin/people/roles/manage/{$role->id()}");
-    $local_tasks_block = $this->assertSession()->elementExists('css', '#block-test-role-admin-test-local-tasks-block');
-    $local_tasks_block->clickLink('Permissions');
+    $this->clickLink('Permissions');
     $this->assertSession()->fieldExists("{$role->id()}[change own username]");
 
     // Try adding a duplicate role.
