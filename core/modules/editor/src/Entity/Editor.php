@@ -64,10 +64,8 @@ class Editor extends ConfigEntityBase implements EditorInterface {
 
   /**
    * The structured array of text editor plugin-specific settings.
-   *
-   * @var array
    */
-  protected $settings = [];
+  protected array $settings = [];
 
   /**
    * The structured array of image upload settings.
