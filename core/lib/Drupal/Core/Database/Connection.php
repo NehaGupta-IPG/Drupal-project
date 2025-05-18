@@ -138,6 +138,13 @@ abstract class Connection {
   public readonly IdentifierHandlerBase $identifiers;
 
   /**
+   * Storage for handling deprecated properties via magic methods.
+   *
+   * @var array<string,mixed>
+   */
+  private array $deprecatedProperties = [];
+
+  /**
    * Constructs a Connection object.
    *
    * @param object $connection
@@ -170,7 +177,7 @@ abstract class Connection {
       $this->identifiers = $identifierHandler;
     }
     else {
-      @trigger_error("Not passing an IdentifierHandler object to " . __METHOD__ . "() is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. See https://www.drupal.org/node/3513282", E_USER_DEPRECATED);
+      @trigger_error("Not passing an IdentifierHandler object to " . __METHOD__ . "() is deprecated in drupal:11.3.0 and is removed from drupal:13.0.0. See https://www.drupal.org/node/3513282", E_USER_DEPRECATED);
       $this->identifiers = new class($connection_options['prefix'] ?? '') extends IdentifierHandlerBase {
 
         /**
@@ -193,19 +200,21 @@ abstract class Connection {
   public function __get(string $name): mixed {
     switch ($name) {
       case 'prefix':
-        @trigger_error("Accessing Connection::\${$name} is deprecated in drupal:11.2.0 and the property is removed from drupal:12.0.0. Use IdentifierHandler methods instead. See https://www.drupal.org/node/3513282", E_USER_DEPRECATED);
-        return $this->identifiers->tablePrefix ?? '';
+        @trigger_error("Accessing Connection::\${$name} is deprecated in drupal:11.3.0 and the property is removed from drupal:13.0.0. Use IdentifierHandler methods instead. See https://www.drupal.org/node/3513282", E_USER_DEPRECATED);
+        return isset($this->deprecatedProperties[$name]) ?
+          $this->deprecatedProperties[$name] :
+          $this->identifiers->tablePrefix ?? '';
 
       case 'escapedTables':
-        @trigger_error("Accessing Connection::\${$name} is deprecated in drupal:11.2.0 and the property is removed from drupal:12.0.0. Use IdentifierHandler methods instead. See https://www.drupal.org/node/3513282", E_USER_DEPRECATED);
+        @trigger_error("Accessing Connection::\${$name} is deprecated in drupal:11.3.0 and the property is removed from drupal:13.0.0. Use IdentifierHandler methods instead. See https://www.drupal.org/node/3513282", E_USER_DEPRECATED);
         return [];
 
       case 'identifierQuotes':
-        @trigger_error("Accessing Connection::\${$name} is deprecated in drupal:11.2.0 and the property is removed from drupal:12.0.0. Use IdentifierHandler methods instead. See https://www.drupal.org/node/3513282", E_USER_DEPRECATED);
+        @trigger_error("Accessing Connection::\${$name} is deprecated in drupal:11.3.0 and the property is removed from drupal:13.0.0. Use IdentifierHandler methods instead. See https://www.drupal.org/node/3513282", E_USER_DEPRECATED);
         return $this->identifiers->identifierQuotes ?? '';
 
       case 'tablePlaceholderReplacements':
-        @trigger_error("Accessing Connection::\${$name} is deprecated in drupal:11.2.0 and the property is removed from drupal:12.0.0. Use IdentifierHandler methods instead. See https://www.drupal.org/node/3513282", E_USER_DEPRECATED);
+        @trigger_error("Accessing Connection::\${$name} is deprecated in drupal:11.3.0 and the property is removed from drupal:13.0.0. Use IdentifierHandler methods instead. See https://www.drupal.org/node/3513282", E_USER_DEPRECATED);
         $identifierQuotes = $this->identifiers->identifierQuotes ?? ['"', '"'];
         return [
           $identifierQuotes[0] . str_replace('.', $identifierQuotes[1] . '.' . $identifierQuotes[0], $this->identifiers->tablePrefix ?? ''),
@@ -224,10 +233,14 @@ abstract class Connection {
   public function __set(string $name, mixed $value): void {
     switch ($name) {
       case 'prefix':
+        @trigger_error("Accessing Connection::\${$name} is deprecated in drupal:11.3.0 and the property is removed from drupal:13.0.0. Use IdentifierHandler methods instead. See https://www.drupal.org/node/3513282", E_USER_DEPRECATED);
+        $this->deprecatedProperties[$name] = $value;
+        return;
+
       case 'escapedTables':
       case 'identifierQuotes':
       case 'tablePlaceholderReplacements':
-        @trigger_error("Accessing Connection::\${$name} is deprecated in drupal:11.2.0 and the property is removed from drupal:12.0.0. Use IdentifierHandler methods instead. See https://www.drupal.org/node/3513282", E_USER_DEPRECATED);
+        @trigger_error("Accessing Connection::\${$name} is deprecated in drupal:11.3.0 and the property is removed from drupal:13.0.0. Use IdentifierHandler methods instead. See https://www.drupal.org/node/3513282", E_USER_DEPRECATED);
         return;
 
       default:
@@ -241,10 +254,15 @@ abstract class Connection {
   public function __isset(string $name): bool {
     switch ($name) {
       case 'prefix':
+        @trigger_error("Accessing Connection::\${$name} is deprecated in drupal:11.3.0 and the property is removed from drupal:13.0.0. Use IdentifierHandler methods instead. See https://www.drupal.org/node/3513282", E_USER_DEPRECATED);
+        return isset($this->deprecatedProperties[$name]) ?
+          TRUE :
+          (bool) $this->identifiers->tablePrefix;
+
       case 'escapedTables':
       case 'identifierQuotes':
       case 'tablePlaceholderReplacements':
-        @trigger_error("Accessing Connection::\${$name} is deprecated in drupal:11.2.0 and the property is removed from drupal:12.0.0. Use IdentifierHandler methods instead. See https://www.drupal.org/node/3513282", E_USER_DEPRECATED);
+        @trigger_error("Accessing Connection::\${$name} is deprecated in drupal:11.3.0 and the property is removed from drupal:13.0.0. Use IdentifierHandler methods instead. See https://www.drupal.org/node/3513282", E_USER_DEPRECATED);
         return TRUE;
 
       default:
@@ -258,10 +276,14 @@ abstract class Connection {
   public function __unset(string $name): void {
     switch ($name) {
       case 'prefix':
+        unset($this->deprecatedProperties[$name]);
+        @trigger_error("Accessing Connection::\${$name} is deprecated in drupal:11.3.0 and the property is removed from drupal:13.0.0. Use IdentifierHandler methods instead. See https://www.drupal.org/node/3513282", E_USER_DEPRECATED);
+        return;
+
       case 'escapedTables':
       case 'identifierQuotes':
       case 'tablePlaceholderReplacements':
-        @trigger_error("Accessing Connection::\${$name} is deprecated in drupal:11.2.0 and the property is removed from drupal:12.0.0. Use IdentifierHandler methods instead. See https://www.drupal.org/node/3513282", E_USER_DEPRECATED);
+        @trigger_error("Accessing Connection::\${$name} is deprecated in drupal:11.3.0 and the property is removed from drupal:13.0.0. Use IdentifierHandler methods instead. See https://www.drupal.org/node/3513282", E_USER_DEPRECATED);
         return;
 
       default:
@@ -402,14 +424,14 @@ abstract class Connection {
    * @return string
    *   The table prefix.
    *
-   * @deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Use
+   * @deprecated in drupal:11.3.0 and is removed from drupal:13.0.0. Use
    *   IdentifierHandler methods instead.
    *
    * @see https://www.drupal.org/node/3513282
    */
   public function getPrefix(): string {
-    @trigger_error(__METHOD__ . "() is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Use IdentifierHandler methods instead. See https://www.drupal.org/node/3513282", E_USER_DEPRECATED);
-    return $this->identifiers->tablePrefix;
+    @trigger_error(__METHOD__ . "() is deprecated in drupal:11.3.0 and is removed from drupal:13.0.0. Use IdentifierHandler methods instead. See https://www.drupal.org/node/3513282", E_USER_DEPRECATED);
+    return $this->prefix;
   }
 
   /**
@@ -418,13 +440,15 @@ abstract class Connection {
    * @param string $prefix
    *   A single prefix.
    *
-   * @deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Pass the
+   * @deprecated in drupal:11.3.0 and is removed from drupal:13.0.0. Pass the
    *   table prefix to the IdentifierHandler constructor instead.
    *
    * @see https://www.drupal.org/node/3513282
    */
   protected function setPrefix($prefix) {
-    @trigger_error(__METHOD__ . "() is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Pass the table prefix to the IdentifierHandler constructor instead. See https://www.drupal.org/node/3513282", E_USER_DEPRECATED);
+    @trigger_error(__METHOD__ . "() is deprecated in drupal:11.3.0 and is removed from drupal:13.0.0. Pass the table prefix to the IdentifierHandler constructor instead. See https://www.drupal.org/node/3513282", E_USER_DEPRECATED);
+    assert(is_string($prefix), 'The \'$prefix\' argument to ' . __METHOD__ . '() must be a string');
+    $this->prefix = $prefix;
   }
 
   /**
@@ -1073,13 +1097,13 @@ abstract class Connection {
    * @return string
    *   The sanitized database name.
    *
-   * @deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Use
+   * @deprecated in drupal:11.3.0 and is removed from drupal:13.0.0. Use
    *   IdentifierHandler methods instead.
    *
    * @see https://www.drupal.org/node/3513282
    */
   public function escapeDatabase($database) {
-    @trigger_error(__METHOD__ . "() is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Use IdentifierHandler methods instead. See https://www.drupal.org/node/3513282", E_USER_DEPRECATED);
+    @trigger_error(__METHOD__ . "() is deprecated in drupal:11.3.0 and is removed from drupal:13.0.0. Use IdentifierHandler methods instead. See https://www.drupal.org/node/3513282", E_USER_DEPRECATED);
     return $this->identifiers->schema($database)->forMachine();
   }
 
@@ -1097,7 +1121,7 @@ abstract class Connection {
    * @return string
    *   The sanitized table name.
    *
-   * @deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Use
+   * @deprecated in drupal:11.3.0 and is removed from drupal:13.0.0. Use
    *   IdentifierHandler methods instead.
    *
    * @see https://www.drupal.org/node/3513282
@@ -1105,7 +1129,7 @@ abstract class Connection {
    * @see \Drupal\Core\Database\Connection::setPrefix()
    */
   public function escapeTable($table) {
-    @trigger_error(__METHOD__ . "() is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Use IdentifierHandler methods instead. See https://www.drupal.org/node/3513282", E_USER_DEPRECATED);
+    @trigger_error(__METHOD__ . "() is deprecated in drupal:11.3.0 and is removed from drupal:13.0.0. Use IdentifierHandler methods instead. See https://www.drupal.org/node/3513282", E_USER_DEPRECATED);
     return $this->identifiers->table($table)->canonical();
   }
 
