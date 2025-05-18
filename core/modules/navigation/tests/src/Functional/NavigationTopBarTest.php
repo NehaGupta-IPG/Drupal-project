@@ -23,6 +23,7 @@ class NavigationTopBarTest extends PageCacheTagsTestBase {
   protected static $modules = [
     'navigation',
     'node',
+    'block',
     'layout_builder',
     'test_page_test',
   ];
@@ -67,6 +68,9 @@ class NavigationTopBarTest extends PageCacheTagsTestBase {
       ->enableLayoutBuilder()
       ->setOverridable()
       ->save();
+
+    // Place the tabs block to check its presence.
+    $this->drupalPlaceBlock('local_tasks_block', ['id' => 'tabs']);
 
     // Enable some test blocks.
     $this->node = $this->drupalCreateNode(['type' => $node_type->id()]);

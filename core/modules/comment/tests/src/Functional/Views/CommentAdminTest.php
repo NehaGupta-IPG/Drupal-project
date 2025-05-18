@@ -33,6 +33,7 @@ class CommentAdminTest extends CommentBrowserTestBase {
    */
   protected static $modules = [
     'language',
+    'navigation_variant_test',
   ];
 
   /**
@@ -62,7 +63,6 @@ class CommentAdminTest extends CommentBrowserTestBase {
       'post comments' => TRUE,
       'skip comment approval' => FALSE,
     ]);
-    $this->drupalPlaceBlock('page_title_block');
     $this->drupalLogin($this->adminUser);
     // Ensure that doesn't require contact info.
     $this->setCommentAnonymous(CommentInterface::ANONYMOUS_MAYNOT_CONTACT);

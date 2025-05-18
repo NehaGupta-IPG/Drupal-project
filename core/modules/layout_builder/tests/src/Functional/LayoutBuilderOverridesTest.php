@@ -15,6 +15,14 @@ use Drupal\node\Entity\Node;
 class LayoutBuilderOverridesTest extends LayoutBuilderTestBase {
 
   /**
+   * {@inheritdoc}
+   */
+  protected function setUp(): void {
+    parent::setUp();
+    $this->drupalPlaceBlock('local_tasks_block');
+  }
+
+  /**
    * Tests deleting a field in-use by an overridden layout.
    */
   public function testDeleteField(): void {

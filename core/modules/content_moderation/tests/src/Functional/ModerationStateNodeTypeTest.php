@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\content_moderation\Functional;
 
+use Drupal\Core\Extension\ModuleInstallerInterface;
+
 /**
  * Tests moderation state node type integration.
  *
@@ -89,6 +91,10 @@ class ModerationStateNodeTypeTest extends ModerationStateTestBase {
       return;
     }
     $node = reset($nodes);
+
+    \Drupal::service(ModuleInstallerInterface::class)->install([
+      'navigation_variant_test',
+    ]);
     $this->drupalGet('node/' . $node->id());
     $this->assertSession()->statusCodeEquals(200);
     $this->assertSession()->linkByHrefExists('node/' . $node->id() . '/edit');

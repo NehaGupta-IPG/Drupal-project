@@ -49,9 +49,10 @@ class UserRoleAdminTest extends BrowserTestBase {
   public function testRoleAdministration(): void {
     $this->drupalLogin($this->adminUser);
     $default_langcode = \Drupal::languageManager()->getDefaultLanguage()->getId();
-    // Test presence of tab.
+
+    // Test presence of 'Roles' tab.
     $this->drupalGet('admin/people/permissions');
-    $this->assertSession()->elementsCount('xpath', '//div[@id="block-test-role-admin-test-local-tasks-block"]/ul/li/a[contains(., "Roles")]', 1);
+    $this->assertSession()->linkExists('Roles');
 
     // Test adding a role. (In doing so, we use a role name that happens to
     // correspond to an integer, to test that the role administration pages

@@ -141,6 +141,8 @@ class LayoutBuilderBlocksTest extends LayoutBuilderTestBase {
    * Tests that deleting a View block used in Layout Builder works.
    */
   public function testDeletedView(): void {
+    $this->drupalPlaceBlock('local_tasks_block');
+
     $assert_session = $this->assertSession();
     $page = $this->getSession()->getPage();
 

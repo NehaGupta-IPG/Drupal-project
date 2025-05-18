@@ -162,6 +162,7 @@ class BlockUiTest extends BrowserTestBase {
     // Ensure hidden themes do not appear in the UI. Enable another non base
     // theme and place the local tasks block.
     $this->assertTrue(\Drupal::service('theme_handler')->themeExists('stark'), 'The stark base theme is enabled');
+    $this->drupalPlaceBlock('local_tasks_block', ['region' => 'header', 'theme' => 'stark']);
     // We have to enable at least one extra theme that is not hidden so that
     // local tasks will show up. That's why we enable test_theme_theme.
     \Drupal::service('theme_installer')->install(['stable9', 'test_theme_theme']);

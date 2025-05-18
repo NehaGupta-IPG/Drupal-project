@@ -27,7 +27,7 @@ class ClaroLayoutBuilderTest extends BrowserTestBase {
     'layout_builder_views_test',
     'layout_test',
     'field_ui',
-    'navigation_variant_test',
+    'block',
     'block_test',
     'node',
     'layout_builder_test',

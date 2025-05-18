@@ -19,6 +19,14 @@ class LayoutBuilderTest extends LayoutBuilderTestBase {
   use EnableLayoutBuilderTrait;
 
   /**
+   * {@inheritdoc}
+   */
+  protected function setUp(): void {
+    parent::setUp();
+    $this->drupalPlaceBlock('local_tasks_block');
+  }
+
+  /**
    * Tests the Layout Builder UI for an entity type without a bundle.
    */
   public function testNonBundleEntityType(): void {

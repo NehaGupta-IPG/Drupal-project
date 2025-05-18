@@ -23,7 +23,7 @@ class LayoutBuilderTestBase extends BrowserTestBase {
     'layout_builder',
     'layout_builder_views_test',
     'layout_test',
-    'navigation_variant_test',
+    'block',
     'block_test',
     'contextual',
     'node',

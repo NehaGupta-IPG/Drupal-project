@@ -24,7 +24,7 @@ class MediaAccessTest extends MediaFunctionalTestBase {
    * {@inheritdoc}
    */
   protected static $modules = [
-    'navigation_variant_test',
+    'block',
     'media_test_source',
   ];
 
@@ -32,6 +32,15 @@ class MediaAccessTest extends MediaFunctionalTestBase {
    * {@inheritdoc}
    */
   protected $defaultTheme = 'stark';
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function setUp(): void {
+    parent::setUp();
+    // This is needed to provide the user cache context for a below assertion.
+    $this->drupalPlaceBlock('local_tasks_block');
+  }
 
   /**
    * Tests some access control functionality.
