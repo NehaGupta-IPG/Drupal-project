@@ -766,8 +766,9 @@ class SqlContentEntityStorageSchema implements DynamicallyFieldableEntityStorage
 
       try {
         if ($this->database->supportsTransactionalDDL()) {
-          // If the database supports transactional DDL, we can go ahead and rely
-          // on it. If not, we will have to rollback manually if something fails.
+          // If the database supports transactional DDL, we can go ahead and
+          // rely on it. If not, we will have to rollback manually if something
+          // fails.
           $transaction = $this->database->startTransaction();
         }
 
@@ -1377,7 +1378,11 @@ class SqlContentEntityStorageSchema implements DynamicallyFieldableEntityStorage
       'description' => "The data table for $entity_type_id entities.",
       'primary key' => [$id_key, $entity_type->getKey('langcode')],
       'indexes' => [
-        $entity_type_id . '__id__default_langcode__langcode' => [$id_key, $entity_type->getKey('default_langcode'), $entity_type->getKey('langcode')],
+        $entity_type_id . '__id__default_langcode__langcode' => [
+          $id_key,
+          $entity_type->getKey('default_langcode'),
+          $entity_type->getKey('langcode'),
+        ],
       ],
       'foreign keys' => [
         $entity_type_id => [
@@ -1415,7 +1420,11 @@ class SqlContentEntityStorageSchema implements DynamicallyFieldableEntityStorage
       'description' => "The revision data table for $entity_type_id entities.",
       'primary key' => [$revision_key, $entity_type->getKey('langcode')],
       'indexes' => [
-        $entity_type_id . '__id__default_langcode__langcode' => [$id_key, $entity_type->getKey('default_langcode'), $entity_type->getKey('langcode')],
+        $entity_type_id . '__id__default_langcode__langcode' => [
+          $id_key,
+          $entity_type->getKey('default_langcode'),
+          $entity_type->getKey('langcode'),
+        ],
       ],
       'foreign keys' => [
         $entity_type_id => [
@@ -1437,7 +1446,7 @@ class SqlContentEntityStorageSchema implements DynamicallyFieldableEntityStorage
   /**
    * Adds defaults to a table schema definition.
    *
-   * @param $schema
+   * @param array $schema
    *   The schema definition array for a single table, passed by reference.
    */
   protected function addTableDefaults(&$schema) {
@@ -1724,8 +1733,9 @@ class SqlContentEntityStorageSchema implements DynamicallyFieldableEntityStorage
       // There is no data. Re-create the tables completely.
       try {
         if ($this->database->supportsTransactionalDDL()) {
-          // If the database supports transactional DDL, we can go ahead and rely
-          // on it. If not, we will have to rollback manually if something fails.
+          // If the database supports transactional DDL, we can go ahead and
+          // rely on it. If not, we will have to rollback manually if something
+          // fails.
           $transaction = $this->database->startTransaction();
         }
         // Since there is no data we may be switching from a shared table schema
@@ -1817,8 +1827,9 @@ class SqlContentEntityStorageSchema implements DynamicallyFieldableEntityStorage
     if (!$this->storage->countFieldData($original, TRUE)) {
       try {
         if ($this->database->supportsTransactionalDDL()) {
-          // If the database supports transactional DDL, we can go ahead and rely
-          // on it. If not, we will have to rollback manually if something fails.
+          // If the database supports transactional DDL, we can go ahead and
+          // rely on it. If not, we will have to rollback manually if something
+          // fails.
           $transaction = $this->database->startTransaction();
         }
         // Since there is no data we may be switching from a dedicated table

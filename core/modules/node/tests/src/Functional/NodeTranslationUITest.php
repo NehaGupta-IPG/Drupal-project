@@ -100,7 +100,6 @@ class NodeTranslationUITest extends ContentTranslationUITestBase {
     $this->entityId = $this->createEntity($values[$default_langcode], $default_langcode);
     $storage = $this->container->get('entity_type.manager')
       ->getStorage($this->entityTypeId);
-    $storage->resetCache([$this->entityId]);
     $entity = $storage->load($this->entityId);
 
     // Add a content translation.
@@ -119,7 +118,6 @@ class NodeTranslationUITest extends ContentTranslationUITestBase {
     $this->drupalGet($add_url);
     $this->submitForm($edit, 'Save (this translation)');
 
-    $storage->resetCache([$this->entityId]);
     $entity = $storage->load($this->entityId);
     $translation = $entity->getTranslation($langcode);
     // Make sure we unpublished the node correctly.
@@ -160,7 +158,6 @@ class NodeTranslationUITest extends ContentTranslationUITestBase {
   protected function doTestPublishedStatus(): void {
     $storage = $this->container->get('entity_type.manager')
       ->getStorage($this->entityTypeId);
-    $storage->resetCache([$this->entityId]);
     $entity = $storage->load($this->entityId);
     $languages = $this->container->get('language_manager')->getLanguages();
 
@@ -180,7 +177,6 @@ class NodeTranslationUITest extends ContentTranslationUITestBase {
           'status[value]' => $value,
         ], 'Save' . $this->getFormSubmitSuffix($entity, $langcode));
       }
-      $storage->resetCache([$this->entityId]);
       $entity = $storage->load($this->entityId);
       foreach ($this->langcodes as $langcode) {
         // The node is created as unpublished thus we switch to the published
@@ -198,7 +194,6 @@ class NodeTranslationUITest extends ContentTranslationUITestBase {
   protected function doTestAuthoringInfo(): void {
     $storage = $this->container->get('entity_type.manager')
       ->getStorage($this->entityTypeId);
-    $storage->resetCache([$this->entityId]);
     $entity = $storage->load($this->entityId);
     $languages = $this->container->get('language_manager')->getLanguages();
     $values = [];
@@ -227,7 +222,6 @@ class NodeTranslationUITest extends ContentTranslationUITestBase {
       $this->submitForm($edit, $this->getFormSubmitAction($entity, $langcode));
     }
 
-    $storage->resetCache([$this->entityId]);
     $entity = $storage->load($this->entityId);
     foreach ($this->langcodes as $langcode) {
       $translation = $entity->getTranslation($langcode);
@@ -485,7 +479,6 @@ class NodeTranslationUITest extends ContentTranslationUITestBase {
   protected function doTestTranslationEdit(): void {
     $storage = $this->container->get('entity_type.manager')
       ->getStorage($this->entityTypeId);
-    $storage->resetCache([$this->entityId]);
     $entity = $storage->load($this->entityId);
     $languages = $this->container->get('language_manager')->getLanguages();
     $type_name = node_get_type_label($entity);
@@ -673,6 +666,33 @@ class NodeTranslationUITest extends ContentTranslationUITestBase {
     // Search for French content.
     $this->drupalGet('search/node', ['query' => ['keys' => urlencode('First rev fr title')]]);
     $this->assertSession()->pageTextNotContains('First rev fr title');
+  }
+
+  /**
+   * Tests redirection after saving translation.
+   */
+  public function testRedirect(): void {
+    $this->drupalLogin($this->administrator);
+
+    $article = $this->drupalCreateNode(['type' => 'article', 'langcode' => $this->langcodes[0]]);
+
+    $edit = [
+      'title[0][value]' => 'English node title',
+    ];
+    $this->drupalGet('node/' . $article->id() . '/edit');
+    $this->submitForm($edit, 'Save');
+
+    $this->assertSession()->pageTextContains('English node title');
+    $this->assertEquals($this->baseUrl . '/node/' . $article->id(), $this->getSession()->getCurrentUrl());
+
+    $this->drupalGet('node/' . $article->id() . '/translations/add/' . $this->langcodes[0] . '/' . $this->langcodes[1]);
+    $edit = [
+      'title[0][value]' => 'Italian node title',
+    ];
+    $this->submitForm($edit, 'Save (this translation)');
+
+    $this->assertSession()->pageTextContains('Italian node title');
+    $this->assertEquals($this->baseUrl . '/' . $this->langcodes[1] . '/node/' . $article->id(), $this->getSession()->getCurrentUrl());
   }
 
 }

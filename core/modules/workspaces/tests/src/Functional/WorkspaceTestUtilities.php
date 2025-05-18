@@ -19,6 +19,11 @@ trait WorkspaceTestUtilities {
 
   use BlockCreationTrait;
 
+  /**
+   * Signifies that the switcher block is configured.
+   *
+   * @var bool
+   */
   protected $switcherBlockConfigured = FALSE;
 
   /**

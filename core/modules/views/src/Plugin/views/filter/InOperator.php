@@ -11,10 +11,11 @@ use Drupal\views\ViewExecutable;
 use Drupal\Core\Form\OptGroup;
 
 /**
- * Simple filter to handle matching of multiple options selectable via checkboxes.
+ * Filter to handle matching of multiple options selectable via checkboxes.
  *
  * Definition items:
- * - options callback: The function to call in order to generate the value options. If omitted, the options 'Yes' and 'No' will be used.
+ * - options callback: The function to call in order to generate the value
+ *   options. If omitted, the options 'Yes' and 'No' will be used.
  * - options arguments: An array of arguments to pass to the options callback.
  *
  * @ingroup views_filter_handlers
@@ -24,6 +25,8 @@ class InOperator extends FilterPluginBase implements FilterOperatorsInterface {
 
   /**
    * The default form type.
+   *
+   * @var string
    */
   protected $valueFormType = 'checkboxes';
 
@@ -275,6 +278,9 @@ class InOperator extends FilterPluginBase implements FilterOperatorsInterface {
 
   /**
    * When using exposed filters, we may be required to reduce the set.
+   *
+   * @param array $input
+   *   (optional) Associative array containing the exposed data for this view.
    */
   public function reduceValueOptions($input = NULL) {
     if (!isset($input)) {
@@ -465,11 +471,13 @@ class InOperator extends FilterPluginBase implements FilterOperatorsInterface {
     }
     if (is_array($this->value)) {
       if (!isset($this->valueOptions)) {
-        // Don't validate if there are none value options provided, for example for special handlers.
+        // Don't validate if there are none value options provided, for example
+        // for special handlers.
         return $errors;
       }
       if ($this->options['exposed'] && !$this->options['expose']['required'] && empty($this->value)) {
-        // Don't validate if the field is exposed and no default value is provided.
+        // Don't validate if the field is exposed and no default value is
+        // provided.
         return $errors;
       }
 
