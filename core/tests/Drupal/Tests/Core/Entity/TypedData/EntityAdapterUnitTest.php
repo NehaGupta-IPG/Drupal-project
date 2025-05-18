@@ -7,7 +7,9 @@ namespace Drupal\Tests\Core\Entity\TypedData;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\Entity\EntityFieldManagerInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
+use Drupal\Core\Entity\Exception\InvalidArgumentCode;
 use Drupal\Core\Entity\Plugin\DataType\EntityAdapter;
+use Drupal\Core\Exception\InvalidArgumentException;
 use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\TypedData\Exception\MissingDataException;
@@ -303,8 +305,14 @@ class EntityAdapterUnitTest extends UnitTestCase {
    * @covers ::get
    */
   public function testGetInvalidField(): void {
-    $this->expectException(\InvalidArgumentException::class);
-    $this->entityAdapter->get('invalid');
+    try {
+      $e = NULL;
+      $this->entityAdapter->get('invalid');
+    }
+    catch (InvalidArgumentException $e) {
+    }
+    $this->assertSame(InvalidArgumentCode::UnknownField, $e->getEnumExceptionCode());
+    $this->assertSame(0, $e->getCode());
   }
 
   /**

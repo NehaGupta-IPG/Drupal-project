@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Drupal\KernelTests\Core\Entity;
 
+use Drupal\Core\Entity\Exception\InvalidArgumentCode;
+use Drupal\Core\Exception\InvalidArgumentException;
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\TypedData\TranslationStatusInterface;
 use Drupal\entity_test\Entity\EntityTestMul;
@@ -455,12 +457,14 @@ class EntityTranslationTest extends EntityLanguageTestBase {
     $entity->removeTranslation($langcode2);
     foreach (['get', 'set', '__get', '__set', 'createDuplicate'] as $method) {
       try {
+        $e = NULL;
         $translation->{$method}('name', $this->randomMachineName());
         $this->fail("The $method method raises an exception when trying to manipulate a removed translation.");
       }
-      catch (\Exception) {
-        // Expected exception; just continue testing.
+      catch (InvalidArgumentException $e) {
       }
+      $this->assertSame(InvalidArgumentCode::RemovedTranslation, $e->getEnumExceptionCode());
+      $this->assertSame(0, $e->getCode());
     }
 
     // Verify that deletion hooks are fired when saving an entity with a removed

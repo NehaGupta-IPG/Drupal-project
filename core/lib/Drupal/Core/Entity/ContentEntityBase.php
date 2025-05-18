@@ -3,7 +3,9 @@
 namespace Drupal\Core\Entity;
 
 use Drupal\Component\Render\FormattableMarkup;
+use Drupal\Core\Entity\Exception\InvalidArgumentCode;
 use Drupal\Core\Entity\Plugin\DataType\EntityReference;
+use Drupal\Core\Exception\InvalidArgumentException;
 use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Language\Language;
 use Drupal\Core\Language\LanguageInterface;
@@ -607,14 +609,14 @@ abstract class ContentEntityBase extends EntityBase implements \IteratorAggregat
    */
   protected function getTranslatedField($name, $langcode) {
     if ($this->translations[$this->activeLangcode]['status'] == static::TRANSLATION_REMOVED) {
-      throw new \InvalidArgumentException("The entity object refers to a removed translation ({$this->activeLangcode}) and cannot be manipulated.");
+      throw new InvalidArgumentException("The entity object refers to a removed translation ({$this->activeLangcode}) and cannot be manipulated.", InvalidArgumentCode::RemovedTranslation);
     }
     // Populate $this->fields to speed-up further look-ups and to keep track of
     // fields objects, possibly holding changes to field values.
     if (!isset($this->fields[$name][$langcode])) {
       $definition = $this->getFieldDefinition($name);
       if (!$definition) {
-        throw new \InvalidArgumentException("Field $name is unknown.");
+        throw new InvalidArgumentException("Field $name is unknown.", InvalidArgumentCode::UnknownField);
       }
       // Non-translatable fields are always stored with
       // LanguageInterface::LANGCODE_DEFAULT as key.
@@ -1192,7 +1194,7 @@ abstract class ContentEntityBase extends EntityBase implements \IteratorAggregat
    */
   public function createDuplicate() {
     if ($this->translations[$this->activeLangcode]['status'] == static::TRANSLATION_REMOVED) {
-      throw new \InvalidArgumentException("The entity object refers to a removed translation ({$this->activeLangcode}) and cannot be manipulated.");
+      throw new InvalidArgumentException("The entity object refers to a removed translation ({$this->activeLangcode}) and cannot be manipulated.", InvalidArgumentCode::RemovedTranslation);
     }
 
     $duplicate = clone $this;
