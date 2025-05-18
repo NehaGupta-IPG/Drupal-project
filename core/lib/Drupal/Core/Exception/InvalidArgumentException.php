@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Core\Exception;
 
 /**
@@ -11,21 +13,28 @@ namespace Drupal\Core\Exception;
 class InvalidArgumentException extends \InvalidArgumentException implements ExceptionWithEnumCodeInterface {
 
   /**
+   * Enum representation of the error code.
+   * 
+   * @var \Drupal\Core\Exception\ExceptionCodeInterface|null
+   */
+  protected ?ExceptionCodeInterface $enumCode = NULL;
+
+  /**
    * Constructs an InvalidArgumentException.
    *
    * @param string $message
    *   The error message.
-   * @param \Drupal\Core\Exception\ExceptionCodeInterface|null $enumCode
-   *   (optional) Enum representation of the error code.
-   * @param int|null $code
-   *   (optional) The error code. If NULL is passed, then the integer error code
-   *   will be derived from the enum code, if there is one. Otherwise, the error
-   *   code will 0.
+   * @param \Drupal\Core\Exception\ExceptionCodeInterface|int $code
+   *   The error code. If an ExceptionCodeInterface enum is passed, the integer
+   *   code will be derived from the enum.
    * @param \Throwable|null $previous
    *   (optional) The previous throwable used for the exception chaining.
    */
-  public function __construct(string $message = "", protected readonly ?ExceptionCodeInterface $enumCode = NULL, ?int $code = NULL, ?\Throwable $previous = NULL) {
-    $code = $code ?? ($enumCode?->getCode() ?? 0);
+  public function __construct(string $message = "", ExceptionCodeInterface|int $code = 0, ?\Throwable $previous = NULL) {
+    if ($code instanceof ExceptionCodeInterface) {
+      $this->enumCode = $code;
+      $code = $this->enumCode->getCode();
+    }
     parent::__construct($message, $code, $previous);
   }
 
