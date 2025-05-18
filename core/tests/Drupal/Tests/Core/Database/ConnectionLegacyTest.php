@@ -36,7 +36,7 @@ class ConnectionLegacyTest extends UnitTestCase {
     $this->assertSame('foo', $connection->prefix);
     $this->expectDeprecation('Accessing Connection::$prefix is deprecated in drupal:11.3.0 and the property is removed from drupal:13.0.0. Use IdentifierHandler methods instead. See https://www.drupal.org/node/3513282');
     $connection->prefix = 'bar';
-    $this->assertSame('foo', $connection->prefix);
+    $this->assertSame('bar', $connection->prefix);
   }
 
   /**
