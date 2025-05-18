@@ -201,9 +201,7 @@ abstract class Connection {
     switch ($name) {
       case 'prefix':
         @trigger_error("Accessing Connection::\${$name} is deprecated in drupal:11.3.0 and the property is removed from drupal:13.0.0. Use IdentifierHandler methods instead. See https://www.drupal.org/node/3513282", E_USER_DEPRECATED);
-        return isset($this->deprecatedProperties[$name]) ?
-          $this->deprecatedProperties[$name] :
-          $this->identifiers->tablePrefix ?? '';
+        return $this->deprecatedProperties[$name] ?? $this->identifiers->tablePrefix;
 
       case 'escapedTables':
         @trigger_error("Accessing Connection::\${$name} is deprecated in drupal:11.3.0 and the property is removed from drupal:13.0.0. Use IdentifierHandler methods instead. See https://www.drupal.org/node/3513282", E_USER_DEPRECATED);
@@ -217,7 +215,7 @@ abstract class Connection {
         @trigger_error("Accessing Connection::\${$name} is deprecated in drupal:11.3.0 and the property is removed from drupal:13.0.0. Use IdentifierHandler methods instead. See https://www.drupal.org/node/3513282", E_USER_DEPRECATED);
         $identifierQuotes = $this->identifiers->identifierQuotes ?? ['"', '"'];
         return [
-          $identifierQuotes[0] . str_replace('.', $identifierQuotes[1] . '.' . $identifierQuotes[0], $this->identifiers->tablePrefix ?? ''),
+          $identifierQuotes[0] . str_replace('.', $identifierQuotes[1] . '.' . $identifierQuotes[0], $this->prefix ?? ''),
           $identifierQuotes[1],
         ];
 
@@ -431,6 +429,7 @@ abstract class Connection {
    */
   public function getPrefix(): string {
     @trigger_error(__METHOD__ . "() is deprecated in drupal:11.3.0 and is removed from drupal:13.0.0. Use IdentifierHandler methods instead. See https://www.drupal.org/node/3513282", E_USER_DEPRECATED);
+    // @phpstan-ignore property.notFound
     return $this->prefix;
   }
 
@@ -448,6 +447,7 @@ abstract class Connection {
   protected function setPrefix($prefix) {
     @trigger_error(__METHOD__ . "() is deprecated in drupal:11.3.0 and is removed from drupal:13.0.0. Pass the table prefix to the IdentifierHandler constructor instead. See https://www.drupal.org/node/3513282", E_USER_DEPRECATED);
     assert(is_string($prefix), 'The \'$prefix\' argument to ' . __METHOD__ . '() must be a string');
+    // @phpstan-ignore property.notFound
     $this->prefix = $prefix;
   }
 

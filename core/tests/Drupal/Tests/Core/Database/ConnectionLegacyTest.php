@@ -21,7 +21,7 @@ class ConnectionLegacyTest extends UnitTestCase {
    */
   #[IgnoreDeprecations]
   public function testMissingIdentifierHandler(): void {
-    $this->expectDeprecation('Not passing an IdentifierHandler object to Drupal\\Core\\Database\\Connection::__construct() is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. See https://www.drupal.org/node/3513282');
+    $this->expectDeprecation('Not passing an IdentifierHandler object to Drupal\\Core\\Database\\Connection::__construct() is deprecated in drupal:11.3.0 and is removed from drupal:13.0.0. See https://www.drupal.org/node/3513282');
     $connection = new StubLegacyConnection($this->createMock(StubPDO::class), ['prefix' => 'foo']);
     $this->assertInstanceOf(StubLegacyConnection::class, $connection);
   }
@@ -31,10 +31,10 @@ class ConnectionLegacyTest extends UnitTestCase {
    */
   #[IgnoreDeprecations]
   public function testPrefix(): void {
-    $this->expectDeprecation('Accessing Connection::$prefix is deprecated in drupal:11.2.0 and the property is removed from drupal:12.0.0. Use IdentifierHandler methods instead. See https://www.drupal.org/node/3513282');
+    $this->expectDeprecation('Accessing Connection::$prefix is deprecated in drupal:11.3.0 and the property is removed from drupal:13.0.0. Use IdentifierHandler methods instead. See https://www.drupal.org/node/3513282');
     $connection = new StubLegacyConnection($this->createMock(StubPDO::class), ['prefix' => 'foo']);
     $this->assertSame('foo', $connection->prefix);
-    $this->expectDeprecation('Accessing Connection::$prefix is deprecated in drupal:11.2.0 and the property is removed from drupal:12.0.0. Use IdentifierHandler methods instead. See https://www.drupal.org/node/3513282');
+    $this->expectDeprecation('Accessing Connection::$prefix is deprecated in drupal:11.3.0 and the property is removed from drupal:13.0.0. Use IdentifierHandler methods instead. See https://www.drupal.org/node/3513282');
     $connection->prefix = 'bar';
     $this->assertSame('foo', $connection->prefix);
   }
@@ -44,10 +44,10 @@ class ConnectionLegacyTest extends UnitTestCase {
    */
   #[IgnoreDeprecations]
   public function testEscapedTables(): void {
-    $this->expectDeprecation('Accessing Connection::$escapedTables is deprecated in drupal:11.2.0 and the property is removed from drupal:12.0.0. Use IdentifierHandler methods instead. See https://www.drupal.org/node/3513282');
+    $this->expectDeprecation('Accessing Connection::$escapedTables is deprecated in drupal:11.3.0 and the property is removed from drupal:13.0.0. Use IdentifierHandler methods instead. See https://www.drupal.org/node/3513282');
     $connection = new StubLegacyConnection($this->createMock(StubPDO::class), ['prefix' => 'foo']);
     $this->assertSame([], $connection->escapedTables);
-    $this->expectDeprecation('Accessing Connection::$escapedTables is deprecated in drupal:11.2.0 and the property is removed from drupal:12.0.0. Use IdentifierHandler methods instead. See https://www.drupal.org/node/3513282');
+    $this->expectDeprecation('Accessing Connection::$escapedTables is deprecated in drupal:11.3.0 and the property is removed from drupal:13.0.0. Use IdentifierHandler methods instead. See https://www.drupal.org/node/3513282');
     $connection->escapedTables = 'bar';
     $this->assertSame([], $connection->escapedTables);
   }
@@ -57,10 +57,10 @@ class ConnectionLegacyTest extends UnitTestCase {
    */
   #[IgnoreDeprecations]
   public function testIdentifierQuotes(): void {
-    $this->expectDeprecation('Accessing Connection::$identifierQuotes is deprecated in drupal:11.2.0 and the property is removed from drupal:12.0.0. Use IdentifierHandler methods instead. See https://www.drupal.org/node/3513282');
+    $this->expectDeprecation('Accessing Connection::$identifierQuotes is deprecated in drupal:11.3.0 and the property is removed from drupal:13.0.0. Use IdentifierHandler methods instead. See https://www.drupal.org/node/3513282');
     $connection = new StubLegacyConnection($this->createMock(StubPDO::class), ['prefix' => 'foo']);
     $this->assertSame(['"', '"'], $connection->identifierQuotes);
-    $this->expectDeprecation('Accessing Connection::$identifierQuotes is deprecated in drupal:11.2.0 and the property is removed from drupal:12.0.0. Use IdentifierHandler methods instead. See https://www.drupal.org/node/3513282');
+    $this->expectDeprecation('Accessing Connection::$identifierQuotes is deprecated in drupal:11.3.0 and the property is removed from drupal:13.0.0. Use IdentifierHandler methods instead. See https://www.drupal.org/node/3513282');
     $connection->identifierQuotes = 'bar';
     $this->assertSame(['"', '"'], $connection->identifierQuotes);
   }
@@ -70,10 +70,10 @@ class ConnectionLegacyTest extends UnitTestCase {
    */
   #[IgnoreDeprecations]
   public function testTablePlaceholderReplacements(): void {
-    $this->expectDeprecation('Accessing Connection::$tablePlaceholderReplacements is deprecated in drupal:11.2.0 and the property is removed from drupal:12.0.0. Use IdentifierHandler methods instead. See https://www.drupal.org/node/3513282');
+    $this->expectDeprecation('Accessing Connection::$tablePlaceholderReplacements is deprecated in drupal:11.3.0 and the property is removed from drupal:13.0.0. Use IdentifierHandler methods instead. See https://www.drupal.org/node/3513282');
     $connection = new StubLegacyConnection($this->createMock(StubPDO::class), ['prefix' => 'foo']);
     $this->assertSame(['"foo', '"'], $connection->tablePlaceholderReplacements);
-    $this->expectDeprecation('Accessing Connection::$tablePlaceholderReplacements is deprecated in drupal:11.2.0 and the property is removed from drupal:12.0.0. Use IdentifierHandler methods instead. See https://www.drupal.org/node/3513282');
+    $this->expectDeprecation('Accessing Connection::$tablePlaceholderReplacements is deprecated in drupal:11.3.0 and the property is removed from drupal:13.0.0. Use IdentifierHandler methods instead. See https://www.drupal.org/node/3513282');
     $connection->tablePlaceholderReplacements = 'bar';
     $this->assertSame(['"foo', '"'], $connection->tablePlaceholderReplacements);
   }
