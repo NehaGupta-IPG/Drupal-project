@@ -346,6 +346,10 @@ class LayoutBuilderEntityViewDisplay extends BaseEntityViewDisplay implements La
     $build = [];
     if ($storage) {
       foreach ($storage->getSections() as $delta => $section) {
+        // If the layout does not exist, skip this section.
+        if (!$section->hasLayout()) {
+          continue;
+        }
         $build[$delta] = $section->toRenderArray($contexts);
       }
     }
