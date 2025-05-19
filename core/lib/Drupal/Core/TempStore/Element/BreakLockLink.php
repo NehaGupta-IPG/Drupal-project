@@ -7,6 +7,7 @@ use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Render\Attribute\RenderElement;
 use Drupal\Core\Render\Element\RenderElementBase;
+use Drupal\Core\Render\ElementInfoManagerInterface;
 use Drupal\Core\Render\RendererInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -72,8 +73,16 @@ class BreakLockLink extends RenderElementBase implements ContainerFactoryPluginI
    * @param \Drupal\Core\Render\RendererInterface $renderer
    *   The renderer.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, DateFormatterInterface $date_formatter, EntityTypeManagerInterface $entity_type_manager, RendererInterface $renderer) {
-    parent::__construct($configuration, $plugin_id, $plugin_definition);
+  public function __construct(
+    array $configuration,
+    $plugin_id,
+    $plugin_definition,
+    DateFormatterInterface $date_formatter,
+    EntityTypeManagerInterface $entity_type_manager,
+    RendererInterface $renderer,
+    ElementInfoManagerInterface $elementInfoManager
+  ) {
+    parent::__construct($configuration, $plugin_id, $plugin_definition, $elementInfoManager);
 
     $this->dateFormatter = $date_formatter;
     $this->entityTypeManager = $entity_type_manager;
@@ -90,7 +99,8 @@ class BreakLockLink extends RenderElementBase implements ContainerFactoryPluginI
       $plugin_definition,
       $container->get('date.formatter'),
       $container->get('entity_type.manager'),
-      $container->get('renderer')
+      $container->get('renderer'),
+      $container->get('plugin.manager.element_info')
     );
   }
 

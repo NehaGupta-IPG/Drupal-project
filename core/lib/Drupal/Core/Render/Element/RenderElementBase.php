@@ -4,10 +4,13 @@ namespace Drupal\Core\Render\Element;
 
 use Drupal\Core\Form\FormBuilderInterface;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Plugin\PluginBase;
 use Drupal\Core\Render\BubbleableMetadata;
 use Drupal\Core\Render\Element;
+use Drupal\Core\Render\ElementInfoManagerInterface;
 use Drupal\Core\Url;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Provides a base class for render element plugins.
@@ -147,12 +150,59 @@ use Drupal\Core\Url;
  *
  * @ingroup theme_render
  */
-abstract class RenderElementBase extends PluginBase implements ElementInterface {
+abstract class RenderElementBase extends PluginBase implements ElementInterface, ContainerFactoryPluginInterface {
+
+  /**
+   * Constructs a new render element object.
+   *
+   * @param array $configuration
+   *   A configuration array containing information about the plugin instance.
+   * @param string $plugin_id
+   *   The plugin ID for the plugin instance.
+   * @param mixed $plugin_definition
+   *   The plugin implementation definition.
+   * @param \Drupal\Core\Render\ElementInfoManagerInterface|null $elementInfoManager
+   *   The element info manager.
+   */
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, protected ?ElementInfoManagerInterface $elementInfoManager = NULL) {
+    if (!$this->elementInfoManager) {
+      // Deprecated blah, blah, blah.
+      $this->elementInfoManager = \Drupal::service('plugin.manager.element_info');
+    }
+    parent::__construct($configuration, $plugin_id, $plugin_definition);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
+    return new static(
+      $configuration,
+      $plugin_id,
+      $plugin_definition,
+      $container->get('plugin.manager.element_info'),
+    );
+  }
+
 
   /**
    * The storage.
    */
   protected array $storage = [];
+
+  /**
+   * The parent element.
+   *
+   * @var static
+   */
+  protected ElementInterface $renderParent;
+
+  /**
+   * The parent key.
+   *
+   * @var string
+   */
+  protected string $renderParentName;
 
   /**
    * {@inheritdoc}
@@ -517,10 +567,7 @@ abstract class RenderElementBase extends PluginBase implements ElementInterface 
   }
 
   /**
-   * Returns a render array.
-   *
-   * @return array
-   *   A render array.
+   * {@inheritdoc}
    */
   public function &toRenderArray(): array {
     return $this->storage;
@@ -551,6 +598,39 @@ abstract class RenderElementBase extends PluginBase implements ElementInterface 
    */
   public function __get(string $name): mixed {
     return $this->storage['#' . $name] ?? NULL;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getChildren(): \Traversable {
+    foreach (Element::children($this->storage) as $key) {
+      yield $key => $this->elementInfoManager->fromRenderArray($this->storage[$key]);
+    }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function addChild(string|int $name, array|ElementInterface $child): static {
+    if ($name[0] === '#') {
+      throw new \LogicException('The name of children can not start with a #.');
+    }
+    if (is_array($child)) {
+      $child = $this->elementInfoManager->fromRenderArray($child);
+    }
+    $child->renderParent = $this;
+    $child->renderParentName = $name;
+    $this->storage[$name] = &$child->toRenderArray();
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function removeChild(int|string $name): static {
+    unset($this->storage[$name]);
+    return $this;
   }
 
 }
