@@ -502,7 +502,7 @@ abstract class RenderElementBase extends PluginBase implements ElementInterface 
   /**
    * Set storage.
    *
-   * @param $element
+   * @param array $element
    *   The containing element.
    *
    * @return $this
@@ -510,7 +510,7 @@ abstract class RenderElementBase extends PluginBase implements ElementInterface 
    *
    * @internal
    */
-  public function setStorage(&$element): static {
+  public function setStorage(array &$element): static {
     if (!$this->storage) {
       $this->storage = &$element;
       $element['##object'] = $this;
@@ -525,10 +525,8 @@ abstract class RenderElementBase extends PluginBase implements ElementInterface 
    *   The name of a property. $value will be accessible with $this->name and
    *   also $element['#' . $name] where the element is the render array this
    *   object was created from.
-   * @param $value
+   * @param mixed $value
    *   The value.
-   *
-   * @return void
    */
   public function __set(string $name, $value): void {
     $this->storage['#' . $name] = $value;

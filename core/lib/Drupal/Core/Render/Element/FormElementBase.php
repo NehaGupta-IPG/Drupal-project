@@ -43,11 +43,9 @@ use Drupal\Core\Url;
  *   Array of callables or function names, which are called after the element
  *   is built. Arguments: $element, $form_state.
  * @property array $ajax
- * @readonly
  *   Array of elements to specify Ajax behavior. See the @link ajax Ajax API
  *   topic @endlink for more information.
  * @property array<string> $array_parents
- * @readonly
  *   Array of names of all the element's parents (including itself) in the
  *   render array. See also #parents, #tree.
  * @property mixed $default_value
