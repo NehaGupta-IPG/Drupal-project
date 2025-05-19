@@ -337,7 +337,7 @@ class ExposedFormTest extends ViewTestBase {
     $this->assertSession()->optionExists('sort_by', 'created');
 
     // Now update the view and add additional filter.
-    $this->drupalLogin($this->rootUser);
+    $this->drupalLogin($this->createUser(['administer views']));
     $this->drupalGet('admin/structure/views/nojs/add-handler/test_exposed_block/page_2/sort');
     $edit = [
       'name[node_field_data.title]' => 'node_field_data.title',
