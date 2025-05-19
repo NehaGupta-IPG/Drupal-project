@@ -551,13 +551,13 @@ class Drupal {
   }
 
   /**
-   * @param $type
+   * @param string $type
    *   A render element type.
    *
    * @return \Drupal\Core\Render\Element\ElementInterface
    *   A render element object.
    */
-  public static function renderElement($type): ElementInterface {
+  public static function renderElement(string $type): ElementInterface {
     return \Drupal::service('plugin.manager.element_info')->createInstance($type);
   }
 
