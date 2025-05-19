@@ -148,9 +148,11 @@
       // Checking persisted does not work with jQuery on().
       window.addEventListener('pageshow', (event) => {
         if (event.persisted) {
-          document.querySelectorAll('form:not([method~="GET"])').forEach(
-            (form) => form.removeAttribute('data-drupal-form-submit-last')
-          );
+          document
+            .querySelectorAll('form:not([method~="GET"])')
+            .forEach((form) =>
+              form.removeAttribute('data-drupal-form-submit-last'),
+            );
         }
       });
     },
