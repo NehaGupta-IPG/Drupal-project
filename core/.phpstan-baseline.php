@@ -3830,32 +3830,8 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/lib/Drupal/Core/Datetime/Element/Datelist.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^The "\\#date_date_callbacks" render array value expects an array of callbacks\\.$#',
-	'identifier' => 'renderCallback.expectsArrayOfCallbacks',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/Datetime/Element/Datelist.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Core\\\\Datetime\\\\Element\\\\Datetime\\:\\:validateDatetime\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/Datetime/Element/Datetime.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^The "\\#date_date_callbacks" render array value expects an array of callbacks\\.$#',
-	'identifier' => 'renderCallback.expectsArrayOfCallbacks',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/Datetime/Element/Datetime.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^The "\\#date_time_callbacks" render array value expects an array of callbacks\\.$#',
-	'identifier' => 'renderCallback.expectsArrayOfCallbacks',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/Datetime/Element/Datetime.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^The "\\#pre_render" render array value expects an array of callbacks\\.$#',
-	'identifier' => 'renderCallback.expectsArrayOfCallbacks',
 	'count' => 1,
 	'path' => __DIR__ . '/lib/Drupal/Core/Datetime/Element/Datetime.php',
 ];
@@ -4654,12 +4630,6 @@ $ignoreErrors[] = [
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Core\\\\Entity\\\\Element\\\\EntityAutocomplete\\:\\:validateEntityAutocomplete\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/Entity/Element/EntityAutocomplete.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^The "\\#pre_render" render array value expects an array of callbacks\\.$#',
-	'identifier' => 'renderCallback.expectsArrayOfCallbacks',
 	'count' => 1,
 	'path' => __DIR__ . '/lib/Drupal/Core/Entity/Element/EntityAutocomplete.php',
 ];
@@ -9602,20 +9572,8 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/lib/Drupal/Core/Render/Element/Button.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^The "\\#pre_render" render array value expects an array of callbacks\\.$#',
-	'identifier' => 'renderCallback.expectsArrayOfCallbacks',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/Render/Element/Button.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Core\\\\Render\\\\Element\\\\Checkbox\\:\\:processCheckbox\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/Render/Element/Checkbox.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^The "\\#pre_render" render array value expects an array of callbacks\\.$#',
-	'identifier' => 'renderCallback.expectsArrayOfCallbacks',
 	'count' => 1,
 	'path' => __DIR__ . '/lib/Drupal/Core/Render/Element/Checkbox.php',
 ];
@@ -9632,56 +9590,14 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/lib/Drupal/Core/Render/Element/Checkboxes.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^The "\\#pre_render" render array value expects an array of callbacks\\.$#',
-	'identifier' => 'renderCallback.expectsArrayOfCallbacks',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/Render/Element/Checkboxes.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Core\\\\Render\\\\Element\\\\Color\\:\\:validateColor\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/lib/Drupal/Core/Render/Element/Color.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^The "\\#pre_render" render array value expects an array of callbacks\\.$#',
-	'identifier' => 'renderCallback.expectsArrayOfCallbacks',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/Render/Element/Color.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^The "\\#pre_render" render array value expects an array of callbacks\\.$#',
-	'identifier' => 'renderCallback.expectsArrayOfCallbacks',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/Render/Element/ComponentElement.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^The "\\#pre_render" render array value expects an array of callbacks\\.$#',
-	'identifier' => 'renderCallback.expectsArrayOfCallbacks',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/Render/Element/Container.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^The "\\#pre_render" render array value expects an array of callbacks\\.$#',
-	'identifier' => 'renderCallback.expectsArrayOfCallbacks',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/Render/Element/Date.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^The "\\#pre_render" render array value expects an array of callbacks\\.$#',
-	'identifier' => 'renderCallback.expectsArrayOfCallbacks',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/Render/Element/Details.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Core\\\\Render\\\\Element\\\\Dropbutton\\:\\:preRenderDropbutton\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/Render/Element/Dropbutton.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^The "\\#pre_render" render array value expects an array of callbacks\\.$#',
-	'identifier' => 'renderCallback.expectsArrayOfCallbacks',
 	'count' => 1,
 	'path' => __DIR__ . '/lib/Drupal/Core/Render/Element/Dropbutton.php',
 ];
@@ -9698,34 +9614,16 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/lib/Drupal/Core/Render/Element/Email.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^The "\\#pre_render" render array value expects an array of callbacks\\.$#',
-	'identifier' => 'renderCallback.expectsArrayOfCallbacks',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/Render/Element/Email.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^The "\\#pre_render" render array value expects an array of callbacks\\.$#',
-	'identifier' => 'renderCallback.expectsArrayOfCallbacks',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/Render/Element/Fieldgroup.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^The "\\#pre_render" render array value expects an array of callbacks\\.$#',
-	'identifier' => 'renderCallback.expectsArrayOfCallbacks',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/Render/Element/Fieldset.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Core\\\\Render\\\\Element\\\\File\\:\\:processFile\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/lib/Drupal/Core/Render/Element/File.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^The "\\#pre_render" render array value expects an array of callbacks\\.$#',
-	'identifier' => 'renderCallback.expectsArrayOfCallbacks',
+	'message' => '#^Method Drupal\\\\Core\\\\Render\\\\Element\\\\FormElement\\:\\:setAttributes\\(\\) has no return type specified\\.$#',
+	'identifier' => 'missingType.return',
 	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/Render/Element/File.php',
+	'path' => __DIR__ . '/lib/Drupal/Core/Render/Element/FormElement.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Core\\\\Render\\\\Element\\\\FormElement\\:\\:validatePattern\\(\\) has no return type specified\\.$#',
@@ -9740,42 +9638,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/lib/Drupal/Core/Render/Element/FormElementBase.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^The "\\#pre_render" render array value expects an array of callbacks\\.$#',
-	'identifier' => 'renderCallback.expectsArrayOfCallbacks',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/Render/Element/Hidden.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^The "\\#pre_render" render array value expects an array of callbacks\\.$#',
-	'identifier' => 'renderCallback.expectsArrayOfCallbacks',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/Render/Element/HtmlTag.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^The "\\#pre_render" render array value expects an array of callbacks\\.$#',
-	'identifier' => 'renderCallback.expectsArrayOfCallbacks',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/Render/Element/Icon.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^The "\\#pre_render" render array value expects an array of callbacks\\.$#',
-	'identifier' => 'renderCallback.expectsArrayOfCallbacks',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/Render/Element/ImageButton.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^The "\\#pre_render" render array value expects an array of callbacks\\.$#',
-	'identifier' => 'renderCallback.expectsArrayOfCallbacks',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/Render/Element/InlineTemplate.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^The "\\#pre_render" render array value expects an array of callbacks\\.$#',
-	'identifier' => 'renderCallback.expectsArrayOfCallbacks',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/Render/Element/Link.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Core\\\\Render\\\\Element\\\\MachineName\\:\\:getTransliterationLanguageOverrides\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -9788,64 +9650,10 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/lib/Drupal/Core/Render/Element/MachineName.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^The "\\#pre_render" render array value expects an array of callbacks\\.$#',
-	'identifier' => 'renderCallback.expectsArrayOfCallbacks',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/Render/Element/MachineName.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property Drupal\\\\Core\\\\Render\\\\Element\\\\MoreLink\\:\\:\\$title\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/Render/Element/MoreLink.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^The "\\#pre_render" render array value expects an array of callbacks\\.$#',
-	'identifier' => 'renderCallback.expectsArrayOfCallbacks',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/Render/Element/MoreLink.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Core\\\\Render\\\\Element\\\\Number\\:\\:validateNumber\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/lib/Drupal/Core/Render/Element/Number.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^The "\\#pre_render" render array value expects an array of callbacks\\.$#',
-	'identifier' => 'renderCallback.expectsArrayOfCallbacks',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/Render/Element/Number.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^The "\\#pre_render" render array value expects an array of callbacks\\.$#',
-	'identifier' => 'renderCallback.expectsArrayOfCallbacks',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/Render/Element/Operations.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property Drupal\\\\Core\\\\Render\\\\Element\\\\Page\\:\\:\\$title\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/Render/Element/Page.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property Drupal\\\\Core\\\\Render\\\\Element\\\\PageTitle\\:\\:\\$title\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/Render/Element/PageTitle.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^The "\\#pre_render" render array value expects an array of callbacks\\.$#',
-	'identifier' => 'renderCallback.expectsArrayOfCallbacks',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/Render/Element/Pager.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^The "\\#pre_render" render array value expects an array of callbacks\\.$#',
-	'identifier' => 'renderCallback.expectsArrayOfCallbacks',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/Render/Element/Password.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Core\\\\Render\\\\Element\\\\PasswordConfirm\\:\\:processPasswordConfirm\\(\\) has no return type specified\\.$#',
@@ -9866,18 +9674,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/lib/Drupal/Core/Render/Element/PathElement.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^The "\\#pre_render" render array value expects an array of callbacks\\.$#',
-	'identifier' => 'renderCallback.expectsArrayOfCallbacks',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/Render/Element/PathElement.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^The "\\#pre_render" render array value expects an array of callbacks\\.$#',
-	'identifier' => 'renderCallback.expectsArrayOfCallbacks',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/Render/Element/Radio.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Core\\\\Render\\\\Element\\\\Radios\\:\\:preRenderCompositeFormElement\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -9888,18 +9684,6 @@ $ignoreErrors[] = [
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/lib/Drupal/Core/Render/Element/Radios.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^The "\\#pre_render" render array value expects an array of callbacks\\.$#',
-	'identifier' => 'renderCallback.expectsArrayOfCallbacks',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/Render/Element/Radios.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^The "\\#pre_render" render array value expects an array of callbacks\\.$#',
-	'identifier' => 'renderCallback.expectsArrayOfCallbacks',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/Render/Element/Range.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Core\\\\Render\\\\Element\\\\RenderElement\\:\\:setAttributes\\(\\) has no return type specified\\.$#',
@@ -9920,28 +9704,10 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/lib/Drupal/Core/Render/Element/RenderElementBase.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^The "\\#pre_render" render array value expects an array of callbacks\\.$#',
-	'identifier' => 'renderCallback.expectsArrayOfCallbacks',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/Render/Element/Search.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Core\\\\Render\\\\Element\\\\Select\\:\\:preRenderSelect\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/lib/Drupal/Core/Render/Element/Select.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^The "\\#pre_render" render array value expects an array of callbacks\\.$#',
-	'identifier' => 'renderCallback.expectsArrayOfCallbacks',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/Render/Element/Select.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^The "\\#pre_render" render array value expects an array of callbacks\\.$#',
-	'identifier' => 'renderCallback.expectsArrayOfCallbacks',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/Render/Element/StatusMessages.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Core\\\\Render\\\\Element\\\\StatusReport\\:\\:preRenderGroupRequirements\\(\\) has no return type specified\\.$#',
@@ -9950,82 +9716,16 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/lib/Drupal/Core/Render/Element/StatusReport.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^The "\\#pre_render" render array value expects an array of callbacks\\.$#',
-	'identifier' => 'renderCallback.expectsArrayOfCallbacks',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/Render/Element/StatusReport.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^The "\\#pre_render" render array value expects an array of callbacks\\.$#',
-	'identifier' => 'renderCallback.expectsArrayOfCallbacks',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/Render/Element/Submit.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^The "\\#pre_render" render array value expects an array of callbacks\\.$#',
-	'identifier' => 'renderCallback.expectsArrayOfCallbacks',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/Render/Element/SystemCompactLink.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Core\\\\Render\\\\Element\\\\Table\\:\\:validateTable\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/lib/Drupal/Core/Render/Element/Table.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^The "\\#pre_render" render array value expects an array of callbacks\\.$#',
-	'identifier' => 'renderCallback.expectsArrayOfCallbacks',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/Render/Element/Table.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^The "\\#pre_render" render array value expects an array of callbacks\\.$#',
-	'identifier' => 'renderCallback.expectsArrayOfCallbacks',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/Render/Element/Tableselect.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^The "\\#pre_render" render array value expects an array of callbacks\\.$#',
-	'identifier' => 'renderCallback.expectsArrayOfCallbacks',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/Render/Element/Tel.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^The "\\#pre_render" render array value expects an array of callbacks\\.$#',
-	'identifier' => 'renderCallback.expectsArrayOfCallbacks',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/Render/Element/Textarea.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^The "\\#pre_render" render array value expects an array of callbacks\\.$#',
-	'identifier' => 'renderCallback.expectsArrayOfCallbacks',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/Render/Element/Textfield.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^The "\\#pre_render" render array value expects an array of callbacks\\.$#',
-	'identifier' => 'renderCallback.expectsArrayOfCallbacks',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/Render/Element/Token.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Core\\\\Render\\\\Element\\\\Url\\:\\:validateUrl\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/lib/Drupal/Core/Render/Element/Url.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^The "\\#pre_render" render array value expects an array of callbacks\\.$#',
-	'identifier' => 'renderCallback.expectsArrayOfCallbacks',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/Render/Element/Url.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^The "\\#pre_render" render array value expects an array of callbacks\\.$#',
-	'identifier' => 'renderCallback.expectsArrayOfCallbacks',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/Render/Element/VerticalTabs.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Core\\\\Render\\\\Element\\\\Weight\\:\\:processWeight\\(\\) has no return type specified\\.$#',
@@ -10674,12 +10374,6 @@ $ignoreErrors[] = [
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/lib/Drupal/Core/StringTranslation/Translator/TranslatorInterface.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^The "\\#pre_render" render array value expects an array of callbacks\\.$#',
-	'identifier' => 'renderCallback.expectsArrayOfCallbacks',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/TempStore/Element/BreakLockLink.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Core\\\\TempStore\\\\PrivateTempStore\\:\\:set\\(\\) has no return type specified\\.$#',
@@ -16106,18 +15800,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/contextual/src/ContextualController.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^The "\\#pre_render" render array value expects an array of callbacks\\.$#',
-	'identifier' => 'renderCallback.expectsArrayOfCallbacks',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/contextual/src/Element/ContextualLinks.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^The "\\#pre_render" render array value expects an array of callbacks\\.$#',
-	'identifier' => 'renderCallback.expectsArrayOfCallbacks',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/contextual/src/Element/ContextualLinksPlaceholder.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\contextual\\\\Plugin\\\\views\\\\field\\\\ContextualLinks\\:\\:buildOptionsForm\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -17486,12 +17168,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/field_ui/src/Access/ViewModeAccessCheck.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^The "\\#pre_render" render array value expects an array of callbacks\\.$#',
-	'identifier' => 'renderCallback.expectsArrayOfCallbacks',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/field_ui/src/Element/FieldUiTable.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\field_ui\\\\FieldUI\\:\\:getOverviewRouteInfo\\(\\) should return Drupal\\\\Core\\\\Url but return statement is missing\\.$#',
 	'identifier' => 'return.missing',
 	'count' => 1,
@@ -18040,12 +17716,6 @@ $ignoreErrors[] = [
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\file\\\\Element\\\\ManagedFile\\:\\:validateManagedFile\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/file/src/Element/ManagedFile.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^The "\\#pre_render" render array value expects an array of callbacks\\.$#',
-	'identifier' => 'renderCallback.expectsArrayOfCallbacks',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/file/src/Element/ManagedFile.php',
 ];
@@ -18974,20 +18644,8 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/filter/filter.module',
 ];
 $ignoreErrors[] = [
-	'message' => '#^The "\\#pre_render" render array value expects an array of callbacks\\.$#',
-	'identifier' => 'renderCallback.expectsArrayOfCallbacks',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/filter/src/Element/ProcessedText.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\filter\\\\Element\\\\TextFormat\\:\\:currentUser\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/filter/src/Element/TextFormat.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^The "\\#pre_render" render array value expects an array of callbacks\\.$#',
-	'identifier' => 'renderCallback.expectsArrayOfCallbacks',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/filter/src/Element/TextFormat.php',
 ];
@@ -27362,30 +27020,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/node/src/Form/NodeDeleteForm.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\node\\\\Form\\\\NodeForm\\:\\:create\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/node/src/Form/NodeForm.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\node\\\\Form\\\\NodeForm\\:\\:form\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/node/src/Form/NodeForm.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\node\\\\Form\\\\NodeForm\\:\\:preview\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/node/src/Form/NodeForm.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\node\\\\Form\\\\NodeForm\\:\\:save\\(\\) should return int but return statement is missing\\.$#',
-	'identifier' => 'return.missing',
-	'count' => 2,
-	'path' => __DIR__ . '/modules/node/src/Form/NodeForm.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\node\\\\Form\\\\NodePreviewForm\\:\\:create\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -27428,30 +27062,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/node/src/Form/NodeRevisionRevertTranslationForm.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\node\\\\Form\\\\NodeTypeForm\\:\\:create\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/node/src/Form/NodeTypeForm.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\node\\\\Form\\\\NodeTypeForm\\:\\:form\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/node/src/Form/NodeTypeForm.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\node\\\\Form\\\\NodeTypeForm\\:\\:save\\(\\) should return int but return statement is missing\\.$#',
-	'identifier' => 'return.missing',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/node/src/Form/NodeTypeForm.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\node\\\\Form\\\\NodeTypeForm\\:\\:validateForm\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/node/src/Form/NodeTypeForm.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\node\\\\Form\\\\RebuildPermissionsForm\\:\\:submitForm\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -27480,6 +27090,30 @@ $ignoreErrors[] = [
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/node/src/NodeAccessControlHandlerInterface.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Method Drupal\\\\node\\\\Form\\\\NodeForm\\:\\:create\\(\\) has no return type specified\\.$#',
+	'identifier' => 'missingType.return',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/node/src/Form/NodeForm.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Method Drupal\\\\node\\\\Form\\\\NodeForm\\:\\:form\\(\\) has no return type specified\\.$#',
+	'identifier' => 'missingType.return',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/node/src/Form/NodeForm.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Method Drupal\\\\node\\\\Form\\\\NodeForm\\:\\:preview\\(\\) has no return type specified\\.$#',
+	'identifier' => 'missingType.return',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/node/src/Form/NodeForm.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Method Drupal\\\\node\\\\Form\\\\NodeForm\\:\\:save\\(\\) should return int but return statement is missing\\.$#',
+	'identifier' => 'return.missing',
+	'count' => 2,
+	'path' => __DIR__ . '/modules/node/src/Form/NodeForm.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\node\\\\NodeGrantDatabaseStorage\\:\\:alterQuery\\(\\) should return int but return statement is missing\\.$#',
@@ -27564,6 +27198,30 @@ $ignoreErrors[] = [
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/node/src/NodeTranslationHandler.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Method Drupal\\\\node\\\\Form\\\\NodeTypeForm\\:\\:create\\(\\) has no return type specified\\.$#',
+	'identifier' => 'missingType.return',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/node/src/Form/NodeTypeForm.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Method Drupal\\\\node\\\\Form\\\\NodeTypeForm\\:\\:form\\(\\) has no return type specified\\.$#',
+	'identifier' => 'missingType.return',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/node/src/Form/NodeTypeForm.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Method Drupal\\\\node\\\\Form\\\\NodeTypeForm\\:\\:save\\(\\) should return int but return statement is missing\\.$#',
+	'identifier' => 'return.missing',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/node/src/Form/NodeTypeForm.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Method Drupal\\\\node\\\\Form\\\\NodeTypeForm\\:\\:validateForm\\(\\) has no return type specified\\.$#',
+	'identifier' => 'missingType.return',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/node/src/Form/NodeTypeForm.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\node\\\\NodeTypeInterface\\:\\:setDisplaySubmitted\\(\\) has no return type specified\\.$#',
@@ -31510,12 +31168,6 @@ $ignoreErrors[] = [
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\system\\\\Element\\\\StatusReportPage\\:\\:preRenderRequirements\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/system/src/Element/StatusReportPage.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^The "\\#pre_render" render array value expects an array of callbacks\\.$#',
-	'identifier' => 'renderCallback.expectsArrayOfCallbacks',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/system/src/Element/StatusReportPage.php',
 ];
@@ -37812,18 +37464,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/toolbar/src/Controller/ToolbarController.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^The "\\#pre_render" render array value expects an array of callbacks\\.$#',
-	'identifier' => 'renderCallback.expectsArrayOfCallbacks',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/toolbar/src/Element/Toolbar.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^The "\\#pre_render" render array value expects an array of callbacks\\.$#',
-	'identifier' => 'renderCallback.expectsArrayOfCallbacks',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/toolbar/src/Element/ToolbarItem.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\toolbar\\\\Functional\\\\ToolbarCacheContextsTest\\:\\:assertCacheContext\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -39484,12 +39124,6 @@ $ignoreErrors[] = [
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\views\\\\Element\\\\View\\:\\:preRenderViewElement\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/views/src/Element/View.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^The "\\#pre_render" render array value expects an array of callbacks\\.$#',
-	'identifier' => 'renderCallback.expectsArrayOfCallbacks',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/views/src/Element/View.php',
 ];
@@ -48879,25 +48513,25 @@ $ignoreErrors[] = [
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\workspaces\\\\Functional\\\\WorkspaceFormValidationTest\\:\\:isLabelInContentOverview\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
+  'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/workspaces/tests/src/Functional/WorkspaceFormValidationTest.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\workspaces\\\\Functional\\\\WorkspaceFormValidationTest\\:\\:setupWorkspaceSwitcherBlock\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
+  'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/workspaces/tests/src/Functional/WorkspaceFormValidationTest.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\workspaces\\\\Functional\\\\WorkspaceFormValidationTest\\:\\:switchToLive\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
+  'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/workspaces/tests/src/Functional/WorkspaceFormValidationTest.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\workspaces\\\\Functional\\\\WorkspaceFormValidationTest\\:\\:switchToWorkspace\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
+  'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/workspaces/tests/src/Functional/WorkspaceFormValidationTest.php',
 ];
