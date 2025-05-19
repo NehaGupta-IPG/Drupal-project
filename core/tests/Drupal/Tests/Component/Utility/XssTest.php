@@ -570,7 +570,7 @@ class XssTest extends TestCase {
       ],
       [
         '<a id="settings"></a><a id="settings" name="url" href="https://example.com/"></a>',
-        '<a></a><a href="https://example.com/"></a>',
+        '<a id="settings"></a><a id="settings" href="https://example.com/"></a>',
         'Link with id and name attributes',
         ['a'],
       ],

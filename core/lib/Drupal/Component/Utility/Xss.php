@@ -301,7 +301,7 @@ class Xss {
               str_starts_with($attribute_name, 'on') ||
               str_starts_with($attribute_name, '-') ||
               // Attributes that can be used for DOM clobbering.
-              (in_array($elem, ['a', 'img']) && in_array($attribute_name, ['id', 'name'])) ||
+              (in_array($elem, ['a', 'img']) && $attribute_name == 'name') ||
               // Ignore long attributes to avoid unnecessary processing
               // overhead.
               strlen($attribute_name) > 96
