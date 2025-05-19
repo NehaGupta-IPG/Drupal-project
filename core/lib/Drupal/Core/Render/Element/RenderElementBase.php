@@ -511,11 +511,19 @@ abstract class RenderElementBase extends PluginBase implements ElementInterface 
    * @internal
    */
   public function setStorage(array &$element): static {
-    if (!$this->storage) {
-      $this->storage = &$element;
-      $element['##object'] = $this;
-    }
+    $this->storage = &$element;
+    $element['##object'] = $this;
     return $this;
+  }
+
+  /**
+   * Returns a render array.
+   *
+   * @return array
+   *   A render array.
+   */
+  public function &toRenderArray(): array {
+    return $this->storage;
   }
 
   /**

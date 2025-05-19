@@ -145,7 +145,10 @@ class ElementInfoManager extends DefaultPluginManager implements ElementInfoMana
    */
   // phpcs:ignore Drupal.Commenting.FunctionComment.MissingReturnComment
   public function createInstance($plugin_id, array $configuration = []) {
-    return parent::createInstance($plugin_id, $configuration);
+    $instance = parent::createInstance($plugin_id, $configuration);
+    assert($instance instanceof ElementInterface);
+    $instance->__set('#object', $instance);
+    return $instance;
   }
 
   /**
