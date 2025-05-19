@@ -21,6 +21,15 @@ class ViewsExposedFilterBlock extends ViewsBlockBase {
   /**
    * {@inheritdoc}
    */
+  public function getCacheTags(): array {
+    $tags = parent::getCacheTags();
+    // Add the tag for the View this block belongs to.
+    return Cache::mergeTags($tags, ['config:views.view.' . $this->view->id()]);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function getCacheContexts() {
     $contexts = $this->view->display_handler->getCacheMetadata()->getCacheContexts();
     return Cache::mergeContexts(parent::getCacheContexts(), $contexts);

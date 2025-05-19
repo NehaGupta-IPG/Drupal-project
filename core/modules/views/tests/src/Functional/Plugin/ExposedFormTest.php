@@ -320,6 +320,45 @@ class ExposedFormTest extends ViewTestBase {
   }
 
   /**
+   * Tests that options in exposed form are updated when we change the view.
+   */
+  public function testExposedBlockOptions(): void {
+    $display = 'page_2';
+    $view = Views::getView('test_exposed_block');
+    $view->setDisplay($display);
+    $block = $this->drupalPlaceBlock('views_exposed_filter_block:test_exposed_block-' . $display);
+
+    // Set label to display on the exposed filter form block.
+    $block->getPlugin()->setConfigurationValue('label_display', TRUE);
+    $block->save();
+
+    $this->drupalGet('test_exposed_block_sort_filters');
+    $this->assertSession()->optionExists('sort_by', 'uid');
+    $this->assertSession()->optionExists('sort_by', 'created');
+
+    // Now update the view and add additional filter.
+    $this->drupalLogin($this->rootUser);
+    $this->drupalGet('admin/structure/views/nojs/add-handler/test_exposed_block/page_2/sort');
+    $edit = [
+      'name[node_field_data.title]' => 'node_field_data.title',
+    ];
+    $this->submitForm($edit, 'Add and configure sort criteria');
+    $edit = [
+      'options[expose_button][checkbox][checkbox]' => '1',
+    ];
+    $this->submitForm($edit, 'Expose sort');
+    $this->submitForm([], 'Apply');
+    $this->submitForm([], 'Save');
+    $this->drupalGet('admin/structure/views/view/test_exposed_block/edit/page_2');
+    $this->drupalLogout();
+
+    $this->drupalGet('test_exposed_block_sort_filters');
+    $this->assertSession()->optionExists('sort_by', 'uid');
+    $this->assertSession()->optionExists('sort_by', 'created');
+    $this->assertSession()->optionExists('sort_by', 'title');
+  }
+
+  /**
    * Data provider for testing different types of displays.
    *
    * @return array
