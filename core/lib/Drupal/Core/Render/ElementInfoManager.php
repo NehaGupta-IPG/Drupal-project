@@ -144,10 +144,10 @@ class ElementInfoManager extends DefaultPluginManager implements ElementInfoMana
    * @return \Drupal\Core\Render\Element\ElementInterface
    */
   // phpcs:ignore Drupal.Commenting.FunctionComment.MissingReturnComment
-  public function createInstance($plugin_id, array $configuration = []) {
-    $instance = parent::createInstance($plugin_id, $configuration);
+  public function createInstance($plugin_id = '', array $configuration = [], &$element = []) {
+    $instance = parent::createInstance($plugin_id ?: $element['#type'], $configuration);
     assert($instance instanceof ElementInterface);
-    $instance->__set('#object', $instance);
+    $instance->initializeInternalStorage($element);
     return $instance;
   }
 
@@ -189,11 +189,12 @@ class ElementInfoManager extends DefaultPluginManager implements ElementInfoMana
    * @return \Drupal\Core\Render\Element\ElementInterface
    *   An element plugin instance.
    */
-  public function fromRenderArray(array &$element): ElementInterface {
+  public function fromRenderArray(ElementInterface|array &$element): ElementInterface {
     if (!isset($element['#type'])) {
       throw new \LogicException('The element passed to ElementInfoManager::fromRenderArray must have a #type.');
     }
-    return $element['##object'] ?? $this->createInstance($element['#type'])->setStorage($element);
+    return $element instanceof ElementInterface ? $element : $element['##object'] ?? $this->createInstance(element: $element);
+
   }
 
 }

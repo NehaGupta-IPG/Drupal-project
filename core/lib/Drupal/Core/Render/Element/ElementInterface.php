@@ -41,6 +41,22 @@ interface ElementInterface extends PluginInspectionInterface, RenderCallbackInte
   public function getInfo();
 
   /**
+   * Set storage.
+   *
+   * Calling this method does nothing, it only exists for the plugin manager
+   * to call when creating a plugin instance.
+   *
+   * @param array $element
+   *   The containing element.
+   *
+   * @return $this
+   *   The object instance.
+   *
+   * @internal
+   */
+  public function initializeInternalStorage(array &$element): static;
+
+  /**
    * Sets a form element's class attribute.
    *
    * Adds 'required' and 'error' classes as needed.
@@ -79,7 +95,7 @@ interface ElementInterface extends PluginInspectionInterface, RenderCallbackInte
    * @return $this
    *   The called object.
    */
-  public function addChild(int|string $name, array|ElementInterface $child): static;
+  public function addChild(int|string $name, ElementInterface|array $child): static;
 
   /**
    * Removes a child.

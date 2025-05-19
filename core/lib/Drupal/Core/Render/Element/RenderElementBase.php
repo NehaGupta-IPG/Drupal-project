@@ -548,19 +548,13 @@ abstract class RenderElementBase extends PluginBase implements ElementInterface,
   }
 
   /**
-   * Set storage.
-   *
-   * @param array $element
-   *   The containing element.
-   *
-   * @return $this
-   *   The object instance.
-   *
-   * @internal
+   * {inheritdoc}
    */
-  public function setStorage(array &$element): static {
-    $this->storage = &$element;
-    $element['##object'] = $this;
+  public function initializeInternalStorage(array &$element): static {
+    if (!$this->storage) {
+      $this->storage = &$element;
+      $element['##object'] = $this;
+    }
     return $this;
   }
 
@@ -610,13 +604,11 @@ abstract class RenderElementBase extends PluginBase implements ElementInterface,
   /**
    * {@inheritdoc}
    */
-  public function addChild(string|int $name, array|ElementInterface $child): static {
+  public function addChild(string|int $name, ElementInterface|array $child): static {
     if ($name[0] === '#') {
       throw new \LogicException('The name of children can not start with a #.');
     }
-    if (is_array($child)) {
-      $child = $this->elementInfoManager()->fromRenderArray($child);
-    }
+    $child = $this->elementInfoManager()->fromRenderArray($child);
     $child->renderParent = $this;
     $child->renderParentName = $name;
     $this->storage[$name] = &$child->toRenderArray();
