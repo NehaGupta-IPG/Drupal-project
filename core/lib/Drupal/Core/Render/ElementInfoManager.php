@@ -193,7 +193,7 @@ class ElementInfoManager extends DefaultPluginManager implements ElementInfoMana
     if (!isset($element['#type'])) {
       throw new \LogicException('The element passed to ElementInfoManager::fromRenderArray must have a #type.');
     }
-    return $this->createInstance($element['#type'])->setStorage($element);
+    return $element['##object'] ?? $this->createInstance($element['#type'])->setStorage($element);
   }
 
 }
