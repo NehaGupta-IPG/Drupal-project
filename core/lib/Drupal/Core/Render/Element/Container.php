@@ -14,7 +14,9 @@ use Drupal\Core\Render\Element;
  * an HTML ID.
  *
  * Properties:
- * - #optional: Indicates whether the container should render when it has no
+ *
+ * @property $optional
+ *   Indicates whether the container should render when it has no
  *   visible children. Defaults to FALSE.
  *
  * Usage example:
@@ -44,14 +46,6 @@ use Drupal\Core\Render\Element;
  */
 #[RenderElement('container')]
 class Container extends RenderElementBase {
-
-
-  /**
-   * Automatically converted property.
-   *
-   * @var mixed
-   */
-  public $optional;
 
   /**
    * {@inheritdoc}
@@ -109,20 +103,6 @@ class Container extends RenderElementBase {
       $element['#printed'] = TRUE;
     }
     return $element;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function toRenderArray() : array {
-    return [
-      '#optional' => $this->optional,
-      '#process' => $this->process,
-      '#pre_render' => $this->pre_render,
-      '#theme_wrappers' => $this->theme_wrappers,
-      '#type' => $this->type,
-      '#defaults_loaded' => $this->defaults_loaded,
-    ];
   }
 
 }

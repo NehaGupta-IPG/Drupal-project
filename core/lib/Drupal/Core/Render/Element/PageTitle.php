@@ -24,16 +24,4 @@ class PageTitle extends RenderElementBase {
     ];
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function toRenderArray() : array {
-    return [
-      '#theme' => $this->theme,
-      '#title' => $this->title,
-      '#type' => $this->type,
-      '#defaults_loaded' => $this->defaults_loaded,
-    ];
-  }
-
 }

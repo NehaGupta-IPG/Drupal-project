@@ -41,18 +41,4 @@ class Token extends Hidden {
     return NULL;
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function toRenderArray() : array {
-    return [
-      '#input' => $this->input,
-      '#pre_render' => $this->pre_render,
-      '#theme' => $this->theme,
-      '#value_callback' => $this->value_callback,
-      '#type' => $this->type,
-      '#defaults_loaded' => $this->defaults_loaded,
-    ];
-  }
-
 }

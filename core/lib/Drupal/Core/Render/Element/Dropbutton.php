@@ -17,7 +17,9 @@ use Drupal\Core\Render\Attribute\RenderElement;
  * element property #links to provide $variables['links'] for theming.
  *
  * Properties:
- * - #links: An array of links to actions. See template_preprocess_links() for
+ *
+ * @property $links
+ *   An array of links to actions. See template_preprocess_links() for
  *   documentation the properties of links in this array.
  * - #dropbutton_type: A string defining a type of dropbutton variant for
  *   styling proposes. Renders as class `dropbutton--#dropbutton_type`.
@@ -80,18 +82,6 @@ class Dropbutton extends RenderElementBase {
     }
 
     return $element;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function toRenderArray() : array {
-    return [
-      '#pre_render' => $this->pre_render,
-      '#theme' => $this->theme,
-      '#type' => $this->type,
-      '#defaults_loaded' => $this->defaults_loaded,
-    ];
   }
 
 }

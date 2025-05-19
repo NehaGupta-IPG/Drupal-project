@@ -49,15 +49,6 @@ use Drupal\Core\Render\Element;
 #[FormElement('vertical_tabs')]
 class VerticalTabs extends RenderElementBase {
 
-
-  /**
-   * Automatically converted property.
-   *
-   * @var mixed
-   */
-  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
-  public $default_tab;
-
   /**
    * {@inheritdoc}
    */
@@ -146,20 +137,6 @@ class VerticalTabs extends RenderElementBase {
     $form_state->addCleanValueKey($name . '__active_tab');
 
     return $element;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function toRenderArray() : array {
-    return [
-      '#default_tab' => $this->default_tab,
-      '#process' => $this->process,
-      '#pre_render' => $this->pre_render,
-      '#theme_wrappers' => $this->theme_wrappers,
-      '#type' => $this->type,
-      '#defaults_loaded' => $this->defaults_loaded,
-    ];
   }
 
 }

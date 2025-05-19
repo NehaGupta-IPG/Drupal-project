@@ -14,8 +14,11 @@ use Drupal\Core\Url as CoreUrl;
  * Provides a link render element.
  *
  * Properties:
- * - #title: The link text.
- * - #url: \Drupal\Core\Url object containing URL information pointing to an
+ *
+ * @property $title
+ *   The link text.
+ * @property $url
+ *   \Drupal\Core\Url object containing URL information pointing to an
  *   internal or external link. See \Drupal\Core\Utility\LinkGeneratorInterface.
  *
  * Usage example:
@@ -202,17 +205,6 @@ class Link extends RenderElementBase {
       }
     }
     return $element;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function toRenderArray() : array {
-    return [
-      '#pre_render' => $this->pre_render,
-      '#type' => $this->type,
-      '#defaults_loaded' => $this->defaults_loaded,
-    ];
   }
 
 }

@@ -22,7 +22,9 @@ use Drupal\Core\Render\Element\ProcessPatternTrait;
  *
  * Properties:
  * - #target_type: (required) The ID of the target entity type.
- * - #tags: (optional) TRUE if the element allows multiple selection. Defaults
+ *
+ * @property $tags
+ *   (optional) TRUE if the element allows multiple selection. Defaults
  *   to FALSE.
  * - #default_value: (optional) The default entity or an array of default
  *   entities, depending on the value of #tags.
@@ -35,7 +37,8 @@ use Drupal\Core\Render\Element\ProcessPatternTrait;
  *   - target_bundles: Array of bundles to allow (omit to allow all bundles).
  *   - sort: Array with 'field' and 'direction' keys, determining how results
  *     will be sorted. Defaults to unsorted.
- * - #autocreate: (optional) Array of settings used to auto-create entities
+ * @property $autocreate
+ *   (optional) Array of settings used to auto-create entities
  *   that do not exist (omit to not auto-create entities). Elements:
  *   - bundle: (required) Bundle to use for auto-created entities.
  *   - uid: User ID to use as the author of auto-created entities. Defaults to
@@ -69,76 +72,8 @@ use Drupal\Core\Render\Element\ProcessPatternTrait;
 #[FormElement('entity_autocomplete')]
 class EntityAutocomplete extends Textfield {
 
-  use ProcessPatternTrait;
   use ProcessAutocompleteTrait;
-
-  /**
-   * Automatically converted property.
-   *
-   * @var mixed
-   */
-  public $size;
-
-  /**
-   * Automatically converted property.
-   *
-   * @var mixed
-   */
-  public $maxlength;
-
-  /**
-   * Automatically converted property.
-   *
-   * @var mixed
-   */
-  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
-  public $target_type;
-
-  /**
-   * Automatically converted property.
-   *
-   * @var mixed
-   */
-  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
-  public $selection_handler;
-
-  /**
-   * Automatically converted property.
-   *
-   * @var mixed
-   */
-  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
-  public $selection_settings;
-
-  /**
-   * Automatically converted property.
-   *
-   * @var mixed
-   */
-  public $tags;
-
-  /**
-   * Automatically converted property.
-   *
-   * @var mixed
-   */
-  public $autocreate;
-
-  /**
-   * Automatically converted property.
-   *
-   * @var mixed
-   */
-  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
-  public $validate_reference;
-
-  /**
-   * Automatically converted property.
-   *
-   * @var mixed
-   */
-  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
-  public $process_default_value;
+  use ProcessPatternTrait;
 
   /**
    * {@inheritdoc}
@@ -493,33 +428,6 @@ class EntityAutocomplete extends Textfield {
     }
 
     return $match;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function toRenderArray() : array {
-    return [
-      '#input' => $this->input,
-      '#size' => $this->size,
-      '#maxlength' => $this->maxlength,
-      '#autocomplete_route_name' => $this->autocomplete_route_name,
-      '#process' => $this->process,
-      '#pre_render' => $this->pre_render,
-      '#theme' => $this->theme,
-      '#theme_wrappers' => $this->theme_wrappers,
-      '#target_type' => $this->target_type,
-      '#selection_handler' => $this->selection_handler,
-      '#selection_settings' => $this->selection_settings,
-      '#tags' => $this->tags,
-      '#autocreate' => $this->autocreate,
-      '#validate_reference' => $this->validate_reference,
-      '#process_default_value' => $this->process_default_value,
-      '#element_validate' => $this->element_validate,
-      '#value_callback' => $this->value_callback,
-      '#type' => $this->type,
-      '#defaults_loaded' => $this->defaults_loaded,
-    ];
   }
 
 }

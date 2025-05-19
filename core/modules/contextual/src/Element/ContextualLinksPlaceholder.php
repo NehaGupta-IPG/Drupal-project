@@ -55,16 +55,4 @@ class ContextualLinksPlaceholder extends RenderElementBase {
     return $element;
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function toRenderArray() : array {
-    return [
-      '#pre_render' => $this->pre_render,
-      '#id' => $this->id,
-      '#type' => $this->type,
-      '#defaults_loaded' => $this->defaults_loaded,
-    ];
-  }
-
 }

@@ -8,7 +8,7 @@ use Drupal\Core\Render\Attribute\RenderElement;
  * Provides a render element for the content of an HTML page.
  *
  * This represents the "main part" of the HTML page's body; see html.html.twig.
-  */
+ */
 #[RenderElement('page')]
 class Page extends RenderElementBase {
 
@@ -19,19 +19,6 @@ class Page extends RenderElementBase {
     return [
       '#theme' => 'page',
       '#title' => '',
-    ];
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function toRenderArray() : array {
-    return [
-      '#theme' => $this->theme,
-      '#title' => $this->title,
-      '#type' => $this->type,
-      '#theme_wrappers' => $this->theme_wrappers,
-      '#defaults_loaded' => $this->defaults_loaded,
     ];
   }
 

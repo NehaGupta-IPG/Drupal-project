@@ -15,38 +15,8 @@ use Drupal\Core\Render\Attribute\FormElement;
 #[FormElement('path')]
 class PathElement extends Textfield {
 
-  use ProcessPatternTrait;
   use ProcessAutocompleteTrait;
-
-  /**
-   * Automatically converted property.
-   *
-   * @var mixed
-   */
-  public $size;
-
-  /**
-   * Automatically converted property.
-   *
-   * @var mixed
-   */
-  public $maxlength;
-
-  /**
-   * Automatically converted property.
-   *
-   * @var mixed
-   */
-  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
-  public $validate_path;
-
-  /**
-   * Automatically converted property.
-   *
-   * @var mixed
-   */
-  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
-  public $convert_path;
+  use ProcessPatternTrait;
   /**
    * Do not convert the submitted value from the user-supplied path.
    */
@@ -119,28 +89,6 @@ class PathElement extends Textfield {
         '%path' => $element['#value'],
       ]));
     }
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function toRenderArray() : array {
-    return [
-      '#input' => $this->input,
-      '#size' => $this->size,
-      '#maxlength' => $this->maxlength,
-      '#autocomplete_route_name' => $this->autocomplete_route_name,
-      '#process' => $this->process,
-      '#pre_render' => $this->pre_render,
-      '#theme' => $this->theme,
-      '#theme_wrappers' => $this->theme_wrappers,
-      '#validate_path' => $this->validate_path,
-      '#convert_path' => $this->convert_path,
-      '#element_validate' => $this->element_validate,
-      '#value_callback' => $this->value_callback,
-      '#type' => $this->type,
-      '#defaults_loaded' => $this->defaults_loaded,
-    ];
   }
 
 }

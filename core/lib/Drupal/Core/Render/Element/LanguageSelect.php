@@ -27,17 +27,4 @@ class LanguageSelect extends FormElementBase {
     ];
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function toRenderArray() : array {
-    return [
-      '#input' => $this->input,
-      '#default_value' => $this->default_value,
-      '#value_callback' => $this->value_callback,
-      '#type' => $this->type,
-      '#defaults_loaded' => $this->defaults_loaded,
-    ];
-  }
-
 }

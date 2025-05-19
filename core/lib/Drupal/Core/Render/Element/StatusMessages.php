@@ -20,22 +20,6 @@ use Drupal\big_pipe\Render\Placeholder\BigPipeStrategy;
 #[RenderElement('status_messages')]
 class StatusMessages extends RenderElementBase {
 
-
-  /**
-   * Automatically converted property.
-   *
-   * @var mixed
-   */
-  public $display;
-
-  /**
-   * Automatically converted property.
-   *
-   * @var mixed
-   */
-  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
-  public $include_fallback;
-
   /**
    * {@inheritdoc}
    *
@@ -139,19 +123,6 @@ class StatusMessages extends RenderElementBase {
       ];
     }
     return $render;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function toRenderArray() : array {
-    return [
-      '#display' => $this->display,
-      '#pre_render' => $this->pre_render,
-      '#include_fallback' => $this->include_fallback,
-      '#type' => $this->type,
-      '#defaults_loaded' => $this->defaults_loaded,
-    ];
   }
 
 }

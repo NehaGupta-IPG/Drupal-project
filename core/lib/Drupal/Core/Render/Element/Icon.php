@@ -14,7 +14,9 @@ use Drupal\Core\Theme\Icon\IconDefinition;
  * Properties:
  * - #pack_id: (string) Icon Pack provider plugin id.
  * - #icon_id: (string) Name of the icon.
- * - #settings: (array) Settings sent to the inline Twig template.
+ *
+ * @property $settings
+ *   (array) Settings sent to the inline Twig template.
  *
  * Usage Example:
  * @code
@@ -32,30 +34,6 @@ use Drupal\Core\Theme\Icon\IconDefinition;
  */
 #[RenderElement('icon')]
 class Icon extends RenderElementBase {
-
-
-  /**
-   * Automatically converted property.
-   *
-   * @var mixed
-   */
-  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
-  public $pack_id;
-
-  /**
-   * Automatically converted property.
-   *
-   * @var mixed
-   */
-  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
-  public $icon_id;
-
-  /**
-   * Automatically converted property.
-   *
-   * @var mixed
-   */
-  public $settings;
 
   /**
    * {@inheritdoc}
@@ -121,20 +99,6 @@ class Icon extends RenderElementBase {
     }
 
     return $element;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function toRenderArray() : array {
-    return [
-      '#pre_render' => $this->pre_render,
-      '#pack_id' => $this->pack_id,
-      '#icon_id' => $this->icon_id,
-      '#settings' => $this->settings,
-      '#type' => $this->type,
-      '#defaults_loaded' => $this->defaults_loaded,
-    ];
   }
 
 }

@@ -146,16 +146,4 @@ class StatusReportPage extends RenderElementBase {
     return $element;
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function toRenderArray() : array {
-    return [
-      '#theme' => $this->theme,
-      '#pre_render' => $this->pre_render,
-      '#type' => $this->type,
-      '#defaults_loaded' => $this->defaults_loaded,
-    ];
-  }
-
 }

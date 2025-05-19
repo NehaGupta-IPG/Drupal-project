@@ -25,15 +25,6 @@ use Drupal\Core\Render\Element;
 #[FormElement('checkbox')]
 class Checkbox extends FormElementBase {
 
-
-  /**
-   * Automatically converted property.
-   *
-   * @var mixed
-   */
-  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
-  public $return_value;
-
   /**
    * {@inheritdoc}
    */
@@ -137,24 +128,6 @@ class Checkbox extends FormElementBase {
       $element['#checked'] = ((string) $value === (string) $return_value);
     }
     return $element;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function toRenderArray() : array {
-    return [
-      '#input' => $this->input,
-      '#return_value' => $this->return_value,
-      '#process' => $this->process,
-      '#pre_render' => $this->pre_render,
-      '#theme' => $this->theme,
-      '#theme_wrappers' => $this->theme_wrappers,
-      '#title_display' => $this->title_display,
-      '#value_callback' => $this->value_callback,
-      '#type' => $this->type,
-      '#defaults_loaded' => $this->defaults_loaded,
-    ];
   }
 
 }

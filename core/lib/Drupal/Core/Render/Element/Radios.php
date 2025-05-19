@@ -10,7 +10,9 @@ use Drupal\Component\Utility\Html as HtmlUtility;
  * Provides a form element for a set of radio buttons.
  *
  * Properties:
- * - #options: An associative array, where the keys are the returned values for
+ *
+ * @property $options
+ *   An associative array, where the keys are the returned values for
  *   each radio button, and the values are the labels next to each radio button.
  *
  * Usage example:
@@ -119,21 +121,6 @@ class Radios extends FormElementBase {
       }
       return $value;
     }
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function toRenderArray() : array {
-    return [
-      '#input' => $this->input,
-      '#process' => $this->process,
-      '#theme_wrappers' => $this->theme_wrappers,
-      '#pre_render' => $this->pre_render,
-      '#value_callback' => $this->value_callback,
-      '#type' => $this->type,
-      '#defaults_loaded' => $this->defaults_loaded,
-    ];
   }
 
 }

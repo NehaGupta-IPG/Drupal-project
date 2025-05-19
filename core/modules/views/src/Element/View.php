@@ -13,29 +13,6 @@ use Drupal\views\Views;
 #[RenderElement('view')]
 class View extends RenderElementBase {
 
-
-  /**
-   * Automatically converted property.
-   *
-   * @var mixed
-   */
-  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
-  public $display_id;
-
-  /**
-   * Automatically converted property.
-   *
-   * @var mixed
-   */
-  public $arguments;
-
-  /**
-   * Automatically converted property.
-   *
-   * @var mixed
-   */
-  public $embed;
-
   /**
    * {@inheritdoc}
    */
@@ -122,22 +99,6 @@ class View extends RenderElementBase {
     }
 
     return $element;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function toRenderArray() : array {
-    return [
-      '#pre_render' => $this->pre_render,
-      '#name' => $this->name,
-      '#display_id' => $this->display_id,
-      '#arguments' => $this->arguments,
-      '#embed' => $this->embed,
-      '#cache' => $this->cache,
-      '#type' => $this->type,
-      '#defaults_loaded' => $this->defaults_loaded,
-    ];
   }
 
 }

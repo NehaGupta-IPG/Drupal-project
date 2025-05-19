@@ -10,8 +10,11 @@ use Drupal\Core\Render\Element;
  * Provides a form element for entering a password, with hidden text.
  *
  * Properties:
- * - #size: The size of the input element in characters.
- * - #pattern: A string for the native HTML5 pattern attribute.
+ *
+ * @property $size
+ *   The size of the input element in characters.
+ * @property $pattern
+ *   A string for the native HTML5 pattern attribute.
  *
  * Usage example:
  * @code
@@ -30,20 +33,6 @@ use Drupal\Core\Render\Element;
 class Password extends FormElementBase {
 
   use ProcessPatternTrait;
-
-  /**
-   * Automatically converted property.
-   *
-   * @var mixed
-   */
-  public $size;
-
-  /**
-   * Automatically converted property.
-   *
-   * @var mixed
-   */
-  public $maxlength;
 
   /**
    * {@inheritdoc}
@@ -94,24 +83,6 @@ class Password extends FormElementBase {
       return is_scalar($input) ? (string) $input : '';
     }
     return NULL;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function toRenderArray() : array {
-    return [
-      '#input' => $this->input,
-      '#size' => $this->size,
-      '#maxlength' => $this->maxlength,
-      '#process' => $this->process,
-      '#pre_render' => $this->pre_render,
-      '#theme' => $this->theme,
-      '#theme_wrappers' => $this->theme_wrappers,
-      '#value_callback' => $this->value_callback,
-      '#type' => $this->type,
-      '#defaults_loaded' => $this->defaults_loaded,
-    ];
   }
 
 }

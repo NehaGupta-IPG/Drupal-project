@@ -13,14 +13,19 @@ use Drupal\Core\Render\Attribute\RenderElement;
  * extend a select query with \Drupal\Core\Database\Query\PagerSelectExtender.
  *
  * Properties:
- * - #element: (optional, int) The pager ID, to distinguish between multiple
+ *
+ * @property $element
+ *   (optional, int) The pager ID, to distinguish between multiple
  *   pagers on the same page (defaults to 0).
  * - #pagination_heading_level: (optional) A heading level for the pager.
- * - #parameters: (optional) An associative array of query string parameters to
+ * @property $parameters
+ *   (optional) An associative array of query string parameters to
  *   append to the pager.
- * - #quantity: The maximum number of numbered page links to create (defaults
+ * @property $quantity
+ *   The maximum number of numbered page links to create (defaults
  *   to 9).
- * - #tags: (optional) An array of labels for the controls in the pages.
+ * @property $tags
+ *   (optional) An array of labels for the controls in the pages.
  * - #route_name: (optional) The name of the route to be used to build pager
  *   links. Defaults to '<none>', which will make links relative to the current
  *   URL. This makes the page more effectively cacheable.
@@ -33,51 +38,6 @@ use Drupal\Core\Render\Attribute\RenderElement;
  */
 #[RenderElement('pager')]
 class Pager extends RenderElementBase {
-
-
-  /**
-   * Automatically converted property.
-   *
-   * @var mixed
-   */
-  public $element;
-
-  /**
-   * Automatically converted property.
-   *
-   * @var mixed
-   */
-  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
-  public $pagination_heading_level;
-
-  /**
-   * Automatically converted property.
-   *
-   * @var mixed
-   */
-  public $parameters;
-
-  /**
-   * Automatically converted property.
-   *
-   * @var mixed
-   */
-  public $quantity;
-
-  /**
-   * Automatically converted property.
-   *
-   * @var mixed
-   */
-  public $tags;
-
-  /**
-   * Automatically converted property.
-   *
-   * @var mixed
-   */
-  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
-  public $route_name;
 
   /**
    * {@inheritdoc}
@@ -127,24 +87,6 @@ class Pager extends RenderElementBase {
     // In other themes, however, that may not be the case.
     $pager['#cache']['contexts'][] = 'url.query_args.pagers:' . $pager['#element'];
     return $pager;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function toRenderArray() : array {
-    return [
-      '#pre_render' => $this->pre_render,
-      '#theme' => $this->theme,
-      '#element' => $this->element,
-      '#pagination_heading_level' => $this->pagination_heading_level,
-      '#parameters' => $this->parameters,
-      '#quantity' => $this->quantity,
-      '#tags' => $this->tags,
-      '#route_name' => $this->route_name,
-      '#type' => $this->type,
-      '#defaults_loaded' => $this->defaults_loaded,
-    ];
   }
 
 }

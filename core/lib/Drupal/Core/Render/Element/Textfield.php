@@ -10,13 +10,17 @@ use Drupal\Core\Render\Element;
  * Provides a one-line text field form element.
  *
  * Properties:
- * - #maxlength: Maximum number of characters of input allowed.
- * - #size: The size of the input element in characters.
+ *
+ * @property $maxlength
+ *   Maximum number of characters of input allowed.
+ * @property $size
+ *   The size of the input element in characters.
  * - #autocomplete_route_name: A route to be used as callback URL by the
  *   autocomplete JavaScript library.
  * - #autocomplete_route_parameters: An array of parameters to be used in
  *   conjunction with the route name.
- * - #pattern: A string for the native HTML5 pattern attribute.
+ * @property $pattern
+ *   A string for the native HTML5 pattern attribute.
  *
  * Usage example:
  *
@@ -38,22 +42,8 @@ use Drupal\Core\Render\Element;
 #[FormElement('textfield')]
 class Textfield extends FormElementBase {
 
-  use ProcessPatternTrait;
   use ProcessAutocompleteTrait;
-
-  /**
-   * Automatically converted property.
-   *
-   * @var mixed
-   */
-  public $size;
-
-  /**
-   * Automatically converted property.
-   *
-   * @var mixed
-   */
-  public $maxlength;
+  use ProcessPatternTrait;
 
   /**
    * {@inheritdoc}
@@ -111,25 +101,6 @@ class Textfield extends FormElementBase {
     static::setAttributes($element, ['form-text']);
 
     return $element;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function toRenderArray() : array {
-    return [
-      '#input' => $this->input,
-      '#size' => $this->size,
-      '#maxlength' => $this->maxlength,
-      '#autocomplete_route_name' => $this->autocomplete_route_name,
-      '#process' => $this->process,
-      '#pre_render' => $this->pre_render,
-      '#theme' => $this->theme,
-      '#theme_wrappers' => $this->theme_wrappers,
-      '#value_callback' => $this->value_callback,
-      '#type' => $this->type,
-      '#defaults_loaded' => $this->defaults_loaded,
-    ];
   }
 
 }

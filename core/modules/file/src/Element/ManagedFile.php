@@ -24,67 +24,6 @@ use Symfony\Component\HttpFoundation\Request;
 #[FormElement('managed_file')]
 class ManagedFile extends FormElementBase {
 
-
-  /**
-   * Automatically converted property.
-   *
-   * @var mixed
-   */
-  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
-  public $progress_indicator;
-
-  /**
-   * Automatically converted property.
-   *
-   * @var mixed
-   */
-  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
-  public $progress_message;
-
-  /**
-   * Automatically converted property.
-   *
-   * @var mixed
-   */
-  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
-  public $upload_validators;
-
-  /**
-   * Automatically converted property.
-   *
-   * @var mixed
-   */
-  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
-  public $upload_location;
-
-  /**
-   * Automatically converted property.
-   *
-   * @var mixed
-   */
-  public $size;
-
-  /**
-   * Automatically converted property.
-   *
-   * @var mixed
-   */
-  public $multiple;
-
-  /**
-   * Automatically converted property.
-   *
-   * @var mixed
-   */
-  public $extended;
-
-  /**
-   * Automatically converted property.
-   *
-   * @var mixed
-   */
-  public $accept;
-
   /**
    * {@inheritdoc}
    */
@@ -530,32 +469,6 @@ class ManagedFile extends FormElementBase {
    */
   protected static function fileUsage() {
     return \Drupal::service('file.usage');
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function toRenderArray() : array {
-    return [
-      '#input' => $this->input,
-      '#process' => $this->process,
-      '#element_validate' => $this->element_validate,
-      '#pre_render' => $this->pre_render,
-      '#theme' => $this->theme,
-      '#theme_wrappers' => $this->theme_wrappers,
-      '#progress_indicator' => $this->progress_indicator,
-      '#progress_message' => $this->progress_message,
-      '#upload_validators' => $this->upload_validators,
-      '#upload_location' => $this->upload_location,
-      '#size' => $this->size,
-      '#multiple' => $this->multiple,
-      '#extended' => $this->extended,
-      '#attached' => $this->attached,
-      '#accept' => $this->accept,
-      '#value_callback' => $this->value_callback,
-      '#type' => $this->type,
-      '#defaults_loaded' => $this->defaults_loaded,
-    ];
   }
 
 }

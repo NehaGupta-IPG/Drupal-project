@@ -9,11 +9,16 @@ use Drupal\Core\Render\Attribute\FormElement;
  * Provides a form element for input of multiple-line text.
  *
  * Properties:
- * - #rows: Number of rows in the text box.
- * - #cols: Number of columns in the text box.
- * - #resizable: Controls whether the text area is resizable.  Allowed values
+ *
+ * @property $rows
+ *   Number of rows in the text box.
+ * @property $cols
+ *   Number of columns in the text box.
+ * @property $resizable
+ *   Controls whether the text area is resizable.  Allowed values
  *   are "none", "vertical", "horizontal", or "both" (defaults to "vertical").
- * - #maxlength: The maximum amount of characters to accept as input.
+ * @property $maxlength
+ *   The maximum amount of characters to accept as input.
  *
  * Usage example:
  * @code
@@ -28,28 +33,6 @@ use Drupal\Core\Render\Attribute\FormElement;
  */
 #[FormElement('textarea')]
 class Textarea extends FormElementBase {
-
-
-  /**
-   * Automatically converted property.
-   *
-   * @var mixed
-   */
-  public $cols;
-
-  /**
-   * Automatically converted property.
-   *
-   * @var mixed
-   */
-  public $rows;
-
-  /**
-   * Automatically converted property.
-   *
-   * @var mixed
-   */
-  public $resizable;
 
   /**
    * {@inheritdoc}
@@ -91,25 +74,6 @@ class Textarea extends FormElementBase {
       return is_scalar($input) ? (string) $input : '';
     }
     return NULL;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function toRenderArray() : array {
-    return [
-      '#input' => $this->input,
-      '#cols' => $this->cols,
-      '#rows' => $this->rows,
-      '#resizable' => $this->resizable,
-      '#process' => $this->process,
-      '#pre_render' => $this->pre_render,
-      '#theme' => $this->theme,
-      '#theme_wrappers' => $this->theme_wrappers,
-      '#value_callback' => $this->value_callback,
-      '#type' => $this->type,
-      '#defaults_loaded' => $this->defaults_loaded,
-    ];
   }
 
 }

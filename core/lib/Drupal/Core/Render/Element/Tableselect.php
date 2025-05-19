@@ -12,12 +12,17 @@ use Drupal\Core\StringTranslation\TranslatableMarkup;
  * Provides a form element for a table with radios or checkboxes in left column.
  *
  * Properties:
- * - #header: An array of table header labels.
- * - #options: An associative array where each key is the value returned when
+ *
+ * @property $header
+ *   An array of table header labels.
+ * @property $options
+ *   An associative array where each key is the value returned when
  *   a user selects the radio button or checkbox, and each value is the row of
  *   table data.
- * - #empty: The message to display if table does not have any options.
- * - #multiple: Set to FALSE to render the table with radios instead checkboxes.
+ * @property $empty
+ *   The message to display if table does not have any options.
+ * @property $multiple
+ *   Set to FALSE to render the table with radios instead checkboxes.
  * - #js_select: Set to FALSE if you don't want the select all checkbox added to
  *   the header.
  *
@@ -53,50 +58,6 @@ use Drupal\Core\StringTranslation\TranslatableMarkup;
  */
 #[FormElement('tableselect')]
 class Tableselect extends Table {
-
-
-  /**
-   * Automatically converted property.
-   *
-   * @var mixed
-   */
-  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
-  public $js_select;
-
-  /**
-   * Automatically converted property.
-   *
-   * @var mixed
-   */
-  public $multiple;
-
-  /**
-   * Automatically converted property.
-   *
-   * @var mixed
-   */
-  public $responsive;
-
-  /**
-   * Automatically converted property.
-   *
-   * @var mixed
-   */
-  public $sticky;
-
-  /**
-   * Automatically converted property.
-   *
-   * @var mixed
-   */
-  public $options;
-
-  /**
-   * Automatically converted property.
-   *
-   * @var mixed
-   */
-  public $empty;
 
   /**
    * {@inheritdoc}
@@ -333,27 +294,6 @@ class Tableselect extends Table {
       $element['#value'] = [];
     }
     return $element;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function toRenderArray() : array {
-    return [
-      '#input' => $this->input,
-      '#js_select' => $this->js_select,
-      '#multiple' => $this->multiple,
-      '#responsive' => $this->responsive,
-      '#sticky' => $this->sticky,
-      '#pre_render' => $this->pre_render,
-      '#process' => $this->process,
-      '#options' => $this->options,
-      '#empty' => $this->empty,
-      '#theme' => $this->theme,
-      '#value_callback' => $this->value_callback,
-      '#type' => $this->type,
-      '#defaults_loaded' => $this->defaults_loaded,
-    ];
   }
 
 }

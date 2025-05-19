@@ -12,7 +12,9 @@ use Drupal\Core\Render\Attribute\FormElement;
  * the order.
  *
  * Properties:
- * - #delta: The range of possible weight values used. A delta of 10 would
+ *
+ * @property $delta
+ *   The range of possible weight values used. A delta of 10 would
  *   indicate possible weight values between -10 and 10.
  *
  * Usage example:
@@ -27,14 +29,6 @@ use Drupal\Core\Render\Attribute\FormElement;
  */
 #[FormElement('weight')]
 class Weight extends FormElementBase {
-
-
-  /**
-   * Automatically converted property.
-   *
-   * @var mixed
-   */
-  public $delta;
 
   /**
    * {@inheritdoc}
@@ -79,21 +73,6 @@ class Weight extends FormElementBase {
     }
 
     return $element;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function toRenderArray() : array {
-    return [
-      '#input' => $this->input,
-      '#delta' => $this->delta,
-      '#default_value' => $this->default_value,
-      '#process' => $this->process,
-      '#value_callback' => $this->value_callback,
-      '#type' => $this->type,
-      '#defaults_loaded' => $this->defaults_loaded,
-    ];
   }
 
 }

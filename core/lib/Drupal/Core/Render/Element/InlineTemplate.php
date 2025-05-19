@@ -8,8 +8,11 @@ use Drupal\Core\Render\Attribute\RenderElement;
  * Provides a render element where the user supplies an in-line Twig template.
  *
  * Properties:
- * - #template: The inline Twig template used to render the element.
- * - #context: (array) The variables to substitute into the Twig template.
+ *
+ * @property $template
+ *   The inline Twig template used to render the element.
+ * @property $context
+ *   (array) The variables to substitute into the Twig template.
  *   Each variable may be a string or a render array.
  *
  * Usage example:
@@ -25,21 +28,6 @@ use Drupal\Core\Render\Attribute\RenderElement;
  */
 #[RenderElement('inline_template')]
 class InlineTemplate extends RenderElementBase {
-
-
-  /**
-   * Automatically converted property.
-   *
-   * @var mixed
-   */
-  public $template;
-
-  /**
-   * Automatically converted property.
-   *
-   * @var mixed
-   */
-  public $context;
 
   /**
    * {@inheritdoc}
@@ -69,19 +57,6 @@ class InlineTemplate extends RenderElementBase {
     $markup = $environment->renderInline($element['#template'], $element['#context']);
     $element['#markup'] = $markup;
     return $element;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function toRenderArray() : array {
-    return [
-      '#pre_render' => $this->pre_render,
-      '#template' => $this->template,
-      '#context' => $this->context,
-      '#type' => $this->type,
-      '#defaults_loaded' => $this->defaults_loaded,
-    ];
   }
 
 }

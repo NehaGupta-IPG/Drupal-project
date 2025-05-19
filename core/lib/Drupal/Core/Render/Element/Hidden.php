@@ -13,7 +13,9 @@ use Drupal\Core\Render\Element;
  * Properties:
  * - #default_value: The initial value of the form element. JavaScript may
  *   alter the value prior to submission.
- * - #value: The value of the form element. The Form API ensures that this
+ *
+ * @property $value
+ *   The value of the form element. The Form API ensures that this
  *   value remains unchanged by the browser.
  *
  * Usage example:
@@ -57,21 +59,6 @@ class Hidden extends FormElementBase {
     Element::setAttributes($element, ['name', 'value']);
 
     return $element;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function toRenderArray() : array {
-    return [
-      '#input' => $this->input,
-      '#process' => $this->process,
-      '#pre_render' => $this->pre_render,
-      '#theme' => $this->theme,
-      '#value_callback' => $this->value_callback,
-      '#type' => $this->type,
-      '#defaults_loaded' => $this->defaults_loaded,
-    ];
   }
 
 }

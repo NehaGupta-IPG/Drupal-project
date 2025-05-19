@@ -9,7 +9,9 @@ use Drupal\Core\Render\Attribute\FormElement;
  * Provides a form element for a set of checkboxes.
  *
  * Properties:
- * - #options: An associative array whose keys are the values returned for each
+ *
+ * @property $options
+ *   An associative array whose keys are the values returned for each
  *   checkbox, and whose values are the labels next to each checkbox. The
  *   #options array cannot have a 0 key, as it would not be possible to discern
  *   checked and unchecked states.
@@ -179,21 +181,6 @@ class Checkboxes extends FormElementBase {
    */
   public static function detectEmptyCheckboxes(array $input) {
     return empty(static::getCheckedCheckboxes($input));
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function toRenderArray() : array {
-    return [
-      '#input' => $this->input,
-      '#process' => $this->process,
-      '#pre_render' => $this->pre_render,
-      '#theme_wrappers' => $this->theme_wrappers,
-      '#value_callback' => $this->value_callback,
-      '#type' => $this->type,
-      '#defaults_loaded' => $this->defaults_loaded,
-    ];
   }
 
 }

@@ -12,8 +12,11 @@ use Drupal\Core\Render\Element;
  * Provides an HTML5 input element with type of "range".
  *
  * Properties:
- * - #min: Minimum value (defaults to 0).
- * - #max: Maximum value (defaults to 100).
+ *
+ * @property $min
+ *   Minimum value (defaults to 0).
+ * @property $max
+ *   Maximum value (defaults to 100).
  * Refer to \Drupal\Core\Render\Element\Number for additional properties.
  *
  * Usage example:
@@ -28,28 +31,6 @@ use Drupal\Core\Render\Element;
  */
 #[FormElement('range')]
 class Range extends Number {
-
-
-  /**
-   * Automatically converted property.
-   *
-   * @var mixed
-   */
-  public $min;
-
-  /**
-   * Automatically converted property.
-   *
-   * @var mixed
-   */
-  public $max;
-
-  /**
-   * Automatically converted property.
-   *
-   * @var mixed
-   */
-  public $step;
 
   /**
    * {@inheritdoc}
@@ -100,26 +81,6 @@ class Range extends Number {
 
       return $element['#min'] + $offset;
     }
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function toRenderArray() : array {
-    return [
-      '#min' => $this->min,
-      '#max' => $this->max,
-      '#pre_render' => $this->pre_render,
-      '#theme' => $this->theme,
-      '#input' => $this->input,
-      '#step' => $this->step,
-      '#process' => $this->process,
-      '#element_validate' => $this->element_validate,
-      '#theme_wrappers' => $this->theme_wrappers,
-      '#value_callback' => $this->value_callback,
-      '#type' => $this->type,
-      '#defaults_loaded' => $this->defaults_loaded,
-    ];
   }
 
 }

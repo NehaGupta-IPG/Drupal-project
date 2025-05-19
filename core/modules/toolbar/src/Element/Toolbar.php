@@ -13,14 +13,6 @@ use Drupal\Core\Render\Element;
 #[RenderElement('toolbar')]
 class Toolbar extends RenderElementBase {
 
-
-  /**
-   * Automatically converted property.
-   *
-   * @var mixed
-   */
-  public $bar;
-
   /**
    * {@inheritdoc}
    */
@@ -117,21 +109,6 @@ class Toolbar extends RenderElementBase {
    */
   protected static function moduleHandler() {
     return \Drupal::moduleHandler();
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function toRenderArray() : array {
-    return [
-      '#pre_render' => $this->pre_render,
-      '#theme' => $this->theme,
-      '#attached' => $this->attached,
-      '#attributes' => $this->attributes,
-      '#bar' => $this->bar,
-      '#type' => $this->type,
-      '#defaults_loaded' => $this->defaults_loaded,
-    ];
   }
 
 }

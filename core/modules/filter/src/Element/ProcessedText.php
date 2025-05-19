@@ -17,36 +17,6 @@ use Drupal\filter\Render\FilteredMarkup;
 #[RenderElement('processed_text')]
 class ProcessedText extends RenderElementBase {
 
-
-  /**
-   * Automatically converted property.
-   *
-   * @var mixed
-   */
-  public $text;
-
-  /**
-   * Automatically converted property.
-   *
-   * @var mixed
-   */
-  public $format;
-
-  /**
-   * Automatically converted property.
-   *
-   * @var mixed
-   */
-  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
-  public $filter_types_to_skip;
-
-  /**
-   * Automatically converted property.
-   *
-   * @var mixed
-   */
-  public $langcode;
-
   /**
    * {@inheritdoc}
    */
@@ -191,21 +161,6 @@ class ProcessedText extends RenderElementBase {
    */
   protected static function configFactory() {
     return \Drupal::configFactory();
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function toRenderArray() : array {
-    return [
-      '#text' => $this->text,
-      '#format' => $this->format,
-      '#filter_types_to_skip' => $this->filter_types_to_skip,
-      '#langcode' => $this->langcode,
-      '#pre_render' => $this->pre_render,
-      '#type' => $this->type,
-      '#defaults_loaded' => $this->defaults_loaded,
-    ];
   }
 
 }

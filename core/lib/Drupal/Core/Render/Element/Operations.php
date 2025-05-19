@@ -25,16 +25,4 @@ class Operations extends Dropbutton {
     ] + parent::getInfo();
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function toRenderArray() : array {
-    return [
-      '#theme' => $this->theme,
-      '#pre_render' => $this->pre_render,
-      '#type' => $this->type,
-      '#defaults_loaded' => $this->defaults_loaded,
-    ];
-  }
-
 }

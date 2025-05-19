@@ -24,20 +24,6 @@ class Search extends FormElementBase {
   use ProcessAutocompleteTrait;
 
   /**
-   * Automatically converted property.
-   *
-   * @var mixed
-   */
-  public $size;
-
-  /**
-   * Automatically converted property.
-   *
-   * @var mixed
-   */
-  public $maxlength;
-
-  /**
    * {@inheritdoc}
    */
   public function getInfo() {
@@ -75,25 +61,6 @@ class Search extends FormElementBase {
     static::setAttributes($element, ['form-search']);
 
     return $element;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function toRenderArray() : array {
-    return [
-      '#input' => $this->input,
-      '#size' => $this->size,
-      '#maxlength' => $this->maxlength,
-      '#autocomplete_route_name' => $this->autocomplete_route_name,
-      '#process' => $this->process,
-      '#pre_render' => $this->pre_render,
-      '#theme' => $this->theme,
-      '#theme_wrappers' => $this->theme_wrappers,
-      '#value_callback' => $this->value_callback,
-      '#type' => $this->type,
-      '#defaults_loaded' => $this->defaults_loaded,
-    ];
   }
 
 }

@@ -13,8 +13,11 @@ use Drupal\Core\Render\Element;
  * will automatically be added to the form element.
  *
  * Properties:
- * - #multiple: A Boolean indicating whether multiple files may be uploaded.
- * - #size: The size of the file input element in characters.
+ *
+ * @property $multiple
+ *   A Boolean indicating whether multiple files may be uploaded.
+ * @property $size
+ *   The size of the file input element in characters.
  *
  * The value of this form element will always be an array of
  * \Symfony\Component\HttpFoundation\File\UploadedFile objects, regardless of
@@ -22,21 +25,6 @@ use Drupal\Core\Render\Element;
  */
 #[FormElement('file')]
 class File extends FormElementBase {
-
-
-  /**
-   * Automatically converted property.
-   *
-   * @var mixed
-   */
-  public $multiple;
-
-  /**
-   * Automatically converted property.
-   *
-   * @var mixed
-   */
-  public $size;
 
   /**
    * {@inheritdoc}
@@ -110,24 +98,6 @@ class File extends FormElementBase {
       return (array) $uploaded_file;
     }
     return NULL;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function toRenderArray() : array {
-    return [
-      '#input' => $this->input,
-      '#multiple' => $this->multiple,
-      '#process' => $this->process,
-      '#size' => $this->size,
-      '#pre_render' => $this->pre_render,
-      '#theme' => $this->theme,
-      '#theme_wrappers' => $this->theme_wrappers,
-      '#value_callback' => $this->value_callback,
-      '#type' => $this->type,
-      '#defaults_loaded' => $this->defaults_loaded,
-    ];
   }
 
 }

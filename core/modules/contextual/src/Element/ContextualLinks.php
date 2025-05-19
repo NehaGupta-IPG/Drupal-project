@@ -14,14 +14,6 @@ use Drupal\Core\Url;
 #[RenderElement('contextual_links')]
 class ContextualLinks extends RenderElementBase {
 
-
-  /**
-   * Automatically converted property.
-   *
-   * @var mixed
-   */
-  public $links;
-
   /**
    * {@inheritdoc}
    */
@@ -123,21 +115,6 @@ class ContextualLinks extends RenderElementBase {
    */
   protected static function moduleHandler() {
     return \Drupal::moduleHandler();
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function toRenderArray() : array {
-    return [
-      '#pre_render' => $this->pre_render,
-      '#theme' => $this->theme,
-      '#links' => $this->links,
-      '#attributes' => $this->attributes,
-      '#attached' => $this->attached,
-      '#type' => $this->type,
-      '#defaults_loaded' => $this->defaults_loaded,
-    ];
   }
 
 }

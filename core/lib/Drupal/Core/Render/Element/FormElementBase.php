@@ -11,6 +11,15 @@ use Drupal\Core\Url;
  *
  * Form elements are a subset of render elements, representing elements for
  * HTML forms, which can be referenced in form arrays. See the
+ *
+ * @see \Drupal\Core\Render\Attribute\FormElement
+ * @see \Drupal\Core\Render\Element\FormElementInterface
+ * @see \Drupal\Core\Render\ElementInfoManager
+ * @see \Drupal\Core\Render\Element\RenderElementBase
+ * @see plugin_api
+ *
+ * @ingroup theme_render
+ * @see \Drupal\Core\Form\FormHelper::processStates()
  * @link theme_render Render API topic @endlink for an overview of render
  * arrays and render elements, and the @link form_api Form API topic @endlink
  * for an overview of forms and form arrays.
@@ -30,194 +39,83 @@ use Drupal\Core\Url;
  * processing of form elements, besides those properties documented in
  * \Drupal\Core\Render\Element\RenderElementBase (for example: #prefix,
  * #suffix):
- * - #after_build: (array) Array of callables or function names, which are
- *   called after the element is built. Arguments: $element, $form_state.
- * - #ajax: (array) Array of elements to specify Ajax behavior. See
- *   the @link ajax Ajax API topic @endlink for more information.
- * - #array_parents: (string[], read-only) Array of names of all the element's
- *   parents (including itself) in the render array. See also #parents, #tree.
- * - #default_value: Default value for the element. See also #value.
- * - #description: (string) Help or description text for the element. In an
- *   ideal user interface, the #title should be enough to describe the element,
- *   so most elements should not have a description; if you do need one, make
- *   sure it is translated. If it is not already wrapped in a safe markup
- *   object, it will be filtered for XSS safety.
- * - #disabled: (bool) If TRUE, the element is shown but does not accept
- *   user input.
- * - #element_validate: (array) Array of callables or function names, which
- *   are called to validate the input. Arguments: $element, $form_state, $form.
- * - #field_prefix: (string) Prefix to display before the HTML input element.
- *   Should be translated, normally. If it is not already wrapped in a safe
- *   markup object, will be filtered for XSS safety. Note that the contents of
- *   this prefix are wrapped in a <span> element, so the value should not
- *   contain block level HTML. Any HTML added must be valid, i.e. any tags
- *   introduced inside this prefix must also be terminated within the prefix.
- * - #field_suffix: (string) Suffix to display after the HTML input element.
- *   Should be translated, normally. If it is not already wrapped in a safe
- *   markup object, will be filtered for XSS safety. Note that the contents of
- *   this suffix are wrapped in a <span> element, so the value should not
- *   contain block level HTML. Any HTML must also be valid, i.e. any tags
- *   introduce inside this suffix must also be terminated within the suffix.
- * - #value: (mixed) A value that cannot be edited by the user.
- * - #has_garbage_value: (bool) Internal only. Set to TRUE to indicate that the
- *   #value property of an element should not be used or processed.
- * - #input: (bool, internal) Whether or not the element accepts input.
- * - #parents: (string[], read-only) Array of names of the element's parents
- *   for purposes of getting values out of $form_state. See also
- *   #array_parents, #tree.
- * - #process: (array) Array of callables or function names, which are
- *   called during form building. Arguments: $element, $form_state, $form.
- * - #processed: (bool, internal) Set to TRUE when the element is processed.
- * - #required: (bool) Whether or not input is required on the element.
- * - #states: (array) Information about JavaScript states, such as when to
- *   hide or show the element based on input on other elements.
- *   See \Drupal\Core\Form\FormHelper::processStates() for documentation.
- * - #title: (string) Title of the form element. Should be translated.
- * - #title_display: (string) Where and how to display the #title. Possible
- *   values:
+ * @property array $after_build
+ *   Array of callables or function names, which are called after the element
+ *   is built. Arguments: $element, $form_state.
+ * @property array $ajax
+ * @readonly
+ *   Array of elements to specify Ajax behavior. See the @link ajax Ajax API
+ *   topic @endlink for more information.
+ * @property array<string> $array_parents
+ * @readonly
+ *   Array of names of all the element's parents (including itself) in the
+ *   render array. See also #parents, #tree.
+ * @property mixed $default_value
+ *   Default value for the element. See also #value.
+ * @property string $description
+ *   Help or description text for the element. In an ideal user interface,
+ *   the #title should be enough to describe the element, so most elements
+ *   should not have a description; if you do need one, make sure it is
+ *   translated. If it is not already wrapped in a safe markup object, it will
+ *   be filtered for XSS safety.
+ * @property bool $disabled
+ *   If TRUE, the element is shown but does not accept user input.
+ * @property array<callable> $element_validate
+ *   Array of callables or function names, which are called to validate the
+ *   input. Arguments: $element, $form_state, $form.
+ * @property string $field_prefix
+ *   Prefix to display before the HTML input element. Should be translated,
+ *   normally. If it is not already wrapped in a safe markup object, will be
+ *   filtered for XSS safety. Note that the contents of this prefix are
+ *   wrapped in a <span> element, so the value should not contain block level
+ *   HTML. Any HTML added must be valid, i.e. any tags introduced inside this
+ *   prefix must also be terminated within the prefix.
+ * @property string $field_suffix
+ *   Suffix to display after the HTML input element. Should be translated,
+ *   normally. If it is not already wrapped in a safe markup object, will be
+ *   filtered for XSS safety. Note that the contents of this suffix are
+ *   wrapped in a <span> element, so the value should not contain block
+ *   level HTML. Any HTML must also be valid, i.e. any tags introduce inside
+ *   this suffix must also be terminated within the suffix.
+ * @property mixed $value
+ *    A value that cannot be edited by the user.
+ * @property bool $has_garbage_value
+ * @internal
+ *   Set to TRUE to indicate that the #value property of an
+ *   element should not be used or processed.
+ * @property bool $input
+ * @internal
+ *   Whether the element accepts input.
+ * @property array<string> $parents
+ *   Array of names of the element's parents for purposes of getting values
+ *   out of $form_state. See also #array_parents, #tree.
+ * @property array $process
+ *   Array of callables or function names, which are called during form
+ *   building. Arguments: $element, $form_state, $form.
+ * @property bool, internal $processed
+ *   Set to TRUE when the element is processed.
+ * @property bool $required
+ *   Whether input is required on the element.
+ * @property array $states
+ *   Information about JavaScript states, such as when to hide or show the
+ *   element based on input on other elements.
+ *   @property string $title
+ *   Title of the form element. Should be translated.
+ * @property string $title_display
+ *   Where and how to display the #title. Possible values:
  *   - before: Label goes before the element (default for most elements).
  *   - after: Label goes after the element (default for radio elements).
  *   - invisible: Label is there but is made invisible using CSS.
  *   - attribute: Make it the title attribute (hover tooltip).
- * - #tree: (bool) TRUE if the values of this element and its children should
- *   be hierarchical in $form_state; FALSE if the values should be flat.
- *   See also #parents, #array_parents.
- * - #value_callback: (callable) Callable or function name, which is called
- *   to transform the raw user input to the element's value. Arguments:
- *   $element, $input, $form_state.
- *
- * @see \Drupal\Core\Render\Attribute\FormElement
- * @see \Drupal\Core\Render\Element\FormElementInterface
- * @see \Drupal\Core\Render\ElementInfoManager
- * @see \Drupal\Core\Render\Element\RenderElementBase
- * @see plugin_api
- *
- * @ingroup theme_render
+ * @property bool $tree
+ *   TRUE if the values of this element and its children should be hierarchical
+ *   in $form_state; FALSE if the values should be flat. See also #parents,
+ *   #array_parents.
+ * @property callable $value_callback
+ *   Callable or function name, which is called to transform the raw user
+ *   input to the element's value. Arguments: $element, $input, $form_state.
  */
 abstract class FormElementBase extends RenderElementBase implements FormElementInterface {
-
-  /**
-   * Array of callables or function names.
-   *
-   * These are called after the element is built.
-   */
-  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
-  protected array $after_build = [];
-
-  /**
-   * Array of names of all the element's parents (including itself).
-   *
-   * @see $parents
-   * @see $tree
-   */
-  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
-  protected array $array_parents = [];
-
-  /**
-   * Default value for the element. See also #value.
-   */
-  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
-  protected mixed $default_value = NULL;
-
-  /**
-   * Help or description text for the element.
-   */
-  protected ?string $description = NULL;
-
-  /**
-   * If TRUE, the element is shown but does not accept user input.
-   */
-  protected bool $disabled = FALSE;
-
-  /**
-   * Array of callables or function names to validate the input.
-   */
-  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
-  protected array $element_validate = [];
-
-  /**
-   * A list of errors.
-   */
-  protected array $errors = [];
-
-  /**
-   * Prefix to display before the HTML input element.
-   */
-  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
-  protected ?string $field_prefix = NULL;
-
-  /**
-   * Suffix to display after the HTML input element.
-   */
-  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
-  protected ?string $field_suffix = NULL;
-
-  /**
-   * Internal only.
-   *
-   * Set to TRUE to indicate that the #value property of an element should not
-   * be used or processed.
-   */
-  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
-  protected bool $has_garbage_value = FALSE;
-
-  /**
-   * Whether or not the element accepts input.
-   */
-  protected bool $input = FALSE;
-
-  /**
-   * Set to TRUE when the element is processed.
-   */
-  protected bool $processed = FALSE;
-
-  /**
-   * Whether or not input is required on the element.
-   */
-  protected bool $required = FALSE;
-
-  /**
-   * Information about JavaScript states.
-   *
-   * @see \Drupal\Core\Form\FormHelper::processStates()
-   */
-  protected array $states = [];
-
-  /**
-   * Title of the form element.
-   */
-  protected ?string $title = NULL;
-
-  /**
-   * Where and how to display the #title.
-   */
-  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
-  protected ?TitleDisplay $title_display = NULL;
-
-  /**
-   * Whether values of this element and its children should be hierarchical.
-   */
-  protected bool $tree = FALSE;
-
-  /**
-   * Whether this element is validated.
-   */
-  protected bool $validated = FALSE;
-
-  /**
-   * A value that cannot be edited by the user.
-   */
-  protected mixed $value = NULL;
-
-  /**
-   * Callable to transform the raw user input to the element's value.
-   *
-   * The callback received $element, $input, $form_state arguments.
-   *
-   * @var callable
-   */
-  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
-  protected mixed $value_callback;
 
   /**
    * {@inheritdoc}
@@ -345,24 +243,6 @@ abstract class FormElementBase extends RenderElementBase implements FormElementI
     }
 
     return $element;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public static function setAttributes(&$element, $class = []): void {
-    parent::setAttributes($element, $class);
-    // This function is invoked from form element theme functions, but the
-    // rendered form element may not necessarily have been processed by
-    // \Drupal::formBuilder()->doBuildForm().
-    if (!empty($element['#required'])) {
-      $element['#attributes']['class'][] = 'required';
-      $element['#attributes']['required'] = 'required';
-    }
-    if (isset($element['#parents']) && isset($element['#errors']) && !empty($element['#validated'])) {
-      $element['#attributes']['class'][] = 'error';
-      $element['#attributes']['aria-invalid'] = 'true';
-    }
   }
 
 }

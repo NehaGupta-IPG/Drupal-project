@@ -21,7 +21,9 @@ use Drupal\Core\Render\Element;
  * - #limit_validation_errors: An array of form element keys that will block
  *   form submission when validation for these elements or any child elements
  *   fails. Specify an empty array to suppress all form validation errors.
- * - #value: The text to be shown on the button.
+ *
+ * @property $value
+ *   The text to be shown on the button.
  * - #submit_button: This has a default value of TRUE. If set to FALSE, the
  *   'type' attribute is set to 'button.'
  *
@@ -38,31 +40,6 @@ use Drupal\Core\Render\Element;
  */
 #[FormElement('button')]
 class Button extends FormElementBase {
-
-
-  /**
-   * Automatically converted property.
-   *
-   * @var mixed
-   */
-  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
-  public $submit_button;
-
-  /**
-   * Automatically converted property.
-   *
-   * @var mixed
-   */
-  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
-  public $executes_submit_callback;
-
-  /**
-   * Automatically converted property.
-   *
-   * @var mixed
-   */
-  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
-  public $limit_validation_errors;
 
   /**
    * {@inheritdoc}
@@ -133,26 +110,6 @@ class Button extends FormElementBase {
     }
 
     return $element;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function toRenderArray() : array {
-    return [
-      '#input' => $this->input,
-      '#name' => $this->name,
-      '#is_button' => $this->is_button,
-      '#submit_button' => $this->submit_button,
-      '#executes_submit_callback' => $this->executes_submit_callback,
-      '#limit_validation_errors' => $this->limit_validation_errors,
-      '#process' => $this->process,
-      '#pre_render' => $this->pre_render,
-      '#theme_wrappers' => $this->theme_wrappers,
-      '#value_callback' => $this->value_callback,
-      '#type' => $this->type,
-      '#defaults_loaded' => $this->defaults_loaded,
-    ];
   }
 
 }

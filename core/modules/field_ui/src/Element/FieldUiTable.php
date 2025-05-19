@@ -13,78 +13,6 @@ use Drupal\Core\Render\Element\Table;
 #[RenderElement('field_ui_table')]
 class FieldUiTable extends Table {
 
-
-  /**
-   * Automatically converted property.
-   *
-   * @var mixed
-   */
-  public $header;
-
-  /**
-   * Automatically converted property.
-   *
-   * @var mixed
-   */
-  public $rows;
-
-  /**
-   * Automatically converted property.
-   *
-   * @var mixed
-   */
-  public $empty;
-
-  /**
-   * Automatically converted property.
-   *
-   * @var mixed
-   */
-  public $tableselect;
-
-  /**
-   * Automatically converted property.
-   *
-   * @var mixed
-   */
-  public $sticky;
-
-  /**
-   * Automatically converted property.
-   *
-   * @var mixed
-   */
-  public $responsive;
-
-  /**
-   * Automatically converted property.
-   *
-   * @var mixed
-   */
-  public $multiple;
-
-  /**
-   * Automatically converted property.
-   *
-   * @var mixed
-   */
-  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
-  public $js_select;
-
-  /**
-   * Automatically converted property.
-   *
-   * @var mixed
-   */
-  public $tabledrag;
-
-  /**
-   * Automatically converted property.
-   *
-   * @var mixed
-   */
-  public $regions;
-
   /**
    * {@inheritdoc}
    */
@@ -309,33 +237,6 @@ class FieldUiTable extends Table {
     }
 
     return $array;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function toRenderArray() : array {
-    return [
-      '#header' => $this->header,
-      '#rows' => $this->rows,
-      '#empty' => $this->empty,
-      '#input' => $this->input,
-      '#tree' => $this->tree,
-      '#tableselect' => $this->tableselect,
-      '#sticky' => $this->sticky,
-      '#responsive' => $this->responsive,
-      '#multiple' => $this->multiple,
-      '#js_select' => $this->js_select,
-      '#process' => $this->process,
-      '#element_validate' => $this->element_validate,
-      '#tabledrag' => $this->tabledrag,
-      '#pre_render' => $this->pre_render,
-      '#theme' => $this->theme,
-      '#regions' => $this->regions,
-      '#value_callback' => $this->value_callback,
-      '#type' => $this->type,
-      '#defaults_loaded' => $this->defaults_loaded,
-    ];
   }
 
 }

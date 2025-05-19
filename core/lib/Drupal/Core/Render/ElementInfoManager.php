@@ -186,20 +186,11 @@ class ElementInfoManager extends DefaultPluginManager implements ElementInfoMana
    * @return \Drupal\Core\Render\Element\ElementInterface
    *   An element plugin instance.
    */
-  public function fromRenderArray(array $element): ElementInterface {
+  public function fromRenderArray(array &$element): ElementInterface {
     if (!isset($element['#type'])) {
       throw new \LogicException('The element passed to ElementInfoManager::fromRenderArray must have a #type.');
     }
-    $instance = $this->createInstance($element['#type']);
-    foreach ($element as $key => $value) {
-      if ($key[0] === '#') {
-        $instance->{substr($key, 1)} = $value;
-      }
-      else {
-        $children[$key] = $value;
-      }
-    }
-    return $instance;
+    return $this->createInstance($element['#type'])->setStorage($element);
   }
 
 }

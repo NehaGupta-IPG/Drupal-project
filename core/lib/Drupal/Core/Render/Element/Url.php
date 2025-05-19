@@ -12,8 +12,11 @@ use Drupal\Core\Render\Element;
  *
  * Properties:
  * - #default_value: A valid URL string.
- * - #size: The size of the input element in characters.
- * - #pattern: A string for the native HTML5 pattern attribute.
+ *
+ * @property $size
+ *   The size of the input element in characters.
+ * @property $pattern
+ *   A string for the native HTML5 pattern attribute.
  *
  * Usage example:
  * @code
@@ -31,22 +34,8 @@ use Drupal\Core\Render\Element;
 #[FormElement('url')]
 class Url extends FormElementBase {
 
-  use ProcessPatternTrait;
   use ProcessAutocompleteTrait;
-
-  /**
-   * Automatically converted property.
-   *
-   * @var mixed
-   */
-  public $size;
-
-  /**
-   * Automatically converted property.
-   *
-   * @var mixed
-   */
-  public $maxlength;
+  use ProcessPatternTrait;
 
   /**
    * {@inheritdoc}
@@ -105,26 +94,6 @@ class Url extends FormElementBase {
     static::setAttributes($element, ['form-url']);
 
     return $element;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function toRenderArray() : array {
-    return [
-      '#input' => $this->input,
-      '#size' => $this->size,
-      '#maxlength' => $this->maxlength,
-      '#autocomplete_route_name' => $this->autocomplete_route_name,
-      '#process' => $this->process,
-      '#element_validate' => $this->element_validate,
-      '#pre_render' => $this->pre_render,
-      '#theme' => $this->theme,
-      '#theme_wrappers' => $this->theme_wrappers,
-      '#value_callback' => $this->value_callback,
-      '#type' => $this->type,
-      '#defaults_loaded' => $this->defaults_loaded,
-    ];
   }
 
 }

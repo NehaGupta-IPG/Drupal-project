@@ -9,13 +9,16 @@ use Drupal\Core\Render\Element;
  * Provides a form element for date or time selection.
  *
  * Properties:
- * - #attributes: An associative array containing:
+ *
+ * @property $attributes
+ *   An associative array containing:
  *   - type: The type of date field rendered, valid values include 'date',
  *     'time', 'datetime', and 'datetime-local'.
  * - #date_date_format: The date format used in PHP formats.
  * - #default_value: A string representing the date formatted as Y-m-d, or
  *   hh:mm for time.
- * - #size: The size of the input element in characters.
+ * @property $size
+ *   The size of the input element in characters.
  *
  * @code
  * $form['expiration'] = [
@@ -35,15 +38,6 @@ use Drupal\Core\Render\Element;
  */
 #[FormElement('date')]
 class Date extends FormElementBase {
-
-
-  /**
-   * Automatically converted property.
-   *
-   * @var mixed
-   */
-  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
-  public $date_date_format;
 
   /**
    * {@inheritdoc}
@@ -87,24 +81,6 @@ class Date extends FormElementBase {
     static::setAttributes($element, ['form-' . $element['#attributes']['type']]);
 
     return $element;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function toRenderArray() : array {
-    return [
-      '#input' => $this->input,
-      '#theme' => $this->theme,
-      '#process' => $this->process,
-      '#pre_render' => $this->pre_render,
-      '#theme_wrappers' => $this->theme_wrappers,
-      '#attributes' => $this->attributes,
-      '#date_date_format' => $this->date_date_format,
-      '#value_callback' => $this->value_callback,
-      '#type' => $this->type,
-      '#defaults_loaded' => $this->defaults_loaded,
-    ];
   }
 
 }

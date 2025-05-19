@@ -19,73 +19,6 @@ class Datetime extends DateElementBase {
 
   use DoTrustedCallbackTrait;
 
-
-  /**
-   * Automatically converted property.
-   *
-   * @var mixed
-   */
-  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
-  public $date_date_format;
-
-  /**
-   * Automatically converted property.
-   *
-   * @var mixed
-   */
-  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
-  public $date_date_element;
-
-  /**
-   * Automatically converted property.
-   *
-   * @var array
-   * @phpstan-var array<int, callable>
-   */
-  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
-  public $date_date_callbacks;
-
-  /**
-   * Automatically converted property.
-   *
-   * @var mixed
-   */
-  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
-  public $date_time_format;
-
-  /**
-   * Automatically converted property.
-   *
-   * @var mixed
-   */
-  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
-  public $date_time_element;
-
-  /**
-   * Automatically converted property.
-   *
-   * @var array
-   * @phpstan-var array<int, callable>
-   */
-  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
-  public $date_time_callbacks;
-
-  /**
-   * Automatically converted property.
-   *
-   * @var mixed
-   */
-  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
-  public $date_year_range;
-
-  /**
-   * Automatically converted property.
-   *
-   * @var mixed
-   */
-  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
-  public $date_increment;
-
   /**
    * @var \DateTimeInterface
    */
@@ -515,31 +448,6 @@ class Datetime extends DateElementBase {
       default:
         return $element['#date_time_format'];
     }
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function toRenderArray() : array {
-    return [
-      '#input' => $this->input,
-      '#element_validate' => $this->element_validate,
-      '#process' => $this->process,
-      '#pre_render' => $this->pre_render,
-      '#theme' => $this->theme,
-      '#theme_wrappers' => $this->theme_wrappers,
-      '#date_date_format' => $this->date_date_format,
-      '#date_date_element' => $this->date_date_element,
-      '#date_date_callbacks' => $this->date_date_callbacks,
-      '#date_time_format' => $this->date_time_format,
-      '#date_time_element' => $this->date_time_element,
-      '#date_time_callbacks' => $this->date_time_callbacks,
-      '#date_year_range' => $this->date_year_range,
-      '#date_increment' => $this->date_increment,
-      '#value_callback' => $this->value_callback,
-      '#type' => $this->type,
-      '#defaults_loaded' => $this->defaults_loaded,
-    ];
   }
 
 }

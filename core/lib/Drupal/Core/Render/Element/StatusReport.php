@@ -10,14 +10,6 @@ use Drupal\Core\Render\Attribute\RenderElement;
 #[RenderElement('status_report')]
 class StatusReport extends RenderElementBase {
 
-
-  /**
-   * Automatically converted property.
-   *
-   * @var mixed
-   */
-  public $priorities;
-
   /**
    * {@inheritdoc}
    */
@@ -95,19 +87,6 @@ class StatusReport extends RenderElementBase {
         'title' => t('Errors found'),
         'status' => 'error',
       ],
-    ];
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function toRenderArray() : array {
-    return [
-      '#theme' => $this->theme,
-      '#priorities' => $this->priorities,
-      '#pre_render' => $this->pre_render,
-      '#type' => $this->type,
-      '#defaults_loaded' => $this->defaults_loaded,
     ];
   }
 

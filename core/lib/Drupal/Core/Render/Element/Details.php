@@ -13,8 +13,11 @@ use Drupal\Core\Render\Element;
  * element, showing or hiding the contained elements.
  *
  * Properties:
- * - #title: The title of the details container. Defaults to "Details".
- * - #open: Indicates whether the container should be open by default.
+ *
+ * @property $title
+ *   The title of the details container. Defaults to "Details".
+ * @property $open
+ *   Indicates whether the container should be open by default.
  *   Defaults to FALSE.
  * - #summary_attributes: An array of attributes to apply to the <summary>
  *   element.
@@ -37,22 +40,6 @@ use Drupal\Core\Render\Element;
  */
 #[RenderElement('details')]
 class Details extends RenderElementBase {
-
-
-  /**
-   * Automatically converted property.
-   *
-   * @var mixed
-   */
-  public $open;
-
-  /**
-   * Automatically converted property.
-   *
-   * @var mixed
-   */
-  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
-  public $summary_attributes;
 
   /**
    * {@inheritdoc}
@@ -108,22 +95,6 @@ class Details extends RenderElementBase {
     }
 
     return $element;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function toRenderArray() : array {
-    return [
-      '#open' => $this->open,
-      '#summary_attributes' => $this->summary_attributes,
-      '#value' => $this->value,
-      '#process' => $this->process,
-      '#pre_render' => $this->pre_render,
-      '#theme_wrappers' => $this->theme_wrappers,
-      '#type' => $this->type,
-      '#defaults_loaded' => $this->defaults_loaded,
-    ];
   }
 
 }

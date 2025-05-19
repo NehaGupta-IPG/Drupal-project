@@ -116,17 +116,4 @@ class Actions extends Container {
     return $dropbuttons + $element;
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function toRenderArray() : array {
-    return [
-      '#process' => $this->process,
-      '#weight' => $this->weight,
-      '#theme_wrappers' => $this->theme_wrappers,
-      '#type' => $this->type,
-      '#defaults_loaded' => $this->defaults_loaded,
-    ];
-  }
-
 }

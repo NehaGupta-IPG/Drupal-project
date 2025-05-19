@@ -11,10 +11,13 @@ use Drupal\Core\Render\Attribute\FormElement;
  * the form's submit handler.
  *
  * Properties:
- * - #submit: Specifies an alternate callback for form submission when the
+ *
+ * @property $submit
+ *   Specifies an alternate callback for form submission when the
  *   submit button is pressed.  Use '::methodName' format or an array containing
  *   the object and method name (for example, [ $this, 'methodName'] ).
- * - #value: The text to be shown on the button.
+ * @property $value
+ *   The text to be shown on the button.
  *
  * Usage Example:
  * @code
@@ -29,31 +32,6 @@ use Drupal\Core\Render\Attribute\FormElement;
 #[FormElement('submit')]
 class Submit extends Button {
 
-
-  /**
-   * Automatically converted property.
-   *
-   * @var mixed
-   */
-  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
-  public $executes_submit_callback;
-
-  /**
-   * Automatically converted property.
-   *
-   * @var mixed
-   */
-  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
-  public $submit_button;
-
-  /**
-   * Automatically converted property.
-   *
-   * @var mixed
-   */
-  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
-  public $limit_validation_errors;
-
   /**
    * {@inheritdoc}
    */
@@ -61,26 +39,6 @@ class Submit extends Button {
     return [
       '#executes_submit_callback' => TRUE,
     ] + parent::getInfo();
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function toRenderArray() : array {
-    return [
-      '#executes_submit_callback' => $this->executes_submit_callback,
-      '#input' => $this->input,
-      '#name' => $this->name,
-      '#is_button' => $this->is_button,
-      '#submit_button' => $this->submit_button,
-      '#limit_validation_errors' => $this->limit_validation_errors,
-      '#process' => $this->process,
-      '#pre_render' => $this->pre_render,
-      '#theme_wrappers' => $this->theme_wrappers,
-      '#value_callback' => $this->value_callback,
-      '#type' => $this->type,
-      '#defaults_loaded' => $this->defaults_loaded,
-    ];
   }
 
 }

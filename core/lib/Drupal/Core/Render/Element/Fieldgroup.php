@@ -47,19 +47,4 @@ class Fieldgroup extends Fieldset {
     return $element;
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function toRenderArray() : array {
-    return [
-      '#process' => $this->process,
-      '#pre_render' => $this->pre_render,
-      '#value' => $this->value,
-      '#theme_wrappers' => $this->theme_wrappers,
-      '#attributes' => $this->attributes,
-      '#type' => $this->type,
-      '#defaults_loaded' => $this->defaults_loaded,
-    ];
-  }
-
 }

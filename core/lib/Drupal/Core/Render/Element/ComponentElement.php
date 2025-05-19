@@ -11,11 +11,16 @@ use Drupal\Core\Security\DoTrustedCallbackTrait;
  * Provides a Single-Directory Component render element.
  *
  * Properties:
- * - #component: The machine name of the component.
- * - #variant: (optional) The variant to be used for the component.
- * - #props: an associative array where the keys are the names of the
+ *
+ * @property $component
+ *   The machine name of the component.
+ * @property $variant
+ *   (optional) The variant to be used for the component.
+ * @property $props
+ *   an associative array where the keys are the names of the
  *   component props, and the values are the prop values.
- * - #slots: an associative array where the keys are the slot names, and the
+ * @property $slots
+ *   an associative array where the keys are the slot names, and the
  *   values are the slot values. Expected slot values are renderable arrays.
  * - #propsAlter: an array of trusted callbacks. These are used to prepare the
  *   context. Typical uses include replacing tokens in props.
@@ -37,49 +42,6 @@ use Drupal\Core\Security\DoTrustedCallbackTrait;
 class ComponentElement extends RenderElementBase {
 
   use DoTrustedCallbackTrait;
-
-
-  /**
-   * Automatically converted property.
-   *
-   * @var mixed
-   */
-  public $component;
-
-  /**
-   * Automatically converted property.
-   *
-   * @var mixed
-   */
-  public $variant;
-
-  /**
-   * Automatically converted property.
-   *
-   * @var mixed
-   */
-  public $props;
-
-  /**
-   * Automatically converted property.
-   *
-   * @var mixed
-   */
-  public $slots;
-
-  /**
-   * Automatically converted property.
-   *
-   * @var mixed
-   */
-  public $propsAlter;
-
-  /**
-   * Automatically converted property.
-   *
-   * @var mixed
-   */
-  public $slotsAlter;
 
   /**
    * Expands a component into an inline template with an attachment.
@@ -204,23 +166,6 @@ class ComponentElement extends RenderElementBase {
       '#slots' => [],
       '#propsAlter' => [],
       '#slotsAlter' => [],
-    ];
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function toRenderArray() : array {
-    return [
-      '#pre_render' => $this->pre_render,
-      '#component' => $this->component,
-      '#variant' => $this->variant,
-      '#props' => $this->props,
-      '#slots' => $this->slots,
-      '#propsAlter' => $this->propsAlter,
-      '#slotsAlter' => $this->slotsAlter,
-      '#type' => $this->type,
-      '#defaults_loaded' => $this->defaults_loaded,
     ];
   }
 

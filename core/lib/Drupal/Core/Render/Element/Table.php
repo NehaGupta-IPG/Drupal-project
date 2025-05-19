@@ -14,19 +14,27 @@ use Drupal\Component\Utility\Html as HtmlUtility;
  * context of a form.
  *
  * Properties:
- * - #header: An array of table header labels.
- * - #rows: An array of the rows to be displayed. Each row is either an array
+ *
+ * @property $header
+ *   An array of table header labels.
+ * @property $rows
+ *   An array of the rows to be displayed. Each row is either an array
  *   of cell contents or an array of properties as described in table.html.twig
  *   Alternatively specify the data for the table as child elements of the table
  *   element. Table elements would contain rows elements that would in turn
  *   contain column elements.
- * - #empty: Text to display when no rows are present.
- * - #responsive: Indicates whether to add the drupal.tableresponsive library
+ * @property $empty
+ *   Text to display when no rows are present.
+ * @property $responsive
+ *   Indicates whether to add the drupal.tableresponsive library
  *   providing responsive tables.  Defaults to TRUE.
- * - #sticky: Indicates whether to make the table headers sticky at
+ * @property $sticky
+ *   Indicates whether to make the table headers sticky at
  *   the top of the page. Defaults to FALSE.
- * - #footer: Table footer rows, in the same format as the #rows property.
- * - #caption: A localized string for the <caption> tag.
+ * @property $footer
+ *   Table footer rows, in the same format as the #rows property.
+ * @property $caption
+ *   A localized string for the <caption> tag.
  *
  * Usage example 1: A simple form with an additional information table which
  * doesn't include any other form field.
@@ -110,71 +118,6 @@ use Drupal\Component\Utility\Html as HtmlUtility;
  */
 #[FormElement('table')]
 class Table extends FormElementBase {
-
-
-  /**
-   * Automatically converted property.
-   *
-   * @var mixed
-   */
-  public $header;
-
-  /**
-   * Automatically converted property.
-   *
-   * @var mixed
-   */
-  public $rows;
-
-  /**
-   * Automatically converted property.
-   *
-   * @var mixed
-   */
-  public $empty;
-
-  /**
-   * Automatically converted property.
-   *
-   * @var mixed
-   */
-  public $tableselect;
-
-  /**
-   * Automatically converted property.
-   *
-   * @var mixed
-   */
-  public $sticky;
-
-  /**
-   * Automatically converted property.
-   *
-   * @var mixed
-   */
-  public $responsive;
-
-  /**
-   * Automatically converted property.
-   *
-   * @var mixed
-   */
-  public $multiple;
-
-  /**
-   * Automatically converted property.
-   *
-   * @var mixed
-   */
-  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
-  public $js_select;
-
-  /**
-   * Automatically converted property.
-   *
-   * @var mixed
-   */
-  public $tabledrag;
 
   /**
    * {@inheritdoc}
@@ -518,32 +461,6 @@ class Table extends FormElementBase {
     }
 
     return $element;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function toRenderArray() : array {
-    return [
-      '#header' => $this->header,
-      '#rows' => $this->rows,
-      '#empty' => $this->empty,
-      '#input' => $this->input,
-      '#tree' => $this->tree,
-      '#tableselect' => $this->tableselect,
-      '#sticky' => $this->sticky,
-      '#responsive' => $this->responsive,
-      '#multiple' => $this->multiple,
-      '#js_select' => $this->js_select,
-      '#process' => $this->process,
-      '#element_validate' => $this->element_validate,
-      '#tabledrag' => $this->tabledrag,
-      '#pre_render' => $this->pre_render,
-      '#theme' => $this->theme,
-      '#value_callback' => $this->value_callback,
-      '#type' => $this->type,
-      '#defaults_loaded' => $this->defaults_loaded,
-    ];
   }
 
 }

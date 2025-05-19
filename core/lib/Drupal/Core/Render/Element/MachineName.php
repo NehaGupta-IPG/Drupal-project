@@ -49,9 +49,12 @@ use Drupal\Core\Render\Attribute\FormElement;
  *     form element rather than in the suffix of the source element. The source
  *     element must appear in the form structure before this element. Defaults
  *     to FALSE.
- * - #maxlength: (optional) Maximum allowed length of the machine name. Defaults
+ *
+ * @property $maxlength
+ *   (optional) Maximum allowed length of the machine name. Defaults
  *   to 64.
- * - #disabled: (optional) Should be set to TRUE if an existing machine name
+ * @property $disabled
+ *   (optional) Should be set to TRUE if an existing machine name
  *   must not be changed after initial creation.
  *
  * Usage example:
@@ -74,20 +77,6 @@ use Drupal\Core\Render\Attribute\FormElement;
 class MachineName extends Textfield {
 
   use ProcessAutocompleteTrait;
-
-  /**
-   * Automatically converted property.
-   *
-   * @var mixed
-   */
-  public $maxlength;
-
-  /**
-   * Automatically converted property.
-   *
-   * @var mixed
-   */
-  public $size;
 
   /**
    * {@inheritdoc}
@@ -322,28 +311,6 @@ class MachineName extends Textfield {
     \Drupal::moduleHandler()->alter('transliteration_overrides', $overrides[$langcode], $langcode);
 
     return [$langcode => $overrides[$langcode]];
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function toRenderArray() : array {
-    return [
-      '#input' => $this->input,
-      '#default_value' => $this->default_value,
-      '#required' => $this->required,
-      '#maxlength' => $this->maxlength,
-      '#size' => $this->size,
-      '#autocomplete_route_name' => $this->autocomplete_route_name,
-      '#process' => $this->process,
-      '#element_validate' => $this->element_validate,
-      '#pre_render' => $this->pre_render,
-      '#theme' => $this->theme,
-      '#theme_wrappers' => $this->theme_wrappers,
-      '#value_callback' => $this->value_callback,
-      '#type' => $this->type,
-      '#defaults_loaded' => $this->defaults_loaded,
-    ];
   }
 
 }

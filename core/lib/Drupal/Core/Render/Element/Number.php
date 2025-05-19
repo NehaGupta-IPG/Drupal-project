@@ -12,9 +12,13 @@ use Drupal\Component\Utility\Number as NumberUtility;
  *
  * Properties:
  * - #default_value: A valid floating point number.
- * - #min: Minimum value.
- * - #max: Maximum value.
- * - #step: Ensures that the number is an even multiple of step, offset by #min
+ *
+ * @property $min
+ *   Minimum value.
+ * @property $max
+ *   Maximum value.
+ * @property $step
+ *   Ensures that the number is an even multiple of step, offset by #min
  *   if specified. A #min of 1 and a #step of 2 would allow values of 1, 3, 5,
  *   etc.
  *
@@ -31,14 +35,6 @@ use Drupal\Component\Utility\Number as NumberUtility;
  */
 #[FormElement('number')]
 class Number extends FormElementBase {
-
-
-  /**
-   * Automatically converted property.
-   *
-   * @var mixed
-   */
-  public $step;
 
   /**
    * {@inheritdoc}
@@ -124,24 +120,6 @@ class Number extends FormElementBase {
     static::setAttributes($element, ['form-number']);
 
     return $element;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function toRenderArray() : array {
-    return [
-      '#input' => $this->input,
-      '#step' => $this->step,
-      '#process' => $this->process,
-      '#element_validate' => $this->element_validate,
-      '#pre_render' => $this->pre_render,
-      '#theme' => $this->theme,
-      '#theme_wrappers' => $this->theme_wrappers,
-      '#value_callback' => $this->value_callback,
-      '#type' => $this->type,
-      '#defaults_loaded' => $this->defaults_loaded,
-    ];
   }
 
 }

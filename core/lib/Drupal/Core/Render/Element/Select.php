@@ -10,7 +10,9 @@ use Drupal\Core\Render\Element;
  * Provides a form element for a drop-down menu or scrolling selection box.
  *
  * Properties:
- * - #options: An associative array of options for the select. Do not use
+ *
+ * @property $options
+ *   An associative array of options for the select. Do not use
  *   placeholders that sanitize data in any labels, as doing so will lead to
  *   double-escaping. Each array value can be:
  *   - A single translated string representing an HTML option element, where
@@ -57,15 +59,18 @@ use Drupal\Core\Render\Element;
  *   - If #required is not TRUE and this value is set (most commonly to an
  *     empty string), then an extra option (see #empty_option above)
  *     representing a "non-selection" is added with this as its value.
- * - #multiple: (optional) Indicates whether one or more options can be
+ * @property $multiple
+ *   (optional) Indicates whether one or more options can be
  *   selected. Defaults to FALSE.
  * - #default_value: Must be NULL or not set in case there is no value for the
  *   element yet, in which case a first default option is inserted by default.
  *   Whether this first option is a valid option depends on whether the field
  *   is #required or not.
- * - #required: (optional) Whether the user needs to select an option (TRUE)
+ * @property $required
+ *   (optional) Whether the user needs to select an option (TRUE)
  *   or not (FALSE). Defaults to FALSE.
- * - #size: The number of rows in the list that should be visible at one time.
+ * @property $size
+ *   The number of rows in the list that should be visible at one time.
  *
  * Usage example:
  * @code
@@ -85,37 +90,6 @@ use Drupal\Core\Render\Element;
  */
 #[FormElement('select')]
 class Select extends FormElementBase {
-
-
-  /**
-   * Automatically converted property.
-   *
-   * @var mixed
-   */
-  public $multiple;
-
-  /**
-   * Automatically converted property.
-   *
-   * @var mixed
-   */
-  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
-  public $sort_options;
-
-  /**
-   * Automatically converted property.
-   *
-   * @var mixed
-   */
-  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
-  public $sort_start;
-
-  /**
-   * Automatically converted property.
-   *
-   * @var mixed
-   */
-  public $options;
 
   /**
    * {@inheritdoc}
@@ -232,26 +206,6 @@ class Select extends FormElementBase {
     Element::setAttributes($element, ['id', 'name', 'size']);
     static::setAttributes($element, ['form-select']);
     return $element;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function toRenderArray() : array {
-    return [
-      '#input' => $this->input,
-      '#multiple' => $this->multiple,
-      '#sort_options' => $this->sort_options,
-      '#sort_start' => $this->sort_start,
-      '#process' => $this->process,
-      '#pre_render' => $this->pre_render,
-      '#theme' => $this->theme,
-      '#theme_wrappers' => $this->theme_wrappers,
-      '#options' => $this->options,
-      '#value_callback' => $this->value_callback,
-      '#type' => $this->type,
-      '#defaults_loaded' => $this->defaults_loaded,
-    ];
   }
 
 }

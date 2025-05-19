@@ -12,46 +12,6 @@ use Drupal\Core\Render\Element;
 #[FormElement('image_button')]
 class ImageButton extends Submit {
 
-
-  /**
-   * Automatically converted property.
-   *
-   * @var mixed
-   */
-  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
-  public $return_value;
-
-  /**
-   * Automatically converted property.
-   *
-   * @var mixed
-   */
-  public $src;
-
-  /**
-   * Automatically converted property.
-   *
-   * @var mixed
-   */
-  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
-  public $executes_submit_callback;
-
-  /**
-   * Automatically converted property.
-   *
-   * @var mixed
-   */
-  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
-  public $submit_button;
-
-  /**
-   * Automatically converted property.
-   *
-   * @var mixed
-   */
-  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
-  public $limit_validation_errors;
-
   /**
    * {@inheritdoc}
    */
@@ -128,29 +88,6 @@ class ImageButton extends Submit {
     }
 
     return $element;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function toRenderArray() : array {
-    return [
-      '#return_value' => $this->return_value,
-      '#has_garbage_value' => $this->has_garbage_value,
-      '#src' => $this->src,
-      '#theme_wrappers' => $this->theme_wrappers,
-      '#executes_submit_callback' => $this->executes_submit_callback,
-      '#input' => $this->input,
-      '#name' => $this->name,
-      '#is_button' => $this->is_button,
-      '#submit_button' => $this->submit_button,
-      '#limit_validation_errors' => $this->limit_validation_errors,
-      '#process' => $this->process,
-      '#pre_render' => $this->pre_render,
-      '#value_callback' => $this->value_callback,
-      '#type' => $this->type,
-      '#defaults_loaded' => $this->defaults_loaded,
-    ];
   }
 
 }

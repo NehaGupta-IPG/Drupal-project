@@ -14,14 +14,6 @@ use Drupal\Core\Url;
 #[RenderElement('toolbar_item')]
 class ToolbarItem extends RenderElementBase {
 
-
-  /**
-   * Automatically converted property.
-   *
-   * @var mixed
-   */
-  public $ab;
-
   /**
    * {@inheritdoc}
    */
@@ -88,18 +80,6 @@ class ToolbarItem extends RenderElementBase {
     $element['tab']['#attributes']['class'][] = 'toolbar-item';
 
     return $element;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function toRenderArray() : array {
-    return [
-      '#pre_render' => $this->pre_render,
-      '#ab' => $this->ab,
-      '#type' => $this->type,
-      '#defaults_loaded' => $this->defaults_loaded,
-    ];
   }
 
 }

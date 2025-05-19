@@ -14,9 +14,13 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  * Provides a link to break a tempstore lock.
  *
  * Properties:
- * - #label: The label of the object that is locked.
- * - #lock: \Drupal\Core\TempStore\Lock object.
- * - #url: \Drupal\Core\Url object pointing to the break lock form.
+ *
+ * @property $label
+ *   The label of the object that is locked.
+ * @property $lock
+ *   \Drupal\Core\TempStore\Lock object.
+ * @property $url
+ *   \Drupal\Core\Url object pointing to the break lock form.
  *
  * Usage example:
  * @code
@@ -131,17 +135,6 @@ class BreakLockLink extends RenderElementBase implements ContainerFactoryPluginI
       ]);
     }
     return $element;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function toRenderArray() : array {
-    return [
-      '#pre_render' => $this->pre_render,
-      '#type' => $this->type,
-      '#defaults_loaded' => $this->defaults_loaded,
-    ];
   }
 
 }

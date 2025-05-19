@@ -14,7 +14,9 @@ use Drupal\Core\Url;
  * Properties:
  * - #base_type: The form element #type to use for the 'value' element.
  *   'textarea' by default.
- * - #format: (optional) The text format ID to preselect. If omitted, the
+ *
+ * @property $format
+ *   (optional) The text format ID to preselect. If omitted, the
  *   default format for the current user will be used.
  * - #allowed_formats: (optional) An array of text format IDs that are available
  *   for this element. If omitted, all text formats that the current user has
@@ -34,15 +36,6 @@ use Drupal\Core\Url;
  */
 #[RenderElement('text_format')]
 class TextFormat extends RenderElementBase {
-
-
-  /**
-   * Automatically converted property.
-   *
-   * @var mixed
-   */
-  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
-  public $base_type;
 
   /**
    * {@inheritdoc}
@@ -317,20 +310,6 @@ class TextFormat extends RenderElementBase {
    */
   protected static function elementInfo() {
     return \Drupal::service('element_info');
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function toRenderArray() : array {
-    return [
-      '#process' => $this->process,
-      '#base_type' => $this->base_type,
-      '#theme_wrappers' => $this->theme_wrappers,
-      '#type' => $this->type,
-      '#pre_render' => $this->pre_render,
-      '#defaults_loaded' => $this->defaults_loaded,
-    ];
   }
 
 }

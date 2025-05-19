@@ -20,48 +20,6 @@ class Datelist extends DateElementBase {
 
   use DoTrustedCallbackTrait;
 
-
-  /**
-   * Automatically converted property.
-   *
-   * @var mixed
-   */
-  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
-  public $date_part_order;
-
-  /**
-   * Automatically converted property.
-   *
-   * @var mixed
-   */
-  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
-  public $date_year_range;
-
-  /**
-   * Automatically converted property.
-   *
-   * @var mixed
-   */
-  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
-  public $date_increment;
-
-  /**
-   * Automatically converted property.
-   *
-   * @var array
-   * @phpstan-var array<int, callable>
-   */
-  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
-  public $date_date_callbacks;
-
-  /**
-   * Automatically converted property.
-   *
-   * @var mixed
-   */
-  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
-  public $date_timezone;
-
   /**
    * {@inheritdoc}
    */
@@ -431,27 +389,6 @@ class Datelist extends DateElementBase {
       }
     }
     return $date;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function toRenderArray() : array {
-    return [
-      '#input' => $this->input,
-      '#element_validate' => $this->element_validate,
-      '#process' => $this->process,
-      '#theme' => $this->theme,
-      '#theme_wrappers' => $this->theme_wrappers,
-      '#date_part_order' => $this->date_part_order,
-      '#date_year_range' => $this->date_year_range,
-      '#date_increment' => $this->date_increment,
-      '#date_date_callbacks' => $this->date_date_callbacks,
-      '#date_timezone' => $this->date_timezone,
-      '#value_callback' => $this->value_callback,
-      '#type' => $this->type,
-      '#defaults_loaded' => $this->defaults_loaded,
-    ];
   }
 
 }
