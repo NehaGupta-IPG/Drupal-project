@@ -167,7 +167,6 @@ abstract class RenderElementBase extends PluginBase implements ElementInterface,
   public function __construct(array $configuration, $plugin_id, $plugin_definition, protected ?ElementInfoManagerInterface $elementInfoManager = NULL) {
     if (!$this->elementInfoManager) {
       // Deprecated blah, blah, blah.
-      $this->elementInfoManager = \Drupal::service('plugin.manager.element_info');
     }
     parent::__construct($configuration, $plugin_id, $plugin_definition);
   }
@@ -604,7 +603,7 @@ abstract class RenderElementBase extends PluginBase implements ElementInterface,
    */
   public function getChildren(): \Traversable {
     foreach (Element::children($this->storage) as $key) {
-      yield $key => $this->elementInfoManager->fromRenderArray($this->storage[$key]);
+      yield $key => $this->elementInfoManager()->fromRenderArray($this->storage[$key]);
     }
   }
 
@@ -616,7 +615,7 @@ abstract class RenderElementBase extends PluginBase implements ElementInterface,
       throw new \LogicException('The name of children can not start with a #.');
     }
     if (is_array($child)) {
-      $child = $this->elementInfoManager->fromRenderArray($child);
+      $child = $this->elementInfoManager()->fromRenderArray($child);
     }
     $child->renderParent = $this;
     $child->renderParentName = $name;
@@ -630,6 +629,19 @@ abstract class RenderElementBase extends PluginBase implements ElementInterface,
   public function removeChild(int|string $name): static {
     unset($this->storage[$name]);
     return $this;
+  }
+
+  /**
+   * Returns the element info manager.
+   *
+   * @return \Drupal\Core\Render\ElementInfoManagerInterface
+   *   The element info manager/
+   */
+  protected function elementInfoManager(): ElementInfoManagerInterface {
+    if (!$this->elementInfoManager) {
+      $this->elementInfoManager = \Drupal::service('plugin.manager.element_info');
+    }
+    return $this->elementInfoManager;
   }
 
 }

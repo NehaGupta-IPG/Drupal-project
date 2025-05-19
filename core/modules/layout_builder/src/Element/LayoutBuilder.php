@@ -54,7 +54,7 @@ class LayoutBuilder extends RenderElementBase implements ContainerFactoryPluginI
    * @param \Symfony\Contracts\EventDispatcher\EventDispatcherInterface $event_dispatcher
    *   The event dispatcher service.
    * @param \Drupal\Core\Render\ElementInfoManagerInterface|null $elementInfoManager
-   *   The element info maanger.
+   *   The element info manager.
    */
   public function __construct(array $configuration, $plugin_id, $plugin_definition, EventDispatcherInterface $event_dispatcher, ?ElementInfoManagerInterface $elementInfoManager = NULL) {
     parent::__construct($configuration, $plugin_id, $plugin_definition, $elementInfoManager);
