@@ -236,7 +236,7 @@ function menu_ui_preprocess_block(&$variables): void {
 /**
  * Implements hook_form_FORM_ID_alter().
  */
-function menu_ui_form_alter(&$form, \Drupal\Core\Form\FormStateInterface $form_state) {
+function menu_ui_form_alter(&$form, FormStateInterface $form_state): void {
 
   if (isset($form['links']['links']['#type']) && $form['links']['links']['#type'] === 'table') {
     foreach ($form['links']['links'] as $key => &$element) {
