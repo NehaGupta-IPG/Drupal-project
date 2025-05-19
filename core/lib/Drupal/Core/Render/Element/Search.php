@@ -21,8 +21,6 @@ use Drupal\Core\Render\Element;
 #[FormElement('search')]
 class Search extends FormElementBase {
 
-  use ProcessAutocompleteTrait;
-
   /**
    * {@inheritdoc}
    */

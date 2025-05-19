@@ -77,8 +77,6 @@ use Drupal\Core\Render\Attribute\FormElement;
 #[FormElement('machine_name')]
 class MachineName extends Textfield {
 
-  use ProcessAutocompleteTrait;
-
   /**
    * {@inheritdoc}
    */

@@ -32,8 +32,6 @@ use Drupal\Core\Render\Element;
 #[FormElement('email')]
 class Email extends FormElementBase {
 
-  use ProcessAutocompleteTrait;
-  use ProcessPatternTrait;
   /**
    * Defines the max length for an email address.
    *

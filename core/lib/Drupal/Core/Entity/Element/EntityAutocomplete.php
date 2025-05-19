@@ -11,8 +11,6 @@ use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Render\Attribute\FormElement;
 use Drupal\Core\Render\Element\Textfield;
 use Drupal\Core\Site\Settings;
-use Drupal\Core\Render\Element\ProcessAutocompleteTrait;
-use Drupal\Core\Render\Element\ProcessPatternTrait;
 
 /**
  * Provides an entity autocomplete form element.
@@ -77,9 +75,6 @@ use Drupal\Core\Render\Element\ProcessPatternTrait;
  */
 #[FormElement('entity_autocomplete')]
 class EntityAutocomplete extends Textfield {
-
-  use ProcessAutocompleteTrait;
-  use ProcessPatternTrait;
 
   /**
    * {@inheritdoc}

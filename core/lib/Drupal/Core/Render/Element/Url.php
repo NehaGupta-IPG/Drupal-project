@@ -35,9 +35,6 @@ use Drupal\Core\Render\Element;
 #[FormElement('url')]
 class Url extends FormElementBase {
 
-  use ProcessAutocompleteTrait;
-  use ProcessPatternTrait;
-
   /**
    * {@inheritdoc}
    */

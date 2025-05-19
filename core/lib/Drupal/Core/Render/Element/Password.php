@@ -32,8 +32,6 @@ use Drupal\Core\Render\Element;
 #[FormElement('password')]
 class Password extends FormElementBase {
 
-  use ProcessPatternTrait;
-
   /**
    * {@inheritdoc}
    */

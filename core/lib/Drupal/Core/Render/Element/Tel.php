@@ -32,9 +32,6 @@ use Drupal\Core\Render\Element;
 #[FormElement('tel')]
 class Tel extends FormElementBase {
 
-  use ProcessAutocompleteTrait;
-  use ProcessPatternTrait;
-
   /**
    * {@inheritdoc}
    */

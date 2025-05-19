@@ -44,9 +44,6 @@ use Drupal\Core\Render\Element;
 #[FormElement('textfield')]
 class Textfield extends FormElementBase {
 
-  use ProcessAutocompleteTrait;
-  use ProcessPatternTrait;
-
   /**
    * {@inheritdoc}
    */

@@ -15,8 +15,6 @@ use Drupal\Core\Render\Attribute\FormElement;
 #[FormElement('path')]
 class PathElement extends Textfield {
 
-  use ProcessAutocompleteTrait;
-  use ProcessPatternTrait;
   /**
    * Do not convert the submitted value from the user-supplied path.
    */
