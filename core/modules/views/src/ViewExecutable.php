@@ -4,6 +4,7 @@ namespace Drupal\views;
 
 use Drupal\Component\Utility\Html;
 use Drupal\Component\Utility\Tags;
+use Drupal\Core\Cache\Cache;
 use Drupal\Core\Logger\LoggerChannelTrait;
 use Drupal\Core\Routing\RouteProviderInterface;
 use Drupal\Core\Session\AccountInterface;
@@ -1625,7 +1626,7 @@ class ViewExecutable {
     $this->initDisplay();
     /** @var \Drupal\views\Plugin\views\cache\CachePluginBase $cache */
     $cache = $this->display_handler->getPlugin('cache');
-    return $cache->getCacheTags();
+    return Cache::mergeTags($cache->getCacheTags(), $this->storage->getCacheTags());
   }
 
   /**

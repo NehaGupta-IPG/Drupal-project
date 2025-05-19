@@ -99,8 +99,7 @@ abstract class ViewsBlockBase extends BlockBase implements ContainerFactoryPlugi
    * {@inheritdoc}
    */
   public function getCacheTags() {
-    $tags = $this->view->display_handler->getCacheMetadata()->getCacheTags();
-    return Cache::mergeTags(parent::getCacheTags(), $tags);
+    return Cache::mergeTags(parent::getCacheTags(), $this->view->getCacheTags());
   }
 
   /**
