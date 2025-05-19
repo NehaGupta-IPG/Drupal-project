@@ -148,8 +148,8 @@ class TaxonomyEntityHooks {
    */
   #[Hook('node_update')]
   public function nodeUpdate(EntityInterface $node): void {
-    // If we're not dealing with the default revision of the node, do not make any
-    // change to the taxonomy index.
+    // If we're not dealing with the default revision of the node,
+    // do not make any change to the taxonomy index.
     if (!$node->isDefaultRevision()) {
       return;
     }
