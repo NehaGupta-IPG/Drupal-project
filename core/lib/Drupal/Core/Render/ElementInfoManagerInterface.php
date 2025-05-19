@@ -3,6 +3,7 @@
 namespace Drupal\Core\Render;
 
 use Drupal\Component\Plugin\Discovery\DiscoveryInterface;
+use Drupal\Core\Render\Element\ElementInterface;
 
 /**
  * Collects available render array element types.
@@ -60,5 +61,17 @@ interface ElementInfoManagerInterface extends DiscoveryInterface {
    *   default value, which can be NULL.
    */
   public function getInfoProperty($type, $property_name, $default = NULL);
+
+  /**
+   * Create a render element object from a render array.
+   *
+   * @param \Drupal\Core\Render\Element\ElementInterface|array $element
+   *   A render element. For easier usage, it can be an element returned from
+   *   this method which will be returned unchanged.
+   *
+   * @return \Drupal\Core\Render\Element\ElementInterface
+   *   A render element object.
+   */
+  public function fromRenderArray(ElementInterface|array &$element): ElementInterface;
 
 }

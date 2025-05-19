@@ -1,6 +1,7 @@
 <?php
 
 use Drupal\Core\DependencyInjection\ContainerNotInitializedException;
+use Drupal\Core\Render\Element\ElementInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -547,6 +548,17 @@ class Drupal {
    */
   public static function flood() {
     return static::getContainer()->get('flood');
+  }
+
+  /**
+   * @param string $type
+   *   A render element type.
+   *
+   * @return \Drupal\Core\Render\Element\ElementInterface
+   *   A render element object.
+   */
+  public static function renderElement(string $type): ElementInterface {
+    return \Drupal::service('plugin.manager.element_info')->createInstance($type);
   }
 
   /**
