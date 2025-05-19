@@ -41,6 +41,22 @@ interface ElementInterface extends PluginInspectionInterface, RenderCallbackInte
   public function getInfo();
 
   /**
+   * Set storage.
+   *
+   * Calling this method does nothing, it only exists for the plugin manager
+   * to call when creating a plugin instance.
+   *
+   * @param array $element
+   *   The containing element.
+   *
+   * @return $this
+   *   The object instance.
+   *
+   * @internal
+   */
+  public function initializeInternalStorage(array &$element): static;
+
+  /**
    * Sets a form element's class attribute.
    *
    * Adds 'required' and 'error' classes as needed.
@@ -51,5 +67,45 @@ interface ElementInterface extends PluginInspectionInterface, RenderCallbackInte
    *   Array of new class names to be added.
    */
   public static function setAttributes(&$element, $class = []);
+
+  /**
+   * Returns a render array.
+   *
+   * @return array
+   *   A render array. Make sure to take the return value as a reference.
+   */
+  public function &toRenderArray();
+
+  /**
+   * Return child elements.
+   *
+   * @return \Traversable
+   *   Key will be children names, values are ElementInterface objects.
+   */
+  public function getChildren(): \Traversable;
+
+  /**
+   * Adds a child.
+   *
+   * @param int|string $name
+   *   The name of the child. Can be an integer, too.
+   * @param array|\Drupal\Core\Render\Element\ElementInterface $child
+   *   A render array or a render object.
+   *
+   * @return $this
+   *   The called object.
+   */
+  public function addChild(int|string $name, ElementInterface|array $child): static;
+
+  /**
+   * Removes a child.
+   *
+   * @param int|string $name
+   *   The name of the child. Can be an integer, too.
+   *
+   * @return $this
+   *   The called object.
+   */
+  public function removeChild(int|string $name): static;
 
 }
