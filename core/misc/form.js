@@ -142,14 +142,14 @@
         onFormSubmit,
       );
 
-      // Binds a listener to clear stored form values from formSingleSubmit() when
-      // page is loaded from back/forward cache. This allows the form submission
-      // button to be used again instead of remaining disabled.
+      // Binds a listener to clear stored form values from formSingleSubmit()
+      // when the page is loaded from back/forward cache. This allows the form
+      // submission button to be used again instead of remaining disabled.
       // Checking persisted does not work with jQuery on().
       window.addEventListener('pageshow', (event) => {
         if (event.persisted) {
-          $('form:not([method~="GET"])').removeAttr(
-            'data-drupal-form-submit-last',
+          document.querySelectorAll('form:not([method~="GET"])').forEach(
+            (form) => form.removeAttribute('data-drupal-form-submit-last')
           );
         }
       });
