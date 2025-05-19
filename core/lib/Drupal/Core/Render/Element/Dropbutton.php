@@ -21,7 +21,8 @@ use Drupal\Core\Render\Attribute\RenderElement;
  * @property $links
  *   An array of links to actions. See template_preprocess_links() for
  *   documentation the properties of links in this array.
- * - #dropbutton_type: A string defining a type of dropbutton variant for
+ * @property $dropbutton_type
+ *   A string defining a type of dropbutton variant for
  *   styling proposes. Renders as class `dropbutton--#dropbutton_type`.
  *
  * Usage Example:

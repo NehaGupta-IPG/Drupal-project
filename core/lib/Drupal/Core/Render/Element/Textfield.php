@@ -15,9 +15,11 @@ use Drupal\Core\Render\Element;
  *   Maximum number of characters of input allowed.
  * @property $size
  *   The size of the input element in characters.
- * - #autocomplete_route_name: A route to be used as callback URL by the
+ * @property $autocomplete_route_name
+ *   A route to be used as callback URL by the
  *   autocomplete JavaScript library.
- * - #autocomplete_route_parameters: An array of parameters to be used in
+ * @property $autocomplete_route_parameters
+ *   An array of parameters to be used in
  *   conjunction with the route name.
  * @property $pattern
  *   A string for the native HTML5 pattern attribute.

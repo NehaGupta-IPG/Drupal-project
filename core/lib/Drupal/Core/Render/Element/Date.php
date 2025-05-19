@@ -14,8 +14,10 @@ use Drupal\Core\Render\Element;
  *   An associative array containing:
  *   - type: The type of date field rendered, valid values include 'date',
  *     'time', 'datetime', and 'datetime-local'.
- * - #date_date_format: The date format used in PHP formats.
- * - #default_value: A string representing the date formatted as Y-m-d, or
+ * @property $date_date_format
+ *   The date format used in PHP formats.
+ * @property $default_value
+ *   A string representing the date formatted as Y-m-d, or
  *   hh:mm for time.
  * @property $size
  *   The size of the input element in characters.

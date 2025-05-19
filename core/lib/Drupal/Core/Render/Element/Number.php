@@ -11,8 +11,9 @@ use Drupal\Component\Utility\Number as NumberUtility;
  * Provides a form element for numeric input, with special numeric validation.
  *
  * Properties:
- * - #default_value: A valid floating point number.
  *
+ * @property $default_value
+ *   A valid floating point number.
  * @property $min
  *   Minimum value.
  * @property $max

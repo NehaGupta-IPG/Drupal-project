@@ -23,7 +23,8 @@ use Drupal\Core\StringTranslation\TranslatableMarkup;
  *   The message to display if table does not have any options.
  * @property $multiple
  *   Set to FALSE to render the table with radios instead checkboxes.
- * - #js_select: Set to FALSE if you don't want the select all checkbox added to
+ * @property $js_select
+ *   Set to FALSE if you don't want the select all checkbox added to
  *   the header.
  *
  * Other properties of the \Drupal\Core\Render\Element\Table element are also

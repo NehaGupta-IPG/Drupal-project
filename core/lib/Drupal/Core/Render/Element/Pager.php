@@ -17,7 +17,8 @@ use Drupal\Core\Render\Attribute\RenderElement;
  * @property $element
  *   (optional, int) The pager ID, to distinguish between multiple
  *   pagers on the same page (defaults to 0).
- * - #pagination_heading_level: (optional) A heading level for the pager.
+ * @property $pagination_heading_level
+ *   (optional) A heading level for the pager.
  * @property $parameters
  *   (optional) An associative array of query string parameters to
  *   append to the pager.
@@ -26,7 +27,8 @@ use Drupal\Core\Render\Attribute\RenderElement;
  *   to 9).
  * @property $tags
  *   (optional) An array of labels for the controls in the pages.
- * - #route_name: (optional) The name of the route to be used to build pager
+ * @property $route_name
+ *   (optional) The name of the route to be used to build pager
  *   links. Defaults to '<none>', which will make links relative to the current
  *   URL. This makes the page more effectively cacheable.
  *

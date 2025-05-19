@@ -19,7 +19,8 @@ use Drupal\Core\Render\Element;
  * @property $open
  *   Indicates whether the container should be open by default.
  *   Defaults to FALSE.
- * - #summary_attributes: An array of attributes to apply to the <summary>
+ * @property $summary_attributes
+ *   An array of attributes to apply to the <summary>
  *   element.
  *
  * Usage example:
