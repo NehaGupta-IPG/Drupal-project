@@ -548,7 +548,7 @@ abstract class RenderElementBase extends PluginBase implements ElementInterface,
   }
 
   /**
-   * {inheritdoc}
+   * {@inheritdoc}
    */
   public function initializeInternalStorage(array &$element): static {
     if (!$this->storage) {
