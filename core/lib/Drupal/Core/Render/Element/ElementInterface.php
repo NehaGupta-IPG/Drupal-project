@@ -60,7 +60,6 @@ interface ElementInterface extends PluginInspectionInterface, RenderCallbackInte
    */
   public function &toRenderArray();
 
-
   /**
    * Return child elements.
    *
@@ -86,7 +85,8 @@ interface ElementInterface extends PluginInspectionInterface, RenderCallbackInte
    * Removes a child.
    *
    * @param int|string $name
-   *  The name of the child. Can be an integer, too.
+   *   The name of the child. Can be an integer, too.
+   *
    * @return $this
    *   The called object.
    */

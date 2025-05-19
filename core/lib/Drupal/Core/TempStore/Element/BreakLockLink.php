@@ -72,6 +72,8 @@ class BreakLockLink extends RenderElementBase implements ContainerFactoryPluginI
    *   The entity type manager.
    * @param \Drupal\Core\Render\RendererInterface $renderer
    *   The renderer.
+   * @param \Drupal\Core\Render\ElementInfoManagerInterface $elementInfoManager
+   *   The element info manager.
    */
   public function __construct(
     array $configuration,
@@ -80,7 +82,7 @@ class BreakLockLink extends RenderElementBase implements ContainerFactoryPluginI
     DateFormatterInterface $date_formatter,
     EntityTypeManagerInterface $entity_type_manager,
     RendererInterface $renderer,
-    ElementInfoManagerInterface $elementInfoManager
+    ElementInfoManagerInterface $elementInfoManager,
   ) {
     parent::__construct($configuration, $plugin_id, $plugin_definition, $elementInfoManager);
 
