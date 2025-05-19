@@ -75,7 +75,7 @@ class EntityOperationsTest extends KernelTestBase {
     // revisions doesn't affect the default node load.
     /** @var \Drupal\node\Entity\Node $page */
     $page = Node::load($id);
-    $this->assertEquals('A', $page->getTitle());
+    $this->assertEquals('A', $page->label());
     $this->assertTrue($page->isDefaultRevision());
     $this->assertFalse($page->isPublished());
 
@@ -86,7 +86,7 @@ class EntityOperationsTest extends KernelTestBase {
 
     // Verify the entity is now published and public.
     $page = Node::load($id);
-    $this->assertEquals('B', $page->getTitle());
+    $this->assertEquals('B', $page->label());
     $this->assertTrue($page->isDefaultRevision());
     $this->assertTrue($page->isPublished());
 
@@ -97,7 +97,7 @@ class EntityOperationsTest extends KernelTestBase {
 
     // Verify normal loads return the still-default previous version.
     $page = Node::load($id);
-    $this->assertEquals('B', $page->getTitle());
+    $this->assertEquals('B', $page->label());
 
     // Verify we can load the pending revision, even if the mechanism is kind
     // of gross. Note: revisionIds() is only available on NodeStorageInterface,
@@ -108,7 +108,7 @@ class EntityOperationsTest extends KernelTestBase {
     sort($revision_ids);
     $latest = end($revision_ids);
     $page = $storage->loadRevision($latest);
-    $this->assertEquals('C', $page->getTitle());
+    $this->assertEquals('C', $page->label());
 
     $page->setTitle('D');
     $page->moderation_state->value = 'published';
@@ -116,7 +116,7 @@ class EntityOperationsTest extends KernelTestBase {
 
     // Verify normal loads return the still-default previous version.
     $page = Node::load($id);
-    $this->assertEquals('D', $page->getTitle());
+    $this->assertEquals('D', $page->label());
     $this->assertTrue($page->isDefaultRevision());
     $this->assertTrue($page->isPublished());
 
@@ -126,7 +126,7 @@ class EntityOperationsTest extends KernelTestBase {
     $page->save();
 
     $page = Node::load($id);
-    $this->assertEquals('E', $page->getTitle());
+    $this->assertEquals('E', $page->label());
     $this->assertTrue($page->isDefaultRevision());
     $this->assertTrue($page->isPublished());
   }
@@ -148,7 +148,7 @@ class EntityOperationsTest extends KernelTestBase {
     // Verify the entity saved correctly.
     /** @var \Drupal\node\Entity\Node $page */
     $page = Node::load($id);
-    $this->assertEquals('A', $page->getTitle());
+    $this->assertEquals('A', $page->label());
     $this->assertTrue($page->isDefaultRevision());
     $this->assertTrue($page->isPublished());
   }

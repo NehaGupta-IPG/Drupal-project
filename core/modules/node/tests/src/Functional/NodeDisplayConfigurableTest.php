@@ -114,7 +114,7 @@ class NodeDisplayConfigurableTest extends NodeTestBase {
 
     $html_element = $is_inline ? 'span' : 'div';
     $title_selector = 'h1 span' . ($title_classes ? '.field--name-title' : '');
-    $assert->elementTextContains('css', $title_selector, $node->getTitle());
+    $assert->elementTextContains('css', $title_selector, $node->label());
 
     // With field classes, the selector can be very specific.
     if ($field_classes) {

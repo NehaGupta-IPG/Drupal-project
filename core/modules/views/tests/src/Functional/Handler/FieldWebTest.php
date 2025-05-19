@@ -115,10 +115,10 @@ class FieldWebTest extends ViewTestBase {
     // Check that the results are ordered by id in ascending order and that the
     // title click filter is for descending.
     $this->assertSession()->linkByHrefExists(Url::fromRoute('<none>', [], ['query' => ['order' => 'changed', 'sort' => 'desc']])->toString());
-    $this->assertSession()->pageTextContains($node->getTitle());
+    $this->assertSession()->pageTextContains($node->label());
     $this->clickLink('Changed');
     $this->assertSession()->statusCodeEquals(200);
-    $this->assertSession()->pageTextContains($node->getTitle());
+    $this->assertSession()->pageTextContains($node->label());
   }
 
   /**

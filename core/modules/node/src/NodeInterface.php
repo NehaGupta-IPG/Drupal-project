@@ -57,6 +57,11 @@ interface NodeInterface extends ContentEntityInterface, EntityChangedInterface, 
    * @return string|null
    *   Title of the node, or NULL if the node doesn't yet have a title (for
    *   example, if a new node is being previewed).
+   *
+   * @deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Use
+   *   \Drupal\node\Entity\Node::label() instead.
+   *
+   * @see https://www.drupal.org/node/3085319
    */
   public function getTitle();
 

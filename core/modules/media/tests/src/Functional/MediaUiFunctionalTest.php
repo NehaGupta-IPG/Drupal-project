@@ -74,7 +74,7 @@ class MediaUiFunctionalTest extends MediaFunctionalTestBase {
       ->getStorage('media')
       ->loadUnchanged($media_id);
     $this->assertSame($media->getRevisionLogMessage(), $revision_log_message);
-    $this->assertSame($media->getName(), $media_name);
+    $this->assertSame($media->label(), $media_name);
 
     // Tests media edit form.
     $media_type->setNewRevision(FALSE);
@@ -89,7 +89,7 @@ class MediaUiFunctionalTest extends MediaFunctionalTestBase {
     $media = $this->container->get('entity_type.manager')
       ->getStorage('media')
       ->loadUnchanged($media_id);
-    $this->assertSame($media->getName(), $media_name2);
+    $this->assertSame($media->label(), $media_name2);
 
     // Change the authored by field to an empty string, which should assign
     // authorship to the anonymous user (uid 0).

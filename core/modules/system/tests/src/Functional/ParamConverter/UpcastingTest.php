@@ -68,7 +68,7 @@ class UpcastingTest extends BrowserTestBase {
     // paramconverter_test/node/{node}/set/parent/{parent}
     // options.parameters.parent.type = entity:node
     $this->drupalGet("paramconverter_test/node/" . $node->id() . "/set/parent/" . $parent->id());
-    $this->assertSession()->pageTextContains("Setting '" . $parent->getTitle() . "' as parent of '" . $node->getTitle() . "'.");
+    $this->assertSession()->pageTextContains("Setting '" . $parent->label() . "' as parent of '" . $node->label() . "'.");
   }
 
   /**

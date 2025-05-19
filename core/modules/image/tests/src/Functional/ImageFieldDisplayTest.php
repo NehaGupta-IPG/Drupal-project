@@ -343,7 +343,7 @@ class ImageFieldDisplayTest extends ImageFieldTestBase {
     $this->submitForm($edit, 'Save');
     // Add the required alt text.
     $this->submitForm([$field_name . '[1][alt]' => $alt], 'Save');
-    $this->assertSession()->statusMessageContains('Article ' . $node->getTitle() . ' has been updated.', 'status');
+    $this->assertSession()->statusMessageContains('Article ' . $node->label() . ' has been updated.', 'status');
 
     // Assert ImageWidget::process() calls FieldWidget::process().
     $this->drupalGet('node/' . $node->id() . '/edit');

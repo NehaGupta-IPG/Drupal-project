@@ -58,7 +58,7 @@ class MigrateNodeTest extends MigrateNodeTestBase {
     $this->assertSame('teaser test rev 3', $node->body->summary);
     $this->assertSame('filtered_html', $node->body->format);
     $this->assertSame('story', $node->getType(), 'Node has the correct bundle.');
-    $this->assertSame('Test title rev 3', $node->getTitle(), 'Node has the correct title.');
+    $this->assertSame('Test title rev 3', $node->label(), 'Node has the correct title.');
     $this->assertSame('1390095702', $node->getCreatedTime(), 'Node has the correct created time.');
     $this->assertFalse($node->isSticky());
     $this->assertSame('1', $node->getOwnerId());
@@ -66,7 +66,7 @@ class MigrateNodeTest extends MigrateNodeTestBase {
 
     /** @var \Drupal\node\NodeInterface $node_revision */
     $node_revision = \Drupal::entityTypeManager()->getStorage('node')->loadRevision(2001);
-    $this->assertSame('Test title rev 3', $node_revision->getTitle());
+    $this->assertSame('Test title rev 3', $node_revision->label());
     $this->assertSame('2', $node_revision->getRevisionUser()->id(), 'Node revision has the correct user');
     $this->assertSame('1', $node_revision->id(), 'Node 1 loaded.');
     $this->assertSame('2001', $node_revision->getRevisionId(), 'Node 1 revision 2001 loaded.');
@@ -115,7 +115,7 @@ class MigrateNodeTest extends MigrateNodeTestBase {
     $this->assertSame('joe.roe', $node->field_commander[0]->entity->getAccountName());
 
     $node = Node::load(2);
-    $this->assertSame('Test title rev 3', $node->getTitle());
+    $this->assertSame('Test title rev 3', $node->label());
     $this->assertSame('test rev 3', $node->body->value);
     $this->assertSame('filtered_html', $node->body->format);
 
@@ -200,7 +200,7 @@ class MigrateNodeTest extends MigrateNodeTestBase {
     // Test that we can re-import using the EntityContentBase destination.
     $title = $this->rerunMigration();
     $node = Node::load(2);
-    $this->assertSame($title, $node->getTitle());
+    $this->assertSame($title, $node->label());
     // Test multi-column fields are correctly upgraded.
     $this->assertSame('test rev 3', $node->body->value);
     $this->assertSame('full_html', $node->body->format);
@@ -212,7 +212,7 @@ class MigrateNodeTest extends MigrateNodeTestBase {
       'source_row_status' => MigrateIdMapInterface::STATUS_NEEDS_UPDATE,
     ]);
     $node = Node::load(2);
-    $this->assertSame($title, $node->getTitle());
+    $this->assertSame($title, $node->label());
 
     // Test synchronized field.
     $value = 'jsmith@example.com';

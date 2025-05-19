@@ -40,8 +40,8 @@ class TermNameFieldTest extends TaxonomyTestBase {
     $view->initDisplay();
     $this->executeView($view);
 
-    $this->assertEquals($this->term1->getName(), $view->getStyle()->getField(0, 'name'));
-    $this->assertEquals($this->term2->getName(), $view->getStyle()->getField(1, 'name'));
+    $this->assertEquals($this->term1->label(), $view->getStyle()->getField(0, 'name'));
+    $this->assertEquals($this->term2->label(), $view->getStyle()->getField(1, 'name'));
 
     $view = Views::getView('test_taxonomy_term_name');
     $display =& $view->storage->getDisplay('default');
@@ -49,8 +49,8 @@ class TermNameFieldTest extends TaxonomyTestBase {
     $view->storage->invalidateCaches();
     $this->executeView($view);
 
-    $this->assertEquals(str_replace(' ', '-', $this->term1->getName()), $view->getStyle()->getField(0, 'name'));
-    $this->assertEquals($this->term2->getName(), $view->getStyle()->getField(1, 'name'));
+    $this->assertEquals(str_replace(' ', '-', $this->term1->label()), $view->getStyle()->getField(0, 'name'));
+    $this->assertEquals($this->term2->label(), $view->getStyle()->getField(1, 'name'));
 
     // Enable link_to_entity option and ensure that title is displayed properly.
     $view = Views::getView('test_taxonomy_term_name');
@@ -60,8 +60,8 @@ class TermNameFieldTest extends TaxonomyTestBase {
     $view->storage->invalidateCaches();
     $this->executeView($view);
 
-    $expected_link1 = Link::fromTextAndUrl(str_replace(' ', '-', $this->term1->getName()), $this->term1->toUrl());
-    $expected_link2 = Link::fromTextAndUrl($this->term2->getName(), $this->term2->toUrl());
+    $expected_link1 = Link::fromTextAndUrl(str_replace(' ', '-', $this->term1->label()), $this->term1->toUrl());
+    $expected_link2 = Link::fromTextAndUrl($this->term2->label(), $this->term2->toUrl());
     $this->assertEquals($expected_link1->toString(), $view->getStyle()->getField(0, 'name'));
     $this->assertEquals($expected_link2->toString(), $view->getStyle()->getField(1, 'name'));
   }

@@ -250,7 +250,7 @@ class TermIndexTest extends TaxonomyTestBase {
     // Breadcrumbs are not rendered with a language, prevent the term
     // language from being added to the options.
     // Check that parent term link is displayed when viewing the node.
-    $this->assertSession()->responseContains(Link::fromTextAndUrl($term2->getName(), $term2->toUrl('canonical', ['language' => NULL]))->toString());
+    $this->assertSession()->responseContains(Link::fromTextAndUrl($term2->label(), $term2->toUrl('canonical', ['language' => NULL]))->toString());
   }
 
 }

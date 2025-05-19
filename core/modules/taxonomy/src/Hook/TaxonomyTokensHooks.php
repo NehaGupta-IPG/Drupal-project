@@ -142,9 +142,10 @@ class TaxonomyTokensHooks {
           case 'parent':
             $taxonomy_storage = \Drupal::entityTypeManager()->getStorage('taxonomy_term');
             if ($parents = $taxonomy_storage->loadParents($term->id())) {
+              /** @var \Drupal\taxonomy\TermInterface $parent */
               $parent = array_pop($parents);
               $bubbleable_metadata->addCacheableDependency($parent);
-              $replacements[$original] = $parent->getName();
+              $replacements[$original] = $parent->label();
             }
             break;
 

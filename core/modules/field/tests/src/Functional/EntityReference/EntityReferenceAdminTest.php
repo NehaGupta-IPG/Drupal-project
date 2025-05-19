@@ -155,8 +155,8 @@ class EntityReferenceAdminTest extends BrowserTestBase {
     $this->assertStringContainsString("/entity_reference_autocomplete/node/views/", $field->getAttribute('data-autocomplete-path'));
     $target_url = $this->getAbsoluteUrl($field->getAttribute('data-autocomplete-path'));
     $this->drupalGet($target_url, ['query' => ['q' => 'Foo']]);
-    $this->assertSession()->pageTextContains($node1->getTitle() . ' (' . $node1->id() . ')');
-    $this->assertSession()->pageTextContains($node2->getTitle() . ' (' . $node2->id() . ')');
+    $this->assertSession()->pageTextContains($node1->label() . ' (' . $node1->id() . ')');
+    $this->assertSession()->pageTextContains($node2->label() . ' (' . $node2->id() . ')');
 
     // Try to add a new node, fill the entity reference field and submit the
     // form.
@@ -182,7 +182,7 @@ class EntityReferenceAdminTest extends BrowserTestBase {
 
     $edit = [
       'title[0][value]' => 'Test',
-      'field_test_entity_ref_field[0][target_id]' => $node1->getTitle(),
+      'field_test_entity_ref_field[0][target_id]' => $node1->label(),
     ];
     $this->drupalGet('node/add/' . $this->type);
     $this->submitForm($edit, 'Save');
@@ -190,17 +190,17 @@ class EntityReferenceAdminTest extends BrowserTestBase {
     // Assert the results multiple times to avoid sorting problem of nodes with
     // the same title.
     $this->assertSession()->pageTextContains('Multiple content items match this reference;');
-    $this->assertSession()->pageTextContains($node1->getTitle() . ' (' . $node1->id() . ')');
-    $this->assertSession()->pageTextContains($node2->getTitle() . ' (' . $node2->id() . ')');
-    $this->assertSession()->pageTextContains('Specify the one you want by appending the id in parentheses, like "' . $node2->getTitle() . ' (' . $node2->id() . ')' . '".');
+    $this->assertSession()->pageTextContains($node1->label() . ' (' . $node1->id() . ')');
+    $this->assertSession()->pageTextContains($node2->label() . ' (' . $node2->id() . ')');
+    $this->assertSession()->pageTextContains('Specify the one you want by appending the id in parentheses, like "' . $node2->label() . ' (' . $node2->id() . ')' . '".');
 
     $edit = [
       'title[0][value]' => 'Test',
-      'field_test_entity_ref_field[0][target_id]' => $node1->getTitle() . ' (' . $node1->id() . ')',
+      'field_test_entity_ref_field[0][target_id]' => $node1->label() . ' (' . $node1->id() . ')',
     ];
     $this->drupalGet('node/add/' . $this->type);
     $this->submitForm($edit, 'Save');
-    $this->assertSession()->linkExists($node1->getTitle());
+    $this->assertSession()->linkExists($node1->label());
 
     // Tests adding default values to autocomplete widgets.
     Vocabulary::create(['vid' => 'tags', 'name' => 'tags'])->save();

@@ -176,7 +176,7 @@ class ModerationLocaleTest extends ModerationStateTestBase {
     $french_node = $english_node->getTranslation('fr');
     $this->assertEquals('published', $french_node->moderation_state->value);
     $this->assertTrue($french_node->isPublished());
-    $this->assertEquals('Translated node', $french_node->getTitle(), 'The default revision of the published translation remains the same.');
+    $this->assertEquals('Translated node', $french_node->label(), 'The default revision of the published translation remains the same.');
 
     // Publish the French article before testing the archive transition.
     $this->drupalGet('fr/node/' . $english_node->id() . '/edit');
@@ -186,7 +186,7 @@ class ModerationLocaleTest extends ModerationStateTestBase {
     $french_node = $english_node->getTranslation('fr');
     $this->assertEquals('published', $french_node->moderation_state->value);
     $this->assertTrue($french_node->isPublished());
-    $this->assertEquals('New draft of translated node', $french_node->getTitle(), 'The draft has replaced the published revision.');
+    $this->assertEquals('New draft of translated node', $french_node->label(), 'The draft has replaced the published revision.');
 
     // Publish the English article before testing the archive transition.
     $this->drupalGet('node/' . $english_node->id() . '/edit');

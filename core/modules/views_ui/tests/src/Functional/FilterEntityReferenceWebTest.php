@@ -55,7 +55,7 @@ class FilterEntityReferenceWebTest extends UITestBase {
     $options = $this->getUiOptions();
     // Should be sorted by title ASC.
     uasort($this->targetEntities, function (EntityInterface $a, EntityInterface $b) {
-      return strnatcasecmp($a->getTitle(), $b->getTitle());
+      return strnatcasecmp($a->label(), $b->label());
     });
     $i = 0;
     foreach ($this->targetEntities as $entity) {

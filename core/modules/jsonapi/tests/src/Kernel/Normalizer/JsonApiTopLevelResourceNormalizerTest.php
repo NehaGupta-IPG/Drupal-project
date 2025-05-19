@@ -578,7 +578,7 @@ class JsonApiTopLevelResourceNormalizerTest extends JsonapiKernelTestBase {
         'resource_type' => $resource_type,
       ]);
     $this->assertInstanceOf(Node::class, $node);
-    $this->assertSame('Testing article', $node->getTitle());
+    $this->assertSame('Testing article', $node->label());
   }
 
   /**
@@ -656,7 +656,7 @@ class JsonApiTopLevelResourceNormalizerTest extends JsonapiKernelTestBase {
 
       /** @var \Drupal\node\Entity\Node $node */
       $this->assertInstanceOf(Node::class, $node);
-      $this->assertSame('Testing article', $node->getTitle());
+      $this->assertSame('Testing article', $node->label());
       if (!empty($expected['user_id'])) {
         $owner = $node->getOwner();
         $this->assertEquals($expected['user_id'], $owner->id());

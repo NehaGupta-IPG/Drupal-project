@@ -17,7 +17,7 @@ class NodeTestExceptionHooks {
    */
   #[Hook('node_insert')]
   public function nodeInsert(NodeInterface $node): void {
-    if ($node->getTitle() == 'testing_transaction_exception') {
+    if ($node->label() == 'testing_transaction_exception') {
       throw new \Exception('Test exception for rollback.');
     }
   }

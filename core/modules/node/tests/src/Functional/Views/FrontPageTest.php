@@ -348,7 +348,7 @@ class FrontPageTest extends ViewTestBase {
     // Let's update a node title on the first page and ensure that the page
     // cache entry invalidates.
     $node = Node::load(10);
-    $title = $node->getTitle() . 'a';
+    $title = $node->label() . 'a';
     $node->setTitle($title);
     $node->save();
 

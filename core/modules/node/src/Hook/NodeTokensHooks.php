@@ -114,7 +114,7 @@ class NodeTokensHooks {
             break;
 
           case 'title':
-            $replacements[$original] = $node->getTitle();
+            $replacements[$original] = $node->label();
             break;
 
           case 'body':

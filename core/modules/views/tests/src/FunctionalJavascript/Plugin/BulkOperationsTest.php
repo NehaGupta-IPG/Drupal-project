@@ -55,15 +55,15 @@ class BulkOperationsTest extends WebDriverTestBase {
 
     // Login as administrator and go to admin/content.
     $this->drupalGet('admin/content');
-    $this->assertSession()->pageTextContains($node_1->getTitle());
+    $this->assertSession()->pageTextContains($node_1->label());
 
     // Filter the list.
-    $this->assertSession()->pageTextContains($node_1->getTitle());
-    $this->assertSession()->pageTextContains($node_2->getTitle());
+    $this->assertSession()->pageTextContains($node_1->label());
+    $this->assertSession()->pageTextContains($node_2->label());
     $this->submitForm(['title' => 'The first node'], 'Filter');
     $this->assertSession()->assertWaitOnAjaxRequest();
-    $this->assertSession()->pageTextContains($node_1->getTitle());
-    $this->assertSession()->pageTextNotContains($node_2->getTitle());
+    $this->assertSession()->pageTextContains($node_1->label());
+    $this->assertSession()->pageTextNotContains($node_2->label());
 
     // Select the node deletion action.
     $action_select = $this->getSession()->getPage()->find('css', '[data-drupal-selector="edit-action"]');
@@ -73,13 +73,13 @@ class BulkOperationsTest extends WebDriverTestBase {
     // Now click 'Apply to selected items' and assert the first node is selected
     // on the confirm form.
     $this->submitForm(['node_bulk_form[0]' => TRUE], 'Apply to selected items');
-    $this->assertSession()->pageTextContains($node_1->getTitle());
-    $this->assertSession()->pageTextNotContains($node_2->getTitle());
+    $this->assertSession()->pageTextContains($node_1->label());
+    $this->assertSession()->pageTextNotContains($node_2->label());
     $this->getSession()->getPage()->pressButton('Delete');
 
     // Confirm that the first node was deleted.
-    $this->assertSession()->pageTextNotContains($node_1->getTitle());
-    $this->assertSession()->pageTextNotContains($node_2->getTitle());
+    $this->assertSession()->pageTextNotContains($node_1->label());
+    $this->assertSession()->pageTextNotContains($node_2->label());
 
     // Ensure that assets are loaded on the page. This confirms that the page
     // was loaded without ajax state.
@@ -87,7 +87,7 @@ class BulkOperationsTest extends WebDriverTestBase {
 
     // Confirm that second node exists.
     $this->submitForm([], 'Reset');
-    $this->assertSession()->pageTextContains($node_2->getTitle());
+    $this->assertSession()->pageTextContains($node_2->label());
 
     // Select the node unpublish action.
     $action_select = $this->getSession()->getPage()->find('css', '[data-drupal-selector="edit-action"]');

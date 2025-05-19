@@ -73,7 +73,7 @@ class LoadMultipleTest extends KernelTestBase {
 
     // Create a single term and load it by name.
     $term = $this->createTerm($vocabulary);
-    $loaded_terms = $term_storage->loadByProperties(['name' => $term->getName()]);
+    $loaded_terms = $term_storage->loadByProperties(['name' => $term->label()]);
     $this->assertCount(1, $loaded_terms, 'One term was loaded.');
     $loaded_term = reset($loaded_terms);
     $this->assertEquals($term->id(), $loaded_term->id(), 'Term loaded by name successfully.');

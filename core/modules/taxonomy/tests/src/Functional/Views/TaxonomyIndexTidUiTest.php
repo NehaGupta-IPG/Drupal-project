@@ -125,7 +125,7 @@ class TaxonomyIndexTidUiTest extends UITestBase {
         $prefix = $this->terms[$i][$j]->parent->target_id ? '-' : '';
         $tid = $option->getAttribute('value');
 
-        $this->assertEquals($prefix . $this->terms[$i][$j]->getName(), $option->getText());
+        $this->assertEquals($prefix . $this->terms[$i][$j]->label(), $option->getText());
         $this->assertEquals($this->terms[$i][$j]->id(), $tid);
       }
     }
@@ -181,7 +181,7 @@ class TaxonomyIndexTidUiTest extends UITestBase {
 
     // Only the nodes with the selected term should be shown.
     $this->drupalGet('test-filter-taxonomy-index-tid');
-    $this->assertSession()->pageTextNotContains($node1->getTitle());
+    $this->assertSession()->pageTextNotContains($node1->label());
     $this->assertSession()->linkByHrefNotExists($node1->toUrl()->toString());
     $xpath_node2_link = $this->assertSession()->buildXPathQuery('//div[@class="views-row"]//a[@href=:url and text()=:label]', [
       ':url' => $node2->toUrl()->toString(),
@@ -193,7 +193,7 @@ class TaxonomyIndexTidUiTest extends UITestBase {
       ':label' => $node3->label(),
     ]);
     $this->assertSession()->elementsCount('xpath', $xpath_node3_link, 1);
-    $this->assertSession()->pageTextNotContains($node4->getTitle());
+    $this->assertSession()->pageTextNotContains($node4->label());
     $this->assertSession()->linkByHrefNotExists($node4->toUrl()->toString());
 
     // Expose the filter.
@@ -215,11 +215,11 @@ class TaxonomyIndexTidUiTest extends UITestBase {
       ':label' => $node1->label(),
     ]);
     $this->assertSession()->elementsCount('xpath', $xpath_node1_link, 1);
-    $this->assertSession()->pageTextNotContains($node2->getTitle());
+    $this->assertSession()->pageTextNotContains($node2->label());
     $this->assertSession()->linkByHrefNotExists($node2->toUrl()->toString());
-    $this->assertSession()->pageTextNotContains($node3->getTitle());
+    $this->assertSession()->pageTextNotContains($node3->label());
     $this->assertSession()->linkByHrefNotExists($node3->toUrl()->toString());
-    $this->assertSession()->pageTextNotContains($node4->getTitle());
+    $this->assertSession()->pageTextNotContains($node4->label());
     $this->assertSession()->linkByHrefNotExists($node4->toUrl()->toString());
 
     // Set the operator to 'not empty'.
@@ -231,7 +231,7 @@ class TaxonomyIndexTidUiTest extends UITestBase {
     // After switching to 'not empty' operator, all nodes with terms should be
     // shown.
     $this->drupalGet('test-filter-taxonomy-index-tid');
-    $this->assertSession()->pageTextNotContains($node1->getTitle());
+    $this->assertSession()->pageTextNotContains($node1->label());
     $this->assertSession()->linkByHrefNotExists($node1->toUrl()->toString());
     $xpath_node2_link = $this->assertSession()->buildXPathQuery('//div[@class="views-row"]//a[@href=:url and text()=:label]', [
       ':url' => $node2->toUrl()->toString(),
@@ -276,13 +276,13 @@ class TaxonomyIndexTidUiTest extends UITestBase {
     $this->drupalGet('admin/structure/views/view/test_taxonomy_term_name/edit/default');
     $this->submitForm([], 'Save');
     $this->submitForm([], 'Update preview');
-    $this->assertSession()->pageTextNotContains($node1->getTitle());
+    $this->assertSession()->pageTextNotContains($node1->label());
     $this->assertSession()->linkByHrefNotExists($node1->toUrl()->toString());
-    $this->assertSession()->pageTextNotContains($node2->getTitle());
+    $this->assertSession()->pageTextNotContains($node2->label());
     $this->assertSession()->linkByHrefNotExists($node2->toUrl()->toString());
-    $this->assertSession()->pageTextNotContains($node3->getTitle());
+    $this->assertSession()->pageTextNotContains($node3->label());
     $this->assertSession()->linkByHrefNotExists($node3->toUrl()->toString());
-    $this->assertSession()->pageTextNotContains($node4->getTitle());
+    $this->assertSession()->pageTextNotContains($node4->label());
     $this->assertSession()->linkByHrefNotExists($node4->toUrl()->toString());
     $this->assertSession()->elementNotExists('xpath', "//div[@class='views-row']");
   }
@@ -316,19 +316,19 @@ class TaxonomyIndexTidUiTest extends UITestBase {
     // Visit the view's page URL and validate the results.
     $this->drupalGet('/test-taxonomy-exposed-grouped-filter');
     $this->submitForm(['field_views_testing_tags_target_id' => 1], 'Apply');
-    $this->assertSession()->pageTextContains($nodes[0]->getTitle());
-    $this->assertSession()->pageTextContains($nodes[1]->getTitle());
-    $this->assertSession()->pageTextNotContains($nodes[2]->getTitle());
+    $this->assertSession()->pageTextContains($nodes[0]->label());
+    $this->assertSession()->pageTextContains($nodes[1]->label());
+    $this->assertSession()->pageTextNotContains($nodes[2]->label());
 
     $this->submitForm(['field_views_testing_tags_target_id' => 2], 'Apply');
-    $this->assertSession()->pageTextContains($nodes[1]->getTitle());
-    $this->assertSession()->pageTextContains($nodes[2]->getTitle());
-    $this->assertSession()->pageTextNotContains($nodes[0]->getTitle());
+    $this->assertSession()->pageTextContains($nodes[1]->label());
+    $this->assertSession()->pageTextContains($nodes[2]->label());
+    $this->assertSession()->pageTextNotContains($nodes[0]->label());
 
     $this->submitForm(['field_views_testing_tags_target_id' => 3], 'Apply');
-    $this->assertSession()->pageTextContains($nodes[0]->getTitle());
-    $this->assertSession()->pageTextContains($nodes[2]->getTitle());
-    $this->assertSession()->pageTextNotContains($nodes[1]->getTitle());
+    $this->assertSession()->pageTextContains($nodes[0]->label());
+    $this->assertSession()->pageTextContains($nodes[2]->label());
+    $this->assertSession()->pageTextNotContains($nodes[1]->label());
   }
 
   /**

@@ -35,10 +35,10 @@ class TermDisplayConfigurableTest extends TaxonomyTestBase {
     // Check the taxonomy_term with default non-configurable display.
     $this->drupalGet('test_term_show_entity');
     // Name should be linked to entity and description should be displayed.
-    $assert->pageTextContains($this->term1->getName());
+    $assert->pageTextContains($this->term1->label());
     $assert->linkByHrefExists($this->term1->toUrl()->toString());
     $assert->pageTextContains($this->term1->getDescription());
-    $assert->pageTextContains($this->term2->getName());
+    $assert->pageTextContains($this->term2->label());
     $assert->linkByHrefExists($this->term2->toUrl()->toString());
     $assert->pageTextContains($this->term2->getDescription());
     // The field labels should not be present.
@@ -62,18 +62,18 @@ class TermDisplayConfigurableTest extends TaxonomyTestBase {
     // displayed after the label. It should not be linked to the term.
     $assert->pageTextContains('Name');
     $assert->pageTextNotContains('Description');
-    $assert->pageTextContains($this->term1->getName());
+    $assert->pageTextContains($this->term1->label());
     $assert->linkByHrefNotExists($this->term1->toUrl()->toString());
     $assert->pageTextContains($this->term1->getDescription());
     $assert->elementTextContains('xpath', '//*[@class="views-row"][1]/div/div[1]//p', $this->term1->getDescription());
     $assert->elementTextContains('xpath', '//*[@class="views-row"][1]/div/div[2]/div[1]', 'Name');
-    $assert->elementTextContains('xpath', '//*[@class="views-row"][1]/div/div[2]/div[2]', $this->term1->getName());
-    $assert->pageTextContains($this->term2->getName());
+    $assert->elementTextContains('xpath', '//*[@class="views-row"][1]/div/div[2]/div[2]', $this->term1->label());
+    $assert->pageTextContains($this->term2->label());
     $assert->linkByHrefNotExists($this->term2->toUrl()->toString());
     $assert->pageTextContains($this->term2->getDescription());
     $assert->elementTextContains('xpath', '//*[@class="views-row"][2]/div/div[1]//p', $this->term2->getDescription());
     $assert->elementTextContains('xpath', '//*[@class="views-row"][2]/div/div[2]/div[1]', 'Name');
-    $assert->elementTextContains('xpath', '//*[@class="views-row"][2]/div/div[2]/div[2]', $this->term2->getName());
+    $assert->elementTextContains('xpath', '//*[@class="views-row"][2]/div/div[2]/div[2]', $this->term2->label());
 
     // Remove 'name' field from display.
     $display->removeComponent('name')->save();
@@ -84,10 +84,10 @@ class TermDisplayConfigurableTest extends TaxonomyTestBase {
     $this->drupalGet('test_term_show_entity');
     $assert->pageTextNotContains('Name');
     $assert->pageTextNotContains('Description');
-    $assert->pageTextNotContains($this->term1->getName());
+    $assert->pageTextNotContains($this->term1->label());
     $assert->linkByHrefNotExists($this->term1->toUrl()->toString());
     $assert->pageTextContains($this->term1->getDescription());
-    $assert->pageTextNotContains($this->term2->getName());
+    $assert->pageTextNotContains($this->term2->label());
     $assert->linkByHrefNotExists($this->term2->toUrl()->toString());
     $assert->pageTextContains($this->term2->getDescription());
   }

@@ -262,7 +262,7 @@ abstract class AddFormBase extends FormBase implements BaseFormIdInterface, Trus
 
     $element = [
       '#wrapper_attributes' => [
-        'aria-label' => $media->getName(),
+        'aria-label' => $media->label(),
         // Add the tabindex '-1' to allow the focus to be shifted to the next
         // media item when an item is removed. We set focus to the container
         // because a media item does not necessarily have required fields and we
@@ -291,12 +291,12 @@ abstract class AddFormBase extends FormBase implements BaseFormIdInterface, Trus
         '#name' => 'media-' . $delta . '-remove-button' . $id_suffix,
         '#weight' => 30,
         '#attributes' => [
-          'aria-label' => $this->t('Remove @label', ['@label' => $media->getName()]),
+          'aria-label' => $this->t('Remove @label', ['@label' => $media->label()]),
         ],
         '#ajax' => [
           'callback' => '::updateFormCallback',
           'wrapper' => 'media-library-add-form-wrapper',
-          'message' => $this->t('Removing @label.', ['@label' => $media->getName()]),
+          'message' => $this->t('Removing @label.', ['@label' => $media->label()]),
         ],
         '#submit' => ['::removeButtonSubmit'],
         // Ensure errors in other media items do not prevent removal.
@@ -322,7 +322,7 @@ abstract class AddFormBase extends FormBase implements BaseFormIdInterface, Trus
       $element['fields']['name'] = [
         '#type' => 'item',
         '#title' => $this->t('Name'),
-        '#markup' => $media->getName(),
+        '#markup' => $media->label(),
       ];
     }
     $form_display->buildForm($media, $element['fields'], $form_state);

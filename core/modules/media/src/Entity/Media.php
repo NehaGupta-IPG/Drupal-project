@@ -111,6 +111,14 @@ class Media extends EditorialContentEntityBase implements MediaInterface {
    * {@inheritdoc}
    */
   public function getName() {
+    @trigger_error(__METHOD__ . '() is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Use \Drupal\media\Entity\Media::label() instead. See https://www.drupal.org/node/3085319', E_USER_DEPRECATED);
+    return $this->label();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function label() {
     $name = $this->getEntityKey('label');
 
     if (empty($name)) {
@@ -119,13 +127,6 @@ class Media extends EditorialContentEntityBase implements MediaInterface {
     }
 
     return $name;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function label() {
-    return $this->getName();
   }
 
   /**
@@ -455,7 +456,7 @@ class Media extends EditorialContentEntityBase implements MediaInterface {
 
         // Try to set a default name for this media item if no name is provided.
         if ($translation->get('name')->isEmpty()) {
-          $translation->setName($translation->getName());
+          $translation->setName($translation->label());
         }
 
         // Set thumbnail.

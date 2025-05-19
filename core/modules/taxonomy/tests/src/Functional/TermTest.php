@@ -155,27 +155,27 @@ class TermTest extends TaxonomyTestBase {
 
     // Get Page 1. Parent term and terms 1-13 are displayed.
     $this->drupalGet('admin/structure/taxonomy/manage/' . $this->vocabulary->id() . '/overview');
-    $this->assertSession()->pageTextContains($term1->getName());
+    $this->assertSession()->pageTextContains($term1->label());
     for ($x = 1; $x <= 13; $x++) {
-      $this->assertSession()->pageTextContains($terms_array[$x]->getName());
+      $this->assertSession()->pageTextContains($terms_array[$x]->label());
     }
 
     // Get Page 2. Parent term and terms 1-18 are displayed.
     $this->drupalGet('admin/structure/taxonomy/manage/' . $this->vocabulary->id() . '/overview', ['query' => ['page' => 1]]);
-    $this->assertSession()->pageTextContains($term1->getName());
+    $this->assertSession()->pageTextContains($term1->label());
     for ($x = 1; $x <= 18; $x++) {
-      $this->assertSession()->pageTextContains($terms_array[$x]->getName());
+      $this->assertSession()->pageTextContains($terms_array[$x]->label());
     }
 
     // Get Page 3. No parent term and no terms <18 are displayed. Terms 18-25
     // are displayed.
     $this->drupalGet('admin/structure/taxonomy/manage/' . $this->vocabulary->id() . '/overview', ['query' => ['page' => 2]]);
-    $this->assertSession()->pageTextNotContains($term1->getName());
+    $this->assertSession()->pageTextNotContains($term1->label());
     for ($x = 1; $x <= 17; $x++) {
-      $this->assertSession()->pageTextNotContains($terms_array[$x]->getName());
+      $this->assertSession()->pageTextNotContains($terms_array[$x]->label());
     }
     for ($x = 18; $x <= 25; $x++) {
-      $this->assertSession()->pageTextContains($terms_array[$x]->getName());
+      $this->assertSession()->pageTextContains($terms_array[$x]->label());
     }
   }
 
@@ -265,13 +265,13 @@ class TermTest extends TaxonomyTestBase {
 
     // Verify that the terms appear on the node page after the two terms were
     // deleted.
-    $term_names = [$term_objects['term3']->getName(), $term_objects['term4']->getName()];
+    $term_names = [$term_objects['term3']->label(), $term_objects['term4']->label()];
     $this->drupalGet('node/' . $node->id());
     foreach ($term_names as $term_name) {
       $this->assertSession()->pageTextContains($term_name);
     }
-    $this->assertSession()->pageTextNotContains($term_objects['term1']->getName());
-    $this->assertSession()->pageTextNotContains($term_objects['term2']->getName());
+    $this->assertSession()->pageTextNotContains($term_objects['term1']->label());
+    $this->assertSession()->pageTextNotContains($term_objects['term2']->label());
   }
 
   /**
@@ -433,7 +433,7 @@ class TermTest extends TaxonomyTestBase {
 
     // The term appears on the vocab list page.
     $this->drupalGet('admin/structure/taxonomy/manage/' . $this->vocabulary->id() . '/overview');
-    $this->assertSession()->pageTextContains($term->getName());
+    $this->assertSession()->pageTextContains($term->label());
   }
 
   /**
@@ -526,7 +526,7 @@ class TermTest extends TaxonomyTestBase {
     // Check that the term was successfully created.
     $term = $this->reloadTermByName($edit['name[0][value]']);
     $this->assertNotNull($term, 'Term found in database.');
-    $this->assertEquals($edit['name[0][value]'], $term->getName(), 'Term name was successfully saved.');
+    $this->assertEquals($edit['name[0][value]'], $term->label(), 'Term name was successfully saved.');
     $this->assertEquals($edit['description[0][value]'], $term->getDescription(), 'Term description was successfully saved.');
 
     // Check that we have the expected parents.
@@ -655,16 +655,16 @@ class TermTest extends TaxonomyTestBase {
     $edit = [];
     $edit['title[0][value]'] = $this->randomMachineName(8);
     $edit['body[0][value]'] = $this->randomMachineName(16);
-    $edit[$this->field->getName() . '[target_id]'] = $term->getName();
+    $edit[$this->field->getName() . '[target_id]'] = $term->label();
     $this->drupalGet('node/add/article');
     $this->submitForm($edit, 'Save');
 
     // Check that the term is displayed when editing and saving the node with no
     // changes.
     $this->clickLink('Edit');
-    $this->assertSession()->responseContains($term->getName());
+    $this->assertSession()->responseContains($term->label());
     $this->submitForm([], 'Save');
-    $this->assertSession()->responseContains($term->getName());
+    $this->assertSession()->responseContains($term->label());
   }
 
   /**

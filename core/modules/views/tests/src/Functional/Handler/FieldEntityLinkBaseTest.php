@@ -56,7 +56,7 @@ class FieldEntityLinkBaseTest extends ViewTestBase {
       ]);
       $entity->save();
       $translation = $entity->addTranslation('es');
-      $translation->set('title', $entity->getTitle() . ' in Spanish');
+      $translation->set('title', $entity->label() . ' in Spanish');
       $translation->save();
     }
 

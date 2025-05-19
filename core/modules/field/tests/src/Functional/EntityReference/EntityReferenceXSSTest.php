@@ -62,7 +62,7 @@ class EntityReferenceXSSTest extends BrowserTestBase {
       'create article content',
     ]));
     $this->drupalGet('node/add/article');
-    $this->assertSession()->assertEscaped($referenced_node->getTitle());
+    $this->assertSession()->assertEscaped($referenced_node->label());
     $this->assertSession()->assertEscaped($node_type_two->label());
 
     $edit = [
@@ -70,14 +70,14 @@ class EntityReferenceXSSTest extends BrowserTestBase {
       'entity_reference_test' => $referenced_node->id(),
     ];
     $this->submitForm($edit, 'Save');
-    $this->assertSession()->assertEscaped($referenced_node->getTitle());
+    $this->assertSession()->assertEscaped($referenced_node->label());
 
     // Test the options_buttons type.
     EntityFormDisplay::load('node.article.default')
       ->setComponent('entity_reference_test', ['type' => 'options_buttons'])
       ->save();
     $this->drupalGet('node/add/article');
-    $this->assertSession()->assertEscaped($referenced_node->getTitle());
+    $this->assertSession()->assertEscaped($referenced_node->label());
     // options_buttons does not support optgroups.
     $this->assertSession()->pageTextNotContains('bundle with markup');
   }

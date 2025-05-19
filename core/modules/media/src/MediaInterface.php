@@ -18,6 +18,11 @@ interface MediaInterface extends ContentEntityInterface, EntityChangedInterface,
    *
    * @return string
    *   The name of the media item.
+   *
+   * @deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Use
+   *   \Drupal\media\Entity\Media::label() instead
+   *
+   * @see https://www.drupal.org/node/3085319
    */
   public function getName();
 

@@ -66,7 +66,7 @@ class MediaDisplayTest extends MediaJavascriptTestBase {
     $this->drupalGet('media/' . $media->id());
     // Verify the "name" field is really not present. The name should be in the
     // h1 with no additional markup in the h1.
-    $assert_session->elementTextContains('css', 'h1', $media->getName());
+    $assert_session->elementTextContains('css', 'h1', $media->label());
     $assert_session->elementNotExists('css', 'h1 div');
 
     // Enable the field on the display and verify it becomes visible on the UI.
@@ -80,7 +80,7 @@ class MediaDisplayTest extends MediaJavascriptTestBase {
     // Verify the name is present, and its text matches what is expected. Now
     // there should be markup in the h1.
     $assert_session->elementTextContains('xpath', '//h1/div/div[1]', 'Name');
-    $assert_session->elementTextContains('xpath', '//h1/div/div[2]', $media->getName());
+    $assert_session->elementTextContains('xpath', '//h1/div/div[2]', $media->label());
 
     // In the standard profile, there are some pre-cooked types. Make sure the
     // elements configured on their displays are the expected ones.

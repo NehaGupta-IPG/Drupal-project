@@ -161,9 +161,9 @@ class MigrateTaxonomyTermTest extends MigrateDrupal7TestBase {
     $term_is = $term->getTranslation('is');
 
     // Test that fields translated with Entity Translation are migrated.
-    $this->assertSame('Term3 in plain old English', $term->getName());
-    $this->assertSame('Term3 en français s\'il vous plaît', $term_fr->getName());
-    $this->assertSame('Term3 á íslensku', $term_is->getName());
+    $this->assertSame('Term3 in plain old English', $term->label());
+    $this->assertSame('Term3 en français s\'il vous plaît', $term_fr->label());
+    $this->assertSame('Term3 á íslensku', $term_is->label());
     $this->assertSame('The third term in plain old English.', $term->getDescription());
     $this->assertSame('The third term en français s\'il vous plaît.', $term_fr->getDescription());
     $this->assertSame('The third term á íslensku.', $term_is->getDescription());

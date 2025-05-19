@@ -73,27 +73,27 @@ class JsonApiFunctionalMultilingualTest extends JsonApiFunctionalTestBase {
 
     // Test reading an individual entity translation.
     $output = Json::decode($this->drupalGet('/ca/jsonapi/node/article/' . $this->nodes[0]->uuid(), ['query' => ['include' => 'field_tags,field_image'] + $default_sort]));
-    $this->assertEquals($this->nodes[0]->getTranslation('ca')->getTitle(), $output['data']['attributes']['title']);
+    $this->assertEquals($this->nodes[0]->getTranslation('ca')->label(), $output['data']['attributes']['title']);
     $this->assertSame('ca', $output['data']['attributes']['langcode']);
     $included_tags = array_filter($output['included'], function ($entry) {
       return $entry['type'] === 'taxonomy_term--tags';
     });
     $tag_name = $this->nodes[0]->get('field_tags')->entity
-      ->getTranslation('ca')->getName();
+      ->getTranslation('ca')->label();
     $this->assertEquals($tag_name, reset($included_tags)['attributes']['name']);
     $alt = $this->nodes[0]->getTranslation('ca')->get('field_image')->alt;
     $this->assertSame($alt, $output['data']['relationships']['field_image']['data']['meta']['alt']);
 
     // Test reading an individual entity fallback.
     $output = Json::decode($this->drupalGet('/ca-fr/jsonapi/node/article/' . $this->nodes[0]->uuid()));
-    $this->assertEquals($this->nodes[0]->getTranslation('ca')->getTitle(), $output['data']['attributes']['title']);
+    $this->assertEquals($this->nodes[0]->getTranslation('ca')->label(), $output['data']['attributes']['title']);
 
     $output = Json::decode($this->drupalGet('/ca/jsonapi/node/article/' . $this->nodes[0]->uuid(), ['query' => $default_sort]));
-    $this->assertEquals($this->nodes[0]->getTranslation('ca')->getTitle(), $output['data']['attributes']['title']);
+    $this->assertEquals($this->nodes[0]->getTranslation('ca')->label(), $output['data']['attributes']['title']);
 
     // Test reading a collection of entities.
     $output = Json::decode($this->drupalGet('/ca/jsonapi/node/article', ['query' => $default_sort]));
-    $this->assertEquals($this->nodes[0]->getTranslation('ca')->getTitle(), $output['data'][0]['attributes']['title']);
+    $this->assertEquals($this->nodes[0]->getTranslation('ca')->label(), $output['data'][0]['attributes']['title']);
   }
 
   /**
@@ -109,8 +109,8 @@ class JsonApiFunctionalMultilingualTest extends JsonApiFunctionalTestBase {
     $document_ca = Json::decode($this->drupalGet('/ca/jsonapi/node/article/' . $uuid));
     $this->assertSame('en', $document['data']['attributes']['langcode']);
     $this->assertSame('ca', $document_ca['data']['attributes']['langcode']);
-    $this->assertSame($node->getTitle(), $document['data']['attributes']['title']);
-    $this->assertSame($node->getTitle() . ' (ca)', $document_ca['data']['attributes']['title']);
+    $this->assertSame($node->label(), $document['data']['attributes']['title']);
+    $this->assertSame($node->label() . ' (ca)', $document_ca['data']['attributes']['title']);
 
     // PATCH the 'ca' translation.
     $this->grantPermissions(Role::load(RoleInterface::ANONYMOUS_ID), [
@@ -135,8 +135,8 @@ class JsonApiFunctionalMultilingualTest extends JsonApiFunctionalTestBase {
     $document_ca_updated = Json::decode($this->drupalGet('/ca/jsonapi/node/article/' . $uuid));
     $this->assertSame('en', $document_updated['data']['attributes']['langcode']);
     $this->assertSame('ca', $document_ca_updated['data']['attributes']['langcode']);
-    $this->assertSame($node->getTitle(), $document_updated['data']['attributes']['title']);
-    $this->assertSame($node->getTitle() . ' (ca) UPDATED', $document_ca_updated['data']['attributes']['title']);
+    $this->assertSame($node->label(), $document_updated['data']['attributes']['title']);
+    $this->assertSame($node->label() . ' (ca) UPDATED', $document_ca_updated['data']['attributes']['title']);
 
     // Specifying a langcode is not allowed by default.
     $request_options[RequestOptions::BODY] = Json::encode([
@@ -167,12 +167,12 @@ class JsonApiFunctionalMultilingualTest extends JsonApiFunctionalTestBase {
     $response = $this->request('GET', Url::fromUri('base:/jsonapi/node/article/' . $this->nodes[0]->uuid()), $request_options);
     $document = $this->getDocumentFromResponse($response);
     $this->assertSame(200, $response->getStatusCode());
-    $this->assertSame($node->getTitle(), $document['data']['attributes']['title']);
+    $this->assertSame($node->label(), $document['data']['attributes']['title']);
     $this->assertSame('en', $document['data']['attributes']['langcode']);
     $response = $this->request('PATCH', Url::fromUri('base:/jsonapi/node/article/' . $this->nodes[0]->uuid()), $request_options);
     $document = $this->getDocumentFromResponse($response);
     $this->assertSame(200, $response->getStatusCode());
-    $this->assertSame($node->getTitle(), $document['data']['attributes']['title']);
+    $this->assertSame($node->label(), $document['data']['attributes']['title']);
     $this->assertSame('ca-fr', $document['data']['attributes']['langcode']);
 
     // Finally: assert the postcondition of all installed languages.
@@ -181,18 +181,18 @@ class JsonApiFunctionalMultilingualTest extends JsonApiFunctionalTestBase {
     $response = $this->request('GET', Url::fromUri('base:/jsonapi/node/article/' . $this->nodes[0]->uuid()), $request_options);
     $document = $this->getDocumentFromResponse($response);
     $this->assertSame('ca-fr', $document['data']['attributes']['langcode']);
-    $this->assertSame($node->getTitle(), $document['data']['attributes']['title']);
+    $this->assertSame($node->label(), $document['data']['attributes']['title']);
     // - When GETting the 'ca' translation, we still get the 'ca' one.
     $response = $this->request('GET', Url::fromUri('base:/ca/jsonapi/node/article/' . $this->nodes[0]->uuid()), $request_options);
     $document = $this->getDocumentFromResponse($response);
     $this->assertSame('ca', $document['data']['attributes']['langcode']);
-    $this->assertSame($node->getTitle() . ' (ca) UPDATED', $document['data']['attributes']['title']);
+    $this->assertSame($node->label() . ' (ca) UPDATED', $document['data']['attributes']['title']);
     // - When GETting the 'ca-fr' translation, we now get the default
     //   translation.
     $response = $this->request('GET', Url::fromUri('base:/ca-fr/jsonapi/node/article/' . $this->nodes[0]->uuid()), $request_options);
     $document = $this->getDocumentFromResponse($response);
     $this->assertSame('ca-fr', $document['data']['attributes']['langcode']);
-    $this->assertSame($node->getTitle(), $document['data']['attributes']['title']);
+    $this->assertSame($node->label(), $document['data']['attributes']['title']);
   }
 
   /**
@@ -211,9 +211,9 @@ class JsonApiFunctionalMultilingualTest extends JsonApiFunctionalTestBase {
     $this->assertSame('en', $document['data']['attributes']['langcode']);
     $this->assertSame('ca', $document_ca['data']['attributes']['langcode']);
     $this->assertSame('ca', $document_ca_fr['data']['attributes']['langcode']);
-    $this->assertSame($node->getTitle(), $document['data']['attributes']['title']);
-    $this->assertSame($node->getTitle() . ' (ca)', $document_ca['data']['attributes']['title']);
-    $this->assertSame($node->getTitle() . ' (ca)', $document_ca_fr['data']['attributes']['title']);
+    $this->assertSame($node->label(), $document['data']['attributes']['title']);
+    $this->assertSame($node->label() . ' (ca)', $document_ca['data']['attributes']['title']);
+    $this->assertSame($node->label() . ' (ca)', $document_ca_fr['data']['attributes']['title']);
 
     // PATCH the 'ca-fr' translation.
     $this->grantPermissions(Role::load(RoleInterface::ANONYMOUS_ID), [

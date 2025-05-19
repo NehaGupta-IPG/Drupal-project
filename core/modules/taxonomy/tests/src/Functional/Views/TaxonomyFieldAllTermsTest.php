@@ -58,13 +58,13 @@ class TaxonomyFieldAllTermsTest extends TaxonomyTestBase {
     $this->drupalGet('taxonomy_all_terms_token_test');
 
     // Term itself: {{ term_node_tid }}.
-    $this->assertSession()->pageTextContains('Term: ' . $this->term1->getName());
+    $this->assertSession()->pageTextContains('Term: ' . $this->term1->label());
 
     // The taxonomy term ID for the term: {{ term_node_tid__tid }}.
     $this->assertSession()->pageTextContains('The taxonomy term ID for the term: ' . $this->term1->id());
 
     // The taxonomy term name for the term: {{ term_node_tid__name }}.
-    $this->assertSession()->pageTextContains('The taxonomy term name for the term: ' . $this->term1->getName());
+    $this->assertSession()->pageTextContains('The taxonomy term name for the term: ' . $this->term1->label());
 
     // The machine name for the vocabulary the term belongs to:
     // {{ term_node_tid__vocabulary_vid }}.

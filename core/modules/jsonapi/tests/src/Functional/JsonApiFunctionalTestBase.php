@@ -274,7 +274,7 @@ abstract class JsonApiFunctionalTestBase extends BrowserTestBase {
       ]);
 
       if ($is_multilingual) {
-        $term->addTranslation('ca', ['name' => $term->getName() . ' (ca)']);
+        $term->addTranslation('ca', ['name' => $term->label() . ' (ca)']);
       }
 
       $term->save();
@@ -335,7 +335,7 @@ abstract class JsonApiFunctionalTestBase extends BrowserTestBase {
       $node = $this->createNode($values);
 
       if ($is_multilingual === static::IS_MULTILINGUAL) {
-        $values['title'] = $node->getTitle() . ' (ca)';
+        $values['title'] = $node->label() . ' (ca)';
         $values['field_image']['alt'] = 'alt text (ca)';
         $node->addTranslation('ca', $values);
       }

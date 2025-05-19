@@ -129,15 +129,15 @@ class NodeTestHooks {
    */
   #[Hook('node_presave')]
   public function nodePresave(NodeInterface $node): void {
-    if ($node->getTitle() == 'testing_node_presave') {
+    if ($node->label() == 'testing_node_presave') {
       // Sun, 19 Nov 1978 05:00:00 GMT
       $node->setCreatedTime(280299600);
       // Drupal 1.0 release.
       $node->changed = 979534800;
     }
     // Determine changes.
-    if ($node->getOriginal()?->getTitle() == 'test_changes') {
-      if ($node->getOriginal()->getTitle() != $node->getTitle()) {
+    if ($node->getOriginal()?->label() == 'test_changes') {
+      if ($node->getOriginal()->label() != $node->label()) {
         $node->title->value .= '_presave';
       }
     }
@@ -149,8 +149,8 @@ class NodeTestHooks {
   #[Hook('node_update')]
   public function nodeUpdate(NodeInterface $node): void {
     // Determine changes on update.
-    if ($node->getOriginal()?->getTitle() == 'test_changes') {
-      if ($node->getOriginal()->getTitle() != $node->getTitle()) {
+    if ($node->getOriginal()?->label() == 'test_changes') {
+      if ($node->getOriginal()->label() != $node->label()) {
         $node->title->value .= '_update';
       }
     }
@@ -178,7 +178,7 @@ class NodeTestHooks {
   #[Hook('node_insert')]
   public function nodeInsert(NodeInterface $node): void {
     // Set the node title to the node ID and save.
-    if ($node->getTitle() == 'new') {
+    if ($node->label() == 'new') {
       $node->setTitle('Node ' . $node->id());
       $node->setNewRevision(FALSE);
       $node->save();

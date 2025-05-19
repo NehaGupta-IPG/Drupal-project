@@ -395,8 +395,8 @@ class PathAliasTest extends PathTestBase {
     // using \Drupal\Tests\BrowserTestBase::assertSession()->addressEquals()
     // would actually make the test pass unconditionally on the testbot (or
     // anywhere else where Drupal is installed in a subdirectory).
-    $this->assertSession()->elementAttributeContains('xpath', "//a[normalize-space(text())='{$node6->getTitle()}']", 'href', base_path() . $alias);
-    $this->clickLink($node6->getTitle());
+    $this->assertSession()->elementAttributeContains('xpath', "//a[normalize-space(text())='{$node6->label()}']", 'href', base_path() . $alias);
+    $this->clickLink($node6->label());
     $this->assertSession()->statusCodeEquals(404);
   }
 

@@ -63,7 +63,7 @@ class NavigationTopBarContentModerationTest extends ModerationStateTestBase {
 
     // Publish a new draft.
     $this->node->setNewRevision(TRUE);
-    $this->node->setTitle($this->node->getTitle() . ' - draft');
+    $this->node->setTitle($this->node->label() . ' - draft');
     $this->node->moderation_state->value = 'draft';
     $this->node->save();
 

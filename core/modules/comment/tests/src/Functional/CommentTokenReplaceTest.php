@@ -94,10 +94,10 @@ class CommentTokenReplaceTest extends CommentTestBase {
     $tests['[comment:parent:cid]'] = $comment->hasParentComment() ? $comment->getParentComment()->id() : NULL;
     $tests['[comment:parent:uuid]'] = $comment->hasParentComment() ? $comment->getParentComment()->uuid() : NULL;
     $tests['[comment:parent:title]'] = $parent_comment->getSubject();
-    $tests['[comment:entity]'] = Html::escape($node->getTitle());
+    $tests['[comment:entity]'] = Html::escape($node->label());
     // Test node specific tokens.
     $tests['[comment:entity:nid]'] = $comment->getCommentedEntityId();
-    $tests['[comment:entity:title]'] = Html::escape($node->getTitle());
+    $tests['[comment:entity:title]'] = Html::escape($node->label());
     $tests['[comment:author:uid]'] = $comment->getOwnerId();
     $tests['[comment:author:name]'] = Html::escape($this->adminUser->getDisplayName());
 

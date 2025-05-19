@@ -69,20 +69,20 @@ class MonthDatePluginTest extends ViewTestBase {
     // Test fallback value.
     $this->drupalGet('test-month-date-plugin');
     $assert_session->statusCodeEquals(200);
-    $assert_session->pageTextContains($this->node1->getTitle());
-    $assert_session->pageTextContains($this->node2->getTitle());
+    $assert_session->pageTextContains($this->node1->label());
+    $assert_session->pageTextContains($this->node2->label());
 
     // Test 'all' values.
     $this->drupalGet('test-month-date-plugin/all');
     $assert_session->statusCodeEquals(200);
-    $assert_session->pageTextContains($this->node1->getTitle());
-    $assert_session->pageTextContains($this->node2->getTitle());
+    $assert_session->pageTextContains($this->node1->label());
+    $assert_session->pageTextContains($this->node2->label());
 
     // Test valid month value.
     $this->drupalGet('test-month-date-plugin/10');
     $assert_session->statusCodeEquals(200);
-    $assert_session->pageTextContains($this->node1->getTitle());
-    $assert_session->pageTextNotContains($this->node2->getTitle());
+    $assert_session->pageTextContains($this->node1->label());
+    $assert_session->pageTextNotContains($this->node2->label());
 
     // Test query parameter.
     $url = Url::fromUserInput('/test-month-date-plugin', [
@@ -92,14 +92,14 @@ class MonthDatePluginTest extends ViewTestBase {
     ]);
     $this->drupalGet($url);
     $assert_session->statusCodeEquals(200);
-    $assert_session->pageTextContains($this->node1->getTitle());
-    $assert_session->pageTextNotContains($this->node2->getTitle());
+    $assert_session->pageTextContains($this->node1->label());
+    $assert_session->pageTextNotContains($this->node2->label());
 
     // Test invalid month name.
     $this->drupalGet('test-month-date-plugin/invalid-month');
     $assert_session->statusCodeEquals(200);
-    $assert_session->pageTextNotContains($this->node1->getTitle());
-    $assert_session->pageTextNotContains($this->node2->getTitle());
+    $assert_session->pageTextNotContains($this->node1->label());
+    $assert_session->pageTextNotContains($this->node2->label());
   }
 
 }

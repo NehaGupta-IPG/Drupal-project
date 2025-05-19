@@ -2280,7 +2280,7 @@ function hook_mail($key, &$message, $params): void {
       '%uid' => $node->getOwnerId(),
       '%url' => $node->toUrl('canonical', ['absolute' => TRUE])->toString(),
       '%node_type' => node_get_type_label($node),
-      '%title' => $node->getTitle(),
+      '%title' => $node->label(),
       '%teaser' => $node->teaser,
       '%body' => $node->body,
     ];

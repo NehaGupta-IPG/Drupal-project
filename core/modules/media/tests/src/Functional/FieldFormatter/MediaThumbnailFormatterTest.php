@@ -86,7 +86,7 @@ class MediaThumbnailFormatterTest extends MediaFunctionalTestBase {
     $edit = [
       'title[0][value]' => $title,
     ];
-    $edit['field_media_reference[0][target_id]'] = $mediaImage->getName();
+    $edit['field_media_reference[0][target_id]'] = $mediaImage->label();
     $this->drupalGet('node/add/article');
     $this->submitForm($edit, 'Save');
 

@@ -217,7 +217,7 @@ class ShortcutLinksTest extends ShortcutTestBase {
 
     $this->config('system.theme')->set('default', 'claro')->save();
     $this->drupalGet('node/' . $this->node->id());
-    $title = $this->node->getTitle();
+    $title = $this->node->label();
 
     // Test the "Add to shortcuts" link for node view route.
     $this->clickLink('Add to Default shortcuts');

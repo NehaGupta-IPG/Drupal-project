@@ -75,7 +75,7 @@ class TermBreadcrumbBuilder implements BreadcrumbBuilderInterface {
     foreach (array_reverse($parents) as $term) {
       $term = $this->entityRepository->getTranslationFromContext($term);
       $breadcrumb->addCacheableDependency($term);
-      $breadcrumb->addLink(Link::createFromRoute($term->getName(), 'entity.taxonomy_term.canonical', ['taxonomy_term' => $term->id()]));
+      $breadcrumb->addLink(Link::createFromRoute($term->label(), 'entity.taxonomy_term.canonical', ['taxonomy_term' => $term->id()]));
     }
 
     // @todo Remove in Drupal 12.0.0, will be added from ::applies(). See

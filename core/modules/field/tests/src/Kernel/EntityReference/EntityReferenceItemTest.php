@@ -142,7 +142,7 @@ class EntityReferenceItemTest extends FieldKernelTestBase {
     $this->assertInstanceOf(FieldItemListInterface::class, $entity->field_test_taxonomy_term);
     $this->assertInstanceOf(FieldItemInterface::class, $entity->field_test_taxonomy_term[0]);
     $this->assertEquals($tid, $entity->field_test_taxonomy_term->target_id);
-    $this->assertEquals($this->term->getName(), $entity->field_test_taxonomy_term->entity->getName());
+    $this->assertEquals($this->term->label(), $entity->field_test_taxonomy_term->entity->label());
     $this->assertEquals($tid, $entity->field_test_taxonomy_term->entity->id());
     $this->assertEquals($this->term->uuid(), $entity->field_test_taxonomy_term->entity->uuid());
     // Verify that the label for the target ID property definition is correct.
@@ -156,7 +156,7 @@ class EntityReferenceItemTest extends FieldKernelTestBase {
     $entity->field_test_taxonomy_term->entity->save();
     // Verify it is the correct name.
     $term = Term::load($tid);
-    $this->assertEquals($new_name, $term->getName());
+    $this->assertEquals($new_name, $term->label());
 
     // Make sure the computed term reflects updates to the term id.
     $term2 = Term::create([
@@ -169,20 +169,20 @@ class EntityReferenceItemTest extends FieldKernelTestBase {
     // Test all the possible ways of assigning a value.
     $entity->field_test_taxonomy_term->target_id = $term->id();
     $this->assertEquals($term->id(), $entity->field_test_taxonomy_term->entity->id());
-    $this->assertEquals($term->getName(), $entity->field_test_taxonomy_term->entity->getName());
+    $this->assertEquals($term->label(), $entity->field_test_taxonomy_term->entity->label());
 
     $entity->field_test_taxonomy_term = [['target_id' => $term2->id()]];
     $this->assertEquals($term2->id(), $entity->field_test_taxonomy_term->entity->id());
-    $this->assertEquals($term2->getName(), $entity->field_test_taxonomy_term->entity->getName());
+    $this->assertEquals($term2->label(), $entity->field_test_taxonomy_term->entity->label());
 
     // Test value assignment via the computed 'entity' property.
     $entity->field_test_taxonomy_term->entity = $term;
     $this->assertEquals($term->id(), $entity->field_test_taxonomy_term->target_id);
-    $this->assertEquals($term->getName(), $entity->field_test_taxonomy_term->entity->getName());
+    $this->assertEquals($term->label(), $entity->field_test_taxonomy_term->entity->label());
 
     $entity->field_test_taxonomy_term = [['entity' => $term2]];
     $this->assertEquals($term2->id(), $entity->field_test_taxonomy_term->target_id);
-    $this->assertEquals($term2->getName(), $entity->field_test_taxonomy_term->entity->getName());
+    $this->assertEquals($term2->label(), $entity->field_test_taxonomy_term->entity->label());
 
     // Test assigning an invalid item throws an exception.
     try {

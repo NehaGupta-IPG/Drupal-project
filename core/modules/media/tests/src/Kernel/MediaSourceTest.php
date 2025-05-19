@@ -100,10 +100,14 @@ class MediaSourceTest extends MediaKernelTestBase {
     $media_source = $media->getSource();
     $this->assertSame('default_name', $media_source->getPluginDefinition()['default_name_metadata_attribute'], 'Default metadata attribute is not used for the default name.');
     $this->assertSame('media:' . $media->bundle() . ':' . $media->uuid(), $media_source->getMetadata($media, 'default_name'), 'Value of the default name metadata attribute does not look correct.');
+    // @phpstan-ignore-next-line
     $this->assertSame('media:' . $media->bundle() . ':' . $media->uuid(), $media->getName(), 'Default name was not used correctly by getName().');
+    // @phpstan-ignore-next-line
     $this->assertSame($media->getName(), $media->label(), 'Default name and label are not the same.');
     $media->save();
+    // @phpstan-ignore-next-line
     $this->assertSame('media:' . $media->bundle() . ':' . $media->uuid(), $media->getName(), 'Default name was not saved correctly.');
+    // @phpstan-ignore-next-line
     $this->assertSame($media->getName(), $media->label(), 'The label changed during save.');
 
     // Make sure that the user-supplied name is used.
@@ -117,7 +121,9 @@ class MediaSourceTest extends MediaKernelTestBase {
     $this->assertSame('default_name', $media_source->getPluginDefinition()['default_name_metadata_attribute'], 'Default metadata attribute is not used for the default name.');
     $this->assertSame('media:' . $media->bundle() . ':' . $media->uuid(), $media_source->getMetadata($media, 'default_name'), 'Value of the default name metadata attribute does not look correct.');
     $media->save();
+    // @phpstan-ignore-next-line
     $this->assertSame($name, $media->getName(), 'User-supplied name was not set correctly.');
+    // @phpstan-ignore-next-line
     $this->assertSame($media->getName(), $media->label(), 'The user-supplied name does not match the label.');
 
     // Change the default name attribute and see if it is used to set the name.
@@ -132,7 +138,9 @@ class MediaSourceTest extends MediaKernelTestBase {
     $this->assertSame('alternative_name', $media_source->getPluginDefinition()['default_name_metadata_attribute'], 'Correct metadata attribute is not used for the default name.');
     $this->assertSame($name, $media_source->getMetadata($media, 'alternative_name'), 'Value of the default name metadata attribute does not look correct.');
     $media->save();
+    // @phpstan-ignore-next-line
     $this->assertSame($name, $media->getName(), 'Default name was not set correctly.');
+    // @phpstan-ignore-next-line
     $this->assertSame($media->getName(), $media->label(), 'The default name does not match the label.');
   }
 
@@ -380,7 +388,7 @@ class MediaSourceTest extends MediaKernelTestBase {
       'field_media_test' => 'some_value',
     ]);
     $media->save();
-    $this->assertSame('Boxer', $media->getName(), 'Correct name was not set on the media item.');
+    $this->assertSame('Boxer', $media->label(), 'Correct name was not set on the media item.');
     $this->assertEmpty($media->thumbnail->title);
     $this->assertSame('This will be alt.', $media->thumbnail->alt);
   }
@@ -418,7 +426,7 @@ class MediaSourceTest extends MediaKernelTestBase {
     $this->assertEmpty($media->id(), 'Entity ID was found.');
     $media->save();
     $this->assertNotEmpty($media->id(), 'Entity ID was not found.');
-    $this->assertSame($media->getName(), 'I love Drupal!');
+    $this->assertSame($media->label(), 'I love Drupal!');
 
     // Test source field constraints.
     \Drupal::state()->set('media_source_test_field_constraints', [

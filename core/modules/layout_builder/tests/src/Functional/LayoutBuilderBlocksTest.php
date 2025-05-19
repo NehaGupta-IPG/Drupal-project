@@ -172,7 +172,7 @@ class LayoutBuilderBlocksTest extends LayoutBuilderTestBase {
     View::load('test_block_view')->delete();
     $this->drupalGet('node/1');
     // Node can be loaded after deleting the View.
-    $assert_session->pageTextContains(Node::load(1)->getTitle());
+    $assert_session->pageTextContains(Node::load(1)->label());
     $assert_session->pageTextNotContains('Test Block View');
   }
 

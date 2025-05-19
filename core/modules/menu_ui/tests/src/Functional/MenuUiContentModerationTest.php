@@ -223,7 +223,7 @@ class MenuUiContentModerationTest extends BrowserTestBase {
     // for users with access to the node.
     $node = $this->drupalGetNodeByTitle($node_title);
     $this->assertTrue($node->access('view', $editor_with_unpublished_content_access));
-    $this->assertEquals($edit['title[0][value]'], $node->getTitle());
+    $this->assertEquals($edit['title[0][value]'], $node->label());
     $this->drupalGet('node/add/page');
     $link_id = menu_ui_get_menu_link_defaults($node)['entity_id'];
     /** @var \Drupal\menu_link_content\Entity\MenuLinkContent $link */

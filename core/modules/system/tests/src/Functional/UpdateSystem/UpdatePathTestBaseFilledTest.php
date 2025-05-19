@@ -57,7 +57,7 @@ class UpdatePathTestBaseFilledTest extends UpdatePathTestBase {
       $node = Node::load($id);
       $this->assertEquals($langcode, $node->language()->getId());
       $this->assertEquals($type, $node->getType());
-      $this->assertEquals($title, $node->getTitle());
+      $this->assertEquals($title, $node->label());
       // Assert that nodes are all published.
       $this->assertTrue($node->isPublished());
       $this->drupalGet('node/' . $id);
@@ -66,7 +66,7 @@ class UpdatePathTestBaseFilledTest extends UpdatePathTestBase {
 
     // Make sure the translated node still exists.
     $translation = Node::load(8)->getTranslation('es');
-    $this->assertEquals('Test title Spanish', $translation->getTitle());
+    $this->assertEquals('Test title Spanish', $translation->label());
 
     // Make sure our alias still works.
     $this->drupalGet('test-article');

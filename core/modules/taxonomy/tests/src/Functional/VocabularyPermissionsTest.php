@@ -333,7 +333,7 @@ class VocabularyPermissionsTest extends TaxonomyTestBase {
     // Edit the term.
     $this->drupalGet('taxonomy/term/' . $term->id() . '/edit');
     $this->assertSession()->statusCodeEquals(200);
-    $this->assertSession()->pageTextContains($term->getName());
+    $this->assertSession()->pageTextContains($term->label());
 
     $edit['name[0][value]'] = $this->randomMachineName();
     $this->submitForm($edit, 'Save');
@@ -363,11 +363,11 @@ class VocabularyPermissionsTest extends TaxonomyTestBase {
 
     // Delete the vocabulary.
     $this->drupalGet('taxonomy/term/' . $term->id() . '/delete');
-    $this->assertSession()->pageTextContains("Are you sure you want to delete the taxonomy term {$term->getName()}?");
+    $this->assertSession()->pageTextContains("Are you sure you want to delete the taxonomy term {$term->label()}?");
 
     // Confirm deletion.
     $this->submitForm([], 'Delete');
-    $this->assertSession()->pageTextContains("Deleted term {$term->getName()}.");
+    $this->assertSession()->pageTextContains("Deleted term {$term->label()}.");
 
     // Test as user without proper permissions.
     $user = $this->drupalCreateUser();

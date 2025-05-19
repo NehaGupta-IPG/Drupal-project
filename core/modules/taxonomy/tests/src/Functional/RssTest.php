@@ -108,7 +108,7 @@ class RssTest extends TaxonomyTestBase {
     $test_element = sprintf(
       '<category %s>%s</category>',
       'domain="' . $term1->toUrl('canonical', ['absolute' => TRUE])->toString() . '"',
-      $term1->getName()
+      $term1->label()
     );
     $this->assertSession()->responseContains($test_element);
 

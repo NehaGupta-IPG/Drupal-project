@@ -164,7 +164,7 @@ class SearchPageCacheTagsTest extends BrowserTestBase {
     // reference field.
     $edit = [
       'title[0][value]' => 'Llama shop',
-      'field_test__ref[0][target_id]' => $this->node->getTitle(),
+      'field_test__ref[0][target_id]' => $this->node->label(),
     ];
     $this->drupalGet('node/add/' . $type->id());
     $this->submitForm($edit, 'Save');

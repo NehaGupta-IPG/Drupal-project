@@ -118,7 +118,7 @@ class TokenReplaceTest extends KernelTestBase {
     $tests = [];
     $tests['[term:tid]'] = $term1->id();
     $tests['[term:uuid]'] = $term1->uuid();
-    $tests['[term:name]'] = $term1->getName();
+    $tests['[term:name]'] = $term1->label();
     $tests['[term:description]'] = $term1->description->processed;
     $tests['[term:url]'] = $term1->toUrl('canonical', ['absolute' => TRUE])->toString();
     $tests['[term:node-count]'] = 0;
@@ -156,11 +156,11 @@ class TokenReplaceTest extends KernelTestBase {
     $tests = [];
     $tests['[term:tid]'] = $term2->id();
     $tests['[term:uuid]'] = $term2->uuid();
-    $tests['[term:name]'] = $term2->getName();
+    $tests['[term:name]'] = $term2->label();
     $tests['[term:description]'] = $term2->description->processed;
     $tests['[term:url]'] = $term2->toUrl('canonical', ['absolute' => TRUE])->toString();
     $tests['[term:node-count]'] = 1;
-    $tests['[term:parent:name]'] = $term1->getName();
+    $tests['[term:parent:name]'] = $term1->label();
     $tests['[term:parent:url]'] = $term1->toUrl('canonical', ['absolute' => TRUE])->toString();
     $tests['[term:parent:parent:name]'] = '[term:parent:parent:name]';
     $tests['[term:changed:since]'] = $date_formatter->formatTimeDiffSince($term2->getChangedTime(), ['langcode' => $language_interface->getId()]);

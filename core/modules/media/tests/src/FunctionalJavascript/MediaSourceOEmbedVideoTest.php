@@ -161,7 +161,7 @@ class MediaSourceOEmbedVideoTest extends MediaSourceTestBase {
 
     // Load the media and check that all fields are properly populated.
     $media = Media::load(1);
-    $this->assertSame('Drupal Rap Video - Schipulcon09', $media->getName());
+    $this->assertSame('Drupal Rap Video - Schipulcon09', $media->label());
     $this->assertSame('480', $media->field_string_width->value);
     $this->assertSame('360', $media->field_string_height->value);
 

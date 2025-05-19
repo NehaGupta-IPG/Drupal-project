@@ -204,7 +204,7 @@ class PagePreviewTest extends NodeTestBase {
     $edit = [];
     $edit[$title_key] = '<em>' . $this->randomMachineName(8) . '</em>';
     $edit[$body_key] = $this->randomMachineName(16);
-    $edit[$term_key] = $this->term->getName();
+    $edit[$term_key] = $this->term->label();
 
     // Upload an image.
     $test_image = current($this->drupalGetTestFiles('image', 39325));
@@ -288,13 +288,13 @@ class PagePreviewTest extends NodeTestBase {
     $edit = [];
     $new_term1 = $this->randomMachineName(8);
     $new_term2 = $this->randomMachineName(8);
-    $edit[$term_key] = $this->term->getName() . ', ' . $new_term1 . ', ' . $new_term2;
+    $edit[$term_key] = $this->term->label() . ', ' . $new_term1 . ', ' . $new_term2;
     $this->drupalGet('node/' . $node->id() . '/edit');
     $this->submitForm($edit, 'Preview');
     $this->assertSession()->responseContains('>' . $new_term1 . '<');
     $this->assertSession()->responseContains('>' . $new_term2 . '<');
     // The first term should be displayed as link, the others not.
-    $this->assertSession()->linkExists($this->term->getName());
+    $this->assertSession()->linkExists($this->term->label());
     $this->assertSession()->linkNotExists($new_term1);
     $this->assertSession()->linkNotExists($new_term2);
 
@@ -311,7 +311,7 @@ class PagePreviewTest extends NodeTestBase {
     $this->assertSession()->responseContains('>' . $new_term1 . '<');
     $this->assertSession()->responseContains('>' . $new_term2 . '<');
     $this->assertSession()->responseContains('>' . $new_term3 . '<');
-    $this->assertSession()->pageTextNotContains($this->term->getName());
+    $this->assertSession()->pageTextNotContains($this->term->label());
     $this->assertSession()->linkExists($new_term1);
     $this->assertSession()->linkExists($new_term2);
     $this->assertSession()->linkNotExists($new_term3);

@@ -114,7 +114,7 @@ class MigrateNodeTest extends MigrateDrupal7TestBase {
     $this->assertInstanceOf(NodeInterface::class, $node);
     $this->assertEquals($type, $node->getType());
     $this->assertEquals($langcode, $node->langcode->value);
-    $this->assertEquals($title, $node->getTitle());
+    $this->assertEquals($title, $node->label());
     $this->assertEquals($uid, $node->getOwnerId());
     $this->assertEquals($status, $node->isPublished());
     $this->assertEquals($created, $node->getCreatedTime());
@@ -144,7 +144,7 @@ class MigrateNodeTest extends MigrateDrupal7TestBase {
   protected function assertRevision(int $id, string $title, int $uid, ?string $log, int $timestamp): void {
     $revision = \Drupal::entityTypeManager()->getStorage('node')->loadRevision($id);
     $this->assertInstanceOf(NodeInterface::class, $revision);
-    $this->assertEquals($title, $revision->getTitle());
+    $this->assertEquals($title, $revision->label());
     $this->assertEquals($uid, $revision->getRevisionUser()->id());
     $this->assertEquals($log, $revision->revision_log->value);
     $this->assertEquals($timestamp, $revision->getRevisionCreationTime());
@@ -199,11 +199,11 @@ class MigrateNodeTest extends MigrateDrupal7TestBase {
     $this->assertEquals(CommentItemInterface::OPEN, $node->comment_node_article->status);
     $term_ref = $node->get('field_vocab_localize')->target_id;
     $this->assertSame('20', $term_ref);
-    $this->assertSame('DS9', Term::load($term_ref)->getName());
+    $this->assertSame('DS9', Term::load($term_ref)->label());
 
     $term_ref = $node->get('field_vocab_translate')->target_id;
     $this->assertSame('21', $term_ref);
-    $this->assertSame('High council', Term::load($term_ref)->getName());
+    $this->assertSame('High council', Term::load($term_ref)->label());
 
     $term_ref = $node->get('field_vocab_fixed')->target_id;
     $this->assertSame('24', $term_ref);
@@ -218,11 +218,11 @@ class MigrateNodeTest extends MigrateDrupal7TestBase {
     $this->assertEquals('Home', $translation->field_link->title);
     $term_ref = $translation->get('field_vocab_localize')->target_id;
     $this->assertSame('20', $term_ref);
-    $this->assertSame('DS9', Term::load($term_ref)->getName());
+    $this->assertSame('DS9', Term::load($term_ref)->label());
 
     $term_ref = $translation->get('field_vocab_translate')->target_id;
     $this->assertSame('23', $term_ref);
-    $this->assertSame('is - High council', Term::load($term_ref)->getName());
+    $this->assertSame('is - High council', Term::load($term_ref)->label());
 
     $term_ref = $translation->get('field_vocab_fixed')->target_id;
     $this->assertNulL($term_ref);
@@ -266,9 +266,9 @@ class MigrateNodeTest extends MigrateDrupal7TestBase {
     $node_is = $node->getTranslation('is');
 
     // Test that fields translated with Entity Translation are migrated.
-    $this->assertSame('An English Node', $node->getTitle());
-    $this->assertSame('A French Node', $node_fr->getTitle());
-    $this->assertSame('An Icelandic Node', $node_is->getTitle());
+    $this->assertSame('An English Node', $node->label());
+    $this->assertSame('A French Node', $node_fr->label());
+    $this->assertSame('An Icelandic Node', $node_is->label());
     $this->assertSame('5', $node->field_integer->value);
     $this->assertSame('6', $node_fr->field_integer->value);
     $this->assertSame('7', $node_is->field_integer->value);

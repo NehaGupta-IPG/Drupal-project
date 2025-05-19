@@ -155,7 +155,7 @@ class TermForm extends ContentEntityForm {
     $term = parent::buildEntity($form, $form_state);
 
     // Prevent leading and trailing spaces in term names.
-    $term->setName(trim($term->getName()));
+    $term->setName(trim($term->label()));
 
     // Assign parents with proper delta values starting from 0.
     $term->parent = array_values($form_state->getValue('parent'));
@@ -201,12 +201,12 @@ class TermForm extends ContentEntityForm {
     switch ($result) {
       case SAVED_NEW:
         $this->messenger()->addStatus($this->t('Created new term %term.', ['%term' => $view_link]));
-        $this->logger('taxonomy')->info('Created new term %term.', ['%term' => $term->getName(), 'link' => $edit_link]);
+        $this->logger('taxonomy')->info('Created new term %term.', ['%term' => $term->label(), 'link' => $edit_link]);
         break;
 
       case SAVED_UPDATED:
         $this->messenger()->addStatus($this->t('Updated term %term.', ['%term' => $view_link]));
-        $this->logger('taxonomy')->info('Updated term %term.', ['%term' => $term->getName(), 'link' => $edit_link]);
+        $this->logger('taxonomy')->info('Updated term %term.', ['%term' => $term->label(), 'link' => $edit_link]);
 
         // Redirect to term view page if user has access, otherwise the form
         // will be displayed again.

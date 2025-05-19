@@ -36,7 +36,7 @@ class TaxonomyController extends ControllerBase {
    *   The term label as a render array.
    */
   public function termTitle(TermInterface $taxonomy_term) {
-    return ['#markup' => $taxonomy_term->getName(), '#allowed_tags' => Xss::getHtmlTagList()];
+    return ['#markup' => $taxonomy_term->label(), '#allowed_tags' => Xss::getHtmlTagList()];
   }
 
 }

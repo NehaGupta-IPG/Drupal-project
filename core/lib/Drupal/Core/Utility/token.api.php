@@ -96,7 +96,7 @@ function hook_tokens($type, $tokens, array $data, array $options, \Drupal\Core\R
           break;
 
         case 'title':
-          $replacements[$original] = $node->getTitle();
+          $replacements[$original] = $node->label();
           break;
 
         case 'edit-url':

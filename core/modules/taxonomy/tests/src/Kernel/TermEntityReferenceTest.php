@@ -108,7 +108,7 @@ class TermEntityReferenceTest extends KernelTestBase {
 
     $expected_result = [
       $vocabulary->id() => [
-        $term->id() => $term->getName(),
+        $term->id() => $term->label(),
       ],
     ];
 

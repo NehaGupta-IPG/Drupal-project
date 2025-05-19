@@ -98,7 +98,7 @@ class MediaRevisionTest extends MediaFunctionalTestBase {
     $assert->statusCodeEquals(200);
 
     // Confirm the revision page shows the correct title.
-    $assert->pageTextContains($media->getName());
+    $assert->pageTextContains($media->label());
   }
 
   /**
@@ -312,7 +312,7 @@ class MediaRevisionTest extends MediaFunctionalTestBase {
     $media = $this->createMedia('Initial title');
     $this->createMediaWithRevision($media);
     $originalRevisionId = $media->getRevisionId();
-    $originalRevisionLabel = $media->getName();
+    $originalRevisionLabel = $media->label();
 
     // Cannot revert latest revision.
     $this->drupalGet($media->toUrl('revision-revert-form'));

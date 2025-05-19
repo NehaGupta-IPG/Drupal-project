@@ -352,7 +352,7 @@ class OverviewTerms extends FormBase {
       $form['terms'][$key]['term'] = [
         '#prefix' => !empty($indentation) ? $this->renderer->render($indentation) : '',
         '#type' => 'link',
-        '#title' => $term->getName(),
+        '#title' => $term->label(),
         '#url' => $term->toUrl(),
       ];
       $form['terms'][$key]['status'] = [

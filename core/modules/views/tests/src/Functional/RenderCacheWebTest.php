@@ -87,9 +87,9 @@ class RenderCacheWebTest extends ViewTestBase {
     $displays = $this->cssSelect('.views-element-container .view-id-node_id_argument.view-display-id-block_1');
     $this->assertCount(2, $displays, 'There are two displays');
     // First display should only have test title 1.
-    $this->assertSame($this->nodes[0]->getTitle(), $displays[0]->getText());
+    $this->assertSame($this->nodes[0]->label(), $displays[0]->getText());
     // Second display should only have test title 2.
-    $this->assertSame($this->nodes[1]->getTitle(), $displays[1]->getText());
+    $this->assertSame($this->nodes[1]->label(), $displays[1]->getText());
   }
 
 }

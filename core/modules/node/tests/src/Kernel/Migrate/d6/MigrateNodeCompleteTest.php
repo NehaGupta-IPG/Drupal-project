@@ -105,7 +105,7 @@ class MigrateNodeCompleteTest extends MigrateNodeTestBase {
     $actual = $this->nodeStorage->loadRevision($revision['vid'])
       ->getTranslation($revision['langcode']);
     $this->assertInstanceOf(NodeInterface::class, $actual);
-    $this->assertSame($revision['title'], $actual->getTitle(), sprintf("Title '%s' does not match actual '%s' for revision '%d' langcode '%s'", $revision['title'], $actual->getTitle(), $revision['vid'], $revision['langcode']));
+    $this->assertSame($revision['title'], $actual->label(), sprintf("Title '%s' does not match actual '%s' for revision '%d' langcode '%s'", $revision['title'], $actual->label(), $revision['vid'], $revision['langcode']));
     $this->assertSame($revision['revision_translation_affected'], $actual->get('revision_translation_affected')->value, sprintf("revision_translation_affected '%s' does not match actual '%s' for revision '%d' langcode '%s'", $revision['revision_translation_affected'], $actual->get('revision_translation_affected')->value, $revision['vid'], $revision['langcode']));
 
     $this->assertSame($data['created'], $actual->getRevisionCreationTime(), sprintf("Creation time '%s' does not match actual '%s' for revision '%d' langcode '%s'", $data['created'], $actual->getRevisionCreationTime(), $revision['vid'], $revision['langcode']));

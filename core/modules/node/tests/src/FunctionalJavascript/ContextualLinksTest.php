@@ -111,7 +111,7 @@ class ContextualLinksTest extends WebDriverTestBase {
     // Confirm that "Edit" and "Delete" contextual links don't appear for
     // non-default revision.
     $this->drupalGet("node/" . $this->nodes[0]->id() . "/revisions/" . $this->nodes[1]->getRevisionId() . "/view");
-    $this->assertSession()->pageTextContains($this->nodes[1]->getTitle());
+    $this->assertSession()->pageTextContains($this->nodes[1]->label());
     $page->waitFor(10, function () use ($page) {
       return $page->find('css', "main .contextual");
     });

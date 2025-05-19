@@ -94,7 +94,7 @@ class OverrideSectionsTest extends LayoutRestTestBase {
     );
     $this->assertResourceResponse(201, FALSE, $response);
     $posted_node = $this->nodeStorage->load(2);
-    $this->assertEquals('On with the rest of the test.', $posted_node->getTitle());
+    $this->assertEquals('On with the rest of the test.', $posted_node->label());
 
     // Make a POST request with override field.
     $new_node['layout_builder__layout'] = [];
@@ -135,7 +135,7 @@ class OverrideSectionsTest extends LayoutRestTestBase {
     $this->assertResourceResponse(200, FALSE, $response);
     $this->nodeStorage->resetCache([1]);
     $this->node = $this->nodeStorage->load(1);
-    $this->assertEquals('New and improved title', $this->node->getTitle());
+    $this->assertEquals('New and improved title', $this->node->label());
 
     // Make a PATCH request with the override field.
     $patch_data['title'][0]['value'] = 'This title will not save.';
@@ -153,7 +153,7 @@ class OverrideSectionsTest extends LayoutRestTestBase {
 
     $this->assertResourceErrorResponse(403, 'Access denied on updating field \'layout_builder__layout\'.', $response);
     // Ensure the title has not changed.
-    $this->assertEquals('New and improved title', Node::load(1)->getTitle());
+    $this->assertEquals('New and improved title', Node::load(1)->label());
   }
 
 }

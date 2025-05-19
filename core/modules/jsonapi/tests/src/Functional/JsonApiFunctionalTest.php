@@ -86,7 +86,7 @@ class JsonApiFunctionalTest extends JsonApiFunctionalTestBase {
     $single_output = Json::decode($this->drupalGet('/jsonapi/node/article/' . $uuid));
     $this->assertSession()->statusCodeEquals(200);
     $this->assertArrayHasKey('type', $single_output['data']);
-    $this->assertEquals($this->nodes[0]->getTitle(), $single_output['data']['attributes']['title']);
+    $this->assertEquals($this->nodes[0]->label(), $single_output['data']['attributes']['title']);
 
     // 5.1 Single article with access denied because unauthenticated.
     Json::decode($this->drupalGet('/jsonapi/node/article/' . $this->nodes[60]->uuid()));
@@ -581,7 +581,7 @@ class JsonApiFunctionalTest extends JsonApiFunctionalTestBase {
     $expectedMeta = [
       'resource_meta_user_has_admin_role' => 'no',
       'resource_meta_user_id' => $this->user->id(),
-      'resource_meta_title' => $node->getTitle(),
+      'resource_meta_title' => $node->label(),
     ];
     $this->assertEquals($expectedMeta, $result['data']['meta']);
     // Test if the cache tags bubbled up
@@ -617,7 +617,7 @@ class JsonApiFunctionalTest extends JsonApiFunctionalTestBase {
     $expectedMeta = [
       'resource_meta_user_has_admin_role' => 'yes',
       'resource_meta_user_id' => $this->adminUser->id(),
-      'resource_meta_title' => $node->getTitle(),
+      'resource_meta_title' => $node->label(),
     ];
     $this->assertEquals($expectedMeta, $result['data']['meta']);
     // Test if the cache tags bubbled up.
@@ -713,7 +713,7 @@ class JsonApiFunctionalTest extends JsonApiFunctionalTestBase {
     $this->assertArrayHasKey('meta', $resource);
     $this->assertArrayHasKey('relationship_meta_name', $resource['meta']);
     // Test that the tag is added to the meta of the document.
-    $this->assertEquals([$node->get('field_tags')->entity->getName()], $resource['meta']['relationship_meta_name']);
+    $this->assertEquals([$node->get('field_tags')->entity->label()], $resource['meta']['relationship_meta_name']);
   }
 
   /**

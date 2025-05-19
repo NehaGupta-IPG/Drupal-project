@@ -56,7 +56,7 @@ class MigrateNodeRevisionTest extends MigrateNodeTestBase {
     $revision = $this->nodeStorage->loadRevision($id)
       ->getTranslation($langcode);
     $this->assertInstanceOf(NodeInterface::class, $revision);
-    $this->assertSame($title, $revision->getTitle());
+    $this->assertSame($title, $revision->label());
     $this->assertSame($log, $revision->revision_log->value);
     $this->assertSame($timestamp, (int) $revision->getRevisionCreationTime());
   }
@@ -70,7 +70,7 @@ class MigrateNodeRevisionTest extends MigrateNodeTestBase {
     $this->assertSame('1', $node->id());
     $this->assertSame('2001', $node->getRevisionId());
     $this->assertSame('und', $node->langcode->value);
-    $this->assertSame('Test title rev 3', $node->getTitle());
+    $this->assertSame('Test title rev 3', $node->label());
     $this->assertSame('body test rev 3', $node->body->value);
     $this->assertSame('teaser test rev 3', $node->body->summary);
     $this->assertSame('2', $node->getRevisionUser()->id());

@@ -104,7 +104,7 @@ class MigrateNodeRevisionTest extends MigrateDrupal7TestBase {
   protected function assertRevision(int $id, string $langcode, string $title, ?string $log, int $timestamp): void {
     $revision = $this->nodeStorage->loadRevision($id);
     $this->assertInstanceOf(NodeInterface::class, $revision);
-    $this->assertSame($title, $revision->getTitle());
+    $this->assertSame($title, $revision->label());
     $this->assertSame($langcode, $revision->language()->getId());
     $this->assertSame($log, $revision->revision_log->value);
     $this->assertSame($timestamp, (int) $revision->getRevisionCreationTime());

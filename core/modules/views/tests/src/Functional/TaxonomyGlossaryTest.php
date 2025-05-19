@@ -89,8 +89,8 @@ class TaxonomyGlossaryTest extends ViewTestBase {
     $assert_session->elementsCount('xpath', '/ancestor::ul//a', count($initials), $link);
 
     // Go the taxonomy glossary page for the first term.
-    $this->drupalGet('test_taxonomy_glossary/' . substr($this->taxonomyTerms[0]->getName(), 0, 1));
-    $assert_session->pageTextContains($this->taxonomyTerms[0]->getName());
+    $this->drupalGet('test_taxonomy_glossary/' . substr($this->taxonomyTerms[0]->label(), 0, 1));
+    $assert_session->pageTextContains($this->taxonomyTerms[0]->label());
   }
 
 }
