@@ -26,33 +26,7 @@ abstract class OffCanvasTestBase extends WebDriverTestBase {
    */
   protected function drupalGet($path, array $options = [], array $headers = []) {
     $return = parent::drupalGet($path, $options, $headers);
-    $this->assertPageLoadComplete();
     return $return;
-  }
-
-  /**
-   * Assert the page is completely loaded.
-   *
-   * Ajax requests may happen after page loads. Also for users who have access
-   * to contextual links the contextual link placeholders will be filled after
-   * the page is received.
-   */
-  protected function assertPageLoadComplete() {
-    if ($this->loggedInUser && $this->loggedInUser->hasPermission('access contextual links')) {
-      $this->assertAllContextualLinksLoaded();
-    }
-  }
-
-  /**
-   * Assert all contextual link areas have be loaded.
-   *
-   * Contextual link placeholders will be filled after
-   * the page is received.
-   *
-   * @todo Move this function to https://www.drupal.org/node/2821724.
-   */
-  protected function assertAllContextualLinksLoaded() {
-    $this->assertSession()->assertNoElementAfterWait('css', '[data-contextual-id]:empty');
   }
 
   /**
