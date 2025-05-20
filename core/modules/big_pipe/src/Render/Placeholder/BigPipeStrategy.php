@@ -217,7 +217,7 @@ class BigPipeStrategy implements PlaceholderStrategyInterface {
     }
 
     return [
-      '#prefix' => '<span data-big-pipe-placeholder-id="' . Html::escape($big_pipe_placeholder_id) . '">',
+      '#prefix' => Markup::create('<span data-big-pipe-placeholder-id="' . Html::escape($big_pipe_placeholder_id) . '">'),
       'interface_preview' => $interface_preview,
       '#suffix' => '</span>',
       '#cache' => [
