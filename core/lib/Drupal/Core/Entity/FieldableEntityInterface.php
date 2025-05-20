@@ -145,19 +145,19 @@ interface FieldableEntityInterface extends EntityInterface {
    * @todo Uncomment new parameter before drupal:12.0.0.
    * @see https://www.drupal.org/node/3522223
    *
-   * @param bool $throw_exception
+   * @param bool $exception_on_invalid
    *   If TRUE, an exception will be thrown if an invalid field name is given.
    *
    * phpcs:enable
    *
    * @return \Drupal\Core\Field\FieldItemListInterface|null
-   *   The field item list, containing the field items. NULL if $throw_exception
-   *   is FALSE and an invalid field name is given.
+   *   The field item list, containing the field items. NULL if
+   *   $exception_on_invalid is FALSE and an invalid field name is given.
    *
    * @throws \InvalidArgumentException
-   *   If $throw_exception is TRUE and an invalid field name is given.
+   *   If $exception_on_invalid is TRUE and an invalid field name is given.
    */
-  public function get(/* string */$field_name /* , bool $throw_exception = TRUE */);
+  public function get(/* string */$field_name /* , bool $exception_on_invalid = TRUE */);
 
   /**
    * Sets a field value.

@@ -592,15 +592,15 @@ abstract class ContentEntityBase extends EntityBase implements \IteratorAggregat
   /**
    * {@inheritdoc}
    */
-  public function get(/* string */$field_name /* , bool $throw_exception = TRUE */) {
+  public function get(/* string */$field_name /* , bool $exception_on_invalid = TRUE */) {
     $arguments = func_get_args();
-    $throw_exception = !isset($arguments[1]) || (bool) $arguments[1];
+    $exception_on_invalid = !isset($arguments[1]) || (bool) $arguments[1];
     if (!isset($this->fields[$field_name][$this->activeLangcode])) {
       try {
         return $this->getTranslatedField($field_name, $this->activeLangcode);
       }
       catch (\InvalidArgumentException $e) {
-        if ($throw_exception) {
+        if ($exception_on_invalid) {
           throw $e;
         }
         return NULL;
