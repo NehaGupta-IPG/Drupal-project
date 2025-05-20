@@ -641,4 +641,21 @@ abstract class RenderElementBase extends PluginBase implements ElementInterface,
     return $this->elementInfoManager;
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function __sleep(): array {
+    $vars = parent::__sleep();
+    unset($this->storage['##object']);
+    return $vars;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function __wakeup(): void {
+    parent::__wakeup();
+    $this->storage['##object'] = $this;
+  }
+
 }

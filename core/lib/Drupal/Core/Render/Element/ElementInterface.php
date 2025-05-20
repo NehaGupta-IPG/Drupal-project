@@ -81,6 +81,8 @@ interface ElementInterface extends PluginInspectionInterface, RenderCallbackInte
    *
    * @return \Traversable
    *   Key will be children names, values are ElementInterface objects.
+   *
+   * @phpstan-return \Traversable<\Drupal\Core\Render\Element\ElementInterface>
    */
   public function getChildren(): \Traversable;
 
