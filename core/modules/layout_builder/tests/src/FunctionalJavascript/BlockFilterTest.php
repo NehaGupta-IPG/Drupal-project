@@ -65,7 +65,7 @@ class BlockFilterTest extends WebDriverTestBase {
     $assert_session->assertWaitOnAjaxRequest();
 
     // Get all blocks, for assertions later.
-    $blocks = $page->findAll('css', '.js-layout-builder-categories li');
+    $blocks = $page->findAll('css', '.js-layout-builder-categories li a');
     $categories = $page->findAll('css', '.js-layout-builder-category');
 
     $filter = $assert_session->elementExists('css', '.table-filter-text');
