@@ -79,11 +79,11 @@
       // Remove the question mark and Drupal path component if any.
       queryString = queryString
         .slice(1)
-        .replace(/q=[^&]+&?|&?render=[^&]+/, '');
+        .replace(/q=[^&]+&?|page=[^&]+&?|&?render=[^&]+/, '');
       if (queryString !== '') {
         // If there is a '?' in ajaxPath, clean URL are on and & should be
         // used to add parameters.
-        queryString = (/\?/.test(ajaxPath) ? '&' : '?') + queryString;
+        queryString = (ajaxPath.includes('?') ? '&' : '?') + queryString;
       }
     }
 

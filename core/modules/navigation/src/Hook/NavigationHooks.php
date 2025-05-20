@@ -3,14 +3,16 @@
 namespace Drupal\navigation\Hook;
 
 use Drupal\Component\Plugin\PluginBase;
-use Drupal\Core\Asset\AttachedAssetsInterface;
 use Drupal\Core\Block\BlockPluginInterface;
 use Drupal\Core\Config\Action\ConfigActionManager;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Hook\Attribute\Hook;
+use Drupal\Core\Hook\Attribute\RemoveHook;
+use Drupal\Core\Hook\Order\Order;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
+use Drupal\layout_builder\Hook\LayoutBuilderHooks;
 use Drupal\navigation\NavigationContentLinks;
 use Drupal\navigation\NavigationRenderer;
 use Drupal\navigation\Plugin\SectionStorage\NavigationSectionStorage;
@@ -32,8 +34,6 @@ class NavigationHooks {
    *   The module handler.
    * @param \Drupal\Core\Session\AccountInterface $currentUser
    *   The current user.
-   * @param \Drupal\Core\Routing\RouteMatchInterface $routeMatch
-   *   The route match.
    * @param \Drupal\navigation\NavigationRenderer $navigationRenderer
    *   The navigation renderer.
    * @param \Drupal\Core\Config\Action\ConfigActionManager $configActionManager
@@ -44,7 +44,6 @@ class NavigationHooks {
   public function __construct(
     protected ModuleHandlerInterface $moduleHandler,
     protected AccountInterface $currentUser,
-    protected RouteMatchInterface $routeMatch,
     protected NavigationRenderer $navigationRenderer,
     #[Autowire('@plugin.manager.config_action')]
     protected ConfigActionManager $configActionManager,
@@ -56,6 +55,7 @@ class NavigationHooks {
    * Implements hook_help().
    */
   #[Hook('help')]
+  #[RemoveHook('help', class: LayoutBuilderHooks::class, method: 'help')]
   public function help($route_name, RouteMatchInterface $route_match): ?string {
     switch ($route_name) {
       case 'help.page.navigation':
@@ -71,7 +71,7 @@ class NavigationHooks {
     }
     if (str_starts_with($route_name, $configuration_route)) {
       $output = '<p>' . $this->t('This layout builder tool allows you to configure the blocks in the navigation toolbar.') . '</p>';
-      $output .= '<p>' . $this->t('Forms and links inside the content of the layout builder tool have been disabled.') . '</p>';
+      $output .= '<p>' . $this->t('Forms and links inside the content of the layout builder tool are disabled in Edit mode.') . '</p>';
       return $output;
     }
     return NULL;
@@ -80,29 +80,13 @@ class NavigationHooks {
   /**
    * Implements hook_page_top().
    */
-  #[Hook('page_top')]
+  #[Hook('page_top', order: Order::Last)]
   public function pageTop(array &$page_top): void {
     if (!$this->currentUser->hasPermission('access navigation')) {
       return;
     }
     $this->navigationRenderer->removeToolbar($page_top);
-    if ($this->routeMatch->getRouteName() !== 'layout_builder.navigation.view') {
-      // Don't render the admin toolbar if in layout edit mode.
-      $this->navigationRenderer->buildNavigation($page_top);
-      $this->navigationRenderer->buildTopBar($page_top);
-      return;
-    }
-    // But if in layout mode, add an empty element to leave space. We need to
-    // use an empty .admin-toolbar element because the css uses the adjacent
-    // sibling selector. The actual rendering of the navigation blocks/layout
-    // occurs in the layout form.
-    $page_top['navigation'] = [
-      '#type' => 'html_tag',
-      '#tag' => 'aside',
-      '#attributes' => [
-        'class' => 'admin-toolbar',
-      ],
-    ];
+    $this->navigationRenderer->buildNavigation($page_top);
     $this->navigationRenderer->buildTopBar($page_top);
   }
 
@@ -153,8 +137,6 @@ class NavigationHooks {
     $navigation_links = \Drupal::classResolver(NavigationContentLinks::class);
     assert($navigation_links instanceof NavigationContentLinks);
     $navigation_links->addMenuLinks($links);
-    $navigation_links->removeAdminContentLink($links);
-    $navigation_links->removeHelpLink($links);
   }
 
   /**
@@ -271,21 +253,6 @@ class NavigationHooks {
   }
 
   /**
-   * Implements hook_js_settings_alter().
-   */
-  #[Hook('js_settings_alter')]
-  public function jsSettingsAlter(array &$settings, AttachedAssetsInterface $assets): void {
-    // If Navigation's user-block library is not installed, return.
-    if (!in_array('navigation/internal.user-block', $assets->getLibraries())) {
-      return;
-    }
-    // Provide the user name in drupalSettings to allow JavaScript code to
-    // customize the experience for the end user, rather than the server side,
-    // which would break the render cache.
-    $settings['navigation']['user'] = $this->currentUser->getAccountName();
-  }
-
-  /**
    * Implements hook_modules_installed().
    */
   #[Hook('modules_installed')]
@@ -303,6 +270,26 @@ class NavigationHooks {
 
       foreach ($blocks as $block) {
         $this->configActionManager->applyAction('addNavigationBlock', 'navigation.block_layout', $block);
+      }
+    }
+  }
+
+  /**
+   * Implements hook_navigation_menu_link_tree_alter().
+   */
+  #[Hook('navigation_menu_link_tree_alter')]
+  public function navigationMenuLinkTreeAlter(array &$tree): void {
+    foreach ($tree as $key => $item) {
+      // Skip elements where menu is not the 'admin' one.
+      $menu_name = $item->link->getMenuName();
+      if ($menu_name != 'admin') {
+        continue;
+      }
+
+      // Remove unwanted Help and Content menu links.
+      $plugin_id = $item->link->getPluginId();
+      if ($plugin_id == 'help.main' || $plugin_id == 'system.admin_content') {
+        unset($tree[$key]);
       }
     }
   }

@@ -29,31 +29,43 @@ use Prophecy\Prophecy\ObjectProphecy;
 class EntityRevisionTest extends UnitTestCase {
 
   /**
+   * The migration.
+   *
    * @var \Drupal\migrate\Plugin\MigrationInterface
    */
   protected MigrationInterface $migration;
 
   /**
+   * The destination storage.
+   *
    * @var \Prophecy\Prophecy\ObjectProphecy
    */
   protected ObjectProphecy $storage;
 
   /**
+   * The entity field manager.
+   *
    * @var \Drupal\Core\Entity\EntityFieldManagerInterface
    */
   protected EntityFieldManagerInterface $entityFieldManager;
 
   /**
+   * The field type manager.
+   *
    * @var \Drupal\Core\Field\FieldTypePluginManagerInterface
    */
   protected FieldTypePluginManagerInterface $fieldTypeManager;
 
   /**
+   * The account switcher.
+   *
    * @var \Drupal\Core\Session\AccountSwitcherInterface
    */
   protected AccountSwitcherInterface $accountSwitcher;
 
   /**
+   * The entity type bundle information.
+   *
    * @var \Drupal\Core\Entity\EntityTypeBundleInfoInterface
    */
   protected EntityTypeBundleInfoInterface $entityTypeBundle;
@@ -114,7 +126,7 @@ class EntityRevisionTest extends UnitTestCase {
       ->willReturn($entity->reveal());
     // Make sure its set as an update and not the default revision.
     $entity->setNewRevision(FALSE)->shouldBeCalled();
-    $entity->isDefaultRevision(FALSE)->shouldBeCalled();
+    $entity->isDefaultRevision()->shouldNotBeCalled();
 
     $row = new Row(['nid' => 1, 'vid' => 2], ['nid' => 1, 'vid' => 2]);
     $row->setDestinationProperty('vid', 2);
