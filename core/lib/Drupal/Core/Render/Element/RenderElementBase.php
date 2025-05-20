@@ -609,7 +609,7 @@ abstract class RenderElementBase extends PluginBase implements ElementInterface,
   /**
    * {@inheritdoc}
    */
-  public function addChild(string|int $name, ElementInterface|array $child): static {
+  public function addChild(string|int $name, ElementInterface|array &$child): static {
     if ($name[0] === '#') {
       throw new \LogicException('The name of children can not start with a #.');
     }

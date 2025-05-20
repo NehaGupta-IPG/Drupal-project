@@ -95,7 +95,7 @@ interface ElementInterface extends PluginInspectionInterface, RenderCallbackInte
    * @return $this
    *   The called object.
    */
-  public function addChild(int|string $name, ElementInterface|array $child): static;
+  public function addChild(int|string $name, ElementInterface|array &$child): static;
 
   /**
    * Removes a child.
