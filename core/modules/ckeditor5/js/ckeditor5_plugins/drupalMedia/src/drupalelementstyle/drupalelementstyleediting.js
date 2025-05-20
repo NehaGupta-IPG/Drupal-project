@@ -63,16 +63,12 @@ function modelToViewStyleAttribute(styles) {
     if (newStyle) {
       if (newStyle.attributeName === 'class') {
         viewWriter.addClass(newStyle.attributeValue, viewElement);
-      } else if (!newStyle.isDefault) {
-        // We only reach this condition if the style is not the default value.
-        // In those instances, there is no need to downcast as the default value
-        // is set automatically when necessary.
-        viewWriter.setAttribute(
-          newStyle.attributeName,
-          newStyle.attributeValue,
-          viewElement,
-        );
       }
+      viewWriter.setAttribute(
+        newStyle.attributeName,
+        newStyle.attributeValue,
+        viewElement,
+      );
     }
   };
 }
@@ -86,9 +82,6 @@ function modelToViewStyleAttribute(styles) {
  * Note that more than one style can be applied to each modelElement.
  */
 function viewToModelStyleAttribute(styles, modelAttribute) {
-  // Convert only non–default styles.
-  const nonDefaultStyles = styles.filter((style) => !style.isDefault);
-
   return (evt, data, conversionApi) => {
     if (!data.modelRange) {
       return;
@@ -110,7 +103,7 @@ function viewToModelStyleAttribute(styles, modelAttribute) {
 
     // Convert styles with CSS classes one by one.
     // eslint-disable-next-line no-restricted-syntax
-    for (const style of nonDefaultStyles) {
+    for (const style of styles) {
       // Try to consume class corresponding with the style.
       if (style.attributeName === 'class') {
         if (
@@ -131,7 +124,7 @@ function viewToModelStyleAttribute(styles, modelAttribute) {
         })
       ) {
         // eslint-disable-next-line no-restricted-syntax
-        for (const style of nonDefaultStyles) {
+        for (const style of styles) {
           if (
             style.attributeValue ===
             viewElement.getAttribute(style.attributeName)
@@ -249,7 +242,6 @@ export default class DrupalElementStyleEditing extends Plugin {
         })
         .filter((style) => {
           if (
-            !style.isDefault &&
             (!style.attributeName || !style.attributeValue)
           ) {
             console.warn(

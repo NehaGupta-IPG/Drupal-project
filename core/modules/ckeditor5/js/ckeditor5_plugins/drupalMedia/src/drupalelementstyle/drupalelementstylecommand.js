@@ -124,13 +124,8 @@ export default class DrupalElementStyleCommand extends Command {
         model.schema,
         this.modelAttributes,
       );
-      if (!value || this.styles[group].get(value).isDefault) {
-        // Remove attribute from the element.
-        writer.removeAttribute(modelAttribute, element);
-      } else {
-        // Set the attribute value on the element.
-        writer.setAttribute(modelAttribute, value, element);
-      }
+      // Set the attribute value on the element.
+      writer.setAttribute(modelAttribute, value, element);
     });
   }
 }
