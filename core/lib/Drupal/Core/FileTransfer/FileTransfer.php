@@ -19,6 +19,11 @@ use Drupal\Core\StringTranslation\StringTranslationTrait;
  *   Path to connection chroot.
  * @property object|false|null $connection
  *   The instantiated connection object.
+ *
+ * @deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. There is no
+ *   replacement. Use composer to manage the code for your site.
+ *
+ * @see https://www.drupal.org/node/3512364
  */
 #[\AllowDynamicProperties]
 abstract class FileTransfer {
@@ -69,6 +74,8 @@ abstract class FileTransfer {
    *   able to touch other parts of the filesystem.
    */
   public function __construct($jail) {
+    @trigger_error(__CLASS__ . ' is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. There is no replacement. Use composer to manage the code for your site. See https://www.drupal.org/node/3512364', E_USER_DEPRECATED);
+
     $this->jail = $jail;
   }
 
@@ -268,7 +275,10 @@ abstract class FileTransfer {
       ->realpath(substr($this->chroot . $path, 0, strlen($full_jail)));
     $full_path = $this->fixRemotePath($full_path, FALSE);
     if ($full_jail !== $full_path) {
-      throw new FileTransferException('@directory is outside of the @jail', 0, ['@directory' => $path, '@jail' => $this->jail]);
+      throw new FileTransferException('@directory is outside of the @jail', 0, [
+        '@directory' => $path,
+        '@jail' => $this->jail,
+      ]);
     }
   }
 
@@ -381,7 +391,7 @@ abstract class FileTransfer {
    * Checks if a particular path is a directory.
    *
    * @param string $path
-   *   The path to check
+   *   The path to check.
    *
    * @return bool
    *   TRUE if the specified path is a directory, FALSE otherwise.

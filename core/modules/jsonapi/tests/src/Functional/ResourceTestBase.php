@@ -328,6 +328,9 @@ abstract class ResourceTestBase extends BrowserTestBase {
     return $this->resaveEntity($entity, $account);
   }
 
+  /**
+   * Reloads and updates an entity with test field values before saving it.
+   */
   protected function resaveEntity(EntityInterface $entity, AccountInterface $account): EntityInterface {
     // Reload entity so that it has the new field.
     $reloaded_entity = $this->entityLoadUnchanged($entity->id());
@@ -2681,7 +2684,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
       if (str_starts_with($type, 'nested')) {
         $this->grantPermissionsToTestedRole(['access user profiles']);
         $query['fields[user--user]'] = implode(',', $field_set);
-        $query['include'] = 'uid';
+        $query['include'] = $this->entity->getEntityType()->getKey('owner');
         $owner = $this->entity->getOwner();
         $owner_resource = static::toResourceIdentifier($owner);
         foreach ($field_set as $field_name) {

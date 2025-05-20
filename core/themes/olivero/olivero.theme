@@ -617,6 +617,15 @@ function olivero_preprocess_table(&$variables): void {
       }
     }
   }
+
+  $variables['#attached']['library'][] = 'olivero/olivero.table';
+}
+
+/**
+ * Implements hook_preprocess_HOOK() for views-view-table templates.
+ */
+function olivero_preprocess_views_view_table(&$variables): void {
+  $variables['#attached']['library'][] = 'olivero/olivero.table';
 }
 
 /**
@@ -630,7 +639,7 @@ function olivero_form_views_exposed_form_alter(&$form): void {
  * Converts hex color strings to array of HSL values.
  *
  * @param string $hex_string
- *   The 6-character hexadecimal color code, optionally with a leading hash
+ *   The 6-character hexadecimal color code, optionally with a leading hash.
  *
  * @return array
  *   Array containing hue, saturation, and lightness values.

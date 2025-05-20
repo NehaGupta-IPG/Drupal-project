@@ -134,6 +134,9 @@ class ViewsConfigUpdater implements ContainerInjectionInterface {
       if ($this->processRememberRolesUpdate($handler, $handler_type)) {
         $changed = TRUE;
       }
+      if ($this->processTableCssClassUpdate($view)) {
+        $changed = TRUE;
+      }
       return $changed;
     });
   }
@@ -300,6 +303,60 @@ class ViewsConfigUpdater implements ContainerInjectionInterface {
       return $needsUpdate;
     }
     return FALSE;
+  }
+
+  /**
+   * Checks for table style views needing a default CSS table class value.
+   *
+   * @param \Drupal\views\ViewEntityInterface $view
+   *   The view entity.
+   *
+   * @return bool
+   *   TRUE if the view has any table styles that need to have
+   *   a default table CSS class added.
+   */
+  public function needsTableCssClassUpdate(ViewEntityInterface $view): bool {
+    return $this->processDisplayHandlers($view, TRUE, function (&$handler, $handler_type) use ($view) {
+      return $this->processTableCssClassUpdate($view);
+    });
+  }
+
+  /**
+   * Processes views and adds default CSS table class value if necessary.
+   *
+   * @param \Drupal\views\ViewEntityInterface $view
+   *   The view entity.
+   *
+   * @return bool
+   *   TRUE if the view was updated with a default table CSS class value.
+   */
+  public function processTableCssClassUpdate(ViewEntityInterface $view): bool {
+    $changed = FALSE;
+    $displays = $view->get('display');
+
+    foreach ($displays as &$display) {
+      if (
+        isset($display['display_options']['style']) &&
+        $display['display_options']['style']['type'] === 'table' &&
+        isset($display['display_options']['style']['options']) &&
+        !isset($display['display_options']['style']['options']['class'])
+      ) {
+        $display['display_options']['style']['options']['class'] = '';
+        $changed = TRUE;
+      }
+    }
+
+    if ($changed) {
+      $view->set('display', $displays);
+    }
+
+    $deprecations_triggered = &$this->triggeredDeprecations['table_css_class'][$view->id()];
+    if ($this->deprecationsEnabled && $changed && !$deprecations_triggered) {
+      $deprecations_triggered = TRUE;
+      @trigger_error(sprintf('The update to add a default table CSS class for view "%s" is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Profile, module and theme provided configuration should be updated. See https://www.drupal.org/node/3499943', $view->id()), E_USER_DEPRECATED);
+    }
+
+    return $changed;
   }
 
 }

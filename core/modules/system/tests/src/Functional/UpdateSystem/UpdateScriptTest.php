@@ -64,6 +64,9 @@ class UpdateScriptTest extends BrowserTestBase {
    * {@inheritdoc}
    */
   protected function setUp(): void {
+    if ($this->name() === 'testMissingExtension') {
+      $this->markTestSkipped('Skipped due to major version-specific logic. See https://www.drupal.org/project/drupal/issues/3359322');
+    }
     parent::setUp();
     $this->updateUrl = Url::fromRoute('system.db_update');
     $this->statusReportUrl = Url::fromRoute('system.status');
@@ -350,7 +353,6 @@ class UpdateScriptTest extends BrowserTestBase {
    * @dataProvider providerMissingExtension
    */
   public function testMissingExtension(array $core, array $contrib): void {
-    $this->markTestSkipped('Skipped due to major version-specific logic. See https://www.drupal.org/project/drupal/issues/3359322');
     $this->drupalLogin(
       $this->drupalCreateUser(
         [
@@ -811,8 +813,9 @@ class UpdateScriptTest extends BrowserTestBase {
     $this->assertSession()->pageTextContains('Updates were attempted.');
     $this->assertSession()->linkExists('logged');
     $this->assertSession()->linkExists('Administration pages');
+    $this->assertSession()->linkExists('Status report');
     $this->assertSession()->elementNotExists('xpath', '//main//a[contains(@href, "update.php")]');
-    $this->clickLink('Administration pages');
+    $this->clickLink('Status report');
     $this->assertSession()->statusCodeEquals(200);
   }
 

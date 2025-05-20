@@ -609,15 +609,15 @@ abstract class SourcePluginBase extends PluginBase implements MigrateSourceInter
    * {@inheritdoc}
    */
   public function preRollback(MigrateRollbackEvent $event) {
-    // Nothing to do in this implementation.
+    // Reset the high-water mark.
+    $this->saveHighWater(NULL);
   }
 
   /**
    * {@inheritdoc}
    */
   public function postRollback(MigrateRollbackEvent $event) {
-    // Reset the high-water mark.
-    $this->saveHighWater(NULL);
+    // Nothing to do in this implementation.
   }
 
   /**
@@ -626,9 +626,6 @@ abstract class SourcePluginBase extends PluginBase implements MigrateSourceInter
   public function getSourceModule() {
     if (!empty($this->configuration['source_module'])) {
       return $this->configuration['source_module'];
-    }
-    elseif (!empty($this->pluginDefinition['source_module'])) {
-      return $this->pluginDefinition['source_module'];
     }
     return NULL;
   }

@@ -55,6 +55,12 @@ class AttributeDiscoveryWithAnnotationsAutomatedProviders extends AttributeDisco
    * {@inheritdoc}
    */
   protected function parseClass(string $class, \SplFileInfo $fileinfo): array {
+    // Parse using attributes first.
+    $definition = $this->attributeDiscovery->parseClass($class, $fileinfo);
+    if (isset($definition['id'])) {
+      return $definition;
+    }
+
     // The filename is already known, so there is no need to find the
     // file. However, StaticReflectionParser needs a finder, so use a
     // mock version.
@@ -66,20 +72,13 @@ class AttributeDiscoveryWithAnnotationsAutomatedProviders extends AttributeDisco
 
     $reflection_class = $parser->getReflectionClass();
     // @todo Handle deprecating definitions discovery via annotations in
-    // https://www.drupal.org/project/drupal/issues/3265945.
+    // https://www.drupal.org/project/drupal/issues/3522409.
     /** @var \Drupal\Component\Annotation\AnnotationInterface $annotation */
     if ($annotation = $this->getAnnotationReader()->getClassAnnotation($reflection_class, $this->pluginDefinitionAnnotationName)) {
       $this->prepareAnnotationDefinition($annotation, $class, $parser);
       return ['id' => $annotation->getId(), 'content' => $annotation->get()];
     }
 
-    // Annotations use static reflection and are able to analyze a class that
-    // extends classes or uses traits that do not exist. Attribute discovery
-    // will trigger a fatal error with such classes, so only call it if the
-    // class has a class attribute.
-    if ($reflection_class->hasClassAttribute($this->pluginDefinitionAttributeName)) {
-      return $this->attributeDiscovery->parseClass($class, $fileinfo);
-    }
     return ['id' => NULL, 'content' => NULL];
   }
 

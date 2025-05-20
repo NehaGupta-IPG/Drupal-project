@@ -12,6 +12,7 @@ use Drupal\Tests\BrowserTestBase;
  * Tests recursive file copy operations with the file transfer jail.
  *
  * @group FileTransfer
+ * @group legacy
  */
 class FileTransferTest extends BrowserTestBase {
 
@@ -33,6 +34,9 @@ class FileTransferTest extends BrowserTestBase {
     $this->testConnection = TestFileTransfer::factory($this->root, []);
   }
 
+  /**
+   * Returns a predefined list of fake module files for testing.
+   */
   public function _getFakeModuleFiles() {
     $files = [
       'fake.module',
@@ -47,6 +51,9 @@ class FileTransferTest extends BrowserTestBase {
     return $files;
   }
 
+  /**
+   * Builds a fake module directory for testing.
+   */
   public function _buildFakeModule() {
     $location = 'temporary://fake';
     if (is_dir($location)) {
@@ -63,6 +70,9 @@ class FileTransferTest extends BrowserTestBase {
     return $location;
   }
 
+  /**
+   * Writes a directory structure to the filesystem.
+   */
   public function _writeDirectory($base, $files = []): void {
     mkdir($base);
     foreach ($files as $key => $file) {
@@ -76,6 +86,9 @@ class FileTransferTest extends BrowserTestBase {
     }
   }
 
+  /**
+   * Tests the file transfer jail.
+   */
   public function testJail(): void {
     $source = $this->_buildFakeModule();
 
