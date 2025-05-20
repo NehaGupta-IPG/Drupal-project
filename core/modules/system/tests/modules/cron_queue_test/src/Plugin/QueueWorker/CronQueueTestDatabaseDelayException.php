@@ -24,7 +24,7 @@ class CronQueueTestDatabaseDelayException extends QueueWorkerBase {
   /**
    * {@inheritdoc}
    */
-  public function processItem($data) {
+  public function processItem($data, ?object $metadata = NULL) {
     throw new DelayedRequeueException(self::DELAY_INTERVAL);
   }
 
