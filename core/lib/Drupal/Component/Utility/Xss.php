@@ -301,6 +301,7 @@ class Xss {
     $attribute_name = '';
     $skip = FALSE;
     $skip_protocol_filtering = FALSE;
+    $filter_attribute_value = FALSE;
 
     while (strlen($attributes) != 0) {
       // Was the last operation successful?
@@ -336,6 +337,7 @@ class Xss {
               'class',
               'datetime',
             ]);
+            $filter_attribute_value = str_starts_with($attribute_name, 'data-');
 
             $working = $mode = 1;
             $attributes = preg_replace('/^[-a-zA-Z][-a-zA-Z0-9]*/', '', $attributes);
@@ -368,7 +370,8 @@ class Xss {
           $working = 1;
           // Attribute value, a URL after href= for instance.
           if (preg_match('/^"([^"]*)"(\s+|$)/', $attributes, $match)) {
-            $value = $skip_protocol_filtering ? self::filterAttributeValue($match[1]) : UrlHelper::filterBadProtocol($match[1]);
+            $value = $skip_protocol_filtering ? $match[1] : UrlHelper::filterBadProtocol($match[1]);
+            $value = $filter_attribute_value ? self::filterAttributeValue($value) : $value;
 
             if (!$skip) {
               $attributes_array[] = "$attribute_name=\"$value\"";
@@ -378,7 +381,8 @@ class Xss {
           }
 
           if (preg_match("/^'([^']*)'(\s+|$)/", $attributes, $match)) {
-            $value = $skip_protocol_filtering ? self::filterAttributeValue($match[1]) : UrlHelper::filterBadProtocol($match[1]);
+            $value = $skip_protocol_filtering ? $match[1] : UrlHelper::filterBadProtocol($match[1]);
+            $value = $filter_attribute_value ? self::filterAttributeValue($value) : $value;
 
             if (!$skip) {
               $attributes_array[] = "$attribute_name='$value'";
@@ -388,7 +392,8 @@ class Xss {
           }
 
           if (preg_match("%^([^\s\"']+)(\s+|$)%", $attributes, $match)) {
-            $value = $skip_protocol_filtering ? self::filterAttributeValue($match[1]) : UrlHelper::filterBadProtocol($match[1]);
+            $value = $skip_protocol_filtering ? $match[1] : UrlHelper::filterBadProtocol($match[1]);
+            $value = $filter_attribute_value ? self::filterAttributeValue($value) : $value;
 
             if (!$skip) {
               $attributes_array[] = "$attribute_name=\"$value\"";
