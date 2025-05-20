@@ -59,6 +59,12 @@ class BigPipeStrategyTest extends UnitTestCase {
         if (isset($processed_placeholders[$placeholder]['#markup'])) {
           $processed_placeholders[$placeholder]['#markup'] = (string) $processed_placeholders[$placeholder]['#markup'];
         }
+        if (isset($expected_big_pipe_placeholders[$placeholder]['#prefix'])) {
+          $expected_big_pipe_placeholders[$placeholder]['#prefix'] = (string) $expected_big_pipe_placeholders[$placeholder]['#prefix'];
+        }
+        if (isset($processed_placeholders[$placeholder]['#prefix'])) {
+          $processed_placeholders[$placeholder]['#prefix'] = (string) $processed_placeholders[$placeholder]['#prefix'];
+        }
         $this->assertSame($expected_big_pipe_placeholders[$placeholder], $processed_placeholders[$placeholder], "Verifying how BigPipeStrategy handles the placeholder '$placeholder'");
       }
     }
