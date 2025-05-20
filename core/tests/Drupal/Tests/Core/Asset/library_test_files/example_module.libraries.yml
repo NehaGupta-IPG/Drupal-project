@@ -4,3 +4,8 @@ example:
     theme:
       css/example.css: {}
       css/example2.css: {}
+    # Empty definition, to demonstrate that the library system will not fail
+    # on minor definition mistakes.
+    # component:
+    # This file is disabled.
+    # css/example3.css: {}
