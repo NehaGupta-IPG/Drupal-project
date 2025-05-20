@@ -22,10 +22,9 @@ interface QueueWorkerInterface extends PluginInspectionInterface {
    * @param mixed $data
    *   The data that was passed to
    *   \Drupal\Core\Queue\QueueInterface::createItem() when the item was queued.
-   *
    * phpcs:disable Drupal.Commenting
    * @todo Uncomment new method parameter before drupal:12.0.0.
-   * @see https://www.drupal.org/project/drupal/issues/3517969
+   * @see https://www.drupal.org/project/drupal/issues/3525399
    *
    * @param object|null $metadata
    *   The queue item metadata, typically including the created time and claimed
