@@ -18,6 +18,9 @@ use Drupal\Core\Site\Settings;
  */
 class FileMoveTest extends FileTestBase {
 
+  /**
+   * The file system service.
+   */
   private FileSystem $fileSystem;
 
   /**
@@ -89,6 +92,9 @@ class FileMoveTest extends FileTestBase {
     $this->assertFileExists($new_filepath);
   }
 
+  /**
+   * Try to move a non-readable file.
+   */
   public function testNotReadable(): void {
     // Create a file for testing
     $uri = $this->createUri();
