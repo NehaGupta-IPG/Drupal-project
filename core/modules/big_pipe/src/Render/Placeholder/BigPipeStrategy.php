@@ -5,6 +5,7 @@ namespace Drupal\big_pipe\Render\Placeholder;
 use Drupal\Component\Utility\Crypt;
 use Drupal\Component\Utility\Html;
 use Drupal\Component\Utility\UrlHelper;
+use Drupal\Core\Render\Markup;
 use Drupal\Core\Render\Placeholder\PlaceholderStrategyInterface;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Session\SessionConfigurationInterface;
@@ -263,7 +264,7 @@ class BigPipeStrategy implements PlaceholderStrategyInterface {
     }
 
     return [
-      '#markup' => $big_pipe_placeholder,
+      '#markup' => Markup::create($big_pipe_placeholder),
       '#cache' => [
         'max-age' => 0,
         'contexts' => [
