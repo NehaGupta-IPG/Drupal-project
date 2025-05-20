@@ -148,6 +148,9 @@ class DatabaseQueue implements ReliableQueueInterface, QueueGarbageCollectionInt
         ->condition('expire', 0);
       // If there are affected rows, this update succeeded.
       if ($update->execute()) {
+        // We fetch the data here rather than in the initial query for
+        // performance. The initial query may run many times before we make a
+        // claim and the data can be very large in some use cases.
         $item = $this->connection->query('SELECT * FROM {' . static::TABLE_NAME . '} q WHERE [item_id] = :item_id ', [':item_id' => $item_id])->fetchObject();
         $item->data = unserialize($item->data);
         return $item;
