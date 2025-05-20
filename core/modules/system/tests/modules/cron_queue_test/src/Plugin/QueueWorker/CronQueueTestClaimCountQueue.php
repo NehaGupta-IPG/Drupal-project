@@ -7,7 +7,7 @@ namespace Drupal\cron_queue_test\Plugin\QueueWorker;
 use Drupal\Component\Plugin\PluginBase;
 use Drupal\Core\Queue\Attribute\QueueWorker;
 use Drupal\Core\Queue\DelayedRequeueException;
-use Drupal\Core\Queue\QueueWorkerWithMetadataInterface;
+use Drupal\Core\Queue\QueueWorkerInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\cron_queue_test\Plugin\Derivative\CronQueueBackendTestDeriver;
 
@@ -20,7 +20,7 @@ use Drupal\cron_queue_test\Plugin\Derivative\CronQueueBackendTestDeriver;
   cron: ['time' => 2],
   deriver: CronQueueBackendTestDeriver::class
 )]
-class CronQueueTestClaimCountQueue extends PluginBase implements QueueWorkerWithMetadataInterface {
+class CronQueueTestClaimCountQueue extends PluginBase implements QueueWorkerInterface {
 
   /**
    * The plugin ID.
@@ -30,14 +30,7 @@ class CronQueueTestClaimCountQueue extends PluginBase implements QueueWorkerWith
   /**
    * {@inheritdoc}
    */
-  public function processItem($data): void {
-    $this->processItemAndMetadata($data, NULL);
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function processItemAndMetadata($data, ?object $metadata): void {
+  public function processItem($data, ?object $metadata = NULL): void {
     $claimed_count = $metadata?->claimed_count ?? 0;
     if ($data === 'process') {
       return;

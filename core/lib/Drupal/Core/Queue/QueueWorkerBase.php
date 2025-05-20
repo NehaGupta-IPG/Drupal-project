@@ -14,14 +14,6 @@ use Drupal\Component\Plugin\PluginBase;
  *
  * @ingroup queue
  */
-abstract class QueueWorkerBase extends PluginBase implements QueueWorkerWithMetadataInterface {
-
-  /**
-   * {@inheritdoc}
-   */
-  public function processItemAndMetadata($data, ?object $metadata): void {
-    // By default, we can ignore the extra metadata.
-    $this->processItem($data);
-  }
+abstract class QueueWorkerBase extends PluginBase implements QueueWorkerInterface {
 
 }
