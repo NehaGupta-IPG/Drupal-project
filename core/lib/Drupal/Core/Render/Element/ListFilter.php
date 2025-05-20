@@ -7,7 +7,9 @@ use Drupal\Core\Render\Element;
 /**
  * Provides a search element for filtering a list with JavaScript.
  *
- * - #list_container_selector: The CSS selector(s) of the container to search in.
+ * - #list_container_selector: The CSS selector(s) of the container to search
+ *   in. To use multiple selectors, separate them with commas, like
+ *   '.selector-a, .selector-b'.
  * - #list_item: (optional) The CSS selector, relative to the container, for the
  *   items to search for. If omitted, defaults to 'tbody tr'.
  * - #list_text: (optional) The CSS selector, relative to a list item, of
