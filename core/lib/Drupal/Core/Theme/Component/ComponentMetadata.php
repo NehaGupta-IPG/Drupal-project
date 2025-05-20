@@ -92,6 +92,11 @@ class ComponentMetadata {
   public readonly array $slots;
 
   /**
+   * The available variants.
+   */
+  public readonly array $variants;
+
+  /**
    * ComponentMetadata constructor.
    *
    * @param array $metadata_info
@@ -125,8 +130,9 @@ class ComponentMetadata {
     $this->group = $metadata_info['group'] ?? $this->t('All Components');
 
     // Save the schemas.
-    $this->parseSchemaInfo($metadata_info);
+    $this->schema = $this->parseSchemaInfo($metadata_info);
     $this->slots = $metadata_info['slots'] ?? [];
+    $this->variants = $metadata_info['variants'] ?? [];
   }
 
   /**
@@ -135,9 +141,12 @@ class ComponentMetadata {
    * @param array $metadata_info
    *   The metadata information as decoded from the component definition file.
    *
+   * @return array|null
+   *   The schema for the component props.
+   *
    * @throws \Drupal\Core\Render\Component\Exception\InvalidComponentException
    */
-  private function parseSchemaInfo(array $metadata_info): void {
+  private function parseSchemaInfo(array $metadata_info): ?array {
     if (empty($metadata_info['props'])) {
       if ($this->mandatorySchemas) {
         throw new InvalidComponentException(sprintf('The component "%s" does not provide schema information. Schema definitions are mandatory for components declared in modules. For components declared in themes, schema definitions are only mandatory if the "enforce_prop_schemas" key is set to "true" in the theme info file.', $metadata_info['id']));
@@ -164,7 +173,7 @@ class ComponentMetadata {
         ]);
       }
     }
-    $this->schema = $schema;
+    return $schema;
   }
 
   /**
@@ -194,6 +203,7 @@ class ComponentMetadata {
       'status' => $this->status,
       'name' => $this->name,
       'group' => $this->group,
+      'variants' => $this->variants,
     ];
   }
 
