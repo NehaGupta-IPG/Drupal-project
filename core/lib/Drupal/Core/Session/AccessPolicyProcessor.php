@@ -30,8 +30,8 @@ class AccessPolicyProcessor implements AccessPolicyProcessorInterface {
     protected ?TimeInterface $time = NULL,
   ) {
     if ($this->time === NULL) {
-      @trigger_error('Calling ' . __CLASS__ . '() without the $time argument is deprecated in drupal:11.1.0 and will be required in drupal:12.0.0. See https://www.drupal.org/node/3447821', E_USER_DEPRECATED);
-      $this->time = \Drupal::service('datetime.time');
+      @trigger_error('Calling ' . __METHOD__ . '() without the $time argument is deprecated in drupal:11.1.0 and will be required in drupal:12.0.0. See https://www.drupal.org/node/3447821', E_USER_DEPRECATED);
+      $this->time = \Drupal::time();
     }
   }
 
@@ -126,13 +126,23 @@ class AccessPolicyProcessor implements AccessPolicyProcessorInterface {
     try {
       // Retrieve the permissions from the static cache if available.
       if ($static_cache = $this->variationStatic->get($cache_keys, $initial_cacheability)) {
-        // @todo How to handle this?
+        // We don't need to worry about adjusting the max age of
+        // statically-cached data since it should either be:
+        // - Already accurate if newly computed, or
+        // - Already adjusted if loaded from persistent cache (see below).
         return $static_cache->data;
       }
 
       // Retrieve the permissions from the persistent cache if available.
       if ($this->needsPersistentCache() && $cache = $this->variationCache->get($cache_keys, $initial_cacheability)) {
-        $calculated_permissions = $cache->data;
+        $calculated_permissions = new RefinableCalculatedPermissions();
+        $calculated_permissions->merge($cache->data);
+
+        if ($cache->expire >= 0) {
+          $max_age = max($cache->expire - $this->time->getRequestTime(), 0);
+          $calculated_permissions->mergeCacheMaxAge($max_age);
+        }
+
         $cacheability = CacheableMetadata::createFromObject($calculated_permissions);
 
         // Convert the calculated permissions into an immutable value object and
@@ -140,13 +150,6 @@ class AccessPolicyProcessor implements AccessPolicyProcessorInterface {
         // conversion every time we call for the calculated permissions from a
         // warm static cache.
         $calculated_permissions = new CalculatedPermissions($calculated_permissions);
-        if ($cache->expire >= 0) {
-          $max_age = max($cache->expire - $this->time->getRequestTime(), 0);
-          $calculated_permissions = (new RefinableCalculatedPermissions())
-            ->merge($calculated_permissions)
-            ->mergeCacheMaxAge($max_age);
-        }
-
         $this->variationStatic->set($cache_keys, $calculated_permissions, $cacheability, $initial_cacheability);
         return $calculated_permissions;
       }
