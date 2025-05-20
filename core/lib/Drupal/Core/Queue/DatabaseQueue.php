@@ -121,7 +121,7 @@ class DatabaseQueue implements ReliableQueueInterface, QueueGarbageCollectionInt
     // are no unclaimed items left.
     while (TRUE) {
       try {
-        $item = $this->connection->queryRange('SELECT [data], [created], [item_id] FROM {' . static::TABLE_NAME . '} q WHERE [expire] = 0 AND [name] = :name ORDER BY [created], [item_id] ASC', 0, 1, [':name' => $this->name])->fetchObject();
+        $item_id = $this->connection->queryRange('SELECT [item_id] FROM {' . static::TABLE_NAME . '} q WHERE [expire] = 0 AND [name] = :name ORDER BY [created], [item_id] ASC', 0, 1, [':name' => $this->name])->fetchField();
       }
       catch (\Exception $e) {
         $this->catchException($e);
@@ -129,7 +129,7 @@ class DatabaseQueue implements ReliableQueueInterface, QueueGarbageCollectionInt
 
       // If the table does not exist there are no items currently available to
       // claim.
-      if (empty($item)) {
+      if (empty($item_id)) {
         return FALSE;
       }
 
@@ -143,10 +143,12 @@ class DatabaseQueue implements ReliableQueueInterface, QueueGarbageCollectionInt
         ->fields([
           'expire' => \Drupal::time()->getCurrentTime() + $lease_time,
         ])
-        ->condition('item_id', $item->item_id)
+        ->expression('claimed_count', '[claimed_count] + 1')
+        ->condition('item_id', $item_id)
         ->condition('expire', 0);
       // If there are affected rows, this update succeeded.
       if ($update->execute()) {
+        $item = $this->connection->query('SELECT * FROM {' . static::TABLE_NAME . '} q WHERE [item_id] = :item_id ', [':item_id' => $item_id])->fetchObject();
         $item->data = unserialize($item->data);
         return $item;
       }
@@ -342,6 +344,12 @@ class DatabaseQueue implements ReliableQueueInterface, QueueGarbageCollectionInt
           'default' => 0,
           'description' => 'Timestamp when the item was created.',
           'size' => 'big',
+        ],
+        'claimed_count' => [
+          'type' => 'int',
+          'not null' => TRUE,
+          'default' => 0,
+          'description' => 'The number of times this item has been claimed.',
         ],
       ],
       'primary key' => ['item_id'],

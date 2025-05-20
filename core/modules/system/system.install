@@ -1798,3 +1798,19 @@ function system_update_11201(): void {
     $schema->addIndex('router', 'alias', ['alias'], $spec);
   }
 }
+
+/**
+ * Add the [claimed_count] field to the {queue} table.
+ */
+function system_update_11202(): void {
+  $schema = \Drupal::database()->schema();
+  if ($schema->tableExists('queue') && !$schema->fieldExists('queue', 'claimed_count')) {
+    $spec = [
+      'type' => 'int',
+      'not null' => TRUE,
+      'default' => 0,
+      'description' => 'The number of times this item has been claimed.',
+    ];
+    $schema->addField('queue', 'claimed_count', $spec);
+  }
+}

@@ -4,11 +4,13 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\system\Kernel\System;
 
+use Drupal\Component\Datetime\MockTime;
 use Drupal\Core\Database\Database;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\Logger\RfcLogLevel;
 use Drupal\Core\Queue\DatabaseQueue;
 use Drupal\Core\Queue\Memory;
+use Drupal\cron_queue_test\Plugin\QueueWorker\CronQueueTestClaimCountQueue;
 use Drupal\cron_queue_test\Plugin\QueueWorker\CronQueueTestDeriverQueue;
 use Drupal\cron_queue_test\Plugin\QueueWorker\CronQueueTestException;
 use Drupal\cron_queue_test\Plugin\QueueWorker\CronQueueTestRequeueException;
@@ -52,7 +54,7 @@ class CronQueueTest extends KernelTestBase {
    *
    * @var int
    */
-  protected $currentTime = 1000;
+  protected int $currentTime = 1000;
 
   /**
    * A logger for testing.
@@ -72,11 +74,8 @@ class CronQueueTest extends KernelTestBase {
     $this->connection = Database::getConnection();
     $this->cron = \Drupal::service('cron');
 
-    $time = $this->prophesize('Drupal\Component\Datetime\TimeInterface');
-    $time->getCurrentTime()->willReturn($this->currentTime);
-    $time->getCurrentMicroTime()->willReturn(100.0);
-    $time->getRequestTime()->willReturn($this->currentTime);
-    \Drupal::getContainer()->set('datetime.time', $time->reveal());
+    $time = new MockTime($this->currentTime, $this->currentTime);
+    $this->container->set('datetime.time', $time);
     $this->assertEquals($this->currentTime, \Drupal::time()->getCurrentTime());
     $this->assertEquals($this->currentTime, \Drupal::time()->getRequestTime());
 
@@ -86,11 +85,27 @@ class CronQueueTest extends KernelTestBase {
     $memory = new Memory('cron_queue_test_memory_delay_exception');
     $queue_factory->get('cron_queue_test_database_delay_exception', Argument::cetera())->willReturn($database);
     $queue_factory->get('cron_queue_test_memory_delay_exception', Argument::cetera())->willReturn($memory);
+    $memory_count = new Memory(CronQueueTestClaimCountQueue::BASE_PLUGIN_ID . ':memory');
+    $queue_factory->get(CronQueueTestClaimCountQueue::BASE_PLUGIN_ID . ':memory', Argument::cetera())->willReturn($memory_count);
     $queue_factory->get(Argument::any(), Argument::cetera())->will(function ($args) use ($realQueueFactory) {
       return $realQueueFactory->get($args[0], $args[1] ?? FALSE);
     });
 
     $this->container->set('queue', $queue_factory->reveal());
+  }
+
+  /**
+   * Move time forward.
+   *
+   * @param int $seconds
+   *   Number of seconds to increase the time in the mock time.
+   */
+  protected function moveTimeForward(int $seconds): void {
+    /** @var \Drupal\Component\Datetime\MockTime $time */
+    $time = $this->container->get('datetime.time');
+    $this->currentTime += $seconds;
+    $time->setCurrentTime($this->currentTime);
+    $time->setRequestTime($this->currentTime);
   }
 
   /**
@@ -150,14 +165,10 @@ class CronQueueTest extends KernelTestBase {
     $this->cron->run();
     static::assertEquals(1, \Drupal::state()->get('cron_queue_test_lease_time'));
 
-    // Set the expiration time to 3 seconds ago, so the lease should
-    // automatically expire.
-    \Drupal::database()
-      ->update(DatabaseQueue::TABLE_NAME)
-      ->fields(['expire' => $this->currentTime - 3])
-      ->execute();
+    // Set the time 300 seconds ahead, so the lease should automatically expire.
+    $this->moveTimeForward(300);
 
-    // The queue job should now be picked back up since it's lease has expired,
+    // The queue job should now be picked back up since its lease has expired,
     // and the state variable should be consequently incremented.
     $this->cron->run();
     static::assertEquals(2, \Drupal::state()->get('cron_queue_test_lease_time'));
@@ -259,6 +270,66 @@ class CronQueueTest extends KernelTestBase {
     $this->assertEquals('suspend', $item->data, 'Suspending item remains in the queue.');
     $item = $queue->claimItem();
     $this->assertEquals('ignored', $item->data, 'Item beyond the suspending item remains in the queue.');
+  }
+
+  /**
+   * Data provider.
+   *
+   * @return array[]
+   *   Back end test cases.
+   */
+  public static function queueBackendData(): array {
+    return [
+      ['database'],
+      ['memory'],
+    ];
+  }
+
+  /**
+   * Tests claimed count works during cron.
+   *
+   * @dataProvider queueBackendData
+   *
+   * @see \Drupal\cron_queue_test\Plugin\QueueWorker\CronQueueTestClaimCountQueue
+   */
+  public function testClaimedCount(string $backend): void {
+    $this->logger->log(
+      RfcLogLevel::ERROR,
+      Argument::cetera()
+    )->shouldBeCalled();
+
+    $this->logger->log(
+      RfcLogLevel::INFO,
+      'Cron run completed.',
+      Argument::cetera()
+    )->shouldBeCalled();
+
+    $plugin_id = CronQueueTestClaimCountQueue::BASE_PLUGIN_ID . ':' . $backend;
+    $queue = \Drupal::queue($plugin_id);
+    $queue->createItem('process');
+    $queue->createItem('process');
+    $queue->createItem('fail');
+    $queue->createItem('process');
+
+    // This queue should process all except the failing suspending item.
+    $this->cron->run();
+
+    $this->assertEquals(1, $queue->numberOfItems(), 'Fail item left on queue.');
+    $this->assertEquals(1, \Drupal::state()->get($plugin_id));
+    // Move time forward to get item re-claimed.
+    $this->moveTimeForward(10);
+    $this->cron->run();
+    $this->assertEquals(1, $queue->numberOfItems(), 'Fail item left on queue.');
+    $this->assertEquals(2, \Drupal::state()->get($plugin_id));
+
+    $this->moveTimeForward(10);
+    $this->cron->run();
+    $this->assertEquals(1, $queue->numberOfItems(), 'Fail item left on queue.');
+    $this->assertEquals(3, \Drupal::state()->get($plugin_id));
+
+    $this->moveTimeForward(10);
+    $this->cron->run();
+    $this->assertEquals(0, $queue->numberOfItems(), 'Fail item removed from queue.');
   }
 
   /**
