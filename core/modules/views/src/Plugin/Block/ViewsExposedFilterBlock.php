@@ -40,8 +40,8 @@ class ViewsExposedFilterBlock extends ViewsBlockBase {
     // \Drupal\views\Plugin\Block\ViewsBlock::build() adds the same context in
     // \Drupal\views\ViewExecutable::buildRenderable() using
     // \Drupal\views\Plugin\views\display\DisplayPluginBase::buildRenderable().
-    if (!empty($build)) {
-      $output += [
+    if ($build) {
+      $output = [
         '#view' => $this->view,
         '#display_id' => $this->displayID,
         'content' => $build,
