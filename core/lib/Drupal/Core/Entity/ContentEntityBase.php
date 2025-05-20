@@ -603,20 +603,20 @@ abstract class ContentEntityBase extends EntityBase implements \IteratorAggregat
   /**
    * {@inheritdoc}
    */
-  public function get(/* string */$field_name /* , bool $throw_exception = TRUE */) {
+  public function get(/* string */$field_name /* , bool $exception_on_invalid = TRUE */) {
     $arguments = func_get_args();
-    $throw_exception = !isset($arguments[1]) || (bool) $arguments[1];
+    $exception_on_invalid = !isset($arguments[1]) || (bool) $arguments[1];
     if (!isset($this->fields[$field_name][$this->activeLangcode])) {
       try {
         return $this->getTranslatedField($field_name, $this->activeLangcode);
       }
       catch (\InvalidArgumentException $e) {
-        if (!$throw_exception) {
+        if (!$exception_on_invalid) {
           return NULL;
         }
 
         if (!isset($arguments[1])) {
-          @trigger_error('Throwing an exception when calling ' . __METHOD__ . ' on an invalid field name without the setting the second "$throw_exception" parameter is deprecated in drupal:11.2.0 and will return NULL unless $throw_exception is explicitly set to TRUE in drupal:13.0.0. See https://www.drupal.org/node/3522223', E_USER_DEPRECATED);
+          @trigger_error('Throwing an exception when calling ' . __METHOD__ . ' on an invalid field name without the setting the second "$exception_on_invalid" parameter is deprecated in drupal:11.2.0 and will return NULL unless $throw_exception is explicitly set to TRUE in drupal:13.0.0. See https://www.drupal.org/node/3522223', E_USER_DEPRECATED);
         }
         throw $e;
       }
