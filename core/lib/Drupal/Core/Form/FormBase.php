@@ -7,6 +7,7 @@ use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
 use Drupal\Core\DependencyInjection\DependencySerializationTrait;
 use Drupal\Core\Htmx\HtmxRequestInfoTrait;
 use Drupal\Core\Logger\LoggerChannelTrait;
+use Drupal\Core\Render\ElementInfoManagerInterface;
 use Drupal\Core\Routing\RedirectDestinationTrait;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\Url;
@@ -78,6 +79,13 @@ abstract class FormBase implements FormInterface, ContainerInjectionInterface {
   protected $routeMatch;
 
   /**
+   * The element info manager.
+   *
+   * @var \Drupal\Core\Render\ElementInfoManagerInterface
+   */
+  protected ElementInfoManagerInterface $elementInfoManager;
+
+  /**
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container) {
@@ -125,6 +133,29 @@ abstract class FormBase implements FormInterface, ContainerInjectionInterface {
       $this->configFactory = $this->container()->get('config.factory');
     }
     return $this->configFactory;
+  }
+
+  /**
+   * The element info manager.
+   *
+   * @return \Drupal\Core\Render\ElementInfoManagerInterface
+   *   The element info manager.
+   */
+  protected function elementInfoManager(): ElementInfoManagerInterface {
+    if (!isset($this->elementInfoManager)) {
+      $this->elementInfoManager = $this->container()->get('plugin.manager.element_info');
+    }
+    return $this->elementInfoManager;
+  }
+
+  /**
+   * Sets the element info manager for this form.
+   *
+   * @return $this
+   */
+  public function setElementInfoManager(ElementInfoManagerInterface $elementInfoManager): static {
+    $this->elementInfoManager = $elementInfoManager;
+    return $this;
   }
 
   /**
