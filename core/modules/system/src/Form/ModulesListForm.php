@@ -56,7 +56,7 @@ class ModulesListForm extends FormBase {
     protected AccessManagerInterface $accessManager,
     protected AccountInterface $currentUser,
     protected PermissionHandlerInterface $permissionHandler,
-    protected ModuleExtensionList $moduleExtensionList
+    protected ModuleExtensionList $moduleExtensionList,
   ) {
   }
 
@@ -68,7 +68,6 @@ class ModulesListForm extends FormBase {
     $instance->installProfile = $container->getParameter('install_profile');
     return $instance;
   }
-
 
   /**
    * {@inheritdoc}
