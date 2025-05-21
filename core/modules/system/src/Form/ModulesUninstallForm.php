@@ -121,7 +121,7 @@ class ModulesUninstallForm extends FormBase {
     ];
 
     $form['filters']['text'] = [
-      '#type' => 'search',
+      '#type' => 'list_filter',
       '#title' => $this->t('Filter modules'),
       '#title_display' => 'invisible',
       '#size' => 30,
@@ -131,6 +131,16 @@ class ModulesUninstallForm extends FormBase {
         'class' => ['table-filter-text'],
         'data-table' => '#system-modules-uninstall',
         'autocomplete' => 'off',
+      ],
+      '#list_container_id' => 'system-modules-uninstall',
+      '#list_item' => 'tbody tr',
+      '#list_text' => 'label.module-name, span.module-description',
+      '#minimum_filter_length' => 2,
+      '#search_start_of_words' => TRUE,
+      '#announce' => [
+        'singular' => $this->t('1 module is available in the modified list.'),
+        'plural' => $this->t('@count modules are available in the modified list.'),
+        'all' => $this->t('All available modules are listed.'),
       ],
     ];
 
@@ -205,7 +215,6 @@ class ModulesUninstallForm extends FormBase {
       }
     }
 
-    $form['#attached']['library'][] = 'system/drupal.system.modules';
     $form['actions'] = ['#type' => 'actions'];
     $form['actions']['submit'] = [
       '#type' => 'submit',

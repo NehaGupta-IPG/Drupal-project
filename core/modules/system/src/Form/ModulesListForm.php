@@ -157,7 +157,7 @@ class ModulesListForm extends FormBase {
     ];
 
     $form['filters']['text'] = [
-      '#type' => 'search',
+      '#type' => 'list_filter',
       '#title' => $this->t('Filter modules'),
       '#title_display' => 'invisible',
       '#size' => 30,
@@ -167,6 +167,18 @@ class ModulesListForm extends FormBase {
         'class' => ['table-filter-text'],
         'data-table' => '#system-modules',
         'autocomplete' => 'off',
+      ],
+      '#list_container_id' => 'system-modules',
+      '#list_item' => 'tr',
+      '#list_group' => 'details.package-listing',
+      '#list_text' => 'label.table-filter-text-source, td.module-list__description summary',
+      '#library' => 'core/drupal.list-filter.details',
+      '#minimum_filter_length' => 2,
+      '#search_start_of_words' => TRUE,
+      '#announce' => [
+        'singular' => $this->t('1 module is available in the modified list.'),
+        'plural' => $this->t('@count modules are available in the modified list.'),
+        'all' => $this->t('All available modules are listed.'),
       ],
     ];
 
@@ -229,7 +241,6 @@ class ModulesListForm extends FormBase {
     uasort($form['modules'], ['\Drupal\Component\Utility\SortArray', 'sortByTitleProperty']);
 
     $form['#attached']['library'][] = 'core/drupal.tableresponsive';
-    $form['#attached']['library'][] = 'system/drupal.system.modules';
     $form['actions'] = ['#type' => 'actions'];
     $form['actions']['submit'] = [
       '#type' => 'submit',

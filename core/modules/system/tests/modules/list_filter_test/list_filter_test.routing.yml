@@ -1,0 +1,39 @@
+list_filter_test.div_and_p:
+  path: /list-filter-test/div-and-p
+  defaults:
+    _title: 'List filter test: DIV and P'
+    _controller: '\Drupal\list_filter_test\Controller\ListFilterTestController::contentDivAndP'
+  requirements:
+    _access: 'TRUE'
+
+list_filter_test.list:
+  path: /list-filter-test/list
+  defaults:
+    _title: 'List filter test: list'
+    _controller: '\Drupal\list_filter_test\Controller\ListFilterTestController::contentList'
+  requirements:
+    _access: 'TRUE'
+
+list_filter_test.table:
+  path: /list-filter-test/table
+  defaults:
+    _title: 'List filter test: table'
+    _controller: '\Drupal\list_filter_test\Controller\ListFilterTestController::contentTable'
+  requirements:
+    _access: 'TRUE'
+
+list_filter_test.details:
+  path: /list-filter-test/details
+  defaults:
+    _title: 'List filter test: details'
+    _controller: '\Drupal\list_filter_test\Controller\ListFilterTestController::contentDetails'
+  requirements:
+    _access: 'TRUE'
+
+list_filter_test.table-with-headers:
+  path: /list-filter-test/table-with-headers
+  defaults:
+    _title: 'List filter test: table with headers'
+    _controller: '\Drupal\list_filter_test\Controller\ListFilterTestController::contentTableWithHeaders'
+  requirements:
+    _access: 'TRUE'

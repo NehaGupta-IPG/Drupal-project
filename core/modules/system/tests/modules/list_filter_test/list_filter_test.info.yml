@@ -1,0 +1,6 @@
+name: list_filter_test
+type: module
+description: 'List filter test module.'
+core_version_requirement: '^8 || ^9 || ^10'
+package: Testing
+version: VERSION

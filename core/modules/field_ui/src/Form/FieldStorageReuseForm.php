@@ -98,13 +98,22 @@ class FieldStorageReuseForm extends FormBase {
     ];
 
     $form['search'] = [
-      '#type' => 'search',
+      '#type' => 'list_filter',
       '#title' => $this->t('Filter by field or field type'),
       '#attributes' => [
         'class' => ['js-table-filter-text'],
         'data-table' => '.js-reuse-table',
         'autocomplete' => 'off',
       ],
+      '#list_container_id' => 'edit-table',
+      '#list_item' => 'tbody tr',
+      '#list_text' => 'td.field_name, td.field_type',
+      '#announce' => [
+        'singular' => $this->t('1 field is available in the modified list.'),
+        'plural' => $this->t('@count fields are available in the modified list.'),
+        'all' => $this->t('All available fields are listed.'),
+      ],
+      // TODO: Block query works within words.
     ];
     $form['add'] = [
       '#type' => 'container',
@@ -145,10 +154,16 @@ class FieldStorageReuseForm extends FormBase {
         'field' => [
           '#plain_text' => $field['field_name'],
           '#type' => 'item',
+          '#wrapper_attributes' => [
+            'class' => ['field_name'],
+          ],
         ],
         'field_type' => [
           '#plain_text' => $field['field_type'],
           '#type' => 'item',
+          '#wrapper_attributes' => [
+            'class' => ['field_type'],
+          ],
         ],
         'summary' => $settings_summary,
         'operations' => [

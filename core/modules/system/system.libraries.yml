@@ -59,17 +59,6 @@ drupal.system:
     - core/drupalSettings
     - core/once
 
-drupal.system.modules:
-  version: VERSION
-  js:
-    js/system.modules.js: {}
-  dependencies:
-    - core/jquery
-    - core/drupal
-    - core/drupal.debounce
-    - core/once
-    - core/drupal.announce
-
 diff:
   version: VERSION
   css:

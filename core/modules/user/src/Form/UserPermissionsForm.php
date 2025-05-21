@@ -158,7 +158,7 @@ class UserPermissionsForm extends FormBase {
     ];
 
     $form['filters']['text'] = [
-      '#type' => 'search',
+      '#type' => 'list_filter',
       '#title' => $this->t('Filter permissions'),
       '#title_display' => 'invisible',
       '#size' => 30,
@@ -168,6 +168,17 @@ class UserPermissionsForm extends FormBase {
         'class' => ['table-filter-text'],
         'data-table' => '#permissions',
         'autocomplete' => 'off',
+      ],
+      '#list_container_id' => 'permissions',
+      '#list_item' => 'tr:has(div.permission)',
+      '#list_group' => 'tr:has(td.module)',
+      '#list_text' => 'span.table-filter-text-source',
+      '#search_start_of_words' => TRUE,
+      '#library' => 'core/drupal.list-filter.sibling-groups',
+      '#announce' => [
+        'singular' => $this->t('1 permission is available in the modified list.'),
+        'plural' => $this->t('@count permissions are available in the modified list.'),
+        'all' => $this->t('All available permissions are listed.'),
       ],
     ];
 

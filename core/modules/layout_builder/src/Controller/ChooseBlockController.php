@@ -126,7 +126,7 @@ class ChooseBlockController implements ContainerInjectionInterface {
     }
 
     $build['filter'] = [
-      '#type' => 'search',
+      '#type' => 'list_filter',
       '#title' => $this->t('Filter by block name'),
       '#title_display' => 'invisible',
       '#size' => 30,
@@ -135,9 +135,21 @@ class ChooseBlockController implements ContainerInjectionInterface {
         'class' => ['js-layout-builder-filter'],
         'title' => $this->t('Enter a part of the block name to filter by.'),
       ],
+      '#list_container_id' => 'block-categories',
+      '#list_item' => 'li',
+      '#list_group' => 'details',
+      '#library' => 'core/drupal.list-filter.details',
+      '#minimum_filter_length' => 2,
+      '#announce' => [
+        'singular' => $this->t('1 block is available in the modified list.'),
+        'plural' => $this->t('@count blocks are available in the modified list.'),
+        'all' => $this->t('All available blocks are listed.'),
+      ],
+      // TODO: Block query works within words.
     ];
 
     $block_categories['#type'] = 'container';
+    $block_categories['#attributes']['id'] = 'block-categories';
     $block_categories['#attributes']['class'][] = 'block-categories';
     $block_categories['#attributes']['class'][] = 'js-layout-builder-categories';
     $block_categories['#attributes']['data-layout-builder-target-highlight-id'] = $this->blockAddHighlightId($delta, $region);

@@ -141,7 +141,7 @@ class BlockLibraryController extends ControllerBase {
     $build['#attached']['library'][] = 'block/drupal.block.admin';
 
     $build['filter'] = [
-      '#type' => 'search',
+      '#type' => 'list_filter',
       '#title' => $this->t('Filter'),
       '#title_display' => 'invisible',
       '#size' => 30,
@@ -151,6 +151,16 @@ class BlockLibraryController extends ControllerBase {
         'data-element' => '.block-add-table',
         'title' => $this->t('Enter a part of the block name to filter by.'),
       ],
+      '#list_container_id' => 'block-add-table',
+      '#list_item' => 'tbody tr',
+      '#list_text' => 'td div.block-filter-text-source',
+      '#minimum_filter_length' => 2,
+      '#announce' => [
+        'singular' => $this->t('1 block is available in the modified list.'),
+        'plural' => $this->t('@count blocks are available in the modified list.'),
+        'all' => $this->t('All available blocks are listed.'),
+      ],
+      // TODO: Block query works within words.
     ];
 
     $build['blocks'] = [
@@ -160,6 +170,7 @@ class BlockLibraryController extends ControllerBase {
       '#empty' => $this->t('No blocks available.'),
       '#attributes' => [
         'class' => ['block-add-table'],
+        'id' => 'block-add-table',
       ],
     ];
 

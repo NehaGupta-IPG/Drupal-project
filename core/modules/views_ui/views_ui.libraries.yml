@@ -17,16 +17,6 @@ views_ui.admin:
     - views_ui/admin.styling
     - core/drupal.dialog
 
-views_ui.listing:
-  version: VERSION
-  js:
-    js/views_ui.listing.js: {}
-  dependencies:
-    - core/jquery
-    - core/drupal
-    - core/once
-    - views_ui/admin.styling
-
 admin.styling:
   version: VERSION
   css:

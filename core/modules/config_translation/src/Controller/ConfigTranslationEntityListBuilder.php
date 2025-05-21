@@ -41,7 +41,7 @@ class ConfigTranslationEntityListBuilder extends ConfigEntityListBuilder impleme
     ];
 
     $build['filters']['text'] = [
-      '#type' => 'search',
+      '#type' => 'list_filter',
       '#title' => $this->t('Search'),
       '#size' => 30,
       '#placeholder' => $filter['placeholder'],
@@ -51,11 +51,16 @@ class ConfigTranslationEntityListBuilder extends ConfigEntityListBuilder impleme
         'autocomplete' => 'off',
         'title' => $filter['description'],
       ],
+      '#list_container_id' => 'config-translation-entity-list',
+      '#list_item' => 'tbody tr',
+      '#list_text' => 'td.table-filter-text-source',
+      '#minimum_filter_length' => 2,
+      '#search_start_of_words' => TRUE,
     ];
 
+    $build['table']['#attributes']['id'] = 'config-translation-entity-list';
     $build['table']['#attributes']['class'][] = 'config-translation-entity-list';
     $build['table']['#weight'] = 0;
-    $build['#attached']['library'][] = 'system/drupal.system.modules';
 
     return $build;
   }
