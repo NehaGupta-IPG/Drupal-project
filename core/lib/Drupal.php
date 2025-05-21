@@ -1,7 +1,6 @@
 <?php
 
 use Drupal\Core\DependencyInjection\ContainerNotInitializedException;
-use Drupal\Core\Render\Element\ElementInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**

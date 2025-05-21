@@ -2,13 +2,13 @@
 
 namespace Drupal\Core\Render;
 
-use Drupal\Component\Plugin\Discovery\DiscoveryInterface;
+use Drupal\Component\Plugin\PluginManagerInterface;
 use Drupal\Core\Render\Element\ElementInterface;
 
 /**
  * Collects available render array element types.
  */
-interface ElementInfoManagerInterface extends DiscoveryInterface {
+interface ElementInfoManagerInterface extends PluginManagerInterface {
 
   /**
    * Retrieves the default properties for the defined element type.
