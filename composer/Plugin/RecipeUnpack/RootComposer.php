@@ -140,13 +140,15 @@ final class RootComposer {
 
     $this->io->write("Unpacking has updated the root composer files.", verbosity: IOInterface::VERBOSE);
 
-    $diff = self::compareComposerContentWithRootPackage($composer_content, $this->composer->getPackage());
-    assert(empty($diff),
-      sprintf("Composer root package and composer.json mismatch detected.\nrequire: %s\nrequire-dev: %s\n",
-        array_key_exists('require', $diff) ? implode(', ', $diff['require']) : 'OK',
-        array_key_exists('require-dev', $diff) ? implode(', ', $diff['require-dev']) : 'OK',
-      )
-    );
+    if (ini_get('zend.assertions') === '-1') {
+      $diff = self::compareComposerContentWithRootPackage($composer_content, $this->composer->getPackage());
+      assert(empty($diff),
+        sprintf("Composer root package and composer.json mismatch detected.\nrequire: %s\nrequire-dev: %s\n",
+          array_key_exists('require', $diff) ? implode(', ', $diff['require']) : 'OK',
+          array_key_exists('require-dev', $diff) ? implode(', ', $diff['require-dev']) : 'OK',
+        )
+      );
+    }
   }
 
   /**
