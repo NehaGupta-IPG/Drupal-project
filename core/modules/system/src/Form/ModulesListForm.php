@@ -16,14 +16,12 @@ use Drupal\Core\Extension\ModuleInstallerInterface;
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\KeyValueStore\KeyValueExpirableFactoryInterface;
-use Drupal\Core\KeyValueStore\KeyValueStoreExpirableInterface;
 use Drupal\Core\Link;
 use Drupal\Core\Render\Element;
 use Drupal\Core\Render\Markup;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\user\PermissionHandlerInterface;
 use Drupal\Core\Url;
-use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Drupal\Component\Utility\Xss;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -47,14 +45,6 @@ class ModulesListForm extends FormBase {
   use ModulesEnabledTrait;
 
   /**
-   * The expirable key value store.
-   *
-   * @deprecated
-   *   Use $this->keyValueExpirableFactory instead.
-   */
-  protected $keyValueExpirable;
-
-  /**
    * The install profile.
    */
   protected string $installProfile;
@@ -62,18 +52,12 @@ class ModulesListForm extends FormBase {
   public function __construct(
     protected ModuleHandlerInterface $moduleHandler,
     protected ModuleInstallerInterface $moduleInstaller,
-    #[Autowire('keyvalue.expirable')]
-    protected KeyValueExpirableFactoryInterface|KeyValueStoreExpirableInterface $keyValueExpirableFactory,
+    protected KeyValueExpirableFactoryInterface $keyValueExpirableFactory,
     protected AccessManagerInterface $accessManager,
     protected AccountInterface $currentUser,
     protected PermissionHandlerInterface $permissionHandler,
     protected ModuleExtensionList $moduleExtensionList
   ) {
-    if ($keyValueExpirableFactory instanceof KeyValueStoreExpirableInterface) {
-      @trigger_error('@todo deprecated message', E_USER_DEPRECATED);
-      $this->keyValueExpirableFactory = \Drupal::service('keyvalue.expirable');
-    }
-    $this->keyValueExpirable = $keyValueExpirableFactory->get('module_list');
   }
 
   /**
