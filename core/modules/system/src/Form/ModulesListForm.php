@@ -5,6 +5,7 @@ namespace Drupal\system\Form;
 use Drupal\Core\Config\PreExistingConfigException;
 use Drupal\Core\Config\UnmetDependenciesException;
 use Drupal\Core\Access\AccessManagerInterface;
+use Drupal\Core\DependencyInjection\AutowireTrait;
 use Drupal\Core\Extension\Extension;
 use Drupal\Core\Extension\ExtensionLifecycle;
 use Drupal\Core\Extension\InfoParserException;
@@ -14,6 +15,7 @@ use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Extension\ModuleInstallerInterface;
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\KeyValueStore\KeyValueExpirableFactoryInterface;
 use Drupal\Core\KeyValueStore\KeyValueStoreExpirableInterface;
 use Drupal\Core\Link;
 use Drupal\Core\Render\Element;
@@ -21,7 +23,7 @@ use Drupal\Core\Render\Markup;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\user\PermissionHandlerInterface;
 use Drupal\Core\Url;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Drupal\Component\Utility\Xss;
 
 /**
@@ -37,99 +39,33 @@ use Drupal\Component\Utility\Xss;
  */
 class ModulesListForm extends FormBase {
 
+  use AutowireTrait;
   use ModuleDependencyMessageTrait;
   use ModulesEnabledTrait;
 
   /**
-   * The current user.
-   *
-   * @var \Drupal\Core\Session\AccountInterface
-   */
-  protected $currentUser;
-
-  /**
-   * The module handler service.
-   *
-   * @var \Drupal\Core\Extension\ModuleHandlerInterface
-   */
-  protected $moduleHandler;
-
-  /**
    * The expirable key value store.
    *
-   * @var \Drupal\Core\KeyValueStore\KeyValueStoreExpirableInterface
+   * @deprecated
+   *   Use $this->keyValueExpirableFactory instead.
    */
   protected $keyValueExpirable;
 
-  /**
-   * The module installer.
-   *
-   * @var \Drupal\Core\Extension\ModuleInstallerInterface
-   */
-  protected $moduleInstaller;
-
-  /**
-   * The permission handler.
-   *
-   * @var \Drupal\user\PermissionHandlerInterface
-   */
-  protected $permissionHandler;
-
-  /**
-   * The module extension list.
-   *
-   * @var \Drupal\Core\Extension\ModuleExtensionList
-   */
-  protected $moduleExtensionList;
-
-  /**
-   * The access manager.
-   *
-   * @var \Drupal\Core\Access\AccessManagerInterface
-   */
-  protected $accessManager;
-
-  /**
-   * {@inheritdoc}
-   */
-  public static function create(ContainerInterface $container) {
-    return new static(
-      $container->get('module_handler'),
-      $container->get('module_installer'),
-      $container->get('keyvalue.expirable')->get('module_list'),
-      $container->get('access_manager'),
-      $container->get('current_user'),
-      $container->get('user.permissions'),
-      $container->get('extension.list.module')
-    );
-  }
-
-  /**
-   * Constructs a ModulesListForm object.
-   *
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
-   *   The module handler.
-   * @param \Drupal\Core\Extension\ModuleInstallerInterface $module_installer
-   *   The module installer.
-   * @param \Drupal\Core\KeyValueStore\KeyValueStoreExpirableInterface $key_value_expirable
-   *   The key value expirable factory.
-   * @param \Drupal\Core\Access\AccessManagerInterface $access_manager
-   *   Access manager.
-   * @param \Drupal\Core\Session\AccountInterface $current_user
-   *   The current user.
-   * @param \Drupal\user\PermissionHandlerInterface $permission_handler
-   *   The permission handler.
-   * @param \Drupal\Core\Extension\ModuleExtensionList $extension_list_module
-   *   The module extension list.
-   */
-  public function __construct(ModuleHandlerInterface $module_handler, ModuleInstallerInterface $module_installer, KeyValueStoreExpirableInterface $key_value_expirable, AccessManagerInterface $access_manager, AccountInterface $current_user, PermissionHandlerInterface $permission_handler, ModuleExtensionList $extension_list_module) {
-    $this->moduleExtensionList = $extension_list_module;
-    $this->moduleHandler = $module_handler;
-    $this->moduleInstaller = $module_installer;
-    $this->keyValueExpirable = $key_value_expirable;
-    $this->accessManager = $access_manager;
-    $this->currentUser = $current_user;
-    $this->permissionHandler = $permission_handler;
+  public function __construct(
+    protected ModuleHandlerInterface $moduleHandler,
+    protected ModuleInstallerInterface $moduleInstaller,
+    #[Autowire('keyvalue.expirable')]
+    protected KeyValueExpirableFactoryInterface|KeyValueStoreExpirableInterface $keyValueExpirableFactory,
+    protected AccessManagerInterface $accessManager,
+    protected AccountInterface $currentUser,
+    protected PermissionHandlerInterface $permissionHandler,
+    protected ModuleExtensionList $moduleExtensionList
+  ) {
+    if ($keyValueExpirableFactory instanceof KeyValueStoreExpirableInterface) {
+      @trigger_error('@todo deprecated message', E_USER_DEPRECATED);
+      $this->keyValueExpirableFactory = \Drupal::service('keyvalue.expirable');
+    }
+    $this->keyValueExpirable = $keyValueExpirableFactory->get('module_list');
   }
 
   /**
@@ -487,7 +423,7 @@ class ModulesListForm extends FormBase {
       $route_name = !empty($modules['non_stable']) ? 'system.modules_list_non_stable_confirm' : 'system.modules_list_confirm';
       // Write the list of changed module states into a key value store.
       $account = $this->currentUser()->id();
-      $this->keyValueExpirable->setWithExpire($account, $modules, 60);
+      $this->keyValueExpirableFactory->get('module_list')->setWithExpire($account, $modules, 60);
 
       // Redirect to the confirmation form.
       $form_state->setRedirect($route_name);
