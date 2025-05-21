@@ -23,20 +23,6 @@ use Composer\Plugin\PluginInterface;
 final class Plugin implements PluginInterface, EventSubscriberInterface {
 
   /**
-   * The format in which the log should be dumped. Can be `json` or `php`.
-   *
-   * @var string
-   */
-  private readonly string $format;
-
-  /**
-   * The path of the log file. Can be absolute or relative.
-   *
-   * @var string
-   */
-  private readonly string $logFile;
-
-  /**
    * {@inheritdoc}
    */
   public static function getSubscribedEvents(): array {
@@ -49,23 +35,12 @@ final class Plugin implements PluginInterface, EventSubscriberInterface {
    * {@inheritdoc}
    */
   public function activate(Composer $composer, IOInterface $io): void {
-    $key = 'drupal-installer-log';
-
-    $extra = $composer->getPackage()->getExtra();
-    $this->format = $extra[$key]['format'] ?? 'php';
-    $this->logFile = $extra[$key]['logFile'] ?? "installer-log.$this->format";
   }
 
   /**
    * {@inheritdoc}
    */
   public function deactivate(Composer $composer, IOInterface $io): void {
-    if (unlink($this->logFile)) {
-      $io->debug("Deleted installer log: $this->logFile");
-    }
-    else {
-      $io->warning("Could not delete installer log: $this->logFile");
-    }
   }
 
   /**
@@ -81,10 +56,12 @@ final class Plugin implements PluginInterface, EventSubscriberInterface {
    *   The event being handled.
    */
   public function preExec(InstallerEvent $event): void {
-    $operations = $event->getTransaction()?->getOperations() ?? [];
+    $extra = $event->getComposer()->getPackage()->getExtra();
+    $file = $extra['drupal-installer-log']['file'] ?? 'installer-log.php';
 
     $data = [];
     $dumper = new ArrayDumper();
+    $operations = $event->getTransaction()?->getOperations() ?? [];
 
     foreach ($operations as $operation) {
       $item = [
@@ -99,11 +76,7 @@ final class Plugin implements PluginInterface, EventSubscriberInterface {
       }
       $data[] = $item;
     }
-
-    file_put_contents($this->logFile, match ($this->format) {
-      'json' => json_encode($data),
-      'php' => "<?php\nreturn " . var_export($data, TRUE),
-    });
+    file_put_contents($file, "<?php\nreturn " . var_export($data, TRUE));
   }
 
 }
