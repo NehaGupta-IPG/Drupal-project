@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\layout_builder_test\Plugin\SectionStorage;
 
 use Drupal\Core\Access\AccessResult;
+use Drupal\Core\Cache\CacheableDependencyInterface;
 use Drupal\Core\Cache\RefinableCacheableDependencyInterface;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
@@ -33,7 +34,7 @@ use Symfony\Component\Routing\RouteCollection;
     label: new TranslatableMarkup("Configuration ID"),
   ),
 ])]
-class SimpleConfigSectionStorage extends PluginBase implements SectionStorageInterface, SectionStorageLocalTaskProviderInterface, ContainerFactoryPluginInterface {
+class SimpleConfigSectionStorage extends PluginBase implements SectionStorageInterface, SectionStorageLocalTaskProviderInterface, ContainerFactoryPluginInterface, CacheableDependencyInterface {
 
   use ContextAwarePluginTrait;
   use LayoutBuilderRoutesTrait;
