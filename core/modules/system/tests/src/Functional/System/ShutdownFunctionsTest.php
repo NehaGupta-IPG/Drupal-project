@@ -30,7 +30,7 @@ class ShutdownFunctionsTest extends BrowserTestBase {
     // This test intentionally throws an exception in a PHP shutdown function.
     // Prevent it from being interpreted as an actual test failure.
     // Not using File API; a potential error must trigger a PHP warning.
-    unlink(\Drupal::root() . '/' . $this->siteDirectory . '/error.log');
+    unlink($this->root . '/' . $this->siteDirectory . '/error.log');
     parent::tearDown();
   }
 

@@ -74,7 +74,7 @@ class ImageStyleDownloadAccessControlTest extends BrowserTestBase {
    * Ensures that private:// access is forbidden through image.style_public.
    */
   public function testPrivateThroughPublicRoute(): void {
-    $this->fileSystem->copy(\Drupal::root() . '/core/tests/fixtures/files/image-1.png', 'private://image.png');
+    $this->fileSystem->copy($this->root . '/core/tests/fixtures/files/image-1.png', 'private://image.png');
 
     // Manually create the file record for the private:// file as we want it
     // to be temporary to pass hook_download() acl's.
@@ -113,7 +113,7 @@ class ImageStyleDownloadAccessControlTest extends BrowserTestBase {
    * Ensures that public:// access is forbidden through image.style.private.
    */
   public function testPublicThroughPrivateRoute(): void {
-    $this->fileSystem->copy(\Drupal::root() . '/core/tests/fixtures/files/image-1.png', 'public://image.png');
+    $this->fileSystem->copy($this->root . '/core/tests/fixtures/files/image-1.png', 'public://image.png');
     $token = $this->style->getPathToken('public://image.png');
     $private_route_public_scheme = Url::fromRoute(
       'image.style_private',

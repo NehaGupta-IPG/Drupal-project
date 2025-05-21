@@ -95,14 +95,14 @@ class UncaughtExceptionTest extends BrowserTestBase {
     if (PHP_VERSION_ID >= 80400) {
       $fatal_error = [
         '%type' => 'TypeError',
-        '@message' => 'Drupal\error_test\Controller\ErrorTestController::{closure:Drupal\error_test\Controller\ErrorTestController::generateFatalErrors():64}(): Argument #1 ($test) must be of type array, string given, called in ' . \Drupal::root() . '/core/modules/system/tests/modules/error_test/src/Controller/ErrorTestController.php on line 67',
+        '@message' => 'Drupal\error_test\Controller\ErrorTestController::{closure:Drupal\error_test\Controller\ErrorTestController::generateFatalErrors():64}(): Argument #1 ($test) must be of type array, string given, called in ' . $this->root . '/core/modules/system/tests/modules/error_test/src/Controller/ErrorTestController.php on line 67',
         '%function' => 'Drupal\error_test\Controller\ErrorTestController->{closure:Drupal\error_test\Controller\ErrorTestController::generateFatalErrors():64}()',
       ];
     }
     else {
       $fatal_error = [
         '%type' => 'TypeError',
-        '@message' => 'Drupal\error_test\Controller\ErrorTestController::Drupal\error_test\Controller\{closure}(): Argument #1 ($test) must be of type array, string given, called in ' . \Drupal::root() . '/core/modules/system/tests/modules/error_test/src/Controller/ErrorTestController.php on line 67',
+        '@message' => 'Drupal\error_test\Controller\ErrorTestController::Drupal\error_test\Controller\{closure}(): Argument #1 ($test) must be of type array, string given, called in ' . $this->root . '/core/modules/system/tests/modules/error_test/src/Controller/ErrorTestController.php on line 67',
         '%function' => 'Drupal\error_test\Controller\ErrorTestController->Drupal\error_test\Controller\{closure}()',
       ];
     }
@@ -246,18 +246,18 @@ class UncaughtExceptionTest extends BrowserTestBase {
     $this->assertSession()->pageTextContains($this->expectedExceptionMessage);
 
     // Find fatal error logged to the error.log
-    $errors = file(\Drupal::root() . '/' . $this->siteDirectory . '/error.log');
+    $errors = file($this->root . '/' . $this->siteDirectory . '/error.log');
     $this->assertCount(10, $errors, 'The error + the error that the logging service is broken has been written to the error log.');
     $this->assertStringContainsString('Failed to log error', $errors[0], 'The error handling logs when an error could not be logged to the logger.');
 
-    $expected_path = \Drupal::root() . '/core/modules/system/tests/modules/error_service_test/src/MonkeysInTheControlRoom.php';
+    $expected_path = $this->root . '/core/modules/system/tests/modules/error_service_test/src/MonkeysInTheControlRoom.php';
     $expected_line = 69;
     $expected_entry = "Failed to log error: Exception: Deforestation in Drupal\\error_service_test\\MonkeysInTheControlRoom->handle() (line {$expected_line} of {$expected_path})";
     $this->assertStringContainsString($expected_entry, $errors[0], 'Original error logged to the PHP error log when an exception is thrown by a logger');
 
     // The exception is expected. Do not interpret it as a test failure. Not
     // using File API; a potential error must trigger a PHP warning.
-    unlink(\Drupal::root() . '/' . $this->siteDirectory . '/error.log');
+    unlink($this->root . '/' . $this->siteDirectory . '/error.log');
   }
 
   /**

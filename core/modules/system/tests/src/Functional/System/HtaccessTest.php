@@ -146,7 +146,7 @@ class HtaccessTest extends BrowserTestBase {
    * @internal
    */
   protected function assertFileAccess(string $path, int $response_code): void {
-    $this->assertFileExists(\Drupal::root() . '/' . $path);
+    $this->assertFileExists($this->root . '/' . $path);
     $this->drupalGet($path);
     $this->assertEquals($response_code, $this->getSession()->getStatusCode(), "Response code to $path should be $response_code");
   }
