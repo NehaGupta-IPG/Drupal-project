@@ -23,6 +23,7 @@ use Drupal\Core\Session\AccountInterface;
 use Drupal\user\PermissionHandlerInterface;
 use Drupal\Core\Url;
 use Drupal\Component\Utility\Xss;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -52,6 +53,7 @@ class ModulesListForm extends FormBase {
   public function __construct(
     protected ModuleHandlerInterface $moduleHandler,
     protected ModuleInstallerInterface $moduleInstaller,
+    #[Autowire('keyvalue.expirable')]
     protected KeyValueExpirableFactoryInterface $keyValueExpirableFactory,
     protected AccessManagerInterface $accessManager,
     protected AccountInterface $currentUser,
