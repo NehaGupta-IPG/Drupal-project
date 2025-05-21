@@ -412,7 +412,7 @@ class ModulesListForm extends FormBase {
   /**
    * {@inheritdoc}
    */
-  public function submitForm(array &$form, FormStateInterface $form_state) {
+  public function submitForm(array &$form, FormStateInterface $form_state): void {
     // Retrieve a list of modules to install and their dependencies.
     $modules = $this->buildModuleList($form_state);
 
