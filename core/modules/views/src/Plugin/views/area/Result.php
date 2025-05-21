@@ -95,7 +95,7 @@ class Result extends AreaPluginBase {
 
     // Send the output.
     if (!empty($this->total) || !empty($this->options['empty'])) {
-      $output .= Xss::filterAdmin(str_replace(array_keys($this->replacements), array_values($this->replacements), $format));
+      $output .= str_replace(array_keys($this->replacements), array_values($this->replacements), $format);
       // Return as render array.
       return [
         '#markup' => $output,
