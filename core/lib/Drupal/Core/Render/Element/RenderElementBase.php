@@ -616,7 +616,7 @@ abstract class RenderElementBase extends PluginBase implements ElementInterface,
     $childObject = $this->elementInfoManager()->fromRenderArray($child);
     $childObject->renderParent = $this;
     $childObject->renderParentName = $name;
-    $child = $this->storage[$name] = &$childObject->toRenderArray();
+    $this->storage[$name] = &$childObject->toRenderArray();
     return $this;
   }
 
