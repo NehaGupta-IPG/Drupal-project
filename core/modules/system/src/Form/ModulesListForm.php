@@ -25,6 +25,7 @@ use Drupal\user\PermissionHandlerInterface;
 use Drupal\Core\Url;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Drupal\Component\Utility\Xss;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Provides module installation interface.
@@ -39,7 +40,9 @@ use Drupal\Component\Utility\Xss;
  */
 class ModulesListForm extends FormBase {
 
-  use AutowireTrait;
+  use AutowireTrait {
+    AutowireTrait::create as autowireCreate;
+  }
   use ModuleDependencyMessageTrait;
   use ModulesEnabledTrait;
 
@@ -50,6 +53,11 @@ class ModulesListForm extends FormBase {
    *   Use $this->keyValueExpirableFactory instead.
    */
   protected $keyValueExpirable;
+
+  /**
+   * The install profile.
+   */
+  protected string $installProfile;
 
   public function __construct(
     protected ModuleHandlerInterface $moduleHandler,
@@ -71,6 +79,16 @@ class ModulesListForm extends FormBase {
   /**
    * {@inheritdoc}
    */
+  public static function create(ContainerInterface $container): static {
+    $instance = static::autowireCreate($container);
+    $instance->installProfile = $container->getParameter('install_profile');
+    return $instance;
+  }
+
+
+  /**
+   * {@inheritdoc}
+   */
   public function getFormId() {
     return 'system_modules';
   }
@@ -79,9 +97,6 @@ class ModulesListForm extends FormBase {
    * {@inheritdoc}
    */
   public function buildForm(array $form, FormStateInterface $form_state) {
-    require_once DRUPAL_ROOT . '/core/includes/install.inc';
-    $distribution = drupal_install_profile_distribution_name();
-
     $form['filters'] = [
       '#type' => 'container',
       '#attributes' => [
@@ -126,7 +141,7 @@ class ModulesListForm extends FormBase {
     foreach ($modules as $filename => $module) {
       if (empty($module->info['hidden'])) {
         $package = $module->info['package'];
-        $form['modules'][$package][$filename] = $this->buildRow($modules, $module, $distribution);
+        $form['modules'][$package][$filename] = $this->buildRow($modules, $module);
         $form['modules'][$package][$filename]['#parents'] = ['modules', $filename];
       }
       if (!$incompatible_installed && $module->status && $module->info['core_incompatible']) {
@@ -180,13 +195,11 @@ class ModulesListForm extends FormBase {
    *   The list existing modules.
    * @param \Drupal\Core\Extension\Extension $module
    *   The module for which to build the form row.
-   * @param string $distribution
-   *   The distribution.
    *
    * @return array
    *   The form row for the given module.
    */
-  protected function buildRow(array $modules, Extension $module, $distribution) {
+  protected function buildRow(array $modules, Extension $module) {
     // Set the basic properties.
     $row['#required'] = [];
     $row['#requires'] = [];
@@ -262,9 +275,9 @@ class ModulesListForm extends FormBase {
     // Disable the checkbox for required modules.
     if (!empty($module->info['required'])) {
       // Used when displaying modules that are required by the installation
-      // profile.
+      // profile
       $row['enable']['#disabled'] = TRUE;
-      $row['#required_by'][] = $distribution . (!empty($module->info['explanation']) ? ' (' . $module->info['explanation'] . ')' : '');
+      $row['#required_by'][] = $this->installProfile . (!empty($module->info['explanation']) ? ' (' . $module->info['explanation'] . ')' : '');
     }
 
     // Check the compatibilities.
@@ -308,6 +321,8 @@ class ModulesListForm extends FormBase {
     // If this module requires other modules, add them to the array.
     /** @var \Drupal\Core\Extension\Dependency $dependency_object */
     foreach ($module->requires as $dependency => $dependency_object) {
+      // @todo Add logic for not displaying hidden modules in
+      //   https://drupal.org/node/3117829.
       if ($incompatible = $this->checkDependencyMessage($modules, $dependency, $dependency_object)) {
         $row['#requires'][$dependency] = $incompatible;
         $row['enable']['#disabled'] = TRUE;
