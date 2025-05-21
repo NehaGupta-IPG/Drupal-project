@@ -591,8 +591,9 @@ class FormBuilder implements FormBuilderInterface, FormValidatorInterface, FormS
         if ($form_state->isCached()) {
           $this->deleteCache($form['#build_id']);
         }
-        // If the form submission directly returned a response, return it now.
-        if ($submit_response) {
+        // If the form submission directly returned a response
+        // and form has enabled to redirect, return it now.
+        if ($submit_response && !$form_state->isRedirectDisabled()) {
           return $submit_response;
         }
       }
