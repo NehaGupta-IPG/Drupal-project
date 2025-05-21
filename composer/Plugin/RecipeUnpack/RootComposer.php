@@ -7,6 +7,7 @@ use Composer\Factory;
 use Composer\IO\IOInterface;
 use Composer\Json\JsonFile;
 use Composer\Json\JsonManipulator;
+use Composer\Package\Link;
 use Composer\Package\Locker;
 use Composer\Package\RootPackageInterface;
 
@@ -139,23 +140,44 @@ final class RootComposer {
 
     $this->io->write("Unpacking has updated the root composer files.", verbosity: IOInterface::VERBOSE);
 
-    assert(self::checkRootPackage($composer_content, $this->composer->getPackage()), 'Composer root package and composer.json match');
+    $diff = self::compareComposerContentWithRootPackage($composer_content, $this->composer->getPackage());
+    assert(empty($diff),
+      sprintf("Composer root package and composer.json mismatch detected.\nrequire: %s\nrequire-dev: %s\n",
+        array_key_exists('require', $diff) ? implode(', ', $diff['require']) : 'OK',
+        array_key_exists('require-dev', $diff) ? implode(', ', $diff['require-dev']) : 'OK',
+      )
+    );
   }
 
   /**
-   * Checks that the composer content and root package match.
+   * Composer the root composer content and root package.
    *
    * @param string $composer_content
    *   The root composer content.
    * @param \Composer\Package\RootPackageInterface $root_package
    *   The root package.
    *
-   * @return bool
-   *   TRUE if the composer content and root package match, FALSE if not.
+   * @return array{require?: string, require-dev?: string[]}
+   *   An array containing differences between composer content and
+   *   root package or an empty array if they match.
    */
-  private static function checkRootPackage(string $composer_content, RootPackageInterface $root_package): bool {
+  private static function compareComposerContentWithRootPackage(string $composer_content, RootPackageInterface $root_package): array {
     $composer = JsonFile::parseJson($composer_content);
-    return empty(array_diff_key($root_package->getRequires(), $composer['require'] ?? [])) && empty(array_diff_key($root_package->getDevRequires(), $composer['require-dev'] ?? []));
+    $diff = [];
+
+    $format_diff = static fn(Link $link): string => (string) $link;
+
+    $requires_diff = array_diff_key($root_package->getRequires(), $composer['require'] ?? []);
+    if (!empty($requires_diff)) {
+      $diff['require'] = array_map($format_diff, $requires_diff);
+    }
+
+    $dev_requires_diff = array_diff_key($root_package->getDevRequires(), $composer['require-dev'] ?? []);
+    if (!empty($dev_requires_diff)) {
+      $diff['require-dev'] = array_map($format_diff, $dev_requires_diff);
+    }
+
+    return $diff;
   }
 
 }
