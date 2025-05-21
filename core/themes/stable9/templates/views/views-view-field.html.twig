@@ -9,8 +9,10 @@
  * - row: The raw result of the database query that generated this field.
  * - output: The processed output that will normally be used.
  *
- * When fetching output from the row this construct should be used:
- * data = row[field.field_alias]
+ * To fetch values of other fields in the row, where [0] gets the first value:
+ * view.field.title.original_value
+ * row._entity.field_my_field.value
+ * row._entity.field_my_field[0].value
  *
  * The above will guarantee that you'll always get the correct data, regardless
  * of any changes in the aliasing that might happen if the view is modified.
