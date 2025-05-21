@@ -149,6 +149,7 @@ class ElementInfoManager extends DefaultPluginManager implements ElementInfoMana
     $instance = parent::createInstance($plugin_id ?: $element['#type'], $configuration);
     assert($instance instanceof ElementInterface);
     $instance->initializeInternalStorage($element);
+    $instance->type = $plugin_id;
     return $instance;
   }
 
@@ -190,12 +191,19 @@ class ElementInfoManager extends DefaultPluginManager implements ElementInfoMana
    * @return \Drupal\Core\Render\Element\ElementInterface
    *   An element plugin instance.
    */
-  public function fromRenderArray(ElementInterface|array &$element): ElementInterface {
-    if (!isset($element['#type'])) {
-      throw new \LogicException('The element passed to ElementInfoManager::fromRenderArray must have a #type.');
+  public function fromRenderArray(ElementInterface|array &$element, string $type = ''): ElementInterface {
+    if ($element instanceof ElementInterface) {
+      return $element;
     }
-    return $element instanceof ElementInterface ? $element : $element['##object'] ?? $this->createInstance(element: $element);
-
+    if (!isset($element['#type'])) {
+      if ($type) {
+        $element['#type'] = $type;
+      }
+      else {
+        throw new \LogicException('The element passed to ElementInfoManager::fromRenderArray must have a #type or a fallback $type must be provided.');
+      }
+    }
+    return $element['##object'] ?? $this->createInstance(element: $element);
   }
 
 }

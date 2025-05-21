@@ -613,10 +613,10 @@ abstract class RenderElementBase extends PluginBase implements ElementInterface,
     if ($name[0] === '#') {
       throw new \LogicException('The name of children can not start with a #.');
     }
-    $child = $this->elementInfoManager()->fromRenderArray($child);
-    $child->renderParent = $this;
-    $child->renderParentName = $name;
-    $this->storage[$name] = &$child->toRenderArray();
+    $childObject = $this->elementInfoManager()->fromRenderArray($child);
+    $childObject->renderParent = $this;
+    $childObject->renderParentName = $name;
+    $child = $this->storage[$name] = &$childObject->toRenderArray();
     return $this;
   }
 

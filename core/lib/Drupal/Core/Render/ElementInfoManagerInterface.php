@@ -72,6 +72,6 @@ interface ElementInfoManagerInterface extends PluginManagerInterface {
    * @return \Drupal\Core\Render\Element\ElementInterface
    *   A render element object.
    */
-  public function fromRenderArray(ElementInterface|array &$element): ElementInterface;
+  public function fromRenderArray(ElementInterface|array &$element, string $type = ''): ElementInterface;
 
 }
