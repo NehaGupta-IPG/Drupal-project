@@ -68,10 +68,13 @@ interface ElementInfoManagerInterface extends PluginManagerInterface {
    * @param \Drupal\Core\Render\Element\ElementInterface|array $element
    *   A render element. For easier usage, it can be an element returned from
    *   this method which will be returned unchanged.
+   * @param string $type
+   *   The element type / render plugin id.
    *
    * @return \Drupal\Core\Render\Element\ElementInterface
-   *   A render element object.
+   *   A render element object. Defaults to form to make it easier to run
+   *   this from form_alter implementations.
    */
-  public function fromRenderArray(ElementInterface|array &$element, string $type = ''): ElementInterface;
+  public function fromRenderArray(ElementInterface|array &$element, string $type = 'form'): ElementInterface;
 
 }
