@@ -140,7 +140,7 @@ final class RootComposer {
 
     $this->io->write("Unpacking has updated the root composer files.", verbosity: IOInterface::VERBOSE);
 
-    if (ini_get('zend.assertions') === '-1') {
+    if (ini_get('zend.assertions') > 0) {
       $diff = self::compareComposerContentWithRootPackage($composer_content, $this->composer->getPackage());
       assert(empty($diff),
         sprintf("Composer root package and composer.json mismatch detected.\nrequire: %s\nrequire-dev: %s\n",
