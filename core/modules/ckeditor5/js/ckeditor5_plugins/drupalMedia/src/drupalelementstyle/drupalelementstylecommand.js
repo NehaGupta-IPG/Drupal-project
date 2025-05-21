@@ -85,14 +85,6 @@ export default class DrupalElementStyleCommand extends Command {
       const modelAttribute = groupNameToModelAttributeKey(group);
       if (element.hasAttribute(modelAttribute)) {
         value[group] = element.getAttribute(modelAttribute);
-      } else {
-        // eslint-disable-next-line no-restricted-syntax
-        for (const [, style] of this.styles[group]) {
-          // Set it to the default value.
-          if (style.isDefault) {
-            value[group] = style.name;
-          }
-        }
       }
     });
     return value;
