@@ -26,7 +26,24 @@ class RecipeAppliedSubscriber implements EventSubscriberInterface {
    */
   public function onRecipeApplied(RecipeAppliedEvent $event): void {
     $recipe_queue = $this->queue->get('update_recipe_telemetry');
+    if (!$this->needsTelemetry($event->recipe)) {
+      return;
+    }
     $recipe_queue->createItem($this->getRecipeInfo($event->recipe));
+  }
+
+  /**
+   * Decides if a given recipe needs telemetry or not.
+   *
+   * @param Drupal\Core\Recipe\Recipe $recipe
+   *   The recipe that has been applied.
+   *
+   * @return bool
+   *   TRUE if this recipe needs Drupal.org telemetry, otherwise FALSE.
+   */
+  protected function needsTelemetry(Recipe $recipe): bool {
+    // @todo
+    return TRUE;
   }
 
   /**
