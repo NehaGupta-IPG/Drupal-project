@@ -25,3 +25,8 @@ services:
   logger.channel.update:
     parent: logger.channel_base
     arguments: [ 'update' ]
+  update.recipe_applied_subscriber:
+    class: Drupal\update\EventSubscriber\RecipeAppliedSubscriber
+    arguments: ['@queue']
+    tags:
+      - { name: event_subscriber }
