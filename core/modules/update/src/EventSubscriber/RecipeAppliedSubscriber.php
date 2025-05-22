@@ -42,7 +42,7 @@ class RecipeAppliedSubscriber implements EventSubscriberInterface {
    *   TRUE if this recipe needs Drupal.org telemetry, otherwise FALSE.
    */
   protected function needsTelemetry(Recipe $recipe): bool {
-    // @todo
+    // @todo Add logic to only report contributed recipes, not core nor custom.
     return TRUE;
   }
 
@@ -53,14 +53,15 @@ class RecipeAppliedSubscriber implements EventSubscriberInterface {
    *   The recipe that has been applied.
    *
    * @return string[]
-   *   Associative array of infomation about the applied recipe.
+   *   Associative array of information about the applied recipe.
    */
   protected function getRecipeInfo(Recipe $recipe): array {
     return [
       'machine_name' => basename($recipe->path),
       'human_name' => $recipe->name,
       'type' => $recipe->type,
-      'version' => 'TBD' // @todo
+      // @todo Get version info from Composer.
+      'version' => 'TBD',
     ];
   }
 
