@@ -77,4 +77,20 @@ interface ElementInfoManagerInterface extends PluginManagerInterface {
    */
   public function fromRenderArray(ElementInterface|array &$element, string $type = 'form'): ElementInterface;
 
+  /**
+   * {@inheritdoc}
+   */
+  public function createInstance($plugin_id = '', array $configuration = []): ElementInterface;
+
+  /**
+   * This function gets the plugin element type from the classname.
+   *
+   * @param string $class
+   *   The class.
+   *
+   * @return string|null
+   *   The element type if any.
+   */
+  public function getTypeFromClass(string $class): ?string;
+
 }

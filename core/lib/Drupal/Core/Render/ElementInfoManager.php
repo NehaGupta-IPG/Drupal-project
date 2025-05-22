@@ -36,6 +36,15 @@ class ElementInfoManager extends DefaultPluginManager implements ElementInfoMana
   protected $elementInfo;
 
   /**
+   * class => plugin id mapping.
+   *
+   * More performant than reflecting runtime.
+   *
+   * @var array
+   */
+  protected array $reverseMapping = [];
+
+  /**
    * Constructs an ElementInfoManager object.
    *
    * @param \Traversable $namespaces
@@ -67,12 +76,19 @@ class ElementInfoManager extends DefaultPluginManager implements ElementInfoMana
    */
   public function getInfo($type) {
     $theme_name = $this->themeManager->getActiveTheme()->getName();
-    if (!isset($this->elementInfo[$theme_name])) {
-      $this->elementInfo[$theme_name] = $this->buildInfo($theme_name);
-    }
+    $this->buildInfo($theme_name);
     $info = $this->elementInfo[$theme_name][$type] ?? [];
     $info['#defaults_loaded'] = TRUE;
     return $info;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getTypeFromClass(string $class): ?string {
+    $theme_name = $this->themeManager->getActiveTheme()->getName();
+    $this->buildInfo($theme_name);
+    return $this->reverseMapping[$theme_name][$class] ?? NULL;
   }
 
   /**
@@ -89,15 +105,20 @@ class ElementInfoManager extends DefaultPluginManager implements ElementInfoMana
    *
    * @param string $theme_name
    *   The theme name.
-   *
-   * @return array
-   *   An array containing all element information.
    */
   protected function buildInfo($theme_name) {
+    if (isset($this->elementInfo[$theme_name])) {
+      return;
+    }
+    $reverse_mapping_key = ' reverse mapping';
     // Get cached definitions.
     $cid = $this->getCid($theme_name);
     if ($cache = $this->cacheBackend->get($cid)) {
-      return $cache->data;
+      $info = $cache->data;
+      $this->reverseMapping[$theme_name] = $info[$reverse_mapping_key];
+      unset($info[$reverse_mapping_key]);
+      $this->elementInfo[$theme_name] = $info;
+      return;
     }
 
     // Otherwise, rebuild and cache.
@@ -113,7 +134,9 @@ class ElementInfoManager extends DefaultPluginManager implements ElementInfoMana
         return $previous_error_handler($severity, $message, $file, $line);
       }
     });
-    foreach ($this->getDefinitions() as $element_type => $definition) {
+    $definitions = $this->getDefinitions();
+    foreach ($definitions as $element_type => $definition) {
+      $this->reverseMapping[$theme_name][$definition['class']] = $element_type;
       $element = $this->createInstance($element_type);
       $element_info = $element->getInfo();
 
@@ -134,18 +157,15 @@ class ElementInfoManager extends DefaultPluginManager implements ElementInfoMana
     $this->moduleHandler->alter('element_info', $info);
     $this->themeManager->alter('element_info', $info);
 
+    $this->elementInfo[$theme_name] = $info;
+    $info[$reverse_mapping_key] = $this->reverseMapping[$theme_name];
     $this->cacheBackend->set($cid, $info);
-
-    return $info;
   }
 
   /**
    * {@inheritdoc}
-   *
-   * @return \Drupal\Core\Render\Element\ElementInterface
-   *   The render element plugin instance.
    */
-  public function createInstance($plugin_id = '', array $configuration = [], &$element = []) {
+  public function createInstance($plugin_id = '', array $configuration = [], &$element = []): ElementInterface {
     $type = $plugin_id ?: $element['#type'];
     $instance = parent::createInstance($type, $configuration);
     assert($instance instanceof ElementInterface);
