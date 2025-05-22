@@ -103,6 +103,6 @@ interface ElementInfoManagerInterface extends PluginManagerInterface {
    * @phpstan-param class-string<T> $class
    * @phpstan-return T
    */
-  public function createInstanceFromClass(string $class, array $configuration = []): ElementInterface;
+  public function fromClass(string $class, array $configuration = []): ElementInterface;
 
 }

@@ -183,7 +183,7 @@ class ElementInfoManager extends DefaultPluginManager implements ElementInfoMana
   /**
    * {@inheritdoc}
    */
-  public function createInstanceFromClass(string $class, array $configuration = []): ElementInterface {
+  public function fromClass(string $class, array $configuration = []): ElementInterface {
     return $this->createInstance($this->getPluginIdFromClass($class), $configuration);
   }
 
