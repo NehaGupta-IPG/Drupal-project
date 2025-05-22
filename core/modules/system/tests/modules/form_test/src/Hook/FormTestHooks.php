@@ -65,7 +65,7 @@ class FormTestHooks {
     $submit->value = $this->t('Rebuild');
     $submit->submit = [[Callbacks::class, 'userRegisterFormRebuild']];
     $this->elementInfoManager->fromRenderArray($form)
-      ->addChild('test_rebuild', $submit->toRenderArray());
+      ->addChild('test_rebuild', $submit);
   }
 
   /**
