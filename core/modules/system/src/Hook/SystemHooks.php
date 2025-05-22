@@ -23,6 +23,7 @@ use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\Url;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Hook\Attribute\Hook;
+use Drupal\workspaces\Hook\EntityTypeInfo;
 
 /**
  * Hook implementations for system.
@@ -411,7 +412,7 @@ class SystemHooks {
     $entity_definition_update_manager = \Drupal::entityDefinitionUpdateManager();
     foreach ($entity_definition_update_manager->getEntityTypes() as $entity_type) {
       if ($entity_type instanceof ContentEntityTypeInterface && $entity_type->hasRevisionMetadataKey('workspace')) {
-        $entity_type->setRevisionMetadataKey('workspace', NULL);
+        EntityTypeInfo::removeWorkspaceSupport($entity_type);
         $entity_definition_update_manager->updateEntityType($entity_type);
       }
     }

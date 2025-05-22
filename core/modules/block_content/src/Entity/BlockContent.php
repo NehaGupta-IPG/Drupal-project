@@ -9,6 +9,7 @@ use Drupal\block_content\BlockContentStorageSchema;
 use Drupal\block_content\BlockContentTranslationHandler;
 use Drupal\block_content\BlockContentViewBuilder;
 use Drupal\block_content\BlockContentViewsData;
+use Drupal\block_content\BlockContentWorkspaceHandler;
 use Drupal\block_content\Form\BlockContentDeleteForm;
 use Drupal\Core\Entity\Attribute\ContentEntityType;
 use Drupal\Core\Entity\Routing\RevisionHtmlRouteProvider;
@@ -64,6 +65,7 @@ use Drupal\block_content\BlockContentInterface;
     ],
     'route_provider' => ['revision' => RevisionHtmlRouteProvider::class],
     'translation' => BlockContentTranslationHandler::class,
+    'workspace' => BlockContentWorkspaceHandler::class,
   ],
   links: [
     'canonical' => '/admin/content/block/{block_content}',

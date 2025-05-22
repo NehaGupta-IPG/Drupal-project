@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace Drupal\workspaces\Hook;
 
+use Drupal\Core\Entity\ContentEntityTypeInterface;
 use Drupal\Core\Entity\EntityPublishedInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Hook\Attribute\Hook;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
-use Drupal\workspaces\Entity\Handler\BlockContentWorkspaceHandler;
 use Drupal\workspaces\Entity\Handler\DefaultWorkspaceHandler;
 use Drupal\workspaces\Entity\Handler\IgnoredWorkspaceHandler;
 use Drupal\workspaces\WorkspaceInformationInterface;
@@ -41,18 +41,6 @@ class EntityTypeInfo {
       // Revisionable and publishable entity types are always supported.
       if ($entity_type->entityClassImplements(EntityPublishedInterface::class) && $entity_type->isRevisionable()) {
         $entity_type->setHandlerClass('workspace', DefaultWorkspaceHandler::class);
-
-        // Support for custom blocks has to be determined on a per-entity
-        // basis.
-        if ($entity_type->id() === 'block_content') {
-          $entity_type->setHandlerClass('workspace', BlockContentWorkspaceHandler::class);
-        }
-      }
-
-      // The 'file' entity type is allowed to perform CRUD operations inside a
-      // workspace without being tracked.
-      if ($entity_type->id() === 'file') {
-        $entity_type->setHandlerClass('workspace', IgnoredWorkspaceHandler::class);
       }
 
       // Internal entity types are allowed to perform CRUD operations inside a
@@ -122,6 +110,41 @@ class EntityTypeInfo {
       return $fields;
     }
     return [];
+  }
+
+  /**
+   * Adds the entity type metadata needed for workspace support.
+   *
+   * @param \Drupal\Core\Entity\ContentEntityTypeInterface $entity_type
+   *   An entity type object.
+   *
+   * @return void
+   */
+  public static function addWorkspaceSupport(ContentEntityTypeInterface $entity_type): void {
+    if (!$entity_type->hasHandlerClass('workspace')) {
+      $entity_type->setHandlerClass('workspace', DefaultWorkspaceHandler::class);
+    }
+    $entity_type->setRevisionMetadataKey('workspace', 'workspace');
+  }
+
+  /**
+   * Removes the entity type metadata needed for workspace support.
+   *
+   * @param \Drupal\Core\Entity\ContentEntityTypeInterface $entity_type
+   *   An entity type object.
+   *
+   * @return void
+   */
+  public static function removeWorkspaceSupport(ContentEntityTypeInterface $entity_type): void {
+    // Remove the workspace handler.
+    $handlers = $entity_type->get('handlers');
+    unset($handlers['workspace']);
+    $entity_type->set('handlers', $handlers);
+
+    // Remove the workspace revision metadata key.
+    $revision_metadata_keys = $entity_type->getRevisionMetadataKeys();
+    unset($revision_metadata_keys['workspace']);
+    $entity_type->set('revision_metadata_keys', $revision_metadata_keys);
   }
 
 }

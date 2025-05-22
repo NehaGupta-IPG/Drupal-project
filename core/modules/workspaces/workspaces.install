@@ -5,7 +5,10 @@
  * Contains install, update and uninstall functions for the Workspaces module.
  */
 
+use Drupal\block_content\BlockContentWorkspaceHandler;
 use Drupal\Core\Entity\EntityTypeInterface;
+use Drupal\workspaces\Entity\Handler\DefaultWorkspaceHandler;
+use Drupal\workspaces\Entity\Handler\IgnoredWorkspaceHandler;
 use Drupal\workspaces\Entity\Workspace;
 
 /**
@@ -129,4 +132,37 @@ function workspaces_update_11101(): void {
  */
 function workspaces_update_11102(): void {
   \Drupal::service('module_installer')->install(['workspaces_ui']);
+}
+
+/**
+ * Clean up workspace metadata for entity types.
+ */
+function workspaces_update_11103(): void {
+  $entity_definition_update_manager = \Drupal::entityDefinitionUpdateManager();
+  /** @var \Drupal\Core\Entity\EntityLastInstalledSchemaRepositoryInterface $last_installed_schema_repository */
+  $last_installed_schema_repository = \Drupal::service('entity.last_installed_schema.repository');
+  /** @var \Drupal\workspaces\WorkspaceInformationInterface $workspace_info */
+  $workspace_info = \Drupal::service('workspaces.information');
+
+  foreach ($entity_definition_update_manager->getEntityTypes() as $entity_type_id => $entity_type) {
+    $entity_type_needs_update = FALSE;
+    if ($workspace_info->isEntityTypeSupported($entity_type) && !$entity_type->hasHandlerClass('workspace')) {
+      if ($entity_type_id === 'block_content') {
+        $entity_type->setHandlerClass('workspace', BlockContentWorkspaceHandler::class);
+      }
+      else {
+        $entity_type->setHandlerClass('workspace', DefaultWorkspaceHandler::class);
+      }
+      $entity_type_needs_update = TRUE;
+    }
+
+    if ($entity_type_id === 'file') {
+      $entity_type->setHandlerClass('workspace', IgnoredWorkspaceHandler::class);
+      $entity_type_needs_update = TRUE;
+    }
+
+    if ($entity_type_needs_update) {
+      $last_installed_schema_repository->setLastInstalledDefinition($entity_type);
+    }
+  }
 }

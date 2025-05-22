@@ -19,6 +19,7 @@ use Drupal\file\FileStorage;
 use Drupal\file\FileStorageSchema;
 use Drupal\file\FileViewsData;
 use Drupal\user\EntityOwnerTrait;
+use Drupal\workspaces\Entity\Handler\IgnoredWorkspaceHandler;
 
 /**
  * Defines the file entity class.
@@ -46,6 +47,7 @@ use Drupal\user\EntityOwnerTrait;
     'list_builder' => EntityListBuilder::class,
     'form' => ['delete' => ContentEntityDeleteForm::class],
     'route_provider' => ['html' => FileRouteProvider::class],
+    'workspace' => IgnoredWorkspaceHandler::class,
   ],
   links: [
     'delete-form' => '/file/{file}/delete',

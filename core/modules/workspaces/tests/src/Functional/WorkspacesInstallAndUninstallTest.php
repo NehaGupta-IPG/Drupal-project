@@ -5,20 +5,19 @@ declare(strict_types=1);
 namespace Drupal\Tests\workspaces\Functional;
 
 use Drupal\Tests\BrowserTestBase;
-use Drupal\Tests\node\Traits\ContentTypeCreationTrait;
+use Drupal\workspaces\Entity\Handler\DefaultWorkspaceHandler;
 
 /**
- * Tests uninstalling the Workspaces module.
+ * Tests installing and uninstalling the Workspaces module.
  *
  * @group workspaces
  */
-class WorkspacesUninstallTest extends BrowserTestBase {
-  use ContentTypeCreationTrait;
+class WorkspacesInstallAndUninstallTest extends BrowserTestBase {
 
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['workspaces', 'node', 'workspaces_ui'];
+  protected static $modules = ['node'];
 
   /**
    * {@inheritdoc}
@@ -30,19 +29,29 @@ class WorkspacesUninstallTest extends BrowserTestBase {
    */
   protected function setUp(): void {
     parent::setUp();
-    $permissions = [
-      'administer workspaces',
-      'administer modules',
-    ];
 
-    $this->drupalLogin($this->drupalCreateUser($permissions));
+    $this->drupalLogin($this->drupalCreateUser(['administer modules']));
   }
 
   /**
-   * Tests deleting workspace entities and uninstalling Workspaces module.
+   * Tests installing and uninstalling the Workspaces module.
    */
-  public function testUninstallingWorkspace(): void {
-    $this->createContentType(['type' => 'article']);
+  public function testInstallAndUninstall(): void {
+    // Install the modules separately to simulate enabling Workspaces on an
+    // existing site.
+    $this->container->get('module_installer')->install(['workspaces', 'workspaces_ui']);
+    $this->resetAll();
+
+    // Check that the workspace handler and revision metadata key are being set
+    // when the module is installed.
+    $entity_type = \Drupal::entityDefinitionUpdateManager()->getEntityType('node');
+    $revision_metadata_keys = $entity_type->get('revision_metadata_keys');
+    $this->assertSame('workspace', $revision_metadata_keys['workspace']);
+    $handlers = $entity_type->get('handlers');
+    $this->assertSame(DefaultWorkspaceHandler::class, $handlers['workspace']);
+
+    $this->assertTrue(\Drupal::database()->schema()->fieldExists('node_revision', 'workspace'));
+
     $this->drupalGet('/admin/modules/uninstall');
     $session = $this->assertSession();
     $session->linkExists('Remove workspaces');
@@ -60,11 +69,13 @@ class WorkspacesUninstallTest extends BrowserTestBase {
 
     $this->assertFalse(\Drupal::database()->schema()->fieldExists('node_revision', 'workspace'));
 
-    // Verify that the revision metadata key has been removed.
+    // Verify that the handler and revision metadata key have been removed.
     $this->rebuildContainer();
     $entity_type = \Drupal::entityDefinitionUpdateManager()->getEntityType('node');
     $revision_metadata_keys = $entity_type->get('revision_metadata_keys');
     $this->assertArrayNotHasKey('workspace', $revision_metadata_keys);
+    $handlers = $entity_type->get('handlers');
+    $this->assertArrayNotHasKey('workspace', $handlers);
   }
 
 }

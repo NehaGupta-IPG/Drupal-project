@@ -2,6 +2,7 @@
 
 namespace Drupal\workspaces\EventSubscriber;
 
+use Drupal\Core\Entity\ContentEntityTypeInterface;
 use Drupal\Core\Entity\EntityDefinitionUpdateManagerInterface;
 use Drupal\Core\Entity\EntityLastInstalledSchemaRepositoryInterface;
 use Drupal\Core\Entity\EntityTypeEventSubscriberTrait;
@@ -9,6 +10,7 @@ use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Entity\EntityTypeListenerInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
+use Drupal\workspaces\Hook\EntityTypeInfo;
 use Drupal\workspaces\WorkspaceInformationInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
@@ -99,9 +101,10 @@ class EntitySchemaSubscriber implements EntityTypeListenerInterface, EventSubscr
       $field_storage_definition = $this->entityLastInstalledSchemaRepository->getLastInstalledFieldStorageDefinitions($entity_type->id())[$revision_metadata_keys['workspace']];
       $this->entityDefinitionUpdateManager->uninstallFieldStorageDefinition($field_storage_definition);
 
-      // We are only removing a revision metadata key so we don't need to go
-      // through the entity update process.
-      $entity_type->setRevisionMetadataKey('workspace', NULL);
+      // We are only removing a handler and a revision metadata key, so we don't
+      // need to go through the entity update process.
+      assert($entity_type instanceof ContentEntityTypeInterface);
+      EntityTypeInfo::removeWorkspaceSupport($entity_type);
       $this->entityLastInstalledSchemaRepository->setLastInstalledDefinition($entity_type);
     }
   }
@@ -133,9 +136,10 @@ class EntitySchemaSubscriber implements EntityTypeListenerInterface, EventSubscr
         throw new \RuntimeException("An existing 'workspace' field was found for the '{$entity_type->id()}' entity type. Set the 'workspace' revision metadata key to use a different field name and run this update function again.");
       }
 
-      // We are only adding a revision metadata key so we don't need to go
-      // through the entity update process.
-      $entity_type->setRevisionMetadataKey('workspace', 'workspace');
+      // We are only adding a handler and a revision metadata key, so we don't
+      // need to go through the entity update process.
+      assert($entity_type instanceof ContentEntityTypeInterface);
+      EntityTypeInfo::addWorkspaceSupport($entity_type);
       $this->entityLastInstalledSchemaRepository->setLastInstalledDefinition($entity_type);
     }
 

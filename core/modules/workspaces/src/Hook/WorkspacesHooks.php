@@ -6,6 +6,7 @@ namespace Drupal\workspaces\Hook;
 
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Cache\CacheTagsInvalidatorInterface;
+use Drupal\Core\Entity\ContentEntityTypeInterface;
 use Drupal\Core\Entity\EntityDefinitionUpdateManagerInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Hook\Attribute\Hook;
@@ -56,7 +57,8 @@ class WorkspacesHooks {
 
     foreach ($this->entityDefinitionUpdateManager->getEntityTypes() as $entity_type) {
       if ($this->workspaceInfo->isEntityTypeSupported($entity_type)) {
-        $entity_type->setRevisionMetadataKey('workspace', 'workspace');
+        assert($entity_type instanceof ContentEntityTypeInterface);
+        EntityTypeInfo::addWorkspaceSupport($entity_type);
         $this->entityDefinitionUpdateManager->updateEntityType($entity_type);
       }
     }

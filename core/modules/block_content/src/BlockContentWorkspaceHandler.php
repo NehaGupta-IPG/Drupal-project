@@ -1,8 +1,9 @@
 <?php
 
-namespace Drupal\workspaces\Entity\Handler;
+namespace Drupal\block_content;
 
 use Drupal\Core\Entity\EntityInterface;
+use Drupal\workspaces\Entity\Handler\DefaultWorkspaceHandler;
 
 /**
  * Provides a custom workspace handler for block_content entities.
