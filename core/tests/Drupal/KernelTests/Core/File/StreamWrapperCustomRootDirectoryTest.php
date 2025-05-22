@@ -30,7 +30,7 @@ namespace Drupal\KernelTests\Core\File {
 
 namespace Drupal\Core\StreamWrapper {
 
-  /*
+  /**
    * Overrdides the core realpath() function to help with this test.
    */
   function realpath(string $path): string|false {
@@ -41,7 +41,7 @@ namespace Drupal\Core\StreamWrapper {
     return \realpath($path);
   }
 
-  /*
+  /**
    * Overrides the core stat() function to help with this test.
    */
   function stat(string $filename): array|false {
