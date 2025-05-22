@@ -90,7 +90,7 @@ interface ElementInterface extends PluginInspectionInterface, RenderCallbackInte
    * Adds a child.
    *
    * @param int|string $name
-   *   The name of the child. Can be an integer, too.
+   *   The name of the child. Can also be an integer.
    * @param array|\Drupal\Core\Render\Element\ElementInterface $child
    *   A render array or a render object.
    *
@@ -103,7 +103,7 @@ interface ElementInterface extends PluginInspectionInterface, RenderCallbackInte
    * Removes a child.
    *
    * @param int|string $name
-   *   The name of the child. Can be an integer, too.
+   *   The name of the child. Can also be an integer.
    *
    * @return $this
    *   The called object.
