@@ -31,13 +31,6 @@ final class ImportStorageTransformer {
   protected $eventDispatcher;
 
   /**
-   * The drupal database connection.
-   *
-   * @var \Drupal\Core\Database\Connection
-   */
-  protected $connection;
-
-  /**
    * The normal lock for the duration of the request.
    *
    * @var \Drupal\Core\Lock\LockBackendInterface
@@ -54,22 +47,34 @@ final class ImportStorageTransformer {
   protected $persistentLock;
 
   /**
+   * The database storage for config imports.
+   *
+   * @var \Drupal\Core\Config\DatabaseStorage
+   */
+   protected $importStorage;
+
+  /**
    * ImportStorageTransformer constructor.
    *
    * @param \Symfony\Contracts\EventDispatcher\EventDispatcherInterface $event_dispatcher
    *   The event dispatcher.
-   * @param \Drupal\Core\Database\Connection $connection
-   *   The database connection.
    * @param \Drupal\Core\Lock\LockBackendInterface $requestLock
    *   The lock for the request.
    * @param \Drupal\Core\Lock\LockBackendInterface $persistentLock
    *   The persistent lock used by the config importer.
+   * @param \Drupal\Core\Config\StorageInterface $import_storage
+   *  The import storage.
    */
-  public function __construct(EventDispatcherInterface $event_dispatcher, Connection $connection, LockBackendInterface $requestLock, LockBackendInterface $persistentLock) {
+  public function __construct(
+    EventDispatcherInterface $event_dispatcher,
+    LockBackendInterface $requestLock,
+    LockBackendInterface $persistentLock,
+    StorageInterface $import_storage
+  ) {
     $this->eventDispatcher = $event_dispatcher;
-    $this->connection = $connection;
     $this->requestLock = $requestLock;
     $this->persistentLock = $persistentLock;
+    $this->importStorage = $import_storage;
   }
 
   /**
@@ -92,8 +97,8 @@ final class ImportStorageTransformer {
    *   Thrown when the lock could not be acquired.
    */
   public function transform(StorageInterface $storage) {
-    // We use a database storage to reduce the memory requirement.
-    $mutable = new DatabaseStorage($this->connection, 'config_import');
+    // We use the injected import storage to reduce the memory requirement.
+    $mutable = $this->importStorage;
 
     if (!$this->persistentLock->lockMayBeAvailable(ConfigImporter::LOCK_NAME)) {
       // If the config importer is already importing, the transformation will

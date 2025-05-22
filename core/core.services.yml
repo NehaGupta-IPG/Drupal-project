@@ -418,19 +418,29 @@ services:
   Drupal\Core\Config\Checkpoint\CheckpointListInterface: '@config.checkpoints'
   config.import_transformer:
     class: Drupal\Core\Config\ImportStorageTransformer
-    arguments: ['@event_dispatcher', '@database', '@lock', '@lock.persistent']
+    arguments: ['@event_dispatcher', '@lock', '@lock.persistent', '@config.storage.import']
   Drupal\Core\Config\ImportStorageTransformer: '@config.import_transformer'
   config.storage.export:
     class: Drupal\Core\Config\ManagedStorage
     arguments: ['@config.storage.export.manager']
   config.storage.export.manager:
     class: Drupal\Core\Config\ExportStorageManager
-    arguments: ['@config.storage', '@database', '@event_dispatcher', '@lock']
+    arguments: ['@config.storage', '@config.storage.export.database', '@event_dispatcher', '@lock']
     public: false
   Drupal\Core\Config\StorageManagerInterface: '@config.storage.export.manager'
   config.storage.sync:
     class: Drupal\Core\Config\FileStorage
     factory: Drupal\Core\Config\FileStorageFactory::getSync
+  config.storage.import:
+    class: Drupal\Core\Config\DatabaseStorage
+    arguments: [ '@database', 'config_import' ]
+    tags:
+      - { name: backend_overridable }
+  config.storage.export.database:
+    class: Drupal\Core\Config\DatabaseStorage
+    arguments: [ '@database', 'config_export' ]
+    tags:
+      - { name: backend_overridable }
   config.storage.snapshot:
     class: Drupal\Core\Config\DatabaseStorage
     arguments: ['@database', config_snapshot]
