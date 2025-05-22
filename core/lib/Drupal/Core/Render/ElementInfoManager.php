@@ -146,10 +146,11 @@ class ElementInfoManager extends DefaultPluginManager implements ElementInfoMana
    *   The render element plugin instance.
    */
   public function createInstance($plugin_id = '', array $configuration = [], &$element = []) {
-    $instance = parent::createInstance($plugin_id ?: $element['#type'], $configuration);
+    $type = $plugin_id ?: $element['#type'];
+    $instance = parent::createInstance($type, $configuration);
     assert($instance instanceof ElementInterface);
     $instance->initializeInternalStorage($element);
-    $instance->type = $plugin_id;
+    $instance->type = $type;
     return $instance;
   }
 
