@@ -658,15 +658,4 @@ abstract class RenderElementBase extends PluginBase implements ElementInterface,
     $this->storage['##object'] = $this;
   }
 
-  /**
-   * @param \Drupal\Core\Render\ElementInfoManagerInterface $elementInfoManager
-   *   The element info manager.
-   *
-   * @return static
-   *   The called class.
-   */
-  public static function createInstance(ElementInfoManagerInterface $elementInfoManager): static {
-    return $elementInfoManager->createInstance($elementInfoManager->getTypeFromClass(static::class));
-  }
-
 }

@@ -79,18 +79,30 @@ interface ElementInfoManagerInterface extends PluginManagerInterface {
 
   /**
    * {@inheritdoc}
+   *
+   * @return \Drupal\Core\Render\Element\ElementInterface
+   *   A fully configured element plugin instance.
    */
   public function createInstance($plugin_id = '', array $configuration = []): ElementInterface;
 
   /**
-   * This function gets the plugin element type from the classname.
+   * Creates a plugin instance based on the provided class and configuration.
    *
    * @param string $class
-   *   The class.
+   *   The class of the element plugin being instantiated.
+   * @param array $configuration
+   *   An array of configuration relevant to the plugin instance.
    *
-   * @return string|null
-   *   The element type if any.
+   * @return \Drupal\Core\Render\Element\ElementInterface
+   *   A fully configured element plugin instance.
+   *
+   * @throws \Drupal\Component\Plugin\Exception\PluginException
+   *   If the instance cannot be created, such as if the ID is invalid.
+   *
+   * @template T of ElementInterface
+   * @phpstan-param class-string<T> $class
+   * @phpstan-return T
    */
-  public function getTypeFromClass(string $class): ?string;
+  public function createInstanceFromClass(string $class, array $configuration = []): ElementInterface;
 
 }

@@ -61,7 +61,7 @@ class FormTestHooks {
    */
   #[Hook('form_user_register_form_alter')]
   public function formUserRegisterFormAlter(&$form, FormStateInterface $form_state) : void {
-    $submit = Submit::createInstance($this->elementInfoManager);
+    $submit = $this->elementInfoManager->createInstanceFromClass(Submit::class);
     $submit->value = $this->t('Rebuild');
     $submit->submit = [[Callbacks::class, 'userRegisterFormRebuild']];
     $this->elementInfoManager->fromRenderArray($form)

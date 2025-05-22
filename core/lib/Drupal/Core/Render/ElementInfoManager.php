@@ -83,9 +83,15 @@ class ElementInfoManager extends DefaultPluginManager implements ElementInfoMana
   }
 
   /**
-   * {@inheritdoc}
+   * Gets the plugin element type from the classname.
+   *
+   * @param string $class
+   *   The class.
+   *
+   * @return string|null
+   *   The element type if any.
    */
-  public function getTypeFromClass(string $class): ?string {
+  protected function getPluginIdFromClass(string $class): ?string {
     $theme_name = $this->themeManager->getActiveTheme()->getName();
     $this->buildInfo($theme_name);
     return $this->reverseMapping[$theme_name][$class] ?? NULL;
@@ -172,6 +178,13 @@ class ElementInfoManager extends DefaultPluginManager implements ElementInfoMana
     $instance->initializeInternalStorage($element);
     $instance->type = $type;
     return $instance;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function createInstanceFromClass(string $class, array $configuration = []): ElementInterface {
+    return $this->createInstance($this->getPluginIdFromClass($class), $configuration);
   }
 
   /**
