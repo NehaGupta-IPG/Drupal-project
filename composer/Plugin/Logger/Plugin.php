@@ -76,7 +76,7 @@ final class Plugin implements PluginInterface, EventSubscriberInterface {
       }
       $data[] = $item;
     }
-    file_put_contents($file, "<?php\nreturn " . var_export($data, TRUE));
+    file_put_contents($file, "<?php\nreturn " . var_export($data, TRUE) . ';');
   }
 
 }
