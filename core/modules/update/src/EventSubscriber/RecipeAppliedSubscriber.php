@@ -42,7 +42,7 @@ class RecipeAppliedSubscriber implements EventSubscriberInterface {
    *   TRUE if this recipe needs Drupal.org telemetry, otherwise FALSE.
    */
   protected function needsTelemetry(Recipe $recipe): bool {
-    // @todo Add logic to only report contributed recipes, not core nor custom.
+    // @todo Add logic to only report core and Drupal.org contributed recipes.
     return TRUE;
   }
 
