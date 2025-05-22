@@ -44,6 +44,7 @@ class TwigFunctionExpression extends FunctionExpression {
    * the attributes, but before the callable is compiled.
    *
    * @param \Twig\Compiler $compiler
+   *   The compiler.
    */
   protected function compileCallable(Compiler $compiler): void {
     // Merge in the extra arguments.

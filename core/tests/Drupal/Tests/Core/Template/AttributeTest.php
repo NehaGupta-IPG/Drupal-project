@@ -15,6 +15,7 @@ use Drupal\Core\Template\AttributeString;
 use Drupal\Core\Template\AttributeValueBase;
 use Drupal\Core\Template\Loader\StringLoader;
 use Drupal\Tests\UnitTestCase;
+use Drupal\TestTools\Random;
 use Twig\Environment;
 
 /**
@@ -359,7 +360,7 @@ class AttributeTest extends UnitTestCase {
   public function testPrint(): void {
     $attribute = new Attribute(['class' => ['example-class'], 'id' => 'example-id', 'enabled' => TRUE]);
 
-    $content = $this->randomMachineName();
+    $content = Random::machineName();
     $html = '<div' . (string) $attribute . '>' . $content . '</div>';
     $this->assertClass('example-class', $html);
     $this->assertNoClass('example-class2', $html);
@@ -552,13 +553,15 @@ class AttributeTest extends UnitTestCase {
    * @see $this->testCreateAttributeValue()
    *
    * @return array
+   *   An array of test data each containing an array of the name & value of the
+   *   attribute, and the expected result.
    */
-  public function providerTestCreateAttributeValues(): array {
+  public static function providerTestCreateAttributeValues(): array {
     $testCases = [];
 
     // Test a pure string.
-    $name = $this->randomMachineName();
-    $value = $this->randomMachineName();
+    $name = Random::machineName();
+    $value = Random::machineName();
     $testCases[] = [$name, $value, new AttributeString($name, $value)];
 
     // Test an AttributeValue instance.
@@ -566,11 +569,11 @@ class AttributeTest extends UnitTestCase {
     $testCases[] = [$name, $value, $value];
 
     // Test an array.
-    $value = [$this->getRandomGenerator()->string(), $this->getRandomGenerator()->string() => $this->getRandomGenerator()->string()];
+    $value = [Random::getGenerator()->string(), Random::getGenerator()->string() => Random::getGenerator()->string()];
     $testCases[] = [$name, $value, new AttributeArray($name, $value)];
 
     // Test an object passed with the name "class".
-    $value = $this->getRandomGenerator()->object();
+    $value = Random::getGenerator()->object();
     $testCases[] = ['class', $value, new AttributeArray('class', (array) $value)];
 
     // Test boolean values.
@@ -598,7 +601,7 @@ class AttributeTest extends UnitTestCase {
     $this->expectExceptionMessage("Attribute 'Random string !@#$' of type 'stdClass' cannot be printed.");
     $attribute = new Attribute();
     $name = 'Random string !@#$';
-    $value = $this->getRandomGenerator()->object();
+    $value = Random::getGenerator()->object();
     $createAttributeValueMethod = $this->getCreateAttributeValueMethod();
 
     $createAttributeValueMethod->invokeArgs($attribute, [$name, $value]);
@@ -608,6 +611,7 @@ class AttributeTest extends UnitTestCase {
    * Helper method to get protected createAttributeValue method.
    *
    * @return \ReflectionMethod
+   *   A createAttributeValue method.
    *
    * @throws \ReflectionException
    */

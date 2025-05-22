@@ -6,7 +6,6 @@ use Twig\Environment;
 use Twig\Node\Nodes;
 use Twig\TwigFunction;
 use Twig\Node\Expression\FilterExpression;
-use Twig\Node\Expression\FunctionExpression;
 use Twig\Node\Node;
 use Twig\Node\PrintNode;
 use Twig\NodeVisitor\NodeVisitorInterface;
