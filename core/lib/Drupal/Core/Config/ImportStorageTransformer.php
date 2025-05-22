@@ -31,6 +31,13 @@ final class ImportStorageTransformer {
   protected $eventDispatcher;
 
   /**
+   * The drupal database connection.
+   *
+   * @var \Drupal\Core\Database\Connection
+   */
+   protected $connection;
+
+   /**
    * The normal lock for the duration of the request.
    *
    * @var \Drupal\Core\Lock\LockBackendInterface
@@ -51,7 +58,7 @@ final class ImportStorageTransformer {
    *
    * @var \Drupal\Core\Config\DatabaseStorage
    */
-   protected $importStorage;
+  protected $importStorage;
 
   /**
    * ImportStorageTransformer constructor.
@@ -63,15 +70,17 @@ final class ImportStorageTransformer {
    * @param \Drupal\Core\Lock\LockBackendInterface $persistentLock
    *   The persistent lock used by the config importer.
    * @param \Drupal\Core\Config\StorageInterface $import_storage
-   *  The import storage.
+   *   The import storage.
    */
   public function __construct(
     EventDispatcherInterface $event_dispatcher,
+    Connection $connection,
     LockBackendInterface $requestLock,
     LockBackendInterface $persistentLock,
-    StorageInterface $import_storage
+    StorageInterface $import_storage,
   ) {
     $this->eventDispatcher = $event_dispatcher;
+    $this->connection = $connection;
     $this->requestLock = $requestLock;
     $this->persistentLock = $persistentLock;
     $this->importStorage = $import_storage;

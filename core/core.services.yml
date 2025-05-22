@@ -418,7 +418,7 @@ services:
   Drupal\Core\Config\Checkpoint\CheckpointListInterface: '@config.checkpoints'
   config.import_transformer:
     class: Drupal\Core\Config\ImportStorageTransformer
-    arguments: ['@event_dispatcher', '@lock', '@lock.persistent', '@config.storage.import']
+    arguments: ['@event_dispatcher', '@database', '@lock', '@lock.persistent', '@config.storage.import']
   Drupal\Core\Config\ImportStorageTransformer: '@config.import_transformer'
   config.storage.export:
     class: Drupal\Core\Config\ManagedStorage
