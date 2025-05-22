@@ -28,5 +28,3 @@ services:
   update.recipe_applied_subscriber:
     class: Drupal\update\EventSubscriber\RecipeAppliedSubscriber
     arguments: ['@queue']
-    tags:
-      - { name: event_subscriber }
