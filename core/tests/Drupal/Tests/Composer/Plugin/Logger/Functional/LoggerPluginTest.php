@@ -76,7 +76,7 @@ final class LoggerPluginTest extends BuildTestBase {
     // The package to update has to actually be in the lock file.
     $this->runComposer('require fixtures/module-a:^1', FALSE);
     $this->runComposer('config repo.module-a path ../module-a-1.1', FALSE);
-    $out = $this->runComposer('update fixtures/module-a', $dry_run);
+    $this->runComposer('update fixtures/module-a', $dry_run);
 
     $operations = require $this->fixturesDir . '/composer-root/installer-log.php';
     $this->assertIsArray($operations);
@@ -86,6 +86,25 @@ final class LoggerPluginTest extends BuildTestBase {
     $this->assertSame('1.0.0', $operations[0]['from_version']['version']);
     $this->assertSame('fixtures/module-a', $operations[0]['to_version']['name']);
     $this->assertSame('1.1.0', $operations[0]['to_version']['version']);
+  }
+
+  /**
+   * @param bool $dry_run
+   *
+   * @testWith [true]
+   *   [false]
+   */
+  public function testUninstallIsLogged(bool $dry_run): void {
+    // The package to uninstall has to actually be in the lock file.
+    $this->runComposer('require fixtures/module-a:^1', FALSE);
+    $this->runComposer('remove fixtures/module-a', $dry_run);
+
+    $operations = require $this->fixturesDir . '/composer-root/installer-log.php';
+    $this->assertIsArray($operations);
+    $this->assertCount(1, $operations);
+    $this->assertSame('uninstall', $operations[0]['operation']);
+    $this->assertSame('fixtures/module-a', $operations[0]['package']['name']);
+    $this->assertSame('1.0.0', $operations[0]['package']['version']);
   }
 
   /**
