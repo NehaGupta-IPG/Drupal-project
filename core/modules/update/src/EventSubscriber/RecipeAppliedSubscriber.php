@@ -40,7 +40,7 @@ class RecipeAppliedSubscriber implements EventSubscriberInterface {
    */
   protected function getRecipeInfo(Recipe $recipe): array {
     return [
-      'machine_name' => 'TBD', // @todo
+      'machine_name' => basename($recipe->path),
       'human_name' => $recipe->name,
       'type' => $recipe->type,
       'version' => 'TBD' // @todo
