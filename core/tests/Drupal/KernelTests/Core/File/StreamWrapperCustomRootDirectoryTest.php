@@ -13,6 +13,11 @@ namespace Drupal\KernelTests\Core\File {
 
     /**
      * Tests that the public stream wrapper can handle a custom root directory.
+     *
+     * This checks that when the public files folder root is the same as a subfolder 
+     * being created, it does actually create it correctly. There has been an edge case
+     * where if the root is "custom-dir" and the folder being created is also caleld 
+     * "custom-dir", it will not creat the folder correctly and think it already exists.
      */
     public function testRealPathHandlesCustomRootDirectory(): void {
       $this->setSetting('file_public_path', '/custom-dir');
