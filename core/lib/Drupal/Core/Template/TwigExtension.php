@@ -533,20 +533,23 @@ class TwigExtension extends AbstractExtension {
    * If an array is passed it is rendered via render() and scalar values are
    * returned directly.
    *
+   * @param string $expr
+   *   The expression passed as the function argument in the template.
+   *   This expression is included in error messages to help with debugging.
    * @param mixed $arg
    *   String, Object or Render Array.
+   *
+   * @return mixed
+   *   The rendered output or an \Twig\Markup object.
    *
    * @throws \Exception
    *   When $arg is passed as an object which does not implement __toString(),
    *   RenderableInterface or toString().
    *
-   * @return mixed
-   *   The rendered output or a \Twig\Markup object.
-   *
    * @see render
    * @see TwigNodeVisitor
    */
-  public function renderVar($arg) {
+  public function renderVar(string $expr, $arg) {
     // Check for a numeric zero int or float.
     if ($arg === 0 || $arg === 0.0) {
       return 0;
@@ -579,7 +582,8 @@ class TwigExtension extends AbstractExtension {
         return $arg->toString();
       }
       else {
-        throw new \Exception('Object of type ' . get_class($arg) . ' cannot be printed.');
+        $class = get_class($arg);
+        throw new \InvalidArgumentException("Argument '{$expr}' of type '{$class}' cannot be printed.");
       }
     }
 
