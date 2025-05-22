@@ -17,6 +17,7 @@ use Drupal\Core\DrupalKernel;
 use Drupal\Core\Database\Database;
 use Drupal\Core\Database\DatabaseExceptionWrapper;
 use Drupal\Core\Extension\Exception\UnknownExtensionException;
+use Drupal\Core\File\FileSystem;
 use Drupal\Core\File\FileSystemInterface;
 use Drupal\Core\Form\FormState;
 use Drupal\Core\Installer\Exception\AlreadyInstalledException;
@@ -29,6 +30,7 @@ use Drupal\Core\Language\LanguageManager;
 use Drupal\Core\Recipe\Recipe;
 use Drupal\Core\Recipe\RecipeRunner;
 use Drupal\Core\Site\Settings;
+use Drupal\Core\StreamWrapper\StreamWrapperManager;
 use Drupal\Core\StringTranslation\Translator\FileTranslation;
 use Drupal\Core\StackMiddleware\ReverseProxyMiddleware;
 use Drupal\Core\Extension\ExtensionDiscovery;
@@ -375,6 +377,13 @@ function install_begin_request($class_loader, &$install_state): void {
   // autoloaded.
   // @see \Drupal\Core\Extension\DatabaseDriverList
   $container->set('class_loader', $class_loader);
+
+  $container->set('settings', Settings::getInstance());
+  $container->register('stream_wrapper_manager', StreamWrapperManager::class)
+    ->addArgument($container);
+  $container->register('file_system', FileSystem::class)
+    ->addArgument(new Reference('stream_wrapper_manager'))
+    ->addArgument(new Reference('settings'));
 
   \Drupal::setContainer($container);
 
