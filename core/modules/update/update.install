@@ -14,6 +14,8 @@ use Drupal\Core\Hook\Attribute\ProceduralHookScanStop;
 function update_install(): void {
   $queue = \Drupal::queue('update_fetch_tasks', TRUE);
   $queue->createQueue();
+  $recipe_queue = \Drupal::queue('update_recipe_telemetry', TRUE);
+  $recipe_queue->createQueue();
 }
 
 /**
@@ -25,6 +27,8 @@ function update_uninstall(): void {
 
   $queue = \Drupal::queue('update_fetch_tasks');
   $queue->deleteQueue();
+  $recipe_queue = \Drupal::queue('update_recipe_telemetry', TRUE);
+  $recipe_queue->deleteQueue();
 }
 
 /**

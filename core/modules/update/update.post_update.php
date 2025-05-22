@@ -37,3 +37,11 @@ function update_post_update_clear_disk_cache(): void {
   }
 
 }
+
+/**
+ * Creates a queue for telemetry about applied recipes.
+ */
+function update_post_update_create_recipe_queue(): void {
+  $recipe_queue = \Drupal::queue('update_recipe_telemetry', TRUE);
+  $recipe_queue->createQueue();
+}
