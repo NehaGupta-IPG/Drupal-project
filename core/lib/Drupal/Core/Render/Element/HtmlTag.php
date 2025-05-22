@@ -2,11 +2,9 @@
 
 namespace Drupal\Core\Render\Element;
 
-use Drupal\Component\Render\MarkupInterface;
 use Drupal\Component\Utility\Html as HtmlUtility;
 use Drupal\Core\Render\Attribute\RenderElement;
 use Drupal\Core\Render\Markup;
-use Drupal\Component\Utility\Xss;
 use Drupal\Core\Template\Attribute;
 
 /**
@@ -102,11 +100,8 @@ class HtmlTag extends RenderElementBase {
       if ($element['#value'] === NULL) {
         $element['#markup'] = '';
       }
-      elseif ($element['#value'] instanceof MarkupInterface) {
-        $element['#markup'] = $element['#value'];
-      }
       else {
-        $element['#markup'] = Markup::create(Xss::filterAdmin($element['#value']));
+        $element['#markup'] = $element['#value'];
       }
     }
     $prefix = isset($element['#prefix']) ? $element['#prefix'] . $open_tag : $open_tag;
