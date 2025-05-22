@@ -3,6 +3,7 @@
 namespace Drupal\layout_builder\EventSubscriber;
 
 use Drupal\block_content\Access\RefinableDependentAccessInterface;
+use Drupal\Component\Utility\Html;
 use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Block\BlockPluginInterface;
 use Drupal\Core\Cache\CacheableMetadata;
@@ -130,6 +131,7 @@ class BlockComponentRenderArray implements EventSubscriberInterface {
         '#derivative_plugin_id' => $block->getDerivativeId(),
         '#in_preview' => $event->inPreview(),
         '#weight' => $event->getComponent()->getWeight(),
+        '#id' => Html::cleanCssIdentifier(Html::getUniqueId($block->getPluginId())),
       ];
 
       // Place the $content returned by the block plugin into a 'content' child
