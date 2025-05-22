@@ -14,9 +14,9 @@ namespace Drupal\KernelTests\Core\File {
     /**
      * Tests that the public stream wrapper can handle a custom root directory.
      *
-     * This checks that when the public files folder root is the same as a subfolder 
+     * This checks that when the public files folder root is the same as a subfolder
      * being created, it does actually create it correctly. There has been an edge case
-     * where if the root is "custom-dir" and the folder being created is also caleld 
+     * where if the root is "custom-dir" and the folder being created is also caleld
      * "custom-dir", it will not creat the folder correctly and think it already exists.
      */
     public function testRealPathHandlesCustomRootDirectory(): void {
@@ -30,6 +30,9 @@ namespace Drupal\KernelTests\Core\File {
 
 namespace Drupal\Core\StreamWrapper {
 
+  /*
+   * Overrdides the core realpath() function to help with this test.
+   */
   function realpath(string $path): string|false {
     // Simulate that /custom-dir is an existing directory.
     if (preg_match('/^\/custom-dir$/', $path)) {
@@ -38,6 +41,9 @@ namespace Drupal\Core\StreamWrapper {
     return \realpath($path);
   }
 
+  /*
+   * Overrides the core stat() function to help with this test.
+   */
   function stat(string $filename): array|false {
     // Simulate that /custom-dir is an existing directory.
     if (preg_match('/^\/custom-dir$/', $filename)) {
