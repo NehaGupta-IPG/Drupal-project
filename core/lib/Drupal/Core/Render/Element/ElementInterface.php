@@ -79,12 +79,21 @@ interface ElementInterface extends PluginInspectionInterface, RenderCallbackInte
   /**
    * Return child elements.
    *
-   * @return \Traversable
+   * @return \Traversable<\Drupal\Core\Render\Element\ElementInterface>
    *   Key will be children names, values are ElementInterface objects.
-   *
-   * @phpstan-return \Traversable<\Drupal\Core\Render\Element\ElementInterface>
    */
   public function getChildren(): \Traversable;
+
+  /**
+   * Gets a child.
+   *
+   * @param int|string $name
+   *   The name of the child. Can also be an integer.
+   *
+   * @return ?\Drupal\Core\Render\Element\ElementInterface
+   *   The child element object.
+   */
+  public function getChild(int|string $name): ?ElementInterface;
 
   /**
    * Adds a child.

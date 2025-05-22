@@ -73,11 +73,12 @@ class FormTestHooks {
    */
   #[Hook('form_form_test_vertical_tabs_access_form_alter')]
   public function formFormTestVerticalTabsAccessFormAlter(&$form, &$form_state, $form_id) : void {
-    $form['vertical_tabs1']['#access'] = FALSE;
-    $form['vertical_tabs2']['#access'] = FALSE;
-    $form['tabs3']['#access'] = TRUE;
-    $form['fieldset1']['#access'] = FALSE;
-    $form['container']['#access'] = FALSE;
+    $element_object = $this->elementInfoManager->fromRenderArray($form);
+    $element_object->getChild('vertical_tabs1')->access = FALSE;
+    $element_object->getChild('vertical_tabs2')->access = FALSE;
+    $element_object->getChild('tab3')->access = FALSE;
+    $element_object->getChild('fieldset1')->access = FALSE;
+    $element_object->getChild('container')->access = FALSE;
   }
 
 }
