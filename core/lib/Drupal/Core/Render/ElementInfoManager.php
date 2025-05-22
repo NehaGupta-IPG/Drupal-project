@@ -36,7 +36,7 @@ class ElementInfoManager extends DefaultPluginManager implements ElementInfoMana
   protected $elementInfo;
 
   /**
-   * class => plugin id mapping.
+   * Class => plugin id mapping.
    *
    * More performant than reflecting runtime.
    *
@@ -106,7 +106,7 @@ class ElementInfoManager extends DefaultPluginManager implements ElementInfoMana
    * @param string $theme_name
    *   The theme name.
    */
-  protected function buildInfo($theme_name) {
+  protected function buildInfo($theme_name): void {
     if (isset($this->elementInfo[$theme_name])) {
       return;
     }
