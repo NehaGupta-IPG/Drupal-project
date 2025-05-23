@@ -70,7 +70,7 @@ class EditorAdminTest extends BrowserTestBase {
 
     // Verify the <select>.
     $select = $this->assertSession()->selectExists('editor[editor]');
-    $this->assertSame('disabled', $select->getAttribute('disabled'));
+    $this->assertTrue($select->hasAttribute('disabled'));
     $options = $select->findAll('css', 'option');
     $this->assertCount(1, $options);
     $this->assertSame('None', $options[0]->getText(), 'Option 1 in the Text Editor select is "None".');
