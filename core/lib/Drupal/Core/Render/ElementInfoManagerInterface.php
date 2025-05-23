@@ -63,41 +63,40 @@ interface ElementInfoManagerInterface extends PluginManagerInterface {
   public function getInfoProperty($type, $property_name, $default = NULL);
 
   /**
-   * Create a render element object from a render array.
+   * Create a render object from a render array.
    *
    * @param \Drupal\Core\Render\Element\ElementInterface|array $element
-   *   A render element. For easier usage, it can be an element returned from
-   *   this method which will be returned unchanged.
+   *   A render array or render objects. The latter is returned unchanged.
    * @param string $type
    *   The element type / render plugin id.
    *
    * @return \Drupal\Core\Render\Element\ElementInterface
-   *   A render element object. Defaults to form to make it easier to run
-   *   this from form_alter implementations.
+   *   A render object. Defaults to form to make it easier to run this from
+   *   form_alter implementations.
    */
-  public function fromRenderArray(ElementInterface|array &$element, string $type = 'form'): ElementInterface;
+  public function fromRenderable(ElementInterface|array &$element, string $type = 'form'): ElementInterface;
 
   /**
    * {@inheritdoc}
    *
    * @return \Drupal\Core\Render\Element\ElementInterface
-   *   A fully configured element plugin instance.
+   *   A fully configured render object.
    */
   public function createInstance($plugin_id = '', array $configuration = []): ElementInterface;
 
   /**
-   * Creates a plugin instance based on the provided class and configuration.
+   * Creates a render object based on the provided class and configuration.
    *
    * @param class-string<T> $class
-   *   The class of the element plugin being instantiated.
+   *   The class of the render object being instantiated.
    * @param array $configuration
-   *   An array of configuration relevant to the plugin instance.
+   *   An array of configuration relevant to the render object.
    *
    * @return T
-   *   A fully configured element plugin instance.
+   *   A fully configured render object.
    *
    * @throws \Drupal\Component\Plugin\Exception\PluginException
-   *   If the instance cannot be created, such as if the ID is invalid.
+   *   If the render object cannot be created, such as if the class is invalid.
    *
    * @template T of ElementInterface
    */

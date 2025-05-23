@@ -31,7 +31,7 @@ class FieldThirdPartyTestHooks {
     $textfield = $this->elementInfoManager->fromClass(Textfield::class);
     $textfield->title = $this->t('3rd party widget settings form');
     $textfield->default_value = $plugin->getThirdPartySetting('field_third_party_test', 'field_test_widget_third_party_settings_form');
-    return $textfield->toRenderArray('field_test_widget_third_party_settings_form');
+    return $textfield->toRenderable('field_test_widget_third_party_settings_form');
   }
 
   /**
@@ -42,7 +42,7 @@ class FieldThirdPartyTestHooks {
     $number = $this->elementInfoManager->fromClass(Number::class);
     $number->title = $this->t('Second 3rd party widget settings form');
     $number->default_value = $plugin->getThirdPartySetting('field_third_party_test', 'second_field_widget_third_party_settings_form');
-    return $number->toRenderArray('second_field_widget_third_party_settings_form');
+    return $number->toRenderable('second_field_widget_third_party_settings_form');
   }
 
   /**
@@ -61,7 +61,7 @@ class FieldThirdPartyTestHooks {
     $textfield = $this->elementInfoManager->fromClass(Textfield::class);
     $textfield->title = $this->t('3rd party formatter settings form');
     $textfield->default_value = $plugin->getThirdPartySetting('field_third_party_test', 'field_test_field_formatter_third_party_settings_form');
-    return $textfield->toRenderArray('field_test_field_formatter_third_party_settings_form');
+    return $textfield->toRenderable('field_test_field_formatter_third_party_settings_form');
   }
 
   /**
@@ -72,7 +72,7 @@ class FieldThirdPartyTestHooks {
     $number = $this->elementInfoManager->fromClass(Number::class);
     $number->title = $this->t('Second 3rd party formatter settings form');
     $number->default_value = $plugin->getThirdPartySetting('field_third_party_test', 'second_field_formatter_third_party_settings_form');
-    return $number->toRenderArray('second_field_formatter_third_party_settings_form');
+    return $number->toRenderable('second_field_formatter_third_party_settings_form');
   }
 
   /**

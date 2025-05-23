@@ -567,7 +567,7 @@ abstract class RenderElementBase extends PluginBase implements ElementInterface,
   /**
    * {@inheritdoc}
    */
-  public function &toRenderArray(?string $wrapper_key = NULL): array {
+  public function &toRenderable(?string $wrapper_key = NULL): array {
     $return = $wrapper_key ? [$wrapper_key => &$this->storage] : $this->storage;
     return $return;
   }
@@ -604,7 +604,7 @@ abstract class RenderElementBase extends PluginBase implements ElementInterface,
    */
   public function getChildren(): \Traversable {
     foreach (Element::children($this->storage) as $key) {
-      yield $key => $this->elementInfoManager()->fromRenderArray($this->storage[$key]);
+      yield $key => $this->elementInfoManager()->fromRenderable($this->storage[$key]);
     }
   }
 
@@ -613,7 +613,7 @@ abstract class RenderElementBase extends PluginBase implements ElementInterface,
    */
   public function getChild(int|string|array $name): ?ElementInterface {
     $value = &NestedArray::getValue($this->storage, (array) $name, $exists);
-    return $exists ? $this->elementInfoManager()->fromRenderArray($value) : NULL;
+    return $exists ? $this->elementInfoManager()->fromRenderable($value) : NULL;
   }
 
   /**
@@ -623,24 +623,28 @@ abstract class RenderElementBase extends PluginBase implements ElementInterface,
     if ($name[0] === '#') {
       throw new \LogicException('The name of children can not start with a #.');
     }
-    $childObject = $this->elementInfoManager()->fromRenderArray($child);
+    $childObject = $this->elementInfoManager()->fromRenderable($child);
     $childObject->renderParent = $this;
     $childObject->renderParentName = $name;
-    $this->storage[$name] = &$childObject->toRenderArray();
+    $this->storage[$name] = &$childObject->toRenderable();
     return $childObject;
   }
 
-  public function createChild(int|string $name, string $class): ElementInterface {
-    $child = $this->elementInfoManager()->fromClass($class);
+  /**
+   * {@inheritdoc}
+   */
+  public function createChild(int|string $name, string $class, array $configuration = []): ElementInterface {
+    $child = $this->elementInfoManager()->fromClass($class, $configuration);
     return $this->addChild($name, $child);
   }
 
   /**
    * {@inheritdoc}
    */
-  public function removeChild(int|string $name): static {
+  public function removeChild(int|string $name): ?ElementInterface {
+    $return = $this->storage[$name] ?? NULL;
     unset($this->storage[$name]);
-    return $this;
+    return $return;
   }
 
   /**

@@ -61,7 +61,7 @@ class FormTestHooks {
    */
   #[Hook('form_user_register_form_alter')]
   public function formUserRegisterFormAlter(&$form, FormStateInterface $form_state) : void {
-    $submit = $this->elementInfoManager->fromRenderArray($form)
+    $submit = $this->elementInfoManager->fromRenderable($form)
       ->createChild('test_rebuild', Submit::class);
     $submit->value = $this->t('Rebuild');
     $submit->submit = [[Callbacks::class, 'userRegisterFormRebuild']];
@@ -72,7 +72,7 @@ class FormTestHooks {
    */
   #[Hook('form_form_test_vertical_tabs_access_form_alter')]
   public function formFormTestVerticalTabsAccessFormAlter(&$form, &$form_state, $form_id) : void {
-    $element_object = $this->elementInfoManager->fromRenderArray($form);
+    $element_object = $this->elementInfoManager->fromRenderable($form);
     $element_object->getChild('vertical_tabs1')->access = FALSE;
     $element_object->getChild('vertical_tabs2')->access = FALSE;
     $element_object->getChild('tab3')->access = FALSE;

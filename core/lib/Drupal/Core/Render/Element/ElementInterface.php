@@ -74,18 +74,22 @@ interface ElementInterface extends PluginInspectionInterface, RenderCallbackInte
    * @param string|null $wrapper_key
    *   An optional wrapper.
    *
-   * @return array
-   *   The render array stored in this object. Make sure to take the return
-   *   value as a reference. If $wrapper_key is given then
-   *   [$wrapper_key => $render_array] is returned.
+   * @return array|\Drupal\Core\Render\Element\ElementInterface
+   *   A render array. Make sure to take the return value as a reference.
+   *   If $wrapper_key is not given then the stored render element is returned.
+   *   If $wrapper_key is given then [$wrapper_key => &$element] is returned.
+   *   The return value is typed with array|ElementInterface to prepare for
+   *   Drupal 12, where the plan for this method is to return an
+   *   ElementInterface object. If that plan goes through then in Drupal 13
+   *   support for render arrays will be dropped.
    */
-  public function &toRenderArray(?string $wrapper_key = NULL);
+  public function &toRenderable(?string $wrapper_key = NULL): array|ElementInterface;
 
   /**
    * Return child elements.
    *
    * @return \Traversable<\Drupal\Core\Render\Element\ElementInterface>
-   *   Key will be children names, values are ElementInterface objects.
+   *   Key will be children names, values are render objects.
    */
   public function getChildren(): \Traversable;
 
@@ -96,12 +100,12 @@ interface ElementInterface extends PluginInspectionInterface, RenderCallbackInte
    *   The name of the child. Can also be an integer. Or a list of these.
    *
    * @return ?\Drupal\Core\Render\Element\ElementInterface
-   *   The child element object.
+   *   The child render object.
    */
   public function getChild(int|string|array $name): ?ElementInterface;
 
   /**
-   * Adds a child object or array.
+   * Adds a child renderable.
    *
    * @param int|string $name
    *   The name of the child. Can also be an integer.
@@ -114,19 +118,21 @@ interface ElementInterface extends PluginInspectionInterface, RenderCallbackInte
   public function addChild(int|string $name, ElementInterface|array &$child): ElementInterface;
 
   /**
-   * Create a child object.
+   * Creates a render object and attaches it to the current render object.
    *
    * @param int|string $name
    *   The name of the child. Can also be an integer.
    * @param class-string<T> $class
-   *   The class of the child plugin.
+   *   The class of the render object.
+   * @param array $configuration
+   *   An array of configuration relevant to the render object.
    *
    * @return T
-   *   The child object.
+   *   The child render object.
    *
    * @template T of \Drupal\Core\Render\Element\ElementInterface
    */
-  public function createChild(int|string $name, string $class): ElementInterface;
+  public function createChild(int|string $name, string $class, array $configuration = []): ElementInterface;
 
   /**
    * Removes a child.
@@ -134,9 +140,9 @@ interface ElementInterface extends PluginInspectionInterface, RenderCallbackInte
    * @param int|string $name
    *   The name of the child. Can also be an integer.
    *
-   * @return $this
-   *   The called object.
+   * @return ?\Drupal\Core\Render\Element\ElementInterface
+   *   The removed render object if any.
    */
-  public function removeChild(int|string $name): static;
+  public function removeChild(int|string $name): ?ElementInterface;
 
 }
