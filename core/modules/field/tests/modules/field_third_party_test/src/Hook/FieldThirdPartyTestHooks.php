@@ -9,6 +9,9 @@ use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Field\WidgetInterface;
 use Drupal\Core\Hook\Attribute\Hook;
+use Drupal\Core\Render\Element\Number;
+use Drupal\Core\Render\Element\Textfield;
+use Drupal\Core\Render\ElementInfoManagerInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 
 /**
@@ -18,16 +21,17 @@ class FieldThirdPartyTestHooks {
 
   use StringTranslationTrait;
 
+  public function __construct(protected ElementInfoManagerInterface $elementInfoManager) {}
+
   /**
    * Implements hook_field_widget_third_party_settings_form().
    */
   #[Hook('field_widget_third_party_settings_form')]
   public function fieldWidgetThirdPartySettingsForm(WidgetInterface $plugin, FieldDefinitionInterface $field_definition, $form_mode, $form, FormStateInterface $form_state): array {
-    $element['field_test_widget_third_party_settings_form'] = [
-      '#type' => 'textfield',
-      '#title' => $this->t('3rd party widget settings form'),
-      '#default_value' => $plugin->getThirdPartySetting('field_third_party_test', 'field_test_widget_third_party_settings_form'),
-    ];
+    $textfield = $this->elementInfoManager->fromClass(Textfield::class);
+    $textfield->title = $this->t('3rd party widget settings form');
+    $textfield->default_value = $plugin->getThirdPartySetting('field_third_party_test', 'field_test_widget_third_party_settings_form');
+    $element['field_test_widget_third_party_settings_form'] = $textfield;
     return $element;
   }
 
@@ -36,11 +40,10 @@ class FieldThirdPartyTestHooks {
    */
   #[Hook('field_widget_third_party_settings_form')]
   public function fieldWidgetThirdPartySettingsFormAdditionalImplementation(WidgetInterface $plugin, FieldDefinitionInterface $field_definition, $form_mode, $form, FormStateInterface $form_state): array {
-    $element['second_field_widget_third_party_settings_form'] = [
-      '#type' => 'number',
-      '#title' => $this->t('Second 3rd party widget settings form'),
-      '#default_value' => $plugin->getThirdPartySetting('field_third_party_test', 'second_field_widget_third_party_settings_form'),
-    ];
+    $number = $this->elementInfoManager->fromClass(Number::class);
+    $number->title = $this->t('Second 3rd party widget settings form');
+    $number->default_value = $plugin->getThirdPartySetting('field_third_party_test', 'second_field_widget_third_party_settings_form');
+    $element['second_field_widget_third_party_settings_form'] = $number;
     return $element;
   }
 
@@ -57,11 +60,10 @@ class FieldThirdPartyTestHooks {
    */
   #[Hook('field_formatter_third_party_settings_form')]
   public function fieldFormatterThirdPartySettingsForm(FormatterInterface $plugin, FieldDefinitionInterface $field_definition, $view_mode, $form, FormStateInterface $form_state): array {
-    $element['field_test_field_formatter_third_party_settings_form'] = [
-      '#type' => 'textfield',
-      '#title' => $this->t('3rd party formatter settings form'),
-      '#default_value' => $plugin->getThirdPartySetting('field_third_party_test', 'field_test_field_formatter_third_party_settings_form'),
-    ];
+    $textfield = $this->elementInfoManager->fromClass(Textfield::class);
+    $textfield->title = $this->t('3rd party formatter settings form');
+    $textfield->default_value = $plugin->getThirdPartySetting('field_third_party_test', 'field_test_field_formatter_third_party_settings_form');
+    $element['field_test_field_formatter_third_party_settings_form'] = $textfield;
     return $element;
   }
 
@@ -70,11 +72,10 @@ class FieldThirdPartyTestHooks {
    */
   #[Hook('field_formatter_third_party_settings_form')]
   public function fieldFormatterThirdPartySettingsFormAdditionalImplementation(FormatterInterface $plugin, FieldDefinitionInterface $field_definition, $view_mode, $form, FormStateInterface $form_state): array {
-    $element['second_field_formatter_third_party_settings_form'] = [
-      '#type' => 'number',
-      '#title' => $this->t('Second 3rd party formatter settings form'),
-      '#default_value' => $plugin->getThirdPartySetting('field_third_party_test', 'second_field_formatter_third_party_settings_form'),
-    ];
+    $number = $this->elementInfoManager->fromClass(Number::class);
+    $number->title = $this->t('Second 3rd party formatter settings form');
+    $number->default_value = $plugin->getThirdPartySetting('field_third_party_test', 'second_field_formatter_third_party_settings_form');
+    $element['second_field_formatter_third_party_settings_form'] = $number;
     return $element;
   }
 
