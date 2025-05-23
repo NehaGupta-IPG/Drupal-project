@@ -16,12 +16,12 @@ use Composer\InstalledVersions;
 class ComposerHelper {
 
   /**
-   * Finds the 'name' property from a composer.json file at a given path
+   * Finds the 'name' property from a composer.json file at a given path.
    *
    * @param string $composer_json_path
    *   The full path to the composer.json file to look in.
    *
-   * @return string|NULL
+   * @return string|null
    *   The value of the 'name' property if found, or NULL if the given file does
    *   not exist, could not be opened, could not be parsed, or does not define a
    *   'name' property at all.
@@ -40,7 +40,7 @@ class ComposerHelper {
    * @param string $package_name
    *   The composer package name to check, for example 'drupal/address'.
    *
-   * @return string|NULL
+   * @return string|null
    *   The 'pretty' version number if known, or NULL if the package is not
    *   installed.
    */
