@@ -80,7 +80,7 @@ class NumberWidget extends WidgetBase {
     switch ($this->fieldDefinition->getType()) {
       case 'decimal':
         // Guard against problems with small numbers beyond 15 positions.
-        $element['#step'] = str_pad('0.', $field_settings['scale'] - 1, '0') . '1';
+        $element['#step'] = '0.' . str_repeat('0', $field_settings['scale'] - 1) . '1';
         break;
 
       case 'float':

@@ -101,7 +101,7 @@ class DecimalItem extends NumericItemBase {
     $settings = $this->getSettings();
 
     // Guard against problems with small numbers beyond 15 positions.
-    $step = str_pad('0.', $settings['scale'] - 1, '0') . '1';
+    $step = '0.' . str_repeat('0', $settings['scale'] - 1) . '1';
     $element['min']['#step'] = $step;
     $element['max']['#step'] = $step;
 
