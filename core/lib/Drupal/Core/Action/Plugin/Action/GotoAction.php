@@ -4,10 +4,12 @@ namespace Drupal\Core\Action\Plugin\Action;
 
 use Drupal\Component\Utility\UrlHelper;
 use Drupal\Core\Access\AccessResult;
+use Drupal\Core\Action\ActionResult;
 use Drupal\Core\Action\ConfigurableActionBase;
 use Drupal\Core\Action\Attribute\Action;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
+use Drupal\Core\Plugin\Context\ContextDefinition;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Utility\UnroutedUrlAssemblerInterface;
@@ -22,7 +24,13 @@ use Symfony\Component\HttpKernel\KernelEvents;
 #[Action(
   id: 'action_goto_action',
   label: new TranslatableMarkup('Redirect to URL'),
-  type: 'system'
+  context_definitions: [
+    'url' => new ContextDefinition(
+      data_type: 'string',
+      label: new TranslatableMarkup("Url"),
+      description: new TranslatableMarkup('The URL to which the user should be redirected. This can be an internal URL like /node/1234 or an external URL like @url.', ['@url' => 'https://example.com']),
+    ),
+  ],
 )]
 class GotoAction extends ConfigurableActionBase implements ContainerFactoryPluginInterface {
 
@@ -71,8 +79,8 @@ class GotoAction extends ConfigurableActionBase implements ContainerFactoryPlugi
   /**
    * {@inheritdoc}
    */
-  public function execute($object = NULL) {
-    $url = $this->configuration['url'];
+  protected function doExecute(array $values): ActionResult {
+    [$url] = $values;
     // Leave external URLs unchanged, and assemble others as absolute URLs
     // relative to the site's base URL.
     if (!UrlHelper::isExternal($url)) {
@@ -98,6 +106,8 @@ class GotoAction extends ConfigurableActionBase implements ContainerFactoryPlugi
     };
     // Add the listener to the event dispatcher.
     $this->dispatcher->addListener(KernelEvents::RESPONSE, $listener);
+
+    return ActionResult::success($this->t('Redirect to @url completed.', ['@url' => $url]));
   }
 
   /**
@@ -133,7 +143,7 @@ class GotoAction extends ConfigurableActionBase implements ContainerFactoryPlugi
   /**
    * {@inheritdoc}
    */
-  public function access($object, ?AccountInterface $account = NULL, $return_as_object = FALSE) {
+  public function access(?AccountInterface $account = NULL, $return_as_object = FALSE) {
     $access = AccessResult::allowed();
     return $return_as_object ? $access : $access->isAllowed();
   }

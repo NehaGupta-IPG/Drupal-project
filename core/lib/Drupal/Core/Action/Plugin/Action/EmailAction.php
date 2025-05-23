@@ -4,6 +4,7 @@ namespace Drupal\Core\Action\Plugin\Action;
 
 use Drupal\Component\Render\PlainTextOutput;
 use Drupal\Component\Utility\EmailValidatorInterface;
+use Drupal\Core\Action\ActionResult;
 use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Action\ConfigurableActionBase;
 use Drupal\Core\Action\Attribute\Action;
@@ -12,6 +13,7 @@ use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\Core\Mail\MailManagerInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
+use Drupal\Core\Plugin\Context\ContextDefinition;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Utility\Token;
@@ -24,16 +26,32 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 #[Action(
   id: 'action_send_email_action',
   label: new TranslatableMarkup('Send email'),
-  type: 'system'
+  context_definitions: [
+    'recipient' => new ContextDefinition(
+      data_type: 'email',
+      label: new TranslatableMarkup("Recipient"),
+      description: new TranslatableMarkup("The email address to which the message should be sent.")
+    ),
+    'subject' => new ContextDefinition(
+      data_type: 'string',
+      label: new TranslatableMarkup("Subject"),
+      description: new TranslatableMarkup("The subject of the message.")
+    ),
+    'message' => new ContextDefinition(
+      data_type: 'string',
+      label: new TranslatableMarkup("Message"),
+      description: new TranslatableMarkup("The message that should be sent.")
+    ),
+    // @Todo Considering allowing multiple entities.
+    'entity' => new ContextDefinition(
+      data_type: 'entity',
+      label: new TranslatableMarkup("entities"),
+      required: FALSE,
+      description: new TranslatableMarkup("The contextual entities that can be used for token replacements.")
+    ),
+  ],
 )]
 class EmailAction extends ConfigurableActionBase implements ContainerFactoryPluginInterface {
-
-  /**
-   * The token service.
-   *
-   * @var \Drupal\Core\Utility\Token
-   */
-  protected $token;
 
   /**
    * The user storage.
@@ -41,34 +59,6 @@ class EmailAction extends ConfigurableActionBase implements ContainerFactoryPlug
    * @var \Drupal\Core\Entity\EntityStorageInterface
    */
   protected $storage;
-
-  /**
-   * A logger instance.
-   *
-   * @var \Psr\Log\LoggerInterface
-   */
-  protected $logger;
-
-  /**
-   * The mail manager.
-   *
-   * @var \Drupal\Core\Mail\MailManagerInterface
-   */
-  protected $mailManager;
-
-  /**
-   * The language manager.
-   *
-   * @var \Drupal\Core\Language\LanguageManagerInterface
-   */
-  protected $languageManager;
-
-  /**
-   * The email validator.
-   *
-   * @var \Drupal\Component\Utility\EmailValidatorInterface
-   */
-  protected $emailValidator;
 
   /**
    * Constructs an EmailAction object.
@@ -85,22 +75,26 @@ class EmailAction extends ConfigurableActionBase implements ContainerFactoryPlug
    *   The entity type manager.
    * @param \Psr\Log\LoggerInterface $logger
    *   A logger instance.
-   * @param \Drupal\Core\Mail\MailManagerInterface $mail_manager
+   * @param \Drupal\Core\Mail\MailManagerInterface $mailManager
    *   The mail manager.
-   * @param \Drupal\Core\Language\LanguageManagerInterface $language_manager
+   * @param \Drupal\Core\Language\LanguageManagerInterface $languageManager
    *   The language manager.
-   * @param \Drupal\Component\Utility\EmailValidatorInterface $email_validator
+   * @param \Drupal\Component\Utility\EmailValidatorInterface $emailValidator
    *   The email validator.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, Token $token, EntityTypeManagerInterface $entity_type_manager, LoggerInterface $logger, MailManagerInterface $mail_manager, LanguageManagerInterface $language_manager, EmailValidatorInterface $email_validator) {
+  public function __construct(
+    array $configuration,
+    $plugin_id,
+    $plugin_definition,
+    protected readonly Token $token,
+    EntityTypeManagerInterface $entity_type_manager,
+    protected readonly LoggerInterface $logger,
+    protected readonly MailManagerInterface $mailManager,
+    protected readonly LanguageManagerInterface $languageManager,
+    protected readonly EmailValidatorInterface $emailValidator
+  ) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
-
-    $this->token = $token;
     $this->storage = $entity_type_manager->getStorage('user');
-    $this->logger = $logger;
-    $this->mailManager = $mail_manager;
-    $this->languageManager = $language_manager;
-    $this->emailValidator = $email_validator;
   }
 
   /**
@@ -120,31 +114,31 @@ class EmailAction extends ConfigurableActionBase implements ContainerFactoryPlug
   /**
    * {@inheritdoc}
    */
-  public function execute($entity = NULL) {
-    if (empty($this->configuration['node'])) {
-      $this->configuration['node'] = $entity;
+  protected function doExecute(array $values): ActionResult {
+    // @var \Drupal\Core\Entity\EntityInterface $entity
+    [$recipient, $subject, $message, $entity] = $values;
+    // @Todo Consider token replacement prior to context validation or during set?
+    $data = [
+      'subject' => $subject,
+      'message' => $message,
+    ];
+    if ($entity) {
+      $data[$entity->getEntityTypeId()] = $entity;
     }
-
-    $recipient = PlainTextOutput::renderFromHtml($this->token->replace($this->configuration['recipient'], $this->configuration));
-
+    $data['recipient'] = PlainTextOutput::renderFromHtml($this->token->replace($recipient, $data));
     // If the recipient is a registered user with a language preference, use
     // the recipient's preferred language. Otherwise, use the system default
     // language.
-    $recipient_accounts = $this->storage->loadByProperties(['mail' => $recipient]);
+    $recipient_accounts = $this->storage->loadByProperties(['mail' => $data['recipient']]);
     $recipient_account = reset($recipient_accounts);
-    if ($recipient_account) {
-      $langcode = $recipient_account->getPreferredLangcode();
-    }
-    else {
-      $langcode = $this->languageManager->getDefaultLanguage()->getId();
-    }
-    $params = ['context' => $this->configuration];
-
-    $message = $this->mailManager->mail('system', 'action_send_email', $recipient, $langcode, $params);
+    $langcode = $recipient_account ? $recipient_account->getPreferredLangcode() : $this->languageManager->getDefaultLanguage()->getId();
+    $message = $this->mailManager->mail('system', 'action_send_email', $data['recipient'], $langcode, ['context' => $data]);
     // Error logging is handled by \Drupal\Core\Mail\MailManager::mail().
     if ($message['result']) {
       $this->logger->info('Sent email to %recipient', ['%recipient' => $recipient]);
+      return ActionResult::success($this->t('Sent email to %recipient', ['%recipient' => $recipient]));
     }
+    return ActionResult::failure($this->t('Failed to send email to %recipient', ['%recipient' => $recipient]));
   }
 
   /**
@@ -167,6 +161,7 @@ class EmailAction extends ConfigurableActionBase implements ContainerFactoryPlug
       '#title' => $this->t('Recipient email address'),
       '#default_value' => $this->configuration['recipient'],
       '#maxlength' => '254',
+      // @Todo Determine if multiple should be allowed as the execute function is not accounting for it.
       '#description' => $this->t('You may also use tokens: [node:author:mail], [comment:author:mail], etc. Separate recipients with a comma.'),
     ];
     $form['subject'] = [
@@ -210,7 +205,7 @@ class EmailAction extends ConfigurableActionBase implements ContainerFactoryPlug
   /**
    * {@inheritdoc}
    */
-  public function access($object, ?AccountInterface $account = NULL, $return_as_object = FALSE) {
+  public function access(?AccountInterface $account = NULL, $return_as_object = FALSE) {
     $result = AccessResult::allowed();
     return $return_as_object ? $result : $result->isAllowed();
   }

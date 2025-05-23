@@ -94,10 +94,11 @@ abstract class ChangeUserRoleBase extends ConfigurableActionBase implements Cont
   /**
    * {@inheritdoc}
    */
-  public function access($object, ?AccountInterface $account = NULL, $return_as_object = FALSE) {
-    /** @var \Drupal\user\UserInterface $object */
-    $access = $object->access('update', $account, TRUE)
-      ->andIf($object->roles->access('edit', $account, TRUE));
+  public function access(?AccountInterface $account = NULL, $return_as_object = FALSE) {
+    /** @var \Drupal\user\UserInterface $user */
+    $user = $this->getContextValue('user');
+    $access = $user->access('update', $account, TRUE)
+      ->andIf($user->roles->access('edit', $account, TRUE));
 
     return $return_as_object ? $access : $access->isAllowed();
   }

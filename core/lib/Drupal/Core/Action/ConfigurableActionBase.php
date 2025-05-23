@@ -6,6 +6,7 @@ use Drupal\Component\Plugin\ConfigurableInterface;
 use Drupal\Component\Plugin\DependentPluginInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Plugin\PluginFormInterface;
+use Drupal\Core\Session\AccountInterface;
 
 /**
  * Provides a base implementation for a configurable Action plugin.
@@ -53,6 +54,32 @@ abstract class ConfigurableActionBase extends ActionBase implements Configurable
    */
   public function calculateDependencies() {
     return [];
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function execute(): void {
+    $this->mapConfigurationToContext();
+    parent::execute();
+  }
+
+  protected function mapConfigurationToContext() {
+    $configuration = $this->getConfiguration();
+    $mapping = $this->getContextMapping();
+    foreach ($this->getContextDefinitions() as $context_name => $definition) {
+      if (!isset($mapping[$context_name]) && isset($configuration[$context_name])) {
+        $this->setContextValue($context_name, $configuration[$context_name]);
+      }
+    }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function access(?AccountInterface $account = NULL, $return_as_object = FALSE) {
+    $this->mapConfigurationToContext();
+    return parent::access($account, $return_as_object);
   }
 
 }

@@ -3,7 +3,8 @@
 namespace Drupal\Core\Action\Plugin\Action;
 
 use Drupal\Component\Datetime\TimeInterface;
-use Drupal\Core\Action\Plugin\Action\Derivative\EntityChangedActionDeriver;
+use Drupal\Core\Action\ActionResult;
+use Drupal\Core\Action\Plugin\Action\Derivative\EntitySaveActionDeriver;
 use Drupal\Core\Action\Attribute\Action;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Session\AccountInterface;
@@ -16,7 +17,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 #[Action(
   id: 'entity:save_action',
   action_label: new TranslatableMarkup('Save'),
-  deriver: EntityChangedActionDeriver::class
+  deriver: EntitySaveActionDeriver::class
 )]
 class SaveAction extends EntityActionBase {
 
@@ -62,20 +63,36 @@ class SaveAction extends EntityActionBase {
   /**
    * {@inheritdoc}
    */
-  public function execute($entity = NULL) {
+  protected function doExecute(array $values): ActionResult {
+    // @var \Drupal\Core\Entity\EntityInterface $entity
+    [$entity] = $values;
+    $entity_is_new = $entity->isNew();
     $entity->setChangedTime($this->time->getRequestTime())->save();
+    $entity_link = $entity->toLink()->toString();
+    // If the entity is new, we need to return it in the result.
+    if ($entity_is_new) {
+      return ActionResult::success(
+        $this->t('The @type %label has been created.', ['@type' => $entity->getEntityType()->getLabel(), '%label' => $entity_link]),
+        [$entity->getEntityTypeId() => $entity]
+      );
+    }
+    return ActionResult::success($this->t('The @type %label has been updated.', ['@type' => $entity->getEntityType()->getLabel(), '%label' => $entity_link]));
   }
 
   /**
    * {@inheritdoc}
    */
-  public function access($object, ?AccountInterface $account = NULL, $return_as_object = FALSE) {
+  public function access(?AccountInterface $account = NULL, $return_as_object = FALSE) {
+    $entity = $this->getContextValue($this->getDerivativeId());
+    if($entity->isNew()) {
+      return $entity->access('create', $account, $return_as_object);
+    }
     // It's not necessary to check the changed field access here, because
     // Drupal\Core\Field\ChangedFieldItemList would anyway return 'not allowed'.
     // Also changing the changed field value is only a workaround to trigger an
     // entity resave. Without a field change, this would not be possible.
-    /** @var \Drupal\Core\Entity\EntityInterface $object */
-    return $object->access('update', $account, $return_as_object);
+    /** @var \Drupal\Core\Entity\EntityInterface $entity */
+    return $entity->access('update', $account, $return_as_object);
   }
 
 }

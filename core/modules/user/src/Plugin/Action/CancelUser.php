@@ -3,11 +3,14 @@
 namespace Drupal\user\Plugin\Action;
 
 use Drupal\Core\Action\ActionBase;
+use Drupal\Core\Action\ActionResult;
 use Drupal\Core\Action\Attribute\Action;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
+use Drupal\Core\Plugin\Context\EntityContextDefinition;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\TempStore\PrivateTempStoreFactory;
+use Drupal\user\UserInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -16,79 +19,79 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 #[Action(
   id: 'user_cancel_user_action',
   label: new TranslatableMarkup('Cancel the selected user accounts'),
-  type: 'user',
-  confirm_form_route_name: 'user.multiple_cancel_confirm'
+  context_definitions: [
+    'user' => new EntityContextDefinition(
+      data_type: 'entity:user',
+      label: new TranslatableMarkup("User"),
+      description: new TranslatableMarkup("The user you want to cancel."),
+    ),
+  ],
 )]
-class CancelUser extends ActionBase implements ContainerFactoryPluginInterface {
+class CancelUser extends ActionBase {
+  // @Todo Solve.
+//
+//  /**
+//   * Constructs a CancelUser object.
+//   *
+//   * @param array $configuration
+//   *   A configuration array containing information about the plugin instance.
+//   * @param string $plugin_id
+//   *   The plugin ID for the plugin instance.
+//   * @param mixed $plugin_definition
+//   *   The plugin implementation definition.
+//   * @param \Drupal\Core\TempStore\PrivateTempStoreFactory $temp_store_factory
+//   *   The tempstore factory.
+//   * @param \Drupal\Core\Session\AccountInterface $current_user
+//   *   Current user.
+//   */
+//  public function __construct(
+//    array $configuration,
+//    $plugin_id,
+//    $plugin_definition,
+//    protected readonly PrivateTempStoreFactory $tempStoreFactory,
+//    protected readonly AccountInterface $currentUser) {
+//    parent::__construct($configuration, $plugin_id, $plugin_definition);
+//  }
+//
+//  /**
+//   * {@inheritdoc}
+//   */
+//  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
+//    return new static(
+//      $configuration,
+//      $plugin_id,
+//      $plugin_definition,
+//      $container->get('tempstore.private'),
+//      $container->get('current_user')
+//    );
+//  }
+  // @Todo Solve.
+//
+//  /**
+//   * {@inheritdoc}
+//   */
+//  public function executeMultiple(array $entities) {
+//    $this->tempStoreFactory->get('user_user_operations_cancel')->set($this->currentUser->id(), $entities);
+//  }
 
   /**
-   * The tempstore factory.
-   *
-   * @var \Drupal\Core\TempStore\PrivateTempStoreFactory
+   * {@inheritdoc}
    */
-  protected $tempStoreFactory;
-
-  /**
-   * The current user.
-   *
-   * @var \Drupal\Core\Session\AccountInterface
-   */
-  protected $currentUser;
-
-  /**
-   * Constructs a CancelUser object.
-   *
-   * @param array $configuration
-   *   A configuration array containing information about the plugin instance.
-   * @param string $plugin_id
-   *   The plugin ID for the plugin instance.
-   * @param mixed $plugin_definition
-   *   The plugin implementation definition.
-   * @param \Drupal\Core\TempStore\PrivateTempStoreFactory $temp_store_factory
-   *   The tempstore factory.
-   * @param \Drupal\Core\Session\AccountInterface $current_user
-   *   Current user.
-   */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, PrivateTempStoreFactory $temp_store_factory, AccountInterface $current_user) {
-    $this->currentUser = $current_user;
-    $this->tempStoreFactory = $temp_store_factory;
-
-    parent::__construct($configuration, $plugin_id, $plugin_definition);
+  protected function doExecute(array $values): ActionResult {
+    // @var \Drupal\user\UserInterface $user
+    [$user] = $values;
+    $user->delete();
+    return ActionResult::success($this->t('The user has been deleted.'));
   }
 
   /**
    * {@inheritdoc}
    */
-  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
-    return new static(
-      $configuration,
-      $plugin_id,
-      $plugin_definition,
-      $container->get('tempstore.private'),
-      $container->get('current_user')
-    );
-  }
+  public function access(?AccountInterface $account = NULL, $return_as_object = FALSE) {
+    /** @var \Drupal\user\UserInterface $user */
+    $user = $this->getContextValue('user');
 
-  /**
-   * {@inheritdoc}
-   */
-  public function executeMultiple(array $entities) {
-    $this->tempStoreFactory->get('user_user_operations_cancel')->set($this->currentUser->id(), $entities);
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function execute($object = NULL) {
-    $this->executeMultiple([$object]);
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function access($object, ?AccountInterface $account = NULL, $return_as_object = FALSE) {
-    /** @var \Drupal\user\UserInterface $object */
-    return $object->access('delete', $account, $return_as_object);
+    return $user->access('delete', $account, $return_as_object);
   }
 
 }

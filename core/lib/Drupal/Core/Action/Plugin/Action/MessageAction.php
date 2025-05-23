@@ -3,11 +3,12 @@
 namespace Drupal\Core\Action\Plugin\Action;
 
 use Drupal\Core\Access\AccessResult;
+use Drupal\Core\Action\ActionResult;
 use Drupal\Core\Action\ConfigurableActionBase;
 use Drupal\Core\Action\Attribute\Action;
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\Core\Messenger\MessengerInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
+use Drupal\Core\Plugin\Context\ContextDefinition;
 use Drupal\Core\Render\RendererInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
@@ -19,31 +20,23 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  */
 #[Action(
   id: 'action_message_action',
-  label: new TranslatableMarkup('Display a message to the user'),
-  type: 'system'
+  label: new TranslatableMarkup('Display a message to the user.'),
+  context_definitions: [
+    'message' => new ContextDefinition(
+      data_type: 'string',
+      label: new TranslatableMarkup("Message"),
+      description: new TranslatableMarkup("The message to be displayed to the current user. You may include placeholders like [node:title], [user:name], and [comment:body] to represent data that will be different each time message is sent. Only the placeholders passed to the entity context will be available."),
+    ),
+    // @Todo Considering allowing multiple entities.
+    'entity' => new ContextDefinition(
+      data_type: 'entity',
+      label: new TranslatableMarkup("Entity"),
+      required: FALSE,
+      description: new TranslatableMarkup("The contextual entity that can be used for token replacements.")
+    ),
+  ],
 )]
 class MessageAction extends ConfigurableActionBase implements ContainerFactoryPluginInterface {
-
-  /**
-   * The token service.
-   *
-   * @var \Drupal\Core\Utility\Token
-   */
-  protected $token;
-
-  /**
-   * The renderer.
-   *
-   * @var \Drupal\Core\Render\RendererInterface
-   */
-  protected $renderer;
-
-  /**
-   * The messenger.
-   *
-   * @var \Drupal\Core\Messenger\MessengerInterface
-   */
-  protected $messenger;
 
   /**
    * Constructs a MessageAction object.
@@ -58,38 +51,40 @@ class MessageAction extends ConfigurableActionBase implements ContainerFactoryPl
    *   The token service.
    * @param \Drupal\Core\Render\RendererInterface $renderer
    *   The renderer.
-   * @param \Drupal\Core\Messenger\MessengerInterface $messenger
-   *   The messenger.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, Token $token, RendererInterface $renderer, MessengerInterface $messenger) {
+  public function __construct(
+    array $configuration,
+    $plugin_id,
+    $plugin_definition,
+    protected readonly Token $token,
+    protected readonly RendererInterface $renderer,
+  ) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
-
-    $this->token = $token;
-    $this->renderer = $renderer;
-    $this->messenger = $messenger;
   }
 
   /**
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
-    return new static($configuration, $plugin_id, $plugin_definition, $container->get('token'), $container->get('renderer'), $container->get('messenger'));
+    return new static($configuration, $plugin_id, $plugin_definition, $container->get('token'), $container->get('renderer'));
   }
 
   /**
    * {@inheritdoc}
    */
-  public function execute($entity = NULL) {
-    if (empty($this->configuration['node'])) {
-      $this->configuration['node'] = $entity;
-    }
-    $message = $this->token->replace($this->configuration['message'], $this->configuration);
+  protected function doExecute(array $values): ActionResult {
+    // @var \Drupal\Core\Entity\EntityInterface $entity
+    [$message, $entity] = $values;
+    $data = $entity ? [$entity->getEntityTypeId() => $entity->id()] : [];
+    // @Todo Test if $message needs Xss::filterAdmin() from context and config.
+    $message = $this->token->replace($message, $data);
     $build = [
       '#markup' => $message,
     ];
-
     // @todo Fix in https://www.drupal.org/node/2577827
     $this->messenger->addStatus($this->renderer->renderInIsolation($build));
+
+    return ActionResult::success($this->t('The message has been displayed.'));
   }
 
   /**
@@ -121,13 +116,12 @@ class MessageAction extends ConfigurableActionBase implements ContainerFactoryPl
    */
   public function submitConfigurationForm(array &$form, FormStateInterface $form_state) {
     $this->configuration['message'] = $form_state->getValue('message');
-    unset($this->configuration['node']);
   }
 
   /**
    * {@inheritdoc}
    */
-  public function access($object, ?AccountInterface $account = NULL, $return_as_object = FALSE) {
+  public function access(?AccountInterface $account = NULL, $return_as_object = FALSE) {
     $result = AccessResult::allowed();
     return $return_as_object ? $result : $result->isAllowed();
   }
