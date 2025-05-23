@@ -610,7 +610,7 @@ abstract class RenderElementBase extends PluginBase implements ElementInterface,
    * {@inheritdoc}
    */
   public function getChild(int|string $name): ?ElementInterface {
-    return $this->storage[$name] ?? NULL;
+    return isset($this->storage[$name]) ? $this->elementInfoManager()->fromRenderArray($this->storage[$name]) : NULL;
   }
 
   /**
