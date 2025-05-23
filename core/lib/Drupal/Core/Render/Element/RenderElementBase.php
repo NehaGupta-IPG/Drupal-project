@@ -3,6 +3,7 @@
 namespace Drupal\Core\Render\Element;
 
 use Drupal\Core\Access\AccessResultInterface;
+use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Form\FormBuilderInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
@@ -610,8 +611,9 @@ abstract class RenderElementBase extends PluginBase implements ElementInterface,
   /**
    * {@inheritdoc}
    */
-  public function getChild(int|string $name): ?ElementInterface {
-    return isset($this->storage[$name]) ? $this->elementInfoManager()->fromRenderArray($this->storage[$name]) : NULL;
+  public function getChild(int|string|array $name): ?ElementInterface {
+    $value = &NestedArray::getValue($this->storage, (array) $name, $exists);
+    return $exists ? $this->elementInfoManager()->fromRenderArray($value) : NULL;
   }
 
   /**
