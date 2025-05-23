@@ -26,9 +26,10 @@ abstract class ActionBase extends ExecutablePluginBase implements ActionInterfac
    * {@inheritdoc}
    */
   public function execute() : void {
-    $this->result = $this->doExecute($this->getContextValues());
+    $args = $this->getContextValues();
+    $this->result = call_user_func_array([$this, 'doExecute'], $args);
     // If the action provides context values, we need to set the values.
-    if ($provided_definitions = $this->getProvidedContextDefiitions()) {
+    if ($provided_definitions = $this->getProvidedContextDefinitions()) {
       $this->providedContext = [];
       foreach ($this->result->getContextValues() as $context_name => $value) {
         if (isset($provided_definitions[$context_name])) {
@@ -72,15 +73,5 @@ abstract class ActionBase extends ExecutablePluginBase implements ActionInterfac
     }
     return $this->result->isSuccess();
   }
-
-  /**
-   * Executes the action.
-   *
-   * @param array $values
-   *   An array of context values.
-   *
-   * @return \Drupal\Core\Action\ActionResult
-   */
-  abstract protected function doExecute(array $values) : ActionResult;
 
 }

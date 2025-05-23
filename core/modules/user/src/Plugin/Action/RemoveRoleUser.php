@@ -34,9 +34,7 @@ class RemoveRoleUser extends ChangeUserRoleBase {
   /**
    * {@inheritdoc}
    */
-  protected function doExecute(array $values): ActionResult {
-    // @var \Drupal\user\UserInterface $user
-    [$user, $rid] = $values;
+  protected function doExecute(UserInterface $user, string $rid): ActionResult {
     // Skip removing the role from the user if they already don't have it.
     if ($user->hasRole($rid)) {
       // For efficiency manually save the original account before applying

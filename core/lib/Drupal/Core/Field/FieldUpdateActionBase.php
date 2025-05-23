@@ -3,6 +3,7 @@
 namespace Drupal\Core\Field;
 
 use Drupal\Core\Action\ActionBase;
+use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Action\ActionResult;
 
@@ -39,9 +40,7 @@ abstract class FieldUpdateActionBase extends ActionBase {
   /**
    * {@inheritdoc}
    */
-  protected function doExecute(array $values): ActionResult {
-    // @var \Drupal\Core\Entity\EntityInterface $entity
-    [$entity] = $values;
+  protected function doExecute(EntityInterface $entity): ActionResult {
     foreach ($this->getFieldsToUpdate() as $field => $value) {
       $entity->$field = $value;
     }

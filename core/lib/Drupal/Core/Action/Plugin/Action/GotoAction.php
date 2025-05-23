@@ -79,8 +79,7 @@ class GotoAction extends ConfigurableActionBase implements ContainerFactoryPlugi
   /**
    * {@inheritdoc}
    */
-  protected function doExecute(array $values): ActionResult {
-    [$url] = $values;
+  protected function doExecute(string $url): ActionResult {
     // Leave external URLs unchanged, and assemble others as absolute URLs
     // relative to the site's base URL.
     if (!UrlHelper::isExternal($url)) {

@@ -31,7 +31,7 @@ trait ContextProviderPluginTrait {
    */
   public function getProvidedContexts(): array {
     // Make sure all context objects are initialized.
-    foreach ($this->getProvidedContextDefiitions() as $name => $definition) {
+    foreach ($this->getProvidedContextDefinitions() as $name => $definition) {
       $this->getProvidedContext($name);
     }
     return $this->context;
@@ -53,7 +53,7 @@ trait ContextProviderPluginTrait {
    */
   public function getProvidedContextValues(): array {
     $values = [];
-    foreach ($this->getProvidedContextDefiitions() as $name => $definition) {
+    foreach ($this->getProvidedContextDefinitions() as $name => $definition) {
       $values[$name] = isset($this->providedContext[$name]) ? $this->providedContext[$name]->getContextValue() : NULL;
     }
     return $values;
@@ -73,7 +73,7 @@ trait ContextProviderPluginTrait {
   /**
    * {@inheritdoc}
    */
-  public function getProvidedContextDefiitions(): array {
+  public function getProvidedContextDefinitions(): array {
     $definition = $this->getPluginDefinition();
     return !empty($definition['provides']) ? $definition['provides'] : [];
   }

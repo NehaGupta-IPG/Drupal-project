@@ -8,6 +8,7 @@ use Drupal\Core\Action\ActionResult;
 use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Action\ConfigurableActionBase;
 use Drupal\Core\Action\Attribute\Action;
+use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Language\LanguageManagerInterface;
@@ -114,9 +115,8 @@ class EmailAction extends ConfigurableActionBase implements ContainerFactoryPlug
   /**
    * {@inheritdoc}
    */
-  protected function doExecute(array $values): ActionResult {
+  protected function doExecute(string $recipient, string  $subject, string $message, ?EntityInterface $entity): ActionResult {
     // @var \Drupal\Core\Entity\EntityInterface $entity
-    [$recipient, $subject, $message, $entity] = $values;
     // @Todo Consider token replacement prior to context validation or during set?
     $data = [
       'subject' => $subject,

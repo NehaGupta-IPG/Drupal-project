@@ -90,9 +90,7 @@ class DeleteAction extends EntityActionBase {
   /**
    * {@inheritdoc}
    */
-  protected function doExecute(array $values): ActionResult {
-    // @var \Drupal\Core\Entity\EntityInterface $entity
-    [$entity] = $values;
+  protected function doExecute(EntityInterface $entity): ActionResult {
     // Get the entity title.
     $entity_label = $entity->label();
     $entity_type_label = $entity->getEntityType()->getLabel();

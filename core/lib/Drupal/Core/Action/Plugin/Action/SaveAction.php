@@ -6,6 +6,7 @@ use Drupal\Component\Datetime\TimeInterface;
 use Drupal\Core\Action\ActionResult;
 use Drupal\Core\Action\Plugin\Action\Derivative\EntitySaveActionDeriver;
 use Drupal\Core\Action\Attribute\Action;
+use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
@@ -63,9 +64,7 @@ class SaveAction extends EntityActionBase {
   /**
    * {@inheritdoc}
    */
-  protected function doExecute(array $values): ActionResult {
-    // @var \Drupal\Core\Entity\EntityInterface $entity
-    [$entity] = $values;
+  protected function doExecute(EntityInterface $entity): ActionResult {
     $entity_is_new = $entity->isNew();
     $entity->setChangedTime($this->time->getRequestTime())->save();
     $entity_link = $entity->toLink()->toString();

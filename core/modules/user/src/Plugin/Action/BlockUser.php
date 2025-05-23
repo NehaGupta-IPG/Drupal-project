@@ -8,6 +8,7 @@ use Drupal\Core\Action\Attribute\Action;
 use Drupal\Core\Plugin\Context\EntityContextDefinition;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\user\UserInterface;
 
 /**
  * Blocks a user.
@@ -28,9 +29,7 @@ class BlockUser extends ActionBase {
   /**
    * {@inheritdoc}
    */
-  protected function doExecute(array $values): ActionResult {
-    // @var \Drupal\user\UserInterface $user
-    [$user] = $values;
+  protected function doExecute(UserInterface $user): ActionResult {
     // Skip blocking user if they are already blocked.
     if ($user->isActive()) {
       // For efficiency manually save the original account before applying any

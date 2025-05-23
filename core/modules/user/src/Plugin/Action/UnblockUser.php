@@ -29,9 +29,7 @@ class UnblockUser extends ActionBase {
   /**
    * {@inheritdoc}
    */
-  protected function doExecute(array $values): ActionResult {
-    // @var \Drupal\user\UserInterface $user
-    [$user] = $values;
+  protected function doExecute(UserInterface $user): ActionResult {
     // Skip unblocking user if they are already unblocked.
     if ($user->isBlocked()) {
       $user->activate();

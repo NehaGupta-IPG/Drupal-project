@@ -80,7 +80,7 @@ interface ContextProviderPluginInterface {
    * @return \Drupal\Component\Plugin\Context\ContextDefinitionInterface[]
    *   The array of provided context definitions, keyed by context name.
    */
-  public function getProvidedContextDefiitions(): array;
+  public function getProvidedContextDefinitions(): array;
 
   /**
    * Validates the provided contexts.

@@ -22,9 +22,7 @@ class UnpublishAction extends EntityActionBase {
   /**
    * {@inheritdoc}
    */
-  protected function doExecute(array $values): ActionResult {
-    // @var \Drupal\Core\Entity\EntityInterface $entity
-    [$entity] = $values;
+  protected function doExecute(EntityInterface $entity): ActionResult {
     $entity->setUnpublished()->save();
     return ActionResult::success($this->t('The @type %label has been unpublished.', ['@type' => $entity->getEntityType()->getLabel(), '%label' => $entity->label()]));
   }

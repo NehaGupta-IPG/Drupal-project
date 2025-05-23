@@ -77,9 +77,7 @@ class CancelUser extends ActionBase {
   /**
    * {@inheritdoc}
    */
-  protected function doExecute(array $values): ActionResult {
-    // @var \Drupal\user\UserInterface $user
-    [$user] = $values;
+  protected function doExecute(UserInterface $user): ActionResult {
     $user->delete();
     return ActionResult::success($this->t('The user has been deleted.'));
   }

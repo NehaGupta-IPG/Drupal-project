@@ -7,6 +7,7 @@ use Drupal\Core\Plugin\Context\ContextDefinition;
 use Drupal\Core\Plugin\Context\EntityContextDefinition;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Action\ActionResult;
+use Drupal\user\UserInterface;
 
 /**
  * Adds a role to a user.
@@ -31,9 +32,7 @@ class AddRoleUser extends ChangeUserRoleBase {
   /**
    * {@inheritdoc}
    */
-  protected function doExecute(array $values): ActionResult {
-    // @var \Drupal\user\UserInterface $user
-    [$user, $rid] = $values;
+  protected function doExecute(UserInterface $user, string $rid): ActionResult {
     // Skip adding the role to the user if they already have it.
     if (!$user->hasRole($rid)) {
       // For efficiency manually save the original account before applying

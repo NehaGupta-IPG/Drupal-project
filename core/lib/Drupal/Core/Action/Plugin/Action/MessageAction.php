@@ -6,6 +6,7 @@ use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Action\ActionResult;
 use Drupal\Core\Action\ConfigurableActionBase;
 use Drupal\Core\Action\Attribute\Action;
+use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Plugin\Context\ContextDefinition;
@@ -72,9 +73,7 @@ class MessageAction extends ConfigurableActionBase implements ContainerFactoryPl
   /**
    * {@inheritdoc}
    */
-  protected function doExecute(array $values): ActionResult {
-    // @var \Drupal\Core\Entity\EntityInterface $entity
-    [$message, $entity] = $values;
+  protected function doExecute(string $message, ?EntityInterface $entity): ActionResult {
     $data = $entity ? [$entity->getEntityTypeId() => $entity->id()] : [];
     // @Todo Test if $message needs Xss::filterAdmin() from context and config.
     $message = $this->token->replace($message, $data);

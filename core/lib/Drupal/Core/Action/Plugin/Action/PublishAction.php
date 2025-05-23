@@ -22,9 +22,7 @@ class PublishAction extends EntityActionBase {
   /**
    * {@inheritdoc}
    */
-  protected function doExecute(array $values): ActionResult {
-    // @var \Drupal\Core\Entity\EntityInterface $entity
-    [$entity] = $values;
+  protected function doExecute(EntityInterface $entity): ActionResult {
     $entity->setPublished()->save();
     $entity->getEntityType()->getLabel();
     return ActionResult::success($this->t('The @type %label has been published.', ['@type' => $entity->getEntityType()->getLabel(), '%label' => $entity->label()]));
