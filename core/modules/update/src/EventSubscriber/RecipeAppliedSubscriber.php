@@ -18,17 +18,17 @@ class RecipeAppliedSubscriber implements EventSubscriberInterface {
    * Constructs a RecipeAppliedSubscriber object.
    */
   public function __construct(
-    protected readonly QueueFactory $queue,
+    protected readonly QueueFactory $queueFactory,
   ) {}
 
   /**
    * Notice when a specific recipe is applied and add to a queue for processing.
    */
   public function onRecipeApplied(RecipeAppliedEvent $event): void {
-    $recipe_queue = $this->queue->get('update_recipe_telemetry');
     if (!$this->needsTelemetry($event->recipe)) {
       return;
     }
+    $recipe_queue = $this->queueFactory->get('update_recipe_telemetry', TRUE);
     $recipe_queue->createItem($this->getRecipeInfo($event->recipe));
   }
 
