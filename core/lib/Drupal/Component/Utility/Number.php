@@ -35,7 +35,7 @@ class Number {
         return (string) $number;
       }
       // For floats with more significant decimals than 100, discard.
-      return rtrim(number_format($number, 100, '.', ''), '0');
+      return rtrim(number_format($number, 15, '.', ''), '0');
     }
     return (string) $number;
   }

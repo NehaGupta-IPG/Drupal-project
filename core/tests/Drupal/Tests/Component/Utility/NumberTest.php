@@ -79,7 +79,7 @@ class NumberTest extends TestCase {
       [-100, 100 / 7, TRUE],
 
       // Valid and very small float steps.
-      [1936.5, 3.0E-7, TRUE],
+      [1936.5, 3.0E-8, TRUE],
       [1000.12345, 1.0E-10, TRUE],
       [3.9999999999999, 1.0E-13, TRUE],
 
@@ -95,6 +95,11 @@ class NumberTest extends TestCase {
 
       // Step mismatches very close to being valid.
       [70 + 9.0E-7, 10 + 9.0E-7, FALSE],
+
+      // Values that are strings that need to cast to numeric floats.
+      ['0.00003', '0.00001', TRUE],
+      ['0.00100001', '0.00100001', TRUE],
+      ['0.00100001', '0.00000001', TRUE],
 
       // These floats are valid but might fail due to precision (rounding)
       // errors that are inherent to floating point numbers.
