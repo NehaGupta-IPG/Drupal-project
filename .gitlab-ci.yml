@@ -26,7 +26,7 @@ default:
 'Rector test annotations to attributes':
   stage: Rector
   variables:
-    KUBERNETES_CPU_REQUEST: "4"
+    KUBERNETES_CPU_REQUEST: ""
   script:
     - composer install --optimize-autoloader --ansi
     - composer run-script drupal-phpunit-upgrade-check
@@ -37,7 +37,7 @@ default:
     - git checkout -- .
     - vendor/bin/rector --version
     - vendor/bin/phpcbf --version
-    - vendor/bin/rector --debug
+    - vendor/bin/rector
     - vendor/bin/phpcbf --filter=GitModified --standard=Drupal,SlevomatCodingStandard --sniffs=SlevomatCodingStandard.Namespaces.AlphabeticallySortedUses,PSR2.Namespaces.UseDeclaration,PSR2.Namespaces.NamespaceDeclaration,Drupal.Classes.UnusedUseStatement,Drupal.Commenting.DocComment,Drupal.WhiteSpace.ScopeIndent,Generic.PHP.UpperCaseConstant,Squiz.WhiteSpace.SuperfluousWhitespace,Squiz.WhiteSpace.FunctionSpacing,Drupal.Classes.FullyQualifiedNamespace,Drupal.Files.EndFileNewline --ignore=core/tests/Drupal/Tests/Component/Annotation/Doctrine/* core
   after_script:
     - git diff >rector-changes/rector-changes.patch
