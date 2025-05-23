@@ -71,10 +71,15 @@ interface ElementInterface extends PluginInspectionInterface, RenderCallbackInte
   /**
    * Returns a render array.
    *
+   * @param string|null $wrapper_key
+   *   An optional wrapper.
+   *
    * @return array
-   *   A render array. Make sure to take the return value as a reference.
+   *   The render array stored in this object. Make sure to take the return
+   *   value as a reference. If $wrapper_key is given then
+   *   [$wrapper_key => $render_array] is returned.
    */
-  public function &toRenderArray();
+  public function &toRenderArray(?string $wrapper_key = NULL);
 
   /**
    * Return child elements.
