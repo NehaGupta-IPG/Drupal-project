@@ -457,6 +457,8 @@ class EntityReferenceItem extends EntityReferenceItemBase implements OptionsProv
         $handlers_options[$selection_group_plugin] = Html::escape($selection_plugins[$selection_group_id][$selection_group_plugin]['base_plugin_label']);
       }
     }
+    // Sort the handlers options.
+    natcasesort($handlers_options);
 
     $form = [
       '#type' => 'container',
