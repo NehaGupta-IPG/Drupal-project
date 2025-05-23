@@ -114,7 +114,7 @@ class Number {
     // do so if it was set explicitly (is not null).
     $float_value = (float) abs($value - $offset);
 
-    // The expected number significant decimals is dictated by the step.
+    // The step dictates the expected number of significant decimals.
     $expected_significant_decimals = static::countSignificantDecimals($step) + 1;
 
     // If the actual value has more significant decimals than expected, then it

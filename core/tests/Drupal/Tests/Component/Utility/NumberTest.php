@@ -96,7 +96,7 @@ class NumberTest extends TestCase {
       // Step mismatches very close to being valid.
       [70 + 9.0E-7, 10 + 9.0E-7, FALSE],
 
-      // These floats are valid, but might fail due to precision (rounding)
+      // These floats are valid but might fail due to precision (rounding)
       // errors that are inherent to floating point numbers.
       [3333333, 0.01, TRUE],
       [4444444, 0.01, TRUE],
@@ -114,12 +114,12 @@ class NumberTest extends TestCase {
       [13517282.20, 0.01, TRUE],
       [13517282.21, 0.01, TRUE],
 
-      // Precision of the value is higher than that of the step.
+      // The precision of the value is higher than that of the step.
       [990088999.0099, 0.001, FALSE],
       [990088999.0099, 0.01, FALSE],
 
       // Ensure floats with more significant decimals that the guaranteed
-      // minimum are normalized.
+      // minimum is normalized.
       [0.0000000000000900009, 0.0000000000000100001, TRUE],
     ];
   }
