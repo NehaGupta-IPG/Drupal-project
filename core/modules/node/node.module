@@ -65,7 +65,7 @@ function node_title_list(StatementInterface $result, $title = NULL) {
  * @return int
  *   One of the MARK constants.
  */
-function node_mark($nid, $timestamp): int {
+function node_mark($nid, $timestamp) {
   if (\Drupal::currentUser()->isAnonymous() || !\Drupal::moduleHandler()->moduleExists('history')) {
     return MARK_READ;
   }
@@ -84,10 +84,10 @@ function node_mark($nid, $timestamp): int {
  *
  * This list can include types that are queued for addition or deletion.
  *
- * @return array[]
+ * @return string[]
  *   An array of node type labels, keyed by the node type name.
  */
-function node_type_get_names(): array {
+function node_type_get_names() {
   return array_map(function ($bundle_info) {
     return $bundle_info['label'];
   }, \Drupal::service('entity_type.bundle.info')->getBundleInfo('node'));
@@ -193,7 +193,7 @@ function node_add_body_field(NodeTypeInterface $type, $label = 'Body') {
  * @return bool
  *   TRUE if this is a full page view, otherwise FALSE.
  */
-function node_is_page(NodeInterface $node): bool {
+function node_is_page(NodeInterface $node) {
   $route_match = \Drupal::routeMatch();
   if ($route_match->getRouteName() == 'entity.node.canonical' || $route_match->getRouteName() == 'entity.node.revision') {
     $page_node = $route_match->getParameter('node');
@@ -682,36 +682,6 @@ function node_reindex_node_search($nid) {
   if (\Drupal::moduleHandler()->moduleExists('search')) {
     // Reindex node context indexed by the node module search plugin.
     \Drupal::service('search.index')->markForReindex('node_search', $nid);
-  }
-}
-
-/**
- * Implements hook_ENTITY_TYPE_insert() for comment entities.
- */
-function node_comment_insert($comment): void {
-  // Reindex the node when comments are added.
-  if ($comment->getCommentedEntityTypeId() == 'node') {
-    node_reindex_node_search($comment->getCommentedEntityId());
-  }
-}
-
-/**
- * Implements hook_ENTITY_TYPE_update() for comment entities.
- */
-function node_comment_update($comment): void {
-  // Reindex the node when comments are changed.
-  if ($comment->getCommentedEntityTypeId() == 'node') {
-    node_reindex_node_search($comment->getCommentedEntityId());
-  }
-}
-
-/**
- * Implements hook_ENTITY_TYPE_delete() for comment entities.
- */
-function node_comment_delete($comment): void {
-  // Reindex the node when comments are deleted.
-  if ($comment->getCommentedEntityTypeId() == 'node') {
-    node_reindex_node_search($comment->getCommentedEntityId());
   }
 }
 
