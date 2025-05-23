@@ -616,7 +616,7 @@ abstract class RenderElementBase extends PluginBase implements ElementInterface,
   /**
    * {@inheritdoc}
    */
-  public function addChild(string|int $name, ElementInterface|array &$child): static {
+  public function addChild(string|int $name, ElementInterface|array &$child): ElementInterface {
     if ($name[0] === '#') {
       throw new \LogicException('The name of children can not start with a #.');
     }
@@ -624,7 +624,12 @@ abstract class RenderElementBase extends PluginBase implements ElementInterface,
     $childObject->renderParent = $this;
     $childObject->renderParentName = $name;
     $this->storage[$name] = &$childObject->toRenderArray();
-    return $this;
+    return $childObject;
+  }
+
+  public function createChild(int|string $name, string $class): ElementInterface {
+    $child = $this->elementInfoManager()->fromClass($class);
+    return $this->addChild($name, $child);
   }
 
   /**

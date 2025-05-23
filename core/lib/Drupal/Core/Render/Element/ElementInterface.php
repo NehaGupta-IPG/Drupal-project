@@ -96,17 +96,32 @@ interface ElementInterface extends PluginInspectionInterface, RenderCallbackInte
   public function getChild(int|string $name): ?ElementInterface;
 
   /**
-   * Adds a child.
+   * Adds a child object or array.
    *
    * @param int|string $name
    *   The name of the child. Can also be an integer.
    * @param array|\Drupal\Core\Render\Element\ElementInterface $child
    *   A render array or a render object.
    *
-   * @return $this
-   *   The called object.
+   * @return \Drupal\Core\Render\Element\ElementInterface
+   *   The added child as an object.
    */
-  public function addChild(int|string $name, ElementInterface|array &$child): static;
+  public function addChild(int|string $name, ElementInterface|array &$child): ElementInterface;
+
+  /**
+   * Create a child object.
+   *
+   * @param int|string $name
+   *   The name of the child. Can also be an integer.
+   * @param class-string<T> $class
+   *   The class of the child plugin.
+   *
+   * @return T
+   *   The child object.
+   *
+   * @template T of \Drupal\Core\Render\Element\ElementInterface
+   */
+  public function createChild(int|string $name, string $class): ElementInterface;
 
   /**
    * Removes a child.
