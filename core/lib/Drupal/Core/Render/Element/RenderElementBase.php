@@ -568,8 +568,11 @@ abstract class RenderElementBase extends PluginBase implements ElementInterface,
    * {@inheritdoc}
    */
   public function &toRenderable(?string $wrapper_key = NULL): array {
-    $return = $wrapper_key ? [$wrapper_key => &$this->storage] : $this->storage;
-    return $return;
+    if ($wrapper_key) {
+      $return = [$wrapper_key => &$this->storage];
+      return $return;
+    }
+    return $this->storage;
   }
 
   /**
