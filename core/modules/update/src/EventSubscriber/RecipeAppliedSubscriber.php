@@ -35,27 +35,6 @@ class RecipeAppliedSubscriber implements EventSubscriberInterface {
   }
 
   /**
-   * Decides if a given recipe needs telemetry or not.
-   *
-   * @param string[] $recipe_info
-   *   Information about the recipe that has been applied, as returned by
-   *   self::getRecipeInfo().
-   *
-   * @return bool
-   *   TRUE if this recipe needs Drupal.org telemetry, otherwise FALSE.
-   *
-   * @see self::getRecipeInfo()
-   */
-  protected function needsTelemetry(array $recipe_info): bool {
-    // We always want telemetry for Drupal Core recipes.
-    if (str_starts_with($recipe_info['path'], \Drupal::root() . '/core/recipes/')) {
-      return TRUE;
-    }
-    // @todo Add logic to only report Drupal.org contributed recipes.
-    return TRUE;
-  }
-
-  /**
    * Gets info about a specific recipe to add to the telemetry queue.
    *
    * @param Drupal\Core\Recipe\Recipe $recipe
@@ -75,6 +54,36 @@ class RecipeAppliedSubscriber implements EventSubscriberInterface {
       'composer_name' => $composer_name,
       'composer_version' => $composer_version,
     ];
+  }
+
+  /**
+   * Decides if a given recipe needs telemetry or not.
+   *
+   * @param string[] $recipe_info
+   *   Information about the recipe that has been applied, as returned by
+   *   self::getRecipeInfo().
+   *
+   * @return bool
+   *   TRUE if this recipe needs Drupal.org telemetry, otherwise FALSE.
+   *
+   * @see self::getRecipeInfo()
+   */
+  protected function needsTelemetry(array $recipe_info): bool {
+    // We always want telemetry for Drupal Core recipes.
+    if (str_starts_with($recipe_info['path'], \Drupal::root() . '/core/recipes/')) {
+      return TRUE;
+    }
+    // If there's no composer package name, do not phone home.
+    if ($recipe_info['composer_name'] === NULL) {
+      return FALSE;
+    }
+    // If the package name does not begin with 'drupal/', no telemetry.
+    if (!str_starts_with($recipe_info['composer_name'], 'drupal/')) {
+      return FALSE;
+    }
+    // If we made here, it's not a core recipe, we have a composer.json, and the
+    // package name starts with 'drupal/', so we want telemetry.
+    return TRUE;
   }
 
   /**
