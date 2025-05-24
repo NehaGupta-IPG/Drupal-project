@@ -541,6 +541,8 @@ return RectorConfig::configure()
     ])
     ->withSkip([
         __DIR__ . '/core/tests/Drupal/Tests/Component/Annotation/Doctrine/Fixtures',
+        __DIR__ . '/core/tests/Drupal/Tests/Component/Datetime/TimeTest.php',
+        __DIR__ . '/core/tests/Drupal/Tests/Component/Plugin/PluginBaseTest.php',
         '*/ProxyClass/*',
         '*.api.php',
     ])
