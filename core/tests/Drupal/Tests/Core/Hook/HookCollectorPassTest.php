@@ -88,7 +88,7 @@ __EOF__
     $module_filenames = self::setupGroupIncludes();
     $container = new ContainerBuilder();
     $container->setParameter('container.modules', $module_filenames);
-    $container->setParameter('container.namespaces' , [
+    $container->setParameter('container.namespaces', [
       'Drupal\\test_module' => 'vfs://drupal_root/test_module_info.yml',
     ]);
     $container->setDefinition('module_handler', new Definition());
