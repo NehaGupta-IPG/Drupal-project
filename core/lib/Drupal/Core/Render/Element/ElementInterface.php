@@ -41,10 +41,10 @@ interface ElementInterface extends PluginInspectionInterface, RenderCallbackInte
   public function getInfo();
 
   /**
-   * Set storage.
+   * Initialize storage.
    *
-   * Calling this method does nothing, it only exists for the plugin manager
-   * to call when creating a plugin instance.
+   * The plugin manager calls this when creating a render object, subsequent
+   * calls do nothing.
    *
    * @param array $element
    *   The containing element.

@@ -2,6 +2,9 @@
 
 namespace Drupal\Core\Render;
 
+use Drupal\Component\Plugin\Discovery\DiscoveryInterface;
+use Drupal\Component\Plugin\Discovery\DiscoveryTrait;
+use Drupal\Core\Cache\Cache;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Extension\ThemeHandlerInterface;
@@ -74,122 +77,47 @@ class ElementInfoManager extends DefaultPluginManager implements ElementInfoMana
   /**
    * {@inheritdoc}
    */
-  public function getInfo($type) {
-    $theme_name = $this->themeManager->getActiveTheme()->getName();
-    $this->buildInfo($theme_name);
-    $info = $this->elementInfo[$theme_name][$type] ?? [];
-    $info['#defaults_loaded'] = TRUE;
-    return $info;
-  }
+  protected function getDiscovery() {
+    $discovery = parent::getDiscovery();
+    return new class ($discovery, $this->reverseMapping) implements DiscoveryInterface {
+      use DiscoveryTrait;
 
-  /**
-   * Gets the plugin element type from the classname.
-   *
-   * @param string $class
-   *   The class.
-   *
-   * @return string|null
-   *   The element type if any.
-   */
-  protected function getPluginIdFromClass(string $class): ?string {
-    $theme_name = $this->themeManager->getActiveTheme()->getName();
-    $this->buildInfo($theme_name);
-    return $this->reverseMapping[$theme_name][$class] ?? NULL;
-  }
+      public function __construct(protected DiscoveryInterface $decorated, protected array &$reverseMapping) {}
 
-  /**
-   * {@inheritdoc}
-   */
-  public function getInfoProperty($type, $property_name, $default = NULL) {
-    $info = $this->getInfo($type);
-
-    return $info[$property_name] ?? $default;
-  }
-
-  /**
-   * Builds up all element information.
-   *
-   * @param string $theme_name
-   *   The theme name.
-   */
-  protected function buildInfo($theme_name): void {
-    if (isset($this->elementInfo[$theme_name])) {
-      return;
-    }
-    $reverse_mapping_key = ' reverse mapping';
-    // Get cached definitions.
-    $cid = $this->getCid($theme_name);
-    if ($cache = $this->cacheBackend->get($cid)) {
-      $info = $cache->data;
-      $this->reverseMapping[$theme_name] = $info[$reverse_mapping_key];
-      unset($info[$reverse_mapping_key]);
-      $this->elementInfo[$theme_name] = $info;
-      return;
-    }
-
-    // Otherwise, rebuild and cache.
-    $info = [];
-    $previous_error_handler = get_error_handler();
-    set_error_handler(function ($severity, $message, $file, $line) use (&$previous_error_handler) {
-      // Ignore deprecations while building element information.
-      if ($severity === E_USER_DEPRECATED) {
-        // Don't execute PHP internal error handler.
-        return TRUE;
+      public function getDefinitions(): array {
+        $definitions = $this->decorated->getDefinitions();
+        foreach ($definitions as $element_type => $definition) {
+          $this->reverseMapping[$definition['class']] = $element_type;
+        }
+        return $definitions;
       }
-      if ($previous_error_handler) {
-        return $previous_error_handler($severity, $message, $file, $line);
-      }
-    });
-    $definitions = $this->getDefinitions();
-    foreach ($definitions as $element_type => $definition) {
-      $this->reverseMapping[$theme_name][$definition['class']] = $element_type;
-      $element = $this->createInstance($element_type);
-      $element_info = $element->getInfo();
 
-      // If this is element is to be used exclusively in a form, denote that it
-      // will receive input, and assign the value callback.
-      if ($element instanceof FormElementInterface) {
-        $element_info['#input'] = TRUE;
-        $element_info['#value_callback'] = [$definition['class'], 'valueCallback'];
-      }
-      $info[$element_type] = $element_info;
+    };
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function getCachedDefinitions(): array {
+    if (!isset($this->definitions) && $cache = $this->cacheGet($this->cacheKey)) {
+      $this->definitions = $cache->data['definitions'];
+      $this->reverseMapping = $cache->data['reverse_mapping'];
     }
-    restore_error_handler();
-
-    foreach ($info as $element_type => $element) {
-      $info[$element_type]['#type'] = $element_type;
-    }
-    // Allow modules to alter the element type defaults.
-    $this->moduleHandler->alter('element_info', $info);
-    $this->themeManager->alter('element_info', $info);
-
-    $this->elementInfo[$theme_name] = $info;
-    $info[$reverse_mapping_key] = $this->reverseMapping[$theme_name];
-    $this->cacheBackend->set($cid, $info);
+    return $this->definitions;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function createInstance($plugin_id = '', array $configuration = [], &$element = []): ElementInterface {
-    $type = $plugin_id ?: $element['#type'];
-    $instance = parent::createInstance($type, $configuration);
-    assert($instance instanceof ElementInterface);
-    $instance->initializeInternalStorage($element);
-    $instance->type = $type;
-    return $instance;
+  protected function setCachedDefinitions($definitions): void {
+    $data = [
+      'definitions' => $definitions,
+      'reverse_mapping' => $this->reverseMapping,
+    ];
+    $this->cacheSet($this->cacheKey, $data, Cache::PERMANENT, $this->cacheTags);
+    $this->definitions = $definitions;
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function fromClass(string $class, array $configuration = []): ElementInterface {
-    return $this->createInstance($this->getPluginIdFromClass($class), $configuration);
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public function clearCachedDefinitions() {
     $this->elementInfo = NULL;
 
@@ -214,6 +142,106 @@ class ElementInfoManager extends DefaultPluginManager implements ElementInfoMana
    */
   protected function getCid($theme_name) {
     return 'element_info_build:' . $theme_name;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getInfo($type) {
+    $theme_name = $this->themeManager->getActiveTheme()->getName();
+    if (!isset($this->elementInfo[$theme_name])) {
+      $this->elementInfo[$theme_name] = $this->buildInfo($theme_name);
+    }
+    $info = $this->elementInfo[$theme_name][$type] ?? [];
+    $info['#defaults_loaded'] = TRUE;
+    return $info;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getInfoProperty($type, $property_name, $default = NULL) {
+    $info = $this->getInfo($type);
+
+    return $info[$property_name] ?? $default;
+  }
+
+  /**
+   * Builds up all element information.
+   *
+   * @param string $theme_name
+   *   The theme name.
+   *
+   * @return array
+   *   An array containing all element information.
+   */
+  protected function buildInfo($theme_name) {
+    // Get cached definitions.
+    $cid = $this->getCid($theme_name);
+    if ($cache = $this->cacheBackend->get($cid)) {
+      return $cache->data;
+    }
+
+    // Otherwise, rebuild and cache.
+    $info = [];
+    $previous_error_handler = get_error_handler();
+    set_error_handler(function ($severity, $message, $file, $line) use (&$previous_error_handler) {
+      // Ignore deprecations while building element information.
+      if ($severity === E_USER_DEPRECATED) {
+        // Don't execute PHP internal error handler.
+        return TRUE;
+      }
+      if ($previous_error_handler) {
+        return $previous_error_handler($severity, $message, $file, $line);
+      }
+    });
+    foreach ($this->getDefinitions() as $element_type => $definition) {
+      $element = $this->createInstance($element_type);
+      $element_info = $element->getInfo();
+
+      // If this is element is to be used exclusively in a form, denote that it
+      // will receive input, and assign the value callback.
+      if ($element instanceof FormElementInterface) {
+        $element_info['#input'] = TRUE;
+        $element_info['#value_callback'] = [$definition['class'], 'valueCallback'];
+      }
+      $info[$element_type] = $element_info;
+    }
+    restore_error_handler();
+
+    foreach ($info as $element_type => $element) {
+      $info[$element_type]['#type'] = $element_type;
+    }
+    // Allow modules to alter the element type defaults.
+    $this->moduleHandler->alter('element_info', $info);
+    $this->themeManager->alter('element_info', $info);
+
+    $this->cacheBackend->set($cid, $info);
+
+    return $info;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  // phpcs:ignore Drupal.Commenting.FunctionComment.MissingReturnComment
+  public function createInstance($plugin_id = '', array $configuration = [], &$element = []): ElementInterface {
+    $type = $plugin_id ?: $element['#type'];
+    $instance = parent::createInstance($type, $configuration);
+    assert($instance instanceof ElementInterface);
+    $instance->initializeInternalStorage($element);
+    $instance->type = $type;
+    return $instance;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function fromClass(string $class, array $configuration = []): ElementInterface {
+    if (isset($this->reverseMapping[$class])) {
+      return $this->createInstance($this->reverseMapping[$class], $configuration);
+    }
+    throw new \LogicException("$class is not a valid element class.");
   }
 
   /**

@@ -50,6 +50,8 @@ abstract class WidgetBase extends PluginSettingsBase implements WidgetInterface,
    *   The widget settings.
    * @param array $third_party_settings
    *   Any third party settings.
+   * @param \Drupal\Core\Render\ElementInfoManagerInterface $elementInfoManager
+   *   The element info manager.
    */
   public function __construct($plugin_id, $plugin_definition, FieldDefinitionInterface $field_definition, array $settings, array $third_party_settings, protected ElementInfoManagerInterface $elementInfoManager) {
     parent::__construct([], $plugin_id, $plugin_definition);
