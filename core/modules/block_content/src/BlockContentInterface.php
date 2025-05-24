@@ -3,6 +3,7 @@
 namespace Drupal\block_content;
 
 use Drupal\block_content\Access\RefinableDependentAccessInterface;
+use Drupal\block_content\BlockUsage\BlockContentBlockUsageInterface;
 use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Entity\EntityChangedInterface;
 use Drupal\Core\Entity\EntityPublishedInterface;
@@ -79,8 +80,10 @@ interface BlockContentInterface extends ContentEntityInterface, EntityChangedInt
    * @return array
    *   Array of Drupal\block\Core\Plugin\Entity\Block entities.
    *
-   * @deprecated in drupal:11.4.0 and is removed from drupal:12.0.0. There is no
-   *   replacement.
+   * @deprecated in drupal:11.4.0 and is removed from drupal:12.0.0. Use the
+   *   functionality provided by
+   *   \Drupal\block_content\BlockUsage\BlockContentBlockUsageInterface instead.
+   *
    * @see https://www.drupal.org/node/3523951
    */
   public function getInstances();
