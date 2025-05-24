@@ -41,6 +41,9 @@ class HookCollectorPassTest extends KernelTestBase {
       'user_hooks_test' => ['pathname' => "$this->siteDirectory/user_hooks_test.info.yml"],
     ];
     $container->setParameter('container.modules', $module_filenames);
+    $container->setParameter('container.namespaces', [
+      'Drupal\\user_hooks_test' => 'core/modules/user/tests/modules/user_hooks_test',
+    ]);
     $container->setDefinition('module_handler', new Definition());
     (new HookCollectorPass())->process($container);
     $implementations = [
@@ -66,6 +69,10 @@ class HookCollectorPassTest extends KernelTestBase {
     ];
     include_once 'core/tests/Drupal/Tests/Core/Extension/modules/module_handler_test_all1/src/Hook/ModuleHandlerTestAll1Hooks.php';
     $container->setParameter('container.modules', $module_filenames);
+    $container->setParameter('container.namespaces', [
+      'Drupal\\module_handler_test_all1' => 'core/tests/Drupal/Tests/Core/Extension/modules/module_handler_test_all1',
+      'Drupal\\module_handler_test_all2' => 'core/tests/Drupal/Tests/Core/Extension/modules/module_handler_test_all2',
+    ]);
     $container->setDefinition('module_handler', new Definition());
     (new HookCollectorPass())->process($container);
     $priorities = [];
@@ -96,6 +103,9 @@ class HookCollectorPassTest extends KernelTestBase {
       'module_implements_alter_test_legacy' => ['pathname' => "core/tests/Drupal/Tests/Core/Extension/modules/module_implements_alter_test_legacy/module_implements_alter_test_legacy.info.yml"],
     ];
     include_once 'core/tests/Drupal/Tests/Core/Extension/modules/module_implements_alter_test_legacy/module_implements_alter_test_legacy.module';
+    $container->setParameter('container.namespaces', [
+      'Drupal\\module_implements_alter_test_legacy' => 'core/tests/Drupal/Tests/Core/Extension/modules/module_implements_alter_test_legacy',
+    ]);
     $container->setParameter('container.modules', $module_filenames);
     $container->setDefinition('module_handler', new Definition());
     (new HookCollectorPass())->process($container);
