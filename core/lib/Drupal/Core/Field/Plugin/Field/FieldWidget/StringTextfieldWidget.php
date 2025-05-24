@@ -69,7 +69,7 @@ class StringTextfieldWidget extends WidgetBase {
    */
   public function formElement(FieldItemListInterface $items, $delta, array $element, array &$form, FormStateInterface $form_state) {
     $wrapper = $this->elementInfoManager->fromRenderable($element, 'wrapper');
-    $value = $wrapper->createChild('value', Textfield::class);
+    $value = $wrapper->createChild('value', Textfield::class, copyProperties: TRUE);
     $value->default_value = $items[$delta]->value;
     $value->size = $this->getSetting('size');
     $value->placeholder = $this->getSetting('placeholder');

@@ -636,9 +636,13 @@ abstract class RenderElementBase extends PluginBase implements ElementInterface,
   /**
    * {@inheritdoc}
    */
-  public function createChild(int|string $name, string $class, array $configuration = []): ElementInterface {
-    $child = $this->elementInfoManager()->fromClass($class, $configuration);
-    return $this->addChild($name, $child);
+  public function createChild(int|string $name, string $class, array $configuration = [], bool $copyProperties = FALSE): ElementInterface {
+    $childObject = $this->elementInfoManager()->fromClass($class, $configuration);
+    $childObject = $this->addChild($name, $childObject);
+    if ($copyProperties) {
+      $childObject->storage += array_filter($this->storage, Element::property(...), \ARRAY_FILTER_USE_KEY);
+    }
+    return $childObject;
   }
 
   /**

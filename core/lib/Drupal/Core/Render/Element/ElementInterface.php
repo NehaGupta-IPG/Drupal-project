@@ -126,13 +126,16 @@ interface ElementInterface extends PluginInspectionInterface, RenderCallbackInte
    *   The class of the render object.
    * @param array $configuration
    *   An array of configuration relevant to the render object.
+   * @param bool $copyProperties
+   *  Copy properties (but not children) from the parent. This is useful for
+   *  widgets for example.
    *
    * @return T
    *   The child render object.
    *
    * @template T of \Drupal\Core\Render\Element\ElementInterface
    */
-  public function createChild(int|string $name, string $class, array $configuration = []): ElementInterface;
+  public function createChild(int|string $name, string $class, array $configuration = [], bool $copyProperties = FALSE): ElementInterface;
 
   /**
    * Removes a child.
