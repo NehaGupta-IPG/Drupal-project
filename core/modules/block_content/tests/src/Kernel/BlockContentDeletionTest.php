@@ -40,19 +40,19 @@ class BlockContentDeletionTest extends KernelTestBase {
   /**
    * Tests deleting a block_content updates the discovered block plugin.
    *
-   * @param bool $blockModuleIsEnabled
-   *   Whether block.module is enabled.
+   * @param bool $installBlockModule
+   *   Whether block.module will be installed in this test.
    *
    * @see \Drupal\block_content\Entity\BlockContent::preDelete
    * @dataProvider providerDeletingBlockContentClearsPluginCacheAndDeletesDependentBlocks
    */
-  public function testDeletingBlockContentClearsPluginCacheAndDeletesDependentBlocks(bool $blockModuleIsEnabled): void {
+  public function testDeletingBlockContentClearsPluginCacheAndDeletesDependentBlocks(bool $installBlockModule): void {
     // Prevent regressions by ensuring Block is not installed.
     /** @var \Drupal\Core\Extension\ModuleHandlerInterface $moduleHandler */
     $moduleHandler = \Drupal::service(ModuleHandlerInterface::class);
     $this->assertFalse($moduleHandler->moduleExists('block'));
 
-    if ($blockModuleIsEnabled) {
+    if ($installBlockModule) {
       /** @var \Drupal\Core\Extension\ModuleInstallerInterface $moduleInstaller */
       $moduleInstaller = \Drupal::service(ModuleInstallerInterface::class);
       $moduleInstaller->install(['block']);
@@ -93,7 +93,7 @@ class BlockContentDeletionTest extends KernelTestBase {
 
     $plugin_id = 'block_content' . PluginBase::DERIVATIVE_SEPARATOR . $block_content->uuid();
 
-    if ($blockModuleIsEnabled) {
+    if ($installBlockModule) {
       $block = $this->placeBlock($plugin_id, ['region' => 'content', 'theme' => 'stark']);
     }
 
@@ -103,7 +103,7 @@ class BlockContentDeletionTest extends KernelTestBase {
     // The plugin should no longer exist.
     $this->assertFalse($block_manager->hasDefinition($plugin_id));
 
-    if ($blockModuleIsEnabled) {
+    if ($installBlockModule) {
       // Block config entities using plugins derived from Block Content entities
       // are deleted before the associated Block Content is deleted.
       $this->assertNull($this->container->get('entity_type.manager')->getStorage('block')->loadUnchanged($block->id()));
