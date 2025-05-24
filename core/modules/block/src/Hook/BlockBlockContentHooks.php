@@ -18,9 +18,6 @@ class BlockBlockContentHooks {
 
   use StringTranslationTrait;
 
-  /**
-   * Constructs a new BlockBlockContentHooks.
-   */
   public function __construct(
     private AccountInterface $currentUser,
     private ConfigFactoryInterface $configFactory,

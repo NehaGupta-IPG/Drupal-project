@@ -15,9 +15,6 @@ use Drupal\Core\Entity\EntityTypeManagerInterface;
  */
 class BlockContentBlockUsage implements BlockContentBlockUsageInterface {
 
-  /**
-   * Constructs a new BlockContentBlockUsage.
-   */
   public function __construct(
     private EntityTypeManagerInterface $entityTypeManager,
   ) {}

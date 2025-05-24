@@ -17,9 +17,6 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  */
 class BlockContentDeleteForm extends ContentEntityDeleteForm {
 
-  /**
-   * Constructs a new BlockContentDeleteForm.
-   */
   public function __construct(
     EntityRepositoryInterface $entityRepository,
     EntityTypeBundleInfoInterface $entityTypeBundleInfo,

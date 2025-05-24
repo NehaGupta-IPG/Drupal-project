@@ -19,9 +19,6 @@ class BlockContentBlockHooks {
 
   use StringTranslationTrait;
 
-  /**
-   * Constructs a new BlockContentBlockHooks.
-   */
   public function __construct(
     private EntityTypeManagerInterface $entityTypeManager,
     TranslationInterface $translation,
