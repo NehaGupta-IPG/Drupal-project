@@ -62,12 +62,15 @@ class CoreServiceProvider implements ServiceProviderInterface, ServiceModifierIn
         ->addTag('stream_wrapper', ['scheme' => 'private']);
     }
 
-    $container->addCompilerPass(new HookCollectorPass());
     // Add the compiler pass that lets service providers modify existing
     // service definitions. This pass must come before all passes operating on
     // services so that later list-building passes are operating on the
     // post-alter services list.
     $container->addCompilerPass(new ModifyServiceDefinitionsPass());
+
+    // Run compiler pass that registers hooks after the service providers pass
+    // to pick up new or altered service definitions before hook discovery.
+    $container->addCompilerPass(new HookCollectorPass());
 
     $container->addCompilerPass(new DevelopmentSettingsPass());
 

@@ -7,6 +7,7 @@ namespace Drupal\Core\Hook;
 use Drupal\Component\Annotation\Doctrine\StaticReflectionParser;
 use Drupal\Component\Annotation\Reflection\MockFileFinder;
 use Drupal\Component\FileCache\FileCacheFactory;
+use Drupal\Component\FileCache\FileCacheInterface;
 use Drupal\Core\Extension\ProceduralCall;
 use Drupal\Core\Hook\Attribute\Hook;
 use Drupal\Core\Hook\Attribute\HookAttributeInterface;
@@ -134,7 +135,7 @@ class HookCollectorPass implements CompilerPassInterface {
       array_keys($module_list),
       static fn (string $module) => !empty($parameters["$module.skip_procedural_hook_scan"]),
     );
-    $collector = static::collectAllHookImplementations($module_list, $skip_procedural_modules);
+    $collector = static::collectAllHookImplementations($module_list, $skip_procedural_modules, $container);
 
     $collector->writeToContainer($container);
   }
@@ -349,6 +350,8 @@ class HookCollectorPass implements CompilerPassInterface {
    *   info yml file path.
    * @param list<string> $skipProceduralModules
    *   Module names that are known to not have procedural hook implementations.
+   * @param \Symfony\Component\DependencyInjection\ContainerBuilder|null $container
+   *   The container builder.
    *
    * @return static
    *   A HookCollectorPass instance holding all hook implementations and
@@ -360,7 +363,7 @@ class HookCollectorPass implements CompilerPassInterface {
    * @todo Pass only $container and make protected when ModuleHandler::add() is
    *   removed in Drupal 12.0.0.
    */
-  public static function collectAllHookImplementations(array $module_list, array $skipProceduralModules = []): static {
+  public static function collectAllHookImplementations(array $module_list, array $skipProceduralModules = [], ?ContainerBuilder $container = NULL): static {
     $modules = array_keys($module_list);
     $modules_by_length = $modules;
     usort($modules_by_length, static fn ($a, $b) => strlen($b) - strlen($a));
@@ -374,6 +377,11 @@ class HookCollectorPass implements CompilerPassInterface {
       $skip_procedural = in_array($module, $skipProceduralModules);
       $collector->collectModuleHookImplementations(dirname($info['pathname']), $module, $module_preg, $skip_procedural);
     }
+
+    if ($container) {
+      $collector->collectServiceHookImplementations($container);
+    }
+
     return $collector;
   }
 
@@ -404,43 +412,8 @@ class HookCollectorPass implements CompilerPassInterface {
       $filename = $fileinfo->getPathname();
 
       if ($extension === 'php') {
-        $cached = $hook_file_cache->get($filename);
-        if ($cached) {
-          $class = $cached['class'];
-          $attributes = $cached['attributes'];
-        }
-        else {
-          $namespace = preg_replace('#^src/#', "Drupal/$module/", $iterator->getSubPath());
-          $class = $namespace . '/' . $fileinfo->getBasename('.php');
-          $class = str_replace('/', '\\', $class);
-          $attributes = [];
-          if (class_exists($class)) {
-            $reflectionClass = new \ReflectionClass($class);
-            $attributes = self::getAttributeInstances($reflectionClass);
-            $hook_file_cache->set($filename, ['class' => $class, 'attributes' => $attributes]);
-          }
-        }
-        foreach ($attributes as $method => $methodAttributes) {
-          foreach ($methodAttributes as $attribute) {
-            if ($attribute instanceof Hook) {
-              self::checkForProceduralOnlyHooks($attribute, $class);
-              $this->oopImplementations[$attribute->hook][$class . '::' . ($attribute->method ?: $method)] = $attribute->module ?? $module;
-              if ($attribute->order !== NULL) {
-                // Use a lower weight for order operations that are declared
-                // together with the hook listener they apply to.
-                $this->orderOperations[$attribute->hook][0][] = $attribute->order->getOperation("$class::$method");
-              }
-            }
-            elseif ($attribute instanceof ReorderHook) {
-              // Use a higher weight for order operations that target other hook
-              // listeners.
-              $this->orderOperations[$attribute->hook][1][] = $attribute->order->getOperation($attribute->class . '::' . $attribute->method);
-            }
-            elseif ($attribute instanceof RemoveHook) {
-              $this->removeHookIdentifiers[$attribute->hook][] = $attribute->class . '::' . $attribute->method;
-            }
-          }
-        }
+        $namespace = preg_replace('#^src/#', "Drupal/$module/", $iterator->getSubPath());
+        $this->collectHookImplementationsFromClassFile($filename, $namespace, $module, $hook_file_cache);
       }
       elseif (!$skip_procedural) {
         $implementations = $procedural_hook_file_cache->get($filename);
@@ -467,6 +440,111 @@ class HookCollectorPass implements CompilerPassInterface {
         $parts = explode('.', $fileinfo->getFilename());
         if (count($parts) === 3 && $parts[0] === $module) {
           $this->groupIncludes[$parts[1]][] = $filename;
+        }
+      }
+    }
+  }
+
+  /**
+   * Collect Attribute hook implementations from declared services.
+   *
+   * @param \Symfony\Component\DependencyInjection\ContainerBuilder $container
+   *   The container builder.
+   */
+  protected function collectServiceHookImplementations(ContainerBuilder $container): void {
+    $containerNamespaces = $container->getParameter('container.namespaces');
+    $cache = FileCacheFactory::get('hook_implementations');
+    foreach ($container->getDefinitions() as $definition) {
+      if ($definition->isAbstract() || $definition->isSynthetic() || !($class = $definition->getClass())) {
+        continue;
+      }
+
+      $parts = explode('\\', $class);
+      $filename = array_pop($parts) . '.php';
+      $namespace = implode('\\', $parts);
+      $root = array_shift($parts);
+      if ($root !== 'Drupal') {
+        continue;
+      }
+
+      $provider = array_shift($parts) ?? '';
+      // Ignore Component and Core services. Also ignore any services in a
+      // module's "Hook" namespace, because they will be picked up by
+      // ::collectModuleHookImplementations().
+      if (in_array($provider, ['Component', 'Core']) ||
+          (reset($parts) === 'Hook')) {
+        continue;
+      }
+
+      $subPath = implode('/', $parts);
+      $path = isset($containerNamespaces["Drupal\\$provider"]) ? $containerNamespaces["Drupal\\$provider"] . '/' . $subPath . '/' : '';
+      // Allow an empty path to be passed if it can not be retrieved from the
+      // container namespaces. This allows test classes to register themselves
+      // as services implementing hooks.
+      $this->collectHookImplementationsFromClassFile($path ? $path . $filename : '', $namespace, $provider, $cache, $class);
+    }
+
+  }
+
+  /**
+   * Collect Attribute hook implementations from a class file.
+   *
+   * @param string $filename
+   *   The filename including path relative to Drupal root.
+   * @param string $namespace
+   *   The fully-qualified namespace for the class.
+   * @param string $module
+   *   The name of module the class file is in.
+   * @param \Drupal\Component\FileCache\FileCacheInterface $cache
+   *   The cache of hook attribute data associated with file paths.
+   * @param class-string $class
+   *   (optional) The class name. If passed, and the file name is empty, the
+   *   cache is bypassed and the class is parsed for attributes directly.
+   *
+   * @throws \InvalidArgumentException
+   *   When both the file and class name are empty.
+   */
+  protected function collectHookImplementationsFromClassFile(string $filename, string $namespace, string $module, FileCacheInterface $cache, string $class = ''): void {
+    if (empty($filename) && empty($class)) {
+      throw new \InvalidArgumentException('A non-empty value must be passed in at least one of $filename or $class.');
+    }
+    $cached = $filename ? $cache->get($filename) : FALSE;
+    if ($cached) {
+      $class = $cached['class'];
+      $attributes = $cached['attributes'];
+    }
+    else {
+      if (!$class) {
+        $class = $namespace . '/' . basename($filename, '.php');
+        $class = str_replace('/', '\\', $class);
+      }
+      $attributes = [];
+      if (class_exists($class)) {
+        $reflectionClass = new \ReflectionClass($class);
+        $attributes = self::getAttributeInstances($reflectionClass);
+        if ($filename) {
+          $cache->set($filename, ['class' => $class, 'attributes' => $attributes]);
+        }
+      }
+    }
+    foreach ($attributes as $method => $methodAttributes) {
+      foreach ($methodAttributes as $attribute) {
+        if ($attribute instanceof Hook) {
+          self::checkForProceduralOnlyHooks($attribute, $class);
+          $this->oopImplementations[$attribute->hook][$class . '::' . ($attribute->method ?: $method)] = $attribute->module ?? $module;
+          if ($attribute->order !== NULL) {
+            // Use a lower weight for order operations that are declared
+            // together with the hook listener they apply to.
+            $this->orderOperations[$attribute->hook][0][] = $attribute->order->getOperation("$class::$method");
+          }
+        }
+        elseif ($attribute instanceof ReorderHook) {
+          // Use a higher weight for order operations that target other hook
+          // listeners.
+          $this->orderOperations[$attribute->hook][1][] = $attribute->order->getOperation($attribute->class . '::' . $attribute->method);
+        }
+        elseif ($attribute instanceof RemoveHook) {
+          $this->removeHookIdentifiers[$attribute->hook][] = $attribute->class . '::' . $attribute->method;
         }
       }
     }
