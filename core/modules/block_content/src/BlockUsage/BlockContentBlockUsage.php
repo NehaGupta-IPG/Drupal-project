@@ -12,6 +12,8 @@ use Drupal\Core\Entity\EntityTypeManagerInterface;
  * Determine which Block configs use plugins derived from Block Content.
  *
  * This service is only available when Block is installed.
+ *
+ * @see \Drupal\block\BlockCompilerPass
  */
 class BlockContentBlockUsage implements BlockContentBlockUsageInterface {
 

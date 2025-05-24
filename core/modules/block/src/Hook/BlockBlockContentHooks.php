@@ -13,6 +13,10 @@ use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
  * Provides hooks for block integrating with block content module.
+ *
+ * Conditionally defined by \Drupal\block\BlockCompilerPass.
+ *
+ * @see \Drupal\block\BlockCompilerPass
  */
 class BlockBlockContentHooks {
 

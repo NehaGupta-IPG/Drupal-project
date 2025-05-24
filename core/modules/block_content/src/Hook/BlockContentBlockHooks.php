@@ -14,6 +14,10 @@ use Drupal\Core\StringTranslation\TranslationInterface;
 
 /**
  * Provides hooks for block_content integrating with block module.
+ *
+ * Conditionally defined by \Drupal\block_content\BlockContentCompilerPass.
+ *
+ * @see \Drupal\block_content\BlockContentCompilerPass
  */
 class BlockContentBlockHooks {
 
