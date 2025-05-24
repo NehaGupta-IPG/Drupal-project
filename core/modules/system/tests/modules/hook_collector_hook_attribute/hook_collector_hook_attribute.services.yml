@@ -1,0 +1,9 @@
+services:
+  _defaults:
+    autowire: true
+
+  Drupal\hook_collector_hook_attribute\Hook\HookRegisteredService: ~
+
+  Drupal\hook_collector_hook_attribute\ServiceWithHook: ~
+
+  Drupal\hook_collector_hook_attribute\AnotherServiceWithHook: ~

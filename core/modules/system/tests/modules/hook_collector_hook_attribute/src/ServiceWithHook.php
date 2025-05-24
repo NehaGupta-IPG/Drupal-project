@@ -1,0 +1,43 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Drupal\hook_collector_hook_attribute;
+
+use Drupal\Core\Hook\Attribute\Hook;
+use Drupal\Core\KeyValueStore\KeyValueFactoryInterface;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
+
+/**
+ * Service class with Hook attribute.
+ *
+ * This is used to test that any service registered in the module's services.yml
+ * can have hook implementations, regardless of where under the module's
+ * namespace it exists.
+ */
+class ServiceWithHook {
+
+  use HookInvocationsCountTrait;
+
+  public function __construct(
+    #[Autowire(service: 'keyvalue')]
+    protected KeyValueFactoryInterface $keyValueFactory,
+  ) {}
+
+  /**
+   * Implements hook_test_hook_2().
+   */
+  #[Hook('test_hook_2')]
+  public function testHook2(): void {
+    $this->incrementRunCount(get_class($this) . '::' . __FUNCTION__);
+  }
+
+  /**
+   * Implements hook_test_hook_5().
+   */
+  #[Hook('test_hook_5')]
+  public function testHook5(): void {
+    $this->incrementRunCount(get_class($this) . '::' . __FUNCTION__);
+  }
+
+}
