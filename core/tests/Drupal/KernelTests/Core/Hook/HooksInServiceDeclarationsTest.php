@@ -154,7 +154,7 @@ class HooksInServiceDeclarationsTest extends KernelTestBase {
    * implementation is registered and will be invoked.
    */
   #[Hook('test_hook', module: 'system')]
-  public function incrementCountOnTestHookInvocation(): void {
+  public function doTestHook(): void {
     $this->testHookRan = TRUE;
   }
 
