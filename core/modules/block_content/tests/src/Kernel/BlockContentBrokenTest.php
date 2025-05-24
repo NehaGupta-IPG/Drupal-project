@@ -69,7 +69,7 @@ final class BlockContentBrokenTest extends KernelTestBase {
     $text = $this->randomMachineName();
     $blockContent = BlockContent::create([
       'type' => $blockContentType->id(),
-      'info' => $undefineBlockPlugin ? BlockContentTestHooks::UNDEFINE_BLOCK : '',
+      'info' => $undefineBlockPlugin ? BlockContentTestHooks::REMOVE_BLOCK : '',
       $fieldConfig->getName() => $text,
     ]);
     $blockContent->save();

@@ -12,7 +12,7 @@ use Drupal\Core\Hook\Attribute\Hook;
  */
 class BlockContentTestHooks {
 
-  public const UNDEFINE_BLOCK = 'undefine block plugin definition';
+  public const REMOVE_BLOCK = 'remove block plugin definition';
 
   /**
    * Implements hook_ENTITY_TYPE_view().
@@ -89,7 +89,7 @@ class BlockContentTestHooks {
     /** @var array<string, array<string, mixed>> $definitions */
     foreach ($definitions as $pluginId => $definition) {
       $labels = array_map('trim', explode(',', (string) ($definition['admin_label'] ?? '')));
-      if (in_array(static::UNDEFINE_BLOCK, $labels, TRUE)) {
+      if (in_array(static::REMOVE_BLOCK, $labels, TRUE)) {
         unset($definitions[$pluginId]);
       }
     }
