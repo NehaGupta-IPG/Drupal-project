@@ -219,7 +219,7 @@ class ElementInfoManager extends DefaultPluginManager implements ElementInfoMana
   /**
    * {@inheritdoc}
    */
-  public function fromRenderable(ElementInterface|array &$element, string $type = ''): ElementInterface {
+  public function fromRenderable(ElementInterface|array &$element, string $type = 'form'): ElementInterface {
     if ($element instanceof ElementInterface) {
       return $element;
     }
