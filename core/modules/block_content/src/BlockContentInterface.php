@@ -3,7 +3,6 @@
 namespace Drupal\block_content;
 
 use Drupal\block_content\Access\RefinableDependentAccessInterface;
-use Drupal\block_content\BlockUsage\BlockContentBlockUsageInterface;
 use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Entity\EntityChangedInterface;
 use Drupal\Core\Entity\EntityPublishedInterface;
