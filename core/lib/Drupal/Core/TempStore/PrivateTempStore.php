@@ -10,25 +10,18 @@ use Drupal\Core\Session\AccountProxyInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
- * Stores and retrieves temporary data for a given owner.
+ * Stores and retrieves private temporary data for a given owner.
  *
- * A PrivateTempStore can be used to make temporary, non-cache data available
- * across requests. The data for the PrivateTempStore is stored in one
- * key/value collection. PrivateTempStore data expires automatically after a
- * given time frame.
+ * The data for the PrivateTempStore is stored in one key/value collection.
+ * PrivateTempStore data expires automatically after a given time frame.
  *
- * The PrivateTempStore is different from a cache, because the data in it is not
- * yet saved permanently and so it cannot be rebuilt. Typically, the
- * PrivateTempStore might be used to store work in progress that is later saved
- * permanently elsewhere, e.g. autosave data, multistep forms, or in-progress
- * changes to complex configuration that are not ready to be saved.
+ * If you want to be able to share data between users or use it for locking, use
+ * SharedTempStore.
  *
- * The PrivateTempStore differs from the SharedTempStore in that all keys are
- * ensured to be unique for a particular user and users can never share data. If
- * you want to be able to share data between users or use it for locking, use
- * \Drupal\Core\TempStore\SharedTempStore.
+ * @see \Drupal\Core\TempStore\SharedTempStore
  */
-class PrivateTempStore {
+class PrivateTempStore implements PrivateTempStoreInterface {
+
   use DependencySerializationTrait;
 
   /**
@@ -93,13 +86,7 @@ class PrivateTempStore {
   }
 
   /**
-   * Retrieves a value from this PrivateTempStore for a given key.
-   *
-   * @param string $key
-   *   The key of the data to retrieve.
-   *
-   * @return mixed
-   *   The data associated with the key, or NULL if the key does not exist.
+   * {@inheritdoc}
    */
   public function get($key) {
     $key = $this->createKey($key);
@@ -109,15 +96,7 @@ class PrivateTempStore {
   }
 
   /**
-   * Stores a particular key/value pair in this PrivateTempStore.
-   *
-   * @param string $key
-   *   The key of the data to store.
-   * @param mixed $value
-   *   The data to store.
-   *
-   * @throws \Drupal\Core\TempStore\TempStoreException
-   *   Thrown when a lock for the backend storage could not be acquired.
+   * {@inheritdoc}
    */
   public function set($key, $value) {
     if ($this->currentUser->isAnonymous()) {
@@ -145,14 +124,7 @@ class PrivateTempStore {
   }
 
   /**
-   * Returns the metadata associated with a particular key/value pair.
-   *
-   * @param string $key
-   *   The key of the data to store.
-   *
-   * @return \Drupal\Core\TempStore\Lock|null
-   *   An object with the owner and updated time if the key has a value, or
-   *   NULL otherwise.
+   * {@inheritdoc}
    */
   public function getMetadata($key) {
     $key = $this->createKey($key);
@@ -166,17 +138,7 @@ class PrivateTempStore {
   }
 
   /**
-   * Deletes data from the store for a given key and releases the lock on it.
-   *
-   * @param string $key
-   *   The key of the data to delete.
-   *
-   * @return bool
-   *   TRUE if the object was deleted or does not exist, FALSE if it exists but
-   *   is not owned by $this->owner.
-   *
-   * @throws \Drupal\Core\TempStore\TempStoreException
-   *   Thrown when a lock for the backend storage could not be acquired.
+   * {@inheritdoc}
    */
   public function delete($key) {
     $key = $this->createKey($key);

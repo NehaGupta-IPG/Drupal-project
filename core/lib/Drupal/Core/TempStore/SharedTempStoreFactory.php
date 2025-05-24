@@ -81,7 +81,7 @@ class SharedTempStoreFactory {
    *   SharedTempStore is owned by the currently authenticated user, or by the
    *   active anonymous session if no user is logged in.
    *
-   * @return \Drupal\Core\TempStore\SharedTempStore
+   * @return \Drupal\Core\TempStore\SharedTempStoreInterface
    *   An instance of the key/value store.
    */
   public function get($collection, $owner = NULL) {

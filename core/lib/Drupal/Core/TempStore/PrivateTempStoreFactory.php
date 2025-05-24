@@ -76,7 +76,7 @@ class PrivateTempStoreFactory {
    *   The collection name to use for this key/value store. This is typically
    *   a shared namespace or module name, e.g. 'views', 'entity', etc.
    *
-   * @return \Drupal\Core\TempStore\PrivateTempStore
+   * @return \Drupal\Core\TempStore\PrivateTempStoreInterface
    *   An instance of the key/value store.
    */
   public function get($collection) {

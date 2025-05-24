@@ -11,33 +11,15 @@ use Symfony\Component\HttpFoundation\RequestStack;
 /**
  * Stores and retrieves temporary data for a given owner.
  *
- * A SharedTempStore can be used to make temporary, non-cache data available
- * across requests. The data for the SharedTempStore is stored in one key/value
- * collection. SharedTempStore data expires automatically after a given
- * time frame.
- *
- * The SharedTempStore is different from a cache, because the data in it is not
- * yet saved permanently and so it cannot be rebuilt. Typically, the
- * SharedTempStore might be used to store work in progress that is later saved
- * permanently elsewhere, e.g. autosave data, multistep forms, or in-progress
- * changes to complex configuration that are not ready to be saved.
- *
- * Each SharedTempStore belongs to a particular owner (e.g. a user, session, or
- * process). Multiple owners may use the same key/value collection, and the
- * owner is stored along with the key/value pair.
- *
- * Every key is unique within the collection, so the SharedTempStore can check
- * whether a particular key is already set by a different owner. This is
- * useful for informing one owner that the data is already in use by another;
- * for example, to let one user know that another user is in the process of
- * editing certain data, or even to restrict other users from editing it at
- * the same time. It is the responsibility of the implementation to decide
- * when and whether one owner can use or update another owner's data.
+ * The data for the SharedTempStore is stored in one key/value collection.
+ * SharedTempStore data expires automatically after a given time frame.
  *
  * If you want to be able to ensure that the data belongs to the current user,
- * use \Drupal\Core\TempStore\PrivateTempStore.
+ * use PrivateTempStore.
+ *
+ * @see \Drupal\Core\TempStore\PrivateTempStore
  */
-class SharedTempStore {
+class SharedTempStore implements SharedTempStoreInterface {
 
   use DependencySerializationTrait;
 
@@ -113,13 +95,7 @@ class SharedTempStore {
   }
 
   /**
-   * Retrieves a value from this SharedTempStore for a given key.
-   *
-   * @param string $key
-   *   The key of the data to retrieve.
-   *
-   * @return mixed
-   *   The data associated with the key, or NULL if the key does not exist.
+   * {@inheritdoc}
    */
   public function get($key) {
     if ($object = $this->storage->get($key)) {
@@ -128,15 +104,7 @@ class SharedTempStore {
   }
 
   /**
-   * Retrieves a value from this SharedTempStore for a given key.
-   *
-   * Only returns the value if the value is owned by $this->owner.
-   *
-   * @param string $key
-   *   The key of the data to retrieve.
-   *
-   * @return mixed
-   *   The data associated with the key, or NULL if the key does not exist.
+   * {@inheritdoc}
    */
   public function getIfOwner($key) {
     if (($object = $this->storage->get($key)) && ($object->owner == $this->owner)) {
@@ -145,15 +113,7 @@ class SharedTempStore {
   }
 
   /**
-   * Stores a particular key/value pair only if the key doesn't already exist.
-   *
-   * @param string $key
-   *   The key of the data to check and store.
-   * @param mixed $value
-   *   The data to store.
-   *
-   * @return bool
-   *   TRUE if the data was set, or FALSE if it already existed.
+   * {@inheritdoc}
    */
   public function setIfNotExists($key, $value) {
     $value = (object) [
@@ -167,22 +127,7 @@ class SharedTempStore {
   }
 
   /**
-   * Stores a particular key/value pair in this SharedTempStore.
-   *
-   * Only stores the given key/value pair if it does not exist yet or is owned
-   * by $this->owner.
-   *
-   * @param string $key
-   *   The key of the data to store.
-   * @param mixed $value
-   *   The data to store.
-   *
-   * @return bool
-   *   TRUE if the data was set, or FALSE if it already exists and is not owned
-   *   by $this->user.
-   *
-   * @throws \Drupal\Core\TempStore\TempStoreException
-   *   Thrown when a lock for the backend storage could not be acquired.
+   * {@inheritdoc}
    */
   public function setIfOwner($key, $value) {
     if ($this->setIfNotExists($key, $value)) {
@@ -198,15 +143,7 @@ class SharedTempStore {
   }
 
   /**
-   * Stores a particular key/value pair in this SharedTempStore.
-   *
-   * @param string $key
-   *   The key of the data to store.
-   * @param mixed $value
-   *   The data to store.
-   *
-   * @throws \Drupal\Core\TempStore\TempStoreException
-   *   Thrown when a lock for the backend storage could not be acquired.
+   * {@inheritdoc}
    */
   public function set($key, $value) {
     if (!$this->lockBackend->acquire($key)) {
@@ -227,14 +164,7 @@ class SharedTempStore {
   }
 
   /**
-   * Returns the metadata associated with a particular key/value pair.
-   *
-   * @param string $key
-   *   The key of the data to store.
-   *
-   * @return \Drupal\Core\TempStore\Lock|null
-   *   An object with the owner and updated time if the key has a value, or
-   *   NULL otherwise.
+   * {@inheritdoc}
    */
   public function getMetadata($key) {
     // Fetch the key/value pair and its metadata.
@@ -247,13 +177,7 @@ class SharedTempStore {
   }
 
   /**
-   * Deletes data from the store for a given key and releases the lock on it.
-   *
-   * @param string $key
-   *   The key of the data to delete.
-   *
-   * @throws \Drupal\Core\TempStore\TempStoreException
-   *   Thrown when a lock for the backend storage could not be acquired.
+   * {@inheritdoc}
    */
   public function delete($key) {
     if (!$this->lockBackend->acquire($key)) {
@@ -267,19 +191,7 @@ class SharedTempStore {
   }
 
   /**
-   * Deletes data from the store for a given key and releases the lock on it.
-   *
-   * Only delete the given key if it is owned by $this->owner.
-   *
-   * @param string $key
-   *   The key of the data to delete.
-   *
-   * @return bool
-   *   TRUE if the object was deleted or does not exist, FALSE if it exists but
-   *   is not owned by $this->owner.
-   *
-   * @throws \Drupal\Core\TempStore\TempStoreException
-   *   Thrown when a lock for the backend storage could not be acquired.
+   * {@inheritdoc}
    */
   public function deleteIfOwner($key) {
     if (!$object = $this->storage->get($key)) {
