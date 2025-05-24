@@ -79,6 +79,8 @@ class MediaLibraryWidget extends WidgetBase implements TrustedCallbackInterface 
    *   The widget settings.
    * @param array $third_party_settings
    *   Any third party settings.
+   * @param \Drupal\Core\Render\ElementInfoManagerInterface $elementInfoManager
+   *   The element info manager.
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
    *   Entity type manager service.
    * @param \Drupal\Core\Session\AccountInterface $current_user
