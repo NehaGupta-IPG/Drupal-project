@@ -127,8 +127,8 @@ interface ElementInterface extends PluginInspectionInterface, RenderCallbackInte
    * @param array $configuration
    *   An array of configuration relevant to the render object.
    * @param bool $copyProperties
-   *  Copy properties (but not children) from the parent. This is useful for
-   *  widgets for example.
+   *   Copy properties (but not children) from the parent. This is useful for
+   *   widgets for example.
    *
    * @return T
    *   The child render object.
