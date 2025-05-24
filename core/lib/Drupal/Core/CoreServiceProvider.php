@@ -62,6 +62,10 @@ class CoreServiceProvider implements ServiceProviderInterface, ServiceModifierIn
         ->addTag('stream_wrapper', ['scheme' => 'private']);
     }
 
+    // Initialize the parameter in case module service providers or modifiers
+    // instantiate the module handler.
+    $container->setParameter('hook_implementations_map', []);
+
     // Add the compiler pass that lets service providers modify existing
     // service definitions. This pass must come before all passes operating on
     // services so that later list-building passes are operating on the
