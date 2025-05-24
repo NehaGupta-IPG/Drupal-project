@@ -10,7 +10,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
 /**
  * Creates a PrivateTempStore object for a given collection.
  */
-class PrivateTempStoreFactory {
+class PrivateTempStoreFactory implements PrivateTempStoreFactoryInterface {
 
   /**
    * The storage factory creating the backend to store the data.
@@ -70,14 +70,7 @@ class PrivateTempStoreFactory {
   }
 
   /**
-   * Creates a PrivateTempStore.
-   *
-   * @param string $collection
-   *   The collection name to use for this key/value store. This is typically
-   *   a shared namespace or module name, e.g. 'views', 'entity', etc.
-   *
-   * @return \Drupal\Core\TempStore\PrivateTempStoreInterface
-   *   An instance of the key/value store.
+   * {@inheritdoc}
    */
   public function get($collection) {
     // Store the data for this collection in the database.
