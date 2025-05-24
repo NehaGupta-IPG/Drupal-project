@@ -69,6 +69,9 @@ __EOF__
 
     $container = new ContainerBuilder();
     $container->setParameter('container.modules', $module_filenames);
+    $container->setParameter('container.namespaces', [
+      'test_module_test_hook' => 'vfs://drupal_root/modules/test_module/test_module_info.yml',
+    ]);
     $container->setDefinition('module_handler', new Definition());
     (new HookCollectorPass())->process($container);
     $this->assertSame($implementations, $container->getParameter('hook_implementations_map'));
@@ -85,6 +88,9 @@ __EOF__
     $module_filenames = self::setupGroupIncludes();
     $container = new ContainerBuilder();
     $container->setParameter('container.modules', $module_filenames);
+    $container->setParameter('container.namespaces' , [
+      'Drupal\\test_module' => 'vfs://drupal_root/test_module_info.yml',
+    ]);
     $container->setDefinition('module_handler', new Definition());
     (new HookCollectorPass())->process($container);
     $argument = $container->getDefinition('module_handler')->getArgument('$groupIncludes');
