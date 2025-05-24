@@ -194,7 +194,6 @@ system.logging:
       sequence:
         type: string
         label: 'Ignored deprecation source file pattern'
-
     ignored_deprecations:
       type: sequence
       label: 'List of ignored deprecations'
