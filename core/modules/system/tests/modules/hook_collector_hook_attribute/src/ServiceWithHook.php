@@ -15,14 +15,14 @@ use Drupal\Core\Hook\Attribute\Hook;
  */
 class ServiceWithHook {
 
-  use HookInvocationsCountTrait;
-
   /**
    * Implements hook_test_hook_2().
    */
   #[Hook('test_hook_2')]
   public function testHook2(array &$invocations): void {
-    $this->incrementRunCount(get_class($this) . '::' . __FUNCTION__, $invocations);
+    $key = get_class($this) . '::' . __FUNCTION__;
+    $invocations[$key] ??= 0;
+    $invocations[$key]++;
   }
 
   /**
@@ -30,7 +30,9 @@ class ServiceWithHook {
    */
   #[Hook('test_hook_5')]
   public function testHook5(array &$invocations): void {
-    $this->incrementRunCount(get_class($this) . '::' . __FUNCTION__, $invocations);
+    $key = get_class($this) . '::' . __FUNCTION__;
+    $invocations[$key] ??= 0;
+    $invocations[$key]++;
   }
 
 }
