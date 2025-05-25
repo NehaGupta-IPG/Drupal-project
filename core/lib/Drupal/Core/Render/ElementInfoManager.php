@@ -238,6 +238,7 @@ class ElementInfoManager extends DefaultPluginManager implements ElementInfoMana
    * {@inheritdoc}
    */
   public function fromClass(string $class, array $configuration = []): ElementInterface {
+    $this->getDefinitions();
     if (isset($this->reverseMapping[$class])) {
       return $this->createInstance($this->reverseMapping[$class], $configuration);
     }
