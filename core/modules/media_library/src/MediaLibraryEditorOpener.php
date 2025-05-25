@@ -70,6 +70,18 @@ class MediaLibraryEditorOpener implements MediaLibraryOpenerInterface {
         'data-entity-uuid' => $selected_media->uuid(),
       ],
     ];
+
+    // Set 'data-view-mode' attribute if a default view mode is configured
+    // for the filter format.
+    $filter_format = $this->filterStorage->load($state->getOpenerParameters()['filter_format_id']);
+    if ($filter_format && $filter_format->filters('media_embed')) {
+      $filter = $filter_format->filters('media_embed');
+      $default_view_mode = $filter->settings['default_view_mode'];
+      if ($default_view_mode) {
+        $values['attributes']['data-view-mode'] = $default_view_mode;
+      }
+    }
+
     $response->addCommand(new EditorDialogSave($values));
 
     return $response;

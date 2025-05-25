@@ -85,14 +85,6 @@ export default class DrupalElementStyleCommand extends Command {
       const modelAttribute = groupNameToModelAttributeKey(group);
       if (element.hasAttribute(modelAttribute)) {
         value[group] = element.getAttribute(modelAttribute);
-      } else {
-        // eslint-disable-next-line no-restricted-syntax
-        for (const [, style] of this.styles[group]) {
-          // Set it to the default value.
-          if (style.isDefault) {
-            value[group] = style.name;
-          }
-        }
       }
     });
     return value;
@@ -124,13 +116,8 @@ export default class DrupalElementStyleCommand extends Command {
         model.schema,
         this.modelAttributes,
       );
-      if (!value || this.styles[group].get(value).isDefault) {
-        // Remove attribute from the element.
-        writer.removeAttribute(modelAttribute, element);
-      } else {
-        // Set the attribute value on the element.
-        writer.setAttribute(modelAttribute, value, element);
-      }
+      // Set the attribute value on the element.
+      writer.setAttribute(modelAttribute, value, element);
     });
   }
 }
