@@ -532,15 +532,15 @@ final class DrupalAnnotationToAttributeRector extends AbstractRector implements 
 
 return RectorConfig::configure()
     ->withPaths([
-#        __DIR__ . '/core/tests/Drupal/Tests/Component/Plugin/Discovery/DiscoveryTraitTest.php',
-        __DIR__ . '/core/tests/Drupal/Tests/Component',
+        __DIR__ . '/core/tests/Drupal/BuildTests',
+#        __DIR__ . '/core/tests/Drupal/Tests/Component',
 #        __DIR__ . '/core/tests/Drupal/KernelTests/Core/Database',
 #        __DIR__ . '/core/tests/Drupal/FunctionalJavascriptTests',
 #        __DIR__ . '/core',
 #        __DIR__ . '/composer',
     ])
     ->withSkip([
-        __DIR__ . '/core/tests/Drupal/Tests/Component/Annotation/Doctrine/Fixtures',
+/*        __DIR__ . '/core/tests/Drupal/Tests/Component/Annotation/Doctrine/Fixtures',
         __DIR__ . '/core/tests/Drupal/Tests/Component/Datetime/TimeTest.php',
         __DIR__ . '/core/tests/Drupal/Tests/Component/Plugin/PluginBaseTest.php',
         __DIR__ . '/core/tests/Drupal/Tests/Component/Annotation/AnnotatedClassDiscoveryTest.php',
@@ -558,7 +558,7 @@ return RectorConfig::configure()
         __DIR__ . '/core/tests/Drupal/Tests/Component/Utility/HtmlTest.php',
         __DIR__ . '/core/tests/Drupal/Tests/Component/Utility/UserAgentTest.php',
         __DIR__ . '/core/tests/Drupal/Tests/Component/Plugin/Discovery/StaticDiscoveryDecoratorTest.php',
-        __DIR__ . '/core/tests/Drupal/Tests/Component/Plugin/Factory/ReflectionFactoryTest.php',
+        __DIR__ . '/core/tests/Drupal/Tests/Component/Plugin/Factory/ReflectionFactoryTest.php',*/
         '*/ProxyClass/*',
         '*.api.php',
     ])
