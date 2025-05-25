@@ -185,7 +185,7 @@ class AttachedAssetsTest extends KernelTestBase {
 
     // Tests with another setting value.
     $this->setSetting('aggregated_js_attributes', ['fetchpriority']);
-    \Drupal::service('library.discovery')->clearCachedDefinitions();
+    \Drupal::service('library.discovery')->clear();
     $js = $this->assetResolver->getJsAssets(
       $assets, TRUE, \Drupal::languageManager()->getCurrentLanguage()
     )[1];
