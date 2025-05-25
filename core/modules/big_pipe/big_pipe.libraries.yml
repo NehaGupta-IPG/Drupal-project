@@ -5,5 +5,5 @@ big_pipe:
   drupalSettings:
     bigPipePlaceholderIds: []
   dependencies:
-    - core/drupal.ajax
+    - core/drupal.htmx
     - core/drupalSettings
