@@ -575,13 +575,6 @@ class BigPipe {
                 'data-big-pipe-replacement-for-placeholder-with-id' => $big_pipe_js_placeholder_id,
               ],
               '#value' => $html_response->getContent(),
-              'script' => [
-                '#type' => 'html_tag',
-                '#tag' => 'script',
-                '#attributes' => [
-                  'src' => '/core/modules/toolbar/js/escapeAdmin.js?v=11.3-dev',
-                ],
-              ],
             ],
             [
               '#type' => 'html_tag',
