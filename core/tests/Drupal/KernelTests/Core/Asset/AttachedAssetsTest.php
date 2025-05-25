@@ -173,7 +173,7 @@ class AttachedAssetsTest extends KernelTestBase {
     $rendered_js = (string) $this->renderer->renderInIsolation($js_render_array);
     $expected_1 = '<script src="http://example.com/deferred-external.js" foo="bar" defer></script>';
     $expected_2 = '<script src="' . $this->fileUrlGenerator->generateString('core/modules/system/tests/modules/common_test/deferred-internal.js') . '?v=1" defer bar="foo"></script>';
-    $includeBase64 = UrlHelper::compressQueryParameter('common_test/js-attributes,common_test/js-aggregated-attributes');
+    $includeBase64 = UrlHelper::compressQueryParameter('common_test/js-aggregated-attributes,common_test/js-attributes');
     $expected_3 = '&amp;language=en&amp;theme=core&amp;include=' . $includeBase64 . '" defer></script>';
     $expected_4 = '&amp;language=en&amp;theme=core&amp;include=' . $includeBase64 . '" async></script>';
     $expected_5 = '<script src="' . $this->fileUrlGenerator->generateString('core/modules/system/tests/modules/common_test/fetchpriority.js') . '?v=1" fetchpriority="high"></script>';
@@ -182,10 +182,19 @@ class AttachedAssetsTest extends KernelTestBase {
     $this->assertStringContainsString($expected_3, $rendered_js, 'Aggregated internal JavaScript with defer attribute.');
     $this->assertStringContainsString($expected_4, $rendered_js, 'Aggregated internal JavaScript with async attribute.');
     $this->assertStringContainsString($expected_5, $rendered_js, 'Rendered internal JavaScript with attribute not in aggregated_js_attributes.');
+  }
+
+  /**
+   * Tests that attributes are maintained when the aggregated_js_attributes is customized.
+   */
+  public function testAggregatedAttributesCustomSetting(): void {
+    $build['#attached']['library'][] = 'common_test/js-attributes';
+    $build['#attached']['library'][] = 'common_test/js-aggregated-attributes';
+    $assets = AttachedAssets::createFromRenderArray($build);
+    $includeBase64 = UrlHelper::compressQueryParameter('common_test/js-aggregated-attributes,common_test/js-attributes');
 
     // Tests with another setting value.
     $this->setSetting('aggregated_js_attributes', ['fetchpriority']);
-    \Drupal::service('library.discovery')->clear();
     $js = $this->assetResolver->getJsAssets(
       $assets, TRUE, \Drupal::languageManager()->getCurrentLanguage()
     )[1];
