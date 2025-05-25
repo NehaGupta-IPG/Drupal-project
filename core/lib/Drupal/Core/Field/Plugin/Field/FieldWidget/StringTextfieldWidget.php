@@ -73,7 +73,7 @@ class StringTextfieldWidget extends WidgetBase {
     $value->default_value = $items[$delta]->value;
     $value->size = $this->getSetting('size');
     $value->placeholder = $this->getSetting('placeholder');
-    $value->maxlength = $this->getSetting('max_length');
+    $value->maxlength = $this->getFieldSetting('max_length');
     $value->attributes = ['class' => ['js-text-full', 'text-full']];
     return $wrapper->toRenderable();
   }
