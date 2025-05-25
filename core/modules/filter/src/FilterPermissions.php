@@ -42,11 +42,12 @@ class FilterPermissions implements ContainerInjectionInterface {
    * Returns an array of filter permissions.
    *
    * @return array
+   *   An array of filter permissions keyed by permission name.
    */
   public function permissions() {
     $permissions = [];
-    // Generate permissions for each text format. Warn the administrator that any
-    // of them are potentially unsafe.
+    // Generate permissions for each text format. Warn the administrator that
+    // any of them are potentially unsafe.
     /** @var \Drupal\filter\FilterFormatInterface[] $formats */
     $formats = $this->entityTypeManager->getStorage('filter_format')->loadByProperties(['status' => TRUE]);
     uasort($formats, 'Drupal\Core\Config\Entity\ConfigEntityBase::sort');
@@ -58,6 +59,13 @@ class FilterPermissions implements ContainerInjectionInterface {
             '#prefix' => '<em>',
             '#markup' => $this->t('Warning: This permission may have security implications depending on how the text format is configured.'),
             '#suffix' => '</em>',
+          ],
+          // This permission is generated on behalf of $format text format,
+          // therefore add this text format as a config dependency.
+          'dependencies' => [
+            $format->getConfigDependencyKey() => [
+              $format->getConfigDependencyName(),
+            ],
           ],
         ];
       }

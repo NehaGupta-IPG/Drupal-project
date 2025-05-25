@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\user\Kernel\Field;
 
 use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
@@ -15,9 +17,7 @@ use Drupal\user\Entity\User;
 class UserNameFormatterTest extends KernelTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['field', 'user', 'system'];
 
@@ -44,7 +44,6 @@ class UserNameFormatterTest extends KernelTestBase {
 
     $this->installConfig(['field']);
     $this->installEntitySchema('user');
-    $this->installSchema('system', ['sequences']);
 
     $this->entityType = 'user';
     $this->bundle = $this->entityType;
@@ -71,28 +70,28 @@ class UserNameFormatterTest extends KernelTestBase {
   /**
    * Tests the formatter output.
    */
-  public function testFormatter() {
+  public function testFormatter(): void {
     $user = User::create([
       'name' => 'test name',
     ]);
     $user->save();
 
     $result = $user->{$this->fieldName}->view(['type' => 'user_name']);
-    $this->assertEqual('username', $result[0]['#theme']);
-    $this->assertEqual(spl_object_hash($user), spl_object_hash($result[0]['#account']));
+    $this->assertEquals('username', $result[0]['#theme']);
+    $this->assertEquals(spl_object_hash($user), spl_object_hash($result[0]['#account']));
 
     $result = $user->{$this->fieldName}->view(['type' => 'user_name', 'settings' => ['link_to_entity' => FALSE]]);
-    $this->assertEqual($user->getDisplayName(), $result[0]['#markup']);
+    $this->assertEquals($user->getDisplayName(), $result[0]['#markup']);
 
     $user = User::getAnonymousUser();
 
     $result = $user->{$this->fieldName}->view(['type' => 'user_name']);
-    $this->assertEqual('username', $result[0]['#theme']);
-    $this->assertEqual(spl_object_hash($user), spl_object_hash($result[0]['#account']));
+    $this->assertEquals('username', $result[0]['#theme']);
+    $this->assertEquals(spl_object_hash($user), spl_object_hash($result[0]['#account']));
 
     $result = $user->{$this->fieldName}->view(['type' => 'user_name', 'settings' => ['link_to_entity' => FALSE]]);
-    $this->assertEqual($user->getDisplayName(), $result[0]['#markup']);
-    $this->assertEqual($this->config('user.settings')->get('anonymous'), $result[0]['#markup']);
+    $this->assertEquals($user->getDisplayName(), $result[0]['#markup']);
+    $this->assertEquals($this->config('user.settings')->get('anonymous'), $result[0]['#markup']);
   }
 
 }

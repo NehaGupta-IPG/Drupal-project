@@ -3,6 +3,7 @@
 namespace Drupal\taxonomy;
 
 use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
+use Drupal\Core\Entity\BundlePermissionHandlerTrait;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\taxonomy\Entity\Vocabulary;
@@ -14,7 +15,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  * @see taxonomy.permissions.yml
  */
 class TaxonomyPermissions implements ContainerInjectionInterface {
-
+  use BundlePermissionHandlerTrait;
   use StringTranslationTrait;
 
   /**
@@ -48,11 +49,7 @@ class TaxonomyPermissions implements ContainerInjectionInterface {
    *   Permissions array.
    */
   public function permissions() {
-    $permissions = [];
-    foreach (Vocabulary::loadMultiple() as $vocabulary) {
-      $permissions += $this->buildPermissions($vocabulary);
-    }
-    return $permissions;
+    return $this->generatePermissions(Vocabulary::loadMultiple(), [$this, 'buildPermissions']);
   }
 
   /**
@@ -72,6 +69,15 @@ class TaxonomyPermissions implements ContainerInjectionInterface {
       "create terms in $id" => ['title' => $this->t('%vocabulary: Create terms', $args)],
       "delete terms in $id" => ['title' => $this->t('%vocabulary: Delete terms', $args)],
       "edit terms in $id" => ['title' => $this->t('%vocabulary: Edit terms', $args)],
+      "view term revisions in $id" => ['title' => $this->t('%vocabulary: View term revisions', $args)],
+      "revert term revisions in $id" => [
+        'title' => $this->t('%vocabulary: Revert term revisions', $args),
+        'description' => $this->t('To revert a revision you also need permission to edit the taxonomy term.'),
+      ],
+      "delete term revisions in $id" => [
+        'title' => $this->t('%vocabulary: Delete term revisions', $args),
+        'description' => $this->t('To delete a revision you also need permission to delete the taxonomy term.'),
+      ],
     ];
   }
 

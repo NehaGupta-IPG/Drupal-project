@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\system\Functional\Menu;
 
 use Drupal\menu_link_content\Entity\MenuLinkContent;
@@ -25,7 +27,7 @@ class MenuLinkSecurityTest extends BrowserTestBase {
   /**
    * Ensures that a menu link does not cause an XSS issue.
    */
-  public function testMenuLink() {
+  public function testMenuLink(): void {
     $menu_link_content = MenuLinkContent::create([
       'title' => '<script>alert("Wild animals")</script>',
       'menu_name' => 'tools',
@@ -36,8 +38,8 @@ class MenuLinkSecurityTest extends BrowserTestBase {
     $this->drupalPlaceBlock('system_menu_block:tools');
 
     $this->drupalGet('<front>');
-    $this->assertNoRaw('<script>alert("Wild animals")</script>');
-    $this->assertNoRaw('<script>alert("Even more wild animals")</script>');
+    $this->assertSession()->responseNotContains('<script>alert("Wild animals")</script>');
+    $this->assertSession()->responseNotContains('<script>alert("Even more wild animals")</script>');
     $this->assertSession()->assertEscaped('<script>alert("Wild animals")</script>');
     $this->assertSession()->assertEscaped('<script>alert("Even more wild animals")</script>');
   }

@@ -110,7 +110,7 @@ class SearchQuery extends SelectExtender {
    * This is always used for the second step in the query, but is not part of
    * the preparation step unless $this->simple is FALSE.
    *
-   * @var Drupal\Core\Database\Query\ConditionInterface[]
+   * @var \Drupal\Core\Database\Query\ConditionInterface[]
    */
   protected $conditions;
 
@@ -177,6 +177,7 @@ class SearchQuery extends SelectExtender {
    *
    * @var int
    */
+  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
   protected $relevance_count = 0;
 
   /**
@@ -314,14 +315,14 @@ class SearchQuery extends SelectExtender {
         }
         $has_or = TRUE;
         $has_new_scores = FALSE;
-        $queryor = $this->connection->condition('OR');
+        $query_or = $this->connection->condition('OR');
         foreach ($key as $or) {
-          list($num_new_scores) = $this->parseWord($or);
+          [$num_new_scores] = $this->parseWord($or);
           $has_new_scores |= $num_new_scores;
-          $queryor->condition('d.data', "% $or %", 'LIKE');
+          $query_or->condition('d.data', "% $or %", 'LIKE');
         }
-        if (count($queryor)) {
-          $this->conditions->condition($queryor);
+        if (count($query_or)) {
+          $this->conditions->condition($query_or);
           // A group of OR keywords only needs to match once.
           $this->matches += ($has_new_scores > 0);
         }
@@ -329,7 +330,7 @@ class SearchQuery extends SelectExtender {
       // Single ANDed term.
       else {
         $has_and = TRUE;
-        list($num_new_scores, $num_valid_words) = $this->parseWord($key);
+        [$num_new_scores, $num_valid_words] = $this->parseWord($key);
         $this->conditions->condition('d.data', "% $key %", 'LIKE');
         if (!$num_valid_words) {
           $this->simple = FALSE;
@@ -409,7 +410,7 @@ class SearchQuery extends SelectExtender {
     $this->condition($or);
 
     // Add keyword normalization information to the query.
-    $this->join('search_total', 't', 'i.word = t.word');
+    $this->join('search_total', 't', '[i].[word] = [t].[word]');
     $this
       ->condition('i.type', $this->type)
       ->groupBy('i.type')
@@ -429,7 +430,7 @@ class SearchQuery extends SelectExtender {
     // For complex search queries, add the LIKE conditions; if the query is
     // simple, we do not need them for normalization.
     if (!$this->simple) {
-      $normalize_query->join('search_dataset', 'd', 'i.sid = d.sid AND i.type = d.type AND i.langcode = d.langcode');
+      $normalize_query->join('search_dataset', 'd', '[i].[sid] = [d].[sid] AND [i].[type] = [d].[type] AND [i].[langcode] = [d].[langcode]');
       if (count($this->conditions)) {
         $normalize_query->condition($this->conditions);
       }
@@ -438,7 +439,7 @@ class SearchQuery extends SelectExtender {
     // Calculate normalization, which is the max of all the search scores for
     // positive keywords in the query. And note that the query could have other
     // fields added to it by the user of this extension.
-    $normalize_query->addExpression('SUM(i.score * t.count)', 'calculated_score');
+    $normalize_query->addExpression('SUM([i].[score] * [t].[count])', 'calculated_score');
     $result = $normalize_query
       ->range(0, 1)
       ->orderBy('calculated_score', 'DESC')
@@ -461,7 +462,7 @@ class SearchQuery extends SelectExtender {
   /**
    * {@inheritdoc}
    */
-  public function preExecute(SelectInterface $query = NULL) {
+  public function preExecute(?SelectInterface $query = NULL) {
     if (!$this->executedPrepare) {
       $this->prepareAndNormalize();
     }
@@ -521,7 +522,7 @@ class SearchQuery extends SelectExtender {
     // search expression. So, use string replacement to change this to a
     // calculated query expression, counting the number of occurrences so
     // in the execute() method we can add arguments.
-    while (strpos($score, 'i.relevance') !== FALSE) {
+    while (str_contains($score, 'i.relevance')) {
       $pieces = explode('i.relevance', $score, 2);
       $score = implode('((ROUND(:normalization_' . $this->relevance_count . ', 4)) * i.score * t.count)', $pieces);
       $this->relevance_count++;
@@ -551,7 +552,7 @@ class SearchQuery extends SelectExtender {
     }
 
     // Add conditions to the query.
-    $this->join('search_dataset', 'd', 'i.sid = d.sid AND i.type = d.type AND i.langcode = d.langcode');
+    $this->join('search_dataset', 'd', '[i].[sid] = [d].[sid] AND [i].[type] = [d].[type] AND [i].[langcode] = [d].[langcode]');
     if (count($this->conditions)) {
       $this->condition($this->conditions);
     }
@@ -609,7 +610,7 @@ class SearchQuery extends SelectExtender {
     $inner = clone $this->query;
 
     // Add conditions to query.
-    $inner->join('search_dataset', 'd', 'i.sid = d.sid AND i.type = d.type');
+    $inner->join('search_dataset', 'd', '[i].[sid] = [d].[sid] AND [i].[type] = [d].[type]');
     if (count($this->conditions)) {
       $inner->condition($this->conditions);
     }

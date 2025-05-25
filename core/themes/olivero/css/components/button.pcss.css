@@ -3,11 +3,7 @@
  * Buttons.
  */
 
-@import "../base/variables.pcss.css";
-
-:root {
-  --button-border-width: var(--form-element-border-size-base);
-}
+@import "../base/media-queries.pcss.css";
 
 .button {
   display: inline-block;
@@ -16,46 +12,44 @@
   margin-inline-start: 0;
   margin-inline-end: var(--sp1);
   padding-block: calc((var(--sp3) - var(--line-height-s)) / 2);
-  padding-inline-start: var(--sp1-5);
-  padding-inline-end: var(--sp1-5);
+  padding-inline: var(--sp1-5);
   cursor: pointer;
   text-align: center;
   text-decoration: none;
-  color: var(--color--blue-20);
-  border: var(--button-border-width) solid var(--color--blue-20);
-  border-radius: var(--border-radius-base);
+  color: var(--color-text-primary-medium);
+  border: solid 2px currentColor;
+  border-radius: var(--border-radius);
   background-color: var(--color--white);
-  font-family: inherit;
-  font-size: var(--font-size-s);
+  font-family: var(--font-sans);
+  font-size: var(--font-size-l);
   font-weight: 700;
-  line-height: var(--line-height-s);
   appearance: none;
   -webkit-font-smoothing: antialiased;
 
   &:hover,
   &:focus {
     text-decoration: none;
-    color: var(--color--blue-50);
-    border-color: var(--color--blue-50);
+    color: var(--color-text-primary-loud);
+    border: solid 2px currentColor;
+    background: none;
+    font-weight: 700;
   }
 
   &:focus {
-    outline: var(--outline--base);
-    outline-offset: var(--outline-offset);
-    box-shadow: var(--shadow-focusable);
+    outline: 2px solid var(--color--primary-60);
+    outline-offset: 2px;
   }
 
   &:active {
-    color: var(--color--blue-20);
-    border-color: var(--color--blue-20);
-    box-shadow: none;
+    color: var(--color-text-primary-medium);
+    border-color: currentColor;
   }
 
   &:disabled,
   &.is-disabled {
     cursor: default;
-    color: var(--color--gray-70);
-    border-color: var(--color--gray-70);
+    color: var(--color--gray-90);
+    border-color: var(--color--gray-90);
   }
 
   /*
@@ -68,8 +62,7 @@
 
     /* Top padding accounts for font not being vertically centered within line-height. */
     padding-block: 1px 0;
-    padding-inline-start: var(--sp1-5);
-    padding-inline-end: var(--sp1-5);
+    padding-inline: var(--sp1-5);
     line-height: var(--line-height-s);
   }
 }
@@ -84,34 +77,40 @@
 .button--small {
   height: var(--sp2-5);
   padding-block: calc((var(--sp2-5) - var(--line-height-s)) / 2);
-  padding-inline-start: var(--sp1-5);
-  padding-inline-end: var(--sp1-5);
+  padding-inline: var(--sp);
+  font-size: var(--font-size-base);
+  line-height: normal;
 }
 
 .button--primary {
   color: var(--color--white);
-  background-color: var(--color--blue-20);
+  border-color: var(--color--primary-40);
+  background-color: var(--color--primary-40);
 
   &:hover,
   &:focus {
     color: var(--color--white);
-    background-color: var(--color--blue-50);
+    border-color: var(--color--primary-30);
+    background-color: var(--color--primary-30);
   }
 
   &:active {
     color: var(--color--white);
-    background-color: var(--color--blue-20);
+    background-color: var(--color--primary-40);
   }
 
   &:disabled,
   &.is-disabled {
     color: var(--color--white);
-    background-color: var(--color--gray-70);
+    background-color: var(--color--gray-90);
   }
 }
 
 .button--icon-back {
-  &:before {
+  display: inline-flex;
+  align-items: center;
+
+  &::before {
     display: block;
     width: 0.5em;
     height: 0.5em;
@@ -123,6 +122,6 @@
   }
 }
 
-[dir="rtl"] .button--icon-back:before {
+[dir="rtl"] .button--icon-back::before {
   transform: rotate(-45deg);
 }

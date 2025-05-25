@@ -147,13 +147,6 @@ class FileStorage implements PhpStorageInterface {
   /**
    * {@inheritdoc}
    */
-  public function writeable() {
-    return TRUE;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public function deleteAll() {
     return $this->unlink($this->directory);
   }

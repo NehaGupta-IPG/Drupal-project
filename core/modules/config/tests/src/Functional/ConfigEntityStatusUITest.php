@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\config\Functional;
 
 use Drupal\Tests\BrowserTestBase;
@@ -12,9 +14,7 @@ use Drupal\Tests\BrowserTestBase;
 class ConfigEntityStatusUITest extends BrowserTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['config_test'];
 
@@ -26,17 +26,18 @@ class ConfigEntityStatusUITest extends BrowserTestBase {
   /**
    * Tests status operations.
    */
-  public function testCRUD() {
+  public function testCRUD(): void {
     $this->drupalLogin($this->drupalCreateUser([
       'administer site configuration',
     ]));
 
-    $id = strtolower($this->randomMachineName());
+    $id = $this->randomMachineName();
     $edit = [
       'id' => $id,
       'label' => $this->randomMachineName(),
     ];
-    $this->drupalPostForm('admin/structure/config_test/add', $edit, 'Save');
+    $this->drupalGet('admin/structure/config_test/add');
+    $this->submitForm($edit, 'Save');
 
     $entity = \Drupal::entityTypeManager()->getStorage('config_test')->load($id);
 

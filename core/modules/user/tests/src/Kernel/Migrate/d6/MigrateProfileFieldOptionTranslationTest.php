@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\user\Kernel\Migrate\d6;
 
 use Drupal\Tests\migrate_drupal\Kernel\d6\MigrateDrupal6TestBase;
@@ -29,6 +31,7 @@ class MigrateProfileFieldOptionTranslationTest extends MigrateDrupal6TestBase {
     $this->executeMigrations([
       'language',
       'user_profile_field',
+      'user_profile_field_instance',
       'd6_profile_field_option_translation',
     ]);
   }
@@ -36,7 +39,7 @@ class MigrateProfileFieldOptionTranslationTest extends MigrateDrupal6TestBase {
   /**
    * Tests the Drupal 6 field option translation.
    */
-  public function testFieldOptionTranslation() {
+  public function testFieldOptionTranslation(): void {
     $language_manager = $this->container->get('language_manager');
 
     /** @var \Drupal\language\Config\LanguageConfigOverride $config_translation */

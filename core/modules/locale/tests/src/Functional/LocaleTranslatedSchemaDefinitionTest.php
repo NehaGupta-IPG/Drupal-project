@@ -1,7 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\locale\Functional;
 
+use Drupal\Core\Url;
 use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\Tests\BrowserTestBase;
 use Drupal\Tests\RequirementsPageTrait;
@@ -16,16 +19,19 @@ class LocaleTranslatedSchemaDefinitionTest extends BrowserTestBase {
   use RequirementsPageTrait;
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['language', 'locale', 'node'];
 
   /**
    * {@inheritdoc}
    */
-  protected $defaultTheme = 'classy';
+  protected $defaultTheme = 'stark';
+
+  /**
+   * {@inheritdoc}
+   */
+  protected bool $useOneTimeLoginLinks = FALSE;
 
   /**
    * {@inheritdoc}
@@ -37,13 +43,13 @@ class LocaleTranslatedSchemaDefinitionTest extends BrowserTestBase {
 
     // Clear all caches so that the base field definition, its cache in the
     // entity field manager, the t() cache, etc. are all cleared.
-    drupal_flush_all_caches();
+    $this->resetAll();
   }
 
   /**
    * Tests that translated field descriptions do not affect the update system.
    */
-  public function testTranslatedSchemaDefinition() {
+  public function testTranslatedSchemaDefinition(): void {
     /** @var \Drupal\locale\StringDatabaseStorage $stringStorage */
     $stringStorage = \Drupal::service('locale.storage');
 
@@ -58,7 +64,7 @@ class LocaleTranslatedSchemaDefinitionTest extends BrowserTestBase {
     ])->save();
 
     // Ensure that the field is translated when access through the API.
-    $this->assertEqual('Translated Revision ID', \Drupal::service('entity_field.manager')->getBaseFieldDefinitions('node')['vid']->getLabel());
+    $this->assertEquals('Translated Revision ID', \Drupal::service('entity_field.manager')->getBaseFieldDefinitions('node')['vid']->getLabel());
 
     // Assert there are no updates.
     $this->assertFalse(\Drupal::service('entity.definition_update_manager')->needsUpdates());
@@ -67,12 +73,16 @@ class LocaleTranslatedSchemaDefinitionTest extends BrowserTestBase {
   /**
    * Tests that translations do not affect the update system.
    */
-  public function testTranslatedUpdate() {
+  public function testTranslatedUpdate(): void {
     // Visit the update page to collect any strings that may be translatable.
     $user = $this->drupalCreateUser(['administer software updates']);
     $this->drupalLogin($user);
-    $update_url = $GLOBALS['base_url'] . '/update.php';
+    $update_url = Url::fromRoute('system.db_update')->setAbsolute()->toString();
+
+    // Collect strings from the PHP warning page, if applicable, as well as the
+    // main update page.
     $this->drupalGet($update_url, ['external' => TRUE]);
+    $this->updateRequirementsProblem();
 
     /** @var \Drupal\locale\StringDatabaseStorage $stringStorage */
     $stringStorage = \Drupal::service('locale.storage');
@@ -91,9 +101,7 @@ class LocaleTranslatedSchemaDefinitionTest extends BrowserTestBase {
     // markup and a link instead of specific text because text may be
     // translated.
     $this->drupalGet($update_url . '/selection', ['external' => TRUE]);
-    $this->updateRequirementsProblem();
-    $this->drupalGet($update_url . '/selection', ['external' => TRUE]);
-    $this->assertRaw('messages--status');
+    $this->assertSession()->statusMessageExists('status');
     $this->assertSession()->linkByHrefNotExists('fr/update.php/run', 'No link to run updates.');
   }
 

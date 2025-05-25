@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\system\Functional\UpdateSystem;
 
 use Drupal\Tests\BrowserTestBase;
@@ -27,18 +29,18 @@ class UpdatePathTestJavaScriptTest extends BrowserTestBase {
   }
 
   /**
-   * Test JavaScript loading at update.php.
+   * Tests JavaScript loading at update.php.
    *
    * @see ::doPreUpdateTests
    */
-  public function testJavaScriptLoading() {
+  public function testJavaScriptLoading(): void {
     $this->runUpdates();
   }
 
   /**
    * {@inheritdoc}
    */
-  protected function doSelectionTest() {
+  protected function doSelectionTest(): void {
     // Ensure that at least one JS script has drupalSettings in there.
     $scripts = $this->xpath('//script');
     $found = FALSE;
@@ -51,7 +53,7 @@ class UpdatePathTestJavaScriptTest extends BrowserTestBase {
       $src = preg_replace('#^' . $GLOBALS['base_path'] . '(.*)#i', $GLOBALS['base_url'] . '/' . '${1}', $script->getAttribute('src'));
       $file_content = file_get_contents($src);
 
-      if (strpos($file_content, 'window.drupalSettings =') !== FALSE) {
+      if (str_contains($file_content, 'window.drupalSettings =')) {
         $found = TRUE;
         break;
       }

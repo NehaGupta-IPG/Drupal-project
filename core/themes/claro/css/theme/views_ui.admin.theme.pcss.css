@@ -5,8 +5,6 @@
  * Replaces the styles provided by the views_ui module.
  */
 
-@import "../base/variables.pcss.css";
-
 .views-admin .links {
   margin: 0;
   list-style: none outside none;
@@ -32,7 +30,9 @@
 .views-admin a.icon {
   border: 1px solid #ddd;
   border-radius: 4px;
-  background: linear-gradient(-90deg, #fff 0, #e8e8e8 100%) no-repeat, repeat-y;
+  background:
+    linear-gradient(-90deg, #fff 0, #e8e8e8 100%) no-repeat,
+    repeat-y;
   box-shadow: 0 0 0 rgba(0, 0, 0, 0.3333) inset;
 }
 .views-admin a.icon:hover {
@@ -74,19 +74,27 @@
   background-position: center -52px;
 }
 .views-admin a.icon.delete {
-  background-position: center -52px, left top; /* LTR */
+  background-position:
+    center -52px,
+    left top; /* LTR */
 }
 [dir="rtl"] .views-admin a.icon.delete {
-  background-position: center -52px, right top;
+  background-position:
+    center -52px,
+    right top;
 }
 .views-admin .icon.rearrange {
   background-position: center -111px;
 }
 .views-admin a.icon.rearrange {
-  background-position: center -111px, left top; /* LTR */
+  background-position:
+    center -111px,
+    left top; /* LTR */
 }
 [dir="rtl"] .views-admin a.icon.rearrange {
-  background-position: center -111px, right top;
+  background-position:
+    center -111px,
+    right top;
 }
 details.box-padding {
   border: none;
@@ -233,7 +241,7 @@ td.group-title {
   bottom: -13px;
   padding: 0.5px 6px;
   text-transform: uppercase;
-  border: 1px solid var(--color-lightgray);
+  border: 1px solid var(--color-gray-200);
   background: #fff;
   font-weight: bold;
   font-style: italic;
@@ -252,9 +260,9 @@ td.group-title {
 }
 .views-displays {
   padding-bottom: 36px;
-  border-top: 1px solid var(--color-lightgray-o-80);
-  border-right: 1px solid var(--color-lightgray-o-80);
-  border-left: 1px solid var(--color-lightgray-o-80);
+  border-top: 1px solid var(--color-gray-200-o-80);
+  border-right: 1px solid var(--color-gray-200-o-80);
+  border-left: 1px solid var(--color-gray-200-o-80);
 }
 .views-display-top {
   position: relative;
@@ -262,16 +270,17 @@ td.group-title {
   flex-wrap: wrap;
   justify-content: space-between;
   padding: var(--space-s) var(--space-s) calc(var(--space-s) - 5px);
-  border-bottom: 1px solid var(--color-lightgray-o-80);
-  background-color: var(--color-whitesmoke);
+  border-bottom: 1px solid var(--color-gray-200-o-80);
+  background-color: var(--color-gray-050);
 }
-.form-edit .form-actions {
+.form-edit .form-actions,
+.form-edit .field-actions {
   margin-top: 0;
   padding: var(--space-s) var(--space-m);
-  border-right: 1px solid var(--color-lightgray-o-80);
-  border-bottom: 1px solid var(--color-lightgray-o-80);
-  border-left: 1px solid var(--color-lightgray-o-80);
-  background-color: var(--color-whitesmoke);
+  border-right: 1px solid var(--color-gray-200-o-80);
+  border-bottom: 1px solid var(--color-gray-200-o-80);
+  border-left: 1px solid var(--color-gray-200-o-80);
+  background-color: var(--color-gray-050);
 }
 .edit-display-settings {
   margin: var(--space-l) var(--space-l) 0 var(--space-l);
@@ -290,7 +299,7 @@ td.group-title {
   padding: 0.125rem 0 0;
 }
 .views-display-column {
-  border: 1px solid var(--color-lightgray-o-80);
+  border: 1px solid var(--color-gray-200-o-80);
   border-radius: var(--base-border-radius);
   box-shadow: var(--details-box-shadow);
 }
@@ -298,8 +307,12 @@ td.group-title {
   margin-top: 0;
 }
 .view-preview-form .form-item--view-args,
-.view-preview-form .form-actions {
+.view-preview-form .form-actions,
+.view-preview-form .field-actions {
   margin-top: 5px;
+}
+.view-preview-form .views-bulk-actions__item {
+  margin-block-start: 0;
 }
 .view-preview-form .arguments-preview {
   font-size: 1em;
@@ -316,11 +329,13 @@ td.group-title {
   display: inline-block;
 }
 .form-item--live-preview,
-.view-preview-form .form-actions {
+.view-preview-form .form-actions,
+.view-preview-form .field-actions {
   vertical-align: top;
 }
 
-@media screen and (min-width: 45em) { /* 720px */
+@media screen and (min-width: 45em) {
+  /* 720px */
   .view-preview-form .form-type-textfield .description {
     white-space: nowrap;
   }
@@ -332,7 +347,7 @@ td.group-title {
   margin: 0 0 var(--space-xs);
   padding-top: var(--space-xs);
   padding-bottom: var(--space-xs);
-  border-bottom: 1px solid var(--color-lightgray-o-80);
+  border-bottom: 1px solid var(--color-gray-200-o-80);
   line-height: 20px;
 }
 .views-ui-display-tab-bucket:last-of-type {
@@ -408,7 +423,12 @@ td.group-title {
 .views-edit-view {
   margin-bottom: 15px;
 }
-
+.views-edit-view.disabled .views-displays {
+  background-color: var(--color-red-020);
+}
+.views-edit-view.disabled .views-display-column {
+  background: var(--color-white);
+}
 /* The contents of the popup dialog on the views edit form. */
 .views-filterable-options .form-type-checkbox {
   padding: 5px 8px;
@@ -469,9 +489,9 @@ td.group-title {
 .views-ui-dialog .views-offset-top:not(:empty) {
   position: relative;
   padding: var(--space-s) var(--space-m) var(--space-xs);
-  background-color: var(--color-whitesmoke);
+  background-color: var(--color-gray-050);
 }
-.views-ui-dialog .views-offset-top:not(:empty):after {
+.views-ui-dialog .views-offset-top:not(:empty)::after {
   position: absolute;
   bottom: 0;
   left: 0;
@@ -488,27 +508,6 @@ td.group-title {
 .views-ui-dialog .views-offset-top .form-item {
   max-width: 40%;
   margin: 0 var(--space-s) var(--space-s) 0;
-}
-
-.views-ui-dialog .views-progress-indicator {
-  position: absolute;
-  z-index: 1;
-  top: 0;
-  right: var(--jui-dialog-close-button-reserved-space); /* LTR */
-  color: var(--jui-dialog-title-color);
-  font-size: var(--font-size-xxs);
-  line-height: var(--jui-dialog-close-button-reserved-space);
-}
-[dir="rtl"] .views-ui-dialog .views-progress-indicator {
-  right: auto;
-  left: var(--jui-dialog-close-button-reserved-space);
-}
-
-.views-ui-dialog .views-progress-indicator:before {
-  content: "\003C\00A0";
-}
-.views-ui-dialog .views-progress-indicator:after {
-  content: "\00A0\003E";
 }
 
 .views-ui-dialog .tabledrag-toggle-weight-wrapper {
@@ -529,7 +528,7 @@ td.group-title {
   border-collapse: collapse;
 }
 .views-ui-rearrange-filter-form tr td[rowspan] {
-  border: 1px solid var(--color-lightgray);
+  border: 1px solid var(--color-gray-200);
 }
 .views-ui-rearrange-filter-form tr[id^="views-row"] {
   border-right: 1px solid #cdcdcd; /* LTR */
@@ -539,13 +538,14 @@ td.group-title {
   border-left: 1px solid #cdcdcd;
 }
 .views-ui-rearrange-filter-form .draggable td {
-  border-bottom: 0.0625rem solid var(--color-lightgray);
+  border-bottom: 0.0625rem solid var(--color-gray-200);
 }
 .views-ui-rearrange-filter-form .group-empty {
   border-bottom: 1px solid #cdcdcd;
 }
 .form-item-options-expose-required,
 .form-item-options-expose-label,
+.form-item-options-expose-field-identifier,
 .form-item-options-expose-description {
   margin-top: 6px;
   margin-bottom: 6px;
@@ -553,6 +553,7 @@ td.group-title {
 }
 [dir="rtl"] .form-item-options-expose-required,
 [dir="rtl"] .form-item-options-expose-label,
+[dir="rtl"] .form-item-options-expose-field-identifier,
 [dir="rtl"] .form-item-options-expose-description {
   margin-right: 18px;
   margin-left: 0;
@@ -567,7 +568,7 @@ td.group-title {
   margin-top: 0;
   padding: 8px 12px;
   border-bottom: 1px solid #ccc;
-  background-color: var(--color-whitesmoke);
+  background-color: var(--color-gray-050);
 }
 .view-preview-form .form-item--live-preview {
   position: absolute;
@@ -592,7 +593,7 @@ td.group-title {
   display: inline-block;
   margin-top: 0;
   margin-bottom: 0;
-  color: #818181;
+  color: var(--color-gray-800);
   font-size: 13px;
   font-weight: normal;
   line-height: 1.6154;
@@ -620,7 +621,7 @@ td.group-title {
   border-color: var(--color-bg);
 }
 .views-query-info table tr {
-  background-color: var(--color-whitesmoke);
+  background-color: var(--color-gray-050);
 }
 .views-query-info table th,
 .views-query-info table td {

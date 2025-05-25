@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\FunctionalTests\Installer;
 
 use Drupal\Tests\BrowserTestBase;
@@ -36,9 +38,9 @@ class SiteNameTest extends BrowserTestBase {
   /**
    * Tests that the desired site name appears on the page after installation.
    */
-  public function testSiteName() {
+  public function testSiteName(): void {
     $this->drupalGet('');
-    $this->assertRaw($this->siteName);
+    $this->assertSession()->pageTextContains($this->siteName);
   }
 
 }

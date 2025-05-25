@@ -2,23 +2,24 @@
 
 namespace Drupal\system\Plugin\Condition;
 
+use Drupal\Core\Condition\Attribute\Condition;
 use Drupal\Core\Condition\ConditionPluginBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Path\CurrentPathStack;
 use Drupal\Core\Path\PathMatcherInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\path_alias\AliasManagerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
  * Provides a 'Request Path' condition.
- *
- * @Condition(
- *   id = "request_path",
- *   label = @Translation("Request Path"),
- * )
  */
+#[Condition(
+  id: "request_path",
+  label: new TranslatableMarkup("Request Path"),
+)]
 class RequestPath extends ConditionPluginBase implements ContainerFactoryPluginInterface {
 
   /**
@@ -63,7 +64,7 @@ class RequestPath extends ConditionPluginBase implements ContainerFactoryPluginI
    * @param array $configuration
    *   A configuration array containing information about the plugin instance.
    * @param string $plugin_id
-   *   The plugin_id for the plugin instance.
+   *   The plugin ID for the plugin instance.
    * @param array $plugin_definition
    *   The plugin implementation definition.
    */
@@ -115,6 +116,19 @@ class RequestPath extends ConditionPluginBase implements ContainerFactoryPluginI
   /**
    * {@inheritdoc}
    */
+  public function validateConfigurationForm(array &$form, FormStateInterface $form_state) {
+    $paths = array_map('trim', explode("\n", $form_state->getValue('pages')));
+    foreach ($paths as $path) {
+      if (empty($path) || $path === '<front>' || str_starts_with($path, '/')) {
+        continue;
+      }
+      $form_state->setErrorByName('pages', $this->t("The path %path requires a leading forward slash when used with the Pages setting.", ['%path' => $path]));
+    }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function submitConfigurationForm(array &$form, FormStateInterface $form_state) {
     $this->configuration['pages'] = $form_state->getValue('pages');
     parent::submitConfigurationForm($form, $form_state);
@@ -124,6 +138,9 @@ class RequestPath extends ConditionPluginBase implements ContainerFactoryPluginI
    * {@inheritdoc}
    */
   public function summary() {
+    if (empty($this->configuration['pages'])) {
+      return $this->t('No page is specified');
+    }
     $pages = array_map('trim', explode("\n", $this->configuration['pages']));
     $pages = implode(', ', $pages);
     if (!empty($this->configuration['negate'])) {

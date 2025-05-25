@@ -1,22 +1,21 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\user\Functional;
 
 use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\Tests\BrowserTestBase;
 
 /**
- * Tests whether proper language is stored for new users and access to language
- * selector.
+ * Tests preferred language configuration and language selector access.
  *
  * @group user
  */
 class UserLanguageCreationTest extends BrowserTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['user', 'language'];
 
@@ -28,7 +27,7 @@ class UserLanguageCreationTest extends BrowserTestBase {
   /**
    * Functional test for language handling during user creation.
    */
-  public function testLocalUserCreation() {
+  public function testLocalUserCreation(): void {
     // User to add and remove language and create new users.
     $admin_user = $this->drupalCreateUser([
       'administer languages',
@@ -45,8 +44,9 @@ class UserLanguageCreationTest extends BrowserTestBase {
     $edit = [
       'language_interface[enabled][language-url]' => TRUE,
     ];
-    $this->drupalPostForm('admin/config/regional/language/detection', $edit, t('Save settings'));
-    $this->assertText(t('Language detection configuration saved.'), 'Set language negotiation.');
+    $this->drupalGet('admin/config/regional/language/detection');
+    $this->submitForm($edit, 'Save settings');
+    $this->assertSession()->pageTextContains('Language detection configuration saved.');
 
     // Check if the language selector is available on admin/people/create and
     // set to the currently active language.
@@ -63,11 +63,12 @@ class UserLanguageCreationTest extends BrowserTestBase {
       'pass[pass2]' => $username,
     ];
 
-    $this->drupalPostForm($langcode . '/admin/people/create', $edit, t('Create new account'));
+    $this->drupalGet($langcode . '/admin/people/create');
+    $this->submitForm($edit, 'Create new account');
 
     $user = user_load_by_name($username);
-    $this->assertEqual($user->getPreferredLangcode(), $langcode, 'New user has correct preferred language set.');
-    $this->assertEqual($user->language()->getId(), $langcode, 'New user has correct profile language set.');
+    $this->assertEquals($langcode, $user->getPreferredLangcode(), 'New user has correct preferred language set.');
+    $this->assertEquals($langcode, $user->language()->getId(), 'New user has correct profile language set.');
 
     // Register a new user and check if the language selector is hidden.
     $this->drupalLogout();
@@ -81,11 +82,12 @@ class UserLanguageCreationTest extends BrowserTestBase {
       'mail' => $this->randomMachineName(4) . '@example.com',
     ];
 
-    $this->drupalPostForm($langcode . '/user/register', $edit, t('Create new account'));
+    $this->drupalGet($langcode . '/user/register');
+    $this->submitForm($edit, 'Create new account');
 
     $user = user_load_by_name($username);
-    $this->assertEqual($user->getPreferredLangcode(), $langcode, 'New user has correct preferred language set.');
-    $this->assertEqual($user->language()->getId(), $langcode, 'New user has correct profile language set.');
+    $this->assertEquals($langcode, $user->getPreferredLangcode(), 'New user has correct preferred language set.');
+    $this->assertEquals($langcode, $user->language()->getId(), 'New user has correct profile language set.');
 
     // Test that the admin can use the language selector and if the correct
     // language is saved.
@@ -102,7 +104,8 @@ class UserLanguageCreationTest extends BrowserTestBase {
       'pass[pass2]' => $user->passRaw,
     ];
 
-    $this->drupalPostForm($user_edit, $edit, t('Save'));
+    $this->drupalGet($user_edit);
+    $this->submitForm($edit, 'Save');
 
     $this->drupalLogin($user);
     $this->drupalGet($user_edit);

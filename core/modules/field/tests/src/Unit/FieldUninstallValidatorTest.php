@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\field\Unit;
 
 use Drupal\Tests\UnitTestCase;
@@ -11,12 +13,14 @@ use Drupal\Tests\UnitTestCase;
 class FieldUninstallValidatorTest extends UnitTestCase {
 
   /**
+   * The mock field uninstall validator.
+   *
    * @var \Drupal\field\FieldUninstallValidator|\PHPUnit\Framework\MockObject\MockObject
    */
   protected $fieldUninstallValidator;
 
   /**
-   * The mock field type plugin manager;
+   * The mock field type plugin manager.
    *
    * @var \Drupal\Core\Field\FieldTypePluginManagerInterface|\PHPUnit\Framework\MockObject\MockObject
    */
@@ -29,7 +33,7 @@ class FieldUninstallValidatorTest extends UnitTestCase {
     parent::setUp();
     $this->fieldUninstallValidator = $this->getMockBuilder('Drupal\field\FieldUninstallValidator')
       ->disableOriginalConstructor()
-      ->setMethods(['getFieldStoragesByModule', 'getFieldTypeLabel'])
+      ->onlyMethods(['getFieldStoragesByModule', 'getFieldTypeLabel'])
       ->getMock();
     $this->fieldUninstallValidator->setStringTranslation($this->getStringTranslationStub());
   }
@@ -37,7 +41,7 @@ class FieldUninstallValidatorTest extends UnitTestCase {
   /**
    * @covers ::validate
    */
-  public function testValidateNoStorages() {
+  public function testValidateNoStorages(): void {
     $this->fieldUninstallValidator->expects($this->once())
       ->method('getFieldStoragesByModule')
       ->willReturn([]);
@@ -51,7 +55,7 @@ class FieldUninstallValidatorTest extends UnitTestCase {
   /**
    * @covers ::validate
    */
-  public function testValidateDeleted() {
+  public function testValidateDeleted(): void {
     $field_storage = $this->getMockBuilder('Drupal\field\Entity\FieldStorageConfig')
       ->disableOriginalConstructor()
       ->getMock();
@@ -71,7 +75,7 @@ class FieldUninstallValidatorTest extends UnitTestCase {
   /**
    * @covers ::validate
    */
-  public function testValidateNoDeleted() {
+  public function testValidateNoDeleted(): void {
     $field_storage = $this->getMockBuilder('Drupal\field\Entity\FieldStorageConfig')
       ->disableOriginalConstructor()
       ->getMock();

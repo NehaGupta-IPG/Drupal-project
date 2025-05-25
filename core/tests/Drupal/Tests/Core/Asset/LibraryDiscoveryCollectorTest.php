@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\Core\Asset;
 
 use Drupal\Core\Asset\LibraryDiscoveryCollector;
@@ -81,12 +83,19 @@ class LibraryDiscoveryCollectorTest extends UnitTestCase {
     ],
   ];
 
+  /**
+   * The active theme.
+   *
+   * @var \Drupal\Core\Theme\ActiveTheme|\PHPUnit\Framework\MockObject\MockObject
+   */
   protected $activeTheme;
 
   /**
    * {@inheritdoc}
    */
   protected function setUp(): void {
+    parent::setUp();
+
     $this->cache = $this->createMock('Drupal\Core\Cache\CacheBackendInterface');
     $this->lock = $this->createMock('Drupal\Core\Lock\LockBackendInterface');
     $this->themeManager = $this->getMockBuilder('Drupal\Core\Theme\ThemeManagerInterface')
@@ -102,7 +111,7 @@ class LibraryDiscoveryCollectorTest extends UnitTestCase {
    *
    * @covers ::resolveCacheMiss
    */
-  public function testResolveCacheMiss() {
+  public function testResolveCacheMiss(): void {
     $this->activeTheme = $this->getMockBuilder(ActiveTheme::class)
       ->disableOriginalConstructor()
       ->getMock();
@@ -128,7 +137,7 @@ class LibraryDiscoveryCollectorTest extends UnitTestCase {
    *
    * @covers ::destruct
    */
-  public function testDestruct() {
+  public function testDestruct(): void {
     $this->activeTheme = $this->getMockBuilder(ActiveTheme::class)
       ->disableOriginalConstructor()
       ->getMock();
@@ -150,7 +159,7 @@ class LibraryDiscoveryCollectorTest extends UnitTestCase {
     $this->lock->expects($this->once())
       ->method('acquire')
       ->with($lock_key)
-      ->will($this->returnValue(TRUE));
+      ->willReturn(TRUE);
     $this->cache->expects($this->exactly(2))
       ->method('get')
       ->with('library_info:kitten_theme')
@@ -172,7 +181,7 @@ class LibraryDiscoveryCollectorTest extends UnitTestCase {
    *
    * @covers ::applyLibrariesExtend
    */
-  public function testLibrariesExtend() {
+  public function testLibrariesExtend(): void {
     $this->activeTheme = $this->getMockBuilder(ActiveTheme::class)
       ->disableOriginalConstructor()
       ->getMock();
@@ -189,18 +198,18 @@ class LibraryDiscoveryCollectorTest extends UnitTestCase {
           'kitten_theme/extend',
         ],
       ]);
-    $this->libraryDiscoveryParser->expects($this->at(0))
+    $this->libraryDiscoveryParser->expects($this->exactly(2))
       ->method('buildByExtension')
-      ->with('test')
-      ->willReturn($this->libraryData);
-    $this->libraryDiscoveryParser->expects($this->at(1))
-      ->method('buildByExtension')
-      ->with('kitten_theme')
-      ->willReturn([
-        'extend' => [
-          'css' => [
-            'theme' => [
-              'baz.css' => [],
+      ->willReturnMap([
+        ['test', $this->libraryData],
+        [
+          'kitten_theme', [
+            'extend' => [
+              'css' => [
+                'theme' => [
+                  'baz.css' => [],
+                ],
+              ],
             ],
           ],
         ],
@@ -217,7 +226,7 @@ class LibraryDiscoveryCollectorTest extends UnitTestCase {
    *
    * @group legacy
    */
-  public function testLibrariesExtendDeprecated() {
+  public function testLibrariesExtendDeprecated(): void {
     $this->expectDeprecation('Theme "test" is extending a deprecated library. The "test/test_4" asset library is deprecated in drupal:X.0.0 and is removed from drupal:Y.0.0. Use the test_3 library instead. See https://www.example.com');
     $this->activeTheme = $this->getMockBuilder(ActiveTheme::class)
       ->disableOriginalConstructor()
@@ -235,18 +244,18 @@ class LibraryDiscoveryCollectorTest extends UnitTestCase {
           'kitten_theme/extend',
         ],
       ]);
-    $this->libraryDiscoveryParser->expects($this->at(0))
+    $this->libraryDiscoveryParser->expects($this->exactly(2))
       ->method('buildByExtension')
-      ->with('test')
-      ->willReturn($this->libraryData);
-    $this->libraryDiscoveryParser->expects($this->at(1))
-      ->method('buildByExtension')
-      ->with('kitten_theme')
-      ->willReturn([
-        'extend' => [
-          'css' => [
-            'theme' => [
-              'baz.css' => [],
+      ->willReturnMap([
+        ['test', $this->libraryData],
+        [
+          'kitten_theme', [
+            'extend' => [
+              'css' => [
+                'theme' => [
+                  'baz.css' => [],
+                ],
+              ],
             ],
           ],
         ],

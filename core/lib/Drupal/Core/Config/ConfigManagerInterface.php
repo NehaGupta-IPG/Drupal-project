@@ -97,6 +97,7 @@ interface ConfigManagerInterface {
    * store.
    *
    * @return \Drupal\Core\Config\Entity\ConfigDependencyManager
+   *   The configuration dependency manager.
    */
   public function getConfigDependencyManager();
 
@@ -114,7 +115,7 @@ interface ConfigManagerInterface {
    * @return \Drupal\Core\Config\Entity\ConfigEntityDependency[]
    *   An array of configuration entity dependency objects.
    */
-  public function findConfigEntityDependents($type, array $names);
+  public function findConfigEntityDependencies($type, array $names);
 
   /**
    * Finds config entities that are dependent on extensions or entities.
@@ -130,10 +131,10 @@ interface ConfigManagerInterface {
    * @return \Drupal\Core\Config\Entity\ConfigEntityInterface[]
    *   An array of dependencies as configuration entities.
    */
-  public function findConfigEntityDependentsAsEntities($type, array $names);
+  public function findConfigEntityDependenciesAsEntities($type, array $names);
 
   /**
-   * Lists which config entities to update and delete on removal of a dependency.
+   * Lists config entities to update and delete on removal of a dependency.
    *
    * @param string $type
    *   The type of dependency being checked. Either 'module', 'theme', 'config'

@@ -1,8 +1,9 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\Core\Extension;
 
-use Drupal\Component\FileCache\FileCacheFactory;
 use Drupal\Core\Extension\Extension;
 use Drupal\Core\Extension\ExtensionDiscovery;
 use Drupal\Tests\UnitTestCase;
@@ -22,7 +23,7 @@ class ExtensionDiscoveryTest extends UnitTestCase {
    *
    * @covers ::scan
    */
-  public function testExtensionDiscoveryVfs() {
+  public function testExtensionDiscoveryVfs(): void {
 
     // Set up the file system.
     $filesystem = [];
@@ -65,55 +66,40 @@ class ExtensionDiscoveryTest extends UnitTestCase {
   }
 
   /**
-   * Tests changing extension discovery file cache objects to arrays.
+   * Tests finding modules that have a trailing comment on the type property.
    *
    * @covers ::scan
-   * @runInSeparateProcess
    */
-  public function testExtensionDiscoveryCache() {
-    // Set up an extension object in the cache to mimic site prior to changing
-    // \Drupal\Core\Extension\ExtensionDiscovery::scanDirectory() to cache an
-    // array instead of an object. Note we cannot use the VFS file system
-    // because FileCache does not support stream wrappers.
-    $extension = new Extension($this->root, 'module', 'core/modules/user/user.info.yml', 'user.module');
-    $extension->subpath = 'modules/user';
-    $extension->origin = 'core';
-    // Undo \Drupal\Tests\UnitTestCase::setUp() so FileCache works.
-    FileCacheFactory::setConfiguration([]);
-    $file_cache = FileCacheFactory::get('extension_discovery');
-    $file_cache->set($this->root . '/core/modules/user/user.info.yml', $extension);
-
-    // Create an ExtensionDiscovery object to test.
+  public function testExtensionDiscoveryTypeComment(): void {
     $extension_discovery = new ExtensionDiscovery($this->root, TRUE, [], 'sites/default');
-    $modules = $extension_discovery->scan('module', FALSE);
-    $this->assertArrayHasKey('user', $modules);
-    $this->assertEquals((array) $extension, (array) $modules['user']);
-    $this->assertNotSame($extension, $modules['user']);
-    // FileCache item should now be an array.
-    $this->assertSame([
-      'type' => 'module',
-      'pathname' => 'core/modules/user/user.info.yml',
-      'filename' => 'user.module',
-      'subpath' => 'modules/user',
-    ], $file_cache->get($this->root . '/core/modules/user/user.info.yml'));
+    $modules = $extension_discovery->scan('module', TRUE);
+    $this->assertArrayHasKey('module_info_type_comment', $modules);
   }
 
   /**
    * Adds example files to the filesystem structure.
    *
    * @param array $filesystem_structure
+   *   An associative array where each key represents a directory.
    *
    * @return string[][]
    *   Format: $[$type][$name] = $yml_file
    *   E.g. $['module']['system'] = 'system.info.yml'
    */
-  protected function populateFilesystemStructure(array &$filesystem_structure) {
+  protected function populateFilesystemStructure(array &$filesystem_structure): array {
     $info_by_file = [
       'core/profiles/standard/standard.info.yml' => [
         'type' => 'profile',
       ],
       'core/profiles/minimal/minimal.info.yml' => [
         'type' => 'profile',
+      ],
+      'core/themes/test_theme/test_theme.info.yml' => [
+        'type' => 'theme',
+      ],
+      // Override the core instance of the 'test_theme' theme.
+      'sites/default/themes/test_theme/test_theme.info.yml' => [
+        'type' => 'theme',
       ],
       // Override the core instance of the 'minimal' profile.
       'sites/default/profiles/minimal/minimal.info.yml' => [
@@ -129,13 +115,6 @@ class ExtensionDiscoveryTest extends UnitTestCase {
       'core/modules/user/user.info.yml' => [],
       'profiles/other_profile/modules/other_profile_nested_module/other_profile_nested_module.info.yml' => [],
       'core/modules/system/system.info.yml' => [],
-      'core/themes/seven/seven.info.yml' => [
-        'type' => 'theme',
-      ],
-      // Override the core instance of the 'seven' theme.
-      'sites/default/themes/seven/seven.info.yml' => [
-        'type' => 'theme',
-      ],
       'modules/devel/devel.info.yml' => [],
       'modules/poorly_placed_theme/poorly_placed_theme.info.yml' => [
         'type' => 'theme',
@@ -174,11 +153,13 @@ class ExtensionDiscoveryTest extends UnitTestCase {
 
   /**
    * @param array $filesystem_structure
+   *   An associative array where each key represents a directory.
    * @param string[] $pieces
    *   Fragments of the file path.
    * @param string $content
+   *   The contents of the file.
    */
-  protected function addFileToFilesystemStructure(array &$filesystem_structure, array $pieces, $content) {
+  protected function addFileToFilesystemStructure(array &$filesystem_structure, array $pieces, $content): void {
     $piece = array_shift($pieces);
     if ($pieces !== []) {
       $filesystem_structure += [$piece => []];

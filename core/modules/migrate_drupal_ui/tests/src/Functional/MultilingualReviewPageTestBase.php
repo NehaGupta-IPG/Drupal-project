@@ -1,8 +1,8 @@
 <?php
 
-namespace Drupal\Tests\migrate_drupal_ui\Functional;
+declare(strict_types=1);
 
-use Drupal\Tests\migrate_drupal\Traits\CreateTestContentEntitiesTrait;
+namespace Drupal\Tests\migrate_drupal_ui\Functional;
 
 /**
  * Provides a base class for testing the review step of the Upgrade form.
@@ -10,8 +10,6 @@ use Drupal\Tests\migrate_drupal\Traits\CreateTestContentEntitiesTrait;
  * When using this test class, enable translation modules.
  */
 abstract class MultilingualReviewPageTestBase extends MigrateUpgradeTestBase {
-
-  use CreateTestContentEntitiesTrait;
 
   /**
    * {@inheritdoc}
@@ -40,25 +38,11 @@ abstract class MultilingualReviewPageTestBase extends MigrateUpgradeTestBase {
    *
    * @see \Drupal\Tests\migrate_drupal_ui\Functional\MigrateUpgradeExecuteTestBase
    */
-  public function testMigrateUpgradeReviewPage() {
+  public function testMigrateUpgradeReviewPage(): void {
     $this->prepare();
     // Start the upgrade process.
-    $this->drupalGet('/upgrade');
-    $this->drupalPostForm(NULL, [], t('Continue'));
-
-    // Get valid credentials.
-    $edits = $this->translatePostValues($this->getCredentials());
-
-    $this->drupalPostForm(NULL, $edits, t('Review upgrade'));
-    $this->drupalPostForm(NULL, [], t('I acknowledge I may lose data. Continue anyway.'));
-
-    // Ensure there are no errors about missing modules from the test module.
-    $session = $this->assertSession();
-    $session->pageTextNotContains(t('Source module not found for migration_provider_no_annotation.'));
-    $session->pageTextNotContains(t('Source module not found for migration_provider_test.'));
-    $session->pageTextNotContains(t('Destination module not found for migration_provider_test'));
-    // Ensure there are no errors about any other missing migration providers.
-    $session->pageTextNotContains(t('module not found'));
+    $this->submitCredentialForm();
+    $this->submitForm([], 'I acknowledge I may lose data. Continue anyway.');
 
     // Test the upgrade paths.
     $this->assertReviewForm();
@@ -75,9 +59,9 @@ abstract class MultilingualReviewPageTestBase extends MigrateUpgradeTestBase {
 
     // Start the upgrade process.
     $this->drupalGet('/upgrade');
-    $this->drupalPostForm(NULL, [], t('Continue'));
-    $this->drupalPostForm(NULL, $edits, t('Review upgrade'));
-    $this->drupalPostForm(NULL, [], t('I acknowledge I may lose data. Continue anyway.'));
+    $this->submitForm([], 'Continue');
+    $this->submitForm($this->edits, 'Review upgrade');
+    $this->submitForm([], 'I acknowledge I may lose data. Continue anyway.');
 
     // Test the upgrade paths. First remove the module from the available paths
     // list.

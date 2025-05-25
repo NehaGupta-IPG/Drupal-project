@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\layout_builder\FunctionalJavascript;
 
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
@@ -25,6 +27,7 @@ class LayoutBuilderNestedFormUiTest extends WebDriverTestBase {
    */
   protected static $modules = [
     'block',
+    'field_ui',
     'node',
     'layout_builder',
     'layout_builder_form_block_test',
@@ -62,9 +65,9 @@ class LayoutBuilderNestedFormUiTest extends WebDriverTestBase {
   }
 
   /**
-   * Test blocks containing forms can be successfully saved editing defaults.
+   * Tests blocks containing forms can be successfully saved editing defaults.
    */
-  public function testAddingFormBlocksToDefaults() {
+  public function testAddingFormBlocksToDefaults(): void {
     $this->drupalLogin($this->drupalCreateUser([
       'configure any layout',
       'administer node display',
@@ -73,8 +76,8 @@ class LayoutBuilderNestedFormUiTest extends WebDriverTestBase {
     // From the manage display page, enable Layout Builder.
     $field_ui_prefix = 'admin/structure/types/manage/bundle_with_section_field';
     $this->drupalGet("$field_ui_prefix/display/default");
-    $this->drupalPostForm(NULL, ['layout[enabled]' => TRUE], 'Save');
-    $this->drupalPostForm(NULL, ['layout[allow_custom]' => TRUE], 'Save');
+    $this->submitForm(['layout[enabled]' => TRUE], 'Save');
+    $this->submitForm(['layout[allow_custom]' => TRUE], 'Save');
 
     // Save the entity view display so that it can be reverted to later.
     /** @var \Drupal\Core\Config\StorageInterface $active_config_storage */
@@ -96,9 +99,9 @@ class LayoutBuilderNestedFormUiTest extends WebDriverTestBase {
   }
 
   /**
-   * Test blocks containing forms can be successfully saved editing overrides.
+   * Tests blocks containing forms can be successfully saved editing overrides.
    */
-  public function testAddingFormBlocksToOverrides() {
+  public function testAddingFormBlocksToOverrides(): void {
     $this->drupalLogin($this->drupalCreateUser([
       'configure any layout',
       'administer node display',
@@ -107,8 +110,8 @@ class LayoutBuilderNestedFormUiTest extends WebDriverTestBase {
     // From the manage display page, enable Layout Builder.
     $field_ui_prefix = 'admin/structure/types/manage/bundle_with_section_field';
     $this->drupalGet("$field_ui_prefix/display/default");
-    $this->drupalPostForm(NULL, ['layout[enabled]' => TRUE], 'Save');
-    $this->drupalPostForm(NULL, ['layout[allow_custom]' => TRUE], 'Save');
+    $this->submitForm(['layout[enabled]' => TRUE], 'Save');
+    $this->submitForm(['layout[allow_custom]' => TRUE], 'Save');
 
     $expected_save_message = 'The layout override has been saved.';
     $nid = 1;
@@ -131,7 +134,7 @@ class LayoutBuilderNestedFormUiTest extends WebDriverTestBase {
    * @param string $expected_save_message
    *   The message that should be displayed after successful layout save.
    */
-  protected function addFormBlock($label, $path, $expected_save_message) {
+  protected function addFormBlock($label, $path, $expected_save_message): void {
     $assert_session = $this->assertSession();
     $page = $this->getSession()->getPage();
 

@@ -75,6 +75,8 @@ class ConfigSingleExportForm extends FormBase {
    * {@inheritdoc}
    */
   public function buildForm(array $form, FormStateInterface $form_state, $config_type = NULL, $config_name = NULL) {
+    $form['#prefix'] = '<div id="js-config-form-wrapper">';
+    $form['#suffix'] = '</div>';
     foreach ($this->entityTypeManager->getDefinitions() as $entity_type => $definition) {
       if ($definition->entityClassImplements(ConfigEntityInterface::class)) {
         $this->definitions[$entity_type] = $definition;
@@ -95,7 +97,7 @@ class ConfigSingleExportForm extends FormBase {
       '#default_value' => $config_type,
       '#ajax' => [
         'callback' => '::updateConfigurationType',
-        'wrapper' => 'edit-config-type-wrapper',
+        'wrapper' => 'js-config-form-wrapper',
       ],
     ];
     $default_type = $form_state->getValue('config_type', $config_type);
@@ -134,7 +136,8 @@ class ConfigSingleExportForm extends FormBase {
    */
   public function updateConfigurationType($form, FormStateInterface $form_state) {
     $form['config_name']['#options'] = $this->findConfiguration($form_state->getValue('config_type'));
-    return $form['config_name'];
+    $form['export']['#value'] = NULL;
+    return $form;
   }
 
   /**
@@ -151,8 +154,9 @@ class ConfigSingleExportForm extends FormBase {
       $name = $form_state->getValue('config_name');
     }
     // Read the raw data for this config name, encode it, and display it.
-    $form['export']['#value'] = Yaml::encode($this->configStorage->read($name));
-    $form['export']['#description'] = $this->t('Filename: %name', ['%name' => $name . '.yml']);
+    $exists = $this->configStorage->exists($name);
+    $form['export']['#value'] = !$exists ? NULL : Yaml::encode($this->configStorage->read($name));
+    $form['export']['#description'] = !$exists ? NULL : $this->t('Filename: %name', ['%name' => $name . '.yml']);
     return $form['export'];
   }
 
@@ -169,7 +173,7 @@ class ConfigSingleExportForm extends FormBase {
       foreach ($entity_storage->loadMultiple() as $entity) {
         $entity_id = $entity->id();
         if ($label = $entity->label()) {
-          $names[$entity_id] = new TranslatableMarkup('@label (@id)', ['@label' => $label, '@id' => $entity_id]);
+          $names[$entity_id] = new TranslatableMarkup('@id (@label)', ['@label' => $label, '@id' => $entity_id]);
         }
         else {
           $names[$entity_id] = $entity_id;
@@ -184,11 +188,11 @@ class ConfigSingleExportForm extends FormBase {
       }, $this->definitions);
 
       // Find all config, and then filter our anything matching a config prefix.
-      $names = $this->configStorage->listAll();
+      $names += $this->configStorage->listAll();
       $names = array_combine($names, $names);
       foreach ($names as $config_name) {
         foreach ($config_prefixes as $config_prefix) {
-          if (strpos($config_name, $config_prefix) === 0) {
+          if (str_starts_with($config_name, $config_prefix)) {
             unset($names[$config_name]);
           }
         }

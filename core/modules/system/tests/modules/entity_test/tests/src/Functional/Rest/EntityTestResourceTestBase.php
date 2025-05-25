@@ -1,13 +1,19 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\entity_test\Functional\Rest;
 
-use Drupal\entity_test\Entity\EntityTest;
-use Drupal\Tests\rest\Functional\EntityResource\EntityResourceTestBase;
+use Drupal\Core\Entity\EntityDefinitionUpdateManagerInterface;
+use Drupal\Core\State\StateInterface;
+use Drupal\Tests\rest\Functional\EntityResource\ConfigEntityResourceTestBase;
 use Drupal\Tests\system\Functional\Entity\Traits\EntityDefinitionTestTrait;
 use Drupal\user\Entity\User;
 
-abstract class EntityTestResourceTestBase extends EntityResourceTestBase {
+/**
+ * Resource test base for the EntityTest entity.
+ */
+abstract class EntityTestResourceTestBase extends ConfigEntityResourceTestBase {
 
   use EntityDefinitionTestTrait;
 
@@ -27,9 +33,23 @@ abstract class EntityTestResourceTestBase extends EntityResourceTestBase {
   protected static $patchProtectedFieldNames = [];
 
   /**
+   * The state object.
+   *
+   * @var \Drupal\Core\State\StateInterface
+   */
+  protected StateInterface $state;
+
+  /**
    * @var \Drupal\entity_test\Entity\EntityTest
    */
   protected $entity;
+
+  /**
+   * The entity definition update manager.
+   *
+   * @var \Drupal\Core\Entity\EntityDefinitionUpdateManagerInterface
+   */
+  protected EntityDefinitionUpdateManagerInterface $entityDefinitionUpdateManager;
 
   /**
    * {@inheritdoc}
@@ -60,16 +80,18 @@ abstract class EntityTestResourceTestBase extends EntityResourceTestBase {
     $this->container->get('state')->set('entity_test.internal_field', TRUE);
     $this->applyEntityUpdates('entity_test');
 
-    $entity_test = EntityTest::create([
-      'name' => 'Llama',
-      'type' => 'entity_test',
-      // Set a value for the internal field to confirm that it will not be
-      // returned in normalization.
-      // @see entity_test_entity_base_field_info().
-      'internal_string_field' => [
-        'value' => 'This value shall not be internal!',
-      ],
-    ]);
+    $entity_test = \Drupal::entityTypeManager()
+      ->getStorage(static::$entityTypeId)
+      ->create([
+        'name' => 'Llama',
+        'type' => static::$entityTypeId,
+        // Set a value for the internal field to confirm that it will not be
+        // returned in normalization.
+        // @see entity_test_entity_base_field_info().
+        'internal_string_field' => [
+          'value' => 'This value shall not be internal!',
+        ],
+      ]);
     $entity_test->setOwnerId(0);
     $entity_test->save();
 
@@ -99,7 +121,7 @@ abstract class EntityTestResourceTestBase extends EntityResourceTestBase {
       ],
       'type' => [
         [
-          'value' => 'entity_test',
+          'value' => static::$entityTypeId,
         ],
       ],
       'name' => [
@@ -134,12 +156,12 @@ abstract class EntityTestResourceTestBase extends EntityResourceTestBase {
     return [
       'type' => [
         [
-          'value' => 'entity_test',
+          'value' => static::$entityTypeId,
         ],
       ],
       'name' => [
         [
-          'value' => 'Dramallama',
+          'value' => 'Drama llama',
         ],
       ],
     ];

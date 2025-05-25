@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\KernelTests\Core\Config;
 
 use Drupal\Core\Config\StorageComparer;
@@ -13,9 +15,7 @@ use Drupal\KernelTests\KernelTestBase;
 class ConfigSnapshotTest extends KernelTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['config_test', 'system'];
 
@@ -34,7 +34,7 @@ class ConfigSnapshotTest extends KernelTestBase {
   /**
    * Tests config snapshot creation and updating.
    */
-  public function testSnapshot() {
+  public function testSnapshot(): void {
     $active = $this->container->get('config.storage');
     $sync = $this->container->get('config.storage.sync');
     $snapshot = $this->container->get('config.storage.snapshot');
@@ -76,7 +76,7 @@ class ConfigSnapshotTest extends KernelTestBase {
 
     // Verify changed config was properly imported.
     \Drupal::configFactory()->reset($config_name);
-    $this->assertIdentical($this->config($config_name)->get($config_key), $new_data);
+    $this->assertSame($new_data, $this->config($config_name)->get($config_key));
 
     // Verify that a new snapshot was created which and that it matches
     // the active config.

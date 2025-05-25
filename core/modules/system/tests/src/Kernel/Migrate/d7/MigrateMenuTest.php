@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\system\Kernel\Migrate\d7;
 
 use Drupal\Core\Database\Database;
@@ -24,16 +26,18 @@ class MigrateMenuTest extends MigrateDrupal7TestBase {
   /**
    * Asserts various aspects of a menu.
    *
-   * @param $id
+   * @param string $id
    *   The menu ID.
    * @param string $language
    *   The menu language.
-   * @param $label
+   * @param string $label
    *   The menu label.
-   * @param $description
+   * @param string $description
    *   The menu description.
+   *
+   * @internal
    */
-  protected function assertEntity($id, $language, $label, $description) {
+  protected function assertEntity(string $id, string $language, string $label, string $description): void {
     $navigation_menu = Menu::load($id);
     $this->assertSame($id, $navigation_menu->id());
     $this->assertSame($language, $navigation_menu->language()->getId());
@@ -44,7 +48,7 @@ class MigrateMenuTest extends MigrateDrupal7TestBase {
   /**
    * Tests the Drupal 7 menu to Drupal 8 migration.
    */
-  public function testMenu() {
+  public function testMenu(): void {
     $this->assertEntity('main', 'und', 'Main menu', 'The <em>Main</em> menu is used on many sites to show the major sections of the site, often in a top navigation bar.');
     $this->assertEntity('admin', 'und', 'Management', 'The <em>Management</em> menu contains links for administrative tasks.');
     $this->assertEntity('menu-test-menu', 'und', 'Test Menu', 'Test menu description.');

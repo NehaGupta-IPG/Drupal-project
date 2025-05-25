@@ -87,7 +87,10 @@ class DefaultExceptionHtmlSubscriber extends HttpExceptionSubscriberBase {
    *   The event to process.
    */
   public function on4xx(ExceptionEvent $event) {
-    if (($exception = $event->getThrowable()) && $exception instanceof HttpExceptionInterface) {
+    // Avoid making a subrequest for 400 errors because the same conditions that
+    // caused the 400 error could also happen in the subrequest. This allows 400
+    // exceptions to fall through to FinalExceptionSubscriber::on4xx.
+    if (($exception = $event->getThrowable()) && $exception instanceof HttpExceptionInterface && $exception->getStatusCode() > 400) {
       $this->makeSubrequest($event, '/system/4xx', $exception->getStatusCode());
     }
   }
@@ -190,7 +193,7 @@ class DefaultExceptionHtmlSubscriber extends HttpExceptionSubscriberBase {
       // just log it. The DefaultExceptionSubscriber will catch the original
       // exception and handle it normally.
       $error = Error::decodeException($e);
-      $this->logger->log($error['severity_level'], '%type: @message in %function (line %line of %file).', $error);
+      $this->logger->log($error['severity_level'], Error::DEFAULT_ERROR_MESSAGE, $error);
     }
   }
 

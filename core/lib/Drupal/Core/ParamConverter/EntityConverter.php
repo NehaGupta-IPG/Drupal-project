@@ -2,10 +2,9 @@
 
 namespace Drupal\Core\ParamConverter;
 
+use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityRepositoryInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
-use Drupal\Core\Plugin\Context\Context;
-use Drupal\Core\Plugin\Context\ContextDefinition;
 use Symfony\Component\Routing\Route;
 
 /**
@@ -26,7 +25,7 @@ use Symfony\Component\Routing\Route;
  *         type: entity:node
  * @endcode
  *
- * If you want to have the entity type itself dynamic in the url you can
+ * If you want to have the entity type itself dynamic in the URL you can
  * specify it like the following:
  * @code
  * example.route:
@@ -36,6 +35,23 @@ use Symfony\Component\Routing\Route;
  *       example:
  *         type: entity:{entity_type}
  * @endcode
+ *
+ * The conversion can be limited to certain entity bundles by specifying a
+ * parameter 'bundle' definition property as an array:
+ * @code
+ * example.route:
+ *   path: foo/{example}
+ *   options:
+ *     parameters:
+ *       example:
+ *         type: entity:node
+ *         bundle:
+ *           - article
+ *           - news
+ * @endcode
+ * In the above example, only node entities of types 'article' and 'news' are
+ * converted. For a node of a different type, such as 'page', the route will
+ * return 404 'Not found'.
  *
  * If your route needs to support pending revisions, you can specify the
  * "load_latest_revision" parameter. This will ensure that the latest revision
@@ -102,28 +118,28 @@ class EntityConverter implements ParamConverterInterface {
     // If the entity type is revisionable and the parameter has the
     // "load_latest_revision" flag, load the active variant.
     if (!empty($definition['load_latest_revision'])) {
-      return $this->entityRepository->getActive($entity_type_id, $value);
+      $entity = $this->entityRepository->getActive($entity_type_id, $value);
+
+      if (
+        !empty($definition['bundle']) &&
+        $entity instanceof EntityInterface &&
+        !in_array($entity->bundle(), $definition['bundle'], TRUE)
+      ) {
+        return NULL;
+      }
+      return $entity;
     }
 
-    // Do not inject the context repository as it is not an actual dependency:
-    // it will be removed once both the TODOs below are fixed.
-    /** @var \Drupal\Core\Plugin\Context\ContextRepositoryInterface $contexts_repository */
-    $contexts_repository = \Drupal::service('context.repository');
-    // @todo Consider deprecating the legacy context operation altogether in
-    //   https://www.drupal.org/node/3031124.
-    $contexts = $contexts_repository->getAvailableContexts();
-    $contexts[EntityRepositoryInterface::CONTEXT_ID_LEGACY_CONTEXT_OPERATION] =
-      new Context(new ContextDefinition('string'), 'entity_upcast');
-    // @todo At the moment we do not need the current user context, which is
-    //   triggering some test failures. We can remove these lines once
-    //   https://www.drupal.org/node/2934192 is fixed.
-    $context_id = '@user.current_user_context:current_user';
-    if (isset($contexts[$context_id])) {
-      $account = $contexts[$context_id]->getContextValue();
-      unset($account->_skipProtectedUserFieldConstraint);
-      unset($contexts[$context_id]);
-    }
+    $contexts = ['operation' => 'entity_upcast'];
     $entity = $this->entityRepository->getCanonical($entity_type_id, $value, $contexts);
+
+    if (
+      !empty($definition['bundle']) &&
+      $entity instanceof EntityInterface &&
+      !in_array($entity->bundle(), $definition['bundle'], TRUE)
+    ) {
+      return NULL;
+    }
 
     return $entity;
   }
@@ -132,9 +148,9 @@ class EntityConverter implements ParamConverterInterface {
    * {@inheritdoc}
    */
   public function applies($definition, $name, Route $route) {
-    if (!empty($definition['type']) && strpos($definition['type'], 'entity:') === 0) {
+    if (!empty($definition['type']) && str_starts_with($definition['type'], 'entity:')) {
       $entity_type_id = substr($definition['type'], strlen('entity:'));
-      if (strpos($definition['type'], '{') !== FALSE) {
+      if (str_contains($definition['type'], '{')) {
         $entity_type_slug = substr($entity_type_id, 1, -1);
         return $name != $entity_type_slug && in_array($entity_type_slug, $route->compile()->getVariables(), TRUE);
       }

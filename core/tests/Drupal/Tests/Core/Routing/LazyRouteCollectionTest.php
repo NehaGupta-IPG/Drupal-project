@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\Core\Routing;
 
 use Drupal\Tests\UnitTestCase;
@@ -32,7 +34,7 @@ class LazyRouteCollectionTest extends UnitTestCase {
   /**
    * {@inheritdoc}
    */
-  public function setUp(): void {
+  protected function setUp(): void {
     parent::setUp();
     $this->routeProvider = $this->createMock(RouteProviderInterface::class);
     $this->testRoutes = [
@@ -45,24 +47,24 @@ class LazyRouteCollectionTest extends UnitTestCase {
    * @covers ::getIterator
    * @covers ::all
    */
-  public function testGetIterator() {
+  public function testGetIterator(): void {
     $this->routeProvider->expects($this->exactly(2))
       ->method('getRoutesByNames')
       ->with(NULL)
-      ->will($this->returnValue($this->testRoutes));
+      ->willReturn($this->testRoutes);
     $lazyRouteCollection = new LazyRouteCollection($this->routeProvider);
-    $this->assertEquals($this->testRoutes, iterator_to_array($lazyRouteCollection->getIterator()));
+    $this->assertEquals($this->testRoutes, (array) $lazyRouteCollection->getIterator());
     $this->assertEquals($this->testRoutes, $lazyRouteCollection->all());
   }
 
   /**
    * @covers ::count
    */
-  public function testCount() {
+  public function testCount(): void {
     $this->routeProvider
       ->method('getRoutesByNames')
       ->with(NULL)
-      ->will($this->returnValue($this->testRoutes));
+      ->willReturn($this->testRoutes);
     $lazyRouteCollection = new LazyRouteCollection($this->routeProvider);
     $this->assertEquals(2, $lazyRouteCollection->count());
   }
@@ -72,12 +74,12 @@ class LazyRouteCollectionTest extends UnitTestCase {
    *
    * @covers ::get
    */
-  public function testGetName() {
+  public function testGetName(): void {
     // Hit.
     $this->routeProvider
       ->method('getRouteByName')
       ->with('route_1')
-      ->will($this->returnValue($this->testRoutes['route_1']));
+      ->willReturn($this->testRoutes['route_1']);
     $lazyRouteCollection = new LazyRouteCollection($this->routeProvider);
     $this->assertEquals($lazyRouteCollection->get('route_1'), $this->testRoutes['route_1']);
 

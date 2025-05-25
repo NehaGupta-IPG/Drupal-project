@@ -2,6 +2,7 @@
 
 namespace Drupal\system\Form;
 
+use Drupal\Core\Config\TypedConfigManagerInterface;
 use Drupal\Core\Extension\ThemeHandlerInterface;
 use Drupal\Core\File\Exception\FileException;
 use Drupal\Core\File\FileSystemInterface;
@@ -15,7 +16,8 @@ use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Form\ConfigFormBase;
 use Drupal\Core\Theme\ThemeManagerInterface;
-use Symfony\Component\Mime\MimeTypeGuesserInterface;
+
+// cspell:ignore apng
 
 /**
  * Displays theme configuration for entire site and individual themes.
@@ -71,6 +73,8 @@ class ThemeSettingsForm extends ConfigFormBase {
    *
    * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
    *   The factory for configuration objects.
+   * @param \Drupal\Core\Config\TypedConfigManagerInterface $typedConfigManager
+   *   The typed config manager.
    * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
    *   The module handler instance to use.
    * @param \Drupal\Core\Extension\ThemeHandlerInterface $theme_handler
@@ -82,8 +86,8 @@ class ThemeSettingsForm extends ConfigFormBase {
    * @param \Drupal\Core\File\FileSystemInterface $file_system
    *   The file system.
    */
-  public function __construct(ConfigFactoryInterface $config_factory, ModuleHandlerInterface $module_handler, ThemeHandlerInterface $theme_handler, $mime_type_guesser, ThemeManagerInterface $theme_manager, FileSystemInterface $file_system) {
-    parent::__construct($config_factory);
+  public function __construct(ConfigFactoryInterface $config_factory, TypedConfigManagerInterface $typedConfigManager, ModuleHandlerInterface $module_handler, ThemeHandlerInterface $theme_handler, $mime_type_guesser, ThemeManagerInterface $theme_manager, FileSystemInterface $file_system) {
+    parent::__construct($config_factory, $typedConfigManager);
 
     $this->moduleHandler = $module_handler;
     $this->themeHandler = $theme_handler;
@@ -98,6 +102,7 @@ class ThemeSettingsForm extends ConfigFormBase {
   public static function create(ContainerInterface $container) {
     return new static(
       $container->get('config.factory'),
+      $container->get('config.typed'),
       $container->get('module_handler'),
       $container->get('theme_handler'),
       $container->get('file.mime_type.guesser'),
@@ -123,6 +128,10 @@ class ThemeSettingsForm extends ConfigFormBase {
   /**
    * {@inheritdoc}
    *
+   * @param array $form
+   *   An associative array containing the structure of the form.
+   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   *   The current state of the form.
    * @param string $theme
    *   The theme name.
    */
@@ -161,10 +170,10 @@ class ThemeSettingsForm extends ConfigFormBase {
 
     // Toggle settings
     $toggles = [
-      'node_user_picture' => t('User pictures in posts'),
-      'comment_user_picture' => t('User pictures in comments'),
-      'comment_user_verification' => t('User verification status in comments'),
-      'favicon' => t('Shortcut icon'),
+      'node_user_picture' => $this->t('User pictures in posts'),
+      'comment_user_picture' => $this->t('User pictures in comments'),
+      'comment_user_verification' => $this->t('User verification status in comments'),
+      'favicon' => $this->t('Shortcut icon'),
     ];
 
     // Some features are not always available
@@ -180,13 +189,14 @@ class ThemeSettingsForm extends ConfigFormBase {
 
     $form['theme_settings'] = [
       '#type' => 'details',
-      '#title' => t('Page element display'),
+      '#title' => $this->t('Page element display'),
       '#open' => TRUE,
     ];
     foreach ($toggles as $name => $title) {
       if ((!$theme) || in_array($name, $features)) {
         $form['theme_settings']['toggle_' . $name] = ['#type' => 'checkbox', '#title' => $title, '#default_value' => theme_get_setting('features.' . $name, $theme)];
-        // Disable checkboxes for features not supported in the current configuration.
+        // Disable checkboxes for features not supported in the current
+        // configuration.
         if (isset($disabled['toggle_' . $name])) {
           $form['theme_settings']['toggle_' . $name]['#disabled'] = TRUE;
         }
@@ -203,12 +213,12 @@ class ThemeSettingsForm extends ConfigFormBase {
     if ((!$theme || in_array('logo', $features)) && $this->moduleHandler->moduleExists('file')) {
       $form['logo'] = [
         '#type' => 'details',
-        '#title' => t('Logo image'),
+        '#title' => $this->t('Logo image'),
         '#open' => TRUE,
       ];
       $form['logo']['default_logo'] = [
         '#type' => 'checkbox',
-        '#title' => t('Use the logo supplied by the theme'),
+        '#title' => $this->t('Use the logo supplied by the theme'),
         '#default_value' => theme_get_setting('logo.use_default', $theme),
         '#tree' => FALSE,
       ];
@@ -223,16 +233,17 @@ class ThemeSettingsForm extends ConfigFormBase {
       ];
       $form['logo']['settings']['logo_path'] = [
         '#type' => 'textfield',
-        '#title' => t('Path to custom logo'),
+        '#title' => $this->t('Path to custom logo'),
         '#default_value' => theme_get_setting('logo.path', $theme),
       ];
       $form['logo']['settings']['logo_upload'] = [
         '#type' => 'file',
-        '#title' => t('Upload logo image'),
-        '#maxlength' => 40,
-        '#description' => t("If you don't have direct file access to the server, use this field to upload your logo."),
+        '#title' => $this->t('Upload logo image'),
+        '#description' => $this->t("If you don't have direct file access to the server, use this field to upload your logo."),
         '#upload_validators' => [
-          'file_validate_is_image' => [],
+          'FileExtension' => [
+            'extensions' => 'png gif jpg jpeg apng svg',
+          ],
         ],
       ];
     }
@@ -240,9 +251,9 @@ class ThemeSettingsForm extends ConfigFormBase {
     if (((!$theme) || in_array('favicon', $features)) && $this->moduleHandler->moduleExists('file')) {
       $form['favicon'] = [
         '#type' => 'details',
-        '#title' => t('Favicon'),
+        '#title' => $this->t('Favicon'),
         '#open' => TRUE,
-        '#description' => t("Your shortcut icon, or favicon, is displayed in the address bar and bookmarks of most browsers."),
+        '#description' => $this->t("Your shortcut icon, or favicon, is displayed in the address bar and bookmarks of most browsers."),
         '#states' => [
           // Hide the shortcut icon settings fieldset when shortcut icon display
           // is disabled.
@@ -253,7 +264,7 @@ class ThemeSettingsForm extends ConfigFormBase {
       ];
       $form['favicon']['default_favicon'] = [
         '#type' => 'checkbox',
-        '#title' => t('Use the favicon supplied by the theme'),
+        '#title' => $this->t('Use the favicon supplied by the theme'),
         '#default_value' => theme_get_setting('favicon.use_default', $theme),
       ];
       $form['favicon']['settings'] = [
@@ -267,16 +278,16 @@ class ThemeSettingsForm extends ConfigFormBase {
       ];
       $form['favicon']['settings']['favicon_path'] = [
         '#type' => 'textfield',
-        '#title' => t('Path to custom icon'),
+        '#title' => $this->t('Path to custom icon'),
         '#default_value' => theme_get_setting('favicon.path', $theme),
       ];
       $form['favicon']['settings']['favicon_upload'] = [
         '#type' => 'file',
-        '#title' => t('Upload favicon image'),
-        '#description' => t("If you don't have direct file access to the server, use this field to upload your shortcut icon."),
+        '#title' => $this->t('Upload favicon image'),
+        '#description' => $this->t("If you don't have direct file access to the server, use this field to upload your shortcut icon."),
         '#upload_validators' => [
-          'file_validate_extensions' => [
-            'ico png gif jpg jpeg apng svg',
+          'FileExtension' => [
+            'extensions' => 'ico png gif jpg jpeg apng svg webp',
           ],
         ],
       ];
@@ -303,14 +314,14 @@ class ThemeSettingsForm extends ConfigFormBase {
           $local_file = strtr($original_path, ['public:/' => PublicStream::basePath()]);
         }
         elseif ($theme) {
-          $local_file = drupal_get_path('theme', $theme) . '/' . $default;
+          $local_file = $this->themeHandler->getTheme($theme)->getPath() . '/' . $default;
         }
         else {
           $local_file = $this->themeManager->getActiveTheme()->getPath() . '/' . $default;
         }
 
-        $element['#description'] = t('Examples: <code>@implicit-public-file</code> (for a file in the public filesystem), <code>@explicit-file</code>, or <code>@local-file</code>.', [
-          '@implicit-public-file' => isset($friendly_path) ? $friendly_path : $default,
+        $element['#description'] = $this->t('Examples: <code>@implicit-public-file</code> (for a file in the public filesystem), <code>@explicit-file</code>, or <code>@local-file</code>.', [
+          '@implicit-public-file' => $friendly_path ?? $default,
           '@explicit-file' => StreamWrapperManager::getScheme($original_path) !== FALSE ? $original_path : 'public://' . $default,
           '@local-file' => $local_file,
         ]);
@@ -323,9 +334,9 @@ class ThemeSettingsForm extends ConfigFormBase {
       if (function_exists($function)) {
         $form['engine_specific'] = [
           '#type' => 'details',
-          '#title' => t('Theme-engine-specific settings'),
+          '#title' => $this->t('Theme-engine-specific settings'),
           '#open' => TRUE,
-          '#description' => t('These settings only exist for the themes based on the %engine theme engine.', ['%engine' => $themes[$theme]->prefix]),
+          '#description' => $this->t('These settings only exist for the themes based on the %engine theme engine.', ['%engine' => $themes[$theme]->prefix]),
         ];
         $function($form, $form_state);
       }
@@ -351,7 +362,7 @@ class ThemeSettingsForm extends ConfigFormBase {
       // Process the theme and all its base themes.
       foreach ($theme_keys as $theme) {
         // Include the theme-settings.php file.
-        $theme_path = drupal_get_path('theme', $theme);
+        $theme_path = $this->themeHandler->getTheme($theme)->getPath();
         $theme_settings_file = $theme_path . '/theme-settings.php';
         $theme_file = $theme_path . '/' . $theme . '.theme';
         $filenames = [$theme_settings_file, $theme_file];
@@ -423,8 +434,8 @@ class ThemeSettingsForm extends ConfigFormBase {
         $form_state->unsetValue('favicon_path');
       }
 
-      // If the user provided a path for a logo or favicon file, make sure a file
-      // exists at that path.
+      // If the user provided a path for a logo or favicon file, make sure a
+      // file exists at that path.
       if ($form_state->getValue('logo_path')) {
         $path = $this->validatePath($form_state->getValue('logo_path'));
         if (!$path) {
@@ -457,8 +468,8 @@ class ThemeSettingsForm extends ConfigFormBase {
 
     $values = $form_state->getValues();
 
-    // If the user uploaded a new logo or favicon, save it to a permanent location
-    // and use it in place of the default theme-provided file.
+    // If the user uploaded a new logo or favicon, save it to a permanent
+    // location and use it in place of the default theme-provided file.
     $default_scheme = $this->config('system.file')->get('default_scheme');
     try {
       if (!empty($values['logo_upload'])) {
@@ -467,7 +478,7 @@ class ThemeSettingsForm extends ConfigFormBase {
         $values['logo_path'] = $filename;
       }
     }
-    catch (FileException $e) {
+    catch (FileException) {
       // Ignore.
     }
     try {
@@ -478,14 +489,14 @@ class ThemeSettingsForm extends ConfigFormBase {
         $values['toggle_favicon'] = 1;
       }
     }
-    catch (FileException $e) {
+    catch (FileException) {
       // Ignore.
     }
     unset($values['logo_upload']);
     unset($values['favicon_upload']);
 
-    // If the user entered a path relative to the system files directory for
-    // a logo or favicon, store a public:// URI so the theme system can handle it.
+    // If the user entered a path relative to the system files directory for a
+    // logo or favicon, store a public:// URI so the theme system can handle it.
     if (!empty($values['logo_path'])) {
       $values['logo_path'] = $this->validatePath($values['logo_path']);
     }
@@ -494,13 +505,7 @@ class ThemeSettingsForm extends ConfigFormBase {
     }
 
     if (empty($values['default_favicon']) && !empty($values['favicon_path'])) {
-      if ($this->mimeTypeGuesser instanceof MimeTypeGuesserInterface) {
-        $values['favicon_mimetype'] = $this->mimeTypeGuesser->guessMimeType($values['favicon_path']);
-      }
-      else {
-        $values['favicon_mimetype'] = $this->mimeTypeGuesser->guess($values['favicon_path']);
-        @trigger_error('\Symfony\Component\HttpFoundation\File\MimeType\MimeTypeGuesserInterface is deprecated in drupal:9.1.0 and is removed from drupal:10.0.0. Implement \Symfony\Component\Mime\MimeTypeGuesserInterface instead. See https://www.drupal.org/node/3133341', E_USER_DEPRECATED);
-      }
+      $values['favicon_mimetype'] = $this->mimeTypeGuesser->guessMimeType($values['favicon_path']);
     }
 
     theme_settings_convert_to_config($values, $config)->save();
@@ -509,9 +514,9 @@ class ThemeSettingsForm extends ConfigFormBase {
   /**
    * Helper function for the system_theme_settings form.
    *
-   * Attempts to validate normal system paths, paths relative to the public files
-   * directory, or stream wrapper URIs. If the given path is any of the above,
-   * returns a valid path or URI that the theme system can display.
+   * Attempts to validate normal system paths, paths relative to the public
+   * files directory, or stream wrapper URIs. If the given path is any of the
+   * above, returns a valid path or URI that the theme system can display.
    *
    * @param string $path
    *   A path relative to the Drupal root or to the public files directory, or

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\system\Kernel\Scripts;
 
 use Drupal\Core\Command\DbImportCommand;
@@ -55,11 +57,11 @@ class DbImportCommandTest extends KernelTestBase {
   ];
 
   /**
-   * Test the command directly.
+   * Tests the command directly.
    *
    * @requires extension pdo_sqlite
    */
-  public function testDbImportCommand() {
+  public function testDbImportCommand(): void {
     $connection_info = [
       'driver' => 'sqlite',
       'database' => ':memory:',
@@ -69,7 +71,7 @@ class DbImportCommandTest extends KernelTestBase {
     $command = new DbImportCommand();
     $command_tester = new CommandTester($command);
     $command_tester->execute([
-      'script' => __DIR__ . '/../../../fixtures/update/drupal-8.8.0.bare.standard.php.gz',
+      'script' => __DIR__ . '/../../../fixtures/update/drupal-10.3.0.bare.standard.php.gz',
       '--database' => $this->databasePrefix,
     ]);
 

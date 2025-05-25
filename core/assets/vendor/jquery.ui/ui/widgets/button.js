@@ -1,22 +1,24 @@
 /*!
- * jQuery UI Button 1.12.1
- * http://jqueryui.com
+ * jQuery UI Button 1.14.1
+ * https://jqueryui.com
  *
- * Copyright jQuery Foundation and other contributors
+ * Copyright OpenJS Foundation and other contributors
  * Released under the MIT license.
- * http://jquery.org/license
+ * https://jquery.org/license
  */
 
 //>>label: Button
 //>>group: Widgets
 //>>description: Enhances a form with themeable buttons.
-//>>docs: http://api.jqueryui.com/button/
-//>>demos: http://jqueryui.com/button/
+//>>docs: https://api.jqueryui.com/button/
+//>>demos: https://jqueryui.com/button/
 //>>css.structure: ../../themes/base/core.css
 //>>css.structure: ../../themes/base/button.css
 //>>css.theme: ../../themes/base/theme.css
 
 ( function( factory ) {
+	"use strict";
+
 	if ( typeof define === "function" && define.amd ) {
 
 		// AMD. Register as an anonymous module.
@@ -36,10 +38,11 @@
 		// Browser globals
 		factory( jQuery );
 	}
-}( function( $ ) {
+} )( function( $ ) {
+"use strict";
 
 $.widget( "ui.button", {
-	version: "1.12.1",
+	version: "1.14.1",
 	defaultElement: "<button>",
 	options: {
 		classes: {
@@ -106,9 +109,9 @@ $.widget( "ui.button", {
 					if ( event.keyCode === $.ui.keyCode.SPACE ) {
 						event.preventDefault();
 
-						// Support: PhantomJS <= 1.9, IE 8 Only
-						// If a native click is available use it so we actually cause navigation
-						// otherwise just trigger a click event
+						// If a native click is available use it, so we
+						// actually cause navigation. Otherwise, just trigger
+						// a click event.
 						if ( this.element[ 0 ].click ) {
 							this.element[ 0 ].click();
 						} else {
@@ -263,7 +266,7 @@ $.widget( "ui.button", {
 			this._toggleClass( null, "ui-state-disabled", value );
 			this.element[ 0 ].disabled = value;
 			if ( value ) {
-				this.element.blur();
+				this.element.trigger( "blur" );
 			}
 		}
 	},
@@ -284,7 +287,7 @@ $.widget( "ui.button", {
 } );
 
 // DEPRECATED
-if ( $.uiBackCompat !== false ) {
+if ( $.uiBackCompat === true ) {
 
 	// Text and Icons options
 	$.widget( "ui.button", $.ui.button, {
@@ -342,22 +345,82 @@ if ( $.uiBackCompat !== false ) {
 	} );
 
 	$.fn.button = ( function( orig ) {
-		return function() {
-			if ( !this.length || ( this.length && this[ 0 ].tagName !== "INPUT" ) ||
-					( this.length && this[ 0 ].tagName === "INPUT" && (
-						this.attr( "type" ) !== "checkbox" && this.attr( "type" ) !== "radio"
-					) ) ) {
-				return orig.apply( this, arguments );
-			}
-			if ( !$.ui.checkboxradio ) {
-				$.error( "Checkboxradio widget missing" );
-			}
-			if ( arguments.length === 0 ) {
-				return this.checkboxradio( {
-					"icon": false
+		return function( options ) {
+			var isMethodCall = typeof options === "string";
+			var args = Array.prototype.slice.call( arguments, 1 );
+			var returnValue = this;
+
+			if ( isMethodCall ) {
+
+				// If this is an empty collection, we need to have the instance method
+				// return undefined instead of the jQuery instance
+				if ( !this.length && options === "instance" ) {
+					returnValue = undefined;
+				} else {
+					this.each( function() {
+						var methodValue;
+						var type = $( this ).attr( "type" );
+						var name = type !== "checkbox" && type !== "radio" ?
+							"button" :
+							"checkboxradio";
+						var instance = $.data( this, "ui-" + name );
+
+						if ( options === "instance" ) {
+							returnValue = instance;
+							return false;
+						}
+
+						if ( !instance ) {
+							return $.error( "cannot call methods on button" +
+								" prior to initialization; " +
+								"attempted to call method '" + options + "'" );
+						}
+
+						if ( typeof instance[ options ] !== "function" ||
+							options.charAt( 0 ) === "_" ) {
+							return $.error( "no such method '" + options + "' for button" +
+								" widget instance" );
+						}
+
+						methodValue = instance[ options ].apply( instance, args );
+
+						if ( methodValue !== instance && methodValue !== undefined ) {
+							returnValue = methodValue && methodValue.jquery ?
+								returnValue.pushStack( methodValue.get() ) :
+								methodValue;
+							return false;
+						}
+					} );
+				}
+			} else {
+
+				// Allow multiple hashes to be passed on init
+				if ( args.length ) {
+					options = $.widget.extend.apply( null, [ options ].concat( args ) );
+				}
+
+				this.each( function() {
+					var type = $( this ).attr( "type" );
+					var name = type !== "checkbox" && type !== "radio" ? "button" : "checkboxradio";
+					var instance = $.data( this, "ui-" + name );
+
+					if ( instance ) {
+						instance.option( options || {} );
+						if ( instance._init ) {
+							instance._init();
+						}
+					} else {
+						if ( name === "button" ) {
+							orig.call( $( this ), options );
+							return;
+						}
+
+						$( this ).checkboxradio( $.extend( { icon: false }, options ) );
+					}
 				} );
 			}
-			return this.checkboxradio.apply( this, arguments );
+
+			return returnValue;
 		};
 	} )( $.fn.button );
 
@@ -383,4 +446,4 @@ if ( $.uiBackCompat !== false ) {
 
 return $.ui.button;
 
-} ) );
+} );

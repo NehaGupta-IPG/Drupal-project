@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\views_ui\Functional;
 
 use Drupal\views\Views;
@@ -26,7 +28,7 @@ class DisplayExtenderUITest extends UITestBase {
   /**
    * Tests the display extender UI.
    */
-  public function testDisplayExtenderUI() {
+  public function testDisplayExtenderUI(): void {
     $this->config('views.settings')->set('display_extenders', ['display_extender_test'])->save();
 
     $view = Views::getView('test_view');
@@ -37,13 +39,14 @@ class DisplayExtenderUITest extends UITestBase {
     $this->assertSession()->linkByHrefExists($display_option_url, 0, 'Make sure the option defined by the test display extender appears in the UI.');
 
     $random_text = $this->randomMachineName();
-    $this->drupalPostForm($display_option_url, ['test_extender_test_option' => $random_text], t('Apply'));
+    $this->drupalGet($display_option_url);
+    $this->submitForm(['test_extender_test_option' => $random_text], 'Apply');
     $this->assertSession()->linkExists($random_text);
-    $this->drupalPostForm(NULL, [], t('Save'));
+    $this->submitForm([], 'Save');
     $view = Views::getView($view->storage->id());
     $view->initDisplay();
     $display_extender_options = $view->display_handler->getOption('display_extenders');
-    $this->assertEqual($display_extender_options['display_extender_test']['test_extender_test_option'], $random_text, 'Make sure that the display extender option got saved.');
+    $this->assertEquals($random_text, $display_extender_options['display_extender_test']['test_extender_test_option'], 'Make sure that the display extender option got saved.');
   }
 
 }

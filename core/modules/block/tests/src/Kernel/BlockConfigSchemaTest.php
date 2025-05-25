@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\block\Kernel;
 
 use Drupal\block\Entity\Block;
@@ -20,13 +22,9 @@ class BlockConfigSchemaTest extends KernelTestBase {
    */
   protected static $modules = [
     'block',
-    'aggregator',
-    'book',
     'block_content',
     'comment',
-    'forum',
     'node',
-    'statistics',
     // \Drupal\block\Entity\Block->preSave() calls system_region_list().
     'system',
     'taxonomy',
@@ -59,18 +57,22 @@ class BlockConfigSchemaTest extends KernelTestBase {
     $this->installEntitySchema('block_content');
     $this->installEntitySchema('taxonomy_term');
     $this->installEntitySchema('node');
-    $this->installSchema('book', ['book']);
+    $this->container->get('theme_installer')->install(['stark']);
   }
 
   /**
    * Tests the block config schema for block plugins.
    */
-  public function testBlockConfigSchema() {
+  public function testBlockConfigSchema(): void {
     foreach ($this->blockManager->getDefinitions() as $block_id => $definition) {
-      $id = strtolower($this->randomMachineName());
+      // Skip the syndicate block as it is deprecated.
+      if ($block_id === 'node_syndicate_block') {
+        continue;
+      }
+      $id = $this->randomMachineName();
       $block = Block::create([
         'id' => $id,
-        'theme' => 'classy',
+        'theme' => 'stark',
         'weight' => 00,
         'status' => TRUE,
         'region' => 'content',
@@ -85,7 +87,7 @@ class BlockConfigSchemaTest extends KernelTestBase {
       $block->save();
 
       $config = $this->config("block.block.$id");
-      $this->assertEqual($config->get('id'), $id);
+      $this->assertEquals($id, $config->get('id'));
       $this->assertConfigSchema($this->typedConfig, $config->getName(), $config->get());
     }
   }

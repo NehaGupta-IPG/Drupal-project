@@ -29,6 +29,13 @@ class EntityResolverManager {
   protected $classResolver;
 
   /**
+   * The list of all entity types.
+   *
+   * @var \Drupal\Core\Entity\EntityTypeInterface[]
+   */
+  protected ?array $entityTypes;
+
+  /**
    * Constructs a new EntityRouteAlterSubscriber.
    *
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
@@ -51,14 +58,14 @@ class EntityResolverManager {
    * and method that would be used. This is not possible for the service:method
    * notation as the runtime container does not allow static introspection.
    *
-   * @see \Drupal\Core\Controller\ControllerResolver::getControllerFromDefinition()
-   * @see \Drupal\Core\Controller\ClassResolver::getInstanceFromDefinition()
-   *
    * @param array $defaults
    *   The default values provided by the route.
    *
    * @return string|null
    *   Returns the controller class, otherwise NULL.
+   *
+   * @see \Drupal\Core\Controller\ControllerResolver::getControllerFromDefinition()
+   * @see \Drupal\Core\Controller\ClassResolver::getInstanceFromDefinition()
    */
   protected function getControllerClass(array $defaults) {
     $controller = NULL;
@@ -79,7 +86,7 @@ class EntityResolverManager {
       return NULL;
     }
 
-    if (strpos($controller, ':') === FALSE) {
+    if (!str_contains($controller, ':')) {
       if (method_exists($controller, '__invoke')) {
         return [$controller, '__invoke'];
       }
@@ -95,10 +102,10 @@ class EntityResolverManager {
       // service. This is dangerous as the controller could depend on services
       // that could not exist at this point. There is however no other way to
       // do it, as the container does not allow static introspection.
-      list($class_or_service, $method) = explode(':', $controller, 2);
+      [$class_or_service, $method] = explode(':', $controller, 2);
       return [$this->classResolver->getInstanceFromDefinition($class_or_service), $method];
     }
-    elseif (strpos($controller, '::') !== FALSE) {
+    elseif (str_contains($controller, '::')) {
       // Controller in the class::method notation.
       return explode('::', $controller, 2);
     }
@@ -124,7 +131,7 @@ class EntityResolverManager {
     $result = FALSE;
 
     if (is_array($controller)) {
-      list($instance, $method) = $controller;
+      [$instance, $method] = $controller;
       $reflection = new \ReflectionMethod($instance, $method);
     }
     else {
@@ -166,24 +173,24 @@ class EntityResolverManager {
    */
   protected function setParametersFromEntityInformation(Route $route) {
     if ($entity_view = $route->getDefault('_entity_view')) {
-      list($entity_type) = explode('.', $entity_view, 2);
+      [$entity_type] = explode('.', $entity_view, 2);
     }
     elseif ($entity_form = $route->getDefault('_entity_form')) {
-      list($entity_type) = explode('.', $entity_form, 2);
+      [$entity_type] = explode('.', $entity_form, 2);
     }
 
     // Do not add parameter information if the route does not declare a
     // parameter in the first place. This is the case for add forms, for
     // example.
-    if (isset($entity_type) && isset($this->getEntityTypes()[$entity_type]) && (strpos($route->getPath(), '{' . $entity_type . '}') !== FALSE)) {
+    if (isset($entity_type) && isset($this->getEntityTypes()[$entity_type]) && str_contains($route->getPath(), '{' . $entity_type . '}')) {
       $parameter_definitions = $route->getOption('parameters') ?: [];
 
       // First try to figure out whether there is already a parameter upcasting
       // the same entity type already.
       foreach ($parameter_definitions as $info) {
-        if (isset($info['type']) && (strpos($info['type'], 'entity:') === 0)) {
+        if (isset($info['type']) && str_starts_with($info['type'], 'entity:')) {
           // The parameter types are in the form 'entity:$entity_type'.
-          list(, $parameter_entity_type) = explode(':', $info['type'], 2);
+          [, $parameter_entity_type] = explode(':', $info['type'], 2);
           if ($parameter_entity_type == $entity_type) {
             return;
           }
@@ -224,6 +231,7 @@ class EntityResolverManager {
    * Gets the list of all entity types.
    *
    * @return \Drupal\Core\Entity\EntityTypeInterface[]
+   *   An array of the entity types.
    */
   protected function getEntityTypes() {
     if (!isset($this->entityTypes)) {

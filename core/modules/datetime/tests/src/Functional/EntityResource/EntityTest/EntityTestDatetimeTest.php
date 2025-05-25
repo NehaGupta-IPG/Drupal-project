@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\datetime\Functional\EntityResource\EntityTest;
 
 use Drupal\Core\Url;
@@ -47,7 +49,7 @@ class EntityTestDatetimeTest extends EntityTestResourceTestBase {
   /**
    * {@inheritdoc}
    */
-  public function setUp(): void {
+  protected function setUp(): void {
     parent::setUp();
 
     // Add datetime field.
@@ -117,7 +119,7 @@ class EntityTestDatetimeTest extends EntityTestResourceTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function assertNormalizationEdgeCases($method, Url $url, array $request_options) {
+  protected function assertNormalizationEdgeCases($method, Url $url, array $request_options): void {
     parent::assertNormalizationEdgeCases($method, $url, $request_options);
 
     if ($this->entity->getEntityType()->hasKey('bundle')) {

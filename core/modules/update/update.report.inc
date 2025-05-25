@@ -2,11 +2,11 @@
 
 /**
  * @file
- * Code required only when rendering the available updates report.
  */
 
 use Drupal\Core\Template\Attribute;
 use Drupal\Core\Url;
+use Drupal\update\ProjectRelease;
 use Drupal\update\UpdateFetcherInterface;
 use Drupal\update\UpdateManagerInterface;
 
@@ -19,7 +19,7 @@ use Drupal\update\UpdateManagerInterface;
  *   An associative array containing:
  *   - data: An array of data about each project's status.
  */
-function template_preprocess_update_report(&$variables) {
+function template_preprocess_update_report(&$variables): void {
   $data = isset($variables['data']) && is_array($variables['data']) ? $variables['data'] : [];
 
   $last = \Drupal::state()->get('update.last_check', 0);
@@ -87,8 +87,8 @@ function template_preprocess_update_report(&$variables) {
     'core' => t('Drupal core'),
     'module' => t('Modules'),
     'theme' => t('Themes'),
-    'module-disabled' => t('Uninstalled modules'),
-    'theme-disabled' => t('Uninstalled themes'),
+    'module-uninstalled' => t('Uninstalled modules'),
+    'theme-uninstalled' => t('Uninstalled themes'),
   ];
 
   $variables['project_types'] = [];
@@ -112,18 +112,18 @@ function template_preprocess_update_report(&$variables) {
  *   An associative array containing:
  *   - version: An array of information about the release version.
  */
-function template_preprocess_update_version(array &$variables) {
-  $version = $variables['version'];
-  if (empty($version['core_compatibility_message'])) {
+function template_preprocess_update_version(array &$variables): void {
+  $release = ProjectRelease::createFromArray($variables['version']);
+  if (!$release->getCoreCompatibilityMessage()) {
     return;
   }
-  $core_compatible = !empty($version['core_compatible']);
+  $core_compatible = $release->isCoreCompatible();
   $variables['core_compatibility_details'] = [
     '#type' => 'details',
     '#title' => $core_compatible ? t('Compatible') : t('Not compatible'),
     '#open' => !$core_compatible,
     'message' => [
-      '#markup' => $version['core_compatibility_message'],
+      '#markup' => $release->getCoreCompatibilityMessage(),
     ],
     '#attributes' => [
       'class' => [
@@ -142,7 +142,7 @@ function template_preprocess_update_version(array &$variables) {
  *   An associative array containing:
  *   - project: An array of information about the project.
  */
-function template_preprocess_update_project_status(&$variables) {
+function template_preprocess_update_project_status(&$variables): void {
   // Storing by reference because we are sorting the project values.
   $project = &$variables['project'];
 

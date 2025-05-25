@@ -1,8 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\Core\Command;
 
-use Drupal\Core\Database\Driver\sqlite\Install\Tasks;
+use Drupal\sqlite\Driver\Database\sqlite\Install\Tasks;
 use Drupal\Core\Test\TestDatabase;
 use Drupal\Tests\BrowserTestBase;
 use GuzzleHttp\Client;
@@ -22,6 +24,7 @@ use Symfony\Component\Process\Process;
  * @requires extension pdo_sqlite
  *
  * @group Command
+ * @group #slow
  */
 class QuickStartTest extends TestCase {
 
@@ -49,7 +52,7 @@ class QuickStartTest extends TestCase {
   /**
    * {@inheritdoc}
    */
-  public function setUp(): void {
+  protected function setUp(): void {
     parent::setUp();
     $php_executable_finder = new PhpExecutableFinder();
     $this->php = $php_executable_finder->find();
@@ -65,7 +68,7 @@ class QuickStartTest extends TestCase {
   /**
    * {@inheritdoc}
    */
-  public function tearDown(): void {
+  protected function tearDown(): void {
     if ($this->testDb) {
       $test_site_directory = $this->root . DIRECTORY_SEPARATOR . $this->testDb->getTestSitePath();
       if (file_exists($test_site_directory)) {
@@ -84,11 +87,9 @@ class QuickStartTest extends TestCase {
   /**
    * Tests the quick-start command.
    */
-  public function testQuickStartCommand() {
-    if (version_compare(phpversion(), \Drupal::MINIMUM_SUPPORTED_PHP) < 0) {
-      $this->markTestSkipped();
-    }
-    if (version_compare(\SQLite3::version()['versionString'], Tasks::SQLITE_MINIMUM_VERSION) < 0) {
+  public function testQuickStartCommand(): void {
+    $sqlite = (new \PDO('sqlite::memory:'))->query('select sqlite_version()')->fetch()[0];
+    if (version_compare($sqlite, Tasks::SQLITE_MINIMUM_VERSION) < 0) {
       $this->markTestSkipped();
     }
 
@@ -108,16 +109,16 @@ class QuickStartTest extends TestCase {
     $process->start();
     $guzzle = new Client();
     $port = FALSE;
-    while ($process->isRunning()) {
-      if (preg_match('/127.0.0.1:(\d+)/', $process->getOutput(), $match)) {
+    $process->waitUntil(function ($type, $output) use (&$port) {
+      if (preg_match('/127.0.0.1:(\d+)/', $output, $match)) {
         $port = $match[1];
-        break;
+        return TRUE;
       }
-      // Wait for more output.
-      sleep(1);
-    }
+    });
     // The progress bar uses STDERR to write messages.
     $this->assertStringContainsString('Congratulations, you installed Drupal!', $process->getErrorOutput());
+    // Ensure the command does not trigger any PHP deprecations.
+    $this->assertStringNotContainsString('Deprecated', $process->getErrorOutput());
     $this->assertNotFalse($port, "Web server running on port $port");
 
     // Give the server a couple of seconds to be ready.
@@ -140,46 +141,11 @@ class QuickStartTest extends TestCase {
   }
 
   /**
-   * Tests that the installer throws a requirement error on older PHP versions.
-   */
-  public function testPhpRequirement() {
-    if (version_compare(phpversion(), \Drupal::MINIMUM_SUPPORTED_PHP) >= 0) {
-      $this->markTestSkipped();
-    }
-
-    $install_command = [
-      $this->php,
-      'core/scripts/drupal',
-      'quick-start',
-      'standard',
-      "--site-name='Test site {$this->testDb->getDatabasePrefix()}'",
-      '--suppress-login',
-    ];
-    $process = new Process($install_command, NULL, ['DRUPAL_DEV_SITE_PATH' => $this->testDb->getTestSitePath()]);
-    $process->setTimeout(500);
-    $process->start();
-    while ($process->isRunning()) {
-      // Wait for more output.
-      sleep(1);
-    }
-
-    $error_output = $process->getErrorOutput();
-    $this->assertStringContainsString('Your PHP installation is too old.', $error_output);
-    $this->assertStringContainsString('Drupal requires at least PHP', $error_output);
-    $this->assertStringContainsString(\Drupal::MINIMUM_SUPPORTED_PHP, $error_output);
-
-    // Stop the web server.
-    $process->stop();
-  }
-
-  /**
    * Tests the quick-start commands.
    */
-  public function testQuickStartInstallAndServerCommands() {
-    if (version_compare(phpversion(), \Drupal::MINIMUM_SUPPORTED_PHP) < 0) {
-      $this->markTestSkipped();
-    }
-    if (version_compare(\SQLite3::version()['versionString'], Tasks::SQLITE_MINIMUM_VERSION) < 0) {
+  public function testQuickStartInstallAndServerCommands(): void {
+    $sqlite = (new \PDO('sqlite::memory:'))->query('select sqlite_version()')->fetch()[0];
+    if (version_compare($sqlite, Tasks::SQLITE_MINIMUM_VERSION) < 0) {
       $this->markTestSkipped();
     }
 
@@ -188,7 +154,8 @@ class QuickStartTest extends TestCase {
       $this->php,
       'core/scripts/drupal',
       'install',
-      'testing',
+      'minimal',
+      "--password='secret'",
       "--site-name='Test site {$this->testDb->getDatabasePrefix()}'",
     ];
     $install_process = new Process($install_command, NULL, ['DRUPAL_DEV_SITE_PATH' => $this->testDb->getTestSitePath()]);
@@ -196,6 +163,7 @@ class QuickStartTest extends TestCase {
     $result = $install_process->run();
     // The progress bar uses STDERR to write messages.
     $this->assertStringContainsString('Congratulations, you installed Drupal!', $install_process->getErrorOutput());
+    $this->assertStringContainsString("Password: 'secret'", $install_process->getOutput());
     $this->assertSame(0, $result);
 
     // Run the PHP built-in webserver.
@@ -209,14 +177,12 @@ class QuickStartTest extends TestCase {
     $server_process->start();
     $guzzle = new Client();
     $port = FALSE;
-    while ($server_process->isRunning()) {
-      if (preg_match('/127.0.0.1:(\d+)/', $server_process->getOutput(), $match)) {
+    $server_process->waitUntil(function ($type, $output) use (&$port) {
+      if (preg_match('/127.0.0.1:(\d+)\/user\/reset\/1\//', $output, $match)) {
         $port = $match[1];
-        break;
+        return TRUE;
       }
-      // Wait for more output.
-      sleep(1);
-    }
+    });
     $this->assertEquals('', $server_process->getErrorOutput());
     $this->assertStringContainsString("127.0.0.1:$port/user/reset/1/", $server_process->getOutput());
     $this->assertNotFalse($port, "Web server running on port $port");
@@ -261,7 +227,7 @@ class QuickStartTest extends TestCase {
   /**
    * Tests the install command with an invalid profile.
    */
-  public function testQuickStartCommandProfileValidation() {
+  public function testQuickStartCommandProfileValidation(): void {
     // Install a site using the standard profile to ensure the one time login
     // link generation works.
     $install_command = [
@@ -273,13 +239,13 @@ class QuickStartTest extends TestCase {
     ];
     $process = new Process($install_command, NULL, ['DRUPAL_DEV_SITE_PATH' => $this->testDb->getTestSitePath()]);
     $process->run();
-    $this->assertStringContainsString('\'umami\' is not a valid install profile. Did you mean \'demo_umami\'?', $process->getErrorOutput());
+    $this->assertMatchesRegularExpression("/'umami' is not a valid install profile or recipe\. Did you mean \W*'demo_umami'?/", $process->getErrorOutput());
   }
 
   /**
    * Tests the server command when there is no installation.
    */
-  public function testServerWithNoInstall() {
+  public function testServerWithNoInstall(): void {
     $server_command = [
       $this->php,
       'core/scripts/drupal',
@@ -298,7 +264,7 @@ class QuickStartTest extends TestCase {
    * test site can be torn down even if something in the test site is broken.
    *
    * @param string $path
-   *   A string containing either an URI or a file or directory path.
+   *   A string containing either a URI or a file or directory path.
    * @param callable $callback
    *   (optional) Callback function to run on each file prior to deleting it and
    *   on each directory prior to traversing it. For example, can be used to
@@ -310,7 +276,7 @@ class QuickStartTest extends TestCase {
    *
    * @see \Drupal\Core\File\FileSystemInterface::deleteRecursive()
    */
-  protected function fileUnmanagedDeleteRecursive($path, $callback = NULL) {
+  protected function fileUnmanagedDeleteRecursive($path, $callback = NULL): bool {
     if (isset($callback)) {
       call_user_func($callback, $path);
     }

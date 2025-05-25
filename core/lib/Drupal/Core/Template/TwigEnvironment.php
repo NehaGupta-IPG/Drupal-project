@@ -50,8 +50,7 @@ class TwigEnvironment extends Environment {
   protected $twigCachePrefix = '';
 
   /**
-   * Constructs a TwigEnvironment object and stores cache and storage
-   * internally.
+   * Creates a TwigEnvironment object, including its cache and storage.
    *
    * @param string $root
    *   The app root.
@@ -66,7 +65,7 @@ class TwigEnvironment extends Environment {
    * @param array $options
    *   The options for the Twig environment.
    */
-  public function __construct($root, CacheBackendInterface $cache, $twig_extension_hash, StateInterface $state, LoaderInterface $loader = NULL, array $options = []) {
+  public function __construct($root, CacheBackendInterface $cache, $twig_extension_hash, StateInterface $state, LoaderInterface $loader, array $options = []) {
     $this->state = $state;
 
     $this->templateClasses = [];
@@ -105,7 +104,7 @@ class TwigEnvironment extends Environment {
   /**
    * {@inheritdoc}
    */
-  public function compileSource(Source $source) {
+  public function compileSource(Source $source): string {
     // Note: always use \Drupal\Core\Serialization\Yaml here instead of the
     // "serializer.yaml" service. This allows the core serializer to utilize
     // core related functionality which isn't available as the standalone
@@ -144,7 +143,7 @@ class TwigEnvironment extends Environment {
   }
 
   /**
-   * Get the cache prefixed used by \Drupal\Core\Template\TwigPhpStorageCache
+   * Get the cache prefixed used by \Drupal\Core\Template\TwigPhpStorageCache.
    *
    * @return string
    *   The file cache prefix, or empty string if the cache is disabled.
@@ -195,7 +194,7 @@ class TwigEnvironment extends Environment {
    * @return string
    *   The template class name.
    */
-  public function getTemplateClass($name, $index = NULL) {
+  public function getTemplateClass(string $name, ?int $index = NULL): string {
     // We override this method to add caching because it gets called multiple
     // times when the same template is used more than once. For example, a page
     // rendering 50 nodes without any node template overrides will use the same

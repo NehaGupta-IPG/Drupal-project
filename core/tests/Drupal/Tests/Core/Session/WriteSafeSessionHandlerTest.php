@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\Core\Session;
 
 use Drupal\Tests\UnitTestCase;
@@ -27,7 +29,12 @@ class WriteSafeSessionHandlerTest extends UnitTestCase {
    */
   protected $sessionHandler;
 
+  /**
+   * {@inheritdoc}
+   */
   protected function setUp(): void {
+    parent::setUp();
+
     $this->wrappedSessionHandler = $this->createMock('SessionHandlerInterface');
     $this->sessionHandler = new WriteSafeSessionHandler($this->wrappedSessionHandler);
   }
@@ -39,22 +46,17 @@ class WriteSafeSessionHandlerTest extends UnitTestCase {
    * @covers ::isSessionWritable
    * @covers ::write
    */
-  public function testConstructWriteSafeSessionHandlerDefaultArgs() {
+  public function testConstructWriteSafeSessionHandlerDefaultArgs(): void {
     $session_id = 'some-id';
     $session_data = 'serialized-session-data';
 
     $this->assertTrue($this->sessionHandler->isSessionWritable());
 
     // Writing should be enabled, return value passed to the caller by default.
-    $this->wrappedSessionHandler->expects($this->at(0))
+    $this->wrappedSessionHandler->expects($this->exactly(2))
       ->method('write')
       ->with($session_id, $session_data)
-      ->will($this->returnValue(TRUE));
-
-    $this->wrappedSessionHandler->expects($this->at(1))
-      ->method('write')
-      ->with($session_id, $session_data)
-      ->will($this->returnValue(FALSE));
+      ->willReturnOnConsecutiveCalls(TRUE, FALSE);
 
     $result = $this->sessionHandler->write($session_id, $session_data);
     $this->assertTrue($result);
@@ -70,7 +72,7 @@ class WriteSafeSessionHandlerTest extends UnitTestCase {
    * @covers ::isSessionWritable
    * @covers ::write
    */
-  public function testConstructWriteSafeSessionHandlerDisableWriting() {
+  public function testConstructWriteSafeSessionHandlerDisableWriting(): void {
     $session_id = 'some-id';
     $session_data = 'serialized-session-data';
 
@@ -89,7 +91,7 @@ class WriteSafeSessionHandlerTest extends UnitTestCase {
    * @covers ::setSessionWritable
    * @covers ::write
    */
-  public function testSetSessionWritable() {
+  public function testSetSessionWritable(): void {
     $session_id = 'some-id';
     $session_data = 'serialized-session-data';
 
@@ -111,15 +113,10 @@ class WriteSafeSessionHandlerTest extends UnitTestCase {
     $this->assertTrue($this->sessionHandler->isSessionWritable());
 
     // Writing should be enabled, return value passed to the caller by default.
-    $this->wrappedSessionHandler->expects($this->at(0))
+    $this->wrappedSessionHandler->expects($this->exactly(2))
       ->method('write')
       ->with($session_id, $session_data)
-      ->will($this->returnValue(TRUE));
-
-    $this->wrappedSessionHandler->expects($this->at(1))
-      ->method('write')
-      ->with($session_id, $session_data)
-      ->will($this->returnValue(FALSE));
+      ->willReturnOnConsecutiveCalls(TRUE, FALSE);
 
     $result = $this->sessionHandler->write($session_id, $session_data);
     $this->assertTrue($result);
@@ -139,10 +136,10 @@ class WriteSafeSessionHandlerTest extends UnitTestCase {
    * @covers ::gc
    * @dataProvider providerTestOtherMethods
    */
-  public function testOtherMethods($method, $expected_result, $args) {
+  public function testOtherMethods($method, $expected_result, $args): void {
     $invocation = $this->wrappedSessionHandler->expects($this->exactly(2))
       ->method($method)
-      ->will($this->returnValue($expected_result));
+      ->willReturn($expected_result);
 
     // Set the parameter matcher.
     call_user_func_array([$invocation, 'with'], $args);
@@ -165,13 +162,13 @@ class WriteSafeSessionHandlerTest extends UnitTestCase {
    * @return array
    *   Test data.
    */
-  public function providerTestOtherMethods() {
+  public static function providerTestOtherMethods() {
     return [
       ['open', TRUE, ['/some/path', 'some-session-id']],
       ['read', 'some-session-data', ['a-session-id']],
       ['close', TRUE, []],
       ['destroy', TRUE, ['old-session-id']],
-      ['gc', TRUE, [42]],
+      ['gc', 0, [42]],
     ];
   }
 

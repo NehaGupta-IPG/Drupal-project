@@ -1,22 +1,24 @@
 /*!
- * jQuery UI Dialog 1.12.1
- * http://jqueryui.com
+ * jQuery UI Dialog 1.14.1
+ * https://jqueryui.com
  *
- * Copyright jQuery Foundation and other contributors
+ * Copyright OpenJS Foundation and other contributors
  * Released under the MIT license.
- * http://jquery.org/license
+ * https://jquery.org/license
  */
 
 //>>label: Dialog
 //>>group: Widgets
 //>>description: Displays customizable dialog windows.
-//>>docs: http://api.jqueryui.com/dialog/
-//>>demos: http://jqueryui.com/dialog/
+//>>docs: https://api.jqueryui.com/dialog/
+//>>demos: https://jqueryui.com/dialog/
 //>>css.structure: ../../themes/base/core.css
 //>>css.structure: ../../themes/base/dialog.css
 //>>css.theme: ../../themes/base/theme.css
 
 ( function( factory ) {
+	"use strict";
+
 	if ( typeof define === "function" && define.amd ) {
 
 		// AMD. Register as an anonymous module.
@@ -29,8 +31,6 @@
 			"../focusable",
 			"../keycode",
 			"../position",
-			"../safe-active-element",
-			"../safe-blur",
 			"../tabbable",
 			"../unique-id",
 			"../version",
@@ -41,10 +41,11 @@
 		// Browser globals
 		factory( jQuery );
 	}
-}( function( $ ) {
+} )( function( $ ) {
+"use strict";
 
 $.widget( "ui.dialog", {
-	version: "1.12.1",
+	version: "1.14.1",
 	options: {
 		appendTo: "body",
 		autoOpen: true,
@@ -80,6 +81,7 @@ $.widget( "ui.dialog", {
 		resizable: true,
 		show: null,
 		title: null,
+		uiDialogTitleHeadingLevel: 0,
 		width: 300,
 
 		// Callbacks
@@ -226,7 +228,7 @@ $.widget( "ui.dialog", {
 			// Hiding a focused element doesn't trigger blur in WebKit
 			// so in case we have nothing to focus on, explicitly blur the active element
 			// https://bugs.webkit.org/show_bug.cgi?id=47182
-			$.ui.safeBlur( $.ui.safeActiveElement( this.document[ 0 ] ) );
+			$( this.document[ 0 ].activeElement ).trigger( "blur" );
 		}
 
 		this._hide( this.uiDialog, this.options.hide, function() {
@@ -270,7 +272,7 @@ $.widget( "ui.dialog", {
 		}
 
 		this._isOpen = true;
-		this.opener = $( $.ui.safeActiveElement( this.document[ 0 ] ) );
+		this.opener = $( this.document[ 0 ].activeElement );
 
 		this._size();
 		this._position();
@@ -289,7 +291,7 @@ $.widget( "ui.dialog", {
 			that._trigger( "focus" );
 		} );
 
-		// Track the dialog immediately upon openening in case a focus event
+		// Track the dialog immediately upon opening in case a focus event
 		// somehow occurs outside of the dialog before an element inside the
 		// dialog is focused (#10152)
 		this._makeFocusTarget();
@@ -325,22 +327,18 @@ $.widget( "ui.dialog", {
 		hasFocus.eq( 0 ).trigger( "focus" );
 	},
 
-	_keepFocus: function( event ) {
-		function checkFocus() {
-			var activeElement = $.ui.safeActiveElement( this.document[ 0 ] ),
-				isActive = this.uiDialog[ 0 ] === activeElement ||
-					$.contains( this.uiDialog[ 0 ], activeElement );
-			if ( !isActive ) {
-				this._focusTabbable();
-			}
+	_restoreTabbableFocus: function() {
+		var activeElement = this.document[ 0 ].activeElement,
+			isActive = this.uiDialog[ 0 ] === activeElement ||
+				$.contains( this.uiDialog[ 0 ], activeElement );
+		if ( !isActive ) {
+			this._focusTabbable();
 		}
-		event.preventDefault();
-		checkFocus.call( this );
+	},
 
-		// support: IE
-		// IE <= 8 doesn't prevent moving focus even with event.preventDefault()
-		// so we check again later
-		this._delay( checkFocus );
+	_keepFocus: function( event ) {
+		event.preventDefault();
+		this._restoreTabbableFocus();
 	},
 
 	_createWrapper: function() {
@@ -350,7 +348,8 @@ $.widget( "ui.dialog", {
 
 				// Setting tabIndex makes the div focusable
 				tabIndex: -1,
-				role: "dialog"
+				role: "dialog",
+				"aria-modal": this.options.modal ? "true" : null
 			} )
 			.appendTo( this._appendTo() );
 
@@ -369,8 +368,8 @@ $.widget( "ui.dialog", {
 					return;
 				}
 				var tabbables = this.uiDialog.find( ":tabbable" ),
-					first = tabbables.filter( ":first" ),
-					last = tabbables.filter( ":last" );
+					first = tabbables.first(),
+					last = tabbables.last();
 
 				if ( ( event.target === last[ 0 ] || event.target === this.uiDialog[ 0 ] ) &&
 						!event.shiftKey ) {
@@ -423,9 +422,6 @@ $.widget( "ui.dialog", {
 			}
 		} );
 
-		// Support: IE
-		// Use type="button" to prevent enter keypresses in textboxes from closing the
-		// dialog in IE (#9312)
 		this.uiDialogTitlebarClose = $( "<button type='button'></button>" )
 			.button( {
 				label: $( "<a>" ).text( this.options.closeText ).html(),
@@ -442,7 +438,13 @@ $.widget( "ui.dialog", {
 			}
 		} );
 
-		uiDialogTitle = $( "<span>" ).uniqueId().prependTo( this.uiDialogTitlebar );
+		var uiDialogHeadingLevel = Number.isInteger( this.options.uiDialogTitleHeadingLevel ) &&
+			this.options.uiDialogTitleHeadingLevel > 0 &&
+			this.options.uiDialogTitleHeadingLevel <= 6 ?
+			"h" + this.options.uiDialogTitleHeadingLevel : "span";
+
+		uiDialogTitle = $( "<" + uiDialogHeadingLevel + ">" )
+			.uniqueId().prependTo( this.uiDialogTitlebar );
 		this._addClass( uiDialogTitle, "ui-dialog-title" );
 		this._title( uiDialogTitle );
 
@@ -481,14 +483,14 @@ $.widget( "ui.dialog", {
 		this.uiDialogButtonPane.remove();
 		this.uiButtonSet.empty();
 
-		if ( $.isEmptyObject( buttons ) || ( $.isArray( buttons ) && !buttons.length ) ) {
+		if ( $.isEmptyObject( buttons ) || ( Array.isArray( buttons ) && !buttons.length ) ) {
 			this._removeClass( this.uiDialog, "ui-dialog-buttons" );
 			return;
 		}
 
 		$.each( buttons, function( name, props ) {
 			var click, buttonOptions;
-			props = $.isFunction( props ) ?
+			props = typeof props === "function" ?
 				{ click: props, text: name } :
 				props;
 
@@ -768,6 +770,10 @@ $.widget( "ui.dialog", {
 		if ( key === "title" ) {
 			this._title( this.uiDialogTitlebar.find( ".ui-dialog-title" ) );
 		}
+
+		if ( key === "modal" ) {
+			uiDialog.attr( "aria-modal", value ? "true" : null );
+		}
 	},
 
 	_size: function() {
@@ -863,20 +869,19 @@ $.widget( "ui.dialog", {
 		if ( !this.document.data( "ui-dialog-overlays" ) ) {
 
 			// Prevent use of anchors and inputs
-			// Using _on() for an event handler shared across many instances is
-			// safe because the dialogs stack and must be closed in reverse order
-			this._on( this.document, {
-				focusin: function( event ) {
-					if ( isOpening ) {
-						return;
-					}
-
-					if ( !this._allowInteraction( event ) ) {
-						event.preventDefault();
-						this._trackingInstances()[ 0 ]._focusTabbable();
-					}
+			// This doesn't use `_on()` because it is a shared event handler
+			// across all open modal dialogs.
+			this.document.on( "focusin.ui-dialog", function( event ) {
+				if ( isOpening ) {
+					return;
 				}
-			} );
+
+				var instance = this._trackingInstances()[ 0 ];
+				if ( !instance._allowInteraction( event ) ) {
+					event.preventDefault();
+					instance._focusTabbable();
+				}
+			}.bind( this ) );
 		}
 
 		this.overlay = $( "<div>" )
@@ -899,7 +904,7 @@ $.widget( "ui.dialog", {
 			var overlays = this.document.data( "ui-dialog-overlays" ) - 1;
 
 			if ( !overlays ) {
-				this._off( this.document, "focusin" );
+				this.document.off( "focusin.ui-dialog" );
 				this.document.removeData( "ui-dialog-overlays" );
 			} else {
 				this.document.data( "ui-dialog-overlays", overlays );
@@ -913,7 +918,7 @@ $.widget( "ui.dialog", {
 
 // DEPRECATED
 // TODO: switch return back to widget declaration at top of file when this is removed
-if ( $.uiBackCompat !== false ) {
+if ( $.uiBackCompat === true ) {
 
 	// Backcompat for dialogClass option
 	$.widget( "ui.dialog", $.ui.dialog, {
@@ -937,4 +942,4 @@ if ( $.uiBackCompat !== false ) {
 
 return $.ui.dialog;
 
-} ) );
+} );

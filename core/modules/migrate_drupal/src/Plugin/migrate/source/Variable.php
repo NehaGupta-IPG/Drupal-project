@@ -7,15 +7,20 @@ use Drupal\Core\State\StateInterface;
 use Drupal\migrate\Plugin\MigrationInterface;
 
 /**
- * Drupal variable source from database.
+ * Drupal 6/7 variable source from database.
  *
  * This source class fetches variables from the source Drupal database.
  * Depending on the configuration, this returns zero or a single row and as such
  * is not a good example for any normal source class returning multiple rows.
  *
- * The configuration may contain optional and required variable names. If any of
- * the required variables is missing in the source, then the source will return
- * zero rows.
+ * Available configuration keys (one of which must be defined):
+ * - variables: (optional) The list of variables to retrieve from the source
+ *   database. Specified variables are retrieved in a single row.
+ * - variables_no_row_if_missing: (optional) The list of variables to retrieve
+ *   from the source database. If any of the variables listed here are missing
+ *   in the source, then the source will return zero rows.
+ *
+ * Examples:
  *
  * With this configuration, the source will return one row even when the
  * "filter_fallback_format" variable isn't available:
@@ -31,12 +36,12 @@ use Drupal\migrate\Plugin\MigrationInterface;
  * @code
  * source:
  *   plugin: variable
- *   variables_required:
+ *   variables_no_row_if_missing:
  *     - filter_fallback_format
  * @endcode
  *
- * The optional and the required variable names are always merged together. All
- * of the following configurations are valid:
+ * The variables and the variables_no_row_if_missing lists are always merged
+ * together. All of the following configurations are valid:
  * @code
  * source:
  *   plugin: variable
@@ -44,7 +49,7 @@ use Drupal\migrate\Plugin\MigrationInterface;
  *     - book_child_type
  *     - book_block_mode
  *     - book_allowed_types
- *   variables_required:
+ *   variables_no_row_if_missing:
  *     - book_child_type
  *     - book_block_mode
  *     - book_allowed_types
@@ -54,16 +59,21 @@ use Drupal\migrate\Plugin\MigrationInterface;
  *   variables:
  *     - book_child_type
  *     - book_block_mode
- *   variables_required:
+ *   variables_no_row_if_missing:
  *     - book_allowed_types
  *
  * source:
  *   plugin: variable
- *   variables_required:
+ *   variables_no_row_if_missing:
  *     - book_child_type
  *     - book_block_mode
  *     - book_allowed_types
  * @endcode
+ *
+ * For additional configuration keys, refer to the parent classes.
+ *
+ * @see \Drupal\migrate\Plugin\migrate\source\SqlBase
+ * @see \Drupal\migrate\Plugin\migrate\source\SourcePluginBase
  *
  * @MigrateSource(
  *   id = "variable",
@@ -80,28 +90,20 @@ class Variable extends DrupalSqlBase {
   protected $variables;
 
   /**
-   * The optional variables.
+   * The variables that result in no row if any are missing from the source.
    *
    * @var array
    */
-  protected $optionalVariables;
-
-  /**
-   * The required variables.
-   *
-   * @var array
-   */
-  protected $requiredVariables;
+  protected $variablesNoRowIfMissing;
 
   /**
    * {@inheritdoc}
    */
   public function __construct(array $configuration, $plugin_id, $plugin_definition, MigrationInterface $migration, StateInterface $state, EntityTypeManagerInterface $entity_type_manager) {
     parent::__construct($configuration, $plugin_id, $plugin_definition, $migration, $state, $entity_type_manager);
-    $this->requiredVariables = $this->configuration['variables_required'] ?? [];
+    $this->variablesNoRowIfMissing = $this->configuration['variables_no_row_if_missing'] ?? [];
     $variables = $this->configuration['variables'] ?? [];
-    $this->variables = array_unique(array_merge(array_values($variables), array_values($this->requiredVariables)));
-    $this->optionalVariables = array_diff($this->variables, $this->requiredVariables);
+    $this->variables = array_unique(array_merge(array_values($variables), array_values($this->variablesNoRowIfMissing)));
   }
 
   /**
@@ -133,13 +135,13 @@ class Variable extends DrupalSqlBase {
   /**
    * {@inheritdoc}
    */
-  public function count($refresh = FALSE) {
-    if (empty($this->requiredVariables)) {
+  protected function doCount() {
+    if (empty($this->variablesNoRowIfMissing)) {
       return 1;
     }
     $variable_names = array_keys($this->query()->execute()->fetchAllAssoc('name'));
 
-    if (!empty(array_diff($this->requiredVariables, $variable_names))) {
+    if (!empty(array_diff($this->variablesNoRowIfMissing, $variable_names))) {
       return 0;
     }
     return 1;

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\taxonomy\Kernel\Migrate\d7;
 
 use Drupal\Tests\migrate_drupal\Kernel\d7\MigrateDrupal7TestBase;
@@ -27,6 +29,7 @@ class MigrateTaxonomyVocabularyTranslationTest extends MigrateDrupal7TestBase {
   protected function setUp(): void {
     parent::setUp();
     $this->executeMigrations([
+      'language',
       'd7_taxonomy_vocabulary',
       'd7_taxonomy_vocabulary_translation',
     ]);
@@ -35,7 +38,7 @@ class MigrateTaxonomyVocabularyTranslationTest extends MigrateDrupal7TestBase {
   /**
    * Tests the Drupal 7 i18n taxonomy vocabularies to Drupal 8 migration.
    */
-  public function testTaxonomyVocabularyTranslation() {
+  public function testTaxonomyVocabularyTranslation(): void {
     /** @var \Drupal\language\ConfigurableLanguageManagerInterface $language_manager */
     $language_manager = \Drupal::service('language_manager');
 

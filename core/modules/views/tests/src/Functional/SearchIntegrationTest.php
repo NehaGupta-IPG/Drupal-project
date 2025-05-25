@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\views\Functional;
 
 use Drupal\Tests\Traits\Core\CronRunTrait;
@@ -14,9 +16,7 @@ class SearchIntegrationTest extends ViewTestBase {
   use CronRunTrait;
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['node', 'search'];
 
@@ -35,7 +35,7 @@ class SearchIntegrationTest extends ViewTestBase {
   /**
    * Tests search integration.
    */
-  public function testSearchIntegration() {
+  public function testSearchIntegration(): void {
     // Create a content type.
     $type = $this->drupalCreateContentType();
 
@@ -117,8 +117,8 @@ class SearchIntegrationTest extends ViewTestBase {
     $xpath = '//div[@class="views-row"]//a';
     /** @var \Behat\Mink\Element\NodeElement[] $results */
     $results = $this->xpath($xpath);
-    $this->assertEqual($results[0]->getText(), "Drupal's search rocks <em>really</em> rocks!");
-    $this->assertEqual($results[1]->getText(), "Drupal's search rocks.");
+    $this->assertEquals("Drupal's search rocks <em>really</em> rocks!", $results[0]->getText());
+    $this->assertEquals("Drupal's search rocks.", $results[1]->getText());
     $this->assertSession()->assertEscaped("Drupal's search rocks <em>really</em> rocks!");
 
     // Test sorting with another set of titles.
@@ -134,8 +134,8 @@ class SearchIntegrationTest extends ViewTestBase {
     $xpath = '//div[@class="views-row"]//a';
     /** @var \SimpleXMLElement[] $results */
     $results = $this->xpath($xpath);
-    $this->assertEqual($results[0]->getText(), "Testing one one one");
-    $this->assertEqual($results[1]->getText(), "Testing one two two two");
+    $this->assertEquals("Testing one one one", $results[0]->getText());
+    $this->assertEquals("Testing one two two two", $results[1]->getText());
   }
 
   /**
@@ -144,15 +144,13 @@ class SearchIntegrationTest extends ViewTestBase {
    * @param string $label
    *   Link label to assert.
    *
-   * @return bool
-   *   TRUE if the assertion succeeded.
+   * @internal
    */
-  protected function assertOneLink($label) {
+  protected function assertOneLink(string $label): void {
     $xpath = $this->assertSession()->buildXPathQuery('//a[normalize-space(text())=:label]', [
       ':label' => $label,
     ]);
     $this->assertSession()->elementsCount('xpath', $xpath, 1);
-    return TRUE;
   }
 
 }

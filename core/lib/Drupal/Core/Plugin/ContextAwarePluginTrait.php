@@ -29,18 +29,6 @@ trait ContextAwarePluginTrait {
   protected $context = [];
 
   /**
-   * Tracks whether the context has been initialized from configuration.
-   *
-   * @var bool
-   *
-   * @todo Remove this in Drupal 10.0.x.
-   *   See https://www.drupal.org/project/drupal/issues/3153956.
-   *
-   * @internal
-   */
-  protected $initializedContextConfig = FALSE;
-
-  /**
    * {@inheritdoc}
    */
   public function getContexts() {
@@ -58,28 +46,6 @@ trait ContextAwarePluginTrait {
    *   The context object.
    */
   public function getContext($name) {
-    // @todo Remove this entire block in Drupal 10.0.x.
-    //   See https://www.drupal.org/project/drupal/issues/3153956.
-    if (!$this->initializedContextConfig) {
-      $this->initializedContextConfig = TRUE;
-      if ($this instanceof ConfigurableInterface) {
-        $configuration = $this->getConfiguration();
-      }
-      else {
-        $reflection = new \ReflectionProperty($this, 'configuration');
-        $reflection->setAccessible(TRUE);
-        $configuration = $reflection->getValue($this);
-      }
-
-      if (isset($configuration['context'])) {
-        @trigger_error('Passing context values to plugins via configuration is deprecated in drupal:9.1.0 and will be removed before drupal:10.0.0. Instead, call ::setContextValue() on the plugin itself. See https://www.drupal.org/node/3120980', E_USER_DEPRECATED);
-        foreach ($configuration['context'] as $key => $value) {
-          $context_definition = $this->getContextDefinition($key);
-          $this->context[$key] = new Context($context_definition, $value);
-        }
-      }
-    }
-
     // Check for a valid context value.
     if (!isset($this->context[$name])) {
       $this->context[$name] = new Context($this->getContextDefinition($name));
@@ -129,7 +95,7 @@ trait ContextAwarePluginTrait {
    */
   public function getContextMapping() {
     $configuration = $this instanceof ConfigurableInterface ? $this->getConfiguration() : $this->configuration;
-    return isset($configuration['context_mapping']) ? $configuration['context_mapping'] : [];
+    return $configuration['context_mapping'] ?? [];
   }
 
   /**
@@ -150,13 +116,14 @@ trait ContextAwarePluginTrait {
   /**
    * {@inheritdoc}
    */
-  abstract protected function getPluginDefinition();
+  abstract public function getPluginDefinition();
 
   /**
    * {@inheritdoc}
    *
    * @return \Drupal\Core\Plugin\Context\ContextDefinitionInterface[]
    */
+  // phpcs:ignore Drupal.Commenting.FunctionComment.MissingReturnComment
   public function getContextDefinitions() {
     $definition = $this->getPluginDefinition();
     if ($definition instanceof ContextAwarePluginDefinitionInterface) {
@@ -171,6 +138,7 @@ trait ContextAwarePluginTrait {
    *
    * @return \Drupal\Core\Plugin\Context\ContextDefinitionInterface
    */
+  // phpcs:ignore Drupal.Commenting.FunctionComment.MissingReturnComment
   public function getContextDefinition($name) {
     $definition = $this->getPluginDefinition();
     if ($definition instanceof ContextAwarePluginDefinitionInterface) {
@@ -207,7 +175,7 @@ trait ContextAwarePluginTrait {
     // Applied contexts can affect the cache contexts when this plugin is
     // involved in caching, collect and return them.
     foreach ($this->getContexts() as $context) {
-      /** @var $context \Drupal\Core\Cache\CacheableDependencyInterface */
+      /** @var \Drupal\Core\Cache\CacheableDependencyInterface $context */
       if ($context instanceof CacheableDependencyInterface) {
         $cache_contexts = Cache::mergeContexts($cache_contexts, $context->getCacheContexts());
       }
@@ -223,7 +191,7 @@ trait ContextAwarePluginTrait {
     // Applied contexts can affect the cache tags when this plugin is
     // involved in caching, collect and return them.
     foreach ($this->getContexts() as $context) {
-      /** @var $context \Drupal\Core\Cache\CacheableDependencyInterface */
+      /** @var \Drupal\Core\Cache\CacheableDependencyInterface $context */
       if ($context instanceof CacheableDependencyInterface) {
         $tags = Cache::mergeTags($tags, $context->getCacheTags());
       }
@@ -240,7 +208,7 @@ trait ContextAwarePluginTrait {
     // Applied contexts can affect the cache max age when this plugin is
     // involved in caching, collect and return them.
     foreach ($this->getContexts() as $context) {
-      /** @var $context \Drupal\Core\Cache\CacheableDependencyInterface */
+      /** @var \Drupal\Core\Cache\CacheableDependencyInterface $context */
       if ($context instanceof CacheableDependencyInterface) {
         $max_age = Cache::mergeMaxAges($max_age, $context->getCacheMaxAge());
       }

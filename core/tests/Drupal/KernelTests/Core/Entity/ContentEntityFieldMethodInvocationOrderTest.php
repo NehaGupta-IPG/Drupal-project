@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\KernelTests\Core\Entity;
 
 use Drupal\language\Entity\ConfigurableLanguage;
@@ -12,9 +14,7 @@ use Drupal\language\Entity\ConfigurableLanguage;
 class ContentEntityFieldMethodInvocationOrderTest extends EntityKernelTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['language', 'system', 'entity_test'];
 
@@ -43,7 +43,7 @@ class ContentEntityFieldMethodInvocationOrderTest extends EntityKernelTestBase {
   /**
    * Tests correct field method invocation order.
    */
-  public function testFieldMethodInvocationOrder() {
+  public function testFieldMethodInvocationOrder(): void {
 
     // Create a test entity.
     $entity = $this->entityTestFieldMethodsStorage->create([
@@ -61,7 +61,9 @@ class ContentEntityFieldMethodInvocationOrderTest extends EntityKernelTestBase {
     }
     $entity->getTranslation('de')
       ->save();
-    $this->assertTrue($entity->getTranslation('fr')->test_invocation_order->value > $entity->getTranslation('de')->test_invocation_order->value, 'The field presave method has been invoked in the correct entity translation order.');
+    // Verify that the field presave method has been invoked in the correct
+    // entity translation order.
+    $this->assertGreaterThan($entity->getTranslation('de')->test_invocation_order->value, $entity->getTranslation('fr')->test_invocation_order->value);
 
     // Reset the current value of the test field.
     foreach (['de', 'fr'] as $langcode) {
@@ -69,7 +71,9 @@ class ContentEntityFieldMethodInvocationOrderTest extends EntityKernelTestBase {
     }
     $entity->getTranslation('fr')
       ->save();
-    $this->assertTrue($entity->getTranslation('de')->test_invocation_order->value > $entity->getTranslation('fr')->test_invocation_order->value, 'The field presave method has been invoked in the correct entity translation order.');
+    // Verify that the field presave method has been invoked in the correct
+    // entity translation order.
+    $this->assertGreaterThan($entity->getTranslation('fr')->test_invocation_order->value, $entity->getTranslation('de')->test_invocation_order->value);
   }
 
 }

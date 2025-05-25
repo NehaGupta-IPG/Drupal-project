@@ -19,12 +19,11 @@
     'region--' ~ region|clean_class,
     'grid-full',
     'layout--pass--content-medium',
-    'ie11-autorow',
   ]
 %}
 
 {% if content %}
-  <div{{ attributes.addClass(classes) }}>
+  <div{{ attributes.addClass(classes) }} id="content">
     {{ content }}
   </div>
 {% endif %}

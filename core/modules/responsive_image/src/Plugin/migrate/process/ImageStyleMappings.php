@@ -2,6 +2,7 @@
 
 namespace Drupal\responsive_image\Plugin\migrate\process;
 
+use Drupal\migrate\Attribute\MigrateProcess;
 use Drupal\migrate\MigrateException;
 use Drupal\migrate\MigrateExecutableInterface;
 use Drupal\migrate\ProcessPluginBase;
@@ -9,11 +10,8 @@ use Drupal\migrate\Row;
 
 /**
  * Transforms image style mappings.
- *
- * @MigrateProcessPlugin(
- *   id = "image_style_mappings"
- * )
  */
+#[MigrateProcess('image_style_mappings')]
 class ImageStyleMappings extends ProcessPluginBase {
 
   /**
@@ -21,10 +19,10 @@ class ImageStyleMappings extends ProcessPluginBase {
    */
   public function transform($value, MigrateExecutableInterface $migrate_executable, Row $row, $destination_property) {
     if (!is_array($value)) {
-      throw new MigrateException(sprintf('Input should be an array for destination %s', $destination_property));
+      throw new MigrateException('Input should be an array');
     }
 
-    list($mappings, $breakpoint_group) = $value;
+    [$mappings, $breakpoint_group] = $value;
 
     $new_value = [];
     foreach ($mappings as $mapping_id => $mapping) {

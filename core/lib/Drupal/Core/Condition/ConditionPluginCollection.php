@@ -22,6 +22,7 @@ class ConditionPluginCollection extends DefaultLazyPluginCollection {
    *
    * @return \Drupal\Core\Condition\ConditionInterface
    */
+  // phpcs:ignore Drupal.Commenting.FunctionComment.MissingReturnComment
   public function &get($instance_id) {
     return parent::get($instance_id);
   }
@@ -42,7 +43,14 @@ class ConditionPluginCollection extends DefaultLazyPluginCollection {
       // configured, so remove the context_mapping from the instance config to
       // compare the remaining values.
       unset($instance_config['context_mapping']);
-      if ($default_config === $instance_config) {
+      ksort($default_config);
+      ksort($instance_config);
+      // With PHP 8 type juggling, there should not be an issue using equal
+      // operator instead of identical operator. Allowing looser comparison here
+      // will prevent configuration from being erroneously exported when values
+      // are updated via form elements that return values of the wrong type, for
+      // example, '0'/'1' vs FALSE/TRUE.
+      if ($default_config == $instance_config) {
         unset($configuration[$instance_id]);
       }
     }

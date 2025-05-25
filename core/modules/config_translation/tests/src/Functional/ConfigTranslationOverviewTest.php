@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\config_translation\Functional;
 
 use Drupal\Component\Utility\Html;
@@ -17,9 +19,7 @@ use Drupal\Tests\BrowserTestBase;
 class ConfigTranslationOverviewTest extends BrowserTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = [
     'block',
@@ -54,6 +54,9 @@ class ConfigTranslationOverviewTest extends BrowserTestBase {
    */
   protected $localeStorage;
 
+  /**
+   * {@inheritdoc}
+   */
   protected function setUp(): void {
     parent::setUp();
     $permissions = [
@@ -80,13 +83,13 @@ class ConfigTranslationOverviewTest extends BrowserTestBase {
   /**
    * Tests the config translation mapper page.
    */
-  public function testMapperListPage() {
+  public function testMapperListPage(): void {
     $this->drupalGet('admin/config/regional/config-translation');
     $this->assertSession()->linkByHrefExists('admin/config/regional/config-translation/config_test');
     $this->assertSession()->linkByHrefExists('admin/config/people/accounts/translate');
     // Make sure there is only a single operation for each dropbutton, either
     // 'List' or 'Translate'.
-    foreach ($this->cssSelect('ul.dropbutton') as $i => $dropbutton) {
+    foreach ($this->cssSelect('ul.dropbutton') as $dropbutton) {
       $this->assertCount(1, $dropbutton->findAll('xpath', 'li'));
       $this->assertTrue(($dropbutton->getText() === 'Translate') || ($dropbutton->getText() === 'List'));
     }
@@ -112,9 +115,9 @@ class ConfigTranslationOverviewTest extends BrowserTestBase {
 
       // Make sure there is only a single 'Translate' operation for each
       // dropbutton.
-      foreach ($this->cssSelect('ul.dropbutton') as $i => $dropbutton) {
+      foreach ($this->cssSelect('ul.dropbutton') as $dropbutton) {
         $this->assertCount(1, $dropbutton->findAll('xpath', 'li'));
-        $this->assertIdentical('Translate', $dropbutton->getText());
+        $this->assertSame('Translate', $dropbutton->getText());
       }
 
       $entity_type = \Drupal::entityTypeManager()->getDefinition($test_entity->getEntityTypeId());
@@ -122,8 +125,8 @@ class ConfigTranslationOverviewTest extends BrowserTestBase {
 
       $title = $test_entity->label() . ' ' . $entity_type->getSingularLabel();
       $title = 'Translations for <em class="placeholder">' . Html::escape($title) . '</em>';
-      $this->assertRaw($title);
-      $this->assertRaw('<th>' . t('Language') . '</th>');
+      $this->assertSession()->responseContains($title);
+      $this->assertSession()->responseContains('<th>Language</th>');
 
       $this->drupalGet($base_url);
       $this->assertSession()->linkExists('Translate test configuration');
@@ -133,28 +136,28 @@ class ConfigTranslationOverviewTest extends BrowserTestBase {
   /**
    * Tests availability of hidden entities in the translation overview.
    */
-  public function testHiddenEntities() {
+  public function testHiddenEntities(): void {
     // Hidden languages are only available to translate through the
     // configuration translation listings.
     $this->drupalGet('admin/config/regional/config-translation/configurable_language');
-    $this->assertText('Not applicable');
+    $this->assertSession()->pageTextContains('Not applicable');
     $this->assertSession()->linkByHrefExists('admin/config/regional/language/edit/zxx/translate');
-    $this->assertText('Not specified');
+    $this->assertSession()->pageTextContains('Not specified');
     $this->assertSession()->linkByHrefExists('admin/config/regional/language/edit/und/translate');
 
     // Hidden date formats are only available to translate through the
     // configuration translation listings. Test a couple of them.
     $this->drupalGet('admin/config/regional/config-translation/date_format');
-    $this->assertText('HTML Date');
+    $this->assertSession()->pageTextContains('HTML Date');
     $this->assertSession()->linkByHrefExists('admin/config/regional/date-time/formats/manage/html_date/translate');
-    $this->assertText('HTML Year');
+    $this->assertSession()->pageTextContains('HTML Year');
     $this->assertSession()->linkByHrefExists('admin/config/regional/date-time/formats/manage/html_year/translate');
   }
 
   /**
    * Tests that overrides do not affect listing screens.
    */
-  public function testListingPageWithOverrides() {
+  public function testListingPageWithOverrides(): void {
     $original_label = 'Default';
     $overridden_label = 'Overridden label';
 
@@ -168,18 +171,18 @@ class ConfigTranslationOverviewTest extends BrowserTestBase {
     $this->writeSettings($settings);
 
     // Test that the overridden label is loaded with the entity.
-    $this->assertEqual($config_test_storage->load('dotted.default')->label(), $overridden_label);
+    $this->assertEquals($overridden_label, $config_test_storage->load('dotted.default')->label());
 
     // Test that the original label on the listing page is intact.
     $this->drupalGet('admin/config/regional/config-translation/config_test');
-    $this->assertText($original_label);
-    $this->assertNoText($overridden_label);
+    $this->assertSession()->pageTextContains($original_label);
+    $this->assertSession()->pageTextNotContains($overridden_label);
   }
 
   /**
    * Tests the field listing for the translate operation.
    */
-  public function testListingFieldsPage() {
+  public function testListingFieldsPage(): void {
     // Create a content type.
     $node_type = NodeType::create([
       'type' => 'basic',
@@ -198,8 +201,8 @@ class ConfigTranslationOverviewTest extends BrowserTestBase {
     $field->save();
 
     $this->drupalGet('admin/config/regional/config-translation/node_fields');
-    $this->assertText('Body');
-    $this->assertText('Basic');
+    $this->assertSession()->pageTextContains('Body');
+    $this->assertSession()->pageTextContains('Basic');
     $this->assertSession()->linkByHrefExists('admin/structure/types/manage/basic/fields/node.basic.body/translate');
   }
 

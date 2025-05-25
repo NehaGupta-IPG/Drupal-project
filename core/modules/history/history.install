@@ -8,7 +8,7 @@
 /**
  * Implements hook_schema().
  */
-function history_schema() {
+function history_schema(): array {
   $schema['history'] = [
     'description' => 'A record of which {users} have read which {node}s.',
     'fields' => [
@@ -30,6 +30,7 @@ function history_schema() {
         'type' => 'int',
         'not null' => TRUE,
         'default' => 0,
+        'size' => 'big',
       ],
     ],
     'primary key' => ['uid', 'nid'],
@@ -44,6 +45,6 @@ function history_schema() {
 /**
  * Implements hook_update_last_removed().
  */
-function history_update_last_removed() {
-  return 8101;
+function history_update_last_removed(): int {
+  return 10100;
 }

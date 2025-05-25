@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\KernelTests\Core\Extension;
 
 use Drupal\KernelTests\KernelTestBase;
@@ -19,12 +21,12 @@ class UpdateSchemaTest extends KernelTestBase {
   /**
    * Tests the function parses schema updates as integer numbers.
    *
-   * @see drupal_get_schema_versions()
+   * @see \Drupal\Core\Update\UpdateHookRegistry::getAvailableUpdates()
    */
-  public function testDrupalGetSchemaVersionsInt() {
+  public function testDrupalGetSchemaVersionsInt(): void {
     \Drupal::state()->set('update_test_schema_version', 8001);
     $this->installSchema('update_test_schema', ['update_test_schema_table']);
-    $schema = drupal_get_schema_versions('update_test_schema');
+    $schema = \Drupal::service('update.update_hook_registry')->getAvailableUpdates('update_test_schema');
     foreach ($schema as $version) {
       $this->assertIsInt($version);
     }

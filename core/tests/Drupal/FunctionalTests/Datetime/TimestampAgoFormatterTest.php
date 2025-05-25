@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\FunctionalTests\Datetime;
 
 use Drupal\Core\Entity\Entity\EntityFormDisplay;
@@ -102,23 +104,23 @@ class TimestampAgoFormatterTest extends BrowserTestBase {
   /**
    * Tests the formatter settings.
    */
-  public function testSettings() {
+  public function testSettings(): void {
     $this->drupalGet('entity_test/structure/entity_test/display');
 
     $edit = [
       'fields[field_timestamp][region]' => 'content',
       'fields[field_timestamp][type]' => 'timestamp_ago',
     ];
-    $this->drupalPostForm(NULL, $edit, t('Save'));
+    $this->submitForm($edit, 'Save');
 
-    $this->drupalPostForm(NULL, [], 'field_timestamp_settings_edit');
+    $this->submitForm([], 'field_timestamp_settings_edit');
     $edit = [
       'fields[field_timestamp][settings_edit_form][settings][future_format]' => 'ends in @interval',
       'fields[field_timestamp][settings_edit_form][settings][past_format]' => 'started @interval ago',
       'fields[field_timestamp][settings_edit_form][settings][granularity]' => 1,
     ];
-    $this->drupalPostForm(NULL, $edit, 'Update');
-    $this->drupalPostForm(NULL, [], 'Save');
+    $this->submitForm($edit, 'Update');
+    $this->submitForm([], 'Save');
 
     $this->assertSession()->pageTextContains('ends in 1 year');
     $this->assertSession()->pageTextContains('started 1 year ago');

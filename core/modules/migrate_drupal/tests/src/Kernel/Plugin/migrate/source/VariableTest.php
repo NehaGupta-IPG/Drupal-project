@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\migrate_drupal\Kernel\Plugin\migrate\source;
 
 use Drupal\Tests\migrate\Kernel\MigrateSqlSourceTestBase;
@@ -21,7 +23,7 @@ class VariableTest extends MigrateSqlSourceTestBase {
   /**
    * {@inheritdoc}
    */
-  public function providerSource() {
+  public static function providerSource() {
     $tests = [];
 
     // The source data.
@@ -93,8 +95,8 @@ class VariableTest extends MigrateSqlSourceTestBase {
       ],
     ];
 
-    // Test cases with only 'variables_required' configuration.
-    $variables_required_tests = [
+    // Test cases with only 'variables_no_row_if_missing' configuration.
+    $variables_no_row_if_missing_tests = [
       'Two required variables, all of them are available' => [
         'source_data' => $source_data,
         'expected_data' => [
@@ -106,7 +108,7 @@ class VariableTest extends MigrateSqlSourceTestBase {
         ],
         'expected_count' => 1,
         'configuration' => [
-          'variables_required' => [
+          'variables_no_row_if_missing' => [
             'foo',
             'bar',
           ],
@@ -117,7 +119,7 @@ class VariableTest extends MigrateSqlSourceTestBase {
         'expected_data' => [],
         'expected_count' => 0,
         'configuration' => [
-          'variables_required' => [
+          'variables_no_row_if_missing' => [
             'foo',
             'bar0',
           ],
@@ -133,7 +135,7 @@ class VariableTest extends MigrateSqlSourceTestBase {
         ],
         'expected_count' => 1,
         'configuration' => [
-          'variables_required' => [
+          'variables_no_row_if_missing' => [
             'baz',
           ],
         ],
@@ -143,12 +145,12 @@ class VariableTest extends MigrateSqlSourceTestBase {
         'expected_data' => [],
         'expected_count' => 0,
         'configuration' => [
-          'variables_required' => [
+          'variables_no_row_if_missing' => [
             'bar0',
           ],
         ],
       ],
-      // Test cases with both 'variables' and 'variables_required'
+      // Test cases with both 'variables' and 'variables_no_row_if_missing'
       // configuration.
       'One optional and two required variables, all of them are available' => [
         'source_data' => $source_data,
@@ -163,7 +165,7 @@ class VariableTest extends MigrateSqlSourceTestBase {
         'expected_count' => 1,
         'configuration' => [
           'variables' => ['foo'],
-          'variables_required' => ['bar', 'baz'],
+          'variables_no_row_if_missing' => ['bar', 'baz'],
         ],
       ],
       'One optional and two required variables, only one required is available' => [
@@ -172,7 +174,7 @@ class VariableTest extends MigrateSqlSourceTestBase {
         'expected_count' => 0,
         'configuration' => [
           'variables' => ['foo'],
-          'variables_required' => ['bar', 'foobar'],
+          'variables_no_row_if_missing' => ['bar', 'foobar'],
         ],
       ],
       'Two optional and one required and available variable, every optional is missing' => [
@@ -186,7 +188,7 @@ class VariableTest extends MigrateSqlSourceTestBase {
         'expected_count' => 1,
         'configuration' => [
           'variables' => ['qux', 'waldo'],
-          'variables_required' => ['bar'],
+          'variables_no_row_if_missing' => ['bar'],
         ],
       ],
       'Two available optional and a required, but missing variable' => [
@@ -195,14 +197,14 @@ class VariableTest extends MigrateSqlSourceTestBase {
         'expected_count' => 0,
         'configuration' => [
           'variables' => ['baz', 'foo'],
-          'variables_required' => [
+          'variables_no_row_if_missing' => [
             'foo_bar_baz',
           ],
         ],
       ],
     ];
 
-    return $tests + $variables_required_tests;
+    return $tests + $variables_no_row_if_missing_tests;
   }
 
 }

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\system\Functional\Cache;
 
 use Drupal\Core\Url;
@@ -12,15 +14,8 @@ abstract class PageCacheTagsTestBase extends BrowserTestBase {
 
   /**
    * {@inheritdoc}
-   *
-   * Always enable header dumping in page cache tags tests, this aids debugging.
    */
-  protected $dumpHeaders = TRUE;
-
-  /**
-   * {@inheritdoc}
-   */
-  protected function setUp() {
+  protected function setUp(): void {
     parent::setUp();
 
     // Enable page caching.
@@ -52,7 +47,7 @@ abstract class PageCacheTagsTestBase extends BrowserTestBase {
       sort($cache_entry->tags);
       $tags = array_unique($tags);
       sort($tags);
-      $this->assertIdentical($cache_entry->tags, $tags);
+      $this->assertSame($cache_entry->tags, $tags);
     }
   }
 

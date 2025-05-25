@@ -1,13 +1,17 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\migrate_drupal_ui\Functional\d7;
 
 use Drupal\Tests\migrate_drupal_ui\Functional\MultilingualReviewPageTestBase;
 
+// cspell:ignore Filefield Flexslider Multiupload Imagefield rulesets
+
 /**
  * Tests migrate upgrade review page for Drupal 7.
  *
- * Tests with translation modules and migrate_drupal_multilingual enabled.
+ * Tests with translation modules enabled.
  *
  * @group migrate_drupal_7
  * @group migrate_drupal_ui
@@ -18,15 +22,11 @@ class MultilingualReviewPageTest extends MultilingualReviewPageTestBase {
    * {@inheritdoc}
    */
   protected static $modules = [
+    'datetime_range',
     'language',
     'content_translation',
     'telephone',
-    'aggregator',
-    'book',
-    'forum',
-    'statistics',
     'syslog',
-    'tracker',
     'update',
     // Test migrations states.
     'migrate_state_finished_test',
@@ -38,28 +38,26 @@ class MultilingualReviewPageTest extends MultilingualReviewPageTestBase {
    */
   protected function setUp(): void {
     parent::setUp();
-    $this->loadFixture(drupal_get_path('module', 'migrate_drupal') . '/tests/fixtures/drupal7.php');
+    $this->loadFixture($this->getModulePath('migrate_drupal') . '/tests/fixtures/drupal7.php');
   }
 
   /**
    * {@inheritdoc}
    */
-  protected function getSourceBasePath() {
+  protected function getSourceBasePath(): string {
     return __DIR__ . '/files';
   }
 
   /**
    * {@inheritdoc}
    */
-  protected function getAvailablePaths() {
+  protected function getAvailablePaths(): array {
     return [
       'Block languages',
       'Blog',
-      'Book',
       'Bulk Export',
       'Chaos tools',
       'Chaos Tools (CTools) AJAX Example',
-      'Color',
       'Comment',
       'Contact',
       'Content translation',
@@ -89,18 +87,20 @@ class MultilingualReviewPageTest extends MultilingualReviewPageTestBase {
       'Field UI',
       'File',
       'Filter',
-      'Forum',
       'Help',
       'Image',
+      'Internationalization',
       'Link',
       'List',
       'Locale',
       'Menu',
       'Menu translation',
+      'Multiupload Filefield Widget',
+      'Multiupload Imagefield Widget',
       'Node',
+      'Node Reference',
       'Number',
       'OpenID',
-      'Options',
       'Overlay',
       'PHP filter',
       'Page manager',
@@ -108,16 +108,17 @@ class MultilingualReviewPageTest extends MultilingualReviewPageTestBase {
       'Phone',
       'Poll',
       'Profile',
-      'RDF',
       'Search',
       'Search embedded form',
       'Shortcut',
-      'Statistics',
+      'String translation',
       'Stylizer',
       'Synchronize translations',
       'Syslog',
       'System',
+      'Taxonomy translation',
       'Taxonomy',
+      'Telephone',
       'Term Depth access',
       'Test search node tags',
       'Test search type',
@@ -125,10 +126,10 @@ class MultilingualReviewPageTest extends MultilingualReviewPageTestBase {
       'Text',
       'Title',
       'Toolbar',
-      'Tracker',
       'Trigger',
       'Update manager',
       'User',
+      'User Reference',
       'Views content panes',
       'Views UI',
     ];
@@ -137,14 +138,15 @@ class MultilingualReviewPageTest extends MultilingualReviewPageTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function getMissingPaths() {
+  protected function getMissingPaths(): array {
     return [
       // Action is set not_finished in migrate_state_not_finished_test.
-      // Aggregator is set not_finished in migrate_state_not_finished_test.
       'Aggregator',
       // Block is set not_finished in migrate_state_not_finished_test.
       'Block',
+      'Book',
       'Breakpoints',
+      'Color',
       'Contact translation',
       'Entity Translation Menu',
       'Entity Translation Upgrade',
@@ -152,14 +154,19 @@ class MultilingualReviewPageTest extends MultilingualReviewPageTestBase {
       // Flexslider_picture is a sub module of Picture module. Only the
       // styles from picture are migrated.
       'FlexSlider Picture',
-      'Internationalization',
+      'Forum',
       'Multilingual content',
       'Multilingual forum',
       'Multilingual select',
+      // Options is set not_finished in migrate_state_not_finished_test.
+      'Options',
       'Path translation',
       'Picture',
-      'String translation',
-      'Taxonomy translation',
+      'RDF',
+      'References',
+      'References UUID',
+      'Statistics',
+      'Tracker',
       'Translation redirect',
       'Translation sets',
       'User mail translation',

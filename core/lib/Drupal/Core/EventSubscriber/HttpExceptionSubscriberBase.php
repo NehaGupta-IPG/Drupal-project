@@ -99,8 +99,8 @@ abstract class HttpExceptionSubscriberBase implements EventSubscriberInterface {
     if ($exception instanceof HttpExceptionInterface && (empty($handled_formats) || in_array($format, $handled_formats))) {
       $method = 'on' . $exception->getStatusCode();
       // Keep just the leading number of the status code to produce either a
-      // on400 or a 500 method callback.
-      $method_fallback = 'on' . substr($exception->getStatusCode(), 0, 1) . 'xx';
+      // 400 or a 500 method callback.
+      $method_fallback = 'on' . substr((string) $exception->getStatusCode(), 0, 1) . 'xx';
       // We want to allow the method to be called and still not set a response
       // if it has additional filtering logic to determine when it will apply.
       // It is therefore the method's responsibility to set the response on the
@@ -120,7 +120,7 @@ abstract class HttpExceptionSubscriberBase implements EventSubscriberInterface {
    * @return array
    *   An array of event listener definitions.
    */
-  public static function getSubscribedEvents() {
+  public static function getSubscribedEvents(): array {
     $events[KernelEvents::EXCEPTION][] = ['onException', static::getPriority()];
     return $events;
   }

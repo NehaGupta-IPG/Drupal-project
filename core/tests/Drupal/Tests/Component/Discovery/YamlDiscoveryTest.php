@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\Component\Discovery;
 
 use Drupal\Component\Discovery\YamlDiscovery;
@@ -28,7 +30,7 @@ class YamlDiscoveryTest extends TestCase {
   /**
    * Tests the YAML file discovery.
    */
-  public function testDiscovery() {
+  public function testDiscovery(): void {
     vfsStreamWrapper::register();
     $root = new vfsStreamDirectory('modules');
     vfsStreamWrapper::setRoot($root);
@@ -62,7 +64,7 @@ class YamlDiscoveryTest extends TestCase {
 
     foreach (['test_1', 'test_2', 'test_3'] as $key) {
       $this->assertArrayHasKey('name', $data[$key]);
-      $this->assertEquals($data[$key]['name'], 'test');
+      $this->assertEquals('test', $data[$key]['name']);
     }
 
     $this->assertSame([], $data['test_4']);
@@ -71,7 +73,7 @@ class YamlDiscoveryTest extends TestCase {
   /**
    * Tests if filename is output for a broken YAML file.
    */
-  public function testForBrokenYml() {
+  public function testForBrokenYml(): void {
     vfsStreamWrapper::register();
     $root = new vfsStreamDirectory('modules');
     vfsStreamWrapper::setRoot($root);

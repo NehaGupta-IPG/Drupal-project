@@ -1,7 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\system\Kernel\Migrate\d7;
 
+use Drupal\migrate\MigrateExecutable;
 use Drupal\Tests\migrate_drupal\Kernel\d7\MigrateDrupal7TestBase;
 
 /**
@@ -19,8 +22,6 @@ class MigrateMenuTranslationTest extends MigrateDrupal7TestBase {
     'language',
     'locale',
     'menu_link_content',
-    // Required for translation migrations.
-    'migrate_drupal_multilingual',
   ];
 
   /**
@@ -40,7 +41,7 @@ class MigrateMenuTranslationTest extends MigrateDrupal7TestBase {
   /**
    * Tests migration of menu translations.
    */
-  public function testMenuTranslation() {
+  public function testMenuTranslation(): void {
     $language_manager = \Drupal::service('language_manager');
 
     $config_translation = $language_manager->getLanguageConfigOverride('is', 'system.menu.main');
@@ -62,6 +63,22 @@ class MigrateMenuTranslationTest extends MigrateDrupal7TestBase {
     $config_translation = $language_manager->getLanguageConfigOverride('is', 'menu-fixedlang');
     $this->assertNull($config_translation->get('description'));
     $this->assertNull($config_translation->get('label'));
+
+    // Test rollback.
+    $this->migration = $this->getMigration("d7_menu_translation");
+    (new MigrateExecutable($this->migration, $this))->rollback();
+
+    $config_translation = $language_manager->getLanguageConfigOverride('is', 'system.menu.main');
+    $this->assertNull($config_translation->get('description'));
+    $this->assertNull($config_translation->get('label'));
+
+    $config_translation = $language_manager->getLanguageConfigOverride('fr', 'system.menu.main');
+    $this->assertNull($config_translation->get('description'));
+    $this->assertNull($config_translation->get('label'));
+
+    // Translate and localize menu.
+    $config_translation = $language_manager->getLanguageConfigOverride('fr', 'system.menu.menu-test-menu');
+    $this->assertNull($config_translation->get('description'));
   }
 
 }

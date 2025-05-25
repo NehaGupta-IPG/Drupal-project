@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\Component\Serialization;
 
 use Drupal\Component\Serialization\Json;
@@ -39,7 +41,7 @@ class JsonTest extends TestCase {
     parent::setUp();
 
     // Setup a string with the full ASCII table.
-    // @todo: Add tests for non-ASCII characters and Unicode.
+    // @todo Add tests for non-ASCII characters and Unicode.
     $this->string = '';
     for ($i = 1; $i < 128; $i++) {
       $this->string .= chr($i);
@@ -55,7 +57,7 @@ class JsonTest extends TestCase {
   /**
    * Tests encoding for every ASCII character.
    */
-  public function testEncodingAscii() {
+  public function testEncodingAscii(): void {
     // Verify there aren't character encoding problems with the source string.
     $this->assertSame(127, strlen($this->string), 'A string with the full ASCII table has the correct length.');
     foreach ($this->htmlUnsafe as $char) {
@@ -66,27 +68,28 @@ class JsonTest extends TestCase {
   /**
    * Tests encoding length.
    */
-  public function testEncodingLength() {
+  public function testEncodingLength(): void {
     // Verify that JSON encoding produces a string with all of the characters.
     $json = Json::encode($this->string);
-    $this->assertTrue(strlen($json) > strlen($this->string), 'A JSON encoded string is larger than the source string.');
+    // Verify that a JSON-encoded string is larger than the source string.
+    $this->assertGreaterThan(strlen($this->string), strlen($json));
   }
 
   /**
    * Tests end and start of the encoded string.
    */
-  public function testEncodingStartEnd() {
+  public function testEncodingStartEnd(): void {
     $json = Json::encode($this->string);
     // The first and last characters should be ", and no others.
-    $this->assertTrue($json[0] == '"', 'A JSON encoded string begins with ".');
-    $this->assertTrue($json[strlen($json) - 1] == '"', 'A JSON encoded string ends with ".');
-    $this->assertTrue(substr_count($json, '"') == 2, 'A JSON encoded string contains exactly two ".');
+    $this->assertStringStartsWith('"', $json, 'A JSON encoded string begins with ".');
+    $this->assertStringEndsWith('"', $json, 'A JSON encoded string ends with ".');
+    $this->assertSame(2, substr_count($json, '"'), 'A JSON encoded string contains exactly two ".');
   }
 
   /**
    * Tests converting PHP variables to JSON strings and back.
    */
-  public function testReversibility() {
+  public function testReversibility(): void {
     $json = Json::encode($this->string);
     // Verify that encoding/decoding is reversible.
     $json_decoded = Json::decode($json);
@@ -94,9 +97,9 @@ class JsonTest extends TestCase {
   }
 
   /**
-   * Test the reversibility of structured data
+   * Tests the reversibility of structured data.
    */
-  public function testStructuredReversibility() {
+  public function testStructuredReversibility(): void {
     // Verify reversibility for structured data. Also verify that necessary
     // characters are escaped.
     $source = [TRUE, FALSE, 0, 1, '0', '1', $this->string, ['key1' => $this->string, 'key2' => ['nested' => TRUE]]];

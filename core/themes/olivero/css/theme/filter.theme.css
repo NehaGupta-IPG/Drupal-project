@@ -15,7 +15,7 @@
  */
 
 .text-full > .form-item {
-  margin-bottom: 0;
+  margin-block-end: 0;
 }
 
 .form-element--editor-format {
@@ -23,26 +23,30 @@
 }
 
 .filter-wrapper {
-  margin-top: 18px;
-  margin-bottom: 9px;
+  margin-block: var(--sp1) var(--sp0-5);
 }
 
 .filter-wrapper .form-item {
   margin: 0;
 }
 
-[dir="ltr"] .filter-help {
-  float: right;
-}
-
-[dir="rtl"] .filter-help {
-  float: left;
-}
-
 .filter-help {
-  padding-top: 9px;
-  padding-bottom: 9px;
-  font-size: 12px;
+  float: right; /* LTR */
+  padding-block: var(--sp0-5);
+  font-size: var(--font-size-xxs);
+
+  /**
+   * Chromium and Webkit do not yet support flow relative logical properties,
+   * such as float: inline-end. However, PostCSS Logical does not compile this
+   * value, so we accommodate by not using these.
+   *
+   * @see https://caniuse.com/mdn-css_properties_clear_flow_relative_values
+   * @see https://github.com/csstools/postcss-plugins/issues/632
+   */
+}
+
+.filter-help:dir(rtl) {
+  float: left;
 }
 
 /**
@@ -52,8 +56,7 @@
  */
 
 .compose-tips__item {
-  margin-top: 27px;
-  margin-bottom: 27px;
+  margin-block: var(--sp1-5);
 }
 
 /**
@@ -61,14 +64,13 @@
  */
 
 .filter-guidelines__item {
-  margin-top: 18px;
-  font-size: 14px;
-  line-height: 18px;
+  margin-block-start: var(--sp1);
+  font-size: var(--font-size-s);
+  line-height: var(--line-height-s);
 }
 
 .filter-guidelines p {
-  margin-top: 4.5px;
-  margin-bottom: 0;
+  margin-block: var(--sp0-25) 0;
 }
 
 /**
@@ -79,16 +81,14 @@
  */
 
 .filter-tips--long {
-  margin-bottom: 27px;
+  margin-block-end: var(--sp1-5);
 }
 
 .filter-tips__item,
 .filter-tips--long p {
-  margin-top: 13.5px;
-  margin-bottom: 13.5px;
+  margin-block: var(--sp0-75);
 }
 
 .filter-tips__item--short {
-  margin-top: 4.5px;
-  margin-bottom: 0;
+  margin-block: var(--sp0-25) 0;
 }

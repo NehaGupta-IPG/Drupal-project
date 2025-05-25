@@ -1,5 +1,5 @@
 <?php
-// @codingStandardsIgnoreFile
+// phpcs:ignoreFile
 
 /**
  * This file was generated via php core/scripts/generate-proxy-class.php 'Drupal\Core\File\MimeType\ExtensionMimeTypeGuesser' "core/lib/Drupal/Core".
@@ -12,7 +12,7 @@ namespace Drupal\Core\ProxyClass\File\MimeType {
      *
      * @see \Drupal\Component\ProxyBuilder
      */
-    class ExtensionMimeTypeGuesser implements \Symfony\Component\Mime\MimeTypeGuesserInterface, \Symfony\Component\HttpFoundation\File\MimeType\MimeTypeGuesserInterface
+    class ExtensionMimeTypeGuesser implements \Symfony\Component\Mime\MimeTypeGuesserInterface
     {
 
         use \Drupal\Core\DependencyInjection\DependencySerializationTrait;
@@ -70,15 +70,7 @@ namespace Drupal\Core\ProxyClass\File\MimeType {
         /**
          * {@inheritdoc}
          */
-        public function guess($path)
-        {
-            return $this->lazyLoadItself()->guess($path);
-        }
-
-        /**
-         * {@inheritdoc}
-         */
-        public function guessMimeType($path): string
+        public function guessMimeType($path): ?string
         {
             return $this->lazyLoadItself()->guessMimeType($path);
         }
@@ -86,9 +78,9 @@ namespace Drupal\Core\ProxyClass\File\MimeType {
         /**
          * {@inheritdoc}
          */
-        public function setMapping(?array $mapping = NULL)
+        public function setMapping(?array $mapping = NULL): void
         {
-            return $this->lazyLoadItself()->setMapping($mapping);
+            $this->lazyLoadItself()->setMapping($mapping);
         }
 
         /**

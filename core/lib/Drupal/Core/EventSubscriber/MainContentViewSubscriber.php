@@ -27,7 +27,7 @@ class MainContentViewSubscriber implements EventSubscriberInterface {
   /**
    * The class resolver service.
    *
-   * @var \Drupal\Core\Controller\ControllerResolverInterface
+   * @var \Drupal\Core\DependencyInjection\ClassResolverInterface
    */
   protected $classResolver;
 
@@ -101,7 +101,7 @@ class MainContentViewSubscriber implements EventSubscriberInterface {
   /**
    * {@inheritdoc}
    */
-  public static function getSubscribedEvents() {
+  public static function getSubscribedEvents(): array {
     $events[KernelEvents::VIEW][] = ['onViewRenderArray'];
 
     return $events;

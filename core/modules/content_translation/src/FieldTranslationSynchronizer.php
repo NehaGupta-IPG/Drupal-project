@@ -101,8 +101,8 @@ class FieldTranslationSynchronizer implements FieldTranslationSynchronizerInterf
           return;
         }
         // When this mode is enabled, changes to synchronized properties are
-        // allowed only in the default translation, thus we need to make sure this
-        // is always used as source for the synchronization process.
+        // allowed only in the default translation, thus we need to make sure
+        // this is always used as source for the synchronization process.
         else {
           $sync_langcode = $entity->getUntranslated()->language()->getId();
         }
@@ -155,7 +155,7 @@ class FieldTranslationSynchronizer implements FieldTranslationSynchronizerInterf
           foreach ($groups as $group) {
             $info = $column_groups[$group];
             // A missing 'columns' key indicates we have a single-column group.
-            $columns = array_merge($columns, isset($info['columns']) ? $info['columns'] : [$group]);
+            $columns = array_merge($columns, $info['columns'] ?? [$group]);
           }
           if (!empty($columns)) {
             $values = [];
@@ -189,12 +189,13 @@ class FieldTranslationSynchronizer implements FieldTranslationSynchronizerInterf
    *   The unchanged entity.
    */
   protected function getOriginalEntity(ContentEntityInterface $entity) {
-    if (!isset($entity->original)) {
+    if (!$entity->getOriginal()) {
+      /** @var \Drupal\Core\Entity\RevisionableStorageInterface $storage */
       $storage = $this->entityTypeManager->getStorage($entity->getEntityTypeId());
-      $original = $entity->isDefaultRevision() ? $storage->loadUnchanged($entity->id()) : $storage->loadRevision($entity->getLoadedRevisionId());
+      $original = $entity->wasDefaultRevision() ? $storage->loadUnchanged($entity->id()) : $storage->loadRevision($entity->getLoadedRevisionId());
     }
     else {
-      $original = $entity->original;
+      $original = $entity->getOriginal();
     }
     return $original;
   }
@@ -285,7 +286,7 @@ class FieldTranslationSynchronizer implements FieldTranslationSynchronizerInterf
             // the new values are at least propagated to all the translations.
             // If the value has only been reordered we just move the old one in
             // the new position.
-            $item = isset($original_field_values[$langcode][$old_delta]) ? $original_field_values[$langcode][$old_delta] : $source_items[$new_delta];
+            $item = $original_field_values[$langcode][$old_delta] ?? $source_items[$new_delta];
             // When saving a default revision starting from a pending revision,
             // we may have desynchronized field values, so we make sure that
             // untranslatable properties are synchronized, even if in any other
@@ -327,7 +328,7 @@ class FieldTranslationSynchronizer implements FieldTranslationSynchronizerInterf
    * @param array $properties
    *   An array of column names to be synchronized.
    *
-   * @returns string
+   * @return string
    *   A hash code that can be used to identify the item.
    */
   protected function itemHash(array $items, $delta, array $properties) {

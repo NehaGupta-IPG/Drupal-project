@@ -96,15 +96,15 @@ class NodeTranslationExceptionSubscriber implements EventSubscriberInterface {
       $route_name = $previous_exception->getRouteName();
       $parameters = $previous_exception->getRawParameters();
       if ($route_name === 'entity.node.canonical' && isset($parameters['node'])) {
-        // If the node_translation_redirect state is not set, we don't need to check
-        // for a redirection.
+        // If the node_translation_redirect state is not set, we don't need to
+        // check for a redirection.
         if (!$this->state->get('node_translation_redirect')) {
           return;
         }
         $old_nid = $parameters['node'];
         $collection = $this->keyValue->get('node_translation_redirect');
         if ($old_nid && $value = $collection->get($old_nid)) {
-          list($nid, $langcode) = $value;
+          [$nid, $langcode] = $value;
           $language = $this->languageManager->getLanguage($langcode);
           $url = $this->urlGenerator->generateFromRoute('entity.node.canonical', ['node' => $nid], ['language' => $language]);
           $response = new RedirectResponse($url, 301);
@@ -117,7 +117,7 @@ class NodeTranslationExceptionSubscriber implements EventSubscriberInterface {
   /**
    * {@inheritdoc}
    */
-  public static function getSubscribedEvents() {
+  public static function getSubscribedEvents(): array {
     $events = [];
 
     $events[KernelEvents::EXCEPTION] = ['onException'];
