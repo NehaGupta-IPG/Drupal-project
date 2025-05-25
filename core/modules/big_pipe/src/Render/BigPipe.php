@@ -567,7 +567,6 @@ class BigPipe {
           $fake_request->query->set('ajax_page_state', ['libraries' => implode(',', $cumulative_assets->getAlreadyLoadedLibraries())] + $cumulative_assets->getSettings()['ajaxPageState']);
           $html_response = $this->filterEmbeddedResponse($fake_request, $html_response);
 
-          dump($html_response->getAttachments());
           $out = [
             [
               '#type' => 'html_tag',
