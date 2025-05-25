@@ -53,96 +53,73 @@ class HooksInServiceDeclarationsTest extends KernelTestBase {
     $this->assertTrue($this->testHookRan);
 
     \Drupal::service('module_installer')->install(['hook_collector_hook_attribute']);
-    $keyValue = \Drupal::keyValue('test_service_hooks');
-    $runCounts = $keyValue->get('run_counts', []);
-    $this->assertArrayNotHasKey(HookRegisteredService::class . '::__invoke', $runCounts);
+    $invocations = [];
 
     // Confirm that HookRegisteredService::__invoke() only runs once.
-    \Drupal::moduleHandler()->invokeAll('test_hook_1');
-    $runCounts = $keyValue->get('run_counts', []);
-    $this->assertEquals(1, $runCounts[HookRegisteredService::class . '::__invoke']);
+    \Drupal::moduleHandler()->invokeAll('test_hook_1', [&$invocations]);
+    $this->assertEquals(1, $invocations[HookRegisteredService::class . '::__invoke']);
 
     // Make sure all expected hook methods are invoked.
-    $this->assertArrayNotHasKey(ServiceWithHook::class . '::testHook2', $runCounts);
-    \Drupal::moduleHandler()->invokeAll('test_hook_2');
-    $runCounts = $keyValue->get('run_counts', []);
-    $this->assertEquals(1, $runCounts[ServiceWithHook::class . '::testHook2']);
-    $this->assertArrayNotHasKey(ServiceWithHook::class . '::testHook5', $runCounts);
-    \Drupal::moduleHandler()->invokeAll('test_hook_5');
-    $runCounts = $keyValue->get('run_counts', []);
-    $this->assertEquals(1, $runCounts[ServiceWithHook::class . '::testHook5']);
-    $this->assertArrayNotHasKey(AnotherServiceWithHook::class . '::testHook3', $runCounts);
-    \Drupal::moduleHandler()->invokeAll('test_hook_3');
-    $runCounts = $keyValue->get('run_counts', []);
-    $this->assertEquals(1, $runCounts[AnotherServiceWithHook::class . '::testHook3']);
-    $this->assertArrayNotHasKey(AnotherServiceWithHook::class . '::testHook6', $runCounts);
-    \Drupal::moduleHandler()->invokeAll('test_hook_6');
-    $runCounts = $keyValue->get('run_counts', []);
-    $this->assertEquals(1, $runCounts[AnotherServiceWithHook::class . '::testHook6']);
-
-    // Reset run counts after before install.
-    $keyValue->set('run_counts', []);
+    $this->assertArrayNotHasKey(ServiceWithHook::class . '::testHook2', $invocations);
+    \Drupal::moduleHandler()->invokeAll('test_hook_2', [&$invocations]);
+    $this->assertEquals(1, $invocations[ServiceWithHook::class . '::testHook2']);
+    $this->assertArrayNotHasKey(ServiceWithHook::class . '::testHook5', $invocations);
+    \Drupal::moduleHandler()->invokeAll('test_hook_5', [&$invocations]);
+    $this->assertEquals(1, $invocations[ServiceWithHook::class . '::testHook5']);
+    $this->assertArrayNotHasKey(AnotherServiceWithHook::class . '::testHook3', $invocations);
+    \Drupal::moduleHandler()->invokeAll('test_hook_3', [&$invocations]);
+    $this->assertEquals(1, $invocations[AnotherServiceWithHook::class . '::testHook3']);
+    $this->assertArrayNotHasKey(AnotherServiceWithHook::class . '::testHook6', $invocations);
+    \Drupal::moduleHandler()->invokeAll('test_hook_6', [&$invocations]);
+    $this->assertEquals(1, $invocations[AnotherServiceWithHook::class . '::testHook6']);
 
     // Install module that decorates the ServiceWithHook service and has a
     // service provider that alters the AnotherServiceWithHook service.
     \Drupal::service('module_installer')->install(['hook_collector_altered_services']);
-    $keyValue = \Drupal::keyValue('test_service_hooks');
-    $runCounts = $keyValue->get('run_counts', []);
 
     // DecoratedServiceWithHook decorates ServiceWithHook without extending it.
     // When test_hook_2 is invoked, ServiceWithHook::testHook2() should not run.
     // DecoratedServiceWithHook has its own test_hook_2 implementation, and that
     // should run.
-    $this->assertArrayNotHasKey(ServiceWithHook::class . '::testHook2', $runCounts);
-    $this->assertArrayNotHasKey(DecoratedServiceWithHook::class . '::testHook2', $runCounts);
-    \Drupal::moduleHandler()->invokeAll('test_hook_2');
-    $runCounts = $keyValue->get('run_counts', []);
-    $this->assertArrayNotHasKey(ServiceWithHook::class . '::testHook2', $runCounts);
-    $this->assertEquals(1, $runCounts[DecoratedServiceWithHook::class . '::testHook2']);
+    $invocations = [];
+    \Drupal::moduleHandler()->invokeAll('test_hook_2', [&$invocations]);
+    $this->assertArrayNotHasKey(ServiceWithHook::class . '::testHook2', $invocations);
+    $this->assertEquals(1, $invocations[DecoratedServiceWithHook::class . '::testHook2']);
 
     // When test_hook_5 is invoked, ServiceWithHook::testHook5() should not run.
     // Since DecorateServiceWithHook does not have a test_hook_5 implementation,
     // there should not be any method run.
-    $keyValue->set('run_counts', []);
-    $this->assertArrayNotHasKey(ServiceWithHook::class . '::testHook5', $runCounts);
-    $this->assertArrayNotHasKey(DecoratedServiceWithHook::class . '::testHook5', $runCounts);
-    \Drupal::moduleHandler()->invokeAll('test_hook_5');
-    $runCounts = $keyValue->get('run_counts', []);
-    $this->assertEmpty($runCounts);
+    $invocations = [];
+    \Drupal::moduleHandler()->invokeAll('test_hook_5', [&$invocations]);
+    $this->assertEmpty($invocations);
 
     // AnotherServiceWithHook service class is replaced with
     // AlteredServiceWithHook by a service provider. When test_hook_3 is
     // invoked, AnotherServiceWithHook::testHook3() should not run. Since
     // AlteredServiceWithHook extends AnotherServiceWithHook and does not
     // implement its own testHook3, testHook3() should run.
-    $this->assertArrayNotHasKey(AnotherServiceWithHook::class . '::testHook3', $runCounts);
-    $this->assertArrayNotHasKey(AlteredServiceWithHook::class . '::testHook3', $runCounts);
-    \Drupal::moduleHandler()->invokeAll('test_hook_3');
-    $runCounts = $keyValue->get('run_counts', []);
-    $this->assertArrayNotHasKey(AnotherServiceWithHook::class . '::testHook3', $runCounts);
-    $this->assertEquals(1, $runCounts[AlteredServiceWithHook::class . '::testHook3']);
+    $invocations = [];
+    \Drupal::moduleHandler()->invokeAll('test_hook_3', [&$invocations]);
+    $this->assertArrayNotHasKey(AnotherServiceWithHook::class . '::testHook3', $invocations);
+    $this->assertEquals(1, $invocations[AlteredServiceWithHook::class . '::testHook3']);
 
     // AlteredServiceWithHook and DecoratedServiceWithHook implement
     // test_hook_4, but their origin service classes do not. The testHook4
     // methods in AlteredServiceWithHook and DecoratedServiceWithHook should run
     // when test_hook_4 is invoked.
-    $this->assertArrayNotHasKey(AlteredServiceWithHook::class . '::testHook4', $runCounts);
-    $this->assertArrayNotHasKey(DecoratedServiceWithHook::class . '::testHook4', $runCounts);
-    \Drupal::moduleHandler()->invokeAll('test_hook_4');
-    $runCounts = $keyValue->get('run_counts', []);
-    $this->assertEquals(1, $runCounts[AlteredServiceWithHook::class . '::testHook4']);
-    $this->assertEquals(1, $runCounts[DecoratedServiceWithHook::class . '::testHook4']);
+    $invocations = [];
+    \Drupal::moduleHandler()->invokeAll('test_hook_4', [&$invocations]);
+    $this->assertEquals(1, $invocations[AlteredServiceWithHook::class . '::testHook4']);
+    $this->assertEquals(1, $invocations[DecoratedServiceWithHook::class . '::testHook4']);
 
     // AlteredServiceWithHook::testHook6() overrides its parent method in
     // AnotherServiceWithHook::testHook6(). AlteredServiceWithHook::testHook6()
     // has no Hook attribute, so when test_hook_6 is invoked, testHook6() should
     // not run.
-    $this->assertArrayNotHasKey(AnotherServiceWithHook::class . '::testHook6', $runCounts);
-    $this->assertArrayNotHasKey(AlteredServiceWithHook::class . '::testHook6', $runCounts);
-    \Drupal::moduleHandler()->invokeAll('test_hook_6');
-    $runCounts = $keyValue->get('run_counts', []);
-    $this->assertArrayNotHasKey(AnotherServiceWithHook::class . '::testHook6', $runCounts);
-    $this->assertArrayNotHasKey(AlteredServiceWithHook::class . '::testHook6', $runCounts);
+    $invocations = [];
+    \Drupal::moduleHandler()->invokeAll('test_hook_6', [&$invocations]);
+    $this->assertArrayNotHasKey(AnotherServiceWithHook::class . '::testHook6', $invocations);
+    $this->assertArrayNotHasKey(AlteredServiceWithHook::class . '::testHook6', $invocations);
   }
 
   /**

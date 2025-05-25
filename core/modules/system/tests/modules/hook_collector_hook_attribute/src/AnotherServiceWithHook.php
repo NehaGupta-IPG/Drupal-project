@@ -5,8 +5,6 @@ declare(strict_types=1);
 namespace Drupal\hook_collector_hook_attribute;
 
 use Drupal\Core\Hook\Attribute\Hook;
-use Drupal\Core\KeyValueStore\KeyValueFactoryInterface;
-use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 /**
  * Another service class with Hook attribute.
@@ -19,25 +17,20 @@ class AnotherServiceWithHook {
 
   use HookInvocationsCountTrait;
 
-  public function __construct(
-    #[Autowire(service: 'keyvalue')]
-    protected KeyValueFactoryInterface $keyValueFactory,
-  ) {}
-
   /**
    * Implements hook_test_hook_3().
    */
   #[Hook('test_hook_3')]
-  public function testHook3(): void {
-    $this->incrementRunCount(get_class($this) . '::' . __FUNCTION__);
+  public function testHook3(array &$invocations): void {
+    $this->incrementRunCount(get_class($this) . '::' . __FUNCTION__, $invocations);
   }
 
   /**
    * Implements hook_test_hook_6().
    */
   #[Hook('test_hook_6')]
-  public function testHook6(): void {
-    $this->incrementRunCount(get_class($this) . '::' . __FUNCTION__);
+  public function testHook6(array &$invocations): void {
+    $this->incrementRunCount(get_class($this) . '::' . __FUNCTION__, $invocations);
   }
 
 }

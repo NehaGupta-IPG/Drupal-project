@@ -19,18 +19,18 @@ class AlteredServiceWithHook extends AnotherServiceWithHook {
    * Implements hook_test_hook_4().
    */
   #[Hook('test_hook_4')]
-  public function testHook4(): void {
+  public function testHook4(array &$invocations): void {
     // This is a hook implementation that does not exist in the parent class.
-    $this->incrementRunCount(get_class($this) . '::' . __FUNCTION__);
+    $this->incrementRunCount(get_class($this) . '::' . __FUNCTION__, $invocations);
   }
 
   /**
    * {@inheritdoc}
    */
-  public function testHook6(): void {
+  public function testHook6(array &$invocations): void {
     // This overrides the parent method with the Hook attribute removed. This
     // should not be run when test_hook_7 is invoked.
-    $this->incrementRunCount(get_class($this) . '::' . __FUNCTION__);
+    $this->incrementRunCount(get_class($this) . '::' . __FUNCTION__, $invocations);
   }
 
 }

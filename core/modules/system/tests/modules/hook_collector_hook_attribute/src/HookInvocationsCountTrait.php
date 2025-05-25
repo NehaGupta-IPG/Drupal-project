@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\hook_collector_hook_attribute;
 
-use Drupal\Core\KeyValueStore\KeyValueFactoryInterface;
-
 /**
  * Trait used to track how often a hook implementation method has run.
  */
@@ -19,25 +17,18 @@ trait HookInvocationsCountTrait {
   protected array $countInvocations = [];
 
   /**
-   * The key value factory.
-   *
-   * @var \Drupal\Core\KeyValueStore\KeyValueFactoryInterface
-   */
-  protected KeyValueFactoryInterface $keyValueFactory;
-
-  /**
    * Increments the run counter for a method.
    *
    * @param string $method
    *   The method name.
+   * @param array{string, int} $invocations
+   *   Count of how many times a method has been invoked, indexed by method.
+   *   Passed by reference.
    */
-  protected function incrementRunCount(string $method): void {
+  protected function incrementRunCount(string $method, array &$invocations): void {
     $this->countInvocations[$method] ??= 0;
     $this->countInvocations[$method]++;
-    $keyValue = $this->keyValueFactory->get('test_service_hooks');
-    $runCounts = $keyValue->get('run_counts', []);
-    $runCounts[$method] = $this->countInvocations[$method];
-    $keyValue->set('run_counts', $runCounts);
+    $invocations[$method] = $this->countInvocations[$method];
   }
 
 }
