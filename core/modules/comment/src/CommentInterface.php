@@ -10,7 +10,26 @@ use Drupal\Core\Entity\EntityChangedInterface;
 /**
  * Provides an interface defining a comment entity.
  */
-interface CommentInterface extends ContentEntityInterface, EntityChangedInterface, EntityOwnerInterface, EntityPublishedInterface {
+interface CommentInterface extends ContentEntityInterface, EntityChangedInterface, EntityOwnerInterface, EntityPublishedInterface
+{
+
+  /**
+   * @deprecated in drupal:11.x and will be removed in drupal:12.0.
+   *   Use \Drupal\Core\Entity\EntityPublishedInterface::NOT_PUBLISHED instead.
+   * @see https://www.drupal.org/node/3426517
+   *
+   * Comment is awaiting approval.
+   */
+  public const NOT_PUBLISHED = EntityPublishedInterface::NOT_PUBLISHED;
+
+  /**
+   * @deprecated in drupal:11.x and will be removed in drupal:12.0.
+   *   Use \Drupal\Core\Entity\EntityPublishedInterface::PUBLISHED instead.
+   * @see https://www.drupal.org/node/3426517
+   *
+   * Comment is published.
+   */
+  public const PUBLISHED = EntityPublishedInterface::PUBLISHED;
 
   /**
    * Anonymous posters cannot enter their contact information.
@@ -233,5 +252,8 @@ interface CommentInterface extends ContentEntityInterface, EntityChangedInterfac
    *   The id of the comment type.
    */
   public function getTypeId();
-
 }
+
+// Warnings of depreciation for the constants.
+@trigger_error('CommentInterface::NOT_PUBLISHED is deprecated in drupal:11.x and will be removed in drupal:12.0.0. Use \Drupal\Core\Entity\EntityPublishedInterface::NOT_PUBLISHED instead. See https://www.drupal.org/node/3426517', E_USER_DEPRECATED);
+@trigger_error('CommentInterface::PUBLISHED is deprecated in drupal:11.x and will be removed in drupal:12.0.0. Use \Drupal\Core\Entity\EntityPublishedInterface::PUBLISHED instead. See https://www.drupal.org/node/3426517', E_USER_DEPRECATED);

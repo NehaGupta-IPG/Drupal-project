@@ -7,17 +7,18 @@ namespace Drupal\Core\Entity;
  *
  * @ingroup entity_type_characteristics
  */
-interface EntityPublishedInterface extends EntityInterface {
+interface EntityPublishedInterface extends EntityInterface
+{
 
   /**
-   * The entity is published.
+   * Denotes that the entity is published.
    *
    * @var int
    */
   public const PUBLISHED = 1;
 
   /**
-   * The entity is not published.
+   * Denotes that the entity is not published.
    *
    * @var int
    */
@@ -46,5 +47,4 @@ interface EntityPublishedInterface extends EntityInterface {
    * @return $this
    */
   public function setUnpublished();
-
 }

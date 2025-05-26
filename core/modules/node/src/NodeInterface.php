@@ -11,7 +11,26 @@ use Drupal\Core\Entity\ContentEntityInterface;
 /**
  * Provides an interface defining a node entity.
  */
-interface NodeInterface extends ContentEntityInterface, EntityChangedInterface, EntityOwnerInterface, RevisionLogInterface, EntityPublishedInterface {
+interface NodeInterface extends ContentEntityInterface, EntityChangedInterface, EntityOwnerInterface, RevisionLogInterface, EntityPublishedInterface
+{
+  /**
+   * @deprecated in drupal:11.x and will be removed in drupal:12.0.
+   *   Use \Drupal\Core\Entity\EntityPublishedInterface::NOT_PUBLISHED instead.
+   * @see https://www.drupal.org/node/3426517
+   *
+   * Denotes that the [node] is not published.
+   */
+  public const NOT_PUBLISHED = EntityPublishedInterface::NOT_PUBLISHED;
+
+
+  /**
+   * @deprecated in drupal:11.x and will be removed in drupal:12.0.
+   *   Use \Drupal\Core\Entity\EntityPublishedInterface::PUBLISHED instead.
+   * @see https://www.drupal.org/node/3426517
+   *
+   * Denotes that the node is published.
+   */
+  public const PUBLISHED = EntityPublishedInterface::PUBLISHED;
 
 
   /**
@@ -137,5 +156,9 @@ interface NodeInterface extends ContentEntityInterface, EntityChangedInterface, 
    *   The called node entity.
    */
   public function setRevisionCreationTime($timestamp);
-
 }
+
+// Warning of deprecation for constants.
+@trigger_error('NodeInterface::NOT_PUBLISHED is deprecated in drupal:11.x and will be removed in drupal:12.0.0 . Use \Drupal\Core\Entity\EntityPublishedInterface::NOT_PUBLISHED instead. See https://www.drupal.org/node/3426517', E_USER_DEPRECATED);
+@trigger_error('NodeInterface::PUBLISHED is deprecated in drupal:11.x and will be removed in drupal:12.0.0. Use \Drupal\Core\Entity\EntityPublishedInterface::PUBLISHED instead. See https://www.drupal.org/node/3426517', E_USER_DEPRECATED);
+
