@@ -104,7 +104,7 @@ class RouteMatch implements RouteMatchInterface {
    */
   public function isRouteName(string|array $value, RouteName $operator = RouteName::Equals): bool {
     if (is_array($value) && $operator !== RouteName::In) {
-      throw new \InvalidArgumentException('Invalid operator for an array value.');
+      throw new \InvalidArgumentException('$operator must be RouteName::In when $value is an array.');
     }
 
     // @todo Check $value for deprecated route names.

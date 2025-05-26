@@ -6,6 +6,7 @@ use Drupal\Component\Utility\UrlHelper;
 use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Block\Attribute\Block;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
+use Drupal\Core\Routing\RouteName;
 use Drupal\Core\Security\TrustedCallbackInterface;
 use Drupal\Core\Routing\RedirectDestinationTrait;
 use Drupal\Core\Routing\RouteMatchInterface;
@@ -83,7 +84,7 @@ class UserLoginBlock extends BlockBase implements ContainerFactoryPluginInterfac
    * {@inheritdoc}
    */
   protected function blockAccess(AccountInterface $account) {
-    if ($account->isAnonymous() && !$this->routeMatch->isRouteName(['user.login', 'user.logout'])) {
+    if ($account->isAnonymous() && !$this->routeMatch->isRouteName(['user.login', 'user.logout'], RouteName::In)) {
       return AccessResult::allowed()
         ->addCacheContexts(['route.name', 'user.roles:anonymous']);
     }
