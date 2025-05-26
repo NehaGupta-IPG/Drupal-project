@@ -489,6 +489,10 @@ services:
     class: Drupal\Core\File\FileSystem
     arguments: ['@stream_wrapper_manager', '@settings']
   Drupal\Core\File\FileSystemInterface: '@file_system'
+  file_permissions:
+    autowire: true
+    class: Drupal\Core\File\FilePermissions
+  Drupal\Core\File\FilePermissions: '@file_permissions'
   file_url_generator:
     class: Drupal\Core\File\FileUrlGenerator
     arguments: ['@stream_wrapper_manager', '@request_stack', '@module_handler']

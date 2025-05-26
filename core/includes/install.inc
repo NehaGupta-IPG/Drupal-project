@@ -13,6 +13,8 @@ use Drupal\Core\Extension\Extension;
 use Drupal\Core\Extension\ExtensionDiscovery;
 use Drupal\Core\Extension\InstallRequirementsInterface;
 use Drupal\Core\Extension\Requirement\RequirementSeverity;
+use Drupal\Core\File\FilePermissions;
+use Drupal\Core\File\FileType;
 use Drupal\Core\Installer\InstallerKernel;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 
@@ -58,41 +60,81 @@ const REQUIREMENT_ERROR = 2;
 
 /**
  * File permission check -- File exists.
+ *
+ * @deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. Use
+ *   \Drupal\Core\File\FilePermissions::EXISTS instead.
+ *
+ * @see https://www.drupal.org/node/3526514
  */
 const FILE_EXIST = 1;
 
 /**
  * File permission check -- File is readable.
+ *
+ * @deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. Use
+ *   \Drupal\Core\File\FilePermissions::READABLE instead.
+ *
+ * @see https://www.drupal.org/node/3526514
  */
 const FILE_READABLE = 2;
 
 /**
  * File permission check -- File is writable.
+ *
+ * @deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. Use
+ *   \Drupal\Core\File\FilePermissions::WRITABLE instead.
+ *
+ * @see https://www.drupal.org/node/3526514
  */
 const FILE_WRITABLE = 4;
 
 /**
  * File permission check -- File is executable.
+ *
+ * @deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. Use
+ *   \Drupal\Core\File\FilePermissions::EXECUTABLE instead.
+ *
+ * @see https://www.drupal.org/node/3526514
  */
 const FILE_EXECUTABLE = 8;
 
 /**
  * File permission check -- File does not exist.
+ *
+ * @deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. Use
+ *   \Drupal\Core\File\FilePermissions::NOT_EXIST instead.
+ *
+ * @see https://www.drupal.org/node/3526514
  */
 const FILE_NOT_EXIST = 16;
 
 /**
  * File permission check -- File is not readable.
+ *
+ * @deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. Use
+ *   \Drupal\Core\File\FilePermissions::NOT_READABLE instead.
+ *
+ * @see https://www.drupal.org/node/3526514
  */
 const FILE_NOT_READABLE = 32;
 
 /**
  * File permission check -- File is not writable.
+ *
+ * @deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. Use
+ *   \Drupal\Core\File\FilePermissions::NOT_WRITABLE instead.
+ *
+ * @see https://www.drupal.org/node/3526514
  */
 const FILE_NOT_WRITABLE = 64;
 
 /**
  * File permission check -- File is not executable.
+ *
+ * @deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. Use
+ *   \Drupal\Core\File\FilePermissions::NOT_EXECUTABLE instead.
+ *
+ * @see https://www.drupal.org/node/3526514
  */
 const FILE_NOT_EXECUTABLE = 128;
 
@@ -315,81 +357,15 @@ function drupal_install_system($install_state): void {
  *
  * @return bool
  *   TRUE on success or FALSE on failure. A message is set for the latter.
+ *
+ * @deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. Use
+ *   \Drupal\Core\File\FilePermissions::verify() instead.
+ *
+ * @see https://www.drupal.org/node/3526514
  */
 function drupal_verify_install_file($file, $mask = NULL, $type = 'file', $auto_fix = TRUE) {
-  $return = TRUE;
-  // Check for files that shouldn't be there.
-  if (isset($mask) && ($mask & FILE_NOT_EXIST) && file_exists($file)) {
-    return FALSE;
-  }
-  // Verify that the file is the type of file it is supposed to be.
-  if (isset($type) && file_exists($file)) {
-    $check = 'is_' . $type;
-    if (!function_exists($check) || !$check($file)) {
-      $return = FALSE;
-    }
-  }
-
-  // Verify file permissions.
-  if (isset($mask)) {
-    $masks = [FILE_EXIST, FILE_READABLE, FILE_WRITABLE, FILE_EXECUTABLE, FILE_NOT_READABLE, FILE_NOT_WRITABLE, FILE_NOT_EXECUTABLE];
-    foreach ($masks as $current_mask) {
-      if ($mask & $current_mask) {
-        switch ($current_mask) {
-          case FILE_EXIST:
-            if (!file_exists($file)) {
-              if ($type == 'dir' && $auto_fix) {
-                drupal_install_mkdir($file, $mask);
-              }
-              if (!file_exists($file)) {
-                $return = FALSE;
-              }
-            }
-            break;
-
-          case FILE_READABLE:
-            if (!is_readable($file)) {
-              $return = FALSE;
-            }
-            break;
-
-          case FILE_WRITABLE:
-            if (!is_writable($file)) {
-              $return = FALSE;
-            }
-            break;
-
-          case FILE_EXECUTABLE:
-            if (!is_executable($file)) {
-              $return = FALSE;
-            }
-            break;
-
-          case FILE_NOT_READABLE:
-            if (is_readable($file)) {
-              $return = FALSE;
-            }
-            break;
-
-          case FILE_NOT_WRITABLE:
-            if (is_writable($file)) {
-              $return = FALSE;
-            }
-            break;
-
-          case FILE_NOT_EXECUTABLE:
-            if (is_executable($file)) {
-              $return = FALSE;
-            }
-            break;
-        }
-      }
-    }
-  }
-  if (!$return && $auto_fix) {
-    return drupal_install_fix_file($file, $mask);
-  }
-  return $return;
+  @trigger_error(sprintf('%s() is deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. Use %s::verify() instead. See https://www.drupal.org/node/3526514', __FUNCTION__, FilePermissions::class), E_USER_DEPRECATED);
+  return \Drupal::service(FilePermissions::class)->verify($file, $mask, FileType::tryFrom($type), $auto_fix);
 }
 
 /**
@@ -406,32 +382,8 @@ function drupal_verify_install_file($file, $mask = NULL, $type = 'file', $auto_f
  *   TRUE/FALSE whether or not the directory was successfully created.
  */
 function drupal_install_mkdir($file, $mask, $message = TRUE) {
-  $mod = 0;
-  $masks = [FILE_READABLE, FILE_WRITABLE, FILE_EXECUTABLE, FILE_NOT_READABLE, FILE_NOT_WRITABLE, FILE_NOT_EXECUTABLE];
-  foreach ($masks as $m) {
-    if ($mask & $m) {
-      switch ($m) {
-        case FILE_READABLE:
-          $mod |= 0444;
-          break;
-
-        case FILE_WRITABLE:
-          $mod |= 0222;
-          break;
-
-        case FILE_EXECUTABLE:
-          $mod |= 0111;
-          break;
-      }
-    }
-  }
-
-  if (@\Drupal::service('file_system')->mkdir($file, $mod)) {
-    return TRUE;
-  }
-  else {
-    return FALSE;
-  }
+  @trigger_error(sprintf('%s() is deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. Use %s::mkdir() instead. See https://www.drupal.org/node/3526514', __FUNCTION__, FilePermissions::class), E_USER_DEPRECATED);
+  return \Drupal::service(FilePermissions::class)->mkdir($file, $mask);
 }
 
 /**
@@ -455,69 +407,15 @@ function drupal_install_mkdir($file, $mask, $message = TRUE) {
  *
  * @return bool
  *   TRUE/FALSE whether or not we were able to fix the file's permissions.
+ *
+ * @deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. Use
+ *   \Drupal\Core\File\FilePermissions::fix() instead.
+ *
+ * @see https://www.drupal.org/node/3526514
  */
 function drupal_install_fix_file($file, $mask, $message = TRUE) {
-  // If $file does not exist, fileperms() issues a PHP warning.
-  if (!file_exists($file)) {
-    return FALSE;
-  }
-
-  $mod = fileperms($file) & 0777;
-  $masks = [FILE_READABLE, FILE_WRITABLE, FILE_EXECUTABLE, FILE_NOT_READABLE, FILE_NOT_WRITABLE, FILE_NOT_EXECUTABLE];
-
-  // FILE_READABLE, FILE_WRITABLE, and FILE_EXECUTABLE permission strings
-  // can theoretically be 0400, 0200, and 0100 respectively, but to be safe
-  // we set all three access types in case the administrator intends to
-  // change the owner of settings.php after installation.
-  foreach ($masks as $m) {
-    if ($mask & $m) {
-      switch ($m) {
-        case FILE_READABLE:
-          if (!is_readable($file)) {
-            $mod |= 0444;
-          }
-          break;
-
-        case FILE_WRITABLE:
-          if (!is_writable($file)) {
-            $mod |= 0222;
-          }
-          break;
-
-        case FILE_EXECUTABLE:
-          if (!is_executable($file)) {
-            $mod |= 0111;
-          }
-          break;
-
-        case FILE_NOT_READABLE:
-          if (is_readable($file)) {
-            $mod &= ~0444;
-          }
-          break;
-
-        case FILE_NOT_WRITABLE:
-          if (is_writable($file)) {
-            $mod &= ~0222;
-          }
-          break;
-
-        case FILE_NOT_EXECUTABLE:
-          if (is_executable($file)) {
-            $mod &= ~0111;
-          }
-          break;
-      }
-    }
-  }
-
-  // chmod() will work if the web server is running as owner of the file.
-  if (@chmod($file, $mod)) {
-    return TRUE;
-  }
-  else {
-    return FALSE;
-  }
+  @trigger_error(sprintf('%s() is deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. Use %s::fix() instead. See https://www.drupal.org/node/3526514', __FUNCTION__, FilePermissions::class), E_USER_DEPRECATED);
+  return \Drupal::service(FilePermissions::class)->fix($file, $mask);
 }
 
 /**
