@@ -17,41 +17,6 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 class ViewsConfigUpdater implements ContainerInjectionInterface {
 
   /**
-   * The entity type manager.
-   *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
-   */
-  protected $entityTypeManager;
-
-  /**
-   * The entity field manager.
-   *
-   * @var \Drupal\Core\Entity\EntityFieldManagerInterface
-   */
-  protected $entityFieldManager;
-
-  /**
-   * The typed config manager.
-   *
-   * @var \Drupal\Core\Config\TypedConfigManagerInterface
-   */
-  protected $typedConfigManager;
-
-  /**
-   * The views data service.
-   *
-   * @var \Drupal\views\ViewsData
-   */
-  protected $viewsData;
-
-  /**
-   * The formatter plugin manager service.
-   *
-   * @var \Drupal\Component\Plugin\PluginManagerInterface
-   */
-  protected $formatterPluginManager;
-
-  /**
    * Flag determining whether deprecations should be triggered.
    *
    * @var bool
@@ -68,29 +33,18 @@ class ViewsConfigUpdater implements ContainerInjectionInterface {
   /**
    * ViewsConfigUpdater constructor.
    *
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
    *   The entity type manager.
-   * @param \Drupal\Core\Entity\EntityFieldManagerInterface $entity_field_manager
+   * @param \Drupal\Core\Entity\EntityFieldManagerInterface $entityFieldManager
    *   The entity field manager.
-   * @param \Drupal\Core\Config\TypedConfigManagerInterface $typed_config_manager
+   * @param \Drupal\Core\Config\TypedConfigManagerInterface $typedConfigManager
    *   The typed config manager.
-   * @param \Drupal\views\ViewsData $views_data
+   * @param \Drupal\views\ViewsData $viewsData
    *   The views data service.
-   * @param \Drupal\Component\Plugin\PluginManagerInterface $formatter_plugin_manager
+   * @param \Drupal\Component\Plugin\PluginManagerInterface $formatterPluginManager
    *   The formatter plugin manager service.
    */
-  public function __construct(
-    EntityTypeManagerInterface $entity_type_manager,
-    EntityFieldManagerInterface $entity_field_manager,
-    TypedConfigManagerInterface $typed_config_manager,
-    ViewsData $views_data,
-    PluginManagerInterface $formatter_plugin_manager,
-  ) {
-    $this->entityTypeManager = $entity_type_manager;
-    $this->entityFieldManager = $entity_field_manager;
-    $this->typedConfigManager = $typed_config_manager;
-    $this->viewsData = $views_data;
-    $this->formatterPluginManager = $formatter_plugin_manager;
+  public function __construct(protected EntityTypeManagerInterface $entityTypeManager, protected EntityFieldManagerInterface $entityFieldManager, protected TypedConfigManagerInterface $typedConfigManager, protected ViewsData $viewsData, protected PluginManagerInterface $formatterPluginManager) {
   }
 
   /**

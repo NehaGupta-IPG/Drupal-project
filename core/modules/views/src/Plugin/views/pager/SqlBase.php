@@ -16,20 +16,6 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 abstract class SqlBase extends PagerPluginBase implements CacheableDependencyInterface, ContainerFactoryPluginInterface {
 
   /**
-   * The pager manager.
-   *
-   * @var \Drupal\Core\Pager\PagerManagerInterface
-   */
-  protected $pagerManager;
-
-  /**
-   * The pager parameters.
-   *
-   * @var \Drupal\Core\Pager\PagerParametersInterface
-   */
-  protected $pagerParameters;
-
-  /**
    * Constructs a SqlBase object.
    *
    * @param array $configuration
@@ -38,15 +24,13 @@ abstract class SqlBase extends PagerPluginBase implements CacheableDependencyInt
    *   The plugin ID for the plugin instance.
    * @param mixed $plugin_definition
    *   The plugin implementation definition.
-   * @param \Drupal\Core\Pager\PagerManagerInterface $pager_manager
+   * @param \Drupal\Core\Pager\PagerManagerInterface $pagerManager
    *   The pager manager.
-   * @param \Drupal\Core\Pager\PagerParametersInterface $pager_parameters
+   * @param \Drupal\Core\Pager\PagerParametersInterface $pagerParameters
    *   The pager parameters.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, PagerManagerInterface $pager_manager, PagerParametersInterface $pager_parameters) {
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, protected PagerManagerInterface $pagerManager, protected PagerParametersInterface $pagerParameters) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
-    $this->pagerManager = $pager_manager;
-    $this->pagerParameters = $pager_parameters;
   }
 
   /**

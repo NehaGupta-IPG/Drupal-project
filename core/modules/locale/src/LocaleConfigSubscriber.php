@@ -34,20 +34,6 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 class LocaleConfigSubscriber implements EventSubscriberInterface {
 
   /**
-   * The configuration factory.
-   *
-   * @var \Drupal\Core\Config\ConfigFactoryInterface
-   */
-  protected $configFactory;
-
-  /**
-   * The typed configuration manager.
-   *
-   * @var \Drupal\locale\LocaleConfigManager
-   */
-  protected $localeConfigManager;
-
-  /**
    * The language manager.
    *
    * @var \Drupal\Core\Language\LanguageManagerInterface
@@ -57,14 +43,12 @@ class LocaleConfigSubscriber implements EventSubscriberInterface {
   /**
    * Constructs a LocaleConfigSubscriber.
    *
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
+   * @param \Drupal\Core\Config\ConfigFactoryInterface $configFactory
    *   The configuration factory.
-   * @param \Drupal\locale\LocaleConfigManager $locale_config_manager
+   * @param \Drupal\locale\LocaleConfigManager $localeConfigManager
    *   The typed configuration manager.
    */
-  public function __construct(ConfigFactoryInterface $config_factory, LocaleConfigManager $locale_config_manager) {
-    $this->configFactory = $config_factory;
-    $this->localeConfigManager = $locale_config_manager;
+  public function __construct(protected ConfigFactoryInterface $configFactory, protected LocaleConfigManager $localeConfigManager) {
   }
 
   /**

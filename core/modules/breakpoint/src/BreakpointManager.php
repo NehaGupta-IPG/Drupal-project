@@ -68,13 +68,6 @@ class BreakpointManager extends DefaultPluginManager implements BreakpointManage
   ];
 
   /**
-   * The theme handler.
-   *
-   * @var \Drupal\Core\Extension\ThemeHandlerInterface
-   */
-  protected $themeHandler;
-
-  /**
    * Static cache of breakpoints keyed by group.
    *
    * @var array
@@ -93,7 +86,7 @@ class BreakpointManager extends DefaultPluginManager implements BreakpointManage
    *
    * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
    *   The module handler.
-   * @param \Drupal\Core\Extension\ThemeHandlerInterface $theme_handler
+   * @param \Drupal\Core\Extension\ThemeHandlerInterface $themeHandler
    *   The theme handler.
    * @param \Drupal\Core\Cache\CacheBackendInterface $cache_backend
    *   The cache backend.
@@ -102,10 +95,9 @@ class BreakpointManager extends DefaultPluginManager implements BreakpointManage
    * @param \Drupal\Core\Extension\ModuleExtensionList|null $module_extension_list
    *   The module extension list.
    */
-  public function __construct(ModuleHandlerInterface $module_handler, ThemeHandlerInterface $theme_handler, CacheBackendInterface $cache_backend, TranslationInterface $string_translation, ?ModuleExtensionList $module_extension_list = NULL) {
+  public function __construct(ModuleHandlerInterface $module_handler, protected ThemeHandlerInterface $themeHandler, CacheBackendInterface $cache_backend, TranslationInterface $string_translation, ?ModuleExtensionList $module_extension_list = NULL) {
     $this->factory = new ContainerFactory($this);
     $this->moduleHandler = $module_handler;
-    $this->themeHandler = $theme_handler;
     if ($module_extension_list === NULL) {
       @trigger_error('Calling ' . __METHOD__ . '() without the $module_extension_list argument is deprecated in drupal:10.3.0 and will be required in drupal:12.0.0. See https://www.drupal.org/node/3310017', E_USER_DEPRECATED);
       $module_extension_list = \Drupal::service('extension.list.module');

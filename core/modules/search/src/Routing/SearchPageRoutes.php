@@ -13,20 +13,12 @@ use Symfony\Component\Routing\Route;
 class SearchPageRoutes implements ContainerInjectionInterface {
 
   /**
-   * The search page repository.
-   *
-   * @var \Drupal\search\SearchPageRepositoryInterface
-   */
-  protected $searchPageRepository;
-
-  /**
    * Constructs a new search route subscriber.
    *
-   * @param \Drupal\search\SearchPageRepositoryInterface $search_page_repository
+   * @param \Drupal\search\SearchPageRepositoryInterface $searchPageRepository
    *   The search page repository.
    */
-  public function __construct(SearchPageRepositoryInterface $search_page_repository) {
-    $this->searchPageRepository = $search_page_repository;
+  public function __construct(protected SearchPageRepositoryInterface $searchPageRepository) {
   }
 
   /**

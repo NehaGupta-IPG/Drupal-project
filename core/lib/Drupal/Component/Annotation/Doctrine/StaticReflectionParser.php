@@ -73,13 +73,6 @@ class StaticReflectionParser
     protected $shortClassName;
 
     /**
-     * Whether the caller only wants class annotations.
-     *
-     * @var bool
-     */
-    protected $classAnnotationOptimize;
-
-    /**
      * A ClassFinder object which finds the class.
      *
      * @var ClassFinderInterface
@@ -154,7 +147,7 @@ class StaticReflectionParser
      * @param bool                 $classAnnotationOptimize Only retrieve the class docComment.
      *                                                         Presumes there is only one statement per line.
      */
-    public function __construct($className, $finder, $classAnnotationOptimize = false)
+    public function __construct($className, $finder, protected $classAnnotationOptimize = false)
     {
         $this->className = ltrim($className, '\\');
         $lastNsPos       = strrpos($this->className, '\\');
@@ -167,7 +160,6 @@ class StaticReflectionParser
         }
 
         $this->finder                  = $finder;
-        $this->classAnnotationOptimize = $classAnnotationOptimize;
     }
 
     /**

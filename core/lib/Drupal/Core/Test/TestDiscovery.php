@@ -17,13 +17,6 @@ use PHPUnit\Framework\Attributes\Group;
 class TestDiscovery {
 
   /**
-   * The class loader.
-   *
-   * @var \Composer\Autoload\ClassLoader
-   */
-  protected $classLoader;
-
-  /**
    * Statically cached list of test classes.
    *
    * @var array
@@ -50,24 +43,15 @@ class TestDiscovery {
   protected $availableExtensions;
 
   /**
-   * The app root.
-   *
-   * @var string
-   */
-  protected $root;
-
-  /**
    * Constructs a new test discovery.
    *
    * @param string $root
    *   The app root.
-   * @param class-string $class_loader
+   * @param class-string $classLoader
    *   The class loader. Normally Composer's ClassLoader, as included by the
    *   front controller, but may also be decorated.
    */
-  public function __construct($root, $class_loader) {
-    $this->root = $root;
-    $this->classLoader = $class_loader;
+  public function __construct(protected $root, protected $classLoader) {
   }
 
   /**

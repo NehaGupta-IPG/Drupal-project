@@ -19,32 +19,11 @@ use Psr\Log\LoggerInterface;
 abstract class ImageToolkitBase extends PluginBase implements ImageToolkitInterface {
 
   /**
-   * The config factory.
-   *
-   * @var \Drupal\Core\Config\ConfigFactoryInterface
-   */
-  protected $configFactory;
-
-  /**
    * Path of the image file.
    *
    * @var string
    */
   protected $source = '';
-
-  /**
-   * The image toolkit operation manager.
-   *
-   * @var \Drupal\Core\ImageToolkit\ImageToolkitOperationManagerInterface
-   */
-  protected $operationManager;
-
-  /**
-   * A logger instance.
-   *
-   * @var \Psr\Log\LoggerInterface
-   */
-  protected $logger;
 
   /**
    * Constructs an ImageToolkitBase object.
@@ -55,18 +34,15 @@ abstract class ImageToolkitBase extends PluginBase implements ImageToolkitInterf
    *   The plugin ID for the plugin instance.
    * @param array $plugin_definition
    *   The plugin implementation definition.
-   * @param \Drupal\Core\ImageToolkit\ImageToolkitOperationManagerInterface $operation_manager
+   * @param \Drupal\Core\ImageToolkit\ImageToolkitOperationManagerInterface $operationManager
    *   The toolkit operation manager.
    * @param \Psr\Log\LoggerInterface $logger
    *   A logger instance.
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
+   * @param \Drupal\Core\Config\ConfigFactoryInterface $configFactory
    *   The config factory.
    */
-  public function __construct(array $configuration, $plugin_id, array $plugin_definition, ImageToolkitOperationManagerInterface $operation_manager, LoggerInterface $logger, ConfigFactoryInterface $config_factory) {
+  public function __construct(array $configuration, $plugin_id, array $plugin_definition, protected ImageToolkitOperationManagerInterface $operationManager, protected LoggerInterface $logger, protected ConfigFactoryInterface $configFactory) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
-    $this->operationManager = $operation_manager;
-    $this->logger = $logger;
-    $this->configFactory = $config_factory;
   }
 
   /**

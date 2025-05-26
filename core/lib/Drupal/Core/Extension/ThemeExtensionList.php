@@ -56,20 +56,6 @@ class ThemeExtensionList extends ExtensionList {
   ];
 
   /**
-   * The config factory.
-   *
-   * @var \Drupal\Core\Config\ConfigFactoryInterface
-   */
-  protected $configFactory;
-
-  /**
-   * The theme engine list needed by this theme list.
-   *
-   * @var \Drupal\Core\Extension\ThemeEngineExtensionList
-   */
-  protected $engineList;
-
-  /**
    * The list of installed themes.
    *
    * @var string[]
@@ -91,18 +77,15 @@ class ThemeExtensionList extends ExtensionList {
    *   The module handler.
    * @param \Drupal\Core\State\StateInterface $state
    *   The state service.
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
+   * @param \Drupal\Core\Config\ConfigFactoryInterface $configFactory
    *   The config factory.
-   * @param \Drupal\Core\Extension\ThemeEngineExtensionList $engine_list
+   * @param \Drupal\Core\Extension\ThemeEngineExtensionList $engineList
    *   The theme engine extension listing.
    * @param string $install_profile
    *   The install profile used by the site.
    */
-  public function __construct($root, $type, CacheBackendInterface $cache, InfoParserInterface $info_parser, ModuleHandlerInterface $module_handler, StateInterface $state, ConfigFactoryInterface $config_factory, ThemeEngineExtensionList $engine_list, $install_profile) {
+  public function __construct($root, $type, CacheBackendInterface $cache, InfoParserInterface $info_parser, ModuleHandlerInterface $module_handler, StateInterface $state, protected ConfigFactoryInterface $configFactory, protected ThemeEngineExtensionList $engineList, $install_profile) {
     parent::__construct($root, $type, $cache, $info_parser, $module_handler, $state, $install_profile);
-
-    $this->configFactory = $config_factory;
-    $this->engineList = $engine_list;
   }
 
   /**

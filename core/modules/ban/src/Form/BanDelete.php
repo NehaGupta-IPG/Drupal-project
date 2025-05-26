@@ -24,20 +24,12 @@ class BanDelete extends ConfirmFormBase {
   protected $banIp;
 
   /**
-   * The IP manager.
-   *
-   * @var \Drupal\ban\BanIpManagerInterface
-   */
-  protected $ipManager;
-
-  /**
    * Constructs a new BanDelete object.
    *
-   * @param \Drupal\ban\BanIpManagerInterface $ip_manager
+   * @param \Drupal\ban\BanIpManagerInterface $ipManager
    *   The IP manager.
    */
-  public function __construct(BanIpManagerInterface $ip_manager) {
-    $this->ipManager = $ip_manager;
+  public function __construct(protected BanIpManagerInterface $ipManager) {
   }
 
   /**

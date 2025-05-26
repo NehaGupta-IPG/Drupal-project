@@ -15,52 +15,6 @@ class ContextDefinition implements ContextDefinitionInterface {
   use TypedDataTrait;
 
   /**
-   * The data type of the data.
-   *
-   * @var string
-   *   The data type.
-   */
-  protected $dataType;
-
-  /**
-   * The human-readable label.
-   *
-   * @var string
-   *   The label.
-   */
-  protected $label;
-
-  /**
-   * The human-readable description.
-   *
-   * @var string|null
-   *   The description, or NULL if no description is available.
-   */
-  protected $description;
-
-  /**
-   * Whether the data is multi-valued, i.e. a list of data items.
-   *
-   * @var bool
-   */
-  protected $isMultiple = FALSE;
-
-  /**
-   * Determines whether a data value is required.
-   *
-   * @var bool
-   *   Whether a data value is required.
-   */
-  protected $isRequired = TRUE;
-
-  /**
-   * The default value.
-   *
-   * @var mixed
-   */
-  protected $defaultValue;
-
-  /**
    * An array of constraints.
    *
    * @var array[]
@@ -89,34 +43,28 @@ class ContextDefinition implements ContextDefinitionInterface {
   /**
    * Constructs a new context definition object.
    *
-   * @param string $data_type
+   * @param string $dataType
    *   The required data type.
    * @param string|null|\Stringable $label
    *   The label of this context definition for the UI.
-   * @param bool $required
+   * @param bool $isRequired
    *   Whether the context definition is required.
-   * @param bool $multiple
+   * @param bool $isMultiple
    *   Whether the context definition is multivalue.
    * @param string|null $description
    *   The description of this context definition for the UI.
-   * @param mixed $default_value
+   * @param mixed $defaultValue
    *   The default value of this definition.
    * @param array $constraints
    *   An array of constraints keyed by the constraint name and a value of an
    *   array constraint options or a NULL.
    */
-  public function __construct($data_type = 'any', $label = NULL, $required = TRUE, $multiple = FALSE, $description = NULL, $default_value = NULL, array $constraints = []) {
-    $this->dataType = $data_type;
-    $this->label = $label;
-    $this->isRequired = $required;
-    $this->isMultiple = $multiple;
-    $this->description = $description;
-    $this->defaultValue = $default_value;
+  public function __construct(protected $dataType = 'any', protected $label = NULL, protected $isRequired = TRUE, protected $isMultiple = FALSE, protected $description = NULL, protected $defaultValue = NULL, array $constraints = []) {
     foreach ($constraints as $constraint_name => $options) {
       $this->addConstraint($constraint_name, $options);
     }
 
-    assert(!str_starts_with($data_type, 'entity:') || $this instanceof EntityContextDefinition);
+    assert(!str_starts_with($this->dataType, 'entity:') || $this instanceof EntityContextDefinition);
   }
 
   /**

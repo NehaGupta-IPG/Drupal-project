@@ -28,20 +28,6 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 class DbLogController extends ControllerBase {
 
   /**
-   * The database service.
-   *
-   * @var \Drupal\Core\Database\Connection
-   */
-  protected $database;
-
-  /**
-   * The date formatter service.
-   *
-   * @var \Drupal\Core\Datetime\DateFormatterInterface
-   */
-  protected $dateFormatter;
-
-  /**
    * The user storage.
    *
    * @var \Drupal\user\UserStorageInterface
@@ -55,15 +41,13 @@ class DbLogController extends ControllerBase {
    *   A database connection.
    * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
    *   A module handler.
-   * @param \Drupal\Core\Datetime\DateFormatterInterface $date_formatter
+   * @param \Drupal\Core\Datetime\DateFormatterInterface $dateFormatter
    *   The date formatter service.
    * @param \Drupal\Core\Form\FormBuilderInterface $form_builder
    *   The form builder service.
    */
-  public function __construct(Connection $database, ModuleHandlerInterface $module_handler, DateFormatterInterface $date_formatter, FormBuilderInterface $form_builder) {
-    $this->database = $database;
+  public function __construct(protected Connection $database, ModuleHandlerInterface $module_handler, protected DateFormatterInterface $dateFormatter, FormBuilderInterface $form_builder) {
     $this->moduleHandler = $module_handler;
-    $this->dateFormatter = $date_formatter;
     $this->formBuilder = $form_builder;
     $this->userStorage = $this->entityTypeManager()->getStorage('user');
   }

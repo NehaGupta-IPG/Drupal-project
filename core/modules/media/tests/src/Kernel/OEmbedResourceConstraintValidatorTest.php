@@ -108,14 +108,14 @@ class OEmbedResourceConstraintValidatorTest extends KernelTestBase {
     return new class ($media) {
 
       /**
-       * The test entity.
-       *
-       * @var \Drupal\media\Entity\Media
+       * @param \Drupal\media\Entity\Media $entity
        */
-      private $entity;
-
-      public function __construct($entity) {
-        $this->entity = $entity;
+      public function __construct(
+        /**
+         * The test entity.
+         */
+        private $entity,
+      ) {
       }
 
       /**

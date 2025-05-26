@@ -49,35 +49,14 @@ final class ProjectSecurityData {
   const SECURITY_COVERAGE_ENDING_WARN_DATE_9_5 = '2023-05-14';
 
   /**
-   * The existing (currently installed) version of the project.
-   *
-   * Because this class only handles the Drupal core project, values will be
-   * semantic version numbers such as 8.8.0, 8.8.0-alpha1, or 9.0.0.
-   *
-   * @var string|null
-   */
-  protected $existingVersion;
-
-  /**
-   * Releases as returned by update_get_available().
-   *
-   * @var array
-   *
-   * @see update_get_available()
-   */
-  protected $releases;
-
-  /**
    * Constructs a ProjectSecurityData object.
    *
-   * @param string $existing_version
+   * @param string $existingVersion
    *   The existing (currently installed) version of the project.
    * @param array $releases
    *   Project releases as returned by update_get_available().
    */
-  private function __construct($existing_version = NULL, array $releases = []) {
-    $this->existingVersion = $existing_version;
-    $this->releases = $releases;
+  private function __construct(protected $existingVersion = NULL, protected array $releases = []) {
   }
 
   /**

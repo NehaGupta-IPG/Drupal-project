@@ -22,35 +22,11 @@ class LanguageConfigFactoryOverride extends ConfigFactoryOverrideBase implements
   use LanguageConfigCollectionNameTrait;
 
   /**
-   * The configuration storage.
-   *
-   * Do not access this directly. Should be accessed through self::getStorage()
-   * so that the cache of storages per langcode is used.
-   *
-   * @var \Drupal\Core\Config\StorageInterface
-   */
-  protected $baseStorage;
-
-  /**
    * An array of configuration storages keyed by langcode.
    *
    * @var \Drupal\Core\Config\StorageInterface[]
    */
   protected $storages;
-
-  /**
-   * The typed config manager.
-   *
-   * @var \Drupal\Core\Config\TypedConfigManagerInterface
-   */
-  protected $typedConfigManager;
-
-  /**
-   * An event dispatcher instance to use for configuration events.
-   *
-   * @var \Symfony\Contracts\EventDispatcher\EventDispatcherInterface
-   */
-  protected $eventDispatcher;
 
   /**
    * The language object used to override configuration data.
@@ -62,19 +38,16 @@ class LanguageConfigFactoryOverride extends ConfigFactoryOverrideBase implements
   /**
    * Constructs the LanguageConfigFactoryOverride object.
    *
-   * @param \Drupal\Core\Config\StorageInterface $storage
+   * @param \Drupal\Core\Config\StorageInterface $baseStorage
    *   The configuration storage engine.
-   * @param \Symfony\Contracts\EventDispatcher\EventDispatcherInterface $event_dispatcher
+   * @param \Symfony\Contracts\EventDispatcher\EventDispatcherInterface $eventDispatcher
    *   An event dispatcher instance to use for configuration events.
-   * @param \Drupal\Core\Config\TypedConfigManagerInterface $typed_config
+   * @param \Drupal\Core\Config\TypedConfigManagerInterface $typedConfigManager
    *   The typed configuration manager.
    * @param \Drupal\Core\Language\LanguageDefault $default_language
    *   The default language.
    */
-  public function __construct(StorageInterface $storage, EventDispatcherInterface $event_dispatcher, TypedConfigManagerInterface $typed_config, LanguageDefault $default_language) {
-    $this->baseStorage = $storage;
-    $this->eventDispatcher = $event_dispatcher;
-    $this->typedConfigManager = $typed_config;
+  public function __construct(protected StorageInterface $baseStorage, protected EventDispatcherInterface $eventDispatcher, protected TypedConfigManagerInterface $typedConfigManager, LanguageDefault $default_language) {
     // Prior to negotiation the override language should be the default
     // language.
     $this->language = $default_language->get();

@@ -13,13 +13,6 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 class LoginLogoutMenuLink extends MenuLinkDefault {
 
   /**
-   * The current user.
-   *
-   * @var \Drupal\Core\Session\AccountInterface
-   */
-  protected $currentUser;
-
-  /**
    * Constructs a new LoginLogoutMenuLink.
    *
    * @param array $configuration
@@ -30,13 +23,11 @@ class LoginLogoutMenuLink extends MenuLinkDefault {
    *   The plugin implementation definition.
    * @param \Drupal\Core\Menu\StaticMenuLinkOverridesInterface $static_override
    *   The static override storage.
-   * @param \Drupal\Core\Session\AccountInterface $current_user
+   * @param \Drupal\Core\Session\AccountInterface $currentUser
    *   The current user.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, StaticMenuLinkOverridesInterface $static_override, AccountInterface $current_user) {
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, StaticMenuLinkOverridesInterface $static_override, protected AccountInterface $currentUser) {
     parent::__construct($configuration, $plugin_id, $plugin_definition, $static_override);
-
-    $this->currentUser = $current_user;
   }
 
   /**

@@ -10,20 +10,12 @@ use Drupal\Core\Database\Connection;
 class BanIpManager implements BanIpManagerInterface {
 
   /**
-   * The database connection used to check the IP against.
-   *
-   * @var \Drupal\Core\Database\Connection
-   */
-  protected $connection;
-
-  /**
    * Constructs a BanIpManager object.
    *
    * @param \Drupal\Core\Database\Connection $connection
    *   The database connection which will be used to check the IP against.
    */
-  public function __construct(Connection $connection) {
-    $this->connection = $connection;
+  public function __construct(protected Connection $connection) {
   }
 
   /**

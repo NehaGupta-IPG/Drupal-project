@@ -75,13 +75,6 @@ class RestExport extends PathPluginBase implements ResponseDisplayPluginInterfac
   protected $mimeType = 'application/json';
 
   /**
-   * The renderer.
-   *
-   * @var \Drupal\Core\Render\RendererInterface
-   */
-  protected $renderer;
-
-  /**
    * The collector of authentication providers.
    *
    * @var \Drupal\Core\Authentication\AuthenticationCollectorInterface
@@ -94,13 +87,6 @@ class RestExport extends PathPluginBase implements ResponseDisplayPluginInterfac
    * @var string[]
    */
   protected $authenticationProviderIds;
-
-  /**
-   * The serialization format providers, keyed by format.
-   *
-   * @var string[]
-   */
-  protected $formatProviders;
 
   /**
    * Constructs a RestExport object.
@@ -119,20 +105,17 @@ class RestExport extends PathPluginBase implements ResponseDisplayPluginInterfac
    *   The renderer.
    * @param string[] $authentication_providers
    *   The authentication providers, keyed by ID.
-   * @param string[] $serializer_format_providers
+   * @param string[] $formatProviders
    *   The serialization format providers, keyed by format.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, RouteProviderInterface $route_provider, StateInterface $state, RendererInterface $renderer, array $authentication_providers, array $serializer_format_providers) {
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, RouteProviderInterface $route_provider, StateInterface $state, protected RendererInterface $renderer, array $authentication_providers, protected array $formatProviders) {
     parent::__construct($configuration, $plugin_id, $plugin_definition, $route_provider, $state);
-
-    $this->renderer = $renderer;
     // $authentication_providers as defined in
     // \Drupal\Core\DependencyInjection\Compiler\AuthenticationProviderPass
     // and as such it is an array, with authentication providers (cookie,
     // basic_auth) as keys and modules providing those as values (user,
     // basic_auth).
     $this->authenticationProviderIds = array_keys($authentication_providers);
-    $this->formatProviders = $serializer_format_providers;
   }
 
   /**

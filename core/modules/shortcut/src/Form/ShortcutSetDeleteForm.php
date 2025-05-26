@@ -16,25 +16,18 @@ use Drupal\Core\Database\Connection;
 class ShortcutSetDeleteForm extends EntityDeleteForm {
 
   /**
-   * The database connection.
-   *
-   * @var \Drupal\Core\Database\Connection
-   */
-  protected $database;
-
-  /**
-   * The shortcut storage.
-   *
-   * @var \Drupal\shortcut\ShortcutSetStorageInterface
-   */
-  protected $storage;
-
-  /**
    * Constructs a ShortcutSetDeleteForm object.
    */
-  public function __construct(Connection $database, ShortcutSetStorageInterface $storage) {
-    $this->database = $database;
-    $this->storage = $storage;
+  public function __construct(
+    /**
+     * The database connection.
+     */
+    protected Connection $database,
+    /**
+     * The shortcut storage.
+     */
+    protected ShortcutSetStorageInterface $storage,
+  ) {
   }
 
   /**

@@ -11,13 +11,6 @@ use Drupal\Core\Entity\EntityTypeManagerInterface;
 class SearchPageRepository implements SearchPageRepositoryInterface {
 
   /**
-   * The config factory.
-   *
-   * @var \Drupal\Core\Config\ConfigFactoryInterface
-   */
-  protected $configFactory;
-
-  /**
    * The search page storage.
    *
    * @var \Drupal\Core\Entity\EntityStorageInterface
@@ -27,13 +20,12 @@ class SearchPageRepository implements SearchPageRepositoryInterface {
   /**
    * Constructs a new SearchPageRepository.
    *
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
+   * @param \Drupal\Core\Config\ConfigFactoryInterface $configFactory
    *   The config factory.
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager.
    */
-  public function __construct(ConfigFactoryInterface $config_factory, EntityTypeManagerInterface $entity_type_manager) {
-    $this->configFactory = $config_factory;
+  public function __construct(protected ConfigFactoryInterface $configFactory, EntityTypeManagerInterface $entity_type_manager) {
     $this->storage = $entity_type_manager->getStorage('search_page');
   }
 

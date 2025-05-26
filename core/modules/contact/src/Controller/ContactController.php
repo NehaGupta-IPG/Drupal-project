@@ -15,20 +15,12 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 class ContactController extends ControllerBase {
 
   /**
-   * The renderer.
-   *
-   * @var \Drupal\Core\Render\RendererInterface
-   */
-  protected $renderer;
-
-  /**
    * Constructs a ContactController object.
    *
    * @param \Drupal\Core\Render\RendererInterface $renderer
    *   The renderer.
    */
-  public function __construct(RendererInterface $renderer) {
-    $this->renderer = $renderer;
+  public function __construct(protected RendererInterface $renderer) {
   }
 
   /**

@@ -40,13 +40,6 @@ abstract class ViewsBlockBase extends BlockBase implements ContainerFactoryPlugi
   protected $displaySet;
 
   /**
-   * The current user.
-   *
-   * @var \Drupal\Core\Session\AccountInterface
-   */
-  protected $user;
-
-  /**
    * Constructs a \Drupal\views\Plugin\Block\ViewsBlockBase object.
    *
    * @param array $configuration
@@ -62,7 +55,7 @@ abstract class ViewsBlockBase extends BlockBase implements ContainerFactoryPlugi
    * @param \Drupal\Core\Session\AccountInterface $user
    *   The current user.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, ViewExecutableFactory $executable_factory, EntityStorageInterface $storage, AccountInterface $user) {
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, ViewExecutableFactory $executable_factory, EntityStorageInterface $storage, protected AccountInterface $user) {
     $this->pluginId = $plugin_id;
     $delta = $this->getDerivativeId();
     [$name, $this->displayID] = explode('-', $delta, 2);
@@ -70,7 +63,6 @@ abstract class ViewsBlockBase extends BlockBase implements ContainerFactoryPlugi
     $view = $storage->load($name);
     $this->view = $executable_factory->get($view);
     $this->displaySet = $this->view->setDisplay($this->displayID);
-    $this->user = $user;
 
     parent::__construct($configuration, $plugin_id, $plugin_definition);
   }

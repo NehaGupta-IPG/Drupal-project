@@ -79,13 +79,6 @@ abstract class Connection {
   protected $transactionalDDLSupport = FALSE;
 
   /**
-   * The actual client connection.
-   *
-   * @var object
-   */
-  protected $connection;
-
-  /**
    * The connection information for this connection object.
    *
    * @var array
@@ -177,7 +170,7 @@ abstract class Connection {
    *   - namespace
    *   - Other driver-specific options.
    */
-  public function __construct(object $connection, array $connection_options) {
+  public function __construct(protected object $connection, array $connection_options) {
     assert(count($this->identifierQuotes) === 2 && Inspector::assertAllStrings($this->identifierQuotes), '\Drupal\Core\Database\Connection::$identifierQuotes must contain 2 string values');
 
     // Manage the table prefix.
@@ -190,8 +183,6 @@ abstract class Connection {
     if (empty($connection_options['namespace'])) {
       $connection_options['namespace'] = (new \ReflectionObject($this))->getNamespaceName();
     }
-
-    $this->connection = $connection;
     $this->connectionOptions = $connection_options;
   }
 

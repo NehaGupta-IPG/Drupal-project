@@ -19,20 +19,6 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 class FieldType extends StaticMap implements ContainerFactoryPluginInterface {
 
   /**
-   * The field plugin manager.
-   *
-   * @var \Drupal\migrate_drupal\Plugin\MigrateFieldPluginManagerInterface
-   */
-  protected $fieldPluginManager;
-
-  /**
-   * The migration object.
-   *
-   * @var \Drupal\migrate\Plugin\MigrationInterface
-   */
-  protected $migration;
-
-  /**
    * Constructs a FieldType plugin.
    *
    * @param array $configuration
@@ -41,15 +27,13 @@ class FieldType extends StaticMap implements ContainerFactoryPluginInterface {
    *   The plugin ID.
    * @param mixed $plugin_definition
    *   The plugin definition.
-   * @param \Drupal\migrate_drupal\Plugin\MigrateFieldPluginManagerInterface $field_plugin_manager
+   * @param \Drupal\migrate_drupal\Plugin\MigrateFieldPluginManagerInterface $fieldPluginManager
    *   The field plugin manager.
    * @param \Drupal\migrate\Plugin\MigrationInterface $migration
    *   The migration being run.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, MigrateFieldPluginManagerInterface $field_plugin_manager, ?MigrationInterface $migration = NULL) {
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, protected MigrateFieldPluginManagerInterface $fieldPluginManager, protected ?MigrationInterface $migration = NULL) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
-    $this->fieldPluginManager = $field_plugin_manager;
-    $this->migration = $migration;
   }
 
   /**

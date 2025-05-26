@@ -9,20 +9,12 @@ use Drupal\Component\EventDispatcher\Event;
  */
 class ConfigImporterEvent extends Event {
   /**
-   * Configuration import object.
-   *
-   * @var \Drupal\Core\Config\ConfigImporter
-   */
-  protected $configImporter;
-
-  /**
    * Constructs ConfigImporterEvent.
    *
-   * @param \Drupal\Core\Config\ConfigImporter $config_importer
+   * @param \Drupal\Core\Config\ConfigImporter $configImporter
    *   A config import object to notify listeners about.
    */
-  public function __construct(ConfigImporter $config_importer) {
-    $this->configImporter = $config_importer;
+  public function __construct(protected ConfigImporter $configImporter) {
   }
 
   /**

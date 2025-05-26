@@ -15,25 +15,17 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 class NodePreviewController extends EntityViewController {
 
   /**
-   * The entity repository service.
-   *
-   * @var \Drupal\Core\Entity\EntityRepositoryInterface
-   */
-  protected $entityRepository;
-
-  /**
    * Creates a NodeViewController object.
    *
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager.
    * @param \Drupal\Core\Render\RendererInterface $renderer
    *   The renderer service.
-   * @param \Drupal\Core\Entity\EntityRepositoryInterface $entity_repository
+   * @param \Drupal\Core\Entity\EntityRepositoryInterface $entityRepository
    *   The entity repository.
    */
-  public function __construct(EntityTypeManagerInterface $entity_type_manager, RendererInterface $renderer, EntityRepositoryInterface $entity_repository) {
+  public function __construct(EntityTypeManagerInterface $entity_type_manager, RendererInterface $renderer, protected EntityRepositoryInterface $entityRepository) {
     parent::__construct($entity_type_manager, $renderer);
-    $this->entityRepository = $entity_repository;
   }
 
   /**

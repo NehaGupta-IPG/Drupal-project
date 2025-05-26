@@ -16,20 +16,12 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 class DblogClearLogConfirmForm extends ConfirmFormBase {
 
   /**
-   * The database connection.
-   *
-   * @var \Drupal\Core\Database\Connection
-   */
-  protected $connection;
-
-  /**
    * Constructs a new DblogClearLogConfirmForm.
    *
    * @param \Drupal\Core\Database\Connection $connection
    *   The database connection.
    */
-  public function __construct(Connection $connection) {
-    $this->connection = $connection;
+  public function __construct(protected Connection $connection) {
   }
 
   /**

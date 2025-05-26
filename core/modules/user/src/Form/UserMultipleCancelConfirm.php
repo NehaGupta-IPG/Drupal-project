@@ -19,40 +19,16 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 class UserMultipleCancelConfirm extends ConfirmFormBase {
 
   /**
-   * The temp store factory.
-   *
-   * @var \Drupal\Core\TempStore\PrivateTempStoreFactory
-   */
-  protected $tempStoreFactory;
-
-  /**
-   * The user storage.
-   *
-   * @var \Drupal\user\UserStorageInterface
-   */
-  protected $userStorage;
-
-  /**
-   * The entity type manager.
-   *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
-   */
-  protected $entityTypeManager;
-
-  /**
    * Constructs a new UserMultipleCancelConfirm.
    *
-   * @param \Drupal\Core\TempStore\PrivateTempStoreFactory $temp_store_factory
+   * @param \Drupal\Core\TempStore\PrivateTempStoreFactory $tempStoreFactory
    *   The temp store factory.
-   * @param \Drupal\user\UserStorageInterface $user_storage
+   * @param \Drupal\user\UserStorageInterface $userStorage
    *   The user storage.
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
    *   The entity type manager.
    */
-  public function __construct(PrivateTempStoreFactory $temp_store_factory, UserStorageInterface $user_storage, EntityTypeManagerInterface $entity_type_manager) {
-    $this->tempStoreFactory = $temp_store_factory;
-    $this->userStorage = $user_storage;
-    $this->entityTypeManager = $entity_type_manager;
+  public function __construct(protected PrivateTempStoreFactory $tempStoreFactory, protected UserStorageInterface $userStorage, protected EntityTypeManagerInterface $entityTypeManager) {
   }
 
   /**

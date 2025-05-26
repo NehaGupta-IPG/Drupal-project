@@ -26,83 +26,27 @@ class MaintenanceModeSubscriber implements EventSubscriberInterface {
   use StringTranslationTrait;
 
   /**
-   * The maintenance mode.
-   *
-   * @var \Drupal\Core\Site\MaintenanceModeInterface
-   */
-  protected $maintenanceMode;
-
-  /**
-   * The current account.
-   *
-   * @var \Drupal\Core\Session\AccountInterface
-   */
-  protected $account;
-
-  /**
-   * The config factory.
-   *
-   * @var \Drupal\Core\Config\ConfigFactoryInterface
-   */
-  protected $config;
-
-  /**
-   * The URL generator.
-   *
-   * @var \Drupal\Core\Routing\UrlGeneratorInterface
-   */
-  protected $urlGenerator;
-
-  /**
-   * The bare HTML page renderer.
-   *
-   * @var \Drupal\Core\Render\BareHtmlPageRendererInterface
-   */
-  protected $bareHtmlPageRenderer;
-
-  /**
-   * The messenger.
-   *
-   * @var \Drupal\Core\Messenger\MessengerInterface
-   */
-  protected $messenger;
-
-  /**
-   * An event dispatcher instance to use for configuration events.
-   *
-   * @var \Symfony\Contracts\EventDispatcher\EventDispatcherInterface
-   */
-  protected $eventDispatcher;
-
-  /**
    * Constructs a new MaintenanceModeSubscriber.
    *
-   * @param \Drupal\Core\Site\MaintenanceModeInterface $maintenance_mode
+   * @param \Drupal\Core\Site\MaintenanceModeInterface $maintenanceMode
    *   The maintenance mode.
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
+   * @param \Drupal\Core\Config\ConfigFactoryInterface $config
    *   The config factory.
    * @param \Drupal\Core\StringTranslation\TranslationInterface $translation
    *   The string translation.
-   * @param \Drupal\Core\Routing\UrlGeneratorInterface $url_generator
+   * @param \Drupal\Core\Routing\UrlGeneratorInterface $urlGenerator
    *   The URL generator.
    * @param \Drupal\Core\Session\AccountInterface $account
    *   The current user.
-   * @param \Drupal\Core\Render\BareHtmlPageRendererInterface $bare_html_page_renderer
+   * @param \Drupal\Core\Render\BareHtmlPageRendererInterface $bareHtmlPageRenderer
    *   The bare HTML page renderer.
    * @param \Drupal\Core\Messenger\MessengerInterface $messenger
    *   The messenger.
-   * @param \Symfony\Contracts\EventDispatcher\EventDispatcherInterface $event_dispatcher
+   * @param \Symfony\Contracts\EventDispatcher\EventDispatcherInterface $eventDispatcher
    *   The event dispatcher.
    */
-  public function __construct(MaintenanceModeInterface $maintenance_mode, ConfigFactoryInterface $config_factory, TranslationInterface $translation, UrlGeneratorInterface $url_generator, AccountInterface $account, BareHtmlPageRendererInterface $bare_html_page_renderer, MessengerInterface $messenger, EventDispatcherInterface $event_dispatcher) {
-    $this->maintenanceMode = $maintenance_mode;
-    $this->config = $config_factory;
+  public function __construct(protected MaintenanceModeInterface $maintenanceMode, protected ConfigFactoryInterface $config, TranslationInterface $translation, protected UrlGeneratorInterface $urlGenerator, protected AccountInterface $account, protected BareHtmlPageRendererInterface $bareHtmlPageRenderer, protected MessengerInterface $messenger, protected EventDispatcherInterface $eventDispatcher) {
     $this->stringTranslation = $translation;
-    $this->urlGenerator = $url_generator;
-    $this->account = $account;
-    $this->bareHtmlPageRenderer = $bare_html_page_renderer;
-    $this->messenger = $messenger;
-    $this->eventDispatcher = $event_dispatcher;
   }
 
   /**

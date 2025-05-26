@@ -24,13 +24,6 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 class RedirectFormBlock extends BlockBase implements ContainerFactoryPluginInterface {
 
   /**
-   * The form builder.
-   *
-   * @var \Drupal\Core\Form\FormBuilderInterface
-   */
-  protected $formBuilder;
-
-  /**
    * Constructs a new RedirectFormBlock.
    *
    * @param array $configuration
@@ -39,13 +32,11 @@ class RedirectFormBlock extends BlockBase implements ContainerFactoryPluginInter
    *   The plugin ID for the plugin instance.
    * @param mixed $plugin_definition
    *   The plugin implementation definition.
-   * @param \Drupal\Core\Form\FormBuilderInterface $form_builder
+   * @param \Drupal\Core\Form\FormBuilderInterface $formBuilder
    *   The form builder.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, FormBuilderInterface $form_builder) {
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, protected FormBuilderInterface $formBuilder) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
-
-    $this->formBuilder = $form_builder;
   }
 
   /**

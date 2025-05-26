@@ -21,20 +21,6 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 class LocaleTranslation extends QueueWorkerBase implements ContainerFactoryPluginInterface {
 
   /**
-   * The module handler.
-   *
-   * @var \Drupal\Core\Extension\ModuleHandlerInterface
-   */
-  protected $moduleHandler;
-
-  /**
-   * The queue object.
-   *
-   * @var \Drupal\Core\Queue\QueueInterface
-   */
-  protected $queue;
-
-  /**
    * Constructs a new LocaleTranslation object.
    *
    * @param array $configuration
@@ -43,16 +29,13 @@ class LocaleTranslation extends QueueWorkerBase implements ContainerFactoryPlugi
    *   The plugin ID for the plugin instance.
    * @param array $plugin_definition
    *   The plugin implementation definition.
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
+   * @param \Drupal\Core\Extension\ModuleHandlerInterface $moduleHandler
    *   The module handler.
    * @param \Drupal\Core\Queue\QueueInterface $queue
    *   The queue object.
    */
-  public function __construct(array $configuration, $plugin_id, array $plugin_definition, ModuleHandlerInterface $module_handler, QueueInterface $queue) {
+  public function __construct(array $configuration, $plugin_id, array $plugin_definition, protected ModuleHandlerInterface $moduleHandler, protected QueueInterface $queue) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
-
-    $this->moduleHandler = $module_handler;
-    $this->queue = $queue;
   }
 
   /**

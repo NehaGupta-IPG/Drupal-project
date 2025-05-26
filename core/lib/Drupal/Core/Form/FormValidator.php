@@ -18,53 +18,21 @@ class FormValidator implements FormValidatorInterface {
   use StringTranslationTrait;
 
   /**
-   * The CSRF token generator to validate the form token.
-   *
-   * @var \Drupal\Core\Access\CsrfTokenGenerator
-   */
-  protected $csrfToken;
-
-  /**
-   * The request stack.
-   *
-   * @var \Symfony\Component\HttpFoundation\RequestStack
-   */
-  protected $requestStack;
-
-  /**
-   * A logger instance.
-   *
-   * @var \Psr\Log\LoggerInterface
-   */
-  protected $logger;
-
-  /**
-   * The form error handler.
-   *
-   * @var \Drupal\Core\Form\FormErrorHandlerInterface
-   */
-  protected $formErrorHandler;
-
-  /**
    * Constructs a new FormValidator.
    *
-   * @param \Symfony\Component\HttpFoundation\RequestStack $request_stack
+   * @param \Symfony\Component\HttpFoundation\RequestStack $requestStack
    *   The request stack.
    * @param \Drupal\Core\StringTranslation\TranslationInterface $string_translation
    *   The string translation service.
-   * @param \Drupal\Core\Access\CsrfTokenGenerator $csrf_token
+   * @param \Drupal\Core\Access\CsrfTokenGenerator $csrfToken
    *   The CSRF token generator.
    * @param \Psr\Log\LoggerInterface $logger
    *   A logger instance.
-   * @param \Drupal\Core\Form\FormErrorHandlerInterface $form_error_handler
+   * @param \Drupal\Core\Form\FormErrorHandlerInterface $formErrorHandler
    *   The form error handler.
    */
-  public function __construct(RequestStack $request_stack, TranslationInterface $string_translation, CsrfTokenGenerator $csrf_token, LoggerInterface $logger, FormErrorHandlerInterface $form_error_handler) {
-    $this->requestStack = $request_stack;
+  public function __construct(protected RequestStack $requestStack, TranslationInterface $string_translation, protected CsrfTokenGenerator $csrfToken, protected LoggerInterface $logger, protected FormErrorHandlerInterface $formErrorHandler) {
     $this->stringTranslation = $string_translation;
-    $this->csrfToken = $csrf_token;
-    $this->logger = $logger;
-    $this->formErrorHandler = $form_error_handler;
   }
 
   /**

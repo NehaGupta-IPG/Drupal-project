@@ -54,22 +54,6 @@ class DefaultPluginManager extends PluginManagerBase implements PluginManagerInt
   protected $alterHook;
 
   /**
-   * The subdirectory within a namespace to look for plugins.
-   *
-   * Set to FALSE if the plugins are in the top level of the namespace.
-   *
-   * @var string|bool
-   */
-  protected $subdir;
-
-  /**
-   * The module handler to invoke the alter hook.
-   *
-   * @var \Drupal\Core\Extension\ModuleHandlerInterface
-   */
-  protected $moduleHandler;
-
-  /**
    * The module extension list.
    *
    * @var \Drupal\Core\Extension\ModuleExtensionList
@@ -101,23 +85,6 @@ class DefaultPluginManager extends PluginManagerBase implements PluginManagerInt
   protected $pluginDefinitionAttributeName;
 
   /**
-   * The interface each plugin should implement.
-   *
-   * @var string|null
-   */
-  protected $pluginInterface;
-
-  /**
-   * An object of root paths that are traversable.
-   *
-   * The root paths are keyed by the corresponding namespace to look for plugin
-   * implementations.
-   *
-   * @var \Traversable
-   */
-  protected $namespaces;
-
-  /**
    * Additional annotation namespaces.
    *
    * The annotation discovery mechanism should scan these for annotation
@@ -135,9 +102,9 @@ class DefaultPluginManager extends PluginManagerBase implements PluginManagerInt
    * @param \Traversable $namespaces
    *   An object that implements \Traversable which contains the root paths
    *   keyed by the corresponding namespace to look for plugin implementations.
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
+   * @param \Drupal\Core\Extension\ModuleHandlerInterface $moduleHandler
    *   The module handler.
-   * @param string|null $plugin_interface
+   * @param string|null $pluginInterface
    *   (optional) The interface each plugin should implement.
    * @param string|null $plugin_definition_attribute_name
    *   (optional) The name of the attribute that contains the plugin definition.
@@ -151,11 +118,7 @@ class DefaultPluginManager extends PluginManagerBase implements PluginManagerInt
    * 'Drupal\Component\Plugin\Attribute\Plugin' once annotations are no longer
    * supported.
    */
-  public function __construct($subdir, \Traversable $namespaces, ModuleHandlerInterface $module_handler, $plugin_interface = NULL, ?string $plugin_definition_attribute_name = NULL, string|array|null $plugin_definition_annotation_name = NULL, array $additional_annotation_namespaces = []) {
-    $this->subdir = $subdir;
-    $this->namespaces = $namespaces;
-    $this->moduleHandler = $module_handler;
-    $this->pluginInterface = $plugin_interface;
+  public function __construct(protected $subdir, protected \Traversable $namespaces, protected ModuleHandlerInterface $moduleHandler, protected $pluginInterface = NULL, ?string $plugin_definition_attribute_name = NULL, string|array|null $plugin_definition_annotation_name = NULL, array $additional_annotation_namespaces = []) {
     if (is_subclass_of($plugin_definition_attribute_name, AttributeInterface::class)) {
       $this->pluginDefinitionAttributeName = $plugin_definition_attribute_name;
       $this->pluginDefinitionAnnotationName = $plugin_definition_annotation_name;

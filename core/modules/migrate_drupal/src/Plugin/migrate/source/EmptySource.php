@@ -29,18 +29,18 @@ class EmptySource extends BaseEmptySource implements ContainerFactoryPluginInter
   use DependencyTrait;
 
   /**
-   * The entity type manager.
-   *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
-   */
-  protected $entityTypeManager;
-
-  /**
    * {@inheritdoc}
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, MigrationInterface $migration, EntityTypeManagerInterface $entity_type_manager) {
+  public function __construct(
+    array $configuration,
+    $plugin_id,
+    $plugin_definition,
+    MigrationInterface $migration, /**
+     * The entity type manager.
+     */
+    protected EntityTypeManagerInterface $entityTypeManager,
+) {
     parent::__construct($configuration, $plugin_id, $plugin_definition, $migration);
-    $this->entityTypeManager = $entity_type_manager;
   }
 
   /**

@@ -16,13 +16,6 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 class BreakLockForm extends EntityConfirmFormBase {
 
   /**
-   * Stores the entity type manager.
-   *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
-   */
-  protected $entityTypeManager;
-
-  /**
    * Stores the shared tempstore.
    *
    * @var \Drupal\Core\TempStore\SharedTempStore
@@ -32,13 +25,12 @@ class BreakLockForm extends EntityConfirmFormBase {
   /**
    * Constructs a \Drupal\views_ui\Form\BreakLockForm object.
    *
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
    *   The entity type manager.
    * @param \Drupal\Core\TempStore\SharedTempStoreFactory $temp_store_factory
    *   The factory for the temp store object.
    */
-  public function __construct(EntityTypeManagerInterface $entity_type_manager, SharedTempStoreFactory $temp_store_factory) {
-    $this->entityTypeManager = $entity_type_manager;
+  public function __construct(protected EntityTypeManagerInterface $entityTypeManager, SharedTempStoreFactory $temp_store_factory) {
     $this->tempStore = $temp_store_factory->get('views');
   }
 

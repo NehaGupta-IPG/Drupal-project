@@ -28,20 +28,6 @@ class UpdateManager implements UpdateManagerInterface {
   protected $updateSettings;
 
   /**
-   * Module Handler Service.
-   *
-   * @var \Drupal\Core\Extension\ModuleHandlerInterface
-   */
-  protected $moduleHandler;
-
-  /**
-   * Update Processor Service.
-   *
-   * @var \Drupal\update\UpdateProcessorInterface
-   */
-  protected $updateProcessor;
-
-  /**
    * An array of installed projects.
    *
    * @var array
@@ -63,57 +49,31 @@ class UpdateManager implements UpdateManagerInterface {
   protected $availableReleasesTempStore;
 
   /**
-   * The theme handler.
-   *
-   * @var \Drupal\Core\Extension\ThemeHandlerInterface
-   */
-  protected $themeHandler;
-
-  /**
-   * The module extension list.
-   *
-   * @var \Drupal\Core\Extension\ModuleExtensionList
-   */
-  protected $moduleExtensionList;
-
-  /**
-   * The theme extension list.
-   *
-   * @var \Drupal\Core\Extension\ThemeExtensionList
-   */
-  protected ThemeExtensionList $themeExtensionList;
-
-  /**
    * Constructs an UpdateManager.
    *
    * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
    *   The config factory.
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
+   * @param \Drupal\Core\Extension\ModuleHandlerInterface $moduleHandler
    *   The Module Handler service.
-   * @param \Drupal\update\UpdateProcessorInterface $update_processor
+   * @param \Drupal\update\UpdateProcessorInterface $updateProcessor
    *   The Update Processor service.
    * @param \Drupal\Core\StringTranslation\TranslationInterface $translation
    *   The translation service.
    * @param \Drupal\Core\KeyValueStore\KeyValueFactoryInterface $key_value_expirable_factory
    *   The expirable key/value factory.
-   * @param \Drupal\Core\Extension\ThemeHandlerInterface $theme_handler
+   * @param \Drupal\Core\Extension\ThemeHandlerInterface $themeHandler
    *   The theme handler.
-   * @param \Drupal\Core\Extension\ModuleExtensionList $extension_list_module
+   * @param \Drupal\Core\Extension\ModuleExtensionList $moduleExtensionList
    *   The module extension list.
-   * @param \Drupal\Core\Extension\ThemeExtensionList $extension_list_theme
+   * @param \Drupal\Core\Extension\ThemeExtensionList $themeExtensionList
    *   The theme extension list.
    */
-  public function __construct(ConfigFactoryInterface $config_factory, ModuleHandlerInterface $module_handler, UpdateProcessorInterface $update_processor, TranslationInterface $translation, KeyValueFactoryInterface $key_value_expirable_factory, ThemeHandlerInterface $theme_handler, ModuleExtensionList $extension_list_module, ThemeExtensionList $extension_list_theme) {
+  public function __construct(ConfigFactoryInterface $config_factory, protected ModuleHandlerInterface $moduleHandler, protected UpdateProcessorInterface $updateProcessor, TranslationInterface $translation, KeyValueFactoryInterface $key_value_expirable_factory, protected ThemeHandlerInterface $themeHandler, protected ModuleExtensionList $moduleExtensionList, protected ThemeExtensionList $themeExtensionList) {
     $this->updateSettings = $config_factory->get('update.settings');
-    $this->moduleHandler = $module_handler;
-    $this->updateProcessor = $update_processor;
     $this->stringTranslation = $translation;
     $this->keyValueStore = $key_value_expirable_factory->get('update');
-    $this->themeHandler = $theme_handler;
     $this->availableReleasesTempStore = $key_value_expirable_factory->get('update_available_releases');
     $this->projects = [];
-    $this->moduleExtensionList = $extension_list_module;
-    $this->themeExtensionList = $extension_list_theme;
   }
 
   /**

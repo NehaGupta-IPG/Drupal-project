@@ -18,27 +18,6 @@ class MailHandler implements MailHandlerInterface {
   use StringTranslationTrait;
 
   /**
-   * Language manager service.
-   *
-   * @var \Drupal\Core\Language\LanguageManagerInterface
-   */
-  protected $languageManager;
-
-  /**
-   * Logger service.
-   *
-   * @var \Drupal\Core\Logger\LoggerChannelInterface
-   */
-  protected $logger;
-
-  /**
-   * Mail manager service.
-   *
-   * @var \Drupal\Core\Mail\MailManagerInterface
-   */
-  protected $mailManager;
-
-  /**
    * The user entity storage handler.
    *
    * @var \Drupal\Core\Entity\EntityStorageInterface
@@ -48,9 +27,9 @@ class MailHandler implements MailHandlerInterface {
   /**
    * Constructs a new \Drupal\contact\MailHandler object.
    *
-   * @param \Drupal\Core\Mail\MailManagerInterface $mail_manager
+   * @param \Drupal\Core\Mail\MailManagerInterface $mailManager
    *   Mail manager service.
-   * @param \Drupal\Core\Language\LanguageManagerInterface $language_manager
+   * @param \Drupal\Core\Language\LanguageManagerInterface $languageManager
    *   Language manager service.
    * @param \Psr\Log\LoggerInterface $logger
    *   A logger instance.
@@ -59,10 +38,7 @@ class MailHandler implements MailHandlerInterface {
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager.
    */
-  public function __construct(MailManagerInterface $mail_manager, LanguageManagerInterface $language_manager, LoggerInterface $logger, TranslationInterface $string_translation, EntityTypeManagerInterface $entity_type_manager) {
-    $this->languageManager = $language_manager;
-    $this->mailManager = $mail_manager;
-    $this->logger = $logger;
+  public function __construct(protected MailManagerInterface $mailManager, protected LanguageManagerInterface $languageManager, protected LoggerInterface $logger, TranslationInterface $string_translation, EntityTypeManagerInterface $entity_type_manager) {
     $this->stringTranslation = $string_translation;
     $this->userStorage = $entity_type_manager->getStorage('user');
   }

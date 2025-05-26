@@ -16,11 +16,6 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 class EntityReverse extends RelationshipPluginBase {
 
   /**
-   * The views plugin join manager.
-   */
-  public ViewsHandlerManager $joinManager;
-
-  /**
    * The alias for the left table.
    */
   // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
@@ -35,12 +30,11 @@ class EntityReverse extends RelationshipPluginBase {
    *   The plugin ID for the plugin instance.
    * @param array $plugin_definition
    *   The plugin implementation definition.
-   * @param \Drupal\views\Plugin\ViewsHandlerManager $join_manager
+   * @param \Drupal\views\Plugin\ViewsHandlerManager $joinManager
    *   The views plugin join manager.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, ViewsHandlerManager $join_manager) {
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, public ViewsHandlerManager $joinManager) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
-    $this->joinManager = $join_manager;
   }
 
   /**

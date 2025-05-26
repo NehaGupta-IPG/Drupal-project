@@ -12,35 +12,19 @@ use Drupal\Core\DrupalKernelInterface;
  */
 class TestService {
 
-  /**
-   * @var \Drupal\autowire_test\TestInjectionInterface
-   */
-  protected $testInjection;
-
-  /**
-   * @var \Drupal\autowire_test\TestInjection2
-   */
-  protected $testInjection2;
-
-  /**
-   * The database connection.
-   *
-   * @var \Drupal\Core\Database\Connection
-   */
-  protected $database;
-
-  /**
-   * The Drupal kernel.
-   *
-   * @var \Drupal\Core\DrupalKernelInterface
-   */
-  protected $kernel;
-
-  public function __construct(TestInjectionInterface $test_injection, TestInjection2 $test_injection2, Connection $database, DrupalKernelInterface $kernel, protected TestInjectionInterface $testInjection3) {
-    $this->testInjection = $test_injection;
-    $this->testInjection2 = $test_injection2;
-    $this->database = $database;
-    $this->kernel = $kernel;
+  public function __construct(
+    protected TestInjectionInterface $testInjection,
+    protected TestInjection2 $testInjection2,
+    /**
+     * The database connection.
+     */
+    protected Connection $database,
+    /**
+     * The Drupal kernel.
+     */
+    protected DrupalKernelInterface $kernel,
+    protected TestInjectionInterface $testInjection3,
+  ) {
   }
 
   public function getTestInjection(): TestInjectionInterface {

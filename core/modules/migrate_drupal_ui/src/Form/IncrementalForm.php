@@ -18,18 +18,11 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 class IncrementalForm extends MigrateUpgradeFormBase {
 
   /**
-   * The date formatter service.
-   *
-   * @var \Drupal\Core\Datetime\DateFormatterInterface
-   */
-  protected $dateFormatter;
-
-  /**
    * IncrementalForm constructor.
    *
    * @param \Drupal\Core\State\StateInterface $state
    *   The state service.
-   * @param \Drupal\Core\Datetime\DateFormatterInterface $date_formatter
+   * @param \Drupal\Core\Datetime\DateFormatterInterface $dateFormatter
    *   The date formatter service.
    * @param \Drupal\Core\TempStore\PrivateTempStoreFactory $tempstore_private
    *   The private tempstore factory service.
@@ -38,9 +31,8 @@ class IncrementalForm extends MigrateUpgradeFormBase {
    * @param \Drupal\migrate\Plugin\MigrationPluginManagerInterface $migration_plugin_manager
    *   The migration plugin manager service.
    */
-  public function __construct(StateInterface $state, DateFormatterInterface $date_formatter, PrivateTempStoreFactory $tempstore_private, ConfigFactoryInterface $config_factory, MigrationPluginManagerInterface $migration_plugin_manager) {
+  public function __construct(StateInterface $state, protected DateFormatterInterface $dateFormatter, PrivateTempStoreFactory $tempstore_private, ConfigFactoryInterface $config_factory, MigrationPluginManagerInterface $migration_plugin_manager) {
     parent::__construct($config_factory, $migration_plugin_manager, $state, $tempstore_private);
-    $this->dateFormatter = $date_formatter;
   }
 
   /**

@@ -14,20 +14,12 @@ use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 class ShortcutSetController extends ControllerBase {
 
   /**
-   * The path validator.
-   *
-   * @var \Drupal\Core\Path\PathValidatorInterface
-   */
-  protected $pathValidator;
-
-  /**
    * Creates a new ShortcutSetController instance.
    *
-   * @param \Drupal\Core\Path\PathValidatorInterface $path_validator
+   * @param \Drupal\Core\Path\PathValidatorInterface $pathValidator
    *   The path validator.
    */
-  public function __construct(PathValidatorInterface $path_validator) {
-    $this->pathValidator = $path_validator;
+  public function __construct(protected PathValidatorInterface $pathValidator) {
   }
 
   /**

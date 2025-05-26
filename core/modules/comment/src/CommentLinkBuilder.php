@@ -22,53 +22,21 @@ class CommentLinkBuilder implements CommentLinkBuilderInterface {
   use StringTranslationTrait;
 
   /**
-   * Current user.
-   *
-   * @var \Drupal\Core\Session\AccountInterface
-   */
-  protected $currentUser;
-
-  /**
-   * Comment manager service.
-   *
-   * @var \Drupal\comment\CommentManagerInterface
-   */
-  protected $commentManager;
-
-  /**
-   * Module handler service.
-   *
-   * @var \Drupal\Core\Extension\ModuleHandlerInterface
-   */
-  protected $moduleHandler;
-
-  /**
-   * The entity type manager service.
-   *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
-   */
-  protected $entityTypeManager;
-
-  /**
    * Constructs a new CommentLinkBuilder object.
    *
-   * @param \Drupal\Core\Session\AccountInterface $current_user
+   * @param \Drupal\Core\Session\AccountInterface $currentUser
    *   Current user.
-   * @param \Drupal\comment\CommentManagerInterface $comment_manager
+   * @param \Drupal\comment\CommentManagerInterface $commentManager
    *   Comment manager service.
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
+   * @param \Drupal\Core\Extension\ModuleHandlerInterface $moduleHandler
    *   Module handler service.
    * @param \Drupal\Core\StringTranslation\TranslationInterface $string_translation
    *   String translation service.
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
    *   The entity type manager.
    */
-  public function __construct(AccountInterface $current_user, CommentManagerInterface $comment_manager, ModuleHandlerInterface $module_handler, TranslationInterface $string_translation, EntityTypeManagerInterface $entity_type_manager) {
-    $this->currentUser = $current_user;
-    $this->commentManager = $comment_manager;
-    $this->moduleHandler = $module_handler;
+  public function __construct(protected AccountInterface $currentUser, protected CommentManagerInterface $commentManager, protected ModuleHandlerInterface $moduleHandler, TranslationInterface $string_translation, protected EntityTypeManagerInterface $entityTypeManager) {
     $this->stringTranslation = $string_translation;
-    $this->entityTypeManager = $entity_type_manager;
   }
 
   /**

@@ -16,27 +16,6 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 abstract class TranslateFormBase extends FormBase {
 
   /**
-   * The locale storage.
-   *
-   * @var \Drupal\locale\StringStorageInterface
-   */
-  protected $localeStorage;
-
-  /**
-   * The state store.
-   *
-   * @var \Drupal\Core\State\StateInterface
-   */
-  protected $state;
-
-  /**
-   * The language manager.
-   *
-   * @var \Drupal\Core\Language\LanguageManagerInterface
-   */
-  protected $languageManager;
-
-  /**
    * Filter values. Shared between objects that inherit this class.
    *
    * @var array|null
@@ -46,17 +25,14 @@ abstract class TranslateFormBase extends FormBase {
   /**
    * Constructs a new TranslationFormBase object.
    *
-   * @param \Drupal\locale\StringStorageInterface $locale_storage
+   * @param \Drupal\locale\StringStorageInterface $localeStorage
    *   The locale storage.
    * @param \Drupal\Core\State\StateInterface $state
    *   The state service.
-   * @param \Drupal\Core\Language\LanguageManagerInterface $language_manager
+   * @param \Drupal\Core\Language\LanguageManagerInterface $languageManager
    *   The language manager.
    */
-  public function __construct(StringStorageInterface $locale_storage, StateInterface $state, LanguageManagerInterface $language_manager) {
-    $this->localeStorage = $locale_storage;
-    $this->state = $state;
-    $this->languageManager = $language_manager;
+  public function __construct(protected StringStorageInterface $localeStorage, protected StateInterface $state, protected LanguageManagerInterface $languageManager) {
   }
 
   /**

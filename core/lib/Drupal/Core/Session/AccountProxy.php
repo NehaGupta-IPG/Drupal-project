@@ -35,20 +35,12 @@ class AccountProxy implements AccountProxyInterface {
   protected $id = 0;
 
   /**
-   * Event dispatcher.
-   *
-   * @var \Symfony\Contracts\EventDispatcher\EventDispatcherInterface
-   */
-  protected $eventDispatcher;
-
-  /**
    * AccountProxy constructor.
    *
    * @param \Symfony\Contracts\EventDispatcher\EventDispatcherInterface $eventDispatcher
    *   Event dispatcher.
    */
-  public function __construct(EventDispatcherInterface $eventDispatcher) {
-    $this->eventDispatcher = $eventDispatcher;
+  public function __construct(protected EventDispatcherInterface $eventDispatcher) {
   }
 
   /**

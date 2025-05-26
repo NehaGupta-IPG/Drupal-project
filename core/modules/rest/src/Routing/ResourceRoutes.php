@@ -17,25 +17,11 @@ use Symfony\Component\Routing\RouteCollection;
 class ResourceRoutes implements EventSubscriberInterface {
 
   /**
-   * The plugin manager for REST plugins.
-   *
-   * @var \Drupal\rest\Plugin\Type\ResourcePluginManager
-   */
-  protected $manager;
-
-  /**
    * The REST resource config storage.
    *
    * @var \Drupal\Core\Entity\EntityStorageInterface
    */
   protected $resourceConfigStorage;
-
-  /**
-   * A logger instance.
-   *
-   * @var \Psr\Log\LoggerInterface
-   */
-  protected $logger;
 
   /**
    * Constructs a RouteSubscriber object.
@@ -47,10 +33,8 @@ class ResourceRoutes implements EventSubscriberInterface {
    * @param \Psr\Log\LoggerInterface $logger
    *   A logger instance.
    */
-  public function __construct(ResourcePluginManager $manager, EntityTypeManagerInterface $entity_type_manager, LoggerInterface $logger) {
-    $this->manager = $manager;
+  public function __construct(protected ResourcePluginManager $manager, EntityTypeManagerInterface $entity_type_manager, protected LoggerInterface $logger) {
     $this->resourceConfigStorage = $entity_type_manager->getStorage('rest_resource_config');
-    $this->logger = $logger;
   }
 
   /**

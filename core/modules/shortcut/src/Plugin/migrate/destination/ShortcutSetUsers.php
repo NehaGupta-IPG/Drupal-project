@@ -18,13 +18,6 @@ use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 class ShortcutSetUsers extends DestinationBase implements ContainerFactoryPluginInterface {
 
   /**
-   * The shortcut set storage handler.
-   *
-   * @var \Drupal\shortcut\ShortcutSetStorageInterface
-   */
-  protected $shortcutSetStorage;
-
-  /**
    * Constructs an entity destination plugin.
    *
    * @param array $configuration
@@ -35,12 +28,11 @@ class ShortcutSetUsers extends DestinationBase implements ContainerFactoryPlugin
    *   The plugin implementation definition.
    * @param \Drupal\migrate\Plugin\MigrationInterface $migration
    *   The migration.
-   * @param \Drupal\shortcut\ShortcutSetStorageInterface $shortcut_set_storage
+   * @param \Drupal\shortcut\ShortcutSetStorageInterface $shortcutSetStorage
    *   The shortcut_set entity storage handler.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, MigrationInterface $migration, ShortcutSetStorageInterface $shortcut_set_storage) {
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, MigrationInterface $migration, protected ShortcutSetStorageInterface $shortcutSetStorage) {
     parent::__construct($configuration, $plugin_id, $plugin_definition, $migration);
-    $this->shortcutSetStorage = $shortcut_set_storage;
   }
 
   /**

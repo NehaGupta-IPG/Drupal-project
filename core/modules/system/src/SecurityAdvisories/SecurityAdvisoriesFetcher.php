@@ -35,13 +35,6 @@ final class SecurityAdvisoriesFetcher {
   protected $config;
 
   /**
-   * The HTTP client.
-   *
-   * @var \GuzzleHttp\Client
-   */
-  protected $httpClient;
-
-  /**
    * The expirable key/value store for the advisories JSON response.
    *
    * @var \Drupal\Core\KeyValueStore\KeyValueStoreExpirableInterface
@@ -54,13 +47,6 @@ final class SecurityAdvisoriesFetcher {
    * @var \Drupal\Core\Extension\ExtensionList[]
    */
   protected $extensionLists = [];
-
-  /**
-   * The logger.
-   *
-   * @var \Psr\Log\LoggerInterface
-   */
-  protected $logger;
 
   /**
    * Whether to fall back to HTTP if the HTTPS request fails.
@@ -76,7 +62,7 @@ final class SecurityAdvisoriesFetcher {
    *   The config factory.
    * @param \Drupal\Core\KeyValueStore\KeyValueExpirableFactoryInterface $key_value_factory
    *   The expirable key/value factory.
-   * @param \GuzzleHttp\ClientInterface $client
+   * @param \GuzzleHttp\ClientInterface $httpClient
    *   The HTTP client.
    * @param \Drupal\Core\Extension\ModuleExtensionList $module_list
    *   The module extension list.
@@ -89,14 +75,12 @@ final class SecurityAdvisoriesFetcher {
    * @param \Drupal\Core\Site\Settings $settings
    *   The settings instance.
    */
-  public function __construct(ConfigFactoryInterface $config_factory, KeyValueExpirableFactoryInterface $key_value_factory, ClientInterface $client, ModuleExtensionList $module_list, ThemeExtensionList $theme_list, ProfileExtensionList $profile_list, LoggerInterface $logger, Settings $settings) {
+  public function __construct(ConfigFactoryInterface $config_factory, KeyValueExpirableFactoryInterface $key_value_factory, protected ClientInterface $httpClient, ModuleExtensionList $module_list, ThemeExtensionList $theme_list, ProfileExtensionList $profile_list, protected LoggerInterface $logger, Settings $settings) {
     $this->config = $config_factory->get('system.advisories');
     $this->keyValueExpirable = $key_value_factory->get('system');
-    $this->httpClient = $client;
     $this->extensionLists['module'] = $module_list;
     $this->extensionLists['theme'] = $theme_list;
     $this->extensionLists['profile'] = $profile_list;
-    $this->logger = $logger;
     $this->withHttpFallback = $settings->get('update_fetch_with_http_fallback', FALSE);
   }
 

@@ -23,20 +23,12 @@ use Drupal\Component\Utility\Html;
 class ViewsUIController extends ControllerBase {
 
   /**
-   * Stores the Views data cache object.
-   *
-   * @var \Drupal\views\ViewsData
-   */
-  protected $viewsData;
-
-  /**
    * Constructs a new \Drupal\views_ui\Controller\ViewsUIController object.
    *
-   * @param \Drupal\views\ViewsData $views_data
+   * @param \Drupal\views\ViewsData $viewsData
    *   The Views data cache object.
    */
-  public function __construct(ViewsData $views_data) {
-    $this->viewsData = $views_data;
+  public function __construct(protected ViewsData $viewsData) {
   }
 
   /**

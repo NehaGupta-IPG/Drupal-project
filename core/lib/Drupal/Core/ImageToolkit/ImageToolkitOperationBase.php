@@ -17,20 +17,6 @@ use Psr\Log\LoggerInterface;
 abstract class ImageToolkitOperationBase extends PluginBase implements ImageToolkitOperationInterface {
 
   /**
-   * The image toolkit.
-   *
-   * @var \Drupal\Core\ImageToolkit\ImageToolkitInterface
-   */
-  protected $toolkit;
-
-  /**
-   * A logger instance.
-   *
-   * @var \Psr\Log\LoggerInterface
-   */
-  protected $logger;
-
-  /**
    * Constructs an image toolkit operation plugin.
    *
    * @param array $configuration
@@ -44,10 +30,8 @@ abstract class ImageToolkitOperationBase extends PluginBase implements ImageTool
    * @param \Psr\Log\LoggerInterface $logger
    *   A logger instance.
    */
-  public function __construct(array $configuration, $plugin_id, array $plugin_definition, ImageToolkitInterface $toolkit, LoggerInterface $logger) {
+  public function __construct(array $configuration, $plugin_id, array $plugin_definition, protected ImageToolkitInterface $toolkit, protected LoggerInterface $logger) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
-    $this->toolkit = $toolkit;
-    $this->logger = $logger;
   }
 
   /**

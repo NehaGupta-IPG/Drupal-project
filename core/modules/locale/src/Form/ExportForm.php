@@ -20,30 +20,14 @@ use Symfony\Component\HttpFoundation\BinaryFileResponse;
 class ExportForm extends FormBase {
 
   /**
-   * The language manager.
-   *
-   * @var \Drupal\Core\Language\LanguageManagerInterface
-   */
-  protected $languageManager;
-
-  /**
-   * The file system service.
-   *
-   * @var \Drupal\Core\File\FileSystemInterface
-   */
-  protected $fileSystem;
-
-  /**
    * Constructs a new ExportForm.
    *
-   * @param \Drupal\Core\Language\LanguageManagerInterface $language_manager
+   * @param \Drupal\Core\Language\LanguageManagerInterface $languageManager
    *   The language manager.
-   * @param \Drupal\Core\File\FileSystemInterface $file_system
+   * @param \Drupal\Core\File\FileSystemInterface $fileSystem
    *   The file system service.
    */
-  public function __construct(LanguageManagerInterface $language_manager, FileSystemInterface $file_system) {
-    $this->languageManager = $language_manager;
-    $this->fileSystem = $file_system;
+  public function __construct(protected LanguageManagerInterface $languageManager, protected FileSystemInterface $fileSystem) {
   }
 
   /**

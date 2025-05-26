@@ -26,27 +26,6 @@ class NodeRevisionDeleteForm extends ConfirmFormBase {
   protected $revision;
 
   /**
-   * The node storage.
-   *
-   * @var \Drupal\Core\Entity\EntityStorageInterface
-   */
-  protected $nodeStorage;
-
-  /**
-   * The node type storage.
-   *
-   * @var \Drupal\Core\Entity\EntityStorageInterface
-   */
-  protected $nodeTypeStorage;
-
-  /**
-   * The access manager.
-   *
-   * @var \Drupal\Core\Access\AccessManagerInterface
-   */
-  protected $accessManager;
-
-  /**
    * The database connection.
    *
    * @var \Drupal\Core\Database\Connection
@@ -54,29 +33,18 @@ class NodeRevisionDeleteForm extends ConfirmFormBase {
   protected $connection;
 
   /**
-   * The date formatter service.
-   *
-   * @var \Drupal\Core\Datetime\DateFormatterInterface
-   */
-  protected $dateFormatter;
-
-  /**
    * Constructs a new NodeRevisionDeleteForm.
    *
-   * @param \Drupal\Core\Entity\EntityStorageInterface $node_storage
+   * @param \Drupal\Core\Entity\EntityStorageInterface $nodeStorage
    *   The node storage.
-   * @param \Drupal\Core\Entity\EntityStorageInterface $node_type_storage
+   * @param \Drupal\Core\Entity\EntityStorageInterface $nodeTypeStorage
    *   The node type storage.
-   * @param \Drupal\Core\Access\AccessManagerInterface $access_manager
+   * @param \Drupal\Core\Access\AccessManagerInterface $accessManager
    *   The access manager.
-   * @param \Drupal\Core\Datetime\DateFormatterInterface $date_formatter
+   * @param \Drupal\Core\Datetime\DateFormatterInterface $dateFormatter
    *   The date formatter service.
    */
-  public function __construct(EntityStorageInterface $node_storage, EntityStorageInterface $node_type_storage, AccessManagerInterface $access_manager, DateFormatterInterface $date_formatter) {
-    $this->nodeStorage = $node_storage;
-    $this->nodeTypeStorage = $node_type_storage;
-    $this->accessManager = $access_manager;
-    $this->dateFormatter = $date_formatter;
+  public function __construct(protected EntityStorageInterface $nodeStorage, protected EntityStorageInterface $nodeTypeStorage, protected AccessManagerInterface $accessManager, protected DateFormatterInterface $dateFormatter) {
   }
 
   /**

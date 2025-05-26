@@ -26,13 +26,6 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 class FilterID extends StaticMap implements ContainerFactoryPluginInterface {
 
   /**
-   * The filter plugin manager.
-   *
-   * @var \Drupal\Component\Plugin\PluginManagerInterface|\Drupal\Component\Plugin\FallbackPluginManagerInterface
-   */
-  protected $filterManager;
-
-  /**
    * FilterID constructor.
    *
    * @param array $configuration
@@ -41,14 +34,13 @@ class FilterID extends StaticMap implements ContainerFactoryPluginInterface {
    *   The plugin ID.
    * @param mixed $plugin_definition
    *   The plugin definition.
-   * @param \Drupal\Component\Plugin\PluginManagerInterface $filter_manager
+   * @param \Drupal\Component\Plugin\PluginManagerInterface $filterManager
    *   The filter plugin manager.
    * @param \Drupal\Core\StringTranslation\TranslationInterface $translator
    *   (optional) The string translation service.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, PluginManagerInterface $filter_manager, ?TranslationInterface $translator = NULL) {
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, protected PluginManagerInterface $filterManager, ?TranslationInterface $translator = NULL) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
-    $this->filterManager = $filter_manager;
     $this->stringTranslation = $translator;
   }
 

@@ -19,27 +19,6 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 class CommentTypeForm extends EntityForm {
 
   /**
-   * Entity type manager service.
-   *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
-   */
-  protected $entityTypeManager;
-
-  /**
-   * A logger instance.
-   *
-   * @var \Psr\Log\LoggerInterface
-   */
-  protected $logger;
-
-  /**
-   * The comment manager.
-   *
-   * @var \Drupal\comment\CommentManagerInterface
-   */
-  protected $commentManager;
-
-  /**
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container) {
@@ -53,17 +32,14 @@ class CommentTypeForm extends EntityForm {
   /**
    * Constructs a CommentTypeFormController.
    *
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
    *   The entity type manager service.
    * @param \Psr\Log\LoggerInterface $logger
    *   A logger instance.
-   * @param \Drupal\comment\CommentManagerInterface $comment_manager
+   * @param \Drupal\comment\CommentManagerInterface $commentManager
    *   The comment manager.
    */
-  public function __construct(EntityTypeManagerInterface $entity_type_manager, LoggerInterface $logger, CommentManagerInterface $comment_manager) {
-    $this->entityTypeManager = $entity_type_manager;
-    $this->logger = $logger;
-    $this->commentManager = $comment_manager;
+  public function __construct(protected EntityTypeManagerInterface $entityTypeManager, protected LoggerInterface $logger, protected CommentManagerInterface $commentManager) {
   }
 
   /**

@@ -18,23 +18,15 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 class ShortcutAccessControlHandler extends EntityAccessControlHandler implements EntityHandlerInterface {
 
   /**
-   * The shortcut_set storage.
-   *
-   * @var \Drupal\shortcut\ShortcutSetStorageInterface
-   */
-  protected $shortcutSetStorage;
-
-  /**
    * Constructs a ShortcutAccessControlHandler object.
    *
    * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
    *   The entity type definition.
-   * @param \Drupal\shortcut\ShortcutSetStorageInterface $shortcut_set_storage
+   * @param \Drupal\shortcut\ShortcutSetStorageInterface $shortcutSetStorage
    *   The shortcut_set storage.
    */
-  public function __construct(EntityTypeInterface $entity_type, ShortcutSetStorageInterface $shortcut_set_storage) {
+  public function __construct(EntityTypeInterface $entity_type, protected ShortcutSetStorageInterface $shortcutSetStorage) {
     parent::__construct($entity_type);
-    $this->shortcutSetStorage = $shortcut_set_storage;
   }
 
   /**

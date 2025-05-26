@@ -17,20 +17,12 @@ use Drupal\Core\Site\Settings;
 class UpdateManagerAccessCheck implements AccessInterface {
 
   /**
-   * Settings Service.
-   *
-   * @var \Drupal\Core\Site\Settings
-   */
-  protected $settings;
-
-  /**
    * Constructs an UpdateManagerAccessCheck object.
    *
    * @param \Drupal\Core\Site\Settings $settings
    *   The read-only settings container.
    */
-  public function __construct(Settings $settings) {
-    $this->settings = $settings;
+  public function __construct(protected Settings $settings) {
   }
 
   /**

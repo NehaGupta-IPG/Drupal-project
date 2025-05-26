@@ -30,32 +30,6 @@ use Drupal\Core\Utility\LinkGeneratorInterface;
 class ResponsiveImageFormatter extends ImageFormatterBase {
 
   /**
-   * @var \Drupal\Core\Entity\EntityStorageInterface
-   */
-  protected $responsiveImageStyleStorage;
-
-  /**
-   * The image style entity storage.
-   *
-   * @var \Drupal\Core\Entity\EntityStorageInterface
-   */
-  protected $imageStyleStorage;
-
-  /**
-   * The current user.
-   *
-   * @var \Drupal\Core\Session\AccountInterface
-   */
-  protected $currentUser;
-
-  /**
-   * The link generator.
-   *
-   * @var \Drupal\Core\Utility\LinkGeneratorInterface
-   */
-  protected $linkGenerator;
-
-  /**
    * Constructs a ResponsiveImageFormatter object.
    *
    * @param string $plugin_id
@@ -72,22 +46,17 @@ class ResponsiveImageFormatter extends ImageFormatterBase {
    *   The view mode.
    * @param array $third_party_settings
    *   Any third party settings.
-   * @param \Drupal\Core\Entity\EntityStorageInterface $responsive_image_style_storage
+   * @param \Drupal\Core\Entity\EntityStorageInterface $responsiveImageStyleStorage
    *   The responsive image style storage.
-   * @param \Drupal\Core\Entity\EntityStorageInterface $image_style_storage
+   * @param \Drupal\Core\Entity\EntityStorageInterface $imageStyleStorage
    *   The image style storage.
-   * @param \Drupal\Core\Utility\LinkGeneratorInterface $link_generator
+   * @param \Drupal\Core\Utility\LinkGeneratorInterface $linkGenerator
    *   The link generator service.
-   * @param \Drupal\Core\Session\AccountInterface $current_user
+   * @param \Drupal\Core\Session\AccountInterface $currentUser
    *   The current user.
    */
-  public function __construct($plugin_id, $plugin_definition, FieldDefinitionInterface $field_definition, array $settings, $label, $view_mode, array $third_party_settings, EntityStorageInterface $responsive_image_style_storage, EntityStorageInterface $image_style_storage, LinkGeneratorInterface $link_generator, AccountInterface $current_user) {
+  public function __construct($plugin_id, $plugin_definition, FieldDefinitionInterface $field_definition, array $settings, $label, $view_mode, array $third_party_settings, protected EntityStorageInterface $responsiveImageStyleStorage, protected EntityStorageInterface $imageStyleStorage, protected LinkGeneratorInterface $linkGenerator, protected AccountInterface $currentUser) {
     parent::__construct($plugin_id, $plugin_definition, $field_definition, $settings, $label, $view_mode, $third_party_settings);
-
-    $this->responsiveImageStyleStorage = $responsive_image_style_storage;
-    $this->imageStyleStorage = $image_style_storage;
-    $this->linkGenerator = $link_generator;
-    $this->currentUser = $current_user;
   }
 
   /**

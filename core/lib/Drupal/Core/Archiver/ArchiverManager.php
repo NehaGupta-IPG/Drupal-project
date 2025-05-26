@@ -19,13 +19,6 @@ use Drupal\Core\Plugin\DefaultPluginManager;
 class ArchiverManager extends DefaultPluginManager {
 
   /**
-   * The file system service.
-   *
-   * @var \Drupal\Core\File\FileSystemInterface
-   */
-  protected $fileSystem;
-
-  /**
    * Constructs an ArchiverManager object.
    *
    * @param \Traversable $namespaces
@@ -35,14 +28,13 @@ class ArchiverManager extends DefaultPluginManager {
    *   Cache backend instance to use.
    * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
    *   The module handler to invoke the alter hook with.
-   * @param \Drupal\Core\File\FileSystemInterface $file_system
+   * @param \Drupal\Core\File\FileSystemInterface $fileSystem
    *   The file handler.
    */
-  public function __construct(\Traversable $namespaces, CacheBackendInterface $cache_backend, ModuleHandlerInterface $module_handler, FileSystemInterface $file_system) {
+  public function __construct(\Traversable $namespaces, CacheBackendInterface $cache_backend, ModuleHandlerInterface $module_handler, protected FileSystemInterface $fileSystem) {
     parent::__construct('Plugin/Archiver', $namespaces, $module_handler, ArchiverInterface::class, Archiver::class, 'Drupal\Core\Archiver\Annotation\Archiver');
     $this->alterInfo('archiver_info');
     $this->setCacheBackend($cache_backend, 'archiver_info_plugins');
-    $this->fileSystem = $file_system;
   }
 
   /**

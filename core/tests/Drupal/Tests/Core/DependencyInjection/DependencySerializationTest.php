@@ -50,13 +50,6 @@ class DependencySerializationTestDummy {
   use DependencySerializationTrait;
 
   /**
-   * A test service.
-   *
-   * @var object
-   */
-  public $service;
-
-  /**
    * The container.
    *
    * @var \Symfony\Component\DependencyInjection\ContainerInterface
@@ -69,8 +62,7 @@ class DependencySerializationTestDummy {
    * @param object $service
    *   A test service.
    */
-  public function __construct(\stdClass $service) {
-    $this->service = $service;
+  public function __construct(public \stdClass $service) {
   }
 
   /**

@@ -33,28 +33,6 @@ abstract class EntityDisplayFormBase extends EntityForm {
   protected $displayContext;
 
   /**
-   * The widget or formatter plugin manager.
-   *
-   * @var \Drupal\Component\Plugin\PluginManagerBase
-   */
-  protected $pluginManager;
-
-  /**
-   * The entity display repository.
-   *
-   * @var \Drupal\Core\Entity\EntityDisplayRepositoryInterface
-   */
-  protected $entityDisplayRepository;
-
-
-  /**
-   * The entity field manager.
-   *
-   * @var \Drupal\Core\Entity\EntityFieldManagerInterface
-   */
-  protected $entityFieldManager;
-
-  /**
    * A list of field types.
    *
    * @var array
@@ -73,18 +51,15 @@ abstract class EntityDisplayFormBase extends EntityForm {
    *
    * @param \Drupal\Core\Field\FieldTypePluginManagerInterface $field_type_manager
    *   The field type manager.
-   * @param \Drupal\Component\Plugin\PluginManagerBase $plugin_manager
+   * @param \Drupal\Component\Plugin\PluginManagerBase $pluginManager
    *   The widget or formatter plugin manager.
-   * @param \Drupal\Core\Entity\EntityDisplayRepositoryInterface|null $entity_display_repository
+   * @param \Drupal\Core\Entity\EntityDisplayRepositoryInterface|null $entityDisplayRepository
    *   (optional) The entity display_repository.
-   * @param \Drupal\Core\Entity\EntityFieldManagerInterface|null $entity_field_manager
+   * @param \Drupal\Core\Entity\EntityFieldManagerInterface|null $entityFieldManager
    *   (optional) The entity field manager.
    */
-  public function __construct(FieldTypePluginManagerInterface $field_type_manager, PluginManagerBase $plugin_manager, EntityDisplayRepositoryInterface $entity_display_repository, EntityFieldManagerInterface $entity_field_manager) {
+  public function __construct(FieldTypePluginManagerInterface $field_type_manager, protected PluginManagerBase $pluginManager, protected EntityDisplayRepositoryInterface $entityDisplayRepository, protected EntityFieldManagerInterface $entityFieldManager) {
     $this->fieldTypes = $field_type_manager->getDefinitions();
-    $this->pluginManager = $plugin_manager;
-    $this->entityDisplayRepository = $entity_display_repository;
-    $this->entityFieldManager = $entity_field_manager;
   }
 
   /**

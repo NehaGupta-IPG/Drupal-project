@@ -18,40 +18,16 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 class ConfigImportForm extends FormBase {
 
   /**
-   * The configuration storage.
-   *
-   * @var \Drupal\Core\Config\StorageInterface
-   */
-  protected $configStorage;
-
-  /**
-   * The file system service.
-   *
-   * @var \Drupal\Core\File\FileSystemInterface
-   */
-  protected $fileSystem;
-
-  /**
-   * The settings object.
-   *
-   * @var \Drupal\Core\Site\Settings
-   */
-  protected $settings;
-
-  /**
    * Constructs a new ConfigImportForm.
    *
-   * @param \Drupal\Core\Config\StorageInterface $config_storage
+   * @param \Drupal\Core\Config\StorageInterface $configStorage
    *   The configuration storage.
-   * @param \Drupal\Core\File\FileSystemInterface $file_system
+   * @param \Drupal\Core\File\FileSystemInterface $fileSystem
    *   The file system service.
    * @param \Drupal\Core\Site\Settings $settings
    *   The settings object.
    */
-  public function __construct(StorageInterface $config_storage, FileSystemInterface $file_system, Settings $settings) {
-    $this->configStorage = $config_storage;
-    $this->fileSystem = $file_system;
-    $this->settings = $settings;
+  public function __construct(protected StorageInterface $configStorage, protected FileSystemInterface $fileSystem, protected Settings $settings) {
   }
 
   /**

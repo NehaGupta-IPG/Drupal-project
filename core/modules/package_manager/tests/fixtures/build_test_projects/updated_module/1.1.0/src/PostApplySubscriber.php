@@ -18,20 +18,12 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 class PostApplySubscriber implements EventSubscriberInterface {
 
   /**
-   * The path locator service.
-   *
-   * @var \Drupal\package_manager\PathLocator
-   */
-  private $pathLocator;
-
-  /**
    * Constructs a PostApplySubscriber.
    *
-   * @param \Drupal\package_manager\PathLocator $path_locator
+   * @param \Drupal\package_manager\PathLocator $pathLocator
    *   The path locator service.
    */
-  public function __construct(PathLocator $path_locator) {
-    $this->pathLocator = $path_locator;
+  public function __construct(private PathLocator $pathLocator) {
   }
 
   /**

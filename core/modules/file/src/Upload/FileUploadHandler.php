@@ -32,91 +32,46 @@ class FileUploadHandler implements FileUploadHandlerInterface {
    */
   const DEFAULT_EXTENSIONS = 'jpg jpeg gif png txt doc xls pdf ppt pps odt ods odp';
 
-  /**
-   * The file system service.
-   *
-   * @var \Drupal\Core\File\FileSystemInterface
-   */
-  protected $fileSystem;
-
-  /**
-   * The entity type manager.
-   *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
-   */
-  protected $entityTypeManager;
-
-  /**
-   * The stream wrapper manager.
-   *
-   * @var \Drupal\Core\StreamWrapper\StreamWrapperManagerInterface
-   */
-  protected $streamWrapperManager;
-
-  /**
-   * The event dispatcher.
-   *
-   * @var \Symfony\Component\EventDispatcher\EventDispatcherInterface
-   */
-  protected $eventDispatcher;
-
-  /**
-   * The current user.
-   *
-   * @var \Drupal\Core\Session\AccountInterface
-   */
-  protected $currentUser;
-
-  /**
-   * The MIME type guesser.
-   *
-   * @var \Symfony\Component\Mime\MimeTypeGuesserInterface
-   */
-  protected $mimeTypeGuesser;
-
-  /**
-   * The request stack.
-   *
-   * @var \Symfony\Component\HttpFoundation\RequestStack
-   */
-  protected $requestStack;
-
-  /**
-   * The file Repository.
-   *
-   * @var \Drupal\file\FileRepositoryInterface
-   */
-  protected $fileRepository;
-
-  /**
-   * The file validator.
-   *
-   * @var \Drupal\file\Validation\FileValidatorInterface
-   */
-  protected FileValidatorInterface $fileValidator;
-
   public function __construct(
-    FileSystemInterface $fileSystem,
-    EntityTypeManagerInterface $entityTypeManager,
-    StreamWrapperManagerInterface $streamWrapperManager,
-    EventDispatcherInterface $eventDispatcher,
-    MimeTypeGuesserInterface $mimeTypeGuesser,
-    AccountInterface $currentUser,
-    RequestStack $requestStack,
-    FileRepositoryInterface $fileRepository,
-    FileValidatorInterface $file_validator,
+    /**
+     * The file system service.
+     */
+    protected FileSystemInterface $fileSystem,
+    /**
+     * The entity type manager.
+     */
+    protected EntityTypeManagerInterface $entityTypeManager,
+    /**
+     * The stream wrapper manager.
+     */
+    protected StreamWrapperManagerInterface $streamWrapperManager,
+    /**
+     * The event dispatcher.
+     */
+    protected EventDispatcherInterface $eventDispatcher,
+    /**
+     * The MIME type guesser.
+     */
+    protected MimeTypeGuesserInterface $mimeTypeGuesser,
+    /**
+     * The current user.
+     */
+    protected AccountInterface $currentUser,
+    /**
+     * The request stack.
+     */
+    protected RequestStack $requestStack,
+    /**
+     * The file Repository.
+     */
+    protected FileRepositoryInterface $fileRepository,
+    /**
+     * The file validator.
+     */
+    protected FileValidatorInterface $fileValidator,
     protected LockBackendInterface $lock,
     protected BasicRecursiveValidatorFactory $validatorFactory,
   ) {
-    $this->fileSystem = $fileSystem;
-    $this->entityTypeManager = $entityTypeManager;
-    $this->streamWrapperManager = $streamWrapperManager;
-    $this->eventDispatcher = $eventDispatcher;
-    $this->mimeTypeGuesser = $mimeTypeGuesser;
-    $this->currentUser = $currentUser;
-    $this->requestStack = $requestStack;
-    $this->fileRepository = $fileRepository;
-    $this->fileValidator = $file_validator;
   }
 
   /**

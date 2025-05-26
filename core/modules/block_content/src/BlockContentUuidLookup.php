@@ -21,25 +21,17 @@ use Drupal\Core\Lock\LockBackendInterface;
 class BlockContentUuidLookup extends CacheCollector {
 
   /**
-   * The entity type manager.
-   *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
-   */
-  protected $entityTypeManager;
-
-  /**
    * Constructs a BlockContentUuidLookup instance.
    *
    * @param \Drupal\Core\Cache\CacheBackendInterface $cache
    *   The cache backend.
    * @param \Drupal\Core\Lock\LockBackendInterface $lock
    *   The lock backend.
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
    *   The entity type manager.
    */
-  public function __construct(CacheBackendInterface $cache, LockBackendInterface $lock, EntityTypeManagerInterface $entity_type_manager) {
+  public function __construct(CacheBackendInterface $cache, LockBackendInterface $lock, protected EntityTypeManagerInterface $entityTypeManager) {
     parent::__construct('block_content_uuid', $cache, $lock);
-    $this->entityTypeManager = $entity_type_manager;
   }
 
   /**

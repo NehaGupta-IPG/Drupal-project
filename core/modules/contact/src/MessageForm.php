@@ -27,57 +27,25 @@ class MessageForm extends ContentEntityForm {
   protected $entity;
 
   /**
-   * The flood control mechanism.
-   *
-   * @var \Drupal\Core\Flood\FloodInterface
-   */
-  protected $flood;
-
-  /**
-   * The language manager service.
-   *
-   * @var \Drupal\Core\Language\LanguageManagerInterface
-   */
-  protected $languageManager;
-
-  /**
-   * The contact mail handler service.
-   *
-   * @var \Drupal\contact\MailHandlerInterface
-   */
-  protected $mailHandler;
-
-  /**
-   * The date formatter service.
-   *
-   * @var \Drupal\Core\Datetime\DateFormatterInterface
-   */
-  protected $dateFormatter;
-
-  /**
    * Constructs a MessageForm object.
    *
    * @param \Drupal\Core\Entity\EntityRepositoryInterface $entity_repository
    *   The entity repository.
    * @param \Drupal\Core\Flood\FloodInterface $flood
    *   The flood control mechanism.
-   * @param \Drupal\Core\Language\LanguageManagerInterface $language_manager
+   * @param \Drupal\Core\Language\LanguageManagerInterface $languageManager
    *   The language manager service.
-   * @param \Drupal\contact\MailHandlerInterface $mail_handler
+   * @param \Drupal\contact\MailHandlerInterface $mailHandler
    *   The contact mail handler service.
-   * @param \Drupal\Core\Datetime\DateFormatterInterface $date_formatter
+   * @param \Drupal\Core\Datetime\DateFormatterInterface $dateFormatter
    *   The date service.
    * @param \Drupal\Core\Entity\EntityTypeBundleInfoInterface $entity_type_bundle_info
    *   The entity type bundle service.
    * @param \Drupal\Component\Datetime\TimeInterface $time
    *   The time service.
    */
-  public function __construct(EntityRepositoryInterface $entity_repository, FloodInterface $flood, LanguageManagerInterface $language_manager, MailHandlerInterface $mail_handler, DateFormatterInterface $date_formatter, ?EntityTypeBundleInfoInterface $entity_type_bundle_info = NULL, ?TimeInterface $time = NULL) {
+  public function __construct(EntityRepositoryInterface $entity_repository, protected FloodInterface $flood, protected LanguageManagerInterface $languageManager, protected MailHandlerInterface $mailHandler, protected DateFormatterInterface $dateFormatter, ?EntityTypeBundleInfoInterface $entity_type_bundle_info = NULL, ?TimeInterface $time = NULL) {
     parent::__construct($entity_repository, $entity_type_bundle_info, $time);
-    $this->flood = $flood;
-    $this->languageManager = $language_manager;
-    $this->mailHandler = $mail_handler;
-    $this->dateFormatter = $date_formatter;
   }
 
   /**

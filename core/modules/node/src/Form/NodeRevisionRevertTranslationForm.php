@@ -25,27 +25,19 @@ class NodeRevisionRevertTranslationForm extends NodeRevisionRevertForm {
   protected $langcode;
 
   /**
-   * The language manager.
-   *
-   * @var \Drupal\Core\Language\LanguageManagerInterface
-   */
-  protected $languageManager;
-
-  /**
    * Constructs a new NodeRevisionRevertTranslationForm.
    *
    * @param \Drupal\Core\Entity\EntityStorageInterface $node_storage
    *   The node storage.
    * @param \Drupal\Core\Datetime\DateFormatterInterface $date_formatter
    *   The date formatter service.
-   * @param \Drupal\Core\Language\LanguageManagerInterface $language_manager
+   * @param \Drupal\Core\Language\LanguageManagerInterface $languageManager
    *   The language manager.
    * @param \Drupal\Component\Datetime\TimeInterface $time
    *   The time service.
    */
-  public function __construct(EntityStorageInterface $node_storage, DateFormatterInterface $date_formatter, LanguageManagerInterface $language_manager, TimeInterface $time) {
+  public function __construct(EntityStorageInterface $node_storage, DateFormatterInterface $date_formatter, protected LanguageManagerInterface $languageManager, TimeInterface $time) {
     parent::__construct($node_storage, $date_formatter, $time);
-    $this->languageManager = $language_manager;
   }
 
   /**

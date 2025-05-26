@@ -30,20 +30,6 @@ class TranslatableMarkup extends FormattableMarkup {
   protected $translatedMarkup;
 
   /**
-   * The translation options.
-   *
-   * @var array
-   */
-  protected $options;
-
-  /**
-   * The string translation service.
-   *
-   * @var \Drupal\Core\StringTranslation\TranslationInterface
-   */
-  protected $stringTranslation;
-
-  /**
    * Constructs a new class instance.
    *
    * When possible, use the
@@ -115,7 +101,7 @@ class TranslatableMarkup extends FormattableMarkup {
    *     translate to a language other than what is used to display the page.
    *   - 'context' (defaults to the empty context): The context the source
    *     string belongs to.
-   * @param \Drupal\Core\StringTranslation\TranslationInterface $string_translation
+   * @param \Drupal\Core\StringTranslation\TranslationInterface $stringTranslation
    *   (optional) The string translation service.
    *
    * @throws \InvalidArgumentException
@@ -126,14 +112,12 @@ class TranslatableMarkup extends FormattableMarkup {
    *
    * @ingroup sanitization
    */
-  public function __construct($string, array $arguments = [], array $options = [], ?TranslationInterface $string_translation = NULL) {
+  public function __construct($string, array $arguments = [], protected array $options = [], protected ?TranslationInterface $stringTranslation = NULL) {
     if (!is_string($string)) {
       $message = $string instanceof TranslatableMarkup ? '$string ("' . $string->getUntranslatedString() . '") must be a string.' : '$string ("' . (string) $string . '") must be a string.';
       throw new \InvalidArgumentException($message);
     }
     parent::__construct($string, $arguments);
-    $this->options = $options;
-    $this->stringTranslation = $string_translation;
   }
 
   /**

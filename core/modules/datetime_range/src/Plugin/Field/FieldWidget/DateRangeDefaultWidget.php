@@ -22,19 +22,19 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 class DateRangeDefaultWidget extends DateRangeWidgetBase {
 
   /**
-   * The date format storage.
-   *
-   * @var \Drupal\Core\Entity\EntityStorageInterface
-   */
-  protected $dateStorage;
-
-  /**
    * {@inheritdoc}
    */
-  public function __construct($plugin_id, $plugin_definition, FieldDefinitionInterface $field_definition, array $settings, array $third_party_settings, EntityStorageInterface $date_storage) {
+  public function __construct(
+    $plugin_id,
+    $plugin_definition,
+    FieldDefinitionInterface $field_definition,
+    array $settings,
+    array $third_party_settings, /**
+     * The date format storage.
+     */
+    protected EntityStorageInterface $dateStorage,
+) {
     parent::__construct($plugin_id, $plugin_definition, $field_definition, $settings, $third_party_settings);
-
-    $this->dateStorage = $date_storage;
   }
 
   /**

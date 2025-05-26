@@ -12,24 +12,15 @@ namespace Drupal\migrate;
 class MigrateSkipRowException extends \Exception {
 
   /**
-   * Whether to record the skip in the map table, or skip silently.
-   *
-   * @var bool
-   *   TRUE to record as STATUS_IGNORED in the map, FALSE to skip silently.
-   */
-  protected $saveToMap;
-
-  /**
    * Constructs a MigrateSkipRowException object.
    *
    * @param string $message
    *   The message for the exception.
-   * @param bool $save_to_map
+   * @param bool $saveToMap
    *   TRUE to record as STATUS_IGNORED in the map, FALSE to skip silently.
    */
-  public function __construct($message = '', $save_to_map = TRUE) {
+  public function __construct($message = '', protected $saveToMap = TRUE) {
     parent::__construct($message);
-    $this->saveToMap = $save_to_map;
   }
 
   /**

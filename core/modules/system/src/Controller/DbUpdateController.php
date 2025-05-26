@@ -25,102 +25,28 @@ use Symfony\Component\HttpFoundation\Response;
 class DbUpdateController extends ControllerBase {
 
   /**
-   * The keyvalue expirable factory.
-   *
-   * @var \Drupal\Core\KeyValueStore\KeyValueExpirableFactoryInterface
-   */
-  protected $keyValueExpirableFactory;
-
-  /**
-   * A cache backend interface.
-   *
-   * @var \Drupal\Core\Cache\CacheBackendInterface
-   */
-  protected $cache;
-
-  /**
-   * The state service.
-   *
-   * @var \Drupal\Core\State\StateInterface
-   */
-  protected $state;
-
-  /**
-   * The module handler.
-   *
-   * @var \Drupal\Core\Extension\ModuleHandlerInterface
-   */
-  protected $moduleHandler;
-
-  /**
-   * The current user.
-   *
-   * @var \Drupal\Core\Session\AccountInterface
-   */
-  protected $account;
-
-  /**
-   * The bare HTML page renderer.
-   *
-   * @var \Drupal\Core\Render\BareHtmlPageRendererInterface
-   */
-  protected $bareHtmlPageRenderer;
-
-  /**
-   * The app root.
-   *
-   * @var string
-   */
-  protected $root;
-
-  /**
-   * The post update registry.
-   *
-   * @var \Drupal\Core\Update\UpdateRegistry
-   */
-  protected $postUpdateRegistry;
-
-  /**
    * Constructs a new UpdateController.
    *
    * @param string $root
    *   The app root.
-   * @param \Drupal\Core\KeyValueStore\KeyValueExpirableFactoryInterface $key_value_expirable_factory
+   * @param \Drupal\Core\KeyValueStore\KeyValueExpirableFactoryInterface $keyValueExpirableFactory
    *   The keyvalue expirable factory.
    * @param \Drupal\Core\Cache\CacheBackendInterface $cache
    *   A cache backend interface.
    * @param \Drupal\Core\State\StateInterface $state
    *   The state service.
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
+   * @param \Drupal\Core\Extension\ModuleHandlerInterface $moduleHandler
    *   The module handler.
    * @param \Drupal\Core\Session\AccountInterface $account
    *   The current user.
-   * @param \Drupal\Core\Render\BareHtmlPageRendererInterface $bare_html_page_renderer
+   * @param \Drupal\Core\Render\BareHtmlPageRendererInterface $bareHtmlPageRenderer
    *   The bare HTML page renderer.
-   * @param \Drupal\Core\Update\UpdateRegistry $post_update_registry
+   * @param \Drupal\Core\Update\UpdateRegistry $postUpdateRegistry
    *   The post update registry.
    * @param \Drupal\Core\Asset\AssetQueryStringInterface $assetQueryString
    *   The asset query string.
    */
-  public function __construct(
-    $root,
-    KeyValueExpirableFactoryInterface $key_value_expirable_factory,
-    CacheBackendInterface $cache,
-    StateInterface $state,
-    ModuleHandlerInterface $module_handler,
-    AccountInterface $account,
-    BareHtmlPageRendererInterface $bare_html_page_renderer,
-    UpdateRegistry $post_update_registry,
-    protected AssetQueryStringInterface $assetQueryString,
-  ) {
-    $this->root = $root;
-    $this->keyValueExpirableFactory = $key_value_expirable_factory;
-    $this->cache = $cache;
-    $this->state = $state;
-    $this->moduleHandler = $module_handler;
-    $this->account = $account;
-    $this->bareHtmlPageRenderer = $bare_html_page_renderer;
-    $this->postUpdateRegistry = $post_update_registry;
+  public function __construct(protected $root, protected KeyValueExpirableFactoryInterface $keyValueExpirableFactory, protected CacheBackendInterface $cache, protected StateInterface $state, protected ModuleHandlerInterface $moduleHandler, protected AccountInterface $account, protected BareHtmlPageRendererInterface $bareHtmlPageRenderer, protected UpdateRegistry $postUpdateRegistry, protected AssetQueryStringInterface $assetQueryString) {
   }
 
   /**

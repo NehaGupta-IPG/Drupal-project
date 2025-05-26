@@ -22,20 +22,6 @@ use Psr\Log\LoggerInterface;
 class ImageToolkitOperationManager extends DefaultPluginManager implements ImageToolkitOperationManagerInterface {
 
   /**
-   * A logger instance.
-   *
-   * @var \Psr\Log\LoggerInterface
-   */
-  protected $logger;
-
-  /**
-   * The image toolkit manager.
-   *
-   * @var \Drupal\Core\ImageToolkit\ImageToolkitManager
-   */
-  protected $toolkitManager;
-
-  /**
    * Constructs the ImageToolkitOperationManager object.
    *
    * @param \Traversable $namespaces
@@ -47,10 +33,10 @@ class ImageToolkitOperationManager extends DefaultPluginManager implements Image
    *   The module handler to invoke the alter hook with.
    * @param \Psr\Log\LoggerInterface $logger
    *   A logger instance.
-   * @param \Drupal\Core\ImageToolkit\ImageToolkitManager $toolkit_manager
+   * @param \Drupal\Core\ImageToolkit\ImageToolkitManager $toolkitManager
    *   The image toolkit manager.
    */
-  public function __construct(\Traversable $namespaces, CacheBackendInterface $cache_backend, ModuleHandlerInterface $module_handler, LoggerInterface $logger, ImageToolkitManager $toolkit_manager) {
+  public function __construct(\Traversable $namespaces, CacheBackendInterface $cache_backend, ModuleHandlerInterface $module_handler, protected LoggerInterface $logger, protected ImageToolkitManager $toolkitManager) {
     parent::__construct(
       'Plugin/ImageToolkit/Operation',
       $namespaces,
@@ -62,8 +48,6 @@ class ImageToolkitOperationManager extends DefaultPluginManager implements Image
 
     $this->alterInfo('image_toolkit_operation');
     $this->setCacheBackend($cache_backend, 'image_toolkit_operation_plugins');
-    $this->logger = $logger;
-    $this->toolkitManager = $toolkit_manager;
   }
 
   /**

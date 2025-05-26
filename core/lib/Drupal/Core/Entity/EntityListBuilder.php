@@ -20,13 +20,6 @@ class EntityListBuilder extends EntityHandlerBase implements EntityListBuilderIn
   use RedirectDestinationTrait;
 
   /**
-   * The entity storage class.
-   *
-   * @var \Drupal\Core\Entity\EntityStorageInterface
-   */
-  protected $storage;
-
-  /**
    * The entity type ID.
    *
    * @var string
@@ -76,9 +69,8 @@ class EntityListBuilder extends EntityHandlerBase implements EntityListBuilderIn
    * @param \Drupal\Core\Entity\EntityStorageInterface $storage
    *   The entity storage class.
    */
-  public function __construct(EntityTypeInterface $entity_type, EntityStorageInterface $storage) {
+  public function __construct(EntityTypeInterface $entity_type, protected EntityStorageInterface $storage) {
     $this->entityTypeId = $entity_type->id();
-    $this->storage = $storage;
     $this->entityType = $entity_type;
   }
 

@@ -17,30 +17,14 @@ use Drupal\Core\Extension\ModuleHandlerInterface;
 class ViewAddForm extends ViewFormBase {
 
   /**
-   * The wizard plugin manager.
-   *
-   * @var \Drupal\views\Plugin\ViewsPluginManager
-   */
-  protected $wizardManager;
-
-  /**
-   * The module handler service.
-   *
-   * @var \Drupal\Core\Extension\ModuleHandlerInterface
-   */
-  protected $moduleHandler;
-
-  /**
    * Constructs a new ViewAddForm object.
    *
-   * @param \Drupal\views\Plugin\ViewsPluginManager $wizard_manager
+   * @param \Drupal\views\Plugin\ViewsPluginManager $wizardManager
    *   The wizard plugin manager.
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
+   * @param \Drupal\Core\Extension\ModuleHandlerInterface $moduleHandler
    *   The module handler service.
    */
-  public function __construct(ViewsPluginManager $wizard_manager, ModuleHandlerInterface $module_handler) {
-    $this->wizardManager = $wizard_manager;
-    $this->moduleHandler = $module_handler;
+  public function __construct(protected ViewsPluginManager $wizardManager, protected ModuleHandlerInterface $moduleHandler) {
   }
 
   /**

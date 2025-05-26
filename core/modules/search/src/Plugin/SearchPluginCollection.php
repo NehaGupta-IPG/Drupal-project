@@ -11,13 +11,6 @@ use Drupal\Component\Plugin\PluginManagerInterface;
 class SearchPluginCollection extends DefaultSingleLazyPluginCollection {
 
   /**
-   * The unique ID for the search page using this plugin collection.
-   *
-   * @var string
-   */
-  protected $searchPageId;
-
-  /**
    * Constructs a new SearchPluginCollection.
    *
    * @param \Drupal\Component\Plugin\PluginManagerInterface $manager
@@ -26,13 +19,11 @@ class SearchPluginCollection extends DefaultSingleLazyPluginCollection {
    *   The ID of the plugin instance.
    * @param array $configuration
    *   An array of configuration.
-   * @param string $search_page_id
+   * @param string $searchPageId
    *   The unique ID of the search page using this plugin.
    */
-  public function __construct(PluginManagerInterface $manager, $instance_id, array $configuration, $search_page_id) {
+  public function __construct(PluginManagerInterface $manager, $instance_id, array $configuration, protected $searchPageId) {
     parent::__construct($manager, $instance_id, $configuration);
-
-    $this->searchPageId = $search_page_id;
   }
 
   /**

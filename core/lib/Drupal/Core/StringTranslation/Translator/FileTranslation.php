@@ -18,31 +18,15 @@ use Drupal\Core\Language\LanguageInterface;
 class FileTranslation extends StaticTranslation {
 
   /**
-   * Directory to find translation files in the file system.
-   *
-   * @var string
-   */
-  protected $directory;
-
-  /**
-   * The file system.
-   *
-   * @var \Drupal\Core\File\FileSystemInterface
-   */
-  protected $fileSystem;
-
-  /**
    * Constructs a StaticTranslation object.
    *
    * @param string $directory
    *   The directory to retrieve file translations from.
-   * @param \Drupal\Core\File\FileSystemInterface $file_system
+   * @param \Drupal\Core\File\FileSystemInterface $fileSystem
    *   The file system service.
    */
-  public function __construct($directory, FileSystemInterface $file_system) {
+  public function __construct(protected $directory, protected FileSystemInterface $fileSystem) {
     parent::__construct();
-    $this->directory = $directory;
-    $this->fileSystem = $file_system;
   }
 
   /**

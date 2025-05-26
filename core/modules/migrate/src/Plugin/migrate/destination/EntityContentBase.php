@@ -101,20 +101,6 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 class EntityContentBase extends Entity implements HighestIdInterface, MigrateValidatableEntityInterface {
 
   /**
-   * Field type plugin manager.
-   *
-   * @var \Drupal\Core\Field\FieldTypePluginManagerInterface
-   */
-  protected $fieldTypeManager;
-
-  /**
-   * The account switcher service.
-   *
-   * @var \Drupal\Core\Session\AccountSwitcherInterface
-   */
-  protected $accountSwitcher;
-
-  /**
    * Entity type bundle info.
    *
    * @var \Drupal\Core\Entity\EntityTypeBundleInfoInterface
@@ -138,18 +124,16 @@ class EntityContentBase extends Entity implements HighestIdInterface, MigrateVal
    *   The list of bundles this entity type has.
    * @param \Drupal\Core\Entity\EntityFieldManagerInterface $entity_field_manager
    *   The entity field manager.
-   * @param \Drupal\Core\Field\FieldTypePluginManagerInterface $field_type_manager
+   * @param \Drupal\Core\Field\FieldTypePluginManagerInterface $fieldTypeManager
    *   The field type plugin manager service.
-   * @param \Drupal\Core\Session\AccountSwitcherInterface $account_switcher
+   * @param \Drupal\Core\Session\AccountSwitcherInterface $accountSwitcher
    *   The account switcher service.
    * @param \Drupal\Core\Entity\EntityTypeBundleInfoInterface|null $entity_type_bundle_info
    *   The entity type bundle info service.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, MigrationInterface $migration, EntityStorageInterface $storage, array $bundles, EntityFieldManagerInterface $entity_field_manager, FieldTypePluginManagerInterface $field_type_manager, ?AccountSwitcherInterface $account_switcher = NULL, ?EntityTypeBundleInfoInterface $entity_type_bundle_info = NULL) {
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, MigrationInterface $migration, EntityStorageInterface $storage, array $bundles, EntityFieldManagerInterface $entity_field_manager, protected FieldTypePluginManagerInterface $fieldTypeManager, protected ?AccountSwitcherInterface $accountSwitcher = NULL, ?EntityTypeBundleInfoInterface $entity_type_bundle_info = NULL) {
     parent::__construct($configuration, $plugin_id, $plugin_definition, $migration, $storage, $bundles);
     $this->entityFieldManager = $entity_field_manager;
-    $this->fieldTypeManager = $field_type_manager;
-    $this->accountSwitcher = $account_switcher;
     if ($entity_type_bundle_info === NULL) {
       @trigger_error('Calling ' . __NAMESPACE__ . '\EntityContentBase::__construct() without the $entity_type_bundle_info argument is deprecated in drupal:11.2.0 and will be required in drupal:12.0.0. See https://www.drupal.org/node/3476634', E_USER_DEPRECATED);
       $entity_type_bundle_info = \Drupal::service('entity_type.bundle.info');

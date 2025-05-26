@@ -39,20 +39,12 @@ use Symfony\Component\Serializer\SerializerInterface;
 class ResourceResponseSubscriber implements EventSubscriberInterface {
 
   /**
-   * The serializer.
-   *
-   * @var \Symfony\Component\Serializer\SerializerInterface
-   */
-  protected $serializer;
-
-  /**
    * Constructs a ResourceResponseSubscriber object.
    *
    * @param \Symfony\Component\Serializer\SerializerInterface $serializer
    *   The serializer.
    */
-  public function __construct(SerializerInterface $serializer) {
-    $this->serializer = $serializer;
+  public function __construct(protected SerializerInterface $serializer) {
   }
 
   /**

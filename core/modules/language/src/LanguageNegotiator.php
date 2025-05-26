@@ -18,41 +18,6 @@ class LanguageNegotiator implements LanguageNegotiatorInterface {
   use LoggerChannelTrait;
 
   /**
-   * The language negotiation method plugin manager.
-   *
-   * @var \Drupal\Component\Plugin\PluginManagerInterface
-   */
-  protected $negotiatorManager;
-
-  /**
-   * The language manager.
-   *
-   * @var \Drupal\language\ConfigurableLanguageManagerInterface
-   */
-  protected $languageManager;
-
-  /**
-   * The configuration factory.
-   *
-   * @var \Drupal\Core\Config\ConfigFactoryInterface
-   */
-  protected $configFactory;
-
-  /**
-   * The settings instance.
-   *
-   * @var \Drupal\Core\Site\Settings
-   */
-  protected $settings;
-
-  /**
-   * The request stack object.
-   *
-   * @var \Symfony\Component\HttpFoundation\RequestStack
-   */
-  protected $requestStack;
-
-  /**
    * The current active user.
    *
    * @var \Drupal\Core\Session\AccountInterface
@@ -76,23 +41,18 @@ class LanguageNegotiator implements LanguageNegotiatorInterface {
   /**
    * Constructs a new LanguageNegotiator object.
    *
-   * @param \Drupal\language\ConfigurableLanguageManagerInterface $language_manager
+   * @param \Drupal\language\ConfigurableLanguageManagerInterface $languageManager
    *   The language manager.
-   * @param \Drupal\Component\Plugin\PluginManagerInterface $negotiator_manager
+   * @param \Drupal\Component\Plugin\PluginManagerInterface $negotiatorManager
    *   The language negotiation methods plugin manager.
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
+   * @param \Drupal\Core\Config\ConfigFactoryInterface $configFactory
    *   The configuration factory.
    * @param \Drupal\Core\Site\Settings $settings
    *   The settings instance.
    * @param \Symfony\Component\HttpFoundation\RequestStack $requestStack
    *   The request stack service.
    */
-  public function __construct(ConfigurableLanguageManagerInterface $language_manager, PluginManagerInterface $negotiator_manager, ConfigFactoryInterface $config_factory, Settings $settings, RequestStack $requestStack) {
-    $this->languageManager = $language_manager;
-    $this->negotiatorManager = $negotiator_manager;
-    $this->configFactory = $config_factory;
-    $this->settings = $settings;
-    $this->requestStack = $requestStack;
+  public function __construct(protected ConfigurableLanguageManagerInterface $languageManager, protected PluginManagerInterface $negotiatorManager, protected ConfigFactoryInterface $configFactory, protected Settings $settings, protected RequestStack $requestStack) {
   }
 
   /**

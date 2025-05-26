@@ -17,13 +17,6 @@ class ShortcutLazyBuilders implements TrustedCallbackInterface {
   use StringTranslationTrait;
 
   /**
-   * The renderer service.
-   *
-   * @var \Drupal\Core\Render\RendererInterface
-   */
-  protected $renderer;
-
-  /**
    * Constructs a new ShortcutLazyBuilders object.
    *
    * @param \Drupal\Core\Render\RendererInterface $renderer
@@ -33,8 +26,7 @@ class ShortcutLazyBuilders implements TrustedCallbackInterface {
    * @param \Drupal\Core\Session\AccountInterface $currentUser
    *   The current user.
    */
-  public function __construct(RendererInterface $renderer, protected EntityTypeManagerInterface $entityTypeManager, protected AccountInterface $currentUser) {
-    $this->renderer = $renderer;
+  public function __construct(protected RendererInterface $renderer, protected EntityTypeManagerInterface $entityTypeManager, protected AccountInterface $currentUser) {
   }
 
   /**

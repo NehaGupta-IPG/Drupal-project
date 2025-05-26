@@ -17,20 +17,12 @@ use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 class ContextualController implements ContainerInjectionInterface {
 
   /**
-   * The renderer.
-   *
-   * @var \Drupal\Core\Render\RendererInterface
-   */
-  protected $renderer;
-
-  /**
    * Constructors a new ContextualController.
    *
    * @param \Drupal\Core\Render\RendererInterface $renderer
    *   The renderer.
    */
-  public function __construct(RendererInterface $renderer) {
-    $this->renderer = $renderer;
+  public function __construct(protected RendererInterface $renderer) {
   }
 
   /**

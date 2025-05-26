@@ -20,20 +20,6 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 class BlockVisibility extends ProcessPluginBase implements ContainerFactoryPluginInterface {
 
   /**
-   * The module handler.
-   *
-   * @var \Drupal\Core\Extension\ModuleHandlerInterface
-   */
-  protected $moduleHandler;
-
-  /**
-   * The migrate lookup service.
-   *
-   * @var \Drupal\migrate\MigrateLookupInterface
-   */
-  protected $migrateLookup;
-
-  /**
    * Whether or not to skip blocks that use PHP for visibility.
    *
    * Only applies if the PHP module is not enabled.
@@ -51,15 +37,13 @@ class BlockVisibility extends ProcessPluginBase implements ContainerFactoryPlugi
    *   The plugin ID.
    * @param mixed $plugin_definition
    *   The plugin definition.
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
+   * @param \Drupal\Core\Extension\ModuleHandlerInterface $moduleHandler
    *   The module handler service.
-   * @param \Drupal\migrate\MigrateLookupInterface $migrate_lookup
+   * @param \Drupal\migrate\MigrateLookupInterface $migrateLookup
    *   The migrate lookup service.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, ModuleHandlerInterface $module_handler, MigrateLookupInterface $migrate_lookup) {
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, protected ModuleHandlerInterface $moduleHandler, protected MigrateLookupInterface $migrateLookup) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
-    $this->moduleHandler = $module_handler;
-    $this->migrateLookup = $migrate_lookup;
 
     if (isset($configuration['skip_php'])) {
       $this->skipPHP = $configuration['skip_php'];

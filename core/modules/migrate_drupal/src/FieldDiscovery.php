@@ -23,27 +23,6 @@ class FieldDiscovery implements FieldDiscoveryInterface {
   protected $fieldPluginCache;
 
   /**
-   * The field plugin manager.
-   *
-   * @var \Drupal\migrate_drupal\Plugin\MigrateFieldPluginManagerInterface
-   */
-  protected $fieldPluginManager;
-
-  /**
-   * The migration plugin manager.
-   *
-   * @var \Drupal\migrate\Plugin\MigrationPluginManagerInterface
-   */
-  protected $migrationPluginManager;
-
-  /**
-   * The logger channel service.
-   *
-   * @var \Psr\Log\LoggerInterface
-   */
-  protected $logger;
-
-  /**
    * A cache of discovered fields.
    *
    * It is an array of arrays. If the entity type is bundleable, a third level
@@ -92,17 +71,14 @@ class FieldDiscovery implements FieldDiscoveryInterface {
   /**
    * Constructs a FieldDiscovery object.
    *
-   * @param \Drupal\migrate_drupal\Plugin\MigrateFieldPluginManagerInterface $field_plugin_manager
+   * @param \Drupal\migrate_drupal\Plugin\MigrateFieldPluginManagerInterface $fieldPluginManager
    *   The field plugin manager.
-   * @param \Drupal\migrate\Plugin\MigrationPluginManagerInterface $migration_plugin_manager
+   * @param \Drupal\migrate\Plugin\MigrationPluginManagerInterface $migrationPluginManager
    *   The migration plugin manager.
    * @param \Psr\Log\LoggerInterface $logger
    *   The logger channel service.
    */
-  public function __construct(MigrateFieldPluginManagerInterface $field_plugin_manager, MigrationPluginManagerInterface $migration_plugin_manager, LoggerInterface $logger) {
-    $this->fieldPluginManager = $field_plugin_manager;
-    $this->migrationPluginManager = $migration_plugin_manager;
-    $this->logger = $logger;
+  public function __construct(protected MigrateFieldPluginManagerInterface $fieldPluginManager, protected MigrationPluginManagerInterface $migrationPluginManager, protected LoggerInterface $logger) {
   }
 
   /**

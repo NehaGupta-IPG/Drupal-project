@@ -15,25 +15,11 @@ use Symfony\Component\HttpKernel\KernelEvents;
 class AutomatedCron implements EventSubscriberInterface {
 
   /**
-   * The cron service.
-   *
-   * @var \Drupal\Core\CronInterface
-   */
-  protected $cron;
-
-  /**
    * The cron configuration.
    *
    * @var \Drupal\Core\Config\Config
    */
   protected $config;
-
-  /**
-   * The state key value store.
-   *
-   * @var \Drupal\Core\State\StateInterface
-   */
-  protected $state;
 
   /**
    * Constructs a new automated cron runner.
@@ -45,10 +31,8 @@ class AutomatedCron implements EventSubscriberInterface {
    * @param \Drupal\Core\State\StateInterface $state
    *   The state key-value store service.
    */
-  public function __construct(CronInterface $cron, ConfigFactoryInterface $config_factory, StateInterface $state) {
-    $this->cron = $cron;
+  public function __construct(protected CronInterface $cron, ConfigFactoryInterface $config_factory, protected StateInterface $state) {
     $this->config = $config_factory->get('automated_cron.settings');
-    $this->state = $state;
   }
 
   /**

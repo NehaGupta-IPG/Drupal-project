@@ -16,15 +16,9 @@ use Twig\Node\Node;
 class TwigNodeCheckDeprecations extends Node {
 
   /**
-   * The named variables used in the template.
-   */
-  protected array $usedNames = [];
-
-  /**
    * {@inheritdoc}
    */
-  public function __construct(array $usedNames) {
-    $this->usedNames = $usedNames;
+  public function __construct(protected array $usedNames) {
     parent::__construct();
   }
 

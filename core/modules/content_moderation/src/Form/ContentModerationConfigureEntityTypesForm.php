@@ -25,27 +25,6 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 class ContentModerationConfigureEntityTypesForm extends FormBase {
 
   /**
-   * The entity type manager service.
-   *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
-   */
-  protected $entityTypeManager;
-
-  /**
-   * The entity type bundle information service.
-   *
-   * @var \Drupal\Core\Entity\EntityTypeBundleInfoInterface
-   */
-  protected $bundleInfo;
-
-  /**
-   * The moderation information service.
-   *
-   * @var \Drupal\content_moderation\ModerationInformationInterface
-   */
-  protected $moderationInformation;
-
-  /**
    * The workflow entity object.
    *
    * @var \Drupal\workflows\WorkflowInterface
@@ -58,13 +37,6 @@ class ContentModerationConfigureEntityTypesForm extends FormBase {
    * @var \Drupal\Core\Entity\EntityTypeInterface
    */
   protected $entityType;
-
-  /**
-   * The Messenger service.
-   *
-   * @var \Drupal\Core\Messenger\MessengerInterface
-   */
-  protected $messenger;
 
   /**
    * {@inheritdoc}
@@ -81,11 +53,24 @@ class ContentModerationConfigureEntityTypesForm extends FormBase {
   /**
    * {@inheritdoc}
    */
-  public function __construct(EntityTypeManagerInterface $entity_type_manager, EntityTypeBundleInfoInterface $bundle_info, ModerationInformationInterface $moderation_information, MessengerInterface $messenger) {
-    $this->entityTypeManager = $entity_type_manager;
-    $this->bundleInfo = $bundle_info;
-    $this->moderationInformation = $moderation_information;
-    $this->messenger = $messenger;
+  public function __construct(
+    /**
+     * The entity type manager service.
+     */
+    protected EntityTypeManagerInterface $entityTypeManager,
+    /**
+     * The entity type bundle information service.
+     */
+    protected EntityTypeBundleInfoInterface $bundleInfo,
+    /**
+     * The moderation information service.
+     */
+    protected ModerationInformationInterface $moderationInformation,
+    /**
+     * The Messenger service.
+     */
+    protected MessengerInterface $messenger,
+  ) {
   }
 
   /**

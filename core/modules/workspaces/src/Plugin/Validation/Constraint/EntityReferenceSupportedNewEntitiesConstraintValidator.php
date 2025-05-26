@@ -15,31 +15,20 @@ use Symfony\Component\Validator\ConstraintValidator;
  */
 class EntityReferenceSupportedNewEntitiesConstraintValidator extends ConstraintValidator implements ContainerInjectionInterface {
 
-  /**
-   * The workspace manager.
-   *
-   * @var \Drupal\workspaces\WorkspaceManagerInterface
-   */
-  protected $workspaceManager;
-
-  /**
-   * The entity type manager.
-   *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
-   */
-  protected $entityTypeManager;
-
-  /**
-   * The workspace information service.
-   *
-   * @var \Drupal\workspaces\WorkspaceInformationInterface
-   */
-  protected $workspaceInfo;
-
-  public function __construct(WorkspaceManagerInterface $workspaceManager, EntityTypeManagerInterface $entityTypeManager, WorkspaceInformationInterface $workspace_information) {
-    $this->workspaceManager = $workspaceManager;
-    $this->entityTypeManager = $entityTypeManager;
-    $this->workspaceInfo = $workspace_information;
+  public function __construct(
+    /**
+     * The workspace manager.
+     */
+    protected WorkspaceManagerInterface $workspaceManager,
+    /**
+     * The entity type manager.
+     */
+    protected EntityTypeManagerInterface $entityTypeManager,
+    /**
+     * The workspace information service.
+     */
+    protected WorkspaceInformationInterface $workspaceInfo,
+  ) {
   }
 
   /**

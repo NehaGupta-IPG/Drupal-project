@@ -28,13 +28,6 @@ use Symfony\Component\HttpKernel\KernelEvents;
 class ResourceResponseValidator implements EventSubscriberInterface {
 
   /**
-   * The JSON:API logger channel.
-   *
-   * @var \Psr\Log\LoggerInterface
-   */
-  protected $logger;
-
-  /**
    * The schema validator.
    *
    * This property will only be set if the validator library is available.
@@ -44,33 +37,16 @@ class ResourceResponseValidator implements EventSubscriberInterface {
   protected $validator;
 
   /**
-   * The module handler.
-   *
-   * @var \Drupal\Core\Extension\ModuleHandlerInterface
-   */
-  protected $moduleHandler;
-
-  /**
-   * The application's root file path.
-   *
-   * @var string
-   */
-  protected $appRoot;
-
-  /**
    * Constructs a ResourceResponseValidator object.
    *
    * @param \Psr\Log\LoggerInterface $logger
    *   The JSON:API logger channel.
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
+   * @param \Drupal\Core\Extension\ModuleHandlerInterface $moduleHandler
    *   The module handler.
-   * @param string $app_root
+   * @param string $appRoot
    *   The application's root file path.
    */
-  public function __construct(LoggerInterface $logger, ModuleHandlerInterface $module_handler, $app_root) {
-    $this->logger = $logger;
-    $this->moduleHandler = $module_handler;
-    $this->appRoot = $app_root;
+  public function __construct(protected LoggerInterface $logger, protected ModuleHandlerInterface $moduleHandler, protected $appRoot) {
   }
 
   /**

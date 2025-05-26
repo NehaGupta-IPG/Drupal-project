@@ -114,20 +114,6 @@ abstract class WizardPluginBase extends PluginBase implements WizardInterface {
   ];
 
   /**
-   * The bundle info service.
-   *
-   * @var \Drupal\Core\Entity\EntityTypeBundleInfoInterface
-   */
-  protected $bundleInfoService;
-
-  /**
-   * The parent form selector service.
-   *
-   * @var \Drupal\Core\Menu\MenuParentFormSelectorInterface
-   */
-  protected $parentFormSelector;
-
-  /**
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
@@ -143,13 +129,19 @@ abstract class WizardPluginBase extends PluginBase implements WizardInterface {
   /**
    * Constructs a WizardPluginBase object.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, EntityTypeBundleInfoInterface $bundle_info_service, MenuParentFormSelectorInterface $parent_form_selector) {
+  public function __construct(
+    array $configuration,
+    $plugin_id,
+    $plugin_definition, /**
+     * The bundle info service.
+     */
+    protected EntityTypeBundleInfoInterface $bundleInfoService, /**
+     * The parent form selector service.
+     */
+    protected MenuParentFormSelectorInterface $parentFormSelector,
+) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
-
-    $this->bundleInfoService = $bundle_info_service;
     $this->base_table = $this->definition['base_table'];
-
-    $this->parentFormSelector = $parent_form_selector;
 
     $entity_types = \Drupal::entityTypeManager()->getDefinitions();
     foreach ($entity_types as $entity_type_id => $entity_type) {

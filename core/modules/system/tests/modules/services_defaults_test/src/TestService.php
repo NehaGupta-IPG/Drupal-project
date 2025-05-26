@@ -9,19 +9,7 @@ namespace Drupal\services_defaults_test;
  */
 class TestService {
 
-  /**
-   * @var \Drupal\services_defaults_test\TestInjectionInterface
-   */
-  protected $testInjection;
-
-  /**
-   * @var \Drupal\services_defaults_test\TestInjection2
-   */
-  protected $testInjection2;
-
-  public function __construct(TestInjectionInterface $test_injection, TestInjection2 $test_injection2) {
-    $this->testInjection = $test_injection;
-    $this->testInjection2 = $test_injection2;
+  public function __construct(protected TestInjectionInterface $testInjection, protected TestInjection2 $testInjection2) {
   }
 
   public function getTestInjection() {

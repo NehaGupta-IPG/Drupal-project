@@ -13,20 +13,12 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 class SearchLocalTask extends DeriverBase implements ContainerDeriverInterface {
 
   /**
-   * The search page repository.
-   *
-   * @var \Drupal\search\SearchPageRepositoryInterface
-   */
-  protected $searchPageRepository;
-
-  /**
    * Constructs a new SearchLocalTask.
    *
-   * @param \Drupal\search\SearchPageRepositoryInterface $search_page_repository
+   * @param \Drupal\search\SearchPageRepositoryInterface $searchPageRepository
    *   The search page repository.
    */
-  public function __construct(SearchPageRepositoryInterface $search_page_repository) {
-    $this->searchPageRepository = $search_page_repository;
+  public function __construct(protected SearchPageRepositoryInterface $searchPageRepository) {
   }
 
   /**

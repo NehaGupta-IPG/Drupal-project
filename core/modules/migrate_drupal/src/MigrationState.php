@@ -142,20 +142,6 @@ class MigrationState {
   const NOT_FINISHED = 'not_finished';
 
   /**
-   * The field plugin manager service.
-   *
-   * @var \Drupal\Core\Extension\ModuleHandler
-   */
-  protected $moduleHandler;
-
-  /**
-   * The field plugin manager service.
-   *
-   * @var \Drupal\migrate_drupal\Plugin\MigrateFieldPluginManagerInterface
-   */
-  protected $fieldPluginManager;
-
-  /**
    * An array of migration states declared for each source migration.
    *
    * States are keyed by version. Each value is an array keyed by name of the
@@ -217,9 +203,7 @@ class MigrationState {
    * @param \Drupal\Core\StringTranslation\TranslationInterface $stringTranslation
    *   String translation service.
    */
-  public function __construct(MigrateFieldPluginManagerInterface $fieldPluginManager, ModuleHandlerInterface $moduleHandler, MessengerInterface $messenger, TranslationInterface $stringTranslation) {
-    $this->fieldPluginManager = $fieldPluginManager;
-    $this->moduleHandler = $moduleHandler;
+  public function __construct(protected MigrateFieldPluginManagerInterface $fieldPluginManager, protected ModuleHandlerInterface $moduleHandler, MessengerInterface $messenger, TranslationInterface $stringTranslation) {
     $this->enabledModules = array_keys($this->moduleHandler->getModuleList());
     $this->enabledModules[] = 'core';
     $this->messenger = $messenger;

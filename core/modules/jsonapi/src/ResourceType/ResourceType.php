@@ -26,69 +26,6 @@ class ResourceType {
   const TYPE_NAME_URI_PATH_SEPARATOR = '--';
 
   /**
-   * The entity type ID.
-   *
-   * @var string
-   */
-  protected $entityTypeId;
-
-  /**
-   * The bundle ID.
-   *
-   * @var string
-   */
-  protected $bundle;
-
-  /**
-   * The type name.
-   *
-   * @var string
-   */
-  protected $typeName;
-
-  /**
-   * The class to which a payload converts to.
-   *
-   * @var string
-   */
-  protected $deserializationTargetClass;
-
-  /**
-   * Whether this resource type is internal.
-   *
-   * @var bool
-   */
-  protected $internal;
-
-  /**
-   * Whether this resource type's resources are locatable.
-   *
-   * @var bool
-   */
-  protected $isLocatable;
-
-  /**
-   * Whether this resource type's resources are mutable.
-   *
-   * @var bool
-   */
-  protected $isMutable;
-
-  /**
-   * Whether this resource type's resources are versionable.
-   *
-   * @var bool
-   */
-  protected $isVersionable;
-
-  /**
-   * The list of fields on the underlying entity type + bundle.
-   *
-   * @var string[]
-   */
-  protected $fields;
-
-  /**
    * An array of arrays of relatable resource types, keyed by public field name.
    *
    * @var array
@@ -329,37 +266,27 @@ class ResourceType {
   /**
    * Instantiates a ResourceType object.
    *
-   * @param string $entity_type_id
+   * @param string $entityTypeId
    *   An entity type ID.
    * @param string $bundle
    *   A bundle.
-   * @param string $deserialization_target_class
+   * @param string $deserializationTargetClass
    *   The deserialization target class.
    * @param bool $internal
    *   (optional) Whether the resource type should be internal.
-   * @param bool $is_locatable
+   * @param bool $isLocatable
    *   (optional) Whether the resource type is locatable.
-   * @param bool $is_mutable
+   * @param bool $isMutable
    *   (optional) Whether the resource type is mutable.
-   * @param bool $is_versionable
+   * @param bool $isVersionable
    *   (optional) Whether the resource type is versionable.
    * @param \Drupal\jsonapi\ResourceType\ResourceTypeField[] $fields
    *   (optional) The resource type fields, keyed by internal field name.
-   * @param null|string $type_name
+   * @param null|string $typeName
    *   The resource type name.
    */
-  public function __construct($entity_type_id, $bundle, $deserialization_target_class, $internal = FALSE, $is_locatable = TRUE, $is_mutable = TRUE, $is_versionable = FALSE, array $fields = [], $type_name = NULL) {
-    $this->entityTypeId = $entity_type_id;
-    $this->bundle = $bundle;
-    $this->deserializationTargetClass = $deserialization_target_class;
-    $this->internal = $internal;
-    $this->isLocatable = $is_locatable;
-    $this->isMutable = $is_mutable;
-    $this->isVersionable = $is_versionable;
-    $this->fields = $fields;
-
-    $this->typeName = $type_name;
-    if ($type_name === NULL) {
+  public function __construct(protected $entityTypeId, protected $bundle, protected $deserializationTargetClass, protected $internal = FALSE, protected $isLocatable = TRUE, protected $isMutable = TRUE, protected $isVersionable = FALSE, protected array $fields = [], protected $typeName = NULL) {
+    if ($this->typeName === NULL) {
       $this->typeName = $this->bundle === '?'
         ? 'unknown'
         : $this->entityTypeId . self::TYPE_NAME_URI_PATH_SEPARATOR . $this->bundle;

@@ -19,20 +19,6 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 class BlockPluginId extends ProcessPluginBase implements ContainerFactoryPluginInterface {
 
   /**
-   * The migrate lookup service.
-   *
-   * @var \Drupal\migrate\MigrateLookupInterface
-   */
-  protected $migrateLookup;
-
-  /**
-   * The block_content entity storage handler.
-   *
-   * @var \Drupal\Core\Entity\EntityStorageInterface|null
-   */
-  protected $blockContentStorage;
-
-  /**
    * Constructs a BlockPluginId object.
    *
    * @param array $configuration
@@ -41,16 +27,14 @@ class BlockPluginId extends ProcessPluginBase implements ContainerFactoryPluginI
    *   The plugin ID.
    * @param array $plugin_definition
    *   The plugin definition.
-   * @param \Drupal\Core\Entity\EntityStorageInterface|null $storage
+   * @param \Drupal\Core\Entity\EntityStorageInterface|null $blockContentStorage
    *   The block content storage object. NULL if the block_content module is
    *   not installed.
-   * @param \Drupal\migrate\MigrateLookupInterface $migrate_lookup
+   * @param \Drupal\migrate\MigrateLookupInterface $migrateLookup
    *   The migrate lookup service.
    */
-  public function __construct(array $configuration, $plugin_id, array $plugin_definition, ?EntityStorageInterface $storage, MigrateLookupInterface $migrate_lookup) {
+  public function __construct(array $configuration, $plugin_id, array $plugin_definition, protected ?EntityStorageInterface $blockContentStorage, protected MigrateLookupInterface $migrateLookup) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
-    $this->blockContentStorage = $storage;
-    $this->migrateLookup = $migrate_lookup;
   }
 
   /**

@@ -18,13 +18,6 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 class EntityUserRole extends EntityConfigBase {
 
   /**
-   * All permissions on the destination site.
-   *
-   * @var string[]
-   */
-  protected $destinationPermissions = [];
-
-  /**
    * Builds a user role entity destination.
    *
    * @param array $configuration
@@ -43,12 +36,11 @@ class EntityUserRole extends EntityConfigBase {
    *   The language manager.
    * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
    *   The configuration factory.
-   * @param array $destination_permissions
+   * @param array $destinationPermissions
    *   All available permissions.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, MigrationInterface $migration, EntityStorageInterface $storage, array $bundles, LanguageManagerInterface $language_manager, ConfigFactoryInterface $config_factory, array $destination_permissions) {
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, MigrationInterface $migration, EntityStorageInterface $storage, array $bundles, LanguageManagerInterface $language_manager, ConfigFactoryInterface $config_factory, protected array $destinationPermissions) {
     parent::__construct($configuration, $plugin_id, $plugin_definition, $migration, $storage, $bundles, $language_manager, $config_factory);
-    $this->destinationPermissions = $destination_permissions;
   }
 
   /**

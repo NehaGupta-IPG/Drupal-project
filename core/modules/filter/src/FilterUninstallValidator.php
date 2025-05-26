@@ -16,13 +16,6 @@ class FilterUninstallValidator implements ModuleUninstallValidatorInterface {
   use StringTranslationTrait;
 
   /**
-   * The filter plugin manager.
-   *
-   * @var \Drupal\Component\Plugin\PluginManagerInterface
-   */
-  protected $filterManager;
-
-  /**
    * The filter entity storage.
    *
    * @var \Drupal\Core\Config\Entity\ConfigEntityStorageInterface
@@ -32,15 +25,14 @@ class FilterUninstallValidator implements ModuleUninstallValidatorInterface {
   /**
    * Constructs a new FilterUninstallValidator.
    *
-   * @param \Drupal\Component\Plugin\PluginManagerInterface $filter_manager
+   * @param \Drupal\Component\Plugin\PluginManagerInterface $filterManager
    *   The filter plugin manager.
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager.
    * @param \Drupal\Core\StringTranslation\TranslationInterface $string_translation
    *   The string translation service.
    */
-  public function __construct(PluginManagerInterface $filter_manager, EntityTypeManagerInterface $entity_type_manager, TranslationInterface $string_translation) {
-    $this->filterManager = $filter_manager;
+  public function __construct(protected PluginManagerInterface $filterManager, EntityTypeManagerInterface $entity_type_manager, TranslationInterface $string_translation) {
     $this->filterStorage = $entity_type_manager->getStorage('filter_format');
     $this->stringTranslation = $string_translation;
   }

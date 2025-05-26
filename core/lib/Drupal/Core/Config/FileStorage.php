@@ -14,20 +14,6 @@ use Drupal\Core\Serialization\Yaml;
 class FileStorage implements StorageInterface {
 
   /**
-   * The storage collection.
-   *
-   * @var string
-   */
-  protected $collection;
-
-  /**
-   * The filesystem path for configuration objects.
-   *
-   * @var string
-   */
-  protected $directory = '';
-
-  /**
    * The file cache object.
    *
    * @var \Drupal\Component\FileCache\FileCacheInterface
@@ -43,9 +29,7 @@ class FileStorage implements StorageInterface {
    *   (optional) The collection to store configuration in. Defaults to the
    *   default collection.
    */
-  public function __construct($directory, $collection = StorageInterface::DEFAULT_COLLECTION) {
-    $this->directory = $directory;
-    $this->collection = $collection;
+  public function __construct(protected $directory, protected $collection = StorageInterface::DEFAULT_COLLECTION) {
     // Use a NULL File Cache backend by default. This will ensure only the
     // internal static caching of FileCache is used and thus avoids blowing up
     // the APCu cache.

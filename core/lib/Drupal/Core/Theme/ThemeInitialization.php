@@ -13,27 +13,6 @@ use Drupal\Core\Extension\ThemeHandlerInterface;
 class ThemeInitialization implements ThemeInitializationInterface {
 
   /**
-   * The theme handler.
-   *
-   * @var \Drupal\Core\Extension\ThemeHandlerInterface
-   */
-  protected $themeHandler;
-
-  /**
-   * The cache backend to use for the active theme.
-   *
-   * @var \Drupal\Core\Cache\CacheBackendInterface
-   */
-  protected $cache;
-
-  /**
-   * The app root.
-   *
-   * @var string
-   */
-  protected $root;
-
-  /**
    * The extensions that might be attaching assets.
    *
    * @var array
@@ -41,29 +20,18 @@ class ThemeInitialization implements ThemeInitializationInterface {
   protected $extensions;
 
   /**
-   * The module handler.
-   *
-   * @var \Drupal\Core\Extension\ModuleHandlerInterface
-   */
-  protected $moduleHandler;
-
-  /**
    * Constructs a new ThemeInitialization object.
    *
    * @param string $root
    *   The app root.
-   * @param \Drupal\Core\Extension\ThemeHandlerInterface $theme_handler
+   * @param \Drupal\Core\Extension\ThemeHandlerInterface $themeHandler
    *   The theme handler.
    * @param \Drupal\Core\Cache\CacheBackendInterface $cache
    *   The cache backend.
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
+   * @param \Drupal\Core\Extension\ModuleHandlerInterface $moduleHandler
    *   The module handler to use to load modules.
    */
-  public function __construct($root, ThemeHandlerInterface $theme_handler, CacheBackendInterface $cache, ModuleHandlerInterface $module_handler) {
-    $this->root = $root;
-    $this->themeHandler = $theme_handler;
-    $this->cache = $cache;
-    $this->moduleHandler = $module_handler;
+  public function __construct(protected $root, protected ThemeHandlerInterface $themeHandler, protected CacheBackendInterface $cache, protected ModuleHandlerInterface $moduleHandler) {
   }
 
   /**

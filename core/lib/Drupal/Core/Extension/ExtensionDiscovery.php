@@ -64,20 +64,6 @@ class ExtensionDiscovery {
   protected static $files = [];
 
   /**
-   * List of installation profile directories to additionally scan.
-   *
-   * @var array
-   */
-  protected $profileDirectories;
-
-  /**
-   * The app root for the current operation.
-   *
-   * @var string
-   */
-  protected $root;
-
-  /**
    * The file cache object.
    *
    * @var \Drupal\Component\FileCache\FileCacheInterface
@@ -88,13 +74,6 @@ class ExtensionDiscovery {
    * @see https://www.drupal.org/node/3490431
    */
   protected $fileCache;
-
-  /**
-   * The site path.
-   *
-   * @var string
-   */
-  protected $sitePath;
 
   /**
    * The info parser.
@@ -114,18 +93,15 @@ class ExtensionDiscovery {
    *   Whether the info_parser should be used. Note this argument also
    *   determines if the deprecated file cache property is set to maintain BC in
    *   Drupal 11.
-   * @param string[] $profile_directories
+   * @param string[] $profileDirectories
    *   The available profile directories.
-   * @param string $site_path
+   * @param string $sitePath
    *   The path to the site.
    */
-  public function __construct(string $root, $use_info_parser = TRUE, ?array $profile_directories = NULL, ?string $site_path = NULL) {
-    $this->root = $root;
+  public function __construct(protected string $root, $use_info_parser = TRUE, protected ?array $profileDirectories = NULL, protected ?string $sitePath = NULL) {
     // @phpstan-ignore property.deprecated
     $this->fileCache = $use_info_parser ? FileCacheFactory::get('extension_discovery') : NULL;
-    $this->profileDirectories = $profile_directories;
-    $this->sitePath = $site_path;
-    $this->infoParser = $use_info_parser ? new InfoParser($root) : NULL;
+    $this->infoParser = $use_info_parser ? new InfoParser($this->root) : NULL;
   }
 
   /**

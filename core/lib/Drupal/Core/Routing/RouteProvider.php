@@ -26,27 +26,6 @@ use Drupal\Core\Database\Connection;
 class RouteProvider implements CacheableRouteProviderInterface, PreloadableRouteProviderInterface, EventSubscriberInterface {
 
   /**
-   * The database connection from which to read route information.
-   *
-   * @var \Drupal\Core\Database\Connection
-   */
-  protected $connection;
-
-  /**
-   * The name of the SQL table from which to read the routes.
-   *
-   * @var string
-   */
-  protected $tableName;
-
-  /**
-   * The state.
-   *
-   * @var \Drupal\Core\State\StateInterface
-   */
-  protected $state;
-
-  /**
    * A cache of already-loaded routes, keyed by route name.
    *
    * @var \Symfony\Component\Routing\Route[]
@@ -59,34 +38,6 @@ class RouteProvider implements CacheableRouteProviderInterface, PreloadableRoute
    * @var string[]
    */
   protected $serializedRoutes = [];
-
-  /**
-   * The current path.
-   *
-   * @var \Drupal\Core\Path\CurrentPathStack
-   */
-  protected $currentPath;
-
-  /**
-   * The cache backend.
-   *
-   * @var \Drupal\Core\Cache\CacheBackendInterface
-   */
-  protected $cache;
-
-  /**
-   * The cache tag invalidator.
-   *
-   * @var \Drupal\Core\Cache\CacheTagsInvalidatorInterface
-   */
-  protected $cacheTagInvalidator;
-
-  /**
-   * A path processor manager for resolving the system path.
-   *
-   * @var \Drupal\Core\PathProcessor\InboundPathProcessorInterface
-   */
-  protected $pathProcessor;
 
   /**
    * The language manager.
@@ -114,28 +65,21 @@ class RouteProvider implements CacheableRouteProviderInterface, PreloadableRoute
    *   A database connection object.
    * @param \Drupal\Core\State\StateInterface $state
    *   The state.
-   * @param \Drupal\Core\Path\CurrentPathStack $current_path
+   * @param \Drupal\Core\Path\CurrentPathStack $currentPath
    *   The current path.
-   * @param \Drupal\Core\Cache\CacheBackendInterface $cache_backend
+   * @param \Drupal\Core\Cache\CacheBackendInterface $cache
    *   The cache backend.
-   * @param \Drupal\Core\PathProcessor\InboundPathProcessorInterface $path_processor
+   * @param \Drupal\Core\PathProcessor\InboundPathProcessorInterface $pathProcessor
    *   The path processor.
-   * @param \Drupal\Core\Cache\CacheTagsInvalidatorInterface $cache_tag_invalidator
+   * @param \Drupal\Core\Cache\CacheTagsInvalidatorInterface $cacheTagInvalidator
    *   The cache tag invalidator.
-   * @param string $table
+   * @param string $tableName
    *   (Optional) The table in the database to use for matching. Defaults to
    *   'router'.
    * @param \Drupal\Core\Language\LanguageManagerInterface $language_manager
    *   (Optional) The language manager.
    */
-  public function __construct(Connection $connection, StateInterface $state, CurrentPathStack $current_path, CacheBackendInterface $cache_backend, InboundPathProcessorInterface $path_processor, CacheTagsInvalidatorInterface $cache_tag_invalidator, $table = 'router', ?LanguageManagerInterface $language_manager = NULL) {
-    $this->connection = $connection;
-    $this->state = $state;
-    $this->currentPath = $current_path;
-    $this->cache = $cache_backend;
-    $this->cacheTagInvalidator = $cache_tag_invalidator;
-    $this->pathProcessor = $path_processor;
-    $this->tableName = $table;
+  public function __construct(protected Connection $connection, protected StateInterface $state, protected CurrentPathStack $currentPath, protected CacheBackendInterface $cache, protected InboundPathProcessorInterface $pathProcessor, protected CacheTagsInvalidatorInterface $cacheTagInvalidator, protected $tableName = 'router', ?LanguageManagerInterface $language_manager = NULL) {
     $this->languageManager = $language_manager ?: \Drupal::languageManager();
   }
 

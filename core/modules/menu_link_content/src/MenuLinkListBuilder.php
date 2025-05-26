@@ -15,13 +15,6 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 class MenuLinkListBuilder extends EntityListBuilder {
 
   /**
-   * The redirect destination.
-   *
-   * @var \Drupal\Core\Routing\RedirectDestinationInterface
-   */
-  protected $redirectDestination;
-
-  /**
    * {@inheritdoc}
    */
   public static function createInstance(ContainerInterface $container, EntityTypeInterface $entity_type) {
@@ -39,13 +32,11 @@ class MenuLinkListBuilder extends EntityListBuilder {
    *   The entity type definition.
    * @param \Drupal\Core\Entity\EntityStorageInterface $storage
    *   The entity storage class.
-   * @param \Drupal\Core\Routing\RedirectDestinationInterface $redirect_destination
+   * @param \Drupal\Core\Routing\RedirectDestinationInterface $redirectDestination
    *   The redirect destination.
    */
-  public function __construct(EntityTypeInterface $entity_type, EntityStorageInterface $storage, RedirectDestinationInterface $redirect_destination) {
+  public function __construct(EntityTypeInterface $entity_type, EntityStorageInterface $storage, protected RedirectDestinationInterface $redirectDestination) {
     parent::__construct($entity_type, $storage);
-
-    $this->redirectDestination = $redirect_destination;
   }
 
   /**
