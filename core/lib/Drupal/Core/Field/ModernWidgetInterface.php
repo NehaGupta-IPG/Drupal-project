@@ -11,7 +11,7 @@ use Drupal\Core\Render\Element\Wrapper;
  * Widget wrapper interface.
  *
  * Eventually this should be a copy of WidgetInterface without formElement and
- * errorelement.
+ * errorElement.
  */
 interface ModernWidgetInterface {
 
