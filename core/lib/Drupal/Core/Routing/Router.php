@@ -101,6 +101,12 @@ class Router extends UrlMatcher implements RequestMatcherInterface, RouterInterf
   public function match($pathinfo): array {
     try {
       $request = Request::create($pathinfo);
+      
+      // Pass the request format on as sometimes it goes missing.
+      $currentRequest = \Drupal::request();
+      if ($currentRequest->getPathInfo() == $pathinfo) {
+        $request->setRequestFormat($currentRequest->getRequestFormat());
+      }
     }
     catch (BadRequestException $e) {
       throw new ResourceNotFoundException($e->getMessage(), $e->getCode(), $e);
