@@ -11,6 +11,7 @@ use Drupal\Core\Ajax\RedirectCommand;
 use Drupal\Core\Ajax\ReplaceCommand;
 use Drupal\Core\Asset\AttachedAssets;
 use Drupal\Core\Asset\AttachedAssetsInterface;
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Form\EnforcedResponseException;
 use Drupal\Core\Messenger\MessengerInterface;
@@ -188,6 +189,7 @@ class BigPipe {
     protected MessengerInterface $messenger,
     protected RequestContext $requestContext,
     protected LoggerInterface $logger,
+    protected bool $debugCacheabilityHeaders = FALSE,
   ) {
   }
 
@@ -290,7 +292,7 @@ class BigPipe {
       // Create a new HtmlResponse. Ensure the CSS and (non-bottom) JS is sent
       // before the HTML they're associated with.
       // @see \Drupal\Core\Render\HtmlResponseSubscriber
-      // @see template_preprocess_html()
+      // @see \Drupal\Core\Theme\ThemePreprocess::preprocessHtml()
       $js_bottom_placeholder = '<nojs-bigpipe-placeholder-scripts-bottom-placeholder token="' . Crypt::randomBytesBase64(55) . '">';
 
       $html_response = new HtmlResponse();
@@ -396,7 +398,7 @@ class BigPipe {
       // before the HTML they're associated with. In other words: ensure the
       // critical assets for this placeholder's markup are loaded first.
       // @see \Drupal\Core\Render\HtmlResponseSubscriber
-      // @see template_preprocess_html()
+      // @see \Drupal\Core\Theme\ThemePreprocess::preprocessHtml()
       $css_placeholder = '<nojs-bigpipe-placeholder-styles-placeholder token="' . $token . '">';
       $js_placeholder = '<nojs-bigpipe-placeholder-scripts-placeholder token="' . $token . '">';
       $elements['#markup'] = BigPipeMarkup::create($css_placeholder . $js_placeholder . (string) $elements['#markup']);
@@ -487,6 +489,9 @@ class BigPipe {
 
     // Create a Fiber for each placeholder.
     $fibers = [];
+
+    $cacheable_metadata = new CacheableMetadata();
+
     foreach ($placeholder_order as $placeholder_id) {
       if (!isset($placeholders[$placeholder_id])) {
         continue;
@@ -520,6 +525,11 @@ class BigPipe {
           }
           $elements = $fiber->getReturn();
           unset($fibers[$placeholder_id]);
+
+          if ($this->debugCacheabilityHeaders) {
+            $cacheable_metadata->addCacheableDependency(CacheableMetadata::createFromRenderArray($elements));
+          }
+
           // Create a new AjaxResponse.
           $ajax_response = new AjaxResponse();
           // JavaScript's querySelector automatically decodes HTML entities in
@@ -530,8 +540,8 @@ class BigPipe {
           $ajax_response->addCommand(new ReplaceCommand(sprintf('[data-big-pipe-placeholder-id="%s"]', $big_pipe_js_placeholder_id), $elements['#markup']));
           $ajax_response->setAttachments($elements['#attached']);
 
-          // Delete all messages that were generated during the rendering of this
-          // placeholder, to render them in a BigPipe-optimized way.
+          // Delete all messages that were generated during the rendering of
+          // this placeholder, to render them in a BigPipe-optimized way.
           $messages = $this->messenger->deleteAll();
           foreach ($messages as $type => $type_messages) {
             foreach ($type_messages as $message) {
@@ -584,8 +594,8 @@ EOF;
           else {
             try {
               // SecuredRedirectResponse is an abstract class that requires a
-              // concrete implementation. Default to LocalRedirectResponse, which
-              // considers only redirects to within the same site as safe.
+              // concrete implementation. Default to LocalRedirectResponse,
+              // which considers only redirects to within the same site as safe.
               $safe_response = LocalRedirectResponse::createFromRedirectResponse($response);
               $safe_response->setRequestContext($this->requestContext);
               $ajax_response->addCommand(new RedirectCommand($safe_response->getTargetUrl()));
@@ -626,6 +636,11 @@ EOF;
         }
       }
       $iterations++;
+    }
+
+    if ($this->debugCacheabilityHeaders) {
+      $this->sendChunk("\n<!-- big_pipe cache tags: " . implode(' ', $cacheable_metadata->getCacheTags()) . " -->\n");
+      $this->sendChunk("\n<!-- big_pipe cache contexts: " . implode(' ', $cacheable_metadata->getCacheContexts()) . " -->\n");
     }
 
     // Send the stop signal.

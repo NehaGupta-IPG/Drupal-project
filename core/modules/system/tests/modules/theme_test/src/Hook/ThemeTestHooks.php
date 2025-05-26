@@ -27,7 +27,12 @@ class ThemeTestHooks {
     $items['theme_test_base1'] = ['variables' => []];
     $items['theme_test_base2'] = ['variables' => []];
     $items['theme_test_xss_suggestion'] = ['variables' => []];
-    $items['theme_test_general_suggestions'] = ['variables' => ['module_hook' => 'theme_test_theme', 'theme_hook' => 'none']];
+    $items['theme_test_general_suggestions'] = [
+      'variables' => [
+        'module_hook' => 'theme_test_theme',
+        'theme_hook' => 'none',
+      ],
+    ];
     $items['theme_test_foo'] = ['variables' => ['foo' => NULL]];
     $items['theme_test_render_element'] = ['render element' => 'elements'];
     $items['theme_test_render_element_children'] = ['render element' => 'element'];
@@ -64,7 +69,10 @@ class ThemeTestHooks {
    */
   #[Hook('theme_registry_alter')]
   public function themeRegistryAlter(&$registry): void {
-    $registry['theme_test_preprocess_callback']['preprocess functions'][] = ['\Drupal\theme_test\ThemeTestPreprocess', 'preprocess'];
+    $registry['theme_test_preprocess_callback']['preprocess functions'][] = [
+      '\Drupal\theme_test\ThemeTestPreprocess',
+      'preprocess',
+    ];
   }
 
   /**
@@ -111,9 +119,9 @@ class ThemeTestHooks {
   #[Hook('library_info_alter')]
   public function libraryInfoAlter(array &$libraries, string $extension) : void {
     // Allow test code to simulate library changes in a particular extension by
-    // setting a state key in the form `theme_test_library_info_alter $extension`,
-    // whose values is an array containing everything that should be recursively
-    // merged into the given extension's library definitions.
+    // setting a state key in the form `theme_test_library_info_alter
+    // $extension`, whose values is an array containing everything that should
+    // be recursively merged into the given extension's library definitions.
     $info = \Drupal::state()->get('theme_test_library_info_alter' . " {$extension}");
     if (is_array($info)) {
       $libraries = NestedArray::mergeDeep($libraries, $info);

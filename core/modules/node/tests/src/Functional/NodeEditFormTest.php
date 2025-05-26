@@ -101,7 +101,8 @@ class NodeEditFormTest extends NodeTestBase {
     // Stay on the current page, without reloading.
     $this->submitForm($edit, 'Save');
 
-    // Check that the title and body fields are displayed with the updated values.
+    // Check that the title and body fields are displayed with the updated
+    // values.
     $this->assertSession()->pageTextContains($edit[$title_key]);
     $this->assertSession()->pageTextContains($edit[$body_key]);
 
@@ -254,6 +255,16 @@ class NodeEditFormTest extends NodeTestBase {
     $this->drupalGet("node/" . $node->id() . "/edit");
     $this->assertSession()->pageTextContains('Published');
     $this->assertSession()->pageTextContains($this->container->get('date.formatter')->format($node->getChangedTime(), 'short'));
+  }
+
+  /**
+   * Tests the node form when the author is NULL.
+   */
+  public function testNodeFormNullAuthor(): void {
+    \Drupal::service('module_installer')->install(['node_no_default_author']);
+    $this->drupalLogin($this->adminUser);
+    $this->drupalGet('node/add/page');
+    $this->assertSession()->statusCodeEquals(200);
   }
 
   /**

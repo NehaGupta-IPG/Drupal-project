@@ -36,6 +36,7 @@ class InstallTasksTest extends UnitTestCase {
    * Creates a Tasks object for testing.
    *
    * @return \Drupal\mysql\Driver\Database\mysql\Install\Tasks
+   *   A Tasks object.
    */
   private function createTasks(): Tasks {
     /** @var \Drupal\mysql\Driver\Database\mysql\Connection $connection */
@@ -54,14 +55,23 @@ class InstallTasksTest extends UnitTestCase {
         $this->connection = $connection;
       }
 
+      /**
+       * {@inheritdoc}
+       */
       protected function isConnectionActive() {
         return TRUE;
       }
 
+      /**
+       * {@inheritdoc}
+       */
       protected function getConnection() {
         return $this->connection;
       }
 
+      /**
+       * {@inheritdoc}
+       */
       protected function t($string, array $args = [], array $options = []) {
         return $string;
       }
@@ -73,18 +83,28 @@ class InstallTasksTest extends UnitTestCase {
    * Creates a Tasks object for testing, without connection.
    *
    * @return \Drupal\mysql\Driver\Database\mysql\Install\Tasks
+   *   A Tasks object.
    */
   private function createTasksNoConnection(): Tasks {
     return new class() extends Tasks {
 
+      /**
+       * {@inheritdoc}
+       */
       protected function isConnectionActive() {
         return FALSE;
       }
 
+      /**
+       * {@inheritdoc}
+       */
       protected function getConnection() {
         return NULL;
       }
 
+      /**
+       * {@inheritdoc}
+       */
       protected function t($string, array $args = [], array $options = []) {
         return $string;
       }
@@ -116,6 +136,7 @@ class InstallTasksTest extends UnitTestCase {
    * Provides test data.
    *
    * @return array
+   *   An array of test data.
    */
   public static function providerNameAndMinimumVersion(): array {
     return [
