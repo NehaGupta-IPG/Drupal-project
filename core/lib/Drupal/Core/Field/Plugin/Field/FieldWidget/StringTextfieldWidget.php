@@ -4,9 +4,12 @@ namespace Drupal\Core\Field\Plugin\Field\FieldWidget;
 
 use Drupal\Core\Field\Attribute\FieldWidget;
 use Drupal\Core\Field\FieldItemListInterface;
+use Drupal\Core\Field\ModernWidgetInterface;
 use Drupal\Core\Field\WidgetBase;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Render\Element\Form;
 use Drupal\Core\Render\Element\Textfield;
+use Drupal\Core\Render\Element\Wrapper;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 
 /**
@@ -17,7 +20,7 @@ use Drupal\Core\StringTranslation\TranslatableMarkup;
   label: new TranslatableMarkup('Textfield'),
   field_types: ['string'],
 )]
-class StringTextfieldWidget extends WidgetBase {
+class StringTextfieldWidget extends WidgetBase implements ModernWidgetInterface {
 
   /**
    * {@inheritdoc}
@@ -68,14 +71,28 @@ class StringTextfieldWidget extends WidgetBase {
    * {@inheritdoc}
    */
   public function formElement(FieldItemListInterface $items, $delta, array $element, array &$form, FormStateInterface $form_state) {
-    $wrapper = $this->elementInfoManager->fromRenderable($element, 'wrapper');
+    $element['value'] = $element + [
+      '#type' => 'textfield',
+      '#default_value' => $items[$delta]->value ?? NULL,
+      '#size' => $this->getSetting('size'),
+      '#placeholder' => $this->getSetting('placeholder'),
+      '#maxlength' => $this->getFieldSetting('max_length'),
+      '#attributes' => ['class' => ['js-text-full', 'text-full']],
+    ];
+
+    return $element;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function singleElementObject(FieldItemListInterface $items, $delta, Wrapper $wrapper, Form $form, FormStateInterface $form_state) {
     $value = $wrapper->createChild('value', Textfield::class, copyProperties: TRUE);
     $value->default_value = $items[$delta]->value;
     $value->size = $this->getSetting('size');
     $value->placeholder = $this->getSetting('placeholder');
     $value->maxlength = $this->getFieldSetting('max_length');
     $value->attributes = ['class' => ['js-text-full', 'text-full']];
-    return $wrapper->toRenderable();
   }
 
 }
