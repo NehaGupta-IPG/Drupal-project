@@ -15,6 +15,7 @@ use Drupal\Core\Database\Database;
 use Drupal\Core\DrupalKernel;
 use Drupal\Core\Extension\ExtensionLifecycle;
 use Drupal\Core\Extension\Requirement\RequirementSeverity;
+use Drupal\Core\File\FilePermissions;
 use Drupal\Core\File\FileSystemInterface;
 use Drupal\Core\Link;
 use Drupal\Core\Render\Markup;
@@ -639,6 +640,10 @@ function system_requirements($phase): array {
     else {
       $site_path = DrupalKernel::findSitePath(Request::createFromGlobals());
     }
+
+    /** @var \Drupal\Core\File\FilePermissions $file_permissions */
+    $file_permissions = \Drupal::service(FilePermissions::class);
+
     // Allow system administrators to disable permissions hardening for the site
     // directory. This allows additional files in the site directory to be
     // updated when they are managed in a version control system.
@@ -652,13 +657,13 @@ function system_requirements($phase): array {
       $error_value = t('Not protected');
       // In normal operation, writable files or directories are an error.
       $file_protection_severity = RequirementSeverity::Error;
-      if (!drupal_verify_install_file($site_path, FILE_NOT_WRITABLE, 'dir')) {
+      if (!$file_permissions->verifyDirectory($site_path, FilePermissions::NOT_WRITABLE)) {
         $conf_errors[] = t("The directory %file is not protected from modifications and poses a security risk. You must change the directory's permissions to be non-writable.", ['%file' => $site_path]);
       }
     }
     foreach (['settings.php', 'settings.local.php', 'services.yml'] as $conf_file) {
       $full_path = $site_path . '/' . $conf_file;
-      if (file_exists($full_path) && !drupal_verify_install_file($full_path, FILE_EXIST | FILE_READABLE | FILE_NOT_WRITABLE, 'file', !Settings::get('skip_permissions_hardening'))) {
+      if (file_exists($full_path) && !$file_permissions->verifyFile($full_path, FilePermissions::EXIST | FilePermissions::READABLE | FilePermissions::NOT_WRITABLE, !Settings::get('skip_permissions_hardening'))) {
         $conf_errors[] = t("The file %file is not protected from modifications and poses a security risk. You must change the file's permissions to be non-writable.", ['%file' => $full_path]);
       }
     }
