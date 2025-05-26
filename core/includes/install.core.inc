@@ -18,6 +18,7 @@ use Drupal\Core\Database\Database;
 use Drupal\Core\Database\DatabaseExceptionWrapper;
 use Drupal\Core\Extension\Exception\UnknownExtensionException;
 use Drupal\Core\Extension\Requirement\RequirementSeverity;
+use Drupal\Core\File\FilePermissions;
 use Drupal\Core\File\FileSystemInterface;
 use Drupal\Core\Form\FormState;
 use Drupal\Core\Installer\Exception\AlreadyInstalledException;
@@ -1970,8 +1971,10 @@ function install_check_translations($langcode, $server_pattern): array {
   // Then, attempt to create or make writable the translations directory.
   $file_system->prepareDirectory($translations_directory, FileSystemInterface::CREATE_DIRECTORY | FileSystemInterface::MODIFY_PERMISSIONS);
 
+  /** @var \Drupal\Core\File\FilePermissions $file_permissions */
+  $file_permissions = \Drupal::service(FilePermissions::class);
   // Get values so the requirements errors can be specific.
-  if (drupal_verify_install_file($translations_directory, FILE_EXIST, 'dir')) {
+  if ($file_permissions->verifyDirectory($translations_directory, FilePermissions::EXIST)) {
     $readable = is_readable($translations_directory);
     $writable = is_writable($translations_directory);
     $translations_directory_exists = TRUE;
@@ -2128,7 +2131,10 @@ function install_check_requirements($install_state) {
     'description_default' => t('The default settings file does not exist.'),
     'title' => t('Settings file'),
   ];
+
   $file_system = \Drupal::service('file_system');
+  /** @var \Drupal\Core\File\FilePermissions $file_permissions */
+  $file_permissions = \Drupal::service(FilePermissions::class);
 
   foreach ($default_files as $default_file_info) {
     $readable = FALSE;
@@ -2138,18 +2144,18 @@ function install_check_requirements($install_state) {
     $default_file = "./sites/default/{$default_file_info['file_default']}";
     $exists = FALSE;
     // Verify that the directory exists.
-    if (drupal_verify_install_file($site_path, FILE_EXIST, 'dir')) {
-      if (drupal_verify_install_file($file, FILE_EXIST)) {
+    if ($file_permissions->verifyDirectory($site_path, FilePermissions::EXIST)) {
+      if ($file_permissions->verifyFile($file, FilePermissions::EXIST)) {
         // If it does, make sure it is writable.
-        $readable = drupal_verify_install_file($file, FILE_READABLE);
-        $writable = drupal_verify_install_file($file, FILE_WRITABLE);
+        $readable = $file_permissions->verifyFile($file, FilePermissions::READABLE);
+        $writable = $file_permissions->verifyFile($file, FilePermissions::WRITABLE);
         $exists = TRUE;
       }
     }
 
     // If the default $default_file does not exist, or is not readable,
     // report an error.
-    if (!drupal_verify_install_file($default_file, FILE_EXIST | FILE_READABLE)) {
+    if (!$file_permissions->verifyFile($default_file, FilePermissions::EXIST | FilePermissions::READABLE)) {
       $requirements["default $file file exists"] = [
         'title' => $default_file_info['title_default'],
         'value' => $default_file_info['description_default'],
@@ -2163,7 +2169,7 @@ function install_check_requirements($install_state) {
     // Otherwise, if $file does not exist yet, we can try to copy
     // $default_file to create it.
     elseif (!$exists) {
-      $copied = drupal_verify_install_file($site_path, FILE_EXIST | FILE_WRITABLE, 'dir') && @copy($default_file, $file);
+      $copied = $file_permissions->verifyDirectory($site_path, FilePermissions::EXIST | FilePermissions::WRITABLE) && @copy($default_file, $file);
       if ($copied) {
         // If the new $file file has the same owner as $default_file this means
         // $default_file is owned by the webserver user. This is an inherent
@@ -2175,8 +2181,8 @@ function install_check_requirements($install_state) {
         // keep the file in place. Additionally, this situation also occurs when
         // the test runner is being run be different user than the webserver.
         if (fileowner($default_file) === fileowner($file) || DRUPAL_TEST_IN_CHILD_SITE) {
-          $readable = drupal_verify_install_file($file, FILE_READABLE);
-          $writable = drupal_verify_install_file($file, FILE_WRITABLE);
+          $readable = $file_permissions->verifyFile($file, FilePermissions::READABLE);
+          $writable = $file_permissions->verifyFile($file, FilePermissions::WRITABLE);
           $exists = TRUE;
         }
         // If $file and $default_file have different owners, this probably means
@@ -2200,8 +2206,8 @@ function install_check_requirements($install_state) {
           $exists = !$deleted;
           if ($exists) {
             $settings_file_ownership_error = TRUE;
-            $readable = drupal_verify_install_file($file, FILE_READABLE);
-            $writable = drupal_verify_install_file($file, FILE_WRITABLE);
+            $readable = $file_permissions->verifyFile($file, FilePermissions::READABLE);
+            $writable = $file_permissions->verifyFile($file, FilePermissions::WRITABLE);
           }
         }
       }
