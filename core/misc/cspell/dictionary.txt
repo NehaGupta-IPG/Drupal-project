@@ -173,6 +173,7 @@ español
 eurozone
 evenodd
 eventhandler
+executability
 expirable
 extlink
 extrasmall
@@ -591,6 +592,7 @@ webroot
 webservers
 widthx
 wordsafe
+writability
 writeln
 xbitmap
 xmlhttp
