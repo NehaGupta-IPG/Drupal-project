@@ -50,12 +50,12 @@ use Drupal\Core\Url;
  *   render array. See also #parents, #tree.
  * @property mixed $default_value
  *   Default value for the element. See also #value.
- * @property string $description
+ * @property scalar|\Stringable|\Drupal\Core\Render\RenderableInterface|array $description
  *   Help or description text for the element. In an ideal user interface,
  *   the #title should be enough to describe the element, so most elements
  *   should not have a description; if you do need one, make sure it is
- *   translated. If it is not already wrapped in a safe markup object, it will
- *   be filtered for XSS safety.
+ *   translated. It can be anything that Twig can print and will be filtered
+ *   for XSS as necessary.
  * @property bool $disabled
  *   If TRUE, the element is shown but does not accept user input.
  * @property array<callable> $element_validate

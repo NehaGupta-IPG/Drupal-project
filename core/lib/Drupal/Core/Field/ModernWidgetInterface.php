@@ -3,6 +3,7 @@
 namespace Drupal\Core\Field;
 
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Render\Element\ElementInterface;
 use Drupal\Core\Render\Element\Form;
 use Drupal\Core\Render\Element\Wrapper;
 
@@ -65,12 +66,13 @@ interface ModernWidgetInterface {
    * @param \Drupal\Core\Form\FormStateInterface $form_state
    *   The current state of the form.
    *
-   * @return void
-   *   No return.
+   * @return \Drupal\Core\Render\Element\ElementInterface
+   *   The wrapper object. Some widgets need to change the type of it so the
+   *   returned object might not be a Wrapper object.
    *
    * @see hook_field_widget_single_element_form_alter()
    * @see hook_field_widget_single_element_WIDGET_TYPE_form_alter()
    */
-  public function singleElementObject(FieldItemListInterface $items, $delta, Wrapper $wrapper, Form $form, FormStateInterface $form_state);
+  public function singleElementObject(FieldItemListInterface $items, $delta, Wrapper $wrapper, Form $form, FormStateInterface $form_state): ElementInterface;
 
 }

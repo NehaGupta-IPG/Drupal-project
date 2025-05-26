@@ -655,6 +655,14 @@ abstract class RenderElementBase extends PluginBase implements ElementInterface,
   }
 
   /**
+   * {@inheritdoc}
+   */
+  public function changeType(string $class): ElementInterface {
+    $this->storage['#type'] = $this->elementInfoManager()->getIdFromClass($class);
+    return $this->elementInfoManager()->fromRenderable($this->storage);
+  }
+
+  /**
    * Returns the element info manager.
    *
    * @return \Drupal\Core\Render\ElementInfoManagerInterface

@@ -7,6 +7,7 @@ use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Field\ModernWidgetInterface;
 use Drupal\Core\Field\WidgetBase;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Render\Element\ElementInterface;
 use Drupal\Core\Render\Element\Form;
 use Drupal\Core\Render\Element\Textfield;
 use Drupal\Core\Render\Element\Wrapper;
@@ -86,13 +87,14 @@ class StringTextfieldWidget extends WidgetBase implements ModernWidgetInterface 
   /**
    * {@inheritdoc}
    */
-  public function singleElementObject(FieldItemListInterface $items, $delta, Wrapper $wrapper, Form $form, FormStateInterface $form_state) {
+  public function singleElementObject(FieldItemListInterface $items, $delta, Wrapper $wrapper, Form $form, FormStateInterface $form_state): ElementInterface {
     $value = $wrapper->createChild('value', Textfield::class, copyProperties: TRUE);
     $value->default_value = $items[$delta]->value;
     $value->size = $this->getSetting('size');
     $value->placeholder = $this->getSetting('placeholder');
     $value->maxlength = $this->getFieldSetting('max_length');
     $value->attributes = ['class' => ['js-text-full', 'text-full']];
+    return $wrapper;
   }
 
 }

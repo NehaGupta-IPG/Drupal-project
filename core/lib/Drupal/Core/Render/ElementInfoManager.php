@@ -239,10 +239,18 @@ class ElementInfoManager extends DefaultPluginManager implements ElementInfoMana
    */
   public function fromClass(string $class, array $configuration = []): ElementInterface {
     $this->getDefinitions();
-    if (isset($this->reverseMapping[$class])) {
-      return $this->createInstance($this->reverseMapping[$class], $configuration);
+    if ($id = $this->getIdFromClass($class)) {
+      return $this->createInstance($id, $configuration);
     }
     throw new \LogicException("$class is not a valid element class.");
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getIdFromClass(string $class): ?string {
+    $this->getDefinitions();
+    return $this->reverseMapping[$class] ?? NULL;
   }
 
   /**

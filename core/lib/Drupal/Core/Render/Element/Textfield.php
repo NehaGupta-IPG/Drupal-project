@@ -23,6 +23,8 @@ use Drupal\Core\Render\Element;
  *   conjunction with the route name.
  * @property $pattern
  *   A string for the native HTML5 pattern attribute.
+ * @property $placeholder
+ *   A string to displayed in a textfield when it has no value.
  *
  * Usage example:
  *

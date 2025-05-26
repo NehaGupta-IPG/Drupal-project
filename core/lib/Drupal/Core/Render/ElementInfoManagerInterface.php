@@ -102,4 +102,20 @@ interface ElementInfoManagerInterface extends PluginManagerInterface {
    */
   public function fromClass(string $class, array $configuration = []): ElementInterface;
 
+  /**
+   * Get the plugin ID from the class.
+   *
+   * Whenever possible, use the class type inference. Calling this method
+   * should not be necessary.
+   *
+   * @param string $class
+   *   The class of an element object.
+   *
+   * @return ?string
+   *   The plugin ID or null if not found.
+   *
+   * @internal
+   */
+  public function getIdFromClass(string $class): ?string;
+
 }

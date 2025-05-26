@@ -474,8 +474,8 @@ abstract class WidgetBase extends PluginSettingsBase implements WidgetInterface,
     if ($this instanceof ModernWidgetInterface) {
       $formObject = $this->elementInfoManager->fromRenderable($form);
       $wrapper = $this->elementInfoManager->fromRenderable($element, 'wrapper');
-      $this->singleElementObject($items, $delta, $wrapper, $formObject, $form_state);
-      $element = $wrapper->toRenderable();
+      $element = $this->singleElementObject($items, $delta, $wrapper, $formObject, $form_state)
+        ->toRenderable();
     }
     else {
       $element = $this->formElement($items, $delta, $element, $form, $form_state);

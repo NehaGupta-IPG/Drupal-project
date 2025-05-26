@@ -148,4 +148,17 @@ interface ElementInterface extends PluginInspectionInterface, RenderCallbackInte
    */
   public function removeChild(int|string $name): ?ElementInterface;
 
+  /**
+   * Change the type of the element.
+   *
+   * @param class-string<T> $class
+   *   The class of the new render object.
+   *
+   * @return T
+   *   The new render object.
+   *
+   * @template T of \Drupal\Core\Render\Element\ElementInterface
+   */
+  public function changeType(string $class): ElementInterface;
+
 }
