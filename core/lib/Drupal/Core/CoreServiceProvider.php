@@ -27,6 +27,7 @@ use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\DependencyInjection\ServiceModifierInterface;
 use Drupal\Core\DependencyInjection\ServiceProviderInterface;
 use Drupal\Core\Extension\ModuleUninstallValidatorInterface;
+use Drupal\Core\Hook\HookCollectorRegisteredServicesPass;
 use Drupal\Core\Plugin\PluginManagerPass;
 use Drupal\Core\PreWarm\PreWarmableInterface;
 use Drupal\Core\Queue\QueueFactoryInterface;
@@ -62,9 +63,8 @@ class CoreServiceProvider implements ServiceProviderInterface, ServiceModifierIn
         ->addTag('stream_wrapper', ['scheme' => 'private']);
     }
 
-    // Initialize the parameter in case module service providers or modifiers
-    // instantiate the module handler.
-    $container->setParameter('hook_implementations_map', []);
+    $hook_collector_pass = new HookCollectorPass();
+    $container->addCompilerPass($hook_collector_pass);
 
     // Add the compiler pass that lets service providers modify existing
     // service definitions. This pass must come before all passes operating on
@@ -72,9 +72,9 @@ class CoreServiceProvider implements ServiceProviderInterface, ServiceModifierIn
     // post-alter services list.
     $container->addCompilerPass(new ModifyServiceDefinitionsPass());
 
-    // Run compiler pass that registers hooks after the service providers pass
-    // to pick up new or altered service definitions before hook discovery.
-    $container->addCompilerPass(new HookCollectorPass());
+    // Run compiler pass that collects hooks in registered services after the
+    // service providers pass to pick up new or altered service definitions.
+    $container->addCompilerPass(new HookCollectorRegisteredServicesPass($hook_collector_pass));
 
     $container->addCompilerPass(new DevelopmentSettingsPass());
 

@@ -19,6 +19,7 @@ use Drupal\Core\Hook\Attribute\ProceduralHookScanStop;
 use Drupal\Core\Hook\OrderOperation\OrderOperation;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Definition;
 
 /**
  * Collects and registers hook implementations.
@@ -105,7 +106,7 @@ class HookCollectorPass implements CompilerPassInterface {
    *
    * @var array<string, true>
    */
-  protected array $preprocessForSuggestions;
+  protected array $preprocessForSuggestions = [];
 
   /**
    * Include files, keyed by the $group part of "/$module.$group.inc".
@@ -122,7 +123,7 @@ class HookCollectorPass implements CompilerPassInterface {
    *   When used as a compiler pass, this parameter should be omitted.
    */
   public function __construct(
-    protected readonly array $modules = [],
+    protected array $modules = [],
   ) {}
 
   /**
@@ -135,9 +136,9 @@ class HookCollectorPass implements CompilerPassInterface {
       array_keys($module_list),
       static fn (string $module) => !empty($parameters["$module.skip_procedural_hook_scan"]),
     );
-    $collector = static::collectAllHookImplementations($module_list, $skip_procedural_modules, $container);
+    static::collectAllHookImplementations($module_list, $skip_procedural_modules, $this);
 
-    $collector->writeToContainer($container);
+    $this->writeToContainer($container);
   }
 
   /**
@@ -326,20 +327,54 @@ class HookCollectorPass implements CompilerPassInterface {
     }
 
     foreach ($tagsInfoByClass as $class => $tagsInfo) {
-      if ($container->hasDefinition($class)) {
-        $definition = $container->findDefinition($class);
-      }
-      else {
+      if (!($definition = static::getServiceDefinitionFromClass($class, $container))) {
         $definition = $container
           ->register($class, $class)
           ->setAutowired(TRUE);
       }
       foreach ($tagsInfo as $tag_info) {
-        $definition->addTag('kernel.event_listener', $tag_info);
+        // Check whether the service definition already has the event listener
+        // tag. If so, update the priority, since it could have been
+        // recalculated.
+        $has_matching_tag = FALSE;
+        $existing_tags = $definition->getTag('kernel.event_listener');
+        foreach ($existing_tags as $existing_tag) {
+          if ($existing_tag['event'] === $tag_info['event'] && $existing_tag['method'] === $tag_info['method']) {
+            $existing_tag['priority'] = $tag_info['priority'];
+            $has_matching_tag = TRUE;
+          }
+        }
+        if ($has_matching_tag) {
+          // Apparently there's no way to update a single instance of an
+          // existing named tag, so clear the tag and add them all back one by
+          // one.
+          $definition->clearTag('kernel.event_listener');
+          foreach ($existing_tags as $tag) {
+            $definition->addTag('kernel.event_listener', $tag);
+          }
+        }
+        else {
+          $definition->addTag('kernel.event_listener', $tag_info);
+        }
       }
     }
 
     $container->setParameter('hook_implementations_map', $map);
+  }
+
+  /**
+   * Gets the service definition for a class.
+   *
+   * @param class-string $class
+   *   The class to get the service definition for.
+   * @param \Symfony\Component\DependencyInjection\ContainerBuilder $container
+   *   The container builder.
+   *
+   * @return \Symfony\Component\DependencyInjection\Definition|null
+   *   The service definition matching the class name or NULL if none found.
+   */
+  protected static function getServiceDefinitionFromClass(string $class, ContainerBuilder $container): ?Definition {
+    return $container->hasDefinition($class) ? $container->findDefinition($class) : NULL;
   }
 
   /**
@@ -350,8 +385,9 @@ class HookCollectorPass implements CompilerPassInterface {
    *   info yml file path.
    * @param list<string> $skipProceduralModules
    *   Module names that are known to not have procedural hook implementations.
-   * @param \Symfony\Component\DependencyInjection\ContainerBuilder|null $container
-   *   The container builder.
+   * @param \Drupal\Core\Hook\HookCollectorPass|null $collector
+   *   (optional) If passed, this collector object is used and returned,
+   *   otherwise a new collector is created and returned.
    *
    * @return static
    *   A HookCollectorPass instance holding all hook implementations and
@@ -363,7 +399,7 @@ class HookCollectorPass implements CompilerPassInterface {
    * @todo Pass only $container and make protected when ModuleHandler::add() is
    *   removed in Drupal 12.0.0.
    */
-  public static function collectAllHookImplementations(array $module_list, array $skipProceduralModules = [], ?ContainerBuilder $container = NULL): static {
+  public static function collectAllHookImplementations(array $module_list, array $skipProceduralModules = [], ?HookCollectorPass $collector = NULL): static {
     $modules = array_keys($module_list);
     $modules_by_length = $modules;
     usort($modules_by_length, static fn ($a, $b) => strlen($b) - strlen($a));
@@ -372,14 +408,15 @@ class HookCollectorPass implements CompilerPassInterface {
       $modules_by_length,
     ));
     $module_preg = '/^(?<function>(?<module>' . $known_modules_pattern . ')_(?!update_\d)(?<hook>[a-zA-Z0-9_\x80-\xff]+$))/';
-    $collector = new static($modules);
+    if ($collector) {
+      $collector->modules = $modules;
+    }
+    else {
+      $collector = new static($modules);
+    }
     foreach ($module_list as $module => $info) {
       $skip_procedural = in_array($module, $skipProceduralModules);
       $collector->collectModuleHookImplementations(dirname($info['pathname']), $module, $module_preg, $skip_procedural);
-    }
-
-    if ($container) {
-      $collector->collectServiceHookImplementations($container);
     }
 
     return $collector;
@@ -446,47 +483,6 @@ class HookCollectorPass implements CompilerPassInterface {
   }
 
   /**
-   * Collect Attribute hook implementations from declared services.
-   *
-   * @param \Symfony\Component\DependencyInjection\ContainerBuilder $container
-   *   The container builder.
-   */
-  protected function collectServiceHookImplementations(ContainerBuilder $container): void {
-    $containerNamespaces = $container->getParameter('container.namespaces');
-    $cache = FileCacheFactory::get('hook_implementations');
-    foreach ($container->getDefinitions() as $definition) {
-      if ($definition->isAbstract() || $definition->isSynthetic() || !($class = $definition->getClass())) {
-        continue;
-      }
-
-      $parts = explode('\\', $class);
-      $filename = array_pop($parts) . '.php';
-      $namespace = implode('\\', $parts);
-      $root = array_shift($parts);
-      if ($root !== 'Drupal') {
-        continue;
-      }
-
-      $provider = array_shift($parts) ?? '';
-      // Ignore Component and Core services. Also ignore any services in a
-      // module's "Hook" namespace, because they will be picked up by
-      // ::collectModuleHookImplementations().
-      if (in_array($provider, ['Component', 'Core']) ||
-          (reset($parts) === 'Hook')) {
-        continue;
-      }
-
-      $subPath = implode('/', $parts);
-      $path = isset($containerNamespaces["Drupal\\$provider"]) ? $containerNamespaces["Drupal\\$provider"] . '/' . $subPath . '/' : '';
-      // Allow an empty path to be passed if it can not be retrieved from the
-      // container namespaces. This allows test classes to register themselves
-      // as services implementing hooks.
-      $this->collectHookImplementationsFromClassFile($path ? $path . $filename : '', $namespace, $provider, $cache, $class);
-    }
-
-  }
-
-  /**
    * Collect Attribute hook implementations from a class file.
    *
    * @param string $filename
@@ -501,10 +497,13 @@ class HookCollectorPass implements CompilerPassInterface {
    *   (optional) The class name. If passed, and the file name is empty, the
    *   cache is bypassed and the class is parsed for attributes directly.
    *
+   * @return bool
+   *   Whether hook implementations were discovered in the class.
+   *
    * @throws \InvalidArgumentException
    *   When both the file and class name are empty.
    */
-  protected function collectHookImplementationsFromClassFile(string $filename, string $namespace, string $module, FileCacheInterface $cache, string $class = ''): void {
+  protected function collectHookImplementationsFromClassFile(string $filename, string $namespace, string $module, FileCacheInterface $cache, string $class = ''): bool {
     if (empty($filename) && empty($class)) {
       throw new \InvalidArgumentException('A non-empty value must be passed in at least one of $filename or $class.');
     }
@@ -548,6 +547,8 @@ class HookCollectorPass implements CompilerPassInterface {
         }
       }
     }
+
+    return !empty($attributes);
   }
 
   /**
