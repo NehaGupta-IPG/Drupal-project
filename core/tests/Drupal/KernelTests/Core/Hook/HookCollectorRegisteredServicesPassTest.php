@@ -6,6 +6,7 @@ namespace Drupal\KernelTests\Core\Hook;
 
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\Hook\Attribute\Hook;
+use Drupal\hook_collector_altered_services\AlteredHookAttributeInvokeHook;
 use Drupal\hook_collector_altered_services\AlteredServiceWithHook;
 use Drupal\hook_collector_altered_services\DecoratedServiceWithHook;
 use Drupal\hook_collector_hook_attribute\AnotherServiceWithHook;
@@ -18,7 +19,7 @@ use Drupal\KernelTests\KernelTestBase;
  *
  * @group Hook
  */
-class HooksInServiceDeclarationsTest extends KernelTestBase {
+class HookCollectorRegisteredServicesPassTest extends KernelTestBase {
 
   /**
    * {@inheritdoc}
@@ -73,6 +74,10 @@ class HooksInServiceDeclarationsTest extends KernelTestBase {
     \Drupal::moduleHandler()->invokeAll('test_hook_6', [&$invocations]);
     $this->assertEquals(1, $invocations[AnotherServiceWithHook::class . '::testHook6']);
 
+    $this->assertArrayNotHasKey('hook_invoke_method', $GLOBALS);
+    \Drupal::moduleHandler()->invokeAll('cache_flush');
+    $this->assertEquals('hook_invoke_method', $GLOBALS['hook_invoke_method']);
+
     // Install module that decorates the ServiceWithHook service and has a
     // service provider that alters the AnotherServiceWithHook service.
     \Drupal::service('module_installer')->install(['hook_collector_altered_services']);
@@ -82,6 +87,7 @@ class HooksInServiceDeclarationsTest extends KernelTestBase {
     // DecoratedServiceWithHook has its own test_hook_2 implementation, and that
     // should run.
     $invocations = [];
+    unset($GLOBALS['hook_invoke_method']);
     \Drupal::moduleHandler()->invokeAll('test_hook_2', [&$invocations]);
     $this->assertArrayNotHasKey(ServiceWithHook::class . '::testHook2', $invocations);
     $this->assertEquals(1, $invocations[DecoratedServiceWithHook::class . '::testHook2']);
@@ -120,6 +126,18 @@ class HooksInServiceDeclarationsTest extends KernelTestBase {
     \Drupal::moduleHandler()->invokeAll('test_hook_6', [&$invocations]);
     $this->assertArrayNotHasKey(AnotherServiceWithHook::class . '::testHook6', $invocations);
     $this->assertArrayNotHasKey(AlteredServiceWithHook::class . '::testHook6', $invocations);
+
+    // HookAttributeInvokeHook service class is replaced with
+    // AlteredHookAttributeInvokeHook by a service provider. There is no
+    // 'cache_flush' Hook attribute on AlteredHookAttributeInvokeHook, so the
+    // method should not be invoked in HookAttributeInvokeHook or
+    // AlteredHookAttributeInvokeHook.
+    \Drupal::moduleHandler()->invokeAll('cache_flush');
+    $this->assertArrayNotHasKey('hook_invoke_method', $GLOBALS);
+
+    $invocations = [];
+    \Drupal::moduleHandler()->invokeAll('test_hook_7', [&$invocations]);
+    $this->assertEquals(1, $invocations[AlteredHookAttributeInvokeHook::class . '::testHook7']);
   }
 
   /**
