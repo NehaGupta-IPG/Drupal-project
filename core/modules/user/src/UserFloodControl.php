@@ -25,8 +25,11 @@ class UserFloodControl implements UserFloodControlInterface {
    * @param \Symfony\Component\HttpFoundation\RequestStack $requestStack
    *   The request stack used to retrieve the current request.
    */
-  public function __construct(protected FloodInterface $flood, protected EventDispatcherInterface $eventDispatcher, protected RequestStack $requestStack) {
-  }
+  public function __construct(
+    protected FloodInterface $flood,
+    protected EventDispatcherInterface $eventDispatcher,
+    protected RequestStack $requestStack,
+  ) {}
 
   /**
    * {@inheritdoc}

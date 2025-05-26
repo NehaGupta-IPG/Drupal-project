@@ -15,8 +15,9 @@ class AdminContext {
    * @param \Drupal\Core\Routing\RouteMatchInterface $routeMatch
    *   The route match.
    */
-  public function __construct(protected RouteMatchInterface $routeMatch) {
-  }
+  public function __construct(
+    protected RouteMatchInterface $routeMatch,
+  ) {}
 
   /**
    * Determines whether the active route is an admin one.

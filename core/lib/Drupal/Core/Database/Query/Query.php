@@ -56,7 +56,10 @@ abstract class Query implements PlaceholderInterface {
    * @param array $queryOptions
    *   Array of query options.
    */
-  public function __construct(protected Connection $connection, protected $queryOptions) {
+  public function __construct(
+    protected Connection $connection,
+    protected $queryOptions,
+  ) {
     $this->uniqueIdentifier = uniqid('', TRUE);
     $this->connectionKey = $this->connection->getKey();
     $this->connectionTarget = $this->connection->getTarget();

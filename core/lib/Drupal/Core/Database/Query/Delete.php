@@ -23,7 +23,11 @@ class Delete extends Query implements ConditionInterface {
    * @param array $options
    *   Array of database options.
    */
-  public function __construct(Connection $connection, protected $table, array $options = []) {
+  public function __construct(
+    Connection $connection,
+    protected $table,
+    array $options = [],
+  ) {
     parent::__construct($connection, $options);
 
     $this->condition = $this->connection->condition('AND');

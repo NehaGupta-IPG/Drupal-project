@@ -55,7 +55,14 @@ abstract class ViewsBlockBase extends BlockBase implements ContainerFactoryPlugi
    * @param \Drupal\Core\Session\AccountInterface $user
    *   The current user.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, ViewExecutableFactory $executable_factory, EntityStorageInterface $storage, protected AccountInterface $user) {
+  public function __construct(
+    array $configuration,
+    $plugin_id,
+    $plugin_definition,
+    ViewExecutableFactory $executable_factory,
+    EntityStorageInterface $storage,
+    protected AccountInterface $user,
+  ) {
     $this->pluginId = $plugin_id;
     $delta = $this->getDerivativeId();
     [$name, $this->displayID] = explode('-', $delta, 2);

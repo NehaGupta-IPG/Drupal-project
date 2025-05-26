@@ -19,8 +19,10 @@ class LayoutBuilderSampleEntityGenerator implements SampleEntityGeneratorInterfa
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
    *   The entity type manager.
    */
-  public function __construct(protected SharedTempStoreFactory $tempStoreFactory, protected EntityTypeManagerInterface $entityTypeManager) {
-  }
+  public function __construct(
+    protected SharedTempStoreFactory $tempStoreFactory,
+    protected EntityTypeManagerInterface $entityTypeManager,
+  ) {}
 
   /**
    * {@inheritdoc}

@@ -16,8 +16,9 @@ class PrivateKey {
    * @param \Drupal\Core\State\StateInterface $state
    *   The state service.
    */
-  public function __construct(protected StateInterface $state) {
-  }
+  public function __construct(
+    protected StateInterface $state,
+  ) {}
 
   /**
    * Gets the private key.

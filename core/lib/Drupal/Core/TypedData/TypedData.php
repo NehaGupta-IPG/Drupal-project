@@ -40,8 +40,11 @@ abstract class TypedData implements TypedDataInterface, PluginInspectionInterfac
    *
    * @see \Drupal\Core\TypedData\TypedDataManager::create()
    */
-  public function __construct(protected DataDefinitionInterface $definition, protected $name = NULL, protected ?TypedDataInterface $parent = NULL) {
-  }
+  public function __construct(
+    protected DataDefinitionInterface $definition,
+    protected $name = NULL,
+    protected ?TypedDataInterface $parent = NULL,
+  ) {}
 
   /**
    * {@inheritdoc}

@@ -20,8 +20,9 @@ class TypedDataMetadata implements MetadataInterface {
    * @param \Drupal\Core\TypedData\TypedDataInterface $typedData
    *   The typed data object the metadata is about.
    */
-  public function __construct(protected TypedDataInterface $typedData) {
-  }
+  public function __construct(
+    protected TypedDataInterface $typedData,
+  ) {}
 
   /**
    * {@inheritdoc}

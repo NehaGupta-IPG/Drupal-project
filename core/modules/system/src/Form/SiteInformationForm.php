@@ -33,7 +33,13 @@ class SiteInformationForm extends ConfigFormBase {
    * @param \Drupal\Core\Routing\RequestContext $requestContext
    *   The request context.
    */
-  public function __construct(ConfigFactoryInterface $config_factory, TypedConfigManagerInterface $typedConfigManager, protected AliasManagerInterface $aliasManager, protected PathValidatorInterface $pathValidator, protected RequestContext $requestContext) {
+  public function __construct(
+    ConfigFactoryInterface $config_factory,
+    TypedConfigManagerInterface $typedConfigManager,
+    protected AliasManagerInterface $aliasManager,
+    protected PathValidatorInterface $pathValidator,
+    protected RequestContext $requestContext,
+  ) {
     parent::__construct($config_factory, $typedConfigManager);
   }
 

@@ -37,8 +37,14 @@ final class SecurityAdvisory {
    *   service announcements this list does not include versions that will be
    *   marked as insecure when the new security release is published.
    */
-  private function __construct(protected string $title, protected string $project, protected string $type, protected bool $isPsa, protected string $url, protected array $insecureVersions) {
-  }
+  private function __construct(
+    protected string $title,
+    protected string $project,
+    protected string $type,
+    protected bool $isPsa,
+    protected string $url,
+    protected array $insecureVersions,
+  ) {}
 
   /**
    * Creates a SecurityAdvisories instance from an array.

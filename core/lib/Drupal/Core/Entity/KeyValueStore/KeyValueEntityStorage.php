@@ -43,7 +43,13 @@ class KeyValueEntityStorage extends EntityStorageBase {
    * @param \Drupal\Core\Cache\MemoryCache\MemoryCacheInterface $memory_cache
    *   The memory cache.
    */
-  public function __construct(EntityTypeInterface $entity_type, protected KeyValueStoreInterface $keyValueStore, protected UuidInterface $uuidService, protected LanguageManagerInterface $languageManager, MemoryCacheInterface $memory_cache) {
+  public function __construct(
+    EntityTypeInterface $entity_type,
+    protected KeyValueStoreInterface $keyValueStore,
+    protected UuidInterface $uuidService,
+    protected LanguageManagerInterface $languageManager,
+    MemoryCacheInterface $memory_cache,
+  ) {
     parent::__construct($entity_type, $memory_cache);
 
     // Check if the entity type supports UUIDs.

@@ -19,8 +19,9 @@ class CsrfTokenController implements ContainerInjectionInterface {
    * @param \Drupal\Core\Access\CsrfTokenGenerator $tokenGenerator
    *   The CSRF token generator.
    */
-  public function __construct(protected CsrfTokenGenerator $tokenGenerator) {
-  }
+  public function __construct(
+    protected CsrfTokenGenerator $tokenGenerator,
+  ) {}
 
   /**
    * {@inheritdoc}

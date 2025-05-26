@@ -277,7 +277,16 @@ class Migration extends PluginBase implements MigrationInterface, RequirementsIn
    * @param \Drupal\migrate\Plugin\MigratePluginManagerInterface $idMapPluginManager
    *   The ID map migration plugin manager.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, protected MigrationPluginManagerInterface $migrationPluginManager, protected MigratePluginManagerInterface $sourcePluginManager, protected MigratePluginManagerInterface $processPluginManager, protected MigrateDestinationPluginManager $destinationPluginManager, protected MigratePluginManagerInterface $idMapPluginManager) {
+  public function __construct(
+    array $configuration,
+    $plugin_id,
+    $plugin_definition,
+    protected MigrationPluginManagerInterface $migrationPluginManager,
+    protected MigratePluginManagerInterface $sourcePluginManager,
+    protected MigratePluginManagerInterface $processPluginManager,
+    protected MigrateDestinationPluginManager $destinationPluginManager,
+    protected MigratePluginManagerInterface $idMapPluginManager,
+  ) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
 
     foreach (NestedArray::mergeDeepArray([$plugin_definition, $configuration], TRUE) as $key => $value) {

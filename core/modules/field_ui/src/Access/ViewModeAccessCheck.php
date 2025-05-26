@@ -23,8 +23,9 @@ class ViewModeAccessCheck implements AccessInterface {
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
    *   The entity type manager.
    */
-  public function __construct(protected EntityTypeManagerInterface $entityTypeManager) {
-  }
+  public function __construct(
+    protected EntityTypeManagerInterface $entityTypeManager,
+  ) {}
 
   /**
    * Checks access to the view mode.

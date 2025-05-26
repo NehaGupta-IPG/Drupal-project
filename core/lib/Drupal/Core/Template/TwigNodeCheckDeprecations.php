@@ -18,7 +18,9 @@ class TwigNodeCheckDeprecations extends Node {
   /**
    * {@inheritdoc}
    */
-  public function __construct(protected array $usedNames) {
+  public function __construct(
+    protected array $usedNames,
+  ) {
     parent::__construct();
   }
 

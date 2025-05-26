@@ -38,7 +38,12 @@ class TestFormApiFormBlock extends BlockBase implements ContainerFactoryPluginIn
    * @param \Drupal\Core\Form\FormBuilderInterface $formBuilder
    *   The form builder service.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, protected FormBuilderInterface $formBuilder) {
+  public function __construct(
+    array $configuration,
+    $plugin_id,
+    $plugin_definition,
+    protected FormBuilderInterface $formBuilder,
+  ) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
   }
 

@@ -28,7 +28,12 @@ class TimeInterval extends FieldPluginBase {
    * @param \Drupal\Core\Datetime\DateFormatterInterface $dateFormatter
    *   The date formatter service.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, protected DateFormatterInterface $dateFormatter) {
+  public function __construct(
+    array $configuration,
+    $plugin_id,
+    $plugin_definition,
+    protected DateFormatterInterface $dateFormatter,
+  ) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
   }
 

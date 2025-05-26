@@ -29,8 +29,12 @@ class DefaultExceptionHtmlSubscriber extends HttpExceptionSubscriberBase {
    * @param \Symfony\Component\Routing\Matcher\UrlMatcherInterface $accessUnawareRouter
    *   A router implementation which does not check access.
    */
-  public function __construct(protected HttpKernelInterface $httpKernel, protected LoggerInterface $logger, protected RedirectDestinationInterface $redirectDestination, protected UrlMatcherInterface $accessUnawareRouter) {
-  }
+  public function __construct(
+    protected HttpKernelInterface $httpKernel,
+    protected LoggerInterface $logger,
+    protected RedirectDestinationInterface $redirectDestination,
+    protected UrlMatcherInterface $accessUnawareRouter,
+  ) {}
 
   /**
    * {@inheritdoc}

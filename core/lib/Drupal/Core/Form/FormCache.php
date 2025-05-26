@@ -46,8 +46,16 @@ class FormCache implements FormCacheInterface {
    * @param \Drupal\Core\PageCache\RequestPolicyInterface $requestPolicy
    *   A policy rule determining the cacheability of a request.
    */
-  public function __construct(protected $root, protected KeyValueExpirableFactoryInterface $keyValueExpirableFactory, protected ModuleHandlerInterface $moduleHandler, protected AccountInterface $currentUser, protected CsrfTokenGenerator $csrfToken, protected LoggerInterface $logger, protected RequestStack $requestStack, protected RequestPolicyInterface $requestPolicy) {
-  }
+  public function __construct(
+    protected $root,
+    protected KeyValueExpirableFactoryInterface $keyValueExpirableFactory,
+    protected ModuleHandlerInterface $moduleHandler,
+    protected AccountInterface $currentUser,
+    protected CsrfTokenGenerator $csrfToken,
+    protected LoggerInterface $logger,
+    protected RequestStack $requestStack,
+    protected RequestPolicyInterface $requestPolicy,
+  ) {}
 
   /**
    * {@inheritdoc}

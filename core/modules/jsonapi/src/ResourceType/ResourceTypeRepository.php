@@ -73,8 +73,13 @@ class ResourceTypeRepository implements ResourceTypeRepositoryInterface {
    * @param \Symfony\Contracts\EventDispatcher\EventDispatcherInterface $eventDispatcher
    *   The event dispatcher.
    */
-  public function __construct(protected EntityTypeManagerInterface $entityTypeManager, protected EntityTypeBundleInfoInterface $entityTypeBundleInfo, protected EntityFieldManagerInterface $entityFieldManager, protected CacheBackendInterface $cache, protected EventDispatcherInterface $eventDispatcher) {
-  }
+  public function __construct(
+    protected EntityTypeManagerInterface $entityTypeManager,
+    protected EntityTypeBundleInfoInterface $entityTypeBundleInfo,
+    protected EntityFieldManagerInterface $entityFieldManager,
+    protected CacheBackendInterface $cache,
+    protected EventDispatcherInterface $eventDispatcher,
+  ) {}
 
   /**
    * {@inheritdoc}

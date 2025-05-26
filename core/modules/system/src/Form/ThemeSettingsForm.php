@@ -51,7 +51,15 @@ class ThemeSettingsForm extends ConfigFormBase {
    * @param \Drupal\Core\File\FileSystemInterface $fileSystem
    *   The file system.
    */
-  public function __construct(ConfigFactoryInterface $config_factory, TypedConfigManagerInterface $typedConfigManager, protected ModuleHandlerInterface $moduleHandler, protected ThemeHandlerInterface $themeHandler, protected $mimeTypeGuesser, protected ThemeManagerInterface $themeManager, protected FileSystemInterface $fileSystem) {
+  public function __construct(
+    ConfigFactoryInterface $config_factory,
+    TypedConfigManagerInterface $typedConfigManager,
+    protected ModuleHandlerInterface $moduleHandler,
+    protected ThemeHandlerInterface $themeHandler,
+    protected $mimeTypeGuesser,
+    protected ThemeManagerInterface $themeManager,
+    protected FileSystemInterface $fileSystem,
+  ) {
     parent::__construct($config_factory, $typedConfigManager);
   }
 

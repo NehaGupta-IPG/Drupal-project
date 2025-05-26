@@ -46,7 +46,14 @@ class NodeNewComments extends NumericField {
    * @param \Drupal\Core\Entity\EntityFieldManagerInterface $entityFieldManager
    *   The entity field manager service.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, protected Connection $database, protected EntityTypeManagerInterface $entityTypeManager, protected EntityFieldManagerInterface $entityFieldManager) {
+  public function __construct(
+    array $configuration,
+    $plugin_id,
+    $plugin_definition,
+    protected Connection $database,
+    protected EntityTypeManagerInterface $entityTypeManager,
+    protected EntityFieldManagerInterface $entityFieldManager,
+  ) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
   }
 

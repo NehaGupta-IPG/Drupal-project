@@ -37,7 +37,13 @@ class Raw extends ArgumentDefaultPluginBase implements CacheableDependencyInterf
    * @param \Drupal\Core\Path\CurrentPathStack $currentPath
    *   The current path.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, protected AliasManagerInterface $aliasManager, protected CurrentPathStack $currentPath) {
+  public function __construct(
+    array $configuration,
+    $plugin_id,
+    $plugin_definition,
+    protected AliasManagerInterface $aliasManager,
+    protected CurrentPathStack $currentPath,
+  ) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
   }
 

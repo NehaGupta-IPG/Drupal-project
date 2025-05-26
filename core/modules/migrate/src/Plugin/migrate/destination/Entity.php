@@ -98,7 +98,14 @@ abstract class Entity extends DestinationBase implements ContainerFactoryPluginI
    * @param array $bundles
    *   The list of bundles this entity type has.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, MigrationInterface $migration, EntityStorageInterface $storage, protected array $bundles) {
+  public function __construct(
+    array $configuration,
+    $plugin_id,
+    $plugin_definition,
+    MigrationInterface $migration,
+    EntityStorageInterface $storage,
+    protected array $bundles,
+  ) {
     $plugin_definition += [
       'label' => $storage->getEntityType()->getPluralLabel(),
     ];

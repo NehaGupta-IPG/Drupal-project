@@ -18,8 +18,9 @@ class IsFrontPathCacheContext implements CacheContextInterface {
    * @param \Drupal\Core\Path\PathMatcherInterface $pathMatcher
    *   The path matcher.
    */
-  public function __construct(protected PathMatcherInterface $pathMatcher) {
-  }
+  public function __construct(
+    protected PathMatcherInterface $pathMatcher,
+  ) {}
 
   /**
    * {@inheritdoc}

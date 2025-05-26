@@ -45,8 +45,10 @@ class KeyValueFactory implements KeyValueFactoryInterface {
    * @param array $options
    *   (optional) Collection-specific storage override options.
    */
-  public function __construct(protected ContainerInterface $container, protected array $options = []) {
-  }
+  public function __construct(
+    protected ContainerInterface $container,
+    protected array $options = [],
+  ) {}
 
   /**
    * {@inheritdoc}

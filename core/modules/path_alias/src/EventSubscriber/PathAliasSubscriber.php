@@ -22,8 +22,10 @@ class PathAliasSubscriber implements EventSubscriberInterface {
    * @param \Drupal\Core\Path\CurrentPathStack $currentPath
    *   The current path.
    */
-  public function __construct(protected AliasManagerInterface $aliasManager, protected CurrentPathStack $currentPath) {
-  }
+  public function __construct(
+    protected AliasManagerInterface $aliasManager,
+    protected CurrentPathStack $currentPath,
+  ) {}
 
   /**
    * Sets the cache key on the alias manager cache decorator.

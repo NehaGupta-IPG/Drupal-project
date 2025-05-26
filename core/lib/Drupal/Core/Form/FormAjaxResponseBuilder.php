@@ -25,8 +25,10 @@ class FormAjaxResponseBuilder implements FormAjaxResponseBuilderInterface {
    * @param \Drupal\Core\Routing\RouteMatchInterface $routeMatch
    *   The current route match.
    */
-  public function __construct(protected MainContentRendererInterface $ajaxRenderer, protected RouteMatchInterface $routeMatch) {
-  }
+  public function __construct(
+    protected MainContentRendererInterface $ajaxRenderer,
+    protected RouteMatchInterface $routeMatch,
+  ) {}
 
   /**
    * {@inheritdoc}

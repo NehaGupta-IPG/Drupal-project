@@ -31,7 +31,11 @@ class Pager {
    * @param int $currentPage
    *   The current page.
    */
-  public function __construct(protected $totalItems, protected $limit, $currentPage = 0) {
+  public function __construct(
+    protected $totalItems,
+    protected $limit,
+    $currentPage = 0,
+  ) {
     $this->setTotalPages($this->totalItems, $this->limit);
     $this->setCurrentPage($currentPage);
   }

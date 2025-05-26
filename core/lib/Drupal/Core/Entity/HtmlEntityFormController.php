@@ -22,7 +22,11 @@ class HtmlEntityFormController extends FormController {
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
    *   The entity type manager service.
    */
-  public function __construct(ArgumentResolverInterface $argument_resolver, FormBuilderInterface $form_builder, protected EntityTypeManagerInterface $entityTypeManager) {
+  public function __construct(
+    ArgumentResolverInterface $argument_resolver,
+    FormBuilderInterface $form_builder,
+    protected EntityTypeManagerInterface $entityTypeManager,
+  ) {
     parent::__construct($argument_resolver, $form_builder);
   }
 

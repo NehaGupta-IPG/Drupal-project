@@ -59,8 +59,10 @@ class OffsetPage {
    * @param int $size
    *   The query size limit.
    */
-  public function __construct(protected $offset, protected $size) {
-  }
+  public function __construct(
+    protected $offset,
+    protected $size,
+  ) {}
 
   /**
    * Returns the current offset.

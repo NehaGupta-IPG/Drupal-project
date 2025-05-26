@@ -22,8 +22,10 @@ class DefaultExceptionSubscriber extends HttpExceptionSubscriberBase {
    * @param array $serializerFormats
    *   The available serialization formats.
    */
-  public function __construct(protected SerializerInterface $serializer, protected array $serializerFormats) {
-  }
+  public function __construct(
+    protected SerializerInterface $serializer,
+    protected array $serializerFormats,
+  ) {}
 
   /**
    * {@inheritdoc}

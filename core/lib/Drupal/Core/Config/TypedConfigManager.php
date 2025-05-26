@@ -42,7 +42,13 @@ class TypedConfigManager extends TypedDataManager implements TypedConfigManagerI
    * @param \Drupal\Core\DependencyInjection\ClassResolverInterface $class_resolver
    *   (optional) The class resolver.
    */
-  public function __construct(protected StorageInterface $configStorage, protected StorageInterface $schemaStorage, CacheBackendInterface $cache, ModuleHandlerInterface $module_handler, ?ClassResolverInterface $class_resolver = NULL) {
+  public function __construct(
+    protected StorageInterface $configStorage,
+    protected StorageInterface $schemaStorage,
+    CacheBackendInterface $cache,
+    ModuleHandlerInterface $module_handler,
+    ?ClassResolverInterface $class_resolver = NULL,
+  ) {
     $this->setCacheBackend($cache, 'typed_config_definitions');
     $this->alterInfo('config_schema_info');
     $this->moduleHandler = $module_handler;

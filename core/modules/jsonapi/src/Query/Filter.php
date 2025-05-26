@@ -56,8 +56,9 @@ class Filter {
    * @param \Drupal\jsonapi\Query\EntityConditionGroup $root
    *   An entity condition group which can be applied to an entity query.
    */
-  public function __construct(protected EntityConditionGroup $root) {
-  }
+  public function __construct(
+    protected EntityConditionGroup $root,
+  ) {}
 
   /**
    * Gets the root condition group.

@@ -54,8 +54,16 @@ class HtmlRenderer implements MainContentRendererInterface {
    * @param \Drupal\Core\Theme\ThemeManagerInterface $themeManager
    *   The theme manager.
    */
-  public function __construct(protected TitleResolverInterface $titleResolver, protected PluginManagerInterface $displayVariantManager, protected EventDispatcherInterface $eventDispatcher, protected ModuleHandlerInterface $moduleHandler, protected RendererInterface $renderer, protected RenderCacheInterface $renderCache, protected array $rendererConfig, protected ThemeManagerInterface $themeManager) {
-  }
+  public function __construct(
+    protected TitleResolverInterface $titleResolver,
+    protected PluginManagerInterface $displayVariantManager,
+    protected EventDispatcherInterface $eventDispatcher,
+    protected ModuleHandlerInterface $moduleHandler,
+    protected RendererInterface $renderer,
+    protected RenderCacheInterface $renderCache,
+    protected array $rendererConfig,
+    protected ThemeManagerInterface $themeManager,
+  ) {}
 
   /**
    * {@inheritdoc}

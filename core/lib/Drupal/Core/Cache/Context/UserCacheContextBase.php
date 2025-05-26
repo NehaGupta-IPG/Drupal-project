@@ -19,7 +19,8 @@ abstract class UserCacheContextBase {
    * @param \Drupal\Core\Session\AccountInterface $user
    *   The current user.
    */
-  public function __construct(protected AccountInterface $user) {
-  }
+  public function __construct(
+    protected AccountInterface $user,
+  ) {}
 
 }

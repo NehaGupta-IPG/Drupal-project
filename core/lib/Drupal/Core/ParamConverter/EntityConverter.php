@@ -90,8 +90,10 @@ class EntityConverter implements ParamConverterInterface {
    *
    * @see https://www.drupal.org/node/2938929
    */
-  public function __construct(protected EntityTypeManagerInterface $entityTypeManager, protected EntityRepositoryInterface $entityRepository) {
-  }
+  public function __construct(
+    protected EntityTypeManagerInterface $entityTypeManager,
+    protected EntityRepositoryInterface $entityRepository,
+  ) {}
 
   /**
    * {@inheritdoc}

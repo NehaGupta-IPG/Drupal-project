@@ -35,7 +35,12 @@ class LayoutPluginManager extends DefaultPluginManager implements LayoutPluginMa
    * @param \Drupal\Core\Extension\ThemeHandlerInterface $themeHandler
    *   The theme handler to invoke the alter hook with.
    */
-  public function __construct(\Traversable $namespaces, CacheBackendInterface $cache_backend, ModuleHandlerInterface $module_handler, protected ThemeHandlerInterface $themeHandler) {
+  public function __construct(
+    \Traversable $namespaces,
+    CacheBackendInterface $cache_backend,
+    ModuleHandlerInterface $module_handler,
+    protected ThemeHandlerInterface $themeHandler,
+  ) {
     parent::__construct('Plugin/Layout', $namespaces, $module_handler, LayoutInterface::class, Layout::class, 'Drupal\Core\Layout\Annotation\Layout');
 
     $type = $this->getType();

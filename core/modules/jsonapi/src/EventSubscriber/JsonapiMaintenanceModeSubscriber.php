@@ -30,8 +30,10 @@ class JsonapiMaintenanceModeSubscriber implements EventSubscriberInterface {
    * @param \Drupal\Core\Config\ConfigFactoryInterface $config
    *   The config factory.
    */
-  public function __construct(protected MaintenanceModeInterface $maintenanceMode, protected ConfigFactoryInterface $config) {
-  }
+  public function __construct(
+    protected MaintenanceModeInterface $maintenanceMode,
+    protected ConfigFactoryInterface $config,
+  ) {}
 
   /**
    * {@inheritdoc}

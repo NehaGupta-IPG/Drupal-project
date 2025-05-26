@@ -54,7 +54,11 @@ abstract class AddFormBase extends FormBase implements BaseFormIdInterface, Trus
    * @param \Drupal\media_library\OpenerResolverInterface $openerResolver
    *   The opener resolver.
    */
-  public function __construct(protected EntityTypeManagerInterface $entityTypeManager, protected MediaLibraryUiBuilder $libraryUiBuilder, protected OpenerResolverInterface $openerResolver) {
+  public function __construct(
+    protected EntityTypeManagerInterface $entityTypeManager,
+    protected MediaLibraryUiBuilder $libraryUiBuilder,
+    protected OpenerResolverInterface $openerResolver,
+  ) {
     $this->viewBuilder = $this->entityTypeManager->getViewBuilder('media');
   }
 

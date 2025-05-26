@@ -40,8 +40,12 @@ final class SmartDefaultSettings {
    * @param \Drupal\Core\Session\AccountInterface $currentUser
    *   The current user.
    */
-  public function __construct(protected CKEditor5PluginManagerInterface $pluginManager, protected LoggerInterface $logger, protected ModuleHandlerInterface $moduleHandler, protected AccountInterface $currentUser) {
-  }
+  public function __construct(
+    protected CKEditor5PluginManagerInterface $pluginManager,
+    protected LoggerInterface $logger,
+    protected ModuleHandlerInterface $moduleHandler,
+    protected AccountInterface $currentUser,
+  ) {}
 
   /**
    * Computes the closest equivalent settings for switching to CKEditor 5.

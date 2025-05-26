@@ -19,8 +19,9 @@ class ThemeRegistryLoader extends FilesystemLoader {
    * @param \Drupal\Core\Theme\Registry $themeRegistry
    *   The theme registry.
    */
-  public function __construct(protected Registry $themeRegistry) {
-  }
+  public function __construct(
+    protected Registry $themeRegistry,
+  ) {}
 
   /**
    * Finds the path to the requested template.

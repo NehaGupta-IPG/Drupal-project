@@ -68,7 +68,16 @@ class UpdateManager implements UpdateManagerInterface {
    * @param \Drupal\Core\Extension\ThemeExtensionList $themeExtensionList
    *   The theme extension list.
    */
-  public function __construct(ConfigFactoryInterface $config_factory, protected ModuleHandlerInterface $moduleHandler, protected UpdateProcessorInterface $updateProcessor, TranslationInterface $translation, KeyValueFactoryInterface $key_value_expirable_factory, protected ThemeHandlerInterface $themeHandler, protected ModuleExtensionList $moduleExtensionList, protected ThemeExtensionList $themeExtensionList) {
+  public function __construct(
+    ConfigFactoryInterface $config_factory,
+    protected ModuleHandlerInterface $moduleHandler,
+    protected UpdateProcessorInterface $updateProcessor,
+    TranslationInterface $translation,
+    KeyValueFactoryInterface $key_value_expirable_factory,
+    protected ThemeHandlerInterface $themeHandler,
+    protected ModuleExtensionList $moduleExtensionList,
+    protected ThemeExtensionList $themeExtensionList,
+  ) {
     $this->updateSettings = $config_factory->get('update.settings');
     $this->stringTranslation = $translation;
     $this->keyValueStore = $key_value_expirable_factory->get('update');

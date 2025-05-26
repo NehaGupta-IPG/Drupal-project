@@ -25,8 +25,9 @@ class Analyzer {
    * @param \Drupal\Core\Extension\ModuleHandlerInterface $moduleHandler
    *   The module handler that invokes the 'views_analyze' hook.
    */
-  public function __construct(protected ModuleHandlerInterface $moduleHandler) {
-  }
+  public function __construct(
+    protected ModuleHandlerInterface $moduleHandler,
+  ) {}
 
   /**
    * Analyzes a review and return the results.

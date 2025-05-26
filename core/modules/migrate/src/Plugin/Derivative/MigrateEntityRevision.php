@@ -23,8 +23,9 @@ class MigrateEntityRevision implements ContainerDeriverInterface {
    * @param \Drupal\Core\Entity\EntityTypeInterface[] $entityDefinitions
    *   A list of entity definition objects.
    */
-  public function __construct(protected array $entityDefinitions) {
-  }
+  public function __construct(
+    protected array $entityDefinitions,
+  ) {}
 
   /**
    * {@inheritdoc}

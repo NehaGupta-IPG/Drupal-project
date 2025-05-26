@@ -35,8 +35,10 @@ class NodePreviewForm extends FormBase {
    * @param \Drupal\Core\Config\ConfigFactoryInterface $configFactory
    *   The configuration factory.
    */
-  public function __construct(protected EntityDisplayRepositoryInterface $entityDisplayRepository, protected ConfigFactoryInterface $configFactory) {
-  }
+  public function __construct(
+    protected EntityDisplayRepositoryInterface $entityDisplayRepository,
+    protected ConfigFactoryInterface $configFactory,
+  ) {}
 
   /**
    * {@inheritdoc}

@@ -22,8 +22,9 @@ class ViewsDataHelper {
    * @param \Drupal\views\ViewsData $data
    *   The views data object, containing the cached table information.
    */
-  public function __construct(protected ViewsData $data) {
-  }
+  public function __construct(
+    protected ViewsData $data,
+  ) {}
 
   /**
    * Fetches a list of all fields available for a given base type.

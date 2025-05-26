@@ -39,7 +39,10 @@ class ResourceTypeBuildEvent extends Event {
    * @param \Drupal\jsonapi\ResourceType\ResourceTypeField[] $fields
    *   The fields of the resource type to be built.
    */
-  protected function __construct(protected $resourceTypeName, array $fields) {
+  protected function __construct(
+    protected $resourceTypeName,
+    array $fields,
+  ) {
     assert(Inspector::assertAllObjects($fields, ResourceTypeField::class));
     $this->fields = $fields;
   }

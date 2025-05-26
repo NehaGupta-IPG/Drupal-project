@@ -62,8 +62,10 @@ class EarlyRenderingControllerWrapperSubscriber implements EventSubscriberInterf
    * @param \Drupal\Core\Render\RendererInterface $renderer
    *   The renderer.
    */
-  public function __construct(protected ArgumentResolverInterface $argumentResolver, protected RendererInterface $renderer) {
-  }
+  public function __construct(
+    protected ArgumentResolverInterface $argumentResolver,
+    protected RendererInterface $renderer,
+  ) {}
 
   /**
    * Ensures bubbleable metadata from early rendering is not lost.

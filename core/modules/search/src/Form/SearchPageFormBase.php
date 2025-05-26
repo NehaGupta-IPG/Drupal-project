@@ -33,8 +33,9 @@ abstract class SearchPageFormBase extends EntityForm {
    * @param \Drupal\search\SearchPageRepositoryInterface $searchPageRepository
    *   The search page repository.
    */
-  public function __construct(protected SearchPageRepositoryInterface $searchPageRepository) {
-  }
+  public function __construct(
+    protected SearchPageRepositoryInterface $searchPageRepository,
+  ) {}
 
   /**
    * {@inheritdoc}

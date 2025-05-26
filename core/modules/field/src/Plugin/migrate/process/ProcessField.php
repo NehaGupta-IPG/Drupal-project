@@ -55,7 +55,13 @@ class ProcessField extends ProcessPluginBase implements ContainerFactoryPluginIn
    * @param \Drupal\migrate\Plugin\MigrationInterface $migration
    *   The migration being run.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, protected MigrateFieldPluginManagerInterface $fieldPluginManager, protected ?MigrationInterface $migration = NULL) {
+  public function __construct(
+    array $configuration,
+    $plugin_id,
+    $plugin_definition,
+    protected MigrateFieldPluginManagerInterface $fieldPluginManager,
+    protected ?MigrationInterface $migration = NULL,
+  ) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
   }
 

@@ -54,8 +54,14 @@ class LocaleTranslation implements TranslatorInterface, DestructableInterface {
    * @param \Symfony\Component\HttpFoundation\RequestStack $requestStack
    *   The request stack.
    */
-  public function __construct(protected StringStorageInterface $storage, protected CacheBackendInterface $cache, protected LockBackendInterface $lock, protected ConfigFactoryInterface $configFactory, protected LanguageManagerInterface $languageManager, protected RequestStack $requestStack) {
-  }
+  public function __construct(
+    protected StringStorageInterface $storage,
+    protected CacheBackendInterface $cache,
+    protected LockBackendInterface $lock,
+    protected ConfigFactoryInterface $configFactory,
+    protected LanguageManagerInterface $languageManager,
+    protected RequestStack $requestStack,
+  ) {}
 
   /**
    * {@inheritdoc}

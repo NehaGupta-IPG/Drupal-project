@@ -29,8 +29,9 @@ class TestSessionBag implements SessionBagInterface {
    * @param string $storageKey
    *   The key used to store test attributes.
    */
-  public function __construct(protected $storageKey = '_dp_session_test') {
-  }
+  public function __construct(
+    protected $storageKey = '_dp_session_test',
+  ) {}
 
   /**
    * Sets the test flag.

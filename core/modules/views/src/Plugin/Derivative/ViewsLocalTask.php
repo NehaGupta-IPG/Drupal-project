@@ -25,8 +25,11 @@ class ViewsLocalTask extends DeriverBase implements ContainerDeriverInterface {
    * @param \Drupal\Core\Entity\EntityStorageInterface $viewStorage
    *   The view storage.
    */
-  public function __construct(protected RouteProviderInterface $routeProvider, protected StateInterface $state, protected EntityStorageInterface $viewStorage) {
-  }
+  public function __construct(
+    protected RouteProviderInterface $routeProvider,
+    protected StateInterface $state,
+    protected EntityStorageInterface $viewStorage,
+  ) {}
 
   /**
    * {@inheritdoc}

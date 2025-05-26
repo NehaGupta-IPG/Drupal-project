@@ -62,7 +62,14 @@ class BlockPageVariant extends VariantBase implements PageVariantInterface, Cont
    * @param string[] $blockListCacheTags
    *   The Block entity type list cache tags.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, protected BlockRepositoryInterface $blockRepository, protected EntityViewBuilderInterface $blockViewBuilder, protected array $blockListCacheTags) {
+  public function __construct(
+    array $configuration,
+    $plugin_id,
+    $plugin_definition,
+    protected BlockRepositoryInterface $blockRepository,
+    protected EntityViewBuilderInterface $blockViewBuilder,
+    protected array $blockListCacheTags,
+  ) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
   }
 

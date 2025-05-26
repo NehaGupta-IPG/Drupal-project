@@ -36,7 +36,13 @@ class ImageToolkitOperationManager extends DefaultPluginManager implements Image
    * @param \Drupal\Core\ImageToolkit\ImageToolkitManager $toolkitManager
    *   The image toolkit manager.
    */
-  public function __construct(\Traversable $namespaces, CacheBackendInterface $cache_backend, ModuleHandlerInterface $module_handler, protected LoggerInterface $logger, protected ImageToolkitManager $toolkitManager) {
+  public function __construct(
+    \Traversable $namespaces,
+    CacheBackendInterface $cache_backend,
+    ModuleHandlerInterface $module_handler,
+    protected LoggerInterface $logger,
+    protected ImageToolkitManager $toolkitManager,
+  ) {
     parent::__construct(
       'Plugin/ImageToolkit/Operation',
       $namespaces,

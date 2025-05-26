@@ -32,8 +32,10 @@ class CKEditor5MediaAndFilterSettingsInSyncConstraintValidator extends Constrain
    * @param \Drupal\Core\Config\TypedConfigManagerInterface $typedConfigManager
    *   The typed config manager service.
    */
-  public function __construct(protected FilterPluginManager $filterPluginManager, protected TypedConfigManagerInterface $typedConfigManager) {
-  }
+  public function __construct(
+    protected FilterPluginManager $filterPluginManager,
+    protected TypedConfigManagerInterface $typedConfigManager,
+  ) {}
 
   /**
    * {@inheritdoc}

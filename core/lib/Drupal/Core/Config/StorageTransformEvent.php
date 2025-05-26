@@ -18,8 +18,9 @@ class StorageTransformEvent extends Event {
    * @param \Drupal\Core\Config\StorageInterface $storage
    *   The storage with the configuration to transform.
    */
-  public function __construct(protected StorageInterface $storage) {
-  }
+  public function __construct(
+    protected StorageInterface $storage,
+  ) {}
 
   /**
    * Returns the mutable storage ready to be read from and written to.

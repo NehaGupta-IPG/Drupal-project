@@ -18,8 +18,10 @@ class MigrateRowDeleteEvent extends Event {
    * @param array $destinationIdValues
    *   Values represent the destination ID.
    */
-  public function __construct(protected MigrationInterface $migration, protected $destinationIdValues) {
-  }
+  public function __construct(
+    protected MigrationInterface $migration,
+    protected $destinationIdValues,
+  ) {}
 
   /**
    * Gets the migration entity.

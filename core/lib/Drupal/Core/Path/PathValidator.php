@@ -34,8 +34,12 @@ class PathValidator implements PathValidatorInterface {
    * @param \Drupal\Core\PathProcessor\InboundPathProcessorInterface $pathProcessor
    *   The path processor.
    */
-  public function __construct(protected AccessAwareRouterInterface $accessAwareRouter, protected UrlMatcherInterface $accessUnawareRouter, protected AccountInterface $account, protected InboundPathProcessorInterface $pathProcessor) {
-  }
+  public function __construct(
+    protected AccessAwareRouterInterface $accessAwareRouter,
+    protected UrlMatcherInterface $accessUnawareRouter,
+    protected AccountInterface $account,
+    protected InboundPathProcessorInterface $pathProcessor,
+  ) {}
 
   /**
    * {@inheritdoc}

@@ -25,8 +25,10 @@ class FieldUiLocalAction extends DeriverBase implements ContainerDeriverInterfac
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
    *   The entity type manager.
    */
-  public function __construct(protected RouteProviderInterface $routeProvider, protected EntityTypeManagerInterface $entityTypeManager) {
-  }
+  public function __construct(
+    protected RouteProviderInterface $routeProvider,
+    protected EntityTypeManagerInterface $entityTypeManager,
+  ) {}
 
   /**
    * {@inheritdoc}

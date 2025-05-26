@@ -18,7 +18,10 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  */
 class FieldConfigDeleteForm extends EntityDeleteForm {
 
-  public function __construct(protected EntityTypeBundleInfoInterface $entityTypeBundleInfo, EntityTypeManagerInterface $entityTypeManager) {
+  public function __construct(
+    protected EntityTypeBundleInfoInterface $entityTypeBundleInfo,
+    EntityTypeManagerInterface $entityTypeManager,
+  ) {
     $this->entityTypeManager = $entityTypeManager;
   }
 

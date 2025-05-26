@@ -17,8 +17,9 @@ class ServiceWithDependency {
    * @param \Drupal\new_dependency_test\InjectedService|null $service
    *   The service of the same module which has the new dependency.
    */
-  public function __construct(protected ?InjectedService $service = NULL) {
-  }
+  public function __construct(
+    protected ?InjectedService $service = NULL,
+  ) {}
 
   /**
    * Gets a greeting from the injected service and adds to it.

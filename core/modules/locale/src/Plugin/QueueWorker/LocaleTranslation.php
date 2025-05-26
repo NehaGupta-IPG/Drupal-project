@@ -34,7 +34,13 @@ class LocaleTranslation extends QueueWorkerBase implements ContainerFactoryPlugi
    * @param \Drupal\Core\Queue\QueueInterface $queue
    *   The queue object.
    */
-  public function __construct(array $configuration, $plugin_id, array $plugin_definition, protected ModuleHandlerInterface $moduleHandler, protected QueueInterface $queue) {
+  public function __construct(
+    array $configuration,
+    $plugin_id,
+    array $plugin_definition,
+    protected ModuleHandlerInterface $moduleHandler,
+    protected QueueInterface $queue,
+  ) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
   }
 

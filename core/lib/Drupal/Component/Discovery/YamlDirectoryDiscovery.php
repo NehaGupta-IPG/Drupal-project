@@ -31,8 +31,11 @@ class YamlDirectoryDiscovery implements DiscoverableInterface {
    *   (optional) The key contained in the discovered data that identifies it.
    *   Defaults to 'id'.
    */
-  public function __construct(protected array $directories, protected $fileCacheKeySuffix, protected $idKey = 'id') {
-  }
+  public function __construct(
+    protected array $directories,
+    protected $fileCacheKeySuffix,
+    protected $idKey = 'id',
+  ) {}
 
   /**
    * {@inheritdoc}

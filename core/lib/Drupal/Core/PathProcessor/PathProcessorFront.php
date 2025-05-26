@@ -17,8 +17,9 @@ class PathProcessorFront implements InboundPathProcessorInterface {
    * @param \Drupal\Core\Config\ConfigFactoryInterface $config
    *   A config factory for retrieving the site front page configuration.
    */
-  public function __construct(protected ConfigFactoryInterface $config) {
-  }
+  public function __construct(
+    protected ConfigFactoryInterface $config,
+  ) {}
 
   /**
    * {@inheritdoc}

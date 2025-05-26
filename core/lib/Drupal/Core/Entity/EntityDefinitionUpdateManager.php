@@ -29,8 +29,13 @@ class EntityDefinitionUpdateManager implements EntityDefinitionUpdateManagerInte
    * @param \Drupal\Core\Field\FieldStorageDefinitionListenerInterface $fieldStorageDefinitionListener
    *   The field storage definition listener service.
    */
-  public function __construct(protected EntityTypeManagerInterface $entityTypeManager, protected EntityLastInstalledSchemaRepositoryInterface $entityLastInstalledSchemaRepository, protected EntityFieldManagerInterface $entityFieldManager, protected EntityTypeListenerInterface $entityTypeListener, protected FieldStorageDefinitionListenerInterface $fieldStorageDefinitionListener) {
-  }
+  public function __construct(
+    protected EntityTypeManagerInterface $entityTypeManager,
+    protected EntityLastInstalledSchemaRepositoryInterface $entityLastInstalledSchemaRepository,
+    protected EntityFieldManagerInterface $entityFieldManager,
+    protected EntityTypeListenerInterface $entityTypeListener,
+    protected FieldStorageDefinitionListenerInterface $fieldStorageDefinitionListener,
+  ) {}
 
   /**
    * {@inheritdoc}

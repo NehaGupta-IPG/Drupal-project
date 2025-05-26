@@ -22,8 +22,9 @@ class UrlMatcher extends BaseUrlMatcher {
    * @param \Drupal\Core\Path\CurrentPathStack $currentPath
    *   The current path.
    */
-  public function __construct(protected CurrentPathStack $currentPath) {
-  }
+  public function __construct(
+    protected CurrentPathStack $currentPath,
+  ) {}
 
   public function finalMatch(RouteCollection $collection, Request $request) {
     $this->routes = $collection;

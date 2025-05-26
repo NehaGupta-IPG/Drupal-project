@@ -24,8 +24,9 @@ class ParamConversionEnhancer implements EnhancerInterface, EventSubscriberInter
    * @param \Drupal\Core\ParamConverter\ParamConverterManagerInterface $paramConverterManager
    *   The parameter conversion manager.
    */
-  public function __construct(protected ParamConverterManagerInterface $paramConverterManager) {
-  }
+  public function __construct(
+    protected ParamConverterManagerInterface $paramConverterManager,
+  ) {}
 
   /**
    * {@inheritdoc}

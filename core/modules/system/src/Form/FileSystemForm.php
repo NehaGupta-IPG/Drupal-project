@@ -38,7 +38,13 @@ class FileSystemForm extends ConfigFormBase {
    * @param \Drupal\Core\File\FileSystemInterface $fileSystem
    *   The file system.
    */
-  public function __construct(ConfigFactoryInterface $config_factory, TypedConfigManagerInterface $typedConfigManager, protected DateFormatterInterface $dateFormatter, protected StreamWrapperManagerInterface $streamWrapperManager, protected FileSystemInterface $fileSystem) {
+  public function __construct(
+    ConfigFactoryInterface $config_factory,
+    TypedConfigManagerInterface $typedConfigManager,
+    protected DateFormatterInterface $dateFormatter,
+    protected StreamWrapperManagerInterface $streamWrapperManager,
+    protected FileSystemInterface $fileSystem,
+  ) {
     parent::__construct($config_factory, $typedConfigManager);
   }
 

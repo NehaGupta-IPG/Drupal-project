@@ -32,8 +32,11 @@ class ContentEntityForm extends EntityForm implements ContentEntityFormInterface
    * @param \Drupal\Component\Datetime\TimeInterface $time
    *   The time service.
    */
-  public function __construct(protected EntityRepositoryInterface $entityRepository, protected EntityTypeBundleInfoInterface $entityTypeBundleInfo, protected TimeInterface $time) {
-  }
+  public function __construct(
+    protected EntityRepositoryInterface $entityRepository,
+    protected EntityTypeBundleInfoInterface $entityTypeBundleInfo,
+    protected TimeInterface $time,
+  ) {}
 
   /**
    * {@inheritdoc}

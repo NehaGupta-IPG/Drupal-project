@@ -23,7 +23,12 @@ class MigratePostRowSaveEvent extends MigratePreRowSaveEvent {
    * @param array|bool $destinationIdValues
    *   Values represent the destination ID.
    */
-  public function __construct(MigrationInterface $migration, MigrateMessageInterface $message, Row $row, protected $destinationIdValues) {
+  public function __construct(
+    MigrationInterface $migration,
+    MigrateMessageInterface $message,
+    Row $row,
+    protected $destinationIdValues,
+  ) {
     parent::__construct($migration, $message, $row);
   }
 

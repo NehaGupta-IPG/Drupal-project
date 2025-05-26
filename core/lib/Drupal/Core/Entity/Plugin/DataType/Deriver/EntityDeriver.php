@@ -32,8 +32,11 @@ class EntityDeriver implements ContainerDeriverInterface {
    * @param \Drupal\Core\Entity\EntityTypeBundleInfoInterface $bundleInfoService
    *   The bundle info service.
    */
-  public function __construct(protected $basePluginId, protected EntityTypeManagerInterface $entityTypeManager, protected EntityTypeBundleInfoInterface $bundleInfoService) {
-  }
+  public function __construct(
+    protected $basePluginId,
+    protected EntityTypeManagerInterface $entityTypeManager,
+    protected EntityTypeBundleInfoInterface $bundleInfoService,
+  ) {}
 
   /**
    * {@inheritdoc}

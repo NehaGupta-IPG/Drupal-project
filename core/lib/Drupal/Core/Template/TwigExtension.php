@@ -49,8 +49,13 @@ class TwigExtension extends AbstractExtension {
    * @param \Drupal\Core\File\FileUrlGeneratorInterface $fileUrlGenerator
    *   The file URL generator.
    */
-  public function __construct(protected RendererInterface $renderer, protected UrlGeneratorInterface $urlGenerator, protected ThemeManagerInterface $themeManager, protected DateFormatterInterface $dateFormatter, protected FileUrlGeneratorInterface $fileUrlGenerator) {
-  }
+  public function __construct(
+    protected RendererInterface $renderer,
+    protected UrlGeneratorInterface $urlGenerator,
+    protected ThemeManagerInterface $themeManager,
+    protected DateFormatterInterface $dateFormatter,
+    protected FileUrlGeneratorInterface $fileUrlGenerator,
+  ) {}
 
   /**
    * {@inheritdoc}

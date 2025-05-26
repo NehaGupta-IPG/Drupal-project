@@ -69,7 +69,15 @@ class ContextualLinkManager extends DefaultPluginManager implements ContextualLi
    * @param \Symfony\Component\HttpFoundation\RequestStack $requestStack
    *   The request stack.
    */
-  public function __construct(protected ControllerResolverInterface $controllerResolver, ModuleHandlerInterface $module_handler, CacheBackendInterface $cache_backend, protected LanguageManagerInterface $languageManager, protected AccessManagerInterface $accessManager, protected AccountInterface $account, protected RequestStack $requestStack) {
+  public function __construct(
+    protected ControllerResolverInterface $controllerResolver,
+    ModuleHandlerInterface $module_handler,
+    CacheBackendInterface $cache_backend,
+    protected LanguageManagerInterface $languageManager,
+    protected AccessManagerInterface $accessManager,
+    protected AccountInterface $account,
+    protected RequestStack $requestStack,
+  ) {
     $this->factory = new ContainerFactory($this, '\Drupal\Core\Menu\ContextualLinkInterface');
     $this->moduleHandler = $module_handler;
     $this->alterInfo('contextual_links_plugins');

@@ -23,7 +23,12 @@ class SubformState extends FormStateDecoratorBase implements SubformStateInterfa
    * @param \Drupal\Core\Form\FormInterface|null $subformFormObject
    *   The subform form object when it's not the same as the parent form.
    */
-  protected function __construct(protected array &$subform, protected array &$parentForm, FormStateInterface $parent_form_state, protected readonly ?FormInterface $subformFormObject = NULL) {
+  protected function __construct(
+    protected array &$subform,
+    protected array &$parentForm,
+    FormStateInterface $parent_form_state,
+    protected readonly ?FormInterface $subformFormObject = NULL,
+  ) {
     $this->decoratedFormState = $parent_form_state;
   }
 

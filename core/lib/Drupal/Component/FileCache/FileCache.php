@@ -41,7 +41,12 @@ class FileCache implements FileCacheInterface {
    * @param array $cache_backend_configuration
    *   (optional) The configuration for the backend class.
    */
-  public function __construct($prefix, protected $collection, $cache_backend_class = NULL, array $cache_backend_configuration = []) {
+  public function __construct(
+    $prefix,
+    protected $collection,
+    $cache_backend_class = NULL,
+    array $cache_backend_configuration = [],
+  ) {
 
     if (empty($prefix)) {
       throw new \InvalidArgumentException('Required prefix configuration is missing');

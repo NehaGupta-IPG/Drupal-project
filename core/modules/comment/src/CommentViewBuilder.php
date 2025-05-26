@@ -37,7 +37,15 @@ class CommentViewBuilder extends EntityViewBuilder {
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
    *   The entity type manager.
    */
-  public function __construct(EntityTypeInterface $entity_type, EntityRepositoryInterface $entity_repository, LanguageManagerInterface $language_manager, protected AccountInterface $currentUser, Registry $theme_registry, EntityDisplayRepositoryInterface $entity_display_repository, protected EntityTypeManagerInterface $entityTypeManager) {
+  public function __construct(
+    EntityTypeInterface $entity_type,
+    EntityRepositoryInterface $entity_repository,
+    LanguageManagerInterface $language_manager,
+    protected AccountInterface $currentUser,
+    Registry $theme_registry,
+    EntityDisplayRepositoryInterface $entity_display_repository,
+    protected EntityTypeManagerInterface $entityTypeManager,
+  ) {
     parent::__construct($entity_type, $entity_repository, $language_manager, $theme_registry, $entity_display_repository);
   }
 

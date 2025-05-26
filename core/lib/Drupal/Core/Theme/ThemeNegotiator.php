@@ -23,8 +23,11 @@ class ThemeNegotiator implements ThemeNegotiatorInterface {
    * @param string[] $negotiators
    *   An array of negotiator IDs.
    */
-  public function __construct(protected ThemeAccessCheck $themeAccess, protected ClassResolverInterface $classResolver, protected array $negotiators) {
-  }
+  public function __construct(
+    protected ThemeAccessCheck $themeAccess,
+    protected ClassResolverInterface $classResolver,
+    protected array $negotiators,
+  ) {}
 
   /**
    * {@inheritdoc}

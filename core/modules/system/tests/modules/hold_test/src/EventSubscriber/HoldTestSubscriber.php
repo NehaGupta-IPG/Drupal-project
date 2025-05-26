@@ -28,8 +28,9 @@ class HoldTestSubscriber implements EventSubscriberInterface {
    * @param string $sitePath
    *   The site path.
    */
-  public function __construct(protected string $sitePath) {
-  }
+  public function __construct(
+    protected string $sitePath,
+  ) {}
 
   /**
    * Request hold.

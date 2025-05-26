@@ -30,8 +30,10 @@ class CachedStorage implements StorageInterface, StorageCacheInterface {
    * @param \Drupal\Core\Cache\CacheBackendInterface $cache
    *   A cache backend used to store configuration.
    */
-  public function __construct(protected StorageInterface $storage, protected CacheBackendInterface $cache) {
-  }
+  public function __construct(
+    protected StorageInterface $storage,
+    protected CacheBackendInterface $cache,
+  ) {}
 
   /**
    * {@inheritdoc}

@@ -203,7 +203,12 @@ class MigrationState {
    * @param \Drupal\Core\StringTranslation\TranslationInterface $stringTranslation
    *   String translation service.
    */
-  public function __construct(protected MigrateFieldPluginManagerInterface $fieldPluginManager, protected ModuleHandlerInterface $moduleHandler, MessengerInterface $messenger, TranslationInterface $stringTranslation) {
+  public function __construct(
+    protected MigrateFieldPluginManagerInterface $fieldPluginManager,
+    protected ModuleHandlerInterface $moduleHandler,
+    MessengerInterface $messenger,
+    TranslationInterface $stringTranslation,
+  ) {
     $this->enabledModules = array_keys($this->moduleHandler->getModuleList());
     $this->enabledModules[] = 'core';
     $this->messenger = $messenger;

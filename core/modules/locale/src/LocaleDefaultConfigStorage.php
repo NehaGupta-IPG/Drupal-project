@@ -45,7 +45,11 @@ class LocaleDefaultConfigStorage {
    * @param string $install_profile
    *   The current installation profile.
    */
-  public function __construct(protected StorageInterface $configStorage, protected ConfigurableLanguageManagerInterface $languageManager, $install_profile) {
+  public function __construct(
+    protected StorageInterface $configStorage,
+    protected ConfigurableLanguageManagerInterface $languageManager,
+    $install_profile,
+  ) {
     $this->requiredInstallStorage = new ExtensionInstallStorage($this->configStorage, ExtensionInstallStorage::CONFIG_INSTALL_DIRECTORY, ExtensionInstallStorage::DEFAULT_COLLECTION, TRUE, $install_profile);
     $this->optionalInstallStorage = new ExtensionInstallStorage($this->configStorage, ExtensionInstallStorage::CONFIG_OPTIONAL_DIRECTORY, ExtensionInstallStorage::DEFAULT_COLLECTION, TRUE, $install_profile);
   }

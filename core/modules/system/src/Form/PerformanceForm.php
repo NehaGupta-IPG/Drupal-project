@@ -35,7 +35,14 @@ class PerformanceForm extends ConfigFormBase {
    * @param \Drupal\Core\Extension\ModuleHandlerInterface $moduleHandler
    *   The module handler.
    */
-  public function __construct(ConfigFactoryInterface $config_factory, TypedConfigManagerInterface $typedConfigManager, protected DateFormatterInterface $dateFormatter, protected AssetCollectionOptimizerInterface $cssCollectionOptimizer, protected AssetCollectionOptimizerInterface $jsCollectionOptimizer, protected ModuleHandlerInterface $moduleHandler) {
+  public function __construct(
+    ConfigFactoryInterface $config_factory,
+    TypedConfigManagerInterface $typedConfigManager,
+    protected DateFormatterInterface $dateFormatter,
+    protected AssetCollectionOptimizerInterface $cssCollectionOptimizer,
+    protected AssetCollectionOptimizerInterface $jsCollectionOptimizer,
+    protected ModuleHandlerInterface $moduleHandler,
+  ) {
     parent::__construct($config_factory, $typedConfigManager);
   }
 

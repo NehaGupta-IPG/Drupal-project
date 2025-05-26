@@ -76,7 +76,11 @@ class ChainedFastBackend implements CacheBackendInterface, CacheTagsInvalidatorI
    * @param string $bin
    *   The cache bin for which the object is created.
    */
-  public function __construct(protected CacheBackendInterface $consistentBackend, protected CacheBackendInterface $fastBackend, $bin) {
+  public function __construct(
+    protected CacheBackendInterface $consistentBackend,
+    protected CacheBackendInterface $fastBackend,
+    $bin,
+  ) {
     $this->bin = 'cache_' . $bin;
     $this->lastWriteTimestamp = NULL;
   }

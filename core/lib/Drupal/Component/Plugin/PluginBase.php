@@ -22,8 +22,11 @@ abstract class PluginBase implements PluginInspectionInterface, DerivativeInspec
    * @param mixed $pluginDefinition
    *   The plugin implementation definition.
    */
-  public function __construct(protected array $configuration, protected $pluginId, protected $pluginDefinition) {
-  }
+  public function __construct(
+    protected array $configuration,
+    protected $pluginId,
+    protected $pluginDefinition,
+  ) {}
 
   /**
    * {@inheritdoc}

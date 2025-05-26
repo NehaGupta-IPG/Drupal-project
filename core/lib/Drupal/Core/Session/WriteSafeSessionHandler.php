@@ -25,7 +25,10 @@ class WriteSafeSessionHandler extends SessionHandlerProxy implements \SessionHan
    * @param bool $sessionWritable
    *   Whether or not the session should be initially writable.
    */
-  public function __construct(\SessionHandlerInterface $handler, protected $sessionWritable = TRUE) {
+  public function __construct(
+    \SessionHandlerInterface $handler,
+    protected $sessionWritable = TRUE,
+  ) {
     parent::__construct($handler);
   }
 

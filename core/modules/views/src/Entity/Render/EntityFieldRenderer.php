@@ -47,7 +47,14 @@ class EntityFieldRenderer extends RendererBase {
    * @param \Drupal\Core\Entity\EntityRepositoryInterface $entityRepository
    *   The entity repository.
    */
-  public function __construct(ViewExecutable $view, protected $relationship, LanguageManagerInterface $language_manager, EntityTypeInterface $entity_type, protected EntityTypeManagerInterface $entityTypeManager, protected EntityRepositoryInterface $entityRepository) {
+  public function __construct(
+    ViewExecutable $view,
+    protected $relationship,
+    LanguageManagerInterface $language_manager,
+    EntityTypeInterface $entity_type,
+    protected EntityTypeManagerInterface $entityTypeManager,
+    protected EntityRepositoryInterface $entityRepository,
+  ) {
     parent::__construct($view, $language_manager, $entity_type);
   }
 

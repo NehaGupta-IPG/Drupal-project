@@ -22,8 +22,10 @@ class FieldLayoutBuilder implements ContainerInjectionInterface {
    * @param \Drupal\Core\Entity\EntityFieldManagerInterface $entityFieldManager
    *   The entity field manager.
    */
-  public function __construct(protected LayoutPluginManagerInterface $layoutPluginManager, protected EntityFieldManagerInterface $entityFieldManager) {
-  }
+  public function __construct(
+    protected LayoutPluginManagerInterface $layoutPluginManager,
+    protected EntityFieldManagerInterface $entityFieldManager,
+  ) {}
 
   /**
    * {@inheritdoc}

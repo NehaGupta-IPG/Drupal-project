@@ -19,8 +19,9 @@ class UserFloodSubscriber implements EventSubscriberInterface {
    * @param \Psr\Log\LoggerInterface $logger
    *   A logger instance.
    */
-  public function __construct(protected ?LoggerInterface $logger = NULL) {
-  }
+  public function __construct(
+    protected ?LoggerInterface $logger = NULL,
+  ) {}
 
   /**
    * {@inheritdoc}

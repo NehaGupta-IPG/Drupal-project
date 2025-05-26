@@ -24,7 +24,12 @@ class ConfigurableLanguageRenderer extends EntityTranslationRendererBase {
    * @param string|null $langcode
    *   A specific language code to set, if available.
    */
-  public function __construct(ViewExecutable $view, LanguageManagerInterface $language_manager, EntityTypeInterface $entity_type, protected $langcode) {
+  public function __construct(
+    ViewExecutable $view,
+    LanguageManagerInterface $language_manager,
+    EntityTypeInterface $entity_type,
+    protected $langcode,
+  ) {
     parent::__construct($view, $language_manager, $entity_type);
   }
 

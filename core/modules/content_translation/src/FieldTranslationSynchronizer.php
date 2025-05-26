@@ -21,8 +21,10 @@ class FieldTranslationSynchronizer implements FieldTranslationSynchronizerInterf
    * @param \Drupal\Core\Field\FieldTypePluginManagerInterface $fieldTypeManager
    *   The field type plugin manager.
    */
-  public function __construct(protected EntityTypeManagerInterface $entityTypeManager, protected FieldTypePluginManagerInterface $fieldTypeManager) {
-  }
+  public function __construct(
+    protected EntityTypeManagerInterface $entityTypeManager,
+    protected FieldTypePluginManagerInterface $fieldTypeManager,
+  ) {}
 
   /**
    * {@inheritdoc}

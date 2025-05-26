@@ -44,8 +44,11 @@ class ConfigTranslationDeleteForm extends ConfirmFormBase {
    * @param \Drupal\Core\Extension\ModuleHandlerInterface $moduleHandler
    *   The module handler.
    */
-  public function __construct(protected ConfigurableLanguageManagerInterface $languageManager, protected ConfigMapperManagerInterface $configMapperManager, protected ModuleHandlerInterface $moduleHandler) {
-  }
+  public function __construct(
+    protected ConfigurableLanguageManagerInterface $languageManager,
+    protected ConfigMapperManagerInterface $configMapperManager,
+    protected ModuleHandlerInterface $moduleHandler,
+  ) {}
 
   /**
    * {@inheritdoc}

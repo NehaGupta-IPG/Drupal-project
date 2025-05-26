@@ -20,8 +20,9 @@ class MockRouteProvider implements RouteProviderInterface {
    * @param \Symfony\Component\Routing\RouteCollection $routes
    *   The route collection to use for this provider.
    */
-  public function __construct(protected RouteCollection $routes) {
-  }
+  public function __construct(
+    protected RouteCollection $routes,
+  ) {}
 
   /**
    * Implements \Drupal\Core\Routing\RouteProviderInterface::getRouteCollectionForRequest().

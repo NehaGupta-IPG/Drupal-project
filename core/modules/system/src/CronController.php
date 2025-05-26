@@ -17,8 +17,9 @@ class CronController extends ControllerBase {
    * @param \Drupal\Core\CronInterface $cron
    *   The cron service.
    */
-  public function __construct(protected CronInterface $cron) {
-  }
+  public function __construct(
+    protected CronInterface $cron,
+  ) {}
 
   /**
    * Run Cron once.

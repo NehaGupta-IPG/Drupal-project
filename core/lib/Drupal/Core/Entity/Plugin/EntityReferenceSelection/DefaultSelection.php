@@ -66,7 +66,17 @@ class DefaultSelection extends SelectionPluginBase implements ContainerFactoryPl
    * @param \Drupal\Core\Entity\EntityRepositoryInterface $entityRepository
    *   The entity repository.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, protected EntityTypeManagerInterface $entityTypeManager, protected ModuleHandlerInterface $moduleHandler, protected AccountInterface $currentUser, protected EntityFieldManagerInterface $entityFieldManager, public EntityTypeBundleInfoInterface $entityTypeBundleInfo, protected EntityRepositoryInterface $entityRepository) {
+  public function __construct(
+    array $configuration,
+    $plugin_id,
+    $plugin_definition,
+    protected EntityTypeManagerInterface $entityTypeManager,
+    protected ModuleHandlerInterface $moduleHandler,
+    protected AccountInterface $currentUser,
+    protected EntityFieldManagerInterface $entityFieldManager,
+    public EntityTypeBundleInfoInterface $entityTypeBundleInfo,
+    protected EntityRepositoryInterface $entityRepository,
+  ) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
   }
 

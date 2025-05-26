@@ -27,8 +27,11 @@ class ConfigImportForm extends FormBase {
    * @param \Drupal\Core\Site\Settings $settings
    *   The settings object.
    */
-  public function __construct(protected StorageInterface $configStorage, protected FileSystemInterface $fileSystem, protected Settings $settings) {
-  }
+  public function __construct(
+    protected StorageInterface $configStorage,
+    protected FileSystemInterface $fileSystem,
+    protected Settings $settings,
+  ) {}
 
   /**
    * {@inheritdoc}

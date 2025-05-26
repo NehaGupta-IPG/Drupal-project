@@ -29,8 +29,12 @@ class BlockLibraryController extends ControllerBase {
    * @param \Drupal\Core\Menu\LocalActionManagerInterface $localActionManager
    *   The local action manager.
    */
-  public function __construct(protected BlockManagerInterface $blockManager, protected ContextRepositoryInterface $contextRepository, protected RouteMatchInterface $routeMatch, protected LocalActionManagerInterface $localActionManager) {
-  }
+  public function __construct(
+    protected BlockManagerInterface $blockManager,
+    protected ContextRepositoryInterface $contextRepository,
+    protected RouteMatchInterface $routeMatch,
+    protected LocalActionManagerInterface $localActionManager,
+  ) {}
 
   /**
    * Shows a list of blocks that can be added to a theme's layout.

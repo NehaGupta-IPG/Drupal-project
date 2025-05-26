@@ -75,7 +75,16 @@ final class SecurityAdvisoriesFetcher {
    * @param \Drupal\Core\Site\Settings $settings
    *   The settings instance.
    */
-  public function __construct(ConfigFactoryInterface $config_factory, KeyValueExpirableFactoryInterface $key_value_factory, protected ClientInterface $httpClient, ModuleExtensionList $module_list, ThemeExtensionList $theme_list, ProfileExtensionList $profile_list, protected LoggerInterface $logger, Settings $settings) {
+  public function __construct(
+    ConfigFactoryInterface $config_factory,
+    KeyValueExpirableFactoryInterface $key_value_factory,
+    protected ClientInterface $httpClient,
+    ModuleExtensionList $module_list,
+    ThemeExtensionList $theme_list,
+    ProfileExtensionList $profile_list,
+    protected LoggerInterface $logger,
+    Settings $settings,
+  ) {
     $this->config = $config_factory->get('system.advisories');
     $this->keyValueExpirable = $key_value_factory->get('system');
     $this->extensionLists['module'] = $module_list;

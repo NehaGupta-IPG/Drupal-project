@@ -35,8 +35,10 @@ class ConfigSingleExportForm extends FormBase {
    * @param \Drupal\Core\Config\StorageInterface $configStorage
    *   The config storage.
    */
-  public function __construct(protected EntityTypeManagerInterface $entityTypeManager, protected StorageInterface $configStorage) {
-  }
+  public function __construct(
+    protected EntityTypeManagerInterface $entityTypeManager,
+    protected StorageInterface $configStorage,
+  ) {}
 
   /**
    * {@inheritdoc}

@@ -23,7 +23,10 @@ class StaticDiscoveryDecorator extends StaticDiscovery {
    *   (optional) A callback or closure used for registering additional
    *   definitions.
    */
-  public function __construct(protected DiscoveryInterface $decorated, $registerDefinitions = NULL) {
+  public function __construct(
+    protected DiscoveryInterface $decorated,
+    $registerDefinitions = NULL,
+  ) {
     $this->registerDefinitions = $registerDefinitions;
   }
 

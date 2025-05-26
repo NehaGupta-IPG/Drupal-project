@@ -22,7 +22,11 @@ class HtmlFormController extends FormController {
    * @param \Drupal\Core\DependencyInjection\ClassResolverInterface $classResolver
    *   The class resolver.
    */
-  public function __construct(ArgumentResolverInterface $argument_resolver, FormBuilderInterface $form_builder, protected ClassResolverInterface $classResolver) {
+  public function __construct(
+    ArgumentResolverInterface $argument_resolver,
+    FormBuilderInterface $form_builder,
+    protected ClassResolverInterface $classResolver,
+  ) {
     parent::__construct($argument_resolver, $form_builder);
   }
 

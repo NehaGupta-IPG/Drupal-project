@@ -29,8 +29,10 @@ class EntityResolverManager {
    * @param \Drupal\Core\DependencyInjection\ClassResolverInterface $classResolver
    *   The class resolver.
    */
-  public function __construct(protected EntityTypeManagerInterface $entityTypeManager, protected ClassResolverInterface $classResolver) {
-  }
+  public function __construct(
+    protected EntityTypeManagerInterface $entityTypeManager,
+    protected ClassResolverInterface $classResolver,
+  ) {}
 
   /**
    * Gets the controller class using route defaults.

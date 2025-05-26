@@ -33,7 +33,11 @@ class WorkspaceSwitcherForm extends FormBase implements WorkspaceSafeFormInterfa
    * @param \Drupal\Core\Messenger\MessengerInterface $messenger
    *   The messenger service.
    */
-  public function __construct(protected WorkspaceManagerInterface $workspaceManager, EntityTypeManagerInterface $entity_type_manager, protected MessengerInterface $messenger) {
+  public function __construct(
+    protected WorkspaceManagerInterface $workspaceManager,
+    EntityTypeManagerInterface $entity_type_manager,
+    protected MessengerInterface $messenger,
+  ) {
     $this->workspaceStorage = $entity_type_manager->getStorage('workspace');
   }
 

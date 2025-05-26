@@ -75,7 +75,16 @@ class EntityResource extends ResourceBase implements DependentPluginInterface {
    * @param \Drupal\Component\Plugin\PluginManagerInterface $linkRelationTypeManager
    *   The link relation type manager.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, EntityTypeManagerInterface $entity_type_manager, $serializer_formats, LoggerInterface $logger, protected ConfigFactoryInterface $configFactory, protected PluginManagerInterface $linkRelationTypeManager) {
+  public function __construct(
+    array $configuration,
+    $plugin_id,
+    $plugin_definition,
+    EntityTypeManagerInterface $entity_type_manager,
+    $serializer_formats,
+    LoggerInterface $logger,
+    protected ConfigFactoryInterface $configFactory,
+    protected PluginManagerInterface $linkRelationTypeManager,
+  ) {
     parent::__construct($configuration, $plugin_id, $plugin_definition, $serializer_formats, $logger);
     $this->entityType = $entity_type_manager->getDefinition($plugin_definition['entity_type']);
   }

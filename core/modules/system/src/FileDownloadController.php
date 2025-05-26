@@ -20,8 +20,9 @@ class FileDownloadController extends ControllerBase {
    * @param \Drupal\Core\StreamWrapper\StreamWrapperManagerInterface $streamWrapperManager
    *   The stream wrapper manager.
    */
-  public function __construct(protected StreamWrapperManagerInterface $streamWrapperManager) {
-  }
+  public function __construct(
+    protected StreamWrapperManagerInterface $streamWrapperManager,
+  ) {}
 
   /**
    * Handles private file transfers.

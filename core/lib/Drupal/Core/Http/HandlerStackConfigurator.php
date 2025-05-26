@@ -36,8 +36,10 @@ class HandlerStackConfigurator {
    * @param string[] $middlewareIds
    *   The middleware IDs.
    */
-  public function __construct(protected ContainerInterface $container, protected array $middlewareIds) {
-  }
+  public function __construct(
+    protected ContainerInterface $container,
+    protected array $middlewareIds,
+  ) {}
 
   /**
    * Ensures that the middlewares are initialized.

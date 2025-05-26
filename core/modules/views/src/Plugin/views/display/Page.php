@@ -63,7 +63,15 @@ class Page extends PathPluginBase {
    * @param \Drupal\Core\Menu\MenuParentFormSelectorInterface $parentFormSelector
    *   The parent form selector service.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, RouteProviderInterface $route_provider, StateInterface $state, protected EntityStorageInterface $menuStorage, protected MenuParentFormSelectorInterface $parentFormSelector) {
+  public function __construct(
+    array $configuration,
+    $plugin_id,
+    $plugin_definition,
+    RouteProviderInterface $route_provider,
+    StateInterface $state,
+    protected EntityStorageInterface $menuStorage,
+    protected MenuParentFormSelectorInterface $parentFormSelector,
+  ) {
     parent::__construct($configuration, $plugin_id, $plugin_definition, $route_provider, $state);
   }
 

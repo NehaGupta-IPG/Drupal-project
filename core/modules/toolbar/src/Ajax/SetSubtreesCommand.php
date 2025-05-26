@@ -15,8 +15,9 @@ class SetSubtreesCommand implements CommandInterface {
    * @param array $subtrees
    *   The toolbar subtrees that will be set.
    */
-  public function __construct(protected $subtrees) {
-  }
+  public function __construct(
+    protected $subtrees,
+  ) {}
 
   /**
    * {@inheritdoc}

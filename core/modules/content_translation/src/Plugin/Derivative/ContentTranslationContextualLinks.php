@@ -23,8 +23,9 @@ class ContentTranslationContextualLinks extends DeriverBase implements Container
    * @param \Drupal\content_translation\ContentTranslationManagerInterface $contentTranslationManager
    *   The content translation manager.
    */
-  public function __construct(protected ContentTranslationManagerInterface $contentTranslationManager) {
-  }
+  public function __construct(
+    protected ContentTranslationManagerInterface $contentTranslationManager,
+  ) {}
 
   /**
    * {@inheritdoc}

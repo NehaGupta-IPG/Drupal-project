@@ -170,7 +170,10 @@ abstract class Connection {
    *   - namespace
    *   - Other driver-specific options.
    */
-  public function __construct(protected object $connection, array $connection_options) {
+  public function __construct(
+    protected object $connection,
+    array $connection_options,
+  ) {
     assert(count($this->identifierQuotes) === 2 && Inspector::assertAllStrings($this->identifierQuotes), '\Drupal\Core\Database\Connection::$identifierQuotes must contain 2 string values');
 
     // Manage the table prefix.

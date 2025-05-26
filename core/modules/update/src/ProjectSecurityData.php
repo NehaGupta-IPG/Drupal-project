@@ -56,8 +56,10 @@ final class ProjectSecurityData {
    * @param array $releases
    *   Project releases as returned by update_get_available().
    */
-  private function __construct(protected $existingVersion = NULL, protected array $releases = []) {
-  }
+  private function __construct(
+    protected $existingVersion = NULL,
+    protected array $releases = [],
+  ) {}
 
   /**
    * Creates a ProjectSecurityData object from project data and releases.

@@ -37,8 +37,12 @@ class ConfigSubscriber implements EventSubscriberInterface {
    * @param \Drupal\language\LanguageNegotiatorInterface $languageNegotiator
    *   The language negotiator.
    */
-  public function __construct(protected LanguageManagerInterface $languageManager, protected LanguageDefault $languageDefault, protected ConfigFactoryInterface $configFactory, protected LanguageNegotiatorInterface $languageNegotiator) {
-  }
+  public function __construct(
+    protected LanguageManagerInterface $languageManager,
+    protected LanguageDefault $languageDefault,
+    protected ConfigFactoryInterface $configFactory,
+    protected LanguageNegotiatorInterface $languageNegotiator,
+  ) {}
 
   /**
    * Causes the container to be rebuilt on the next request.

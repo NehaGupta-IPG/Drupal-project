@@ -51,8 +51,10 @@ class TestDiscovery {
    *   The class loader. Normally Composer's ClassLoader, as included by the
    *   front controller, but may also be decorated.
    */
-  public function __construct(protected $root, protected $classLoader) {
-  }
+  public function __construct(
+    protected $root,
+    protected $classLoader,
+  ) {}
 
   /**
    * Registers test namespaces of all extensions and core test classes.

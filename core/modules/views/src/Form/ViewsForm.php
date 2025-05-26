@@ -41,8 +41,14 @@ class ViewsForm implements FormInterface, ContainerInjectionInterface {
    * @param string[] $viewArguments
    *   The arguments passed to the active view.
    */
-  public function __construct(protected ClassResolverInterface $classResolver, protected UrlGeneratorInterface $urlGenerator, protected RequestStack $requestStack, protected $viewId, protected $viewDisplayId, protected array $viewArguments) {
-  }
+  public function __construct(
+    protected ClassResolverInterface $classResolver,
+    protected UrlGeneratorInterface $urlGenerator,
+    protected RequestStack $requestStack,
+    protected $viewId,
+    protected $viewDisplayId,
+    protected array $viewArguments,
+  ) {}
 
   /**
    * {@inheritdoc}

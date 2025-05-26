@@ -32,7 +32,10 @@ class ViewDuplicateForm extends ViewFormBase {
    * @param \Drupal\Core\Language\LanguageManagerInterface $languageManager
    *   The language manager.
    */
-  public function __construct(ModuleHandlerInterface $moduleHandler, protected LanguageManagerInterface $languageManager) {
+  public function __construct(
+    ModuleHandlerInterface $moduleHandler,
+    protected LanguageManagerInterface $languageManager,
+  ) {
     $this->setModuleHandler($moduleHandler);
   }
 

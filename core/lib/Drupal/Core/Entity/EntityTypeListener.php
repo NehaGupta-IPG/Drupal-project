@@ -23,8 +23,12 @@ class EntityTypeListener implements EntityTypeListenerInterface {
    * @param \Drupal\Core\Entity\EntityLastInstalledSchemaRepositoryInterface $entityLastInstalledSchemaRepository
    *   The entity last installed schema repository.
    */
-  public function __construct(protected EntityTypeManagerInterface $entityTypeManager, protected EntityFieldManagerInterface $entityFieldManager, protected EventDispatcherInterface $eventDispatcher, protected EntityLastInstalledSchemaRepositoryInterface $entityLastInstalledSchemaRepository) {
-  }
+  public function __construct(
+    protected EntityTypeManagerInterface $entityTypeManager,
+    protected EntityFieldManagerInterface $entityFieldManager,
+    protected EventDispatcherInterface $eventDispatcher,
+    protected EntityLastInstalledSchemaRepositoryInterface $entityLastInstalledSchemaRepository,
+  ) {}
 
   /**
    * {@inheritdoc}

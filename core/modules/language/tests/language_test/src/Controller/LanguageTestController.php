@@ -28,8 +28,10 @@ class LanguageTestController implements ContainerInjectionInterface {
    * @param \Drupal\Core\Language\LanguageManagerInterface $languageManager
    *   The language manager.
    */
-  public function __construct(protected HttpKernelInterface $httpKernel, protected LanguageManagerInterface $languageManager) {
-  }
+  public function __construct(
+    protected HttpKernelInterface $httpKernel,
+    protected LanguageManagerInterface $languageManager,
+  ) {}
 
   /**
    * {@inheritdoc}

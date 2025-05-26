@@ -37,7 +37,13 @@ class ModeratedNodeListBuilder extends NodeListBuilder {
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
    *   The entity type manager.
    */
-  public function __construct(EntityTypeInterface $entity_type, EntityStorageInterface $storage, DateFormatterInterface $date_formatter, RedirectDestinationInterface $redirect_destination, protected EntityTypeManagerInterface $entityTypeManager) {
+  public function __construct(
+    EntityTypeInterface $entity_type,
+    EntityStorageInterface $storage,
+    DateFormatterInterface $date_formatter,
+    RedirectDestinationInterface $redirect_destination,
+    protected EntityTypeManagerInterface $entityTypeManager,
+  ) {
     parent::__construct($entity_type, $storage, $date_formatter, $redirect_destination);
   }
 

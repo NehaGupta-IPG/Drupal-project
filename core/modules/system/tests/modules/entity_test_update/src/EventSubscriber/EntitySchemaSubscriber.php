@@ -28,8 +28,10 @@ class EntitySchemaSubscriber implements EntityTypeListenerInterface, EventSubscr
    * @param \Drupal\Core\State\StateInterface $state
    *   The state service.
    */
-  public function __construct(protected EntityDefinitionUpdateManagerInterface $entityDefinitionUpdateManager, protected StateInterface $state) {
-  }
+  public function __construct(
+    protected EntityDefinitionUpdateManagerInterface $entityDefinitionUpdateManager,
+    protected StateInterface $state,
+  ) {}
 
   /**
    * {@inheritdoc}

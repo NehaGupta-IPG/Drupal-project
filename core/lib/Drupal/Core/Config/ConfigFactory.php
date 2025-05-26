@@ -48,8 +48,11 @@ class ConfigFactory implements ConfigFactoryInterface, EventSubscriberInterface 
    * @param \Drupal\Core\Config\TypedConfigManagerInterface $typedConfigManager
    *   The typed configuration manager.
    */
-  public function __construct(protected StorageInterface $storage, protected EventDispatcherInterface $eventDispatcher, protected TypedConfigManagerInterface $typedConfigManager) {
-  }
+  public function __construct(
+    protected StorageInterface $storage,
+    protected EventDispatcherInterface $eventDispatcher,
+    protected TypedConfigManagerInterface $typedConfigManager,
+  ) {}
 
   /**
    * {@inheritdoc}

@@ -52,7 +52,9 @@ class EnforcedResponse extends Response {
    * @param \Symfony\Component\HttpFoundation\Response $response
    *   The response to wrap.
    */
-  public function __construct(protected Response $response) {
+  public function __construct(
+    protected Response $response,
+  ) {
     parent::__construct('', 500);
   }
 

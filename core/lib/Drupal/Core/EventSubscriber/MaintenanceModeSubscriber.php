@@ -45,7 +45,16 @@ class MaintenanceModeSubscriber implements EventSubscriberInterface {
    * @param \Symfony\Contracts\EventDispatcher\EventDispatcherInterface $eventDispatcher
    *   The event dispatcher.
    */
-  public function __construct(protected MaintenanceModeInterface $maintenanceMode, protected ConfigFactoryInterface $config, TranslationInterface $translation, protected UrlGeneratorInterface $urlGenerator, protected AccountInterface $account, protected BareHtmlPageRendererInterface $bareHtmlPageRenderer, protected MessengerInterface $messenger, protected EventDispatcherInterface $eventDispatcher) {
+  public function __construct(
+    protected MaintenanceModeInterface $maintenanceMode,
+    protected ConfigFactoryInterface $config,
+    TranslationInterface $translation,
+    protected UrlGeneratorInterface $urlGenerator,
+    protected AccountInterface $account,
+    protected BareHtmlPageRendererInterface $bareHtmlPageRenderer,
+    protected MessengerInterface $messenger,
+    protected EventDispatcherInterface $eventDispatcher,
+  ) {
     $this->stringTranslation = $translation;
   }
 

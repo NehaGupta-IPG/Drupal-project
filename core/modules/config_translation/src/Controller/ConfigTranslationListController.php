@@ -17,8 +17,9 @@ class ConfigTranslationListController extends ControllerBase {
    * @param \Drupal\config_translation\ConfigMapperManagerInterface $mapperManager
    *   The config mapper manager.
    */
-  public function __construct(protected ConfigMapperManagerInterface $mapperManager) {
-  }
+  public function __construct(
+    protected ConfigMapperManagerInterface $mapperManager,
+  ) {}
 
   /**
    * Provides the listing page for any entity type.

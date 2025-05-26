@@ -44,7 +44,17 @@ class FieldMigration extends Migration implements ContainerFactoryPluginInterfac
    * @param \Drupal\migrate_drupal\FieldDiscoveryInterface $fieldDiscovery
    *   The migration field discovery service.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, MigrationPluginManagerInterface $migration_plugin_manager, MigratePluginManager $source_plugin_manager, MigratePluginManager $process_plugin_manager, MigrateDestinationPluginManager $destination_plugin_manager, MigratePluginManager $id_map_plugin_manager, protected FieldDiscoveryInterface $fieldDiscovery) {
+  public function __construct(
+    array $configuration,
+    $plugin_id,
+    $plugin_definition,
+    MigrationPluginManagerInterface $migration_plugin_manager,
+    MigratePluginManager $source_plugin_manager,
+    MigratePluginManager $process_plugin_manager,
+    MigrateDestinationPluginManager $destination_plugin_manager,
+    MigratePluginManager $id_map_plugin_manager,
+    protected FieldDiscoveryInterface $fieldDiscovery,
+  ) {
     parent::__construct($configuration, $plugin_id, $plugin_definition, $migration_plugin_manager, $source_plugin_manager, $process_plugin_manager, $destination_plugin_manager, $id_map_plugin_manager);
   }
 

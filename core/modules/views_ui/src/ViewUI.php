@@ -148,7 +148,9 @@ class ViewUI implements ViewEntityInterface {
    * @param \Drupal\views\ViewEntityInterface $storage
    *   The View storage object to wrap.
    */
-  public function __construct(protected ViewEntityInterface $storage) {
+  public function __construct(
+    protected ViewEntityInterface $storage,
+  ) {
     $this->entityType = 'view';
   }
 

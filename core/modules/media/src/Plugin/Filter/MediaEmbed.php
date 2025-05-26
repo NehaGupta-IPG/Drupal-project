@@ -77,7 +77,17 @@ class MediaEmbed extends FilterBase implements ContainerFactoryPluginInterface, 
    * @param \Drupal\Core\Logger\LoggerChannelFactoryInterface $loggerFactory
    *   The logger factory.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, protected EntityRepositoryInterface $entityRepository, protected EntityTypeManagerInterface $entityTypeManager, protected EntityDisplayRepositoryInterface $entityDisplayRepository, protected EntityTypeBundleInfoInterface $entityTypeBundleInfo, protected RendererInterface $renderer, protected LoggerChannelFactoryInterface $loggerFactory) {
+  public function __construct(
+    array $configuration,
+    $plugin_id,
+    $plugin_definition,
+    protected EntityRepositoryInterface $entityRepository,
+    protected EntityTypeManagerInterface $entityTypeManager,
+    protected EntityDisplayRepositoryInterface $entityDisplayRepository,
+    protected EntityTypeBundleInfoInterface $entityTypeBundleInfo,
+    protected RendererInterface $renderer,
+    protected LoggerChannelFactoryInterface $loggerFactory,
+  ) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
   }
 

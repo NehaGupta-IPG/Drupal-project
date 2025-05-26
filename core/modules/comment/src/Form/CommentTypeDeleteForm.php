@@ -31,8 +31,10 @@ class CommentTypeDeleteForm extends EntityDeleteForm {
    * @param \Psr\Log\LoggerInterface $logger
    *   A logger instance.
    */
-  public function __construct(protected CommentManagerInterface $commentManager, protected LoggerInterface $logger) {
-  }
+  public function __construct(
+    protected CommentManagerInterface $commentManager,
+    protected LoggerInterface $logger,
+  ) {}
 
   /**
    * {@inheritdoc}

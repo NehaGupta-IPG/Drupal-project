@@ -29,7 +29,12 @@ class FieldUiLocalTask extends DeriverBase implements ContainerDeriverInterface 
    * @param \Drupal\Core\Entity\EntityDisplayRepositoryInterface $entityDisplayRepository
    *   The entity display repository.
    */
-  public function __construct(protected RouteProviderInterface $routeProvider, protected EntityTypeManagerInterface $entityTypeManager, TranslationInterface $string_translation, protected EntityDisplayRepositoryInterface $entityDisplayRepository) {
+  public function __construct(
+    protected RouteProviderInterface $routeProvider,
+    protected EntityTypeManagerInterface $entityTypeManager,
+    TranslationInterface $string_translation,
+    protected EntityDisplayRepositoryInterface $entityDisplayRepository,
+  ) {
     $this->stringTranslation = $string_translation;
   }
 

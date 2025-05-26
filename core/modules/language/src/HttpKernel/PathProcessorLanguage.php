@@ -46,7 +46,13 @@ class PathProcessorLanguage implements InboundPathProcessorInterface, OutboundPa
    * @param \Drupal\language\EventSubscriber\ConfigSubscriber $configSubscriber
    *   The language configuration event subscriber.
    */
-  public function __construct(protected ConfigFactoryInterface $config, protected ConfigurableLanguageManagerInterface $languageManager, protected LanguageNegotiatorInterface $negotiator, AccountInterface $current_user, protected ConfigSubscriber $configSubscriber) {
+  public function __construct(
+    protected ConfigFactoryInterface $config,
+    protected ConfigurableLanguageManagerInterface $languageManager,
+    protected LanguageNegotiatorInterface $negotiator,
+    AccountInterface $current_user,
+    protected ConfigSubscriber $configSubscriber,
+  ) {
     $this->negotiator->setCurrentUser($current_user);
   }
 

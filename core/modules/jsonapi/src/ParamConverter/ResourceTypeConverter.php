@@ -30,8 +30,9 @@ class ResourceTypeConverter implements ParamConverterInterface {
    * @param \Drupal\jsonapi\ResourceType\ResourceTypeRepositoryInterface $resourceTypeRepository
    *   The JSON:API resource type repository.
    */
-  public function __construct(protected ResourceTypeRepositoryInterface $resourceTypeRepository) {
-  }
+  public function __construct(
+    protected ResourceTypeRepositoryInterface $resourceTypeRepository,
+  ) {}
 
   /**
    * {@inheritdoc}

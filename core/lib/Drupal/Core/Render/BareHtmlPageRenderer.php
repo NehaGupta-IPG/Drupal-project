@@ -17,8 +17,10 @@ class BareHtmlPageRenderer implements BareHtmlPageRendererInterface {
    * @param \Drupal\Core\Render\AttachmentsResponseProcessorInterface $htmlResponseAttachmentsProcessor
    *   The HTML response attachments processor service.
    */
-  public function __construct(protected RendererInterface $renderer, protected AttachmentsResponseProcessorInterface $htmlResponseAttachmentsProcessor) {
-  }
+  public function __construct(
+    protected RendererInterface $renderer,
+    protected AttachmentsResponseProcessorInterface $htmlResponseAttachmentsProcessor,
+  ) {}
 
   /**
    * {@inheritdoc}

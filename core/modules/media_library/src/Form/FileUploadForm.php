@@ -52,7 +52,16 @@ class FileUploadForm extends AddFormBase {
    * @param \Drupal\file\FileRepositoryInterface $fileRepository
    *   The file repository service.
    */
-  public function __construct(EntityTypeManagerInterface $entity_type_manager, MediaLibraryUiBuilder $library_ui_builder, protected ElementInfoManagerInterface $elementInfo, protected RendererInterface $renderer, protected FileSystemInterface $fileSystem, OpenerResolverInterface $opener_resolver, protected FileUsageInterface $fileUsage, protected FileRepositoryInterface $fileRepository) {
+  public function __construct(
+    EntityTypeManagerInterface $entity_type_manager,
+    MediaLibraryUiBuilder $library_ui_builder,
+    protected ElementInfoManagerInterface $elementInfo,
+    protected RendererInterface $renderer,
+    protected FileSystemInterface $fileSystem,
+    OpenerResolverInterface $opener_resolver,
+    protected FileUsageInterface $fileUsage,
+    protected FileRepositoryInterface $fileRepository,
+  ) {
     parent::__construct($entity_type_manager, $library_ui_builder, $opener_resolver);
   }
 

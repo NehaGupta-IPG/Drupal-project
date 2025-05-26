@@ -15,7 +15,10 @@ class ConfigRenameEvent extends ConfigCrudEvent {
    * @param string $oldName
    *   The old configuration object name.
    */
-  public function __construct(StorableConfigBase $config, protected $oldName) {
+  public function __construct(
+    StorableConfigBase $config,
+    protected $oldName,
+  ) {
     $this->config = $config;
   }
 

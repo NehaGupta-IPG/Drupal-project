@@ -21,8 +21,10 @@ class TestMiddleware implements HttpKernelInterface {
    * @param mixed $optionalArgument
    *   (optional) An optional argument.
    */
-  public function __construct(protected HttpKernelInterface $httpKernel, protected $optionalArgument = NULL) {
-  }
+  public function __construct(
+    protected HttpKernelInterface $httpKernel,
+    protected $optionalArgument = NULL,
+  ) {}
 
   /**
    * {@inheritdoc}

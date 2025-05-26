@@ -31,7 +31,13 @@ class FormValidator implements FormValidatorInterface {
    * @param \Drupal\Core\Form\FormErrorHandlerInterface $formErrorHandler
    *   The form error handler.
    */
-  public function __construct(protected RequestStack $requestStack, TranslationInterface $string_translation, protected CsrfTokenGenerator $csrfToken, protected LoggerInterface $logger, protected FormErrorHandlerInterface $formErrorHandler) {
+  public function __construct(
+    protected RequestStack $requestStack,
+    TranslationInterface $string_translation,
+    protected CsrfTokenGenerator $csrfToken,
+    protected LoggerInterface $logger,
+    protected FormErrorHandlerInterface $formErrorHandler,
+  ) {
     $this->stringTranslation = $string_translation;
   }
 

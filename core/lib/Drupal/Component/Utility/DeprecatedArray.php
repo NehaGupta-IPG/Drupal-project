@@ -15,7 +15,10 @@ class DeprecatedArray extends \ArrayObject {
    * @param string $message
    *   The deprecation message.
    */
-  public function __construct(array $values, protected $message) {
+  public function __construct(
+    array $values,
+    protected $message,
+  ) {
     parent::__construct($values);
   }
 

@@ -27,8 +27,9 @@ class UpdateCacheBackendFactory implements CacheFactoryInterface {
    * @param \Drupal\Core\Cache\CacheFactoryInterface $cacheFactory
    *   The regular runtime cache_factory service.
    */
-  public function __construct(protected CacheFactoryInterface $cacheFactory) {
-  }
+  public function __construct(
+    protected CacheFactoryInterface $cacheFactory,
+  ) {}
 
   /**
    * {@inheritdoc}

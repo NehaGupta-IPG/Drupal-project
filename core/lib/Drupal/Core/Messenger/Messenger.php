@@ -20,8 +20,10 @@ class Messenger implements MessengerInterface {
    * @param \Drupal\Core\PageCache\ResponsePolicy\KillSwitch $killSwitch
    *   The kill switch.
    */
-  public function __construct(protected FlashBagInterface $flashBag, protected KillSwitch $killSwitch) {
-  }
+  public function __construct(
+    protected FlashBagInterface $flashBag,
+    protected KillSwitch $killSwitch,
+  ) {}
 
   /**
    * {@inheritdoc}

@@ -69,7 +69,10 @@ class EntityListBuilder extends EntityHandlerBase implements EntityListBuilderIn
    * @param \Drupal\Core\Entity\EntityStorageInterface $storage
    *   The entity storage class.
    */
-  public function __construct(EntityTypeInterface $entity_type, protected EntityStorageInterface $storage) {
+  public function __construct(
+    EntityTypeInterface $entity_type,
+    protected EntityStorageInterface $storage,
+  ) {
     $this->entityTypeId = $entity_type->id();
     $this->entityType = $entity_type;
   }

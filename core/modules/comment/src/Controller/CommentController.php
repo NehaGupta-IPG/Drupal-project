@@ -41,7 +41,13 @@ class CommentController extends ControllerBase {
    * @param \Drupal\Core\Entity\EntityRepositoryInterface $entityRepository
    *   The entity repository service.
    */
-  public function __construct(protected HttpKernelInterface $httpKernel, protected CommentManagerInterface $commentManager, EntityTypeManagerInterface $entity_type_manager, protected EntityFieldManagerInterface $entityFieldManager, protected EntityRepositoryInterface $entityRepository) {
+  public function __construct(
+    protected HttpKernelInterface $httpKernel,
+    protected CommentManagerInterface $commentManager,
+    EntityTypeManagerInterface $entity_type_manager,
+    protected EntityFieldManagerInterface $entityFieldManager,
+    protected EntityRepositoryInterface $entityRepository,
+  ) {
     $this->entityTypeManager = $entity_type_manager;
   }
 

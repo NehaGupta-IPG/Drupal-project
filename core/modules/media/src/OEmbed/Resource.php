@@ -145,7 +145,16 @@ class Resource implements CacheableDependencyInterface {
    *   (optional) The height of the thumbnail, in pixels. If this parameter is
    *   present, $thumbnail_url and $thumbnail_width must also be present.
    */
-  protected function __construct(protected ?Provider $provider = NULL, protected $title = NULL, protected $authorName = NULL, protected $authorUrl = NULL, $cache_age = NULL, $thumbnail_url = NULL, $thumbnail_width = NULL, $thumbnail_height = NULL) {
+  protected function __construct(
+    protected ?Provider $provider = NULL,
+    protected $title = NULL,
+    protected $authorName = NULL,
+    protected $authorUrl = NULL,
+    $cache_age = NULL,
+    $thumbnail_url = NULL,
+    $thumbnail_width = NULL,
+    $thumbnail_height = NULL,
+  ) {
     if (isset($cache_age) && is_numeric($cache_age)) {
       // If the cache age is too big, it can overflow the 'expire' column of
       // database cache backends, causing SQL exceptions. To prevent that,

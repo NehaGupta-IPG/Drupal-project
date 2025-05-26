@@ -20,8 +20,9 @@ abstract class LanguageFormBase extends EntityForm {
    * @param \Drupal\language\ConfigurableLanguageManagerInterface $languageManager
    *   The configurable language manager.
    */
-  public function __construct(protected ConfigurableLanguageManagerInterface $languageManager) {
-  }
+  public function __construct(
+    protected ConfigurableLanguageManagerInterface $languageManager,
+  ) {}
 
   /**
    * {@inheritdoc}

@@ -20,8 +20,9 @@ class ExceptionLoggingSubscriber implements EventSubscriberInterface {
    * @param \Drupal\Core\Logger\LoggerChannelFactoryInterface $logger
    *   The logger channel factory.
    */
-  public function __construct(protected LoggerChannelFactoryInterface $logger) {
-  }
+  public function __construct(
+    protected LoggerChannelFactoryInterface $logger,
+  ) {}
 
   /**
    * Log 403 errors.

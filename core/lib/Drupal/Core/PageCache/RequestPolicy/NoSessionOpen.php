@@ -22,8 +22,9 @@ class NoSessionOpen implements RequestPolicyInterface {
    * @param \Drupal\Core\Session\SessionConfigurationInterface $sessionConfiguration
    *   The session configuration.
    */
-  public function __construct(protected SessionConfigurationInterface $sessionConfiguration) {
-  }
+  public function __construct(
+    protected SessionConfigurationInterface $sessionConfiguration,
+  ) {}
 
   /**
    * {@inheritdoc}

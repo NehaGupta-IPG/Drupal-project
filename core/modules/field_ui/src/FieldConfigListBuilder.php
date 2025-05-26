@@ -51,7 +51,12 @@ class FieldConfigListBuilder extends ConfigEntityListBuilder {
    * @param \Drupal\Core\Entity\EntityFieldManagerInterface|null $entityFieldManager
    *   The entity field manager.
    */
-  public function __construct(EntityTypeInterface $entity_type, EntityTypeManagerInterface $entity_type_manager, protected FieldTypePluginManagerInterface $fieldTypeManager, protected EntityFieldManagerInterface $entityFieldManager) {
+  public function __construct(
+    EntityTypeInterface $entity_type,
+    EntityTypeManagerInterface $entity_type_manager,
+    protected FieldTypePluginManagerInterface $fieldTypeManager,
+    protected EntityFieldManagerInterface $entityFieldManager,
+  ) {
     parent::__construct($entity_type, $entity_type_manager->getStorage($entity_type->id()));
 
     $this->entityTypeManager = $entity_type_manager;

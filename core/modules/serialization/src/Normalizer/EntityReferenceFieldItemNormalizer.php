@@ -21,8 +21,9 @@ class EntityReferenceFieldItemNormalizer extends FieldItemNormalizer {
    * @param \Drupal\Core\Entity\EntityRepositoryInterface $entityRepository
    *   The entity repository.
    */
-  public function __construct(protected EntityRepositoryInterface $entityRepository) {
-  }
+  public function __construct(
+    protected EntityRepositoryInterface $entityRepository,
+  ) {}
 
   /**
    * {@inheritdoc}

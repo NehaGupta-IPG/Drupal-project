@@ -41,7 +41,14 @@ abstract class ImageToolkitBase extends PluginBase implements ImageToolkitInterf
    * @param \Drupal\Core\Config\ConfigFactoryInterface $configFactory
    *   The config factory.
    */
-  public function __construct(array $configuration, $plugin_id, array $plugin_definition, protected ImageToolkitOperationManagerInterface $operationManager, protected LoggerInterface $logger, protected ConfigFactoryInterface $configFactory) {
+  public function __construct(
+    array $configuration,
+    $plugin_id,
+    array $plugin_definition,
+    protected ImageToolkitOperationManagerInterface $operationManager,
+    protected LoggerInterface $logger,
+    protected ConfigFactoryInterface $configFactory,
+  ) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
   }
 

@@ -26,8 +26,11 @@ class ContentTranslationPermissions implements ContainerInjectionInterface {
    * @param \Drupal\Core\Entity\EntityTypeBundleInfoInterface $entityTypeBundleInfo
    *   The entity type bundle info.
    */
-  public function __construct(protected EntityTypeManagerInterface $entityTypeManager, protected ContentTranslationManagerInterface $contentTranslationManager, protected EntityTypeBundleInfoInterface $entityTypeBundleInfo) {
-  }
+  public function __construct(
+    protected EntityTypeManagerInterface $entityTypeManager,
+    protected ContentTranslationManagerInterface $contentTranslationManager,
+    protected EntityTypeBundleInfoInterface $entityTypeBundleInfo,
+  ) {}
 
   /**
    * {@inheritdoc}

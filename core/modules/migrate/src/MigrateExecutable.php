@@ -87,7 +87,11 @@ class MigrateExecutable implements MigrateExecutableInterface {
    * @param \Symfony\Contracts\EventDispatcher\EventDispatcherInterface $eventDispatcher
    *   (optional) The event dispatcher.
    */
-  public function __construct(protected MigrationInterface $migration, ?MigrateMessageInterface $message = NULL, protected ?EventDispatcherInterface $eventDispatcher = NULL) {
+  public function __construct(
+    protected MigrationInterface $migration,
+    ?MigrateMessageInterface $message = NULL,
+    protected ?EventDispatcherInterface $eventDispatcher = NULL,
+  ) {
     $this->message = $message ?: new MigrateMessage();
     $this->getIdMap()->setMessage($this->message);
     // Record the memory limit in bytes

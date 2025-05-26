@@ -51,7 +51,14 @@ class ViewEditForm extends ViewFormBase {
    * @param \Drupal\Core\Extension\ModuleHandlerInterface $moduleHandler
    *   The module handler service.
    */
-  public function __construct(SharedTempStoreFactory $temp_store_factory, protected RequestStack $requestStack, protected DateFormatterInterface $dateFormatter, protected ElementInfoManagerInterface $elementInfo, protected ThemeManagerInterface $themeManager, protected ModuleHandlerInterface $moduleHandler) {
+  public function __construct(
+    SharedTempStoreFactory $temp_store_factory,
+    protected RequestStack $requestStack,
+    protected DateFormatterInterface $dateFormatter,
+    protected ElementInfoManagerInterface $elementInfo,
+    protected ThemeManagerInterface $themeManager,
+    protected ModuleHandlerInterface $moduleHandler,
+  ) {
     $this->tempStore = $temp_store_factory->get('views');
   }
 

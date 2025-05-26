@@ -55,8 +55,14 @@ class RouteBuilder implements RouteBuilderInterface, DestructableInterface {
    * @param \Drupal\Core\Access\CheckProviderInterface $checkProvider
    *   The check provider.
    */
-  public function __construct(protected MatcherDumperInterface $dumper, protected LockBackendInterface $lock, protected EventDispatcherInterface $dispatcher, protected ModuleHandlerInterface $moduleHandler, protected ControllerResolverInterface $controllerResolver, protected CheckProviderInterface $checkProvider) {
-  }
+  public function __construct(
+    protected MatcherDumperInterface $dumper,
+    protected LockBackendInterface $lock,
+    protected EventDispatcherInterface $dispatcher,
+    protected ModuleHandlerInterface $moduleHandler,
+    protected ControllerResolverInterface $controllerResolver,
+    protected CheckProviderInterface $checkProvider,
+  ) {}
 
   /**
    * {@inheritdoc}

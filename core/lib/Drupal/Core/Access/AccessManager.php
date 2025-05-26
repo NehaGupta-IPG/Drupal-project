@@ -33,8 +33,13 @@ class AccessManager implements AccessManagerInterface {
    * @param CheckProviderInterface $checkProvider
    *   The check access provider.
    */
-  public function __construct(protected RouteProviderInterface $routeProvider, protected ParamConverterManagerInterface $paramConverterManager, protected AccessArgumentsResolverFactoryInterface $argumentsResolverFactory, protected AccountInterface $currentUser, protected CheckProviderInterface $checkProvider) {
-  }
+  public function __construct(
+    protected RouteProviderInterface $routeProvider,
+    protected ParamConverterManagerInterface $paramConverterManager,
+    protected AccessArgumentsResolverFactoryInterface $argumentsResolverFactory,
+    protected AccountInterface $currentUser,
+    protected CheckProviderInterface $checkProvider,
+  ) {}
 
   /**
    * {@inheritdoc}

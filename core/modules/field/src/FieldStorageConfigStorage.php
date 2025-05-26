@@ -43,7 +43,17 @@ class FieldStorageConfigStorage extends ConfigEntityStorage {
    * @param \Drupal\Core\Cache\MemoryCache\MemoryCacheInterface $memory_cache
    *   The memory cache.
    */
-  public function __construct(EntityTypeInterface $entity_type, ConfigFactoryInterface $config_factory, UuidInterface $uuid_service, LanguageManagerInterface $language_manager, protected EntityTypeManagerInterface $entityTypeManager, protected ModuleHandlerInterface $moduleHandler, protected FieldTypePluginManagerInterface $fieldTypeManager, protected DeletedFieldsRepositoryInterface $deletedFieldsRepository, MemoryCacheInterface $memory_cache) {
+  public function __construct(
+    EntityTypeInterface $entity_type,
+    ConfigFactoryInterface $config_factory,
+    UuidInterface $uuid_service,
+    LanguageManagerInterface $language_manager,
+    protected EntityTypeManagerInterface $entityTypeManager,
+    protected ModuleHandlerInterface $moduleHandler,
+    protected FieldTypePluginManagerInterface $fieldTypeManager,
+    protected DeletedFieldsRepositoryInterface $deletedFieldsRepository,
+    MemoryCacheInterface $memory_cache,
+  ) {
     parent::__construct($entity_type, $config_factory, $uuid_service, $language_manager, $memory_cache);
   }
 

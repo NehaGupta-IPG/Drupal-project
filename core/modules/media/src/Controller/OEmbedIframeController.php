@@ -50,8 +50,13 @@ class OEmbedIframeController implements ContainerInjectionInterface {
    * @param \Drupal\media\IFrameUrlHelper $iFrameUrlHelper
    *   The iFrame URL helper service.
    */
-  public function __construct(protected ResourceFetcherInterface $resourceFetcher, protected UrlResolverInterface $urlResolver, protected RendererInterface $renderer, protected LoggerInterface $logger, protected IFrameUrlHelper $iFrameUrlHelper) {
-  }
+  public function __construct(
+    protected ResourceFetcherInterface $resourceFetcher,
+    protected UrlResolverInterface $urlResolver,
+    protected RendererInterface $renderer,
+    protected LoggerInterface $logger,
+    protected IFrameUrlHelper $iFrameUrlHelper,
+  ) {}
 
   /**
    * {@inheritdoc}

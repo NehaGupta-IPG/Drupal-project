@@ -34,7 +34,11 @@ class DynamicLocalTasks extends DeriverBase implements ContainerDeriverInterface
    * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
    *   The config factory.
    */
-  public function __construct(TranslationInterface $string_translation, protected EntityTypeManagerInterface $entityTypeManager, ConfigFactoryInterface $config_factory) {
+  public function __construct(
+    TranslationInterface $string_translation,
+    protected EntityTypeManagerInterface $entityTypeManager,
+    ConfigFactoryInterface $config_factory,
+  ) {
     $this->stringTranslation = $string_translation;
     $this->config = $config_factory->get('media.settings');
   }

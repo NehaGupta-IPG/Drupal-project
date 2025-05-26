@@ -23,8 +23,14 @@ class Transition implements TransitionInterface {
    * @param int $weight
    *   (optional) The transition's weight. Defaults to 0.
    */
-  public function __construct(protected WorkflowTypeInterface $workflow, protected $id, protected $label, protected array $fromStateIds, protected $toStateId, protected $weight = 0) {
-  }
+  public function __construct(
+    protected WorkflowTypeInterface $workflow,
+    protected $id,
+    protected $label,
+    protected array $fromStateIds,
+    protected $toStateId,
+    protected $weight = 0,
+  ) {}
 
   /**
    * {@inheritdoc}

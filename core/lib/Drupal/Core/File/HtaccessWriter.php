@@ -22,8 +22,10 @@ class HtaccessWriter implements HtaccessWriterInterface {
    * @param \Drupal\Core\StreamWrapper\StreamWrapperManagerInterface $streamWrapperManager
    *   The stream wrapper manager.
    */
-  public function __construct(protected LoggerInterface $logger, protected StreamWrapperManagerInterface $streamWrapperManager) {
-  }
+  public function __construct(
+    protected LoggerInterface $logger,
+    protected StreamWrapperManagerInterface $streamWrapperManager,
+  ) {}
 
   /**
    * {@inheritdoc}

@@ -23,7 +23,11 @@ class DatabaseDriverUninstallValidator implements ModuleUninstallValidatorInterf
    * @param \Drupal\Core\Database\Connection $connection
    *   The database connection.
    */
-  public function __construct(TranslationInterface $string_translation, protected ModuleExtensionList $moduleExtensionList, protected Connection $connection) {
+  public function __construct(
+    TranslationInterface $string_translation,
+    protected ModuleExtensionList $moduleExtensionList,
+    protected Connection $connection,
+  ) {
     $this->stringTranslation = $string_translation;
   }
 

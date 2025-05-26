@@ -60,8 +60,16 @@ class ConfigController implements ContainerInjectionInterface {
    * @param \Drupal\Core\Config\ImportStorageTransformer $importTransformer
    *   The import transformer service.
    */
-  public function __construct(protected StorageInterface $targetStorage, protected StorageInterface $syncStorage, protected ConfigManagerInterface $configManager, protected FileDownloadController $fileDownloadController, protected DiffFormatter $diffFormatter, protected FileSystemInterface $fileSystem, protected StorageInterface $exportStorage, protected ImportStorageTransformer $importTransformer) {
-  }
+  public function __construct(
+    protected StorageInterface $targetStorage,
+    protected StorageInterface $syncStorage,
+    protected ConfigManagerInterface $configManager,
+    protected FileDownloadController $fileDownloadController,
+    protected DiffFormatter $diffFormatter,
+    protected FileSystemInterface $fileSystem,
+    protected StorageInterface $exportStorage,
+    protected ImportStorageTransformer $importTransformer,
+  ) {}
 
   /**
    * Downloads a tarball of the site configuration.

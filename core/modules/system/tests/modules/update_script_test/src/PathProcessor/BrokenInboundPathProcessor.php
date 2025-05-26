@@ -19,8 +19,9 @@ class BrokenInboundPathProcessor implements InboundPathProcessorInterface {
    * @param \Drupal\Core\State\StateInterface $state
    *   The state.
    */
-  public function __construct(protected StateInterface $state) {
-  }
+  public function __construct(
+    protected StateInterface $state,
+  ) {}
 
   /**
    * {@inheritdoc}

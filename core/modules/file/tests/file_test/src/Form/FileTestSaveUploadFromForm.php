@@ -26,8 +26,10 @@ class FileTestSaveUploadFromForm extends FormBase {
    * @param \Drupal\Core\Messenger\MessengerInterface $messenger
    *   The messenger.
    */
-  public function __construct(protected StateInterface $state, protected MessengerInterface $messenger) {
-  }
+  public function __construct(
+    protected StateInterface $state,
+    protected MessengerInterface $messenger,
+  ) {}
 
   /**
    * {@inheritdoc}

@@ -25,8 +25,9 @@ class AccessDeniedSubscriber extends HttpExceptionSubscriberBase {
    * @param \Drupal\Core\Session\AccountInterface $account
    *   The current user.
    */
-  public function __construct(protected AccountInterface $account) {
-  }
+  public function __construct(
+    protected AccountInterface $account,
+  ) {}
 
   /**
    * {@inheritdoc}

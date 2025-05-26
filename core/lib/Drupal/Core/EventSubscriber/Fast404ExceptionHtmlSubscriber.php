@@ -41,8 +41,10 @@ class Fast404ExceptionHtmlSubscriber extends HttpExceptionSubscriberBase {
    * @param \Drupal\Core\Cache\CacheTagsInvalidatorInterface $cacheTagsInvalidator
    *   The cache tags invalidator.
    */
-  public function __construct(protected ConfigFactoryInterface $configFactory, protected CacheTagsInvalidatorInterface $cacheTagsInvalidator) {
-  }
+  public function __construct(
+    protected ConfigFactoryInterface $configFactory,
+    protected CacheTagsInvalidatorInterface $cacheTagsInvalidator,
+  ) {}
 
   /**
    * {@inheritdoc}

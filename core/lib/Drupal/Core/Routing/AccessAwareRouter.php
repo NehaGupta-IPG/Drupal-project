@@ -30,8 +30,11 @@ class AccessAwareRouter implements AccessAwareRouterInterface {
    * @param \Drupal\Core\Session\AccountInterface $account
    *   The account to use in access checks.
    */
-  public function __construct(protected RouterInterface $router, protected AccessManagerInterface $accessManager, protected AccountInterface $account) {
-  }
+  public function __construct(
+    protected RouterInterface $router,
+    protected AccessManagerInterface $accessManager,
+    protected AccountInterface $account,
+  ) {}
 
   /**
    * {@inheritdoc}

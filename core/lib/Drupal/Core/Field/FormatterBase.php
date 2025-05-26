@@ -35,7 +35,15 @@ abstract class FormatterBase extends PluginSettingsBase implements FormatterInte
    * @param array $third_party_settings
    *   Any third party settings.
    */
-  public function __construct($plugin_id, $plugin_definition, protected FieldDefinitionInterface $fieldDefinition, protected array $settings, protected $label, protected $viewMode, array $third_party_settings) {
+  public function __construct(
+    $plugin_id,
+    $plugin_definition,
+    protected FieldDefinitionInterface $fieldDefinition,
+    protected array $settings,
+    protected $label,
+    protected $viewMode,
+    array $third_party_settings,
+  ) {
     parent::__construct([], $plugin_id, $plugin_definition);
     $this->thirdPartySettings = $third_party_settings;
   }

@@ -31,7 +31,12 @@ class UserListBuilder extends EntityListBuilder {
    * @param \Drupal\Core\Routing\RedirectDestinationInterface $redirectDestination
    *   The redirect destination service.
    */
-  public function __construct(EntityTypeInterface $entity_type, EntityStorageInterface $storage, protected DateFormatterInterface $dateFormatter, protected RedirectDestinationInterface $redirectDestination) {
+  public function __construct(
+    EntityTypeInterface $entity_type,
+    EntityStorageInterface $storage,
+    protected DateFormatterInterface $dateFormatter,
+    protected RedirectDestinationInterface $redirectDestination,
+  ) {
     parent::__construct($entity_type, $storage);
   }
 

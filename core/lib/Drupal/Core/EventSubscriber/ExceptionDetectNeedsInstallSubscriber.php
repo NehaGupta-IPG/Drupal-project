@@ -21,8 +21,9 @@ class ExceptionDetectNeedsInstallSubscriber implements EventSubscriberInterface 
    * @param \Drupal\Core\Database\Connection $connection
    *   The default database connection.
    */
-  public function __construct(protected Connection $connection) {
-  }
+  public function __construct(
+    protected Connection $connection,
+  ) {}
 
   /**
    * Handles errors for this subscriber.

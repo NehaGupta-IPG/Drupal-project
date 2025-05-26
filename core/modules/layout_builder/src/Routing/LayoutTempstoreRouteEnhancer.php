@@ -19,8 +19,9 @@ class LayoutTempstoreRouteEnhancer implements EnhancerInterface {
    * @param \Drupal\layout_builder\LayoutTempstoreRepositoryInterface $layoutTempstoreRepository
    *   The layout tempstore repository.
    */
-  public function __construct(protected LayoutTempstoreRepositoryInterface $layoutTempstoreRepository) {
-  }
+  public function __construct(
+    protected LayoutTempstoreRepositoryInterface $layoutTempstoreRepository,
+  ) {}
 
   /**
    * {@inheritdoc}

@@ -18,8 +18,9 @@ class DatabaseCacheTagsChecksum implements CacheTagsChecksumInterface, CacheTags
    * @param \Drupal\Core\Database\Connection $connection
    *   The database connection.
    */
-  public function __construct(protected Connection $connection) {
-  }
+  public function __construct(
+    protected Connection $connection,
+  ) {}
 
   /**
    * {@inheritdoc}

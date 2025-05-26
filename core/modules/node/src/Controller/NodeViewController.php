@@ -27,7 +27,12 @@ class NodeViewController extends EntityViewController {
    * @param \Drupal\Core\Entity\EntityRepositoryInterface $entityRepository
    *   The entity repository.
    */
-  public function __construct(EntityTypeManagerInterface $entity_type_manager, RendererInterface $renderer, protected AccountInterface $currentUser, protected EntityRepositoryInterface $entityRepository) {
+  public function __construct(
+    EntityTypeManagerInterface $entity_type_manager,
+    RendererInterface $renderer,
+    protected AccountInterface $currentUser,
+    protected EntityRepositoryInterface $entityRepository,
+  ) {
     parent::__construct($entity_type_manager, $renderer);
   }
 

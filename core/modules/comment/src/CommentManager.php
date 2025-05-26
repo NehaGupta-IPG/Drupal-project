@@ -57,7 +57,15 @@ class CommentManager implements CommentManagerInterface {
    * @param \Drupal\Core\Entity\EntityDisplayRepositoryInterface $entityDisplayRepository
    *   The entity display repository service.
    */
-  public function __construct(protected EntityTypeManagerInterface $entityTypeManager, ConfigFactoryInterface $config_factory, TranslationInterface $string_translation, protected ModuleHandlerInterface $moduleHandler, protected AccountInterface $currentUser, protected EntityFieldManagerInterface $entityFieldManager, protected EntityDisplayRepositoryInterface $entityDisplayRepository) {
+  public function __construct(
+    protected EntityTypeManagerInterface $entityTypeManager,
+    ConfigFactoryInterface $config_factory,
+    TranslationInterface $string_translation,
+    protected ModuleHandlerInterface $moduleHandler,
+    protected AccountInterface $currentUser,
+    protected EntityFieldManagerInterface $entityFieldManager,
+    protected EntityDisplayRepositoryInterface $entityDisplayRepository,
+  ) {
     $this->userConfig = $config_factory->get('user.settings');
     $this->stringTranslation = $string_translation;
   }

@@ -38,8 +38,11 @@ class ModulesListConfirmForm extends ConfirmFormBase {
    * @param \Drupal\Core\KeyValueStore\KeyValueStoreExpirableInterface $keyValueExpirable
    *   The key value expirable factory.
    */
-  public function __construct(protected ModuleHandlerInterface $moduleHandler, protected ModuleInstallerInterface $moduleInstaller, protected KeyValueStoreExpirableInterface $keyValueExpirable) {
-  }
+  public function __construct(
+    protected ModuleHandlerInterface $moduleHandler,
+    protected ModuleInstallerInterface $moduleInstaller,
+    protected KeyValueStoreExpirableInterface $keyValueExpirable,
+  ) {}
 
   /**
    * {@inheritdoc}

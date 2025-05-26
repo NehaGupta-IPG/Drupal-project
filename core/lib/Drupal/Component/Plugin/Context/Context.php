@@ -19,8 +19,10 @@ class Context implements ContextInterface {
    * @param mixed|null $contextValue
    *   The value of the context.
    */
-  public function __construct(protected ContextDefinitionInterface $contextDefinition, protected $contextValue = NULL) {
-  }
+  public function __construct(
+    protected ContextDefinitionInterface $contextDefinition,
+    protected $contextValue = NULL,
+  ) {}
 
   /**
    * {@inheritdoc}

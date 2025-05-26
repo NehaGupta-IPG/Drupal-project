@@ -30,8 +30,9 @@ class MenuLinkResetForm extends ConfirmFormBase {
    * @param \Drupal\Core\Menu\MenuLinkManagerInterface $menuLinkManager
    *   The menu link manager.
    */
-  public function __construct(protected MenuLinkManagerInterface $menuLinkManager) {
-  }
+  public function __construct(
+    protected MenuLinkManagerInterface $menuLinkManager,
+  ) {}
 
   /**
    * {@inheritdoc}

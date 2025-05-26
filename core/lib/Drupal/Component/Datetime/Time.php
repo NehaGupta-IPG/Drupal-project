@@ -26,8 +26,9 @@ class Time implements TimeInterface {
    * @param \Symfony\Component\HttpFoundation\RequestStack|null $requestStack
    *   (Optional) The request stack.
    */
-  public function __construct(protected ?RequestStack $requestStack = NULL) {
-  }
+  public function __construct(
+    protected ?RequestStack $requestStack = NULL,
+  ) {}
 
   /**
    * {@inheritdoc}

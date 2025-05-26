@@ -45,7 +45,14 @@ class SearchPageListBuilder extends DraggableListBuilder implements FormInterfac
    * @param \Drupal\search\SearchIndexInterface $searchIndex
    *   The search index.
    */
-  public function __construct(EntityTypeInterface $entity_type, EntityStorageInterface $storage, protected SearchPluginManager $searchManager, protected ConfigFactoryInterface $configFactory, protected MessengerInterface $messenger, protected SearchIndexInterface $searchIndex) {
+  public function __construct(
+    EntityTypeInterface $entity_type,
+    EntityStorageInterface $storage,
+    protected SearchPluginManager $searchManager,
+    protected ConfigFactoryInterface $configFactory,
+    protected MessengerInterface $messenger,
+    protected SearchIndexInterface $searchIndex,
+  ) {
     parent::__construct($entity_type, $storage);
   }
 

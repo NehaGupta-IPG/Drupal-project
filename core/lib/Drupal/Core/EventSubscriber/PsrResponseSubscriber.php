@@ -20,8 +20,9 @@ class PsrResponseSubscriber implements EventSubscriberInterface {
    * @param \Symfony\Bridge\PsrHttpMessage\HttpFoundationFactoryInterface $httpFoundationFactory
    *   The httpFoundation factory.
    */
-  public function __construct(protected HttpFoundationFactoryInterface $httpFoundationFactory) {
-  }
+  public function __construct(
+    protected HttpFoundationFactoryInterface $httpFoundationFactory,
+  ) {}
 
   /**
    * Converts a PSR-7 response to a Symfony response.

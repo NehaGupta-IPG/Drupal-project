@@ -35,8 +35,11 @@ class Cookie implements AuthenticationProviderInterface, EventSubscriberInterfac
    * @param \Drupal\Core\Messenger\MessengerInterface $messenger
    *   The messenger.
    */
-  public function __construct(protected SessionConfigurationInterface $sessionConfiguration, protected Connection $connection, protected MessengerInterface $messenger) {
-  }
+  public function __construct(
+    protected SessionConfigurationInterface $sessionConfiguration,
+    protected Connection $connection,
+    protected MessengerInterface $messenger,
+  ) {}
 
   /**
    * {@inheritdoc}

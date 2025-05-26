@@ -17,8 +17,9 @@ class ModuleRouteSubscriber extends RouteSubscriberBase {
    * @param \Drupal\Core\Extension\ModuleHandlerInterface $moduleHandler
    *   The module handler.
    */
-  public function __construct(protected ModuleHandlerInterface $moduleHandler) {
-  }
+  public function __construct(
+    protected ModuleHandlerInterface $moduleHandler,
+  ) {}
 
   /**
    * {@inheritdoc}

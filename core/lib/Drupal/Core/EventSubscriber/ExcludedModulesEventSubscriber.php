@@ -30,8 +30,11 @@ final class ExcludedModulesEventSubscriber implements EventSubscriberInterface {
    * @param \Drupal\Core\Config\ConfigManagerInterface $manager
    *   The config manager.
    */
-  public function __construct(private StorageInterface $activeStorage, private Settings $settings, private ConfigManagerInterface $manager) {
-  }
+  public function __construct(
+    private StorageInterface $activeStorage,
+    private Settings $settings,
+    private ConfigManagerInterface $manager,
+  ) {}
 
   /**
    * {@inheritdoc}

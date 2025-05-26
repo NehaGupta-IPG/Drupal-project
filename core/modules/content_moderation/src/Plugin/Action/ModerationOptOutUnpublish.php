@@ -36,7 +36,15 @@ class ModerationOptOutUnpublish extends UnpublishAction {
    * @param \Drupal\Core\Messenger\MessengerInterface $messenger
    *   Messenger service.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, EntityTypeManagerInterface $entity_type_manager, protected ModerationInformationInterface $moderationInfo, protected EntityTypeBundleInfoInterface $bundleInfo, protected MessengerInterface $messenger) {
+  public function __construct(
+    array $configuration,
+    $plugin_id,
+    $plugin_definition,
+    EntityTypeManagerInterface $entity_type_manager,
+    protected ModerationInformationInterface $moderationInfo,
+    protected EntityTypeBundleInfoInterface $bundleInfo,
+    protected MessengerInterface $messenger,
+  ) {
     parent::__construct($configuration, $plugin_id, $plugin_definition, $entity_type_manager);
   }
 

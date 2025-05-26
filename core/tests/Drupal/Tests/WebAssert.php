@@ -32,7 +32,10 @@ class WebAssert extends MinkWebAssert {
    * @param string $baseUrl
    *   The base URL of the site under test.
    */
-  public function __construct(Session $session, protected $baseUrl = '') {
+  public function __construct(
+    Session $session,
+    protected $baseUrl = '',
+  ) {
     parent::__construct($session);
   }
 

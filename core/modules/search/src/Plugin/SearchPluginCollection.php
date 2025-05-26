@@ -22,7 +22,12 @@ class SearchPluginCollection extends DefaultSingleLazyPluginCollection {
    * @param string $searchPageId
    *   The unique ID of the search page using this plugin.
    */
-  public function __construct(PluginManagerInterface $manager, $instance_id, array $configuration, protected $searchPageId) {
+  public function __construct(
+    PluginManagerInterface $manager,
+    $instance_id,
+    array $configuration,
+    protected $searchPageId,
+  ) {
     parent::__construct($manager, $instance_id, $configuration);
   }
 

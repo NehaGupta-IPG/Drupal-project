@@ -9,8 +9,10 @@ namespace Drupal\services_defaults_test;
  */
 class TestService {
 
-  public function __construct(protected TestInjectionInterface $testInjection, protected TestInjection2 $testInjection2) {
-  }
+  public function __construct(
+    protected TestInjectionInterface $testInjection,
+    protected TestInjection2 $testInjection2,
+  ) {}
 
   public function getTestInjection() {
     return $this->testInjection;

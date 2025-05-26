@@ -39,8 +39,11 @@ class CKEditor5MediaController extends ControllerBase {
    * @param \Symfony\Component\HttpFoundation\RequestStack $requestStack
    *   The request stack.
    */
-  public function __construct(protected AccountInterface $currentUser, protected EntityRepositoryInterface $entityRepository, protected RequestStack $requestStack) {
-  }
+  public function __construct(
+    protected AccountInterface $currentUser,
+    protected EntityRepositoryInterface $entityRepository,
+    protected RequestStack $requestStack,
+  ) {}
 
   /**
    * Returns JSON response containing metadata about media entity.

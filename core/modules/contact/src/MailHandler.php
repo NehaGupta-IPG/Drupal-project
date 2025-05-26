@@ -38,7 +38,13 @@ class MailHandler implements MailHandlerInterface {
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager.
    */
-  public function __construct(protected MailManagerInterface $mailManager, protected LanguageManagerInterface $languageManager, protected LoggerInterface $logger, TranslationInterface $string_translation, EntityTypeManagerInterface $entity_type_manager) {
+  public function __construct(
+    protected MailManagerInterface $mailManager,
+    protected LanguageManagerInterface $languageManager,
+    protected LoggerInterface $logger,
+    TranslationInterface $string_translation,
+    EntityTypeManagerInterface $entity_type_manager,
+  ) {
     $this->stringTranslation = $string_translation;
     $this->userStorage = $entity_type_manager->getStorage('user');
   }

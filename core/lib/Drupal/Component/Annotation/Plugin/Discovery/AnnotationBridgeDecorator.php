@@ -22,8 +22,10 @@ class AnnotationBridgeDecorator implements DiscoveryInterface {
    *   corresponding to this name must implement
    *   \Drupal\Component\Annotation\AnnotationInterface.
    */
-  public function __construct(protected DiscoveryInterface $decorated, protected $pluginDefinitionAnnotationName) {
-  }
+  public function __construct(
+    protected DiscoveryInterface $decorated,
+    protected $pluginDefinitionAnnotationName,
+  ) {}
 
   /**
    * {@inheritdoc}

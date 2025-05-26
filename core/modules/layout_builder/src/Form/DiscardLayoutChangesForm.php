@@ -35,8 +35,10 @@ class DiscardLayoutChangesForm extends ConfirmFormBase implements WorkspaceDynam
    * @param \Drupal\Core\Messenger\MessengerInterface $messenger
    *   The messenger service.
    */
-  public function __construct(protected LayoutTempstoreRepositoryInterface $layoutTempstoreRepository, protected MessengerInterface $messenger) {
-  }
+  public function __construct(
+    protected LayoutTempstoreRepositoryInterface $layoutTempstoreRepository,
+    protected MessengerInterface $messenger,
+  ) {}
 
   /**
    * {@inheritdoc}

@@ -20,8 +20,10 @@ class PluginManagerCacheClearer extends DefaultPluginManager {
    * @param null $optionalService
    *   An optional service for testing.
    */
-  public function __construct(protected StateInterface $state, protected $optionalService = NULL) {
-  }
+  public function __construct(
+    protected StateInterface $state,
+    protected $optionalService = NULL,
+  ) {}
 
   /**
    * Tests call to CachedDiscoveryInterface::clearCachedDefinitions().

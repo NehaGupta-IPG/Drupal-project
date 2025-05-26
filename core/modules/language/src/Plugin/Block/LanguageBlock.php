@@ -39,7 +39,13 @@ class LanguageBlock extends BlockBase implements ContainerFactoryPluginInterface
    * @param \Drupal\Core\Path\PathMatcherInterface $pathMatcher
    *   The path matcher.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, protected LanguageManagerInterface $languageManager, protected PathMatcherInterface $pathMatcher) {
+  public function __construct(
+    array $configuration,
+    $plugin_id,
+    $plugin_definition,
+    protected LanguageManagerInterface $languageManager,
+    protected PathMatcherInterface $pathMatcher,
+  ) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
   }
 

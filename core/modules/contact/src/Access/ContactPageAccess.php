@@ -22,8 +22,10 @@ class ContactPageAccess implements AccessInterface {
    * @param \Drupal\user\UserDataInterface $userData
    *   The user data service.
    */
-  public function __construct(protected ConfigFactoryInterface $configFactory, protected UserDataInterface $userData) {
-  }
+  public function __construct(
+    protected ConfigFactoryInterface $configFactory,
+    protected UserDataInterface $userData,
+  ) {}
 
   /**
    * Checks access to the given user's contact page.

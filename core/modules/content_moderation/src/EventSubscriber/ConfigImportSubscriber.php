@@ -21,8 +21,10 @@ class ConfigImportSubscriber extends ConfigImportValidateEventSubscriberBase {
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
    *   The entity type manager.
    */
-  public function __construct(protected ConfigManagerInterface $configManager, protected EntityTypeManagerInterface $entityTypeManager) {
-  }
+  public function __construct(
+    protected ConfigManagerInterface $configManager,
+    protected EntityTypeManagerInterface $entityTypeManager,
+  ) {}
 
   /**
    * {@inheritdoc}

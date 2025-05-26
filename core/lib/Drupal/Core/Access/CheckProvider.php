@@ -55,8 +55,10 @@ class CheckProvider implements CheckProviderInterface {
    * @param \Psr\Container\ContainerInterface $container
    *   The check provider service locator.
    */
-  public function __construct(protected array $dynamicRequirementMap, protected ContainerInterface $container) {
-  }
+  public function __construct(
+    protected array $dynamicRequirementMap,
+    protected ContainerInterface $container,
+  ) {}
 
   /**
    * {@inheritdoc}

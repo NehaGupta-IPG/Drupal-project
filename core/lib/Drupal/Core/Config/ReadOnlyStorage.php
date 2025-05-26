@@ -13,8 +13,9 @@ class ReadOnlyStorage implements StorageInterface {
    * @param \Drupal\Core\Config\StorageInterface $storage
    *   The decorated storage.
    */
-  public function __construct(protected StorageInterface $storage) {
-  }
+  public function __construct(
+    protected StorageInterface $storage,
+  ) {}
 
   /**
    * {@inheritdoc}

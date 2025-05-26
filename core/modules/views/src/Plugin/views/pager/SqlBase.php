@@ -29,7 +29,13 @@ abstract class SqlBase extends PagerPluginBase implements CacheableDependencyInt
    * @param \Drupal\Core\Pager\PagerParametersInterface $pagerParameters
    *   The pager parameters.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, protected PagerManagerInterface $pagerManager, protected PagerParametersInterface $pagerParameters) {
+  public function __construct(
+    array $configuration,
+    $plugin_id,
+    $plugin_definition,
+    protected PagerManagerInterface $pagerManager,
+    protected PagerParametersInterface $pagerParameters,
+  ) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
   }
 

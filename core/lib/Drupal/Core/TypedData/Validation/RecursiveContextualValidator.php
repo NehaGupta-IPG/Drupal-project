@@ -43,8 +43,12 @@ class RecursiveContextualValidator implements ContextualValidatorInterface {
    * @param \Drupal\Core\TypedData\TypedDataManagerInterface $typedDataManager
    *   The typed data manager.
    */
-  public function __construct(protected ExecutionContextInterface $context, protected MetadataFactoryInterface $metadataFactory, protected ConstraintValidatorFactoryInterface $constraintValidatorFactory, protected TypedDataManagerInterface $typedDataManager) {
-  }
+  public function __construct(
+    protected ExecutionContextInterface $context,
+    protected MetadataFactoryInterface $metadataFactory,
+    protected ConstraintValidatorFactoryInterface $constraintValidatorFactory,
+    protected TypedDataManagerInterface $typedDataManager,
+  ) {}
 
   /**
    * {@inheritdoc}

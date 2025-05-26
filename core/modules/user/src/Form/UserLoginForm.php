@@ -43,7 +43,13 @@ class UserLoginForm extends FormBase implements WorkspaceSafeFormInterface {
    * @param \Drupal\Core\Render\BareHtmlPageRendererInterface $bareHtmlPageRenderer
    *   The renderer.
    */
-  public function __construct(protected UserFloodControlInterface $userFloodControl, protected UserStorageInterface $userStorage, UserAuthInterface|UserAuthenticationInterface $user_auth, protected RendererInterface $renderer, protected BareHtmlPageRendererInterface $bareHtmlPageRenderer) {
+  public function __construct(
+    protected UserFloodControlInterface $userFloodControl,
+    protected UserStorageInterface $userStorage,
+    UserAuthInterface|UserAuthenticationInterface $user_auth,
+    protected RendererInterface $renderer,
+    protected BareHtmlPageRendererInterface $bareHtmlPageRenderer,
+  ) {
     if (!$user_auth instanceof UserAuthenticationInterface) {
       @trigger_error('The $user_auth parameter not implementing UserAuthenticationInterface is deprecated in drupal:10.3.0 and will be removed in drupal:12.0.0. See https://www.drupal.org/node/3411040');
     }

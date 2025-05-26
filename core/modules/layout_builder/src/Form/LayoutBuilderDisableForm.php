@@ -36,7 +36,10 @@ class LayoutBuilderDisableForm extends ConfirmFormBase implements WorkspaceDynam
    * @param \Drupal\Core\Messenger\MessengerInterface $messenger
    *   The messenger service.
    */
-  public function __construct(protected LayoutTempstoreRepositoryInterface $layoutTempstoreRepository, MessengerInterface $messenger) {
+  public function __construct(
+    protected LayoutTempstoreRepositoryInterface $layoutTempstoreRepository,
+    MessengerInterface $messenger,
+  ) {
     $this->setMessenger($messenger);
   }
 

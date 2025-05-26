@@ -61,8 +61,13 @@ class MenuLinkTreeElement {
    * @param \Drupal\Core\Menu\MenuLinkTreeElement[] $subtree
    *   The children of this element in the menu link tree.
    */
-  public function __construct(public MenuLinkInterface $link, public $hasChildren, public $depth, public $inActiveTrail, public array $subtree) {
-  }
+  public function __construct(
+    public MenuLinkInterface $link,
+    public $hasChildren,
+    public $depth,
+    public $inActiveTrail,
+    public array $subtree,
+  ) {}
 
   /**
    * Counts all menu links in the current subtree.

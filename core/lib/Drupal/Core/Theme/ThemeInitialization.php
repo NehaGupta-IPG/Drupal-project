@@ -31,8 +31,12 @@ class ThemeInitialization implements ThemeInitializationInterface {
    * @param \Drupal\Core\Extension\ModuleHandlerInterface $moduleHandler
    *   The module handler to use to load modules.
    */
-  public function __construct(protected $root, protected ThemeHandlerInterface $themeHandler, protected CacheBackendInterface $cache, protected ModuleHandlerInterface $moduleHandler) {
-  }
+  public function __construct(
+    protected $root,
+    protected ThemeHandlerInterface $themeHandler,
+    protected CacheBackendInterface $cache,
+    protected ModuleHandlerInterface $moduleHandler,
+  ) {}
 
   /**
    * {@inheritdoc}

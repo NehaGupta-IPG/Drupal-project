@@ -17,7 +17,11 @@ class FileValidationException extends \RuntimeException {
    * @param array $errors
    *   The validation errors.
    */
-  public function __construct(string $message, protected string $fileName, protected array $errors) {
+  public function __construct(
+    string $message,
+    protected string $fileName,
+    protected array $errors,
+  ) {
     parent::__construct($message, 0, NULL);
   }
 

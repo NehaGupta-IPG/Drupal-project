@@ -26,7 +26,13 @@ class AliasPrefixList extends CacheCollector implements AliasPrefixListInterface
    * @param \Drupal\path_alias\AliasRepositoryInterface $pathAliasRepository
    *   The path alias repository.
    */
-  public function __construct($cid, CacheBackendInterface $cache, LockBackendInterface $lock, protected StateInterface $state, protected AliasRepositoryInterface $pathAliasRepository) {
+  public function __construct(
+    $cid,
+    CacheBackendInterface $cache,
+    LockBackendInterface $lock,
+    protected StateInterface $state,
+    protected AliasRepositoryInterface $pathAliasRepository,
+  ) {
     parent::__construct($cid, $cache, $lock);
   }
 

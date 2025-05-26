@@ -117,7 +117,15 @@ class MenuLinkParent extends ProcessPluginBase implements ContainerFactoryPlugin
    * @param \Drupal\migrate\Plugin\MigrationInterface $migration
    *   The currently running migration.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, protected MigrateLookupInterface $migrateLookup, protected MenuLinkManagerInterface $menuLinkManager, protected EntityStorageInterface $menuLinkStorage, protected MigrationInterface $migration) {
+  public function __construct(
+    array $configuration,
+    $plugin_id,
+    $plugin_definition,
+    protected MigrateLookupInterface $migrateLookup,
+    protected MenuLinkManagerInterface $menuLinkManager,
+    protected EntityStorageInterface $menuLinkStorage,
+    protected MigrationInterface $migration,
+  ) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
     $this->lookupMigrations = $this->configuration['lookup_migrations'] ?? [$this->migration->id()];
   }

@@ -29,8 +29,10 @@ final class StageFixtureManipulator extends FixtureManipulator implements Beginn
    * @param \PhpTuf\ComposerStager\API\Core\BeginnerInterface $inner
    *   The decorated beginner service.
    */
-  public function __construct(private StateInterface $state, private BeginnerInterface $inner) {
-  }
+  public function __construct(
+    private StateInterface $state,
+    private BeginnerInterface $inner,
+  ) {}
 
   /**
    * {@inheritdoc}

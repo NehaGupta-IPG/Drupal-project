@@ -52,7 +52,14 @@ class ContentModeration extends WorkflowTypeBase implements ContentModerationInt
    * @param \Drupal\content_moderation\ModerationInformationInterface $moderationInfo
    *   Moderation information service.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, protected EntityTypeManagerInterface $entityTypeManager, protected EntityTypeBundleInfoInterface $entityTypeBundleInfo, protected ModerationInformationInterface $moderationInfo) {
+  public function __construct(
+    array $configuration,
+    $plugin_id,
+    $plugin_definition,
+    protected EntityTypeManagerInterface $entityTypeManager,
+    protected EntityTypeBundleInfoInterface $entityTypeBundleInfo,
+    protected ModerationInformationInterface $moderationInfo,
+  ) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
   }
 

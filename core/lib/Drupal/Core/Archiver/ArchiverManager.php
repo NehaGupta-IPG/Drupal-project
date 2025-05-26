@@ -31,7 +31,12 @@ class ArchiverManager extends DefaultPluginManager {
    * @param \Drupal\Core\File\FileSystemInterface $fileSystem
    *   The file handler.
    */
-  public function __construct(\Traversable $namespaces, CacheBackendInterface $cache_backend, ModuleHandlerInterface $module_handler, protected FileSystemInterface $fileSystem) {
+  public function __construct(
+    \Traversable $namespaces,
+    CacheBackendInterface $cache_backend,
+    ModuleHandlerInterface $module_handler,
+    protected FileSystemInterface $fileSystem,
+  ) {
     parent::__construct('Plugin/Archiver', $namespaces, $module_handler, ArchiverInterface::class, Archiver::class, 'Drupal\Core\Archiver\Annotation\Archiver');
     $this->alterInfo('archiver_info');
     $this->setCacheBackend($cache_backend, 'archiver_info_plugins');

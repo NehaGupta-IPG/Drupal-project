@@ -24,8 +24,10 @@ class LazyContextRepository implements ContextRepositoryInterface {
    * @param string[] $contextProviderServiceIDs
    *   The set of the available context provider service IDs.
    */
-  public function __construct(protected ContainerInterface $container, protected array $contextProviderServiceIDs) {
-  }
+  public function __construct(
+    protected ContainerInterface $container,
+    protected array $contextProviderServiceIDs,
+  ) {}
 
   /**
    * {@inheritdoc}

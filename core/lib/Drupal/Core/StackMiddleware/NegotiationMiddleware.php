@@ -24,8 +24,9 @@ class NegotiationMiddleware implements HttpKernelInterface {
    * @param \Symfony\Component\HttpKernel\HttpKernelInterface $httpKernel
    *   The wrapper HTTP kernel.
    */
-  public function __construct(protected HttpKernelInterface $httpKernel) {
-  }
+  public function __construct(
+    protected HttpKernelInterface $httpKernel,
+  ) {}
 
   /**
    * {@inheritdoc}

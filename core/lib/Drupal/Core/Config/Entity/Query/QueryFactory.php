@@ -42,7 +42,11 @@ class QueryFactory implements QueryFactoryInterface, EventSubscriberInterface {
    * @param \Drupal\Core\Config\ConfigManagerInterface $configManager
    *   The configuration manager.
    */
-  public function __construct(protected ConfigFactoryInterface $configFactory, protected KeyValueFactoryInterface $keyValueFactory, protected ConfigManagerInterface $configManager) {
+  public function __construct(
+    protected ConfigFactoryInterface $configFactory,
+    protected KeyValueFactoryInterface $keyValueFactory,
+    protected ConfigManagerInterface $configManager,
+  ) {
     $this->namespaces = QueryBase::getNamespaces($this);
   }
 

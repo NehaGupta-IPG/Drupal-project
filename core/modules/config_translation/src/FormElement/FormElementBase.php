@@ -28,7 +28,9 @@ abstract class FormElementBase implements ElementInterface {
    * @param \Drupal\Core\TypedData\TypedDataInterface $element
    *   The schema element this form element is for.
    */
-  public function __construct(protected TypedDataInterface $element) {
+  public function __construct(
+    protected TypedDataInterface $element,
+  ) {
     $this->definition = $this->element->getDataDefinition();
   }
 

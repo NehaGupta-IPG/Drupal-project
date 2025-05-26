@@ -46,8 +46,11 @@ class ResourceResponseValidator implements EventSubscriberInterface {
    * @param string $appRoot
    *   The application's root file path.
    */
-  public function __construct(protected LoggerInterface $logger, protected ModuleHandlerInterface $moduleHandler, protected $appRoot) {
-  }
+  public function __construct(
+    protected LoggerInterface $logger,
+    protected ModuleHandlerInterface $moduleHandler,
+    protected $appRoot,
+  ) {}
 
   /**
    * {@inheritdoc}

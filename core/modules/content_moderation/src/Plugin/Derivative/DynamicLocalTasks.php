@@ -33,7 +33,13 @@ class DynamicLocalTasks extends DeriverBase implements ContainerDeriverInterface
    * @param \Symfony\Component\Routing\RouterInterface $router
    *   The router.
    */
-  public function __construct(protected $basePluginId, protected EntityTypeManagerInterface $entityTypeManager, TranslationInterface $string_translation, protected ModerationInformationInterface $moderationInfo, protected RouterInterface $router) {
+  public function __construct(
+    protected $basePluginId,
+    protected EntityTypeManagerInterface $entityTypeManager,
+    TranslationInterface $string_translation,
+    protected ModerationInformationInterface $moderationInfo,
+    protected RouterInterface $router,
+  ) {
     $this->stringTranslation = $string_translation;
   }
 

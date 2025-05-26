@@ -15,8 +15,9 @@ final class AccountSetEvent extends Event {
    * @param \Drupal\Core\Session\AccountInterface $account
    *   The set account.
    */
-  public function __construct(protected AccountInterface $account) {
-  }
+  public function __construct(
+    protected AccountInterface $account,
+  ) {}
 
   /**
    * Gets the account.

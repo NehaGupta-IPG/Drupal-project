@@ -20,8 +20,9 @@ class ContentPreprocess implements ContainerInjectionInterface {
    * @param \Drupal\Core\Routing\RouteMatchInterface $routeMatch
    *   Current route match service.
    */
-  public function __construct(protected RouteMatchInterface $routeMatch) {
-  }
+  public function __construct(
+    protected RouteMatchInterface $routeMatch,
+  ) {}
 
   /**
    * {@inheritdoc}

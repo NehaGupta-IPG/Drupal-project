@@ -44,8 +44,11 @@ class ContentTranslationSynchronizedFieldsConstraintValidator extends Constraint
    * @param \Drupal\content_translation\FieldTranslationSynchronizerInterface $synchronizer
    *   The field translation synchronizer.
    */
-  public function __construct(protected EntityTypeManagerInterface $entityTypeManager, protected ContentTranslationManagerInterface $contentTranslationManager, protected FieldTranslationSynchronizerInterface $synchronizer) {
-  }
+  public function __construct(
+    protected EntityTypeManagerInterface $entityTypeManager,
+    protected ContentTranslationManagerInterface $contentTranslationManager,
+    protected FieldTranslationSynchronizerInterface $synchronizer,
+  ) {}
 
   /**
    * {@inheritdoc}

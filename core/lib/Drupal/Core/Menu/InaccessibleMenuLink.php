@@ -17,7 +17,9 @@ class InaccessibleMenuLink extends MenuLinkBase {
    * @param \Drupal\Core\Menu\MenuLinkInterface $wrappedLink
    *   The menu link to wrap.
    */
-  public function __construct(protected MenuLinkInterface $wrappedLink) {
+  public function __construct(
+    protected MenuLinkInterface $wrappedLink,
+  ) {
     $plugin_definition = [
       'route_name' => '<front>',
       'route_parameters' => [],

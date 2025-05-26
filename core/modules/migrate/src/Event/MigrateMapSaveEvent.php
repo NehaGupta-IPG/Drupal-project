@@ -18,8 +18,10 @@ class MigrateMapSaveEvent extends Event {
    * @param array $fields
    *   Array of fields being saved to the map.
    */
-  public function __construct(protected MigrateIdMapInterface $map, protected array $fields) {
-  }
+  public function __construct(
+    protected MigrateIdMapInterface $map,
+    protected array $fields,
+  ) {}
 
   /**
    * Gets the map plugin.

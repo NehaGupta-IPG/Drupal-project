@@ -30,7 +30,12 @@ class LanguageConfigOverride extends StorableConfigBase {
    * @param \Symfony\Contracts\EventDispatcher\EventDispatcherInterface $eventDispatcher
    *   The event dispatcher.
    */
-  public function __construct($name, StorageInterface $storage, TypedConfigManagerInterface $typed_config, protected EventDispatcherInterface $eventDispatcher) {
+  public function __construct(
+    $name,
+    StorageInterface $storage,
+    TypedConfigManagerInterface $typed_config,
+    protected EventDispatcherInterface $eventDispatcher,
+  ) {
     $this->name = $name;
     $this->storage = $storage;
     $this->typedConfigManager = $typed_config;

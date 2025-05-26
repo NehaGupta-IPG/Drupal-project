@@ -58,7 +58,13 @@ class Permission extends AccessPluginBase implements CacheableDependencyInterfac
    * @param \Drupal\Core\Extension\ModuleExtensionList|\Drupal\Core\Extension\ModuleHandlerInterface $module_extension_list
    *   The module extension list.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, protected PermissionHandlerInterface $permissionHandler, ModuleExtensionList|ModuleHandlerInterface $module_extension_list) {
+  public function __construct(
+    array $configuration,
+    $plugin_id,
+    $plugin_definition,
+    protected PermissionHandlerInterface $permissionHandler,
+    ModuleExtensionList|ModuleHandlerInterface $module_extension_list,
+  ) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
     if ($module_extension_list instanceof ModuleHandlerInterface) {
       @trigger_error('Calling ' . __METHOD__ . '() with the $module_extension_list argument as ModuleHandlerInterface is deprecated in drupal:10.3.0 and will be required in drupal:12.0.0. See https://www.drupal.org/node/3310017', E_USER_DEPRECATED);

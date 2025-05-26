@@ -73,8 +73,15 @@ class ModulesListForm extends FormBase {
    * @param \Drupal\Core\Extension\ModuleExtensionList $moduleExtensionList
    *   The module extension list.
    */
-  public function __construct(protected ModuleHandlerInterface $moduleHandler, protected ModuleInstallerInterface $moduleInstaller, protected KeyValueStoreExpirableInterface $keyValueExpirable, protected AccessManagerInterface $accessManager, protected AccountInterface $currentUser, protected PermissionHandlerInterface $permissionHandler, protected ModuleExtensionList $moduleExtensionList) {
-  }
+  public function __construct(
+    protected ModuleHandlerInterface $moduleHandler,
+    protected ModuleInstallerInterface $moduleInstaller,
+    protected KeyValueStoreExpirableInterface $keyValueExpirable,
+    protected AccessManagerInterface $accessManager,
+    protected AccountInterface $currentUser,
+    protected PermissionHandlerInterface $permissionHandler,
+    protected ModuleExtensionList $moduleExtensionList,
+  ) {}
 
   /**
    * {@inheritdoc}

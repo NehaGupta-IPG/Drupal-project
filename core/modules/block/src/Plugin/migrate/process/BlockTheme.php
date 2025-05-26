@@ -30,7 +30,13 @@ class BlockTheme extends ProcessPluginBase implements ContainerFactoryPluginInte
    * @param array $themes
    *   The list of themes available on the destination.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, protected Config $themeConfig, protected array $themes) {
+  public function __construct(
+    array $configuration,
+    $plugin_id,
+    $plugin_definition,
+    protected Config $themeConfig,
+    protected array $themes,
+  ) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
   }
 

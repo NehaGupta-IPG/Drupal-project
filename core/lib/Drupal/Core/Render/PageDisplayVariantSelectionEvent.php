@@ -45,8 +45,10 @@ class PageDisplayVariantSelectionEvent extends Event implements RefinableCacheab
    * @param \Drupal\Core\Routing\RouteMatchInterface $routeMatch
    *   The current route match, for context.
    */
-  public function __construct(protected $pluginId, protected RouteMatchInterface $routeMatch) {
-  }
+  public function __construct(
+    protected $pluginId,
+    protected RouteMatchInterface $routeMatch,
+  ) {}
 
   /**
    * The selected page display variant plugin ID.

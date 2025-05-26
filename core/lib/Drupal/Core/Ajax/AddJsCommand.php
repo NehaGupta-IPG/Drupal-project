@@ -25,8 +25,10 @@ class AddJsCommand implements CommandInterface {
    * @param string $selector
    *   A CSS selector of the element where the script tags will be appended.
    */
-  public function __construct(protected array $scripts, protected string $selector = 'body') {
-  }
+  public function __construct(
+    protected array $scripts,
+    protected string $selector = 'body',
+  ) {}
 
   /**
    * {@inheritdoc}

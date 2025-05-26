@@ -46,7 +46,12 @@ class LayoutBuilder extends RenderElementBase implements ContainerFactoryPluginI
    * @param \Symfony\Contracts\EventDispatcher\EventDispatcherInterface $eventDispatcher
    *   The event dispatcher service.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, protected EventDispatcherInterface $eventDispatcher) {
+  public function __construct(
+    array $configuration,
+    $plugin_id,
+    $plugin_definition,
+    protected EventDispatcherInterface $eventDispatcher,
+  ) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
   }
 

@@ -78,8 +78,11 @@ class FieldDiscovery implements FieldDiscoveryInterface {
    * @param \Psr\Log\LoggerInterface $logger
    *   The logger channel service.
    */
-  public function __construct(protected MigrateFieldPluginManagerInterface $fieldPluginManager, protected MigrationPluginManagerInterface $migrationPluginManager, protected LoggerInterface $logger) {
-  }
+  public function __construct(
+    protected MigrateFieldPluginManagerInterface $fieldPluginManager,
+    protected MigrationPluginManagerInterface $migrationPluginManager,
+    protected LoggerInterface $logger,
+  ) {}
 
   /**
    * {@inheritdoc}

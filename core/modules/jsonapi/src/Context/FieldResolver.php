@@ -86,8 +86,14 @@ class FieldResolver {
    * @param \Drupal\Core\Session\AccountInterface $currentUser
    *   The current user account.
    */
-  public function __construct(protected EntityTypeManagerInterface $entityTypeManager, protected EntityFieldManagerInterface $fieldManager, protected EntityTypeBundleInfoInterface $entityTypeBundleInfo, protected ResourceTypeRepositoryInterface $resourceTypeRepository, protected ModuleHandlerInterface $moduleHandler, protected AccountInterface $currentUser) {
-  }
+  public function __construct(
+    protected EntityTypeManagerInterface $entityTypeManager,
+    protected EntityFieldManagerInterface $fieldManager,
+    protected EntityTypeBundleInfoInterface $entityTypeBundleInfo,
+    protected ResourceTypeRepositoryInterface $resourceTypeRepository,
+    protected ModuleHandlerInterface $moduleHandler,
+    protected AccountInterface $currentUser,
+  ) {}
 
   /**
    * Validates and resolves an include path into its internal possibilities.

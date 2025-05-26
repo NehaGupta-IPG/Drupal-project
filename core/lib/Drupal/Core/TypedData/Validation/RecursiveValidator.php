@@ -30,8 +30,11 @@ class RecursiveValidator implements ValidatorInterface {
    * @param \Drupal\Core\TypedData\TypedDataManagerInterface $typedDataManager
    *   The typed data manager.
    */
-  public function __construct(protected ExecutionContextFactoryInterface $contextFactory, protected ConstraintValidatorFactoryInterface $constraintValidatorFactory, protected TypedDataManagerInterface $typedDataManager) {
-  }
+  public function __construct(
+    protected ExecutionContextFactoryInterface $contextFactory,
+    protected ConstraintValidatorFactoryInterface $constraintValidatorFactory,
+    protected TypedDataManagerInterface $typedDataManager,
+  ) {}
 
   /**
    * {@inheritdoc}

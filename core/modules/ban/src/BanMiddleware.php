@@ -20,8 +20,10 @@ class BanMiddleware implements HttpKernelInterface {
    * @param \Drupal\ban\BanIpManagerInterface $banIpManager
    *   The ban IP manager.
    */
-  public function __construct(protected HttpKernelInterface $httpKernel, protected BanIpManagerInterface $banIpManager) {
-  }
+  public function __construct(
+    protected HttpKernelInterface $httpKernel,
+    protected BanIpManagerInterface $banIpManager,
+  ) {}
 
   /**
    * {@inheritdoc}

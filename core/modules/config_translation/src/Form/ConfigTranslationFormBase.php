@@ -57,8 +57,11 @@ abstract class ConfigTranslationFormBase extends FormBase implements BaseFormIdI
    * @param \Drupal\language\ConfigurableLanguageManagerInterface $languageManager
    *   The configurable language manager.
    */
-  public function __construct(protected TypedConfigManagerInterface $typedConfigManager, protected ConfigMapperManagerInterface $configMapperManager, protected ConfigurableLanguageManagerInterface $languageManager) {
-  }
+  public function __construct(
+    protected TypedConfigManagerInterface $typedConfigManager,
+    protected ConfigMapperManagerInterface $configMapperManager,
+    protected ConfigurableLanguageManagerInterface $languageManager,
+  ) {}
 
   /**
    * {@inheritdoc}

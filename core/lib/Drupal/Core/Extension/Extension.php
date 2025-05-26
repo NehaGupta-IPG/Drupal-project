@@ -56,7 +56,12 @@ class Extension {
    * @param string $filename
    *   (optional) The filename of the main extension file; e.g., 'node.module'.
    */
-  public function __construct($root, protected $type, $pathname, protected $filename = NULL) {
+  public function __construct(
+    $root,
+    protected $type,
+    $pathname,
+    protected $filename = NULL,
+  ) {
     // @see \Drupal\Core\Theme\ThemeInitialization::getActiveThemeByName()
     assert($pathname === 'core/core.info.yml' || ($pathname[0] !== '/' && file_exists($root . '/' . $pathname)), sprintf('The file specified by the given app root, relative path and file name (%s) do not exist.', $root . '/' . $pathname));
     $this->root = $root;

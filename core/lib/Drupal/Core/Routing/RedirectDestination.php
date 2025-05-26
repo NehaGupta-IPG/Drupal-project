@@ -25,8 +25,10 @@ class RedirectDestination implements RedirectDestinationInterface {
    * @param \Drupal\Core\Routing\UrlGeneratorInterface $urlGenerator
    *   The URL generator.
    */
-  public function __construct(protected RequestStack $requestStack, protected UrlGeneratorInterface $urlGenerator) {
-  }
+  public function __construct(
+    protected RequestStack $requestStack,
+    protected UrlGeneratorInterface $urlGenerator,
+  ) {}
 
   /**
    * {@inheritdoc}

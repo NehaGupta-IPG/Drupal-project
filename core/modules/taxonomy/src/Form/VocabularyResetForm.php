@@ -20,8 +20,9 @@ class VocabularyResetForm extends EntityConfirmFormBase {
    * @param \Drupal\taxonomy\TermStorageInterface $termStorage
    *   The term storage.
    */
-  public function __construct(protected TermStorageInterface $termStorage) {
-  }
+  public function __construct(
+    protected TermStorageInterface $termStorage,
+  ) {}
 
   /**
    * {@inheritdoc}

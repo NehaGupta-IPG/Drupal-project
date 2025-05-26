@@ -28,7 +28,10 @@ class RestPermissions implements ContainerInjectionInterface {
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager.
    */
-  public function __construct(protected ResourcePluginManager $restPluginManager, EntityTypeManagerInterface $entity_type_manager) {
+  public function __construct(
+    protected ResourcePluginManager $restPluginManager,
+    EntityTypeManagerInterface $entity_type_manager,
+  ) {
     $this->resourceConfigStorage = $entity_type_manager->getStorage('rest_resource_config');
   }
 

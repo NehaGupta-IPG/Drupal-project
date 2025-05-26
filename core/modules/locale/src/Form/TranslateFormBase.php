@@ -32,8 +32,11 @@ abstract class TranslateFormBase extends FormBase {
    * @param \Drupal\Core\Language\LanguageManagerInterface $languageManager
    *   The language manager.
    */
-  public function __construct(protected StringStorageInterface $localeStorage, protected StateInterface $state, protected LanguageManagerInterface $languageManager) {
-  }
+  public function __construct(
+    protected StringStorageInterface $localeStorage,
+    protected StateInterface $state,
+    protected LanguageManagerInterface $languageManager,
+  ) {}
 
   /**
    * {@inheritdoc}

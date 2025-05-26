@@ -135,7 +135,11 @@ abstract class QueryBase implements QueryInterface {
    * @param array $namespaces
    *   List of potential namespaces of the classes belonging to this query.
    */
-  public function __construct(EntityTypeInterface $entity_type, protected string $conjunction, protected array $namespaces) {
+  public function __construct(
+    EntityTypeInterface $entity_type,
+    protected string $conjunction,
+    protected array $namespaces,
+  ) {
     $this->entityTypeId = $entity_type->id();
     $this->entityType = $entity_type;
     $this->condition = $this->conditionGroupFactory($this->conjunction);

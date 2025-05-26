@@ -22,7 +22,10 @@ class ThemeInstallController extends ControllerBase {
    * @param \Drupal\Core\Extension\ThemeInstallerInterface $themeInstaller
    *   The theme installer.
    */
-  public function __construct(ConfigFactoryInterface $config_factory, protected ThemeInstallerInterface $themeInstaller) {
+  public function __construct(
+    ConfigFactoryInterface $config_factory,
+    protected ThemeInstallerInterface $themeInstaller,
+  ) {
     $this->configFactory = $config_factory;
   }
 

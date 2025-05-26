@@ -20,8 +20,9 @@ class ImageEffectAddForm extends ImageEffectFormBase {
    * @param \Drupal\image\ImageEffectManager $effectManager
    *   The image effect manager.
    */
-  public function __construct(protected ImageEffectManager $effectManager) {
-  }
+  public function __construct(
+    protected ImageEffectManager $effectManager,
+  ) {}
 
   /**
    * {@inheritdoc}

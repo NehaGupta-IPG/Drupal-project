@@ -40,7 +40,15 @@ class RequestPath extends ConditionPluginBase implements ContainerFactoryPluginI
    * @param array $plugin_definition
    *   The plugin implementation definition.
    */
-  public function __construct(protected AliasManagerInterface $aliasManager, protected PathMatcherInterface $pathMatcher, protected RequestStack $requestStack, protected CurrentPathStack $currentPath, array $configuration, $plugin_id, array $plugin_definition) {
+  public function __construct(
+    protected AliasManagerInterface $aliasManager,
+    protected PathMatcherInterface $pathMatcher,
+    protected RequestStack $requestStack,
+    protected CurrentPathStack $currentPath,
+    array $configuration,
+    $plugin_id,
+    array $plugin_definition,
+  ) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
   }
 

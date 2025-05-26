@@ -28,8 +28,9 @@ class ViewsUIController extends ControllerBase {
    * @param \Drupal\views\ViewsData $viewsData
    *   The Views data cache object.
    */
-  public function __construct(protected ViewsData $viewsData) {
-  }
+  public function __construct(
+    protected ViewsData $viewsData,
+  ) {}
 
   /**
    * Lists all instances of fields on any views.

@@ -19,8 +19,9 @@ class ParamConverterSubscriber implements EventSubscriberInterface {
    *   The parameter converter manager that will be responsible for upcasting
    *   request attributes.
    */
-  public function __construct(protected ParamConverterManagerInterface $paramConverterManager) {
-  }
+  public function __construct(
+    protected ParamConverterManagerInterface $paramConverterManager,
+  ) {}
 
   /**
    * Applies parameter converters to route parameters.

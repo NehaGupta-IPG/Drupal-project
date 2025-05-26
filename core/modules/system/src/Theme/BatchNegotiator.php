@@ -20,8 +20,10 @@ class BatchNegotiator implements ThemeNegotiatorInterface {
    * @param \Symfony\Component\HttpFoundation\RequestStack $requestStack
    *   The request stack used to retrieve the current request.
    */
-  public function __construct(protected BatchStorageInterface $batchStorage, protected RequestStack $requestStack) {
-  }
+  public function __construct(
+    protected BatchStorageInterface $batchStorage,
+    protected RequestStack $requestStack,
+  ) {}
 
   /**
    * {@inheritdoc}

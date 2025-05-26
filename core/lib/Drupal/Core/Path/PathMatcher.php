@@ -40,8 +40,10 @@ class PathMatcher implements PathMatcherInterface {
    * @param \Drupal\Core\Routing\RouteMatchInterface $routeMatch
    *   The current route match.
    */
-  public function __construct(protected ConfigFactoryInterface $configFactory, protected RouteMatchInterface $routeMatch) {
-  }
+  public function __construct(
+    protected ConfigFactoryInterface $configFactory,
+    protected RouteMatchInterface $routeMatch,
+  ) {}
 
   /**
    * {@inheritdoc}

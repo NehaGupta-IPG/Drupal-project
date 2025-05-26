@@ -48,7 +48,12 @@ class SetInlineBlockDependency implements EventSubscriberInterface {
    * @param \Drupal\layout_builder\SectionStorage\SectionStorageManagerInterface $section_storage_manager
    *   The section storage manager.
    */
-  public function __construct(protected EntityTypeManagerInterface $entityTypeManager, protected Connection $database, protected InlineBlockUsageInterface $usage, SectionStorageManagerInterface $section_storage_manager) {
+  public function __construct(
+    protected EntityTypeManagerInterface $entityTypeManager,
+    protected Connection $database,
+    protected InlineBlockUsageInterface $usage,
+    SectionStorageManagerInterface $section_storage_manager,
+  ) {
     $this->sectionStorageManager = $section_storage_manager;
   }
 

@@ -31,7 +31,13 @@ class IncrementalForm extends MigrateUpgradeFormBase {
    * @param \Drupal\migrate\Plugin\MigrationPluginManagerInterface $migration_plugin_manager
    *   The migration plugin manager service.
    */
-  public function __construct(StateInterface $state, protected DateFormatterInterface $dateFormatter, PrivateTempStoreFactory $tempstore_private, ConfigFactoryInterface $config_factory, MigrationPluginManagerInterface $migration_plugin_manager) {
+  public function __construct(
+    StateInterface $state,
+    protected DateFormatterInterface $dateFormatter,
+    PrivateTempStoreFactory $tempstore_private,
+    ConfigFactoryInterface $config_factory,
+    MigrationPluginManagerInterface $migration_plugin_manager,
+  ) {
     parent::__construct($config_factory, $migration_plugin_manager, $state, $tempstore_private);
   }
 

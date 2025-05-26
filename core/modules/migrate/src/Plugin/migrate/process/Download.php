@@ -76,7 +76,13 @@ class Download extends FileProcessBase implements ContainerFactoryPluginInterfac
    * @param \GuzzleHttp\ClientInterface $httpClient
    *   The HTTP client.
    */
-  public function __construct(array $configuration, $plugin_id, array $plugin_definition, protected FileSystemInterface $fileSystem, protected ClientInterface $httpClient) {
+  public function __construct(
+    array $configuration,
+    $plugin_id,
+    array $plugin_definition,
+    protected FileSystemInterface $fileSystem,
+    protected ClientInterface $httpClient,
+  ) {
     $configuration += [
       'guzzle_options' => [],
     ];

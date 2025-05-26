@@ -37,8 +37,10 @@ class RouteProviderLazyBuilder implements PreloadableRouteProviderInterface, Eve
    * @param \Drupal\Core\Routing\RouteBuilderInterface $routeBuilder
    *   The route building service.
    */
-  public function __construct(protected RouteProviderInterface $routeProvider, protected RouteBuilderInterface $routeBuilder) {
-  }
+  public function __construct(
+    protected RouteProviderInterface $routeProvider,
+    protected RouteBuilderInterface $routeBuilder,
+  ) {}
 
   /**
    * Gets the real route provider service and rebuilds the router id necessary.

@@ -18,8 +18,9 @@ class AjaxPageState implements HttpKernelInterface {
    * @param \Symfony\Component\HttpKernel\HttpKernelInterface $httpKernel
    *   The wrapped HTTP kernel.
    */
-  public function __construct(protected readonly HttpKernelInterface $httpKernel) {
-  }
+  public function __construct(
+    protected readonly HttpKernelInterface $httpKernel,
+  ) {}
 
   /**
    * {@inheritdoc}

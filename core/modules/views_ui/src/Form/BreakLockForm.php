@@ -30,7 +30,10 @@ class BreakLockForm extends EntityConfirmFormBase {
    * @param \Drupal\Core\TempStore\SharedTempStoreFactory $temp_store_factory
    *   The factory for the temp store object.
    */
-  public function __construct(protected EntityTypeManagerInterface $entityTypeManager, SharedTempStoreFactory $temp_store_factory) {
+  public function __construct(
+    protected EntityTypeManagerInterface $entityTypeManager,
+    SharedTempStoreFactory $temp_store_factory,
+  ) {
     $this->tempStore = $temp_store_factory->get('views');
   }
 

@@ -27,7 +27,10 @@ class Constraint {
    *   Core compatibility declared for the current version of Drupal core.
    *   Normally this is set to \Drupal::CORE_COMPATIBILITY by the caller.
    */
-  public function __construct(protected $constraint, $core_compatibility) {
+  public function __construct(
+    protected $constraint,
+    $core_compatibility,
+  ) {
     $this->parseConstraint($this->constraint, $core_compatibility);
   }
 

@@ -31,7 +31,10 @@ class CurrentUserContext implements ContextProviderInterface {
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager.
    */
-  public function __construct(protected AccountInterface $account, EntityTypeManagerInterface $entity_type_manager) {
+  public function __construct(
+    protected AccountInterface $account,
+    EntityTypeManagerInterface $entity_type_manager,
+  ) {
     $this->userStorage = $entity_type_manager->getStorage('user');
   }
 

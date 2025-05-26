@@ -29,7 +29,11 @@ class BlockRepository implements BlockRepositoryInterface {
    * @param \Drupal\Core\Plugin\Context\ContextHandlerInterface $contextHandler
    *   The plugin context handler.
    */
-  public function __construct(EntityTypeManagerInterface $entity_type_manager, protected ThemeManagerInterface $themeManager, protected ContextHandlerInterface $contextHandler) {
+  public function __construct(
+    EntityTypeManagerInterface $entity_type_manager,
+    protected ThemeManagerInterface $themeManager,
+    protected ContextHandlerInterface $contextHandler,
+  ) {
     $this->blockStorage = $entity_type_manager->getStorage('block');
   }
 

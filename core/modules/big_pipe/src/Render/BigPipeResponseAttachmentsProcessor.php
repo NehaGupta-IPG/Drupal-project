@@ -45,7 +45,17 @@ class BigPipeResponseAttachmentsProcessor extends HtmlResponseAttachmentsProcess
    * @param \Drupal\Core\Language\LanguageManagerInterface $language_manager
    *   The language manager.
    */
-  public function __construct(protected AttachmentsResponseProcessorInterface $htmlResponseAttachmentsProcessor, AssetResolverInterface $asset_resolver, ConfigFactoryInterface $config_factory, AssetCollectionRendererInterface $css_collection_renderer, AssetCollectionRendererInterface $js_collection_renderer, RequestStack $request_stack, RendererInterface $renderer, ModuleHandlerInterface $module_handler, LanguageManagerInterface $language_manager) {
+  public function __construct(
+    protected AttachmentsResponseProcessorInterface $htmlResponseAttachmentsProcessor,
+    AssetResolverInterface $asset_resolver,
+    ConfigFactoryInterface $config_factory,
+    AssetCollectionRendererInterface $css_collection_renderer,
+    AssetCollectionRendererInterface $js_collection_renderer,
+    RequestStack $request_stack,
+    RendererInterface $renderer,
+    ModuleHandlerInterface $module_handler,
+    LanguageManagerInterface $language_manager,
+  ) {
     parent::__construct($asset_resolver, $config_factory, $css_collection_renderer, $js_collection_renderer, $request_stack, $renderer, $module_handler, $language_manager);
   }
 

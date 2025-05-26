@@ -54,7 +54,13 @@ class Block extends DisplayPluginBase {
    * @param \Drupal\Core\Block\BlockManagerInterface $blockManager
    *   The block manager.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, protected EntityTypeManagerInterface $entityTypeManager, protected BlockManagerInterface $blockManager) {
+  public function __construct(
+    array $configuration,
+    $plugin_id,
+    $plugin_definition,
+    protected EntityTypeManagerInterface $entityTypeManager,
+    protected BlockManagerInterface $blockManager,
+  ) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
   }
 

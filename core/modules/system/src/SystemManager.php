@@ -67,8 +67,12 @@ class SystemManager {
    * @param \Drupal\Core\Menu\MenuActiveTrailInterface $menuActiveTrail
    *   The active menu trail service.
    */
-  public function __construct(protected ModuleHandlerInterface $moduleHandler, protected RequestStack $requestStack, protected MenuLinkTreeInterface $menuTree, protected MenuActiveTrailInterface $menuActiveTrail) {
-  }
+  public function __construct(
+    protected ModuleHandlerInterface $moduleHandler,
+    protected RequestStack $requestStack,
+    protected MenuLinkTreeInterface $menuTree,
+    protected MenuActiveTrailInterface $menuActiveTrail,
+  ) {}
 
   /**
    * Checks for requirement severity.

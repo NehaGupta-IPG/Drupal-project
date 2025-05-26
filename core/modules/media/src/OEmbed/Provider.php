@@ -35,7 +35,11 @@ class Provider {
    *
    * @throws \Drupal\media\OEmbed\ProviderException
    */
-  public function __construct(protected $name, $url, array $endpoints) {
+  public function __construct(
+    protected $name,
+    $url,
+    array $endpoints,
+  ) {
     if (!UrlHelper::isValid($url, TRUE) || !UrlHelper::isExternal($url)) {
       throw new ProviderException('Provider @name does not define a valid external URL.', $this);
     }

@@ -24,8 +24,10 @@ class ViewAddForm extends ViewFormBase {
    * @param \Drupal\Core\Extension\ModuleHandlerInterface $moduleHandler
    *   The module handler service.
    */
-  public function __construct(protected ViewsPluginManager $wizardManager, protected ModuleHandlerInterface $moduleHandler) {
-  }
+  public function __construct(
+    protected ViewsPluginManager $wizardManager,
+    protected ModuleHandlerInterface $moduleHandler,
+  ) {}
 
   /**
    * {@inheritdoc}

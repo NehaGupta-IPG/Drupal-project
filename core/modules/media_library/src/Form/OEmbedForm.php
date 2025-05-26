@@ -36,7 +36,13 @@ class OEmbedForm extends AddFormBase {
    * @param \Drupal\media_library\OpenerResolverInterface $opener_resolver
    *   The opener resolver.
    */
-  public function __construct(EntityTypeManagerInterface $entity_type_manager, MediaLibraryUiBuilder $library_ui_builder, protected UrlResolverInterface $urlResolver, protected ResourceFetcherInterface $resourceFetcher, ?OpenerResolverInterface $opener_resolver = NULL) {
+  public function __construct(
+    EntityTypeManagerInterface $entity_type_manager,
+    MediaLibraryUiBuilder $library_ui_builder,
+    protected UrlResolverInterface $urlResolver,
+    protected ResourceFetcherInterface $resourceFetcher,
+    ?OpenerResolverInterface $opener_resolver = NULL,
+  ) {
     parent::__construct($entity_type_manager, $library_ui_builder, $opener_resolver);
   }
 

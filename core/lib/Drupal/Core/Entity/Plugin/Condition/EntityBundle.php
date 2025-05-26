@@ -34,7 +34,12 @@ class EntityBundle extends ConditionPluginBase implements ContainerFactoryPlugin
    * @param \Drupal\Core\Entity\EntityTypeBundleInfoInterface $entityTypeBundleInfo
    *   The entity type bundle info service.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, protected EntityTypeBundleInfoInterface $entityTypeBundleInfo) {
+  public function __construct(
+    array $configuration,
+    $plugin_id,
+    $plugin_definition,
+    protected EntityTypeBundleInfoInterface $entityTypeBundleInfo,
+  ) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
   }
 

@@ -31,7 +31,11 @@ class AutomatedCron implements EventSubscriberInterface {
    * @param \Drupal\Core\State\StateInterface $state
    *   The state key-value store service.
    */
-  public function __construct(protected CronInterface $cron, ConfigFactoryInterface $config_factory, protected StateInterface $state) {
+  public function __construct(
+    protected CronInterface $cron,
+    ConfigFactoryInterface $config_factory,
+    protected StateInterface $state,
+  ) {
     $this->config = $config_factory->get('automated_cron.settings');
   }
 

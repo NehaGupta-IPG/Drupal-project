@@ -46,7 +46,13 @@ class ConfigMapperManager extends DefaultPluginManager implements ConfigMapperMa
    * @param \Drupal\Core\Extension\ThemeHandlerInterface $themeHandler
    *   The theme handler.
    */
-  public function __construct(CacheBackendInterface $cache_backend, protected LanguageManagerInterface $languageManager, ModuleHandlerInterface $module_handler, protected TypedConfigManagerInterface $typedConfigManager, protected ThemeHandlerInterface $themeHandler) {
+  public function __construct(
+    CacheBackendInterface $cache_backend,
+    protected LanguageManagerInterface $languageManager,
+    ModuleHandlerInterface $module_handler,
+    protected TypedConfigManagerInterface $typedConfigManager,
+    protected ThemeHandlerInterface $themeHandler,
+  ) {
     $this->factory = new ContainerFactory($this, '\Drupal\config_translation\ConfigMapperInterface');
 
     // Let others alter definitions with hook_config_translation_info_alter().

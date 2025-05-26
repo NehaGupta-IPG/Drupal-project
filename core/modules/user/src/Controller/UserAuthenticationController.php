@@ -66,7 +66,16 @@ class UserAuthenticationController extends ControllerBase implements ContainerIn
    * @param \Psr\Log\LoggerInterface $logger
    *   A logger instance.
    */
-  public function __construct(protected UserFloodControlInterface $userFloodControl, protected UserStorageInterface $userStorage, protected CsrfTokenGenerator $csrfToken, UserAuthenticationInterface|UserAuthInterface $user_auth, protected RouteProviderInterface $routeProvider, protected Serializer $serializer, protected array $serializerFormats, protected LoggerInterface $logger) {
+  public function __construct(
+    protected UserFloodControlInterface $userFloodControl,
+    protected UserStorageInterface $userStorage,
+    protected CsrfTokenGenerator $csrfToken,
+    UserAuthenticationInterface|UserAuthInterface $user_auth,
+    protected RouteProviderInterface $routeProvider,
+    protected Serializer $serializer,
+    protected array $serializerFormats,
+    protected LoggerInterface $logger,
+  ) {
     if (!$user_auth instanceof UserAuthenticationInterface) {
       @trigger_error('The $user_auth parameter implementing UserAuthInterface is deprecated in drupal:10.3.0 and will be removed in drupal:12.0.0. Implement UserAuthenticationInterface instead. See https://www.drupal.org/node/3411040');
     }

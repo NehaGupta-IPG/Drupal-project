@@ -46,8 +46,12 @@ class LanguageNegotiationUserAdmin extends LanguageNegotiationMethodBase impleme
    * @param \Drupal\Core\Routing\StackedRouteMatchInterface $stackedRouteMatch
    *   The stacked route match.
    */
-  public function __construct(protected AdminContext $adminContext, protected UrlMatcherInterface $router, protected PathProcessorManager $pathProcessorManager, protected StackedRouteMatchInterface $stackedRouteMatch) {
-  }
+  public function __construct(
+    protected AdminContext $adminContext,
+    protected UrlMatcherInterface $router,
+    protected PathProcessorManager $pathProcessorManager,
+    protected StackedRouteMatchInterface $stackedRouteMatch,
+  ) {}
 
   /**
    * {@inheritdoc}

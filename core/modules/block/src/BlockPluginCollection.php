@@ -23,7 +23,12 @@ class BlockPluginCollection extends DefaultSingleLazyPluginCollection {
    * @param string $blockId
    *   The unique ID of the block entity using this plugin.
    */
-  public function __construct(PluginManagerInterface $manager, $instance_id, array $configuration, protected $blockId) {
+  public function __construct(
+    PluginManagerInterface $manager,
+    $instance_id,
+    array $configuration,
+    protected $blockId,
+  ) {
     parent::__construct($manager, $instance_id, $configuration);
   }
 

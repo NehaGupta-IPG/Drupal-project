@@ -30,8 +30,11 @@ class EntitySchemaSubscriber implements EntityTypeListenerInterface, EventSubscr
    * @param \Drupal\workspaces\WorkspaceInformationInterface $workspaceInfo
    *   The workspace information service.
    */
-  public function __construct(protected EntityDefinitionUpdateManagerInterface $entityDefinitionUpdateManager, protected EntityLastInstalledSchemaRepositoryInterface $entityLastInstalledSchemaRepository, protected WorkspaceInformationInterface $workspaceInfo) {
-  }
+  public function __construct(
+    protected EntityDefinitionUpdateManagerInterface $entityDefinitionUpdateManager,
+    protected EntityLastInstalledSchemaRepositoryInterface $entityLastInstalledSchemaRepository,
+    protected WorkspaceInformationInterface $workspaceInfo,
+  ) {}
 
   /**
    * {@inheritdoc}

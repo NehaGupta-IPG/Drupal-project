@@ -44,8 +44,15 @@ class ConfigTranslationController extends ControllerBase {
    * @param \Drupal\Core\Render\RendererInterface $renderer
    *   The renderer.
    */
-  public function __construct(protected ConfigMapperManagerInterface $configMapperManager, protected AccessManagerInterface $accessManager, protected RequestMatcherInterface $router, protected InboundPathProcessorInterface $pathProcessor, protected AccountInterface $account, protected LanguageManagerInterface $languageManager, protected RendererInterface $renderer) {
-  }
+  public function __construct(
+    protected ConfigMapperManagerInterface $configMapperManager,
+    protected AccessManagerInterface $accessManager,
+    protected RequestMatcherInterface $router,
+    protected InboundPathProcessorInterface $pathProcessor,
+    protected AccountInterface $account,
+    protected LanguageManagerInterface $languageManager,
+    protected RendererInterface $renderer,
+  ) {}
 
   /**
    * {@inheritdoc}

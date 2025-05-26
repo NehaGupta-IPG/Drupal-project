@@ -22,8 +22,9 @@ class MemoryBackend implements FloodInterface, PrefixFloodInterface {
    * @param \Symfony\Component\HttpFoundation\RequestStack $requestStack
    *   The request stack used to retrieve the current request.
    */
-  public function __construct(protected RequestStack $requestStack) {
-  }
+  public function __construct(
+    protected RequestStack $requestStack,
+  ) {}
 
   /**
    * {@inheritdoc}

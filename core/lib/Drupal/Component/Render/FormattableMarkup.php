@@ -59,7 +59,10 @@ class FormattableMarkup implements MarkupInterface, \Countable {
    *
    * @see \Drupal\Component\Render\FormattableMarkup::placeholderFormat()
    */
-  public function __construct($string, protected array $arguments) {
+  public function __construct(
+    $string,
+    protected array $arguments,
+  ) {
     $this->string = (string) $string;
   }
 

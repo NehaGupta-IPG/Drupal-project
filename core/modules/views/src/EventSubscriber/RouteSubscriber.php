@@ -51,7 +51,10 @@ class RouteSubscriber extends RouteSubscriberBase {
    * @param \Drupal\Core\State\StateInterface $state
    *   The state key value store.
    */
-  public function __construct(EntityTypeManagerInterface $entity_type_manager, protected StateInterface $state) {
+  public function __construct(
+    EntityTypeManagerInterface $entity_type_manager,
+    protected StateInterface $state,
+  ) {
     $this->viewStorage = $entity_type_manager->getStorage('view');
   }
 

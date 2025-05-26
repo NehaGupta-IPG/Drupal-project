@@ -28,8 +28,10 @@ class ContactFormEditForm extends EntityForm implements ContainerInjectionInterf
    * @param \Drupal\Core\Path\PathValidatorInterface $pathValidator
    *   The path validator service.
    */
-  public function __construct(protected EmailValidatorInterface $emailValidator, protected PathValidatorInterface $pathValidator) {
-  }
+  public function __construct(
+    protected EmailValidatorInterface $emailValidator,
+    protected PathValidatorInterface $pathValidator,
+  ) {}
 
   /**
    * {@inheritdoc}

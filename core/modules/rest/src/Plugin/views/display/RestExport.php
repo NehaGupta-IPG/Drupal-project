@@ -108,7 +108,16 @@ class RestExport extends PathPluginBase implements ResponseDisplayPluginInterfac
    * @param string[] $formatProviders
    *   The serialization format providers, keyed by format.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, RouteProviderInterface $route_provider, StateInterface $state, protected RendererInterface $renderer, array $authentication_providers, protected array $formatProviders) {
+  public function __construct(
+    array $configuration,
+    $plugin_id,
+    $plugin_definition,
+    RouteProviderInterface $route_provider,
+    StateInterface $state,
+    protected RendererInterface $renderer,
+    array $authentication_providers,
+    protected array $formatProviders,
+  ) {
     parent::__construct($configuration, $plugin_id, $plugin_definition, $route_provider, $state);
     // $authentication_providers as defined in
     // \Drupal\Core\DependencyInjection\Compiler\AuthenticationProviderPass

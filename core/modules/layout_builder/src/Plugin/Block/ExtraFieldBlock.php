@@ -55,7 +55,13 @@ class ExtraFieldBlock extends BlockBase implements ContextAwarePluginInterface, 
    * @param \Drupal\Core\Entity\EntityFieldManagerInterface $entityFieldManager
    *   The entity field manager.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, protected EntityTypeManagerInterface $entityTypeManager, protected EntityFieldManagerInterface $entityFieldManager) {
+  public function __construct(
+    array $configuration,
+    $plugin_id,
+    $plugin_definition,
+    protected EntityTypeManagerInterface $entityTypeManager,
+    protected EntityFieldManagerInterface $entityFieldManager,
+  ) {
     // Get field name from the plugin ID.
     [, , , $field_name] = explode(static::DERIVATIVE_SEPARATOR, $plugin_id, 4);
     assert(!empty($field_name));

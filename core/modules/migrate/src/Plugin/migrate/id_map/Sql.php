@@ -150,7 +150,14 @@ class Sql extends PluginBase implements MigrateIdMapInterface, ContainerFactoryP
    * @param \Drupal\migrate\Plugin\MigrationPluginManagerInterface $migrationPluginManager
    *   The migration plugin manager.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, protected MigrationInterface $migration, protected EventDispatcherInterface $eventDispatcher, protected ?MigrationPluginManagerInterface $migrationPluginManager = NULL) {
+  public function __construct(
+    array $configuration,
+    $plugin_id,
+    $plugin_definition,
+    protected MigrationInterface $migration,
+    protected EventDispatcherInterface $eventDispatcher,
+    protected ?MigrationPluginManagerInterface $migrationPluginManager = NULL,
+  ) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
     $this->message = new MigrateMessage();
 

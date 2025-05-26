@@ -27,7 +27,12 @@ class LibraryDiscoveryCollector extends CacheCollector implements LibraryDiscove
    * @param \Drupal\Core\Theme\ThemeManagerInterface $themeManager
    *   The theme manager.
    */
-  public function __construct(CacheBackendInterface $cache, LockBackendInterface $lock, protected LibraryDiscoveryParser $discoveryParser, protected ThemeManagerInterface $themeManager) {
+  public function __construct(
+    CacheBackendInterface $cache,
+    LockBackendInterface $lock,
+    protected LibraryDiscoveryParser $discoveryParser,
+    protected ThemeManagerInterface $themeManager,
+  ) {
     parent::__construct(NULL, $cache, $lock, ['library_info']);
   }
 

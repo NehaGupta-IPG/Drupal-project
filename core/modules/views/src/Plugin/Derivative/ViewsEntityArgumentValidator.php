@@ -36,7 +36,11 @@ class ViewsEntityArgumentValidator extends DeriverBase implements ContainerDeriv
    * @param \Drupal\Core\StringTranslation\TranslationInterface $string_translation
    *   The string translation.
    */
-  public function __construct(protected $basePluginId, protected EntityTypeManagerInterface $entityTypeManager, TranslationInterface $string_translation) {
+  public function __construct(
+    protected $basePluginId,
+    protected EntityTypeManagerInterface $entityTypeManager,
+    TranslationInterface $string_translation,
+  ) {
     $this->stringTranslation = $string_translation;
   }
 

@@ -18,8 +18,9 @@ class BlockListController extends EntityListController {
    * @param \Drupal\Core\Extension\ThemeHandlerInterface $themeHandler
    *   The theme handler.
    */
-  public function __construct(protected ThemeHandlerInterface $themeHandler) {
-  }
+  public function __construct(
+    protected ThemeHandlerInterface $themeHandler,
+  ) {}
 
   /**
    * Shows the block administration page.

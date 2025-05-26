@@ -23,8 +23,9 @@ class MoveBlockController implements ContainerInjectionInterface {
    * @param \Drupal\layout_builder\LayoutTempstoreRepositoryInterface $layoutTempstoreRepository
    *   The layout tempstore repository.
    */
-  public function __construct(protected LayoutTempstoreRepositoryInterface $layoutTempstoreRepository) {
-  }
+  public function __construct(
+    protected LayoutTempstoreRepositoryInterface $layoutTempstoreRepository,
+  ) {}
 
   /**
    * {@inheritdoc}

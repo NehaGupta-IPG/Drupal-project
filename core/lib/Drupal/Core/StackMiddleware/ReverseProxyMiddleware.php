@@ -20,8 +20,10 @@ class ReverseProxyMiddleware implements HttpKernelInterface {
    * @param \Drupal\Core\Site\Settings $settings
    *   The site settings.
    */
-  public function __construct(protected HttpKernelInterface $httpKernel, protected Settings $settings) {
-  }
+  public function __construct(
+    protected HttpKernelInterface $httpKernel,
+    protected Settings $settings,
+  ) {}
 
   /**
    * {@inheritdoc}

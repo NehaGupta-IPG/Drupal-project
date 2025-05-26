@@ -23,7 +23,11 @@ class YamlDiscoveryDecorator extends YamlDiscovery {
    * @param array $directories
    *   An array of directories to scan.
    */
-  public function __construct(protected DiscoveryInterface $decorated, $name, array $directories) {
+  public function __construct(
+    protected DiscoveryInterface $decorated,
+    $name,
+    array $directories,
+  ) {
     parent::__construct($name, $directories);
   }
 

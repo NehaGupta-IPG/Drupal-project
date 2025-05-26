@@ -59,8 +59,14 @@ class SharedTempStore {
    * @param int $expire
    *   The time to live for items, in seconds.
    */
-  public function __construct(protected KeyValueStoreExpirableInterface $storage, protected LockBackendInterface $lockBackend, protected $owner, protected RequestStack $requestStack, protected AccountProxyInterface $currentUser, protected $expire = 604800) {
-  }
+  public function __construct(
+    protected KeyValueStoreExpirableInterface $storage,
+    protected LockBackendInterface $lockBackend,
+    protected $owner,
+    protected RequestStack $requestStack,
+    protected AccountProxyInterface $currentUser,
+    protected $expire = 604800,
+  ) {}
 
   /**
    * Retrieves a value from this SharedTempStore for a given key.

@@ -20,8 +20,10 @@ class YamlDiscovery implements DiscoverableInterface {
    * @param array $directories
    *   An array of directories to scan, keyed by the provider.
    */
-  public function __construct(protected $name, protected array $directories) {
-  }
+  public function __construct(
+    protected $name,
+    protected array $directories,
+  ) {}
 
   /**
    * {@inheritdoc}

@@ -46,7 +46,13 @@ abstract class ContentEntityStorageBase extends EntityStorageBase implements Con
    * @param \Drupal\Core\Entity\EntityTypeBundleInfoInterface $entityTypeBundleInfo
    *   The entity type bundle info.
    */
-  public function __construct(EntityTypeInterface $entity_type, protected EntityFieldManagerInterface $entityFieldManager, protected CacheBackendInterface $cacheBackend, MemoryCacheInterface $memory_cache, protected EntityTypeBundleInfoInterface $entityTypeBundleInfo) {
+  public function __construct(
+    EntityTypeInterface $entity_type,
+    protected EntityFieldManagerInterface $entityFieldManager,
+    protected CacheBackendInterface $cacheBackend,
+    MemoryCacheInterface $memory_cache,
+    protected EntityTypeBundleInfoInterface $entityTypeBundleInfo,
+  ) {
     parent::__construct($entity_type, $memory_cache);
     $this->bundleKey = $this->entityType->getKey('bundle');
   }

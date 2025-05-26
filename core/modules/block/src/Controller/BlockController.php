@@ -19,8 +19,9 @@ class BlockController extends ControllerBase {
    * @param \Drupal\Core\Extension\ThemeHandlerInterface $themeHandler
    *   The theme handler.
    */
-  public function __construct(protected ThemeHandlerInterface $themeHandler) {
-  }
+  public function __construct(
+    protected ThemeHandlerInterface $themeHandler,
+  ) {}
 
   /**
    * Calls a method on a block and reloads the listing page.

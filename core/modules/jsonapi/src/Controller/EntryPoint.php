@@ -36,8 +36,10 @@ class EntryPoint extends ControllerBase {
    * @param \Drupal\Core\Session\AccountInterface $user
    *   The current user.
    */
-  public function __construct(protected ResourceTypeRepositoryInterface $resourceTypeRepository, protected AccountInterface $user) {
-  }
+  public function __construct(
+    protected ResourceTypeRepositoryInterface $resourceTypeRepository,
+    protected AccountInterface $user,
+  ) {}
 
   /**
    * {@inheritdoc}

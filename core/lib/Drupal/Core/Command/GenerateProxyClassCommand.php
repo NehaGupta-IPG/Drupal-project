@@ -22,7 +22,9 @@ class GenerateProxyClassCommand extends Command {
    * @param \Drupal\Component\ProxyBuilder\ProxyBuilder $proxyBuilder
    *   The proxy builder.
    */
-  public function __construct(protected ProxyBuilder $proxyBuilder) {
+  public function __construct(
+    protected ProxyBuilder $proxyBuilder,
+  ) {
     parent::__construct();
   }
 

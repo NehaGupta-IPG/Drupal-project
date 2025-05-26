@@ -23,8 +23,10 @@ class DialogRenderer implements MainContentRendererInterface {
    * @param \Drupal\Core\Render\RendererInterface $renderer
    *   The renderer.
    */
-  public function __construct(protected TitleResolverInterface $titleResolver, protected RendererInterface $renderer) {
-  }
+  public function __construct(
+    protected TitleResolverInterface $titleResolver,
+    protected RendererInterface $renderer,
+  ) {}
 
   /**
    * {@inheritdoc}

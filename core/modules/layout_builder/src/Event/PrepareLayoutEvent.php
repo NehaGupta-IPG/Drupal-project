@@ -21,8 +21,9 @@ class PrepareLayoutEvent extends Event {
    * @param \Drupal\layout_builder\SectionStorageInterface $sectionStorage
    *   The section storage preparing the Layout.
    */
-  public function __construct(protected SectionStorageInterface $sectionStorage) {
-  }
+  public function __construct(
+    protected SectionStorageInterface $sectionStorage,
+  ) {}
 
   /**
    * Gets the section storage.

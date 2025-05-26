@@ -42,7 +42,12 @@ class Media extends CKEditor5PluginDefault implements ContainerFactoryPluginInte
    * @param \Drupal\Core\Entity\EntityDisplayRepositoryInterface $entityDisplayRepository
    *   The entity display repository.
    */
-  public function __construct(array $configuration, string $plugin_id, CKEditor5PluginDefinition $plugin_definition, protected EntityDisplayRepositoryInterface $entityDisplayRepository) {
+  public function __construct(
+    array $configuration,
+    string $plugin_id,
+    CKEditor5PluginDefinition $plugin_definition,
+    protected EntityDisplayRepositoryInterface $entityDisplayRepository,
+  ) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
   }
 

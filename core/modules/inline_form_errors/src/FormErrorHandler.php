@@ -30,7 +30,11 @@ class FormErrorHandler extends CoreFormErrorHandler {
    * @param \Drupal\Core\Messenger\MessengerInterface $messenger
    *   The messenger.
    */
-  public function __construct(TranslationInterface $string_translation, protected RendererInterface $renderer, protected MessengerInterface $messenger) {
+  public function __construct(
+    TranslationInterface $string_translation,
+    protected RendererInterface $renderer,
+    protected MessengerInterface $messenger,
+  ) {
     $this->stringTranslation = $string_translation;
   }
 

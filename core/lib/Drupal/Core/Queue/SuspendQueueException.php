@@ -28,7 +28,12 @@ class SuspendQueueException extends \RuntimeException {
    *   known, pass an interval in seconds. Otherwise NULL if the time to resume
    *   processing the queue is not known.
    */
-  public function __construct(string $message = '', int $code = 0, ?\Throwable $previous = NULL, protected ?float $delay = NULL) {
+  public function __construct(
+    string $message = '',
+    int $code = 0,
+    ?\Throwable $previous = NULL,
+    protected ?float $delay = NULL,
+  ) {
     parent::__construct($message, $code, $previous);
   }
 

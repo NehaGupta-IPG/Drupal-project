@@ -64,7 +64,15 @@ class EntityRow extends RowPluginBase {
    * @param \Drupal\Core\Entity\EntityDisplayRepositoryInterface $entityDisplayRepository
    *   The entity display repository.
    */
-  public function __construct(array $configuration, $plugin_id, array $plugin_definition, protected EntityTypeManagerInterface $entityTypeManager, protected LanguageManagerInterface $languageManager, protected ?EntityRepositoryInterface $entityRepository = NULL, protected ?EntityDisplayRepositoryInterface $entityDisplayRepository = NULL) {
+  public function __construct(
+    array $configuration,
+    $plugin_id,
+    array $plugin_definition,
+    protected EntityTypeManagerInterface $entityTypeManager,
+    protected LanguageManagerInterface $languageManager,
+    protected ?EntityRepositoryInterface $entityRepository = NULL,
+    protected ?EntityDisplayRepositoryInterface $entityDisplayRepository = NULL,
+  ) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
   }
 

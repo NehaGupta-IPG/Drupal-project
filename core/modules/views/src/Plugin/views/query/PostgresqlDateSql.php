@@ -49,8 +49,9 @@ class PostgresqlDateSql implements DateSqlInterface {
    * @param \Drupal\Core\Database\Connection $database
    *   The database connection.
    */
-  public function __construct(protected Connection $database) {
-  }
+  public function __construct(
+    protected Connection $database,
+  ) {}
 
   /**
    * {@inheritdoc}

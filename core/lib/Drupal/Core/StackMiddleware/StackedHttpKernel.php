@@ -25,8 +25,10 @@ class StackedHttpKernel implements HttpKernelInterface, TerminableInterface {
    * @param array $middlewares
    *   An array of previous middleware services.
    */
-  public function __construct(private HttpKernelInterface $httpKernel, private array $middlewares) {
-  }
+  public function __construct(
+    private HttpKernelInterface $httpKernel,
+    private array $middlewares,
+  ) {}
 
   /**
    * {@inheritdoc}

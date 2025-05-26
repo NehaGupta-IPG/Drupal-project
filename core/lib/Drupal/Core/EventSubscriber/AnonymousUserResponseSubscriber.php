@@ -20,8 +20,9 @@ class AnonymousUserResponseSubscriber implements EventSubscriberInterface {
    * @param \Drupal\Core\Session\AccountInterface $currentUser
    *   The current user.
    */
-  public function __construct(protected AccountInterface $currentUser) {
-  }
+  public function __construct(
+    protected AccountInterface $currentUser,
+  ) {}
 
   /**
    * Adds a cache tag if the 'user.permissions' cache context is present.

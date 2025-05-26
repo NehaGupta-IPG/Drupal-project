@@ -49,7 +49,15 @@ class LibraryDiscoveryParser {
    * @param \Drupal\Core\Theme\ComponentPluginManager $componentPluginManager
    *   The component plugin manager.
    */
-  public function __construct(protected $root, protected ModuleHandlerInterface $moduleHandler, protected ThemeManagerInterface $themeManager, protected StreamWrapperManagerInterface $streamWrapperManager, protected LibrariesDirectoryFileFinder $librariesDirectoryFileFinder, protected ExtensionPathResolver $extensionPathResolver, protected ComponentPluginManager $componentPluginManager) {
+  public function __construct(
+    protected $root,
+    protected ModuleHandlerInterface $moduleHandler,
+    protected ThemeManagerInterface $themeManager,
+    protected StreamWrapperManagerInterface $streamWrapperManager,
+    protected LibrariesDirectoryFileFinder $librariesDirectoryFileFinder,
+    protected ExtensionPathResolver $extensionPathResolver,
+    protected ComponentPluginManager $componentPluginManager,
+  ) {
     $this->fileCache = FileCacheFactory::get('library_parser');
   }
 

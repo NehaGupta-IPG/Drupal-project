@@ -40,7 +40,14 @@ class MessageAction extends ConfigurableActionBase implements ContainerFactoryPl
    * @param \Drupal\Core\Messenger\MessengerInterface $messenger
    *   The messenger.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, protected Token $token, protected RendererInterface $renderer, protected MessengerInterface $messenger) {
+  public function __construct(
+    array $configuration,
+    $plugin_id,
+    $plugin_definition,
+    protected Token $token,
+    protected RendererInterface $renderer,
+    protected MessengerInterface $messenger,
+  ) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
   }
 

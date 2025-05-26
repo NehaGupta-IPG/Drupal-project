@@ -34,7 +34,11 @@ class HelpTwigExtension extends AbstractExtension {
    * @param \Drupal\Core\StringTranslation\TranslationInterface $string_translation
    *   The string translation service.
    */
-  public function __construct(protected AccessManagerInterface $accessManager, protected HelpTopicPluginManagerInterface $pluginManager, TranslationInterface $string_translation) {
+  public function __construct(
+    protected AccessManagerInterface $accessManager,
+    protected HelpTopicPluginManagerInterface $pluginManager,
+    TranslationInterface $string_translation,
+  ) {
     $this->stringTranslation = $string_translation;
   }
 

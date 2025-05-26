@@ -63,7 +63,9 @@ class Tables implements TablesInterface {
    * @param \Drupal\Core\Database\Query\SelectInterface $sqlQuery
    *   The SQL query.
    */
-  public function __construct(protected SelectInterface $sqlQuery) {
+  public function __construct(
+    protected SelectInterface $sqlQuery,
+  ) {
     $this->entityTypeManager = \Drupal::entityTypeManager();
     $this->entityFieldManager = \Drupal::service('entity_field.manager');
   }

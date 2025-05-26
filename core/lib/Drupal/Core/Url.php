@@ -101,8 +101,11 @@ class Url implements TrustedCallbackInterface {
    * @todo Update this documentation for non-routed URIs in
    *   https://www.drupal.org/node/2346787
    */
-  public function __construct(protected $routeName, protected $routeParameters = [], protected $options = []) {
-  }
+  public function __construct(
+    protected $routeName,
+    protected $routeParameters = [],
+    protected $options = [],
+  ) {}
 
   /**
    * Creates a new Url object for a URL that has a Drupal route.

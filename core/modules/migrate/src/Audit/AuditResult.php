@@ -34,7 +34,11 @@ class AuditResult implements MarkupInterface, \Countable {
    * @param string[] $reasons
    *   (optional) The reasons why the migration passed or failed the audit.
    */
-  public function __construct(protected MigrationInterface $migration, $status, array $reasons = []) {
+  public function __construct(
+    protected MigrationInterface $migration,
+    $status,
+    array $reasons = [],
+  ) {
     if (!is_bool($status)) {
       throw new \InvalidArgumentException('Audit results must have a boolean status.');
     }

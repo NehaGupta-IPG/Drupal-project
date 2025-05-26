@@ -29,8 +29,9 @@ class BanDelete extends ConfirmFormBase {
    * @param \Drupal\ban\BanIpManagerInterface $ipManager
    *   The IP manager.
    */
-  public function __construct(protected BanIpManagerInterface $ipManager) {
-  }
+  public function __construct(
+    protected BanIpManagerInterface $ipManager,
+  ) {}
 
   /**
    * {@inheritdoc}

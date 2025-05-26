@@ -55,7 +55,13 @@ class FilterFormatPermission extends ProcessPluginBase implements ContainerFacto
    * @param \Drupal\migrate\MigrateLookupInterface $migrateLookup
    *   The migrate lookup service.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, protected MigrationInterface $migration, protected MigrateLookupInterface $migrateLookup) {
+  public function __construct(
+    array $configuration,
+    $plugin_id,
+    $plugin_definition,
+    protected MigrationInterface $migration,
+    protected MigrateLookupInterface $migrateLookup,
+  ) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
   }
 

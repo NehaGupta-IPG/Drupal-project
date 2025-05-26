@@ -42,8 +42,12 @@ class NodeTranslationExceptionSubscriber implements EventSubscriberInterface {
    * @param \Drupal\Core\State\StateInterface $state
    *   The state service.
    */
-  public function __construct(protected KeyValueFactoryInterface $keyValue, protected LanguageManagerInterface $languageManager, protected UrlGeneratorInterface $urlGenerator, protected StateInterface $state) {
-  }
+  public function __construct(
+    protected KeyValueFactoryInterface $keyValue,
+    protected LanguageManagerInterface $languageManager,
+    protected UrlGeneratorInterface $urlGenerator,
+    protected StateInterface $state,
+  ) {}
 
   /**
    * Redirects not found node translations using the key value collection.

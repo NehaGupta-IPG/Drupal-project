@@ -30,8 +30,9 @@ class DerivativeDiscoveryDecorator implements CachedDiscoveryInterface {
    *   The parent object implementing DiscoveryInterface that is being
    *   decorated.
    */
-  public function __construct(protected DiscoveryInterface $decorated) {
-  }
+  public function __construct(
+    protected DiscoveryInterface $decorated,
+  ) {}
 
   /**
    * {@inheritdoc}

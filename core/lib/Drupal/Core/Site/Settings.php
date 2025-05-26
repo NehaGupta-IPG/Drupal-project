@@ -43,7 +43,9 @@ final class Settings {
    * @param array $storage
    *   Array with the settings.
    */
-  public function __construct(private array $storage) {
+  public function __construct(
+    private array $storage,
+  ) {
     self::$instance = $this;
   }
 

@@ -27,7 +27,12 @@ class Vid extends NumericArgument {
    * @param \Drupal\node\NodeStorageInterface $nodeStorage
    *   The node storage.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, protected NodeStorageInterface $nodeStorage) {
+  public function __construct(
+    array $configuration,
+    $plugin_id,
+    $plugin_definition,
+    protected NodeStorageInterface $nodeStorage,
+  ) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
   }
 

@@ -17,8 +17,9 @@ class InfoParserDynamic implements InfoParserInterface {
    * @param string $root
    *   The root directory of the Drupal installation.
    */
-  public function __construct(protected string $root) {
-  }
+  public function __construct(
+    protected string $root,
+  ) {}
 
   /**
    * {@inheritdoc}

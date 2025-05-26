@@ -22,8 +22,9 @@ class ViewsMenuLink extends DeriverBase implements ContainerDeriverInterface {
    * @param \Drupal\Core\Entity\EntityStorageInterface $viewStorage
    *   The view storage.
    */
-  public function __construct(protected EntityStorageInterface $viewStorage) {
-  }
+  public function __construct(
+    protected EntityStorageInterface $viewStorage,
+  ) {}
 
   /**
    * {@inheritdoc}

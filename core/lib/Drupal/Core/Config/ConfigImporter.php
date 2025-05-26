@@ -133,7 +133,19 @@ class ConfigImporter {
    * @param \Drupal\Core\Extension\ThemeExtensionList $themeExtensionList
    *   The theme extension list.
    */
-  public function __construct(protected StorageComparerInterface $storageComparer, protected EventDispatcherInterface $eventDispatcher, protected ConfigManagerInterface $configManager, protected LockBackendInterface $lock, protected TypedConfigManagerInterface $typedConfigManager, protected ModuleHandlerInterface $moduleHandler, protected ModuleInstallerInterface $moduleInstaller, protected ThemeHandlerInterface $themeHandler, TranslationInterface $string_translation, protected ModuleExtensionList $moduleExtensionList, protected ThemeExtensionList $themeExtensionList) {
+  public function __construct(
+    protected StorageComparerInterface $storageComparer,
+    protected EventDispatcherInterface $eventDispatcher,
+    protected ConfigManagerInterface $configManager,
+    protected LockBackendInterface $lock,
+    protected TypedConfigManagerInterface $typedConfigManager,
+    protected ModuleHandlerInterface $moduleHandler,
+    protected ModuleInstallerInterface $moduleInstaller,
+    protected ThemeHandlerInterface $themeHandler,
+    TranslationInterface $string_translation,
+    protected ModuleExtensionList $moduleExtensionList,
+    protected ThemeExtensionList $themeExtensionList,
+  ) {
     $this->stringTranslation = $string_translation;
     foreach ($this->storageComparer->getAllCollectionNames() as $collection) {
       $this->processedConfiguration[$collection] = $this->storageComparer->getEmptyChangelist();

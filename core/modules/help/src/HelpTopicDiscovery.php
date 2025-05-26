@@ -38,8 +38,9 @@ class HelpTopicDiscovery implements DiscoveryInterface {
    *   either be a string or an array of strings. The string values should be
    *   the path of a directory to scan.
    */
-  public function __construct(protected array $directories) {
-  }
+  public function __construct(
+    protected array $directories,
+  ) {}
 
   /**
    * {@inheritdoc}

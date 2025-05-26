@@ -22,8 +22,10 @@ final class TestSystemLoggerChannel extends LoggerChannel {
    * @param \Drupal\Core\State\StateInterface $state
    *   The state service.
    */
-  public function __construct(protected LoggerChannelInterface $innerLogger, protected StateInterface $state) {
-  }
+  public function __construct(
+    protected LoggerChannelInterface $innerLogger,
+    protected StateInterface $state,
+  ) {}
 
   /**
    * {@inheritdoc}

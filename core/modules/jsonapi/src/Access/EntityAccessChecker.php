@@ -55,8 +55,12 @@ class EntityAccessChecker {
    * @param \Drupal\Core\Entity\EntityRepositoryInterface $entityRepository
    *   The entity repository.
    */
-  public function __construct(protected ResourceTypeRepositoryInterface $resourceTypeRepository, protected RouterInterface $router, protected AccountInterface $currentUser, protected EntityRepositoryInterface $entityRepository) {
-  }
+  public function __construct(
+    protected ResourceTypeRepositoryInterface $resourceTypeRepository,
+    protected RouterInterface $router,
+    protected AccountInterface $currentUser,
+    protected EntityRepositoryInterface $entityRepository,
+  ) {}
 
   /**
    * Sets the media revision access check service.

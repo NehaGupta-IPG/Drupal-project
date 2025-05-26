@@ -33,8 +33,10 @@ class ThemeTestSubscriber implements EventSubscriberInterface {
    * @param \Drupal\Core\Render\RendererInterface $renderer
    *   The renderer.
    */
-  public function __construct(protected RouteMatchInterface $currentRouteMatch, protected RendererInterface $renderer) {
-  }
+  public function __construct(
+    protected RouteMatchInterface $currentRouteMatch,
+    protected RendererInterface $renderer,
+  ) {}
 
   /**
    * Generates themed output early in a page request.

@@ -28,8 +28,11 @@ class SearchBlockForm extends FormBase implements WorkspaceSafeFormInterface {
    * @param \Drupal\Core\Render\RendererInterface $renderer
    *   The renderer.
    */
-  public function __construct(protected SearchPageRepositoryInterface $searchPageRepository, protected ConfigFactoryInterface $configFactory, protected RendererInterface $renderer) {
-  }
+  public function __construct(
+    protected SearchPageRepositoryInterface $searchPageRepository,
+    protected ConfigFactoryInterface $configFactory,
+    protected RendererInterface $renderer,
+  ) {}
 
   /**
    * {@inheritdoc}

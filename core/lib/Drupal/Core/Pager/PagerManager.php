@@ -37,8 +37,9 @@ class PagerManager implements PagerManagerInterface {
    * @param \Drupal\Core\Pager\PagerParametersInterface $pagerParams
    *   The pager parameters.
    */
-  public function __construct(protected PagerParametersInterface $pagerParams) {
-  }
+  public function __construct(
+    protected PagerParametersInterface $pagerParams,
+  ) {}
 
   /**
    * {@inheritdoc}

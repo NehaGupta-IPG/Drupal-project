@@ -62,8 +62,9 @@ class DependencySerializationTestDummy {
    * @param object $service
    *   A test service.
    */
-  public function __construct(public \stdClass $service) {
-  }
+  public function __construct(
+    public \stdClass $service,
+  ) {}
 
   /**
    * {@inheritdoc}

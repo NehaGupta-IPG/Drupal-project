@@ -31,7 +31,13 @@ class LatestTranslationAffectedRevision extends FilterPluginBase implements Cont
    * @param \Drupal\views\Plugin\ViewsHandlerManager $joinHandler
    *   Views Handler Plugin Manager.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, protected EntityTypeManagerInterface $entityTypeManager, protected ViewsHandlerManager $joinHandler) {
+  public function __construct(
+    array $configuration,
+    $plugin_id,
+    $plugin_definition,
+    protected EntityTypeManagerInterface $entityTypeManager,
+    protected ViewsHandlerManager $joinHandler,
+  ) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
   }
 

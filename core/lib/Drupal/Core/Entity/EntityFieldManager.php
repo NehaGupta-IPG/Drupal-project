@@ -112,7 +112,17 @@ class EntityFieldManager implements EntityFieldManagerInterface, PreWarmableInte
    * @param \Drupal\Core\Entity\EntityLastInstalledSchemaRepositoryInterface $entityLastInstalledSchemaRepository
    *   The entity last installed schema repository.
    */
-  public function __construct(protected EntityTypeManagerInterface $entityTypeManager, protected EntityTypeBundleInfoInterface $entityTypeBundleInfo, protected EntityDisplayRepositoryInterface $entityDisplayRepository, protected TypedDataManagerInterface $typedDataManager, protected LanguageManagerInterface $languageManager, protected KeyValueFactoryInterface $keyValueFactory, protected ModuleHandlerInterface $moduleHandler, CacheBackendInterface $cache_backend, protected EntityLastInstalledSchemaRepositoryInterface $entityLastInstalledSchemaRepository) {
+  public function __construct(
+    protected EntityTypeManagerInterface $entityTypeManager,
+    protected EntityTypeBundleInfoInterface $entityTypeBundleInfo,
+    protected EntityDisplayRepositoryInterface $entityDisplayRepository,
+    protected TypedDataManagerInterface $typedDataManager,
+    protected LanguageManagerInterface $languageManager,
+    protected KeyValueFactoryInterface $keyValueFactory,
+    protected ModuleHandlerInterface $moduleHandler,
+    CacheBackendInterface $cache_backend,
+    protected EntityLastInstalledSchemaRepositoryInterface $entityLastInstalledSchemaRepository,
+  ) {
     $this->cacheBackend = $cache_backend;
   }
 

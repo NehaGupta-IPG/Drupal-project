@@ -41,7 +41,13 @@ class EditorFileReference extends FilterBase implements ContainerFactoryPluginIn
    * @param \Drupal\Core\Image\ImageFactory $imageFactory
    *   The image factory.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, protected EntityRepositoryInterface $entityRepository, protected ImageFactory $imageFactory) {
+  public function __construct(
+    array $configuration,
+    $plugin_id,
+    $plugin_definition,
+    protected EntityRepositoryInterface $entityRepository,
+    protected ImageFactory $imageFactory,
+  ) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
   }
 

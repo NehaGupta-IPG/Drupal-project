@@ -87,7 +87,13 @@ abstract class ConfigureBlockFormBase extends FormBase implements BaseFormIdInte
    * @param \Drupal\Core\Plugin\PluginFormFactoryInterface $pluginFormFactory
    *   The plugin form manager.
    */
-  public function __construct(protected LayoutTempstoreRepositoryInterface $layoutTempstoreRepository, ContextRepositoryInterface $context_repository, protected BlockManagerInterface $blockManager, protected UuidInterface $uuidGenerator, protected PluginFormFactoryInterface $pluginFormFactory) {
+  public function __construct(
+    protected LayoutTempstoreRepositoryInterface $layoutTempstoreRepository,
+    ContextRepositoryInterface $context_repository,
+    protected BlockManagerInterface $blockManager,
+    protected UuidInterface $uuidGenerator,
+    protected PluginFormFactoryInterface $pluginFormFactory,
+  ) {
     $this->contextRepository = $context_repository;
   }
 

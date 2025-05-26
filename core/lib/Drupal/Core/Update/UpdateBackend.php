@@ -19,8 +19,9 @@ class UpdateBackend extends NullBackend {
    * @param \Drupal\Core\Cache\CacheBackendInterface $backend
    *   The regular runtime cache backend.
    */
-  public function __construct(protected CacheBackendInterface $backend) {
-  }
+  public function __construct(
+    protected CacheBackendInterface $backend,
+  ) {}
 
   /**
    * {@inheritdoc}

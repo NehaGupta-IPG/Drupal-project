@@ -27,8 +27,13 @@ class SharedTempStoreFactory {
    * @param int $expire
    *   The time to live for items, in seconds.
    */
-  public function __construct(protected KeyValueExpirableFactoryInterface $storageFactory, protected LockBackendInterface $lockBackend, protected RequestStack $requestStack, protected AccountProxyInterface $currentUser, protected $expire = 604800) {
-  }
+  public function __construct(
+    protected KeyValueExpirableFactoryInterface $storageFactory,
+    protected LockBackendInterface $lockBackend,
+    protected RequestStack $requestStack,
+    protected AccountProxyInterface $currentUser,
+    protected $expire = 604800,
+  ) {}
 
   /**
    * Creates a SharedTempStore for the current user or anonymous session.

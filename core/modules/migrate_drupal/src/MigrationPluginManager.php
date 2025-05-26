@@ -46,7 +46,13 @@ class MigrationPluginManager extends BaseMigrationPluginManager {
    * @param \Drupal\Core\Config\ConfigFactoryInterface $configFactory
    *   The config factory service.
    */
-  public function __construct(ModuleHandlerInterface $module_handler, CacheBackendInterface $cache_backend, LanguageManagerInterface $language_manager, protected MigrateSourcePluginManager $sourceManager, protected ConfigFactoryInterface $configFactory) {
+  public function __construct(
+    ModuleHandlerInterface $module_handler,
+    CacheBackendInterface $cache_backend,
+    LanguageManagerInterface $language_manager,
+    protected MigrateSourcePluginManager $sourceManager,
+    protected ConfigFactoryInterface $configFactory,
+  ) {
     parent::__construct($module_handler, $cache_backend, $language_manager);
   }
 

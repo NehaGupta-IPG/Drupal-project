@@ -43,7 +43,11 @@ class DefaultSingleLazyPluginCollection extends LazyPluginCollection {
    * @param array $configuration
    *   An array of configuration.
    */
-  public function __construct(protected PluginManagerInterface $manager, $instance_id, array $configuration) {
+  public function __construct(
+    protected PluginManagerInterface $manager,
+    $instance_id,
+    array $configuration,
+  ) {
     $this->addInstanceId($instance_id, $configuration);
   }
 

@@ -30,7 +30,12 @@ class SiteMaintenanceModeForm extends ConfigFormBase {
    * @param \Drupal\user\PermissionHandlerInterface $permissionHandler
    *   The permission handler.
    */
-  public function __construct(ConfigFactoryInterface $config_factory, TypedConfigManagerInterface $typedConfigManager, protected StateInterface $state, protected PermissionHandlerInterface $permissionHandler) {
+  public function __construct(
+    ConfigFactoryInterface $config_factory,
+    TypedConfigManagerInterface $typedConfigManager,
+    protected StateInterface $state,
+    protected PermissionHandlerInterface $permissionHandler,
+  ) {
     parent::__construct($config_factory, $typedConfigManager);
   }
 

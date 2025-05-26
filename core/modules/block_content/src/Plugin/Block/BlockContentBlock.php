@@ -57,7 +57,17 @@ class BlockContentBlock extends BlockBase implements ContainerFactoryPluginInter
    * @param \Drupal\Core\Entity\EntityDisplayRepositoryInterface $entityDisplayRepository
    *   The entity display repository.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, protected BlockManagerInterface $blockManager, protected EntityTypeManagerInterface $entityTypeManager, protected AccountInterface $account, protected UrlGeneratorInterface $urlGenerator, protected BlockContentUuidLookup $uuidLookup, protected EntityDisplayRepositoryInterface $entityDisplayRepository) {
+  public function __construct(
+    array $configuration,
+    $plugin_id,
+    $plugin_definition,
+    protected BlockManagerInterface $blockManager,
+    protected EntityTypeManagerInterface $entityTypeManager,
+    protected AccountInterface $account,
+    protected UrlGeneratorInterface $urlGenerator,
+    protected BlockContentUuidLookup $uuidLookup,
+    protected EntityDisplayRepositoryInterface $entityDisplayRepository,
+  ) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
   }
 

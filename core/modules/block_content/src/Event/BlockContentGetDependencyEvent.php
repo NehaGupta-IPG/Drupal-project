@@ -26,8 +26,9 @@ class BlockContentGetDependencyEvent extends Event {
    * @param \Drupal\block_content\BlockContentInterface $blockContent
    *   The block content entity.
    */
-  public function __construct(protected BlockContentInterface $blockContent) {
-  }
+  public function __construct(
+    protected BlockContentInterface $blockContent,
+  ) {}
 
   /**
    * Gets the block content entity.

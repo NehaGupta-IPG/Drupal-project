@@ -40,7 +40,10 @@ class EntityConstraintViolationList extends ConstraintViolationList implements E
    * @param iterable $violations
    *   The set of violations.
    */
-  public function __construct(protected FieldableEntityInterface $entity, iterable $violations = []) {
+  public function __construct(
+    protected FieldableEntityInterface $entity,
+    iterable $violations = [],
+  ) {
     parent::__construct($violations);
   }
 

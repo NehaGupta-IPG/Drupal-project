@@ -31,8 +31,9 @@ class SystemInfoController implements ContainerInjectionInterface {
    * @param \Drupal\system\SystemManager $systemManager
    *   System manager service.
    */
-  public function __construct(protected SystemManager $systemManager) {
-  }
+  public function __construct(
+    protected SystemManager $systemManager,
+  ) {}
 
   /**
    * Displays the site status report.

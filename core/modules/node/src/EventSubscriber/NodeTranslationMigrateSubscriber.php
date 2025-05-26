@@ -35,8 +35,10 @@ class NodeTranslationMigrateSubscriber implements EventSubscriberInterface {
    * @param \Drupal\Core\State\StateInterface $state
    *   The state service.
    */
-  public function __construct(protected KeyValueFactoryInterface $keyValue, protected StateInterface $state) {
-  }
+  public function __construct(
+    protected KeyValueFactoryInterface $keyValue,
+    protected StateInterface $state,
+  ) {}
 
   /**
    * Helper method to check if we are migrating translated nodes.

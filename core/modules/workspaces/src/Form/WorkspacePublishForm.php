@@ -35,8 +35,10 @@ class WorkspacePublishForm extends ConfirmFormBase implements ContainerInjection
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
    *   The entity type manager.
    */
-  public function __construct(protected WorkspaceOperationFactory $workspaceOperationFactory, protected EntityTypeManagerInterface $entityTypeManager) {
-  }
+  public function __construct(
+    protected WorkspaceOperationFactory $workspaceOperationFactory,
+    protected EntityTypeManagerInterface $entityTypeManager,
+  ) {}
 
   /**
    * {@inheritdoc}

@@ -20,8 +20,9 @@ class ToolbarLinkBuilder implements TrustedCallbackInterface {
    * @param \Drupal\Core\Session\AccountProxyInterface $account
    *   The current user.
    */
-  public function __construct(protected AccountProxyInterface $account) {
-  }
+  public function __construct(
+    protected AccountProxyInterface $account,
+  ) {}
 
   /**
    * Lazy builder callback for rendering toolbar links.

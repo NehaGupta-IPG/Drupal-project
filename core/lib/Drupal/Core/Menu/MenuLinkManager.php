@@ -43,8 +43,11 @@ class MenuLinkManager implements MenuLinkManagerInterface {
    * @param \Drupal\Core\Extension\ModuleHandlerInterface $moduleHandler
    *   The module handler.
    */
-  public function __construct(protected MenuTreeStorageInterface $treeStorage, protected StaticMenuLinkOverridesInterface $overrides, protected ModuleHandlerInterface $moduleHandler) {
-  }
+  public function __construct(
+    protected MenuTreeStorageInterface $treeStorage,
+    protected StaticMenuLinkOverridesInterface $overrides,
+    protected ModuleHandlerInterface $moduleHandler,
+  ) {}
 
   /**
    * Performs extra processing on plugin definitions.

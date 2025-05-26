@@ -25,8 +25,11 @@ class MenuTestController extends ControllerBase {
    * @param \Drupal\Core\Routing\RouteMatchInterface $routeMatch
    *   The current route match.
    */
-  public function __construct(protected ThemeManagerInterface $themeManager, protected ThemeNegotiatorInterface $themeNegotiator, protected RouteMatchInterface $routeMatch) {
-  }
+  public function __construct(
+    protected ThemeManagerInterface $themeManager,
+    protected ThemeNegotiatorInterface $themeNegotiator,
+    protected RouteMatchInterface $routeMatch,
+  ) {}
 
   /**
    * {@inheritdoc}

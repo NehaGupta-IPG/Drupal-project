@@ -61,7 +61,10 @@ abstract class EntityBase implements EntityInterface {
    * @param string $entityTypeId
    *   The type of the entity to create.
    */
-  public function __construct(array $values, protected $entityTypeId) {
+  public function __construct(
+    array $values,
+    protected $entityTypeId,
+  ) {
     // Set initial values.
     foreach ($values as $key => $value) {
       $this->$key = $value;

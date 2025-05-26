@@ -19,8 +19,9 @@ class AcceptHeaderMiddleware implements HttpKernelInterface {
    * @param \Symfony\Component\HttpKernel\HttpKernelInterface $httpKernel
    *   The app.
    */
-  public function __construct(protected HttpKernelInterface $httpKernel) {
-  }
+  public function __construct(
+    protected HttpKernelInterface $httpKernel,
+  ) {}
 
   /**
    * {@inheritdoc}

@@ -21,8 +21,10 @@ class MaintenanceMode implements MaintenanceModeInterface {
    * @param \Drupal\Core\Config\ConfigFactoryInterface $config
    *   The config factory.
    */
-  public function __construct(protected StateInterface $state, protected ConfigFactoryInterface $config) {
-  }
+  public function __construct(
+    protected StateInterface $state,
+    protected ConfigFactoryInterface $config,
+  ) {}
 
   /**
    * {@inheritdoc}

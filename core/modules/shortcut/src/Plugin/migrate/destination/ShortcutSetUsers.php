@@ -31,7 +31,13 @@ class ShortcutSetUsers extends DestinationBase implements ContainerFactoryPlugin
    * @param \Drupal\shortcut\ShortcutSetStorageInterface $shortcutSetStorage
    *   The shortcut_set entity storage handler.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, MigrationInterface $migration, protected ShortcutSetStorageInterface $shortcutSetStorage) {
+  public function __construct(
+    array $configuration,
+    $plugin_id,
+    $plugin_definition,
+    MigrationInterface $migration,
+    protected ShortcutSetStorageInterface $shortcutSetStorage,
+  ) {
     parent::__construct($configuration, $plugin_id, $plugin_definition, $migration);
   }
 

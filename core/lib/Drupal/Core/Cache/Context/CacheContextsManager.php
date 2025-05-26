@@ -35,8 +35,10 @@ class CacheContextsManager {
    * @param string[] $contexts
    *   An array of the available cache context IDs.
    */
-  public function __construct(protected ContainerInterface $container, protected array $contexts) {
-  }
+  public function __construct(
+    protected ContainerInterface $container,
+    protected array $contexts,
+  ) {}
 
   /**
    * Provides an array of available cache contexts.

@@ -43,8 +43,12 @@ class PageCache implements HttpKernelInterface {
    * @param \Drupal\Core\PageCache\ResponsePolicyInterface $responsePolicy
    *   A policy rule determining the cacheability of the response.
    */
-  public function __construct(protected HttpKernelInterface $httpKernel, protected CacheBackendInterface $cache, protected RequestPolicyInterface $requestPolicy, protected ResponsePolicyInterface $responsePolicy) {
-  }
+  public function __construct(
+    protected HttpKernelInterface $httpKernel,
+    protected CacheBackendInterface $cache,
+    protected RequestPolicyInterface $requestPolicy,
+    protected ResponsePolicyInterface $responsePolicy,
+  ) {}
 
   /**
    * {@inheritdoc}

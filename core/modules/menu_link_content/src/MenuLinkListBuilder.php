@@ -35,7 +35,11 @@ class MenuLinkListBuilder extends EntityListBuilder {
    * @param \Drupal\Core\Routing\RedirectDestinationInterface $redirectDestination
    *   The redirect destination.
    */
-  public function __construct(EntityTypeInterface $entity_type, EntityStorageInterface $storage, protected RedirectDestinationInterface $redirectDestination) {
+  public function __construct(
+    EntityTypeInterface $entity_type,
+    EntityStorageInterface $storage,
+    protected RedirectDestinationInterface $redirectDestination,
+  ) {
     parent::__construct($entity_type, $storage);
   }
 

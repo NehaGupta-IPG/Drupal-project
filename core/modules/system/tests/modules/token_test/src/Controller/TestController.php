@@ -21,8 +21,9 @@ class TestController extends ControllerBase {
    * @param \Drupal\Core\Utility\Token $token
    *   The token replacement system.
    */
-  public function __construct(protected Token $token) {
-  }
+  public function __construct(
+    protected Token $token,
+  ) {}
 
   /**
    * {@inheritdoc}

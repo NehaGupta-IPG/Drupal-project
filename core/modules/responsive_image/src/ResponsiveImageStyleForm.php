@@ -30,8 +30,9 @@ class ResponsiveImageStyleForm extends EntityForm {
    * @param \Drupal\breakpoint\BreakpointManagerInterface $breakpointManager
    *   The breakpoint manager.
    */
-  public function __construct(protected BreakpointManagerInterface $breakpointManager) {
-  }
+  public function __construct(
+    protected BreakpointManagerInterface $breakpointManager,
+  ) {}
 
   /**
    * Overrides Drupal\Core\Entity\EntityForm::form().

@@ -48,7 +48,15 @@ abstract class LinkBase extends FieldPluginBase {
    * @param \Drupal\Core\Language\LanguageManagerInterface $languageManager
    *   The language manager.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, protected AccessManagerInterface $accessManager, protected EntityTypeManagerInterface $entityTypeManager, protected EntityRepositoryInterface $entityRepository, protected LanguageManagerInterface $languageManager) {
+  public function __construct(
+    array $configuration,
+    $plugin_id,
+    $plugin_definition,
+    protected AccessManagerInterface $accessManager,
+    protected EntityTypeManagerInterface $entityTypeManager,
+    protected EntityRepositoryInterface $entityRepository,
+    protected LanguageManagerInterface $languageManager,
+  ) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
   }
 

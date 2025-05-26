@@ -44,7 +44,13 @@ class ViewUIConverter extends AdminPathConfigEntityConverter implements ParamCon
    * @param \Drupal\Core\Entity\EntityRepositoryInterface $entity_repository
    *   The entity repository.
    */
-  public function __construct(EntityTypeManagerInterface $entity_type_manager, protected SharedTempStoreFactory $tempStoreFactory, ConfigFactoryInterface $config_factory, AdminContext $admin_context, EntityRepositoryInterface $entity_repository) {
+  public function __construct(
+    EntityTypeManagerInterface $entity_type_manager,
+    protected SharedTempStoreFactory $tempStoreFactory,
+    ConfigFactoryInterface $config_factory,
+    AdminContext $admin_context,
+    EntityRepositoryInterface $entity_repository,
+  ) {
     parent::__construct($entity_type_manager, $config_factory, $admin_context, $entity_repository);
   }
 

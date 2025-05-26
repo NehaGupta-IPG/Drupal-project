@@ -16,8 +16,9 @@ class LanguagesCacheContext implements CalculatedCacheContextInterface {
    * @param \Drupal\Core\Language\LanguageManagerInterface $languageManager
    *   The language manager.
    */
-  public function __construct(protected LanguageManagerInterface $languageManager) {
-  }
+  public function __construct(
+    protected LanguageManagerInterface $languageManager,
+  ) {}
 
   /**
    * {@inheritdoc}

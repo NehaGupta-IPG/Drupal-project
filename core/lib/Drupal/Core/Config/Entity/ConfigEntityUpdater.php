@@ -41,8 +41,10 @@ class ConfigEntityUpdater implements ContainerInjectionInterface {
    * @param int $batchSize
    *   The number of entities to process in each batch.
    */
-  public function __construct(protected EntityTypeManagerInterface $entityTypeManager, protected $batchSize) {
-  }
+  public function __construct(
+    protected EntityTypeManagerInterface $entityTypeManager,
+    protected $batchSize,
+  ) {}
 
   /**
    * {@inheritdoc}

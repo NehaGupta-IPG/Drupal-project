@@ -44,8 +44,12 @@ class NodeRevisionDeleteForm extends ConfirmFormBase {
    * @param \Drupal\Core\Datetime\DateFormatterInterface $dateFormatter
    *   The date formatter service.
    */
-  public function __construct(protected EntityStorageInterface $nodeStorage, protected EntityStorageInterface $nodeTypeStorage, protected AccessManagerInterface $accessManager, protected DateFormatterInterface $dateFormatter) {
-  }
+  public function __construct(
+    protected EntityStorageInterface $nodeStorage,
+    protected EntityStorageInterface $nodeTypeStorage,
+    protected AccessManagerInterface $accessManager,
+    protected DateFormatterInterface $dateFormatter,
+  ) {}
 
   /**
    * {@inheritdoc}

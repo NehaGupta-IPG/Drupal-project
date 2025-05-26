@@ -23,8 +23,9 @@ class PostApplySubscriber implements EventSubscriberInterface {
    * @param \Drupal\package_manager\PathLocator $pathLocator
    *   The path locator service.
    */
-  public function __construct(private PathLocator $pathLocator) {
-  }
+  public function __construct(
+    private PathLocator $pathLocator,
+  ) {}
 
   /**
    * Writes a file when staged changes are applied to the active directory.

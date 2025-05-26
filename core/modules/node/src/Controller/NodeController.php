@@ -29,8 +29,11 @@ class NodeController extends ControllerBase implements ContainerInjectionInterfa
    * @param \Drupal\Core\Entity\EntityRepositoryInterface $entityRepository
    *   The entity repository.
    */
-  public function __construct(protected DateFormatterInterface $dateFormatter, protected RendererInterface $renderer, protected EntityRepositoryInterface $entityRepository) {
-  }
+  public function __construct(
+    protected DateFormatterInterface $dateFormatter,
+    protected RendererInterface $renderer,
+    protected EntityRepositoryInterface $entityRepository,
+  ) {}
 
   /**
    * Displays add content links for available content types.

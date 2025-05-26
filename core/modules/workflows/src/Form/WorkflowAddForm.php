@@ -22,8 +22,9 @@ class WorkflowAddForm extends EntityForm {
    * @param \Drupal\Component\Plugin\PluginManagerInterface $workflowTypePluginManager
    *   The workflow type plugin manager.
    */
-  public function __construct(protected PluginManagerInterface $workflowTypePluginManager) {
-  }
+  public function __construct(
+    protected PluginManagerInterface $workflowTypePluginManager,
+  ) {}
 
   /**
    * {@inheritdoc}

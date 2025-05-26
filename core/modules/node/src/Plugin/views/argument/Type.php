@@ -27,7 +27,12 @@ class Type extends StringArgument {
    * @param \Drupal\Core\Entity\EntityStorageInterface $nodeTypeStorage
    *   The entity storage class.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, protected EntityStorageInterface $nodeTypeStorage) {
+  public function __construct(
+    array $configuration,
+    $plugin_id,
+    $plugin_definition,
+    protected EntityStorageInterface $nodeTypeStorage,
+  ) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
   }
 

@@ -19,8 +19,9 @@ class ConfigTranslationMapperList extends ControllerBase {
    * @param \Drupal\config_translation\ConfigMapperInterface[] $mappers
    *   The configuration mapper manager.
    */
-  public function __construct(protected array $mappers) {
-  }
+  public function __construct(
+    protected array $mappers,
+  ) {}
 
   /**
    * {@inheritdoc}

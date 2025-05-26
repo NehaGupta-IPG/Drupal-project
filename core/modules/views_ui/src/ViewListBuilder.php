@@ -41,7 +41,11 @@ class ViewListBuilder extends ConfigEntityListBuilder {
    * @param \Drupal\Component\Plugin\PluginManagerInterface $displayManager
    *   The views display plugin manager to use.
    */
-  public function __construct(EntityTypeInterface $entity_type, EntityStorageInterface $storage, protected PluginManagerInterface $displayManager) {
+  public function __construct(
+    EntityTypeInterface $entity_type,
+    EntityStorageInterface $storage,
+    protected PluginManagerInterface $displayManager,
+  ) {
     parent::__construct($entity_type, $storage);
     // This list builder uses client-side filters which requires all entities to
     // be listed, disable the pager.

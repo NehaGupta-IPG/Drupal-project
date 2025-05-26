@@ -23,8 +23,10 @@ abstract class FormController {
    * @param \Drupal\Core\Form\FormBuilderInterface $formBuilder
    *   The form builder.
    */
-  public function __construct(protected ArgumentResolverInterface $argumentResolver, protected FormBuilderInterface $formBuilder) {
-  }
+  public function __construct(
+    protected ArgumentResolverInterface $argumentResolver,
+    protected FormBuilderInterface $formBuilder,
+  ) {}
 
   /**
    * Invokes the form and returns the result.

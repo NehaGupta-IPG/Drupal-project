@@ -34,7 +34,11 @@ class MenuLinksetRoutes extends RouteSubscriberBase implements ContainerInjectio
    * @param \Drupal\Core\Routing\RouteBuilderInterface $routeBuilder
    *   The route builder.
    */
-  public function __construct(array $authenticationProviders, protected readonly ConfigFactoryInterface $configFactory, protected readonly RouteBuilderInterface $routeBuilder) {
+  public function __construct(
+    array $authenticationProviders,
+    protected readonly ConfigFactoryInterface $configFactory,
+    protected readonly RouteBuilderInterface $routeBuilder,
+  ) {
     $this->providerIds = array_keys($authenticationProviders);
   }
 

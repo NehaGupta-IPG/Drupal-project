@@ -19,8 +19,9 @@ class ShortcutSetController extends ControllerBase {
    * @param \Drupal\Core\Path\PathValidatorInterface $pathValidator
    *   The path validator.
    */
-  public function __construct(protected PathValidatorInterface $pathValidator) {
-  }
+  public function __construct(
+    protected PathValidatorInterface $pathValidator,
+  ) {}
 
   /**
    * Creates a new link in the provided shortcut set.

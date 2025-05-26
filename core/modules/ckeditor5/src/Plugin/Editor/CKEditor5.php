@@ -85,7 +85,17 @@ class CKEditor5 extends EditorBase implements ContainerFactoryPluginInterface {
    * @param \Psr\Log\LoggerInterface $logger
    *   A logger instance.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, protected CKEditor5PluginManagerInterface $ckeditor5PluginManager, protected LanguageManagerInterface $languageManager, protected ModuleHandlerInterface $moduleHandler, protected SmartDefaultSettings $smartDefaultSettings, protected CacheBackendInterface $cache, protected LoggerInterface $logger) {
+  public function __construct(
+    array $configuration,
+    $plugin_id,
+    $plugin_definition,
+    protected CKEditor5PluginManagerInterface $ckeditor5PluginManager,
+    protected LanguageManagerInterface $languageManager,
+    protected ModuleHandlerInterface $moduleHandler,
+    protected SmartDefaultSettings $smartDefaultSettings,
+    protected CacheBackendInterface $cache,
+    protected LoggerInterface $logger,
+  ) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
   }
 

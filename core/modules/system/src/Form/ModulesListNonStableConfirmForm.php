@@ -52,7 +52,12 @@ class ModulesListNonStableConfirmForm extends ModulesListConfirmForm {
    * @param \Drupal\Core\Extension\ModuleExtensionList $moduleExtensionList
    *   The module extension list.
    */
-  public function __construct(ModuleHandlerInterface $module_handler, ModuleInstallerInterface $module_installer, KeyValueStoreExpirableInterface $key_value_expirable, protected ModuleExtensionList $moduleExtensionList) {
+  public function __construct(
+    ModuleHandlerInterface $module_handler,
+    ModuleInstallerInterface $module_installer,
+    KeyValueStoreExpirableInterface $key_value_expirable,
+    protected ModuleExtensionList $moduleExtensionList,
+  ) {
     parent::__construct($module_handler, $module_installer, $key_value_expirable);
   }
 

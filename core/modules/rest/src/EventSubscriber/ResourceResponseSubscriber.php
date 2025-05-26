@@ -31,8 +31,11 @@ class ResourceResponseSubscriber implements EventSubscriberInterface {
    * @param \Drupal\Core\Routing\RouteMatchInterface $routeMatch
    *   The current route match.
    */
-  public function __construct(protected SerializerInterface $serializer, protected RendererInterface $renderer, protected RouteMatchInterface $routeMatch) {
-  }
+  public function __construct(
+    protected SerializerInterface $serializer,
+    protected RendererInterface $renderer,
+    protected RouteMatchInterface $routeMatch,
+  ) {}
 
   /**
    * Serializes ResourceResponse responses' data, and removes that data.

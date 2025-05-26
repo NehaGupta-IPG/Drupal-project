@@ -42,8 +42,11 @@ class MainContentViewSubscriber implements EventSubscriberInterface {
    * @param array $mainContentRenderers
    *   The available main content renderer service IDs, keyed by format.
    */
-  public function __construct(protected ClassResolverInterface $classResolver, protected RouteMatchInterface $routeMatch, protected array $mainContentRenderers) {
-  }
+  public function __construct(
+    protected ClassResolverInterface $classResolver,
+    protected RouteMatchInterface $routeMatch,
+    protected array $mainContentRenderers,
+  ) {}
 
   /**
    * Sets a response given a (main content) render array.

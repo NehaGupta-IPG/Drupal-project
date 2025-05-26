@@ -38,7 +38,13 @@ abstract class PathPluginBase extends DisplayPluginBase implements DisplayRouter
    * @param \Drupal\Core\State\StateInterface $state
    *   The state key value store.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, protected RouteProviderInterface $routeProvider, protected StateInterface $state) {
+  public function __construct(
+    array $configuration,
+    $plugin_id,
+    $plugin_definition,
+    protected RouteProviderInterface $routeProvider,
+    protected StateInterface $state,
+  ) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
   }
 

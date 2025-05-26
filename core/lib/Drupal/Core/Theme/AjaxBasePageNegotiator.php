@@ -34,8 +34,11 @@ class AjaxBasePageNegotiator implements ThemeNegotiatorInterface {
    * @param \Symfony\Component\HttpFoundation\RequestStack $requestStack
    *   The request stack used to retrieve the current request.
    */
-  public function __construct(protected CsrfTokenGenerator $csrfGenerator, protected ConfigFactoryInterface $configFactory, protected RequestStack $requestStack) {
-  }
+  public function __construct(
+    protected CsrfTokenGenerator $csrfGenerator,
+    protected ConfigFactoryInterface $configFactory,
+    protected RequestStack $requestStack,
+  ) {}
 
   /**
    * {@inheritdoc}

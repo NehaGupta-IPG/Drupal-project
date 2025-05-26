@@ -49,7 +49,13 @@ class OverviewTerms extends FormBase {
    * @param \Drupal\Core\Pager\PagerManagerInterface $pagerManager
    *   The pager manager.
    */
-  public function __construct(protected ModuleHandlerInterface $moduleHandler, protected EntityTypeManagerInterface $entityTypeManager, protected RendererInterface $renderer, protected EntityRepositoryInterface $entityRepository, protected PagerManagerInterface $pagerManager) {
+  public function __construct(
+    protected ModuleHandlerInterface $moduleHandler,
+    protected EntityTypeManagerInterface $entityTypeManager,
+    protected RendererInterface $renderer,
+    protected EntityRepositoryInterface $entityRepository,
+    protected PagerManagerInterface $pagerManager,
+  ) {
     $this->storageController = $this->entityTypeManager->getStorage('taxonomy_term');
     $this->termListBuilder = $this->entityTypeManager->getListBuilder('taxonomy_term');
   }

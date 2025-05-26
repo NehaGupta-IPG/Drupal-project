@@ -40,7 +40,13 @@ class GotoAction extends ConfigurableActionBase implements ContainerFactoryPlugi
    * @param \Drupal\Core\Utility\UnroutedUrlAssemblerInterface $unroutedUrlAssembler
    *   The unrouted URL assembler service.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, protected EventDispatcherInterface $dispatcher, protected UnroutedUrlAssemblerInterface $unroutedUrlAssembler) {
+  public function __construct(
+    array $configuration,
+    $plugin_id,
+    $plugin_definition,
+    protected EventDispatcherInterface $dispatcher,
+    protected UnroutedUrlAssemblerInterface $unroutedUrlAssembler,
+  ) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
   }
 

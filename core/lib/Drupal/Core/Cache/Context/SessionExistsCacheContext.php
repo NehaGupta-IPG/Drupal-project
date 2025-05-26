@@ -21,8 +21,10 @@ class SessionExistsCacheContext implements CacheContextInterface {
    * @param \Symfony\Component\HttpFoundation\RequestStack $requestStack
    *   The request stack.
    */
-  public function __construct(protected SessionConfigurationInterface $sessionConfiguration, protected RequestStack $requestStack) {
-  }
+  public function __construct(
+    protected SessionConfigurationInterface $sessionConfiguration,
+    protected RequestStack $requestStack,
+  ) {}
 
   /**
    * {@inheritdoc}

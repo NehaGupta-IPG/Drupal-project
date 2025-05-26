@@ -19,7 +19,12 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 )]
 final class Cleaner extends QueueWorkerBase implements ContainerFactoryPluginInterface {
 
-  public function __construct(array $configuration, string $plugin_id, mixed $plugin_definition, private readonly FileSystemInterface $fileSystem) {
+  public function __construct(
+    array $configuration,
+    string $plugin_id,
+    mixed $plugin_definition,
+    private readonly FileSystemInterface $fileSystem,
+  ) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
   }
 

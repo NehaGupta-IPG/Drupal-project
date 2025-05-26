@@ -30,7 +30,11 @@ class EntityDeleteMultipleAccessCheck implements AccessInterface {
    * @param \Symfony\Component\HttpFoundation\RequestStack $requestStack
    *   The request stack service.
    */
-  public function __construct(protected EntityTypeManagerInterface $entityTypeManager, PrivateTempStoreFactory $temp_store_factory, protected RequestStack $requestStack) {
+  public function __construct(
+    protected EntityTypeManagerInterface $entityTypeManager,
+    PrivateTempStoreFactory $temp_store_factory,
+    protected RequestStack $requestStack,
+  ) {
     $this->tempStore = $temp_store_factory->get('entity_delete_multiple_confirm');
   }
 

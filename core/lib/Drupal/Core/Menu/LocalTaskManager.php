@@ -87,7 +87,17 @@ class LocalTaskManager extends DefaultPluginManager implements LocalTaskManagerI
    * @param \Drupal\Core\Session\AccountInterface $account
    *   The current user.
    */
-  public function __construct(protected ArgumentResolverInterface $argumentResolver, protected RequestStack $requestStack, protected RouteMatchInterface $routeMatch, protected RouteProviderInterface $routeProvider, ModuleHandlerInterface $module_handler, CacheBackendInterface $cache, LanguageManagerInterface $language_manager, protected AccessManagerInterface $accessManager, protected AccountInterface $account) {
+  public function __construct(
+    protected ArgumentResolverInterface $argumentResolver,
+    protected RequestStack $requestStack,
+    protected RouteMatchInterface $routeMatch,
+    protected RouteProviderInterface $routeProvider,
+    ModuleHandlerInterface $module_handler,
+    CacheBackendInterface $cache,
+    LanguageManagerInterface $language_manager,
+    protected AccessManagerInterface $accessManager,
+    protected AccountInterface $account,
+  ) {
     $this->factory = new ContainerFactory($this, '\Drupal\Core\Menu\LocalTaskInterface');
     $this->moduleHandler = $module_handler;
     $this->alterInfo('local_tasks');

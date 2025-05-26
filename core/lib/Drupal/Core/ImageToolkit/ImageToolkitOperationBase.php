@@ -30,7 +30,13 @@ abstract class ImageToolkitOperationBase extends PluginBase implements ImageTool
    * @param \Psr\Log\LoggerInterface $logger
    *   A logger instance.
    */
-  public function __construct(array $configuration, $plugin_id, array $plugin_definition, protected ImageToolkitInterface $toolkit, protected LoggerInterface $logger) {
+  public function __construct(
+    array $configuration,
+    $plugin_id,
+    array $plugin_definition,
+    protected ImageToolkitInterface $toolkit,
+    protected LoggerInterface $logger,
+  ) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
   }
 

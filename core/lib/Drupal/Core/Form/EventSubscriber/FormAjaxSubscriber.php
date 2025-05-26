@@ -35,7 +35,11 @@ class FormAjaxSubscriber implements EventSubscriberInterface {
    * @param \Drupal\Core\Messenger\MessengerInterface $messenger
    *   The messenger.
    */
-  public function __construct(protected FormAjaxResponseBuilderInterface $formAjaxResponseBuilder, TranslationInterface $string_translation, protected MessengerInterface $messenger) {
+  public function __construct(
+    protected FormAjaxResponseBuilderInterface $formAjaxResponseBuilder,
+    TranslationInterface $string_translation,
+    protected MessengerInterface $messenger,
+  ) {
     $this->stringTranslation = $string_translation;
   }
 

@@ -31,7 +31,11 @@ class NegotiationUrlForm extends ConfigFormBase {
    * @param \Drupal\Core\Language\LanguageManagerInterface $languageManager
    *   The language manager.
    */
-  public function __construct(ConfigFactoryInterface $config_factory, TypedConfigManagerInterface $typedConfigManager, protected LanguageManagerInterface $languageManager) {
+  public function __construct(
+    ConfigFactoryInterface $config_factory,
+    TypedConfigManagerInterface $typedConfigManager,
+    protected LanguageManagerInterface $languageManager,
+  ) {
     parent::__construct($config_factory, $typedConfigManager);
   }
 

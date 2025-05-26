@@ -53,7 +53,13 @@ class Endpoint {
    * @throws \InvalidArgumentException
    *   If the endpoint URL is empty.
    */
-  public function __construct($url, protected Provider $provider, protected array $schemes = [], array $formats = [], $supports_discovery = FALSE) {
+  public function __construct(
+    $url,
+    protected Provider $provider,
+    protected array $schemes = [],
+    array $formats = [],
+    $supports_discovery = FALSE,
+  ) {
     $this->formats = $formats = array_map('mb_strtolower', $formats);
     // Assert that only the supported formats are present.
     assert(array_diff($formats, ['json', 'xml']) == []);

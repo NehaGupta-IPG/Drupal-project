@@ -21,7 +21,9 @@ class CustomStrings extends StaticTranslation {
    * @param \Drupal\Core\Site\Settings $settings
    *   The settings read only object.
    */
-  public function __construct(protected Settings $settings) {
+  public function __construct(
+    protected Settings $settings,
+  ) {
     parent::__construct();
   }
 

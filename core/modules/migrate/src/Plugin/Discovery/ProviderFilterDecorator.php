@@ -33,7 +33,10 @@ class ProviderFilterDecorator implements DiscoveryInterface {
    *   A callable, gets passed a provider name, should return TRUE if the
    *   provider exists and FALSE if not.
    */
-  public function __construct(protected DiscoveryInterface $decorated, callable $provider_exists) {
+  public function __construct(
+    protected DiscoveryInterface $decorated,
+    callable $provider_exists,
+  ) {
     $this->providerExists = $provider_exists;
   }
 

@@ -30,7 +30,12 @@ class LanguageFilter extends InOperator implements ContainerFactoryPluginInterfa
    * @param \Drupal\Core\Language\LanguageManagerInterface $languageManager
    *   The language manager.
    */
-  public function __construct($configuration, $plugin_id, $plugin_definition, protected LanguageManagerInterface $languageManager) {
+  public function __construct(
+    $configuration,
+    $plugin_id,
+    $plugin_definition,
+    protected LanguageManagerInterface $languageManager,
+  ) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
   }
 

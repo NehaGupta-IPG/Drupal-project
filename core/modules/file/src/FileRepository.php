@@ -33,8 +33,14 @@ class FileRepository implements FileRepositoryInterface {
    * @param \Drupal\Core\Session\AccountInterface $currentUser
    *   The current user.
    */
-  public function __construct(protected FileSystemInterface $fileSystem, protected StreamWrapperManagerInterface $streamWrapperManager, protected EntityTypeManagerInterface $entityTypeManager, protected ModuleHandlerInterface $moduleHandler, protected FileUsageInterface $fileUsage, protected AccountInterface $currentUser) {
-  }
+  public function __construct(
+    protected FileSystemInterface $fileSystem,
+    protected StreamWrapperManagerInterface $streamWrapperManager,
+    protected EntityTypeManagerInterface $entityTypeManager,
+    protected ModuleHandlerInterface $moduleHandler,
+    protected FileUsageInterface $fileUsage,
+    protected AccountInterface $currentUser,
+  ) {}
 
   /**
    * {@inheritdoc}

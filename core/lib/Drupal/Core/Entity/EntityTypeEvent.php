@@ -18,8 +18,10 @@ class EntityTypeEvent extends Event {
    *   (optional) The original entity type. This should be passed only when
    *   updating the entity type.
    */
-  public function __construct(protected EntityTypeInterface $entityType, protected ?EntityTypeInterface $original = NULL) {
-  }
+  public function __construct(
+    protected EntityTypeInterface $entityType,
+    protected ?EntityTypeInterface $original = NULL,
+  ) {}
 
   /**
    * The entity type the event refers to.

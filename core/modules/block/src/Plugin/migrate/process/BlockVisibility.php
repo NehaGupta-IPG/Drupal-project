@@ -42,7 +42,13 @@ class BlockVisibility extends ProcessPluginBase implements ContainerFactoryPlugi
    * @param \Drupal\migrate\MigrateLookupInterface $migrateLookup
    *   The migrate lookup service.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, protected ModuleHandlerInterface $moduleHandler, protected MigrateLookupInterface $migrateLookup) {
+  public function __construct(
+    array $configuration,
+    $plugin_id,
+    $plugin_definition,
+    protected ModuleHandlerInterface $moduleHandler,
+    protected MigrateLookupInterface $migrateLookup,
+  ) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
 
     if (isset($configuration['skip_php'])) {

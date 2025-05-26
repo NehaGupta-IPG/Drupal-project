@@ -22,8 +22,10 @@ abstract class DateFormatFormBase extends EntityForm {
    * @param \Drupal\Core\Config\Entity\ConfigEntityStorageInterface $dateFormatStorage
    *   The date format storage.
    */
-  public function __construct(protected DateFormatterInterface $dateFormatter, protected ConfigEntityStorageInterface $dateFormatStorage) {
-  }
+  public function __construct(
+    protected DateFormatterInterface $dateFormatter,
+    protected ConfigEntityStorageInterface $dateFormatStorage,
+  ) {}
 
   /**
    * {@inheritdoc}

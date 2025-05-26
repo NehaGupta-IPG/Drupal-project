@@ -54,7 +54,12 @@ class RolesLookup extends ProcessPluginBase implements ContainerFactoryPluginInt
    * @param \Drupal\migrate\MigrateLookupInterface $migrateLookup
    *   The migrate lookup service.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, protected MigrateLookupInterface $migrateLookup) {
+  public function __construct(
+    array $configuration,
+    $plugin_id,
+    $plugin_definition,
+    protected MigrateLookupInterface $migrateLookup,
+  ) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
 
     if (isset($configuration['migration'])) {

@@ -32,7 +32,11 @@ class FilterUninstallValidator implements ModuleUninstallValidatorInterface {
    * @param \Drupal\Core\StringTranslation\TranslationInterface $string_translation
    *   The string translation service.
    */
-  public function __construct(protected PluginManagerInterface $filterManager, EntityTypeManagerInterface $entity_type_manager, TranslationInterface $string_translation) {
+  public function __construct(
+    protected PluginManagerInterface $filterManager,
+    EntityTypeManagerInterface $entity_type_manager,
+    TranslationInterface $string_translation,
+  ) {
     $this->filterStorage = $entity_type_manager->getStorage('filter_format');
     $this->stringTranslation = $string_translation;
   }

@@ -25,8 +25,11 @@ class FileUrlGenerator implements FileUrlGeneratorInterface {
    * @param \Drupal\Core\Extension\ModuleHandlerInterface $moduleHandler
    *   The module handler.
    */
-  public function __construct(protected StreamWrapperManagerInterface $streamWrapperManager, protected RequestStack $requestStack, protected ModuleHandlerInterface $moduleHandler) {
-  }
+  public function __construct(
+    protected StreamWrapperManagerInterface $streamWrapperManager,
+    protected RequestStack $requestStack,
+    protected ModuleHandlerInterface $moduleHandler,
+  ) {}
 
   /**
    * {@inheritdoc}

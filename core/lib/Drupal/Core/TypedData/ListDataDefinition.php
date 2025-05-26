@@ -40,7 +40,10 @@ class ListDataDefinition extends DataDefinition implements ListDataDefinitionInt
   /**
    * {@inheritdoc}
    */
-  public function __construct(array $values = [], protected ?DataDefinitionInterface $itemDefinition = NULL) {
+  public function __construct(
+    array $values = [],
+    protected ?DataDefinitionInterface $itemDefinition = NULL,
+  ) {
     $this->definition = $values;
   }
 

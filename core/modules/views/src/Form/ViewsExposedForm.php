@@ -27,8 +27,10 @@ class ViewsExposedForm extends FormBase implements WorkspaceSafeFormInterface {
    * @param \Drupal\Core\Path\CurrentPathStack $currentPathStack
    *   The current path stack.
    */
-  public function __construct(protected ExposedFormCache $exposedFormCache, protected CurrentPathStack $currentPathStack) {
-  }
+  public function __construct(
+    protected ExposedFormCache $exposedFormCache,
+    protected CurrentPathStack $currentPathStack,
+  ) {}
 
   /**
    * {@inheritdoc}

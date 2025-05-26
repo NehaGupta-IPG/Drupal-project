@@ -48,8 +48,13 @@ class ModulesUninstallForm extends FormBase {
    * @param \Drupal\Core\Update\UpdateHookRegistry|null $updateRegistry
    *   Versioning update registry service.
    */
-  public function __construct(protected ModuleHandlerInterface $moduleHandler, protected ModuleInstallerInterface $moduleInstaller, protected KeyValueStoreExpirableInterface $keyValueExpirable, protected ModuleExtensionList $moduleExtensionList, protected UpdateHookRegistry $updateRegistry) {
-  }
+  public function __construct(
+    protected ModuleHandlerInterface $moduleHandler,
+    protected ModuleInstallerInterface $moduleInstaller,
+    protected KeyValueStoreExpirableInterface $keyValueExpirable,
+    protected ModuleExtensionList $moduleExtensionList,
+    protected UpdateHookRegistry $updateRegistry,
+  ) {}
 
   /**
    * {@inheritdoc}

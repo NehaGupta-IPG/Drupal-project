@@ -23,8 +23,11 @@ class SearchTextProcessor implements SearchTextProcessorInterface {
    * @param \Drupal\Core\Extension\ModuleHandlerInterface $moduleHandler
    *   The module handler.
    */
-  public function __construct(protected TransliterationInterface $transliteration, protected ConfigFactoryInterface $configFactory, protected ModuleHandlerInterface $moduleHandler) {
-  }
+  public function __construct(
+    protected TransliterationInterface $transliteration,
+    protected ConfigFactoryInterface $configFactory,
+    protected ModuleHandlerInterface $moduleHandler,
+  ) {}
 
   /**
    * {@inheritdoc}

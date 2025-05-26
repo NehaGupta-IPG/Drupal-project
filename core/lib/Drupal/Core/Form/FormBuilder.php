@@ -102,8 +102,18 @@ class FormBuilder implements FormBuilderInterface, FormValidatorInterface, FormS
    * @param \Drupal\Core\Access\CsrfTokenGenerator $csrfToken
    *   The CSRF token generator.
    */
-  public function __construct(protected FormValidatorInterface $formValidator, protected FormSubmitterInterface $formSubmitter, protected FormCacheInterface $formCache, protected ModuleHandlerInterface $moduleHandler, protected EventDispatcherInterface $eventDispatcher, protected RequestStack $requestStack, protected ClassResolverInterface $classResolver, protected ElementInfoManagerInterface $elementInfo, protected ThemeManagerInterface $themeManager, protected ?CsrfTokenGenerator $csrfToken = NULL) {
-  }
+  public function __construct(
+    protected FormValidatorInterface $formValidator,
+    protected FormSubmitterInterface $formSubmitter,
+    protected FormCacheInterface $formCache,
+    protected ModuleHandlerInterface $moduleHandler,
+    protected EventDispatcherInterface $eventDispatcher,
+    protected RequestStack $requestStack,
+    protected ClassResolverInterface $classResolver,
+    protected ElementInfoManagerInterface $elementInfo,
+    protected ThemeManagerInterface $themeManager,
+    protected ?CsrfTokenGenerator $csrfToken = NULL,
+  ) {}
 
   /**
    * {@inheritdoc}

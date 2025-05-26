@@ -31,7 +31,9 @@ class QueryFactory implements QueryFactoryInterface {
    * @param \Drupal\Core\Database\Connection $connection
    *   The database connection used by the entity query.
    */
-  public function __construct(protected Connection $connection) {
+  public function __construct(
+    protected Connection $connection,
+  ) {
     $this->namespaces = QueryBase::getNamespaces($this);
   }
 

@@ -62,7 +62,12 @@ class Query extends QueryBase implements QueryInterface {
    * @param array $namespaces
    *   List of potential namespaces of the classes belonging to this query.
    */
-  public function __construct(EntityTypeInterface $entity_type, $conjunction, protected Connection $connection, array $namespaces) {
+  public function __construct(
+    EntityTypeInterface $entity_type,
+    $conjunction,
+    protected Connection $connection,
+    array $namespaces,
+  ) {
     parent::__construct($entity_type, $conjunction, $namespaces);
   }
 

@@ -52,7 +52,15 @@ class EntityController implements ContainerInjectionInterface {
    * @param \Drupal\Core\Routing\RouteMatchInterface $routeMatch
    *   The route match.
    */
-  public function __construct(protected EntityTypeManagerInterface $entityTypeManager, protected EntityTypeBundleInfoInterface $entityTypeBundleInfo, protected EntityRepositoryInterface $entityRepository, protected RendererInterface $renderer, TranslationInterface $string_translation, protected UrlGeneratorInterface $urlGenerator, protected RouteMatchInterface $routeMatch) {
+  public function __construct(
+    protected EntityTypeManagerInterface $entityTypeManager,
+    protected EntityTypeBundleInfoInterface $entityTypeBundleInfo,
+    protected EntityRepositoryInterface $entityRepository,
+    protected RendererInterface $renderer,
+    TranslationInterface $string_translation,
+    protected UrlGeneratorInterface $urlGenerator,
+    protected RouteMatchInterface $routeMatch,
+  ) {
     $this->stringTranslation = $string_translation;
   }
 

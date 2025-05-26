@@ -20,8 +20,10 @@ class KernelPreHandle implements HttpKernelInterface {
    * @param \Drupal\Core\DrupalKernelInterface $drupalKernel
    *   The main Drupal kernel.
    */
-  public function __construct(protected HttpKernelInterface $httpKernel, protected DrupalKernelInterface $drupalKernel) {
-  }
+  public function __construct(
+    protected HttpKernelInterface $httpKernel,
+    protected DrupalKernelInterface $drupalKernel,
+  ) {}
 
   /**
    * {@inheritdoc}

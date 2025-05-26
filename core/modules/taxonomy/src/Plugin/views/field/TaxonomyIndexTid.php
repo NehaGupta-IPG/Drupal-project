@@ -30,7 +30,12 @@ class TaxonomyIndexTid extends PrerenderList {
    * @param \Drupal\taxonomy\VocabularyStorageInterface $vocabularyStorage
    *   The vocabulary storage.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, protected VocabularyStorageInterface $vocabularyStorage) {
+  public function __construct(
+    array $configuration,
+    $plugin_id,
+    $plugin_definition,
+    protected VocabularyStorageInterface $vocabularyStorage,
+  ) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
   }
 

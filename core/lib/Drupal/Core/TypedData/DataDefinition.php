@@ -36,8 +36,9 @@ class DataDefinition implements DataDefinitionInterface, \ArrayAccess {
    * @param array $definition
    *   (optional) If given, an array of initial values to set on the definition.
    */
-  public function __construct(protected array $definition = []) {
-  }
+  public function __construct(
+    protected array $definition = [],
+  ) {}
 
   /**
    * {@inheritdoc}

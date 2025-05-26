@@ -36,7 +36,13 @@ class MediaListBuilder extends EntityListBuilder {
    * @param \Drupal\Core\Entity\EntityStorageInterface $image_style_storage
    *   The entity storage class for image styles.
    */
-  public function __construct(EntityTypeInterface $entity_type, EntityStorageInterface $storage, protected DateFormatterInterface $dateFormatter, protected LanguageManagerInterface $languageManager, EntityStorageInterface $image_style_storage) {
+  public function __construct(
+    EntityTypeInterface $entity_type,
+    EntityStorageInterface $storage,
+    protected DateFormatterInterface $dateFormatter,
+    protected LanguageManagerInterface $languageManager,
+    EntityStorageInterface $image_style_storage,
+  ) {
     parent::__construct($entity_type, $storage);
     $this->thumbnailStyleExists = !empty($image_style_storage->load('thumbnail'));
   }

@@ -39,8 +39,11 @@ class CommentTypeForm extends EntityForm {
    * @param \Drupal\comment\CommentManagerInterface $commentManager
    *   The comment manager.
    */
-  public function __construct(protected EntityTypeManagerInterface $entityTypeManager, protected LoggerInterface $logger, protected CommentManagerInterface $commentManager) {
-  }
+  public function __construct(
+    protected EntityTypeManagerInterface $entityTypeManager,
+    protected LoggerInterface $logger,
+    protected CommentManagerInterface $commentManager,
+  ) {}
 
   /**
    * {@inheritdoc}

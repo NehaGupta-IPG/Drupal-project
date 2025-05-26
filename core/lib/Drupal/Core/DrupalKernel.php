@@ -287,7 +287,12 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
    *   (optional) The path to the application root as a string. If not supplied,
    *   the application root will be computed.
    */
-  public function __construct(protected $environment, protected $classLoader, protected $allowDumping = TRUE, $app_root = NULL) {
+  public function __construct(
+    protected $environment,
+    protected $classLoader,
+    protected $allowDumping = TRUE,
+    $app_root = NULL,
+  ) {
     if ($app_root === NULL) {
       $app_root = static::guessApplicationRoot();
     }

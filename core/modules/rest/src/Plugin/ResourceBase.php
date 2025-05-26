@@ -40,7 +40,13 @@ abstract class ResourceBase extends PluginBase implements ContainerFactoryPlugin
    * @param \Psr\Log\LoggerInterface $logger
    *   A logger instance.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, protected array $serializerFormats, protected LoggerInterface $logger) {
+  public function __construct(
+    array $configuration,
+    $plugin_id,
+    $plugin_definition,
+    protected array $serializerFormats,
+    protected LoggerInterface $logger,
+  ) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
   }
 

@@ -47,7 +47,12 @@ class LanguageConfigFactoryOverride extends ConfigFactoryOverrideBase implements
    * @param \Drupal\Core\Language\LanguageDefault $default_language
    *   The default language.
    */
-  public function __construct(protected StorageInterface $baseStorage, protected EventDispatcherInterface $eventDispatcher, protected TypedConfigManagerInterface $typedConfigManager, LanguageDefault $default_language) {
+  public function __construct(
+    protected StorageInterface $baseStorage,
+    protected EventDispatcherInterface $eventDispatcher,
+    protected TypedConfigManagerInterface $typedConfigManager,
+    LanguageDefault $default_language,
+  ) {
     // Prior to negotiation the override language should be the default
     // language.
     $this->language = $default_language->get();

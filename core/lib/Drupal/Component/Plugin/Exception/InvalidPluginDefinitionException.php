@@ -21,7 +21,12 @@ class InvalidPluginDefinitionException extends PluginException {
    *
    * @see \Exception
    */
-  public function __construct(protected $pluginId, $message = '', $code = 0, ?\Throwable $previous = NULL) {
+  public function __construct(
+    protected $pluginId,
+    $message = '',
+    $code = 0,
+    ?\Throwable $previous = NULL,
+  ) {
     parent::__construct($message, $code, $previous);
   }
 

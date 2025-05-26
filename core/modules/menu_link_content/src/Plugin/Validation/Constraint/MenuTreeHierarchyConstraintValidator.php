@@ -19,8 +19,9 @@ class MenuTreeHierarchyConstraintValidator extends ConstraintValidator implement
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
    *   The entity type manager.
    */
-  public function __construct(private EntityTypeManagerInterface $entityTypeManager) {
-  }
+  public function __construct(
+    private EntityTypeManagerInterface $entityTypeManager,
+  ) {}
 
   /**
    * {@inheritdoc}

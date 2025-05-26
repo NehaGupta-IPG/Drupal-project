@@ -17,8 +17,10 @@ class PhpBackendFactory implements CacheFactoryInterface {
    * @param \Drupal\Component\Datetime\TimeInterface $time
    *   The time service.
    */
-  public function __construct(protected CacheTagsChecksumInterface $checksumProvider, protected TimeInterface $time) {
-  }
+  public function __construct(
+    protected CacheTagsChecksumInterface $checksumProvider,
+    protected TimeInterface $time,
+  ) {}
 
   /**
    * Gets PhpBackend for the specified cache bin.

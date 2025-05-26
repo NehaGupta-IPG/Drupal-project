@@ -55,7 +55,12 @@ class LinkUri extends ProcessPluginBase implements ContainerFactoryPluginInterfa
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
    *   The entity type manager, used to fetch entity link templates.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, protected EntityTypeManagerInterface $entityTypeManager) {
+  public function __construct(
+    array $configuration,
+    $plugin_id,
+    $plugin_definition,
+    protected EntityTypeManagerInterface $entityTypeManager,
+  ) {
     $configuration += [
       'validate_route' => TRUE,
     ];

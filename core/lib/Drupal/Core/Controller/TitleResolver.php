@@ -24,7 +24,11 @@ class TitleResolver implements TitleResolverInterface {
    * @param \Symfony\Component\HttpKernel\Controller\ArgumentResolverInterface $argumentResolver
    *   The argument resolver.
    */
-  public function __construct(protected ControllerResolverInterface $controllerResolver, TranslationInterface $string_translation, protected ArgumentResolverInterface $argumentResolver) {
+  public function __construct(
+    protected ControllerResolverInterface $controllerResolver,
+    TranslationInterface $string_translation,
+    protected ArgumentResolverInterface $argumentResolver,
+  ) {
     $this->stringTranslation = $string_translation;
   }
 

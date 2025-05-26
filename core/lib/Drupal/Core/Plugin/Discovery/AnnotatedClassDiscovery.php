@@ -46,7 +46,12 @@ class AnnotatedClassDiscovery extends ComponentAnnotatedClassDiscovery {
    * @param string[] $annotation_namespaces
    *   (optional) Additional namespaces to scan for annotation definitions.
    */
-  public function __construct($subdir, protected \Traversable $rootNamespacesIterator, $plugin_definition_annotation_name = 'Drupal\Component\Annotation\Plugin', array $annotation_namespaces = []) {
+  public function __construct(
+    $subdir,
+    protected \Traversable $rootNamespacesIterator,
+    $plugin_definition_annotation_name = 'Drupal\Component\Annotation\Plugin',
+    array $annotation_namespaces = [],
+  ) {
     if ($subdir) {
       // Prepend a directory separator to $subdir,
       // if it does not already have one.

@@ -32,8 +32,10 @@ class WorkspaceActivateForm extends EntityConfirmFormBase implements WorkspaceSa
    * @param \Drupal\Core\Messenger\MessengerInterface $messenger
    *   The messenger service.
    */
-  public function __construct(protected WorkspaceManagerInterface $workspaceManager, protected MessengerInterface $messenger) {
-  }
+  public function __construct(
+    protected WorkspaceManagerInterface $workspaceManager,
+    protected MessengerInterface $messenger,
+  ) {}
 
   /**
    * {@inheritdoc}

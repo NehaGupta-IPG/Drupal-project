@@ -18,8 +18,9 @@ class ActiveWorkspaceCheck implements AccessInterface {
    * @param \Drupal\workspaces\WorkspaceManagerInterface $workspaceManager
    *   The workspace manager.
    */
-  public function __construct(protected WorkspaceManagerInterface $workspaceManager) {
-  }
+  public function __construct(
+    protected WorkspaceManagerInterface $workspaceManager,
+  ) {}
 
   /**
    * Checks access.

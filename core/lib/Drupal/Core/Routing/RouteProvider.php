@@ -79,7 +79,16 @@ class RouteProvider implements CacheableRouteProviderInterface, PreloadableRoute
    * @param \Drupal\Core\Language\LanguageManagerInterface $language_manager
    *   (Optional) The language manager.
    */
-  public function __construct(protected Connection $connection, protected StateInterface $state, protected CurrentPathStack $currentPath, protected CacheBackendInterface $cache, protected InboundPathProcessorInterface $pathProcessor, protected CacheTagsInvalidatorInterface $cacheTagInvalidator, protected $tableName = 'router', ?LanguageManagerInterface $language_manager = NULL) {
+  public function __construct(
+    protected Connection $connection,
+    protected StateInterface $state,
+    protected CurrentPathStack $currentPath,
+    protected CacheBackendInterface $cache,
+    protected InboundPathProcessorInterface $pathProcessor,
+    protected CacheTagsInvalidatorInterface $cacheTagInvalidator,
+    protected $tableName = 'router',
+    ?LanguageManagerInterface $language_manager = NULL,
+  ) {
     $this->languageManager = $language_manager ?: \Drupal::languageManager();
   }
 

@@ -1179,7 +1179,10 @@ class MockService {
    * @param string $someParameter
    *   (optional) An injected parameter.
    */
-  public function __construct($some_other_service = NULL, protected $someParameter = NULL) {
+  public function __construct(
+    $some_other_service = NULL,
+    protected $someParameter = NULL,
+  ) {
     if (is_array($some_other_service)) {
       $some_other_service = $some_other_service[0];
     }

@@ -26,7 +26,11 @@ class MenuParentFormSelector implements MenuParentFormSelectorInterface {
    * @param \Drupal\Core\StringTranslation\TranslationInterface $string_translation
    *   The string translation service.
    */
-  public function __construct(protected MenuLinkTreeInterface $menuLinkTree, protected EntityTypeManagerInterface $entityTypeManager, TranslationInterface $string_translation) {
+  public function __construct(
+    protected MenuLinkTreeInterface $menuLinkTree,
+    protected EntityTypeManagerInterface $entityTypeManager,
+    TranslationInterface $string_translation,
+  ) {
     $this->stringTranslation = $string_translation;
   }
 

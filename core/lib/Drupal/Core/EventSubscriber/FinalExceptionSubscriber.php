@@ -50,8 +50,9 @@ class FinalExceptionSubscriber implements EventSubscriberInterface {
    * @param \Drupal\Core\Config\ConfigFactoryInterface $configFactory
    *   The configuration factory.
    */
-  public function __construct(protected ConfigFactoryInterface $configFactory) {
-  }
+  public function __construct(
+    protected ConfigFactoryInterface $configFactory,
+  ) {}
 
   /**
    * Gets the configured error level.

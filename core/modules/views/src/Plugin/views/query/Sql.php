@@ -160,7 +160,14 @@ class Sql extends QueryPluginBase {
    * @param \Drupal\Core\Messenger\MessengerInterface $messenger
    *   The messenger.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, protected EntityTypeManagerInterface $entityTypeManager, protected DateSqlInterface $dateSql, protected MessengerInterface $messenger) {
+  public function __construct(
+    array $configuration,
+    $plugin_id,
+    $plugin_definition,
+    protected EntityTypeManagerInterface $entityTypeManager,
+    protected DateSqlInterface $dateSql,
+    protected MessengerInterface $messenger,
+  ) {
     // By default, use AND operator to connect WHERE groups.
     $this->groupOperator = 'AND';
 

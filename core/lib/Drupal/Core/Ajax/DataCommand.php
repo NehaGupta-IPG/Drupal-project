@@ -25,8 +25,11 @@ class DataCommand implements CommandInterface {
    * @param mixed $value
    *   The value of the data to be attached to elements matched by the selector.
    */
-  public function __construct(protected $selector, protected $name, protected $value) {
-  }
+  public function __construct(
+    protected $selector,
+    protected $name,
+    protected $value,
+  ) {}
 
   /**
    * Implements Drupal\Core\Ajax\CommandInterface:render().

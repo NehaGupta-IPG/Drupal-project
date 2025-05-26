@@ -57,7 +57,17 @@ class EmailAction extends ConfigurableActionBase implements ContainerFactoryPlug
    * @param \Drupal\Component\Utility\EmailValidatorInterface $emailValidator
    *   The email validator.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, protected Token $token, EntityTypeManagerInterface $entity_type_manager, protected LoggerInterface $logger, protected MailManagerInterface $mailManager, protected LanguageManagerInterface $languageManager, protected EmailValidatorInterface $emailValidator) {
+  public function __construct(
+    array $configuration,
+    $plugin_id,
+    $plugin_definition,
+    protected Token $token,
+    EntityTypeManagerInterface $entity_type_manager,
+    protected LoggerInterface $logger,
+    protected MailManagerInterface $mailManager,
+    protected LanguageManagerInterface $languageManager,
+    protected EmailValidatorInterface $emailValidator,
+  ) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
     $this->storage = $entity_type_manager->getStorage('user');
   }

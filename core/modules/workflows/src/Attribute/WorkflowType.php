@@ -33,7 +33,11 @@ class WorkflowType extends Plugin {
    * @param string[] $required_states
    *   States required to exist.
    */
-  public function __construct(public readonly string $id, public readonly ?TranslatableMarkup $label = NULL, public array $forms = [], public array $required_states = []) {
-  }
+  public function __construct(
+    public readonly string $id,
+    public readonly ?TranslatableMarkup $label = NULL,
+    public array $forms = [],
+    public array $required_states = [],
+  ) {}
 
 }

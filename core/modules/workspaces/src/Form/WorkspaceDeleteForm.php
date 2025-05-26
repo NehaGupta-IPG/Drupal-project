@@ -53,7 +53,13 @@ class WorkspaceDeleteForm extends ContentEntityDeleteForm {
    * @param \Drupal\Component\Datetime\TimeInterface $time
    *   The time service.
    */
-  public function __construct(EntityRepositoryInterface $entity_repository, protected WorkspaceAssociationInterface $workspaceAssociation, protected WorkspaceRepositoryInterface $workspaceRepository, ?EntityTypeBundleInfoInterface $entity_type_bundle_info = NULL, ?TimeInterface $time = NULL) {
+  public function __construct(
+    EntityRepositoryInterface $entity_repository,
+    protected WorkspaceAssociationInterface $workspaceAssociation,
+    protected WorkspaceRepositoryInterface $workspaceRepository,
+    ?EntityTypeBundleInfoInterface $entity_type_bundle_info = NULL,
+    ?TimeInterface $time = NULL,
+  ) {
     parent::__construct($entity_repository, $entity_type_bundle_info, $time);
   }
 

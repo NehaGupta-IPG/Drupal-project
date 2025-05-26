@@ -18,8 +18,9 @@ class AdvisoriesConfigSubscriber implements EventSubscriberInterface {
    * @param \Drupal\system\SecurityAdvisories\SecurityAdvisoriesFetcher $securityAdvisoriesFetcher
    *   The security advisory fetcher service.
    */
-  public function __construct(protected SecurityAdvisoriesFetcher $securityAdvisoriesFetcher) {
-  }
+  public function __construct(
+    protected SecurityAdvisoriesFetcher $securityAdvisoriesFetcher,
+  ) {}
 
   /**
    * Deletes the stored response from the security advisories feed, if needed.

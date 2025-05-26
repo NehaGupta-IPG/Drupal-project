@@ -16,7 +16,9 @@ final class ProceduralCall {
    *   An associated array, key is a function name, value is the name of the
    *   include file the function lives in, if any.
    */
-  public function __construct(protected array $includes) {
+  public function __construct(
+    protected array $includes,
+  ) {
 
   }
 

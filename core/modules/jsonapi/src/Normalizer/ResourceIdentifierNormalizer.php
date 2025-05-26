@@ -29,8 +29,9 @@ class ResourceIdentifierNormalizer extends NormalizerBase implements Denormalize
    * @param \Drupal\Core\Entity\EntityFieldManagerInterface $fieldManager
    *   The entity field manager.
    */
-  public function __construct(protected EntityFieldManagerInterface $fieldManager) {
-  }
+  public function __construct(
+    protected EntityFieldManagerInterface $fieldManager,
+  ) {}
 
   /**
    * {@inheritdoc}

@@ -22,8 +22,9 @@ class VocabularyForm extends BundleEntityFormBase {
    * @param \Drupal\taxonomy\VocabularyStorageInterface $vocabularyStorage
    *   The vocabulary storage.
    */
-  public function __construct(protected VocabularyStorageInterface $vocabularyStorage) {
-  }
+  public function __construct(
+    protected VocabularyStorageInterface $vocabularyStorage,
+  ) {}
 
   /**
    * {@inheritdoc}

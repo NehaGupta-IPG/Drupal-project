@@ -16,8 +16,9 @@ class MigrateRollbackEvent extends Event {
    * @param \Drupal\migrate\Plugin\MigrationInterface $migration
    *   Migration entity.
    */
-  public function __construct(protected MigrationInterface $migration) {
-  }
+  public function __construct(
+    protected MigrationInterface $migration,
+  ) {}
 
   /**
    * Gets the migration entity.

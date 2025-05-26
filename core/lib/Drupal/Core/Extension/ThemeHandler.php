@@ -27,8 +27,11 @@ class ThemeHandler implements ThemeHandlerInterface {
    * @param \Drupal\Core\Extension\ThemeExtensionList $themeList
    *   An extension discovery instance.
    */
-  public function __construct(protected $root, protected ConfigFactoryInterface $configFactory, protected ThemeExtensionList $themeList) {
-  }
+  public function __construct(
+    protected $root,
+    protected ConfigFactoryInterface $configFactory,
+    protected ThemeExtensionList $themeList,
+  ) {}
 
   /**
    * {@inheritdoc}

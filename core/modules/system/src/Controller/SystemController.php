@@ -40,8 +40,14 @@ class SystemController extends ControllerBase {
    * @param \Drupal\Core\Extension\ThemeExtensionList $themeExtensionList
    *   The theme extension list.
    */
-  public function __construct(protected SystemManager $systemManager, protected ThemeAccessCheck $themeAccess, protected FormBuilderInterface $formBuilder, protected MenuLinkTreeInterface $menuLinkTree, protected ModuleExtensionList $moduleExtensionList, protected ThemeExtensionList $themeExtensionList) {
-  }
+  public function __construct(
+    protected SystemManager $systemManager,
+    protected ThemeAccessCheck $themeAccess,
+    protected FormBuilderInterface $formBuilder,
+    protected MenuLinkTreeInterface $menuLinkTree,
+    protected ModuleExtensionList $moduleExtensionList,
+    protected ThemeExtensionList $themeExtensionList,
+  ) {}
 
   /**
    * {@inheritdoc}

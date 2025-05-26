@@ -22,8 +22,9 @@ class LayoutTempstoreRepository implements LayoutTempstoreRepositoryInterface {
    * @param \Drupal\Core\TempStore\SharedTempStoreFactory $tempStoreFactory
    *   The shared tempstore factory.
    */
-  public function __construct(protected SharedTempStoreFactory $tempStoreFactory) {
-  }
+  public function __construct(
+    protected SharedTempStoreFactory $tempStoreFactory,
+  ) {}
 
   /**
    * {@inheritdoc}

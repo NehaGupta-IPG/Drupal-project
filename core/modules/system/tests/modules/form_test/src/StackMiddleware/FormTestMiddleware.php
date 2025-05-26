@@ -19,8 +19,9 @@ class FormTestMiddleware implements HttpKernelInterface {
    * @param \Symfony\Component\HttpKernel\HttpKernelInterface $httpKernel
    *   The decorated kernel.
    */
-  public function __construct(protected HttpKernelInterface $httpKernel) {
-  }
+  public function __construct(
+    protected HttpKernelInterface $httpKernel,
+  ) {}
 
   /**
    * {@inheritdoc}

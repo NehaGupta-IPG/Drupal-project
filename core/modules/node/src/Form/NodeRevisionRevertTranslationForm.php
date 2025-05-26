@@ -36,7 +36,12 @@ class NodeRevisionRevertTranslationForm extends NodeRevisionRevertForm {
    * @param \Drupal\Component\Datetime\TimeInterface $time
    *   The time service.
    */
-  public function __construct(EntityStorageInterface $node_storage, DateFormatterInterface $date_formatter, protected LanguageManagerInterface $languageManager, TimeInterface $time) {
+  public function __construct(
+    EntityStorageInterface $node_storage,
+    DateFormatterInterface $date_formatter,
+    protected LanguageManagerInterface $languageManager,
+    TimeInterface $time,
+  ) {
     parent::__construct($node_storage, $date_formatter, $time);
   }
 

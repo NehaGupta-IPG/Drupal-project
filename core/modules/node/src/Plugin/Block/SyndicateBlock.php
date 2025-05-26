@@ -40,7 +40,12 @@ class SyndicateBlock extends BlockBase implements ContainerFactoryPluginInterfac
    * @param \Drupal\Core\Config\ConfigFactoryInterface $configFactory
    *   The config factory.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, protected ConfigFactoryInterface $configFactory) {
+  public function __construct(
+    array $configuration,
+    $plugin_id,
+    $plugin_definition,
+    protected ConfigFactoryInterface $configFactory,
+  ) {
     @trigger_error('The Syndicate block is deprecated in drupal:11.2.0 and will be removed from drupal:12.0.0. There is no replacement. See https://www.drupal.org/node/3519248', E_USER_DEPRECATED);
     parent::__construct($configuration, $plugin_id, $plugin_definition);
   }

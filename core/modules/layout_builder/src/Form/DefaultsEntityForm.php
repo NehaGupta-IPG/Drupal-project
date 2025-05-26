@@ -37,8 +37,10 @@ class DefaultsEntityForm extends EntityForm {
    * @param \Drupal\Core\Entity\EntityTypeBundleInfoInterface $entityTypeBundleInfo
    *   The entity type bundle info service.
    */
-  public function __construct(protected LayoutTempstoreRepositoryInterface $layoutTempstoreRepository, protected EntityTypeBundleInfoInterface $entityTypeBundleInfo) {
-  }
+  public function __construct(
+    protected LayoutTempstoreRepositoryInterface $layoutTempstoreRepository,
+    protected EntityTypeBundleInfoInterface $entityTypeBundleInfo,
+  ) {}
 
   /**
    * {@inheritdoc}

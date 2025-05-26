@@ -27,8 +27,11 @@ class InvokeCommand implements CommandInterface {
    * @param array $arguments
    *   An optional array of arguments to pass to the method.
    */
-  public function __construct(protected $selector, protected $method, protected array $arguments = []) {
-  }
+  public function __construct(
+    protected $selector,
+    protected $method,
+    protected array $arguments = [],
+  ) {}
 
   /**
    * Implements Drupal\Core\Ajax\CommandInterface:render().

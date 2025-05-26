@@ -22,8 +22,10 @@ class PlaceholderGenerator implements PlaceholderGeneratorInterface {
    * @param array $rendererConfig
    *   The renderer configuration array.
    */
-  public function __construct(protected CacheContextsManager $cacheContextsManager, protected array $rendererConfig) {
-  }
+  public function __construct(
+    protected CacheContextsManager $cacheContextsManager,
+    protected array $rendererConfig,
+  ) {}
 
   /**
    * {@inheritdoc}

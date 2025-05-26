@@ -29,8 +29,11 @@ class InsertCommand implements CommandInterface, CommandWithAttachedAssetsInterf
    * @param array $settings
    *   An array of JavaScript settings to be passed to any attached behaviors.
    */
-  public function __construct(protected $selector, protected $content, protected ?array $settings = NULL) {
-  }
+  public function __construct(
+    protected $selector,
+    protected $content,
+    protected ?array $settings = NULL,
+  ) {}
 
   /**
    * Implements Drupal\Core\Ajax\CommandInterface:render().

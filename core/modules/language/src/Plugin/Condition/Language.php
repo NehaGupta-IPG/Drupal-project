@@ -42,7 +42,12 @@ class Language extends ConditionPluginBase implements ContainerFactoryPluginInte
    * @param mixed $plugin_definition
    *   The plugin implementation definition.
    */
-  public function __construct(protected LanguageManagerInterface $languageManager, array $configuration, $plugin_id, $plugin_definition) {
+  public function __construct(
+    protected LanguageManagerInterface $languageManager,
+    array $configuration,
+    $plugin_id,
+    $plugin_definition,
+  ) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
   }
 

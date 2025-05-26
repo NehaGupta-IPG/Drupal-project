@@ -46,7 +46,12 @@ class DbLogController extends ControllerBase {
    * @param \Drupal\Core\Form\FormBuilderInterface $form_builder
    *   The form builder service.
    */
-  public function __construct(protected Connection $database, ModuleHandlerInterface $module_handler, protected DateFormatterInterface $dateFormatter, FormBuilderInterface $form_builder) {
+  public function __construct(
+    protected Connection $database,
+    ModuleHandlerInterface $module_handler,
+    protected DateFormatterInterface $dateFormatter,
+    FormBuilderInterface $form_builder,
+  ) {
     $this->moduleHandler = $module_handler;
     $this->formBuilder = $form_builder;
     $this->userStorage = $this->entityTypeManager()->getStorage('user');

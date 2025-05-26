@@ -37,8 +37,12 @@ class ActiveLinkResponseFilter implements EventSubscriberInterface {
    * @param \Drupal\Core\Language\LanguageManagerInterface $languageManager
    *   The language manager.
    */
-  public function __construct(protected AccountInterface $currentUser, protected CurrentPathStack $currentPath, protected PathMatcherInterface $pathMatcher, protected LanguageManagerInterface $languageManager) {
-  }
+  public function __construct(
+    protected AccountInterface $currentUser,
+    protected CurrentPathStack $currentPath,
+    protected PathMatcherInterface $pathMatcher,
+    protected LanguageManagerInterface $languageManager,
+  ) {}
 
   /**
    * Sets the 'is-active' class on links.

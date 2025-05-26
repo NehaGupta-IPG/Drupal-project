@@ -34,8 +34,16 @@ final class ProjectRelease {
    * @param int|null $date
    *   The release date in Unix timestamp format.
    */
-  private function __construct(private bool $published, private string $version, private string $releaseUrl, private ?array $releaseTypes, private ?bool $coreCompatible, private ?string $coreCompatibilityMessage, private ?string $downloadUrl, private ?int $date) {
-  }
+  private function __construct(
+    private bool $published,
+    private string $version,
+    private string $releaseUrl,
+    private ?array $releaseTypes,
+    private ?bool $coreCompatible,
+    private ?string $coreCompatibilityMessage,
+    private ?string $downloadUrl,
+    private ?int $date,
+  ) {}
 
   /**
    * Creates a ProjectRelease instance from an array.

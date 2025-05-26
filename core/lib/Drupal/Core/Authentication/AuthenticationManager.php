@@ -23,8 +23,9 @@ class AuthenticationManager implements AuthenticationProviderInterface, Authenti
    * @param \Drupal\Core\Authentication\AuthenticationCollectorInterface $authCollector
    *   The authentication provider collector.
    */
-  public function __construct(protected AuthenticationCollectorInterface $authCollector) {
-  }
+  public function __construct(
+    protected AuthenticationCollectorInterface $authCollector,
+  ) {}
 
   /**
    * {@inheritdoc}

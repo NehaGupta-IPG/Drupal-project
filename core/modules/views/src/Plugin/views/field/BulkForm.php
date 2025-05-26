@@ -72,7 +72,16 @@ class BulkForm extends FieldPluginBase implements CacheableDependencyInterface, 
    * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
    * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, protected EntityTypeManagerInterface $entityTypeManager, protected LanguageManagerInterface $languageManager, protected MessengerInterface $messenger, protected EntityRepositoryInterface $entityRepository, protected ResettableStackedRouteMatchInterface $routeMatch) {
+  public function __construct(
+    array $configuration,
+    $plugin_id,
+    $plugin_definition,
+    protected EntityTypeManagerInterface $entityTypeManager,
+    protected LanguageManagerInterface $languageManager,
+    protected MessengerInterface $messenger,
+    protected EntityRepositoryInterface $entityRepository,
+    protected ResettableStackedRouteMatchInterface $routeMatch,
+  ) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
     $this->actionStorage = $this->entityTypeManager->getStorage('action');
   }

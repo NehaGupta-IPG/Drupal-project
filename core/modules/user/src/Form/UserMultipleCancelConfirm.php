@@ -28,8 +28,11 @@ class UserMultipleCancelConfirm extends ConfirmFormBase {
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
    *   The entity type manager.
    */
-  public function __construct(protected PrivateTempStoreFactory $tempStoreFactory, protected UserStorageInterface $userStorage, protected EntityTypeManagerInterface $entityTypeManager) {
-  }
+  public function __construct(
+    protected PrivateTempStoreFactory $tempStoreFactory,
+    protected UserStorageInterface $userStorage,
+    protected EntityTypeManagerInterface $entityTypeManager,
+  ) {}
 
   /**
    * {@inheritdoc}

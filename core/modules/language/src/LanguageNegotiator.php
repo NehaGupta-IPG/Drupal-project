@@ -52,8 +52,13 @@ class LanguageNegotiator implements LanguageNegotiatorInterface {
    * @param \Symfony\Component\HttpFoundation\RequestStack $requestStack
    *   The request stack service.
    */
-  public function __construct(protected ConfigurableLanguageManagerInterface $languageManager, protected PluginManagerInterface $negotiatorManager, protected ConfigFactoryInterface $configFactory, protected Settings $settings, protected RequestStack $requestStack) {
-  }
+  public function __construct(
+    protected ConfigurableLanguageManagerInterface $languageManager,
+    protected PluginManagerInterface $negotiatorManager,
+    protected ConfigFactoryInterface $configFactory,
+    protected Settings $settings,
+    protected RequestStack $requestStack,
+  ) {}
 
   /**
    * Initializes the injected language manager with the negotiator.

@@ -38,7 +38,14 @@ class HelpBlock extends BlockBase implements ContainerFactoryPluginInterface {
    * @param \Drupal\Core\Routing\RouteMatchInterface $routeMatch
    *   The current route match.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, protected Request $request, protected ModuleHandlerInterface $moduleHandler, protected RouteMatchInterface $routeMatch) {
+  public function __construct(
+    array $configuration,
+    $plugin_id,
+    $plugin_definition,
+    protected Request $request,
+    protected ModuleHandlerInterface $moduleHandler,
+    protected RouteMatchInterface $routeMatch,
+  ) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
   }
 

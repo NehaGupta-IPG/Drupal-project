@@ -35,7 +35,12 @@ class SectionStorageManager extends DefaultPluginManager implements SectionStora
    * @param \Drupal\Core\Plugin\Context\ContextHandlerInterface $contextHandler
    *   The context handler.
    */
-  public function __construct(\Traversable $namespaces, CacheBackendInterface $cache_backend, ModuleHandlerInterface $module_handler, protected ContextHandlerInterface $contextHandler) {
+  public function __construct(
+    \Traversable $namespaces,
+    CacheBackendInterface $cache_backend,
+    ModuleHandlerInterface $module_handler,
+    protected ContextHandlerInterface $contextHandler,
+  ) {
     parent::__construct('Plugin/SectionStorage', $namespaces, $module_handler, SectionStorageInterface::class, SectionStorage::class, '\Drupal\layout_builder\Annotation\SectionStorage');
 
     $this->alterInfo('layout_builder_section_storage');

@@ -70,7 +70,11 @@ class ResourceIdentifier implements ResourceIdentifierInterface {
    * @param array $meta
    *   Any metadata for the ResourceIdentifier.
    */
-  public function __construct($resource_type, protected $id, array $meta = []) {
+  public function __construct(
+    $resource_type,
+    protected $id,
+    array $meta = [],
+  ) {
     assert(is_string($resource_type) || $resource_type instanceof ResourceType);
     assert(!isset($meta[static::ARITY_KEY]) || is_int($meta[static::ARITY_KEY]) && $meta[static::ARITY_KEY] >= 0);
     $this->resourceTypeName = is_string($resource_type) ? $resource_type : $resource_type->getTypeName();

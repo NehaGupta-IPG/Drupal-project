@@ -28,8 +28,12 @@ class LanguageRequestSubscriber implements EventSubscriberInterface {
    * @param \Drupal\Core\Session\AccountInterface $currentUser
    *   The current active user.
    */
-  public function __construct(protected ConfigurableLanguageManagerInterface $languageManager, protected LanguageNegotiatorInterface $negotiator, protected TranslatorInterface $translation, protected AccountInterface $currentUser) {
-  }
+  public function __construct(
+    protected ConfigurableLanguageManagerInterface $languageManager,
+    protected LanguageNegotiatorInterface $negotiator,
+    protected TranslatorInterface $translation,
+    protected AccountInterface $currentUser,
+  ) {}
 
   /**
    * Initializes the language manager at the beginning of the request.

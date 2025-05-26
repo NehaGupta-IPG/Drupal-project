@@ -22,7 +22,10 @@ class PhpTransliteration extends BaseTransliteration {
    * @param \Drupal\Core\Extension\ModuleHandlerInterface $moduleHandler
    *   The module handler to execute the transliteration_overrides alter hook.
    */
-  public function __construct($data_directory, protected ModuleHandlerInterface $moduleHandler) {
+  public function __construct(
+    $data_directory,
+    protected ModuleHandlerInterface $moduleHandler,
+  ) {
     parent::__construct($data_directory);
   }
 

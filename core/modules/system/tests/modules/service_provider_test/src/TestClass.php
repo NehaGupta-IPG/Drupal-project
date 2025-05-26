@@ -25,8 +25,9 @@ class TestClass implements EventSubscriberInterface, DestructableInterface {
    * @param \Drupal\Core\State\StateInterface $state
    *   The state key value store.
    */
-  public function __construct(protected StateInterface $state) {
-  }
+  public function __construct(
+    protected StateInterface $state,
+  ) {}
 
   /**
    * A simple kernel listener method.

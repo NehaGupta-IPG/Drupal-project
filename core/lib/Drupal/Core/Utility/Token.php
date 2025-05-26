@@ -93,8 +93,13 @@ class Token {
    * @param \Drupal\Core\Render\RendererInterface $renderer
    *   The renderer.
    */
-  public function __construct(protected ModuleHandlerInterface $moduleHandler, protected CacheBackendInterface $cache, protected LanguageManagerInterface $languageManager, protected CacheTagsInvalidatorInterface $cacheTagsInvalidator, protected RendererInterface $renderer) {
-  }
+  public function __construct(
+    protected ModuleHandlerInterface $moduleHandler,
+    protected CacheBackendInterface $cache,
+    protected LanguageManagerInterface $languageManager,
+    protected CacheTagsInvalidatorInterface $cacheTagsInvalidator,
+    protected RendererInterface $renderer,
+  ) {}
 
   /**
    * Replaces all tokens in given markup with appropriate values.

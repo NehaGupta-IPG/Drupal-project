@@ -24,8 +24,9 @@ class HtmlResponseBigPipeSubscriber implements EventSubscriberInterface {
    * @param \Drupal\big_pipe\Render\BigPipe $bigPipe
    *   The BigPipe service.
    */
-  public function __construct(protected BigPipe $bigPipe) {
-  }
+  public function __construct(
+    protected BigPipe $bigPipe,
+  ) {}
 
   /**
    * Adds markers to the response necessary for the BigPipe render strategy.

@@ -18,8 +18,9 @@ class MigrateStub implements MigrateStubInterface {
    * @param \Drupal\migrate\Plugin\MigrationPluginManagerInterface $migrationPluginManager
    *   The migration plugin manager.
    */
-  public function __construct(protected MigrationPluginManagerInterface $migrationPluginManager) {
-  }
+  public function __construct(
+    protected MigrationPluginManagerInterface $migrationPluginManager,
+  ) {}
 
   /**
    * Creates a stub.

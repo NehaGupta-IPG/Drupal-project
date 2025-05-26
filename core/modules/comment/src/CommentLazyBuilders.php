@@ -37,8 +37,14 @@ class CommentLazyBuilders implements TrustedCallbackInterface {
    * @param \Drupal\Core\Render\RendererInterface $renderer
    *   The renderer service.
    */
-  public function __construct(protected EntityTypeManagerInterface $entityTypeManager, protected EntityFormBuilderInterface $entityFormBuilder, protected AccountInterface $currentUser, protected CommentManagerInterface $commentManager, protected ModuleHandlerInterface $moduleHandler, protected RendererInterface $renderer) {
-  }
+  public function __construct(
+    protected EntityTypeManagerInterface $entityTypeManager,
+    protected EntityFormBuilderInterface $entityFormBuilder,
+    protected AccountInterface $currentUser,
+    protected CommentManagerInterface $commentManager,
+    protected ModuleHandlerInterface $moduleHandler,
+    protected RendererInterface $renderer,
+  ) {}
 
   /**
    * Render API callback: Builds the comment form.

@@ -68,8 +68,9 @@ final class ResourceVersionRouteEnhancer implements EnhancerInterface {
    * @param \Drupal\jsonapi\Revisions\VersionNegotiator $versionNegotiator
    *   The version negotiator.
    */
-  public function __construct(protected VersionNegotiator $versionNegotiator) {
-  }
+  public function __construct(
+    protected VersionNegotiator $versionNegotiator,
+  ) {}
 
   /**
    * {@inheritdoc}

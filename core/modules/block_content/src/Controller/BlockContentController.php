@@ -37,8 +37,11 @@ class BlockContentController extends ControllerBase {
    * @param \Drupal\Core\Extension\ThemeHandlerInterface $themeHandler
    *   The theme handler.
    */
-  public function __construct(protected EntityStorageInterface $blockContentStorage, protected EntityStorageInterface $blockContentTypeStorage, protected ThemeHandlerInterface $themeHandler) {
-  }
+  public function __construct(
+    protected EntityStorageInterface $blockContentStorage,
+    protected EntityStorageInterface $blockContentTypeStorage,
+    protected ThemeHandlerInterface $themeHandler,
+  ) {}
 
   /**
    * Displays add content block links for available types.

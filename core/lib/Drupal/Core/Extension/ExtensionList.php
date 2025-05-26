@@ -83,8 +83,15 @@ abstract class ExtensionList {
    * @param string $installProfile
    *   The install profile used by the site.
    */
-  public function __construct(protected $root, protected $type, protected CacheBackendInterface $cache, protected InfoParserInterface $infoParser, protected ModuleHandlerInterface $moduleHandler, protected StateInterface $state, protected $installProfile) {
-  }
+  public function __construct(
+    protected $root,
+    protected $type,
+    protected CacheBackendInterface $cache,
+    protected InfoParserInterface $infoParser,
+    protected ModuleHandlerInterface $moduleHandler,
+    protected StateInterface $state,
+    protected $installProfile,
+  ) {}
 
   /**
    * Returns the extension discovery.

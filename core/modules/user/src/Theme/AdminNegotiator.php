@@ -38,7 +38,11 @@ class AdminNegotiator implements ThemeNegotiatorInterface {
    * @param \Drupal\Core\Routing\AdminContext|EntityTypeManagerInterface $admin_context
    *   The route admin context to determine whether the route is an admin one.
    */
-  public function __construct(protected AccountInterface $user, protected ConfigFactoryInterface $configFactory, AdminContext|EntityTypeManagerInterface $admin_context) {
+  public function __construct(
+    protected AccountInterface $user,
+    protected ConfigFactoryInterface $configFactory,
+    AdminContext|EntityTypeManagerInterface $admin_context,
+  ) {
     if ($admin_context instanceof EntityTypeManagerInterface) {
       $deprecated_service_name = EntityTypeManagerInterface::class;
       @trigger_error("Passing the $deprecated_service_name (entity_type.manager service) to AdminNegotiator is deprecated in drupal:11.2.0 and will be removed in drupal:12.0.0. There is no replacement for this service, as it is not used. See https://www.drupal.org/project/drupal/issues/3501727", E_USER_DEPRECATED);

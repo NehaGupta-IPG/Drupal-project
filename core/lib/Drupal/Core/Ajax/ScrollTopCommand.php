@@ -15,8 +15,9 @@ class ScrollTopCommand implements CommandInterface {
    * @param string $selector
    *   A CSS selector.
    */
-  public function __construct(protected $selector) {
-  }
+  public function __construct(
+    protected $selector,
+  ) {}
 
   /**
    * {@inheritdoc}

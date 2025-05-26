@@ -13,8 +13,9 @@ class MockPhpStorage {
    * @param array $configuration
    *   The storage configuration.
    */
-  public function __construct(protected array $configuration) {
-  }
+  public function __construct(
+    protected array $configuration,
+  ) {}
 
   /**
    * Gets the configuration data.

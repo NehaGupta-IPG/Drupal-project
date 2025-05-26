@@ -50,7 +50,13 @@ class Relationship implements TopLevelDataInterface {
    *
    * @see \Drupal\jsonapi\JsonApiResource\Relationship::createFromEntityReferenceField()
    */
-  protected function __construct(protected $fieldName, protected RelationshipData $data, LinkCollection $links, protected array $meta, protected ResourceObject $context) {
+  protected function __construct(
+    protected $fieldName,
+    protected RelationshipData $data,
+    LinkCollection $links,
+    protected array $meta,
+    protected ResourceObject $context,
+  ) {
     $this->links = $links->withContext($this);
   }
 

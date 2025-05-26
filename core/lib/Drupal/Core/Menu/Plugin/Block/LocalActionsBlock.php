@@ -33,7 +33,13 @@ class LocalActionsBlock extends BlockBase implements ContainerFactoryPluginInter
    * @param \Drupal\Core\Routing\RouteMatchInterface $routeMatch
    *   The route match.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, protected LocalActionManagerInterface $localActionManager, protected RouteMatchInterface $routeMatch) {
+  public function __construct(
+    array $configuration,
+    $plugin_id,
+    $plugin_definition,
+    protected LocalActionManagerInterface $localActionManager,
+    protected RouteMatchInterface $routeMatch,
+  ) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
   }
 

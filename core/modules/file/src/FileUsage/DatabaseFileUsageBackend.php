@@ -22,7 +22,11 @@ class DatabaseFileUsageBackend extends FileUsageBase {
    * @param string $tableName
    *   (optional) The table to store file usage info. Defaults to 'file_usage'.
    */
-  public function __construct(ConfigFactoryInterface $config_factory, protected Connection $connection, protected $tableName = 'file_usage') {
+  public function __construct(
+    ConfigFactoryInterface $config_factory,
+    protected Connection $connection,
+    protected $tableName = 'file_usage',
+  ) {
     parent::__construct($config_factory);
   }
 

@@ -37,8 +37,10 @@ class PluralFormula implements PluralFormulaInterface {
    * @param \Drupal\Core\State\StateInterface $state
    *   The state.
    */
-  public function __construct(protected LanguageManagerInterface $languageManager, protected StateInterface $state) {
-  }
+  public function __construct(
+    protected LanguageManagerInterface $languageManager,
+    protected StateInterface $state,
+  ) {}
 
   /**
    * {@inheritdoc}

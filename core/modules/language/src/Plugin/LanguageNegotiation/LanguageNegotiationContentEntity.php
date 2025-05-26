@@ -69,7 +69,9 @@ class LanguageNegotiationContentEntity extends LanguageNegotiationMethodBase imp
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
    *   The entity type manager.
    */
-  public function __construct(protected EntityTypeManagerInterface $entityTypeManager) {
+  public function __construct(
+    protected EntityTypeManagerInterface $entityTypeManager,
+  ) {
     $this->paths = new \SplObjectStorage();
   }
 

@@ -104,7 +104,11 @@ class DefaultTableMapping implements TableMappingInterface {
    *   (optional) A prefix to be used by all the tables of this mapping.
    *   Defaults to an empty string.
    */
-  public function __construct(protected ContentEntityTypeInterface $entityType, protected array $fieldStorageDefinitions, protected $prefix = '') {
+  public function __construct(
+    protected ContentEntityTypeInterface $entityType,
+    protected array $fieldStorageDefinitions,
+    protected $prefix = '',
+  ) {
     // @todo Remove table names from the entity type definition in
     //   https://www.drupal.org/node/2232465.
     $this->baseTable = $this->prefix . $this->entityType->getBaseTable() ?: $this->entityType->id();

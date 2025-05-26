@@ -29,8 +29,13 @@ class FieldStorageDefinitionListener implements FieldStorageDefinitionListenerIn
    * @param \Drupal\Core\Field\DeletedFieldsRepositoryInterface $deletedFieldsRepository
    *   The deleted fields repository.
    */
-  public function __construct(protected EntityTypeManagerInterface $entityTypeManager, protected EventDispatcherInterface $eventDispatcher, protected EntityLastInstalledSchemaRepositoryInterface $entityLastInstalledSchemaRepository, protected EntityFieldManagerInterface $entityFieldManager, protected DeletedFieldsRepositoryInterface $deletedFieldsRepository) {
-  }
+  public function __construct(
+    protected EntityTypeManagerInterface $entityTypeManager,
+    protected EventDispatcherInterface $eventDispatcher,
+    protected EntityLastInstalledSchemaRepositoryInterface $entityLastInstalledSchemaRepository,
+    protected EntityFieldManagerInterface $entityFieldManager,
+    protected DeletedFieldsRepositoryInterface $deletedFieldsRepository,
+  ) {}
 
   /**
    * {@inheritdoc}

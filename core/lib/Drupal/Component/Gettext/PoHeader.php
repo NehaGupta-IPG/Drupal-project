@@ -63,7 +63,9 @@ class PoHeader {
    * @param string $langcode
    *   Language code.
    */
-  public function __construct(protected $langcode = NULL) {
+  public function __construct(
+    protected $langcode = NULL,
+  ) {
     // Ignore errors when run during site installation before
     // date_default_timezone_set() is called.
     $this->poDate = @date("Y-m-d H:iO");

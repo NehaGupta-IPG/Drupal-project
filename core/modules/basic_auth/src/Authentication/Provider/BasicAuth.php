@@ -39,7 +39,12 @@ class BasicAuth implements AuthenticationProviderInterface, AuthenticationProvid
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
    *   The entity type manager service.
    */
-  public function __construct(protected ConfigFactoryInterface $configFactory, UserAuthInterface|UserAuthenticationInterface $user_auth, protected FloodInterface $flood, protected EntityTypeManagerInterface $entityTypeManager) {
+  public function __construct(
+    protected ConfigFactoryInterface $configFactory,
+    UserAuthInterface|UserAuthenticationInterface $user_auth,
+    protected FloodInterface $flood,
+    protected EntityTypeManagerInterface $entityTypeManager,
+  ) {
     if (!$user_auth instanceof UserAuthenticationInterface) {
       @trigger_error('The $user_auth parameter implementing UserAuthInterface is deprecated in drupal:10.3.0 and will be removed in drupal:12.0.0. Implement UserAuthenticationInterface instead. See https://www.drupal.org/node/3411040');
     }

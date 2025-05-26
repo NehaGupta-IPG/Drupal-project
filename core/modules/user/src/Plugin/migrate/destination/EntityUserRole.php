@@ -39,7 +39,17 @@ class EntityUserRole extends EntityConfigBase {
    * @param array $destinationPermissions
    *   All available permissions.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, MigrationInterface $migration, EntityStorageInterface $storage, array $bundles, LanguageManagerInterface $language_manager, ConfigFactoryInterface $config_factory, protected array $destinationPermissions) {
+  public function __construct(
+    array $configuration,
+    $plugin_id,
+    $plugin_definition,
+    MigrationInterface $migration,
+    EntityStorageInterface $storage,
+    array $bundles,
+    LanguageManagerInterface $language_manager,
+    ConfigFactoryInterface $config_factory,
+    protected array $destinationPermissions,
+  ) {
     parent::__construct($configuration, $plugin_id, $plugin_definition, $migration, $storage, $bundles, $language_manager, $config_factory);
   }
 

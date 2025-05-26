@@ -76,8 +76,11 @@ final class ExtensionVersion {
    * @param string|null $versionExtra
    *   The extra version string.
    */
-  private function __construct(protected string $majorVersion, protected ?string $minorVersion, protected ?string $versionExtra) {
-  }
+  private function __construct(
+    protected string $majorVersion,
+    protected ?string $minorVersion,
+    protected ?string $versionExtra,
+  ) {}
 
   /**
    * Constructs an ExtensionVersion version object from a support branch.

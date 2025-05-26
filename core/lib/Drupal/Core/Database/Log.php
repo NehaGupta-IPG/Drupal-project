@@ -42,8 +42,9 @@ class Log {
    * @param string $connectionKey
    *   The database connection key for which to enable logging.
    */
-  public function __construct(protected $connectionKey = 'default') {
-  }
+  public function __construct(
+    protected $connectionKey = 'default',
+  ) {}
 
   /**
    * Begin logging queries to the specified connection and logging key.

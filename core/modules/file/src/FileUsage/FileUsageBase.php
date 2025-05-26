@@ -16,8 +16,9 @@ abstract class FileUsageBase implements FileUsageInterface {
    * @param \Drupal\Core\Config\ConfigFactoryInterface $configFactory
    *   The config factory.
    */
-  public function __construct(protected ConfigFactoryInterface $configFactory) {
-  }
+  public function __construct(
+    protected ConfigFactoryInterface $configFactory,
+  ) {}
 
   /**
    * {@inheritdoc}

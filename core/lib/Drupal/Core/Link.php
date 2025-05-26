@@ -29,8 +29,10 @@ class Link implements RenderableInterface {
    * @param \Drupal\Core\Url $url
    *   The \Drupal\Core\Url object.
    */
-  public function __construct(protected $text, protected Url $url) {
-  }
+  public function __construct(
+    protected $text,
+    protected Url $url,
+  ) {}
 
   /**
    * Creates a Link object from a given route name and parameters.

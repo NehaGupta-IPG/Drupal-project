@@ -60,7 +60,14 @@ class Feed extends PathPluginBase implements ResponseDisplayPluginInterface {
    * @param \Drupal\Core\Render\RendererInterface $renderer
    *   The renderer.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, RouteProviderInterface $route_provider, StateInterface $state, protected RendererInterface $renderer) {
+  public function __construct(
+    array $configuration,
+    $plugin_id,
+    $plugin_definition,
+    RouteProviderInterface $route_provider,
+    StateInterface $state,
+    protected RendererInterface $renderer,
+  ) {
     parent::__construct($configuration, $plugin_id, $plugin_definition, $route_provider, $state);
   }
 

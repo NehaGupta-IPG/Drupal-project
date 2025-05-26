@@ -30,8 +30,11 @@ class EventSubscriber implements EventSubscriberInterface {
    * @param \Drupal\Core\State\StateInterface $state
    *   The Drupal state.
    */
-  public function __construct(protected StorageInterface $active, protected StorageInterface $sync, protected StateInterface $state) {
-  }
+  public function __construct(
+    protected StorageInterface $active,
+    protected StorageInterface $sync,
+    protected StateInterface $state,
+  ) {}
 
   /**
    * The storage is transformed for importing.

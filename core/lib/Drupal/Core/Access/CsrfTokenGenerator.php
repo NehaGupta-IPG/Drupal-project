@@ -22,8 +22,10 @@ class CsrfTokenGenerator {
    * @param \Drupal\Core\Session\MetadataBag $sessionMetadata
    *   The session metadata bag.
    */
-  public function __construct(protected PrivateKey $privateKey, protected MetadataBag $sessionMetadata) {
-  }
+  public function __construct(
+    protected PrivateKey $privateKey,
+    protected MetadataBag $sessionMetadata,
+  ) {}
 
   /**
    * Generates a token based on $value, the user session, and the private key.

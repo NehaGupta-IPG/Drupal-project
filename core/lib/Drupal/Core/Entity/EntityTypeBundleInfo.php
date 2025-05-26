@@ -37,7 +37,13 @@ class EntityTypeBundleInfo implements EntityTypeBundleInfoInterface {
    * @param \Drupal\Core\Cache\CacheBackendInterface $cache_backend
    *   The cache backend.
    */
-  public function __construct(protected EntityTypeManagerInterface $entityTypeManager, protected LanguageManagerInterface $languageManager, protected ModuleHandlerInterface $moduleHandler, protected TypedDataManagerInterface $typedDataManager, CacheBackendInterface $cache_backend) {
+  public function __construct(
+    protected EntityTypeManagerInterface $entityTypeManager,
+    protected LanguageManagerInterface $languageManager,
+    protected ModuleHandlerInterface $moduleHandler,
+    protected TypedDataManagerInterface $typedDataManager,
+    CacheBackendInterface $cache_backend,
+  ) {
     $this->cacheBackend = $cache_backend;
   }
 

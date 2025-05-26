@@ -24,8 +24,9 @@ class ListElement implements ElementInterface {
    * @param \Drupal\Core\TypedData\TraversableTypedDataInterface $element
    *   The schema element this form element is for.
    */
-  public function __construct(protected TraversableTypedDataInterface $element) {
-  }
+  public function __construct(
+    protected TraversableTypedDataInterface $element,
+  ) {}
 
   /**
    * {@inheritdoc}

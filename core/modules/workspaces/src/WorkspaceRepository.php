@@ -28,8 +28,10 @@ class WorkspaceRepository implements WorkspaceRepositoryInterface {
    * @param \Drupal\Core\Cache\CacheBackendInterface $cache
    *   The cache backend.
    */
-  public function __construct(protected EntityTypeManagerInterface $entityTypeManager, protected CacheBackendInterface $cache) {
-  }
+  public function __construct(
+    protected EntityTypeManagerInterface $entityTypeManager,
+    protected CacheBackendInterface $cache,
+  ) {}
 
   /**
    * {@inheritdoc}

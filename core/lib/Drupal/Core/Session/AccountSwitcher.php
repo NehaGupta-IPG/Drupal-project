@@ -33,8 +33,10 @@ class AccountSwitcher implements AccountSwitcherInterface {
    * @param \Drupal\Core\Session\WriteSafeSessionHandlerInterface $writeSafeHandler
    *   The write-safe session handler.
    */
-  public function __construct(protected AccountProxyInterface $currentUser, protected WriteSafeSessionHandlerInterface $writeSafeHandler) {
-  }
+  public function __construct(
+    protected AccountProxyInterface $currentUser,
+    protected WriteSafeSessionHandlerInterface $writeSafeHandler,
+  ) {}
 
   /**
    * {@inheritdoc}

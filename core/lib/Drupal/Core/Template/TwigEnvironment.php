@@ -58,7 +58,14 @@ class TwigEnvironment extends Environment {
    * @param array $options
    *   The options for the Twig environment.
    */
-  public function __construct($root, CacheBackendInterface $cache, $twig_extension_hash, protected StateInterface $state, LoaderInterface $loader, array $options = []) {
+  public function __construct(
+    $root,
+    CacheBackendInterface $cache,
+    $twig_extension_hash,
+    protected StateInterface $state,
+    LoaderInterface $loader,
+    array $options = [],
+  ) {
     $this->templateClasses = [];
 
     $options += [

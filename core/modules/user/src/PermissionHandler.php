@@ -73,7 +73,12 @@ class PermissionHandler implements PermissionHandlerInterface {
    * @param \Drupal\Core\Extension\ModuleExtensionList $moduleExtensionList
    *   The module extension list.
    */
-  public function __construct(protected ModuleHandlerInterface $moduleHandler, TranslationInterface $string_translation, protected CallableResolver $callableResolver, protected ModuleExtensionList $moduleExtensionList) {
+  public function __construct(
+    protected ModuleHandlerInterface $moduleHandler,
+    TranslationInterface $string_translation,
+    protected CallableResolver $callableResolver,
+    protected ModuleExtensionList $moduleExtensionList,
+  ) {
     $this->stringTranslation = $string_translation;
   }
 

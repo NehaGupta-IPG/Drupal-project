@@ -37,7 +37,13 @@ class LocalTasksBlock extends BlockBase implements ContainerFactoryPluginInterfa
    * @param \Drupal\Core\Routing\RouteMatchInterface $routeMatch
    *   The route match.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, protected LocalTaskManagerInterface $localTaskManager, protected RouteMatchInterface $routeMatch) {
+  public function __construct(
+    array $configuration,
+    $plugin_id,
+    $plugin_definition,
+    protected LocalTaskManagerInterface $localTaskManager,
+    protected RouteMatchInterface $routeMatch,
+  ) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
   }
 

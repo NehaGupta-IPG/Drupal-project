@@ -55,7 +55,12 @@ class UpdateFetcher implements UpdateFetcherInterface {
    * @param \Psr\Log\LoggerInterface $logger
    *   The logger.
    */
-  public function __construct(ConfigFactoryInterface $config_factory, protected ClientInterface $httpClient, Settings $settings, protected LoggerInterface $logger) {
+  public function __construct(
+    ConfigFactoryInterface $config_factory,
+    protected ClientInterface $httpClient,
+    Settings $settings,
+    protected LoggerInterface $logger,
+  ) {
     $this->fetchUrl = $config_factory->get('update.settings')->get('fetch.url');
     $this->updateSettings = $config_factory->get('update.settings');
     $this->withHttpFallback = $settings->get('update_fetch_with_http_fallback', FALSE);

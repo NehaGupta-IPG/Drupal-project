@@ -24,8 +24,10 @@ class DefaultFactory implements FactoryInterface {
    * @param string|null $interface
    *   (optional) The interface each plugin should implement.
    */
-  public function __construct(protected DiscoveryInterface $discovery, protected $interface = NULL) {
-  }
+  public function __construct(
+    protected DiscoveryInterface $discovery,
+    protected $interface = NULL,
+  ) {}
 
   /**
    * {@inheritdoc}

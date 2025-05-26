@@ -131,7 +131,18 @@ class EntityContentBase extends Entity implements HighestIdInterface, MigrateVal
    * @param \Drupal\Core\Entity\EntityTypeBundleInfoInterface|null $entity_type_bundle_info
    *   The entity type bundle info service.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, MigrationInterface $migration, EntityStorageInterface $storage, array $bundles, EntityFieldManagerInterface $entity_field_manager, protected FieldTypePluginManagerInterface $fieldTypeManager, protected ?AccountSwitcherInterface $accountSwitcher = NULL, ?EntityTypeBundleInfoInterface $entity_type_bundle_info = NULL) {
+  public function __construct(
+    array $configuration,
+    $plugin_id,
+    $plugin_definition,
+    MigrationInterface $migration,
+    EntityStorageInterface $storage,
+    array $bundles,
+    EntityFieldManagerInterface $entity_field_manager,
+    protected FieldTypePluginManagerInterface $fieldTypeManager,
+    protected ?AccountSwitcherInterface $accountSwitcher = NULL,
+    ?EntityTypeBundleInfoInterface $entity_type_bundle_info = NULL,
+  ) {
     parent::__construct($configuration, $plugin_id, $plugin_definition, $migration, $storage, $bundles);
     $this->entityFieldManager = $entity_field_manager;
     if ($entity_type_bundle_info === NULL) {

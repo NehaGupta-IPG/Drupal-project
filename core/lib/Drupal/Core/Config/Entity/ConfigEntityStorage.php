@@ -83,7 +83,13 @@ class ConfigEntityStorage extends EntityStorageBase implements ConfigEntityStora
    * @param \Drupal\Core\Cache\MemoryCache\MemoryCacheInterface $memory_cache
    *   The memory cache backend.
    */
-  public function __construct(EntityTypeInterface $entity_type, protected ConfigFactoryInterface $configFactory, UuidInterface $uuid_service, protected LanguageManagerInterface $languageManager, MemoryCacheInterface $memory_cache) {
+  public function __construct(
+    EntityTypeInterface $entity_type,
+    protected ConfigFactoryInterface $configFactory,
+    UuidInterface $uuid_service,
+    protected LanguageManagerInterface $languageManager,
+    MemoryCacheInterface $memory_cache,
+  ) {
     parent::__construct($entity_type, $memory_cache);
     $this->uuidService = $uuid_service;
   }

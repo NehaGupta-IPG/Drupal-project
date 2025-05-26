@@ -38,7 +38,12 @@ class CommentAdminOverview extends FormBase {
    * @param \Drupal\Core\TempStore\PrivateTempStoreFactory $tempStoreFactory
    *   The tempstore factory.
    */
-  public function __construct(protected EntityTypeManagerInterface $entityTypeManager, protected DateFormatterInterface $dateFormatter, protected ModuleHandlerInterface $moduleHandler, protected PrivateTempStoreFactory $tempStoreFactory) {
+  public function __construct(
+    protected EntityTypeManagerInterface $entityTypeManager,
+    protected DateFormatterInterface $dateFormatter,
+    protected ModuleHandlerInterface $moduleHandler,
+    protected PrivateTempStoreFactory $tempStoreFactory,
+  ) {
     $this->commentStorage = $this->entityTypeManager->getStorage('comment');
   }
 

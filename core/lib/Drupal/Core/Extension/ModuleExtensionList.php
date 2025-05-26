@@ -56,7 +56,18 @@ class ModuleExtensionList extends ExtensionList {
    * @param array[] $container_modules_info
    *   (optional) The module locations coming from the compiled container.
    */
-  public function __construct($root, $type, CacheBackendInterface $cache, InfoParserInterface $info_parser, ModuleHandlerInterface $module_handler, StateInterface $state, protected ConfigFactoryInterface $configFactory, protected ExtensionList $profileList, $install_profile, array $container_modules_info = []) {
+  public function __construct(
+    $root,
+    $type,
+    CacheBackendInterface $cache,
+    InfoParserInterface $info_parser,
+    ModuleHandlerInterface $module_handler,
+    StateInterface $state,
+    protected ConfigFactoryInterface $configFactory,
+    protected ExtensionList $profileList,
+    $install_profile,
+    array $container_modules_info = [],
+  ) {
     parent::__construct($root, $type, $cache, $info_parser, $module_handler, $state, $install_profile);
 
     // Use the information from the container. This is an optimization.

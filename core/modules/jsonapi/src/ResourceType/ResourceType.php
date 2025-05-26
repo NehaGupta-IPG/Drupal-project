@@ -285,7 +285,17 @@ class ResourceType {
    * @param null|string $typeName
    *   The resource type name.
    */
-  public function __construct(protected $entityTypeId, protected $bundle, protected $deserializationTargetClass, protected $internal = FALSE, protected $isLocatable = TRUE, protected $isMutable = TRUE, protected $isVersionable = FALSE, protected array $fields = [], protected $typeName = NULL) {
+  public function __construct(
+    protected $entityTypeId,
+    protected $bundle,
+    protected $deserializationTargetClass,
+    protected $internal = FALSE,
+    protected $isLocatable = TRUE,
+    protected $isMutable = TRUE,
+    protected $isVersionable = FALSE,
+    protected array $fields = [],
+    protected $typeName = NULL,
+  ) {
     if ($this->typeName === NULL) {
       $this->typeName = $this->bundle === '?'
         ? 'unknown'

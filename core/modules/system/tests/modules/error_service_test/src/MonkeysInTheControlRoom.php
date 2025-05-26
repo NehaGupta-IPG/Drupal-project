@@ -24,8 +24,10 @@ class MonkeysInTheControlRoom implements HttpKernelInterface {
    * @param \Drupal\Core\Site\Settings $settings
    *   The settings object.
    */
-  public function __construct(protected HttpKernelInterface $app, protected Settings $settings) {
-  }
+  public function __construct(
+    protected HttpKernelInterface $app,
+    protected Settings $settings,
+  ) {}
 
   /**
    * {@inheritdoc}

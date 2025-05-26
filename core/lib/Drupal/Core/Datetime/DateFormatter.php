@@ -72,7 +72,13 @@ class DateFormatter implements DateFormatterInterface {
    * @param \Symfony\Component\HttpFoundation\RequestStack $requestStack
    *   The request stack.
    */
-  public function __construct(EntityTypeManagerInterface $entity_type_manager, protected LanguageManagerInterface $languageManager, TranslationInterface $translation, protected ConfigFactoryInterface $configFactory, protected RequestStack $requestStack) {
+  public function __construct(
+    EntityTypeManagerInterface $entity_type_manager,
+    protected LanguageManagerInterface $languageManager,
+    TranslationInterface $translation,
+    protected ConfigFactoryInterface $configFactory,
+    protected RequestStack $requestStack,
+  ) {
     $this->dateFormatStorage = $entity_type_manager->getStorage('date_format');
     $this->stringTranslation = $translation;
   }

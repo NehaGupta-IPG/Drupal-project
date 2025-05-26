@@ -43,7 +43,11 @@ class SectionComponentBuildRenderArrayEvent extends Event {
    * @param bool $inPreview
    *   (optional) Whether the component is in preview mode or not.
    */
-  public function __construct(protected SectionComponent $component, protected array $contexts, protected $inPreview = FALSE) {
+  public function __construct(
+    protected SectionComponent $component,
+    protected array $contexts,
+    protected $inPreview = FALSE,
+  ) {
     $this->plugin = $this->component->getPlugin($this->contexts);
 
     if ($this->plugin instanceof PreviewAwarePluginInterface) {

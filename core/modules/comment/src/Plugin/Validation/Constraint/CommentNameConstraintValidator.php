@@ -20,8 +20,9 @@ class CommentNameConstraintValidator extends ConstraintValidator implements Cont
    * @param \Drupal\user\UserStorageInterface $userStorage
    *   The user storage handler.
    */
-  public function __construct(protected UserStorageInterface $userStorage) {
-  }
+  public function __construct(
+    protected UserStorageInterface $userStorage,
+  ) {}
 
   /**
    * {@inheritdoc}

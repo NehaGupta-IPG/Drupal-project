@@ -27,8 +27,10 @@ class TimeZoneResolver implements EventSubscriberInterface {
    * @param \Drupal\Core\Config\ConfigFactoryInterface $configFactory
    *   The config factory.
    */
-  public function __construct(private AccountInterface $currentUser, protected ConfigFactoryInterface $configFactory) {
-  }
+  public function __construct(
+    private AccountInterface $currentUser,
+    protected ConfigFactoryInterface $configFactory,
+  ) {}
 
   /**
    * Sets the default time zone.

@@ -34,7 +34,13 @@ class CurrentThemeCondition extends ConditionPluginBase implements ContainerFact
    * @param \Drupal\Core\Extension\ThemeHandlerInterface $themeHandler
    *   The theme handler.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, protected ThemeManagerInterface $themeManager, protected ThemeHandlerInterface $themeHandler) {
+  public function __construct(
+    array $configuration,
+    $plugin_id,
+    $plugin_definition,
+    protected ThemeManagerInterface $themeManager,
+    protected ThemeHandlerInterface $themeHandler,
+  ) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
   }
 

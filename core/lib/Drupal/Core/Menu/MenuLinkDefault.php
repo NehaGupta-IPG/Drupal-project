@@ -34,7 +34,12 @@ class MenuLinkDefault extends MenuLinkBase implements ContainerFactoryPluginInte
    * @param \Drupal\Core\Menu\StaticMenuLinkOverridesInterface $staticOverride
    *   The static override storage.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, protected StaticMenuLinkOverridesInterface $staticOverride) {
+  public function __construct(
+    array $configuration,
+    $plugin_id,
+    $plugin_definition,
+    protected StaticMenuLinkOverridesInterface $staticOverride,
+  ) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
   }
 

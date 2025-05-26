@@ -42,7 +42,15 @@ class AssetResolver implements AssetResolverInterface {
    * @param \Drupal\Core\Extension\ThemeHandlerInterface $theme_handler
    *   The theme handler service.
    */
-  public function __construct(protected LibraryDiscoveryInterface $libraryDiscovery, protected LibraryDependencyResolverInterface $libraryDependencyResolver, protected ModuleHandlerInterface $moduleHandler, protected ThemeManagerInterface $themeManager, protected LanguageManagerInterface $languageManager, protected CacheBackendInterface $cache, ?ThemeHandlerInterface $theme_handler = NULL) {
+  public function __construct(
+    protected LibraryDiscoveryInterface $libraryDiscovery,
+    protected LibraryDependencyResolverInterface $libraryDependencyResolver,
+    protected ModuleHandlerInterface $moduleHandler,
+    protected ThemeManagerInterface $themeManager,
+    protected LanguageManagerInterface $languageManager,
+    protected CacheBackendInterface $cache,
+    ?ThemeHandlerInterface $theme_handler = NULL,
+  ) {
     if ($theme_handler === NULL) {
       @trigger_error('Calling ' . __METHOD__ . ' without the $theme_handler argument is deprecated in drupal:11.1.0 and it will be required in drupal:12.0.0. See https://www.drupal.org/project/drupal/issues/3451667', E_USER_DEPRECATED);
       $theme_handler = \Drupal::service('theme_handler');

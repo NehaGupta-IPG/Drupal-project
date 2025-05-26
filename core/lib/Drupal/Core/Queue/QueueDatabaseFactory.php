@@ -15,8 +15,9 @@ class QueueDatabaseFactory implements QueueFactoryInterface {
    * @param \Drupal\Core\Database\Connection $connection
    *   The Connection object containing the queue table.
    */
-  public function __construct(protected Connection $connection) {
-  }
+  public function __construct(
+    protected Connection $connection,
+  ) {}
 
   /**
    * {@inheritdoc}

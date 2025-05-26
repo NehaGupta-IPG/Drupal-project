@@ -22,8 +22,9 @@ class NodeTypeForm extends BundleEntityFormBase {
    * @param \Drupal\Core\Entity\EntityFieldManagerInterface $entityFieldManager
    *   The entity field manager.
    */
-  public function __construct(protected EntityFieldManagerInterface $entityFieldManager) {
-  }
+  public function __construct(
+    protected EntityFieldManagerInterface $entityFieldManager,
+  ) {}
 
   /**
    * {@inheritdoc}

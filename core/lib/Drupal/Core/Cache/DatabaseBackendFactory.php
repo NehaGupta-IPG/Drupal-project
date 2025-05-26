@@ -28,8 +28,13 @@ class DatabaseBackendFactory implements CacheFactoryInterface {
    *
    * @throws \BadMethodCallException
    */
-  public function __construct(protected Connection $connection, protected CacheTagsChecksumInterface $checksumProvider, protected Settings $settings, protected ObjectAwareSerializationInterface $serializer, protected TimeInterface $time) {
-  }
+  public function __construct(
+    protected Connection $connection,
+    protected CacheTagsChecksumInterface $checksumProvider,
+    protected Settings $settings,
+    protected ObjectAwareSerializationInterface $serializer,
+    protected TimeInterface $time,
+  ) {}
 
   /**
    * Gets DatabaseBackend for the specified cache bin.

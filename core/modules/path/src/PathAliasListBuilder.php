@@ -37,7 +37,14 @@ class PathAliasListBuilder extends EntityListBuilder {
    * @param \Drupal\path_alias\AliasManagerInterface $aliasManager
    *   The path alias manager.
    */
-  public function __construct(EntityTypeInterface $entity_type, EntityStorageInterface $storage, protected Request $currentRequest, protected FormBuilderInterface $formBuilder, protected LanguageManagerInterface $languageManager, protected AliasManagerInterface $aliasManager) {
+  public function __construct(
+    EntityTypeInterface $entity_type,
+    EntityStorageInterface $storage,
+    protected Request $currentRequest,
+    protected FormBuilderInterface $formBuilder,
+    protected LanguageManagerInterface $languageManager,
+    protected AliasManagerInterface $aliasManager,
+  ) {
     parent::__construct($entity_type, $storage);
   }
 

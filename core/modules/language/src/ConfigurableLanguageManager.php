@@ -92,7 +92,14 @@ class ConfigurableLanguageManager extends LanguageManager implements Configurabl
    * @param \Drupal\Core\Cache\CacheBackendInterface|null $cacheBackend
    *   The cache backend.
    */
-  public function __construct(LanguageDefault $default_language, protected ConfigFactoryInterface $configFactory, protected ModuleHandlerInterface $moduleHandler, protected LanguageConfigFactoryOverrideInterface $configFactoryOverride, protected RequestStack $requestStack, protected ?CacheBackendInterface $cacheBackend = NULL) {
+  public function __construct(
+    LanguageDefault $default_language,
+    protected ConfigFactoryInterface $configFactory,
+    protected ModuleHandlerInterface $moduleHandler,
+    protected LanguageConfigFactoryOverrideInterface $configFactoryOverride,
+    protected RequestStack $requestStack,
+    protected ?CacheBackendInterface $cacheBackend = NULL,
+  ) {
     $this->defaultLanguage = $default_language;
     if (!$cacheBackend) {
       @trigger_error('Calling ' . __CLASS__ . ' constructor without the $cacheBackend argument is deprecated in drupal:11.2.0 and it will be required in drupal:12.0.0. See https://www.drupal.org/project/drupal/issues/3497341', E_USER_DEPRECATED);

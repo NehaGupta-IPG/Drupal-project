@@ -84,8 +84,10 @@ class ViewsEntitySchemaSubscriber implements EntityTypeListenerInterface, EventS
    * @param \Psr\Log\LoggerInterface $logger
    *   A logger instance.
    */
-  public function __construct(protected EntityTypeManagerInterface $entityTypeManager, protected LoggerInterface $logger) {
-  }
+  public function __construct(
+    protected EntityTypeManagerInterface $entityTypeManager,
+    protected LoggerInterface $logger,
+  ) {}
 
   /**
    * {@inheritdoc}

@@ -38,7 +38,12 @@ class EntityExists extends ProcessPluginBase implements ContainerFactoryPluginIn
    * @param \Drupal\Core\Entity\EntityStorageInterface $storage
    *   The entity storage.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, protected EntityStorageInterface $storage) {
+  public function __construct(
+    array $configuration,
+    $plugin_id,
+    $plugin_definition,
+    protected EntityStorageInterface $storage,
+  ) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
   }
 

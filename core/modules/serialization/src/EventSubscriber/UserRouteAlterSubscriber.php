@@ -17,8 +17,9 @@ class UserRouteAlterSubscriber implements EventSubscriberInterface {
    * @param array $serializerFormats
    *   The available serializer formats.
    */
-  public function __construct(protected array $serializerFormats) {
-  }
+  public function __construct(
+    protected array $serializerFormats,
+  ) {}
 
   /**
    * {@inheritdoc}

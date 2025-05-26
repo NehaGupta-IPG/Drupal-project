@@ -43,7 +43,13 @@ class SystemMenuBlock extends BlockBase implements ContainerFactoryPluginInterfa
    * @param \Drupal\Core\Menu\MenuActiveTrailInterface $menuActiveTrail
    *   The active menu trail service.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, protected MenuLinkTreeInterface $menuTree, protected MenuActiveTrailInterface $menuActiveTrail) {
+  public function __construct(
+    array $configuration,
+    $plugin_id,
+    $plugin_definition,
+    protected MenuLinkTreeInterface $menuTree,
+    protected MenuActiveTrailInterface $menuActiveTrail,
+  ) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
   }
 

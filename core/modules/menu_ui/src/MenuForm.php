@@ -47,8 +47,12 @@ class MenuForm extends EntityForm {
    * @param \Drupal\menu_link_content\MenuLinkContentStorageInterface $menuLinkContentStorage
    *   The menu link content storage handler.
    */
-  public function __construct(protected MenuLinkManagerInterface $menuLinkManager, protected MenuLinkTreeInterface $menuTree, protected LinkGeneratorInterface $linkGenerator, protected MenuLinkContentStorageInterface $menuLinkContentStorage) {
-  }
+  public function __construct(
+    protected MenuLinkManagerInterface $menuLinkManager,
+    protected MenuLinkTreeInterface $menuTree,
+    protected LinkGeneratorInterface $linkGenerator,
+    protected MenuLinkContentStorageInterface $menuLinkContentStorage,
+  ) {}
 
   /**
    * {@inheritdoc}

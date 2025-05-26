@@ -33,8 +33,12 @@ final class ProjectSecurityRequirement {
    *   The next version after the installed version in the format
    *   [MAJOR].[MINOR].
    */
-  private function __construct(protected $projectTitle = NULL, private array $securityCoverageInfo = [], private $existingMajorMinorVersion = NULL, private $nextMajorMinorVersion = NULL) {
-  }
+  private function __construct(
+    protected $projectTitle = NULL,
+    private array $securityCoverageInfo = [],
+    private $existingMajorMinorVersion = NULL,
+    private $nextMajorMinorVersion = NULL,
+  ) {}
 
   /**
    * Creates a ProjectSecurityRequirement object from project data.

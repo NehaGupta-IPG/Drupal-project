@@ -17,8 +17,9 @@ class InjectedService {
    * @param \Drupal\new_dependency_test_with_service\NewService $service
    *   The service of the new module.
    */
-  public function __construct(protected NewService $service) {
-  }
+  public function __construct(
+    protected NewService $service,
+  ) {}
 
   /**
    * Get the simple greeting from the service.

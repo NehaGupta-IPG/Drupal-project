@@ -17,8 +17,9 @@ class MenuLinkPluginConverter implements ParamConverterInterface {
    * @param \Drupal\Core\Menu\MenuLinkManagerInterface $menuLinkManager
    *   The menu link plugin manager.
    */
-  public function __construct(protected MenuLinkManagerInterface $menuLinkManager) {
-  }
+  public function __construct(
+    protected MenuLinkManagerInterface $menuLinkManager,
+  ) {}
 
   /**
    * {@inheritdoc}

@@ -21,8 +21,10 @@ class UpdateController extends ControllerBase {
    * @param \Drupal\Core\Render\RendererInterface $renderer
    *   The renderer.
    */
-  public function __construct(protected UpdateManagerInterface $updateManager, protected RendererInterface $renderer) {
-  }
+  public function __construct(
+    protected UpdateManagerInterface $updateManager,
+    protected RendererInterface $renderer,
+  ) {}
 
   /**
    * Returns a page about the update status of projects.

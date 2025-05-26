@@ -26,8 +26,10 @@ class SettingsCommand implements CommandInterface {
    * @param bool $merge
    *   Whether the settings should be merged into the global drupalSettings.
    */
-  public function __construct(protected array $settings, protected $merge = FALSE) {
-  }
+  public function __construct(
+    protected array $settings,
+    protected $merge = FALSE,
+  ) {}
 
   /**
    * Implements Drupal\Core\Ajax\CommandInterface:render().

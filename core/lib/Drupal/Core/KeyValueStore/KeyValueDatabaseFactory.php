@@ -18,8 +18,10 @@ class KeyValueDatabaseFactory implements KeyValueFactoryInterface {
    * @param \Drupal\Core\Database\Connection $connection
    *   The Connection object containing the key-value tables.
    */
-  public function __construct(protected SerializationInterface $serializer, protected Connection $connection) {
-  }
+  public function __construct(
+    protected SerializationInterface $serializer,
+    protected Connection $connection,
+  ) {}
 
   /**
    * {@inheritdoc}

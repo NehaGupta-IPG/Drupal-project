@@ -18,8 +18,10 @@ class UserAuthentication implements UserAuthInterface, UserAuthenticationInterfa
    * @param \Drupal\Core\Password\PasswordInterface $passwordChecker
    *   The password service.
    */
-  public function __construct(protected EntityTypeManagerInterface $entityTypeManager, protected PasswordInterface $passwordChecker) {
-  }
+  public function __construct(
+    protected EntityTypeManagerInterface $entityTypeManager,
+    protected PasswordInterface $passwordChecker,
+  ) {}
 
   /**
    * {@inheritdoc}

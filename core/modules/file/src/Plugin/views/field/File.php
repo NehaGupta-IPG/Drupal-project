@@ -31,7 +31,12 @@ class File extends FieldPluginBase {
    * @param \Drupal\Core\File\FileUrlGeneratorInterface $fileUrlGenerator
    *   The file URL generator.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, protected FileUrlGeneratorInterface $fileUrlGenerator) {
+  public function __construct(
+    array $configuration,
+    $plugin_id,
+    $plugin_definition,
+    protected FileUrlGeneratorInterface $fileUrlGenerator,
+  ) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
   }
 

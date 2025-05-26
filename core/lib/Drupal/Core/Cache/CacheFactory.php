@@ -34,8 +34,11 @@ class CacheFactory implements CacheFactoryInterface {
    *   (optional) A mapping of bin to backend service name. Mappings in
    *   $settings take precedence over this.
    */
-  public function __construct(protected Settings $settings, protected array $defaultBinBackends = [], protected array $memoryDefaultBinBackends = []) {
-  }
+  public function __construct(
+    protected Settings $settings,
+    protected array $defaultBinBackends = [],
+    protected array $memoryDefaultBinBackends = [],
+  ) {}
 
   /**
    * Instantiates a cache backend class for a given cache bin.

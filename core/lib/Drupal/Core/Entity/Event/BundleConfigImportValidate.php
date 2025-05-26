@@ -21,8 +21,10 @@ class BundleConfigImportValidate extends ConfigImportValidateEventSubscriberBase
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
    *   The entity type manager service.
    */
-  public function __construct(protected ConfigManagerInterface $configManager, protected EntityTypeManagerInterface $entityTypeManager) {
-  }
+  public function __construct(
+    protected ConfigManagerInterface $configManager,
+    protected EntityTypeManagerInterface $entityTypeManager,
+  ) {}
 
   /**
    * Ensures bundles that will be deleted are not in use.

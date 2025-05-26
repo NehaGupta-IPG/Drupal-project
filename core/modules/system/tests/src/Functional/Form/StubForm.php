@@ -22,8 +22,10 @@ class StubForm extends FormBase {
    * @param array $form
    *   The form array.
    */
-  public function __construct(protected $formId, protected $form) {
-  }
+  public function __construct(
+    protected $formId,
+    protected $form,
+  ) {}
 
   /**
    * {@inheritdoc}

@@ -33,8 +33,9 @@ class ManyToOneHelper {
    */
   public bool $formula = FALSE;
 
-  public function __construct(public ViewsHandlerInterface $handler) {
-  }
+  public function __construct(
+    public ViewsHandlerInterface $handler,
+  ) {}
 
   public static function defineOptions(&$options) {
     $options['reduce_duplicates'] = ['default' => FALSE];

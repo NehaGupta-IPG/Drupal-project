@@ -29,8 +29,11 @@ class LinkGenerator implements LinkGeneratorInterface {
    * @param \Drupal\Core\Render\RendererInterface $renderer
    *   The renderer service.
    */
-  public function __construct(protected UrlGeneratorInterface $urlGenerator, protected ModuleHandlerInterface $moduleHandler, protected RendererInterface $renderer) {
-  }
+  public function __construct(
+    protected UrlGeneratorInterface $urlGenerator,
+    protected ModuleHandlerInterface $moduleHandler,
+    protected RendererInterface $renderer,
+  ) {}
 
   /**
    * {@inheritdoc}

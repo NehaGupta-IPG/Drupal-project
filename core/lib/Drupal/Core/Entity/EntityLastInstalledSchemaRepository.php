@@ -27,8 +27,10 @@ class EntityLastInstalledSchemaRepository implements EntityLastInstalledSchemaRe
    * @param \Drupal\Core\Cache\CacheBackendInterface $cacheBackend
    *   The cache backend.
    */
-  public function __construct(protected KeyValueFactoryInterface $keyValueFactory, protected CacheBackendInterface $cacheBackend) {
-  }
+  public function __construct(
+    protected KeyValueFactoryInterface $keyValueFactory,
+    protected CacheBackendInterface $cacheBackend,
+  ) {}
 
   /**
    * {@inheritdoc}

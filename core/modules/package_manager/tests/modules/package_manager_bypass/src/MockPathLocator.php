@@ -23,7 +23,10 @@ final class MockPathLocator extends BasePathLocator {
    * @param mixed ...$arguments
    *   Additional arguments to pass to the parent constructor.
    */
-  public function __construct(private StateInterface $state, ...$arguments) {
+  public function __construct(
+    private StateInterface $state,
+    ...$arguments,
+  ) {
     parent::__construct(...$arguments);
   }
 

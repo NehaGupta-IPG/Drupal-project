@@ -21,8 +21,9 @@ class SystemConfigSubscriber implements EventSubscriberInterface {
    * @param \Drupal\Core\Routing\RouteBuilderInterface $routerBuilder
    *   The router builder service.
    */
-  public function __construct(protected RouteBuilderInterface $routerBuilder) {
-  }
+  public function __construct(
+    protected RouteBuilderInterface $routerBuilder,
+  ) {}
 
   /**
    * Rebuilds the router when the default or admin theme is changed.

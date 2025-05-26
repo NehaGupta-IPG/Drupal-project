@@ -31,7 +31,9 @@ class ServerCommand extends Command {
    * @param object $classLoader
    *   The class loader.
    */
-  public function __construct(protected $classLoader) {
+  public function __construct(
+    protected $classLoader,
+  ) {
     parent::__construct('server');
   }
 

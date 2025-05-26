@@ -35,8 +35,12 @@ final class ImportStorageTransformer {
    * @param \Drupal\Core\Lock\LockBackendInterface $persistentLock
    *   The persistent lock used by the config importer.
    */
-  public function __construct(protected EventDispatcherInterface $eventDispatcher, protected Connection $connection, protected LockBackendInterface $requestLock, protected LockBackendInterface $persistentLock) {
-  }
+  public function __construct(
+    protected EventDispatcherInterface $eventDispatcher,
+    protected Connection $connection,
+    protected LockBackendInterface $requestLock,
+    protected LockBackendInterface $persistentLock,
+  ) {}
 
   /**
    * Transform the storage to be imported from.

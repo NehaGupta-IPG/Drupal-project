@@ -21,8 +21,10 @@ class ConfigDependencies implements ContainerInjectionInterface {
    * @param string[] $authProviders
    *   The authentication providers, keyed by ID.
    */
-  public function __construct(protected array $formatProviders, protected array $authProviders) {
-  }
+  public function __construct(
+    protected array $formatProviders,
+    protected array $authProviders,
+  ) {}
 
   /**
    * {@inheritdoc}

@@ -26,8 +26,10 @@ class EntityAutocompleteController extends ControllerBase {
    * @param \Drupal\Core\KeyValueStore\KeyValueStoreInterface $keyValue
    *   The key value factory.
    */
-  public function __construct(protected EntityAutocompleteMatcherInterface $matcher, protected KeyValueStoreInterface $keyValue) {
-  }
+  public function __construct(
+    protected EntityAutocompleteMatcherInterface $matcher,
+    protected KeyValueStoreInterface $keyValue,
+  ) {}
 
   /**
    * {@inheritdoc}

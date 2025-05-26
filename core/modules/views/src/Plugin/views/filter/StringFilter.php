@@ -41,7 +41,12 @@ class StringFilter extends FilterPluginBase implements FilterOperatorsInterface 
    * @param \Drupal\Core\Database\Connection $connection
    *   The database connection.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, protected Connection $connection) {
+  public function __construct(
+    array $configuration,
+    $plugin_id,
+    $plugin_definition,
+    protected Connection $connection,
+  ) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
   }
 

@@ -22,8 +22,9 @@ class UpdateManagerAccessCheck implements AccessInterface {
    * @param \Drupal\Core\Site\Settings $settings
    *   The read-only settings container.
    */
-  public function __construct(protected Settings $settings) {
-  }
+  public function __construct(
+    protected Settings $settings,
+  ) {}
 
   /**
    * Checks access.

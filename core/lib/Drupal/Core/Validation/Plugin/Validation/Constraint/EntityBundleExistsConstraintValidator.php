@@ -23,7 +23,9 @@ class EntityBundleExistsConstraintValidator extends ConstraintValidator implemen
    * @param \Drupal\Core\Entity\EntityTypeBundleInfoInterface $bundleInfo
    *   The entity type bundle info service.
    */
-  public function __construct(private readonly EntityTypeBundleInfoInterface $bundleInfo) {}
+  public function __construct(
+    private readonly EntityTypeBundleInfoInterface $bundleInfo,
+  ) {}
 
   /**
    * {@inheritdoc}

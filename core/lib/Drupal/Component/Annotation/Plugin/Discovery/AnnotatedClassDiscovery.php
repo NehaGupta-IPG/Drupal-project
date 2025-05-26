@@ -45,7 +45,11 @@ class AnnotatedClassDiscovery implements DiscoveryInterface {
    * @param string[] $annotationNamespaces
    *   (optional) Additional namespaces to be scanned for annotation classes.
    */
-  public function __construct(protected $pluginNamespaces = [], protected $pluginDefinitionAnnotationName = 'Drupal\Component\Annotation\Plugin', protected array $annotationNamespaces = []) {
+  public function __construct(
+    protected $pluginNamespaces = [],
+    protected $pluginDefinitionAnnotationName = 'Drupal\Component\Annotation\Plugin',
+    protected array $annotationNamespaces = [],
+  ) {
     $file_cache_suffix = str_replace('\\', '_', $this->pluginDefinitionAnnotationName);
     $file_cache_suffix .= ':' . Crypt::hashBase64(serialize($this->annotationNamespaces));
     $this->fileCache = FileCacheFactory::get('annotation_discovery:' . $file_cache_suffix);

@@ -18,8 +18,9 @@ class RouteCacheContext implements CacheContextInterface {
    * @param \Drupal\Core\Routing\RouteMatchInterface $routeMatch
    *   The route match.
    */
-  public function __construct(protected RouteMatchInterface $routeMatch) {
-  }
+  public function __construct(
+    protected RouteMatchInterface $routeMatch,
+  ) {}
 
   /**
    * {@inheritdoc}

@@ -77,7 +77,11 @@ class Row {
    * @throws \InvalidArgumentException
    *   Thrown when a source ID property does not exist.
    */
-  public function __construct(protected array $source = [], protected array $sourceIds = [], protected $isStub = FALSE) {
+  public function __construct(
+    protected array $source = [],
+    protected array $sourceIds = [],
+    protected $isStub = FALSE,
+  ) {
     foreach (array_keys($this->sourceIds) as $id) {
       if (!$this->hasSourceProperty($id)) {
         throw new \InvalidArgumentException("'$id' is defined as a source ID but has no value.");

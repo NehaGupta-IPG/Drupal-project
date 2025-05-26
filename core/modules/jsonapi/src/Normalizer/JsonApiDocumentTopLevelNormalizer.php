@@ -54,8 +54,10 @@ class JsonApiDocumentTopLevelNormalizer extends NormalizerBase implements Denorm
    * @param \Drupal\jsonapi\ResourceType\ResourceTypeRepositoryInterface $resourceTypeRepository
    *   The JSON:API resource type repository.
    */
-  public function __construct(protected EntityTypeManagerInterface $entityTypeManager, protected ResourceTypeRepositoryInterface $resourceTypeRepository) {
-  }
+  public function __construct(
+    protected EntityTypeManagerInterface $entityTypeManager,
+    protected ResourceTypeRepositoryInterface $resourceTypeRepository,
+  ) {}
 
   /**
    * {@inheritdoc}

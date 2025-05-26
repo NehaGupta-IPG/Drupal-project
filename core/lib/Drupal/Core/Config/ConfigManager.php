@@ -55,7 +55,16 @@ class ConfigManager implements ConfigManagerInterface {
    * @param \Drupal\Core\Extension\ExtensionPathResolver $extensionPathResolver
    *   The extension path resolver.
    */
-  public function __construct(protected EntityTypeManagerInterface $entityTypeManager, protected ConfigFactoryInterface $configFactory, protected TypedConfigManagerInterface $typedConfigManager, TranslationInterface $string_translation, protected StorageInterface $activeStorage, protected EventDispatcherInterface $eventDispatcher, protected EntityRepositoryInterface $entityRepository, protected ExtensionPathResolver $extensionPathResolver) {
+  public function __construct(
+    protected EntityTypeManagerInterface $entityTypeManager,
+    protected ConfigFactoryInterface $configFactory,
+    protected TypedConfigManagerInterface $typedConfigManager,
+    TranslationInterface $string_translation,
+    protected StorageInterface $activeStorage,
+    protected EventDispatcherInterface $eventDispatcher,
+    protected EntityRepositoryInterface $entityRepository,
+    protected ExtensionPathResolver $extensionPathResolver,
+  ) {
     $this->stringTranslation = $string_translation;
   }
 

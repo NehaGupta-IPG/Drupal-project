@@ -23,8 +23,10 @@ class MenuDeleteForm extends EntityDeleteForm {
    * @param \Drupal\Core\Database\Connection $connection
    *   The database connection.
    */
-  public function __construct(protected MenuLinkManagerInterface $menuLinkManager, protected Connection $connection) {
-  }
+  public function __construct(
+    protected MenuLinkManagerInterface $menuLinkManager,
+    protected Connection $connection,
+  ) {}
 
   /**
    * {@inheritdoc}

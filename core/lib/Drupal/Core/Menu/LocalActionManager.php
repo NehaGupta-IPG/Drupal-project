@@ -76,7 +76,17 @@ class LocalActionManager extends DefaultPluginManager implements LocalActionMana
    * @param \Drupal\Core\Session\AccountInterface $account
    *   The current user.
    */
-  public function __construct(protected ArgumentResolverInterface $argumentResolver, protected RequestStack $requestStack, protected RouteMatchInterface $routeMatch, protected RouteProviderInterface $routeProvider, ModuleHandlerInterface $module_handler, CacheBackendInterface $cache_backend, protected LanguageManagerInterface $languageManager, protected AccessManagerInterface $accessManager, protected AccountInterface $account) {
+  public function __construct(
+    protected ArgumentResolverInterface $argumentResolver,
+    protected RequestStack $requestStack,
+    protected RouteMatchInterface $routeMatch,
+    protected RouteProviderInterface $routeProvider,
+    ModuleHandlerInterface $module_handler,
+    CacheBackendInterface $cache_backend,
+    protected LanguageManagerInterface $languageManager,
+    protected AccessManagerInterface $accessManager,
+    protected AccountInterface $account,
+  ) {
     // Skip calling the parent constructor, since that assumes annotation-based
     // discovery.
     $this->factory = new ContainerFactory($this, 'Drupal\Core\Menu\LocalActionInterface');

@@ -28,8 +28,11 @@ class D7NodeDeriver extends DeriverBase implements ContainerDeriverInterface {
    * @param \Drupal\migrate_drupal\FieldDiscoveryInterface $fieldDiscovery
    *   The migration field discovery service.
    */
-  public function __construct(protected $basePluginId, protected $includeTranslations, protected FieldDiscoveryInterface $fieldDiscovery) {
-  }
+  public function __construct(
+    protected $basePluginId,
+    protected $includeTranslations,
+    protected FieldDiscoveryInterface $fieldDiscovery,
+  ) {}
 
   /**
    * {@inheritdoc}

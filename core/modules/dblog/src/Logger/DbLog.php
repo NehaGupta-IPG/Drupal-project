@@ -30,8 +30,10 @@ class DbLog implements LoggerInterface {
    * @param \Drupal\Core\Logger\LogMessageParserInterface $parser
    *   The parser to use when extracting message variables.
    */
-  public function __construct(protected Connection $connection, protected LogMessageParserInterface $parser) {
-  }
+  public function __construct(
+    protected Connection $connection,
+    protected LogMessageParserInterface $parser,
+  ) {}
 
   /**
    * {@inheritdoc}

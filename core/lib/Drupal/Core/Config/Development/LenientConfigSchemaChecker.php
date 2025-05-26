@@ -25,7 +25,12 @@ class LenientConfigSchemaChecker extends ConfigSchemaChecker {
    * @param string[] $exclude
    *   An array of config object names that are excluded from schema checking.
    */
-  public function __construct(TypedConfigManagerInterface $typed_manager, protected readonly MessengerInterface $messenger, protected readonly LoggerInterface $logger, array $exclude = []) {
+  public function __construct(
+    TypedConfigManagerInterface $typed_manager,
+    protected readonly MessengerInterface $messenger,
+    protected readonly LoggerInterface $logger,
+    array $exclude = [],
+  ) {
     parent::__construct($typed_manager, $exclude);
   }
 

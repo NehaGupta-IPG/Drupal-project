@@ -81,7 +81,12 @@ class MachineName extends ProcessPluginBase implements ContainerFactoryPluginInt
    * @param \Drupal\Component\Transliteration\TransliterationInterface $transliteration
    *   The transliteration service.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, protected TransliterationInterface $transliteration) {
+  public function __construct(
+    array $configuration,
+    $plugin_id,
+    $plugin_definition,
+    protected TransliterationInterface $transliteration,
+  ) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
 
     $this->replacePattern = $this->configuration['replace_pattern'] ?? '/[^a-z0-9_]+/';

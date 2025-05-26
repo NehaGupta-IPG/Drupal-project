@@ -43,7 +43,12 @@ class ImageStyleDownloadController extends FileDownloadController {
    * @param \Drupal\Core\File\FileSystemInterface $fileSystem
    *   The system service.
    */
-  public function __construct(protected LockBackendInterface $lock, protected ImageFactory $imageFactory, StreamWrapperManagerInterface $stream_wrapper_manager, protected FileSystemInterface $fileSystem) {
+  public function __construct(
+    protected LockBackendInterface $lock,
+    protected ImageFactory $imageFactory,
+    StreamWrapperManagerInterface $stream_wrapper_manager,
+    protected FileSystemInterface $fileSystem,
+  ) {
     parent::__construct($stream_wrapper_manager);
     $this->logger = $this->getLogger('image');
   }

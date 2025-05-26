@@ -24,8 +24,10 @@ class ConfigTranslationOverviewAccess implements AccessInterface {
    * @param \Drupal\Core\Language\LanguageManagerInterface $languageManager
    *   The language manager service.
    */
-  public function __construct(protected ConfigMapperManagerInterface $configMapperManager, protected LanguageManagerInterface $languageManager) {
-  }
+  public function __construct(
+    protected ConfigMapperManagerInterface $configMapperManager,
+    protected LanguageManagerInterface $languageManager,
+  ) {}
 
   /**
    * Checks access to the overview based on permissions and translatability.

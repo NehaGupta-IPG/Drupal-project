@@ -30,7 +30,10 @@ class UpdateRoot {
    * @param \Symfony\Component\HttpFoundation\RequestStack $requestStack
    *   The request stack.
    */
-  public function __construct(protected DrupalKernelInterface $drupalKernel, protected RequestStack $requestStack) {
+  public function __construct(
+    protected DrupalKernelInterface $drupalKernel,
+    protected RequestStack $requestStack,
+  ) {
     @trigger_error(__CLASS__ . ' is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. There is no replacement. Use composer to manage the code for your site. See https://www.drupal.org/node/3522119', E_USER_DEPRECATED);
   }
 

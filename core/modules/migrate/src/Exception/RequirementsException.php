@@ -21,7 +21,12 @@ class RequirementsException extends \RuntimeException {
    * @param \Throwable $previous
    *   (optional) The previous exception used for the exception chaining.
    */
-  public function __construct($message = "", protected array $requirements = [], $code = 0, ?\Throwable $previous = NULL) {
+  public function __construct(
+    $message = "",
+    protected array $requirements = [],
+    $code = 0,
+    ?\Throwable $previous = NULL,
+  ) {
     parent::__construct($message, $code, $previous);
   }
 

@@ -51,7 +51,13 @@ class Bundle extends InOperator {
    * @param \Drupal\Core\Entity\EntityTypeBundleInfoInterface $bundleInfoService
    *   The bundle info service.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, protected EntityTypeManagerInterface $entityTypeManager, protected EntityTypeBundleInfoInterface $bundleInfoService) {
+  public function __construct(
+    array $configuration,
+    $plugin_id,
+    $plugin_definition,
+    protected EntityTypeManagerInterface $entityTypeManager,
+    protected EntityTypeBundleInfoInterface $bundleInfoService,
+  ) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
   }
 

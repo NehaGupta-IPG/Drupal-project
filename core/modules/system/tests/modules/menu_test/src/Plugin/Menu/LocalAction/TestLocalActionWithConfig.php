@@ -36,7 +36,13 @@ class TestLocalActionWithConfig extends LocalActionDefault {
    * @param \Drupal\Core\Config\Config $config
    *   The 'menu_test.links.action' config.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, RouteProviderInterface $route_provider, protected Config $config) {
+  public function __construct(
+    array $configuration,
+    $plugin_id,
+    $plugin_definition,
+    RouteProviderInterface $route_provider,
+    protected Config $config,
+  ) {
     parent::__construct($configuration, $plugin_id, $plugin_definition, $route_provider);
   }
 

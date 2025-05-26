@@ -35,7 +35,13 @@ class CommentLinkBuilder implements CommentLinkBuilderInterface {
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
    *   The entity type manager.
    */
-  public function __construct(protected AccountInterface $currentUser, protected CommentManagerInterface $commentManager, protected ModuleHandlerInterface $moduleHandler, TranslationInterface $string_translation, protected EntityTypeManagerInterface $entityTypeManager) {
+  public function __construct(
+    protected AccountInterface $currentUser,
+    protected CommentManagerInterface $commentManager,
+    protected ModuleHandlerInterface $moduleHandler,
+    TranslationInterface $string_translation,
+    protected EntityTypeManagerInterface $entityTypeManager,
+  ) {
     $this->stringTranslation = $string_translation;
   }
 

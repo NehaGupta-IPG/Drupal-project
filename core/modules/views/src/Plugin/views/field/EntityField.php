@@ -119,7 +119,19 @@ class EntityField extends FieldPluginBase implements CacheableDependencyInterfac
    * @param \Drupal\Core\Entity\EntityTypeBundleInfoInterface $entityTypeBundleInfo
    *   The entity type bundle info service.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, protected EntityTypeManagerInterface $entityTypeManager, protected FormatterPluginManager $formatterPluginManager, protected FieldTypePluginManagerInterface $fieldTypePluginManager, protected LanguageManagerInterface $languageManager, protected RendererInterface $renderer, protected EntityRepositoryInterface $entityRepository, EntityFieldManagerInterface $entity_field_manager, protected EntityTypeBundleInfoInterface $entityTypeBundleInfo) {
+  public function __construct(
+    array $configuration,
+    $plugin_id,
+    $plugin_definition,
+    protected EntityTypeManagerInterface $entityTypeManager,
+    protected FormatterPluginManager $formatterPluginManager,
+    protected FieldTypePluginManagerInterface $fieldTypePluginManager,
+    protected LanguageManagerInterface $languageManager,
+    protected RendererInterface $renderer,
+    protected EntityRepositoryInterface $entityRepository,
+    EntityFieldManagerInterface $entity_field_manager,
+    protected EntityTypeBundleInfoInterface $entityTypeBundleInfo,
+  ) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
     $this->entityFieldManager = $entity_field_manager;
 

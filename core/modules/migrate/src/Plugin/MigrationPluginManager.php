@@ -45,7 +45,11 @@ class MigrationPluginManager extends DefaultPluginManager implements MigrationPl
    * @param \Drupal\Core\Language\LanguageManagerInterface $language_manager
    *   The language manager.
    */
-  public function __construct(protected ModuleHandlerInterface $moduleHandler, CacheBackendInterface $cache_backend, LanguageManagerInterface $language_manager) {
+  public function __construct(
+    protected ModuleHandlerInterface $moduleHandler,
+    CacheBackendInterface $cache_backend,
+    LanguageManagerInterface $language_manager,
+  ) {
     $this->factory = new ContainerFactory($this, $this->pluginInterface);
     $this->alterInfo('migration_plugins');
     $this->setCacheBackend($cache_backend, 'migration_plugins');

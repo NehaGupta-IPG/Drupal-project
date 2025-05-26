@@ -29,7 +29,10 @@ final class LoggingBeginner implements BeginnerInterface {
    * @param \PhpTuf\ComposerStager\API\Core\BeginnerInterface $inner
    *   The decorated beginner service.
    */
-  public function __construct(StateInterface $state, private BeginnerInterface $inner) {
+  public function __construct(
+    StateInterface $state,
+    private BeginnerInterface $inner,
+  ) {
     $this->state = $state;
   }
 

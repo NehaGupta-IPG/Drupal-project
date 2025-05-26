@@ -31,7 +31,12 @@ class LocalActionDefault extends PluginBase implements LocalActionInterface, Con
    * @param \Drupal\Core\Routing\RouteProviderInterface $routeProvider
    *   The route provider to load routes by name.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, protected RouteProviderInterface $routeProvider) {
+  public function __construct(
+    array $configuration,
+    $plugin_id,
+    $plugin_definition,
+    protected RouteProviderInterface $routeProvider,
+  ) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
   }
 

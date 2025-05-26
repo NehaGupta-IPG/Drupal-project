@@ -101,7 +101,11 @@ class ComponentMetadata {
    *
    * @throws \Drupal\Core\Render\Component\Exception\InvalidComponentException
    */
-  public function __construct(array $metadata_info, string $app_root, public readonly bool $mandatorySchemas) {
+  public function __construct(
+    array $metadata_info,
+    string $app_root,
+    public readonly bool $mandatorySchemas,
+  ) {
     $path = $metadata_info['path'];
     // Make the absolute path, relative to the Drupal root.
     $app_root = rtrim($app_root, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR;

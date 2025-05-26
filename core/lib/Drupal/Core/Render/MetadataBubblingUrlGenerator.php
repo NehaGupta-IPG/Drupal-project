@@ -28,8 +28,10 @@ class MetadataBubblingUrlGenerator implements UrlGeneratorInterface {
    * @param \Drupal\Core\Render\RendererInterface $renderer
    *   The renderer.
    */
-  public function __construct(protected UrlGeneratorInterface $urlGenerator, protected RendererInterface $renderer) {
-  }
+  public function __construct(
+    protected UrlGeneratorInterface $urlGenerator,
+    protected RendererInterface $renderer,
+  ) {}
 
   /**
    * {@inheritdoc}

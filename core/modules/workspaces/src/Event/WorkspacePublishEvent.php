@@ -29,8 +29,10 @@ abstract class WorkspacePublishEvent extends Event {
    * @param array $publishedRevisionIds
    *   The IDs of the entities that are being published.
    */
-  public function __construct(protected readonly WorkspaceInterface $workspace, protected readonly array $publishedRevisionIds) {
-  }
+  public function __construct(
+    protected readonly WorkspaceInterface $workspace,
+    protected readonly array $publishedRevisionIds,
+  ) {}
 
   /**
    * Gets the workspace.

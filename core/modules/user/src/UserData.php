@@ -15,8 +15,9 @@ class UserData implements UserDataInterface {
    * @param \Drupal\Core\Database\Connection $connection
    *   The database connection to use.
    */
-  public function __construct(protected Connection $connection) {
-  }
+  public function __construct(
+    protected Connection $connection,
+  ) {}
 
   /**
    * {@inheritdoc}

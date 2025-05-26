@@ -21,8 +21,10 @@ class MaintenanceModeSubscriber implements EventSubscriberInterface {
    * @param \Drupal\Core\Session\AccountInterface $account
    *   The current user.
    */
-  public function __construct(protected MaintenanceModeInterface $maintenanceMode, protected AccountInterface $account) {
-  }
+  public function __construct(
+    protected MaintenanceModeInterface $maintenanceMode,
+    protected AccountInterface $account,
+  ) {}
 
   /**
    * Logout users if site is in maintenance mode and user is not exempt.

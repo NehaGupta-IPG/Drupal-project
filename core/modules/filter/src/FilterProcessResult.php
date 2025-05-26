@@ -69,8 +69,9 @@ class FilterProcessResult extends BubbleableMetadata {
    * @param string $processedText
    *   The text as processed by a text filter.
    */
-  public function __construct(protected $processedText = '') {
-  }
+  public function __construct(
+    protected $processedText = '',
+  ) {}
 
   /**
    * Gets the processed text.

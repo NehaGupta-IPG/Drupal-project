@@ -25,8 +25,9 @@ class DatabaseTestController extends ControllerBase {
    * @param \Drupal\Core\Database\Connection $connection
    *   A database connection.
    */
-  public function __construct(protected Connection $connection) {
-  }
+  public function __construct(
+    protected Connection $connection,
+  ) {}
 
   /**
    * {@inheritdoc}

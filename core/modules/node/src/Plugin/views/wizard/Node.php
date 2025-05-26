@@ -52,7 +52,15 @@ class Node extends WizardPluginBase {
    * @param \Drupal\Core\Menu\MenuParentFormSelectorInterface $parent_form_selector
    *   The parent form selector service.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, EntityTypeBundleInfoInterface $bundle_info_service, protected EntityDisplayRepositoryInterface $entityDisplayRepository, protected EntityFieldManagerInterface $entityFieldManager, MenuParentFormSelectorInterface $parent_form_selector) {
+  public function __construct(
+    array $configuration,
+    $plugin_id,
+    $plugin_definition,
+    EntityTypeBundleInfoInterface $bundle_info_service,
+    protected EntityDisplayRepositoryInterface $entityDisplayRepository,
+    protected EntityFieldManagerInterface $entityFieldManager,
+    MenuParentFormSelectorInterface $parent_form_selector,
+  ) {
     parent::__construct($configuration, $plugin_id, $plugin_definition, $bundle_info_service, $parent_form_selector);
   }
 

@@ -55,7 +55,19 @@ class ResponsiveImageFormatter extends ImageFormatterBase {
    * @param \Drupal\Core\Session\AccountInterface $currentUser
    *   The current user.
    */
-  public function __construct($plugin_id, $plugin_definition, FieldDefinitionInterface $field_definition, array $settings, $label, $view_mode, array $third_party_settings, protected EntityStorageInterface $responsiveImageStyleStorage, protected EntityStorageInterface $imageStyleStorage, protected LinkGeneratorInterface $linkGenerator, protected AccountInterface $currentUser) {
+  public function __construct(
+    $plugin_id,
+    $plugin_definition,
+    FieldDefinitionInterface $field_definition,
+    array $settings,
+    $label,
+    $view_mode,
+    array $third_party_settings,
+    protected EntityStorageInterface $responsiveImageStyleStorage,
+    protected EntityStorageInterface $imageStyleStorage,
+    protected LinkGeneratorInterface $linkGenerator,
+    protected AccountInterface $currentUser,
+  ) {
     parent::__construct($plugin_id, $plugin_definition, $field_definition, $settings, $label, $view_mode, $third_party_settings);
   }
 

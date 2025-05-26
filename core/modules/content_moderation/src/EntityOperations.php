@@ -38,8 +38,13 @@ class EntityOperations implements ContainerInjectionInterface {
    * @param \Drupal\Core\Routing\RouteBuilderInterface $routerBuilder
    *   The router builder service.
    */
-  public function __construct(protected ModerationInformationInterface $moderationInfo, protected EntityTypeManagerInterface $entityTypeManager, protected FormBuilderInterface $formBuilder, protected EntityTypeBundleInfoInterface $bundleInfo, protected RouteBuilderInterface $routerBuilder) {
-  }
+  public function __construct(
+    protected ModerationInformationInterface $moderationInfo,
+    protected EntityTypeManagerInterface $entityTypeManager,
+    protected FormBuilderInterface $formBuilder,
+    protected EntityTypeBundleInfoInterface $bundleInfo,
+    protected RouteBuilderInterface $routerBuilder,
+  ) {}
 
   /**
    * {@inheritdoc}

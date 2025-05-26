@@ -47,7 +47,17 @@ class ModerationStateWidget extends OptionsSelectWidget {
    * @param \Drupal\content_moderation\StateTransitionValidationInterface $validator
    *   Moderation state transition validation service.
    */
-  public function __construct($plugin_id, $plugin_definition, FieldDefinitionInterface $field_definition, array $settings, array $third_party_settings, protected AccountInterface $currentUser, protected EntityTypeManagerInterface $entityTypeManager, protected ModerationInformation $moderationInformation, protected StateTransitionValidationInterface $validator) {
+  public function __construct(
+    $plugin_id,
+    $plugin_definition,
+    FieldDefinitionInterface $field_definition,
+    array $settings,
+    array $third_party_settings,
+    protected AccountInterface $currentUser,
+    protected EntityTypeManagerInterface $entityTypeManager,
+    protected ModerationInformation $moderationInformation,
+    protected StateTransitionValidationInterface $validator,
+  ) {
     parent::__construct($plugin_id, $plugin_definition, $field_definition, $settings, $third_party_settings);
   }
 

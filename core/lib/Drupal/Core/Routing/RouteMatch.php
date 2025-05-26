@@ -38,7 +38,12 @@ class RouteMatch implements RouteMatchInterface {
    * @param array $raw_parameters
    *   The raw $parameters array.
    */
-  public function __construct(protected $routeName, protected Route $route, array $parameters = [], array $raw_parameters = []) {
+  public function __construct(
+    protected $routeName,
+    protected Route $route,
+    array $parameters = [],
+    array $raw_parameters = [],
+  ) {
     // Pre-filter parameters.
     $route_params = $this->getParameterNames();
     $parameters = array_intersect_key($parameters, $route_params);

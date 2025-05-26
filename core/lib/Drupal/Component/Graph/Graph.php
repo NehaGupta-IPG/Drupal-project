@@ -36,8 +36,9 @@ class Graph {
    *   connected to it; the values in this array can be simply TRUE or may
    *   contain other data.
    */
-  public function __construct(protected $graph) {
-  }
+  public function __construct(
+    protected $graph,
+  ) {}
 
   /**
    * Performs a depth-first search and sort on the directed acyclic graph.

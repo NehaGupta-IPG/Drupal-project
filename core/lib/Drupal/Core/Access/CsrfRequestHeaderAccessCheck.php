@@ -25,8 +25,10 @@ class CsrfRequestHeaderAccessCheck implements AccessCheckInterface {
    * @param \Drupal\Core\Access\CsrfTokenGenerator $csrfToken
    *   The token generator.
    */
-  public function __construct(protected SessionConfigurationInterface $sessionConfiguration, protected CsrfTokenGenerator $csrfToken) {
-  }
+  public function __construct(
+    protected SessionConfigurationInterface $sessionConfiguration,
+    protected CsrfTokenGenerator $csrfToken,
+  ) {}
 
   /**
    * {@inheritdoc}

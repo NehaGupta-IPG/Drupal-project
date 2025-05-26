@@ -68,7 +68,11 @@ class ViewsData {
    * @param \Drupal\Core\Language\LanguageManagerInterface $languageManager
    *   The language manager.
    */
-  public function __construct(protected CacheBackendInterface $cacheBackend, protected ModuleHandlerInterface $moduleHandler, protected LanguageManagerInterface $languageManager) {
+  public function __construct(
+    protected CacheBackendInterface $cacheBackend,
+    protected ModuleHandlerInterface $moduleHandler,
+    protected LanguageManagerInterface $languageManager,
+  ) {
     $this->langcode = $this->languageManager->getCurrentLanguage()->getId();
   }
 

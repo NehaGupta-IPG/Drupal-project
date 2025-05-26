@@ -18,8 +18,9 @@ class MockMatcher implements RequestMatcherInterface {
    * @param \Closure $matcher
    *   An anonymous function that will be used for the matchRequest() method.
    */
-  public function __construct(protected \Closure $matcher) {
-  }
+  public function __construct(
+    protected \Closure $matcher,
+  ) {}
 
   /**
    * {@inheritdoc}

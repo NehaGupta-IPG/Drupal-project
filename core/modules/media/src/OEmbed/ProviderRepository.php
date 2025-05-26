@@ -52,7 +52,14 @@ class ProviderRepository implements ProviderRepositoryInterface {
    * @param int $maxAge
    *   (optional) How long the cache data should be kept. Defaults to a week.
    */
-  public function __construct(protected ClientInterface $httpClient, ConfigFactoryInterface $config_factory, protected TimeInterface $time, KeyValueFactoryInterface $key_value_factory, LoggerChannelFactoryInterface $logger_factory, protected int $maxAge = 604800) {
+  public function __construct(
+    protected ClientInterface $httpClient,
+    ConfigFactoryInterface $config_factory,
+    protected TimeInterface $time,
+    KeyValueFactoryInterface $key_value_factory,
+    LoggerChannelFactoryInterface $logger_factory,
+    protected int $maxAge = 604800,
+  ) {
     $this->providersUrl = $config_factory->get('media.settings')->get('oembed_providers_url');
     $this->keyValue = $key_value_factory->get('media');
     $this->logger = $logger_factory->get('media');

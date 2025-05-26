@@ -61,7 +61,15 @@ class EntityTypeManager extends DefaultPluginManager implements EntityTypeManage
    * @param \Symfony\Component\DependencyInjection\ContainerInterface $container
    *   The service container.
    */
-  public function __construct(\Traversable $namespaces, ModuleHandlerInterface $module_handler, CacheBackendInterface $cache, protected TranslationInterface $stringTranslation, protected ClassResolverInterface $classResolver, protected EntityLastInstalledSchemaRepositoryInterface $entityLastInstalledSchemaRepository, protected ContainerInterface $container) {
+  public function __construct(
+    \Traversable $namespaces,
+    ModuleHandlerInterface $module_handler,
+    CacheBackendInterface $cache,
+    protected TranslationInterface $stringTranslation,
+    protected ClassResolverInterface $classResolver,
+    protected EntityLastInstalledSchemaRepositoryInterface $entityLastInstalledSchemaRepository,
+    protected ContainerInterface $container,
+  ) {
     parent::__construct('Entity', $namespaces, $module_handler, EntityInterface::class);
 
     $this->setCacheBackend($cache, 'entity_type', ['entity_types']);

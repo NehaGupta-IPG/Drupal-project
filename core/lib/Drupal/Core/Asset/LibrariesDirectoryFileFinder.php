@@ -21,8 +21,12 @@ class LibrariesDirectoryFileFinder {
    * @param string $installProfile
    *   The install profile.
    */
-  public function __construct(protected $root, protected $sitePath, protected ProfileExtensionList $profileExtensionList, protected $installProfile) {
-  }
+  public function __construct(
+    protected $root,
+    protected $sitePath,
+    protected ProfileExtensionList $profileExtensionList,
+    protected $installProfile,
+  ) {}
 
   /**
    * Finds files that are located in the supported 'libraries' directories.

@@ -84,7 +84,21 @@ class OEmbedFormatter extends FormatterBase {
    * @param \Drupal\media\IFrameUrlHelper $iFrameUrlHelper
    *   The iFrame URL helper service.
    */
-  public function __construct($plugin_id, $plugin_definition, FieldDefinitionInterface $field_definition, array $settings, $label, $view_mode, array $third_party_settings, protected MessengerInterface $messenger, protected ResourceFetcherInterface $resourceFetcher, protected UrlResolverInterface $urlResolver, LoggerChannelFactoryInterface $logger_factory, ConfigFactoryInterface $config_factory, protected IFrameUrlHelper $iFrameUrlHelper) {
+  public function __construct(
+    $plugin_id,
+    $plugin_definition,
+    FieldDefinitionInterface $field_definition,
+    array $settings,
+    $label,
+    $view_mode,
+    array $third_party_settings,
+    protected MessengerInterface $messenger,
+    protected ResourceFetcherInterface $resourceFetcher,
+    protected UrlResolverInterface $urlResolver,
+    LoggerChannelFactoryInterface $logger_factory,
+    ConfigFactoryInterface $config_factory,
+    protected IFrameUrlHelper $iFrameUrlHelper,
+  ) {
     parent::__construct($plugin_id, $plugin_definition, $field_definition, $settings, $label, $view_mode, $third_party_settings);
     $this->logger = $logger_factory->get('media');
     $this->config = $config_factory->get('media.settings');

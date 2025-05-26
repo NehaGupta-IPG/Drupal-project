@@ -29,8 +29,9 @@ class PagerTestController extends ControllerBase implements TrustedCallbackInter
    * @param \Drupal\Core\Pager\PagerParametersInterface $pagerParams
    *   The pager parameters.
    */
-  public function __construct(protected PagerParametersInterface $pagerParams) {
-  }
+  public function __construct(
+    protected PagerParametersInterface $pagerParams,
+  ) {}
 
   /**
    * Builds a render array for a multi-page test table.

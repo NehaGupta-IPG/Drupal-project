@@ -35,7 +35,14 @@ class CustomPageExceptionHtmlSubscriber extends DefaultExceptionHtmlSubscriber {
    * @param \Drupal\Core\Access\AccessManagerInterface $accessManager
    *   The access manager.
    */
-  public function __construct(protected ConfigFactoryInterface $configFactory, HttpKernelInterface $http_kernel, LoggerInterface $logger, RedirectDestinationInterface $redirect_destination, UrlMatcherInterface $access_unaware_router, protected AccessManagerInterface $accessManager) {
+  public function __construct(
+    protected ConfigFactoryInterface $configFactory,
+    HttpKernelInterface $http_kernel,
+    LoggerInterface $logger,
+    RedirectDestinationInterface $redirect_destination,
+    UrlMatcherInterface $access_unaware_router,
+    protected AccessManagerInterface $accessManager,
+  ) {
     parent::__construct($http_kernel, $logger, $redirect_destination, $access_unaware_router);
   }
 

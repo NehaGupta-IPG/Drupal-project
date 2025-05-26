@@ -17,8 +17,9 @@ class ThemeAccessCheck implements AccessInterface {
    * @param \Drupal\Core\Extension\ThemeHandlerInterface $themeHandler
    *   The theme handler.
    */
-  public function __construct(protected ThemeHandlerInterface $themeHandler) {
-  }
+  public function __construct(
+    protected ThemeHandlerInterface $themeHandler,
+  ) {}
 
   /**
    * Checks access to the theme for routing.

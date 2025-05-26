@@ -37,7 +37,10 @@ class SysLog implements LoggerInterface {
    * @param \Drupal\Core\Logger\LogMessageParserInterface $parser
    *   The parser to use when extracting message variables.
    */
-  public function __construct(ConfigFactoryInterface $config_factory, protected LogMessageParserInterface $parser) {
+  public function __construct(
+    ConfigFactoryInterface $config_factory,
+    protected LogMessageParserInterface $parser,
+  ) {
     $this->config = $config_factory->get('syslog.settings');
   }
 

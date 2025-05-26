@@ -72,7 +72,14 @@ class MenuLinkContent extends MenuLinkBase implements ContainerFactoryPluginInte
    * @param \Drupal\Core\Entity\EntityRepositoryInterface $entityRepository
    *   The entity repository.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, protected EntityTypeManagerInterface $entityTypeManager, protected LanguageManagerInterface $languageManager, protected EntityRepositoryInterface $entityRepository) {
+  public function __construct(
+    array $configuration,
+    $plugin_id,
+    $plugin_definition,
+    protected EntityTypeManagerInterface $entityTypeManager,
+    protected LanguageManagerInterface $languageManager,
+    protected EntityRepositoryInterface $entityRepository,
+  ) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
 
     if (!empty($this->pluginDefinition['metadata']['entity_id'])) {

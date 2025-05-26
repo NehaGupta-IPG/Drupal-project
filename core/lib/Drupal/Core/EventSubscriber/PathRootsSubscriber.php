@@ -28,8 +28,9 @@ class PathRootsSubscriber implements EventSubscriberInterface {
    * @param \Drupal\Core\State\StateInterface $state
    *   The state key value store.
    */
-  public function __construct(protected StateInterface $state) {
-  }
+  public function __construct(
+    protected StateInterface $state,
+  ) {}
 
   /**
    * Collects all path roots.

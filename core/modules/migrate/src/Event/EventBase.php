@@ -19,8 +19,10 @@ class EventBase extends Event {
    * @param \Drupal\migrate\MigrateMessageInterface $message
    *   The Migrate message service.
    */
-  public function __construct(protected MigrationInterface $migration, protected MigrateMessageInterface $message) {
-  }
+  public function __construct(
+    protected MigrationInterface $migration,
+    protected MigrateMessageInterface $message,
+  ) {}
 
   /**
    * Gets the migration.

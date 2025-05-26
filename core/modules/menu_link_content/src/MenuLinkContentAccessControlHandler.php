@@ -24,7 +24,10 @@ class MenuLinkContentAccessControlHandler extends EntityAccessControlHandler imp
    * @param \Drupal\Core\Access\AccessManagerInterface $accessManager
    *   The access manager to check routes by name.
    */
-  public function __construct(EntityTypeInterface $entity_type, protected AccessManagerInterface $accessManager) {
+  public function __construct(
+    EntityTypeInterface $entity_type,
+    protected AccessManagerInterface $accessManager,
+  ) {
     parent::__construct($entity_type);
   }
 

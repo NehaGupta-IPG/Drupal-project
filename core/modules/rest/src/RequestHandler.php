@@ -29,8 +29,9 @@ class RequestHandler implements ContainerInjectionInterface {
    * @param \Symfony\Component\Serializer\SerializerInterface|\Symfony\Component\Serializer\Encoder\DecoderInterface $serializer
    *   The serializer.
    */
-  public function __construct(protected SerializerInterface $serializer) {
-  }
+  public function __construct(
+    protected SerializerInterface $serializer,
+  ) {}
 
   /**
    * {@inheritdoc}

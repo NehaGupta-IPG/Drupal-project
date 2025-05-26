@@ -41,7 +41,10 @@ class AuthenticationSubscriber implements EventSubscriberInterface {
    * @param \Drupal\Core\Session\AccountProxyInterface $accountProxy
    *   Account proxy.
    */
-  public function __construct(protected AuthenticationProviderInterface $authenticationProvider, protected AccountProxyInterface $accountProxy) {
+  public function __construct(
+    protected AuthenticationProviderInterface $authenticationProvider,
+    protected AccountProxyInterface $accountProxy,
+  ) {
     $this->filter = ($this->authenticationProvider instanceof AuthenticationProviderFilterInterface) ? $this->authenticationProvider : NULL;
     $this->challengeProvider = ($this->authenticationProvider instanceof AuthenticationProviderChallengeInterface) ? $this->authenticationProvider : NULL;
   }

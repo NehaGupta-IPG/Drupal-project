@@ -23,7 +23,12 @@ class BrokenPostRequestException extends BadRequestHttpException {
    * @param int $code
    *   The internal exception code.
    */
-  public function __construct(protected int $size, string $message = '', ?\Throwable $previous = NULL, int $code = 0) {
+  public function __construct(
+    protected int $size,
+    string $message = '',
+    ?\Throwable $previous = NULL,
+    int $code = 0,
+  ) {
     parent::__construct($message, $previous, $code);
   }
 

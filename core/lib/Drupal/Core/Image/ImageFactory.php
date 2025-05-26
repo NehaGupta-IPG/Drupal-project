@@ -22,7 +22,9 @@ class ImageFactory {
    * @param \Drupal\Core\ImageToolkit\ImageToolkitManager $toolkitManager
    *   The image toolkit plugin manager.
    */
-  public function __construct(protected ImageToolkitManager $toolkitManager) {
+  public function __construct(
+    protected ImageToolkitManager $toolkitManager,
+  ) {
     $this->toolkitId = $this->toolkitManager->getDefaultToolkitId();
   }
 

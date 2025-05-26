@@ -45,8 +45,10 @@ class AnnounceCommand implements CommandInterface, CommandWithAttachedAssetsInte
    *   client and therefore the JavaScript Drupal.announce() default of 'polite'
    *   will be used for the message.
    */
-  public function __construct(protected $text, protected $priority = NULL) {
-  }
+  public function __construct(
+    protected $text,
+    protected $priority = NULL,
+  ) {}
 
   /**
    * {@inheritdoc}

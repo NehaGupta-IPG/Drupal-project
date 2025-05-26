@@ -18,8 +18,9 @@ class AliasRepository implements AliasRepositoryInterface {
    * @param \Drupal\Core\Database\Connection $connection
    *   A database connection for reading and writing path aliases.
    */
-  public function __construct(protected Connection $connection) {
-  }
+  public function __construct(
+    protected Connection $connection,
+  ) {}
 
   /**
    * {@inheritdoc}

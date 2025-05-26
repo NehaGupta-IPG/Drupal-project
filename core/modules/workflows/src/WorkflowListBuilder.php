@@ -36,7 +36,11 @@ class WorkflowListBuilder extends ConfigEntityListBuilder {
    * @param \Drupal\Component\Plugin\PluginManagerInterface $workflowTypeManager
    *   The workflow type plugin manager.
    */
-  public function __construct(EntityTypeInterface $entity_type, EntityStorageInterface $storage, protected PluginManagerInterface $workflowTypeManager) {
+  public function __construct(
+    EntityTypeInterface $entity_type,
+    EntityStorageInterface $storage,
+    protected PluginManagerInterface $workflowTypeManager,
+  ) {
     parent::__construct($entity_type, $storage);
   }
 

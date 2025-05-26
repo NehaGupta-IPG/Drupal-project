@@ -20,8 +20,9 @@ class LibraryDependencyResolver implements LibraryDependencyResolverInterface {
    * @param \Drupal\Core\Asset\LibraryDiscoveryInterface $libraryDiscovery
    *   The library discovery service.
    */
-  public function __construct(protected LibraryDiscoveryInterface $libraryDiscovery) {
-  }
+  public function __construct(
+    protected LibraryDiscoveryInterface $libraryDiscovery,
+  ) {}
 
   /**
    * {@inheritdoc}

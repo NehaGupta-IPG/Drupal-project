@@ -46,7 +46,14 @@ class TaxonomyIndexTid extends ManyToOne {
    * @param \Drupal\Core\Session\AccountInterface $currentUser
    *   The current user.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, protected VocabularyStorageInterface $vocabularyStorage, protected TermStorageInterface $termStorage, protected AccountInterface $currentUser) {
+  public function __construct(
+    array $configuration,
+    $plugin_id,
+    $plugin_definition,
+    protected VocabularyStorageInterface $vocabularyStorage,
+    protected TermStorageInterface $termStorage,
+    protected AccountInterface $currentUser,
+  ) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
   }
 

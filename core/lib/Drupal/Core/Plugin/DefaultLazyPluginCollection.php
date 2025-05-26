@@ -42,7 +42,10 @@ class DefaultLazyPluginCollection extends LazyPluginCollection {
    *   (optional) An associative array containing the initial configuration for
    *   each plugin in the collection, keyed by plugin instance ID.
    */
-  public function __construct(protected PluginManagerInterface $manager, protected array $configurations = []) {
+  public function __construct(
+    protected PluginManagerInterface $manager,
+    protected array $configurations = [],
+  ) {
     if (!empty($this->configurations)) {
       $instance_ids = array_keys($this->configurations);
       $this->instanceIds = array_combine($instance_ids, $instance_ids);

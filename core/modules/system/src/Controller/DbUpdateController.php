@@ -46,8 +46,17 @@ class DbUpdateController extends ControllerBase {
    * @param \Drupal\Core\Asset\AssetQueryStringInterface $assetQueryString
    *   The asset query string.
    */
-  public function __construct(protected $root, protected KeyValueExpirableFactoryInterface $keyValueExpirableFactory, protected CacheBackendInterface $cache, protected StateInterface $state, protected ModuleHandlerInterface $moduleHandler, protected AccountInterface $account, protected BareHtmlPageRendererInterface $bareHtmlPageRenderer, protected UpdateRegistry $postUpdateRegistry, protected AssetQueryStringInterface $assetQueryString) {
-  }
+  public function __construct(
+    protected $root,
+    protected KeyValueExpirableFactoryInterface $keyValueExpirableFactory,
+    protected CacheBackendInterface $cache,
+    protected StateInterface $state,
+    protected ModuleHandlerInterface $moduleHandler,
+    protected AccountInterface $account,
+    protected BareHtmlPageRendererInterface $bareHtmlPageRenderer,
+    protected UpdateRegistry $postUpdateRegistry,
+    protected AssetQueryStringInterface $assetQueryString,
+  ) {}
 
   /**
    * {@inheritdoc}

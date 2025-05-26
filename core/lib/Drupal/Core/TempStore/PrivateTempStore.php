@@ -47,8 +47,13 @@ class PrivateTempStore {
    * @param int $expire
    *   The time to live for items, in seconds.
    */
-  public function __construct(protected KeyValueStoreExpirableInterface $storage, protected LockBackendInterface $lockBackend, protected AccountProxyInterface $currentUser, protected RequestStack $requestStack, protected $expire = 604800) {
-  }
+  public function __construct(
+    protected KeyValueStoreExpirableInterface $storage,
+    protected LockBackendInterface $lockBackend,
+    protected AccountProxyInterface $currentUser,
+    protected RequestStack $requestStack,
+    protected $expire = 604800,
+  ) {}
 
   /**
    * Retrieves a value from this PrivateTempStore for a given key.

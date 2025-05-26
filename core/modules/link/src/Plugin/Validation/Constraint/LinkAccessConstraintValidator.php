@@ -19,8 +19,9 @@ class LinkAccessConstraintValidator extends ConstraintValidator implements Conta
    * @param \Drupal\Core\Session\AccountProxyInterface $current_user
    *   The current user account.
    */
-  public function __construct(protected AccountProxyInterface $current_user) {
-  }
+  public function __construct(
+    protected AccountProxyInterface $current_user,
+  ) {}
 
   /**
    * {@inheritdoc}

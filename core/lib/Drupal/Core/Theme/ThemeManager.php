@@ -50,8 +50,13 @@ class ThemeManager implements ThemeManagerInterface {
    * @param \Drupal\Core\Utility\CallableResolver $callableResolver
    *   The callable resolver.
    */
-  public function __construct(protected $root, protected ThemeNegotiatorInterface $themeNegotiator, protected ThemeInitializationInterface $themeInitialization, protected ModuleHandlerInterface $moduleHandler, protected CallableResolver $callableResolver) {
-  }
+  public function __construct(
+    protected $root,
+    protected ThemeNegotiatorInterface $themeNegotiator,
+    protected ThemeInitializationInterface $themeInitialization,
+    protected ModuleHandlerInterface $moduleHandler,
+    protected CallableResolver $callableResolver,
+  ) {}
 
   /**
    * Sets the theme registry.

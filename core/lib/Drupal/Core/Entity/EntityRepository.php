@@ -24,8 +24,11 @@ class EntityRepository implements EntityRepositoryInterface {
    * @param \Drupal\Core\Plugin\Context\ContextRepositoryInterface $contextRepository
    *   The context repository service.
    */
-  public function __construct(protected EntityTypeManagerInterface $entityTypeManager, protected LanguageManagerInterface $languageManager, protected ContextRepositoryInterface $contextRepository) {
-  }
+  public function __construct(
+    protected EntityTypeManagerInterface $entityTypeManager,
+    protected LanguageManagerInterface $languageManager,
+    protected ContextRepositoryInterface $contextRepository,
+  ) {}
 
   /**
    * {@inheritdoc}

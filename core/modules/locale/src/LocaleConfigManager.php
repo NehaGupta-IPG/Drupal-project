@@ -67,8 +67,15 @@ class LocaleConfigManager {
    * @param \Drupal\Core\Config\ConfigManagerInterface $configManager
    *   The configuration manager.
    */
-  public function __construct(protected StorageInterface $configStorage, protected StringStorageInterface $localeStorage, protected ConfigFactoryInterface $configFactory, protected TypedConfigManagerInterface $typedConfigManager, protected ConfigurableLanguageManagerInterface $languageManager, protected LocaleDefaultConfigStorage $defaultConfigStorage, protected ConfigManagerInterface $configManager) {
-  }
+  public function __construct(
+    protected StorageInterface $configStorage,
+    protected StringStorageInterface $localeStorage,
+    protected ConfigFactoryInterface $configFactory,
+    protected TypedConfigManagerInterface $typedConfigManager,
+    protected ConfigurableLanguageManagerInterface $languageManager,
+    protected LocaleDefaultConfigStorage $defaultConfigStorage,
+    protected ConfigManagerInterface $configManager,
+  ) {}
 
   /**
    * Gets array of translated strings for Locale translatable configuration.

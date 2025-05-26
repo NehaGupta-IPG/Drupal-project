@@ -48,8 +48,10 @@ class LocaleConfigSubscriber implements EventSubscriberInterface {
    * @param \Drupal\locale\LocaleConfigManager $localeConfigManager
    *   The typed configuration manager.
    */
-  public function __construct(protected ConfigFactoryInterface $configFactory, protected LocaleConfigManager $localeConfigManager) {
-  }
+  public function __construct(
+    protected ConfigFactoryInterface $configFactory,
+    protected LocaleConfigManager $localeConfigManager,
+  ) {}
 
   /**
    * {@inheritdoc}

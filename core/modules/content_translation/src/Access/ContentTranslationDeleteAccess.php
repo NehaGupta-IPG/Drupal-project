@@ -32,8 +32,10 @@ class ContentTranslationDeleteAccess implements AccessInterface {
    * @param \Drupal\content_translation\ContentTranslationManagerInterface $contentTranslationManager
    *   The content translation manager.
    */
-  public function __construct(protected EntityTypeManagerInterface $entityTypeManager, protected ContentTranslationManagerInterface $contentTranslationManager) {
-  }
+  public function __construct(
+    protected EntityTypeManagerInterface $entityTypeManager,
+    protected ContentTranslationManagerInterface $contentTranslationManager,
+  ) {}
 
   /**
    * Checks access to translation deletion for the specified route match.

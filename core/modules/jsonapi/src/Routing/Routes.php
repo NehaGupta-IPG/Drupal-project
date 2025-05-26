@@ -71,7 +71,11 @@ class Routes implements ContainerInjectionInterface {
    * @param string $jsonapi_base_path
    *   The JSON:API base path.
    */
-  public function __construct(protected ResourceTypeRepositoryInterface $resourceTypeRepository, array $authentication_providers, $jsonapi_base_path) {
+  public function __construct(
+    protected ResourceTypeRepositoryInterface $resourceTypeRepository,
+    array $authentication_providers,
+    $jsonapi_base_path,
+  ) {
     $this->providerIds = array_keys($authentication_providers);
     assert(is_string($jsonapi_base_path));
     assert(

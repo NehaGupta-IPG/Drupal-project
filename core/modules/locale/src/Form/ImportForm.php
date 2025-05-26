@@ -42,8 +42,10 @@ class ImportForm extends FormBase {
    * @param \Drupal\language\ConfigurableLanguageManagerInterface $languageManager
    *   The configurable language manager.
    */
-  public function __construct(protected ModuleHandlerInterface $moduleHandler, protected ConfigurableLanguageManagerInterface $languageManager) {
-  }
+  public function __construct(
+    protected ModuleHandlerInterface $moduleHandler,
+    protected ConfigurableLanguageManagerInterface $languageManager,
+  ) {}
 
   /**
    * {@inheritdoc}

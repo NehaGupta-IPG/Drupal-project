@@ -45,8 +45,14 @@ class FieldBlockDeriver extends DeriverBase implements ContainerDeriverInterface
    * @param \Drupal\Core\Extension\ModuleHandlerInterface $moduleHandler
    *   The module handler.
    */
-  public function __construct(protected EntityTypeRepositoryInterface $entityTypeRepository, protected EntityFieldManagerInterface $entityFieldManager, protected FieldTypePluginManagerInterface $fieldTypeManager, protected FormatterPluginManager $formatterManager, protected ConfigEntityStorageInterface $entityViewDisplayStorage, protected ModuleHandlerInterface $moduleHandler) {
-  }
+  public function __construct(
+    protected EntityTypeRepositoryInterface $entityTypeRepository,
+    protected EntityFieldManagerInterface $entityFieldManager,
+    protected FieldTypePluginManagerInterface $fieldTypeManager,
+    protected FormatterPluginManager $formatterManager,
+    protected ConfigEntityStorageInterface $entityViewDisplayStorage,
+    protected ModuleHandlerInterface $moduleHandler,
+  ) {}
 
   /**
    * {@inheritdoc}

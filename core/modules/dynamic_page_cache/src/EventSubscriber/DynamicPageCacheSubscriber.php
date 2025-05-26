@@ -77,7 +77,13 @@ class DynamicPageCacheSubscriber implements EventSubscriberInterface {
    * @param array $rendererConfig
    *   The renderer configuration array.
    */
-  public function __construct(protected RequestPolicyInterface $requestPolicy, protected ResponsePolicyInterface $responsePolicy, protected VariationCacheInterface $cache, protected CacheContextsManager $cacheContextsManager, protected array $rendererConfig) {
+  public function __construct(
+    protected RequestPolicyInterface $requestPolicy,
+    protected ResponsePolicyInterface $responsePolicy,
+    protected VariationCacheInterface $cache,
+    protected CacheContextsManager $cacheContextsManager,
+    protected array $rendererConfig,
+  ) {
     $this->requestPolicyResults = new \SplObjectStorage();
   }
 

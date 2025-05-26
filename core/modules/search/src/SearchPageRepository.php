@@ -25,7 +25,10 @@ class SearchPageRepository implements SearchPageRepositoryInterface {
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager.
    */
-  public function __construct(protected ConfigFactoryInterface $configFactory, EntityTypeManagerInterface $entity_type_manager) {
+  public function __construct(
+    protected ConfigFactoryInterface $configFactory,
+    EntityTypeManagerInterface $entity_type_manager,
+  ) {
     $this->storage = $entity_type_manager->getStorage('search_page');
   }
 

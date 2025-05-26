@@ -28,7 +28,13 @@ class ExtensionInstallStorage extends InstallStorage {
    * @param string $installProfile
    *   The current installation profile.
    */
-  public function __construct(protected StorageInterface $configStorage, $directory, $collection, protected $includeProfile, protected $installProfile) {
+  public function __construct(
+    protected StorageInterface $configStorage,
+    $directory,
+    $collection,
+    protected $includeProfile,
+    protected $installProfile,
+  ) {
     parent::__construct($directory, $collection);
   }
 

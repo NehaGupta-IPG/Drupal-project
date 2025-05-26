@@ -48,7 +48,14 @@ class EntityPermissionsForm extends UserPermissionsForm {
    * @param \Drupal\Core\Extension\ModuleExtensionList|null $module_extension_list
    *   The module extension list.
    */
-  public function __construct(PermissionHandlerInterface $permission_handler, RoleStorageInterface $role_storage, ModuleHandlerInterface $module_handler, protected ConfigManagerInterface $configManager, protected EntityTypeManagerInterface $entityTypeManager, ?ModuleExtensionList $module_extension_list = NULL) {
+  public function __construct(
+    PermissionHandlerInterface $permission_handler,
+    RoleStorageInterface $role_storage,
+    ModuleHandlerInterface $module_handler,
+    protected ConfigManagerInterface $configManager,
+    protected EntityTypeManagerInterface $entityTypeManager,
+    ?ModuleExtensionList $module_extension_list = NULL,
+  ) {
     if ($module_extension_list === NULL) {
       @trigger_error('Calling ' . __METHOD__ . '() without the $module_extension_list argument is deprecated in drupal:10.3.0 and will be required in drupal:12.0.0. See https://www.drupal.org/node/3310017', E_USER_DEPRECATED);
       $module_extension_list = \Drupal::service('extension.list.module');

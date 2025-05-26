@@ -84,7 +84,17 @@ class ThemeExtensionList extends ExtensionList {
    * @param string $install_profile
    *   The install profile used by the site.
    */
-  public function __construct($root, $type, CacheBackendInterface $cache, InfoParserInterface $info_parser, ModuleHandlerInterface $module_handler, StateInterface $state, protected ConfigFactoryInterface $configFactory, protected ThemeEngineExtensionList $engineList, $install_profile) {
+  public function __construct(
+    $root,
+    $type,
+    CacheBackendInterface $cache,
+    InfoParserInterface $info_parser,
+    ModuleHandlerInterface $module_handler,
+    StateInterface $state,
+    protected ConfigFactoryInterface $configFactory,
+    protected ThemeEngineExtensionList $engineList,
+    $install_profile,
+  ) {
     parent::__construct($root, $type, $cache, $info_parser, $module_handler, $state, $install_profile);
   }
 

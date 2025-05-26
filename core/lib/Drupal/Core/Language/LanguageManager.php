@@ -36,8 +36,9 @@ class LanguageManager implements LanguageManagerInterface {
    * @param \Drupal\Core\Language\LanguageDefault $defaultLanguage
    *   The default language.
    */
-  public function __construct(protected LanguageDefault $defaultLanguage) {
-  }
+  public function __construct(
+    protected LanguageDefault $defaultLanguage,
+  ) {}
 
   /**
    * {@inheritdoc}

@@ -101,7 +101,20 @@ class CommentDefaultFormatter extends FormatterBase {
    * @param \Drupal\Core\Entity\EntityDisplayRepositoryInterface $entityDisplayRepository
    *   The entity display repository.
    */
-  public function __construct($plugin_id, $plugin_definition, FieldDefinitionInterface $field_definition, array $settings, $label, $view_mode, array $third_party_settings, protected AccountInterface $currentUser, EntityTypeManagerInterface $entity_type_manager, protected EntityFormBuilderInterface $entityFormBuilder, protected RouteMatchInterface $routeMatch, protected EntityDisplayRepositoryInterface $entityDisplayRepository) {
+  public function __construct(
+    $plugin_id,
+    $plugin_definition,
+    FieldDefinitionInterface $field_definition,
+    array $settings,
+    $label,
+    $view_mode,
+    array $third_party_settings,
+    protected AccountInterface $currentUser,
+    EntityTypeManagerInterface $entity_type_manager,
+    protected EntityFormBuilderInterface $entityFormBuilder,
+    protected RouteMatchInterface $routeMatch,
+    protected EntityDisplayRepositoryInterface $entityDisplayRepository,
+  ) {
     parent::__construct($plugin_id, $plugin_definition, $field_definition, $settings, $label, $view_mode, $third_party_settings);
     $this->viewBuilder = $entity_type_manager->getViewBuilder('comment');
     $this->storage = $entity_type_manager->getStorage('comment');

@@ -88,7 +88,15 @@ class FieldBlock extends BlockBase implements ContextAwarePluginInterface, Conta
    * @param \Psr\Log\LoggerInterface $logger
    *   The logger.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, protected EntityFieldManagerInterface $entityFieldManager, protected FormatterPluginManager $formatterManager, protected ModuleHandlerInterface $moduleHandler, protected LoggerInterface $logger) {
+  public function __construct(
+    array $configuration,
+    $plugin_id,
+    $plugin_definition,
+    protected EntityFieldManagerInterface $entityFieldManager,
+    protected FormatterPluginManager $formatterManager,
+    protected ModuleHandlerInterface $moduleHandler,
+    protected LoggerInterface $logger,
+  ) {
     // Get the entity type and field name from the plugin ID.
     [, $entity_type_id, $bundle, $field_name] = explode(static::DERIVATIVE_SEPARATOR, $plugin_id, 4);
     $this->entityTypeId = $entity_type_id;

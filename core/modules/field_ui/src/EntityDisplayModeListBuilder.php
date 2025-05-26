@@ -28,7 +28,11 @@ class EntityDisplayModeListBuilder extends ConfigEntityListBuilder {
    * @param \Drupal\Core\Entity\EntityTypeInterface[] $entityTypes
    *   List of all entity types.
    */
-  public function __construct(EntityTypeInterface $entity_type, EntityStorageInterface $storage, protected array $entityTypes) {
+  public function __construct(
+    EntityTypeInterface $entity_type,
+    EntityStorageInterface $storage,
+    protected array $entityTypes,
+  ) {
     parent::__construct($entity_type, $storage);
 
     // Override the default limit (50) in order to display all view modes.

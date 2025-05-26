@@ -118,7 +118,15 @@ class DefaultPluginManager extends PluginManagerBase implements PluginManagerInt
    * 'Drupal\Component\Plugin\Attribute\Plugin' once annotations are no longer
    * supported.
    */
-  public function __construct(protected $subdir, protected \Traversable $namespaces, protected ModuleHandlerInterface $moduleHandler, protected $pluginInterface = NULL, ?string $plugin_definition_attribute_name = NULL, string|array|null $plugin_definition_annotation_name = NULL, array $additional_annotation_namespaces = []) {
+  public function __construct(
+    protected $subdir,
+    protected \Traversable $namespaces,
+    protected ModuleHandlerInterface $moduleHandler,
+    protected $pluginInterface = NULL,
+    ?string $plugin_definition_attribute_name = NULL,
+    string|array|null $plugin_definition_annotation_name = NULL,
+    array $additional_annotation_namespaces = [],
+  ) {
     if (is_subclass_of($plugin_definition_attribute_name, AttributeInterface::class)) {
       $this->pluginDefinitionAttributeName = $plugin_definition_attribute_name;
       $this->pluginDefinitionAnnotationName = $plugin_definition_annotation_name;

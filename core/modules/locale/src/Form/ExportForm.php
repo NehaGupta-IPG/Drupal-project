@@ -27,8 +27,10 @@ class ExportForm extends FormBase {
    * @param \Drupal\Core\File\FileSystemInterface $fileSystem
    *   The file system service.
    */
-  public function __construct(protected LanguageManagerInterface $languageManager, protected FileSystemInterface $fileSystem) {
-  }
+  public function __construct(
+    protected LanguageManagerInterface $languageManager,
+    protected FileSystemInterface $fileSystem,
+  ) {}
 
   /**
    * {@inheritdoc}

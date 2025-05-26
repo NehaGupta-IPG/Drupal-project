@@ -62,7 +62,12 @@ class DeleteMultipleForm extends ConfirmFormBase implements BaseFormIdInterface,
    * @param \Drupal\Core\Messenger\MessengerInterface $messenger
    *   The messenger service.
    */
-  public function __construct(protected AccountInterface $currentUser, protected EntityTypeManagerInterface $entityTypeManager, PrivateTempStoreFactory $temp_store_factory, protected MessengerInterface $messenger) {
+  public function __construct(
+    protected AccountInterface $currentUser,
+    protected EntityTypeManagerInterface $entityTypeManager,
+    PrivateTempStoreFactory $temp_store_factory,
+    protected MessengerInterface $messenger,
+  ) {
     $this->tempStore = $temp_store_factory->get('entity_delete_multiple_confirm');
   }
 

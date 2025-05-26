@@ -30,7 +30,12 @@ class DatabaseStorage extends StorageBase {
    * @param string $table
    *   The name of the SQL table to use, defaults to key_value.
    */
-  public function __construct($collection, protected SerializationInterface $serializer, protected Connection $connection, protected $table = 'key_value') {
+  public function __construct(
+    $collection,
+    protected SerializationInterface $serializer,
+    protected Connection $connection,
+    protected $table = 'key_value',
+  ) {
     parent::__construct($collection);
   }
 

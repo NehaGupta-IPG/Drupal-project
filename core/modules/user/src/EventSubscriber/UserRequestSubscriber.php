@@ -25,8 +25,11 @@ class UserRequestSubscriber implements EventSubscriberInterface {
    * @param \Drupal\Component\Datetime\TimeInterface $time
    *   The time service.
    */
-  public function __construct(protected AccountInterface $account, protected EntityTypeManagerInterface $entityTypeManager, protected TimeInterface $time) {
-  }
+  public function __construct(
+    protected AccountInterface $account,
+    protected EntityTypeManagerInterface $entityTypeManager,
+    protected TimeInterface $time,
+  ) {}
 
   /**
    * Updates the current user's last access time.

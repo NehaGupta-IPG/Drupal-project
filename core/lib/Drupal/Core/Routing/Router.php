@@ -55,7 +55,11 @@ class Router extends UrlMatcher implements RequestMatcherInterface, RouterInterf
    * @param \Symfony\Component\Routing\Generator\UrlGeneratorInterface $urlGenerator
    *   The URL generator.
    */
-  public function __construct(protected RouteProviderInterface $routeProvider, CurrentPathStack $current_path, protected BaseUrlGeneratorInterface $urlGenerator) {
+  public function __construct(
+    protected RouteProviderInterface $routeProvider,
+    CurrentPathStack $current_path,
+    protected BaseUrlGeneratorInterface $urlGenerator,
+  ) {
     parent::__construct($current_path);
   }
 

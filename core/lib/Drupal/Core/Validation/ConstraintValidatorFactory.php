@@ -21,8 +21,9 @@ class ConstraintValidatorFactory extends BaseConstraintValidatorFactory {
    * @param \Drupal\Core\DependencyInjection\ClassResolverInterface $classResolver
    *   The class resolver.
    */
-  public function __construct(protected ClassResolverInterface $classResolver) {
-  }
+  public function __construct(
+    protected ClassResolverInterface $classResolver,
+  ) {}
 
   /**
    * {@inheritdoc}

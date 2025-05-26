@@ -30,7 +30,10 @@ class SearchController extends ControllerBase {
    * @param \Drupal\Core\Render\RendererInterface $renderer
    *   The renderer.
    */
-  public function __construct(protected SearchPageRepositoryInterface $searchPageRepository, protected RendererInterface $renderer) {
+  public function __construct(
+    protected SearchPageRepositoryInterface $searchPageRepository,
+    protected RendererInterface $renderer,
+  ) {
     $this->logger = $this->getLogger('search');
   }
 

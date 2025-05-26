@@ -37,8 +37,11 @@ class ChooseBlockController implements ContainerInjectionInterface {
    * @param \Drupal\Core\Session\AccountInterface $currentUser
    *   The current user.
    */
-  public function __construct(protected BlockManagerInterface $blockManager, protected EntityTypeManagerInterface $entityTypeManager, protected AccountInterface $currentUser) {
-  }
+  public function __construct(
+    protected BlockManagerInterface $blockManager,
+    protected EntityTypeManagerInterface $entityTypeManager,
+    protected AccountInterface $currentUser,
+  ) {}
 
   /**
    * {@inheritdoc}

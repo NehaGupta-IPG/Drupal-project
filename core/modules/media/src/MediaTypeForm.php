@@ -32,8 +32,11 @@ class MediaTypeForm extends EntityForm {
    * @param \Drupal\Core\Entity\EntityDisplayRepositoryInterface $entityDisplayRepository
    *   Entity display repository service.
    */
-  public function __construct(protected PluginManagerInterface $sourceManager, protected EntityFieldManagerInterface $entityFieldManager, protected EntityDisplayRepositoryInterface $entityDisplayRepository) {
-  }
+  public function __construct(
+    protected PluginManagerInterface $sourceManager,
+    protected EntityFieldManagerInterface $entityFieldManager,
+    protected EntityDisplayRepositoryInterface $entityDisplayRepository,
+  ) {}
 
   /**
    * {@inheritdoc}

@@ -21,7 +21,12 @@ class EnforcedResponseException extends \Exception {
    * @param \Throwable $previous
    *   (optional) The previous exception for nested exceptions.
    */
-  public function __construct(protected Response $response, $message = "", $code = 0, ?\Throwable $previous = NULL) {
+  public function __construct(
+    protected Response $response,
+    $message = "",
+    $code = 0,
+    ?\Throwable $previous = NULL,
+  ) {
     parent::__construct($message, $code, $previous);
   }
 

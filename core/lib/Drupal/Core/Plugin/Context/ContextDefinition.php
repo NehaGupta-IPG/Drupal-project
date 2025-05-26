@@ -59,7 +59,15 @@ class ContextDefinition implements ContextDefinitionInterface {
    *   An array of constraints keyed by the constraint name and a value of an
    *   array constraint options or a NULL.
    */
-  public function __construct(protected $dataType = 'any', protected $label = NULL, protected $isRequired = TRUE, protected $isMultiple = FALSE, protected $description = NULL, protected $defaultValue = NULL, array $constraints = []) {
+  public function __construct(
+    protected $dataType = 'any',
+    protected $label = NULL,
+    protected $isRequired = TRUE,
+    protected $isMultiple = FALSE,
+    protected $description = NULL,
+    protected $defaultValue = NULL,
+    array $constraints = [],
+  ) {
     foreach ($constraints as $constraint_name => $options) {
       $this->addConstraint($constraint_name, $options);
     }

@@ -113,7 +113,23 @@ class OEmbed extends MediaSourceBase implements OEmbedInterface {
    * @param \Drupal\Core\Utility\Token $token
    *   The token replacement service.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, EntityTypeManagerInterface $entity_type_manager, EntityFieldManagerInterface $entity_field_manager, ConfigFactoryInterface $config_factory, FieldTypePluginManagerInterface $field_type_manager, protected LoggerInterface $logger, protected MessengerInterface $messenger, protected ClientInterface $httpClient, protected ResourceFetcherInterface $resourceFetcher, protected UrlResolverInterface $urlResolver, protected IFrameUrlHelper $iFrameUrlHelper, protected FileSystemInterface $fileSystem, protected Token $token) {
+  public function __construct(
+    array $configuration,
+    $plugin_id,
+    $plugin_definition,
+    EntityTypeManagerInterface $entity_type_manager,
+    EntityFieldManagerInterface $entity_field_manager,
+    ConfigFactoryInterface $config_factory,
+    FieldTypePluginManagerInterface $field_type_manager,
+    protected LoggerInterface $logger,
+    protected MessengerInterface $messenger,
+    protected ClientInterface $httpClient,
+    protected ResourceFetcherInterface $resourceFetcher,
+    protected UrlResolverInterface $urlResolver,
+    protected IFrameUrlHelper $iFrameUrlHelper,
+    protected FileSystemInterface $fileSystem,
+    protected Token $token,
+  ) {
     parent::__construct($configuration, $plugin_id, $plugin_definition, $entity_type_manager, $entity_field_manager, $field_type_manager, $config_factory);
   }
 

@@ -90,7 +90,10 @@ abstract class EntityStorageBase extends EntityHandlerBase implements EntityStor
    * @param \Drupal\Core\Cache\MemoryCache\MemoryCacheInterface $memoryCache
    *   The memory cache.
    */
-  public function __construct(EntityTypeInterface $entity_type, protected MemoryCacheInterface $memoryCache) {
+  public function __construct(
+    EntityTypeInterface $entity_type,
+    protected MemoryCacheInterface $memoryCache,
+  ) {
     $this->entityTypeId = $entity_type->id();
     $this->entityType = $entity_type;
     $this->baseEntityClass = $entity_type->getClass();

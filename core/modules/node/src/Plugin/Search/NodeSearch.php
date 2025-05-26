@@ -120,7 +120,21 @@ class NodeSearch extends ConfigurableSearchPluginBase implements AccessibleInter
    * @param \Drupal\search\SearchIndexInterface $searchIndex
    *   The search index.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, protected Connection $database, protected EntityTypeManagerInterface $entityTypeManager, protected ModuleHandlerInterface $moduleHandler, protected Config $searchSettings, protected LanguageManagerInterface $languageManager, protected RendererInterface $renderer, protected MessengerInterface $messenger, protected AccountInterface $account, protected Connection $databaseReplica, protected SearchIndexInterface $searchIndex) {
+  public function __construct(
+    array $configuration,
+    $plugin_id,
+    $plugin_definition,
+    protected Connection $database,
+    protected EntityTypeManagerInterface $entityTypeManager,
+    protected ModuleHandlerInterface $moduleHandler,
+    protected Config $searchSettings,
+    protected LanguageManagerInterface $languageManager,
+    protected RendererInterface $renderer,
+    protected MessengerInterface $messenger,
+    protected AccountInterface $account,
+    protected Connection $databaseReplica,
+    protected SearchIndexInterface $searchIndex,
+  ) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
 
     $this->addCacheTags(['node_list']);

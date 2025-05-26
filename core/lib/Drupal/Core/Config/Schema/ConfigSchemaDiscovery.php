@@ -19,8 +19,9 @@ class ConfigSchemaDiscovery implements DiscoveryInterface {
    * @param \Drupal\Core\Config\StorageInterface $schemaStorage
    *   The storage object to use for reading schema data.
    */
-  public function __construct(protected StorageInterface $schemaStorage) {
-  }
+  public function __construct(
+    protected StorageInterface $schemaStorage,
+  ) {}
 
   /**
    * {@inheritdoc}

@@ -49,7 +49,13 @@ class OpenDialogCommand implements CommandInterface, CommandWithAttachedAssetsIn
    *   on the content of the dialog. If left empty, the settings will be
    *   populated automatically from the current request.
    */
-  public function __construct(protected $selector, string|\Stringable|null $title, protected $content, array $dialog_options = [], protected $settings = NULL) {
+  public function __construct(
+    protected $selector,
+    string|\Stringable|null $title,
+    protected $content,
+    array $dialog_options = [],
+    protected $settings = NULL,
+  ) {
     $title = PlainTextOutput::renderFromHtml($title);
 
     $dialog_options += ['title' => $title];

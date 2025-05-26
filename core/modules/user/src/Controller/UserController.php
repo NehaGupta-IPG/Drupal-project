@@ -40,8 +40,14 @@ class UserController extends ControllerBase {
    * @param \Drupal\Component\Datetime\TimeInterface|null $time
    *   The time service.
    */
-  public function __construct(protected DateFormatterInterface $dateFormatter, protected UserStorageInterface $userStorage, protected UserDataInterface $userData, protected LoggerInterface $logger, protected FloodInterface $flood, protected TimeInterface $time) {
-  }
+  public function __construct(
+    protected DateFormatterInterface $dateFormatter,
+    protected UserStorageInterface $userStorage,
+    protected UserDataInterface $userData,
+    protected LoggerInterface $logger,
+    protected FloodInterface $flood,
+    protected TimeInterface $time,
+  ) {}
 
   /**
    * {@inheritdoc}

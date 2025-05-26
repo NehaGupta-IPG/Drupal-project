@@ -39,8 +39,12 @@ class SectionComponent {
    * @param mixed[] $additional
    *   An additional values.
    */
-  public function __construct(protected $uuid, protected $region, protected array $configuration = [], protected array $additional = []) {
-  }
+  public function __construct(
+    protected $uuid,
+    protected $region,
+    protected array $configuration = [],
+    protected array $additional = [],
+  ) {}
 
   /**
    * Returns the renderable array for this component.

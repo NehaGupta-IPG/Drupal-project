@@ -18,8 +18,10 @@ class EntityFormBuilder implements EntityFormBuilderInterface {
    * @param \Drupal\Core\Form\FormBuilderInterface $formBuilder
    *   The form builder.
    */
-  public function __construct(protected EntityTypeManagerInterface $entityTypeManager, protected FormBuilderInterface $formBuilder) {
-  }
+  public function __construct(
+    protected EntityTypeManagerInterface $entityTypeManager,
+    protected FormBuilderInterface $formBuilder,
+  ) {}
 
   /**
    * {@inheritdoc}

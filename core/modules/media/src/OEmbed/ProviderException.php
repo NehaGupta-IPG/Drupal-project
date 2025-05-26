@@ -22,7 +22,11 @@ class ProviderException extends \Exception {
    * @param \Throwable $previous
    *   (optional) The previous exception, if any.
    */
-  public function __construct($message, protected ?Provider $provider = NULL, ?\Throwable $previous = NULL) {
+  public function __construct(
+    $message,
+    protected ?Provider $provider = NULL,
+    ?\Throwable $previous = NULL,
+  ) {
     $message = str_replace('@name', $this->provider ? $this->provider->getName() : '<unknown>', $message);
     parent::__construct($message, 0, $previous);
   }

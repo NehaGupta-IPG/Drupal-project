@@ -157,7 +157,16 @@ class SqlContentEntityStorage extends ContentEntityStorageBase implements SqlEnt
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
    *   The entity type manager.
    */
-  public function __construct(EntityTypeInterface $entity_type, protected Connection $database, EntityFieldManagerInterface $entity_field_manager, CacheBackendInterface $cache, protected LanguageManagerInterface $languageManager, MemoryCacheInterface $memory_cache, EntityTypeBundleInfoInterface $entity_type_bundle_info, protected EntityTypeManagerInterface $entityTypeManager) {
+  public function __construct(
+    EntityTypeInterface $entity_type,
+    protected Connection $database,
+    EntityFieldManagerInterface $entity_field_manager,
+    CacheBackendInterface $cache,
+    protected LanguageManagerInterface $languageManager,
+    MemoryCacheInterface $memory_cache,
+    EntityTypeBundleInfoInterface $entity_type_bundle_info,
+    protected EntityTypeManagerInterface $entityTypeManager,
+  ) {
     parent::__construct($entity_type, $entity_field_manager, $cache, $memory_cache, $entity_type_bundle_info);
     $this->entityType = $this->entityTypeManager->getActiveDefinition($entity_type->id());
     $this->fieldStorageDefinitions = $this->entityFieldManager->getActiveFieldStorageDefinitions($entity_type->id());

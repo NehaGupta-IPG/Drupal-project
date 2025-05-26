@@ -24,8 +24,10 @@ class IFrameUrlHelper {
    * @param \Drupal\Core\PrivateKey $privateKey
    *   The private key service.
    */
-  public function __construct(protected RequestContext $requestContext, protected PrivateKey $privateKey) {
-  }
+  public function __construct(
+    protected RequestContext $requestContext,
+    protected PrivateKey $privateKey,
+  ) {}
 
   /**
    * Hashes an oEmbed resource URL.

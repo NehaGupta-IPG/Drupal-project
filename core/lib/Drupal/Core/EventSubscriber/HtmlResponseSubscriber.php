@@ -19,8 +19,9 @@ class HtmlResponseSubscriber implements EventSubscriberInterface {
    * @param \Drupal\Core\Render\AttachmentsResponseProcessorInterface $htmlResponseAttachmentsProcessor
    *   The HTML response attachments processor service.
    */
-  public function __construct(protected AttachmentsResponseProcessorInterface $htmlResponseAttachmentsProcessor) {
-  }
+  public function __construct(
+    protected AttachmentsResponseProcessorInterface $htmlResponseAttachmentsProcessor,
+  ) {}
 
   /**
    * Processes attachments for HtmlResponse responses.

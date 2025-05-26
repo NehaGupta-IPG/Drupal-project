@@ -24,8 +24,9 @@ class CssOptimizer implements AssetOptimizerInterface {
    * @param \Drupal\Core\File\FileUrlGeneratorInterface $fileUrlGenerator
    *   The file URL generator.
    */
-  public function __construct(protected FileUrlGeneratorInterface $fileUrlGenerator) {
-  }
+  public function __construct(
+    protected FileUrlGeneratorInterface $fileUrlGenerator,
+  ) {}
 
   /**
    * {@inheritdoc}

@@ -29,7 +29,10 @@ final class LoggingCommitter implements CommitterInterface {
    * @param \PhpTuf\ComposerStager\API\Core\CommitterInterface $inner
    *   The decorated committer service.
    */
-  public function __construct(StateInterface $state, private CommitterInterface $inner) {
+  public function __construct(
+    StateInterface $state,
+    private CommitterInterface $inner,
+  ) {
     $this->state = $state;
   }
 

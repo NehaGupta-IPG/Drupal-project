@@ -23,8 +23,10 @@ class ViewsData {
    * @param \Drupal\content_moderation\ModerationInformationInterface $moderationInformation
    *   The moderation information.
    */
-  public function __construct(protected EntityTypeManagerInterface $entityTypeManager, protected ModerationInformationInterface $moderationInformation) {
-  }
+  public function __construct(
+    protected EntityTypeManagerInterface $entityTypeManager,
+    protected ModerationInformationInterface $moderationInformation,
+  ) {}
 
   /**
    * Returns the views data.

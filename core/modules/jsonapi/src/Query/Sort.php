@@ -63,8 +63,9 @@ class Sort {
    * @param array $fields
    *   The entity query sort fields.
    */
-  public function __construct(protected array $fields) {
-  }
+  public function __construct(
+    protected array $fields,
+  ) {}
 
   /**
    * Gets the root condition group.

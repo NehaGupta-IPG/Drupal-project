@@ -20,8 +20,9 @@ class MenuController extends ControllerBase {
    * @param \Drupal\Core\Menu\MenuParentFormSelectorInterface $menuParentSelector
    *   The menu parent form service.
    */
-  public function __construct(protected MenuParentFormSelectorInterface $menuParentSelector) {
-  }
+  public function __construct(
+    protected MenuParentFormSelectorInterface $menuParentSelector,
+  ) {}
 
   /**
    * Gets all the available menus and menu items as a JavaScript array.

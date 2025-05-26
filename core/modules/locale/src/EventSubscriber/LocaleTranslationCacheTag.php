@@ -17,8 +17,9 @@ class LocaleTranslationCacheTag implements EventSubscriberInterface {
    * @param \Drupal\Core\Cache\CacheTagsInvalidatorInterface $cacheTagsInvalidator
    *   The cache tags invalidator.
    */
-  public function __construct(protected CacheTagsInvalidatorInterface $cacheTagsInvalidator) {
-  }
+  public function __construct(
+    protected CacheTagsInvalidatorInterface $cacheTagsInvalidator,
+  ) {}
 
   /**
    * Invalidate cache tags whenever a string is translated.

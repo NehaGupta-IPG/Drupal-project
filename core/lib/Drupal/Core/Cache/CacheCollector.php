@@ -89,7 +89,12 @@ abstract class CacheCollector implements CacheCollectorInterface, DestructableIn
    * @param array $tags
    *   (optional) The tags to specify for the cache item.
    */
-  public function __construct(protected $cid, protected CacheBackendInterface $cache, protected LockBackendInterface $lock, array $tags = []) {
+  public function __construct(
+    protected $cid,
+    protected CacheBackendInterface $cache,
+    protected LockBackendInterface $lock,
+    array $tags = [],
+  ) {
     assert(Inspector::assertAllStrings($tags), 'Cache tags must be strings.');
     $this->tags = $tags;
   }

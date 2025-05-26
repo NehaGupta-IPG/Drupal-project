@@ -54,7 +54,11 @@ class NodeAccessControlHandler extends EntityAccessControlHandler implements Nod
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
    *   The entity type manager.
    */
-  public function __construct(EntityTypeInterface $entity_type, protected NodeGrantDatabaseStorageInterface $grantStorage, protected EntityTypeManagerInterface $entityTypeManager) {
+  public function __construct(
+    EntityTypeInterface $entity_type,
+    protected NodeGrantDatabaseStorageInterface $grantStorage,
+    protected EntityTypeManagerInterface $entityTypeManager,
+  ) {
     parent::__construct($entity_type);
   }
 

@@ -56,7 +56,10 @@ abstract class EntityDisplayModeFormBase extends EntityForm {
    * @param \Drupal\Core\Entity\EntityDisplayRepository $entityDisplayRepository
    *   The entity display repository.
    */
-  public function __construct(protected EntityTypeBundleInfoInterface $entityTypeBundleInfo, protected EntityDisplayRepositoryInterface $entityDisplayRepository) {}
+  public function __construct(
+    protected EntityTypeBundleInfoInterface $entityTypeBundleInfo,
+    protected EntityDisplayRepositoryInterface $entityDisplayRepository,
+  ) {}
 
   /**
    * {@inheritdoc}

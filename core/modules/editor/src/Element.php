@@ -19,8 +19,9 @@ class Element implements TrustedCallbackInterface {
    * @param \Drupal\Component\Plugin\PluginManagerInterface $pluginManager
    *   The Text Editor plugin manager service.
    */
-  public function __construct(protected PluginManagerInterface $pluginManager) {
-  }
+  public function __construct(
+    protected PluginManagerInterface $pluginManager,
+  ) {}
 
   /**
    * {@inheritdoc}

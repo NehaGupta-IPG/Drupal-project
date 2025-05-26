@@ -28,7 +28,11 @@ class SetDialogOptionCommand implements CommandInterface {
    * @param mixed $optionValue
    *   The value of the option to be passed to the dialog.
    */
-  public function __construct($selector, protected $optionName, protected $optionValue) {
+  public function __construct(
+    $selector,
+    protected $optionName,
+    protected $optionValue,
+  ) {
     $this->selector = $selector ?: '#drupal-modal';
   }
 

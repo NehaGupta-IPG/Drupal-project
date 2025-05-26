@@ -29,8 +29,10 @@ class UpdateBuildIdCommand implements CommandInterface {
    * @param string $new
    *   The new build_id.
    */
-  public function __construct(protected $old, protected $new) {
-  }
+  public function __construct(
+    protected $old,
+    protected $new,
+  ) {}
 
   /**
    * {@inheritdoc}

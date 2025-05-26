@@ -35,7 +35,12 @@ class FilterFormatListBuilder extends DraggableListBuilder {
    * @param \Drupal\Core\Messenger\MessengerInterface $messenger
    *   The messenger.
    */
-  public function __construct(EntityTypeInterface $entity_type, EntityStorageInterface $storage, protected ConfigFactoryInterface $configFactory, protected MessengerInterface $messenger) {
+  public function __construct(
+    EntityTypeInterface $entity_type,
+    EntityStorageInterface $storage,
+    protected ConfigFactoryInterface $configFactory,
+    protected MessengerInterface $messenger,
+  ) {
     parent::__construct($entity_type, $storage);
   }
 

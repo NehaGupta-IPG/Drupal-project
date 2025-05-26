@@ -32,7 +32,11 @@ class ResourceResponse extends Response {
    * @param array $headers
    *   An array of response headers.
    */
-  public function __construct(protected $responseData = NULL, $status = 200, array $headers = []) {
+  public function __construct(
+    protected $responseData = NULL,
+    $status = 200,
+    array $headers = [],
+  ) {
     parent::__construct('', $status, $headers);
   }
 

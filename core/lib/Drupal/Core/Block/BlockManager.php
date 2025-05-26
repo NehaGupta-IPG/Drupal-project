@@ -38,7 +38,12 @@ class BlockManager extends DefaultPluginManager implements BlockManagerInterface
    * @param \Psr\Log\LoggerInterface $logger
    *   The logger.
    */
-  public function __construct(\Traversable $namespaces, CacheBackendInterface $cache_backend, ModuleHandlerInterface $module_handler, protected LoggerInterface $logger) {
+  public function __construct(
+    \Traversable $namespaces,
+    CacheBackendInterface $cache_backend,
+    ModuleHandlerInterface $module_handler,
+    protected LoggerInterface $logger,
+  ) {
     parent::__construct('Plugin/Block', $namespaces, $module_handler, BlockPluginInterface::class, Block::class, 'Drupal\Core\Block\Annotation\Block');
 
     $this->alterInfo($this->getType());

@@ -39,7 +39,12 @@ class Section implements ThirdPartySettingsInterface {
    * @param array[] $thirdPartySettings
    *   (optional) Any third party settings.
    */
-  public function __construct(protected $layoutId, protected array $layoutSettings = [], array $components = [], protected array $thirdPartySettings = []) {
+  public function __construct(
+    protected $layoutId,
+    protected array $layoutSettings = [],
+    array $components = [],
+    protected array $thirdPartySettings = [],
+  ) {
     foreach ($components as $component) {
       $this->setComponent($component);
     }

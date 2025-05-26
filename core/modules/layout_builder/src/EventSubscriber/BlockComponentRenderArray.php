@@ -33,8 +33,9 @@ class BlockComponentRenderArray implements EventSubscriberInterface {
    * @param \Drupal\Core\Session\AccountInterface $currentUser
    *   The current user.
    */
-  public function __construct(protected AccountInterface $currentUser) {
-  }
+  public function __construct(
+    protected AccountInterface $currentUser,
+  ) {}
 
   /**
    * {@inheritdoc}

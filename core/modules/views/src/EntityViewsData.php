@@ -59,7 +59,14 @@ class EntityViewsData implements EntityHandlerInterface, EntityViewsDataInterfac
    * @param \Drupal\Core\Entity\EntityFieldManagerInterface $entityFieldManager
    *   The entity field manager.
    */
-  public function __construct(protected EntityTypeInterface $entityType, protected SqlEntityStorageInterface $storage, protected EntityTypeManagerInterface $entityTypeManager, protected ModuleHandlerInterface $moduleHandler, TranslationInterface $translation_manager, protected EntityFieldManagerInterface $entityFieldManager) {
+  public function __construct(
+    protected EntityTypeInterface $entityType,
+    protected SqlEntityStorageInterface $storage,
+    protected EntityTypeManagerInterface $entityTypeManager,
+    protected ModuleHandlerInterface $moduleHandler,
+    TranslationInterface $translation_manager,
+    protected EntityFieldManagerInterface $entityFieldManager,
+  ) {
     $this->setStringTranslation($translation_manager);
   }
 

@@ -20,8 +20,10 @@ class DbUpdateNegotiator implements ThemeNegotiatorInterface {
    * @param \Drupal\Core\Extension\ThemeHandlerInterface $themeHandler
    *   The theme handler.
    */
-  public function __construct(protected ConfigFactoryInterface $configFactory, protected ThemeHandlerInterface $themeHandler) {
-  }
+  public function __construct(
+    protected ConfigFactoryInterface $configFactory,
+    protected ThemeHandlerInterface $themeHandler,
+  ) {}
 
   /**
    * {@inheritdoc}

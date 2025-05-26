@@ -30,7 +30,12 @@ class AccountSettingsForm extends ConfigFormBase {
    * @param \Drupal\user\RoleStorageInterface $roleStorage
    *   The role storage.
    */
-  public function __construct(ConfigFactoryInterface $config_factory, TypedConfigManagerInterface $typedConfigManager, protected ModuleHandlerInterface $moduleHandler, protected RoleStorageInterface $roleStorage) {
+  public function __construct(
+    ConfigFactoryInterface $config_factory,
+    TypedConfigManagerInterface $typedConfigManager,
+    protected ModuleHandlerInterface $moduleHandler,
+    protected RoleStorageInterface $roleStorage,
+  ) {
     parent::__construct($config_factory, $typedConfigManager);
   }
 

@@ -25,8 +25,12 @@ class DatabaseStorage implements StorageInterface {
    *   (optional) The collection to store configuration in. Defaults to the
    *   default collection.
    */
-  public function __construct(protected Connection $connection, protected $table, protected array $options = [], protected $collection = StorageInterface::DEFAULT_COLLECTION) {
-  }
+  public function __construct(
+    protected Connection $connection,
+    protected $table,
+    protected array $options = [],
+    protected $collection = StorageInterface::DEFAULT_COLLECTION,
+  ) {}
 
   /**
    * {@inheritdoc}

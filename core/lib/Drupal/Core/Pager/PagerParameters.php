@@ -18,8 +18,9 @@ class PagerParameters implements PagerParametersInterface {
    * @param \Symfony\Component\HttpFoundation\RequestStack $requestStack
    *   The current HTTP request stack.
    */
-  public function __construct(protected RequestStack $requestStack) {
-  }
+  public function __construct(
+    protected RequestStack $requestStack,
+  ) {}
 
   /**
    * {@inheritdoc}

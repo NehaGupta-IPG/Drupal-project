@@ -53,7 +53,15 @@ class ConfigInstaller implements ConfigInstallerInterface {
    * @param \Drupal\Core\Extension\ExtensionPathResolver $extensionPathResolver
    *   The extension path resolver.
    */
-  public function __construct(protected ConfigFactoryInterface $configFactory, StorageInterface $active_storage, protected TypedConfigManagerInterface $typedConfig, protected ConfigManagerInterface $configManager, protected EventDispatcherInterface $eventDispatcher, protected $installProfile, protected ExtensionPathResolver $extensionPathResolver) {
+  public function __construct(
+    protected ConfigFactoryInterface $configFactory,
+    StorageInterface $active_storage,
+    protected TypedConfigManagerInterface $typedConfig,
+    protected ConfigManagerInterface $configManager,
+    protected EventDispatcherInterface $eventDispatcher,
+    protected $installProfile,
+    protected ExtensionPathResolver $extensionPathResolver,
+  ) {
     $this->activeStorages[$active_storage->getCollectionName()] = $active_storage;
   }
 

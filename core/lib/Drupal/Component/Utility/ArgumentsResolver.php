@@ -18,8 +18,11 @@ class ArgumentsResolver implements ArgumentsResolverInterface {
    *   An array object candidates tried on every parameter regardless of its
    *   name.
    */
-  public function __construct(protected array $scalars, protected array $objects, protected array $wildcards) {
-  }
+  public function __construct(
+    protected array $scalars,
+    protected array $objects,
+    protected array $wildcards,
+  ) {}
 
   /**
    * {@inheritdoc}

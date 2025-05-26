@@ -45,7 +45,13 @@ class MediaLibraryUiBuilder {
    * @param \Drupal\media_library\OpenerResolverInterface $openerResolver
    *   The opener resolver.
    */
-  public function __construct(protected EntityTypeManagerInterface $entityTypeManager, RequestStack $request_stack, protected ViewExecutableFactory $viewsExecutableFactory, protected FormBuilderInterface $formBuilder, protected OpenerResolverInterface $openerResolver) {
+  public function __construct(
+    protected EntityTypeManagerInterface $entityTypeManager,
+    RequestStack $request_stack,
+    protected ViewExecutableFactory $viewsExecutableFactory,
+    protected FormBuilderInterface $formBuilder,
+    protected OpenerResolverInterface $openerResolver,
+  ) {
     $this->request = $request_stack->getCurrentRequest();
   }
 

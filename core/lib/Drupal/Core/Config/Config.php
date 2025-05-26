@@ -55,7 +55,12 @@ class Config extends StorableConfigBase {
    * @param \Drupal\Core\Config\TypedConfigManagerInterface $typed_config
    *   The typed configuration manager service.
    */
-  public function __construct($name, StorageInterface $storage, protected EventDispatcherInterface $eventDispatcher, TypedConfigManagerInterface $typed_config) {
+  public function __construct(
+    $name,
+    StorageInterface $storage,
+    protected EventDispatcherInterface $eventDispatcher,
+    TypedConfigManagerInterface $typed_config,
+  ) {
     $this->name = $name;
     $this->storage = $storage;
     $this->typedConfigManager = $typed_config;

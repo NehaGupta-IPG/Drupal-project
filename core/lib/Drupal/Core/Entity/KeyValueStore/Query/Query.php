@@ -24,7 +24,12 @@ class Query extends QueryBase {
    * @param \Drupal\Core\KeyValueStore\KeyValueFactoryInterface $keyValueFactory
    *   The key value factory.
    */
-  public function __construct(EntityTypeInterface $entity_type, $conjunction, array $namespaces, protected KeyValueFactoryInterface $keyValueFactory) {
+  public function __construct(
+    EntityTypeInterface $entity_type,
+    $conjunction,
+    array $namespaces,
+    protected KeyValueFactoryInterface $keyValueFactory,
+  ) {
     parent::__construct($entity_type, $conjunction, $namespaces);
   }
 

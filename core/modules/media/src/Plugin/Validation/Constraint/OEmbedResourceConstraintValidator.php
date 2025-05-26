@@ -39,7 +39,11 @@ class OEmbedResourceConstraintValidator extends ConstraintValidator implements C
    * @param \Drupal\Core\Logger\LoggerChannelFactoryInterface $logger_factory
    *   The logger service.
    */
-  public function __construct(protected UrlResolverInterface $urlResolver, protected ResourceFetcherInterface $resourceFetcher, LoggerChannelFactoryInterface $logger_factory) {
+  public function __construct(
+    protected UrlResolverInterface $urlResolver,
+    protected ResourceFetcherInterface $resourceFetcher,
+    LoggerChannelFactoryInterface $logger_factory,
+  ) {
     $this->logger = $logger_factory->get('media');
   }
 

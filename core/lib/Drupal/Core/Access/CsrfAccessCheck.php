@@ -32,8 +32,9 @@ class CsrfAccessCheck implements RoutingAccessInterface {
    * @param \Drupal\Core\Access\CsrfTokenGenerator $csrfToken
    *   The CSRF token generator.
    */
-  public function __construct(protected CsrfTokenGenerator $csrfToken) {
-  }
+  public function __construct(
+    protected CsrfTokenGenerator $csrfToken,
+  ) {}
 
   /**
    * Checks access based on a CSRF token for the request.

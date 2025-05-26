@@ -57,8 +57,13 @@ class ViewAjaxController implements ContainerInjectionInterface {
    * @param \Drupal\Core\Routing\RedirectDestinationInterface $redirectDestination
    *   The redirect destination.
    */
-  public function __construct(protected EntityStorageInterface $storage, protected ViewExecutableFactory $executableFactory, protected RendererInterface $renderer, protected CurrentPathStack $currentPath, protected RedirectDestinationInterface $redirectDestination) {
-  }
+  public function __construct(
+    protected EntityStorageInterface $storage,
+    protected ViewExecutableFactory $executableFactory,
+    protected RendererInterface $renderer,
+    protected CurrentPathStack $currentPath,
+    protected RedirectDestinationInterface $redirectDestination,
+  ) {}
 
   /**
    * {@inheritdoc}

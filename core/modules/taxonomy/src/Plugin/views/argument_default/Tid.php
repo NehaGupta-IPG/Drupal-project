@@ -37,7 +37,13 @@ class Tid extends ArgumentDefaultPluginBase implements CacheableDependencyInterf
    * @param \Drupal\taxonomy\VocabularyStorageInterface $vocabularyStorage
    *   The vocabulary storage.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, protected RouteMatchInterface $routeMatch, protected VocabularyStorageInterface $vocabularyStorage) {
+  public function __construct(
+    array $configuration,
+    $plugin_id,
+    $plugin_definition,
+    protected RouteMatchInterface $routeMatch,
+    protected VocabularyStorageInterface $vocabularyStorage,
+  ) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
   }
 

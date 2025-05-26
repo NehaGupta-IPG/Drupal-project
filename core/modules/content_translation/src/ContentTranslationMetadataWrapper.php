@@ -18,8 +18,10 @@ class ContentTranslationMetadataWrapper implements ContentTranslationMetadataWra
    * @param ContentTranslationHandlerInterface $handler
    *   The content translation handler.
    */
-  public function __construct(protected EntityInterface $translation, protected ContentTranslationHandlerInterface $handler) {
-  }
+  public function __construct(
+    protected EntityInterface $translation,
+    protected ContentTranslationHandlerInterface $handler,
+  ) {}
 
   /**
    * {@inheritdoc}

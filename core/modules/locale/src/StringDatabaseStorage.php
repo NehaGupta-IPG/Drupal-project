@@ -18,8 +18,10 @@ class StringDatabaseStorage implements StringStorageInterface {
    * @param array $options
    *   (optional) Any additional database connection options to use in queries.
    */
-  public function __construct(protected Connection $connection, protected array $options = []) {
-  }
+  public function __construct(
+    protected Connection $connection,
+    protected array $options = [],
+  ) {}
 
   /**
    * {@inheritdoc}

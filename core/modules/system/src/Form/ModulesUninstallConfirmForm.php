@@ -44,7 +44,14 @@ class ModulesUninstallConfirmForm extends ConfirmFormBase {
    * @param string|false|null $installProfile
    *   The install profile.
    */
-  public function __construct(protected ModuleInstallerInterface $moduleInstaller, protected KeyValueStoreExpirableInterface $keyValueExpirable, protected ConfigManagerInterface $configManager, protected EntityTypeManagerInterface $entityTypeManager, protected ModuleExtensionList $moduleExtensionList, protected string|false|null $installProfile = NULL) {
+  public function __construct(
+    protected ModuleInstallerInterface $moduleInstaller,
+    protected KeyValueStoreExpirableInterface $keyValueExpirable,
+    protected ConfigManagerInterface $configManager,
+    protected EntityTypeManagerInterface $entityTypeManager,
+    protected ModuleExtensionList $moduleExtensionList,
+    protected string|false|null $installProfile = NULL,
+  ) {
     $this->installProfile ??= \Drupal::installProfile();
   }
 

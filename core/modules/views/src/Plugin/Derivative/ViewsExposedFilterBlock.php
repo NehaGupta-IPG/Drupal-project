@@ -31,8 +31,10 @@ class ViewsExposedFilterBlock implements ContainerDeriverInterface {
    * @param \Drupal\Core\Entity\EntityStorageInterface $viewStorage
    *   The entity storage to load views.
    */
-  public function __construct(protected $basePluginId, protected EntityStorageInterface $viewStorage) {
-  }
+  public function __construct(
+    protected $basePluginId,
+    protected EntityStorageInterface $viewStorage,
+  ) {}
 
   /**
    * {@inheritdoc}

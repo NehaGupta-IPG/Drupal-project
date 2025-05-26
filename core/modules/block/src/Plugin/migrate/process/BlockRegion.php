@@ -27,7 +27,12 @@ class BlockRegion extends StaticMap implements ContainerFactoryPluginInterface {
    * @param array $regions
    *   Array of region maps, keyed by theme.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, protected array $regions) {
+  public function __construct(
+    array $configuration,
+    $plugin_id,
+    $plugin_definition,
+    protected array $regions,
+  ) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
   }
 

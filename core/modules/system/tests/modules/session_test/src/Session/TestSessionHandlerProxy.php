@@ -17,8 +17,10 @@ class TestSessionHandlerProxy implements \SessionHandlerInterface, \SessionUpdat
    * @param mixed $optionalArgument
    *   (optional) An optional argument.
    */
-  public function __construct(protected \SessionHandlerInterface&\SessionUpdateTimestampHandlerInterface $sessionHandler, protected $optionalArgument = NULL) {
-  }
+  public function __construct(
+    protected \SessionHandlerInterface&\SessionUpdateTimestampHandlerInterface $sessionHandler,
+    protected $optionalArgument = NULL,
+  ) {}
 
   /**
    * {@inheritdoc}

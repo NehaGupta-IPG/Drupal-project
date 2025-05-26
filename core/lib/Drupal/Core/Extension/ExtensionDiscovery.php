@@ -98,7 +98,12 @@ class ExtensionDiscovery {
    * @param string $sitePath
    *   The path to the site.
    */
-  public function __construct(protected string $root, $use_info_parser = TRUE, protected ?array $profileDirectories = NULL, protected ?string $sitePath = NULL) {
+  public function __construct(
+    protected string $root,
+    $use_info_parser = TRUE,
+    protected ?array $profileDirectories = NULL,
+    protected ?string $sitePath = NULL,
+  ) {
     // @phpstan-ignore property.deprecated
     $this->fileCache = $use_info_parser ? FileCacheFactory::get('extension_discovery') : NULL;
     $this->infoParser = $use_info_parser ? new InfoParser($this->root) : NULL;

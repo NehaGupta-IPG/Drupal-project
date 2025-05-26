@@ -22,8 +22,12 @@ class MigrateIdMapMessageEvent extends Event {
    * @param int $level
    *   Severity level (one of the MigrationInterface::MESSAGE_* constants).
    */
-  public function __construct(protected MigrationInterface $migration, protected array $sourceIdValues, protected $message, protected $level) {
-  }
+  public function __construct(
+    protected MigrationInterface $migration,
+    protected array $sourceIdValues,
+    protected $message,
+    protected $level,
+  ) {}
 
   /**
    * Gets the migration entity.

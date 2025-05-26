@@ -68,7 +68,14 @@ class FileCopy extends FileProcessBase implements ContainerFactoryPluginInterfac
    * @param \Drupal\migrate\Plugin\MigrateProcessInterface $downloadPlugin
    *   An instance of the download plugin for handling remote URIs.
    */
-  public function __construct(array $configuration, $plugin_id, array $plugin_definition, protected StreamWrapperManagerInterface $streamWrapperManager, protected FileSystemInterface $fileSystem, protected MigrateProcessInterface $downloadPlugin) {
+  public function __construct(
+    array $configuration,
+    $plugin_id,
+    array $plugin_definition,
+    protected StreamWrapperManagerInterface $streamWrapperManager,
+    protected FileSystemInterface $fileSystem,
+    protected MigrateProcessInterface $downloadPlugin,
+  ) {
     $configuration += [
       'move' => FALSE,
     ];

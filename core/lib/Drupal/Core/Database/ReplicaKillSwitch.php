@@ -24,8 +24,11 @@ class ReplicaKillSwitch implements EventSubscriberInterface {
    * @param \Symfony\Component\HttpFoundation\Session\SessionInterface $session
    *   The session.
    */
-  public function __construct(protected Settings $settings, protected TimeInterface $time, protected SessionInterface $session) {
-  }
+  public function __construct(
+    protected Settings $settings,
+    protected TimeInterface $time,
+    protected SessionInterface $session,
+  ) {}
 
   /**
    * Denies access to replica database on the current request.

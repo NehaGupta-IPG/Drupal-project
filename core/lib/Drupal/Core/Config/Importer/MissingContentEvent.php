@@ -17,8 +17,9 @@ class MissingContentEvent extends Event {
    * @param array $missingContent
    *   Missing content information.
    */
-  public function __construct(protected array $missingContent) {
-  }
+  public function __construct(
+    protected array $missingContent,
+  ) {}
 
   /**
    * Gets missing content information.

@@ -25,8 +25,9 @@ abstract class ImageStyleFormBase extends EntityForm {
    * @param \Drupal\Core\Entity\EntityStorageInterface $imageStyleStorage
    *   The image style entity storage.
    */
-  public function __construct(protected EntityStorageInterface $imageStyleStorage) {
-  }
+  public function __construct(
+    protected EntityStorageInterface $imageStyleStorage,
+  ) {}
 
   /**
    * {@inheritdoc}

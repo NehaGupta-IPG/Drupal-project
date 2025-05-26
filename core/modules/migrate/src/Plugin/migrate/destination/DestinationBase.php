@@ -54,7 +54,12 @@ abstract class DestinationBase extends PluginBase implements MigrateDestinationI
    * @param \Drupal\migrate\Plugin\MigrationInterface $migration
    *   The migration.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, protected MigrationInterface $migration) {
+  public function __construct(
+    array $configuration,
+    $plugin_id,
+    $plugin_definition,
+    protected MigrationInterface $migration,
+  ) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
   }
 

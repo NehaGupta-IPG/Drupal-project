@@ -18,8 +18,9 @@ class FormUploadedFile implements UploadedFileInterface {
    * @param \Symfony\Component\HttpFoundation\File\UploadedFile $uploadedFile
    *   The wrapped Symfony uploaded file.
    */
-  public function __construct(protected UploadedFile $uploadedFile) {
-  }
+  public function __construct(
+    protected UploadedFile $uploadedFile,
+  ) {}
 
   /**
    * {@inheritdoc}

@@ -22,8 +22,10 @@ class ProtectedUserFieldConstraintValidator extends ConstraintValidator implemen
    * @param \Drupal\Core\Session\AccountProxyInterface $currentUser
    *   The current user.
    */
-  public function __construct(protected UserStorageInterface $userStorage, protected AccountProxyInterface $currentUser) {
-  }
+  public function __construct(
+    protected UserStorageInterface $userStorage,
+    protected AccountProxyInterface $currentUser,
+  ) {}
 
   /**
    * {@inheritdoc}

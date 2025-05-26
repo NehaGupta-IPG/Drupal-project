@@ -35,8 +35,10 @@ class SystemBrandingOffCanvasForm extends PluginFormBase implements ContainerInj
    * @param \Drupal\Core\Session\AccountInterface $currentUser
    *   The current user.
    */
-  public function __construct(protected ConfigFactoryInterface $configFactory, protected AccountInterface $currentUser) {
-  }
+  public function __construct(
+    protected ConfigFactoryInterface $configFactory,
+    protected AccountInterface $currentUser,
+  ) {}
 
   /**
    * {@inheritdoc}

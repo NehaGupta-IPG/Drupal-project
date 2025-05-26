@@ -58,7 +58,12 @@ abstract class EntityDisplayFormBase extends EntityForm {
    * @param \Drupal\Core\Entity\EntityFieldManagerInterface|null $entityFieldManager
    *   (optional) The entity field manager.
    */
-  public function __construct(FieldTypePluginManagerInterface $field_type_manager, protected PluginManagerBase $pluginManager, protected EntityDisplayRepositoryInterface $entityDisplayRepository, protected EntityFieldManagerInterface $entityFieldManager) {
+  public function __construct(
+    FieldTypePluginManagerInterface $field_type_manager,
+    protected PluginManagerBase $pluginManager,
+    protected EntityDisplayRepositoryInterface $entityDisplayRepository,
+    protected EntityFieldManagerInterface $entityFieldManager,
+  ) {
     $this->fieldTypes = $field_type_manager->getDefinitions();
   }
 

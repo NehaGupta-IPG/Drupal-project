@@ -19,8 +19,10 @@ class ConfigMapperPopulateEvent extends Event {
    * @param \Drupal\Core\Routing\RouteMatchInterface $routeMatch
    *   The route match this event is related to.
    */
-  public function __construct(protected ConfigMapperInterface $mapper, protected RouteMatchInterface $routeMatch) {
-  }
+  public function __construct(
+    protected ConfigMapperInterface $mapper,
+    protected RouteMatchInterface $routeMatch,
+  ) {}
 
   /**
    * Gets the configuration mapper this event is related to.

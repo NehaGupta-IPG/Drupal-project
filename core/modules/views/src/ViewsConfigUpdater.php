@@ -44,8 +44,13 @@ class ViewsConfigUpdater implements ContainerInjectionInterface {
    * @param \Drupal\Component\Plugin\PluginManagerInterface $formatterPluginManager
    *   The formatter plugin manager service.
    */
-  public function __construct(protected EntityTypeManagerInterface $entityTypeManager, protected EntityFieldManagerInterface $entityFieldManager, protected TypedConfigManagerInterface $typedConfigManager, protected ViewsData $viewsData, protected PluginManagerInterface $formatterPluginManager) {
-  }
+  public function __construct(
+    protected EntityTypeManagerInterface $entityTypeManager,
+    protected EntityFieldManagerInterface $entityFieldManager,
+    protected TypedConfigManagerInterface $typedConfigManager,
+    protected ViewsData $viewsData,
+    protected PluginManagerInterface $formatterPluginManager,
+  ) {}
 
   /**
    * {@inheritdoc}

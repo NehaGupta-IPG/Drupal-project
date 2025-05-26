@@ -19,8 +19,9 @@ class RoleSettingsForm extends FormBase {
    * @param \Drupal\user\RoleStorageInterface $roleStorage
    *   The role storage.
    */
-  public function __construct(protected RoleStorageInterface $roleStorage) {
-  }
+  public function __construct(
+    protected RoleStorageInterface $roleStorage,
+  ) {}
 
   /**
    * {@inheritdoc}

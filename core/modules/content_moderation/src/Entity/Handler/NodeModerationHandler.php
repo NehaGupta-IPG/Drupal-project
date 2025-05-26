@@ -20,8 +20,9 @@ class NodeModerationHandler extends ModerationHandler {
    * @param \Drupal\content_moderation\ModerationInformationInterface $moderationInfo
    *   The moderation information service.
    */
-  public function __construct(protected ModerationInformationInterface $moderationInfo) {
-  }
+  public function __construct(
+    protected ModerationInformationInterface $moderationInfo,
+  ) {}
 
   /**
    * {@inheritdoc}

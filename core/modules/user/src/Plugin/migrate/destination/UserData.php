@@ -30,7 +30,13 @@ class UserData extends DestinationBase implements ContainerFactoryPluginInterfac
    * @param \Drupal\user\UserData $userData
    *   The user data service.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, MigrationInterface $migration, protected UserDataStorage $userData) {
+  public function __construct(
+    array $configuration,
+    $plugin_id,
+    $plugin_definition,
+    MigrationInterface $migration,
+    protected UserDataStorage $userData,
+  ) {
     parent::__construct($configuration, $plugin_id, $plugin_definition, $migration);
   }
 

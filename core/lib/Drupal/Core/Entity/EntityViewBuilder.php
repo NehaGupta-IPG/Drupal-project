@@ -66,7 +66,13 @@ class EntityViewBuilder extends EntityHandlerBase implements EntityHandlerInterf
    * @param \Drupal\Core\Entity\EntityDisplayRepositoryInterface $entityDisplayRepository
    *   The entity display repository.
    */
-  public function __construct(EntityTypeInterface $entity_type, protected EntityRepositoryInterface $entityRepository, protected LanguageManagerInterface $languageManager, protected Registry $themeRegistry, protected EntityDisplayRepositoryInterface $entityDisplayRepository) {
+  public function __construct(
+    EntityTypeInterface $entity_type,
+    protected EntityRepositoryInterface $entityRepository,
+    protected LanguageManagerInterface $languageManager,
+    protected Registry $themeRegistry,
+    protected EntityDisplayRepositoryInterface $entityDisplayRepository,
+  ) {
     $this->entityTypeId = $entity_type->id();
     $this->entityType = $entity_type;
   }

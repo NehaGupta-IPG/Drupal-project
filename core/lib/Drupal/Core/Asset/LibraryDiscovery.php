@@ -19,7 +19,9 @@ class LibraryDiscovery implements LibraryDiscoveryInterface {
    * @param \Drupal\Core\Cache\CacheCollectorInterface $collector
    *   The library discovery cache collector.
    */
-  public function __construct(protected CacheCollectorInterface $collector) {
+  public function __construct(
+    protected CacheCollectorInterface $collector,
+  ) {
     trigger_error(__CLASS__ . 'is deprecated in drupal:11.1.0 and is removed from drupal:12.0.0. Use LibraryDiscoveryCollector instead. See https://www.drupal.org/node/3462970', E_USER_DEPRECATED);
   }
 

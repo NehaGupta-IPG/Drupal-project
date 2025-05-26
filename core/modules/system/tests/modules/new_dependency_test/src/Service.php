@@ -17,8 +17,9 @@ class Service {
    * @param \Drupal\new_dependency_test\Service|null $inner
    *   The service to decorate.
    */
-  public function __construct(protected ?Service $inner = NULL) {
-  }
+  public function __construct(
+    protected ?Service $inner = NULL,
+  ) {}
 
   /**
    * Determines if the service is decorated.

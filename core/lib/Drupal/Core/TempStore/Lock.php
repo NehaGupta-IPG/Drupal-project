@@ -15,8 +15,10 @@ final class Lock {
    * @param int $updated
    *   The updated timestamp.
    */
-  public function __construct(private $ownerId, private $updated) {
-  }
+  public function __construct(
+    private $ownerId,
+    private $updated,
+  ) {}
 
   /**
    * Gets the owner ID.

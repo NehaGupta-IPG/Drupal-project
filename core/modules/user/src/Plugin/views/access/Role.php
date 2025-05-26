@@ -44,7 +44,12 @@ class Role extends AccessPluginBase implements CacheableDependencyInterface {
    * @param \Drupal\user\RoleStorageInterface $roleStorage
    *   The role storage.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, protected RoleStorageInterface $roleStorage) {
+  public function __construct(
+    array $configuration,
+    $plugin_id,
+    $plugin_definition,
+    protected RoleStorageInterface $roleStorage,
+  ) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
   }
 

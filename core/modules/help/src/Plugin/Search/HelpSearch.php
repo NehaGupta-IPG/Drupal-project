@@ -87,7 +87,19 @@ class HelpSearch extends SearchPluginBase implements AccessibleInterface, Search
    * @param \Drupal\search\SearchIndexInterface $searchIndex
    *   The search index.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, protected Connection $database, protected Config $searchSettings, protected LanguageManagerInterface $languageManager, protected MessengerInterface $messenger, protected AccountInterface $account, protected StateInterface $state, protected HelpSectionManager $helpSectionManager, protected SearchIndexInterface $searchIndex) {
+  public function __construct(
+    array $configuration,
+    $plugin_id,
+    $plugin_definition,
+    protected Connection $database,
+    protected Config $searchSettings,
+    protected LanguageManagerInterface $languageManager,
+    protected MessengerInterface $messenger,
+    protected AccountInterface $account,
+    protected StateInterface $state,
+    protected HelpSectionManager $helpSectionManager,
+    protected SearchIndexInterface $searchIndex,
+  ) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
   }
 

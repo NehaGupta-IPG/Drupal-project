@@ -35,7 +35,13 @@ class CancelUser extends ActionBase implements ContainerFactoryPluginInterface {
    * @param \Drupal\Core\Session\AccountInterface $currentUser
    *   Current user.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, protected PrivateTempStoreFactory $tempStoreFactory, protected AccountInterface $currentUser) {
+  public function __construct(
+    array $configuration,
+    $plugin_id,
+    $plugin_definition,
+    protected PrivateTempStoreFactory $tempStoreFactory,
+    protected AccountInterface $currentUser,
+  ) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
   }
 

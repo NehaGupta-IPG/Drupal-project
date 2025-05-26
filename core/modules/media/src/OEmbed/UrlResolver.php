@@ -40,8 +40,13 @@ class UrlResolver implements UrlResolverInterface {
    * @param \Drupal\Core\Cache\CacheBackendInterface $cacheBackend
    *   The cache backend.
    */
-  public function __construct(protected ProviderRepositoryInterface $providers, protected ResourceFetcherInterface $resourceFetcher, protected ClientInterface $httpClient, protected ModuleHandlerInterface $moduleHandler, protected CacheBackendInterface $cacheBackend) {
-  }
+  public function __construct(
+    protected ProviderRepositoryInterface $providers,
+    protected ResourceFetcherInterface $resourceFetcher,
+    protected ClientInterface $httpClient,
+    protected ModuleHandlerInterface $moduleHandler,
+    protected CacheBackendInterface $cacheBackend,
+  ) {}
 
   /**
    * Runs oEmbed discovery and returns the endpoint URL if successful.

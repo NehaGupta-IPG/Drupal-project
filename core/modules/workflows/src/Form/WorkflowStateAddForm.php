@@ -23,8 +23,9 @@ class WorkflowStateAddForm extends EntityForm {
    * @param \Drupal\Core\Plugin\PluginFormFactoryInterface $pluginFormFactory
    *   The plugin form factory.
    */
-  public function __construct(protected PluginFormFactoryInterface $pluginFormFactory) {
-  }
+  public function __construct(
+    protected PluginFormFactoryInterface $pluginFormFactory,
+  ) {}
 
   /**
    * {@inheritdoc}

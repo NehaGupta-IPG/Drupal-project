@@ -21,8 +21,9 @@ class AccessCheck implements AccessInterface, ContainerInjectionInterface {
    * @param \Symfony\Component\HttpFoundation\RequestStack $requestStack
    *   The request stack.
    */
-  public function __construct(protected RequestStack $requestStack) {
-  }
+  public function __construct(
+    protected RequestStack $requestStack,
+  ) {}
 
   /**
    * {@inheritdoc}

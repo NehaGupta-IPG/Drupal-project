@@ -32,8 +32,9 @@ class ChooseSectionController implements ContainerInjectionInterface {
    * @param \Drupal\Core\Layout\LayoutPluginManagerInterface $layoutManager
    *   The layout manager.
    */
-  public function __construct(protected LayoutPluginManagerInterface $layoutManager) {
-  }
+  public function __construct(
+    protected LayoutPluginManagerInterface $layoutManager,
+  ) {}
 
   /**
    * {@inheritdoc}

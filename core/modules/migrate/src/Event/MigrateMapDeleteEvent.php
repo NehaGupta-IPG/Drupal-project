@@ -19,8 +19,10 @@ class MigrateMapDeleteEvent extends Event {
    *   Array of source ID fields representing the object being deleted from the
    *   map.
    */
-  public function __construct(protected MigrateIdMapInterface $map, protected array $sourceId) {
-  }
+  public function __construct(
+    protected MigrateIdMapInterface $map,
+    protected array $sourceId,
+  ) {}
 
   /**
    * Gets the map plugin.

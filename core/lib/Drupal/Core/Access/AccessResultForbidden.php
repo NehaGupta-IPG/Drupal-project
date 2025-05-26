@@ -13,8 +13,9 @@ class AccessResultForbidden extends AccessResult implements AccessResultReasonIn
    * @param null|string $reason
    *   (optional) A message to provide details about this access result.
    */
-  public function __construct(protected $reason = NULL) {
-  }
+  public function __construct(
+    protected $reason = NULL,
+  ) {}
 
   /**
    * {@inheritdoc}

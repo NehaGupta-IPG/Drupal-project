@@ -58,7 +58,13 @@ class Date extends NumericDate implements ContainerFactoryPluginInterface {
    * @param \Symfony\Component\HttpFoundation\RequestStack $requestStack
    *   The request stack used to determine the current time.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, protected DateFormatterInterface $dateFormatter, protected RequestStack $requestStack) {
+  public function __construct(
+    array $configuration,
+    $plugin_id,
+    $plugin_definition,
+    protected DateFormatterInterface $dateFormatter,
+    protected RequestStack $requestStack,
+  ) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
 
     $definition = $this->getFieldStorageDefinition();

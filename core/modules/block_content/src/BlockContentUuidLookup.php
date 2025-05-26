@@ -30,7 +30,11 @@ class BlockContentUuidLookup extends CacheCollector {
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
    *   The entity type manager.
    */
-  public function __construct(CacheBackendInterface $cache, LockBackendInterface $lock, protected EntityTypeManagerInterface $entityTypeManager) {
+  public function __construct(
+    CacheBackendInterface $cache,
+    LockBackendInterface $lock,
+    protected EntityTypeManagerInterface $entityTypeManager,
+  ) {
     parent::__construct('block_content_uuid', $cache, $lock);
   }
 

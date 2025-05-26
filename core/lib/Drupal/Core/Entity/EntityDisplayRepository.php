@@ -36,7 +36,12 @@ class EntityDisplayRepository implements EntityDisplayRepositoryInterface {
    * @param \Drupal\Core\Language\LanguageManagerInterface $languageManager
    *   The language manager.
    */
-  public function __construct(protected EntityTypeManagerInterface $entityTypeManager, protected ModuleHandlerInterface $moduleHandler, CacheBackendInterface $cache_backend, protected LanguageManagerInterface $languageManager) {
+  public function __construct(
+    protected EntityTypeManagerInterface $entityTypeManager,
+    protected ModuleHandlerInterface $moduleHandler,
+    CacheBackendInterface $cache_backend,
+    protected LanguageManagerInterface $languageManager,
+  ) {
     $this->cacheBackend = $cache_backend;
   }
 

@@ -29,8 +29,9 @@ class UpdateSelectionCommand implements CommandInterface {
    * @param int[] $mediaIds
    *   An array of media IDs to add to the current selection.
    */
-  public function __construct(protected array $mediaIds) {
-  }
+  public function __construct(
+    protected array $mediaIds,
+  ) {}
 
   /**
    * {@inheritdoc}

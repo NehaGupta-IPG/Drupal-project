@@ -37,7 +37,11 @@ class InlineBlockEntityOperations implements ContainerInjectionInterface {
    * @param \Drupal\layout_builder\SectionStorage\SectionStorageManagerInterface $section_storage_manager
    *   The section storage manager.
    */
-  public function __construct(protected EntityTypeManagerInterface $entityTypeManager, protected InlineBlockUsageInterface $usage, SectionStorageManagerInterface $section_storage_manager) {
+  public function __construct(
+    protected EntityTypeManagerInterface $entityTypeManager,
+    protected InlineBlockUsageInterface $usage,
+    SectionStorageManagerInterface $section_storage_manager,
+  ) {
     $this->blockContentStorage = $this->entityTypeManager->getStorage('block_content');
     $this->sectionStorageManager = $section_storage_manager;
   }
