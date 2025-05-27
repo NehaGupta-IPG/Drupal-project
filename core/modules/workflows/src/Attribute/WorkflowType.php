@@ -38,7 +38,6 @@ class WorkflowType extends Plugin {
     public readonly ?TranslatableMarkup $label = NULL,
     public array $forms = [],
     public array $required_states = [],
-  ) {
-  }
+  ) {}
 
 }

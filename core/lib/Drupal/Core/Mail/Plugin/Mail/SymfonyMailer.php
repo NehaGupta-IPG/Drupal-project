@@ -94,8 +94,7 @@ class SymfonyMailer implements MailInterface, ContainerFactoryPluginInterface {
   public function __construct(
     protected LoggerInterface $logger,
     protected ?MailerInterface $mailer = NULL,
-  ) {
-  }
+  ) {}
 
   public function format(array $message) {
     foreach ($message['body'] as &$part) {
