@@ -71,7 +71,7 @@ class FileAccessContentRevisionTest extends FieldKernelTestBase {
   }
 
   /**
-   * Tests if public file is always accessible.
+   * Tests the association of file access depending on revision of the content.
    */
   public function testFileAccess(): void {
     \Drupal::state()->set('file_test_alternate_entity_test_access_handler', TRUE);
