@@ -34,8 +34,7 @@ class TestRun {
   public function __construct(
     protected TestRunResultsStorageInterface $testRunResultsStorage,
     protected int|string $testId,
-  ) {
-  }
+  ) {}
 
   /**
    * Returns a new test run object.

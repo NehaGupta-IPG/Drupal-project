@@ -20,7 +20,6 @@ final class StackItem {
   public function __construct(
     public readonly string $name,
     public readonly StackItemType $type,
-  ) {
-  }
+  ) {}
 
 }

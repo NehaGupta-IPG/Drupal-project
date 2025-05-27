@@ -30,8 +30,7 @@ final class AddNavigationBlock implements ConfigActionPluginInterface, Container
   public function __construct(
     protected readonly SectionStorageManagerInterface $sectionStorageManager,
     protected readonly UuidInterface $uuidGenerator,
-  ) {
-  }
+  ) {}
 
   /**
    * {@inheritdoc}

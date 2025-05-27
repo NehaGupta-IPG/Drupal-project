@@ -81,7 +81,6 @@ class FieldType extends Plugin {
     public readonly array $serialized_property_names = [],
     public readonly ?string $deriver = NULL,
     public readonly ?string $module = NULL,
-  ) {
-  }
+  ) {}
 
 }

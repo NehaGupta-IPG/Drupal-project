@@ -68,8 +68,7 @@ final class EntityMethod implements ConfigActionPluginInterface, ContainerFactor
     protected readonly int $numberOfParams,
     protected readonly int $numberOfRequiredParams,
     protected readonly bool $pluralized,
-  ) {
-  }
+  ) {}
 
   /**
    * {@inheritdoc}

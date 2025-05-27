@@ -24,8 +24,7 @@ class ExecutionContextFactory implements ExecutionContextFactoryInterface {
   public function __construct(
     protected TranslatorInterface $translator,
     protected ?string $translationDomain = NULL,
-  ) {
-  }
+  ) {}
 
   /**
    * {@inheritdoc}

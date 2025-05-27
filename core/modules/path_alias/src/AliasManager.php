@@ -70,8 +70,7 @@ class AliasManager implements AliasManagerInterface {
     protected LanguageManagerInterface $languageManager,
     protected CacheBackendInterface $cache,
     protected TimeInterface $time,
-  ) {
-  }
+  ) {}
 
   /**
    * {@inheritdoc}

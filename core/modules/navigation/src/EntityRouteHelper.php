@@ -41,8 +41,7 @@ class EntityRouteHelper {
     protected CurrentRouteMatch $routeMatch,
     protected EntityTypeManagerInterface $entityTypeManager,
     protected CacheBackendInterface $cacheBackend,
-  ) {
-  }
+  ) {}
 
   /**
    * Determines if content entity route condition is met.

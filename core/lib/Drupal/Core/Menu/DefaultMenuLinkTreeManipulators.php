@@ -37,8 +37,7 @@ class DefaultMenuLinkTreeManipulators {
     protected AccountInterface $account,
     protected EntityTypeManagerInterface $entityTypeManager,
     protected ModuleHandlerInterface $moduleHandler,
-  ) {
-  }
+  ) {}
 
   /**
    * Performs access checks of a menu tree.

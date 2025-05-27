@@ -28,8 +28,7 @@ final class LazyBuilders implements TrustedCallbackInterface {
    */
   public function __construct(
     protected ElementInfoManagerInterface $elementInfo,
-  ) {
-  }
+  ) {}
 
   /**
    * Render announcements.

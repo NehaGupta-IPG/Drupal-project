@@ -21,8 +21,7 @@ class NavigationTestHooks {
    */
   public function __construct(
     protected StateInterface $state,
-  ) {
-  }
+  ) {}
 
   /**
    * Implements hook_block_alter().

@@ -27,8 +27,7 @@ final class ComponentTestDoesNotExtendCoreTest implements Rule {
 
   public function __construct(
     private ReflectionProvider $reflectionProvider,
-  ) {
-  }
+  ) {}
 
   /**
    * {@inheritdoc}

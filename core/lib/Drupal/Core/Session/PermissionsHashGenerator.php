@@ -27,8 +27,7 @@ class PermissionsHashGenerator implements PermissionsHashGeneratorInterface {
     protected PrivateKey $privateKey,
     protected CacheBackendInterface $static,
     protected AccessPolicyProcessorInterface $processor,
-  ) {
-  }
+  ) {}
 
   /**
    * {@inheritdoc}

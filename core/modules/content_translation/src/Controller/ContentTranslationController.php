@@ -34,8 +34,7 @@ class ContentTranslationController extends ControllerBase {
     protected ContentTranslationManagerInterface $manager,
     protected EntityFieldManagerInterface $entityFieldManager,
     protected TimeInterface $time,
-  ) {
-  }
+  ) {}
 
   /**
    * {@inheritdoc}

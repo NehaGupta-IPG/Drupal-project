@@ -19,8 +19,7 @@ class AdminController extends ControllerBase {
     protected ModuleExtensionList $moduleExtensionList,
     protected ModuleAdminLinksHelper $moduleAdminLinks,
     protected ModulePermissionsLinkHelper $modulePermissionsLinks,
-  ) {
-  }
+  ) {}
 
   /**
    * Prints a listing of admin tasks, organized by module.

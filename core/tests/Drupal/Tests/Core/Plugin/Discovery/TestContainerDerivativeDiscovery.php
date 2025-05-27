@@ -19,8 +19,7 @@ class TestContainerDerivativeDiscovery extends TestDerivativeDiscovery implement
    * @var \Symfony\Contracts\EventDispatcher\EventDispatcherInterface $example_service
    *   Some service.
    */
-  public function __construct(EventDispatcherInterface $example_service) {
-  }
+  public function __construct(EventDispatcherInterface $example_service) {}
 
   /**
    * {@inheritdoc}

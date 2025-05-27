@@ -20,8 +20,7 @@ class DateFormatDeleteForm extends EntityDeleteForm {
   public function __construct(
     protected DateFormatterInterface $dateFormatter,
     protected TimeInterface $time,
-  ) {
-  }
+  ) {}
 
   /**
    * {@inheritdoc}

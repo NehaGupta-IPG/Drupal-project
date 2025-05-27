@@ -39,8 +39,7 @@ class SystemAdminMenuBlockAccessCheck implements AccessInterface {
     private readonly MenuLinkTreeInterface $menuLinkTree,
     private readonly AccessAwareRouter $router,
     private readonly MenuLinkManagerInterface $menuLinkManager,
-  ) {
-  }
+  ) {}
 
   /**
    * Checks access.

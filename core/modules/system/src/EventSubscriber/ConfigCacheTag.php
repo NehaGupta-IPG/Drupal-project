@@ -21,8 +21,7 @@ class ConfigCacheTag implements EventSubscriberInterface {
     protected ThemeHandlerInterface $themeHandler,
     protected CacheTagsInvalidatorInterface $cacheTagsInvalidator,
     protected Registry $themeRegistry,
-  ) {
-  }
+  ) {}
 
   /**
    * Invalidate cache tags when particular system config objects are saved.

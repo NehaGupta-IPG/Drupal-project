@@ -28,8 +28,7 @@ final class RecipeConfigStorageWrapper implements StorageInterface {
     protected readonly StorageInterface $storageA,
     protected readonly StorageInterface $storageB,
     protected readonly string $collection = StorageInterface::DEFAULT_COLLECTION,
-  ) {
-  }
+  ) {}
 
   /**
    * Creates a single config storage for an array of storages.

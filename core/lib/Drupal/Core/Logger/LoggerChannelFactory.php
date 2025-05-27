@@ -36,8 +36,7 @@ class LoggerChannelFactory implements LoggerChannelFactoryInterface {
   public function __construct(
     protected RequestStack $requestStack,
     protected AccountInterface $currentUser,
-  ) {
-  }
+  ) {}
 
   /**
    * {@inheritdoc}

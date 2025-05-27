@@ -32,8 +32,7 @@ final class TestErrorHandler {
   public function __construct(
     private readonly BootstrapErrorHandler $parentHandler,
     private readonly TestCase $testCase,
-  ) {
-  }
+  ) {}
 
   /**
    * Executes when the object is called as a function.

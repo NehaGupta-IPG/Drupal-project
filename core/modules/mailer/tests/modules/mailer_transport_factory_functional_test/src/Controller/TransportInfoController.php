@@ -27,8 +27,7 @@ class TransportInfoController implements ContainerInjectionInterface {
   public function __construct(
     protected ConfigFactoryInterface $configFactory,
     protected TransportInterface $transport,
-  ) {
-  }
+  ) {}
 
   /**
    * {@inheritdoc}

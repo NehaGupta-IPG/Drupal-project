@@ -42,8 +42,7 @@ final class Announcement {
     public readonly string $content_html,
     public readonly string $version,
     public readonly bool $featured,
-  ) {
-  }
+  ) {}
 
   /**
    * Returns the content of the announcement with no markup.

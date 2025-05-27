@@ -14,8 +14,7 @@ class AttributeHelper {
   /**
    * This class should not be instantiated.
    */
-  private function __construct() {
-  }
+  private function __construct() {}
 
   /**
    * Checks if the given attribute collection has an attribute.

@@ -84,8 +84,7 @@ final class CheckpointStorage implements CheckpointStorageInterface, EventSubscr
     private readonly CheckpointListInterface $checkpoints,
     private readonly KeyValueFactoryInterface $keyValueFactory,
     private readonly string $collection = StorageInterface::DEFAULT_COLLECTION,
-  ) {
-  }
+  ) {}
 
   /**
    * {@inheritdoc}

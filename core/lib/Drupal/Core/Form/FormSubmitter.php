@@ -28,8 +28,7 @@ class FormSubmitter implements FormSubmitterInterface {
     protected RequestStack $requestStack,
     protected UrlGeneratorInterface $urlGenerator,
     protected RedirectResponseSubscriber $redirectResponseSubscriber,
-  ) {
-  }
+  ) {}
 
   /**
    * {@inheritdoc}

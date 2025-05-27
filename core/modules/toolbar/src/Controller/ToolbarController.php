@@ -25,8 +25,7 @@ class ToolbarController extends ControllerBase implements TrustedCallbackInterfa
    */
   public function __construct(
     protected ?TimeInterface $time = NULL,
-  ) {
-  }
+  ) {}
 
   /**
    * Returns an AJAX response to render the toolbar subtrees.

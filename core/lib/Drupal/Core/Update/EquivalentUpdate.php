@@ -28,8 +28,7 @@ final class EquivalentUpdate {
     public readonly int $future_update,
     public readonly int $ran_update,
     public readonly string $future_version,
-  ) {
-  }
+  ) {}
 
   /**
    * Creates a message to explain why an update has been skipped.

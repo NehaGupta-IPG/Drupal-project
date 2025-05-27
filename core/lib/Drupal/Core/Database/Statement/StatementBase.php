@@ -82,8 +82,7 @@ abstract class StatementBase implements \Iterator, StatementInterface {
     protected readonly object $clientConnection,
     protected readonly string $queryString,
     protected readonly bool $rowCountEnabled = FALSE,
-  ) {
-  }
+  ) {}
 
   /**
    * {@inheritdoc}

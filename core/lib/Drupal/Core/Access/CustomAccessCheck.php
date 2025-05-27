@@ -32,8 +32,7 @@ class CustomAccessCheck implements RoutingAccessInterface {
   public function __construct(
     protected CallableResolver $callableResolver,
     protected AccessArgumentsResolverFactoryInterface $argumentsResolverFactory,
-  ) {
-  }
+  ) {}
 
   /**
    * Checks access for the account and route using the custom access checker.

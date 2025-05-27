@@ -67,8 +67,7 @@ class FileUpload {
     protected HttpKernelInterface $httpKernel,
     protected InputStreamFileWriterInterface $inputStreamFileWriter,
     protected FileSystemInterface $fileSystem,
-  ) {
-  }
+  ) {}
 
   /**
    * Handles JSON:API file upload requests.

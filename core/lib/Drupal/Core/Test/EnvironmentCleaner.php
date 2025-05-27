@@ -33,8 +33,7 @@ class EnvironmentCleaner implements EnvironmentCleanerInterface {
     protected TestRunResultsStorageInterface $testRunResultsStorage,
     protected OutputInterface $output,
     protected FileSystemInterface $fileSystem,
-  ) {
-  }
+  ) {}
 
   /**
    * {@inheritdoc}

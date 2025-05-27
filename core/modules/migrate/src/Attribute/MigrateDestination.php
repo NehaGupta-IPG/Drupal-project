@@ -47,7 +47,6 @@ class MigrateDestination extends Plugin {
     public bool $requirements_met = TRUE,
     public readonly ?string $destination_module = NULL,
     public readonly ?string $deriver = NULL,
-  ) {
-  }
+  ) {}
 
 }

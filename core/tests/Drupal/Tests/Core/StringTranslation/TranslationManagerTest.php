@@ -107,7 +107,6 @@ class TranslationManagerTest extends UnitTestCase {
  */
 class TestTranslationManager extends TranslationManager {
 
-  public function __construct() {
-  }
+  public function __construct() {}
 
 }

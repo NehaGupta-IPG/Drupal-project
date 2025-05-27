@@ -36,8 +36,7 @@ class SearchIndex implements SearchIndexInterface {
     protected CacheTagsInvalidatorInterface $cacheTagsInvalidator,
     protected SearchTextProcessorInterface $textProcessor,
     protected TimeInterface $time ,
-  ) {
-  }
+  ) {}
 
   /**
    * {@inheritdoc}

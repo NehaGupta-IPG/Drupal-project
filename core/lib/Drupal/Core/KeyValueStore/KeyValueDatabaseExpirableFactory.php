@@ -32,8 +32,7 @@ class KeyValueDatabaseExpirableFactory implements KeyValueExpirableFactoryInterf
     protected SerializationInterface $serializer,
     protected Connection $connection,
     protected TimeInterface $time,
-  ) {
-  }
+  ) {}
 
   /**
    * {@inheritdoc}

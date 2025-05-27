@@ -362,8 +362,7 @@ class FieldItemListTest extends UnitTestCase {
  */
 class FieldItemTestClass extends FieldItemBase {
 
-  public function __construct() {
-  }
+  public function __construct() {}
 
   public static function propertyDefinitions(FieldStorageDefinitionInterface $field_definition): array {
     return [];

@@ -22,8 +22,7 @@ final class ContentLength implements HttpKernelInterface {
    */
   public function __construct(
     protected readonly HttpKernelInterface $httpKernel,
-  ) {
-  }
+  ) {}
 
   /**
    * {@inheritdoc}

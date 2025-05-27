@@ -26,8 +26,7 @@ final class AnnounceRenderer {
   public function __construct(
     protected AnnounceFetcher $announceFetcher,
     protected string $feedLink,
-  ) {
-  }
+  ) {}
 
   /**
    * Generates the announcements feed render array.
