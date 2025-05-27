@@ -63,12 +63,13 @@ interface ElementInfoManagerInterface extends PluginManagerInterface {
   public function getInfoProperty($type, $property_name, $default = NULL);
 
   /**
-   * Create a render object from a render array.
+   * Creates a render object from a render array.
    *
    * @param \Drupal\Core\Render\Element\ElementInterface|array $element
    *   A render array or render objects. The latter is returned unchanged.
    * @param string $type
-   *   The element type / render plugin id.
+   *   The element type / render plugin id. Defaults to 'form' to make it
+   *   easier to run this from form_alter implementations.
    *
    * @return \Drupal\Core\Render\Element\ElementInterface
    *   A render object. Defaults to form to make it easier to run this from

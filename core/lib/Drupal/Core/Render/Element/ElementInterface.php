@@ -43,13 +43,14 @@ interface ElementInterface extends PluginInspectionInterface, RenderCallbackInte
   /**
    * Initialize storage.
    *
+   * This will only have an effect the first time it is called, once it has
+   * been called, subsequent calls will not have an effect.
    * Only the plugin manager should ever call this method.
    *
    * @param array $element
    *   The containing element.
    *
    * @return $this
-   *   The object instance.
    *
    * @internal
    */
@@ -85,10 +86,10 @@ interface ElementInterface extends PluginInspectionInterface, RenderCallbackInte
   public function &toRenderable(?string $wrapper_key = NULL): array|ElementInterface;
 
   /**
-   * Return child elements.
+   * Returns child elements.
    *
    * @return \Traversable<\Drupal\Core\Render\Element\ElementInterface>
-   *   Key will be children names, values are render objects.
+   *   Keys will be children names, values are render objects.
    */
   public function getChildren(): \Traversable;
 
@@ -97,6 +98,7 @@ interface ElementInterface extends PluginInspectionInterface, RenderCallbackInte
    *
    * @param int|string|list<int|string> $name
    *   The name of the child. Can also be an integer. Or a list of these.
+   *   It is an integer when the field API uses the delta for children.
    *
    * @return ?\Drupal\Core\Render\Element\ElementInterface
    *   The child render object.
@@ -104,10 +106,10 @@ interface ElementInterface extends PluginInspectionInterface, RenderCallbackInte
   public function getChild(int|string|array $name): ?ElementInterface;
 
   /**
-   * Adds a child renderable.
+   * Adds a child render element.
    *
    * @param int|string $name
-   *   The name of the child. Can also be an integer.
+   *   The name of the child. Can also be an integer when the child is a delta.
    * @param array|\Drupal\Core\Render\Element\ElementInterface $child
    *   A render array or a render object.
    *
@@ -143,7 +145,8 @@ interface ElementInterface extends PluginInspectionInterface, RenderCallbackInte
    *   The name of the child. Can also be an integer.
    *
    * @return ?\Drupal\Core\Render\Element\ElementInterface
-   *   The removed render object if any.
+   *   The removed render object if any, or NULL if the child could not be
+   *   found.
    */
   public function removeChild(int|string $name): ?ElementInterface;
 
