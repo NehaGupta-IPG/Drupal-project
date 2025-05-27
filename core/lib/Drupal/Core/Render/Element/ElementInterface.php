@@ -114,7 +114,7 @@ interface ElementInterface extends PluginInspectionInterface, RenderCallbackInte
    *   A render array or a render object.
    *
    * @return \Drupal\Core\Render\Element\ElementInterface
-   *   The added child as an object.
+   *   The added child as a render object.
    */
   public function addChild(int|string $name, ElementInterface|array &$child): ElementInterface;
 
