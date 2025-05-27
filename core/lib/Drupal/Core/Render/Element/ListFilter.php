@@ -8,6 +8,15 @@ use Drupal\Core\Render\Attribute\RenderElement;
 /**
  * Provides a search element for filtering a list with JavaScript.
  *
+ * - #input: TRUE
+ * - #auto_activate: (optional) Whether the filter functionality should be
+ *   automatically activated via the drupalFilterByText behavior; it can be set
+ *   to FALSE, in which case the implementation needs to provide its own
+ *   integration with Drupal.filterByText. Defaults to TRUE.
+ * - #size: (optional) The size of the input field. Defaults to 60.
+ * - #maxlength: (optional) The maximum length of the input field. Defaults to
+ *   128.
+ * - theme_wrappers: ['form_element'].
  * - #list_container_selector: The CSS selector(s) of the container to search
  *   in. To use multiple selectors, separate them with commas, like
  *   '.selector-a, .selector-b'.
@@ -42,6 +51,7 @@ class ListFilter extends Search {
     $class = static::class;
     return [
       '#input' => TRUE,
+      '#auto_activate' => TRUE,
       '#size' => 60,
       '#maxlength' => 128,
       '#pre_render' => [
@@ -82,6 +92,9 @@ class ListFilter extends Search {
     $element['#attributes']['class'][] = 'table-filter-text';
     $element['#attributes']['data-table'] = $element['#list_container_selector'];
     $element['#attributes']['data-items'] = $element['#list_item'];
+    if ($element['#auto_activate']) {
+      $element['#attributes']['data-auto-activate'] = 'true';
+    }
     if ($element['#list_text']) {
       $element['#attributes']['data-targets'] = $element['#list_text'];
     }
