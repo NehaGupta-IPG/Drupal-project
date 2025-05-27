@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Core\Render\Element;
+namespace Drupal\Tests\Core\Render\Element;
 
 use Drupal\Component\Plugin\Factory\FactoryInterface;
 use Drupal\Core\Render\Element;

@@ -619,9 +619,9 @@ abstract class RenderElementBase extends PluginBase implements ElementInterface,
    * Magic method: checks if a property value is set.
    *
    * @param string $name
-   *   The name of the property. This will check both the object property
-   *   $this->name and also the render key $element['#' . $name] where the
-   *   element is the render array this object was created from.
+   *   The name of the property. Check whether the render key
+   *   $element['#' . $name] is set where element is the render array this
+   *   object was created from. This value is also accessible as $this->name.
    *
    * @return bool
    *   Whether it is set or not.
