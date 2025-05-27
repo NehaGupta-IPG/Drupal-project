@@ -7,6 +7,7 @@ namespace Drupal\Tests\Core\Render\Element;
 use Drupal\Core\Form\FormState;
 use Drupal\Core\Link;
 use Drupal\Core\Render\Element\Tableselect;
+use Drupal\Core\Render\ElementInfoManagerInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Url;
 use Drupal\Tests\UnitTestCase;
@@ -30,7 +31,7 @@ class TableSelectTest extends UnitTestCase {
     $form_state = new FormState();
     $complete_form = [];
 
-    $element_object = new Tableselect([], 'table_select', []);
+    $element_object = new Tableselect([], 'table_select', [], elementInfoManager: $this->createStub(ElementInfoManagerInterface::class));
     $info = $element_object->getInfo();
     $element += $info;
 
@@ -57,7 +58,7 @@ class TableSelectTest extends UnitTestCase {
     $form_state = new FormState();
     $complete_form = [];
 
-    $element_object = new Tableselect([], 'table_select', []);
+    $element_object = new Tableselect([], 'table_select', [], elementInfoManager: $this->createStub(ElementInfoManagerInterface::class));
     $info = $element_object->getInfo();
     $element += $info;
 
