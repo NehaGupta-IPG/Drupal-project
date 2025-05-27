@@ -34803,5 +34803,11 @@ $ignoreErrors[] = [
 	'count' => 1,
 	'path' => __DIR__ . '/themes/default_admin/src/Hook/PreprocessHooks.php',
 ];
+$ignoreErrors[] = [
+  'message' => '#^Method Drupal\\\\views\\\\Plugin\\\\views\\\\area\\\\AreaPluginBase\\:\\:submitOptionsForm\\(\\) has no return type specified\\.$#',
+  'identifier' => 'missingType.return',
+  'count' => 1,
+  'path' => __DIR__ . '/modules/views/src/Plugin/views/area/AreaPluginBase.php',
+];
 
 return ['parameters' => ['ignoreErrors' => $ignoreErrors]];

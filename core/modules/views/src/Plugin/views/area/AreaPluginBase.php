@@ -125,7 +125,7 @@ abstract class AreaPluginBase extends HandlerBase {
   /**
    * {@inheritdoc}
    */
-  public function submitOptionsForm(&$form, FormStateInterface $form_state): void {
+  public function submitOptionsForm(&$form, FormStateInterface $form_state) {
     $current_area_id = $form_state->get('id');
 
     if ($form_state->getValue(['options', 'area_id']) != $current_area_id) {
