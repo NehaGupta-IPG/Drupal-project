@@ -7,6 +7,7 @@ namespace Drupal\Tests\file\Functional;
 use Drupal\Core\Database\Database;
 use Drupal\Core\File\FileSystemInterface;
 use Drupal\file_test\FileTestHelper;
+use Drupal\system\FileDownloadController;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -136,7 +137,7 @@ class DownloadTest extends FileManagedTestBase {
     $this->assertSame($contents, $this->getSession()->getPage()->getContent(), 'Contents of the file are correct.');
 
     // Deny access to all downloads via a -1 header.
-    FileTestHelper::setReturn('download', -1);
+    FileTestHelper::setReturn('download', FileDownloadController::FILE_DOWNLOAD_DENY);
     $response = $http_client->head($url, ['http_errors' => FALSE]);
     $this->assertSame(403, $response->getStatusCode(), 'Correctly denied access to a file when file_test sets the header to -1.');
 
