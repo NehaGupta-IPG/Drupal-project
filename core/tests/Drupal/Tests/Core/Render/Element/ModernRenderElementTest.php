@@ -16,7 +16,7 @@ use Drupal\Tests\UnitTestCase;
  */
 class ModernRenderElementTest extends UnitTestCase {
 
-  public function testChildren() {
+  public function testChildren(): void {
     $factory = $this->createMock(FactoryInterface::class);
     $elementInfoManager = new class ($factory) extends ElementInfoManager {
 
