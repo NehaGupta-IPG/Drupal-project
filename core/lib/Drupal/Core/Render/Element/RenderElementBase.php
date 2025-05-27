@@ -170,7 +170,8 @@ abstract class RenderElementBase extends PluginBase implements ElementInterface,
    */
   public function __construct(array $configuration, $plugin_id, $plugin_definition, protected ?ElementInfoManagerInterface $elementInfoManager = NULL) {
     if (!$this->elementInfoManager) {
-      // Deprecated blah, blah, blah.
+      @trigger_error('Calling ' . __METHOD__ . '() without the $elementInfoManager argument is deprecated in drupal:11.3.0 and it will be required in drupal:12.0.0. See https://www.drupal.org/node/placeholder', E_USER_DEPRECATED);
+      $this->elementInfoManager = \Drupal::service('plugin.manager.element_info');
     }
     parent::__construct($configuration, $plugin_id, $plugin_definition);
   }
