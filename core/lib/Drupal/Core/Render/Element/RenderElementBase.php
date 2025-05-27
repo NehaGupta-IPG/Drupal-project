@@ -603,20 +603,20 @@ abstract class RenderElementBase extends PluginBase implements ElementInterface,
   }
 
   /**
-   * Unsets a key.
+   * Magic method: unsets a property value.
    *
    * @param string $name
-   *   The name of the key to unset.
+   *   The name of the property.
    */
   public function __unset(string $name): void {
     unset($this->storage['#' . $name]);
   }
 
   /**
-   * Checks if a key is set.
+   * Magic method: checks if a property value is set.
    *
    * @param string $name
-   *   The name to check.
+   *   The name of the property.
    *
    * @return bool
    *   Whether it is set or not.
