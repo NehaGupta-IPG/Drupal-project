@@ -8,7 +8,6 @@ use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Field\Plugin\Field\FieldWidget\StringTextfieldWidget;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Render\Element\ElementInterface;
-use Drupal\Core\Render\Element\Form;
 use Drupal\Core\Render\Element\Wrapper;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\media\Entity\MediaType;
@@ -40,7 +39,7 @@ class OEmbedWidget extends StringTextfieldWidget {
   /**
    * {@inheritdoc}
    */
-  public function singleElementObject(FieldItemListInterface $items, $delta, Wrapper $wrapper, Form $form, FormStateInterface $form_state): ElementInterface {
+  public function singleElementObject(FieldItemListInterface $items, $delta, Wrapper $wrapper, ElementInterface $form, FormStateInterface $form_state): ElementInterface {
     $wrapper = parent::singleElementObject($items, $delta, $wrapper, $form, $form_state);
     $value = $wrapper->getChild('value');
     $value->description = $this->getValueDescription($items, $value->description);

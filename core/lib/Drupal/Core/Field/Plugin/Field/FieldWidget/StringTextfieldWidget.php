@@ -8,7 +8,6 @@ use Drupal\Core\Field\ModernWidgetInterface;
 use Drupal\Core\Field\WidgetBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Render\Element\ElementInterface;
-use Drupal\Core\Render\Element\Form;
 use Drupal\Core\Render\Element\Textfield;
 use Drupal\Core\Render\Element\Wrapper;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
@@ -87,7 +86,7 @@ class StringTextfieldWidget extends WidgetBase implements ModernWidgetInterface 
   /**
    * {@inheritdoc}
    */
-  public function singleElementObject(FieldItemListInterface $items, $delta, Wrapper $wrapper, Form $form, FormStateInterface $form_state): ElementInterface {
+  public function singleElementObject(FieldItemListInterface $items, $delta, Wrapper $wrapper, ElementInterface $form, FormStateInterface $form_state): ElementInterface {
     $value = $wrapper->createChild('value', Textfield::class, copyProperties: TRUE);
     $value->default_value = $items[$delta]->value;
     $value->size = $this->getSetting('size');

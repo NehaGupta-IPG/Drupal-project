@@ -268,7 +268,10 @@ class ElementInfoManager extends DefaultPluginManager implements ElementInfoMana
         throw new \LogicException('The element passed to ElementInfoManager::fromRenderArray must have a #type or a fallback $type must be provided.');
       }
     }
-    return $element['##object'] ?? $this->createInstance(element: $element);
+    if (isset($element['##object']) && $element['##object'] instanceof ElementInterface) {
+      return $element['##object']->initializeInternalStorage($element);
+    }
+    return $this->createInstance(element: $element);
   }
 
 }

@@ -4,7 +4,6 @@ namespace Drupal\Core\Field;
 
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Render\Element\ElementInterface;
-use Drupal\Core\Render\Element\Form;
 use Drupal\Core\Render\Element\Wrapper;
 
 /**
@@ -60,7 +59,7 @@ interface ModernWidgetInterface {
    *     required.
    *   - delta: The order of this item in the array of sub-elements; see $delta
    *     above.
-   * @param \Drupal\Core\Render\Element\Form $form
+   * @param \Drupal\Core\Render\Element\ElementInterface $form
    *   The form structure where widgets are being attached to. This might be a
    *   full form structure, or a sub-element of a larger form.
    * @param \Drupal\Core\Form\FormStateInterface $form_state
@@ -73,6 +72,6 @@ interface ModernWidgetInterface {
    * @see hook_field_widget_single_element_form_alter()
    * @see hook_field_widget_single_element_WIDGET_TYPE_form_alter()
    */
-  public function singleElementObject(FieldItemListInterface $items, $delta, Wrapper $wrapper, Form $form, FormStateInterface $form_state): ElementInterface;
+  public function singleElementObject(FieldItemListInterface $items, $delta, Wrapper $wrapper, ElementInterface $form, FormStateInterface $form_state): ElementInterface;
 
 }

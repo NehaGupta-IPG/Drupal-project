@@ -557,10 +557,8 @@ abstract class RenderElementBase extends PluginBase implements ElementInterface,
    * {@inheritdoc}
    */
   public function initializeInternalStorage(array &$element): static {
-    if (!$this->storage) {
-      $this->storage = &$element;
-      $element['##object'] = $this;
-    }
+    $this->storage = &$element;
+    $element['##object'] = $this;
     return $this;
   }
 
@@ -593,13 +591,38 @@ abstract class RenderElementBase extends PluginBase implements ElementInterface,
    * Magic method: gets a property value.
    *
    * @param string $name
-   *   The name of the property.
+   *   The name of the property. $value is accessible with $this->name and
+   *   also $element['#' . $name] where the element is the render array this
+   *   object was created from.
    *
    * @return mixed
    *   The value.
    */
   public function __get(string $name): mixed {
     return $this->storage['#' . $name] ?? NULL;
+  }
+
+  /**
+   * Unsets a key.
+   *
+   * @param string $name
+   *   The name of the key to unset.
+   */
+  public function __unset(string $name): void {
+    unset($this->storage['#' . $name]);
+  }
+
+  /**
+   * Checks if a key is set.
+   *
+   * @param string $name
+   *   The name to check.
+   *
+   * @return bool
+   *   Whether it is set or not.
+   */
+  public function __isset(string $name): bool {
+    return isset($this->storage['#' . $name]);
   }
 
   /**
