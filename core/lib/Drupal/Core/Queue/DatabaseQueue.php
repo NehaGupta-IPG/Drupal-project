@@ -21,13 +21,6 @@ class DatabaseQueue implements ReliableQueueInterface, QueueGarbageCollectionInt
   const TABLE_NAME = 'queue';
 
   /**
-   * The name of the queue this instance is working with.
-   *
-   * @var string
-   */
-  protected $name;
-
-  /**
    * The database connection.
    *
    * @var \Drupal\Core\Database\Connection
@@ -42,8 +35,7 @@ class DatabaseQueue implements ReliableQueueInterface, QueueGarbageCollectionInt
    * @param \Drupal\Core\Database\Connection $connection
    *   The Connection object containing the key-value tables.
    */
-  public function __construct($name, Connection $connection) {
-    $this->name = $name;
+  public function __construct(protected $name, Connection $connection) {
     $this->connection = $connection;
   }
 

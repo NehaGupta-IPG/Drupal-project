@@ -26,13 +26,6 @@ class DefaultTableMapping implements TableMappingInterface {
   protected $fieldStorageDefinitions = [];
 
   /**
-   * The prefix to be used by all the tables of this mapping.
-   *
-   * @var string
-   */
-  protected $prefix;
-
-  /**
    * The base table of the entity.
    *
    * @var string
@@ -125,10 +118,9 @@ class DefaultTableMapping implements TableMappingInterface {
    *   (optional) A prefix to be used by all the tables of this mapping.
    *   Defaults to an empty string.
    */
-  public function __construct(ContentEntityTypeInterface $entity_type, array $storage_definitions, $prefix = '') {
+  public function __construct(ContentEntityTypeInterface $entity_type, array $storage_definitions, protected $prefix = '') {
     $this->entityType = $entity_type;
     $this->fieldStorageDefinitions = $storage_definitions;
-    $this->prefix = $prefix;
 
     // @todo Remove table names from the entity type definition in
     //   https://www.drupal.org/node/2232465.

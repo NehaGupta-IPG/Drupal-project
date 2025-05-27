@@ -42,13 +42,6 @@ class MenuLinkTreeElement {
   public $subtree;
 
   /**
-   * The depth of this link relative to the root of the tree.
-   *
-   * @var int
-   */
-  public $depth;
-
-  /**
    * Whether this link has any children at all.
    *
    * @var bool
@@ -99,11 +92,10 @@ class MenuLinkTreeElement {
    * @param \Drupal\Core\Menu\MenuLinkTreeElement[] $subtree
    *   The children of this element in the menu link tree.
    */
-  public function __construct(MenuLinkInterface $link, $has_children, $depth, $in_active_trail, array $subtree) {
+  public function __construct(MenuLinkInterface $link, $has_children, public $depth, $in_active_trail, array $subtree) {
     // Essential properties.
     $this->link = $link;
     $this->hasChildren = $has_children;
-    $this->depth = $depth;
     $this->subtree = $subtree;
     $this->inActiveTrail = $in_active_trail;
   }

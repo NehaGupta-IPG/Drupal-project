@@ -10,13 +10,6 @@ use Drupal\Core\Database\Query\PlaceholderInterface;
 abstract class Schema implements PlaceholderInterface {
 
   /**
-   * The database connection.
-   *
-   * @var \Drupal\Core\Database\Connection
-   */
-  protected $connection;
-
-  /**
    * The placeholder counter.
    *
    * @var int
@@ -43,9 +36,8 @@ abstract class Schema implements PlaceholderInterface {
    */
   protected $uniqueIdentifier;
 
-  public function __construct($connection) {
+  public function __construct(protected $connection) {
     $this->uniqueIdentifier = uniqid('', TRUE);
-    $this->connection = $connection;
   }
 
   /**

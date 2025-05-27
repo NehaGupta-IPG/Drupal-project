@@ -51,13 +51,6 @@ class ThemeManager implements ThemeManagerInterface {
   protected $moduleHandler;
 
   /**
-   * The app root.
-   *
-   * @var string
-   */
-  protected $root;
-
-  /**
    * Default variables.
    *
    * @var array|null
@@ -79,13 +72,12 @@ class ThemeManager implements ThemeManagerInterface {
    *   The callable resolver.
    */
   public function __construct(
-    $root,
+    protected $root,
     ThemeNegotiatorInterface $theme_negotiator,
     ThemeInitializationInterface $theme_initialization,
     ModuleHandlerInterface $module_handler,
     protected CallableResolver $callableResolver,
   ) {
-    $this->root = $root;
     $this->themeNegotiator = $theme_negotiator;
     $this->themeInitialization = $theme_initialization;
     $this->moduleHandler = $module_handler;

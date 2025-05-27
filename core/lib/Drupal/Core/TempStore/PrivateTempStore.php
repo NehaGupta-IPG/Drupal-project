@@ -60,15 +60,6 @@ class PrivateTempStore {
   protected $requestStack;
 
   /**
-   * The time to live for items in seconds.
-   *
-   * By default, data is stored for one week (604800 seconds) before expiring.
-   *
-   * @var int
-   */
-  protected $expire;
-
-  /**
    * Constructs a new object for accessing data from a key/value store.
    *
    * @param \Drupal\Core\KeyValueStore\KeyValueStoreExpirableInterface $storage
@@ -84,12 +75,11 @@ class PrivateTempStore {
    * @param int $expire
    *   The time to live for items, in seconds.
    */
-  public function __construct(KeyValueStoreExpirableInterface $storage, LockBackendInterface $lock_backend, AccountProxyInterface $current_user, RequestStack $request_stack, $expire = 604800) {
+  public function __construct(KeyValueStoreExpirableInterface $storage, LockBackendInterface $lock_backend, AccountProxyInterface $current_user, RequestStack $request_stack, protected $expire = 604800) {
     $this->storage = $storage;
     $this->lockBackend = $lock_backend;
     $this->currentUser = $current_user;
     $this->requestStack = $request_stack;
-    $this->expire = $expire;
   }
 
   /**

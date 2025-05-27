@@ -50,13 +50,6 @@ class TestDiscovery {
   protected $availableExtensions;
 
   /**
-   * The app root.
-   *
-   * @var string
-   */
-  protected $root;
-
-  /**
    * Constructs a new test discovery.
    *
    * @param string $root
@@ -65,8 +58,7 @@ class TestDiscovery {
    *   The class loader. Normally Composer's ClassLoader, as included by the
    *   front controller, but may also be decorated.
    */
-  public function __construct($root, $class_loader) {
-    $this->root = $root;
+  public function __construct(protected $root, $class_loader) {
     $this->classLoader = $class_loader;
   }
 

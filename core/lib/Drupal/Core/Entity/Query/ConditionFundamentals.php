@@ -15,29 +15,11 @@ abstract class ConditionFundamentals {
   protected $conditions = [];
 
   /**
-   * The conjunction of this condition group.
-   *
-   * The value is one of the following:
-   * - AND (default)
-   * - OR
-   *
-   * @var string
-   */
-  protected $conjunction;
-
-  /**
    * The query this condition belongs to.
    *
    * @var \Drupal\Core\Entity\Query\QueryInterface
    */
   protected $query;
-
-  /**
-   * List of potential namespaces of the classes belonging to this condition.
-   *
-   * @var array
-   */
-  protected $namespaces = [];
 
   /**
    * Constructs a Condition object.
@@ -49,10 +31,8 @@ abstract class ConditionFundamentals {
    * @param array $namespaces
    *   List of potential namespaces of the classes belonging to this condition.
    */
-  public function __construct($conjunction, QueryInterface $query, $namespaces = []) {
-    $this->conjunction = $conjunction;
+  public function __construct(protected $conjunction, QueryInterface $query, protected $namespaces = []) {
     $this->query = $query;
-    $this->namespaces = $namespaces;
   }
 
   /**

@@ -127,13 +127,6 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
   protected $container;
 
   /**
-   * The environment, e.g. 'testing', 'install'.
-   *
-   * @var string
-   */
-  protected $environment;
-
-  /**
    * Whether the kernel has been booted.
    *
    * @var bool
@@ -308,8 +301,7 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
    *   (optional) The path to the application root as a string. If not supplied,
    *   the application root will be computed.
    */
-  public function __construct($environment, $class_loader, $allow_dumping = TRUE, $app_root = NULL) {
-    $this->environment = $environment;
+  public function __construct(protected $environment, $class_loader, $allow_dumping = TRUE, $app_root = NULL) {
     $this->classLoader = $class_loader;
     $this->allowDumping = $allow_dumping;
     if ($app_root === NULL) {

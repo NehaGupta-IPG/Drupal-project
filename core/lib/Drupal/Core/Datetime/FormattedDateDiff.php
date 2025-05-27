@@ -14,13 +14,6 @@ class FormattedDateDiff implements RenderableInterface, CacheableDependencyInter
   use UnchangingCacheableDependencyTrait;
 
   /**
-   * The actual formatted time difference.
-   *
-   * @var string
-   */
-  protected $string;
-
-  /**
    * The maximum time in seconds that this string may be cached.
    *
    * Let's say the time difference is 1 day 1 hour. In this case, we can cache
@@ -38,8 +31,7 @@ class FormattedDateDiff implements RenderableInterface, CacheableDependencyInter
    * @param int $max_age
    *   The maximum time in seconds that this string may be cached.
    */
-  public function __construct($string, $max_age) {
-    $this->string = $string;
+  public function __construct(protected $string, $max_age) {
     $this->maxAge = $max_age;
   }
 

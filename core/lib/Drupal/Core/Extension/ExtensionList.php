@@ -21,22 +21,6 @@ use Drupal\Core\State\StateInterface;
 abstract class ExtensionList {
 
   /**
-   * The type of the extension.
-   *
-   * Possible values: "module", "theme", "profile" or "database_driver".
-   *
-   * @var string
-   */
-  protected $type;
-
-  /**
-   * The app root.
-   *
-   * @var string
-   */
-  protected $root;
-
-  /**
    * The cache.
    *
    * @var \Drupal\Core\Cache\CacheBackendInterface
@@ -134,9 +118,7 @@ abstract class ExtensionList {
    * @param string $install_profile
    *   The install profile used by the site.
    */
-  public function __construct($root, $type, CacheBackendInterface $cache, InfoParserInterface $info_parser, ModuleHandlerInterface $module_handler, StateInterface $state, $install_profile) {
-    $this->root = $root;
-    $this->type = $type;
+  public function __construct(protected $root, protected $type, CacheBackendInterface $cache, InfoParserInterface $info_parser, ModuleHandlerInterface $module_handler, StateInterface $state, $install_profile) {
     $this->cache = $cache;
     $this->infoParser = $info_parser;
     $this->moduleHandler = $module_handler;

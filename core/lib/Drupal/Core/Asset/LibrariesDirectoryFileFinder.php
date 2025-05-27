@@ -10,13 +10,6 @@ use Drupal\Core\Extension\ProfileExtensionList;
 class LibrariesDirectoryFileFinder {
 
   /**
-   * The app root.
-   *
-   * @var string
-   */
-  protected $root;
-
-  /**
    * The site path.
    *
    * @var string
@@ -49,8 +42,7 @@ class LibrariesDirectoryFileFinder {
    * @param string $install_profile
    *   The install profile.
    */
-  public function __construct($root, $site_path, ProfileExtensionList $profile_extension_list, $install_profile) {
-    $this->root = $root;
+  public function __construct(protected $root, $site_path, ProfileExtensionList $profile_extension_list, $install_profile) {
     $this->sitePath = $site_path;
     $this->profileExtensionList = $profile_extension_list;
     $this->installProfile = $install_profile;

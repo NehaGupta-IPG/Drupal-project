@@ -32,13 +32,6 @@ abstract class FormatterBase extends PluginSettingsBase implements FormatterInte
   protected $settings;
 
   /**
-   * The label display setting.
-   *
-   * @var string
-   */
-  protected $label;
-
-  /**
    * The view mode.
    *
    * @var string
@@ -63,12 +56,11 @@ abstract class FormatterBase extends PluginSettingsBase implements FormatterInte
    * @param array $third_party_settings
    *   Any third party settings.
    */
-  public function __construct($plugin_id, $plugin_definition, FieldDefinitionInterface $field_definition, array $settings, $label, $view_mode, array $third_party_settings) {
+  public function __construct($plugin_id, $plugin_definition, FieldDefinitionInterface $field_definition, array $settings, protected $label, $view_mode, array $third_party_settings) {
     parent::__construct([], $plugin_id, $plugin_definition);
 
     $this->fieldDefinition = $field_definition;
     $this->settings = $settings;
-    $this->label = $label;
     $this->viewMode = $view_mode;
     $this->thirdPartySettings = $third_party_settings;
   }

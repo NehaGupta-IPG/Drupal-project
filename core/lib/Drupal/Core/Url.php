@@ -66,15 +66,6 @@ class Url implements TrustedCallbackInterface {
   protected $routeParameters = [];
 
   /**
-   * The URL options.
-   *
-   * See \Drupal\Core\Url::fromUri() for details on the options.
-   *
-   * @var array
-   */
-  protected $options = [];
-
-  /**
    * Indicates whether this object contains an external URL.
    *
    * @var bool
@@ -124,10 +115,9 @@ class Url implements TrustedCallbackInterface {
    * @todo Update this documentation for non-routed URIs in
    *   https://www.drupal.org/node/2346787
    */
-  public function __construct($route_name, $route_parameters = [], $options = []) {
+  public function __construct($route_name, $route_parameters = [], protected $options = []) {
     $this->routeName = $route_name;
     $this->routeParameters = $route_parameters;
-    $this->options = $options;
   }
 
   /**

@@ -41,13 +41,6 @@ class PrivateTempStoreFactory {
   protected $requestStack;
 
   /**
-   * The time to live for items in seconds.
-   *
-   * @var int
-   */
-  protected $expire;
-
-  /**
    * Constructs a Drupal\Core\TempStore\PrivateTempStoreFactory object.
    *
    * @param \Drupal\Core\KeyValueStore\KeyValueExpirableFactoryInterface $storage_factory
@@ -61,12 +54,11 @@ class PrivateTempStoreFactory {
    * @param int $expire
    *   The time to live for items, in seconds.
    */
-  public function __construct(KeyValueExpirableFactoryInterface $storage_factory, LockBackendInterface $lock_backend, AccountProxyInterface $current_user, RequestStack $request_stack, $expire = 604800) {
+  public function __construct(KeyValueExpirableFactoryInterface $storage_factory, LockBackendInterface $lock_backend, AccountProxyInterface $current_user, RequestStack $request_stack, protected $expire = 604800) {
     $this->storageFactory = $storage_factory;
     $this->lockBackend = $lock_backend;
     $this->currentUser = $current_user;
     $this->requestStack = $request_stack;
-    $this->expire = $expire;
   }
 
   /**

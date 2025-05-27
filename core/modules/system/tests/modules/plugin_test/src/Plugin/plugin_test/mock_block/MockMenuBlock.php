@@ -11,23 +11,7 @@ namespace Drupal\plugin_test\Plugin\plugin_test\mock_block;
  */
 class MockMenuBlock {
 
-  /**
-   * The title to display when rendering this block instance.
-   *
-   * @var string
-   */
-  protected $title;
-
-  /**
-   * The number of menu levels deep to render.
-   *
-   * @var int
-   */
-  protected $depth;
-
-  public function __construct($title = '', $depth = 0) {
-    $this->title = $title;
-    $this->depth = $depth;
+  public function __construct(protected $title = '', protected $depth = 0) {
   }
 
   /**

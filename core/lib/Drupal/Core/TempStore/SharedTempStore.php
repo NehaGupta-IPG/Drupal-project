@@ -63,27 +63,11 @@ class SharedTempStore {
   protected $requestStack;
 
   /**
-   * The owner key to store along with the data (e.g. a user or session ID).
-   *
-   * @var mixed
-   */
-  protected $owner;
-
-  /**
    * The current user.
    *
    * @var \Drupal\Core\Session\AccountProxyInterface
    */
   protected $currentUser;
-
-  /**
-   * The time to live for items in seconds.
-   *
-   * By default, data is stored for one week (604800 seconds) before expiring.
-   *
-   * @var int
-   */
-  protected $expire;
 
   /**
    * Constructs a new object for accessing data from a key/value store.
@@ -103,13 +87,11 @@ class SharedTempStore {
    * @param int $expire
    *   The time to live for items, in seconds.
    */
-  public function __construct(KeyValueStoreExpirableInterface $storage, LockBackendInterface $lock_backend, $owner, RequestStack $request_stack, AccountProxyInterface $current_user, $expire = 604800) {
+  public function __construct(KeyValueStoreExpirableInterface $storage, LockBackendInterface $lock_backend, protected $owner, RequestStack $request_stack, AccountProxyInterface $current_user, protected $expire = 604800) {
     $this->storage = $storage;
     $this->lockBackend = $lock_backend;
-    $this->owner = $owner;
     $this->requestStack = $request_stack;
     $this->currentUser = $current_user;
-    $this->expire = $expire;
   }
 
   /**

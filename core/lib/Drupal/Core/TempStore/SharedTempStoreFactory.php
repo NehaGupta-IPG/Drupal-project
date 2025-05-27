@@ -42,13 +42,6 @@ class SharedTempStoreFactory {
   protected $currentUser;
 
   /**
-   * The time to live for items in seconds.
-   *
-   * @var int
-   */
-  protected $expire;
-
-  /**
    * Constructs a Drupal\Core\TempStore\SharedTempStoreFactory object.
    *
    * @param \Drupal\Core\KeyValueStore\KeyValueExpirableFactoryInterface $storage_factory
@@ -62,12 +55,11 @@ class SharedTempStoreFactory {
    * @param int $expire
    *   The time to live for items, in seconds.
    */
-  public function __construct(KeyValueExpirableFactoryInterface $storage_factory, LockBackendInterface $lock_backend, RequestStack $request_stack, AccountProxyInterface $current_user, $expire = 604800) {
+  public function __construct(KeyValueExpirableFactoryInterface $storage_factory, LockBackendInterface $lock_backend, RequestStack $request_stack, AccountProxyInterface $current_user, protected $expire = 604800) {
     $this->storageFactory = $storage_factory;
     $this->lockBackend = $lock_backend;
     $this->requestStack = $request_stack;
     $this->currentUser = $current_user;
-    $this->expire = $expire;
   }
 
   /**

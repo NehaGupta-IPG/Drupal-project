@@ -21,20 +21,6 @@ use Drupal\layout_builder\Event\SectionComponentBuildRenderArrayEvent;
 class SectionComponent {
 
   /**
-   * The UUID of the component.
-   *
-   * @var string
-   */
-  protected $uuid;
-
-  /**
-   * The region the component is placed in.
-   *
-   * @var string
-   */
-  protected $region;
-
-  /**
    * An array of plugin configuration.
    *
    * @var mixed[]
@@ -67,9 +53,7 @@ class SectionComponent {
    * @param mixed[] $additional
    *   An additional values.
    */
-  public function __construct($uuid, $region, array $configuration = [], array $additional = []) {
-    $this->uuid = $uuid;
-    $this->region = $region;
+  public function __construct(protected $uuid, protected $region, array $configuration = [], array $additional = []) {
     $this->configuration = $configuration;
     $this->additional = $additional;
   }

@@ -12,13 +12,6 @@ namespace Drupal\media\OEmbed;
 class ResourceException extends \Exception {
 
   /**
-   * The URL of the resource.
-   *
-   * @var string
-   */
-  protected $url;
-
-  /**
    * The resource data.
    *
    * @var array
@@ -38,8 +31,7 @@ class ResourceException extends \Exception {
    * @param \Throwable $previous
    *   (optional) The previous exception, if any.
    */
-  public function __construct($message, $url, array $data = [], ?\Throwable $previous = NULL) {
-    $this->url = $url;
+  public function __construct($message, protected $url, array $data = [], ?\Throwable $previous = NULL) {
     $this->data = $data;
     parent::__construct($message, 0, $previous);
   }

@@ -10,20 +10,6 @@ use Drupal\Component\Version\Constraint;
 class Dependency {
 
   /**
-   * The name of the dependency.
-   *
-   * @var string
-   */
-  protected $name;
-
-  /**
-   * The project namespace for the dependency.
-   *
-   * @var string
-   */
-  protected $project;
-
-  /**
    * The constraint string.
    *
    * @var \Drupal\Component\Version\Constraint
@@ -47,9 +33,7 @@ class Dependency {
    * @param string $constraint
    *   The constraint string. For example, '>8.x-1.1'.
    */
-  public function __construct($name, $project, $constraint) {
-    $this->name = $name;
-    $this->project = $project;
+  public function __construct(protected $name, protected $project, $constraint) {
     $this->constraintString = $constraint;
   }
 

@@ -29,16 +29,6 @@ class SettingsCommand implements CommandInterface {
   protected $settings;
 
   /**
-   * Whether the settings should be merged into the global drupalSettings.
-   *
-   * By default (FALSE), the settings that are passed to Drupal.attachBehaviors
-   * will not include the global drupalSettings.
-   *
-   * @var bool
-   */
-  protected $merge;
-
-  /**
    * Constructs a SettingsCommand object.
    *
    * @param array $settings
@@ -46,9 +36,8 @@ class SettingsCommand implements CommandInterface {
    * @param bool $merge
    *   Whether the settings should be merged into the global drupalSettings.
    */
-  public function __construct(array $settings, $merge = FALSE) {
+  public function __construct(array $settings, protected $merge = FALSE) {
     $this->settings = $settings;
-    $this->merge = $merge;
   }
 
   /**

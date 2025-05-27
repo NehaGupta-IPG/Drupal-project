@@ -14,27 +14,11 @@ class OpenDialogCommand implements CommandInterface, CommandWithAttachedAssetsIn
   use CommandWithAttachedAssetsTrait;
 
   /**
-   * The selector of the dialog.
-   *
-   * @var string
-   */
-  protected $selector;
-
-  /**
    * The title of the dialog.
    *
    * @var string
    */
   protected $title;
-
-  /**
-   * The content for the dialog.
-   *
-   * Either a render array or an HTML string.
-   *
-   * @var string|array
-   */
-  protected $content;
 
   /**
    * Stores dialog-specific options passed directly to jQuery UI dialogs.
@@ -72,7 +56,7 @@ class OpenDialogCommand implements CommandInterface, CommandWithAttachedAssetsIn
    *   on the content of the dialog. If left empty, the settings will be
    *   populated automatically from the current request.
    */
-  public function __construct($selector, string|\Stringable|null $title, $content, array $dialog_options = [], $settings = NULL) {
+  public function __construct(protected $selector, string|\Stringable|null $title, protected $content, array $dialog_options = [], $settings = NULL) {
     $title = PlainTextOutput::renderFromHtml($title);
 
     $dialog_options += ['title' => $title];
@@ -82,8 +66,6 @@ class OpenDialogCommand implements CommandInterface, CommandWithAttachedAssetsIn
       unset($dialog_options['dialogClass']);
     }
 
-    $this->selector = $selector;
-    $this->content = $content;
     $this->dialogOptions = $dialog_options;
     $this->settings = $settings;
   }

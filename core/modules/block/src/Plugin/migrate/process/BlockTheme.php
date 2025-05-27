@@ -22,13 +22,6 @@ class BlockTheme extends ProcessPluginBase implements ContainerFactoryPluginInte
   protected Config $themeConfig;
 
   /**
-   * List of themes available on the destination.
-   *
-   * @var string[]
-   */
-  protected array $themes;
-
-  /**
    * Constructs a BlockTheme object.
    *
    * @param array $configuration
@@ -42,10 +35,9 @@ class BlockTheme extends ProcessPluginBase implements ContainerFactoryPluginInte
    * @param array $themes
    *   The list of themes available on the destination.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, Config $theme_config, array $themes) {
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, Config $theme_config, protected array $themes) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
     $this->themeConfig = $theme_config;
-    $this->themes = $themes;
   }
 
   /**

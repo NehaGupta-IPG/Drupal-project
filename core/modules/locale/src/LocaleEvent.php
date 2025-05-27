@@ -17,13 +17,6 @@ class LocaleEvent extends Event {
   protected $langCodes;
 
   /**
-   * List of string identifiers that have been updated / created.
-   *
-   * @var string[]
-   */
-  protected array $lids;
-
-  /**
    * Constructs a new LocaleEvent.
    *
    * @param array $lang_codes
@@ -31,9 +24,8 @@ class LocaleEvent extends Event {
    * @param array $lids
    *   (optional) List of string identifiers that have been updated / created.
    */
-  public function __construct(array $lang_codes, array $lids = []) {
+  public function __construct(array $lang_codes, protected array $lids = []) {
     $this->langCodes = $lang_codes;
-    $this->lids = $lids;
   }
 
   /**

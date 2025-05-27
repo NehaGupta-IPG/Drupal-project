@@ -26,13 +26,6 @@ class StorageReplaceDataWrapper implements StorageInterface {
   protected $replacementData = [];
 
   /**
-   * The storage collection.
-   *
-   * @var string
-   */
-  protected $collection;
-
-  /**
    * Constructs a new StorageReplaceDataWrapper.
    *
    * @param \Drupal\Core\Config\StorageInterface $storage
@@ -41,9 +34,8 @@ class StorageReplaceDataWrapper implements StorageInterface {
    *   (optional) The collection to store configuration in. Defaults to the
    *   default collection.
    */
-  public function __construct(StorageInterface $storage, $collection = StorageInterface::DEFAULT_COLLECTION) {
+  public function __construct(StorageInterface $storage, protected $collection = StorageInterface::DEFAULT_COLLECTION) {
     $this->storage = $storage;
-    $this->collection = $collection;
     $this->replacementData[$collection] = [];
   }
 

@@ -59,13 +59,6 @@ abstract class FileTransfer {
   protected $port;
 
   /**
-   * Full path to directory where file-transfer is restricted to.
-   *
-   * @var string
-   */
-  protected $jail;
-
-  /**
    * Constructs a Drupal\Core\FileTransfer\FileTransfer object.
    *
    * @param string $jail
@@ -73,10 +66,9 @@ abstract class FileTransfer {
    *   be restricted to. This prevents the FileTransfer classes from being
    *   able to touch other parts of the filesystem.
    */
-  public function __construct($jail) {
+  public function __construct(protected $jail) {
     @trigger_error(__CLASS__ . ' is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. There is no replacement. Use composer to manage the code for your site. See https://www.drupal.org/node/3512364', E_USER_DEPRECATED);
 
-    $this->jail = $jail;
   }
 
   /**

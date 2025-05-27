@@ -12,23 +12,11 @@ use Drupal\Core\Cache\CacheableDependencyInterface;
 class TestCacheableDependency implements CacheableDependencyInterface {
 
   /**
-   * The cache contexts.
-   */
-  protected array $contexts;
-
-  /**
-   * The cache tags.
-   */
-  protected array $tags;
-
-  /**
    * The cache maximum age.
    */
   protected int $maxAge;
 
-  public function __construct(array $contexts, array $tags, $max_age) {
-    $this->contexts = $contexts;
-    $this->tags = $tags;
+  public function __construct(protected array $contexts, protected array $tags, $max_age) {
     $this->maxAge = $max_age;
   }
 

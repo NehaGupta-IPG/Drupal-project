@@ -18,23 +18,6 @@ namespace Drupal\Core\Ajax;
 class InvokeCommand implements CommandInterface {
 
   /**
-   * A CSS selector string.
-   *
-   * If the command is a response to a request from an #ajax form element then
-   * this value can be NULL.
-   *
-   * @var string
-   */
-  protected $selector;
-
-  /**
-   * A jQuery method to invoke.
-   *
-   * @var string
-   */
-  protected $method;
-
-  /**
    * An optional list of arguments to pass to the method.
    *
    * @var array
@@ -51,9 +34,7 @@ class InvokeCommand implements CommandInterface {
    * @param array $arguments
    *   An optional array of arguments to pass to the method.
    */
-  public function __construct($selector, $method, array $arguments = []) {
-    $this->selector = $selector;
-    $this->method = $method;
+  public function __construct(protected $selector, protected $method, array $arguments = []) {
     $this->arguments = $arguments;
   }
 

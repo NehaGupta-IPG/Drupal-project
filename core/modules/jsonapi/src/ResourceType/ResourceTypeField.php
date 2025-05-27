@@ -30,13 +30,6 @@ abstract class ResourceTypeField {
   protected $publicName;
 
   /**
-   * Whether the field is disabled.
-   *
-   * @var bool
-   */
-  protected $enabled;
-
-  /**
    * Whether the field can only have one value.
    *
    * @var bool
@@ -55,10 +48,9 @@ abstract class ResourceTypeField {
    * @param bool $has_one
    *   (optional) Whether the field can only have ony value. Defaults to TRUE.
    */
-  public function __construct($internal_name, $public_name = NULL, $enabled = TRUE, $has_one = TRUE) {
+  public function __construct($internal_name, $public_name = NULL, protected $enabled = TRUE, $has_one = TRUE) {
     $this->internalName = $internal_name;
     $this->publicName = $public_name ?: $internal_name;
-    $this->enabled = $enabled;
     $this->hasOne = $has_one;
   }
 

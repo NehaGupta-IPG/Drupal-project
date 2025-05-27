@@ -67,13 +67,6 @@ class DbUpdateController extends ControllerBase {
   protected $bareHtmlPageRenderer;
 
   /**
-   * The app root.
-   *
-   * @var string
-   */
-  protected $root;
-
-  /**
    * The post update registry.
    *
    * @var \Drupal\Core\Update\UpdateRegistry
@@ -103,7 +96,7 @@ class DbUpdateController extends ControllerBase {
    *   The asset query string.
    */
   public function __construct(
-    $root,
+    protected $root,
     KeyValueExpirableFactoryInterface $key_value_expirable_factory,
     CacheBackendInterface $cache,
     StateInterface $state,
@@ -113,7 +106,6 @@ class DbUpdateController extends ControllerBase {
     UpdateRegistry $post_update_registry,
     protected AssetQueryStringInterface $assetQueryString,
   ) {
-    $this->root = $root;
     $this->keyValueExpirableFactory = $key_value_expirable_factory;
     $this->cache = $cache;
     $this->state = $state;

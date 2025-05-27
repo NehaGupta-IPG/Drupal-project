@@ -27,13 +27,6 @@ class ThemeInitialization implements ThemeInitializationInterface {
   protected $cache;
 
   /**
-   * The app root.
-   *
-   * @var string
-   */
-  protected $root;
-
-  /**
    * The extensions that might be attaching assets.
    *
    * @var array
@@ -59,8 +52,7 @@ class ThemeInitialization implements ThemeInitializationInterface {
    * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
    *   The module handler to use to load modules.
    */
-  public function __construct($root, ThemeHandlerInterface $theme_handler, CacheBackendInterface $cache, ModuleHandlerInterface $module_handler) {
-    $this->root = $root;
+  public function __construct(protected $root, ThemeHandlerInterface $theme_handler, CacheBackendInterface $cache, ModuleHandlerInterface $module_handler) {
     $this->themeHandler = $theme_handler;
     $this->cache = $cache;
     $this->moduleHandler = $module_handler;

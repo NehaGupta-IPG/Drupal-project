@@ -25,13 +25,6 @@ class EntityFieldRenderer extends RendererBase {
   use DependencySerializationTrait;
 
   /**
-   * The relationship being handled.
-   *
-   * @var string
-   */
-  protected $relationship;
-
-  /**
    * The entity type manager.
    *
    * @var \Drupal\Core\Entity\EntityTypeManagerInterface
@@ -68,9 +61,8 @@ class EntityFieldRenderer extends RendererBase {
    * @param \Drupal\Core\Entity\EntityRepositoryInterface $entity_repository
    *   The entity repository.
    */
-  public function __construct(ViewExecutable $view, $relationship, LanguageManagerInterface $language_manager, EntityTypeInterface $entity_type, EntityTypeManagerInterface $entity_type_manager, EntityRepositoryInterface $entity_repository) {
+  public function __construct(ViewExecutable $view, protected $relationship, LanguageManagerInterface $language_manager, EntityTypeInterface $entity_type, EntityTypeManagerInterface $entity_type_manager, EntityRepositoryInterface $entity_repository) {
     parent::__construct($view, $language_manager, $entity_type);
-    $this->relationship = $relationship;
     $this->entityTypeManager = $entity_type_manager;
     $this->entityRepository = $entity_repository;
   }

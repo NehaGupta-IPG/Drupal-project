@@ -42,11 +42,6 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 class FilterFormatPermission extends ProcessPluginBase implements ContainerFactoryPluginInterface {
 
   /**
-   * The current migration.
-   */
-  protected MigrationInterface $migration;
-
-  /**
    * The migrate lookup service.
    *
    * @var \Drupal\migrate\MigrateLookupInterface
@@ -67,9 +62,8 @@ class FilterFormatPermission extends ProcessPluginBase implements ContainerFacto
    * @param \Drupal\migrate\MigrateLookupInterface $migrate_lookup
    *   The migrate lookup service.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, MigrationInterface $migration, MigrateLookupInterface $migrate_lookup) {
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, protected MigrationInterface $migration, MigrateLookupInterface $migrate_lookup) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
-    $this->migration = $migration;
     $this->migrateLookup = $migrate_lookup;
   }
 

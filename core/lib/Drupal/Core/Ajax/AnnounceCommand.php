@@ -35,13 +35,6 @@ class AnnounceCommand implements CommandInterface, CommandWithAttachedAssetsInte
   const PRIORITY_POLITE = 'polite';
 
   /**
-   * The text to be announced.
-   *
-   * @var string
-   */
-  protected $text;
-
-  /**
    * The priority that will be used for the announcement.
    *
    * @var string
@@ -59,8 +52,7 @@ class AnnounceCommand implements CommandInterface, CommandWithAttachedAssetsInte
    *   client and therefore the JavaScript Drupal.announce() default of 'polite'
    *   will be used for the message.
    */
-  public function __construct($text, $priority = NULL) {
-    $this->text = $text;
+  public function __construct(protected $text, $priority = NULL) {
     $this->priority = $priority;
   }
 
