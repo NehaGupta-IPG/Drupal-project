@@ -265,7 +265,7 @@ class ElementInfoManager extends DefaultPluginManager implements ElementInfoMana
         $element['#type'] = $type;
       }
       else {
-        throw new \LogicException('The element passed to ElementInfoManager::fromRenderArray must have a #type or a fallback $type must be provided.');
+        throw new \LogicException('The element passed to ElementInfoManager::fromRenderable must have a #type or a fallback $type must be provided.');
       }
     }
     if (isset($element['##object']) && $element['##object'] instanceof ElementInterface) {
