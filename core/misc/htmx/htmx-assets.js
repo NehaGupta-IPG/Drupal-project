@@ -94,6 +94,10 @@
     // Custom event to detach behaviors.
     htmx.trigger(detail.elt, 'htmx:drupal:unload');
 
+    if (!detail.xhr) {
+      return;
+    }
+
     // We need to parse the response to find all the assets to load.
     // htmx cleans up too many things to be able to rely on their dom fragment.
     let responseHTML = Document.parseHTMLUnsafe(detail.serverResponse);
@@ -165,7 +169,7 @@
   // Trigger the Drupal processing once all assets have been loaded.
   // @see https://htmx.org/events/#htmx:afterSettle
   htmx.on('htmx:afterSettle', ({ detail }) => {
-    requestAssetsLoaded.get(detail.xhr).then(() => {
+    (requestAssetsLoaded.get(detail.xhr) || Promise.resolve()).then(() => {
       htmx.trigger(detail.elt, 'htmx:drupal:load');
       // This should be automatic but don't wait for the garbage collector.
       requestAssetsLoaded.delete(detail.xhr);

@@ -6,4 +6,5 @@ big_pipe:
     bigPipePlaceholderIds: []
   dependencies:
     - core/drupal.htmx
+    - core/drupal.htmx.commands
     - core/drupalSettings

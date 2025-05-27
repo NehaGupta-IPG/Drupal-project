@@ -532,7 +532,6 @@ class BigPipe {
 
           // Create a new AjaxResponse.
           $ajax_response = new AjaxResponse();
-          $html_response = new HtmlResponse();
           // JavaScript's querySelector automatically decodes HTML entities in
           // attributes, so we must decode the entities of the current BigPipe
           // placeholder ID (which has HTML entities encoded since we use it to
@@ -540,9 +539,6 @@ class BigPipe {
           $big_pipe_js_placeholder_id = Html::decodeEntities($placeholder_id);
           $ajax_response->addCommand(new ReplaceCommand(sprintf('[data-big-pipe-placeholder-id="%s"]', $big_pipe_js_placeholder_id), $elements['#markup']));
           $ajax_response->setAttachments($elements['#attached']);
-
-          $html_response->setContent($elements['#markup']);
-          $html_response->setAttachments($elements['#attached']);
 
           // Delete all messages that were generated during the rendering of
           // this placeholder, to render them in a BigPipe-optimized way.
@@ -565,37 +561,21 @@ class BigPipe {
           // the initial HTML response plus all embedded AJAX responses sent so
           // far.
           $fake_request->query->set('ajax_page_state', ['libraries' => implode(',', $cumulative_assets->getAlreadyLoadedLibraries())] + $cumulative_assets->getSettings()['ajaxPageState']);
-          $html_response = $this->filterEmbeddedResponse($fake_request, $html_response);
-
-          $out = [
-            [
-              '#type' => 'html_tag',
-              '#tag' => 'template',
-              '#attributes' => [
-                'data-big-pipe-replacement-for-placeholder-with-id' => $big_pipe_js_placeholder_id,
-              ],
-              '#value' => $html_response->getContent(),
-            ],
-            [
-              '#type' => 'html_tag',
-              '#tag' => 'object',
-              '#attributes' => [
-                'onload' => 'Drupal.bigPipeLoad(this);',
-                'height' => '0',
-                'type' => 'text/html',
-                'data' => 'data:text/plain,',
-              ],
-            ],
-          ];
-          $output = (string) \Drupal::service('renderer')->renderRoot($out);
-
+          $ajax_response = $this->filterEmbeddedResponse($fake_request, $ajax_response);
+          // Send this embedded AJAX response.
+          $json = $ajax_response->getContent();
+          $output = <<<EOF
+<script type="application/vnd.drupal-ajax" data-big-pipe-replacement-for-placeholder-with-id="$placeholder_id">
+$json
+</script>
+EOF;
           $this->sendChunk($output);
 
           // Another placeholder was rendered and sent, track the set of asset
           // libraries sent so far. Any new settings are already sent; we
           // don't need to track those.
-          if (isset($html_response->getAttachments()['drupalSettings']['ajaxPageState']['libraries'])) {
-            $cumulative_assets->setAlreadyLoadedLibraries(explode(',', $html_response->getAttachments()['drupalSettings']['ajaxPageState']['libraries']));
+          if (isset($ajax_response->getAttachments()['drupalSettings']['ajaxPageState']['libraries'])) {
+            $cumulative_assets->setAlreadyLoadedLibraries(explode(',', $ajax_response->getAttachments()['drupalSettings']['ajaxPageState']['libraries']));
           }
         }
         // Handle enforced redirect responses.
@@ -635,9 +615,9 @@ class BigPipe {
 
           $json = $ajax_response->getContent();
           $output = <<<EOF
-<template type="application/vnd.drupal-ajax" data-big-pipe-replacement-for-placeholder-with-id="$placeholder_id">
+<script type="application/vnd.drupal-ajax" data-big-pipe-replacement-for-placeholder-with-id="$placeholder_id">
 $json
-</template>
+</script>
 EOF;
           $this->sendChunk($output);
 

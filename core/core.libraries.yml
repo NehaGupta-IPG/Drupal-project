@@ -632,6 +632,17 @@ drupal.htmx:
       theme_token: null
     ajaxTrustedUrl: {}
 
+drupal.htmx.commands:
+  version: VERSION
+  js:
+    misc/htmx/htmx-commands.js: {}
+  dependencies:
+    - core/htmx
+    - core/drupal
+    - core/drupal.htmx
+    - core/drupalSettings
+    - core/loadjs
+
 drupal.machine-name:
   version: VERSION
   js:
