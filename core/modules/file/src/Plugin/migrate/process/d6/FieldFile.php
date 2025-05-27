@@ -47,7 +47,6 @@ class FieldFile extends ProcessPluginBase implements ContainerFactoryPluginInter
   ) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
     $this->migrateLookup = $migrate_lookup;
-
   }
 
   /**

@@ -18,9 +18,7 @@ final class ProceduralCall {
    */
   public function __construct(
     protected array $includes,
-  ) {
-
-  }
+  ) {}
 
   /**
    * Loads the file a function lives in, if any.
