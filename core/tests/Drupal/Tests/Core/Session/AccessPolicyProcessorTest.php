@@ -578,7 +578,8 @@ class UserContextAccessPolicy extends AccessPolicyBase {
  */
 class CacheItem {
 
-  public function __construct(public $data) {
-  }
+  public function __construct(
+    public $data,
+  ) {}
 
 }

@@ -27,7 +27,10 @@ class InfoHookDecorator implements DiscoveryInterface {
    * @param string $hook
    *   The name of the info hook to be invoked by this discovery instance.
    */
-  public function __construct(DiscoveryInterface $decorated, protected $hook) {
+  public function __construct(
+    DiscoveryInterface $decorated,
+    protected $hook,
+  ) {
     $this->decorated = $decorated;
   }
 

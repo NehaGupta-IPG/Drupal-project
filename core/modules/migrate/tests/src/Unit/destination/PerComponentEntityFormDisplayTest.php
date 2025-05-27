@@ -60,8 +60,9 @@ class TestPerComponentEntityFormDisplay extends PerComponentEntityFormDisplay {
    */
   protected $testValues;
 
-  public function __construct(protected $entity) {
-  }
+  public function __construct(
+    protected $entity,
+  ) {}
 
   /**
    * Gets the test entity.

@@ -24,7 +24,10 @@ class CloseDialogCommand implements CommandInterface {
    * @param bool $persist
    *   (optional) Whether to persist the dialog in the DOM or not.
    */
-  public function __construct($selector = NULL, protected $persist = FALSE) {
+  public function __construct(
+    $selector = NULL,
+    protected $persist = FALSE,
+  ) {
     $this->selector = $selector ?: '#drupal-modal';
   }
 

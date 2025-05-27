@@ -32,7 +32,10 @@ class CssCommand implements CommandInterface {
    * @param array $css
    *   An array of CSS property/value pairs to set.
    */
-  public function __construct(protected $selector, array $css = []) {
+  public function __construct(
+    protected $selector,
+    array $css = [],
+  ) {
     $this->css = $css;
   }
 

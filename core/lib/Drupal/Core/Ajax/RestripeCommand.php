@@ -21,8 +21,9 @@ class RestripeCommand implements CommandInterface {
    * @param string $selector
    *   A CSS selector for the table to be restriped.
    */
-  public function __construct(protected $selector) {
-  }
+  public function __construct(
+    protected $selector,
+  ) {}
 
   /**
    * Implements Drupal\Core\Ajax\CommandInterface:render().

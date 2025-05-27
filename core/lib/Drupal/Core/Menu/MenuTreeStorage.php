@@ -84,7 +84,13 @@ class MenuTreeStorage implements MenuTreeStorageInterface {
    * @param array $options
    *   (optional) Any additional database connection options to use in queries.
    */
-  public function __construct(Connection $connection, CacheBackendInterface $menu_cache_backend, CacheTagsInvalidatorInterface $cache_tags_invalidator, protected $table, array $options = []) {
+  public function __construct(
+    Connection $connection,
+    CacheBackendInterface $menu_cache_backend,
+    CacheTagsInvalidatorInterface $cache_tags_invalidator,
+    protected $table,
+    array $options = [],
+  ) {
     $this->connection = $connection;
     $this->menuCacheBackend = $menu_cache_backend;
     $this->cacheTagsInvalidator = $cache_tags_invalidator;

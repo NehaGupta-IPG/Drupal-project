@@ -21,8 +21,9 @@ class ThemeSettings extends ConfigBase {
    * @param string $theme
    *   The name of the theme settings object being constructed.
    */
-  public function __construct(protected $theme) {
-  }
+  public function __construct(
+    protected $theme,
+  ) {}
 
   /**
    * Returns the theme of this theme settings object.

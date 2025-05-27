@@ -36,7 +36,10 @@ class SettingsCommand implements CommandInterface {
    * @param bool $merge
    *   Whether the settings should be merged into the global drupalSettings.
    */
-  public function __construct(array $settings, protected $merge = FALSE) {
+  public function __construct(
+    array $settings,
+    protected $merge = FALSE,
+  ) {
     $this->settings = $settings;
   }
 

@@ -35,7 +35,12 @@ class UserFloodEvent extends Event {
    * @param string $identifier
    *   The identifier of the flood event.
    */
-  public function __construct(protected $name, protected $threshold, protected $window, protected $identifier) {
+  public function __construct(
+    protected $name,
+    protected $threshold,
+    protected $window,
+    protected $identifier,
+  ) {
     // The identifier could be a uid or an IP, or a composite of both.
     if (is_numeric($identifier)) {
       $this->uid = $identifier;

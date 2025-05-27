@@ -84,7 +84,16 @@ class LocaleLookup extends CacheCollector {
    * @param \Symfony\Component\HttpFoundation\RequestStack $request_stack
    *   The request stack.
    */
-  public function __construct(protected $langcode, $context, StringStorageInterface $string_storage, CacheBackendInterface $cache, LockBackendInterface $lock, ConfigFactoryInterface $config_factory, LanguageManagerInterface $language_manager, RequestStack $request_stack) {
+  public function __construct(
+    protected $langcode,
+    $context,
+    StringStorageInterface $string_storage,
+    CacheBackendInterface $cache,
+    LockBackendInterface $lock,
+    ConfigFactoryInterface $config_factory,
+    LanguageManagerInterface $language_manager,
+    RequestStack $request_stack,
+  ) {
     $this->context = (string) $context;
     $this->stringStorage = $string_storage;
     $this->configFactory = $config_factory;

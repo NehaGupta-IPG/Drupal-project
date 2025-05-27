@@ -24,8 +24,9 @@ class RemoveCommand implements CommandInterface {
    * @param string $selector
    *   The selector.
    */
-  public function __construct(protected $selector) {
-  }
+  public function __construct(
+    protected $selector,
+  ) {}
 
   /**
    * Implements Drupal\Core\Ajax\CommandInterface:render().

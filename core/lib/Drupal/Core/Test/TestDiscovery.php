@@ -58,7 +58,10 @@ class TestDiscovery {
    *   The class loader. Normally Composer's ClassLoader, as included by the
    *   front controller, but may also be decorated.
    */
-  public function __construct(protected $root, $class_loader) {
+  public function __construct(
+    protected $root,
+    $class_loader,
+  ) {
     $this->classLoader = $class_loader;
   }
 

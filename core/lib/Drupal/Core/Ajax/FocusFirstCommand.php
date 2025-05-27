@@ -27,8 +27,9 @@ class FocusFirstCommand implements CommandInterface {
    * @param string $selector
    *   The selector of the container with tabbable elements.
    */
-  public function __construct(protected $selector) {
-  }
+  public function __construct(
+    protected $selector,
+  ) {}
 
   /**
    * {@inheritdoc}

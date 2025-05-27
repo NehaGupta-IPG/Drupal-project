@@ -38,7 +38,13 @@ class FieldFile extends ProcessPluginBase implements ContainerFactoryPluginInter
    * @param \Drupal\migrate\MigrateLookupInterface $migrate_lookup
    *   The migrate lookup service.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, protected MigrationInterface $migration, MigrateLookupInterface $migrate_lookup) {
+  public function __construct(
+    array $configuration,
+    $plugin_id,
+    $plugin_definition,
+    protected MigrationInterface $migration,
+    MigrateLookupInterface $migrate_lookup,
+  ) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
     $this->migrateLookup = $migrate_lookup;
 

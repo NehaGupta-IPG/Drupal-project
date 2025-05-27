@@ -22,7 +22,10 @@ final class Lock {
    * @param int $updated
    *   The updated timestamp.
    */
-  public function __construct($owner_id, private $updated) {
+  public function __construct(
+    $owner_id,
+    private $updated,
+  ) {
     $this->ownerId = $owner_id;
   }
 

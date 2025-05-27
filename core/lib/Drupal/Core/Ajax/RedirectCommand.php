@@ -16,8 +16,9 @@ class RedirectCommand implements CommandInterface {
    *   The URL that will be loaded into window.location. This should be a full
    *   URL.
    */
-  public function __construct(protected $url) {
-  }
+  public function __construct(
+    protected $url,
+  ) {}
 
   /**
    * Implements \Drupal\Core\Ajax\CommandInterface:render().

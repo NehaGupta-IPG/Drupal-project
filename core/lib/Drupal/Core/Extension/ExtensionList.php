@@ -118,7 +118,15 @@ abstract class ExtensionList {
    * @param string $install_profile
    *   The install profile used by the site.
    */
-  public function __construct(protected $root, protected $type, CacheBackendInterface $cache, InfoParserInterface $info_parser, ModuleHandlerInterface $module_handler, StateInterface $state, $install_profile) {
+  public function __construct(
+    protected $root,
+    protected $type,
+    CacheBackendInterface $cache,
+    InfoParserInterface $info_parser,
+    ModuleHandlerInterface $module_handler,
+    StateInterface $state,
+    $install_profile,
+  ) {
     $this->cache = $cache;
     $this->infoParser = $info_parser;
     $this->moduleHandler = $module_handler;

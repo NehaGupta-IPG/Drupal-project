@@ -36,7 +36,10 @@ class Link implements RenderableInterface {
    * @param \Drupal\Core\Url $url
    *   The \Drupal\Core\Url object.
    */
-  public function __construct(protected $text, Url $url) {
+  public function __construct(
+    protected $text,
+    Url $url,
+  ) {
     $this->url = $url;
   }
 

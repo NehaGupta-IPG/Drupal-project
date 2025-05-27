@@ -31,7 +31,10 @@ class FormattedDateDiff implements RenderableInterface, CacheableDependencyInter
    * @param int $max_age
    *   The maximum time in seconds that this string may be cached.
    */
-  public function __construct(protected $string, $max_age) {
+  public function __construct(
+    protected $string,
+    $max_age,
+  ) {
     $this->maxAge = $max_age;
   }
 

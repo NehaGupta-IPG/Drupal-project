@@ -18,8 +18,9 @@ class ShowButtonsCommand implements CommandInterface {
    * @param bool $changed
    *   Whether the view has been changed.
    */
-  public function __construct(protected $changed) {
-  }
+  public function __construct(
+    protected $changed,
+  ) {}
 
   /**
    * {@inheritdoc}

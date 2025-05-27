@@ -55,7 +55,13 @@ class SharedTempStoreFactory {
    * @param int $expire
    *   The time to live for items, in seconds.
    */
-  public function __construct(KeyValueExpirableFactoryInterface $storage_factory, LockBackendInterface $lock_backend, RequestStack $request_stack, AccountProxyInterface $current_user, protected $expire = 604800) {
+  public function __construct(
+    KeyValueExpirableFactoryInterface $storage_factory,
+    LockBackendInterface $lock_backend,
+    RequestStack $request_stack,
+    AccountProxyInterface $current_user,
+    protected $expire = 604800,
+  ) {
     $this->storageFactory = $storage_factory;
     $this->lockBackend = $lock_backend;
     $this->requestStack = $request_stack;

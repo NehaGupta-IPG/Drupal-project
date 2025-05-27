@@ -11,7 +11,8 @@ use Drupal\Core\Database\Connection;
  */
 class LonelyMonkeyClass {
 
-  public function __construct(protected Connection $connection) {
-  }
+  public function __construct(
+    protected Connection $connection,
+  ) {}
 
 }

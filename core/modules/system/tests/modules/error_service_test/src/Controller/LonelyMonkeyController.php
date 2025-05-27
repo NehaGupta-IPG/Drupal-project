@@ -14,8 +14,9 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  */
 class LonelyMonkeyController extends ControllerBase implements ContainerInjectionInterface {
 
-  public function __construct(protected LonelyMonkeyClass $class) {
-  }
+  public function __construct(
+    protected LonelyMonkeyClass $class,
+  ) {}
 
   public function testBrokenClass() {
     return [

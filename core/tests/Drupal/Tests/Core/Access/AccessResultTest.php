@@ -977,8 +977,9 @@ class UncacheableTestAccessResult implements AccessResultInterface {
   /**
    * Constructs a new UncacheableTestAccessResult object.
    */
-  public function __construct(protected $value) {
-  }
+  public function __construct(
+    protected $value,
+  ) {}
 
   /**
    * {@inheritdoc}

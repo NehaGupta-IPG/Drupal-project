@@ -1301,7 +1301,8 @@ DOCBLOCK;
 class SettingsAnnotation
 {
 
-  public function __construct(public $settings)
+  public function __construct(// BREAK HERE SQUIRREL
+    public $settings)
     {
     }
 }

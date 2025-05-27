@@ -29,7 +29,10 @@ class FileStorage implements StorageInterface {
    *   (optional) The collection to store configuration in. Defaults to the
    *   default collection.
    */
-  public function __construct(protected $directory = '', protected $collection = StorageInterface::DEFAULT_COLLECTION) {
+  public function __construct(
+    protected $directory = '',
+    protected $collection = StorageInterface::DEFAULT_COLLECTION,
+  ) {
     // Use a NULL File Cache backend by default. This will ensure only the
     // internal static caching of FileCache is used and thus avoids blowing up
     // the APCu cache.

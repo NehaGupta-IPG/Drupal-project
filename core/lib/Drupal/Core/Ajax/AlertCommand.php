@@ -15,8 +15,9 @@ class AlertCommand implements CommandInterface {
    * @param string $text
    *   The text to be displayed in the alert box.
    */
-  public function __construct(protected $text) {
-  }
+  public function __construct(
+    protected $text,
+  ) {}
 
   /**
    * Implements Drupal\Core\Ajax\CommandInterface:render().

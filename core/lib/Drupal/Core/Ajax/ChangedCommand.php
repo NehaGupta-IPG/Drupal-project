@@ -23,8 +23,10 @@ class ChangedCommand implements CommandInterface {
    * @param string $asterisk
    *   CSS selector for elements to which an asterisk will be appended.
    */
-  public function __construct(protected $selector, protected $asterisk = '') {
-  }
+  public function __construct(
+    protected $selector,
+    protected $asterisk = '',
+  ) {}
 
   /**
    * Implements Drupal\Core\Ajax\CommandInterface:render().

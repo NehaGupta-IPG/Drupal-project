@@ -16,7 +16,11 @@ class TestCacheableDependency implements CacheableDependencyInterface {
    */
   protected int $maxAge;
 
-  public function __construct(protected array $contexts, protected array $tags, $max_age) {
+  public function __construct(
+    protected array $contexts,
+    protected array $tags,
+    $max_age,
+  ) {
     $this->maxAge = $max_age;
   }
 

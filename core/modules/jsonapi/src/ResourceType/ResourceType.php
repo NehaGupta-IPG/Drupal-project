@@ -334,7 +334,17 @@ class ResourceType {
    * @param null|string $type_name
    *   The resource type name.
    */
-  public function __construct($entity_type_id, protected $bundle, $deserialization_target_class, protected $internal = FALSE, $is_locatable = TRUE, $is_mutable = TRUE, $is_versionable = FALSE, array $fields = [], $type_name = NULL) {
+  public function __construct(
+    $entity_type_id,
+    protected $bundle,
+    $deserialization_target_class,
+    protected $internal = FALSE,
+    $is_locatable = TRUE,
+    $is_mutable = TRUE,
+    $is_versionable = FALSE,
+    array $fields = [],
+    $type_name = NULL,
+  ) {
     $this->entityTypeId = $entity_type_id;
     $this->deserializationTargetClass = $deserialization_target_class;
     $this->isLocatable = $is_locatable;

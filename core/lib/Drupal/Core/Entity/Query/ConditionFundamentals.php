@@ -31,7 +31,11 @@ abstract class ConditionFundamentals {
    * @param array $namespaces
    *   List of potential namespaces of the classes belonging to this condition.
    */
-  public function __construct(protected $conjunction, QueryInterface $query, protected $namespaces = []) {
+  public function __construct(
+    protected $conjunction,
+    QueryInterface $query,
+    protected $namespaces = [],
+  ) {
     $this->query = $query;
   }
 

@@ -61,7 +61,11 @@ class EntityCondition {
   /**
    * Constructs a new EntityCondition object.
    */
-  public function __construct(protected $field, protected $value, $operator = NULL) {
+  public function __construct(
+    protected $field,
+    protected $value,
+    $operator = NULL,
+  ) {
     $this->operator = ($operator) ? $operator : '=';
   }
 

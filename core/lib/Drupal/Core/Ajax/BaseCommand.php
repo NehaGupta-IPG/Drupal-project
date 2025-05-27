@@ -15,8 +15,10 @@ class BaseCommand implements CommandInterface {
    * @param string $data
    *   The data to pass on to the client side.
    */
-  public function __construct(protected $command, protected $data) {
-  }
+  public function __construct(
+    protected $command,
+    protected $data,
+  ) {}
 
   /**
    * {@inheritdoc}

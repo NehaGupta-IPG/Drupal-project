@@ -33,7 +33,11 @@ class Dependency {
    * @param string $constraint
    *   The constraint string. For example, '>8.x-1.1'.
    */
-  public function __construct(protected $name, protected $project, $constraint) {
+  public function __construct(
+    protected $name,
+    protected $project,
+    $constraint,
+  ) {
     $this->constraintString = $constraint;
   }
 

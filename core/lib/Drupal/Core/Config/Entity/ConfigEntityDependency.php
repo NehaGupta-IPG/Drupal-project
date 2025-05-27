@@ -26,7 +26,10 @@ class ConfigEntityDependency {
    * @param array $values
    *   (optional) The configuration entity's values.
    */
-  public function __construct(protected $name, $values = []) {
+  public function __construct(
+    protected $name,
+    $values = [],
+  ) {
     if (isset($values['dependencies']) && isset($values['dependencies']['enforced'])) {
       // Merge the enforced dependencies into the list of dependencies.
       $enforced_dependencies = $values['dependencies']['enforced'];

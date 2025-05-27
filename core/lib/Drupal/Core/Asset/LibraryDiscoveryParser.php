@@ -91,7 +91,15 @@ class LibraryDiscoveryParser {
    * @param \Drupal\Core\Theme\ComponentPluginManager $component_plugin_manager
    *   The component plugin manager.
    */
-  public function __construct(protected $root, ModuleHandlerInterface $module_handler, ThemeManagerInterface $theme_manager, StreamWrapperManagerInterface $stream_wrapper_manager, LibrariesDirectoryFileFinder $libraries_directory_file_finder, ExtensionPathResolver $extension_path_resolver, ComponentPluginManager $component_plugin_manager) {
+  public function __construct(
+    protected $root,
+    ModuleHandlerInterface $module_handler,
+    ThemeManagerInterface $theme_manager,
+    StreamWrapperManagerInterface $stream_wrapper_manager,
+    LibrariesDirectoryFileFinder $libraries_directory_file_finder,
+    ExtensionPathResolver $extension_path_resolver,
+    ComponentPluginManager $component_plugin_manager,
+  ) {
     $this->moduleHandler = $module_handler;
     $this->themeManager = $theme_manager;
     $this->streamWrapperManager = $stream_wrapper_manager;

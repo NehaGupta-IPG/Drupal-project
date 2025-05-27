@@ -15,8 +15,9 @@ class StaticTranslation implements TranslatorInterface {
    * @param array $translations
    *   Array of override strings indexed by language and context.
    */
-  public function __construct(protected $translations = []) {
-  }
+  public function __construct(
+    protected $translations = [],
+  ) {}
 
   /**
    * {@inheritdoc}

@@ -21,8 +21,10 @@ abstract class AttributeValueBase {
   /**
    * Constructs a \Drupal\Core\Template\AttributeValueBase object.
    */
-  public function __construct(protected $name, protected $value) {
-  }
+  public function __construct(
+    protected $name,
+    protected $value,
+  ) {}
 
   /**
    * Returns a string representation of the attribute.

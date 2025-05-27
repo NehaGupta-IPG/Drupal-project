@@ -36,7 +36,9 @@ abstract class Schema implements PlaceholderInterface {
    */
   protected $uniqueIdentifier;
 
-  public function __construct(protected $connection) {
+  public function __construct(
+    protected $connection,
+  ) {
     $this->uniqueIdentifier = uniqid('', TRUE);
   }
 

@@ -18,8 +18,9 @@ class ReplaceTitleCommand implements CommandInterface {
    * @param string $title
    *   The title of the page.
    */
-  public function __construct(protected $title) {
-  }
+  public function __construct(
+    protected $title,
+  ) {}
 
   /**
    * {@inheritdoc}

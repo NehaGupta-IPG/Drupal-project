@@ -31,7 +31,11 @@ class WideModalRenderer extends ModalRenderer {
    * @param string $mode
    *   The mode, either 'wide' or 'extra_wide'.
    */
-  public function __construct(TitleResolverInterface $title_resolver, RendererInterface $renderer, protected $mode = 'wide') {
+  public function __construct(
+    TitleResolverInterface $title_resolver,
+    RendererInterface $renderer,
+    protected $mode = 'wide',
+  ) {
     parent::__construct($title_resolver, $renderer);
   }
 

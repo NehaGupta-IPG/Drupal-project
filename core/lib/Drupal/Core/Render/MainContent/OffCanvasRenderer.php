@@ -33,7 +33,11 @@ class OffCanvasRenderer extends DialogRenderer {
    * @param string $position
    *   (optional) The position to render the off-canvas dialog.
    */
-  public function __construct(TitleResolverInterface $title_resolver, RendererInterface $renderer, protected $position = 'side') {
+  public function __construct(
+    TitleResolverInterface $title_resolver,
+    RendererInterface $renderer,
+    protected $position = 'side',
+  ) {
     parent::__construct($title_resolver, $renderer);
     $this->renderer = $renderer;
   }

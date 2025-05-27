@@ -115,7 +115,11 @@ class Url implements TrustedCallbackInterface {
    * @todo Update this documentation for non-routed URIs in
    *   https://www.drupal.org/node/2346787
    */
-  public function __construct($route_name, $route_parameters = [], protected $options = []) {
+  public function __construct(
+    $route_name,
+    $route_parameters = [],
+    protected $options = [],
+  ) {
     $this->routeName = $route_name;
     $this->routeParameters = $route_parameters;
   }

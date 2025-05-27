@@ -38,7 +38,11 @@ class ContentModerationState implements StateInterface {
    *   (optional) TRUE if entities should be the default revision if in this
    *   state, FALSE if not. Defaults to FALSE.
    */
-  public function __construct(StateInterface $state, protected $published = FALSE, $default_revision = FALSE) {
+  public function __construct(
+    StateInterface $state,
+    protected $published = FALSE,
+    $default_revision = FALSE,
+  ) {
     $this->state = $state;
     $this->defaultRevision = $default_revision;
   }

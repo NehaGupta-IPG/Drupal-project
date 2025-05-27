@@ -683,8 +683,9 @@ class TwigExtensionTest extends UnitTestCase {
  */
 class TwigExtensionTestString {
 
-  public function __construct(protected $string) {
-  }
+  public function __construct(
+    protected $string,
+  ) {}
 
   public function __toString() {
     return $this->string;

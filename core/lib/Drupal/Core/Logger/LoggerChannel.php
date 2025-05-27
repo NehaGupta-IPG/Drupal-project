@@ -77,8 +77,9 @@ class LoggerChannel implements LoggerChannelInterface {
    * @param string $channel
    *   The channel name for this instance.
    */
-  public function __construct(protected $channel) {
-  }
+  public function __construct(
+    protected $channel,
+  ) {}
 
   /**
    * {@inheritdoc}

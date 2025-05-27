@@ -31,7 +31,9 @@ final class TestNodeVisitor implements NodeVisitorInterface {
    * @param string $extensionName
    *   The name of the extension.
    */
-  public function __construct(private string $extensionName) {
+  public function __construct(
+    private string $extensionName,
+  ) {
     $this->varName = sprintf('__internal_%s', hash(\PHP_VERSION_ID < 80100 ? 'sha256' : 'xxh128', $extensionName));
   }
 

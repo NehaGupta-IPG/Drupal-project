@@ -11,8 +11,10 @@ namespace Drupal\plugin_test\Plugin\plugin_test\mock_block;
  */
 class MockMenuBlock {
 
-  public function __construct(protected $title = '', protected $depth = 0) {
-  }
+  public function __construct(
+    protected $title = '',
+    protected $depth = 0,
+  ) {}
 
   /**
    * Returns the content to display.

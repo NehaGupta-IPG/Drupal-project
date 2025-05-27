@@ -104,7 +104,12 @@ class MessageCommand implements CommandInterface, CommandWithAttachedAssetsInter
    * @param bool $clear_previous
    *   If TRUE, previous messages will be cleared first.
    */
-  public function __construct(protected $message, $wrapper_query_selector = NULL, array $options = [], $clear_previous = TRUE) {
+  public function __construct(
+    protected $message,
+    $wrapper_query_selector = NULL,
+    array $options = [],
+    $clear_previous = TRUE,
+  ) {
     $this->wrapperQuerySelector = $wrapper_query_selector;
     $this->options = $options;
     $this->clearPrevious = $clear_previous;

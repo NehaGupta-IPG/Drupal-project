@@ -10,8 +10,9 @@ abstract class StorageBase implements KeyValueStoreInterface {
   /**
    * {@inheritdoc}
    */
-  public function __construct(protected $collection) {
-  }
+  public function __construct(
+    protected $collection,
+  ) {}
 
   /**
    * {@inheritdoc}

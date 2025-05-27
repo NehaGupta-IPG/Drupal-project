@@ -17,8 +17,9 @@ class SetFormCommand implements CommandInterface {
    * @param string $url
    *   The URL of the form.
    */
-  public function __construct(protected $url) {
-  }
+  public function __construct(
+    protected $url,
+  ) {}
 
   /**
    * {@inheritdoc}

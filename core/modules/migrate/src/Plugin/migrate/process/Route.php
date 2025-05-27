@@ -65,7 +65,13 @@ class Route extends ProcessPluginBase implements ContainerFactoryPluginInterface
   /**
    * {@inheritdoc}
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, protected MigrationInterface $migration, PathValidatorInterface $path_validator) {
+  public function __construct(
+    array $configuration,
+    $plugin_id,
+    $plugin_definition,
+    protected MigrationInterface $migration,
+    PathValidatorInterface $path_validator,
+  ) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
     $this->pathValidator = $path_validator;
   }

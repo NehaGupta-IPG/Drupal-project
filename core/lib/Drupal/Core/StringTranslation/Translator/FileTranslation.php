@@ -32,7 +32,10 @@ class FileTranslation extends StaticTranslation {
    * @param \Drupal\Core\File\FileSystemInterface $file_system
    *   The file system service.
    */
-  public function __construct(protected $directory, FileSystemInterface $file_system) {
+  public function __construct(
+    protected $directory,
+    FileSystemInterface $file_system,
+  ) {
     parent::__construct();
     $this->fileSystem = $file_system;
   }

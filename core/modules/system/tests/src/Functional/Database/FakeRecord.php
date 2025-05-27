@@ -37,7 +37,8 @@ class FakeRecord {
    * @param int $fakeArg
    *   A class variable.
    */
-  public function __construct(public $fakeArg = 0) {
-  }
+  public function __construct(
+    public $fakeArg = 0,
+  ) {}
 
 }

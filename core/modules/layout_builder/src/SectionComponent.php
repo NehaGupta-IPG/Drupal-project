@@ -53,7 +53,12 @@ class SectionComponent {
    * @param mixed[] $additional
    *   An additional values.
    */
-  public function __construct(protected $uuid, protected $region, array $configuration = [], array $additional = []) {
+  public function __construct(
+    protected $uuid,
+    protected $region,
+    array $configuration = [],
+    array $additional = [],
+  ) {
     $this->configuration = $configuration;
     $this->additional = $additional;
   }

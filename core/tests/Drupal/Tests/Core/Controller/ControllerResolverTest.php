@@ -216,8 +216,9 @@ class MockControllerPsr7 {
  */
 class MockContainerInjection implements ContainerInjectionInterface {
 
-  public function __construct(protected $result) {
-  }
+  public function __construct(
+    protected $result,
+  ) {}
 
   public static function create(ContainerInterface $container) {
     return new static('This used injection.');

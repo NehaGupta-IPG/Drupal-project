@@ -29,7 +29,10 @@ class HookDiscovery implements DiscoveryInterface {
    *   The Drupal hook that a module can implement in order to interface to
    *   this discovery class.
    */
-  public function __construct(ModuleHandlerInterface $module_handler, protected $hook) {
+  public function __construct(
+    ModuleHandlerInterface $module_handler,
+    protected $hook,
+  ) {
     $this->moduleHandler = $module_handler;
   }
 

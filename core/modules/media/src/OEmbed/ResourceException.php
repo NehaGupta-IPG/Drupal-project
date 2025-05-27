@@ -31,7 +31,12 @@ class ResourceException extends \Exception {
    * @param \Throwable $previous
    *   (optional) The previous exception, if any.
    */
-  public function __construct($message, protected $url, array $data = [], ?\Throwable $previous = NULL) {
+  public function __construct(
+    $message,
+    protected $url,
+    array $data = [],
+    ?\Throwable $previous = NULL,
+  ) {
     $this->data = $data;
     parent::__construct($message, 0, $previous);
   }

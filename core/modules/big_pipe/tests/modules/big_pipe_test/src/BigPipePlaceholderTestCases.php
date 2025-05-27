@@ -495,7 +495,11 @@ class BigPipePlaceholderTestCase {
    */
   public $embeddedHtmlResponse;
 
-  public function __construct(array $render_array, public $placeholder, array $placeholder_render_array) {
+  public function __construct(
+    array $render_array,
+    public $placeholder,
+    array $placeholder_render_array,
+  ) {
     $this->renderArray = $render_array;
     $this->placeholderRenderArray = $placeholder_render_array;
   }

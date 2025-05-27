@@ -17,8 +17,10 @@ class ScaffoldTestResult {
    * @param string $scaffoldOutput
    *   The stdout from the test.
    */
-  public function __construct(protected $docroot, protected $scaffoldOutput) {
-  }
+  public function __construct(
+    protected $docroot,
+    protected $scaffoldOutput,
+  ) {}
 
   /**
    * Returns the location of the docroot from the scaffold test.

@@ -17,8 +17,11 @@ class ProtectedDirectory {
    * @param bool $private
    *   (optional) Whether the directory is private or public (default).
    */
-  public function __construct(protected $title, protected $path, protected $private = FALSE) {
-  }
+  public function __construct(
+    protected $title,
+    protected $path,
+    protected $private = FALSE,
+  ) {}
 
   /**
    * Gets the title.
