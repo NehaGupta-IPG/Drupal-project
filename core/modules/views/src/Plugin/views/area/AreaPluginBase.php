@@ -77,7 +77,7 @@ abstract class AreaPluginBase extends HandlerBase {
   /**
    * {@inheritdoc}
    */
-  public function buildOptionsForm(&$form, FormStateInterface $form_state) {
+  public function buildOptionsForm(&$form, FormStateInterface $form_state): void {
     parent::buildOptionsForm($form, $form_state);
 
     if ($form_state->get('type') != 'empty') {
@@ -100,7 +100,7 @@ abstract class AreaPluginBase extends HandlerBase {
   /**
    * {@inheritdoc}
    */
-  public function validateOptionsForm(&$form, FormStateInterface $form_state) {
+  public function validateOptionsForm(&$form, FormStateInterface $form_state): void {
     $area_id = $form_state->getValue(['options', 'area_id']);
     if ($area_id) {
       if (preg_match(
