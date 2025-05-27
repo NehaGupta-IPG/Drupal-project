@@ -679,7 +679,7 @@ abstract class RenderElementBase extends PluginBase implements ElementInterface,
   public function removeChild(int|string $name): ?ElementInterface {
     $return = $this->storage[$name] ?? NULL;
     unset($this->storage[$name]);
-    return $return;
+    return $return ? $this->elementInfoManager()->fromRenderable($return) : NULL;
   }
 
   /**
