@@ -175,6 +175,10 @@ class FileTestHooks {
       /** @var \Drupal\Core\Entity\EntityTypeInterface[] $entity_types */
       $entity_types['file']->setAccessClass('Drupal\file_test\FileTestAccessControlHandler');
     }
+    if (\Drupal::state()->get('file_test_alternate_entity_test_access_handler', FALSE)) {
+      /** @var \Drupal\Core\Entity\EntityTypeInterface[] $entity_types */
+      $entity_types['entity_test_rev']->setAccessClass('Drupal\file_test\Access\EntityTestAccessControlHandler');
+    }
   }
 
   /**
