@@ -72,7 +72,7 @@ class StaticReflectionParser
      */
     protected $shortClassName;
 
-  /**
+    /**
      * Whether the parser has run.
      *
      * @var bool
@@ -140,8 +140,11 @@ class StaticReflectionParser
      * @param bool                 $classAnnotationOptimize Only retrieve the class docComment.
      *                                                         Presumes there is only one statement per line.
      */
-    public function __construct($className, protected $finder, protected $classAnnotationOptimize = false)
-    {
+    public function __construct(
+        $className,
+        protected $finder,
+        protected $classAnnotationOptimize = false,
+    ) {
         $this->className = ltrim($className, '\\');
         $lastNsPos       = strrpos($this->className, '\\');
 
