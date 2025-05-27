@@ -208,7 +208,19 @@ class Registry implements DestructableInterface {
    * @param array<string, true> $preprocess_for_suggestions
    *   (optional) Grouped preprocess functions from modules.
    */
-  public function __construct($root, CacheBackendInterface $cache, LockBackendInterface $lock, ModuleHandlerInterface $module_handler, ThemeHandlerInterface $theme_handler, ThemeInitializationInterface $theme_initialization, CacheBackendInterface $runtime_cache, ModuleExtensionList $module_list, protected HttpKernelInterface $kernel, $theme_name = NULL, array $preprocess_for_suggestions = []) {
+  public function __construct(
+    $root,
+    CacheBackendInterface $cache,
+    LockBackendInterface $lock,
+    ModuleHandlerInterface $module_handler,
+    ThemeHandlerInterface $theme_handler,
+    ThemeInitializationInterface $theme_initialization,
+    CacheBackendInterface $runtime_cache,
+    ModuleExtensionList $module_list,
+    protected HttpKernelInterface $kernel,
+    $theme_name = NULL,
+    array $preprocess_for_suggestions = [],
+  ) {
     $this->root = $root;
     $this->cache = $cache;
     $this->lock = $lock;

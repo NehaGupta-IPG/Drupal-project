@@ -57,7 +57,11 @@ class PhpBackend implements CacheBackendInterface {
    * @param \Drupal\Component\Datetime\TimeInterface $time
    *   The time service.
    */
-  public function __construct($bin, CacheTagsChecksumInterface $checksum_provider, protected TimeInterface $time) {
+  public function __construct(
+    $bin,
+    CacheTagsChecksumInterface $checksum_provider,
+    protected TimeInterface $time,
+  ) {
     $this->bin = 'cache_' . $bin;
     $this->checksumProvider = $checksum_provider;
   }

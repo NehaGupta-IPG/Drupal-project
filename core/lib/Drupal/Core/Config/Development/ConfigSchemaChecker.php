@@ -58,7 +58,11 @@ class ConfigSchemaChecker implements EventSubscriberInterface {
    *   validation errors will be added to the errors found by
    *   SchemaCheckTrait::checkConfigSchema().
    */
-  public function __construct(TypedConfigManagerInterface $typed_manager, array $exclude = [], private readonly bool $validateConstraints = FALSE) {
+  public function __construct(
+    TypedConfigManagerInterface $typed_manager,
+    array $exclude = [],
+    private readonly bool $validateConstraints = FALSE,
+  ) {
     $this->typedManager = $typed_manager;
     $this->exclude = $exclude;
   }

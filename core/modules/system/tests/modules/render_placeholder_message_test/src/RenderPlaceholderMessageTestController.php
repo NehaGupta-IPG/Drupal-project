@@ -21,8 +21,9 @@ class RenderPlaceholderMessageTestController implements TrustedCallbackInterface
    * @param \Drupal\Core\Render\RendererInterface $renderer
    *   The renderer service.
    */
-  public function __construct(protected RendererInterface $renderer) {
-  }
+  public function __construct(
+    protected RendererInterface $renderer,
+  ) {}
 
   /**
    * {@inheritdoc}

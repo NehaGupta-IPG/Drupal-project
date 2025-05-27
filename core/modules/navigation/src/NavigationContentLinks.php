@@ -31,7 +31,10 @@ final class NavigationContentLinks implements ContainerInjectionInterface {
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
    *   The entity type manager.
    */
-  public function __construct(private RouteProviderInterface $routeProvider, private EntityTypeManagerInterface $entityTypeManager) {}
+  public function __construct(
+    private RouteProviderInterface $routeProvider,
+    private EntityTypeManagerInterface $entityTypeManager,
+  ) {}
 
   /**
    * {@inheritdoc}

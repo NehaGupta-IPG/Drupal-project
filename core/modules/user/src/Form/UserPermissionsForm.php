@@ -50,7 +50,12 @@ class UserPermissionsForm extends FormBase {
    * @param \Drupal\Core\Extension\ModuleExtensionList|null $moduleExtensionList
    *   The module extension list.
    */
-  public function __construct(PermissionHandlerInterface $permission_handler, RoleStorageInterface $role_storage, ModuleHandlerInterface $module_handler, protected ?ModuleExtensionList $moduleExtensionList = NULL) {
+  public function __construct(
+    PermissionHandlerInterface $permission_handler,
+    RoleStorageInterface $role_storage,
+    ModuleHandlerInterface $module_handler,
+    protected ?ModuleExtensionList $moduleExtensionList = NULL,
+  ) {
     $this->permissionHandler = $permission_handler;
     $this->roleStorage = $role_storage;
     $this->moduleHandler = $module_handler;

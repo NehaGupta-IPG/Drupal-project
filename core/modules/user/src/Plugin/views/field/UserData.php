@@ -52,7 +52,14 @@ class UserData extends FieldPluginBase {
   /**
    * Constructs a UserData object.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, UserDataInterface $user_data, ModuleHandlerInterface $module_handler, protected ?ModuleExtensionList $moduleExtensionList = NULL) {
+  public function __construct(
+    array $configuration,
+    $plugin_id,
+    $plugin_definition,
+    UserDataInterface $user_data,
+    ModuleHandlerInterface $module_handler,
+    protected ?ModuleExtensionList $moduleExtensionList = NULL,
+  ) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
 
     $this->userData = $user_data;

@@ -24,7 +24,13 @@ final class UnknownRecipeException extends \RuntimeException {
    * @param \Throwable|null $previous
    *   (optional) The previous exception.
    */
-  public function __construct(public readonly string $recipe, public readonly string $searchPath, string $message = "", int $code = 0, ?\Throwable $previous = NULL) {
+  public function __construct(
+    public readonly string $recipe,
+    public readonly string $searchPath,
+    string $message = "",
+    int $code = 0,
+    ?\Throwable $previous = NULL,
+  ) {
     parent::__construct($message, $code, $previous);
   }
 

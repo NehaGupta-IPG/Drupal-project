@@ -14,7 +14,10 @@ use Drupal\performance_test\PerformanceDataCollector;
  */
 class CacheTagsChecksumDecorator implements CacheTagsChecksumInterface, CacheTagsInvalidatorInterface, CacheTagsChecksumPreloadInterface {
 
-  public function __construct(protected readonly CacheTagsChecksumInterface $checksumInvalidator, protected readonly PerformanceDataCollector $performanceDataCollector) {}
+  public function __construct(
+    protected readonly CacheTagsChecksumInterface $checksumInvalidator,
+    protected readonly PerformanceDataCollector $performanceDataCollector,
+  ) {}
 
   /**
    * {@inheritdoc}

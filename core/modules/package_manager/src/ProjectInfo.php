@@ -21,8 +21,9 @@ use Drupal\update\UpdateManagerInterface;
  */
 final class ProjectInfo {
 
-  public function __construct(private readonly string $name) {
-  }
+  public function __construct(
+    private readonly string $name,
+  ) {}
 
   /**
    * Determines if a release can be installed.

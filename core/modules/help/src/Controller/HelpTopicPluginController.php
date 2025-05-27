@@ -25,8 +25,10 @@ class HelpTopicPluginController extends ControllerBase {
    * @param \Drupal\Core\Render\RendererInterface $renderer
    *   The renderer service.
    */
-  public function __construct(protected HelpTopicPluginManagerInterface $helpTopicPluginManager, protected RendererInterface $renderer) {
-  }
+  public function __construct(
+    protected HelpTopicPluginManagerInterface $helpTopicPluginManager,
+    protected RendererInterface $renderer,
+  ) {}
 
   /**
    * Displays a help topic page.

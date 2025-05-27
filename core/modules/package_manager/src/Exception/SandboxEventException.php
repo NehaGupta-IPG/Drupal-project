@@ -28,7 +28,11 @@ class SandboxEventException extends SandboxException {
    * @param mixed ...$arguments
    *   Additional arguments to pass to the parent constructor.
    */
-  public function __construct(public readonly SandboxEvent $event, ?string $message = NULL, ...$arguments) {
+  public function __construct(
+    public readonly SandboxEvent $event,
+    ?string $message = NULL,
+    ...$arguments,
+  ) {
     parent::__construct($event->sandboxManager, $message ?: $this->getResultsAsText(), ...$arguments);
   }
 

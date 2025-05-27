@@ -58,7 +58,11 @@ class FieldTypeCategoryManager extends DefaultPluginManager implements FieldType
    * @param \Drupal\Core\Cache\CacheBackendInterface $cache_backend
    *   The cache backend.
    */
-  public function __construct(protected readonly string $root, ModuleHandlerInterface $module_handler, CacheBackendInterface $cache_backend) {
+  public function __construct(
+    protected readonly string $root,
+    ModuleHandlerInterface $module_handler,
+    CacheBackendInterface $cache_backend,
+  ) {
     $this->moduleHandler = $module_handler;
     $this->alterInfo('field_type_category_info');
     $this->setCacheBackend($cache_backend, 'field_type_category_info_plugins');

@@ -17,8 +17,9 @@ class UserAuthDecorator implements UserAuthInterface {
    * @param \Drupal\user\UserAuthInterface $inner
    *   The inner User.Auth service.
    */
-  public function __construct(protected UserAuthInterface $inner) {
-  }
+  public function __construct(
+    protected UserAuthInterface $inner,
+  ) {}
 
   /**
    * {@inheritdoc}

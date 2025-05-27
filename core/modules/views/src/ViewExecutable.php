@@ -508,7 +508,13 @@ class ViewExecutable {
    * @param \Drupal\views\Plugin\ViewsPluginManager|null $displayPluginManager
    *   The plugin manager for display.
    */
-  public function __construct(ViewEntityInterface $storage, AccountInterface $user, ViewsData $views_data, RouteProviderInterface $route_provider, protected ?ViewsPluginManager $displayPluginManager = NULL) {
+  public function __construct(
+    ViewEntityInterface $storage,
+    AccountInterface $user,
+    ViewsData $views_data,
+    RouteProviderInterface $route_provider,
+    protected ?ViewsPluginManager $displayPluginManager = NULL,
+  ) {
     // Reference the storage and the executable to each other.
     $this->storage = $storage;
     $this->storage->set('executable', $this);
