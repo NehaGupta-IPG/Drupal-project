@@ -87,6 +87,53 @@ abstract class AreaPluginBase extends HandlerBase {
         '#default_value' => $this->options['empty'] ?? 0,
       ];
     }
+
+    $form['area_id'] = [
+      '#type' => 'textfield',
+      '#title' => $this->t('Machine name of the area'),
+      '#default_value' => $this->options['new_id'] ?? $form_state->get('id'),
+      '#required' => TRUE,
+      '#size' => 64,
+    ];
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function validateOptionsForm(&$form, FormStateInterface $form_state) {
+    $area_id = $form_state->getValue(['options', 'area_id']);
+    if ($area_id) {
+      if (preg_match(
+        '/[^a-z0-9_]/',
+        $form_state->getValue(['options', 'area_id']))
+      ) {
+        $form_state->setError($form['area_id'], $this->t(
+          'Area id must contain only lowercase letters, numbers, or underscores.'
+        ));
+      }
+
+      if ($area_id != $form_state->get('id')
+        && array_key_exists($area_id, $this->displayHandler->getHandlers($this->areaType))
+      ) {
+        $form_state->setError($form['area_id'], $this->t(
+          'Area id should be unique.'
+        ));
+      }
+    }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function submitOptionsForm(&$form, FormStateInterface $form_state) {
+    $current_area_id = $form_state->get('id');
+
+    if ($form_state->getValue(['options', 'area_id']) != $current_area_id) {
+      $this->options['new_id'] = $form_state->getValue(['options', 'area_id']);
+    }
+    else {
+      unset($this->options['new_id']);
+    }
   }
 
   /**

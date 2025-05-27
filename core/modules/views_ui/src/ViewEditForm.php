@@ -299,6 +299,27 @@ class ViewEditForm extends ViewFormBase {
         $executable->displayHandlers->remove($id);
         unset($displays[$id]);
       }
+      else {
+        // Rename area ids if needed.
+        foreach (['header', 'footer', 'empty'] as $type) {
+          if (empty($display['display_options'][$type])) {
+            continue;
+          }
+
+          foreach ($display['display_options'][$type] as $handler) {
+            if (isset($handler['new_id'])) {
+              $old_id = $handler['id'];
+              $handler['id'] = $handler['new_id'];
+              unset($handler['new_id']);
+
+              $display['display_options'][$type][$handler['id']] = $handler;
+              unset($display['display_options'][$type][$old_id]);
+            }
+          }
+
+          $displays[$id] = $display;
+        }
+      }
     }
 
     // Rename display ids if needed.
