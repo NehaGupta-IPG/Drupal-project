@@ -31,6 +31,10 @@ class ModernRenderElementTest extends UnitTestCase {
     for ($i = 0; $i <= 2; $i++) {
       $child = ['#test' => $i];
       $elementObject->addChild("test$i", $child);
+      // addChild() takes the $child render array by reference and stores a
+      // reference to it in the render object. To avoid modifying the
+      // previously created render object when reusing the $child variable,
+      // unset() it to break the reference before reassigning.
       unset($child);
     }
     foreach ([1 => ['test0', 'test1', 'test2'], 2 => ['test0', 'test2']] as $delta => $expectedChildrenKeys) {
@@ -41,6 +45,8 @@ class ModernRenderElementTest extends UnitTestCase {
         $i += $delta;
       }
       $this->assertSame(Element::children($elementObject->toRenderable()), $expectedChildrenKeys);
+      // The first iteration tests removing an existing child. The second
+      // iteration tests removing a nonexistent child.
       $elementObject->removeChild('test1');
     }
   }
