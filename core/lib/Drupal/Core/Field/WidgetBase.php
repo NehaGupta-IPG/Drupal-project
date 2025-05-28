@@ -53,7 +53,7 @@ abstract class WidgetBase extends PluginSettingsBase implements WidgetInterface,
    * @param \Drupal\Core\Render\ElementInfoManagerInterface $elementInfoManager
    *   The element info manager.
    */
-  public function __construct($plugin_id, $plugin_definition, FieldDefinitionInterface $field_definition, array $settings, array $third_party_settings, protected ElementInfoManagerInterface $elementInfoManager) {
+  public function __construct($plugin_id, $plugin_definition, FieldDefinitionInterface $field_definition, array $settings, array $third_party_settings, ?ElementInfoManagerInterface $elementInfoManager = NULL) {
     parent::__construct([], $plugin_id, $plugin_definition);
     $this->fieldDefinition = $field_definition;
     $this->settings = $settings;
@@ -70,7 +70,7 @@ abstract class WidgetBase extends PluginSettingsBase implements WidgetInterface,
       $configuration['field_definition'],
       $configuration['settings'],
       $configuration['third_party_settings'],
-      $container->get('plugin.manager.element_info')
+      $container->get('plugin.manager.element_info'),
     );
   }
 

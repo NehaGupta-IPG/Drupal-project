@@ -72,8 +72,7 @@ interface ElementInfoManagerInterface extends PluginManagerInterface {
    *   easier to run this from form_alter implementations.
    *
    * @return \Drupal\Core\Render\Element\ElementInterface
-   *   A render object. Defaults to form to make it easier to run this from
-   *   form_alter implementations.
+   *   A render object.
    */
   public function fromRenderable(ElementInterface|array &$element, string $type = 'form'): ElementInterface;
 

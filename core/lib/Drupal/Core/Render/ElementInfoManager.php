@@ -77,7 +77,7 @@ class ElementInfoManager extends DefaultPluginManager implements ElementInfoMana
   /**
    * {@inheritdoc}
    */
-  protected function getDiscovery() {
+  protected function getDiscovery(): DiscoveryInterface {
     $discovery = parent::getDiscovery();
     return new class ($discovery, $this->reverseMapping) implements DiscoveryInterface {
       use DiscoveryTrait;
@@ -98,7 +98,7 @@ class ElementInfoManager extends DefaultPluginManager implements ElementInfoMana
   /**
    * {@inheritdoc}
    */
-  protected function getCachedDefinitions() {
+  protected function getCachedDefinitions(): array {
     if (!isset($this->definitions) && $cache = $this->cacheGet($this->cacheKey)) {
       $this->definitions = $cache->data['definitions'];
       $this->reverseMapping = $cache->data['reverse_mapping'];
@@ -118,7 +118,7 @@ class ElementInfoManager extends DefaultPluginManager implements ElementInfoMana
     $this->definitions = $definitions;
   }
 
-  public function clearCachedDefinitions() {
+  public function clearCachedDefinitions(): void {
     $this->elementInfo = NULL;
 
     $cids = [];
