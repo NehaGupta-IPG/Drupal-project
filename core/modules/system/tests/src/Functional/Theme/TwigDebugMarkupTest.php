@@ -73,7 +73,7 @@ class TwigDebugMarkupTest extends BrowserTestBase {
     $build += $builder->view($node3);
     $output = (string) $renderer->renderRoot($build);
     $this->assertStringContainsString("THEME HOOK: 'node__foo__bar'", $output, 'Theme call information found.');
-    $this->assertStringContainsString('▪️ node--foo--bar' . $extension . PHP_EOL . '   ▪️ node--foo' . $extension . PHP_EOL . '   ▪️ node--&lt;script type=&quot;text/javascript&quot;&gt;alert(&#039;yo&#039;);&lt;/script&gt;' . $extension . PHP_EOL . '   ▪️ node--3--full' . $extension . PHP_EOL . '   ▪️ node--3' . $extension . PHP_EOL . '   ▪️ node--page--full' . $extension . PHP_EOL . '   ▪️ node--page' . $extension . PHP_EOL . '   ▪️ node--full' . $extension . PHP_EOL . '   ✅ node' . $extension, $output, 'Suggested template files found in order and base template shown as current template.');
+    $this->assertStringContainsString('▪️ node--foo--bar' . $extension . PHP_EOL . '   ▪️ node--foo' . $extension . PHP_EOL . '   ▪️ node--&lt;script type=&quot;text/javascript&quot;&gt;alert(&#039;yo&#039;);&lt;/script&gt;' . $extension . PHP_EOL . '   ▪️ node--' . $node3->uuid() . '--full' . $extension . PHP_EOL . '   ▪️ node--' . $node3->uuid() . $extension . PHP_EOL . '   ▪️ node--3--full' . $extension . PHP_EOL . '   ▪️ node--3' . $extension . PHP_EOL . '   ▪️ node--page--full' . $extension . PHP_EOL . '   ▪️ node--page' . $extension . PHP_EOL . '   ▪️ node--full' . $extension . PHP_EOL . '   ✅ node' . $extension, $output, 'Suggested template files found in order and base template shown as current template.');
 
     // Disable debug, rebuild the service container, and clear all caches.
     $parameters = $this->container->getParameter('twig.config');

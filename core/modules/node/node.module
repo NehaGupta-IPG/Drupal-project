@@ -261,14 +261,18 @@ function node_preprocess_block(&$variables): void {
  */
 function node_theme_suggestions_node(array $variables): array {
   $suggestions = [];
+  /** @var \Drupal\node\NodeInterface $node */
   $node = $variables['elements']['#node'];
   $sanitized_view_mode = strtr($variables['elements']['#view_mode'], '.', '_');
+  $sanitized_uuid = str_replace('-', '_', $node->uuid());
 
   $suggestions[] = 'node__' . $sanitized_view_mode;
   $suggestions[] = 'node__' . $node->bundle();
   $suggestions[] = 'node__' . $node->bundle() . '__' . $sanitized_view_mode;
   $suggestions[] = 'node__' . $node->id();
   $suggestions[] = 'node__' . $node->id() . '__' . $sanitized_view_mode;
+  $suggestions[] = 'node__' . $sanitized_uuid;
+  $suggestions[] = 'node__' . $sanitized_uuid . '__' . $sanitized_view_mode;
 
   return $suggestions;
 }

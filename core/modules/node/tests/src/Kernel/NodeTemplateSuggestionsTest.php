@@ -27,7 +27,7 @@ class NodeTemplateSuggestionsTest extends KernelTestBase {
   ];
 
   /**
-   * Tests if template_preprocess_node() generates the correct suggestions.
+   * Tests if node_theme_suggestions_node() generates the correct suggestions.
    */
   public function testNodeThemeHookSuggestions(): void {
     $this->installEntitySchema('user');
@@ -50,12 +50,15 @@ class NodeTemplateSuggestionsTest extends KernelTestBase {
     $variables['elements'] = $build;
     $suggestions = \Drupal::moduleHandler()->invokeAll('theme_suggestions_node', [$variables]);
 
+    $sanitized_uuid = str_replace('-', '_', $node->uuid());
     $this->assertEquals([
       'node__full',
       'node__page',
       'node__page__full',
       'node__' . $node->id(),
       'node__' . $node->id() . '__full',
+      'node__' . $sanitized_uuid,
+      'node__' . $sanitized_uuid . '__full',
     ],
     $suggestions,
     'Found expected node suggestions.');
@@ -73,6 +76,8 @@ class NodeTemplateSuggestionsTest extends KernelTestBase {
       'node__page__node_my_custom_view_mode',
       'node__' . $node->id(),
       'node__' . $node->id() . '__node_my_custom_view_mode',
+      'node__' . $sanitized_uuid,
+      'node__' . $sanitized_uuid . '__node_my_custom_view_mode',
     ],
     $suggestions,
     'Found expected node suggestions.');
