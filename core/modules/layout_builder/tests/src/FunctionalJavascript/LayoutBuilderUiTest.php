@@ -9,7 +9,6 @@ use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
 use Drupal\Tests\contextual\FunctionalJavascript\ContextualLinkClickTrait;
 
 // cspell:ignore blocknodebundle fieldbody fieldlayout
-
 /**
  * Tests the Layout Builder UI.
  *
@@ -116,6 +115,13 @@ class LayoutBuilderUiTest extends WebDriverTestBase {
     // Make and then save changes.
     $this->assertModifiedLayout(static::FIELD_UI_PREFIX . '/display/default/layout');
     $page->pressButton('Save layout');
+    $assert_session->pageTextNotContains('You have unsaved changes.');
+
+    // Go back to layout form.
+    $this->drupalGet(static::FIELD_UI_PREFIX . '/display/default/layout');
+    $assert_session->pageTextNotContains('You have unsaved changes.');
+    // Reload the page.
+    $this->drupalGet(static::FIELD_UI_PREFIX . '/display/default/layout');
     $assert_session->pageTextNotContains('You have unsaved changes.');
   }
 

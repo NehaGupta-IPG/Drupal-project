@@ -68,10 +68,10 @@ class PrepareLayout implements EventSubscriberInterface {
     $section_storage = $event->getSectionStorage();
 
     // If the layout has pending changes, add a warning.
-    if ($this->layoutTempstoreRepository->has($section_storage)) {
+    if ($this->layoutTempstoreRepository->hasUnsavedChanges($section_storage)) {
       $this->messenger->addWarning($this->t('You have unsaved changes.'));
     }
-    else {
+    if (!$this->layoutTempstoreRepository->has($section_storage)) {
       // If the layout is an override that has not yet been overridden, copy the
       // sections from the corresponding default.
       if ($section_storage instanceof OverridesSectionStorageInterface && !$section_storage->isOverridden()) {
@@ -81,7 +81,7 @@ class PrepareLayout implements EventSubscriberInterface {
         }
       }
       // Add storage to tempstore regardless of what the storage is.
-      $this->layoutTempstoreRepository->set($section_storage);
+      $this->layoutTempstoreRepository->set($section_storage, FALSE);
     }
   }
 
