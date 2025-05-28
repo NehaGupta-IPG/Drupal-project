@@ -30,7 +30,7 @@ class Details extends RenderElementBase {
   /**
    * {@inheritdoc}
    */
-  public function getInfo() {
+  public function getInfo(): array {
     return [
       '#open' => FALSE,
       '#summary_attributes' => [],
@@ -48,7 +48,7 @@ class Details extends RenderElementBase {
    * @return array
    *   The modified element.
    */
-  public static function preRenderDetails($element) {
+  public static function preRenderDetails($element): array {
     Element::setAttributes($element, ['custom']);
 
     return $element;
