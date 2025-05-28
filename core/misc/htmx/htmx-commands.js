@@ -1,10 +1,103 @@
-((Drupal, htmx, loadjs) => {
+((Drupal, drupalSettings, htmx, loadjs) => {
+  /**
+   * Helper function to merge two objects recursively.
+   *
+   * @param current
+   *   The object to receive the merged values.
+   * @param sources
+   *   The objects to merge into current.
+   *
+   * @return object
+   *   The merged object.
+   *
+   * @see https://youmightnotneedjquery.com/#deep_extend
+   */
+  function mergeSettings(current, ...sources) {
+    if (!current) {
+      return {};
+    }
+
+    sources
+      .filter((obj) => Boolean(obj))
+      .forEach((obj) => {
+        Object.entries(obj).forEach(([key, value]) => {
+          switch (Object.prototype.toString.call(value)) {
+            case '[object Object]':
+              current[key] = current[key] || {};
+              current[key] = mergeSettings(current[key], value);
+              break;
+
+            case '[object Array]':
+              current[key] = mergeSettings(new Array(value.length), value);
+              break;
+
+            default:
+              current[key] = value;
+          }
+        });
+      });
+
+    return current;
+  }
+
+  function addAssets(data) {
+    const bundleIds = data
+      .filter(({ href, src }) => !loadjs.isDefined(href ?? src))
+      .map(({ href, src, type, ...attributes }) => {
+        const bundleId = href ?? src;
+        let prefix = 'css!';
+        if (src) {
+          prefix = type === 'module' ? 'module!' : 'js!';
+        }
+
+        loadjs(prefix + bundleId, bundleId, {
+          // JS files are loaded in order, so this needs to be false when 'src'
+          // is defined.
+          async: !src,
+          // Copy asset tag attributes to the new element.
+          before(path, element) {
+            // This allows all attributes to be added, like defer, async and
+            // crossorigin.
+            Object.entries(attributes).forEach(([name, value]) => {
+              element.setAttribute(name, value);
+            });
+          },
+        });
+
+        return bundleId;
+      });
+
+    // Nothing to load, we resolve the promise right away.
+    let assetsLoaded = Promise.resolve();
+    // If there are assets to load, use loadjs to manage this process.
+    if (bundleIds.length) {
+      // Trigger the event once all the dependencies have loaded.
+      assetsLoaded = new Promise((resolve, reject) => {
+        loadjs.ready(bundleIds, {
+          success: resolve,
+          error(depsNotFound) {
+            const message = Drupal.t(
+              `The following files could not be loaded: @dependencies`,
+              { '@dependencies': depsNotFound.join(', ') },
+            );
+            reject(message);
+          },
+        });
+      });
+    }
+
+    return assetsLoaded;
+  }
+
+  /**
+   * Namespace for htmx utilities.
+   */
   Drupal.htmx = {};
 
   /**
    * Helper method to make sure commands are executed in sequence.
    *
-   * @param {Array.<Drupal.AjaxCommands~commandDefinition>} response
+   * @param {Array} response
    *   Drupal Ajax response.
    * @param {number} status
    *   XMLHttpRequest status.
@@ -31,6 +124,11 @@
     );
   };
 
+  /**
+   * Implementation of Drupal ajax commands with htmx.
+   *
+   * @type {object}
+   */
   Drupal.htmx.commands = {
     /**
      * Command to insert new content into the DOM.
@@ -38,28 +136,31 @@
      * @param {object} response
      *   The response from the Ajax request.
      * @param {string} response.data
-     *   The data to use with the jQuery method.
+     *   The new HTML.
      * @param {string} [response.method]
      *   The jQuery DOM manipulation method to be used.
      * @param {string} [response.selector]
-     *   An optional jQuery selector string.
-     * @param {object} [response.settings]
-     *   An optional array of settings that will be used.
+     *   An optional selector string.
      */
-    insert(response) {
-      const target = htmx.find(response.selector);
-      const newHtml = response.data;
+    insert({ data, method, selector }) {
+      const target = htmx.find(selector);
+      const newHtml = data;
 
       // Detach behaviors.
       htmx.trigger(target, 'htmx:drupal:unload');
 
       const styleMap = {
         replaceWith: 'outerHTML',
+        html: 'innerHTML',
+        before: 'beforebegin',
+        prepend: 'afterbegin',
+        append: 'beforeend',
+        after: 'afterend',
       };
 
       // Make the actual swap and initialize everything.
       htmx.swap(target, newHtml, {
-        swapStyle: styleMap?.[response.method] || 'outerHTML',
+        swapStyle: styleMap[method] || 'outerHTML',
       });
     },
 
@@ -70,13 +171,9 @@
      *   The response from the Ajax request.
      * @param {string} response.selector
      *   A jQuery selector string.
-     * @param {object} [response.settings]
-     *   An optional array of settings that will be used.
-     * @param {number} [status]
-     *   The XMLHttpRequest status.
      */
-    remove(response, status) {
-      htmx.findAll(response.selector).forEach((element) => {
+    remove({ selector }) {
+      htmx.findAll(selector).forEach((element) => {
         htmx.trigger(element, 'htmx:drupal:unload');
         element.remove();
       });
@@ -92,11 +189,11 @@
      * @param {string} [response.priority]
      *   An optional priority that will be used for the announcement.
      */
-    announce(response) {
-      if (response.priority) {
-        Drupal.announce(response.text, response.priority);
+    announce({ text, priority }) {
+      if (priority) {
+        Drupal.announce(text, priority);
       } else {
-        Drupal.announce(response.text);
+        Drupal.announce(text);
       }
     },
 
@@ -107,16 +204,12 @@
      *   The response from the Ajax request.
      * @param {string} response.url
      *   The URL to redirect to.
-     * @param {number} [status]
-     *   The XMLHttpRequest status.
      */
-    redirect(response, status) {
-      window.location = response.url;
+    redirect({ url }) {
+      window.location = url;
     },
 
     /**
-     * @TODO
-     *
      * Command to set the settings used for other commands in this response.
      *
      * This method will also remove expired `drupalSettings.ajax` settings.
@@ -128,36 +221,11 @@
      *   global settings.
      * @param {object} response.settings
      *   Contains additional settings to add to the global settings.
-     * @param {number} [status]
-     *   The XMLHttpRequest status.
      */
-    settings(response, status) {
-      /*
-      const ajaxSettings = drupalSettings.ajax;
-
-      // Clean up drupalSettings.ajax.
-      if (ajaxSettings) {
-        Drupal.ajax.expired().forEach((instance) => {
-          // If the Ajax object has been created through drupalSettings.ajax
-          // it will have a selector. When there is no selector the object
-          // has been initialized with a special class name picked up by the
-          // Ajax behavior.
-
-          if (instance.selector) {
-            const selector = instance.selector.replace('#', '');
-            if (selector in ajaxSettings) {
-              delete ajaxSettings[selector];
-            }
-          }
-        });
+    settings({ merge, settings }) {
+      if (merge) {
+        mergeSettings(drupalSettings, settings);
       }
-
-      if (response.merge) {
-        $.extend(true, drupalSettings, response.settings);
-      } else {
-        ajax.settings = response.settings;
-      }
-       */
     },
 
     /**
@@ -169,10 +237,8 @@
      *   The old form build ID.
      * @param {string} response.new
      *   The new form build ID.
-     * @param {number} [status]
-     *   The XMLHttpRequest status.
      */
-    update_build_id(response, status) {
+    update_build_id(response) {
       document
         .querySelectorAll(
           `input[name="form_build_id"][value="${response.old}"]`,
@@ -189,44 +255,9 @@
      *   The response from the Ajax request.
      * @param {object[]} response.data
      *   An array of styles to be added.
-     * @param {number} [status]
-     *   The XMLHttpRequest status.
      */
-    add_css(response, status) {
-      const allUniqueBundleIds = response.data.map(function (style) {
-        const uniqueBundleId = style.href;
-        // Force file to load as a CSS stylesheet using 'css!' flag.
-        if (!loadjs.isDefined(uniqueBundleId)) {
-          loadjs(`css!${style.href}`, uniqueBundleId, {
-            before(path, styleEl) {
-              // This allows all attributes to be added, like media.
-              Object.keys(style).forEach((attributeKey) => {
-                styleEl.setAttribute(attributeKey, style[attributeKey]);
-              });
-            },
-          });
-        }
-        return uniqueBundleId;
-      });
-      // Returns the promise so that the next AJAX command waits on the
-      // completion of this one to execute, ensuring the CSS is loaded before
-      // executing.
-      return new Promise((resolve, reject) => {
-        loadjs.ready(allUniqueBundleIds, {
-          success() {
-            // All CSS files were loaded. Resolve the promise and let the
-            // remaining commands execute.
-            resolve();
-          },
-          error(depsNotFound) {
-            const message = Drupal.t(
-              `The following files could not be loaded: @dependencies`,
-              { '@dependencies': depsNotFound.join(', ') },
-            );
-            reject(message);
-          },
-        });
-      });
+    add_css({ data }) {
+      return addAssets(data);
     },
 
     /**
@@ -243,14 +274,19 @@
      * @param {boolean} response.clearPrevious
      *   If true, clear previous messages.
      */
-    message(response) {
+    message({
+      message,
+      messageOptions,
+      messageWrapperQuerySelector,
+      clearPrevious,
+    }) {
       const messages = new Drupal.Message(
-        document.querySelector(response.messageWrapperQuerySelector),
+        document.querySelector(messageWrapperQuerySelector),
       );
-      if (response.clearPrevious) {
+      if (clearPrevious) {
         messages.clear();
       }
-      messages.add(response.message, response.messageOptions);
+      messages.add(message, messageOptions);
     },
 
     /**
@@ -260,60 +296,11 @@
      *   The response from the Ajax request.
      * @param {Array} response.data
      *   An array of objects of script attributes.
-     * @param {number} [status]
-     *   The XMLHttpRequest status.
      */
-    add_js(response, status) {
-      const parentEl = document.querySelector(response.selector || 'body');
-      const allUniqueBundleIds = response.data.map((script) => {
-        const uniqueBundleId = script.src;
-        if (!loadjs.isDefined(uniqueBundleId)) {
-          loadjs(script.src, uniqueBundleId, {
-            // The default loadjs behavior is to load script with async, in Drupal
-            // we need to explicitly tell scripts to load async, this is set in
-            // the before callback below if necessary.
-            async: false,
-            before(path, scriptEl) {
-              // This allows all attributes to be added, like defer, async and
-              // crossorigin.
-              Object.keys(script).forEach((attributeKey) => {
-                scriptEl.setAttribute(attributeKey, script[attributeKey]);
-              });
-
-              // By default, loadjs appends the script to the head. When scripts
-              // are loaded via AJAX, their location has no impact on
-              // functionality. But, since non-AJAX loaded scripts can choose
-              // their parent element, we provide that option here for the sake of
-              // consistency.
-              parentEl.appendChild(scriptEl);
-              // Return false to bypass loadjs' default DOM insertion mechanism.
-              return false;
-            },
-          });
-        }
-        return uniqueBundleId;
-      });
-      // Returns the promise so that the next AJAX command waits on the
-      // completion of this one to execute, ensuring the JS is loaded before
-      // executing.
-      return new Promise((resolve, reject) => {
-        loadjs.ready(allUniqueBundleIds, {
-          success() {
-            htmx.trigger(parentEl, 'htmx:drupal:load');
-            // All JS files were loaded and new and old behaviors have
-            // been attached. Resolve the promise and let the remaining
-            // commands execute.
-            resolve();
-          },
-          error(depsNotFound) {
-            const message = Drupal.t(
-              `The following files could not be loaded: @dependencies`,
-              { '@dependencies': depsNotFound.join(', ') },
-            );
-            reject(message);
-          },
-        });
+    add_js({ data }) {
+      return addAssets(data).then(() => {
+        htmx.trigger(document.body, 'htmx:drupal:load');
       });
     },
   };
-})(Drupal, htmx, loadjs);
+})(Drupal, drupalSettings, htmx, loadjs);
