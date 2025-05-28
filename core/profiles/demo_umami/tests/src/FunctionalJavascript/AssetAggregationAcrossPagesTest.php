@@ -48,7 +48,7 @@ class AssetAggregationAcrossPagesTest extends PerformanceTestBase {
 
     $expected = [
       'ScriptCount' => 3,
-      'ScriptBytes' => 256135,
+      'ScriptBytes' => 254481,
       'StylesheetCount' => 5,
       'StylesheetBytes' => 83102,
     ];
@@ -69,7 +69,7 @@ class AssetAggregationAcrossPagesTest extends PerformanceTestBase {
     }, 'umamiFrontAndRecipePagesEditor');
     $expected = [
       'ScriptCount' => 5,
-      'ScriptBytes' => 448671,
+      'ScriptBytes' => 447017,
       'StylesheetCount' => 5,
       'StylesheetBytes' => 205700,
     ];
