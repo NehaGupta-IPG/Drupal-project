@@ -4,16 +4,46 @@ namespace Drupal\file;
 
 use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Entity\EntityAccessControlHandler;
+use Drupal\Core\Entity\EntityHandlerInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityStorageInterface;
+use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Session\AccountInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
 /**
  * Provides a File access control handler.
  */
-class FileAccessControlHandler extends EntityAccessControlHandler {
+class FileAccessControlHandler extends EntityAccessControlHandler implements EntityHandlerInterface {
+
+  /**
+   * Constructs a new BlockListBuilder object.
+   *
+   * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
+   *   The entity type definition.
+   * @param \Symfony\Component\HttpFoundation\Session\SessionInterface|null $session
+   *   The session service or null.
+   */
+  public function __construct(EntityTypeInterface $entity_type, protected ?SessionInterface $session = NULL) {
+    parent::__construct($entity_type);
+    if ($session === NULL) {
+      @trigger_error('Calling ' . __CLASS__ . ' constructor without the $session argument is deprecated in drupal:11.2.0 and it will be required in drupal:12.0.0. See https://www.drupal.org/project/drupal/issues/2888581', E_USER_DEPRECATED);
+      $this->session = \Drupal::service('session');
+    }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function createInstance(ContainerInterface $container, EntityTypeInterface $entity_type): static {
+    return new static(
+      $entity_type,
+      $container->get('session')
+    );
+  }
 
   /**
    * {@inheritdoc}
@@ -48,9 +78,7 @@ class FileAccessControlHandler extends EntityAccessControlHandler {
         if ($account->isAnonymous()) {
           // For anonymous users, only the browser session that uploaded the
           // file is positively allowed access to it. See file_save_upload().
-          // @todo Implement \Drupal\Core\Entity\EntityHandlerInterface so that
-          //   services can be more properly injected.
-          $allowed_fids = \Drupal::service('session')->get('anonymous_allowed_file_ids', []);
+          $allowed_fids = $this->session->get('anonymous_allowed_file_ids', []);
           if (!empty($allowed_fids[$entity->id()])) {
             return AccessResult::allowed()->addCacheContexts(['session', 'user']);
           }
