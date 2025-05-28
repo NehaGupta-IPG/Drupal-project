@@ -53,8 +53,7 @@ class BigPipeRegressionTest extends WebDriverTestBase {
     $this->drupalLogin($this->drupalCreateUser());
     $this->drupalGet(Url::fromRoute('big_pipe_regression_test.2678662'));
 
-    // Confirm that AJAX behaviors were instantiated, if not, this points to a
-    // JavaScript syntax error.
+    // Confirm that the JS variable has the appropriate content.
     $javascript = <<<JS
     (function(){
       return hitsTheFloor === "</body>";
