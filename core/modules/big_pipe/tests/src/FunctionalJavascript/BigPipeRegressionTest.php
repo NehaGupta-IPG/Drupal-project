@@ -57,7 +57,7 @@ class BigPipeRegressionTest extends WebDriverTestBase {
     // JavaScript syntax error.
     $javascript = <<<JS
     (function(){
-      return Object.keys(Drupal.ajax.instances).length > 0;
+      return hitsTheFloor === "</body>";
     }())
 JS;
     $this->assertJsCondition($javascript);

@@ -642,6 +642,8 @@ drupal.htmx.commands:
     - core/drupal.htmx
     - core/drupalSettings
     - core/loadjs
+    - core/drupal.message
+
 
 drupal.machine-name:
   version: VERSION

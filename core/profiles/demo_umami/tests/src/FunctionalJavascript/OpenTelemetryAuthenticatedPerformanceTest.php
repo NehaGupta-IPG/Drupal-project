@@ -67,7 +67,7 @@ class OpenTelemetryAuthenticatedPerformanceTest extends PerformanceTestBase {
       'ScriptCount' => 2,
       'ScriptBytes' => 73858,
       'StylesheetCount' => 2,
-      'StylesheetBytes' => 42000,
+      'StylesheetBytes' => 39513,
     ];
     $this->assertMetrics($expected, $performance_data);
   }
