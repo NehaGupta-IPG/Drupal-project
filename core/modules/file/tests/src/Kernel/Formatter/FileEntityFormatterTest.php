@@ -7,6 +7,7 @@ namespace Drupal\Tests\file\Kernel\Formatter;
 use Drupal\Core\Entity\Entity\EntityViewDisplay;
 use Drupal\file\Entity\File;
 use Drupal\KernelTests\KernelTestBase;
+use Symfony\Component\DomCrawler\Crawler;
 
 /**
  * Tests the default file formatter.
@@ -200,6 +201,24 @@ class FileEntityFormatterTest extends KernelTestBase {
 
     $output = (string) \Drupal::service('renderer')->renderRoot($file_link);
     $this->assertStringContainsString($this->fileUrlGenerator->generate('dummy-external-readonly://file-query-string?foo=bar')->toUriString(), $output);
+  }
+
+  /**
+   * Tests the file_link field formatter using link options.
+   */
+  public function testFormatterFileLinkWithLinkOptions(): void {
+    $file_link = [
+      '#theme' => 'file_link',
+      '#file' => $this->files[0],
+      '#link_options' => [
+        'attributes' => ['target' => '_blank'],
+      ],
+    ];
+
+    $crawler = new Crawler((string) \Drupal::service('renderer')->renderRoot($file_link));
+    $link = $crawler->filterXPath("//a");
+    self::assertCount(1, $link);
+    self::assertEquals('_blank', $link->attr('target'));
   }
 
 }
