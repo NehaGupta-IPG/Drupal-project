@@ -10,7 +10,7 @@ use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\file\Entity\File;
 use Drupal\file\FileInterface;
-use Drupal\Tests\field\Kernel\FieldKernelTestBase;
+use Drupal\KernelTests\Core\File\FileTestBase;
 use Drupal\Tests\user\Traits\UserCreationTrait;
 
 /**
@@ -18,7 +18,7 @@ use Drupal\Tests\user\Traits\UserCreationTrait;
  *
  * @group file
  */
-class FileAccessContentRevisionTest extends FieldKernelTestBase {
+class FileAccessContentRevisionTest extends FileTestBase {
 
   use UserCreationTrait;
 
@@ -34,9 +34,10 @@ class FileAccessContentRevisionTest extends FieldKernelTestBase {
    */
   protected static $modules = [
     'file',
-    'system',
+    'field',
     'user',
     'file_test',
+    'entity_test',
   ];
 
   /**
@@ -45,10 +46,11 @@ class FileAccessContentRevisionTest extends FieldKernelTestBase {
   public function setUp(): void {
     parent::setUp();
     $this->installEntitySchema('user');
+    $this->installEntitySchema('entity_test');
     $this->installEntitySchema('entity_test_rev');
     $this->installEntitySchema('file');
     $this->installSchema('file', ['file_usage']);
-    $this->installConfig('user');
+    $this->installConfig(['user', 'field', 'system']);
 
     FieldStorageConfig::create([
       'field_name' => 'file_test',
@@ -62,11 +64,11 @@ class FileAccessContentRevisionTest extends FieldKernelTestBase {
       'bundle' => 'entity_test_rev',
       'settings' => ['file_directory' => $this->getRandomGenerator()->name()],
     ])->save();
-    file_put_contents('private://example.txt', $this->randomMachineName());
 
     $this->file = File::create([
       'uri' => 'private://example.txt',
     ]);
+    file_put_contents($this->file->getFileUri(), $this->randomMachineName());
     $this->file->save();
   }
 
