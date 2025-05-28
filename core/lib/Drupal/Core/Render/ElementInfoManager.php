@@ -99,7 +99,7 @@ class ElementInfoManager extends DefaultPluginManager implements ElementInfoMana
   /**
    * {@inheritdoc}
    */
-  protected function getCachedDefinitions(): array {
+  protected function getCachedDefinitions(): ?array {
     if (!isset($this->definitions) && $cache = $this->cacheGet($this->cacheKey)) {
       $this->definitions = $cache->data['definitions'];
       $this->reverseMapping = $cache->data['reverse_mapping'];

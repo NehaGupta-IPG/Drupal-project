@@ -53,11 +53,15 @@ abstract class WidgetBase extends PluginSettingsBase implements WidgetInterface,
    * @param \Drupal\Core\Render\ElementInfoManagerInterface $elementInfoManager
    *   The element info manager.
    */
-  public function __construct($plugin_id, $plugin_definition, FieldDefinitionInterface $field_definition, array $settings, array $third_party_settings, ?ElementInfoManagerInterface $elementInfoManager = NULL) {
+  public function __construct($plugin_id, $plugin_definition, FieldDefinitionInterface $field_definition, array $settings, array $third_party_settings, protected ?ElementInfoManagerInterface $elementInfoManager = NULL) {
     parent::__construct([], $plugin_id, $plugin_definition);
     $this->fieldDefinition = $field_definition;
     $this->settings = $settings;
     $this->thirdPartySettings = $third_party_settings;
+    if (!$this->elementInfoManager) {
+      @trigger_error('Calling ' . __METHOD__ . '() without the $elementInfoManager argument is deprecated in drupal:11.3.0 and it will be required in drupal:12.0.0. See https://www.drupal.org/node/3526683', E_USER_DEPRECATED);
+      $this->elementInfoManager = \Drupal::service('plugin.manager.element_info');
+    }
   }
 
   /**
