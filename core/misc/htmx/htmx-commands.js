@@ -144,11 +144,11 @@
      */
     insert({ data, method, selector }) {
       const target = htmx.find(selector);
-      const newHtml = data;
 
       // Detach behaviors.
       htmx.trigger(target, 'htmx:drupal:unload');
 
+      // Map jQuery manipulation methods to the DOM equivalent.
       const styleMap = {
         replaceWith: 'outerHTML',
         html: 'innerHTML',
@@ -159,7 +159,7 @@
       };
 
       // Make the actual swap and initialize everything.
-      htmx.swap(target, newHtml, {
+      htmx.swap(target, data, {
         swapStyle: styleMap[method] || 'outerHTML',
       });
     },
