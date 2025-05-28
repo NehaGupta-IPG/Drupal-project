@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\block\Functional;
 
+use Drupal\user\Entity\Role;
+
 /**
  * Tests branding block display.
  *
@@ -122,13 +124,21 @@ class BlockSystemBrandingTest extends BlockTestBase {
     ]);
 
     $this->drupalLogin($authenticatedUser);
-    $this->drupalGet('admin/structure/block/manage/site-branding');
-    $this->assertSession()->responseNotContains('The site logo can only be changed on the Appearance or Theme Settings page.');
+    $this->drupalGet('admin/structure/block/manage/site_branding');
+    $this->assertSession()->statusCodeEquals(200);
+    $this->assertSession()->pageTextNotContains('Defined on the Appearance Settings or Theme Settings page.');
+    $this->assertSession()->pageTextNotContains('Defined on the Site Information page.');
 
-    // Add positive asserts for the user with the required permissions.
-    $this->assertSession()->titleEquals('Site branding');
-    $this->assertSession()->elementExists('css', 'form#block-form');
-    $this->assertSession()->elementExists('css', 'fieldset#edit-site-branding');
+    $rids = $authenticatedUser->getRoles(TRUE);
+    $role = Role::load(array_shift($rids));
+    $role->grantPermission('administer themes')
+      ->grantPermission('administer site configuration')
+      ->save();
+
+    $this->drupalGet('admin/structure/block/manage/site_branding');
+    $this->assertSession()->statusCodeEquals(200);
+    $this->assertSession()->pageTextContains('Defined on the Appearance Settings or Theme Settings page.');
+    $this->assertSession()->pageTextContains('Defined on the Site Information page.');
   }
 
 }
