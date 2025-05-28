@@ -78,7 +78,13 @@
       'link[rel="stylesheet"][href], script[src]',
     );
     // Transform the data from the DOM into an ajax command like format.
-    const data = Array.from(assetsTags).map(({ attributes }) => attributes);
+    const data = Array.from(assetsTags).map(({ attributes }) => {
+      const attrs = {};
+      Object.values(attributes).forEach(({ name, value }) => {
+        attrs[name] = value;
+      });
+      return attrs;
+    });
 
     // Helps with memory management.
     responseHTML = null;
