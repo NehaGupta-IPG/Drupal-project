@@ -241,6 +241,23 @@ class Ckeditor5Hooks {
   }
 
   /**
+   * Implements hook_form_FORM_ID_alter().
+   */
+  #[Hook('form_entity_view_mode_form_alter')]
+  public function formEntityViewModeFormAlter(&$form, FormStateInterface $form_state, $form_id) : void {
+    $viewMode = $form_state->getFormObject()->getEntity();
+    if ($viewMode->getTargetType() === 'media') {
+      $form['inline'] = [
+        '#type' => 'checkbox',
+        '#title' => $this->t('Enable this view mode for inline media'),
+        '#description' => $this->t('Check this box to allow media of this type to be embedded inline.'),
+        '#default_value' => $viewMode->getThirdPartySetting('ckeditor5', 'inline')
+      ];
+      $form['#entity_builders'][] = 'ckeditor5_entity_view_mode_form_builder';
+    }
+  }
+
+  /**
    * Implements hook_library_info_alter().
    */
   #[Hook('library_info_alter')]
