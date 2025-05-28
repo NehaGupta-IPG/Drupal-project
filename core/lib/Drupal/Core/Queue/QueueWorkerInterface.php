@@ -26,7 +26,7 @@ interface QueueWorkerInterface extends PluginInspectionInterface {
    * @todo Uncomment new method parameter before drupal:12.0.0.
    * @see https://www.drupal.org/project/drupal/issues/3525399
    *
-   * @param object|null $metadata
+   * @param object{'data': mixed, item_id: int|string, 'created': int, 'claimed_count'?: int}|null $metadata
    *   The queue item metadata, typically including the created time and claimed
    *   count. The worker must still work correctly if this is NULL or expected
    *   properties are missing.
