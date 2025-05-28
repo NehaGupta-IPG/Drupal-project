@@ -115,6 +115,20 @@ class BlockSystemBrandingTest extends BlockTestBase {
     $this->assertSession()->elementNotExists('xpath', $site_name_xpath);
     $this->assertSession()->elementTextNotContains('xpath', $site_slogan_xpath, 'Community carpentry');
     $this->assertSession()->responseHeaderContains('X-Drupal-Cache-Tags', 'config:system.site');
+
+    $authenticatedUser = $this->drupalCreateUser([
+      'administer blocks',
+      'access administration pages',
+    ]);
+
+    $this->drupalLogin($authenticatedUser);
+    $this->drupalGet('admin/structure/block/manage/site-branding');
+    $this->assertSession()->responseNotContains('The site logo can only be changed on the Appearance or Theme Settings page.');
+
+    // Add positive asserts for the user with the required permissions.
+    $this->assertSession()->titleEquals('Site branding');
+    $this->assertSession()->elementExists('css', 'form#block-form');
+    $this->assertSession()->elementExists('css', 'fieldset#edit-site-branding');
   }
 
 }
