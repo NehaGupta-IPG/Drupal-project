@@ -20,7 +20,7 @@ interface QueueWorkerWithMetadataInterface extends QueueWorkerInterface {
    * @param mixed $data
    *   The data that was passed to
    *   \Drupal\Core\Queue\QueueInterface::createItem() when the item was queued.
-   * @param object|null $metadata
+   * @param object{'data': mixed, item_id: int|string, 'created': int, 'claimed_count'?: int}|null $metadata
    *   The queue item metadata including the created time and claimed count.
    *   The worker must still work correctly if this is NULL.
    *
