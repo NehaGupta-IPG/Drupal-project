@@ -153,6 +153,8 @@ interface ElementInterface extends PluginInspectionInterface, RenderCallbackInte
   /**
    * Change the type of the element.
    *
+   * Changes only the #type all other properties and children are preserved.
+   *
    * @param class-string<T> $class
    *   The class of the new render object.
    *

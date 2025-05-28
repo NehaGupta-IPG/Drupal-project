@@ -7,7 +7,7 @@ use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Field\Plugin\Field\FieldWidget\StringTextfieldWidget;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Render\Element\ElementInterface;
-use Drupal\Core\Render\Element\Wrapper;
+use Drupal\Core\Render\Element\Widget;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\filter\Element\TextFormat;
 use Symfony\Component\Validator\ConstraintViolationInterface;
@@ -44,20 +44,20 @@ class TextfieldWidget extends StringTextfieldWidget {
   /**
    * {@inheritdoc}
    */
-  public function singleElementObject(FieldItemListInterface $items, $delta, Wrapper $wrapper, ElementInterface $form, FormStateInterface $form_state): ElementInterface {
-    $wrapper = parent::singleElementObject($items, $delta, $wrapper, $form, $form_state);
+  public function singleElementObject(FieldItemListInterface $items, $delta, Widget $widget, ElementInterface $form, FormStateInterface $form_state): ElementInterface {
+    $widget = parent::singleElementObject($items, $delta, $widget, $form, $form_state);
     $allowed_formats = $this->getFieldSetting('allowed_formats');
 
-    $wrapper = $wrapper->getChild('value');
-    $type = $wrapper->type;
-    $wrapper = $wrapper->changeType(TextFormat::class);
-    $wrapper->format = $items[$delta]->format ?? NULL;
-    $wrapper->base_type = $type;
+    $widget = $widget->getChild('value');
+    $type = $widget->type;
+    $widget = $widget->changeType(TextFormat::class);
+    $widget->format = $items[$delta]->format ?? NULL;
+    $widget->base_type = $type;
     if ($allowed_formats && !$this->isDefaultValueWidget($form_state)) {
-      $wrapper->allowed_formats = $allowed_formats;
+      $widget->allowed_formats = $allowed_formats;
     }
 
-    return $wrapper;
+    return $widget;
   }
 
   /**

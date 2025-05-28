@@ -190,6 +190,8 @@ abstract class RenderElementBase extends PluginBase implements ElementInterface,
 
   /**
    * The storage.
+   *
+   * @internal
    */
   protected array $storage = [];
 

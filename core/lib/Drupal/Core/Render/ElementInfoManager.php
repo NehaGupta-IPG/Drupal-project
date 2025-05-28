@@ -44,6 +44,7 @@ class ElementInfoManager extends DefaultPluginManager implements ElementInfoMana
    * More performant than reflecting runtime.
    *
    * @var array
+   * @internal
    */
   protected array $reverseMapping = [];
 

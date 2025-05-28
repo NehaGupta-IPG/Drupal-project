@@ -4,7 +4,7 @@ namespace Drupal\Core\Field;
 
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Render\Element\ElementInterface;
-use Drupal\Core\Render\Element\Wrapper;
+use Drupal\Core\Render\Element\Widget;
 
 /**
  * Widget wrapper interface.
@@ -42,23 +42,8 @@ interface ModernWidgetInterface {
    *   Array of default values for this field.
    * @param int $delta
    *   The order of this item in the array of sub-elements (0, 1, 2, etc.).
-   * @param \Drupal\Core\Render\Element\Wrapper $wrapper
-   *   A form wrapper containing basic properties for the widget, attach
-   *   the widget elements to this wrapper.
-   *   - field_parents: The 'parents' space for the field in the form. Most
-   *       widgets can simply overlook this property. This identifies the
-   *       location where the field values are placed within
-   *       $form_state->getValues(), and is used to access processing
-   *       information for the field through the getWidgetState() and
-   *       setWidgetState() methods.
-   *   - title: The sanitized element label for the field, ready for output.
-   *   - description: The sanitized element description for the field, ready
-   *     for output.
-   *   - required: A Boolean indicating whether the element value is required;
-   *     for required multiple value fields, only the first widget's values are
-   *     required.
-   *   - delta: The order of this item in the array of sub-elements; see $delta
-   *     above.
+   * @param \Drupal\Core\Render\Element\Widget $widget
+   *   A widget element.
    * @param \Drupal\Core\Render\Element\ElementInterface $form
    *   The form structure where widgets are being attached to. This might be a
    *   full form structure, or a sub-element of a larger form.
@@ -72,6 +57,6 @@ interface ModernWidgetInterface {
    * @see hook_field_widget_single_element_form_alter()
    * @see hook_field_widget_single_element_WIDGET_TYPE_form_alter()
    */
-  public function singleElementObject(FieldItemListInterface $items, $delta, Wrapper $wrapper, ElementInterface $form, FormStateInterface $form_state): ElementInterface;
+  public function singleElementObject(FieldItemListInterface $items, $delta, Widget $widget, ElementInterface $form, FormStateInterface $form_state): ElementInterface;
 
 }
