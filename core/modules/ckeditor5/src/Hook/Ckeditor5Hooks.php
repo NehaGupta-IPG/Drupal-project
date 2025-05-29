@@ -115,6 +115,16 @@ class Ckeditor5Hooks {
   }
 
   /**
+   * Implements hook_theme_suggestions_HOOK_alter().
+   */
+  #[Hook('theme_suggestions_media_alter')]
+  public function themeSuggestionsMediaAlter(array &$suggestions, array $variables): void {
+    if ($variables['elements']['#view_mode'] == 'ckeditor_inline') {
+      $suggestions[] = 'media__ckeditor_inline_embed';
+    }
+  }
+
+  /**
    * Implements hook_form_FORM_ID_alter().
    *
    * This module's implementation of form_filter_format_form_alter() must
