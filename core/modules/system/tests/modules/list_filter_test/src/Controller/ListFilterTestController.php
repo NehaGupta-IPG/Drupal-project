@@ -6,6 +6,9 @@ use Drupal\Core\Controller\ControllerBase;
 
 /**
  * Provides a controller for testing the ListFilter functionality.
+ *
+ * @see \Drupal\Core\Render\Element\ListFilter
+ * @see \Drupal\FunctionalJavascriptTests\ListFilterTest
  */
 class ListFilterTestController extends ControllerBase {
 
