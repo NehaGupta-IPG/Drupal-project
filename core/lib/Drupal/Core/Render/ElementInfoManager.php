@@ -13,6 +13,7 @@ use Drupal\Core\Plugin\DefaultPluginManager;
 use Drupal\Core\PreWarm\PreWarmableInterface;
 use Drupal\Core\Render\Attribute\RenderElement;
 use Drupal\Core\Render\Element\ElementInterface;
+use Drupal\Core\Render\Element\Form;
 use Drupal\Core\Render\Element\FormElementInterface;
 use Drupal\Core\Theme\ThemeManagerInterface;
 
@@ -257,17 +258,15 @@ class ElementInfoManager extends DefaultPluginManager implements ElementInfoMana
   /**
    * {@inheritdoc}
    */
-  public function fromRenderable(ElementInterface|array &$element, string $type = 'form'): ElementInterface {
+  public function fromRenderable(ElementInterface|array &$element, string $class = Form::class): ElementInterface {
     if ($element instanceof ElementInterface) {
       return $element;
     }
-    if (!isset($element['#type'])) {
-      if ($type) {
-        $element['#type'] = $type;
-      }
-      else {
-        throw new \LogicException('The element passed to ElementInfoManager::fromRenderable must have a #type or a fallback $type must be provided.');
-      }
+    if (!isset($element['#type']) && $class) {
+      $element['#type'] = $this->getIdFromClass($class);
+    }
+    if (!$element['#type']) {
+      throw new \LogicException('The element passed to ElementInfoManager::fromRenderable must have a #type or a valid class must be provided.');
     }
     if (isset($element['##object']) && $element['##object'] instanceof ElementInterface) {
       return $element['##object']->initializeInternalStorage($element);

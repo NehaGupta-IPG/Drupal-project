@@ -4,6 +4,7 @@ namespace Drupal\Core\Render;
 
 use Drupal\Component\Plugin\PluginManagerInterface;
 use Drupal\Core\Render\Element\ElementInterface;
+use Drupal\Core\Render\Element\Form;
 
 /**
  * Collects available render array element types.
@@ -67,14 +68,17 @@ interface ElementInfoManagerInterface extends PluginManagerInterface {
    *
    * @param \Drupal\Core\Render\Element\ElementInterface|array $element
    *   A render array or render objects. The latter is returned unchanged.
-   * @param string $type
-   *   The element type / render plugin id. Defaults to 'form' to make it
-   *   easier to run this from form_alter implementations.
+   * @param class-string<T> $class
+   *   The class of the render object being crated. Defaults to
+   *   \Drupal\Core\Render\Element\Form to make it easier to use it from
+   *   hook_form_alter().)
    *
-   * @return \Drupal\Core\Render\Element\ElementInterface
+   * @return T
    *   A render object.
+   *
+   * @template T of ElementInterface
    */
-  public function fromRenderable(ElementInterface|array &$element, string $type = 'form'): ElementInterface;
+  public function fromRenderable(ElementInterface|array &$element, string $class = Form::class): ElementInterface;
 
   /**
    * {@inheritdoc}

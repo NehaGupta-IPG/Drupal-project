@@ -4,7 +4,6 @@ namespace Drupal\Core\Field\Plugin\Field\FieldWidget;
 
 use Drupal\Core\Field\Attribute\FieldWidget;
 use Drupal\Core\Field\FieldItemListInterface;
-use Drupal\Core\Field\ModernWidgetInterface;
 use Drupal\Core\Field\WidgetBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Render\Element\ElementInterface;
@@ -20,7 +19,7 @@ use Drupal\Core\StringTranslation\TranslatableMarkup;
   label: new TranslatableMarkup('Textfield'),
   field_types: ['string'],
 )]
-class StringTextfieldWidget extends WidgetBase implements ModernWidgetInterface {
+class StringTextfieldWidget extends WidgetBase {
 
   /**
    * {@inheritdoc}
@@ -65,22 +64,6 @@ class StringTextfieldWidget extends WidgetBase implements ModernWidgetInterface 
     }
 
     return $summary;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function formElement(FieldItemListInterface $items, $delta, array $element, array &$form, FormStateInterface $form_state) {
-    $element['value'] = $element + [
-      '#type' => 'textfield',
-      '#default_value' => $items[$delta]->value ?? NULL,
-      '#size' => $this->getSetting('size'),
-      '#placeholder' => $this->getSetting('placeholder'),
-      '#maxlength' => $this->getFieldSetting('max_length'),
-      '#attributes' => ['class' => ['js-text-full', 'text-full']],
-    ];
-
-    return $element;
   }
 
   /**

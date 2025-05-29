@@ -30,15 +30,6 @@ class OEmbedWidget extends StringTextfieldWidget {
   /**
    * {@inheritdoc}
    */
-  public function formElement(FieldItemListInterface $items, $delta, array $element, array &$form, FormStateInterface $form_state) {
-    $element = parent::formElement($items, $delta, $element, $form, $form_state);
-    $element['value']['#description'] = $this->getValueDescription($items, $element['value']['#description'] ?? NULL);
-    return $element;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public function singleElementObject(FieldItemListInterface $items, $delta, Widget $widget, ElementInterface $form, FormStateInterface $form_state): ElementInterface {
     $widget = parent::singleElementObject($items, $delta, $widget, $form, $form_state);
     $value = $widget->getChild('value');

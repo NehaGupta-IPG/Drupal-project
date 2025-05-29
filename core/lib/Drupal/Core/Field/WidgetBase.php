@@ -11,6 +11,8 @@ use Drupal\Core\Ajax\InsertCommand;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Render\Element;
+use Drupal\Core\Render\Element\ElementInterface;
+use Drupal\Core\Render\Element\Widget;
 use Drupal\Core\Render\ElementInfoManagerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Validator\ConstraintViolationInterface;
@@ -475,15 +477,9 @@ abstract class WidgetBase extends PluginSettingsBase implements WidgetInterface,
       '#weight' => $delta,
     ];
 
-    if ($this instanceof ModernWidgetInterface) {
-      $formObject = $this->elementInfoManager->fromRenderable($form);
-      $widget = $this->elementInfoManager->fromRenderable($element, 'widget');
-      $element = $this->singleElementObject($items, $delta, $widget, $formObject, $form_state)
-        ->toRenderable();
-    }
-    else {
-      $element = $this->formElement($items, $delta, $element, $form, $form_state);
-    }
+    $formObject = $this->elementInfoManager->fromRenderable($form);
+    $widget = $this->elementInfoManager->fromRenderable($element, Widget::class);
+    $element = $this->singleElementObject($items, $delta, $widget, $formObject, $form_state)->toRenderable();
 
     if ($element) {
       // Allow modules to alter the field widget form element.
@@ -501,6 +497,21 @@ abstract class WidgetBase extends PluginSettingsBase implements WidgetInterface,
     }
 
     return $element;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function formElement(FieldItemListInterface $items, $delta, array $element, array &$form, FormStateInterface $form_state) {
+    return $element;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function singleElementObject(FieldItemListInterface $items, $delta, Widget $widget, ElementInterface $form, FormStateInterface $form_state): ElementInterface {
+    $element = $this->formElement($items, $delta, $widget->toRenderable(), $form->toRenderable(), $form_state);
+    return $this->elementInfoManager->fromRenderable($element);
   }
 
   /**
