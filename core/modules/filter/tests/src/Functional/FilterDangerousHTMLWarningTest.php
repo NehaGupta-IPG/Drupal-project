@@ -57,7 +57,7 @@ class FilterDangerousHTMLWarningTest extends BrowserTestBase {
     // Check if no warnings exist when no dangerous tags are present
     $this->drupalGet('admin/config/content/formats/manage/' . $format_id);
     $this->submitForm([], 'Save configuration');
-    $this->assertSession()->pageTextContains('Warning message', 'There are no warnings on this page');
+    $this->assertSession()->statusMessageNotExists('warning');
 
     // Check if warning pops up when dangerous tags are present
     $edit = [
@@ -65,7 +65,7 @@ class FilterDangerousHTMLWarningTest extends BrowserTestBase {
     ];
     $this->drupalGet('admin/config/content/formats/manage/' . $format_id);
     $this->submitForm($edit, 'Save configuration');
-    $this->assertSession()->responseContains('Warning message', 'There is a warning on this page');
+    $this->assertSession()->statusMessageContains('You have insecure HTML tags in your filter format.', 'warning');
   }
 
 }
