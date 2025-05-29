@@ -5,11 +5,21 @@
 
 (function (Drupal, debounce, once) {
   /**
-   * The custom event name for triggering filtering.
+   * Default phrases for filter status messages.
    *
-   * @const {string}
+   * @const {string} FILTER_EVENT
+   *   The custom event name for triggering filtering.
+   * @const {string} ALL_PHRASE
+   *   Default phrase for "all items listed".
+   * @const {string} SINGULAR_PHRASE
+   *   Default phrase for a single item.
+   * @const {string} PLURAL_PHRASE
+   *   Default phrase for multiple items.
    */
   const FILTER_EVENT = 'drupal-filter-event';
+  const ALL_PHRASE = Drupal.t('All available items are listed.');
+  const SINGULAR_PHRASE = '1 item is available in the modified list.';
+  const PLURAL_PHRASE = '@count items are available in the modified list.';
 
   let listFilter;
 
@@ -244,10 +254,6 @@
         showElement = listFilter.showElement,
         searchMethod = listFilter.searchMethod,
       } = options;
-
-      const ALL_PHRASE = Drupal.t('All available items are listed.');
-      const SINGULAR_PHRASE = '1 item is available in the modified list.';
-      const PLURAL_PHRASE = '@count items are available in the modified list.';
 
       const tables = document.querySelectorAll(tableSelector);
 
