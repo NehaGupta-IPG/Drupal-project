@@ -136,7 +136,6 @@ class ModulesUninstallForm extends FormBase {
         'all' => $this->t('All available modules are listed.'),
       ],
       '#attributes' => [
-        'class' => ['table-filter-text'],
         'autocomplete' => 'off',
       ],
     ];

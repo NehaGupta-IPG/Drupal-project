@@ -49,7 +49,6 @@ class ConfigTranslationEntityListBuilder extends ConfigEntityListBuilder impleme
       '#list_item' => 'tbody tr',
       '#list_text' => '.table-filter-text-source',
       '#attributes' => [
-        'class' => ['table-filter-text'],
         'autocomplete' => 'off',
         'title' => $filter['description'],
       ],
