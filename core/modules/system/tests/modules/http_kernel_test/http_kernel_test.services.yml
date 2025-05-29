@@ -5,6 +5,6 @@ services:
       - { name: http_middleware }
   http_kernel_test.test_middleware2:
     class: Drupal\http_kernel_test\HttpKernel\TestMiddleware
-    arguments: ['test_argument']
+    arguments: ['test_argument', '@messenger']
     tags:
-      - { name: http_middleware, priority: 20 }
+      - { name: http_middleware, priority: 200 }

@@ -5,6 +5,7 @@ namespace Drupal\Core\Session;
 use Drupal\Component\Datetime\TimeInterface;
 use Drupal\Core\Database\Connection;
 use Drupal\Core\DependencyInjection\DependencySerializationTrait;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\SessionBagInterface;
 use Symfony\Component\HttpFoundation\Session\Storage\NativeSessionStorage;
@@ -84,6 +85,11 @@ class SessionManager extends NativeSessionStorage implements SessionManagerInter
     }
 
     $request = $this->requestStack->getCurrentRequest();
+    // If a session is started prior to the the request stack having the request
+    // create one from globals.
+    if (!$request) {
+      $request = Request::createFromGlobals();
+    }
     $this->setOptions($this->sessionConfiguration->getOptions($request));
 
     if ($this->sessionConfiguration->hasSession($request)) {

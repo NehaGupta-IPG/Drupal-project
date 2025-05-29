@@ -1878,7 +1878,7 @@ services:
     class: Drupal\Core\EventSubscriber\RssResponseRelativeUrlFilter
   messenger:
     class: Drupal\Core\Messenger\Messenger
-    arguments: ['@session.flash_bag', '@page_cache_kill_switch']
+    arguments: ['@session', '@page_cache_kill_switch']
   Drupal\Core\Messenger\MessengerInterface: '@messenger'
   tempstore.private:
     class: Drupal\Core\TempStore\PrivateTempStoreFactory

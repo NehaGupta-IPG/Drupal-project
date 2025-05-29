@@ -48,6 +48,13 @@ class InstallerServiceProvider extends NormalInstallerServiceProvider implements
       // we don't need to ship with a custom proxy class.
       ->setLazy(FALSE);
 
+    // Replace the session_manager with an implementation that does not use the
+    // database.
+    $container->getDefinition('session_manager')
+      ->setClass('Symfony\Component\HttpFoundation\Session\Storage\NativeSessionStorage')
+      ->setArguments([])
+      ->setMethodCalls();
+
     parent::register($container);
   }
 

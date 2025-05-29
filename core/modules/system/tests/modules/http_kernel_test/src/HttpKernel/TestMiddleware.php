@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\http_kernel_test\HttpKernel;
 
+use Drupal\Core\Messenger\MessengerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
@@ -28,16 +29,26 @@ class TestMiddleware implements HttpKernelInterface {
   protected $optionalArgument;
 
   /**
+   * The messenger service.
+   *
+   * @var \Drupal\Core\Messenger\MessengerInterface
+   */
+  protected $messenger;
+
+  /**
    * Constructs a new TestMiddleware object.
    *
    * @param \Symfony\Component\HttpKernel\HttpKernelInterface $http_kernel
    *   The decorated kernel.
    * @param mixed $optional_argument
    *   (optional) An optional argument.
+   * @param \Drupal\Core\Messenger\MessengerInterface|null $messenger
+   *  The messenger service.
    */
-  public function __construct(HttpKernelInterface $http_kernel, $optional_argument = NULL) {
+  public function __construct(HttpKernelInterface $http_kernel, $optional_argument = NULL, ?MessengerInterface $messenger = NULL) {
     $this->httpKernel = $http_kernel;
     $this->optionalArgument = $optional_argument;
+    $this->messenger = $messenger;
   }
 
   /**
@@ -50,6 +61,9 @@ class TestMiddleware implements HttpKernelInterface {
     }
     elseif (isset($this->optionalArgument)) {
       $request->attributes->set('_optional_argument', $this->optionalArgument);
+    }
+    if ($this->messenger && $request->query->has('set_message')) {
+      $this->messenger->addStatus($request->query->get('set_message'));
     }
 
     return $this->httpKernel->handle($request, $type, $catch);

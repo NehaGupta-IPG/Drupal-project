@@ -530,6 +530,10 @@ function drupal_install_fix_file($file, $mask, $message = TRUE) {
  */
 function install_goto($path): void {
   global $base_url;
+  // If a session has been initiated in this request, make sure to save it.
+  if (\Drupal::request()->hasSession()) {
+    \Drupal::request()->getSession()->save();
+  }
   $headers = [
     // Not a permanent redirect.
     'Cache-Control' => 'no-cache',

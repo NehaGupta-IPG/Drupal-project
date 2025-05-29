@@ -1073,6 +1073,10 @@ function install_display_output($output, $install_state): void {
     'Cache-Control' => 'no-cache, must-revalidate',
     'ETag' => '"' . $request_time . '"',
   ];
+  // If a session has been initiated in this request, make sure to save it.
+  if (\Drupal::request()->hasSession()) {
+    \Drupal::request()->getSession()->save();
+  }
   $response->headers->add($default_headers);
   $response->send();
   exit;

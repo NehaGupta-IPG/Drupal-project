@@ -5,7 +5,7 @@ namespace Drupal\Core\Messenger;
 use Drupal\Component\Render\MarkupInterface;
 use Drupal\Core\PageCache\ResponsePolicy\KillSwitch;
 use Drupal\Core\Render\Markup;
-use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
 /**
  * The messenger service.
@@ -13,11 +13,11 @@ use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
 class Messenger implements MessengerInterface {
 
   /**
-   * The flash bag.
+   * The session.
    *
-   * @var \Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface
+   * @var \Symfony\Component\HttpFoundation\Session\SessionInterface
    */
-  protected $flashBag;
+  protected $session;
 
   /**
    * The kill switch.
@@ -27,16 +27,33 @@ class Messenger implements MessengerInterface {
   protected $killSwitch;
 
   /**
+   * A boolean to indicate if a message has been set.
+   *
+   * @var bool
+   */
+  protected $messageSet = FALSE;
+
+  /**
    * Messenger constructor.
    *
-   * @param \Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface $flash_bag
-   *   The flash bag.
+   * @param \Symfony\Component\HttpFoundation\Session\SessionInterface $session
+   *   The session.
    * @param \Drupal\Core\PageCache\ResponsePolicy\KillSwitch $killSwitch
    *   The kill switch.
    */
-  public function __construct(FlashBagInterface $flash_bag, KillSwitch $killSwitch) {
-    $this->flashBag = $flash_bag;
+  public function __construct(SessionInterface $session, KillSwitch $killSwitch) {
+    $this->session = $session;
     $this->killSwitch = $killSwitch;
+  }
+
+  /**
+   * Gets the flash bag.
+   *
+   * @return \Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface
+   *   The flash bag.
+   */
+  protected function getFlashBag() {
+    return $this->session->getFlashBag();
   }
 
   /**
@@ -56,12 +73,13 @@ class Messenger implements MessengerInterface {
 
     // Do not use strict type checking so that equivalent string and
     // MarkupInterface objects are detected.
-    if ($repeat || !in_array($message, $this->flashBag->peek($type))) {
-      $this->flashBag->add($type, $message);
+    if ($repeat || !in_array($message, $this->getFlashBag()->peek($type))) {
+      $this->getFlashBag()->add($type, $message);
     }
 
     // Mark this page as being uncacheable.
     $this->killSwitch->trigger();
+    $this->messageSet = TRUE;
 
     return $this;
   }
@@ -91,22 +109,45 @@ class Messenger implements MessengerInterface {
    * {@inheritdoc}
    */
   public function deleteAll() {
-    return $this->flashBag->clear();
+    if ($this->noMessages()) {
+      return [];
+    }
+    return $this->getFlashBag()->clear();
   }
 
   /**
    * {@inheritdoc}
    */
   public function deleteByType($type) {
+    if ($this->noMessages()) {
+      return [];
+    }
     // Flash bag gets and clears flash messages from the stack.
-    return $this->flashBag->get($type);
+    return $this->getFlashBag()->get($type);
   }
 
   /**
    * {@inheritdoc}
    */
   public function messagesByType($type) {
-    return $this->flashBag->peek($type);
+    if ($this->noMessages()) {
+      return [];
+    }
+    // Flash bag gets and clears flash messages from the stack.
+    return $this->getFlashBag()->peek($type);
+  }
+
+  /**
+   * Determines if there are no messages.
+   *
+   * If the session has not started and $this->messageSet there cannot be any
+   * messages.
+   *
+   * @return bool
+   *   TRUE if there are no messages, FALSE if not.
+   */
+  protected function noMessages() {
+    return !$this->session->isStarted() && !$this->messageSet;
   }
 
 }
