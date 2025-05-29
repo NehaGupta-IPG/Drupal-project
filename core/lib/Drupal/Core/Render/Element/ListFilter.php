@@ -92,9 +92,8 @@ class ListFilter extends Search {
     $element['#attributes']['class'][] = 'table-filter-text';
     $element['#attributes']['data-table'] = $element['#list_container_selector'];
     $element['#attributes']['data-items'] = $element['#list_item'];
-    if ($element['#auto_activate']) {
-      $element['#attributes']['data-auto-activate'] = 'true';
-    }
+    $element['#attributes']['data-auto-activate'] = $element['#auto_activate'] ? 'true' : 'false';
+
     if ($element['#list_text']) {
       $element['#attributes']['data-targets'] = $element['#list_text'];
     }
