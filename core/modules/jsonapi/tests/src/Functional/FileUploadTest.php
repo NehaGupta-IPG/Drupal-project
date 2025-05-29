@@ -249,7 +249,7 @@ class FileUploadTest extends ResourceTestBase {
   /**
    * Tests using the 'file upload and "use" file in single request" POST route.
    */
-  public function testPostFileUploadAndUseInSingleRequest(): void {
+  public function testPostFileUploadAndUseInSingleRequest($field_name = 'field_rest_file_test'): void {
     \Drupal::service('router.builder')->rebuild();
     // Update the test entity so it already has a file. This allows verifying
     // that this route appends files, and does not replace them.
@@ -265,7 +265,7 @@ class FileUploadTest extends ResourceTestBase {
       ->set('field_rest_file_test', ['target_id' => $existing_file->id()])
       ->save();
 
-    $uri = Url::fromUri('base:' . '/jsonapi/entity_test/entity_test/' . $this->entity->uuid() . '/field_rest_file_test');
+    $uri = Url::fromUri('base:' . '/jsonapi/entity_test/entity_test/' . $this->entity->uuid() . '/' . $field_name);
 
     // DX: 405 when read-only mode is enabled.
     $response = $this->fileRequest($uri, $this->testFileData);
@@ -283,7 +283,7 @@ class FileUploadTest extends ResourceTestBase {
     // 404 when the field name is invalid.
     $invalid_uri = Url::fromUri($uri->getUri() . '_invalid');
     $response = $this->fileRequest($invalid_uri, $this->testFileData);
-    $this->assertResourceErrorResponse(404, 'Field "field_rest_file_test_invalid" does not exist.', $invalid_uri, $response);
+    $this->assertResourceErrorResponse(404, 'Field "' . $field_name . '_invalid" does not exist.', $invalid_uri, $response);
 
     // This request fails despite the upload succeeding, because we're not
     // allowed to view the entity we're uploading to.
@@ -306,7 +306,7 @@ class FileUploadTest extends ResourceTestBase {
         'version' => JsonApiSpec::SUPPORTED_SPECIFICATION_VERSION,
       ],
       'links' => [
-        'self' => ['href' => Url::fromUri('base:/jsonapi/entity_test/entity_test/' . $this->entity->uuid() . '/field_rest_file_test')->setAbsolute(TRUE)->toString()],
+        'self' => ['href' => Url::fromUri('base:/jsonapi/entity_test/entity_test/' . $this->entity->uuid() . '/' . $field_name)->setAbsolute(TRUE)->toString()],
       ],
       'data' => [
         0 => $this->getExpectedDocument(1, 'existing.txt', TRUE, TRUE)['data'],
@@ -717,6 +717,54 @@ class FileUploadTest extends ResourceTestBase {
 
     $this->assertResponseData($expected, $response);
     $this->assertFileExists('public://example.txt');
+  }
+
+  /**
+   * Tests file upload while using the renamed fields.
+   *
+   * @see \Drupal\jsonapi\Controller\FileUpload::handleFileUploadForNewResource()
+   * @link https://www.drupal.org/project/drupal/issues/3096267
+   */
+  public function testCreateFileUploadWhenUsingFieldAliases3096267(): void {
+    $this->assertTrue(mkdir('public://foobar'));
+    $this->assertTrue($this->container->get('module_installer')->install([
+      'jsonapi_test_resource_type_building',
+    ], TRUE));
+
+    \Drupal::state()->set('jsonapi_test_resource_type_builder.resource_type_field_aliases', [
+      'entity_test--entity_test' => [
+        'field_rest_file_test' => 'fieldRestFileTest',
+      ],
+    ]);
+
+    $this->config('jsonapi.settings')->set('read_only', FALSE)->save(TRUE);
+    $this->rebuildAll();
+
+    $this->setUpAuthorization('POST');
+
+    $response = $this->fileRequest(Url::fromUri('base:/jsonapi/entity_test/entity_test/fieldRestFileTest'), $this->testFileData);
+    $this->assertSame(201, $response->getStatusCode());
+  }
+
+  /**
+   * Tests file upload while using the renamed fields.
+   *
+   * @see \Drupal\jsonapi\Controller\FileUpload::handleFileUploadForExistingResource()
+   * @link https://www.drupal.org/project/drupal/issues/3096267
+   */
+  public function testUpdateFileUploadWhenUsingFieldAliases3096267(): void {
+    $this->assertTrue($this->container->get('module_installer')->install([
+      'jsonapi_test_resource_type_building',
+    ], TRUE));
+
+    \Drupal::state()->set('jsonapi_test_resource_type_builder.resource_type_field_aliases', [
+      'entity_test--entity_test' => [
+        'field_rest_file_test' => 'fieldRestFileTest',
+      ],
+    ]);
+
+    $this->rebuildAll();
+    $this->testPostFileUploadAndUseInSingleRequest('fieldRestFileTest');
   }
 
   /**

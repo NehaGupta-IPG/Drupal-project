@@ -829,6 +829,66 @@ class JsonApiRegressionTest extends JsonApiFunctionalTestBase {
   }
 
   /**
+   * Tests PATCH request while using the renamed fields.
+   *
+   * @see \Drupal\jsonapi\Controller\EntityResource::patchIndividual()
+   * @link https://www.drupal.org/project/drupal/issues/3096267
+   */
+  public function testPatchIndividualWhenUsingFieldAliases3096267(): void {
+    $this->assertTrue($this->container->get('module_installer')->install([
+      'jsonapi_test_resource_type_building',
+    ], TRUE));
+    \Drupal::state()->set('jsonapi_test_resource_type_builder.resource_type_field_aliases', [
+      'node--article' => [
+        'title' => 'title_aliased',
+      ],
+    ]);
+    $this->config('jsonapi.settings')->set('read_only', FALSE)->save(TRUE);
+    $this->rebuildAll();
+
+    $user = $this->drupalCreateUser(['bypass node access']);
+    $node = Node::create(['type' => 'article', 'title' => 'test_article']);
+    $node->save();
+
+    $response = $this->request('PATCH', Url::fromUri('internal:/jsonapi/node/article/' . $node->uuid()), [
+      RequestOptions::JSON => [
+        'data' => [
+          'id' => $node->uuid(),
+          'type' => 'node--article',
+          'relationships' => [
+            // Node's "title" is required because has "->setRequired(TRUE)".
+            /** @see \Drupal\node\Entity\Node::baseFieldDefinitions() */
+            // This configuration allows automatically add the "NotNull"
+            // validation constraint.
+            /** @see \Drupal\Core\TypedData\TypedDataManager::getDefaultConstraints() */
+            'title_aliased' => '',
+          ],
+        ],
+      ],
+      RequestOptions::HEADERS => [
+        'Content-Type' => 'application/vnd.api+json',
+        'Accept' => 'application/vnd.api+json',
+      ],
+      RequestOptions::AUTH => [
+        $user->getAccountName(),
+        $user->pass_raw,
+      ],
+    ]);
+    $this->assertSame(422, $response->getStatusCode(), $response->getBody());
+    $this->assertSame([
+      [
+        'title' => 'Unprocessable Entity',
+        'status' => '422',
+        /** @see \Symfony\Component\Validator\Constraints\NotNull */
+        'detail' => 'title: This value should not be null.',
+        'source' => [
+          'pointer' => '/data/attributes/title',
+        ],
+      ],
+    ], Json::decode((string) $response->getBody())['errors']);
+  }
+
+  /**
    * Tests that caching isn't happening for non-cacheable methods.
    *
    * @see https://www.drupal.org/project/drupal/issues/3072076
