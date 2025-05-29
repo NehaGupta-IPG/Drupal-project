@@ -243,7 +243,7 @@ abstract class FilterFormatFormBase extends EntityForm {
     $safe_tags = ['a', 'abbr', 'acronym', 'address', 'article', 'aside', 'b', 'bdi', 'bdo', 'big', 'blockquote', 'caption', 'cite', 'code', 'col', 'colgroup', 'command', 'dd', 'del', 'details', 'dfn', 'dl', 'dt', 'em', 'figcaption', 'figure', 'footer', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'header', 'hgroup', 'hr', 'i', 'ins', 'kbd', 'li', 'mark', 'menu', 'meter', 'nav', 'ol', 'output', 'p', 'pre', 'progress', 'q', 'rp', 'rt', 'ruby', 's', 'samp', 'section', 'small', 'strong', 'sub', 'summary', 'sup', 'tbody', 'tfoot', 'th', 'thead', 'time', 'tt', 'u', 'ul', 'var', 'wbr'];
     $xss_filtered_html = Xss::filter($allowed_html, $safe_tags);
     if (strcasecmp($allowed_html, $xss_filtered_html)) {
-      $this->messenger()->addWarning($this->t('You have insecure HTML tags in your filter format. Please review documentation on <a href="@link">configuring text formats for security</a>.', ['@link' => 'https://www.drupal.org/node/224921']));
+      $this->messenger()->addWarning($this->t('You have insecure HTML tags in your filter format. Review documentation on <a href="@link">configuring text formats for security</a>.', ['@link' => 'https://www.drupal.org/node/224921']));
     }
 
     $form_state->setRedirect('filter.admin_overview');
