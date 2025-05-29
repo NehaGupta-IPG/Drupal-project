@@ -1,10 +1,17 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\contact\Functional;
 
 use Behat\Mink\Exception\ExpectationException;
 use Drupal\Tests\BrowserTestBase;
 
+/**
+ * Test DB error on malicious contact URLs.
+ *
+ * @group contact
+ */
 class ContactCoalitionDbFailTest extends BrowserTestBase {
 
   /**
@@ -25,11 +32,12 @@ class ContactCoalitionDbFailTest extends BrowserTestBase {
    * Tests configuration options with language enabled.
    */
   public function testError(): void {
+    // cspell:disable-next-line
     $this->drupalGet('/contact/Perú');
     try {
       $this->assertSession()->statusCodeEquals(200);
     }
-    catch (ExpectationException $exception ) {
+    catch (ExpectationException $exception) {
       echo $exception;
     }
   }
