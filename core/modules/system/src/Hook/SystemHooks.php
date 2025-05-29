@@ -122,9 +122,9 @@ class SystemHooks {
       case 'system.modules_list':
         $output = '<p>' . $this->t('Add <a href=":modules">contributed modules</a> to extend your site\'s functionality.', [':modules' => 'https://www.drupal.org/project/modules']) . '</p>';
         if (!\Drupal::moduleHandler()->moduleExists('update')) {
-          $output .= '<p>' . $this->t('Regularly review available updates and update as required to maintain a secure and current site. Always run the <a href=":update-php">update script</a> each time a module is updated. Install the <a href=":update-manager">Update Manager module</a> to update modules and themes.', [
+          $output .= '<p>' . $this->t('Regularly review available updates and update as required to maintain a secure and current site. Always run the <a href=":update-php">update script</a> each time a module is updated. Install the <a href=":update-status">Update Status module</a> to see a report of available releases for Drupal Core and contributed modules and themes.', [
             ':update-php' => Url::fromRoute('system.db_update')->toString(),
-            ':update-manager' => Url::fromRoute('system.modules_list', [], [
+            ':update-status' => Url::fromRoute('system.modules_list', [], [
               'fragment' => 'module-update',
             ])->toString(),
           ]) . '</p>';
@@ -276,7 +276,11 @@ class SystemHooks {
     // before doing so. Also add the loaded libraries to ajaxPageState.
     /** @var \Drupal\Core\Asset\LibraryDependencyResolver $library_dependency_resolver */
     $library_dependency_resolver = \Drupal::service('library.dependency_resolver');
-    if (isset($settings['ajaxPageState']) || in_array('core/drupal.ajax', $library_dependency_resolver->getLibrariesWithDependencies($assets->getAlreadyLoadedLibraries()))) {
+    $loaded_libraries = [];
+    if (!isset($settings['ajaxPageState'])) {
+      $loaded_libraries = $library_dependency_resolver->getLibrariesWithDependencies($assets->getAlreadyLoadedLibraries());
+    }
+    if (isset($settings['ajaxPageState']) || in_array('core/drupal.ajax', $loaded_libraries) || in_array('core/drupal.htmx', $loaded_libraries)) {
       if (!defined('MAINTENANCE_MODE')) {
         // The theme token is only validated when the theme requested is not the
         // default, so don't generate it unless necessary.

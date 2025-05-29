@@ -11,7 +11,11 @@ use Drupal\Core\Entity\Query\QueryInterface;
 use Drupal\Core\Entity\RevisionableInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Hook\Attribute\Hook;
+use Drupal\Core\Hook\Attribute\ReorderHook;
+use Drupal\Core\Hook\Order\Order;
+use Drupal\Core\Hook\Order\OrderBefore;
 use Drupal\Core\Render\Element;
+use Drupal\content_moderation\Hook\ContentModerationHooks;
 use Drupal\workspaces\WorkspaceAssociationInterface;
 use Drupal\workspaces\WorkspaceInformationInterface;
 use Drupal\workspaces\WorkspaceManagerInterface;
@@ -67,7 +71,12 @@ class EntityOperations {
   /**
    * Implements hook_entity_presave().
    */
-  #[Hook('entity_presave')]
+  #[Hook('entity_presave', order: Order::First)]
+  #[ReorderHook('entity_presave',
+    class: ContentModerationHooks::class,
+    method: 'entityPresave',
+    order: new OrderBefore(['workspaces'])
+  )]
   public function entityPresave(EntityInterface $entity): void {
     if ($active_workspace = $this->workspaceManager->getActiveWorkspace()) {
       $this->workspaceManager->getProvider($active_workspace)->entityPresave($entity);
@@ -77,7 +86,7 @@ class EntityOperations {
   /**
    * Implements hook_entity_insert().
    */
-  #[Hook('entity_insert')]
+  #[Hook('entity_insert', order: Order::Last)]
   public function entityInsert(EntityInterface $entity): void {
     if ($entity->getEntityTypeId() === 'workspace') {
       $this->workspaceAssociation->workspaceInsert($entity);
@@ -119,18 +128,19 @@ class EntityOperations {
     // that translation to the default revision as well, otherwise the new
     // translation wouldn't show up in entity queries or views which use the
     // field data table as the base table.
-    $this->workspaceManager->executeOutsideWorkspace(function () use ($translation) {
-      $storage = $this->entityTypeManager->getStorage($translation->getEntityTypeId());
-      $default_revision = $storage->load($translation->id());
-
-      $langcode = $translation->language()->getId();
-      if (!$default_revision->hasTranslation($langcode)) {
-        $default_revision_translation = $default_revision->addTranslation($langcode, $translation->toArray());
-        $default_revision_translation->setUnpublished();
-        $default_revision_translation->setSyncing(TRUE);
-        $default_revision_translation->save();
-      }
+    $default_revision = $this->workspaceManager->executeOutsideWorkspace(function () use ($translation) {
+      return $this->entityTypeManager
+        ->getStorage($translation->getEntityTypeId())
+        ->load($translation->id());
     });
+    $langcode = $translation->language()->getId();
+    if (!$default_revision->hasTranslation($langcode)) {
+      $default_revision_translation = $default_revision->addTranslation($langcode, $translation->toArray());
+      assert($default_revision_translation instanceof EntityPublishedInterface);
+      $default_revision_translation->setUnpublished();
+      $default_revision_translation->setSyncing(TRUE);
+      $default_revision_translation->save();
+    }
   }
 
   /**
@@ -198,7 +208,7 @@ class EntityOperations {
    *
    * Alters entity forms to disallow concurrent editing in multiple workspaces.
    */
-  #[Hook('form_alter')]
+  #[Hook('form_alter', order: Order::First)]
   public function entityFormAlter(array &$form, FormStateInterface $form_state, string $form_id): void {
     if (!$form_state->getFormObject() instanceof EntityFormInterface) {
       return;
