@@ -31,6 +31,11 @@ class FilterDangerousHTMLWarningTest extends BrowserTestBase {
   /**
    * {@inheritdoc}
    */
+  protected $defaultTheme = 'stark';
+
+  /**
+   * {@inheritdoc}
+   */
   protected function setUp(): void {
     parent::setUp();
 
@@ -50,15 +55,17 @@ class FilterDangerousHTMLWarningTest extends BrowserTestBase {
     $format_id = 'filtered_html';
 
     // Check if no warnings exist when no dangerous tags are present
-    $this->drupalPostForm('admin/config/content/formats/manage/' . $format_id, [], 'Save configuration');
-    $this->assertNoText('Warning message', 'There are no warnings on this page');
+    $this->drupalGet('admin/config/content/formats/manage/' . $format_id);
+    $this->submitForm([], 'Save configuration');
+    $this->assertSession()->pageTextContains('Warning message', 'There are no warnings on this page');
 
     // Check if warning pops up when dangerous tags are present
     $edit = [
       'filters[filter_html][settings][allowed_html]' => '<iframe>',
     ];
-    $this->drupalPostForm('admin/config/content/formats/manage/' . $format_id, $edit, 'Save configuration');
-    $this->assertRaw('Warning message', 'There is a warning on this page');
+    $this->drupalGet('admin/config/content/formats/manage/' . $format_id);
+    $this->submitForm($edit, 'Save configuration');
+    $this->assertSession()->responseContains('Warning message', 'There is a warning on this page');
   }
 
 }
