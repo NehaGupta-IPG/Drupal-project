@@ -126,19 +126,21 @@ class ChooseBlockController implements ContainerInjectionInterface {
     }
 
     $build['filter'] = [
-      '#type' => 'search',
+      '#type' => 'list_filter',
       '#title' => $this->t('Filter by block name'),
       '#title_display' => 'invisible',
       '#size' => 30,
       '#placeholder' => $this->t('Filter by block name'),
+      '#list_container_selector' => '.js-layout-builder-categories',
+      '#list_item' => '.js-layout-builder-block-link',
+      '#announce' => [
+        'singular' => $this->t('1 block is available in the modified list.'),
+        'plural' => $this->t('@count blocks are available in the modified list.'),
+        'all' => $this->t('All available blocks are listed.'),
+      ],
       '#attributes' => [
         'class' => ['table-filter-text'],
         'title' => $this->t('Enter a part of the block name to filter by.'),
-        'data-table' => '.js-layout-builder-categories',
-        'data-items' => '.js-layout-builder-block-link',
-        'data-singular' => $this->t('1 block is available in the modified list.'),
-        'data-plural' => $this->t('@count blocks are available in the modified list.'),
-        'data-full' => $this->t('All available blocks are listed.'),
       ],
     ];
 
