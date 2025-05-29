@@ -158,21 +158,21 @@ class UserPermissionsForm extends FormBase {
     ];
 
     $form['filters']['text'] = [
-      '#type' => 'search',
+      '#type' => 'list_filter',
       '#title' => $this->t('Filter permissions'),
       '#title_display' => 'invisible',
       '#size' => 30,
       '#placeholder' => $this->t('Filter by permission name'),
       '#description' => $this->t('Enter permission name'),
+      '#list_container_selector' => '#permissions',
+      '#list_item' => 'tbody tr[data-filter-labelledby]',
+      '#data_targets' => '.table-filter-text-source',
+      '#singular' => $this->t('1 permission is available in the modified list.'),
+      '#plural' => $this->t('@count permissions are available in the modified list.'),
+      '#full' => $this->t('All available permissions are listed.'),
       '#attributes' => [
         'class' => ['table-filter-text'],
-        'data-table' => '#permissions',
         'autocomplete' => 'off',
-        'data-items' => 'tbody tr[data-filter-labelledby]',
-        'data-targets' => '.table-filter-text-source',
-        'data-singular' => $this->t('1 permission is available in the modified list.'),
-        'data-plural' => $this->t('@count permissions are available in the modified list.'),
-        'data-full' => $this->t('All available permissions are listed.'),
       ],
     ];
 
