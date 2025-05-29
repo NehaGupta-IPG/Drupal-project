@@ -26,10 +26,16 @@ class ModernRenderElementTest extends UnitTestCase {
     $factory->expects($this->any())
       ->method('createInstance')
       ->willReturnCallback(fn () => new Textfield([], '', NULL, $elementInfoManager));
-    $element = [];
+    // If the type is not given ::fromRenderable presumes "form" and uses the
+    // plugin discovery to find which class provides the form element. This
+    // test does not set up discovery so some type must be provided.
+    $element = ['#type' => 'ignored by the mock factory'];
     $elementObject = $elementInfoManager->fromRenderable($element);
     for ($i = 0; $i <= 2; $i++) {
-      $child = ['#test' => $i];
+      $child = [
+        '#type' => 'ignored by the mock factory',
+        '#test' => $i,
+      ];
       $elementObject->addChild("test$i", $child);
       // addChild() takes the $child render array by reference and stores a
       // reference to it in the render object. To avoid modifying the
