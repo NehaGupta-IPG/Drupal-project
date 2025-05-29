@@ -24,6 +24,7 @@
     element.classList.add('hidden');
     element.setAttribute('hidden', true);
     element.style.display = 'none';
+    return element;
   }
 
   /**
@@ -37,6 +38,7 @@
     element.classList.remove('hidden');
     element.removeAttribute('hidden');
     element.style.display = '';
+    return element;
   }
 
   /**
@@ -128,16 +130,16 @@
    *
    */
   function defaultFilterItemsBuilder(tableElement, rowSelector, targetSelector, normalizeString) {
-  return Array.from(tableElement.querySelectorAll(rowSelector)).map((source) => {
-    const textContent = targetSelector
-      ? Array.from(source.querySelectorAll(targetSelector)).map(t => t.textContent).join(' ')
-      : source.textContent;
-    return {
-      node: source,
-      textContent: normalizeString(textContent),
-    };
-  });
-}
+    return Array.from(tableElement.querySelectorAll(rowSelector)).map((source) => {
+      const textContent = targetSelector
+        ? Array.from(source.querySelectorAll(targetSelector)).map(t => t.textContent).join(' ')
+        : source.textContent;
+      return {
+        node: source,
+        textContent: normalizeString(textContent),
+      };
+    });
+  }
 
   /**
    * List filter object.
@@ -194,7 +196,6 @@
      *   A function to normalize the text content of each item.
      * @return {Array}
      *   An array of objects containing the node and normalized text content.
-     * 
      */
     filterItemsBuilder: defaultFilterItemsBuilder,
 
@@ -241,6 +242,7 @@
         debug = listFilter.options.debug,
         hideElement = listFilter.hideElement,
         showElement = listFilter.showElement,
+        searchMethod = listFilter.searchMethod,
       } = options;
 
       const ALL_PHRASE = Drupal.t('All available items are listed.');
@@ -308,14 +310,14 @@
           const queryContinuation = query.startsWith(queryTransitional);
 
           if (queryContinuation && filterItemsTransitional.length === 0) return;
-          if (!listFilter.searchMethod(query, queryTransitional, searchFromWordStart)) {
+          if (!searchMethod(query, queryTransitional, searchFromWordStart)) {
             filterItemsTransitional = filterItems;
           }
 
           if (query.length >= minQueryLength) {
             const matches = [];
             for (const item of filterItemsTransitional) {
-              if (!listFilter.searchMethod(item.textContent, query, searchFromWordStart)) {
+              if (!searchMethod(item.textContent, query, searchFromWordStart)) {
                 hideElement(item.node); // Use override or default
               } else {
                 showElement(item.node); // Use override or default
