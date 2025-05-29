@@ -8,6 +8,7 @@ use Drupal\Core\Form\FormStateInterface;
 use Drupal\filter\Plugin\Filter\FilterNull;
 use Drupal\user\Entity\Role;
 use Drupal\user\RoleInterface;
+use Drupal\Component\Utility\Xss;
 
 /**
  * Provides a base form for a filter format.
@@ -236,6 +237,16 @@ abstract class FilterFormatFormBase extends EntityForm {
         user_role_change_permissions($rid, [$permission => $enabled]);
       }
     }
+
+    // Display warning for insecure HTML tags.
+    $allowed_html = $form_state->getValue('filters')['filter_html']['settings']['allowed_html'];
+    $safe_tags = ['a', 'abbr', 'acronym', 'address', 'article', 'aside', 'b', 'bdi', 'bdo', 'big', 'blockquote', 'caption', 'cite', 'code', 'col', 'colgroup', 'command', 'dd', 'del', 'details', 'dfn', 'dl', 'dt', 'em', 'figcaption', 'figure', 'footer', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'header', 'hgroup', 'hr', 'i', 'ins', 'kbd', 'li', 'mark', 'menu', 'meter', 'nav', 'ol', 'output', 'p', 'pre', 'progress', 'q', 'rp', 'rt', 'ruby', 's', 'samp', 'section', 'small', 'strong', 'sub', 'summary', 'sup', 'tbody', 'tfoot', 'th', 'thead', 'time', 'tt', 'u', 'ul', 'var', 'wbr'];
+    $xss_filtered_html = Xss::filter($allowed_html, $safe_tags);
+    if (strcasecmp($allowed_html, $xss_filtered_html)) {
+      $this->messenger()->addWarning($this->t('You have insecure HTML tags in your filter format. Please review documentation on <a href="@link">configuring text formats for security</a>.', ['@link' => 'https://www.drupal.org/node/224921']));
+    }
+
+    $form_state->setRedirect('filter.admin_overview');
 
     return $this->entity;
   }

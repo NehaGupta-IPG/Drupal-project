@@ -1,0 +1,64 @@
+<?php
+
+namespace Drupal\Tests\filter\Functional;
+
+use Drupal\filter\Entity\FilterFormat;
+use Drupal\Tests\BrowserTestBase;
+use Drupal\user\RoleInterface;
+
+/**
+ * Tests that a warning message appears when dangerous HTML tags are allowed in
+ * a filter format.
+ *
+ * @group filter
+ */
+class FilterDangerousHTMLWarningTest extends BrowserTestBase {
+
+  /**
+   * Modules to enable.
+   *
+   * @var array
+   */
+  public static $modules = ['filter', 'filter_test'];
+
+  /**
+   * A user with administrative permissions.
+   *
+   * @var \Drupal\user\UserInterface
+   */
+  protected $adminUser;
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function setUp() {
+    parent::setUp();
+
+    /** @var \Drupal\filter\Entity\FilterFormat $filtered_html_format */
+    $filtered_html_format = FilterFormat::load('filtered_html');
+    $filtered_html_permission = $filtered_html_format->getPermissionName();
+    user_role_grant_permissions(RoleInterface::ANONYMOUS_ID, [$filtered_html_permission]);
+
+    $this->adminUser = $this->drupalCreateUser(['administer modules', 'administer filters', 'administer site configuration']);
+    $this->drupalLogin($this->adminUser);
+  }
+
+  /**
+   * Tests that a warning message appears when dangerous HTML tags are allowed
+   */
+  public function testDangerousHTMLWarning() {
+    $format_id = 'filtered_html';
+
+    // Check if no warnings exist when no dangerous tags are present
+    $this->drupalPostForm('admin/config/content/formats/manage/' . $format_id, [], t('Save configuration'));
+    $this->assertNoText('Warning message', 'There are no warnings on this page');
+
+    // Check if warning pops up when dangerous tags are present
+    $edit = [
+      'filters[filter_html][settings][allowed_html]' => '<iframe>',
+    ];
+    $this->drupalPostForm('admin/config/content/formats/manage/' . $format_id, $edit, t('Save configuration'));
+    $this->assertRaw('Warning message', 'There is a warning on this page');
+  }
+
+}
