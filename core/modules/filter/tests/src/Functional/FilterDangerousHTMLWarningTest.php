@@ -1,23 +1,23 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\filter\Functional;
 
 use Drupal\filter\Entity\FilterFormat;
 use Drupal\Tests\BrowserTestBase;
 use Drupal\user\RoleInterface;
+use Drupal\user\UserInterface;
 
 /**
- * Tests that a warning message appears when dangerous HTML tags are allowed in
- * a filter format.
+ * Tests that a warning message appears when dangerous HTML tags are allowed in a filter format.
  *
  * @group filter
  */
 class FilterDangerousHTMLWarningTest extends BrowserTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   public static $modules = ['filter', 'filter_test'];
 
@@ -26,12 +26,12 @@ class FilterDangerousHTMLWarningTest extends BrowserTestBase {
    *
    * @var \Drupal\user\UserInterface
    */
-  protected $adminUser;
+  protected UserInterface $adminUser;
 
   /**
    * {@inheritdoc}
    */
-  protected function setUp() {
+  protected function setUp(): void {
     parent::setUp();
 
     /** @var \Drupal\filter\Entity\FilterFormat $filtered_html_format */
@@ -44,20 +44,20 @@ class FilterDangerousHTMLWarningTest extends BrowserTestBase {
   }
 
   /**
-   * Tests that a warning message appears when dangerous HTML tags are allowed
+   * Tests that a warning message appears when dangerous HTML tags are allowed.
    */
   public function testDangerousHTMLWarning() {
     $format_id = 'filtered_html';
 
     // Check if no warnings exist when no dangerous tags are present
-    $this->drupalPostForm('admin/config/content/formats/manage/' . $format_id, [], t('Save configuration'));
+    $this->drupalPostForm('admin/config/content/formats/manage/' . $format_id, [], 'Save configuration');
     $this->assertNoText('Warning message', 'There are no warnings on this page');
 
     // Check if warning pops up when dangerous tags are present
     $edit = [
       'filters[filter_html][settings][allowed_html]' => '<iframe>',
     ];
-    $this->drupalPostForm('admin/config/content/formats/manage/' . $format_id, $edit, t('Save configuration'));
+    $this->drupalPostForm('admin/config/content/formats/manage/' . $format_id, $edit, 'Save configuration');
     $this->assertRaw('Warning message', 'There is a warning on this page');
   }
 
