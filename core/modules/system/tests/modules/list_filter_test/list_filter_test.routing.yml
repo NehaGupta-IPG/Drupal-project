@@ -1,0 +1,7 @@
+list_filter_test.test:
+  path: '/list-filter/{test_case}'
+  defaults:
+    _title: 'Controller test for list filter'
+    _controller: '\Drupal\list_filter_test\Controller\ListFilterTestController'
+  requirements:
+    _permission: 'access content'
