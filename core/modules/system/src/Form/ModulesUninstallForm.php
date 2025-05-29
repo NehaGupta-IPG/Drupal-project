@@ -108,7 +108,7 @@ class ModulesUninstallForm extends FormBase {
     // Get a list of all available modules that can be uninstalled.
     $modules = $this->moduleExtensionList->getList();
     $uninstallable = array_filter($modules, function ($module) {
-       return empty($module->info['required']) && $module->status;
+      return empty($module->info['required']) && $module->status;
     });
 
     $form['filters'] = [
@@ -119,20 +119,22 @@ class ModulesUninstallForm extends FormBase {
     ];
 
     $form['filters']['text'] = [
-      '#type' => 'search',
+      '#type' => 'list_filter',
       '#title' => $this->t('Filter modules'),
       '#title_display' => 'invisible',
       '#size' => 30,
       '#placeholder' => $this->t('Filter by name or description'),
       '#description' => $this->t('Enter a part of the module name or description'),
+      '#list_container_selector' => '[data-drupal-selector="system-modules-uninstall"]',
+      '#list_item' => 'tbody tr',
+      '#list_text' => '.table-filter-text-source, .module-name, .module-description',
+      '#announce' => [
+        'singular' => $this->t('1 module is available in the modified list.'),
+        'plural' => $this->t('@count modules are available in the modified list.'),
+        'all' => $this->t('All available modules are listed.'),
+      ],
       '#attributes' => [
         'class' => ['table-filter-text'],
-        'data-table' => '[data-drupal-selector="system-modules-uninstall"]',
-        'data-items' => 'tbody tr',
-        'data-targets' => '.table-filter-text-source, .module-name, .module-description',
-        'data-singular' => $this->t('1 module is available in the modified list.'),
-        'data-plural' => $this->t('@count modules are available in the modified list.'),
-        'data-full' => $this->t('All available modules are listed.'),
         'autocomplete' => 'off',
       ],
     ];
