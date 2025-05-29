@@ -143,7 +143,6 @@ class UserPermissionsForm extends FormBase {
       '#plural' => $this->t('@count permissions are available in the modified list.'),
       '#full' => $this->t('All available permissions are listed.'),
       '#attributes' => [
-        'class' => ['table-filter-text'],
         'autocomplete' => 'off',
       ],
     ];

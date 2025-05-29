@@ -104,7 +104,6 @@ class FieldStorageReuseForm extends FormBase {
       '#list_item' => 'tbody tr',
       '#list_text' => '.form-item',
       '#attributes' => [
-        'class' => ['table-filter-text'],
         'autocomplete' => 'off',
       ],
     ];
