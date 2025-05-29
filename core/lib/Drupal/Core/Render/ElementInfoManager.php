@@ -13,8 +13,8 @@ use Drupal\Core\Plugin\DefaultPluginManager;
 use Drupal\Core\PreWarm\PreWarmableInterface;
 use Drupal\Core\Render\Attribute\RenderElement;
 use Drupal\Core\Render\Element\ElementInterface;
-use Drupal\Core\Render\Element\Form;
 use Drupal\Core\Render\Element\FormElementInterface;
+use Drupal\Core\Render\Element\Wrapper;
 use Drupal\Core\Theme\ThemeManagerInterface;
 
 /**
@@ -232,7 +232,6 @@ class ElementInfoManager extends DefaultPluginManager implements ElementInfoMana
     $instance = parent::createInstance($type, $configuration);
     assert($instance instanceof ElementInterface);
     $instance->initializeInternalStorage($element);
-    $instance->type = $type;
     return $instance;
   }
 
@@ -258,18 +257,18 @@ class ElementInfoManager extends DefaultPluginManager implements ElementInfoMana
   /**
    * {@inheritdoc}
    */
-  public function fromRenderable(ElementInterface|array &$element, string $class = Form::class): ElementInterface {
+  public function fromRenderable(ElementInterface|array &$element, string $class = Wrapper::class): ElementInterface {
     if ($element instanceof ElementInterface) {
       return $element;
+    }
+    if (isset($element['##object']) && $element['##object'] instanceof ElementInterface) {
+      return $element['##object']->initializeInternalStorage($element);
     }
     if (!isset($element['#type']) && $class) {
       $element['#type'] = $this->getIdFromClass($class);
     }
     if (!$element['#type']) {
       throw new \LogicException('The element passed to ElementInfoManager::fromRenderable must have a #type or a valid class must be provided.');
-    }
-    if (isset($element['##object']) && $element['##object'] instanceof ElementInterface) {
-      return $element['##object']->initializeInternalStorage($element);
     }
     return $this->createInstance(element: $element);
   }
