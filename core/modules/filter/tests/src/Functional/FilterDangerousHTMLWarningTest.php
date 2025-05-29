@@ -19,7 +19,7 @@ class FilterDangerousHTMLWarningTest extends BrowserTestBase {
   /**
    * {@inheritdoc}
    */
-  public static $modules = ['filter', 'filter_test'];
+  protected static $modules = ['filter', 'filter_test'];
 
   /**
    * A user with administrative permissions.
@@ -51,7 +51,7 @@ class FilterDangerousHTMLWarningTest extends BrowserTestBase {
   /**
    * Tests that a warning message appears when dangerous HTML tags are allowed.
    */
-  public function testDangerousHTMLWarning() {
+  public function testDangerousHTMLWarning(): void {
     $format_id = 'filtered_html';
 
     // Check if no warnings exist when no dangerous tags are present
