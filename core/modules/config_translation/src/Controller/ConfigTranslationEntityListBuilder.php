@@ -48,8 +48,8 @@ class ConfigTranslationEntityListBuilder extends ConfigEntityListBuilder impleme
       '#list_container_selector' => '[data-drupal-selector="config-translation-entity-list"]',
       '#list_item' => 'tbody tr',
       '#list_text' => '.table-filter-text-source',
+      '#search_start_of_words' => TRUE,
       '#attributes' => [
-        'class' => ['table-filter-text'],
         'autocomplete' => 'off',
         'title' => $filter['description'],
       ],

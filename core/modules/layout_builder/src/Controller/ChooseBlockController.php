@@ -139,7 +139,6 @@ class ChooseBlockController implements ContainerInjectionInterface {
         'all' => $this->t('All available blocks are listed.'),
       ],
       '#attributes' => [
-        'class' => ['table-filter-text'],
         'title' => $this->t('Enter a part of the block name to filter by.'),
       ],
     ];

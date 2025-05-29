@@ -207,21 +207,22 @@ class ViewListBuilder extends ConfigEntityListBuilder {
     ];
 
     $list['filters']['text'] = [
-      '#type' => 'search',
+      '#type' => 'list_filter',
       '#title' => $this->t('Filter'),
       '#title_display' => 'invisible',
       '#size' => 60,
       '#placeholder' => $this->t('Filter by view name, machine name, description, or display path'),
+      '#list_container_selector' => '.views-listing-table',
+      '#list_item' => 'tbody tr',
+      '#list_text' => '[data-drupal-selector="views-table-filter-text-source"]',
+      '#announce' => [
+        'singular' => $this->t('1 view is available in the modified list.'),
+        'plural' => $this->t('@count views are available in the modified list.'),
+        'all' => $this->t('All available views are listed.'),
+      ],
       '#attributes' => [
-        'class' => ['table-filter-text'],
-        'data-table' => '.views-listing-table',
         'autocomplete' => 'off',
         'title' => $this->t('Enter a part of the view name, machine name, description, or display path to filter by.'),
-        'data-items' => 'tbody tr',
-        'data-targets' => '[data-drupal-selector="views-table-filter-text-source"]',
-        'data-singular' => $this->t('1 view is available in the modified list.'),
-        'data-plural' => $this->t('@count views are available in the modified list.'),
-        'data-full' => $this->t('All available views are listed.'),
       ],
     ];
 

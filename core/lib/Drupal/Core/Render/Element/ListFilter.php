@@ -98,9 +98,8 @@ class ListFilter extends Search {
       $element['#attributes']['data-targets'] = $element['#list_text'];
     }
     $element['#attributes']['data-min-length'] = $element['#minimum_filter_length'];
-    if ($element['#search_start_of_words']) {
-      $element['#attributes']['data-search-start'] = 'true';
-    }
+    $element['#attributes']['data-search-start'] = $element['#search_start_of_words'] ? 'true' : 'false';
+
     if ($element['#library']) {
       $element['#attached']['library'][] = $element['#library'];
     }
