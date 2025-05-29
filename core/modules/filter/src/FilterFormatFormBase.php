@@ -245,8 +245,6 @@ abstract class FilterFormatFormBase extends EntityForm {
       $this->messenger()->addWarning($this->t('You have insecure HTML tags in your filter format. Review documentation on <a href="@link">configuring text formats for security</a>.', ['@link' => 'https://www.drupal.org/node/224921']));
     }
 
-    $form_state->setRedirect('filter.admin_overview');
-
     return $this->entity;
   }
 
