@@ -297,13 +297,6 @@ class MediaEmbed extends FilterBase implements ContainerFactoryPluginInterface, 
       $uuid = $node->getAttribute('data-entity-uuid');
       $view_mode_id = $node->getAttribute('data-view-mode') ?: $this->settings['default_view_mode'];
 
-      // Inline media needs a dedicated view mode in order to ensure rendering
-      // of valid (flow content) HTML when rendering inside flow content like
-      // <p> tags for example.
-      if ($node->tagName == 'drupal-media-inline') {
-        $view_mode_id = 'ckeditor_inline';
-      }
-
       // Delete the consumed attributes.
       $node->removeAttribute('data-entity-type');
       $node->removeAttribute('data-entity-uuid');
@@ -325,6 +318,16 @@ class MediaEmbed extends FilterBase implements ContainerFactoryPluginInterface, 
         $view_mode = $this->entityRepository->loadEntityByConfigTarget('entity_view_mode', "media.$view_mode_id");
         if (!$view_mode) {
           $this->loggerFactory->get('media')->error('During rendering of embedded media: the view mode "@view-mode-id" does not exist.', ['@view-mode-id' => $view_mode_id]);
+        }
+      }
+      // Inline media must be rendered in view modes that contain only HTML
+      // that is valid inside flow content (such as <p> tags).
+      if ($node->tagName === 'drupal-media-inline') {
+        $view_mode = $view_mode ?? $this->entityRepository->loadEntityByConfigTarget('entity_view_mode', "media.$view_mode_id");
+        // If an invalid view mode for inline content has been chosen, fall
+        // back to ckeditor_inline.
+        if (!$view_mode?->getThirdPartySetting('ckeditor5', 'inline', false)) {
+          $view_mode = $this->entityRepository->loadEntityByConfigTarget('entity_view_mode', "media.ckeditor_inline");
         }
       }
 
