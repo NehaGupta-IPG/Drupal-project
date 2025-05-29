@@ -141,18 +141,20 @@ class BlockLibraryController extends ControllerBase {
     $build['#attached']['library'][] = 'block/drupal.block.admin';
 
     $build['filter'] = [
-      '#type' => 'search',
+      '#type' => 'list_filter',
       '#title' => $this->t('Filter'),
       '#title_display' => 'invisible',
       '#size' => 30,
       '#placeholder' => $this->t('Filter by block name'),
+      '#list_container_selector' => '.block-add-table',
+      '#list_item' => 'tbody tr',
+      '#announce' => [
+        'singular' => $this->t('1 block is available in the modified list.'),
+        'plural' => $this->t('@count blocks are available in the modified list.'),
+        'all' => $this->t('All available blocks are listed.'),
+      ],
       '#attributes' => [
         'class' => ['table-filter-text'],
-        'data-table' => '.block-add-table',
-        'data-items' => 'tbody tr',
-        'data-singular' => $this->t('1 block is available in the modified list.'),
-        'data-plural' => $this->t('@count blocks are available in the modified list.'),
-        'data-full' => $this->t('All available blocks are listed.'),
         'title' => $this->t('Enter a part of the block name to filter by.'),
       ],
     ];
