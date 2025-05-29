@@ -352,7 +352,7 @@ class EntityTypeInfo implements ContainerInjectionInterface {
       ]);
       $workspace->save();
 
-      $this->workspaceManager->setActiveWorkspace($workspace);
+      $this->workspaceManager->setActiveWorkspace($workspace, FALSE);
     }
   }
 

@@ -94,7 +94,6 @@ class ContentModerationWorkspaceProvider extends WorkspaceProviderBase {
 
       // Delete the temporary workspace.
       $this->workspaceAssociation->deleteAssociations($temporary_workspace->id());
-      $this->workspaceManager->clearActiveWorkspace();
       $temporary_workspace->delete();
     }
   }

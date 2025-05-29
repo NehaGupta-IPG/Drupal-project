@@ -51,10 +51,6 @@ class SessionWorkspaceNegotiator implements WorkspaceNegotiatorInterface, Worksp
    * {@inheritdoc}
    */
   public function setActiveWorkspace(WorkspaceInterface $workspace) {
-    if ($workspace->isManaged()) {
-      return;
-    }
-
     $this->session->set('active_workspace_id', $workspace->id());
   }
 

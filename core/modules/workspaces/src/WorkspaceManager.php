@@ -40,10 +40,10 @@ class WorkspaceManager implements WorkspaceManagerInterface {
     protected ClassResolverInterface $classResolver,
     protected WorkspaceAssociationInterface $workspaceAssociation,
     protected WorkspaceInformationInterface $workspaceInfo,
-    #[AutowireIterator(tag: 'workspace_provider', indexAttribute: 'id')]
-    protected iterable $providers = [],
     #[AutowireIterator(tag: 'workspace_negotiator')]
     protected iterable $negotiators = [],
+    #[AutowireIterator(tag: 'workspace_provider', indexAttribute: 'id')]
+    protected iterable $providers = [],
   ) {}
 
   /**
@@ -165,12 +165,6 @@ class WorkspaceManager implements WorkspaceManagerInterface {
     if (\Drupal::hasService('path_alias.manager')) {
       \Drupal::service('path_alias.manager')->cacheClear();
     }
-  }
-
-  public function clearActiveWorkspace(): static {
-    unset($this->activeWorkspace);
-
-    return $this;
   }
 
   /**

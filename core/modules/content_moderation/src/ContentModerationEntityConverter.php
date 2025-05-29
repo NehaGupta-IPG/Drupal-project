@@ -30,7 +30,7 @@ class ContentModerationEntityConverter implements ParamConverterInterface {
     $id = implode('.', ['cm', $entity_type_id, $value]);
     if (!empty($definition['load_latest_revision'])
       && ($workspace = $this->entityTypeManager->getStorage('workspace')->load($id))) {
-      $this->workspaceManager->setActiveWorkspace($workspace);
+      $this->workspaceManager->setActiveWorkspace($workspace, FALSE);
     }
 
     return $this->inner->convert($value, $definition, $name, $defaults);

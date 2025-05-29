@@ -6,6 +6,7 @@ namespace Drupal\workspaces\Hook;
 
 use Drupal\Core\Entity\EntityFormInterface;
 use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Entity\EntityPublishedInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Entity\Query\QueryInterface;
 use Drupal\Core\Entity\RevisionableInterface;
@@ -229,18 +230,13 @@ class EntityOperations {
       return;
     }
 
-    if ($active_workspace = $this->workspaceManager->getActiveWorkspace()) {
-      // Add an entity builder to the form which marks the edited entity object as
-      // a pending revision. This is needed so validation constraints like
-      // \Drupal\path\Plugin\Validation\Constraint\PathAliasConstraintValidator
-      // know in advance (before hook_entity_presave()) that the new revision will
-      // be a pending one.
+    // Add an entity builder to the form which marks the edited entity object as
+    // a pending revision. This is needed so validation constraints like
+    // \Drupal\path\Plugin\Validation\Constraint\PathAliasConstraintValidator
+    // know in advance (before hook_entity_presave()) that the new revision will
+    // be a pending one.
+    if ($this->workspaceManager->getActiveWorkspace()) {
       $form['#entity_builders'][] = [static::class, 'entityFormEntityBuild'];
-
-      // Ensure that the active workspace set by a non-persistent workspace
-      // negotiator is persisted across AJAX requests.
-      $url_query_options = \Drupal::service('workspaces.negotiator.query_parameter')->getQueryOptions($active_workspace->id());
-      $this->persistNegotiatedWorkspace($form, $url_query_options);
     }
   }
 
@@ -255,31 +251,6 @@ class EntityOperations {
     // Set the non-default revision flag so that validation constraints are also
     // aware that a pending revision is about to be created.
     $entity->isDefaultRevision(FALSE);
-  }
-
-  /**
-   * Ensures that the negotiated workspace is used during AJAX interactions.
-   *
-   * @param array &$element
-   *   An associative array containing the structure of the form.
-   * @param array $url_query_options
-   *   An array of URL query options used by the query parameter workspace
-   *   negotiator.
-   */
-  protected function persistNegotiatedWorkspace(array &$element, array $url_query_options): void {
-    // Recurse through all children if needed.
-    foreach (Element::children($element) as $key) {
-      if (isset($element[$key]) && $element[$key]) {
-        $this->persistNegotiatedWorkspace($element[$key], $url_query_options);
-      }
-    }
-
-    if (isset($element['#ajax']) && !isset($element['#ajax']['options']['query']['workspace'])) {
-      $element['#ajax']['options']['query'] = array_merge_recursive(
-        $url_query_options,
-        $element['#ajax']['options']['query'] ?? [],
-      );
-    }
   }
 
   /**

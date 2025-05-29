@@ -40,10 +40,6 @@ services:
     parent: workspaces.negotiator.session
     tags:
       - { name: workspace_negotiator, priority: 100 }
-  workspaces.negotiator.static:
-    class: Drupal\workspaces\Negotiator\StaticWorkspaceNegotiator
-    tags:
-      - { name: workspace_negotiator, priority: 200 }
 
   access_check.workspaces.active_workspace:
     class: Drupal\workspaces\Access\ActiveWorkspaceCheck
@@ -96,11 +92,11 @@ services:
     tags:
       - { name: backend_overridable }
 
-#  workspaces.controller.entity_form:
-#    # Decorate the entity form controller to handle entity operations inside a
-#    # workspace.
-#    decorates: controller.entity_form
-#    class: Drupal\workspaces\Controller\WorkspacesHtmlEntityFormController
-#    public: false
-#    arguments: ['@.inner', '@workspaces.manager', '@workspaces.information', '@typed_data_manager']
-#  Drupal\workspaces\Controller\WorkspacesHtmlEntityFormController: '@workspaces.controller.entity_form'
+  workspaces.controller.entity_form:
+    # Decorate the entity form controller to handle entity operations inside a
+    # workspace.
+    decorates: controller.entity_form
+    class: Drupal\workspaces\Controller\WorkspacesHtmlEntityFormController
+    public: false
+    arguments: ['@.inner', '@workspaces.manager', '@workspaces.information', '@typed_data_manager']
+  Drupal\workspaces\Controller\WorkspacesHtmlEntityFormController: '@workspaces.controller.entity_form'
