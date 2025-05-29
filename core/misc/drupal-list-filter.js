@@ -112,6 +112,34 @@
   }
 
   /**
+   * Builds the filter items from the table element.
+   *
+   * @param {HTMLElement} tableElement
+   *  The table element to filter.
+   * @param {string} rowSelector
+   * The selector for the rows/items to filter.
+   * @param {string|null} targetSelector
+   * The selector for sub-elements to search within each row.
+   * @param {function} normalizeString
+   * A function to normalize the text content of each item.
+   *
+   * @return {Array}
+   * An array of objects containing the node and normalized text content.
+   *
+   */
+  function defaultFilterItemsBuilder(tableElement, rowSelector, targetSelector, normalizeString) {
+  return Array.from(tableElement.querySelectorAll(rowSelector)).map((source) => {
+    const textContent = targetSelector
+      ? Array.from(source.querySelectorAll(targetSelector)).map(t => t.textContent).join(' ')
+      : source.textContent;
+    return {
+      node: source,
+      textContent: normalizeString(textContent),
+    };
+  });
+}
+
+  /**
    * List filter object.
    *
    * @namespace Drupal.listFilter
@@ -151,6 +179,24 @@
      * @type {function}
      */
     announce: defaultAnnounce,
+
+    /*
+     * Builds filter items from the table element. Can be overridden.
+     *
+     * @type {function}
+     * @param {HTMLElement} tableElement
+     *   The table element to filter.
+     * @param {string} rowSelector
+     *   The selector for the rows/items to filter.
+     * @param {string|null} targetSelector
+     *   The selector for sub-elements to search within each row.
+     * @param {function} normalizeString
+     *   A function to normalize the text content of each item.
+     * @return {Array}
+     *   An array of objects containing the node and normalized text content.
+     * 
+     */
+    filterItemsBuilder: defaultFilterItemsBuilder,
 
     /**
      * Default options for the filter.
@@ -207,15 +253,12 @@
         let filterItemsTransitional = null;
         let queryTransitional = '';
 
-        const filterItems = Array.from(tableElement.querySelectorAll(rowSelector)).map((source) => {
-          const textContent = targetSelector
-            ? Array.from(source.querySelectorAll(targetSelector)).map(t => t.textContent).join(' ')
-            : source.textContent;
-          return {
-            node: source,
-            textContent: listFilter.normalizeString(textContent),
-          };
-        });
+        const filterItems = listFilter.filterItemsBuilder(
+          tableElement,
+          rowSelector,
+          targetSelector,
+          listFilter.normalizeString,
+        );
 
         filterItemsTransitional = filterItems;
 
