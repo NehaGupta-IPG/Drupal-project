@@ -127,13 +127,13 @@
    * Builds the filter items from the table element.
    *
    * @param {HTMLElement} tableElement
-   *  The table element to filter.
+   *   The table element to filter.
    * @param {string} rowSelector
-   * The selector for the rows/items to filter.
+   *   The selector for the rows/items to filter.
    * @param {string|null} targetSelector
-   * The selector for sub-elements to search within each row.
+   *   The selector for sub-elements to search within each row.
    * @param {function} normalizeString
-   * A function to normalize the text content of each item.
+   *   A function to normalize the text content of each item.
    *
    * @return {Array}
    * An array of objects containing the node and normalized text content.
