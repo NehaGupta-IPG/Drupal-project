@@ -681,7 +681,7 @@ abstract class ContentEntityBase extends EntityBase implements \IteratorAggregat
     // Assign the value on the child and overrule notify such that we get
     // notified to handle changes afterwards. We can ignore notify as there is
     // no parent to notify anyway.
-    $this->get($name)->setValue($value, TRUE);
+    $this->get($name, TRUE)->setValue($value, TRUE);
     return $this;
   }
 
