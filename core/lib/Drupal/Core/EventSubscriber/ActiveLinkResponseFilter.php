@@ -205,8 +205,8 @@ class ActiveLinkResponseFilter implements EventSubscriberInterface {
       // The query parameters of an active link are equal to the current
       // parameters.
       if ($add_active) {
-        if ($query) {
-          if (!$node->hasAttribute('data-drupal-link-query') || $node->getAttribute('data-drupal-link-query') !== Json::encode($query)) {
+        if ($add_active && $query && $node->hasAttribute('data-drupal-link-query')) {
+          if ($node->getAttribute('data-drupal-link-query') !== Json::encode($query)) {
             $add_active = FALSE;
           }
         }
