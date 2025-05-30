@@ -198,6 +198,9 @@ condition.plugin.user_role:
       type: sequence
       sequence:
         type: string
+        constraints:
+          ConfigExists:
+            prefix: user.role.
 
 # Schema for the entity reference 'default:user' selection handler settings.
 entity_reference_selection.default:user:
