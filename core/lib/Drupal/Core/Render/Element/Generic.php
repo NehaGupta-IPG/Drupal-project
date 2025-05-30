@@ -25,7 +25,7 @@ class Generic extends RenderElementBase {
   /**
    * {@inheritdoc}
    */
-  protected function setType() {
+  protected function setType(): void {
   }
 
 }

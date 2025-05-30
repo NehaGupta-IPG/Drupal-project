@@ -573,7 +573,7 @@ abstract class RenderElementBase extends PluginBase implements ElementInterface,
    *
    * @internal
    */
-  protected function setType() {
+  protected function setType(): void {
     $this->storage['#type'] = $this->getPluginId();
   }
 
