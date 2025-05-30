@@ -86,9 +86,6 @@ class ListFilterTest extends WebDriverTestBase {
 
   /**
    * Tests the ListFilter with an overridden library.
-   *
-   * This test checks if the filter works correctly when the library is overridden
-   * and the auto-activate feature is disabled.
    */
   public function testListFilterOverride() {
     $this->drupalGet('/list-filter/override_library');
@@ -102,6 +99,43 @@ class ListFilterTest extends WebDriverTestBase {
       return $element->isVisible();
     });
     $this->assertSession()->pageTextContains('Results found: ' . count($elementVisible));
+  }
+
+  /**
+   * Tests the minimum filter length functionality.
+   */
+  public function testMinFilterLength() {
+    $this->drupalGet('/list-filter/minimum_filter_length');
+    $page = $this->getSession()->getPage();
+    $totalRows = count($page->findAll('css', '.filter-container tbody tr'));
+    $filterInput = $page->find('css', '.filter-input');
+    $filterInput->setValue('patr');
+    sleep(1);
+    $totalVisibleRows = count(array_filter($page->findAll('css', '.filter-container tbody tr'), function ($element) {
+      return $element->isVisible();
+    }));
+    $this->assertEquals($totalRows, $totalVisibleRows, 'All rows are visible before reaching the minimum filter length.');
+    $filterInput->setValue('patria');
+    sleep(1);
+    $totalVisibleRows = count(array_filter($page->findAll('css', '.filter-container tbody tr'), function ($element) {
+      return $element->isVisible();
+    }));
+    $this->assertLessThan($totalRows, $totalVisibleRows, 'Rows are visible after reaching the minimum filter length.');;
+  }
+
+  /**
+   * Tests the search start of words functionality.
+   */
+  public function testSearchStartOfWords() {
+    $this->drupalGet('/list-filter/search_start_of_words');
+    $page = $this->getSession()->getPage();
+    $filterInput = $page->find('css', '.filter-input');
+    $filterInput->setValue('sub');
+    sleep(1);
+    $trs = $page->findAll('css', '.filter-container tbody tr');
+
+    $this->assertTrue($trs[2]->isVisible(), 'Pull Fiction move should be visible when searching for "sub".');
+    $this->assertFalse($trs[4]->isVisible(), 'Spirited Away should not be visible when searching for "sub".');
   }
 
 }
