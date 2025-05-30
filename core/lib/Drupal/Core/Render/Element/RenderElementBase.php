@@ -2,7 +2,6 @@
 
 namespace Drupal\Core\Render\Element;
 
-use Drupal\Core\Access\AccessResultInterface;
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Form\FormBuilderInterface;
 use Drupal\Core\Form\FormStateInterface;
@@ -46,7 +45,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  * by magic setter/getter) and also the render array starting with a #
  * character. For example $element['#access'] or $elementObject->access.
  *
- * @property bool|AccessResultInterface $access
+ * @property bool|\Drupal\Core\Access\AccessResultInterface $access
  *   Whether the element is accessible or not.
  *   When the value is FALSE (if boolean) or the isAllowed() method returns
  *   FALSE (if AccessResultInterface), the element is not rendered and
