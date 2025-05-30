@@ -14,7 +14,7 @@ use Drupal\Core\PreWarm\PreWarmableInterface;
 use Drupal\Core\Render\Attribute\RenderElement;
 use Drupal\Core\Render\Element\ElementInterface;
 use Drupal\Core\Render\Element\FormElementInterface;
-use Drupal\Core\Render\Element\Wrapper;
+use Drupal\Core\Render\Element\Generic;
 use Drupal\Core\Theme\ThemeManagerInterface;
 
 /**
@@ -227,9 +227,8 @@ class ElementInfoManager extends DefaultPluginManager implements ElementInfoMana
    * {@inheritdoc}
    */
   // phpcs:ignore Drupal.Commenting.FunctionComment.MissingReturnComment
-  public function createInstance($plugin_id = '', array $configuration = [], &$element = []): ElementInterface {
-    $type = $plugin_id ?: $element['#type'];
-    $instance = parent::createInstance($type, $configuration);
+  public function createInstance($plugin_id, array $configuration = [], &$element = []): ElementInterface {
+    $instance = parent::createInstance($plugin_id, $configuration);
     assert($instance instanceof ElementInterface);
     $instance->initializeInternalStorage($element);
     return $instance;
@@ -257,20 +256,18 @@ class ElementInfoManager extends DefaultPluginManager implements ElementInfoMana
   /**
    * {@inheritdoc}
    */
-  public function fromRenderable(ElementInterface|array &$element, string $class = Wrapper::class): ElementInterface {
+  public function fromRenderable(ElementInterface|array &$element, string $class = Generic::class): ElementInterface {
     if ($element instanceof ElementInterface) {
       return $element;
     }
     if (isset($element['##object']) && $element['##object'] instanceof ElementInterface) {
       return $element['##object']->initializeInternalStorage($element);
     }
-    if (!isset($element['#type']) && $class) {
-      $element['#type'] = $this->getIdFromClass($class);
-    }
-    if (!$element['#type']) {
+    $type = $element['#type'] ?? $this->getIdFromClass($class);
+    if (!$type) {
       throw new \LogicException('The element passed to ElementInfoManager::fromRenderable must have a #type or a valid class must be provided.');
     }
-    return $this->createInstance(element: $element);
+    return $this->createInstance($type, element: $element);
   }
 
 }

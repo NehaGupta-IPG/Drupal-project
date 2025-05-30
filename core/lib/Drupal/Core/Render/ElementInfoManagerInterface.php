@@ -69,9 +69,7 @@ interface ElementInfoManagerInterface extends PluginManagerInterface {
    * @param \Drupal\Core\Render\Element\ElementInterface|array $element
    *   A render array or render objects. The latter is returned unchanged.
    * @param class-string<T> $class
-   *   The class of the render object being crated. Defaults to
-   *   \Drupal\Core\Render\Element\Form to make it easier to use it from
-   *   hook_form_alter().)
+   *   The class of the render object being created.
    *
    * @return T
    *   A render object.
@@ -86,7 +84,7 @@ interface ElementInfoManagerInterface extends PluginManagerInterface {
    * @return \Drupal\Core\Render\Element\ElementInterface
    *   A fully configured render object.
    */
-  public function createInstance($plugin_id = '', array $configuration = []): ElementInterface;
+  public function createInstance($plugin_id, array $configuration = []): ElementInterface;
 
   /**
    * Creates a render object based on the provided class and configuration.
