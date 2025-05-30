@@ -512,3 +512,7 @@ condition.plugin.current_theme:
     theme:
       type: string
       label: Theme
+      constraints:
+        NotBlank: []
+        ExtensionName: []
+        ExtensionExists: theme
