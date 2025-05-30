@@ -41,7 +41,7 @@
    * @return {string}
    *   The machine name string.
    */
-  const prepareMachineName = (source, settings) => {
+  Drupal.prepareMachineName = (source, settings) => {
     const rx = new RegExp(settings.replace_pattern, 'g');
 
     return trimByChar(
@@ -113,7 +113,10 @@
         if (needsTransliteration) {
           self.showMachineName(self.transliterate(baseValue, options), data);
         } else {
-          self.showMachineName(prepareMachineName(baseValue, options), data);
+          self.showMachineName(
+            Drupal.prepareMachineName(baseValue, options),
+            data,
+          );
         }
       }
 
@@ -190,7 +193,7 @@
         if (machine === '' && $source[0].value !== '') {
           if (/^[A-Za-z0-9_\s]*$/.test($source[0].value)) {
             self.showMachineName(
-              prepareMachineName($source[0].value, options),
+              Drupal.prepareMachineName($source[0].value, options),
               eventData,
             );
           } else {
@@ -300,7 +303,7 @@
 
       const transliteratedSource = transliterateLibrary(source, { replace });
 
-      return prepareMachineName(transliteratedSource, settings);
+      return Drupal.prepareMachineName(transliteratedSource, settings);
     },
   };
 })(jQuery, Drupal, drupalSettings, transliterate);
