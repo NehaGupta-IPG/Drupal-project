@@ -3,9 +3,10 @@
 namespace Drupal\Core\Entity;
 
 use Drupal\Component\Render\FormattableMarkup;
-use Drupal\Core\Entity\Exception\UnknownFieldNameException;
+use Drupal\Core\Entity\Exception\UnknownFieldException;
 use Drupal\Core\Entity\Plugin\DataType\EntityReference;
 use Drupal\Core\Field\BaseFieldDefinition;
+use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Language\Language;
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\Session\AccountInterface;
@@ -609,13 +610,9 @@ abstract class ContentEntityBase extends EntityBase implements \IteratorAggregat
     $exception_on_invalid = !isset($arguments[1]) || (bool) $arguments[1];
     if (!isset($this->fields[$field_name][$this->activeLangcode])) {
       try {
-        return $this->getTranslatedField($field_name, $this->activeLangcode);
+        return $this->getTranslatedField($field_name, $this->activeLangcode, $exception_on_invalid);
       }
-      catch (UnknownFieldNameException $e) {
-        if (!$exception_on_invalid) {
-          return NULL;
-        }
-
+      catch (UnknownFieldException $e) {
         if (!isset($arguments[1])) {
           @trigger_error('Throwing an exception when calling ' . __METHOD__ . ' on an invalid field name without the setting the second "$exception_on_invalid" parameter is deprecated in drupal:11.3.0 and will return NULL unless $exception_on_invalid is explicitly set to TRUE in drupal:13.0.0. See https://www.drupal.org/node/3522223', E_USER_DEPRECATED);
         }
@@ -628,10 +625,10 @@ abstract class ContentEntityBase extends EntityBase implements \IteratorAggregat
   /**
    * Gets a translated field.
    *
-   * @return \Drupal\Core\Field\FieldItemListInterface
+   * @return \Drupal\Core\Field\FieldItemListInterface|null
    *   The translated field.
    */
-  protected function getTranslatedField($name, $langcode) {
+  protected function getTranslatedField(string $name, string $langcode, bool $exception_on_invalid = TRUE): ?FieldItemListInterface {
     if ($this->translations[$this->activeLangcode]['status'] == static::TRANSLATION_REMOVED) {
       throw new \InvalidArgumentException("The entity object refers to a removed translation ({$this->activeLangcode}) and cannot be manipulated.");
     }
@@ -640,7 +637,10 @@ abstract class ContentEntityBase extends EntityBase implements \IteratorAggregat
     if (!isset($this->fields[$name][$langcode])) {
       $definition = $this->getFieldDefinition($name);
       if (!$definition) {
-        throw new UnknownFieldNameException("Field $name is unknown.");
+        if ($exception_on_invalid) {
+          throw new UnknownFieldException("Field $name is unknown.");
+        }
+        return NULL;
       }
       // Non-translatable fields are always stored with
       // LanguageInterface::LANGCODE_DEFAULT as key.
@@ -648,7 +648,7 @@ abstract class ContentEntityBase extends EntityBase implements \IteratorAggregat
       $default = $langcode == LanguageInterface::LANGCODE_DEFAULT;
       if (!$default && !$definition->isTranslatable()) {
         if (!isset($this->fields[$name][LanguageInterface::LANGCODE_DEFAULT])) {
-          $this->fields[$name][LanguageInterface::LANGCODE_DEFAULT] = $this->getTranslatedField($name, LanguageInterface::LANGCODE_DEFAULT);
+          $this->fields[$name][LanguageInterface::LANGCODE_DEFAULT] = $this->getTranslatedField($name, LanguageInterface::LANGCODE_DEFAULT, $exception_on_invalid);
         }
         $this->fields[$name][$langcode] = &$this->fields[$name][LanguageInterface::LANGCODE_DEFAULT];
       }

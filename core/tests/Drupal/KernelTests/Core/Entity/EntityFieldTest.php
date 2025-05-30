@@ -7,7 +7,7 @@ namespace Drupal\KernelTests\Core\Entity;
 use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityStorageException;
-use Drupal\Core\Entity\Exception\UnknownFieldNameException;
+use Drupal\Core\Entity\Exception\UnknownFieldException;
 use Drupal\Core\Entity\RevisionLogInterface;
 use Drupal\Core\Entity\TypedData\EntityDataDefinition;
 use Drupal\Core\Entity\TypedData\EntityDataDefinitionInterface;
@@ -1005,7 +1005,7 @@ class EntityFieldTest extends EntityKernelTestBase {
     $entity = $this->createTestEntity('entity_test');
 
     if (is_null($exception_on_invalid) || $exception_on_invalid) {
-      $this->expectException(UnknownFieldNameException::class);
+      $this->expectException(UnknownFieldException::class);
       $this->expectExceptionMessage('Field field_does_not_exist is unknown.');
     }
 
