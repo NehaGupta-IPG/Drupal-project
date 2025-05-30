@@ -22,4 +22,10 @@ class Generic extends RenderElementBase {
     return [];
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  protected function setType() {
+  }
+
 }

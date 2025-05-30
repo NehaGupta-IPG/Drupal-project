@@ -562,7 +562,19 @@ abstract class RenderElementBase extends PluginBase implements ElementInterface,
   public function initializeInternalStorage(array &$element): static {
     $this->storage = &$element;
     $element['##object'] = $this;
+    $this->setType();
     return $this;
+  }
+
+  /**
+   * Set type on initialize.
+   *
+   * There is no need to either call or override this method.
+   *
+   * @internal
+   */
+  protected function setType() {
+    $this->storage['#type'] = $this->getPluginId();
   }
 
   /**

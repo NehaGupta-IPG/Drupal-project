@@ -21,13 +21,6 @@ use Drupal\Core\Render\Attribute\RenderElement;
  *   The order of this item in the array of sub-elements. (0, 1, 2, etc.)
  */
 #[RenderElement('widget')]
-class Widget extends RenderElementBase {
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getInfo() {
-    return [];
-  }
+class Widget extends Generic {
 
 }
