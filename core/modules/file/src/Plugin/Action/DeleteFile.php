@@ -4,21 +4,22 @@ namespace Drupal\file\Plugin\Action;
 
 use Drupal\Core\Access\AccessResultInterface;
 use Drupal\Core\Action\ActionBase;
+use Drupal\Core\Action\Attribute\Action;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Session\AccountInterface;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\TempStore\PrivateTempStoreFactory;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Redirects to a file deletion form.
- *
- * @Action(
- *   id = "file_delete_action",
- *   label = @Translation("Delete file"),
- *   type = "file",
- *   confirm_form_route_name = "file.multiple_delete_confirm"
- * )
  */
+#[Action(
+  id: 'file_delete_action',
+  label: new TranslatableMarkup('Delete file'),
+  confirm_form_route_name: 'file.multiple_delete_confirm',
+  type: 'file',
+)]
 class DeleteFile extends ActionBase implements ContainerFactoryPluginInterface {
 
   /**

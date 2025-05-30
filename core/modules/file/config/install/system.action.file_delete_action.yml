@@ -7,3 +7,4 @@ plugin: file_delete_action
 dependencies:
   module:
     - file
+configuration: {  }
