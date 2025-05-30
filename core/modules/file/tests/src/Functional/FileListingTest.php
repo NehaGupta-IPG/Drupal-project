@@ -184,6 +184,7 @@ class FileListingTest extends FileFieldTestBase {
     $this->assertSession()->addressEquals(Url::fromRoute('file.multiple_delete_confirm', [], [
       'query' => [
         'destination' => Url::fromRoute('view.files.page_1')->toString(),
+        'display_id' => 'page_1',
       ],
     ]));
     $this->assertLinkByHref('admin/content/files');
