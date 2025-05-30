@@ -23,6 +23,7 @@ class HelpTest extends BrowserTestBase {
    * @var array
    */
   protected static $modules = [
+    'block',
     'block_content',
     'breakpoint',
     'editor',

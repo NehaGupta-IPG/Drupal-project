@@ -1,0 +1,2 @@
+administer blocks:
+  title: 'Administer blocks permission for testing \Drupal\Core\Block\Plugin\Block\Broken::build without block.module.'

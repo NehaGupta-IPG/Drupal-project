@@ -24,12 +24,9 @@ class PageEditTest extends BlockContentTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function setUp(): void {
-    parent::setUp();
-
-    $this->drupalPlaceBlock('page_title_block');
-    $this->drupalPlaceBlock('system_breadcrumb_block');
-  }
+  protected static $modules = [
+    'navigation_variant_test',
+  ];
 
   /**
    * Checks block edit functionality.

@@ -7,11 +7,11 @@ namespace Drupal\Tests\block_content\Kernel;
 use Drupal\block\Entity\Block;
 use Drupal\block_content\Entity\BlockContent;
 use Drupal\block_content\Entity\BlockContentType;
+use Drupal\block_content\Hook\BlockContentBlockHooks;
 use Drupal\Component\Plugin\PluginBase;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\Tests\user\Traits\UserCreationTrait;
-use Drupal\block_content\Hook\BlockContentHooks;
 
 /**
  * Tests the block content.
@@ -38,7 +38,7 @@ class BlockContentTest extends KernelTestBase {
   }
 
   /**
-   * Tests the editing links for BlockContentBlock.
+   * Tests entity operations from Block config to Block Content.
    */
   public function testOperationLinks(): void {
     // Create a block content type.
@@ -60,20 +60,18 @@ class BlockContentTest extends KernelTestBase {
       'theme' => 'stark',
     ]);
 
-    // The anonymous user doesn't have the "administer block" permission.
-    $blockContentEntityOperation = new BlockContentHooks();
-    $this->assertEmpty($blockContentEntityOperation->entityOperation($block));
+    $operation = 'block-edit';
 
-    $this->setUpCurrentUser(['uid' => 1], ['edit any spiffy block content', 'administer blocks']);
+    /** @var \Drupal\block_content\Hook\BlockContentBlockHooks $blockHooks */
+    $blockHooks = \Drupal::service(BlockContentBlockHooks::class);
+    $this->assertArrayNotHasKey($operation, $blockHooks->entityOperation($block));
 
-    // The admin user does have the "administer block" permission.
+    $this->setUpCurrentUser(['uid' => 2], ['edit any spiffy block content']);
     $this->assertEquals([
-      'block-edit' => [
-        'title' => 'Edit block',
-        'url' => $block_content->toUrl('edit-form')->setOptions([]),
-        'weight' => 50,
-      ],
-    ], $blockContentEntityOperation->entityOperation($block));
+      'title' => 'Edit block',
+      'url' => $block_content->toUrl('edit-form')->setOptions([]),
+      'weight' => 50,
+    ], $blockHooks->entityOperation($block)[$operation]);
   }
 
 }

@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Drupal\Tests\block_content\Functional;
 
 use Drupal\block_content\Entity\BlockContentType;
-use Drupal\Component\Utility\Html;
 use Drupal\Core\Url;
 use Drupal\Tests\system\Functional\Menu\AssertBreadcrumbTrait;
 
@@ -20,7 +19,10 @@ class BlockContentTypeTest extends BlockContentTestBase {
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['field_ui'];
+  protected static $modules = [
+    'field_ui',
+    'navigation_variant_test',
+  ];
 
   /**
    * {@inheritdoc}
@@ -34,7 +36,6 @@ class BlockContentTypeTest extends BlockContentTestBase {
    */
   protected $permissions = [
     'administer block content',
-    'administer blocks',
     'administer block_content fields',
     'administer block types',
     'administer block content',
@@ -47,15 +48,6 @@ class BlockContentTypeTest extends BlockContentTestBase {
    * @var bool
    */
   protected $autoCreateBasicBlockType = FALSE;
-
-  /**
-   * {@inheritdoc}
-   */
-  protected function setUp(): void {
-    parent::setUp();
-
-    $this->drupalPlaceBlock('page_title_block');
-  }
 
   /**
    * Tests the order of the block content types on the add page.
@@ -121,7 +113,6 @@ class BlockContentTypeTest extends BlockContentTestBase {
    * Tests editing a block type using the UI.
    */
   public function testBlockContentTypeEditing(): void {
-    $this->drupalPlaceBlock('system_breadcrumb_block');
     // Now create an initial block-type.
     $this->createBlockContentType(['id' => 'basic'], TRUE);
 
@@ -197,70 +188,43 @@ class BlockContentTypeTest extends BlockContentTestBase {
   }
 
   /**
-   * Tests that redirects work as expected when multiple block types exist.
+   * Tests the form or list is displayed by how many block types exist.
+   *
+   * @covers \Drupal\block_content\Controller\BlockContentController::add
    */
   public function testsBlockContentAddTypes(): void {
-    // Now create an initial block-type.
-    $this->createBlockContentType(['id' => 'basic'], TRUE);
+    $this->drupalLogin($this->drupalCreateUser([
+      'access block library',
+      'administer block content',
+    ]));
 
-    $this->drupalLogin($this->adminUser);
-    // Create two block types programmatically.
-    $this->createBlockContentType(['id' => 'foo']);
-    $this->createBlockContentType(['id' => 'bar']);
+    $addUrl = Url::fromRoute('block_content.add_page');
 
-    // Get the content block storage.
-    $storage = $this->container
-      ->get('entity_type.manager')
-      ->getStorage('block_content');
+    // No block types, access denied:
+    $this->drupalGet($addUrl);
+    $this->assertSession()->statusCodeEquals(403);
 
-    // Install all themes.
-    $themes = ['olivero', 'stark', 'claro'];
-    \Drupal::service('theme_installer')->install($themes);
-    $theme_settings = $this->config('system.theme');
-    foreach ($themes as $default_theme) {
-      // Change the default theme.
-      $theme_settings->set('default', $default_theme)->save();
-      $this->drupalPlaceBlock('local_actions_block');
+    // One block type, form shown.
+    BlockContentType::create([
+      'id' => $this->randomMachineName(),
+      'label' => 'First block',
+    ])->save();
+    $this->drupalGet($addUrl);
+    $this->assertSession()->statusCodeEquals(200);
+    $this->assertSession()->pageTextContains('Add content block');
+    $this->assertSession()->fieldExists('info[0][value]');
 
-      // For each installed theme, go to its block page and test the redirects.
-      foreach ($themes as $theme) {
-        // Test that adding a block from the 'place blocks' form sends you to
-        // the block configure form.
-        $path = $theme == $default_theme ? 'admin/structure/block' : "admin/structure/block/list/$theme";
-        $this->drupalGet($path);
-        $this->clickLink('Place block');
-        $this->clickLink('Add content block');
-        $this->clickLink('foo');
-        // Create a new block.
-        $edit = ['info[0][value]' => $this->randomMachineName(8)];
-        $this->submitForm($edit, 'Save and configure');
-        $blocks = $storage->loadByProperties(['info' => $edit['info[0][value]']]);
-        if (!empty($blocks)) {
-          $block = reset($blocks);
-          $this->assertSession()->addressEquals(Url::fromRoute('block.admin_add', ['plugin_id' => 'block_content:' . $block->uuid(), 'theme' => $theme]));
-          $this->submitForm(['region' => 'content'], 'Save block');
-          $this->assertSession()->addressEquals(Url::fromRoute('block.admin_display_theme', ['theme' => $theme], ['query' => ['block-placement' => $theme . '-' . Html::getClass($edit['info[0][value]'])]]));
-        }
-        else {
-          $this->fail('Could not load created block.');
-        }
-      }
-    }
-
-    // Test that adding a block from the 'content blocks list' doesn't send you
-    // to the block configure form.
-    $this->drupalGet('admin/content/block');
-    $this->clickLink('Add content block');
-    $this->clickLink('foo');
-    $edit = ['info[0][value]' => $this->randomMachineName(8)];
-    $this->submitForm($edit, 'Save');
-    $blocks = $storage->loadByProperties(['info' => $edit['info[0][value]']]);
-    if (!empty($blocks)) {
-      $this->assertSession()->addressEquals(Url::fromRoute('entity.block_content.collection'));
-    }
-    else {
-      $this->fail('Could not load created block.');
-    }
+    // Multiple block types, menu shown.
+    BlockContentType::create([
+      'id' => $this->randomMachineName(),
+      'label' => 'Second block',
+    ])->save();
+    $this->drupalGet($addUrl);
+    $this->assertSession()->statusCodeEquals(200);
+    $this->assertSession()->pageTextContains('Add content block');
+    $this->assertSession()->linkExists('First block');
+    $this->assertSession()->linkExists('Second block');
+    $this->assertSession()->fieldNotExists('info[0][value]');
   }
 
 }

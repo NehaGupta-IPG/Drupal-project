@@ -1,0 +1,4 @@
+name: 'Administer Blocks Permission test'
+type: module
+description: 'Provides a permission for testing block functionality provided by core until https://www.drupal.org/project/drupal/issues/3524897 is resolved.'
+package: Testing

@@ -7,6 +7,8 @@ namespace Drupal\Tests\block_content\Kernel;
 use Drupal\block_content\Entity\BlockContent;
 use Drupal\block_content\Entity\BlockContentType;
 use Drupal\Component\Plugin\PluginBase;
+use Drupal\Core\Extension\ModuleHandlerInterface;
+use Drupal\Core\Extension\ModuleInstallerInterface;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\Tests\block\Traits\BlockCreationTrait;
 
@@ -22,7 +24,7 @@ class BlockContentDeletionTest extends KernelTestBase {
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['block', 'block_content', 'field', 'system', 'text', 'user'];
+  protected static $modules = ['block_content', 'field', 'system', 'text', 'user'];
 
   /**
    * {@inheritdoc}
@@ -37,8 +39,25 @@ class BlockContentDeletionTest extends KernelTestBase {
 
   /**
    * Tests deleting a block_content updates the discovered block plugin.
+   *
+   * @param bool $installBlockModule
+   *   Whether block.module will be installed in this test.
+   *
+   * @see \Drupal\block_content\Entity\BlockContent::preDelete
+   * @dataProvider providerDeletingBlockContentClearsPluginCacheAndDeletesDependentBlocks
    */
-  public function testDeletingBlockContentShouldClearPluginCache(): void {
+  public function testDeletingBlockContentClearsPluginCacheAndDeletesDependentBlocks(bool $installBlockModule): void {
+    // Prevent regressions by ensuring Block is not installed.
+    /** @var \Drupal\Core\Extension\ModuleHandlerInterface $moduleHandler */
+    $moduleHandler = \Drupal::service(ModuleHandlerInterface::class);
+    $this->assertFalse($moduleHandler->moduleExists('block'));
+
+    if ($installBlockModule) {
+      /** @var \Drupal\Core\Extension\ModuleInstallerInterface $moduleInstaller */
+      $moduleInstaller = \Drupal::service(ModuleInstallerInterface::class);
+      $moduleInstaller->install(['block']);
+    }
+
     // Create a block content type.
     $block_content_type = BlockContentType::create([
       'id' => 'spiffy',
@@ -73,15 +92,33 @@ class BlockContentDeletionTest extends KernelTestBase {
     $block_content->save();
 
     $plugin_id = 'block_content' . PluginBase::DERIVATIVE_SEPARATOR . $block_content->uuid();
-    $block = $this->placeBlock($plugin_id, ['region' => 'content', 'theme' => 'stark']);
 
-    // Delete it via storage.
+    if ($installBlockModule) {
+      $block = $this->placeBlock($plugin_id, ['region' => 'content', 'theme' => 'stark']);
+    }
+
+    // Delete the Block Content.
     $storage = $this->container->get('entity_type.manager')->getStorage('block_content');
     $storage->delete([$block_content]);
     // The plugin should no longer exist.
     $this->assertFalse($block_manager->hasDefinition($plugin_id));
 
-    $this->assertNull($this->container->get('entity_type.manager')->getStorage('block')->loadUnchanged($block->id()));
+    if ($installBlockModule) {
+      // Block config entities using plugins derived from Block Content entities
+      // are deleted before the associated Block Content is deleted.
+      $this->assertNull($this->container->get('entity_type.manager')->getStorage('block')->loadUnchanged($block->id()));
+    }
+  }
+
+  /**
+   * Data provider.
+   *
+   * @return \Generator<array{bool}>
+   *   Test scenarios.
+   */
+  public static function providerDeletingBlockContentClearsPluginCacheAndDeletesDependentBlocks(): \Generator {
+    yield [TRUE];
+    yield [FALSE];
   }
 
 }

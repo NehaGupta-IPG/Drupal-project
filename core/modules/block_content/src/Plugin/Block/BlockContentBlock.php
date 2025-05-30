@@ -15,6 +15,7 @@ use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Routing\UrlGeneratorInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\Core\Url;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -186,12 +187,15 @@ class BlockContentBlock extends BlockBase implements ContainerFactoryPluginInter
       return $this->entityTypeManager->getViewBuilder($block->getEntityTypeId())->view($block, $this->configuration['view_mode']);
     }
     else {
+      $url = Url::fromRoute('block_content.add_page');
+      $tArgs = [
+        '%uuid' => $this->getDerivativeId(),
+        ':url' => $url->toString(),
+      ];
       return [
-        '#markup' => $this->t('Block with uuid %uuid does not exist. <a href=":url">Add content block</a>.', [
-          '%uuid' => $this->getDerivativeId(),
-          ':url' => $this->urlGenerator->generate('block_content.add_page'),
-        ]),
-        '#access' => $this->account->hasPermission('administer blocks'),
+        '#markup' => $url->access()
+          ? $this->t('Block with uuid %uuid does not exist. <a href=":url">Add content block</a>.', $tArgs)
+          : $this->t('Block with uuid %uuid does not exist.', $tArgs),
       ];
     }
   }

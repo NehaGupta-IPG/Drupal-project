@@ -18,7 +18,7 @@ class MigrateBlockContentTypeTest extends MigrateDrupal7TestBase {
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['block', 'block_content', 'filter', 'text'];
+  protected static $modules = ['block_content', 'filter', 'text'];
 
   /**
    * {@inheritdoc}

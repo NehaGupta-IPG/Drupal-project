@@ -20,7 +20,7 @@ class BlockContentDeriverTest extends KernelTestBase {
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['block', 'block_content', 'system', 'user'];
+  protected static $modules = ['block_content', 'system', 'user'];
 
   /**
    * The definition array of the base plugin.

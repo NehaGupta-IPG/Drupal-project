@@ -67,6 +67,8 @@ class Broken extends PluginBase implements BlockPluginInterface, ContainerFactor
    */
   public function build() {
     $build = [];
+    // Broken message depends on a permission provided by block.module.
+    // @todo Decouple in https://www.drupal.org/project/drupal/issues/3524897
     if ($this->currentUser->hasPermission('administer blocks')) {
       $build += $this->brokenMessage();
     }

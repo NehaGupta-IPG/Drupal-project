@@ -11810,12 +11810,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/block_content/src/Entity/BlockContent.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\block_content\\\\Entity\\\\BlockContent\\:\\:preDelete\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/block_content/src/Entity/BlockContent.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\block_content\\\\Entity\\\\BlockContent\\:\\:preSaveRevision\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,

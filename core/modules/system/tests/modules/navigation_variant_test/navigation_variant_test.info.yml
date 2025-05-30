@@ -1,0 +1,5 @@
+name: 'Navigation variant test'
+type: module
+description: 'Module for displaying typical Drupal navigation elements without installing Block module.'
+package: Testing
+version: VERSION

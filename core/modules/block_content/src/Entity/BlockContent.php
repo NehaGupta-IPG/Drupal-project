@@ -9,7 +9,9 @@ use Drupal\block_content\BlockContentStorageSchema;
 use Drupal\block_content\BlockContentTranslationHandler;
 use Drupal\block_content\BlockContentViewBuilder;
 use Drupal\block_content\BlockContentViewsData;
+use Drupal\block_content\BlockUsage\BlockContentBlockUsageInterface;
 use Drupal\block_content\Form\BlockContentDeleteForm;
+use Drupal\Component\DependencyInjection\ContainerInterface;
 use Drupal\Core\Entity\Attribute\ContentEntityType;
 use Drupal\Core\Entity\Routing\RevisionHtmlRouteProvider;
 use Drupal\Core\Entity\Form\RevisionRevertForm;
@@ -149,13 +151,13 @@ class BlockContent extends EditorialContentEntityBase implements BlockContentInt
   /**
    * {@inheritdoc}
    */
-  public static function preDelete(EntityStorageInterface $storage, array $entities) {
+  public static function preDelete(EntityStorageInterface $storage, array $entities): void {
     parent::preDelete($storage, $entities);
 
-    /** @var \Drupal\block_content\BlockContentInterface $block */
-    foreach ($entities as $block) {
-      foreach ($block->getInstances() as $instance) {
-        $instance->delete();
+    /** @var \Drupal\block_content\BlockContentInterface $blockContent */
+    foreach ($entities as $blockContent) {
+      foreach ((static::blockContentBlockUsage()?->getUsage($blockContent) ?? []) as $block) {
+        $block->delete();
       }
     }
   }
@@ -179,6 +181,7 @@ class BlockContent extends EditorialContentEntityBase implements BlockContentInt
    * {@inheritdoc}
    */
   public function getInstances() {
+    @trigger_error(BlockContentInterface::class . '::getInstances() is deprecated in drupal:11.4.0 and is removed from drupal:12.0.0. Use the functionality provided by ' . BlockContentBlockUsageInterface::class . ' instead. See https://www.drupal.org/node/3523951', E_USER_DEPRECATED);
     return \Drupal::entityTypeManager()->getStorage('block')->loadByProperties(['plugin' => 'block_content:' . $this->uuid()]);
   }
 
@@ -280,6 +283,14 @@ class BlockContent extends EditorialContentEntityBase implements BlockContentInt
   protected static function invalidateBlockPluginCache() {
     // Invalidate the block cache to update content block-based derivatives.
     \Drupal::service('plugin.manager.block')->clearCachedDefinitions();
+  }
+
+  /**
+   * Determine which Blocks use plugins from Block Content.
+   */
+  private static function blockContentBlockUsage(): ?BlockContentBlockUsageInterface {
+    /** @var \Drupal\block_content\BlockUsage\BlockContentBlockUsageInterface */
+    return \Drupal::getContainer()->get(BlockContentBlockUsageInterface::class, ContainerInterface::NULL_ON_INVALID_REFERENCE);
   }
 
 }

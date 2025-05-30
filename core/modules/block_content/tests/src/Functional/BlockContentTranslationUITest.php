@@ -52,8 +52,6 @@ class BlockContentTranslationUITest extends ContentTranslationUITestBase {
     $this->testLanguageSelector = FALSE;
     parent::setUp();
     $this->doSetup();
-
-    $this->drupalPlaceBlock('page_title_block');
   }
 
   /**
@@ -76,7 +74,6 @@ class BlockContentTranslationUITest extends ContentTranslationUITestBase {
     return array_merge(parent::getTranslatorPermissions(), [
       'translate any entity',
       'access administration pages',
-      'administer blocks',
       'administer block_content fields',
       'access block library',
       'create basic block content',
