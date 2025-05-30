@@ -1009,7 +1009,7 @@ class EntityFieldTest extends EntityKernelTestBase {
     }
 
     if (is_null($exception_on_invalid)) {
-      $this->expectDeprecation('Throwing an exception when calling Drupal\Core\Entity\ContentEntityBase::get on an invalid field name without the setting the second "$exception_on_invalid" parameter is deprecated in drupal:11.2.0 and will return NULL unless $throw_exception is explicitly set to TRUE in drupal:13.0.0. See https://www.drupal.org/node/3522223');
+      $this->expectDeprecation('Throwing an exception when calling Drupal\Core\Entity\ContentEntityBase::get on an invalid field name without the setting the second "$exception_on_invalid" parameter is deprecated in drupal:11.3.0 and will return NULL unless $throw_exception is explicitly set to TRUE in drupal:13.0.0. See https://www.drupal.org/node/3522223');
       $value = $entity->get('field_does_not_exist')?->value;
     }
     else {
