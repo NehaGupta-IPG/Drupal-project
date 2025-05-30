@@ -65,7 +65,7 @@ class ListFilterTestController extends ControllerBase {
       ],
       [
         'name' => 'Pulp Fiction',
-        'description' => 'The lives of two mob hitmen, a sub boxer, and others intertwine in four tales of violence and redemption.',
+        'description' => 'The lives of two mob hitmen, a boxer, and others intertwine in four tales of violence and redemption.',
         'category' => 'Drama',
         'likes' => 980,
         'release_date' => '1994-10-14',
@@ -157,7 +157,7 @@ class ListFilterTestController extends ControllerBase {
         break;
 
       default:
-        return [];
+        return $filterElement;
     }
     return $filterElement;
   }

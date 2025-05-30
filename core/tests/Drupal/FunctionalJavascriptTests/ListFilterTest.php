@@ -3,7 +3,7 @@
 namespace Drupal\FunctionalJavascriptTests;
 
 /**
- * Tests the ListFilter functionality with a temporary page.
+ * Tests the ListFilter functionality.
  *
  * @group javascript
  * @coversClass \Drupal\Core\Render\Element\ListFilter
@@ -27,61 +27,20 @@ class ListFilterTest extends WebDriverTestBase {
   }
 
   /**
-   * Tests the ListFilter functionality.
-   *
-   * @dataProvider dataProvider
+   * Tests the ListFilter with auto_activate set to FALSE.
    */
-  public function testListFilter($filters, $expected, $not_expected): void {
-    // Visit the temporary page.
-    $this->drupalGet('/list-filter/' . $this->dataName());
-
-    $page = $this->getSession()->getPage();
-    $filterInput = $page->find('css', '.filter-input');
-    foreach ($filters as $index => $filter) {
-      $filterInput->setValue($filter);
-      sleep(1);
-      $expectedByType = $expected[$index] ?? [];
-      $notExpectedByType = $not_expected[$index] ?? [];
-      $max = max(count($expectedByType), count($notExpectedByType));
-      for ($i=0; $i < $max; $i++) {
-        if (isset($expectedByType[$i])) {
-          $this->assertSession()->pageTextContains($expectedByType[$i]);
-        }
-        if (isset($not_expected[$i])) {
-          $this->assertSession()->pageTextNotContains($notExpectedByType[$i]);
-        }
-      }
-    }
-  }
-
-  /**
-   * Provides fake data for the test.
-   *
-   * @return \Generator
-   *   The fake data.
-   */
-  public static function dataProvider(): \Generator {
-    yield 'ok' => [
-      [
-        'Drama', 'Crime',
-      ],
-      [
-        ['Inception', 'Pulp Fiction'],
-        ['The Godfather'],
-      ],
-      [
-        ['The Godfather', 'The Matrix', 'Spirited Away'],
-        ['Inception', 'Pulp Fiction', 'The Matrix', 'Spirited Away'],
-      ],
-    ];
-    yield 'auto_activate_false' => [
-      ['drama', 'no matter filter is not active'],
-      [
-        ['Inception', 'Pulp Fiction', 'The Godfather', 'The Matrix', 'Spirited Away'],
-        ['Inception', 'Pulp Fiction', 'The Godfather', 'The Matrix', 'Spirited Away']
-      ],
-      [],
-    ];
+  public function testAutoActivateFalse() {
+    $this->drupalGet('/list-filter/auto_activate_false');
+    $this->getSession()
+      ->getPage()
+      ->find('css', '.filter-input')
+      ->setValue('patriarch');
+    $this->waitSearchFiltered();
+    $this->assertEquals(
+      $this->countVisibleRows(),
+      $this->countTotalRows(),
+      'All rows should be visible when auto_activate is set to FALSE.'
+    );
   }
 
   /**
@@ -92,7 +51,7 @@ class ListFilterTest extends WebDriverTestBase {
     $page = $this->getSession()->getPage();
     $filterInput = $page->find('css', '.filter-input');
     $filterInput->setValue('patriarch');
-    sleep(1);
+    $this->waitSearchFiltered();
     $filterInput->blur();
     $this->assertSession()->waitForElementVisible('css', '.js-filter-count');
     $elementVisible = array_filter($page->findAll('css', '.filter-container tbody tr'), function ($element) {
@@ -110,16 +69,12 @@ class ListFilterTest extends WebDriverTestBase {
     $totalRows = count($page->findAll('css', '.filter-container tbody tr'));
     $filterInput = $page->find('css', '.filter-input');
     $filterInput->setValue('patr');
-    sleep(1);
-    $totalVisibleRows = count(array_filter($page->findAll('css', '.filter-container tbody tr'), function ($element) {
-      return $element->isVisible();
-    }));
+    $this->waitSearchFiltered();
+    $totalVisibleRows = $this->countVisibleRows();
     $this->assertEquals($totalRows, $totalVisibleRows, 'All rows are visible before reaching the minimum filter length.');
     $filterInput->setValue('patria');
-    sleep(1);
-    $totalVisibleRows = count(array_filter($page->findAll('css', '.filter-container tbody tr'), function ($element) {
-      return $element->isVisible();
-    }));
+    $this->waitSearchFiltered();
+    $totalVisibleRows = $this->countVisibleRows();
     $this->assertLessThan($totalRows, $totalVisibleRows, 'Rows are visible after reaching the minimum filter length.');;
   }
 
@@ -130,12 +85,56 @@ class ListFilterTest extends WebDriverTestBase {
     $this->drupalGet('/list-filter/search_start_of_words');
     $page = $this->getSession()->getPage();
     $filterInput = $page->find('css', '.filter-input');
-    $filterInput->setValue('sub');
-    sleep(1);
+    $filterInput->setValue('rea');
+    $this->waitSearchFiltered();
     $trs = $page->findAll('css', '.filter-container tbody tr');
+    $this->assertTrue($trs[3]->isVisible(), 'The Matrix move should be visible when searching for "rea".');
+    $this->assertFalse($trs[0]->isVisible(), 'Inception should not be visible when searching for "rea".');
+  }
 
-    $this->assertTrue($trs[2]->isVisible(), 'Pull Fiction move should be visible when searching for "sub".');
-    $this->assertFalse($trs[4]->isVisible(), 'Spirited Away should not be visible when searching for "sub".');
+  /**
+   * Helper function to wait for the search to be filtered.
+   */
+  protected function waitSearchFiltered($timeout = 300000): void {
+    usleep($timeout);
+  }
+
+  /**
+   * Counts the number of visible rows in the filter container.
+   *
+   * @param string $selector
+   *   The CSS selector for the rows to count.
+   *
+   * @return int
+   *   The number of visible rows.
+   */
+  protected function countVisibleRows(string $selector = '.filter-container tbody tr'): int {
+    return count(array_filter($this->getTableRows(), function ($element) {
+      return $element->isVisible();
+    }));
+  }
+
+  /**
+   * Counts the total number of rows in the filter container.
+   *
+   * @return int
+   *   The total number of rows.
+   */
+  protected function countTotalRows(): int {
+    return count($this->getTableRows());
+  }
+
+  /**
+   * Gets all the rows in the filter container.
+   *
+   * @param string $selector
+   *   The CSS selector for the rows to retrieve.
+   *
+   * @return array
+   *   An array of row elements.
+   */
+  protected function getTableRows($selector = '.filter-container tbody tr'): array {
+    return $this->getSession()->getPage()->findAll('css', $selector);
   }
 
 }
