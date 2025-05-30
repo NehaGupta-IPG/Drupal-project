@@ -143,7 +143,11 @@ trait UpdatePathTestTrait {
           continue;
         }
         $config = $this->config($name);
-        $this->assertConfigSchema($typed_config, $name, $config->get());
+
+        $test_file_name = (new \ReflectionClass($this))->getFileName();
+        // @todo Decide in https://www.drupal.org/project/drupal/issues/3395099 when/how to trigger deprecation errors or even failures for contrib modules.
+        $is_core_test = str_starts_with($test_file_name, $this->root . DIRECTORY_SEPARATOR . 'core');
+        $this->assertConfigSchema($typed_config, $name, $config->get(), $is_core_test);
       }
 
       // Ensure that the update hooks updated all entity schema.

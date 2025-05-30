@@ -23,9 +23,12 @@ trait SchemaCheckTestTrait {
    *   The configuration name.
    * @param array $config_data
    *   The configuration data.
+   * @param bool $validate_constraints
+   *   Determines if constraints will be validated. If TRUE, constraint
+   *   validation errors will be added to the errors found.
    */
-  public function assertConfigSchema(TypedConfigManagerInterface $typed_config, $config_name, $config_data) {
-    $check = $this->checkConfigSchema($typed_config, $config_name, $config_data);
+  public function assertConfigSchema(TypedConfigManagerInterface $typed_config, $config_name, $config_data, bool $validate_constraints = FALSE) {
+    $check = $this->checkConfigSchema($typed_config, $config_name, $config_data, $validate_constraints);
     $message = '';
     if ($check === FALSE) {
       $message = 'Error: No schema exists.';
