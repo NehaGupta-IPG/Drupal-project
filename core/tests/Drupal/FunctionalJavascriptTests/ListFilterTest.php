@@ -50,14 +50,11 @@ class ListFilterTest extends WebDriverTestBase {
     $this->drupalGet('/list-filter/override_library');
     $page = $this->getSession()->getPage();
     $filterInput = $page->find('css', '.filter-input');
-    $filterInput->setValue('patriarch');
+    $filterInput->setValue('patri');
     $this->waitSearchFiltered();
     $filterInput->blur();
     $this->assertSession()->waitForElementVisible('css', '.js-filter-count');
-    $elementVisible = array_filter($page->findAll('css', '.filter-container tbody tr'), function ($element) {
-      return $element->isVisible();
-    });
-    $this->assertSession()->pageTextContains('Results found: ' . count($elementVisible));
+    $this->assertSession()->pageTextContains('Results found: ' . $this->countVisibleRows());
   }
 
   /**

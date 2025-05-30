@@ -151,6 +151,12 @@
     });
   }
 
+  const defaultOptions = {
+    minQueryLength: 2,
+    searchFromWordStart: false,
+    debug: false,
+  };
+
   /**
    * List filter object.
    *
@@ -162,6 +168,11 @@
      * Total rows matched by the filter.
      */
     matchedRows: null,
+
+    /**
+     * @todo improve this variable or how can we handle the end of searching.
+     */
+    searchingFinished: undefined,
 
     /**
      * Hides an element. Can be overridden.
@@ -194,12 +205,16 @@
     /**
      * Announces the number of matches. Can be overridden.
      *
+     * @todo add this function in the override filter "constructor"
+     *
      * @type {function}
      */
     announce: defaultAnnounce,
 
     /*
      * Builds filter items from the table element. Can be overridden.
+     *
+     * @todo add this function in the override filter "constructor"
      *
      * @type {function}
      * @param {HTMLElement} tableElement
@@ -217,17 +232,69 @@
 
     /**
      * Default options for the filter.
+     * @todo update this instance when filter created.
      *
      * @type {object}
      */
-    options: {
-      minQueryLength: 2,
-      searchFromWordStart: false,
-      debug: false,
+    options: {},
+
+    defaultDebug: (tableElement, rowSelector, targetSelector) => {
+      tableElement.style.outline = '2px solid red';
+      tableElement.querySelectorAll(rowSelector)?.forEach((item) => {
+        item.style.backgroundColor = 'yellow';
+        if (targetSelector) {
+          item.querySelectorAll(targetSelector)?.forEach((target) => {
+            target.style.outline = 'green 2px dotted';
+          });
+        }
+      });
+    },
+
+    /**
+     * Controll opened status of Detail elements.
+     * 
+     * @param {boolean} reset 
+     * @param {HTMLElement} label 
+     */
+    checkDetailedLabels: function (reset, label) {
+      if (!reset && !label.open) {
+        label.open = true;
+        label.dataset.openedByFilter = true;
+      } else if (reset && label.dataset.openedByFilter) {
+        label.open = false;
+        delete label.dataset.openedByFilter;
+      }
+    },
+
+    /**
+     * Checks and updates the visibility of labels.
+     *
+     * @param {boolean} [reset=false]
+     *   Whether to reset the label state.
+     */
+    checkLabels: function (labels, reset = false) {
+      for (const label of labels) {
+        const anyVisible = Array.from(label.labelledItems).some(
+          (element) => !element.hasAttribute('hidden'),
+        );
+        if (!anyVisible) {
+          this.hideElement(label);
+          continue;
+        }
+        // @todo make the function to process other node types overridable, for example, fieldset elements.
+        // we can check if the function exists then call it, or we can use a different approach.
+        // like this[checkFIELDSETLabels](reset, label);
+        if (label.nodeName === 'DETAILS') {
+          this.checkDetailedLabels(reset, label);
+        }
+        this.showElement(label);
+      }
     },
 
     /**
      * Filters table/list rows based on input.
+     *
+     * @todo update options documentation and sync with onFilter function overrides.
      *
      * @function Drupal.listFilter.filter
      * @param {object} options
@@ -244,7 +311,7 @@
      *   - hideElement: {function} (Optional) Custom hideElement override.
      *   - showElement: {function} (Optional) Custom showElement override.
      */
-    filter(options) {
+    filter: function (options) {
       const {
         inputElement,
         tableSelector,
@@ -253,20 +320,24 @@
         singularLabel = null,
         pluralLabel = null,
         fullLabel = null,
-        minQueryLength = listFilter.options.minQueryLength,
-        searchFromWordStart = listFilter.options.searchFromWordStart,
-        debug = listFilter.options.debug,
-        hideElement = listFilter.hideElement,
-        showElement = listFilter.showElement,
-        searchMethod = listFilter.searchMethod,
+        minQueryLength = defaultOptions.minQueryLength,
+        searchFromWordStart = defaultOptions.searchFromWordStart,
+        debug = defaultOptions.debug,
+        hideElement,
+        showElement,
+        searchMethod,
+        searchingFinished,
       } = options;
+      this.showElement = showElement;
+      this.hideElement = hideElement;
+      this.searchingFinished = searchingFinished;
       const tables = document.querySelectorAll(tableSelector);
 
       for (const tableElement of tables) {
         let filterItemsTransitional = null;
         let queryTransitional = '';
 
-        const filterItems = listFilter.filterItemsBuilder(
+        const filterItems = this.filterItemsBuilder(
           tableElement,
           rowSelector,
           targetSelector,
@@ -283,42 +354,15 @@
         }
 
         /**
-         * Checks and updates the visibility of labels.
-         *
-         * @param {boolean} [reset=false]
-         *   Whether to reset the label state.
-         */
-        function checkLabels(reset = false) {
-          for (const label of labels) {
-            const anyVisible = Array.from(label.labelledItems).some(
-              (element) => !element.hasAttribute('hidden'),
-            );
-            if (anyVisible) {
-              if (label.nodeName === 'DETAILS') {
-                if (!reset && !label.open) {
-                  label.open = true;
-                  label.dataset.openedByFilter = true;
-                } else if (reset && label.dataset.openedByFilter) {
-                  label.open = false;
-                  delete label.dataset.openedByFilter;
-                }
-              }
-              showElement(label); // Use override or default
-            } else {
-              hideElement(label); // Use override or default
-            }
-          }
-        }
-
-        /**
          * Filters the table/list based on the input event.
          *
          * @param {Event} e
          *   The input event.
          */
         function filterTableList(e) {
+          e = e.detail.event;
           tableElement.classList.remove('js-list-filtered');
-          const query = listFilter.normalizeString(e.target.value);
+          const query = this.normalizeString(e.target.value);
           const queryContinuation = query.startsWith(queryTransitional);
 
           if (queryContinuation && filterItemsTransitional.length === 0) return;
@@ -330,46 +374,41 @@
             const matches = [];
             for (const item of filterItemsTransitional) {
               if (!searchMethod(item.textContent, query, searchFromWordStart)) {
-                hideElement(item.node); // Use override or default
+                hideElement(item.node);
               } else {
-                showElement(item.node); // Use override or default
+                this.showElement(item.node);
                 matches.push(item);
               }
             }
-            listFilter.announce(
+            this.announce(
               matches.length,
               singularLabel,
               pluralLabel,
               SINGULAR_PHRASE,
               PLURAL_PHRASE
             );
-            checkLabels();
+            this.checkLabels(labels);
             filterItemsTransitional = matches;
           } else {
             for (const item of filterItems) {
-              showElement(item.node); // Use override or default
+              this.showElement(item.node); // Use override or default
             }
             Drupal.announce(fullLabel ?? ALL_PHRASE);
-            checkLabels(true);
+            this.checkLabels(labels, true);
             filterItemsTransitional = filterItems;
           }
-          listFilter.matchedRows = filterItemsTransitional.length;
+          this.matchedRows = filterItemsTransitional.length;
           tableElement.classList.add('js-list-filtered');
+          if (this.searchingFinished !== undefined) {
+            this.searchingFinished();
+          }
           queryTransitional = query;
         }
 
-        tableElement.addEventListener(FILTER_EVENT, (e) => filterTableList(e.detail.event));
+        tableElement.addEventListener(FILTER_EVENT, filterTableList.bind(this));
 
         if (debug) {
-          tableElement.style.outline = '2px solid red';
-          tableElement.querySelectorAll(rowSelector)?.forEach((item) => {
-            item.style.backgroundColor = 'yellow';
-            if (targetSelector) {
-              item.querySelectorAll(targetSelector)?.forEach((target) => {
-                target.style.outline = 'green 2px dotted';
-              });
-            }
-          });
+          this.defaultDebug(tableElement, rowSelector, targetSelector);
         }
       }
 
@@ -392,23 +431,18 @@
       });
       return listFilter;
     },
-  };
 
-  /**
-   * Expose the listFilter object.
-   *
-   * @namespace Drupal.listFilter
-   */
-  Drupal.listFilter = listFilter;
-
-  /**
-   * Behavior to attach the list filter to elements.
-   *
-   * @namespace Drupal.behaviors.drupalListFilter
-   */
-  Drupal.behaviors.drupalListFilter = {
-    attach(context) {
-      once('drupal-list-filter', '.table-filter-text[data-auto-activate="true"]', context).forEach(
+    /**
+     * Attaches the filter to input elements.
+     *
+     * @todo document all override options.
+     *
+     * @param inputFilter
+     * @param context
+     * @param overrides
+     */
+    onFilter: function (inputFilter, context, overrides = {}) {
+      once('drupal-list-filter', inputFilter, context).forEach(
         (input) => {
           const {
             table,
@@ -421,7 +455,6 @@
             searchStart,
             debug
           } = input.dataset;
-
           input.addEventListener(
             'focus',
             () => {
@@ -438,12 +471,35 @@
                   : undefined,
                 searchFromWordStart: searchStart === 'true',
                 debug: debug === 'true',
+                hideElement: overrides.hideElement || defaultHideElement,
+                showElement: overrides.showElement || defaultShowElement,
+                normalizeString: overrides.normalizeString || defaultNormalizeString,
+                searchMethod: overrides.searchMethod || defaultSearchMethod,
+                searchingFinished: overrides?.searchingFinished,
               });
             },
             { once: true },
           );
         },
       );
+    },
+  };
+
+  /**
+   * Expose the listFilter object.
+   *
+   * @namespace Drupal.listFilter
+   */
+  Drupal.listFilter = listFilter;
+
+  /**
+   * Behavior to attach the list filter to elements.
+   *
+   * @namespace Drupal.behaviors.drupalListFilter
+   */
+  Drupal.behaviors.drupalListFilter = {
+    attach(context) {
+      Drupal.listFilter.onFilter('.table-filter-text[data-auto-activate="true"]', context);
     },
   };
 })(Drupal, Drupal.debounce, once);
