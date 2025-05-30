@@ -310,7 +310,6 @@ class EntityTranslationTest extends EntityLanguageTestBase {
    */
   #[IgnoreDeprecations]
   public function testEntityTranslationAPI(): void {
-    $this->expectDeprecation('Throwing an exception when calling Drupal\Core\Entity\ContentEntityBase::get on an invalid field name without the setting the second "$exception_on_invalid" parameter is deprecated in drupal:11.3.0 and will return NULL unless $exception_on_invalid is explicitly set to TRUE in drupal:13.0.0. See https://www.drupal.org/node/3522223');
     // Test all entity variations with data table support.
     foreach (EntityTestHelper::getEntityTypes(EntityTestTypesFilter::Multilingual) as $entity_type) {
       $this->doTestEntityTranslationAPI($entity_type);
