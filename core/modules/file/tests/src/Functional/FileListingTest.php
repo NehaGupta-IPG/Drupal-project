@@ -173,28 +173,6 @@ class FileListingTest extends FileFieldTestBase {
       $this->assertSession()->linkByHrefExists('node/' . $node->id(), 0, 'Link to registering entity found on usage page.');
     }
 
-    // Delete both the files to check bulk form.
-    $edit = [
-      'action' => 'file_delete_action',
-      'file_bulk_form[0]' => 1,
-      'file_bulk_form[1]' => 1,
-    ];
-    $this->drupalGet('admin/content/files');
-    $this->submitForm($edit, 'Apply to selected items');
-    $this->assertSession()->addressEquals(Url::fromRoute('file.multiple_delete_confirm', [], [
-      'query' => [
-        'destination' => Url::fromRoute('view.files.page_1')->toString(),
-        'display_id' => 'page_1',
-      ],
-    ]));
-    $this->assertLinkByHref('admin/content/files');
-    $this->clickLink('Cancel');
-    $this->assertSession()->addressEquals('admin/content/files');
-    $this->submitForm($edit, 'Apply to selected items');
-    $this->assertText('Are you sure you want to delete these items?');
-    $this->submitForm([], 'Delete');
-    $this->assertText('Deleted 2 files.');
-
     // Log in as another user that has access to the file list but cannot delete
     // files.
     $role_id = $this->drupalCreateRole([
@@ -231,6 +209,29 @@ class FileListingTest extends FileFieldTestBase {
     $this->assertSession()->buttonExists('Delete')->press();
     $this->assertSession()->pageTextContains('The file druplicon.txt has been deleted.');
     $this->assertFileDoesNotExist($file_uri);
+
+    // Delete both the files to check bulk form.
+    $edit = [
+      'action' => 'file_delete_action',
+      'file_bulk_form[0]' => 1,
+      'file_bulk_form[1]' => 1,
+    ];
+    $this->drupalGet('admin/content/files');
+    $this->submitForm($edit, 'Apply to selected items');
+    $this->assertSession()->addressEquals(Url::fromRoute('file.multiple_delete_confirm', [], [
+      'query' => [
+        'destination' => Url::fromRoute('view.files.page_1')->toString(),
+        'view_id' => 'files',
+        'display_id' => 'page_1',
+      ],
+    ]));
+    $this->assertSession()->linkByHrefExists('/admin/content/files');
+    $this->clickLink('Cancel');
+    $this->assertSession()->addressEquals('admin/content/files');
+    $this->submitForm($edit, 'Apply to selected items');
+    $this->assertSession()->pageTextContains('Are you sure you want to delete these items?');
+    $this->submitForm([], 'Delete');
+    $this->assertSession()->pageTextContains('Deleted 2 files.');
   }
 
   /**
