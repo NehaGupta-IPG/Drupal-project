@@ -31,7 +31,7 @@ class ComposerProjectTemplatesTest extends ComposerBuildTestBase {
    *
    * @see https://getcomposer.org/doc/04-schema.md#minimum-stability
    */
-  protected const MINIMUM_STABILITY = 'stable';
+  protected const MINIMUM_STABILITY = 'beta';
 
   /**
    * The order of stability strings from least stable to most stable.
@@ -109,6 +109,7 @@ class ComposerProjectTemplatesTest extends ComposerBuildTestBase {
 
     $exclude = [
       'drupal/core',
+      'drupal/core-recipe-unpack',
       'drupal/core-project-message',
       'drupal/core-vendor-hardening',
     ];

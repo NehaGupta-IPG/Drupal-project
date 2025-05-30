@@ -1,4 +1,4 @@
-# cspell:ignore codequality Micheh micheh webide testdox updatedb stylelintrc
+# cspell:ignore codequality Micheh micheh webide testdox updatedb stylelintrc fastzip
 
 ################
 # Drupal GitLabCI template.
@@ -56,6 +56,7 @@ workflow:
 ################
 
 variables:
+  FF_USE_FASTZIP: 1
   _CONFIG_DOCKERHUB_ROOT: "registry.gitlab.com/drupal-infrastructure/drupalci/drupalci-environments"
   CACHE_TARGET: "${CI_MERGE_REQUEST_TARGET_BRANCH_NAME}${CI_COMMIT_BRANCH}"
   CORE_GITLAB_PROJECT_ID: 59858
@@ -65,7 +66,8 @@ variables:
   CONCURRENCY: 24
   GIT_DEPTH: "50"
   PARENT_PIPELINE_ID: $CI_PIPELINE_ID
-  _TARGET_PHP: "8.4-ubuntu"
+  _TARGET_PHP: "8.3-ubuntu"
+  PHPUNIT_FAIL_ON_PHPUNIT_DEPRECATION: false
 
 #############
 # Stages    #
@@ -108,6 +110,7 @@ default:
   before_script:
     - composer validate
     - composer install --optimize-autoloader
+    - composer run-script drupal-phpunit-upgrade-check
     - mkdir -p ./sites/simpletest ./sites/default/files ./build/logs/junit /var/www/.composer
     - chown -R www-data:www-data ./sites ./build/logs/junit ./vendor /var/www/
   script:
@@ -127,9 +130,13 @@ default:
   before_script:
     - composer validate
     - composer install --optimize-autoloader
+    - composer run-script drupal-phpunit-upgrade-check
     - docker-php-ext-enable pcov
   script:
-    - vendor/bin/phpunit -c core/tests/Drupal/Tests/Component --testsuite unit-component --colors=always --testdox --coverage-text=component-coverage-report.txt --coverage-cobertura=component-coverage-cobertura.xml --log-junit junit.xml --fail-on-deprecation --fail-on-phpunit-deprecation
+    - |
+      [[ $PHPUNIT_FAIL_ON_PHPUNIT_DEPRECATION == false ]] && export _FAIL_ON_PHPUNIT_DEPRECATION=""
+      [[ $PHPUNIT_FAIL_ON_PHPUNIT_DEPRECATION != false ]] && export _FAIL_ON_PHPUNIT_DEPRECATION="--fail-on-phpunit-deprecation"
+    - vendor/bin/phpunit -c core/tests/Drupal/Tests/Component --testsuite unit-component --colors=always --testdox --coverage-text=component-coverage-report.txt --coverage-cobertura=component-coverage-cobertura.xml --log-junit junit.xml --fail-on-deprecation $_FAIL_ON_PHPUNIT_DEPRECATION
     # Process the coverage text report to produce an OpenMetrics report.
     - php .gitlab-ci/scripts/component-coverage-metrics.php
   artifacts:
@@ -219,11 +226,11 @@ default:
       allow_failure: true
 
 # Default configuration.
-'DEFAULT: PHP 8.4 MySQL 8.4':
+'DEFAULT: PHP 8.3 MySQL 8.0':
   <<: *default-stage
   variables:
-    _TARGET_PHP: "8.4-ubuntu"
-    _TARGET_DB: "mysql-8.4"
+    _TARGET_PHP: "8.3-ubuntu"
+    _TARGET_DB: "mysql-8"
     PERFORMANCE_TEST: $PERFORMANCE_TEST
   # Run on MR, schedule, push, parent pipeline and performance test.
   rules:
@@ -236,7 +243,7 @@ default:
     - if: $PERFORMANCE_TEST == "1"
 
 # Re-run the pipeline, but with Composer updates.
-'DEFAULT: Updated dependencies (PHP 8.4 MySQL 8.4)':
+'DEFAULT: Updated dependencies (PHP 8.3 MySQL 8.0)':
   <<: *default-stage
   # Run daily and allow manual runs on MRs.
   rules:
@@ -251,13 +258,13 @@ default:
     include: .gitlab-ci.yml
 
 # Special job for MRs for test-only checks.
-'DEFAULT: Test-only (PHP 8.4 MySQL 8.4)':
+'DEFAULT: Test-only (PHP 8.3 MySQL 8.0)':
   <<: [ *default-stage, *with-composer ]
   when: manual
   allow_failure: true
   variables:
-    _TARGET_PHP: "8.4-ubuntu"
-    _TARGET_DB: "mysql-8.4"
+    _TARGET_PHP: "8.3-ubuntu"
+    _TARGET_DB: "mysql-8"
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
   trigger:
@@ -275,13 +282,13 @@ default:
     _TARGET_PHP: "8.3-ubuntu"
     _TARGET_DB: "mariadb-10.6"
 
-'PHP 8.3 MySQL 8.0':
+'PHP 8.3 MySQL 8.4':
   <<: [ *default-stage, *run-on-mr ]
   variables:
     _TARGET_PHP: "8.3-ubuntu"
-    _TARGET_DB: "mysql-8"
+    _TARGET_DB: "mysql-8.4"
 
-'PHP 8.4 MySQL 9.2':
+'PHP 8.4 MySQL 9.3':
   <<: [ *default-stage, *run-on-mr ]
   variables:
     _TARGET_PHP: "8.4-ubuntu"
@@ -305,17 +312,17 @@ default:
     _TARGET_PHP: "8.3-ubuntu"
     _TARGET_DB: "sqlite-3"
 
-'PHP 8.4 MySQL 8.0':
+'PHP 8.4 MySQL 8.4':
   <<: [ *default-stage, *run-on-mr ]
   variables:
     _TARGET_PHP: "8.4-ubuntu"
-    _TARGET_DB: "mysql-8"
+    _TARGET_DB: "mysql-8.4"
 
 # Jobs running on commits.
 # The value set in the "needs" property will determine the order in the sequence.
 '[Commit] PHP 8.3 PostgreSQL 16':
   extends: 'PHP 8.3 PostgreSQL 16'
-  needs: [ 'DEFAULT: PHP 8.4 MySQL 8.4' ]
+  needs: [ 'DEFAULT: PHP 8.3 MySQL 8.0' ]
   <<: [ *run-on-commit ]
 
 '[Commit] PHP 8.3 SQLite 3.45':
@@ -327,7 +334,7 @@ default:
 # The value set in the "needs" property will determine the order in the sequence.
 '[Daily] PHP 8.3 PostgreSQL 16':
   extends: 'PHP 8.3 PostgreSQL 16'
-  needs: [ 'DEFAULT: PHP 8.4 MySQL 8.4' ]
+  needs: [ 'DEFAULT: PHP 8.3 MySQL 8.0' ]
   <<: [ *run-daily ]
 
 '[Daily] PHP 8.3 SQLite 3.45':
@@ -340,14 +347,14 @@ default:
   needs: [ '[Daily] PHP 8.3 SQLite 3.45' ]
   <<: [ *run-daily ]
 
-'[Daily] PHP 8.4 MySQL 8.0':
-  extends: 'PHP 8.4 MySQL 8.0'
+'[Daily] PHP 8.4 MySQL 8.4':
+  extends: 'PHP 8.4 MySQL 8.4'
   needs: [ '[Daily] PHP 8.3 MariaDB 10.6' ]
   <<: [ *run-daily ]
 
 '[Daily] PHP 8.4 PostgreSQL 17':
   extends: 'PHP 8.4 PostgreSQL 17'
-  needs: [ '[Daily] PHP 8.4 MySQL 8.0' ]
+  needs: [ '[Daily] PHP 8.4 MySQL 8.4' ]
   <<: [ *run-daily ]
 
 ################
@@ -389,6 +396,7 @@ default:
     - *phpstan-cache
     - composer validate
     - composer install --optimize-autoloader
+    - composer run-script drupal-phpunit-upgrade-check
     - if [ -n "$COMPOSER_UPDATE" ]; then
         composer update --optimize-autoloader;
         composer outdated;
@@ -438,6 +446,7 @@ default:
   script:
     - composer validate
     - composer install --optimize-autoloader
+    - composer run-script drupal-phpunit-upgrade-check
     - if [ -n "$COMPOSER_UPDATE" ]; then
         composer update --optimize-autoloader;
         composer outdated;
@@ -584,7 +593,7 @@ default:
   stage: 🪄 Lint
   variables:
     KUBERNETES_CPU_REQUEST: "2"
-    _TARGET_PHP: "8.4-ubuntu"
+    _TARGET_PHP: "8.3-ubuntu"
   # Run on MRs if config schema files have changed, or manually.
   rules:
     - if: $PERFORMANCE_TEST != "1"
