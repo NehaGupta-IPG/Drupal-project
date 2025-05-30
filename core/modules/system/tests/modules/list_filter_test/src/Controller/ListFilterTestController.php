@@ -65,7 +65,7 @@ class ListFilterTestController extends ControllerBase {
       ],
       [
         'name' => 'Pulp Fiction',
-        'description' => 'The lives of two mob hitmen, a boxer, and others intertwine in four tales of violence and redemption.',
+        'description' => 'The lives of two mob hitmen, a sub boxer, and others intertwine in four tales of violence and redemption.',
         'category' => 'Drama',
         'likes' => 980,
         'release_date' => '1994-10-14',
@@ -144,7 +144,12 @@ class ListFilterTestController extends ControllerBase {
   protected function overrideFilterElementSettings($test_case): array {
     $filterElement = $this->getDefaultFilterElementSettings();
     switch ($test_case) {
-      case 'ok':
+      case 'minimum_filter_length':
+        $filterElement['#minimum_filter_length'] = 5;
+        break;
+
+      case 'search_start_of_words':
+        $filterElement['#search_start_of_words'] = TRUE;
         break;
 
       case 'auto_activate_false':
