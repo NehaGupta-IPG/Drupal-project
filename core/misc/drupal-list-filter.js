@@ -317,7 +317,7 @@
          *   The input event.
          */
         function filterTableList(e) {
-          tableElement.classList.remove('js-list-filtering');
+          tableElement.classList.remove('js-list-filtered');
           const query = listFilter.normalizeString(e.target.value);
           const queryContinuation = query.startsWith(queryTransitional);
 
