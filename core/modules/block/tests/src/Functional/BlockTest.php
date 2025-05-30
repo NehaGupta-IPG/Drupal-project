@@ -85,7 +85,7 @@ class BlockTest extends BlockTestBase {
   /**
    * Tests the negate condition for block's role visibility settings.
    */
-  public function testBlockRoleVisibilityNegateCondition() {
+  public function testBlockRoleVisibilityNegateCondition(): void {
     $block_name = 'system_powered_by_block';
     // Create a random title for the block.
     $title = $this->randomMachineName(8);
