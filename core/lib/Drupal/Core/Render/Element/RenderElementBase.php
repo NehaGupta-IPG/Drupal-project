@@ -701,6 +701,7 @@ abstract class RenderElementBase extends PluginBase implements ElementInterface,
    */
   public function changeType(string $class): ElementInterface {
     $this->storage['#type'] = $this->elementInfoManager()->getIdFromClass($class);
+    unset($this->storage['##object']);
     return $this->elementInfoManager()->fromRenderable($this->storage);
   }
 
