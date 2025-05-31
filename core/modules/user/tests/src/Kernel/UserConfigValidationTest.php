@@ -47,7 +47,7 @@ class UserConfigValidationTest extends KernelTestBase {
       "Invalid password_reset_timeout" => [
         'password_reset_timeout',
         '0',
-        'This value should be <em class="placeholder">1</em> or more.',
+        'This value should be <em class="placeholder">300</em> or more.',
       ],
     ];
   }
