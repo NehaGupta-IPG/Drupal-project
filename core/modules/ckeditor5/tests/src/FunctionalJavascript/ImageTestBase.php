@@ -66,14 +66,18 @@ abstract class ImageTestBase extends CKEditor5TestBase {
    *
    * @param bool $reverse
    *   Reverse attributes when printing them.
+   * @param array $excludedAttributes
+   *   Attributes to exclude.
    *
    * @return string
    *   A space-separated string of image attributes.
    */
-  protected function imageAttributesAsString($reverse = FALSE) {
+  protected function imageAttributesAsString($reverse = FALSE, array $excludedAttributes = []) {
     $string = [];
     foreach ($this->imageAttributes() as $key => $value) {
-      $string[] = $key . '="' . $value . '"';
+      if (!in_array($key, $excludedAttributes)) {
+        $string[] = $key . '="' . $value . '"';
+      }
     }
     if ($reverse) {
       $string = array_reverse($string);

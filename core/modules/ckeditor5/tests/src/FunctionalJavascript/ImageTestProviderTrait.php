@@ -210,12 +210,12 @@ trait ImageTestProviderTrait {
     // of the image.
     $expected_computed_height = $width;
     if (!str_ends_with($width, '%')) {
-      $ratio = $width / 40;
+      $ratio = $width / (int) $this->imageAttributes()['width'];
       $expected_computed_height = (string) (int) round($ratio * (int) $this->imageAttributes()['height']);
     }
 
     // Add image to the host body.
-    $this->host->body->value = sprintf('<img data-foo="bar" alt="drupalimage test image" ' . $this->imageAttributesAsString() . ' width="%s" />', $width);
+    $this->host->body->value = sprintf('<img data-foo="bar" alt="drupalimage test image" ' . $this->imageAttributesAsString(FALSE, ['width']) . ' width="%s" />', $width);
     $this->host->save();
 
     $this->drupalGet($this->host->toUrl('edit-form'));
