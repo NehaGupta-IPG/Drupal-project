@@ -122,7 +122,7 @@ class UserAccessControlHandlerTest extends UnitTestCase {
     $this->admin
       ->expects($this->any())
       ->method('hasPermission')
-      ->willreturnValueMap([
+      ->willReturnMap([
         ['administer users', TRUE],
         ['administer permissions', FALSE],
       ]);
@@ -131,7 +131,7 @@ class UserAccessControlHandlerTest extends UnitTestCase {
     $this->accountWithAdminPermsPerm
       ->expects($this->any())
       ->method('hasPermission')
-      ->willreturnValueMap([
+      ->willReturnMap([
         ['administer users', FALSE],
         ['administer permissions', TRUE],
       ]);
