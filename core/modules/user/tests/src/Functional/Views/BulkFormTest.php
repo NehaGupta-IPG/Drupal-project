@@ -179,7 +179,7 @@ class BulkFormTest extends UserTestBase {
       'user_bulk_form[3]' => TRUE,
       'action' => "user_add_role_action.$role_id",
     ];
-    $this->drupalPostForm(NULL, $edit, t('Apply to selected items'));
+    $this->drupalPostForm(NULL, $edit, 'Apply to selected items');
     $this->assertSession()->pageTextContains("Add the $role_label role to the selected user(s) was applied to 1 item.");
 
     // Check that the role has been added to the user.
@@ -192,7 +192,7 @@ class BulkFormTest extends UserTestBase {
       'user_bulk_form[3]' => TRUE,
       'action' => "user_remove_role_action.$role_id",
     ];
-    $this->submitForm($edit, t('Apply to selected items'));
+    $this->submitForm($edit, 'Apply to selected items');
     $this->assertSession()->pageTextContains("Remove the $role_label role from the selected user(s) was applied to 1 item.");
 
     // Check that the role has been removed from the user.
