@@ -8,7 +8,6 @@ use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Cache\Context\CacheContextsManager;
 use Drupal\Core\DependencyInjection\Container;
 use Drupal\Core\Session\AccountInterface;
-use Drupal\Tests\PhpunitCompatibilityTrait;
 use Drupal\Tests\UnitTestCase;
 use Drupal\user\UserAccessControlHandler;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -22,8 +21,6 @@ use PHPUnit\Framework\Attributes\Group;
 #[Group('Drupal')]
 #[Group('User')]
 class UserAccessControlHandlerTest extends UnitTestCase {
-
-  use PhpunitCompatibilityTrait;
 
   /**
    * The user access controller to test.
@@ -404,14 +401,14 @@ class UserAccessControlHandlerTest extends UnitTestCase {
    *
    * @dataProvider rolesAccessProvider
    */
-  public function testRolesAccess($viewer, $target, $view, $edit) {
+  public function testRolesAccess($viewer, $target, $view, $edit): void {
     $this->assertFieldAccess('roles', $viewer, $target, $view, $edit);
   }
 
   /**
    * Provides test data for testRolesAccess().
    */
-  public function rolesAccessProvider() {
+  public static function rolesAccessProvider(): array {
     $role_access = [
       [
         'viewer' => 'viewer',
