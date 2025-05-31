@@ -13,7 +13,6 @@ use Drupal\entity_test\EntityTestTypesFilter;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\language\Entity\ConfigurableLanguage;
-use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 
 /**
  * Tests entity translation functionality.
@@ -308,8 +307,7 @@ class EntityTranslationTest extends EntityLanguageTestBase {
   /**
    * Tests the Entity Translation API behavior.
    */
-  #[IgnoreDeprecations]
-  public function testEntityTranslationAPI(): void {
+    public function testEntityTranslationAPI(): void {
     // Test all entity variations with data table support.
     foreach (EntityTestHelper::getEntityTypes(EntityTestTypesFilter::Multilingual) as $entity_type) {
       $this->doTestEntityTranslationAPI($entity_type);
