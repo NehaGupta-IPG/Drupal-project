@@ -19,6 +19,7 @@ parameters:
     gc_maxlifetime: 200000
     cookie_lifetime: 2000000
     cookie_samesite: Lax
+    cookie_domain_bc_mode: false
     name_suffix: ''
   twig.config:
     debug: false
