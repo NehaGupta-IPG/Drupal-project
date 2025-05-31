@@ -4,11 +4,13 @@ namespace Drupal\options\Hook;
 
 use Drupal\field\FieldStorageConfigInterface;
 use Drupal\Core\Hook\Attribute\Hook;
+use Drupal\Core\StringTranslation\StringTranslationTrait;
 
 /**
  * Hook implementations for options.
  */
 class OptionsViewsHooks {
+  use StringTranslationTrait;
 
   /**
    * Implements hook_field_views_data().
@@ -29,9 +31,9 @@ class OptionsViewsHooks {
           if ($field->getType() != 'list_string') {
             $data[$table_name][$field_name . '_numeric'] = [
               'group' => $data[$table_name][$field_name]['group'],
-              'title' => $data[$table_name][$field_name]['title'] . ' ' . t('(numeric)'),
-              'title short' => $data[$table_name][$field_name]['title short'] . ' ' . t('(numeric)'),
-              'help' => t('Numeric filter for %label field.', ['%label' => $data[$table_name][$field_name]['title']]) . ' ' . $data[$table_name][$field_name]['help'],
+              'title' => $data[$table_name][$field_name]['title'] . ' ' . $this->t('(numeric)'),
+              'title short' => $data[$table_name][$field_name]['title short'] . ' ' . $this->t('(numeric)'),
+              'help' => $this->t('Numeric filter for %label field.', ['%label' => $data[$table_name][$field_name]['title']]) . ' ' . $data[$table_name][$field_name]['help'],
               'filter' => ['id' => 'numeric'] + $data[$table_name][$field_name]['filter'],
             ];
           }
