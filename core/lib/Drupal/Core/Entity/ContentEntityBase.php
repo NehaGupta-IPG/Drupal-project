@@ -3,7 +3,6 @@
 namespace Drupal\Core\Entity;
 
 use Drupal\Component\Render\FormattableMarkup;
-use Drupal\Core\Entity\Exception\UnknownFieldException;
 use Drupal\Core\Entity\Plugin\DataType\EntityReference;
 use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Field\FieldItemListInterface;
@@ -25,6 +24,11 @@ abstract class ContentEntityBase extends EntityBase implements \IteratorAggregat
     getFieldsToSkipFromTranslationChangesCheck as traitGetFieldsToSkipFromTranslationChangesCheck;
   }
   use SynchronizableEntityTrait;
+
+  /**
+   * Error code in exception when accessing an unknown field.
+   */
+  protected const UNKNOWN_FIELD = 1;
 
   /**
    * The plain data values of the contained fields.
@@ -612,8 +616,8 @@ abstract class ContentEntityBase extends EntityBase implements \IteratorAggregat
       try {
         return $this->getTranslatedField($field_name, $this->activeLangcode, $exception_on_invalid);
       }
-      catch (UnknownFieldException $e) {
-        if (!isset($arguments[1])) {
+      catch (\InvalidArgumentException $e) {
+        if ($e->getCode() == self::UNKNOWN_FIELD && !isset($arguments[1])) {
           @trigger_error('Throwing an exception when calling ' . __METHOD__ . ' on an invalid field name without the setting the second "$exception_on_invalid" parameter is deprecated in drupal:11.3.0 and will return NULL unless $exception_on_invalid is explicitly set to TRUE in drupal:13.0.0. See https://www.drupal.org/node/3522223', E_USER_DEPRECATED);
         }
         throw $e;
@@ -638,7 +642,7 @@ abstract class ContentEntityBase extends EntityBase implements \IteratorAggregat
       $definition = $this->getFieldDefinition($name);
       if (!$definition) {
         if ($exception_on_invalid) {
-          throw new UnknownFieldException("Field $name is unknown.");
+          throw new \InvalidArgumentException("Field $name is unknown.", self::UNKNOWN_FIELD);
         }
         return NULL;
       }
@@ -1102,18 +1106,10 @@ abstract class ContentEntityBase extends EntityBase implements \IteratorAggregat
    *   builders) by reference. Clean that up.
    */
   public function &__get($name) {
-    // If this is an entity field, handle it accordingly. We first check whether
-    // a field object has been already created. If not, we create one.
-    if (isset($this->fields[$name][$this->activeLangcode])) {
-      return $this->fields[$name][$this->activeLangcode];
-    }
-    // Inline getFieldDefinition() to speed things up.
-    if (!isset($this->fieldDefinitions)) {
-      $this->getFieldDefinitions();
-    }
-    if (isset($this->fieldDefinitions[$name])) {
-      $return = $this->getTranslatedField($name, $this->activeLangcode);
-      return $return;
+    // If this is an entity field, handle it accordingly.
+    if (($field = ($this->fields[$name][$this->activeLangcode] ?? NULL)) ||
+        ($field = $this->getTranslatedField($name, $this->activeLangcode, FALSE))) {
+      return $field;
     }
     if ($name === 'original') {
       // A variable is required that this technically is a return-by-reference.
@@ -1134,29 +1130,14 @@ abstract class ContentEntityBase extends EntityBase implements \IteratorAggregat
    * Uses default language always.
    */
   public function __set($name, $value) {
-    // Inline getFieldDefinition() to speed things up.
-    if (!isset($this->fieldDefinitions)) {
-      $this->getFieldDefinitions();
-    }
     // Handle Field API fields.
-    if (isset($this->fieldDefinitions[$name])) {
+    if (($field = ($this->fields[$name][$this->activeLangcode] ?? NULL)) ||
+        ($field = $this->getTranslatedField($name, $this->activeLangcode, FALSE))) {
       // Support setting values via property objects.
       if ($value instanceof TypedDataInterface) {
         $value = $value->getValue();
       }
-      // If a FieldItemList object already exists, set its value.
-      if (isset($this->fields[$name][$this->activeLangcode])) {
-        $this->fields[$name][$this->activeLangcode]->setValue($value);
-      }
-      // If not, create one.
-      else {
-        $this->getTranslatedField($name, $this->activeLangcode)->setValue($value);
-      }
-    }
-    // The translations array is unset when cloning the entity object, we just
-    // need to restore it.
-    elseif ($name == 'translations') {
-      $this->translations = $value;
+      $field->setValue($value);
     }
     elseif ($name == 'original') {
       parent::__set('original', $value);
