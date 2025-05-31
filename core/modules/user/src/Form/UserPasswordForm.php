@@ -25,39 +25,11 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 class UserPasswordForm extends FormBase implements WorkspaceSafeFormInterface {
 
   /**
-   * The user storage.
-   *
-   * @var \Drupal\user\UserStorageInterface
-   */
-  protected $userStorage;
-
-  /**
-   * The language manager.
-   *
-   * @var \Drupal\Core\Language\LanguageManagerInterface
-   */
-  protected $languageManager;
-
-  /**
-   * The flood service.
-   *
-   * @var \Drupal\Core\Flood\FloodInterface
-   */
-  protected $flood;
-
-  /**
-   * The email validator service.
-   *
-   * @var \Drupal\Component\Utility\EmailValidatorInterface
-   */
-  protected $emailValidator;
-
-  /**
    * Constructs a UserPasswordForm object.
    *
-   * @param \Drupal\user\UserStorageInterface $user_storage
+   * @param \Drupal\user\UserStorageInterface $userStorage
    *   The user storage.
-   * @param \Drupal\Core\Language\LanguageManagerInterface $language_manager
+   * @param \Drupal\Core\Language\LanguageManagerInterface $languageManager
    *   The language manager.
    * @param \Drupal\Core\Config\ConfigFactory $config_factory
    *   The config factory.
@@ -65,22 +37,18 @@ class UserPasswordForm extends FormBase implements WorkspaceSafeFormInterface {
    *   The flood service.
    * @param \Drupal\user\UserNameValidator $userNameValidator
    *   The user validator service.
-   * @param \Drupal\Component\Utility\EmailValidatorInterface $email_validator
+   * @param \Drupal\Component\Utility\EmailValidatorInterface $emailValidator
    *   The email validator service.
    */
   public function __construct(
-    UserStorageInterface $user_storage,
-    LanguageManagerInterface $language_manager,
+    protected UserStorageInterface $userStorage,
+    protected LanguageManagerInterface $languageManager,
     ConfigFactory $config_factory,
-    FloodInterface $flood,
+    protected FloodInterface $flood,
     protected UserNameValidator $userNameValidator,
-    EmailValidatorInterface $email_validator,
+    protected EmailValidatorInterface $emailValidator,
   ) {
-    $this->userStorage = $user_storage;
-    $this->languageManager = $language_manager;
     $this->configFactory = $config_factory;
-    $this->flood = $flood;
-    $this->emailValidator = $email_validator;
   }
 
   /**

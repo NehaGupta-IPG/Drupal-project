@@ -14,31 +14,17 @@ use Symfony\Component\HttpKernel\Event\RequestEvent;
 class MaintenanceModeSubscriber implements EventSubscriberInterface {
 
   /**
-   * The maintenance mode.
-   *
-   * @var \Drupal\Core\Site\MaintenanceMode
-   */
-  protected $maintenanceMode;
-
-  /**
-   * The current account.
-   *
-   * @var \Drupal\Core\Session\AccountInterface
-   */
-  protected $account;
-
-  /**
    * Constructs a new MaintenanceModeSubscriber.
    *
-   * @param \Drupal\Core\Site\MaintenanceModeInterface $maintenance_mode
+   * @param \Drupal\Core\Site\MaintenanceModeInterface $maintenanceMode
    *   The maintenance mode.
    * @param \Drupal\Core\Session\AccountInterface $account
    *   The current user.
    */
-  public function __construct(MaintenanceModeInterface $maintenance_mode, AccountInterface $account) {
-    $this->maintenanceMode = $maintenance_mode;
-    $this->account = $account;
-  }
+  public function __construct(
+    protected MaintenanceModeInterface $maintenanceMode,
+    protected AccountInterface $account,
+  ) {}
 
   /**
    * Logout users if site is in maintenance mode and user is not exempt.

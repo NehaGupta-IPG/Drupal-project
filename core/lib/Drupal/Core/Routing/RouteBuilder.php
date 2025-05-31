@@ -19,41 +19,6 @@ use Symfony\Component\Routing\Route;
 class RouteBuilder implements RouteBuilderInterface, DestructableInterface {
 
   /**
-   * The dumper to which we should send collected routes.
-   *
-   * @var \Drupal\Core\Routing\MatcherDumperInterface
-   */
-  protected $dumper;
-
-  /**
-   * The used lock backend instance.
-   *
-   * @var \Drupal\Core\Lock\LockBackendInterface
-   */
-  protected $lock;
-
-  /**
-   * The event dispatcher to notify of routes.
-   *
-   * @var \Symfony\Contracts\EventDispatcher\EventDispatcherInterface
-   */
-  protected $dispatcher;
-
-  /**
-   * The module handler.
-   *
-   * @var \Drupal\Core\Extension\ModuleHandlerInterface
-   */
-  protected $moduleHandler;
-
-  /**
-   * The controller resolver.
-   *
-   * @var \Drupal\Core\Controller\ControllerResolverInterface
-   */
-  protected $controllerResolver;
-
-  /**
    * The route collection during the rebuild.
    *
    * @var \Symfony\Component\Routing\RouteCollection
@@ -75,13 +40,6 @@ class RouteBuilder implements RouteBuilderInterface, DestructableInterface {
   protected $rebuildNeeded = FALSE;
 
   /**
-   * The check provider.
-   *
-   * @var \Drupal\Core\Access\CheckProviderInterface
-   */
-  protected $checkProvider;
-
-  /**
    * Constructs the RouteBuilder using the passed MatcherDumperInterface.
    *
    * @param \Drupal\Core\Routing\MatcherDumperInterface $dumper
@@ -90,21 +48,21 @@ class RouteBuilder implements RouteBuilderInterface, DestructableInterface {
    *   The lock backend.
    * @param \Symfony\Contracts\EventDispatcher\EventDispatcherInterface $dispatcher
    *   The event dispatcher to notify of routes.
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
+   * @param \Drupal\Core\Extension\ModuleHandlerInterface $moduleHandler
    *   The module handler.
-   * @param \Drupal\Core\Controller\ControllerResolverInterface $controller_resolver
+   * @param \Drupal\Core\Controller\ControllerResolverInterface $controllerResolver
    *   The controller resolver.
-   * @param \Drupal\Core\Access\CheckProviderInterface $check_provider
+   * @param \Drupal\Core\Access\CheckProviderInterface $checkProvider
    *   The check provider.
    */
-  public function __construct(MatcherDumperInterface $dumper, LockBackendInterface $lock, EventDispatcherInterface $dispatcher, ModuleHandlerInterface $module_handler, ControllerResolverInterface $controller_resolver, CheckProviderInterface $check_provider) {
-    $this->dumper = $dumper;
-    $this->lock = $lock;
-    $this->dispatcher = $dispatcher;
-    $this->moduleHandler = $module_handler;
-    $this->controllerResolver = $controller_resolver;
-    $this->checkProvider = $check_provider;
-  }
+  public function __construct(
+    protected MatcherDumperInterface $dumper,
+    protected LockBackendInterface $lock,
+    protected EventDispatcherInterface $dispatcher,
+    protected ModuleHandlerInterface $moduleHandler,
+    protected ControllerResolverInterface $controllerResolver,
+    protected CheckProviderInterface $checkProvider,
+  ) {}
 
   /**
    * {@inheritdoc}

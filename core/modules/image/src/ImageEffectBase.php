@@ -34,20 +34,19 @@ abstract class ImageEffectBase extends PluginBase implements ImageEffectInterfac
   protected $weight = '';
 
   /**
-   * A logger instance.
-   *
-   * @var \Psr\Log\LoggerInterface
-   */
-  protected $logger;
-
-  /**
    * {@inheritdoc}
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, LoggerInterface $logger) {
+  public function __construct(
+    array $configuration,
+    $plugin_id,
+    $plugin_definition, /**
+     * A logger instance.
+     */
+    protected LoggerInterface $logger,
+) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
 
     $this->setConfiguration($configuration);
-    $this->logger = $logger;
   }
 
   /**

@@ -24,13 +24,6 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 class SystemBrandingBlock extends BlockBase implements ContainerFactoryPluginInterface {
 
   /**
-   * Stores the configuration factory.
-   *
-   * @var \Drupal\Core\Config\ConfigFactoryInterface
-   */
-  protected $configFactory;
-
-  /**
    * Creates a SystemBrandingBlock instance.
    *
    * @param array $configuration
@@ -39,12 +32,16 @@ class SystemBrandingBlock extends BlockBase implements ContainerFactoryPluginInt
    *   The plugin ID for the plugin instance.
    * @param mixed $plugin_definition
    *   The plugin implementation definition.
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
+   * @param \Drupal\Core\Config\ConfigFactoryInterface $configFactory
    *   The factory for configuration objects.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, ConfigFactoryInterface $config_factory) {
+  public function __construct(
+    array $configuration,
+    $plugin_id,
+    $plugin_definition,
+    protected ConfigFactoryInterface $configFactory,
+  ) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
-    $this->configFactory = $config_factory;
   }
 
   /**

@@ -47,13 +47,6 @@ class Registry implements DestructableInterface {
   protected $theme;
 
   /**
-   * The lock backend that should be used.
-   *
-   * @var \Drupal\Core\Lock\LockBackendInterface
-   */
-  protected $lock;
-
-  /**
    * The complete theme registry.
    *
    * @var array
@@ -96,20 +89,6 @@ class Registry implements DestructableInterface {
   protected $registry = [];
 
   /**
-   * The cache backend to use for the complete theme registry data.
-   *
-   * @var \Drupal\Core\Cache\CacheBackendInterface
-   */
-  protected $cache;
-
-  /**
-   * The module handler to use to load modules.
-   *
-   * @var \Drupal\Core\Extension\ModuleHandlerInterface
-   */
-  protected $moduleHandler;
-
-  /**
    * An array of incomplete, runtime theme registries, keyed by theme name.
    *
    * @var \Drupal\Core\Utility\ThemeRegistry[]
@@ -124,63 +103,11 @@ class Registry implements DestructableInterface {
   protected $initialized = FALSE;
 
   /**
-   * The name of the theme for which to construct the registry, if given.
-   *
-   * @var string|null
-   */
-  protected $themeName;
-
-  /**
-   * The app root.
-   *
-   * @var string
-   */
-  protected $root;
-
-  /**
-   * The theme handler.
-   *
-   * @var \Drupal\Core\Extension\ThemeHandlerInterface
-   */
-  protected $themeHandler;
-
-  /**
-   * The theme initialization.
-   *
-   * @var \Drupal\Core\Theme\ThemeInitializationInterface
-   */
-  protected $themeInitialization;
-
-  /**
    * The theme manager.
    *
    * @var \Drupal\Core\Theme\ThemeManagerInterface
    */
   protected $themeManager;
-
-  /**
-   * The runtime cache.
-   *
-   * @var \Drupal\Core\Cache\CacheBackendInterface
-   */
-  protected $runtimeCache;
-
-  /**
-   * The module list.
-   *
-   * @var \Drupal\Core\Extension\ModuleExtensionList
-   */
-  protected $moduleList;
-
-  /**
-   * Preprocess suggestions discovered in modules.
-   *
-   * These are stored to prevent adding preprocess suggestions to the invoke map
-   * that are not discovered in modules.
-   *
-   * @var array<string, true>
-   */
-  protected array $preprocessForSuggestions;
 
   /**
    * Constructs a \Drupal\Core\Theme\Registry object.
@@ -191,35 +118,36 @@ class Registry implements DestructableInterface {
    *   The cache backend interface to use for the complete theme registry data.
    * @param \Drupal\Core\Lock\LockBackendInterface $lock
    *   The lock backend.
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
+   * @param \Drupal\Core\Extension\ModuleHandlerInterface $moduleHandler
    *   The module handler to use to load modules.
-   * @param \Drupal\Core\Extension\ThemeHandlerInterface $theme_handler
+   * @param \Drupal\Core\Extension\ThemeHandlerInterface $themeHandler
    *   The theme handler.
-   * @param \Drupal\Core\Theme\ThemeInitializationInterface $theme_initialization
+   * @param \Drupal\Core\Theme\ThemeInitializationInterface $themeInitialization
    *   The theme initialization.
-   * @param \Drupal\Core\Cache\CacheBackendInterface $runtime_cache
+   * @param \Drupal\Core\Cache\CacheBackendInterface $runtimeCache
    *   The cache backend interface to use for the runtime theme registry data.
-   * @param \Drupal\Core\Extension\ModuleExtensionList $module_list
+   * @param \Drupal\Core\Extension\ModuleExtensionList $moduleList
    *   The module list.
    * @param \Symfony\Component\HttpKernel\HttpKernelInterface $kernel
    *   The kernel.
-   * @param string $theme_name
+   * @param string $themeName
    *   (optional) The name of the theme for which to construct the registry.
-   * @param array<string, true> $preprocess_for_suggestions
+   * @param array<string, true> $preprocessForSuggestions
    *   (optional) Grouped preprocess functions from modules.
    */
-  public function __construct($root, CacheBackendInterface $cache, LockBackendInterface $lock, ModuleHandlerInterface $module_handler, ThemeHandlerInterface $theme_handler, ThemeInitializationInterface $theme_initialization, CacheBackendInterface $runtime_cache, ModuleExtensionList $module_list, protected HttpKernelInterface $kernel, $theme_name = NULL, array $preprocess_for_suggestions = []) {
-    $this->root = $root;
-    $this->cache = $cache;
-    $this->lock = $lock;
-    $this->moduleHandler = $module_handler;
-    $this->themeHandler = $theme_handler;
-    $this->themeInitialization = $theme_initialization;
-    $this->runtimeCache = $runtime_cache;
-    $this->moduleList = $module_list;
-    $this->themeName = $theme_name;
-    $this->preprocessForSuggestions = $preprocess_for_suggestions;
-  }
+  public function __construct(
+    protected $root,
+    protected CacheBackendInterface $cache,
+    protected LockBackendInterface $lock,
+    protected ModuleHandlerInterface $moduleHandler,
+    protected ThemeHandlerInterface $themeHandler,
+    protected ThemeInitializationInterface $themeInitialization,
+    protected CacheBackendInterface $runtimeCache,
+    protected ModuleExtensionList $moduleList,
+    protected HttpKernelInterface $kernel,
+    protected $themeName = NULL,
+    protected array $preprocessForSuggestions = [],
+  ) {}
 
   /**
    * Sets the theme manager.

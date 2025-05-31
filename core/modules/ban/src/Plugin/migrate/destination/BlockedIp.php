@@ -17,13 +17,6 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 class BlockedIp extends DestinationBase implements ContainerFactoryPluginInterface {
 
   /**
-   * The IP ban manager.
-   *
-   * @var \Drupal\ban\BanIpManagerInterface
-   */
-  protected $banManager;
-
-  /**
    * Constructs a BlockedIp object.
    *
    * @param array $configuration
@@ -34,12 +27,17 @@ class BlockedIp extends DestinationBase implements ContainerFactoryPluginInterfa
    *   The plugin definition.
    * @param \Drupal\migrate\Plugin\MigrationInterface $migration
    *   The current migration.
-   * @param \Drupal\ban\BanIpManagerInterface $ban_manager
+   * @param \Drupal\ban\BanIpManagerInterface $banManager
    *   The IP manager service.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, MigrationInterface $migration, BanIpManagerInterface $ban_manager) {
+  public function __construct(
+    array $configuration,
+    $plugin_id,
+    $plugin_definition,
+    MigrationInterface $migration,
+    protected BanIpManagerInterface $banManager,
+  ) {
     parent::__construct($configuration, $plugin_id, $plugin_definition, $migration);
-    $this->banManager = $ban_manager;
   }
 
   /**

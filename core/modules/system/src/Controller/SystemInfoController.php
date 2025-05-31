@@ -17,13 +17,6 @@ class SystemInfoController implements ContainerInjectionInterface {
   use StringTranslationTrait;
 
   /**
-   * System Manager Service.
-   *
-   * @var \Drupal\system\SystemManager
-   */
-  protected $systemManager;
-
-  /**
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container) {
@@ -38,9 +31,9 @@ class SystemInfoController implements ContainerInjectionInterface {
    * @param \Drupal\system\SystemManager $systemManager
    *   System manager service.
    */
-  public function __construct(SystemManager $systemManager) {
-    $this->systemManager = $systemManager;
-  }
+  public function __construct(
+    protected SystemManager $systemManager,
+  ) {}
 
   /**
    * Displays the site status report.

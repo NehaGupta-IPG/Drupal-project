@@ -217,14 +217,14 @@ class CallableResolverTest extends UnitTestCase {
 class MockContainerInjection implements ContainerInjectionInterface {
 
   /**
-   * The value to be injected.
-   *
-   * @var string
+   * @param string $result
    */
-  protected $injected;
-
-  public function __construct($result) {
-    $this->injected = $result;
+  public function __construct(
+    /**
+     * The value to be injected.
+     */
+    protected $injected,
+  ) {
   }
 
   public static function create(ContainerInterface $container) {

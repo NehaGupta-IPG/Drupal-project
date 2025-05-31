@@ -16,31 +16,17 @@ use Symfony\Component\HttpFoundation\Request;
 class DialogRenderer implements MainContentRendererInterface {
 
   /**
-   * The title resolver.
-   *
-   * @var \Drupal\Core\Controller\TitleResolverInterface
-   */
-  protected $titleResolver;
-
-  /**
-   * The renderer.
-   *
-   * @var \Drupal\Core\Render\RendererInterface
-   */
-  protected $renderer;
-
-  /**
    * Constructs a new DialogRenderer.
    *
-   * @param \Drupal\Core\Controller\TitleResolverInterface $title_resolver
+   * @param \Drupal\Core\Controller\TitleResolverInterface $titleResolver
    *   The title resolver.
    * @param \Drupal\Core\Render\RendererInterface $renderer
    *   The renderer.
    */
-  public function __construct(TitleResolverInterface $title_resolver, RendererInterface $renderer) {
-    $this->titleResolver = $title_resolver;
-    $this->renderer = $renderer;
-  }
+  public function __construct(
+    protected TitleResolverInterface $titleResolver,
+    protected RendererInterface $renderer,
+  ) {}
 
   /**
    * {@inheritdoc}

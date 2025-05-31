@@ -43,62 +43,6 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 class HelpSearch extends SearchPluginBase implements AccessibleInterface, SearchIndexingInterface {
 
   /**
-   * The current database connection.
-   *
-   * @var \Drupal\Core\Database\Connection
-   */
-  protected $database;
-
-  /**
-   * A config object for 'search.settings'.
-   *
-   * @var \Drupal\Core\Config\Config
-   */
-  protected $searchSettings;
-
-  /**
-   * The language manager.
-   *
-   * @var \Drupal\Core\Language\LanguageManagerInterface
-   */
-  protected $languageManager;
-
-  /**
-   * The Drupal account to use for checking for access to search.
-   *
-   * @var \Drupal\Core\Session\AccountInterface
-   */
-  protected $account;
-
-  /**
-   * The messenger.
-   *
-   * @var \Drupal\Core\Messenger\MessengerInterface
-   */
-  protected $messenger;
-
-  /**
-   * The state object.
-   *
-   * @var \Drupal\Core\State\StateInterface
-   */
-  protected $state;
-
-  /**
-   * The help section plugin manager.
-   *
-   * @var \Drupal\help\HelpSectionManager
-   */
-  protected $helpSectionManager;
-
-  /**
-   * The search index.
-   *
-   * @var \Drupal\search\SearchIndexInterface
-   */
-  protected $searchIndex;
-
-  /**
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
@@ -128,9 +72,9 @@ class HelpSearch extends SearchPluginBase implements AccessibleInterface, Search
    *   The plugin implementation definition.
    * @param \Drupal\Core\Database\Connection $database
    *   The current database connection.
-   * @param \Drupal\Core\Config\Config $search_settings
+   * @param \Drupal\Core\Config\Config $searchSettings
    *   A config object for 'search.settings'.
-   * @param \Drupal\Core\Language\LanguageManagerInterface $language_manager
+   * @param \Drupal\Core\Language\LanguageManagerInterface $languageManager
    *   The language manager.
    * @param \Drupal\Core\Messenger\MessengerInterface $messenger
    *   The messenger.
@@ -138,21 +82,25 @@ class HelpSearch extends SearchPluginBase implements AccessibleInterface, Search
    *   The $account object to use for checking for access to view help.
    * @param \Drupal\Core\State\StateInterface $state
    *   The state object.
-   * @param \Drupal\help\HelpSectionManager $help_section_manager
+   * @param \Drupal\help\HelpSectionManager $helpSectionManager
    *   The help section manager.
-   * @param \Drupal\search\SearchIndexInterface $search_index
+   * @param \Drupal\search\SearchIndexInterface $searchIndex
    *   The search index.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, Connection $database, Config $search_settings, LanguageManagerInterface $language_manager, MessengerInterface $messenger, AccountInterface $account, StateInterface $state, HelpSectionManager $help_section_manager, SearchIndexInterface $search_index) {
+  public function __construct(
+    array $configuration,
+    $plugin_id,
+    $plugin_definition,
+    protected Connection $database,
+    protected Config $searchSettings,
+    protected LanguageManagerInterface $languageManager,
+    protected MessengerInterface $messenger,
+    protected AccountInterface $account,
+    protected StateInterface $state,
+    protected HelpSectionManager $helpSectionManager,
+    protected SearchIndexInterface $searchIndex,
+  ) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
-    $this->database = $database;
-    $this->searchSettings = $search_settings;
-    $this->languageManager = $language_manager;
-    $this->messenger = $messenger;
-    $this->account = $account;
-    $this->state = $state;
-    $this->helpSectionManager = $help_section_manager;
-    $this->searchIndex = $search_index;
   }
 
   /**

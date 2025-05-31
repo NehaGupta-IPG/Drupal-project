@@ -18,13 +18,6 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 class RoleListBuilder extends DraggableListBuilder {
 
   /**
-   * The messenger.
-   *
-   * @var \Drupal\Core\Messenger\MessengerInterface
-   */
-  protected $messenger;
-
-  /**
    * RoleListBuilder constructor.
    *
    * @param \Drupal\Core\Entity\EntityTypeInterface $entityType
@@ -37,10 +30,9 @@ class RoleListBuilder extends DraggableListBuilder {
   public function __construct(
     EntityTypeInterface $entityType,
     EntityStorageInterface $storage,
-    MessengerInterface $messenger,
+    protected MessengerInterface $messenger,
   ) {
     parent::__construct($entityType, $storage);
-    $this->messenger = $messenger;
   }
 
   /**

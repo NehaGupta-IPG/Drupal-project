@@ -80,62 +80,6 @@ use Symfony\Component\Mime\MimeTypes;
 class OEmbed extends MediaSourceBase implements OEmbedInterface {
 
   /**
-   * The logger channel for media.
-   *
-   * @var \Psr\Log\LoggerInterface
-   */
-  protected $logger;
-
-  /**
-   * The messenger service.
-   *
-   * @var \Drupal\Core\Messenger\MessengerInterface
-   */
-  protected $messenger;
-
-  /**
-   * The HTTP client.
-   *
-   * @var \GuzzleHttp\Client
-   */
-  protected $httpClient;
-
-  /**
-   * The oEmbed resource fetcher service.
-   *
-   * @var \Drupal\media\OEmbed\ResourceFetcherInterface
-   */
-  protected $resourceFetcher;
-
-  /**
-   * The OEmbed manager service.
-   *
-   * @var \Drupal\media\OEmbed\UrlResolverInterface
-   */
-  protected $urlResolver;
-
-  /**
-   * The iFrame URL helper service.
-   *
-   * @var \Drupal\media\IFrameUrlHelper
-   */
-  protected $iFrameUrlHelper;
-
-  /**
-   * The file system.
-   *
-   * @var \Drupal\Core\File\FileSystemInterface
-   */
-  protected $fileSystem;
-
-  /**
-   * The token replacement service.
-   *
-   * @var \Drupal\Core\Utility\Token
-   */
-  protected $token;
-
-  /**
    * Constructs a new OEmbed instance.
    *
    * @param array $configuration
@@ -156,29 +100,37 @@ class OEmbed extends MediaSourceBase implements OEmbedInterface {
    *   The logger channel for media.
    * @param \Drupal\Core\Messenger\MessengerInterface $messenger
    *   The messenger service.
-   * @param \GuzzleHttp\ClientInterface $http_client
+   * @param \GuzzleHttp\ClientInterface $httpClient
    *   The HTTP client.
-   * @param \Drupal\media\OEmbed\ResourceFetcherInterface $resource_fetcher
+   * @param \Drupal\media\OEmbed\ResourceFetcherInterface $resourceFetcher
    *   The oEmbed resource fetcher service.
-   * @param \Drupal\media\OEmbed\UrlResolverInterface $url_resolver
+   * @param \Drupal\media\OEmbed\UrlResolverInterface $urlResolver
    *   The oEmbed URL resolver service.
-   * @param \Drupal\media\IFrameUrlHelper $iframe_url_helper
+   * @param \Drupal\media\IFrameUrlHelper $iFrameUrlHelper
    *   The iFrame URL helper service.
-   * @param \Drupal\Core\File\FileSystemInterface $file_system
+   * @param \Drupal\Core\File\FileSystemInterface $fileSystem
    *   The file system.
    * @param \Drupal\Core\Utility\Token $token
    *   The token replacement service.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, EntityTypeManagerInterface $entity_type_manager, EntityFieldManagerInterface $entity_field_manager, ConfigFactoryInterface $config_factory, FieldTypePluginManagerInterface $field_type_manager, LoggerInterface $logger, MessengerInterface $messenger, ClientInterface $http_client, ResourceFetcherInterface $resource_fetcher, UrlResolverInterface $url_resolver, IFrameUrlHelper $iframe_url_helper, FileSystemInterface $file_system, Token $token) {
+  public function __construct(
+    array $configuration,
+    $plugin_id,
+    $plugin_definition,
+    EntityTypeManagerInterface $entity_type_manager,
+    EntityFieldManagerInterface $entity_field_manager,
+    ConfigFactoryInterface $config_factory,
+    FieldTypePluginManagerInterface $field_type_manager,
+    protected LoggerInterface $logger,
+    protected MessengerInterface $messenger,
+    protected ClientInterface $httpClient,
+    protected ResourceFetcherInterface $resourceFetcher,
+    protected UrlResolverInterface $urlResolver,
+    protected IFrameUrlHelper $iFrameUrlHelper,
+    protected FileSystemInterface $fileSystem,
+    protected Token $token,
+  ) {
     parent::__construct($configuration, $plugin_id, $plugin_definition, $entity_type_manager, $entity_field_manager, $field_type_manager, $config_factory);
-    $this->logger = $logger;
-    $this->messenger = $messenger;
-    $this->httpClient = $http_client;
-    $this->resourceFetcher = $resource_fetcher;
-    $this->urlResolver = $url_resolver;
-    $this->iFrameUrlHelper = $iframe_url_helper;
-    $this->fileSystem = $file_system;
-    $this->token = $token;
   }
 
   /**

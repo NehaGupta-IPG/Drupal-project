@@ -63,13 +63,6 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 class MachineName extends ProcessPluginBase implements ContainerFactoryPluginInterface {
 
   /**
-   * The transliteration service.
-   *
-   * @var \Drupal\Component\Transliteration\TransliterationInterface
-   */
-  protected $transliteration;
-
-  /**
    * The regular expression pattern.
    *
    * @var string
@@ -88,9 +81,13 @@ class MachineName extends ProcessPluginBase implements ContainerFactoryPluginInt
    * @param \Drupal\Component\Transliteration\TransliterationInterface $transliteration
    *   The transliteration service.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, TransliterationInterface $transliteration) {
+  public function __construct(
+    array $configuration,
+    $plugin_id,
+    $plugin_definition,
+    protected TransliterationInterface $transliteration,
+  ) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
-    $this->transliteration = $transliteration;
 
     $this->replacePattern = $this->configuration['replace_pattern'] ?? '/[^a-z0-9_]+/';
     if (!is_string($this->replacePattern)) {

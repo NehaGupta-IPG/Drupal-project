@@ -29,53 +29,11 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 class BlockContentBlock extends BlockBase implements ContainerFactoryPluginInterface {
 
   /**
-   * The Plugin Block Manager.
-   *
-   * @var \Drupal\Core\Block\BlockManagerInterface
-   */
-  protected $blockManager;
-
-  /**
-   * The entity type manager service.
-   *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
-   */
-  protected $entityTypeManager;
-
-  /**
-   * The Drupal account to use for checking for access to block.
-   *
-   * @var \Drupal\Core\Session\AccountInterface
-   */
-  protected $account;
-
-  /**
    * The block content entity.
    *
    * @var \Drupal\block_content\BlockContentInterface
    */
   protected $blockContent;
-
-  /**
-   * The URL generator.
-   *
-   * @var \Drupal\Core\Routing\UrlGeneratorInterface
-   */
-  protected $urlGenerator;
-
-  /**
-   * The block content UUID lookup service.
-   *
-   * @var \Drupal\block_content\BlockContentUuidLookup
-   */
-  protected $uuidLookup;
-
-  /**
-   * The entity display repository.
-   *
-   * @var \Drupal\Core\Entity\EntityDisplayRepositoryInterface
-   */
-  protected $entityDisplayRepository;
 
   /**
    * Constructs a new BlockContentBlock.
@@ -86,28 +44,31 @@ class BlockContentBlock extends BlockBase implements ContainerFactoryPluginInter
    *   The plugin ID for the plugin instance.
    * @param mixed $plugin_definition
    *   The plugin implementation definition.
-   * @param \Drupal\Core\Block\BlockManagerInterface $block_manager
+   * @param \Drupal\Core\Block\BlockManagerInterface $blockManager
    *   The Plugin Block Manager.
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
    *   The entity type manager service.
    * @param \Drupal\Core\Session\AccountInterface $account
    *   The account for which view access should be checked.
-   * @param \Drupal\Core\Routing\UrlGeneratorInterface $url_generator
+   * @param \Drupal\Core\Routing\UrlGeneratorInterface $urlGenerator
    *   The URL generator.
-   * @param \Drupal\block_content\BlockContentUuidLookup $uuid_lookup
+   * @param \Drupal\block_content\BlockContentUuidLookup $uuidLookup
    *   The block content UUID lookup service.
-   * @param \Drupal\Core\Entity\EntityDisplayRepositoryInterface $entity_display_repository
+   * @param \Drupal\Core\Entity\EntityDisplayRepositoryInterface $entityDisplayRepository
    *   The entity display repository.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, BlockManagerInterface $block_manager, EntityTypeManagerInterface $entity_type_manager, AccountInterface $account, UrlGeneratorInterface $url_generator, BlockContentUuidLookup $uuid_lookup, EntityDisplayRepositoryInterface $entity_display_repository) {
+  public function __construct(
+    array $configuration,
+    $plugin_id,
+    $plugin_definition,
+    protected BlockManagerInterface $blockManager,
+    protected EntityTypeManagerInterface $entityTypeManager,
+    protected AccountInterface $account,
+    protected UrlGeneratorInterface $urlGenerator,
+    protected BlockContentUuidLookup $uuidLookup,
+    protected EntityDisplayRepositoryInterface $entityDisplayRepository,
+  ) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
-
-    $this->blockManager = $block_manager;
-    $this->entityTypeManager = $entity_type_manager;
-    $this->account = $account;
-    $this->urlGenerator = $url_generator;
-    $this->uuidLookup = $uuid_lookup;
-    $this->entityDisplayRepository = $entity_display_repository;
   }
 
   /**

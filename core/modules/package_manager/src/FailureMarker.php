@@ -27,8 +27,9 @@ use Drupal\package_manager\Exception\FailureMarkerExistsException;
  */
 final class FailureMarker implements EventSubscriberInterface {
 
-  public function __construct(private readonly PathLocator $pathLocator) {
-  }
+  public function __construct(
+    private readonly PathLocator $pathLocator,
+  ) {}
 
   /**
    * Gets the marker file path.

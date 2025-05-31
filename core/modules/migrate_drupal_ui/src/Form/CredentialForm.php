@@ -27,13 +27,6 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 class CredentialForm extends MigrateUpgradeFormBase {
 
   /**
-   * The HTTP client to fetch the files with.
-   *
-   * @var \GuzzleHttp\ClientInterface
-   */
-  protected $httpClient;
-
-  /**
    * An array of error information.
    *
    * @var array
@@ -45,7 +38,7 @@ class CredentialForm extends MigrateUpgradeFormBase {
    *
    * @param \Drupal\Core\TempStore\PrivateTempStoreFactory $tempstore_private
    *   The private tempstore factory service.
-   * @param \GuzzleHttp\ClientInterface $http_client
+   * @param \GuzzleHttp\ClientInterface $httpClient
    *   A Guzzle client object.
    * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
    *   The config factory service.
@@ -54,9 +47,8 @@ class CredentialForm extends MigrateUpgradeFormBase {
    * @param \Drupal\Core\State\StateInterface $state
    *   The state service.
    */
-  public function __construct(PrivateTempStoreFactory $tempstore_private, ClientInterface $http_client, ConfigFactoryInterface $config_factory, MigrationPluginManagerInterface $migration_plugin_manager, StateInterface $state) {
+  public function __construct(PrivateTempStoreFactory $tempstore_private, protected ClientInterface $httpClient, ConfigFactoryInterface $config_factory, MigrationPluginManagerInterface $migration_plugin_manager, StateInterface $state) {
     parent::__construct($config_factory, $migration_plugin_manager, $state, $tempstore_private);
-    $this->httpClient = $http_client;
   }
 
   /**

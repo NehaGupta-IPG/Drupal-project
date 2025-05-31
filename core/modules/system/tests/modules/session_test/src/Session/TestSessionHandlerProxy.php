@@ -10,31 +10,17 @@ namespace Drupal\session_test\Session;
 class TestSessionHandlerProxy implements \SessionHandlerInterface, \SessionUpdateTimestampHandlerInterface {
 
   /**
-   * The decorated session handler.
-   *
-   * @var \SessionHandlerInterface&\SessionUpdateTimestampHandlerInterface
-   */
-  protected $sessionHandler;
-
-  /**
-   * An optional argument.
-   *
-   * @var mixed
-   */
-  protected $optionalArgument;
-
-  /**
    * Constructs a new TestSessionHandlerProxy object.
    *
-   * @param \SessionHandlerInterface $session_handler
+   * @param \SessionHandlerInterface $sessionHandler
    *   The decorated session handler.
-   * @param mixed $optional_argument
+   * @param mixed $optionalArgument
    *   (optional) An optional argument.
    */
-  public function __construct(\SessionHandlerInterface&\SessionUpdateTimestampHandlerInterface $session_handler, $optional_argument = NULL) {
-    $this->sessionHandler = $session_handler;
-    $this->optionalArgument = $optional_argument;
-  }
+  public function __construct(
+    protected \SessionHandlerInterface&\SessionUpdateTimestampHandlerInterface $sessionHandler,
+    protected $optionalArgument = NULL,
+  ) {}
 
   /**
    * {@inheritdoc}

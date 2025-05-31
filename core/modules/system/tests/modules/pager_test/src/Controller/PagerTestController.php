@@ -17,13 +17,6 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 class PagerTestController extends ControllerBase implements TrustedCallbackInterface {
 
   /**
-   * The pager request service.
-   *
-   * @var \Drupal\Core\Pager\PagerParametersInterface
-   */
-  protected $pagerParams;
-
-  /**
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container) {
@@ -33,12 +26,12 @@ class PagerTestController extends ControllerBase implements TrustedCallbackInter
   /**
    * Construct a new PagerTestController object.
    *
-   * @param \Drupal\Core\Pager\PagerParametersInterface $pager_params
+   * @param \Drupal\Core\Pager\PagerParametersInterface $pagerParams
    *   The pager parameters.
    */
-  public function __construct(PagerParametersInterface $pager_params) {
-    $this->pagerParams = $pager_params;
-  }
+  public function __construct(
+    protected PagerParametersInterface $pagerParams,
+  ) {}
 
   /**
    * Builds a render array for a multi-page test table.

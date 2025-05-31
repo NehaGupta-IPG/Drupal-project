@@ -46,18 +46,19 @@ abstract class DrupalSqlBase extends SqlBase implements DependentPluginInterface
   protected $requirements = TRUE;
 
   /**
-   * The entity type manager.
-   *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
-   */
-  protected $entityTypeManager;
-
-  /**
    * {@inheritdoc}
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, MigrationInterface $migration, StateInterface $state, EntityTypeManagerInterface $entity_type_manager) {
+  public function __construct(
+    array $configuration,
+    $plugin_id,
+    $plugin_definition,
+    MigrationInterface $migration,
+    StateInterface $state, /**
+     * The entity type manager.
+     */
+    protected EntityTypeManagerInterface $entityTypeManager,
+) {
     parent::__construct($configuration, $plugin_id, $plugin_definition, $migration, $state);
-    $this->entityTypeManager = $entity_type_manager;
   }
 
   /**

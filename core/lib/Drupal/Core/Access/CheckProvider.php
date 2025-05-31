@@ -48,26 +48,17 @@ class CheckProvider implements CheckProviderInterface {
   protected $staticRequirementMap;
 
   /**
-   * An array to map dynamic requirement keys to service IDs.
-   *
-   * @var array
-   */
-  protected $dynamicRequirementMap;
-
-  /**
    * Constructs a CheckProvider object.
    *
-   * @param array $dynamic_requirements_map
+   * @param array $dynamicRequirementMap
    *   An array to map dynamic requirement keys to service IDs.
    * @param \Psr\Container\ContainerInterface $container
    *   The check provider service locator.
    */
   public function __construct(
-    array $dynamic_requirements_map,
+    protected array $dynamicRequirementMap,
     protected ContainerInterface $container,
-  ) {
-    $this->dynamicRequirementMap = $dynamic_requirements_map;
-  }
+  ) {}
 
   /**
    * {@inheritdoc}

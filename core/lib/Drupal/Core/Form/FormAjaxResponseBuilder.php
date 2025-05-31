@@ -18,31 +18,17 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
 class FormAjaxResponseBuilder implements FormAjaxResponseBuilderInterface {
 
   /**
-   * The main content to AJAX Response renderer.
-   *
-   * @var \Drupal\Core\Render\MainContent\MainContentRendererInterface
-   */
-  protected $ajaxRenderer;
-
-  /**
-   * The current route match.
-   *
-   * @var \Drupal\Core\Routing\RouteMatchInterface
-   */
-  protected $routeMatch;
-
-  /**
    * Constructs a new FormAjaxResponseBuilder.
    *
-   * @param \Drupal\Core\Render\MainContent\MainContentRendererInterface $ajax_renderer
+   * @param \Drupal\Core\Render\MainContent\MainContentRendererInterface $ajaxRenderer
    *   The ajax renderer.
-   * @param \Drupal\Core\Routing\RouteMatchInterface $route_match
+   * @param \Drupal\Core\Routing\RouteMatchInterface $routeMatch
    *   The current route match.
    */
-  public function __construct(MainContentRendererInterface $ajax_renderer, RouteMatchInterface $route_match) {
-    $this->ajaxRenderer = $ajax_renderer;
-    $this->routeMatch = $route_match;
-  }
+  public function __construct(
+    protected MainContentRendererInterface $ajaxRenderer,
+    protected RouteMatchInterface $routeMatch,
+  ) {}
 
   /**
    * {@inheritdoc}

@@ -17,34 +17,6 @@ use Psr\Http\Client\ClientExceptionInterface;
 class UrlResolver implements UrlResolverInterface {
 
   /**
-   * The HTTP client.
-   *
-   * @var \GuzzleHttp\Client
-   */
-  protected $httpClient;
-
-  /**
-   * The OEmbed provider repository service.
-   *
-   * @var \Drupal\media\OEmbed\ProviderRepositoryInterface
-   */
-  protected $providers;
-
-  /**
-   * The OEmbed resource fetcher service.
-   *
-   * @var \Drupal\media\OEmbed\ResourceFetcherInterface
-   */
-  protected $resourceFetcher;
-
-  /**
-   * The module handler service.
-   *
-   * @var \Drupal\Core\Extension\ModuleHandlerInterface
-   */
-  protected $moduleHandler;
-
-  /**
    * Static cache of discovered oEmbed resource URLs, keyed by canonical URL.
    *
    * A discovered resource URL is the actual endpoint URL for a specific media
@@ -55,33 +27,26 @@ class UrlResolver implements UrlResolverInterface {
   protected $urlCache = [];
 
   /**
-   * The cache backend.
-   *
-   * @var \Drupal\Core\Cache\CacheBackendInterface
-   */
-  protected $cacheBackend;
-
-  /**
    * Constructs a UrlResolver object.
    *
    * @param \Drupal\media\OEmbed\ProviderRepositoryInterface $providers
    *   The oEmbed provider repository service.
-   * @param \Drupal\media\OEmbed\ResourceFetcherInterface $resource_fetcher
+   * @param \Drupal\media\OEmbed\ResourceFetcherInterface $resourceFetcher
    *   The OEmbed resource fetcher service.
-   * @param \GuzzleHttp\ClientInterface $http_client
+   * @param \GuzzleHttp\ClientInterface $httpClient
    *   The HTTP client.
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
+   * @param \Drupal\Core\Extension\ModuleHandlerInterface $moduleHandler
    *   The module handler service.
-   * @param \Drupal\Core\Cache\CacheBackendInterface $cache_backend
+   * @param \Drupal\Core\Cache\CacheBackendInterface $cacheBackend
    *   The cache backend.
    */
-  public function __construct(ProviderRepositoryInterface $providers, ResourceFetcherInterface $resource_fetcher, ClientInterface $http_client, ModuleHandlerInterface $module_handler, CacheBackendInterface $cache_backend) {
-    $this->providers = $providers;
-    $this->resourceFetcher = $resource_fetcher;
-    $this->httpClient = $http_client;
-    $this->moduleHandler = $module_handler;
-    $this->cacheBackend = $cache_backend;
-  }
+  public function __construct(
+    protected ProviderRepositoryInterface $providers,
+    protected ResourceFetcherInterface $resourceFetcher,
+    protected ClientInterface $httpClient,
+    protected ModuleHandlerInterface $moduleHandler,
+    protected CacheBackendInterface $cacheBackend,
+  ) {}
 
   /**
    * Runs oEmbed discovery and returns the endpoint URL if successful.

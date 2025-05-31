@@ -14,21 +14,14 @@ use Drupal\Core\Render\BubbleableMetadata;
 class Element implements TrustedCallbackInterface {
 
   /**
-   * The Text Editor plugin manager service.
-   *
-   * @var \Drupal\Component\Plugin\PluginManagerInterface
-   */
-  protected $pluginManager;
-
-  /**
    * Constructs a new Element object.
    *
-   * @param \Drupal\Component\Plugin\PluginManagerInterface $plugin_manager
+   * @param \Drupal\Component\Plugin\PluginManagerInterface $pluginManager
    *   The Text Editor plugin manager service.
    */
-  public function __construct(PluginManagerInterface $plugin_manager) {
-    $this->pluginManager = $plugin_manager;
-  }
+  public function __construct(
+    protected PluginManagerInterface $pluginManager,
+  ) {}
 
   /**
    * {@inheritdoc}

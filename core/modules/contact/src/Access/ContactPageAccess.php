@@ -15,31 +15,17 @@ use Drupal\user\UserInterface;
 class ContactPageAccess implements AccessInterface {
 
   /**
-   * The contact settings config object.
-   *
-   * @var \Drupal\Core\Config\ConfigFactoryInterface
-   */
-  protected $configFactory;
-
-  /**
-   * The user data service.
-   *
-   * @var \Drupal\user\UserDataInterface
-   */
-  protected $userData;
-
-  /**
    * Constructs a ContactPageAccess instance.
    *
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
+   * @param \Drupal\Core\Config\ConfigFactoryInterface $configFactory
    *   The config factory.
-   * @param \Drupal\user\UserDataInterface $user_data
+   * @param \Drupal\user\UserDataInterface $userData
    *   The user data service.
    */
-  public function __construct(ConfigFactoryInterface $config_factory, UserDataInterface $user_data) {
-    $this->configFactory = $config_factory;
-    $this->userData = $user_data;
-  }
+  public function __construct(
+    protected ConfigFactoryInterface $configFactory,
+    protected UserDataInterface $userData,
+  ) {}
 
   /**
    * Checks access to the given user's contact page.

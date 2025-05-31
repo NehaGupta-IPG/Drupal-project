@@ -23,18 +23,21 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 class ContentModerationStateFormatter extends FormatterBase {
 
   /**
-   * The moderation information service.
-   *
-   * @var \Drupal\content_moderation\ModerationInformationInterface
-   */
-  protected $moderationInformation;
-
-  /**
    * Create an instance of ContentModerationStateFormatter.
    */
-  public function __construct($plugin_id, $plugin_definition, FieldDefinitionInterface $field_definition, array $settings, $label, $view_mode, array $third_party_settings, ModerationInformationInterface $moderation_information) {
+  public function __construct(
+    $plugin_id,
+    $plugin_definition,
+    FieldDefinitionInterface $field_definition,
+    array $settings,
+    $label,
+    $view_mode,
+    array $third_party_settings, /**
+     * The moderation information service.
+     */
+    protected ModerationInformationInterface $moderationInformation,
+) {
     parent::__construct($plugin_id, $plugin_definition, $field_definition, $settings, $label, $view_mode, $third_party_settings);
-    $this->moderationInformation = $moderation_information;
   }
 
   /**

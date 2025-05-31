@@ -17,13 +17,6 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 class UserLangcode extends ProcessPluginBase implements ContainerFactoryPluginInterface {
 
   /**
-   * The language manager.
-   *
-   * @var \Drupal\Core\Language\LanguageManager
-   */
-  protected $languageManager;
-
-  /**
    * Constructs a UserLangcode object.
    *
    * @param array $configuration
@@ -32,12 +25,16 @@ class UserLangcode extends ProcessPluginBase implements ContainerFactoryPluginIn
    *   The plugin ID.
    * @param mixed $plugin_definition
    *   The plugin definition.
-   * @param \Drupal\Core\Language\LanguageManager $language_manager
+   * @param \Drupal\Core\Language\LanguageManager $languageManager
    *   The language manager service.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, LanguageManager $language_manager) {
+  public function __construct(
+    array $configuration,
+    $plugin_id,
+    $plugin_definition,
+    protected LanguageManager $languageManager,
+  ) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
-    $this->languageManager = $language_manager;
   }
 
   /**

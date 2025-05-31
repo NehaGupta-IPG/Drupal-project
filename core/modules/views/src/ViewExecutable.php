@@ -32,13 +32,6 @@ class ViewExecutable {
   use LoggerChannelTrait;
 
   /**
-   * The config entity in which the view is stored.
-   *
-   * @var \Drupal\views\Entity\View
-   */
-  public $storage;
-
-  /**
    * Whether or not the view has been built.
    *
    * @var bool
@@ -453,32 +446,11 @@ class ViewExecutable {
   ];
 
   /**
-   * The current user.
-   *
-   * @var \Drupal\Core\Session\AccountInterface
-   */
-  protected $user;
-
-  /**
    * Should the admin links be shown on the rendered view.
    *
    * @var bool
    */
   protected $showAdminLinks;
-
-  /**
-   * The views data.
-   *
-   * @var \Drupal\views\ViewsData
-   */
-  protected $viewsData;
-
-  /**
-   * The route provider.
-   *
-   * @var \Drupal\Core\Routing\RouteProviderInterface
-   */
-  protected $routeProvider;
 
   /**
    * The entity type of the base table, if available.
@@ -501,20 +473,21 @@ class ViewExecutable {
    *   The view config entity the actual information is stored on.
    * @param \Drupal\Core\Session\AccountInterface $user
    *   The current user.
-   * @param \Drupal\views\ViewsData $views_data
+   * @param \Drupal\views\ViewsData $viewsData
    *   The views data.
-   * @param \Drupal\Core\Routing\RouteProviderInterface $route_provider
+   * @param \Drupal\Core\Routing\RouteProviderInterface $routeProvider
    *   The route provider.
    * @param \Drupal\views\Plugin\ViewsPluginManager|null $displayPluginManager
    *   The plugin manager for display.
    */
-  public function __construct(ViewEntityInterface $storage, AccountInterface $user, ViewsData $views_data, RouteProviderInterface $route_provider, protected ?ViewsPluginManager $displayPluginManager = NULL) {
-    // Reference the storage and the executable to each other.
-    $this->storage = $storage;
+  public function __construct(
+    public ViewEntityInterface $storage,
+    protected AccountInterface $user,
+    protected ViewsData $viewsData,
+    protected RouteProviderInterface $routeProvider,
+    protected ?ViewsPluginManager $displayPluginManager = NULL,
+  ) {
     $this->storage->set('executable', $this);
-    $this->user = $user;
-    $this->viewsData = $views_data;
-    $this->routeProvider = $route_provider;
     if ($this->displayPluginManager === NULL) {
       @trigger_error('Calling ' . __METHOD__ . ' without the $displayPluginManager argument is deprecated in drupal:10.3.0 and it will be required in drupal:12.0.0. See https://www.drupal.org/node/3410349', E_USER_DEPRECATED);
       $this->displayPluginManager = \Drupal::service('plugin.manager.views.display');

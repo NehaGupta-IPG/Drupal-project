@@ -32,16 +32,13 @@ use ReflectionException;
 class StaticReflectionClass extends ReflectionClass
 {
 
-    /**
-     * The static reflection parser object.
-     *
-     * @var StaticReflectionParser
-     */
-    private $staticReflectionParser;
-
-    public function __construct(StaticReflectionParser $staticReflectionParser)
+    public function __construct(
+        /**
+         * The static reflection parser object.
+         */
+        private StaticReflectionParser $staticReflectionParser
+    )
     {
-        $this->staticReflectionParser = $staticReflectionParser;
     }
 
     /**

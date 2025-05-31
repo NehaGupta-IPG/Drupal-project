@@ -19,41 +19,20 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 class SearchBlockForm extends FormBase implements WorkspaceSafeFormInterface {
 
   /**
-   * The search page repository.
-   *
-   * @var \Drupal\search\SearchPageRepositoryInterface
-   */
-  protected $searchPageRepository;
-
-  /**
-   * The config factory.
-   *
-   * @var \Drupal\Core\Config\ConfigFactoryInterface
-   */
-  protected $configFactory;
-
-  /**
-   * The renderer.
-   *
-   * @var \Drupal\Core\Render\RendererInterface
-   */
-  protected $renderer;
-
-  /**
    * Constructs a new SearchBlockForm.
    *
-   * @param \Drupal\search\SearchPageRepositoryInterface $search_page_repository
+   * @param \Drupal\search\SearchPageRepositoryInterface $searchPageRepository
    *   The search page repository.
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
+   * @param \Drupal\Core\Config\ConfigFactoryInterface $configFactory
    *   The config factory.
    * @param \Drupal\Core\Render\RendererInterface $renderer
    *   The renderer.
    */
-  public function __construct(SearchPageRepositoryInterface $search_page_repository, ConfigFactoryInterface $config_factory, RendererInterface $renderer) {
-    $this->searchPageRepository = $search_page_repository;
-    $this->configFactory = $config_factory;
-    $this->renderer = $renderer;
-  }
+  public function __construct(
+    protected SearchPageRepositoryInterface $searchPageRepository,
+    protected ConfigFactoryInterface $configFactory,
+    protected RendererInterface $renderer,
+  ) {}
 
   /**
    * {@inheritdoc}

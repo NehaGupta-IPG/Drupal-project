@@ -45,13 +45,6 @@ class Feed extends PathPluginBase implements ResponseDisplayPluginInterface {
   protected $usesPager = FALSE;
 
   /**
-   * The renderer.
-   *
-   * @var \Drupal\Core\Render\RendererInterface
-   */
-  protected $renderer;
-
-  /**
    * Constructs a PathPluginBase object.
    *
    * @param array $configuration
@@ -67,9 +60,15 @@ class Feed extends PathPluginBase implements ResponseDisplayPluginInterface {
    * @param \Drupal\Core\Render\RendererInterface $renderer
    *   The renderer.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, RouteProviderInterface $route_provider, StateInterface $state, RendererInterface $renderer) {
+  public function __construct(
+    array $configuration,
+    $plugin_id,
+    $plugin_definition,
+    RouteProviderInterface $route_provider,
+    StateInterface $state,
+    protected RendererInterface $renderer,
+  ) {
     parent::__construct($configuration, $plugin_id, $plugin_definition, $route_provider, $state);
-    $this->renderer = $renderer;
   }
 
   /**

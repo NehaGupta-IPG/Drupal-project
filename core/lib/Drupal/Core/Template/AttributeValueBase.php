@@ -19,25 +19,20 @@ abstract class AttributeValueBase {
   const RENDER_EMPTY_ATTRIBUTE = TRUE;
 
   /**
-   * The value itself.
-   *
-   * @var mixed
-   */
-  protected $value;
-
-  /**
-   * The name of the value.
-   *
-   * @var mixed
-   */
-  protected $name;
-
-  /**
    * Constructs a \Drupal\Core\Template\AttributeValueBase object.
+   * @param mixed $value
+   * @param mixed $name
    */
-  public function __construct($name, $value) {
-    $this->name = $name;
-    $this->value = $value;
+  public function __construct(
+    /**
+     * The name of the value.
+     */
+    protected $name,
+    /**
+     * The value itself.
+     */
+    protected $value,
+  ) {
   }
 
   /**

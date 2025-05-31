@@ -14,21 +14,14 @@ use Psr\Log\LoggerInterface;
 class UserFloodSubscriber implements EventSubscriberInterface {
 
   /**
-   * The default logger service.
-   *
-   * @var \Psr\Log\LoggerInterface
-   */
-  protected $logger;
-
-  /**
    * Constructs a UserFloodSubscriber.
    *
    * @param \Psr\Log\LoggerInterface $logger
    *   A logger instance.
    */
-  public function __construct(?LoggerInterface $logger = NULL) {
-    $this->logger = $logger;
-  }
+  public function __construct(
+    protected ?LoggerInterface $logger = NULL,
+  ) {}
 
   /**
    * {@inheritdoc}

@@ -29,34 +29,23 @@ class ModerationStateFilter extends InOperator implements DependentWithRemovalPl
   protected $valueFormType = 'select';
 
   /**
-   * The entity type manager.
-   *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
-   */
-  protected $entityTypeManager;
-
-  /**
-   * The bundle information service.
-   *
-   * @var \Drupal\Core\Entity\EntityTypeBundleInfoInterface
-   */
-  protected $bundleInfo;
-
-  /**
-   * The storage handler of the workflow entity type.
-   *
-   * @var \Drupal\Core\Entity\EntityStorageInterface
-   */
-  protected $workflowStorage;
-
-  /**
    * Creates an instance of ModerationStateFilter.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, EntityTypeManagerInterface $entity_type_manager, EntityTypeBundleInfoInterface $bundle_info, EntityStorageInterface $workflow_storage) {
+  public function __construct(
+    array $configuration,
+    $plugin_id,
+    $plugin_definition, /**
+     * The entity type manager.
+     */
+    protected EntityTypeManagerInterface $entityTypeManager, /**
+     * The bundle information service.
+     */
+    protected EntityTypeBundleInfoInterface $bundleInfo, /**
+     * The storage handler of the workflow entity type.
+     */
+    protected EntityStorageInterface $workflowStorage,
+) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
-    $this->entityTypeManager = $entity_type_manager;
-    $this->bundleInfo = $bundle_info;
-    $this->workflowStorage = $workflow_storage;
   }
 
   /**

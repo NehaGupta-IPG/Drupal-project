@@ -9,7 +9,9 @@ namespace Drupal\Core\ClassLoader;
  */
 final class BackwardsCompatibilityClassLoader {
 
-  public function __construct(protected array $movedClasses) {}
+  public function __construct(
+    protected array $movedClasses,
+  ) {}
 
   /**
    * Aliases a moved class to another class, instead of actually autoloading it.

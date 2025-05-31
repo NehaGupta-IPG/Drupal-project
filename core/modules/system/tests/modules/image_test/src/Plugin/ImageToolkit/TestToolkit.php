@@ -24,13 +24,6 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 class TestToolkit extends ImageToolkitBase {
 
   /**
-   * The state service.
-   *
-   * @var \Drupal\Core\State\StateInterface
-   */
-  protected $state;
-
-  /**
    * Image type represented by a PHP IMAGETYPE_* constant (e.g. IMAGETYPE_JPEG).
    *
    * @var int
@@ -69,9 +62,16 @@ class TestToolkit extends ImageToolkitBase {
    * @param \Drupal\Core\State\StateInterface $state
    *   The state key value store.
    */
-  public function __construct(array $configuration, $plugin_id, array $plugin_definition, ImageToolkitOperationManagerInterface $operation_manager, LoggerInterface $logger, ConfigFactoryInterface $config_factory, StateInterface $state) {
+  public function __construct(
+    array $configuration,
+    $plugin_id,
+    array $plugin_definition,
+    ImageToolkitOperationManagerInterface $operation_manager,
+    LoggerInterface $logger,
+    ConfigFactoryInterface $config_factory,
+    protected StateInterface $state,
+  ) {
     parent::__construct($configuration, $plugin_id, $plugin_definition, $operation_manager, $logger, $config_factory);
-    $this->state = $state;
   }
 
   /**

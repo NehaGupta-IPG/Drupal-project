@@ -526,21 +526,14 @@ class TestEntityForm extends EntityHandlerBase {
 class TestEntityFormInjected extends TestEntityForm implements ContainerInjectionInterface {
 
   /**
-   * The color of the entity type.
-   *
-   * @var string
-   */
-  public $color;
-
-  /**
    * Constructs a new TestEntityFormInjected.
    *
    * @param string $color
    *   The color of the entity type.
    */
-  public function __construct($color) {
-    $this->color = $color;
-  }
+  public function __construct(
+    public $color,
+  ) {}
 
   /**
    * {@inheritdoc}

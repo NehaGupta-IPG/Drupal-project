@@ -17,13 +17,6 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 class WorkspaceSwitcherForm extends FormBase implements WorkspaceSafeFormInterface {
 
   /**
-   * The workspace manager.
-   *
-   * @var \Drupal\workspaces\WorkspaceManagerInterface
-   */
-  protected $workspaceManager;
-
-  /**
    * The workspace entity storage handler.
    *
    * @var \Drupal\Core\Entity\EntityStorageInterface
@@ -31,26 +24,21 @@ class WorkspaceSwitcherForm extends FormBase implements WorkspaceSafeFormInterfa
   protected $workspaceStorage;
 
   /**
-   * The messenger service.
-   *
-   * @var \Drupal\Core\Messenger\MessengerInterface
-   */
-  protected $messenger;
-
-  /**
    * Constructs a new WorkspaceSwitcherForm.
    *
-   * @param \Drupal\workspaces\WorkspaceManagerInterface $workspace_manager
+   * @param \Drupal\workspaces\WorkspaceManagerInterface $workspaceManager
    *   The workspace manager.
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager.
    * @param \Drupal\Core\Messenger\MessengerInterface $messenger
    *   The messenger service.
    */
-  public function __construct(WorkspaceManagerInterface $workspace_manager, EntityTypeManagerInterface $entity_type_manager, MessengerInterface $messenger) {
-    $this->workspaceManager = $workspace_manager;
+  public function __construct(
+    protected WorkspaceManagerInterface $workspaceManager,
+    EntityTypeManagerInterface $entity_type_manager,
+    protected MessengerInterface $messenger,
+  ) {
     $this->workspaceStorage = $entity_type_manager->getStorage('workspace');
-    $this->messenger = $messenger;
   }
 
   /**

@@ -84,13 +84,6 @@ abstract class SqlBase extends SourcePluginBase implements ContainerFactoryPlugi
   protected $database;
 
   /**
-   * State service for retrieving database info.
-   *
-   * @var \Drupal\Core\State\StateInterface
-   */
-  protected $state;
-
-  /**
    * The count of the number of batches run.
    *
    * @var int
@@ -109,9 +102,16 @@ abstract class SqlBase extends SourcePluginBase implements ContainerFactoryPlugi
   /**
    * {@inheritdoc}
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, MigrationInterface $migration, StateInterface $state) {
+  public function __construct(
+    array $configuration,
+    $plugin_id,
+    $plugin_definition,
+    MigrationInterface $migration, /**
+     * State service for retrieving database info.
+     */
+    protected StateInterface $state,
+) {
     parent::__construct($configuration, $plugin_id, $plugin_definition, $migration);
-    $this->state = $state;
   }
 
   /**

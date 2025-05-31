@@ -13,21 +13,14 @@ use Symfony\Component\Routing\Matcher\RequestMatcherInterface;
 class MockMatcher implements RequestMatcherInterface {
 
   /**
-   * The matcher being tested.
-   *
-   * @var \Closure
-   */
-  protected $matcher;
-
-  /**
    * Constructs a MockMatcher object.
    *
    * @param \Closure $matcher
    *   An anonymous function that will be used for the matchRequest() method.
    */
-  public function __construct(\Closure $matcher) {
-    $this->matcher = $matcher;
-  }
+  public function __construct(
+    protected \Closure $matcher,
+  ) {}
 
   /**
    * {@inheritdoc}

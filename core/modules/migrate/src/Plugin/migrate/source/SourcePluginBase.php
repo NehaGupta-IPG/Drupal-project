@@ -124,13 +124,6 @@ abstract class SourcePluginBase extends PluginBase implements MigrateSourceInter
   protected $moduleHandler;
 
   /**
-   * The entity migration object.
-   *
-   * @var \Drupal\migrate\Plugin\MigrationInterface
-   */
-  protected $migration;
-
-  /**
    * The current row from the query.
    *
    * @var \Drupal\migrate\Row
@@ -238,9 +231,15 @@ abstract class SourcePluginBase extends PluginBase implements MigrateSourceInter
   /**
    * {@inheritdoc}
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, MigrationInterface $migration) {
+  public function __construct(
+    array $configuration,
+    $plugin_id,
+    $plugin_definition, /**
+     * The entity migration object.
+     */
+    protected MigrationInterface $migration,
+) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
-    $this->migration = $migration;
 
     // Set up some defaults based on the source configuration.
     foreach (['cacheCounts' => 'cache_counts', 'skipCount' => 'skip_count', 'trackChanges' => 'track_changes'] as $property => $config_key) {

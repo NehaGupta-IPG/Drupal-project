@@ -13,31 +13,17 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
 class BanMiddleware implements HttpKernelInterface {
 
   /**
-   * The decorated kernel.
-   *
-   * @var \Symfony\Component\HttpKernel\HttpKernelInterface
-   */
-  protected $httpKernel;
-
-  /**
-   * The ban IP manager.
-   *
-   * @var \Drupal\ban\BanIpManagerInterface
-   */
-  protected $banIpManager;
-
-  /**
    * Constructs a BanMiddleware object.
    *
-   * @param \Symfony\Component\HttpKernel\HttpKernelInterface $http_kernel
+   * @param \Symfony\Component\HttpKernel\HttpKernelInterface $httpKernel
    *   The decorated kernel.
-   * @param \Drupal\ban\BanIpManagerInterface $manager
+   * @param \Drupal\ban\BanIpManagerInterface $banIpManager
    *   The ban IP manager.
    */
-  public function __construct(HttpKernelInterface $http_kernel, BanIpManagerInterface $manager) {
-    $this->httpKernel = $http_kernel;
-    $this->banIpManager = $manager;
-  }
+  public function __construct(
+    protected HttpKernelInterface $httpKernel,
+    protected BanIpManagerInterface $banIpManager,
+  ) {}
 
   /**
    * {@inheritdoc}

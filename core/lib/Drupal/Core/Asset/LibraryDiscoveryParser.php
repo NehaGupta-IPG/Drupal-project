@@ -25,55 +25,6 @@ use Drupal\Core\Plugin\Component;
 class LibraryDiscoveryParser {
 
   /**
-   * The module handler.
-   *
-   * @var \Drupal\Core\Extension\ModuleHandlerInterface
-   */
-  protected $moduleHandler;
-
-  /**
-   * The theme manager.
-   *
-   * @var \Drupal\Core\Theme\ThemeManagerInterface
-   */
-  protected $themeManager;
-
-  /**
-   * The app root.
-   *
-   * @var string
-   */
-  protected $root;
-
-  /**
-   * The stream wrapper manager.
-   *
-   * @var \Drupal\Core\StreamWrapper\StreamWrapperManagerInterface
-   */
-  protected $streamWrapperManager;
-
-  /**
-   * The libraries directory file finder.
-   *
-   * @var \Drupal\Core\Asset\LibrariesDirectoryFileFinder
-   */
-  protected $librariesDirectoryFileFinder;
-
-  /**
-   * The component plugin manager.
-   *
-   * @var \Drupal\Core\Theme\ComponentPluginManager
-   */
-  protected $componentPluginManager;
-
-  /**
-   * The extension path resolver.
-   *
-   * @var \Drupal\Core\Extension\ExtensionPathResolver
-   */
-  protected $extensionPathResolver;
-
-  /**
    * The file cache.
    *
    * @var \Drupal\Component\FileCache\FileCacheInterface
@@ -85,28 +36,29 @@ class LibraryDiscoveryParser {
    *
    * @param string $root
    *   The app root.
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
+   * @param \Drupal\Core\Extension\ModuleHandlerInterface $moduleHandler
    *   The module handler.
-   * @param \Drupal\Core\Theme\ThemeManagerInterface $theme_manager
+   * @param \Drupal\Core\Theme\ThemeManagerInterface $themeManager
    *   The theme manager.
-   * @param \Drupal\Core\StreamWrapper\StreamWrapperManagerInterface $stream_wrapper_manager
+   * @param \Drupal\Core\StreamWrapper\StreamWrapperManagerInterface $streamWrapperManager
    *   The stream wrapper manager.
-   * @param \Drupal\Core\Asset\LibrariesDirectoryFileFinder $libraries_directory_file_finder
+   * @param \Drupal\Core\Asset\LibrariesDirectoryFileFinder $librariesDirectoryFileFinder
    *   The libraries directory file finder.
-   * @param \Drupal\Core\Extension\ExtensionPathResolver $extension_path_resolver
+   * @param \Drupal\Core\Extension\ExtensionPathResolver $extensionPathResolver
    *   The extension path resolver.
-   * @param \Drupal\Core\Theme\ComponentPluginManager $component_plugin_manager
+   * @param \Drupal\Core\Theme\ComponentPluginManager $componentPluginManager
    *   The component plugin manager.
    */
-  public function __construct($root, ModuleHandlerInterface $module_handler, ThemeManagerInterface $theme_manager, StreamWrapperManagerInterface $stream_wrapper_manager, LibrariesDirectoryFileFinder $libraries_directory_file_finder, ExtensionPathResolver $extension_path_resolver, ComponentPluginManager $component_plugin_manager) {
-    $this->root = $root;
-    $this->moduleHandler = $module_handler;
-    $this->themeManager = $theme_manager;
-    $this->streamWrapperManager = $stream_wrapper_manager;
-    $this->librariesDirectoryFileFinder = $libraries_directory_file_finder;
-    $this->extensionPathResolver = $extension_path_resolver;
+  public function __construct(
+    protected $root,
+    protected ModuleHandlerInterface $moduleHandler,
+    protected ThemeManagerInterface $themeManager,
+    protected StreamWrapperManagerInterface $streamWrapperManager,
+    protected LibrariesDirectoryFileFinder $librariesDirectoryFileFinder,
+    protected ExtensionPathResolver $extensionPathResolver,
+    protected ComponentPluginManager $componentPluginManager,
+  ) {
     $this->fileCache = FileCacheFactory::get('library_parser');
-    $this->componentPluginManager = $component_plugin_manager;
   }
 
   /**

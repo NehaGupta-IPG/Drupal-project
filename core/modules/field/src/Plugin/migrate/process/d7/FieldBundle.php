@@ -56,13 +56,6 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 class FieldBundle extends ProcessPluginBase implements ContainerFactoryPluginInterface {
 
   /**
-   * The migrate lookup service.
-   *
-   * @var \Drupal\migrate\MigrateLookupInterface
-   */
-  protected $migrateLookup;
-
-  /**
    * Constructs a ProcessField plugin.
    *
    * @param array $configuration
@@ -71,12 +64,16 @@ class FieldBundle extends ProcessPluginBase implements ContainerFactoryPluginInt
    *   The plugin ID.
    * @param mixed $plugin_definition
    *   The plugin definition.
-   * @param \Drupal\migrate\MigrateLookupInterface $migrate_lookup
+   * @param \Drupal\migrate\MigrateLookupInterface $migrateLookup
    *   The migrate lookup service.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, MigrateLookupInterface $migrate_lookup) {
+  public function __construct(
+    array $configuration,
+    $plugin_id,
+    $plugin_definition,
+    protected MigrateLookupInterface $migrateLookup,
+  ) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
-    $this->migrateLookup = $migrate_lookup;
   }
 
   /**

@@ -29,51 +29,23 @@ final class SmartDefaultSettings {
   use StringTranslationTrait;
 
   /**
-   * The CKEditor 5 plugin manager.
-   *
-   * @var \Drupal\ckeditor5\Plugin\CKEditor5PluginManagerInterface
-   */
-  protected $pluginManager;
-
-  /**
-   * The module handler.
-   *
-   * @var \Drupal\Core\Extension\ModuleHandlerInterface
-   */
-  protected $moduleHandler;
-
-  /**
-   * The current user.
-   *
-   * @var \Drupal\Core\Session\AccountInterface
-   */
-  protected $currentUser;
-
-  /**
-   * A logger instance.
-   *
-   * @var \Psr\Log\LoggerInterface
-   */
-  protected $logger;
-
-  /**
    * Constructs a SmartDefaultSettings object.
    *
-   * @param \Drupal\ckeditor5\Plugin\CKEditor5PluginManagerInterface $plugin_manager
+   * @param \Drupal\ckeditor5\Plugin\CKEditor5PluginManagerInterface $pluginManager
    *   The CKEditor 5 plugin manager.
    * @param \Psr\Log\LoggerInterface $logger
    *   A logger instance.
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
+   * @param \Drupal\Core\Extension\ModuleHandlerInterface $moduleHandler
    *   The module handler.
-   * @param \Drupal\Core\Session\AccountInterface $current_user
+   * @param \Drupal\Core\Session\AccountInterface $currentUser
    *   The current user.
    */
-  public function __construct(CKEditor5PluginManagerInterface $plugin_manager, LoggerInterface $logger, ModuleHandlerInterface $module_handler, AccountInterface $current_user) {
-    $this->pluginManager = $plugin_manager;
-    $this->logger = $logger;
-    $this->moduleHandler = $module_handler;
-    $this->currentUser = $current_user;
-  }
+  public function __construct(
+    protected CKEditor5PluginManagerInterface $pluginManager,
+    protected LoggerInterface $logger,
+    protected ModuleHandlerInterface $moduleHandler,
+    protected AccountInterface $currentUser,
+  ) {}
 
   /**
    * Computes the closest equivalent settings for switching to CKEditor 5.

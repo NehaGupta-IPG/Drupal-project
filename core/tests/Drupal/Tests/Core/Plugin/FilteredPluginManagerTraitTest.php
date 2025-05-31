@@ -86,13 +86,6 @@ class TestFilteredPluginManager extends PluginManagerBase implements FilteredPlu
   use FilteredPluginManagerTrait;
 
   /**
-   * An array of plugin definitions.
-   *
-   * @var array
-   */
-  protected $definitions = [];
-
-  /**
    * The module handler.
    *
    * @var Drupal\Core\Extension\ModuleHandlerInterface
@@ -113,8 +106,14 @@ class TestFilteredPluginManager extends PluginManagerBase implements FilteredPlu
    */
   protected $contextHandler;
 
-  public function __construct(array $definitions, ModuleHandlerInterface $module_handler, ThemeManagerInterface $theme_manager, ContextHandlerInterface $context_handler) {
-    $this->definitions = $definitions;
+  public function __construct(/**
+     * An array of plugin definitions.
+     */
+    protected array $definitions,
+    ModuleHandlerInterface $module_handler,
+    ThemeManagerInterface $theme_manager,
+    ContextHandlerInterface $context_handler,
+) {
     $this->moduleHandler = $module_handler;
     $this->themeManager = $theme_manager;
     $this->contextHandler = $context_handler;

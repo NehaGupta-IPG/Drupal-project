@@ -11,20 +11,6 @@ use Drupal\user\UserInterface;
 class ContentTranslationMetadataWrapper implements ContentTranslationMetadataWrapperInterface {
 
   /**
-   * The wrapped entity translation.
-   *
-   * @var \Drupal\Core\Entity\FieldableEntityInterface|\Drupal\Core\TypedData\TranslatableInterface
-   */
-  protected $translation;
-
-  /**
-   * The content translation handler.
-   *
-   * @var \Drupal\content_translation\ContentTranslationHandlerInterface
-   */
-  protected $handler;
-
-  /**
    * Initializes an instance of the content translation metadata handler.
    *
    * @param \Drupal\Core\Entity\EntityInterface $translation
@@ -32,10 +18,10 @@ class ContentTranslationMetadataWrapper implements ContentTranslationMetadataWra
    * @param ContentTranslationHandlerInterface $handler
    *   The content translation handler.
    */
-  public function __construct(EntityInterface $translation, ContentTranslationHandlerInterface $handler) {
-    $this->translation = $translation;
-    $this->handler = $handler;
-  }
+  public function __construct(
+    protected EntityInterface $translation,
+    protected ContentTranslationHandlerInterface $handler,
+  ) {}
 
   /**
    * {@inheritdoc}

@@ -17,8 +17,9 @@ class ClassResolver implements ClassResolverInterface {
    * @param \Symfony\Component\DependencyInjection\ContainerInterface $container
    *   The service container.
    */
-  public function __construct(protected ContainerInterface $container) {
-  }
+  public function __construct(
+    protected ContainerInterface $container,
+  ) {}
 
   /**
    * {@inheritdoc}

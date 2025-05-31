@@ -18,31 +18,17 @@ use Symfony\Component\HttpFoundation\Response;
 class StackedHttpKernel implements HttpKernelInterface, TerminableInterface {
 
   /**
-   * The decorated kernel.
-   *
-   * @var \Symfony\Component\HttpKernel\HttpKernelInterface
-   */
-  private $httpKernel;
-
-  /**
-   * A set of middlewares that are wrapped around this kernel.
-   *
-   * @var array
-   */
-  private $middlewares = [];
-
-  /**
    * Constructs a stacked HTTP kernel.
    *
-   * @param \Symfony\Component\HttpKernel\HttpKernelInterface $http_kernel
+   * @param \Symfony\Component\HttpKernel\HttpKernelInterface $httpKernel
    *   The decorated kernel.
    * @param array $middlewares
    *   An array of previous middleware services.
    */
-  public function __construct(HttpKernelInterface $http_kernel, array $middlewares) {
-    $this->httpKernel = $http_kernel;
-    $this->middlewares = $middlewares;
-  }
+  public function __construct(
+    private HttpKernelInterface $httpKernel,
+    private array $middlewares,
+  ) {}
 
   /**
    * {@inheritdoc}

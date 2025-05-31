@@ -16,21 +16,18 @@ use Symfony\Component\HttpFoundation\Response;
 final class CallsDestructableServiceController extends ControllerBase {
 
   /**
-   * Destructable service.
-   *
-   * @var \Drupal\destructable_test\Destructable
-   */
-  protected $destructable;
-
-  /**
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container) {
     return new static($container->get(Destructable::class));
   }
 
-  public function __construct(Destructable $destructable) {
-    $this->destructable = $destructable;
+  public function __construct(
+    /**
+     * Destructable service.
+     */
+    protected Destructable $destructable,
+  ) {
   }
 
   /**

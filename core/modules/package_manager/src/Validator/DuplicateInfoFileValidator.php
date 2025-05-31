@@ -22,8 +22,9 @@ final class DuplicateInfoFileValidator implements EventSubscriberInterface {
 
   use StringTranslationTrait;
 
-  public function __construct(private readonly PathLocator $pathLocator) {
-  }
+  public function __construct(
+    private readonly PathLocator $pathLocator,
+  ) {}
 
   /**
    * Validates the stage does not have duplicate info.yml not present in active.

@@ -25,18 +25,17 @@ class UserUpdate7002 extends ProcessPluginBase implements ContainerFactoryPlugin
   protected static $timezones;
 
   /**
-   * Contains the system.theme configuration object.
-   *
-   * @var \Drupal\Core\Config\Config
-   */
-  protected $dateConfig;
-
-  /**
    * {@inheritdoc}
    */
-  public function __construct(array $configuration, $plugin_id, array $plugin_definition, Config $date_config) {
+  public function __construct(
+    array $configuration,
+    $plugin_id,
+    array $plugin_definition, /**
+     * Contains the system.theme configuration object.
+     */
+    protected Config $dateConfig,
+) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
-    $this->dateConfig = $date_config;
     if (!isset(static::$timezones)) {
       static::$timezones = TimeZoneFormHelper::getOptionsList();
     }

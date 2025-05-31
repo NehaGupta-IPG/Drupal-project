@@ -192,21 +192,18 @@ class NaughtyRecursiveLogger implements LoggerInterface {
   use LoggerTrait;
 
   /**
-   * The logger channel.
-   *
-   * @var \Drupal\Core\Logger\LoggerChannel
-   */
-  protected $channel;
-
-  /**
    * The message to log.
    *
    * @var string|\Stringable
    */
   protected $message;
 
-  public function __construct(LoggerChannel $channel) {
-    $this->channel = $channel;
+  public function __construct(
+    /**
+     * The logger channel.
+     */
+    protected LoggerChannel $channel,
+  ) {
   }
 
   public function log($level, string|\Stringable $message, array $context = []): void {

@@ -36,13 +36,6 @@ class ResourceObjectNormalizer extends NormalizerBase {
   use SchematicNormalizerTrait;
 
   /**
-   * The entity normalization cacher.
-   *
-   * @var \Drupal\jsonapi\EventSubscriber\ResourceObjectNormalizationCacher
-   */
-  protected $cacher;
-
-  /**
    * @var mixed|\Symfony\Component\EventDispatcher\EventDispatcherInterface|null
    */
   private EventDispatcherInterface $eventDispatcher;
@@ -69,9 +62,12 @@ class ResourceObjectNormalizer extends NormalizerBase {
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager.
    */
-  public function __construct(ResourceObjectNormalizationCacher $cacher, ?EventDispatcherInterface $event_dispatcher = NULL, ?EntityFieldManagerInterface $entity_field_manager = NULL, ?EntityTypeManagerInterface $entity_type_manager = NULL) {
-    $this->cacher = $cacher;
-
+  public function __construct(
+    protected ResourceObjectNormalizationCacher $cacher,
+    ?EventDispatcherInterface $event_dispatcher = NULL,
+    ?EntityFieldManagerInterface $entity_field_manager = NULL,
+    ?EntityTypeManagerInterface $entity_type_manager = NULL,
+  ) {
     if ($event_dispatcher === NULL) {
       @trigger_error('Calling ' . __METHOD__ . '() without the $event_dispatcher argument is deprecated in drupal:11.2.0 and will be required in drupal:12.0.0. See https://www.drupal.org/node/3280569', E_USER_DEPRECATED);
       $event_dispatcher = \Drupal::service('event_dispatcher');

@@ -15,21 +15,14 @@ class ToolbarLinkBuilder implements TrustedCallbackInterface {
   use StringTranslationTrait;
 
   /**
-   * The current user.
-   *
-   * @var \Drupal\Core\Session\AccountProxyInterface
-   */
-  protected $account;
-
-  /**
    * ToolbarHandler constructor.
    *
    * @param \Drupal\Core\Session\AccountProxyInterface $account
    *   The current user.
    */
-  public function __construct(AccountProxyInterface $account) {
-    $this->account = $account;
-  }
+  public function __construct(
+    protected AccountProxyInterface $account,
+  ) {}
 
   /**
    * Lazy builder callback for rendering toolbar links.

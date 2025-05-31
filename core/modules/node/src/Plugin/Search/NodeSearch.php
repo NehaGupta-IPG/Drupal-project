@@ -38,69 +38,6 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 class NodeSearch extends ConfigurableSearchPluginBase implements AccessibleInterface, SearchIndexingInterface, TrustedCallbackInterface {
 
   /**
-   * The current database connection.
-   *
-   * @var \Drupal\Core\Database\Connection
-   */
-  protected $database;
-
-  /**
-   * The replica database connection.
-   *
-   * @var \Drupal\Core\Database\Connection
-   */
-  protected $databaseReplica;
-
-  /**
-   * The entity type manager.
-   *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
-   */
-  protected $entityTypeManager;
-
-  /**
-   * A module manager object.
-   *
-   * @var \Drupal\Core\Extension\ModuleHandlerInterface
-   */
-  protected $moduleHandler;
-
-  /**
-   * A config object for 'search.settings'.
-   *
-   * @var \Drupal\Core\Config\Config
-   */
-  protected $searchSettings;
-
-  /**
-   * The language manager.
-   *
-   * @var \Drupal\Core\Language\LanguageManagerInterface
-   */
-  protected $languageManager;
-
-  /**
-   * The Drupal account to use for checking for access to advanced search.
-   *
-   * @var \Drupal\Core\Session\AccountInterface
-   */
-  protected $account;
-
-  /**
-   * The Renderer service to format the username and node.
-   *
-   * @var \Drupal\Core\Render\RendererInterface
-   */
-  protected $renderer;
-
-  /**
-   * The search index.
-   *
-   * @var \Drupal\search\SearchIndexInterface
-   */
-  protected $searchIndex;
-
-  /**
    * An array of additional rankings from hook_ranking().
    *
    * @var array
@@ -131,13 +68,6 @@ class NodeSearch extends ConfigurableSearchPluginBase implements AccessibleInter
    * A constant for setting and checking the query string.
    */
   const ADVANCED_FORM = 'advanced-form';
-
-  /**
-   * The messenger.
-   *
-   * @var \Drupal\Core\Messenger\MessengerInterface
-   */
-  protected $messenger;
 
   /**
    * {@inheritdoc}
@@ -171,13 +101,13 @@ class NodeSearch extends ConfigurableSearchPluginBase implements AccessibleInter
    *   The plugin implementation definition.
    * @param \Drupal\Core\Database\Connection $database
    *   The current database connection.
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
    *   The entity type manager.
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
+   * @param \Drupal\Core\Extension\ModuleHandlerInterface $moduleHandler
    *   A module manager object.
-   * @param \Drupal\Core\Config\Config $search_settings
+   * @param \Drupal\Core\Config\Config $searchSettings
    *   A config object for 'search.settings'.
-   * @param \Drupal\Core\Language\LanguageManagerInterface $language_manager
+   * @param \Drupal\Core\Language\LanguageManagerInterface $languageManager
    *   The language manager.
    * @param \Drupal\Core\Render\RendererInterface $renderer
    *   The renderer.
@@ -185,25 +115,29 @@ class NodeSearch extends ConfigurableSearchPluginBase implements AccessibleInter
    *   The messenger.
    * @param \Drupal\Core\Session\AccountInterface $account
    *   The $account object to use for checking for access to advanced search.
-   * @param \Drupal\Core\Database\Connection|null $database_replica
+   * @param \Drupal\Core\Database\Connection|null $databaseReplica
    *   The replica database connection.
-   * @param \Drupal\search\SearchIndexInterface $search_index
+   * @param \Drupal\search\SearchIndexInterface $searchIndex
    *   The search index.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, Connection $database, EntityTypeManagerInterface $entity_type_manager, ModuleHandlerInterface $module_handler, Config $search_settings, LanguageManagerInterface $language_manager, RendererInterface $renderer, MessengerInterface $messenger, AccountInterface $account, Connection $database_replica, SearchIndexInterface $search_index) {
-    $this->database = $database;
-    $this->databaseReplica = $database_replica;
-    $this->entityTypeManager = $entity_type_manager;
-    $this->moduleHandler = $module_handler;
-    $this->searchSettings = $search_settings;
-    $this->languageManager = $language_manager;
-    $this->renderer = $renderer;
-    $this->messenger = $messenger;
-    $this->account = $account;
+  public function __construct(
+    array $configuration,
+    $plugin_id,
+    $plugin_definition,
+    protected Connection $database,
+    protected EntityTypeManagerInterface $entityTypeManager,
+    protected ModuleHandlerInterface $moduleHandler,
+    protected Config $searchSettings,
+    protected LanguageManagerInterface $languageManager,
+    protected RendererInterface $renderer,
+    protected MessengerInterface $messenger,
+    protected AccountInterface $account,
+    protected Connection $databaseReplica,
+    protected SearchIndexInterface $searchIndex,
+  ) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
 
     $this->addCacheTags(['node_list']);
-    $this->searchIndex = $search_index;
   }
 
   /**

@@ -21,31 +21,17 @@ class ContactFormEditForm extends EntityForm implements ContainerInjectionInterf
   use ConfigFormBaseTrait;
 
   /**
-   * The email validator.
-   *
-   * @var \Drupal\Component\Utility\EmailValidatorInterface
-   */
-  protected $emailValidator;
-
-  /**
-   * The path validator.
-   *
-   * @var \Drupal\Core\Path\PathValidatorInterface
-   */
-  protected $pathValidator;
-
-  /**
    * Constructs a new ContactFormEditForm.
    *
-   * @param \Drupal\Component\Utility\EmailValidatorInterface $email_validator
+   * @param \Drupal\Component\Utility\EmailValidatorInterface $emailValidator
    *   The email validator.
-   * @param \Drupal\Core\Path\PathValidatorInterface $path_validator
+   * @param \Drupal\Core\Path\PathValidatorInterface $pathValidator
    *   The path validator service.
    */
-  public function __construct(EmailValidatorInterface $email_validator, PathValidatorInterface $path_validator) {
-    $this->emailValidator = $email_validator;
-    $this->pathValidator = $path_validator;
-  }
+  public function __construct(
+    protected EmailValidatorInterface $emailValidator,
+    protected PathValidatorInterface $pathValidator,
+  ) {}
 
   /**
    * {@inheritdoc}

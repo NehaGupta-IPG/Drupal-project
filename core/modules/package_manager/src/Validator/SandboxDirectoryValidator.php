@@ -25,8 +25,9 @@ final class SandboxDirectoryValidator implements EventSubscriberInterface {
   }
   use StringTranslationTrait;
 
-  public function __construct(private readonly PathLocator $pathLocator) {
-  }
+  public function __construct(
+    private readonly PathLocator $pathLocator,
+  ) {}
 
   /**
    * Check if staging root is a subdirectory of active.

@@ -25,48 +25,13 @@ use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 class UserController extends ControllerBase {
 
   /**
-   * The date formatter service.
-   *
-   * @var \Drupal\Core\Datetime\DateFormatterInterface
-   */
-  protected $dateFormatter;
-
-  /**
-   * The user storage.
-   *
-   * @var \Drupal\user\UserStorageInterface
-   */
-  protected $userStorage;
-
-  /**
-   * The user data service.
-   *
-   * @var \Drupal\user\UserDataInterface
-   */
-  protected $userData;
-
-  /**
-   * A logger instance.
-   *
-   * @var \Psr\Log\LoggerInterface
-   */
-  protected $logger;
-
-  /**
-   * The flood service.
-   *
-   * @var \Drupal\Core\Flood\FloodInterface
-   */
-  protected $flood;
-
-  /**
    * Constructs a UserController object.
    *
-   * @param \Drupal\Core\Datetime\DateFormatterInterface $date_formatter
+   * @param \Drupal\Core\Datetime\DateFormatterInterface $dateFormatter
    *   The date formatter service.
-   * @param \Drupal\user\UserStorageInterface $user_storage
+   * @param \Drupal\user\UserStorageInterface $userStorage
    *   The user storage.
-   * @param \Drupal\user\UserDataInterface $user_data
+   * @param \Drupal\user\UserDataInterface $userData
    *   The user data service.
    * @param \Psr\Log\LoggerInterface $logger
    *   A logger instance.
@@ -76,19 +41,13 @@ class UserController extends ControllerBase {
    *   The time service.
    */
   public function __construct(
-    DateFormatterInterface $date_formatter,
-    UserStorageInterface $user_storage,
-    UserDataInterface $user_data,
-    LoggerInterface $logger,
-    FloodInterface $flood,
+    protected DateFormatterInterface $dateFormatter,
+    protected UserStorageInterface $userStorage,
+    protected UserDataInterface $userData,
+    protected LoggerInterface $logger,
+    protected FloodInterface $flood,
     protected TimeInterface $time,
-  ) {
-    $this->dateFormatter = $date_formatter;
-    $this->userStorage = $user_storage;
-    $this->userData = $user_data;
-    $this->logger = $logger;
-    $this->flood = $flood;
-  }
+  ) {}
 
   /**
    * {@inheritdoc}

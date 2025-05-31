@@ -24,21 +24,14 @@ use Symfony\Component\Serializer\SerializerInterface;
 class RequestHandler implements ContainerInjectionInterface {
 
   /**
-   * The serializer.
-   *
-   * @var \Symfony\Component\Serializer\SerializerInterface|\Symfony\Component\Serializer\Encoder\DecoderInterface
-   */
-  protected $serializer;
-
-  /**
    * Creates a new RequestHandler instance.
    *
    * @param \Symfony\Component\Serializer\SerializerInterface|\Symfony\Component\Serializer\Encoder\DecoderInterface $serializer
    *   The serializer.
    */
-  public function __construct(SerializerInterface $serializer) {
-    $this->serializer = $serializer;
-  }
+  public function __construct(
+    protected SerializerInterface $serializer,
+  ) {}
 
   /**
    * {@inheritdoc}

@@ -15,31 +15,17 @@ use Symfony\Component\HttpKernel\Event\TerminateEvent;
 class PathAliasSubscriber implements EventSubscriberInterface {
 
   /**
-   * The alias manager that caches alias lookups based on the request.
-   *
-   * @var \Drupal\path_alias\AliasManagerInterface
-   */
-  protected $aliasManager;
-
-  /**
-   * The current path.
-   *
-   * @var \Drupal\Core\Path\CurrentPathStack
-   */
-  protected $currentPath;
-
-  /**
    * Constructs a new PathSubscriber instance.
    *
-   * @param \Drupal\path_alias\AliasManagerInterface $alias_manager
+   * @param \Drupal\path_alias\AliasManagerInterface $aliasManager
    *   The alias manager.
-   * @param \Drupal\Core\Path\CurrentPathStack $current_path
+   * @param \Drupal\Core\Path\CurrentPathStack $currentPath
    *   The current path.
    */
-  public function __construct(AliasManagerInterface $alias_manager, CurrentPathStack $current_path) {
-    $this->aliasManager = $alias_manager;
-    $this->currentPath = $current_path;
-  }
+  public function __construct(
+    protected AliasManagerInterface $aliasManager,
+    protected CurrentPathStack $currentPath,
+  ) {}
 
   /**
    * Sets the cache key on the alias manager cache decorator.

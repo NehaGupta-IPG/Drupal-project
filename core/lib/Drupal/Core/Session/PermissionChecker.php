@@ -7,8 +7,9 @@ namespace Drupal\Core\Session;
  */
 class PermissionChecker implements PermissionCheckerInterface {
 
-  public function __construct(protected AccessPolicyProcessorInterface $processor) {
-  }
+  public function __construct(
+    protected AccessPolicyProcessorInterface $processor,
+  ) {}
 
   /**
    * {@inheritdoc}

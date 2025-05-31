@@ -44,15 +44,12 @@ class InstallTasksTest extends UnitTestCase {
 
     return new class($connection) extends Tasks {
 
-      /**
-       * The database connection.
-       *
-       * @var \Drupal\Core\Database\Connection
-       */
-      private $connection;
-
-      public function __construct(Connection $connection) {
-        $this->connection = $connection;
+      public function __construct(
+        /**
+         * The database connection.
+         */
+        private Connection $connection,
+      ) {
       }
 
       /**

@@ -15,31 +15,17 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 class FieldLayoutBuilder implements ContainerInjectionInterface {
 
   /**
-   * The layout plugin manager.
-   *
-   * @var \Drupal\Core\Layout\LayoutPluginManagerInterface
-   */
-  protected $layoutPluginManager;
-
-  /**
-   * The entity field manager.
-   *
-   * @var \Drupal\Core\Entity\EntityFieldManagerInterface
-   */
-  protected $entityFieldManager;
-
-  /**
    * Constructs a new FieldLayoutBuilder.
    *
-   * @param \Drupal\Core\Layout\LayoutPluginManagerInterface $layout_plugin_manager
+   * @param \Drupal\Core\Layout\LayoutPluginManagerInterface $layoutPluginManager
    *   The layout plugin manager.
-   * @param \Drupal\Core\Entity\EntityFieldManagerInterface $entity_field_manager
+   * @param \Drupal\Core\Entity\EntityFieldManagerInterface $entityFieldManager
    *   The entity field manager.
    */
-  public function __construct(LayoutPluginManagerInterface $layout_plugin_manager, EntityFieldManagerInterface $entity_field_manager) {
-    $this->layoutPluginManager = $layout_plugin_manager;
-    $this->entityFieldManager = $entity_field_manager;
-  }
+  public function __construct(
+    protected LayoutPluginManagerInterface $layoutPluginManager,
+    protected EntityFieldManagerInterface $entityFieldManager,
+  ) {}
 
   /**
    * {@inheritdoc}

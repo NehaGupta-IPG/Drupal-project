@@ -22,7 +22,10 @@ class CacheFactoryDecorator implements CacheFactoryInterface {
    */
   protected array $cacheBackends = [];
 
-  public function __construct(protected readonly CacheFactoryInterface $cacheFactory, protected readonly PerformanceDataCollector $performanceDataCollector) {}
+  public function __construct(
+    protected readonly CacheFactoryInterface $cacheFactory,
+    protected readonly PerformanceDataCollector $performanceDataCollector,
+  ) {}
 
   /**
    * {@inheritdoc}

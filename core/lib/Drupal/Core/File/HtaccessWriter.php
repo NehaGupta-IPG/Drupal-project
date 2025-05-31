@@ -15,31 +15,17 @@ use Psr\Log\LoggerInterface;
 class HtaccessWriter implements HtaccessWriterInterface {
 
   /**
-   * The stream wrapper manager.
-   *
-   * @var \Drupal\Core\StreamWrapper\StreamWrapperManagerInterface
-   */
-  protected $streamWrapperManager;
-
-  /**
-   * The logger.
-   *
-   * @var \Psr\Log\LoggerInterface
-   */
-  protected $logger;
-
-  /**
    * Htaccess constructor.
    *
    * @param \Psr\Log\LoggerInterface $logger
    *   The logger.
-   * @param \Drupal\Core\StreamWrapper\StreamWrapperManagerInterface $stream_wrapper_manager
+   * @param \Drupal\Core\StreamWrapper\StreamWrapperManagerInterface $streamWrapperManager
    *   The stream wrapper manager.
    */
-  public function __construct(LoggerInterface $logger, StreamWrapperManagerInterface $stream_wrapper_manager) {
-    $this->logger = $logger;
-    $this->streamWrapperManager = $stream_wrapper_manager;
-  }
+  public function __construct(
+    protected LoggerInterface $logger,
+    protected StreamWrapperManagerInterface $streamWrapperManager,
+  ) {}
 
   /**
    * {@inheritdoc}

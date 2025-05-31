@@ -10,20 +10,6 @@ use Drupal\Core\Database\Connection;
 class SelectExtender implements SelectInterface {
 
   /**
-   * The Select query object we are extending/decorating.
-   *
-   * @var \Drupal\Core\Database\Query\SelectInterface
-   */
-  protected $query;
-
-  /**
-   * The connection object on which to run this query.
-   *
-   * @var \Drupal\Core\Database\Connection
-   */
-  protected $connection;
-
-  /**
    * A unique identifier for this query object.
    *
    * @var string
@@ -37,10 +23,15 @@ class SelectExtender implements SelectInterface {
    */
   protected $placeholder = 0;
 
-  public function __construct(SelectInterface $query, Connection $connection) {
+  public function __construct(/**
+     * The Select query object we are extending/decorating.
+     */
+    protected SelectInterface $query, /**
+     * The connection object on which to run this query.
+     */
+    protected Connection $connection,
+) {
     $this->uniqueIdentifier = uniqid('', TRUE);
-    $this->query = $query;
-    $this->connection = $connection;
   }
 
   /**

@@ -26,7 +26,12 @@ final class RecipeMissingExtensionsException extends \RuntimeException {
    * @param null|\Throwable $previous
    *   [optional] The previous throwable used for the exception chaining.
    */
-  public function __construct(public readonly array $extensions, string $message = "", int $code = 0, ?\Throwable $previous = NULL) {
+  public function __construct(
+    public readonly array $extensions,
+    string $message = "",
+    int $code = 0,
+    ?\Throwable $previous = NULL,
+  ) {
     assert(Inspector::assertAllStrings($extensions), 'Extension names must be strings.');
     if (!$message) {
       $sorted = $this->extensions;

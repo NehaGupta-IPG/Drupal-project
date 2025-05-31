@@ -30,7 +30,9 @@ class ComponentNodeVisitor implements NodeVisitorInterface {
    * @param \Drupal\Core\Theme\ComponentPluginManager $pluginManager
    *   The plugin manager for components.
    */
-  public function __construct(protected ComponentPluginManager $pluginManager) {}
+  public function __construct(
+    protected ComponentPluginManager $pluginManager,
+  ) {}
 
   /**
    * {@inheritdoc}

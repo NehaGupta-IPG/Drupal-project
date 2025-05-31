@@ -19,31 +19,17 @@ use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 class EntityAutocompleteController extends ControllerBase {
 
   /**
-   * The autocomplete matcher for entity references.
-   *
-   * @var \Drupal\Core\Entity\EntityAutocompleteMatcherInterface
-   */
-  protected $matcher;
-
-  /**
-   * The key value store.
-   *
-   * @var \Drupal\Core\KeyValueStore\KeyValueStoreInterface
-   */
-  protected $keyValue;
-
-  /**
    * Constructs an EntityAutocompleteController object.
    *
    * @param \Drupal\Core\Entity\EntityAutocompleteMatcherInterface $matcher
    *   The autocomplete matcher for entity references.
-   * @param \Drupal\Core\KeyValueStore\KeyValueStoreInterface $key_value
+   * @param \Drupal\Core\KeyValueStore\KeyValueStoreInterface $keyValue
    *   The key value factory.
    */
-  public function __construct(EntityAutocompleteMatcherInterface $matcher, KeyValueStoreInterface $key_value) {
-    $this->matcher = $matcher;
-    $this->keyValue = $key_value;
-  }
+  public function __construct(
+    protected EntityAutocompleteMatcherInterface $matcher,
+    protected KeyValueStoreInterface $keyValue,
+  ) {}
 
   /**
    * {@inheritdoc}

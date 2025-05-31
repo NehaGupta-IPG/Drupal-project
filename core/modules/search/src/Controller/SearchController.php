@@ -16,13 +16,6 @@ use Symfony\Component\HttpFoundation\Request;
 class SearchController extends ControllerBase {
 
   /**
-   * The search page repository.
-   *
-   * @var \Drupal\search\SearchPageRepositoryInterface
-   */
-  protected $searchPageRepository;
-
-  /**
    * A logger instance.
    *
    * @var \Psr\Log\LoggerInterface
@@ -30,24 +23,18 @@ class SearchController extends ControllerBase {
   protected $logger;
 
   /**
-   * The renderer.
-   *
-   * @var \Drupal\Core\Render\RendererInterface
-   */
-  protected $renderer;
-
-  /**
    * Constructs a new search controller.
    *
-   * @param \Drupal\search\SearchPageRepositoryInterface $search_page_repository
+   * @param \Drupal\search\SearchPageRepositoryInterface $searchPageRepository
    *   The search page repository.
    * @param \Drupal\Core\Render\RendererInterface $renderer
    *   The renderer.
    */
-  public function __construct(SearchPageRepositoryInterface $search_page_repository, RendererInterface $renderer) {
-    $this->searchPageRepository = $search_page_repository;
+  public function __construct(
+    protected SearchPageRepositoryInterface $searchPageRepository,
+    protected RendererInterface $renderer,
+  ) {
     $this->logger = $this->getLogger('search');
-    $this->renderer = $renderer;
   }
 
   /**

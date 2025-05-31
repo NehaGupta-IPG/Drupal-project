@@ -95,13 +95,6 @@ class ViewUI implements ViewEntityInterface {
   public $live_preview;
 
   /**
-   * The View storage object.
-   *
-   * @var \Drupal\views\ViewEntityInterface
-   */
-  protected $storage;
-
-  /**
    * Stores a list of database queries run beside the main one from views.
    *
    * @var array
@@ -155,9 +148,10 @@ class ViewUI implements ViewEntityInterface {
    * @param \Drupal\views\ViewEntityInterface $storage
    *   The View storage object to wrap.
    */
-  public function __construct(ViewEntityInterface $storage) {
+  public function __construct(
+    protected ViewEntityInterface $storage,
+  ) {
     $this->entityType = 'view';
-    $this->storage = $storage;
   }
 
   /**

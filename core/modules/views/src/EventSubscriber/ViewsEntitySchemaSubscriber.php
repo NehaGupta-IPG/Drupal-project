@@ -70,20 +70,6 @@ class ViewsEntitySchemaSubscriber implements EntityTypeListenerInterface, EventS
   const REVISION_DATA_TABLE_REMOVAL = 9;
 
   /**
-   * The entity type manager.
-   *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
-   */
-  protected $entityTypeManager;
-
-  /**
-   * The default logger service.
-   *
-   * @var \Psr\Log\LoggerInterface
-   */
-  protected $logger;
-
-  /**
    * Array of views that need to be saved, indexed by view name.
    *
    * @var \Drupal\views\ViewEntityInterface[]
@@ -93,15 +79,15 @@ class ViewsEntitySchemaSubscriber implements EntityTypeListenerInterface, EventS
   /**
    * Constructs a ViewsEntitySchemaSubscriber.
    *
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
    *   The entity type manager.
    * @param \Psr\Log\LoggerInterface $logger
    *   A logger instance.
    */
-  public function __construct(EntityTypeManagerInterface $entity_type_manager, LoggerInterface $logger) {
-    $this->entityTypeManager = $entity_type_manager;
-    $this->logger = $logger;
-  }
+  public function __construct(
+    protected EntityTypeManagerInterface $entityTypeManager,
+    protected LoggerInterface $logger,
+  ) {}
 
   /**
    * {@inheritdoc}

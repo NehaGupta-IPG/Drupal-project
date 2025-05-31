@@ -45,7 +45,14 @@ class FieldStorageAddForm extends FormBase {
    */
   protected $bundle;
 
-  public function __construct(protected EntityTypeManagerInterface $entityTypeManager, protected FieldTypePluginManagerInterface $fieldTypePluginManager, ConfigFactoryInterface $configFactory, protected EntityFieldManagerInterface $entityFieldManager, protected PrivateTempStore $tempStore, protected FieldTypeCategoryManagerInterface $fieldTypeCategoryManager) {
+  public function __construct(
+    protected EntityTypeManagerInterface $entityTypeManager,
+    protected FieldTypePluginManagerInterface $fieldTypePluginManager,
+    ConfigFactoryInterface $configFactory,
+    protected EntityFieldManagerInterface $entityFieldManager,
+    protected PrivateTempStore $tempStore,
+    protected FieldTypeCategoryManagerInterface $fieldTypeCategoryManager,
+  ) {
     $this->setConfigFactory($configFactory);
   }
 

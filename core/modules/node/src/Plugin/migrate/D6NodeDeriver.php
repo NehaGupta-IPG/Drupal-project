@@ -19,41 +19,20 @@ class D6NodeDeriver extends DeriverBase implements ContainerDeriverInterface {
   use StringTranslationTrait;
 
   /**
-   * The base plugin ID this derivative is for.
-   *
-   * @var string
-   */
-  protected $basePluginId;
-
-  /**
-   * Whether or not to include translations.
-   *
-   * @var bool
-   */
-  protected $includeTranslations;
-
-  /**
-   * The migration field discovery service.
-   *
-   * @var \Drupal\migrate_drupal\FieldDiscoveryInterface
-   */
-  protected $fieldDiscovery;
-
-  /**
    * D6NodeDeriver constructor.
    *
-   * @param string $base_plugin_id
+   * @param string $basePluginId
    *   The base plugin ID for the plugin ID.
-   * @param bool $translations
+   * @param bool $includeTranslations
    *   Whether or not to include translations.
-   * @param \Drupal\migrate_drupal\FieldDiscoveryInterface $field_discovery
+   * @param \Drupal\migrate_drupal\FieldDiscoveryInterface $fieldDiscovery
    *   The migration field discovery service.
    */
-  public function __construct($base_plugin_id, $translations, FieldDiscoveryInterface $field_discovery) {
-    $this->basePluginId = $base_plugin_id;
-    $this->includeTranslations = $translations;
-    $this->fieldDiscovery = $field_discovery;
-  }
+  public function __construct(
+    protected $basePluginId,
+    protected $includeTranslations,
+    protected FieldDiscoveryInterface $fieldDiscovery,
+  ) {}
 
   /**
    * {@inheritdoc}

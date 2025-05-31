@@ -14,41 +14,20 @@ use Drupal\Core\Extension\ModuleHandlerInterface;
 class SearchTextProcessor implements SearchTextProcessorInterface {
 
   /**
-   * The transliteration service.
-   *
-   * @var \Drupal\Component\Transliteration\TransliterationInterface
-   */
-  protected $transliteration;
-
-  /**
-   * The config factory.
-   *
-   * @var \Drupal\Core\Config\ConfigFactoryInterface
-   */
-  protected $configFactory;
-
-  /**
-   * The module handler.
-   *
-   * @var \Drupal\Core\Extension\ModuleHandlerInterface
-   */
-  protected $moduleHandler;
-
-  /**
    * SearchTextProcessor constructor.
    *
    * @param \Drupal\Component\Transliteration\TransliterationInterface $transliteration
    *   The transliteration service.
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
+   * @param \Drupal\Core\Config\ConfigFactoryInterface $configFactory
    *   The config factory.
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
+   * @param \Drupal\Core\Extension\ModuleHandlerInterface $moduleHandler
    *   The module handler.
    */
-  public function __construct(TransliterationInterface $transliteration, ConfigFactoryInterface $config_factory, ModuleHandlerInterface $module_handler) {
-    $this->transliteration = $transliteration;
-    $this->configFactory = $config_factory;
-    $this->moduleHandler = $module_handler;
-  }
+  public function __construct(
+    protected TransliterationInterface $transliteration,
+    protected ConfigFactoryInterface $configFactory,
+    protected ModuleHandlerInterface $moduleHandler,
+  ) {}
 
   /**
    * {@inheritdoc}

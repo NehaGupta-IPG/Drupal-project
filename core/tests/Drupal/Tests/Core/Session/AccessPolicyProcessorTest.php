@@ -579,14 +579,14 @@ class UserContextAccessPolicy extends AccessPolicyBase {
 class CacheItem {
 
   /**
-   * The cache data.
-   *
-   * @var \Drupal\Core\Session\CalculatedPermissions
+   * @param \Drupal\Core\Session\CalculatedPermissions $data
    */
-  public $data;
-
-  public function __construct($data) {
-    $this->data = $data;
+  public function __construct(
+    /**
+     * The cache data.
+     */
+    public $data,
+  ) {
   }
 
 }

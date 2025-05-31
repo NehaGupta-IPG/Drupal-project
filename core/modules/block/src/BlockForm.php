@@ -39,65 +39,33 @@ class BlockForm extends EntityForm {
   protected $storage;
 
   /**
-   * The condition plugin manager.
-   *
-   * @var \Drupal\Core\Condition\ConditionManager
-   */
-  protected $manager;
-
-  /**
-   * The language manager service.
-   *
-   * @var \Drupal\Core\Language\LanguageManagerInterface
-   */
-  protected $language;
-
-  /**
-   * The theme handler.
-   *
-   * @var \Drupal\Core\Extension\ThemeHandler
-   */
-  protected $themeHandler;
-
-  /**
-   * The context repository service.
-   *
-   * @var \Drupal\Core\Plugin\Context\ContextRepositoryInterface
-   */
-  protected $contextRepository;
-
-  /**
-   * The plugin form manager.
-   *
-   * @var \Drupal\Core\Plugin\PluginFormFactoryInterface
-   */
-  protected $pluginFormFactory;
-
-  /**
    * Constructs a BlockForm object.
    *
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager.
    * @param \Drupal\Core\Executable\ExecutableManagerInterface $manager
    *   The ConditionManager for building the visibility UI.
-   * @param \Drupal\Core\Plugin\Context\ContextRepositoryInterface $context_repository
+   * @param \Drupal\Core\Plugin\Context\ContextRepositoryInterface $contextRepository
    *   The lazy context repository service.
    * @param \Drupal\Core\Language\LanguageManagerInterface $language
    *   The language manager.
-   * @param \Drupal\Core\Extension\ThemeHandlerInterface $theme_handler
+   * @param \Drupal\Core\Extension\ThemeHandlerInterface $themeHandler
    *   The theme handler.
-   * @param \Drupal\Core\Plugin\PluginFormFactoryInterface $plugin_form_manager
+   * @param \Drupal\Core\Plugin\PluginFormFactoryInterface $pluginFormFactory
    *   The plugin form manager.
    * @param \Drupal\block\BlockRepositoryInterface $blockRepository
    *   The block repository service.
    */
-  public function __construct(EntityTypeManagerInterface $entity_type_manager, ExecutableManagerInterface $manager, ContextRepositoryInterface $context_repository, LanguageManagerInterface $language, ThemeHandlerInterface $theme_handler, PluginFormFactoryInterface $plugin_form_manager, protected BlockRepositoryInterface $blockRepository) {
+  public function __construct(
+    EntityTypeManagerInterface $entity_type_manager,
+    protected ExecutableManagerInterface $manager,
+    protected ContextRepositoryInterface $contextRepository,
+    protected LanguageManagerInterface $language,
+    protected ThemeHandlerInterface $themeHandler,
+    protected PluginFormFactoryInterface $pluginFormFactory,
+    protected BlockRepositoryInterface $blockRepository,
+  ) {
     $this->storage = $entity_type_manager->getStorage('block');
-    $this->manager = $manager;
-    $this->contextRepository = $context_repository;
-    $this->language = $language;
-    $this->themeHandler = $theme_handler;
-    $this->pluginFormFactory = $plugin_form_manager;
   }
 
   /**

@@ -13,31 +13,17 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
 class KernelPreHandle implements HttpKernelInterface {
 
   /**
-   * The wrapped HTTP kernel.
-   *
-   * @var \Symfony\Component\HttpKernel\HttpKernelInterface
-   */
-  protected $httpKernel;
-
-  /**
-   * The main Drupal kernel.
-   *
-   * @var \Drupal\Core\DrupalKernelInterface
-   */
-  protected $drupalKernel;
-
-  /**
    * Constructs a new KernelPreHandle instance.
    *
-   * @param \Symfony\Component\HttpKernel\HttpKernelInterface $http_kernel
+   * @param \Symfony\Component\HttpKernel\HttpKernelInterface $httpKernel
    *   The wrapped HTTP kernel.
-   * @param \Drupal\Core\DrupalKernelInterface $drupal_kernel
+   * @param \Drupal\Core\DrupalKernelInterface $drupalKernel
    *   The main Drupal kernel.
    */
-  public function __construct(HttpKernelInterface $http_kernel, DrupalKernelInterface $drupal_kernel) {
-    $this->httpKernel = $http_kernel;
-    $this->drupalKernel = $drupal_kernel;
-  }
+  public function __construct(
+    protected HttpKernelInterface $httpKernel,
+    protected DrupalKernelInterface $drupalKernel,
+  ) {}
 
   /**
    * {@inheritdoc}

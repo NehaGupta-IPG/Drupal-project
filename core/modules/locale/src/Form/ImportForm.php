@@ -25,20 +25,6 @@ class ImportForm extends FormBase {
   protected $file;
 
   /**
-   * The module handler service.
-   *
-   * @var \Drupal\Core\Extension\ModuleHandlerInterface
-   */
-  protected $moduleHandler;
-
-  /**
-   * The configurable language manager.
-   *
-   * @var \Drupal\language\ConfigurableLanguageManagerInterface
-   */
-  protected $languageManager;
-
-  /**
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container) {
@@ -51,15 +37,15 @@ class ImportForm extends FormBase {
   /**
    * Constructs a form for language import.
    *
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
+   * @param \Drupal\Core\Extension\ModuleHandlerInterface $moduleHandler
    *   The module handler service.
-   * @param \Drupal\language\ConfigurableLanguageManagerInterface $language_manager
+   * @param \Drupal\language\ConfigurableLanguageManagerInterface $languageManager
    *   The configurable language manager.
    */
-  public function __construct(ModuleHandlerInterface $module_handler, ConfigurableLanguageManagerInterface $language_manager) {
-    $this->moduleHandler = $module_handler;
-    $this->languageManager = $language_manager;
-  }
+  public function __construct(
+    protected ModuleHandlerInterface $moduleHandler,
+    protected ConfigurableLanguageManagerInterface $languageManager,
+  ) {}
 
   /**
    * {@inheritdoc}

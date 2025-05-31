@@ -17,8 +17,14 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
  */
 class WorkspaceOperationFactory {
 
-  public function __construct(protected EntityTypeManagerInterface $entityTypeManager, protected Connection $database, protected WorkspaceManagerInterface $workspaceManager, protected WorkspaceAssociationInterface $workspaceAssociation, protected EventDispatcherInterface $eventDispatcher, protected LoggerInterface $logger) {
-  }
+  public function __construct(
+    protected EntityTypeManagerInterface $entityTypeManager,
+    protected Connection $database,
+    protected WorkspaceManagerInterface $workspaceManager,
+    protected WorkspaceAssociationInterface $workspaceAssociation,
+    protected EventDispatcherInterface $eventDispatcher,
+    protected LoggerInterface $logger,
+  ) {}
 
   /**
    * Gets the workspace publisher.

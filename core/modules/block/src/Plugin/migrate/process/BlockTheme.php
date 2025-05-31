@@ -17,18 +17,6 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 class BlockTheme extends ProcessPluginBase implements ContainerFactoryPluginInterface {
 
   /**
-   * Contains the system.theme configuration object.
-   */
-  protected Config $themeConfig;
-
-  /**
-   * List of themes available on the destination.
-   *
-   * @var string[]
-   */
-  protected array $themes;
-
-  /**
    * Constructs a BlockTheme object.
    *
    * @param array $configuration
@@ -37,15 +25,19 @@ class BlockTheme extends ProcessPluginBase implements ContainerFactoryPluginInte
    *   The plugin ID for the plugin instance.
    * @param mixed $plugin_definition
    *   The plugin implementation definition.
-   * @param \Drupal\Core\Config\Config $theme_config
+   * @param \Drupal\Core\Config\Config $themeConfig
    *   The system.theme configuration factory object.
    * @param array $themes
    *   The list of themes available on the destination.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, Config $theme_config, array $themes) {
+  public function __construct(
+    array $configuration,
+    $plugin_id,
+    $plugin_definition,
+    protected Config $themeConfig,
+    protected array $themes,
+  ) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
-    $this->themeConfig = $theme_config;
-    $this->themes = $themes;
   }
 
   /**

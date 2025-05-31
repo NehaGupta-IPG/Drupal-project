@@ -975,17 +975,15 @@ class AccessResultTest extends UnitTestCase {
 class UncacheableTestAccessResult implements AccessResultInterface {
 
   /**
-   * The access result value. 'ALLOWED', 'FORBIDDEN' or 'NEUTRAL'.
-   *
-   * @var string
-   */
-  protected $value;
-
-  /**
    * Constructs a new UncacheableTestAccessResult object.
+   * @param string $value
    */
-  public function __construct($value) {
-    $this->value = $value;
+  public function __construct(
+    /**
+     * The access result value. 'ALLOWED', 'FORBIDDEN' or 'NEUTRAL'.
+     */
+    protected $value,
+  ) {
   }
 
   /**

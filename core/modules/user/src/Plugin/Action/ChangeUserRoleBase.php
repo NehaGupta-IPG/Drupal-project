@@ -20,18 +20,17 @@ abstract class ChangeUserRoleBase extends ConfigurableActionBase implements Cont
   use DependencyTrait;
 
   /**
-   * The user role entity type.
-   *
-   * @var \Drupal\Core\Entity\EntityTypeInterface
-   */
-  protected $entityType;
-
-  /**
    * {@inheritdoc}
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, EntityTypeInterface $entity_type) {
+  public function __construct(
+    array $configuration,
+    $plugin_id,
+    $plugin_definition, /**
+     * The user role entity type.
+     */
+    protected EntityTypeInterface $entityType,
+) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
-    $this->entityType = $entity_type;
   }
 
   /**

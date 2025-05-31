@@ -42,13 +42,6 @@ class ReviewForm extends MigrateUpgradeFormBase {
   protected $migrations;
 
   /**
-   * Migration state service.
-   *
-   * @var \Drupal\migrate_drupal\MigrationState
-   */
-  protected $migrationState;
-
-  /**
    * Source system data set in buildForm().
    *
    * @var array
@@ -77,13 +70,12 @@ class ReviewForm extends MigrateUpgradeFormBase {
     StateInterface $state,
     MigrationPluginManagerInterface $migration_plugin_manager,
     PrivateTempStoreFactory $tempstore_private,
-    MigrationState $migrationState,
+    protected MigrationState $migrationState,
     ConfigFactoryInterface $config_factory,
     protected ModuleExtensionList $moduleExtensionList,
     protected TimeInterface $time,
   ) {
     parent::__construct($config_factory, $migration_plugin_manager, $state, $tempstore_private);
-    $this->migrationState = $migrationState;
   }
 
   /**

@@ -23,7 +23,11 @@ class DirectoryWithMetadataDiscovery extends YamlDirectoryDiscovery {
    * @param \Drupal\Core\File\FileSystemInterface $fileSystem
    *   The file system service.
    */
-  public function __construct(array $directories, string $file_cache_key_suffix, protected FileSystemInterface $fileSystem) {
+  public function __construct(
+    array $directories,
+    string $file_cache_key_suffix,
+    protected FileSystemInterface $fileSystem,
+  ) {
     parent::__construct($directories, $file_cache_key_suffix);
   }
 

@@ -30,45 +30,27 @@ class MenuLinkDefaultForm implements MenuLinkFormInterface, ContainerInjectionIn
   protected $menuLink;
 
   /**
-   * The menu link manager.
-   *
-   * @var \Drupal\Core\Menu\MenuLinkManagerInterface
-   */
-  protected $menuLinkManager;
-
-  /**
-   * The parent form selector service.
-   *
-   * @var \Drupal\Core\Menu\MenuParentFormSelectorInterface
-   */
-  protected $menuParentSelector;
-
-  /**
-   * The module handler service.
-   *
-   * @var \Drupal\Core\Extension\ModuleHandlerInterface
-   */
-  protected $moduleHandler;
-
-  /**
    * Constructs a new \Drupal\Core\Menu\Form\MenuLinkDefaultForm.
    *
-   * @param \Drupal\Core\Menu\MenuLinkManagerInterface $menu_link_manager
+   * @param \Drupal\Core\Menu\MenuLinkManagerInterface $menuLinkManager
    *   The menu link manager.
-   * @param \Drupal\Core\Menu\MenuParentFormSelectorInterface $menu_parent_selector
+   * @param \Drupal\Core\Menu\MenuParentFormSelectorInterface $menuParentSelector
    *   The menu parent form selector service.
    * @param \Drupal\Core\StringTranslation\TranslationInterface $string_translation
    *   The string translation.
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
+   * @param \Drupal\Core\Extension\ModuleHandlerInterface $moduleHandler
    *   The module handler.
    * @param \Drupal\Core\Extension\ModuleExtensionList|null $moduleExtensionList
    *   The module extension list.
    */
-  public function __construct(MenuLinkManagerInterface $menu_link_manager, MenuParentFormSelectorInterface $menu_parent_selector, TranslationInterface $string_translation, ModuleHandlerInterface $module_handler, protected ?ModuleExtensionList $moduleExtensionList = NULL) {
-    $this->menuLinkManager = $menu_link_manager;
-    $this->menuParentSelector = $menu_parent_selector;
+  public function __construct(
+    protected MenuLinkManagerInterface $menuLinkManager,
+    protected MenuParentFormSelectorInterface $menuParentSelector,
+    TranslationInterface $string_translation,
+    protected ModuleHandlerInterface $moduleHandler,
+    protected ?ModuleExtensionList $moduleExtensionList = NULL,
+  ) {
     $this->stringTranslation = $string_translation;
-    $this->moduleHandler = $module_handler;
     if ($this->moduleExtensionList === NULL) {
       @trigger_error('Calling ' . __METHOD__ . '() without the $moduleExtensionList argument is deprecated in drupal:10.3.0 and will be required in drupal:12.0.0. See https://www.drupal.org/node/3310017', E_USER_DEPRECATED);
       $this->moduleExtensionList = \Drupal::service('extension.list.module');

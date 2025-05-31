@@ -44,61 +44,26 @@ class ViewAjaxController implements ContainerInjectionInterface {
   ];
 
   /**
-   * The entity storage for views.
-   *
-   * @var \Drupal\Core\Entity\EntityStorageInterface
-   */
-  protected $storage;
-
-  /**
-   * The factory to load a view executable with.
-   *
-   * @var \Drupal\views\ViewExecutableFactory
-   */
-  protected $executableFactory;
-
-  /**
-   * The renderer.
-   *
-   * @var \Drupal\Core\Render\RendererInterface
-   */
-  protected $renderer;
-
-  /**
-   * The current path.
-   *
-   * @var \Drupal\Core\Path\CurrentPathStack
-   */
-  protected $currentPath;
-
-  /**
-   * The redirect destination.
-   *
-   * @var \Drupal\Core\Routing\RedirectDestinationInterface
-   */
-  protected $redirectDestination;
-
-  /**
    * Constructs a ViewAjaxController object.
    *
    * @param \Drupal\Core\Entity\EntityStorageInterface $storage
    *   The entity storage for views.
-   * @param \Drupal\views\ViewExecutableFactory $executable_factory
+   * @param \Drupal\views\ViewExecutableFactory $executableFactory
    *   The factory to load a view executable with.
    * @param \Drupal\Core\Render\RendererInterface $renderer
    *   The renderer.
-   * @param \Drupal\Core\Path\CurrentPathStack $current_path
+   * @param \Drupal\Core\Path\CurrentPathStack $currentPath
    *   The current path.
-   * @param \Drupal\Core\Routing\RedirectDestinationInterface $redirect_destination
+   * @param \Drupal\Core\Routing\RedirectDestinationInterface $redirectDestination
    *   The redirect destination.
    */
-  public function __construct(EntityStorageInterface $storage, ViewExecutableFactory $executable_factory, RendererInterface $renderer, CurrentPathStack $current_path, RedirectDestinationInterface $redirect_destination) {
-    $this->storage = $storage;
-    $this->executableFactory = $executable_factory;
-    $this->renderer = $renderer;
-    $this->currentPath = $current_path;
-    $this->redirectDestination = $redirect_destination;
-  }
+  public function __construct(
+    protected EntityStorageInterface $storage,
+    protected ViewExecutableFactory $executableFactory,
+    protected RendererInterface $renderer,
+    protected CurrentPathStack $currentPath,
+    protected RedirectDestinationInterface $redirectDestination,
+  ) {}
 
   /**
    * {@inheritdoc}

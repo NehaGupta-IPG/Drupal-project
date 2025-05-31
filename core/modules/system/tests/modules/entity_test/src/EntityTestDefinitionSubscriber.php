@@ -27,34 +27,6 @@ class EntityTestDefinitionSubscriber implements EventSubscriberInterface, Entity
   use FieldStorageDefinitionEventSubscriberTrait;
 
   /**
-   * The state service.
-   *
-   * @var \Drupal\Core\State\StateInterface
-   */
-  protected $state;
-
-  /**
-   * The last installed schema repository.
-   *
-   * @var \Drupal\Core\Entity\EntityLastInstalledSchemaRepositoryInterface
-   */
-  protected $entityLastInstalledSchemaRepository;
-
-  /**
-   * The entity type manager.
-   *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
-   */
-  protected $entityTypeManager;
-
-  /**
-   * The entity field manager.
-   *
-   * @var \Drupal\Core\Entity\EntityFieldManagerInterface
-   */
-  protected $entityFieldManager;
-
-  /**
    * Flag determining whether events should be tracked.
    *
    * @var bool
@@ -71,11 +43,24 @@ class EntityTestDefinitionSubscriber implements EventSubscriberInterface, Entity
   /**
    * {@inheritdoc}
    */
-  public function __construct(StateInterface $state, EntityLastInstalledSchemaRepositoryInterface $entity_last_installed_schema_repository, EntityTypeManagerInterface $entity_type_manager, EntityFieldManagerInterface $entity_field_manager) {
-    $this->state = $state;
-    $this->entityLastInstalledSchemaRepository = $entity_last_installed_schema_repository;
-    $this->entityTypeManager = $entity_type_manager;
-    $this->entityFieldManager = $entity_field_manager;
+  public function __construct(
+    /**
+     * The state service.
+     */
+    protected StateInterface $state,
+    /**
+     * The last installed schema repository.
+     */
+    protected EntityLastInstalledSchemaRepositoryInterface $entityLastInstalledSchemaRepository,
+    /**
+     * The entity type manager.
+     */
+    protected EntityTypeManagerInterface $entityTypeManager,
+    /**
+     * The entity field manager.
+     */
+    protected EntityFieldManagerInterface $entityFieldManager,
+  ) {
   }
 
   /**

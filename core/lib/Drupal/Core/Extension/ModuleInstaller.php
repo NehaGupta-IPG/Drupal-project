@@ -32,52 +32,17 @@ use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 class ModuleInstaller implements ModuleInstallerInterface {
 
   /**
-   * The module handler.
-   *
-   * @var \Drupal\Core\Extension\ModuleHandlerInterface
-   */
-  protected $moduleHandler;
-
-  /**
-   * The drupal kernel.
-   *
-   * @var \Drupal\Core\DrupalKernelInterface
-   */
-  protected $kernel;
-
-  /**
-   * The app root.
-   *
-   * @var string
-   */
-  protected $root;
-
-  /**
-   * The database connection.
-   *
-   * @var \Drupal\Core\Database\Connection
-   */
-  protected $connection;
-
-  /**
-   * The update registry service.
-   *
-   * @var \Drupal\Core\Update\UpdateHookRegistry
-   */
-  protected $updateRegistry;
-
-  /**
    * Constructs a new ModuleInstaller instance.
    *
    * @param string $root
    *   The app root.
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
+   * @param \Drupal\Core\Extension\ModuleHandlerInterface $moduleHandler
    *   The module handler.
    * @param \Drupal\Core\DrupalKernelInterface $kernel
    *   The drupal kernel.
    * @param \Drupal\Core\Database\Connection $connection
    *   The database connection.
-   * @param \Drupal\Core\Update\UpdateHookRegistry $update_registry
+   * @param \Drupal\Core\Update\UpdateHookRegistry $updateRegistry
    *   The update registry service.
    * @param \Psr\Log\LoggerInterface|null $logger
    *   The logger.
@@ -88,22 +53,16 @@ class ModuleInstaller implements ModuleInstallerInterface {
    * @see \Drupal\Core\CoreServiceProvider
    */
   public function __construct(
-    #[Autowire(param: 'app.root')]
-    string $root,
-    ModuleHandlerInterface $module_handler,
-    DrupalKernelInterface $kernel,
-    Connection $connection,
-    UpdateHookRegistry $update_registry,
+    #[Autowire(param: 'app.root')]protected string $root,
+    protected ModuleHandlerInterface $moduleHandler,
+    protected DrupalKernelInterface $kernel,
+    protected Connection $connection,
+    protected UpdateHookRegistry $updateRegistry,
     #[Autowire(service: 'logger.channel.default')]
     protected LoggerInterface $logger,
     #[AutowireIterator(tag: 'module_install.uninstall_validator')]
     protected ?\Traversable $uninstallValidators = NULL,
   ) {
-    $this->root = $root;
-    $this->moduleHandler = $module_handler;
-    $this->kernel = $kernel;
-    $this->connection = $connection;
-    $this->updateRegistry = $update_registry;
     if ($this->uninstallValidators === NULL) {
       $this->uninstallValidators = \Drupal::service('module_installer.uninstall_validators');
     }
