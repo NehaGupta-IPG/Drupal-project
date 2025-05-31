@@ -307,7 +307,7 @@ class EntityTranslationTest extends EntityLanguageTestBase {
   /**
    * Tests the Entity Translation API behavior.
    */
-    public function testEntityTranslationAPI(): void {
+  public function testEntityTranslationAPI(): void {
     // Test all entity variations with data table support.
     foreach (EntityTestHelper::getEntityTypes(EntityTestTypesFilter::Multilingual) as $entity_type) {
       $this->doTestEntityTranslationAPI($entity_type);
