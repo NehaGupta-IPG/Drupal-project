@@ -90,7 +90,7 @@ class UserTest extends ResourceTestBase {
 
     switch ($method) {
       case 'GET':
-        $this->grantPermissionsToTestedRole(['access user profiles', 'administer permissions']);
+        $this->grantPermissionsToTestedRole(['access user profiles']);
         break;
 
       case 'POST':
@@ -465,6 +465,7 @@ class UserTest extends ResourceTestBase {
    */
   public function testQueryInvolvingRoles(): void {
     $this->setUpAuthorization('GET');
+    $this->grantPermissionsToTestedRole(['administer permissions']);
 
     $collection_url = Url::fromRoute('jsonapi.user--user.collection', [], ['query' => ['filter[roles.id][value]' => 'e9b1de3f-9517-4c27-bef0-0301229de792']]);
     $request_options = [];
