@@ -324,6 +324,40 @@ class StandardPerformanceTest extends PerformanceTestBase {
       'StylesheetBytes' => 1800,
     ];
     $this->assertMetrics($expected, $performance_data);
+
+    // Test 404 page.
+    $performance_data = $this->collectPerformanceData(function () {
+      $this->drupalGet('abcdef');
+    }, 'standard404Page');
+    $this->assertNoJavaScript($performance_data);
+
+    $expected_queries = [
+      'SELECT "base_table"."id" AS "id", "base_table"."path" AS "path", "base_table"."alias" AS "alias", "base_table"."langcode" AS "langcode" FROM "path_alias" "base_table" WHERE ("base_table"."status" = 1) AND ("base_table"."alias" LIKE "/abcdef" ESCAPE ' . "'\\\\'" . ') AND ("base_table"."langcode" IN ("en", "und")) ORDER BY "base_table"."langcode" ASC, "base_table"."id" DESC',
+      'SELECT "name", "route", "fit" FROM "router" WHERE "pattern_outline" IN ( "/abcdef" ) AND "number_parts" >= 1',
+      'INSERT INTO "watchdog" ("uid", "type", "message", "variables", "severity", "link", "location", "referer", "hostname", "timestamp") VALUES (0, "page not found", "@uri", "WATCHDOG_DATA", 4, "", "LOCATION", "REFERER", "CLIENT_IP", "TIMESTAMP")',
+      'SELECT "base_table"."id" AS "id", "base_table"."path" AS "path", "base_table"."alias" AS "alias", "base_table"."langcode" AS "langcode" FROM "path_alias" "base_table" WHERE ("base_table"."status" = 1) AND ("base_table"."alias" LIKE "/system/404" ESCAPE ' . "'\\\\'" . ') AND ("base_table"."langcode" IN ("en", "und")) ORDER BY "base_table"."langcode" ASC, "base_table"."id" DESC',
+      'SELECT "name", "route", "fit" FROM "router" WHERE "pattern_outline" IN ( "/system/404", "/system/%", "/system" ) AND "number_parts" >= 2',
+      'SELECT "name", "route" FROM "router" WHERE "name" IN ( "<current>" )',
+      'SELECT "name", "route" FROM "router" WHERE "name" IN ( "big_pipe.nojs", "block.category_autocomplete", "block_content.add_page", "block_content.add_form", "ckeditor5.media_entity_metadata", "entity.comment.edit_form", "comment.approve", "entity.comment.canonical", "entity.comment.delete_form", "comment.reply", "block.category_autocomplete"0, "block.category_autocomplete"1, "block.category_autocomplete"2, "block.category_autocomplete"3, "block.category_autocomplete"4, "block.category_autocomplete"5, "block.category_autocomplete"6, "block.category_autocomplete"7, "block.category_autocomplete"8, "block.category_autocomplete"9, "block_content.add_page"0, "block_content.add_page"1, "block_content.add_page"2, "block_content.add_page"3, "block_content.add_page"4, "block_content.add_page"5, "block_content.add_page"6, "block_content.add_page"7, "block_content.add_page"8, "block_content.add_page"9, "block_content.add_form"0, "block_content.add_form"1, "block_content.add_form"2, "block_content.add_form"3, "block_content.add_form"4, "block_content.add_form"5, "block_content.add_form"6, "block_content.add_form"7, "block_content.add_form"8, "block_content.add_form"9, "ckeditor5.media_entity_metadata"0, "ckeditor5.media_entity_metadata"1, "ckeditor5.media_entity_metadata"2, "ckeditor5.media_entity_metadata"3, "ckeditor5.media_entity_metadata"4, "ckeditor5.media_entity_metadata"5, "ckeditor5.media_entity_metadata"6, "ckeditor5.media_entity_metadata"7, "ckeditor5.media_entity_metadata"8, "ckeditor5.media_entity_metadata"9, "entity.comment.edit_form"0, "entity.comment.edit_form"1, "entity.comment.edit_form"2, "entity.comment.edit_form"3, "entity.comment.edit_form"4, "entity.comment.edit_form"5, "entity.comment.edit_form"6, "entity.comment.edit_form"7, "entity.comment.edit_form"8, "entity.comment.edit_form"9, "comment.approve"0, "comment.approve"1, "comment.approve"2, "comment.approve"3, "comment.approve"4, "comment.approve"5, "comment.approve"6, "comment.approve"7, "comment.approve"8, "comment.approve"9, "entity.comment.canonical"0, "entity.comment.canonical"1, "entity.comment.canonical"2, "entity.comment.canonical"3, "entity.comment.canonical"4, "entity.comment.canonical"5, "entity.comment.canonical"6, "entity.comment.canonical"7, "entity.comment.canonical"8, "entity.comment.canonical"9, "entity.comment.delete_form"0, "entity.comment.delete_form"1, "entity.comment.delete_form"2, "entity.comment.delete_form"3, "entity.comment.delete_form"4, "entity.comment.delete_form"5, "entity.comment.delete_form"6, "entity.comment.delete_form"7, "entity.comment.delete_form"8, "entity.comment.delete_form"9, "comment.reply"0 )',
+      'SELECT "name", "value" FROM "key_value" WHERE "name" IN ( "theme:stark" ) AND "collection" = "config.entity.key_store.block"',
+      'SELECT "menu_tree"."menu_name" AS "menu_name", "menu_tree"."route_name" AS "route_name", "menu_tree"."route_parameters" AS "route_parameters", "menu_tree"."url" AS "url", "menu_tree"."title" AS "title", "menu_tree"."description" AS "description", "menu_tree"."parent" AS "parent", "menu_tree"."weight" AS "weight", "menu_tree"."options" AS "options", "menu_tree"."expanded" AS "expanded", "menu_tree"."enabled" AS "enabled", "menu_tree"."provider" AS "provider", "menu_tree"."metadata" AS "metadata", "menu_tree"."class" AS "class", "menu_tree"."form_class" AS "form_class", "menu_tree"."id" AS "id" FROM "menu_tree" "menu_tree" WHERE ("route_name" = "system.404") AND ("route_param_key" = "") AND ("menu_name" = "main") ORDER BY "depth" ASC, "weight" ASC, "id" ASC',
+      'SELECT "menu_tree"."menu_name" AS "menu_name", "menu_tree"."route_name" AS "route_name", "menu_tree"."route_parameters" AS "route_parameters", "menu_tree"."url" AS "url", "menu_tree"."title" AS "title", "menu_tree"."description" AS "description", "menu_tree"."parent" AS "parent", "menu_tree"."weight" AS "weight", "menu_tree"."options" AS "options", "menu_tree"."expanded" AS "expanded", "menu_tree"."enabled" AS "enabled", "menu_tree"."provider" AS "provider", "menu_tree"."metadata" AS "metadata", "menu_tree"."class" AS "class", "menu_tree"."form_class" AS "form_class", "menu_tree"."id" AS "id" FROM "menu_tree" "menu_tree" WHERE ("route_name" = "system.404") AND ("route_param_key" = "") AND ("menu_name" = "account") ORDER BY "depth" ASC, "weight" ASC, "id" ASC',
+      'INSERT INTO "semaphore" ("name", "value", "expire") VALUES ("active-trail:route:system.404:route_parameters:a:0:{}:Drupal\Core\Cache\CacheCollector", "LOCK_ID", "EXPIRE")',
+      'DELETE FROM "semaphore"  WHERE ("name" = "active-trail:route:system.404:route_parameters:a:0:{}:Drupal\Core\Cache\CacheCollector") AND ("value" = "LOCK_ID")',
+    ];
+    $recorded_queries = $performance_data->getQueries();
+    $this->assertSame($expected_queries, $recorded_queries);
+    $expected = [
+      'QueryCount' => 12,
+      'CacheGetCount' => 38,
+      'CacheSetCount' => 13,
+      'CacheDeleteCount' => 0,
+      'CacheTagInvalidationCount' => 0,
+      'CacheTagLookupQueryCount' => 11,
+      'StylesheetCount' => 1,
+      'StylesheetBytes' => 1800,
+    ];
+    $this->assertMetrics($expected, $performance_data);
   }
 
   /**
