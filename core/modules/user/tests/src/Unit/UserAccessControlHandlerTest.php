@@ -8,6 +8,7 @@ use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Cache\Context\CacheContextsManager;
 use Drupal\Core\DependencyInjection\Container;
 use Drupal\Core\Session\AccountInterface;
+use Drupal\Core\Session\AccountProxyInterface;
 use Drupal\Tests\UnitTestCase;
 use Drupal\user\UserAccessControlHandler;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -60,16 +61,16 @@ class UserAccessControlHandlerTest extends UnitTestCase {
   /**
    * A user with 'administer users' permission.
    *
-   * @var \Drupal\Core\Session\AccountInterface|\PHPUnit_Framework_MockObject_MockObject
+   * @var \Drupal\Core\Session\AccountInterface
    */
-  protected $accountWithAdminUsersPerm;
+  protected AccountInterface $accountWithAdminUsersPerm;
 
   /**
    * A user with 'administer permissions' permission.
    *
-   * @var \Drupal\Core\Session\AccountInterface|\PHPUnit_Framework_MockObject_MockObject
+   * @var \Drupal\Core\Session\AccountInterface
    */
-  protected $accountWithAdminPermsPerm;
+  protected AccountInterface $accountWithAdminPermsPerm;
 
   /**
    * The mocked test field items.
@@ -89,6 +90,7 @@ class UserAccessControlHandlerTest extends UnitTestCase {
     $cache_contexts_manager->reveal();
     $container = new Container();
     $container->set('cache_contexts_manager', $cache_contexts_manager);
+    $container->set('current_user', $this->prophesize(AccountProxyInterface::class)->reveal());
     \Drupal::setContainer($container);
 
     $this->viewer = $this->createMock('\Drupal\user\UserInterface');
@@ -117,6 +119,15 @@ class UserAccessControlHandlerTest extends UnitTestCase {
 
     $this->admin = $this->createMock('\Drupal\user\UserInterface');
     $this->admin
+      ->expects($this->any())
+      ->method('hasPermission')
+      ->willReturnMap([
+        ['administer users', TRUE],
+        ['administer permissions', FALSE],
+      ]);
+
+    $this->accountWithAdminUsersPerm = $this->createMock(AccountInterface::class);
+    $this->accountWithAdminUsersPerm
       ->expects($this->any())
       ->method('hasPermission')
       ->willReturnMap([
@@ -224,7 +235,7 @@ class UserAccessControlHandlerTest extends UnitTestCase {
       ],
       // The users-administrator user has full access.
       [
-        'viewer' => 'account_with_admin_users_perm',
+        'viewer' => 'accountWithAdminUsersPerm',
         'target' => 'owner',
         'view' => TRUE,
         'edit' => TRUE,
@@ -281,14 +292,14 @@ class UserAccessControlHandlerTest extends UnitTestCase {
       ];
       $access_info[] = [
         'field' => $field,
-        'viewer' => 'account_with_admin_users_perm',
+        'viewer' => 'accountWithAdminUsersPerm',
         'target' => 'owner',
         'view' => TRUE,
         'edit' => TRUE,
       ];
       $access_info[] = [
         'field' => $field,
-        'viewer' => 'account_with_admin_perms_perm',
+        'viewer' => 'accountWithAdminPermsPerm',
         'target' => 'owner',
         'view' => FALSE,
         'edit' => TRUE,
@@ -336,7 +347,7 @@ class UserAccessControlHandlerTest extends UnitTestCase {
       ];
       $access_info[] = [
         'field' => $field,
-        'viewer' => 'account_with_admin_users_perm',
+        'viewer' => 'accountWithAdminUsersPerm',
         'target' => 'owner',
         'view' => TRUE,
         'edit' => TRUE,
@@ -381,13 +392,13 @@ class UserAccessControlHandlerTest extends UnitTestCase {
         'edit' => TRUE,
       ],
       [
-        'viewer' => 'account_with_admin_users_perm',
+        'viewer' => 'accountWithAdminUsersPerm',
         'target' => 'owner',
         'view' => FALSE,
         'edit' => TRUE,
       ],
       [
-        'viewer' => 'account_with_admin_perms_perm',
+        'viewer' => 'accountWithAdminPermsPerm',
         'target' => 'owner',
         'view' => FALSE,
         'edit' => TRUE,
@@ -429,13 +440,13 @@ class UserAccessControlHandlerTest extends UnitTestCase {
         'edit' => FALSE,
       ],
       [
-        'viewer' => 'account_with_admin_users_perm',
+        'viewer' => 'accountWithAdminUsersPerm',
         'target' => 'owner',
         'view' => FALSE,
         'edit' => FALSE,
       ],
       [
-        'viewer' => 'account_with_admin_perms_perm',
+        'viewer' => 'accountWithAdminPermsPerm',
         'target' => 'owner',
         'view' => TRUE,
         'edit' => TRUE,
@@ -470,13 +481,13 @@ class UserAccessControlHandlerTest extends UnitTestCase {
         'edit' => FALSE,
       ],
       [
-        'viewer' => 'account_with_admin_users_perm',
+        'viewer' => 'accountWithAdminUsersPerm',
         'target' => 'owner',
         'view' => TRUE,
         'edit' => TRUE,
       ],
       [
-        'viewer' => 'account_with_admin_perms_perm',
+        'viewer' => 'accountWithAdminPermsPerm',
         'target' => 'owner',
         'view' => TRUE,
         'edit' => FALSE,
@@ -514,13 +525,13 @@ class UserAccessControlHandlerTest extends UnitTestCase {
         'edit' => TRUE,
       ],
       [
-        'viewer' => 'account_with_admin_users_perm',
+        'viewer' => 'accountWithAdminUsersPerm',
         'target' => 'owner',
         'view' => TRUE,
         'edit' => TRUE,
       ],
       [
-        'viewer' => 'account_with_admin_perms_perm',
+        'viewer' => 'accountWithAdminPermsPerm',
         'target' => 'owner',
         'view' => TRUE,
         'edit' => TRUE,
