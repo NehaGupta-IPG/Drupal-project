@@ -205,6 +205,7 @@ class JsonApiFilterRegressionTest extends JsonApiFunctionalTestBase {
     // Create a user that will be used to execute the test HTTP requests.
     $account = $this->drupalCreateUser([
       'administer users',
+      'administer permissions',
       'bypass node access',
     ]);
     $request_options = [

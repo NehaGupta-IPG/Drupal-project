@@ -46,7 +46,7 @@ class BulkFormTest extends UserTestBase {
     $user_storage = $this->container->get('entity_type.manager')->getStorage('user');
 
     // Create a user which actually can change users.
-    $this->drupalLogin($this->drupalCreateUser(['administer users']));
+    $this->drupalLogin($this->drupalCreateUser(['administer users', 'administer permissions']));
     $this->drupalGet('test-user-bulk-form');
     $this->assertNotEmpty($this->cssSelect('#edit-action option'));
 
@@ -58,6 +58,7 @@ class BulkFormTest extends UserTestBase {
     $this->submitForm($edit, 'Apply to selected items');
     $this->assertSession()->pageTextContains('No users selected.');
 
+    // Assign a role to a user.
     $account = $user_storage->load($this->users[0]->id());
     $roles = Role::loadMultiple();
     unset($roles[RoleInterface::ANONYMOUS_ID]);
@@ -115,10 +116,12 @@ class BulkFormTest extends UserTestBase {
     $this->assertTrue($anonymous_account->isBlocked(), 'Ensure the anonymous user got blocked.');
 
     // Test the list of available actions with a value that contains a dot.
-    $this->drupalLogin($this->drupalCreateUser(['administer permissions', 'administer views', 'administer users']));
-    $role_id = strtolower($this->randomMachineName());
-    Role::create(['id' => $role_id])->save();
-    $action_id = 'user_add_role_action.' . $role_id;
+    $this->drupalLogin($this->drupalCreateUser([
+      'administer permissions',
+      'administer views',
+      'administer users',
+    ]));
+    $action_id = 'user_add_role_action.' . $role;
     $edit = [
       'options[include_exclude]' => 'exclude',
       "options[selected_actions][$action_id]" => $action_id,

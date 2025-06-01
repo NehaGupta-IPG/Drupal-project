@@ -90,7 +90,7 @@ class UserTest extends ResourceTestBase {
 
     switch ($method) {
       case 'GET':
-        $this->grantPermissionsToTestedRole(['access user profiles']);
+        $this->grantPermissionsToTestedRole(['access user profiles', 'administer permissions']);
         break;
 
       case 'POST':
