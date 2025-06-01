@@ -126,7 +126,7 @@ class UserLoginHttpTest extends BrowserTestBase {
     // Create new user for each iteration to reset flood.
     // Grant the user administer users permissions to they can see the
     // 'roles' field.
-    $account = $this->drupalCreateUser(['administer users']);
+    $account = $this->drupalCreateUser(['administer users', 'administer permissions']);
     $name = $account->getAccountName();
     $pass = $account->passRaw;
 
