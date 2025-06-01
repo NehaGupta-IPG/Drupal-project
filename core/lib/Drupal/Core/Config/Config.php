@@ -4,6 +4,7 @@ namespace Drupal\Core\Config;
 
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Cache\Cache;
+use Drupal\Core\Utility\Error;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 /**
@@ -224,7 +225,7 @@ class Config extends StorableConfigBase {
     }
     catch (\Exception $e) {
       // Log and ignore exceptions caused by invalid config structures.
-      watchdog_exception('config', $e);
+      Error::logException(\Drupal::logger('config'), $e);
     }
 
     // Potentially configuration schema could have changed the underlying data's
