@@ -5,9 +5,12 @@ declare(strict_types=1);
 namespace Drupal\Tests\Core\Plugin;
 
 use Drupal\Component\Plugin\ConfigurableInterface;
+use Drupal\Component\Plugin\Exception\PluginNotFoundException;
 use Drupal\Component\Plugin\PluginBase;
+use Drupal\Component\Plugin\PluginManagerInterface;
 use Drupal\Core\Plugin\DefaultSingleLazyPluginCollection;
 use PHPUnit\Framework\MockObject\Rule\InvocationOrder;
+use Prophecy\Argument;
 
 /**
  * @coversDefaultClass \Drupal\Core\Plugin\DefaultSingleLazyPluginCollection
@@ -59,6 +62,38 @@ class DefaultSingleLazyPluginCollectionTest extends LazyPluginCollectionTestBase
     $this->assertEquals(['id' => 'apple', 'key' => 'value'], $this->defaultPluginCollection->get('apple')->getConfiguration());
     $this->assertEquals(['id' => 'banana', 'key' => 'other_value'], $this->defaultPluginCollection->getConfiguration());
     $this->assertEquals(['id' => 'banana', 'key' => 'other_value'], $this->defaultPluginCollection->get('banana')->getConfiguration());
+  }
+
+  /**
+   * @covers ::__construct
+   *
+   * @group legacy
+   */
+  public function testConstructNullId() {
+    $plugin_manager = $this->prophesize(PluginManagerInterface::class);
+    $plugin_manager->createInstance(Argument::cetera())->shouldNotBeCalled();
+
+    $this->expectDeprecation('Instantiating Drupal\Core\Plugin\DefaultSingleLazyPluginCollection with a NULL instance ID is deprecated in drupal:11.2.0 and must be a string from drupal:12.0.0. See https://www.drupal.org/node/3302915');
+    $plugin_collection = new DefaultSingleLazyPluginCollection($plugin_manager->reveal(), NULL, []);
+    $this->assertEmpty($plugin_collection->getInstanceIds());
+  }
+
+  /**
+   * @covers ::initializePlugin
+   *
+   * @group legacy
+   */
+  public function testInstantiatingNullId() {
+    $plugin_id = NULL;
+    $plugin_manager = $this->prophesize(PluginManagerInterface::class);
+    $plugin_manager->createInstance(NULL, Argument::cetera())->willThrow(new PluginNotFoundException($plugin_id, sprintf('The "%s" plugin does not exist.', $plugin_id)));
+
+    $plugin_collection = new DefaultSingleLazyPluginCollection($plugin_manager->reveal(), $plugin_id, []);
+
+    $this->expectDeprecation('Instantiating Drupal\Core\Plugin\DefaultSingleLazyPluginCollection with a NULL instance ID is deprecated in drupal:11.2.0 and must be a string from drupal:12.0.0. See https://www.drupal.org/node/3302915');
+    $this->expectException(PluginNotFoundException::class);
+    $this->expectExceptionMessage('The "" plugin does not exist.');
+    $this->assertEmpty($plugin_collection->getConfiguration());
   }
 
   /**

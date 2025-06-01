@@ -31,7 +31,7 @@ class DefaultSingleLazyPluginCollection extends LazyPluginCollection {
    *
    * @var array
    */
-  protected $configuration;
+  protected $configuration = [];
 
   /**
    * The instance ID used for this plugin collection.
@@ -52,7 +52,13 @@ class DefaultSingleLazyPluginCollection extends LazyPluginCollection {
    */
   public function __construct(PluginManagerInterface $manager, $instance_id, array $configuration) {
     $this->manager = $manager;
-    $this->addInstanceId($instance_id, $configuration);
+
+    if ($instance_id === NULL) {
+      @trigger_error('Instantiating ' . __CLASS__ . ' with a NULL instance ID is deprecated in drupal:11.2.0 and must be a string from drupal:12.0.0. See https://www.drupal.org/node/3302915', E_USER_DEPRECATED);
+    }
+    else {
+      $this->addInstanceId($instance_id, $configuration);
+    }
   }
 
   /**

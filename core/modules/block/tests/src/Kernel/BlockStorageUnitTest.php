@@ -42,6 +42,19 @@ class BlockStorageUnitTest extends KernelTestBase {
   }
 
   /**
+   * Tests creating a block without a plugin.
+   *
+   * @group legacy
+   */
+  public function testMissingPlugin() {
+    $entity = $this->controller->create([]);
+    $this->expectDeprecation('Instantiating Drupal\Core\Plugin\DefaultSingleLazyPluginCollection with a NULL instance ID is deprecated in drupal:11.2.0 and must be a string from drupal:12.0.0. See https://www.drupal.org/node/3302915');
+    $this->expectException(PluginException::class);
+    $this->expectExceptionMessage("The block '' did not specify a plugin.");
+    $entity->getPlugin();
+  }
+
+  /**
    * Tests CRUD operations.
    */
   public function testBlockCRUD(): void {
@@ -57,16 +70,6 @@ class BlockStorageUnitTest extends KernelTestBase {
    * Tests the creation of blocks.
    */
   protected function createTests(): void {
-    // Attempt to create a block without a plugin.
-    try {
-      $entity = $this->controller->create([]);
-      $entity->getPlugin();
-      $this->fail('A block without a plugin was created with no exception thrown.');
-    }
-    catch (PluginException $e) {
-      $this->assertEquals('The block \'\' did not specify a plugin.', $e->getMessage(), 'An exception was thrown when a block was created without a plugin.');
-    }
-
     // Create a block with only required values.
     $entity = $this->controller->create([
       'id' => 'test_block',
