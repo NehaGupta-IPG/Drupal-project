@@ -7,7 +7,6 @@ use Drupal\Core\Installer\InstallerRedirectTrait;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;
-use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 use Symfony\Component\HttpKernel\KernelEvents;
 
 /**
@@ -34,6 +33,15 @@ class ExceptionDetectNeedsInstallSubscriber implements EventSubscriberInterface 
   }
 
   /**
+   * {@inheritdoc}
+   */
+  protected static function getPriority(): int {
+    // Run after DefaultExceptionSubscriber so that it handles regular HTTP
+    // exceptions first.
+    return -129;
+  }
+
+  /**
    * Handles errors for this subscriber.
    *
    * @param \Symfony\Component\HttpKernel\Event\ExceptionEvent $event
@@ -41,10 +49,6 @@ class ExceptionDetectNeedsInstallSubscriber implements EventSubscriberInterface 
    */
   public function onException(ExceptionEvent $event) {
     $exception = $event->getThrowable();
-    // HTTP exceptions cannot be thrown if Drupal is not already installed.
-    if ($exception instanceof HttpExceptionInterface) {
-      return;
-    }
 
     if ($this->shouldRedirectToInstaller($exception, $this->connection)) {
       // Only redirect if this is an HTML response (i.e., a user trying to view
