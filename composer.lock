@@ -497,14 +497,14 @@
             "dist": {
                 "type": "path",
                 "url": "core",
-                "reference": "3806cfdbb344a5c7ed6e8b78534454547ccd882a"
+                "reference": "7d2d6a32cdb382310276445d271aeb3348c5d103"
             },
             "require": {
                 "asm89/stack-cors": "^2.3",
                 "composer-runtime-api": "^2.1",
                 "composer/semver": "^3.3",
                 "doctrine/annotations": "^2.0",
-                "doctrine/lexer": "^2.0",
+                "doctrine/lexer": "^2 || ^3",
                 "egulias/email-validator": "^3.2.1|^4.0",
                 "ext-date": "*",
                 "ext-dom": "*",
@@ -550,6 +550,8 @@
                 "twig/twig": "^3.21.0"
             },
             "conflict": {
+                "drupal/automatic_updates": "<4",
+                "drupal/project_browser": "<2.1",
                 "drush/drush": "<12.4.3"
             },
             "replace": {
