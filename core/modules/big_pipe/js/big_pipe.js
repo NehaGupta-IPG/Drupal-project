@@ -3,7 +3,7 @@
  * Renders BigPipe placeholders using Drupal's Ajax system.
  */
 
-((Drupal, drupalSettings, htmx) => {
+((Drupal, drupalSettings) => {
   /**
    * CSS selector for script elements to process on page load.
    *
@@ -164,4 +164,4 @@
       processMutations(mutations);
     }
   });
-})(Drupal, drupalSettings, htmx);
+})(Drupal, drupalSettings);
